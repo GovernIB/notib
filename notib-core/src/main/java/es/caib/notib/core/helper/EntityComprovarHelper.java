@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import es.caib.notib.core.api.exception.PermissionDeniedException;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.EntitatUsuariRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 
 
@@ -28,9 +27,6 @@ public class EntityComprovarHelper {
 
 	@Resource
 	private EntitatRepository entitatRepository;
-	
-	@Resource
-	private EntitatUsuariRepository entitatUsuariRepository;
 
 	@Resource
 	private PermisosHelper permisosHelper;
