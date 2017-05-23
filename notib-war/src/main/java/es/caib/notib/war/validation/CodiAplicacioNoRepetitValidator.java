@@ -47,12 +47,12 @@ public class CodiAplicacioNoRepetitValidator implements ConstraintValidator<Codi
 			final AplicacioCommand command = (AplicacioCommand) value;
 			
 			final Long id = command.getId();
-			final String codi = command.getUsuariCodi();
+			final String usuariCodi = command.getUsuariCodi();
 			
 			boolean valid = true;
 			
 			// Comprovar codi no repetit
-			AplicacioDto aplicacio = usuariAplicacioService.findByCodi(codi);
+			AplicacioDto aplicacio = usuariAplicacioService.findByUsuariCodi(usuariCodi);
 			if (aplicacio != null) {
 				if (id == null) {
 					valid = false;
