@@ -4,15 +4,10 @@
 package es.caib.notib.core.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -38,12 +33,6 @@ public class UsuariEntity implements Serializable {
 	private String email;
 	@Column(name = "inicialitzat")
 	private boolean inicialitzat = false;
-	@OneToMany(
-			mappedBy = "usuari",
-			fetch = FetchType.LAZY,
-			cascade = CascadeType.ALL,
-			orphanRemoval = true)
-	private List<EntitatUsuariEntity> entitatUsuaris = new ArrayList<EntitatUsuariEntity>();
 	@Version
 	private long version = 0;
 
@@ -61,9 +50,6 @@ public class UsuariEntity implements Serializable {
 	}
 	public boolean isInicialitzat() {
 		return inicialitzat;
-	}
-	public List<EntitatUsuariEntity> getEntitatUsuaris() {
-		return entitatUsuaris;
 	}
 
 	public void update(
