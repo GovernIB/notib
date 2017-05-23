@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans	xmlns="http://www.springframework.org/schema/beans"
+		xmlns:sec="http://www.springframework.org/schema/security"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="
+				http://www.springframework.org/schema/beans
+				http://www.springframework.org/schema/beans/spring-beans.xsd
+				http://www.springframework.org/schema/security
+				http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<sec:http create-session="never" use-expressions="true" auto-config="true" entry-point-ref="preAuthenticatedProcessingFilterEntryPoint">
+		<sec:intercept-url pattern="/error" access="isAnonymous()"/>
+		<!--sec:intercept-url pattern="/ws/adviserWS*" access="isAnonymous()"/>
+		<sec:intercept-url pattern="/notificacio*" access="isAnonymous()"/>
+		<sec:intercept-url pattern="/v2/api-docs*" access="isAnonymous()"/>
+		<sec:intercept-url pattern="/swagger*" access="isAnonymous()"/-->
+		<sec:intercept-url pattern="/notificacio/rest*" access="hasRole('NOT_APL')"/>
+		<sec:intercept-url pattern="/test/rest*" access="hasRole('NOT_APL')"/>
+		<sec:intercept-url pattern="/entitat*" access="hasRole('NOT_ADMIN') or hasRole('NOT_REP')"/>
+		<sec:intercept-url pattern="/permis*" access="hasRole('NOT_ADMIN') or hasRole('NOT_REP')"/>
+		<sec:intercept-url pattern="/*" access="hasRole('NOT_ADMIN') or hasRole('NOT_REP') or hasRole('NOT_APL')"/>
+ 		<!-- <sec:intercept-url pattern="/*" access="isAnonymous()"/> -->
+		<sec:custom-filter position="PRE_AUTH_FILTER" ref="preauthFilter"/>
+		<sec:anonymous/>
+		<sec:session-management session-fixation-protection="none"/>
+		<sec:headers>
+			<sec:frame-options policy="SAMEORIGIN"/>
+		</sec:headers>
+	</sec:http>
+
+	<sec:authentication-manager alias="authenticationManager">
+		<sec:authentication-provider ref="preAuthenticatedAuthenticationProvider"/>
+	</sec:authentication-manager>
+
+	<bean id="preAuthenticatedProcessingFilterEntryPoint" class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint" />
+	<bean id="preAuthenticatedAuthenticationProvider" class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+		<property name="preAuthenticatedUserDetailsService">
+			<bean class="org.springframework.security.web.authentication.preauth.PreAuthenticatedGrantedAuthoritiesUserDetailsService" />
+		</property>
+	</bean>
+
+	<bean id="preauthFilter" class="org.springframework.security.web.authentication.preauth.j2ee.J2eePreAuthenticatedProcessingFilter">
+		<property name="authenticationDetailsSource">
+			<bean class="es.caib.notib.war.security.RolesBasedPreAuthenticatedWebAuthenticationDetailsSource">
+				<property name="mappableRolesRetriever">
+					<bean class="es.caib.notib.war.security.RolesBasedMappableAttributesRetriever">
+						<property name="defaultMappableAttributes">
+							<set>
+								<value>NOT_ADMIN</value>
+								<value>NOT_REP</value>
+								<value>NOT_APL</value>
+							</set>
+						</property>
+					</bean>
+				</property>
+				<property name="userRoles2GrantedAuthoritiesMapper">
+					<bean class="es.caib.notib.war.security.RolesBasedAttributes2GrantedAuthoritiesMapper"/>
+				</property>
+			</bean>
+		</property>
+		<property name="authenticationManager" ref="authenticationManager"/>
+	</bean>
+
+	<bean class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler"/>
+	<bean class="es.caib.notib.war.security.DefaultRolesPrefixPostProcessor"/>
+
+</beans>

@@ -1,0 +1,27 @@
+/**
+ * 
+ */
+package es.caib.notib.core.api.service.rest;
+
+import java.io.Serializable;
+
+public enum NotificaEstat implements Serializable {
+
+	AUSENTE,
+	DESCONOCIDO,
+	DIRECCION_INCORRECTA,
+	EDITANDO,
+	ENVIADO_CENTRO_IMPRESION,
+	ENVIADO_DEH,
+	LEIDA,
+	ERROR_EN_ENVIO,
+	EXTRAVIADA,
+	FALLECIDO,
+	NOTIFICADA,
+	PENDIENT_ENVIO,
+	PENDIENTE_COMPARECENCIA,
+	REHUSADA,
+	FECHA_ENVIO_PROGRAMADO,
+	SIN_INFORMACION
+
+}
