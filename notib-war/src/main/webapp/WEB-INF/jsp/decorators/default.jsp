@@ -84,7 +84,7 @@ body {
 				<div class="nav navbar-nav navbar-right">
 					<ul class="list-inline pull-right">
 					
-						<c:if test="${hiHaEntitats}">
+						<c:if test="${hiHaEntitats && isRolActualRepresentant}">
 							<li class="dropdown">
 								<c:if test="${hiHaMesEntitats}"><a href="#" data-toggle="dropdown"></c:if>
 		         				<span class="fa fa-home"></span> ${entitatActual.nom} <c:if test="${hiHaMesEntitats}"><b class="caret caret-white"></b></c:if>
@@ -94,24 +94,10 @@ body {
 										<c:forEach var="entitat" items="${sessionEntitats}" varStatus="status">
 											<c:if test="${entitat.id != entitatActual.id}">
 											
-												<c:if test="${enConsulta}">
-													<c:url var="urlCanviEntitat" value="/consulta">
-														<c:param name="${requestParameterCanviEntitat}" value="${entitat.id}"/>
-													</c:url>
-													<li><a href="${urlCanviEntitat}">${entitat.nom}</a></li>
-												</c:if>
-												<c:if test="${enEntitat}">
-													<c:url var="urlCanviEntitat" value="/entitats">
-														<c:param name="${requestParameterCanviEntitat}" value="${entitat.id}"/>
-													</c:url>
-													<li><a href="${urlCanviEntitat}">${entitat.nom}</a></li>
-												</c:if>
-												<c:if test="${!enConsulta && !enEntitat}">
-													<c:url var="urlCanviEntitat" value="/index">
-														<c:param name="${requestParameterCanviEntitat}" value="${entitat.id}"/>
-													</c:url>
-													<li><a href="${urlCanviEntitat}">${entitat.nom}</a></li>
-												</c:if>
+												<c:url var="urlCanviEntitat" value="/index">
+													<c:param name="${requestParameterCanviEntitat}" value="${entitat.id}"/>
+												</c:url>
+												<li><a href="${urlCanviEntitat}">${entitat.nom}</a></li>
 												
 											</c:if>
 										</c:forEach>
@@ -132,24 +118,10 @@ body {
 										<c:forEach var="rol" items="${rolsUsuariActual}">
 											<c:if test="${rol != rolActual}">
 												<li>
-													<c:if test="${enConsulta}">
-														<c:url var="canviRolUrl" value="/consulta">
-															<c:param name="${requestParameterCanviRol}" value="${rol}"/>
-														</c:url>
-														<a href="${canviRolUrl}"><spring:message code="decorator.menu.rol.${rol}"/></a>
-													</c:if>
-													<c:if test="${enEntitat}">
-														<c:url var="canviRolUrl" value="/entitats">
-															<c:param name="${requestParameterCanviRol}" value="${rol}"/>
-														</c:url>
-														<a href="${canviRolUrl}"><spring:message code="decorator.menu.rol.${rol}"/></a>
-													</c:if>
-													<c:if test="${!enConsulta && !enEntitat}">
-														<c:url var="canviRolUrl" value="/index">
-															<c:param name="${requestParameterCanviRol}" value="${rol}"/>
-														</c:url>
-														<a href="${canviRolUrl}"><spring:message code="decorator.menu.rol.${rol}"/></a>
-													</c:if>
+													<c:url var="canviRolUrl" value="/index">
+														<c:param name="${requestParameterCanviRol}" value="${rol}"/>
+													</c:url>
+													<a href="${canviRolUrl}"><spring:message code="decorator.menu.rol.${rol}"/></a>
 												</li>
 											</c:if>
 										</c:forEach>
@@ -174,13 +146,18 @@ body {
 					<div class="btn-group navbar-btn navbar-right">
 						<a href="<c:url value="/notificacions"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
 						<div class="btn-group">
+							<c:if test="${isRolActualAdministrador}">
 							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="<c:url value="/entitats"/>"><spring:message code="decorator.menu.entitats"/></a></li>
-								<c:if test="${isRolActualAdministrador}">
-									<li><a href="<c:url value="/aplicacions"/>"><spring:message code="decorator.menu.aplicacions"/></a></li>
-								</c:if>
+								
+								<li><a href="<c:url value="/aplicacions"/>"><spring:message code="decorator.menu.aplicacions"/></a></li>
 							</ul>
+							</c:if>
+							
+							<c:if test="${isRolActualRepresentant}">
+								<a href="<c:url value="/entitats/${entitatActual.id}/permis/entitatactual"/>" class="btn btn-primary"><spring:message code="decorator.menu.permisos"/></a>
+							</c:if>
 						</div>
 						<%-- <c:choose> --%>
 							<%-- <c:when test="${isRolActualAdministrador}"> --%>

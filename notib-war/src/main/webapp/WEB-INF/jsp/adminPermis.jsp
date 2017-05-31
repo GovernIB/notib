@@ -3,6 +3,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%
+	pageContext.setAttribute(
+			"isRolActualAdministrador",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
+%>
 <html>
 <head>
 	<title><spring:message code="permis.list.titol"/></title>
@@ -63,9 +68,11 @@
 		</thead>
 	</table>
 	
+	<c:if test="${isRolActualAdministrador}">
 	<div class="text-right" >
 		<a class="btn btn-default" href="<c:url value="/entitats/"/>" data-datatable-id="permisos"><span class="fa fa-reply"></span>&nbsp;<spring:message code="usuari.list.boto.tornar.enrere"/></a>
 	</div>
+	</c:if>
 	
 </body>
 </html>

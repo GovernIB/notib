@@ -22,7 +22,6 @@ import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.war.command.PermisCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.notib.war.helper.SessioHelper;
 
 /**
  * Controlador per al manteniment d'entitats.
@@ -43,7 +42,20 @@ public class PermisController extends BaseController {
 			@PathVariable Long entitatId,
 			Model model) {
 		
-		SessioHelper.setEnEntitat( request );
+		model.addAttribute(
+				"entitat", 
+				entitatService.findById(entitatId)
+				);
+		
+		return "adminPermis";
+		
+	}
+	
+	@RequestMapping(value="/entitatactual", method = RequestMethod.GET)
+	public String getPermisActual(
+			HttpServletRequest request,
+			@PathVariable Long entitatId,
+			Model model) {
 		
 		model.addAttribute(
 				"entitat", 
@@ -72,8 +84,6 @@ public class PermisController extends BaseController {
 			HttpServletRequest request,
 			@PathVariable Long entitatId,
 			Model model) {
-	
-		SessioHelper.setEnEntitat( request ); 
 		
 		model.addAttribute( new PermisCommand() );
 		
@@ -87,8 +97,6 @@ public class PermisController extends BaseController {
 			@PathVariable Long entitatId,
 			@PathVariable Long permisId,
 			Model model) {
-		
-		SessioHelper.setEnEntitat( request );
 		
 		List<PermisDto> permisos = null;
 		permisos = entitatService.findPermis(entitatId);

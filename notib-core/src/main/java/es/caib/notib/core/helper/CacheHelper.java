@@ -9,10 +9,10 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -66,6 +66,7 @@ public class CacheHelper {
 				new Permission[] {
 					ExtendedPermission.REPRESENTANT},
 				auth);
+		
 		List<EntitatDto> resposta = conversioTipusHelper.convertirList(
 				entitats,
 				EntitatDto.class);
@@ -98,9 +99,6 @@ public class CacheHelper {
 //		}
 //		
 //		return result;
-	}
-	@CacheEvict(value = "entitatsUsuari", key="#usuariCodi")
-	public void evictEntitatsAccessiblesUsuari(String usuariCodi) {
 	}
 
 	@Cacheable(value = "usuariAmbCodi", key="#usuariCodi")

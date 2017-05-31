@@ -140,8 +140,8 @@
 	<script id="botonsTemplate" type="text/x-jsrender"></script>
 	
 	
-	<div class="text-right">
-		<a href="<c:url value="/consulta"/>" class="btn btn-default" data-modal-cancel="true"> <span class="fa fa-reply"></span>&nbsp;<spring:message code="comu.boto.tornar"/> </a>
+	<div id="modal-botons" class="text-right">
+		<a href="<c:url value="/notificacions"/>" class="btn btn-default" data-modal-cancel="true"> <span class="fa fa-reply"></span>&nbsp;<spring:message code="comu.boto.tornar"/> </a>
 	</div>
 		
 </body>

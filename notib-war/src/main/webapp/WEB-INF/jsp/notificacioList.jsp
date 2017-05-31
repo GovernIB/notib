@@ -89,14 +89,15 @@
 					$table = $table + '<div class="dropdown">';
 					$table = $table + '<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>';
 					$table = $table + '<ul class="dropdown-menu">';
-					$table = $table + '<li><a href="<c:url value="/consulta/' + rowData.id + '/destinatari/' + data[i].id + '/info"/>" data-toggle="modal"><span class="fa fa-search"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>';
-					$table = $table + '<li><a href="<c:url value="/consulta/' + rowData.id + '/destinatari/' + data[i].id + '/llistaevents"/>" data-toggle="modal"><span class="fa fa-calendar-check-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.destinatari.list.boto.events"/></a></li>';
+					$table = $table + '<li><a href="<c:url value="/notificacions/' + rowData.id + '/destinatari/' + data[i].id + '/info"/>" data-toggle="modal"><span class="fa fa-search"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>';
+					$table = $table + '<li><a href="<c:url value="/notificacions/' + rowData.id + '/destinatari/' + data[i].id + '/llistaevents"/>" data-toggle="modal"><span class="fa fa-calendar-check-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.destinatari.list.boto.events"/></a></li>';
 					$table = $table + '</ul>';
 					$table = $table + '</div>';
 					$table = $table + '</td>';
 					$table = $table + '</tr>';
 				}
 				$('table tbody', td).append($table);
+				$('table tbody td').webutilModalEval();
 			});
 		});
 		$('#btnNetejar').click(function() {
