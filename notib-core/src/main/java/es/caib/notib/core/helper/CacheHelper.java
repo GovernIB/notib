@@ -9,13 +9,18 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 
 /**
@@ -47,13 +52,53 @@ public class CacheHelper {
 	public List<EntitatDto> findEntitatsAccessiblesUsuari(
 			String usuariCodi) {
 		logger.debug("Consulta entitats accessibles (usuariCodi=" + usuariCodi + ")");
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<EntitatEntity> entitats = entitatRepository.findByActiva(true);
-		return conversioTipusHelper.convertirList(
+		permisosHelper.filterGrantedAny(
+				entitats,
+				new ObjectIdentifierExtractor<EntitatEntity>() {
+					public Long getObjectIdentifier(EntitatEntity entitat) {
+						return entitat.getId();
+					}
+				},
+				EntitatEntity.class,
+				new Permission[] {
+					ExtendedPermission.REPRESENTANT},
+				auth);
+		
+		List<EntitatDto> resposta = conversioTipusHelper.convertirList(
 				entitats,
 				EntitatDto.class);
-	}
-	@CacheEvict(value = "entitatsUsuari", key="#usuariCodi")
-	public void evictEntitatsAccessiblesUsuari(String usuariCodi) {
+		
+		for(EntitatDto dto : resposta) dto.setUsuariActualRepresentant(true);
+		
+		return resposta;
+		
+//		usuarisEntitatHelper.omplirUsuarisPerEntitats(
+//				resposta,
+//				false);
+		
+		//////////////////////////////////////////////////////////////////
+		
+//		List<EntitatDto> entitats = conversioTipusHelper.convertirList(
+//				entitatRepository.findAll(),
+//				EntitatDto.class );
+//		
+//		List<EntitatDto> result = new ArrayList<>();
+//		for(EntitatDto e : entitats) {
+//			List<PermisDto> permisos = permisosHelper.findPermisos(
+//					e.getId(),
+//					EntitatEntity.class);
+//			for(PermisDto p : permisos) {
+//				if(p.getNom().equals(usuariCodi)) {
+//					e.setUsuariActualRepresentant(p.isRepresentant());
+//					result.add(e);
+//				}
+//			}
+//		}
+//		
+//		return result;
 	}
 
 	@Cacheable(value = "usuariAmbCodi", key="#usuariCodi")

@@ -33,13 +33,21 @@
 	
 	<link href="<c:url value="/css/notificacio.css"/>" rel="stylesheet" type="text/css">
 	
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$('#events').on( 'draw.dt', function () {
+				webutilModalAdjustHeight();
+			} );
+		});
+	</script>
+	
 </head>
 <body>
 		
 	<table
 		id="events"
 		data-toggle="datatable"
-		data-url="<c:url value="/consulta/${notificacioId}/destinatari/${destinatariId}/events"/>"
+		data-url="<c:url value="/notificacions/${notificacioId}/destinatari/${destinatariId}/events"/>"
 		data-search-enabled="false"
 		data-default-order="2"
 		data-default-dir="asc"
@@ -68,8 +76,8 @@
 		
 	</table>
 	
-	<div class="text-right" >
-		<a href="<c:url value="/consulta"/>" class="btn btn-default" data-modal-cancel="true"> <span class="fa fa-reply"></span>&nbsp;<spring:message code="comu.boto.tornar"/> </a>
+	<div id="modal-botons" class="text-right" >
+		<a href="<c:url value="/notificacions"/>" class="btn btn-default" data-modal-cancel="true"> <span class="fa fa-reply"></span>&nbsp;<spring:message code="comu.boto.tornar"/> </a>
 	</div>
 	
 	<script id="botonsTemplate" type="text/x-jsrender"></script> 

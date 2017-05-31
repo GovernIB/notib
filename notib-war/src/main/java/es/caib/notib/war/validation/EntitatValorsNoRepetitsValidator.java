@@ -60,7 +60,7 @@ public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<Ent
 				if (id == null) {
 					valid = false;
 				} else {
-					valid = id.equals(entitat.getId().toString());
+					valid = id.equals(entitat.getId());
 				}
 				if (!valid) {
 					context.disableDefaultConstraintViolation();
@@ -73,7 +73,7 @@ public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<Ent
 				if (id == null) {
 					valid = false;
 				} else {
-					valid = id.equals(entitat.getId().toString());
+					valid = id.equals(entitat.getId());
 				}
 				if (!valid) {
 					context.disableDefaultConstraintViolation();
@@ -86,7 +86,7 @@ public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<Ent
 				if (id == null) {
 					valid = false;
 				} else {
-					valid = id.equals(entitat.getId().toString());
+					valid = id.equals(entitat.getId());
 				}
 				if (!valid) {
 					context.disableDefaultConstraintViolation();
