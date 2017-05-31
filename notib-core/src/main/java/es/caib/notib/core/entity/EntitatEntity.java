@@ -43,7 +43,6 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	private boolean activa = true;
 	@Version
 	private long version = 0;
-	
 
 	public String getCodi() {
 		return codi;

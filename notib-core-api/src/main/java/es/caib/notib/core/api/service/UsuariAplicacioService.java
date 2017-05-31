@@ -78,7 +78,7 @@ public interface UsuariAplicacioService {
 	 * @return L'aplicació amb el codi assenyalat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public AplicacioDto findByCodi(String aplicacioCodi);
+	public AplicacioDto findByUsuariCodi(String usuariCodi);
 	
 	/**
 	 * Llistat amb totes les aplicacions paginades.

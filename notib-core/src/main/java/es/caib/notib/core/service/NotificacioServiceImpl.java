@@ -68,43 +68,32 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	@Override
 	public NotificacioDto findById(Long id) {
-		
-		logger.debug("Consulta de la notificacio (id=" + id + ")");
-		
+		logger.debug("Consulta de la notificacio amb id (id=" + id + ")");
 		NotificacioEntity dto = notificacioRepository.findOne(id);
-		
 		entityComprovarHelper.comprovarPermisos(
 				dto.getEntitat().getId(),
 				true,
-				true );
-		
+				true);
 		return  conversioTipusHelper.convertir(
 				dto,
-				NotificacioDto.class );
+				NotificacioDto.class);
 	}
-	
-	
+
 	@Transactional
 	@Override
 	public PaginaDto<NotificacioDto> findFilteredByEntitatAndUsuari(
 			NotificacioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams
-			) {
-		
+			PaginacioParamsDto paginacioParams) {
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
-				false );
-		
+				false);
 		Page<NotificacioEntity> notificacions;
-		
-		if(filtre == null)
+		if (filtre == null) {
 			notificacions = notificacioRepository.findAll(
 					paginacioHelper.toSpringDataPageable(paginacioParams));
-		else
-		{
+		} else {
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
-		
 			notificacions = notificacioRepository.findFilteredByEntitatId(
 							filtre.getConcepte(),
 							filtre.getDataInici(),
@@ -113,72 +102,50 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getDestinatari(),
 							filtre.getEntitatId() == null,
 							filtre.getEntitatId(),
-							pageable
-							);
+							pageable);
 		}
-		
-//		return conversioTipusHelper.convertirList( notificacions, NotificacioDto.class);
 		return paginacioHelper.toPaginaDto(
 				notificacions,
-				NotificacioDto.class
-				);
+				NotificacioDto.class);
 	}
-	
+
 	@Transactional
 	@Override
 	public PaginaDto<NotificacioDto> findByEntitat(
 			Long entitatId,
 			NotificacioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams
-			) {
-		
+			PaginacioParamsDto paginacioParams) {
 		entityComprovarHelper.comprovarPermisos(
 				entitatId,
 				false,
-				true );
-		
+				true);
 		PaginaDto<NotificacioDto> notificacions;
-		
-		if(filtre == null)
+		if (filtre == null) {
 			notificacions = paginacioHelper.toPaginaDto(
 					notificacioRepository.findByEntitatId(
 							entitatId,
-							paginacioHelper.toSpringDataPageable(paginacioParams)
-							),
-					NotificacioDto.class
-					);
-		else
+							paginacioHelper.toSpringDataPageable(paginacioParams)),
+					NotificacioDto.class);
+		} else {
 			notificacions = paginacioHelper.toPaginaDto(
 					notificacioRepository.findFilteredByEntitat(
 							entitatId,
-//							filtre.getTitolEnviament(),
-//							filtre.getEstat(),
-//							filtre.getTipusEnviament(),
-//							filtre.getProcediment(),
-//							filtre.getDestinatariNom(),
-//							filtre.getDataInici(),
-//							filtre.getDataFi(),
-							paginacioHelper.toSpringDataPageable(paginacioParams)
-							),
-					NotificacioDto.class
-					);
-		
-//		return conversioTipusHelper.convertirList( notificacions, NotificacioDto.class );
+							paginacioHelper.toSpringDataPageable(paginacioParams)),
+					NotificacioDto.class);
+		}
 		return notificacions;
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public PaginaDto<NotificacioDestinatariDto> findDestinatarisByNotificacioId(
 			Long notificacioId,
 			PaginacioParamsDto paginacioParams ) {
-		
 		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
 		entityComprovarHelper.comprovarPermisos(
 				notificacio.getEntitat().getId(),
 				true,
 				true);
-		
 		return paginacioHelper.toPaginaDto( 
 				notificacioDestinatariRepository.findByNotificacioId(
 					notificacioId,
@@ -186,95 +153,79 @@ public class NotificacioServiceImpl implements NotificacioService {
 					),
 				NotificacioDestinatariDto.class);
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<NotificacioDestinatariDto> findDestinatarisByNotificacioId(
-			Long notificacioId ) {
-		
-		
+			Long notificacioId) {
 		entityComprovarHelper.comprovarPermisos(
 				notificacioId,
 				true,
 				true);
-		
 		return conversioTipusHelper.convertirList( 
 				notificacioDestinatariRepository.findByNotificacioId(notificacioId),
 				NotificacioDestinatariDto.class);
-		
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<NotificacioEventDto> findEventsByNotificacioId(
-			Long notificacioId ) {
+			Long notificacioId) {
 		logger.debug("Anam a cercar els events de la notificació amb ID=" + notificacioId);
-		
 		entityComprovarHelper.comprovarPermisos(
 				notificacioId,
 				true,
 				true);
-		
 		return conversioTipusHelper.convertirList(
 				notificacioEventRepository.findByNotificacioId(notificacioId),
 				NotificacioEventDto.class);
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<NotificacioEventDto> findEventsByDestinatariId(
 			Long destinatariId ) {
-		
 		logger.debug("Anam a cercar els events del destinatari amb ID=" + destinatariId);
-		
 		NotificacioDestinatariEntity destinatari = notificacioDestinatariRepository.findOne(destinatariId);
 		entityComprovarHelper.comprovarPermisos(
 				destinatari.getNotificacio().getId(),
 				true,
 				true);
-		
 		return conversioTipusHelper.convertirList(
 				notificacioEventRepository.findByNotificacioDestinatariId(destinatariId),
 				NotificacioEventDto.class);
-		
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public NotificacioDestinatariDto findDestinatariById(Long destinatariId) {
-		
 		NotificacioDestinatariEntity destinatari =
 				notificacioDestinatariRepository.findOne(destinatariId);
-		
 		NotificacioEntity notificacio = notificacioRepository.findOne( destinatari.getNotificacio().getId() );
 		entityComprovarHelper.comprovarPermisos(
 				notificacio.getEntitat().getId(),
 				true,
 				true);
-		
 		return conversioTipusHelper.convertir(
 				destinatari,
 				NotificacioDestinatariDto.class);
-	}
-	
-	@Override
-	@Transactional(readOnly = true)
-	public NotificacioDestinatariDto findDestinatariByReferencia(String referencia) {
-		
-		NotificacioDestinatariEntity destinatari =
-				notificacioDestinatariRepository.findByReferencia(referencia);
-		
-		NotificacioEntity notificacio = notificacioRepository.findOne( destinatari.getNotificacio().getId() );
-		entityComprovarHelper.comprovarPermisosAplicacio(
-				notificacio.getEntitat().getId() );
-		
-		return conversioTipusHelper.convertir(
-				destinatari,
-				NotificacioDestinatariDto.class);
-		
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	public NotificacioDestinatariDto findDestinatariByReferencia(String referencia) {
+		NotificacioDestinatariEntity destinatari =
+				notificacioDestinatariRepository.findByReferencia(referencia);
+		NotificacioEntity notificacio = notificacioRepository.findOne( destinatari.getNotificacio().getId() );
+		entityComprovarHelper.comprovarPermisosAplicacio(
+				notificacio.getEntitat().getId() );
+		return conversioTipusHelper.convertir(
+				destinatari,
+				NotificacioDestinatariDto.class);
+	}
+
+	@Override
+	@Transactional
 	@Scheduled(fixedRateString = "${config:es.caib.notib.tasca.seu.enviaments.periode}")
 	public void seuEnviamentsPendents() {
 		logger.debug("Cercant notificacions pendents d'enviar a la seu electrònica");
@@ -294,6 +245,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 	@Override
+	@Transactional
 	@Scheduled(fixedRateString = "${config:es.caib.notib.tasca.seu.justificants.periode}")
 	public void seuJustificantsPendents() {
 		logger.debug("Cercant notificacions pendents de consulta d'estat a la seu electrònica");
@@ -317,6 +269,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 	@Override
+	@Transactional
 	@Scheduled(fixedRateString = "${config:es.caib.notib.tasca.seu.notifica.estat.periode}")
 	public void seuNotificaComunicarEstatPendents() {
 		logger.debug("Cercant notificacions provinents de la seu pendents d'actualització d'estat a Notifica");
@@ -338,6 +291,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 
+
 	private int getSeuEnviamentsProcessarMaxProperty() {
 		return propertiesHelper.getAsInt(
 				"es.caib.notib.tasca.seu.enviaments.processar.max",
@@ -355,6 +309,5 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceImpl.class);
-
 
 }

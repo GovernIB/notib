@@ -29,12 +29,6 @@
 	pageContext.setAttribute(
 			"requestParameterCanviRol",
 			es.caib.notib.war.helper.RolHelper.getRequestParameterCanviRol());
-	pageContext.setAttribute(
-			"enConsulta",
-			es.caib.notib.war.helper.SessioHelper.esEnConsulta(request));
-	pageContext.setAttribute(
-			"enEntitat",
-			es.caib.notib.war.helper.SessioHelper.esEnEntitat(request));
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
 <c:set var="hiHaMesEntitats" value="${fn:length(sessionEntitats) > 1}"/>
@@ -180,7 +174,7 @@ body {
 					<div class="btn-group navbar-btn navbar-right">
 						<a href="<c:url value="/notificacions"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
 						<div class="btn-group">
-							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.accions"/>&nbsp;<span class="caret caret-white"></span></button>
+							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="<c:url value="/entitats"/>"><spring:message code="decorator.menu.entitats"/></a></li>
 								<c:if test="${isRolActualAdministrador}">

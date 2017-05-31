@@ -127,16 +127,16 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 	
 	@Override
 	@Transactional(readOnly = true)
-	public AplicacioDto findByCodi(String aplicacioCodi) {
+	public AplicacioDto findByUsuariCodi(String usuariCodi) {
 
-		logger.debug("Consulta una aplicació amb codi = " + aplicacioCodi);
+		logger.debug("Consulta una aplicació amb codi = " + usuariCodi);
 		
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
 				false );
 		
-		AplicacioEntity entity = aplicacioRepository.findByUsuariCodi(aplicacioCodi);
+		AplicacioEntity entity = aplicacioRepository.findByUsuariCodi(usuariCodi);
 		
 		return conversioTipusHelper.convertir(
 				entity,

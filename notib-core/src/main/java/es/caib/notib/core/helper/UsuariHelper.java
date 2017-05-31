@@ -17,7 +17,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.repository.EntitatRepository;
@@ -43,31 +42,8 @@ public class UsuariHelper {
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
 
-	public UsuariDto toUsuariDto(UsuariEntity usuari) {
-		UsuariDto udto = new UsuariDto();
-		udto.setCodi( usuari.getCodi() );
-		udto.setNom( usuari.getNom() );
-		udto.setEmail( usuari.getEmail() );
-		return udto;
-	}
 
-//	public List<UsuariDto> findUsuaris(Long objectIdentifier, Class<?> objectClass) {
-//		/**
-//		Acl acl = null;
-//		try {
-//			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
-//			acl = aclService.readAclById(oid);
-//		} catch (NotFoundException nfex) {
-//			return new ArrayList<PermisDto>();
-//		}
-//		return findPermisosPerAcl(acl);
-//		*/
-//		List<UsuariDto> usuaris = conversioTipusHelper.convertirList(
-//				usuariRepository.findByEntitatUsuarisEntitatId(objectIdentifier),
-//				UsuariDto.class);
-//		return usuaris;
-//	}
-	
+
 	public Authentication generarUsuariAutenticatEjb(
 			SessionContext sessionContext,
 			boolean establirComAUsuariActual) {

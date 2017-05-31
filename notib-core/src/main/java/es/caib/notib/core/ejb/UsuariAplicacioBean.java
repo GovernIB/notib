@@ -59,9 +59,9 @@ public class UsuariAplicacioBean implements UsuariAplicacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
-	public AplicacioDto findByCodi(
-			String aplicacioCodi) {
-		return delegate.findByCodi(aplicacioCodi);
+	public AplicacioDto findByUsuariCodi(
+			String usuariCodi) {
+		return delegate.findByUsuariCodi(usuariCodi);
 	}
 
 	@Override

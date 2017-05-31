@@ -38,7 +38,7 @@
 		$(document).ready(function(){
 		    
     		$('#callPDF').click(function(e) {  
-    			 $.get("<c:url value="/consulta/showpdf/${notificacioId}"/>");
+    			 $.get("<c:url value="/consulta/showpdf/${notificacio.id}"/>");
     		});
 			
 		});
