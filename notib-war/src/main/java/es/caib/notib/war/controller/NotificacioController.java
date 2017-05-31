@@ -34,7 +34,6 @@ import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EntitatHelper;
 import es.caib.notib.war.helper.RolHelper;
-import es.caib.notib.war.helper.SessioHelper;
 
 /**
  * Controlador per a la consulta i gestió de notificacions.
@@ -56,7 +55,7 @@ public class NotificacioController extends BaseController {
 	public String get(
 			HttpServletRequest request,
 			Model model) {
-		SessioHelper.setEnConsulta( request );
+		
 		model.addAttribute( new NotificacioFiltreCommand() );
 		if( RolHelper.isUsuariActualAdministrador(request) ) {
 			model.addAttribute( "entitat", entitatService.findAll() );
@@ -101,7 +100,7 @@ public class NotificacioController extends BaseController {
 			HttpServletRequest request,
 			Model model,
 			@PathVariable Long notificacioId) {
-		SessioHelper.setEnConsulta(request);
+		
 		model.addAttribute(notificacioService.findById(notificacioId));
 		return "notificacioForm";
 	}

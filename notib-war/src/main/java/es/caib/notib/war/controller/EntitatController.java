@@ -22,7 +22,6 @@ import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EntitatHelper;
 import es.caib.notib.war.helper.RolHelper;
-import es.caib.notib.war.helper.SessioHelper;
 
 /**
  * Controlador per al manteniment d'entitats.
@@ -39,8 +38,6 @@ public class EntitatController extends BaseController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get( HttpServletRequest request ) {
-		
-		SessioHelper.setEnEntitat( request );
 		
 		return "entitatList";
 	}
@@ -81,8 +78,6 @@ public class EntitatController extends BaseController {
 			HttpServletRequest request,
 			@PathVariable Long entitatId,
 			Model model) {
-		
-		SessioHelper.setEnEntitat( request );
 		
 		EntitatDto entitat = null;
 		if (entitatId != null)

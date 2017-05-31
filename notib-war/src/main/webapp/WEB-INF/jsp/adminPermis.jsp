@@ -3,6 +3,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%
+	pageContext.setAttribute(
+			"isRolActualAdministrador",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
+%>
 <html>
 <head>
 	<title><spring:message code="permis.list.titol"/></title>
@@ -53,8 +58,8 @@
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="<c:url value="/entitat/${entitatId}/permis/{{:id}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								<li><a href="<c:url value="/entitat/${entitatId}/permis/{{:id}}/delete"/>" data-confirm="<spring:message code="entitat.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								<li><a href="<c:url value="/entitats/${entitatId}/permis/{{:id}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								<li><a href="<c:url value="/entitats/${entitatId}/permis/{{:id}}/delete"/>" data-confirm="<spring:message code="entitat.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
 						</div>
 					</script>
@@ -63,9 +68,11 @@
 		</thead>
 	</table>
 	
+	<c:if test="${isRolActualAdministrador}">
 	<div class="text-right" >
 		<a class="btn btn-default" href="<c:url value="/entitats/"/>" data-datatable-id="permisos"><span class="fa fa-reply"></span>&nbsp;<spring:message code="usuari.list.boto.tornar.enrere"/></a>
 	</div>
+	</c:if>
 	
 </body>
 </html>

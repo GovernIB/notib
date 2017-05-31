@@ -35,6 +35,7 @@ public class UsuariEntity implements Serializable {
 	private boolean inicialitzat = false;
 	@Version
 	private long version = 0;
+	
 
 	public String getCodi() {
 		return codi;

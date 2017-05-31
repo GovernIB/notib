@@ -21,7 +21,6 @@ import es.caib.notib.core.api.service.UsuariAplicacioService;
 import es.caib.notib.war.command.AplicacioCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.notib.war.helper.SessioHelper;
 
 /**
  * Controlador per al manteniment d'entitats.
@@ -40,8 +39,6 @@ public class AplicacioController extends BaseController {
 	public String get(
 			HttpServletRequest request,
 			Model model) {
-		
-		SessioHelper.setEnEntitat( request );
 		
 		return "aplicacioList";
 		

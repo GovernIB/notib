@@ -32,6 +32,7 @@
 	<script src="<c:url value="/js/datepicker-locales/bootstrap-datepicker.${idioma}.js"/>"></script>
 	
 	<link href="<c:url value="/css/notificacio.css"/>" rel="stylesheet" type="text/css">
+	
 	<script type="text/javascript">
 		$(document).ready(function(){
 			$('#events').on( 'draw.dt', function () {
@@ -39,6 +40,7 @@
 			} );
 		});
 	</script>
+	
 </head>
 <body>
 		
@@ -75,7 +77,7 @@
 	</table>
 	
 	<div id="modal-botons" class="text-right" >
-		<a href="<c:url value="/consulta"/>" class="btn btn-default" data-modal-cancel="true"> <span class="fa fa-reply"></span>&nbsp;<spring:message code="comu.boto.tornar"/> </a>
+		<a href="<c:url value="/notificacions"/>" class="btn btn-default" data-modal-cancel="true"> <span class="fa fa-reply"></span>&nbsp;<spring:message code="comu.boto.tornar"/> </a>
 	</div>
 	
 	<script id="botonsTemplate" type="text/x-jsrender"></script> 
