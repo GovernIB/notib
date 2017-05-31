@@ -47,53 +47,10 @@ public class CacheHelper {
 	public List<EntitatDto> findEntitatsAccessiblesUsuari(
 			String usuariCodi) {
 		logger.debug("Consulta entitats accessibles (usuariCodi=" + usuariCodi + ")");
-		
-//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//		List<EntitatEntity> entitats = entitatRepository.findByActiva(true);
-//		permisosHelper.filterGrantedAny(
-//				entitats,
-//				new ObjectIdentifierExtractor<EntitatEntity>() {
-//					public Long getObjectIdentifier(EntitatEntity entitat) {
-//						return entitat.getId();
-//					}
-//				},
-//				EntitatEntity.class,
-//				new Permission[] {
-//					ExtendedPermission.READ,
-//					ExtendedPermission.ADMINISTRATION},
-//				auth);
-//		List<EntitatDto> resposta = conversioTipusHelper.convertirList(
-//				entitats,
-//				EntitatDto.class);
-//		usuarisEntitatHelper.omplirUsuarisPerEntitats(
-//				resposta,
-//				false);
-		
-//		List<EntitatDto> entitats = conversioTipusHelper.convertirList(
-//				entitatRepository.findByEntitatUsuarisUsuariCodi( usuariCodi ),
-//				EntitatDto.class
-//				);
-		
-//		List<EntitatEntity> entitats = entitatRepository.findByEntitatUsuarisUsuariCodi( usuariCodi );
-//		List<EntitatDto> dtos = conversioTipusHelper.convertirList( entitats, EntitatDto.class );
-//		List<EntitatDto> result = new ArrayList<EntitatDto>();
-//		
-//		for( int i = 0; i < entitats.size(); i++ ) {
-//			EntitatEntity e = entitats.get( i );
-//			List<PermisDto> permisos = permisosHelper.findPermisos( e.getId(), EntitatEntity.class);
-//			boolean amb_permisos = false;
-//			for( PermisDto permis: permisos ) {
-//				if( permis.getNom().equals(usuariCodi) ) amb_permisos = true;
-//			}
-//			if( amb_permisos ){
-//				result.add( dtos.get( i ) );
-//			}
-//		}
-		
-		List<EntitatEntity> entitats = entitatRepository.findByEntitatUsuarisUsuariCodi( usuariCodi );
-		List<EntitatDto> dtos = conversioTipusHelper.convertirList( entitats, EntitatDto.class );
-		
-		return dtos;
+		List<EntitatEntity> entitats = entitatRepository.findByActiva(true);
+		return conversioTipusHelper.convertirList(
+				entitats,
+				EntitatDto.class);
 	}
 	@CacheEvict(value = "entitatsUsuari", key="#usuariCodi")
 	public void evictEntitatsAccessiblesUsuari(String usuariCodi) {
