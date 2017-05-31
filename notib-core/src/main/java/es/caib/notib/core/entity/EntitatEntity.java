@@ -3,17 +3,11 @@
  */
 package es.caib.notib.core.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -49,12 +43,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	private boolean activa = true;
 	@Version
 	private long version = 0;
-	@OneToMany(
-			mappedBy = "entitat",
-			fetch = FetchType.LAZY,
-			cascade = CascadeType.ALL,
-			orphanRemoval = true)
-	private List<EntitatUsuariEntity> entitatUsuaris = new ArrayList<EntitatUsuariEntity>();
+	
 
 	public String getCodi() {
 		return codi;
@@ -76,9 +65,6 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	}
 	public boolean isActiva() {
 		return activa;
-	}
-	public List<EntitatUsuariEntity> getEntitatUsuaris() {
-		return entitatUsuaris;
 	}
 
 	public void update(

@@ -129,7 +129,7 @@ public class PermisController extends BaseController {
 		
 		return getModalControllerReturnValueSuccess(
 				request,
-				"redirect:/entitat/" + entitatId + "/permis/",
+				"redirect:/entitats/" + entitatId + "/permis/",
 				msg);
 		
 	}
@@ -145,7 +145,7 @@ public class PermisController extends BaseController {
 		
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:/entitat/" + entitatId + "/permis/",
+				"redirect:/entitats/" + entitatId + "/permis/",
 				"entitat.controller.permis.esborrat.ok");
 		
 	}

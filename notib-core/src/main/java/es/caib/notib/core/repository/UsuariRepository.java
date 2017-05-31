@@ -33,9 +33,5 @@ public interface UsuariRepository extends JpaRepository<UsuariEntity, String> {
 			+ "order by "
 			+ "    u.nom desc")
 	public List<UsuariEntity> findByText(@Param("text") String text);
-	
-	public List<UsuariEntity> findByEntitatUsuarisEntitatId(long idEntitat);
-	
-	public List<UsuariEntity> findByEntitatUsuarisEntitatId(long idEntitat, Pageable paginacio);
 
 }

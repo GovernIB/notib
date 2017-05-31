@@ -10,8 +10,6 @@ import java.util.Set;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.core.api.dto.EntitatUsuariDto;
-import es.caib.notib.core.entity.EntitatUsuariEntity;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
@@ -36,13 +34,6 @@ public class ConversioTipusHelper {
 						return source.toDate();
 					}
 				});
-
-		mapperFactory
-		.classMap(EntitatUsuariEntity.class, EntitatUsuariDto.class)
-		.field("entitat.id", "entitat")
-		.byDefault()
-		.register();
-		
 	}
 
 	public <T> T convertir(Object source, Class<T> targetType) {

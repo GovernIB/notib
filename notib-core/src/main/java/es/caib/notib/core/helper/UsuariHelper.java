@@ -51,22 +51,22 @@ public class UsuariHelper {
 		return udto;
 	}
 
-	public List<UsuariDto> findUsuaris(Long objectIdentifier, Class<?> objectClass) {
-		/**
-		Acl acl = null;
-		try {
-			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
-			acl = aclService.readAclById(oid);
-		} catch (NotFoundException nfex) {
-			return new ArrayList<PermisDto>();
-		}
-		return findPermisosPerAcl(acl);
-		*/
-		List<UsuariDto> usuaris = conversioTipusHelper.convertirList(
-				usuariRepository.findByEntitatUsuarisEntitatId(objectIdentifier),
-				UsuariDto.class);
-		return usuaris;
-	}
+//	public List<UsuariDto> findUsuaris(Long objectIdentifier, Class<?> objectClass) {
+//		/**
+//		Acl acl = null;
+//		try {
+//			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
+//			acl = aclService.readAclById(oid);
+//		} catch (NotFoundException nfex) {
+//			return new ArrayList<PermisDto>();
+//		}
+//		return findPermisosPerAcl(acl);
+//		*/
+//		List<UsuariDto> usuaris = conversioTipusHelper.convertirList(
+//				usuariRepository.findByEntitatUsuarisEntitatId(objectIdentifier),
+//				UsuariDto.class);
+//		return usuaris;
+//	}
 	
 	public Authentication generarUsuariAutenticatEjb(
 			SessionContext sessionContext,

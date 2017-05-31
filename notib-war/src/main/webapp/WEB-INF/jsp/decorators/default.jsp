@@ -107,7 +107,7 @@ body {
 													<li><a href="${urlCanviEntitat}">${entitat.nom}</a></li>
 												</c:if>
 												<c:if test="${enEntitat}">
-													<c:url var="urlCanviEntitat" value="/entitat">
+													<c:url var="urlCanviEntitat" value="/entitats">
 														<c:param name="${requestParameterCanviEntitat}" value="${entitat.id}"/>
 													</c:url>
 													<li><a href="${urlCanviEntitat}">${entitat.nom}</a></li>
@@ -145,7 +145,7 @@ body {
 														<a href="${canviRolUrl}"><spring:message code="decorator.menu.rol.${rol}"/></a>
 													</c:if>
 													<c:if test="${enEntitat}">
-														<c:url var="canviRolUrl" value="/entitat">
+														<c:url var="canviRolUrl" value="/entitats">
 															<c:param name="${requestParameterCanviRol}" value="${rol}"/>
 														</c:url>
 														<a href="${canviRolUrl}"><spring:message code="decorator.menu.rol.${rol}"/></a>
@@ -183,7 +183,9 @@ body {
 							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.accions"/>&nbsp;<span class="caret caret-white"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="<c:url value="/entitats"/>"><spring:message code="decorator.menu.entitats"/></a></li>
-								<li><a href="<c:url value="/aplicacions"/>"><spring:message code="decorator.menu.aplicacions"/></a></li>
+								<c:if test="${isRolActualAdministrador}">
+									<li><a href="<c:url value="/aplicacions"/>"><spring:message code="decorator.menu.aplicacions"/></a></li>
+								</c:if>
 							</ul>
 						</div>
 						<%-- <c:choose> --%>

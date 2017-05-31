@@ -136,7 +136,7 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 				true,
 				false );
 		
-		AplicacioEntity entity = aplicacioRepository.findByCodi(aplicacioCodi);
+		AplicacioEntity entity = aplicacioRepository.findByUsuariCodi(aplicacioCodi);
 		
 		return conversioTipusHelper.convertir(
 				entity,
