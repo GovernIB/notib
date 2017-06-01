@@ -4,8 +4,6 @@
 package es.caib.notib.core.service;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 
 import org.slf4j.Logger;

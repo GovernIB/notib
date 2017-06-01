@@ -14,9 +14,9 @@ public class DadesUsuari implements Serializable {
 
 	private String codi;
 	private String nom;
-	private String nif;
+	private String llinatges;
+	private String nomSencer;
 	private String email;
-	private String[] rols;
 
 	public String getCodi() {
 		return codi;
@@ -30,11 +30,17 @@ public class DadesUsuari implements Serializable {
 	public void setNom(String nom) {
 		this.nom = nom;
 	}
-	public String getNif() {
-		return nif;
+	public String getLlinatges() {
+		return llinatges;
 	}
-	public void setNif(String nif) {
-		this.nif = nif;
+	public void setLlinatges(String llinatges) {
+		this.llinatges = llinatges;
+	}
+	public String getNomSencer() {
+		return nomSencer;
+	}
+	public void setNomSencer(String nomSencer) {
+		this.nomSencer = nomSencer;
 	}
 	public String getEmail() {
 		return email;
@@ -42,13 +48,6 @@ public class DadesUsuari implements Serializable {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public String[] getRols() {
-		return rols;
-	}
-	public void setRols(String[] rols) {
-		this.rols = rols;
-	}
-
 
 	private static final long serialVersionUID = -139254994389509932L;
 
