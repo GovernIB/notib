@@ -3,11 +3,15 @@
  */
 package es.caib.notib.war.controller;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
@@ -50,6 +55,7 @@ public class NotificacioController extends BaseController {
 	private NotificacioService notificacioService;
 	@Autowired
 	private EntitatService entitatService;
+	
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -198,17 +204,24 @@ public class NotificacioController extends BaseController {
 				dto);
 	}
 
-	@RequestMapping(value = "/showpdf/{notificacioId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/descarregar/{notificacioId}", method = RequestMethod.GET)
 	@ResponseBody
-	public void showPDF(
+	public void descarregarArxiu(
+			HttpServletResponse response,
 			@PathVariable Long notificacioId) {
-		/*NotificacioDto dto = notificacioService.findById(notificacioId);
-		File file = new File(NotificacioWsService.BASEDIR_ARXIU + dto.getDocumentArxiuId());
-		try {
-			Desktop.getDesktop().open(file);
+		
+        try {
+        	FitxerDto fitxer = notificacioService.findFitxer(notificacioId);
+    		
+        	writeFileToResponse(
+					fitxer.getNom(),
+					fitxer.getContingut(),
+					response);
 		} catch (IOException e) {
+			
 			e.printStackTrace();
-		}*/
+		}
+		
 	}
 
 	@InitBinder

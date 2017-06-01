@@ -9,7 +9,7 @@
 <html>
 
 <head>
-	<title><spring:message code="events.llista.titol" arguments="${servei.descripcio}"/></title>
+	<title><spring:message code="events.notificacio.llista.titol" arguments="${servei.descripcio}"/></title>
 	<not:modalHead/>
 	
 	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
@@ -49,7 +49,6 @@
 		data-toggle="datatable"
 		data-url="<c:url value="/notificacions/${notificacioId}/events"/>"
 		data-search-enabled="false"
-		data-default-order="2"
 		data-default-dir="asc"
 		data-botons-template="#botonsTemplate"
 		data-paging="false"
@@ -61,15 +60,15 @@
 			<tr>
 				<th data-col-name="id" data-visible="false" width="4%">#</th>
 				
-				<th data-col-name="tipus"><spring:message code="notificacio.form.events.tipus"/></th>
-				<th data-col-name="data" data-converter="date"><spring:message code="notificacio.form.events.data"/></th>
-				<th data-col-name="error" data-template="#cellError">
+				<th data-col-name="tipus" data-orderable="false"><spring:message code="notificacio.form.events.tipus"/></th>
+				<th data-col-name="data" data-converter="date" data-orderable="false"><spring:message code="notificacio.form.events.data"/></th>
+				<th data-col-name="error" data-template="#cellError" data-orderable="false">
 					<spring:message code="notificacio.form.events.error"/>
 					<script id="cellError" type="text/x-jsrender">
 						{{if error}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="descripcio"><spring:message code="notificacio.form.events.error.descripcio"/></th>
+				<th data-col-name="descripcio" data-orderable="false"><spring:message code="notificacio.form.events.error.descripcio"/></th>
 				
 			</tr>
 		</thead>

@@ -3,6 +3,9 @@
  */
 package es.caib.notib.core.service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -15,6 +18,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
@@ -29,6 +33,7 @@ import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
+import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.helper.SeuHelper;
 import es.caib.notib.core.repository.NotificacioDestinatariRepository;
@@ -62,6 +67,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private NotificaHelper notificaHelper;
 	@Autowired
 	private SeuHelper seuHelper;
+	
+	@Autowired
+	private PluginHelper pluginHelper;
 
 
 
@@ -303,6 +311,24 @@ public class NotificacioServiceImpl implements NotificacioService {
 			logger.debug("No hi ha notificacions pendents d'actualització d'estat a Notifica");
 		}
 	}
+	
+	@Override
+	public FitxerDto findFitxer(Long notificacioId) {
+		
+		NotificacioEntity entity = notificacioRepository.findOne(notificacioId);
+		
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		pluginHelper.gestioDocumentalGet(
+				entity.getDocumentArxiuId(),
+				PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
+				output);
+		
+		return new FitxerDto(
+				entity.getDocumentArxiuNom(),
+				"pdf",
+				output.toByteArray(),
+				output.size());
+	}
 
 
 
@@ -323,5 +349,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceImpl.class);
+	
 
 }

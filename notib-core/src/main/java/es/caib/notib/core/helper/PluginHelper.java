@@ -507,10 +507,10 @@ public class PluginHelper {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.class");
 	}
 	private String getPropertyPluginGestioDocumental() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.gesdoc.class");
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesdoc.class");
 	}
 	private String getPropertyPluginSeu() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.seu.class");
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.seu.class");
 	}
 
 }

@@ -24,7 +24,7 @@ import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
- * Controlador per al manteniment de permisos.
+ * Controlador per al manteniment d'entitats.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

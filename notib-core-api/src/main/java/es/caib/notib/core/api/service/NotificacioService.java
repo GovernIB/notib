@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
@@ -136,6 +137,17 @@ public interface NotificacioService {
 	public List<NotificacioEventDto> eventFindByNotificacioIDestinatari(
 			Long notificacioId,
 			Long destinatariId);
+	
+	/**
+	 * Consulta el fitxer associat a una notificació
+	 * 
+	 * @param notificacioId
+	 *            Atribut id de la notificació.
+	 * @return el fitxer associat.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')  or hasRole('NOT_REP')")
+	public FitxerDto findFitxer(
+			Long notificacioId);
 
 	/**
 	 * Mètode d'execució periòdica per a fer els enviaments pendents
