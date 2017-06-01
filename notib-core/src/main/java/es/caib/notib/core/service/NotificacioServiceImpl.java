@@ -4,8 +4,6 @@
 package es.caib.notib.core.service;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -313,6 +311,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public FitxerDto findFitxer(Long notificacioId) {
 		
 		NotificacioEntity entity = notificacioRepository.findOne(notificacioId);
@@ -325,7 +324,27 @@ public class NotificacioServiceImpl implements NotificacioService {
 		
 		return new FitxerDto(
 				entity.getDocumentArxiuNom(),
-				"pdf",
+				"PDF",
+				output.toByteArray(),
+				output.size());
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public FitxerDto findCertificacio(String referencia) {
+		
+		NotificacioDestinatariEntity entity =
+				notificacioDestinatariRepository.findByReferencia(referencia);
+		
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		pluginHelper.gestioDocumentalGet(
+				entity.getNotificaCertificacioArxiuId(),
+				PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
+				output);
+		
+		return new FitxerDto(
+				entity.getNotificaCertificacioArxiuId(),
+				entity.getNotificaCertificacioArxiuTipus().toString(),
 				output.toByteArray(),
 				output.size());
 	}

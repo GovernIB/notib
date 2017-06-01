@@ -148,6 +148,17 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('NOT_ADMIN')  or hasRole('NOT_REP')")
 	public FitxerDto findFitxer(
 			Long notificacioId);
+	
+	/**
+	 * Consulta la certificació associada a un enviament
+	 * 
+	 * @param referencia
+	 *            referencia d'un enviament.
+	 * @return el fitxer de certificació associat.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')  or hasRole('NOT_REP')")
+	public FitxerDto findCertificacio(
+			String referencia);
 
 	/**
 	 * Mètode d'execució periòdica per a fer els enviaments pendents

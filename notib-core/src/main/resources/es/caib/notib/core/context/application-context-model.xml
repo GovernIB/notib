@@ -55,12 +55,6 @@
 	<cache:annotation-driven cache-manager="cacheManager"/>
 	<!-- /Cache -->
 
-	<!-- E-mail -->
-	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-		<property name="session" ref="mailSession"/>
-	</bean>
-	<!-- /E-mail -->
-
 	<!-- Execució de tasques periòdiques -->
 	<task:annotation-driven scheduler="taskScheduler"/>
 	<task:scheduler id="taskScheduler" pool-size="10"/>
