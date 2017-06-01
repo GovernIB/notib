@@ -33,6 +33,7 @@ import org.springframework.security.crypto.codec.Base64;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.loginModule.client.AuthenticationFailureException;
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
@@ -53,7 +54,6 @@ import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioDestinatariEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.helper.ws.WsClientHelper;
 import es.caib.notib.core.wsdl.notifica.ArrayOfTipoDestinatario;
 import es.caib.notib.core.wsdl.notifica.CertificacionEnvioRespuesta;
 import es.caib.notib.core.wsdl.notifica.DatadoEnvio;
@@ -894,7 +894,7 @@ public class NotificaHelper {
 	    return result;
 	}
 
-	private NotificaWsPortType getNotificaWs() throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
+	private NotificaWsPortType getNotificaWs() throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
 		NotificaWsPortType port = new WsClientHelper<NotificaWsPortType>().generarClientWs(
 				getClass().getResource("/es/caib/notib/core/wsdl/NotificaWS.wsdl"),
 				getUrlProperty(),
@@ -903,11 +903,10 @@ public class NotificaHelper {
 						"NotificaWsService"),
 				getUsernameProperty(),
 				getPasswordProperty(),
-				null,
 				NotificaWsPortType.class);
 		return port;
 	}
-	private SedeWsPortType getSedeWs() throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
+	private SedeWsPortType getSedeWs() throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
 		SedeWsPortType port = new WsClientHelper<SedeWsPortType>().generarClientWs(
 				getClass().getResource("/es/caib/notib/core/wsdl/SedeWs.wsdl"),
 				getUrlProperty(),
@@ -916,7 +915,6 @@ public class NotificaHelper {
 						"SedeWsService"),
 				getUsernameProperty(),
 				getPasswordProperty(),
-				null,
 				SedeWsPortType.class);
 		return port;
 	}
