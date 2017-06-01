@@ -89,9 +89,11 @@ public class AplicacioServiceImpl implements AplicacioService {
 				usuari = usuariRepository.save(
 						UsuariEntity.getBuilder(
 								dadesUsuari.getCodi(),
-								dadesUsuari.getNom(),
-								dadesUsuari.getNif(),
-								dadesUsuari.getEmail()).build());
+								dadesUsuari.getEmail()).
+						nom(dadesUsuari.getNom()).
+						llinatges(dadesUsuari.getLlinatges()).
+						nomSencer(dadesUsuari.getNomSencer()).
+						build());
 			} else {
 				throw new NotFoundException(
 						auth.getName(),
@@ -101,10 +103,16 @@ public class AplicacioServiceImpl implements AplicacioService {
 			logger.debug("Consultant plugin de dades d'usuari (" + "usuariCodi=" + auth.getName() + ")");
 			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 			if (dadesUsuari != null) {
-				usuari.update(
-						dadesUsuari.getNom(),
-						dadesUsuari.getNif(),
-						dadesUsuari.getEmail());
+				if (dadesUsuari.getNomSencer() != null) {
+					usuari.update(
+							dadesUsuari.getNomSencer(),
+							dadesUsuari.getEmail());
+				} else {
+					usuari.update(
+							dadesUsuari.getNom(),
+							dadesUsuari.getLlinatges(),
+							dadesUsuari.getEmail());
+				}
 			} else {
 				throw new NotFoundException(
 						auth.getName(),

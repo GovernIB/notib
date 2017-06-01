@@ -12,6 +12,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
@@ -122,6 +123,11 @@ public class NotificacioServiceBean implements NotificacioService {
 	@Override
 	public void seuNotificaComunicarEstatPendents() {
 		delegate.seuNotificaComunicarEstatPendents();
+	}
+
+	@Override
+	public FitxerDto findFitxer(Long notificacioId) {
+		return delegate.findFitxer(notificacioId);
 	}
 
 }
