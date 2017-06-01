@@ -26,43 +26,6 @@ import es.caib.notib.war.helper.EnumHelper.HtmlOption;
 @RequestMapping("/userajax") // No podem posar "/ajaxuser" per mor del AjaxInterceptor
 public class AjaxUserController extends BaseUserController {
 
-//	@Autowired
-//	private AplicacioService aplicacioService;
-//	@Autowired
-//	private ArxiuService arxiuService;
-
-
-
-//	@RequestMapping(value = "/usuari/{codi}", method = RequestMethod.GET)
-//	@ResponseBody
-//	public UsuariDto getByCodi(
-//			HttpServletRequest request,
-//			@PathVariable String codi,
-//			Model model) {
-//		return aplicacioService.findUsuariAmbCodi(codi);
-//	}
-//
-//	@RequestMapping(value = "/usuaris/{text}", method = RequestMethod.GET)
-//	@ResponseBody
-//	public List<UsuariDto> get(
-//			HttpServletRequest request,
-//			@PathVariable String text,
-//			Model model) {
-//		return aplicacioService.findUsuariAmbText(text);
-//	}
-//
-//	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/arxius", method = RequestMethod.GET)
-//	@ResponseBody
-//	public List<ArxiuDto> arxiusAmbMetaExpedient(
-//			HttpServletRequest request,
-//			@PathVariable Long metaExpedientId,
-//			Model model) {
-//		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-//		return arxiuService.findAmbMetaExpedientPerCreacio(
-//				entitatActual.getId(),
-//				metaExpedientId);
-//	}
-
 	@RequestMapping(value = "/enum/{enumClass}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<HtmlOption> enumValorsAmbText(

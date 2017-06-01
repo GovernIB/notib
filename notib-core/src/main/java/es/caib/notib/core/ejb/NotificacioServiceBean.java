@@ -32,8 +32,7 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Autowired
 	NotificacioService delegate;
-	
-	
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
 	public NotificacioDto findById(Long id) {
@@ -42,65 +41,72 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
-	public PaginaDto<NotificacioDto> findFilteredByEntitatAndUsuari(
+	public PaginaDto<NotificacioDto> findByFiltrePaginat(
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
-		
-		return delegate.findFilteredByEntitatAndUsuari(filtre, paginacioParams);
+		return delegate.findByFiltrePaginat(
+				filtre,
+				paginacioParams);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_REP"})
-	public PaginaDto<NotificacioDto> findByEntitat(
+	public PaginaDto<NotificacioDto> findByEntitatIFiltrePaginat(
 			Long entitatId,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
-		
-		return delegate.findByEntitat(entitatId, filtre, paginacioParams);
+		return delegate.findByEntitatIFiltrePaginat(
+				entitatId,
+				filtre,
+				paginacioParams);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public PaginaDto<NotificacioDestinatariDto> findDestinatarisByNotificacioId(
+	public PaginaDto<NotificacioDestinatariDto> destinatariFindByNotificacioPaginat(
 			Long notificacioId,
 			PaginacioParamsDto paginacioParams) {
-		
-		return delegate.findDestinatarisByNotificacioId(notificacioId, paginacioParams);
+		return delegate.destinatariFindByNotificacioPaginat(
+				notificacioId,
+				paginacioParams);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public List<NotificacioDestinatariDto> findDestinatarisByNotificacioId(Long notificacioId) {
-		
-		return delegate.findDestinatarisByNotificacioId(notificacioId);
+	public List<NotificacioDestinatariDto> destinatariFindByNotificacio(
+			Long notificacioId) {
+		return delegate.destinatariFindByNotificacio(notificacioId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public List<NotificacioEventDto> findEventsByNotificacioId(Long notificacioId) {
-		
-		return delegate.findEventsByNotificacioId(notificacioId);
+	public NotificacioDestinatariDto destinatariFindById(
+			Long destinatariId) {
+		return delegate.destinatariFindById(destinatariId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public List<NotificacioEventDto> findEventsByDestinatariId(Long destinatariId) {
-		
-		return delegate.findEventsByDestinatariId(destinatariId);
+	public NotificacioDestinatariDto destinatariFindByReferencia(
+			String referencia) {
+		return delegate.destinatariFindByReferencia(referencia);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public NotificacioDestinatariDto findDestinatariById(Long destinatariId) {
-		
-		return delegate.findDestinatariById(destinatariId);
+	public List<NotificacioEventDto> eventFindByNotificacio(
+			Long notificacioId) {
+		return delegate.eventFindByNotificacio(notificacioId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public NotificacioDestinatariDto findDestinatariByReferencia(String referencia) {
-		
-		return delegate.findDestinatariByReferencia(referencia);
+	public List<NotificacioEventDto> eventFindByNotificacioIDestinatari(
+			Long notificacioId,
+			Long destinatariId) {
+		return delegate.eventFindByNotificacioIDestinatari(
+				notificacioId,
+				destinatariId);
 	}
 
 	@Override
@@ -117,8 +123,5 @@ public class NotificacioServiceBean implements NotificacioService {
 	public void seuNotificaComunicarEstatPendents() {
 		delegate.seuNotificaComunicarEstatPendents();
 	}
-
-	
-	
 
 }

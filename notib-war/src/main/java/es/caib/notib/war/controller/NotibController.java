@@ -34,8 +34,6 @@ public class NotibController {
 	@Autowired
 	private AplicacioService aplicacioService;
 
-
-
 	@RequestMapping(value = "/index", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request) {

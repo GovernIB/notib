@@ -81,12 +81,12 @@ public class NotificacioController extends BaseController {
 				request.getSession().getAttribute( NOTIFICACIONS_FILTRE );
 		PaginaDto<NotificacioDto> notificacions = null;
 		if (RolHelper.isUsuariActualAdministrador(request)) {
-			notificacions = notificacioService.findFilteredByEntitatAndUsuari(
+			notificacions = notificacioService.findByFiltrePaginat(
 					filtre,
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 		} else if (RolHelper.isUsuariActualRepresentant(request)) {
 			EntitatDto entitat = EntitatHelper.getEntitatActual( request );
-			notificacions = notificacioService.findByEntitat(
+			notificacions = notificacioService.findByEntitatIFiltrePaginat(
 					entitat.getId(),
 					filtre,
 					DatatablesHelper.getPaginacioDtoFromRequest(request) );
@@ -112,11 +112,9 @@ public class NotificacioController extends BaseController {
 			@PathVariable Long notificacioId ) {
 		return DatatablesHelper.getDatatableResponse(
 				request,
-				notificacioService.findDestinatarisByNotificacioId(
+				notificacioService.destinatariFindByNotificacioPaginat(
 						notificacioId,
-						DatatablesHelper.getPaginacioDtoFromRequest(request)
-						)
-				);
+						DatatablesHelper.getPaginacioDtoFromRequest(request)));
 	}
 
 	@RequestMapping(value = "/{notificacioId}/destinatari", method = RequestMethod.GET)
@@ -125,7 +123,7 @@ public class NotificacioController extends BaseController {
 			HttpServletRequest request,
 			Model model,
 			@PathVariable Long notificacioId) {
-		List<NotificacioDestinatariDto> destinataris = notificacioService.findDestinatarisByNotificacioId(
+		List<NotificacioDestinatariDto> destinataris = notificacioService.destinatariFindByNotificacio(
 				notificacioId);
 		return destinataris;
 	}
@@ -135,28 +133,22 @@ public class NotificacioController extends BaseController {
 			HttpServletRequest request,
 			Model model,
 			@PathVariable Long notificacioId) {
-		
 		model.addAttribute("notificacioId", notificacioId);
-		
 		return "notificacioEvents";
-		
 	}
 
 	@RequestMapping(value = "/{notificacioId}/events/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatableEvents(
 			HttpServletRequest request,
-			@PathVariable Long notificacioId ) {
-		List<NotificacioEventDto> dto = notificacioService.findEventsByNotificacioId(notificacioId);
-		for(NotificacioEventDto event: dto) {
-			event.setLastModifiedDate( new Date(0) );
-			event.setCreatedDate( new Date(0) );
-			if(event.getDestinatari() == null) {
+			@PathVariable Long notificacioId) {
+		List<NotificacioEventDto> dto = notificacioService.eventFindByNotificacio(
+				notificacioId);
+		for (NotificacioEventDto event: dto) {
+			if (event.getDestinatari() == null) {
 				event.setDestinatari(new NotificacioDestinatariDto());
 				event.getDestinatari().setReferencia("-");
 			}
-			event.getDestinatari().setLastModifiedDate( new Date(0) );
-			event.getDestinatari().setCreatedDate( new Date(0) );
 		}
 		return DatatablesHelper.getDatatableResponse(
 				request,
@@ -169,7 +161,8 @@ public class NotificacioController extends BaseController {
 			Model model,
 			@PathVariable Long notificacioId,
 			@PathVariable Long destinatariId ) {
-		NotificacioDestinatariDto destinatari = notificacioService.findDestinatariById(destinatariId);
+		NotificacioDestinatariDto destinatari = notificacioService.destinatariFindById(
+				destinatariId);
 		model.addAttribute(destinatari);
 		return "destinatariForm";
 	}
@@ -191,40 +184,19 @@ public class NotificacioController extends BaseController {
 			HttpServletRequest request,
 			@PathVariable Long notificacioId,
 			@PathVariable Long destinatariId ) {
-		List<NotificacioEventDto> dto = notificacioService.findEventsByDestinatariId(destinatariId);
+		List<NotificacioEventDto> dto = notificacioService.eventFindByNotificacioIDestinatari(
+				notificacioId,
+				destinatariId);
 		for (NotificacioEventDto event: dto) {
-			event.setLastModifiedDate( new Date(0) );
-			event.setCreatedDate( new Date(0) );
 			if(event.getDestinatari() == null) {
 				event.setDestinatari(new NotificacioDestinatariDto());
 				event.getDestinatari().setReferencia("-");
 			}
-			event.getDestinatari().setLastModifiedDate( new Date(0) );
-			event.getDestinatari().setCreatedDate( new Date(0) );
 		}
 		return DatatablesHelper.getDatatableResponse(
 				request,
 				dto);
 	}
-
-//	@RequestMapping(
-//			value = "/{notificacioId}/destinatari/{destinatariId}/events/datatable",
-//			method = RequestMethod.GET)
-//	@ResponseBody
-//	public DatatablesResponse datatableDestinatariEvents(
-//			HttpServletRequest request,
-//			@PathVariable Long notificacioId,
-//			@PathVariable Long destinatariId) {
-//		
-//		return DatatablesHelper.getDatatableResponse(
-//				request,
-//				notificacioService.findEventsByDestinatariId(
-//						notificacioId,
-//						destinatariId
-//						)
-//				);
-//		
-//	}
 
 	@RequestMapping(value = "/showpdf/{notificacioId}", method = RequestMethod.GET)
 	@ResponseBody

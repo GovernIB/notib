@@ -81,7 +81,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional
 	@Override
-	public PaginaDto<NotificacioDto> findFilteredByEntitatAndUsuari(
+	public PaginaDto<NotificacioDto> findByFiltrePaginat(
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		entityComprovarHelper.comprovarPermisos(
@@ -111,7 +111,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional
 	@Override
-	public PaginaDto<NotificacioDto> findByEntitat(
+	public PaginaDto<NotificacioDto> findByEntitatIFiltrePaginat(
 			Long entitatId,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
@@ -138,7 +138,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public PaginaDto<NotificacioDestinatariDto> findDestinatarisByNotificacioId(
+	public PaginaDto<NotificacioDestinatariDto> destinatariFindByNotificacioPaginat(
 			Long notificacioId,
 			PaginacioParamsDto paginacioParams ) {
 		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
@@ -156,7 +156,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<NotificacioDestinatariDto> findDestinatarisByNotificacioId(
+	public List<NotificacioDestinatariDto> destinatariFindByNotificacio(
 			Long notificacioId) {
 		entityComprovarHelper.comprovarPermisos(
 				notificacioId,
@@ -169,36 +169,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<NotificacioEventDto> findEventsByNotificacioId(
-			Long notificacioId) {
-		logger.debug("Anam a cercar els events de la notificació amb ID=" + notificacioId);
-		entityComprovarHelper.comprovarPermisos(
-				notificacioId,
-				true,
-				true);
-		return conversioTipusHelper.convertirList(
-				notificacioEventRepository.findByNotificacioId(notificacioId),
-				NotificacioEventDto.class);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public List<NotificacioEventDto> findEventsByDestinatariId(
-			Long destinatariId ) {
-		logger.debug("Anam a cercar els events del destinatari amb ID=" + destinatariId);
-		NotificacioDestinatariEntity destinatari = notificacioDestinatariRepository.findOne(destinatariId);
-		entityComprovarHelper.comprovarPermisos(
-				destinatari.getNotificacio().getId(),
-				true,
-				true);
-		return conversioTipusHelper.convertirList(
-				notificacioEventRepository.findByNotificacioDestinatariId(destinatariId),
-				NotificacioEventDto.class);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public NotificacioDestinatariDto findDestinatariById(Long destinatariId) {
+	public NotificacioDestinatariDto destinatariFindById(Long destinatariId) {
+		logger.debug("Consulta de destinatari donat el seu id (" +
+				"destinatariId=" + destinatariId + ")");
 		NotificacioDestinatariEntity destinatari =
 				notificacioDestinatariRepository.findOne(destinatariId);
 		NotificacioEntity notificacio = notificacioRepository.findOne( destinatari.getNotificacio().getId() );
@@ -213,7 +186,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public NotificacioDestinatariDto findDestinatariByReferencia(String referencia) {
+	public NotificacioDestinatariDto destinatariFindByReferencia(String referencia) {
+		logger.debug("Consulta de destinatari donat el seu id (" +
+				"referencia=" + referencia + ")");
 		NotificacioDestinatariEntity destinatari =
 				notificacioDestinatariRepository.findByReferencia(referencia);
 		NotificacioEntity notificacio = notificacioRepository.findOne( destinatari.getNotificacio().getId() );
@@ -222,6 +197,38 @@ public class NotificacioServiceImpl implements NotificacioService {
 		return conversioTipusHelper.convertir(
 				destinatari,
 				NotificacioDestinatariDto.class);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<NotificacioEventDto> eventFindByNotificacio(
+			Long notificacioId) {
+		logger.debug("Anam a cercar els events de la notificació amb ID=" + notificacioId);
+		entityComprovarHelper.comprovarPermisos(
+				notificacioId,
+				true,
+				true);
+		return conversioTipusHelper.convertirList(
+				notificacioEventRepository.findByNotificacioId(notificacioId),
+				NotificacioEventDto.class);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<NotificacioEventDto> eventFindByNotificacioIDestinatari(
+			Long notificacioId,
+			Long destinatariId) {
+		logger.debug("Consulta dels events associats a un destinatari (" +
+				"notificacioId=" + notificacioId + ", " + 
+				"destinatariId=" + destinatariId + ")");
+		NotificacioDestinatariEntity destinatari = notificacioDestinatariRepository.findOne(destinatariId);
+		entityComprovarHelper.comprovarPermisos(
+				destinatari.getNotificacio().getId(),
+				true,
+				true);
+		return conversioTipusHelper.convertirList(
+				notificacioEventRepository.findByNotificacioDestinatariId(destinatariId),
+				NotificacioEventDto.class);
 	}
 
 	@Override

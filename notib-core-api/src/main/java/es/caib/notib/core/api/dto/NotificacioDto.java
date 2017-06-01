@@ -49,9 +49,10 @@ public class NotificacioDto extends AuditoriaDto {
 	private NotificacioEstatEnumDto estat;
 	private boolean error;
 	private NotificacioEventDto errorEvent;
-//	private List<NotificacioDestinatariDto> destinataris;
-	
+	private List<NotificacioDestinatariDto> destinataris;
 	private EntitatDto entitat;
+
+
 
 	public Long getId() {
 		return id;
@@ -251,31 +252,18 @@ public class NotificacioDto extends AuditoriaDto {
 	public void setErrorEvent(NotificacioEventDto errorEvent) {
 		this.errorEvent = errorEvent;
 	}
-//	public List<NotificacioDestinatariDto> getDestinataris() {
-//		return destinataris;
-//	}
-//	public void setDestinataris(List<NotificacioDestinatariDto> destinataris) {
-//		this.destinataris = destinataris;
-//	}
+	public List<NotificacioDestinatariDto> getDestinataris() {
+		return destinataris;
+	}
+	public void setDestinataris(List<NotificacioDestinatariDto> destinataris) {
+		this.destinataris = destinataris;
+	}
 	public EntitatDto getEntitat() {
 		return entitat;
 	}
 	public void setEntitat(EntitatDto entitat) {
 		this.entitat = entitat;
 	}
-	
-//	public String getDestinatarisList() {
-//		String result = "";
-//		for (int index = 0; index < destinataris.size(); index++) {
-//			NotificacioDestinatariDto d = destinataris.get(index);
-//			result = result + d.getDestinatariNom();
-//			result = result + " " + d.getDestinatariLlinatges();
-//			result = result + " ( " + d.getDestinatariNif() + " ) ";
-//			if (index != destinataris.size() - 1) result = result + " , ";
-//		}
-//		return result;
-//	}
-	
 
 	@Override
 	public String toString() {

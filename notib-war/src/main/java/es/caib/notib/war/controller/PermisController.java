@@ -24,7 +24,7 @@ import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
- * Controlador per al manteniment d'entitats.
+ * Controlador per al manteniment de permisos.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -35,20 +35,15 @@ public class PermisController extends BaseController {
 	@Autowired
 	private EntitatService entitatService;
 
-
 	@RequestMapping(value="", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
 			@PathVariable Long entitatId,
 			Model model) {
-		
 		model.addAttribute(
 				"entitat", 
-				entitatService.findById(entitatId)
-				);
-		
+				entitatService.findById(entitatId));
 		return "adminPermis";
-		
 	}
 	
 	@RequestMapping(value="/entitatactual", method = RequestMethod.GET)
@@ -56,14 +51,10 @@ public class PermisController extends BaseController {
 			HttpServletRequest request,
 			@PathVariable Long entitatId,
 			Model model) {
-		
 		model.addAttribute(
 				"entitat", 
-				entitatService.findById(entitatId)
-				);
-		
+				entitatService.findById(entitatId));
 		return "adminPermis";
-		
 	}
 	
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
@@ -71,12 +62,9 @@ public class PermisController extends BaseController {
 	public DatatablesResponse datatable(
 			HttpServletRequest request,
 			@PathVariable Long entitatId) {
-		
 		List<PermisDto> permisos = null;
 		permisos = entitatService.findPermis(entitatId);
-		
 		return DatatablesHelper.getDatatableResponse(request, permisos);
-		
 	}
 	
 	@RequestMapping(value="/new", method = RequestMethod.GET)
@@ -84,11 +72,8 @@ public class PermisController extends BaseController {
 			HttpServletRequest request,
 			@PathVariable Long entitatId,
 			Model model) {
-		
 		model.addAttribute( new PermisCommand() );
-		
 		return "adminPermisForm";
-		
 	}
 	
 	@RequestMapping(value="/{permisId}", method = RequestMethod.GET)
@@ -97,10 +82,8 @@ public class PermisController extends BaseController {
 			@PathVariable Long entitatId,
 			@PathVariable Long permisId,
 			Model model) {
-		
 		List<PermisDto> permisos = null;
 		permisos = entitatService.findPermis(entitatId);
-		
 		PermisDto permis = null;
 		for (PermisDto p: permisos) {
 			if (p.getId().equals(permisId)) {
@@ -108,13 +91,10 @@ public class PermisController extends BaseController {
 				break;
 			}
 		}
-		
 		model.addAttribute( PermisCommand.asCommand(permis) );
-		
 		return "adminPermisForm";
-		
 	}
-	
+
 	@RequestMapping(value="/create", method = RequestMethod.POST)
 	public String Create(
 			Model model,
@@ -122,24 +102,21 @@ public class PermisController extends BaseController {
 			@PathVariable Long entitatId,
 			@Valid PermisCommand command,
 			BindingResult bindingResult) {
-		
-		if( bindingResult.hasErrors() ) return "adminPermisForm";
-		
+		if (bindingResult.hasErrors()) {
+			return "adminPermisForm";
+		}
 		PermisDto dto = PermisCommand.asDto( command );
-		
 		entitatService.updatePermis(entitatId, dto);
-		
 		String msg;
-		if (command.getId() == null)
+		if (command.getId() == null) {
 			msg = "entitat.controller.permis.creat.ok";
-		else
+		} else {
 			msg = "entitat.controller.permis.modificat.ok";
-		
+		}
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:/entitats/" + entitatId + "/permis/",
 				msg);
-		
 	}
 	
 	@RequestMapping(value="/{permisId}/delete", method = RequestMethod.GET)
@@ -148,15 +125,11 @@ public class PermisController extends BaseController {
 			@PathVariable Long entitatId,
 			@PathVariable Long permisId,
 			Model model) {
-		
 		entitatService.deletePermis( entitatId, permisId );
-		
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:/entitats/" + entitatId + "/permis/",
 				"entitat.controller.permis.esborrat.ok");
-		
 	}
-	
 
 }
