@@ -2,9 +2,9 @@
 CREATE TABLE NOT_USUARI
 (
   CODI          VARCHAR2(64)                    NOT NULL,
-  INICIALITZAT  NUMBER(1),
-  NIF           VARCHAR2(9),
-  NOM           VARCHAR2(200),
+  NOM           VARCHAR2(100),
+  LLINATGES     VARCHAR2(100),
+  NOM_SENCER    VARCHAR2(200),
   EMAIL         VARCHAR2(200),
   VERSION       NUMBER(19)                      NOT NULL
 );

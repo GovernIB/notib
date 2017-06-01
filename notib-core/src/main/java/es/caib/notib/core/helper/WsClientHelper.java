@@ -1,22 +1,31 @@
 /**
  * 
  */
-package es.caib.notib.core.helper.ws;
+package es.caib.notib.core.helper;
 
+import java.io.ByteArrayOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 import javax.xml.ws.handler.Handler;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPHandler;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import es.caib.loginModule.client.AuthenticationFailureException;
 
@@ -35,6 +44,7 @@ public class WsClientHelper<T> {
 			String username,
 			String password,
 			String soapAction,
+			boolean logMissatgesActiu,
 			Class<T> clazz,
 			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
 		URL url = wsdlResourceUrl;
@@ -68,7 +78,9 @@ public class WsClientHelper<T> {
 		// Configura el log de les peticions
 		@SuppressWarnings("rawtypes")
 		List<Handler> handlerChain = new ArrayList<Handler>();
-		handlerChain.add(new SOAPLoggingHandler());
+		if (logMissatgesActiu) {
+			handlerChain.add(new SOAPLoggingHandler());
+		}
 		// Configura handlers addicionals
 		for (int i = 0; i < handlers.length; i++) {
 			if (handlers[i] != null)
@@ -87,11 +99,30 @@ public class WsClientHelper<T> {
 	}
 
 	public T generarClientWs(
+			URL wsdlResourceUrl,
 			String endpoint,
 			QName qname,
 			String userName,
 			String password,
-			String soapAction,
+			Class<T> clazz,
+			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
+		return this.generarClientWs(
+				wsdlResourceUrl,
+				endpoint,
+				qname,
+				userName,
+				password,
+				null,
+				false,
+				clazz,
+				handlers);
+	}
+
+	public T generarClientWs(
+			String endpoint,
+			QName qname,
+			String userName,
+			String password,
 			Class<T> clazz,
 			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
 		return this.generarClientWs(
@@ -100,9 +131,61 @@ public class WsClientHelper<T> {
 				qname,
 				userName,
 				password,
-				soapAction,
+				null,
+				false,
 				clazz,
 				handlers);
+	}
+
+	public T generarClientWs(
+			String endpoint,
+			QName qname,
+			Class<T> clazz,
+			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
+		return this.generarClientWs(
+				null,
+				endpoint,
+				qname,
+				null,
+				null,
+				null,
+				false,
+				clazz,
+				handlers);
+	}
+
+	public static class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {
+		public Set<QName> getHeaders() {
+			return null;
+		}
+		public boolean handleMessage(SOAPMessageContext smc) {
+			logToSystemOut(smc);
+			return true;
+		}
+		public boolean handleFault(SOAPMessageContext smc) {
+			logToSystemOut(smc);
+			return true;
+		}
+		public void close(MessageContext messageContext) {
+		}
+		private void logToSystemOut(SOAPMessageContext smc) {
+			StringBuilder sb = new StringBuilder();
+			Boolean outboundProperty = (Boolean)smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+			if (outboundProperty.booleanValue())
+				sb.append("Missarge sortint: ");
+			else
+				sb.append("Missarge entrant: ");
+			SOAPMessage message = smc.getMessage();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			try {
+				message.writeTo(baos);
+				sb.append(baos.toString());
+			} catch (Exception ex) {
+				sb.append("Error al imprimir el missatge XML: " + ex.getMessage());
+			}
+			LOGGER.debug(sb.toString());
+		}
+		private static final Logger LOGGER = LoggerFactory.getLogger(SOAPLoggingHandler.class);
 	}
 
 }

@@ -112,6 +112,9 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 					procedimentDescripcioSia(notificacio.getProcedimentDescripcioSia()).
 					build();
 			notificacioRepository.save(notificacioEntity);
+			// TODO decidir si es fa l'enviament immediatament o si s'espera
+			// a que l'envii la tasca programada.
+			//notificaHelper.intentarEnviament(notificacioEntity);
 			List<String> result = new ArrayList<>();
 			for (NotificacioDestinatari d: notificacio.getDestinataris()) {
 				NotificacioDestinatariEntity.Builder destinatari = NotificacioDestinatariEntity.getBuilder(

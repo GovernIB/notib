@@ -99,9 +99,11 @@ public class UsuariHelper {
 				usuari = usuariRepository.save(
 						UsuariEntity.getBuilder(
 								dadesUsuari.getCodi(),
-								dadesUsuari.getNom(),
-								dadesUsuari.getNif(),
-								dadesUsuari.getEmail()).build());
+								dadesUsuari.getEmail()).
+						nom(dadesUsuari.getNom()).
+						llinatges(dadesUsuari.getLlinatges()).
+						nomSencer(dadesUsuari.getNomSencer()).
+						build());
 			} else {
 				throw new NotFoundException(
 						auth.getName(),
@@ -110,8 +112,6 @@ public class UsuariHelper {
 		}
 		return usuari;
 	}
-
-
 
 	private static final Logger logger = LoggerFactory.getLogger(UsuariHelper.class);
 

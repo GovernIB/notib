@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.caib.notib.core.entity.AplicacioEntity;
-import es.caib.notib.core.entity.EntitatEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base

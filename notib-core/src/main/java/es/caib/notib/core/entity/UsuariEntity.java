@@ -25,17 +25,16 @@ public class UsuariEntity implements Serializable {
 	@Id
 	@Column(name = "codi", length = 64, nullable = false)
 	private String codi;
-	@Column(name = "nom", length = 200)
+	@Column(name = "nom", length = 100)
 	private String nom;
-	@Column(name = "nif", length = 9)
-	private String nif;
+	@Column(name = "llinatges", length = 100)
+	private String llinatges;
+	@Column(name = "nom_sencer", length = 200)
+	private String nomSencer;
 	@Column(name = "email", length = 200)
 	private String email;
-	@Column(name = "inicialitzat")
-	private boolean inicialitzat = false;
 	@Version
 	private long version = 0;
-	
 
 	public String getCodi() {
 		return codi;
@@ -43,50 +42,58 @@ public class UsuariEntity implements Serializable {
 	public String getNom() {
 		return nom;
 	}
-	public String getNif() {
-		return nif;
+	public String getLlinatges() {
+		return llinatges;
+	}
+	public String getNomSencer() {
+		return nomSencer;
 	}
 	public String getEmail() {
 		return email;
 	}
-	public boolean isInicialitzat() {
-		return inicialitzat;
-	}
 
 	public void update(
 			String nom,
-			String nif,
+			String llinatges,
 			String email) {
 		this.nom = nom;
-		this.nif = nif;
+		this.llinatges = llinatges;
 		this.email = email;
-		this.inicialitzat = true;
+	}
+	public void update(
+			String nomSencer,
+			String email) {
+		this.nomSencer = nomSencer;
+		this.email = email;
 	}
 
 	public static Builder getBuilder(
 			String codi,
-			String nom,
-			String nif,
 			String email) {
 		return new Builder(
 				codi,
-				nom,
-				nif,
 				email);
 	}
 
 	public static class Builder {
 		UsuariEntity built;
 		Builder(String codi,
-				String nom,
-				String nif,
 				String email) {
 			built = new UsuariEntity();
 			built.codi = codi;
-			built.nom = nom;
-			built.nif = nif;
 			built.email = email;
-			built.inicialitzat = true;
+		}
+		public Builder nom(String nom) {
+			built.nom = nom;
+			return this;
+		}
+		public Builder llinatges(String llinatges) {
+			built.llinatges = llinatges;
+			return this;
+		}
+		public Builder nomSencer(String nomSencer) {
+			built.nomSencer = nomSencer;
+			return this;
 		}
 		public UsuariEntity build() {
 			return built;
