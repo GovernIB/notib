@@ -20,10 +20,12 @@ public class BaseUserController extends BaseController {
 	public EntitatDto getEntitatActualComprovantPermisos( 
 			HttpServletRequest request) {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-		if (entitat == null)
+		if (entitat == null) {
 			throw new SecurityException("No te cap entitat assignada");
-		if (!entitat.isUsuariActualRepresentant())
+		}
+		if (!entitat.isUsuariActualRepresentant()) {
 			throw new SecurityException("No te permisos per accedir a aquesta entitat com a representant");
+		}
 		return entitat;
 	}
 

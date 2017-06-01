@@ -34,43 +34,35 @@ public class EntitatController extends BaseController {
 
 	@Autowired
 	private EntitatService entitatService;
-	
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get( HttpServletRequest request ) {
-		
 		return "entitatList";
 	}
-	
+
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable( HttpServletRequest request ) {
-		
-		if( RolHelper.isUsuariActualAdministrador(request) ) {
+		if (RolHelper.isUsuariActualAdministrador(request)) {
 			return DatatablesHelper.getDatatableResponse(
 					request,
 					entitatService.findAllPaginat(
-							DatatablesHelper.getPaginacioDtoFromRequest( request ) )
-					);
-			
+							DatatablesHelper.getPaginacioDtoFromRequest(request)));
 		} else if ( RolHelper.isUsuariActualRepresentant(request) ) {
 			EntitatDto entitat = EntitatHelper.getEntitatActual( request );
 			return DatatablesHelper.getDatatableResponse(
 					request,
-					entitatService.findByEntitatId( entitat.getId() )
-					);
+					entitatService.findByEntitatId(entitat.getId()));
 		}
-		
 		return null;
-		
 	}
 
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
 	public String getNew(HttpServletRequest request,
 						 Model model) {
-		
-		if( !RolHelper.isUsuariActualAdministrador(request) ) return "entitatList";
-		
+		if (!RolHelper.isUsuariActualAdministrador(request)) {
+			return "entitatList";
+		}
 		return get(request, null, model);
 	}
 	@RequestMapping(value = "/{entitatId}", method = RequestMethod.GET)
@@ -78,16 +70,16 @@ public class EntitatController extends BaseController {
 			HttpServletRequest request,
 			@PathVariable Long entitatId,
 			Model model) {
-		
 		EntitatDto entitat = null;
-		if (entitatId != null)
+		if (entitatId != null) {
 			entitat = entitatService.findById(entitatId);
+		}
 		if (entitat != null) {
 			EntitatCommand command = EntitatCommand.asCommand( entitat );
 			model.addAttribute( command );
-		} else
+		} else {
 			model.addAttribute(new EntitatCommand());
-		
+		}
 		return "entitatForm";
 	}
 	@RequestMapping(method = RequestMethod.POST)
@@ -95,14 +87,11 @@ public class EntitatController extends BaseController {
 			HttpServletRequest request,
 			@Valid EntitatCommand command,
 			BindingResult bindingResult) {
-		
 		if (bindingResult.hasErrors()) {
 			return "entitatForm";
 		}
 		if (command.getId() != null) {
-			
 			entitatService.update(EntitatCommand.asDto(command));
-
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:entitats",
@@ -141,10 +130,7 @@ public class EntitatController extends BaseController {
 	public String delete(
 			HttpServletRequest request,
 			@PathVariable Long entitatId) {
-		
 		entitatService.delete(entitatId);
-		
-		
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../entitats",

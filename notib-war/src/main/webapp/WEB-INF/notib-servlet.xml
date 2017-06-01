@@ -36,7 +36,6 @@
 		<bean class="es.caib.notib.war.interceptor.SessioInterceptor"/>
 		<bean class="es.caib.notib.war.interceptor.LlistaEntitatsInterceptor"/>
 		<bean class="es.caib.notib.war.interceptor.LlistaRolsInterceptor"/>
-<!-- 		<bean class="es.caib.notib.war.interceptor.ElementsPendentsBustiaInterceptor"/> -->
 		<bean class="es.caib.notib.war.interceptor.ModalInterceptor"/>
 		<bean class="es.caib.notib.war.interceptor.NodecoInterceptor"/>
 		<bean class="es.caib.notib.war.interceptor.AjaxInterceptor"/>
