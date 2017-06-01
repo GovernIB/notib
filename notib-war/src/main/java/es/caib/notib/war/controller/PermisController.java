@@ -87,6 +87,8 @@ public class PermisController extends BaseController {
 		
 		model.addAttribute( new PermisCommand() );
 		
+		model.addAttribute( "entitatId", entitatId );
+		
 		return "adminPermisForm";
 		
 	}
@@ -97,6 +99,8 @@ public class PermisController extends BaseController {
 			@PathVariable Long entitatId,
 			@PathVariable Long permisId,
 			Model model) {
+		
+		model.addAttribute( "entitatId", entitatId );
 		
 		List<PermisDto> permisos = null;
 		permisos = entitatService.findPermis(entitatId);

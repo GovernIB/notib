@@ -45,11 +45,13 @@
 		id="taulaAplicacions"
 		data-toggle="datatable"
 		data-url="<c:url value="/aplicacions/datatable"/>"
+		data-search-enabled="true"
 		data-selection-enabled="false"
 		data-default-order="0" 
 		data-default-dir="asc"
 		data-botons-template="#botonsTemplate"
 		class="table table-bordered table-striped"
+		data-info-type="search"
 		style="width:100%">
 		<thead>
 			<tr>

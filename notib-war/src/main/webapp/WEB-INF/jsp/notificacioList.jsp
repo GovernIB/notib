@@ -158,9 +158,12 @@
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false" width="4%">#</th>
-				<th data-col-name="concepte"><spring:message code="notificacio.list.columna.concepte"/></th>
-				<th data-col-name="enviamentDataProgramada" data-converter="datetime"><spring:message code="notificacio.list.columna.enviament.data.programada"/></th>
-				<th data-col-name="estat" data-template="#cellEstatTemplate">
+				<th data-col-name="enviamentDataProgramada" data-converter="datetime" width="15%"><spring:message code="notificacio.list.columna.enviament.data.programada"/></th>
+				<th data-col-name="concepte" width="35%"><spring:message code="notificacio.list.columna.concepte"/></th>
+				<c:if test="${isRolActualAdministrador}">
+					<th data-col-name="entitat.nom" width="20%"><spring:message code="notificacio.list.columna.entitat"/></th>
+				</c:if>
+				<th data-col-name="estat" data-template="#cellEstatTemplate" width="20%">
 					<spring:message code="notificacio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						{{if estat == 'PENDENT'}}
@@ -173,10 +176,7 @@
 							{{:estat}}
 						{{/if}}
 					</script>
-				</th>				
-				<c:if test="${isRolActualAdministrador}">
-					<th data-col-name="entitat.nom"><spring:message code="notificacio.list.columna.entitat"/></th>
-				</c:if>
+				</th>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
@@ -184,7 +184,7 @@
 							<ul class="dropdown-menu">
 								<li><a href="<c:url value="/notificacions/{{:id}}"/>" data-toggle="modal"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
 								<li><a href="<c:url value="/notificacions/{{:id}}/llistaevents"/>" data-toggle="modal"><span class="fa fa-calendar-check-o"></span>&nbsp;<spring:message code="notificacio.list.boto.events"/></a></li>								
-								<li><a href="<c:url value="/consulta/showpdf/"/>{{:id}}"><span class="fa fa-download"></span>&nbsp;<spring:message code="notificacio.list.boto.descarregar.document"/></a></li>
+								<li><a href="<c:url value="/notificacions/descarregar/{{:id}}"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="notificacio.list.boto.descarregar.document"/></a></li>
 							</ul>
 						</div>
 					</script>

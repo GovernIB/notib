@@ -53,9 +53,9 @@
 			<not:inputSelect name="permis" textKey="permis.form.camp.permis" optionEnum="PermisosEnumDto" />
 		</div>
 		
-		<div id="modal-botons">
+		<div id="modal-botons" class="col-xs-12 text-right">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
-			<a href="<c:url value="/permis"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+			<a href="<c:url value="/entitats/${entitatId}/permis"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
 </body>

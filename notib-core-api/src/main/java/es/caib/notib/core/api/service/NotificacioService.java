@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
@@ -83,6 +84,11 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('NOT_APL')")
 	public NotificacioDestinatariDto findDestinatariByReferencia(
 			String referencia
+			);
+	
+	@PreAuthorize("hasRole('NOT_ADMIN')  or hasRole('NOT_REP')")
+	public FitxerDto findFitxer(
+			Long notificacioId
 			);
 
 	/**

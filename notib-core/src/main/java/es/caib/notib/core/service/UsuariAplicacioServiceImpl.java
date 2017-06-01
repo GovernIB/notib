@@ -155,7 +155,8 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 				true,
 				false );
 		
-		Page<AplicacioEntity> aplicacions = aplicacioRepository.findAll(
+		Page<AplicacioEntity> aplicacions = aplicacioRepository.findAllFiltrat(
+				paginacioParams.getFiltre(),
 				paginacioHelper.toSpringDataPageable(paginacioParams)
 				);
 		
