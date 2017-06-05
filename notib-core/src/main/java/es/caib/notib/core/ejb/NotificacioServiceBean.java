@@ -138,9 +138,4 @@ public class NotificacioServiceBean implements NotificacioService {
 		delegate.seuNotificaComunicarEstatPendents();
 	}
 
-	@Override
-	public FitxerDto findFitxer(Long notificacioId) {
-		return delegate.findFitxer(notificacioId);
-	}
-
 }
