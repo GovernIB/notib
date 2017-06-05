@@ -109,6 +109,19 @@ public class NotificacioServiceBean implements NotificacioService {
 				notificacioId,
 				destinatariId);
 	}
+	
+	@Override
+	public FitxerDto findCertificacio(
+			String referencia) {
+		return delegate.findCertificacio(referencia);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	public FitxerDto findFitxer(
+			Long notificacioId) {
+		return delegate.findFitxer(notificacioId);
+	}
 
 	@Override
 	public void seuEnviamentsPendents() {

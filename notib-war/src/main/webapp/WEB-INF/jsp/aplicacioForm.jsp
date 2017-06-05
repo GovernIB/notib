@@ -30,11 +30,17 @@
 	<c:set var="createAplication"><not:modalUrl value="/aplicacions/save"/></c:set>
 	<form:form action="${createAplication}" method="post" cssClass="form-horizontal" commandName="aplicacioCommand" role="form">
 		<form:hidden path="id"/>
-		<div class="col-xs-6"><not:inputText name="usuariCodi" textKey="aplicacio.form.camp.codi" required="true" labelSize="5"/></div>
+		
+		<div class="col-xs-5"><not:inputText name="usuariCodi" textKey="aplicacio.form.camp.codi" required="true" labelSize="6"/></div>
+		
+		<div class="col-xs-5"><not:inputSelect name="tipusAutenticacio" textKey="permis.form.camp.permis" optionEnum="TipusAutenticacioEnumDto" labelSize="5"/></div>
+		
 		<div class="col-xs-10"><not:inputText name="callbackUrl" textKey="aplicacio.form.camp.urlcallback" required="true" labelSize="3"/></div>
+		
 		<div id="modal-botons">
 			<button id="btnSubmit" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/aplicacions"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+		
 		</div>
 	</form:form>
 	

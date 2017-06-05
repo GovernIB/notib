@@ -24,7 +24,7 @@ import es.caib.notib.core.api.service.UsuariAplicacioService;
  */
 @Stateless
 @Interceptors(SpringBeanAutowiringInterceptor.class)
-public class UsuariAplicacioBean implements UsuariAplicacioService {
+public class UsuariAplicacioServiceBean implements UsuariAplicacioService {
 
 	@Autowired
 	UsuariAplicacioService delegate;

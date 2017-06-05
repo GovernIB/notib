@@ -15,6 +15,7 @@ public class AplicacioDto extends AuditoriaDto {
 	private Long id;
 	private String usuariCodi;
 	private String callbackUrl;
+	private TipusAutenticacioEnumDto tipusAutenticacio;
 
 	public Long getId() {
 		return id;
@@ -22,19 +23,29 @@ public class AplicacioDto extends AuditoriaDto {
 	public void setId(Long id) {
 		this.id = id;
 	}
+	
 	public String getUsuariCodi() {
 		return usuariCodi;
 	}
 	public void setUsuariCodi(String usuariCodi) {
 		this.usuariCodi = usuariCodi;
 	}
+	
 	public String getCallbackUrl() {
 		return callbackUrl;
 	}
 	public void setCallbackUrl(String callbackUrl) {
 		this.callbackUrl = callbackUrl;
 	}
-
+	
+	public TipusAutenticacioEnumDto getTipusAutenticacio() {
+		return tipusAutenticacio;
+	}
+	public void setTipusAutenticacio(TipusAutenticacioEnumDto tipusAutenticacio) {
+		this.tipusAutenticacio = tipusAutenticacio;
+	}
+	
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

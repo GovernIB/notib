@@ -21,7 +21,7 @@ public class NotificacioCertificacioClient {
 	
 	private CertificacioTipusEnum tipus;
 	private CertificacioArxiuTipusEnum arxiuTipus;
-	private String arxiuContingut;
+	private byte[] arxiuContingut;
 	private String numSeguiment;
 	private Date dataActualitzacio;
 	
@@ -31,7 +31,7 @@ public class NotificacioCertificacioClient {
 	public NotificacioCertificacioClient(
 			CertificacioTipusEnum tipus, 
 			CertificacioArxiuTipusEnum arxiuTipus,
-			String arxiuContingut, 
+			byte[] arxiuContingut, 
 			String numSeguiment, 
 			Date dataActualitzacio) {
 		
@@ -56,10 +56,10 @@ public class NotificacioCertificacioClient {
 	public void setArxiuTipus(CertificacioArxiuTipusEnum arxiuTipus) {
 		this.arxiuTipus = arxiuTipus;
 	}
-	public String getArxiuContingut() {
+	public byte[] getArxiuContingut() {
 		return arxiuContingut;
 	}
-	public void setArxiuContingut(String arxiuContingut) {
+	public void setArxiuContingut(byte[] arxiuContingut) {
 		this.arxiuContingut = arxiuContingut;
 	}
 	public String getNumSeguiment() {
