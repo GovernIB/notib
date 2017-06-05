@@ -82,8 +82,9 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 			String valor) throws NamingException {
 		List<DadesUsuari> usuaris = new ArrayList<DadesUsuari>();
 		Hashtable<String, String> entornLdap = new Hashtable<String, String>();
-		entornLdap.put(Context.INITIAL_CONTEXT_FACTORY,
-				  "com.sun.jndi.ldap.LdapCtxFactory");
+		entornLdap.put(
+				Context.INITIAL_CONTEXT_FACTORY,
+				"com.sun.jndi.ldap.LdapCtxFactory");
 		entornLdap.put(Context.PROVIDER_URL, getLdapServerUrl());
 		entornLdap.put(Context.SECURITY_PRINCIPAL, getLdapPrincipal());
 		entornLdap.put(Context.SECURITY_CREDENTIALS, getLdapCredentials());
