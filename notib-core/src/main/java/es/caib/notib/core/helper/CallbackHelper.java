@@ -67,8 +67,8 @@ public class CallbackHelper {
 				jerseyClient.addFilter( new HTTPBasicAuthFilter(username, password) );
 				break;
 			case TEXT_CLAR:
-				username = getAplicacioPropertyUsername(aplicacio.getUsuariCodi());
-				password = getAplicacioPropertyPassword(aplicacio.getUsuariCodi());
+//				username = getAplicacioPropertyUsername(aplicacio.getUsuariCodi());
+//				password = getAplicacioPropertyPassword(aplicacio.getUsuariCodi());
 				jerseyClient.addFilter( new HTTPBasicAuthFilter(username, password) );
 				break;
 			case CAP:
@@ -135,8 +135,8 @@ public class CallbackHelper {
 				jerseyClient.addFilter( new HTTPBasicAuthFilter(username, password) );
 				break;
 			case TEXT_CLAR:
-				username = getAplicacioPropertyUsername(aplicacio.getUsuariCodi());
-				password = getAplicacioPropertyPassword(aplicacio.getUsuariCodi());
+//				username = getAplicacioPropertyUsername(aplicacio.getUsuariCodi());
+//				password = getAplicacioPropertyPassword(aplicacio.getUsuariCodi());
 				jerseyClient.addFilter( new HTTPBasicAuthFilter(username, password) );
 				break;
 			case CAP:
@@ -172,24 +172,24 @@ public class CallbackHelper {
 		
 	}
 	
-	private String getAplicacioPropertyUsername(String aplicacioCodi) {
-		String username = PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib." + aplicacioCodi + ".auth.username");
-		if (username == null) {
-			username = PropertiesHelper.getProperties().getProperty(
-					"es.caib.notib.auth.username");
-		}
-		return username;
-	}
-	private String getAplicacioPropertyPassword(String aplicacioCodi) {
-		String password = PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib." + aplicacioCodi + ".auth.password");
-		if (password == null) {
-			password = PropertiesHelper.getProperties().getProperty(
-					"es.caib.notib.auth.password");
-		}
-		return password;
-	}
+//	private String getAplicacioPropertyUsername(String aplicacioCodi) {
+//		String username = PropertiesHelper.getProperties().getProperty(
+//				"es.caib.notib." + aplicacioCodi + ".auth.username");
+//		if (username == null) {
+//			username = PropertiesHelper.getProperties().getProperty(
+//					"es.caib.notib.auth.username");
+//		}
+//		return username;
+//	}
+//	private String getAplicacioPropertyPassword(String aplicacioCodi) {
+//		String password = PropertiesHelper.getProperties().getProperty(
+//				"es.caib.notib." + aplicacioCodi + ".auth.password");
+//		if (password == null) {
+//			password = PropertiesHelper.getProperties().getProperty(
+//					"es.caib.notib.auth.password");
+//		}
+//		return password;
+//	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
 

@@ -105,7 +105,7 @@ public class WsClientHelper<T> {
 			String userName,
 			String password,
 			Class<T> clazz,
-			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
+			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
 		return this.generarClientWs(
 				wsdlResourceUrl,
 				endpoint,
@@ -124,7 +124,7 @@ public class WsClientHelper<T> {
 			String userName,
 			String password,
 			Class<T> clazz,
-			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
+			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
 		return this.generarClientWs(
 				null,
 				endpoint,
@@ -141,7 +141,7 @@ public class WsClientHelper<T> {
 			String endpoint,
 			QName qname,
 			Class<T> clazz,
-			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
+			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
 		return this.generarClientWs(
 				null,
 				endpoint,
