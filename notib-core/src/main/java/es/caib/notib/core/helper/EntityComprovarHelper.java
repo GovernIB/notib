@@ -39,44 +39,47 @@ public class EntityComprovarHelper {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		
+		boolean esAdministradorEntitat = false;
+		boolean esRepresentantEntitat = false;
+		
 		if(comprovarAdmin) {
-			
-			boolean esAdministradorEntitat = false;
 			for(GrantedAuthority ga: auth.getAuthorities()) {
 				if( ga.toString().equals("NOT_ADMIN") ) {
 					esAdministradorEntitat = true;
 					break;
 				}
 			}
-			
-			if (!esAdministradorEntitat) {
+		}
+		
+		if(comprovarRep) {
+			esRepresentantEntitat = permisosHelper.isGrantedAll(
+					entitatId,
+					EntitatEntity.class,
+					new Permission[] {ExtendedPermission.REPRESENTANT},
+					auth);
+		}
+		
+		if (comprovarAdmin && !esAdministradorEntitat) {
+			if ( (!comprovarRep) || 
+				 (comprovarRep && !esRepresentantEntitat)
+			   ) {
 				throw new PermissionDeniedException(
 						new Long(-1),
 						EntitatEntity.class,
 						auth.getName(),
 						"ADMINISTRATION");
-				
-			} else return;
-		
+			}
+		} else if(comprovarAdmin && esAdministradorEntitat) {
+			return;
 		}
 		
-		if(comprovarRep) {
-			
-			boolean esRepresentantEntitat = permisosHelper.isGrantedAll(
+		if ( comprovarRep && !esRepresentantEntitat) {
+			throw new PermissionDeniedException(
 					entitatId,
 					EntitatEntity.class,
-					new Permission[] {ExtendedPermission.REPRESENTANT},
-					auth);
-			if (!esRepresentantEntitat) {
-				throw new PermissionDeniedException(
-						entitatId,
-						EntitatEntity.class,
-						auth.getName(),
-						"REPRESENTANT");
-				
-			} else return;
-		
-		}	
+					auth.getName(),
+					"REPRESENTANT");
+		}
 		
 	}
 	

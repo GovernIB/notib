@@ -41,7 +41,7 @@ public interface EntitatService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public EntitatDto update(EntitatDto entitat) throws NotFoundException;
 
 	/**

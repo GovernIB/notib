@@ -21,8 +21,6 @@ public interface UsuariRepository extends JpaRepository<UsuariEntity, String> {
 	
 	public UsuariEntity findByCodi(String codi);
 
-	public UsuariEntity findByNif(String nif);
-
 	@Query(   "select "
 			+ "    u "
 			+ "from "
