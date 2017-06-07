@@ -11,12 +11,6 @@
         <dependent-module archiveName="notib-plugin-impl-0.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/notib-plugin-impl/notib-plugin-impl">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="regweb3-ws-api-3.0.8.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/regweb3-ws-api/regweb3-ws-api">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="regweb3-utils-3.0.8.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/regweb3-utils/regweb3-utils">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
         <dependent-module archiveName="notib-plugin-0.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/notib-plugin/notib-plugin">
             <dependency-type>uses</dependency-type>
         </dependent-module>
