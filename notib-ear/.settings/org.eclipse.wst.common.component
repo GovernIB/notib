@@ -179,8 +179,5 @@
         <dependent-module archiveName="jsr311-api-1.1.1.jar" deploy-path="/" handle="module:/classpath/var/M2_REPO/javax/ws/rs/jsr311-api/1.1.1/jsr311-api-1.1.1.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="hsqldb-2.3.2.jar" deploy-path="/" handle="module:/classpath/var/M2_REPO/org/hsqldb/hsqldb/2.3.2/hsqldb-2.3.2.jar">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
     </wb-module>
 </project-modules>

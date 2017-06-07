@@ -110,11 +110,13 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 					pagadorCorreusDataVigencia(notificacio.getPagadorCorreusDataVigencia()).
 					procedimentCodiSia(notificacio.getProcedimentCodiSia()).
 					procedimentDescripcioSia(notificacio.getProcedimentDescripcioSia()).
+					seuAvisTextMobil(notificacio.getSeuAvisTextMobil()).
 					build();
 			notificacioRepository.save(notificacioEntity);
 			// TODO decidir si es fa l'enviament immediatament o si s'espera
 			// a que l'envii la tasca programada.
 			//notificaHelper.intentarEnviament(notificacioEntity);
+			List<NotificacioDestinatariEntity> destinatarislist = new ArrayList();
 			List<String> result = new ArrayList<>();
 			for (NotificacioDestinatari d: notificacio.getDestinataris()) {
 				NotificacioDestinatariEntity.Builder destinatari = NotificacioDestinatariEntity.getBuilder(
@@ -167,7 +169,9 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 				String referencia = notificaHelper.generarReferencia(entity);
 				entity.updateReferencia(referencia);
 				result.add(referencia);
+				destinatarislist.add(entity);
 			}
+			notificacioEntity.updateDestinataris(destinatarislist);
 			return result;
 		} catch (Exception ex) {
 			throw new NotificacioWsServiceException(
@@ -244,7 +248,7 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 					notificacio.getEnviamentTipus(),
 					notificacio.getEnviamentDataProgramada(),
 					notificacio.getConcepte(),
-					notificacio.getPagadorCieCodiDir3(),
+					notificacio.getPagadorCorreusCodiDir3(),
 					notificacio.getPagadorCorreusContracteNum(),
 					notificacio.getPagadorCorreusCodiClientFacturacio(),
 					notificacio.getPagadorCorreusDataVigencia(),

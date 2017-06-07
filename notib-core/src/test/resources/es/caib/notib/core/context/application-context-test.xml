@@ -26,7 +26,7 @@
 			</list>
 		</property>
 	</bean>
-
+	
 	<jdbc:embedded-database id="dataSource" type="HSQL">
 		<jdbc:script location="classpath:/es/caib/notib/core/testdb/NOTIB.sql"/>
 	</jdbc:embedded-database>

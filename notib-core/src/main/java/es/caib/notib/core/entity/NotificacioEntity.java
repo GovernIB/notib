@@ -222,6 +222,11 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public EntitatEntity getEntitat() {
 		return entitat;
 	}
+	
+	public void updateDestinataris(
+			List<NotificacioDestinatariEntity> destinataris) {
+		this.destinataris = destinataris;
+	}
 
 	public void updateEstat(
 			NotificacioEstatEnumDto estat) {
@@ -362,6 +367,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		}
 		public Builder procedimentDescripcioSia(String procedimentDescripcioSia) {
 			built.procedimentDescripcioSia = procedimentDescripcioSia;
+			return this;
+		}
+		public Builder seuAvisTextMobil(String seuAvisTextMobil) {
+			built.seuAvisTextMobil = seuAvisTextMobil;
 			return this;
 		}
 		public NotificacioEntity build() {
