@@ -27,8 +27,6 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import es.caib.loginModule.client.AuthenticationFailureException;
-
 /**
  * Utilitat per a instanciar clients per al servei d'enviament
  * de contingut a bústies.

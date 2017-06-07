@@ -4,9 +4,6 @@ import java.io.IOException;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
@@ -23,7 +20,6 @@ import es.caib.notib.core.api.ws.callback.NotificacioCertificacioClient;
 import es.caib.notib.core.api.ws.callback.NotificacioEstatClient;
 import es.caib.notib.core.api.ws.notificacio.CertificacioArxiuTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.CertificacioTipusEnum;
-import es.caib.notib.core.service.EntitatServiceImpl;
 
 public class CallbackHelper {
 	
@@ -190,7 +186,5 @@ public class CallbackHelper {
 //		}
 //		return password;
 //	}
-	
-	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
 
 }

@@ -28,6 +28,7 @@ import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.core.helper.PropertiesHelper;
 
 /**
  * Tests per al servei d'entitats.
@@ -35,7 +36,7 @@ import es.caib.notib.core.api.service.EntitatService;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/es/caib/notib/core/context/application-context-test.xml"})
+@ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
 @Transactional
 public class EntitatServiceTest extends BaseServiceTest {
 
@@ -47,7 +48,8 @@ public class EntitatServiceTest extends BaseServiceTest {
 	private PermisDto permisUserRepresentant;
 
 	@Before
-	public void setUp() {		
+	public void setUp() {
+		PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
 		entitatCreate = new EntitatDto();
 		entitatCreate.setCodi("LIMIT");
 		entitatCreate.setNom("Limit Tecnologies");
@@ -56,7 +58,6 @@ public class EntitatServiceTest extends BaseServiceTest {
 		entitatCreate.setTipus(EntitatTipusEnumDto.AJUNTAMENT);
 		entitatCreate.setDir3Codi("LIM00001");
 		entitatCreate.setActiva(true);
-		
 		entitatUpdate = new EntitatDto();
 		entitatUpdate.setId(new Long(1));
 		entitatUpdate.setCodi("LIMIT2");
@@ -65,7 +66,6 @@ public class EntitatServiceTest extends BaseServiceTest {
 		entitatUpdate.setCif("23599770E");
 		entitatUpdate.setDir3Codi("LIM00002");
 		entitatCreate.setActiva(true);
-		
 		permisUserRepresentant = new PermisDto();
 		permisUserRepresentant.setRepresentant(true);
 		permisUserRepresentant.setTipus(TipusEnumDto.USUARI);
@@ -220,13 +220,13 @@ public class EntitatServiceTest extends BaseServiceTest {
 		autenticarUsuari("rep");
 		entitatService.create(entitatCreate);
 	}
-	
+
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAdminUpdate() {
 		autenticarUsuari("rep");
 		entitatService.update(entitatCreate);
 	}
-	
+
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAdminDelete() {
 		autenticarUsuari("rep");
