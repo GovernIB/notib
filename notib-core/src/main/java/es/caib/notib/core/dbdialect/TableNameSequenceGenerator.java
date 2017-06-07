@@ -9,14 +9,14 @@ import org.hibernate.type.Type;
 
 public class TableNameSequenceGenerator extends SequenceGenerator {
 
-    public static final String CUSTOM_SEQUENCE_NAME = "NOT_HIBERNATE_SEQ";
+	public static final String CUSTOM_SEQUENCE_NAME = "NOT_HIBERNATE_SEQ";
 
-    public void configure(Type type, Properties params, Dialect dialect) throws MappingException {
-        if(params.getProperty(SEQUENCE) == null || params.getProperty(SEQUENCE).length() == 0) {
-            String seqName = CUSTOM_SEQUENCE_NAME;
-            params.setProperty(SEQUENCE, seqName);               
-        }
-        super.configure(type, params, dialect);
-    }
+	public void configure(Type type, Properties params, Dialect dialect) throws MappingException {
+		if (params.getProperty(SEQUENCE) == null || params.getProperty(SEQUENCE).length() == 0) {
+			String seqName = CUSTOM_SEQUENCE_NAME;
+			params.setProperty(SEQUENCE, seqName);
+		}
+		super.configure(type, params, dialect);
+	}
 
 }
