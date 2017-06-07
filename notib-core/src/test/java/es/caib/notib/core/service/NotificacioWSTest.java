@@ -29,7 +29,6 @@ import es.caib.notib.core.api.dto.NotificacioSeuEstatEnumDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.service.EntitatService;
-import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.ws.notificacio.DomiciliConcretTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.DomiciliNumeracioTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.DomiciliTipusEnum;
@@ -37,10 +36,6 @@ import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioDestinatari;
 import es.caib.notib.core.api.ws.notificacio.NotificacioWsService;
 import es.caib.notib.core.api.ws.notificacio.ServeiTipusEnum;
-import es.caib.notib.core.entity.NotificacioDestinatariEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.repository.NotificacioDestinatariRepository;
-import es.caib.notib.core.repository.NotificacioRepository;
 
 /**
  * Tests per al servei d'entitats.
@@ -48,21 +43,14 @@ import es.caib.notib.core.repository.NotificacioRepository;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/es/caib/notib/core/context/application-context-test.xml"})
+@ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
 @Transactional
 public class NotificacioWSTest extends BaseServiceTest {
 
 	@Autowired
 	private EntitatService entitatService;
 	@Autowired
-	private NotificacioService notificacioService;
-	@Autowired
 	private NotificacioWsService notificacioWSService;
-	
-	@Autowired
-	private NotificacioRepository notificacioRepository;
-	@Autowired
-	private NotificacioDestinatariRepository notificacioDestinatariRepository;
 
 	private EntitatDto entitat;
 	private Notificacio notificacio;
