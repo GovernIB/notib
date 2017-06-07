@@ -1,4 +1,7 @@
-package es.caib.notib.core.dbdialect;
+/**
+ * 
+ */
+package es.caib.notib.core.dialect;
 
 import java.util.Properties;
 
@@ -7,6 +10,13 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.id.SequenceGenerator;
 import org.hibernate.type.Type;
 
+/**
+ * SequenceGenerator de Hibernate per a la base de dades Oracle per a
+ * permetre adaptar el nom de la seqüència HIBERNATE_SEQUENCE als estàndards
+ * de nomenclatura de la DGDT.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
 public class TableNameSequenceGenerator extends SequenceGenerator {
 
 	public static final String CUSTOM_SEQUENCE_NAME = "NOT_HIBERNATE_SEQ";
