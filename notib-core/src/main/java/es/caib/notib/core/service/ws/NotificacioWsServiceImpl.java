@@ -113,11 +113,8 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 					seuAvisTextMobil(notificacio.getSeuAvisTextMobil()).
 					build();
 			notificacioRepository.save(notificacioEntity);
-			// TODO decidir si es fa l'enviament immediatament o si s'espera
-			// a que l'envii la tasca programada.
-			//notificaHelper.intentarEnviament(notificacioEntity);
-			List<NotificacioDestinatariEntity> destinatarislist = new ArrayList();
-			List<String> result = new ArrayList<>();
+			List<String> result = new ArrayList<String>();
+			List<NotificacioDestinatariEntity> destinataris = new ArrayList<NotificacioDestinatariEntity>();
 			for (NotificacioDestinatari d: notificacio.getDestinataris()) {
 				NotificacioDestinatariEntity.Builder destinatari = NotificacioDestinatariEntity.getBuilder(
 						d.getTitularNom(),
@@ -169,9 +166,12 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 				String referencia = notificaHelper.generarReferencia(entity);
 				entity.updateReferencia(referencia);
 				result.add(referencia);
-				destinatarislist.add(entity);
+				destinataris.add(entity);
 			}
-			notificacioEntity.updateDestinataris(destinatarislist);
+			notificacioEntity.updateDestinataris(destinataris);
+			// TODO decidir si es fa l'enviament immediatament o si s'espera
+			// a que l'envii la tasca programada.
+			//notificaHelper.intentarEnviament(notificacioEntity);
 			return result;
 		} catch (Exception ex) {
 			throw new NotificacioWsServiceException(
@@ -192,56 +192,58 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 					notificacio.getDocumentArxiuId(),
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 					baos);
-			List<NotificacioDestinatari> destinataris = new ArrayList<>();
-			for (NotificacioDestinatariEntity d: notificacio.getDestinataris()) {
-				destinataris.add(new NotificacioDestinatari(
-						d.getReferencia(), 
-						d.getTitularNom(), 
-						d.getTitularLlinatges(), 
-						d.getTitularNif(), 
-						d.getTitularTelefon(), 
-						d.getTitularEmail(), 
-						d.getDestinatariNom(), 
-						d.getDestinatariLlinatges(), 
-						d.getDestinatariNif(), 
-						d.getDestinatariTelefon(), 
-						d.getDestinatariEmail(), 
-						DomiciliTipusEnum.toDomiciliTipusEnum(d.getDomiciliTipus()), 
-						DomiciliConcretTipusEnum.toDomiciliConcretTipusEnum(d.getDomiciliConcretTipus()), 
-						d.getDomiciliViaTipus(), 
-						d.getDomiciliViaNom(), 
-						DomiciliNumeracioTipusEnum.toDomiciliNumeracioTipusEnum(d.getDomiciliNumeracioTipus()), 
-						d.getDomiciliNumeracioNumero(), 
-						d.getDomiciliNumeracioPuntKm(), 
-						d.getDomiciliApartatCorreus(), 
-						d.getDomiciliBloc(), 
-						d.getDomiciliPortal(), 
-						d.getDomiciliEscala(), 
-						d.getDomiciliPlanta(), 
-						d.getDomiciliPorta(), 
-						d.getDomiciliComplement(), 
-						d.getDomiciliPoblacio(), 
-						d.getDomiciliMunicipiCodiIne(),
-						d.getDomiciliMunicipiNom(),
-						d.getDomiciliCodiPostal(),
-						d.getDomiciliProvinciaCodi(),
-						d.getDomiciliProvinciaNom(),
-						d.getDomiciliPaisCodiIso(),
-						d.getDomiciliPaisNom(),
-						d.getDomiciliLinea1(),
-						d.getDomiciliLinea2(),
-						d.getDomiciliCie(),
-						d.isDehObligat(),
-						d.getDehNif(),
-						d.getDehProcedimentCodi(),
-						ServeiTipusEnum.toServeiTipusEnum(d.getServeiTipus()),
-						d.getRetardPostal(),
-						d.getCaducitat(),
-						d.getNotificaIdentificador(),
-						d.getSeuRegistreNumero(),
-						d.getSeuRegistreData(),
-						d.getSeuEstat() )
-						);
+			List<NotificacioDestinatari> destinataris = new ArrayList<NotificacioDestinatari>();
+			if (notificacio.getDestinataris() != null) {
+				for (NotificacioDestinatariEntity d: notificacio.getDestinataris()) {
+					destinataris.add(new NotificacioDestinatari(
+							d.getReferencia(), 
+							d.getTitularNom(), 
+							d.getTitularLlinatges(), 
+							d.getTitularNif(), 
+							d.getTitularTelefon(), 
+							d.getTitularEmail(), 
+							d.getDestinatariNom(), 
+							d.getDestinatariLlinatges(), 
+							d.getDestinatariNif(), 
+							d.getDestinatariTelefon(), 
+							d.getDestinatariEmail(), 
+							DomiciliTipusEnum.toDomiciliTipusEnum(d.getDomiciliTipus()), 
+							DomiciliConcretTipusEnum.toDomiciliConcretTipusEnum(d.getDomiciliConcretTipus()), 
+							d.getDomiciliViaTipus(), 
+							d.getDomiciliViaNom(), 
+							DomiciliNumeracioTipusEnum.toDomiciliNumeracioTipusEnum(d.getDomiciliNumeracioTipus()), 
+							d.getDomiciliNumeracioNumero(), 
+							d.getDomiciliNumeracioPuntKm(), 
+							d.getDomiciliApartatCorreus(), 
+							d.getDomiciliBloc(), 
+							d.getDomiciliPortal(), 
+							d.getDomiciliEscala(), 
+							d.getDomiciliPlanta(), 
+							d.getDomiciliPorta(), 
+							d.getDomiciliComplement(), 
+							d.getDomiciliPoblacio(), 
+							d.getDomiciliMunicipiCodiIne(),
+							d.getDomiciliMunicipiNom(),
+							d.getDomiciliCodiPostal(),
+							d.getDomiciliProvinciaCodi(),
+							d.getDomiciliProvinciaNom(),
+							d.getDomiciliPaisCodiIso(),
+							d.getDomiciliPaisNom(),
+							d.getDomiciliLinea1(),
+							d.getDomiciliLinea2(),
+							d.getDomiciliCie(),
+							d.isDehObligat(),
+							d.getDehNif(),
+							d.getDehProcedimentCodi(),
+							ServeiTipusEnum.toServeiTipusEnum(d.getServeiTipus()),
+							d.getRetardPostal(),
+							d.getCaducitat(),
+							d.getNotificaIdentificador(),
+							d.getSeuRegistreNumero(),
+							d.getSeuRegistreData(),
+							d.getSeuEstat() )
+							);
+				}
 			}
 			Notificacio result = new Notificacio(
 					notificacio.getEntitat().getCif(),

@@ -108,7 +108,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			fetch = FetchType.LAZY,
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
-	private List<NotificacioDestinatariEntity> destinataris;
+	private List<NotificacioDestinatariEntity> destinataris = new ArrayList<NotificacioDestinatariEntity>();
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,
