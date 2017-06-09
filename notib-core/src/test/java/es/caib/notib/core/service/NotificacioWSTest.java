@@ -78,7 +78,8 @@ public class NotificacioWSTest extends BaseServiceTest {
 
 	@Before
 	public void setUp() {
-		PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
+		es.caib.notib.core.helper.PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
+		es.caib.notib.plugin.utils.PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
 		entitat = new EntitatDto();
 		entitat.setCodi("LIMIT");
 		entitat.setNom("Limit Tecnologies");
