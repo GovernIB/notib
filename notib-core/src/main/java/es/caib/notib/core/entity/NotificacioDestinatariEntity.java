@@ -405,6 +405,7 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 			Date notificaCertificacioDataActualitzacio) {
 		this.notificaCertificacioTipus = notificaCertificacioTipus;
 		this.notificaCertificacioArxiuTipus = notificaCertificacioArxiuTipus;
+		this.notificaCertificacioArxiuId = notificaCertificacioArxiuId;
 		this.notificaCertificacioNumSeguiment = notificaCertificacioNumSeguiment;
 		this.notificaCertificacioDataActualitzacio = notificaCertificacioDataActualitzacio;
 	}

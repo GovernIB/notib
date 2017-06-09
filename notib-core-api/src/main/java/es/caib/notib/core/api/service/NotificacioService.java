@@ -4,15 +4,20 @@
 package es.caib.notib.core.api.service;
 
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
+import es.caib.notib.core.api.dto.NotificacioSeuEstatEnumDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 
@@ -159,6 +164,62 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('NOT_ADMIN')  or hasRole('NOT_REP')")
 	public FitxerDto findCertificacio(
 			String referencia);
+	
+	/**
+	 * Actualitza l'estat d'un enviament
+	 * 
+	 * @param referencia
+	 * 				Referencia identificadora del enviament al que volem actualitzar l'estat
+	 * @param notificaEstat
+	 *            	Estat de notifica.
+	 * @param notificaEstatData
+	 * 				Data de la darrera actualització del estat de notifica
+	 * @param notificaEstatReceptorNom
+	 * 				Nom del destinatari del enviament.
+	 * @param notificaEstatReceptorNif
+	 * 				Nif del destinatari del enviament.
+	 * @param notificaEstatOrigen
+	 * 				Origen del esta de notifica.
+	 * @param notificaEstatNumSeguiment
+	 * 				Número de seguiment del estat de notifica.
+	 * @param seuEstat
+	 * 				Esta del enviament en la seu.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public void updateDestinatariEstat(
+			String referencia,
+			NotificaEstatEnumDto notificaEstat,
+			Date notificaEstatData,
+			String notificaEstatReceptorNom,
+			String notificaEstatReceptorNif,
+			String notificaEstatOrigen,
+			String notificaEstatNumSeguiment,
+			NotificacioSeuEstatEnumDto seuEstat);
+	
+	/**
+	 * Actualitza el certificat d'un enviament
+	 * 
+	 * @param referencia
+	 * 				Referencia identificadora del enviament al que volem actualitzar l'estat.
+	 * @param notificaCertificacioTipus
+	 * 				El tipus de certificació.
+	 * @param notificaCertificacioArxiuTipus
+	 * 				El format del fitxer de certificació.
+	 * @param notificaCertificacioArxiuId
+	 * 				Identificador del fitxer de certificació.
+	 * @param notificaCertificacioNumSeguiment
+	 * 				Número de seguiment de la certificació.
+	 * @param notificaCertificacioDataActualitzacio
+	 * 				Data de actualització de la certificació.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public void updateCertificacio(
+			String referencia,
+			NotificaCertificacioTipusEnumDto notificaCertificacioTipus,
+			NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus,
+			String notificaCertificacioArxiuId,
+			String notificaCertificacioNumSeguiment,
+			Date notificaCertificacioDataActualitzacio);
 
 	/**
 	 * Mètode d'execució periòdica per a fer els enviaments pendents

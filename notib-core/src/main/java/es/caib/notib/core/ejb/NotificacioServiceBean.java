@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.ejb;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -13,10 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
+import es.caib.notib.core.api.dto.NotificacioSeuEstatEnumDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.service.NotificacioService;
@@ -121,6 +126,46 @@ public class NotificacioServiceBean implements NotificacioService {
 	public FitxerDto findFitxer(
 			Long notificacioId) {
 		return delegate.findFitxer(notificacioId);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public void updateDestinatariEstat(
+			String referencia,
+			NotificaEstatEnumDto notificaEstat,
+			Date notificaEstatData,
+			String notificaEstatReceptorNom,
+			String notificaEstatReceptorNif,
+			String notificaEstatOrigen,
+			String notificaEstatNumSeguiment,
+			NotificacioSeuEstatEnumDto seuEstat) {
+		delegate.updateDestinatariEstat( 
+				referencia,
+				notificaEstat,
+				notificaEstatData,
+				notificaEstatReceptorNom,
+				notificaEstatReceptorNif,
+				notificaEstatOrigen,
+				notificaEstatNumSeguiment,
+				seuEstat);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public void updateCertificacio(
+			String referencia,
+			NotificaCertificacioTipusEnumDto notificaCertificacioTipus,
+			NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus,
+			String notificaCertificacioArxiuId,
+			String notificaCertificacioNumSeguiment,
+			Date notificaCertificacioDataActualitzacio) {
+		delegate.updateCertificacio(
+				referencia,
+				notificaCertificacioTipus,
+				notificaCertificacioArxiuTipus,
+				notificaCertificacioArxiuId,
+				notificaCertificacioNumSeguiment,
+				notificaCertificacioDataActualitzacio);
 	}
 
 	@Override

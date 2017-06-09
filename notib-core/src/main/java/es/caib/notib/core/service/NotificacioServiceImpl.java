@@ -4,6 +4,7 @@
 package es.caib.notib.core.service;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -17,6 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
@@ -348,9 +352,61 @@ public class NotificacioServiceImpl implements NotificacioService {
 				output.toByteArray(),
 				output.size());
 	}
-
-
-
+	
+	@Override
+	public void updateDestinatariEstat(
+			String referencia,
+			NotificaEstatEnumDto notificaEstat,
+			Date notificaEstatData,
+			String notificaEstatReceptorNom,
+			String notificaEstatReceptorNif,
+			String notificaEstatOrigen,
+			String notificaEstatNumSeguiment,
+			NotificacioSeuEstatEnumDto seuEstat) {
+		
+		NotificacioDestinatariEntity entity =
+				notificacioDestinatariRepository.findByReferencia(referencia);
+		entityComprovarHelper.comprovarPermisos(
+				entity.getNotificacio().getId(),
+				true,
+				false);
+		
+		entity.updateNotificaEstat(
+				notificaEstat,
+				notificaEstatData,
+				notificaEstatReceptorNom,
+				notificaEstatReceptorNif,
+				notificaEstatOrigen,
+				notificaEstatNumSeguiment);
+		entity.updateSeuNotificaEstat(seuEstat);
+		
+	}
+	
+	@Override
+	public void updateCertificacio(
+			String referencia, 
+			NotificaCertificacioTipusEnumDto notificaCertificacioTipus,
+			NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus,
+			String notificaCertificacioArxiuId,
+			String notificaCertificacioNumSeguiment, 
+			Date notificaCertificacioDataActualitzacio) {
+		
+		NotificacioDestinatariEntity entity =
+				notificacioDestinatariRepository.findByReferencia(referencia);
+		entityComprovarHelper.comprovarPermisos(
+				entity.getNotificacio().getId(),
+				true,
+				false);
+		
+		entity.updateNotificaCertificacio(
+				notificaCertificacioTipus,
+				notificaCertificacioArxiuTipus,
+				notificaCertificacioArxiuId,
+				notificaCertificacioNumSeguiment,
+				notificaCertificacioDataActualitzacio);
+		
+	}
+	
 	private int getSeuEnviamentsProcessarMaxProperty() {
 		return propertiesHelper.getAsInt(
 				"es.caib.notib.tasca.seu.enviaments.processar.max",

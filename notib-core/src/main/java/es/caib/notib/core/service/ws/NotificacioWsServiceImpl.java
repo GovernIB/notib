@@ -296,10 +296,10 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 			NotificacioEstat notificacioEstat = new NotificacioEstat(
 					destinatari.getEstatUnificat(),
 					destinatari.getNotificaEstatData(),
-					destinatari.getDestinatariNom(),//receptorNom,
-					destinatari.getDestinatariNif(),//receptorNif,
+					destinatari.getNotificaEstatReceptorNom(),//receptorNom,
+					destinatari.getNotificaEstatReceptorNif(),//receptorNif,
 					destinatari.getNotificaEstatOrigen(),//origen,
-					destinatari.getNotificaCertificacioNumSeguiment());//numSeguiment
+					destinatari.getNotificaEstatNumSeguiment());//numSeguiment
 			return notificacioEstat;
 		} catch (Exception ex) {
 			throw new NotificacioWsServiceException(
