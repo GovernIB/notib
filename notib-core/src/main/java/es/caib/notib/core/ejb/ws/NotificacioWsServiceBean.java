@@ -19,7 +19,6 @@ import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioCertificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioEstat;
 import es.caib.notib.core.api.ws.notificacio.NotificacioWsService;
-import es.caib.notib.core.service.ws.NotificacioWsServiceImpl;
 
 /**
  * Implementació dels mètodes per al servei de bústies de RIPEA.
@@ -44,7 +43,7 @@ import es.caib.notib.core.service.ws.NotificacioWsServiceImpl;
 public class NotificacioWsServiceBean implements NotificacioWsService {
 
 	@Autowired
-	private NotificacioWsServiceImpl delegate;
+	private NotificacioWsService delegate;
 
 	@Override
 	public List<String> alta(
