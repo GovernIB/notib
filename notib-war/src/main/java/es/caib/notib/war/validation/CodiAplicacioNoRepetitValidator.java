@@ -57,11 +57,11 @@ public class CodiAplicacioNoRepetitValidator implements ConstraintValidator<Codi
 				if (id == null) {
 					valid = false;
 				} else {
-					valid = id.equals(aplicacio.getId().toString());
+					valid = ( id.longValue() == aplicacio.getId().longValue() );
 				}
 				if (!valid) {
 					context.disableDefaultConstraintViolation();
-					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("aplicacio.validation.codi.repetit")).addNode("codi").addConstraintViolation();
+					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("aplicacio.validation.codi.repetit")).addNode("usuariCodi").addConstraintViolation();
 				}
 			}
 			
