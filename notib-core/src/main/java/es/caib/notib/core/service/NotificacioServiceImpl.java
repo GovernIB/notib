@@ -100,7 +100,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 				false);
 		Page<NotificacioEntity> notificacions;
 		if (filtre == null) {
-			notificacions = notificacioRepository.findAll(
+			notificacions = notificacioRepository.findByEntitatActiva(
+					true,
 					paginacioHelper.toSpringDataPageable(paginacioParams));
 		} else {
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);

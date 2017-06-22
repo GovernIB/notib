@@ -22,6 +22,12 @@ import es.caib.notib.core.entity.NotificacioEntity;
  */
 public interface NotificacioRepository extends JpaRepository<NotificacioEntity, Long> {
 	
+	
+	Page<NotificacioEntity> findByEntitatActiva(
+			boolean activa,
+			Pageable paginacio
+			);
+	
 	Page<NotificacioEntity> findByEntitatId(
 			Long entitatId,
 			Pageable paginacio
@@ -36,6 +42,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			+ "		lower(ne.concepte) like concat('%', lower(:concepte), '%') "
 			+ "AND "
 			+ "		ne.enviamentDataProgramada BETWEEN :dataInici AND :dataFi "
+			+ "AND "
+			+ "		ne.entitat.activa = true "
 			+ "AND "
 			+ "	    ( :isDestinatariNull = true OR "
 			+ "		0 < ( SELECT count(d.id) "

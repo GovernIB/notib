@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.caib.notib.core.api.dto.AplicacioDto;
 import es.caib.notib.core.api.service.UsuariAplicacioService;
 import es.caib.notib.war.command.AplicacioCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
@@ -66,9 +67,16 @@ public class AplicacioController extends BaseController {
 			HttpServletRequest request,
 			Model model,
 			@PathVariable Long aplicacioId) {
-		AplicacioCommand command = AplicacioCommand.asCommand(
-				usuariAplicacioService.findById(aplicacioId));
-		model.addAttribute(command);
+		
+		AplicacioDto dto = null;
+		if(aplicacioId != null) {
+			dto = usuariAplicacioService.findById(aplicacioId);
+		}
+		if(dto != null) {
+			model.addAttribute(AplicacioCommand.asCommand(dto));
+		} else {
+			model.addAttribute(new AplicacioCommand());
+		}
 		return "aplicacioForm";
 	}
 
