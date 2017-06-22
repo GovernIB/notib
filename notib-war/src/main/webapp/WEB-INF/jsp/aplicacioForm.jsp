@@ -31,7 +31,7 @@
 	<form:form action="${createAplication}" method="post" cssClass="form-horizontal" commandName="aplicacioCommand" role="form">
 		<form:hidden path="id"/>
 		
-		<div class="col-xs-5"><not:inputText name="usuariCodi" textKey="aplicacio.form.camp.codi" required="true" labelSize="6"/></div>
+		<div class="col-xs-5"><not:inputText name="usuariCodi" textKey="aplicacio.form.camp.codi" required="true" labelSize="6" readonly="${!empty aplicacioCommand.id}"/></div>
 		
 		<div class="col-xs-5"><not:inputSelect name="tipusAutenticacio" textKey="permis.form.camp.permis" optionEnum="TipusAutenticacioEnumDto" labelSize="5"/></div>
 		

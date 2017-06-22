@@ -159,7 +159,13 @@
 			<tr>
 				<th data-col-name="id" data-visible="false" width="4%">#</th>
 				<th data-col-name="enviamentDataProgramada" data-converter="datetime" width="15%"><spring:message code="notificacio.list.columna.enviament.data.programada"/></th>
-				<th data-col-name="concepte" width="35%"><spring:message code="notificacio.list.columna.concepte"/></th>
+				<c:set var="myWidth">
+					<c:choose>
+						<c:when test="${isRolActualAdministrador}">35%</c:when>
+						<c:otherwise>55%</c:otherwise>
+					</c:choose>
+				</c:set>
+				<th data-col-name="concepte" width="${myWidth}"><spring:message code="notificacio.list.columna.concepte"/></th>
 				<c:if test="${isRolActualAdministrador}">
 					<th data-col-name="entitat.nom" width="20%"><spring:message code="notificacio.list.columna.entitat"/></th>
 				</c:if>
