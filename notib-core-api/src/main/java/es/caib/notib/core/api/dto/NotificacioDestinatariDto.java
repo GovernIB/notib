@@ -82,7 +82,7 @@ public class NotificacioDestinatariDto extends AuditoriaDto {
 	private boolean seuError;
 	private NotificacioEventDto seuErrorEvent;
 	
-	private NotificacioDto notificacio;
+//	private NotificacioDto notificacio;
 
 	public Long getId() {
 		return id;
@@ -463,12 +463,12 @@ public class NotificacioDestinatariDto extends AuditoriaDto {
 	public void setSeuErrorEvent(NotificacioEventDto seuErrorEvent) {
 		this.seuErrorEvent = seuErrorEvent;
 	}
-	public NotificacioDto getNotificacio() {
-		return notificacio;
-	}
-	public void setNotificacio(NotificacioDto notificacio) {
-		this.notificacio = notificacio;
-	}
+//	public NotificacioDto getNotificacio() {
+//		return notificacio;
+//	}
+//	public void setNotificacio(NotificacioDto notificacio) {
+//		this.notificacio = notificacio;
+//	}
 
 //	public List<NotificacioEventDto> getEvents() {
 //		return events;
