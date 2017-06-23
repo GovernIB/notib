@@ -9,16 +9,16 @@ import java.security.GeneralSecurityException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.wordnik.swagger.annotations.Api;
@@ -40,8 +40,6 @@ import es.caib.notib.war.validation.RestPreconditions;
 @Controller
 @RequestMapping("/api")
 @Api(value = "/notificacio", description = "Notificaio API")
-@Produces("application/json")
-@Consumes("application/json")
 public class NotificacioServiceController extends BaseController {
 
 //	private static final int RESPONSE_CODE_OK = 200;
