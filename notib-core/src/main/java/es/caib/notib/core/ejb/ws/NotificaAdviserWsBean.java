@@ -14,7 +14,6 @@ import org.jboss.wsf.spi.annotation.WebContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.notib.core.service.ws.NotificaAdviserWsImpl;
 import es.caib.notib.core.wsdl.adviser.AdviserWS;
 import es.caib.notib.core.wsdl.adviser.CertificadoRequest;
 import es.caib.notib.core.wsdl.adviser.DatadoRequest;
@@ -45,7 +44,7 @@ public class NotificaAdviserWsBean implements AdviserWS {
 	@Resource
 	private SessionContext sessionContext;
 	@Autowired
-	private NotificaAdviserWsImpl delegate;
+	private AdviserWS delegate;
 
 
 
