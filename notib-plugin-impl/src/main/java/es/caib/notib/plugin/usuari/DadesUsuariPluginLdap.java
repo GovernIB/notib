@@ -148,34 +148,34 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 	}
 
 	private String getLdapServerUrl() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.server.url");
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.server.url");
 	}
 	private String getLdapPrincipal() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.principal");
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.principal");
 	}
 	private String getLdapCredentials() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.credentials");
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.credentials");
 	}
 	private String getLdapSearchBase() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.search.base");
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.search.base");
 	}
 	private String getLdapAtributs() {
 		// Exemple: cn,givenName,sn,mail,departmentNumber,memberOf
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.atributs");
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.atributs");
 	}
 	private String getLdapFiltreCodi() {
 		// Exemple: (&(objectClass=inetOrgPersonCAIB)(cn=XXX))
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.filtre.codi");
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.filtre.codi");
 	}
 	private String getLdapFiltreGrup() {
 		// Exemple: (&(objectClass=inetOrgPersonCAIB)(memberOf=cn=XXX,dc=caib,dc=es))
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.filtre.grup");
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.filtre.grup");
 	}
 	private String getLdapExcloureGrup() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.excloure.grup");
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.excloure.grup");
 	}
 	private String getLdapExcloureMembre() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.excloure.membre");
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.excloure.membre");
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DadesUsuariPluginLdap.class);

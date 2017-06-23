@@ -11,18 +11,16 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import es.caib.notib.core.api.ws.notificacio.Notificacio; 
+import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioCertificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioEstat;
 import es.caib.notib.core.api.ws.notificacio.NotificacioWsService;
@@ -35,23 +33,22 @@ import es.caib.notib.war.validation.RestPreconditions;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
-@RequestMapping("/notificacio")
+@RequestMapping("/api")
 public class NotificacioServiceController extends BaseController {
 
 	@Autowired
 	private NotificacioWsService notificacioWSService;
 
-	@RequestMapping(value = "/documentacioRest", method = RequestMethod.GET)
+	@RequestMapping(value = "/apidoc", method = RequestMethod.GET)
 	public String documentacio(HttpServletRequest request) {
 		return "restDoc";
 	}
 
 	@RequestMapping(
-			value = "/rest/altaEnviament", 
-			method = RequestMethod.POST)
-	@ResponseStatus(HttpStatus.CREATED)
-	@ResponseBody
-	public List<String> altaEnviament(
+			value = "/services/altaEnviament", 
+			method = RequestMethod.POST,
+			produces="application/json")
+	public @ResponseBody List<String> altaEnviament(
 			@RequestBody Notificacio notificacio) throws GeneralSecurityException, IOException {
 		RestPreconditions.checkNotNull(notificacio);
 		List<String> references = notificacioWSService.alta(notificacio);
@@ -59,30 +56,30 @@ public class NotificacioServiceController extends BaseController {
 	}
 
 	@RequestMapping(
-			value = "/rest/infoEnviament/{referencia}", 
-			method = RequestMethod.GET)
-	@ResponseBody
-	public Notificacio infoEnviament(
+			value = "/services/infoEnviament/{referencia}", 
+			method = RequestMethod.GET,
+			produces="application/json")
+	public @ResponseBody Notificacio infoEnviament(
 			@PathVariable("referencia") String referencia) throws UnsupportedEncodingException, IOException {
 		RestPreconditions.checkNotNull(referencia);
 		return notificacioWSService.consulta(referencia);
 	}
 
 	@RequestMapping(
-			value = "/rest/consultaEstat/{referencia}", 
-			method = RequestMethod.GET)
-	@ResponseBody
-	public NotificacioEstat consultaEstat(
+			value = "/services/consultaEstat/{referencia}", 
+			method = RequestMethod.GET,
+			produces="application/json")
+	public @ResponseBody NotificacioEstat consultaEstat(
 			@PathVariable("referencia") String referencia) throws JsonProcessingException {
 		RestPreconditions.checkNotNull(referencia);
 		return notificacioWSService.consultaEstat(referencia);
 	}
 
 	@RequestMapping(
-			value = "/rest/consultaCertificacio/{referencia}", 
-			method = RequestMethod.GET)
-	@ResponseBody
-	public NotificacioCertificacio consultaCertificacio(
+			value = "/services/consultaCertificacio/{referencia}", 
+			method = RequestMethod.GET,
+			produces="application/json")
+	public @ResponseBody NotificacioCertificacio consultaCertificacio(
 			@PathVariable("referencia") String referencia) throws UnsupportedEncodingException, IOException {
 		RestPreconditions.checkNotNull(referencia);
 		return notificacioWSService.consultaCertificacio(referencia);
