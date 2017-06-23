@@ -5,6 +5,8 @@ package es.caib.notib.core.api.ws.notificacio;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
 import es.caib.notib.core.api.dto.NotificacioSeuEstatEnumDto;
 
 /**
@@ -12,6 +14,7 @@ import es.caib.notib.core.api.dto.NotificacioSeuEstatEnumDto;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@JsonAutoDetect
 public class NotificacioDestinatari {
 
 	private String referencia;

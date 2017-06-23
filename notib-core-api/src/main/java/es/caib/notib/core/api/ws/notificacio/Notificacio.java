@@ -22,8 +22,8 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
  * @author Limit Tecnologies <limit@limit.es>
  */
 
-@XmlRootElement
 @JsonAutoDetect
+@XmlRootElement
 public class Notificacio {
 	
 	private String cifEntitat;
