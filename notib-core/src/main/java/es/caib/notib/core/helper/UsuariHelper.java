@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.helper;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -48,8 +50,18 @@ public class UsuariHelper {
 			SessionContext sessionContext,
 			boolean establirComAUsuariActual) {
 		if (sessionContext != null && sessionContext.getCallerPrincipal() != null) {
+			List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+			if (sessionContext.isCallerInRole("NOT_APL"))
+				authorities.add(new SimpleGrantedAuthority("NOT_APL"));
+			if (sessionContext.isCallerInRole("NOT_REP"))
+				authorities.add(new SimpleGrantedAuthority("NOT_REP"));
+			if (sessionContext.isCallerInRole("NOT_ADMIN"))
+				authorities.add(new SimpleGrantedAuthority("NOT_ADMIN"));
+			if (authorities.isEmpty())
+				authorities = null;
 			return generarUsuariAutenticat(
 					sessionContext.getCallerPrincipal().getName(),
+					authorities,
 					establirComAUsuariActual);
 		} else {
 			return null;
@@ -58,10 +70,18 @@ public class UsuariHelper {
 	public Authentication generarUsuariAutenticat(
 			String usuariCodi,
 			boolean establirComAUsuariActual) {
-		List<GrantedAuthority> authorities = null;
+		return generarUsuariAutenticat(
+				usuariCodi,
+				null,
+				establirComAUsuariActual);
+	}
+	public Authentication generarUsuariAutenticat(
+			String usuariCodi,
+			List<GrantedAuthority> authorities,
+			boolean establirComAUsuariActual) {
 		Authentication auth = new DadesUsuariAuthenticationToken(
 				usuariCodi,
-			authorities);
+				authorities);
 		if (establirComAUsuariActual)
 			SecurityContextHolder.getContext().setAuthentication(auth);
 		return auth;

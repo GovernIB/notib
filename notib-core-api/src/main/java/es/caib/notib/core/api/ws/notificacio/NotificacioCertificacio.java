@@ -14,8 +14,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@XmlRootElement
 @JsonAutoDetect
+@XmlRootElement
 public class NotificacioCertificacio {
 
 	private CertificacioTipusEnum tipus;
