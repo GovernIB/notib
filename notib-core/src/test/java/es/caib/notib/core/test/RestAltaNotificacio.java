@@ -32,8 +32,8 @@ public class RestAltaNotificacio {
 		
 		String user = "prova01";
 		String pass = "prova0115";
-		String urlAmbMetode = "http://localhost:8080/notib/notificacio/rest/altaEnviament";
-		String body = mapper.writeValueAsString( generateNotificacio("02", 5) );
+		String urlAmbMetode = "http://localhost:8080/notib/api/services/altaEnviament";
+		String body = mapper.writeValueAsString( generateNotificacio("31", 31) );
 		
 		jerseyClient.addFilter( new HTTPBasicAuthFilter(user, pass) );
 		ClientResponse response = jerseyClient.
@@ -41,11 +41,8 @@ public class RestAltaNotificacio {
 				type("application/json").
 				post(ClientResponse.class, body);
 		
-		
-		String json = response.getEntity(String.class);
-		
-		System.out.println( json );
-
+		System.out.println( response.getStatus() );
+		System.out.println( response.getEntity(String.class) );
 		
 	}
 	
@@ -54,7 +51,7 @@ public class RestAltaNotificacio {
 			int destinatarisNum ) {
 		
 		List<NotificacioDestinatari> destinataris = new ArrayList<>();
-		for(int i = destinatarisNum; i < destinatarisNum + 5; i++) {
+		for(int i = destinatarisNum; i < destinatarisNum + 1; i++) {
 			destinataris.add( new NotificacioDestinatari(
 					"referencia_" + notificacioId + "_" + i,
 					"titularNom_" + notificacioId + "_" + i,

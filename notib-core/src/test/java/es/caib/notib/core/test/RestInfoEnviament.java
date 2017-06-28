@@ -14,7 +14,7 @@ public class RestInfoEnviament {
 		
 		String user = "prova01";
 		String pass = "prova0115";
-		String urlAmbMetode = "http://localhost:8080/notib/notificacio/rest/infoEnviament/8vzkicPJC2k=";
+		String urlAmbMetode = "http://localhost:8080/notib/api/services/infoEnviament/8vzkicPJC2k=";
 		
 		jerseyClient.addFilter( new HTTPBasicAuthFilter(user, pass) );
 		ClientResponse response = jerseyClient.
@@ -23,9 +23,9 @@ public class RestInfoEnviament {
 				get(ClientResponse.class);
 		
 		
-		String json = response.getEntity(String.class);
 		
-		System.out.println( json );
+		System.out.println( response.getStatus() );
+		System.out.println( response.getEntity(String.class) );
 		
 	}
 

@@ -11,6 +11,7 @@ import java.util.List;
 import javax.jws.WebService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.hibernate3.HibernateJdbcException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import es.caib.notib.core.api.ws.notificacio.CertificacioTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.DomiciliConcretTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.DomiciliNumeracioTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.DomiciliTipusEnum;
+import es.caib.notib.core.api.ws.notificacio.InconsistenciaDadesWsServiceException;
 import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioCertificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioDestinatari;
@@ -112,7 +114,7 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 					procedimentDescripcioSia(notificacio.getProcedimentDescripcioSia()).
 					seuAvisTextMobil(notificacio.getSeuAvisTextMobil()).
 					build();
-			notificacioRepository.save(notificacioEntity);
+			notificacioRepository.saveAndFlush(notificacioEntity);
 			List<String> result = new ArrayList<String>();
 			List<NotificacioDestinatariEntity> destinataris = new ArrayList<NotificacioDestinatariEntity>();
 			for (NotificacioDestinatari d: notificacio.getDestinataris()) {
@@ -162,7 +164,7 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 				destinatari.retardPostal( d.getRetardPostal() );
 				destinatari.caducitat( d.getCaducitat() );
 				NotificacioDestinatariEntity entity = destinatari.build();
-				entity = notificacioDestinatariRepository.save(entity);
+				entity = notificacioDestinatariRepository.saveAndFlush(entity);
 				String referencia = notificaHelper.generarReferencia(entity);
 				entity.updateReferencia(referencia);
 				result.add(referencia);
@@ -174,6 +176,10 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 			//notificaHelper.intentarEnviament(notificacioEntity);
 			return result;
 		} catch (Exception ex) {
+			if( ex instanceof HibernateJdbcException)
+				throw new InconsistenciaDadesWsServiceException(
+						"Inconsistencia de dades al donar d'alta la notificació");
+			
 			throw new NotificacioWsServiceException(
 					"Error al donar d'alta la notificació",
 					ex);
@@ -186,6 +192,7 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 		try {
 			NotificacioEntity notificacio = notificacioRepository.findByDestinatariReferencia(
 					referencia);
+			if(notificacio == null) return null;
 			entityComprovarHelper.comprovarPermisosAplicacio(notificacio.getEntitat().getId());
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			pluginHelper.gestioDocumentalGet(
@@ -291,6 +298,7 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 	public NotificacioEstat consultaEstat(String referencia) {
 		try {
 			NotificacioEntity notificacio = notificacioRepository.findByDestinatariReferencia( referencia );
+			if(notificacio == null) return null;
 			entityComprovarHelper.comprovarPermisosAplicacio(notificacio.getEntitat().getId());
 			NotificacioDestinatariEntity destinatari = notificacioDestinatariRepository.findByReferencia(referencia);
 			NotificacioEstat notificacioEstat = new NotificacioEstat(
@@ -314,6 +322,7 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 	public NotificacioCertificacio consultaCertificacio(String referencia) {
 		try {
 			NotificacioDestinatariEntity destinatari = notificacioDestinatariRepository.findByReferencia(referencia);
+			if(destinatari == null || destinatari.getNotificaCertificacioArxiuId() == null) return null;
 			entityComprovarHelper.comprovarPermisosAplicacio(destinatari.getNotificacio().getEntitat().getId());
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			pluginHelper.gestioDocumentalGet(

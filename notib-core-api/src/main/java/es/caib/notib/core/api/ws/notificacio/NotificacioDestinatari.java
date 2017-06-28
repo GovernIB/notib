@@ -17,7 +17,7 @@ import es.caib.notib.core.api.dto.NotificacioSeuEstatEnumDto;
 @JsonAutoDetect
 public class NotificacioDestinatari {
 
-	private String referencia;
+	private String referencia;//
 	private String titularNom;
 	private String titularLlinatges;
 	private String titularNif;
@@ -59,7 +59,7 @@ public class NotificacioDestinatari {
 	private ServeiTipusEnum serveiTipus;
 	private int retardPostal;
 	private Date caducitat;
-	private String notificaIdentificador;
+	private String notificaIdentificador;//
 	private String seuRegistreNumero;
 	private Date seuRegistreData;
 	private NotificacioSeuEstatEnumDto seuEstat;

@@ -9,6 +9,7 @@ import java.security.GeneralSecurityException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,10 +26,12 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 
+import es.caib.notib.core.api.ws.notificacio.InconsistenciaDadesWsServiceException;
 import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioCertificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioEstat;
 import es.caib.notib.core.api.ws.notificacio.NotificacioWsService;
+import es.caib.notib.core.api.ws.notificacio.NotificacioWsServiceException;
 import es.caib.notib.war.validation.RestPreconditions;
 
 /**
@@ -70,9 +73,17 @@ public class NotificacioServiceController extends BaseController {
 //    })
 	public @ResponseBody List<String> altaEnviament(
 			@ApiParam(name="notificacio", value="Objecte amb les dades necessàries per a generar una notificació", required=true) 
-			@RequestBody Notificacio notificacio) throws GeneralSecurityException, IOException {
+			@RequestBody Notificacio notificacio,
+			HttpServletResponse response) throws GeneralSecurityException, IOException {
 		RestPreconditions.checkNotNull(notificacio);
-		List<String> references = notificacioWSService.alta(notificacio);
+		List<String> references = null;
+		try {
+			references = notificacioWSService.alta(notificacio);
+		} catch(NotificacioWsServiceException e) {
+			if( e instanceof InconsistenciaDadesWsServiceException) {
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			}
+		}
 		return references;
 	}
 
@@ -85,9 +96,18 @@ public class NotificacioServiceController extends BaseController {
 			response = Notificacio.class)
 	public @ResponseBody Notificacio infoEnviament(
 			@ApiParam(name="referencia", value="Identificador de la notificació a consultar", required=true)
-			@PathVariable("referencia") String referencia) throws UnsupportedEncodingException, IOException {
+			@PathVariable("referencia") String referencia,
+			HttpServletResponse response) throws UnsupportedEncodingException, IOException {
 		RestPreconditions.checkNotNull(referencia);
-		return notificacioWSService.consulta(referencia);
+		Notificacio notificacio = notificacioWSService.consulta(referencia);
+		try {
+			if(notificacio == null)
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return notificacio;
 	}
 
 	@RequestMapping(
@@ -99,9 +119,18 @@ public class NotificacioServiceController extends BaseController {
 			response = NotificacioEstat.class)
 	public @ResponseBody NotificacioEstat consultaEstat(
 			@ApiParam(name="referencia", value="Identificador de la notificació de la que es vol consultar el seu estat", required=true) 
-			@PathVariable("referencia") String referencia) throws JsonProcessingException {
+			@PathVariable("referencia") String referencia,
+			HttpServletResponse response) throws JsonProcessingException {
 		RestPreconditions.checkNotNull(referencia);
-		return notificacioWSService.consultaEstat(referencia);
+		NotificacioEstat estat = notificacioWSService.consultaEstat(referencia);
+		try {
+			if(estat == null)
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return estat;
 	}
 
 	@RequestMapping(
@@ -113,9 +142,18 @@ public class NotificacioServiceController extends BaseController {
 			response = NotificacioCertificacio.class)
 	public @ResponseBody NotificacioCertificacio consultaCertificacio(
 			@ApiParam(name="referencia", value="Identificador de la notificació de la que es vol consultar la seva certificació", required=true)
-			@PathVariable("referencia") String referencia) throws UnsupportedEncodingException, IOException {
+			@PathVariable("referencia") String referencia,
+			HttpServletResponse response) throws UnsupportedEncodingException, IOException {
 		RestPreconditions.checkNotNull(referencia);
-		return notificacioWSService.consultaCertificacio(referencia);
+		NotificacioCertificacio certificacio = notificacioWSService.consultaCertificacio(referencia);
+		try {
+			if(certificacio == null)
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return certificacio;
 	}
 
 }
