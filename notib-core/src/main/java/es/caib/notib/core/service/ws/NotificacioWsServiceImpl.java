@@ -171,9 +171,10 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 				destinataris.add(entity);
 			}
 			notificacioEntity.updateDestinataris(destinataris);
+			notificacioRepository.saveAndFlush(notificacioEntity);
 			// TODO decidir si es fa l'enviament immediatament o si s'espera
 			// a que l'envii la tasca programada.
-			//notificaHelper.intentarEnviament(notificacioEntity);
+			notificaHelper.intentarEnviament(notificacioEntity);
 			return result;
 		} catch (Exception ex) {
 			if( ex instanceof HibernateJdbcException)
@@ -192,7 +193,7 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 		try {
 			NotificacioEntity notificacio = notificacioRepository.findByDestinatariReferencia(
 					referencia);
-			if(notificacio == null) return null;
+			if (notificacio == null) return null;
 			entityComprovarHelper.comprovarPermisosAplicacio(notificacio.getEntitat().getId());
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			pluginHelper.gestioDocumentalGet(
@@ -252,37 +253,68 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 							);
 				}
 			}
-			Notificacio result = new Notificacio(
-					notificacio.getEntitat().getCif(),
-					notificacio.getEnviamentTipus(),
-					notificacio.getEnviamentDataProgramada(),
-					notificacio.getConcepte(),
-					notificacio.getPagadorCorreusCodiDir3(),
-					notificacio.getPagadorCorreusContracteNum(),
-					notificacio.getPagadorCorreusCodiClientFacturacio(),
-					notificacio.getPagadorCorreusDataVigencia(),
-					notificacio.getPagadorCieCodiDir3(),
-					notificacio.getPagadorCieDataVigencia(),
-					notificacio.getProcedimentCodiSia(),
-					notificacio.getProcedimentDescripcioSia(),
-					notificacio.getDocumentArxiuNom(),
-					new String(Base64.encode(baos.toByteArray())),
-					notificacio.getDocumentSha1(),
-					notificacio.isDocumentNormalitzat(),
-					notificacio.isDocumentGenerarCsv(),
-					notificacio.getSeuExpedientSerieDocumental(),
-					notificacio.getSeuExpedientUnitatOrganitzativa(),
-					notificacio.getSeuExpedientIdentificadorEni(),
-					notificacio.getSeuExpedientTitol(),
-					notificacio.getSeuRegistreOficina(),
-					notificacio.getSeuRegistreLlibre(),
-					notificacio.getSeuIdioma(),
-					notificacio.getSeuAvisTitol(),
-					notificacio.getSeuAvisText(),
-					notificacio.getSeuAvisTextMobil(),
-					notificacio.getSeuOficiTitol(),
-					notificacio.getSeuOficiText(),
-					notificacio.getEstat(),
+			Notificacio result = new Notificacio();
+			result.setCifEntitat(
+					notificacio.getEntitat().getCif());
+			result.setEnviamentTipus(
+					notificacio.getEnviamentTipus());
+			result.setEnviamentDataProgramada(
+					notificacio.getEnviamentDataProgramada());
+			result.setConcepte(
+					notificacio.getConcepte());
+			result.setPagadorCorreusCodiDir3(
+					notificacio.getPagadorCorreusCodiDir3());
+			result.setPagadorCorreusContracteNum(
+					notificacio.getPagadorCorreusContracteNum());
+			result.setPagadorCorreusCodiClientFacturacio(
+					notificacio.getPagadorCorreusCodiClientFacturacio());
+			result.setPagadorCorreusDataVigencia(
+					notificacio.getPagadorCorreusDataVigencia());
+			result.setPagadorCieCodiDir3(
+					notificacio.getPagadorCieCodiDir3());
+			result.setPagadorCieDataVigencia(
+					notificacio.getPagadorCieDataVigencia());
+			result.setProcedimentCodiSia(
+					notificacio.getProcedimentCodiSia());
+			result.setProcedimentDescripcioSia(
+					notificacio.getProcedimentDescripcioSia());
+			result.setDocumentArxiuNom(
+					notificacio.getDocumentArxiuNom());
+			result.setDocumentContingutBase64(
+					new String(Base64.encode(baos.toByteArray())));
+			result.setDocumentSha1(
+					notificacio.getDocumentSha1());
+			result.setDocumentNormalitzat(
+					notificacio.isDocumentNormalitzat());
+			result.setDocumentGenerarCsv(
+					notificacio.isDocumentGenerarCsv());
+			result.setSeuExpedientSerieDocumental(
+					notificacio.getSeuExpedientSerieDocumental());
+			result.setSeuExpedientUnitatOrganitzativa(
+					notificacio.getSeuExpedientUnitatOrganitzativa());
+			result.setSeuExpedientIdentificadorEni(
+					notificacio.getSeuExpedientIdentificadorEni());
+			result.setSeuExpedientTitol(
+					notificacio.getSeuExpedientTitol());
+			result.setSeuRegistreOficina(
+					notificacio.getSeuRegistreOficina());
+			result.setSeuRegistreLlibre(
+					notificacio.getSeuRegistreLlibre());
+			result.setSeuIdioma(
+					notificacio.getSeuIdioma());
+			result.setSeuAvisTitol(
+					notificacio.getSeuAvisTitol());
+			result.setSeuAvisText(
+					notificacio.getSeuAvisText());
+			result.setSeuAvisTextMobil(
+					notificacio.getSeuAvisTextMobil());
+			result.setSeuOficiTitol(
+					notificacio.getSeuOficiTitol());
+			result.setSeuOficiText(
+					notificacio.getSeuOficiText());
+			result.setEstat(
+					notificacio.getEstat());
+			result.setDestinataris(
 					destinataris);
 			return result;
 		} catch (Exception ex) {

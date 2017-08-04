@@ -53,8 +53,8 @@ public class WsClientHelper<T> {
 				url = new URL(endpoint);
 		}
 		Service service = Service.create(url, qname);
-		T bustiaWs = service.getPort(clazz);
-		BindingProvider bindingProvider = (BindingProvider)bustiaWs;
+		T servicePort = service.getPort(clazz);
+		BindingProvider bindingProvider = (BindingProvider)servicePort;
 		// Configura l'adreça del servei
 		String endpointAddress;
 		if (!endpoint.endsWith("?wsdl"))
@@ -93,7 +93,7 @@ public class WsClientHelper<T> {
 					BindingProvider.SOAPACTION_URI_PROPERTY,
 					soapAction);
 		}
-		return bustiaWs;
+		return servicePort;
 	}
 
 	public T generarClientWs(

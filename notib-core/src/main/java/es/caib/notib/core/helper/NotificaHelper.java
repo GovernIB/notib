@@ -4,15 +4,19 @@
 package es.caib.notib.core.helper;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -24,6 +28,15 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPFactory;
+import javax.xml.soap.SOAPHeader;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPHandler;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -100,8 +113,8 @@ public class NotificaHelper {
 	public void intentarEnviament(
 			NotificacioEntity notificacio) {
 		try {
-			ResultadoAlta resultadoAlta = getNotificaWs().altaEnvio(
-					generarTipoEnvio(notificacio));
+			TipoEnvio tipoEnvio = generarTipoEnvio(notificacio);
+			ResultadoAlta resultadoAlta = getNotificaWs().altaEnvio(tipoEnvio);
 			if ("000".equals(resultadoAlta.getCodigoRespuesta())) {
 				if (resultadoAlta.getIdentificadores() != null && resultadoAlta.getIdentificadores().getItem() != null) {
 					for (IdentificadorEnvio identificadorEnvio: resultadoAlta.getIdentificadores().getItem()) {
@@ -600,7 +613,7 @@ public class NotificaHelper {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		pluginHelper.gestioDocumentalGet(
 				notificacio.getDocumentArxiuId(),
-				PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
+				PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 				baos);
 		documento.setContenido(new String(Base64.encode(baos.toByteArray())));
 		envio.setDocumento(documento);
@@ -902,7 +915,8 @@ public class NotificaHelper {
 						"NotificaWsService"),
 				getUsernameProperty(),
 				getPasswordProperty(),
-				NotificaWsPortType.class);
+				NotificaWsPortType.class,
+				new SoapApiKeyHeaderHandler(getApiKeyProperty())); // Hanler per afegir la clau api_key de Notific@
 		return port;
 	}
 	private SedeWsPortType getSedeWs() throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
@@ -935,7 +949,58 @@ public class NotificaHelper {
 				"es.caib.notib.notifica.clau.xifrat.ids",
 				"P0rt4FI8");
 	}
+	private String getApiKeyProperty() {
+		return PropertiesHelper.getProperties().getProperty(
+				"es.caib.notib.notifica.apikey");
+	}
 
+	/** Handler per afegir la clau API_KEY a la capçalera del missatge SOAP cap a Notific@ */
+	public class SoapApiKeyHeaderHandler implements SOAPHandler<SOAPMessageContext> {
+
+		private final String authenticatedToken;
+		
+		/** Constructor per guardar el valor de la API_KEY */
+		public SoapApiKeyHeaderHandler(String authenticatedToken) {
+	        this.authenticatedToken = authenticatedToken;
+	    }
+		
+		@Override
+		public boolean handleMessage(SOAPMessageContext context) {
+			Boolean outboundProperty =
+	                (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+	        if (outboundProperty.booleanValue()) {
+	            try {
+	                SOAPEnvelope envelope = context.getMessage().getSOAPPart().getEnvelope();
+	                SOAPFactory factory = SOAPFactory.newInstance();
+	                SOAPElement apiKeyElement = factory.createElement("api_key");
+	                apiKeyElement.addTextNode(authenticatedToken);
+	                SOAPHeader header = envelope.addHeader();
+	                header.addChildElement(apiKeyElement);
+	            } catch (Exception e) {
+	                e.printStackTrace();
+	            }
+	        } else {
+	            // inbound
+	        }
+	        return true;
+	    }
+
+		@Override
+		public boolean handleFault(SOAPMessageContext context) {
+			return false;
+		}
+
+		@Override
+		public void close(MessageContext context) {
+			//
+		}
+
+		@Override
+		public Set<QName> getHeaders() {
+			return new TreeSet<QName>();
+		}
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(NotificaHelper.class);
 
 }

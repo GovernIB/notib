@@ -25,7 +25,7 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 @JsonAutoDetect
 @XmlRootElement
 public class Notificacio {
-	
+
 	private String cifEntitat;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
 	private Date enviamentDataProgramada;
@@ -57,78 +57,6 @@ public class Notificacio {
 	private String seuOficiText;
 	private NotificacioEstatEnumDto estat;
 	private List<NotificacioDestinatari> destinataris;
-	
-	
-	public Notificacio(){}
-	
-	public Notificacio(
-			String cifEntitat, 
-			NotificaEnviamentTipusEnumDto enviamentTipus, 
-			Date enviamentDataProgramada,
-			String concepte, 
-			String pagadorCorreusCodiDir3, 
-			String pagadorCorreusContracteNum,
-			String pagadorCorreusCodiClientFacturacio, 
-			Date pagadorCorreusDataVigencia, 
-			String pagadorCieCodiDir3,
-			Date pagadorCieDataVigencia, 
-			String procedimentCodiSia, 
-			String procedimentDescripcioSia,
-			String documentArxiuNom, 
-			String documentContingutBase64, 
-			String documentSha1,
-			boolean documentNormalitzat, 
-			boolean documentGenerarCsv, 
-			String seuExpedientSerieDocumental,
-			String seuExpedientUnitatOrganitzativa, 
-			String seuExpedientIdentificadorEni, 
-			String seuExpedientTitol,
-			String seuRegistreOficina, 
-			String seuRegistreLlibre, 
-			String seuIdioma, 
-			String seuAvisTitol,
-			String seuAvisText, 
-			String seuAvisTextMobil, 
-			String seuOficiTitol, 
-			String seuOficiText,
-			NotificacioEstatEnumDto estat,
-			List<NotificacioDestinatari> destinataris) {
-		
-		super();
-		this.cifEntitat = cifEntitat;
-		this.enviamentTipus = enviamentTipus;
-		this.enviamentDataProgramada = enviamentDataProgramada;
-		this.concepte = concepte;
-		this.pagadorCorreusCodiDir3 = pagadorCorreusCodiDir3;
-		this.pagadorCorreusContracteNum = pagadorCorreusContracteNum;
-		this.pagadorCorreusCodiClientFacturacio = pagadorCorreusCodiClientFacturacio;
-		this.pagadorCorreusDataVigencia = pagadorCorreusDataVigencia;
-		this.pagadorCieCodiDir3 = pagadorCieCodiDir3;
-		this.pagadorCieDataVigencia = pagadorCieDataVigencia;
-		this.procedimentCodiSia = procedimentCodiSia;
-		this.procedimentDescripcioSia = procedimentDescripcioSia;
-		this.documentArxiuNom = documentArxiuNom;
-		this.documentContingutBase64 = documentContingutBase64;
-		this.documentSha1 = documentSha1;
-		this.documentNormalitzat = documentNormalitzat;
-		this.documentGenerarCsv = documentGenerarCsv;
-		this.seuExpedientSerieDocumental = seuExpedientSerieDocumental;
-		this.seuExpedientUnitatOrganitzativa = seuExpedientUnitatOrganitzativa;
-		this.seuExpedientIdentificadorEni = seuExpedientIdentificadorEni;
-		this.seuExpedientTitol = seuExpedientTitol;
-		this.seuRegistreOficina = seuRegistreOficina;
-		this.seuRegistreLlibre = seuRegistreLlibre;
-		this.seuIdioma = seuIdioma;
-		this.seuAvisTitol = seuAvisTitol;
-		this.seuAvisText = seuAvisText;
-		this.seuAvisTextMobil = seuAvisTextMobil;
-		this.seuOficiTitol = seuOficiTitol;
-		this.seuOficiText = seuOficiText;
-		this.estat = estat;
-		this.destinataris = destinataris;
-	}
-	
-
 
 	public String getCifEntitat() {
 		return cifEntitat;
