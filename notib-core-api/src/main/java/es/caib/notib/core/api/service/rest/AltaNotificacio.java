@@ -35,7 +35,7 @@ public class AltaNotificacio {
 	
 	private List<NotificacioDestinatari> destinataris;
 	
-	public AltaNotificacio(){}
+	public AltaNotificacio() {}
 	
 	public AltaNotificacio(
 			String nifEntitat,
@@ -56,8 +56,7 @@ public class AltaNotificacio {
 			boolean documentNormalitzat,
 			boolean documentGenerarCsv,
 			boolean certificada,
-			List<NotificacioDestinatari> destinataris ) {
-	
+			List<NotificacioDestinatari> destinataris) {
 		super();
 		this.nifEntitat = nifEntitat;
 		this.enviamentTipus = enviamentTipus;
