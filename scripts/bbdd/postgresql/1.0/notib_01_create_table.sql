@@ -53,7 +53,7 @@ CREATE TABLE NOT_NOTIFICACIO
   PROC_DESC_SIA        character varying(256),
   DOC_ARXIU_NOM        character varying(256)   NOT NULL,
   DOC_ARXIU_ID         character varying(64)    NOT NULL,
-  DOC_SHA1             character varying(20)    NOT NULL,
+  DOC_SHA1             character varying(40)    NOT NULL,
   DOC_NORMALITZAT      boolean                  NOT NULL,
   DOC_GEN_CSV          boolean                  NOT NULL,
   SEU_EXP_SERDOC       character varying(10)    NOT NULL,

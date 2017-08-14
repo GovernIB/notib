@@ -53,7 +53,7 @@ CREATE TABLE NOT_NOTIFICACIO
   PROC_DESC_SIA        VARCHAR2(256),
   DOC_ARXIU_NOM        VARCHAR2(256)            NOT NULL,
   DOC_ARXIU_ID         VARCHAR2(64)             NOT NULL,
-  DOC_SHA1             VARCHAR2(20)             NOT NULL,
+  DOC_SHA1             VARCHAR2(40)             NOT NULL,
   DOC_NORMALITZAT      NUMBER(1)                NOT NULL,
   DOC_GEN_CSV          NUMBER(1)                NOT NULL,
   SEU_EXP_SERDOC       VARCHAR2(10)             NOT NULL,

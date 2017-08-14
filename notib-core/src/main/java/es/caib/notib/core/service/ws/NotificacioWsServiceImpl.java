@@ -133,31 +133,33 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 				destinatari.destinatariLlinatges( d.getDestinatariLlinatges() );
 				destinatari.destinatariTelefon( d.getDestinatariTelefon() );
 				destinatari.destinatariEmail( d.getDestinatariEmail() );
-				destinatari.domiciliTipus(d.getDomiciliTipus().toNotificaDomiciliTipusEnumDto());
-				destinatari.domiciliConcretTipus(d.getDomiciliConcretTipus().toNotificaDomiciliConcretTipusEnumDto());
-				destinatari.domiciliViaTipus( d.getDomiciliViaTipus() );
-				destinatari.domiciliViaNom( d.getDomiciliViaNom() );
-				destinatari.domiciliNumeracioTipus(d.getDomiciliNumeracioTipus().toNotificaDomiciliNumeracioTipusEnumDto());
-				destinatari.domiciliNumeracioNumero( d.getDomiciliNumeracioNumero() );
-				destinatari.domiciliNumeracioPuntKm( d.getDomiciliNumeracioPuntKm() );
-				destinatari.domiciliApartatCorreus( d.getDomiciliApartatCorreus() );
-				destinatari.domiciliBloc( d.getDomiciliBloc() );
-				destinatari.domiciliPortal( d.getDomiciliPortal() );
-				destinatari.domiciliEscala( d.getDomiciliEscala() );
-				destinatari.domiciliPlanta( d.getDomiciliPlanta() );
-				destinatari.domiciliPorta( d.getDomiciliPorta() );
-				destinatari.domiciliComplement( d.getDomiciliComplement() );
-				destinatari.domiciliPoblacio( d.getDomiciliPoblacio() );
-				destinatari.domiciliMunicipiCodiIne( d.getDomiciliMunicipiCodiIne() );
-				destinatari.domiciliMunicipiNom( d.getDomiciliMunicipiNom() );
-				destinatari.domiciliCodiPostal( d.getDomiciliCodiPostal() );
-				destinatari.domiciliProvinciaCodi( d.getDomiciliProvinciaCodi() );
-				destinatari.domiciliProvinciaNom( d.getDomiciliProvinciaNom() );
-				destinatari.domiciliPaisCodiIso( d.getDomiciliPaisCodiIso() );
-				destinatari.domiciliPaisNom( d.getDomiciliPaisNom() );
-				destinatari.domiciliLinea1( d.getDomiciliLinea1() );
-				destinatari.domiciliLinea2( d.getDomiciliLinea2() );
-				destinatari.domiciliCie( d.getDomiciliCie() );
+				if (d.getDomiciliTipus() != null) {
+					destinatari.domiciliTipus(d.getDomiciliTipus().toNotificaDomiciliTipusEnumDto());
+					destinatari.domiciliConcretTipus(d.getDomiciliConcretTipus().toNotificaDomiciliConcretTipusEnumDto());
+					destinatari.domiciliViaTipus( d.getDomiciliViaTipus() );
+					destinatari.domiciliViaNom( d.getDomiciliViaNom() );
+					destinatari.domiciliNumeracioTipus(d.getDomiciliNumeracioTipus().toNotificaDomiciliNumeracioTipusEnumDto());
+					destinatari.domiciliNumeracioNumero( d.getDomiciliNumeracioNumero() );
+					destinatari.domiciliNumeracioPuntKm( d.getDomiciliNumeracioPuntKm() );
+					destinatari.domiciliApartatCorreus( d.getDomiciliApartatCorreus() );
+					destinatari.domiciliBloc( d.getDomiciliBloc() );
+					destinatari.domiciliPortal( d.getDomiciliPortal() );
+					destinatari.domiciliEscala( d.getDomiciliEscala() );
+					destinatari.domiciliPlanta( d.getDomiciliPlanta() );
+					destinatari.domiciliPorta( d.getDomiciliPorta() );
+					destinatari.domiciliComplement( d.getDomiciliComplement() );
+					destinatari.domiciliPoblacio( d.getDomiciliPoblacio() );
+					destinatari.domiciliMunicipiCodiIne( d.getDomiciliMunicipiCodiIne() );
+					destinatari.domiciliMunicipiNom( d.getDomiciliMunicipiNom() );
+					destinatari.domiciliCodiPostal( d.getDomiciliCodiPostal() );
+					destinatari.domiciliProvinciaCodi( d.getDomiciliProvinciaCodi() );
+					destinatari.domiciliProvinciaNom( d.getDomiciliProvinciaNom() );
+					destinatari.domiciliPaisCodiIso( d.getDomiciliPaisCodiIso() );
+					destinatari.domiciliPaisNom( d.getDomiciliPaisNom() );
+					destinatari.domiciliLinea1( d.getDomiciliLinea1() );
+					destinatari.domiciliLinea2( d.getDomiciliLinea2() );
+					destinatari.domiciliCie( d.getDomiciliCie() );
+				}
 				destinatari.dehObligat( d.isDehObligat() );
 				destinatari.dehNif( d.getDehNif() );
 				destinatari.dehProcedimentCodi( d.getDehProcedimentCodi() );
@@ -177,6 +179,7 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 			notificaHelper.intentarEnviament(notificacioEntity);
 			return result;
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			if( ex instanceof HibernateJdbcException)
 				throw new InconsistenciaDadesWsServiceException(
 						"Inconsistencia de dades al donar d'alta la notificació");

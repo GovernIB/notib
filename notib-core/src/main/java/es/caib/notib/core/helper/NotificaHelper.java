@@ -594,18 +594,22 @@ public class NotificaHelper {
 		if (notificacio.getEnviamentTipus() != null) {
 			envio.setTipoEnvio(notificacio.getEnviamentTipus().getText());
 		}
-		TipoOrganismoPagadorCorreos pagadorCorreos = new TipoOrganismoPagadorCorreos();
-		pagadorCorreos.setCodigoDir3(notificacio.getPagadorCorreusCodiDir3());
-		pagadorCorreos.setCodigoClienteFacturacionCorreos(notificacio.getPagadorCorreusCodiClientFacturacio());
-		pagadorCorreos.setNumeroContratoCorreos(notificacio.getPagadorCorreusContracteNum());
-		pagadorCorreos.setFechaVigencia(
-				toXmlGregorianCalendar(notificacio.getPagadorCieDataVigencia()));
-		envio.setOrganismoPagadorCorreos(pagadorCorreos);
-		TipoOrganismoPagadorCIE pagadorCie = new TipoOrganismoPagadorCIE();
-		pagadorCie.setCodigoDir3(notificacio.getPagadorCieCodiDir3());
-		pagadorCie.setFechaVigencia(
-				toXmlGregorianCalendar(notificacio.getPagadorCieDataVigencia()));
-		envio.setOrganismoPagadorCie(pagadorCie);
+		if (notificacio.getPagadorCorreusCodiDir3() != null) {
+			TipoOrganismoPagadorCorreos pagadorCorreos = new TipoOrganismoPagadorCorreos();
+			pagadorCorreos.setCodigoDir3(notificacio.getPagadorCorreusCodiDir3());
+			pagadorCorreos.setCodigoClienteFacturacionCorreos(notificacio.getPagadorCorreusCodiClientFacturacio());
+			pagadorCorreos.setNumeroContratoCorreos(notificacio.getPagadorCorreusContracteNum());
+			pagadorCorreos.setFechaVigencia(
+					toXmlGregorianCalendar(notificacio.getPagadorCieDataVigencia()));
+			envio.setOrganismoPagadorCorreos(pagadorCorreos);
+		}
+		if (notificacio.getPagadorCieCodiDir3() != null) {
+			TipoOrganismoPagadorCIE pagadorCie = new TipoOrganismoPagadorCIE();
+			pagadorCie.setCodigoDir3(notificacio.getPagadorCieCodiDir3());
+			pagadorCie.setFechaVigencia(
+					toXmlGregorianCalendar(notificacio.getPagadorCieDataVigencia()));
+			envio.setOrganismoPagadorCie(pagadorCie);
+		}
 		Documento documento = new Documento();
 		documento.setHashSha1(notificacio.getDocumentSha1());
 		documento.setNormalizado(notificacio.isDocumentNormalitzat() ? "si" : "no");
@@ -662,48 +666,50 @@ public class NotificaHelper {
 			if (destinatari.getDomiciliTipus() != null) {
 				destinatario.setTipoDomicilio(destinatari.getDomiciliTipus().getText());
 			}
-			TipoDomicilio domicilio = new TipoDomicilio();
-			if (destinatari.getDomiciliConcretTipus() != null) {
-				domicilio.setTipoDomicilioConcreto(destinatari.getDomiciliConcretTipus().getText());
+			if (destinatari.getDomiciliTipus() != null) {
+				TipoDomicilio domicilio = new TipoDomicilio();
+				if (destinatari.getDomiciliConcretTipus() != null) {
+					domicilio.setTipoDomicilioConcreto(destinatari.getDomiciliConcretTipus().getText());
+				}
+				domicilio.setTipoVia(destinatari.getDomiciliViaTipus());
+				domicilio.setNombreVia(destinatari.getDomiciliViaNom());
+				if (destinatari.getDomiciliNumeracioTipus() != null) {
+					domicilio.setCalificadorNumero(destinatari.getDomiciliNumeracioTipus().getText());
+				}
+				domicilio.setNumeroCasa(destinatari.getDomiciliNumeracioNumero());
+				domicilio.setPuntoKilometrico(destinatari.getDomiciliNumeracioPuntKm());
+				domicilio.setApartadoCorreos(destinatari.getDomiciliApartatCorreus());
+				domicilio.setBloque(destinatari.getDomiciliBloc());
+				domicilio.setPortal(destinatari.getDomiciliPortal());
+				domicilio.setEscalera(destinatari.getDomiciliEscala());
+				domicilio.setPlanta(destinatari.getDomiciliPlanta());
+				domicilio.setPuerta(destinatari.getDomiciliPorta());
+				domicilio.setComplemento(destinatari.getDomiciliComplement());
+				domicilio.setPoblacion(destinatari.getDomiciliPoblacio());
+				if (destinatari.getDomiciliMunicipiCodiIne() != null || destinatari.getDomiciliMunicipiNom() != null) {
+					TipoMunicipio municipio = new TipoMunicipio();
+					municipio.setCodigoIne(destinatari.getDomiciliMunicipiCodiIne());
+					municipio.setNombre(destinatari.getDomiciliMunicipiNom());
+					domicilio.setMunicipio(municipio);
+				}
+				domicilio.setCodigoPostal(destinatari.getDomiciliCodiPostal());
+				if (destinatari.getDomiciliProvinciaCodi() != null || destinatari.getDomiciliProvinciaNom() != null) {
+					TipoProvincia provincia = new TipoProvincia();
+					provincia.setCodigoProvincia(destinatari.getDomiciliProvinciaCodi());
+					provincia.setNombre(destinatari.getDomiciliProvinciaNom());
+					domicilio.setProvincia(provincia);
+				}
+				if (destinatari.getDomiciliPaisCodiIso() != null || destinatari.getDomiciliPaisNom() != null) {
+					TipoPais pais = new TipoPais();
+					pais.setCodigoIso3166(destinatari.getDomiciliPaisCodiIso());
+					pais.setNombre(destinatari.getDomiciliPaisNom());
+					domicilio.setPais(pais);
+				}
+				domicilio.setLinea1(destinatari.getDomiciliLinea1());
+				domicilio.setLinea2(destinatari.getDomiciliLinea2());
+				domicilio.setCie(destinatari.getDomiciliCie());
+				destinatario.setDomicilio(domicilio);
 			}
-			domicilio.setTipoVia(destinatari.getDomiciliViaTipus());
-			domicilio.setNombreVia(destinatari.getDomiciliViaNom());
-			if (destinatari.getDomiciliNumeracioTipus() != null) {
-				domicilio.setCalificadorNumero(destinatari.getDomiciliNumeracioTipus().getText());
-			}
-			domicilio.setNumeroCasa(destinatari.getDomiciliNumeracioNumero());
-			domicilio.setPuntoKilometrico(destinatari.getDomiciliNumeracioPuntKm());
-			domicilio.setApartadoCorreos(destinatari.getDomiciliApartatCorreus());
-			domicilio.setBloque(destinatari.getDomiciliBloc());
-			domicilio.setPortal(destinatari.getDomiciliPortal());
-			domicilio.setEscalera(destinatari.getDomiciliEscala());
-			domicilio.setPlanta(destinatari.getDomiciliPlanta());
-			domicilio.setPuerta(destinatari.getDomiciliPorta());
-			domicilio.setComplemento(destinatari.getDomiciliComplement());
-			domicilio.setPoblacion(destinatari.getDomiciliPoblacio());
-			if (destinatari.getDomiciliMunicipiCodiIne() != null || destinatari.getDomiciliMunicipiNom() != null) {
-				TipoMunicipio municipio = new TipoMunicipio();
-				municipio.setCodigoIne(destinatari.getDomiciliMunicipiCodiIne());
-				municipio.setNombre(destinatari.getDomiciliMunicipiNom());
-				domicilio.setMunicipio(municipio);
-			}
-			domicilio.setCodigoPostal(destinatari.getDomiciliCodiPostal());
-			if (destinatari.getDomiciliProvinciaCodi() != null || destinatari.getDomiciliProvinciaNom() != null) {
-				TipoProvincia provincia = new TipoProvincia();
-				provincia.setCodigoProvincia(destinatari.getDomiciliProvinciaCodi());
-				provincia.setNombre(destinatari.getDomiciliProvinciaNom());
-				domicilio.setProvincia(provincia);
-			}
-			if (destinatari.getDomiciliPaisCodiIso() != null || destinatari.getDomiciliPaisNom() != null) {
-				TipoPais pais = new TipoPais();
-				pais.setCodigoIso3166(destinatari.getDomiciliPaisCodiIso());
-				pais.setNombre(destinatari.getDomiciliPaisNom());
-				domicilio.setPais(pais);
-			}
-			domicilio.setLinea1(destinatari.getDomiciliLinea1());
-			domicilio.setLinea2(destinatari.getDomiciliLinea2());
-			domicilio.setCie(destinatari.getDomiciliCie());
-			destinatario.setDomicilio(domicilio);
 			OpcionesEmision opcionesEmision = new OpcionesEmision();
 			if (destinatari.getCaducitat() != null) {
 				opcionesEmision.setCaducidad(
