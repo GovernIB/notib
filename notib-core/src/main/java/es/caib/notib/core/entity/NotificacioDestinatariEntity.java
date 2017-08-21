@@ -42,8 +42,10 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 
 	@Column(name = "titular_nom", length = 125, nullable = false)
 	private String titularNom;
-	@Column(name = "titular_llinatges", length = 125)
-	private String titularLlinatges;
+	@Column(name = "titular_llinatge1", length = 125)
+	private String titularLlinatge1;
+	@Column(name = "titular_llinatge2", length = 125)
+	private String titularLlinatge2;
 	@Column(name = "titular_nif", length = 9, nullable = false)
 	private String titularNif;
 	@Column(name = "titular_telefon", length = 16)
@@ -52,8 +54,10 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 	private String titularEmail;
 	@Column(name = "destinatari_nom", length = 125, nullable = false)
 	private String destinatariNom;
-	@Column(name = "destinatari_llinatges", length = 125)
-	private String destinatariLlinatges;
+	@Column(name = "destinatari_llinatge1", length = 125)
+	private String destinatariLlinatge1;
+	@Column(name = "destinatari_llinatge2", length = 125)
+	private String destinatariLlinatge2;
 	@Column(name = "destinatari_nif", length = 9, nullable = false)
 	private String destinatariNif;
 	@Column(name = "destinatari_telefon", length = 16)
@@ -184,8 +188,14 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 	public String getTitularNom() {
 		return titularNom;
 	}
+	public String getTitularLlinatge1() {
+		return titularLlinatge1;
+	}
+	public String getTitularLlinatge2() {
+		return titularLlinatge2;
+	}
 	public String getTitularLlinatges() {
-		return titularLlinatges;
+		return titularLlinatge1 + " " + titularLlinatge2;
 	}
 	public String getTitularNif() {
 		return titularNif;
@@ -199,8 +209,14 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 	public String getDestinatariNom() {
 		return destinatariNom;
 	}
+	public String getDestinatariLlinatge1() {
+		return destinatariLlinatge1;
+	}
+	public String getDestinatariLlinatge2() {
+		return destinatariLlinatge2;
+	}
 	public String getDestinatariLlinatges() {
-		return destinatariLlinatges;
+		return destinatariLlinatge1 + " " + destinatariLlinatge2;
 	}
 	public String getDestinatariNif() {
 		return destinatariNif;
@@ -485,8 +501,12 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 			built.dehObligat = dehObligat;
 			built.notificacio = notificacio;
 		}
-		public Builder titularLlinatges(String titularLlinatges) {
-			built.titularLlinatges = titularLlinatges;
+		public Builder titularLlinatges(
+				String titularLlinatge1,
+				String titularLlinatge2) {
+			
+			built.titularLlinatge1 = titularLlinatge1;
+			built.titularLlinatge2 = titularLlinatge2;
 			return this;
 		}
 		public Builder titularTelefon(String titularTelefon) {
@@ -497,8 +517,12 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 			built.titularEmail = titularEmail;
 			return this;
 		}
-		public Builder destinatariLlinatges(String destinatariLlinatges) {
-			built.destinatariLlinatges = destinatariLlinatges;
+		public Builder destinatariLlinatges(
+				String destinatariLlinatge1,
+				String destinatariLlinatge2) {
+			
+			built.destinatariLlinatge1 = destinatariLlinatge1;
+			built.destinatariLlinatge2 = destinatariLlinatge2;
 			return this;
 		}
 		public Builder destinatariTelefon(String destinatariTelefon) {

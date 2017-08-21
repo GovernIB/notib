@@ -3,23 +3,41 @@
  */
 package es.caib.notib.core.helper;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.sun.jersey.core.util.Base64;
 
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
+import es.caib.notib.core.api.ws.notificacio.Notificacio;
+import es.caib.notib.core.api.ws.notificacio.NotificacioDestinatari;
+import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioDestinatariEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
+import es.caib.notib.plugin.registre.sortida.DocumentRegistre;
+import es.caib.notib.plugin.registre.sortida.RegistreAssentament;
+import es.caib.notib.plugin.registre.sortida.RegistreAssentamentInteressat;
+import es.caib.notib.plugin.registre.sortida.RegistrePluginException;
+import es.caib.notib.plugin.registre.sortida.RegistrePluginRegweb3;
+import es.caib.notib.plugin.registre.sortida.RespostaAnotacioRegistre;
 import es.caib.notib.plugin.seu.SeuDocument;
 import es.caib.notib.plugin.seu.SeuNotificacioEstat;
 import es.caib.notib.plugin.seu.SeuNotificacioResultat;
@@ -42,11 +60,14 @@ public class PluginHelper {
 	private DadesUsuariPlugin dadesUsuariPlugin;
 	private GestioDocumentalPlugin gestioDocumentalPlugin;
 	private SeuPlugin seuPlugin;
+	private RegistrePluginRegweb3 registrePluginRegweb3;
 
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
 	@Resource
 	private IntegracioHelper integracioHelper;
+	@Autowired
+	private EntitatRepository entitatRepository;
 
 
 
@@ -392,7 +413,104 @@ public class PluginHelper {
 		}
 	}
 
+	public RespostaAnotacioRegistre registrarNotificacio(Notificacio notificacio) {
+		
+		RespostaAnotacioRegistre respostaAnotacioRegistre = null;
+		boolean desactivat = getPropertyRegistrePluginRegweb3Desactivat();
+		boolean obligatori = getPropertyRegistrePluginRegweb3Obligatori();
+		
+		if(desactivat && !obligatori) return null;
+		
+		if(obligatori || notificacio.isRegistreEnviar()) {
+			
+			RegistreAssentament registreSortida = new RegistreAssentament();
+			List<RegistreAssentamentInteressat> registreAssentamentInteressat = new ArrayList<RegistreAssentamentInteressat>();
+			DocumentRegistre document = new DocumentRegistre();
+			
+			EntitatEntity entitat = entitatRepository.findByCif(notificacio.getCifEntitat());
+			
+			registreSortida.setOrganisme(entitat.getDir3Codi());
+			registreSortida.setOficina(notificacio.getRegistreOficina());
+			registreSortida.setLlibre(notificacio.getRegistreLlibre());
+			registreSortida.setExtracte(notificacio.getSeuAvisText()); // Preguntar si es correcte
+			registreSortida.setAssumpteTipus(notificacio.getRegistreTipusAssumpte());
+			registreSortida.setAssumpteCodi(notificacio.getRegistreCodiAssumpte());
+			registreSortida.setIdioma(notificacio.getRegistreIdioma());
+			
+			registreSortida.setDocumentacioFisicaCodi(notificacio.getDocumentacioFisicaCodi());
+			
+			for(NotificacioDestinatari destinatari : notificacio.getDestinataris()) {
+				
+				RegistreAssentamentInteressat interessat = new RegistreAssentamentInteressat();
+				
+				if(esPersonaJuridica(destinatari.getDestinatariNif())) {
+					
+					interessat.setTipus("3");
+					interessat.setDocumentTipus("CIF");
+					interessat.setRaoSocial(destinatari.getDestinatariNom());
+				} else {
+					
+					interessat.setTipus("2");
+					interessat.setDocumentTipus("NIF");
+					interessat.setNom(destinatari.getDestinatariNom());
+				}
+				
+				interessat.setDocumentNum(destinatari.getDestinatariNif());
+				interessat.setLlinatge1(destinatari.getDestinatariLlinatge1());
+				interessat.setLlinatge2(destinatari.getDestinatariLlinatge2());
+				interessat.setPais(destinatari.getDomiciliPaisCodiIso());
+				interessat.setProvincia(destinatari.getDomiciliProvinciaCodi());
+				interessat.setMunicipi(destinatari.getDomiciliMunicipiCodiIne());
+				interessat.setAdresa(destinatari.getDireccio());
+				interessat.setCodiPostal(destinatari.getDomiciliCodiPostal());
+				interessat.setEmail(destinatari.getDestinatariEmail());
+				interessat.setTelefon(destinatari.getDestinatariTelefon());
+				
+				registreAssentamentInteressat.add(interessat);
+			}
+			
+			
+			document.setTitol("Document de la notificació");
+			document.setArxiuNom(notificacio.getDocumentArxiuNom());
+			byte[] contingut = Base64.decode(notificacio.getDocumentContingutBase64());
+			document.setArxiuContingut(contingut);
+			document.setArxiuMida(contingut.length);
+			InputStream is = new BufferedInputStream(new ByteArrayInputStream(contingut));
+			try {
+				String mimeType = URLConnection.guessContentTypeFromStream(is);
+				document.setTipusMIMEFitxerAnexat(mimeType);
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			}
+			document.setTipusDocumental(notificacio.getRegistreTipusDocumental());
+			document.setOrigenCiutadaAdmin(notificacio.getRegistreOrigenCiutadaAdmin());
+			document.setDataCaptura(notificacio.getRegistreDataCaptura());
+			
+			
+			registreSortida.setInteressats(registreAssentamentInteressat);
+			registreSortida.setDocument(document);
+			
+			try {
+				respostaAnotacioRegistre = getRegistrePluginRegweb3().registrarSortida(registreSortida);
+			} catch (RegistrePluginException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		
+		return respostaAnotacioRegistre;
+	}
+	
+	private boolean esPersonaJuridica(String codiId) {
+		
+		String letrasCif = "ABCDEFGHJKLMNPQRSVW";
+		
+		String primeraLletraCif = codiId.toUpperCase().substring(0, 1);
 
+        return letrasCif.contains(primeraLletraCif);
+	}
+	
 
 	private boolean isTelefonMobil(String telefonMobil) {
 		if (telefonMobil == null) {
@@ -470,6 +588,29 @@ public class PluginHelper {
 		}
 		return seuPlugin;
 	}
+	
+	private RegistrePluginRegweb3 getRegistrePluginRegweb3() {
+		
+		if (registrePluginRegweb3 == null) {
+			String pluginClass = getPropertyRegistrePluginRegweb3();
+			if (pluginClass != null && pluginClass.length() > 0) {
+				try {
+					Class<?> clazz = Class.forName(pluginClass);
+					registrePluginRegweb3 = (RegistrePluginRegweb3)clazz.newInstance();
+				} catch (Exception ex) {
+					throw new SistemaExternException(
+							IntegracioHelper.INTCODI_GESDOC,
+							"Error al crear la instància del plugin de registre regweb3",
+							ex);
+				}
+			} else {
+				throw new SistemaExternException(
+						IntegracioHelper.INTCODI_USUARIS,
+						"La classe del plugin de registre regweb3 no està configurada");
+			}
+		}
+		return registrePluginRegweb3;
+	}
 
 	private String getPropertyPluginDadesUsuari() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.class");
@@ -480,5 +621,16 @@ public class PluginHelper {
 	private String getPropertyPluginSeu() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.seu.class");
 	}
+	private String getPropertyRegistrePluginRegweb3() {
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.registre.sortida");
+	}
+	private boolean getPropertyRegistrePluginRegweb3Desactivat() {
+		return "true".equals(PropertiesHelper.getProperties().getProperty("es.caib.notib.registre.sortida.desactivat"));
+	}
+	private boolean getPropertyRegistrePluginRegweb3Obligatori() {
+		return "true".equals(PropertiesHelper.getProperties().getProperty("es.caib.notib.registre.sortida.obligatori"));
+	}
+	
+	
 
 }

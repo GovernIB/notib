@@ -57,6 +57,46 @@ public class Notificacio {
 	private String seuOficiText;
 	private NotificacioEstatEnumDto estat;
 	private List<NotificacioDestinatari> destinataris;
+	
+	// Dades per a realitzar registres a regweb3
+	private boolean registreEnviar;
+	private String registreOficina;
+	private String registreLlibre;
+	private String registreTipusAssumpte;
+	private String registreCodiAssumpte;
+	private String registreIdioma;
+	private String registreTipusDocumental;
+	private int registreOrigenCiutadaAdmin;
+	private Date registreDataCaptura;
+	
+	private String documentacioFisicaCodi;
+	
+	
+	public void updateRegistre(
+			boolean registreEnviar,
+			String registreOficina,
+			String registreLlibre,
+			String registreTipusAssumpte,
+			String registreCodiAssumpte,
+			String registreIdioma,
+			String registreTipusDocumental,
+			int registreOrigenCiutadaAdmin,
+			Date registreDataCaptura,
+			String documentacioFisicaCodi) {
+		
+		this.registreEnviar = registreEnviar;
+		this.registreOficina = registreOficina;
+		this.registreLlibre = registreLlibre;
+		this.registreTipusAssumpte = registreTipusAssumpte;
+		this.registreCodiAssumpte = registreCodiAssumpte;
+		this.registreIdioma = registreIdioma;
+		this.registreTipusDocumental = registreTipusDocumental;
+		this.registreOrigenCiutadaAdmin = registreOrigenCiutadaAdmin;
+		this.registreDataCaptura = registreDataCaptura;
+		
+		this.documentacioFisicaCodi = documentacioFisicaCodi;
+		
+	}
 
 	public String getCifEntitat() {
 		return cifEntitat;
@@ -244,7 +284,79 @@ public class Notificacio {
 	public void setDestinataris(List<NotificacioDestinatari> destinataris) {
 		this.destinataris = destinataris;
 	}
-
+	
+	
+	public boolean isRegistreEnviar() {
+		return registreEnviar;
+	}
+	public void setRegistreEnviar(boolean registreEnviar) {
+		this.registreEnviar = registreEnviar;
+	}
+	
+	public String getRegistreOficina() {
+		return registreOficina;
+	}
+	public void setRegistreOficina(String registreOficina) {
+		this.registreOficina = registreOficina;
+	}
+	
+	public String getRegistreLlibre() {
+		return registreLlibre;
+	}
+	public void setRegistreLlibre(String registreLlibre) {
+		this.registreLlibre = registreLlibre;
+	}
+	
+	public String getRegistreTipusAssumpte() {
+		return registreTipusAssumpte;
+	}
+	public void setRegistreTipusAssumpte(String registreTipusAssumpte) {
+		this.registreTipusAssumpte = registreTipusAssumpte;
+	}
+	
+	public String getRegistreCodiAssumpte() {
+		return registreCodiAssumpte;
+	}
+	public void setRegistreCodiAssumpte(String registreCodiAssumpte) {
+		this.registreCodiAssumpte = registreCodiAssumpte;
+	}
+	
+	public String getRegistreIdioma() {
+		return registreIdioma;
+	}
+	public void setRegistreIdioma(String registreIdioma) {
+		this.registreIdioma = registreIdioma;
+	}
+	
+	public String getRegistreTipusDocumental() {
+		return registreTipusDocumental;
+	}
+	public void setRegistreTipusDocumental(String registreTipusDocumental) {
+		this.registreTipusDocumental = registreTipusDocumental;
+	}
+	
+	public int getRegistreOrigenCiutadaAdmin() {
+		return registreOrigenCiutadaAdmin;
+	}
+	public void setRegistreOrigenCiutadaAdmin(int registreOrigenCiutadaAdmin) {
+		this.registreOrigenCiutadaAdmin = registreOrigenCiutadaAdmin;
+	}
+	
+	public Date getRegistreDataCaptura() {
+		return registreDataCaptura;
+	}
+	public void setRegistreDataCaptura(Date registreDataCaptura) {
+		this.registreDataCaptura = registreDataCaptura;
+	}
+	
+	public String getDocumentacioFisicaCodi() {
+		return documentacioFisicaCodi;
+	}
+	public void setDocumentacioFisicaCodi(String documentacioFisicaCodi) {
+		this.documentacioFisicaCodi = documentacioFisicaCodi;
+	}
+	
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

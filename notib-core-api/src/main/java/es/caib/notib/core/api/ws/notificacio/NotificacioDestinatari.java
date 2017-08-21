@@ -6,6 +6,7 @@ package es.caib.notib.core.api.ws.notificacio;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import es.caib.notib.core.api.dto.NotificacioSeuEstatEnumDto;
 
@@ -19,12 +20,14 @@ public class NotificacioDestinatari {
 
 	private String referencia;//
 	private String titularNom;
-	private String titularLlinatges;
+	private String titularLlinatge1;
+	private String titularLlinatge2;
 	private String titularNif;
 	private String titularTelefon;
 	private String titularEmail;
 	private String destinatariNom;
-	private String destinatariLlinatges;
+	private String destinatariLlinatge1;
+	private String destinatariLlinatge2;
 	private String destinatariNif;
 	private String destinatariTelefon;
 	private String destinatariEmail;
@@ -70,12 +73,14 @@ public class NotificacioDestinatari {
 	public NotificacioDestinatari(
 			String referencia, 
 			String titularNom, 
-			String titularLlinatges, 
+			String titularLlinatge1,
+			String titularLlinatge2,
 			String titularNif,
 			String titularTelefon, 
 			String titularEmail, 
 			String destinatariNom, 
-			String destinatariLlinatges,
+			String destinatariLlinatge1,
+			String destinatariLlinatge2,
 			String destinatariNif, 
 			String destinatariTelefon, 
 			String destinatariEmail, 
@@ -118,12 +123,14 @@ public class NotificacioDestinatari {
 		super();
 		this.referencia = referencia;
 		this.titularNom = titularNom;
-		this.titularLlinatges = titularLlinatges;
+		this.titularLlinatge1 = titularLlinatge1;
+		this.titularLlinatge2 = titularLlinatge2;
 		this.titularNif = titularNif;
 		this.titularTelefon = titularTelefon;
 		this.titularEmail = titularEmail;
 		this.destinatariNom = destinatariNom;
-		this.destinatariLlinatges = destinatariLlinatges;
+		this.destinatariLlinatge1 = destinatariLlinatge1;
+		this.destinatariLlinatge2 = destinatariLlinatge2;
 		this.destinatariNif = destinatariNif;
 		this.destinatariTelefon = destinatariTelefon;
 		this.destinatariEmail = destinatariEmail;
@@ -184,11 +191,17 @@ public class NotificacioDestinatari {
 	public void setTitularNom(String titularNom) {
 		this.titularNom = titularNom;
 	}
-	public String getTitularLlinatges() {
-		return titularLlinatges;
+	public String getTitularLlinatge1() {
+		return titularLlinatge1;
 	}
-	public void setTitularLlinatges(String titularLlinatges) {
-		this.titularLlinatges = titularLlinatges;
+	public void setTitularLlinatge1(String titularLlinatge1) {
+		this.titularLlinatge1 = titularLlinatge1;
+	}
+	public String getTitularLlinatge2() {
+		return titularLlinatge2;
+	}
+	public void setTitularLlinatge2(String titularLlinatge2) {
+		this.titularLlinatge2 = titularLlinatge2;
 	}
 	public String getTitularNif() {
 		return titularNif;
@@ -214,11 +227,17 @@ public class NotificacioDestinatari {
 	public void setDestinatariNom(String destinatariNom) {
 		this.destinatariNom = destinatariNom;
 	}
-	public String getDestinatariLlinatges() {
-		return destinatariLlinatges;
+	public String getDestinatariLlinatge1() {
+		return destinatariLlinatge1;
 	}
-	public void setDestinatariLlinatges(String destinatariLlinatges) {
-		this.destinatariLlinatges = destinatariLlinatges;
+	public void setDestinatariLlinatge1(String destinatariLlinatge1) {
+		this.destinatariLlinatge1 = destinatariLlinatge1;
+	}
+	public String getDestinatariLlinatge2() {
+		return destinatariLlinatge2;
+	}
+	public void setDestinatariLlinatge2(String destinatariLlinatge2) {
+		this.destinatariLlinatge2 = destinatariLlinatge2;
 	}
 	public String getDestinatariNif() {
 		return destinatariNif;
@@ -441,6 +460,42 @@ public class NotificacioDestinatari {
 	}
 	public void setSeuRegistreData(Date seuRegistreData) {
 		this.seuRegistreData = seuRegistreData;
+	}
+	
+	
+	@JsonIgnore
+	public String getDireccio() {
+		
+		String direccio = "";
+		
+//		if(domiciliTipus == DomiciliTipusEnum.FISCAL)
+//			direccio = direccio + "Domicili fiscal: Si,";
+//		else
+//			direccio = direccio + "Domicili fiscal: No,";
+		
+//		direccio = direccio + "Tipus de domicili: " + domiciliConcretTipus + ", ";
+		
+		direccio = direccio + domiciliViaTipus + " " + domiciliViaNom + ", ";
+		
+		if(domiciliNumeracioTipus == DomiciliNumeracioTipusEnum.NUMERO)
+			direccio = direccio + "Número: " + domiciliNumeracioNumero + ", ";
+		else if (domiciliNumeracioTipus == DomiciliNumeracioTipusEnum.PUNT_KILOMETRIC)
+			direccio = direccio + "Punt Km: " + domiciliNumeracioPuntKm + ", ";
+		else if (domiciliNumeracioTipus == DomiciliNumeracioTipusEnum.APARTAT_CORREUS)
+			direccio = direccio + "Apartat de correus: " + domiciliApartatCorreus + ", ";
+		
+		direccio = direccio + "Bloc: " + domiciliBloc + ", ";
+		direccio = direccio + "Portal: " + domiciliPortal + ", ";
+		direccio = direccio + "Escala: " + domiciliEscala + ", ";
+		direccio = direccio + "Planta: " + domiciliPlanta + ", ";
+		direccio = direccio + "Porta: " + domiciliPorta + ", ";
+//		direccio = direccio + "Complement: " + domiciliComplement + ", ";
+		direccio = direccio + domiciliPoblacio + ", ";
+//		direccio = direccio + "Municipi: " + domiciliMunicipiNom + ", ";
+		direccio = direccio + domiciliProvinciaNom + ", ";
+		direccio = direccio + domiciliPaisNom;
+		
+		return direccio;
 	}
 
 }

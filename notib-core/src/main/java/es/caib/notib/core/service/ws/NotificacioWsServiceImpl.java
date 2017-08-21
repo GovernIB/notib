@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sun.jersey.core.util.Base64;
 
+import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.ws.notificacio.CertificacioArxiuTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.CertificacioTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.DomiciliConcretTipusEnum;
@@ -34,11 +35,14 @@ import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioDestinatariEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.helper.EntityComprovarHelper;
+import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioDestinatariRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
+import es.caib.notib.plugin.registre.sortida.RegistrePluginRegweb3;
 
 
 /**
@@ -127,10 +131,10 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 						d.getSeuEstat(),
 						d.isDehObligat(),
 						notificacioEntity);
-				destinatari.titularLlinatges( d.getTitularLlinatges() );
+				destinatari.titularLlinatges( d.getTitularLlinatge1(), d.getTitularLlinatge2() );
 				destinatari.titularTelefon( d.getTitularTelefon() );
 				destinatari.titularEmail( d.getTitularEmail() );
-				destinatari.destinatariLlinatges( d.getDestinatariLlinatges() );
+				destinatari.destinatariLlinatges( d.getDestinatariLlinatge1(), d.getDestinatariLlinatge2() );
 				destinatari.destinatariTelefon( d.getDestinatariTelefon() );
 				destinatari.destinatariEmail( d.getDestinatariEmail() );
 				destinatari.domiciliTipus(d.getDomiciliTipus().toNotificaDomiciliTipusEnumDto());
@@ -174,8 +178,12 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 			notificacioRepository.saveAndFlush(notificacioEntity);
 			// TODO decidir si es fa l'enviament immediatament o si s'espera
 			// a que l'envii la tasca programada.
-			notificaHelper.intentarEnviament(notificacioEntity);
+			// notificaHelper.intentarEnviament(notificacioEntity);
+			// Se registra la notificació a l'aplicació de regweb3
+			pluginHelper.registrarNotificacio(notificacio);
+			
 			return result;
+			
 		} catch (Exception ex) {
 			if( ex instanceof HibernateJdbcException)
 				throw new InconsistenciaDadesWsServiceException(
@@ -206,12 +214,14 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 					destinataris.add(new NotificacioDestinatari(
 							d.getReferencia(), 
 							d.getTitularNom(), 
-							d.getTitularLlinatges(), 
+							d.getTitularLlinatge1(),
+							d.getTitularLlinatge2(),
 							d.getTitularNif(), 
 							d.getTitularTelefon(), 
 							d.getTitularEmail(), 
 							d.getDestinatariNom(), 
-							d.getDestinatariLlinatges(), 
+							d.getDestinatariLlinatge1(),
+							d.getDestinatariLlinatge2(),
 							d.getDestinatariNif(), 
 							d.getDestinatariTelefon(), 
 							d.getDestinatariEmail(), 

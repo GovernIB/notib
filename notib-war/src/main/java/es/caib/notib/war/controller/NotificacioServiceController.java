@@ -43,6 +43,7 @@ import es.caib.notib.war.validation.RestPreconditions;
 @Controller
 @RequestMapping("/api")
 @Api(value = "/notificacio", description = "Notificaio API")
+//@ControllerAdvice
 public class NotificacioServiceController extends BaseController {
 
 //	private static final int RESPONSE_CODE_OK = 200;
@@ -155,5 +156,12 @@ public class NotificacioServiceController extends BaseController {
 		
 		return certificacio;
 	}
+	
+//	@ExceptionHandler
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public void handle(HttpMessageNotReadableException e) {
+//		System.out.println(e);
+//        throw e;
+//    }
 
 }

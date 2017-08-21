@@ -97,12 +97,14 @@ public class NotificacioWSTest extends BaseServiceTest {
 			destinataris.add(new NotificacioDestinatari(
 					"referencia_" + notificacioId + "_" + i,
 					"titularNom_" + notificacioId + "_" + i,
-					"titularLlinatges_" + notificacioId + "_" + i,
+					"titularLlinatge1_" + notificacioId + "_" + i,
+					"titularLlinatge2_" + notificacioId + "_" + i,
 					"tNif" + notificacioId + "_" + i,
 					"tTelefon_" + notificacioId + "_" + i,
 					"titularEmail_" + notificacioId + "_" + i,
 					"destinatariNom_" + notificacioId + "_" + i,
-					"destinatariLlinatges_" + notificacioId + "_" + i,
+					"destinatariLlinatge1_" + notificacioId + "_" + i,
+					"destinatariLlinatge2_" + notificacioId + "_" + i,
 					"dNif" + notificacioId + "_" + i,
 					"dTelefon_" + notificacioId + "_" + i,
 					"destinatariEmail_" + notificacioId + "_" + i,
@@ -265,12 +267,14 @@ public class NotificacioWSTest extends BaseServiceTest {
 			NotificacioDestinatari d1 = notificacio.getDestinataris().get(i);
 			assertThat( d0.getReferencia(), is(references.get(i)) );
 			assertThat( d0.getTitularNom(), is(d1.getTitularNom()) );
-			assertThat( d0.getTitularLlinatges(), is(d1.getTitularLlinatges()) );
+			assertThat( d0.getTitularLlinatge1(), is(d1.getTitularLlinatge1()) );
+			assertThat( d0.getTitularLlinatge2(), is(d1.getTitularLlinatge2()) );
 			assertThat( d0.getTitularNif(), is(d1.getTitularNif()) );
 			assertThat( d0.getTitularTelefon(), is(d1.getTitularTelefon()) );
 			assertThat( d0.getTitularEmail(), is(d1.getTitularEmail()) );
 			assertThat( d0.getDestinatariNom(), is(d1.getDestinatariNom()) );
-			assertThat( d0.getDestinatariLlinatges(), is(d1.getDestinatariLlinatges()) );
+			assertThat( d0.getDestinatariLlinatge1(), is(d1.getDestinatariLlinatge1()) );
+			assertThat( d0.getDestinatariLlinatge2(), is(d1.getDestinatariLlinatge2()) );
 			assertThat( d0.getDestinatariNif(), is(d1.getDestinatariNif()) );
 			assertThat( d0.getDestinatariTelefon(), is(d1.getDestinatariTelefon()) );
 			assertThat( d0.getDestinatariEmail(), is(d1.getDestinatariEmail()) );

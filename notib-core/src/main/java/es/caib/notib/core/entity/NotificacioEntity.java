@@ -99,7 +99,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private NotificacioEstatEnumDto estat;
 	@Column(name = "error", nullable = false)
 	private boolean error;
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "error_event_id")
 	@ForeignKey(name = "not_noteve_notificacio_fk")
 	private NotificacioEventEntity errorEvent;
