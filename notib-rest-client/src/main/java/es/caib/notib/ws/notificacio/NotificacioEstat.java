@@ -9,9 +9,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * <p>Java class for notificacioEstat complex type.
+ * <p>Clase Java para notificacioEstat complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
  * 
  * <pre>
  * &lt;complexType name="notificacioEstat">
@@ -53,7 +53,7 @@ public class NotificacioEstat {
     protected String receptorNom;
 
     /**
-     * Gets the value of the data property.
+     * Obtiene el valor de la propiedad data.
      * 
      * @return
      *     possible object is
@@ -65,7 +65,7 @@ public class NotificacioEstat {
     }
 
     /**
-     * Sets the value of the data property.
+     * Define el valor de la propiedad data.
      * 
      * @param value
      *     allowed object is
@@ -77,7 +77,7 @@ public class NotificacioEstat {
     }
 
     /**
-     * Gets the value of the estat property.
+     * Obtiene el valor de la propiedad estat.
      * 
      * @return
      *     possible object is
@@ -89,7 +89,7 @@ public class NotificacioEstat {
     }
 
     /**
-     * Sets the value of the estat property.
+     * Define el valor de la propiedad estat.
      * 
      * @param value
      *     allowed object is
@@ -101,7 +101,7 @@ public class NotificacioEstat {
     }
 
     /**
-     * Gets the value of the numSeguiment property.
+     * Obtiene el valor de la propiedad numSeguiment.
      * 
      * @return
      *     possible object is
@@ -113,7 +113,7 @@ public class NotificacioEstat {
     }
 
     /**
-     * Sets the value of the numSeguiment property.
+     * Define el valor de la propiedad numSeguiment.
      * 
      * @param value
      *     allowed object is
@@ -125,7 +125,7 @@ public class NotificacioEstat {
     }
 
     /**
-     * Gets the value of the origen property.
+     * Obtiene el valor de la propiedad origen.
      * 
      * @return
      *     possible object is
@@ -137,7 +137,7 @@ public class NotificacioEstat {
     }
 
     /**
-     * Sets the value of the origen property.
+     * Define el valor de la propiedad origen.
      * 
      * @param value
      *     allowed object is
@@ -149,7 +149,7 @@ public class NotificacioEstat {
     }
 
     /**
-     * Gets the value of the receptorNif property.
+     * Obtiene el valor de la propiedad receptorNif.
      * 
      * @return
      *     possible object is
@@ -161,7 +161,7 @@ public class NotificacioEstat {
     }
 
     /**
-     * Sets the value of the receptorNif property.
+     * Define el valor de la propiedad receptorNif.
      * 
      * @param value
      *     allowed object is
@@ -173,7 +173,7 @@ public class NotificacioEstat {
     }
 
     /**
-     * Gets the value of the receptorNom property.
+     * Obtiene el valor de la propiedad receptorNom.
      * 
      * @return
      *     possible object is
@@ -185,7 +185,7 @@ public class NotificacioEstat {
     }
 
     /**
-     * Sets the value of the receptorNom property.
+     * Define el valor de la propiedad receptorNom.
      * 
      * @param value
      *     allowed object is

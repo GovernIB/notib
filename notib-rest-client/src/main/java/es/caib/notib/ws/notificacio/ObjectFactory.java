@@ -30,6 +30,7 @@ public class ObjectFactory {
     private final static QName _AltaResponse_QNAME = new QName("http://www.caib.es/notib/ws/notificacio", "altaResponse");
     private final static QName _Alta_QNAME = new QName("http://www.caib.es/notib/ws/notificacio", "alta");
     private final static QName _NotificacioCertificacio_QNAME = new QName("http://www.caib.es/notib/ws/notificacio", "notificacioCertificacio");
+    private final static QName _NotificacioWsServiceException_QNAME = new QName("http://www.caib.es/notib/ws/notificacio", "NotificacioWsServiceException");
     private final static QName _ConsultaEstat_QNAME = new QName("http://www.caib.es/notib/ws/notificacio", "consultaEstat");
     private final static QName _ConsultaResponse_QNAME = new QName("http://www.caib.es/notib/ws/notificacio", "consultaResponse");
     private final static QName _Notificacio_QNAME = new QName("http://www.caib.es/notib/ws/notificacio", "notificacio");
@@ -97,6 +98,14 @@ public class ObjectFactory {
      */
     public NotificacioCertificacio createNotificacioCertificacio() {
         return new NotificacioCertificacio();
+    }
+
+    /**
+     * Create an instance of {@link NotificacioWsServiceException }
+     * 
+     */
+    public NotificacioWsServiceException createNotificacioWsServiceException() {
+        return new NotificacioWsServiceException();
     }
 
     /**
@@ -191,6 +200,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://www.caib.es/notib/ws/notificacio", name = "notificacioCertificacio")
     public JAXBElement<NotificacioCertificacio> createNotificacioCertificacio(NotificacioCertificacio value) {
         return new JAXBElement<NotificacioCertificacio>(_NotificacioCertificacio_QNAME, NotificacioCertificacio.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link NotificacioWsServiceException }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.caib.es/notib/ws/notificacio", name = "NotificacioWsServiceException")
+    public JAXBElement<NotificacioWsServiceException> createNotificacioWsServiceException(NotificacioWsServiceException value) {
+        return new JAXBElement<NotificacioWsServiceException>(_NotificacioWsServiceException_QNAME, NotificacioWsServiceException.class, null, value);
     }
 
     /**

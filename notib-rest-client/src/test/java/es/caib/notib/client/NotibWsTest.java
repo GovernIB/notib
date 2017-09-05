@@ -9,6 +9,7 @@ import es.caib.notib.ws.client.NotibWsClientFactory;
 import es.caib.notib.ws.notificacio.Notificacio;
 import es.caib.notib.ws.notificacio.NotificacioCertificacio;
 import es.caib.notib.ws.notificacio.NotificacioEstat;
+import es.caib.notib.ws.notificacio.NotificacioWsServiceException_Exception;
 import es.caib.notib.ws.notificacio.Notificacio_Type;
 
 public class NotibWsTest extends NotibBaseTest {
@@ -30,7 +31,7 @@ public class NotibWsTest extends NotibBaseTest {
 		}
 	}
 
-	private List<String> testAlta() {
+	private List<String> testAlta() throws NotificacioWsServiceException_Exception {
 
 		List<String> referencies = null;
 		try {
@@ -54,7 +55,7 @@ public class NotibWsTest extends NotibBaseTest {
 		return referencies;
 	}
 
-	private void testInfo(String referencia) {
+	private void testInfo(String referencia) throws NotificacioWsServiceException_Exception {
 		
 		try {
 			
@@ -72,7 +73,7 @@ public class NotibWsTest extends NotibBaseTest {
 		
 	}
 
-	private void consultaEstat(String referencia) {
+	private void consultaEstat(String referencia) throws NotificacioWsServiceException_Exception {
 
 		try {
 			
@@ -90,7 +91,7 @@ public class NotibWsTest extends NotibBaseTest {
 		}
 	}
 
-	private void consultaCertificacio(String referencia) {
+	private void consultaCertificacio(String referencia) throws NotificacioWsServiceException_Exception {
 
 		try {
 			

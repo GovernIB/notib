@@ -9,9 +9,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * <p>Java class for notificacioDestinatari complex type.
+ * <p>Clase Java para notificacioDestinatari complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
  * 
  * <pre>
  * &lt;complexType name="notificacioDestinatari">
@@ -23,7 +23,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *         &lt;element name="dehObligat" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *         &lt;element name="dehProcedimentCodi" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="destinatariEmail" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="destinatariLlinatges" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="destinatariLlinatge1" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="destinatariLlinatge2" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="destinatariNif" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="destinatariNom" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="destinatariTelefon" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
@@ -60,7 +61,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *         &lt;element name="seuRegistreData" type="{http://www.w3.org/2001/XMLSchema}dateTime" minOccurs="0"/>
  *         &lt;element name="seuRegistreNumero" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="titularEmail" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="titularLlinatges" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="titularLlinatge1" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="titularLlinatge2" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="titularNif" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="titularNom" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="titularTelefon" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
@@ -79,7 +81,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
     "dehObligat",
     "dehProcedimentCodi",
     "destinatariEmail",
-    "destinatariLlinatges",
+    "destinatariLlinatge1",
+    "destinatariLlinatge2",
     "destinatariNif",
     "destinatariNom",
     "destinatariTelefon",
@@ -116,7 +119,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
     "seuRegistreData",
     "seuRegistreNumero",
     "titularEmail",
-    "titularLlinatges",
+    "titularLlinatge1",
+    "titularLlinatge2",
     "titularNif",
     "titularNom",
     "titularTelefon"
@@ -129,7 +133,8 @@ public class NotificacioDestinatari {
     protected boolean dehObligat;
     protected String dehProcedimentCodi;
     protected String destinatariEmail;
-    protected String destinatariLlinatges;
+    protected String destinatariLlinatge1;
+    protected String destinatariLlinatge2;
     protected String destinatariNif;
     protected String destinatariNom;
     protected String destinatariTelefon;
@@ -172,13 +177,14 @@ public class NotificacioDestinatari {
     protected XMLGregorianCalendar seuRegistreData;
     protected String seuRegistreNumero;
     protected String titularEmail;
-    protected String titularLlinatges;
+    protected String titularLlinatge1;
+    protected String titularLlinatge2;
     protected String titularNif;
     protected String titularNom;
     protected String titularTelefon;
 
     /**
-     * Gets the value of the caducitat property.
+     * Obtiene el valor de la propiedad caducitat.
      * 
      * @return
      *     possible object is
@@ -190,7 +196,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the caducitat property.
+     * Define el valor de la propiedad caducitat.
      * 
      * @param value
      *     allowed object is
@@ -202,7 +208,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the dehNif property.
+     * Obtiene el valor de la propiedad dehNif.
      * 
      * @return
      *     possible object is
@@ -214,7 +220,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the dehNif property.
+     * Define el valor de la propiedad dehNif.
      * 
      * @param value
      *     allowed object is
@@ -226,7 +232,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the dehObligat property.
+     * Obtiene el valor de la propiedad dehObligat.
      * 
      */
     public boolean isDehObligat() {
@@ -234,7 +240,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the dehObligat property.
+     * Define el valor de la propiedad dehObligat.
      * 
      */
     public void setDehObligat(boolean value) {
@@ -242,7 +248,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the dehProcedimentCodi property.
+     * Obtiene el valor de la propiedad dehProcedimentCodi.
      * 
      * @return
      *     possible object is
@@ -254,7 +260,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the dehProcedimentCodi property.
+     * Define el valor de la propiedad dehProcedimentCodi.
      * 
      * @param value
      *     allowed object is
@@ -266,7 +272,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the destinatariEmail property.
+     * Obtiene el valor de la propiedad destinatariEmail.
      * 
      * @return
      *     possible object is
@@ -278,7 +284,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the destinatariEmail property.
+     * Define el valor de la propiedad destinatariEmail.
      * 
      * @param value
      *     allowed object is
@@ -290,31 +296,55 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the destinatariLlinatges property.
+     * Obtiene el valor de la propiedad destinatariLlinatge1.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getDestinatariLlinatges() {
-        return destinatariLlinatges;
+    public String getDestinatariLlinatge1() {
+        return destinatariLlinatge1;
     }
 
     /**
-     * Sets the value of the destinatariLlinatges property.
+     * Define el valor de la propiedad destinatariLlinatge1.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setDestinatariLlinatges(String value) {
-        this.destinatariLlinatges = value;
+    public void setDestinatariLlinatge1(String value) {
+        this.destinatariLlinatge1 = value;
     }
 
     /**
-     * Gets the value of the destinatariNif property.
+     * Obtiene el valor de la propiedad destinatariLlinatge2.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getDestinatariLlinatge2() {
+        return destinatariLlinatge2;
+    }
+
+    /**
+     * Define el valor de la propiedad destinatariLlinatge2.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setDestinatariLlinatge2(String value) {
+        this.destinatariLlinatge2 = value;
+    }
+
+    /**
+     * Obtiene el valor de la propiedad destinatariNif.
      * 
      * @return
      *     possible object is
@@ -326,7 +356,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the destinatariNif property.
+     * Define el valor de la propiedad destinatariNif.
      * 
      * @param value
      *     allowed object is
@@ -338,7 +368,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the destinatariNom property.
+     * Obtiene el valor de la propiedad destinatariNom.
      * 
      * @return
      *     possible object is
@@ -350,7 +380,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the destinatariNom property.
+     * Define el valor de la propiedad destinatariNom.
      * 
      * @param value
      *     allowed object is
@@ -362,7 +392,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the destinatariTelefon property.
+     * Obtiene el valor de la propiedad destinatariTelefon.
      * 
      * @return
      *     possible object is
@@ -374,7 +404,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the destinatariTelefon property.
+     * Define el valor de la propiedad destinatariTelefon.
      * 
      * @param value
      *     allowed object is
@@ -386,7 +416,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliApartatCorreus property.
+     * Obtiene el valor de la propiedad domiciliApartatCorreus.
      * 
      * @return
      *     possible object is
@@ -398,7 +428,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliApartatCorreus property.
+     * Define el valor de la propiedad domiciliApartatCorreus.
      * 
      * @param value
      *     allowed object is
@@ -410,7 +440,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliBloc property.
+     * Obtiene el valor de la propiedad domiciliBloc.
      * 
      * @return
      *     possible object is
@@ -422,7 +452,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliBloc property.
+     * Define el valor de la propiedad domiciliBloc.
      * 
      * @param value
      *     allowed object is
@@ -434,7 +464,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliCie property.
+     * Obtiene el valor de la propiedad domiciliCie.
      * 
      * @return
      *     possible object is
@@ -446,7 +476,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliCie property.
+     * Define el valor de la propiedad domiciliCie.
      * 
      * @param value
      *     allowed object is
@@ -458,7 +488,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliCodiPostal property.
+     * Obtiene el valor de la propiedad domiciliCodiPostal.
      * 
      * @return
      *     possible object is
@@ -470,7 +500,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliCodiPostal property.
+     * Define el valor de la propiedad domiciliCodiPostal.
      * 
      * @param value
      *     allowed object is
@@ -482,7 +512,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliComplement property.
+     * Obtiene el valor de la propiedad domiciliComplement.
      * 
      * @return
      *     possible object is
@@ -494,7 +524,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliComplement property.
+     * Define el valor de la propiedad domiciliComplement.
      * 
      * @param value
      *     allowed object is
@@ -506,7 +536,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliConcretTipus property.
+     * Obtiene el valor de la propiedad domiciliConcretTipus.
      * 
      * @return
      *     possible object is
@@ -518,7 +548,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliConcretTipus property.
+     * Define el valor de la propiedad domiciliConcretTipus.
      * 
      * @param value
      *     allowed object is
@@ -530,7 +560,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliEscala property.
+     * Obtiene el valor de la propiedad domiciliEscala.
      * 
      * @return
      *     possible object is
@@ -542,7 +572,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliEscala property.
+     * Define el valor de la propiedad domiciliEscala.
      * 
      * @param value
      *     allowed object is
@@ -554,7 +584,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliLinea1 property.
+     * Obtiene el valor de la propiedad domiciliLinea1.
      * 
      * @return
      *     possible object is
@@ -566,7 +596,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliLinea1 property.
+     * Define el valor de la propiedad domiciliLinea1.
      * 
      * @param value
      *     allowed object is
@@ -578,7 +608,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliLinea2 property.
+     * Obtiene el valor de la propiedad domiciliLinea2.
      * 
      * @return
      *     possible object is
@@ -590,7 +620,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliLinea2 property.
+     * Define el valor de la propiedad domiciliLinea2.
      * 
      * @param value
      *     allowed object is
@@ -602,7 +632,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliMunicipiCodiIne property.
+     * Obtiene el valor de la propiedad domiciliMunicipiCodiIne.
      * 
      * @return
      *     possible object is
@@ -614,7 +644,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliMunicipiCodiIne property.
+     * Define el valor de la propiedad domiciliMunicipiCodiIne.
      * 
      * @param value
      *     allowed object is
@@ -626,7 +656,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliMunicipiNom property.
+     * Obtiene el valor de la propiedad domiciliMunicipiNom.
      * 
      * @return
      *     possible object is
@@ -638,7 +668,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliMunicipiNom property.
+     * Define el valor de la propiedad domiciliMunicipiNom.
      * 
      * @param value
      *     allowed object is
@@ -650,7 +680,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliNumeracioNumero property.
+     * Obtiene el valor de la propiedad domiciliNumeracioNumero.
      * 
      * @return
      *     possible object is
@@ -662,7 +692,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliNumeracioNumero property.
+     * Define el valor de la propiedad domiciliNumeracioNumero.
      * 
      * @param value
      *     allowed object is
@@ -674,7 +704,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliNumeracioPuntKm property.
+     * Obtiene el valor de la propiedad domiciliNumeracioPuntKm.
      * 
      * @return
      *     possible object is
@@ -686,7 +716,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliNumeracioPuntKm property.
+     * Define el valor de la propiedad domiciliNumeracioPuntKm.
      * 
      * @param value
      *     allowed object is
@@ -698,7 +728,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliNumeracioTipus property.
+     * Obtiene el valor de la propiedad domiciliNumeracioTipus.
      * 
      * @return
      *     possible object is
@@ -710,7 +740,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliNumeracioTipus property.
+     * Define el valor de la propiedad domiciliNumeracioTipus.
      * 
      * @param value
      *     allowed object is
@@ -722,7 +752,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliPaisCodiIso property.
+     * Obtiene el valor de la propiedad domiciliPaisCodiIso.
      * 
      * @return
      *     possible object is
@@ -734,7 +764,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliPaisCodiIso property.
+     * Define el valor de la propiedad domiciliPaisCodiIso.
      * 
      * @param value
      *     allowed object is
@@ -746,7 +776,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliPaisNom property.
+     * Obtiene el valor de la propiedad domiciliPaisNom.
      * 
      * @return
      *     possible object is
@@ -758,7 +788,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliPaisNom property.
+     * Define el valor de la propiedad domiciliPaisNom.
      * 
      * @param value
      *     allowed object is
@@ -770,7 +800,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliPlanta property.
+     * Obtiene el valor de la propiedad domiciliPlanta.
      * 
      * @return
      *     possible object is
@@ -782,7 +812,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliPlanta property.
+     * Define el valor de la propiedad domiciliPlanta.
      * 
      * @param value
      *     allowed object is
@@ -794,7 +824,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliPoblacio property.
+     * Obtiene el valor de la propiedad domiciliPoblacio.
      * 
      * @return
      *     possible object is
@@ -806,7 +836,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliPoblacio property.
+     * Define el valor de la propiedad domiciliPoblacio.
      * 
      * @param value
      *     allowed object is
@@ -818,7 +848,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliPorta property.
+     * Obtiene el valor de la propiedad domiciliPorta.
      * 
      * @return
      *     possible object is
@@ -830,7 +860,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliPorta property.
+     * Define el valor de la propiedad domiciliPorta.
      * 
      * @param value
      *     allowed object is
@@ -842,7 +872,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliPortal property.
+     * Obtiene el valor de la propiedad domiciliPortal.
      * 
      * @return
      *     possible object is
@@ -854,7 +884,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliPortal property.
+     * Define el valor de la propiedad domiciliPortal.
      * 
      * @param value
      *     allowed object is
@@ -866,7 +896,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliProvinciaCodi property.
+     * Obtiene el valor de la propiedad domiciliProvinciaCodi.
      * 
      * @return
      *     possible object is
@@ -878,7 +908,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliProvinciaCodi property.
+     * Define el valor de la propiedad domiciliProvinciaCodi.
      * 
      * @param value
      *     allowed object is
@@ -890,7 +920,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliProvinciaNom property.
+     * Obtiene el valor de la propiedad domiciliProvinciaNom.
      * 
      * @return
      *     possible object is
@@ -902,7 +932,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliProvinciaNom property.
+     * Define el valor de la propiedad domiciliProvinciaNom.
      * 
      * @param value
      *     allowed object is
@@ -914,7 +944,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliTipus property.
+     * Obtiene el valor de la propiedad domiciliTipus.
      * 
      * @return
      *     possible object is
@@ -926,7 +956,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliTipus property.
+     * Define el valor de la propiedad domiciliTipus.
      * 
      * @param value
      *     allowed object is
@@ -938,7 +968,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliViaNom property.
+     * Obtiene el valor de la propiedad domiciliViaNom.
      * 
      * @return
      *     possible object is
@@ -950,7 +980,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliViaNom property.
+     * Define el valor de la propiedad domiciliViaNom.
      * 
      * @param value
      *     allowed object is
@@ -962,7 +992,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the domiciliViaTipus property.
+     * Obtiene el valor de la propiedad domiciliViaTipus.
      * 
      * @return
      *     possible object is
@@ -974,7 +1004,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the domiciliViaTipus property.
+     * Define el valor de la propiedad domiciliViaTipus.
      * 
      * @param value
      *     allowed object is
@@ -986,7 +1016,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the notificaIdentificador property.
+     * Obtiene el valor de la propiedad notificaIdentificador.
      * 
      * @return
      *     possible object is
@@ -998,7 +1028,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the notificaIdentificador property.
+     * Define el valor de la propiedad notificaIdentificador.
      * 
      * @param value
      *     allowed object is
@@ -1010,7 +1040,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the referencia property.
+     * Obtiene el valor de la propiedad referencia.
      * 
      * @return
      *     possible object is
@@ -1022,7 +1052,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the referencia property.
+     * Define el valor de la propiedad referencia.
      * 
      * @param value
      *     allowed object is
@@ -1034,7 +1064,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the retardPostal property.
+     * Obtiene el valor de la propiedad retardPostal.
      * 
      */
     public int getRetardPostal() {
@@ -1042,7 +1072,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the retardPostal property.
+     * Define el valor de la propiedad retardPostal.
      * 
      */
     public void setRetardPostal(int value) {
@@ -1050,7 +1080,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the serveiTipus property.
+     * Obtiene el valor de la propiedad serveiTipus.
      * 
      * @return
      *     possible object is
@@ -1062,7 +1092,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the serveiTipus property.
+     * Define el valor de la propiedad serveiTipus.
      * 
      * @param value
      *     allowed object is
@@ -1074,7 +1104,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the seuEstat property.
+     * Obtiene el valor de la propiedad seuEstat.
      * 
      * @return
      *     possible object is
@@ -1086,7 +1116,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the seuEstat property.
+     * Define el valor de la propiedad seuEstat.
      * 
      * @param value
      *     allowed object is
@@ -1098,7 +1128,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the seuRegistreData property.
+     * Obtiene el valor de la propiedad seuRegistreData.
      * 
      * @return
      *     possible object is
@@ -1110,7 +1140,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the seuRegistreData property.
+     * Define el valor de la propiedad seuRegistreData.
      * 
      * @param value
      *     allowed object is
@@ -1122,7 +1152,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the seuRegistreNumero property.
+     * Obtiene el valor de la propiedad seuRegistreNumero.
      * 
      * @return
      *     possible object is
@@ -1134,7 +1164,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the seuRegistreNumero property.
+     * Define el valor de la propiedad seuRegistreNumero.
      * 
      * @param value
      *     allowed object is
@@ -1146,7 +1176,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the titularEmail property.
+     * Obtiene el valor de la propiedad titularEmail.
      * 
      * @return
      *     possible object is
@@ -1158,7 +1188,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the titularEmail property.
+     * Define el valor de la propiedad titularEmail.
      * 
      * @param value
      *     allowed object is
@@ -1170,31 +1200,55 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the titularLlinatges property.
+     * Obtiene el valor de la propiedad titularLlinatge1.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getTitularLlinatges() {
-        return titularLlinatges;
+    public String getTitularLlinatge1() {
+        return titularLlinatge1;
     }
 
     /**
-     * Sets the value of the titularLlinatges property.
+     * Define el valor de la propiedad titularLlinatge1.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setTitularLlinatges(String value) {
-        this.titularLlinatges = value;
+    public void setTitularLlinatge1(String value) {
+        this.titularLlinatge1 = value;
     }
 
     /**
-     * Gets the value of the titularNif property.
+     * Obtiene el valor de la propiedad titularLlinatge2.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getTitularLlinatge2() {
+        return titularLlinatge2;
+    }
+
+    /**
+     * Define el valor de la propiedad titularLlinatge2.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setTitularLlinatge2(String value) {
+        this.titularLlinatge2 = value;
+    }
+
+    /**
+     * Obtiene el valor de la propiedad titularNif.
      * 
      * @return
      *     possible object is
@@ -1206,7 +1260,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the titularNif property.
+     * Define el valor de la propiedad titularNif.
      * 
      * @param value
      *     allowed object is
@@ -1218,7 +1272,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the titularNom property.
+     * Obtiene el valor de la propiedad titularNom.
      * 
      * @return
      *     possible object is
@@ -1230,7 +1284,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the titularNom property.
+     * Define el valor de la propiedad titularNom.
      * 
      * @param value
      *     allowed object is
@@ -1242,7 +1296,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Gets the value of the titularTelefon property.
+     * Obtiene el valor de la propiedad titularTelefon.
      * 
      * @return
      *     possible object is
@@ -1254,7 +1308,7 @@ public class NotificacioDestinatari {
     }
 
     /**
-     * Sets the value of the titularTelefon property.
+     * Define el valor de la propiedad titularTelefon.
      * 
      * @param value
      *     allowed object is

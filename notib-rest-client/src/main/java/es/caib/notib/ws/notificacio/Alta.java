@@ -3,20 +3,21 @@ package es.caib.notib.ws.notificacio;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for alta complex type.
+ * <p>Clase Java para alta complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
  * 
  * <pre>
  * &lt;complexType name="alta">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="arg0" type="{http://www.caib.es/notib/ws/notificacio}notificacio" minOccurs="0"/>
+ *         &lt;element name="notificacio" type="{http://www.caib.es/notib/ws/notificacio}notificacio"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -27,34 +28,35 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "alta", propOrder = {
-    "arg0"
+    "notificacio"
 })
 public class Alta {
 
-    protected Notificacio_Type arg0;
+    @XmlElement(required = true)
+    protected Notificacio_Type notificacio;
 
     /**
-     * Gets the value of the arg0 property.
+     * Obtiene el valor de la propiedad notificacio.
      * 
      * @return
      *     possible object is
      *     {@link Notificacio_Type }
      *     
      */
-    public Notificacio_Type getArg0() {
-        return arg0;
+    public Notificacio_Type getNotificacio() {
+        return notificacio;
     }
 
     /**
-     * Sets the value of the arg0 property.
+     * Define el valor de la propiedad notificacio.
      * 
      * @param value
      *     allowed object is
      *     {@link Notificacio_Type }
      *     
      */
-    public void setArg0(Notificacio_Type value) {
-        this.arg0 = value;
+    public void setNotificacio(Notificacio_Type value) {
+        this.notificacio = value;
     }
 
 }

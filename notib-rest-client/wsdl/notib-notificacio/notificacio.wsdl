@@ -1,0 +1,389 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions name="NotificacioService" targetNamespace="http://www.caib.es/notib/ws/notificacio" xmlns:ns1="http://schemas.xmlsoap.org/wsdl/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.caib.es/notib/ws/notificacio" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.caib.es/notib/ws/notificacio" xmlns:tns="http://www.caib.es/notib/ws/notificacio" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:element name="alta" type="tns:alta" />
+<xs:element name="altaResponse" type="tns:altaResponse" />
+<xs:element name="consulta" type="tns:consulta" />
+<xs:element name="consultaCertificacio" type="tns:consultaCertificacio" />
+<xs:element name="consultaCertificacioResponse" type="tns:consultaCertificacioResponse" />
+<xs:element name="consultaEstat" type="tns:consultaEstat" />
+<xs:element name="consultaEstatResponse" type="tns:consultaEstatResponse" />
+<xs:element name="consultaResponse" type="tns:consultaResponse" />
+<xs:element name="notificacio" type="tns:notificacio" />
+<xs:element name="notificacioCertificacio" type="tns:notificacioCertificacio" />
+<xs:element name="notificacioEstat" type="tns:notificacioEstat" />
+<xs:complexType name="alta">
+<xs:sequence>
+<xs:element name="notificacio" type="tns:notificacio" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="notificacio">
+<xs:sequence>
+<xs:element minOccurs="0" name="cifEntitat" type="xs:string" />
+<xs:element minOccurs="0" name="concepte" type="xs:string" />
+<xs:element maxOccurs="unbounded" minOccurs="0" name="destinataris" nillable="true" type="tns:notificacioDestinatari" />
+<xs:element minOccurs="0" name="documentArxiuNom" type="xs:string" />
+<xs:element minOccurs="0" name="documentContingutBase64" type="xs:string" />
+<xs:element name="documentGenerarCsv" type="xs:boolean" />
+<xs:element name="documentNormalitzat" type="xs:boolean" />
+<xs:element minOccurs="0" name="documentSha1" type="xs:string" />
+<xs:element minOccurs="0" name="documentacioFisicaCodi" type="xs:string" />
+<xs:element minOccurs="0" name="enviamentDataProgramada" type="xs:dateTime" />
+<xs:element minOccurs="0" name="enviamentTipus" type="tns:notificaEnviamentTipusEnumDto" />
+<xs:element minOccurs="0" name="estat" type="tns:notificacioEstatEnumDto" />
+<xs:element minOccurs="0" name="pagadorCieCodiDir3" type="xs:string" />
+<xs:element minOccurs="0" name="pagadorCieDataVigencia" type="xs:dateTime" />
+<xs:element minOccurs="0" name="pagadorCorreusCodiClientFacturacio" type="xs:string" />
+<xs:element minOccurs="0" name="pagadorCorreusCodiDir3" type="xs:string" />
+<xs:element minOccurs="0" name="pagadorCorreusContracteNum" type="xs:string" />
+<xs:element minOccurs="0" name="pagadorCorreusDataVigencia" type="xs:dateTime" />
+<xs:element minOccurs="0" name="procedimentCodiSia" type="xs:string" />
+<xs:element minOccurs="0" name="procedimentDescripcioSia" type="xs:string" />
+<xs:element minOccurs="0" name="registreCodiAssumpte" type="xs:string" />
+<xs:element minOccurs="0" name="registreDataCaptura" type="xs:dateTime" />
+<xs:element name="registreEnviar" type="xs:boolean" />
+<xs:element minOccurs="0" name="registreIdioma" type="xs:string" />
+<xs:element minOccurs="0" name="registreLlibre" type="xs:string" />
+<xs:element minOccurs="0" name="registreOficina" type="xs:string" />
+<xs:element name="registreOrigenCiutadaAdmin" type="xs:int" />
+<xs:element minOccurs="0" name="registreTipusAssumpte" type="xs:string" />
+<xs:element minOccurs="0" name="registreTipusDocumental" type="xs:string" />
+<xs:element minOccurs="0" name="seuAvisText" type="xs:string" />
+<xs:element minOccurs="0" name="seuAvisTextMobil" type="xs:string" />
+<xs:element minOccurs="0" name="seuAvisTitol" type="xs:string" />
+<xs:element minOccurs="0" name="seuExpedientIdentificadorEni" type="xs:string" />
+<xs:element minOccurs="0" name="seuExpedientSerieDocumental" type="xs:string" />
+<xs:element minOccurs="0" name="seuExpedientTitol" type="xs:string" />
+<xs:element minOccurs="0" name="seuExpedientUnitatOrganitzativa" type="xs:string" />
+<xs:element minOccurs="0" name="seuIdioma" type="xs:string" />
+<xs:element minOccurs="0" name="seuOficiText" type="xs:string" />
+<xs:element minOccurs="0" name="seuOficiTitol" type="xs:string" />
+<xs:element minOccurs="0" name="seuRegistreLlibre" type="xs:string" />
+<xs:element minOccurs="0" name="seuRegistreOficina" type="xs:string" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="notificacioDestinatari">
+<xs:sequence>
+<xs:element minOccurs="0" name="caducitat" type="xs:dateTime" />
+<xs:element minOccurs="0" name="dehNif" type="xs:string" />
+<xs:element name="dehObligat" type="xs:boolean" />
+<xs:element minOccurs="0" name="dehProcedimentCodi" type="xs:string" />
+<xs:element minOccurs="0" name="destinatariEmail" type="xs:string" />
+<xs:element minOccurs="0" name="destinatariLlinatge1" type="xs:string" />
+<xs:element minOccurs="0" name="destinatariLlinatge2" type="xs:string" />
+<xs:element minOccurs="0" name="destinatariNif" type="xs:string" />
+<xs:element minOccurs="0" name="destinatariNom" type="xs:string" />
+<xs:element minOccurs="0" name="destinatariTelefon" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliApartatCorreus" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliBloc" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliCie" type="xs:int" />
+<xs:element minOccurs="0" name="domiciliCodiPostal" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliComplement" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliConcretTipus" type="tns:domiciliConcretTipusEnum" />
+<xs:element minOccurs="0" name="domiciliEscala" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliLinea1" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliLinea2" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliMunicipiCodiIne" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliMunicipiNom" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliNumeracioNumero" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliNumeracioPuntKm" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliNumeracioTipus" type="tns:domiciliNumeracioTipusEnum" />
+<xs:element minOccurs="0" name="domiciliPaisCodiIso" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliPaisNom" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliPlanta" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliPoblacio" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliPorta" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliPortal" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliProvinciaCodi" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliProvinciaNom" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliTipus" type="tns:domiciliTipusEnum" />
+<xs:element minOccurs="0" name="domiciliViaNom" type="xs:string" />
+<xs:element minOccurs="0" name="domiciliViaTipus" type="xs:string" />
+<xs:element minOccurs="0" name="notificaIdentificador" type="xs:string" />
+<xs:element minOccurs="0" name="referencia" type="xs:string" />
+<xs:element name="retardPostal" type="xs:int" />
+<xs:element minOccurs="0" name="serveiTipus" type="tns:serveiTipusEnum" />
+<xs:element minOccurs="0" name="seuEstat" type="tns:notificacioSeuEstatEnumDto" />
+<xs:element minOccurs="0" name="seuRegistreData" type="xs:dateTime" />
+<xs:element minOccurs="0" name="seuRegistreNumero" type="xs:string" />
+<xs:element minOccurs="0" name="titularEmail" type="xs:string" />
+<xs:element minOccurs="0" name="titularLlinatge1" type="xs:string" />
+<xs:element minOccurs="0" name="titularLlinatge2" type="xs:string" />
+<xs:element minOccurs="0" name="titularNif" type="xs:string" />
+<xs:element minOccurs="0" name="titularNom" type="xs:string" />
+<xs:element minOccurs="0" name="titularTelefon" type="xs:string" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="altaResponse">
+<xs:sequence>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="return" type="xs:string" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="consulta">
+<xs:sequence>
+<xs:element name="referencia" type="xs:string" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="consultaResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:notificacio" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="consultaCertificacio">
+<xs:sequence>
+<xs:element name="referencia" type="xs:string" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="consultaCertificacioResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:notificacioCertificacio" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="notificacioCertificacio">
+<xs:sequence>
+<xs:element minOccurs="0" name="arxiuContingut" type="xs:string" />
+<xs:element minOccurs="0" name="arxiuTipus" type="tns:certificacioArxiuTipusEnum" />
+<xs:element minOccurs="0" name="dataActualitzacio" type="xs:dateTime" />
+<xs:element minOccurs="0" name="numSeguiment" type="xs:string" />
+<xs:element minOccurs="0" name="tipus" type="tns:certificacioTipusEnum" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="consultaEstat">
+<xs:sequence>
+<xs:element name="referencia" type="xs:string" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="consultaEstatResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:notificacioEstat" />
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="notificacioEstat">
+<xs:sequence>
+<xs:element minOccurs="0" name="data" type="xs:dateTime" />
+<xs:element minOccurs="0" name="estat" type="tns:notificacioEstatEnum" />
+<xs:element minOccurs="0" name="numSeguiment" type="xs:string" />
+<xs:element minOccurs="0" name="origen" type="xs:string" />
+<xs:element minOccurs="0" name="receptorNif" type="xs:string" />
+<xs:element minOccurs="0" name="receptorNom" type="xs:string" />
+</xs:sequence>
+</xs:complexType>
+<xs:simpleType name="domiciliConcretTipusEnum">
+<xs:restriction base="xs:string">
+<xs:enumeration value="NACIONAL" />
+<xs:enumeration value="ESTRANGER" />
+<xs:enumeration value="SENSE_NORMALITZAR" />
+<xs:enumeration value="APARTAT_CORREUS" />
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="domiciliNumeracioTipusEnum">
+<xs:restriction base="xs:string">
+<xs:enumeration value="NUMERO" />
+<xs:enumeration value="PUNT_KILOMETRIC" />
+<xs:enumeration value="SENSE_NUMERO" />
+<xs:enumeration value="APARTAT_CORREUS" />
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="domiciliTipusEnum">
+<xs:restriction base="xs:string">
+<xs:enumeration value="FISCAL" />
+<xs:enumeration value="CONCRET" />
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="serveiTipusEnum">
+<xs:restriction base="xs:string">
+<xs:enumeration value="NORMAL" />
+<xs:enumeration value="URGENT" />
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="notificacioSeuEstatEnumDto">
+<xs:restriction base="xs:string">
+<xs:enumeration value="PENDENT" />
+<xs:enumeration value="ENVIADA" />
+<xs:enumeration value="ERROR_ENVIAMENT" />
+<xs:enumeration value="LLEGIDA" />
+<xs:enumeration value="REBUTJADA" />
+<xs:enumeration value="ERROR_PROCESSAMENT" />
+<xs:enumeration value="LLEGIDA_NOTIFICA" />
+<xs:enumeration value="REBUTJADA_NOTIFICA" />
+<xs:enumeration value="ERROR_NOTIFICA" />
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="notificaEnviamentTipusEnumDto">
+<xs:restriction base="xs:string">
+<xs:enumeration value="NOTIFICACIO" />
+<xs:enumeration value="COMUNICACIO" />
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="notificacioEstatEnumDto">
+<xs:restriction base="xs:string">
+<xs:enumeration value="PENDENT" />
+<xs:enumeration value="ENVIADA_NOTIFICA" />
+<xs:enumeration value="PROCESSADA" />
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="certificacioArxiuTipusEnum">
+<xs:restriction base="xs:string">
+<xs:enumeration value="PDF" />
+<xs:enumeration value="XML" />
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="certificacioTipusEnum">
+<xs:restriction base="xs:string">
+<xs:enumeration value="JUSTIFICANT" />
+<xs:enumeration value="SOBRE" />
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="notificacioEstatEnum">
+<xs:restriction base="xs:string">
+<xs:enumeration value="AUSENT" />
+<xs:enumeration value="DESCONEGUT" />
+<xs:enumeration value="ADRESA_INCORRECTA" />
+<xs:enumeration value="EDITANT" />
+<xs:enumeration value="ENVIADA_CENTRE_IMPRESSIO" />
+<xs:enumeration value="ENVIADA_DEH" />
+<xs:enumeration value="LLEGIDA" />
+<xs:enumeration value="ERROR_ENVIAMENT" />
+<xs:enumeration value="EXTRAVIADA" />
+<xs:enumeration value="MORT" />
+<xs:enumeration value="NOTIFICADA" />
+<xs:enumeration value="PENDENT_ENVIAMENT" />
+<xs:enumeration value="PENDENT_COMPAREIXENSA" />
+<xs:enumeration value="REBUTJADA" />
+<xs:enumeration value="DATA_ENVIAMENT_PROGRAMAT" />
+<xs:enumeration value="SENSE_INFORMACIO" />
+</xs:restriction>
+</xs:simpleType>
+<xs:element name="NotificacioWsServiceException" type="tns:NotificacioWsServiceException" />
+<xs:complexType name="NotificacioWsServiceException">
+<xs:sequence />
+</xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="consulta">
+    <wsdl:part element="tns:consulta" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="consultaCertificacio">
+    <wsdl:part element="tns:consultaCertificacio" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="consultaEstat">
+    <wsdl:part element="tns:consultaEstat" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="consultaResponse">
+    <wsdl:part element="tns:consultaResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="altaResponse">
+    <wsdl:part element="tns:altaResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="consultaCertificacioResponse">
+    <wsdl:part element="tns:consultaCertificacioResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="alta">
+    <wsdl:part element="tns:alta" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="consultaEstatResponse">
+    <wsdl:part element="tns:consultaEstatResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="NotificacioWsServiceException">
+    <wsdl:part element="tns:NotificacioWsServiceException" name="NotificacioWsServiceException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="Notificacio">
+    <wsdl:operation name="alta">
+      <wsdl:input message="tns:alta" name="alta">
+    </wsdl:input>
+      <wsdl:output message="tns:altaResponse" name="altaResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:NotificacioWsServiceException" name="NotificacioWsServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="consulta">
+      <wsdl:input message="tns:consulta" name="consulta">
+    </wsdl:input>
+      <wsdl:output message="tns:consultaResponse" name="consultaResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:NotificacioWsServiceException" name="NotificacioWsServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="consultaCertificacio">
+      <wsdl:input message="tns:consultaCertificacio" name="consultaCertificacio">
+    </wsdl:input>
+      <wsdl:output message="tns:consultaCertificacioResponse" name="consultaCertificacioResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:NotificacioWsServiceException" name="NotificacioWsServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="consultaEstat">
+      <wsdl:input message="tns:consultaEstat" name="consultaEstat">
+    </wsdl:input>
+      <wsdl:output message="tns:consultaEstatResponse" name="consultaEstatResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:NotificacioWsServiceException" name="NotificacioWsServiceException">
+    </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="NotificacioServiceSoapBinding" type="tns:Notificacio">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="alta">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="alta">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="altaResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="NotificacioWsServiceException">
+        <soap:fault name="NotificacioWsServiceException" use="literal" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="consulta">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="consulta">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="consultaResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="NotificacioWsServiceException">
+        <soap:fault name="NotificacioWsServiceException" use="literal" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="consultaCertificacio">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="consultaCertificacio">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="consultaCertificacioResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="NotificacioWsServiceException">
+        <soap:fault name="NotificacioWsServiceException" use="literal" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="consultaEstat">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input name="consultaEstat">
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="consultaEstatResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="NotificacioWsServiceException">
+        <soap:fault name="NotificacioWsServiceException" use="literal" />
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="NotificacioService">
+    <wsdl:port binding="tns:NotificacioServiceSoapBinding" name="NotificacioServicePort">
+      <soap:address location="http://127.0.0.1:8080/notib/ws/notificacio" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

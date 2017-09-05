@@ -9,9 +9,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * <p>Java class for notificacioCertificacio complex type.
+ * <p>Clase Java para notificacioCertificacio complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
  * 
  * <pre>
  * &lt;complexType name="notificacioCertificacio">
@@ -51,7 +51,7 @@ public class NotificacioCertificacio {
     protected CertificacioTipusEnum tipus;
 
     /**
-     * Gets the value of the arxiuContingut property.
+     * Obtiene el valor de la propiedad arxiuContingut.
      * 
      * @return
      *     possible object is
@@ -63,7 +63,7 @@ public class NotificacioCertificacio {
     }
 
     /**
-     * Sets the value of the arxiuContingut property.
+     * Define el valor de la propiedad arxiuContingut.
      * 
      * @param value
      *     allowed object is
@@ -75,7 +75,7 @@ public class NotificacioCertificacio {
     }
 
     /**
-     * Gets the value of the arxiuTipus property.
+     * Obtiene el valor de la propiedad arxiuTipus.
      * 
      * @return
      *     possible object is
@@ -87,7 +87,7 @@ public class NotificacioCertificacio {
     }
 
     /**
-     * Sets the value of the arxiuTipus property.
+     * Define el valor de la propiedad arxiuTipus.
      * 
      * @param value
      *     allowed object is
@@ -99,7 +99,7 @@ public class NotificacioCertificacio {
     }
 
     /**
-     * Gets the value of the dataActualitzacio property.
+     * Obtiene el valor de la propiedad dataActualitzacio.
      * 
      * @return
      *     possible object is
@@ -111,7 +111,7 @@ public class NotificacioCertificacio {
     }
 
     /**
-     * Sets the value of the dataActualitzacio property.
+     * Define el valor de la propiedad dataActualitzacio.
      * 
      * @param value
      *     allowed object is
@@ -123,7 +123,7 @@ public class NotificacioCertificacio {
     }
 
     /**
-     * Gets the value of the numSeguiment property.
+     * Obtiene el valor de la propiedad numSeguiment.
      * 
      * @return
      *     possible object is
@@ -135,7 +135,7 @@ public class NotificacioCertificacio {
     }
 
     /**
-     * Sets the value of the numSeguiment property.
+     * Define el valor de la propiedad numSeguiment.
      * 
      * @param value
      *     allowed object is
@@ -147,7 +147,7 @@ public class NotificacioCertificacio {
     }
 
     /**
-     * Gets the value of the tipus property.
+     * Obtiene el valor de la propiedad tipus.
      * 
      * @return
      *     possible object is
@@ -159,7 +159,7 @@ public class NotificacioCertificacio {
     }
 
     /**
-     * Sets the value of the tipus property.
+     * Define el valor de la propiedad tipus.
      * 
      * @param value
      *     allowed object is

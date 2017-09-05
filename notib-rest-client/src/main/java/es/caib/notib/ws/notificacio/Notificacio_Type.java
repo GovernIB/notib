@@ -12,9 +12,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * <p>Java class for notificacio complex type.
+ * <p>Clase Java para notificacio complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
  * 
  * <pre>
  * &lt;complexType name="notificacio">
@@ -29,6 +29,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *         &lt;element name="documentGenerarCsv" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *         &lt;element name="documentNormalitzat" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *         &lt;element name="documentSha1" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="documentacioFisicaCodi" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="enviamentDataProgramada" type="{http://www.w3.org/2001/XMLSchema}dateTime" minOccurs="0"/>
  *         &lt;element name="enviamentTipus" type="{http://www.caib.es/notib/ws/notificacio}notificaEnviamentTipusEnumDto" minOccurs="0"/>
  *         &lt;element name="estat" type="{http://www.caib.es/notib/ws/notificacio}notificacioEstatEnumDto" minOccurs="0"/>
@@ -40,6 +41,15 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *         &lt;element name="pagadorCorreusDataVigencia" type="{http://www.w3.org/2001/XMLSchema}dateTime" minOccurs="0"/>
  *         &lt;element name="procedimentCodiSia" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="procedimentDescripcioSia" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="registreCodiAssumpte" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="registreDataCaptura" type="{http://www.w3.org/2001/XMLSchema}dateTime" minOccurs="0"/>
+ *         &lt;element name="registreEnviar" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *         &lt;element name="registreIdioma" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="registreLlibre" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="registreOficina" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="registreOrigenCiutadaAdmin" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="registreTipusAssumpte" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="registreTipusDocumental" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="seuAvisText" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="seuAvisTextMobil" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="seuAvisTitol" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
@@ -70,6 +80,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
     "documentGenerarCsv",
     "documentNormalitzat",
     "documentSha1",
+    "documentacioFisicaCodi",
     "enviamentDataProgramada",
     "enviamentTipus",
     "estat",
@@ -81,6 +92,15 @@ import javax.xml.datatype.XMLGregorianCalendar;
     "pagadorCorreusDataVigencia",
     "procedimentCodiSia",
     "procedimentDescripcioSia",
+    "registreCodiAssumpte",
+    "registreDataCaptura",
+    "registreEnviar",
+    "registreIdioma",
+    "registreLlibre",
+    "registreOficina",
+    "registreOrigenCiutadaAdmin",
+    "registreTipusAssumpte",
+    "registreTipusDocumental",
     "seuAvisText",
     "seuAvisTextMobil",
     "seuAvisTitol",
@@ -105,6 +125,7 @@ public class Notificacio_Type {
     protected boolean documentGenerarCsv;
     protected boolean documentNormalitzat;
     protected String documentSha1;
+    protected String documentacioFisicaCodi;
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar enviamentDataProgramada;
     @XmlSchemaType(name = "string")
@@ -121,6 +142,16 @@ public class Notificacio_Type {
     protected XMLGregorianCalendar pagadorCorreusDataVigencia;
     protected String procedimentCodiSia;
     protected String procedimentDescripcioSia;
+    protected String registreCodiAssumpte;
+    @XmlSchemaType(name = "dateTime")
+    protected XMLGregorianCalendar registreDataCaptura;
+    protected boolean registreEnviar;
+    protected String registreIdioma;
+    protected String registreLlibre;
+    protected String registreOficina;
+    protected int registreOrigenCiutadaAdmin;
+    protected String registreTipusAssumpte;
+    protected String registreTipusDocumental;
     protected String seuAvisText;
     protected String seuAvisTextMobil;
     protected String seuAvisTitol;
@@ -135,7 +166,7 @@ public class Notificacio_Type {
     protected String seuRegistreOficina;
 
     /**
-     * Gets the value of the cifEntitat property.
+     * Obtiene el valor de la propiedad cifEntitat.
      * 
      * @return
      *     possible object is
@@ -147,7 +178,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the cifEntitat property.
+     * Define el valor de la propiedad cifEntitat.
      * 
      * @param value
      *     allowed object is
@@ -159,7 +190,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the concepte property.
+     * Obtiene el valor de la propiedad concepte.
      * 
      * @return
      *     possible object is
@@ -171,7 +202,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the concepte property.
+     * Define el valor de la propiedad concepte.
      * 
      * @param value
      *     allowed object is
@@ -210,14 +241,9 @@ public class Notificacio_Type {
         }
         return this.destinataris;
     }
-    
 
-    public void setDestinataris(List<NotificacioDestinatari> destinataris) {
-		this.destinataris = destinataris;
-	}
-
-	/**
-     * Gets the value of the documentArxiuNom property.
+    /**
+     * Obtiene el valor de la propiedad documentArxiuNom.
      * 
      * @return
      *     possible object is
@@ -229,7 +255,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the documentArxiuNom property.
+     * Define el valor de la propiedad documentArxiuNom.
      * 
      * @param value
      *     allowed object is
@@ -241,7 +267,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the documentContingutBase64 property.
+     * Obtiene el valor de la propiedad documentContingutBase64.
      * 
      * @return
      *     possible object is
@@ -253,7 +279,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the documentContingutBase64 property.
+     * Define el valor de la propiedad documentContingutBase64.
      * 
      * @param value
      *     allowed object is
@@ -265,7 +291,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the documentGenerarCsv property.
+     * Obtiene el valor de la propiedad documentGenerarCsv.
      * 
      */
     public boolean isDocumentGenerarCsv() {
@@ -273,7 +299,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the documentGenerarCsv property.
+     * Define el valor de la propiedad documentGenerarCsv.
      * 
      */
     public void setDocumentGenerarCsv(boolean value) {
@@ -281,7 +307,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the documentNormalitzat property.
+     * Obtiene el valor de la propiedad documentNormalitzat.
      * 
      */
     public boolean isDocumentNormalitzat() {
@@ -289,7 +315,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the documentNormalitzat property.
+     * Define el valor de la propiedad documentNormalitzat.
      * 
      */
     public void setDocumentNormalitzat(boolean value) {
@@ -297,7 +323,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the documentSha1 property.
+     * Obtiene el valor de la propiedad documentSha1.
      * 
      * @return
      *     possible object is
@@ -309,7 +335,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the documentSha1 property.
+     * Define el valor de la propiedad documentSha1.
      * 
      * @param value
      *     allowed object is
@@ -321,7 +347,31 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the enviamentDataProgramada property.
+     * Obtiene el valor de la propiedad documentacioFisicaCodi.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getDocumentacioFisicaCodi() {
+        return documentacioFisicaCodi;
+    }
+
+    /**
+     * Define el valor de la propiedad documentacioFisicaCodi.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setDocumentacioFisicaCodi(String value) {
+        this.documentacioFisicaCodi = value;
+    }
+
+    /**
+     * Obtiene el valor de la propiedad enviamentDataProgramada.
      * 
      * @return
      *     possible object is
@@ -333,7 +383,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the enviamentDataProgramada property.
+     * Define el valor de la propiedad enviamentDataProgramada.
      * 
      * @param value
      *     allowed object is
@@ -345,7 +395,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the enviamentTipus property.
+     * Obtiene el valor de la propiedad enviamentTipus.
      * 
      * @return
      *     possible object is
@@ -357,7 +407,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the enviamentTipus property.
+     * Define el valor de la propiedad enviamentTipus.
      * 
      * @param value
      *     allowed object is
@@ -369,7 +419,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the estat property.
+     * Obtiene el valor de la propiedad estat.
      * 
      * @return
      *     possible object is
@@ -381,7 +431,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the estat property.
+     * Define el valor de la propiedad estat.
      * 
      * @param value
      *     allowed object is
@@ -393,7 +443,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the pagadorCieCodiDir3 property.
+     * Obtiene el valor de la propiedad pagadorCieCodiDir3.
      * 
      * @return
      *     possible object is
@@ -405,7 +455,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the pagadorCieCodiDir3 property.
+     * Define el valor de la propiedad pagadorCieCodiDir3.
      * 
      * @param value
      *     allowed object is
@@ -417,7 +467,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the pagadorCieDataVigencia property.
+     * Obtiene el valor de la propiedad pagadorCieDataVigencia.
      * 
      * @return
      *     possible object is
@@ -429,7 +479,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the pagadorCieDataVigencia property.
+     * Define el valor de la propiedad pagadorCieDataVigencia.
      * 
      * @param value
      *     allowed object is
@@ -441,7 +491,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the pagadorCorreusCodiClientFacturacio property.
+     * Obtiene el valor de la propiedad pagadorCorreusCodiClientFacturacio.
      * 
      * @return
      *     possible object is
@@ -453,7 +503,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the pagadorCorreusCodiClientFacturacio property.
+     * Define el valor de la propiedad pagadorCorreusCodiClientFacturacio.
      * 
      * @param value
      *     allowed object is
@@ -465,7 +515,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the pagadorCorreusCodiDir3 property.
+     * Obtiene el valor de la propiedad pagadorCorreusCodiDir3.
      * 
      * @return
      *     possible object is
@@ -477,7 +527,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the pagadorCorreusCodiDir3 property.
+     * Define el valor de la propiedad pagadorCorreusCodiDir3.
      * 
      * @param value
      *     allowed object is
@@ -489,7 +539,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the pagadorCorreusContracteNum property.
+     * Obtiene el valor de la propiedad pagadorCorreusContracteNum.
      * 
      * @return
      *     possible object is
@@ -501,7 +551,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the pagadorCorreusContracteNum property.
+     * Define el valor de la propiedad pagadorCorreusContracteNum.
      * 
      * @param value
      *     allowed object is
@@ -513,7 +563,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the pagadorCorreusDataVigencia property.
+     * Obtiene el valor de la propiedad pagadorCorreusDataVigencia.
      * 
      * @return
      *     possible object is
@@ -525,7 +575,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the pagadorCorreusDataVigencia property.
+     * Define el valor de la propiedad pagadorCorreusDataVigencia.
      * 
      * @param value
      *     allowed object is
@@ -537,7 +587,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the procedimentCodiSia property.
+     * Obtiene el valor de la propiedad procedimentCodiSia.
      * 
      * @return
      *     possible object is
@@ -549,7 +599,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the procedimentCodiSia property.
+     * Define el valor de la propiedad procedimentCodiSia.
      * 
      * @param value
      *     allowed object is
@@ -561,7 +611,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the procedimentDescripcioSia property.
+     * Obtiene el valor de la propiedad procedimentDescripcioSia.
      * 
      * @return
      *     possible object is
@@ -573,7 +623,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the procedimentDescripcioSia property.
+     * Define el valor de la propiedad procedimentDescripcioSia.
      * 
      * @param value
      *     allowed object is
@@ -585,7 +635,207 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the seuAvisText property.
+     * Obtiene el valor de la propiedad registreCodiAssumpte.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getRegistreCodiAssumpte() {
+        return registreCodiAssumpte;
+    }
+
+    /**
+     * Define el valor de la propiedad registreCodiAssumpte.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setRegistreCodiAssumpte(String value) {
+        this.registreCodiAssumpte = value;
+    }
+
+    /**
+     * Obtiene el valor de la propiedad registreDataCaptura.
+     * 
+     * @return
+     *     possible object is
+     *     {@link XMLGregorianCalendar }
+     *     
+     */
+    public XMLGregorianCalendar getRegistreDataCaptura() {
+        return registreDataCaptura;
+    }
+
+    /**
+     * Define el valor de la propiedad registreDataCaptura.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link XMLGregorianCalendar }
+     *     
+     */
+    public void setRegistreDataCaptura(XMLGregorianCalendar value) {
+        this.registreDataCaptura = value;
+    }
+
+    /**
+     * Obtiene el valor de la propiedad registreEnviar.
+     * 
+     */
+    public boolean isRegistreEnviar() {
+        return registreEnviar;
+    }
+
+    /**
+     * Define el valor de la propiedad registreEnviar.
+     * 
+     */
+    public void setRegistreEnviar(boolean value) {
+        this.registreEnviar = value;
+    }
+
+    /**
+     * Obtiene el valor de la propiedad registreIdioma.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getRegistreIdioma() {
+        return registreIdioma;
+    }
+
+    /**
+     * Define el valor de la propiedad registreIdioma.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setRegistreIdioma(String value) {
+        this.registreIdioma = value;
+    }
+
+    /**
+     * Obtiene el valor de la propiedad registreLlibre.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getRegistreLlibre() {
+        return registreLlibre;
+    }
+
+    /**
+     * Define el valor de la propiedad registreLlibre.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setRegistreLlibre(String value) {
+        this.registreLlibre = value;
+    }
+
+    /**
+     * Obtiene el valor de la propiedad registreOficina.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getRegistreOficina() {
+        return registreOficina;
+    }
+
+    /**
+     * Define el valor de la propiedad registreOficina.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setRegistreOficina(String value) {
+        this.registreOficina = value;
+    }
+
+    /**
+     * Obtiene el valor de la propiedad registreOrigenCiutadaAdmin.
+     * 
+     */
+    public int getRegistreOrigenCiutadaAdmin() {
+        return registreOrigenCiutadaAdmin;
+    }
+
+    /**
+     * Define el valor de la propiedad registreOrigenCiutadaAdmin.
+     * 
+     */
+    public void setRegistreOrigenCiutadaAdmin(int value) {
+        this.registreOrigenCiutadaAdmin = value;
+    }
+
+    /**
+     * Obtiene el valor de la propiedad registreTipusAssumpte.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getRegistreTipusAssumpte() {
+        return registreTipusAssumpte;
+    }
+
+    /**
+     * Define el valor de la propiedad registreTipusAssumpte.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setRegistreTipusAssumpte(String value) {
+        this.registreTipusAssumpte = value;
+    }
+
+    /**
+     * Obtiene el valor de la propiedad registreTipusDocumental.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getRegistreTipusDocumental() {
+        return registreTipusDocumental;
+    }
+
+    /**
+     * Define el valor de la propiedad registreTipusDocumental.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setRegistreTipusDocumental(String value) {
+        this.registreTipusDocumental = value;
+    }
+
+    /**
+     * Obtiene el valor de la propiedad seuAvisText.
      * 
      * @return
      *     possible object is
@@ -597,7 +847,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the seuAvisText property.
+     * Define el valor de la propiedad seuAvisText.
      * 
      * @param value
      *     allowed object is
@@ -609,7 +859,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the seuAvisTextMobil property.
+     * Obtiene el valor de la propiedad seuAvisTextMobil.
      * 
      * @return
      *     possible object is
@@ -621,7 +871,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the seuAvisTextMobil property.
+     * Define el valor de la propiedad seuAvisTextMobil.
      * 
      * @param value
      *     allowed object is
@@ -633,7 +883,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the seuAvisTitol property.
+     * Obtiene el valor de la propiedad seuAvisTitol.
      * 
      * @return
      *     possible object is
@@ -645,7 +895,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the seuAvisTitol property.
+     * Define el valor de la propiedad seuAvisTitol.
      * 
      * @param value
      *     allowed object is
@@ -657,7 +907,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the seuExpedientIdentificadorEni property.
+     * Obtiene el valor de la propiedad seuExpedientIdentificadorEni.
      * 
      * @return
      *     possible object is
@@ -669,7 +919,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the seuExpedientIdentificadorEni property.
+     * Define el valor de la propiedad seuExpedientIdentificadorEni.
      * 
      * @param value
      *     allowed object is
@@ -681,7 +931,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the seuExpedientSerieDocumental property.
+     * Obtiene el valor de la propiedad seuExpedientSerieDocumental.
      * 
      * @return
      *     possible object is
@@ -693,7 +943,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the seuExpedientSerieDocumental property.
+     * Define el valor de la propiedad seuExpedientSerieDocumental.
      * 
      * @param value
      *     allowed object is
@@ -705,7 +955,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the seuExpedientTitol property.
+     * Obtiene el valor de la propiedad seuExpedientTitol.
      * 
      * @return
      *     possible object is
@@ -717,7 +967,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the seuExpedientTitol property.
+     * Define el valor de la propiedad seuExpedientTitol.
      * 
      * @param value
      *     allowed object is
@@ -729,7 +979,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the seuExpedientUnitatOrganitzativa property.
+     * Obtiene el valor de la propiedad seuExpedientUnitatOrganitzativa.
      * 
      * @return
      *     possible object is
@@ -741,7 +991,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the seuExpedientUnitatOrganitzativa property.
+     * Define el valor de la propiedad seuExpedientUnitatOrganitzativa.
      * 
      * @param value
      *     allowed object is
@@ -753,7 +1003,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the seuIdioma property.
+     * Obtiene el valor de la propiedad seuIdioma.
      * 
      * @return
      *     possible object is
@@ -765,7 +1015,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the seuIdioma property.
+     * Define el valor de la propiedad seuIdioma.
      * 
      * @param value
      *     allowed object is
@@ -777,7 +1027,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the seuOficiText property.
+     * Obtiene el valor de la propiedad seuOficiText.
      * 
      * @return
      *     possible object is
@@ -789,7 +1039,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the seuOficiText property.
+     * Define el valor de la propiedad seuOficiText.
      * 
      * @param value
      *     allowed object is
@@ -801,7 +1051,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the seuOficiTitol property.
+     * Obtiene el valor de la propiedad seuOficiTitol.
      * 
      * @return
      *     possible object is
@@ -813,7 +1063,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the seuOficiTitol property.
+     * Define el valor de la propiedad seuOficiTitol.
      * 
      * @param value
      *     allowed object is
@@ -825,7 +1075,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the seuRegistreLlibre property.
+     * Obtiene el valor de la propiedad seuRegistreLlibre.
      * 
      * @return
      *     possible object is
@@ -837,7 +1087,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the seuRegistreLlibre property.
+     * Define el valor de la propiedad seuRegistreLlibre.
      * 
      * @param value
      *     allowed object is
@@ -849,7 +1099,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Gets the value of the seuRegistreOficina property.
+     * Obtiene el valor de la propiedad seuRegistreOficina.
      * 
      * @return
      *     possible object is
@@ -861,7 +1111,7 @@ public class Notificacio_Type {
     }
 
     /**
-     * Sets the value of the seuRegistreOficina property.
+     * Define el valor de la propiedad seuRegistreOficina.
      * 
      * @param value
      *     allowed object is

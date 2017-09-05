@@ -25,6 +25,7 @@ public class NotificacioEstatClient {
 	private String receptorNif;
 	private String origen;
 	private String numSeguiment;
+	private String referenciaEnviament;
 	
 	
 	public NotificacioEstatClient() {}
@@ -35,7 +36,8 @@ public class NotificacioEstatClient {
 			String receptorNom,
 			String receptorNif,
 			String origen,
-			String numSeguiment) {
+			String numSeguiment,
+			String referenciaEnviament) {
 		
 		super();
 		this.estat = estat;
@@ -44,6 +46,7 @@ public class NotificacioEstatClient {
 		this.receptorNif = receptorNif;
 		this.origen = origen;
 		this.numSeguiment = numSeguiment;
+		this.referenciaEnviament = referenciaEnviament;
 	}
 	public NotificacioEstatEnum getEstat() {
 		return estat;
@@ -81,6 +84,10 @@ public class NotificacioEstatClient {
 	public void setNumSeguiment(String numSeguiment) {
 		this.numSeguiment = numSeguiment;
 	}
-	
-	
+	public String getReferenciaEnviament() {
+		return referenciaEnviament;
+	}
+	public void setReferenciaEnviament(String referenciaEnviament) {
+		this.referenciaEnviament = referenciaEnviament;
+	}
 }

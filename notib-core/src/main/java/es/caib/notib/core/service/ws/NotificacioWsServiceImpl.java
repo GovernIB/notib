@@ -5,7 +5,10 @@ package es.caib.notib.core.service.ws;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.List;
 
 import javax.jws.WebService;
@@ -17,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sun.jersey.core.util.Base64;
 
-import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.ws.notificacio.CertificacioArxiuTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.CertificacioTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.DomiciliConcretTipusEnum;
@@ -35,14 +37,11 @@ import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioDestinatariEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.helper.EntityComprovarHelper;
-import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioDestinatariRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
-import es.caib.notib.plugin.registre.sortida.RegistrePluginRegweb3;
 
 
 /**
@@ -92,7 +91,9 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 					notificacio.getConcepte(),
 					notificacio.getDocumentArxiuNom(),
 					documentGesdocId,
-					notificacio.getDocumentSha1(),
+					(notificacio.getDocumentSha1() != null && !notificacio.getDocumentSha1().isEmpty()) ? 
+							notificacio.getDocumentSha1() : 
+								SHAsum(Base64.decode(notificacio.getDocumentContingutBase64())),
 					notificacio.getSeuAvisText(),
 					notificacio.getSeuAvisTitol(),
 					notificacio.getSeuOficiTitol(),
@@ -127,7 +128,7 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 						d.getTitularNif(),
 						d.getDestinatariNom(),
 						d.getDestinatariNif(),
-						d.getServeiTipus().toServeiTipusEnumDto(),
+						d.getServeiTipus() != null ? d.getServeiTipus().toServeiTipusEnumDto() : null,
 						d.getSeuEstat(),
 						d.isDehObligat(),
 						notificacioEntity);
@@ -137,11 +138,11 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 				destinatari.destinatariLlinatges( d.getDestinatariLlinatge1(), d.getDestinatariLlinatge2() );
 				destinatari.destinatariTelefon( d.getDestinatariTelefon() );
 				destinatari.destinatariEmail( d.getDestinatariEmail() );
-				destinatari.domiciliTipus(d.getDomiciliTipus().toNotificaDomiciliTipusEnumDto());
-				destinatari.domiciliConcretTipus(d.getDomiciliConcretTipus().toNotificaDomiciliConcretTipusEnumDto());
+				destinatari.domiciliTipus(d.getDomiciliTipus() != null ? d.getDomiciliTipus().toNotificaDomiciliTipusEnumDto() : null);
+				destinatari.domiciliConcretTipus(d.getDomiciliConcretTipus() != null ? d.getDomiciliConcretTipus().toNotificaDomiciliConcretTipusEnumDto() : null);
 				destinatari.domiciliViaTipus( d.getDomiciliViaTipus() );
 				destinatari.domiciliViaNom( d.getDomiciliViaNom() );
-				destinatari.domiciliNumeracioTipus(d.getDomiciliNumeracioTipus().toNotificaDomiciliNumeracioTipusEnumDto());
+				destinatari.domiciliNumeracioTipus(d.getDomiciliNumeracioTipus() != null ? d.getDomiciliNumeracioTipus().toNotificaDomiciliNumeracioTipusEnumDto() : null);
 				destinatari.domiciliNumeracioNumero( d.getDomiciliNumeracioNumero() );
 				destinatari.domiciliNumeracioPuntKm( d.getDomiciliNumeracioPuntKm() );
 				destinatari.domiciliApartatCorreus( d.getDomiciliApartatCorreus() );
@@ -163,7 +164,7 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 				destinatari.domiciliLinea2( d.getDomiciliLinea2() );
 				destinatari.domiciliCie( d.getDomiciliCie() );
 				destinatari.dehObligat( d.isDehObligat() );
-				destinatari.dehNif( d.getDehNif() );
+				destinatari.dehNif( d.getDehNif() != null ? d.getDehNif() : "" );
 				destinatari.dehProcedimentCodi( d.getDehProcedimentCodi() );
 				destinatari.retardPostal( d.getRetardPostal() );
 				destinatari.caducitat( d.getCaducitat() );
@@ -386,4 +387,17 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 		}
 	}
 
+	/**Mètodes privats per a calcular SHA1 a partir del fitxerContingut**/
+	private String SHAsum(byte[] convertme) throws NoSuchAlgorithmException{
+	    MessageDigest md = MessageDigest.getInstance("SHA-1"); 
+	    return byteArray2Hex(md.digest(convertme));
+	}
+
+	private String byteArray2Hex(final byte[] hash) {
+	    Formatter formatter = new Formatter();
+	    for (byte b : hash) {
+	        formatter.format("%02x", b);
+	    }
+	    return formatter.toString();
+	}
 }

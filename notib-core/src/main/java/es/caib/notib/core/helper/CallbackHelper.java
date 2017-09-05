@@ -84,7 +84,8 @@ public class CallbackHelper {
 				destinatari.getDestinatariNom(),
 				destinatari.getDestinatariNif(),
 				destinatari.getNotificaEstatOrigen(),
-				destinatari.getNotificaEstatNumSeguiment());
+				destinatari.getNotificaEstatNumSeguiment(),
+				destinatari.getReferencia());
 		
 		String body = mapper.writeValueAsString(notificacioEstat);
 		

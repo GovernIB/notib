@@ -18,6 +18,7 @@ import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.ClientFilter;
+import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.representation.Form;
 
 import es.caib.notib.ws.notificacio.NotificacioCertificacio;
@@ -286,22 +287,24 @@ public class NotibRestClient {
     		String user,
     		String pass) {
     	
-    	jerseyClient.resource(urlAmbMetode).post(String.class, body);
-    	
-		WebResource webResource = jerseyClient.resource(urlLogin);
+//    	jerseyClient.resource(urlAmbMetode).post(String.class, body);
+//    	
+//		WebResource webResource = jerseyClient.resource(urlLogin);
+//		
+//		Form form = new Form();
+//		form.putSingle("j_username", user);
+//		form.putSingle("j_password", pass);
+//		webResource.type("application/x-www-form-urlencoded").post(form);
 		
-		Form form = new Form();
-		form.putSingle("j_username", user);
-		form.putSingle("j_password", pass);
-		webResource.type("application/x-www-form-urlencoded").post(form);
 		
+		jerseyClient.addFilter( new HTTPBasicAuthFilter(user, pass) );
 		ClientResponse response = jerseyClient.
 				resource(urlAmbMetode).
 				type("application/json").
 				post(ClientResponse.class, body);
 		
 		String json = response.getEntity(String.class);
-		if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+		if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
 			if (json.startsWith("<")) // Rebem una resposta amb XML
 				throw new NotibRestException(
 						"Error amb l'autenticació de la petició. Revisi les dades:\n"

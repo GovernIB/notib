@@ -6,7 +6,7 @@
 		<artifactId>notib</artifactId>
 		<version>0.1</version>
 	</parent>
-	<artifactId>notib-rest-client</artifactId>
+	<artifactId>notib-api-client</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -39,6 +39,29 @@
 	</dependencies>
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxws-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-reports-ws-code</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>wsimport</goal>
+						</goals>
+						<configuration>
+							<wsdlUrls>
+								<wsdlUrl>${basedir}/wsdl/notib-notificacio/notificacio.wsdl</wsdlUrl>
+							</wsdlUrls>
+							<vmArgs>
+								<vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
+							</vmArgs>
+							<verbose>true</verbose>
+							<sourceDestDir>${basedir}/src/main/java</sourceDestDir>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
