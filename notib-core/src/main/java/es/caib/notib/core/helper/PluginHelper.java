@@ -13,6 +13,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
@@ -392,6 +394,39 @@ public class PluginHelper {
 		}
 	}
 
+	public boolean isDadesUsuariPluginConfigurat() {
+		try {
+			return getDadesUsuariPlugin() != null;
+		} catch (SistemaExternException sex) {
+			logger.error(
+					"Error al obtenir la instància del plugin de dades d'usuari",
+					sex);
+			return false;
+		}
+	}
+
+	public boolean isGestioDocumentalPluginConfigurat() {
+		try {
+			return getGestioDocumentalPlugin() != null;
+		} catch (SistemaExternException sex) {
+			logger.error(
+					"Error al obtenir la instància del plugin de gestió documental",
+					sex);
+			return false;
+		}
+	}
+
+	public boolean isSeuPluginConfigurat() {
+		try {
+			return getSeuPlugin() != null;
+		} catch (SistemaExternException sex) {
+			logger.error(
+					"Error al obtenir la instància del plugin de seu electrònica",
+					sex);
+			return false;
+		}
+	}
+
 
 
 	private boolean isTelefonMobil(String telefonMobil) {
@@ -405,8 +440,10 @@ public class PluginHelper {
 				telefonTrim.startsWith("6"));
 	}
 
+	private boolean dadesUsuariPluginConfiguracioProvada = false;
 	private DadesUsuariPlugin getDadesUsuariPlugin() {
-		if (dadesUsuariPlugin == null) {
+		if (dadesUsuariPlugin == null && !dadesUsuariPluginConfiguracioProvada) {
+			dadesUsuariPluginConfiguracioProvada = true;
 			String pluginClass = getPropertyPluginDadesUsuari();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
@@ -427,8 +464,10 @@ public class PluginHelper {
 		return dadesUsuariPlugin;
 	}
 
+	private boolean gestioDocumentalPluginConfiguracioProvada = false;
 	private GestioDocumentalPlugin getGestioDocumentalPlugin() {
-		if (gestioDocumentalPlugin == null) {
+		if (gestioDocumentalPlugin == null && !gestioDocumentalPluginConfiguracioProvada) {
+			gestioDocumentalPluginConfiguracioProvada = true;
 			String pluginClass = getPropertyPluginGestioDocumental();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
@@ -449,8 +488,10 @@ public class PluginHelper {
 		return gestioDocumentalPlugin;
 	}
 
+	private boolean seuPluginConfiguracioProvada = false;
 	private SeuPlugin getSeuPlugin() {
-		if (seuPlugin == null) {
+		if (seuPlugin == null && !seuPluginConfiguracioProvada) {
+			seuPluginConfiguracioProvada = true;
 			String pluginClass = getPropertyPluginSeu();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
@@ -480,5 +521,7 @@ public class PluginHelper {
 	private String getPropertyPluginSeu() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.seu.class");
 	}
+
+	private static final Logger logger = LoggerFactory.getLogger(PluginHelper.class);
 
 }

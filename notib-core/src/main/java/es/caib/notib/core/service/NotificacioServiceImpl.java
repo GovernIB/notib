@@ -465,17 +465,21 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Scheduled(fixedRateString = "${config:es.caib.notib.tasca.notifica.enviaments.periode}")
 	public void notificaEnviamentsPendents() {
 		logger.debug("Cercant notificacions pendents d'enviar a Notifica");
-		int maxPendents = getNotificaEnviamentsProcessarMaxProperty();
-		List<NotificacioEntity> pendents = notificacioRepository.findByEstatOrderByCreatedDateAsc(
-				NotificacioEstatEnumDto.PENDENT,
-				new PageRequest(0, maxPendents));
-		if (!pendents.isEmpty()) {
-			logger.debug("Realitzant enviaments a Notifica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
-			for (NotificacioEntity pendent: pendents) {
-				notificaHelper.enviament(pendent.getId());
+		if (notificaHelper.isConnexioNotificaDisponible()) {
+			int maxPendents = getNotificaEnviamentsProcessarMaxProperty();
+			List<NotificacioEntity> pendents = notificacioRepository.findByEstatOrderByCreatedDateAsc(
+					NotificacioEstatEnumDto.PENDENT,
+					new PageRequest(0, maxPendents));
+			if (!pendents.isEmpty()) {
+				logger.debug("Realitzant enviaments a Notifica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
+				for (NotificacioEntity pendent: pendents) {
+					notificaHelper.enviament(pendent.getId());
+				}
+			} else {
+				logger.debug("No hi ha notificacions pendents d'enviar a la seu electrònica");
 			}
 		} else {
-			logger.debug("No hi ha notificacions pendents d'enviar a la seu electrònica");
+			logger.warn("La connexió amb Notifica no està configurada i no es realitzarà cap enviament");
 		}
 	}
 
@@ -483,59 +487,71 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Scheduled(fixedRateString = "${config:es.caib.notib.tasca.seu.enviaments.periode}")
 	public void seuEnviamentsPendents() {
 		logger.debug("Cercant notificacions pendents d'enviar a la seu electrònica");
-		int maxPendents = getSeuEnviamentsProcessarMaxProperty();
-		List<NotificacioDestinatariEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
-				new NotificacioDestinatariEstatEnumDto[] {
-						NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT},
-				new PageRequest(0, maxPendents));
-		if (!pendents.isEmpty()) {
-			logger.debug("Realitzant enviaments a la seu electrònica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
-			for (NotificacioDestinatariEntity pendent: pendents) {
-				seuHelper.enviament(pendent.getId());
+		if (pluginHelper.isSeuPluginConfigurat()) {
+			int maxPendents = getSeuEnviamentsProcessarMaxProperty();
+			List<NotificacioDestinatariEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
+					new NotificacioDestinatariEstatEnumDto[] {
+							NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT},
+					new PageRequest(0, maxPendents));
+			if (!pendents.isEmpty()) {
+				logger.debug("Realitzant enviaments a la seu electrònica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
+				for (NotificacioDestinatariEntity pendent: pendents) {
+					seuHelper.enviament(pendent.getId());
+				}
+			} else {
+				logger.debug("No hi ha notificacions pendents d'enviar a la seu electrònica");
 			}
 		} else {
-			logger.debug("No hi ha notificacions pendents d'enviar a la seu electrònica");
+			logger.warn("La connexió amb la seu electrònica no està activa i no es realitzarà cap enviament");
 		}
 	}
 	@Override
 	@Scheduled(fixedRateString = "${config:es.caib.notib.tasca.seu.justificants.periode}")
 	public void seuNotificacionsPendents() {
 		logger.debug("Cercant notificacions pendents de consulta d'estat a la seu electrònica");
-		int maxPendents = getSeuJustificantsProcessarMaxProperty();
-		List<NotificacioDestinatariEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
-				new NotificacioDestinatariEstatEnumDto[] {
-						NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA},
-				new PageRequest(0, maxPendents));
-		// TODO excloure les notificacions ja processades amb Notifica
-		if (!pendents.isEmpty()) {
-			logger.debug("Realitzant consulta d'estat a la seu electrònica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
-			for (NotificacioDestinatariEntity pendent: pendents) {
-				boolean estatActualitzat = seuHelper.consultaEstat(pendent.getId());
-				if (estatActualitzat) {
-					notificaHelper.comunicacioCanviEstatSeu(pendent.getId());
+		if (pluginHelper.isSeuPluginConfigurat()) {
+			int maxPendents = getSeuJustificantsProcessarMaxProperty();
+			List<NotificacioDestinatariEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
+					new NotificacioDestinatariEstatEnumDto[] {
+							NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA},
+					new PageRequest(0, maxPendents));
+			// TODO excloure les notificacions ja processades amb Notifica
+			if (!pendents.isEmpty()) {
+				logger.debug("Realitzant consulta d'estat a la seu electrònica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
+				for (NotificacioDestinatariEntity pendent: pendents) {
+					boolean estatActualitzat = seuHelper.consultaEstat(pendent.getId());
+					if (estatActualitzat) {
+						notificaHelper.comunicacioCanviEstatSeu(pendent.getId());
+					}
 				}
+			} else {
+				logger.debug("No hi ha notificacions pendents de consultar estat a la seu electrònica");
 			}
 		} else {
-			logger.debug("No hi ha notificacions pendents de consultar estat a la seu electrònica");
+			logger.warn("La connexió amb la seu electrònica no està activa i no es realitzarà cap enviament");
 		}
 	}
 	@Override
 	@Scheduled(fixedRateString = "${config:es.caib.notib.tasca.seu.notifica.estat.periode}")
 	public void seuNotificaComunicarEstatPendents() {
 		logger.debug("Cercant notificacions provinents de la seu pendents d'actualització d'estat a Notifica");
-		int maxPendents = getSeuNotificaEstatProcessarMaxProperty();
-		List<NotificacioDestinatariEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
-				new NotificacioDestinatariEstatEnumDto[] {
-						NotificacioDestinatariEstatEnumDto.LLEGIDA,
-						NotificacioDestinatariEstatEnumDto.REBUTJADA},
-				new PageRequest(0, maxPendents));
-		if (!pendents.isEmpty()) {
-			logger.debug("Realitzant actualització d'estat a Notifica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
-			for (NotificacioDestinatariEntity pendent: pendents) {
-				notificaHelper.comunicacioCanviEstatSeu(pendent.getId());
+		if (pluginHelper.isSeuPluginConfigurat()) {
+			int maxPendents = getSeuNotificaEstatProcessarMaxProperty();
+			List<NotificacioDestinatariEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
+					new NotificacioDestinatariEstatEnumDto[] {
+							NotificacioDestinatariEstatEnumDto.LLEGIDA,
+							NotificacioDestinatariEstatEnumDto.REBUTJADA},
+					new PageRequest(0, maxPendents));
+			if (!pendents.isEmpty()) {
+				logger.debug("Realitzant actualització d'estat a Notifica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
+				for (NotificacioDestinatariEntity pendent: pendents) {
+					notificaHelper.comunicacioCanviEstatSeu(pendent.getId());
+				}
+			} else {
+				logger.debug("No hi ha notificacions pendents d'actualització d'estat a Notifica");
 			}
 		} else {
-			logger.debug("No hi ha notificacions pendents d'actualització d'estat a Notifica");
+			logger.warn("La connexió amb la seu electrònica no està activa i no es realitzarà cap enviament");
 		}
 	}
 

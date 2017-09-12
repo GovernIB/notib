@@ -602,6 +602,10 @@ public class NotificaHelper {
 		return xifrarIdPerNotifica(notificacioDestinatari.getId());
 	}
 
+	public boolean isConnexioNotificaDisponible() {
+		return getUrlProperty() != null && getApiKeyProperty() != null;
+	}
+
 	public void setModeTest(boolean modeTest) {
 		this.modeTest = modeTest;
 	}

@@ -41,7 +41,7 @@ enviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
 		$('#notificacio').on('rowinfo.dataTable', function(e, td, rowData) {
 			var getUrl = "<c:url value="/notificacio/"/>" + rowData.id + "/enviament";
 	        $.get(getUrl).done(function(data) {
-	        	$(td).append(	
+	        	$(td).append(
 	        			'<table class="table teble-striped table-bordered"><thead>' +
 	        			'<tr>' +
 	        				'<th><spring:message code="notificacio.list.enviament.list.destinatari"/></th>' + 
@@ -51,7 +51,7 @@ enviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
 						'</thead><tbody></tbody></table>'
 	        	);
 	        	$table = '';
-				for (i = 0; i < data.length; i++) { 
+				for (i = 0; i < data.length; i++) {
 					$table = $table + '<tr>';
 					$table = $table + '<td>' + data[i].destinatari + '</td>';
 					$table = $table + '<td>' + ((data[i].estat) ? enviamentEstats[data[i].estat] : '') + '</td>';
