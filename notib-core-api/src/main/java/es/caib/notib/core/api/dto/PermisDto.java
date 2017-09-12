@@ -15,7 +15,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class PermisDto implements Serializable {
 
 	private Long id;
-	private String nom;
+	private String principal;
 	private TipusEnumDto tipus;
 	private boolean read;
 	private boolean write;
@@ -24,16 +24,6 @@ public class PermisDto implements Serializable {
 	private boolean administration;
 	private boolean representant;
 	private boolean aplicacio;
-	
-	public static PermisDto permisBuit(String nom) {
-		
-		PermisDto permis = new PermisDto();
-		permis.nom = nom;
-		permis.representant = false;
-		permis.aplicacio = false;
-		
-		return permis;
-	}
 
 	public Long getId() {
 		return id;
@@ -41,11 +31,11 @@ public class PermisDto implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public String getNom() {
-		return nom;
+	public String getPrincipal() {
+		return principal;
 	}
-	public void setNom(String nom) {
-		this.nom = nom;
+	public void setPrincipal(String principal) {
+		this.principal = principal;
 	}
 	public TipusEnumDto getTipus() {
 		return tipus;
@@ -83,7 +73,6 @@ public class PermisDto implements Serializable {
 	public void setAdministration(boolean administration) {
 		this.administration = administration;
 	}
-
 	public boolean isRepresentant() {
 		return representant;
 	}
@@ -97,8 +86,6 @@ public class PermisDto implements Serializable {
 	public void setAplicacio(boolean aplicacio) {
 		this.aplicacio = aplicacio;
 	}
-	
-	
 	
 	@Override
 	public String toString() {

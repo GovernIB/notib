@@ -13,7 +13,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.PermisosEnumDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
@@ -26,10 +25,9 @@ public class PermisCommand {
 
 	private Long id;
 	@NotEmpty @Size(max=64)
-	private String nom;
+	private String principal;
 	@NotNull
 	private TipusEnumDto tipus;
-	private PermisosEnumDto permis; 
 	private boolean read;
 	private boolean write;
 	private boolean create;
@@ -44,23 +42,17 @@ public class PermisCommand {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public String getNom() {
-		return nom;
+	public String getPrincipal() {
+		return principal;
 	}
-	public void setNom(String nom) {
-		this.nom = nom;
+	public void setPrincipal(String principal) {
+		this.principal = principal;
 	}
 	public TipusEnumDto getTipus() {
 		return tipus;
 	}
 	public void setTipus(TipusEnumDto tipus) {
 		this.tipus = tipus;
-	}
-	public PermisosEnumDto getPermis() {
-		return permis;
-	}
-	public void setPermis(PermisosEnumDto permis) {
-		this.permis = permis;
 	}
 	public boolean isRead() {
 		return read;
@@ -123,18 +115,12 @@ public class PermisCommand {
 		PermisCommand command = ConversioTipusHelper.convertir(
 				dto,
 				PermisCommand.class);
-		if( dto.isRepresentant() ) command.setPermis( PermisosEnumDto.Representant );
-		else if( dto.isAplicacio() ) command.setPermis( PermisosEnumDto.Aplicacio );
-		
 		return command;		
 	}
 	public static PermisDto asDto(PermisCommand command) {
 		PermisDto dto = ConversioTipusHelper.convertir(
 				command,
 				PermisDto.class);
-		dto.setRepresentant( command.getPermis() == PermisosEnumDto.Representant );
-		dto.setAplicacio( command.getPermis() == PermisosEnumDto.Aplicacio );
-		
 		return dto;
 	}
 

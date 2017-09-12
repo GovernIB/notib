@@ -26,7 +26,7 @@
 </head>
 <body>
 	<div class="container-nocappeus">
-		<div id="contingut-missatges"><rip:missatges/></div>
+		<div id="contingut-missatges"><not:missatges/></div>
 		<decorator:body />
 	</div>
     <script src="<c:url value="/js/bootstrap.min.js"/>"></script>

@@ -15,6 +15,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -32,6 +33,8 @@ import es.caib.notib.core.audit.NotibAuditable;
 @EntityListeners(AuditingEntityListener.class)
 public class NotificacioEventEntity extends NotibAuditable<Long> {
 
+	private static final int ERROR_DESC_MAX_LENGTH = 2048;
+
 	@Column(name = "tipus", nullable = false)
 	private NotificacioEventTipusEnumDto tipus;
 	@Column(name = "data", nullable = false)
@@ -41,7 +44,7 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	private String descripcio;
 	@Column(name = "error", nullable = false)
 	private boolean error;
-	@Column(name = "error_desc", length = 2048)
+	@Column(name = "error_desc", length = ERROR_DESC_MAX_LENGTH)
 	private String errorDescripcio;
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_id")
@@ -101,7 +104,7 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 			return this;
 		}
 		public Builder errorDescripcio(String errorDescripcio) {
-			built.errorDescripcio = errorDescripcio;
+			built.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH);
 			return this;
 		}
 		public Builder notificacioDestinatari(NotificacioDestinatariEntity notificacioDestinatari) {

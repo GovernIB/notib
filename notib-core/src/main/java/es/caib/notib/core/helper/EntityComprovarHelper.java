@@ -31,71 +31,60 @@ public class EntityComprovarHelper {
 	@Resource
 	private PermisosHelper permisosHelper;
 
-	
+
+
 	public void comprovarPermisos(
 			Long entitatId,
 			boolean comprovarAdmin,
-			boolean comprovarRep ) {
-		
+			boolean comprovarRep) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		
 		boolean esAdministradorEntitat = false;
 		boolean esRepresentantEntitat = false;
-		
-		if(comprovarAdmin) {
-			for(GrantedAuthority ga: auth.getAuthorities()) {
-				if( ga.toString().equals("NOT_ADMIN") ) {
+		if (comprovarAdmin) {
+			for (GrantedAuthority ga: auth.getAuthorities()) {
+				if (ga.toString().equals("NOT_ADMIN")) {
 					esAdministradorEntitat = true;
 					break;
 				}
 			}
 		}
-		
-		if(comprovarRep) {
+		if (comprovarRep) {
 			esRepresentantEntitat = permisosHelper.isGrantedAll(
 					entitatId,
 					EntitatEntity.class,
 					new Permission[] {ExtendedPermission.REPRESENTANT},
 					auth);
 		}
-		
 		if (comprovarAdmin && !esAdministradorEntitat) {
-			if ( (!comprovarRep) || 
-				 (comprovarRep && !esRepresentantEntitat)
-			   ) {
+			if ((!comprovarRep) || (comprovarRep && !esRepresentantEntitat)) {
 				throw new PermissionDeniedException(
-						new Long(-1),
+						entitatId,
 						EntitatEntity.class,
 						auth.getName(),
 						"ADMINISTRATION");
 			}
-		} else if(comprovarAdmin && esAdministradorEntitat) {
+		} else if (comprovarAdmin && esAdministradorEntitat) {
 			return;
 		}
-		
-		if ( comprovarRep && !esRepresentantEntitat) {
+		if (comprovarRep && !esRepresentantEntitat) {
 			throw new PermissionDeniedException(
 					entitatId,
 					EntitatEntity.class,
 					auth.getName(),
 					"REPRESENTANT");
 		}
-		
 	}
-	
+
 	public void comprovarPermisosAplicacio(
-			Long entitatId ) {
-		
+			Long entitatId) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		
 		boolean esUsuariAplicacio = false;
-		for(GrantedAuthority ga: auth.getAuthorities()) {
+		for (GrantedAuthority ga: auth.getAuthorities()) {
 			if( ga.toString().equals("NOT_APL") ) {
 				esUsuariAplicacio = true;
 				break;
 			}
 		}
-		
 		if (!esUsuariAplicacio) {
 			throw new PermissionDeniedException(
 					new Long(-1),
@@ -104,7 +93,6 @@ public class EntityComprovarHelper {
 					"APLICATION");
 			
 		}
-		
 	}
 
 //	public EntitatEntity comprovarEntitatAdmin(

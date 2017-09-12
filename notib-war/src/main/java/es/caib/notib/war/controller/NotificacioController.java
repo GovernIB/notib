@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
+import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
@@ -36,6 +37,7 @@ import es.caib.notib.war.command.NotificacioFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EntitatHelper;
+import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.RolHelper;
 
 /**
@@ -44,7 +46,7 @@ import es.caib.notib.war.helper.RolHelper;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
-@RequestMapping("/notificacions")
+@RequestMapping("/notificacio")
 public class NotificacioController extends BaseController {
 
 	private final static String NOTIFICACIONS_FILTRE = "notificacions_filtre";
@@ -53,17 +55,24 @@ public class NotificacioController extends BaseController {
 	private NotificacioService notificacioService;
 	@Autowired
 	private EntitatService entitatService;
-	
+
+
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
 			Model model) {
-		
-		model.addAttribute( new NotificacioFiltreCommand() );
-		if( RolHelper.isUsuariActualAdministrador(request) ) {
-			model.addAttribute( "entitat", entitatService.findAll() );
+		model.addAttribute(new NotificacioFiltreCommand());
+		if (RolHelper.isUsuariActualAdministrador(request)) {
+			model.addAttribute(
+					"entitat",
+					entitatService.findAll());
 		}
+		model.addAttribute(
+				"notificacioDestinatariEstats",
+				EnumHelper.getOptionsForEnum(
+						NotificacioDestinatariEstatEnumDto.class,
+						"es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto."));
 		return "notificacioList";
 	}
 
@@ -100,50 +109,27 @@ public class NotificacioController extends BaseController {
 	}
 
 	@RequestMapping(value = "/{notificacioId}", method = RequestMethod.GET)
-	public String New(
+	public String info(
 			HttpServletRequest request,
 			Model model,
 			@PathVariable Long notificacioId) {
-		
-		model.addAttribute(notificacioService.findById(notificacioId));
-		return "notificacioForm";
+		model.addAttribute(
+				"notificacio",
+				notificacioService.findById(notificacioId));
+		return "notificacioInfo";
 	}
 
-	@RequestMapping(value = "/{notificacioId}/destinataris/datatable", method = RequestMethod.GET)
-	@ResponseBody
-	public DatatablesResponse datatableDestinataris(
-			HttpServletRequest request,
-			@PathVariable Long notificacioId ) {
-		return DatatablesHelper.getDatatableResponse(
-				request,
-				notificacioService.destinatariFindByNotificacioPaginat(
-						notificacioId,
-						DatatablesHelper.getPaginacioDtoFromRequest(request)));
-	}
-
-	@RequestMapping(value = "/{notificacioId}/destinatari", method = RequestMethod.GET)
-	@ResponseBody
-	public List<NotificacioDestinatariDto> llistaDestinataris(
-			HttpServletRequest request,
-			Model model,
-			@PathVariable Long notificacioId) {
-		List<NotificacioDestinatariDto> destinataris = notificacioService.destinatariFindByNotificacio(
-				notificacioId);
-		return destinataris;
-	}
-
-	@RequestMapping(value = "/{notificacioId}/llistaevents", method = RequestMethod.GET)
-	public String eventsNotificacio(
+	@RequestMapping(value = "/{notificacioId}/event", method = RequestMethod.GET)
+	public String eventList(
 			HttpServletRequest request,
 			Model model,
 			@PathVariable Long notificacioId) {
 		model.addAttribute("notificacioId", notificacioId);
 		return "notificacioEvents";
 	}
-
-	@RequestMapping(value = "/{notificacioId}/events/datatable", method = RequestMethod.GET)
+	@RequestMapping(value = "/{notificacioId}/event/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatableEvents(
+	public DatatablesResponse eventDatatable(
 			HttpServletRequest request,
 			@PathVariable Long notificacioId) {
 		List<NotificacioEventDto> dto = notificacioService.eventFindByNotificacio(
@@ -159,38 +145,60 @@ public class NotificacioController extends BaseController {
 				dto);
 	}
 
-	@RequestMapping(value = "/{notificacioId}/destinatari/{destinatariId}/info", method = RequestMethod.GET)
-	public String infoDestinatari(
-			HttpServletRequest request,
-			Model model,
-			@PathVariable Long notificacioId,
-			@PathVariable Long destinatariId ) {
-		NotificacioDestinatariDto destinatari = notificacioService.destinatariFindById(
-				destinatariId);
-		model.addAttribute(destinatari);
-		return "destinatariForm";
-	}
-
-	@RequestMapping(value = "/{notificacioId}/destinatari/{destinatariId}/llistaevents", method = RequestMethod.GET)
-	public String llistaEvents(
-			HttpServletRequest request,
-			Model model,
-			@PathVariable Long notificacioId,
-			@PathVariable Long destinatariId) {
-		model.addAttribute("notificacioId", notificacioId);
-		model.addAttribute("destinatariId", destinatariId);
-		return "destinatariEvents";
-	}
-
-	@RequestMapping(value = "/{notificacioId}/destinatari/{destinatariId}/events/datatable", method = RequestMethod.GET)
+	@RequestMapping(value = "/{notificacioId}/document", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatableEventsDestinatari(
+	public void documentDescarregar(
+			HttpServletResponse response,
+			@PathVariable Long notificacioId) throws IOException {
+    	FitxerDto fitxer = notificacioService.findFitxer(notificacioId);
+    	writeFileToResponse(
+				fitxer.getNom(),
+				fitxer.getContingut(),
+				response);
+	}
+
+	@RequestMapping(value = "/{notificacioId}/enviament", method = RequestMethod.GET)
+	@ResponseBody
+	public List<NotificacioDestinatariDto> enviamentList(
+			HttpServletRequest request,
+			Model model,
+			@PathVariable Long notificacioId) {
+		List<NotificacioDestinatariDto> destinataris = notificacioService.destinatariFindByNotificacio(
+				notificacioId);
+		return destinataris;
+	}
+
+	@RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/info", method = RequestMethod.GET)
+	public String enviamentInfo(
+			HttpServletRequest request,
+			Model model,
+			@PathVariable Long notificacioId,
+			@PathVariable Long enviamentId) {
+		NotificacioDestinatariDto enviament = notificacioService.destinatariFindById(
+				enviamentId);
+		model.addAttribute("enviament", enviament);
+		return "enviamentInfo";
+	}
+
+	@RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/event", method = RequestMethod.GET)
+	public String enviamentEvents(
+			HttpServletRequest request,
+			Model model,
+			@PathVariable Long notificacioId,
+			@PathVariable Long enviamentId) {
+		model.addAttribute("notificacioId", notificacioId);
+		model.addAttribute("enviamentId", enviamentId);
+		return "enviamentEvents";
+	}
+	@RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/event/datatable", method = RequestMethod.GET)
+	@ResponseBody
+	public DatatablesResponse enviamentEventsDatatable(
 			HttpServletRequest request,
 			@PathVariable Long notificacioId,
-			@PathVariable Long destinatariId ) {
+			@PathVariable Long enviamentId) {
 		List<NotificacioEventDto> dto = notificacioService.eventFindByNotificacioIDestinatari(
 				notificacioId,
-				destinatariId);
+				enviamentId);
 		for (NotificacioEventDto event: dto) {
 			if(event.getDestinatari() == null) {
 				event.setDestinatari(new NotificacioDestinatariDto());
@@ -200,26 +208,6 @@ public class NotificacioController extends BaseController {
 		return DatatablesHelper.getDatatableResponse(
 				request,
 				dto);
-	}
-
-	@RequestMapping(value = "/descarregar/{notificacioId}", method = RequestMethod.GET)
-	@ResponseBody
-	public void descarregarArxiu(
-			HttpServletResponse response,
-			@PathVariable Long notificacioId) {
-		
-        try {
-        	FitxerDto fitxer = notificacioService.findFitxer(notificacioId);
-    		
-        	writeFileToResponse(
-					fitxer.getNom(),
-					fitxer.getContingut(),
-					response);
-		} catch (IOException e) {
-			
-			e.printStackTrace();
-		}
-		
 	}
 
 	@InitBinder

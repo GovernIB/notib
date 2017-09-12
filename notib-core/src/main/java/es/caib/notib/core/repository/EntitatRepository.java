@@ -20,34 +20,21 @@ import es.caib.notib.core.entity.EntitatEntity;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface EntitatRepository extends JpaRepository<EntitatEntity, Long> {
-	
-	EntitatEntity findById(long id);
 
 	EntitatEntity findByCodi(String codi);
 
 	EntitatEntity findByDir3Codi(String dir3Codi);
-	
-	EntitatEntity findByCif(String cif);
 
 	List<EntitatEntity> findByActiva(boolean activa);
-	
-	EntitatEntity findById(Long entitatId);
-	
-	List<EntitatEntity> findListById(Long entitatId);
-	
-	
-	@Query(
-			  "FROM "
-			+ "     EntitatEntity eu "
-			+ "WHERE "
-			+ "		lower(eu.codi) like concat('%', lower(:filtre), '%') "
-			+ "OR "
-			+ "		lower(eu.nom) like concat('%', lower(:filtre), '%')"
-			+ "OR "
-			+ "		lower(eu.cif) like concat('%', lower(:filtre), '%')"
-			)
+
+	@Query(	"from " +
+			"     EntitatEntity eu " +
+			"where " +
+			"    lower(eu.codi) like concat('%', lower(:filtre), '%') " +
+			" or lower(eu.nom) like concat('%', lower(:filtre), '%') " +
+			" or lower(eu.dir3Codi) like concat('%', lower(:filtre), '%') ")
 	public Page<EntitatEntity> findByFiltre(
 			@Param("filtre") String filtre,
-			Pageable paginacio
-			);
+			Pageable paginacio);
+
 }

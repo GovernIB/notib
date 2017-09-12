@@ -27,19 +27,17 @@ import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
-@RequestMapping("/aplicacions")
+@RequestMapping("/aplicacio")
 public class AplicacioController extends BaseController {
 
 	@Autowired
 	private UsuariAplicacioService usuariAplicacioService;
 
-	@RequestMapping(value="", method = RequestMethod.GET)
+	@RequestMapping(method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
 			Model model) {
-		
 		return "aplicacioList";
-		
 	}
 
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
@@ -56,9 +54,7 @@ public class AplicacioController extends BaseController {
 	public String create(
 			HttpServletRequest request,
 			Model model) {
-		
 		model.addAttribute(new AplicacioCommand());
-		
 		return "aplicacioForm";
 	}
 
@@ -67,12 +63,11 @@ public class AplicacioController extends BaseController {
 			HttpServletRequest request,
 			Model model,
 			@PathVariable Long aplicacioId) {
-		
 		AplicacioDto dto = null;
-		if(aplicacioId != null) {
+		if (aplicacioId != null) {
 			dto = usuariAplicacioService.findById(aplicacioId);
 		}
-		if(dto != null) {
+		if (dto != null) {
 			model.addAttribute(AplicacioCommand.asCommand(dto));
 		} else {
 			model.addAttribute(new AplicacioCommand());
@@ -80,7 +75,7 @@ public class AplicacioController extends BaseController {
 		return "aplicacioForm";
 	}
 
-	@RequestMapping(value = "/save", method = RequestMethod.POST)
+	@RequestMapping(method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
 			Model model,
@@ -91,19 +86,17 @@ public class AplicacioController extends BaseController {
 		}
 		if (command.getId() == null) {
 			usuariAplicacioService.create(
-					AplicacioCommand.asDto(command)
-					);
+					AplicacioCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(
 					request,
-					"redirect:aplicacions",
+					"redirect:aplicacio",
 					"aplicacio.controller.creada.ok");
 		} else {
 			usuariAplicacioService.update(
-					AplicacioCommand.asDto(command)
-					);
+					AplicacioCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(
 					request,
-					"redirect:aplicacions",
+					"redirect:aplicacio",
 					"aplicacio.controller.modificada.ok");
 		}
 	}
@@ -116,7 +109,7 @@ public class AplicacioController extends BaseController {
 		usuariAplicacioService.delete(aplicacioId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:aplicacions",
+				"redirect:aplicacio",
 				"aplicacio.controller.esborrada.ok");
 	}
 

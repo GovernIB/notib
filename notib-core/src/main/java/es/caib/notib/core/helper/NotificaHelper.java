@@ -4,17 +4,17 @@
 package es.caib.notib.core.helper;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -34,17 +34,29 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.message.WSSecSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.codec.Base64;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.w3c.dom.Document;
 
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
@@ -58,14 +70,17 @@ import es.caib.notib.core.api.dto.NotificaRespostaDatatDto.NotificaRespostaDatat
 import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
 import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
+import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioSeuEstatEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioDestinatariEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.repository.NotificacioDestinatariRepository;
+import es.caib.notib.core.repository.NotificacioEventRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.wsdl.notifica.ArrayOfTipoDestinatario;
 import es.caib.notib.core.wsdl.notifica.CertificacionEnvioRespuesta;
 import es.caib.notib.core.wsdl.notifica.DatadoEnvio;
@@ -108,10 +123,23 @@ import es.caib.notib.core.wsdl.sede.SedeWsPortType;
 public class NotificaHelper {
 
 	@Autowired
+	private NotificacioRepository notificacioRepository;
+	@Autowired
+	private NotificacioDestinatariRepository notificacioDestinatariRepository;
+	@Autowired
+	private NotificacioEventRepository notificacioEventRepository;
+
+	@Autowired
 	private PluginHelper pluginHelper;
 
-	public void intentarEnviament(
-			NotificacioEntity notificacio) {
+	private boolean modeTest;
+
+
+
+	@Transactional
+	public void enviament(
+			Long notificacioId) {
+		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
 		try {
 			TipoEnvio tipoEnvio = generarTipoEnvio(notificacio);
 			ResultadoAlta resultadoAlta = getNotificaWs().altaEnvio(tipoEnvio);
@@ -122,6 +150,13 @@ public class NotificaHelper {
 							if (destinatari.getReferencia().equals(identificadorEnvio.getReferenciaEmisor())) {
 								destinatari.updateNotificaIdentificador(
 										identificadorEnvio.getIdentificador());
+								destinatari.updateNotificaEstat(
+										NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA,
+										null,
+										null,
+										null,
+										null,
+										null);
 							}
 						}
 					}
@@ -129,8 +164,9 @@ public class NotificaHelper {
 				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
 						notificacio).build();
-				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA_NOTIFICA);
+				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
 				notificacio.updateEventAfegir(event);
+				notificacioEventRepository.save(event);
 			} else {
 				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
@@ -142,22 +178,26 @@ public class NotificaHelper {
 						true,
 						event);
 				notificacio.updateEventAfegir(event);
+				notificacioEventRepository.save(event);
 			}
 		} catch (Exception ex) {
-			logger.error(
-					"Error al intentar l'enviament d'una notificació a Notifica (" +
-					"notificacioId=" + notificacio.getId() + ")",
-					ex);
+			String errorDescripcio;
+			if (ex instanceof SOAPFaultException) {
+				errorDescripcio = ex.getMessage();
+			} else {
+				errorDescripcio = ExceptionUtils.getStackTrace(ex);
+			}
 			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
 					NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
 					notificacio).
 					error(true).
-					errorDescripcio(ExceptionUtils.getStackTrace(ex)).
+					errorDescripcio(errorDescripcio).
 					build();
 			notificacio.updateEventAfegir(event);
 			notificacio.updateError(
 					true,
 					event);
+			notificacioEventRepository.save(event);
 		}
 	}
 
@@ -442,10 +482,11 @@ public class NotificaHelper {
 	}
 
 	@Transactional
-	public void comunicacioSeu(
-			NotificacioDestinatariEntity destinatari) {
+	public void comunicacioCanviEstatSeu(
+			Long notificacioDestinatariId) {
+		NotificacioDestinatariEntity destinatari = notificacioDestinatariRepository.findOne(
+				notificacioDestinatariId);
 		NotificacioEntity notificacio = destinatari.getNotificacio();
-		NotificacioSeuEstatEnumDto estat;
 		NotificacioEventEntity event;
 		try {
 			ComunicacionSede comunicacionSede = new ComunicacionSede();
@@ -460,17 +501,6 @@ public class NotificaHelper {
 						notificacio).
 						notificacioDestinatari(destinatari).
 						build();
-				switch (destinatari.getSeuEstat()) {
-				case LLEGIDA:
-					estat = NotificacioSeuEstatEnumDto.LLEGIDA_NOTIFICA;
-					break;
-				case REBUTJADA:
-					estat = NotificacioSeuEstatEnumDto.REBUTJADA_NOTIFICA;
-					break;
-				default:
-					estat = destinatari.getSeuEstat();
-					break;
-				}
 			} else {
 				event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.SEU_NOTIFICA_COMUNICACIO,
@@ -481,8 +511,8 @@ public class NotificaHelper {
 						build();
 				destinatari.updateSeuError(
 						true,
-						event);
-				estat = NotificacioSeuEstatEnumDto.ERROR_NOTIFICA;
+						event,
+						true);
 			}
 		} catch (Exception ex) {
 			logger.error(
@@ -499,10 +529,10 @@ public class NotificaHelper {
 					build();
 			destinatari.updateSeuError(
 					true,
-					event);
-			estat = NotificacioSeuEstatEnumDto.ERROR_NOTIFICA;
+					event,
+					true);
 		}
-		destinatari.updateSeuNotificaEstat(estat);
+		destinatari.updateSeuNotificaInformat();
 		notificacio.updateEventAfegir(event);
 	}
 
@@ -510,14 +540,13 @@ public class NotificaHelper {
 	public void certificacioSeu(
 			NotificacioDestinatariEntity destinatari) {
 		NotificacioEntity notificacio = destinatari.getNotificacio();
-		NotificacioSeuEstatEnumDto estat;
 		NotificacioEventEntity event;
 		try {
 			CertificacionSede certificacionSede = new CertificacionSede();
 			certificacionSede.setEnvioDestinatario(destinatari.getNotificaIdentificador());
-			if (NotificacioSeuEstatEnumDto.LLEGIDA.equals(destinatari.getSeuEstat())) {
+			if (NotificacioDestinatariEstatEnumDto.LLEGIDA.equals(destinatari.getSeuEstat())) {
 				certificacionSede.setEstado("notificada");
-			} else if (NotificacioSeuEstatEnumDto.REBUTJADA.equals(destinatari.getSeuEstat())) {
+			} else if (NotificacioDestinatariEstatEnumDto.REBUTJADA.equals(destinatari.getSeuEstat())) {
 				certificacionSede.setEstado("rehusada");
 			}
 			certificacionSede.setFecha(
@@ -534,8 +563,6 @@ public class NotificaHelper {
 						notificacio).
 						notificacioDestinatari(destinatari).
 						build();
-				// TODO revisar estat
-				estat = destinatari.getSeuEstat();
 			} else {
 				event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.SEU_NOTIFICA_CERTIFICACIO,
@@ -546,9 +573,8 @@ public class NotificaHelper {
 						build();
 				destinatari.updateSeuError(
 						true,
-						event);
-				// TODO revisar estat
-				estat = destinatari.getSeuEstat();
+						event,
+						true);
 			}
 		} catch (Exception ex) {
 			logger.error(
@@ -565,16 +591,19 @@ public class NotificaHelper {
 					build();
 			destinatari.updateSeuError(
 					true,
-					event);
-			// TODO revisar estat
-			estat = destinatari.getSeuEstat();
+					event,
+					true);
 		}
-		destinatari.updateSeuNotificaEstat(estat);
+		destinatari.updateSeuNotificaInformat();
 		notificacio.updateEventAfegir(event);
 	}
 
 	public String generarReferencia(NotificacioDestinatariEntity notificacioDestinatari) throws GeneralSecurityException {
 		return xifrarIdPerNotifica(notificacioDestinatari.getId());
+	}
+
+	public void setModeTest(boolean modeTest) {
+		this.modeTest = modeTest;
 	}
 
 
@@ -879,7 +908,12 @@ public class NotificaHelper {
 	}
 
 	private String xifrarIdPerNotifica(Long id) throws GeneralSecurityException {
-		byte[] bytes = longToBytes(id.longValue());
+		// Si el mode test està actiu concatena la data actual a l'identificador de
+		// base de dades per a generar l'id de Notifica. Si no ho fessim així es
+		// duplicarien els ids de Notifica en cada execució del test i les cridades
+		// a Notifica donarien error.
+		long idlong = (modeTest) ? id.longValue() + System.currentTimeMillis() : id.longValue();
+		byte[] bytes = longToBytes(idlong);
 		Cipher cipher = Cipher.getInstance("RC4");
 		SecretKeySpec rc4Key = new SecretKeySpec(getClauXifratIdsProperty().getBytes(),"RC4");
 		cipher.init(Cipher.ENCRYPT_MODE, rc4Key);
@@ -922,7 +956,14 @@ public class NotificaHelper {
 				getUsernameProperty(),
 				getPasswordProperty(),
 				NotificaWsPortType.class,
-				new SoapApiKeyHeaderHandler(getApiKeyProperty())); // Hanler per afegir la clau api_key de Notific@
+				new ApiKeySOAPHandler(getApiKeyProperty()),
+				/*new FirmaSOAPHandler(
+						getKeystorePathProperty(),
+						getKeystoreTypeProperty(),
+						getKeystorePasswordProperty(),
+						getKeystoreCertAliasProperty(),
+						getKeystoreCertPasswordProperty()),*/
+				new WsClientHelper.SOAPLoggingHandler());
 		return port;
 	}
 	private SedeWsPortType getSedeWs() throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
@@ -959,54 +1000,170 @@ public class NotificaHelper {
 		return PropertiesHelper.getProperties().getProperty(
 				"es.caib.notib.notifica.apikey");
 	}
+	@SuppressWarnings("unused")
+	private String getKeystorePathProperty() {
+		return PropertiesHelper.getProperties().getProperty(
+				"es.caib.notib.notifica.keystore.path");
+	}
+	@SuppressWarnings("unused")
+	private String getKeystoreTypeProperty() {
+		return PropertiesHelper.getProperties().getProperty(
+				"es.caib.notib.notifica.keystore.type");
+	}
+	@SuppressWarnings("unused")
+	private String getKeystorePasswordProperty() {
+		return PropertiesHelper.getProperties().getProperty(
+				"es.caib.notib.notifica.keystore.password");
+	}
+	@SuppressWarnings("unused")
+	private String getKeystoreCertAliasProperty() {
+		return PropertiesHelper.getProperties().getProperty(
+				"es.caib.notib.notifica.keystore.cert.alias");
+	}
+	@SuppressWarnings("unused")
+	private String getKeystoreCertPasswordProperty() {
+		return PropertiesHelper.getProperties().getProperty(
+				"es.caib.notib.notifica.keystore.cert.password");
+	}
 
-	/** Handler per afegir la clau API_KEY a la capçalera del missatge SOAP cap a Notific@ */
-	public class SoapApiKeyHeaderHandler implements SOAPHandler<SOAPMessageContext> {
-
-		private final String authenticatedToken;
-		
-		/** Constructor per guardar el valor de la API_KEY */
-		public SoapApiKeyHeaderHandler(String authenticatedToken) {
-	        this.authenticatedToken = authenticatedToken;
-	    }
-		
+	public class ApiKeySOAPHandler implements SOAPHandler<SOAPMessageContext> {
+		private final String apiKey;
+		public ApiKeySOAPHandler(String apiKey) {
+			this.apiKey = apiKey;
+		}
 		@Override
 		public boolean handleMessage(SOAPMessageContext context) {
-			Boolean outboundProperty =
-	                (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-	        if (outboundProperty.booleanValue()) {
-	            try {
-	                SOAPEnvelope envelope = context.getMessage().getSOAPPart().getEnvelope();
-	                SOAPFactory factory = SOAPFactory.newInstance();
-	                SOAPElement apiKeyElement = factory.createElement("api_key");
-	                apiKeyElement.addTextNode(authenticatedToken);
-	                SOAPHeader header = envelope.addHeader();
-	                header.addChildElement(apiKeyElement);
-	            } catch (Exception e) {
-	                e.printStackTrace();
-	            }
-	        } else {
-	            // inbound
+			Boolean outboundProperty = (Boolean)context.get(
+					MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+			if (outboundProperty.booleanValue()) {
+				try {
+					SOAPEnvelope envelope = context.getMessage().getSOAPPart().getEnvelope();
+					SOAPFactory factory = SOAPFactory.newInstance();
+					SOAPElement apiKeyElement = factory.createElement("api_key");
+					apiKeyElement.addTextNode(apiKey);
+					SOAPHeader header = envelope.addHeader();
+					header.addChildElement(apiKeyElement);
+				} catch (SOAPException ex) {
+					logger.error(
+							"No s'ha pogut afegir l'API key a la petició SOAP per Notifica",
+							ex);
+	        	}
 	        }
 	        return true;
 	    }
-
 		@Override
 		public boolean handleFault(SOAPMessageContext context) {
 			return false;
 		}
-
 		@Override
 		public void close(MessageContext context) {
-			//
 		}
-
 		@Override
 		public Set<QName> getHeaders() {
 			return new TreeSet<QName>();
 		}
 	}
-	
+
+	public class FirmaSOAPHandler implements SOAPHandler<SOAPMessageContext> {
+		private String keystoreLocation;
+		private String keystoreType;
+		private String keystorePassword;
+		private String keystoreCertAlias;
+		private String keystoreCertPassword;
+		public FirmaSOAPHandler(
+				String keystoreLocation,
+				String keystoreType,
+				String keystorePassword,
+				String keystoreCertAlias,
+				String keystoreCertPassword) {
+			this.keystoreLocation = keystoreLocation;
+			this.keystoreType = keystoreType;
+			this.keystorePassword = keystorePassword;
+			this.keystoreCertAlias = keystoreCertAlias;
+			this.keystoreCertPassword = keystoreCertPassword;
+		}
+		@Override
+		public boolean handleMessage(SOAPMessageContext context) {
+			Boolean outboundProperty = (Boolean)context.get(
+					MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+			if (outboundProperty.booleanValue()) {
+				try {
+					Document document = toDocument(context.getMessage());
+					Properties cryptoProperties = getCryptoProperties();
+			        WSSecHeader header = new WSSecHeader();
+			        header.setMustUnderstand(false);
+			        header.insertSecurityHeader(document);
+					WSSecSignature signer = new WSSecSignature();
+					signer.setUserInfo(keystoreCertAlias, keystoreCertPassword);
+					Crypto crypto = CryptoFactory.getInstance(cryptoProperties);
+					Document signedDoc = signer.build(
+							document,
+							crypto,
+							header);
+					context.getMessage().getSOAPPart().setContent(
+							new DOMSource(signedDoc));
+				} catch (Exception ex) {
+					throw new RuntimeException(
+							"No s'ha pogut firmar el missatge SOAP",
+							ex);
+				}
+				@SuppressWarnings("unchecked")
+				Map<String, List<String>> headers = (Map<String, List<String>>)context.get(
+						MessageContext.HTTP_REQUEST_HEADERS);
+				if (headers != null) {
+					for (String header: headers.keySet()) {
+						List<String> values = headers.get(header);
+						System.out.println(">>> " + header);
+						for (String value: values) {
+							System.out.println(">>>      " + value);
+						}
+					}
+				}
+			}
+			return true;
+		}
+		@Override
+		public boolean handleFault(SOAPMessageContext context) {
+			return false;
+		}
+		@Override
+		public void close(MessageContext context) {
+		}
+		@Override
+		public Set<QName> getHeaders() {
+			return new TreeSet<QName>();
+		}
+		private Properties getCryptoProperties() {
+			Properties cryptoProperties = new Properties();
+			cryptoProperties.put(
+					"org.apache.ws.security.crypto.provider",
+					"org.apache.ws.security.components.crypto.Merlin");
+			cryptoProperties.put(
+					"org.apache.ws.security.crypto.merlin.file",
+					keystoreLocation);
+			cryptoProperties.put(
+					"org.apache.ws.security.crypto.merlin.keystore.type",
+					keystoreType);
+			if (keystorePassword != null && !keystorePassword.isEmpty()) {
+				cryptoProperties.put(
+						"org.apache.ws.security.crypto.merlin.keystore.password",
+						keystorePassword);
+			}
+			cryptoProperties.put(
+					"org.apache.ws.security.crypto.merlin.keystore.alias",
+					keystoreCertAlias);
+			return cryptoProperties;
+		}
+		private Document toDocument(SOAPMessage soapMsg) throws SOAPException, TransformerException {
+			Source src = soapMsg.getSOAPPart().getContent();
+			TransformerFactory tf = TransformerFactory.newInstance();
+			Transformer transformer = tf.newTransformer();
+			DOMResult result = new DOMResult();
+			transformer.transform(src, result);
+			return (Document) result.getNode();
+		}
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(NotificaHelper.class);
 
 }

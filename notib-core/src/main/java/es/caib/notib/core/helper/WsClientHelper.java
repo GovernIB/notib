@@ -24,9 +24,6 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Utilitat per a instanciar clients per al servei d'enviament
  * de contingut a bústies.
@@ -181,9 +178,10 @@ public class WsClientHelper<T> {
 			} catch (Exception ex) {
 				sb.append("Error al imprimir el missatge XML: " + ex.getMessage());
 			}
-			LOGGER.debug(sb.toString());
+			//LOGGER.debug(sb.toString());
+			System.out.println(sb.toString());
 		}
-		private static final Logger LOGGER = LoggerFactory.getLogger(SOAPLoggingHandler.class);
+		//private static final Logger LOGGER = LoggerFactory.getLogger(SOAPLoggingHandler.class);
 	}
 
 }

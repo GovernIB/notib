@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 @XmlRootElement
 public class NotificacioEstat {
 
-	private NotificacioEstatEnum estat;
+	private NotificacioDestinatariEstatEnum estat;
 	private Date data;
 	private String receptorNom;
 	private String receptorNif;
@@ -29,7 +29,7 @@ public class NotificacioEstat {
 	public NotificacioEstat() {}
 
 	public NotificacioEstat(
-			NotificacioEstatEnum estat,
+			NotificacioDestinatariEstatEnum estat,
 			Date data,
 			String receptorNom,
 			String receptorNif,
@@ -44,10 +44,10 @@ public class NotificacioEstat {
 		this.origen = origen;
 		this.numSeguiment = numSeguiment;
 	}
-	public NotificacioEstatEnum getEstat() {
+	public NotificacioDestinatariEstatEnum getEstat() {
 		return estat;
 	}
-	public void setEstat(NotificacioEstatEnum estat) {
+	public void setEstat(NotificacioDestinatariEstatEnum estat) {
 		this.estat = estat;
 	}
 	public Date getData() {

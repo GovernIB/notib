@@ -51,7 +51,6 @@ public class CacheHelper {
 	public List<EntitatDto> findEntitatsAccessiblesUsuari(
 			String usuariCodi) {
 		logger.debug("Consulta entitats accessibles (usuariCodi=" + usuariCodi + ")");
-		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<EntitatEntity> entitats = entitatRepository.findByActiva(true);
 		permisosHelper.filterGrantedAny(

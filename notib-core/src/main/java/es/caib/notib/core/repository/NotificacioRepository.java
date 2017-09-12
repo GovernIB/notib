@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.entity.NotificacioEntity;
 
 /**
@@ -22,40 +23,35 @@ import es.caib.notib.core.entity.NotificacioEntity;
  */
 public interface NotificacioRepository extends JpaRepository<NotificacioEntity, Long> {
 	
-	
 	Page<NotificacioEntity> findByEntitatActiva(
 			boolean activa,
-			Pageable paginacio
-			);
-	
+			Pageable paginacio);
+
 	Page<NotificacioEntity> findByEntitatId(
 			Long entitatId,
-			Pageable paginacio
-			);
-	
-	@Query(   
-			  "FROM "
-			+ "     NotificacioEntity ne "
-			+ "WHERE "
-			+ "		(:isEntitatIdNull = true OR ne.entitat.id = :entitatId) "
-			+ "AND "
-			+ "		lower(ne.concepte) like concat('%', lower(:concepte), '%') "
-			+ "AND "
-			+ "		ne.enviamentDataProgramada BETWEEN :dataInici AND :dataFi "
-			+ "AND "
-			+ "		ne.entitat.activa = true "
-			+ "AND "
-			+ "	    ( :isDestinatariNull = true OR "
-			+ "		0 < ( SELECT count(d.id) "
-			+ "			  FROM ne.destinataris d "
-			+ "			  WHERE "
-			+ "				lower(d.destinatariNom) like concat('%', lower(:destinatari), '%') "
-			+ "			  OR "
-			+ "				lower(d.destinatariLlinatges) like concat('%', lower(:destinatari), '%') "
-			+ "			  OR "
-			+ "				lower(d.destinatariNif) like concat('%', lower(:destinatari), '%') "
-			+ "			) "
-			+ "	    ) "
+			Pageable paginacio);
+
+	List<NotificacioEntity> findByEstatOrderByCreatedDateAsc(
+			NotificacioEstatEnumDto estat,
+			Pageable pageable);
+
+	@Query(
+			"from " +
+			"     NotificacioEntity ne " +
+			"where " +
+			"    (:isEntitatIdNull = true OR ne.entitat.id = :entitatId) " +
+			"and lower(ne.concepte) like concat('%', lower(:concepte), '%') " +
+			"and ne.enviamentDataProgramada BETWEEN :dataInici AND :dataFi " +
+			"and ne.entitat.activa = true " +
+			"and ( " +
+			"        :isDestinatariNull = true or (" +
+			"            select count(d.id) " +
+			"            from ne.destinataris d " +
+			"            where " +
+			"               lower(d.destinatariNom) like concat('%', lower(:destinatari), '%') " +
+			"            or lower(d.destinatariLlinatges) like concat('%', lower(:destinatari), '%') " +
+			"            or lower(d.destinatariNif) like concat('%', lower(:destinatari), '%') " +
+			"        ) > 0) "
 		  )
 	public Page<NotificacioEntity> findFilteredByEntitatId(
 			@Param("concepte") String concepte,
@@ -94,10 +90,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 //		@Param("destinatariNom") String destinatariNom,
 //		@Param("dataInici") Date dataInici,
 //		@Param("dataFi") Date dataFi,
-		Pageable paginacio
-		);
-	
-	
+		Pageable paginacio);
 	@Query(   
 			  "FROM "
 			+ "     NotificacioEntity ne "
@@ -110,6 +103,5 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 		  )
 	public NotificacioEntity findByDestinatariReferencia(
 			@Param("referencia") String referencia );
-	
 
 }

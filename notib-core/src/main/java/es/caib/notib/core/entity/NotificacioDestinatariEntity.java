@@ -23,10 +23,8 @@ import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioSeuEstatEnumDto;
-import es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum;
+import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 
 /**
@@ -127,8 +125,8 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 	private String referencia;
 	@Column(name = "notifica_id", length = 20)
 	private String notificaIdentificador;
-	@Column(name = "notifica_est_estat") 
-	private NotificaEstatEnumDto notificaEstat;
+	@Column(name = "notifica_est_estat", nullable = false)
+	private NotificacioDestinatariEstatEnumDto notificaEstat;
 	@Column(name = "notifica_est_data")
 	@Temporal(TemporalType.DATE)
 	private Date notificaEstatData;
@@ -166,16 +164,25 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date seuDataFi;
 	@Column(name = "seu_estat", nullable = false)
-	private NotificacioSeuEstatEnumDto seuEstat;
+	private NotificacioDestinatariEstatEnumDto seuEstat;
 	@Column(name = "seu_error", nullable = false)
 	private boolean seuError;
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "seu_error_event_id")
 	@ForeignKey(name = "not_noteve_seuerr_notdest_fk")
 	private NotificacioEventEntity seuErrorEvent;
-	@Column(name = "seu_data_peticio")
+	@Column(name = "seu_data_enviam")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date seuDarreraPeticioData;
+	private Date seuDataEnviament;
+	@Column(name = "seu_data_estat")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date seuDataEstat;
+	@Column(name = "seu_data_notinf")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date seuDataNotificaInformat;
+	@Column(name = "seu_data_notidp")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date seuDataNotificaDarreraPeticio;
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_id")
 	@ForeignKey(name = "not_notificacio_notdest_fk")
@@ -310,7 +317,7 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 	public String getNotificaIdentificador() {
 		return notificaIdentificador;
 	}
-	public NotificaEstatEnumDto getNotificaEstat() {
+	public NotificacioDestinatariEstatEnumDto getNotificaEstat() {
 		return notificaEstat;
 	}
 	public Date getNotificaEstatData() {
@@ -358,7 +365,7 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 	public Date getSeuDataFi() {
 		return seuDataFi;
 	}
-	public NotificacioSeuEstatEnumDto getSeuEstat() {
+	public NotificacioDestinatariEstatEnumDto getSeuEstat() {
 		return seuEstat;
 	}
 	public boolean isSeuError() {
@@ -367,8 +374,17 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 	public NotificacioEventEntity getSeuErrorEvent() {
 		return seuErrorEvent;
 	}
-	public Date getSeuDarreraPeticioData() {
-		return seuDarreraPeticioData;
+	public Date getSeuDataEnviament() {
+		return seuDataEnviament;
+	}
+	public Date getSeuDataEstat() {
+		return seuDataEstat;
+	}
+	public Date getSeuDataNotificaInformat() {
+		return seuDataNotificaInformat;
+	}
+	public Date getSeuDataNotificaDarreraPeticio() {
+		return seuDataNotificaDarreraPeticio;
 	}
 	public NotificacioEntity getNotificacio() {
 		return notificacio;
@@ -384,7 +400,7 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 	}
 
 	public void updateNotificaEstat(
-			NotificaEstatEnumDto notificaEstat,
+			NotificacioDestinatariEstatEnumDto notificaEstat,
 			Date notificaEstatData,
 			String notificaEstatReceptorNom,
 			String notificaEstatReceptorNif,
@@ -419,29 +435,32 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 	public void updateSeuEnviament(
 			String seuRegistreNumero,
 			Date seuRegistreData,
-			NotificacioSeuEstatEnumDto seuEstat) {
-		this.seuDarreraPeticioData = new Date();
+			NotificacioDestinatariEstatEnumDto seuEstat) {
+		this.seuDataEnviament = new Date();
 		this.seuRegistreNumero = seuRegistreNumero;
 		this.seuRegistreData = seuRegistreData;
 		this.seuEstat = seuEstat;
 	}
 	public void updateSeuEstat(
 			Date seuDataFi,
-			NotificacioSeuEstatEnumDto seuEstat) {
-		this.seuDarreraPeticioData = new Date();
+			NotificacioDestinatariEstatEnumDto seuEstat) {
+		this.seuDataEstat = new Date();
 		this.seuDataFi = seuDataFi;
 		this.seuEstat = seuEstat;
 	}
-	public void updateSeuNotificaEstat(
-			NotificacioSeuEstatEnumDto seuEstat) {
-		this.seuDarreraPeticioData = new Date();
-		this.seuEstat = seuEstat;
+	public void updateSeuNotificaInformat() {
+		this.seuDataNotificaInformat = new Date();
+		this.seuDataNotificaDarreraPeticio = new Date();
 	}
 	public void updateSeuError(
 			boolean seuError,
-			NotificacioEventEntity seuErrorEvent) {
+			NotificacioEventEntity seuErrorEvent,
+			boolean esNotificaPeticio) {
 		this.seuError = seuError;
 		this.seuErrorEvent = seuErrorEvent;
+		if (esNotificaPeticio) {
+			this.seuDataNotificaDarreraPeticio = new Date();
+		}
 	}
 
 	public static Builder getBuilder(
@@ -450,7 +469,6 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 			String destinatariNom,
 			String destinatariNif,
 			NotificaServeiTipusEnumDto serveiTipus,
-			NotificacioSeuEstatEnumDto seuEstat,
 			boolean dehObligat,
 			NotificacioEntity notificacio) {
 		return new Builder(
@@ -459,7 +477,6 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 				destinatariNom,
 				destinatariNif,
 				serveiTipus,
-				seuEstat,
 				dehObligat,
 				notificacio);
 	}
@@ -472,7 +489,6 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 				String destinatariNom,
 				String destinatariNif,
 				NotificaServeiTipusEnumDto serveiTipus,
-				NotificacioSeuEstatEnumDto seuEstat,
 				boolean dehObligat,
 				NotificacioEntity notificacio) {
 			built = new NotificacioDestinatariEntity();
@@ -481,9 +497,10 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 			built.destinatariNom = destinatariNom;
 			built.destinatariNif = destinatariNif;
 			built.serveiTipus = serveiTipus;
-			built.seuEstat = seuEstat;
 			built.dehObligat = dehObligat;
 			built.notificacio = notificacio;
+			built.notificaEstat = NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT;
+			built.seuEstat = NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT;
 		}
 		public Builder titularLlinatges(String titularLlinatges) {
 			built.titularLlinatges = titularLlinatges;
@@ -637,17 +654,27 @@ public class NotificacioDestinatariEntity extends NotibAuditable<Long> {
 			return built;
 		}
 	}
-	
-	public NotificacioEstatEnum getEstatUnificat() {
-		
-		switch(seuEstat) {
-			case ENVIADA: return NotificacioEstatEnum.PENDENT_COMPAREIXENSA;
-			case LLEGIDA: return NotificacioEstatEnum.LLEGIDA;
-			case REBUTJADA: return NotificacioEstatEnum.REBUTJADA;
-			default:
-				if(notificaEstat == null) return NotificacioEstatEnum.SENSE_INFORMACIO;
-				return NotificacioEstatEnum.toNotificacioEstatEnum(notificaEstat);
+
+	public static NotificacioDestinatariEstatEnumDto calcularEstatNotificacioDestinatari(
+			NotificacioDestinatariEntity destinatari) {
+		NotificacioDestinatariEstatEnumDto estatNotifica = destinatari.getNotificaEstat();
+		NotificacioDestinatariEstatEnumDto estatSeu = destinatari.getSeuEstat();
+		NotificacioDestinatariEstatEnumDto estatBo;
+		if (!NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT.equals(estatSeu) &&
+			!NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA.equals(estatSeu)) {
+			estatBo = estatSeu;
+		} else if (	!NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT.equals(estatNotifica) &&
+					!NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA.equals(estatNotifica)) {
+			estatBo = estatNotifica;
+		} else {
+			if (NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA.equals(estatSeu) ||
+				NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA.equals(estatNotifica)) {
+				return NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA;
+			} else {
+				return NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT;
+			}
 		}
+		return estatBo;
 	}
 
 	@Override

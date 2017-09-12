@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import es.caib.notib.core.api.ws.notificacio2.ErrorOrigenEnum;
+
 
 /**
  * Informació d'una anotació.
@@ -48,11 +50,12 @@ public class NotificacioDto extends AuditoriaDto {
 	private String seuOficiText;
 	private NotificacioEstatEnumDto estat;
 	private boolean error;
-	private NotificacioEventDto errorEvent;
+	private ErrorOrigenEnum errorOrigen;
+	private Date errorEventData;
+	private String errorEventError;
 	private List<NotificacioDestinatariDto> destinataris;
+
 	private EntitatDto entitat;
-
-
 
 	public Long getId() {
 		return id;
@@ -246,11 +249,23 @@ public class NotificacioDto extends AuditoriaDto {
 	public void setError(boolean error) {
 		this.error = error;
 	}
-	public NotificacioEventDto getErrorEvent() {
-		return errorEvent;
+	public ErrorOrigenEnum getErrorOrigen() {
+		return errorOrigen;
 	}
-	public void setErrorEvent(NotificacioEventDto errorEvent) {
-		this.errorEvent = errorEvent;
+	public void setErrorOrigen(ErrorOrigenEnum errorOrigen) {
+		this.errorOrigen = errorOrigen;
+	}
+	public Date getErrorEventData() {
+		return errorEventData;
+	}
+	public void setErrorEventData(Date errorEventData) {
+		this.errorEventData = errorEventData;
+	}
+	public String getErrorEventError() {
+		return errorEventError;
+	}
+	public void setErrorEventError(String errorEventError) {
+		this.errorEventError = errorEventError;
 	}
 	public List<NotificacioDestinatariDto> getDestinataris() {
 		return destinataris;

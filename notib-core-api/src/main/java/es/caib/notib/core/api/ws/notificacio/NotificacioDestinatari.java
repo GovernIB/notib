@@ -7,8 +7,6 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
-import es.caib.notib.core.api.dto.NotificacioSeuEstatEnumDto;
-
 /**
  * Informació d'un destinatari d'una anotació.
  * 
@@ -17,7 +15,7 @@ import es.caib.notib.core.api.dto.NotificacioSeuEstatEnumDto;
 @JsonAutoDetect
 public class NotificacioDestinatari {
 
-	private String referencia;//
+	private String referencia;
 	private String titularNom;
 	private String titularLlinatges;
 	private String titularNif;
@@ -59,62 +57,57 @@ public class NotificacioDestinatari {
 	private ServeiTipusEnum serveiTipus;
 	private int retardPostal;
 	private Date caducitat;
-	private String notificaIdentificador;//
-	private String seuRegistreNumero;
-	private Date seuRegistreData;
-	private NotificacioSeuEstatEnumDto seuEstat;
+	private String notificaIdentificador;
+	private NotificacioDestinatariEstatEnum estat;
 	
 	
 	public NotificacioDestinatari() {}
 
 	public NotificacioDestinatari(
-			String referencia, 
-			String titularNom, 
-			String titularLlinatges, 
+			String referencia,
+			String titularNom,
+			String titularLlinatges,
 			String titularNif,
-			String titularTelefon, 
-			String titularEmail, 
-			String destinatariNom, 
+			String titularTelefon,
+			String titularEmail,
+			String destinatariNom,
 			String destinatariLlinatges,
-			String destinatariNif, 
-			String destinatariTelefon, 
-			String destinatariEmail, 
+			String destinatariNif,
+			String destinatariTelefon,
+			String destinatariEmail,
 			DomiciliTipusEnum domiciliTipus,
-			DomiciliConcretTipusEnum domiciliConcretTipus, 
-			String domiciliViaTipus, 
+			DomiciliConcretTipusEnum domiciliConcretTipus,
+			String domiciliViaTipus,
 			String domiciliViaNom,
-			DomiciliNumeracioTipusEnum domiciliNumeracioTipus, 
+			DomiciliNumeracioTipusEnum domiciliNumeracioTipus,
 			String domiciliNumeracioNumero,
-			String domiciliNumeracioPuntKm, 
-			String domiciliApartatCorreus, 
-			String domiciliBloc, 
+			String domiciliNumeracioPuntKm,
+			String domiciliApartatCorreus,
+			String domiciliBloc,
 			String domiciliPortal,
-			String domiciliEscala, 
-			String domiciliPlanta, 
-			String domiciliPorta, 
+			String domiciliEscala,
+			String domiciliPlanta,
+			String domiciliPorta,
 			String domiciliComplement,
-			String domiciliPoblacio, 
-			String domiciliMunicipiCodiIne, 
+			String domiciliPoblacio,
+			String domiciliMunicipiCodiIne,
 			String domiciliMunicipiNom,
-			String domiciliCodiPostal, 
-			String domiciliProvinciaCodi, 
+			String domiciliCodiPostal,
+			String domiciliProvinciaCodi,
 			String domiciliProvinciaNom,
-			String domiciliPaisCodiIso, 
-			String domiciliPaisNom, 
-			String domiciliLinea1, 
+			String domiciliPaisCodiIso,
+			String domiciliPaisNom,
+			String domiciliLinea1,
 			String domiciliLinea2,
-			Integer domiciliCie, 
-			boolean dehObligat, 
-			String dehNif, 
+			Integer domiciliCie,
+			boolean dehObligat,
+			String dehNif,
 			String dehProcedimentCodi,
-			ServeiTipusEnum serveiTipus, 
-			int retardPostal, 
-			Date caducitat, 
+			ServeiTipusEnum serveiTipus,
+			int retardPostal,
+			Date caducitat,
 			String notificaIdentificador,
-			String seuRegistreNumero, 
-			Date seuRegistreData,
-			NotificacioSeuEstatEnumDto seuEstat) {
-		
+			NotificacioDestinatariEstatEnum estat) {
 		super();
 		this.referencia = referencia;
 		this.titularNom = titularNom;
@@ -159,18 +152,14 @@ public class NotificacioDestinatari {
 		this.retardPostal = retardPostal;
 		this.caducitat = caducitat;
 		this.notificaIdentificador = notificaIdentificador;
-		this.seuRegistreNumero = seuRegistreNumero;
-		this.seuRegistreData = seuRegistreData;
-		this.seuEstat = seuEstat;
+		this.estat = estat;
 	}
-	
-	
-	
-	public NotificacioSeuEstatEnumDto getSeuEstat() {
-		return seuEstat;
+
+	public NotificacioDestinatariEstatEnum getEstat() {
+		return estat;
 	}
-	public void setSeuEstat(NotificacioSeuEstatEnumDto seuEstat) {
-		this.seuEstat = seuEstat;
+	public void setSeuEstat(NotificacioDestinatariEstatEnum estat) {
+		this.estat = estat;
 	}
 	public String getReferencia() {
 		return referencia;
@@ -429,18 +418,6 @@ public class NotificacioDestinatari {
 	}
 	public void setNotificaIdentificador(String notificaIdentificador) {
 		this.notificaIdentificador = notificaIdentificador;
-	}
-	public String getSeuRegistreNumero() {
-		return seuRegistreNumero;
-	}
-	public void setSeuRegistreNumero(String seuRegistreNumero) {
-		this.seuRegistreNumero = seuRegistreNumero;
-	}
-	public Date getSeuRegistreData() {
-		return seuRegistreData;
-	}
-	public void setSeuRegistreData(Date seuRegistreData) {
-		this.seuRegistreData = seuRegistreData;
 	}
 
 }

@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<%@ taglib tagdir="/WEB-INF/tags/notib" prefix="not" %>
+<%@ taglib tagdir="/WEB-INF/tags/notib" prefix="not"%>
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
 <%
 	pageContext.setAttribute(
@@ -144,14 +144,14 @@ body {
 					</ul>
 					<div class="clearfix"></div>
 					<div class="btn-group navbar-btn navbar-right">
-						<a href="<c:url value="/notificacions"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
+						<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
 						<div class="btn-group">
 							<c:if test="${isRolActualAdministrador}">
 							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="<c:url value="/entitats"/>"><spring:message code="decorator.menu.entitats"/></a></li>
+								<li><a href="<c:url value="/entitat"/>"><spring:message code="decorator.menu.entitats"/></a></li>
 								
-								<li><a href="<c:url value="/aplicacions"/>"><spring:message code="decorator.menu.aplicacions"/></a></li>
+								<li><a href="<c:url value="/aplicacio"/>"><spring:message code="decorator.menu.aplicacions"/></a></li>
 							</ul>
 							</c:if>
 							

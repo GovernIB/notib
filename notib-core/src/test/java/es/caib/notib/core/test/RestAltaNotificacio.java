@@ -12,7 +12,6 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioSeuEstatEnumDto;
 import es.caib.notib.core.api.service.rest.AltaNotificacio;
 import es.caib.notib.core.api.service.rest.NotificaEnviamentTipus;
 import es.caib.notib.core.api.ws.notificacio.DomiciliConcretTipusEnum;
@@ -96,10 +95,7 @@ public class RestAltaNotificacio {
 					5,
 					new Date(0),
 					"notificaIdentificador_" + notificacioId + "_" + i,
-					"seuRegistreNumero_" + notificacioId + "_" + i,
-					new Date(0),
-					NotificacioSeuEstatEnumDto.ENVIADA)
-					);
+					null));
 					
 		}
 		
@@ -165,7 +161,7 @@ public class RestAltaNotificacio {
 		notificacio.setSeuOficiText(
 				"seuOficiText_" + notificacioId);
 		notificacio.setEstat(
-				NotificacioEstatEnumDto.PROCESSADA);
+				NotificacioEstatEnumDto.FINALITZADA);
 		notificacio.setDestinataris(
 				destinataris);
 		return notificacio;

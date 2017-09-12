@@ -13,29 +13,25 @@ import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum ServeiTipusEnum implements Serializable {
-	
+
 	NORMAL,
 	URGENT;
-	
-	
+
 	public NotificaServeiTipusEnumDto toServeiTipusEnumDto() {
-		
 		switch( this ) {
 			case NORMAL: return NotificaServeiTipusEnumDto.NORMAL;
 			case URGENT: return  NotificaServeiTipusEnumDto.URGENTE;
 		}
-		
 		return null;
 	}
-	
+
 	public static ServeiTipusEnum toServeiTipusEnum(NotificaServeiTipusEnumDto dto) {
-		
+		if (dto == null) return null;
 		switch( dto ) {
 			case NORMAL: return ServeiTipusEnum.NORMAL;
 			case URGENTE: return ServeiTipusEnum.URGENT;
 		}
-		
 		return null;
 	}
-	
+
 }

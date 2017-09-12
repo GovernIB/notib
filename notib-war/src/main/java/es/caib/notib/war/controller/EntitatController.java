@@ -3,6 +3,8 @@
  */
 package es.caib.notib.war.controller;
 
+import java.util.Arrays;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -29,7 +31,7 @@ import es.caib.notib.war.helper.RolHelper;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
-@RequestMapping("/entitats")
+@RequestMapping("/entitat")
 public class EntitatController extends BaseController {
 
 	@Autowired
@@ -48,11 +50,11 @@ public class EntitatController extends BaseController {
 					request,
 					entitatService.findAllPaginat(
 							DatatablesHelper.getPaginacioDtoFromRequest(request)));
-		} else if ( RolHelper.isUsuariActualRepresentant(request) ) {
-			EntitatDto entitat = EntitatHelper.getEntitatActual( request );
+		} else if (RolHelper.isUsuariActualRepresentant(request)) {
+			EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 			return DatatablesHelper.getDatatableResponse(
 					request,
-					entitatService.findByEntitatId(entitat.getId()));
+					Arrays.asList(entitat));
 		}
 		return null;
 	}
@@ -94,13 +96,13 @@ public class EntitatController extends BaseController {
 			entitatService.update(EntitatCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(
 					request,
-					"redirect:entitats",
+					"redirect:entitat",
 					"entitat.controller.modificada.ok");
 		} else {
 			entitatService.create(EntitatCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(
 					request,
-					"redirect:entitats",
+					"redirect:entitat",
 					"entitat.controller.creada.ok");
 		}
 	}
@@ -112,7 +114,7 @@ public class EntitatController extends BaseController {
 		entitatService.updateActiva(entitatId, true);
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:../../entitats",
+				"redirect:../../entitat",
 				"entitat.controller.activada.ok");
 	}
 	@RequestMapping(value = "/{entitatId}/disable", method = RequestMethod.GET)
@@ -122,7 +124,7 @@ public class EntitatController extends BaseController {
 		entitatService.updateActiva(entitatId, false);
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:../../entitats",
+				"redirect:../../entitat",
 				"entitat.controller.desactivada.ok");
 	}
 
@@ -133,7 +135,7 @@ public class EntitatController extends BaseController {
 		entitatService.delete(entitatId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:../../entitats",
+				"redirect:../../entitat",
 				"entitat.controller.esborrada.ok");
 	}
 

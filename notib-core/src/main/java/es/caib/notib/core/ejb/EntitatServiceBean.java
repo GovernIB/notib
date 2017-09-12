@@ -4,7 +4,6 @@
 package es.caib.notib.core.ejb;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -32,8 +31,6 @@ public class EntitatServiceBean implements EntitatService {
 
 	@Autowired
 	EntitatService delegate;
-
-
 
 	@Override
 	@RolesAllowed("NOT_ADMIN")
@@ -74,7 +71,13 @@ public class EntitatServiceBean implements EntitatService {
 	public EntitatDto findByCodi(String codi) {
 		return delegate.findByCodi(codi);
 	}
-	
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	public EntitatDto findByDir3codi(String dir3Codi) {
+		return delegate.findByDir3codi(dir3Codi);
+	}
+
 	@Override
 	@RolesAllowed("NOT_ADMIN")
 	public List<EntitatDto> findAll() {
@@ -92,47 +95,23 @@ public class EntitatServiceBean implements EntitatService {
 	public List<EntitatDto> findAccessiblesUsuariActual() {
 		return delegate.findAccessiblesUsuariActual();
 	}
-	
+
 	@Override
-	@RolesAllowed("NOT_REP")
-	public List<EntitatDto> findByEntitatId(Long entitatId) {
-		return delegate.findByEntitatId(entitatId);
+	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	public List<PermisDto> permisFindByEntitatId(Long id) throws NotFoundException {
+		return delegate.permisFindByEntitatId(id);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public List<PermisDto> findPermis(Long id) throws NotFoundException {
-		return delegate.findPermis(id);
+	public void permisUpdate(Long entitatId, PermisDto permis) throws NotFoundException {
+		delegate.permisUpdate(entitatId, permis);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public void updatePermis(Long id, PermisDto permis) throws NotFoundException {
-		delegate.updatePermis(id, permis);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public void deletePermis(Long id, Long permisId) throws NotFoundException {
-		delegate.deletePermis(id, permisId);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP", "NOT_APL"})
-	public Map<Long, List<PermisDto>> findPermisos(List<Long> entitatIds) {
-		return delegate.findPermisos(entitatIds);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public EntitatDto findByCif(String cif) {
-		return delegate.findByCif(cif);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public EntitatDto findByDir3(String dir3) {
-		return delegate.findByDir3(dir3);
+	public void permisDelete(Long entitatId, Long permisId) throws NotFoundException {
+		delegate.permisDelete(entitatId, permisId);
 	}
 
 }

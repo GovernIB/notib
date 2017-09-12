@@ -8,9 +8,9 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
@@ -57,6 +57,10 @@ public class Notificacio {
 	private String seuOficiText;
 	private NotificacioEstatEnumDto estat;
 	private List<NotificacioDestinatari> destinataris;
+	private boolean error;
+	private Date errorEventData;
+	private String errorEventDescripcio;
+	private String errorEventError;
 
 	public String getCifEntitat() {
 		return cifEntitat;
@@ -243,6 +247,30 @@ public class Notificacio {
 	}
 	public void setDestinataris(List<NotificacioDestinatari> destinataris) {
 		this.destinataris = destinataris;
+	}
+	public boolean isError() {
+		return error;
+	}
+	public void setError(boolean error) {
+		this.error = error;
+	}
+	public Date getErrorEventData() {
+		return errorEventData;
+	}
+	public void setErrorEventData(Date errorEventData) {
+		this.errorEventData = errorEventData;
+	}
+	public String getErrorEventDescripcio() {
+		return errorEventDescripcio;
+	}
+	public void setErrorEventDescripcio(String errorEventDescripcio) {
+		this.errorEventDescripcio = errorEventDescripcio;
+	}
+	public String getErrorEventError() {
+		return errorEventError;
+	}
+	public void setErrorEventError(String errorEventError) {
+		this.errorEventError = errorEventError;
 	}
 
 	@Override

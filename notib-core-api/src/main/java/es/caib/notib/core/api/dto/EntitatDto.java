@@ -17,10 +17,9 @@ public class EntitatDto extends AuditoriaDto {
 	private Long id;
 	private String codi;
 	private String nom;
-	private String descripcio;
-	private String cif;
 	private EntitatTipusEnumDto tipus;
 	private String dir3Codi;
+	private String descripcio;
 	private boolean activa;
 
 	private List<PermisDto> permisos;
@@ -46,18 +45,6 @@ public class EntitatDto extends AuditoriaDto {
 	public void setNom(String nom) {
 		this.nom = nom;
 	}
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
-	}
-	public String getCif() {
-		return cif;
-	}
-	public void setCif(String cif) {
-		this.cif = cif;
-	}
 	public EntitatTipusEnumDto getTipus() {
 		return tipus;
 	}
@@ -69,6 +56,12 @@ public class EntitatDto extends AuditoriaDto {
 	}
 	public void setDir3Codi(String dir3Codi) {
 		this.dir3Codi = dir3Codi;
+	}
+	public String getDescripcio() {
+		return descripcio;
+	}
+	public void setDescripcio(String descripcio) {
+		this.descripcio = descripcio;
 	}
 	public boolean isActiva() {
 		return activa;
