@@ -29,13 +29,13 @@ import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
-@RequestMapping("/entitats/{entitatId}/permis")
-public class PermisController extends BaseController {
-	
+@RequestMapping("/entitat/{entitatId}/permis")
+public class EntitatPermisController extends BaseController {
+
 	@Autowired
 	private EntitatService entitatService;
 
-	@RequestMapping(value="", method = RequestMethod.GET)
+	@RequestMapping(method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
 			@PathVariable Long entitatId,
@@ -43,47 +43,42 @@ public class PermisController extends BaseController {
 		model.addAttribute(
 				"entitat", 
 				entitatService.findById(entitatId));
-		return "adminPermis";
+		return "entitatPermisList";
 	}
-	
-	@RequestMapping(value="/entitatactual", method = RequestMethod.GET)
-	public String getPermisActual(
-			HttpServletRequest request,
-			@PathVariable Long entitatId,
-			Model model) {
-		model.addAttribute(
-				"entitat", 
-				entitatService.findById(entitatId));
-		return "adminPermis";
-	}
-	
+
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(
 			HttpServletRequest request,
 			@PathVariable Long entitatId) {
 		List<PermisDto> permisos = null;
-		permisos = entitatService.findPermis(entitatId);
+		permisos = entitatService.permisFindByEntitatId(entitatId);
 		return DatatablesHelper.getDatatableResponse(request, permisos);
 	}
-	
+
 	@RequestMapping(value="/new", method = RequestMethod.GET)
-	public String New(
+	public String getNew(
 			HttpServletRequest request,
 			@PathVariable Long entitatId,
 			Model model) {
-		model.addAttribute( new PermisCommand() );
-		return "adminPermisForm";
+		model.addAttribute(
+				"entitat", 
+				entitatService.findById(entitatId));
+		model.addAttribute(new PermisCommand());
+		return "entitatPermisForm";
 	}
-	
+
 	@RequestMapping(value="/{permisId}", method = RequestMethod.GET)
-	public String Update(
+	public String get(
 			HttpServletRequest request,
 			@PathVariable Long entitatId,
 			@PathVariable Long permisId,
 			Model model) {
+		model.addAttribute(
+				"entitat", 
+				entitatService.findById(entitatId));
 		List<PermisDto> permisos = null;
-		permisos = entitatService.findPermis(entitatId);
+		permisos = entitatService.permisFindByEntitatId(entitatId);
 		PermisDto permis = null;
 		for (PermisDto p: permisos) {
 			if (p.getId().equals(permisId)) {
@@ -92,21 +87,21 @@ public class PermisController extends BaseController {
 			}
 		}
 		model.addAttribute( PermisCommand.asCommand(permis) );
-		return "adminPermisForm";
+		return "entitatPermisForm";
 	}
 
-	@RequestMapping(value="/create", method = RequestMethod.POST)
-	public String Create(
+	@RequestMapping(method = RequestMethod.POST)
+	public String save(
 			Model model,
 			HttpServletRequest request,
 			@PathVariable Long entitatId,
 			@Valid PermisCommand command,
 			BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
-			return "adminPermisForm";
+			return "entitatPermisForm";
 		}
-		PermisDto dto = PermisCommand.asDto( command );
-		entitatService.updatePermis(entitatId, dto);
+		PermisDto dto = PermisCommand.asDto(command);
+		entitatService.permisUpdate(entitatId, dto);
 		String msg;
 		if (command.getId() == null) {
 			msg = "entitat.controller.permis.creat.ok";
@@ -115,20 +110,22 @@ public class PermisController extends BaseController {
 		}
 		return getModalControllerReturnValueSuccess(
 				request,
-				"redirect:/entitats/" + entitatId + "/permis/",
+				"redirect:/entitat/" + entitatId + "/permis/",
 				msg);
 	}
-	
+
 	@RequestMapping(value="/{permisId}/delete", method = RequestMethod.GET)
-	public String Delete(
+	public String delete(
 			HttpServletRequest request,
 			@PathVariable Long entitatId,
 			@PathVariable Long permisId,
 			Model model) {
-		entitatService.deletePermis( entitatId, permisId );
+		entitatService.permisDelete(
+				entitatId,
+				permisId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:/entitats/" + entitatId + "/permis/",
+				"redirect:/entitat/" + entitatId + "/permis/",
 				"entitat.controller.permis.esborrat.ok");
 	}
 

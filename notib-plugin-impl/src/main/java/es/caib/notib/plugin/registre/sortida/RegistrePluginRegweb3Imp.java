@@ -11,7 +11,7 @@ import es.caib.notib.plugin.registre.sortida.DocumentRegistre;
 import es.caib.notib.plugin.registre.sortida.RegistreAssentament;
 import es.caib.notib.plugin.registre.sortida.RegistreAssentamentInteressat;
 import es.caib.notib.plugin.registre.sortida.RegistrePluginException;
-import es.caib.notib.plugin.registre.sortida.RegistrePluginRegweb3;
+import es.caib.notib.plugin.registre.sortida.RegistrePlugin;
 import es.caib.notib.plugin.registre.sortida.RespostaAnotacioRegistre;
 import es.caib.notib.plugin.utils.PropertiesHelper;
 import es.caib.regweb3.ws.api.v3.AnexoWs;
@@ -25,7 +25,7 @@ import es.caib.regweb3.ws.api.v3.WsI18NException;
 import es.caib.regweb3.ws.api.v3.WsValidationException;
 import es.caib.regweb3.ws.api.v3.utils.WsClientUtils;
 
-public class RegistrePluginRegweb3Imp implements RegistrePluginRegweb3 {
+public class RegistrePluginRegweb3Imp implements RegistrePlugin {
 	
 	private static final int MODO_FIRMA_ATTACHED = 1;
 	private final static String TIPUS_DOCUMENT_ADJUNT = "02";

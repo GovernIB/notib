@@ -23,22 +23,21 @@ import es.caib.notib.war.validation.EntitatValorsNoRepetits;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-//@CodiEntitatNoRepetit(campId = "id", campCodi = "codi")
 @EntitatValorsNoRepetits
 public class EntitatCommand {
 
 	private Long id;
-
 	@NotEmpty @Size(max=64)
 	private String codi;
 	@NotEmpty @Size(max=256)
-	private String nom; 
-	@NotEmpty @Size(max=9) @DocumentIdentitat
-	private String cif;
+	private String nom;
 	@NotNull 
 	private EntitatTipusEnumDto tipus;
+	@NotEmpty
 	@Size(max=9)
+	@DocumentIdentitat
 	private String dir3Codi;
+	private String descripcio;
 
 	public Long getId() {
 		return id;
@@ -58,12 +57,6 @@ public class EntitatCommand {
 	public void setNom(String nom) {
 		this.nom = nom;
 	}
-	public String getCif() {
-		return cif;
-	}
-	public void setCif(String cif) {
-		this.cif = cif;
-	}
 	public EntitatTipusEnumDto getTipus() {
 		return tipus;
 	}
@@ -76,7 +69,13 @@ public class EntitatCommand {
 	public void setDir3Codi(String dir3Codi) {
 		this.dir3Codi = dir3Codi;
 	}
-	
+	public String getDescripcio() {
+		return descripcio;
+	}
+	public void setDescripcio(String descripcio) {
+		this.descripcio = descripcio;
+	}
+
 	public static List<EntitatCommand> toEntitatCommands(
 			List<EntitatDto> dtos) {
 		List<EntitatCommand> commands = new ArrayList<EntitatCommand>();
@@ -90,12 +89,14 @@ public class EntitatCommand {
 	}
 
 	public static EntitatCommand asCommand(EntitatDto dto) {	
-		
-		return ConversioTipusHelper.convertir( dto, EntitatCommand.class );
+		return ConversioTipusHelper.convertir(
+				dto,
+				EntitatCommand.class);
 	}
 	public static EntitatDto asDto(EntitatCommand command) {
-		
-		return ConversioTipusHelper.convertir( command, EntitatDto.class );
+		return ConversioTipusHelper.convertir(
+				command,
+				EntitatDto.class);
 	}
 
 	@Override

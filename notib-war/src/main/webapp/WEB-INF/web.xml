@@ -54,32 +54,12 @@
 	<servlet>
 		<servlet-name>notib</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-<!-- 		<servlet-class>es.caib.notib.war.webdav.WebdavDispatcherServlet</servlet-class> -->
-<!-- 		<init-param> -->
-<!-- 			<param-name>webdav-prefix</param-name> -->
-<!-- 			<param-value>/webdav</param-value> -->
-<!-- 		</init-param> -->
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-<!-- 	<servlet-mapping> -->
-<!-- 		<servlet-name>default</servlet-name> -->
-<!-- 		<url-pattern>/swagger-ui.html</url-pattern> -->
-<!-- 	</servlet-mapping> -->
 	<servlet-mapping>
 		<servlet-name>notib</servlet-name>
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
-
-	<!--${enable.tomcat.ws.start}
-	<servlet>
-		<servlet-name>jaxws-servlet</servlet-name>
-		<servlet-class>com.sun.xml.ws.transport.http.servlet.WSSpringServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>jaxws-servlet</servlet-name>
-		<url-pattern>/ws/*</url-pattern>
-	</servlet-mapping>
-	${enable.tomcat.ws.end}-->
 
 	<login-config>
 		<auth-method>BASIC</auth-method>
@@ -104,15 +84,6 @@
 		<auth-constraint>
 			<role-name>NOT_ADMIN</role-name>
 			<role-name>NOT_REP</role-name>
-		</auth-constraint>
-	</security-constraint>
-	<security-constraint>
-		<web-resource-collection>
-			<web-resource-name>Serveis Rest</web-resource-name>
-			<url-pattern>/api/services/*</url-pattern>
-			<url-pattern>/test/rest/*</url-pattern>
-		</web-resource-collection>
-		<auth-constraint>
 			<role-name>NOT_APL</role-name>
 		</auth-constraint>
 	</security-constraint>
@@ -121,8 +92,6 @@
 			<web-resource-name>Public areas</web-resource-name>
 			<url-pattern>/ws/adviserWS</url-pattern>
 			<url-pattern>/ws/notificacioWS</url-pattern>
-			<!-- <url-pattern>/notificacio/*</url-pattern> -->
-			<url-pattern>/api-docs*</url-pattern>
 		</web-resource-collection>
 	</security-constraint>
 
@@ -130,10 +99,6 @@
 		<exception-type>java.lang.Throwable</exception-type>
 		<location>/error</location>
 	</error-page>
-	<!--error-page>
-		<error-code>404</error-code>
-		<location>/error</location>
-	</error-page-->
 
 	<session-config>
 		<session-timeout>30</session-timeout>

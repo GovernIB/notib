@@ -30,17 +30,15 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	private String codi;
 	@Column(name = "nom", length = 256, nullable = false)
 	private String nom;
-	@Column(name = "descripcio", length = 1024)
-	private String descripcio;
 	@Column(name = "tipus", length = 32, nullable = false)
 	@Enumerated(EnumType.STRING)
 	private EntitatTipusEnumDto tipus;
-	@Column(name = "cif", length = 9, nullable = false)
-	private String cif;
-	@Column(name = "dir3_codi", length = 9)
+	@Column(name = "dir3_codi", length = 9, nullable = false)
 	private String dir3Codi;
+	@Column(name = "descripcio", length = 1024)
+	private String descripcio;
 	@Column(name = "activa", nullable = false)
-	private boolean activa = true;
+	private boolean activa;
 	@Version
 	private long version = 0;
 
@@ -50,17 +48,14 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	public String getNom() {
 		return nom;
 	}
-	public String getDescripcio() {
-		return descripcio;
-	}
 	public EntitatTipusEnumDto getTipus() {
 		return tipus;
 	}
-	public String getCif() {
-		return cif;
-	}
 	public String getDir3Codi() {
 		return dir3Codi;
+	}
+	public String getDescripcio() {
+		return descripcio;
 	}
 	public boolean isActiva() {
 		return activa;
@@ -69,16 +64,13 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	public void update(
 			String codi,
 			String nom,
-			String descripcio,
 			EntitatTipusEnumDto tipus,
-			String cif,
-			String dir3Codi
-			) {
+			String dir3Codi,
+			String descripcio) {
 		this.codi = codi;
 		this.nom = nom;
 		this.descripcio = descripcio;
 		this.tipus = tipus;
-		this.cif = cif;
 		this.dir3Codi = dir3Codi;
 	}
 
@@ -90,16 +82,12 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	public static Builder getBuilder(
 			String codi,
 			String nom,
-			String descripcio,
 			EntitatTipusEnumDto tipus,
-			String cif,
 			String dir3Codi) {
 		return new Builder(
 				codi,
 				nom,
-				descripcio,
 				tipus,
-				cif,
 				dir3Codi);
 	}
 
@@ -108,17 +96,18 @@ public class EntitatEntity extends NotibAuditable<Long> {
 		Builder(
 				String codi,
 				String nom,
-				String descripcio,
 				EntitatTipusEnumDto tipus,
-				String cif,
 				String dir3Codi) {
 			built = new EntitatEntity();
 			built.codi = codi;
 			built.nom = nom;
-			built.descripcio = descripcio;
 			built.tipus = tipus;
-			built.cif = cif;
 			built.dir3Codi = dir3Codi;
+			built.activa = true;
+		}
+		public Builder descripcio(String descripcio) {
+			built.descripcio = descripcio;
+			return this;
 		}
 		public EntitatEntity build() {
 			return built;

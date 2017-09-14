@@ -36,7 +36,6 @@ import org.springframework.security.acls.domain.AccessControlEntryImpl;
 import org.springframework.security.acls.domain.AclAuthorizationStrategy;
 import org.springframework.security.acls.domain.AclImpl;
 import org.springframework.security.acls.domain.AuditLogger;
-import org.springframework.security.acls.domain.DefaultPermissionFactory;
 import org.springframework.security.acls.domain.DefaultPermissionGrantingStrategy;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
@@ -109,7 +108,7 @@ public final class BasicLookupStrategy implements LookupStrategy {
     //~ Instance fields ================================================================================================
 
     private final AclAuthorizationStrategy aclAuthorizationStrategy;
-    private PermissionFactory permissionFactory = new DefaultPermissionFactory();
+    private PermissionFactory permissionFactory = new ExtendedPermissionFactory();
     private final AclCache aclCache;
     private final PermissionGrantingStrategy grantingStrategy;
     private final JdbcTemplate jdbcTemplate;
@@ -136,13 +135,23 @@ public final class BasicLookupStrategy implements LookupStrategy {
      * @deprecated Use the version which takes a  {@code PermissionGrantingStrategy} argument instead.
      */
     @Deprecated
-    public BasicLookupStrategy(DataSource dataSource, AclCache aclCache,
-            AclAuthorizationStrategy aclAuthorizationStrategy, AuditLogger auditLogger) {
-        this(dataSource, aclCache, aclAuthorizationStrategy, new DefaultPermissionGrantingStrategy(auditLogger));
+    public BasicLookupStrategy(
+    		DataSource dataSource,
+    		AclCache aclCache,
+            AclAuthorizationStrategy aclAuthorizationStrategy,
+            AuditLogger auditLogger) {
+        this(
+        		dataSource,
+        		aclCache,
+        		aclAuthorizationStrategy,
+        		new DefaultPermissionGrantingStrategy(auditLogger));
     }
 
-    public BasicLookupStrategy(DataSource dataSource, AclCache aclCache,
-            AclAuthorizationStrategy aclAuthorizationStrategy, PermissionGrantingStrategy grantingStrategy) {
+    public BasicLookupStrategy(
+    		DataSource dataSource,
+    		AclCache aclCache,
+            AclAuthorizationStrategy aclAuthorizationStrategy,
+            PermissionGrantingStrategy grantingStrategy) {
         Assert.notNull(dataSource, "DataSource required");
         Assert.notNull(aclCache, "AclCache required");
         Assert.notNull(aclAuthorizationStrategy, "AclAuthorizationStrategy required");
@@ -153,7 +162,6 @@ public final class BasicLookupStrategy implements LookupStrategy {
         this.grantingStrategy = grantingStrategy;
         fieldAces.setAccessible(true);
         fieldAcl.setAccessible(true);
-
     }
 
     //~ Methods ========================================================================================================

@@ -4,16 +4,20 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
-
 <%
 	pageContext.setAttribute(
 			"isRolActualAdministrador",
 			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
 %>
-
+<c:set var="ampladaConcepte">
+	<c:choose>
+		<c:when test="${isRolActualAdministrador}">35%</c:when>
+		<c:otherwise>55%</c:otherwise>
+	</c:choose>
+</c:set>
 <html>
 <head>
-	<title><spring:message code="consulta.list.titol"/></title>
+	<title><spring:message code="notificacio.list.titol"/></title>
 	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -28,94 +32,60 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
-	<link href="<c:url value="/css/notificacio.css"/>" rel="stylesheet" type="text/css">
 <script type="text/javascript">
+var enviamentEstats = [];
+<c:forEach var="estat" items="${notificacioDestinatariEstats}">
+enviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
+</c:forEach>
 	$(document).ready(function() {
 		$('#notificacio').on('rowinfo.dataTable', function(e, td, rowData) {
-			var getUrl = "<c:url value="/notificacions/"/>" + rowData.id + "/destinatari";
-			console.log('>>> getUrl: ' + getUrl);
+			var getUrl = "<c:url value="/notificacio/"/>" + rowData.id + "/enviament";
 	        $.get(getUrl).done(function(data) {
-	        	$(td).append(	
+	        	$(td).append(
 	        			'<table class="table teble-striped table-bordered"><thead>' +
 	        			'<tr>' +
-	        				'<th><spring:message code="notificacio.list.destinatari.list.destinatari"/></th>' + 
-	        				'<th><spring:message code="notificacio.list.destinatari.list.estat"/></th>' +
+	        				'<th><spring:message code="notificacio.list.enviament.list.destinatari"/></th>' + 
+	        				'<th><spring:message code="notificacio.list.enviament.list.estat"/></th>' +
 	        				'<th></th>' + 
 	        			'</tr>' +
-						'</thead><tbody></tbody></table>'
-	        	);
-	        	$table = '';
-				for (i = 0; i < data.length; i++) { 
-					$table = $table + '<tr>';
-					$table = $table + '<td>' + data[i].destinatari + '</td>';
-					$table = $table + '<td>';
-					if(data[i].estatUnificat == 'AUSENT') {
-						$table = $table + '<spring:message code="es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum.AUSENT"/>';
-					} else if(data[i].estatUnificat == 'DESCONEGUT') {
-						$table = $table + '<spring:message code="es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum.DESCONEGUT"/>';
-					} else if(data[i].estatUnificat == 'ADRESA_INCORRECTA') {
-						$table = $table + '<spring:message code="es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum.ADRESA_INCORRECTA"/>';
-					} else if(data[i].estatUnificat == 'EDITANT') {
-						$table = $table + '<spring:message code="es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum.EDITANT"/>';
-					} else if(data[i].estatUnificat == 'ENVIADA_CENTRE_IMPRESSIO') {
-						$table = $table + '<spring:message code="es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum.ENVIADA_CENTRE_IMPRESSIO"/>';
-					} else if(data[i].estatUnificat == 'ENVIADA_DEH') {
-						$table = $table + '<spring:message code="es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum.ENVIADA_DEH"/>';
-					} else if(data[i].estatUnificat == 'LLEGIDA') {
-						$table = $table + '<spring:message code="es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum.LLEGIDA"/>';
-					} else if(data[i].estatUnificat == 'ERROR_ENVIAMENT') {
-						$table = $table + '<spring:message code="es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum.ERROR_ENVIAMENT"/>';
-					} else if(data[i].estatUnificat == 'EXTRAVIADA') {
-						$table = $table + '<spring:message code="es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum.EXTRAVIADA"/>';
-					} else if(data[i].estatUnificat == 'MORT') {
-						$table = $table + '<spring:message code="es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum.MORT"/>';
-					} else if(data[i].estatUnificat == 'NOTIFICADA') {
-						$table = $table + '<spring:message code="es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum.NOTIFICADA"/>';
-					} else if(data[i].estatUnificat == 'PENDENT_ENVIAMENT') {
-						$table = $table + '<spring:message code="es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum.PENDENT_ENVIAMENT"/>';
-					} else if(data[i].estatUnificat == 'PENDENT_COMPAREIXENSA') {
-						$table = $table + '<spring:message code="es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum.PENDENT_COMPAREIXENSA"/>';
-					} else if(data[i].estatUnificat == 'REBUTJADA') {
-						$table = $table + '<spring:message code="es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum.REBUTJADA"/>';
-					} else if(data[i].estatUnificat == 'DATA_ENVIAMENT_PROGRAMAT') {
-						$table = $table + '<spring:message code="es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum.DATA_ENVIAMENT_PROGRAMAT"/>';
-					} else if(data[i].estatUnificat == 'SENSE_INFORMACIO') {
-						$table = $table + '<spring:message code="es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum.SENSE_INFORMACIO"/>';
-					} else {
-						$table = $table + data[i].estatUnificat;
-					}
-					$table = $table + '</td>';
-					$table = $table + '<td width="10%">';
-					$table = $table + '<div class="dropdown">';
-					$table = $table + '<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>';
-					$table = $table + '<ul class="dropdown-menu">';
-					$table = $table + '<li><a href="<c:url value="/notificacions/' + rowData.id + '/destinatari/' + data[i].id + '/info"/>" data-toggle="modal"><span class="fa fa-search"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>';
-					$table = $table + '<li><a href="<c:url value="/notificacions/' + rowData.id + '/destinatari/' + data[i].id + '/llistaevents"/>" data-toggle="modal"><span class="fa fa-calendar-check-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.destinatari.list.boto.events"/></a></li>';
-					$table = $table + '</ul>';
-					$table = $table + '</div>';
-					$table = $table + '</td>';
-					$table = $table + '</tr>';
+						'</thead><tbody></tbody></table>');
+	        	contingutTbody = '';
+				for (i = 0; i < data.length; i++) {
+					contingutTbody += '<tr>';
+					contingutTbody += '<td>' + data[i].destinatari + '</td>';
+					contingutTbody += '<td>' + ((data[i].estat) ? enviamentEstats[data[i].estat] : '') + '</td>';
+					contingutTbody += '<td width="10%">';
+					contingutTbody += '<div class="dropdown">';
+					contingutTbody += '<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>';
+					contingutTbody += '<ul class="dropdown-menu">';
+					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/info"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>';
+					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/event"/>" data-toggle="modal"><span class="fa fa-calendar-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.enviament.list.accio.events"/></a></li>';
+					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].referencia + '/consultarInfo"/>" data-toggle="modal"><span class="fa fa-share-square-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.enviament.list.accio.consultar.info"/></a></li>';
+					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].referencia + '/consultarEstat"/>" data-toggle="modal"><span class="fa fa-share-square-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.enviament.list.accio.consultar.estat"/></a></li>';
+					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].referencia + '/consultarDatat"/>" data-toggle="modal"><span class="fa fa-share-square-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.enviament.list.accio.consultar.datat"/></a></li>';
+					contingutTbody += '</ul>';
+					contingutTbody += '</div>';
+					contingutTbody += '</td>';
+					contingutTbody += '</tr>';
 				}
-				$('table tbody', td).append($table);
+				$('table tbody', td).append(contingutTbody);
 				$('table tbody td').webutilModalEval();
 			});
 		});
 		$('#btnNetejar').click(function() {
-				$(':input', $('#filtre')).each (function() {
-					var type = this.type, tag = this.tagName.toLowerCase();
-				if (type == 'text' || type == 'password' || tag == 'textarea')
+			$(':input', $('#filtre')).each (function() {
+				var type = this.type, tag = this.tagName.toLowerCase();
+				if (type == 'text' || type == 'password' || tag == 'textarea') {
 					this.value = '';
-				else if (type == 'checkbox' || type == 'radio')
-						this.checked = false;
-				else if (tag == 'select')
-						this.selectedIndex = 0;
+				} else if (type == 'checkbox' || type == 'radio') {
+					this.checked = false;
+				} else if (tag == 'select') {
+					this.selectedIndex = 0;
+				}
 			});
-				$('#form-filtre').submit();
+			$('#form-filtre').submit();
 		});
 	});
-	function callPDF(notId) {
-		$.get("<c:url value="/consulta/showpdf/"/>" + notId);
-	}
 </script>
 </head>
 <body>
@@ -147,25 +117,21 @@
 	<table
 		id="notificacio"
 		data-toggle="datatable"
-		data-url="<c:url value="/notificacions/datatable"/>"
+		data-url="<c:url value="/notificacio/datatable"/>"
 		data-search-enabled="false"
-		data-default-order="2"
-		data-default-dir="asc"
+		data-default-order="3"
+		data-default-dir="desc"
 		class="table table-striped table-bordered"
 		style="width:100%"
 		data-row-info="true"
 		data-filter="#filtre">
 		<thead>
 			<tr>
-				<th data-col-name="id" data-visible="false" width="4%">#</th>
-				<th data-col-name="enviamentDataProgramada" data-converter="datetime" width="15%"><spring:message code="notificacio.list.columna.enviament.data.programada"/></th>
-				<c:set var="myWidth">
-					<c:choose>
-						<c:when test="${isRolActualAdministrador}">35%</c:when>
-						<c:otherwise>55%</c:otherwise>
-					</c:choose>
-				</c:set>
-				<th data-col-name="concepte" width="${myWidth}"><spring:message code="notificacio.list.columna.concepte"/></th>
+				<th data-col-name="id" data-visible="false">#</th>
+				<th data-col-name="error" data-visible="false"></th>
+				<th data-col-name="errorEventError" data-visible="false"></th>
+				<th data-col-name=createdDate data-converter="datetime" width="15%"><spring:message code="notificacio.list.columna.enviament.data"/></th>
+				<th data-col-name="concepte" width="${ampladaConcepte}"><spring:message code="notificacio.list.columna.concepte"/></th>
 				<c:if test="${isRolActualAdministrador}">
 					<th data-col-name="entitat.nom" width="20%"><spring:message code="notificacio.list.columna.entitat"/></th>
 				</c:if>
@@ -173,14 +139,15 @@
 					<spring:message code="notificacio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						{{if estat == 'PENDENT'}}
-							<spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.PENDENT"/>
-						{{else estat == 'ENVIADA_NOTIFICA'}}
-							<spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.ENVIADA_NOTIFICA"/>
-						{{else estat == 'PROCESSADA'}}
-							<spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.PENDENT"/>
+							<span class="fa fa-clock-o"></span>&nbsp;<spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.PENDENT"/>
+						{{else estat == 'ENVIADA'}}
+							<span class="fa fa-send-o"></span>&nbsp;<spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.ENVIADA"/>
+						{{else estat == 'FINALITZADA'}}
+							<span class="fa fa-check"></span>&nbsp;<spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.FINALITZADA"/>
 						{{else}}
 							{{:estat}}
 						{{/if}}
+						{{if error}}<span class="fa fa-warning text-danger" title="{{:errorEventError}}"></span>{{/if}}
 					</script>
 				</th>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
@@ -188,9 +155,12 @@
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="<c:url value="/notificacions/{{:id}}"/>" data-toggle="modal"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
-								<li><a href="<c:url value="/notificacions/{{:id}}/llistaevents"/>" data-toggle="modal"><span class="fa fa-calendar-check-o"></span>&nbsp;<spring:message code="notificacio.list.boto.events"/></a></li>								
-								<li><a href="<c:url value="/notificacions/descarregar/{{:id}}"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="notificacio.list.boto.descarregar.document"/></a></li>
+								<li><a href="<c:url value="/notificacio/{{:id}}"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+								<li><a href="<c:url value="/notificacio/{{:id}}/event"/>" data-toggle="modal"><span class="fa fa-calendar-o"></span>&nbsp;<spring:message code="notificacio.list.accio.events"/></a></li>
+								{{if estat == 'PENDENT'}}
+									<li><a href="<c:url value="/notificacio/{{:id}}/enviar"/>"><span class="fa fa-share-square-o"></span>&nbsp;<spring:message code="notificacio.list.accio.enviar"/></a></li>
+								{{/if}}
+								<li><a href="<c:url value="/notificacio/{{:id}}/document"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="notificacio.list.accio.descarregar.document"/></a></li>
 							</ul>
 						</div>
 					</script>

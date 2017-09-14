@@ -11,12 +11,10 @@
 
 	<sec:http create-session="never" use-expressions="true" auto-config="true" entry-point-ref="preAuthenticatedProcessingFilterEntryPoint">
 		<sec:intercept-url pattern="/error" access="isAnonymous()"/>
-		<!--sec:intercept-url pattern="/ws/adviserWS*" access="isAnonymous()"/>
-		<sec:intercept-url pattern="/notificacio*" access="isAnonymous()"/>
-		<sec:intercept-url pattern="/v2/api-docs*" access="isAnonymous()"/>
-		<sec:intercept-url pattern="/swagger*" access="isAnonymous()"/-->
 		<sec:intercept-url pattern="/notificacio/rest*" access="hasRole('NOT_APL')"/>
 		<sec:intercept-url pattern="/test/rest*" access="hasRole('NOT_APL')"/>
+		<sec:intercept-url pattern="/api*" access="hasRole('NOT_APL')"/>
+		<sec:intercept-url pattern="/api-docs*" access="hasRole('NOT_APL')"/>
 		<sec:intercept-url pattern="/entitat*" access="hasRole('NOT_ADMIN') or hasRole('NOT_REP')"/>
 		<sec:intercept-url pattern="/permis*" access="hasRole('NOT_ADMIN') or hasRole('NOT_REP')"/>
 		<sec:intercept-url pattern="/*" access="hasRole('NOT_ADMIN') or hasRole('NOT_REP') or hasRole('NOT_APL')"/>

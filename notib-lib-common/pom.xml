@@ -241,7 +241,7 @@
 		<dependency>
 			<groupId>ma.glasnost.orika</groupId>
 			<artifactId>orika-core</artifactId>
-			<version>1.4.5</version>
+			<version>${orika.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>slf4j-simple</artifactId>

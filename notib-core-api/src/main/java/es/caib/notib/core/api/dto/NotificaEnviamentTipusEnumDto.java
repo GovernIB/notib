@@ -12,8 +12,8 @@ import java.io.Serializable;
  */
 public enum NotificaEnviamentTipusEnumDto implements Serializable {
 
-	NOTIFICACIO("notificacion"),
-	COMUNICACIO("comunicacion");
+	NOTIFICACIO("NOTIFICACION"),
+	COMUNICACIO("COMUNICACION");
 
 	private final String text;
 

@@ -47,10 +47,12 @@ public class AuditoriaDto implements Serializable {
 	}
 
 	public String getCreatedDateAmbFormat() {
+		if (createdDate == null) return null;
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
 		return sdf.format(createdDate);
 	}
 	public String getLastModifiedDateAmbFormat() {
+		if (lastModifiedDate == null) return null;
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
 		return sdf.format(lastModifiedDate);
 	}

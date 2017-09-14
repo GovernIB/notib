@@ -5,11 +5,10 @@ package es.caib.notib.core.repository;
 
 import java.util.List;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import es.caib.notib.core.api.dto.NotificacioSeuEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioDestinatariEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
@@ -22,28 +21,25 @@ import es.caib.notib.core.entity.NotificacioEntity;
  */
 public interface NotificacioDestinatariRepository extends JpaRepository<NotificacioDestinatariEntity, Long> {
 
-	Page<NotificacioEntity> findByNotificacioId(
-			Long notificacioId,
-			Pageable pageable);
-	
-	List<NotificacioEntity> findByNotificacioId(
+	List<NotificacioDestinatariEntity> findByNotificacioId(
 			Long notificacioId);
 
 	NotificacioDestinatariEntity findByReferencia(
 			String referencia);
 
+	NotificacioDestinatariEntity findByNotificacioAndReferencia(
+			NotificacioEntity notificacio,
+			String referencia);
+
 	NotificacioDestinatariEntity findByNotificacioEntitatAndNotificaIdentificador(
 			EntitatEntity entitat,
 			String notificaIdentificador);
-			
-	List<NotificacioDestinatariEntity> findBySeuEstatInOrderBySeuEstatAscSeuDarreraPeticioDataAsc(
-			NotificacioSeuEstatEnumDto[] seuEstats,
+
+	List<NotificacioDestinatariEntity> findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
+			NotificacioDestinatariEstatEnumDto[] seuEstats,
 			Pageable pageable);
 
-//	List<NotificacioDestinatariEntity> findBySeuEstatOrSeuEstatOrSeuEstatOrderBySeuEstatAscSeuDarreraPeticioDataAsc(
-//			NotificacioSeuEstatEnumDto seuEstat1,
-//			NotificacioSeuEstatEnumDto seuEstat2,
-//			NotificacioSeuEstatEnumDto seuEstat3,
-//			Pageable pageable);
+	List<NotificacioDestinatariEntity> findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
+			NotificacioDestinatariEstatEnumDto[] seuEstats);
 
 }

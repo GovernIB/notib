@@ -1,6 +1,5 @@
 package es.caib.notib.core.test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
@@ -11,7 +10,6 @@ public class TestNotificaCertificacio {
 		
 		
 		Client jerseyClient = new Client();
-		ObjectMapper mapper  = new ObjectMapper();
 		
 		String user = "prova01";
 		String pass = "prova0115";

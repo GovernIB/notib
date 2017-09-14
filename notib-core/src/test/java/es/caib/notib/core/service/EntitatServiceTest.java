@@ -54,22 +54,20 @@ public class EntitatServiceTest extends BaseServiceTest {
 		entitatCreate.setCodi("LIMIT");
 		entitatCreate.setNom("Limit Tecnologies");
 		entitatCreate.setDescripcio("Descripció de Limit Tecnologies");
-		entitatCreate.setCif("12345678Z");
 		entitatCreate.setTipus(EntitatTipusEnumDto.AJUNTAMENT);
-		entitatCreate.setDir3Codi("LIM00001");
+		entitatCreate.setDir3Codi("23599770E");
 		entitatCreate.setActiva(true);
 		entitatUpdate = new EntitatDto();
 		entitatUpdate.setId(new Long(1));
 		entitatUpdate.setCodi("LIMIT2");
 		entitatUpdate.setNom("Limit Tecnologies 2");
 		entitatCreate.setDescripcio("Descripció de Limit Tecnologies 2");
-		entitatUpdate.setCif("23599770E");
-		entitatUpdate.setDir3Codi("LIM00002");
+		entitatUpdate.setDir3Codi("23599771E");
 		entitatCreate.setActiva(true);
 		permisUserRepresentant = new PermisDto();
 		permisUserRepresentant.setRepresentant(true);
 		permisUserRepresentant.setTipus(TipusEnumDto.USUARI);
-		permisUserRepresentant.setNom("user");
+		permisUserRepresentant.setPrincipal("user");
 	}
 
 	@Test
@@ -93,8 +91,8 @@ public class EntitatServiceTest extends BaseServiceTest {
 				entitatCreate.getNom(),
 				is(entitatCreada.getNom()));
 		assertThat(
-				entitatCreate.getCif(),
-				is(entitatCreada.getCif()));
+				entitatCreate.getDir3Codi(),
+				is(entitatCreada.getDir3Codi()));
     }
 	@Test
 	public void update() {
@@ -108,8 +106,8 @@ public class EntitatServiceTest extends BaseServiceTest {
 				entitatCreate.getNom(),
 				not(entitatUpdate.getNom()));
 		assertThat(
-				entitatCreate.getCif(),
-				not(entitatUpdate.getCif()));
+				entitatCreate.getDir3Codi(),
+				not(entitatUpdate.getDir3Codi()));
 		entitatUpdate.setId(entitatCreada.getId());
 		EntitatDto entitatModificada = entitatService.update(entitatUpdate);
 		assertThat(
@@ -119,8 +117,8 @@ public class EntitatServiceTest extends BaseServiceTest {
 				entitatUpdate.getNom(),
 				is(entitatModificada.getNom()));
 		assertThat(
-				entitatUpdate.getCif(),
-				is(entitatModificada.getCif()));
+				entitatUpdate.getDir3Codi(),
+				is(entitatModificada.getDir3Codi()));
     }
 	@Test
 	public void delete() {
@@ -135,8 +133,8 @@ public class EntitatServiceTest extends BaseServiceTest {
 				entitatCreate.getNom(),
 				is(entitatEsborrada.getNom()));
 		assertThat(
-				entitatCreate.getCif(),
-				is(entitatEsborrada.getCif()));
+				entitatCreate.getDir3Codi(),
+				is(entitatEsborrada.getDir3Codi()));
 		assertNull(entitatService.findById(entitatCreada.getId()));
 	}
 
@@ -179,13 +177,14 @@ public class EntitatServiceTest extends BaseServiceTest {
 		PermisDto permisRepresentat = new PermisDto();
 		permisRepresentat.setRepresentant(true);
 		permisRepresentat.setTipus(TipusEnumDto.USUARI);
-		permisRepresentat.setNom("rep");
-		entitatService.updatePermis(
+		permisRepresentat.setPrincipal("rep");
+		entitatService.permisUpdate(
 				entitatCreada.getId(),
 				permisRepresentat);
 		
 		autenticarUsuari("rep");
-		List<PermisDto> permisos = entitatService.findPermis(entitatCreada.getId());
+		List<PermisDto> permisos = entitatService.permisFindByEntitatId(
+				entitatCreada.getId());
 		assertThat(
 				permisos.size(),
 				is(1));
@@ -195,10 +194,10 @@ public class EntitatServiceTest extends BaseServiceTest {
 				is(1));
 		
 		autenticarUsuari("admin");
-		for(PermisDto p : permisos)
-			if(p.getNom().equals("rep"))
+		for (PermisDto p : permisos)
+			if (p.getPrincipal().equals("rep"))
 				permisRepresentat = p;
-		entitatService.deletePermis(
+		entitatService.permisDelete(
 				entitatCreada.getId(),
 				permisRepresentat.getId());
 		autenticarUsuari("rep");

@@ -9,7 +9,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 
 import es.caib.notib.core.api.ws.callback.NotificacioEstatClient;
-import es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum;
+import es.caib.notib.core.api.ws.notificacio.NotificacioDestinatariEstatEnum;
 
 public class CallbackRestTest {
 	
@@ -30,7 +30,7 @@ public class CallbackRestTest {
 		urlAmbMetode = urlAmbMetode + NOTIFICACIO_ESTAT;
 		
 		NotificacioEstatClient notificacioEstat = new NotificacioEstatClient(
-				NotificacioEstatEnum.NOTIFICADA,
+				NotificacioDestinatariEstatEnum.NOTIFICADA,
 				new Date(),
 				null,
 				null,

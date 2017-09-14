@@ -38,13 +38,15 @@ public class NotibController {
 	public String get(
 			HttpServletRequest request) {
 		if (RolHelper.isUsuariActualAdministrador(request)) {
-			return "redirect:entitats";
+			return "redirect:notificacio";
+		} else if (RolHelper.isUsuariActualAplicacio(request)) {
+			return "redirect:api/apidoc";
 		} else {
 			EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 			if (entitat == null)
 				throw new SecurityException("No te cap entitat assignada");
 			if (RolHelper.isUsuariActualRepresentant(request)) {
-				return "redirect:notificacions";
+				return "redirect:notificacio";
 			} else {
 				return "index";
 			}
@@ -69,21 +71,6 @@ public class NotibController {
 	public UsuariDto desenvUsuariActual() { 
 		return aplicacioService.getUsuariActual();
 	}
-
-	// PER LLEVAR
-	@RequestMapping(value = "/util/modalTancar", method = RequestMethod.GET)
-	public String utilModalTancar() {
-		return "util/modalTancar";
-	}
-	@RequestMapping(value = "/util/ajaxOk", method = RequestMethod.GET)
-	public String utilAjaxOk() {
-		return "util/ajaxOk";
-	}
-	@RequestMapping(value = "/util/alertes", method = RequestMethod.GET)
-	public String utilAlertes() {
-		return "util/missatges";
-	}
-	// /PER LLEVAR
 
 	@RequestMapping(value = "/error")
 	public String error(

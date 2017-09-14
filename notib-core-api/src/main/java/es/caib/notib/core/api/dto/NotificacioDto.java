@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import es.caib.notib.core.api.ws.notificacio2.ErrorOrigenEnum;
+
 
 /**
  * Informació d'una anotació.
@@ -17,6 +19,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class NotificacioDto extends AuditoriaDto {
 
 	private Long id;
+	private String cifEntitat;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
 	private Date enviamentDataProgramada;
 	private String concepte;
@@ -48,17 +51,24 @@ public class NotificacioDto extends AuditoriaDto {
 	private String seuOficiText;
 	private NotificacioEstatEnumDto estat;
 	private boolean error;
-	private NotificacioEventDto errorEvent;
+	private ErrorOrigenEnum errorOrigen;
+	private Date errorEventData;
+	private String errorEventError;
 	private List<NotificacioDestinatariDto> destinataris;
+
 	private EntitatDto entitat;
-
-
 
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
+	}
+	public String getCifEntitat() {
+		return cifEntitat;
+	}
+	public void setCifEntitat(String cifEntitat) {
+		this.cifEntitat = cifEntitat;
 	}
 	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
 		return enviamentTipus;
@@ -246,11 +256,23 @@ public class NotificacioDto extends AuditoriaDto {
 	public void setError(boolean error) {
 		this.error = error;
 	}
-	public NotificacioEventDto getErrorEvent() {
-		return errorEvent;
+	public ErrorOrigenEnum getErrorOrigen() {
+		return errorOrigen;
 	}
-	public void setErrorEvent(NotificacioEventDto errorEvent) {
-		this.errorEvent = errorEvent;
+	public void setErrorOrigen(ErrorOrigenEnum errorOrigen) {
+		this.errorOrigen = errorOrigen;
+	}
+	public Date getErrorEventData() {
+		return errorEventData;
+	}
+	public void setErrorEventData(Date errorEventData) {
+		this.errorEventData = errorEventData;
+	}
+	public String getErrorEventError() {
+		return errorEventError;
+	}
+	public void setErrorEventError(String errorEventError) {
+		this.errorEventError = errorEventError;
 	}
 	public List<NotificacioDestinatariDto> getDestinataris() {
 		return destinataris;

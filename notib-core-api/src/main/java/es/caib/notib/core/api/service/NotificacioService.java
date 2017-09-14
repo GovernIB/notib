@@ -12,12 +12,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificaRespostaDatatDto;
+import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
+import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
-import es.caib.notib.core.api.dto.NotificacioSeuEstatEnumDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 
@@ -28,6 +29,31 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface NotificacioService {
+
+	/**
+	 * Dona d'alta una notificació.
+	 * 
+	 * @param entitatDir3Codi
+	 *            Codi Dir3 de l'entitat emisora de la notificació.
+	 * @param notificacio
+	 *            La informació de la notificació.
+	 * @return La notificació creada.
+	 */
+	@PreAuthorize("hasRole('NOT_APL')")
+	public NotificacioDto alta(
+			String entitatDir3Codi,
+			NotificacioDto notificacio);
+
+	/**
+	 * Consulta l'estat d'un enviament.
+	 * 
+	 * @param referencia
+	 *            Referència retornada per l'alta de la notificació.
+	 * @return La notificació amb l'enviament especificat.
+	 */
+	@PreAuthorize("hasRole('NOT_APL')")
+	public NotificacioDto consulta(
+			String referencia);
 
 	/**
 	 * Consulta una entitat donat el seu id.
@@ -69,20 +95,6 @@ public interface NotificacioService {
 	public PaginaDto<NotificacioDto> findByEntitatIFiltrePaginat(
 			Long entitatId,
 			NotificacioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams);
-
-	/**
-	 * Consulta dels destinataris d'una notificació.
-	 * 
-	 * @param notificacioId
-	 *            Atribut id de la notificació.
-	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
-	 * @return la pàgina amb els destinataris trobats.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
-	public PaginaDto<NotificacioDestinatariDto> destinatariFindByNotificacioPaginat(
-			Long notificacioId,
 			PaginacioParamsDto paginacioParams);
 
 	/**
@@ -188,13 +200,13 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public void updateDestinatariEstat(
 			String referencia,
-			NotificaEstatEnumDto notificaEstat,
+			NotificacioDestinatariEstatEnumDto notificaEstat,
 			Date notificaEstatData,
 			String notificaEstatReceptorNom,
 			String notificaEstatReceptorNif,
 			String notificaEstatOrigen,
 			String notificaEstatNumSeguiment,
-			NotificacioSeuEstatEnumDto seuEstat);
+			NotificacioDestinatariEstatEnumDto seuEstat);
 	
 	/**
 	 * Actualitza el certificat d'un enviament
@@ -222,6 +234,55 @@ public interface NotificacioService {
 			Date notificaCertificacioDataActualitzacio);
 
 	/**
+	 * Prova de fer l'enviament d'una notificació pendent.
+	 * 
+	 * @param notificacioId
+	 *            Atribut id de la notificació.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public void enviar(
+			Long notificacioId);
+
+	/**
+	 * Consulta la informació d'una notificació enviada a Notific@.
+	 * 
+	 * @param referencia
+	 *            Referencia de l'enviament.
+	 * @return la informació de la notificació i de l'enviament.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public NotificacioDto consultarInformacio(
+			String referencia);
+
+	/**
+	 * Consulta l'estat d'una notificació enviada a Notific@.
+	 * 
+	 * @param referencia
+	 *            Referencia de l'enviament.
+	 * @return l'estat de l'enviament.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public NotificaRespostaEstatDto consultarEstat(
+			String referencia);
+
+	/**
+	 * Consulta lel datat d'una notificació enviada a Notific@.
+	 * 
+	 * @param referencia
+	 *            Referencia de l'enviament.
+	 * @return el datat de l'enviament.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public NotificaRespostaDatatDto consultarDatat(
+			String referencia);
+
+	/**
+	 * Mètode d'execució periòdica per a fer els enviaments pendents
+	 * a Notific@.
+	 */
+	public void notificaEnviamentsPendents();
+	
+	/**
 	 * Mètode d'execució periòdica per a fer els enviaments pendents
 	 * a la seu.
 	 */
@@ -231,7 +292,7 @@ public interface NotificacioService {
 	 * Mètode d'execució periòdica per a refrescar l'estat de les notificacions
 	 * pendents a la seu.
 	 */
-	public void seuJustificantsPendents();
+	public void seuNotificacionsPendents();
 
 	/**
 	 * Mètode d'execució periòdica per a comunicar a Notifica els canvis d'estat

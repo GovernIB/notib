@@ -8,9 +8,9 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
@@ -55,10 +55,6 @@ public class Notificacio {
 	private String seuAvisTextMobil;
 	private String seuOficiTitol;
 	private String seuOficiText;
-	private NotificacioEstatEnumDto estat;
-	private List<NotificacioDestinatari> destinataris;
-	
-	// Dades per a realitzar registres a regweb3
 	private boolean registreEnviar;
 	private String registreOficina;
 	private String registreLlibre;
@@ -68,35 +64,15 @@ public class Notificacio {
 	private String registreTipusDocumental;
 	private int registreOrigenCiutadaAdmin;
 	private Date registreDataCaptura;
-	
 	private String documentacioFisicaCodi;
-	
-	
-	public void updateRegistre(
-			boolean registreEnviar,
-			String registreOficina,
-			String registreLlibre,
-			String registreTipusAssumpte,
-			String registreCodiAssumpte,
-			String registreIdioma,
-			String registreTipusDocumental,
-			int registreOrigenCiutadaAdmin,
-			Date registreDataCaptura,
-			String documentacioFisicaCodi) {
-		
-		this.registreEnviar = registreEnviar;
-		this.registreOficina = registreOficina;
-		this.registreLlibre = registreLlibre;
-		this.registreTipusAssumpte = registreTipusAssumpte;
-		this.registreCodiAssumpte = registreCodiAssumpte;
-		this.registreIdioma = registreIdioma;
-		this.registreTipusDocumental = registreTipusDocumental;
-		this.registreOrigenCiutadaAdmin = registreOrigenCiutadaAdmin;
-		this.registreDataCaptura = registreDataCaptura;
-		
-		this.documentacioFisicaCodi = documentacioFisicaCodi;
-		
-	}
+
+	private NotificacioEstatEnumDto estat;
+	private List<NotificacioDestinatari> destinataris;
+
+	private boolean error;
+	private Date errorEventData;
+	private String errorEventDescripcio;
+	private String errorEventError;
 
 	public String getCifEntitat() {
 		return cifEntitat;
@@ -285,7 +261,6 @@ public class Notificacio {
 		this.destinataris = destinataris;
 	}
 	
-	
 	public boolean isRegistreEnviar() {
 		return registreEnviar;
 	}
@@ -355,8 +330,31 @@ public class Notificacio {
 	public void setDocumentacioFisicaCodi(String documentacioFisicaCodi) {
 		this.documentacioFisicaCodi = documentacioFisicaCodi;
 	}
-	
-	
+	public boolean isError() {
+		return error;
+	}
+	public void setError(boolean error) {
+		this.error = error;
+	}
+	public Date getErrorEventData() {
+		return errorEventData;
+	}
+	public void setErrorEventData(Date errorEventData) {
+		this.errorEventData = errorEventData;
+	}
+	public String getErrorEventDescripcio() {
+		return errorEventDescripcio;
+	}
+	public void setErrorEventDescripcio(String errorEventDescripcio) {
+		this.errorEventDescripcio = errorEventDescripcio;
+	}
+	public String getErrorEventError() {
+		return errorEventError;
+	}
+	public void setErrorEventError(String errorEventError) {
+		this.errorEventError = errorEventError;
+	}
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

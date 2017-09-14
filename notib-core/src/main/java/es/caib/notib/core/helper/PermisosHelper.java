@@ -289,14 +289,14 @@ public class PermisosHelper {
 			PermisDto permis) {
 		if (TipusEnumDto.USUARI.equals(permis.getTipus())) {
 			assignarPermisos(
-					new PrincipalSid(permis.getNom()),
+					new PrincipalSid(permis.getPrincipal()),
 					objectClass,
 					objectIdentifier,
 					getPermissionsFromPermis(permis),
 					true);
 		} else if (TipusEnumDto.ROL.equals(permis.getTipus())) {
 			assignarPermisos(
-					new GrantedAuthoritySid(getMapeigRol(permis.getNom())),
+					new GrantedAuthoritySid(getMapeigRol(permis.getPrincipal())),
 					objectClass,
 					objectIdentifier,
 					getPermissionsFromPermis(permis),
@@ -348,7 +348,7 @@ public class PermisosHelper {
 					if (permis == null) {
 						permis = new PermisDto();
 						permis.setId((Long)ace.getId());
-						permis.setNom(principal);
+						permis.setPrincipal(principal);
 						permis.setTipus(TipusEnumDto.USUARI);
 						permisosUsuari.put(principal, permis);
 					}
@@ -358,7 +358,7 @@ public class PermisosHelper {
 					if (permis == null) {
 						permis = new PermisDto();
 						permis.setId((Long)ace.getId());
-						permis.setNom(grantedAuthority);
+						permis.setPrincipal(grantedAuthority);
 						permis.setTipus(TipusEnumDto.ROL);
 						permisosRol.put(grantedAuthority, permis);
 					}

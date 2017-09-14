@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioDestinatariEntity;
@@ -80,9 +80,48 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 							receptorNombre = datadoOrganismo.getReceptor().getNombre();
 							receptorNif = datadoOrganismo.getReceptor().getNif();
 						}
-						NotificaEstatEnumDto notificaEstatIntern = NotificaEstatEnumDto.toEnum(datadoOrganismo.getResultado());
+						NotificacioDestinatariEstatEnumDto notificaEstat = null;
+						if ("pendiente_envio".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.PENDENT_ENVIAMENT;
+						} else if ("enviado_ci".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.ENVIADA_CI;
+						} else if ("notificada".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.NOTIFICADA;
+						} else if ("extraviada".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.EXTRAVIADA;
+						} else if ("rehusada".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.REBUTJADA;
+						} else if ("desconocido".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.DESCONEGUT;
+						} else if ("fallecido".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.MORT;
+						} else if ("ausente".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.ABSENT;
+						} else if ("direccion_incorrecta".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.ADRESA_INCORRECTA;
+						} else if ("sin_informacion".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.SENSE_INFORMACIO;
+						} else if ("error".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.ERROR_ENTREGA;
+						} else if ("pendiente_sede".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.PENDENT_SEU;
+						} else if ("enviado_deh".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.ENVIADA_DEH;
+						} else if ("leida".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.LLEGIDA;
+						} else if ("envio_programado".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.ENVIAMENT_PROGRAMAT;
+						} else if ("pendiente_cie".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.PENDENT_CIE;
+						} else if ("pendiente_deh".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.PENDENT_DEH;
+						} else if ("entregado_op".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.ENTREGADA_OP;
+						} else if ("expirada".equals(datadoOrganismo.getResultado())) {
+							notificaEstat = NotificacioDestinatariEstatEnumDto.EXPIRADA;
+						}
 						notificacioDestinatari.updateNotificaEstat(
-								notificaEstatIntern,
+								notificaEstat,
 								toDate(datadoOrganismo.getFecha()),
 								receptorNombre,
 								receptorNif,

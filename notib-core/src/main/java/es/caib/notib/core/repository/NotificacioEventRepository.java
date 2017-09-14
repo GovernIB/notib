@@ -16,14 +16,11 @@ import es.caib.notib.core.entity.NotificacioEventEntity;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface NotificacioEventRepository extends JpaRepository<NotificacioEventEntity, Long> {
-	
-	
+
 	List<NotificacioEventEntity> findByNotificacioId(
-			Long notificacioId
-			);
-	
+			Long notificacioId);
+
 	List<NotificacioEventEntity> findByNotificacioDestinatariId(
-			Long destinatariId
-			);
-	
+			Long destinatariId);
+
 }

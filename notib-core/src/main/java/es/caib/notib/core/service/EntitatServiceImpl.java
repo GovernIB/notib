@@ -4,7 +4,6 @@
 package es.caib.notib.core.service;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -69,10 +68,10 @@ public class EntitatServiceImpl implements EntitatService {
 		EntitatEntity entity = EntitatEntity.getBuilder(
 				entitat.getCodi(),
 				entitat.getNom(),
-				entitat.getDescripcio(),
 				entitat.getTipus(),
-				entitat.getCif(),
-				entitat.getDir3Codi()).build();
+				entitat.getDir3Codi()).
+				descripcio(entitat.getDescripcio()).
+				build();
 		return conversioTipusHelper.convertir(
 				entitatRepository.save(entity),
 				EntitatDto.class);
@@ -86,14 +85,13 @@ public class EntitatServiceImpl implements EntitatService {
 				entitat.getId(),
 				true,
 				true );
-		EntitatEntity entity = entitatRepository.findOne( entitat.getId() );
+		EntitatEntity entity = entitatRepository.findOne(entitat.getId());
 		entity.update(
 				entitat.getCodi(),
 				entitat.getNom(),
-				entitat.getDescripcio(),
 				entitat.getTipus(),
-				entitat.getCif(),
-				entitat.getDir3Codi());
+				entitat.getDir3Codi(),
+				entitat.getDescripcio());
 		return conversioTipusHelper.convertir(
 				entity,
 				EntitatDto.class);
@@ -104,55 +102,40 @@ public class EntitatServiceImpl implements EntitatService {
 	public EntitatDto updateActiva(
 			Long id,
 			boolean activa) {
-		
 		logger.debug("Actualitzant propietat activa d'una entitat existent ("
 				+ "id=" + id + ", "
 				+ "activa=" + activa + ")");
-		
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
-				false );
-		
-		EntitatEntity entitat = entitatRepository.findOne( id );
-		
+				false);
+		EntitatEntity entitat = entitatRepository.findOne(id);
 		entitat.updateActiva(activa);
-		
 		return conversioTipusHelper.convertir(
 				entitat,
 				EntitatDto.class);
 	}
-	
-	
-	
+
 	@Transactional
 	@Override
 	@CacheEvict(value = "entitatsUsuari", allEntries = true)
 	public EntitatDto delete(
 			Long id) {
-		
 		logger.debug("Esborrant entitat (id=" + id +  ")");
-		
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
-				false );
-		
+				false);
 		EntitatEntity entitat = entitatRepository.findOne( id );
-		
 		entitatRepository.delete(entitat);
-		
 		permisosHelper.deleteAcl(
 				entitat.getId(),
 				EntitatEntity.class);
-		
 		return conversioTipusHelper.convertir(
 				entitat,
 				EntitatDto.class);
 	}
-	
-	
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public EntitatDto findById(
@@ -166,7 +149,7 @@ public class EntitatServiceImpl implements EntitatService {
 				entitatRepository.findOne(id),
 				EntitatDto.class);
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public EntitatDto findByCodi(String codi) {
@@ -181,95 +164,50 @@ public class EntitatServiceImpl implements EntitatService {
 				entitat,
 				EntitatDto.class);
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
-	public EntitatDto findByCif(
-			String cif ) {
-		
-		logger.debug("Consulta de l'entitat (cif=" + cif + ")");
-		
-//		entityComprovarHelper.comprovarPermisos(
-//				id,
-//				true,
-//				true );
-		
+	public EntitatDto findByDir3codi(
+			String dir3codi) {
+		logger.debug("Consulta de l'entitat amb codi DIR3 (dir3codi=" + dir3codi + ")");
 		EntitatDto dto = conversioTipusHelper.convertir(
-				entitatRepository.findByCif( cif ),
+				entitatRepository.findByDir3Codi(dir3codi),
 				EntitatDto.class);
-		
 		return dto;
 	}
-	
+
 	@Transactional(readOnly = true)
-	@Override
-	public EntitatDto findByDir3(
-			String dir3 ) {
-		
-		logger.debug("Consulta de l'entitat (dir3=" + dir3 + ")");
-		
-//		entityComprovarHelper.comprovarPermisos(
-//				id,
-//				true,
-//				true );
-		
-		EntitatDto dto = conversioTipusHelper.convertir(
-				entitatRepository.findByDir3Codi( dir3 ),
-				EntitatDto.class);
-		
-		return dto;
-	}
-	
 	@Override
 	public List<EntitatDto> findAll() {
-		
+		logger.debug("Consulta de totes les entitats");
+		entityComprovarHelper.comprovarPermisos(
+				null,
+				true,
+				false);
 		return conversioTipusHelper.convertirList(
 					entitatRepository.findAll(),
-					EntitatDto.class
-				);
+					EntitatDto.class);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<EntitatDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		logger.debug("Consulta de totes les entitats paginades (paginacioParams=" + paginacioParams + ")");
-		
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
-				false );
-		
+				false);
 		PaginaDto<EntitatDto> resposta = paginacioHelper.toPaginaDto(
 					entitatRepository.findByFiltre(
 							paginacioParams.getFiltre(), 
-							paginacioHelper.toSpringDataPageable(paginacioParams)
-							),
+							paginacioHelper.toSpringDataPageable(paginacioParams)),
 					EntitatDto.class);
-		
-		for (EntitatDto e: resposta.getContingut()) {
-			List<PermisDto> permisos = permisosHelper.findPermisos(e.getId(), EntitatEntity.class);
-			e.setPermisos( permisos );
+		for (EntitatDto entitat: resposta.getContingut()) {
+			List<PermisDto> permisos = permisosHelper.findPermisos(
+					entitat.getId(),
+					EntitatEntity.class);
+			entitat.setPermisos(permisos);
 		}
-		
-		return resposta;
-	}
-	
-	@Override
-	public List<EntitatDto> findByEntitatId(Long entitatId) {
-		
-		entityComprovarHelper.comprovarPermisos(
-				entitatId,
-				false,
-				true );
-		
-		List<EntitatEntity> entitats = entitatRepository.findListById( entitatId );
-		List<EntitatDto> resposta = conversioTipusHelper.convertirList( entitats, EntitatDto.class );
-		
-		for (EntitatDto e: resposta) {
-			List<PermisDto> permisos = permisosHelper.findPermisos(e.getId(), EntitatEntity.class);
-			e.setPermisos( permisos );
-		}
-		
 		return resposta;
 	}
 
@@ -283,76 +221,60 @@ public class EntitatServiceImpl implements EntitatService {
 
 	@Transactional
 	@Override
-	public List<PermisDto> findPermis(
-			Long id) {
-		
-		logger.debug("Consulta com a administrador dels permisos de l'entitat (id=" + id + ")");
-		
+	public List<PermisDto> permisFindByEntitatId(
+			Long entitatId) {
+		logger.debug("Consulta dels permisos de l'entitat (entitatId=" + entitatId + ")");
 		entityComprovarHelper.comprovarPermisos(
-				id,
+				entitatId,
 				true,
-				true );
-		
+				true);
 		return permisosHelper.findPermisos(
-				id,
+				entitatId,
 				EntitatEntity.class);
 	}
-	
-	
-	
+
 	@Transactional
 	@Override
 	@CacheEvict(value = "entitatsUsuari", allEntries = true)
-	public void updatePermis(
-			Long id,
+	public void permisUpdate(
+			Long entitatId,
 			PermisDto permis) {
-		
-		logger.debug("Modificació com a superusuari del permis de l'entitat ("
-				+ "id=" + id + ", "
-				+ "permis=" + permis + ")");
-		
+		logger.debug("Modificació com a superusuari del permis de l'entitat (" +
+				"entitatId=" + entitatId + ", " +
+				"permis=" + permis + ")");
 		entityComprovarHelper.comprovarPermisos(
-				id,
+				entitatId,
 				true,
-				true );
-		
+				true);
 		permisosHelper.updatePermis(
-				id,
+				entitatId,
 				EntitatEntity.class,
 				permis);
 	}
-	
-	
-	
+
 	@Transactional
 	@Override
 	@CacheEvict(value = "entitatsUsuari", allEntries = true)
-	public void deletePermis(
-			Long id,
+	public void permisDelete(
+			Long entitatId,
 			Long permisId) {
-		
-		logger.debug("Eliminació com a superusuari del permis de l'entitat ("
-				+ "id=" + id + ", "
-				+ "permisId=" + permisId + ")");
-		
+		logger.debug("Eliminació com a superusuari del permis de l'entitat (" +
+				"entitatId=" + entitatId + ", " +
+				"permisId=" + permisId + ")");
 		entityComprovarHelper.comprovarPermisos(
-				id,
+				entitatId,
 				true,
 				true);
-		
 		permisosHelper.deletePermis(
-				id,
+				entitatId,
 				EntitatEntity.class,
 				permisId);
 	}
-	
-	
-	@Override
+
+	/*@Override
 	@Transactional
 	public Map<Long, List<PermisDto>> findPermisos(List<Long> entitatIds) {
-		
 		logger.debug("Consulta com a administrador dels permisos de les entitats (" + entitatIds.toString() + ")");
-		
 		for(Long id : entitatIds)
 			entityComprovarHelper.comprovarPermisos(
 					id,
@@ -362,7 +284,7 @@ public class EntitatServiceImpl implements EntitatService {
 		return permisosHelper.findPermisos(
 				entitatIds,
 				EntitatEntity.class);
-	}
+	}*/
 	
 	
 //	@Transactional
@@ -448,9 +370,6 @@ public class EntitatServiceImpl implements EntitatService {
 //				permisId);
 //	}
 
-
-
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
-	
 
 }

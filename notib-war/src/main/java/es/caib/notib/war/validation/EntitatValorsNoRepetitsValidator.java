@@ -46,14 +46,10 @@ public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<Ent
 			final ConstraintValidatorContext context) {
 		try {
 			final EntitatCommand entitatCommand = (EntitatCommand)value;
-			
 			final Long id = entitatCommand.getId();
 			final String codi = entitatCommand.getCodi();
-			final String cif = entitatCommand.getCif();
 			final String dir3 = entitatCommand.getDir3Codi();
-			
 			boolean valid = true;
-			
 			// Comprovar codi no repetit
 			EntitatDto entitat = entitatService.findByCodi(codi);
 			if (entitat != null) {
@@ -68,20 +64,7 @@ public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<Ent
 				}
 			}
 			// Comprovar cif no repetit
-			entitat = entitatService.findByCif(cif);
-			if (entitat != null) {
-				if (id == null) {
-					valid = false;
-				} else {
-					valid = id.equals(entitat.getId());
-				}
-				if (!valid) {
-					context.disableDefaultConstraintViolation();
-					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entitat.validation.cif.repetit")).addNode("cif").addConstraintViolation();
-				}
-			}
-			// Comprovar cif no repetit
-			entitat = entitatService.findByDir3(dir3);
+			entitat = entitatService.findByDir3codi(dir3);
 			if (entitat != null) {
 				if (id == null) {
 					valid = false;
@@ -93,10 +76,8 @@ public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<Ent
 					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entitat.validation.dir3.repetit")).addNode("dir3Codi").addConstraintViolation();
 				}
 			}
-			
 			return valid;
-			
-        } catch (final Exception ex) {
+        } catch (Exception ex) {
         	LOGGER.error("Error al validar si el codi d'entitat és únic", ex);
         	MissatgesHelper.error(request, "Error inesperat en la validació de les dades de l'entitat.");
         }

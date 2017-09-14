@@ -8,8 +8,6 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import es.caib.notib.core.api.dto.NotificacioSeuEstatEnumDto;
-
 /**
  * Informació d'un destinatari d'una anotació.
  * 
@@ -65,7 +63,7 @@ public class NotificacioDestinatari {
 	private String notificaIdentificador;//
 	private String seuRegistreNumero;
 	private Date seuRegistreData;
-	private NotificacioSeuEstatEnumDto seuEstat;
+	private NotificacioDestinatariEstatEnum estat;
 	
 	
 	public NotificacioDestinatari() {}
@@ -118,8 +116,7 @@ public class NotificacioDestinatari {
 			String notificaIdentificador,
 			String seuRegistreNumero, 
 			Date seuRegistreData,
-			NotificacioSeuEstatEnumDto seuEstat) {
-		
+			NotificacioDestinatariEstatEnum estat) {
 		super();
 		this.referencia = referencia;
 		this.titularNom = titularNom;
@@ -168,16 +165,16 @@ public class NotificacioDestinatari {
 		this.notificaIdentificador = notificaIdentificador;
 		this.seuRegistreNumero = seuRegistreNumero;
 		this.seuRegistreData = seuRegistreData;
-		this.seuEstat = seuEstat;
+		this.estat = estat;
 	}
 	
 	
 	
-	public NotificacioSeuEstatEnumDto getSeuEstat() {
-		return seuEstat;
+	public NotificacioDestinatariEstatEnum getEstat() {
+		return estat;
 	}
-	public void setSeuEstat(NotificacioSeuEstatEnumDto seuEstat) {
-		this.seuEstat = seuEstat;
+	public void setEstat(NotificacioDestinatariEstatEnum estat) {
+		this.estat = estat;
 	}
 	public String getReferencia() {
 		return referencia;

@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
-import es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum;
+import es.caib.notib.core.api.ws.notificacio.NotificacioDestinatariEstatEnum;
 
 
 /**
@@ -17,28 +17,23 @@ import es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum;
 @XmlRootElement
 @JsonAutoDetect
 public class NotificacioEstatClient {
-	
-	
-	private NotificacioEstatEnum estat;
+
+	private NotificacioDestinatariEstatEnum estat;
 	private Date data;
 	private String receptorNom;
 	private String receptorNif;
 	private String origen;
 	private String numSeguiment;
 	private String referenciaEnviament;
-	
-	
-	public NotificacioEstatClient() {}
 
 	public NotificacioEstatClient(
-			NotificacioEstatEnum estat,
+			NotificacioDestinatariEstatEnum estat,
 			Date data,
 			String receptorNom,
 			String receptorNif,
 			String origen,
 			String numSeguiment,
 			String referenciaEnviament) {
-		
 		super();
 		this.estat = estat;
 		this.data = data;
@@ -48,10 +43,10 @@ public class NotificacioEstatClient {
 		this.numSeguiment = numSeguiment;
 		this.referenciaEnviament = referenciaEnviament;
 	}
-	public NotificacioEstatEnum getEstat() {
+	public NotificacioDestinatariEstatEnum getEstat() {
 		return estat;
 	}
-	public void setEstat(NotificacioEstatEnum estat) {
+	public void setEstat(NotificacioDestinatariEstatEnum estat) {
 		this.estat = estat;
 	}
 	public Date getData() {
@@ -90,4 +85,5 @@ public class NotificacioEstatClient {
 	public void setReferenciaEnviament(String referenciaEnviament) {
 		this.referenciaEnviament = referenciaEnviament;
 	}
+
 }

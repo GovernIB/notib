@@ -1,6 +1,6 @@
 package es.caib.notib.plugin.registre.sortida;
 
-public interface RegistrePluginRegweb3 {
+public interface RegistrePlugin {
 	
 	public RespostaAnotacioRegistre registrarSortida(
 			RegistreAssentament registreSortida)

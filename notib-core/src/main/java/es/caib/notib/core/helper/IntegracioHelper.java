@@ -150,7 +150,7 @@ public class IntegracioHelper {
 
 
 
-	private LinkedList<IntegracioAccioDto> getLlistaAccions(
+	private synchronized LinkedList<IntegracioAccioDto> getLlistaAccions(
 			String integracioCodi) {
 		LinkedList<IntegracioAccioDto> accions = accionsIntegracio.get(integracioCodi);
 		if (accions == null) {
@@ -218,7 +218,5 @@ public class IntegracioHelper {
 		}
 		return integracio;
 	}
-
-	//private static final Logger logger = LoggerFactory.getLogger(IntegracioHelper.class);
 
 }
