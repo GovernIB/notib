@@ -415,16 +415,35 @@ public class NotificacioDestinatariDto extends AuditoriaDto {
 		this.seuEstat = seuEstat;
 	}
 
+	public String getTitularLlinatges() {
+		return concatenarLlinatges(
+				titularLlinatge1,
+				titularLlinatge2);
+	}
+	public String getTitular() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(titularNom);
+		String llinatges = getTitularLlinatges();
+		if (llinatges != null && !llinatges.isEmpty()) {
+			sb.append(llinatges);
+		}
+		sb.append(" (");
+		sb.append(destinatariNif);
+		sb.append(")");
+		return sb.toString();
+	}
+
+	public String getDestinatariLlinatges() {
+		return concatenarLlinatges(
+				destinatariLlinatge1,
+				destinatariLlinatge2);
+	}
 	public String getDestinatari() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(destinatariNom);
-		if (destinatariLlinatge1 != null && !destinatariLlinatge1.isEmpty()) {
-			sb.append(" ");
-			sb.append(destinatariLlinatge1);
-		}
-		if (destinatariLlinatge2 != null && !destinatariLlinatge2.isEmpty()) {
-			sb.append(" ");
-			sb.append(destinatariLlinatge2);
+		String llinatges = getDestinatariLlinatges();
+		if (llinatges != null && !llinatges.isEmpty()) {
+			sb.append(llinatges);
 		}
 		sb.append(" (");
 		sb.append(destinatariNif);
@@ -435,6 +454,23 @@ public class NotificacioDestinatariDto extends AuditoriaDto {
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
+	}
+
+
+
+	private String concatenarLlinatges(
+			String llinatge1,
+			String llinatge2) {
+		if (llinatge1 == null && llinatge2 == null) {
+			return null;
+		}
+		StringBuilder sb = new StringBuilder();
+		sb.append(llinatge1);
+		if (llinatge2 != null && !llinatge2.isEmpty()) {
+			sb.append(" ");
+			sb.append(llinatge2);
+		}
+		return sb.toString();
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;

@@ -49,7 +49,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"            from ne.destinataris d " +
 			"            where " +
 			"               lower(d.destinatariNom) like concat('%', lower(:destinatari), '%') " +
-			"            or lower(d.destinatariLlinatges) like concat('%', lower(:destinatari), '%') " +
+			"            or lower(concat(d.destinatariLlinatge1, ' ', d.destinatariLlinatge2)) like concat('%', lower(:destinatari), '%') " +
 			"            or lower(d.destinatariNif) like concat('%', lower(:destinatari), '%') " +
 			"        ) > 0) "
 		  )

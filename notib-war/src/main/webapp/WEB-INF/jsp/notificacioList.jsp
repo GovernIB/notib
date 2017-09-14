@@ -44,14 +44,16 @@ enviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
 	        	$(td).append(
 	        			'<table class="table teble-striped table-bordered"><thead>' +
 	        			'<tr>' +
-	        				'<th><spring:message code="notificacio.list.enviament.list.destinatari"/></th>' + 
-	        				'<th><spring:message code="notificacio.list.enviament.list.estat"/></th>' +
-	        				'<th></th>' + 
+        				'<th><spring:message code="notificacio.list.enviament.list.titular"/></th>' + 
+	        			'<th><spring:message code="notificacio.list.enviament.list.destinatari"/></th>' + 
+	        			'<th><spring:message code="notificacio.list.enviament.list.estat"/></th>' +
+	        			'<th></th>' + 
 	        			'</tr>' +
 						'</thead><tbody></tbody></table>');
 	        	contingutTbody = '';
 				for (i = 0; i < data.length; i++) {
 					contingutTbody += '<tr>';
+					contingutTbody += '<td>' + data[i].titular + '</td>';
 					contingutTbody += '<td>' + data[i].destinatari + '</td>';
 					contingutTbody += '<td>' + ((data[i].estat) ? enviamentEstats[data[i].estat] : '') + '</td>';
 					contingutTbody += '<td width="10%">';
