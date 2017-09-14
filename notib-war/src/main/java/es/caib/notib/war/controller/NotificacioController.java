@@ -29,6 +29,7 @@ import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
+import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.service.EntitatService;
@@ -125,6 +126,11 @@ public class NotificacioController extends BaseController {
 			Model model,
 			@PathVariable Long notificacioId) {
 		model.addAttribute("notificacioId", notificacioId);
+		model.addAttribute(
+				"eventTipus",
+				EnumHelper.getOptionsForEnum(
+						NotificacioEventTipusEnumDto.class,
+						"es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
 		return "notificacioEvents";
 	}
 	@RequestMapping(value = "/{notificacioId}/event/datatable", method = RequestMethod.GET)
@@ -155,6 +161,53 @@ public class NotificacioController extends BaseController {
 				fitxer.getNom(),
 				fitxer.getContingut(),
 				response);
+	}
+
+	@RequestMapping(value = "/{notificacioId}/enviar", method = RequestMethod.GET)
+	public String enviar(
+			HttpServletRequest request,
+			@PathVariable Long notificacioId) {
+		notificacioService.enviar(notificacioId);
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:../../notificacio",
+				"notificacio.controller.enviament.ok");
+	}
+
+	@RequestMapping(value = "/{notificacioId}/enviament/{referencia}/consultarInfo", method = RequestMethod.GET)
+	public String consultarInfo(
+			HttpServletRequest request,
+			@PathVariable Long notificacioId,
+			@PathVariable String referencia,
+			Model model) {
+		model.addAttribute(
+				"notificacioInfo",
+				notificacioService.consultarInformacio(referencia));
+		return "enviamentConsultarInfo";
+	}
+
+	@RequestMapping(value = "/{notificacioId}/enviament/{referencia}/consultarEstat", method = RequestMethod.GET)
+	public String consultarEstat(
+			HttpServletRequest request,
+			@PathVariable Long notificacioId,
+			@PathVariable String referencia,
+			Model model) {
+		model.addAttribute(
+				"notificacioEstat",
+				notificacioService.consultarEstat(referencia));
+		return "enviamentConsultarEstat";
+	}
+
+	@RequestMapping(value = "/{notificacioId}/enviament/{referencia}/consultarDatat", method = RequestMethod.GET)
+	public String consultarDatat(
+			HttpServletRequest request,
+			@PathVariable Long notificacioId,
+			@PathVariable String referencia,
+			Model model) {
+		model.addAttribute(
+				"notificacioDatat",
+				notificacioService.consultarDatat(referencia));
+		return "enviamentConsultarDatat";
 	}
 
 	@RequestMapping(value = "/{notificacioId}/enviament", method = RequestMethod.GET)
@@ -188,6 +241,11 @@ public class NotificacioController extends BaseController {
 			@PathVariable Long enviamentId) {
 		model.addAttribute("notificacioId", notificacioId);
 		model.addAttribute("enviamentId", enviamentId);
+		model.addAttribute(
+				"eventTipus",
+				EnumHelper.getOptionsForEnum(
+						NotificacioEventTipusEnumDto.class,
+						"es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
 		return "enviamentEvents";
 	}
 	@RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/event/datatable", method = RequestMethod.GET)

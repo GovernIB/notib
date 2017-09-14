@@ -89,6 +89,9 @@ public class RolHelper {
 		if (request.isUserInRole(ROLE_ADMIN)) {
 			rols.add(ROLE_ADMIN);
 		}
+		if (request.isUserInRole(ROLE_APLICACIO)) {
+			rols.add(ROLE_APLICACIO);
+		}
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		if (entitatActual != null) {
 			if (entitatActual.isUsuariActualRepresentant() && request.isUserInRole(ROLE_REPRESENTANT))

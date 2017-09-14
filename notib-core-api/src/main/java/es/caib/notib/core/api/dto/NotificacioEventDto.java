@@ -20,9 +20,8 @@ public class NotificacioEventDto extends AuditoriaDto {
 	private String descripcio;
 	private boolean error;
 	private String errorDescripcio;
-	
+
 	private NotificacioDto notificacio;
-	
 	private NotificacioDestinatariDto destinatari;
 
 	public Long getId() {
@@ -61,19 +60,21 @@ public class NotificacioEventDto extends AuditoriaDto {
 	public void setErrorDescripcio(String errorDescripcio) {
 		this.errorDescripcio = errorDescripcio;
 	}
-	
 	public NotificacioDto getNotificacio() {
 		return notificacio;
 	}
 	public void setNotificacio(NotificacioDto notificacio) {
 		this.notificacio = notificacio;
 	}
-	
 	public NotificacioDestinatariDto getDestinatari() {
 		return destinatari;
 	}
 	public void setDestinatari(NotificacioDestinatariDto destinatari) {
 		this.destinatari = destinatari;
+	}
+
+	public boolean isDestinatariAssociat() {
+		return this.destinatari != null;
 	}
 
 	@Override

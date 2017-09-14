@@ -39,7 +39,6 @@ import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioDestinatariEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.EntitatRepository;
@@ -70,8 +69,6 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 	private NotificacioDestinatariRepository notificacioDestinatariRepository;
 
 	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
 	private NotificaHelper notificaHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
@@ -83,7 +80,6 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 	public List<String> alta(Notificacio notificacio) {
 		try {
 			EntitatEntity entitat = entitatRepository.findByDir3Codi(notificacio.getCifEntitat());
-			entityComprovarHelper.comprovarPermisosAplicacio(entitat.getId());
 			String documentGesdocId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 					new ByteArrayInputStream(
@@ -209,7 +205,6 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 						"ref:" + referencia,
 						NotificacioDestinatariEntity.class);
 			}
-			entityComprovarHelper.comprovarPermisosAplicacio(notificacio.getEntitat().getId());
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			pluginHelper.gestioDocumentalGet(
 					notificacio.getDocumentArxiuId(),
@@ -357,7 +352,6 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 						"ref:" + referencia,
 						NotificacioDestinatariEntity.class);
 			}
-			entityComprovarHelper.comprovarPermisosAplicacio(notificacio.getEntitat().getId());
 			NotificacioDestinatariEntity destinatari = notificacioDestinatariRepository.findByNotificacioAndReferencia(
 					notificacio,
 					referencia);
@@ -440,7 +434,6 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 						"ref:" + referencia,
 						NotificacioDestinatariEntity.class);
 			}
-			entityComprovarHelper.comprovarPermisosAplicacio(destinatari.getNotificacio().getEntitat().getId());
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			pluginHelper.gestioDocumentalGet(
 					destinatari.getNotificaCertificacioArxiuId(),

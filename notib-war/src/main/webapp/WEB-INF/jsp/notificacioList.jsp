@@ -48,39 +48,42 @@ enviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
 	        				'<th><spring:message code="notificacio.list.enviament.list.estat"/></th>' +
 	        				'<th></th>' + 
 	        			'</tr>' +
-						'</thead><tbody></tbody></table>'
-	        	);
-	        	$table = '';
+						'</thead><tbody></tbody></table>');
+	        	contingutTbody = '';
 				for (i = 0; i < data.length; i++) {
-					$table = $table + '<tr>';
-					$table = $table + '<td>' + data[i].destinatari + '</td>';
-					$table = $table + '<td>' + ((data[i].estat) ? enviamentEstats[data[i].estat] : '') + '</td>';
-					$table = $table + '<td width="10%">';
-					$table = $table + '<div class="dropdown">';
-					$table = $table + '<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>';
-					$table = $table + '<ul class="dropdown-menu">';
-					$table = $table + '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/info"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>';
-					$table = $table + '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/event"/>" data-toggle="modal"><span class="fa fa-calendar-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.enviament.list.boto.events"/></a></li>';
-					$table = $table + '</ul>';
-					$table = $table + '</div>';
-					$table = $table + '</td>';
-					$table = $table + '</tr>';
+					contingutTbody += '<tr>';
+					contingutTbody += '<td>' + data[i].destinatari + '</td>';
+					contingutTbody += '<td>' + ((data[i].estat) ? enviamentEstats[data[i].estat] : '') + '</td>';
+					contingutTbody += '<td width="10%">';
+					contingutTbody += '<div class="dropdown">';
+					contingutTbody += '<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>';
+					contingutTbody += '<ul class="dropdown-menu">';
+					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/info"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>';
+					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/event"/>" data-toggle="modal"><span class="fa fa-calendar-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.enviament.list.accio.events"/></a></li>';
+					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].referencia + '/consultarInfo"/>" data-toggle="modal"><span class="fa fa-share-square-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.enviament.list.accio.consultar.info"/></a></li>';
+					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].referencia + '/consultarEstat"/>" data-toggle="modal"><span class="fa fa-share-square-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.enviament.list.accio.consultar.estat"/></a></li>';
+					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].referencia + '/consultarDatat"/>" data-toggle="modal"><span class="fa fa-share-square-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.enviament.list.accio.consultar.datat"/></a></li>';
+					contingutTbody += '</ul>';
+					contingutTbody += '</div>';
+					contingutTbody += '</td>';
+					contingutTbody += '</tr>';
 				}
-				$('table tbody', td).append($table);
+				$('table tbody', td).append(contingutTbody);
 				$('table tbody td').webutilModalEval();
 			});
 		});
 		$('#btnNetejar').click(function() {
-				$(':input', $('#filtre')).each (function() {
-					var type = this.type, tag = this.tagName.toLowerCase();
-				if (type == 'text' || type == 'password' || tag == 'textarea')
+			$(':input', $('#filtre')).each (function() {
+				var type = this.type, tag = this.tagName.toLowerCase();
+				if (type == 'text' || type == 'password' || tag == 'textarea') {
 					this.value = '';
-				else if (type == 'checkbox' || type == 'radio')
-						this.checked = false;
-				else if (tag == 'select')
-						this.selectedIndex = 0;
+				} else if (type == 'checkbox' || type == 'radio') {
+					this.checked = false;
+				} else if (tag == 'select') {
+					this.selectedIndex = 0;
+				}
 			});
-				$('#form-filtre').submit();
+			$('#form-filtre').submit();
 		});
 	});
 </script>
@@ -153,8 +156,11 @@ enviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="<c:url value="/notificacio/{{:id}}"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
-								<li><a href="<c:url value="/notificacio/{{:id}}/event"/>" data-toggle="modal"><span class="fa fa-calendar-o"></span>&nbsp;<spring:message code="notificacio.list.boto.events"/></a></li>								
-								<li><a href="<c:url value="/notificacio/{{:id}}/document"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="notificacio.list.boto.descarregar.document"/></a></li>
+								<li><a href="<c:url value="/notificacio/{{:id}}/event"/>" data-toggle="modal"><span class="fa fa-calendar-o"></span>&nbsp;<spring:message code="notificacio.list.accio.events"/></a></li>
+								{{if estat == 'PENDENT'}}
+									<li><a href="<c:url value="/notificacio/{{:id}}/enviar"/>"><span class="fa fa-share-square-o"></span>&nbsp;<spring:message code="notificacio.list.accio.enviar"/></a></li>
+								{{/if}}
+								<li><a href="<c:url value="/notificacio/{{:id}}/document"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="notificacio.list.accio.descarregar.document"/></a></li>
 							</ul>
 						</div>
 					</script>

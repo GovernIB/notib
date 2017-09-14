@@ -75,6 +75,7 @@ import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
+import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.entity.NotificacioDestinatariEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
@@ -140,6 +141,12 @@ public class NotificaHelper {
 	public void enviament(
 			Long notificacioId) {
 		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
+		if (!NotificacioEstatEnumDto.PENDENT.equals(notificacio.getEstat())) {
+			throw new ValidationException(
+					notificacioId,
+					NotificacioEntity.class,
+					"La notificació no te l'estat " + NotificacioEstatEnumDto.PENDENT);
+		}
 		try {
 			TipoEnvio tipoEnvio = generarTipoEnvio(notificacio);
 			ResultadoAlta resultadoAlta = getNotificaWs().altaEnvio(tipoEnvio);
@@ -201,7 +208,7 @@ public class NotificaHelper {
 		}
 	}
 
-	public NotificacioDto detallsEnviament(
+	public NotificacioDto enviamentInfo(
 			NotificacioDestinatariEntity destinatari) throws SistemaExternException {
 		NotificacioEntity notificacio = destinatari.getNotificacio();
 		String errorPrefix = "Error al consultar els detalls d'un enviament fet amb Notifica (" +
@@ -251,7 +258,7 @@ public class NotificaHelper {
 		}
 	}
 
-	public NotificaRespostaEstatDto consultarEstatEnviament(
+	public NotificaRespostaEstatDto enviamentEstat(
 			NotificacioDestinatariEntity destinatari) throws SistemaExternException {
 		NotificacioEntity notificacio = destinatari.getNotificacio();
 		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb Notifica (" +
@@ -307,7 +314,7 @@ public class NotificaHelper {
 		}
 	}
 
-	public NotificaRespostaDatatDto consultarDatatEnviament(
+	public NotificaRespostaDatatDto enviamentDatat(
 			NotificacioDestinatariEntity destinatari) {
 		NotificacioEntity notificacio = destinatari.getNotificacio();
 		String errorPrefix = "Error al consultar el datat d'un enviament fet amb Notifica (" +
@@ -391,7 +398,7 @@ public class NotificaHelper {
 		}
 	}
 
-	public NotificaRespostaCertificacioDto consultarCertificacio(
+	public NotificaRespostaCertificacioDto enviamentCertificacio(
 			NotificacioDestinatariEntity destinatari) {
 		NotificacioEntity notificacio = destinatari.getNotificacio();
 		String errorPrefix = "Error al consultar la certificació d'un enviament fet amb Notifica (" +

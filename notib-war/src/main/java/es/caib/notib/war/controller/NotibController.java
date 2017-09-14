@@ -39,6 +39,8 @@ public class NotibController {
 			HttpServletRequest request) {
 		if (RolHelper.isUsuariActualAdministrador(request)) {
 			return "redirect:notificacio";
+		} else if (RolHelper.isUsuariActualAplicacio(request)) {
+			return "redirect:api/apidoc";
 		} else {
 			EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 			if (entitat == null)

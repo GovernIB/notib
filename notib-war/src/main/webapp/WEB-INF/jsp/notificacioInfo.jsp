@@ -50,7 +50,7 @@
 			<td width="30%"><strong><spring:message code="notificacio.info.document.arxiu.nom"/></strong></td>
 			<td>
 				${notificacio.documentArxiuNom}
-				<a href="<c:url value="/modal/notificacio/${notificacio.id}/document"/>" class="btn btn-default pull-right" title="<spring:message code="notificacio.info.document.descarregar"/>"><span class="fa fa-download"></span></a>
+				<a href="<c:url value="/modal/notificacio/${notificacio.id}/document"/>" class="btn btn-default btn-sm pull-right" title="<spring:message code="notificacio.info.document.descarregar"/>"><span class="fa fa-download"></span></a>
 			</td>
 		</tr>
 		<tr>

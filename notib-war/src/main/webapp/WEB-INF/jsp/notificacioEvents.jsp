@@ -5,6 +5,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+
 <html>
 <head>
 	<title><spring:message code="notificacio.event.list.titol" arguments="${servei.descripcio}"/></title>
@@ -24,6 +25,10 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<not:modalHead/>
 <script type="text/javascript">
+var eventTipus = [];
+<c:forEach var="tipus" items="${eventTipus}">
+eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
+</c:forEach>
 	$(document).ready(function() {
 		$('#events').on('draw.dt', function () {
 			webutilModalAdjustHeight();
@@ -37,23 +42,34 @@
 		data-toggle="datatable"
 		data-url="<c:url value="/notificacio/${notificacioId}/event"/>"
 		data-search-enabled="false"
-		data-default-dir="asc"
 		data-paging="false"
 		data-info="false"
 		class="table table-striped table-bordered"
 		style="width:100%">
 		<thead>
 			<tr>
-				<th data-col-name="id" data-visible="false" width="4%">#</th>
-				<th data-col-name="tipus" data-orderable="false"><spring:message code="notificacio.event.list.columna.tipus"/></th>
-				<th data-col-name="data" data-converter="date" data-orderable="false"><spring:message code="notificacio.event.list.columna.data"/></th>
-				<th data-col-name="error" data-template="#cellError" data-orderable="false">
-					<spring:message code="notificacio.event.list.columna.error"/>
-					<script id="cellError" type="text/x-jsrender">
-						{{if error}}<span class="fa fa-check"></span>{{/if}}
+				<th data-col-name="id" data-visible="false">#</th>
+				<th data-col-name="destinatariAssociat" data-visible="false"></th>
+				<th data-col-name="errorDescripcio" data-visible="false"></th>
+				<th data-col-name="data" data-converter="datetime" data-orderable="false"><spring:message code="notificacio.event.list.columna.data"/></th>
+				<th data-col-name="tipus" data-template="#cellTipus" data-orderable="false">
+					<spring:message code="notificacio.event.list.columna.tipus"/>
+					<script id="cellTipus" type="text/x-jsrender">
+						{{:~eval('eventTipus["' + tipus + '"]')}}
+						{{if destinatariAssociat}}<span class="label label-default pull-right" title="<spring:message code="notificacio.event.list.info.associat"/>">E</span>{{/if}}
 					</script>
 				</th>
 				<th data-col-name="descripcio" data-orderable="false"><spring:message code="notificacio.event.list.columna.descripcio"/></th>
+				<th data-col-name="error" data-template="#cellResultat" data-orderable="false">
+					<spring:message code="notificacio.event.list.columna.resultat"/>
+					<script id="cellResultat" type="text/x-jsrender">
+						{{if error}}
+							<span class="fa fa-warning text-danger" title="{{:errorDescripcio}}"></span>
+						{{else}}
+							<span class="fa fa-check text-success"></span>
+						{{/if}}
+					</script>
+				</th>
 			</tr>
 		</thead>
 	</table>

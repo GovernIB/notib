@@ -16,6 +16,8 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaRespostaDatatDto;
+import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
@@ -78,16 +80,6 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.findByEntitatIFiltrePaginat(
 				entitatId,
 				filtre,
-				paginacioParams);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public PaginaDto<NotificacioDestinatariDto> destinatariFindByNotificacioPaginat(
-			Long notificacioId,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.destinatariFindByNotificacioPaginat(
-				notificacioId,
 				paginacioParams);
 	}
 
@@ -180,6 +172,29 @@ public class NotificacioServiceBean implements NotificacioService {
 				notificaCertificacioArxiuId,
 				notificaCertificacioNumSeguiment,
 				notificaCertificacioDataActualitzacio);
+	}
+
+	public void enviar(
+			Long notificacioId) {
+		delegate.enviar(notificacioId);
+	}
+
+	@Override
+	public NotificacioDto consultarInformacio(
+			String referencia) {
+		return delegate.consultarInformacio(referencia);
+	}
+
+	@Override
+	public NotificaRespostaEstatDto consultarEstat(
+			String referencia) {
+		return delegate.consultarEstat(referencia);
+	}
+
+	@Override
+	public NotificaRespostaDatatDto consultarDatat(
+			String referencia) {
+		return delegate.consultarDatat(referencia);
 	}
 
 	@Override

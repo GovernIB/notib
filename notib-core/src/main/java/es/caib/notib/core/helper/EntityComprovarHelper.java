@@ -11,9 +11,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.PermissionDeniedException;
 import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.NotificacioDestinatariEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 
 
@@ -27,6 +31,8 @@ public class EntityComprovarHelper {
 
 	@Resource
 	private EntitatRepository entitatRepository;
+	@Resource
+	private NotificacioRepository notificacioRepository;
 
 	@Resource
 	private PermisosHelper permisosHelper;
@@ -75,151 +81,49 @@ public class EntityComprovarHelper {
 		}
 	}
 
-	public void comprovarPermisosAplicacio(
-			Long entitatId) {
+	public EntitatEntity comprovarEntitatAplicacio(
+			String dir3Codi) {
+		EntitatEntity entitat = entitatRepository.findByDir3Codi(dir3Codi);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		boolean esUsuariAplicacio = false;
-		for (GrantedAuthority ga: auth.getAuthorities()) {
-			if( ga.toString().equals("NOT_APL") ) {
-				esUsuariAplicacio = true;
-				break;
-			}
-		}
-		if (!esUsuariAplicacio) {
+		if (!permisosHelper.isGrantedAll(
+				entitat.getId(),
+				EntitatEntity.class,
+				new Permission[] {ExtendedPermission.APLICACIO},
+				auth)) {
 			throw new PermissionDeniedException(
-					new Long(-1),
+					entitat.getId(),
 					EntitatEntity.class,
 					auth.getName(),
-					"APLICATION");
+					"APLICACIO");
 			
 		}
+		return entitat;
 	}
 
-//	public EntitatEntity comprovarEntitatAdmin(
-//			Long entitatId) throws NotFoundException {
-//		
-//		EntitatEntity entitat = entitatRepository.findOne(entitatId);
-//		
-//		if (entitat == null) {
-//			throw new NotFoundException(
-//					entitatId,
-//					EntitatEntity.class);
-//		}
-//		
-//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//		
-//		boolean esAdministradorEntitat = false;
-//		for(GrantedAuthority ga: auth.getAuthorities()) {
-//			if( ga.toString().equals("NOT_ADMIN") ) {
-//				esAdministradorEntitat = true;
-//				break;
-//			}
-//		}
-//		
-//		if (!esAdministradorEntitat) {
-//			throw new PermissionDeniedException(
-//					entitatId,
-//					EntitatEntity.class,
-//					auth.getName(),
-//					"ADMINISTRATION");
-//		}
-//		
-//		return entitat;
-//		
-//	}
-//	
-//	public EntitatEntity comprovarEntitatRep(
-//			Long entitatId) throws NotFoundException {
-//		
-//		EntitatEntity entitat = entitatRepository.findOne(entitatId);
-//		
-//		if (entitat == null) {
-//			throw new NotFoundException(
-//					entitatId,
-//					EntitatEntity.class);
-//		}
-//		
-//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//		
-//		boolean esRepresentantEntitat = permisosHelper.isGrantedAll(
-//				entitatId,
-//				EntitatEntity.class,
-//				new Permission[] {ExtendedPermission.REPRESENTANT},
-//				auth);
-//		if (!esRepresentantEntitat) {
-//			throw new PermissionDeniedException(
-//					entitatId,
-//					EntitatEntity.class,
-//					auth.getName(),
-//					"REPRESENTANT");
-//		}
-//		
-//		return entitat;
-//	}
-//	
-//	
-//	
-//	public EntitatUsuariEntity comprovarEntitatUsuariAdmin(
-//			Long entitatUsuariId ) throws NotFoundException {
-//		
-//		EntitatUsuariEntity entitatUsuari = entitatUsuariRepository.findOne(entitatUsuariId);
-//		
-//		if (entitatUsuari == null) {
-//			throw new NotFoundException(
-//					entitatUsuariId,
-//					EntitatUsuariEntity.class);
-//		}
-//		
-//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//		
-//		boolean esAdministrador = false;
-//		for(GrantedAuthority ga: auth.getAuthorities()) {
-//			if( ga.toString().equals("NOT_ADMIN") ) {
-//				esAdministrador = true;
-//				break;
-//			}
-//		}
-//		
-//		if (!esAdministrador) {
-//			throw new PermissionDeniedException(
-//					entitatUsuari.getEntitat().getId(),
-//					EntitatEntity.class,
-//					auth.getName(),
-//					"ADMINISTRATION");
-//		}
-//		
-//		return entitatUsuari;
-//		
-//	}
-//	
-//	public EntitatUsuariEntity comprovarEntitatUsuariRep(
-//			Long entitatUsuariId ) throws NotFoundException {
-//		
-//		EntitatUsuariEntity entitatUsuari = entitatUsuariRepository.findOne(entitatUsuariId);
-//		
-//		if (entitatUsuari == null) {
-//			throw new NotFoundException(
-//					entitatUsuariId,
-//					EntitatUsuariEntity.class);
-//		}
-//		
-//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//		
-//		boolean esRepresentant = permisosHelper.isGrantedAll(
-//				entitatUsuari.getEntitat().getId(),
-//				EntitatEntity.class,
-//				new Permission[] {ExtendedPermission.REPRESENTANT},
-//				auth);
-//		if (!esRepresentant) {
-//			throw new PermissionDeniedException(
-//					entitatUsuari.getEntitat().getId(),
-//					EntitatEntity.class,
-//					auth.getName(),
-//					"REPRESENTANT");
-//		}
-//		
-//		return entitatUsuari;
-//	}
-
+	public NotificacioEntity comprovarNotificacioAplicacio(
+			String referencia) {
+		NotificacioEntity notificacio = notificacioRepository.findByDestinatariReferencia(
+				referencia);
+		if (notificacio == null) {
+			throw new NotFoundException(
+					"ref:" + referencia,
+					NotificacioDestinatariEntity.class);
+		}
+		EntitatEntity entitat = notificacio.getEntitat();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (!permisosHelper.isGrantedAll(
+				entitat.getId(),
+				EntitatEntity.class,
+				new Permission[] {ExtendedPermission.APLICACIO},
+				auth)) {
+			throw new PermissionDeniedException(
+					entitat.getId(),
+					EntitatEntity.class,
+					auth.getName(),
+					"APLICACIO");
+			
+		}
+		return notificacio;
+	}
 
 }

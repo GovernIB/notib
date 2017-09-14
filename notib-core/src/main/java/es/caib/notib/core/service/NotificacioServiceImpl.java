@@ -26,6 +26,8 @@ import com.sun.jersey.core.util.Base64;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaRespostaDatatDto;
+import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
@@ -34,7 +36,6 @@ import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.ws.notificacio2.ErrorOrigenEnum;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -48,7 +49,6 @@ import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.helper.SeuHelper;
-import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioDestinatariRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
@@ -61,8 +61,6 @@ import es.caib.notib.core.repository.NotificacioRepository;
 @Service
 public class NotificacioServiceImpl implements NotificacioService {
 
-	@Autowired
-	private EntitatRepository entitatRepository;
 	@Autowired
 	private NotificacioRepository notificacioRepository;
 	@Autowired
@@ -97,8 +95,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 				"entitatDir3Codi=" + entitatDir3Codi + ", " +
 				"tipus=" + notificacio.getEnviamentTipus() + ", " +
 				"concepte=" + notificacio.getConcepte() + ")");
-		EntitatEntity entitat = entitatRepository.findByDir3Codi(entitatDir3Codi);
-		entityComprovarHelper.comprovarPermisosAplicacio(entitat.getId());
+		String dir3Codi = (entitatDir3Codi != null) ? entitatDir3Codi : notificacio.getCifEntitat();
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatAplicacio(dir3Codi);
 		String documentGesdocId = pluginHelper.gestioDocumentalCreate(
 				PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 				new ByteArrayInputStream(
@@ -207,9 +205,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				notificacioEntity,
 				NotificacioDto.class);
 		dto.setDestinataris(
-				conversioTipusHelper.convertirList(
-						notificacioEntity.getDestinataris(),
-						NotificacioDestinatariDto.class));
+				destinatarisToDto(notificacioEntity.getDestinataris()));
 		return dto;
 	}
 
@@ -218,14 +214,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public NotificacioDto consulta(
 			String referencia) {
 		logger.debug("Consulta l'estat d'un enviament (referencia=" + referencia + ")");
-		NotificacioEntity notificacio = notificacioRepository.findByDestinatariReferencia(
+		NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacioAplicacio(
 				referencia);
-		if (notificacio == null) {
-			throw new NotFoundException(
-					"ref:" + referencia,
-					NotificacioDestinatariEntity.class);
-		}
-		entityComprovarHelper.comprovarPermisosAplicacio(notificacio.getEntitat().getId());
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		pluginHelper.gestioDocumentalGet(
 				notificacio.getDocumentArxiuId(),
@@ -237,14 +227,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 		NotificacioDestinatariEntity destinatari = notificacioDestinatariRepository.findByNotificacioAndReferencia(
 				notificacio,
 				referencia);
-		NotificacioDestinatariDto destinatariDto = conversioTipusHelper.convertir(
-				destinatari,
-				NotificacioDestinatariDto.class);
-		if (destinatariDto != null) {
-			destinatariDto.setEstat(
-					NotificacioDestinatariEntity.calcularEstatNotificacioDestinatari(destinatari));
+		if (destinatari != null) {
+			dto.setDestinataris(
+					destinatarisToDto(Arrays.asList(destinatari)));
 		}
-		dto.setDestinataris(Arrays.asList(destinatariDto));
 		if (notificacio.isError()) {
 			dto.setError(true);
 			NotificacioEventEntity errorEvent = notificacio.getErrorEvent();
@@ -345,6 +331,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			Long entitatId,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
+		logger.debug("Consulta paginada de notificacions d'una entitat segons el filtre (" +
+				"entitatId=" + entitatId + ", " +
+				"filtre=" + filtre + ", " +
+				"paginacioParams=" + paginacioParams + ")");
 		entityComprovarHelper.comprovarPermisos(
 				entitatId,
 				false,
@@ -368,33 +358,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public PaginaDto<NotificacioDestinatariDto> destinatariFindByNotificacioPaginat(
-			Long notificacioId,
-			PaginacioParamsDto paginacioParams ) {
-		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
-		entityComprovarHelper.comprovarPermisos(
-				notificacio.getEntitat().getId(),
-				true,
-				true);
-		return paginacioHelper.toPaginaDto( 
-				notificacioDestinatariRepository.findByNotificacioId(
-					notificacioId,
-					paginacioHelper.toSpringDataPageable(paginacioParams)
-					),
-				NotificacioDestinatariDto.class);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
 	public List<NotificacioDestinatariDto> destinatariFindByNotificacio(
 			Long notificacioId) {
+		logger.debug("Consulta els destinataris d'una notificació (" +
+				"notificacioId=" + notificacioId + ")");
 		entityComprovarHelper.comprovarPermisos(
 				notificacioId,
 				true,
 				true);
-		return conversioTipusHelper.convertirList( 
-				notificacioDestinatariRepository.findByNotificacioId(notificacioId),
-				NotificacioDestinatariDto.class);
+		return destinatarisToDto(
+				notificacioDestinatariRepository.findByNotificacioId(notificacioId));
 	}
 
 	@Override
@@ -409,9 +382,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				notificacio.getEntitat().getId(),
 				true,
 				true);
-		return conversioTipusHelper.convertir(
-				destinatari,
-				NotificacioDestinatariDto.class);
+		return destinatariToDto(destinatari);
 	}
 
 	@Override
@@ -421,12 +392,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				"referencia=" + referencia + ")");
 		NotificacioDestinatariEntity destinatari =
 				notificacioDestinatariRepository.findByReferencia(referencia);
-		NotificacioEntity notificacio = notificacioRepository.findOne( destinatari.getNotificacio().getId() );
-		entityComprovarHelper.comprovarPermisosAplicacio(
-				notificacio.getEntitat().getId() );
-		return conversioTipusHelper.convertir(
-				destinatari,
-				NotificacioDestinatariDto.class);
+		return destinatariToDto(destinatari);
 	}
 
 	@Override
@@ -459,6 +425,50 @@ public class NotificacioServiceImpl implements NotificacioService {
 		return conversioTipusHelper.convertirList(
 				notificacioEventRepository.findByNotificacioDestinatariId(destinatariId),
 				NotificacioEventDto.class);
+	}
+
+	@Override
+	public void enviar(
+			Long notificacioId) {
+		logger.debug("Intentant enviament a Notifica i a la seu de la notificació pendent (" +
+				"notificacioId=" + notificacioId + ")");
+		notificaHelper.enviament(notificacioId);
+		List<NotificacioDestinatariEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
+				new NotificacioDestinatariEstatEnumDto[] {
+						NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT});
+		for (NotificacioDestinatariEntity pendent: pendents) {
+			seuHelper.enviament(pendent.getId());
+		}
+	}
+
+	@Override
+	@Transactional
+	public NotificacioDto consultarInformacio(
+			String referencia) {
+		logger.debug("Consultant a Notifica la informació de la notificació (" +
+				"referencia=" + referencia + ")");
+		NotificacioDestinatariEntity destinatari = notificacioDestinatariRepository.findByReferencia(referencia);
+		return notificaHelper.enviamentInfo(destinatari);
+	}
+
+	@Override
+	@Transactional
+	public NotificaRespostaEstatDto consultarEstat(
+			String referencia) {
+		logger.debug("Consultant a Notifica l'estat de la notificació (" +
+				"referencia=" + referencia + ")");
+		NotificacioDestinatariEntity destinatari = notificacioDestinatariRepository.findByReferencia(referencia);
+		return notificaHelper.enviamentEstat(destinatari);
+	}
+
+	@Override
+	@Transactional
+	public NotificaRespostaDatatDto consultarDatat(
+			String referencia) {
+		logger.debug("Consultant a Notifica el datat de la notificació (" +
+				"referencia=" + referencia + ")");
+		NotificacioDestinatariEntity destinatari = notificacioDestinatariRepository.findByReferencia(referencia);
+		return notificaHelper.enviamentDatat(destinatari);
 	}
 
 	@Override
@@ -637,6 +647,33 @@ public class NotificacioServiceImpl implements NotificacioService {
 		
 	}
 
+
+
+	private List<NotificacioDestinatariDto> destinatarisToDto(
+			List<NotificacioDestinatariEntity> destinatarisEntity) {
+		List<NotificacioDestinatariDto> destinatarisDto = conversioTipusHelper.convertirList(
+				destinatarisEntity,
+				NotificacioDestinatariDto.class);
+		for (int i = 0; i < destinatarisEntity.size(); i++) {
+			NotificacioDestinatariEntity destinatariEntity = destinatarisEntity.get(i);
+			NotificacioDestinatariDto destinatariDto = destinatarisDto.get(i);
+			destinatariDto.setEstat(
+					NotificacioDestinatariEntity.calcularEstatNotificacioDestinatari(
+							destinatariEntity));
+		}
+		return destinatarisDto;
+	}
+
+	private NotificacioDestinatariDto destinatariToDto(
+			NotificacioDestinatariEntity destinatariEntity) {
+		NotificacioDestinatariDto destinatariDto = conversioTipusHelper.convertir(
+				destinatariEntity,
+				NotificacioDestinatariDto.class);
+		destinatariDto.setEstat(
+				NotificacioDestinatariEntity.calcularEstatNotificacioDestinatari(
+						destinatariEntity));
+		return destinatariDto;
+	}
 
 	private int getNotificaEnviamentsProcessarMaxProperty() {
 		return propertiesHelper.getAsInt(

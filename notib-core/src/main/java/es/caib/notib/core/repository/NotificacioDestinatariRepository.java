@@ -5,7 +5,6 @@ package es.caib.notib.core.repository;
 
 import java.util.List;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -22,11 +21,7 @@ import es.caib.notib.core.entity.NotificacioEntity;
  */
 public interface NotificacioDestinatariRepository extends JpaRepository<NotificacioDestinatariEntity, Long> {
 
-	Page<NotificacioEntity> findByNotificacioId(
-			Long notificacioId,
-			Pageable pageable);
-	
-	List<NotificacioEntity> findByNotificacioId(
+	List<NotificacioDestinatariEntity> findByNotificacioId(
 			Long notificacioId);
 
 	NotificacioDestinatariEntity findByReferencia(
@@ -39,9 +34,12 @@ public interface NotificacioDestinatariRepository extends JpaRepository<Notifica
 	NotificacioDestinatariEntity findByNotificacioEntitatAndNotificaIdentificador(
 			EntitatEntity entitat,
 			String notificaIdentificador);
-			
+
 	List<NotificacioDestinatariEntity> findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
 			NotificacioDestinatariEstatEnumDto[] seuEstats,
 			Pageable pageable);
+
+	List<NotificacioDestinatariEntity> findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
+			NotificacioDestinatariEstatEnumDto[] seuEstats);
 
 }

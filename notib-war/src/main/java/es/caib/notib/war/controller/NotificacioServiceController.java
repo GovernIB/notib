@@ -21,17 +21,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 
-import es.caib.notib.core.api.ws.notificacio.InconsistenciaDadesWsServiceException;
-import es.caib.notib.core.api.ws.notificacio.Notificacio;
-import es.caib.notib.core.api.ws.notificacio.NotificacioCertificacio;
-import es.caib.notib.core.api.ws.notificacio.NotificacioEstat;
-import es.caib.notib.core.api.ws.notificacio.NotificacioWsService;
-import es.caib.notib.core.api.ws.notificacio.NotificacioWsServiceException;
+import es.caib.notib.core.api.ws.notificacio2.Notificacio;
+import es.caib.notib.core.api.ws.notificacio2.Notificacio2Service;
 import es.caib.notib.war.validation.RestPreconditions;
 
 /**
@@ -49,87 +44,69 @@ public class NotificacioServiceController extends BaseController {
 //  private static final int RESPONSE_CODE_CREATED = 201;
 //  private static final int RESPONSE_CODE_NOCONTENT = 204;
 //  private static final int RESPONSE_CODE_NOTFOUND = 404;
-    
+
 	@Autowired
-	private NotificacioWsService notificacioWSService;
+	private Notificacio2Service notificacio2Service;
 
 	@RequestMapping(value = "/apidoc", method = RequestMethod.GET)
 	public String documentacio(HttpServletRequest request) {
-		return "restDoc";
+		return "apidoc";
 	}
 
 	@RequestMapping(
-			value = "/services/altaEnviament", 
+			value = "/services/alta", 
 			method = RequestMethod.POST,
 			produces="application/json")
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation(
 			value = "Genera una notificació", 
-//			response = String.class, 
-//			responseContainer = "List",
-			notes = "Retorna una llista amb els codis de les notificacions generades") //, response=ArrayList.class)
-//    @ApiResponses({
-//            @ApiResponse(code = RESPONSE_CODE_OK, message = "Notificació generada correctament")
-//    })
-	public @ResponseBody List<String> altaEnviament(
+			notes = "Retorna una llista amb els codis de les notificacions generades")
+	public @ResponseBody List<String> alta(
 			@ApiParam(name="notificacio", value="Objecte amb les dades necessàries per a generar una notificació", required=true) 
 			@RequestBody Notificacio notificacio,
 			HttpServletResponse response) throws GeneralSecurityException, IOException {
 		RestPreconditions.checkNotNull(notificacio);
-		List<String> references = null;
-		try {
-			references = notificacioWSService.alta(notificacio);
-		} catch(NotificacioWsServiceException e) {
-			if( e instanceof InconsistenciaDadesWsServiceException) {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-			}
-		}
-		return references;
+		List<String> resposta = notificacio2Service.alta(
+				notificacio);
+		return resposta;
 	}
 
 	@RequestMapping(
-			value = "/services/infoEnviament/{referencia}", 
+			value = "/services/consulta/{referencia}", 
 			method = RequestMethod.GET,
 			produces="application/json")
 	@ApiOperation(
 			value = "Consulta una notificació",
 			response = Notificacio.class)
-	public @ResponseBody Notificacio infoEnviament(
+	public @ResponseBody Notificacio consulta(
 			@ApiParam(name="referencia", value="Identificador de la notificació a consultar", required=true)
-			@PathVariable("referencia") String referencia,
+			@PathVariable("referencia")
+			String referencia,
 			HttpServletResponse response) throws UnsupportedEncodingException, IOException {
 		RestPreconditions.checkNotNull(referencia);
-		Notificacio notificacio = notificacioWSService.consulta(referencia);
-		try {
-			if(notificacio == null)
-				response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		} catch (IOException e) {
-			e.printStackTrace();
+		Notificacio notificacio = notificacio2Service.consulta(referencia);
+		if (notificacio == null) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
-		
 		return notificacio;
 	}
 
-	@RequestMapping(
+	/*@RequestMapping(
 			value = "/services/consultaEstat/{referencia}", 
 			method = RequestMethod.GET,
 			produces="application/json")
 	@ApiOperation(
 			value = "Consulta l'estat d'una notificació",
 			response = NotificacioEstat.class)
-	public @ResponseBody NotificacioEstat consultaEstat(
+	public @ResponseBody NotificacioEstatDto consultaEstat(
 			@ApiParam(name="referencia", value="Identificador de la notificació de la que es vol consultar el seu estat", required=true) 
 			@PathVariable("referencia") String referencia,
-			HttpServletResponse response) throws JsonProcessingException {
+			HttpServletResponse response) throws IOException {
 		RestPreconditions.checkNotNull(referencia);
-		NotificacioEstat estat = notificacioWSService.consultaEstat(referencia);
-		try {
-			if(estat == null)
-				response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		} catch (IOException e) {
-			e.printStackTrace();
+		NotificacioEstat estat = notificacioService.cons.consultaEstat(referencia);
+		if (estat == null) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
-		
 		return estat;
 	}
 
@@ -145,15 +122,11 @@ public class NotificacioServiceController extends BaseController {
 			@PathVariable("referencia") String referencia,
 			HttpServletResponse response) throws UnsupportedEncodingException, IOException {
 		RestPreconditions.checkNotNull(referencia);
-		NotificacioCertificacio certificacio = notificacioWSService.consultaCertificacio(referencia);
-		try {
-			if(certificacio == null)
-				response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		} catch (IOException e) {
-			e.printStackTrace();
+		NotificacioCertificacio certificacio = notificacioService.consultaCertificacio(referencia);
+		if (certificacio == null) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
-		
 		return certificacio;
-	}
+	}*/
 
 }

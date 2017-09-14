@@ -84,15 +84,6 @@
 		<auth-constraint>
 			<role-name>NOT_ADMIN</role-name>
 			<role-name>NOT_REP</role-name>
-		</auth-constraint>
-	</security-constraint>
-	<security-constraint>
-		<web-resource-collection>
-			<web-resource-name>Serveis Rest</web-resource-name>
-			<url-pattern>/api/services/*</url-pattern>
-			<url-pattern>/test/rest/*</url-pattern>
-		</web-resource-collection>
-		<auth-constraint>
 			<role-name>NOT_APL</role-name>
 		</auth-constraint>
 	</security-constraint>
@@ -101,7 +92,6 @@
 			<web-resource-name>Public areas</web-resource-name>
 			<url-pattern>/ws/adviserWS</url-pattern>
 			<url-pattern>/ws/notificacioWS</url-pattern>
-			<url-pattern>/api-docs*</url-pattern>
 		</web-resource-collection>
 	</security-constraint>
 

@@ -19,6 +19,7 @@ import es.caib.notib.core.api.ws.notificacio2.ErrorOrigenEnum;
 public class NotificacioDto extends AuditoriaDto {
 
 	private Long id;
+	private String cifEntitat;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
 	private Date enviamentDataProgramada;
 	private String concepte;
@@ -62,6 +63,12 @@ public class NotificacioDto extends AuditoriaDto {
 	}
 	public void setId(Long id) {
 		this.id = id;
+	}
+	public String getCifEntitat() {
+		return cifEntitat;
+	}
+	public void setCifEntitat(String cifEntitat) {
+		this.cifEntitat = cifEntitat;
 	}
 	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
 		return enviamentTipus;

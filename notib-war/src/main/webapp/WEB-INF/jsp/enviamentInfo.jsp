@@ -49,7 +49,31 @@
 		</c:if>
 		<tr>
 			<td><strong><spring:message code="enviament.info.dada.estat"/></strong></td>
-			<td>${enviament.estat} (Notifica: ${enviament.notificaEstat}, SeuCaib: ${enviament.seuEstat})</td>
+			<td>
+				<spring:message code="es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto.${enviament.estat}"/>
+				<button class="btn btn-default btn-sm pull-right" role="button" data-toggle="collapse" data-target="#collapseEstat" aria-expanded="false" aria-controls="collapseEstat">
+					<span class="fa fa-info-circle"></span>
+					<spring:message code="enviament.info.dada.estat.mesinfo"/>
+				</button>
+				<div id="collapseEstat" class="collapse" style="margin-top: 1.5em">
+					<table class="table table-bordered" style="width:100%">
+					<tbody>
+						<tr>
+							<td><strong><spring:message code="enviament.info.dada.estat.notifica"/></strong></td>
+							<td>
+								<spring:message code="es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto.${enviament.notificaEstat}"/>
+							</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="enviament.info.dada.estat.seucaib"/></strong></td>
+							<td>
+								<spring:message code="es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto.${enviament.seuEstat}"/>
+							</td>
+						</tr>
+					</tbody>
+					</table>
+				</div>
+			</td>
 		</tr>
 	</tbody>
 	</table>
