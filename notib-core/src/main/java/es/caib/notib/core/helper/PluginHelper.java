@@ -483,46 +483,66 @@ public class PluginHelper {
 		}
 	}
 
-	public boolean isDadesUsuariPluginConfigurat() {
-		try {
-			return getDadesUsuariPlugin() != null;
-		} catch (SistemaExternException sex) {
-			logger.error(
-					"Error al obtenir la instància del plugin de dades d'usuari",
-					sex);
+	public boolean isDadesUsuariPluginDisponible() {
+		String pluginClass = getPropertyPluginDadesUsuari();
+		if (pluginClass != null && pluginClass.length() > 0) {
+			try {
+				return getDadesUsuariPlugin() != null;
+			} catch (SistemaExternException sex) {
+				logger.error(
+						"Error al obtenir la instància del plugin de dades d'usuari",
+						sex);
+				return false;
+			}
+		} else {
 			return false;
 		}
 	}
 
-	public boolean isGestioDocumentalPluginConfigurat() {
-		try {
-			return getGestioDocumentalPlugin() != null;
-		} catch (SistemaExternException sex) {
-			logger.error(
-					"Error al obtenir la instància del plugin de gestió documental",
-					sex);
+	public boolean isGestioDocumentalPluginDisponible() {
+		String pluginClass = getPropertyPluginGestioDocumental();
+		if (pluginClass != null && pluginClass.length() > 0) {
+			try {
+				return getGestioDocumentalPlugin() != null;
+			} catch (SistemaExternException sex) {
+				logger.error(
+						"Error al obtenir la instància del plugin de gestió documental",
+						sex);
+				return false;
+			}
+		} else {
 			return false;
 		}
 	}
 
-	public boolean isSeuPluginConfigurat() {
-		try {
-			return getSeuPlugin() != null;
-		} catch (SistemaExternException sex) {
-			logger.error(
-					"Error al obtenir la instància del plugin de seu electrònica",
-					sex);
+	public boolean isSeuPluginDisponible() {
+		String pluginClass = getPropertyPluginSeu();
+		if (pluginClass != null && pluginClass.length() > 0) {
+			try {
+				return getSeuPlugin() != null;
+			} catch (SistemaExternException sex) {
+				logger.error(
+						"Error al obtenir la instància del plugin de seu electrònica",
+						sex);
+				return false;
+			}
+		} else {
 			return false;
 		}
 	}
 
-	public boolean isRegistrePluginConfigurat() {
-		try {
-			return getRegistrePlugin() != null;
-		} catch (SistemaExternException sex) {
-			logger.error(
-					"Error al obtenir la instància del plugin de seu electrònica",
-					sex);
+	public boolean isRegistrePluginDisponible() {
+		String pluginClass = getPropertyPluginRegistre();
+		if (pluginClass != null && pluginClass.length() > 0) {
+			try {
+				return getRegistrePlugin() != null;
+			} catch (SistemaExternException sex) {
+				logger.error(
+						"Error al obtenir la instància del plugin de seu electrònica",
+						sex);
+				return false;
+			}
+		} else {
 			return false;
 		}
 	}
@@ -620,7 +640,7 @@ public class PluginHelper {
 	
 	private RegistrePlugin getRegistrePlugin() {
 		if (registrePlugin == null) {
-			String pluginClass = getPropertyRegistrePlugin();
+			String pluginClass = getPropertyPluginRegistre();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
@@ -649,7 +669,7 @@ public class PluginHelper {
 	private String getPropertyPluginSeu() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.seu.class");
 	}
-	private String getPropertyRegistrePlugin() {
+	private String getPropertyPluginRegistre() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.registre.sortida");
 	}
 	private boolean getPropertyRegistrePluginDesactivat() {

@@ -16,7 +16,6 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaRespostaDatatDto;
 import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
@@ -180,21 +179,9 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-	public NotificacioDto consultarInformacio(
-			String referencia) {
-		return delegate.consultarInformacio(referencia);
-	}
-
-	@Override
 	public NotificaRespostaEstatDto consultarEstat(
 			String referencia) {
 		return delegate.consultarEstat(referencia);
-	}
-
-	@Override
-	public NotificaRespostaDatatDto consultarDatat(
-			String referencia) {
-		return delegate.consultarDatat(referencia);
 	}
 
 	@Override

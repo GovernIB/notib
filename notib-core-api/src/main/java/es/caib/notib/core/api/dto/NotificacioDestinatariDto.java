@@ -13,7 +13,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class NotificacioDestinatariDto extends AuditoriaDto {
-	
+
 	private Long id;
 	private String titularNom;
 	private String titularLlinatge1;

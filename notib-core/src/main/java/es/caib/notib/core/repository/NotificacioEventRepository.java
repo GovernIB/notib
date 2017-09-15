@@ -17,10 +17,10 @@ import es.caib.notib.core.entity.NotificacioEventEntity;
  */
 public interface NotificacioEventRepository extends JpaRepository<NotificacioEventEntity, Long> {
 
-	List<NotificacioEventEntity> findByNotificacioId(
+	List<NotificacioEventEntity> findByNotificacioIdOrderByDataDesc(
 			Long notificacioId);
 
-	List<NotificacioEventEntity> findByNotificacioDestinatariId(
+	List<NotificacioEventEntity> findByNotificacioDestinatariIdOrderByDataDesc(
 			Long destinatariId);
 
 }

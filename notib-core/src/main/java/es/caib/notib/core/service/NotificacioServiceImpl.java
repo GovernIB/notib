@@ -26,7 +26,6 @@ import com.sun.jersey.core.util.Base64;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaRespostaDatatDto;
 import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
@@ -407,7 +406,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				true,
 				true);
 		return conversioTipusHelper.convertirList(
-				notificacioEventRepository.findByNotificacioId(notificacioId),
+				notificacioEventRepository.findByNotificacioIdOrderByDataDesc(notificacioId),
 				NotificacioEventDto.class);
 	}
 
@@ -425,7 +424,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				true,
 				true);
 		return conversioTipusHelper.convertirList(
-				notificacioEventRepository.findByNotificacioDestinatariId(destinatariId),
+				notificacioEventRepository.findByNotificacioDestinatariIdOrderByDataDesc(destinatariId),
 				NotificacioEventDto.class);
 	}
 
@@ -445,32 +444,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional
-	public NotificacioDto consultarInformacio(
-			String referencia) {
-		logger.debug("Consultant a Notifica la informació de la notificació (" +
-				"referencia=" + referencia + ")");
-		NotificacioDestinatariEntity destinatari = notificacioDestinatariRepository.findByReferencia(referencia);
-		return notificaHelper.enviamentInfo(destinatari);
-	}
-
-	@Override
-	@Transactional
 	public NotificaRespostaEstatDto consultarEstat(
 			String referencia) {
 		logger.debug("Consultant a Notifica l'estat de la notificació (" +
 				"referencia=" + referencia + ")");
 		NotificacioDestinatariEntity destinatari = notificacioDestinatariRepository.findByReferencia(referencia);
 		return notificaHelper.enviamentEstat(destinatari);
-	}
-
-	@Override
-	@Transactional
-	public NotificaRespostaDatatDto consultarDatat(
-			String referencia) {
-		logger.debug("Consultant a Notifica el datat de la notificació (" +
-				"referencia=" + referencia + ")");
-		NotificacioDestinatariEntity destinatari = notificacioDestinatariRepository.findByReferencia(referencia);
-		return notificaHelper.enviamentDatat(destinatari);
 	}
 
 	@Override
@@ -499,7 +478,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Scheduled(fixedRateString = "${config:es.caib.notib.tasca.seu.enviaments.periode}")
 	public void seuEnviamentsPendents() {
 		logger.debug("Cercant notificacions pendents d'enviar a la seu electrònica");
-		if (pluginHelper.isSeuPluginConfigurat()) {
+		if (pluginHelper.isSeuPluginDisponible()) {
 			int maxPendents = getSeuEnviamentsProcessarMaxProperty();
 			List<NotificacioDestinatariEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
 					new NotificacioDestinatariEstatEnumDto[] {
@@ -521,7 +500,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Scheduled(fixedRateString = "${config:es.caib.notib.tasca.seu.justificants.periode}")
 	public void seuNotificacionsPendents() {
 		logger.debug("Cercant notificacions pendents de consulta d'estat a la seu electrònica");
-		if (pluginHelper.isSeuPluginConfigurat()) {
+		if (pluginHelper.isSeuPluginDisponible()) {
 			int maxPendents = getSeuJustificantsProcessarMaxProperty();
 			List<NotificacioDestinatariEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
 					new NotificacioDestinatariEstatEnumDto[] {
@@ -547,7 +526,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Scheduled(fixedRateString = "${config:es.caib.notib.tasca.seu.notifica.estat.periode}")
 	public void seuNotificaComunicarEstatPendents() {
 		logger.debug("Cercant notificacions provinents de la seu pendents d'actualització d'estat a Notifica");
-		if (pluginHelper.isSeuPluginConfigurat()) {
+		if (pluginHelper.isSeuPluginDisponible()) {
 			int maxPendents = getSeuNotificaEstatProcessarMaxProperty();
 			List<NotificacioDestinatariEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
 					new NotificacioDestinatariEstatEnumDto[] {

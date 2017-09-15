@@ -12,7 +12,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaRespostaDatatDto;
 import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
@@ -244,18 +243,7 @@ public interface NotificacioService {
 			Long notificacioId);
 
 	/**
-	 * Consulta la informació d'una notificació enviada a Notific@.
-	 * 
-	 * @param referencia
-	 *            Referencia de l'enviament.
-	 * @return la informació de la notificació i de l'enviament.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public NotificacioDto consultarInformacio(
-			String referencia);
-
-	/**
-	 * Consulta l'estat d'una notificació enviada a Notific@.
+	 * Consulta l'estat d'un enviament a Notific@.
 	 * 
 	 * @param referencia
 	 *            Referencia de l'enviament.
@@ -263,17 +251,6 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public NotificaRespostaEstatDto consultarEstat(
-			String referencia);
-
-	/**
-	 * Consulta lel datat d'una notificació enviada a Notific@.
-	 * 
-	 * @param referencia
-	 *            Referencia de l'enviament.
-	 * @return el datat de l'enviament.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public NotificaRespostaDatatDto consultarDatat(
 			String referencia);
 
 	/**

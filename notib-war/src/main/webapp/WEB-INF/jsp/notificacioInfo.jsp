@@ -9,150 +9,247 @@
 <html>
 <head>
 	<title><spring:message code="notificacio.info.titol"/></title>
-	<not:modalHead/>
-	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
+	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
+	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
+	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<not:modalHead/>
+<script type="text/javascript">
+var eventTipus = [];
+<c:forEach var="tipus" items="${eventTipus}">
+eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
+</c:forEach>
+</script>
 </head>
 <body>
-	<h4><spring:message code="notificacio.info.seccio.dades"/></h4>
-	<table class="table table-bordered table-striped" style="width:100%">
-	<tbody>
-		<tr>
-			<td width="30%"><strong><spring:message code="notificacio.info.dada.data.creacio"/></strong></td>
-			<td><fmt:formatDate value="${notificacio.createdDate}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-		</tr>
-		<tr>
-			<td><strong><spring:message code="notificacio.info.dada.entitat"/></strong></td>
-			<td>${notificacio.entitat.nom} (${notificacio.entitat.dir3Codi})</td>
-		</tr>
-		<tr>
-			<td><strong><spring:message code="notificacio.info.dada.concepte"/></strong></td>
-			<td>${notificacio.concepte}</td>
-		</tr>
-		<tr>
-			<td><strong><spring:message code="notificacio.info.dada.tipus"/></strong></td>
-			<td><spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.${notificacio.enviamentTipus}"/></td>
-		</tr>
-		<tr>
-			<td><strong><spring:message code="notificacio.info.dada.procediment.sia"/></strong></td>
-			<td>${notificacio.procedimentDescripcioSia} (${notificacio.procedimentCodiSia})</td>
-		</tr>
-		<tr>
-			<td><strong><spring:message code="notificacio.info.dada.estat"/></strong></td>
-			<td><spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.${notificacio.estat}"/></td>
-		</tr>
-	</tbody>
-	</table>
-	<h4><spring:message code="notificacio.info.seccio.document"/></h4>
-	<table class="table table-bordered table-striped" style="width:100%">
-	<tbody>
-		<tr>
-			<td width="30%"><strong><spring:message code="notificacio.info.document.arxiu.nom"/></strong></td>
-			<td>
-				${notificacio.documentArxiuNom}
-				<a href="<c:url value="/modal/notificacio/${notificacio.id}/document"/>" class="btn btn-default btn-sm pull-right" title="<spring:message code="notificacio.info.document.descarregar"/>"><span class="fa fa-download"></span></a>
-			</td>
-		</tr>
-		<tr>
-			<td><strong><spring:message code="notificacio.info.document.normalitzat"/></strong></td>
-			<td>${notificacio.documentNormalitzat}</td>
-		</tr>
-		<tr>
-			<td><strong><spring:message code="notificacio.info.document.generar.csv"/></strong></td>
-			<td>${notificacio.documentGenerarCsv}</td>
-		</tr>
-	</tbody>
-	</table>
-	<c:if test="${not empty notificacio.pagadorCorreusCodiDir3 or not empty notificacio.pagadorCieCodiDir3}">
-		<h4><spring:message code="notificacio.info.seccio.pagador"/></h4>
-		<table class="table table-bordered table-striped" style="width:100%">
-		<tbody>
-			<c:if test="${not empty notificacio.pagadorCorreusCodiDir3}">
-				<tr>
-					<td width="30%"><strong><spring:message code="notificacio.info.pagador.correus.codi.dir3"/></strong></td>
-					<td>${notificacio.pagadorCorreusCodiDir3}</td>
-				</tr>
-				<tr>
-					<td><strong><spring:message code="notificacio.info.pagador.correus.contracte"/></strong></td>
-					<td>${notificacio.pagadorCorreusContracteNum}</td>
-				</tr>
-				<tr>
-					<td><strong><spring:message code="notificacio.info.pagador.correus.client"/></strong></td>
-					<td>${notificacio.pagadorCorreusCodiClientFacturacio}</td>
-				</tr>
-				<tr>
-					<td><strong><spring:message code="notificacio.info.pagador.correus.vigencia"/></strong></td>
-					<td>${notificacio.pagadorCorreusDataVigencia}</td>
-				</tr>
+	<ul class="nav nav-tabs" role="tablist">
+		<li role="presentation" class="active">
+			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab">
+				<spring:message code="notificacio.info.tab.dades"/>
+			</a>
+		</li>
+		<li role="presentation">
+			<a href="#events" aria-controls="events" role="tab" data-toggle="tab">
+				<spring:message code="notificacio.info.tab.events"/>
+			</a>
+		</li>
+		<li role="presentation">
+			<a href="#accions" aria-controls="accions" role="tab" data-toggle="tab">
+				<spring:message code="notificacio.info.tab.accions"/>
+			</a>
+		</li>
+	</ul>
+	<div class="tab-content">
+		<div role="tabpanel" class="tab-pane active" id="dades">
+			<br/>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						<strong><spring:message code="notificacio.info.seccio.dades"/></strong>
+					</h3>
+ 				</div>
+				<table class="table table-bordered" style="width:100%">
+				<tbody>
+					<tr>
+						<td width="30%"><strong><spring:message code="notificacio.info.dada.data.creacio"/></strong></td>
+						<td><fmt:formatDate value="${notificacio.createdDate}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+					</tr>
+					<tr>
+						<td><strong><spring:message code="notificacio.info.dada.entitat"/></strong></td>
+						<td>${notificacio.entitat.nom} (${notificacio.entitat.dir3Codi})</td>
+					</tr>
+					<tr>
+						<td><strong><spring:message code="notificacio.info.dada.concepte"/></strong></td>
+						<td>${notificacio.concepte}</td>
+					</tr>
+					<tr>
+						<td><strong><spring:message code="notificacio.info.dada.tipus"/></strong></td>
+						<td><spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.${notificacio.enviamentTipus}"/></td>
+					</tr>
+					<tr>
+						<td><strong><spring:message code="notificacio.info.dada.procediment.sia"/></strong></td>
+						<td>${notificacio.procedimentDescripcioSia} (${notificacio.procedimentCodiSia})</td>
+					</tr>
+					<tr>
+						<td><strong><spring:message code="notificacio.info.dada.estat"/></strong></td>
+						<td><spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.${notificacio.estat}"/></td>
+					</tr>
+				</tbody>
+				</table>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						<strong><spring:message code="notificacio.info.seccio.document"/></strong>
+					</h3>
+ 				</div>
+				<table class="table table-bordered" style="width:100%">
+				<tbody>
+					<tr>
+						<td width="30%"><strong><spring:message code="notificacio.info.document.arxiu.nom"/></strong></td>
+						<td>
+							${notificacio.documentArxiuNom}
+							<a href="<c:url value="/modal/notificacio/${notificacio.id}/document"/>" class="btn btn-default btn-sm pull-right" title="<spring:message code="notificacio.info.document.descarregar"/>"><span class="fa fa-download"></span></a>
+						</td>
+					</tr>
+					<tr>
+						<td><strong><spring:message code="notificacio.info.document.normalitzat"/></strong></td>
+						<td>${notificacio.documentNormalitzat}</td>
+					</tr>
+					<tr>
+						<td><strong><spring:message code="notificacio.info.document.generar.csv"/></strong></td>
+						<td>${notificacio.documentGenerarCsv}</td>
+					</tr>
+				</tbody>
+				</table>
+			</div>
+			<c:if test="${not empty notificacio.pagadorCorreusCodiDir3 or not empty notificacio.pagadorCieCodiDir3}">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							<strong><spring:message code="notificacio.info.seccio.pagador"/></strong>
+						</h3>
+	 				</div>
+					<table class="table table-bordered" style="width:100%">
+					<tbody>
+						<c:if test="${not empty notificacio.pagadorCorreusCodiDir3}">
+							<tr>
+								<td width="30%"><strong><spring:message code="notificacio.info.pagador.correus.codi.dir3"/></strong></td>
+								<td>${notificacio.pagadorCorreusCodiDir3}</td>
+							</tr>
+							<tr>
+								<td><strong><spring:message code="notificacio.info.pagador.correus.contracte"/></strong></td>
+								<td>${notificacio.pagadorCorreusContracteNum}</td>
+							</tr>
+							<tr>
+								<td><strong><spring:message code="notificacio.info.pagador.correus.client"/></strong></td>
+								<td>${notificacio.pagadorCorreusCodiClientFacturacio}</td>
+							</tr>
+							<tr>
+								<td><strong><spring:message code="notificacio.info.pagador.correus.vigencia"/></strong></td>
+								<td>${notificacio.pagadorCorreusDataVigencia}</td>
+							</tr>
+						</c:if>
+						<c:if test="${not empty notificacio.pagadorCieCodiDir3}">
+							<tr>
+								<td><strong><spring:message code="notificacio.info.pagador.cie.codi.dir3"/></strong></td>
+								<td>${notificacio.pagadorCieCodiDir3}</td>
+							</tr>
+							<tr>
+								<td><strong><spring:message code="notificacio.info.pagador.cie.vigencia"/></strong></td>
+								<td>${notificacio.pagadorCieDataVigencia}</td>
+							</tr>
+						</c:if>
+					</tbody>
+					</table>
+				</div>
 			</c:if>
-			<c:if test="${not empty notificacio.pagadorCieCodiDir3}">
-				<tr>
-					<td><strong><spring:message code="notificacio.info.pagador.cie.codi.dir3"/></strong></td>
-					<td>${notificacio.pagadorCieCodiDir3}</td>
-				</tr>
-				<tr>
-					<td><strong><spring:message code="notificacio.info.pagador.cie.vigencia"/></strong></td>
-					<td>${notificacio.pagadorCieDataVigencia}</td>
-				</tr>
+			<c:if test="${not empty notificacio.seuExpedientSerieDocumental}">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							<strong><spring:message code="notificacio.info.seccio.seucaib"/></strong>
+						</h3>
+	 				</div>
+					<table class="table table-bordered" style="width:100%">
+					<tbody>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.seucaib.expedient.serie"/></strong></td>
+							<td>${notificacio.seuExpedientSerieDocumental}</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.seucaib.expedient.unitat"/></strong></td>
+							<td>${notificacio.seuExpedientUnitatOrganitzativa}</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.seucaib.expedient.id"/></strong></td>
+							<td>${notificacio.seuExpedientIdentificadorEni}</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.seucaib.expedient.titol"/></strong></td>
+							<td>${notificacio.seuExpedientTitol}</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.seucaib.registre.oficina"/></strong></td>
+							<td>${notificacio.seuRegistreOficina}</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.seucaib.registre.llibre"/></strong></td>
+							<td>${notificacio.seuRegistreLlibre}</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.seucaib.idioma"/></strong></td>
+							<td>${notificacio.seuIdioma}</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.seucaib.avis.titol"/></strong></td>
+							<td>${notificacio.seuAvisTitol}</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.seucaib.avis.text"/></strong></td>
+							<td>${notificacio.seuAvisText}</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.seucaib.avis.text.mobil"/></strong></td>
+							<td>${notificacio.seuAvisTextMobil}</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.seucaib.ofici.titol"/></strong></td>
+							<td>${notificacio.seuOficiTitol}</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.seucaib.ofici.text"/></strong></td>
+							<td>${notificacio.seuOficiText}</td>
+						</tr>
+					</tbody>
+					</table>
+				</div>
 			</c:if>
-		</tbody>
-		</table>
-	</c:if>
-	<h4><spring:message code="notificacio.info.seccio.seucaib"/></h4>
-	<c:if test="${not empty notificacio.seuExpedientSerieDocumental}">
-		<table class="table table-bordered table-striped" style="width:100%">
-		<tbody>
-			<tr>
-				<td><strong><spring:message code="notificacio.info.seucaib.expedient.serie"/></strong></td>
-				<td>${notificacio.seuExpedientSerieDocumental}</td>
-			</tr>
-			<tr>
-				<td><strong><spring:message code="notificacio.info.seucaib.expedient.unitat"/></strong></td>
-				<td>${notificacio.seuExpedientUnitatOrganitzativa}</td>
-			</tr>
-			<tr>
-				<td><strong><spring:message code="notificacio.info.seucaib.expedient.id"/></strong></td>
-				<td>${notificacio.seuExpedientIdentificadorEni}</td>
-			</tr>
-			<tr>
-				<td><strong><spring:message code="notificacio.info.seucaib.expedient.titol"/></strong></td>
-				<td>${notificacio.seuExpedientTitol}</td>
-			</tr>
-			<tr>
-				<td><strong><spring:message code="notificacio.info.seucaib.registre.oficina"/></strong></td>
-				<td>${notificacio.seuRegistreOficina}</td>
-			</tr>
-			<tr>
-				<td><strong><spring:message code="notificacio.info.seucaib.registre.llibre"/></strong></td>
-				<td>${notificacio.seuRegistreLlibre}</td>
-			</tr>
-			<tr>
-				<td><strong><spring:message code="notificacio.info.seucaib.idioma"/></strong></td>
-				<td>${notificacio.seuIdioma}</td>
-			</tr>
-			<tr>
-				<td><strong><spring:message code="notificacio.info.seucaib.avis.titol"/></strong></td>
-				<td>${notificacio.seuAvisTitol}</td>
-			</tr>
-			<tr>
-				<td><strong><spring:message code="notificacio.info.seucaib.avis.text"/></strong></td>
-				<td>${notificacio.seuAvisText}</td>
-			</tr>
-			<tr>
-				<td><strong><spring:message code="notificacio.info.seucaib.avis.text.mobil"/></strong></td>
-				<td>${notificacio.seuAvisTextMobil}</td>
-			</tr>
-			<tr>
-				<td><strong><spring:message code="notificacio.info.seucaib.ofici.titol"/></strong></td>
-				<td>${notificacio.seuOficiTitol}</td>
-			</tr>
-			<tr>
-				<td><strong><spring:message code="notificacio.info.seucaib.ofici.text"/></strong></td>
-				<td>${notificacio.seuOficiText}</td>
-			</tr>
-		</tbody>
-		</table>
-	</c:if>
+		</div>
+		<div role="tabpanel" class="tab-pane" id="events">
+			<table
+				id="events"
+				data-toggle="datatable"
+				data-url="<c:url value="/notificacio/${notificacioId}/event"/>"
+				data-search-enabled="false"
+				data-paging="false"
+				data-info="false"
+				class="table table-striped table-bordered"
+				style="width:100%">
+			<thead>
+				<tr>
+					<th data-col-name="id" data-visible="false">#</th>
+					<th data-col-name="destinatariAssociat" data-visible="false"></th>
+					<th data-col-name="errorDescripcio" data-visible="false"></th>
+					<th data-col-name="data" data-converter="datetime" data-orderable="false"><spring:message code="notificacio.event.list.columna.data"/></th>
+					<th data-col-name="tipus" data-template="#cellTipus" data-orderable="false">
+						<spring:message code="notificacio.event.list.columna.tipus"/>
+						<script id="cellTipus" type="text/x-jsrender">
+						{{:~eval('eventTipus["' + tipus + '"]')}}
+						{{if destinatariAssociat}}<span class="label label-default pull-right" title="<spring:message code="notificacio.event.list.info.associat"/>">E</span>{{/if}}
+					</script>
+					</th>
+					<th data-col-name="descripcio" data-orderable="false"><spring:message code="notificacio.event.list.columna.descripcio"/></th>
+					<th data-col-name="error" data-template="#cellResultat" data-orderable="false">
+						<spring:message code="notificacio.event.list.columna.resultat"/>
+						<script id="cellResultat" type="text/x-jsrender">
+						{{if error}}
+							<span class="fa fa-warning text-danger" title="{{:errorDescripcio}}"></span>
+						{{else}}
+							<span class="fa fa-check text-success"></span>
+						{{/if}}
+					</script>
+					</th>
+				</tr>
+			</thead>
+			</table>
+		</div>
+		<div role="tabpanel" class="tab-pane" id="accions">
+		</div>
+	</div>
 	<div id="modal-botons" class="text-right">
 		<a href="<c:url value="/notificacions"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar"/></a>
 	</div>

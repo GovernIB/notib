@@ -35,8 +35,7 @@ import es.caib.notib.core.api.ws.notificacio.NotificacioWsServiceException;
 import es.caib.notib.war.validation.RestPreconditions;
 
 /**
- * Controlador que exposa un servei REST per a la gestio de
- * notificacions.
+ * Controlador del servei REST per a la gestio de notificacions.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -46,11 +45,6 @@ import es.caib.notib.war.validation.RestPreconditions;
 //@ControllerAdvice
 public class NotificacioServiceController extends BaseController {
 
-//	private static final int RESPONSE_CODE_OK = 200;
-//  private static final int RESPONSE_CODE_CREATED = 201;
-//  private static final int RESPONSE_CODE_NOCONTENT = 204;
-//  private static final int RESPONSE_CODE_NOTFOUND = 404;
-    
 	@Autowired
 	private NotificacioWsService notificacioWSService;
 
@@ -60,20 +54,18 @@ public class NotificacioServiceController extends BaseController {
 	}
 
 	@RequestMapping(
-			value = "/services/altaEnviament", 
+			value = "/services/alta", 
 			method = RequestMethod.POST,
 			produces="application/json")
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation(
 			value = "Genera una notificació", 
-//			response = String.class, 
-//			responseContainer = "List",
-			notes = "Retorna una llista amb els codis de les notificacions generades") //, response=ArrayList.class)
-//    @ApiResponses({
-//            @ApiResponse(code = RESPONSE_CODE_OK, message = "Notificació generada correctament")
-//    })
-	public @ResponseBody List<String> altaEnviament(
-			@ApiParam(name="notificacio", value="Objecte amb les dades necessàries per a generar una notificació", required=true) 
+			notes = "Retorna una llista amb els codis de les notificacions generades")
+	public @ResponseBody List<String> alta(
+			@ApiParam(
+					name="notificacio",
+					value="Objecte amb les dades necessàries per a generar una notificació",
+					required = true) 
 			@RequestBody Notificacio notificacio,
 			HttpServletResponse response) throws GeneralSecurityException, IOException {
 		RestPreconditions.checkNotNull(notificacio);
@@ -89,14 +81,17 @@ public class NotificacioServiceController extends BaseController {
 	}
 
 	@RequestMapping(
-			value = "/services/infoEnviament/{referencia}", 
+			value = "/services/consulta/{referencia}", 
 			method = RequestMethod.GET,
 			produces="application/json")
 	@ApiOperation(
 			value = "Consulta una notificació",
 			response = Notificacio.class)
-	public @ResponseBody Notificacio infoEnviament(
-			@ApiParam(name="referencia", value="Identificador de la notificació a consultar", required=true)
+	public @ResponseBody Notificacio consulta(
+			@ApiParam(
+					name="referencia",
+					value="Identificador de la notificació a consultar",
+					required=true)
 			@PathVariable("referencia") String referencia,
 			HttpServletResponse response) throws UnsupportedEncodingException, IOException {
 		RestPreconditions.checkNotNull(referencia);

@@ -7,7 +7,6 @@ import java.io.ByteArrayOutputStream;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,6 +44,9 @@ import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 import javax.xml.ws.soap.SOAPFaultException;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -53,25 +55,17 @@ import org.apache.ws.security.message.WSSecSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.codec.Base64;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaRespostaCertificacioDto;
 import es.caib.notib.core.api.dto.NotificaRespostaDatatDto;
 import es.caib.notib.core.api.dto.NotificaRespostaDatatDto.NotificaRespostaDatatEventDto;
 import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
-import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
@@ -87,16 +81,12 @@ import es.caib.notib.core.wsdl.notifica.CertificacionEnvioRespuesta;
 import es.caib.notib.core.wsdl.notifica.DatadoEnvio;
 import es.caib.notib.core.wsdl.notifica.DireccionElectronicaHabilitada;
 import es.caib.notib.core.wsdl.notifica.Documento;
-import es.caib.notib.core.wsdl.notifica.EstadoRespuesta;
 import es.caib.notib.core.wsdl.notifica.IdentificadorEnvio;
-import es.caib.notib.core.wsdl.notifica.InfoEnvio;
 import es.caib.notib.core.wsdl.notifica.NotificaWsPortType;
 import es.caib.notib.core.wsdl.notifica.OpcionesEmision;
 import es.caib.notib.core.wsdl.notifica.ResultadoAlta;
 import es.caib.notib.core.wsdl.notifica.ResultadoCertificacion;
 import es.caib.notib.core.wsdl.notifica.ResultadoDatado;
-import es.caib.notib.core.wsdl.notifica.ResultadoEstado;
-import es.caib.notib.core.wsdl.notifica.ResultadoInfoEnvio;
 import es.caib.notib.core.wsdl.notifica.TipoDestinatario;
 import es.caib.notib.core.wsdl.notifica.TipoDomicilio;
 import es.caib.notib.core.wsdl.notifica.TipoEnvio;
@@ -208,286 +198,21 @@ public class NotificaHelper {
 		}
 	}
 
-	public NotificacioDto enviamentInfo(
-			NotificacioDestinatariEntity destinatari) throws SistemaExternException {
-		NotificacioEntity notificacio = destinatari.getNotificacio();
-		String errorPrefix = "Error al consultar els detalls d'un enviament fet amb Notifica (" +
-				"notificacioId=" + notificacio.getId() + ", " +
-				"notificaIdentificador=" + destinatari.getNotificaIdentificador() + ")";
-		try {
-			InfoEnvio infoEnvio = new InfoEnvio();
-			infoEnvio.setEnvioDestinatario(destinatari.getNotificaIdentificador());
-			ResultadoInfoEnvio resultadoEnvio = getNotificaWs().infoEnvio(infoEnvio);
-			if ("000".equals(resultadoEnvio.getCodigoRespuesta())) {
-				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
-						notificacio).
-						notificacioDestinatari(destinatari).
-						build();
-				notificacio.updateEventAfegir(event);
-				return generarNotificacioDto(resultadoEnvio.getInfoEnvio());
-			} else {
-				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
-						notificacio).
-						notificacioDestinatari(destinatari).
-						error(true).
-						errorDescripcio("Error retornat per notifica: [" + resultadoEnvio.getCodigoRespuesta() + "] " + resultadoEnvio.getDescripcionRespuesta()).
-						build();
-				notificacio.updateEventAfegir(event);
-				throw new SistemaExternException(
-						"NOTIFICA",
-						errorPrefix + ": [" + resultadoEnvio.getCodigoRespuesta() + "] " + resultadoEnvio.getDescripcionRespuesta());
-			}
-		} catch (Exception ex) {
-			logger.error(
-					errorPrefix,
-					ex);
-			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
-					NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
-					notificacio).
-					notificacioDestinatari(destinatari).
-					error(true).
-					errorDescripcio(ExceptionUtils.getStackTrace(ex)).
-					build();
-			notificacio.updateEventAfegir(event);
-			throw new SistemaExternException(
-					"NOTIFICA",
-					errorPrefix,
-					ex);
-		}
-	}
-
 	public NotificaRespostaEstatDto enviamentEstat(
 			NotificacioDestinatariEntity destinatari) throws SistemaExternException {
-		NotificacioEntity notificacio = destinatari.getNotificacio();
-		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb Notifica (" +
-				"notificacioId=" + notificacio.getId() + ", " +
-				"notificaIdentificador=" + destinatari.getNotificaIdentificador() + ")";
-		try {
-			ResultadoEstado resultadoEstado = getNotificaWs().consultaEstado(
-					destinatari.getNotificaIdentificador());
-			if ("000".equals(resultadoEstado.getCodigoRespuesta())) {
-				EstadoRespuesta estado = resultadoEstado.getEstado();
-				NotificaRespostaEstatDto resposta = new NotificaRespostaEstatDto();
-				resposta.setRespostaCodi(resultadoEstado.getCodigoRespuesta());
-				resposta.setRespostaDescripcio(resultadoEstado.getDescripcionRespuesta());
-				resposta.setIdentificador(estado.getIdentificadorEnvio());
-				resposta.setEstat(estado.getEstado());
-				resposta.setNumSeguiment(estado.getNccIdExterno());
-				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ESTAT,
-						notificacio).
-						notificacioDestinatari(destinatari).
-						build();
-				notificacio.updateEventAfegir(event);
-				return resposta;
-			} else {
-				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ESTAT,
-						notificacio).
-						notificacioDestinatari(destinatari).
-						error(true).
-						errorDescripcio("Error retornat per notifica: [" + resultadoEstado.getCodigoRespuesta() + "] " + resultadoEstado.getDescripcionRespuesta()).
-						build();
-				notificacio.updateEventAfegir(event);
-				throw new SistemaExternException(
-						"NOTIFICA",
-						errorPrefix + ": [" + resultadoEstado.getCodigoRespuesta() + "] " + resultadoEstado.getDescripcionRespuesta());
-			}
-		} catch (Exception ex) {
-			logger.error(
-					errorPrefix,
-					ex);
-			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
-					NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ESTAT,
-					notificacio).
-					notificacioDestinatari(destinatari).
-					error(true).
-					errorDescripcio(ExceptionUtils.getStackTrace(ex)).
-					build();
-			notificacio.updateEventAfegir(event);
-			throw new SistemaExternException(
-					"NOTIFICA",
-					errorPrefix,
-					ex);
+		NotificaRespostaDatatDto respostaDatat = enviamentDatat(destinatari);
+		NotificaRespostaEstatDto resposta = new NotificaRespostaEstatDto();
+		resposta.setData(respostaDatat.getDataActualitzacio());
+		resposta.setEstatCodi(respostaDatat.getEstatActual());
+		resposta.setEstatDescripcio(respostaDatat.getEstatActualDescripcio());
+		resposta.setNumSeguiment(respostaDatat.getNumSeguiment());
+		if (isEstatFinal(respostaDatat.getEstatActual())) {
+			//NotificaRespostaCertificacioDto respostaCertificacio = enviamentCertificacio(destinatari);
+			enviamentCertificacio(destinatari);
+			// TODO
 		}
+		return resposta;
 	}
-
-	public NotificaRespostaDatatDto enviamentDatat(
-			NotificacioDestinatariEntity destinatari) {
-		NotificacioEntity notificacio = destinatari.getNotificacio();
-		String errorPrefix = "Error al consultar el datat d'un enviament fet amb Notifica (" +
-				"notificacioId=" + notificacio.getId() + ", " +
-				"notificaIdentificador=" + destinatari.getNotificaIdentificador() + ")";
-		try {
-			ResultadoDatado resultadoDatado = getNotificaWs().consultaDatadoEnvio(
-					destinatari.getNotificaIdentificador());
-			if ("000".equals(resultadoDatado.getCodigoRespuesta())) {
-				DatadoEnvio datadoEnvio = resultadoDatado.getDatado();
-				comprovarIdentificadorEnviament(
-						notificacio,
-						destinatari,
-						datadoEnvio.getIdentificadorEnvio().getIdentificador(),
-						datadoEnvio.getIdentificadorEnvio().getNifTitular(),
-						datadoEnvio.getIdentificadorEnvio().getReferenciaEmisor());
-				/*destinatari.updateNotificaDatat(
-						NotificaEstatEnumDto.toEnum(datadoEnvio.getEstadoActual()),
-						datadoEnvio.getNccIdExterno(),
-						toDate(datadoEnvio.getFechaActualizacion()));*/
-				NotificaRespostaDatatDto resposta = new NotificaRespostaDatatDto();
-				resposta.setRespostaCodi(resultadoDatado.getCodigoRespuesta());
-				resposta.setRespostaDescripcio(resultadoDatado.getDescripcionRespuesta());
-				if (datadoEnvio.getIdentificadorEnvio() != null) {
-					resposta.setIdentificador(datadoEnvio.getIdentificadorEnvio().getIdentificador());
-					resposta.setReferenciaEmisor(datadoEnvio.getIdentificadorEnvio().getReferenciaEmisor());
-					resposta.setTitularNif(datadoEnvio.getIdentificadorEnvio().getNifTitular());
-				}
-				resposta.setEstatActual(datadoEnvio.getEstadoActual());
-				resposta.setEstatActualDescripcio(datadoEnvio.getDescripcionEstadoActual());
-				resposta.setDataActualitzacio(
-						toDate(datadoEnvio.getFechaActualizacion()));
-				resposta.setNumSeguiment(datadoEnvio.getNccIdExterno());
-				if (datadoEnvio.getDatado() != null && datadoEnvio.getDatado().getItem() != null) {
-					List<NotificaRespostaDatatEventDto> events = new ArrayList<NotificaRespostaDatatEventDto>();
-					for (TipoIntento intento: datadoEnvio.getDatado().getItem()) {
-						NotificaRespostaDatatEventDto event = new NotificaRespostaDatatEventDto();
-						event.setEstat(intento.getEstado());
-						event.setDescripcio(intento.getDescripcion());
-						event.setData(toDate(intento.getFecha()));
-						events.add(event);
-					}
-					resposta.setEvents(events);
-				}
-				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_DATAT,
-						notificacio).
-						notificacioDestinatari(destinatari).
-						build();
-				notificacio.updateEventAfegir(event);
-				return resposta;
-			} else {
-				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_DATAT,
-						notificacio).
-						notificacioDestinatari(destinatari).
-						error(true).
-						errorDescripcio("Error retornat per notifica: [" + resultadoDatado.getCodigoRespuesta() + "] " + resultadoDatado.getDescripcionRespuesta()).
-						build();
-				notificacio.updateEventAfegir(event);
-				throw new SistemaExternException(
-						"NOTIFICA",
-						errorPrefix + ": [" + resultadoDatado.getCodigoRespuesta() + "] " + resultadoDatado.getDescripcionRespuesta());
-			}
-		} catch (Exception ex) {
-			logger.error(
-					errorPrefix,
-					ex);
-			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
-					NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_DATAT,
-					notificacio).
-					notificacioDestinatari(destinatari).
-					error(true).
-					errorDescripcio(ExceptionUtils.getStackTrace(ex)).
-					build();
-			notificacio.updateEventAfegir(event);
-			throw new SistemaExternException(
-					"NOTIFICA",
-					errorPrefix,
-					ex);
-		}
-	}
-
-	public NotificaRespostaCertificacioDto enviamentCertificacio(
-			NotificacioDestinatariEntity destinatari) {
-		NotificacioEntity notificacio = destinatari.getNotificacio();
-		String errorPrefix = "Error al consultar la certificació d'un enviament fet amb Notifica (" +
-				"notificacioId=" + notificacio.getId() + ", " +
-				"notificaIdentificador=" + destinatari.getNotificaIdentificador() + ")";
-		try {
-			ResultadoCertificacion resultadoCertificacion = getNotificaWs().consultaCertificacionEnvio(
-					destinatari.getNotificaIdentificador());
-			if ("000".equals(resultadoCertificacion.getCodigoRespuesta())) {
-				CertificacionEnvioRespuesta certificacion = resultadoCertificacion.getCertificacion();
-				comprovarIdentificadorEnviament(
-						notificacio,
-						destinatari,
-						certificacion.getIdentificadorEnvio().getIdentificador(),
-						certificacion.getIdentificadorEnvio().getNifTitular(),
-						certificacion.getIdentificadorEnvio().getReferenciaEmisor());
-				//String gestioDocumentalId = null;
-				NotificaCertificacioArxiuTipusEnumDto arxiuTipus = null;
-				byte[] decodificat = null;
-				if (certificacion.getPdfCertificado() != null) {
-					arxiuTipus = NotificaCertificacioArxiuTipusEnumDto.PDF;
-					decodificat = Base64.decode(certificacion.getPdfCertificado().getBytes());
-				} else if (certificacion.getXmlCertificado() != null) {
-					arxiuTipus = NotificaCertificacioArxiuTipusEnumDto.XML;
-					decodificat = Base64.decode(certificacion.getXmlCertificado().getBytes());
-				}
-				/*gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
-						PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
-						new ByteArrayInputStream(decodificat));
-				destinatari.updateNotificaCertificacio(
-						NotificaCertificacioTipusEnumDto.toEnum(certificacion.getCertificacion()),
-						arxiuTipus,
-						gestioDocumentalId,
-						certificacion.getNccIdExterno(),
-						toDate(certificacion.getFechaActualizacion()));*/
-				NotificaRespostaCertificacioDto resposta = new NotificaRespostaCertificacioDto();
-				resposta.setRespostaCodi(resultadoCertificacion.getCodigoRespuesta());
-				resposta.setRespostaDescripcio(resultadoCertificacion.getDescripcionRespuesta());
-				if (certificacion.getIdentificadorEnvio() != null) {
-					resposta.setIdentificador(certificacion.getIdentificadorEnvio().getIdentificador());
-					resposta.setReferenciaEmisor(certificacion.getIdentificadorEnvio().getReferenciaEmisor());
-					resposta.setTitularNif(certificacion.getIdentificadorEnvio().getNifTitular());
-				}
-				resposta.setCertificacioTipus(
-						NotificaCertificacioTipusEnumDto.toEnum(certificacion.getCertificacion()));
-				resposta.setCertificatTipus(arxiuTipus);
-				resposta.setCertificatContingut(decodificat);
-				resposta.setDataActualitzacio(
-						toDate(certificacion.getFechaActualizacion()));
-				resposta.setNumSeguiment(certificacion.getNccIdExterno());
-				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_CERT,
-						notificacio).
-						notificacioDestinatari(destinatari).
-						build();
-				notificacio.updateEventAfegir(event);
-				return resposta;
-			} else {
-				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_CERT,
-						notificacio).
-						notificacioDestinatari(destinatari).
-						error(true).
-						errorDescripcio("Error retornat per notifica: [" + resultadoCertificacion.getCodigoRespuesta() + "] " + resultadoCertificacion.getDescripcionRespuesta()).
-						build();
-				notificacio.updateEventAfegir(event);
-				throw new SistemaExternException(
-						"NOTIFICA",
-						errorPrefix + ": [" + resultadoCertificacion.getCodigoRespuesta() + "] " + resultadoCertificacion.getDescripcionRespuesta());
-			}
-		} catch (Exception ex) {
-			logger.error(
-					errorPrefix,
-					ex);
-			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
-					NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_CERT,
-					notificacio).
-					notificacioDestinatari(destinatari).
-					error(true).
-					errorDescripcio(ExceptionUtils.getStackTrace(ex)).
-					build();
-			notificacio.updateEventAfegir(event);
-			throw new SistemaExternException(
-					"NOTIFICA",
-					errorPrefix,
-					ex);
-		}
-	}
-
 	@Transactional
 	public void comunicacioCanviEstatSeu(
 			Long notificacioDestinatariId) {
@@ -545,7 +270,8 @@ public class NotificaHelper {
 
 	@Transactional
 	public void certificacioSeu(
-			NotificacioDestinatariEntity destinatari) {
+			NotificacioDestinatariEntity destinatari,
+			byte[] document) {
 		NotificacioEntity notificacio = destinatari.getNotificacio();
 		NotificacioEventEntity event;
 		try {
@@ -558,9 +284,12 @@ public class NotificaHelper {
 			}
 			certificacionSede.setFecha(
 					toXmlGregorianCalendar(destinatari.getSeuDataFi()));
-			// TODO generar certificacio
-			//certificacionSede.setDocumento(value);
-			//certificacionSede.setHashDocumento(value);
+			certificacionSede.setDocumento(
+					Base64.encodeBase64String(document));
+			certificacionSede.setHashDocumento(
+					Base64.encodeBase64String(
+							Hex.decodeHex(
+									DigestUtils.sha1Hex(document).toCharArray())));
 			//certificacionSede.setCsv(value);
 			certificacionSede.setOrganismoRemisor(notificacio.getEntitat().getDir3Codi());
 			ResultadoCertificacionSede resultadoCertificacion = getSedeWs().certificacionSede(certificacionSede);
@@ -659,7 +388,7 @@ public class NotificaHelper {
 				notificacio.getDocumentArxiuId(),
 				PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 				baos);
-		documento.setContenido(new String(Base64.encode(baos.toByteArray())));
+		documento.setContenido(new String(Base64.encodeBase64(baos.toByteArray())));
 		envio.setDocumento(documento);
 		TipoProcedimiento procedimiento = null;
 		if (notificacio.getProcedimentCodiSia() != null) {
@@ -774,7 +503,7 @@ public class NotificaHelper {
 		return destinatarios;
 	}
 
-	private NotificacioDto generarNotificacioDto(
+	/*private NotificacioDto generarNotificacioDto(
 			TipoEnvio envio) throws ParseException, DatatypeConfigurationException {
 		NotificacioDto notificacio = new NotificacioDto();
 		notificacio.setEnviamentTipus(
@@ -881,6 +610,280 @@ public class NotificaHelper {
 		}
 		destinatari.setReferencia(destinatario.getReferenciaEmisor());
 		return destinatari;
+	}*/
+
+	/*private NotificacioDto enviamentInfo(
+			NotificacioDestinatariEntity destinatari) throws SistemaExternException {
+		NotificacioEntity notificacio = destinatari.getNotificacio();
+		String errorPrefix = "Error al consultar els detalls d'un enviament fet amb Notifica (" +
+				"notificacioId=" + notificacio.getId() + ", " +
+				"notificaIdentificador=" + destinatari.getNotificaIdentificador() + ")";
+		try {
+			InfoEnvio infoEnvio = new InfoEnvio();
+			infoEnvio.setEnvioDestinatario(destinatari.getNotificaIdentificador());
+			ResultadoInfoEnvio resultadoEnvio = getNotificaWs().infoEnvio(infoEnvio);
+			if ("000".equals(resultadoEnvio.getCodigoRespuesta())) {
+				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
+						notificacio).
+						notificacioDestinatari(destinatari).
+						build();
+				notificacio.updateEventAfegir(event);
+				return generarNotificacioDto(resultadoEnvio.getInfoEnvio());
+			} else {
+				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
+						notificacio).
+						notificacioDestinatari(destinatari).
+						error(true).
+						errorDescripcio("Error retornat per notifica: [" + resultadoEnvio.getCodigoRespuesta() + "] " + resultadoEnvio.getDescripcionRespuesta()).
+						build();
+				notificacio.updateEventAfegir(event);
+				throw new SistemaExternException(
+						"NOTIFICA",
+						errorPrefix + ": [" + resultadoEnvio.getCodigoRespuesta() + "] " + resultadoEnvio.getDescripcionRespuesta());
+			}
+		} catch (Exception ex) {
+			logger.error(
+					errorPrefix,
+					ex);
+			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+					NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
+					notificacio).
+					notificacioDestinatari(destinatari).
+					error(true).
+					errorDescripcio(ExceptionUtils.getStackTrace(ex)).
+					build();
+			notificacio.updateEventAfegir(event);
+			throw new SistemaExternException(
+					"NOTIFICA",
+					errorPrefix,
+					ex);
+		}
+	}*/
+
+	private NotificaRespostaDatatDto enviamentDatat(
+			NotificacioDestinatariEntity destinatari) {
+		NotificacioEntity notificacio = destinatari.getNotificacio();
+		String errorPrefix = "Error al consultar el datat d'un enviament fet amb Notifica (" +
+				"notificacioId=" + notificacio.getId() + ", " +
+				"notificaIdentificador=" + destinatari.getNotificaIdentificador() + ")";
+		try {
+			ResultadoDatado resultadoDatado = getNotificaWs().consultaDatadoEnvio(
+					destinatari.getNotificaIdentificador());
+			if ("000".equals(resultadoDatado.getCodigoRespuesta())) {
+				DatadoEnvio datadoEnvio = resultadoDatado.getDatado();
+				comprovarIdentificadorEnviament(
+						notificacio,
+						destinatari,
+						datadoEnvio.getIdentificadorEnvio().getIdentificador(),
+						datadoEnvio.getIdentificadorEnvio().getNifTitular(),
+						datadoEnvio.getIdentificadorEnvio().getReferenciaEmisor());
+				/*destinatari.updateNotificaDatat(
+						NotificaEstatEnumDto.toEnum(datadoEnvio.getEstadoActual()),
+						datadoEnvio.getNccIdExterno(),
+						toDate(datadoEnvio.getFechaActualizacion()));*/
+				NotificaRespostaDatatDto resposta = new NotificaRespostaDatatDto();
+				resposta.setRespostaCodi(resultadoDatado.getCodigoRespuesta());
+				resposta.setRespostaDescripcio(resultadoDatado.getDescripcionRespuesta());
+				if (datadoEnvio.getIdentificadorEnvio() != null) {
+					resposta.setIdentificador(datadoEnvio.getIdentificadorEnvio().getIdentificador());
+					resposta.setReferenciaEmisor(datadoEnvio.getIdentificadorEnvio().getReferenciaEmisor());
+					resposta.setTitularNif(datadoEnvio.getIdentificadorEnvio().getNifTitular());
+				}
+				resposta.setEstatActual(datadoEnvio.getEstadoActual());
+				resposta.setEstatActualDescripcio(datadoEnvio.getDescripcionEstadoActual());
+				resposta.setDataActualitzacio(
+						toDate(datadoEnvio.getFechaActualizacion()));
+				resposta.setNumSeguiment(datadoEnvio.getNccIdExterno());
+				if (datadoEnvio.getDatado() != null && datadoEnvio.getDatado().getItem() != null) {
+					List<NotificaRespostaDatatEventDto> events = new ArrayList<NotificaRespostaDatatEventDto>();
+					for (TipoIntento intento: datadoEnvio.getDatado().getItem()) {
+						NotificaRespostaDatatEventDto event = new NotificaRespostaDatatEventDto();
+						event.setEstat(intento.getEstado());
+						event.setDescripcio(intento.getDescripcion());
+						event.setData(toDate(intento.getFecha()));
+						events.add(event);
+					}
+					resposta.setEvents(events);
+				}
+				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_DATAT,
+						notificacio).
+						notificacioDestinatari(destinatari).
+						build();
+				notificacio.updateEventAfegir(event);
+				return resposta;
+			} else {
+				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_DATAT,
+						notificacio).
+						notificacioDestinatari(destinatari).
+						error(true).
+						errorDescripcio("Error retornat per notifica: [" + resultadoDatado.getCodigoRespuesta() + "] " + resultadoDatado.getDescripcionRespuesta()).
+						build();
+				notificacio.updateEventAfegir(event);
+				throw new SistemaExternException(
+						"NOTIFICA",
+						errorPrefix + ": [" + resultadoDatado.getCodigoRespuesta() + "] " + resultadoDatado.getDescripcionRespuesta());
+			}
+		} catch (Exception ex) {
+			logger.error(
+					errorPrefix,
+					ex);
+			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+					NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_DATAT,
+					notificacio).
+					notificacioDestinatari(destinatari).
+					error(true).
+					errorDescripcio(ExceptionUtils.getStackTrace(ex)).
+					build();
+			notificacio.updateEventAfegir(event);
+			throw new SistemaExternException(
+					"NOTIFICA",
+					errorPrefix,
+					ex);
+		}
+	}
+
+	private NotificaRespostaCertificacioDto enviamentCertificacio(
+			NotificacioDestinatariEntity destinatari) {
+		NotificacioEntity notificacio = destinatari.getNotificacio();
+		String errorPrefix = "Error al consultar la certificació d'un enviament fet amb Notifica (" +
+				"notificacioId=" + notificacio.getId() + ", " +
+				"notificaIdentificador=" + destinatari.getNotificaIdentificador() + ")";
+		try {
+			ResultadoCertificacion resultadoCertificacion = getNotificaWs().consultaCertificacionEnvio(
+					destinatari.getNotificaIdentificador());
+			if ("000".equals(resultadoCertificacion.getCodigoRespuesta())) {
+				CertificacionEnvioRespuesta certificacion = resultadoCertificacion.getCertificacion();
+				comprovarIdentificadorEnviament(
+						notificacio,
+						destinatari,
+						certificacion.getIdentificadorEnvio().getIdentificador(),
+						certificacion.getIdentificadorEnvio().getNifTitular(),
+						certificacion.getIdentificadorEnvio().getReferenciaEmisor());
+				//String gestioDocumentalId = null;
+				NotificaCertificacioArxiuTipusEnumDto arxiuTipus = null;
+				byte[] decodificat = null;
+				if (certificacion.getPdfCertificado() != null) {
+					arxiuTipus = NotificaCertificacioArxiuTipusEnumDto.PDF;
+					decodificat = Base64.decodeBase64(certificacion.getPdfCertificado().getBytes());
+				} else if (certificacion.getXmlCertificado() != null) {
+					arxiuTipus = NotificaCertificacioArxiuTipusEnumDto.XML;
+					decodificat = Base64.decodeBase64(certificacion.getXmlCertificado().getBytes());
+				}
+				/*gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
+						PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
+						new ByteArrayInputStream(decodificat));
+				destinatari.updateNotificaCertificacio(
+						NotificaCertificacioTipusEnumDto.toEnum(certificacion.getCertificacion()),
+						arxiuTipus,
+						gestioDocumentalId,
+						certificacion.getNccIdExterno(),
+						toDate(certificacion.getFechaActualizacion()));*/
+				NotificaRespostaCertificacioDto resposta = new NotificaRespostaCertificacioDto();
+				resposta.setRespostaCodi(resultadoCertificacion.getCodigoRespuesta());
+				resposta.setRespostaDescripcio(resultadoCertificacion.getDescripcionRespuesta());
+				if (certificacion.getIdentificadorEnvio() != null) {
+					resposta.setIdentificador(certificacion.getIdentificadorEnvio().getIdentificador());
+					resposta.setReferenciaEmisor(certificacion.getIdentificadorEnvio().getReferenciaEmisor());
+					resposta.setTitularNif(certificacion.getIdentificadorEnvio().getNifTitular());
+				}
+				resposta.setCertificacioTipus(
+						NotificaCertificacioTipusEnumDto.toEnum(certificacion.getCertificacion()));
+				resposta.setCertificatTipus(arxiuTipus);
+				resposta.setCertificatContingut(decodificat);
+				resposta.setDataActualitzacio(
+						toDate(certificacion.getFechaActualizacion()));
+				resposta.setNumSeguiment(certificacion.getNccIdExterno());
+				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_CERT,
+						notificacio).
+						notificacioDestinatari(destinatari).
+						build();
+				notificacio.updateEventAfegir(event);
+				return resposta;
+			} else {
+				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_CERT,
+						notificacio).
+						notificacioDestinatari(destinatari).
+						error(true).
+						errorDescripcio("Error retornat per notifica: [" + resultadoCertificacion.getCodigoRespuesta() + "] " + resultadoCertificacion.getDescripcionRespuesta()).
+						build();
+				notificacio.updateEventAfegir(event);
+				throw new SistemaExternException(
+						"NOTIFICA",
+						errorPrefix + ": [" + resultadoCertificacion.getCodigoRespuesta() + "] " + resultadoCertificacion.getDescripcionRespuesta());
+			}
+		} catch (Exception ex) {
+			logger.error(
+					errorPrefix,
+					ex);
+			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+					NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_CERT,
+					notificacio).
+					notificacioDestinatari(destinatari).
+					error(true).
+					errorDescripcio(ExceptionUtils.getStackTrace(ex)).
+					build();
+			notificacio.updateEventAfegir(event);
+			throw new SistemaExternException(
+					"NOTIFICA",
+					errorPrefix,
+					ex);
+		}
+	}
+
+	private boolean isEstatFinal(
+			String estatCodi) {
+		String[] estatsNotifica = new String[] {
+				"ausente",
+				"desconocido",
+				"direccion_incorrecta",
+				"enviado_deh",
+				"enviado_ci",
+				"entregado_op",
+				"leida",
+				"error",
+				"extraviada",
+				"fallecido",
+				"notificada",
+				"pendiente_envio",
+				"pendiente_cie",
+				"pendiente_deh",
+				"pendiente_sede",
+				"rehusada",
+				"expirada",
+				"envio_programado",
+				"sin_informacion"};
+		boolean[] esFinal = new boolean[] {
+			true,
+			true,
+			true,
+			false,
+			false,
+			false,
+			true,
+			true,
+			true,
+			true,
+			true,
+			false,
+			false,
+			false,
+			false,
+			true,
+			true,
+			false,
+			false};
+		for (int i = 0; i < estatsNotifica.length; i++) {
+			if (estatCodi.equalsIgnoreCase(estatsNotifica[i])) {
+				return esFinal[i];
+			}
+		}
+		return false;
 	}
 
 	private void comprovarIdentificadorEnviament(
@@ -896,7 +899,8 @@ public class NotificaHelper {
 					"identificadorPeticio=" + destinatari.getNotificaIdentificador() + ", " +
 					"identificadorRetornat=" + identificador + ")");
 		}
-		if (!titularNif.equalsIgnoreCase(destinatari.getTitularNif())) {
+		String nifPerComprovar = (destinatari.getDestinatariNif() != null) ? destinatari.getDestinatariNif() : destinatari.getTitularNif();
+		if (!titularNif.equalsIgnoreCase(nifPerComprovar)) {
 			throw new SistemaExternException(
 					"NOTIFICA",
 					"La identificació retornada no coincideix amb la identificació de la petició (" + 
@@ -938,14 +942,14 @@ public class NotificaHelper {
 		SecretKeySpec rc4Key = new SecretKeySpec(getClauXifratIdsProperty().getBytes(),"RC4");
 		cipher.init(Cipher.ENCRYPT_MODE, rc4Key);
 		byte[] xifrat = cipher.doFinal(bytes);
-		return new String(Base64.encode(xifrat));
+		return new String(Base64.encodeBase64(xifrat));
 	}
 	@SuppressWarnings("unused")
 	private Long desxifrarIdPerNotifica(String idXifrat) throws GeneralSecurityException {
 		Cipher cipher = Cipher.getInstance("RC4");
 		SecretKeySpec rc4Key = new SecretKeySpec(getClauXifratIdsProperty().getBytes(),"RC4");
 		cipher.init(Cipher.DECRYPT_MODE, rc4Key);
-		byte[] desxifrat = cipher.doFinal(Base64.decode(idXifrat.getBytes()));
+		byte[] desxifrat = cipher.doFinal(Base64.decodeBase64(idXifrat.getBytes()));
 		return new Long(bytesToLong(desxifrat));
 	}
 
@@ -978,7 +982,7 @@ public class NotificaHelper {
 		return llinatges.toString();
 	}
 
-	private String[] separarLlinatges(
+	/*private String[] separarLlinatges(
 			String llinatges) {
 		int indexEspai = llinatges.indexOf(" ");
 		if (indexEspai != -1) {
@@ -990,7 +994,7 @@ public class NotificaHelper {
 					llinatges,
 					null};
 		}
-	}
+	}*/
 
 	private NotificaWsPortType getNotificaWs() throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
 		NotificaWsPortType port = new WsClientHelper<NotificaWsPortType>().generarClientWs(

@@ -174,18 +174,6 @@ public class NotificacioController extends BaseController {
 				"notificacio.controller.enviament.ok");
 	}
 
-	@RequestMapping(value = "/{notificacioId}/enviament/{referencia}/consultarInfo", method = RequestMethod.GET)
-	public String consultarInfo(
-			HttpServletRequest request,
-			@PathVariable Long notificacioId,
-			@PathVariable String referencia,
-			Model model) {
-		model.addAttribute(
-				"notificacioInfo",
-				notificacioService.consultarInformacio(referencia));
-		return "enviamentConsultarInfo";
-	}
-
 	@RequestMapping(value = "/{notificacioId}/enviament/{referencia}/consultarEstat", method = RequestMethod.GET)
 	public String consultarEstat(
 			HttpServletRequest request,
@@ -196,18 +184,6 @@ public class NotificacioController extends BaseController {
 				"notificacioEstat",
 				notificacioService.consultarEstat(referencia));
 		return "enviamentConsultarEstat";
-	}
-
-	@RequestMapping(value = "/{notificacioId}/enviament/{referencia}/consultarDatat", method = RequestMethod.GET)
-	public String consultarDatat(
-			HttpServletRequest request,
-			@PathVariable Long notificacioId,
-			@PathVariable String referencia,
-			Model model) {
-		model.addAttribute(
-				"notificacioDatat",
-				notificacioService.consultarDatat(referencia));
-		return "enviamentConsultarDatat";
 	}
 
 	@RequestMapping(value = "/{notificacioId}/enviament", method = RequestMethod.GET)

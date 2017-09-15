@@ -23,7 +23,6 @@ public class NotificaRespostaDatatDto extends NotificaRespostaDto {
 	private Date dataActualitzacio;
 	private String numSeguiment;
 	private List<NotificaRespostaDatatEventDto> events;
-	
 
 	public String getIdentificador() {
 		return identificador;

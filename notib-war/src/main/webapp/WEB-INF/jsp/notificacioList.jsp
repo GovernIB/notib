@@ -56,17 +56,16 @@ enviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
 					contingutTbody += '<td>' + data[i].titular + '</td>';
 					contingutTbody += '<td>' + data[i].destinatari + '</td>';
 					contingutTbody += '<td>' + ((data[i].estat) ? enviamentEstats[data[i].estat] : '') + '</td>';
-					contingutTbody += '<td width="10%">';
-					contingutTbody += '<div class="dropdown">';
+					contingutTbody += '<td width="5%">';
+					contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/info"/>" data-toggle="modal" class="btn btn-default btn-sm"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>';
+					/*contingutTbody += '<div class="dropdown">';
 					contingutTbody += '<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>';
 					contingutTbody += '<ul class="dropdown-menu">';
 					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/info"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>';
 					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/event"/>" data-toggle="modal"><span class="fa fa-calendar-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.enviament.list.accio.events"/></a></li>';
-					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].referencia + '/consultarInfo"/>" data-toggle="modal"><span class="fa fa-share-square-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.enviament.list.accio.consultar.info"/></a></li>';
 					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].referencia + '/consultarEstat"/>" data-toggle="modal"><span class="fa fa-share-square-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.enviament.list.accio.consultar.estat"/></a></li>';
-					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].referencia + '/consultarDatat"/>" data-toggle="modal"><span class="fa fa-share-square-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.enviament.list.accio.consultar.datat"/></a></li>';
 					contingutTbody += '</ul>';
-					contingutTbody += '</div>';
+					contingutTbody += '</div>';*/
 					contingutTbody += '</td>';
 					contingutTbody += '</tr>';
 				}
@@ -152,9 +151,10 @@ enviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
 						{{if error}}<span class="fa fa-warning text-danger" title="{{:errorEventError}}"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
+				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="5%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<div class="dropdown">
+						<a href="<c:url value="/notificacio/{{:id}}"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a>
+						<%--<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="<c:url value="/notificacio/{{:id}}"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
@@ -164,7 +164,7 @@ enviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
 								{{/if}}
 								<li><a href="<c:url value="/notificacio/{{:id}}/document"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="notificacio.list.accio.descarregar.document"/></a></li>
 							</ul>
-						</div>
+						</div>--%>
 					</script>
 				</th>
 			</tr>
