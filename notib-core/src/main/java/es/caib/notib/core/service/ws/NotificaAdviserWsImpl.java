@@ -63,6 +63,7 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 			DatadoRequest datadoOrganismo,
 			Holder<String> codigoRespuesta,
 			Holder<String> textoRespuesta) {
+		
 		NotificacioDestinatariEntity notificacioDestinatari = null;
 		NotificacioEventEntity event = null;
 		try {
@@ -132,6 +133,7 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 								notificacioDestinatari.getNotificacio()).
 								notificacioDestinatari(notificacioDestinatari).
 								descripcio(datadoOrganismo.getResultado()).
+								callbackInicialitza().
 								build();
 						codigoRespuesta.value = "000";
 						textoRespuesta.value = "OK";
@@ -207,6 +209,7 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 			CertificadoRequest certificacionOrganismo,
 			Holder<String> codigoRespuesta,
 			Holder<String> textoRespuesta) {
+				
 		NotificacioDestinatariEntity notificacioDestinatari = null;
 		NotificacioEventEntity event = null;
 		try {
@@ -234,6 +237,7 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
 								notificacioDestinatari.getNotificacio()).
 								notificacioDestinatari(notificacioDestinatari).
+								callbackInicialitza().
 								build();
 						codigoRespuesta.value = "000";
 						textoRespuesta.value = "OK";

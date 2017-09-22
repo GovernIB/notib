@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 
 import es.caib.notib.core.api.ws.callback.NotificacioEstatClient;
 import es.caib.notib.core.api.ws.notificacio.NotificacioDestinatariEstatEnum;
@@ -20,9 +21,9 @@ public class CallbackRestTest {
 		Client jerseyClient = new Client();
 		ObjectMapper mapper  = new ObjectMapper();
 		
-		String user = "siona";
-		String pass = "siona15";
-		String urlAmbMetode = "http://localhost:8181/ripea/rest/v1/callback";
+		String user = "admin";
+		String pass = "admin";
+		String urlAmbMetode = "http://localhost:8180/ripea/rest/v1/callback";
 		
 		if(urlAmbMetode.charAt(urlAmbMetode.length() - 1) != '/')
 			urlAmbMetode = urlAmbMetode + "/";
@@ -41,6 +42,8 @@ public class CallbackRestTest {
 		String body = mapper.writeValueAsString(notificacioEstat);
 		
 		jerseyClient.addFilter( new HTTPBasicAuthFilter(user, pass) );
+		jerseyClient.addFilter(new LoggingFilter(System.out));
+		
 		ClientResponse response = jerseyClient.
 				resource(urlAmbMetode).
 				type("application/json").

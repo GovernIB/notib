@@ -1,4 +1,4 @@
-package es.caib.notib.core.api.ws.callback;
+package es.caib.notib.rest.callback;
 
 import java.util.Date;
 
@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
-import es.caib.notib.core.api.ws.notificacio.NotificacioDestinatariEstatEnum;
+import es.caib.notib.rest.callback.NotificacioDestinatariEstatEnum;
 
 
 /**
@@ -25,6 +25,10 @@ public class NotificacioEstatClient {
 	private String origen;
 	private String numSeguiment;
 	private String referenciaEnviament;
+	
+	public NotificacioEstatClient() {
+		super();
+	}
 	
 	public NotificacioEstatClient(
 			NotificacioDestinatariEstatEnum estat,

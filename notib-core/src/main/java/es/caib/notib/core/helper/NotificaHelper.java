@@ -70,6 +70,7 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.ws.notificacio.NotificacioDestinatariEstatEnum;
 import es.caib.notib.core.entity.NotificacioDestinatariEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
@@ -1213,6 +1214,74 @@ public class NotificaHelper {
 			transformer.transform(src, result);
 			return (Document) result.getNode();
 		}
+	}
+	
+	
+	//@SuppressWarnings("incomplete-switch")
+	public static NotificacioDestinatariEstatEnum calcularEstat(
+			NotificacioDestinatariEntity destinatari) {
+		NotificacioDestinatariEstatEnumDto estatCalculatDto = NotificacioDestinatariEntity.calcularEstatNotificacioDestinatari(destinatari);
+		NotificacioDestinatariEstatEnum estatCalculat = null;
+		switch (estatCalculatDto) {
+		case ABSENT:
+			estatCalculat = NotificacioDestinatariEstatEnum.ABSENT;
+			break;
+		case ADRESA_INCORRECTA:
+			estatCalculat = NotificacioDestinatariEstatEnum.ADRESA_INCORRECTA;
+			break;
+		case DESCONEGUT:
+			estatCalculat = NotificacioDestinatariEstatEnum.DESCONEGUT;
+			break;
+		case ENTREGADA_OP:
+			estatCalculat = NotificacioDestinatariEstatEnum.ENTREGADA_OP;
+			break;
+		case ENVIADA_CI:
+			estatCalculat = NotificacioDestinatariEstatEnum.ENVIADA_CI;
+			break;
+		case ENVIADA_DEH:
+			estatCalculat = NotificacioDestinatariEstatEnum.ENVIADA_DEH;
+			break;
+		case ENVIAMENT_PROGRAMAT:
+			estatCalculat = NotificacioDestinatariEstatEnum.ENVIAMENT_PROGRAMAT;
+			break;
+		case ERROR_ENTREGA:
+			estatCalculat = NotificacioDestinatariEstatEnum.ERROR_ENTREGA;
+			break;
+		case EXPIRADA:
+			estatCalculat = NotificacioDestinatariEstatEnum.EXPIRADA;
+			break;
+		case EXTRAVIADA:
+			estatCalculat = NotificacioDestinatariEstatEnum.EXTRAVIADA;
+			break;
+		case LLEGIDA:
+			estatCalculat = NotificacioDestinatariEstatEnum.LLEGIDA;
+			break;
+		case MORT:
+			estatCalculat = NotificacioDestinatariEstatEnum.MORT;
+			break;
+		case NOTIFICADA:
+			estatCalculat = NotificacioDestinatariEstatEnum.NOTIFICADA;
+			break;
+		case PENDENT_CIE:
+			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_CIE;
+			break;
+		case PENDENT_DEH:
+			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_DEH;
+			break;
+		case PENDENT_ENVIAMENT:
+			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_ENVIAMENT;
+			break;
+		case PENDENT_SEU:
+			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_SEU;
+			break;
+		case REBUTJADA:
+			estatCalculat = NotificacioDestinatariEstatEnum.REBUTJADA;
+			break;
+		case SENSE_INFORMACIO:
+			estatCalculat = NotificacioDestinatariEstatEnum.SENSE_INFORMACIO;
+			break;
+		}
+		return estatCalculat;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(NotificaHelper.class);

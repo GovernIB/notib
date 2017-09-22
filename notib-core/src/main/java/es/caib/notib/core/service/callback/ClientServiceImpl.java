@@ -1,5 +1,7 @@
 package es.caib.notib.core.service.callback;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import es.caib.notib.core.api.ws.callback.ClientService;
@@ -7,18 +9,19 @@ import es.caib.notib.core.api.ws.callback.NotificacioCertificacioClient;
 import es.caib.notib.core.api.ws.callback.NotificacioEstatClient;
 
 @Service
-public class ClientServiceImp implements ClientService {
+public class ClientServiceImpl implements ClientService {
 
 	@Override
 	public void notificaEstat(NotificacioEstatClient estatNotificacio) {
 		
-		System.out.println(estatNotificacio.toString());	
+		logger.debug(estatNotificacio.toString());	
 	}
 
 	@Override
 	public void notificaCertificacio(NotificacioCertificacioClient certificacioNotificacio) {
 		
-		System.out.println(certificacioNotificacio.toString());
-	}
-	
+		logger.debug(certificacioNotificacio.toString());
+	}	
+
+	private static final Logger logger = LoggerFactory.getLogger(ClientServiceImpl.class);
 }

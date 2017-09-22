@@ -341,7 +341,7 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 							destinatari.getNotificaIdentificador(),
 							null,
 							null,
-							calcularEstat(destinatari)));
+							NotificaHelper.calcularEstat(destinatari)));
 			result.setDestinataris(destinataris);
 			return result;
 		} catch (Exception ex) {
@@ -419,7 +419,7 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 				}
 			}
 			NotificacioEstat notificacioEstat = new NotificacioEstat(
-					calcularEstat(destinatari),
+					NotificaHelper.calcularEstat(destinatari),
 					destinatari.getNotificaEstatData(),
 					destinatari.getNotificaEstatReceptorNom(),
 					destinatari.getNotificaEstatReceptorNif(),
@@ -487,72 +487,72 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 	    return hex;
 	}
 
-	@SuppressWarnings("incomplete-switch")
-	private NotificacioDestinatariEstatEnum calcularEstat(
-			NotificacioDestinatariEntity destinatari) {
-		NotificacioDestinatariEstatEnumDto estatCalculatDto = NotificacioDestinatariEntity.calcularEstatNotificacioDestinatari(destinatari);
-		NotificacioDestinatariEstatEnum estatCalculat = null;
-		switch (estatCalculatDto) {
-		case ABSENT:
-			estatCalculat = NotificacioDestinatariEstatEnum.ABSENT;
-			break;
-		case ADRESA_INCORRECTA:
-			estatCalculat = NotificacioDestinatariEstatEnum.ADRESA_INCORRECTA;
-			break;
-		case DESCONEGUT:
-			estatCalculat = NotificacioDestinatariEstatEnum.DESCONEGUT;
-			break;
-		case ENTREGADA_OP:
-			estatCalculat = NotificacioDestinatariEstatEnum.ENTREGADA_OP;
-			break;
-		case ENVIADA_CI:
-			estatCalculat = NotificacioDestinatariEstatEnum.ENVIADA_CI;
-			break;
-		case ENVIADA_DEH:
-			estatCalculat = NotificacioDestinatariEstatEnum.ENVIADA_DEH;
-			break;
-		case ENVIAMENT_PROGRAMAT:
-			estatCalculat = NotificacioDestinatariEstatEnum.ENVIAMENT_PROGRAMAT;
-			break;
-		case ERROR_ENTREGA:
-			estatCalculat = NotificacioDestinatariEstatEnum.ERROR_ENTREGA;
-			break;
-		case EXPIRADA:
-			estatCalculat = NotificacioDestinatariEstatEnum.EXPIRADA;
-			break;
-		case EXTRAVIADA:
-			estatCalculat = NotificacioDestinatariEstatEnum.EXTRAVIADA;
-			break;
-		case LLEGIDA:
-			estatCalculat = NotificacioDestinatariEstatEnum.LLEGIDA;
-			break;
-		case MORT:
-			estatCalculat = NotificacioDestinatariEstatEnum.MORT;
-			break;
-		case NOTIFICADA:
-			estatCalculat = NotificacioDestinatariEstatEnum.NOTIFICADA;
-			break;
-		case PENDENT_CIE:
-			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_CIE;
-			break;
-		case PENDENT_DEH:
-			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_DEH;
-			break;
-		case PENDENT_ENVIAMENT:
-			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_ENVIAMENT;
-			break;
-		case PENDENT_SEU:
-			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_SEU;
-			break;
-		case REBUTJADA:
-			estatCalculat = NotificacioDestinatariEstatEnum.REBUTJADA;
-			break;
-		case SENSE_INFORMACIO:
-			estatCalculat = NotificacioDestinatariEstatEnum.SENSE_INFORMACIO;
-			break;
-		}
-		return estatCalculat;
-	}
+//	@SuppressWarnings("incomplete-switch")
+//	private NotificacioDestinatariEstatEnum calcularEstat(
+//			NotificacioDestinatariEntity destinatari) {
+//		NotificacioDestinatariEstatEnumDto estatCalculatDto = NotificacioDestinatariEntity.calcularEstatNotificacioDestinatari(destinatari);
+//		NotificacioDestinatariEstatEnum estatCalculat = null;
+//		switch (estatCalculatDto) {
+//		case ABSENT:
+//			estatCalculat = NotificacioDestinatariEstatEnum.ABSENT;
+//			break;
+//		case ADRESA_INCORRECTA:
+//			estatCalculat = NotificacioDestinatariEstatEnum.ADRESA_INCORRECTA;
+//			break;
+//		case DESCONEGUT:
+//			estatCalculat = NotificacioDestinatariEstatEnum.DESCONEGUT;
+//			break;
+//		case ENTREGADA_OP:
+//			estatCalculat = NotificacioDestinatariEstatEnum.ENTREGADA_OP;
+//			break;
+//		case ENVIADA_CI:
+//			estatCalculat = NotificacioDestinatariEstatEnum.ENVIADA_CI;
+//			break;
+//		case ENVIADA_DEH:
+//			estatCalculat = NotificacioDestinatariEstatEnum.ENVIADA_DEH;
+//			break;
+//		case ENVIAMENT_PROGRAMAT:
+//			estatCalculat = NotificacioDestinatariEstatEnum.ENVIAMENT_PROGRAMAT;
+//			break;
+//		case ERROR_ENTREGA:
+//			estatCalculat = NotificacioDestinatariEstatEnum.ERROR_ENTREGA;
+//			break;
+//		case EXPIRADA:
+//			estatCalculat = NotificacioDestinatariEstatEnum.EXPIRADA;
+//			break;
+//		case EXTRAVIADA:
+//			estatCalculat = NotificacioDestinatariEstatEnum.EXTRAVIADA;
+//			break;
+//		case LLEGIDA:
+//			estatCalculat = NotificacioDestinatariEstatEnum.LLEGIDA;
+//			break;
+//		case MORT:
+//			estatCalculat = NotificacioDestinatariEstatEnum.MORT;
+//			break;
+//		case NOTIFICADA:
+//			estatCalculat = NotificacioDestinatariEstatEnum.NOTIFICADA;
+//			break;
+//		case PENDENT_CIE:
+//			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_CIE;
+//			break;
+//		case PENDENT_DEH:
+//			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_DEH;
+//			break;
+//		case PENDENT_ENVIAMENT:
+//			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_ENVIAMENT;
+//			break;
+//		case PENDENT_SEU:
+//			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_SEU;
+//			break;
+//		case REBUTJADA:
+//			estatCalculat = NotificacioDestinatariEstatEnum.REBUTJADA;
+//			break;
+//		case SENSE_INFORMACIO:
+//			estatCalculat = NotificacioDestinatariEstatEnum.SENSE_INFORMACIO;
+//			break;
+//		}
+//		return estatCalculat;
+//	}
 
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioWsServiceImpl.class);
 
