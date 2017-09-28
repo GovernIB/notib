@@ -110,4 +110,10 @@ public class AplicacioServiceBean implements AplicacioService {
 		return delegate.propertyFindByPrefix(prefix);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public boolean pluginSeuDisponible() {
+		return delegate.pluginSeuDisponible();
+	}
+
 }

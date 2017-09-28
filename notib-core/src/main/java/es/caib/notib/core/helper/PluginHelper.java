@@ -26,7 +26,7 @@ import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioDestinatari;
 import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.NotificacioDestinatariEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
@@ -142,7 +142,7 @@ public class PluginHelper {
 		try {
 			String gestioDocumentalId = getGestioDocumentalPlugin().create(
 					agrupacio,
-							contingut);
+						contingut);
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_GESDOC,
 					accioDescripcio,
@@ -273,7 +273,7 @@ public class PluginHelper {
 	}
 
 	public SeuNotificacioResultat seuNotificacioDestinatariEnviar(
-			NotificacioDestinatariEntity notificacioDestinatari) {
+			NotificacioEnviamentEntity notificacioDestinatari) {
 		NotificacioEntity notificacio = notificacioDestinatari.getNotificacio();
 		String accioDescripcio = "Enviament d'una notificació a la seu electrònica per un destinatari";
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -365,7 +365,7 @@ public class PluginHelper {
 	}
 
 	public SeuNotificacioEstat seuNotificacioComprovarEstat(
-			NotificacioDestinatariEntity notificacioDestinatari) {
+			NotificacioEnviamentEntity notificacioDestinatari) {
 		NotificacioEntity notificacio = notificacioDestinatari.getNotificacio();
 		String accioDescripcio = "Consulta de l'estat d'una notificació a la seu electrònica";
 		Map<String, String> accioParams = new HashMap<String, String>();

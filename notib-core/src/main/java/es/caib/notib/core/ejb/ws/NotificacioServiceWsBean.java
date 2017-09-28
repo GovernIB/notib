@@ -5,7 +5,6 @@ package es.caib.notib.core.ejb.ws;
 
 import java.util.List;
 
-import javax.annotation.Resource;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
@@ -17,14 +16,14 @@ import org.jboss.wsf.spi.annotation.WebContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.notib.core.api.ws.notificacio2.InformacioEnviament;
+import es.caib.notib.core.api.ws.notificacio2.Notificacio;
+import es.caib.notib.core.api.ws.notificacio2.NotificacioServiceWs;
+import es.caib.notib.core.api.ws.notificacio2.NotificacioServiceWsException;
 import es.caib.notib.core.helper.UsuariHelper;
-import es.caib.notib.core.api.ws.notificacio.Notificacio;
-import es.caib.notib.core.api.ws.notificacio.NotificacioCertificacio;
-import es.caib.notib.core.api.ws.notificacio.NotificacioEstat;
-import es.caib.notib.core.api.ws.notificacio.NotificacioWsService;
 
 /**
- * Implementació dels mètodes per al servei de Notifica de NOTIB.
+ * EJB per a la publicació del servei web de gestió de notificacions.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -43,19 +42,21 @@ import es.caib.notib.core.api.ws.notificacio.NotificacioWsService;
 @RolesAllowed({"NOT_APL"})
 @SecurityDomain("seycon")
 @Interceptors(SpringBeanAutowiringInterceptor.class)
-public class NotificacioWsServiceBean implements NotificacioWsService {
+public class NotificacioServiceWsBean implements NotificacioServiceWs {
 
 	@Autowired
-	private NotificacioWsService delegate;
-
-	@Resource
 	private SessionContext sessionContext;
 	@Autowired
 	private UsuariHelper usuariHelper;
-	
+
+	@Autowired
+	private NotificacioServiceWs delegate;
+
+
+
 	@Override
 	public List<String> alta(
-			Notificacio notificacio) {
+			Notificacio notificacio) throws NotificacioServiceWsException {
 		usuariHelper.generarUsuariAutenticatEjb(
 				sessionContext,
 				true);
@@ -63,30 +64,12 @@ public class NotificacioWsServiceBean implements NotificacioWsService {
 	}
 
 	@Override
-	public Notificacio consulta(
-			String referencia) {
+	public InformacioEnviament consulta(
+			String identificador) throws NotificacioServiceWsException {
 		usuariHelper.generarUsuariAutenticatEjb(
 				sessionContext,
 				true);
-		return delegate.consulta(referencia);
-	}
-
-	@Override
-	public NotificacioEstat consultaEstat(
-			String referencia) {
-		usuariHelper.generarUsuariAutenticatEjb(
-				sessionContext,
-				true);
-		return delegate.consultaEstat(referencia);
-	}
-
-	@Override
-	public NotificacioCertificacio consultaCertificacio(
-			String referencia) {
-		usuariHelper.generarUsuariAutenticatEjb(
-				sessionContext,
-				true);
-		return delegate.consultaCertificacio(referencia);
+		return delegate.consulta(identificador);
 	}
 
 }

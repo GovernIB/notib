@@ -55,17 +55,27 @@ enviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
 					contingutTbody += '<tr>';
 					contingutTbody += '<td>' + data[i].titular + '</td>';
 					contingutTbody += '<td>' + data[i].destinatari + '</td>';
-					contingutTbody += '<td>' + ((data[i].estat) ? enviamentEstats[data[i].estat] : '') + '</td>';
+					contingutTbody += '<td>';
+					contingutTbody += (data[i].estat) ? enviamentEstats[data[i].estat] : '';
+					if (data[i].notificaError) {
+						var errorTitle = '';
+						if (data[i].notificaErrorError) {
+							errorTitle = data[i].notificaErrorError;
+						}
+						var escaped = data[i].notificaErrorError.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+						contingutTbody += ' <span class="fa fa-warning text-danger" title="' + escaped + '"></span>';
+					}
+					contingutTbody += '</td>';
 					contingutTbody += '<td width="5%">';
-					contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/info"/>" data-toggle="modal" class="btn btn-default btn-sm"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>';
-					/*contingutTbody += '<div class="dropdown">';
+					contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" data-toggle="modal" class="btn btn-default btn-sm"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>';
+					<%--contingutTbody += '<div class="dropdown">';
 					contingutTbody += '<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>';
 					contingutTbody += '<ul class="dropdown-menu">';
 					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/info"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>';
 					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/event"/>" data-toggle="modal"><span class="fa fa-calendar-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.enviament.list.accio.events"/></a></li>';
 					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].referencia + '/consultarEstat"/>" data-toggle="modal"><span class="fa fa-share-square-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.enviament.list.accio.consultar.estat"/></a></li>';
 					contingutTbody += '</ul>';
-					contingutTbody += '</div>';*/
+					contingutTbody += '</div>';--%>
 					contingutTbody += '</td>';
 					contingutTbody += '</tr>';
 				}
@@ -129,8 +139,8 @@ enviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false">#</th>
-				<th data-col-name="error" data-visible="false"></th>
-				<th data-col-name="errorEventError" data-visible="false"></th>
+				<th data-col-name="errorNotifica" data-visible="false"></th>
+				<th data-col-name="errorNotificaError" data-visible="false"></th>
 				<th data-col-name=createdDate data-converter="datetime" width="15%"><spring:message code="notificacio.list.columna.enviament.data"/></th>
 				<th data-col-name="concepte" width="${ampladaConcepte}"><spring:message code="notificacio.list.columna.concepte"/></th>
 				<c:if test="${isRolActualAdministrador}">
@@ -148,7 +158,7 @@ enviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
 						{{else}}
 							{{:estat}}
 						{{/if}}
-						{{if error}}<span class="fa fa-warning text-danger" title="{{:errorEventError}}"></span>{{/if}}
+						{{if errorNotifica}}<span class="fa fa-warning text-danger" title="{{:errorNotificaError}}"></span>{{/if}}
 					</script>
 				</th>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="5%">

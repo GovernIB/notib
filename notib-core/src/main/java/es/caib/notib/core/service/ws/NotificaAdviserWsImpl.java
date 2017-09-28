@@ -24,11 +24,11 @@ import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.NotificacioDestinatariEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.NotificacioDestinatariRepository;
+import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.wsdl.adviser.AdviserWS;
 import es.caib.notib.core.wsdl.adviser.CertificadoRequest;
 import es.caib.notib.core.wsdl.adviser.DatadoRequest;
@@ -50,7 +50,7 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 	@Autowired
 	private EntitatRepository entitatRepository;
 	@Autowired
-	private NotificacioDestinatariRepository notificacioDestinatariRepository;
+	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 
 	@Autowired
 	private PluginHelper pluginHelper;
@@ -63,17 +63,17 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 			DatadoRequest datadoOrganismo,
 			Holder<String> codigoRespuesta,
 			Holder<String> textoRespuesta) {
-		NotificacioDestinatariEntity notificacioDestinatari = null;
+		NotificacioEnviamentEntity enviament = null;
 		NotificacioEventEntity event = null;
 		try {
 			if (datadoOrganismo.getOrganismoEmisor().getCodigoDir3() != null) {
 				EntitatEntity entitat = entitatRepository.findByDir3Codi(
 						datadoOrganismo.getOrganismoEmisor().getCodigoDir3());
 				if (entitat != null) {
-					notificacioDestinatari = notificacioDestinatariRepository.findByNotificacioEntitatAndNotificaIdentificador(
+					enviament = notificacioEnviamentRepository.findByNotificacioEntitatAndNotificaIdentificador(
 							entitat,
 							datadoOrganismo.getIdentificadorDestinatario());
-					if (notificacioDestinatari != null) {
+					if (enviament != null) {
 						String receptorNombre = null;
 						String receptorNif = null;
 						if (datadoOrganismo.getReceptor() != null) {
@@ -120,17 +120,18 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 						} else if ("expirada".equals(datadoOrganismo.getResultado())) {
 							notificaEstat = NotificacioDestinatariEstatEnumDto.EXPIRADA;
 						}
-						notificacioDestinatari.updateNotificaEstat(
-								notificaEstat,
+						enviament.updateNotificaDatat(
 								toDate(datadoOrganismo.getFecha()),
-								receptorNombre,
-								receptorNif,
+								notificaEstat,
+								null, // Estat descripció
 								datadoOrganismo.getModo(),
-								null);
+								receptorNif,
+								receptorNombre,
+								null); // Núm. seguiment
 						event = NotificacioEventEntity.getBuilder(
 								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-								notificacioDestinatari.getNotificacio()).
-								notificacioDestinatari(notificacioDestinatari).
+								enviament.getNotificacio()).
+								enviament(enviament).
 								descripcio(datadoOrganismo.getResultado()).
 								build();
 						codigoRespuesta.value = "000";
@@ -167,37 +168,37 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 					"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
 					"identificadorDestinatario=" + datadoOrganismo.getIdentificadorDestinatario() + ")",
 					ex);
-			if (notificacioDestinatari != null) {
+			if (enviament != null) {
 				event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-						notificacioDestinatari.getNotificacio()).
-						notificacioDestinatari(notificacioDestinatari).
+						enviament.getNotificacio()).
+						enviament(enviament).
 						descripcio(datadoOrganismo.getResultado()).
 						error(true).
 						errorDescripcio(ExceptionUtils.getStackTrace(ex)).
 						build();
-				notificacioDestinatari.updateNotificaError(
+				enviament.updateNotificaError(
 						true,
 						event);
 			}
 			codigoRespuesta.value = "666";
 			textoRespuesta.value = "Error procesando peticion";
 		}
-		if (notificacioDestinatari != null) {
+		if (enviament != null) {
 			if (event == null) {
 				event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-						notificacioDestinatari.getNotificacio()).
-						notificacioDestinatari(notificacioDestinatari).
+						enviament.getNotificacio()).
+						enviament(enviament).
 						descripcio(datadoOrganismo.getResultado()).
 						error(true).
 						errorDescripcio("Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + textoRespuesta.value).
 						build();
-				notificacioDestinatari.updateNotificaError(
+				enviament.updateNotificaError(
 						true,
 						event);
 			}
-			notificacioDestinatari.getNotificacio().updateEventAfegir(event);
+			enviament.getNotificacio().updateEventAfegir(event);
 		}
 	}
 
@@ -207,33 +208,39 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 			CertificadoRequest certificacionOrganismo,
 			Holder<String> codigoRespuesta,
 			Holder<String> textoRespuesta) {
-		NotificacioDestinatariEntity notificacioDestinatari = null;
+		NotificacioEnviamentEntity enviament = null;
 		NotificacioEventEntity event = null;
 		try {
 			if (certificacionOrganismo.getOrganismoEmisor() != null) {
 				EntitatEntity entitat = entitatRepository.findByDir3Codi(
 						certificacionOrganismo.getOrganismoEmisor());
 				if (entitat != null) {
-					notificacioDestinatari = notificacioDestinatariRepository.findByNotificacioEntitatAndNotificaIdentificador(
+					enviament = notificacioEnviamentRepository.findByNotificacioEntitatAndNotificaIdentificador(
 							entitat,
 							certificacionOrganismo.getIdentificadorDestinatario());
-					if (notificacioDestinatari != null) {
+					if (enviament != null) {
 						//certificacionOrganismo.getHashSha1(); // Hash document certificacio
 						String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
 								PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
 								new ByteArrayInputStream(
 										Base64.decode(
 												certificacionOrganismo.getCertificacion().getBytes())));
-						notificacioDestinatari.updateNotificaCertificacio(
+						enviament.updateNotificaCertificacio(
+								new Date(),
+								gestioDocumentalId,
+								null, // hash
+								null, // origen
+								null, // metadades
+								null, // csv
+								null, // tipus mime
+								null, // tamany
 								NotificaCertificacioTipusEnumDto.toEnum(certificacionOrganismo.getAcuseOSobre()),
 								NotificaCertificacioArxiuTipusEnumDto.PDF,
-								gestioDocumentalId,
-								null,
-								new Date());
+								null); // núm. seguiment
 						event = NotificacioEventEntity.getBuilder(
 								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-								notificacioDestinatari.getNotificacio()).
-								notificacioDestinatari(notificacioDestinatari).
+								enviament.getNotificacio()).
+								enviament(enviament).
 								build();
 						codigoRespuesta.value = "000";
 						textoRespuesta.value = "OK";
@@ -266,35 +273,35 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 					"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
 					"identificadorDestinatario=" + certificacionOrganismo.getIdentificadorDestinatario() + ")",
 					ex);
-			if (notificacioDestinatari != null) {
+			if (enviament != null) {
 				event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-						notificacioDestinatari.getNotificacio()).
-						notificacioDestinatari(notificacioDestinatari).
+						enviament.getNotificacio()).
+						enviament(enviament).
 						error(true).
 						errorDescripcio(ExceptionUtils.getStackTrace(ex)).
 						build();
-				notificacioDestinatari.updateNotificaError(
+				enviament.updateNotificaError(
 						true,
 						event);
 			}
 			codigoRespuesta.value = "666";
 			textoRespuesta.value = "Error procesando peticion";
 		}
-		if (notificacioDestinatari != null) {
+		if (enviament != null) {
 			if (event == null) {
 				event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-						notificacioDestinatari.getNotificacio()).
-						notificacioDestinatari(notificacioDestinatari).
+						enviament.getNotificacio()).
+						enviament(enviament).
 						error(true).
 						errorDescripcio("Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + textoRespuesta.value).
 						build();
-				notificacioDestinatari.updateNotificaError(
+				enviament.updateNotificaError(
 						true,
 						event);
 			}
-			notificacioDestinatari.getNotificacio().updateEventAfegir(event);
+			enviament.getNotificacio().updateEventAfegir(event);
 		}
 	}
 

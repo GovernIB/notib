@@ -18,12 +18,18 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 
-import es.caib.notib.core.api.ws.notificacio2.DomiciliConcretTipusEnum;
-import es.caib.notib.core.api.ws.notificacio2.DomiciliNumeracioTipusEnum;
-import es.caib.notib.core.api.ws.notificacio2.DomiciliTipusEnum;
+import es.caib.notib.core.api.ws.notificacio2.Document;
+import es.caib.notib.core.api.ws.notificacio2.EntregaDeh;
+import es.caib.notib.core.api.ws.notificacio2.EntregaPostal;
+import es.caib.notib.core.api.ws.notificacio2.EntregaPostalTipusEnum;
+import es.caib.notib.core.api.ws.notificacio2.EntregaPostalViaTipusEnum;
+import es.caib.notib.core.api.ws.notificacio2.Enviament;
 import es.caib.notib.core.api.ws.notificacio2.EnviamentTipusEnum;
 import es.caib.notib.core.api.ws.notificacio2.Notificacio;
-import es.caib.notib.core.api.ws.notificacio2.NotificacioEnviament;
+import es.caib.notib.core.api.ws.notificacio2.PagadorCie;
+import es.caib.notib.core.api.ws.notificacio2.PagadorPostal;
+import es.caib.notib.core.api.ws.notificacio2.ParametresSeu;
+import es.caib.notib.core.api.ws.notificacio2.Persona;
 import es.caib.notib.core.api.ws.notificacio2.ServeiTipusEnum;
 
 public class RestAltaNotificacio {
@@ -69,117 +75,118 @@ public class RestAltaNotificacio {
 			boolean ambEnviamentPostal) throws IOException, DecoderException {
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 		Notificacio notificacio = new Notificacio();
-		notificacio.setEntitatDir3Codi(ENTITAT_DIR3CODI);
+		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
 		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
-		notificacio.setEnviamentDataProgramada(null);
 		notificacio.setConcepte(
 				"concepte_" + notificacioId);
-		if (ambEnviamentPostal) {
-			notificacio.setPagadorCorreusCodiDir3("A04013511");
-			notificacio.setPagadorCorreusContracteNum("00001");
-			notificacio.setPagadorCorreusCodiClientFacturacio("A04013511");
-			notificacio.setPagadorCorreusDataVigencia(new Date());
-			notificacio.setPagadorCorreusContracteNum(
-					"pccNum_" + notificacioId);
-			notificacio.setPagadorCorreusCodiClientFacturacio(
-					"ccFac_" + notificacioId);
-			notificacio.setPagadorCorreusDataVigencia(
-					new Date(0));
-			notificacio.setPagadorCieCodiDir3(
-					"A04013511");
-			notificacio.setPagadorCieDataVigencia(
-					new Date(0));
-		}
-		notificacio.setProcedimentCodiSia(
-				"0000");
-		notificacio.setProcedimentDescripcioSia(
-				"Procediment desc.");
-		notificacio.setDocumentArxiuNom(
-				"documentArxiuNom_" + notificacioId + ".pdf");
-		notificacio.setDocumentContingutBase64(
-				Base64.encodeBase64String(arxiuBytes));
-		notificacio.setDocumentSha1(
+		notificacio.setDescripcio(
+				"descripcio_" + notificacioId);
+		notificacio.setEnviamentDataProgramada(null);
+		notificacio.setRetard(5);
+		notificacio.setCaducitat(
+				new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000));
+		Document document = new Document();
+		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
+		document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
+		document.setHash(
 				Base64.encodeBase64String(
 						Hex.decodeHex(
 								DigestUtils.sha1Hex(arxiuBytes).toCharArray())));
-		notificacio.setDocumentNormalitzat(
-				false);
-		notificacio.setDocumentGenerarCsv(
-				false);
-		notificacio.setSeuExpedientSerieDocumental(
-				"0000S");
-		notificacio.setSeuExpedientUnitatOrganitzativa(
-				"00000000T");
-		notificacio.setSeuExpedientIdentificadorEni(
-				"seuExpedientIdentificadorEni_" + notificacioId);
-		notificacio.setSeuExpedientTitol(
-				"seuExpedientTitol_" + notificacioId);
-		notificacio.setSeuRegistreOficina(
-				"seuRegistreOficina_" + notificacioId);
-		notificacio.setSeuRegistreLlibre(
-				"seuRegistreLlibre_" + notificacioId);
-		notificacio.setSeuIdioma(
-				"seuIdioma_" + notificacioId);
-		notificacio.setSeuAvisTitol(
-				"seuAvisTitol_" + notificacioId);
-		notificacio.setSeuAvisText(
-				"seuAvisText_" + notificacioId);
-		notificacio.setSeuAvisTextMobil(
-				"seuAvisTextMobil_" + notificacioId);
-		notificacio.setSeuOficiTitol(
-				"seuOficiTitol_" + notificacioId);
-		notificacio.setSeuOficiText(
-				"seuOficiText_" + notificacioId);
-		List<NotificacioEnviament> enviaments = new ArrayList<>();
+		document.setNormalitzat(false);
+		document.setGenerarCsv(false);
+		notificacio.setDocument(document);
+		notificacio.setProcedimentCodi("0000");
+		List<Enviament> enviaments = new ArrayList<Enviament>();
+		if (ambEnviamentPostal) {
+			PagadorPostal pagadorPostal = new PagadorPostal();
+			pagadorPostal.setDir3Codi("A04013511");
+			pagadorPostal.setFacturacioClientCodi("ccFac_" + notificacioId);
+			pagadorPostal.setContracteNum("pccNum_" + notificacioId);
+			pagadorPostal.setContracteDataVigencia(new Date(0));
+			notificacio.setPagadorPostal(pagadorPostal);
+			PagadorCie pagadorCie = new PagadorCie();
+			pagadorCie.setDir3Codi("A04013511");
+			pagadorCie.setContracteDataVigencia(new Date(0));
+			notificacio.setPagadorCie(pagadorCie);
+		}
 		for (int i = 0; i < numDestinataris; i++) {
-			NotificacioEnviament enviament = new NotificacioEnviament();
-			enviament.setTitularNom("titularNom" + i);
-			enviament.setTitularLlinatges("titularLlinatges" + i);
-			enviament.setTitularNif("00000000T");
-			enviament.setTitularTelefon("666010101");
-			enviament.setTitularEmail("titular@gmail.com");
-			enviament.setDestinatariNom("destinatariNom" + i);
-			enviament.setDestinatariLlinatges("destinatariLlinatges" + i);
-			enviament.setDestinatariNif("12345678Z");
-			enviament.setDestinatariTelefon("666020202");
-			enviament.setDestinatariEmail("destinatari@gmail.com");
+			Enviament enviament = new Enviament();
+			Persona titular = new Persona();
+			titular.setNom("titularNom" + i);
+			titular.setLlinatge1("titLlinatge1_" + i);
+			titular.setLlinatge2("titLlinatge2_" + i);
+			titular.setNif("00000000T");
+			titular.setTelefon("666010101");
+			titular.setEmail("titular@gmail.com");
+			enviament.setTitular(titular);
+			List<Persona> destinataris = new ArrayList<Persona>();
+			Persona destinatari = new Persona();
+			destinatari.setNom("destinatariNom" + i);
+			destinatari.setLlinatge1("destLlinatge1_" + i);
+			destinatari.setLlinatge2("destLlinatge2_" + i);
+			destinatari.setNif("12345678Z");
+			destinatari.setTelefon("666020202");
+			destinatari.setEmail("destinatari@gmail.com");
+			destinataris.add(destinatari);
+			enviament.setDestinataris(destinataris);
 			if (ambEnviamentPostal) {
-				enviament.setDomiciliTipus(DomiciliTipusEnum.CONCRET);
-				enviament.setDomiciliConcretTipus(DomiciliConcretTipusEnum.NACIONAL);
-				enviament.setDomiciliViaTipus("CALLE");
-				enviament.setDomiciliViaNom("Bas");
-				enviament.setDomiciliNumeracioTipus(DomiciliNumeracioTipusEnum.SENSE_NUMERO);
-				enviament.setDomiciliNumeracioNumero("00");
-				enviament.setDomiciliNumeracioPuntKm("pk01");
-				enviament.setDomiciliApartatCorreus("0228");
-				enviament.setDomiciliBloc("bloc" + i);
-				enviament.setDomiciliPortal("portal" + i);
-				enviament.setDomiciliEscala("escala" + i);
-				enviament.setDomiciliPlanta("planta" + i);
-				enviament.setDomiciliPorta("porta" + i);
-				enviament.setDomiciliComplement("complement" + i);
-				enviament.setDomiciliPoblacio("poblacio" + i);
-				enviament.setDomiciliMunicipiCodiIne("07033");
-				enviament.setDomiciliMunicipiNom("Manacor");
-				enviament.setDomiciliCodiPostal("07500");
-				enviament.setDomiciliProvinciaCodi("07");
-				enviament.setDomiciliProvinciaNom("Illes Balears");
-				enviament.setDomiciliPaisCodiIso("ES");
-				enviament.setDomiciliPaisNom("Espanya");
-				enviament.setDomiciliLinea1("linea1" + i);
-				enviament.setDomiciliLinea2("linea2" + i);
-				enviament.setDomiciliCie(new Integer(8));
+				EntregaPostal entregaPostal = new EntregaPostal();
+				entregaPostal.setTipus(EntregaPostalTipusEnum.NACIONAL);
+				entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLE);
+				entregaPostal.setViaNom("Bas");
+				entregaPostal.setNumeroCasa("25");
+				entregaPostal.setNumeroQualificador("bis");
+				entregaPostal.setPuntKm("pk01");
+				entregaPostal.setApartatCorreus("0228");
+				entregaPostal.setPortal("portal" + i);
+				entregaPostal.setEscala("escala" + i);
+				entregaPostal.setPlanta("planta" + i);
+				entregaPostal.setPorta("porta" + i);
+				entregaPostal.setBloc("bloc" + i);
+				entregaPostal.setComplement("complement" + i);
+				entregaPostal.setCodiPostal("07500");
+				entregaPostal.setPoblacio("poblacio" + i);
+				entregaPostal.setMunicipiCodi("07033");
+				entregaPostal.setProvinciaCodi("07");
+				entregaPostal.setPaisCodi("ES");
+				entregaPostal.setLinea1("linea1_" + i);
+				entregaPostal.setLinea2("linea2_" + i);
+				entregaPostal.setCie(new Integer(8));
 			}
-			enviament.setDehObligat(true);
-			enviament.setDehNif("00000000T");
-			enviament.setDehProcedimentCodi("0000");
+			EntregaDeh entregaDeh = new EntregaDeh();
+			entregaDeh.setObligat(true);
+			entregaDeh.setProcedimentCodi("0000");
+			enviament.setEntregaDeh(entregaDeh);
 			enviament.setServeiTipus(ServeiTipusEnum.URGENT);
-			enviament.setRetardPostal(5);
-			enviament.setCaducitat(
-					new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000));
 			enviaments.add(enviament);
 		}
 		notificacio.setEnviaments(enviaments);
+		ParametresSeu parametresSeu = new ParametresSeu();
+		parametresSeu.setExpedientSerieDocumental(
+				"0000S");
+		parametresSeu.setExpedientUnitatOrganitzativa(
+				"00000000T");
+		parametresSeu.setExpedientIdentificadorEni(
+				"seuExpedientIdentificadorEni_" + notificacioId);
+		parametresSeu.setExpedientTitol(
+				"seuExpedientTitol_" + notificacioId);
+		parametresSeu.setRegistreOficina(
+				"seuRegistreOficina_" + notificacioId);
+		parametresSeu.setRegistreLlibre(
+				"seuRegistreLlibre_" + notificacioId);
+		parametresSeu.setIdioma(
+				"seuIdioma_" + notificacioId);
+		parametresSeu.setAvisTitol(
+				"seuAvisTitol_" + notificacioId);
+		parametresSeu.setAvisText(
+				"seuAvisText_" + notificacioId);
+		parametresSeu.setAvisTextMobil(
+				"seuAvisTextMobil_" + notificacioId);
+		parametresSeu.setOficiTitol(
+				"seuOficiTitol_" + notificacioId);
+		parametresSeu.setOficiText(
+				"seuOficiText_" + notificacioId);
+		notificacio.setParametresSeu(parametresSeu);
 		return notificacio;
 	}
 

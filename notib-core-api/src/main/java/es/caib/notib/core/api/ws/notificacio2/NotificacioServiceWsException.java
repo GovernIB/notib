@@ -10,14 +10,14 @@ package es.caib.notib.core.api.ws.notificacio2;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @SuppressWarnings("serial")
-public class Notificacio2ServiceException extends RuntimeException {
+public class NotificacioServiceWsException extends RuntimeException {
 
-	public Notificacio2ServiceException(
+	public NotificacioServiceWsException(
 			String message) {
 		super(message);
 	}
 
-	public Notificacio2ServiceException(
+	public NotificacioServiceWsException(
 			String message,
 			Throwable cause) {
 		super(message, cause);

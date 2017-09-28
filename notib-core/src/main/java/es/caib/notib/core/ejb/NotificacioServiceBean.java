@@ -3,7 +3,6 @@
  */
 package es.caib.notib.core.ejb;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -13,13 +12,10 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
+import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
-import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
-import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -39,7 +35,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	@Autowired
 	NotificacioService delegate;
 
-	@Override
+	/*@Override
 	@RolesAllowed({"NOT_APL"})
 	public NotificacioDto alta(
 			String entitatDir3Codi,
@@ -52,31 +48,31 @@ public class NotificacioServiceBean implements NotificacioService {
 	public NotificacioDto consulta(
 			String referencia) {
 		return delegate.consulta(referencia);
-	}
+	}*/
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public NotificacioDto findById(Long id) {
-		return delegate.findById(id);
+	public NotificacioDto findAmbId(Long id) {
+		return delegate.findAmbId(id);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
-	public PaginaDto<NotificacioDto> findByFiltrePaginat(
+	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
-		return delegate.findByFiltrePaginat(
+		return delegate.findAmbFiltrePaginat(
 				filtre,
 				paginacioParams);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_REP"})
-	public PaginaDto<NotificacioDto> findByEntitatIFiltrePaginat(
+	public PaginaDto<NotificacioDto> findAmbEntitatIFiltrePaginat(
 			Long entitatId,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
-		return delegate.findByEntitatIFiltrePaginat(
+		return delegate.findAmbEntitatIFiltrePaginat(
 				entitatId,
 				filtre,
 				paginacioParams);
@@ -84,56 +80,56 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public List<NotificacioDestinatariDto> destinatariFindByNotificacio(
+	public List<NotificacioEnviamentDto> enviamentFindAmbNotificacio(
 			Long notificacioId) {
-		return delegate.destinatariFindByNotificacio(notificacioId);
+		return delegate.enviamentFindAmbNotificacio(notificacioId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public NotificacioDestinatariDto destinatariFindById(
-			Long destinatariId) {
-		return delegate.destinatariFindById(destinatariId);
+	public NotificacioEnviamentDto enviamentFindAmbId(
+			Long enviamentId) {
+		return delegate.enviamentFindAmbId(enviamentId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public NotificacioDestinatariDto destinatariFindByReferencia(
+	public NotificacioEnviamentDto enviamentFindAmbReferencia(
 			String referencia) {
-		return delegate.destinatariFindByReferencia(referencia);
+		return delegate.enviamentFindAmbReferencia(referencia);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public List<NotificacioEventDto> eventFindByNotificacio(
+	public List<NotificacioEventDto> eventFindAmbNotificacio(
 			Long notificacioId) {
-		return delegate.eventFindByNotificacio(notificacioId);
+		return delegate.eventFindAmbNotificacio(notificacioId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public List<NotificacioEventDto> eventFindByNotificacioIDestinatari(
+	public List<NotificacioEventDto> eventFindAmbNotificacioIEnviament(
 			Long notificacioId,
-			Long destinatariId) {
-		return delegate.eventFindByNotificacioIDestinatari(
+			Long enviamentId) {
+		return delegate.eventFindAmbNotificacioIEnviament(
 				notificacioId,
-				destinatariId);
-	}
-	
-	@Override
-	public FitxerDto findCertificacio(
-			String referencia) {
-		return delegate.findCertificacio(referencia);
+				enviamentId);
 	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public FitxerDto findFitxer(
+	public ArxiuDto getDocumentArxiu(
 			Long notificacioId) {
-		return delegate.findFitxer(notificacioId);
+		return delegate.getDocumentArxiu(notificacioId);
 	}
 	
 	@Override
+	public ArxiuDto enviamentGetCertificacioArxiu(
+			Long enviamentId) {
+		return delegate.enviamentGetCertificacioArxiu(enviamentId);
+	}
+	
+	/*@Override
 	@RolesAllowed({"NOT_ADMIN"})
 	public void updateDestinatariEstat(
 			String referencia,
@@ -171,17 +167,27 @@ public class NotificacioServiceBean implements NotificacioService {
 				notificaCertificacioArxiuId,
 				notificaCertificacioNumSeguiment,
 				notificaCertificacioDataActualitzacio);
-	}
+	}*/
 
-	public void enviar(
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public boolean enviar(
 			Long notificacioId) {
-		delegate.enviar(notificacioId);
+		return delegate.enviar(notificacioId);
 	}
 
 	@Override
-	public NotificaRespostaEstatDto consultarEstat(
-			String referencia) {
-		return delegate.consultarEstat(referencia);
+	@RolesAllowed({"NOT_ADMIN"})
+	public NotificaRespostaEstatDto enviamentRefrescarEstat(
+			Long enviamentId) {
+		return delegate.enviamentRefrescarEstat(enviamentId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public boolean enviamentComunicacioSeu(
+			Long enviamentId) {
+		return delegate.enviamentComunicacioSeu(enviamentId);
 	}
 
 	@Override

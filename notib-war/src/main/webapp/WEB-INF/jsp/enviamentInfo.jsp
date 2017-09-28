@@ -24,6 +24,19 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 </script>
 </head>
 <body>
+	<c:if test="${enviament.notificaError}">
+		<div class="alert alert-danger well-sm">
+			<span class="fa fa-warning text-danger"></span>
+			<spring:message code="enviament.info.error.titol"/>
+			<button class="btn btn-default btn-xs pull-right" data-toggle="collapse" data-target="#collapseError" aria-expanded="false" aria-controls="collapseError">
+				<span class="fa fa-bars"></span>
+			</button>
+			<div id="collapseError" class="collapse">
+				<br/>
+				<textarea rows="10" style="width:100%">${enviament.notificaErrorError}</textarea>
+			</div>
+		</div>
+	</c:if>
 	<ul class="nav nav-tabs" role="tablist">
 		<li role="presentation" class="active">
 			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab">
@@ -42,7 +55,7 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 		</li>
 	</ul>
 	<div class="tab-content">
-		<div role="tabpanel" class="tab-pane active" id="dades">
+		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'dades'}"> active</c:if>" id="dades">
 			<br/>
 			<div class="panel panel-default">
 				<div class="panel-heading">
@@ -54,7 +67,7 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 				<tbody>
 					<tr>
 						<td width="30%"><strong><spring:message code="enviament.info.dada.referencia"/></strong></td>
-						<td>${enviament.referencia}</td>
+						<td>${enviament.notificaReferencia}</td>
 					</tr>
 					<tr>
 						<td><strong><spring:message code="enviament.info.dada.deh.nif"/></strong></td>
@@ -286,7 +299,7 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 				</div>
 			</c:if>
 		</div>
-		<div role="tabpanel" class="tab-pane" id="events">
+		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'events'}"> active</c:if>" id="events">
 			<table
 				id="events"
 				data-toggle="datatable"
@@ -313,7 +326,7 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 						<spring:message code="notificacio.event.list.columna.resultat"/>
 						<script id="cellResultat" type="text/x-jsrender">
 						{{if error}}
-							<span class="fa fa-warning text-danger" title="{{:errorDescripcio}}"></span>
+							<span class="fa fa-warning text-danger" title="{{>errorDescripcio}}"></span>
 						{{else}}
 							<span class="fa fa-check text-success"></span>
 						{{/if}}
@@ -323,75 +336,97 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 			</thead>
 			</table>
 		</div>
-		<div role="tabpanel" class="tab-pane" id="accions">
+		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'accions'}"> active</c:if>" id="accions">
 			<br/>
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h3 class="panel-title"><strong>Notific@</strong></h3>
-  				</div>
-  				<table class="table table-bordered" style="width:100%">
-				<tbody>
-					<tr>
-						<td width="30%"><strong><spring:message code="enviament.estat.estat.data"/></strong></td>
-						<td><fmt:formatDate value="${notificacioEstat.data}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-					</tr>
-					<tr>
-						<td><strong><spring:message code="enviament.estat.estat.codi"/></strong></td>
-						<td>${notificacioEstat.estatCodi}</td>
-					</tr>
-					<tr>
-						<td><strong><spring:message code="enviament.estat.estat.descripcio"/></strong></td>
-						<td>${notificacioEstat.estatDescripcio}</td>
-					</tr>
-					<c:if test="${not empty notificacioEstat.numSeguiment}">
+			<c:set var="algunaAccioDisponible" value="${false}"/>
+			<c:if test="${enviament.notificaEstat != 'NOTIB_PENDENT'}">
+				<c:set var="algunaAccioDisponible" value="${true}"/>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							<strong><spring:message code="enviament.info.accio.seccio.notifica"/></strong>
+							<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstat"/>" class="btn btn-default btn-sm" style="float:right; position: relative; top: -6px; right: -6px;"><span class="fa fa-refresh"></span> <spring:message code="enviament.info.accio.refrescar.estat"/></a>
+						</h3>
+	  				</div>
+	  				<table class="table table-bordered" style="width:100%">
+					<tbody>
 						<tr>
-							<td><strong><spring:message code="enviament.estat.estat.seguiment"/></strong></td>
-							<td>${notificacioEstat.numSeguiment}</td>
+							<td width="30%"><strong><spring:message code="enviament.estat.estat.data"/></strong></td>
+							<td><fmt:formatDate value="${notificacioEstat.data}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 						</tr>
-					</c:if>
-					<tr>
-						<td colspan="2">
-							<button class="btn btn-default pull-right"><span class="fa fa-send"></span> Enviar certificacio</button>
-						</td>
-					</tr>
-				</tbody>
-				</table>
-				<div class="panel-body text-right">
-					<button class="btn btn-default"><span class="fa fa-check-square-o"></span> Comunicació seu</button>
-					<button class="btn btn-default"><span class="fa fa-refresh"></span> Refrescar estat</button>
-				</div>
-			</div>
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h3 class="panel-title"><strong>Seu CAIB</strong></h3>
-  				</div>
-  				<table class="table table-bordered" style="width:100%">
-				<tbody>
-					<tr>
-						<td width="30%"><strong><spring:message code="enviament.estat.estat.data"/></strong></td>
-						<td><fmt:formatDate value="${notificacioEstat.data}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-					</tr>
-					<tr>
-						<td><strong><spring:message code="enviament.estat.estat.codi"/></strong></td>
-						<td>${notificacioEstat.estatCodi}</td>
-					</tr>
-					<tr>
-						<td><strong><spring:message code="enviament.estat.estat.descripcio"/></strong></td>
-						<td>${notificacioEstat.estatDescripcio}</td>
-					</tr>
-					<c:if test="${not empty notificacioEstat.numSeguiment}">
 						<tr>
-							<td><strong><spring:message code="enviament.estat.estat.seguiment"/></strong></td>
-							<td>${notificacioEstat.numSeguiment}</td>
+							<td><strong><spring:message code="enviament.estat.estat.codi"/></strong></td>
+							<td>${notificacioEstat.estatCodi}</td>
 						</tr>
-					</c:if>
-				</tbody>
-				</table>
-				<div class="panel-body text-right">
-					<button class="btn btn-default"><span class="fa fa-download"></span> Obtenir certificacio</button>
-					<button class="btn btn-default"><span class="fa fa-refresh"></span> Refrescar estat</button>
+						<tr>
+							<td><strong><spring:message code="enviament.estat.estat.descripcio"/></strong></td>
+							<td>${notificacioEstat.estatDescripcio}</td>
+						</tr>
+						<c:if test="${not empty notificacioEstat.numSeguiment}">
+							<tr>
+								<td><strong><spring:message code="enviament.estat.estat.seguiment"/></strong></td>
+								<td>${notificacioEstat.numSeguiment}</td>
+							</tr>
+						</c:if>
+						<tr>
+							<td colspan="2" class="text-right">
+								<button class="btn btn-default"><span class="fa fa-download"></span> <spring:message code="enviament.info.accio.obtenir.cert"/></button>
+								<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/comunicacioSeu"/>" class="btn btn-default">
+									<span class="fa fa-check-square-o"></span>
+									<spring:message code="enviament.info.accio.comunicacio.seu"/>
+								</a>
+							</td>
+						</tr>
+					</tbody>
+					</table>
+					<div class="panel-body text-right">
+						<button class="btn btn-default"><span class="fa fa-send"></span> Enviar certificacio</button>
+					</div>
 				</div>
-			</div>
+			</c:if>
+			<c:if test="${pluginSeuDisponible && enviament.seuEstat != 'NOTIB_PENDENT'}">
+				<c:set var="algunaAccioDisponible" value="${true}"/>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							<strong><spring:message code="enviament.info.accio.seccio.seu.caib"/></strong>
+							<button class="btn btn-default btn-sm" style="float:right; position: relative; top: -6px; right: -6px;"><span class="fa fa-refresh"></span> <spring:message code="enviament.info.accio.refrescar.estat"/></button>
+						</h3>
+	  				</div>
+	  				<table class="table table-bordered" style="width:100%">
+					<tbody>
+						<tr>
+							<td width="30%"><strong><spring:message code="enviament.estat.estat.data"/></strong></td>
+							<td><fmt:formatDate value="${notificacioEstat.data}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="enviament.estat.estat.codi"/></strong></td>
+							<td>${notificacioEstat.estatCodi}</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="enviament.estat.estat.descripcio"/></strong></td>
+							<td>${notificacioEstat.estatDescripcio}</td>
+						</tr>
+						<c:if test="${not empty notificacioEstat.numSeguiment}">
+							<tr>
+								<td><strong><spring:message code="enviament.estat.estat.seguiment"/></strong></td>
+								<td>${notificacioEstat.numSeguiment}</td>
+							</tr>
+						</c:if>
+						<tr>
+							<td colspan="2" class="text-right">
+								<button class="btn btn-default"><span class="fa fa-download"></span> <spring:message code="enviament.info.accio.obtenir.cert"/></button>
+							</td>
+						</tr>
+					</tbody>
+					</table>
+				</div>
+			</c:if>
+			<c:if test="${not algunaAccioDisponible}">
+				<div class="alert alert-info well-sm" role="alert">
+					<spring:message code="enviament.info.accio.no.accions"/>
+				</div>
+			</c:if>
 		</div>
 	</div>
 	<div id="modal-botons" class="text-right">

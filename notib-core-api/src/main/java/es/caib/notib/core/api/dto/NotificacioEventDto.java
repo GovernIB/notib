@@ -22,7 +22,7 @@ public class NotificacioEventDto extends AuditoriaDto {
 	private String errorDescripcio;
 
 	private NotificacioDto notificacio;
-	private NotificacioDestinatariDto destinatari;
+	private NotificacioEnviamentDto destinatari;
 
 	public Long getId() {
 		return id;
@@ -66,10 +66,10 @@ public class NotificacioEventDto extends AuditoriaDto {
 	public void setNotificacio(NotificacioDto notificacio) {
 		this.notificacio = notificacio;
 	}
-	public NotificacioDestinatariDto getDestinatari() {
+	public NotificacioEnviamentDto getDestinatari() {
 		return destinatari;
 	}
-	public void setDestinatari(NotificacioDestinatariDto destinatari) {
+	public void setDestinatari(NotificacioEnviamentDto destinatari) {
 		this.destinatari = destinatari;
 	}
 

@@ -10,7 +10,7 @@ import java.io.Serializable;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public enum DomiciliNumeracioTipusEnum implements Serializable {
+public enum EntregaPostalNumeracioTipusEnum implements Serializable {
 	NUMERO,
 	PUNT_KILOMETRIC,
 	SENSE_NUMERO,

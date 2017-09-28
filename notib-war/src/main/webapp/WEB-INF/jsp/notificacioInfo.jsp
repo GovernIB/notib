@@ -25,6 +25,30 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 </script>
 </head>
 <body>
+	<c:if test="${notificacio.errorNotifica}">
+		<div class="alert alert-danger well-sm">
+			<span class="fa fa-warning text-danger"></span>
+			<spring:message code="notificacio.info.error.titol"/>
+			<button class="btn btn-default btn-xs pull-right" data-toggle="collapse" data-target="#collapseError" aria-expanded="false" aria-controls="collapseError">
+				<span class="fa fa-bars"></span>
+			</button>
+			<div id="collapseError" class="collapse">
+				<br/>
+				<table class="table table-bordered" style="background-color:white; width:100%">
+				<tbody>
+					<tr>
+						<td width="30%"><strong><spring:message code="notificacio.info.error.data"/></strong></td>
+						<td><fmt:formatDate value="${notificacio.errorNotificaData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+					</tr>
+					<tr>
+						<td><strong><spring:message code="notificacio.info.error.error"/></strong></td>
+						<td><textarea rows="10" style="width:100%">${notificacio.errorNotificaError}</textarea></td>
+					</tr>
+				</tbody>
+				</table>
+			</div>
+		</div>
+	</c:if>
 	<ul class="nav nav-tabs" role="tablist">
 		<li role="presentation" class="active">
 			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab">
@@ -42,9 +66,9 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 			</a>
 		</li>
 	</ul>
+	<br/>
 	<div class="tab-content">
-		<div role="tabpanel" class="tab-pane active" id="dades">
-			<br/>
+		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'dades'}"> active</c:if>" id="dades">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">
@@ -209,11 +233,11 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 				</div>
 			</c:if>
 		</div>
-		<div role="tabpanel" class="tab-pane" id="events">
+		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'events'}"> active</c:if>" id="events">
 			<table
 				id="events"
 				data-toggle="datatable"
-				data-url="<c:url value="/notificacio/${notificacioId}/event"/>"
+				data-url="<c:url value="/notificacio/${notificacio.id}/event"/>"
 				data-search-enabled="false"
 				data-paging="false"
 				data-info="false"
@@ -247,7 +271,31 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 			</thead>
 			</table>
 		</div>
-		<div role="tabpanel" class="tab-pane" id="accions">
+		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'accions'}"> active</c:if>" id="accions">
+			<c:set var="algunaAccioDisponible" value="${false}"/>
+			<ul class="list-group">
+				<c:if test="${notificacio.estat == 'PENDENT'}">
+					<c:set var="algunaAccioDisponible" value="${true}"/>
+					<li class="list-group-item">
+						<div class="row">
+							<div class="col-sm-6" style="height: 100%">
+								<strong><spring:message code="notificacio.info.accio.enviar"/></strong>
+							</div>
+							<div class="col-sm-6 text-right">
+								<a href="<not:modalUrl value="/notificacio/${notificacio.id}/enviar"/>" class="btn btn-default btn-sm">
+									<span class="fa fa-send"></span>
+									<spring:message code="notificacio.info.accio.enviar.boto"/>
+								</a>
+							</div>
+						</div>
+					</li>
+				</c:if>
+			</ul>
+			<c:if test="${not algunaAccioDisponible}">
+				<div class="alert alert-info well-sm" role="alert">
+					<spring:message code="notificacio.info.accio.no.accions"/>
+				</div>
+			</c:if>
 		</div>
 	</div>
 	<div id="modal-botons" class="text-right">

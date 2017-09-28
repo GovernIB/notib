@@ -8,11 +8,11 @@ import java.io.Serializable;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * Informació d'un fitxer.
+ * Informació d'un arxiu.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class FitxerDto implements Serializable {
+public class ArxiuDto implements Serializable {
 
 	private String nom;
 	private String contentType;
@@ -20,7 +20,7 @@ public class FitxerDto implements Serializable {
 	private long tamany;
 	
 	
-	public FitxerDto(
+	public ArxiuDto(
 			String nom,
 			String contentType,
 			byte[] contingut,

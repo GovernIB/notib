@@ -36,6 +36,8 @@ import es.caib.notib.core.audit.NotibAuditable;
 @EntityListeners(AuditingEntityListener.class)
 public class NotificacioEntity extends NotibAuditable<Long> {
 
+	@Column(name = "emisor_dir3codi", length = 9, nullable = false)
+	private String emisorDir3Codi;
 	@Column(name = "env_tipus", nullable = false)
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
 	@Column(name = "env_data_prog")
@@ -43,6 +45,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private Date enviamentDataProgramada;
 	@Column(name = "concepte", length = 50, nullable = false)
 	private String concepte;
+	@Column(name = "descripcio", length = 100)
+	private String descripcio;
 	@Column(name = "pagcor_dir3", length = 9)
 	private String pagadorCorreusCodiDir3;
 	@Column(name = "pagcor_numcont", length = 20)
@@ -65,8 +69,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private String documentArxiuNom;
 	@Column(name = "doc_arxiu_id", length = 64, nullable = false)
 	private String documentArxiuId;
-	@Column(name = "doc_sha1", length = 40, nullable = false)
-	private String documentSha1;
+	@Column(name = "doc_hash", length = 40, nullable = false)
+	private String documentHash;
 	@Column(name = "doc_normalitzat", nullable = false)
 	private boolean documentNormalitzat;
 	@Column(name = "doc_gen_csv", nullable = false)
@@ -97,18 +101,18 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private String seuOficiText;
 	@Column(name = "estat", nullable = false)
 	private NotificacioEstatEnumDto estat;
-	@Column(name = "error", nullable = false)
-	private boolean error;
+	@Column(name = "error_not", nullable = false)
+	private boolean errorNotifica;
 	@ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@JoinColumn(name = "error_event_id")
-	@ForeignKey(name = "not_noteve_notificacio_fk")
-	private NotificacioEventEntity errorEvent;
+	@JoinColumn(name = "error_not_event_id")
+	@ForeignKey(name = "not_notevenot_notificacio_fk")
+	private NotificacioEventEntity errorNotificaEvent;
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
-	private List<NotificacioDestinatariEntity> destinataris = new ArrayList<NotificacioDestinatariEntity>();
+	private List<NotificacioEnviamentEntity> enviaments = new ArrayList<NotificacioEnviamentEntity>();
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,
@@ -120,6 +124,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@ForeignKey(name = "not_entitat_notificacio_fk")
 	private EntitatEntity entitat;
 
+	public String getEmisorDir3Codi() {
+		return emisorDir3Codi;
+	}
 	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
 		return enviamentTipus;
 	}
@@ -128,6 +135,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	}
 	public String getConcepte() {
 		return concepte;
+	}
+	public String getDescripcio() {
+		return descripcio;
 	}
 	public String getPagadorCorreusCodiDir3() {
 		return pagadorCorreusCodiDir3;
@@ -159,8 +169,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public String getDocumentArxiuId() {
 		return documentArxiuId;
 	}
-	public String getDocumentSha1() {
-		return documentSha1;
+	public String getDocumentHash() {
+		return documentHash;
 	}
 	public boolean isDocumentNormalitzat() {
 		return documentNormalitzat;
@@ -207,14 +217,14 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public NotificacioEstatEnumDto getEstat() {
 		return estat;
 	}
-	public boolean isError() {
-		return error;
+	public boolean isErrorNotifica() {
+		return errorNotifica;
 	}
-	public NotificacioEventEntity getErrorEvent() {
-		return errorEvent;
+	public NotificacioEventEntity getErrorNotificaEvent() {
+		return errorNotificaEvent;
 	}
-	public List<NotificacioDestinatariEntity> getDestinataris() {
-		return destinataris;
+	public List<NotificacioEnviamentEntity> getEnviaments() {
+		return enviaments;
 	}
 	public List<NotificacioEventEntity> getEvents() {
 		return events;
@@ -223,20 +233,20 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		return entitat;
 	}
 	
-	public void updateDestinataris(
-			List<NotificacioDestinatariEntity> destinataris) {
-		this.destinataris = destinataris;
+	public void updateEnviaments(
+			List<NotificacioEnviamentEntity> enviaments) {
+		this.enviaments = enviaments;
 	}
 
 	public void updateEstat(
 			NotificacioEstatEnumDto estat) {
 		this.estat = estat;
 	}
-	public void updateError(
+	public void updateErrorNotifica(
 			boolean error,
 			NotificacioEventEntity errorEvent) {
-		this.error = error;
-		this.errorEvent = errorEvent;
+		this.errorNotifica = error;
+		this.errorNotificaEvent = errorEvent;
 	}
 	public void updateEventAfegir(
 			NotificacioEventEntity event) {
@@ -244,98 +254,62 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	}
 
 	public static Builder getBuilder(
+			EntitatEntity entitat,
+			String emisorDir3Codi,
 			NotificaEnviamentTipusEnumDto enviamentTipus,
 			Date enviamentDataProgramada,
 			String concepte,
 			String documentArxiuNom,
 			String documentArxiuId,
-			String documentSha1,
-			String seuAvisText,
-			String seuAvisTitol,
-			String seuOficiTitol,
-			String seuOficiText,
-			String seuIdioma,
-			String seuRegistreLlibre,
-			String seuRegistreOficina,
-			String seuExpedientTitol,
-			String seuExpedientIdentificadorEni,
-			String seuExpedientUnitatOrganitzativa,
-			String seuExpedientSerieDocumental,
+			String documentHash,
 			boolean documentNormalitzat,
 			boolean documentGenerarCsv,
-			List<NotificacioDestinatariEntity> destinataris,
-			EntitatEntity entitat) {
+			List<NotificacioEnviamentEntity> enviaments) {
 		return new Builder(
+				entitat,
+				emisorDir3Codi,
 				enviamentTipus,
 				enviamentDataProgramada,
 				concepte,
 				documentArxiuNom,
 				documentArxiuId,
-				documentSha1,
-				seuAvisText,
-				seuAvisTitol,
-				seuOficiTitol,
-				seuOficiText,
-				seuIdioma,
-				seuRegistreLlibre,
-				seuRegistreOficina,
-				seuExpedientTitol,
-				seuExpedientIdentificadorEni,
-				seuExpedientUnitatOrganitzativa,
-				seuExpedientSerieDocumental,
+				documentHash,
 				documentNormalitzat,
 				documentGenerarCsv,
-				destinataris,
-				entitat);
+				enviaments);
 	}
 
 	public static class Builder {
 		NotificacioEntity built;
 		Builder(
+				EntitatEntity entitat,
+				String emisorDir3Codi,
 				NotificaEnviamentTipusEnumDto enviamentTipus,
 				Date enviamentDataProgramada,
 				String concepte,
 				String documentArxiuNom,
 				String documentArxiuId,
-				String documentSha1,
-				String seuAvisText,
-				String seuAvisTitol,
-				String seuOficiTitol,
-				String seuOficiText,
-				String seuIdioma,
-				String seuRegistreLlibre,
-				String seuRegistreOficina,
-				String seuExpedientTitol,
-				String seuExpedientIdentificadorEni,
-				String seuExpedientUnitatOrganitzativa,
-				String seuExpedientSerieDocumental,
+				String documentHash,
 				boolean documentNormalitzat,
 				boolean documentGenerarCsv,
-				List<NotificacioDestinatariEntity> destinataris,
-				EntitatEntity entitat) {
+				List<NotificacioEnviamentEntity> enviaments) {
 			built = new NotificacioEntity();
+			built.entitat = entitat;
+			built.emisorDir3Codi = emisorDir3Codi;
 			built.enviamentTipus = enviamentTipus;
 			built.enviamentDataProgramada = enviamentDataProgramada;
 			built.concepte = concepte;
 			built.documentArxiuNom = documentArxiuNom;
 			built.documentArxiuId = documentArxiuId;
-			built.documentSha1 = documentSha1;
-			built.seuAvisText = seuAvisText;
-			built.seuAvisTitol = seuAvisTitol;
-			built.seuOficiTitol = seuOficiTitol;
-			built.seuOficiText = seuOficiText;
-			built.seuIdioma = seuIdioma;
-			built.seuRegistreLlibre = seuRegistreLlibre;
-			built.seuRegistreOficina = seuRegistreOficina;
-			built.seuExpedientTitol = seuExpedientTitol;
-			built.seuExpedientIdentificadorEni = seuExpedientIdentificadorEni;
-			built.seuExpedientUnitatOrganitzativa = seuExpedientUnitatOrganitzativa;
-			built.seuExpedientSerieDocumental = seuExpedientSerieDocumental;
+			built.documentHash = documentHash;
 			built.documentNormalitzat = documentNormalitzat;
 			built.documentGenerarCsv = documentGenerarCsv;
-			built.destinataris = destinataris;
-			built.entitat = entitat;
+			built.enviaments = enviaments;
 			built.estat = NotificacioEstatEnumDto.PENDENT;
+		}
+		public Builder descripcio(String descripcio) {
+			built.descripcio = descripcio;
+			return this;
 		}
 		public Builder pagadorCorreusCodiDir3(String pagadorCorreusCodiDir3) {
 			built.pagadorCorreusCodiDir3 = pagadorCorreusCodiDir3;
@@ -369,8 +343,52 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.procedimentDescripcioSia = procedimentDescripcioSia;
 			return this;
 		}
+		public Builder seuExpedientSerieDocumental(String seuExpedientSerieDocumental) {
+			built.seuExpedientSerieDocumental = seuExpedientSerieDocumental;
+			return this;
+		}
+		public Builder seuExpedientUnitatOrganitzativa(String seuExpedientUnitatOrganitzativa) {
+			built.seuExpedientUnitatOrganitzativa = seuExpedientUnitatOrganitzativa;
+			return this;
+		}
+		public Builder seuAvisTitol(String seuAvisTitol) {
+			built.seuAvisTitol = seuAvisTitol;
+			return this;
+		}
+		public Builder seuAvisText(String seuAvisText) {
+			built.seuAvisText = seuAvisText;
+			return this;
+		}
 		public Builder seuAvisTextMobil(String seuAvisTextMobil) {
 			built.seuAvisTextMobil = seuAvisTextMobil;
+			return this;
+		}
+		public Builder seuOficiTitol(String seuOficiTitol) {
+			built.seuOficiTitol = seuOficiTitol;
+			return this;
+		}
+		public Builder seuOficiText(String seuOficiText) {
+			built.seuOficiText = seuOficiText;
+			return this;
+		}
+		public Builder seuRegistreLlibre(String seuRegistreLlibre) {
+			built.seuRegistreLlibre = seuRegistreLlibre;
+			return this;
+		}
+		public Builder seuRegistreOficina(String seuRegistreOficina) {
+			built.seuRegistreOficina = seuRegistreOficina;
+			return this;
+		}
+		public Builder seuIdioma(String seuIdioma) {
+			built.seuIdioma = seuIdioma;
+			return this;
+		}
+		public Builder seuExpedientTitol(String seuExpedientTitol) {
+			built.seuExpedientTitol = seuExpedientTitol;
+			return this;
+		}
+		public Builder seuExpedientIdentificadorEni(String seuExpedientIdentificadorEni) {
+			built.seuExpedientIdentificadorEni = seuExpedientIdentificadorEni;
 			return this;
 		}
 		public NotificacioEntity build() {
@@ -383,14 +401,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((concepte == null) ? 0 : concepte.hashCode());
-		result = prime * result + ((destinataris == null) ? 0 : destinataris.hashCode());
-		result = prime * result + ((documentArxiuId == null) ? 0 : documentArxiuId.hashCode());
-		result = prime * result + (documentGenerarCsv ? 1231 : 1237);
-		result = prime * result + (documentNormalitzat ? 1231 : 1237);
-		result = prime * result + ((documentSha1 == null) ? 0 : documentSha1.hashCode());
+		result = prime * result + ((documentHash == null) ? 0 : documentHash.hashCode());
 		result = prime * result + ((entitat == null) ? 0 : entitat.hashCode());
 		result = prime * result + ((enviamentTipus == null) ? 0 : enviamentTipus.hashCode());
-		result = prime * result + ((events == null) ? 0 : events.hashCode());
 		return result;
 	}
 	@Override
@@ -407,24 +420,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				return false;
 		} else if (!concepte.equals(other.concepte))
 			return false;
-		if (destinataris == null) {
-			if (other.destinataris != null)
+		if (documentHash == null) {
+			if (other.documentHash != null)
 				return false;
-		} else if (!destinataris.equals(other.destinataris))
-			return false;
-		if (documentArxiuId == null) {
-			if (other.documentArxiuId != null)
-				return false;
-		} else if (!documentArxiuId.equals(other.documentArxiuId))
-			return false;
-		if (documentGenerarCsv != other.documentGenerarCsv)
-			return false;
-		if (documentNormalitzat != other.documentNormalitzat)
-			return false;
-		if (documentSha1 == null) {
-			if (other.documentSha1 != null)
-				return false;
-		} else if (!documentSha1.equals(other.documentSha1))
+		} else if (!documentHash.equals(other.documentHash))
 			return false;
 		if (entitat == null) {
 			if (other.entitat != null)
@@ -432,11 +431,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		} else if (!entitat.equals(other.entitat))
 			return false;
 		if (enviamentTipus != other.enviamentTipus)
-			return false;
-		if (events == null) {
-			if (other.events != null)
-				return false;
-		} else if (!events.equals(other.events))
 			return false;
 		return true;
 	}

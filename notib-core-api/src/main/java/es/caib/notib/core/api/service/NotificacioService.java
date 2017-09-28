@@ -4,18 +4,14 @@
 package es.caib.notib.core.api.service;
 
 
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
+import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
-import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
-import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -38,31 +34,31 @@ public interface NotificacioService {
 	 *            La informació de la notificació.
 	 * @return La notificació creada.
 	 */
-	@PreAuthorize("hasRole('NOT_APL')")
+	/*@PreAuthorize("hasRole('NOT_APL')")
 	public NotificacioDto alta(
-			String entitatDir3Codi,
-			NotificacioDto notificacio);
+			Long entitatId,
+			NotificacioDto notificacio);*/
 
 	/**
-	 * Consulta l'estat d'un enviament.
+	 * Consulta la informació de la notificació associada a un enviament.
 	 * 
 	 * @param referencia
-	 *            Referència retornada per l'alta de la notificació.
+	 *            Referencia retornada per l'alta de la notificació.
 	 * @return La notificació amb l'enviament especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_APL')")
-	public NotificacioDto consulta(
-			String referencia);
+	/*@PreAuthorize("hasRole('NOT_APL')")
+	public NotificacioDto findAmbEnviamentId(
+			Long enviamentId);*/
 
 	/**
-	 * Consulta una entitat donat el seu id.
+	 * Consulta una notificació donat el seu id.
 	 * 
 	 * @param id
 	 *            Atribut id de la notificació.
 	 * @return La notificació amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
-	public NotificacioDto findById(Long id);
+	public NotificacioDto findAmbId(Long id);
 
 	/**
 	 * Consulta de les notificacions segons els paràmetres del filtre.
@@ -74,7 +70,7 @@ public interface NotificacioService {
 	 * @return La pàgina amb les notificacions.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public PaginaDto<NotificacioDto> findByFiltrePaginat(
+	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
 
@@ -91,42 +87,42 @@ public interface NotificacioService {
 	 * @return la pàgina amb les notificacions trobades.
 	 */
 	@PreAuthorize("hasRole('NOT_REP')")
-	public PaginaDto<NotificacioDto> findByEntitatIFiltrePaginat(
+	public PaginaDto<NotificacioDto> findAmbEntitatIFiltrePaginat(
 			Long entitatId,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
 
 	/**
-	 * Consulta dels destinataris d'una notificació.
+	 * Consulta dels enviaments d'una notificació.
 	 * 
 	 * @param notificacioId
 	 *            Atribut id de la notificació.
 	 * @return els destinataris trobats.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
-	public List<NotificacioDestinatariDto> destinatariFindByNotificacio(
+	public List<NotificacioEnviamentDto> enviamentFindAmbNotificacio(
 			Long notificacioId);
 
 	/**
-	 * Consulta d'un destinatari donat el seu id.
+	 * Consulta d'un enviament donat el seu id.
 	 * 
-	 * @param destinatariId
-	 *            Atribut id del destinatari.
+	 * @param enviamentId
+	 *            Atribut id de l'enviament.
 	 * @return el destinatari trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')  or hasRole('NOT_REP')")
-	public NotificacioDestinatariDto destinatariFindById(
-			Long destinatariId);
+	public NotificacioEnviamentDto enviamentFindAmbId(
+			Long enviamentId);
 
 	/**
-	 * Consulta d'un destinatari donada la seva referència.
+	 * Consulta d'un enviament donada la seva referència.
 	 * 
 	 * @param referencia
-	 *            Referència que identifica al destinatari.
+	 *            Referència de l'enviament retornat per l'alta notificació.
 	 * @return el destinatari trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_APL')")
-	public NotificacioDestinatariDto destinatariFindByReferencia(
+	public NotificacioEnviamentDto enviamentFindAmbReferencia(
 			String referencia);
 
 	/**
@@ -137,7 +133,7 @@ public interface NotificacioService {
 	 * @return els events trobats.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')  or hasRole('NOT_REP')")
-	public List<NotificacioEventDto> eventFindByNotificacio(
+	public List<NotificacioEventDto> eventFindAmbNotificacio(
 			Long notificacioId);
 
 	/**
@@ -145,14 +141,14 @@ public interface NotificacioService {
 	 * 
 	 * @param notificacioId
 	 *            Atribut id de la notificació.
-	 * @param destinatariId
-	 *            Atribut id del destinatari.
+	 * @param enviamentId
+	 *            Atribut id de l'enviament.
 	 * @return els destinataris trobats.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')  or hasRole('NOT_REP')")
-	public List<NotificacioEventDto> eventFindByNotificacioIDestinatari(
+	public List<NotificacioEventDto> eventFindAmbNotificacioIEnviament(
 			Long notificacioId,
-			Long destinatariId);
+			Long enviamentId);
 	
 	/**
 	 * Consulta el fitxer associat a una notificació
@@ -162,20 +158,20 @@ public interface NotificacioService {
 	 * @return el fitxer associat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')  or hasRole('NOT_REP')")
-	public FitxerDto findFitxer(
+	public ArxiuDto getDocumentArxiu(
 			Long notificacioId);
-	
+
 	/**
 	 * Consulta la certificació associada a un enviament
 	 * 
-	 * @param referencia
-	 *            referencia d'un enviament.
+	 * @param enviamentId
+	 *            Atribut id de l'enviament.
 	 * @return el fitxer de certificació associat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')  or hasRole('NOT_REP')")
-	public FitxerDto findCertificacio(
-			String referencia);
-	
+	public ArxiuDto enviamentGetCertificacioArxiu(
+			Long enviamentId);
+
 	/**
 	 * Actualitza l'estat d'un enviament
 	 * 
@@ -196,7 +192,7 @@ public interface NotificacioService {
 	 * @param seuEstat
 	 * 				Esta del enviament en la seu.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	/*@PreAuthorize("hasRole('NOT_ADMIN')")
 	public void updateDestinatariEstat(
 			String referencia,
 			NotificacioDestinatariEstatEnumDto notificaEstat,
@@ -205,7 +201,7 @@ public interface NotificacioService {
 			String notificaEstatReceptorNif,
 			String notificaEstatOrigen,
 			String notificaEstatNumSeguiment,
-			NotificacioDestinatariEstatEnumDto seuEstat);
+			NotificacioDestinatariEstatEnumDto seuEstat);*/
 	
 	/**
 	 * Actualitza el certificat d'un enviament
@@ -223,42 +219,53 @@ public interface NotificacioService {
 	 * @param notificaCertificacioDataActualitzacio
 	 * 				Data de actualització de la certificació.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	/*@PreAuthorize("hasRole('NOT_ADMIN')")
 	public void updateCertificacio(
 			String referencia,
 			NotificaCertificacioTipusEnumDto notificaCertificacioTipus,
 			NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus,
 			String notificaCertificacioArxiuId,
 			String notificaCertificacioNumSeguiment,
-			Date notificaCertificacioDataActualitzacio);
+			Date notificaCertificacioDataActualitzacio);*/
 
 	/**
 	 * Prova de fer l'enviament d'una notificació pendent.
 	 * 
 	 * @param notificacioId
 	 *            Atribut id de la notificació.
+	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public void enviar(
+	public boolean enviar(
 			Long notificacioId);
 
 	/**
-	 * Consulta l'estat d'un enviament a Notific@.
+	 * Refresca l'estat d'un enviament.
 	 * 
-	 * @param referencia
-	 *            Referencia de l'enviament.
+	 * @param enviamentId
+	 *            Atribut id de l'enviament.
 	 * @return l'estat de l'enviament.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public NotificaRespostaEstatDto consultarEstat(
-			String referencia);
+	public NotificaRespostaEstatDto enviamentRefrescarEstat(
+			Long enviamentId);
+
+	/**
+	 * Comunica a Notific@ la lectura en seu d'un enviament.
+	 * 
+	 * @param enviamentId
+	 *            Atribut id de l'enviament.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public boolean enviamentComunicacioSeu(
+			Long enviamentId);
 
 	/**
 	 * Mètode d'execució periòdica per a fer els enviaments pendents
 	 * a Notific@.
 	 */
 	public void notificaEnviamentsPendents();
-	
+
 	/**
 	 * Mètode d'execució periòdica per a fer els enviaments pendents
 	 * a la seu.

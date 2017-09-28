@@ -35,25 +35,23 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			NotificacioEstatEnumDto estat,
 			Pageable pageable);
 
-	@Query(
-			"from " +
-			"     NotificacioEntity ne " +
+	@Query(	"from " +
+			"     NotificacioEntity nf " +
 			"where " +
-			"    (:isEntitatIdNull = true OR ne.entitat.id = :entitatId) " +
-			"and lower(ne.concepte) like concat('%', lower(:concepte), '%') " +
-			"and ne.enviamentDataProgramada BETWEEN :dataInici AND :dataFi " +
-			"and ne.entitat.activa = true " +
+			"    (:isEntitatIdNull = true OR nf.entitat.id = :entitatId) " +
+			"and lower(nf.concepte) like concat('%', lower(:concepte), '%') " +
+			"and nf.enviamentDataProgramada BETWEEN :dataInici AND :dataFi " +
+			"and nf.entitat.activa = true " +
 			"and ( " +
 			"        :isDestinatariNull = true or (" +
-			"            select count(d.id) " +
-			"            from ne.destinataris d " +
+			"            select count(env.id) " +
+			"            from nf.enviaments env " +
 			"            where " +
-			"               lower(d.destinatariNom) like concat('%', lower(:destinatari), '%') " +
-			"            or lower(concat(d.destinatariLlinatge1, ' ', d.destinatariLlinatge2)) like concat('%', lower(:destinatari), '%') " +
-			"            or lower(d.destinatariNif) like concat('%', lower(:destinatari), '%') " +
-			"        ) > 0) "
-		  )
-	public Page<NotificacioEntity> findFilteredByEntitatId(
+			"               lower(env.destinatariNom) like concat('%', lower(:destinatari), '%') " +
+			"            or lower(concat(env.destinatariLlinatge1, ' ', env.destinatariLlinatge2)) like concat('%', lower(:destinatari), '%') " +
+			"            or lower(env.destinatariNif) like concat('%', lower(:destinatari), '%') " +
+			"        ) > 0) ")
+	public Page<NotificacioEntity> findAmbFiltre(
 			@Param("concepte") String concepte,
 			@Param("dataInici") Date dataInici,
 			@Param("dataFi") Date dataFi,
@@ -61,47 +59,6 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("destinatari") String destinatari,
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
-			Pageable paginacio
-			);
-	
-	@Query(   "FROM "
-			+ "     NotificacioEntity ne "
-			+ "WHERE "
-			+ "		ne.entitat.id = :entitatId "
-//			+ "AND "
-//			+ "		lower(ne.titolEnviament) like concat('%', lower(:titolEnviament), '%') "
-//			+ "AND "
-//			+ "		lower(ne.estat) like concat('%', lower(:estat), '%') "
-//			+ "AND "
-//			+ "		lower(ne.tipusEnviament) like concat('%', lower(:tipusEnviament), '%') "
-//			+ "AND "
-//			+ "		lower(ne.procediment) like concat('%', lower(:procediment), '%') "
-//			+ "AND "
-//			+ "		lower(ne.destinatariNom) like concat('%', lower(:destinatariNom), '%') "
-//			+ "AND "
-//			+ "		ne.data BETWEEN :dataInici AND :dataFi "
-		  )
-	public Page<NotificacioEntity> findFilteredByEntitat(
-		@Param("entitatId") long entitatId,
-//		@Param("titolEnviament") String titolEnviament,
-//		@Param("estat") String estat,
-//		@Param("tipusEnviament") String tipusEnviament,
-//		@Param("procediment") String procediment,
-//		@Param("destinatariNom") String destinatariNom,
-//		@Param("dataInici") Date dataInici,
-//		@Param("dataFi") Date dataFi,
-		Pageable paginacio);
-	@Query(   
-			  "FROM "
-			+ "     NotificacioEntity ne "
-			+ "WHERE "
-			+ "		ne.id = ( SELECT d.notificacio.id "
-			+ "			  FROM ne.destinataris d "
-			+ "			  WHERE "
-			+ "				d.referencia = :referencia "
-			+ "			) "
-		  )
-	public NotificacioEntity findByDestinatariReferencia(
-			@Param("referencia") String referencia );
+			Pageable paginacio);
 
 }

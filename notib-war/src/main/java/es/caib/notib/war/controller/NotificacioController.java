@@ -24,14 +24,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.NotificacioDestinatariDto;
+import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
-import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
@@ -39,6 +39,7 @@ import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EntitatHelper;
 import es.caib.notib.war.helper.EnumHelper;
+import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RolHelper;
 
 /**
@@ -52,6 +53,8 @@ public class NotificacioController extends BaseController {
 
 	private final static String NOTIFICACIONS_FILTRE = "notificacions_filtre";
 
+	@Autowired
+	private AplicacioService aplicacioService;
 	@Autowired
 	private NotificacioService notificacioService;
 	@Autowired
@@ -95,12 +98,12 @@ public class NotificacioController extends BaseController {
 				request.getSession().getAttribute( NOTIFICACIONS_FILTRE );
 		PaginaDto<NotificacioDto> notificacions = null;
 		if (RolHelper.isUsuariActualAdministrador(request)) {
-			notificacions = notificacioService.findByFiltrePaginat(
+			notificacions = notificacioService.findAmbFiltrePaginat(
 					filtre,
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 		} else if (RolHelper.isUsuariActualRepresentant(request)) {
 			EntitatDto entitat = EntitatHelper.getEntitatActual( request );
-			notificacions = notificacioService.findByEntitatIFiltrePaginat(
+			notificacions = notificacioService.findAmbEntitatIFiltrePaginat(
 					entitat.getId(),
 					filtre,
 					DatatablesHelper.getPaginacioDtoFromRequest(request) );
@@ -114,9 +117,10 @@ public class NotificacioController extends BaseController {
 			HttpServletRequest request,
 			Model model,
 			@PathVariable Long notificacioId) {
-		model.addAttribute(
-				"notificacio",
-				notificacioService.findById(notificacioId));
+		emplenarModelNotificacioInfo(
+				notificacioId,
+				"dades",
+				model);
 		return "notificacioInfo";
 	}
 
@@ -138,17 +142,9 @@ public class NotificacioController extends BaseController {
 	public DatatablesResponse eventDatatable(
 			HttpServletRequest request,
 			@PathVariable Long notificacioId) {
-		List<NotificacioEventDto> dto = notificacioService.eventFindByNotificacio(
-				notificacioId);
-		for (NotificacioEventDto event: dto) {
-			if (event.getDestinatari() == null) {
-				event.setDestinatari(new NotificacioDestinatariDto());
-				event.getDestinatari().setReferencia("-");
-			}
-		}
 		return DatatablesHelper.getDatatableResponse(
 				request,
-				dto);
+				notificacioService.eventFindAmbNotificacio(notificacioId));
 	}
 
 	@RequestMapping(value = "/{notificacioId}/document", method = RequestMethod.GET)
@@ -156,56 +152,100 @@ public class NotificacioController extends BaseController {
 	public void documentDescarregar(
 			HttpServletResponse response,
 			@PathVariable Long notificacioId) throws IOException {
-    	FitxerDto fitxer = notificacioService.findFitxer(notificacioId);
+    	ArxiuDto arxiu = notificacioService.getDocumentArxiu(notificacioId);
     	writeFileToResponse(
-				fitxer.getNom(),
-				fitxer.getContingut(),
+    			arxiu.getNom(),
+    			arxiu.getContingut(),
 				response);
 	}
 
 	@RequestMapping(value = "/{notificacioId}/enviar", method = RequestMethod.GET)
 	public String enviar(
 			HttpServletRequest request,
-			@PathVariable Long notificacioId) {
-		notificacioService.enviar(notificacioId);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../notificacio",
-				"notificacio.controller.enviament.ok");
+			@PathVariable Long notificacioId,
+			Model model) {
+		boolean enviada = notificacioService.enviar(notificacioId);
+		emplenarModelNotificacioInfo(
+				notificacioId,
+				"accions",
+				model);
+		if (enviada) {
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					"notificacioInfo",
+					"notificacio.controller.enviament.ok");
+		} else {
+			return getAjaxControllerReturnValueError(
+					request,
+					"notificacioInfo",
+					"notificacio.controller.enviament.error");
+		}
 	}
 
-	@RequestMapping(value = "/{notificacioId}/enviament/{referencia}/consultarEstat", method = RequestMethod.GET)
+	@RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/refrescarEstat", method = RequestMethod.GET)
 	public String consultarEstat(
 			HttpServletRequest request,
 			@PathVariable Long notificacioId,
-			@PathVariable String referencia,
+			@PathVariable Long enviamentId,
 			Model model) {
 		model.addAttribute(
 				"notificacioEstat",
-				notificacioService.consultarEstat(referencia));
-		return "enviamentConsultarEstat";
+				notificacioService.enviamentRefrescarEstat(enviamentId));
+		emplenarModelEnviamentInfo(
+				enviamentId,
+				"accions",
+				model);
+		return "enviamentInfo";
+	}
+
+	@RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/comunicacioSeu", method = RequestMethod.GET)
+	public String comunicacioSeu(
+			HttpServletRequest request,
+			@PathVariable Long notificacioId,
+			@PathVariable Long enviamentId,
+			Model model) {
+		boolean totbe = notificacioService.enviamentComunicacioSeu(enviamentId);
+		if (totbe) {
+			MissatgesHelper.success(
+					request, 
+					getMessage(
+							request, 
+							"notificacio.controller.comunicacio.seu.ok"));
+		} else {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"notificacio.controller.comunicacio.seu.error"));
+		}
+		emplenarModelEnviamentInfo(
+				enviamentId,
+				"accions",
+				model);
+		return "enviamentInfo";
 	}
 
 	@RequestMapping(value = "/{notificacioId}/enviament", method = RequestMethod.GET)
 	@ResponseBody
-	public List<NotificacioDestinatariDto> enviamentList(
+	public List<NotificacioEnviamentDto> enviamentList(
 			HttpServletRequest request,
 			Model model,
 			@PathVariable Long notificacioId) {
-		List<NotificacioDestinatariDto> destinataris = notificacioService.destinatariFindByNotificacio(
+		List<NotificacioEnviamentDto> destinataris = notificacioService.enviamentFindAmbNotificacio(
 				notificacioId);
 		return destinataris;
 	}
 
-	@RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/info", method = RequestMethod.GET)
+	@RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}", method = RequestMethod.GET)
 	public String enviamentInfo(
 			HttpServletRequest request,
-			Model model,
 			@PathVariable Long notificacioId,
-			@PathVariable Long enviamentId) {
-		NotificacioDestinatariDto enviament = notificacioService.destinatariFindById(
-				enviamentId);
-		model.addAttribute("enviament", enviament);
+			@PathVariable Long enviamentId,
+			Model model) {
+		emplenarModelEnviamentInfo(
+				enviamentId,
+				"dades",
+				model);
 		return "enviamentInfo";
 	}
 
@@ -230,18 +270,11 @@ public class NotificacioController extends BaseController {
 			HttpServletRequest request,
 			@PathVariable Long notificacioId,
 			@PathVariable Long enviamentId) {
-		List<NotificacioEventDto> dto = notificacioService.eventFindByNotificacioIDestinatari(
-				notificacioId,
-				enviamentId);
-		for (NotificacioEventDto event: dto) {
-			if(event.getDestinatari() == null) {
-				event.setDestinatari(new NotificacioDestinatariDto());
-				event.getDestinatari().setReferencia("-");
-			}
-		}
 		return DatatablesHelper.getDatatableResponse(
 				request,
-				dto);
+				notificacioService.eventFindAmbNotificacioIEnviament(
+						notificacioId,
+						enviamentId));
 	}
 
 	@InitBinder
@@ -254,6 +287,39 @@ public class NotificacioController extends BaseController {
 	    binder.registerCustomEditor(
 	    		Boolean.class, 
 	    		new CustomBooleanEditor("SI", "NO", false));
+	}
+
+	private void emplenarModelNotificacioInfo(
+			Long notificacioId,
+			String pipellaActiva,
+			Model model) {
+		model.addAttribute("pipellaActiva", pipellaActiva);
+		model.addAttribute(
+				"notificacio",
+				notificacioService.findAmbId(notificacioId));
+		model.addAttribute(
+				"eventTipus",
+				EnumHelper.getOptionsForEnum(
+						NotificacioEventTipusEnumDto.class,
+						"es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
+	}
+
+	private void emplenarModelEnviamentInfo(
+			Long enviamentId,
+			String pipellaActiva,
+			Model model) {
+		model.addAttribute("pipellaActiva", pipellaActiva);
+		NotificacioEnviamentDto enviament = notificacioService.enviamentFindAmbId(
+				enviamentId);
+		model.addAttribute("enviament", enviament);
+		model.addAttribute(
+				"pluginSeuDisponible",
+				aplicacioService.pluginSeuDisponible());
+		model.addAttribute(
+				"eventTipus",
+				EnumHelper.getOptionsForEnum(
+						NotificacioEventTipusEnumDto.class,
+						"es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
 	}
 
 }

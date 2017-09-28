@@ -10,7 +10,9 @@ import java.io.Serializable;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public enum DomiciliTipusEnum implements Serializable {
-	FISCAL,
-	CONCRET
+public enum EntregaPostalTipusEnum implements Serializable {
+	NACIONAL,
+	ESTRANGER,
+	APARTAT_CORREUS,
+	SENSE_NORMALITZAR
 }

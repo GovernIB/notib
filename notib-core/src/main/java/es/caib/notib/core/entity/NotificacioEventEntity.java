@@ -51,9 +51,9 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	@ForeignKey(name = "not_notifi_noteve_fk")
 	private NotificacioEntity notificacio;
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
-	@JoinColumn(name = "notificacio_dest_id")
-	@ForeignKey(name = "not_notdes_noteve_fk")
-	private NotificacioDestinatariEntity notificacioDestinatari;
+	@JoinColumn(name = "notificacio_env_id")
+	@ForeignKey(name = "not_notenv_noteve_fk")
+	private NotificacioEnviamentEntity enviament;
 
 	public NotificacioEventTipusEnumDto getTipus() {
 		return tipus;
@@ -73,8 +73,8 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	public NotificacioEntity getNotificacio() {
 		return notificacio;
 	}
-	public NotificacioDestinatariEntity getNotificacioDestinatari() {
-		return notificacioDestinatari;
+	public NotificacioEnviamentEntity getEnviament() {
+		return enviament;
 	}
 
 	public static Builder getBuilder(
@@ -107,8 +107,8 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 			built.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH);
 			return this;
 		}
-		public Builder notificacioDestinatari(NotificacioDestinatariEntity notificacioDestinatari) {
-			built.notificacioDestinatari = notificacioDestinatari;
+		public Builder enviament(NotificacioEnviamentEntity enviament) {
+			built.enviament = enviament;
 			return this;
 		}
 		public NotificacioEventEntity build() {

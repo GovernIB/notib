@@ -10,7 +10,7 @@ import java.io.Serializable;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public enum NotificacioEnviamentEstatEnum implements Serializable {
+public enum EnviamentEstatEnum implements Serializable {
 	NOTIB_PENDENT,
 	NOTIB_ENVIADA,
 	ABSENT,

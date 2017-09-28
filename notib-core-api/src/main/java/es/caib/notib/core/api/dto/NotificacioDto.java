@@ -8,8 +8,6 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import es.caib.notib.core.api.ws.notificacio2.ErrorOrigenEnum;
-
 
 /**
  * Informació d'una anotació.
@@ -50,11 +48,10 @@ public class NotificacioDto extends AuditoriaDto {
 	private String seuOficiTitol;
 	private String seuOficiText;
 	private NotificacioEstatEnumDto estat;
-	private boolean error;
-	private ErrorOrigenEnum errorOrigen;
-	private Date errorEventData;
-	private String errorEventError;
-	private List<NotificacioDestinatariDto> destinataris;
+	private boolean errorNotifica;
+	private Date errorNotificaData;
+	private String errorNotificaError;
+	private List<NotificacioEnviamentDto> enviaments;
 
 	private EntitatDto entitat;
 
@@ -250,35 +247,29 @@ public class NotificacioDto extends AuditoriaDto {
 	public void setEstat(NotificacioEstatEnumDto estat) {
 		this.estat = estat;
 	}
-	public boolean isError() {
-		return error;
+	public boolean isErrorNotifica() {
+		return errorNotifica;
 	}
-	public void setError(boolean error) {
-		this.error = error;
+	public void setErrorNotifica(boolean errorNotifica) {
+		this.errorNotifica = errorNotifica;
 	}
-	public ErrorOrigenEnum getErrorOrigen() {
-		return errorOrigen;
+	public Date getErrorNotificaData() {
+		return errorNotificaData;
 	}
-	public void setErrorOrigen(ErrorOrigenEnum errorOrigen) {
-		this.errorOrigen = errorOrigen;
+	public void setErrorNotificaData(Date errorNotificaData) {
+		this.errorNotificaData = errorNotificaData;
 	}
-	public Date getErrorEventData() {
-		return errorEventData;
+	public String getErrorNotificaError() {
+		return errorNotificaError;
 	}
-	public void setErrorEventData(Date errorEventData) {
-		this.errorEventData = errorEventData;
+	public void setErrorNotificaError(String errorNotificaError) {
+		this.errorNotificaError = errorNotificaError;
 	}
-	public String getErrorEventError() {
-		return errorEventError;
+	public List<NotificacioEnviamentDto> getEnviaments() {
+		return enviaments;
 	}
-	public void setErrorEventError(String errorEventError) {
-		this.errorEventError = errorEventError;
-	}
-	public List<NotificacioDestinatariDto> getDestinataris() {
-		return destinataris;
-	}
-	public void setDestinataris(List<NotificacioDestinatariDto> destinataris) {
-		this.destinataris = destinataris;
+	public void setEnviaments(List<NotificacioEnviamentDto> enviaments) {
+		this.enviaments = enviaments;
 	}
 	public EntitatDto getEntitat() {
 		return entitat;

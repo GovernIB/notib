@@ -10,15 +10,7 @@ import java.util.Set;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
-import es.caib.notib.core.api.ws.notificacio2.DomiciliConcretTipusEnum;
-import es.caib.notib.core.api.ws.notificacio2.DomiciliNumeracioTipusEnum;
-import es.caib.notib.core.api.ws.notificacio2.DomiciliTipusEnum;
-import es.caib.notib.core.api.ws.notificacio2.ServeiTipusEnum;
 import es.caib.notib.core.entity.NotificacioEntity;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
@@ -46,10 +38,10 @@ public class ConversioTipusHelper {
 						return source.toDate();
 					}
 				});
-		mapperFactory.getConverterFactory().registerConverter(
-				new CustomConverter<DomiciliTipusEnum, NotificaDomiciliTipusEnumDto>() {
+		/*mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<EntregaPostalTipusEnum, NotificaDomiciliTipusEnumDto>() {
 					public NotificaDomiciliTipusEnumDto convert(
-							DomiciliTipusEnum source,
+							EntregaPostalTipusEnum source,
 							Type<? extends NotificaDomiciliTipusEnumDto> destinationClass) {
 						switch (source) {
 						case CONCRET:
@@ -62,15 +54,15 @@ public class ConversioTipusHelper {
 					}
 				});
 		mapperFactory.getConverterFactory().registerConverter(
-				new CustomConverter<NotificaDomiciliTipusEnumDto, DomiciliTipusEnum>() {
-					public DomiciliTipusEnum convert(
+				new CustomConverter<NotificaDomiciliTipusEnumDto, EntregaPostalTipusEnum>() {
+					public EntregaPostalTipusEnum convert(
 							NotificaDomiciliTipusEnumDto source,
-							Type<? extends DomiciliTipusEnum> destinationClass) {
+							Type<? extends EntregaPostalTipusEnum> destinationClass) {
 						switch (source) {
 						case CONCRETO:
-							return DomiciliTipusEnum.CONCRET;
+							return EntregaPostalTipusEnum.CONCRET;
 						case FISCAL:
-							return DomiciliTipusEnum.FISCAL;
+							return EntregaPostalTipusEnum.FISCAL;
 						default:
 							return null;
 						}
@@ -115,9 +107,9 @@ public class ConversioTipusHelper {
 					}
 				});
 		mapperFactory.getConverterFactory().registerConverter(
-				new CustomConverter<DomiciliNumeracioTipusEnum, NotificaDomiciliNumeracioTipusEnumDto>() {
+				new CustomConverter<EntregaPostalNumeracioTipusEnum, NotificaDomiciliNumeracioTipusEnumDto>() {
 					public NotificaDomiciliNumeracioTipusEnumDto convert(
-							DomiciliNumeracioTipusEnum source,
+							EntregaPostalNumeracioTipusEnum source,
 							Type<? extends NotificaDomiciliNumeracioTipusEnumDto> destinationClass) {
 						switch (source) {
 						case APARTAT_CORREUS:
@@ -134,19 +126,19 @@ public class ConversioTipusHelper {
 					}
 				});
 		mapperFactory.getConverterFactory().registerConverter(
-				new CustomConverter<NotificaDomiciliNumeracioTipusEnumDto, DomiciliNumeracioTipusEnum>() {
-					public DomiciliNumeracioTipusEnum convert(
+				new CustomConverter<NotificaDomiciliNumeracioTipusEnumDto, EntregaPostalNumeracioTipusEnum>() {
+					public EntregaPostalNumeracioTipusEnum convert(
 							NotificaDomiciliNumeracioTipusEnumDto source,
-							Type<? extends DomiciliNumeracioTipusEnum> destinationClass) {
+							Type<? extends EntregaPostalNumeracioTipusEnum> destinationClass) {
 						switch (source) {
 						case APARTADO_CORREOS:
-							return DomiciliNumeracioTipusEnum.APARTAT_CORREUS;
+							return EntregaPostalNumeracioTipusEnum.APARTAT_CORREUS;
 						case NUMERO:
-							return DomiciliNumeracioTipusEnum.NUMERO;
+							return EntregaPostalNumeracioTipusEnum.NUMERO;
 						case PUNTO_KILOMETRICO:
-							return DomiciliNumeracioTipusEnum.PUNT_KILOMETRIC;
+							return EntregaPostalNumeracioTipusEnum.PUNT_KILOMETRIC;
 						case SIN_NUMERO:
-							return DomiciliNumeracioTipusEnum.SENSE_NUMERO;
+							return EntregaPostalNumeracioTipusEnum.SENSE_NUMERO;
 						default:
 							return null;
 						}
@@ -181,8 +173,10 @@ public class ConversioTipusHelper {
 							return null;
 						}
 					}
-				});
+				});*/
 		mapperFactory.classMap(NotificacioEntity.class, NotificacioDto.class).
+		field("errorNotificaEvent.data", "errorNotificaData").
+		field("errorNotificaEvent.errorDescripcio", "errorNotificaError").
 		exclude("destinataris").
 		byDefault().
 		register();

@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.NotificacioDestinatariEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 
 /**
@@ -19,27 +19,27 @@ import es.caib.notib.core.entity.NotificacioEntity;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface NotificacioDestinatariRepository extends JpaRepository<NotificacioDestinatariEntity, Long> {
+public interface NotificacioEnviamentRepository extends JpaRepository<NotificacioEnviamentEntity, Long> {
 
-	List<NotificacioDestinatariEntity> findByNotificacioId(
+	List<NotificacioEnviamentEntity> findByNotificacioId(
 			Long notificacioId);
 
-	NotificacioDestinatariEntity findByReferencia(
-			String referencia);
+	NotificacioEnviamentEntity findByNotificaReferencia(
+			String notificaReferencia);
 
-	NotificacioDestinatariEntity findByNotificacioAndReferencia(
+	NotificacioEnviamentEntity findByNotificacioAndNotificaReferencia(
 			NotificacioEntity notificacio,
-			String referencia);
+			String notificaReferencia);
 
-	NotificacioDestinatariEntity findByNotificacioEntitatAndNotificaIdentificador(
+	NotificacioEnviamentEntity findByNotificacioEntitatAndNotificaIdentificador(
 			EntitatEntity entitat,
 			String notificaIdentificador);
 
-	List<NotificacioDestinatariEntity> findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
+	List<NotificacioEnviamentEntity> findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
 			NotificacioDestinatariEstatEnumDto[] seuEstats,
 			Pageable pageable);
 
-	List<NotificacioDestinatariEntity> findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
+	List<NotificacioEnviamentEntity> findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
 			NotificacioDestinatariEstatEnumDto[] seuEstats);
 
 }

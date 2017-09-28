@@ -20,7 +20,7 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 	List<NotificacioEventEntity> findByNotificacioIdOrderByDataDesc(
 			Long notificacioId);
 
-	List<NotificacioEventEntity> findByNotificacioDestinatariIdOrderByDataDesc(
-			Long destinatariId);
+	List<NotificacioEventEntity> findByEnviamentIdOrderByDataDesc(
+			Long enviamentId);
 
 }

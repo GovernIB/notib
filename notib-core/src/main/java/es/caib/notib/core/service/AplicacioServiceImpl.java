@@ -7,11 +7,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,6 +28,7 @@ import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.ExcepcioLogHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
+import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.repository.AclSidRepository;
 import es.caib.notib.core.repository.UsuariRepository;
@@ -44,19 +44,21 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	private String version;
 
-	@Resource
+	@Autowired
 	private UsuariRepository usuariRepository;
-	@Resource
+	@Autowired
 	private AclSidRepository aclSidRepository;
 
-	@Resource
+	@Autowired
 	private CacheHelper cacheHelper;
-	@Resource
+	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
+	@Autowired
 	private IntegracioHelper integracioHelper;
-	@Resource
+	@Autowired
 	private ExcepcioLogHelper excepcioLogHelper;
+	@Autowired
+	private PluginHelper pluginHelper;
 
 
 
@@ -198,6 +200,12 @@ public class AplicacioServiceImpl implements AplicacioService {
 		logger.debug("Consulta del valor dels properties amb prefix (" +
 				"prefix=" + prefix + ")");
 		return PropertiesHelper.getProperties().findByPrefix(prefix);
+	}
+
+	@Override
+	public boolean pluginSeuDisponible() {
+		logger.debug("Consulta de la disponibilidad del plugin de seu electrònica");
+		return pluginHelper.isSeuPluginDisponible();
 	}
 
 

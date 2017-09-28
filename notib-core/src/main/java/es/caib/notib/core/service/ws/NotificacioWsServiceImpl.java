@@ -3,50 +3,9 @@
  */
 package es.caib.notib.core.service.ws;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Formatter;
-import java.util.List;
-
 import javax.jws.WebService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.hibernate3.HibernateJdbcException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.sun.jersey.core.util.Base64;
-
-import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.ws.notificacio.CertificacioArxiuTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.CertificacioTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.DomiciliConcretTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.DomiciliNumeracioTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.DomiciliTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.InconsistenciaDadesWsServiceException;
-import es.caib.notib.core.api.ws.notificacio.Notificacio;
-import es.caib.notib.core.api.ws.notificacio.NotificacioCertificacio;
-import es.caib.notib.core.api.ws.notificacio.NotificacioDestinatari;
-import es.caib.notib.core.api.ws.notificacio.NotificacioDestinatariEstatEnum;
-import es.caib.notib.core.api.ws.notificacio.NotificacioEstat;
-import es.caib.notib.core.api.ws.notificacio.NotificacioWsService;
-import es.caib.notib.core.api.ws.notificacio.NotificacioWsServiceException;
-import es.caib.notib.core.api.ws.notificacio.ServeiTipusEnum;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.NotificacioDestinatariEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.helper.NotificaHelper;
-import es.caib.notib.core.helper.PluginHelper;
-import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.NotificacioDestinatariRepository;
-import es.caib.notib.core.repository.NotificacioRepository;
 
 
 /**
@@ -62,14 +21,14 @@ import es.caib.notib.core.repository.NotificacioRepository;
 		portName = "NotificacioWsServicePort",
 		targetNamespace = "http://www.caib.es/notib/ws/notificacio",
 		endpointInterface = "es.caib.notib.core.api.service.ws.NotificacioWsService")
-public class NotificacioWsServiceImpl implements NotificacioWsService {
+public class NotificacioWsServiceImpl /*implements NotificacioWsService*/ {
 
-	@Autowired
+	/*@Autowired
 	private EntitatRepository entitatRepository;
 	@Autowired
 	private NotificacioRepository notificacioRepository;
 	@Autowired
-	private NotificacioDestinatariRepository notificacioDestinatariRepository;
+	private NotificacioEnviamentRepository notificacioDestinatariRepository;
 
 	@Autowired
 	private NotificaHelper notificaHelper;
@@ -123,9 +82,9 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 					build();
 			notificacioRepository.saveAndFlush(notificacioEntity);
 			List<String> result = new ArrayList<String>();
-			List<NotificacioDestinatariEntity> destinataris = new ArrayList<NotificacioDestinatariEntity>();
+			List<NotificacioEnviamentEntity> destinataris = new ArrayList<NotificacioEnviamentEntity>();
 			for (NotificacioDestinatari d: notificacio.getDestinataris()) {
-				NotificacioDestinatariEntity.Builder destinatari = NotificacioDestinatariEntity.getBuilder(
+				NotificacioEnviamentEntity.Builder destinatari = NotificacioEnviamentEntity.getBuilder(
 						d.getTitularNom(),
 						d.getTitularNif(),
 						d.getDestinatariNom(),
@@ -177,7 +136,7 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 				destinatari.dehProcedimentCodi( d.getDehProcedimentCodi() );
 				destinatari.retardPostal( d.getRetardPostal() );
 				destinatari.caducitat( d.getCaducitat() );
-				NotificacioDestinatariEntity entity = destinatari.build();
+				NotificacioEnviamentEntity entity = destinatari.build();
 				entity = notificacioDestinatariRepository.saveAndFlush(entity);
 				String referencia = notificaHelper.generarReferencia(entity);
 				entity.updateReferencia(referencia);
@@ -210,12 +169,12 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 	@Transactional
 	public Notificacio consulta(String referencia) {
 		try {
-			NotificacioEntity notificacio = notificacioRepository.findByDestinatariReferencia(
+			NotificacioEntity notificacio = notificacioRepository.findByDestinatariAndReferencia(
 					referencia);
 			if (notificacio == null) {
 				throw new NotFoundException(
-						"ref:" + referencia,
-						NotificacioDestinatariEntity.class);
+						"referencia:" + referencia,
+						NotificacioEnviamentEntity.class);
 			}
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			pluginHelper.gestioDocumentalGet(
@@ -281,15 +240,8 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 					notificacio.getSeuOficiText());
 			result.setEstat(
 					notificacio.getEstat());
-			if (notificacio.isError()) {
-				result.setError(true);
-				NotificacioEventEntity errorEvent = notificacio.getErrorEvent();
-				result.setErrorEventData(errorEvent.getData());
-				result.setErrorEventDescripcio(errorEvent.getDescripcio());
-				result.setErrorEventError(errorEvent.getErrorDescripcio());
-			}
 			List<NotificacioDestinatari> destinataris = new ArrayList<NotificacioDestinatari>();
-			NotificacioDestinatariEntity destinatari = notificacioDestinatariRepository.findByNotificacioAndReferencia(
+			NotificacioEnviamentEntity destinatari = notificacioDestinatariRepository.findByNotificacioAndReferencia(
 					notificacio,
 					referencia);
 			destinataris.add(
@@ -360,14 +312,14 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 	@Transactional
 	public NotificacioEstat consultaEstat(String referencia) {
 		try {
-			NotificacioEntity notificacio = notificacioRepository.findByDestinatariReferencia(
+			NotificacioEntity notificacio = notificacioRepository.findByDestinatariAndReferencia(
 					referencia);
 			if (notificacio == null) {
 				throw new NotFoundException(
-						"ref:" + referencia,
-						NotificacioDestinatariEntity.class);
+						"referencia:" + referencia,
+						NotificacioEnviamentEntity.class);
 			}
-			NotificacioDestinatariEntity destinatari = notificacioDestinatariRepository.findByNotificacioAndReferencia(
+			NotificacioEnviamentEntity destinatari = notificacioDestinatariRepository.findByNotificacioAndReferencia(
 					notificacio,
 					referencia);
 			if (destinatari.getSeuEstat() != null) {
@@ -442,12 +394,12 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 	@Transactional
 	public NotificacioCertificacio consultaCertificacio(String referencia) {
 		try {
-			NotificacioDestinatariEntity destinatari = notificacioDestinatariRepository.findByReferencia(
+			NotificacioEnviamentEntity destinatari = notificacioDestinatariRepository.findByReferencia(
 					referencia);
 			if (destinatari == null) {
 				throw new NotFoundException(
-						"ref:" + referencia,
-						NotificacioDestinatariEntity.class);
+						"referencia:" + referencia,
+						NotificacioEnviamentEntity.class);
 			}
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			pluginHelper.gestioDocumentalGet(
@@ -489,8 +441,8 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 
 	@SuppressWarnings("incomplete-switch")
 	private NotificacioDestinatariEstatEnum calcularEstat(
-			NotificacioDestinatariEntity destinatari) {
-		NotificacioDestinatariEstatEnumDto estatCalculatDto = NotificacioDestinatariEntity.calcularEstatNotificacioDestinatari(destinatari);
+			NotificacioEnviamentEntity destinatari) {
+		NotificacioDestinatariEstatEnumDto estatCalculatDto = NotificacioEnviamentEntity.calcularEstatNotificacioDestinatari(destinatari);
 		NotificacioDestinatariEstatEnum estatCalculat = null;
 		switch (estatCalculatDto) {
 		case ABSENT:
@@ -555,5 +507,5 @@ public class NotificacioWsServiceImpl implements NotificacioWsService {
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioWsServiceImpl.class);
-
+*/
 }

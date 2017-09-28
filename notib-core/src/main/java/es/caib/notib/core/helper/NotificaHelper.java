@@ -61,6 +61,7 @@ import org.w3c.dom.Document;
 
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaRespostaCertificacioDto;
 import es.caib.notib.core.api.dto.NotificaRespostaDatatDto;
 import es.caib.notib.core.api.dto.NotificaRespostaDatatDto.NotificaRespostaDatatEventDto;
@@ -70,10 +71,10 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.entity.NotificacioDestinatariEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.repository.NotificacioDestinatariRepository;
+import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.wsdl.notifica.ArrayOfTipoDestinatario;
@@ -116,7 +117,7 @@ public class NotificaHelper {
 	@Autowired
 	private NotificacioRepository notificacioRepository;
 	@Autowired
-	private NotificacioDestinatariRepository notificacioDestinatariRepository;
+	private NotificacioEnviamentRepository notificacioDestinatariRepository;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
 
@@ -128,7 +129,7 @@ public class NotificaHelper {
 
 
 	@Transactional
-	public void enviament(
+	public boolean enviament(
 			Long notificacioId) {
 		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
 		if (!NotificacioEstatEnumDto.PENDENT.equals(notificacio.getEstat())) {
@@ -143,17 +144,14 @@ public class NotificaHelper {
 			if ("000".equals(resultadoAlta.getCodigoRespuesta())) {
 				if (resultadoAlta.getIdentificadores() != null && resultadoAlta.getIdentificadores().getItem() != null) {
 					for (IdentificadorEnvio identificadorEnvio: resultadoAlta.getIdentificadores().getItem()) {
-						for (NotificacioDestinatariEntity destinatari: notificacio.getDestinataris()) {
-							if (destinatari.getReferencia().equals(identificadorEnvio.getReferenciaEmisor())) {
-								destinatari.updateNotificaIdentificador(
+						for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+							if (enviament.getNotificaReferencia().equals(identificadorEnvio.getReferenciaEmisor())) {
+								enviament.updateNotificaIdentificador(
 										identificadorEnvio.getIdentificador());
-								destinatari.updateNotificaEstat(
+								enviament.updateNotificaEstat(
+										new Date(),
 										NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA,
-										null,
-										null,
-										null,
-										null,
-										null);
+										true);
 							}
 						}
 					}
@@ -163,6 +161,9 @@ public class NotificaHelper {
 						notificacio).build();
 				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
 				notificacio.updateEventAfegir(event);
+				notificacio.updateErrorNotifica(
+						false,
+						null);
 				notificacioEventRepository.save(event);
 			} else {
 				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
@@ -171,7 +172,7 @@ public class NotificaHelper {
 						error(true).
 						errorDescripcio("Error retornat per notifica: [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta()).
 						build();
-				notificacio.updateError(
+				notificacio.updateErrorNotifica(
 						true,
 						event);
 				notificacio.updateEventAfegir(event);
@@ -191,16 +192,21 @@ public class NotificaHelper {
 					errorDescripcio(errorDescripcio).
 					build();
 			notificacio.updateEventAfegir(event);
-			notificacio.updateError(
+			notificacio.updateErrorNotifica(
 					true,
 					event);
 			notificacioEventRepository.save(event);
 		}
+		return NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat());
 	}
 
-	public NotificaRespostaEstatDto enviamentEstat(
-			NotificacioDestinatariEntity destinatari) throws SistemaExternException {
+	public NotificaRespostaEstatDto refrescarEstat(
+			NotificacioEnviamentEntity destinatari) throws SistemaExternException {
 		NotificaRespostaDatatDto respostaDatat = enviamentDatat(destinatari);
+		destinatari.updateNotificaEstat(
+				respostaDatat.getDataActualitzacio(),
+				getEstatNotifica(respostaDatat.getEstatActual()),
+				true);
 		NotificaRespostaEstatDto resposta = new NotificaRespostaEstatDto();
 		resposta.setData(respostaDatat.getDataActualitzacio());
 		resposta.setEstatCodi(respostaDatat.getEstatActual());
@@ -213,77 +219,86 @@ public class NotificaHelper {
 		}
 		return resposta;
 	}
+
 	@Transactional
-	public void comunicacioCanviEstatSeu(
+	public boolean comunicacioSeu(
 			Long notificacioDestinatariId) {
-		NotificacioDestinatariEntity destinatari = notificacioDestinatariRepository.findOne(
+		NotificacioEnviamentEntity enviament = notificacioDestinatariRepository.findOne(
 				notificacioDestinatariId);
-		NotificacioEntity notificacio = destinatari.getNotificacio();
+		NotificacioEntity notificacio = enviament.getNotificacio();
 		NotificacioEventEntity event;
+		boolean error = false;
 		try {
 			ComunicacionSede comunicacionSede = new ComunicacionSede();
-			comunicacionSede.setIdentificadorDestinatario(destinatari.getNotificaIdentificador());
+			comunicacionSede.setIdentificadorDestinatario(enviament.getNotificaIdentificador());
 			comunicacionSede.setFecha(
-					toXmlGregorianCalendar(destinatari.getSeuDataFi()));
+					toXmlGregorianCalendar(enviament.getSeuDataFi()));
 			comunicacionSede.setOrganismoRemisor(notificacio.getEntitat().getDir3Codi());
 			ResultadoComunicacionSede resultadoComunicacion = getSedeWs().comunicacionSede(comunicacionSede);
 			if ("000".equals(resultadoComunicacion.getCodigoRespuesta())) {
 				event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.SEU_NOTIFICA_COMUNICACIO,
 						notificacio).
-						notificacioDestinatari(destinatari).
+						enviament(enviament).
 						build();
+				notificacioEventRepository.save(event);
+				enviament.updateNotificaError(
+						false,
+						null);
 			} else {
 				event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.SEU_NOTIFICA_COMUNICACIO,
 						notificacio).
-						notificacioDestinatari(destinatari).
+						enviament(enviament).
 						error(true).
 						errorDescripcio("Error retornat per notifica: [" + resultadoComunicacion.getCodigoRespuesta() + "] " + resultadoComunicacion.getDescripcionRespuesta()).
 						build();
-				destinatari.updateSeuError(
+				enviament.updateNotificaError(
 						true,
-						event,
-						true);
+						event);
+				notificacioEventRepository.save(event);
+				error = true;
 			}
 		} catch (Exception ex) {
 			logger.error(
 					"Error al comunicar el canvi d'estat d'una notificació de la seu a Notifica (" +
 					"notificacioId=" + notificacio.getId() + ", " +
-					"notificaIdentificador=" + destinatari.getNotificaIdentificador() + ")",
+					"notificaIdentificador=" + enviament.getNotificaIdentificador() + ")",
 					ex);
 			event = NotificacioEventEntity.getBuilder(
 					NotificacioEventTipusEnumDto.SEU_NOTIFICA_COMUNICACIO,
 					notificacio).
-					notificacioDestinatari(destinatari).
+					enviament(enviament).
 					error(true).
 					errorDescripcio(ExceptionUtils.getStackTrace(ex)).
 					build();
-			destinatari.updateSeuError(
+			enviament.updateNotificaError(
 					true,
-					event,
-					true);
+					event);
+			notificacioEventRepository.save(event);
+			error = true;
 		}
-		destinatari.updateSeuNotificaInformat();
+		enviament.updateSeuNotificaInformat();
 		notificacio.updateEventAfegir(event);
+		return !error;
 	}
 
 	@Transactional
 	public void certificacioSeu(
-			NotificacioDestinatariEntity destinatari,
+			NotificacioEnviamentEntity enviament,
 			byte[] document) {
-		NotificacioEntity notificacio = destinatari.getNotificacio();
+		NotificacioEntity notificacio = enviament.getNotificacio();
 		NotificacioEventEntity event;
 		try {
 			CertificacionSede certificacionSede = new CertificacionSede();
-			certificacionSede.setEnvioDestinatario(destinatari.getNotificaIdentificador());
-			if (NotificacioDestinatariEstatEnumDto.LLEGIDA.equals(destinatari.getSeuEstat())) {
+			certificacionSede.setEnvioDestinatario(enviament.getNotificaIdentificador());
+			if (NotificacioDestinatariEstatEnumDto.LLEGIDA.equals(enviament.getSeuEstat())) {
 				certificacionSede.setEstado("notificada");
-			} else if (NotificacioDestinatariEstatEnumDto.REBUTJADA.equals(destinatari.getSeuEstat())) {
+			} else if (NotificacioDestinatariEstatEnumDto.REBUTJADA.equals(enviament.getSeuEstat())) {
 				certificacionSede.setEstado("rehusada");
 			}
 			certificacionSede.setFecha(
-					toXmlGregorianCalendar(destinatari.getSeuDataFi()));
+					toXmlGregorianCalendar(enviament.getSeuDataFi()));
 			certificacionSede.setDocumento(
 					Base64.encodeBase64String(document));
 			certificacionSede.setHashDocumento(
@@ -297,44 +312,47 @@ public class NotificaHelper {
 				event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.SEU_NOTIFICA_CERTIFICACIO,
 						notificacio).
-						notificacioDestinatari(destinatari).
+						enviament(enviament).
 						build();
+				notificacioEventRepository.save(event);
 			} else {
 				event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.SEU_NOTIFICA_CERTIFICACIO,
 						notificacio).
-						notificacioDestinatari(destinatari).
+						enviament(enviament).
 						error(true).
 						errorDescripcio("Error retornat per notifica: [" + resultadoCertificacion.getCodigoRespuesta() + "] " + resultadoCertificacion.getDescripcionRespuesta()).
 						build();
-				destinatari.updateSeuError(
+				enviament.updateSeuError(
 						true,
 						event,
 						true);
+				notificacioEventRepository.save(event);
 			}
 		} catch (Exception ex) {
 			logger.error(
 					"Error al enviar la certificació d'una notificació de la seu a Notifica (" +
 					"notificacioId=" + notificacio.getId() + ", " +
-					"notificaIdentificador=" + destinatari.getNotificaIdentificador() + ")",
+					"notificaIdentificador=" + enviament.getNotificaIdentificador() + ")",
 					ex);
 			event = NotificacioEventEntity.getBuilder(
 					NotificacioEventTipusEnumDto.SEU_NOTIFICA_CERTIFICACIO,
 					notificacio).
-					notificacioDestinatari(destinatari).
+					enviament(enviament).
 					error(true).
 					errorDescripcio(ExceptionUtils.getStackTrace(ex)).
 					build();
-			destinatari.updateSeuError(
+			enviament.updateSeuError(
 					true,
 					event,
 					true);
+			notificacioEventRepository.save(event);
 		}
-		destinatari.updateSeuNotificaInformat();
+		enviament.updateSeuNotificaInformat();
 		notificacio.updateEventAfegir(event);
 	}
 
-	public String generarReferencia(NotificacioDestinatariEntity notificacioDestinatari) throws GeneralSecurityException {
+	public String generarReferencia(NotificacioEnviamentEntity notificacioDestinatari) throws GeneralSecurityException {
 		return xifrarIdPerNotifica(notificacioDestinatari.getId());
 	}
 
@@ -380,7 +398,7 @@ public class NotificaHelper {
 			envio.setOrganismoPagadorCie(pagadorCie);
 		}
 		Documento documento = new Documento();
-		documento.setHashSha1(notificacio.getDocumentSha1());
+		documento.setHashSha1(notificacio.getDocumentHash());
 		documento.setNormalizado(notificacio.isDocumentNormalitzat() ? "si" : "no");
 		documento.setGenerarCsv(notificacio.isDocumentGenerarCsv() ? "si" : "no");
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -410,93 +428,142 @@ public class NotificaHelper {
 			NotificacioEntity notificacio) throws GeneralSecurityException {
 		SimpleDateFormat sdfCaducitat = new SimpleDateFormat("yyyy-MM-dd");
 		ArrayOfTipoDestinatario destinatarios = new ArrayOfTipoDestinatario();
-		for (NotificacioDestinatariEntity destinatari: notificacio.getDestinataris()) {
+		for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
 			TipoDestinatario destinatario = new TipoDestinatario();
-			if (destinatari.getReferencia() == null) {
-				destinatari.updateReferencia(
-						xifrarIdPerNotifica(destinatari.getId()));
+			if (enviament.getNotificaReferencia() == null) {
+				enviament.updateNotificaReferencia(
+						xifrarIdPerNotifica(enviament.getId()));
 			}
-			destinatario.setReferenciaEmisor(destinatari.getReferencia());
+			destinatario.setReferenciaEmisor(enviament.getNotificaReferencia());
 			TipoPersonaDestinatario personaTitular = new TipoPersonaDestinatario();
-			personaTitular.setNif(destinatari.getTitularNif());
-			personaTitular.setNombre(destinatari.getTitularNom());
+			personaTitular.setNif(enviament.getTitularNif());
+			personaTitular.setNombre(enviament.getTitularNom());
 			personaTitular.setApellidos(
 					concatenarLlinatges(
-							destinatari.getTitularLlinatge1(),
-							destinatari.getTitularLlinatge2()));
-			personaTitular.setTelefono(destinatari.getTitularTelefon());
-			personaTitular.setEmail(destinatari.getTitularEmail());
+							enviament.getTitularLlinatge1(),
+							enviament.getTitularLlinatge2()));
+			personaTitular.setTelefono(enviament.getTitularTelefon());
+			personaTitular.setEmail(enviament.getTitularEmail());
 			destinatario.setTitular(personaTitular);
 			TipoPersonaDestinatario personaDestinatario = new TipoPersonaDestinatario();
-			personaDestinatario.setNif(destinatari.getDestinatariNif());
-			personaDestinatario.setNombre(destinatari.getDestinatariNom());
+			personaDestinatario.setNif(enviament.getDestinatariNif());
+			personaDestinatario.setNombre(enviament.getDestinatariNom());
 			personaDestinatario.setApellidos(
 					concatenarLlinatges(
-							destinatari.getDestinatariLlinatge1(),
-							destinatari.getDestinatariLlinatge2()));
-			personaDestinatario.setTelefono(destinatari.getDestinatariTelefon());
-			personaDestinatario.setEmail(destinatari.getDestinatariEmail());
+							enviament.getDestinatariLlinatge1(),
+							enviament.getDestinatariLlinatge2()));
+			personaDestinatario.setTelefono(enviament.getDestinatariTelefon());
+			personaDestinatario.setEmail(enviament.getDestinatariEmail());
 			destinatario.setDestinatario(personaDestinatario);
-			destinatario.setServicio(destinatari.getServeiTipus().getText());
-			if (destinatari.getDomiciliTipus() != null) {
-				destinatario.setTipoDomicilio(destinatari.getDomiciliTipus().getText());
+			String serveiTipusText = null;
+			if (enviament.getServeiTipus() != null) {
+				switch (enviament.getServeiTipus()) {
+				case NORMAL:
+					serveiTipusText = "normal";
+					break;
+				case URGENT:
+					serveiTipusText = "urgente";
+					break;
+				}
 			}
-			if (destinatari.getDomiciliTipus() != null) {
+			destinatario.setServicio(serveiTipusText);
+			if (enviament.getDomiciliTipus() != null) {
+				String domiciliTipusText = null;
+				switch (enviament.getDomiciliTipus()) {
+				case CONCRETO:
+					domiciliTipusText = "concreto";
+					break;
+				case FISCAL:
+					domiciliTipusText = "fiscal";
+					break;
+				}
+				destinatario.setTipoDomicilio(domiciliTipusText);
 				TipoDomicilio domicilio = new TipoDomicilio();
-				if (destinatari.getDomiciliConcretTipus() != null) {
-					domicilio.setTipoDomicilioConcreto(destinatari.getDomiciliConcretTipus().getText());
+				String domiciliConcretTipusText = null;
+				if (enviament.getDomiciliConcretTipus() != null) {
+					switch (enviament.getDomiciliConcretTipus())  {
+					case APARTAT_CORREUS:
+						domiciliConcretTipusText = "apartado_correos";
+						break;
+					case ESTRANGER:
+						domiciliConcretTipusText = "extranjero";
+						break;
+					case NACIONAL:
+						domiciliConcretTipusText = "nacional";
+						break;
+					case SENSE_NORMALITZAR:
+						domiciliConcretTipusText = "sin_normalizar";
+						break;
+					}
+					domicilio.setTipoDomicilioConcreto(domiciliConcretTipusText);
 				}
-				domicilio.setTipoVia(destinatari.getDomiciliViaTipus());
-				domicilio.setNombreVia(destinatari.getDomiciliViaNom());
-				if (destinatari.getDomiciliNumeracioTipus() != null) {
-					domicilio.setCalificadorNumero(destinatari.getDomiciliNumeracioTipus().getText());
+				domicilio.setTipoVia(
+						viaTipusToString(enviament.getDomiciliViaTipus()));
+				domicilio.setNombreVia(enviament.getDomiciliViaNom());
+				String numeracioTipusText = null;
+				if (enviament.getDomiciliNumeracioTipus() != null) {
+					switch (enviament.getDomiciliNumeracioTipus()) {
+					case APARTAT_CORREUS:
+						numeracioTipusText = "apc";
+						break;
+					case NUMERO:
+						numeracioTipusText = "num";
+						break;
+					case PUNT_KILOMETRIC:
+						numeracioTipusText = "pkm";
+						break;
+					case SENSE_NUMERO:
+						numeracioTipusText = "s/n";
+						break;
+					}
+					domicilio.setCalificadorNumero(numeracioTipusText);
 				}
-				domicilio.setNumeroCasa(destinatari.getDomiciliNumeracioNumero());
-				domicilio.setPuntoKilometrico(destinatari.getDomiciliNumeracioPuntKm());
-				domicilio.setApartadoCorreos(destinatari.getDomiciliApartatCorreus());
-				domicilio.setBloque(destinatari.getDomiciliBloc());
-				domicilio.setPortal(destinatari.getDomiciliPortal());
-				domicilio.setEscalera(destinatari.getDomiciliEscala());
-				domicilio.setPlanta(destinatari.getDomiciliPlanta());
-				domicilio.setPuerta(destinatari.getDomiciliPorta());
-				domicilio.setComplemento(destinatari.getDomiciliComplement());
-				domicilio.setPoblacion(destinatari.getDomiciliPoblacio());
-				if (destinatari.getDomiciliMunicipiCodiIne() != null || destinatari.getDomiciliMunicipiNom() != null) {
+				domicilio.setNumeroCasa(enviament.getDomiciliNumeracioNumero());
+				domicilio.setPuntoKilometrico(enviament.getDomiciliNumeracioPuntKm());
+				domicilio.setApartadoCorreos(enviament.getDomiciliApartatCorreus());
+				domicilio.setBloque(enviament.getDomiciliBloc());
+				domicilio.setPortal(enviament.getDomiciliPortal());
+				domicilio.setEscalera(enviament.getDomiciliEscala());
+				domicilio.setPlanta(enviament.getDomiciliPlanta());
+				domicilio.setPuerta(enviament.getDomiciliPorta());
+				domicilio.setComplemento(enviament.getDomiciliComplement());
+				domicilio.setPoblacion(enviament.getDomiciliPoblacio());
+				if (enviament.getDomiciliMunicipiCodiIne() != null || enviament.getDomiciliMunicipiNom() != null) {
 					TipoMunicipio municipio = new TipoMunicipio();
-					municipio.setCodigoIne(destinatari.getDomiciliMunicipiCodiIne());
-					municipio.setNombre(destinatari.getDomiciliMunicipiNom());
+					municipio.setCodigoIne(enviament.getDomiciliMunicipiCodiIne());
+					municipio.setNombre(enviament.getDomiciliMunicipiNom());
 					domicilio.setMunicipio(municipio);
 				}
-				domicilio.setCodigoPostal(destinatari.getDomiciliCodiPostal());
-				if (destinatari.getDomiciliProvinciaCodi() != null || destinatari.getDomiciliProvinciaNom() != null) {
+				domicilio.setCodigoPostal(enviament.getDomiciliCodiPostal());
+				if (enviament.getDomiciliProvinciaCodi() != null || enviament.getDomiciliProvinciaNom() != null) {
 					TipoProvincia provincia = new TipoProvincia();
-					provincia.setCodigoProvincia(destinatari.getDomiciliProvinciaCodi());
-					provincia.setNombre(destinatari.getDomiciliProvinciaNom());
+					provincia.setCodigoProvincia(enviament.getDomiciliProvinciaCodi());
+					provincia.setNombre(enviament.getDomiciliProvinciaNom());
 					domicilio.setProvincia(provincia);
 				}
-				if (destinatari.getDomiciliPaisCodiIso() != null || destinatari.getDomiciliPaisNom() != null) {
+				if (enviament.getDomiciliPaisCodiIso() != null || enviament.getDomiciliPaisNom() != null) {
 					TipoPais pais = new TipoPais();
-					pais.setCodigoIso3166(destinatari.getDomiciliPaisCodiIso());
-					pais.setNombre(destinatari.getDomiciliPaisNom());
+					pais.setCodigoIso3166(enviament.getDomiciliPaisCodiIso());
+					pais.setNombre(enviament.getDomiciliPaisNom());
 					domicilio.setPais(pais);
 				}
-				domicilio.setLinea1(destinatari.getDomiciliLinea1());
-				domicilio.setLinea2(destinatari.getDomiciliLinea2());
-				domicilio.setCie(destinatari.getDomiciliCie());
+				domicilio.setLinea1(enviament.getDomiciliLinea1());
+				domicilio.setLinea2(enviament.getDomiciliLinea2());
+				domicilio.setCie(enviament.getDomiciliCie());
 				destinatario.setDomicilio(domicilio);
 			}
 			OpcionesEmision opcionesEmision = new OpcionesEmision();
-			if (destinatari.getCaducitat() != null) {
+			if (enviament.getCaducitat() != null) {
 				opcionesEmision.setCaducidad(
-						sdfCaducitat.format(destinatari.getCaducitat()));
+						sdfCaducitat.format(enviament.getCaducitat()));
 			}
 			opcionesEmision.setRetardoPostalDeh(
-					new Integer(destinatari.getRetardPostal()));
+					new Integer(enviament.getRetardPostal()));
 			destinatario.setOpcionesEmision(opcionesEmision);
 			DireccionElectronicaHabilitada deh = new DireccionElectronicaHabilitada();
-			deh.setCodigoProcedimiento(destinatari.getDehProcedimentCodi());
-			deh.setNif(destinatari.getDehNif());
-			deh.setObligado(destinatari.isDehObligat());
+			deh.setCodigoProcedimiento(enviament.getDehProcedimentCodi());
+			deh.setNif(enviament.getDehNif());
+			deh.setObligado((enviament.getDehObligat() != null) ? enviament.getDehObligat() : false);
 			destinatario.setDireccionElectronica(deh);
 			destinatarios.getItem().add(destinatario);
 		}
@@ -663,19 +730,19 @@ public class NotificaHelper {
 	}*/
 
 	private NotificaRespostaDatatDto enviamentDatat(
-			NotificacioDestinatariEntity destinatari) {
-		NotificacioEntity notificacio = destinatari.getNotificacio();
+			NotificacioEnviamentEntity enviament) {
+		NotificacioEntity notificacio = enviament.getNotificacio();
 		String errorPrefix = "Error al consultar el datat d'un enviament fet amb Notifica (" +
 				"notificacioId=" + notificacio.getId() + ", " +
-				"notificaIdentificador=" + destinatari.getNotificaIdentificador() + ")";
+				"notificaIdentificador=" + enviament.getNotificaIdentificador() + ")";
 		try {
 			ResultadoDatado resultadoDatado = getNotificaWs().consultaDatadoEnvio(
-					destinatari.getNotificaIdentificador());
+					enviament.getNotificaIdentificador());
 			if ("000".equals(resultadoDatado.getCodigoRespuesta())) {
 				DatadoEnvio datadoEnvio = resultadoDatado.getDatado();
 				comprovarIdentificadorEnviament(
 						notificacio,
-						destinatari,
+						enviament,
 						datadoEnvio.getIdentificadorEnvio().getIdentificador(),
 						datadoEnvio.getIdentificadorEnvio().getNifTitular(),
 						datadoEnvio.getIdentificadorEnvio().getReferenciaEmisor());
@@ -710,7 +777,7 @@ public class NotificaHelper {
 				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_DATAT,
 						notificacio).
-						notificacioDestinatari(destinatari).
+						enviament(enviament).
 						build();
 				notificacio.updateEventAfegir(event);
 				return resposta;
@@ -718,7 +785,7 @@ public class NotificaHelper {
 				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_DATAT,
 						notificacio).
-						notificacioDestinatari(destinatari).
+						enviament(enviament).
 						error(true).
 						errorDescripcio("Error retornat per notifica: [" + resultadoDatado.getCodigoRespuesta() + "] " + resultadoDatado.getDescripcionRespuesta()).
 						build();
@@ -734,7 +801,7 @@ public class NotificaHelper {
 			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
 					NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_DATAT,
 					notificacio).
-					notificacioDestinatari(destinatari).
+					enviament(enviament).
 					error(true).
 					errorDescripcio(ExceptionUtils.getStackTrace(ex)).
 					build();
@@ -747,19 +814,19 @@ public class NotificaHelper {
 	}
 
 	private NotificaRespostaCertificacioDto enviamentCertificacio(
-			NotificacioDestinatariEntity destinatari) {
-		NotificacioEntity notificacio = destinatari.getNotificacio();
+			NotificacioEnviamentEntity enviament) {
+		NotificacioEntity notificacio = enviament.getNotificacio();
 		String errorPrefix = "Error al consultar la certificació d'un enviament fet amb Notifica (" +
 				"notificacioId=" + notificacio.getId() + ", " +
-				"notificaIdentificador=" + destinatari.getNotificaIdentificador() + ")";
+				"notificaIdentificador=" + enviament.getNotificaIdentificador() + ")";
 		try {
 			ResultadoCertificacion resultadoCertificacion = getNotificaWs().consultaCertificacionEnvio(
-					destinatari.getNotificaIdentificador());
+					enviament.getNotificaIdentificador());
 			if ("000".equals(resultadoCertificacion.getCodigoRespuesta())) {
 				CertificacionEnvioRespuesta certificacion = resultadoCertificacion.getCertificacion();
 				comprovarIdentificadorEnviament(
 						notificacio,
-						destinatari,
+						enviament,
 						certificacion.getIdentificadorEnvio().getIdentificador(),
 						certificacion.getIdentificadorEnvio().getNifTitular(),
 						certificacion.getIdentificadorEnvio().getReferenciaEmisor());
@@ -800,7 +867,7 @@ public class NotificaHelper {
 				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_CERT,
 						notificacio).
-						notificacioDestinatari(destinatari).
+						enviament(enviament).
 						build();
 				notificacio.updateEventAfegir(event);
 				return resposta;
@@ -808,7 +875,7 @@ public class NotificaHelper {
 				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_CERT,
 						notificacio).
-						notificacioDestinatari(destinatari).
+						enviament(enviament).
 						error(true).
 						errorDescripcio("Error retornat per notifica: [" + resultadoCertificacion.getCodigoRespuesta() + "] " + resultadoCertificacion.getDescripcionRespuesta()).
 						build();
@@ -824,7 +891,7 @@ public class NotificaHelper {
 			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
 					NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_CERT,
 					notificacio).
-					notificacioDestinatari(destinatari).
+					enviament(enviament).
 					error(true).
 					errorDescripcio(ExceptionUtils.getStackTrace(ex)).
 					build();
@@ -836,28 +903,57 @@ public class NotificaHelper {
 		}
 	}
 
+	private static final String[] estatsNotifica = new String[] {
+			"ausente",
+			"desconocido",
+			"direccion_incorrecta",
+			"enviado_deh",
+			"enviado_ci",
+			"entregado_op",
+			"leida",
+			"error",
+			"extraviada",
+			"fallecido",
+			"notificada",
+			"pendiente_envio",
+			"pendiente_cie",
+			"pendiente_deh",
+			"pendiente_sede",
+			"rehusada",
+			"expirada",
+			"envio_programado",
+			"sin_informacion"};
+	private static final NotificacioDestinatariEstatEnumDto[] estatsNotib = new NotificacioDestinatariEstatEnumDto[] {
+			NotificacioDestinatariEstatEnumDto.ABSENT,
+			NotificacioDestinatariEstatEnumDto.DESCONEGUT,
+			NotificacioDestinatariEstatEnumDto.ADRESA_INCORRECTA,
+			NotificacioDestinatariEstatEnumDto.ENVIADA_DEH,
+			NotificacioDestinatariEstatEnumDto.ENVIADA_CI,
+			NotificacioDestinatariEstatEnumDto.ENTREGADA_OP,
+			NotificacioDestinatariEstatEnumDto.LLEGIDA,
+			NotificacioDestinatariEstatEnumDto.ERROR_ENTREGA,
+			NotificacioDestinatariEstatEnumDto.EXTRAVIADA,
+			NotificacioDestinatariEstatEnumDto.MORT,
+			NotificacioDestinatariEstatEnumDto.NOTIFICADA,
+			NotificacioDestinatariEstatEnumDto.PENDENT_ENVIAMENT,
+			NotificacioDestinatariEstatEnumDto.PENDENT_CIE,
+			NotificacioDestinatariEstatEnumDto.PENDENT_DEH,
+			NotificacioDestinatariEstatEnumDto.PENDENT_SEU,
+			NotificacioDestinatariEstatEnumDto.REBUTJADA,
+			NotificacioDestinatariEstatEnumDto.EXPIRADA,
+			NotificacioDestinatariEstatEnumDto.ENVIAMENT_PROGRAMAT,
+			NotificacioDestinatariEstatEnumDto.SENSE_INFORMACIO};
+	private NotificacioDestinatariEstatEnumDto getEstatNotifica(
+			String estatCodi) {
+		for (int i = 0; i < estatsNotifica.length; i++) {
+			if (estatCodi.equalsIgnoreCase(estatsNotifica[i])) {
+				return estatsNotib[i];
+			}
+		}
+		return null;
+	}
 	private boolean isEstatFinal(
 			String estatCodi) {
-		String[] estatsNotifica = new String[] {
-				"ausente",
-				"desconocido",
-				"direccion_incorrecta",
-				"enviado_deh",
-				"enviado_ci",
-				"entregado_op",
-				"leida",
-				"error",
-				"extraviada",
-				"fallecido",
-				"notificada",
-				"pendiente_envio",
-				"pendiente_cie",
-				"pendiente_deh",
-				"pendiente_sede",
-				"rehusada",
-				"expirada",
-				"envio_programado",
-				"sin_informacion"};
 		boolean[] esFinal = new boolean[] {
 			true,
 			true,
@@ -886,9 +982,104 @@ public class NotificaHelper {
 		return false;
 	}
 
+	private String viaTipusToString(NotificaDomiciliViaTipusEnumDto viaTipus) {
+		if (viaTipus != null) {
+			switch (viaTipus) {
+			case ALAMEDA:
+				return "ALMDA";
+			case AVENIDA:
+				return "AVDA";
+			case AVINGUDA:
+				return "AVGDA";
+			case BARRIO:
+				return "BAR";
+			case BULEVAR:
+				return "BVR";
+			case CALLE:
+				return "CALLE";
+			case CALLEJA:
+				return "CJA";
+			case CAMI:
+				return "CAMÍ";
+			case CAMINO:
+				return "CAMNO";
+			case CAMPO:
+				return "CAMPO";
+			case CARRER:
+				return "CARR";
+			case CARRERA:
+				return "CRA";
+			case CARRETERA:
+				return "CTRA";
+			case CUESTA:
+				return "CSTA";
+			case EDIFICIO:
+				return "EDIF";
+			case ENPARANTZA:
+				return "EPTZA";
+			case ESTRADA:
+				return "ESTR";
+			case GLORIETA:
+				return "GTA";
+			case JARDINES:
+				return "JARD";
+			case JARDINS:
+				return "JARDI";
+			case KALEA:
+				return "KALEA";
+			case OTROS:
+				return "OTROS";
+			case PARQUE:
+				return "PRQUE";
+			case PASAJE:
+				return "PSJ";
+			case PASEO:
+				return "PASEO";
+			case PASSATGE:
+				return "PASTG";
+			case PASSEIG:
+				return "PSG";
+			case PLACETA:
+				return "PLCTA";
+			case PLAZA:
+				return "PLAZA";
+			case PLAZUELA:
+				return "PLZA";
+			case PLAÇA:
+				return "PLAÇA";
+			case POBLADO:
+				return "POBL";
+			case POLIGONO:
+				return "POLIG";
+			case PRAZA:
+				return "PRAZA";
+			case RAMBLA:
+				return "RAMBL";
+			case RONDA:
+				return "RONDA";
+			case RUA:
+				return "RÚA";
+			case SECTOR:
+				return "SECT";
+			case TRAVESIA:
+				return "TRAV";
+			case TRAVESSERA:
+				return "TRAVS";
+			case URBANIZACION:
+				return "URB";
+			case VIA:
+				return "VIA";
+			default:
+				return null;
+			}
+		} else {
+			return null;
+		}
+	}
+
 	private void comprovarIdentificadorEnviament(
 			NotificacioEntity notificacio,
-			NotificacioDestinatariEntity destinatari,
+			NotificacioEnviamentEntity destinatari,
 			String identificador,
 			String titularNif,
 			String referenciaEmisor) {
@@ -907,11 +1098,11 @@ public class NotificaHelper {
 					"titularNifPeticio=" + destinatari.getTitularNif() + ", " +
 					"titularNifRetornat=" + titularNif + ")");
 		}
-		if (!referenciaEmisor.equals(destinatari.getReferencia())) {
+		if (!referenciaEmisor.equals(destinatari.getNotificaReferencia())) {
 			throw new SistemaExternException(
 					"NOTIFICA",
 					"La identificació retornada no coincideix amb la identificació de la petició (" + 
-					"referenciaEmisorPeticio=" + destinatari.getReferencia() + ", " +
+					"referenciaEmisorPeticio=" + destinatari.getNotificaReferencia() + ", " +
 					"referenciaEmisorRetornat=" + referenciaEmisor + ")");
 		}
 	}
@@ -973,6 +1164,9 @@ public class NotificaHelper {
 	private String concatenarLlinatges(
 			String llinatge1,
 			String llinatge2) {
+		if (llinatge1 == null && llinatge2 == null) {
+			return null;
+		}
 		StringBuilder llinatges = new StringBuilder();
 		llinatges.append(llinatge1.trim());
 		if (llinatge2 != null && !llinatge2.trim().isEmpty()) {

@@ -21,17 +21,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 
-import es.caib.notib.core.api.ws.notificacio.InconsistenciaDadesWsServiceException;
-import es.caib.notib.core.api.ws.notificacio.Notificacio;
-import es.caib.notib.core.api.ws.notificacio.NotificacioCertificacio;
-import es.caib.notib.core.api.ws.notificacio.NotificacioEstat;
-import es.caib.notib.core.api.ws.notificacio.NotificacioWsService;
-import es.caib.notib.core.api.ws.notificacio.NotificacioWsServiceException;
+import es.caib.notib.core.api.ws.notificacio2.InformacioEnviament;
+import es.caib.notib.core.api.ws.notificacio2.Notificacio;
+import es.caib.notib.core.api.ws.notificacio2.NotificacioServiceWs;
 import es.caib.notib.war.validation.RestPreconditions;
 
 /**
@@ -41,16 +37,15 @@ import es.caib.notib.war.validation.RestPreconditions;
  */
 @Controller
 @RequestMapping("/api")
-@Api(value = "/notificacio", description = "Notificaio API")
-//@ControllerAdvice
+@Api(value = "/notificacio", description = "Notificacio API")
 public class NotificacioServiceController extends BaseController {
 
 	@Autowired
-	private NotificacioWsService notificacioWSService;
+	private NotificacioServiceWs notificacioServiceWs;
 
 	@RequestMapping(value = "/apidoc", method = RequestMethod.GET)
 	public String documentacio(HttpServletRequest request) {
-		return "restDoc";
+		return "apidoc";
 	}
 
 	@RequestMapping(
@@ -60,24 +55,15 @@ public class NotificacioServiceController extends BaseController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation(
 			value = "Genera una notificació", 
-			notes = "Retorna una llista amb els codis de les notificacions generades")
+			notes = "Retorna una llista amb els codis dels enviaments creats")
 	public @ResponseBody List<String> alta(
-			@ApiParam(
-					name="notificacio",
-					value="Objecte amb les dades necessàries per a generar una notificació",
-					required = true) 
+			@ApiParam(name="notificacio", value="Objecte amb les dades necessàries per a generar una notificació", required=true) 
 			@RequestBody Notificacio notificacio,
 			HttpServletResponse response) throws GeneralSecurityException, IOException {
 		RestPreconditions.checkNotNull(notificacio);
-		List<String> references = null;
-		try {
-			references = notificacioWSService.alta(notificacio);
-		} catch(NotificacioWsServiceException e) {
-			if( e instanceof InconsistenciaDadesWsServiceException) {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-			}
-		}
-		return references;
+		List<String> resposta = notificacioServiceWs.alta(
+				notificacio);
+		return resposta;
 	}
 
 	@RequestMapping(
@@ -87,45 +73,35 @@ public class NotificacioServiceController extends BaseController {
 	@ApiOperation(
 			value = "Consulta una notificació",
 			response = Notificacio.class)
-	public @ResponseBody Notificacio consulta(
-			@ApiParam(
-					name="referencia",
-					value="Identificador de la notificació a consultar",
-					required=true)
-			@PathVariable("referencia") String referencia,
+	public @ResponseBody InformacioEnviament consulta(
+			@ApiParam(name="referencia", value="Referència de la notificació a consultar", required=true)
+			@PathVariable("referencia")
+			String referencia,
 			HttpServletResponse response) throws UnsupportedEncodingException, IOException {
 		RestPreconditions.checkNotNull(referencia);
-		Notificacio notificacio = notificacioWSService.consulta(referencia);
-		try {
-			if(notificacio == null)
-				response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		} catch (IOException e) {
-			e.printStackTrace();
+		InformacioEnviament informacio = notificacioServiceWs.consulta(referencia);
+		if (informacio == null) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
-		
-		return notificacio;
+		return informacio;
 	}
 
-	@RequestMapping(
+	/*@RequestMapping(
 			value = "/services/consultaEstat/{referencia}", 
 			method = RequestMethod.GET,
 			produces="application/json")
 	@ApiOperation(
 			value = "Consulta l'estat d'una notificació",
 			response = NotificacioEstat.class)
-	public @ResponseBody NotificacioEstat consultaEstat(
+	public @ResponseBody NotificacioEstatDto consultaEstat(
 			@ApiParam(name="referencia", value="Identificador de la notificació de la que es vol consultar el seu estat", required=true) 
 			@PathVariable("referencia") String referencia,
-			HttpServletResponse response) throws JsonProcessingException {
+			HttpServletResponse response) throws IOException {
 		RestPreconditions.checkNotNull(referencia);
-		NotificacioEstat estat = notificacioWSService.consultaEstat(referencia);
-		try {
-			if(estat == null)
-				response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		} catch (IOException e) {
-			e.printStackTrace();
+		NotificacioEstat estat = notificacioService.cons.consultaEstat(referencia);
+		if (estat == null) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
-		
 		return estat;
 	}
 
@@ -141,22 +117,11 @@ public class NotificacioServiceController extends BaseController {
 			@PathVariable("referencia") String referencia,
 			HttpServletResponse response) throws UnsupportedEncodingException, IOException {
 		RestPreconditions.checkNotNull(referencia);
-		NotificacioCertificacio certificacio = notificacioWSService.consultaCertificacio(referencia);
-		try {
-			if(certificacio == null)
-				response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		} catch (IOException e) {
-			e.printStackTrace();
+		NotificacioCertificacio certificacio = notificacioService.consultaCertificacio(referencia);
+		if (certificacio == null) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
-		
 		return certificacio;
-	}
-	
-//	@ExceptionHandler
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public void handle(HttpMessageNotReadableException e) {
-//		System.out.println(e);
-//        throw e;
-//    }
+	}*/
 
 }

@@ -10,7 +10,7 @@ import java.io.Serializable;
  * 
  * Els possibles estats son:
  *  - PENDENT: Pendent d'enviament a Notifica.
- *  - ENVIADA_NOTIFICA: Enviada a Notifica.
+ *  - ENVIADA: Enviada a Notifica.
  *  - FINALITZADA: Estat final de la notificació.
  * 
  * @author Limit Tecnologies <limit@limit.es>
