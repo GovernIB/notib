@@ -1,5 +1,11 @@
 package es.caib.notib.core.api.ws.callback;
 
+/** Servei per a notificar a les aplicacions clients un event de canvi d'estat o de certificat
+ * provinent del WS Adviser de Notific@.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ *
+ */
 public interface ClientService {
 	
 	/**
@@ -20,6 +26,4 @@ public interface ClientService {
 	 */
 	public void notificaCertificacio(
 			NotificacioCertificacioClient certificacioNotificacio);
-	
-	
 }

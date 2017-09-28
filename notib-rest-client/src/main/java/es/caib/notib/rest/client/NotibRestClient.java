@@ -35,7 +35,7 @@ public class NotibRestClient {
     	
     	urlBaseNotib = urlBaseNotib + (urlBaseNotib.endsWith("/") ? "" : "/");
     	
-		String urlAmbMetode = urlBaseNotib + "api/services/altaEnviament";
+		String urlAmbMetode = urlBaseNotib + "api/services/alta";
 		String urlLogin = urlBaseNotib + "j_security_check";
 		
 		Client jerseyClient = generarClientRestForm();
@@ -95,7 +95,7 @@ public class NotibRestClient {
 
     	urlBaseNotib = urlBaseNotib + (urlBaseNotib.endsWith("/") ? "" : "/");
     	
-    	String urlAmbMetode = urlBaseNotib + (urlBaseNotib.endsWith("/") ? "" : "/") + "api/services/infoEnviament/" + referencia;
+    	String urlAmbMetode = urlBaseNotib + (urlBaseNotib.endsWith("/") ? "" : "/") + "api/notificacio/" + referencia;
     	String urlLogin = urlBaseNotib + "j_security_check";
     	
     	Client jerseyClient = generarClientRestForm();

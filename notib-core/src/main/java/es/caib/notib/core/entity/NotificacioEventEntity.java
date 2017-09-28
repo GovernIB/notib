@@ -8,6 +8,8 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -19,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 
@@ -54,6 +57,16 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	@JoinColumn(name = "notificacio_env_id")
 	@ForeignKey(name = "not_notenv_noteve_fk")
 	private NotificacioEnviamentEntity enviament;
+	@Column(name = "callback_estat", length = 10, nullable = true)
+	@Enumerated(EnumType.STRING)
+	private CallbackEstatEnumDto callbackEstat;
+	@Column(name = "callback_data")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date callbackData;
+	@Column(name = "callback_intents")
+	private Integer callbackIntents;
+	@Column(name = "callback_error_desc", length = ERROR_DESC_MAX_LENGTH)
+	private String callbackError;
 
 	public NotificacioEventTipusEnumDto getTipus() {
 		return tipus;
@@ -76,7 +89,29 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	public NotificacioEnviamentEntity getEnviament() {
 		return enviament;
 	}
-
+	public CallbackEstatEnumDto getCallbackEstat() {
+		return callbackEstat;
+	}
+	public Date getCallbackData() {
+		return callbackData;
+	}
+	public int getCallbackIntents() {
+		return callbackIntents != null? callbackIntents : 0;
+	}
+	public String getCallbackError() {
+		return callbackError;
+	}
+	public void updateCallbackClient(
+			CallbackEstatEnumDto estat,
+			Date data,
+			Integer intents,
+			String error) {
+		this.callbackEstat = estat;
+		this.callbackData = data;
+		this.callbackIntents = intents;
+		this.callbackError = error;
+	}
+	
 	public static Builder getBuilder(
 			NotificacioEventTipusEnumDto tipus,
 			NotificacioEntity notificacio) {
@@ -109,6 +144,12 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 		}
 		public Builder enviament(NotificacioEnviamentEntity enviament) {
 			built.enviament = enviament;
+			return this;
+		}
+		/** Inicialitza els camps pel callback cap al client. */
+		public Builder callbackInicialitza() {
+			built.callbackEstat = CallbackEstatEnumDto.PENDENT;
+			built.callbackIntents = 0;
 			return this;
 		}
 		public NotificacioEventEntity build() {

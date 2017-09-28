@@ -17,7 +17,7 @@ import javax.xml.ws.WebServiceFeature;
  * Generated source version: 2.2
  * 
  */
-@WebServiceClient(name = "NotificacioService", targetNamespace = "http://www.caib.es/notib/ws/notificacio", wsdlLocation = "file:/C:/Users/PereP/git/notib/notib-rest-client/wsdl/notib-notificacio/notificacio.wsdl")
+@WebServiceClient(name = "NotificacioService", targetNamespace = "http://www.caib.es/notib/ws/notificacio", wsdlLocation = "file:/C:/Users/danielm/Limit%20Tecnologies/lot3/Notib/git/notib-rest-client/wsdl/notib-notificacio/notificacio.wsdl")
 public class NotificacioService
     extends Service
 {
@@ -30,7 +30,7 @@ public class NotificacioService
         URL url = null;
         WebServiceException e = null;
         try {
-            url = new URL("file:/C:/Users/PereP/git/notib/notib-rest-client/wsdl/notib-notificacio/notificacio.wsdl");
+            url = new URL("file:/C:/Users/danielm/Limit%20Tecnologies/lot3/Notib/git/notib-rest-client/wsdl/notib-notificacio/notificacio.wsdl");
         } catch (MalformedURLException ex) {
             e = new WebServiceException(ex);
         }

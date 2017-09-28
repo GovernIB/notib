@@ -133,6 +133,7 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 								enviament.getNotificacio()).
 								enviament(enviament).
 								descripcio(datadoOrganismo.getResultado()).
+								callbackInicialitza().
 								build();
 						codigoRespuesta.value = "000";
 						textoRespuesta.value = "OK";
@@ -241,6 +242,7 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
 								enviament.getNotificacio()).
 								enviament(enviament).
+								callbackInicialitza().
 								build();
 						codigoRespuesta.value = "000";
 						textoRespuesta.value = "OK";

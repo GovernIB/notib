@@ -1,13 +1,10 @@
-package es.caib.notib.core.api.ws.callback;
+package es.caib.notib.rest.callback;
 
 import java.util.Date;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-
-import es.caib.notib.core.api.ws.notificacio.CertificacioArxiuTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.CertificacioTipusEnum;
 
 /**
  * Informació sobre l'estat d'una notificació.

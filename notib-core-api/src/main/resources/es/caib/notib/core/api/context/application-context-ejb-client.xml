@@ -29,5 +29,9 @@
 			id="notificacioWsService"
 			jndi-name="notib/NotificacioWsServiceBean/local"
 			business-interface="es.caib.notib.core.api.ws.notificacio.NotificacioWsService"/>
+	<jee:local-slsb
+			id="adviserWsService"
+			jndi-name="notib/NotificaAdviserWsBean/local"
+			business-interface="es.caib.notib.core.wsdl.adviser.AdviserWS"/>
 
 </beans>
