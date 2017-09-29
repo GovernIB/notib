@@ -45,8 +45,6 @@ public class NotificacioRestClient {
 	private String username;
 	private String password;
 
-	private boolean execucioDinsJBoss = true;
-
 	public NotificacioRestClient(
 			String baseUrl,
 			String username,
@@ -99,15 +97,11 @@ public class NotificacioRestClient {
 		return mapper.readValue(json, InformacioEnviament.class);
 	}
 
-	public void setExecucioDinsJBoss(boolean execucioDinsJBoss) {
-		this.execucioDinsJBoss = execucioDinsJBoss;
-	}
-
 
 
 	private Client generarClient() {
 		Client jerseyClient = Client.create();
-		if (!execucioDinsJBoss) {
+		if (!isExecucioDinsJBoss()) {
 			jerseyClient.addFilter(
 					new ClientFilter() {
 						private ArrayList<Object> cookies;
@@ -136,7 +130,7 @@ public class NotificacioRestClient {
 			String urlAmbMetode,
 			String username,
 			String password) throws InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
-		if (execucioDinsJBoss) {
+		if (isExecucioDinsJBoss()) {
 			ControladorSesion controlador = new ControladorSesion();
 			controlador.autenticar(username, password);
 			AuthorizationToken token = controlador.getToken();
@@ -152,6 +146,10 @@ public class NotificacioRestClient {
 			type("application/x-www-form-urlencoded").
 			post(form);
 		}
+	}
+
+	private boolean isExecucioDinsJBoss() {
+		return System.getProperty("jboss.server.name") != null;
 	}
 
 }

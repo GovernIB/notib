@@ -6,7 +6,6 @@ package es.caib.notib.client;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +13,10 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import javax.ejb.CreateException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MalformedObjectNameException;
+import javax.naming.NamingException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -23,9 +26,13 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.jboss.mx.util.MBeanProxyCreationException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
+import es.caib.loginModule.client.AuthenticationFailureException;
 import es.caib.notib.ws.notificacio.Document;
 import es.caib.notib.ws.notificacio.EntregaDeh;
 import es.caib.notib.ws.notificacio.EntregaPostal;
@@ -36,6 +43,7 @@ import es.caib.notib.ws.notificacio.EnviamentEstatEnum;
 import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
 import es.caib.notib.ws.notificacio.InformacioEnviament;
 import es.caib.notib.ws.notificacio.Notificacio;
+import es.caib.notib.ws.notificacio.NotificacioServiceWsException_Exception;
 import es.caib.notib.ws.notificacio.PagadorCie;
 import es.caib.notib.ws.notificacio.PagadorPostal;
 import es.caib.notib.ws.notificacio.ParametresSeu;
@@ -51,6 +59,9 @@ public class ClientRestTest {
 
 	private static final String ENTITAT_DIR3CODI = "A04013511";
 
+	@Rule
+	public ExpectedException expectedException = ExpectedException.none();
+
 	private NotificacioRestClient client;
 
 	@Before
@@ -59,34 +70,28 @@ public class ClientRestTest {
 				"http://localhost:8080/notib",
 				"notapp",
 				"notapp");
-		client.setExecucioDinsJBoss(false);
 	}
 
 	@Test
-	public void test() {
+	public void test() throws InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, NotificacioServiceWsException_Exception, NamingException, CreateException, AuthenticationFailureException, IOException, DecoderException, DatatypeConfigurationException {
 		String notificacioId = new Long(System.currentTimeMillis()).toString();
-		try {
-			List<String> referencies = client.alta(
-					generarNotificacio(
-							notificacioId,
-							1,
-							true));
-			assertNotNull(referencies);
-			assertThat(
-					referencies.size(),
-					is(1));
-			/*for (String referencia: referencies) {
-				System.out.println(">>> Referencia enviament creat: " + referencia);
-			}*/
-			InformacioEnviament info = client.consulta(referencies.get(0));
-			assertNotNull(info);
-			assertThat(
-					info.getEstat(),
-					is(EnviamentEstatEnum.NOTIB_PENDENT));
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			fail();
-		}
+		List<String> referencies = client.alta(
+				generarNotificacio(
+						notificacioId,
+						1,
+						true));
+		assertNotNull(referencies);
+		assertThat(
+				referencies.size(),
+				is(1));
+		/*for (String referencia: referencies) {
+			System.out.println(">>> Referencia enviament creat: " + referencia);
+		}*/
+		InformacioEnviament info = client.consulta(referencies.get(0));
+		assertNotNull(info);
+		assertThat(
+				info.getEstat(),
+				is(EnviamentEstatEnum.NOTIB_PENDENT));
 	}
 
 

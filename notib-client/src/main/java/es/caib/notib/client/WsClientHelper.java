@@ -5,13 +5,24 @@ package es.caib.notib.client;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ejb.CreateException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MalformedObjectNameException;
+import javax.naming.NamingException;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 import javax.xml.ws.handler.Handler;
+
+import org.jboss.mx.util.MBeanProxyCreationException;
+
+import es.caib.loginModule.auth.ControladorSesion;
+import es.caib.loginModule.client.AuthenticationFailureException;
+import es.caib.loginModule.client.AuthorizationToken;
 
 /**
  * Utilitat per a instanciar clients per al servei d'enviament
@@ -28,7 +39,7 @@ public class WsClientHelper<T> {
 			String username,
 			String password,
 			Class<T> clazz,
-			Handler<?>... handlers) throws MalformedURLException {
+			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
 		URL url = wsdlResourceUrl;
 		if (url == null) {
 			if (!endpoint.endsWith("?wsdl"))
@@ -48,23 +59,25 @@ public class WsClientHelper<T> {
 		bindingProvider.getRequestContext().put(
 				BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
 				endpointAddress);
-		// Configura l'autenticació si és necessària
 		if (username != null && !username.isEmpty()) {
-			/*ControladorSesion controlador = new ControladorSesion();
-			controlador.autenticar(username, password);
-			AuthorizationToken token = controlador.getToken();
-			bindingProvider.getRequestContext().put(
-					BindingProvider.USERNAME_PROPERTY,
-					token.getUser());
-			bindingProvider.getRequestContext().put(
-					BindingProvider.PASSWORD_PROPERTY,
-					token.getPassword());*/
-			bindingProvider.getRequestContext().put(
-					BindingProvider.USERNAME_PROPERTY,
-					username);
-			bindingProvider.getRequestContext().put(
-					BindingProvider.PASSWORD_PROPERTY,
-					password);
+			if (isExecucioDinsJBoss()) {
+				ControladorSesion controlador = new ControladorSesion();
+				controlador.autenticar(username, password);
+				AuthorizationToken token = controlador.getToken();
+				bindingProvider.getRequestContext().put(
+						BindingProvider.USERNAME_PROPERTY,
+						token.getUser());
+				bindingProvider.getRequestContext().put(
+						BindingProvider.PASSWORD_PROPERTY,
+						token.getPassword());
+			} else {
+				bindingProvider.getRequestContext().put(
+						BindingProvider.USERNAME_PROPERTY,
+						username);
+				bindingProvider.getRequestContext().put(
+						BindingProvider.PASSWORD_PROPERTY,
+						password);
+			}
 		}
 		// Configura el log de les peticions
 		@SuppressWarnings("rawtypes")
@@ -85,7 +98,7 @@ public class WsClientHelper<T> {
 			String username,
 			String password,
 			Class<T> clazz,
-			Handler<?>... handlers) throws MalformedURLException {
+			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
 		return this.generarClientWs(
 				null,
 				endpoint,
@@ -93,6 +106,10 @@ public class WsClientHelper<T> {
 				username,
 				password,
 				clazz);
+	}
+
+	private boolean isExecucioDinsJBoss() {
+		return System.getProperty("jboss.server.name") != null;
 	}
 
 }
