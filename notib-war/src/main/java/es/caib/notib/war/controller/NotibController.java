@@ -82,6 +82,13 @@ public class NotibController {
 		return "util/error";
 	}
 
+	@RequestMapping(value = "/api")
+	public String api(
+			HttpServletRequest request,
+			Model model) {
+		return "redirect:api/apidoc";
+	}
+
 	public static class ErrorObject {
 		Integer statusCode;
 		Throwable throwable;

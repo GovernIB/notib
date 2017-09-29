@@ -35,31 +35,31 @@ public class AplicacioServiceBean implements AplicacioService {
 
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_REP", "NOT_APL"})
 	public String getVersioActual() {
 		return delegate.getVersioActual();
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_REP", "NOT_APL"})
 	public void processarAutenticacioUsuari() {
 		delegate.processarAutenticacioUsuari();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
 	public UsuariDto getUsuariActual() {
 		return delegate.getUsuariActual();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
 	public UsuariDto findUsuariAmbCodi(String codi) {
 		return delegate.findUsuariAmbCodi(codi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
 	public List<UsuariDto> findUsuariAmbText(String text) {
 		return delegate.findUsuariAmbText(text);
 	}
@@ -99,13 +99,13 @@ public class AplicacioServiceBean implements AplicacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
 	public String propertyGet(String property) {
 		return delegate.propertyGet(property);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
 	public Map<String, String> propertyFindByPrefix(String prefix) {
 		return delegate.propertyFindByPrefix(prefix);
 	}

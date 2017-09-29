@@ -37,7 +37,7 @@ import es.caib.notib.war.validation.RestPreconditions;
  */
 @Controller
 @RequestMapping("/api")
-@Api(value = "/notificacio", description = "Notificacio API")
+@Api(value = "/services", description = "Notificacio API")
 public class NotificacioServiceController extends BaseController {
 
 	@Autowired
@@ -49,7 +49,7 @@ public class NotificacioServiceController extends BaseController {
 	}
 
 	@RequestMapping(
-			value = "/services/alta", 
+			value = "/services/notificacio/alta", 
 			method = RequestMethod.POST,
 			produces="application/json")
 	@ResponseStatus(HttpStatus.CREATED)
@@ -67,7 +67,7 @@ public class NotificacioServiceController extends BaseController {
 	}
 
 	@RequestMapping(
-			value = "/services/consulta/{referencia}", 
+			value = "/services/notificacio/consulta/{referencia}", 
 			method = RequestMethod.GET,
 			produces="application/json")
 	@ApiOperation(

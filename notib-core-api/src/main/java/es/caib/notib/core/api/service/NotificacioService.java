@@ -110,7 +110,7 @@ public interface NotificacioService {
 	 *            Atribut id de l'enviament.
 	 * @return el destinatari trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')  or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
 	public NotificacioEnviamentDto enviamentFindAmbId(
 			Long enviamentId);
 
@@ -132,7 +132,7 @@ public interface NotificacioService {
 	 *            Atribut id de la notificació.
 	 * @return els events trobats.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')  or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
 	public List<NotificacioEventDto> eventFindAmbNotificacio(
 			Long notificacioId);
 
@@ -145,7 +145,7 @@ public interface NotificacioService {
 	 *            Atribut id de l'enviament.
 	 * @return els destinataris trobats.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')  or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
 	public List<NotificacioEventDto> eventFindAmbNotificacioIEnviament(
 			Long notificacioId,
 			Long enviamentId);
@@ -157,7 +157,7 @@ public interface NotificacioService {
 	 *            Atribut id de la notificació.
 	 * @return el fitxer associat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')  or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
 	public ArxiuDto getDocumentArxiu(
 			Long notificacioId);
 
@@ -168,7 +168,7 @@ public interface NotificacioService {
 	 *            Atribut id de l'enviament.
 	 * @return el fitxer de certificació associat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')  or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
 	public ArxiuDto enviamentGetCertificacioArxiu(
 			Long enviamentId);
 

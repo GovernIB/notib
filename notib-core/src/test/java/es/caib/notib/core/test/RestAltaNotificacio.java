@@ -48,8 +48,8 @@ public class RestAltaNotificacio {
 	private void testAlta() throws JsonProcessingException, IOException, DecoderException {
 		Client jerseyClient = new Client();
 		ObjectMapper mapper  = new ObjectMapper();
-		String user = "notibapp";
-		String pass = "notibapp";
+		String user = "admin";
+		String pass = "admin15";
 		String urlAmbMetode = "http://localhost:8080/notib/api/services/alta";
 		String notificacioId = new Long(System.currentTimeMillis()).toString();
 		String body = mapper.writeValueAsString(

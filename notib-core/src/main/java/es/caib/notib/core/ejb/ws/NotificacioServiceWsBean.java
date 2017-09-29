@@ -5,6 +5,7 @@ package es.caib.notib.core.ejb.ws;
 
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
@@ -29,7 +30,7 @@ import es.caib.notib.core.helper.UsuariHelper;
  */
 @Stateless
 @WebService(
-		name = "Notificacio",
+		name = "NotificacioService",
 		serviceName = "NotificacioService",
 		portName = "NotificacioServicePort",
 		targetNamespace = "http://www.caib.es/notib/ws/notificacio")
@@ -44,8 +45,9 @@ import es.caib.notib.core.helper.UsuariHelper;
 @Interceptors(SpringBeanAutowiringInterceptor.class)
 public class NotificacioServiceWsBean implements NotificacioServiceWs {
 
-	@Autowired
+	@Resource
 	private SessionContext sessionContext;
+
 	@Autowired
 	private UsuariHelper usuariHelper;
 

@@ -3,8 +3,6 @@
  */
 package es.caib.notib.core.ejb.ws;
 
-import javax.annotation.Resource;
-import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 import javax.jws.WebService;
@@ -32,7 +30,7 @@ import es.caib.notib.core.wsdl.adviser.DatadoRequest;
 		targetNamespace = "https://administracionelectronica.gob.es/notifica/ws/notifica/1.0/")
 @WebContext(
 		contextRoot = "/notib/ws",
-		urlPattern = "/AdviserWS",
+		urlPattern = "/adviser",
 		authMethod = "WSBASIC",
 		transportGuarantee = "NONE",
 		secureWSDLAccess = false)
@@ -41,8 +39,6 @@ import es.caib.notib.core.wsdl.adviser.DatadoRequest;
 @Interceptors(SpringBeanAutowiringInterceptor.class)
 public class NotificaAdviserWsBean implements AdviserWS {
 
-	@Resource
-	private SessionContext sessionContext;
 	@Autowired
 	private AdviserWS delegate;
 

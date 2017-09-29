@@ -91,7 +91,7 @@ public class EntitatServiceBean implements EntitatService {
 	}
 
 	@Override
-	@RolesAllowed("NOT_ADMIN")
+	@RolesAllowed({"NOT_ADMIN", "NOT_REP", "NOT_APL"})
 	public List<EntitatDto> findAccessiblesUsuariActual() {
 		return delegate.findAccessiblesUsuariActual();
 	}

@@ -17,8 +17,8 @@ import javax.xml.bind.annotation.XmlElement;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @WebService(
-		name = "Notificacio2",
-		targetNamespace = "http://www.caib.es/notib/ws/notificacio2")
+		name = "NotificacioService",
+		targetNamespace = "http://www.caib.es/notib/ws/notificacio")
 public interface NotificacioServiceWs {
 
 	/**

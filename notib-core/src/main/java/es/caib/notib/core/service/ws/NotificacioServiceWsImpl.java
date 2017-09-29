@@ -60,11 +60,11 @@ import es.caib.notib.core.repository.NotificacioRepository;
  */
 @Service
 @WebService(
-		name = "Notificacio2",
-		serviceName = "Notificacio2Service",
-		portName = "Notificacio2ServicePort",
-		targetNamespace = "http://www.caib.es/notib/ws/notificacio2",
-		endpointInterface = "es.caib.notib.core.api.service.ws.Notificacio2Service")
+		name = "NotificacioService",
+		serviceName = "NotificacioService",
+		portName = "NotificacioServicePort",
+		targetNamespace = "http://www.caib.es/notib/ws/notificacio",
+		endpointInterface = "es.caib.notib.core.api.service.ws.NotificacioService")
 public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 
 	@Autowired

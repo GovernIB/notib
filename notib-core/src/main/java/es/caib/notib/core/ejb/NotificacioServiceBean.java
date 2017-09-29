@@ -93,7 +93,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed("NOT_APL")
 	public NotificacioEnviamentDto enviamentFindAmbReferencia(
 			String referencia) {
 		return delegate.enviamentFindAmbReferencia(referencia);
@@ -124,6 +124,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 	
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
 	public ArxiuDto enviamentGetCertificacioArxiu(
 			Long enviamentId) {
 		return delegate.enviamentGetCertificacioArxiu(enviamentId);

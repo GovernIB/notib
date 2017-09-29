@@ -55,7 +55,7 @@ public class CallbackServiceImpl implements CallbackService {
 
 	
 	@Override
-	@Scheduled(fixedRateString = "${config:es.caib.notib.callback.notifica.events.periode}")
+	@Scheduled(fixedRateString = "${config:es.caib.notib.tasca.callback.pendents.periode}")
 	public void notificarEventsPendens() {
 				
 		// Prepara la consulta
@@ -90,8 +90,8 @@ public class CallbackServiceImpl implements CallbackService {
 					NotificacioEventEntity.class);
 		// Recupera la referència
 		String referencia = null;
-		if (event.getNotificacioDestinatari() != null)
-			referencia = event.getNotificacioDestinatari().getReferencia();
+		if (event.getEnviament() != null)
+			referencia = event.getEnviament().getNotificaReferencia();
 		int intents = event.getCallbackIntents() + 1;
 		Date ara = new Date();
 		if (referencia != null) {
@@ -101,9 +101,9 @@ public class CallbackServiceImpl implements CallbackService {
 						|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) {
 					// Invoca el mètode de notificació de l'aplicació client segons és estat o certificat:
 					if (event.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT))
-						callbackHelper.notificaEstat(event.getNotificacioDestinatari());
+						callbackHelper.notificaEstat(event.getEnviament());
 					else if (event.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO))
-						callbackHelper.notificaCertificat(event.getNotificacioDestinatari());					
+						callbackHelper.notificaCertificat(event.getEnviament());					
 					// Marca l'event com a notificat
 					event.updateCallbackClient(CallbackEstatEnumDto.NOTIFICAT, ara, intents, null);
 					ret = true;
@@ -129,7 +129,7 @@ public class CallbackServiceImpl implements CallbackService {
 		Builder eventBuilder = NotificacioEventEntity.getBuilder(
 				NotificacioEventTipusEnumDto.CALLBACK_CLIENT,
 				event.getNotificacio()).
-				notificacioDestinatari(event.getNotificacioDestinatari()).
+				enviament(event.getEnviament()).
 				descripcio("Callback " + event.getTipus());
 		if (!ret) {
 			eventBuilder.error(true)

@@ -29,7 +29,7 @@
 		<module>notib-war</module>
 		<module>notib-ear</module>
 		<module>notib-lib-common</module>
-		<module>notib-rest-client</module>
+		<module>notib-client</module>
 	</modules>
 	<build>
 		<plugins>
