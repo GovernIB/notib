@@ -20,14 +20,8 @@
 	<mvc:annotation-driven/>
 	<mvc:default-servlet-handler/>
 
-	<!-- TOMCAT: 
-		<mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/"/>
-		<mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/> 
-	-->
-	<!-- JBOSS: 
-		<mvc:resources mapping="/webjars/**" location="/META-INF/resources/webjars/"/> 
-		<mvc:resources mapping="swagger-ui.html" location="/META-INF/resources/"/>
-	-->
+	<!-- TOMCAT: <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/> -->
+	<!-- JBOSS: <mvc:resources mapping="/webjars/**" location="/META-INF/resources/webjars/"/> -->
 	<mvc:resources mapping="/webjars/**" location="/META-INF/resources/webjars/"/>
 
 	<mvc:interceptors>
