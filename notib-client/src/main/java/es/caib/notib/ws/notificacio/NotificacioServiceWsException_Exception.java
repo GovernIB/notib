@@ -23,8 +23,8 @@ public class NotificacioServiceWsException_Exception
 
     /**
      * 
-     * @param faultInfo
      * @param message
+     * @param faultInfo
      */
     public NotificacioServiceWsException_Exception(String message, NotificacioServiceWsException faultInfo) {
         super(message);
@@ -33,9 +33,9 @@ public class NotificacioServiceWsException_Exception
 
     /**
      * 
+     * @param message
      * @param faultInfo
      * @param cause
-     * @param message
      */
     public NotificacioServiceWsException_Exception(String message, NotificacioServiceWsException faultInfo, Throwable cause) {
         super(message, cause);

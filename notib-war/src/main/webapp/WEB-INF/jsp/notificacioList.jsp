@@ -158,7 +158,7 @@ enviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
 						{{else}}
 							{{:estat}}
 						{{/if}}
-						{{if errorNotifica}}<span class="fa fa-warning text-danger" title="{{:errorNotificaError}}"></span>{{/if}}
+						{{if errorNotifica}}<span class="fa fa-warning text-danger" title="{{>errorNotificaError}}"></span>{{/if}}
 					</script>
 				</th>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="5%">

@@ -42,7 +42,7 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 					</tr>
 					<tr>
 						<td><strong><spring:message code="notificacio.info.error.error"/></strong></td>
-						<td><textarea rows="10" style="width:100%">${notificacio.errorNotificaError}</textarea></td>
+						<td><textarea rows="10" style="width:100%">${fn:escapeXml(notificacio.errorNotificaError)}</textarea></td>
 					</tr>
 				</tbody>
 				</table>
@@ -252,20 +252,20 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 					<th data-col-name="tipus" data-template="#cellTipus" data-orderable="false">
 						<spring:message code="notificacio.event.list.columna.tipus"/>
 						<script id="cellTipus" type="text/x-jsrender">
-						{{:~eval('eventTipus["' + tipus + '"]')}}
-						{{if destinatariAssociat}}<span class="label label-default pull-right" title="<spring:message code="notificacio.event.list.info.associat"/>">E</span>{{/if}}
-					</script>
+							{{:~eval('eventTipus["' + tipus + '"]')}}
+							{{if destinatariAssociat}}<span class="label label-default pull-right" title="<spring:message code="notificacio.event.list.info.associat"/>">E</span>{{/if}}
+						</script>
 					</th>
 					<th data-col-name="descripcio" data-orderable="false"><spring:message code="notificacio.event.list.columna.descripcio"/></th>
 					<th data-col-name="error" data-template="#cellResultat" data-orderable="false">
 						<spring:message code="notificacio.event.list.columna.resultat"/>
 						<script id="cellResultat" type="text/x-jsrender">
-						{{if error}}
-							<span class="fa fa-warning text-danger" title="{{:errorDescripcio}}"></span>
-						{{else}}
-							<span class="fa fa-check text-success"></span>
-						{{/if}}
-					</script>
+							{{if error}}
+								<span class="fa fa-warning text-danger" title="{{>errorDescripcio}}"></span>
+							{{else}}
+								<span class="fa fa-check text-success"></span>
+							{{/if}}
+						</script>
 					</th>
 				</tr>
 			</thead>

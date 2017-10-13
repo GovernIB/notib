@@ -68,8 +68,8 @@ public class ClientRestTest {
 	public void setUp() throws IOException, DecoderException {
 		client = NotificacioRestClientFactory.getRestClient(
 				"http://localhost:8080/notib",
-				"notapp",
-				"notapp");
+				"notibapp",
+				"notibapp");
 	}
 
 	@Test
