@@ -40,7 +40,7 @@ import es.caib.notib.core.wsdl.adviser.DatadoRequest;
  */
 @Service
 @WebService(
-		name = "AdviserWS",
+		name = "adviserWS",
 		serviceName = "AdviserWSService",
 		portName = "AdviserWSServicePort",
 		endpointInterface = "es.caib.notib.core.wsdl.adviser.AdviserWS",
@@ -229,7 +229,7 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 						enviament.updateNotificaCertificacio(
 								new Date(),
 								gestioDocumentalId,
-								null, // hash
+								certificacionOrganismo.getHashSha1(), // hash
 								null, // origen
 								null, // metadades
 								null, // csv

@@ -5,6 +5,7 @@ package es.caib.notib.core.ejb.ws;
 
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
+import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.ws.Holder;
 
@@ -24,7 +25,7 @@ import es.caib.notib.core.wsdl.adviser.DatadoRequest;
  */
 @Stateless
 @WebService(
-		name = "AdviserWS",
+		name = "adviserWS",
 		serviceName = "AdviserWSService",
 		portName = "AdviserWSServicePort",
 		targetNamespace = "https://administracionelectronica.gob.es/notifica/ws/notifica/1.0/")
@@ -46,8 +47,11 @@ public class NotificaAdviserWsBean implements AdviserWS {
 
 	@Override
 	public void datadoOrganismo(
+			@WebParam(name = "datadoOrganismo", targetNamespace = "") 
 			DatadoRequest datadoOrganismo, 
+			@WebParam(mode = WebParam.Mode.OUT, name = "codigo_respuesta", targetNamespace = "") 
 			Holder<String> codigoRespuesta,
+			@WebParam(mode = WebParam.Mode.OUT, name = "texto_respuesta", targetNamespace = "")
 			Holder<String> textoRespuesta) {
 		delegate.datadoOrganismo(
 				datadoOrganismo, 
@@ -56,8 +60,11 @@ public class NotificaAdviserWsBean implements AdviserWS {
 	}
 	@Override
 	public void certificacionOrganismo(
-			CertificadoRequest certificacionOrganismo, 
+			@WebParam(name = "certificacionOrganismo", targetNamespace = "")
+			CertificadoRequest certificacionOrganismo,
+			@WebParam(mode = WebParam.Mode.OUT, name = "codigo_respuesta", targetNamespace = "")
 			Holder<String> codigoRespuesta,
+			@WebParam(mode = WebParam.Mode.OUT, name = "texto_respuesta", targetNamespace = "")
 			Holder<String> textoRespuesta) {
 		delegate.certificacionOrganismo(
 				certificacionOrganismo, 

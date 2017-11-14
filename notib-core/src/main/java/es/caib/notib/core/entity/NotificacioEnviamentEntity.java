@@ -494,6 +494,21 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			this.notificaErrorEvent = null;
 		}
 	}
+	public void updateNotificaEstat(
+			Date notificaEstatData,
+			NotificacioDestinatariEstatEnumDto notificaEstat,
+			String notificaEstatDescripcio,
+			String notificaEstatNumSeguiment,
+			boolean netejarError) {
+		this.notificaEstatData = notificaEstatData;
+		this.notificaEstat = notificaEstat;
+		this.notificaEstatDescripcio = notificaEstatDescripcio;
+		this.notificaEstatNumSeguiment = notificaEstatNumSeguiment;
+		if (netejarError) {
+			this.notificaError = false;
+			this.notificaErrorEvent = null;
+		}
+	}
 	public void updateNotificaDatat(
 			Date notificaEstatData,
 			NotificacioDestinatariEstatEnumDto notificaEstat,

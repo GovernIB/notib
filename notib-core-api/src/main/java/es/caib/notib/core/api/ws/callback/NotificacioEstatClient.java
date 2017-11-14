@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 import es.caib.notib.core.api.ws.notificacio.NotificacioDestinatariEstatEnum;
@@ -86,4 +88,7 @@ public class NotificacioEstatClient {
 		this.referenciaEnviament = referenciaEnviament;
 	}
 
+	public String toString() {
+		return ReflectionToStringBuilder.toString(this);
+	}
 }

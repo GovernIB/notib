@@ -39,6 +39,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
@@ -207,6 +208,8 @@ public class NotificaHelper {
 		destinatari.updateNotificaEstat(
 				respostaDatat.getDataActualitzacio(),
 				getEstatNotifica(respostaDatat.getEstatActual()),
+				respostaDatat.getEstatActualDescripcio(),
+				respostaDatat.getNumSeguiment(),
 				true);
 		NotificaRespostaEstatDto resposta = new NotificaRespostaEstatDto();
 		resposta.setData(respostaDatat.getDataActualitzacio());
@@ -220,7 +223,7 @@ public class NotificaHelper {
 		}
 		return resposta;
 	}
-
+	
 	@Transactional
 	public boolean comunicacioSeu(
 			Long notificacioDestinatariId) {
@@ -1091,14 +1094,14 @@ public class NotificaHelper {
 					"identificadorPeticio=" + destinatari.getNotificaIdentificador() + ", " +
 					"identificadorRetornat=" + identificador + ")");
 		}
-		String nifPerComprovar = (destinatari.getDestinatariNif() != null) ? destinatari.getDestinatariNif() : destinatari.getTitularNif();
-		if (!titularNif.equalsIgnoreCase(nifPerComprovar)) {
-			throw new SistemaExternException(
-					"NOTIFICA",
-					"La identificació retornada no coincideix amb la identificació de la petició (" + 
-					"titularNifPeticio=" + destinatari.getTitularNif() + ", " +
-					"titularNifRetornat=" + titularNif + ")");
-		}
+//		String nifPerComprovar = (destinatari.getDestinatariNif() != null) ? destinatari.getDestinatariNif() : destinatari.getTitularNif();
+//		if (!titularNif.equalsIgnoreCase(nifPerComprovar)) {
+//			throw new SistemaExternException(
+//					"NOTIFICA",
+//					"La identificació retornada no coincideix amb la identificació de la petició (" + 
+//					"titularNifPeticio=" + destinatari.getTitularNif() + ", " +
+//					"titularNifRetornat=" + titularNif + ")");
+//		}
 		if (!referenciaEmisor.equals(destinatari.getNotificaReferencia())) {
 			throw new SistemaExternException(
 					"NOTIFICA",
@@ -1208,6 +1211,7 @@ public class NotificaHelper {
 						getKeystorePasswordProperty(),
 						getKeystoreCertAliasProperty(),
 						getKeystoreCertPasswordProperty()),*/
+//				new ChunkedSOAPHandler("false"),
 				new WsClientHelper.SOAPLoggingHandler());
 		return port;
 	}
@@ -1271,7 +1275,13 @@ public class NotificaHelper {
 		return PropertiesHelper.getProperties().getProperty(
 				"es.caib.notib.notifica.keystore.cert.password");
 	}
-
+	
+	public Boolean useNotificaAdviser() {
+		String useAdviser = PropertiesHelper.getProperties().getProperty(
+				"es.caib.notib.notifica.use.adviser");
+		return "true".equalsIgnoreCase(useAdviser);
+	}
+	
 	public class ApiKeySOAPHandler implements SOAPHandler<SOAPMessageContext> {
 		private final String apiKey;
 		public ApiKeySOAPHandler(String apiKey) {
@@ -1279,22 +1289,52 @@ public class NotificaHelper {
 		}
 		@Override
 		public boolean handleMessage(SOAPMessageContext context) {
-			Boolean outboundProperty = (Boolean)context.get(
-					MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+			Boolean outboundProperty = (Boolean)context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 			if (outboundProperty.booleanValue()) {
+				
 				try {
 					SOAPEnvelope envelope = context.getMessage().getSOAPPart().getEnvelope();
 					SOAPFactory factory = SOAPFactory.newInstance();
-					SOAPElement apiKeyElement = factory.createElement("api_key");
+					SOAPElement apiKeyElement = factory.createElement(
+							new QName(
+									"https://administracionelectronica.gob.es/notifica/ws/notifica/1.0/", 
+									"api_key"));
+//					SOAPElement apiKeyElement = factory.createElement("api_key");
 					apiKeyElement.addTextNode(apiKey);
-					SOAPHeader header = envelope.addHeader();
+					SOAPHeader header = envelope.getHeader();
+					if (header == null)
+						header = envelope.addHeader();
 					header.addChildElement(apiKeyElement);
+					
 				} catch (SOAPException ex) {
 					logger.error(
 							"No s'ha pogut afegir l'API key a la petició SOAP per Notifica",
 							ex);
 	        	}
 	        }
+	        return true;
+	    }
+		@Override
+		public boolean handleFault(SOAPMessageContext context) {
+			return false;
+		}
+		@Override
+		public void close(MessageContext context) {
+		}
+		@Override
+		public Set<QName> getHeaders() {
+			return new TreeSet<QName>();
+		}
+	}
+	
+	public class ChunkedSOAPHandler implements SOAPHandler<SOAPMessageContext> {
+		private final String chunked;
+		public ChunkedSOAPHandler(String chunked) {
+			this.chunked = chunked;
+		}
+		@Override
+		public boolean handleMessage(SOAPMessageContext context) {
+			context.put("__CHUNKED__", chunked);
 	        return true;
 	    }
 		@Override

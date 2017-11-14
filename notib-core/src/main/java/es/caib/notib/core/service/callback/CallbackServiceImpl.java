@@ -55,9 +55,13 @@ public class CallbackServiceImpl implements CallbackService {
 
 	
 	@Override
-	@Scheduled(fixedRateString = "${config:es.caib.notib.tasca.callback.pendents.periode}")
+	@Scheduled(
+			fixedRateString = "${config:es.caib.notib.tasca.callback.pendents.periode}",
+			initialDelayString = "${config:es.caib.notib.tasca.retard.inicial}")
 	public void notificarEventsPendens() {
 				
+		logger.debug("Cercant notificacions pendents d'enviar al client");
+		
 		// Prepara la consulta
 		int maxPendents = getEventsProcessarMaxProperty(); 
 		Pageable page = new PageRequest(0, maxPendents, new Sort(new Order(Direction.ASC, "data")));

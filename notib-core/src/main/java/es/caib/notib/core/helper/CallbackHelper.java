@@ -76,13 +76,11 @@ public class CallbackHelper {
 		String body = mapper.writeValueAsString(notificacioEstat);
 				
 		// Prepara el client JSON per a la crida POST
-		Client jerseyClient = this.getClient(aplicacio); 
+		Client jerseyClient = this.getClient(aplicacio);
 
 		// Completa la URL al mètode
-		String urlAmbMetode = aplicacio.getCallbackUrl();
-		if(urlAmbMetode.charAt(urlAmbMetode.length() - 1) != '/')
-			urlAmbMetode = urlAmbMetode + "/";
-		urlAmbMetode = urlAmbMetode + NOTIFICACIO_ESTAT;
+		String urlBase = aplicacio.getCallbackUrl();
+		String urlAmbMetode = urlBase + (urlBase.endsWith("/") ? "" : "/") +  NOTIFICACIO_ESTAT;
 		
 		// Fa la crida POST passant les dades JSON
 		ClientResponse response = jerseyClient.

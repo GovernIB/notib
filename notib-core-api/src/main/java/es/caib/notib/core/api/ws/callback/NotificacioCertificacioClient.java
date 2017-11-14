@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 import es.caib.notib.core.api.ws.notificacio.CertificacioArxiuTipusEnum;
@@ -76,5 +78,7 @@ public class NotificacioCertificacioClient {
 		this.dataActualitzacio = dataActualitzacio;
 	}
 	
-	
+	public String toString() {
+		return ReflectionToStringBuilder.toString(this);
+	}
 }
