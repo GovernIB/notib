@@ -739,8 +739,9 @@ public class NotificaHelper {
 		String errorPrefix = "Error al consultar el datat d'un enviament fet amb Notifica (" +
 				"notificacioId=" + notificacio.getId() + ", " +
 				"notificaIdentificador=" + enviament.getNotificaIdentificador() + ")";
+		ResultadoDatado resultadoDatado = null;
 		try {
-			ResultadoDatado resultadoDatado = getNotificaWs().consultaDatadoEnvio(
+			resultadoDatado = getNotificaWs().consultaDatadoEnvio(
 					enviament.getNotificaIdentificador());
 			if ("000".equals(resultadoDatado.getCodigoRespuesta())) {
 				DatadoEnvio datadoEnvio = resultadoDatado.getDatado();
@@ -799,6 +800,10 @@ public class NotificaHelper {
 						errorPrefix + ": [" + resultadoDatado.getCodigoRespuesta() + "] " + resultadoDatado.getDescripcionRespuesta());
 			}
 		} catch (Exception ex) {
+			if(resultadoDatado != null && ex instanceof SistemaExternException)
+				throw new SistemaExternException(
+						"NOTIFICA",
+						errorPrefix + ": [" + resultadoDatado.getCodigoRespuesta() + "] " + resultadoDatado.getDescripcionRespuesta());
 			logger.error(
 					errorPrefix,
 					ex);
@@ -1280,6 +1285,12 @@ public class NotificaHelper {
 		String useAdviser = PropertiesHelper.getProperties().getProperty(
 				"es.caib.notib.notifica.use.adviser");
 		return "true".equalsIgnoreCase(useAdviser);
+	}
+	
+	public Boolean sendToNotificaOnAlta() {
+		String sendToNotifica = PropertiesHelper.getProperties().getProperty(
+				"es.caib.notib.notifica.send.alta");
+		return !"false".equalsIgnoreCase(sendToNotifica);
 	}
 	
 	public class ApiKeySOAPHandler implements SOAPHandler<SOAPMessageContext> {

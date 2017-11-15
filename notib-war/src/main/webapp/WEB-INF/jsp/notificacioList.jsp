@@ -15,6 +15,8 @@
 		<c:otherwise>55%</c:otherwise>
 	</c:choose>
 </c:set>
+<c:set var="refresh_state_succes"><spring:message code="notificacio.list.enviament.list.refresca.estat.exitos"/></c:set>
+<c:set var="refresh_state_error"><spring:message code="notificacio.list.enviament.list.refresca.estat.error"/></c:set>
 <html>
 <head>
 	<title><spring:message code="notificacio.list.titol"/></title>
@@ -37,69 +39,103 @@ var enviamentEstats = [];
 <c:forEach var="estat" items="${notificacioDestinatariEstats}">
 enviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
 </c:forEach>
-	$(document).ready(function() {
-		$('#notificacio').on('rowinfo.dataTable', function(e, td, rowData) {
-			var getUrl = "<c:url value="/notificacio/"/>" + rowData.id + "/enviament";
-	        $.get(getUrl).done(function(data) {
-	        	$(td).append(
-	        			'<table class="table teble-striped table-bordered"><thead>' +
-	        			'<tr>' +
-        				'<th><spring:message code="notificacio.list.enviament.list.titular"/></th>' + 
-	        			'<th><spring:message code="notificacio.list.enviament.list.destinatari"/></th>' + 
-	        			'<th><spring:message code="notificacio.list.enviament.list.estat"/></th>' +
-	        			'<th></th>' + 
-	        			'</tr>' +
-						'</thead><tbody></tbody></table>');
-	        	contingutTbody = '';
-				for (i = 0; i < data.length; i++) {
-					contingutTbody += '<tr>';
-					contingutTbody += '<td>' + data[i].titular + '</td>';
-					contingutTbody += '<td>' + data[i].destinatari + '</td>';
-					contingutTbody += '<td>';
-					contingutTbody += (data[i].estat) ? enviamentEstats[data[i].estat] : '';
-					if (data[i].notificaError) {
-						var errorTitle = '';
-						if (data[i].notificaErrorError) {
-							errorTitle = data[i].notificaErrorError;
-						}
-						var escaped = data[i].notificaErrorError.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-						contingutTbody += ' <span class="fa fa-warning text-danger" title="' + escaped + '"></span>';
-					}
-					contingutTbody += '</td>';
-					contingutTbody += '<td width="5%">';
-					contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" data-toggle="modal" class="btn btn-default btn-sm"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>';
-					<%--contingutTbody += '<div class="dropdown">';
-					contingutTbody += '<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>';
-					contingutTbody += '<ul class="dropdown-menu">';
-					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/info"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>';
-					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/event"/>" data-toggle="modal"><span class="fa fa-calendar-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.enviament.list.accio.events"/></a></li>';
-					contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].referencia + '/consultarEstat"/>" data-toggle="modal"><span class="fa fa-share-square-o"></span>&nbsp;&nbsp;<spring:message code="notificacio.list.enviament.list.accio.consultar.estat"/></a></li>';
-					contingutTbody += '</ul>';
-					contingutTbody += '</div>';--%>
-					contingutTbody += '</td>';
-					contingutTbody += '</tr>';
-				}
-				$('table tbody', td).append(contingutTbody);
-				$('table tbody td').webutilModalEval();
-			});
-		});
-		$('#btnNetejar').click(function() {
-			$(':input', $('#filtre')).each (function() {
-				var type = this.type, tag = this.tagName.toLowerCase();
-				if (type == 'text' || type == 'password' || tag == 'textarea') {
-					this.value = '';
-				} else if (type == 'checkbox' || type == 'radio') {
-					this.checked = false;
-				} else if (tag == 'select') {
-					this.selectedIndex = 0;
-				}
-			});
-			$('#form-filtre').submit();
-		});
+
+var rows = {};
+var notifications = {};
+$(document).ready(function() {
+	$('#notificacio').on('rowinfo.dataTable', function(e, td, rowData) {
+		rows[rowData.id] = td;
+		notifications[rowData.id] = rowData;
+		printEnviaments(rowData.id);
 	});
+	$('#btnNetejar').click(function() {
+		$(':input', $('#filtre')).each (function() {
+			var type = this.type, tag = this.tagName.toLowerCase();
+			if (type == 'text' || type == 'password' || tag == 'textarea') {
+				this.value = '';
+			} else if (type == 'checkbox' || type == 'radio') {
+				this.checked = false;
+			} else if (tag == 'select') {
+				this.selectedIndex = 0;
+			}
+		});
+		$('#form-filtre').submit();
+	});
+});
+	
+function printEnviaments(id) {
+	td = rows[id];
+	rowData = notifications[id];
+	var getUrl = "<c:url value="/notificacio/"/>" + rowData.id + "/enviament";
+    $.get(getUrl).done(function(data) {
+    	$(td).empty();
+    	$(td).append(
+    			'<table class="table teble-striped table-bordered"><thead>' +
+    			'<tr>' +
+				'<th><spring:message code="notificacio.list.enviament.list.titular"/></th>' + 
+    			'<th><spring:message code="notificacio.list.enviament.list.destinatari"/></th>' + 
+    			'<th><spring:message code="notificacio.list.enviament.list.estat"/></th>' +
+    			'<th></th>' +
+    			'</tr>' +
+				'</thead><tbody></tbody></table>');
+    	contingutTbody = '';
+		for (i = 0; i < data.length; i++) {
+			contingutTbody += '<tr>';
+			contingutTbody += '<td>' + data[i].titular + '</td>';
+			contingutTbody += '<td>' + data[i].destinatari + '</td>';
+			contingutTbody += '<td>';
+			contingutTbody += (data[i].estat) ? enviamentEstats[data[i].estat] : '';
+			if (data[i].notificaError) {
+				var errorTitle = '';
+				if (data[i].notificaErrorError) {
+					errorTitle = data[i].notificaErrorError;
+				}
+				var escaped = data[i].notificaErrorError.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+				contingutTbody += ' <span class="fa fa-warning text-danger" title="' + escaped + '"></span>';
+			}
+			contingutTbody += '</td>';
+			
+			if (${send}) {
+				contingutTbody += '<td width="5%">';
+				contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" data-toggle="modal" class="btn btn-default btn-sm"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>';
+				contingutTbody += '</td>';
+			} else {
+				contingutTbody += '<td width="5%">';
+				contingutTbody += '<div class="dropdown">';
+				contingutTbody += '<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>';
+				contingutTbody += '<ul class="dropdown-menu">';
+				contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>';
+				contingutTbody += '<li><a href="javascript:refrescarEstat(' + rowData.id + ',' + data[i].id + ');" ><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="enviament.info.accio.refrescar.estat"/></a></li>';
+				contingutTbody += '</ul>';
+				contingutTbody += '</div>';
+				contingutTbody += '</td>';
+			}
+			
+			contingutTbody += '</tr>';
+		}
+		$('table tbody', td).append(contingutTbody);
+		$('table tbody td').webutilModalEval();
+	});
+}
+	
+function refrescarEstat(n, d) {
+	$('.btn').blur();
+	var url = "<c:url value="/notificacio/" />" + n + "/refrescarEstat/" + d;
+    $.get(url).done(function(data) {
+    	$( "#msg-box" ).empty();
+    	if(data) {
+    		printEnviaments(n);
+    		$( "#msg-box" ).append( '<div class="alert alert-success well-sm">' + "${refresh_state_succes}" + '</div>' );
+    	} else {
+    		$( "#msg-box" ).append( '<div class="alert alert-danger well-sm">' + "${refresh_state_error}" + '</div>' );
+    	}
+    	
+    });
+}
 </script>
 </head>
 <body>
+<div id="msg-box"></div>
 	<form:form id="filtre" action="" method="post" cssClass="well" commandName="notificacioFiltreCommand">
 		<div class="row">
 			<div class="col-md-3">

@@ -23,11 +23,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -40,6 +40,7 @@ import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EntitatHelper;
 import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
+import es.caib.notib.war.helper.PropertiesHelper;
 import es.caib.notib.war.helper.RolHelper;
 
 /**
@@ -77,6 +78,7 @@ public class NotificacioController extends BaseController {
 				EnumHelper.getOptionsForEnum(
 						NotificacioDestinatariEstatEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto."));
+		model.addAttribute("send", sendToNotificaOnAlta());
 		return "notificacioList";
 	}
 
@@ -179,6 +181,22 @@ public class NotificacioController extends BaseController {
 					request,
 					"notificacioInfo",
 					"notificacio.controller.enviament.error");
+		}
+	}
+	
+	@RequestMapping(value = "/{notificacioId}/refrescarEstat/{enviamentId}", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean consultarEstatLlista(
+			HttpServletRequest request,
+			@PathVariable Long notificacioId,
+			@PathVariable Long enviamentId,
+			Model model) {
+		
+		try {
+			notificacioService.enviamentRefrescarEstat(enviamentId);
+			return true;
+		} catch (Exception e) {
+			return false;
 		}
 	}
 
@@ -320,6 +338,12 @@ public class NotificacioController extends BaseController {
 				EnumHelper.getOptionsForEnum(
 						NotificacioEventTipusEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
+	}
+	
+	public Boolean sendToNotificaOnAlta() {
+		String sendToNotifica = PropertiesHelper.getProperties().getProperty(
+				"es.caib.notib.notifica.send.alta");
+		return !"false".equalsIgnoreCase(sendToNotifica);
 	}
 
 }
