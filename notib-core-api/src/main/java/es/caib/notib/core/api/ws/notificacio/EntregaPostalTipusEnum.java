@@ -1,0 +1,18 @@
+/**
+ * 
+ */
+package es.caib.notib.core.api.ws.notificacio;
+
+import java.io.Serializable;
+
+/**
+ * Enumerat que indica el tipus de domicili per a un destinatari.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
+public enum EntregaPostalTipusEnum implements Serializable {
+	NACIONAL,
+	ESTRANGER,
+	APARTAT_CORREUS,
+	SENSE_NORMALITZAR
+}

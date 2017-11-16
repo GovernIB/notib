@@ -25,9 +25,9 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 
-import es.caib.notib.core.api.ws.notificacio2.InformacioEnviament;
-import es.caib.notib.core.api.ws.notificacio2.Notificacio;
-import es.caib.notib.core.api.ws.notificacio2.NotificacioServiceWs;
+import es.caib.notib.core.api.ws.notificacio.InformacioEnviament;
+import es.caib.notib.core.api.ws.notificacio.Notificacio;
+import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWs;
 import es.caib.notib.war.validation.RestPreconditions;
 
 /**

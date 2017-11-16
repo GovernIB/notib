@@ -17,10 +17,10 @@ import org.jboss.wsf.spi.annotation.WebContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.notib.core.api.ws.notificacio2.InformacioEnviament;
-import es.caib.notib.core.api.ws.notificacio2.Notificacio;
-import es.caib.notib.core.api.ws.notificacio2.NotificacioServiceWs;
-import es.caib.notib.core.api.ws.notificacio2.NotificacioServiceWsException;
+import es.caib.notib.core.api.ws.notificacio.InformacioEnviament;
+import es.caib.notib.core.api.ws.notificacio.Notificacio;
+import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWs;
+import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsException;
 import es.caib.notib.core.helper.UsuariHelper;
 
 /**

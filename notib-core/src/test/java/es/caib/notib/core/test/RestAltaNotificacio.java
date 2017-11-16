@@ -18,19 +18,19 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 
-import es.caib.notib.core.api.ws.notificacio2.Document;
-import es.caib.notib.core.api.ws.notificacio2.EntregaDeh;
-import es.caib.notib.core.api.ws.notificacio2.EntregaPostal;
-import es.caib.notib.core.api.ws.notificacio2.EntregaPostalTipusEnum;
-import es.caib.notib.core.api.ws.notificacio2.EntregaPostalViaTipusEnum;
-import es.caib.notib.core.api.ws.notificacio2.Enviament;
-import es.caib.notib.core.api.ws.notificacio2.EnviamentTipusEnum;
-import es.caib.notib.core.api.ws.notificacio2.Notificacio;
-import es.caib.notib.core.api.ws.notificacio2.PagadorCie;
-import es.caib.notib.core.api.ws.notificacio2.PagadorPostal;
-import es.caib.notib.core.api.ws.notificacio2.ParametresSeu;
-import es.caib.notib.core.api.ws.notificacio2.Persona;
-import es.caib.notib.core.api.ws.notificacio2.ServeiTipusEnum;
+import es.caib.notib.core.api.ws.notificacio.Document;
+import es.caib.notib.core.api.ws.notificacio.EntregaDeh;
+import es.caib.notib.core.api.ws.notificacio.EntregaPostal;
+import es.caib.notib.core.api.ws.notificacio.EntregaPostalTipusEnum;
+import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
+import es.caib.notib.core.api.ws.notificacio.Enviament;
+import es.caib.notib.core.api.ws.notificacio.EnviamentTipusEnum;
+import es.caib.notib.core.api.ws.notificacio.Notificacio;
+import es.caib.notib.core.api.ws.notificacio.PagadorCie;
+import es.caib.notib.core.api.ws.notificacio.PagadorPostal;
+import es.caib.notib.core.api.ws.notificacio.ParametresSeu;
+import es.caib.notib.core.api.ws.notificacio.Persona;
+import es.caib.notib.core.api.ws.notificacio.ServeiTipusEnum;
 
 public class RestAltaNotificacio {
 
