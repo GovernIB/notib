@@ -44,11 +44,14 @@ public class InformacioEnviament {
 	private EntregaDeh entregaDeh;
 	private Certificacio certificacio;
 	private EnviamentEstatEnum estat;
+	private Date estatData;
 	private EnviamentEstatEnum notificaEstat;
+	private Date notificaEstatData;
 	private boolean notificaError;
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
 	private EnviamentEstatEnum seuEstat;
+	private Date seuEstatData;
 	private boolean seuError;
 	private Date seuErrorData;
 	private String seuErrorDescripcio;
@@ -191,11 +194,23 @@ public class InformacioEnviament {
 	public void setEstat(EnviamentEstatEnum estat) {
 		this.estat = estat;
 	}
+	public Date getEstatData() {
+		return estatData;
+	}
+	public void setEstatData(Date estatData) {
+		this.estatData = estatData;
+	}
 	public EnviamentEstatEnum getNotificaEstat() {
 		return notificaEstat;
 	}
 	public void setNotificaEstat(EnviamentEstatEnum notificaEstat) {
 		this.notificaEstat = notificaEstat;
+	}
+	public Date getNotificaEstatData() {
+		return notificaEstatData;
+	}
+	public void setNotificaEstatData(Date notificaEstatData) {
+		this.notificaEstatData = notificaEstatData;
 	}
 	public boolean isNotificaError() {
 		return notificaError;
@@ -220,6 +235,12 @@ public class InformacioEnviament {
 	}
 	public void setSeuEstat(EnviamentEstatEnum seuEstat) {
 		this.seuEstat = seuEstat;
+	}
+	public Date getSeuEstatData() {
+		return seuEstatData;
+	}
+	public void setSeuEstatData(Date seuEstatData) {
+		this.seuEstatData = seuEstatData;
 	}
 	public boolean isSeuError() {
 		return seuError;

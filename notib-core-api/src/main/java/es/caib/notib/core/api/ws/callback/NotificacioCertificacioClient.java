@@ -8,9 +8,6 @@ import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
-import es.caib.notib.core.api.ws.notificacio.CertificacioArxiuTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.CertificacioTipusEnum;
-
 /**
  * Informació sobre l'estat d'una notificació.
  * 
@@ -19,18 +16,15 @@ import es.caib.notib.core.api.ws.notificacio.CertificacioTipusEnum;
 @XmlRootElement
 @JsonAutoDetect
 public class NotificacioCertificacioClient {
-	
-	
+
 	private CertificacioTipusEnum tipus;
 	private CertificacioArxiuTipusEnum arxiuTipus;
-	/** Contingut dels bytes codificats en base 64*/ 
 	private String arxiuContingut;
 	private String numSeguiment;
 	private Date dataActualitzacio;
-	
-	
+
 	public NotificacioCertificacioClient() {}
-	
+
 	public NotificacioCertificacioClient(
 			CertificacioTipusEnum tipus, 
 			CertificacioArxiuTipusEnum arxiuTipus,
@@ -45,8 +39,7 @@ public class NotificacioCertificacioClient {
 		this.numSeguiment = numSeguiment;
 		this.dataActualitzacio = dataActualitzacio;
 	}
-	
-	
+
 	public CertificacioTipusEnum getTipus() {
 		return tipus;
 	}
@@ -77,8 +70,8 @@ public class NotificacioCertificacioClient {
 	public void setDataActualitzacio(Date dataActualitzacio) {
 		this.dataActualitzacio = dataActualitzacio;
 	}
-	
 	public String toString() {
 		return ReflectionToStringBuilder.toString(this);
 	}
+
 }

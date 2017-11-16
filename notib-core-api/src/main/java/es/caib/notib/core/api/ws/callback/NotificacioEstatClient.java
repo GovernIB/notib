@@ -8,9 +8,6 @@ import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
-import es.caib.notib.core.api.ws.notificacio.NotificacioDestinatariEstatEnum;
-
-
 /**
  * Informació sobre l'estat d'una notificació.
  * 

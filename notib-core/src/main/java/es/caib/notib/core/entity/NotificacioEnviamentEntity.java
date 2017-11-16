@@ -801,12 +801,35 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		} else {
 			if (NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA.equals(estatSeu) ||
 				NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA.equals(estatNotifica)) {
-				return NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA;
+				estatBo = NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA;
 			} else {
-				return NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT;
+				estatBo = NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT;
 			}
 		}
 		return estatBo;
+	}
+
+	public static Date calcularDataCombinadaNotificaSeu(
+			NotificacioEnviamentEntity enviament) {
+		NotificacioDestinatariEstatEnumDto estatNotifica = enviament.getNotificaEstat();
+		NotificacioDestinatariEstatEnumDto estatSeu = enviament.getSeuEstat();
+		Date dataBona;
+		if (!NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT.equals(estatSeu) &&
+			!NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA.equals(estatSeu)) {
+			dataBona = enviament.getSeuDataEstat();
+		} else if (	!NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT.equals(estatNotifica) &&
+					!NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA.equals(estatNotifica)) {
+			dataBona = enviament.getNotificaEstatData();
+		} else {
+			if (NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA.equals(estatSeu)) {
+				dataBona = enviament.getSeuDataEstat();
+			} else if (NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA.equals(estatNotifica)) {
+				dataBona = enviament.getNotificaEstatData();
+			} else {
+				dataBona = enviament.getCreatedDate().toDate();
+			}
+		}
+		return dataBona;
 	}
 
 	@Override

@@ -9,8 +9,8 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 
+import es.caib.notib.core.api.ws.callback.NotificacioDestinatariEstatEnum;
 import es.caib.notib.core.api.ws.callback.NotificacioEstatClient;
-import es.caib.notib.core.api.ws.notificacio.NotificacioDestinatariEstatEnum;
 
 public class CallbackRestTest {
 	

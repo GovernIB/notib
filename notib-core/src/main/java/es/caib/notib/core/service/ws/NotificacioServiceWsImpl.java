@@ -305,13 +305,11 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			// Error de no trobat
 			throw new ValidationException("Error: No s'ha trobat cap notificació amb la referencia " + referencia);
 		} else {
-			
 			// Si Notib no utilitza el servei Adviser de @Notifica, i ja ha estat enviat a @Notifica
 			// serà necessari consultar l'estat de la notificacioó a Notifica
 			if (!notificaHelper.useNotificaAdviser() && enviament.getNotificaIdentificador() != null) {
 				notificaHelper.refrescarEstat(enviament);
 			}
-			
 			NotificacioEntity notificacio = enviament.getNotificacio();
 			informacioEnviament.setConcepte(notificacio.getConcepte());
 			informacioEnviament.setDescripcio(notificacio.getDescripcio());
@@ -430,8 +428,12 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			informacioEnviament.setEstat(
 					toEnviamentEstat(
 							NotificacioEnviamentEntity.calcularEstatCombinatNotificaSeu(enviament)));
+			informacioEnviament.setEstatData(
+					NotificacioEnviamentEntity.calcularDataCombinadaNotificaSeu(enviament));
 			informacioEnviament.setNotificaEstat(
 					toEnviamentEstat(enviament.getNotificaEstat()));
+			informacioEnviament.setNotificaEstatData(
+					enviament.getNotificaEstatData());
 			informacioEnviament.setNotificaError(enviament.isNotificaError());
 			if (enviament.getNotificaErrorEvent() != null) {
 				NotificacioEventEntity event = enviament.getNotificaErrorEvent();
@@ -442,6 +444,8 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			}
 			informacioEnviament.setSeuEstat(
 					toEnviamentEstat(enviament.getSeuEstat()));
+			informacioEnviament.setSeuEstatData(
+					enviament.getSeuDataEstat());
 			informacioEnviament.setSeuError(enviament.isSeuError());
 			if (enviament.getSeuErrorEvent() != null) {
 				NotificacioEventEntity event = enviament.getSeuErrorEvent();

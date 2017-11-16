@@ -3,12 +3,9 @@
  */
 package es.caib.notib.core.helper;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,22 +16,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.sun.jersey.core.util.Base64;
-
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
-import es.caib.notib.core.api.ws.notificacio.Notificacio;
-import es.caib.notib.core.api.ws.notificacio.NotificacioDestinatari;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
-import es.caib.notib.plugin.registre.sortida.DocumentRegistre;
-import es.caib.notib.plugin.registre.sortida.RegistreAssentament;
-import es.caib.notib.plugin.registre.sortida.RegistreAssentamentInteressat;
 import es.caib.notib.plugin.registre.sortida.RegistrePlugin;
-import es.caib.notib.plugin.registre.sortida.RespostaAnotacioRegistre;
 import es.caib.notib.plugin.seu.SeuDocument;
 import es.caib.notib.plugin.seu.SeuNotificacioEstat;
 import es.caib.notib.plugin.seu.SeuNotificacioResultat;
@@ -61,8 +48,8 @@ public class PluginHelper {
 
 	@Autowired
 	private IntegracioHelper integracioHelper;
-	@Autowired
-	private EntitatRepository entitatRepository;
+	/*@Autowired
+	private EntitatRepository entitatRepository;*/
 
 
 
@@ -402,7 +389,7 @@ public class PluginHelper {
 		}
 	}
 
-	public RespostaAnotacioRegistre registreSortida(Notificacio notificacio) {
+	/*public RespostaAnotacioRegistre registreSortida(Notificacio notificacio) {
 		String accioDescripcio = "Anotació al registre de sortida";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("notificacio.cifEntitat", notificacio.getCifEntitat());
@@ -481,7 +468,7 @@ public class PluginHelper {
 					errorDescripcio,
 					ex);
 		}
-	}
+	}*/
 
 	public boolean isDadesUsuariPluginDisponible() {
 		String pluginClass = getPropertyPluginDadesUsuari();
@@ -549,11 +536,11 @@ public class PluginHelper {
 
 
 
-	private boolean esPersonaJuridica(String codiId) {
+	/*private boolean esPersonaJuridica(String codiId) {
 		String letrasCif = "ABCDEFGHJKLMNPQRSVW";
 		String primeraLletraCif = codiId.toUpperCase().substring(0, 1);
         return letrasCif.contains(primeraLletraCif);
-	}
+	}*/
 
 	private boolean isTelefonMobil(String telefonMobil) {
 		if (telefonMobil == null) {
@@ -672,12 +659,12 @@ public class PluginHelper {
 	private String getPropertyPluginRegistre() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.registre.sortida");
 	}
-	private boolean getPropertyRegistrePluginDesactivat() {
+	/*private boolean getPropertyRegistrePluginDesactivat() {
 		return "true".equals(PropertiesHelper.getProperties().getProperty("es.caib.notib.registre.sortida.desactivat"));
 	}
 	private boolean getPropertyRegistrePluginObligatori() {
 		return "true".equals(PropertiesHelper.getProperties().getProperty("es.caib.notib.registre.sortida.obligatori"));
-	}
+	}*/
 	
 	
 

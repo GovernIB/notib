@@ -158,11 +158,13 @@
 <xs:element minOccurs="0" name="entregaPostal" type="tns:entregaPostal"/>
 <xs:element minOccurs="0" name="enviamentTipus" type="tns:enviamentTipusEnum"/>
 <xs:element minOccurs="0" name="estat" type="tns:enviamentEstatEnum"/>
+<xs:element minOccurs="0" name="estatData" type="xs:dateTime"/>
 <xs:element minOccurs="0" name="identificador" type="xs:string"/>
 <xs:element name="notificaError" type="xs:boolean"/>
 <xs:element minOccurs="0" name="notificaErrorData" type="xs:dateTime"/>
 <xs:element minOccurs="0" name="notificaErrorDescripcio" type="xs:string"/>
 <xs:element minOccurs="0" name="notificaEstat" type="tns:enviamentEstatEnum"/>
+<xs:element minOccurs="0" name="notificaEstatData" type="xs:dateTime"/>
 <xs:element minOccurs="0" name="procedimentCodi" type="xs:string"/>
 <xs:element minOccurs="0" name="procedimentDescripcio" type="xs:string"/>
 <xs:element minOccurs="0" name="referencia" type="xs:string"/>
@@ -171,6 +173,7 @@
 <xs:element minOccurs="0" name="seuErrorData" type="xs:dateTime"/>
 <xs:element minOccurs="0" name="seuErrorDescripcio" type="xs:string"/>
 <xs:element minOccurs="0" name="seuEstat" type="tns:enviamentEstatEnum"/>
+<xs:element minOccurs="0" name="seuEstatData" type="xs:dateTime"/>
 <xs:element minOccurs="0" name="titular" type="tns:persona"/>
 </xs:sequence>
 </xs:complexType>

@@ -14,15 +14,14 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.core.util.Base64;
 
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.ws.callback.CertificacioArxiuTipusEnum;
+import es.caib.notib.core.api.ws.callback.CertificacioTipusEnum;
 import es.caib.notib.core.api.ws.callback.NotificacioCertificacioClient;
 import es.caib.notib.core.api.ws.callback.NotificacioEstatClient;
-import es.caib.notib.core.api.ws.notificacio.CertificacioArxiuTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.CertificacioTipusEnum;
 import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
-import es.caib.notib.core.service.ws.NotificacioWsServiceImpl;
 
 /** Classe per englobar la tasca de notificar l'estat o la certificació a l'aplicació
  * client a partir de la referència del destinatari de la notificació.

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package es.caib.notib.core.api.ws.notificacio;
+package es.caib.notib.core.api.ws.callback;
 
 import java.io.Serializable;
 
