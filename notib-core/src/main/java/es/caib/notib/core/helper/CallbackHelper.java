@@ -13,10 +13,12 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.core.util.Base64;
 
+import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.ws.callback.CertificacioArxiuTipusEnum;
 import es.caib.notib.core.api.ws.callback.CertificacioTipusEnum;
 import es.caib.notib.core.api.ws.callback.NotificacioCertificacioClient;
+import es.caib.notib.core.api.ws.callback.NotificacioDestinatariEstatEnum;
 import es.caib.notib.core.api.ws.callback.NotificacioEstatClient;
 import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -61,7 +63,7 @@ public class CallbackHelper {
 				
 		// Omple l'objecte amb la informació cap a l'aplicació client
 		NotificacioEstatClient notificacioEstat = new NotificacioEstatClient(
-					NotificaHelper.calcularEstat(enviament),
+					calcularEstat(enviament),
 					enviament.getNotificaEstatData(),
 					enviament.getDestinatariNom(),
 					enviament.getDestinatariNif(),
@@ -93,7 +95,6 @@ public class CallbackHelper {
 
 		return response.getEntity(String.class);
 	}
-
 
 	public String notificaCertificat(NotificacioEnviamentEntity enviament) throws Exception{
 		if (enviament == null)
@@ -148,17 +149,83 @@ public class CallbackHelper {
 
 		return response.getEntity(String.class);
 	}
-	
-	/** Mètode comú per preparar el client jersey per a la crida segons el la operació i 
-	 * les dades de l'aplicació.
-	 * @param metode
-	 * 				Mètode REST a invocar
-	 * @param aplicacio
-	 * 				Entity amb les dades de l'aplicació.
-	 * @return
-	 */
+
+
+
+	private NotificacioDestinatariEstatEnum calcularEstat(
+			NotificacioEnviamentEntity enviament) {
+		NotificacioDestinatariEstatEnumDto estatCalculatDto = NotificacioEnviamentEntity.calcularEstatCombinatNotificaSeu(
+				enviament);
+		NotificacioDestinatariEstatEnum estatCalculat = null;
+		switch (estatCalculatDto) {
+		case ABSENT:
+			estatCalculat = NotificacioDestinatariEstatEnum.ABSENT;
+			break;
+		case ADRESA_INCORRECTA:
+			estatCalculat = NotificacioDestinatariEstatEnum.ADRESA_INCORRECTA;
+			break;
+		case DESCONEGUT:
+			estatCalculat = NotificacioDestinatariEstatEnum.DESCONEGUT;
+			break;
+		case ENTREGADA_OP:
+			estatCalculat = NotificacioDestinatariEstatEnum.ENTREGADA_OP;
+			break;
+		case ENVIADA_CI:
+			estatCalculat = NotificacioDestinatariEstatEnum.ENVIADA_CI;
+			break;
+		case ENVIADA_DEH:
+			estatCalculat = NotificacioDestinatariEstatEnum.ENVIADA_DEH;
+			break;
+		case ENVIAMENT_PROGRAMAT:
+			estatCalculat = NotificacioDestinatariEstatEnum.ENVIAMENT_PROGRAMAT;
+			break;
+		case ERROR_ENTREGA:
+			estatCalculat = NotificacioDestinatariEstatEnum.ERROR_ENTREGA;
+			break;
+		case EXPIRADA:
+			estatCalculat = NotificacioDestinatariEstatEnum.EXPIRADA;
+			break;
+		case EXTRAVIADA:
+			estatCalculat = NotificacioDestinatariEstatEnum.EXTRAVIADA;
+			break;
+		case LLEGIDA:
+			estatCalculat = NotificacioDestinatariEstatEnum.LLEGIDA;
+			break;
+		case MORT:
+			estatCalculat = NotificacioDestinatariEstatEnum.MORT;
+			break;
+		case NOTIFICADA:
+			estatCalculat = NotificacioDestinatariEstatEnum.NOTIFICADA;
+			break;
+		case PENDENT_CIE:
+			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_CIE;
+			break;
+		case PENDENT_DEH:
+			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_DEH;
+			break;
+		case PENDENT_ENVIAMENT:
+			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_ENVIAMENT;
+			break;
+		case PENDENT_SEU:
+			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_SEU;
+			break;
+		case REBUTJADA:
+			estatCalculat = NotificacioDestinatariEstatEnum.REBUTJADA;
+			break;
+		case SENSE_INFORMACIO:
+			estatCalculat = NotificacioDestinatariEstatEnum.SENSE_INFORMACIO;
+			break;
+		case NOTIB_ENVIADA:
+			estatCalculat = NotificacioDestinatariEstatEnum.NOTIB_ENVIADA;
+			break;
+		case NOTIB_PENDENT:
+			estatCalculat = NotificacioDestinatariEstatEnum.NOTIB_PENDENT;
+			break;
+		}
+		return estatCalculat;
+	}
+
 	private Client getClient(AplicacioEntity aplicacio) {
-		
 		Client jerseyClient =  new Client();
 		// Només per depurar la sortida, esborrar o comentar-ho: jerseyClient.addFilter(new LoggingFilter(System.out));		
 		String username = null;
@@ -178,5 +245,5 @@ public class CallbackHelper {
 		}	
 		return jerseyClient;
 	}
-	
+
 }

@@ -199,6 +199,15 @@
 									</extraargs>
 								</wsdlOption>
 								<wsdlOption>
+									<wsdl>${basedir}/src/main/resources/es/caib/notib/core/wsdl/NotificaWsV2.wsdl</wsdl>
+									<extraargs>
+										<extraarg>-client</extraarg>
+										<extraarg>-autoNameResolution</extraarg>
+										<extraarg>-p</extraarg>
+										<extraarg>es.caib.notib.core.wsdl.notificav2</extraarg>
+									</extraargs>
+								</wsdlOption>
+								<wsdlOption>
 									<wsdl>${basedir}/src/main/resources/es/caib/notib/core/wsdl/adviserWS.wsdl</wsdl>
 									<extraargs>
 										<extraarg>-client</extraarg>
