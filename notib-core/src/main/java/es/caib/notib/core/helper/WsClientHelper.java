@@ -24,6 +24,9 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Utilitat per a instanciar clients per al servei d'enviament
  * de contingut a bústies.
@@ -74,7 +77,7 @@ public class WsClientHelper<T> {
 		@SuppressWarnings("rawtypes")
 		List<Handler> handlerChain = new ArrayList<Handler>();
 		if (logMissatgesActiu) {
-			handlerChain.add(new SOAPLoggingHandler());
+			handlerChain.add(new SOAPLoggingHandler(clazz));
 		}
 		// Configura handlers addicionals
 		for (int i = 0; i < handlers.length; i++) {
@@ -150,20 +153,25 @@ public class WsClientHelper<T> {
 	}
 
 	public static class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {
+		private final Logger LOGGER;
+		public SOAPLoggingHandler(Class<?> loggerClass) {
+			super();
+			LOGGER = LoggerFactory.getLogger(loggerClass);
+		}
 		public Set<QName> getHeaders() {
 			return null;
 		}
 		public boolean handleMessage(SOAPMessageContext smc) {
-			logToSystemOut(smc);
+			logXml(smc);
 			return true;
 		}
 		public boolean handleFault(SOAPMessageContext smc) {
-			logToSystemOut(smc);
+			logXml(smc);
 			return true;
 		}
 		public void close(MessageContext messageContext) {
 		}
-		private void logToSystemOut(SOAPMessageContext smc) {
+		private void logXml(SOAPMessageContext smc) {
 			StringBuilder sb = new StringBuilder();
 			Boolean outboundProperty = (Boolean)smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 			if (outboundProperty.booleanValue())
@@ -178,10 +186,8 @@ public class WsClientHelper<T> {
 			} catch (Exception ex) {
 				sb.append("Error al imprimir el missatge XML: " + ex.getMessage());
 			}
-			//LOGGER.debug(sb.toString());
-			System.out.println(sb.toString());
+			LOGGER.debug(sb.toString());
 		}
-		//private static final Logger LOGGER = LoggerFactory.getLogger(SOAPLoggingHandler.class);
 	}
 
 }

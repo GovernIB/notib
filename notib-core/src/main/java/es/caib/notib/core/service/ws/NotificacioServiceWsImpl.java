@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.jws.WebService;
@@ -47,6 +48,7 @@ import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity.Builder;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.EntitatRepository;
@@ -129,6 +131,9 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				document.isGenerarCsv(),
 				null).
 				descripcio(notificacio.getDescripcio()).
+				caducitat(notificacio.getCaducitat()).
+				retardPostal(notificacio.getRetard()).
+				descripcio(notificacio.getDescripcio()).
 				procedimentCodiSia(notificacio.getProcedimentCodi());
 		PagadorPostal pagadorPostal = notificacio.getPagadorPostal();
 		if (pagadorPostal != null) {
@@ -144,7 +149,6 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			pagadorCieCodiDir3(pagadorCie.getDir3Codi()).
 			pagadorCieDataVigencia(pagadorCie.getContracteDataVigencia());
 		}
-		
 		ParametresSeu parametresSeu = notificacio.getParametresSeu();
 		if (parametresSeu != null) {
 			notificacioBuilder.
@@ -270,8 +274,9 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				dehProcedimentCodi(entregaDeh.getProcedimentCodi());
 			}
 			NotificacioEnviamentEntity enviamentEntity = destinatariBuilder.
-					retardPostal(notificacio.getRetard()).
-					caducitat(notificacio.getCaducitat()).
+					//serveiTipus(NotificaServeiTipusEnumDto serveiTipus).
+					//formatSobre(String formatSobre).
+					//formatFulla(String formatFulla).
 					build();
 			NotificacioEnviamentEntity enviamentSaved = notificacioEnviamentRepository.saveAndFlush(
 					enviamentEntity);
@@ -333,8 +338,8 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			informacioEnviament.setEnviamentTipus(enviamentTipus);
 			informacioEnviament.setDataCreacio(enviament.getNotificaDataCreacio());
 			informacioEnviament.setDataPostaDisposicio(enviament.getNotificaDataDisposicio());
-			informacioEnviament.setDataCaducitat(enviament.getCaducitat());
-			informacioEnviament.setRetard(enviament.getRetardPostal());
+			informacioEnviament.setDataCaducitat(notificacio.getCaducitat());
+			informacioEnviament.setRetard(notificacio.getRetardPostal());
 			informacioEnviament.setProcedimentCodi(notificacio.getProcedimentCodiSia());
 			informacioEnviament.setProcedimentDescripcio(notificacio.getProcedimentDescripcioSia());
 			informacioEnviament.setReferencia(enviament.getNotificaReferencia());

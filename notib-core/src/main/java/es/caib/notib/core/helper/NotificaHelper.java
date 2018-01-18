@@ -776,7 +776,7 @@ public class NotificaHelper extends AbstractNotificaHelper {
 						getKeystoreCertAliasProperty(),
 						getKeystoreCertPasswordProperty()),*/
 //				new ChunkedSOAPHandler("false"),
-				new WsClientHelper.SOAPLoggingHandler());
+				new WsClientHelper.SOAPLoggingHandler(NotificaWsPortType.class));
 		return port;
 	}
 
