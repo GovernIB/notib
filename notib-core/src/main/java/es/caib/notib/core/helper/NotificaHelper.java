@@ -37,9 +37,18 @@ public class NotificaHelper {
 		return getNotificaHelper().refrescarEstat(destinatari);
 	}
 
+	public boolean comunicacioSeu(
+			Long notificacioDestinatariId) {
+		return getNotificaHelper().comunicacioSeu(notificacioDestinatariId);
+	}
+
 	public String generarReferencia(
 			NotificacioEnviamentEntity notificacioDestinatari) throws GeneralSecurityException {
 		return getNotificaHelper().xifrarIdPerNotifica(notificacioDestinatari.getId());
+	}
+
+	public boolean isConnexioNotificaDisponible() {
+		return getNotificaHelper().isConnexioNotificaDisponible();
 	}
 
 	public boolean isAdviserActiu() {

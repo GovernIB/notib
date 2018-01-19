@@ -137,6 +137,9 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 				notificacioEventRepository.save(event);
 			}
 		} catch (Exception ex) {
+			logger.error(
+					"Error al donar d'alta la notificació a Notific@ (notificacioId=" + notificacioId + ")",
+					ex);
 			String errorDescripcio;
 			if (ex instanceof SOAPFaultException) {
 				errorDescripcio = ex.getMessage();

@@ -128,6 +128,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				notificacioEventRepository.save(event);
 			}
 		} catch (Exception ex) {
+			logger.error(
+					"Error al donar d'alta la notificació a Notific@ (notificacioId=" + notificacioId + ")",
+					ex);
 			String errorDescripcio;
 			if (ex instanceof SOAPFaultException) {
 				errorDescripcio = ex.getMessage();
@@ -354,11 +357,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
 			Envio envio = new Envio();
 			envio.setReferenciaEmisor(enviament.getNotificaReferencia());
-			EntregaDEH2 entregaDeh = new EntregaDEH2();
-			entregaDeh.setCodigoProcedimiento(
-					notificacio.getProcedimentCodiSia());
-			entregaDeh.setObligado(enviament.getDehObligat());
-			envio.setEntregaDEH(entregaDeh);
 			Persona2 titular = new Persona2();
 			titular.setNif(enviament.getTitularNif());
 			titular.setNombre(enviament.getTitularNom());
@@ -385,76 +383,85 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			destinatario.setCodigoDestino(enviament.getDestinatariCodiDesti());
 			destinatarios.getDestinatario().add(destinatario);
 			envio.setDestinatarios(destinatarios);
-			EntregaPostal2 entregaPostal = new EntregaPostal2();
-			OrganismoPagadorPostal2 pagadorPostal = new OrganismoPagadorPostal2();
-			pagadorPostal.setCodigoDIR3Postal(notificacio.getPagadorCorreusCodiDir3());
-			pagadorPostal.setCodClienteFacturacionPostal(notificacio.getPagadorCorreusCodiClientFacturacio());
-			pagadorPostal.setNumContratoPostal(notificacio.getPagadorCorreusContracteNum());
-			pagadorPostal.setFechaVigenciaPostal(
-					toXmlGregorianCalendar(notificacio.getPagadorCieDataVigencia()));
-			entregaPostal.setOrganismoPagadorPostal(pagadorPostal);
-			OrganismoPagadorCIE2 pagadorCie = new OrganismoPagadorCIE2();
-			pagadorCie.setCodigoDIR3CIE(notificacio.getPagadorCieCodiDir3());
-			pagadorCie.setFechaVigenciaCIE(
-					toXmlGregorianCalendar(notificacio.getPagadorCieDataVigencia()));
-			entregaPostal.setOrganismoPagadorCIE(pagadorCie);
 			if (enviament.getDomiciliConcretTipus() != null) {
-				switch (enviament.getDomiciliConcretTipus())  {
-				case NACIONAL:
-					entregaPostal.setTipoDomicilio(new BigInteger("1"));
-					break;
-				case ESTRANGER:
-					entregaPostal.setTipoDomicilio(new BigInteger("2"));
-					break;
-				case APARTAT_CORREUS:
-					entregaPostal.setTipoDomicilio(new BigInteger("3"));
-					break;
-				case SENSE_NORMALITZAR:
-					entregaPostal.setTipoDomicilio(new BigInteger("4"));
-					break;
+				EntregaPostal2 entregaPostal = new EntregaPostal2();
+				OrganismoPagadorPostal2 pagadorPostal = new OrganismoPagadorPostal2();
+				pagadorPostal.setCodigoDIR3Postal(notificacio.getPagadorCorreusCodiDir3());
+				pagadorPostal.setCodClienteFacturacionPostal(notificacio.getPagadorCorreusCodiClientFacturacio());
+				pagadorPostal.setNumContratoPostal(notificacio.getPagadorCorreusContracteNum());
+				pagadorPostal.setFechaVigenciaPostal(
+						toXmlGregorianCalendar(notificacio.getPagadorCieDataVigencia()));
+				entregaPostal.setOrganismoPagadorPostal(pagadorPostal);
+				OrganismoPagadorCIE2 pagadorCie = new OrganismoPagadorCIE2();
+				pagadorCie.setCodigoDIR3CIE(notificacio.getPagadorCieCodiDir3());
+				pagadorCie.setFechaVigenciaCIE(
+						toXmlGregorianCalendar(notificacio.getPagadorCieDataVigencia()));
+				entregaPostal.setOrganismoPagadorCIE(pagadorCie);
+				if (enviament.getDomiciliConcretTipus() != null) {
+					switch (enviament.getDomiciliConcretTipus())  {
+					case NACIONAL:
+						entregaPostal.setTipoDomicilio(new BigInteger("1"));
+						break;
+					case ESTRANGER:
+						entregaPostal.setTipoDomicilio(new BigInteger("2"));
+						break;
+					case APARTAT_CORREUS:
+						entregaPostal.setTipoDomicilio(new BigInteger("3"));
+						break;
+					case SENSE_NORMALITZAR:
+						entregaPostal.setTipoDomicilio(new BigInteger("4"));
+						break;
+					}
 				}
+				entregaPostal.setTipoVia(
+						viaTipusToString(enviament.getDomiciliViaTipus()));
+				entregaPostal.setNombreVia(enviament.getDomiciliViaNom());
+				entregaPostal.setNumeroCasa(enviament.getDomiciliNumeracioNumero());
+				entregaPostal.setPuntoKilometrico(enviament.getDomiciliNumeracioPuntKm());
+				entregaPostal.setPortal(enviament.getDomiciliPortal());
+				entregaPostal.setPuerta(enviament.getDomiciliPorta());
+				entregaPostal.setEscalera(enviament.getDomiciliEscala());
+				entregaPostal.setPlanta(enviament.getDomiciliPlanta());
+				entregaPostal.setBloque(enviament.getDomiciliBloc());
+				entregaPostal.setComplemento(enviament.getDomiciliComplement());
+				entregaPostal.setCalificadorNumero(enviament.getDomiciliNumeracioQualificador());
+				entregaPostal.setCodigoPostal(enviament.getDomiciliCodiPostal());
+				entregaPostal.setApartadoCorreos(enviament.getDomiciliApartatCorreus());
+				entregaPostal.setMunicipio(enviament.getDomiciliMunicipiCodiIne());
+				entregaPostal.setProvincia(enviament.getDomiciliProvinciaCodi());
+				entregaPostal.setPais(enviament.getDomiciliPaisCodiIso());
+				entregaPostal.setPoblacion(enviament.getDomiciliPoblacio());
+				entregaPostal.setLinea1(enviament.getDomiciliLinea1());
+				entregaPostal.setLinea2(enviament.getDomiciliLinea2());
+				Opciones2 opcionesCie = new Opciones2();
+				if (enviament.getDomiciliCie() != null) {
+					Opcion2 opcionCie = new Opcion2();
+					opcionCie.setTipo("cie");
+					opcionCie.setValue(enviament.getDomiciliCie().toString()); // identificador CIE
+					opcionesCie.getOpcion().add(opcionCie);
+				}
+				if (enviament.getFormatSobre() != null) {
+					Opcion2 opcionFormatoSobre = new Opcion2();
+					opcionFormatoSobre.setTipo("formatoSobre");
+					opcionFormatoSobre.setValue(enviament.getFormatSobre()); // americano, C5...
+					opcionesCie.getOpcion().add(opcionFormatoSobre);
+				}
+				if (enviament.getFormatFulla() != null) {
+					Opcion2 opcionFormatoHoja = new Opcion2();
+					opcionFormatoHoja.setTipo("formatoHoja");
+					opcionFormatoHoja.setValue(enviament.getFormatFulla()); // A4, A5...
+					opcionesCie.getOpcion().add(opcionFormatoHoja);
+				}
+				entregaPostal.setOpcionesCIE(opcionesCie);
+				envio.setEntregaPostal(entregaPostal);
 			}
-			entregaPostal.setTipoVia(
-					viaTipusToString(enviament.getDomiciliViaTipus()));
-			entregaPostal.setNombreVia(enviament.getDomiciliViaNom());
-			entregaPostal.setNumeroCasa(enviament.getDomiciliNumeracioNumero());
-			entregaPostal.setPuntoKilometrico(enviament.getDomiciliNumeracioPuntKm());
-			entregaPostal.setPortal(enviament.getDomiciliPortal());
-			entregaPostal.setPuerta(enviament.getDomiciliPorta());
-			entregaPostal.setEscalera(enviament.getDomiciliEscala());
-			entregaPostal.setPlanta(enviament.getDomiciliPlanta());
-			entregaPostal.setBloque(enviament.getDomiciliBloc());
-			entregaPostal.setComplemento(enviament.getDomiciliComplement());
-			entregaPostal.setCalificadorNumero(enviament.getDomiciliNumeracioQualificador());
-			entregaPostal.setCodigoPostal(enviament.getDomiciliCodiPostal());
-			entregaPostal.setApartadoCorreos(enviament.getDomiciliApartatCorreus());
-			entregaPostal.setMunicipio(enviament.getDomiciliMunicipiCodiIne());
-			entregaPostal.setProvincia(enviament.getDomiciliProvinciaCodi());
-			entregaPostal.setPais(enviament.getDomiciliPaisCodiIso());
-			entregaPostal.setPoblacion(enviament.getDomiciliPoblacio());
-			entregaPostal.setLinea1(enviament.getDomiciliLinea1());
-			entregaPostal.setLinea2(enviament.getDomiciliLinea2());
-			Opciones2 opcionesCie = new Opciones2();
-			if (enviament.getDomiciliCie() != null) {
-				Opcion2 opcionCie = new Opcion2();
-				opcionCie.setTipo("cie");
-				opcionCie.setValue(enviament.getDomiciliCie().toString()); // identificador CIE
-				opcionesCie.getOpcion().add(opcionCie);
+			if (enviament.getDehObligat() != null) {
+				EntregaDEH2 entregaDeh = new EntregaDEH2();
+				entregaDeh.setObligado(enviament.getDehObligat());
+				entregaDeh.setCodigoProcedimiento(
+						enviament.getDehProcedimentCodi());
+				envio.setEntregaDEH(entregaDeh);
 			}
-			if (enviament.getFormatSobre() != null) {
-				Opcion2 opcionFormatoSobre = new Opcion2();
-				opcionFormatoSobre.setTipo("formatoSobre");
-				opcionFormatoSobre.setValue(enviament.getFormatSobre()); // americano, C5...
-				opcionesCie.getOpcion().add(opcionFormatoSobre);
-			}
-			if (enviament.getFormatFulla() != null) {
-				Opcion2 opcionFormatoHoja = new Opcion2();
-				opcionFormatoHoja.setTipo("formatoHoja");
-				opcionFormatoHoja.setValue(enviament.getFormatFulla()); // A4, A5...
-				opcionesCie.getOpcion().add(opcionFormatoHoja);
-			}
-			entregaPostal.setOpcionesCIE(opcionesCie);
-			envio.setEntregaPostal(entregaPostal);
 			envios.getEnvio().add(envio);
 		}
 		return envios;
@@ -462,11 +469,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 	private NotificaWsV2PortType getNotificaWs() throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
 		NotificaWsV2PortType port = new WsClientHelper<NotificaWsV2PortType>().generarClientWs(
-				getClass().getResource("/es/caib/notib/core/wsdl/NotificaWSV2.wsdl"),
+				getClass().getResource("/es/caib/notib/core/wsdl/NotificaWsV2.wsdl"),
 				getUrlProperty(),
 				new QName(
 						"https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/", 
-						"NotificaWsService"),
+						"NotificaWsV2Service"),
 				getUsernameProperty(),
 				getPasswordProperty(),
 				NotificaWsV2PortType.class,
