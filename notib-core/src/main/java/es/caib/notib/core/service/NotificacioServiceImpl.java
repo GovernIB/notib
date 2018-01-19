@@ -32,7 +32,7 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
-import es.caib.notib.core.helper.NotificaHelper;
+import es.caib.notib.core.helper.NotificaV1Helper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
@@ -65,7 +65,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private PropertiesHelper propertiesHelper;
 	@Autowired
-	private NotificaHelper notificaHelper;
+	private NotificaV1Helper notificaHelper;
 	@Autowired
 	private SeuHelper seuHelper;
 	@Autowired

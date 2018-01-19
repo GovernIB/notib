@@ -8,7 +8,6 @@ import java.io.ByteArrayOutputStream;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import javax.jws.WebService;
@@ -48,7 +47,6 @@ import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity.Builder;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.EntitatRepository;
@@ -311,8 +309,9 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			throw new ValidationException("Error: No s'ha trobat cap notificació amb la referencia " + referencia);
 		} else {
 			// Si Notib no utilitza el servei Adviser de @Notifica, i ja ha estat enviat a @Notifica
-			// serà necessari consultar l'estat de la notificacioó a Notifica
-			if (!notificaHelper.useNotificaAdviser() && enviament.getNotificaIdentificador() != null) {
+			// serà necessari consultar l'estat de la notificació a Notifica
+			if (	!notificaHelper.isAdviserActiu() &&
+					!enviament.getNotificaEstat().equals(NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT)) {
 				notificaHelper.refrescarEstat(enviament);
 			}
 			NotificacioEntity notificacio = enviament.getNotificacio();

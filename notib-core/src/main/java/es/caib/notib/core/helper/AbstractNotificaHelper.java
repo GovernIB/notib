@@ -230,6 +230,16 @@ public abstract class AbstractNotificaHelper {
 		return xifrarIdPerNotifica(notificacioDestinatari.getId());
 	}
 
+	public boolean isAdviserActiu() {
+		String actiu = PropertiesHelper.getProperties().getProperty(
+				"es.caib.notib.notifica.adviser.actiu");
+		if (actiu != null) {
+			return new Boolean(actiu).booleanValue();
+		} else {
+			return true;
+		}
+	}
+
 	public boolean isConnexioNotificaDisponible() {
 		return getUrlProperty() != null && getApiKeyProperty() != null;
 	}
@@ -237,6 +247,8 @@ public abstract class AbstractNotificaHelper {
 	public void setModeTest(boolean modeTest) {
 		this.modeTest = modeTest;
 	}
+
+
 
 	private static final String[] estatsNotifica = new String[] {
 			"ausente",
