@@ -72,7 +72,7 @@ import es.caib.notib.core.wsdl.sede.ResultadoComunicacionSede;
 import es.caib.notib.core.wsdl.sede.SedeWsPortType;
 
 /**
- * Helper per a interactuar amb el servei web de Notifica.
+ * Mètodes comuns per a accedir a Notific@.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

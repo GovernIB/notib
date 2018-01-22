@@ -61,7 +61,7 @@ import es.caib.notib.core.wsdl.notificav2.ResultadoEnvio;
 import es.caib.notib.core.wsdl.notificav2.ResultadoInfoEnvioV2;
 
 /**
- * Helper per a interactuar amb el servei web de Notifica.
+ * Helper per a interactuar amb la versió 2 del servei web de Notific@.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -163,28 +163,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			InfoEnvioV2 infoEnvio = new InfoEnvioV2();
 			infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
 			resultadoInfoEnvio = getNotificaWs().infoEnvioV2(infoEnvio);
-			// TODO Validar info
-			/*resultadoInfoEnvio.getIdentificador();
-			resultadoInfoEnvio.getEstado();
-			resultadoInfoEnvio.getConcepto();
-			resultadoInfoEnvio.getDescripcion();
-			resultadoInfoEnvio.getCodigoOrganismoEmisor();
-			resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
-			resultadoInfoEnvio.getTipoEnvio();
-			resultadoInfoEnvio.getFechaCreacion();
-			resultadoInfoEnvio.getFechaPuestaDisposicion();
-			resultadoInfoEnvio.getFechaCaducidad();
-			resultadoInfoEnvio.getRetardo();
-			resultadoInfoEnvio.getProcedimiento();
-			resultadoInfoEnvio.getDocumento();
-			resultadoInfoEnvio.getReferenciaEmisor();
-			resultadoInfoEnvio.getTitular();
-			resultadoInfoEnvio.getDestinatarios();
-			resultadoInfoEnvio.getEntregaPostal();
-			resultadoInfoEnvio.getEntregaDEH();
-			resultadoInfoEnvio.getDatados();
-			resultadoInfoEnvio.getCertificacion();
-			resultadoInfoEnvio.getOpcionesEnvio();*/
 			NotificaRespostaEstatDto resposta = new NotificaRespostaEstatDto();
 			if (resultadoInfoEnvio.getDatados() != null) {
 				Datado datatDarrer = null;

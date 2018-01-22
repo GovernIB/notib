@@ -13,7 +13,7 @@ import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 
 /**
- * Helper per a interactuar amb el servei web de Notifica.
+ * Helper per a interactuar amb el servei web de Notific@.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

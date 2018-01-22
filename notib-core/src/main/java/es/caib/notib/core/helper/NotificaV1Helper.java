@@ -69,7 +69,7 @@ import es.caib.notib.core.wsdl.notifica.TipoProcedimiento;
 import es.caib.notib.core.wsdl.notifica.TipoProvincia;
 
 /**
- * Helper per a interactuar amb el servei web de Notifica.
+ * Helper per a interactuar amb la versió 1 del servei web de Notific@.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
