@@ -69,7 +69,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private String documentArxiuNom;
 	@Column(name = "doc_arxiu_id", length = 64, nullable = false)
 	private String documentArxiuId;
-	@Column(name = "doc_hash", length = 40, nullable = false)
+	@Column(name = "doc_hash", length = 40)
 	private String documentHash;
 	@Column(name = "doc_normalitzat", nullable = false)
 	private boolean documentNormalitzat;
