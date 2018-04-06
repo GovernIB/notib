@@ -1,0 +1,90 @@
+<jxb:bindings 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+    version="2.1">
+
+	<jxb:bindings schemaLocation="infoEnvioV2.xsd">
+		<jxb:schemaBindings>
+			<jxb:package name="es.caib.notib.core.wsdl.notificaV2.infoEnvioV2"/>
+		</jxb:schemaBindings>
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='Destinatarios']"> -->
+<!-- 	        <jxb:class name="Destinatarios"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='Documento']"> -->
+<!-- 	        <jxb:class name="Documento"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='EntregaDEH']"> -->
+<!-- 	        <jxb:class name="EntregaDEH"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='EntregaPostal']"> -->
+<!-- 	        <jxb:class name="EntregaPostal"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='Opcion']"> -->
+<!-- 	        <jxb:class name="Opcion"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='Opciones']"> -->
+<!-- 	        <jxb:class name="Opciones"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='OrganismoPagadorCIE']"> -->
+<!-- 	        <jxb:class name="OrganismoPagadorCIE"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='OrganismoPagadorPostal']"> -->
+<!-- 	        <jxb:class name="OrganismoPagadorPostal"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='Persona']"> -->
+<!-- 	        <jxb:class name="Persona"/> -->
+<!-- 	    </jxb:bindings> -->
+    </jxb:bindings>
+    
+    <jxb:bindings schemaLocation="altaRemesaEnvios.xsd">
+    	<jxb:schemaBindings>
+			<jxb:package name="es.caib.notib.core.wsdl.notificaV2.altaremesaenvios"/>
+		</jxb:schemaBindings>
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='Destinatarios']"> -->
+<!-- 	        <jxb:class name="Destinatarios2"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='Documento']"> -->
+<!-- 	        <jxb:class name="Documento2"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='EntregaDEH']"> -->
+<!-- 	        <jxb:class name="EntregaDEH2"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='EntregaPostal']"> -->
+<!-- 	        <jxb:class name="EntregaPostal2"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='Opcion']"> -->
+<!-- 	        <jxb:class name="Opcion2"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='Opciones']"> -->
+<!-- 	        <jxb:class name="Opciones2"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='OrganismoPagadorCIE']"> -->
+<!-- 	        <jxb:class name="OrganismoPagadorCIE2"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='OrganismoPagadorPostal']"> -->
+<!-- 	        <jxb:class name="OrganismoPagadorPostal2"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='Persona']"> -->
+<!-- 	        <jxb:class name="Persona2"/> -->
+<!-- 	    </jxb:bindings> -->
+    </jxb:bindings>
+    
+    <jxb:bindings schemaLocation="getCies.xsd">
+    	<jxb:schemaBindings>
+			<jxb:package name="es.caib.notib.core.wsdl.notificaV2.getcies"/>
+		</jxb:schemaBindings>
+<!--     	<jxb:bindings node="//xs:complexType[@name='resultadoGetCies']"> -->
+<!-- 	        <jxb:class name="getcies/ResultadoGetCies"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='Cies']"> -->
+<!-- 	        <jxb:class name="getcies/Cies"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='Cie']"> -->
+<!-- 	        <jxb:class name="getcies/Cie"/> -->
+<!-- 	    </jxb:bindings> -->
+<!-- 	    <jxb:bindings node="//xs:complexType[@name='getCies']"> -->
+<!-- 	        <jxb:class name="getcies/GetCies"/> -->
+<!-- 	    </jxb:bindings> -->
+    </jxb:bindings>
+
+</jxb:bindings>

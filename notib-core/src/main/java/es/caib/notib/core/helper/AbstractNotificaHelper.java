@@ -24,11 +24,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFactory;
-import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -65,11 +61,11 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
-import es.caib.notib.core.wsdl.sede.CertificacionSede;
-import es.caib.notib.core.wsdl.sede.ComunicacionSede;
-import es.caib.notib.core.wsdl.sede.ResultadoCertificacionSede;
-import es.caib.notib.core.wsdl.sede.ResultadoComunicacionSede;
-import es.caib.notib.core.wsdl.sede.SedeWsPortType;
+import es.caib.notib.core.wsdl.seu.CertificacionSede;
+import es.caib.notib.core.wsdl.seu.ComunicacionSede;
+import es.caib.notib.core.wsdl.seu.ResultadoCertificacionSede;
+import es.caib.notib.core.wsdl.seu.ResultadoComunicacionSede;
+import es.caib.notib.core.wsdl.seu.SedeWsPortType;
 
 /**
  * Mètodes comuns per a accedir a Notific@.
@@ -570,49 +566,49 @@ public abstract class AbstractNotificaHelper {
 		return !"false".equalsIgnoreCase(sendToNotifica);
 	}*/
 
-	public class ApiKeySOAPHandler implements SOAPHandler<SOAPMessageContext> {
-		private final String apiKey;
-		public ApiKeySOAPHandler(String apiKey) {
-			this.apiKey = apiKey;
-		}
-		@Override
-		public boolean handleMessage(SOAPMessageContext context) {
-			Boolean outboundProperty = (Boolean)context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-			if (outboundProperty.booleanValue()) {
-				
-				try {
-					SOAPEnvelope envelope = context.getMessage().getSOAPPart().getEnvelope();
-					SOAPFactory factory = SOAPFactory.newInstance();
-					SOAPElement apiKeyElement = factory.createElement(
-							new QName(
-									"https://administracionelectronica.gob.es/notifica/ws/notifica/1.0/", 
-									"api_key"));
-					apiKeyElement.addTextNode(apiKey);
-					SOAPHeader header = envelope.getHeader();
-					if (header == null)
-						header = envelope.addHeader();
-					header.addChildElement(apiKeyElement);
-					
-				} catch (SOAPException ex) {
-					logger.error(
-							"No s'ha pogut afegir l'API key a la petició SOAP per Notifica",
-							ex);
-	        	}
-	        }
-	        return true;
-	    }
-		@Override
-		public boolean handleFault(SOAPMessageContext context) {
-			return false;
-		}
-		@Override
-		public void close(MessageContext context) {
-		}
-		@Override
-		public Set<QName> getHeaders() {
-			return new TreeSet<QName>();
-		}
-	}
+//	public class ApiKeySOAPHandler implements SOAPHandler<SOAPMessageContext> {
+//		private final String apiKey;
+//		public ApiKeySOAPHandler(String apiKey) {
+//			this.apiKey = apiKey;
+//		}
+//		@Override
+//		public boolean handleMessage(SOAPMessageContext context) {
+//			Boolean outboundProperty = (Boolean)context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+//			if (outboundProperty.booleanValue()) {
+//				
+//				try {
+//					SOAPEnvelope envelope = context.getMessage().getSOAPPart().getEnvelope();
+//					SOAPFactory factory = SOAPFactory.newInstance();
+//					SOAPElement apiKeyElement = factory.createElement(
+//							new QName(
+//									"https://administracionelectronica.gob.es/notifica/ws/notifica/1.0/", 
+//									"api_key"));
+//					apiKeyElement.addTextNode(apiKey);
+//					SOAPHeader header = envelope.getHeader();
+//					if (header == null)
+//						header = envelope.addHeader();
+//					header.addChildElement(apiKeyElement);
+//					
+//				} catch (SOAPException ex) {
+//					logger.error(
+//							"No s'ha pogut afegir l'API key a la petició SOAP per Notifica",
+//							ex);
+//	        	}
+//	        }
+//	        return true;
+//	    }
+//		@Override
+//		public boolean handleFault(SOAPMessageContext context) {
+//			return false;
+//		}
+//		@Override
+//		public void close(MessageContext context) {
+//		}
+//		@Override
+//		public Set<QName> getHeaders() {
+//			return new TreeSet<QName>();
+//		}
+//	}
 	
 	public class ChunkedSOAPHandler implements SOAPHandler<SOAPMessageContext> {
 		private final String chunked;

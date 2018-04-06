@@ -15,6 +15,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -37,97 +38,98 @@ import es.caib.notib.core.audit.NotibAuditable;
 public class NotificacioEntity extends NotibAuditable<Long> {
 
 	@Column(name = "emisor_dir3codi", length = 9, nullable = false)
-	private String emisorDir3Codi;
+	protected String emisorDir3Codi;
 	@Column(name = "env_tipus", nullable = false)
-	private NotificaEnviamentTipusEnumDto enviamentTipus;
+	protected NotificaEnviamentTipusEnumDto enviamentTipus;
 	@Column(name = "env_data_prog")
 	@Temporal(TemporalType.DATE)
-	private Date enviamentDataProgramada;
+	protected Date enviamentDataProgramada;
 	@Column(name = "concepte", length = 50, nullable = false)
-	private String concepte;
+	protected String concepte;
 	@Column(name = "descripcio", length = 100)
-	private String descripcio;
+	protected String descripcio;
 	@Column(name = "pagcor_dir3", length = 9)
-	private String pagadorCorreusCodiDir3;
+	protected String pagadorCorreusCodiDir3;
 	@Column(name = "pagcor_numcont", length = 20)
-	private String pagadorCorreusContracteNum;
+	protected String pagadorCorreusContracteNum;
 	@Column(name = "pagcor_codi_client", length = 20)
-	private String pagadorCorreusCodiClientFacturacio;
+	protected String pagadorCorreusCodiClientFacturacio;
 	@Column(name = "pagcor_data_vig")
 	@Temporal(TemporalType.DATE)
-	private Date pagadorCorreusDataVigencia;
+	protected Date pagadorCorreusDataVigencia;
 	@Column(name = "pagcie_dir3", length = 9)
-	private String pagadorCieCodiDir3;
+	protected String pagadorCieCodiDir3;
 	@Column(name = "pagcie_data_vig")
 	@Temporal(TemporalType.DATE)
-	private Date pagadorCieDataVigencia;
+	protected Date pagadorCieDataVigencia;
 	@Column(name = "proc_codi_sia", length = 6, nullable = false)
-	private String procedimentCodiSia;
+	protected String procedimentCodiSia;
 	@Column(name = "proc_desc_sia", length = 256)
-	private String procedimentDescripcioSia;
+	protected String procedimentDescripcioSia;
 	@Column(name = "retard_postal")
-	private Integer retardPostal;
+	protected Integer retardPostal;
 	@Column(name = "caducitat")
 	@Temporal(TemporalType.DATE)
-	private Date caducitat;
+	protected Date caducitat;
 	@Column(name = "doc_arxiu_nom", length = 256, nullable = false)
-	private String documentArxiuNom;
+	protected String documentArxiuNom;
 	@Column(name = "doc_arxiu_id", length = 64, nullable = false)
-	private String documentArxiuId;
+	protected String documentArxiuId;
 	@Column(name = "doc_hash", length = 40, nullable = false)
-	private String documentHash;
+	protected String documentHash;
 	@Column(name = "doc_normalitzat", nullable = false)
-	private boolean documentNormalitzat;
+	protected boolean documentNormalitzat;
 	@Column(name = "doc_gen_csv", nullable = false)
-	private boolean documentGenerarCsv;
+	protected boolean documentGenerarCsv;
 	@Column(name = "seu_exp_serdoc", length = 10, nullable = false)
-	private String seuExpedientSerieDocumental;
+	protected String seuExpedientSerieDocumental;
 	@Column(name = "seu_exp_uniorg", length = 10, nullable = false)
-	private String seuExpedientUnitatOrganitzativa;
+	protected String seuExpedientUnitatOrganitzativa;
 	@Column(name = "seu_exp_ideni", length = 52, nullable = false)
-	private String seuExpedientIdentificadorEni;
+	protected String seuExpedientIdentificadorEni;
 	@Column(name = "seu_exp_titol", length = 256, nullable = false)
-	private String seuExpedientTitol;
+	protected String seuExpedientTitol;
 	@Column(name = "seu_reg_oficina", length = 256, nullable = false)
-	private String seuRegistreOficina;
+	protected String seuRegistreOficina;
 	@Column(name = "seu_reg_llibre", length = 256, nullable = false)
-	private String seuRegistreLlibre;
+	protected String seuRegistreLlibre;
 	@Column(name = "seu_idioma", length = 256, nullable = false)
-	private String seuIdioma;
+	protected String seuIdioma;
 	@Column(name = "seu_avis_titol", length = 256, nullable = false)
-	private String seuAvisTitol;
+	protected String seuAvisTitol;
 	@Column(name = "seu_avis_text", length = 256, nullable = false)
-	private String seuAvisText;
+	protected String seuAvisText;
 	@Column(name = "seu_avis_mobil", length = 256)
-	private String seuAvisTextMobil;
+	protected String seuAvisTextMobil;
 	@Column(name = "seu_ofici_titol", length = 256, nullable = false)
-	private String seuOficiTitol;
+	protected String seuOficiTitol;
 	@Column(name = "seu_ofici_text", length = 256, nullable = false)
-	private String seuOficiText;
+	protected String seuOficiText;
 	@Column(name = "estat", nullable = false)
-	private NotificacioEstatEnumDto estat;
+	protected NotificacioEstatEnumDto estat;
 	@Column(name = "error_not", nullable = false)
-	private boolean errorNotifica;
+	protected boolean errorNotifica;
 	@ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "error_not_event_id")
 	@ForeignKey(name = "not_notevenot_notificacio_fk")
-	private NotificacioEventEntity errorNotificaEvent;
+	protected NotificacioEventEntity errorNotificaEvent;
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
-	private List<NotificacioEnviamentEntity> enviaments = new ArrayList<NotificacioEnviamentEntity>();
+	@OrderColumn(name="id")
+	protected List<NotificacioEnviamentEntity> enviaments = new ArrayList<NotificacioEnviamentEntity>();
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
-	private List<NotificacioEventEntity> events = new ArrayList<NotificacioEventEntity>();
+	protected List<NotificacioEventEntity> events = new ArrayList<NotificacioEventEntity>();
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "entitat_id")
 	@ForeignKey(name = "not_entitat_notificacio_fk")
-	private EntitatEntity entitat;
+	protected EntitatEntity entitat;
 
 	public String getEmisorDir3Codi() {
 		return emisorDir3Codi;

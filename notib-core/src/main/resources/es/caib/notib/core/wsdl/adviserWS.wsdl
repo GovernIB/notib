@@ -1,133 +1,131 @@
 <?xml version="1.0"?>
 <wsdl:definitions name="DatadoAgenciaTributariaWs" targetNamespace="https://administracionelectronica.gob.es/notifica/ws/notifica/1.0/"
-xmlns:tns="https://administracionelectronica.gob.es/notifica/ws/notifica/1.0/"
-xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
-xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/"
-xmlns="http://schemas.xmlsoap.org/wsdl/"
-xmlns:xs="http://www.w3.org/2001/XMLSchema"
-xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-<wsdl:types>
-<xs:schema elementFormDefault="unqualified" targetNamespace="https://administracionelectronica.gob.es/notifica/ws/notifica/1.0/" version="1.0">
-<xs:element name="certificacionOrganismo" type="tns:certificacionOrganismo" />
-<xs:element name="certificacionOrganismoResponse" type="tns:certificacionOrganismoResponse" />
-<xs:element name="datadoOrganismo" type="tns:datadoOrganismo" />
-<xs:element name="datadoOrganismoResponse" type="tns:datadoOrganismoResponse" />
-<xs:element name="datadoRequest" type="tns:datadoRequest" />
-<xs:element name="organismo_emisor" type="tns:organismoEmisor" />
-<xs:complexType name="datadoOrganismo">
-<xs:sequence>
-<xs:element minOccurs="0" name="datadoOrganismo" type="tns:datadoRequest" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="datadoRequest">
-<xs:sequence>
-<xs:element minOccurs="0" name="fecha" type="xs:dateTime" />
-<xs:element minOccurs="0" name="identificador_destinatario" type="xs:string" />
-<xs:element minOccurs="0" name="organismo_emisor" type="tns:organismoEmisor" />
-<xs:element minOccurs="0" name="receptor" type="tns:receptorEnvio" />
-<xs:element minOccurs="0" name="resultado" type="xs:string" />
-<xs:element minOccurs="0" name="modo" type="xs:string" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="organismoEmisor">
-<xs:sequence>
-<xs:element minOccurs="0" name="codigo_dir3" type="xs:string" />
-<xs:element minOccurs="0" name="nombre" type="xs:string" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="receptorEnvio">
-<xs:sequence>
-<xs:element minOccurs="0" name="nif" type="xs:string" />
-<xs:element minOccurs="0" name="nombre" type="xs:string" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="datadoOrganismoResponse">
-<xs:sequence>
-<xs:element minOccurs="0" name="codigo_respuesta" type="xs:string" />
-<xs:element minOccurs="0" name="texto_respuesta" type="xs:string" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="certificacionOrganismo">
-<xs:sequence>
-<xs:element minOccurs="0" name="certificacionOrganismo" type="tns:certificadoRequest" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="certificadoRequest">
-<xs:sequence>
-<xs:element minOccurs="0" name="certificacion" type="xs:string" />
-<xs:element minOccurs="0" name="hash_sha1" type="xs:string" />
-<xs:element minOccurs="0" name="identificador_destinatario" type="xs:string" />
-<xs:element minOccurs="0" name="organismo_emisor" type="xs:string" />
-<xs:element minOccurs="0" name="acuse_o_sobre" type="xs:string" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="certificacionOrganismoResponse">
-<xs:sequence>
-<xs:element minOccurs="0" name="codigo_respuesta" type="xs:string" />
-<xs:element minOccurs="0" name="texto_respuesta" type="xs:string" />
-</xs:sequence>
-</xs:complexType>
-</xs:schema>
-</wsdl:types>
-<wsdl:message name="datadoOrganismoResponse">
-<wsdl:part element="tns:datadoOrganismoResponse" name="parameters" />
-</wsdl:message>
-<wsdl:message name="datadoOrganismo">
-<wsdl:part element="tns:datadoOrganismo" name="parameters" />
-</wsdl:message>
-<wsdl:message name="consultarNotificacionesPendientesES">
-<wsdl:part element="tns:consultarNotificacionesPendientesES" name="parameters" />
-</wsdl:message>
-<wsdl:message name="certificacionOrganismo">
-<wsdl:part element="tns:certificacionOrganismo" name="parameters" />
-</wsdl:message>
-<wsdl:message name="lanzarEntradaManual">
-<wsdl:part element="tns:lanzarEntradaManual" name="parameters" />
-</wsdl:message>
-<wsdl:message name="lanzarSalidaManual">
-<wsdl:part element="tns:lanzarSalidaManual" name="parameters" />
-</wsdl:message>
-<wsdl:message name="enviarNotificaResponse">
-<wsdl:part element="tns:enviarNotificaResponse" name="parameters" />
-</wsdl:message>
-<wsdl:message name="certificacionOrganismoResponse">
-<wsdl:part element="tns:certificacionOrganismoResponse" name="parameters" />
-</wsdl:message>
-<wsdl:portType name="adviserWS">
-<wsdl:operation name="datadoOrganismo">
-<wsdl:input message="tns:datadoOrganismo" name="datadoOrganismo" />
-<wsdl:output message="tns:datadoOrganismoResponse" name="datadoOrganismoResponse" />
-</wsdl:operation>
-<wsdl:operation name="certificacionOrganismo">
-<wsdl:input message="tns:certificacionOrganismo" name="certificacionOrganismo" />
-<wsdl:output message="tns:certificacionOrganismoResponse" name="certificacionOrganismoResponse" />
-</wsdl:operation>
-</wsdl:portType>
-<wsdl:binding name="adviserWSSoapBinding" type="tns:adviserWS">
-<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
-<wsdl:operation name="datadoOrganismo">
-<soap:operation soapAction="" style="document" />
-<wsdl:input name="datadoOrganismo">
-<soap:body use="literal" />
-</wsdl:input>
-<wsdl:output name="datadoOrganismoResponse">
-<soap:body use="literal" />
-</wsdl:output>
-</wsdl:operation>
-<wsdl:operation name="certificacionOrganismo">
-<soap:operation soapAction="" style="document" />
-<wsdl:input name="certificacionOrganismo">
-<soap:body use="literal" />
-</wsdl:input>
-<wsdl:output name="certificacionOrganismoResponse">
-<soap:body use="literal" />
-</wsdl:output>
-</wsdl:operation>
-</wsdl:binding>
-<wsdl:service name="adviserWS">
-<wsdl:port binding="tns:adviserWSSoapBinding" name="AdviserWSImplPort">
-<soap:address location="http://notificaws.local/ws/soap/AdviserWS" />
-</wsdl:port>
-</wsdl:service>
+	xmlns:tns="https://administracionelectronica.gob.es/notifica/ws/notifica/1.0/"
+	xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+	xmlns:soap-enc="http://schemas.xmlsoap.org/soap/encoding/"
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+>
+
+	<wsdl:types>
+		<xs:schema elementFormDefault="unqualified" targetNamespace="https://administracionelectronica.gob.es/notifica/ws/notifica/1.0/" version="1.0">
+			<xs:element name="certificacionOrganismo" type="tns:certificacionOrganismo" />
+			<xs:element name="certificacionOrganismoResponse" type="tns:certificacionOrganismoResponse" />
+			<xs:element name="datadoOrganismo" type="tns:datadoOrganismo" />
+			<xs:element name="datadoOrganismoResponse" type="tns:datadoOrganismoResponse" />
+			<xs:element name="datadoRequest" type="tns:datadoRequest" />
+			<xs:element name="organismo_emisor" type="tns:organismoEmisor" />
+			<xs:complexType name="datadoOrganismo">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="datadoOrganismo" type="tns:datadoRequest" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="datadoRequest">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="fecha" type="xs:dateTime" />
+					<xs:element minOccurs="0" name="identificador_destinatario" type="xs:string" />
+					<xs:element minOccurs="0" name="organismo_emisor" type="tns:organismoEmisor" />
+					<xs:element minOccurs="0" name="receptor" type="tns:receptorEnvio" />
+					<xs:element minOccurs="0" name="resultado" type="xs:string" />
+					<xs:element minOccurs="0" name="modo" type="xs:string" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="organismoEmisor">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="codigo_dir3" type="xs:string" />
+					<xs:element minOccurs="0" name="nombre" type="xs:string" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="receptorEnvio">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="nif" type="xs:string" />
+					<xs:element minOccurs="0" name="nombre" type="xs:string" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="datadoOrganismoResponse">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="codigo_respuesta" type="xs:string" />
+					<xs:element minOccurs="0" name="texto_respuesta" type="xs:string" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="certificacionOrganismo">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="certificacionOrganismo" type="tns:certificadoRequest" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="certificadoRequest">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="certificacion" type="xs:string" />
+					<xs:element minOccurs="0" name="hash_sha1" type="xs:string" />
+					<xs:element minOccurs="0" name="identificador_destinatario" type="xs:string" />
+					<xs:element minOccurs="0" name="organismo_emisor" type="xs:string" />
+					<xs:element minOccurs="0" name="acuse_o_sobre" type="xs:string" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="certificacionOrganismoResponse">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="codigo_respuesta" type="xs:string" />
+					<xs:element minOccurs="0" name="texto_respuesta" type="xs:string" />
+				</xs:sequence>
+			</xs:complexType>
+		</xs:schema>
+	</wsdl:types>
+	
+	<wsdl:message name="datadoOrganismoResponse">
+		<wsdl:part element="tns:datadoOrganismoResponse" name="parameters" />
+	</wsdl:message>
+	<wsdl:message name="datadoOrganismo">
+		<wsdl:part element="tns:datadoOrganismo" name="parameters" />
+	</wsdl:message>
+<!-- 	<wsdl:message name="consultarNotificacionesPendientesES"> -->
+<!-- 		<wsdl:part element="tns:consultarNotificacionesPendientesES" name="parameters" /> -->
+<!-- 	</wsdl:message> -->
+	<wsdl:message name="certificacionOrganismo">
+		<wsdl:part element="tns:certificacionOrganismo" name="parameters" />
+	</wsdl:message>
+<!-- 	<wsdl:message name="lanzarEntradaManual"> -->
+<!-- 		<wsdl:part element="tns:lanzarEntradaManual" name="parameters" /> -->
+<!-- 	</wsdl:message> -->
+<!-- 	<wsdl:message name="lanzarSalidaManual"> -->
+<!-- 		<wsdl:part element="tns:lanzarSalidaManual" name="parameters" /> -->
+<!-- 	</wsdl:message> -->
+<!-- 	<wsdl:message name="enviarNotificaResponse"> -->
+<!-- 		<wsdl:part element="tns:enviarNotificaResponse" name="parameters" /> -->
+<!-- 	</wsdl:message> -->
+	<wsdl:message name="certificacionOrganismoResponse">
+		<wsdl:part element="tns:certificacionOrganismoResponse" name="parameters" />
+	</wsdl:message>
+	
+	<wsdl:portType name="adviserWS">
+		<wsdl:operation name="datadoOrganismo">
+			<wsdl:input message="tns:datadoOrganismo" name="datadoOrganismo" />
+			<wsdl:output message="tns:datadoOrganismoResponse" name="datadoOrganismoResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="certificacionOrganismo">
+			<wsdl:input message="tns:certificacionOrganismo" name="certificacionOrganismo" />
+			<wsdl:output message="tns:certificacionOrganismoResponse" name="certificacionOrganismoResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<wsdl:binding name="adviserWSSoapBinding" type="tns:adviserWS">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="datadoOrganismo">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="datadoOrganismo"><soap:body use="literal" /></wsdl:input>
+			<wsdl:output name="datadoOrganismoResponse"><soap:body use="literal" /></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="certificacionOrganismo">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="certificacionOrganismo"><soap:body use="literal" /></wsdl:input>
+			<wsdl:output name="certificacionOrganismoResponse"><soap:body use="literal" /></wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+
+	<wsdl:service name="adviserWS">
+		<wsdl:port binding="tns:adviserWSSoapBinding" name="AdviserWSImplPort">
+			<soap:address location="http://notificaws.local/ws/soap/AdviserWS" />
+		</wsdl:port>
+	</wsdl:service>
 </wsdl:definitions>

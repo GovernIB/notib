@@ -1,6 +1,10 @@
 package es.caib.notib.core.ejb;
 
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.notib.core.api.service.CallbackService;
 
@@ -11,6 +15,8 @@ import es.caib.notib.core.api.service.CallbackService;
  * @author Limit Tecnologies <limit@limit.es>
  *
  */
+@Stateless
+@Interceptors(SpringBeanAutowiringInterceptor.class)
 public class CallbackServiceBean implements CallbackService {
 	
 	@Autowired

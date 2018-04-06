@@ -6,8 +6,6 @@ package es.caib.notib.client;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.ejb.CreateException;
 import javax.management.InstanceNotFoundException;
@@ -28,7 +26,6 @@ import com.sun.jersey.api.representation.Form;
 import es.caib.loginModule.auth.ControladorSesion;
 import es.caib.loginModule.client.AuthenticationFailureException;
 import es.caib.loginModule.client.AuthorizationToken;
-import es.caib.notib.ws.notificacio.InformacioEnviament;
 import es.caib.notib.ws.notificacio.Notificacio;
 import es.caib.notib.ws.notificacio.NotificacioServiceWsException_Exception;
 
@@ -55,7 +52,7 @@ public class NotificacioRestClient {
 		this.password = password;
 	}
 
-	public List<String> alta(
+	public AltaResposta alta(
 			Notificacio notificacio) throws NotificacioServiceWsException_Exception, InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, NamingException, CreateException, AuthenticationFailureException, IOException {
 		String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/alta";
 		ObjectMapper mapper  = new ObjectMapper();
@@ -72,13 +69,10 @@ public class NotificacioRestClient {
 				resource(urlAmbMetode).
 				type("application/json").
 				post(String.class, body);
-		return Arrays.asList(
-				mapper.readValue(
-						json,
-						String[].class));
+		return mapper.readValue(json, AltaResposta.class);
 	}
 
-	public InformacioEnviament consulta(
+	public InformacioResposta consulta(
 			String referencia) throws NotificacioServiceWsException_Exception, InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, NamingException, CreateException, AuthenticationFailureException, IOException {
 		String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/consulta/" + referencia;
 		Client jerseyClient = generarClient();
@@ -94,7 +88,7 @@ public class NotificacioRestClient {
 				type("application/json").
 				get(String.class);
 		ObjectMapper mapper  = new ObjectMapper();
-		return mapper.readValue(json, InformacioEnviament.class);
+		return mapper.readValue(json, InformacioResposta.class);
 	}
 
 

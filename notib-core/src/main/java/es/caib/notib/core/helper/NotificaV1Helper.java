@@ -11,6 +11,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.ejb.CreateException;
 import javax.management.InstanceNotFoundException;
@@ -18,6 +20,14 @@ import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPFactory;
+import javax.xml.soap.SOAPHeader;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPHandler;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.commons.codec.binary.Base64;
@@ -44,29 +54,29 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.wsdl.notifica.ArrayOfTipoDestinatario;
-import es.caib.notib.core.wsdl.notifica.CertificacionEnvioRespuesta;
-import es.caib.notib.core.wsdl.notifica.DatadoEnvio;
-import es.caib.notib.core.wsdl.notifica.DireccionElectronicaHabilitada;
-import es.caib.notib.core.wsdl.notifica.Documento;
-import es.caib.notib.core.wsdl.notifica.IdentificadorEnvio;
-import es.caib.notib.core.wsdl.notifica.NotificaWsPortType;
-import es.caib.notib.core.wsdl.notifica.OpcionesEmision;
-import es.caib.notib.core.wsdl.notifica.ResultadoAlta;
-import es.caib.notib.core.wsdl.notifica.ResultadoCertificacion;
-import es.caib.notib.core.wsdl.notifica.ResultadoDatado;
-import es.caib.notib.core.wsdl.notifica.TipoDestinatario;
-import es.caib.notib.core.wsdl.notifica.TipoDomicilio;
-import es.caib.notib.core.wsdl.notifica.TipoEnvio;
-import es.caib.notib.core.wsdl.notifica.TipoIntento;
-import es.caib.notib.core.wsdl.notifica.TipoMunicipio;
-import es.caib.notib.core.wsdl.notifica.TipoOrganismoEmisor;
-import es.caib.notib.core.wsdl.notifica.TipoOrganismoPagadorCIE;
-import es.caib.notib.core.wsdl.notifica.TipoOrganismoPagadorCorreos;
-import es.caib.notib.core.wsdl.notifica.TipoPais;
-import es.caib.notib.core.wsdl.notifica.TipoPersonaDestinatario;
-import es.caib.notib.core.wsdl.notifica.TipoProcedimiento;
-import es.caib.notib.core.wsdl.notifica.TipoProvincia;
+import es.caib.notib.core.wsdl.notificaV1.ArrayOfTipoDestinatario;
+import es.caib.notib.core.wsdl.notificaV1.CertificacionEnvioRespuesta;
+import es.caib.notib.core.wsdl.notificaV1.DatadoEnvio;
+import es.caib.notib.core.wsdl.notificaV1.DireccionElectronicaHabilitada;
+import es.caib.notib.core.wsdl.notificaV1.Documento;
+import es.caib.notib.core.wsdl.notificaV1.IdentificadorEnvio;
+import es.caib.notib.core.wsdl.notificaV1.NotificaWsPortType;
+import es.caib.notib.core.wsdl.notificaV1.OpcionesEmision;
+import es.caib.notib.core.wsdl.notificaV1.ResultadoAlta;
+import es.caib.notib.core.wsdl.notificaV1.ResultadoCertificacion;
+import es.caib.notib.core.wsdl.notificaV1.ResultadoDatado;
+import es.caib.notib.core.wsdl.notificaV1.TipoDestinatario;
+import es.caib.notib.core.wsdl.notificaV1.TipoDomicilio;
+import es.caib.notib.core.wsdl.notificaV1.TipoEnvio;
+import es.caib.notib.core.wsdl.notificaV1.TipoIntento;
+import es.caib.notib.core.wsdl.notificaV1.TipoMunicipio;
+import es.caib.notib.core.wsdl.notificaV1.TipoOrganismoEmisor;
+import es.caib.notib.core.wsdl.notificaV1.TipoOrganismoPagadorCIE;
+import es.caib.notib.core.wsdl.notificaV1.TipoOrganismoPagadorCorreos;
+import es.caib.notib.core.wsdl.notificaV1.TipoPais;
+import es.caib.notib.core.wsdl.notificaV1.TipoPersonaDestinatario;
+import es.caib.notib.core.wsdl.notificaV1.TipoProcedimiento;
+import es.caib.notib.core.wsdl.notificaV1.TipoProvincia;
 
 /**
  * Helper per a interactuar amb la versió 1 del servei web de Notific@.
@@ -771,7 +781,7 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 				getUsernameProperty(),
 				getPasswordProperty(),
 				NotificaWsPortType.class,
-				new ApiKeySOAPHandler(getApiKeyProperty()),
+				new ApiKeySOAPHandlerV1(getApiKeyProperty()),
 				/*new FirmaSOAPHandler(
 						getKeystorePathProperty(),
 						getKeystoreTypeProperty(),
@@ -783,6 +793,50 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 		return port;
 	}
 
+	public class ApiKeySOAPHandlerV1 implements SOAPHandler<SOAPMessageContext> {
+		private final String apiKey;
+		public ApiKeySOAPHandlerV1(String apiKey) {
+			this.apiKey = apiKey;
+		}
+		@Override
+		public boolean handleMessage(SOAPMessageContext context) {
+			Boolean outboundProperty = (Boolean)context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+			if (outboundProperty.booleanValue()) {
+				
+				try {
+					SOAPEnvelope envelope = context.getMessage().getSOAPPart().getEnvelope();
+					SOAPFactory factory = SOAPFactory.newInstance();
+					SOAPElement apiKeyElement = factory.createElement(
+							new QName(
+									"https://administracionelectronica.gob.es/notifica/ws/notifica/1.0/", 
+									"api_key"));
+					apiKeyElement.addTextNode(apiKey);
+					SOAPHeader header = envelope.getHeader();
+					if (header == null)
+						header = envelope.addHeader();
+					header.addChildElement(apiKeyElement);
+					
+				} catch (SOAPException ex) {
+					logger.error(
+							"No s'ha pogut afegir l'API key a la petició SOAP per Notifica",
+							ex);
+	        	}
+	        }
+	        return true;
+	    }
+		@Override
+		public boolean handleFault(SOAPMessageContext context) {
+			return false;
+		}
+		@Override
+		public void close(MessageContext context) {
+		}
+		@Override
+		public Set<QName> getHeaders() {
+			return new TreeSet<QName>();
+		}
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(NotificaV1Helper.class);
 
 }

@@ -1,0 +1,12 @@
+<jaxws:bindings 
+	wsdlLocation="../NotificaWsV21.wsdl"
+	xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    version="2.1">
+
+	<jaxws:bindings node="wsdl:definitions">
+		<jaxws:package name="es.caib.notib.core.wsdl.notificaV2"/>
+    </jaxws:bindings>
+    
+
+</jaxws:bindings>

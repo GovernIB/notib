@@ -6,7 +6,7 @@ CREATE TABLE NOT_USUARI
   LLINATGES     character varying(100),
   NOM_SENCER    character varying(200),
   EMAIL         character varying(200),
-  VERSION       bigint                     	NOT NULL
+  VERSION       bigint                     		NOT NULL
 );
 
 CREATE TABLE NOT_ENTITAT
@@ -106,7 +106,7 @@ CREATE TABLE NOT_NOTIFICACIO_DEST
   DOM_PORTA            character varying(50),
   DOM_COMPLEM          character varying(250),
   DOM_POBLACIO         character varying(30),
-  DOM_MUN_CODINE       character varying(5),
+  DOM_MUN_CODINE       character varying(6),
   DOM_MUN_NOM          character varying(64),
   DOM_CODI_POSTAL      character varying(10),
   DOM_PRV_CODI         character varying(2),

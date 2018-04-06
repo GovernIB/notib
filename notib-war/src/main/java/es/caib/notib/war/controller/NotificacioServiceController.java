@@ -4,8 +4,6 @@
 package es.caib.notib.war.controller;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +23,11 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 
+import es.caib.notib.core.api.exception.SistemaExternException;
+import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.ws.notificacio.AltaResposta;
 import es.caib.notib.core.api.ws.notificacio.InformacioEnviament;
+import es.caib.notib.core.api.ws.notificacio.InformacioResposta;
 import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWs;
 import es.caib.notib.war.validation.RestPreconditions;
@@ -56,13 +58,31 @@ public class NotificacioServiceController extends BaseController {
 	@ApiOperation(
 			value = "Genera una notificació", 
 			notes = "Retorna una llista amb els codis dels enviaments creats")
-	public @ResponseBody List<String> alta(
+	public @ResponseBody AltaResposta alta(
 			@ApiParam(name="notificacio", value="Objecte amb les dades necessàries per a generar una notificació", required=true) 
 			@RequestBody Notificacio notificacio,
-			HttpServletResponse response) throws GeneralSecurityException, IOException {
-		RestPreconditions.checkNotNull(notificacio);
-		List<String> resposta = notificacioServiceWs.alta(
-				notificacio);
+			HttpServletResponse response) throws IOException {
+		AltaResposta resposta = new AltaResposta();
+		List<String> referencies = null;
+		try {
+			RestPreconditions.checkNotNull(notificacio);
+			referencies = notificacioServiceWs.alta(notificacio);
+			resposta.setCodiResposta("OK");
+			resposta.setReferencies(referencies);
+		} catch (Exception e) {
+			if (isExceptionOrCauseInstanceOf(e, ValidationException.class)) {
+				ValidationException ve = (ValidationException)geExceptionOrCauseInstanceOf(e, ValidationException.class);
+				resposta.setCodiResposta(ve.getObjectId().toString());
+				resposta.setDescripcioResposta(e.getMessage());
+			} else if (isExceptionOrCauseInstanceOf(e, SistemaExternException.class)) {
+				SistemaExternException se = (SistemaExternException)geExceptionOrCauseInstanceOf(e, SistemaExternException.class);
+				resposta.setCodiResposta(se.getSistemaExternCodi());
+				resposta.setDescripcioResposta(se.getMessage());
+			} else {
+				resposta.setCodiResposta("KO");
+				resposta.setDescripcioResposta(e.getMessage());
+			}
+		}
 		return resposta;
 	}
 
@@ -73,17 +93,35 @@ public class NotificacioServiceController extends BaseController {
 	@ApiOperation(
 			value = "Consulta una notificació",
 			response = Notificacio.class)
-	public @ResponseBody InformacioEnviament consulta(
+	public @ResponseBody InformacioResposta consulta(
 			@ApiParam(name="referencia", value="Referència de la notificació a consultar", required=true)
 			@PathVariable("referencia")
 			String referencia,
-			HttpServletResponse response) throws UnsupportedEncodingException, IOException {
-		RestPreconditions.checkNotNull(referencia);
-		InformacioEnviament informacio = notificacioServiceWs.consulta(referencia);
-		if (informacio == null) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			HttpServletResponse response) throws IOException {
+		
+		InformacioResposta resposta = new InformacioResposta();
+		try {
+			RestPreconditions.checkNotNull(referencia);
+			InformacioEnviament informacio = notificacioServiceWs.consulta(referencia);
+			resposta.setCodiResposta("OK");
+			resposta.setInformacioEnviament(informacio);
+		} catch (Exception e) {
+			if (isExceptionOrCauseInstanceOf(e, ValidationException.class)) {
+				ValidationException ve = (ValidationException)geExceptionOrCauseInstanceOf(e, ValidationException.class);
+				resposta.setCodiResposta(ve.getObjectId().toString());
+				resposta.setDescripcioResposta(e.getMessage());
+			} else if (isExceptionOrCauseInstanceOf(e, SistemaExternException.class)) {
+				SistemaExternException se = (SistemaExternException)geExceptionOrCauseInstanceOf(e, SistemaExternException.class);
+				resposta.setCodiResposta(se.getSistemaExternCodi());
+				resposta.setDescripcioResposta(se.getMessage());
+			} else {
+				resposta.setCodiResposta("KO");
+				resposta.setDescripcioResposta(e.getMessage());
+			}
+			resposta.setCodiResposta("KO");
+			resposta.setDescripcioResposta(e.getMessage());
 		}
-		return informacio;
+		return resposta;
 	}
 
 	/*@RequestMapping(
@@ -124,4 +162,39 @@ public class NotificacioServiceController extends BaseController {
 		return certificacio;
 	}*/
 
+	private boolean isExceptionOrCauseInstanceOf(Exception e, Class<? extends Exception> exceptionClass) {
+		boolean isException = exceptionClass.isInstance(e);
+		 
+		if (!isException && e.getCause() != null) {
+			Throwable t = e.getCause();
+			isException = exceptionClass.isInstance(t);
+			if (!isException && t.getCause() != null) { // && t.getClass().getName().equals("javax.trasaction.RollbackException")) {
+				isException = exceptionClass.isInstance(t.getCause());
+			}
+		}
+		
+		return isException;
+	}
+	
+	private Throwable geExceptionOrCauseInstanceOf(Exception e, Class<? extends Exception> exceptionClass) {
+		
+		if (exceptionClass.isInstance(e)) {
+			return e;
+		}else{		 
+			if (e.getCause() != null) {
+				Throwable t = e.getCause();
+				if (exceptionClass.isInstance(t)) {
+					return t;
+				}else{
+					if (t.getCause() != null) {
+						if (exceptionClass.isInstance(t.getCause())) {
+							return t.getCause();
+						}
+					}
+				}
+			}
+		}
+		
+		return null;
+	}
 }

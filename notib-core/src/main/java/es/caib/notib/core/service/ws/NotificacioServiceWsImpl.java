@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.jws.WebService;
-import javax.validation.ValidationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +25,7 @@ import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
+import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.ws.notificacio.Certificacio;
 import es.caib.notib.core.api.ws.notificacio.Document;
 import es.caib.notib.core.api.ws.notificacio.EntregaDeh;
@@ -89,18 +89,31 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			Notificacio notificacio) throws NotificacioServiceWsException {
 		String emisorDir3Codi = notificacio.getEmisorDir3Codi();
 		if (emisorDir3Codi == null) {
-			// TODO Error de validació
-			throw new ValidationException("El camp 'emisorDir3Codi' no pot ser null.");
+			throw new ValidationException(
+					"EMISOR", 
+					"El camp 'emisorDir3Codi' no pot ser null.");
 		}
 		EntitatEntity entitat = entitatRepository.findByDir3Codi(emisorDir3Codi);
 		if (entitat == null) {
-			// TODO Error de validació
-			throw new ValidationException("No s'ha trobat cap entitat configurada a Notib amb el codi Dir3 " + emisorDir3Codi + ". (emisorDir3Codi)");
+			throw new ValidationException(
+					"ENTITAT", 
+					"No s'ha trobat cap entitat configurada a Notib amb el codi Dir3 " + emisorDir3Codi + ". (emisorDir3Codi)");
+		}
+		if (notificacio.getConcepte() == null) {
+			throw new ValidationException(
+					"CONCEPTE", 
+					"El concepte de la notificació no pot ser null.");
+		}
+		if (notificacio.getEnviamentTipus() == null) {
+			throw new ValidationException(
+					"ENVIAMENT_TIPUS", 
+					"El tipus d'enviament de la notificació no pot ser null.");
 		}
 		Document document = notificacio.getDocument();
 		if (document == null) {
-			// TODO Error de validació
-			throw new ValidationException("El camp 'document' no pot ser null.");
+			throw new ValidationException(
+					"DOCUMENT",
+					"El camp 'document' no pot ser null.");
 		}
 		String documentGesdocId = pluginHelper.gestioDocumentalCreate(
 				PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
@@ -172,7 +185,9 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			Persona titular = enviament.getTitular();
 			if (titular == null) {
 				// TODO Error de validació
-				throw new ValidationException("El camp 'titular' no pot ser null.");
+				throw new ValidationException(
+						"TITULAR",
+						"El camp 'titular' no pot ser null.");
 			}
 			NotificaServeiTipusEnumDto serveiTipus = null;
 			if (enviament.getServeiTipus() != null) {
@@ -198,6 +213,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				if (enviament.getDestinataris().size() != 1) {
 					// TODO Error de validació
 					throw new ValidationException(
+							"DESTINATARI",
 							"Únicament es pot indicar un destinatari");
 				}
 				Persona destinatari = enviament.getDestinataris().get(0);
@@ -231,6 +247,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 					tipus = NotificaDomiciliTipusEnumDto.CONCRETO;
 				} else {
 					throw new ValidationException(
+							"ENTREGA_POSTAL",
 							"L'entrega postal te el camp tipus buit");
 				}
 				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
@@ -310,7 +327,9 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 		InformacioEnviament informacioEnviament = new InformacioEnviament();
 		if (enviament == null) {
 			// Error de no trobat
-			throw new ValidationException("Error: No s'ha trobat cap notificació amb la referencia " + referencia);
+			throw new ValidationException(
+					"REFERENCIA",
+					"Error: No s'ha trobat cap notificació amb la referencia " + referencia);
 		} else {
 			// Si Notib no utilitza el servei Adviser de @Notifica, i ja ha estat enviat a @Notifica
 			// serà necessari consultar l'estat de la notificació a Notifica
@@ -319,6 +338,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				notificaHelper.refrescarEstat(enviament);
 			}
 			NotificacioEntity notificacio = enviament.getNotificacio();
+			informacioEnviament.setIdentificador(enviament.getNotificaIdentificador());
 			informacioEnviament.setConcepte(notificacio.getConcepte());
 			informacioEnviament.setDescripcio(notificacio.getDescripcio());
 			informacioEnviament.setEmisorDir3Codi(notificacio.getEmisorDir3Codi());

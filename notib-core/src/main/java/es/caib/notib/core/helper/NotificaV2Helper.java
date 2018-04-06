@@ -3,21 +3,41 @@
  */
 package es.caib.notib.core.helper;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
+import javax.activation.DataHandler;
 import javax.ejb.CreateException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
+import javax.xml.soap.AttachmentPart;
+import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPBodyElement;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPFactory;
+import javax.xml.soap.SOAPHeader;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPHandler;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.commons.codec.binary.Base64;
@@ -27,6 +47,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.sun.jersey.core.impl.provider.entity.DataSourceProvider.ByteArrayDataSource;
 
 import es.caib.notib.core.api.dto.NotificaRespostaDatatDto.NotificaRespostaDatatEventDto;
 import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
@@ -40,25 +62,25 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.wsdl.notificav2.AltaRemesaEnvios;
-import es.caib.notib.core.wsdl.notificav2.Certificacion;
-import es.caib.notib.core.wsdl.notificav2.Datado;
-import es.caib.notib.core.wsdl.notificav2.Destinatarios2;
-import es.caib.notib.core.wsdl.notificav2.Documento2;
-import es.caib.notib.core.wsdl.notificav2.EntregaDEH2;
-import es.caib.notib.core.wsdl.notificav2.EntregaPostal2;
-import es.caib.notib.core.wsdl.notificav2.Envio;
-import es.caib.notib.core.wsdl.notificav2.Envios;
-import es.caib.notib.core.wsdl.notificav2.InfoEnvioV2;
-import es.caib.notib.core.wsdl.notificav2.NotificaWsV2PortType;
-import es.caib.notib.core.wsdl.notificav2.Opcion2;
-import es.caib.notib.core.wsdl.notificav2.Opciones2;
-import es.caib.notib.core.wsdl.notificav2.OrganismoPagadorCIE2;
-import es.caib.notib.core.wsdl.notificav2.OrganismoPagadorPostal2;
-import es.caib.notib.core.wsdl.notificav2.Persona2;
-import es.caib.notib.core.wsdl.notificav2.ResultadoAltaRemesaEnvios;
-import es.caib.notib.core.wsdl.notificav2.ResultadoEnvio;
-import es.caib.notib.core.wsdl.notificav2.ResultadoInfoEnvioV2;
+import es.caib.notib.core.wsdl.notificaV2.NotificaWsV2PortType;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.AltaRemesaEnvios;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Destinatarios;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Documento;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.EntregaDEH;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.EntregaPostal;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Envio;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Envios;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Opcion;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Opciones;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorCIE;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorPostal;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Persona;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Certificacion;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Datado;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.InfoEnvioV2;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
 
 /**
  * Helper per a interactuar amb la versió 2 del servei web de Notific@.
@@ -77,33 +99,86 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private PluginHelper pluginHelper;
 
 
-
-	@Transactional
-	public boolean enviament(
-			Long notificacioId) {
-		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
+	public ResultadoAltaRemesaEnvios enviaNotificacio(
+			NotificacioEntity notificacio) throws Exception {
+		
+		ResultadoAltaRemesaEnvios resultat = null;
+		
 		if (!NotificacioEstatEnumDto.PENDENT.equals(notificacio.getEstat())) {
 			throw new ValidationException(
-					notificacioId,
+					notificacio.getId(),
 					NotificacioEntity.class,
 					"La notificació no te l'estat " + NotificacioEstatEnumDto.PENDENT);
 		}
+		
 		try {
 			AltaRemesaEnvios altaRemesaEnvios = generarAltaRemesaEnvios(notificacio);
-			ResultadoAltaRemesaEnvios resultadoAlta = getNotificaWs().altaRemesaEnvios(
-					altaRemesaEnvios);
+			resultat = getNotificaWs().altaRemesaEnvios(altaRemesaEnvios);
+		} catch (SOAPFaultException sfe) {
+			String codiResposta = sfe.getFault().getFaultCode();
+			String descripcioResposta = sfe.getFault().getFaultString();
+			
+			resultat = new ResultadoAltaRemesaEnvios();
+			resultat.setCodigoRespuesta(codiResposta);
+			resultat.setDescripcionRespuesta(descripcioResposta);
+		}
+		
+		return resultat;
+	}
+	
+	@Transactional(noRollbackFor=SOAPFaultException.class)
+	public boolean enviament(
+			Long notificacioId) {
+		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
+//		if (!NotificacioEstatEnumDto.PENDENT.equals(notificacio.getEstat())) {
+//			throw new ValidationException(
+//					notificacioId,
+//					NotificacioEntity.class,
+//					"La notificació no te l'estat " + NotificacioEstatEnumDto.PENDENT);
+//		}
+//		try {
+//			AltaRemesaEnvios altaRemesaEnvios = generarAltaRemesaEnvios(notificacio);
+//			
+////			Holder<String> codigoRespuesta = new Holder<String>();
+////	        Holder<String> descripcionRespuesta = new Holder<String>();
+////	        Holder<XMLGregorianCalendar> fechaCreacion = new Holder<XMLGregorianCalendar>();
+////			Holder<ResultadoEnvios> resultadoEnvios = new Holder<ResultadoEnvios>();
+//			
+//			ResultadoAltaRemesaEnvios resultadoAlta = getNotificaWs(
+////					notificacio.getDocumentArxiuId(),
+////					MimeTypeHelper.getContentTypeByFileName(notificacio.getDocumentArxiuNom())
+//			).altaRemesaEnvios(
+////					new Holder<String>(altaRemesaEnvios.getCodigoOrganismoEmisor()), 
+////					altaRemesaEnvios.getTipoEnvio(), 
+////					altaRemesaEnvios.getConcepto(), 
+////					altaRemesaEnvios.getDescripcion(), 
+////					altaRemesaEnvios.getFechaEnvioProgramado(), 
+////					altaRemesaEnvios.getProcedimiento(), 
+////					altaRemesaEnvios.getDocumento(), 
+////					altaRemesaEnvios.getEnvios(), 
+////					altaRemesaEnvios.getOpcionesRemesa(), 
+////					codigoRespuesta, 
+////					descripcionRespuesta, 
+////					fechaCreacion, 
+////					resultadoEnvios);
+//					altaRemesaEnvios);
+		try {
+			ResultadoAltaRemesaEnvios resultadoAlta = enviaNotificacio(notificacio);
+			
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
+				int i = 0;
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
-					for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
-						if (enviament.getNotificaReferencia().equals(resultadoEnvio.getIdentificador())) {
-							enviament.updateNotificaIdentificador(
-									resultadoEnvio.getIdentificador());
-							enviament.updateNotificaEstat(
-									new Date(),
-									NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA,
-									true);
-						}
-					}
+					NotificacioEnviamentEntity enviament = notificacio.getEnviaments().get(i++);
+//					for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+//						if (enviament.getNotificaReferencia().equals(resultadoEnvio.getIdentificador())) {
+					enviament.updateNotificaIdentificador(
+							resultadoEnvio.getIdentificador());
+					enviament.updateNotificaEstat(
+							new Date(),
+							NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA,
+							true);
+//						}
+//					}
 				}
 				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
@@ -126,7 +201,28 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						event);
 				notificacio.updateEventAfegir(event);
 				notificacioEventRepository.save(event);
+				for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+					enviament.updateNotificaError(true, event);
+				}
 			}
+//		} catch (SOAPFaultException sfe) {
+//			logger.error(
+//					"Error al donar d'alta la notificació a Notific@ (notificacioId=" + notificacioId + ")",
+//					sfe);
+//			String codiResposta = sfe.getFault().getFaultCode();
+//			String descripcioResposta = sfe.getFault().getFaultString();
+//			
+//			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+//					NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
+//					notificacio).
+//					error(true).
+//					errorDescripcio("Error retornat per notifica: [" + codiResposta + "] " + descripcioResposta).
+//					build();
+//			notificacio.updateErrorNotifica(
+//					true,
+//					event);
+//			notificacio.updateEventAfegir(event);
+//			notificacioEventRepository.save(event);
 		} catch (Exception ex) {
 			logger.error(
 					"Error al donar d'alta la notificació a Notific@ (notificacioId=" + notificacioId + ")",
@@ -148,10 +244,35 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					true,
 					event);
 			notificacioEventRepository.save(event);
+			for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+				enviament.updateNotificaError(true, event);
+			}
 		}
 		return NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat());
 	}
 
+	public ResultadoInfoEnvioV2 infoEnviament(
+			NotificacioEnviamentEntity enviament) throws Exception {
+		
+		ResultadoInfoEnvioV2 resultat = null;
+		
+//		NotificacioEntity notificacio = enviament.getNotificacio();
+		
+		try {
+			InfoEnvioV2 infoEnvio = new InfoEnvioV2();
+			infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
+			resultat = getNotificaWs().infoEnvioV2(infoEnvio);
+		} catch (SOAPFaultException sfe) {
+			String codiResposta = sfe.getFault().getFaultCode();
+			String descripcioResposta = sfe.getFault().getFaultString();
+			
+			resultat = new ResultadoInfoEnvioV2();
+			resultat.setConcepto(codiResposta);
+			resultat.setDescripcion(descripcioResposta);
+		}
+		return resultat;
+	}
+	
 	public NotificaRespostaEstatDto refrescarEstat(
 			NotificacioEnviamentEntity enviament) throws SistemaExternException {
 		NotificacioEntity notificacio = enviament.getNotificacio();
@@ -162,7 +283,52 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		try {
 			InfoEnvioV2 infoEnvio = new InfoEnvioV2();
 			infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
-			resultadoInfoEnvio = getNotificaWs().infoEnvioV2(infoEnvio);
+			
+//	        Holder<String> identificador = new Holder<String>();
+//	        Holder<String> estado = new Holder<String>();
+//	        Holder<String> concepto = new Holder<String>();
+//	        Holder<String> descripcion = new Holder<String>();
+//	        Holder<CodigoDIR> codigoOrganismoEmisor = new Holder<CodigoDIR>();
+//	        Holder<CodigoDIR> codigoOrganismoEmisorRaiz = new Holder<CodigoDIR>();
+//	        Holder<String> tipoEnvio = new Holder<String>();
+//	        Holder<XMLGregorianCalendar> fechaCreacion = new Holder<XMLGregorianCalendar>();
+//	        Holder<XMLGregorianCalendar> fechaPuestaDisposicion = new Holder<XMLGregorianCalendar>();
+//	        Holder<XMLGregorianCalendar> fechaCaducidad = new Holder<XMLGregorianCalendar>();
+//	        Holder<BigInteger> retardo = new Holder<BigInteger>();
+//	        Holder<Procedimiento> procedimiento = new Holder<Procedimiento>();
+//	        Holder<Documento> documento = new Holder<Documento>();
+//	        Holder<String> referenciaEmisor = new Holder<String>();
+//	        Holder<Persona> titular = new Holder<Persona>();
+//	        Holder<Destinatarios> destinatarios = new Holder<Destinatarios>();
+//	        Holder<EntregaPostal> entregaPostal = new Holder<EntregaPostal>();
+//	        Holder<EntregaDEH> entregaDEH = new Holder<EntregaDEH>();
+//	        Holder<Datados> datados = new Holder<Datados>();
+//	        Holder<Certificacion> certificacion = new Holder<Certificacion>();
+//	        Holder<Opciones> opcionesEnvio = new Holder<Opciones>();
+	        
+			resultadoInfoEnvio = getNotificaWs().infoEnvioV2(
+//					identificador, 
+//					estado, 
+//					concepto, 
+//					descripcion, 
+//					codigoOrganismoEmisor, 
+//					codigoOrganismoEmisorRaiz, 
+//					tipoEnvio, 
+//					fechaCreacion, 
+//					fechaPuestaDisposicion, 
+//					fechaCaducidad, 
+//					retardo, 
+//					procedimiento, 
+//					documento, 
+//					referenciaEmisor, 
+//					titular, 
+//					destinatarios, 
+//					entregaPostal, 
+//					entregaDEH, 
+//					datados, 
+//					certificacion, 
+//					opcionesEnvio);
+					infoEnvio);
 			NotificaRespostaEstatDto resposta = new NotificaRespostaEstatDto();
 			if (resultadoInfoEnvio.getDatados() != null) {
 				Datado datatDarrer = null;
@@ -210,34 +376,37 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						"La resposta rebuda de Notific@ no conté informació de datat");
 			}
 			if (resultadoInfoEnvio.getCertificacion() != null) {
-				Certificacion certificacion = resultadoInfoEnvio.getCertificacion();
-				byte[] decodificat = Base64.decodeBase64(certificacion.getContenido());
+				Certificacion certificacio = resultadoInfoEnvio.getCertificacion();
+				byte[] decodificat = Base64.decodeBase64(certificacio.getContenidoCertificacion());
+//				byte[] decodificat = Base64.decodeBase64(certificacio.getContenidoCertificacion().getValue());
+				
 				String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
 						PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
+//						certificacio.getContenidoCertificacion().getHref().getInputStream());
 						new ByteArrayInputStream(decodificat));
 				enviament.updateNotificaCertificacio(
-						toDate(certificacion.getFechaCertificacion()),
+						toDate(certificacio.getFechaCertificacion()),
 						gestioDocumentalId,
-						certificacion.getHash(),
-						certificacion.getOrigen(),
-						certificacion.getMetadatos(),
-						certificacion.getCsv(),
-						certificacion.getMime(),
-						Integer.parseInt(certificacion.getSize()),
+						certificacio.getHash(),
+						certificacio.getOrigen(),
+						certificacio.getMetadatos(),
+						certificacio.getCsv(),
+						certificacio.getMime(),
+						Integer.parseInt(certificacio.getSize()),
 						null,
 						null,
 						null);
 				resposta.setCertificacioDisponible(true);
 				resposta.setCertificacioContingut(null);
-				resposta.setCertificacioHash(certificacion.getHash());
-				resposta.setCertificacioCsv(certificacion.getCsv());
+				resposta.setCertificacioHash(certificacio.getHash());
+				resposta.setCertificacioCsv(certificacio.getCsv());
 				resposta.setCertificacioTamany(
-						new Integer(certificacion.getSize()));
+						new Integer(certificacio.getSize()));
 				resposta.setCertificacioData(
-						toDate(certificacion.getFechaCertificacion()));
-				resposta.setCertificacioOrigen(certificacion.getOrigen());
-				resposta.setCertificacioMetadades(certificacion.getMetadatos());
-				resposta.setCertificacioTipusMime(certificacion.getMime());
+						toDate(certificacio.getFechaCertificacion()));
+				resposta.setCertificacioOrigen(certificacio.getOrigen());
+				resposta.setCertificacioMetadades(certificacio.getMetadatos());
+				resposta.setCertificacioTipusMime(certificacio.getMime());
 			}
 			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
 					NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
@@ -285,23 +454,47 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		envios.setDescripcion(notificacio.getDescripcio());
 		envios.setProcedimiento(
 				notificacio.getProcedimentCodiSia());
-		Documento2 documento = new Documento2();
+		Documento documento = new Documento();
+		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		pluginHelper.gestioDocumentalGet(
 				notificacio.getDocumentArxiuId(),
 				PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 				baos);
-		documento.setContenido(Base64.encodeBase64(baos.toByteArray()));
+		
+		documento.setContenido(baos.toByteArray());
+//		documento.setContenido(Base64.encodeBase64(baos.toByteArray()));
+//		byte[] bDoc = baos.toByteArray();
+////		InputStream bais = new ByteArrayInputStream(bDoc);
+//		InputStream bais = new BufferedInputStream(new ByteArrayInputStream(bDoc));
+//		Contenido2 contenido = new Contenido2();
+//		DataHandler dataHandler = null;
+//		String fileType = MimeTypeHelper.getContentTypeByFileName(notificacio.getDocumentArxiuNom());
+//		try {
+//			ByteArrayDataSource bads = new ByteArrayDataSource(bais, fileType);
+//			bads.setName(notificacio.getDocumentArxiuNom());
+//			dataHandler = new DataHandler(bads);
+////			dataHandler = new DataHandler(new FileDataSource(new File("/home/siona/git/notib/notib-client/src/test/resources/es/caib/notib/client/notificacio_adjunt.pdf")));
+//		} catch (IOException ex) {
+////			ex.printStackTrace();
+//			throw new SistemaExternException(
+//					"NOTIFICA",
+//					"Error al generar el document a enviar a Notific@",
+//					ex);
+//		}
+//		contenido.setHref(dataHandler);
+//		contenido.setValue(notificacio.getDocumentArxiuNom());
+//		documento.setContenido(contenido);
 		documento.setHash(notificacio.getDocumentHash());
 		//documento.setEnlaceDocumento(value);
 		//documento.setMetadatos(value);
-		Opciones2 opcionesDocumento = new Opciones2();
-		Opcion2 opcionNormalizado = new Opcion2();
+		Opciones opcionesDocumento = new Opciones();
+		Opcion opcionNormalizado = new Opcion();
 		opcionNormalizado.setTipo("normalizado");
 		opcionNormalizado.setValue(
 				notificacio.isDocumentNormalitzat() ? "si" : "no"); // si o no
 		opcionesDocumento.getOpcion().add(opcionNormalizado);
-		Opcion2 opcionGenerarCsv = new Opcion2();
+		Opcion opcionGenerarCsv = new Opcion();
 		opcionGenerarCsv.setTipo("generarCsv");
 		opcionGenerarCsv.setValue(
 				notificacio.isDocumentGenerarCsv() ? "si" : "no"); // si o no
@@ -309,16 +502,16 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		documento.setOpcionesDocumento(opcionesDocumento);
 		envios.setDocumento(documento);
 		envios.setEnvios(generarEnvios(notificacio));
-		Opciones2 opcionesRemesa = new Opciones2();
+		Opciones opcionesRemesa = new Opciones();
 		if (notificacio.getRetardPostal() != null) {
-			Opcion2 opcionRetardo = new Opcion2();
+			Opcion opcionRetardo = new Opcion();
 			opcionRetardo.setTipo("retardo");
 			opcionRetardo.setValue(
 					notificacio.getRetardPostal().toString()); // número de días
 			opcionesRemesa.getOpcion().add(opcionRetardo);
 		}
 		if (notificacio.getCaducitat() != null) {
-			Opcion2 opcionCaducidad = new Opcion2();
+			Opcion opcionCaducidad = new Opcion();
 			opcionCaducidad.setTipo("caducidad");
 			SimpleDateFormat sdfCaducitat = new SimpleDateFormat("yyyy-MM-dd");
 			opcionCaducidad.setValue(
@@ -328,6 +521,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		envios.setOpcionesRemesa(opcionesRemesa);
 		return envios;
 	}
+	
 
 	private Envios generarEnvios(
 			NotificacioEntity notificacio) throws DatatypeConfigurationException {
@@ -335,7 +529,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
 			Envio envio = new Envio();
 			envio.setReferenciaEmisor(enviament.getNotificaReferencia());
-			Persona2 titular = new Persona2();
+			Persona titular = new Persona();
 			titular.setNif(enviament.getTitularNif());
 			titular.setNombre(enviament.getTitularNom());
 			titular.setApellidos(
@@ -347,8 +541,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			titular.setRazonSocial(enviament.getTitularRaoSocial());
 			titular.setCodigoDestino(enviament.getTitularCodiDesti());
 			envio.setTitular(titular);
-			Destinatarios2 destinatarios = new Destinatarios2();
-			Persona2 destinatario = new Persona2();
+			Destinatarios destinatarios = new Destinatarios();
+			Persona destinatario = new Persona();
 			destinatario.setNif(enviament.getDestinatariNif());
 			destinatario.setNombre(enviament.getDestinatariNom());
 			destinatario.setApellidos(
@@ -362,15 +556,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			destinatarios.getDestinatario().add(destinatario);
 			envio.setDestinatarios(destinatarios);
 			if (enviament.getDomiciliConcretTipus() != null) {
-				EntregaPostal2 entregaPostal = new EntregaPostal2();
-				OrganismoPagadorPostal2 pagadorPostal = new OrganismoPagadorPostal2();
+				EntregaPostal entregaPostal = new EntregaPostal();
+				OrganismoPagadorPostal pagadorPostal = new OrganismoPagadorPostal();
 				pagadorPostal.setCodigoDIR3Postal(notificacio.getPagadorCorreusCodiDir3());
 				pagadorPostal.setCodClienteFacturacionPostal(notificacio.getPagadorCorreusCodiClientFacturacio());
 				pagadorPostal.setNumContratoPostal(notificacio.getPagadorCorreusContracteNum());
 				pagadorPostal.setFechaVigenciaPostal(
 						toXmlGregorianCalendar(notificacio.getPagadorCieDataVigencia()));
 				entregaPostal.setOrganismoPagadorPostal(pagadorPostal);
-				OrganismoPagadorCIE2 pagadorCie = new OrganismoPagadorCIE2();
+				OrganismoPagadorCIE pagadorCie = new OrganismoPagadorCIE();
 				pagadorCie.setCodigoDIR3CIE(notificacio.getPagadorCieCodiDir3());
 				pagadorCie.setFechaVigenciaCIE(
 						toXmlGregorianCalendar(notificacio.getPagadorCieDataVigencia()));
@@ -411,21 +605,21 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				entregaPostal.setPoblacion(enviament.getDomiciliPoblacio());
 				entregaPostal.setLinea1(enviament.getDomiciliLinea1());
 				entregaPostal.setLinea2(enviament.getDomiciliLinea2());
-				Opciones2 opcionesCie = new Opciones2();
+				Opciones opcionesCie = new Opciones();
 				if (enviament.getDomiciliCie() != null) {
-					Opcion2 opcionCie = new Opcion2();
+					Opcion opcionCie = new Opcion();
 					opcionCie.setTipo("cie");
 					opcionCie.setValue(enviament.getDomiciliCie().toString()); // identificador CIE
 					opcionesCie.getOpcion().add(opcionCie);
 				}
 				if (enviament.getFormatSobre() != null) {
-					Opcion2 opcionFormatoSobre = new Opcion2();
+					Opcion opcionFormatoSobre = new Opcion();
 					opcionFormatoSobre.setTipo("formatoSobre");
 					opcionFormatoSobre.setValue(enviament.getFormatSobre()); // americano, C5...
 					opcionesCie.getOpcion().add(opcionFormatoSobre);
 				}
 				if (enviament.getFormatFulla() != null) {
-					Opcion2 opcionFormatoHoja = new Opcion2();
+					Opcion opcionFormatoHoja = new Opcion();
 					opcionFormatoHoja.setTipo("formatoHoja");
 					opcionFormatoHoja.setValue(enviament.getFormatFulla()); // A4, A5...
 					opcionesCie.getOpcion().add(opcionFormatoHoja);
@@ -434,7 +628,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				envio.setEntregaPostal(entregaPostal);
 			}
 			if (enviament.getDehObligat() != null) {
-				EntregaDEH2 entregaDeh = new EntregaDEH2();
+				EntregaDEH entregaDeh = new EntregaDEH();
 				entregaDeh.setObligado(enviament.getDehObligat());
 				entregaDeh.setCodigoProcedimiento(
 						enviament.getDehProcedimentCodi());
@@ -445,9 +639,14 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return envios;
 	}
 
+//	private NotificaWsV2PortType getNotificaWs() throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
+//		return getNotificaWs(null, null);
+//	}
+
 	private NotificaWsV2PortType getNotificaWs() throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
+//			String documentId, String fileType
 		NotificaWsV2PortType port = new WsClientHelper<NotificaWsV2PortType>().generarClientWs(
-				getClass().getResource("/es/caib/notib/core/wsdl/NotificaWsV2.wsdl"),
+				getClass().getResource("/es/caib/notib/core/wsdl/NotificaWsV21.wsdl"),
 				getUrlProperty(),
 				new QName(
 						"https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/", 
@@ -455,15 +654,144 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				getUsernameProperty(),
 				getPasswordProperty(),
 				NotificaWsV2PortType.class,
-				new ApiKeySOAPHandler(getApiKeyProperty()),
-				/*new FirmaSOAPHandler(
-						getKeystorePathProperty(),
-						getKeystoreTypeProperty(),
-						getKeystorePasswordProperty(),
-						getKeystoreCertAliasProperty(),
-						getKeystoreCertPasswordProperty()),*/
+				new ApiKeySOAPHandlerV2(getApiKeyProperty()),
+//				new ChunkedSOAPHandler("false"),
+//				new DocumentHandler(documentId, fileType),
 				new WsClientHelper.SOAPLoggingHandler(NotificaWsV2PortType.class));
 		return port;
+	}
+	
+	public class ApiKeySOAPHandlerV2 implements SOAPHandler<SOAPMessageContext> {
+		private final String apiKey;
+		public ApiKeySOAPHandlerV2(String apiKey) {
+			this.apiKey = apiKey;
+		}
+		@Override
+		public boolean handleMessage(SOAPMessageContext context) {
+			Boolean outboundProperty = (Boolean)context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+			if (outboundProperty.booleanValue()) {
+				
+				Map<String, List<String>> requestHeaders = (Map<String, List<String>>) context.get(MessageContext.HTTP_REQUEST_HEADERS);
+				if (requestHeaders == null) {
+	                requestHeaders = new HashMap<String, List<String>>();
+	                context.put(MessageContext.HTTP_REQUEST_HEADERS, requestHeaders);
+	            }
+//				requestHeaders.put(RequestMyService.MY_CONSTANT, Collections.singletonList(something));
+				
+				try {
+					SOAPEnvelope envelope = context.getMessage().getSOAPPart().getEnvelope();
+					SOAPFactory factory = SOAPFactory.newInstance();
+					SOAPElement apiKeyElement = factory.createElement(
+							new QName(
+									"https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/", 
+									"apiKey"));
+					apiKeyElement.addTextNode(apiKey);
+					SOAPHeader header = envelope.getHeader();
+					if (header == null)
+						header = envelope.addHeader();
+					header.addChildElement(apiKeyElement);
+					
+				} catch (SOAPException ex) {
+					logger.error(
+							"No s'ha pogut afegir l'API key a la petició SOAP per Notifica",
+							ex);
+	        	}
+	        }
+	        return true;
+	    }
+		@Override
+		public boolean handleFault(SOAPMessageContext context) {
+			return false;
+		}
+		@Override
+		public void close(MessageContext context) {
+		}
+		@Override
+		public Set<QName> getHeaders() {
+			return new TreeSet<QName>();
+		}
+	}
+	
+	public class DocumentHandler implements SOAPHandler<SOAPMessageContext> {
+		private final String documentId;
+		private final String fileType;
+		public DocumentHandler(String documentId, String fileType) {
+			this.documentId = documentId;
+			this.fileType = fileType;
+		}
+		@Override
+		public boolean handleMessage(SOAPMessageContext context) {
+			if (documentId != null) {
+				Boolean outboundProperty = (Boolean)context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+				if (outboundProperty.booleanValue()) {
+					
+					try {
+						SOAPEnvelope envelope = context.getMessage().getSOAPPart().getEnvelope();
+//						SOAPFactory factory = SOAPFactory.newInstance();
+//						SOAPElement apiKeyElement = factory.createElement(
+	//							new QName(
+	//									"https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/", 
+	//									"apiKey"));
+	//					apiKeyElement.addTextNode(apiKey);
+	//					SOAPHeader header = envelope.getHeader();
+	//					if (header == null)
+	//						header = envelope.addHeader();
+	//					header.addChildElement(apiKeyElement);
+						SOAPBody body = envelope.getBody();
+						SOAPBodyElement soapBodyElement = (SOAPBodyElement)body.getChildElements().next();
+						SOAPElement documentElement = (SOAPElement)soapBodyElement.getChildElements(
+								new QName(
+										"https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/altaRemesaEnvios",
+										"documento")).next();
+						SOAPElement contenido = (SOAPElement)documentElement.getChildElements(
+								new QName(
+										"https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/altaRemesaEnvios",
+										"contenido")).next();
+						
+						contenido.addAttribute(new QName("href"), "cid:" + documentId);
+						contenido.setValue("");
+						
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						pluginHelper.gestioDocumentalGet(
+								documentId,
+								PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
+								baos);
+	//					documento.setContenido(Base64.encodeBase64(baos.toByteArray()));
+						byte[] bDoc = baos.toByteArray();
+	//					InputStream bais = new ByteArrayInputStream(bDoc);
+						InputStream bais = new BufferedInputStream(new ByteArrayInputStream(bDoc));
+//						String fileType = MimeTypeHelper.getContentTypeByFileName(notificacio.getDocumentArxiuNom());
+						ByteArrayDataSource bads = new ByteArrayDataSource(bais, fileType);
+						bads.setName(documentId);
+						DataHandler dataHandler = new DataHandler(bads);
+	
+		                SOAPMessage objSOAPMessage = context.getMessage();
+		                AttachmentPart objAttachment = objSOAPMessage.createAttachmentPart(dataHandler);
+		                objAttachment.setContentId(documentId);
+		                objSOAPMessage.addAttachmentPart(objAttachment);
+		                context.setMessage(objSOAPMessage);
+		                objSOAPMessage.writeTo(System.out);
+						
+					} catch (Exception ex) {
+						logger.error(
+								"No s'ha pogut afegir el document a la petició SOAP per Notifica",
+								ex);
+		        	}
+		        }
+			}
+	        return true;
+	    }
+		@Override
+		public boolean handleFault(SOAPMessageContext context) {
+			return false;
+		}
+		@Override
+		public void close(MessageContext context) {
+		}
+		@Override
+		public Set<QName> getHeaders() {
+			return new TreeSet<QName>();
+		}
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(NotificaV2Helper.class);

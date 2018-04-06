@@ -3,11 +3,14 @@
  */
 package es.caib.notib.core.helper;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -16,6 +19,8 @@ import javax.management.InstanceNotFoundException;
 import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
 import javax.xml.namespace.QName;
+import javax.xml.soap.AttachmentPart;
+import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
@@ -23,6 +28,7 @@ import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
+import javax.xml.ws.soap.SOAPBinding;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +99,8 @@ public class WsClientHelper<T> {
 					BindingProvider.SOAPACTION_URI_PROPERTY,
 					soapAction);
 		}
+		SOAPBinding binding = (SOAPBinding) bindingProvider.getBinding();
+		binding.setMTOMEnabled(true);
 		return servicePort;
 	}
 
@@ -182,7 +190,26 @@ public class WsClientHelper<T> {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			try {
 				message.writeTo(baos);
-				sb.append(baos.toString());
+				String missatge = baos.toString();
+//				if (outboundProperty.booleanValue() && !missatge.startsWith("<env")) {
+//					missatge = missatge.substring(missatge.indexOf("<env"));
+//					InputStream is = new ByteArrayInputStream(missatge.getBytes());
+//					smc.setMessage(MessageFactory.newInstance().createMessage(null, is));
+//				}
+				sb.append(missatge);
+				Iterator attachments = smc.getMessage().getAttachments();
+                while (attachments.hasNext()) {
+                    AttachmentPart attachment = (AttachmentPart) attachments.next();
+                    sb.append("\n"
+                    		+ "### Start Attachment ###"
+                    		+ "Content type: " + attachment.getContentType() + "\n"
+                            + "Content-ID: " + attachment.getContentId() + "\n"
+                            + "Contingut: \n");
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                    attachment.getDataHandler().writeTo(bos);
+                    sb.append(new String(bos.toByteArray()));
+                    sb.append("### End Attachment ###");
+                }
 			} catch (Exception ex) {
 				sb.append("Error al imprimir el missatge XML: " + ex.getMessage());
 			}
