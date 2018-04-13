@@ -18,6 +18,10 @@ public class NotificaRespostaEstatDto extends NotificaRespostaDto {
 	private String estatCodi;
 	private String estatDescripcio;
 	private String numSeguiment;
+	private String errorDescripcio;
+	private String origen;
+	private String receptorNom;
+	private String receptorNif;
 	private boolean certificacioDisponible;
 	private String certificacioContingut;
 	private String certificacioHash;
@@ -51,6 +55,30 @@ public class NotificaRespostaEstatDto extends NotificaRespostaDto {
 	}
 	public void setNumSeguiment(String numSeguiment) {
 		this.numSeguiment = numSeguiment;
+	}
+	public String getErrorDescripcio() {
+		return errorDescripcio;
+	}
+	public void setErrorDescripcio(String errorDescripcio) {
+		this.errorDescripcio = errorDescripcio;
+	}
+	public String getOrigen() {
+		return origen;
+	}
+	public void setOrigen(String origen) {
+		this.origen = origen;
+	}
+	public String getReceptorNom() {
+		return receptorNom;
+	}
+	public void setReceptorNom(String receptorNom) {
+		this.receptorNom = receptorNom;
+	}
+	public String getReceptorNif() {
+		return receptorNif;
+	}
+	public void setReceptorNif(String receptorNif) {
+		this.receptorNif = receptorNif;
 	}
 	public boolean isCertificacioDisponible() {
 		return certificacioDisponible;

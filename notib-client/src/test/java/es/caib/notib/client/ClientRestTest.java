@@ -4,6 +4,7 @@
 package es.caib.notib.client;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.anyOf;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
@@ -33,6 +34,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import es.caib.loginModule.client.AuthenticationFailureException;
+import es.caib.notib.client.NotificacioRestClient;
+import es.caib.notib.client.NotificacioRestClientFactory;
 import es.caib.notib.ws.notificacio.Document;
 import es.caib.notib.ws.notificacio.EntregaDeh;
 import es.caib.notib.ws.notificacio.EntregaPostal;
@@ -67,31 +70,62 @@ public class ClientRestTest {
 	@Before
 	public void setUp() throws IOException, DecoderException {
 		client = NotificacioRestClientFactory.getRestClient(
-				"http://localhost:8080/notib",
-				"notibapp",
-				"notibapp");
+				"http://localhost:8180/notib",
+				"notapp",
+				"notapp");
 	}
 
 	@Test
 	public void test() throws InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, NotificacioServiceWsException_Exception, NamingException, CreateException, AuthenticationFailureException, IOException, DecoderException, DatatypeConfigurationException {
 		String notificacioId = new Long(System.currentTimeMillis()).toString();
-		List<String> referencies = client.alta(
+//		List<String> referencies = client.alta(
+//				generarNotificacio(
+//						notificacioId,
+//						1,
+//						true));
+//		assertNotNull(referencies);
+//		assertThat(
+//				referencies.size(),
+//				is(1));
+//		/*for (String referencia: referencies) {
+//			System.out.println(">>> Referencia enviament creat: " + referencia);
+//		}*/
+//		InformacioEnviament info = client.consulta(referencies.get(0));
+//		assertNotNull(info);
+//		assertThat(
+//				info.getEstat(),
+//				is(EnviamentEstatEnum.NOTIB_PENDENT));
+////		is(or(EnviamentEstatEnum.NOTIB_PENDENT, EnviamentEstatEnum.NOTIB_PENDENT)));
+		
+		AltaResposta respostaAlta = client.alta(
 				generarNotificacio(
 						notificacioId,
 						1,
 						true));
+		
+		assertThat(
+				respostaAlta.getCodiResposta(),
+				is("OK"));
+		assertNotNull(respostaAlta);
+		List<String> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(1));
-		/*for (String referencia: referencies) {
-			System.out.println(">>> Referencia enviament creat: " + referencia);
-		}*/
-		InformacioEnviament info = client.consulta(referencies.get(0));
+		
+		InformacioResposta respostaInfo = client.consulta(referencies.get(0));
+		assertNotNull(respostaInfo);
+		assertThat(
+				respostaInfo.getCodiResposta(),
+				is("OK"));
+		InformacioEnviament info = respostaInfo.getInformacioEnviament();
 		assertNotNull(info);
 		assertThat(
 				info.getEstat(),
-				is(EnviamentEstatEnum.NOTIB_PENDENT));
+				anyOf(
+						is(EnviamentEstatEnum.NOTIB_PENDENT), 
+						is(EnviamentEstatEnum.NOTIB_ENVIADA)) 
+				);
 	}
 
 
@@ -115,11 +149,19 @@ public class ClientRestTest {
 						new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000)));
 		Document document = new Document();
 		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
-		document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
+		
+		String arxiuB64 = Base64.encodeBase64String(arxiuBytes);
+		
+//		System.out.println("Hash: " + new String(DigestUtils.sha256(arxiuBytes)));
+//		System.out.println("Hash: " + new String(DigestUtils.sha256(arxiuB64)));
+//		System.out.println("Hash: " + Base64.encodeBase64String(DigestUtils.sha256(arxiuBytes)));
+//		System.out.println("Hash: " + Base64.encodeBase64String(DigestUtils.sha256(arxiuB64)));
+		
+		document.setContingutBase64(arxiuB64);
 		document.setHash(
 				Base64.encodeBase64String(
 						Hex.decodeHex(
-								DigestUtils.sha1Hex(arxiuBytes).toCharArray())));
+								DigestUtils.sha256Hex(arxiuBytes).toCharArray())));
 		document.setNormalitzat(false);
 		document.setGenerarCsv(false);
 		notificacio.setDocument(document);
@@ -173,7 +215,7 @@ public class ClientRestTest {
 				entregaPostal.setComplement("complement" + i);
 				entregaPostal.setCodiPostal("07500");
 				entregaPostal.setPoblacio("poblacio" + i);
-				entregaPostal.setMunicipiCodi("07033");
+				entregaPostal.setMunicipiCodi("070337");
 				entregaPostal.setProvinciaCodi("07");
 				entregaPostal.setPaisCodi("ES");
 				entregaPostal.setLinea1("linea1_" + i);

@@ -47,6 +47,10 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	private String titularLlinatge2;
 	@Column(name = "titular_nif", length = 9, nullable = false)
 	private String titularNif;
+	@Column(name = "titular_raosoc", length = 100)
+	private String titularRaoSocial;
+	@Column(name = "titular_coddes", length = 9)
+	private String titularCodiDesti;
 	@Column(name = "titular_telefon", length = 16)
 	private String titularTelefon;
 	@Column(name = "titular_email", length = 100)
@@ -59,6 +63,10 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	private String destinatariLlinatge2;
 	@Column(name = "destinatari_nif", length = 9)
 	private String destinatariNif;
+	@Column(name = "destinatari_raosoc", length = 100)
+	private String destinatariRaoSocial;
+	@Column(name = "destinatari_coddes", length = 9)
+	private String destinatariCodiDesti;
 	@Column(name = "destinatari_telefon", length = 16)
 	private String destinatariTelefon;
 	@Column(name = "destinatari_email", length = 100)
@@ -75,6 +83,8 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	private NotificaDomiciliNumeracioTipusEnumDto domiciliNumeracioTipus;
 	@Column(name = "dom_num_num", length = 10)
 	private String domiciliNumeracioNumero;
+	@Column(name = "dom_num_qualif", length = 3)
+	private String domiciliNumeracioQualificador;
 	@Column(name = "dom_num_puntkm", length = 10)
 	private String domiciliNumeracioPuntKm;
 	@Column(name = "dom_apartat", length = 10)
@@ -93,7 +103,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	private String domiciliComplement;
 	@Column(name = "dom_poblacio", length = 30)
 	private String domiciliPoblacio;
-	@Column(name = "dom_mun_codine", length = 5)
+	@Column(name = "dom_mun_codine", length = 6)
 	private String domiciliMunicipiCodiIne;
 	@Column(name = "dom_mun_nom", length = 64)
 	private String domiciliMunicipiNom;
@@ -121,11 +131,10 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	private String dehProcedimentCodi;
 	@Column(name = "servei_tipus")
 	private NotificaServeiTipusEnumDto serveiTipus;
-	@Column(name = "retard_postal")
-	private Integer retardPostal;
-	@Column(name = "caducitat")
-	@Temporal(TemporalType.DATE)
-	private Date caducitat;
+	@Column(name = "format_sobre", length = 10)
+	private String formatSobre;
+	@Column(name = "format_fulla", length = 10)
+	private String formatFulla;
 	@Column(name = "notifica_id", length = 20)
 	private String notificaIdentificador;
 	@Column(name = "notifica_ref", length = 20)
@@ -163,6 +172,8 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	private String notificaEstatReceptorNom;
 	@Column(name = "notifica_estat_numseg", length = 50)
 	private String notificaEstatNumSeguiment;
+	@Column(name = "notifica_estat_error", length = 255)
+	private String notificaEstatError;
 	@Column(name = "notifica_cer_arxiuid", length = 50)
 	private String notificaCertificacioArxiuId;
 	@Column(name = "notifica_cer_hash", length = 50)
@@ -237,6 +248,12 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public String getTitularNif() {
 		return titularNif;
 	}
+	public String getTitularRaoSocial() {
+		return titularRaoSocial;
+	}
+	public String getTitularCodiDesti() {
+		return titularCodiDesti;
+	}
 	public String getTitularTelefon() {
 		return titularTelefon;
 	}
@@ -254,6 +271,12 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 	public String getDestinatariNif() {
 		return destinatariNif;
+	}
+	public String getDestinatariRaoSocial() {
+		return destinatariRaoSocial;
+	}
+	public String getDestinatariCodiDesti() {
+		return destinatariCodiDesti;
 	}
 	public String getDestinatariTelefon() {
 		return destinatariTelefon;
@@ -278,6 +301,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 	public String getDomiciliNumeracioNumero() {
 		return domiciliNumeracioNumero;
+	}
+	public String getDomiciliNumeracioQualificador() {
+		return domiciliNumeracioQualificador;
 	}
 	public String getDomiciliNumeracioPuntKm() {
 		return domiciliNumeracioPuntKm;
@@ -348,11 +374,11 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public NotificaServeiTipusEnumDto getServeiTipus() {
 		return serveiTipus;
 	}
-	public Integer getRetardPostal() {
-		return retardPostal;
+	public String getFormatSobre() {
+		return formatSobre;
 	}
-	public Date getCaducitat() {
-		return caducitat;
+	public String getFormatFulla() {
+		return formatFulla;
 	}
 	public String getNotificaIdentificador() {
 		return notificaIdentificador;
@@ -525,6 +551,20 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaEstatReceptorNom = notificaEstatReceptorNom;
 		this.notificaEstatNumSeguiment = notificaEstatNumSeguiment;
 	}
+	public void updateNotificaInfo(
+			Date notificaEstatData,
+			NotificacioDestinatariEstatEnumDto notificaEstat,
+			String notificaEstatOrigen,
+			String notificaEstatReceptorNif,
+			String notificaEstatReceptorNom,
+			String notificaEstatError) {
+		this.notificaEstatData = notificaEstatData;
+		this.notificaEstat = notificaEstat;
+		this.notificaEstatOrigen = notificaEstatOrigen;
+		this.notificaEstatReceptorNif = notificaEstatReceptorNif;
+		this.notificaEstatReceptorNom = notificaEstatReceptorNom;
+		this.notificaEstatError = notificaEstatError;
+	}
 	public void updateNotificaCertificacio(
 			Date notificaCertificacioData,
 			String notificaCertificacioArxiuId,
@@ -626,6 +666,14 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built.titularLlinatge2 = titularLlinatge2;
 			return this;
 		}
+		public Builder titularRaoSocial(String titularRaoSocial) {
+			built.titularRaoSocial = titularRaoSocial;
+			return this;
+		}
+		public Builder titularCodiDesti(String titularCodiDesti) {
+			built.titularCodiDesti = titularCodiDesti;
+			return this;
+		}
 		public Builder titularTelefon(String titularTelefon) {
 			built.titularTelefon = titularTelefon;
 			return this;
@@ -648,6 +696,14 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		}
 		public Builder destinatariLlinatge2(String destinatariLlinatge2) {
 			built.destinatariLlinatge2 = destinatariLlinatge2;
+			return this;
+		}
+		public Builder destinatariRaoSocial(String destinatariRaoSocial) {
+			built.destinatariRaoSocial = destinatariRaoSocial;
+			return this;
+		}
+		public Builder destinatariCodiDesti(String destinatariCodiDesti) {
+			built.destinatariCodiDesti = destinatariCodiDesti;
 			return this;
 		}
 		public Builder destinatariTelefon(String destinatariTelefon) {
@@ -680,6 +736,10 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		}
 		public Builder domiciliNumeracioNumero(String domiciliNumeracioNumero) {
 			built.domiciliNumeracioNumero = domiciliNumeracioNumero;
+			return this;
+		}
+		public Builder domiciliNumeracioQualificador(String domiciliNumeracioQualificador) {
+			built.domiciliNumeracioQualificador = domiciliNumeracioQualificador;
 			return this;
 		}
 		public Builder domiciliNumeracioPuntKm(String domiciliNumeracioPuntKm) {
@@ -774,12 +834,12 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built.serveiTipus = serveiTipus;
 			return this;
 		}
-		public Builder retardPostal(Integer retardPostal) {
-			built.retardPostal = retardPostal;
+		public Builder formatSobre(String formatSobre) {
+			built.formatSobre = formatSobre;
 			return this;
 		}
-		public Builder caducitat(Date caducitat) {
-			built.caducitat = caducitat;
+		public Builder formatFulla(String formatFulla) {
+			built.formatFulla = formatFulla;
 			return this;
 		}
 		public NotificacioEnviamentEntity build() {

@@ -109,7 +109,7 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 		this.callbackEstat = estat;
 		this.callbackData = data;
 		this.callbackIntents = intents;
-		this.callbackError = error;
+		this.callbackError = StringUtils.abbreviate(error, ERROR_DESC_MAX_LENGTH);
 	}
 	
 	public static Builder getBuilder(

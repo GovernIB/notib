@@ -21,6 +21,10 @@
 			jndi-name="notib/NotificacioServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.NotificacioService"/>
 	<jee:local-slsb
+			id="callbackService"
+			jndi-name="notib/CallbackServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.CallbackService"/>
+	<jee:local-slsb
 			id="usuariAplicacioService"
 			jndi-name="notib/UsuariAplicacioServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.UsuariAplicacioService"/>

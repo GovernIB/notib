@@ -1,11 +1,13 @@
 package es.caib.notib.core.helper;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Date;
 
-import javax.annotation.Resource;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
@@ -13,15 +15,22 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.core.util.Base64;
 
+import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.ws.callback.CertificacioArxiuTipusEnum;
 import es.caib.notib.core.api.ws.callback.CertificacioTipusEnum;
 import es.caib.notib.core.api.ws.callback.NotificacioCertificacioClient;
+import es.caib.notib.core.api.ws.callback.NotificacioDestinatariEstatEnum;
 import es.caib.notib.core.api.ws.callback.NotificacioEstatClient;
 import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.NotificacioEventEntity.Builder;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
+import es.caib.notib.core.repository.NotificacioEventRepository;
 
 /** Classe per englobar la tasca de notificar l'estat o la certificació a l'aplicació
  * client a partir de la referència del destinatari de la notificació.
@@ -36,18 +45,87 @@ import es.caib.notib.core.repository.AplicacioRepository;
  */
 @Component
 public class CallbackHelper {
-	
+
 	private static final String NOTIFICACIO_ESTAT = "notificaEstat";
 	private static final String NOTIFICACIO_CERTIFICACIO = "notificaCertificacio";
-	
-	@Resource
+
+	@Autowired
 	private AplicacioRepository aplicacioRepository;
+	@Autowired
+	private NotificacioEventRepository notificacioEventRepository;
+
 	@Autowired
 	private PluginHelper pluginHelper;
 
-	
-	
-	public String notificaEstat(NotificacioEnviamentEntity enviament) throws Exception {
+
+
+	@Transactional
+	public boolean notifica(Long eventId) {
+		boolean ret = false;
+		// Recupera l'event
+		NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
+		if (event == null)
+			throw new NotFoundException(
+					"eventId:" + eventId,
+					NotificacioEventEntity.class);
+		// Recupera la referència
+		String referencia = null;
+		if (event.getEnviament() != null)
+			referencia = event.getEnviament().getNotificaReferencia();
+		int intents = event.getCallbackIntents() + 1;
+		Date ara = new Date();
+		if (referencia != null) {
+			// Notifica al client
+			try {
+				if (event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT
+						|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) {
+					// Invoca el mètode de notificació de l'aplicació client segons és estat o certificat:
+					if (event.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT))
+						notificaEstat(event.getEnviament());
+					else if (event.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO))
+						notificaCertificat(event.getEnviament());					
+					// Marca l'event com a notificat
+					event.updateCallbackClient(CallbackEstatEnumDto.NOTIFICAT, ara, intents, null);
+					ret = true;
+				} else {
+					// És un event pendent de notificar que no és del tipus esperat
+					event.updateCallbackClient(CallbackEstatEnumDto.ERROR, ara, intents, "L'event id=" + event.getId() + " és del tipus " + event.getTipus() + " i no es pot notificar a l'aplicació client.");
+				}
+			} catch (Exception ex) {
+				logger.debug("Error notificant l'event " + eventId + " amb referencia de destinatari " + referencia, ex);
+				// Marca un error a l'event
+				Integer maxIntents = this.getEventsIntentsMaxProperty();
+				CallbackEstatEnumDto estatNou = maxIntents == null || intents < maxIntents ? 
+													CallbackEstatEnumDto.PENDENT
+													: CallbackEstatEnumDto.ERROR;
+				event.updateCallbackClient(
+						estatNou,
+						ara,
+						intents,
+						"Error notificant l'event al client: " + ex.getMessage());
+			}
+		} else {
+			// No és un event que es pugui notificar, el marca com a error
+			event.updateCallbackClient(CallbackEstatEnumDto.ERROR, ara, intents, "L'event " + eventId + " no té referència de destinatari, no es pot fer un callback a l'aplicació client.");
+		}
+		
+		// Crea una nova entrada a la taula d'events per deixar constància de la notificació a l'aplicació client
+		Builder eventBuilder = NotificacioEventEntity.getBuilder(
+				NotificacioEventTipusEnumDto.CALLBACK_CLIENT,
+				event.getNotificacio()).
+				enviament(event.getEnviament()).
+				descripcio("Callback " + event.getTipus());
+		if (!ret) {
+			eventBuilder.error(true)
+						.errorDescripcio(event.getCallbackError());
+		}
+		NotificacioEventEntity callbackEvent = eventBuilder.build();
+		event.getNotificacio().updateEventAfegir(callbackEvent);
+		
+		return ret;
+	}
+
+	private String notificaEstat(NotificacioEnviamentEntity enviament) throws Exception {
 		if (enviament == null)
 			throw new Exception("El destinatari no pot ser nul.");
 		
@@ -61,7 +139,7 @@ public class CallbackHelper {
 				
 		// Omple l'objecte amb la informació cap a l'aplicació client
 		NotificacioEstatClient notificacioEstat = new NotificacioEstatClient(
-					NotificaHelper.calcularEstat(enviament),
+					calcularEstat(enviament),
 					enviament.getNotificaEstatData(),
 					enviament.getDestinatariNom(),
 					enviament.getDestinatariNif(),
@@ -88,14 +166,13 @@ public class CallbackHelper {
 				post(ClientResponse.class, body);
 		
 		// Comprova que la resposta sigui 200 OK
-		if ( ClientResponse.Status.OK.equals(response.getStatusInfo().getStatusCode()))
+		if ( ClientResponse.Status.OK.getStatusCode() != response.getStatusInfo().getStatusCode())
 			throw new Exception("La resposta del client és: " + response.getStatusInfo().getStatusCode() + " - " + response.getStatusInfo().getReasonPhrase());
 
 		return response.getEntity(String.class);
 	}
 
-
-	public String notificaCertificat(NotificacioEnviamentEntity enviament) throws Exception{
+	private String notificaCertificat(NotificacioEnviamentEntity enviament) throws Exception{
 		if (enviament == null)
 			throw new Exception("El destinatari no pot ser nul.");
 		// Resol si hi ha una aplicació pel codi d'usuari que ha creat l'enviament
@@ -143,22 +220,95 @@ public class CallbackHelper {
 				post(ClientResponse.class, body);
 		
 		// Comprova que la resposta sigui 200 OK
-		if ( ClientResponse.Status.OK.equals(response.getStatusInfo().getStatusCode()))
+		if ( ClientResponse.Status.OK.getStatusCode() != response.getStatusInfo().getStatusCode())
 			throw new Exception("La resposta del client és: " + response.getStatusInfo().getStatusCode() + " - " + response.getStatusInfo().getReasonPhrase());
 
 		return response.getEntity(String.class);
 	}
-	
-	/** Mètode comú per preparar el client jersey per a la crida segons el la operació i 
-	 * les dades de l'aplicació.
-	 * @param metode
-	 * 				Mètode REST a invocar
-	 * @param aplicacio
-	 * 				Entity amb les dades de l'aplicació.
-	 * @return
-	 */
+
+	private NotificacioDestinatariEstatEnum calcularEstat(
+			NotificacioEnviamentEntity enviament) {
+		NotificacioDestinatariEstatEnumDto estatCalculatDto = NotificacioEnviamentEntity.calcularEstatCombinatNotificaSeu(
+				enviament);
+		NotificacioDestinatariEstatEnum estatCalculat = null;
+		switch (estatCalculatDto) {
+		case ABSENT:
+			estatCalculat = NotificacioDestinatariEstatEnum.ABSENT;
+			break;
+		case ADRESA_INCORRECTA:
+			estatCalculat = NotificacioDestinatariEstatEnum.ADRESA_INCORRECTA;
+			break;
+		case DESCONEGUT:
+			estatCalculat = NotificacioDestinatariEstatEnum.DESCONEGUT;
+			break;
+		case ENTREGADA_OP:
+			estatCalculat = NotificacioDestinatariEstatEnum.ENTREGADA_OP;
+			break;
+		case ENVIADA_CI:
+			estatCalculat = NotificacioDestinatariEstatEnum.ENVIADA_CI;
+			break;
+		case ENVIADA_DEH:
+			estatCalculat = NotificacioDestinatariEstatEnum.ENVIADA_DEH;
+			break;
+		case ENVIAMENT_PROGRAMAT:
+			estatCalculat = NotificacioDestinatariEstatEnum.ENVIAMENT_PROGRAMAT;
+			break;
+		case ERROR_ENTREGA:
+			estatCalculat = NotificacioDestinatariEstatEnum.ERROR_ENTREGA;
+			break;
+		case EXPIRADA:
+			estatCalculat = NotificacioDestinatariEstatEnum.EXPIRADA;
+			break;
+		case EXTRAVIADA:
+			estatCalculat = NotificacioDestinatariEstatEnum.EXTRAVIADA;
+			break;
+		case LLEGIDA:
+			estatCalculat = NotificacioDestinatariEstatEnum.LLEGIDA;
+			break;
+		case MORT:
+			estatCalculat = NotificacioDestinatariEstatEnum.MORT;
+			break;
+		case NOTIFICADA:
+			estatCalculat = NotificacioDestinatariEstatEnum.NOTIFICADA;
+			break;
+		case PENDENT_CIE:
+			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_CIE;
+			break;
+		case PENDENT_DEH:
+			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_DEH;
+			break;
+		case PENDENT_ENVIAMENT:
+			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_ENVIAMENT;
+			break;
+		case PENDENT_SEU:
+			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_SEU;
+			break;
+		case REBUTJADA:
+			estatCalculat = NotificacioDestinatariEstatEnum.REBUTJADA;
+			break;
+		case SENSE_INFORMACIO:
+			estatCalculat = NotificacioDestinatariEstatEnum.SENSE_INFORMACIO;
+			break;
+		case NOTIB_ENVIADA:
+			estatCalculat = NotificacioDestinatariEstatEnum.NOTIB_ENVIADA;
+			break;
+		case NOTIB_PENDENT:
+			estatCalculat = NotificacioDestinatariEstatEnum.NOTIB_PENDENT;
+			break;
+		}
+		return estatCalculat;
+	}
+
+	/** Propietat que assenayala el màxim de reintents. Si la propietat és null llavors no hi ha un màxim. */
+	private Integer getEventsIntentsMaxProperty() {
+		Integer ret = null;
+		String maxIntents = PropertiesHelper.getProperties().getProperty("es.caib.notib.callback.notifica.events.intents.max");
+		if (maxIntents != null && !"".equals(maxIntents))
+			ret = Integer.parseInt(maxIntents);
+		return ret;
+	}
+
 	private Client getClient(AplicacioEntity aplicacio) {
-		
 		Client jerseyClient =  new Client();
 		// Només per depurar la sortida, esborrar o comentar-ho: jerseyClient.addFilter(new LoggingFilter(System.out));		
 		String username = null;
@@ -178,5 +328,7 @@ public class CallbackHelper {
 		}	
 		return jerseyClient;
 	}
-	
+
+	private static final Logger logger = LoggerFactory.getLogger(CallbackHelper.class);
+
 }

@@ -1,8 +1,12 @@
 package es.caib.notib.core.ejb;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
 
-import es.caib.notib.core.api.ws.callback.CallbackService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
+import es.caib.notib.core.api.service.CallbackService;
 
 /**
  * Implementació de CallbackService com a EJB que empra una clase
@@ -11,18 +15,16 @@ import es.caib.notib.core.api.ws.callback.CallbackService;
  * @author Limit Tecnologies <limit@limit.es>
  *
  */
+@Stateless
+@Interceptors(SpringBeanAutowiringInterceptor.class)
 public class CallbackServiceBean implements CallbackService {
 	
 	@Autowired
 	CallbackService delegate;
 
 	@Override
-	public void notificarEventsPendens() {
-		delegate.notificarEventsPendens();
+	public void processarPendents() {
+		delegate.processarPendents();
 	}
-	
-	@Override
-	public boolean notifica(Long eventId) {
-		return delegate.notifica(eventId);
-	}
+
 }

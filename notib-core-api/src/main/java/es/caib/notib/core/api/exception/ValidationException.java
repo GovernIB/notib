@@ -25,6 +25,13 @@ public class ValidationException extends RuntimeException {
 		this.error = error;
 	}
 	public ValidationException(
+			Object objectId,
+			String error) {
+		super(error);
+		this.objectId = objectId;
+		this.error = error;
+	}
+	public ValidationException(
 			String error) {
 		super(error);
 		this.error = error;

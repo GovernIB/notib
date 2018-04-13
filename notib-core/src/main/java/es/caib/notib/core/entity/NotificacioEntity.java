@@ -15,6 +15,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -65,11 +66,16 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private String procedimentCodiSia;
 	@Column(name = "proc_desc_sia", length = 256)
 	private String procedimentDescripcioSia;
+	@Column(name = "retard_postal")
+	private Integer retardPostal;
+	@Column(name = "caducitat")
+	@Temporal(TemporalType.DATE)
+	private Date caducitat;
 	@Column(name = "doc_arxiu_nom", length = 256, nullable = false)
 	private String documentArxiuNom;
 	@Column(name = "doc_arxiu_id", length = 64, nullable = false)
 	private String documentArxiuId;
-	@Column(name = "doc_hash", length = 40)
+	@Column(name = "doc_hash", length = 40, nullable = false)
 	private String documentHash;
 	@Column(name = "doc_normalitzat", nullable = false)
 	private boolean documentNormalitzat;
@@ -112,6 +118,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			fetch = FetchType.LAZY,
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
+	@OrderColumn(name="id")
 	private List<NotificacioEnviamentEntity> enviaments = new ArrayList<NotificacioEnviamentEntity>();
 	@OneToMany(
 			mappedBy = "notificacio",
@@ -162,6 +169,12 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	}
 	public String getProcedimentDescripcioSia() {
 		return procedimentDescripcioSia;
+	}
+	public Integer getRetardPostal() {
+		return retardPostal;
+	}
+	public Date getCaducitat() {
+		return caducitat;
 	}
 	public String getDocumentArxiuNom() {
 		return documentArxiuNom;
@@ -341,6 +354,14 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		}
 		public Builder procedimentDescripcioSia(String procedimentDescripcioSia) {
 			built.procedimentDescripcioSia = procedimentDescripcioSia;
+			return this;
+		}
+		public Builder retardPostal(Integer retardPostal) {
+			built.retardPostal = retardPostal;
+			return this;
+		}
+		public Builder caducitat(Date caducitat) {
+			built.caducitat = caducitat;
 			return this;
 		}
 		public Builder seuExpedientSerieDocumental(String seuExpedientSerieDocumental) {
