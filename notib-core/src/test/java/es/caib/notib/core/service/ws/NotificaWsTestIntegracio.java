@@ -2,7 +2,7 @@
  * 
  */
 package es.caib.notib.core.service.ws;
-
+/*
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -57,12 +57,12 @@ import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
-@Transactional
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
+//@Transactional
+//@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class NotificaWsTestIntegracio {
-
+/*
 	private static final String ENTITAT_DIR3CODI = "A04013511";
 
 	@Autowired
@@ -1873,9 +1873,6 @@ public class NotificaWsTestIntegracio {
 		public void setProcedimentCodiSia(String procedimentCodiSia) {
 			this.procedimentCodiSia = procedimentCodiSia;
 		}
-//		public void setProcedimentDescripcioSia(String procedimentDescripcioSia) {
-//			this.procedimentDescripcioSia = procedimentDescripcioSia;
-//		}
 		public void setRetardPostal(Integer retardPostal) {
 			this.retardPostal = retardPostal;
 		}
@@ -1921,21 +1918,9 @@ public class NotificaWsTestIntegracio {
 		public void setEstat(NotificacioEstatEnumDto estat) {
 			this.estat = estat;
 		}
-//		public void setErrorNotifica(boolean errorNotifica) {
-//			this.errorNotifica = errorNotifica;
-//		}
-//		public void setErrorNotificaEvent(NotificacioEventEntity errorNotificaEvent) {
-//			this.errorNotificaEvent = errorNotificaEvent;
-//		}
 		public void setEnviaments(List<NotificacioEnviamentEntity> enviaments) {
 			this.enviaments = enviaments;
 		}
-//		public void setEvents(List<NotificacioEventEntity> events) {
-//			this.events = events;
-//		}
-//		public void setEntitat(EntitatEntity entitat) {
-//			this.entitat = entitat;
-//		}
 	}
 	private class NotificacioEnviamentTest extends NotificacioEnviamentEntity {
 		
@@ -1953,12 +1938,6 @@ public class NotificaWsTestIntegracio {
 		public void setTitularNif(String titularNif) {
 			this.titularNif = titularNif;
 		}
-//		public void setTitularRaoSocial(String titularRaoSocial) {
-//			this.titularRaoSocial = titularRaoSocial;
-//		}
-//		public void setTitularCodiDesti(String titularCodiDesti) {
-//			this.titularCodiDesti = titularCodiDesti;
-//		}
 		public void setTitularTelefon(String titularTelefon) {
 			this.titularTelefon = titularTelefon;
 		}
@@ -1977,12 +1956,6 @@ public class NotificaWsTestIntegracio {
 		public void setDestinatariNif(String destinatariNif) {
 			this.destinatariNif = destinatariNif;
 		}
-//		public void setDestinatariRaoSocial(String destinatariRaoSocial) {
-//			this.destinatariRaoSocial = destinatariRaoSocial;
-//		}
-//		public void setDestinatariCodiDesti(String destinatariCodiDesti) {
-//			this.destinatariCodiDesti = destinatariCodiDesti;
-//		}
 		public void setDestinatariTelefon(String destinatariTelefon) {
 			this.destinatariTelefon = destinatariTelefon;
 		}
@@ -2007,9 +1980,6 @@ public class NotificaWsTestIntegracio {
 		public void setDomiciliNumeracioNumero(String domiciliNumeracioNumero) {
 			this.domiciliNumeracioNumero = domiciliNumeracioNumero;
 		}
-//		public void setDomiciliNumeracioQualificador(String domiciliNumeracioQualificador) {
-//			this.domiciliNumeracioQualificador = domiciliNumeracioQualificador;
-//		}
 		public void setDomiciliNumeracioPuntKm(String domiciliNumeracioPuntKm) {
 			this.domiciliNumeracioPuntKm = domiciliNumeracioPuntKm;
 		}
@@ -2040,24 +2010,15 @@ public class NotificaWsTestIntegracio {
 		public void setDomiciliMunicipiCodiIne(String domiciliMunicipiCodiIne) {
 			this.domiciliMunicipiCodiIne = domiciliMunicipiCodiIne;
 		}
-//		public void setDomiciliMunicipiNom(String domiciliMunicipiNom) {
-//			this.domiciliMunicipiNom = domiciliMunicipiNom;
-//		}
 		public void setDomiciliCodiPostal(String domiciliCodiPostal) {
 			this.domiciliCodiPostal = domiciliCodiPostal;
 		}
 		public void setDomiciliProvinciaCodi(String domiciliProvinciaCodi) {
 			this.domiciliProvinciaCodi = domiciliProvinciaCodi;
 		}
-//		public void setDomiciliProvinciaNom(String domiciliProvinciaNom) {
-//			this.domiciliProvinciaNom = domiciliProvinciaNom;
-//		}
 		public void setDomiciliPaisCodiIso(String domiciliPaisCodiIso) {
 			this.domiciliPaisCodiIso = domiciliPaisCodiIso;
 		}
-//		public void setDomiciliPaisNom(String domiciliPaisNom) {
-//			this.domiciliPaisNom = domiciliPaisNom;
-//		}
 		public void setDomiciliLinea1(String domiciliLinea1) {
 			this.domiciliLinea1 = domiciliLinea1;
 		}
@@ -2079,138 +2040,18 @@ public class NotificaWsTestIntegracio {
 		public void setServeiTipus(NotificaServeiTipusEnumDto serveiTipus) {
 			this.serveiTipus = serveiTipus;
 		}
-//		public void setFormatSobre(String formatSobre) {
-//			this.formatSobre = formatSobre;
-//		}
-//		public void setFormatFulla(String formatFulla) {
-//			this.formatFulla = formatFulla;
-//		}
-//		public void setNotificaIdentificador(String notificaIdentificador) {
-//			this.notificaIdentificador = notificaIdentificador;
-//		}
 		public void setNotificaReferencia(String notificaReferencia) {
 			this.notificaReferencia = notificaReferencia;
 		}
-//		public void setNotificaDataCreacio(Date notificaDataCreacio) {
-//			this.notificaDataCreacio = notificaDataCreacio;
-//		}
-//		public void setNotificaDataDisposicio(Date notificaDataDisposicio) {
-//			this.notificaDataDisposicio = notificaDataDisposicio;
-//		}
-//		public void setNotificaEmisorDir3(String notificaEmisorDir3) {
-//			this.notificaEmisorDir3 = notificaEmisorDir3;
-//		}
-//		public void setNotificaEmisorDescripcio(String notificaEmisorDescripcio) {
-//			this.notificaEmisorDescripcio = notificaEmisorDescripcio;
-//		}
-//		public void setNotificaArrelDir3(String notificaArrelDir3) {
-//			this.notificaArrelDir3 = notificaArrelDir3;
-//		}
-//		public void setNotificaArrelDescripcio(String notificaArrelDescripcio) {
-//			this.notificaArrelDescripcio = notificaArrelDescripcio;
-//		}
-//		public void setNotificaDestiDir3(String notificaDestiDir3) {
-//			this.notificaDestiDir3 = notificaDestiDir3;
-//		}
-//		public void setNotificaDestiDescripcio(String notificaDestiDescripcio) {
-//			this.notificaDestiDescripcio = notificaDestiDescripcio;
-//		}
 		public void setNotificaEstat(NotificacioDestinatariEstatEnumDto notificaEstat) {
 			this.notificaEstat = notificaEstat;
 		}
-//		public void setNotificaEstatDescripcio(String notificaEstatDescripcio) {
-//			this.notificaEstatDescripcio = notificaEstatDescripcio;
-//		}
-//		public void setNotificaEstatData(Date notificaEstatData) {
-//			this.notificaEstatData = notificaEstatData;
-//		}
-//		public void setNotificaEstatOrigen(String notificaEstatOrigen) {
-//			this.notificaEstatOrigen = notificaEstatOrigen;
-//		}
-//		public void setNotificaEstatReceptorNif(String notificaEstatReceptorNif) {
-//			this.notificaEstatReceptorNif = notificaEstatReceptorNif;
-//		}
-//		public void setNotificaEstatReceptorNom(String notificaEstatReceptorNom) {
-//			this.notificaEstatReceptorNom = notificaEstatReceptorNom;
-//		}
-//		public void setNotificaEstatNumSeguiment(String notificaEstatNumSeguiment) {
-//			this.notificaEstatNumSeguiment = notificaEstatNumSeguiment;
-//		}
-//		public void setNotificaEstatError(String notificaEstatError) {
-//			this.notificaEstatError = notificaEstatError;
-//		}
-//		public void setNotificaCertificacioArxiuId(String notificaCertificacioArxiuId) {
-//			this.notificaCertificacioArxiuId = notificaCertificacioArxiuId;
-//		}
-//		public void setNotificaCertificacioHash(String notificaCertificacioHash) {
-//			this.notificaCertificacioHash = notificaCertificacioHash;
-//		}
-//		public void setNotificaCertificacioData(Date notificaCertificacioData) {
-//			this.notificaCertificacioData = notificaCertificacioData;
-//		}
-//		public void setNotificaCertificacioOrigen(String notificaCertificacioOrigen) {
-//			this.notificaCertificacioOrigen = notificaCertificacioOrigen;
-//		}
-//		public void setNotificaCertificacioMetadades(String notificaCertificacioMetadades) {
-//			this.notificaCertificacioMetadades = notificaCertificacioMetadades;
-//		}
-//		public void setNotificaCertificacioCsv(String notificaCertificacioCsv) {
-//			this.notificaCertificacioCsv = notificaCertificacioCsv;
-//		}
-//		public void setNotificaCertificacioTipusMime(String notificaCertificacioTipusMime) {
-//			this.notificaCertificacioTipusMime = notificaCertificacioTipusMime;
-//		}
-//		public void setNotificaCertificacioTamany(Integer notificaCertificacioTamany) {
-//			this.notificaCertificacioTamany = notificaCertificacioTamany;
-//		}
-//		public void setNotificaCertificacioTipus(NotificaCertificacioTipusEnumDto notificaCertificacioTipus) {
-//			this.notificaCertificacioTipus = notificaCertificacioTipus;
-//		}
-//		public void setNotificaCertificacioArxiuTipus(NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus) {
-//			this.notificaCertificacioArxiuTipus = notificaCertificacioArxiuTipus;
-//		}
-//		public void setNotificaCertificacioNumSeguiment(String notificaCertificacioNumSeguiment) {
-//			this.notificaCertificacioNumSeguiment = notificaCertificacioNumSeguiment;
-//		}
-//		public void setNotificaError(boolean notificaError) {
-//			this.notificaError = notificaError;
-//		}
-//		public void setNotificaErrorEvent(NotificacioEventEntity notificaErrorEvent) {
-//			this.notificaErrorEvent = notificaErrorEvent;
-//		}
-//		public void setSeuRegistreNumero(String seuRegistreNumero) {
-//			this.seuRegistreNumero = seuRegistreNumero;
-//		}
-//		public void setSeuRegistreData(Date seuRegistreData) {
-//			this.seuRegistreData = seuRegistreData;
-//		}
-//		public void setSeuDataFi(Date seuDataFi) {
-//			this.seuDataFi = seuDataFi;
-//		}
 		public void setSeuEstat(NotificacioDestinatariEstatEnumDto seuEstat) {
 			this.seuEstat = seuEstat;
 		}
-//		public void setSeuError(boolean seuError) {
-//			this.seuError = seuError;
-//		}
-//		public void setSeuErrorEvent(NotificacioEventEntity seuErrorEvent) {
-//			this.seuErrorEvent = seuErrorEvent;
-//		}
-//		public void setSeuDataEnviament(Date seuDataEnviament) {
-//			this.seuDataEnviament = seuDataEnviament;
-//		}
-//		public void setSeuDataEstat(Date seuDataEstat) {
-//			this.seuDataEstat = seuDataEstat;
-//		}
-//		public void setSeuDataNotificaInformat(Date seuDataNotificaInformat) {
-//			this.seuDataNotificaInformat = seuDataNotificaInformat;
-//		}
-//		public void setSeuDataNotificaDarreraPeticio(Date seuDataNotificaDarreraPeticio) {
-//			this.seuDataNotificaDarreraPeticio = seuDataNotificaDarreraPeticio;
-//		}
 		public void setNotificacio(NotificacioEntity notificacio) {
 			this.notificacio = notificacio;
 		}
 	}
-
+*/
 }

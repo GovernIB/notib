@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
@@ -39,10 +40,15 @@ public class SeuHelper {
 
 
 
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
+	public void updateSeuDataEnviament(NotificacioEnviamentEntity enviament) {
+		enviament.updateSeuDataEnviament();
+	}
+	
 	@Transactional
 	public void enviament(Long notificacioEnviamentId) {
-		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(
-				notificacioEnviamentId);
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(notificacioEnviamentId);
+		updateSeuDataEnviament(enviament);
 		String registreNumero = null;
 		Date registreData = null;
 		NotificacioDestinatariEstatEnumDto estat = enviament.getSeuEstat();
@@ -81,8 +87,8 @@ public class SeuHelper {
 
 	@Transactional
 	public boolean consultaEstat(Long notificacioDestinatariId) {
-		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(
-				notificacioDestinatariId);
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(notificacioDestinatariId);
+		updateSeuDataEnviament(enviament);
 		Date dataFi = null;
 		NotificacioDestinatariEstatEnumDto estat = enviament.getSeuEstat();
 		NotificacioEventEntity event;

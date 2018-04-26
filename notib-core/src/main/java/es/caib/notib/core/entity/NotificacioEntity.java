@@ -109,6 +109,11 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private NotificacioEstatEnumDto estat;
 	@Column(name = "error_not", nullable = false)
 	private boolean errorNotifica;
+	@Column(name = "notifica_datenv")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date notificaDataEnviament = new Date();
+	@Column(name = "not_reintents_env")
+	private int notificaReintentsEnviament;
 	@ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "error_not_event_id")
 	@ForeignKey(name = "not_notevenot_notificacio_fk")
@@ -265,7 +270,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			NotificacioEventEntity event) {
 		events.add(event);
 	}
-
+	public void updateNotificaDataEnviament() {
+		this.notificaDataEnviament = new Date();
+		this.notificaReintentsEnviament++;
+	}
 	public static Builder getBuilder(
 			EntitatEntity entitat,
 			String emisorDir3Codi,

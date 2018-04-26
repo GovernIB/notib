@@ -145,6 +145,9 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 						event);
 				notificacio.updateEventAfegir(event);
 				notificacioEventRepository.save(event);
+				for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+					enviament.updateNotificaError(true, event);
+				}
 			}
 		} catch (Exception ex) {
 			logger.error(
@@ -167,6 +170,9 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 					true,
 					event);
 			notificacioEventRepository.save(event);
+			for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+				enviament.updateNotificaError(true, event);
+			}
 		}
 		return NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat());
 	}

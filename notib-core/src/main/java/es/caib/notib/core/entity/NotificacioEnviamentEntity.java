@@ -8,6 +8,8 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -72,14 +74,18 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "destinatari_email", length = 100)
 	private String destinatariEmail;
 	@Column(name = "dom_tipus")
+	@Enumerated(EnumType.ORDINAL)
 	private NotificaDomiciliTipusEnumDto domiciliTipus;
 	@Column(name = "dom_con_tipus")
+	@Enumerated(EnumType.ORDINAL)
 	private NotificaDomiciliConcretTipusEnumDto domiciliConcretTipus;
 	@Column(name = "dom_via_tipus")
+	@Enumerated(EnumType.ORDINAL)
 	private NotificaDomiciliViaTipusEnumDto domiciliViaTipus;
 	@Column(name = "dom_via_nom", length = 100)
 	private String domiciliViaNom;
 	@Column(name = "dom_num_tipus")
+	@Enumerated(EnumType.ORDINAL)
 	private NotificaDomiciliNumeracioTipusEnumDto domiciliNumeracioTipus;
 	@Column(name = "dom_num_num", length = 10)
 	private String domiciliNumeracioNumero;
@@ -130,6 +136,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "deh_proc_codi", length = 6)
 	private String dehProcedimentCodi;
 	@Column(name = "servei_tipus")
+	@Enumerated(EnumType.ORDINAL)
 	private NotificaServeiTipusEnumDto serveiTipus;
 	@Column(name = "format_sobre", length = 10)
 	private String formatSobre;
@@ -145,6 +152,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "notifica_datdisp")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaDataDisposicio;
+//	@Column(name = "notifica_datenv")
+//	@Temporal(TemporalType.TIMESTAMP)
+//	private Date notificaDataEnviament = new Date();
 	@Column(name = "notifica_emi_dir3codi", length = 9)
 	private String notificaEmisorDir3;
 	@Column(name = "notifica_emi_dir3desc", length = 100)
@@ -192,8 +202,10 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "notifica_cer_tamany", length = 20)
 	private Integer notificaCertificacioTamany;
 	@Column(name = "notifica_cer_tipus")
+	@Enumerated(EnumType.ORDINAL)
 	private NotificaCertificacioTipusEnumDto notificaCertificacioTipus;
 	@Column(name = "notifica_cer_arxtip")
+	@Enumerated(EnumType.ORDINAL)
 	private NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus;
 	@Column(name = "notifica_cer_numseg", length = 50)
 	private String notificaCertificacioNumSeguiment;
@@ -212,6 +224,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date seuDataFi;
 	@Column(name = "seu_estat", nullable = false)
+	@Enumerated(EnumType.ORDINAL)
 	private NotificacioDestinatariEstatEnumDto seuEstat;
 	@Column(name = "seu_error", nullable = false)
 	private boolean seuError;
@@ -221,7 +234,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	private NotificacioEventEntity seuErrorEvent;
 	@Column(name = "seu_data_enviam")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date seuDataEnviament;
+	private Date seuDataEnviament = new Date();
+	@Column(name = "seu_reintents_env")
+	private int seuReintentsEnviament;
 	@Column(name = "seu_data_estat")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date seuDataEstat;
@@ -629,6 +644,10 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		if (esNotificaPeticio) {
 			this.seuDataNotificaDarreraPeticio = new Date();
 		}
+	}
+	public void updateSeuDataEnviament() {
+		this.seuDataEnviament = new Date();
+		this.seuReintentsEnviament++;
 	}
 
 	public static Builder getBuilder(

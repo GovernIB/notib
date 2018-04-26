@@ -5,13 +5,15 @@ package es.caib.notib.core.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -38,7 +40,24 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	List<NotificacioEnviamentEntity> findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
 			NotificacioDestinatariEstatEnumDto[] seuEstats,
 			Pageable pageable);
+	
+	@Query("FROM NotificacioEnviamentEntity "
+			+ "WHERE seuEstat = es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT "
+			+ "  AND seuReintentsEnviament < 3 "
+			+ "ORDER BY seuDataEnviament ASC")
+	List<NotificacioEnviamentEntity> findBySeuEstatPendent(Pageable pageable);
+	
+	@Query("FROM NotificacioEnviamentEntity "
+			+ "WHERE seuEstat = es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA "
+			+ "ORDER BY seuDataEnviament ASC")
+	List<NotificacioEnviamentEntity> findBySeuEstatEnviada(Pageable pageable);
 
+	@Query("FROM NotificacioEnviamentEntity "
+			+ "WHERE seuEstat = es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto.LLEGIDA "
+			+ "   OR seuEstat = es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto.REBUTJADA "
+			+ "ORDER BY seuDataEnviament ASC")
+	List<NotificacioEnviamentEntity> findBySeuEstatTramitada(PageRequest pageRequest);
+	
 	List<NotificacioEnviamentEntity> findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
 			NotificacioDestinatariEstatEnumDto[] seuEstats);
 

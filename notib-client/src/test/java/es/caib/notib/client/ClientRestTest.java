@@ -61,6 +61,10 @@ import es.caib.notib.ws.notificacio.ServeiTipusEnum;
 public class ClientRestTest {
 
 	private static final String ENTITAT_DIR3CODI = "A04013511";
+	private static final String ORGAN_CODI = "A04003003";
+	private static final String UNITAT_ADMINISTRATIVA_SISTRA = "1";
+	private static final String IDENTIFICADOR_PROCEDIMENT = "000000";
+	private static final String IDIOMA = "ca";
 
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
@@ -191,12 +195,12 @@ public class ClientRestTest {
 			titular.setEmail("titular@gmail.com");
 			enviament.setTitular(titular);
 			Persona destinatari = new Persona();
-			destinatari.setNom("destinatariNom" + i);
-			destinatari.setLlinatge1("destLlinatge1_" + i);
-			destinatari.setLlinatge2("destLlinatge2_" + i);
-			destinatari.setNif("12345678Z");
+			destinatari.setNom("Melcior");
+			destinatari.setLlinatge1("Andreu");
+			destinatari.setLlinatge2("Nadal");
+			destinatari.setNif("18225486x");
 			destinatari.setTelefon("666020202");
-			destinatari.setEmail("destinatari@gmail.com");
+			destinatari.setEmail("sandreu@limit.es");
 			enviament.getDestinataris().add(destinatari);
 			if (ambEnviamentPostal) {
 				EntregaPostal entregaPostal = new EntregaPostal();
@@ -230,30 +234,18 @@ public class ClientRestTest {
 			notificacio.getEnviaments().add(enviament);
 		}
 		ParametresSeu parametresSeu = new ParametresSeu();
-		parametresSeu.setExpedientSerieDocumental(
-				"0000S");
-		parametresSeu.setExpedientUnitatOrganitzativa(
-				"00000000T");
-		parametresSeu.setExpedientIdentificadorEni(
-				"seuExpedientIdentificadorEni_" + notificacioId);
-		parametresSeu.setExpedientTitol(
-				"seuExpedientTitol_" + notificacioId);
-		parametresSeu.setRegistreOficina(
-				"seuRegistreOficina_" + notificacioId);
-		parametresSeu.setRegistreLlibre(
-				"seuRegistreLlibre_" + notificacioId);
-		parametresSeu.setIdioma(
-				"seuIdioma_" + notificacioId);
-		parametresSeu.setAvisTitol(
-				"seuAvisTitol_" + notificacioId);
-		parametresSeu.setAvisText(
-				"seuAvisText_" + notificacioId);
-		parametresSeu.setAvisTextMobil(
-				"seuAvisTextMobil_" + notificacioId);
-		parametresSeu.setOficiTitol(
-				"seuOficiTitol_" + notificacioId);
-		parametresSeu.setOficiText(
-				"seuOficiText_" + notificacioId);
+		parametresSeu.setExpedientSerieDocumental("0000S");
+		parametresSeu.setExpedientUnitatOrganitzativa(UNITAT_ADMINISTRATIVA_SISTRA);
+		parametresSeu.setExpedientIdentificadorEni("ES_" + ORGAN_CODI + "_2018_EXP_NOTIB" + notificacioId);
+		parametresSeu.setExpedientTitol("seuExpedientTitol_" + notificacioId);
+		parametresSeu.setRegistreOficina("L99");
+		parametresSeu.setRegistreLlibre("L99");
+		parametresSeu.setIdioma(IDIOMA);
+		parametresSeu.setAvisTitol("seuAvisTitol_" + notificacioId);
+		parametresSeu.setAvisText("seuAvisText_" + notificacioId);
+		parametresSeu.setAvisTextMobil("seuAvisTextMobil_" + notificacioId);
+		parametresSeu.setOficiTitol("seuOficiTitol_" + notificacioId);
+		parametresSeu.setOficiText("seuOficiText_" + notificacioId);
 		notificacio.setParametresSeu(parametresSeu);
 		return notificacio;
 	}
