@@ -201,7 +201,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				}
 			}
 			NotificacioEnviamentEntity.Builder destinatariBuilder = NotificacioEnviamentEntity.getBuilder(
-					titular.getNif(),
+					titular.getNif().toUpperCase(),
 					serveiTipus,
 					notificacioEntity).
 					titularNom(titular.getNom()).
@@ -218,7 +218,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				}
 				Persona destinatari = enviament.getDestinataris().get(0);
 				destinatariBuilder.
-				destinatariNif(destinatari.getNif()).
+				destinatariNif(destinatari.getNif().toUpperCase()).
 				destinatariNom(destinatari.getNom()).
 				destinatariLlinatge1(destinatari.getLlinatge1()).
 				destinatariLlinatge2(destinatari.getLlinatge2()).
@@ -289,7 +289,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			if (entregaDeh != null) {
 				destinatariBuilder.
 				dehObligat(entregaDeh.isObligat()).
-				dehNif(titular.getNif()).
+				dehNif(titular.getNif().toUpperCase()).
 				dehProcedimentCodi(entregaDeh.getProcedimentCodi());
 			}
 			NotificacioEnviamentEntity enviamentEntity = destinatariBuilder.

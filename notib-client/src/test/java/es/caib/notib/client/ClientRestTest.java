@@ -169,7 +169,7 @@ public class ClientRestTest {
 		document.setNormalitzat(false);
 		document.setGenerarCsv(false);
 		notificacio.setDocument(document);
-		notificacio.setProcedimentCodi("0000");
+		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 		if (ambEnviamentPostal) {
 			PagadorPostal pagadorPostal = new PagadorPostal();
 			pagadorPostal.setDir3Codi("A04013511");
@@ -236,9 +236,9 @@ public class ClientRestTest {
 		ParametresSeu parametresSeu = new ParametresSeu();
 		parametresSeu.setExpedientSerieDocumental("0000S");
 		parametresSeu.setExpedientUnitatOrganitzativa(UNITAT_ADMINISTRATIVA_SISTRA);
-		parametresSeu.setExpedientIdentificadorEni("ES_" + ORGAN_CODI + "_2018_EXP_NOTIB" + notificacioId);
+		parametresSeu.setExpedientIdentificadorEni("ES_" + ORGAN_CODI + "_2018_EXP_NOTIB" + "0000000000000000000000001");//+ String.format("%25s", notificacioId).replace(' ', '0'));
 		parametresSeu.setExpedientTitol("seuExpedientTitol_" + notificacioId);
-		parametresSeu.setRegistreOficina("L99");
+		parametresSeu.setRegistreOficina(ORGAN_CODI); //"L99");
 		parametresSeu.setRegistreLlibre("L99");
 		parametresSeu.setIdioma(IDIOMA);
 		parametresSeu.setAvisTitol("seuAvisTitol_" + notificacioId);

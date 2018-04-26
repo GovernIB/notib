@@ -80,7 +80,7 @@ public class NotificacioFiltreCommand {
 		
 		NotificacioFiltreDto dto = ConversioTipusHelper.convertir( command, NotificacioFiltreDto.class );
 		if( command.getDataInici() == null ) dto.setDataInici( new Date(0) );
-		if( command.getDataFi() == null ) dto.setDataFi( new Date(Long.MAX_VALUE) );
+		if( command.getDataFi() == null ) dto.setDataFi( new Date(9000000000000L) );
 		
 		return dto;
 		
