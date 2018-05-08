@@ -228,7 +228,7 @@ public abstract class AbstractNotificaHelper {
 
 	public boolean isAdviserActiu() {
 		String actiu = PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.notifica.adviser.actiu");
+				"es.caib.notib.adviser.actiu");
 		if (actiu != null) {
 			return new Boolean(actiu).booleanValue();
 		} else {

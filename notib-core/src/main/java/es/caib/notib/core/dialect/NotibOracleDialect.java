@@ -3,7 +3,7 @@
  */
 package es.caib.notib.core.dialect;
 
-import org.hibernate.dialect.Oracle9iDialect;
+import org.hibernate.dialect.Oracle10gDialect;
 
 /**
  * Dialecte de Hibernate per a la base de dades Oracle per a permetre
@@ -12,7 +12,7 @@ import org.hibernate.dialect.Oracle9iDialect;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class NotibOracleDialect extends Oracle9iDialect {
+public class NotibOracleDialect extends Oracle10gDialect {
 
 	@SuppressWarnings("rawtypes")
 	public Class getNativeIdentifierGeneratorClass() {

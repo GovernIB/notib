@@ -152,9 +152,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "notifica_datdisp")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaDataDisposicio;
-//	@Column(name = "notifica_datenv")
-//	@Temporal(TemporalType.TIMESTAMP)
-//	private Date notificaDataEnviament = new Date();
+	@Column(name = "notifica_datenv")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date notificaDataEnviament;
 	@Column(name = "notifica_emi_dir3codi", length = 9)
 	private String notificaEmisorDir3;
 	@Column(name = "notifica_emi_dir3desc", length = 100)
@@ -234,7 +234,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	private NotificacioEventEntity seuErrorEvent;
 	@Column(name = "seu_data_enviam")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date seuDataEnviament = new Date();
+	private Date seuDataEnviament;
 	@Column(name = "seu_reintents_env")
 	private int seuReintentsEnviament;
 	@Column(name = "seu_data_estat")
@@ -407,6 +407,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public Date getNotificaDataDisposicio() {
 		return notificaDataDisposicio;
 	}
+	public Date getNotificaDataEnviament() {
+		return notificaDataEnviament;
+	}
 	public String getNotificaEmisorDir3() {
 		return notificaEmisorDir3;
 	}
@@ -445,6 +448,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 	public String getNotificaEstatNumSeguiment() {
 		return notificaEstatNumSeguiment;
+	}
+	public String getNotificaEstatError() {
+		return notificaEstatError;
 	}
 	public String getNotificaCertificacioArxiuId() {
 		return notificaCertificacioArxiuId;
@@ -505,6 +511,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 	public Date getSeuDataEnviament() {
 		return seuDataEnviament;
+	}
+	public int getSeuReintentsEnviament() {
+		return seuReintentsEnviament;
 	}
 	public Date getSeuDataEstat() {
 		return seuDataEstat;
@@ -866,7 +875,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		}
 	}
 
-	public static NotificacioDestinatariEstatEnumDto calcularEstatCombinatNotificaSeu(
+	/*public static NotificacioDestinatariEstatEnumDto calcularEstatCombinatNotificaSeu(
 			NotificacioEnviamentEntity enviament) {
 		NotificacioDestinatariEstatEnumDto estatNotifica = enviament.getNotificaEstat();
 		NotificacioDestinatariEstatEnumDto estatSeu = enviament.getSeuEstat();
@@ -909,7 +918,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			}
 		}
 		return dataBona;
-	}
+	}*/
 
 	@Override
 	public int hashCode() {

@@ -3,11 +3,7 @@
  */
 package es.caib.notib.war.controller;
 
-import java.io.IOException;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,14 +19,11 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 
-import es.caib.notib.core.api.exception.SistemaExternException;
-import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.api.ws.notificacio.AltaResposta;
-import es.caib.notib.core.api.ws.notificacio.InformacioEnviament;
-import es.caib.notib.core.api.ws.notificacio.InformacioResposta;
 import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWs;
-import es.caib.notib.war.validation.RestPreconditions;
+import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
+import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
+import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
 
 /**
  * Controlador del servei REST per a la gestio de notificacions.
@@ -58,143 +51,50 @@ public class NotificacioServiceController extends BaseController {
 	@ApiOperation(
 			value = "Genera una notificació", 
 			notes = "Retorna una llista amb els codis dels enviaments creats")
-	public @ResponseBody AltaResposta alta(
-			@ApiParam(name="notificacio", value="Objecte amb les dades necessàries per a generar una notificació", required=true) 
-			@RequestBody Notificacio notificacio,
-			HttpServletResponse response) throws IOException {
-		AltaResposta resposta = new AltaResposta();
-		List<String> referencies = null;
-		try {
-			RestPreconditions.checkNotNull(notificacio);
-			referencies = notificacioServiceWs.alta(notificacio);
-			resposta.setCodiResposta("OK");
-			resposta.setReferencies(referencies);
-		} catch (Exception e) {
-			if (isExceptionOrCauseInstanceOf(e, ValidationException.class)) {
-				ValidationException ve = (ValidationException)geExceptionOrCauseInstanceOf(e, ValidationException.class);
-				resposta.setCodiResposta(ve.getObjectId().toString());
-				resposta.setDescripcioResposta(e.getMessage());
-			} else if (isExceptionOrCauseInstanceOf(e, SistemaExternException.class)) {
-				SistemaExternException se = (SistemaExternException)geExceptionOrCauseInstanceOf(e, SistemaExternException.class);
-				resposta.setCodiResposta(se.getSistemaExternCodi());
-				resposta.setDescripcioResposta(se.getMessage());
-			} else {
-				resposta.setCodiResposta("KO");
-				resposta.setDescripcioResposta(e.getMessage());
-			}
-		}
-		return resposta;
+	@ResponseBody
+	public RespostaAlta alta(
+			@ApiParam(
+					name = "notificacio",
+					value = "Objecte amb les dades necessàries per a generar una notificació",
+					required = true) 
+			@RequestBody Notificacio notificacio) {
+		return notificacioServiceWs.alta(notificacio);
 	}
 
 	@RequestMapping(
-			value = "/services/notificacio/consulta/{referencia}", 
+			value = "/services/notificacio/consultaEstatNotificacio/{referencia}", 
 			method = RequestMethod.GET,
 			produces="application/json")
 	@ApiOperation(
-			value = "Consulta una notificació",
+			value = "Consulta de la informació d'una notificació",
 			response = Notificacio.class)
-	public @ResponseBody InformacioResposta consulta(
-			@ApiParam(name="referencia", value="Referència de la notificació a consultar", required=true)
-			@PathVariable("referencia")
-			String referencia,
-			HttpServletResponse response) throws IOException {
-		
-		InformacioResposta resposta = new InformacioResposta();
-		try {
-			RestPreconditions.checkNotNull(referencia);
-			InformacioEnviament informacio = notificacioServiceWs.consulta(referencia);
-			resposta.setCodiResposta("OK");
-			resposta.setInformacioEnviament(informacio);
-		} catch (Exception e) {
-			if (isExceptionOrCauseInstanceOf(e, ValidationException.class)) {
-				ValidationException ve = (ValidationException)geExceptionOrCauseInstanceOf(e, ValidationException.class);
-				resposta.setCodiResposta(ve.getObjectId().toString());
-				resposta.setDescripcioResposta(e.getMessage());
-			} else if (isExceptionOrCauseInstanceOf(e, SistemaExternException.class)) {
-				SistemaExternException se = (SistemaExternException)geExceptionOrCauseInstanceOf(e, SistemaExternException.class);
-				resposta.setCodiResposta(se.getSistemaExternCodi());
-				resposta.setDescripcioResposta(se.getMessage());
-			} else {
-				resposta.setCodiResposta("KO");
-				resposta.setDescripcioResposta(e.getMessage());
-			}
-			resposta.setCodiResposta("KO");
-			resposta.setDescripcioResposta(e.getMessage());
-		}
-		return resposta;
-	}
-
-	/*@RequestMapping(
-			value = "/services/consultaEstat/{referencia}", 
-			method = RequestMethod.GET,
-			produces="application/json")
-	@ApiOperation(
-			value = "Consulta l'estat d'una notificació",
-			response = NotificacioEstat.class)
-	public @ResponseBody NotificacioEstatDto consultaEstat(
-			@ApiParam(name="referencia", value="Identificador de la notificació de la que es vol consultar el seu estat", required=true) 
-			@PathVariable("referencia") String referencia,
-			HttpServletResponse response) throws IOException {
-		RestPreconditions.checkNotNull(referencia);
-		NotificacioEstat estat = notificacioService.cons.consultaEstat(referencia);
-		if (estat == null) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		}
-		return estat;
+	@ResponseBody
+	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
+			@ApiParam(
+					name = "identificador",
+					value = "Identificador de la notificació a consultar",
+					required = true)
+			@PathVariable("identificador")
+			String identificador) {
+		return notificacioServiceWs.consultaEstatNotificacio(identificador);
 	}
 
 	@RequestMapping(
-			value = "/services/consultaCertificacio/{referencia}", 
+			value = "/services/notificacio/consultaEstatEnviament/{referencia}", 
 			method = RequestMethod.GET,
 			produces="application/json")
 	@ApiOperation(
-			value = "Consulta la certificació d'una notificació",
-			response = NotificacioCertificacio.class)
-	public @ResponseBody NotificacioCertificacio consultaCertificacio(
-			@ApiParam(name="referencia", value="Identificador de la notificació de la que es vol consultar la seva certificació", required=true)
-			@PathVariable("referencia") String referencia,
-			HttpServletResponse response) throws UnsupportedEncodingException, IOException {
-		RestPreconditions.checkNotNull(referencia);
-		NotificacioCertificacio certificacio = notificacioService.consultaCertificacio(referencia);
-		if (certificacio == null) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		}
-		return certificacio;
-	}*/
+			value = "Consulta de la informació d'una notificació",
+			response = Notificacio.class)
+	@ResponseBody
+	public RespostaConsultaEstatEnviament consultaEstatEnviament(
+			@ApiParam(
+					name = "referencia",
+					value = "Referència de la notificació a consultar",
+					required = true)
+			@PathVariable("referencia")
+			String referencia) {
+		return notificacioServiceWs.consultaEstatEnviament(referencia);
+	}
 
-	private boolean isExceptionOrCauseInstanceOf(Exception e, Class<? extends Exception> exceptionClass) {
-		boolean isException = exceptionClass.isInstance(e);
-		 
-		if (!isException && e.getCause() != null) {
-			Throwable t = e.getCause();
-			isException = exceptionClass.isInstance(t);
-			if (!isException && t.getCause() != null) { // && t.getClass().getName().equals("javax.trasaction.RollbackException")) {
-				isException = exceptionClass.isInstance(t.getCause());
-			}
-		}
-		
-		return isException;
-	}
-	
-	private Throwable geExceptionOrCauseInstanceOf(Exception e, Class<? extends Exception> exceptionClass) {
-		
-		if (exceptionClass.isInstance(e)) {
-			return e;
-		}else{		 
-			if (e.getCause() != null) {
-				Throwable t = e.getCause();
-				if (exceptionClass.isInstance(t)) {
-					return t;
-				}else{
-					if (t.getCause() != null) {
-						if (exceptionClass.isInstance(t.getCause())) {
-							return t.getCause();
-						}
-					}
-				}
-			}
-		}
-		
-		return null;
-	}
 }

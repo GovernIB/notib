@@ -5,10 +5,10 @@ package es.caib.notib.core.repository;
 
 import java.util.List;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -37,11 +37,16 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			EntitatEntity entitat,
 			String notificaIdentificador);
 
-	List<NotificacioEnviamentEntity> findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
-			NotificacioDestinatariEstatEnumDto[] seuEstats,
+	@Query("FROM NotificacioEnviamentEntity "
+			+ "WHERE seuEstat in (:seuEstat) "
+			+ "  AND seuReintentsEnviament < :maxReintents "
+			+ "ORDER BY seuDataEnviament ASC")
+	List<NotificacioEnviamentEntity> findBySeuEstatInAndMaxReintentsOrderBySeuDataNotificaDarreraPeticioAsc(
+			@Param("seuEstat") NotificacioDestinatariEstatEnumDto[] seuEstat,
+			@Param("maxReintents") int maxReintents,
 			Pageable pageable);
 	
-	@Query("FROM NotificacioEnviamentEntity "
+	/*@Query("FROM NotificacioEnviamentEntity "
 			+ "WHERE seuEstat = es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT "
 			+ "  AND seuReintentsEnviament < 3 "
 			+ "ORDER BY seuDataEnviament ASC")
@@ -56,7 +61,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			+ "WHERE seuEstat = es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto.LLEGIDA "
 			+ "   OR seuEstat = es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto.REBUTJADA "
 			+ "ORDER BY seuDataEnviament ASC")
-	List<NotificacioEnviamentEntity> findBySeuEstatTramitada(PageRequest pageRequest);
+	List<NotificacioEnviamentEntity> findBySeuEstatTramitada(PageRequest pageRequest);*/
 	
 	List<NotificacioEnviamentEntity> findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
 			NotificacioDestinatariEstatEnumDto[] seuEstats);

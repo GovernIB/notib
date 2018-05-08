@@ -8,8 +8,6 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 /**
@@ -19,9 +17,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
  */
 @JsonAutoDetect
 @XmlRootElement
-public class InformacioEnviament {
+public class RespostaConsultaEstatEnviament {
 
-	private String identificador;
 	private String concepte;
 	private String descripcio;
 	private String emisorDir3Codi;
@@ -45,23 +42,7 @@ public class InformacioEnviament {
 	private Certificacio certificacio;
 	private EnviamentEstatEnum estat;
 	private Date estatData;
-	private EnviamentEstatEnum notificaEstat;
-	private Date notificaEstatData;
-	private boolean notificaError;
-	private Date notificaErrorData;
-	private String notificaErrorDescripcio;
-	private EnviamentEstatEnum seuEstat;
-	private Date seuEstatData;
-	private boolean seuError;
-	private Date seuErrorData;
-	private String seuErrorDescripcio;
 
-	public String getIdentificador() {
-		return identificador;
-	}
-	public void setIdentificador(String identificador) {
-		this.identificador = identificador;
-	}
 	public String getConcepte() {
 		return concepte;
 	}
@@ -199,71 +180,6 @@ public class InformacioEnviament {
 	}
 	public void setEstatData(Date estatData) {
 		this.estatData = estatData;
-	}
-	public EnviamentEstatEnum getNotificaEstat() {
-		return notificaEstat;
-	}
-	public void setNotificaEstat(EnviamentEstatEnum notificaEstat) {
-		this.notificaEstat = notificaEstat;
-	}
-	public Date getNotificaEstatData() {
-		return notificaEstatData;
-	}
-	public void setNotificaEstatData(Date notificaEstatData) {
-		this.notificaEstatData = notificaEstatData;
-	}
-	public boolean isNotificaError() {
-		return notificaError;
-	}
-	public void setNotificaError(boolean notificaError) {
-		this.notificaError = notificaError;
-	}
-	public Date getNotificaErrorData() {
-		return notificaErrorData;
-	}
-	public void setNotificaErrorData(Date notificaErrorData) {
-		this.notificaErrorData = notificaErrorData;
-	}
-	public String getNotificaErrorDescripcio() {
-		return notificaErrorDescripcio;
-	}
-	public void setNotificaErrorDescripcio(String notificaErrorDescripcio) {
-		this.notificaErrorDescripcio = notificaErrorDescripcio;
-	}
-	public EnviamentEstatEnum getSeuEstat() {
-		return seuEstat;
-	}
-	public void setSeuEstat(EnviamentEstatEnum seuEstat) {
-		this.seuEstat = seuEstat;
-	}
-	public Date getSeuEstatData() {
-		return seuEstatData;
-	}
-	public void setSeuEstatData(Date seuEstatData) {
-		this.seuEstatData = seuEstatData;
-	}
-	public boolean isSeuError() {
-		return seuError;
-	}
-	public void setSeuError(boolean seuError) {
-		this.seuError = seuError;
-	}
-	public Date getSeuErrorData() {
-		return seuErrorData;
-	}
-	public void setSeuErrorData(Date seuErrorData) {
-		this.seuErrorData = seuErrorData;
-	}
-	public String getSeuErrorDescripcio() {
-		return seuErrorDescripcio;
-	}
-	public void setSeuErrorDescripcio(String seuErrorDescripcio) {
-		this.seuErrorDescripcio = seuErrorDescripcio;
-	}
-
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
 	}
 
 }

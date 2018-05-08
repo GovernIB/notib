@@ -1,3 +1,6 @@
+/**
+ * 
+ */
 package es.caib.notib.core.helper;
 
 import java.io.ByteArrayOutputStream;
@@ -16,7 +19,6 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.core.util.Base64;
 
 import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.ws.callback.CertificacioArxiuTipusEnum;
@@ -32,16 +34,17 @@ import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 
-/** Classe per englobar la tasca de notificar l'estat o la certificació a l'aplicació
+/**
+ * Classe per englobar la tasca de notificar l'estat o la certificació a l'aplicació
  * client a partir de la referència del destinatari de la notificació.
  * 
  * Recupera la informació de la notificació a partir de la referència i la informació
  * de l'aplicació client a partir del codi d'usuari que ha creat l'anotació.
  * Emplena la informació cap al client de la mateixa forma que el WS de consulta  NotificacioWsServiceImpl.
  * 
+ * @see NotificacioWsServiceImpl
  * 
  * @author Limit Tecnologies <limit@limit.es>
- * @see NotificacioWsServiceImpl
  */
 @Component
 public class CallbackHelper {
@@ -228,75 +231,73 @@ public class CallbackHelper {
 
 	private NotificacioDestinatariEstatEnum calcularEstat(
 			NotificacioEnviamentEntity enviament) {
-		NotificacioDestinatariEstatEnumDto estatCalculatDto = NotificacioEnviamentEntity.calcularEstatCombinatNotificaSeu(
-				enviament);
-		NotificacioDestinatariEstatEnum estatCalculat = null;
-		switch (estatCalculatDto) {
+		NotificacioDestinatariEstatEnum estat = null;
+		switch (enviament.getNotificaEstat()) {
 		case ABSENT:
-			estatCalculat = NotificacioDestinatariEstatEnum.ABSENT;
+			estat = NotificacioDestinatariEstatEnum.ABSENT;
 			break;
 		case ADRESA_INCORRECTA:
-			estatCalculat = NotificacioDestinatariEstatEnum.ADRESA_INCORRECTA;
+			estat = NotificacioDestinatariEstatEnum.ADRESA_INCORRECTA;
 			break;
 		case DESCONEGUT:
-			estatCalculat = NotificacioDestinatariEstatEnum.DESCONEGUT;
+			estat = NotificacioDestinatariEstatEnum.DESCONEGUT;
 			break;
 		case ENTREGADA_OP:
-			estatCalculat = NotificacioDestinatariEstatEnum.ENTREGADA_OP;
+			estat = NotificacioDestinatariEstatEnum.ENTREGADA_OP;
 			break;
 		case ENVIADA_CI:
-			estatCalculat = NotificacioDestinatariEstatEnum.ENVIADA_CI;
+			estat = NotificacioDestinatariEstatEnum.ENVIADA_CI;
 			break;
 		case ENVIADA_DEH:
-			estatCalculat = NotificacioDestinatariEstatEnum.ENVIADA_DEH;
+			estat = NotificacioDestinatariEstatEnum.ENVIADA_DEH;
 			break;
 		case ENVIAMENT_PROGRAMAT:
-			estatCalculat = NotificacioDestinatariEstatEnum.ENVIAMENT_PROGRAMAT;
+			estat = NotificacioDestinatariEstatEnum.ENVIAMENT_PROGRAMAT;
 			break;
 		case ERROR_ENTREGA:
-			estatCalculat = NotificacioDestinatariEstatEnum.ERROR_ENTREGA;
+			estat = NotificacioDestinatariEstatEnum.ERROR_ENTREGA;
 			break;
 		case EXPIRADA:
-			estatCalculat = NotificacioDestinatariEstatEnum.EXPIRADA;
+			estat = NotificacioDestinatariEstatEnum.EXPIRADA;
 			break;
 		case EXTRAVIADA:
-			estatCalculat = NotificacioDestinatariEstatEnum.EXTRAVIADA;
+			estat = NotificacioDestinatariEstatEnum.EXTRAVIADA;
 			break;
 		case LLEGIDA:
-			estatCalculat = NotificacioDestinatariEstatEnum.LLEGIDA;
+			estat = NotificacioDestinatariEstatEnum.LLEGIDA;
 			break;
 		case MORT:
-			estatCalculat = NotificacioDestinatariEstatEnum.MORT;
+			estat = NotificacioDestinatariEstatEnum.MORT;
 			break;
 		case NOTIFICADA:
-			estatCalculat = NotificacioDestinatariEstatEnum.NOTIFICADA;
+			estat = NotificacioDestinatariEstatEnum.NOTIFICADA;
 			break;
 		case PENDENT_CIE:
-			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_CIE;
+			estat = NotificacioDestinatariEstatEnum.PENDENT_CIE;
 			break;
 		case PENDENT_DEH:
-			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_DEH;
+			estat = NotificacioDestinatariEstatEnum.PENDENT_DEH;
 			break;
 		case PENDENT_ENVIAMENT:
-			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_ENVIAMENT;
+			estat = NotificacioDestinatariEstatEnum.PENDENT_ENVIAMENT;
 			break;
 		case PENDENT_SEU:
-			estatCalculat = NotificacioDestinatariEstatEnum.PENDENT_SEU;
+			estat = NotificacioDestinatariEstatEnum.PENDENT_SEU;
 			break;
 		case REBUTJADA:
-			estatCalculat = NotificacioDestinatariEstatEnum.REBUTJADA;
+			estat = NotificacioDestinatariEstatEnum.REBUTJADA;
 			break;
 		case SENSE_INFORMACIO:
-			estatCalculat = NotificacioDestinatariEstatEnum.SENSE_INFORMACIO;
+			estat = NotificacioDestinatariEstatEnum.SENSE_INFORMACIO;
 			break;
 		case NOTIB_ENVIADA:
-			estatCalculat = NotificacioDestinatariEstatEnum.NOTIB_ENVIADA;
+			estat = NotificacioDestinatariEstatEnum.NOTIB_ENVIADA;
 			break;
 		case NOTIB_PENDENT:
-			estatCalculat = NotificacioDestinatariEstatEnum.NOTIB_PENDENT;
+			estat = NotificacioDestinatariEstatEnum.NOTIB_PENDENT;
 			break;
 		}
-		return estatCalculat;
+		return estat;
 	}
 
 	/** Propietat que assenayala el màxim de reintents. Si la propietat és null llavors no hi ha un màxim. */

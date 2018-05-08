@@ -23,7 +23,9 @@ import javax.persistence.TemporalType;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import es.caib.notib.core.api.dto.NotificaComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 
@@ -39,6 +41,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 
 	@Column(name = "emisor_dir3codi", length = 9, nullable = false)
 	private String emisorDir3Codi;
+	@Column(name = "com_tipus", nullable = false)
+	private NotificaComunicacioTipusEnumDto comunicacioTipus;
 	@Column(name = "env_tipus", nullable = false)
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
 	@Column(name = "env_data_prog")
@@ -107,17 +111,20 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private String seuOficiText;
 	@Column(name = "estat", nullable = false)
 	private NotificacioEstatEnumDto estat;
-	@Column(name = "error_not", nullable = false)
-	private boolean errorNotifica;
-	@Column(name = "notifica_datenv")
+	@Column(name = "not_error_tipus")
+	private NotificacioErrorTipusEnumDto notificaErrorTipus;
+	@Column(name = "not_env_data")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date notificaDataEnviament = new Date();
-	@Column(name = "not_reintents_env")
-	private int notificaReintentsEnviament;
+	private Date notificaEnviamentData;
+	@Column(name = "not_env_intent")
+	private int notificaEnviamentIntent;
+	@Column(name = "not_reenv_data")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date notificaReenviamentData;
 	@ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@JoinColumn(name = "error_not_event_id")
-	@ForeignKey(name = "not_notevenot_notificacio_fk")
-	private NotificacioEventEntity errorNotificaEvent;
+	@JoinColumn(name = "not_error_event_id")
+	@ForeignKey(name = "not_noterrevent_notificacio_fk")
+	private NotificacioEventEntity notificaErrorEvent;
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,
@@ -138,6 +145,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 
 	public String getEmisorDir3Codi() {
 		return emisorDir3Codi;
+	}
+	public NotificaComunicacioTipusEnumDto getComunicacioTipus() {
+		return comunicacioTipus;
 	}
 	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
 		return enviamentTipus;
@@ -235,11 +245,20 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public NotificacioEstatEnumDto getEstat() {
 		return estat;
 	}
-	public boolean isErrorNotifica() {
-		return errorNotifica;
+	public NotificacioErrorTipusEnumDto getNotificaErrorTipus() {
+		return notificaErrorTipus;
 	}
-	public NotificacioEventEntity getErrorNotificaEvent() {
-		return errorNotificaEvent;
+	public Date getNotificaEnviamentData() {
+		return notificaEnviamentData;
+	}
+	public int getNotificaEnviamentIntent() {
+		return notificaEnviamentIntent;
+	}
+	public Date getNotificaReenviamentData() {
+		return notificaReenviamentData;
+	}
+	public NotificacioEventEntity getNotificaErrorEvent() {
+		return notificaErrorEvent;
 	}
 	public List<NotificacioEnviamentEntity> getEnviaments() {
 		return enviaments;
@@ -251,32 +270,33 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		return entitat;
 	}
 	
-	public void updateEnviaments(
-			List<NotificacioEnviamentEntity> enviaments) {
-		this.enviaments = enviaments;
+	public void addEnviament(
+			NotificacioEnviamentEntity enviament) {
+		this.enviaments.add(enviament);
 	}
 
 	public void updateEstat(
 			NotificacioEstatEnumDto estat) {
 		this.estat = estat;
 	}
-	public void updateErrorNotifica(
-			boolean error,
+	public void updateNotificaNouEnviament() {
+		this.notificaEnviamentData = new Date();
+		this.notificaEnviamentIntent++;
+	}
+	public void updateNotificaError(
+			NotificacioErrorTipusEnumDto errorTipus,
 			NotificacioEventEntity errorEvent) {
-		this.errorNotifica = error;
-		this.errorNotificaEvent = errorEvent;
+		this.notificaErrorTipus = errorTipus;
+		this.notificaErrorEvent = errorEvent;
 	}
 	public void updateEventAfegir(
 			NotificacioEventEntity event) {
 		events.add(event);
 	}
-	public void updateNotificaDataEnviament() {
-		this.notificaDataEnviament = new Date();
-		this.notificaReintentsEnviament++;
-	}
 	public static Builder getBuilder(
 			EntitatEntity entitat,
 			String emisorDir3Codi,
+			NotificaComunicacioTipusEnumDto comunicacioTipus,
 			NotificaEnviamentTipusEnumDto enviamentTipus,
 			Date enviamentDataProgramada,
 			String concepte,
@@ -289,6 +309,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		return new Builder(
 				entitat,
 				emisorDir3Codi,
+				comunicacioTipus,
 				enviamentTipus,
 				enviamentDataProgramada,
 				concepte,
@@ -305,6 +326,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		Builder(
 				EntitatEntity entitat,
 				String emisorDir3Codi,
+				NotificaComunicacioTipusEnumDto comunicacioTipus,
 				NotificaEnviamentTipusEnumDto enviamentTipus,
 				Date enviamentDataProgramada,
 				String concepte,
@@ -327,6 +349,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.documentGenerarCsv = documentGenerarCsv;
 			built.enviaments = enviaments;
 			built.estat = NotificacioEstatEnumDto.PENDENT;
+			built.notificaEnviamentIntent = 0;
 		}
 		public Builder descripcio(String descripcio) {
 			built.descripcio = descripcio;

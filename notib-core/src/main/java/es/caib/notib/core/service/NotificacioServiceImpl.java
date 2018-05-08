@@ -259,20 +259,20 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public boolean enviar(
 			Long notificacioId) {
-		logger.debug("Intentant enviament a Notifica i a la seu de la notificació pendent (" +
+		logger.debug("Intentant enviament de la notificació pendent (" +
 				"notificacioId=" + notificacioId + ")");
-		boolean enviada = enviaNotificacio(notificacioId); // notificaHelper.enviament(notificacioId);
-		if (enviada && pluginHelper.isSeuPluginDisponible()) {
+		boolean enviada = notificaHelper.enviament(notificacioId);
+		/*if (enviada && pluginHelper.isSeuPluginDisponible()) {
 			List<NotificacioEnviamentEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
 					new NotificacioDestinatariEstatEnumDto[] {
 							NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT});
 			for (NotificacioEnviamentEntity pendent: pendents) {
 				seuHelper.enviament(pendent.getId());
 			}
-		}
+		}*/
 		return enviada;
 	}
-	
+
 	@Override
 	@Transactional
 	public NotificaRespostaEstatDto enviamentRefrescarEstat(
@@ -304,10 +304,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!pendents.isEmpty()) {
 				logger.debug("Realitzant enviaments a Notifica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
 				for (NotificacioEntity pendent: pendents) {
-					try {
-						enviaNotificacio(pendent.getId());
-					}catch (Exception e) {}
-//					notificaHelper.enviament(pendent.getId());
+					notificaHelper.enviament(pendent.getId());
 				}
 			} else {
 				logger.debug("No hi ha notificacions pendents d'enviar a la seu electrònica");
@@ -323,9 +320,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 			initialDelayString = "${config:es.caib.notib.tasca.retard.inicial}")
 	public void seuEnviamentsPendents() {
 		logger.debug("Cercant notificacions pendents d'enviar a la seu electrònica");
-		if (isTasquesActivesProperty() && pluginHelper.isSeuPluginDisponible()) {
+		if (pluginHelper.isSeuPluginDisponible() && isTasquesActivesProperty() && pluginHelper.isSeuPluginDisponible()) {
 			int maxPendents = getSeuEnviamentsProcessarMaxProperty();
-			List<NotificacioEnviamentEntity> pendents = notificacioDestinatariRepository.findBySeuEstatPendent( 
+			List<NotificacioEnviamentEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInAndMaxReintentsOrderBySeuDataNotificaDarreraPeticioAsc(
+					new NotificacioDestinatariEstatEnumDto[] {NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT},
+					3,
 					new PageRequest(0, maxPendents));
 			if (!pendents.isEmpty()) {
 				logger.debug("Realitzant enviaments a la seu electrònica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
@@ -345,9 +344,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 			initialDelayString = "${config:es.caib.notib.tasca.retard.inicial}")
 	public void seuNotificacionsPendents() {
 		logger.debug("Cercant notificacions pendents de consulta d'estat a la seu electrònica");
-		if (isTasquesActivesProperty() && pluginHelper.isSeuPluginDisponible()) {
+		if (pluginHelper.isSeuPluginDisponible() && isTasquesActivesProperty() && pluginHelper.isSeuPluginDisponible()) {
 			int maxPendents = getSeuJustificantsProcessarMaxProperty();
-			List<NotificacioEnviamentEntity> pendents = notificacioDestinatariRepository.findBySeuEstatEnviada(
+			List<NotificacioEnviamentEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInAndMaxReintentsOrderBySeuDataNotificaDarreraPeticioAsc(
+					new NotificacioDestinatariEstatEnumDto[] {NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA},
+					3,
 					new PageRequest(0, maxPendents));
 			// TODO excloure les notificacions ja processades amb Notifica
 			if (!pendents.isEmpty()) {
@@ -371,9 +372,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 			initialDelayString = "${config:es.caib.notib.tasca.retard.inicial}")
 	public void seuNotificaComunicarEstatPendents() {
 		logger.debug("Cercant notificacions provinents de la seu pendents d'actualització d'estat a Notifica");
-		if (isTasquesActivesProperty() && pluginHelper.isSeuPluginDisponible()) {
+		if (pluginHelper.isSeuPluginDisponible() && isTasquesActivesProperty() && pluginHelper.isSeuPluginDisponible()) {
 			int maxPendents = getSeuNotificaEstatProcessarMaxProperty();
-			List<NotificacioEnviamentEntity> pendents = notificacioDestinatariRepository.findBySeuEstatTramitada(
+			List<NotificacioEnviamentEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInAndMaxReintentsOrderBySeuDataNotificaDarreraPeticioAsc(
+					new NotificacioDestinatariEstatEnumDto[] {
+							NotificacioDestinatariEstatEnumDto.LLEGIDA,
+							NotificacioDestinatariEstatEnumDto.REBUTJADA},
+					3,
 					new PageRequest(0, maxPendents));
 			if (!pendents.isEmpty()) {
 				logger.debug("Realitzant actualització d'estat a Notifica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
@@ -388,13 +393,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 
-	
-	private boolean enviaNotificacio(Long notificacioId) {
-		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
-		notificacio.updateNotificaDataEnviament();
-		notificacioRepository.save(notificacio);
-		return notificaHelper.enviament(notificacioId);
-	}
+
 
 	private List<NotificacioEnviamentDto> enviamentsToDto(
 			List<NotificacioEnviamentEntity> enviaments) {
@@ -425,9 +424,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private void destinatariEmplenarDadesAddicionals(
 			NotificacioEnviamentEntity enviament,
 			NotificacioEnviamentDto enviamentDto) {
-		enviamentDto.setEstat(
-				NotificacioEnviamentEntity.calcularEstatCombinatNotificaSeu(
-						enviament));
+		enviamentDto.setEstat(enviament.getNotificaEstat());
 		if (enviament.isNotificaError()) {
 			enviamentDto.setNotificaError(true);
 			NotificacioEventEntity event = enviament.getNotificaErrorEvent();
@@ -437,7 +434,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 		}
 		if (enviament.isSeuError()) {
-			enviamentDto.setNotificaError(true);
+			enviamentDto.setSeuError(true);
 			NotificacioEventEntity event = enviament.getSeuErrorEvent();
 			if (event != null) {
 				enviamentDto.setSeuErrorData(event.getData());

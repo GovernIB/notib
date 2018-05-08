@@ -6,12 +6,12 @@ package es.caib.notib.core.api.ws.notificacio;
 import java.io.Serializable;
 
 /**
- * Enumerat que indica el servei que ha originat un error.
+ * Enumerat que indica l'estat de la notificació.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public enum ErrorOrigenEnum implements Serializable {
-	NOTIB,
-	NOTIFICA,
-	SEU_CAIB
+public enum NotificacioEstatEnum implements Serializable {
+	PENDENT,
+	ENVIADA,
+	FINALITZADA
 }

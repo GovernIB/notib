@@ -12,7 +12,7 @@ import org.hibernate.dialect.PostgreSQLDialect;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class NotibPostgresDialect extends PostgreSQLDialect {
+public class NotibPostgreSQLDialect extends PostgreSQLDialect {
 
 	@SuppressWarnings("rawtypes")
 	public Class getNativeIdentifierGeneratorClass() {

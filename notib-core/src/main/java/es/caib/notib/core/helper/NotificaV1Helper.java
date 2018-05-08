@@ -45,6 +45,7 @@ import es.caib.notib.core.api.dto.NotificaRespostaDatatDto;
 import es.caib.notib.core.api.dto.NotificaRespostaDatatDto.NotificaRespostaDatatEventDto;
 import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
 import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
@@ -100,6 +101,7 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 	public boolean enviament(
 			Long notificacioId) {
 		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
+		notificacio.updateNotificaNouEnviament();
 		if (!NotificacioEstatEnumDto.PENDENT.equals(notificacio.getEstat())) {
 			throw new ValidationException(
 					notificacioId,
@@ -129,8 +131,8 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 						notificacio).build();
 				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
 				notificacio.updateEventAfegir(event);
-				notificacio.updateErrorNotifica(
-						false,
+				notificacio.updateNotificaError(
+						null,
 						null);
 				notificacioEventRepository.save(event);
 			} else {
@@ -140,8 +142,8 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 						error(true).
 						errorDescripcio("Error retornat per notifica: [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta()).
 						build();
-				notificacio.updateErrorNotifica(
-						true,
+				notificacio.updateNotificaError(
+						NotificacioErrorTipusEnumDto.ERROR_REMOT,
 						event);
 				notificacio.updateEventAfegir(event);
 				notificacioEventRepository.save(event);
@@ -166,8 +168,8 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 					errorDescripcio(errorDescripcio).
 					build();
 			notificacio.updateEventAfegir(event);
-			notificacio.updateErrorNotifica(
-					true,
+			notificacio.updateNotificaError(
+					NotificacioErrorTipusEnumDto.ERROR_XARXA,
 					event);
 			notificacioEventRepository.save(event);
 			for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
