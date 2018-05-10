@@ -43,7 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.NotificaRespostaDatatDto.NotificaRespostaDatatEventDto;
 import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
-import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
@@ -70,6 +70,7 @@ import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Persona;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
 import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Certificacion;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.CodigoDIR;
 import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Datado;
 import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.InfoEnvioV2;
 import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
@@ -92,28 +93,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 
 
-	public ResultadoAltaRemesaEnvios enviaNotificacio(
-			NotificacioEntity notificacio) throws Exception {
-		ResultadoAltaRemesaEnvios resultat = null;
-		if (!NotificacioEstatEnumDto.PENDENT.equals(notificacio.getEstat())) {
-			throw new ValidationException(
-					notificacio.getId(),
-					NotificacioEntity.class,
-					"La notificació no te l'estat " + NotificacioEstatEnumDto.PENDENT);
-		}
-		try {
-			AltaRemesaEnvios altaRemesaEnvios = generarAltaRemesaEnvios(notificacio);
-			resultat = getNotificaWs().altaRemesaEnvios(altaRemesaEnvios);
-		} catch (SOAPFaultException sfe) {
-			String codiResposta = sfe.getFault().getFaultCode();
-			String descripcioResposta = sfe.getFault().getFaultString();
-			resultat = new ResultadoAltaRemesaEnvios();
-			resultat.setCodigoRespuesta(codiResposta);
-			resultat.setDescripcionRespuesta(descripcioResposta);
-		}
-		return resultat;
-	}
-	
 	@Transactional
 	public boolean enviament(
 			Long notificacioId) {
@@ -125,12 +104,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
 					for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
 						if (enviament.getTitularNif().equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
-							enviament.updateNotificaIdentificador(
+							enviament.updateNotificaEnviada(
 									resultadoEnvio.getIdentificador());
-							enviament.updateNotificaEstat(
-									new Date(),
-									NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA,
-									true);
 						}
 					}
 				}
@@ -237,7 +212,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					event.setEstat(datado.getResultado());
 				}
 				if (datatDarrer != null) {
-					NotificacioDestinatariEstatEnumDto estat = getEstatNotifica(
+					NotificacioEnviamentEstatEnumDto estat = getEstatNotifica(
 							datatDarrer.getResultado());
 					resposta.setData(toDate(datatDarrer.getFecha()));
 					resposta.setEstatCodi(datatDarrer.getResultado());
@@ -246,13 +221,28 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					resposta.setOrigen(datatDarrer.getOrigen());
 					resposta.setReceptorNom(datatDarrer.getNombreReceptor());
 					resposta.setReceptorNif(datatDarrer.getNifReceptor());
-					enviament.updateNotificaInfo(
-							toDate(datatDarrer.getFecha()),
+					CodigoDIR organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
+					CodigoDIR organismoEmisorRaiz = resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
+					enviament.updateNotificaInformacio(
+							toDate(resultadoInfoEnvio.getFechaCreacion()),
+							toDate(resultadoInfoEnvio.getFechaPuestaDisposicion()),
+							toDate(resultadoInfoEnvio.getFechaCaducidad()),
+							(organismoEmisor != null) ? organismoEmisor.getCodigo() : null,
+							(organismoEmisor != null) ? organismoEmisor.getDescripcionCodigoDIR() : null,
+							(organismoEmisor != null) ? organismoEmisor.getNifDIR() : null,
+							(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getCodigo() : null,
+							(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getDescripcionCodigoDIR() : null,
+							(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getNifDIR() : null);
+					enviament.updateNotificaDatat(
 							estat,
+							toDate(datatDarrer.getFecha()),
+							null,
 							datatDarrer.getOrigen(),
 							datatDarrer.getNifReceptor(),
 							datatDarrer.getNombreReceptor(),
-							datatDarrer.getDescripcionError());
+							null,
+							null);
+					enviament.updateNotificaError(false, null);
 				} else {
 					throw new ValidationException(
 							enviament,
@@ -322,6 +312,28 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	}
 
 
+
+	private ResultadoAltaRemesaEnvios enviaNotificacio(
+			NotificacioEntity notificacio) throws Exception {
+		ResultadoAltaRemesaEnvios resultat = null;
+		if (!NotificacioEstatEnumDto.PENDENT.equals(notificacio.getEstat())) {
+			throw new ValidationException(
+					notificacio.getId(),
+					NotificacioEntity.class,
+					"La notificació no te l'estat " + NotificacioEstatEnumDto.PENDENT);
+		}
+		try {
+			AltaRemesaEnvios altaRemesaEnvios = generarAltaRemesaEnvios(notificacio);
+			resultat = getNotificaWs().altaRemesaEnvios(altaRemesaEnvios);
+		} catch (SOAPFaultException sfe) {
+			String codiResposta = sfe.getFault().getFaultCode();
+			String descripcioResposta = sfe.getFault().getFaultString();
+			resultat = new ResultadoAltaRemesaEnvios();
+			resultat.setCodigoRespuesta(codiResposta);
+			resultat.setDescripcionRespuesta(descripcioResposta);
+		}
+		return resultat;
+	}
 
 	private AltaRemesaEnvios generarAltaRemesaEnvios(
 			NotificacioEntity notificacio) throws GeneralSecurityException, DatatypeConfigurationException {

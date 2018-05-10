@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -42,7 +42,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			+ "  AND seuReintentsEnviament < :maxReintents "
 			+ "ORDER BY seuDataEnviament ASC")
 	List<NotificacioEnviamentEntity> findBySeuEstatInAndMaxReintentsOrderBySeuDataNotificaDarreraPeticioAsc(
-			@Param("seuEstat") NotificacioDestinatariEstatEnumDto[] seuEstat,
+			@Param("seuEstat") NotificacioEnviamentEstatEnumDto[] seuEstat,
 			@Param("maxReintents") int maxReintents,
 			Pageable pageable);
 	
@@ -64,6 +64,6 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	List<NotificacioEnviamentEntity> findBySeuEstatTramitada(PageRequest pageRequest);*/
 	
 	List<NotificacioEnviamentEntity> findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
-			NotificacioDestinatariEstatEnumDto[] seuEstats);
+			NotificacioEnviamentEstatEnumDto[] seuEstats);
 
 }

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
@@ -51,13 +51,13 @@ public class SeuHelper {
 		updateSeuDataEnviament(enviament);
 		String registreNumero = null;
 		Date registreData = null;
-		NotificacioDestinatariEstatEnumDto estat = enviament.getSeuEstat();
+		NotificacioEnviamentEstatEnumDto estat = enviament.getSeuEstat();
 		NotificacioEventEntity event;
 		try {
 			SeuNotificacioResultat resultat = pluginHelper.seuNotificacioDestinatariEnviar(enviament);
 			registreNumero = resultat.getRegistreNumero();
 			registreData = resultat.getRegistreData();
-			estat = NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA;
+			estat = NotificacioEnviamentEstatEnumDto.NOTIB_ENVIADA;
 			event = NotificacioEventEntity.getBuilder(
 					NotificacioEventTipusEnumDto.SEU_CAIB_ENVIAMENT,
 					enviament.getNotificacio()).
@@ -90,7 +90,7 @@ public class SeuHelper {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(notificacioDestinatariId);
 		updateSeuDataEnviament(enviament);
 		Date dataFi = null;
-		NotificacioDestinatariEstatEnumDto estat = enviament.getSeuEstat();
+		NotificacioEnviamentEstatEnumDto estat = enviament.getSeuEstat();
 		NotificacioEventEntity event;
 		boolean estatActualitzat;
 		try {
@@ -99,16 +99,16 @@ public class SeuHelper {
 			if (notificacioEstat.getEstat() != null) {
 				switch (notificacioEstat.getEstat()) {
 				case LLEGIDA:
-					estat = NotificacioDestinatariEstatEnumDto.LLEGIDA;
+					estat = NotificacioEnviamentEstatEnumDto.LLEGIDA;
 					dataFi = notificacioEstat.getData();
 					break;
 				case REBUTJADA:
-					estat = NotificacioDestinatariEstatEnumDto.REBUTJADA;
+					estat = NotificacioEnviamentEstatEnumDto.REBUTJADA;
 					dataFi = notificacioEstat.getData();
 					break;
 				case PENDENT:
 				default:
-					estat = NotificacioDestinatariEstatEnumDto.PENDENT_SEU;
+					estat = NotificacioEnviamentEstatEnumDto.PENDENT_SEU;
 					break;
 				}
 			} else {

@@ -11,7 +11,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 
 /**
@@ -43,7 +43,7 @@ public class NotificacioCommand {
 	@NotEmpty @Size(max=64)
 	private NotificacioEstatEnumDto estat;
 	@NotEmpty @Size(max=64)
-	private NotificacioDestinatariEstatEnumDto estatNotifica;
+	private NotificacioEnviamentEstatEnumDto estatNotifica;
 
 
 
@@ -113,10 +113,10 @@ public class NotificacioCommand {
 	public void setEstat(NotificacioEstatEnumDto estat) {
 		this.estat = estat;
 	}
-	public NotificacioDestinatariEstatEnumDto getEstatNotifica() {
+	public NotificacioEnviamentEstatEnumDto getEstatNotifica() {
 		return estatNotifica;
 	}
-	public void setEstatNotifica(NotificacioDestinatariEstatEnumDto estatNotifica) {
+	public void setEstatNotifica(NotificacioEnviamentEstatEnumDto estatNotifica) {
 		this.estatNotifica = estatNotifica;
 	}
 

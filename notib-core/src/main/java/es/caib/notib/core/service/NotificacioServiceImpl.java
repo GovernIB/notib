@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
-import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
@@ -323,7 +323,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		if (pluginHelper.isSeuPluginDisponible() && isTasquesActivesProperty() && pluginHelper.isSeuPluginDisponible()) {
 			int maxPendents = getSeuEnviamentsProcessarMaxProperty();
 			List<NotificacioEnviamentEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInAndMaxReintentsOrderBySeuDataNotificaDarreraPeticioAsc(
-					new NotificacioDestinatariEstatEnumDto[] {NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT},
+					new NotificacioEnviamentEstatEnumDto[] {NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT},
 					3,
 					new PageRequest(0, maxPendents));
 			if (!pendents.isEmpty()) {
@@ -347,7 +347,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		if (pluginHelper.isSeuPluginDisponible() && isTasquesActivesProperty() && pluginHelper.isSeuPluginDisponible()) {
 			int maxPendents = getSeuJustificantsProcessarMaxProperty();
 			List<NotificacioEnviamentEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInAndMaxReintentsOrderBySeuDataNotificaDarreraPeticioAsc(
-					new NotificacioDestinatariEstatEnumDto[] {NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA},
+					new NotificacioEnviamentEstatEnumDto[] {NotificacioEnviamentEstatEnumDto.NOTIB_ENVIADA},
 					3,
 					new PageRequest(0, maxPendents));
 			// TODO excloure les notificacions ja processades amb Notifica
@@ -375,9 +375,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 		if (pluginHelper.isSeuPluginDisponible() && isTasquesActivesProperty() && pluginHelper.isSeuPluginDisponible()) {
 			int maxPendents = getSeuNotificaEstatProcessarMaxProperty();
 			List<NotificacioEnviamentEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInAndMaxReintentsOrderBySeuDataNotificaDarreraPeticioAsc(
-					new NotificacioDestinatariEstatEnumDto[] {
-							NotificacioDestinatariEstatEnumDto.LLEGIDA,
-							NotificacioDestinatariEstatEnumDto.REBUTJADA},
+					new NotificacioEnviamentEstatEnumDto[] {
+							NotificacioEnviamentEstatEnumDto.LLEGIDA,
+							NotificacioEnviamentEstatEnumDto.REBUTJADA},
 					3,
 					new PageRequest(0, maxPendents));
 			if (!pendents.isEmpty()) {

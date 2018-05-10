@@ -20,9 +20,9 @@ public class RespostaAlta {
 
 	private String identificador;
 	private NotificacioEstatEnum estat;
+	private List<EnviamentReferencia> referencies;
 	private boolean error;
 	private String errorDescripcio;
-	private List<EnviamentReferencia> referencies;
 
 	public String getIdentificador() {
 		return identificador;
@@ -36,6 +36,12 @@ public class RespostaAlta {
 	public void setEstat(NotificacioEstatEnum estat) {
 		this.estat = estat;
 	}
+	public List<EnviamentReferencia> getReferencies() {
+		return referencies;
+	}
+	public void setReferencies(List<EnviamentReferencia> referencies) {
+		this.referencies = referencies;
+	}
 	public boolean isError() {
 		return error;
 	}
@@ -47,12 +53,6 @@ public class RespostaAlta {
 	}
 	public void setErrorDescripcio(String errorDescripcio) {
 		this.errorDescripcio = errorDescripcio;
-	}
-	public List<EnviamentReferencia> getReferencies() {
-		return referencies;
-	}
-	public void setReferencies(List<EnviamentReferencia> referencies) {
-		this.referencies = referencies;
 	}
 
 }
