@@ -74,10 +74,8 @@
 							<goal>wsimport</goal>
 						</goals>
 						<configuration>
-							<packageName>gob.face.webservice.https</packageName>
 							<sourceDestDir>${basedir}/src/main/java</sourceDestDir>
 							<wsdlUrls>
-								<wsdlUrl>${basedir}/src/main/resources/es/caib/notib/plugin/wsdl/dir3caib/Dir3CaibObtenerUnidades.wsdl</wsdlUrl>
 								<wsdlUrl>${basedir}/src/main/resources/es/caib/notib/plugin/wsdl/sistra/zonaper/BackofficeFacade.wsdl</wsdlUrl>
 								<wsdlUrl>${basedir}/src/main/resources/es/caib/notib/plugin/wsdl/sistra/regtel/BackofficeFacade.wsdl</wsdlUrl>
 							</wsdlUrls>
@@ -94,15 +92,6 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<skip>true</skip>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<fork>true</fork>
-					<compilerVersion>${java.version}</compilerVersion>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
 				</configuration>
 			</plugin>
 		</plugins>

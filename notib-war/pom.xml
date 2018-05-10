@@ -329,15 +329,6 @@
 					</webResources>
 				</configuration>
 			</plugin>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<fork>true</fork>
-					<compilerVersion>${java.version}</compilerVersion>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-				</configuration>
-			</plugin>
 		</plugins>
 		<finalName>notib</finalName>
 	</build>
@@ -347,10 +338,5 @@
 			<name>GitHub GovernIB Maven Repository</name>
 			<url>http://GovernIB.github.io/maven/maven/</url>
 		</repository>
-		<repository>
-	        <id>maven-restlet</id>
-	        <name>Public online Restlet repository</name>
-	        <url>http://maven.restlet.org</url>
-	    </repository>
 	</repositories>
 </project>
