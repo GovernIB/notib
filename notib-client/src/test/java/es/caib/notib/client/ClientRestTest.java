@@ -3,8 +3,8 @@
  */
 package es.caib.notib.client;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
@@ -34,8 +34,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import es.caib.loginModule.client.AuthenticationFailureException;
-import es.caib.notib.client.NotificacioRestClient;
-import es.caib.notib.client.NotificacioRestClientFactory;
 import es.caib.notib.ws.notificacio.Document;
 import es.caib.notib.ws.notificacio.EntregaDeh;
 import es.caib.notib.ws.notificacio.EntregaPostal;
@@ -43,14 +41,17 @@ import es.caib.notib.ws.notificacio.EntregaPostalTipusEnum;
 import es.caib.notib.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.ws.notificacio.Enviament;
 import es.caib.notib.ws.notificacio.EnviamentEstatEnum;
+import es.caib.notib.ws.notificacio.EnviamentReferencia;
 import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
-import es.caib.notib.ws.notificacio.InformacioEnviament;
 import es.caib.notib.ws.notificacio.Notificacio;
-import es.caib.notib.ws.notificacio.NotificacioServiceWsException_Exception;
+import es.caib.notib.ws.notificacio.NotificacioEstatEnum;
 import es.caib.notib.ws.notificacio.PagadorCie;
 import es.caib.notib.ws.notificacio.PagadorPostal;
 import es.caib.notib.ws.notificacio.ParametresSeu;
 import es.caib.notib.ws.notificacio.Persona;
+import es.caib.notib.ws.notificacio.RespostaAlta;
+import es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament;
+import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
 import es.caib.notib.ws.notificacio.ServeiTipusEnum;
 
 /**
@@ -80,7 +81,7 @@ public class ClientRestTest {
 	}
 
 	@Test
-	public void test() throws InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, NotificacioServiceWsException_Exception, NamingException, CreateException, AuthenticationFailureException, IOException, DecoderException, DatatypeConfigurationException {
+	public void test() throws InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, NamingException, CreateException, AuthenticationFailureException, IOException, DecoderException, DatatypeConfigurationException {
 		String notificacioId = new Long(System.currentTimeMillis()).toString();
 //		List<String> referencies = client.alta(
 //				generarNotificacio(
@@ -101,35 +102,47 @@ public class ClientRestTest {
 //				is(EnviamentEstatEnum.NOTIB_PENDENT));
 ////		is(or(EnviamentEstatEnum.NOTIB_PENDENT, EnviamentEstatEnum.NOTIB_PENDENT)));
 		
-		AltaResposta respostaAlta = client.alta(
+		RespostaAlta respostaAlta = client.alta(
 				generarNotificacio(
 						notificacioId,
 						1,
 						true));
-		
-		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		assertThat(
+				respostaAlta.isError(),
+				is(false));
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(1));
 		
-		InformacioResposta respostaInfo = client.consulta(referencies.get(0));
-		assertNotNull(respostaInfo);
+		RespostaConsultaEstatNotificacio estatNotificacio = client.consultaEstatNotificacio(notificacioId);
+		assertNotNull(estatNotificacio);
 		assertThat(
-				respostaInfo.getCodiResposta(),
-				is("OK"));
-		InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		assertNotNull(info);
+				estatNotificacio.isError(),
+				is(false));
 		assertThat(
-				info.getEstat(),
+				estatNotificacio.getEstat(),
+				anyOf(
+						is(NotificacioEstatEnum.PENDENT), 
+						is(NotificacioEstatEnum.ENVIADA)) 
+				);
+		
+		
+		RespostaConsultaEstatEnviament estatEnviament = client.consultaEstatEnviament(referencies.get(0).getReferencia());
+		assertNotNull(estatEnviament);
+		assertThat(
+				estatEnviament.isError(),
+				is(false));
+		assertThat(
+				estatEnviament.getEstat(),
 				anyOf(
 						is(EnviamentEstatEnum.NOTIB_PENDENT), 
 						is(EnviamentEstatEnum.NOTIB_ENVIADA)) 
 				);
+		
 	}
 
 

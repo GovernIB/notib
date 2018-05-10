@@ -39,7 +39,6 @@ import es.caib.notib.ws.notificacio.EntregaPostalTipusEnum;
 import es.caib.notib.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.ws.notificacio.Enviament;
 import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
-import es.caib.notib.ws.notificacio.InformacioEnviament;
 import es.caib.notib.ws.notificacio.Notificacio;
 import es.caib.notib.ws.notificacio.PagadorCie;
 import es.caib.notib.ws.notificacio.PagadorPostal;
@@ -70,6 +69,7 @@ public class NotificaWsTestIntegracioRest {
 
 	private static NotificacioRestClient client;
 	
+	/*
 
 	@BeforeClass
 	public static void setUpClass() throws IOException, DecoderException {
@@ -2474,4 +2474,5 @@ public class NotificaWsTestIntegracioRest {
 		return DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
 	}
 	
+	*/
 }

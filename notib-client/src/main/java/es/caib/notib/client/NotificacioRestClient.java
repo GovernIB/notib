@@ -27,7 +27,9 @@ import es.caib.loginModule.auth.ControladorSesion;
 import es.caib.loginModule.client.AuthenticationFailureException;
 import es.caib.loginModule.client.AuthorizationToken;
 import es.caib.notib.ws.notificacio.Notificacio;
-import es.caib.notib.ws.notificacio.NotificacioServiceWsException_Exception;
+import es.caib.notib.ws.notificacio.RespostaAlta;
+import es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament;
+import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
 
 /**
  * Client REST per al servei de notificacions de NOTIB.
@@ -52,8 +54,8 @@ public class NotificacioRestClient {
 		this.password = password;
 	}
 
-	public AltaResposta alta(
-			Notificacio notificacio) throws NotificacioServiceWsException_Exception, InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, NamingException, CreateException, AuthenticationFailureException, IOException {
+	public RespostaAlta alta(
+			Notificacio notificacio) throws InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, NamingException, CreateException, AuthenticationFailureException, IOException {
 		String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/alta";
 		ObjectMapper mapper  = new ObjectMapper();
 		String body = mapper.writeValueAsString(notificacio);
@@ -69,12 +71,12 @@ public class NotificacioRestClient {
 				resource(urlAmbMetode).
 				type("application/json").
 				post(String.class, body);
-		return mapper.readValue(json, AltaResposta.class);
+		return mapper.readValue(json, RespostaAlta.class);
 	}
 
-	public InformacioResposta consulta(
-			String referencia) throws NotificacioServiceWsException_Exception, InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, NamingException, CreateException, AuthenticationFailureException, IOException {
-		String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/consulta/" + referencia;
+	public RespostaConsultaEstatEnviament consultaEstatEnviament(
+			String referencia) throws InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, NamingException, CreateException, AuthenticationFailureException, IOException {
+		String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
 		Client jerseyClient = generarClient();
 		if (username != null) {
 			autenticarClient(
@@ -88,9 +90,27 @@ public class NotificacioRestClient {
 				type("application/json").
 				get(String.class);
 		ObjectMapper mapper  = new ObjectMapper();
-		return mapper.readValue(json, InformacioResposta.class);
+		return mapper.readValue(json, RespostaConsultaEstatEnviament.class);
 	}
 
+	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
+			String identificador) throws InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, NamingException, CreateException, AuthenticationFailureException, IOException {
+		String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
+		Client jerseyClient = generarClient();
+		if (username != null) {
+			autenticarClient(
+					jerseyClient,
+					urlAmbMetode,
+					username,
+					password);
+		}
+		String json = jerseyClient.
+				resource(urlAmbMetode).
+				type("application/json").
+				get(String.class);
+		ObjectMapper mapper  = new ObjectMapper();
+		return mapper.readValue(json, RespostaConsultaEstatNotificacio.class);
+	}
 
 
 	private Client generarClient() {
