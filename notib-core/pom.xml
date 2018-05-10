@@ -261,59 +261,6 @@
 					</execution>
 				</executions>
 			</plugin>
-<!-- 			<plugin> -->
-<!-- 				<groupId>org.apache.cxf</groupId> -->
-<!-- 				<artifactId>cxf-codegen-plugin</artifactId> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<id>generate-sources</id> -->
-<!-- 						<phase>generate-sources</phase> -->
-<!-- 						<configuration> -->
-<!-- 							<sourceRoot>src/main/java</sourceRoot> -->
-<!-- 							<wsdlOptions> -->
-<!-- 								<wsdlOption> -->
-<!-- 									<wsdl>${basedir}/src/main/resources/es/caib/notib/core/wsdl/NotificaWS.wsdl</wsdl> -->
-<!-- 									<extraargs> -->
-<!-- 										<extraarg>-client</extraarg> -->
-<!-- 										<extraarg>-p</extraarg> -->
-<!-- 										<extraarg>es.caib.notib.core.wsdl.notifica</extraarg> -->
-<!-- 									</extraargs> -->
-<!-- 								</wsdlOption> -->
-<!-- 								<wsdlOption> -->
-<!-- 									<wsdl>${basedir}/src/main/resources/es/caib/notib/core/wsdl/NotificaWsV21.wsdl</wsdl> -->
-<!-- 									<extraargs> -->
-<!-- 										<extraarg>-client</extraarg> -->
-<!-- 										<extraarg>-b</extraarg> -->
-<!-- 										<extraarg>${basedir}/src/main/resources/es/caib/notib/core/wsdl/NotificaWsV21/binding.xml</extraarg> -->
-<!-- <!- 										<extraarg>-autoNameResolution</extraarg> -> -->
-<!-- 										<extraarg>-p</extraarg> -->
-<!-- 										<extraarg>es.caib.notib.core.wsdl.notificav21</extraarg> -->
-<!-- 									</extraargs> -->
-<!-- 								</wsdlOption> -->
-<!-- 								<wsdlOption> -->
-<!-- 									<wsdl>${basedir}/src/main/resources/es/caib/notib/core/wsdl/adviserWS.wsdl</wsdl> -->
-<!-- 									<extraargs> -->
-<!-- 										<extraarg>-client</extraarg> -->
-<!-- 										<extraarg>-p</extraarg> -->
-<!-- 										<extraarg>es.caib.notib.core.wsdl.adviser</extraarg> -->
-<!-- 									</extraargs> -->
-<!-- 								</wsdlOption> -->
-<!-- 								<wsdlOption> -->
-<!-- 									<wsdl>${basedir}/src/main/resources/es/caib/notib/core/wsdl/SedeWs.wsdl</wsdl> -->
-<!-- 									<extraargs> -->
-<!-- 										<extraarg>-client</extraarg> -->
-<!-- 										<extraarg>-p</extraarg> -->
-<!-- 										<extraarg>es.caib.notib.core.wsdl.sede</extraarg> -->
-<!-- 									</extraargs> -->
-<!-- 								</wsdlOption> -->
-<!-- 							</wsdlOptions> -->
-<!-- 						</configuration> -->
-<!-- 						<goals> -->
-<!-- 							<goal>wsdl2java</goal> -->
-<!-- 						</goals> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
-<!-- 			</plugin> -->
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>

@@ -3,8 +3,6 @@
  */
 package es.caib.notib.core.ejb.ws;
 
-import java.util.List;
-
 import javax.annotation.Resource;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.SessionContext;
@@ -17,10 +15,11 @@ import org.jboss.wsf.spi.annotation.WebContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.notib.core.api.ws.notificacio.InformacioEnviament;
 import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWs;
-import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsException;
+import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
+import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
+import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
 import es.caib.notib.core.helper.UsuariHelper;
 
 /**
@@ -57,8 +56,7 @@ public class NotificacioServiceWsBean implements NotificacioServiceWs {
 
 
 	@Override
-	public List<String> alta(
-			Notificacio notificacio) throws NotificacioServiceWsException {
+	public RespostaAlta alta(Notificacio notificacio) {
 		usuariHelper.generarUsuariAutenticatEjb(
 				sessionContext,
 				true);
@@ -66,12 +64,19 @@ public class NotificacioServiceWsBean implements NotificacioServiceWs {
 	}
 
 	@Override
-	public InformacioEnviament consulta(
-			String identificador) throws NotificacioServiceWsException {
+	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(String identificador) {
 		usuariHelper.generarUsuariAutenticatEjb(
 				sessionContext,
 				true);
-		return delegate.consulta(identificador);
+		return delegate.consultaEstatNotificacio(identificador);
+	}
+
+	@Override
+	public RespostaConsultaEstatEnviament consultaEstatEnviament(String referencia) {
+		usuariHelper.generarUsuariAutenticatEjb(
+				sessionContext,
+				true);
+		return delegate.consultaEstatEnviament(referencia);
 	}
 
 }

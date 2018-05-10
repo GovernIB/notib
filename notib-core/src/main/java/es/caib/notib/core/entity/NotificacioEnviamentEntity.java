@@ -27,7 +27,7 @@ import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 
 /**
@@ -41,6 +41,7 @@ import es.caib.notib.core.audit.NotibAuditable;
 @EntityListeners(AuditingEntityListener.class)
 public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 
+	/* Titular */
 	@Column(name = "titular_nom", length = 100)
 	private String titularNom;
 	@Column(name = "titular_llinatge1", length = 100)
@@ -57,6 +58,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	private String titularTelefon;
 	@Column(name = "titular_email", length = 100)
 	private String titularEmail;
+	/* Destinatari */
 	@Column(name = "destinatari_nom", length = 100)
 	private String destinatariNom;
 	@Column(name = "destinatari_llinatge1", length = 100)
@@ -73,6 +75,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	private String destinatariTelefon;
 	@Column(name = "destinatari_email", length = 100)
 	private String destinatariEmail;
+	/* Domicili */
 	@Column(name = "dom_tipus")
 	@Enumerated(EnumType.ORDINAL)
 	private NotificaDomiciliTipusEnumDto domiciliTipus;
@@ -129,12 +132,14 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	private String domiciliLinea2;
 	@Column(name = "dom_cie")
 	private Integer domiciliCie;
+	/* DEH */
 	@Column(name = "deh_obligat")
 	private Boolean dehObligat;
 	@Column(name = "deh_nif", length = 9)
 	private String dehNif;
 	@Column(name = "deh_proc_codi", length = 6)
 	private String dehProcedimentCodi;
+	/* Altres */
 	@Column(name = "servei_tipus")
 	@Enumerated(EnumType.ORDINAL)
 	private NotificaServeiTipusEnumDto serveiTipus;
@@ -142,55 +147,58 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	private String formatSobre;
 	@Column(name = "format_fulla", length = 10)
 	private String formatFulla;
-	@Column(name = "notifica_id", length = 20)
-	private String notificaIdentificador;
+	/* Notifica informació */
 	@Column(name = "notifica_ref", length = 20)
 	private String notificaReferencia;
+	@Column(name = "notifica_id", length = 20)
+	private String notificaIdentificador;
 	@Column(name = "notifica_datcre")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaDataCreacio;
 	@Column(name = "notifica_datdisp")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaDataDisposicio;
-//	@Column(name = "notifica_datenv")
-//	@Temporal(TemporalType.TIMESTAMP)
-//	private Date notificaDataEnviament = new Date();
+	@Column(name = "notifica_datcad")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date notificaDataCaducitat;
 	@Column(name = "notifica_emi_dir3codi", length = 9)
 	private String notificaEmisorDir3;
 	@Column(name = "notifica_emi_dir3desc", length = 100)
 	private String notificaEmisorDescripcio;
+	@Column(name = "notifica_emi_dir3nif", length = 9)
+	private String notificaEmisorNif;
 	@Column(name = "notifica_arr_dir3codi", length = 9)
 	private String notificaArrelDir3;
 	@Column(name = "notifica_arr_dir3desc", length = 100)
 	private String notificaArrelDescripcio;
-	@Column(name = "notifica_des_dir3codi", length = 9)
-	private String notificaDestiDir3;
-	@Column(name = "notifica_des_dir3desc", length = 100)
-	private String notificaDestiDescripcio;
+	@Column(name = "notifica_arr_dir3nif", length = 9)
+	private String notificaArrelNif;
+	/* Notifica estat i datat */
 	@Column(name = "notifica_estat", nullable = false)
-	private NotificacioDestinatariEstatEnumDto notificaEstat;
-	@Column(name = "notifica_estat_desc", length = 255)
-	private String notificaEstatDescripcio;
+	private NotificacioEnviamentEstatEnumDto notificaEstat;
 	@Column(name = "notifica_estat_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaEstatData;
-	@Column(name = "notifica_estat_origen", length = 20)
-	private String notificaEstatOrigen;
-	@Column(name = "notifica_estat_recnif", length = 9)
-	private String notificaEstatReceptorNif;
-	@Column(name = "notifica_estat_recnom", length = 100)
-	private String notificaEstatReceptorNom;
-	@Column(name = "notifica_estat_numseg", length = 50)
-	private String notificaEstatNumSeguiment;
-	@Column(name = "notifica_estat_error", length = 255)
-	private String notificaEstatError;
+	@Column(name = "notifica_estat_desc", length = 255)
+	private String notificaEstatDescripcio;
+	@Column(name = "notifica_datat_origen", length = 20)
+	private String notificaDatatOrigen;
+	@Column(name = "notifica_datat_recnif", length = 9)
+	private String notificaDatatReceptorNif;
+	@Column(name = "notifica_datat_recnom", length = 100)
+	private String notificaDatatReceptorNom;
+	@Column(name = "notifica_datat_numseg", length = 50)
+	private String notificaDatatNumSeguiment;
+	@Column(name = "notifica_datat_errdes", length = 255)
+	private String notificaDatatErrorDescripcio;
+	/* Notifica certificació */
+	@Column(name = "notifica_cer_data")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date notificaCertificacioData;
 	@Column(name = "notifica_cer_arxiuid", length = 50)
 	private String notificaCertificacioArxiuId;
 	@Column(name = "notifica_cer_hash", length = 50)
 	private String notificaCertificacioHash;
-	@Column(name = "notifica_cer_data")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date notificaCertificacioData;
 	@Column(name = "notifica_cer_origen", length = 20)
 	private String notificaCertificacioOrigen;
 	@Column(name = "notifica_cer_metas", length = 255)
@@ -198,7 +206,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "notifica_cer_csv", length = 50)
 	private String notificaCertificacioCsv;
 	@Column(name = "notifica_cer_mime", length = 20)
-	private String notificaCertificacioTipusMime;
+	private String notificaCertificacioMime;
 	@Column(name = "notifica_cer_tamany", length = 20)
 	private Integer notificaCertificacioTamany;
 	@Column(name = "notifica_cer_tipus")
@@ -209,12 +217,14 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	private NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus;
 	@Column(name = "notifica_cer_numseg", length = 50)
 	private String notificaCertificacioNumSeguiment;
+	/* Notifica error */
 	@Column(name = "notifica_error", nullable = false)
 	private boolean notificaError;
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "notifica_error_event_id")
 	@ForeignKey(name = "not_noteve_noterr_notdest_fk")
 	private NotificacioEventEntity notificaErrorEvent;
+	/* Seu CAIB */
 	@Column(name = "seu_reg_numero", length = 50)
 	private String seuRegistreNumero;
 	@Column(name = "seu_reg_data")
@@ -225,7 +235,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	private Date seuDataFi;
 	@Column(name = "seu_estat", nullable = false)
 	@Enumerated(EnumType.ORDINAL)
-	private NotificacioDestinatariEstatEnumDto seuEstat;
+	private NotificacioEnviamentEstatEnumDto seuEstat;
 	@Column(name = "seu_error", nullable = false)
 	private boolean seuError;
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
@@ -234,7 +244,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	private NotificacioEventEntity seuErrorEvent;
 	@Column(name = "seu_data_enviam")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date seuDataEnviament = new Date();
+	private Date seuDataEnviament;
 	@Column(name = "seu_reintents_env")
 	private int seuReintentsEnviament;
 	@Column(name = "seu_data_estat")
@@ -246,6 +256,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "seu_data_notidp")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date seuDataNotificaDarreraPeticio;
+
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_id")
 	@ForeignKey(name = "not_notificacio_notdest_fk")
@@ -395,11 +406,11 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public String getFormatFulla() {
 		return formatFulla;
 	}
-	public String getNotificaIdentificador() {
-		return notificaIdentificador;
-	}
 	public String getNotificaReferencia() {
 		return notificaReferencia;
+	}
+	public String getNotificaIdentificador() {
+		return notificaIdentificador;
 	}
 	public Date getNotificaDataCreacio() {
 		return notificaDataCreacio;
@@ -407,11 +418,17 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public Date getNotificaDataDisposicio() {
 		return notificaDataDisposicio;
 	}
+	public Date getNotificaDataCaducitat() {
+		return notificaDataCaducitat;
+	}
 	public String getNotificaEmisorDir3() {
 		return notificaEmisorDir3;
 	}
 	public String getNotificaEmisorDescripcio() {
 		return notificaEmisorDescripcio;
+	}
+	public String getNotificaEmisorNif() {
+		return notificaEmisorNif;
 	}
 	public String getNotificaArrelDir3() {
 		return notificaArrelDir3;
@@ -419,41 +436,41 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public String getNotificaArrelDescripcio() {
 		return notificaArrelDescripcio;
 	}
-	public String getNotificaDestiDir3() {
-		return notificaDestiDir3;
+	public String getNotificaArrelNif() {
+		return notificaArrelNif;
 	}
-	public String getNotificaDestiDescripcio() {
-		return notificaDestiDescripcio;
-	}
-	public NotificacioDestinatariEstatEnumDto getNotificaEstat() {
+	public NotificacioEnviamentEstatEnumDto getNotificaEstat() {
 		return notificaEstat;
-	}
-	public String getNotificaEstatDescripcio() {
-		return notificaEstatDescripcio;
 	}
 	public Date getNotificaEstatData() {
 		return notificaEstatData;
 	}
-	public String getNotificaEstatOrigen() {
-		return notificaEstatOrigen;
+	public String getNotificaEstatDescripcio() {
+		return notificaEstatDescripcio;
 	}
-	public String getNotificaEstatReceptorNif() {
-		return notificaEstatReceptorNif;
+	public String getNotificaDatatOrigen() {
+		return notificaDatatOrigen;
 	}
-	public String getNotificaEstatReceptorNom() {
-		return notificaEstatReceptorNom;
+	public String getNotificaDatatReceptorNif() {
+		return notificaDatatReceptorNif;
 	}
-	public String getNotificaEstatNumSeguiment() {
-		return notificaEstatNumSeguiment;
+	public String getNotificaDatatReceptorNom() {
+		return notificaDatatReceptorNom;
+	}
+	public String getNotificaDatatNumSeguiment() {
+		return notificaDatatNumSeguiment;
+	}
+	public String getNotificaDatatErrorDescripcio() {
+		return notificaDatatErrorDescripcio;
+	}
+	public Date getNotificaCertificacioData() {
+		return notificaCertificacioData;
 	}
 	public String getNotificaCertificacioArxiuId() {
 		return notificaCertificacioArxiuId;
 	}
 	public String getNotificaCertificacioHash() {
 		return notificaCertificacioHash;
-	}
-	public Date getNotificaCertificacioData() {
-		return notificaCertificacioData;
 	}
 	public String getNotificaCertificacioOrigen() {
 		return notificaCertificacioOrigen;
@@ -464,8 +481,8 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public String getNotificaCertificacioCsv() {
 		return notificaCertificacioCsv;
 	}
-	public String getNotificaCertificacioTipusMime() {
-		return notificaCertificacioTipusMime;
+	public String getNotificaCertificacioMime() {
+		return notificaCertificacioMime;
 	}
 	public Integer getNotificaCertificacioTamany() {
 		return notificaCertificacioTamany;
@@ -494,7 +511,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public Date getSeuDataFi() {
 		return seuDataFi;
 	}
-	public NotificacioDestinatariEstatEnumDto getSeuEstat() {
+	public NotificacioEnviamentEstatEnumDto getSeuEstat() {
 		return seuEstat;
 	}
 	public boolean isSeuError() {
@@ -505,6 +522,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 	public Date getSeuDataEnviament() {
 		return seuDataEnviament;
+	}
+	public int getSeuReintentsEnviament() {
+		return seuReintentsEnviament;
 	}
 	public Date getSeuDataEstat() {
 		return seuDataEstat;
@@ -519,66 +539,54 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		return notificacio;
 	}
 
-	public void updateNotificaIdentificador(
+	public void updateNotificaReferencia(
+			String notificaReferencia) {
+		this.notificaReferencia = notificaReferencia;
+	}
+	public void updateNotificaEnviada(
 			String notificaIdentificador) {
 		this.notificaIdentificador = notificaIdentificador;
+		this.notificaEstatData = new Date();
+		this.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_ENVIADA;
+		this.notificaError = false;
+		this.notificaErrorEvent = null;
 	}
-
-	public void updateNotificaEstat(
-			Date notificaEstatData,
-			NotificacioDestinatariEstatEnumDto notificaEstat,
-			boolean netejarError) {
-		this.notificaEstatData = notificaEstatData;
-		this.notificaEstat = notificaEstat;
-		if (netejarError) {
-			this.notificaError = false;
-			this.notificaErrorEvent = null;
-		}
-	}
-	public void updateNotificaEstat(
-			Date notificaEstatData,
-			NotificacioDestinatariEstatEnumDto notificaEstat,
-			String notificaEstatDescripcio,
-			String notificaEstatNumSeguiment,
-			boolean netejarError) {
-		this.notificaEstatData = notificaEstatData;
-		this.notificaEstat = notificaEstat;
-		this.notificaEstatDescripcio = notificaEstatDescripcio;
-		this.notificaEstatNumSeguiment = notificaEstatNumSeguiment;
-		if (netejarError) {
-			this.notificaError = false;
-			this.notificaErrorEvent = null;
-		}
+	public void updateNotificaInformacio(
+			Date notificaDataCreacio,
+			Date notificaDataDisposicio,
+			Date notificaDataCaducitat,
+			String notificaEmisorDir3,
+			String notificaEmisorDescripcio,
+			String notificaEmisorNif,
+			String notificaArrelDir3,
+			String notificaArrelDescripcio,
+			String notificaArrelNif) {
+		this.notificaDataCreacio = notificaDataCreacio;
+		this.notificaDataDisposicio = notificaDataDisposicio;
+		this.notificaDataCaducitat = notificaDataCaducitat;
+		this.notificaEmisorDir3 = notificaEmisorDir3;
+		this.notificaEmisorDescripcio = notificaEmisorDescripcio;
+		this.notificaEmisorNif = notificaEmisorNif;
+		this.notificaArrelDir3 = notificaArrelDir3;
+		this.notificaArrelDescripcio = notificaArrelDescripcio;
+		this.notificaArrelNif = notificaArrelNif;
 	}
 	public void updateNotificaDatat(
+			NotificacioEnviamentEstatEnumDto notificaEstat,
 			Date notificaEstatData,
-			NotificacioDestinatariEstatEnumDto notificaEstat,
 			String notificaEstatDescripcio,
-			String notificaEstatOrigen,
-			String notificaEstatReceptorNif,
-			String notificaEstatReceptorNom,
-			String notificaEstatNumSeguiment) {
-		this.notificaEstatData = notificaEstatData;
+			String notificaDatatOrigen,
+			String notificaDatatReceptorNif,
+			String notificaDatatReceptorNom,
+			String notificaDatatNumSeguiment,
+			String notificaDatatErrorDescripcio) {
 		this.notificaEstat = notificaEstat;
 		this.notificaEstatDescripcio = notificaEstatDescripcio;
-		this.notificaEstatOrigen = notificaEstatOrigen;
-		this.notificaEstatReceptorNif = notificaEstatReceptorNif;
-		this.notificaEstatReceptorNom = notificaEstatReceptorNom;
-		this.notificaEstatNumSeguiment = notificaEstatNumSeguiment;
-	}
-	public void updateNotificaInfo(
-			Date notificaEstatData,
-			NotificacioDestinatariEstatEnumDto notificaEstat,
-			String notificaEstatOrigen,
-			String notificaEstatReceptorNif,
-			String notificaEstatReceptorNom,
-			String notificaEstatError) {
-		this.notificaEstatData = notificaEstatData;
-		this.notificaEstat = notificaEstat;
-		this.notificaEstatOrigen = notificaEstatOrigen;
-		this.notificaEstatReceptorNif = notificaEstatReceptorNif;
-		this.notificaEstatReceptorNom = notificaEstatReceptorNom;
-		this.notificaEstatError = notificaEstatError;
+		this.notificaDatatOrigen = notificaDatatOrigen;
+		this.notificaDatatReceptorNif = notificaDatatReceptorNif;
+		this.notificaDatatReceptorNom = notificaDatatReceptorNom;
+		this.notificaDatatNumSeguiment = notificaDatatNumSeguiment;
+		this.notificaDatatErrorDescripcio = notificaDatatErrorDescripcio;
 	}
 	public void updateNotificaCertificacio(
 			Date notificaCertificacioData,
@@ -587,7 +595,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			String notificaCertificacioOrigen,
 			String notificaCertificacioMetadades,
 			String notificaCertificacioCsv,
-			String notificaCertificacioTipusMime,
+			String notificaCertificacioMime,
 			Integer notificaCertificacioTamany,
 			NotificaCertificacioTipusEnumDto notificaCertificacioTipus, // acuse o sobre
 			NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus,
@@ -598,7 +606,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaCertificacioOrigen = notificaCertificacioOrigen;
 		this.notificaCertificacioMetadades = notificaCertificacioMetadades;
 		this.notificaCertificacioCsv = notificaCertificacioCsv;
-		this.notificaCertificacioTipusMime = notificaCertificacioTipusMime;
+		this.notificaCertificacioMime = notificaCertificacioMime;
 		this.notificaCertificacioTamany = notificaCertificacioTamany;
 		this.notificaCertificacioTipus = notificaCertificacioTipus;
 		this.notificaCertificacioArxiuTipus = notificaCertificacioArxiuTipus;
@@ -610,15 +618,11 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaError = notificaError;
 		this.notificaErrorEvent = notificaErrorEvent;
 	}
-	public void updateNotificaReferencia(
-			String notificaReferencia) {
-		this.notificaReferencia = notificaReferencia;
-	}
 
 	public void updateSeuEnviament(
 			String seuRegistreNumero,
 			Date seuRegistreData,
-			NotificacioDestinatariEstatEnumDto seuEstat) {
+			NotificacioEnviamentEstatEnumDto seuEstat) {
 		this.seuDataEnviament = new Date();
 		this.seuRegistreNumero = seuRegistreNumero;
 		this.seuRegistreData = seuRegistreData;
@@ -626,7 +630,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 	public void updateSeuEstat(
 			Date seuDataFi,
-			NotificacioDestinatariEstatEnumDto seuEstat) {
+			NotificacioEnviamentEstatEnumDto seuEstat) {
 		this.seuDataEstat = new Date();
 		this.seuDataFi = seuDataFi;
 		this.seuEstat = seuEstat;
@@ -670,8 +674,8 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built.titularNif = titularNif;
 			built.serveiTipus = serveiTipus;
 			built.notificacio = notificacio;
-			built.notificaEstat = NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT;
-			built.seuEstat = NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT;
+			built.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
+			built.seuEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
 		}
 		public Builder titularNom(String titularNom) {
 			built.titularNom = titularNom;
@@ -866,7 +870,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		}
 	}
 
-	public static NotificacioDestinatariEstatEnumDto calcularEstatCombinatNotificaSeu(
+	/*public static NotificacioDestinatariEstatEnumDto calcularEstatCombinatNotificaSeu(
 			NotificacioEnviamentEntity enviament) {
 		NotificacioDestinatariEstatEnumDto estatNotifica = enviament.getNotificaEstat();
 		NotificacioDestinatariEstatEnumDto estatSeu = enviament.getSeuEstat();
@@ -909,7 +913,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			}
 		}
 		return dataBona;
-	}
+	}*/
 
 	@Override
 	public int hashCode() {

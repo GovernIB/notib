@@ -3,13 +3,9 @@
  */
 package es.caib.notib.core.api.ws.notificacio;
 
-
-import java.util.List;
-
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
-
 
 /**
  * Servei per a l'enviament i consulta de notificacions.
@@ -28,18 +24,29 @@ public interface NotificacioServiceWs {
 	 *            Dades per a donar d'alta la notificació.
 	 * @return la llista de referencies generades per NOTIB (una per enviament)).
 	 */
-	public List<String> alta(
-			@WebParam(name="notificacio") @XmlElement(required = true) Notificacio notificacio) throws NotificacioServiceWsException;
+	public RespostaAlta alta(
+			@WebParam(name="notificacio") @XmlElement(required = true) Notificacio notificacio);
 
 	/**
-	 * Consulta la informació d'una notificació donat un enviament.
+	 * Consulta l'estat d'un enviament d'una notificació.
 	 * 
 	 * @param referencia
 	 *            Referència de l'enviament a consultar.
 	 * @return la informació de la notificació amb l'enviament
 	 *            especificat.
 	 */
-	public InformacioEnviament consulta(
-			@WebParam(name="referencia") @XmlElement(required = true) String referencia) throws NotificacioServiceWsException;
+	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
+			@WebParam(name="identificador") @XmlElement(required = true) String identificador);
+
+	/**
+	 * Consulta l'estat d'un enviament d'una notificació.
+	 * 
+	 * @param referencia
+	 *            Referència de l'enviament a consultar.
+	 * @return la informació de la notificació amb l'enviament
+	 *            especificat.
+	 */
+	public RespostaConsultaEstatEnviament consultaEstatEnviament(
+			@WebParam(name="referencia") @XmlElement(required = true) String referencia);
 
 }

@@ -9,7 +9,6 @@ import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -44,7 +43,7 @@ import es.caib.notib.core.api.dto.NotificaRespostaCertificacioDto;
 import es.caib.notib.core.api.dto.NotificaRespostaDatatDto;
 import es.caib.notib.core.api.dto.NotificaRespostaDatatDto.NotificaRespostaDatatEventDto;
 import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
-import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
@@ -100,6 +99,7 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 	public boolean enviament(
 			Long notificacioId) {
 		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
+		notificacio.updateNotificaNouEnviament();
 		if (!NotificacioEstatEnumDto.PENDENT.equals(notificacio.getEstat())) {
 			throw new ValidationException(
 					notificacioId,
@@ -114,12 +114,8 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 					for (IdentificadorEnvio identificadorEnvio: resultadoAlta.getIdentificadores().getItem()) {
 						for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
 							if (enviament.getNotificaReferencia().equals(identificadorEnvio.getReferenciaEmisor())) {
-								enviament.updateNotificaIdentificador(
+								enviament.updateNotificaEnviada(
 										identificadorEnvio.getIdentificador());
-								enviament.updateNotificaEstat(
-										new Date(),
-										NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA,
-										true);
 							}
 						}
 					}
@@ -129,8 +125,8 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 						notificacio).build();
 				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
 				notificacio.updateEventAfegir(event);
-				notificacio.updateErrorNotifica(
-						false,
+				notificacio.updateNotificaError(
+						null,
 						null);
 				notificacioEventRepository.save(event);
 			} else {
@@ -140,8 +136,8 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 						error(true).
 						errorDescripcio("Error retornat per notifica: [" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta()).
 						build();
-				notificacio.updateErrorNotifica(
-						true,
+				notificacio.updateNotificaError(
+						NotificacioErrorTipusEnumDto.ERROR_REMOT,
 						event);
 				notificacio.updateEventAfegir(event);
 				notificacioEventRepository.save(event);
@@ -166,8 +162,8 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 					errorDescripcio(errorDescripcio).
 					build();
 			notificacio.updateEventAfegir(event);
-			notificacio.updateErrorNotifica(
-					true,
+			notificacio.updateNotificaError(
+					NotificacioErrorTipusEnumDto.ERROR_XARXA,
 					event);
 			notificacioEventRepository.save(event);
 			for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
@@ -178,14 +174,18 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 	}
 
 	public NotificaRespostaEstatDto refrescarEstat(
-			NotificacioEnviamentEntity destinatari) throws SistemaExternException {
-		NotificaRespostaDatatDto respostaDatat = enviamentDatat(destinatari);
-		destinatari.updateNotificaEstat(
-				respostaDatat.getDataActualitzacio(),
+			NotificacioEnviamentEntity enviament) throws SistemaExternException {
+		NotificaRespostaDatatDto respostaDatat = enviamentDatat(enviament);
+		enviament.updateNotificaDatat(
 				getEstatNotifica(respostaDatat.getEstatActual()),
+				respostaDatat.getDataActualitzacio(),
 				respostaDatat.getEstatActualDescripcio(),
+				null,
+				null,
+				null,
 				respostaDatat.getNumSeguiment(),
-				true);
+				null);
+		enviament.updateNotificaError(false, null);
 		NotificaRespostaEstatDto resposta = new NotificaRespostaEstatDto();
 		resposta.setData(respostaDatat.getDataActualitzacio());
 		resposta.setEstatCodi(respostaDatat.getEstatActual());
@@ -193,7 +193,7 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 		resposta.setNumSeguiment(respostaDatat.getNumSeguiment());
 		if (isEstatFinal(respostaDatat.getEstatActual())) {
 			//NotificaRespostaCertificacioDto respostaCertificacio = enviamentCertificacio(destinatari);
-			enviamentCertificacio(destinatari);
+			enviamentCertificacio(enviament);
 			// TODO
 		}
 		return resposta;

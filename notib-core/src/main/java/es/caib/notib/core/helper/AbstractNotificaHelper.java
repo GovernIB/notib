@@ -53,7 +53,7 @@ import org.w3c.dom.Document;
 
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
-import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEntity;
@@ -162,9 +162,9 @@ public abstract class AbstractNotificaHelper {
 		try {
 			CertificacionSede certificacionSede = new CertificacionSede();
 			certificacionSede.setEnvioDestinatario(enviament.getNotificaIdentificador());
-			if (NotificacioDestinatariEstatEnumDto.LLEGIDA.equals(enviament.getSeuEstat())) {
+			if (NotificacioEnviamentEstatEnumDto.LLEGIDA.equals(enviament.getSeuEstat())) {
 				certificacionSede.setEstado("notificada");
-			} else if (NotificacioDestinatariEstatEnumDto.REBUTJADA.equals(enviament.getSeuEstat())) {
+			} else if (NotificacioEnviamentEstatEnumDto.REBUTJADA.equals(enviament.getSeuEstat())) {
 				certificacionSede.setEstado("rehusada");
 			}
 			certificacionSede.setFecha(
@@ -228,7 +228,7 @@ public abstract class AbstractNotificaHelper {
 
 	public boolean isAdviserActiu() {
 		String actiu = PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.notifica.adviser.actiu");
+				"es.caib.notib.adviser.actiu");
 		if (actiu != null) {
 			return new Boolean(actiu).booleanValue();
 		} else {
@@ -266,27 +266,27 @@ public abstract class AbstractNotificaHelper {
 			"expirada",
 			"envio_programado",
 			"sin_informacion"};
-	private static final NotificacioDestinatariEstatEnumDto[] estatsNotib = new NotificacioDestinatariEstatEnumDto[] {
-			NotificacioDestinatariEstatEnumDto.ABSENT,
-			NotificacioDestinatariEstatEnumDto.DESCONEGUT,
-			NotificacioDestinatariEstatEnumDto.ADRESA_INCORRECTA,
-			NotificacioDestinatariEstatEnumDto.ENVIADA_DEH,
-			NotificacioDestinatariEstatEnumDto.ENVIADA_CI,
-			NotificacioDestinatariEstatEnumDto.ENTREGADA_OP,
-			NotificacioDestinatariEstatEnumDto.LLEGIDA,
-			NotificacioDestinatariEstatEnumDto.ERROR_ENTREGA,
-			NotificacioDestinatariEstatEnumDto.EXTRAVIADA,
-			NotificacioDestinatariEstatEnumDto.MORT,
-			NotificacioDestinatariEstatEnumDto.NOTIFICADA,
-			NotificacioDestinatariEstatEnumDto.PENDENT_ENVIAMENT,
-			NotificacioDestinatariEstatEnumDto.PENDENT_CIE,
-			NotificacioDestinatariEstatEnumDto.PENDENT_DEH,
-			NotificacioDestinatariEstatEnumDto.PENDENT_SEU,
-			NotificacioDestinatariEstatEnumDto.REBUTJADA,
-			NotificacioDestinatariEstatEnumDto.EXPIRADA,
-			NotificacioDestinatariEstatEnumDto.ENVIAMENT_PROGRAMAT,
-			NotificacioDestinatariEstatEnumDto.SENSE_INFORMACIO};
-	protected NotificacioDestinatariEstatEnumDto getEstatNotifica(
+	private static final NotificacioEnviamentEstatEnumDto[] estatsNotib = new NotificacioEnviamentEstatEnumDto[] {
+			NotificacioEnviamentEstatEnumDto.ABSENT,
+			NotificacioEnviamentEstatEnumDto.DESCONEGUT,
+			NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA,
+			NotificacioEnviamentEstatEnumDto.ENVIADA_DEH,
+			NotificacioEnviamentEstatEnumDto.ENVIADA_CI,
+			NotificacioEnviamentEstatEnumDto.ENTREGADA_OP,
+			NotificacioEnviamentEstatEnumDto.LLEGIDA,
+			NotificacioEnviamentEstatEnumDto.ERROR_ENTREGA,
+			NotificacioEnviamentEstatEnumDto.EXTRAVIADA,
+			NotificacioEnviamentEstatEnumDto.MORT,
+			NotificacioEnviamentEstatEnumDto.NOTIFICADA,
+			NotificacioEnviamentEstatEnumDto.PENDENT_ENVIAMENT,
+			NotificacioEnviamentEstatEnumDto.PENDENT_CIE,
+			NotificacioEnviamentEstatEnumDto.PENDENT_DEH,
+			NotificacioEnviamentEstatEnumDto.PENDENT_SEU,
+			NotificacioEnviamentEstatEnumDto.REBUTJADA,
+			NotificacioEnviamentEstatEnumDto.EXPIRADA,
+			NotificacioEnviamentEstatEnumDto.ENVIAMENT_PROGRAMAT,
+			NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO};
+	protected NotificacioEnviamentEstatEnumDto getEstatNotifica(
 			String estatCodi) {
 		for (int i = 0; i < estatsNotifica.length; i++) {
 			if (estatCodi.equalsIgnoreCase(estatsNotifica[i])) {

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
+import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 
 /**
@@ -42,7 +43,17 @@ public class NotificaHelper {
 		return getNotificaHelper().comunicacioSeu(notificacioDestinatariId);
 	}
 
-	public String generarReferencia(
+	public String generarIdentificadorNotificacio(
+			NotificacioEntity notificacio) throws GeneralSecurityException {
+		return getNotificaHelper().xifrarIdPerNotifica(notificacio.getId());
+	}
+
+	public Long obtenirIdNotificacioAmbIdentificador(
+			String identificador) throws GeneralSecurityException {
+		return getNotificaHelper().desxifrarIdPerNotifica(identificador);
+	}
+
+	public String generarReferenciaDestinatari(
 			NotificacioEnviamentEntity notificacioDestinatari) throws GeneralSecurityException {
 		return getNotificaHelper().xifrarIdPerNotifica(notificacioDestinatari.getId());
 	}

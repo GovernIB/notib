@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 public class Notificacio {
 
 	private String emisorDir3Codi;
+	private ComunicacioTipusEnum comunicacioTipus;
 	private EnviamentTipusEnum enviamentTipus;
 	private String concepte;
 	private String descripcio;
@@ -41,6 +42,12 @@ public class Notificacio {
 	}
 	public void setEmisorDir3Codi(String emisorDir3Codi) {
 		this.emisorDir3Codi = emisorDir3Codi;
+	}
+	public ComunicacioTipusEnum getComunicacioTipus() {
+		return comunicacioTipus;
+	}
+	public void setComunicacioTipus(ComunicacioTipusEnum comunicacioTipus) {
+		this.comunicacioTipus = comunicacioTipus;
 	}
 	public EnviamentTipusEnum getEnviamentTipus() {
 		return enviamentTipus;

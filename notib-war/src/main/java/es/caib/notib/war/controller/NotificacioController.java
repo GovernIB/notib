@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
@@ -76,7 +76,7 @@ public class NotificacioController extends BaseController {
 		model.addAttribute(
 				"notificacioDestinatariEstats",
 				EnumHelper.getOptionsForEnum(
-						NotificacioDestinatariEstatEnumDto.class,
+						NotificacioEnviamentEstatEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto."));
 		model.addAttribute("send", sendToNotificaOnAlta());
 		return "notificacioList";

@@ -195,12 +195,12 @@ public class ClientRestTest {
 			titular.setEmail("titular@gmail.com");
 			enviament.setTitular(titular);
 			Persona destinatari = new Persona();
-			destinatari.setNom("Melcior");
-			destinatari.setLlinatge1("Andreu");
-			destinatari.setLlinatge2("Nadal");
+			destinatari.setNom("Josep Bernadí");
+			destinatari.setLlinatge1("Gayà");
+			destinatari.setLlinatge2("Miralles");
 			destinatari.setNif("18225486x");
 			destinatari.setTelefon("666020202");
-			destinatari.setEmail("sandreu@limit.es");
+			destinatari.setEmail("josepg@limit.es");
 			enviament.getDestinataris().add(destinatari);
 			if (ambEnviamentPostal) {
 				EntregaPostal entregaPostal = new EntregaPostal();
@@ -219,7 +219,7 @@ public class ClientRestTest {
 				entregaPostal.setComplement("complement" + i);
 				entregaPostal.setCodiPostal("07500");
 				entregaPostal.setPoblacio("poblacio" + i);
-				entregaPostal.setMunicipiCodi("070337");
+				entregaPostal.setMunicipiCodi("07507");
 				entregaPostal.setProvinciaCodi("07");
 				entregaPostal.setPaisCodi("ES");
 				entregaPostal.setLinea1("linea1_" + i);

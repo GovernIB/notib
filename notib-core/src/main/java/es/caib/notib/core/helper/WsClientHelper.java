@@ -3,9 +3,7 @@
  */
 package es.caib.notib.core.helper;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
@@ -20,7 +18,6 @@ import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
 import javax.xml.namespace.QName;
 import javax.xml.soap.AttachmentPart;
-import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
@@ -197,9 +194,10 @@ public class WsClientHelper<T> {
 //					smc.setMessage(MessageFactory.newInstance().createMessage(null, is));
 //				}
 				sb.append(missatge);
-				Iterator attachments = smc.getMessage().getAttachments();
+				@SuppressWarnings("unchecked")
+				Iterator<AttachmentPart> attachments = smc.getMessage().getAttachments();
                 while (attachments.hasNext()) {
-                    AttachmentPart attachment = (AttachmentPart) attachments.next();
+                    AttachmentPart attachment = attachments.next();
                     sb.append("\n"
                     		+ "### Start Attachment ###"
                     		+ "Content type: " + attachment.getContentType() + "\n"
