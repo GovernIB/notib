@@ -35,12 +35,17 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			NotificacioEstatEnumDto estat,
 			Pageable pageable);
 
-	@Query("FROM NotificacioEntity "
-			+ "WHERE estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.PENDENT "
-			+ "  AND notificaReintentsEnviament < 3 "
-			+ "ORDER BY notificaDataEnviament ASC")
+	@Query(
+			"from " +
+			"    NotificacioEntity " +
+			"where " +
+			"    comunicacioTipus = es.caib.notib.core.api.dto.NotificaComunicacioTipusEnumDto.ASINCRON " +
+			"and estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.PENDENT " +
+			"and notificaEnviamentIntent < 3 " +
+			"order by " +
+			"    notificaEnviamentData ASC")
 	List<NotificacioEntity> findByNotificaEstatPendent(Pageable pageable);
-		
+
 	@Query(	"from " +
 			"     NotificacioEntity nf " +
 			"where " +

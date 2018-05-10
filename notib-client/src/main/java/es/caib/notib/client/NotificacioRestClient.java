@@ -3,7 +3,6 @@
  */
 package es.caib.notib.client;
 
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
@@ -27,6 +26,7 @@ import es.caib.loginModule.auth.ControladorSesion;
 import es.caib.loginModule.client.AuthenticationFailureException;
 import es.caib.loginModule.client.AuthorizationToken;
 import es.caib.notib.ws.notificacio.Notificacio;
+import es.caib.notib.ws.notificacio.NotificacioService;
 import es.caib.notib.ws.notificacio.RespostaAlta;
 import es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
@@ -36,7 +36,7 @@ import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class NotificacioRestClient {
+public class NotificacioRestClient implements NotificacioService {
 
 	private static final String NOTIFICACIO_SERVICE_PATH = "/api/services/notificacio";
 
@@ -54,63 +54,79 @@ public class NotificacioRestClient {
 		this.password = password;
 	}
 
+	@Override
 	public RespostaAlta alta(
-			Notificacio notificacio) throws InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, NamingException, CreateException, AuthenticationFailureException, IOException {
-		String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/alta";
-		ObjectMapper mapper  = new ObjectMapper();
-		String body = mapper.writeValueAsString(notificacio);
-		Client jerseyClient = generarClient();
-		if (username != null) {
-			autenticarClient(
-					jerseyClient,
-					urlAmbMetode,
-					username,
-					password);
+			Notificacio notificacio) {
+		try {
+			String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/alta";
+			ObjectMapper mapper  = new ObjectMapper();
+			String body = mapper.writeValueAsString(notificacio);
+			Client jerseyClient = generarClient();
+			if (username != null) {
+				autenticarClient(
+						jerseyClient,
+						urlAmbMetode,
+						username,
+						password);
+			}
+			String json = jerseyClient.
+					resource(urlAmbMetode).
+					type("application/json").
+					post(String.class, body);
+			return mapper.readValue(json, RespostaAlta.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
 		}
-		String json = jerseyClient.
-				resource(urlAmbMetode).
-				type("application/json").
-				post(String.class, body);
-		return mapper.readValue(json, RespostaAlta.class);
 	}
 
-	public RespostaConsultaEstatEnviament consultaEstatEnviament(
-			String referencia) throws InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, NamingException, CreateException, AuthenticationFailureException, IOException {
-		String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
-		Client jerseyClient = generarClient();
-		if (username != null) {
-			autenticarClient(
-					jerseyClient,
-					urlAmbMetode,
-					username,
-					password);
-		}
-		String json = jerseyClient.
-				resource(urlAmbMetode).
-				type("application/json").
-				get(String.class);
-		ObjectMapper mapper  = new ObjectMapper();
-		return mapper.readValue(json, RespostaConsultaEstatEnviament.class);
-	}
-
+	@Override
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
-			String identificador) throws InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, NamingException, CreateException, AuthenticationFailureException, IOException {
-		String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
-		Client jerseyClient = generarClient();
-		if (username != null) {
-			autenticarClient(
-					jerseyClient,
-					urlAmbMetode,
-					username,
-					password);
+			String identificador) {
+		try {
+			String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
+			Client jerseyClient = generarClient();
+			if (username != null) {
+				autenticarClient(
+						jerseyClient,
+						urlAmbMetode,
+						username,
+						password);
+			}
+			String json = jerseyClient.
+					resource(urlAmbMetode).
+					type("application/json").
+					get(String.class);
+			ObjectMapper mapper  = new ObjectMapper();
+			return mapper.readValue(json, RespostaConsultaEstatNotificacio.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
 		}
-		String json = jerseyClient.
-				resource(urlAmbMetode).
-				type("application/json").
-				get(String.class);
-		ObjectMapper mapper  = new ObjectMapper();
-		return mapper.readValue(json, RespostaConsultaEstatNotificacio.class);
 	}
+
+	@Override
+	public RespostaConsultaEstatEnviament consultaEstatEnviament(
+			String referencia) {
+		try {
+			String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
+			Client jerseyClient = generarClient();
+			if (username != null) {
+				autenticarClient(
+						jerseyClient,
+						urlAmbMetode,
+						username,
+						password);
+			}
+			String json = jerseyClient.
+					resource(urlAmbMetode).
+					type("application/json").
+					get(String.class);
+			ObjectMapper mapper  = new ObjectMapper();
+			return mapper.readValue(json, RespostaConsultaEstatEnviament.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
 
 
 	private Client generarClient() {
