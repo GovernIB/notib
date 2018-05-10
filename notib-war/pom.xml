@@ -182,6 +182,9 @@
 		<profile>
 			<id>tomcat</id>
 			<activation>
+				<file>
+					<exists>appserv_tomcat</exists>
+				</file>
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
@@ -250,10 +253,14 @@
 		<profile>
 			<id>jboss</id>
 			<activation>
+				<file>
+					<missing>appserv_tomcat</missing>
+				</file>
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
 				<application.context>application-context-jboss.xml</application.context>
+				<webjars.classpath></webjars.classpath>
 			</properties>
 			<dependencies>
 				<dependency>
