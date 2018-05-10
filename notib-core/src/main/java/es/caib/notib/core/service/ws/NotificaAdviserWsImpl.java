@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -80,54 +80,55 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 							receptorNombre = datadoOrganismo.getReceptor().getNombre();
 							receptorNif = datadoOrganismo.getReceptor().getNif();
 						}
-						NotificacioDestinatariEstatEnumDto notificaEstat = null;
+						NotificacioEnviamentEstatEnumDto notificaEstat = null;
 						if ("pendiente_envio".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.PENDENT_ENVIAMENT;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_ENVIAMENT;
 						} else if ("enviado_ci".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.ENVIADA_CI;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIADA_CI;
 						} else if ("notificada".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.NOTIFICADA;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIFICADA;
 						} else if ("extraviada".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.EXTRAVIADA;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.EXTRAVIADA;
 						} else if ("rehusada".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.REBUTJADA;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.REBUTJADA;
 						} else if ("desconocido".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.DESCONEGUT;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.DESCONEGUT;
 						} else if ("fallecido".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.MORT;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.MORT;
 						} else if ("ausente".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.ABSENT;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.ABSENT;
 						} else if ("direccion_incorrecta".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.ADRESA_INCORRECTA;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA;
 						} else if ("sin_informacion".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.SENSE_INFORMACIO;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO;
 						} else if ("error".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.ERROR_ENTREGA;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.ERROR_ENTREGA;
 						} else if ("pendiente_sede".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.PENDENT_SEU;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_SEU;
 						} else if ("enviado_deh".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.ENVIADA_DEH;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIADA_DEH;
 						} else if ("leida".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.LLEGIDA;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.LLEGIDA;
 						} else if ("envio_programado".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.ENVIAMENT_PROGRAMAT;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIAMENT_PROGRAMAT;
 						} else if ("pendiente_cie".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.PENDENT_CIE;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_CIE;
 						} else if ("pendiente_deh".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.PENDENT_DEH;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_DEH;
 						} else if ("entregado_op".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.ENTREGADA_OP;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.ENTREGADA_OP;
 						} else if ("expirada".equals(datadoOrganismo.getResultado())) {
-							notificaEstat = NotificacioDestinatariEstatEnumDto.EXPIRADA;
+							notificaEstat = NotificacioEnviamentEstatEnumDto.EXPIRADA;
 						}
 						enviament.updateNotificaDatat(
-								toDate(datadoOrganismo.getFecha()),
 								notificaEstat,
+								toDate(datadoOrganismo.getFecha()),
 								null, // Estat descripció
 								datadoOrganismo.getModo(),
 								receptorNif,
 								receptorNombre,
-								null); // Núm. seguiment
+								null, // Núm. seguiment
+								null); // Error descripció
 						event = NotificacioEventEntity.getBuilder(
 								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
 								enviament.getNotificacio()).

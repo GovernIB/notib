@@ -146,8 +146,8 @@ public class CallbackHelper {
 					enviament.getNotificaEstatData(),
 					enviament.getDestinatariNom(),
 					enviament.getDestinatariNif(),
-					enviament.getNotificaEstatOrigen(),
-					enviament.getNotificaEstatNumSeguiment(),
+					enviament.getNotificaDatatOrigen(),
+					enviament.getNotificaDatatNumSeguiment(),
 					enviament.getNotificaReferencia() 
 				);
 

@@ -5,7 +5,7 @@ package es.caib.notib.core.api.ws.callback;
 
 import java.io.Serializable;
 
-import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 
 /**
  * Enumerat que indica l'estat d'una notificació per a un destinatari.
@@ -35,34 +35,34 @@ public enum NotificacioDestinatariEstatEnum implements Serializable {
 	REBUTJADA,
 	SENSE_INFORMACIO;
 	
-	public NotificacioDestinatariEstatEnumDto toNotificacioDestinatariEstatEnumDto() {
+	public NotificacioEnviamentEstatEnumDto toNotificacioDestinatariEstatEnumDto() {
 		switch( this ) {
-			case NOTIB_PENDENT: return NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT;
-			case NOTIB_ENVIADA: return NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA;
-			case ABSENT: return NotificacioDestinatariEstatEnumDto.ABSENT;
-			case ADRESA_INCORRECTA: return NotificacioDestinatariEstatEnumDto.ADRESA_INCORRECTA;
-			case DESCONEGUT: return NotificacioDestinatariEstatEnumDto.DESCONEGUT;
-			case ENVIADA_CI: return NotificacioDestinatariEstatEnumDto.ENVIADA_CI;
-			case ENVIADA_DEH: return NotificacioDestinatariEstatEnumDto.ENVIADA_DEH;
-			case ENVIAMENT_PROGRAMAT: return NotificacioDestinatariEstatEnumDto.ENVIAMENT_PROGRAMAT;
-			case ENTREGADA_OP: return NotificacioDestinatariEstatEnumDto.ENTREGADA_OP;
-			case ERROR_ENTREGA: return NotificacioDestinatariEstatEnumDto.ERROR_ENTREGA;
-			case EXPIRADA: return NotificacioDestinatariEstatEnumDto.EXPIRADA;
-			case EXTRAVIADA: return NotificacioDestinatariEstatEnumDto.EXTRAVIADA;
-			case MORT: return NotificacioDestinatariEstatEnumDto.MORT;
-			case LLEGIDA: return NotificacioDestinatariEstatEnumDto.LLEGIDA;
-			case NOTIFICADA: return NotificacioDestinatariEstatEnumDto.NOTIFICADA;
-			case PENDENT_ENVIAMENT: return NotificacioDestinatariEstatEnumDto.PENDENT_ENVIAMENT;
-			case PENDENT_SEU: return NotificacioDestinatariEstatEnumDto.PENDENT_SEU;
-			case PENDENT_CIE: return NotificacioDestinatariEstatEnumDto.PENDENT_CIE;
-			case PENDENT_DEH: return NotificacioDestinatariEstatEnumDto.PENDENT_DEH;
-			case REBUTJADA: return NotificacioDestinatariEstatEnumDto.REBUTJADA;
-			case SENSE_INFORMACIO: return NotificacioDestinatariEstatEnumDto.SENSE_INFORMACIO;
+			case NOTIB_PENDENT: return NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
+			case NOTIB_ENVIADA: return NotificacioEnviamentEstatEnumDto.NOTIB_ENVIADA;
+			case ABSENT: return NotificacioEnviamentEstatEnumDto.ABSENT;
+			case ADRESA_INCORRECTA: return NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA;
+			case DESCONEGUT: return NotificacioEnviamentEstatEnumDto.DESCONEGUT;
+			case ENVIADA_CI: return NotificacioEnviamentEstatEnumDto.ENVIADA_CI;
+			case ENVIADA_DEH: return NotificacioEnviamentEstatEnumDto.ENVIADA_DEH;
+			case ENVIAMENT_PROGRAMAT: return NotificacioEnviamentEstatEnumDto.ENVIAMENT_PROGRAMAT;
+			case ENTREGADA_OP: return NotificacioEnviamentEstatEnumDto.ENTREGADA_OP;
+			case ERROR_ENTREGA: return NotificacioEnviamentEstatEnumDto.ERROR_ENTREGA;
+			case EXPIRADA: return NotificacioEnviamentEstatEnumDto.EXPIRADA;
+			case EXTRAVIADA: return NotificacioEnviamentEstatEnumDto.EXTRAVIADA;
+			case MORT: return NotificacioEnviamentEstatEnumDto.MORT;
+			case LLEGIDA: return NotificacioEnviamentEstatEnumDto.LLEGIDA;
+			case NOTIFICADA: return NotificacioEnviamentEstatEnumDto.NOTIFICADA;
+			case PENDENT_ENVIAMENT: return NotificacioEnviamentEstatEnumDto.PENDENT_ENVIAMENT;
+			case PENDENT_SEU: return NotificacioEnviamentEstatEnumDto.PENDENT_SEU;
+			case PENDENT_CIE: return NotificacioEnviamentEstatEnumDto.PENDENT_CIE;
+			case PENDENT_DEH: return NotificacioEnviamentEstatEnumDto.PENDENT_DEH;
+			case REBUTJADA: return NotificacioEnviamentEstatEnumDto.REBUTJADA;
+			case SENSE_INFORMACIO: return NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO;
 		}
 		return null;
 	}
 
-	public static NotificacioDestinatariEstatEnum toNotificacioDestinatariEstatEnum(NotificacioDestinatariEstatEnumDto dto) {
+	public static NotificacioDestinatariEstatEnum toNotificacioDestinatariEstatEnum(NotificacioEnviamentEstatEnumDto dto) {
 		if (dto == null) return null;
 		switch( dto ) {
 			case NOTIB_PENDENT: return NOTIB_PENDENT;
