@@ -39,9 +39,9 @@ public class ClientRestTest extends ClientBaseTest {
 	@Before
 	public void setUp() throws IOException, DecoderException {
 		client = NotificacioRestClientFactory.getRestClient(
-				"http://localhost:8180/notib",
-				"notapp",
-				"notapp");
+				"http://localhost:8080/notib",
+				"notibapp",
+				"notibapp");
 	}
 
 	@Test

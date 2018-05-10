@@ -149,8 +149,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				documentGesdocId,
 				document.getHash(),
 				document.isNormalitzat(),
-				document.isGenerarCsv(),
-				null).
+				document.isGenerarCsv()).
 				descripcio(notificacio.getDescripcio()).
 				caducitat(notificacio.getCaducitat()).
 				retardPostal(notificacio.getRetard()).

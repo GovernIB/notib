@@ -11,9 +11,6 @@ import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -539,12 +536,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		public boolean handleMessage(SOAPMessageContext context) {
 			Boolean outboundProperty = (Boolean)context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 			if (outboundProperty.booleanValue()) {
-				@SuppressWarnings("unchecked")
+				/*@SuppressWarnings("unchecked")
 				Map<String, List<String>> requestHeaders = (Map<String, List<String>>)context.get(MessageContext.HTTP_REQUEST_HEADERS);
 				if (requestHeaders == null) {
 	                requestHeaders = new HashMap<String, List<String>>();
 	                context.put(MessageContext.HTTP_REQUEST_HEADERS, requestHeaders);
-	            }
+	            }*/
 				try {
 					SOAPEnvelope envelope = context.getMessage().getSOAPPart().getEnvelope();
 					SOAPFactory factory = SOAPFactory.newInstance();
@@ -554,10 +551,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 									"apiKey"));
 					apiKeyElement.addTextNode(apiKey);
 					SOAPHeader header = envelope.getHeader();
-					if (header == null)
+					if (header == null) {
 						header = envelope.addHeader();
+					}
 					header.addChildElement(apiKeyElement);
-					
+					context.getMessage().saveChanges();
 				} catch (SOAPException ex) {
 					logger.error(
 							"No s'ha pogut afegir l'API key a la petició SOAP per Notifica",

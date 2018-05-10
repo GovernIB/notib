@@ -304,8 +304,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String documentArxiuId,
 			String documentHash,
 			boolean documentNormalitzat,
-			boolean documentGenerarCsv,
-			List<NotificacioEnviamentEntity> enviaments) {
+			boolean documentGenerarCsv) {
 		return new Builder(
 				entitat,
 				emisorDir3Codi,
@@ -317,8 +316,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				documentArxiuId,
 				documentHash,
 				documentNormalitzat,
-				documentGenerarCsv,
-				enviaments);
+				documentGenerarCsv);
 	}
 
 	public static class Builder {
@@ -334,11 +332,11 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				String documentArxiuId,
 				String documentHash,
 				boolean documentNormalitzat,
-				boolean documentGenerarCsv,
-				List<NotificacioEnviamentEntity> enviaments) {
+				boolean documentGenerarCsv) {
 			built = new NotificacioEntity();
 			built.entitat = entitat;
 			built.emisorDir3Codi = emisorDir3Codi;
+			built.comunicacioTipus = comunicacioTipus;
 			built.enviamentTipus = enviamentTipus;
 			built.enviamentDataProgramada = enviamentDataProgramada;
 			built.concepte = concepte;
@@ -347,7 +345,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.documentHash = documentHash;
 			built.documentNormalitzat = documentNormalitzat;
 			built.documentGenerarCsv = documentGenerarCsv;
-			built.enviaments = enviaments;
 			built.estat = NotificacioEstatEnumDto.PENDENT;
 			built.notificaEnviamentIntent = 0;
 		}
