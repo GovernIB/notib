@@ -4,7 +4,6 @@
 package es.caib.notib.core.api.dto;
 
 import java.util.Date;
-import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -51,7 +50,6 @@ public class NotificacioDto extends AuditoriaDto {
 	private boolean errorNotifica;
 	private Date errorNotificaData;
 	private String errorNotificaError;
-	private List<NotificacioEnviamentDto> enviaments;
 
 	private EntitatDto entitat;
 
@@ -264,12 +262,6 @@ public class NotificacioDto extends AuditoriaDto {
 	}
 	public void setErrorNotificaError(String errorNotificaError) {
 		this.errorNotificaError = errorNotificaError;
-	}
-	public List<NotificacioEnviamentDto> getEnviaments() {
-		return enviaments;
-	}
-	public void setEnviaments(List<NotificacioEnviamentDto> enviaments) {
-		this.enviaments = enviaments;
 	}
 	public EntitatDto getEntitat() {
 		return entitat;

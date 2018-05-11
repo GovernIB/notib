@@ -8,9 +8,7 @@ import java.security.GeneralSecurityException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
-import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 
 /**
@@ -28,34 +26,26 @@ public class NotificaHelper {
 
 
 
-	public boolean enviament(
+	public boolean notificacioEnviar(
 			Long notificacioId) {
-		return getNotificaHelper().enviament(notificacioId);
+		return getNotificaHelper().notificacioEnviar(notificacioId);
 	}
 
-	public NotificaRespostaEstatDto refrescarEstat(
-			NotificacioEnviamentEntity destinatari) throws SistemaExternException {
-		return getNotificaHelper().refrescarEstat(destinatari);
+	public boolean enviamentRefrescarEstat(
+			NotificacioEnviamentEntity enviament) throws SistemaExternException {
+		return getNotificaHelper().enviamentRefrescarEstat(enviament);
 	}
 
-	public boolean comunicacioSeu(
-			Long notificacioDestinatariId) {
-		return getNotificaHelper().comunicacioSeu(notificacioDestinatariId);
+	public boolean enviamentComunicacioSeu(
+			Long notificacioEnviamentId) {
+		return getNotificaHelper().enviamentComunicacioSeu(notificacioEnviamentId);
 	}
 
-	public String generarIdentificadorNotificacio(
-			NotificacioEntity notificacio) throws GeneralSecurityException {
-		return getNotificaHelper().xifrarIdPerNotifica(notificacio.getId());
+	public String xifrarId(Long id) throws GeneralSecurityException {
+		return getNotificaHelper().xifrarId(id);
 	}
-
-	public Long obtenirIdNotificacioAmbIdentificador(
-			String identificador) throws GeneralSecurityException {
-		return getNotificaHelper().desxifrarIdPerNotifica(identificador);
-	}
-
-	public String generarReferenciaDestinatari(
-			NotificacioEnviamentEntity notificacioDestinatari) throws GeneralSecurityException {
-		return getNotificaHelper().xifrarIdPerNotifica(notificacioDestinatari.getId());
+	public Long desxifrarId(String identificador) throws GeneralSecurityException {
+		return getNotificaHelper().desxifrarId(identificador);
 	}
 
 	public boolean isConnexioNotificaDisponible() {

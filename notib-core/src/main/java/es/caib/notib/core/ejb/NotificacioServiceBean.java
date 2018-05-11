@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
@@ -34,21 +34,6 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Autowired
 	NotificacioService delegate;
-
-	/*@Override
-	@RolesAllowed({"NOT_APL"})
-	public NotificacioDto alta(
-			String entitatDir3Codi,
-			NotificacioDto notificacio) {
-		return delegate.alta(entitatDir3Codi, notificacio);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_APL"})
-	public NotificacioDto consulta(
-			String referencia) {
-		return delegate.consulta(referencia);
-	}*/
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
@@ -129,46 +114,6 @@ public class NotificacioServiceBean implements NotificacioService {
 			Long enviamentId) {
 		return delegate.enviamentGetCertificacioArxiu(enviamentId);
 	}
-	
-	/*@Override
-	@RolesAllowed({"NOT_ADMIN"})
-	public void updateDestinatariEstat(
-			String referencia,
-			NotificacioDestinatariEstatEnumDto notificaEstat,
-			Date notificaEstatData,
-			String notificaEstatReceptorNom,
-			String notificaEstatReceptorNif,
-			String notificaEstatOrigen,
-			String notificaEstatNumSeguiment,
-			NotificacioDestinatariEstatEnumDto seuEstat) {
-		delegate.updateDestinatariEstat( 
-				referencia,
-				notificaEstat,
-				notificaEstatData,
-				notificaEstatReceptorNom,
-				notificaEstatReceptorNif,
-				notificaEstatOrigen,
-				notificaEstatNumSeguiment,
-				seuEstat);
-	}
-	
-	@Override
-	@RolesAllowed({"NOT_ADMIN"})
-	public void updateCertificacio(
-			String referencia,
-			NotificaCertificacioTipusEnumDto notificaCertificacioTipus,
-			NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus,
-			String notificaCertificacioArxiuId,
-			String notificaCertificacioNumSeguiment,
-			Date notificaCertificacioDataActualitzacio) {
-		delegate.updateCertificacio(
-				referencia,
-				notificaCertificacioTipus,
-				notificaCertificacioArxiuTipus,
-				notificaCertificacioArxiuId,
-				notificaCertificacioNumSeguiment,
-				notificaCertificacioDataActualitzacio);
-	}*/
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
@@ -179,7 +124,7 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
-	public NotificaRespostaEstatDto enviamentRefrescarEstat(
+	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(
 			Long enviamentId) {
 		return delegate.enviamentRefrescarEstat(enviamentId);
 	}

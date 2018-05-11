@@ -8,41 +8,44 @@ import java.util.Date;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * Informació de la resposta de Notifica a una consulta d'estat.
+ * Informació sobre l'estat de Notifica d'un destinatari de
+ * la notificació.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class NotificaRespostaEstatDto extends NotificaRespostaDto {
 
-	private Date data;
-	private String estatCodi;
+	private NotificacioEnviamentEstatEnumDto estat;
+	private Date estatData;
 	private String estatDescripcio;
-	private String numSeguiment;
-	private String errorDescripcio;
-	private String origen;
-	private String receptorNom;
-	private String receptorNif;
-	private boolean certificacioDisponible;
-	private String certificacioContingut;
-	private String certificacioHash;
-	private String certificacioCsv;
-	private int certificacioTamany;
+	private String datatOrigen;
+	private String datatReceptorNif;
+	private String datatReceptorNom;
+	private String datatNumSeguiment;
+	private String datatErrorDescripcio;
 	private Date certificacioData;
+	private String certificacioArxiuId;
+	private String certificacioHash;
 	private String certificacioOrigen;
 	private String certificacioMetadades;
-	private String certificacioTipusMime;
+	private String certificacioCsv;
+	private String certificacioMime;
+	private Integer certificacioTamany;
+	private NotificaCertificacioTipusEnumDto certificacioTipus;
+	private NotificaCertificacioArxiuTipusEnumDto certificacioArxiuTipus;
+	private String certificacioNumSeguiment;
 
-	public Date getData() {
-		return data;
+	public NotificacioEnviamentEstatEnumDto getEstat() {
+		return estat;
 	}
-	public void setData(Date data) {
-		this.data = data;
+	public void setEstat(NotificacioEnviamentEstatEnumDto estat) {
+		this.estat = estat;
 	}
-	public String getEstatCodi() {
-		return estatCodi;
+	public Date getEstatData() {
+		return estatData;
 	}
-	public void setEstatCodi(String estatCodi) {
-		this.estatCodi = estatCodi;
+	public void setEstatData(Date estatData) {
+		this.estatData = estatData;
 	}
 	public String getEstatDescripcio() {
 		return estatDescripcio;
@@ -50,71 +53,53 @@ public class NotificaRespostaEstatDto extends NotificaRespostaDto {
 	public void setEstatDescripcio(String estatDescripcio) {
 		this.estatDescripcio = estatDescripcio;
 	}
-	public String getNumSeguiment() {
-		return numSeguiment;
+	public String getDatatOrigen() {
+		return datatOrigen;
 	}
-	public void setNumSeguiment(String numSeguiment) {
-		this.numSeguiment = numSeguiment;
+	public void setDatatOrigen(String datatOrigen) {
+		this.datatOrigen = datatOrigen;
 	}
-	public String getErrorDescripcio() {
-		return errorDescripcio;
+	public String getDatatReceptorNif() {
+		return datatReceptorNif;
 	}
-	public void setErrorDescripcio(String errorDescripcio) {
-		this.errorDescripcio = errorDescripcio;
+	public void setDatatReceptorNif(String datatReceptorNif) {
+		this.datatReceptorNif = datatReceptorNif;
 	}
-	public String getOrigen() {
-		return origen;
+	public String getDatatReceptorNom() {
+		return datatReceptorNom;
 	}
-	public void setOrigen(String origen) {
-		this.origen = origen;
+	public void setDatatReceptorNom(String datatReceptorNom) {
+		this.datatReceptorNom = datatReceptorNom;
 	}
-	public String getReceptorNom() {
-		return receptorNom;
+	public String getDatatNumSeguiment() {
+		return datatNumSeguiment;
 	}
-	public void setReceptorNom(String receptorNom) {
-		this.receptorNom = receptorNom;
+	public void setDatatNumSeguiment(String datatNumSeguiment) {
+		this.datatNumSeguiment = datatNumSeguiment;
 	}
-	public String getReceptorNif() {
-		return receptorNif;
+	public String getDatatErrorDescripcio() {
+		return datatErrorDescripcio;
 	}
-	public void setReceptorNif(String receptorNif) {
-		this.receptorNif = receptorNif;
-	}
-	public boolean isCertificacioDisponible() {
-		return certificacioDisponible;
-	}
-	public void setCertificacioDisponible(boolean certificacioDisponible) {
-		this.certificacioDisponible = certificacioDisponible;
-	}
-	public String getCertificacioContingut() {
-		return certificacioContingut;
-	}
-	public void setCertificacioContingut(String certificacioContingut) {
-		this.certificacioContingut = certificacioContingut;
-	}
-	public String getCertificacioHash() {
-		return certificacioHash;
-	}
-	public void setCertificacioHash(String certificacioHash) {
-		this.certificacioHash = certificacioHash;
-	}
-	public String getCertificacioCsv() {
-		return certificacioCsv;
-	}
-	public void setCertificacioCsv(String certificacioCsv) {
-		this.certificacioCsv = certificacioCsv;
-	}
-	public int getCertificacioTamany() {
-		return certificacioTamany;
-	}
-	public void setCertificacioTamany(int certificacioTamany) {
-		this.certificacioTamany = certificacioTamany;
+	public void setDatatErrorDescripcio(String datatErrorDescripcio) {
+		this.datatErrorDescripcio = datatErrorDescripcio;
 	}
 	public Date getCertificacioData() {
 		return certificacioData;
 	}
 	public void setCertificacioData(Date certificacioData) {
 		this.certificacioData = certificacioData;
+	}
+	public String getCertificacioArxiuId() {
+		return certificacioArxiuId;
+	}
+	public void setCertificacioArxiuId(String certificacioArxiuId) {
+		this.certificacioArxiuId = certificacioArxiuId;
+	}
+	public String getCertificacioHash() {
+		return certificacioHash;
+	}
+	public void setCertificacioHash(String certificacioHash) {
+		this.certificacioHash = certificacioHash;
 	}
 	public String getCertificacioOrigen() {
 		return certificacioOrigen;
@@ -128,11 +113,41 @@ public class NotificaRespostaEstatDto extends NotificaRespostaDto {
 	public void setCertificacioMetadades(String certificacioMetadades) {
 		this.certificacioMetadades = certificacioMetadades;
 	}
-	public String getCertificacioTipusMime() {
-		return certificacioTipusMime;
+	public String getCertificacioCsv() {
+		return certificacioCsv;
 	}
-	public void setCertificacioTipusMime(String certificacioTipusMime) {
-		this.certificacioTipusMime = certificacioTipusMime;
+	public void setCertificacioCsv(String certificacioCsv) {
+		this.certificacioCsv = certificacioCsv;
+	}
+	public String getCertificacioMime() {
+		return certificacioMime;
+	}
+	public void setCertificacioMime(String certificacioMime) {
+		this.certificacioMime = certificacioMime;
+	}
+	public Integer getCertificacioTamany() {
+		return certificacioTamany;
+	}
+	public void setCertificacioTamany(Integer certificacioTamany) {
+		this.certificacioTamany = certificacioTamany;
+	}
+	public NotificaCertificacioTipusEnumDto getCertificacioTipus() {
+		return certificacioTipus;
+	}
+	public void setCertificacioTipus(NotificaCertificacioTipusEnumDto certificacioTipus) {
+		this.certificacioTipus = certificacioTipus;
+	}
+	public NotificaCertificacioArxiuTipusEnumDto getCertificacioArxiuTipus() {
+		return certificacioArxiuTipus;
+	}
+	public void setCertificacioArxiuTipus(NotificaCertificacioArxiuTipusEnumDto certificacioArxiuTipus) {
+		this.certificacioArxiuTipus = certificacioArxiuTipus;
+	}
+	public String getCertificacioNumSeguiment() {
+		return certificacioNumSeguiment;
+	}
+	public void setCertificacioNumSeguiment(String certificacioNumSeguiment) {
+		this.certificacioNumSeguiment = certificacioNumSeguiment;
 	}
 
 	@Override

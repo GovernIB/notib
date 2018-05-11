@@ -17,10 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -261,26 +261,24 @@ public class NotificacioServiceImpl implements NotificacioService {
 			Long notificacioId) {
 		logger.debug("Intentant enviament de la notificació pendent (" +
 				"notificacioId=" + notificacioId + ")");
-		boolean enviada = notificaHelper.enviament(notificacioId);
-		/*if (enviada && pluginHelper.isSeuPluginDisponible()) {
-			List<NotificacioEnviamentEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
-					new NotificacioDestinatariEstatEnumDto[] {
-							NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT});
-			for (NotificacioEnviamentEntity pendent: pendents) {
-				seuHelper.enviament(pendent.getId());
-			}
-		}*/
-		return enviada;
+		return notificaHelper.notificacioEnviar(notificacioId);
 	}
 
 	@Override
 	@Transactional
-	public NotificaRespostaEstatDto enviamentRefrescarEstat(
-			Long destinatariId) {
-		logger.debug("Refrescant l'estat de la notificació amb informació de Notific@ (" +
-				"destinatariId=" + destinatariId + ")");
-		NotificacioEnviamentEntity destinatari = notificacioDestinatariRepository.findOne(destinatariId);
-		return notificaHelper.refrescarEstat(destinatari);
+	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(
+			Long enviamentId) {
+		logger.debug("Refrescant l'estat de la notificació amb informació de Notific@ i de la seu (" +
+				"enviamentId=" + enviamentId + ")");
+		NotificacioEnviamentEntity enviament = notificacioDestinatariRepository.findOne(enviamentId);
+		notificaHelper.enviamentRefrescarEstat(enviament);
+		NotificacioEnviamenEstatDto estatDto = conversioTipusHelper.convertir(
+				enviament,
+				NotificacioEnviamenEstatDto.class);
+		estatEmplenarErrors(
+				enviament,
+				estatDto);
+		return estatDto;
 	}
 
 	@Override
@@ -289,7 +287,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			Long destinatariId) {
 		logger.debug("Enviant canvi d'estat de la seu electrònica a Notific@ (" +
 				"destinatariId=" + destinatariId + ")");
-		return notificaHelper.comunicacioSeu(destinatariId);
+		return notificaHelper.enviamentComunicacioSeu(destinatariId);
 	}
 
 	@Override
@@ -304,7 +302,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!pendents.isEmpty()) {
 				logger.debug("Realitzant enviaments a Notifica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
 				for (NotificacioEntity pendent: pendents) {
-					notificaHelper.enviament(pendent.getId());
+					notificaHelper.notificacioEnviar(pendent.getId());
 				}
 			} else {
 				logger.debug("No hi ha notificacions pendents d'enviar a la seu electrònica");
@@ -356,7 +354,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				for (NotificacioEnviamentEntity pendent: pendents) {
 					boolean estatActualitzat = seuHelper.consultaEstat(pendent.getId());
 					if (estatActualitzat) {
-						notificaHelper.comunicacioSeu(pendent.getId());
+						notificaHelper.enviamentComunicacioSeu(pendent.getId());
 					}
 				}
 			} else {
@@ -383,7 +381,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!pendents.isEmpty()) {
 				logger.debug("Realitzant actualització d'estat a Notifica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
 				for (NotificacioEnviamentEntity pendent: pendents) {
-					notificaHelper.comunicacioSeu(pendent.getId());
+					notificaHelper.enviamentComunicacioSeu(pendent.getId());
 				}
 			} else {
 				logger.debug("No hi ha notificacions pendents d'actualització d'estat a Notifica");
@@ -403,7 +401,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		for (int i = 0; i < enviaments.size(); i++) {
 			NotificacioEnviamentEntity destinatariEntity = enviaments.get(i);
 			NotificacioEnviamentDto destinatariDto = destinatarisDto.get(i);
-			destinatariEmplenarDadesAddicionals(
+			destinatariEmplenarErrors(
 					destinatariEntity,
 					destinatariDto);
 		}
@@ -415,30 +413,46 @@ public class NotificacioServiceImpl implements NotificacioService {
 		NotificacioEnviamentDto destinatariDto = conversioTipusHelper.convertir(
 				enviament,
 				NotificacioEnviamentDto.class);
-		destinatariEmplenarDadesAddicionals(
+		destinatariEmplenarErrors(
 				enviament,
 				destinatariDto);
 		return destinatariDto;
 	}
 
-	private void destinatariEmplenarDadesAddicionals(
+	private void destinatariEmplenarErrors(
 			NotificacioEnviamentEntity enviament,
 			NotificacioEnviamentDto enviamentDto) {
-		enviamentDto.setEstat(enviament.getNotificaEstat());
 		if (enviament.isNotificaError()) {
-			enviamentDto.setNotificaError(true);
 			NotificacioEventEntity event = enviament.getNotificaErrorEvent();
 			if (event != null) {
 				enviamentDto.setNotificaErrorData(event.getData());
-				enviamentDto.setNotificaErrorError(event.getErrorDescripcio());
+				enviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
 			}
 		}
 		if (enviament.isSeuError()) {
-			enviamentDto.setSeuError(true);
 			NotificacioEventEntity event = enviament.getSeuErrorEvent();
 			if (event != null) {
 				enviamentDto.setSeuErrorData(event.getData());
-				enviamentDto.setSeuErrorError(event.getErrorDescripcio());
+				enviamentDto.setSeuErrorDescripcio(event.getErrorDescripcio());
+			}
+		}
+	}
+
+	private void estatEmplenarErrors(
+			NotificacioEnviamentEntity enviament,
+			NotificacioEnviamenEstatDto estatDto) {
+		if (enviament.isNotificaError()) {
+			NotificacioEventEntity event = enviament.getNotificaErrorEvent();
+			if (event != null) {
+				estatDto.setNotificaErrorData(event.getData());
+				estatDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
+			}
+		}
+		if (enviament.isSeuError()) {
+			NotificacioEventEntity event = enviament.getSeuErrorEvent();
+			if (event != null) {
+				estatDto.setSeuErrorData(event.getData());
+				estatDto.setSeuErrorDescripcio(event.getErrorDescripcio());
 			}
 		}
 	}

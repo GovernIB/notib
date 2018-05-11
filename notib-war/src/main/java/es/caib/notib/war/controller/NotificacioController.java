@@ -200,8 +200,8 @@ public class NotificacioController extends BaseController {
 		}
 	}
 
-	@RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/refrescarEstat", method = RequestMethod.GET)
-	public String consultarEstat(
+	@RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/refrescarEstatNotifica", method = RequestMethod.GET)
+	public String refrescarEstatNotifica(
 			HttpServletRequest request,
 			@PathVariable Long notificacioId,
 			@PathVariable Long enviamentId,
@@ -211,7 +211,7 @@ public class NotificacioController extends BaseController {
 				notificacioService.enviamentRefrescarEstat(enviamentId));
 		emplenarModelEnviamentInfo(
 				enviamentId,
-				"accions",
+				"estatNotifica",
 				model);
 		return "enviamentInfo";
 	}

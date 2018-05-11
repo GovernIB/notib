@@ -301,7 +301,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 					enviamentBuilder.build());
 			String referencia;
 			try {
-				referencia = notificaHelper.generarReferenciaDestinatari(enviamentSaved);
+				referencia = notificaHelper.xifrarId(enviamentSaved.getId());
 			} catch (GeneralSecurityException ex) {
 				throw new RuntimeException(
 						"No s'ha pogut crear la referencia per al destinatari",
@@ -315,10 +315,13 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			notificacioEntity.addEnviament(enviamentSaved);
 		}
 		notificacioRepository.saveAndFlush(notificacioEntity);
+		if (getEnviamentSincronProperty()) {
+			notificaHelper.notificacioEnviar(notificacioEntity.getId());
+		}
 		RespostaAlta resposta = new RespostaAlta();
 		try {
 			resposta.setIdentificador(
-					notificaHelper.generarIdentificadorNotificacio(notificacioEntity));
+					notificaHelper.xifrarId(notificacioEntity.getId()));
 		} catch (GeneralSecurityException ex) {
 			throw new RuntimeException(
 					"No s'ha pogut crear l'identificador de la notificació",
@@ -341,9 +344,6 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 					notificacioEntity.getNotificaErrorEvent().getErrorDescripcio());
 		}
 		resposta.setReferencies(referencies);
-		if (getEnviamentSincronProperty()) {
-			notificaHelper.enviament(notificacioEntity.getId());
-		}
 		return resposta;
 	}
 
@@ -353,7 +353,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			String identificador) {
 		Long notificacioId;
 		try {
-			notificacioId = notificaHelper.obtenirIdNotificacioAmbIdentificador(identificador);
+			notificacioId = notificaHelper.desxifrarId(identificador);
 		} catch (GeneralSecurityException ex) {
 			throw new RuntimeException(
 					"No s'ha pogut desxifrar l'identificador de la notificació",
@@ -398,7 +398,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			// serà necessari consultar l'estat de la notificació a Notifica
 			if (	!notificaHelper.isAdviserActiu() &&
 					!enviament.getNotificaEstat().equals(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT)) {
-				notificaHelper.refrescarEstat(enviament);
+				notificaHelper.enviamentRefrescarEstat(enviament);
 			}
 			resposta.setEstat(toEnviamentEstat(enviament.getNotificaEstat()));
 			resposta.setEstatData(enviament.getNotificaEstatData());

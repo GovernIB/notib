@@ -84,13 +84,13 @@ function printEnviaments(id) {
 			contingutTbody += '<td>' + data[i].titular + '</td>';
 			contingutTbody += '<td>' + data[i].destinatari + '</td>';
 			contingutTbody += '<td>';
-			contingutTbody += (data[i].estat) ? enviamentEstats[data[i].estat] : '';
+			contingutTbody += (data[i].notificaEstat) ? enviamentEstats[data[i].notificaEstat] : '';
 			if (data[i].notificaError) {
 				var errorTitle = '';
-				if (data[i].notificaErrorError) {
-					errorTitle = data[i].notificaErrorError;
+				if (data[i].notificaErrorDescripcio) {
+					errorTitle = data[i].notificaErrorDescripcio;
 				}
-				var escaped = data[i].notificaErrorError.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+				var escaped = data[i].notificaErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 				contingutTbody += ' <span class="fa fa-warning text-danger" title="' + escaped + '"></span>';
 			}
 			contingutTbody += '</td>';
