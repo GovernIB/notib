@@ -25,7 +25,7 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 </script>
 </head>
 <body>
-	<c:if test="${notificacio.errorNotifica}">
+	<c:if test="${notificacio.notificaError}">
 		<div class="alert alert-danger well-sm">
 			<span class="fa fa-warning text-danger"></span>
 			<spring:message code="notificacio.info.error.titol"/>
@@ -38,11 +38,11 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 				<tbody>
 					<tr>
 						<td width="30%"><strong><spring:message code="notificacio.info.error.data"/></strong></td>
-						<td><fmt:formatDate value="${notificacio.errorNotificaData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+						<td><fmt:formatDate value="${notificacio.notificaErrorData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 					</tr>
 					<tr>
 						<td><strong><spring:message code="notificacio.info.error.error"/></strong></td>
-						<td><textarea rows="10" style="width:100%">${fn:escapeXml(notificacio.errorNotificaError)}</textarea></td>
+						<td><textarea rows="10" style="width:100%">${fn:escapeXml(notificacio.notificaErrorDescripcio)}</textarea></td>
 					</tr>
 				</tbody>
 				</table>
@@ -78,11 +78,7 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 				<table class="table table-bordered" style="width:100%">
 				<tbody>
 					<tr>
-						<td width="30%"><strong><spring:message code="notificacio.info.dada.data.creacio"/></strong></td>
-						<td><fmt:formatDate value="${notificacio.createdDate}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-					</tr>
-					<tr>
-						<td><strong><spring:message code="notificacio.info.dada.entitat"/></strong></td>
+						<td width="30%"><strong><spring:message code="notificacio.info.dada.entitat"/></strong></td>
 						<td>${notificacio.entitat.nom} (${notificacio.entitat.dir3Codi})</td>
 					</tr>
 					<tr>
@@ -101,6 +97,14 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 						<td><strong><spring:message code="notificacio.info.dada.estat"/></strong></td>
 						<td><spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.${notificacio.estat}"/></td>
 					</tr>
+					<tr>
+						<td><strong><spring:message code="notificacio.info.dada.creacio.data"/></strong></td>
+						<td><fmt:formatDate value="${notificacio.createdDate}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+					</tr>
+					<tr>
+						<td><strong><spring:message code="notificacio.info.dada.creacio.usuari"/></strong></td>
+						<td>${notificacio.createdBy.nom} (${notificacio.createdBy.codi})</td>
+					</tr>
 				</tbody>
 				</table>
 			</div>
@@ -116,7 +120,7 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 						<td width="30%"><strong><spring:message code="notificacio.info.document.arxiu.nom"/></strong></td>
 						<td>
 							${notificacio.documentArxiuNom}
-							<a href="<c:url value="/modal/notificacio/${notificacio.id}/document"/>" class="btn btn-default btn-sm pull-right" title="<spring:message code="notificacio.info.document.descarregar"/>"><span class="fa fa-download"></span></a>
+							<a href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar"/>" class="btn btn-default btn-sm pull-right" title="<spring:message code="notificacio.info.document.descarregar"/>"><span class="fa fa-download"></span></a>
 						</td>
 					</tr>
 					<tr>

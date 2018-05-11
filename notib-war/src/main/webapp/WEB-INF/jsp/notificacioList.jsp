@@ -35,11 +35,22 @@
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 <script type="text/javascript">
-var enviamentEstats = [];
-<c:forEach var="estat" items="${notificacioDestinatariEstats}">
-enviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
+var notificacioEstats = [];
+<c:forEach var="estat" items="${notificacioEstats}">
+notificacioEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
 </c:forEach>
-
+var notificacioEnviamentEstats = [];
+<c:forEach var="estat" items="${notificacioEnviamentEstats}">
+notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
+</c:forEach>
+var comunicacioTipus = [];
+<c:forEach var="tipus" items="${notificacioComunicacioTipus}">
+comunicacioTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
+</c:forEach>
+var enviamentTipus = [];
+<c:forEach var="tipus" items="${notificacioEnviamentTipus}">
+enviamentTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
+</c:forEach>
 var rows = {};
 var notifications = {};
 $(document).ready(function() {
@@ -84,53 +95,24 @@ function printEnviaments(id) {
 			contingutTbody += '<td>' + data[i].titular + '</td>';
 			contingutTbody += '<td>' + data[i].destinatari + '</td>';
 			contingutTbody += '<td>';
-			contingutTbody += (data[i].estat) ? enviamentEstats[data[i].estat] : '';
+			contingutTbody += (data[i].notificaEstat) ? notificacioEnviamentEstats[data[i].notificaEstat] : '';
 			if (data[i].notificaError) {
 				var errorTitle = '';
-				if (data[i].notificaErrorError) {
-					errorTitle = data[i].notificaErrorError;
+				if (data[i].notificaErrorDescripcio) {
+					errorTitle = data[i].notificaErrorDescripcio;
 				}
-				var escaped = data[i].notificaErrorError.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+				var escaped = data[i].notificaErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 				contingutTbody += ' <span class="fa fa-warning text-danger" title="' + escaped + '"></span>';
 			}
 			contingutTbody += '</td>';
-			
-			if (${send}) {
-				contingutTbody += '<td width="5%">';
-				contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" data-toggle="modal" class="btn btn-default btn-sm"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>';
-				contingutTbody += '</td>';
-			} else {
-				contingutTbody += '<td width="5%">';
-				contingutTbody += '<div class="dropdown">';
-				contingutTbody += '<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>';
-				contingutTbody += '<ul class="dropdown-menu">';
-				contingutTbody += '<li><a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>';
-				contingutTbody += '<li><a href="javascript:refrescarEstat(' + rowData.id + ',' + data[i].id + ');" ><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="enviament.info.accio.refrescar.estat"/></a></li>';
-				contingutTbody += '</ul>';
-				contingutTbody += '</div>';
-				contingutTbody += '</td>';
-			}
-			
+			contingutTbody += '<td width="5%">';
+			contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" data-toggle="modal" class="btn btn-default btn-sm"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>';
+			contingutTbody += '</td>';
 			contingutTbody += '</tr>';
 		}
 		$('table tbody', td).append(contingutTbody);
 		$('table tbody td').webutilModalEval();
 	});
-}
-	
-function refrescarEstat(n, d) {
-	$('.btn').blur();
-	var url = "<c:url value="/notificacio/" />" + n + "/refrescarEstat/" + d;
-    $.get(url).done(function(data) {
-    	$( "#msg-box" ).empty();
-    	if(data) {
-    		printEnviaments(n);
-    		$( "#msg-box" ).append( '<div class="alert alert-success well-sm">' + "${refresh_state_succes}" + '</div>' );
-    	} else {
-    		$( "#msg-box" ).append( '<div class="alert alert-danger well-sm">' + "${refresh_state_error}" + '</div>' );
-    	}
-    	
-    });
 }
 </script>
 </head>
@@ -138,24 +120,35 @@ function refrescarEstat(n, d) {
 <div id="msg-box"></div>
 	<form:form id="filtre" action="" method="post" cssClass="well" commandName="notificacioFiltreCommand">
 		<div class="row">
-			<div class="col-md-3">
-				<not:inputText name="concepte" inline="true"  placeholderKey="notificacio.list.filtre.camp.concepte"/>
-			</div>
-			<div class="col-md-3">
-				<not:inputDate name="dataInici" placeholderKey="notificacio.list.filtre.camp.datainici" inline="true" required="false" />
-			</div>
-			<div class="col-md-3">
-				<not:inputDate name="dataFi" placeholderKey="notificacio.list.filtre.camp.datafi" inline="true" required="false" />
-			</div>
-			<div class="col-md-3">
-				<not:inputText name="destinatari" inline="true" placeholderKey="notificacio.list.filtre.camp.destinatari"/>
-			</div>
 			<c:if test="${isRolActualAdministrador}">
 				<div class="col-md-3">
 					<not:inputSelect name="entitatId" optionItems="${entitat}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.entitat" inline="true"/>
 				</div>
 			</c:if>
-			<div class="pull-right form-buttons">
+			<div class="col-md-2">
+				<not:inputSelect name="enviamentTipus" optionItems="${notificacioEnviamentTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.enviament.tipus" inline="true"/>
+			</div>
+			<div class="col-md-2">
+				<not:inputSelect name="comunicacioTipus" optionItems="${notificacioComunicacioTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.comunicacio.tipus" inline="true"/>
+			</div>
+			<div class="col-md-3">
+				<not:inputText name="concepte" inline="true"  placeholderKey="notificacio.list.filtre.camp.concepte"/>
+			</div>
+			<div class="col-md-2">
+				<not:inputSelect name="estat" optionItems="${notificacioEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"/>
+			</div>
+			<div class="col-md-2">
+				<not:inputDate name="dataInici" placeholderKey="notificacio.list.filtre.camp.datainici" inline="true" required="false" />
+			</div>
+			<div class="col-md-2">
+				<not:inputDate name="dataFi" placeholderKey="notificacio.list.filtre.camp.datafi" inline="true" required="false" />
+			</div>
+			<div class="col-md-3">
+				<not:inputText name="destinatari" inline="true" placeholderKey="notificacio.list.filtre.camp.destinatari"/>
+			</div>
+			<div class="col-md-3">
+			</div>
+			<div class="col-md-2 pull-right form-buttons">
 				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 				<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 			</div>
@@ -175,42 +168,42 @@ function refrescarEstat(n, d) {
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false">#</th>
-				<th data-col-name="errorNotifica" data-visible="false"></th>
-				<th data-col-name="errorNotificaError" data-visible="false"></th>
+				<th data-col-name="notificaError" data-visible="false"></th>
+				<th data-col-name="notificaErrorDescripcio" data-visible="false"></th>
 				<th data-col-name=createdDate data-converter="datetime" width="15%"><spring:message code="notificacio.list.columna.enviament.data"/></th>
-				<th data-col-name="concepte" width="${ampladaConcepte}"><spring:message code="notificacio.list.columna.concepte"/></th>
 				<c:if test="${isRolActualAdministrador}">
 					<th data-col-name="entitat.nom" width="20%"><spring:message code="notificacio.list.columna.entitat"/></th>
 				</c:if>
+				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate">
+					<spring:message code="notificacio.list.columna.tipus.enviament"/>
+					<script id="cellEnviamentTipusTemplate" type="text/x-jsrender">
+						{{:~eval('enviamentTipus["' + enviamentTipus + '"]')}}
+					</script>
+				</th>
+				<th data-col-name="comunicacioTipus" data-template="#cellComunicacioTipusTemplate">
+					<spring:message code="notificacio.list.columna.tipus.comunicacio"/>
+					<script id="cellComunicacioTipusTemplate" type="text/x-jsrender">
+						{{:~eval('comunicacioTipus["' + comunicacioTipus + '"]')}}
+					</script>
+				</th>
+				<th data-col-name="concepte" width="${ampladaConcepte}"><spring:message code="notificacio.list.columna.concepte"/></th>
 				<th data-col-name="estat" data-template="#cellEstatTemplate" width="20%">
 					<spring:message code="notificacio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						{{if estat == 'PENDENT'}}
-							<span class="fa fa-clock-o"></span>&nbsp;<spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.PENDENT"/>
+							<span class="fa fa-clock-o"></span>
 						{{else estat == 'ENVIADA'}}
-							<span class="fa fa-send-o"></span>&nbsp;<spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.ENVIADA"/>
+							<span class="fa fa-send-o"></span>
 						{{else estat == 'FINALITZADA'}}
-							<span class="fa fa-check"></span>&nbsp;<spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.FINALITZADA"/>
-						{{else}}
-							{{:estat}}
+							<span class="fa fa-check"></span>
 						{{/if}}
-						{{if errorNotifica}}<span class="fa fa-warning text-danger" title="{{>errorNotificaError}}"></span>{{/if}}
+						{{:~eval('notificacioEstats["' + estat + '"]')}}
+						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>errorNotificaDescripcio}}"></span>{{/if}}
 					</script>
 				</th>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="5%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<a href="<c:url value="/notificacio/{{:id}}"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a>
-						<%--<div class="dropdown">
-							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-							<ul class="dropdown-menu">
-								<li><a href="<c:url value="/notificacio/{{:id}}"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
-								<li><a href="<c:url value="/notificacio/{{:id}}/event"/>" data-toggle="modal"><span class="fa fa-calendar-o"></span>&nbsp;<spring:message code="notificacio.list.accio.events"/></a></li>
-								{{if estat == 'PENDENT'}}
-									<li><a href="<c:url value="/notificacio/{{:id}}/enviar"/>"><span class="fa fa-share-square-o"></span>&nbsp;<spring:message code="notificacio.list.accio.enviar"/></a></li>
-								{{/if}}
-								<li><a href="<c:url value="/notificacio/{{:id}}/document"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="notificacio.list.accio.descarregar.document"/></a></li>
-							</ul>
-						</div>--%>
 					</script>
 				</th>
 			</tr>

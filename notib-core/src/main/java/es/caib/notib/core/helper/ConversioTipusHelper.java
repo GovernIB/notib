@@ -175,8 +175,8 @@ public class ConversioTipusHelper {
 					}
 				});*/
 		mapperFactory.classMap(NotificacioEntity.class, NotificacioDto.class).
-		field("notificaErrorEvent.data", "errorNotificaData").
-		field("notificaErrorEvent.errorDescripcio", "errorNotificaError").
+		field("notificaErrorEvent.data", "notificaErrorData").
+		field("notificaErrorEvent.errorDescripcio", "notificaErrorDescripcio").
 		exclude("destinataris").
 		byDefault().
 		register();

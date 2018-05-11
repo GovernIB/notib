@@ -4,7 +4,6 @@
 package es.caib.notib.core.api.dto;
 
 import java.util.Date;
-import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -18,6 +17,7 @@ public class NotificacioDto extends AuditoriaDto {
 
 	private Long id;
 	private String cifEntitat;
+	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
 	private Date enviamentDataProgramada;
 	private String concepte;
@@ -48,10 +48,8 @@ public class NotificacioDto extends AuditoriaDto {
 	private String seuOficiTitol;
 	private String seuOficiText;
 	private NotificacioEstatEnumDto estat;
-	private boolean errorNotifica;
-	private Date errorNotificaData;
-	private String errorNotificaError;
-	private List<NotificacioEnviamentDto> enviaments;
+	private Date notificaErrorData;
+	private String notificaErrorDescripcio;
 
 	private EntitatDto entitat;
 
@@ -66,6 +64,12 @@ public class NotificacioDto extends AuditoriaDto {
 	}
 	public void setCifEntitat(String cifEntitat) {
 		this.cifEntitat = cifEntitat;
+	}
+	public NotificacioComunicacioTipusEnumDto getComunicacioTipus() {
+		return comunicacioTipus;
+	}
+	public void setComunicacioTipus(NotificacioComunicacioTipusEnumDto comunicacioTipus) {
+		this.comunicacioTipus = comunicacioTipus;
 	}
 	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
 		return enviamentTipus;
@@ -247,35 +251,27 @@ public class NotificacioDto extends AuditoriaDto {
 	public void setEstat(NotificacioEstatEnumDto estat) {
 		this.estat = estat;
 	}
-	public boolean isErrorNotifica() {
-		return errorNotifica;
+	public Date getNotificaErrorData() {
+		return notificaErrorData;
 	}
-	public void setErrorNotifica(boolean errorNotifica) {
-		this.errorNotifica = errorNotifica;
+	public void setNotificaErrorData(Date notificaErrorData) {
+		this.notificaErrorData = notificaErrorData;
 	}
-	public Date getErrorNotificaData() {
-		return errorNotificaData;
+	public String getNotificaErrorDescripcio() {
+		return notificaErrorDescripcio;
 	}
-	public void setErrorNotificaData(Date errorNotificaData) {
-		this.errorNotificaData = errorNotificaData;
-	}
-	public String getErrorNotificaError() {
-		return errorNotificaError;
-	}
-	public void setErrorNotificaError(String errorNotificaError) {
-		this.errorNotificaError = errorNotificaError;
-	}
-	public List<NotificacioEnviamentDto> getEnviaments() {
-		return enviaments;
-	}
-	public void setEnviaments(List<NotificacioEnviamentDto> enviaments) {
-		this.enviaments = enviaments;
+	public void setNotificaErrorDescripcio(String notificaErrorDescripcio) {
+		this.notificaErrorDescripcio = notificaErrorDescripcio;
 	}
 	public EntitatDto getEntitat() {
 		return entitat;
 	}
 	public void setEntitat(EntitatDto entitat) {
 		this.entitat = entitat;
+	}
+
+	public boolean isNotificaError() {
+		return notificaErrorData != null;
 	}
 
 	@Override

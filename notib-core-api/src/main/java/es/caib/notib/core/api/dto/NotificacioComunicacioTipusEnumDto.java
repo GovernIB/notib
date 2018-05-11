@@ -14,7 +14,7 @@ package es.caib.notib.core.api.dto;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public enum NotificaComunicacioTipusEnumDto {
+public enum NotificacioComunicacioTipusEnumDto {
 	SINCRON,
 	ASINCRON
 }

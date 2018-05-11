@@ -42,7 +42,7 @@ public class ClientBaseTest {
 	protected static final String ENTITAT_DIR3CODI = "A04013511";
 	protected static final String ORGAN_CODI = "A04003003";
 	protected static final String UNITAT_ADMINISTRATIVA_SISTRA = "1";
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "000000";
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "846823";
 	protected static final String IDIOMA = "ca";
 
 	protected Notificacio generarNotificacio(
@@ -52,7 +52,7 @@ public class ClientBaseTest {
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 		Notificacio notificacio = new Notificacio();
 		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
+		notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
 		notificacio.setConcepte(
 				"concepte_" + notificacioId);
 		notificacio.setDescripcio(
@@ -139,7 +139,7 @@ public class ClientBaseTest {
 			}
 			EntregaDeh entregaDeh = new EntregaDeh();
 			entregaDeh.setObligat(true);
-			entregaDeh.setProcedimentCodi("0000");
+			entregaDeh.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 			enviament.setEntregaDeh(entregaDeh);
 			enviament.setServeiTipus(ServeiTipusEnum.URGENT);
 			notificacio.getEnviaments().add(enviament);
