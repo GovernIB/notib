@@ -44,26 +44,8 @@ public interface NotificacioService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina amb les notificacions.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
 	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
-			NotificacioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams);
-
-	/**
-	 * Consulta de les notificacions d'una entitat segons els paràmetres
-	 * del filtre.
-	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat.
-	 * @param filtre
-	 *            Paràmetres per a filtrar els resultats.
-	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
-	 * @return la pàgina amb les notificacions trobades.
-	 */
-	@PreAuthorize("hasRole('NOT_REP')")
-	public PaginaDto<NotificacioDto> findAmbEntitatIFiltrePaginat(
-			Long entitatId,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
 
@@ -110,7 +92,7 @@ public interface NotificacioService {
 	 * @return els destinataris trobats.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
-	public List<NotificacioEventDto> eventFindAmbNotificacioIEnviament(
+	public List<NotificacioEventDto> eventFindAmbEnviament(
 			Long notificacioId,
 			Long enviamentId);
 	
@@ -204,5 +186,11 @@ public interface NotificacioService {
 	 * de les notificacions de la seu.
 	 */
 	public void seuNotificaComunicarEstatPendents();
+
+	/**
+	 * Mètode d'execució periòdica per a refrescar l'estat dels enviaments fets a
+	 * Notific@.
+	 */
+	public void enviamentRefrescarEstatPendents();
 
 }

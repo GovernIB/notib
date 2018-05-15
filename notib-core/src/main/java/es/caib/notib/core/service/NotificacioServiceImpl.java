@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
@@ -128,8 +129,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			notificacions = notificacioRepository.findAmbFiltre(
 					filtre.getEntitatId() == null,
 					filtre.getEntitatId(),
-					filtre.getComunicacioTipus() == null,
-					filtre.getComunicacioTipus(),
+					//filtre.getComunicacioTipus() == null,
+					//filtre.getComunicacioTipus(),
+					false,
+					NotificacioComunicacioTipusEnumDto.SINCRON,
 					filtre.getEnviamentTipus() == null,
 					filtre.getEnviamentTipus(),
 					filtre.getConcepte() == null,
@@ -139,44 +142,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 					dataInici == null && dataFi == null,
 					dataInici,
 					dataFi,
-					filtre.getDestinatari() == null || filtre.getDestinatari().isEmpty(), 
-					filtre.getDestinatari(),
+					filtre.getTitular() == null || filtre.getTitular().isEmpty(), 
+					filtre.getTitular(),
 					pageable);
 		}
 		return paginacioHelper.toPaginaDto(
 				notificacions,
 				NotificacioDto.class);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public PaginaDto<NotificacioDto> findAmbEntitatIFiltrePaginat(
-			Long entitatId,
-			NotificacioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		logger.debug("Consulta paginada de notificacions d'una entitat segons el filtre (" +
-				"entitatId=" + entitatId + ", " +
-				"filtre=" + filtre + ", " +
-				"paginacioParams=" + paginacioParams + ")");
-		entityComprovarHelper.comprovarPermisos(
-				entitatId,
-				false,
-				true);
-		PaginaDto<NotificacioDto> notificacions;
-		if (filtre == null) {
-			notificacions = paginacioHelper.toPaginaDto(
-					notificacioRepository.findByEntitatId(
-							entitatId,
-							paginacioHelper.toSpringDataPageable(paginacioParams)),
-					NotificacioDto.class);
-		} else {
-			notificacions = paginacioHelper.toPaginaDto(
-					notificacioRepository.findByEntitatId(
-							entitatId,
-							paginacioHelper.toSpringDataPageable(paginacioParams)),
-					NotificacioDto.class);
-		}
-		return notificacions;
 	}
 
 	@Override
@@ -219,13 +191,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 				true,
 				true);
 		return conversioTipusHelper.convertirList(
-				notificacioEventRepository.findByNotificacioIdOrderByDataDesc(notificacioId),
+				notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacioId),
 				NotificacioEventDto.class);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<NotificacioEventDto> eventFindAmbNotificacioIEnviament(
+	public List<NotificacioEventDto> eventFindAmbEnviament(
 			Long notificacioId,
 			Long enviamentId) {
 		logger.debug("Consulta dels events associats a un destinatari (" +
@@ -237,7 +209,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 				true,
 				true);
 		return conversioTipusHelper.convertirList(
-				notificacioEventRepository.findByEnviamentIdOrderByDataDesc(enviamentId),
+				notificacioEventRepository.findByNotificacioIdOrEnviamentIdOrderByDataAsc(
+						notificacioId,
+						enviamentId),
 				NotificacioEventDto.class);
 	}
 
@@ -288,25 +262,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional
 	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(
 			Long enviamentId) {
-<<<<<<< HEAD
 		logger.debug("Refrescant l'estat de la notificació de Notific@ (" +
 				"enviamentId=" + enviamentId + ")");
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
-		notificaHelper.enviamentRefrescarEstat(enviament);
+		notificaHelper.enviamentRefrescarEstat(enviament.getId());
 		NotificacioEnviamenEstatDto estatDto = conversioTipusHelper.convertir(
 				enviament,
 				NotificacioEnviamenEstatDto.class);
 		estatCalcularCampsAddicionals(
-=======
-		logger.debug("Refrescant l'estat de la notificació amb informació de Notific@ i de la seu (" +
-				"enviamentId=" + enviamentId + ")");
-		NotificacioEnviamentEntity enviament = notificacioDestinatariRepository.findOne(enviamentId);
-		notificaHelper.enviamentRefrescarEstat(enviament);
-		NotificacioEnviamenEstatDto estatDto = conversioTipusHelper.convertir(
-				enviament,
-				NotificacioEnviamenEstatDto.class);
-		estatEmplenarErrors(
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 				enviament,
 				estatDto);
 		return estatDto;
@@ -317,11 +280,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public boolean enviamentComunicacioSeu(
 			Long enviamentId) {
 		logger.debug("Enviant canvi d'estat de la seu electrònica a Notific@ (" +
-<<<<<<< HEAD
 				"enviamentId=" + enviamentId + ")");
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		return notificaHelper.enviamentComunicacioSeu(
-				enviament,
+				enviament.getId(),
 				new Date());
 	}
 
@@ -334,13 +296,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 				"enviamentId=" + enviamentId + ")");
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		return notificaHelper.enviamentCertificacioSeu(
-				enviament,
+				enviament.getId(),
 				certificacioArxiu,
 				new Date());
-=======
-				"destinatariId=" + destinatariId + ")");
-		return notificaHelper.enviamentComunicacioSeu(destinatariId);
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 	}
 
 	@Override
@@ -407,11 +365,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				for (NotificacioEnviamentEntity pendent: pendents) {
 					boolean estatActualitzat = seuHelper.consultaEstat(pendent.getId());
 					if (estatActualitzat) {
-<<<<<<< HEAD
-						notificaHelper.enviamentComunicacioSeu(pendent, null);
-=======
-						notificaHelper.enviamentComunicacioSeu(pendent.getId());
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
+						notificaHelper.enviamentComunicacioSeu(pendent.getId(), null);
 					}
 				}
 			} else {
@@ -426,7 +380,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			fixedRateString = "${config:es.caib.notib.tasca.seu.notifica.estat.periode}",
 			initialDelayString = "${config:es.caib.notib.tasca.retard.inicial}")
 	public void seuNotificaComunicarEstatPendents() {
-		logger.debug("Cercant notificacions provinents de la seu pendents d'actualització d'estat a Notifica");
+		logger.debug("Cercant notificacions de la seu pendents d'actualitzar l'estat a Notifica");
 		if (pluginHelper.isSeuPluginDisponible() && isTasquesActivesProperty() && pluginHelper.isSeuPluginDisponible()) {
 			int maxPendents = getSeuNotificaEstatProcessarMaxProperty();
 			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findBySeuEstatInAndMaxReintentsOrderBySeuDataNotificaDarreraPeticioAsc(
@@ -438,17 +392,36 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!pendents.isEmpty()) {
 				logger.debug("Realitzant actualització d'estat a Notifica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
 				for (NotificacioEnviamentEntity pendent: pendents) {
-<<<<<<< HEAD
-					notificaHelper.enviamentComunicacioSeu(pendent, null);
-=======
-					notificaHelper.enviamentComunicacioSeu(pendent.getId());
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
+					notificaHelper.enviamentComunicacioSeu(pendent.getId(), null);
 				}
 			} else {
 				logger.debug("No hi ha notificacions pendents d'actualització d'estat a Notifica");
 			}
 		} else {
 			logger.warn("La connexió amb la seu electrònica no està activa i no es realitzarà cap enviament");
+		}
+	}
+
+	@Override
+	@Scheduled(
+			fixedRateString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.periode}",
+			initialDelayString = "${config:es.caib.notib.tasca.retard.inicial}")
+	public void enviamentRefrescarEstatPendents() {
+		logger.debug("Cercant enviaments pendents de refrescar l'estat de Notifica");
+		if (isTasquesActivesProperty() && notificaHelper.isConnexioNotificaDisponible()) {
+			int maxPendents = getEnviamentActualitzacioEstatProcessarMaxProperty();
+			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByNotificaEstatFinalFalseOrderByEstatDataActualitzacioAsc(
+					new PageRequest(0, maxPendents));
+			if (!pendents.isEmpty()) {
+				logger.debug("Realitzant refresc de l'estat de Notifica per a " + pendents.size() + " enviaments (màxim=" + maxPendents + ")");
+				for (NotificacioEnviamentEntity pendent: pendents) {
+					notificaHelper.enviamentRefrescarEstat(pendent.getId());
+				}
+			} else {
+				logger.debug("No hi ha enviaments pendents de refrescar l'estat de Notifica");
+			}
+		} else {
+			logger.warn("La connexió amb Notific@ no està activa i no es realitzarà cap refresca d'estat");
 		}
 	}
 
@@ -462,11 +435,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		for (int i = 0; i < enviaments.size(); i++) {
 			NotificacioEnviamentEntity destinatariEntity = enviaments.get(i);
 			NotificacioEnviamentDto destinatariDto = destinatarisDto.get(i);
-<<<<<<< HEAD
 			destinatariCalcularCampsAddicionals(
-=======
-			destinatariEmplenarErrors(
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 					destinatariEntity,
 					destinatariDto);
 		}
@@ -478,21 +447,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 		NotificacioEnviamentDto destinatariDto = conversioTipusHelper.convertir(
 				enviament,
 				NotificacioEnviamentDto.class);
-<<<<<<< HEAD
 		destinatariCalcularCampsAddicionals(
-=======
-		destinatariEmplenarErrors(
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 				enviament,
 				destinatariDto);
 		return destinatariDto;
 	}
 
-<<<<<<< HEAD
 	private void destinatariCalcularCampsAddicionals(
-=======
-	private void destinatariEmplenarErrors(
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 			NotificacioEnviamentEntity enviament,
 			NotificacioEnviamentDto enviamentDto) {
 		if (enviament.isNotificaError()) {
@@ -507,28 +468,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (event != null) {
 				enviamentDto.setSeuErrorData(event.getData());
 				enviamentDto.setSeuErrorDescripcio(event.getErrorDescripcio());
-<<<<<<< HEAD
-=======
-			}
-		}
-	}
-
-	private void estatEmplenarErrors(
-			NotificacioEnviamentEntity enviament,
-			NotificacioEnviamenEstatDto estatDto) {
-		if (enviament.isNotificaError()) {
-			NotificacioEventEntity event = enviament.getNotificaErrorEvent();
-			if (event != null) {
-				estatDto.setNotificaErrorData(event.getData());
-				estatDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
-			}
-		}
-		if (enviament.isSeuError()) {
-			NotificacioEventEntity event = enviament.getSeuErrorEvent();
-			if (event != null) {
-				estatDto.setSeuErrorData(event.getData());
-				estatDto.setSeuErrorDescripcio(event.getErrorDescripcio());
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 			}
 		}
 		enviamentDto.setNotificaCertificacioArxiuNom(
@@ -578,6 +517,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private int getSeuNotificaEstatProcessarMaxProperty() {
 		return propertiesHelper.getAsInt(
 				"es.caib.notib.tasca.seu.notifica.estat.processar.max",
+				10);
+	}
+	private int getEnviamentActualitzacioEstatProcessarMaxProperty() {
+		return propertiesHelper.getAsInt(
+				"es.caib.notib.tasca.enviament.actualitzacio.estat.processar.max",
 				10);
 	}
 

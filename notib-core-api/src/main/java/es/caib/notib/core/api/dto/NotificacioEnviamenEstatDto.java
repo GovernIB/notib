@@ -24,7 +24,6 @@ public class NotificacioEnviamenEstatDto {
 	private String notificaDatatErrorDescripcio;
 	private Date notificaCertificacioData;
 	private String notificaCertificacioArxiuId;
-<<<<<<< HEAD
 	private String notificaCertificacioArxiuNom;
 	private String notificaCertificacioHash;
 	private String notificaCertificacioOrigen;
@@ -116,92 +115,6 @@ public class NotificacioEnviamenEstatDto {
 	}
 	public void setNotificaCertificacioArxiuNom(String notificaCertificacioArxiuNom) {
 		this.notificaCertificacioArxiuNom = notificaCertificacioArxiuNom;
-=======
-	private String notificaCertificacioHash;
-	private String notificaCertificacioOrigen;
-	private String notificaCertificacioMetadades;
-	private String notificaCertificacioCsv;
-	private String notificaCertificacioMime;
-	private Integer notificaCertificacioTamany;
-	private NotificaCertificacioTipusEnumDto notificaCertificacioTipus;
-	private NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus;
-	private String notificaCertificacioNumSeguiment;
-	private boolean notificaError;
-	private Date notificaErrorData;
-	private String notificaErrorDescripcio;
-	private String seuRegistreNumero;
-	private Date seuRegistreData;
-	private Date seuDataFi;
-	private NotificacioEnviamentEstatEnumDto seuEstat;
-	private boolean seuError;
-	private Date seuErrorData;
-	private String seuErrorDescripcio;
-	private Date seuDataEnviament;
-	private int seuReintentsEnviament;
-	private Date seuDataEstat;
-	private Date seuDataNotificaInformat;
-	private Date seuDataNotificaDarreraPeticio;
-
-	public NotificacioEnviamentEstatEnumDto getNotificaEstat() {
-		return notificaEstat;
-	}
-	public void setNotificaEstat(NotificacioEnviamentEstatEnumDto notificaEstat) {
-		this.notificaEstat = notificaEstat;
-	}
-	public Date getNotificaEstatData() {
-		return notificaEstatData;
-	}
-	public void setNotificaEstatData(Date notificaEstatData) {
-		this.notificaEstatData = notificaEstatData;
-	}
-	public String getNotificaEstatDescripcio() {
-		return notificaEstatDescripcio;
-	}
-	public void setNotificaEstatDescripcio(String notificaEstatDescripcio) {
-		this.notificaEstatDescripcio = notificaEstatDescripcio;
-	}
-	public String getNotificaDatatOrigen() {
-		return notificaDatatOrigen;
-	}
-	public void setNotificaDatatOrigen(String notificaDatatOrigen) {
-		this.notificaDatatOrigen = notificaDatatOrigen;
-	}
-	public String getNotificaDatatReceptorNif() {
-		return notificaDatatReceptorNif;
-	}
-	public void setNotificaDatatReceptorNif(String notificaDatatReceptorNif) {
-		this.notificaDatatReceptorNif = notificaDatatReceptorNif;
-	}
-	public String getNotificaDatatReceptorNom() {
-		return notificaDatatReceptorNom;
-	}
-	public void setNotificaDatatReceptorNom(String notificaDatatReceptorNom) {
-		this.notificaDatatReceptorNom = notificaDatatReceptorNom;
-	}
-	public String getNotificaDatatNumSeguiment() {
-		return notificaDatatNumSeguiment;
-	}
-	public void setNotificaDatatNumSeguiment(String notificaDatatNumSeguiment) {
-		this.notificaDatatNumSeguiment = notificaDatatNumSeguiment;
-	}
-	public String getNotificaDatatErrorDescripcio() {
-		return notificaDatatErrorDescripcio;
-	}
-	public void setNotificaDatatErrorDescripcio(String notificaDatatErrorDescripcio) {
-		this.notificaDatatErrorDescripcio = notificaDatatErrorDescripcio;
-	}
-	public Date getNotificaCertificacioData() {
-		return notificaCertificacioData;
-	}
-	public void setNotificaCertificacioData(Date notificaCertificacioData) {
-		this.notificaCertificacioData = notificaCertificacioData;
-	}
-	public String getNotificaCertificacioArxiuId() {
-		return notificaCertificacioArxiuId;
-	}
-	public void setNotificaCertificacioArxiuId(String notificaCertificacioArxiuId) {
-		this.notificaCertificacioArxiuId = notificaCertificacioArxiuId;
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 	}
 	public String getNotificaCertificacioHash() {
 		return notificaCertificacioHash;

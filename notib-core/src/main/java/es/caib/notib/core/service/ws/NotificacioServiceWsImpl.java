@@ -101,6 +101,11 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 					"ENTITAT", 
 					"No s'ha trobat cap entitat configurada a Notib amb el codi Dir3 " + emisorDir3Codi + ". (emisorDir3Codi)");
 		}
+		if (!entitat.isActiva()) {
+			throw new ValidationException(
+					"ENTITAT", 
+					"L'entitat especificada està desactivada per a l'enviament de notificacions");
+		}
 		if (notificacio.getConcepte() == null) {
 			throw new ValidationException(
 					"CONCEPTE", 
@@ -398,7 +403,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			// serà necessari consultar l'estat de la notificació a Notifica
 			if (	!notificaHelper.isAdviserActiu() &&
 					!enviament.getNotificaEstat().equals(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT)) {
-				notificaHelper.enviamentRefrescarEstat(enviament);
+				notificaHelper.enviamentRefrescarEstat(enviament.getId());
 			}
 			resposta.setEstat(toEnviamentEstat(enviament.getNotificaEstat()));
 			resposta.setEstatData(enviament.getNotificaEstatData());

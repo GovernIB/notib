@@ -8,11 +8,11 @@ import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-<<<<<<< HEAD
 import es.caib.notib.core.api.dto.ArxiuDto;
-=======
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+//github.com/GovernIB/notib.git
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 
@@ -30,51 +30,41 @@ public class NotificaHelper {
 	private NotificaV2Helper notificaV2Helper;
 
 
-
+	@Transactional
 	public boolean notificacioEnviar(
 			Long notificacioId) {
 		return getNotificaHelper().notificacioEnviar(notificacioId);
 	}
 
+	@Transactional
 	public boolean enviamentRefrescarEstat(
-			NotificacioEnviamentEntity enviament) throws SistemaExternException {
-		return getNotificaHelper().enviamentRefrescarEstat(enviament);
+			Long enviamentId) throws SistemaExternException {
+		return getNotificaHelper().enviamentRefrescarEstat(enviamentId);
 	}
 
+	@Transactional
 	public boolean enviamentComunicacioSeu(
-<<<<<<< HEAD
-			NotificacioEnviamentEntity enviament,
+			Long enviamentId,
 			Date comunicacioData) {
 		return getNotificaHelper().enviamentComunicacioSeu(
-				enviament,
+				enviamentId,
 				comunicacioData);
-=======
-			Long notificacioEnviamentId) {
-		return getNotificaHelper().enviamentComunicacioSeu(notificacioEnviamentId);
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 	}
 
-<<<<<<< HEAD
+	@Transactional
 	public boolean enviamentCertificacioSeu(
-			NotificacioEnviamentEntity enviament,
+			Long enviamentId,
 			ArxiuDto certificacioArxiu,
 			Date certificacioData) {
 		return getNotificaHelper().enviamentCertificacioSeu(
-				enviament,
+				enviamentId,
 				certificacioArxiu,
 				certificacioData);
-=======
-	public String xifrarId(Long id) throws GeneralSecurityException {
-		return getNotificaHelper().xifrarId(id);
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 	}
-<<<<<<< HEAD
 
 	public String xifrarId(Long id) throws GeneralSecurityException {
 		return getNotificaHelper().xifrarId(id);
 	}
-=======
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 	public Long desxifrarId(String identificador) throws GeneralSecurityException {
 		return getNotificaHelper().desxifrarId(identificador);
 	}
@@ -85,6 +75,28 @@ public class NotificaHelper {
 
 	public boolean isAdviserActiu() {
 		return getNotificaHelper().isAdviserActiu();
+	}
+
+	public void enviamentUpdateDatat(
+			NotificacioEnviamentEstatEnumDto notificaEstat,
+			Date notificaEstatData,
+			String notificaEstatDescripcio,
+			String notificaDatatOrigen,
+			String notificaDatatReceptorNif,
+			String notificaDatatReceptorNom,
+			String notificaDatatNumSeguiment,
+			String notificaDatatErrorDescripcio,
+			NotificacioEnviamentEntity enviament) {
+		getNotificaHelper().enviamentUpdateDatat(
+				notificaEstat,
+				notificaEstatData,
+				notificaEstatDescripcio,
+				notificaDatatOrigen,
+				notificaDatatReceptorNif,
+				notificaDatatReceptorNom,
+				notificaDatatNumSeguiment,
+				notificaDatatErrorDescripcio,
+				enviament);
 	}
 
 

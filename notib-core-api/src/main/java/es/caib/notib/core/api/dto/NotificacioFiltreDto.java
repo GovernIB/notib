@@ -22,7 +22,7 @@ public class NotificacioFiltreDto implements Serializable {
 	private String concepte;
 	private Date dataInici;
 	private Date dataFi;
-	private String destinatari;
+	private String titular;
 	
 	public Long getEntitatId() {
 		return entitatId;
@@ -66,11 +66,11 @@ public class NotificacioFiltreDto implements Serializable {
 	public void setDataFi(Date dataFi) {
 		this.dataFi = dataFi;
 	}
-	public String getDestinatari() {
-		return destinatari;
+	public String getTitular() {
+		return titular;
 	}
-	public void setDestinatari(String destinatari) {
-		this.destinatari = destinatari;
+	public void setTitular(String titular) {
+		this.titular = titular;
 	}
 	
 	@Override

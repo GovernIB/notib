@@ -17,11 +17,9 @@ import org.apache.commons.codec.DecoderException;
 import org.junit.Before;
 import org.junit.Test;
 
-import es.caib.notib.ws.notificacio.EnviamentEstatEnum;
 import es.caib.notib.ws.notificacio.EnviamentReferencia;
 import es.caib.notib.ws.notificacio.NotificacioEstatEnum;
 import es.caib.notib.ws.notificacio.RespostaAlta;
-import es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament;
 
 /**
  * Test per al client REST del servei de notificacions de NOTIB.
@@ -55,7 +53,7 @@ public class ClientRestTest extends ClientBaseTest {
 				generarNotificacio(
 						notificacioId,
 						1,
-						true));
+						false));
 		assertNotNull(respostaAlta);
 		assertFalse(respostaAlta.isError());
 		assertNull(respostaAlta.getErrorDescripcio());
@@ -66,13 +64,13 @@ public class ClientRestTest extends ClientBaseTest {
 		assertEquals(
 				NotificacioEstatEnum.ENVIADA,
 				respostaAlta.getEstat());
-		RespostaConsultaEstatEnviament respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencies.get(0).getReferencia());
+		/*RespostaConsultaEstatEnviament respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencies.get(0).getReferencia());
 		assertNotNull(respostaConsultaEstatEnviament);
 		assertFalse(respostaConsultaEstatEnviament.isError());
 		assertNull(respostaConsultaEstatEnviament.getErrorDescripcio());
 		assertEquals(
 				EnviamentEstatEnum.PENDENT_SEU,
-				respostaConsultaEstatEnviament.getEstat());
+				respostaConsultaEstatEnviament.getEstat());*/
 	}
 
 }

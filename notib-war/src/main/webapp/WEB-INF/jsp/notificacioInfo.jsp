@@ -22,6 +22,21 @@ var eventTipus = [];
 <c:forEach var="tipus" items="${eventTipus}">
 eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 </c:forEach>
+$(document).ready(function() {
+	$('#events').on('rowinfo.dataTable', function(e, td, rowData) {
+		$(td).empty();
+    	$(td).append('<textarea style="width:100%" rows="10">' + rowData['errorDescripcio'] + '</textarea>');
+	});
+	$('#events').on('draw.dt', function(e, settings) {
+		var api = new $.fn.dataTable.Api(settings);
+		api.rows().every(function (rowIdx, tableLoop, rowLoop) {
+			var data = this.data();
+			if (!data.error) {
+				$('td:last-child', this.node()).empty();
+			}
+		});
+	});
+});
 </script>
 </head>
 <body>
@@ -37,7 +52,7 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 				<table class="table table-bordered" style="background-color:white; width:100%">
 				<tbody>
 					<tr>
-						<td width="30%"><strong><spring:message code="notificacio.info.error.data"/></strong></td>
+						<td width="10%"><strong><spring:message code="notificacio.info.error.data"/></strong></td>
 						<td><fmt:formatDate value="${notificacio.notificaErrorData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 					</tr>
 					<tr>
@@ -245,29 +260,30 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 				data-search-enabled="false"
 				data-paging="false"
 				data-info="false"
+				data-row-info="true"
 				class="table table-striped table-bordered"
 				style="width:100%">
 			<thead>
 				<tr>
 					<th data-col-name="id" data-visible="false">#</th>
-					<th data-col-name="destinatariAssociat" data-visible="false"></th>
+					<th data-col-name="enviamentAssociat" data-visible="false"></th>
 					<th data-col-name="errorDescripcio" data-visible="false"></th>
+					<th data-col-name="createdBy.nom" data-orderable="false"><spring:message code="notificacio.event.list.columna.usuari"/></th>
 					<th data-col-name="data" data-converter="datetime" data-orderable="false"><spring:message code="notificacio.event.list.columna.data"/></th>
 					<th data-col-name="tipus" data-template="#cellTipus" data-orderable="false">
 						<spring:message code="notificacio.event.list.columna.tipus"/>
 						<script id="cellTipus" type="text/x-jsrender">
 							{{:~eval('eventTipus["' + tipus + '"]')}}
-							{{if destinatariAssociat}}<span class="label label-default pull-right" title="<spring:message code="notificacio.event.list.info.associat"/>">E</span>{{/if}}
+							{{if enviamentAssociat}}<span class="label label-default pull-right" title="<spring:message code="notificacio.event.list.info.associat"/>">E</span>{{/if}}
 						</script>
 					</th>
-					<th data-col-name="descripcio" data-orderable="false"><spring:message code="notificacio.event.list.columna.descripcio"/></th>
 					<th data-col-name="error" data-template="#cellResultat" data-orderable="false">
-						<spring:message code="notificacio.event.list.columna.resultat"/>
+						<spring:message code="notificacio.event.list.columna.estat"/>
 						<script id="cellResultat" type="text/x-jsrender">
 							{{if error}}
-								<span class="fa fa-warning text-danger" title="{{>errorDescripcio}}"></span>
+								<span class="fa fa-warning text-danger" title="<spring:message code="enviament.event.list.processat.error"/>"></span>
 							{{else}}
-								<span class="fa fa-check text-success"></span>
+								<span class="fa fa-check text-success" title="<spring:message code="enviament.event.list.processat.ok"/>"></span>
 							{{/if}}
 						</script>
 					</th>

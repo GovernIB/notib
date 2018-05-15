@@ -35,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.NotificaRespostaDatatDto.NotificaRespostaDatatEventDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
@@ -47,6 +46,7 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.wsdl.notificaV2.NotificaWsV2PortType;
@@ -82,13 +82,14 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
+	@Autowired
+	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 
 	@Autowired
 	private PluginHelper pluginHelper;
 
 
 
-	@Transactional
 	public boolean notificacioEnviar(
 			Long notificacioId) {
 		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
@@ -153,9 +154,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 		return NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat());
 	}
-	
+
 	public boolean enviamentRefrescarEstat(
-			NotificacioEnviamentEntity enviament) throws SistemaExternException {
+			Long enviamentId) throws SistemaExternException {
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		NotificacioEntity notificacio = enviament.getNotificacio();
 		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb NotificaV2 (" +
 				"notificacioId=" + notificacio.getId() + ", " +
@@ -195,7 +197,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 							(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getCodigo() : null,
 							(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getDescripcionCodigoDIR() : null,
 							(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getNifDIR() : null);
-					enviament.updateNotificaDatat(
+					enviamentUpdateDatat(
 							estat,
 							toDate(datatDarrer.getFecha()),
 							null,
@@ -203,7 +205,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 							datatDarrer.getNifReceptor(),
 							datatDarrer.getNombreReceptor(),
 							null,
-							null);
+							null,
+							enviament);
 					enviament.updateNotificaError(false, null);
 				} else {
 					throw new ValidationException(
@@ -260,13 +263,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					errorDescripcio(ExceptionUtils.getStackTrace(ex)).
 					build();
 			notificacio.updateEventAfegir(event);
-<<<<<<< HEAD
 			notificacioEventRepository.save(event);
 			enviament.updateNotificaError(
 					true,
 					event);
-=======
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 			return false;
 		}
 	}

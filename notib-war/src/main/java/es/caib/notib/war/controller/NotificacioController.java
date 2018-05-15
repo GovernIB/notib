@@ -118,18 +118,13 @@ public class NotificacioController extends BaseController {
 		NotificacioFiltreDto filtre = (NotificacioFiltreDto)
 				request.getSession().getAttribute( NOTIFICACIONS_FILTRE );
 		PaginaDto<NotificacioDto> notificacions = null;
-		if (RolHelper.isUsuariActualAdministrador(request)) {
-			notificacions = notificacioService.findAmbFiltrePaginat(
-					filtre,
-					DatatablesHelper.getPaginacioDtoFromRequest(request));
-		} else if (RolHelper.isUsuariActualRepresentant(request)) {
-			EntitatDto entitat = EntitatHelper.getEntitatActual( request );
-			notificacions = notificacioService.findAmbEntitatIFiltrePaginat(
-					entitat.getId(),
-					filtre,
-					DatatablesHelper.getPaginacioDtoFromRequest(request) );
+		if (RolHelper.isUsuariActualRepresentant(request)) {
+			EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+			filtre.setEntitatId(entitat.getId());
 		}
-		filtre = null;
+		notificacions = notificacioService.findAmbFiltrePaginat(
+				filtre,
+				DatatablesHelper.getPaginacioDtoFromRequest(request));
 		return DatatablesHelper.getDatatableResponse(request, notificacions);
 	}
 
@@ -190,68 +185,6 @@ public class NotificacioController extends BaseController {
 					"notificacio.controller.enviament.error");
 		}
 	}
-<<<<<<< HEAD
-=======
-	
-	@RequestMapping(value = "/{notificacioId}/refrescarEstat/{enviamentId}", method = RequestMethod.GET)
-	@ResponseBody
-	public boolean consultarEstatLlista(
-			HttpServletRequest request,
-			@PathVariable Long notificacioId,
-			@PathVariable Long enviamentId,
-			Model model) {
-		
-		try {
-			notificacioService.enviamentRefrescarEstat(enviamentId);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	@RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/refrescarEstatNotifica", method = RequestMethod.GET)
-	public String refrescarEstatNotifica(
-			HttpServletRequest request,
-			@PathVariable Long notificacioId,
-			@PathVariable Long enviamentId,
-			Model model) {
-		model.addAttribute(
-				"notificacioEstat",
-				notificacioService.enviamentRefrescarEstat(enviamentId));
-		emplenarModelEnviamentInfo(
-				enviamentId,
-				"estatNotifica",
-				model);
-		return "enviamentInfo";
-	}
-
-	@RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/comunicacioSeu", method = RequestMethod.GET)
-	public String comunicacioSeu(
-			HttpServletRequest request,
-			@PathVariable Long notificacioId,
-			@PathVariable Long enviamentId,
-			Model model) {
-		boolean totbe = notificacioService.enviamentComunicacioSeu(enviamentId);
-		if (totbe) {
-			MissatgesHelper.success(
-					request, 
-					getMessage(
-							request, 
-							"notificacio.controller.comunicacio.seu.ok"));
-		} else {
-			MissatgesHelper.error(
-					request, 
-					getMessage(
-							request, 
-							"notificacio.controller.comunicacio.seu.error"));
-		}
-		emplenarModelEnviamentInfo(
-				enviamentId,
-				"accions",
-				model);
-		return "enviamentInfo";
-	}
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 
 	@RequestMapping(value = "/{notificacioId}/enviament", method = RequestMethod.GET)
 	@ResponseBody
@@ -271,6 +204,7 @@ public class NotificacioController extends BaseController {
 			@PathVariable Long enviamentId,
 			Model model) {
 		emplenarModelEnviamentInfo(
+				notificacioId,
 				enviamentId,
 				"dades",
 				model);
@@ -300,7 +234,7 @@ public class NotificacioController extends BaseController {
 			@PathVariable Long enviamentId) {
 		return DatatablesHelper.getDatatableResponse(
 				request,
-				notificacioService.eventFindAmbNotificacioIEnviament(
+				notificacioService.eventFindAmbEnviament(
 						notificacioId,
 						enviamentId));
 	}
@@ -344,6 +278,7 @@ public class NotificacioController extends BaseController {
 							"notificacio.controller.refrescar.estat.error"));
 		}
 		emplenarModelEnviamentInfo(
+				notificacioId,
 				enviamentId,
 				"estatNotifica",
 				model);
@@ -371,6 +306,7 @@ public class NotificacioController extends BaseController {
 							"notificacio.controller.comunicacio.seu.error"));
 		}
 		emplenarModelEnviamentInfo(
+				notificacioId,
 				enviamentId,
 				"estatSeu",
 				model);
@@ -414,6 +350,7 @@ public class NotificacioController extends BaseController {
 							"notificacio.controller.certificacio.seu.arxiu.buit"));
 		}
 		emplenarModelEnviamentInfo(
+				notificacioId,
 				enviamentId,
 				"estatSeu",
 				model);
@@ -475,9 +412,13 @@ public class NotificacioController extends BaseController {
 	}
 
 	private void emplenarModelEnviamentInfo(
+			Long notificacioId,
 			Long enviamentId,
 			String pipellaActiva,
 			Model model) {
+		model.addAttribute(
+				"notificacio",
+				notificacioService.findAmbId(notificacioId));
 		model.addAttribute("pipellaActiva", pipellaActiva);
 		NotificacioEnviamentDto enviament = notificacioService.enviamentFindAmbId(
 				enviamentId);

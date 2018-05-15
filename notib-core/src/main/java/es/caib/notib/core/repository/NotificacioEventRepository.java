@@ -12,17 +12,17 @@ import org.springframework.data.jpa.repository.Query;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 
 /**
- * Definició dels mètodes necessaris per a gestionar una entitat de base
- * de dades del tipus entitat.
+ * Consultes necessàries per als events de les notificacions.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface NotificacioEventRepository extends JpaRepository<NotificacioEventEntity, Long> {
 
-	List<NotificacioEventEntity> findByNotificacioIdOrderByDataDesc(
+	List<NotificacioEventEntity> findByNotificacioIdOrderByDataAsc(
 			Long notificacioId);
 
-	List<NotificacioEventEntity> findByEnviamentIdOrderByDataDesc(
+	List<NotificacioEventEntity> findByNotificacioIdOrEnviamentIdOrderByDataAsc(
+			Long notificacioId,
 			Long enviamentId);
 
 	/** Recupera la llista de notificacions pendents */

@@ -42,23 +42,11 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
 	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findAmbFiltrePaginat(
-				filtre,
-				paginacioParams);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_REP"})
-	public PaginaDto<NotificacioDto> findAmbEntitatIFiltrePaginat(
-			Long entitatId,
-			NotificacioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findAmbEntitatIFiltrePaginat(
-				entitatId,
 				filtre,
 				paginacioParams);
 	}
@@ -86,10 +74,10 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
-	public List<NotificacioEventDto> eventFindAmbNotificacioIEnviament(
+	public List<NotificacioEventDto> eventFindAmbEnviament(
 			Long notificacioId,
 			Long enviamentId) {
-		return delegate.eventFindAmbNotificacioIEnviament(
+		return delegate.eventFindAmbEnviament(
 				notificacioId,
 				enviamentId);
 	}
@@ -157,6 +145,11 @@ public class NotificacioServiceBean implements NotificacioService {
 	@Override
 	public void seuNotificaComunicarEstatPendents() {
 		delegate.seuNotificaComunicarEstatPendents();
+	}
+
+	@Override
+	public void enviamentRefrescarEstatPendents() {
+		delegate.enviamentRefrescarEstatPendents();
 	}
 
 }

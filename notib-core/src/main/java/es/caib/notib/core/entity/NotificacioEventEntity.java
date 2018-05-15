@@ -26,8 +26,8 @@ import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 
 /**
- * Classe del model de dades que representa un event per a
- * una notificació.
+ * Classe del model de dades que representa un event
+ * d'una notificació.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

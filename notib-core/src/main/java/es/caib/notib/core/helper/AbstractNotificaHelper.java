@@ -8,6 +8,7 @@ import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -38,16 +39,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.wsdl.seu.CertificacionSede;
 import es.caib.notib.core.wsdl.seu.ComunicacionSede;
@@ -64,28 +66,23 @@ import es.caib.notib.core.wsdl.seu.SedeWsPortType;
 public abstract class AbstractNotificaHelper {
 
 	@Autowired
+	private NotificacioEnviamentRepository notificacioEnviamentRepository;
+	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
 
 	private boolean modeTest;
-
 
 
 	public abstract boolean notificacioEnviar(
 			Long notificacioId);
 
 	public abstract boolean enviamentRefrescarEstat(
-			NotificacioEnviamentEntity enviament) throws SistemaExternException;
+			Long enviamentId) throws SistemaExternException;
 
-	@Transactional
 	public boolean enviamentComunicacioSeu(
-<<<<<<< HEAD
-			NotificacioEnviamentEntity enviament,
+			Long enviamentId,
 			Date comunicacioData) {
-=======
-			Long notificacioEnviamentId) {
-		NotificacioEnviamentEntity enviament = notificacioDestinatariRepository.findOne(
-				notificacioEnviamentId);
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		NotificacioEntity notificacio = enviament.getNotificacio();
 		NotificacioEventEntity event;
 		boolean error = false;
@@ -147,11 +144,11 @@ public abstract class AbstractNotificaHelper {
 		return !error;
 	}
 
-	@Transactional
 	public boolean enviamentCertificacioSeu(
-			NotificacioEnviamentEntity enviament,
+			Long enviamentId,
 			ArxiuDto certificacio,
 			Date certificacioData) {
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		NotificacioEntity notificacio = enviament.getNotificacio();
 		NotificacioEventEntity event;
 		boolean error = false;
@@ -243,6 +240,48 @@ public abstract class AbstractNotificaHelper {
 
 	public void setModeTest(boolean modeTest) {
 		this.modeTest = modeTest;
+	}
+
+	public void enviamentUpdateDatat(
+			NotificacioEnviamentEstatEnumDto notificaEstat,
+			Date notificaEstatData,
+			String notificaEstatDescripcio,
+			String notificaDatatOrigen,
+			String notificaDatatReceptorNif,
+			String notificaDatatReceptorNom,
+			String notificaDatatNumSeguiment,
+			String notificaDatatErrorDescripcio,
+			NotificacioEnviamentEntity enviament) {
+		boolean estatFinal = NotificacioEnviamentEstatEnumDto.ABSENT.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.ERROR_ENTREGA.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.EXPIRADA.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.EXTRAVIADA.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.MORT.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.LLEGIDA.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.NOTIFICADA.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.REBUTJADA.equals(notificaEstat);
+		enviament.updateNotificaDatat(
+				notificaEstat,
+				notificaEstatData,
+				estatFinal,
+				notificaEstatDescripcio,
+				notificaDatatOrigen,
+				notificaDatatReceptorNif,
+				notificaDatatReceptorNom,
+				notificaDatatNumSeguiment,
+				notificaDatatErrorDescripcio);
+		boolean estatsEnviamentsFinals = true;
+		List<NotificacioEnviamentEntity> enviaments = enviament.getNotificacio().getEnviaments();
+		for (NotificacioEnviamentEntity env: enviaments) {
+			if (!env.isNotificaEstatFinal()) {
+				estatsEnviamentsFinals = false;
+				break;
+			}
+		}
+		if (estatsEnviamentsFinals) {
+			enviament.getNotificacio().updateEstat(NotificacioEstatEnumDto.FINALITZADA);
+		}
 	}
 
 
@@ -447,7 +486,8 @@ public abstract class AbstractNotificaHelper {
 		SecretKeySpec rc4Key = new SecretKeySpec(getClauXifratIdsProperty().getBytes(),"RC4");
 		cipher.init(Cipher.ENCRYPT_MODE, rc4Key);
 		byte[] xifrat = cipher.doFinal(bytes);
-		return new String(Base64.encodeBase64(xifrat));
+		//return new String(Base64.encodeBase64(xifrat));
+		return new String(Hex.encodeHex(xifrat));
 	}
 	protected Long desxifrarId(String idXifrat) throws GeneralSecurityException {
 		Cipher cipher = Cipher.getInstance("RC4");
@@ -616,7 +656,7 @@ public abstract class AbstractNotificaHelper {
 			return new TreeSet<QName>();
 		}
 	}
-	
+
 //	public class FirmaSOAPHandler implements SOAPHandler<SOAPMessageContext> {
 //		private String keystoreLocation;
 //		private String keystoreType;

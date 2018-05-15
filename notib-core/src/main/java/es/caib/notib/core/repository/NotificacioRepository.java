@@ -57,13 +57,12 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
 			"and (:isEstatNull = true or ntf.estat = :estat) " +
 			"and (:isDatesNull = true or ntf.createdDate between :dataInici and :dataFi) " +
-			"and (:isDestinatariNull = true or (" +
+			"and (:isTitularNull = true or (" +
 			"    select count(env.id) " +
 			"    from ntf.enviaments env " +
 			"    where " +
-			"        lower(env.destinatariNom) like concat('%', lower(:destinatari), '%') " +
-			"    or lower(concat(env.destinatariLlinatge1, ' ', env.destinatariLlinatge2)) like concat('%', lower(:destinatari), '%') " +
-			"    or lower(env.destinatariNif) like concat('%', lower(:destinatari), '%') " +
+			"       lower(concat(env.titularNom, ' ', env.titularLlinatge1, ' ', env.destinatariLlinatge2)) like concat('%', lower(:titular), '%') " +
+			"    or lower(env.titularNif) like concat('%', lower(:titular), '%') " +
 			"    ) > 0) ")
 	public Page<NotificacioEntity> findAmbFiltre(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
@@ -79,8 +78,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("isDatesNull") boolean isDatesNull,
 			@Param("dataInici") Date dataInici,
 			@Param("dataFi") Date dataFi,
-			@Param("isDestinatariNull") boolean isDestinatariNull,
-			@Param("destinatari") String destinatari,
+			@Param("isTitularNull") boolean isTitularNull,
+			@Param("titular") String titular,
 			Pageable paginacio);
 
 }

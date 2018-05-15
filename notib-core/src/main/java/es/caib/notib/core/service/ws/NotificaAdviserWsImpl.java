@@ -26,6 +26,7 @@ import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
@@ -54,6 +55,8 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 
 	@Autowired
 	private PluginHelper pluginHelper;
+	@Autowired
+	private NotificaHelper notificaHelper;
 
 
 
@@ -120,15 +123,16 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 						} else if ("expirada".equals(datadoOrganismo.getResultado())) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.EXPIRADA;
 						}
-						enviament.updateNotificaDatat(
+						notificaHelper.enviamentUpdateDatat(
 								notificaEstat,
 								toDate(datadoOrganismo.getFecha()),
-								null, // Estat descripció
+								null,
 								datadoOrganismo.getModo(),
 								receptorNif,
 								receptorNombre,
-								null, // Núm. seguiment
-								null); // Error descripció
+								null,
+								null,
+								enviament);
 						event = NotificacioEventEntity.getBuilder(
 								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
 								enviament.getNotificacio()).

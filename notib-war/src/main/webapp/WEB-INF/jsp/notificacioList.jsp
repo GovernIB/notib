@@ -51,13 +51,44 @@ var enviamentTipus = [];
 <c:forEach var="tipus" items="${notificacioEnviamentTipus}">
 enviamentTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 </c:forEach>
-var rows = {};
-var notifications = {};
 $(document).ready(function() {
 	$('#notificacio').on('rowinfo.dataTable', function(e, td, rowData) {
-		rows[rowData.id] = td;
-		notifications[rowData.id] = rowData;
-		printEnviaments(rowData.id);
+		var getUrl = "<c:url value="/notificacio/"/>" + rowData.id + "/enviament";
+	    $.get(getUrl).done(function(data) {
+	    	$(td).empty();
+	    	$(td).append(
+	    			'<table class="table teble-striped table-bordered"><thead>' +
+	    			'<tr>' +
+					'<th><spring:message code="notificacio.list.enviament.list.titular"/></th>' + 
+	    			//'<th><spring:message code="notificacio.list.enviament.list.destinatari"/></th>' + 
+	    			'<th><spring:message code="notificacio.list.enviament.list.estat"/></th>' +
+	    			'<th></th>' +
+	    			'</tr>' +
+					'</thead><tbody></tbody></table>');
+	    	contingutTbody = '';
+			for (i = 0; i < data.length; i++) {
+				contingutTbody += '<tr>';
+				contingutTbody += '<td>' + data[i].titular + '</td>';
+				//contingutTbody += '<td>' + data[i].destinatari + '</td>';
+				contingutTbody += '<td>';
+				contingutTbody += (data[i].notificaEstat) ? notificacioEnviamentEstats[data[i].notificaEstat] : '';
+				if (data[i].notificaError) {
+					var errorTitle = '';
+					if (data[i].notificaErrorDescripcio) {
+						errorTitle = data[i].notificaErrorDescripcio;
+					}
+					var escaped = data[i].notificaErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+					contingutTbody += ' <span class="fa fa-warning text-danger" title="' + escaped + '"></span>';
+				}
+				contingutTbody += '</td>';
+				contingutTbody += '<td width="5%">';
+				contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" data-toggle="modal" class="btn btn-default btn-sm"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>';
+				contingutTbody += '</td>';
+				contingutTbody += '</tr>';
+			}
+			$('table tbody', td).append(contingutTbody);
+			$('table tbody td').webutilModalEval();
+		});
 	});
 	$('#btnNetejar').click(function() {
 		$(':input', $('#filtre')).each (function() {
@@ -73,51 +104,6 @@ $(document).ready(function() {
 		$('#form-filtre').submit();
 	});
 });
-	
-function printEnviaments(id) {
-	td = rows[id];
-	rowData = notifications[id];
-	var getUrl = "<c:url value="/notificacio/"/>" + rowData.id + "/enviament";
-    $.get(getUrl).done(function(data) {
-    	$(td).empty();
-    	$(td).append(
-    			'<table class="table teble-striped table-bordered"><thead>' +
-    			'<tr>' +
-				'<th><spring:message code="notificacio.list.enviament.list.titular"/></th>' + 
-    			'<th><spring:message code="notificacio.list.enviament.list.destinatari"/></th>' + 
-    			'<th><spring:message code="notificacio.list.enviament.list.estat"/></th>' +
-    			'<th></th>' +
-    			'</tr>' +
-				'</thead><tbody></tbody></table>');
-    	contingutTbody = '';
-		for (i = 0; i < data.length; i++) {
-			contingutTbody += '<tr>';
-			contingutTbody += '<td>' + data[i].titular + '</td>';
-			contingutTbody += '<td>' + data[i].destinatari + '</td>';
-			contingutTbody += '<td>';
-<<<<<<< HEAD
-			contingutTbody += (data[i].notificaEstat) ? notificacioEnviamentEstats[data[i].notificaEstat] : '';
-=======
-			contingutTbody += (data[i].notificaEstat) ? enviamentEstats[data[i].notificaEstat] : '';
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
-			if (data[i].notificaError) {
-				var errorTitle = '';
-				if (data[i].notificaErrorDescripcio) {
-					errorTitle = data[i].notificaErrorDescripcio;
-				}
-				var escaped = data[i].notificaErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-				contingutTbody += ' <span class="fa fa-warning text-danger" title="' + escaped + '"></span>';
-			}
-			contingutTbody += '</td>';
-			contingutTbody += '<td width="5%">';
-			contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" data-toggle="modal" class="btn btn-default btn-sm"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>';
-			contingutTbody += '</td>';
-			contingutTbody += '</tr>';
-		}
-		$('table tbody', td).append(contingutTbody);
-		$('table tbody td').webutilModalEval();
-	});
-}
 </script>
 </head>
 <body>
@@ -132,9 +118,9 @@ function printEnviaments(id) {
 			<div class="col-md-2">
 				<not:inputSelect name="enviamentTipus" optionItems="${notificacioEnviamentTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.enviament.tipus" inline="true"/>
 			</div>
-			<div class="col-md-2">
+			<%--div class="col-md-2">
 				<not:inputSelect name="comunicacioTipus" optionItems="${notificacioComunicacioTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.comunicacio.tipus" inline="true"/>
-			</div>
+			</div--%>
 			<div class="col-md-3">
 				<not:inputText name="concepte" inline="true"  placeholderKey="notificacio.list.filtre.camp.concepte"/>
 			</div>
@@ -148,7 +134,7 @@ function printEnviaments(id) {
 				<not:inputDate name="dataFi" placeholderKey="notificacio.list.filtre.camp.datafi" inline="true" required="false" />
 			</div>
 			<div class="col-md-3">
-				<not:inputText name="destinatari" inline="true" placeholderKey="notificacio.list.filtre.camp.destinatari"/>
+				<not:inputText name="titular" inline="true" placeholderKey="notificacio.list.filtre.camp.titular"/>
 			</div>
 			<div class="col-md-3">
 			</div>
@@ -184,12 +170,12 @@ function printEnviaments(id) {
 						{{:~eval('enviamentTipus["' + enviamentTipus + '"]')}}
 					</script>
 				</th>
-				<th data-col-name="comunicacioTipus" data-template="#cellComunicacioTipusTemplate">
+				<%--th data-col-name="comunicacioTipus" data-template="#cellComunicacioTipusTemplate">
 					<spring:message code="notificacio.list.columna.tipus.comunicacio"/>
 					<script id="cellComunicacioTipusTemplate" type="text/x-jsrender">
 						{{:~eval('comunicacioTipus["' + comunicacioTipus + '"]')}}
 					</script>
-				</th>
+				</th--%>
 				<th data-col-name="concepte" width="${ampladaConcepte}"><spring:message code="notificacio.list.columna.concepte"/></th>
 				<th data-col-name="estat" data-template="#cellEstatTemplate" width="20%">
 					<spring:message code="notificacio.list.columna.estat"/>

@@ -179,6 +179,11 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "notifica_estat_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaEstatData;
+	@Column(name = "notifica_estat_dataact")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date notificaEstatDataActualitzacio;
+	@Column(name = "notifica_estat_final")
+	private boolean notificaEstatFinal;
 	@Column(name = "notifica_estat_desc", length = 255)
 	private String notificaEstatDescripcio;
 	@Column(name = "notifica_datat_origen", length = 20)
@@ -256,7 +261,6 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "seu_data_notidp")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date seuDataNotificaDarreraPeticio;
-
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_id")
 	@ForeignKey(name = "not_notificacio_notdest_fk")
@@ -445,6 +449,12 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public Date getNotificaEstatData() {
 		return notificaEstatData;
 	}
+	public Date getNotificaEstatDataActualitzacio() {
+		return notificaEstatDataActualitzacio;
+	}
+	public boolean isNotificaEstatFinal() {
+		return notificaEstatFinal;
+	}
 	public String getNotificaEstatDescripcio() {
 		return notificaEstatDescripcio;
 	}
@@ -574,6 +584,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public void updateNotificaDatat(
 			NotificacioEnviamentEstatEnumDto notificaEstat,
 			Date notificaEstatData,
+			boolean notificaEstatFinal,
 			String notificaEstatDescripcio,
 			String notificaDatatOrigen,
 			String notificaDatatReceptorNif,
@@ -581,12 +592,15 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			String notificaDatatNumSeguiment,
 			String notificaDatatErrorDescripcio) {
 		this.notificaEstat = notificaEstat;
+		this.notificaEstatData = notificaEstatData;
+		this.notificaEstatFinal = notificaEstatFinal;
 		this.notificaEstatDescripcio = notificaEstatDescripcio;
 		this.notificaDatatOrigen = notificaDatatOrigen;
 		this.notificaDatatReceptorNif = notificaDatatReceptorNif;
 		this.notificaDatatReceptorNom = notificaDatatReceptorNom;
 		this.notificaDatatNumSeguiment = notificaDatatNumSeguiment;
 		this.notificaDatatErrorDescripcio = notificaDatatErrorDescripcio;
+		this.notificaEstatDataActualitzacio = new Date();
 	}
 	public void updateNotificaCertificacio(
 			Date notificaCertificacioData,

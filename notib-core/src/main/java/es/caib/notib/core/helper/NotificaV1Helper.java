@@ -50,6 +50,7 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.wsdl.notificaV1.ArrayOfTipoDestinatario;
@@ -88,6 +89,8 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
+	@Autowired
+	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 
 	@Autowired
 	private PluginHelper pluginHelper;
@@ -173,9 +176,10 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 	}
 
 	public boolean enviamentRefrescarEstat(
-			NotificacioEnviamentEntity enviament) throws SistemaExternException {
+			Long enviamentId) throws SistemaExternException {
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		NotificaRespostaDatatDto respostaDatat = enviamentDatat(enviament);
-		enviament.updateNotificaDatat(
+		enviamentUpdateDatat(
 				getEstatNotifica(respostaDatat.getEstatActual()),
 				respostaDatat.getDataActualitzacio(),
 				respostaDatat.getEstatActualDescripcio(),
@@ -183,7 +187,8 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 				null,
 				null,
 				respostaDatat.getNumSeguiment(),
-				null);
+				null,
+				enviament);
 		enviament.updateNotificaError(false, null);
 		if (isEstatFinal(respostaDatat.getEstatActual())) {
 			//NotificaRespostaCertificacioDto respostaCertificacio = enviamentCertificacio(destinatari);

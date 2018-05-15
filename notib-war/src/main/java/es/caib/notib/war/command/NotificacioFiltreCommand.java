@@ -7,8 +7,8 @@ import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
@@ -27,7 +27,7 @@ public class NotificacioFiltreCommand {
 	private String concepte;
 	private Date dataInici;
 	private Date dataFi;
-	private String destinatari;
+	private String titular;
 	
 	public Long getEntitatId() {
 		return entitatId;
@@ -71,11 +71,11 @@ public class NotificacioFiltreCommand {
 	public void setDataFi(Date dataFi) {
 		this.dataFi = dataFi;
 	}
-	public String getDestinatari() {
-		return destinatari;
+	public String getTitular() {
+		return titular;
 	}
-	public void setDestinatari(String destinatari) {
-		this.destinatari = destinatari;
+	public void setTitular(String titular) {
+		this.titular = titular;
 	}
 
 	public static NotificacioFiltreCommand asCommand(NotificacioFiltreDto dto) {

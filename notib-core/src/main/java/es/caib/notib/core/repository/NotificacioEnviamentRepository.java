@@ -37,33 +37,29 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			EntitatEntity entitat,
 			String notificaIdentificador);
 
-	@Query("FROM NotificacioEnviamentEntity "
-			+ "WHERE seuEstat in (:seuEstat) "
-			+ "  AND seuReintentsEnviament < :maxReintents "
-			+ "ORDER BY seuDataEnviament ASC")
+	@Query(	"from " +
+			"    NotificacioEnviamentEntity " +
+			"where " +
+			"    seuEstat in (:seuEstat) " +
+			"and seuReintentsEnviament < :maxReintents " +
+			"order by " +
+			"    seuDataEnviament asc")
 	List<NotificacioEnviamentEntity> findBySeuEstatInAndMaxReintentsOrderBySeuDataNotificaDarreraPeticioAsc(
 			@Param("seuEstat") NotificacioEnviamentEstatEnumDto[] seuEstat,
 			@Param("maxReintents") int maxReintents,
 			Pageable pageable);
-	
-	/*@Query("FROM NotificacioEnviamentEntity "
-			+ "WHERE seuEstat = es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT "
-			+ "  AND seuReintentsEnviament < 3 "
-			+ "ORDER BY seuDataEnviament ASC")
-	List<NotificacioEnviamentEntity> findBySeuEstatPendent(Pageable pageable);
-	
-	@Query("FROM NotificacioEnviamentEntity "
-			+ "WHERE seuEstat = es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA "
-			+ "ORDER BY seuDataEnviament ASC")
-	List<NotificacioEnviamentEntity> findBySeuEstatEnviada(Pageable pageable);
 
-	@Query("FROM NotificacioEnviamentEntity "
-			+ "WHERE seuEstat = es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto.LLEGIDA "
-			+ "   OR seuEstat = es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto.REBUTJADA "
-			+ "ORDER BY seuDataEnviament ASC")
-	List<NotificacioEnviamentEntity> findBySeuEstatTramitada(PageRequest pageRequest);*/
-	
 	List<NotificacioEnviamentEntity> findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
 			NotificacioEnviamentEstatEnumDto[] seuEstats);
+
+	@Query(	"from " +
+			"    NotificacioEnviamentEntity " +
+			"where " +
+			"    notificaEstatFinal = false " +
+			"order by " +
+			"    notificaEstatDataActualitzacio asc nulls first, " +
+			"    id asc")
+	List<NotificacioEnviamentEntity> findByNotificaEstatFinalFalseOrderByEstatDataActualitzacioAsc(
+			Pageable pageable);
 
 }

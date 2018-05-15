@@ -48,8 +48,6 @@ public class PluginHelper {
 
 	@Autowired
 	private IntegracioHelper integracioHelper;
-	/*@Autowired
-	private EntitatRepository entitatRepository;*/
 
 
 
