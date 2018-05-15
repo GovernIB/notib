@@ -288,6 +288,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional
 	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(
 			Long enviamentId) {
+<<<<<<< HEAD
 		logger.debug("Refrescant l'estat de la notificació de Notific@ (" +
 				"enviamentId=" + enviamentId + ")");
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
@@ -296,6 +297,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 				enviament,
 				NotificacioEnviamenEstatDto.class);
 		estatCalcularCampsAddicionals(
+=======
+		logger.debug("Refrescant l'estat de la notificació amb informació de Notific@ i de la seu (" +
+				"enviamentId=" + enviamentId + ")");
+		NotificacioEnviamentEntity enviament = notificacioDestinatariRepository.findOne(enviamentId);
+		notificaHelper.enviamentRefrescarEstat(enviament);
+		NotificacioEnviamenEstatDto estatDto = conversioTipusHelper.convertir(
+				enviament,
+				NotificacioEnviamenEstatDto.class);
+		estatEmplenarErrors(
+>>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 				enviament,
 				estatDto);
 		return estatDto;
@@ -306,6 +317,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public boolean enviamentComunicacioSeu(
 			Long enviamentId) {
 		logger.debug("Enviant canvi d'estat de la seu electrònica a Notific@ (" +
+<<<<<<< HEAD
 				"enviamentId=" + enviamentId + ")");
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		return notificaHelper.enviamentComunicacioSeu(
@@ -325,6 +337,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 				enviament,
 				certificacioArxiu,
 				new Date());
+=======
+				"destinatariId=" + destinatariId + ")");
+		return notificaHelper.enviamentComunicacioSeu(destinatariId);
+>>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 	}
 
 	@Override
@@ -391,7 +407,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 				for (NotificacioEnviamentEntity pendent: pendents) {
 					boolean estatActualitzat = seuHelper.consultaEstat(pendent.getId());
 					if (estatActualitzat) {
+<<<<<<< HEAD
 						notificaHelper.enviamentComunicacioSeu(pendent, null);
+=======
+						notificaHelper.enviamentComunicacioSeu(pendent.getId());
+>>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 					}
 				}
 			} else {
@@ -418,7 +438,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!pendents.isEmpty()) {
 				logger.debug("Realitzant actualització d'estat a Notifica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
 				for (NotificacioEnviamentEntity pendent: pendents) {
+<<<<<<< HEAD
 					notificaHelper.enviamentComunicacioSeu(pendent, null);
+=======
+					notificaHelper.enviamentComunicacioSeu(pendent.getId());
+>>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 				}
 			} else {
 				logger.debug("No hi ha notificacions pendents d'actualització d'estat a Notifica");
@@ -438,7 +462,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 		for (int i = 0; i < enviaments.size(); i++) {
 			NotificacioEnviamentEntity destinatariEntity = enviaments.get(i);
 			NotificacioEnviamentDto destinatariDto = destinatarisDto.get(i);
+<<<<<<< HEAD
 			destinatariCalcularCampsAddicionals(
+=======
+			destinatariEmplenarErrors(
+>>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 					destinatariEntity,
 					destinatariDto);
 		}
@@ -450,13 +478,21 @@ public class NotificacioServiceImpl implements NotificacioService {
 		NotificacioEnviamentDto destinatariDto = conversioTipusHelper.convertir(
 				enviament,
 				NotificacioEnviamentDto.class);
+<<<<<<< HEAD
 		destinatariCalcularCampsAddicionals(
+=======
+		destinatariEmplenarErrors(
+>>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 				enviament,
 				destinatariDto);
 		return destinatariDto;
 	}
 
+<<<<<<< HEAD
 	private void destinatariCalcularCampsAddicionals(
+=======
+	private void destinatariEmplenarErrors(
+>>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 			NotificacioEnviamentEntity enviament,
 			NotificacioEnviamentDto enviamentDto) {
 		if (enviament.isNotificaError()) {
@@ -471,6 +507,28 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (event != null) {
 				enviamentDto.setSeuErrorData(event.getData());
 				enviamentDto.setSeuErrorDescripcio(event.getErrorDescripcio());
+<<<<<<< HEAD
+=======
+			}
+		}
+	}
+
+	private void estatEmplenarErrors(
+			NotificacioEnviamentEntity enviament,
+			NotificacioEnviamenEstatDto estatDto) {
+		if (enviament.isNotificaError()) {
+			NotificacioEventEntity event = enviament.getNotificaErrorEvent();
+			if (event != null) {
+				estatDto.setNotificaErrorData(event.getData());
+				estatDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
+			}
+		}
+		if (enviament.isSeuError()) {
+			NotificacioEventEntity event = enviament.getSeuErrorEvent();
+			if (event != null) {
+				estatDto.setSeuErrorData(event.getData());
+				estatDto.setSeuErrorDescripcio(event.getErrorDescripcio());
+>>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 			}
 		}
 		enviamentDto.setNotificaCertificacioArxiuNom(

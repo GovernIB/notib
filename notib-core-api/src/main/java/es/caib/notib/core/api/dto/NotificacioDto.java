@@ -48,8 +48,14 @@ public class NotificacioDto extends AuditoriaDto {
 	private String seuOficiTitol;
 	private String seuOficiText;
 	private NotificacioEstatEnumDto estat;
+<<<<<<< HEAD
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
+=======
+	private boolean errorNotifica;
+	private Date errorNotificaData;
+	private String errorNotificaError;
+>>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 
 	private EntitatDto entitat;
 
@@ -260,8 +266,19 @@ public class NotificacioDto extends AuditoriaDto {
 	public String getNotificaErrorDescripcio() {
 		return notificaErrorDescripcio;
 	}
+<<<<<<< HEAD
 	public void setNotificaErrorDescripcio(String notificaErrorDescripcio) {
 		this.notificaErrorDescripcio = notificaErrorDescripcio;
+=======
+	public void setErrorNotificaData(Date errorNotificaData) {
+		this.errorNotificaData = errorNotificaData;
+	}
+	public String getErrorNotificaError() {
+		return errorNotificaError;
+	}
+	public void setErrorNotificaError(String errorNotificaError) {
+		this.errorNotificaError = errorNotificaError;
+>>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 	}
 	public EntitatDto getEntitat() {
 		return entitat;

@@ -95,7 +95,11 @@ function printEnviaments(id) {
 			contingutTbody += '<td>' + data[i].titular + '</td>';
 			contingutTbody += '<td>' + data[i].destinatari + '</td>';
 			contingutTbody += '<td>';
+<<<<<<< HEAD
 			contingutTbody += (data[i].notificaEstat) ? notificacioEnviamentEstats[data[i].notificaEstat] : '';
+=======
+			contingutTbody += (data[i].notificaEstat) ? enviamentEstats[data[i].notificaEstat] : '';
+>>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 			if (data[i].notificaError) {
 				var errorTitle = '';
 				if (data[i].notificaErrorDescripcio) {

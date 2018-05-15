@@ -79,7 +79,10 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	private String notificaDatatErrorDescripcio;
 	private Date notificaCertificacioData;
 	private String notificaCertificacioArxiuId;
+<<<<<<< HEAD
 	private String notificaCertificacioArxiuNom;
+=======
+>>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 	private String notificaCertificacioHash;
 	private String notificaCertificacioOrigen;
 	private String notificaCertificacioMetadades;
