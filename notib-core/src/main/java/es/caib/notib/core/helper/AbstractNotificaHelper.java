@@ -78,14 +78,8 @@ public abstract class AbstractNotificaHelper {
 
 	@Transactional
 	public boolean enviamentComunicacioSeu(
-<<<<<<< HEAD
 			NotificacioEnviamentEntity enviament,
 			Date comunicacioData) {
-=======
-			Long notificacioEnviamentId) {
-		NotificacioEnviamentEntity enviament = notificacioDestinatariRepository.findOne(
-				notificacioEnviamentId);
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 		NotificacioEntity notificacio = enviament.getNotificacio();
 		NotificacioEventEntity event;
 		boolean error = false;

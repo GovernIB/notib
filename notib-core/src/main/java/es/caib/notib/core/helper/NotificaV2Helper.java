@@ -260,13 +260,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					errorDescripcio(ExceptionUtils.getStackTrace(ex)).
 					build();
 			notificacio.updateEventAfegir(event);
-<<<<<<< HEAD
 			notificacioEventRepository.save(event);
 			enviament.updateNotificaError(
 					true,
 					event);
-=======
->>>>>>> branch 'master' of https://github.com/GovernIB/notib.git
 			return false;
 		}
 	}
