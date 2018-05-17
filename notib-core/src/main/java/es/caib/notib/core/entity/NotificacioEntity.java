@@ -339,6 +339,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built = new NotificacioEntity();
 			built.entitat = entitat;
 			built.emisorDir3Codi = emisorDir3Codi;
+			built.comunicacioTipus = comunicacioTipus;
 			built.enviamentTipus = enviamentTipus;
 			built.enviamentDataProgramada = enviamentDataProgramada;
 			built.concepte = concepte;
@@ -347,7 +348,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.documentHash = documentHash;
 			built.documentNormalitzat = documentNormalitzat;
 			built.documentGenerarCsv = documentGenerarCsv;
-			built.enviaments = enviaments;
+			if (enviaments != null)
+				built.enviaments = enviaments;
 			built.estat = NotificacioEstatEnumDto.PENDENT;
 			built.notificaEnviamentIntent = 0;
 		}

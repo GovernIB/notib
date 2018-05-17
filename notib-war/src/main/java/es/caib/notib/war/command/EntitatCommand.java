@@ -35,7 +35,7 @@ public class EntitatCommand {
 	private EntitatTipusEnumDto tipus;
 	@NotEmpty
 	@Size(max=9)
-	@DocumentIdentitat
+//	@DocumentIdentitat
 	private String dir3Codi;
 	private String descripcio;
 

@@ -356,6 +356,16 @@ public class SeuPluginSistra implements SeuPlugin {
 									"extension",
 									annex.getArxiuExtensio(),
 									String.class));
+					documento.setVersion(
+							newJAXBElement(
+									"version",
+									1,
+									Integer.class));
+					documento.setModelo(
+							newJAXBElement(
+									"modelo",
+									"GE0005ANEXGEN",
+									String.class));
 					documentos.getDocumentos().add(documento);
 				}
 				notificacion.setDocumentos(

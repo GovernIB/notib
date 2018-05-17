@@ -96,8 +96,6 @@ public class WsClientHelper<T> {
 					BindingProvider.SOAPACTION_URI_PROPERTY,
 					soapAction);
 		}
-		SOAPBinding binding = (SOAPBinding) bindingProvider.getBinding();
-		binding.setMTOMEnabled(true);
 		return servicePort;
 	}
 

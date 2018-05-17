@@ -39,9 +39,13 @@ import es.caib.notib.ws.notificacio.ServeiTipusEnum;
  */
 public class ClientBaseTest {
 
+//	Entitat: A04013511 (DGTIC) ò A04003003 (Govern)
 	protected static final String ENTITAT_DIR3CODI = "A04013511";
-	protected static final String ORGAN_CODI = "A04003003";
+//	protected static final String ORGAN_CODI = "A04013501";
+	protected static final String ORGAN_CODI = "A04013511";
+	protected static final String LLIBRE_OFICINA = "L99.O00009390";
 	protected static final String UNITAT_ADMINISTRATIVA_SISTRA = "1";
+//	protected static final String IDENTIFICADOR_PROCEDIMENT = "846823";
 	protected static final String IDENTIFICADOR_PROCEDIMENT = "000000";
 	protected static final String IDIOMA = "ca";
 
@@ -106,12 +110,12 @@ public class ClientBaseTest {
 			titular.setEmail("titular@gmail.com");
 			enviament.setTitular(titular);
 			Persona destinatari = new Persona();
-			destinatari.setNom("Josep Bernadí");
-			destinatari.setLlinatge1("Gayà");
-			destinatari.setLlinatge2("Miralles");
+			destinatari.setNom("melcior");
+			destinatari.setLlinatge1("Andreu");
+			destinatari.setLlinatge2("Nadal");
 			destinatari.setNif("18225486x");
 			destinatari.setTelefon("666020202");
-			destinatari.setEmail("josepg@limit.es");
+			destinatari.setEmail("sandreu@limit.es");
 			enviament.getDestinataris().add(destinatari);
 			if (ambEnviamentPostal) {
 				EntregaPostal entregaPostal = new EntregaPostal();
@@ -139,7 +143,7 @@ public class ClientBaseTest {
 			}
 			EntregaDeh entregaDeh = new EntregaDeh();
 			entregaDeh.setObligat(true);
-			entregaDeh.setProcedimentCodi("0000");
+			entregaDeh.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 			enviament.setEntregaDeh(entregaDeh);
 			enviament.setServeiTipus(ServeiTipusEnum.URGENT);
 			notificacio.getEnviaments().add(enviament);
@@ -147,10 +151,10 @@ public class ClientBaseTest {
 		ParametresSeu parametresSeu = new ParametresSeu();
 		parametresSeu.setExpedientSerieDocumental("0000S");
 		parametresSeu.setExpedientUnitatOrganitzativa(UNITAT_ADMINISTRATIVA_SISTRA);
-		parametresSeu.setExpedientIdentificadorEni("ES_" + ORGAN_CODI + "_2018_EXP_NOTIB" + "0000000000000000000000001");//+ String.format("%25s", notificacioId).replace(' ', '0'));
+		parametresSeu.setExpedientIdentificadorEni("ES_" + ORGAN_CODI + "_2018_EXP_NOTIB" + "0000000000000000000000005");//+ String.format("%25s", notificacioId).replace(' ', '0'));
 		parametresSeu.setExpedientTitol("seuExpedientTitol_" + notificacioId);
-		parametresSeu.setRegistreOficina("L99");
-		parametresSeu.setRegistreLlibre("L99");
+		parametresSeu.setRegistreOficina(ORGAN_CODI);
+		parametresSeu.setRegistreLlibre(LLIBRE_OFICINA);
 		parametresSeu.setIdioma(IDIOMA);
 		parametresSeu.setAvisTitol("seuAvisTitol_" + notificacioId);
 		parametresSeu.setAvisText("seuAvisText_" + notificacioId);

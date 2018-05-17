@@ -74,7 +74,7 @@ CREATE TABLE NOT_NOTIFICACIO
   SEU_OFICI_TEXT       VARCHAR2(256)            NOT NULL,
   ESTAT                NUMBER(10)               NOT NULL,
   NOT_ERROR_TIPUS      NUMBER(10),
-  NOT_ERROR            NUMBER(1)                NOT NULL,
+  --NOT_ERROR            NUMBER(1)                NOT NULL,
   NOT_ENV_DATA         TIMESTAMP(6),
   NOT_ENV_INTENT       NUMBER(10)               NOT NULL,
   NOT_REENV_DATA       TIMESTAMP(6),
