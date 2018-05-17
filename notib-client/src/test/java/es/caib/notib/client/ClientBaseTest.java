@@ -45,8 +45,7 @@ public class ClientBaseTest {
 	protected static final String ORGAN_CODI = "A04013511";
 	protected static final String LLIBRE_OFICINA = "L99.O00009390";
 	protected static final String UNITAT_ADMINISTRATIVA_SISTRA = "1";
-//	protected static final String IDENTIFICADOR_PROCEDIMENT = "846823";
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "000000";
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "846823";
 	protected static final String IDIOMA = "ca";
 
 	protected Notificacio generarNotificacio(
@@ -56,7 +55,7 @@ public class ClientBaseTest {
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 		Notificacio notificacio = new Notificacio();
 		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
+		notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
 		notificacio.setConcepte(
 				"concepte_" + notificacioId);
 		notificacio.setDescripcio(
@@ -102,12 +101,12 @@ public class ClientBaseTest {
 		for (int i = 0; i < numDestinataris; i++) {
 			Enviament enviament = new Enviament();
 			Persona titular = new Persona();
-			titular.setNom("titularNom" + i);
-			titular.setLlinatge1("titLlinatge1_" + i);
-			titular.setLlinatge2("titLlinatge2_" + i);
+			titular.setNom("Siòn");
+			titular.setLlinatge1("Andreu");
+			titular.setLlinatge2("Nadal");
 			titular.setNif("00000000T");
 			titular.setTelefon("666010101");
-			titular.setEmail("titular@gmail.com");
+			titular.setEmail("sandreu@limit.es");
 			enviament.setTitular(titular);
 			Persona destinatari = new Persona();
 			destinatari.setNom("melcior");
@@ -124,22 +123,22 @@ public class ClientBaseTest {
 				entregaPostal.setViaNom("Bas");
 				entregaPostal.setNumeroCasa("25");
 				entregaPostal.setNumeroQualificador("bis");
-				entregaPostal.setPuntKm("pk01");
-				entregaPostal.setApartatCorreus("0228");
-				entregaPostal.setPortal("portal" + i);
-				entregaPostal.setEscala("escala" + i);
-				entregaPostal.setPlanta("planta" + i);
-				entregaPostal.setPorta("porta" + i);
-				entregaPostal.setBloc("bloc" + i);
+				//entregaPostal.setApartatCorreus("0228");
+				entregaPostal.setPortal("pt" + i);
+				entregaPostal.setEscala("es" + i);
+				entregaPostal.setPlanta("pl" + i);
+				entregaPostal.setPorta("pr" + i);
+				entregaPostal.setBloc("bl" + i);
 				entregaPostal.setComplement("complement" + i);
 				entregaPostal.setCodiPostal("07500");
 				entregaPostal.setPoblacio("poblacio" + i);
-				entregaPostal.setMunicipiCodi("07507");
+				entregaPostal.setMunicipiCodi("070337");
 				entregaPostal.setProvinciaCodi("07");
 				entregaPostal.setPaisCodi("ES");
 				entregaPostal.setLinea1("linea1_" + i);
 				entregaPostal.setLinea2("linea2_" + i);
-				entregaPostal.setCie(new Integer(8));
+				entregaPostal.setCie(new Integer(0));
+				enviament.setEntregaPostal(entregaPostal);
 			}
 			EntregaDeh entregaDeh = new EntregaDeh();
 			entregaDeh.setObligat(true);

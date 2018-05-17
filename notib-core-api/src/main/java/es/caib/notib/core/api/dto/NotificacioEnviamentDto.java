@@ -56,48 +56,51 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	private String dehNif;
 	private String dehProcedimentCodi;
 	private NotificaServeiTipusEnumDto serveiTipus;
-	private int retardPostal;
-	private Date caducitat;
-	private NotificacioEnviamentEstatEnumDto estat;
-	private String notificaIdentificador;
+	private String formatSobre;
+	private String formatFulla;
 	private String notificaReferencia;
+	private String notificaIdentificador;
 	private Date notificaDataCreacio;
 	private Date notificaDataDisposicio;
+	private Date notificaDataCaducitat;
 	private String notificaEmisorDir3;
 	private String notificaEmisorDescripcio;
+	private String notificaEmisorNif;
 	private String notificaArrelDir3;
 	private String notificaArrelDescripcio;
-	private String notificaDestiDir3;
-	private String notificaDestiDescripcio;
+	private String notificaArrelNif;
 	private NotificacioEnviamentEstatEnumDto notificaEstat;
-	private String notificaEstatDescripcio;
 	private Date notificaEstatData;
-	private String notificaEstatOrigen;
-	private String notificaEstatReceptorNif;
-	private String notificaEstatReceptorNom;
-	private String notificaEstatNumSeguiment;
-	private String notificaCertificacioArxiuId;
-	private String notificaCertificacioHash;
+	private String notificaEstatDescripcio;
+	private String notificaDatatOrigen;
+	private String notificaDatatReceptorNif;
+	private String notificaDatatReceptorNom;
+	private String notificaDatatNumSeguiment;
+	private String notificaDatatErrorDescripcio;
 	private Date notificaCertificacioData;
+	private String notificaCertificacioArxiuId;
+	private String notificaCertificacioArxiuNom;
+	private String notificaCertificacioHash;
 	private String notificaCertificacioOrigen;
 	private String notificaCertificacioMetadades;
 	private String notificaCertificacioCsv;
-	private String notificaCertificacioTipusMime;
+	private String notificaCertificacioMime;
 	private Integer notificaCertificacioTamany;
 	private NotificaCertificacioTipusEnumDto notificaCertificacioTipus;
 	private NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus;
 	private String notificaCertificacioNumSeguiment;
 	private boolean notificaError;
 	private Date notificaErrorData;
-	private String notificaErrorError;
+	private String notificaErrorDescripcio;
 	private String seuRegistreNumero;
 	private Date seuRegistreData;
 	private Date seuDataFi;
 	private NotificacioEnviamentEstatEnumDto seuEstat;
 	private boolean seuError;
 	private Date seuErrorData;
-	private String seuErrorError;
+	private String seuErrorDescripcio;
 	private Date seuDataEnviament;
+	private int seuReintentsEnviament;
 	private Date seuDataEstat;
 	private Date seuDataNotificaInformat;
 	private Date seuDataNotificaDarreraPeticio;
@@ -354,35 +357,29 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	public void setServeiTipus(NotificaServeiTipusEnumDto serveiTipus) {
 		this.serveiTipus = serveiTipus;
 	}
-	public int getRetardPostal() {
-		return retardPostal;
+	public String getFormatSobre() {
+		return formatSobre;
 	}
-	public void setRetardPostal(int retardPostal) {
-		this.retardPostal = retardPostal;
+	public void setFormatSobre(String formatSobre) {
+		this.formatSobre = formatSobre;
 	}
-	public Date getCaducitat() {
-		return caducitat;
+	public String getFormatFulla() {
+		return formatFulla;
 	}
-	public void setCaducitat(Date caducitat) {
-		this.caducitat = caducitat;
-	}
-	public NotificacioEnviamentEstatEnumDto getEstat() {
-		return estat;
-	}
-	public void setEstat(NotificacioEnviamentEstatEnumDto estat) {
-		this.estat = estat;
-	}
-	public String getNotificaIdentificador() {
-		return notificaIdentificador;
-	}
-	public void setNotificaIdentificador(String notificaIdentificador) {
-		this.notificaIdentificador = notificaIdentificador;
+	public void setFormatFulla(String formatFulla) {
+		this.formatFulla = formatFulla;
 	}
 	public String getNotificaReferencia() {
 		return notificaReferencia;
 	}
 	public void setNotificaReferencia(String notificaReferencia) {
 		this.notificaReferencia = notificaReferencia;
+	}
+	public String getNotificaIdentificador() {
+		return notificaIdentificador;
+	}
+	public void setNotificaIdentificador(String notificaIdentificador) {
+		this.notificaIdentificador = notificaIdentificador;
 	}
 	public Date getNotificaDataCreacio() {
 		return notificaDataCreacio;
@@ -396,6 +393,12 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	public void setNotificaDataDisposicio(Date notificaDataDisposicio) {
 		this.notificaDataDisposicio = notificaDataDisposicio;
 	}
+	public Date getNotificaDataCaducitat() {
+		return notificaDataCaducitat;
+	}
+	public void setNotificaDataCaducitat(Date notificaDataCaducitat) {
+		this.notificaDataCaducitat = notificaDataCaducitat;
+	}
 	public String getNotificaEmisorDir3() {
 		return notificaEmisorDir3;
 	}
@@ -407,6 +410,12 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	}
 	public void setNotificaEmisorDescripcio(String notificaEmisorDescripcio) {
 		this.notificaEmisorDescripcio = notificaEmisorDescripcio;
+	}
+	public String getNotificaEmisorNif() {
+		return notificaEmisorNif;
+	}
+	public void setNotificaEmisorNif(String notificaEmisorNif) {
+		this.notificaEmisorNif = notificaEmisorNif;
 	}
 	public String getNotificaArrelDir3() {
 		return notificaArrelDir3;
@@ -420,17 +429,11 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	public void setNotificaArrelDescripcio(String notificaArrelDescripcio) {
 		this.notificaArrelDescripcio = notificaArrelDescripcio;
 	}
-	public String getNotificaDestiDir3() {
-		return notificaDestiDir3;
+	public String getNotificaArrelNif() {
+		return notificaArrelNif;
 	}
-	public void setNotificaDestiDir3(String notificaDestiDir3) {
-		this.notificaDestiDir3 = notificaDestiDir3;
-	}
-	public String getNotificaDestiDescripcio() {
-		return notificaDestiDescripcio;
-	}
-	public void setNotificaDestiDescripcio(String notificaDestiDescripcio) {
-		this.notificaDestiDescripcio = notificaDestiDescripcio;
+	public void setNotificaArrelNif(String notificaArrelNif) {
+		this.notificaArrelNif = notificaArrelNif;
 	}
 	public NotificacioEnviamentEstatEnumDto getNotificaEstat() {
 		return notificaEstat;
@@ -438,41 +441,53 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	public void setNotificaEstat(NotificacioEnviamentEstatEnumDto notificaEstat) {
 		this.notificaEstat = notificaEstat;
 	}
-	public String getNotificaEstatDescripcio() {
-		return notificaEstatDescripcio;
-	}
-	public void setNotificaEstatDescripcio(String notificaEstatDescripcio) {
-		this.notificaEstatDescripcio = notificaEstatDescripcio;
-	}
 	public Date getNotificaEstatData() {
 		return notificaEstatData;
 	}
 	public void setNotificaEstatData(Date notificaEstatData) {
 		this.notificaEstatData = notificaEstatData;
 	}
-	public String getNotificaEstatOrigen() {
-		return notificaEstatOrigen;
+	public String getNotificaEstatDescripcio() {
+		return notificaEstatDescripcio;
 	}
-	public void setNotificaEstatOrigen(String notificaEstatOrigen) {
-		this.notificaEstatOrigen = notificaEstatOrigen;
+	public void setNotificaEstatDescripcio(String notificaEstatDescripcio) {
+		this.notificaEstatDescripcio = notificaEstatDescripcio;
 	}
-	public String getNotificaEstatReceptorNif() {
-		return notificaEstatReceptorNif;
+	public String getNotificaDatatOrigen() {
+		return notificaDatatOrigen;
 	}
-	public void setNotificaEstatReceptorNif(String notificaEstatReceptorNif) {
-		this.notificaEstatReceptorNif = notificaEstatReceptorNif;
+	public void setNotificaDatatOrigen(String notificaDatatOrigen) {
+		this.notificaDatatOrigen = notificaDatatOrigen;
 	}
-	public String getNotificaEstatReceptorNom() {
-		return notificaEstatReceptorNom;
+	public String getNotificaDatatReceptorNif() {
+		return notificaDatatReceptorNif;
 	}
-	public void setNotificaEstatReceptorNom(String notificaEstatReceptorNom) {
-		this.notificaEstatReceptorNom = notificaEstatReceptorNom;
+	public void setNotificaDatatReceptorNif(String notificaDatatReceptorNif) {
+		this.notificaDatatReceptorNif = notificaDatatReceptorNif;
 	}
-	public String getNotificaEstatNumSeguiment() {
-		return notificaEstatNumSeguiment;
+	public String getNotificaDatatReceptorNom() {
+		return notificaDatatReceptorNom;
 	}
-	public void setNotificaEstatNumSeguiment(String notificaEstatNumSeguiment) {
-		this.notificaEstatNumSeguiment = notificaEstatNumSeguiment;
+	public void setNotificaDatatReceptorNom(String notificaDatatReceptorNom) {
+		this.notificaDatatReceptorNom = notificaDatatReceptorNom;
+	}
+	public String getNotificaDatatNumSeguiment() {
+		return notificaDatatNumSeguiment;
+	}
+	public void setNotificaDatatNumSeguiment(String notificaDatatNumSeguiment) {
+		this.notificaDatatNumSeguiment = notificaDatatNumSeguiment;
+	}
+	public String getNotificaDatatErrorDescripcio() {
+		return notificaDatatErrorDescripcio;
+	}
+	public void setNotificaDatatErrorDescripcio(String notificaDatatErrorDescripcio) {
+		this.notificaDatatErrorDescripcio = notificaDatatErrorDescripcio;
+	}
+	public Date getNotificaCertificacioData() {
+		return notificaCertificacioData;
+	}
+	public void setNotificaCertificacioData(Date notificaCertificacioData) {
+		this.notificaCertificacioData = notificaCertificacioData;
 	}
 	public String getNotificaCertificacioArxiuId() {
 		return notificaCertificacioArxiuId;
@@ -480,17 +495,17 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	public void setNotificaCertificacioArxiuId(String notificaCertificacioArxiuId) {
 		this.notificaCertificacioArxiuId = notificaCertificacioArxiuId;
 	}
+	public String getNotificaCertificacioArxiuNom() {
+		return notificaCertificacioArxiuNom;
+	}
+	public void setNotificaCertificacioArxiuNom(String notificaCertificacioArxiuNom) {
+		this.notificaCertificacioArxiuNom = notificaCertificacioArxiuNom;
+	}
 	public String getNotificaCertificacioHash() {
 		return notificaCertificacioHash;
 	}
 	public void setNotificaCertificacioHash(String notificaCertificacioHash) {
 		this.notificaCertificacioHash = notificaCertificacioHash;
-	}
-	public Date getNotificaCertificacioData() {
-		return notificaCertificacioData;
-	}
-	public void setNotificaCertificacioData(Date notificaCertificacioData) {
-		this.notificaCertificacioData = notificaCertificacioData;
 	}
 	public String getNotificaCertificacioOrigen() {
 		return notificaCertificacioOrigen;
@@ -510,11 +525,11 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	public void setNotificaCertificacioCsv(String notificaCertificacioCsv) {
 		this.notificaCertificacioCsv = notificaCertificacioCsv;
 	}
-	public String getNotificaCertificacioTipusMime() {
-		return notificaCertificacioTipusMime;
+	public String getNotificaCertificacioMime() {
+		return notificaCertificacioMime;
 	}
-	public void setNotificaCertificacioTipusMime(String notificaCertificacioTipusMime) {
-		this.notificaCertificacioTipusMime = notificaCertificacioTipusMime;
+	public void setNotificaCertificacioMime(String notificaCertificacioMime) {
+		this.notificaCertificacioMime = notificaCertificacioMime;
 	}
 	public Integer getNotificaCertificacioTamany() {
 		return notificaCertificacioTamany;
@@ -552,11 +567,11 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	public void setNotificaErrorData(Date notificaErrorData) {
 		this.notificaErrorData = notificaErrorData;
 	}
-	public String getNotificaErrorError() {
-		return notificaErrorError;
+	public String getNotificaErrorDescripcio() {
+		return notificaErrorDescripcio;
 	}
-	public void setNotificaErrorError(String notificaErrorError) {
-		this.notificaErrorError = notificaErrorError;
+	public void setNotificaErrorDescripcio(String notificaErrorDescripcio) {
+		this.notificaErrorDescripcio = notificaErrorDescripcio;
 	}
 	public String getSeuRegistreNumero() {
 		return seuRegistreNumero;
@@ -594,17 +609,23 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	public void setSeuErrorData(Date seuErrorData) {
 		this.seuErrorData = seuErrorData;
 	}
-	public String getSeuErrorError() {
-		return seuErrorError;
+	public String getSeuErrorDescripcio() {
+		return seuErrorDescripcio;
 	}
-	public void setSeuErrorError(String seuErrorError) {
-		this.seuErrorError = seuErrorError;
+	public void setSeuErrorDescripcio(String seuErrorDescripcio) {
+		this.seuErrorDescripcio = seuErrorDescripcio;
 	}
 	public Date getSeuDataEnviament() {
 		return seuDataEnviament;
 	}
 	public void setSeuDataEnviament(Date seuDataEnviament) {
 		this.seuDataEnviament = seuDataEnviament;
+	}
+	public int getSeuReintentsEnviament() {
+		return seuReintentsEnviament;
+	}
+	public void setSeuReintentsEnviament(int seuReintentsEnviament) {
+		this.seuReintentsEnviament = seuReintentsEnviament;
 	}
 	public Date getSeuDataEstat() {
 		return seuDataEstat;
@@ -635,6 +656,7 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 		sb.append(titularNom);
 		String llinatges = getTitularLlinatges();
 		if (llinatges != null && !llinatges.isEmpty()) {
+			sb.append(" ");
 			sb.append(llinatges);
 		}
 		sb.append(" (");
@@ -653,6 +675,7 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 		sb.append(destinatariNom);
 		String llinatges = getDestinatariLlinatges();
 		if (llinatges != null && !llinatges.isEmpty()) {
+			sb.append(" ");
 			sb.append(llinatges);
 		}
 		sb.append(" (");

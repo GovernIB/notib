@@ -23,7 +23,7 @@ import javax.persistence.TemporalType;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.notib.core.api.dto.NotificaComunicacioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
@@ -42,7 +42,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "emisor_dir3codi", length = 9, nullable = false)
 	private String emisorDir3Codi;
 	@Column(name = "com_tipus", nullable = false)
-	private NotificaComunicacioTipusEnumDto comunicacioTipus;
+	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	@Column(name = "env_tipus", nullable = false)
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
 	@Column(name = "env_data_prog")
@@ -146,7 +146,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public String getEmisorDir3Codi() {
 		return emisorDir3Codi;
 	}
-	public NotificaComunicacioTipusEnumDto getComunicacioTipus() {
+	public NotificacioComunicacioTipusEnumDto getComunicacioTipus() {
 		return comunicacioTipus;
 	}
 	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
@@ -296,7 +296,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public static Builder getBuilder(
 			EntitatEntity entitat,
 			String emisorDir3Codi,
-			NotificaComunicacioTipusEnumDto comunicacioTipus,
+			NotificacioComunicacioTipusEnumDto comunicacioTipus,
 			NotificaEnviamentTipusEnumDto enviamentTipus,
 			Date enviamentDataProgramada,
 			String concepte,
@@ -304,8 +304,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String documentArxiuId,
 			String documentHash,
 			boolean documentNormalitzat,
-			boolean documentGenerarCsv,
-			List<NotificacioEnviamentEntity> enviaments) {
+			boolean documentGenerarCsv) {
 		return new Builder(
 				entitat,
 				emisorDir3Codi,
@@ -317,8 +316,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				documentArxiuId,
 				documentHash,
 				documentNormalitzat,
-				documentGenerarCsv,
-				enviaments);
+				documentGenerarCsv);
 	}
 
 	public static class Builder {
@@ -326,7 +324,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		Builder(
 				EntitatEntity entitat,
 				String emisorDir3Codi,
-				NotificaComunicacioTipusEnumDto comunicacioTipus,
+				NotificacioComunicacioTipusEnumDto comunicacioTipus,
 				NotificaEnviamentTipusEnumDto enviamentTipus,
 				Date enviamentDataProgramada,
 				String concepte,
@@ -334,8 +332,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				String documentArxiuId,
 				String documentHash,
 				boolean documentNormalitzat,
-				boolean documentGenerarCsv,
-				List<NotificacioEnviamentEntity> enviaments) {
+				boolean documentGenerarCsv) {
 			built = new NotificacioEntity();
 			built.entitat = entitat;
 			built.emisorDir3Codi = emisorDir3Codi;
@@ -348,8 +345,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.documentHash = documentHash;
 			built.documentNormalitzat = documentNormalitzat;
 			built.documentGenerarCsv = documentGenerarCsv;
-			if (enviaments != null)
-				built.enviaments = enviaments;
 			built.estat = NotificacioEstatEnumDto.PENDENT;
 			built.notificaEnviamentIntent = 0;
 		}

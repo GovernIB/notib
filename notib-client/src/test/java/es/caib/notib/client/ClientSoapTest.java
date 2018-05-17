@@ -59,7 +59,7 @@ public class ClientSoapTest extends ClientBaseTest {
 				generarNotificacio(
 						notificacioId,
 						1,
-						true));
+						false));
 		assertNotNull(respostaAlta);
 		assertFalse(respostaAlta.isError());
 		assertNull(respostaAlta.getErrorDescripcio());

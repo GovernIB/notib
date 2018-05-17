@@ -44,6 +44,8 @@ public class NotificacioRestClient implements NotificacioService {
 	private String username;
 	private String password;
 
+	private boolean serveiDesplegatDamuntJboss = true;
+
 	public NotificacioRestClient(
 			String baseUrl,
 			String username,
@@ -127,6 +129,13 @@ public class NotificacioRestClient implements NotificacioService {
 		}
 	}
 
+	public boolean isServeiDesplegatDamuntJboss() {
+		return serveiDesplegatDamuntJboss;
+	}
+	public void setServeiDesplegatDamuntJboss(boolean serveiDesplegatDamuntJboss) {
+		this.serveiDesplegatDamuntJboss = serveiDesplegatDamuntJboss;
+	}
+
 
 
 	private Client generarClient() {
@@ -166,7 +175,7 @@ public class NotificacioRestClient implements NotificacioService {
 			AuthorizationToken token = controlador.getToken();
 			jerseyClient.addFilter(
 					new HTTPBasicAuthFilter(token.getUser(), token.getPassword()));
-		} else {
+		} else if (serveiDesplegatDamuntJboss) {
 			jerseyClient.resource(urlAmbMetode).get(String.class);
 			Form form = new Form();
 			form.putSingle("j_username", username);
@@ -175,6 +184,9 @@ public class NotificacioRestClient implements NotificacioService {
 			resource(baseUrl + "/j_security_check").
 			type("application/x-www-form-urlencoded").
 			post(form);
+		} else {
+			jerseyClient.addFilter(
+					new HTTPBasicAuthFilter(username, password));
 		}
 	}
 

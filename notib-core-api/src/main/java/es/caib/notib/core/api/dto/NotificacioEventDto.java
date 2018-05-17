@@ -7,8 +7,8 @@ import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**
+ * Informació d'un event associat a una notificació.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -21,8 +21,7 @@ public class NotificacioEventDto extends AuditoriaDto {
 	private boolean error;
 	private String errorDescripcio;
 
-	private NotificacioDto notificacio;
-	private NotificacioEnviamentDto destinatari;
+	private NotificacioEventEnviamentDto enviament;
 
 	public Long getId() {
 		return id;
@@ -60,21 +59,15 @@ public class NotificacioEventDto extends AuditoriaDto {
 	public void setErrorDescripcio(String errorDescripcio) {
 		this.errorDescripcio = errorDescripcio;
 	}
-	public NotificacioDto getNotificacio() {
-		return notificacio;
+	public NotificacioEventEnviamentDto getEnviament() {
+		return enviament;
 	}
-	public void setNotificacio(NotificacioDto notificacio) {
-		this.notificacio = notificacio;
-	}
-	public NotificacioEnviamentDto getDestinatari() {
-		return destinatari;
-	}
-	public void setDestinatari(NotificacioEnviamentDto destinatari) {
-		this.destinatari = destinatari;
+	public void setEnviament(NotificacioEventEnviamentDto enviament) {
+		this.enviament = enviament;
 	}
 
-	public boolean isDestinatariAssociat() {
-		return this.destinatari != null;
+	public boolean isEnviamentAssociat() {
+		return enviament != null;
 	}
 
 	@Override

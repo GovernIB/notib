@@ -11,9 +11,6 @@ import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -33,16 +30,13 @@ import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 import javax.xml.ws.soap.SOAPFaultException;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.NotificaRespostaDatatDto.NotificaRespostaDatatEventDto;
-import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
@@ -52,6 +46,7 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.wsdl.notificaV2.NotificaWsV2PortType;
@@ -87,14 +82,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
+	@Autowired
+	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 
 	@Autowired
 	private PluginHelper pluginHelper;
 
 
 
-	@Transactional
-	public boolean enviament(
+	public boolean notificacioEnviar(
 			Long notificacioId) {
 		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
 		notificacio.updateNotificaNouEnviament();
@@ -151,41 +147,17 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					errorDescripcio(errorDescripcio).
 					build();
 			notificacio.updateEventAfegir(event);
+			notificacioEventRepository.save(event);
 			notificacio.updateNotificaError(
 					NotificacioErrorTipusEnumDto.ERROR_XARXA,
 					event);
-			notificacioEventRepository.save(event);
-			for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
-				enviament.updateNotificaError(true, event);
-			}
 		}
 		return NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat());
 	}
 
-	public ResultadoInfoEnvioV2 infoEnviament(
-			NotificacioEnviamentEntity enviament) throws Exception {
-		
-		ResultadoInfoEnvioV2 resultat = null;
-		
-//		NotificacioEntity notificacio = enviament.getNotificacio();
-		
-		try {
-			InfoEnvioV2 infoEnvio = new InfoEnvioV2();
-			infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
-			resultat = getNotificaWs().infoEnvioV2(infoEnvio);
-		} catch (SOAPFaultException sfe) {
-			String codiResposta = sfe.getFault().getFaultCode();
-			String descripcioResposta = sfe.getFault().getFaultString();
-			
-			resultat = new ResultadoInfoEnvioV2();
-			resultat.setConcepto(codiResposta);
-			resultat.setDescripcion(descripcioResposta);
-		}
-		return resultat;
-	}
-	
-	public NotificaRespostaEstatDto refrescarEstat(
-			NotificacioEnviamentEntity enviament) throws SistemaExternException {
+	public boolean enviamentRefrescarEstat(
+			Long enviamentId) throws SistemaExternException {
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		NotificacioEntity notificacio = enviament.getNotificacio();
 		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb NotificaV2 (" +
 				"notificacioId=" + notificacio.getId() + ", " +
@@ -194,7 +166,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			InfoEnvioV2 infoEnvio = new InfoEnvioV2();
 			infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
 			ResultadoInfoEnvioV2 resultadoInfoEnvio = getNotificaWs().infoEnvioV2(infoEnvio);
-			NotificaRespostaEstatDto resposta = new NotificaRespostaEstatDto();
 			if (resultadoInfoEnvio.getDatados() != null) {
 				Datado datatDarrer = null;
 				for (Datado datado: resultadoInfoEnvio.getDatados().getDatado()) {
@@ -214,13 +185,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				if (datatDarrer != null) {
 					NotificacioEnviamentEstatEnumDto estat = getEstatNotifica(
 							datatDarrer.getResultado());
-					resposta.setData(toDate(datatDarrer.getFecha()));
-					resposta.setEstatCodi(datatDarrer.getResultado());
-					resposta.setEstatDescripcio(null);
-					resposta.setNumSeguiment(null);
-					resposta.setOrigen(datatDarrer.getOrigen());
-					resposta.setReceptorNom(datatDarrer.getNombreReceptor());
-					resposta.setReceptorNif(datatDarrer.getNifReceptor());
 					CodigoDIR organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
 					CodigoDIR organismoEmisorRaiz = resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
 					enviament.updateNotificaInformacio(
@@ -233,7 +197,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 							(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getCodigo() : null,
 							(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getDescripcionCodigoDIR() : null,
 							(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getNifDIR() : null);
-					enviament.updateNotificaDatat(
+					enviamentUpdateDatat(
 							estat,
 							toDate(datatDarrer.getFecha()),
 							null,
@@ -241,7 +205,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 							datatDarrer.getNifReceptor(),
 							datatDarrer.getNombreReceptor(),
 							null,
-							null);
+							null,
+							enviament);
 					enviament.updateNotificaError(false, null);
 				} else {
 					throw new ValidationException(
@@ -257,7 +222,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			}
 			if (resultadoInfoEnvio.getCertificacion() != null) {
 				Certificacion certificacio = resultadoInfoEnvio.getCertificacion();
-				byte[] decodificat = Base64.decodeBase64(certificacio.getContenidoCertificacion());
+				byte[] decodificat = certificacio.getContenidoCertificacion();
+				if (enviament.getNotificaCertificacioArxiuId() != null) {
+					pluginHelper.gestioDocumentalDelete(
+							enviament.getNotificaCertificacioArxiuId(),
+							PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
+				}
 				String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
 						PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
 						new ByteArrayInputStream(decodificat));
@@ -273,17 +243,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						null,
 						null,
 						null);
-				resposta.setCertificacioDisponible(true);
-				resposta.setCertificacioContingut(null);
-				resposta.setCertificacioHash(certificacio.getHash());
-				resposta.setCertificacioCsv(certificacio.getCsv());
-				resposta.setCertificacioTamany(
-						new Integer(certificacio.getSize()));
-				resposta.setCertificacioData(
-						toDate(certificacio.getFechaCertificacion()));
-				resposta.setCertificacioOrigen(certificacio.getOrigen());
-				resposta.setCertificacioMetadades(certificacio.getMetadatos());
-				resposta.setCertificacioTipusMime(certificacio.getMime());
 			}
 			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
 					NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
@@ -291,7 +250,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					enviament(enviament).
 					build();
 			notificacio.updateEventAfegir(event);
-			return resposta;
+			return true;
 		} catch (Exception ex) {
 			logger.error(
 					errorPrefix,
@@ -304,10 +263,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					errorDescripcio(ExceptionUtils.getStackTrace(ex)).
 					build();
 			notificacio.updateEventAfegir(event);
-			throw new SistemaExternException(
-					"NOTIFICA",
-					errorPrefix,
-					ex);
+			notificacioEventRepository.save(event);
+			enviament.updateNotificaError(
+					true,
+					event);
+			return false;
 		}
 	}
 
@@ -516,7 +476,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private NotificaWsV2PortType getNotificaWs() throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
 		NotificaWsV2PortType port = new WsClientHelper<NotificaWsV2PortType>().generarClientWs(
 				getClass().getResource("/es/caib/notib/core/wsdl/NotificaWsV21.wsdl"),
-				getUrlProperty(),
+				getNotificaUrlProperty(),
 				new QName(
 						"https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/", 
 						"NotificaWsV2Service"),
@@ -524,12 +484,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				getPasswordProperty(),
 				NotificaWsV2PortType.class,
 				new ApiKeySOAPHandlerV2(getApiKeyProperty()),
-				// new ChunkedSOAPHandler("false"),
-				// new DocumentHandler(documentId, fileType),
-				new WsClientHelper.SOAPLoggingHandler(NotificaWsV2PortType.class));
+				new WsClientHelper.SOAPLoggingHandler(NotificaV2Helper.class));
 		return port;
 	}
-	
+
 	public class ApiKeySOAPHandlerV2 implements SOAPHandler<SOAPMessageContext> {
 		private final String apiKey;
 		public ApiKeySOAPHandlerV2(String apiKey) {
@@ -539,12 +497,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		public boolean handleMessage(SOAPMessageContext context) {
 			Boolean outboundProperty = (Boolean)context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 			if (outboundProperty.booleanValue()) {
-				@SuppressWarnings("unchecked")
-				Map<String, List<String>> requestHeaders = (Map<String, List<String>>)context.get(MessageContext.HTTP_REQUEST_HEADERS);
-				if (requestHeaders == null) {
-	                requestHeaders = new HashMap<String, List<String>>();
-	                context.put(MessageContext.HTTP_REQUEST_HEADERS, requestHeaders);
-	            }
 				try {
 					SOAPEnvelope envelope = context.getMessage().getSOAPPart().getEnvelope();
 					SOAPFactory factory = SOAPFactory.newInstance();
@@ -554,10 +506,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 									"apiKey"));
 					apiKeyElement.addTextNode(apiKey);
 					SOAPHeader header = envelope.getHeader();
-					if (header == null)
+					if (header == null) {
 						header = envelope.addHeader();
+					}
 					header.addChildElement(apiKeyElement);
-					
+					context.getMessage().saveChanges();
 				} catch (SOAPException ex) {
 					logger.error(
 							"No s'ha pogut afegir l'API key a la petició SOAP per Notifica",

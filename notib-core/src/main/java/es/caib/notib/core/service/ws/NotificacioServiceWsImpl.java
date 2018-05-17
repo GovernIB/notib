@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sun.jersey.core.util.Base64;
 
-import es.caib.notib.core.api.dto.NotificaComunicacioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliTipusEnumDto;
@@ -101,6 +101,11 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 					"ENTITAT", 
 					"No s'ha trobat cap entitat configurada a Notib amb el codi Dir3 " + emisorDir3Codi + ". (emisorDir3Codi)");
 		}
+		if (!entitat.isActiva()) {
+			throw new ValidationException(
+					"ENTITAT", 
+					"L'entitat especificada està desactivada per a l'enviament de notificacions");
+		}
 		if (notificacio.getConcepte() == null) {
 			throw new ValidationException(
 					"CONCEPTE", 
@@ -132,11 +137,11 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				break;
 			}
 		}
-		NotificaComunicacioTipusEnumDto comunicacioTipus;
+		NotificacioComunicacioTipusEnumDto comunicacioTipus;
 		if (getEnviamentSincronProperty()) {
-			comunicacioTipus = NotificaComunicacioTipusEnumDto.SINCRON;
+			comunicacioTipus = NotificacioComunicacioTipusEnumDto.SINCRON;
 		} else {
-			comunicacioTipus = NotificaComunicacioTipusEnumDto.ASINCRON;
+			comunicacioTipus = NotificacioComunicacioTipusEnumDto.ASINCRON;
 		}
 		NotificacioEntity.Builder notificacioBuilder = NotificacioEntity.getBuilder(
 				entitat,
@@ -149,8 +154,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				documentGesdocId,
 				document.getHash(),
 				document.isNormalitzat(),
-				document.isGenerarCsv(),
-				null).
+				document.isGenerarCsv()).
 				descripcio(notificacio.getDescripcio()).
 				caducitat(notificacio.getCaducitat()).
 				retardPostal(notificacio.getRetard()).
@@ -302,7 +306,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 					enviamentBuilder.build());
 			String referencia;
 			try {
-				referencia = notificaHelper.generarReferenciaDestinatari(enviamentSaved);
+				referencia = notificaHelper.xifrarId(enviamentSaved.getId());
 			} catch (GeneralSecurityException ex) {
 				throw new RuntimeException(
 						"No s'ha pogut crear la referencia per al destinatari",
@@ -316,10 +320,13 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			notificacioEntity.addEnviament(enviamentSaved);
 		}
 		notificacioRepository.saveAndFlush(notificacioEntity);
+		if (getEnviamentSincronProperty()) {
+			notificaHelper.notificacioEnviar(notificacioEntity.getId());
+		}
 		RespostaAlta resposta = new RespostaAlta();
 		try {
 			resposta.setIdentificador(
-					notificaHelper.generarIdentificadorNotificacio(notificacioEntity));
+					notificaHelper.xifrarId(notificacioEntity.getId()));
 		} catch (GeneralSecurityException ex) {
 			throw new RuntimeException(
 					"No s'ha pogut crear l'identificador de la notificació",
@@ -342,9 +349,6 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 					notificacioEntity.getNotificaErrorEvent().getErrorDescripcio());
 		}
 		resposta.setReferencies(referencies);
-		if (getEnviamentSincronProperty()) {
-			notificaHelper.enviament(notificacioEntity.getId());
-		}
 		return resposta;
 	}
 
@@ -354,7 +358,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			String identificador) {
 		Long notificacioId;
 		try {
-			notificacioId = notificaHelper.obtenirIdNotificacioAmbIdentificador(identificador);
+			notificacioId = notificaHelper.desxifrarId(identificador);
 		} catch (GeneralSecurityException ex) {
 			throw new RuntimeException(
 					"No s'ha pogut desxifrar l'identificador de la notificació",
@@ -399,7 +403,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			// serà necessari consultar l'estat de la notificació a Notifica
 			if (	!notificaHelper.isAdviserActiu() &&
 					!enviament.getNotificaEstat().equals(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT)) {
-				notificaHelper.refrescarEstat(enviament);
+				notificaHelper.enviamentRefrescarEstat(enviament.getId());
 			}
 			resposta.setEstat(toEnviamentEstat(enviament.getNotificaEstat()));
 			resposta.setEstatData(enviament.getNotificaEstatData());

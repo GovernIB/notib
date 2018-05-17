@@ -3,55 +3,26 @@
  */
 package es.caib.notib.core.api.dto;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**
- * Informació d'una entitat.
+ * Filtre per a la consulta de notificacions.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class NotificacioFiltreDto extends AuditoriaDto {
+public class NotificacioFiltreDto implements Serializable {
 	
-	
+	private Long entitatId;
+	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
+	private NotificaEnviamentTipusEnumDto enviamentTipus;
+	private NotificacioEstatEnumDto estat;
 	private String concepte;
 	private Date dataInici;
 	private Date dataFi;
-	private String destinatari;
-	
-	private Long entitatId;
-	
-	
-	
-	public String getConcepte() {
-		return concepte;
-	}
-	public void setConcepte(String concepte) {
-		this.concepte = concepte;
-	}
-	
-	public Date getDataInici() {
-		return dataInici;
-	}
-	public void setDataInici(Date dataInici) {
-		this.dataInici = dataInici;
-	}
-	
-	public Date getDataFi() {
-		return dataFi;
-	}
-	public void setDataFi(Date dataFi) {
-		this.dataFi = dataFi;
-	}
-	
-	public String getDestinatari() {
-		return destinatari;
-	}
-	public void setDestinatari(String destinatari) {
-		this.destinatari = destinatari;
-	}
+	private String titular;
 	
 	public Long getEntitatId() {
 		return entitatId;
@@ -59,15 +30,54 @@ public class NotificacioFiltreDto extends AuditoriaDto {
 	public void setEntitatId(Long entitatId) {
 		this.entitatId = entitatId;
 	}
-	
-	
+	public NotificacioComunicacioTipusEnumDto getComunicacioTipus() {
+		return comunicacioTipus;
+	}
+	public void setComunicacioTipus(NotificacioComunicacioTipusEnumDto comunicacioTipus) {
+		this.comunicacioTipus = comunicacioTipus;
+	}
+	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
+		return enviamentTipus;
+	}
+	public void setEnviamentTipus(NotificaEnviamentTipusEnumDto enviamentTipus) {
+		this.enviamentTipus = enviamentTipus;
+	}
+	public NotificacioEstatEnumDto getEstat() {
+		return estat;
+	}
+	public void setEstat(NotificacioEstatEnumDto estat) {
+		this.estat = estat;
+	}
+	public String getConcepte() {
+		return concepte;
+	}
+	public void setConcepte(String concepte) {
+		this.concepte = concepte;
+	}
+	public Date getDataInici() {
+		return dataInici;
+	}
+	public void setDataInici(Date dataInici) {
+		this.dataInici = dataInici;
+	}
+	public Date getDataFi() {
+		return dataFi;
+	}
+	public void setDataFi(Date dataFi) {
+		this.dataFi = dataFi;
+	}
+	public String getTitular() {
+		return titular;
+	}
+	public void setTitular(String titular) {
+		this.titular = titular;
+	}
 	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
 
-	private static final long serialVersionUID = -139254994389509932L;
-
+	private static final long serialVersionUID = 4118407692540857237L;
 
 }

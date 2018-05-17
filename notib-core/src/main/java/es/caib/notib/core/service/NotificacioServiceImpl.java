@@ -4,6 +4,8 @@
 package es.caib.notib.core.service;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -17,10 +19,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -51,7 +54,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private NotificacioRepository notificacioRepository;
 	@Autowired
-	private NotificacioEnviamentRepository notificacioDestinatariRepository;
+	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
 
@@ -81,6 +84,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				dto.getEntitat().getId(),
 				true,
 				true);
+		
 		return  conversioTipusHelper.convertir(
 				dto,
 				NotificacioDto.class);
@@ -101,51 +105,50 @@ public class NotificacioServiceImpl implements NotificacioService {
 					true,
 					paginacioHelper.toSpringDataPageable(paginacioParams));
 		} else {
+			Date dataInici = filtre.getDataInici();
+			if (dataInici != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataInici);
+				cal.set(Calendar.HOUR, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataInici = cal.getTime();
+			}
+			Date dataFi = filtre.getDataFi();
+			if (dataFi != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataInici);
+				cal.set(Calendar.HOUR, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataFi = cal.getTime();
+			}
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
 			notificacions = notificacioRepository.findAmbFiltre(
-							filtre.getConcepte(),
-							filtre.getDataInici(),
-							filtre.getDataFi(),
-							filtre.getDestinatari() == null || filtre.getDestinatari().isEmpty(), 
-							filtre.getDestinatari(),
-							filtre.getEntitatId() == null,
-							filtre.getEntitatId(),
-							pageable);
+					filtre.getEntitatId() == null,
+					filtre.getEntitatId(),
+					//filtre.getComunicacioTipus() == null,
+					//filtre.getComunicacioTipus(),
+					false,
+					NotificacioComunicacioTipusEnumDto.SINCRON,
+					filtre.getEnviamentTipus() == null,
+					filtre.getEnviamentTipus(),
+					filtre.getConcepte() == null,
+					filtre.getConcepte(),
+					filtre.getEstat() == null,
+					filtre.getEstat(),
+					dataInici == null && dataFi == null,
+					dataInici,
+					dataFi,
+					filtre.getTitular() == null || filtre.getTitular().isEmpty(), 
+					filtre.getTitular(),
+					pageable);
 		}
 		return paginacioHelper.toPaginaDto(
 				notificacions,
 				NotificacioDto.class);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public PaginaDto<NotificacioDto> findAmbEntitatIFiltrePaginat(
-			Long entitatId,
-			NotificacioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		logger.debug("Consulta paginada de notificacions d'una entitat segons el filtre (" +
-				"entitatId=" + entitatId + ", " +
-				"filtre=" + filtre + ", " +
-				"paginacioParams=" + paginacioParams + ")");
-		entityComprovarHelper.comprovarPermisos(
-				entitatId,
-				false,
-				true);
-		PaginaDto<NotificacioDto> notificacions;
-		if (filtre == null) {
-			notificacions = paginacioHelper.toPaginaDto(
-					notificacioRepository.findByEntitatId(
-							entitatId,
-							paginacioHelper.toSpringDataPageable(paginacioParams)),
-					NotificacioDto.class);
-		} else {
-			notificacions = paginacioHelper.toPaginaDto(
-					notificacioRepository.findByEntitatId(
-							entitatId,
-							paginacioHelper.toSpringDataPageable(paginacioParams)),
-					NotificacioDto.class);
-		}
-		return notificacions;
 	}
 
 	@Override
@@ -159,7 +162,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				true,
 				true);
 		return enviamentsToDto(
-				notificacioDestinatariRepository.findByNotificacioId(notificacioId));
+				notificacioEnviamentRepository.findByNotificacioId(notificacioId));
 	}
 
 	@Override
@@ -168,23 +171,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 		logger.debug("Consulta de destinatari donat el seu id (" +
 				"destinatariId=" + destinatariId + ")");
 		NotificacioEnviamentEntity destinatari =
-				notificacioDestinatariRepository.findOne(destinatariId);
+				notificacioEnviamentRepository.findOne(destinatariId);
 		NotificacioEntity notificacio = notificacioRepository.findOne( destinatari.getNotificacio().getId() );
 		entityComprovarHelper.comprovarPermisos(
 				notificacio.getEntitat().getId(),
 				true,
 				true);
-		return enviamentToDto(destinatari);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public NotificacioEnviamentDto enviamentFindAmbReferencia(String referencia) {
-		logger.debug("Consulta de destinatari donada la referència (" +
-				"referencia=" + referencia + ")");
-		NotificacioEnviamentEntity destinatari =
-				notificacioDestinatariRepository.findByNotificaReferencia(
-						referencia);
 		return enviamentToDto(destinatari);
 	}
 
@@ -199,25 +191,27 @@ public class NotificacioServiceImpl implements NotificacioService {
 				true,
 				true);
 		return conversioTipusHelper.convertirList(
-				notificacioEventRepository.findByNotificacioIdOrderByDataDesc(notificacioId),
+				notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacioId),
 				NotificacioEventDto.class);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<NotificacioEventDto> eventFindAmbNotificacioIEnviament(
+	public List<NotificacioEventDto> eventFindAmbEnviament(
 			Long notificacioId,
 			Long enviamentId) {
 		logger.debug("Consulta dels events associats a un destinatari (" +
 				"notificacioId=" + notificacioId + ", " + 
 				"enviamentId=" + enviamentId + ")");
-		NotificacioEnviamentEntity destinatari = notificacioDestinatariRepository.findOne(enviamentId);
+		NotificacioEnviamentEntity destinatari = notificacioEnviamentRepository.findOne(enviamentId);
 		entityComprovarHelper.comprovarPermisos(
 				destinatari.getNotificacio().getId(),
 				true,
 				true);
 		return conversioTipusHelper.convertirList(
-				notificacioEventRepository.findByEnviamentIdOrderByDataDesc(enviamentId),
+				notificacioEventRepository.findByNotificacioIdOrEnviamentIdOrderByDataAsc(
+						notificacioId,
+						enviamentId),
 				NotificacioEventDto.class);
 	}
 
@@ -243,15 +237,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public ArxiuDto enviamentGetCertificacioArxiu(
 			Long enviamentId) {
 		NotificacioEnviamentEntity enviament =
-				notificacioDestinatariRepository.findOne(enviamentId);
+				notificacioEnviamentRepository.findOne(enviamentId);
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		pluginHelper.gestioDocumentalGet(
 				enviament.getNotificaCertificacioArxiuId(),
 				PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
 				output);
 		return new ArxiuDto(
-				enviament.getNotificaCertificacioArxiuId(),
-				enviament.getNotificaCertificacioArxiuTipus().toString(),
+				calcularNomArxiuCertificacio(enviament),
+				enviament.getNotificaCertificacioMime(),
 				output.toByteArray(),
 				output.size());
 	}
@@ -261,35 +255,50 @@ public class NotificacioServiceImpl implements NotificacioService {
 			Long notificacioId) {
 		logger.debug("Intentant enviament de la notificació pendent (" +
 				"notificacioId=" + notificacioId + ")");
-		boolean enviada = notificaHelper.enviament(notificacioId);
-		/*if (enviada && pluginHelper.isSeuPluginDisponible()) {
-			List<NotificacioEnviamentEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
-					new NotificacioDestinatariEstatEnumDto[] {
-							NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT});
-			for (NotificacioEnviamentEntity pendent: pendents) {
-				seuHelper.enviament(pendent.getId());
-			}
-		}*/
-		return enviada;
+		return notificaHelper.notificacioEnviar(notificacioId);
 	}
 
 	@Override
 	@Transactional
-	public NotificaRespostaEstatDto enviamentRefrescarEstat(
-			Long destinatariId) {
-		logger.debug("Refrescant l'estat de la notificació amb informació de Notific@ (" +
-				"destinatariId=" + destinatariId + ")");
-		NotificacioEnviamentEntity destinatari = notificacioDestinatariRepository.findOne(destinatariId);
-		return notificaHelper.refrescarEstat(destinatari);
+	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(
+			Long enviamentId) {
+		logger.debug("Refrescant l'estat de la notificació de Notific@ (" +
+				"enviamentId=" + enviamentId + ")");
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+		notificaHelper.enviamentRefrescarEstat(enviament.getId());
+		NotificacioEnviamenEstatDto estatDto = conversioTipusHelper.convertir(
+				enviament,
+				NotificacioEnviamenEstatDto.class);
+		estatCalcularCampsAddicionals(
+				enviament,
+				estatDto);
+		return estatDto;
 	}
 
 	@Override
 	@Transactional
 	public boolean enviamentComunicacioSeu(
-			Long destinatariId) {
+			Long enviamentId) {
 		logger.debug("Enviant canvi d'estat de la seu electrònica a Notific@ (" +
-				"destinatariId=" + destinatariId + ")");
-		return notificaHelper.comunicacioSeu(destinatariId);
+				"enviamentId=" + enviamentId + ")");
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+		return notificaHelper.enviamentComunicacioSeu(
+				enviament.getId(),
+				new Date());
+	}
+
+	@Override
+	@Transactional
+	public boolean enviamentCertificacioSeu(
+			Long enviamentId,
+			ArxiuDto certificacioArxiu) {
+		logger.debug("Enviant certificació de la seu electrònica a Notific@ (" +
+				"enviamentId=" + enviamentId + ")");
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+		return notificaHelper.enviamentCertificacioSeu(
+				enviament.getId(),
+				certificacioArxiu,
+				new Date());
 	}
 
 	@Override
@@ -304,7 +313,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!pendents.isEmpty()) {
 				logger.debug("Realitzant enviaments a Notifica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
 				for (NotificacioEntity pendent: pendents) {
-					notificaHelper.enviament(pendent.getId());
+					notificaHelper.notificacioEnviar(pendent.getId());
 				}
 			} else {
 				logger.debug("No hi ha notificacions pendents d'enviar a la seu electrònica");
@@ -322,7 +331,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		logger.debug("Cercant notificacions pendents d'enviar a la seu electrònica");
 		if (pluginHelper.isSeuPluginDisponible() && isTasquesActivesProperty() && pluginHelper.isSeuPluginDisponible()) {
 			int maxPendents = getSeuEnviamentsProcessarMaxProperty();
-			List<NotificacioEnviamentEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInAndMaxReintentsOrderBySeuDataNotificaDarreraPeticioAsc(
+			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findBySeuEstatInAndMaxReintentsOrderBySeuDataNotificaDarreraPeticioAsc(
 					new NotificacioEnviamentEstatEnumDto[] {NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT},
 					3,
 					new PageRequest(0, maxPendents));
@@ -346,7 +355,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		logger.debug("Cercant notificacions pendents de consulta d'estat a la seu electrònica");
 		if (pluginHelper.isSeuPluginDisponible() && isTasquesActivesProperty() && pluginHelper.isSeuPluginDisponible()) {
 			int maxPendents = getSeuJustificantsProcessarMaxProperty();
-			List<NotificacioEnviamentEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInAndMaxReintentsOrderBySeuDataNotificaDarreraPeticioAsc(
+			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findBySeuEstatInAndMaxReintentsOrderBySeuDataNotificaDarreraPeticioAsc(
 					new NotificacioEnviamentEstatEnumDto[] {NotificacioEnviamentEstatEnumDto.NOTIB_ENVIADA},
 					3,
 					new PageRequest(0, maxPendents));
@@ -356,7 +365,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				for (NotificacioEnviamentEntity pendent: pendents) {
 					boolean estatActualitzat = seuHelper.consultaEstat(pendent.getId());
 					if (estatActualitzat) {
-						notificaHelper.comunicacioSeu(pendent.getId());
+						notificaHelper.enviamentComunicacioSeu(pendent.getId(), null);
 					}
 				}
 			} else {
@@ -371,10 +380,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			fixedRateString = "${config:es.caib.notib.tasca.seu.notifica.estat.periode}",
 			initialDelayString = "${config:es.caib.notib.tasca.retard.inicial}")
 	public void seuNotificaComunicarEstatPendents() {
-		logger.debug("Cercant notificacions provinents de la seu pendents d'actualització d'estat a Notifica");
+		logger.debug("Cercant notificacions de la seu pendents d'actualitzar l'estat a Notifica");
 		if (pluginHelper.isSeuPluginDisponible() && isTasquesActivesProperty() && pluginHelper.isSeuPluginDisponible()) {
 			int maxPendents = getSeuNotificaEstatProcessarMaxProperty();
-			List<NotificacioEnviamentEntity> pendents = notificacioDestinatariRepository.findBySeuEstatInAndMaxReintentsOrderBySeuDataNotificaDarreraPeticioAsc(
+			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findBySeuEstatInAndMaxReintentsOrderBySeuDataNotificaDarreraPeticioAsc(
 					new NotificacioEnviamentEstatEnumDto[] {
 							NotificacioEnviamentEstatEnumDto.LLEGIDA,
 							NotificacioEnviamentEstatEnumDto.REBUTJADA},
@@ -383,13 +392,36 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!pendents.isEmpty()) {
 				logger.debug("Realitzant actualització d'estat a Notifica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
 				for (NotificacioEnviamentEntity pendent: pendents) {
-					notificaHelper.comunicacioSeu(pendent.getId());
+					notificaHelper.enviamentComunicacioSeu(pendent.getId(), null);
 				}
 			} else {
 				logger.debug("No hi ha notificacions pendents d'actualització d'estat a Notifica");
 			}
 		} else {
 			logger.warn("La connexió amb la seu electrònica no està activa i no es realitzarà cap enviament");
+		}
+	}
+
+	@Override
+	@Scheduled(
+			fixedRateString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.periode}",
+			initialDelayString = "${config:es.caib.notib.tasca.retard.inicial}")
+	public void enviamentRefrescarEstatPendents() {
+		logger.debug("Cercant enviaments pendents de refrescar l'estat de Notifica");
+		if (isTasquesActivesProperty() && notificaHelper.isConnexioNotificaDisponible()) {
+			int maxPendents = getEnviamentActualitzacioEstatProcessarMaxProperty();
+			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByNotificaEstatFinalFalseOrderByEstatDataActualitzacioAsc(
+					new PageRequest(0, maxPendents));
+			if (!pendents.isEmpty()) {
+				logger.debug("Realitzant refresc de l'estat de Notifica per a " + pendents.size() + " enviaments (màxim=" + maxPendents + ")");
+				for (NotificacioEnviamentEntity pendent: pendents) {
+					notificaHelper.enviamentRefrescarEstat(pendent.getId());
+				}
+			} else {
+				logger.debug("No hi ha enviaments pendents de refrescar l'estat de Notifica");
+			}
+		} else {
+			logger.warn("La connexió amb Notific@ no està activa i no es realitzarà cap refresca d'estat");
 		}
 	}
 
@@ -403,7 +435,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		for (int i = 0; i < enviaments.size(); i++) {
 			NotificacioEnviamentEntity destinatariEntity = enviaments.get(i);
 			NotificacioEnviamentDto destinatariDto = destinatarisDto.get(i);
-			destinatariEmplenarDadesAddicionals(
+			destinatariCalcularCampsAddicionals(
 					destinatariEntity,
 					destinatariDto);
 		}
@@ -415,32 +447,56 @@ public class NotificacioServiceImpl implements NotificacioService {
 		NotificacioEnviamentDto destinatariDto = conversioTipusHelper.convertir(
 				enviament,
 				NotificacioEnviamentDto.class);
-		destinatariEmplenarDadesAddicionals(
+		destinatariCalcularCampsAddicionals(
 				enviament,
 				destinatariDto);
 		return destinatariDto;
 	}
 
-	private void destinatariEmplenarDadesAddicionals(
+	private void destinatariCalcularCampsAddicionals(
 			NotificacioEnviamentEntity enviament,
 			NotificacioEnviamentDto enviamentDto) {
-		enviamentDto.setEstat(enviament.getNotificaEstat());
 		if (enviament.isNotificaError()) {
-			enviamentDto.setNotificaError(true);
 			NotificacioEventEntity event = enviament.getNotificaErrorEvent();
 			if (event != null) {
 				enviamentDto.setNotificaErrorData(event.getData());
-				enviamentDto.setNotificaErrorError(event.getErrorDescripcio());
+				enviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
 			}
 		}
 		if (enviament.isSeuError()) {
-			enviamentDto.setSeuError(true);
 			NotificacioEventEntity event = enviament.getSeuErrorEvent();
 			if (event != null) {
 				enviamentDto.setSeuErrorData(event.getData());
-				enviamentDto.setSeuErrorError(event.getErrorDescripcio());
+				enviamentDto.setSeuErrorDescripcio(event.getErrorDescripcio());
 			}
 		}
+		enviamentDto.setNotificaCertificacioArxiuNom(
+				calcularNomArxiuCertificacio(enviament));
+	}
+	private void estatCalcularCampsAddicionals(
+			NotificacioEnviamentEntity enviament,
+			NotificacioEnviamenEstatDto estatDto) {
+		if (enviament.isNotificaError()) {
+			NotificacioEventEntity event = enviament.getNotificaErrorEvent();
+			if (event != null) {
+				estatDto.setNotificaErrorData(event.getData());
+				estatDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
+			}
+		}
+		if (enviament.isSeuError()) {
+			NotificacioEventEntity event = enviament.getSeuErrorEvent();
+			if (event != null) {
+				estatDto.setSeuErrorData(event.getData());
+				estatDto.setSeuErrorDescripcio(event.getErrorDescripcio());
+			}
+		}
+		estatDto.setNotificaCertificacioArxiuNom(
+				calcularNomArxiuCertificacio(enviament));
+	}
+
+	private String calcularNomArxiuCertificacio(
+			NotificacioEnviamentEntity enviament) {
+		return "certificacio_" + enviament.getNotificaIdentificador() + ".pdf";
 	}
 
 	private int getNotificaEnviamentsProcessarMaxProperty() {
@@ -461,6 +517,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private int getSeuNotificaEstatProcessarMaxProperty() {
 		return propertiesHelper.getAsInt(
 				"es.caib.notib.tasca.seu.notifica.estat.processar.max",
+				10);
+	}
+	private int getEnviamentActualitzacioEstatProcessarMaxProperty() {
+		return propertiesHelper.getAsInt(
+				"es.caib.notib.tasca.enviament.actualitzacio.estat.processar.max",
 				10);
 	}
 

@@ -42,7 +42,6 @@ import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaRespostaCertificacioDto;
 import es.caib.notib.core.api.dto.NotificaRespostaDatatDto;
 import es.caib.notib.core.api.dto.NotificaRespostaDatatDto.NotificaRespostaDatatEventDto;
-import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
@@ -51,6 +50,7 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.wsdl.notificaV1.ArrayOfTipoDestinatario;
@@ -89,6 +89,8 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
+	@Autowired
+	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 
 	@Autowired
 	private PluginHelper pluginHelper;
@@ -96,7 +98,7 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 
 
 	@Transactional
-	public boolean enviament(
+	public boolean notificacioEnviar(
 			Long notificacioId) {
 		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
 		notificacio.updateNotificaNouEnviament();
@@ -173,10 +175,11 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 		return NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat());
 	}
 
-	public NotificaRespostaEstatDto refrescarEstat(
-			NotificacioEnviamentEntity enviament) throws SistemaExternException {
+	public boolean enviamentRefrescarEstat(
+			Long enviamentId) throws SistemaExternException {
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		NotificaRespostaDatatDto respostaDatat = enviamentDatat(enviament);
-		enviament.updateNotificaDatat(
+		enviamentUpdateDatat(
 				getEstatNotifica(respostaDatat.getEstatActual()),
 				respostaDatat.getDataActualitzacio(),
 				respostaDatat.getEstatActualDescripcio(),
@@ -184,19 +187,15 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 				null,
 				null,
 				respostaDatat.getNumSeguiment(),
-				null);
+				null,
+				enviament);
 		enviament.updateNotificaError(false, null);
-		NotificaRespostaEstatDto resposta = new NotificaRespostaEstatDto();
-		resposta.setData(respostaDatat.getDataActualitzacio());
-		resposta.setEstatCodi(respostaDatat.getEstatActual());
-		resposta.setEstatDescripcio(respostaDatat.getEstatActualDescripcio());
-		resposta.setNumSeguiment(respostaDatat.getNumSeguiment());
 		if (isEstatFinal(respostaDatat.getEstatActual())) {
 			//NotificaRespostaCertificacioDto respostaCertificacio = enviamentCertificacio(destinatari);
 			enviamentCertificacio(enviament);
 			// TODO
 		}
-		return resposta;
+		return true;
 	}
 
 
@@ -267,7 +266,7 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 			TipoDestinatario destinatario = new TipoDestinatario();
 			if (enviament.getNotificaReferencia() == null) {
 				enviament.updateNotificaReferencia(
-						xifrarIdPerNotifica(enviament.getId()));
+						xifrarId(enviament.getId()));
 			}
 			destinatario.setReferenciaEmisor(enviament.getNotificaReferencia());
 			TipoPersonaDestinatario personaTitular = new TipoPersonaDestinatario();
@@ -780,7 +779,7 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 	private NotificaWsPortType getNotificaWs() throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
 		NotificaWsPortType port = new WsClientHelper<NotificaWsPortType>().generarClientWs(
 				getClass().getResource("/es/caib/notib/core/wsdl/NotificaWS.wsdl"),
-				getUrlProperty(),
+				getNotificaUrlProperty(),
 				new QName(
 						"https://administracionelectronica.gob.es/notifica/ws/notifica/1.0/", 
 						"NotificaWsService"),

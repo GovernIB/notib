@@ -4,13 +4,17 @@
 package es.caib.notib.core.helper;
 
 import java.security.GeneralSecurityException;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.notib.core.api.dto.NotificaRespostaEstatDto;
+import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+//github.com/GovernIB/notib.git
+//github.com/GovernIB/notib.git
 import es.caib.notib.core.api.exception.SistemaExternException;
-import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 
 /**
@@ -27,35 +31,43 @@ public class NotificaHelper {
 	private NotificaV2Helper notificaV2Helper;
 
 
-
-	public boolean enviament(
+	@Transactional
+	public boolean notificacioEnviar(
 			Long notificacioId) {
-		return getNotificaHelper().enviament(notificacioId);
+		return getNotificaHelper().notificacioEnviar(notificacioId);
 	}
 
-	public NotificaRespostaEstatDto refrescarEstat(
-			NotificacioEnviamentEntity destinatari) throws SistemaExternException {
-		return getNotificaHelper().refrescarEstat(destinatari);
+	@Transactional
+	public boolean enviamentRefrescarEstat(
+			Long enviamentId) throws SistemaExternException {
+		return getNotificaHelper().enviamentRefrescarEstat(enviamentId);
 	}
 
-	public boolean comunicacioSeu(
-			Long notificacioDestinatariId) {
-		return getNotificaHelper().comunicacioSeu(notificacioDestinatariId);
+	@Transactional
+	public boolean enviamentComunicacioSeu(
+			Long enviamentId,
+			Date comunicacioData) {
+		return getNotificaHelper().enviamentComunicacioSeu(
+				enviamentId,
+				comunicacioData);
 	}
 
-	public String generarIdentificadorNotificacio(
-			NotificacioEntity notificacio) throws GeneralSecurityException {
-		return getNotificaHelper().xifrarIdPerNotifica(notificacio.getId());
+	@Transactional
+	public boolean enviamentCertificacioSeu(
+			Long enviamentId,
+			ArxiuDto certificacioArxiu,
+			Date certificacioData) {
+		return getNotificaHelper().enviamentCertificacioSeu(
+				enviamentId,
+				certificacioArxiu,
+				certificacioData);
 	}
 
-	public Long obtenirIdNotificacioAmbIdentificador(
-			String identificador) throws GeneralSecurityException {
-		return getNotificaHelper().desxifrarIdPerNotifica(identificador);
+	public String xifrarId(Long id) throws GeneralSecurityException {
+		return getNotificaHelper().xifrarId(id);
 	}
-
-	public String generarReferenciaDestinatari(
-			NotificacioEnviamentEntity notificacioDestinatari) throws GeneralSecurityException {
-		return getNotificaHelper().xifrarIdPerNotifica(notificacioDestinatari.getId());
+	public Long desxifrarId(String identificador) throws GeneralSecurityException {
+		return getNotificaHelper().desxifrarId(identificador);
 	}
 
 	public boolean isConnexioNotificaDisponible() {
@@ -64,6 +76,28 @@ public class NotificaHelper {
 
 	public boolean isAdviserActiu() {
 		return getNotificaHelper().isAdviserActiu();
+	}
+
+	public void enviamentUpdateDatat(
+			NotificacioEnviamentEstatEnumDto notificaEstat,
+			Date notificaEstatData,
+			String notificaEstatDescripcio,
+			String notificaDatatOrigen,
+			String notificaDatatReceptorNif,
+			String notificaDatatReceptorNom,
+			String notificaDatatNumSeguiment,
+			String notificaDatatErrorDescripcio,
+			NotificacioEnviamentEntity enviament) {
+		getNotificaHelper().enviamentUpdateDatat(
+				notificaEstat,
+				notificaEstatData,
+				notificaEstatDescripcio,
+				notificaDatatOrigen,
+				notificaDatatReceptorNif,
+				notificaDatatReceptorNom,
+				notificaDatatNumSeguiment,
+				notificaDatatErrorDescripcio,
+				enviament);
 	}
 
 

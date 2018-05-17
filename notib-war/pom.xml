@@ -182,12 +182,16 @@
 		<profile>
 			<id>tomcat</id>
 			<activation>
+				<file>
+					<exists>appserv_tomcat</exists>
+				</file>
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
 				<application.context>application-context-tomcat.xml</application.context>
 				<enable.tomcat.ws.start>--&gt;</enable.tomcat.ws.start>
 				<enable.tomcat.ws.end>&lt;!--</enable.tomcat.ws.end>
+				<webjars.classpath>classpath:</webjars.classpath>
 			</properties>
 			<dependencies>
 				<dependency>
@@ -249,10 +253,14 @@
 		<profile>
 			<id>jboss</id>
 			<activation>
+				<file>
+					<missing>appserv_tomcat</missing>
+				</file>
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
 				<application.context>application-context-jboss.xml</application.context>
+				<webjars.classpath></webjars.classpath>
 			</properties>
 			<dependencies>
 				<dependency>
@@ -322,6 +330,7 @@
 							<directory>${basedir}/src/main/webapp/WEB-INF</directory>
 							<includes>
 								<include>web.xml</include>
+								<include>notib-servlet.xml</include>
 							</includes>
 							<targetPath>WEB-INF</targetPath>
 							<filtering>true</filtering>
