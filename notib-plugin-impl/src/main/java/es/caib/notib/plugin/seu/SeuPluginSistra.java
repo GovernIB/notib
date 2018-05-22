@@ -242,8 +242,9 @@ public class SeuPluginSistra implements SeuPlugin {
 	public SeuNotificacioResultat notificacioCrear(
 			String expedientIdentificador,
 			String unitatAdministrativa,
+			String registreLlibre,
 			String registreOficinaCodi,
-			String registreOficinaOrganCodi,
+			String registreOrganCodi,
 			SeuPersona destinatari,
 			SeuPersona representat,
 			String idioma,
@@ -268,8 +269,8 @@ public class SeuPluginSistra implements SeuPlugin {
 			datosExpediente.setClaveExpediente(clauSistra);
 			notificacion.setDatosExpediente(datosExpediente);
 			OficinaRegistral oficinaRegistral = new OficinaRegistral();
-			oficinaRegistral.setCodigoOficina(registreOficinaCodi);
-			oficinaRegistral.setCodigoOrgano(registreOficinaOrganCodi);
+			oficinaRegistral.setCodigoOficina(registreLlibre + "." + registreOficinaCodi);
+			oficinaRegistral.setCodigoOrgano(registreOrganCodi);
 			notificacion.setOficinaRegistral(oficinaRegistral);
 			DatosInteresado datosInteresado = new DatosInteresado();
 			datosInteresado.setNif(destinatari.getNif());

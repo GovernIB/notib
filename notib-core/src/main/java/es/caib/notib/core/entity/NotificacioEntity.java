@@ -4,7 +4,9 @@
 package es.caib.notib.core.entity;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -23,11 +25,12 @@ import javax.persistence.TemporalType;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
+import es.caib.notib.core.helper.PluginHelper;
 
 /**
  * Classe del model de dades que representa una notificació.
@@ -93,10 +96,14 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private String seuExpedientIdentificadorEni;
 	@Column(name = "seu_exp_titol", length = 256, nullable = false)
 	private String seuExpedientTitol;
+	@Column(name = "seu_proc_codi", length = 256, nullable = false)
+	private String seuProcedimentCodi;
 	@Column(name = "seu_reg_oficina", length = 256, nullable = false)
 	private String seuRegistreOficina;
 	@Column(name = "seu_reg_llibre", length = 256, nullable = false)
 	private String seuRegistreLlibre;
+	@Column(name = "seu_reg_organ", length = 256, nullable = false)
+	private String seuRegistreOrgan;
 	@Column(name = "seu_idioma", length = 256, nullable = false)
 	private String seuIdioma;
 	@Column(name = "seu_avis_titol", length = 256, nullable = false)
@@ -118,9 +125,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private Date notificaEnviamentData;
 	@Column(name = "not_env_intent")
 	private int notificaEnviamentIntent;
-	@Column(name = "not_reenv_data")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date notificaReenviamentData;
 	@ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "not_error_event_id")
 	@ForeignKey(name = "not_noterrevent_notificacio_fk")
@@ -254,14 +258,17 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public int getNotificaEnviamentIntent() {
 		return notificaEnviamentIntent;
 	}
-	public Date getNotificaReenviamentData() {
-		return notificaReenviamentData;
-	}
 	public NotificacioEventEntity getNotificaErrorEvent() {
 		return notificaErrorEvent;
 	}
 	public List<NotificacioEnviamentEntity> getEnviaments() {
 		return enviaments;
+	}
+	public String getSeuProcedimentCodi() {
+		return seuProcedimentCodi;
+	}
+	public String getSeuRegistreOrgan() {
+		return seuRegistreOrgan;
 	}
 	public List<NotificacioEventEntity> getEvents() {
 		return events;
@@ -280,8 +287,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		this.estat = estat;
 	}
 	public void updateNotificaNouEnviament() {
-		this.notificaEnviamentData = new Date();
 		this.notificaEnviamentIntent++;
+		Calendar cal = GregorianCalendar.getInstance();
+		cal.add(Calendar.MILLISECOND, PluginHelper.reintentsPeriodeNotifica*(2^notificaEnviamentIntent));
+		this.notificaEnviamentData = cal.getTime();
 	}
 	public void updateNotificaError(
 			NotificacioErrorTipusEnumDto errorTipus,
@@ -347,6 +356,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.documentGenerarCsv = documentGenerarCsv;
 			built.estat = NotificacioEstatEnumDto.PENDENT;
 			built.notificaEnviamentIntent = 0;
+			built.notificaEnviamentData = new Date();
 		}
 		public Builder descripcio(String descripcio) {
 			built.descripcio = descripcio;
@@ -428,6 +438,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.seuRegistreOficina = seuRegistreOficina;
 			return this;
 		}
+		public Builder seuRegistreOrgan(String seuRegistreOrgan) {
+			built.seuRegistreOrgan = seuRegistreOrgan;
+			return this;
+		}
 		public Builder seuIdioma(String seuIdioma) {
 			built.seuIdioma = seuIdioma;
 			return this;
@@ -438,6 +452,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		}
 		public Builder seuExpedientIdentificadorEni(String seuExpedientIdentificadorEni) {
 			built.seuExpedientIdentificadorEni = seuExpedientIdentificadorEni;
+			return this;
+		}
+		public Builder seuProcedimentCodi(String seuProcedimentCodi) {
+			built.seuProcedimentCodi = seuProcedimentCodi;
 			return this;
 		}
 		public NotificacioEntity build() {

@@ -88,6 +88,7 @@ public interface SeuPlugin {
 	public SeuNotificacioResultat notificacioCrear(
 			String expedientIdentificador,
 			String unitatAdministrativa,
+			String registreLlibre,
 			String registreOficinaCodi,
 			String registreOrganCodi,
 			SeuPersona destinatari,

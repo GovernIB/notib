@@ -64,8 +64,9 @@ public class SeuPluginMock implements SeuPlugin {
 	public SeuNotificacioResultat notificacioCrear(
 			String expedientIdentificador,
 			String unitatAdministrativa,
+			String registreLlibre,
 			String registreOficinaCodi,
-			String registreOficinaOrganCodi,
+			String registreOrganCodi,
 			SeuPersona destinatari,
 			SeuPersona representat,
 			String idioma,
@@ -86,8 +87,9 @@ public class SeuPluginMock implements SeuPlugin {
 					"identificadorSistra=" + expedientIdentificador + ", " +
 					"clauSistra=" + clauSistra + ", " +
 					"unitatAdministrativa=" + unitatAdministrativa + ", " +
+					"registreLlibre=" + registreLlibre + ", " +
 					"registreOficinaCodi=" + registreOficinaCodi + ", " +
-					"registreOficinaOrganCodi=" + registreOficinaOrganCodi + ", " +
+					"registreOrganCodi=" + registreOrganCodi + ", " +
 					"destinatari=" + destinatari + ", " +
 					"representat=" + representat + ", " +
 					"idioma=" + idioma + ", " +

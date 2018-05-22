@@ -14,9 +14,11 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -48,8 +50,6 @@ public class PluginHelper {
 
 	@Autowired
 	private IntegracioHelper integracioHelper;
-
-
 
 	public DadesUsuari dadesUsuariConsultarAmbCodi(
 			String usuariCodi) {
@@ -272,6 +272,7 @@ public class PluginHelper {
 		accioParams.put("avisTitol", notificacio.getSeuAvisTitol());
 		accioParams.put("oficiTitol", notificacio.getSeuOficiTitol());
 		accioParams.put("destinatariNif", notificacioDestinatari.getDestinatariNif());
+		boolean isNotificacio = NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus());
 		long t0 = System.currentTimeMillis();
 		try {
 			SeuPersona destinatari = new SeuPersona();
@@ -291,7 +292,7 @@ public class PluginHelper {
 			getSeuPlugin().comprovarExpedientCreat(
 					notificacio.getSeuExpedientIdentificadorEni(),
 					notificacio.getSeuExpedientUnitatOrganitzativa(),
-					notificacio.getProcedimentCodiSia(),
+					notificacio.getSeuProcedimentCodi(),
 					notificacio.getSeuIdioma(),
 					notificacio.getSeuExpedientTitol(),
 					destinatari,
@@ -315,6 +316,7 @@ public class PluginHelper {
 					notificacio.getSeuExpedientUnitatOrganitzativa(),
 					notificacio.getSeuRegistreLlibre(),
 					notificacio.getSeuRegistreOficina(),
+					notificacio.getSeuRegistreOrgan(),
 					destinatari,
 					representat,
 					notificacio.getSeuIdioma(),
@@ -323,7 +325,7 @@ public class PluginHelper {
 					notificacio.getSeuAvisTitol(),
 					notificacio.getSeuAvisText(),
 					notificacio.getSeuAvisTextMobil(),
-					true,
+					isNotificacio,
 					annexos);
 			integracioHelper.addAccioOk(
 					IntegracioHelper.INTCODI_SEU,

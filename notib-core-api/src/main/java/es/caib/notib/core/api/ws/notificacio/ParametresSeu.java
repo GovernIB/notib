@@ -20,6 +20,8 @@ public class ParametresSeu {
 	private String expedientUnitatOrganitzativa;
 	private String expedientIdentificadorEni;
 	private String expedientTitol;
+	private String procedimentCodi;
+	private String registreOrgan;
 	private String registreOficina;
 	private String registreLlibre;
 	private String idioma;
@@ -101,7 +103,19 @@ public class ParametresSeu {
 	public void setOficiText(String oficiText) {
 		this.oficiText = oficiText;
 	}
-
+	public String getProcedimentCodi() {
+		return procedimentCodi;
+	}
+	public void setProcedimentCodi(String procedimentCodi) {
+		this.procedimentCodi = procedimentCodi;
+	}
+	public String getRegistreOrgan() {
+		return registreOrgan;
+	}
+	public void setRegistreOrgan(String registreOrgan) {
+		this.registreOrgan = registreOrgan;
+	}
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

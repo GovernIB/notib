@@ -27,6 +27,7 @@ import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.ws.notificacio.Certificacio;
+import es.caib.notib.core.api.ws.notificacio.ComunicacioTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.Document;
 import es.caib.notib.core.api.ws.notificacio.EntregaDeh;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostal;
@@ -186,9 +187,11 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			seuOficiText(parametresSeu.getOficiText()).
 			seuRegistreLlibre(parametresSeu.getRegistreLlibre()).
 			seuRegistreOficina(parametresSeu.getRegistreOficina()).
+			seuRegistreOrgan(parametresSeu.getRegistreOrgan()).
 			seuIdioma(parametresSeu.getIdioma()).
 			seuExpedientTitol(parametresSeu.getExpedientTitol()).
-			seuExpedientIdentificadorEni(parametresSeu.getExpedientIdentificadorEni());
+			seuExpedientIdentificadorEni(parametresSeu.getExpedientIdentificadorEni()).
+			seuProcedimentCodi(parametresSeu.getProcedimentCodi());
 		}
 		NotificacioEntity notificacioEntity = notificacioBuilder.build();
 		notificacioRepository.saveAndFlush(notificacioEntity);
@@ -322,6 +325,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 		notificacioRepository.saveAndFlush(notificacioEntity);
 		if (getEnviamentSincronProperty()) {
 			notificaHelper.notificacioEnviar(notificacioEntity.getId());
+			notificacioEntity = notificacioRepository.findOne(notificacioEntity.getId());
 		}
 		RespostaAlta resposta = new RespostaAlta();
 		try {
