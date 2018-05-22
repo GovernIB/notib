@@ -20,6 +20,8 @@ public class SeuNotificacioEstat {
 
 	private Date data;
 	private ZonaperJustificantEstat estat;
+	private Long fitxerCodi;
+	private String fitxerClau;
 
 
 
@@ -34,6 +36,18 @@ public class SeuNotificacioEstat {
 	}
 	public void setEstat(ZonaperJustificantEstat estat) {
 		this.estat = estat;
+	}
+	public Long getFitxerCodi() {
+		return fitxerCodi;
+	}
+	public void setFitxerCodi(Long fitxerCodi) {
+		this.fitxerCodi = fitxerCodi;
+	}
+	public String getFitxerClau() {
+		return fitxerClau;
+	}
+	public void setFitxerClau(String fitxerClau) {
+		this.fitxerClau = fitxerClau;
 	}
 
 }

@@ -18,6 +18,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 
+import es.caib.notib.ws.notificacio.ComunicacioTipusEnum;
 import es.caib.notib.ws.notificacio.Document;
 import es.caib.notib.ws.notificacio.EntregaDeh;
 import es.caib.notib.ws.notificacio.EntregaPostal;
@@ -43,9 +44,11 @@ public class ClientBaseTest {
 	protected static final String ENTITAT_DIR3CODI = "A04013511";
 //	protected static final String ORGAN_CODI = "A04013501";
 	protected static final String ORGAN_CODI = "A04013511";
-	protected static final String LLIBRE_OFICINA = "L99.O00009390";
+	protected static final String LLIBRE = "L99";
+	protected static final String OFICINA = "O00009390";
 	protected static final String UNITAT_ADMINISTRATIVA_SISTRA = "1";
 	protected static final String IDENTIFICADOR_PROCEDIMENT = "846823";
+	protected static final String IDENTIFICADOR_PROCEDIMENT_SISTRA = "IN0026NSPI";
 	protected static final String IDIOMA = "ca";
 
 	protected Notificacio generarNotificacio(
@@ -56,6 +59,8 @@ public class ClientBaseTest {
 		Notificacio notificacio = new Notificacio();
 		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
 		notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
+//		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
+		notificacio.setComunicacioTipus(ComunicacioTipusEnum.ASINCRON);
 		notificacio.setConcepte(
 				"concepte_" + notificacioId);
 		notificacio.setDescripcio(
@@ -150,10 +155,12 @@ public class ClientBaseTest {
 		ParametresSeu parametresSeu = new ParametresSeu();
 		parametresSeu.setExpedientSerieDocumental("0000S");
 		parametresSeu.setExpedientUnitatOrganitzativa(UNITAT_ADMINISTRATIVA_SISTRA);
-		parametresSeu.setExpedientIdentificadorEni("ES_" + ORGAN_CODI + "_2018_EXP_NOTIB" + "0000000000000000000000005");//+ String.format("%25s", notificacioId).replace(' ', '0'));
+		parametresSeu.setExpedientIdentificadorEni("ES_" + ORGAN_CODI + "_2018_EXP_NOTIB" + "0000000000000000000000006");//+ String.format("%25s", notificacioId).replace(' ', '0'));
 		parametresSeu.setExpedientTitol("seuExpedientTitol_" + notificacioId);
-		parametresSeu.setRegistreOficina(ORGAN_CODI);
-		parametresSeu.setRegistreLlibre(LLIBRE_OFICINA);
+		parametresSeu.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT_SISTRA);
+		parametresSeu.setRegistreLlibre(LLIBRE);
+		parametresSeu.setRegistreOficina(OFICINA);
+		parametresSeu.setRegistreOrgan(ORGAN_CODI);
 		parametresSeu.setIdioma(IDIOMA);
 		parametresSeu.setAvisTitol("seuAvisTitol_" + notificacioId);
 		parametresSeu.setAvisText("seuAvisText_" + notificacioId);

@@ -10,6 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.ejb.CreateException;
 import javax.management.InstanceNotFoundException;
@@ -27,6 +28,7 @@ import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.seu.SeuNotificacioEstat.ZonaperJustificantEstat;
 import es.caib.notib.plugin.utils.PropertiesHelper;
 import es.caib.notib.plugin.utils.WsClientHelper;
+import es.caib.redose.ws.v2.model.documentords.DocumentoRDS;
 import es.caib.regtel.ws.v2.model.aviso.Aviso;
 import es.caib.regtel.ws.v2.model.datosexpediente.DatosExpediente;
 import es.caib.regtel.ws.v2.model.datosinteresado.DatosInteresado;
@@ -39,6 +41,7 @@ import es.caib.regtel.ws.v2.model.documento.Documento;
 import es.caib.regtel.ws.v2.model.documento.Documentos;
 import es.caib.regtel.ws.v2.model.oficinaregistral.OficinaRegistral;
 import es.caib.regtel.ws.v2.model.oficioremision.OficioRemision;
+import es.caib.regtel.ws.v2.model.referenciards.ReferenciaRDS;
 import es.caib.regtel.ws.v2.model.resultadoregistro.ResultadoRegistro;
 import es.caib.zonaper.ws.v2.model.configuracionavisosexpediente.ConfiguracionAvisosExpediente;
 import es.caib.zonaper.ws.v2.model.documentoexpediente.DocumentoExpediente;
@@ -253,6 +256,7 @@ public class SeuPluginSistra implements SeuPlugin {
 			String avisTitol,
 			String avisText,
 			String avisTextSms,
+			Date dataCaducitat,
 			boolean confirmarRecepcio,
 			List<SeuDocument> annexos) throws SistemaExternException {
 		String clauSistra = "<buit>";
@@ -331,6 +335,21 @@ public class SeuPluginSistra implements SeuPlugin {
 				datosNotificacion.setAviso(aviso);
 			}
 			datosNotificacion.setAcuseRecibo(confirmarRecepcio);
+			if (confirmarRecepcio && dataCaducitat != null) {
+				
+				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+			    Date firstDate = sdf.parse(sdf.format(new Date()));
+			    Date secondDate = sdf.parse(sdf.format(dataCaducitat));
+			 
+			    long diffInMillies = Math.abs(secondDate.getTime() - firstDate.getTime());
+			    Long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
+				datosNotificacion.setPlazo(
+						newJAXBElement(
+						"plazo",
+						diff.intValue(),
+						Integer.class));
+			}
 			notificacion.setDatosNotificacion(datosNotificacion);
 			if (representat != null) {
 				DatosRepresentado datosRepresentado = new DatosRepresentado();
@@ -403,6 +422,13 @@ public class SeuPluginSistra implements SeuPlugin {
 				XMLGregorianCalendar cal = acuseRecibo.getFechaAcuseRecibo().getValue();
 				notificacioEstat.setData(cal.toGregorianCalendar().getTime());
 			}
+			if (acuseRecibo.getFicheroAcuseRecibo() != null) {
+				ReferenciaRDS referenciaRDS = acuseRecibo.getFicheroAcuseRecibo().getValue();
+				if (referenciaRDS != null) {
+					notificacioEstat.setFitxerCodi(referenciaRDS.getCodigo());
+					notificacioEstat.setFitxerClau(referenciaRDS.getClave());
+				}
+			}
 			if (acuseRecibo.getEstado() != null) {
 				switch (acuseRecibo.getEstado()) {
 				case ENTREGADA:
@@ -421,14 +447,42 @@ public class SeuPluginSistra implements SeuPlugin {
 			}
 			return notificacioEstat;
 		} catch (Exception ex) {
+			String msg = "No s'ha pogut obtenir el justificant de recepció (registreNumero=" + registreNumero;
+			if (ex.getMessage().contains("No existe notificacion"))
+				msg += ". No existeix la notificació";
+			msg += ")";
 			throw new SistemaExternException(
-					"No s'ha pogut obtenir el justificant de recepció (" +
-							"registreNumero=" + registreNumero + ")",
+					msg,
 					ex);
 		}
 	}
 
-
+	@Override
+	public SeuDocument notificacioObtenirFitxerJustificantRecepcio(
+			Long seuFitxerCodi, 
+			String seuFitxerClau) throws SistemaExternException {
+		
+		SeuDocument seuDocument = new SeuDocument();
+		try {
+			es.caib.redose.ws.v2.model.referenciards.ReferenciaRDS referencia = new es.caib.redose.ws.v2.model.referenciards.ReferenciaRDS();
+			referencia.setCodigo(seuFitxerCodi);
+			referencia.setClave(seuFitxerClau);
+			DocumentoRDS document = getRedoseWs().consultarDocumentoFormateado(
+					referencia,
+					null,
+					null);
+			
+			seuDocument.setArxiuNom(document.getNombreFichero());
+			seuDocument.setArxiuContingut(document.getDatosFichero());
+			seuDocument.setTitol(document.getTitulo());
+			
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'ha pogut obtenir el pdf del justificant de recepció (codi=" + seuFitxerCodi + ", clau=" + seuFitxerClau + ")",
+					ex);
+		}
+		return seuDocument;
+	}
 
 	private void comprovarZonaPersonalCreada(
 			SeuPersona persona) throws SistemaExternException {
@@ -485,6 +539,19 @@ public class SeuPluginSistra implements SeuPlugin {
 				getPassword(),
 				null,
 				es.caib.regtel.ws.v2.services.BackofficeFacade.class);
+	}
+	
+	private es.caib.redose.ws.v2.services.BackofficeFacade getRedoseWs() throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, MBeanProxyCreationException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
+		return new WsClientHelper<es.caib.redose.ws.v2.services.BackofficeFacade>().generarClientWs(
+				getClass().getResource("/es/caib/notib/plugin/wsdl/sistra/redose/BackofficeFacade.wsdl"),
+				getBaseUrl() + "/redosews/services/v2/BackofficeFacade",
+				new QName(
+						"urn:es:caib:redose:ws:v2:services",
+						"BackofficeFacadeService"),
+				getUsername(),
+				getPassword(),
+				null,
+				es.caib.redose.ws.v2.services.BackofficeFacade.class);
 	}
 
 	private <T> JAXBElement<T> newJAXBElement(

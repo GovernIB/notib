@@ -14,7 +14,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
@@ -50,6 +49,7 @@ public class PluginHelper {
 
 	@Autowired
 	private IntegracioHelper integracioHelper;
+
 
 	public DadesUsuari dadesUsuariConsultarAmbCodi(
 			String usuariCodi) {
@@ -325,6 +325,7 @@ public class PluginHelper {
 					notificacio.getSeuAvisTitol(),
 					notificacio.getSeuAvisText(),
 					notificacio.getSeuAvisTextMobil(),
+					notificacio.getCaducitat(),
 					isNotificacio,
 					annexos);
 			integracioHelper.addAccioOk(
@@ -374,6 +375,8 @@ public class PluginHelper {
 			return notificacioEstat;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de seu electrònica";
+			if (ex.getMessage().contains("No existeix la notificació"))
+				errorDescripcio = "Error al consultar la notificació. No existeix la notificació";
 			integracioHelper.addAccioError(
 					IntegracioHelper.INTCODI_SEU,
 					accioDescripcio,
@@ -387,6 +390,19 @@ public class PluginHelper {
 					errorDescripcio,
 					ex);
 		}
+	}
+	
+	public SeuDocument obtenirJustificant(NotificacioEnviamentEntity notificacioDestinatari) {
+		
+		SeuDocument seuDocument = null;
+		try {
+			seuDocument = getSeuPlugin().notificacioObtenirFitxerJustificantRecepcio(
+					notificacioDestinatari.getSeuFitxerCodi(),
+					notificacioDestinatari.getSeuFitxerClau());
+		} catch (Exception ex) {
+			// TODO: handle exception
+		}
+		return seuDocument;
 	}
 
 	/*public RespostaAnotacioRegistre registreSortida(Notificacio notificacio) {
@@ -665,7 +681,21 @@ public class PluginHelper {
 	private boolean getPropertyRegistrePluginObligatori() {
 		return "true".equals(PropertiesHelper.getProperties().getProperty("es.caib.notib.registre.sortida.obligatori"));
 	}*/
-	
+	public int getNotificaReintentsMaxProperty() {
+		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.notifica.enviaments.reintents.maxim", 5);
+	}
+	public int getNotificaReintentsPeriodeProperty() {
+		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.notifica.enviaments.periode", 300000);
+	}
+	public int getSeuReintentsMaxProperty() {
+		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.seu.enviaments.reintents.maxim", 5);
+	}
+	public int getSeuReintentsEnviamentPeriodeProperty() {
+		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.seu.enviaments.periode", 300000);
+	}
+	public int getSeuReintentsConsultaPeriodeProperty() {
+		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.seu.consulta.periode", 300000);
+	}
 	
 
 	private static final Logger logger = LoggerFactory.getLogger(PluginHelper.class);

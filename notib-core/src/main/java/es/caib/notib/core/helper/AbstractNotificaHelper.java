@@ -42,9 +42,11 @@ import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.api.dto.SeuEstatEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -56,6 +58,7 @@ import es.caib.notib.core.wsdl.seu.ComunicacionSede;
 import es.caib.notib.core.wsdl.seu.ResultadoCertificacionSede;
 import es.caib.notib.core.wsdl.seu.ResultadoComunicacionSede;
 import es.caib.notib.core.wsdl.seu.SedeWsPortType;
+import es.caib.notib.plugin.seu.SeuDocument;
 
 /**
  * Mètodes comuns per a accedir a Notific@.
@@ -69,6 +72,9 @@ public abstract class AbstractNotificaHelper {
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
+	
+	@Autowired
+	private PluginHelper pluginHelper;
 
 	private boolean modeTest;
 
@@ -79,6 +85,25 @@ public abstract class AbstractNotificaHelper {
 	public abstract boolean enviamentRefrescarEstat(
 			Long enviamentId) throws SistemaExternException;
 
+	
+	public boolean enviamentSeu(Long enviamentId) {
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+		NotificacioEntity notificacio = enviament.getNotificacio();
+		
+		if (NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
+			SeuDocument fitxer = pluginHelper.obtenirJustificant(enviament);
+			ArxiuDto certificacio = new ArxiuDto(
+					fitxer.getArxiuNom(), 
+					"application/pdf", 
+					fitxer.getArxiuContingut(), 
+					fitxer.getArxiuContingut().length);
+			return enviamentCertificacioSeu(enviamentId, certificacio, null);
+		} else {
+			return enviamentComunicacioSeu(enviamentId, null);
+		}
+		
+	}
+	
 	public boolean enviamentComunicacioSeu(
 			Long enviamentId,
 			Date comunicacioData) {
@@ -140,6 +165,7 @@ public abstract class AbstractNotificaHelper {
 			error = true;
 		}
 		enviament.updateSeuNotificaInformat();
+		enviament.updateNotificaFiOperacio();
 		notificacio.updateEventAfegir(event);
 		return !error;
 	}
@@ -155,9 +181,9 @@ public abstract class AbstractNotificaHelper {
 		try {
 			CertificacionSede certificacionSede = new CertificacionSede();
 			certificacionSede.setEnvioDestinatario(enviament.getNotificaIdentificador());
-			if (NotificacioEnviamentEstatEnumDto.LLEGIDA.equals(enviament.getSeuEstat())) {
+			if (SeuEstatEnumDto.LLEGIDA.equals(enviament.getSeuEstat())) {
 				certificacionSede.setEstado("notificada");
-			} else if (NotificacioEnviamentEstatEnumDto.REBUTJADA.equals(enviament.getSeuEstat())) {
+			} else if (SeuEstatEnumDto.REBUTJADA.equals(enviament.getSeuEstat())) {
 				certificacionSede.setEstado("rehusada");
 			}
 			Date fecha = enviament.getSeuDataFi();
@@ -170,7 +196,7 @@ public abstract class AbstractNotificaHelper {
 			certificacionSede.setHashDocumento(
 					Base64.encodeBase64String(
 							Hex.decodeHex(
-									DigestUtils.sha1Hex(certificacio.getContingut()).toCharArray())));
+									DigestUtils.sha256Hex(certificacio.getContingut()).toCharArray())));
 			//certificacionSede.setCsv(value);
 			certificacionSede.setOrganismoRemisor(notificacio.getEntitat().getDir3Codi());
 			ResultadoCertificacionSede resultadoCertificacion = getSedeWs().certificacionSede(certificacionSede);
@@ -216,6 +242,7 @@ public abstract class AbstractNotificaHelper {
 			error = true;
 		}
 		enviament.updateSeuNotificaInformat();
+		enviament.updateNotificaFiOperacio();
 		notificacio.updateEventAfegir(event);
 		return !error;
 	}
@@ -252,12 +279,13 @@ public abstract class AbstractNotificaHelper {
 			String notificaDatatNumSeguiment,
 			String notificaDatatErrorDescripcio,
 			NotificacioEnviamentEntity enviament) {
-		boolean estatFinal = NotificacioEnviamentEstatEnumDto.ABSENT.equals(notificaEstat) ||
-				NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA.equals(notificaEstat) ||
-				NotificacioEnviamentEstatEnumDto.ERROR_ENTREGA.equals(notificaEstat) ||
+		boolean estatFinal = 
+//				NotificacioEnviamentEstatEnumDto.ABSENT.equals(notificaEstat) ||
+//				NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA.equals(notificaEstat) ||
+//				NotificacioEnviamentEstatEnumDto.ERROR_ENTREGA.equals(notificaEstat) ||
 				NotificacioEnviamentEstatEnumDto.EXPIRADA.equals(notificaEstat) ||
-				NotificacioEnviamentEstatEnumDto.EXTRAVIADA.equals(notificaEstat) ||
-				NotificacioEnviamentEstatEnumDto.MORT.equals(notificaEstat) ||
+//				NotificacioEnviamentEstatEnumDto.EXTRAVIADA.equals(notificaEstat) ||
+//				NotificacioEnviamentEstatEnumDto.MORT.equals(notificaEstat) ||
 				NotificacioEnviamentEstatEnumDto.LLEGIDA.equals(notificaEstat) ||
 				NotificacioEnviamentEstatEnumDto.NOTIFICADA.equals(notificaEstat) ||
 				NotificacioEnviamentEstatEnumDto.REBUTJADA.equals(notificaEstat);

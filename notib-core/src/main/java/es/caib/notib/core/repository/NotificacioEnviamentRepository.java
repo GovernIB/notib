@@ -36,14 +36,46 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	NotificacioEnviamentEntity findByNotificacioEntitatAndNotificaIdentificador(
 			EntitatEntity entitat,
 			String notificaIdentificador);
-
+	
+	@Query(
+			"select env " +
+			"  from	NotificacioEnviamentEntity env " +
+			"  left	join env.notificacio as noti " +
+			" where	env.seuEstat = es.caib.notib.core.api.dto.SeuEstatEnumDto.PENDENT " +
+			"   and noti.estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.ENVIADA " +
+			"   and	(noti.enviamentDataProgramada is null or current_date() >= noti.enviamentDataProgramada) " +
+			"   and	env.intentNum < :maxReintents " +
+			"   and	env.seuIntentData is not null " +
+			" order	by env.seuIntentData ASC")
+	List<NotificacioEnviamentEntity> findBySeuEstatPendent(@Param("maxReintents")Integer maxReintents, Pageable pageable);
+	
+	@Query(
+			"  from	NotificacioEnviamentEntity " +
+			" where	seuEstat = es.caib.notib.core.api.dto.SeuEstatEnumDto.ENVIADA " +
+			// Excloem les notificacions ja processades per Notific@
+			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.NOTIFICADA " +
+			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.LLEGIDA " +
+			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.EXPIRADA " +
+			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REBUTJADA " +
+			"   and	seuIntentData is not null " +
+			" order	by seuIntentData ASC")
+	List<NotificacioEnviamentEntity> findBySeuEstatEnviat(Pageable pageable);
+	
+	@Query(
+			"  from	NotificacioEnviamentEntity " +
+			" where	seuEstat != es.caib.notib.core.api.dto.SeuEstatEnumDto.ENVIADA " +
+			"   and	seuDataNotificaInformat is null " +
+			"   and	seuIntentData is not null " +
+			" order	by seuIntentData ASC")
+	List<NotificacioEnviamentEntity> findBySeuEstatModificat(Pageable pageable);
+	
 	@Query(	"from " +
 			"    NotificacioEnviamentEntity " +
 			"where " +
 			"    seuEstat in (:seuEstat) " +
-			"and seuReintentsEnviament < :maxReintents " +
+			"and intentNum < :maxReintents " +
 			"order by " +
-			"    seuDataEnviament asc")
+			"    seuIntentData asc")
 	List<NotificacioEnviamentEntity> findBySeuEstatInAndMaxReintentsOrderBySeuDataNotificaDarreraPeticioAsc(
 			@Param("seuEstat") NotificacioEnviamentEstatEnumDto[] seuEstat,
 			@Param("maxReintents") int maxReintents,

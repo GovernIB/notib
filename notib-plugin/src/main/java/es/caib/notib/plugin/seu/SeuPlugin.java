@@ -1,5 +1,6 @@
 package es.caib.notib.plugin.seu;
 
+import java.util.Date;
 import java.util.List;
 
 import es.caib.notib.plugin.SistemaExternException;
@@ -79,6 +80,7 @@ public interface SeuPlugin {
 	 * @param avisTitol
 	 * @param avisText
 	 * @param avisTextSms
+	 * @param date 
 	 * @param confirmarRecepcio
 	 * @param annexos
 	 * @return les dades de la notificació creada
@@ -99,6 +101,7 @@ public interface SeuPlugin {
 			String avisTitol,
 			String avisText,
 			String avisTextSms,
+			Date dataCaducitat, 
 			boolean confirmarRecepcio,
 			List<SeuDocument> annexos) throws SistemaExternException;
 
@@ -112,5 +115,9 @@ public interface SeuPlugin {
 	 */
 	public SeuNotificacioEstat notificacioObtenirJustificantRecepcio(
 			String registreNumero) throws SistemaExternException;
+
+	public SeuDocument notificacioObtenirFitxerJustificantRecepcio(
+			Long seuFitxerCodi, 
+			String seuFitxerClau) throws SistemaExternException;
 
 }

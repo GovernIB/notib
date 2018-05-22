@@ -17,7 +17,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -30,7 +30,6 @@ import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
-import es.caib.notib.core.helper.PluginHelper;
 
 /**
  * Classe del model de dades que representa una notificació.
@@ -134,7 +133,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			fetch = FetchType.LAZY,
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
-	@OrderColumn(name="id")
+	@OrderBy(value="id")
 	private List<NotificacioEnviamentEntity> enviaments = new ArrayList<NotificacioEnviamentEntity>();
 	@OneToMany(
 			mappedBy = "notificacio",
@@ -286,10 +285,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			NotificacioEstatEnumDto estat) {
 		this.estat = estat;
 	}
-	public void updateNotificaNouEnviament() {
+	public void updateNotificaNouEnviament(int reintentsPeriodeNotifica) {
 		this.notificaEnviamentIntent++;
 		Calendar cal = GregorianCalendar.getInstance();
-		cal.add(Calendar.MILLISECOND, PluginHelper.reintentsPeriodeNotifica*(2^notificaEnviamentIntent));
+		cal.add(Calendar.MILLISECOND, reintentsPeriodeNotifica*(2^notificaEnviamentIntent));
 		this.notificaEnviamentData = cal.getTime();
 	}
 	public void updateNotificaError(

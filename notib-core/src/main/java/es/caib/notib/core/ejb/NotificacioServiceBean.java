@@ -138,18 +138,20 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-	public void seuNotificacionsPendents() {
-		delegate.seuNotificacionsPendents();
+	public void seuConsultaEstatNotificacions() {
+		delegate.seuConsultaEstatNotificacions();
 	}
 
 	@Override
-	public void seuNotificaComunicarEstatPendents() {
-		delegate.seuNotificaComunicarEstatPendents();
+	public void notificaInformaCanviEstatSeu() {
+		delegate.notificaInformaCanviEstatSeu();
 	}
-
+	
 	@Override
 	public void enviamentRefrescarEstatPendents() {
 		delegate.enviamentRefrescarEstatPendents();
 	}
+
+	
 
 }

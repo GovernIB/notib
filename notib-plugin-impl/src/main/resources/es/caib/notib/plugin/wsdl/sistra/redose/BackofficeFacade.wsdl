@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="BackofficeFacade" targetNamespace="urn:es:caib:redose:ws:v2:services" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:impl="urn:es:caib:redose:ws:v2:services" xmlns:intf="urn:es:caib:redose:ws:v2:model:BackofficeFacade" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns1="urn:es:caib:redose:ws:v2:model:DocumentoRDS" xmlns:tns2="urn:es:caib:redose:ws:v2:model:ReferenciaRDS" xmlns:tns3="urn:es:caib:redose:ws:v2:model:TransformacionRDS" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <types>
+<schema elementFormDefault="qualified" targetNamespace="urn:es:caib:redose:ws:v2:model:BackofficeFacade" version="1.0" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:impl="urn:es:caib:redose:ws:v2:services" xmlns:intf="urn:es:caib:redose:ws:v2:model:BackofficeFacade" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns1="urn:es:caib:redose:ws:v2:model:DocumentoRDS" xmlns:tns2="urn:es:caib:redose:ws:v2:model:ReferenciaRDS" xmlns:tns3="urn:es:caib:redose:ws:v2:model:TransformacionRDS" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+			<xsd:import namespace="urn:es:caib:redose:ws:v2:model:DocumentoRDS" schemaLocation="DocumentoRDS.xsd"/>
+			<xsd:import namespace="urn:es:caib:redose:ws:v2:model:TransformacionRDS" schemaLocation="TransformacionRDS.xsd"/>
+			<xsd:import namespace="urn:es:caib:redose:ws:v2:model:ReferenciaRDS" schemaLocation="ReferenciaRDS.xsd"/>
+			<xsd:element name="insertarDocumento">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="documento" type="tns1:DocumentoRDS"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="insertarDocumentoResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="insertarDocumentoReturn" type="tns2:ReferenciaRDS"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="insertarDocumentoConTransformacion">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="documento" type="tns1:DocumentoRDS"/>
+						<xsd:element name="transformacion" type="tns3:TransformacionRDS"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="insertarDocumentoConTransformacionResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="insertarDocumentoConTransformacionReturn" type="tns2:ReferenciaRDS"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="consultarDocumento">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="referencia" type="tns2:ReferenciaRDS"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="consultarDocumentoResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="consultarDocumentoReturn" type="tns1:DocumentoRDS"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="consultarDocumentoFormateado">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="referencia" type="tns2:ReferenciaRDS"/>
+						<xsd:element name="tipoPlantilla" type="xsd:string"/>
+						<xsd:element name="idioma" type="xsd:string"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="consultarDocumentoFormateadoResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="consultarDocumentoFormateadoReturn" type="tns1:DocumentoRDS"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<complexType name="BackofficeFacadeException">
+				<sequence/>
+			</complexType>
+			<xsd:element name="fault" type="intf:BackofficeFacadeException"/>
+		</schema>
+  </types>
+  <message name="insertarDocumentoRequest">
+    <part element="intf:insertarDocumento" name="parameters">
+    </part>
+  </message>
+  <message name="insertarDocumentoResponse">
+    <part element="intf:insertarDocumentoResponse" name="parameters">
+    </part>
+  </message>
+  <message name="consultarDocumentoFormateadoResponse">
+    <part element="intf:consultarDocumentoFormateadoResponse" name="parameters">
+    </part>
+  </message>
+  <message name="insertarDocumentoConTransformacionRequest">
+    <part element="intf:insertarDocumentoConTransformacion" name="parameters">
+    </part>
+  </message>
+  <message name="insertarDocumentoConTransformacionResponse">
+    <part element="intf:insertarDocumentoConTransformacionResponse" name="parameters">
+    </part>
+  </message>
+  <message name="consultarDocumentoFormateadoRequest">
+    <part element="intf:consultarDocumentoFormateado" name="parameters">
+    </part>
+  </message>
+  <message name="consultarDocumentoRequest">
+    <part element="intf:consultarDocumento" name="parameters">
+    </part>
+  </message>
+  <message name="BackofficeFacadeException">
+    <part element="intf:fault" name="fault">
+    </part>
+  </message>
+  <message name="consultarDocumentoResponse">
+    <part element="intf:consultarDocumentoResponse" name="parameters">
+    </part>
+  </message>
+  <portType name="BackofficeFacade">
+    <operation name="insertarDocumento">
+      <input message="impl:insertarDocumentoRequest" name="insertarDocumentoRequest">
+    </input>
+      <output message="impl:insertarDocumentoResponse" name="insertarDocumentoResponse">
+    </output>
+      <fault message="impl:BackofficeFacadeException" name="BackofficeFacadeException">
+    </fault>
+    </operation>
+    <operation name="insertarDocumentoConTransformacion">
+      <input message="impl:insertarDocumentoConTransformacionRequest" name="insertarDocumentoConTransformacionRequest">
+    </input>
+      <output message="impl:insertarDocumentoConTransformacionResponse" name="insertarDocumentoConTransformacionResponse">
+    </output>
+      <fault message="impl:BackofficeFacadeException" name="BackofficeFacadeException">
+    </fault>
+    </operation>
+    <operation name="consultarDocumento">
+      <input message="impl:consultarDocumentoRequest" name="consultarDocumentoRequest">
+    </input>
+      <output message="impl:consultarDocumentoResponse" name="consultarDocumentoResponse">
+    </output>
+      <fault message="impl:BackofficeFacadeException" name="BackofficeFacadeException">
+    </fault>
+    </operation>
+    <operation name="consultarDocumentoFormateado">
+      <input message="impl:consultarDocumentoFormateadoRequest" name="consultarDocumentoFormateadoRequest">
+    </input>
+      <output message="impl:consultarDocumentoFormateadoResponse" name="consultarDocumentoFormateadoResponse">
+    </output>
+      <fault message="impl:BackofficeFacadeException" name="BackofficeFacadeException">
+    </fault>
+    </operation>
+  </portType>
+  <binding name="BackofficeFacadeSoapBinding" type="impl:BackofficeFacade">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="insertarDocumento">
+      <soap:operation/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BackofficeFacadeException">
+        <soap:fault name="BackofficeFacadeException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="insertarDocumentoConTransformacion">
+      <soap:operation/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BackofficeFacadeException">
+        <soap:fault name="BackofficeFacadeException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="consultarDocumento">
+      <soap:operation/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BackofficeFacadeException">
+        <soap:fault name="BackofficeFacadeException" use="literal"/>
+      </fault>
+    </operation>
+    <operation name="consultarDocumentoFormateado">
+      <soap:operation/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="BackofficeFacadeException">
+        <soap:fault name="BackofficeFacadeException" use="literal"/>
+      </fault>
+    </operation>
+  </binding>
+  <service name="BackofficeFacadeService">
+    <port binding="impl:BackofficeFacadeSoapBinding" name="BackofficeFacade">
+      <soap:address location="http://spreesplin7.caib.es:48080/sistraback/redosews/services/v2/BackofficeFacade"/>
+    </port>
+  </service>
+</definitions>

@@ -75,6 +75,7 @@ public class SeuPluginMock implements SeuPlugin {
 			String avisTitol,
 			String avisText,
 			String avisTextSms,
+			Date dataCaducitat,
 			boolean confirmarRecepcio,
 			List<SeuDocument> annexos) throws SistemaExternException {
 		String clauSistra = "<buit>";
@@ -120,7 +121,13 @@ public class SeuPluginMock implements SeuPlugin {
 		return notificacioEstat;
 	}
 
-
+	@Override
+	public SeuDocument notificacioObtenirFitxerJustificantRecepcio(Long seuFitxerCodi, String seuFitxerClau)
+			throws SistemaExternException {
+		SeuDocument document = new SeuDocument();
+		document.setArxiuNom("nomDelFitxer.pdf");
+		return document;
+	}
 
 	private String getExpedientClau(
 			String expedientIdentificador,
@@ -138,5 +145,6 @@ public class SeuPluginMock implements SeuPlugin {
 	    }
 	    return hexString.toString().toUpperCase();
 	}
+
 
 }

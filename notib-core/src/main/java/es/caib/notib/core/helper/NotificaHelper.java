@@ -44,6 +44,13 @@ public class NotificaHelper {
 	}
 
 	@Transactional
+	public boolean enviamentSeu(
+			Long enviamentId,
+			Date comunicacioData) {
+		return getNotificaHelper().enviamentSeu(enviamentId);
+	}
+	
+	@Transactional
 	public boolean enviamentComunicacioSeu(
 			Long enviamentId,
 			Date comunicacioData) {
@@ -61,6 +68,11 @@ public class NotificaHelper {
 				enviamentId,
 				certificacioArxiu,
 				certificacioData);
+	}
+	
+	@Transactional
+	public boolean enviamentSeu(Long enviamentId) {
+		return getNotificaHelper().enviamentSeu(enviamentId);
 	}
 
 	public String xifrarId(Long id) throws GeneralSecurityException {

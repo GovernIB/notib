@@ -3,7 +3,9 @@
  */
 package es.caib.notib.core.entity;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,6 +30,7 @@ import es.caib.notib.core.api.dto.NotificaDomiciliTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.SeuEstatEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 
 /**
@@ -229,6 +232,11 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@JoinColumn(name = "notifica_error_event_id")
 	@ForeignKey(name = "not_noteve_noterr_notdest_fk")
 	private NotificacioEventEntity notificaErrorEvent;
+	
+	@Column(name = "notifica_intent_data")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date notificaIntentData;
+	
 	/* Seu CAIB */
 	@Column(name = "seu_reg_numero", length = 50)
 	private String seuRegistreNumero;
@@ -240,18 +248,13 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	private Date seuDataFi;
 	@Column(name = "seu_estat", nullable = false)
 	@Enumerated(EnumType.ORDINAL)
-	private NotificacioEnviamentEstatEnumDto seuEstat;
+	private SeuEstatEnumDto seuEstat;
 	@Column(name = "seu_error", nullable = false)
 	private boolean seuError;
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "seu_error_event_id")
 	@ForeignKey(name = "not_noteve_seuerr_notdest_fk")
 	private NotificacioEventEntity seuErrorEvent;
-	@Column(name = "seu_data_enviam")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date seuDataEnviament;
-	@Column(name = "seu_reintents_env")
-	private int seuReintentsEnviament;
 	@Column(name = "seu_data_estat")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date seuDataEstat;
@@ -261,6 +264,16 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "seu_data_notidp")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date seuDataNotificaDarreraPeticio;
+	@Column(name = "seu_fitxer_codi")
+	private Long seuFitxerCodi;
+	@Column(name = "seu_fitxer_clau", length = 20)
+	private String seuFitxerClau;
+	@Column(name = "seu_intent_data")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date seuIntentData;
+	
+	@Column(name = "intent_num")
+	private int intentNum;
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_id")
 	@ForeignKey(name = "not_notificacio_notdest_fk")
@@ -512,6 +525,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public NotificacioEventEntity getNotificaErrorEvent() {
 		return notificaErrorEvent;
 	}
+	public Date getNotificaIntentData() {
+		return notificaIntentData;
+	}
 	public String getSeuRegistreNumero() {
 		return seuRegistreNumero;
 	}
@@ -521,7 +537,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public Date getSeuDataFi() {
 		return seuDataFi;
 	}
-	public NotificacioEnviamentEstatEnumDto getSeuEstat() {
+	public SeuEstatEnumDto getSeuEstat() {
 		return seuEstat;
 	}
 	public boolean isSeuError() {
@@ -530,11 +546,11 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public NotificacioEventEntity getSeuErrorEvent() {
 		return seuErrorEvent;
 	}
-	public Date getSeuDataEnviament() {
-		return seuDataEnviament;
+	public Date getSeuIntentData() {
+		return seuIntentData;
 	}
-	public int getSeuReintentsEnviament() {
-		return seuReintentsEnviament;
+	public int getIntentNum() {
+		return intentNum;
 	}
 	public Date getSeuDataEstat() {
 		return seuDataEstat;
@@ -544,6 +560,12 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 	public Date getSeuDataNotificaDarreraPeticio() {
 		return seuDataNotificaDarreraPeticio;
+	}
+	public Long getSeuFitxerCodi() {
+		return seuFitxerCodi;
+	}
+	public String getSeuFitxerClau() {
+		return seuFitxerClau;
 	}
 	public NotificacioEntity getNotificacio() {
 		return notificacio;
@@ -560,6 +582,8 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_ENVIADA;
 		this.notificaError = false;
 		this.notificaErrorEvent = null;
+		this.seuIntentData = new Date();
+		this.notificaIntentData = new Date();
 	}
 	public void updateNotificaInformacio(
 			Date notificaDataCreacio,
@@ -636,15 +660,19 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public void updateSeuEnviament(
 			String seuRegistreNumero,
 			Date seuRegistreData,
-			NotificacioEnviamentEstatEnumDto seuEstat) {
-		this.seuDataEnviament = new Date();
+			SeuEstatEnumDto seuEstat) {
 		this.seuRegistreNumero = seuRegistreNumero;
 		this.seuRegistreData = seuRegistreData;
 		this.seuEstat = seuEstat;
+		
+		if (this.seuRegistreNumero != null && SeuEstatEnumDto.ENVIADA.equals(this.seuEstat)) {
+			this.seuIntentData = new Date();
+			this.intentNum = 0;
+		}
 	}
 	public void updateSeuEstat(
 			Date seuDataFi,
-			NotificacioEnviamentEstatEnumDto seuEstat) {
+			SeuEstatEnumDto seuEstat) {
 		this.seuDataEstat = new Date();
 		this.seuDataFi = seuDataFi;
 		this.seuEstat = seuEstat;
@@ -663,11 +691,58 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			this.seuDataNotificaDarreraPeticio = new Date();
 		}
 	}
-	public void updateSeuDataEnviament() {
-		this.seuDataEnviament = new Date();
-		this.seuReintentsEnviament++;
-	}
+//	public void updateSeuNouEnviament(int reintentsPeriodeSeu) {
+//		this.intentNum++;
+//		Calendar cal = GregorianCalendar.getInstance();
+//		cal.add(Calendar.MILLISECOND, reintentsPeriodeSeu*(2^intentNum));
+//		this.seuIntentData = cal.getTime();
+//	}
+//	public void updateSeuNovaConsulta() {
+//		this.seuIntentData = new Date();
+//	}
+//	public void updateSeuConsultaError(int reintentsPeriodeSeu) {
+//		this.intentNum++;
+//		Calendar cal = GregorianCalendar.getInstance();
+//		cal.add(Calendar.MILLISECOND, reintentsPeriodeSeu*(2^intentNum));
+//		this.seuIntentData = cal.getTime();
+//	}
 
+	public void updateSeuFitxer(
+			Long codi,
+			String clau) {
+		this.seuFitxerCodi = codi;
+		this.seuFitxerClau = clau;
+	}
+	public void updateSeuFiOperacio() {
+		this.seuIntentData = new Date();
+	}
+	public void updateSeuFiOperacio(boolean isError, Integer reintentPeriode) {
+		if (isError) {
+			this.intentNum++;
+			Calendar cal = GregorianCalendar.getInstance();
+			cal.add(Calendar.MILLISECOND, reintentPeriode*(2^intentNum));
+			this.seuIntentData = cal.getTime();
+		} else {
+			this.intentNum = 0;
+			this.seuIntentData = new Date();
+		}
+	}
+	
+	public void updateNotificaFiOperacio() {
+		this.notificaIntentData = new Date();
+	}
+	public void updateNotificaFiOperacio(boolean isError, Integer reintentPeriode) {
+		if (isError) {
+			this.intentNum++;
+			Calendar cal = GregorianCalendar.getInstance();
+			cal.add(Calendar.MILLISECOND, reintentPeriode*(2^intentNum));
+			this.notificaIntentData = cal.getTime();
+		} else {
+			this.intentNum = 0;
+			this.notificaIntentData = new Date();
+		}
+	}
+	
 	public static Builder getBuilder(
 			String titularNif,
 			NotificaServeiTipusEnumDto serveiTipus,
@@ -689,7 +764,14 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built.serveiTipus = serveiTipus;
 			built.notificacio = notificacio;
 			built.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
-			built.seuEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
+			built.seuEstat = SeuEstatEnumDto.PENDENT;
+			built.intentNum = 0;
+			// Definim la data en que s'ha d'enviar cap a la SEU
+			if (notificacio.getEnviamentDataProgramada() != null) {
+				built.seuIntentData = notificacio.getEnviamentDataProgramada();
+			} else {
+				built.seuIntentData = new Date();
+			}
 		}
 		public Builder titularNom(String titularNom) {
 			built.titularNom = titularNom;
@@ -883,51 +965,6 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			return built;
 		}
 	}
-
-	/*public static NotificacioDestinatariEstatEnumDto calcularEstatCombinatNotificaSeu(
-			NotificacioEnviamentEntity enviament) {
-		NotificacioDestinatariEstatEnumDto estatNotifica = enviament.getNotificaEstat();
-		NotificacioDestinatariEstatEnumDto estatSeu = enviament.getSeuEstat();
-		NotificacioDestinatariEstatEnumDto estatBo;
-		if (!NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT.equals(estatSeu) &&
-			!NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA.equals(estatSeu)) {
-			estatBo = estatSeu;
-		} else if (	!NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT.equals(estatNotifica) &&
-					!NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA.equals(estatNotifica)) {
-			estatBo = estatNotifica;
-		} else {
-			if (NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA.equals(estatSeu) ||
-				NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA.equals(estatNotifica)) {
-				estatBo = NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA;
-			} else {
-				estatBo = NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT;
-			}
-		}
-		return estatBo;
-	}
-
-	public static Date calcularDataCombinadaNotificaSeu(
-			NotificacioEnviamentEntity enviament) {
-		NotificacioDestinatariEstatEnumDto estatNotifica = enviament.getNotificaEstat();
-		NotificacioDestinatariEstatEnumDto estatSeu = enviament.getSeuEstat();
-		Date dataBona;
-		if (!NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT.equals(estatSeu) &&
-			!NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA.equals(estatSeu)) {
-			dataBona = enviament.getSeuDataEstat();
-		} else if (	!NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT.equals(estatNotifica) &&
-					!NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA.equals(estatNotifica)) {
-			dataBona = enviament.getNotificaEstatData();
-		} else {
-			if (NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA.equals(estatSeu)) {
-				dataBona = enviament.getSeuDataEstat();
-			} else if (NotificacioDestinatariEstatEnumDto.NOTIB_ENVIADA.equals(estatNotifica)) {
-				dataBona = enviament.getNotificaEstatData();
-			} else {
-				dataBona = enviament.getCreatedDate().toDate();
-			}
-		}
-		return dataBona;
-	}*/
 
 	@Override
 	public int hashCode() {

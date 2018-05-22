@@ -183,6 +183,7 @@ public class SeuPluginTest {
 					"Avis titol",
 					"Avis text",
 					"Text avis per mobils",
+					null,
 					true,
 					null);
 		/*plugin.notificacioCrear(

@@ -101,7 +101,7 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 	public boolean notificacioEnviar(
 			Long notificacioId) {
 		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
-		notificacio.updateNotificaNouEnviament();
+		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
 		if (!NotificacioEstatEnumDto.PENDENT.equals(notificacio.getEstat())) {
 			throw new ValidationException(
 					notificacioId,

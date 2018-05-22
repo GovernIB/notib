@@ -179,13 +179,13 @@ public interface NotificacioService {
 	 * Mètode d'execució periòdica per a refrescar l'estat de les notificacions
 	 * pendents a la seu.
 	 */
-	public void seuNotificacionsPendents();
+	public void seuConsultaEstatNotificacions();
 
 	/**
 	 * Mètode d'execució periòdica per a comunicar a Notifica els canvis d'estat
 	 * de les notificacions de la seu.
 	 */
-	public void seuNotificaComunicarEstatPendents();
+	public void notificaInformaCanviEstatSeu();
 
 	/**
 	 * Mètode d'execució periòdica per a refrescar l'estat dels enviaments fets a

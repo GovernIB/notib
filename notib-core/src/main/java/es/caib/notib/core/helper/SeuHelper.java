@@ -10,15 +10,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.api.dto.SeuEstatEnumDto;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
+import es.caib.notib.plugin.seu.SeuDocument;
 import es.caib.notib.plugin.seu.SeuNotificacioEstat;
 import es.caib.notib.plugin.seu.SeuNotificacioResultat;
 
@@ -40,24 +40,30 @@ public class SeuHelper {
 
 
 
-	@Transactional(propagation=Propagation.REQUIRES_NEW)
-	public void updateSeuDataEnviament(NotificacioEnviamentEntity enviament) {
-		enviament.updateSeuDataEnviament();
-	}
+//	@Transactional(propagation=Propagation.REQUIRES_NEW)
+//	public void updateSeuNouEnviament(NotificacioEnviamentEntity enviament) {
+//		enviament.updateSeuNouEnviament(pluginHelper.getSeuReintentsEnviamentPeriodeProperty());
+//	}
+//	
+//	@Transactional(propagation=Propagation.REQUIRES_NEW)
+//	public void updateSeuNovaConsulta(NotificacioEnviamentEntity enviament) {
+//		enviament.updateSeuNovaConsulta();
+//	}
 	
 	@Transactional
 	public void enviament(Long notificacioEnviamentId) {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(notificacioEnviamentId);
-		updateSeuDataEnviament(enviament);
+		boolean error = false;
+//		updateSeuNouEnviament(enviament);
 		String registreNumero = null;
 		Date registreData = null;
-		NotificacioEnviamentEstatEnumDto estat = enviament.getSeuEstat();
+		SeuEstatEnumDto estat = enviament.getSeuEstat();
 		NotificacioEventEntity event;
 		try {
 			SeuNotificacioResultat resultat = pluginHelper.seuNotificacioDestinatariEnviar(enviament);
 			registreNumero = resultat.getRegistreNumero();
 			registreData = resultat.getRegistreData();
-			estat = NotificacioEnviamentEstatEnumDto.NOTIB_ENVIADA;
+			estat = SeuEstatEnumDto.ENVIADA;
 			event = NotificacioEventEntity.getBuilder(
 					NotificacioEventTipusEnumDto.SEU_CAIB_ENVIAMENT,
 					enviament.getNotificacio()).
@@ -76,6 +82,7 @@ public class SeuHelper {
 					true,
 					event,
 					false);
+			error = true;
 		}
 		notificacioEventRepository.save(event);
 		enviament.getNotificacio().updateEventAfegir(event);
@@ -83,14 +90,17 @@ public class SeuHelper {
 				registreNumero,
 				registreData,
 				estat);
+		enviament.updateSeuFiOperacio(
+				error, 
+				pluginHelper.getSeuReintentsEnviamentPeriodeProperty());
 	}
 
 	@Transactional
 	public boolean consultaEstat(Long notificacioDestinatariId) {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(notificacioDestinatariId);
-		updateSeuDataEnviament(enviament);
+//		updateSeuNovaConsulta(enviament);
 		Date dataFi = null;
-		NotificacioEnviamentEstatEnumDto estat = enviament.getSeuEstat();
+		SeuEstatEnumDto estat = enviament.getSeuEstat();
 		NotificacioEventEntity event;
 		boolean estatActualitzat;
 		try {
@@ -98,18 +108,30 @@ public class SeuHelper {
 					enviament);
 			if (notificacioEstat.getEstat() != null) {
 				switch (notificacioEstat.getEstat()) {
-				case LLEGIDA:
-					estat = NotificacioEnviamentEstatEnumDto.LLEGIDA;
-					dataFi = notificacioEstat.getData();
-					break;
-				case REBUTJADA:
-					estat = NotificacioEnviamentEstatEnumDto.REBUTJADA;
-					dataFi = notificacioEstat.getData();
-					break;
-				case PENDENT:
-				default:
-					estat = NotificacioEnviamentEstatEnumDto.PENDENT_SEU;
-					break;
+					case LLEGIDA:
+						estat = SeuEstatEnumDto.LLEGIDA;
+						dataFi = notificacioEstat.getData();
+						break;
+					case REBUTJADA:
+						estat = SeuEstatEnumDto.REBUTJADA;
+						dataFi = notificacioEstat.getData();
+						break;
+					case PENDENT:
+					default:
+						estat = SeuEstatEnumDto.ENVIADA;
+						break;
+				}
+				if (notificacioEstat.getFitxerCodi() != null) {
+					enviament.updateSeuFitxer(
+							notificacioEstat.getFitxerCodi(), 
+							notificacioEstat.getFitxerClau());
+					
+//					SeuDocument fitxer = pluginHelper.obtenirJustificant(enviament);
+//					FileOutputStream outputStream = new FileOutputStream("/home/siona/Feina/Documents/Lot3/Notib/justificant.pdf");
+//				    byte[] strToBytes = fitxer.getArxiuContingut();
+//				    outputStream.write(strToBytes);
+//				    outputStream.close();
+					
 				}
 			} else {
 				estat = enviament.getSeuEstat();
@@ -120,7 +142,7 @@ public class SeuHelper {
 					enviament(enviament).
 					descripcio((estat != null) ? estat.toString() : null).
 					build();
-			estatActualitzat = true;
+			estatActualitzat = !estat.equals(enviament.getSeuEstat());
 		} catch (Exception ex) {
 			logger.error(
 					"Error al consultar l'estat de la notificació a la seu electrònica (" +
@@ -143,6 +165,10 @@ public class SeuHelper {
 					true,
 					event,
 					true);
+//			enviament.updateSeuConsultaError(pluginHelper.getSeuReintentsConsultaPeriodeProperty());
+			if (ex.getMessage().contains("No existeix la notificació")) {
+				estat = SeuEstatEnumDto.INEXISTENT;
+			}
 			estatActualitzat = false;
 		}
 		enviament.updateSeuEstat(
@@ -150,7 +176,15 @@ public class SeuHelper {
 				estat);
 		notificacioEventRepository.save(event);
 		enviament.getNotificacio().updateEventAfegir(event);
+		enviament.updateSeuFiOperacio();
 		return estatActualitzat;
+	}
+	
+	@Transactional
+	public SeuDocument obtenirJustificant(Long notificacioDestinatariId) {
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(notificacioDestinatariId);
+		return pluginHelper.obtenirJustificant(enviament);
+		
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(SeuHelper.class);
