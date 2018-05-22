@@ -138,11 +138,9 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				break;
 			}
 		}
-		NotificacioComunicacioTipusEnumDto comunicacioTipus;
-		if (getEnviamentSincronProperty()) {
+		NotificacioComunicacioTipusEnumDto comunicacioTipus = NotificacioComunicacioTipusEnumDto.ASINCRON;
+		if (notificacio.getComunicacioTipus() != null && ComunicacioTipusEnum.SINCRON.equals(notificacio.getComunicacioTipus())) {
 			comunicacioTipus = NotificacioComunicacioTipusEnumDto.SINCRON;
-		} else {
-			comunicacioTipus = NotificacioComunicacioTipusEnumDto.ASINCRON;
 		}
 		NotificacioEntity.Builder notificacioBuilder = NotificacioEntity.getBuilder(
 				entitat,
@@ -323,7 +321,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			notificacioEntity.addEnviament(enviamentSaved);
 		}
 		notificacioRepository.saveAndFlush(notificacioEntity);
-		if (getEnviamentSincronProperty()) {
+		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioEntity.getComunicacioTipus())) {
 			notificaHelper.notificacioEnviar(notificacioEntity.getId());
 			notificacioEntity = notificacioRepository.findOne(notificacioEntity.getId());
 		}
@@ -498,16 +496,6 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			return EnviamentEstatEnum.SENSE_INFORMACIO;
 		default:
 			return null;
-		}
-	}
-
-	private boolean getEnviamentSincronProperty() {
-		String enviamentSincron = PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.notifica.enviament.sincron");
-		if (enviamentSincron != null) {
-			return new Boolean(enviamentSincron);
-		} else {
-			return false;
 		}
 	}
 
