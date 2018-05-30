@@ -12,6 +12,8 @@ import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
 
 import org.jboss.mx.util.MBeanProxyCreationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
@@ -71,10 +73,12 @@ public class NotificacioRestClient implements NotificacioService {
 						username,
 						password);
 			}
+			logger.debug("Missatge REST enviat: " + body);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
 					post(String.class, body);
+			logger.debug("Missatge REST rebut: " + json);
 			return mapper.readValue(json, RespostaAlta.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
@@ -193,5 +197,7 @@ public class NotificacioRestClient implements NotificacioService {
 	private boolean isExecucioDinsJBoss() {
 		return System.getProperty("jboss.server.name") != null;
 	}
+
+	private static final Logger logger = LoggerFactory.getLogger(NotificacioRestClient.class);
 
 }

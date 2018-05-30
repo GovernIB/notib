@@ -36,14 +36,14 @@ public class ClientRestTest extends ClientBaseTest {
 	@Before
 	public void setUp() throws IOException, DecoderException {
 		client = NotificacioRestClientFactory.getRestClient(
-				"http://localhost:8080/notib",
+				"http://localhost:8180/notib",
 				"notibapp",
 				"notibapp");
 		/*client = NotificacioRestClientFactory.getRestClient(
 				"http://10.35.3.118:8180/notib",
 				"notapp",
 				"notapp");*/
-		client.setServeiDesplegatDamuntJboss(false);
+		//client.setServeiDesplegatDamuntJboss(false);
 	}
 
 	@Test
