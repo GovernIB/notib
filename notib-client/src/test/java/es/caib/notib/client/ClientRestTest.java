@@ -39,10 +39,7 @@ public class ClientRestTest extends ClientBaseTest {
 				"http://localhost:8180/notib",
 				"notapp",
 				"notapp");
-		/*client = NotificacioRestClientFactory.getRestClient(
-				"http://10.35.3.118:8180/notib",
-				"notapp",
-				"notapp");*/
+
 //		client.setServeiDesplegatDamuntJboss(false);
 	}
 

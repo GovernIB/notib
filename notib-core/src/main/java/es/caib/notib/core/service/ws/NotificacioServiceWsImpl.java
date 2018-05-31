@@ -221,19 +221,20 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 					titularTelefon(titular.getTelefon()).
 					titularEmail(titular.getEmail());
 			if (enviament.getDestinataris() != null) {
-				if (enviament.getDestinataris().size() != 1) {
+				if (enviament.getDestinataris().size() > 1) {
 					throw new ValidationException(
 							"DESTINATARI",
 							"Únicament es pot indicar un destinatari");
+				} else if (enviament.getDestinataris().size() == 1) {
+					Persona destinatari = enviament.getDestinataris().get(0);
+					enviamentBuilder.
+					destinatariNif(destinatari.getNif().toUpperCase()).
+					destinatariNom(destinatari.getNom()).
+					destinatariLlinatge1(destinatari.getLlinatge1()).
+					destinatariLlinatge2(destinatari.getLlinatge2()).
+					destinatariTelefon(destinatari.getTelefon()).
+					destinatariEmail(destinatari.getEmail());
 				}
-				Persona destinatari = enviament.getDestinataris().get(0);
-				enviamentBuilder.
-				destinatariNif(destinatari.getNif().toUpperCase()).
-				destinatariNom(destinatari.getNom()).
-				destinatariLlinatge1(destinatari.getLlinatge1()).
-				destinatariLlinatge2(destinatari.getLlinatge2()).
-				destinatariTelefon(destinatari.getTelefon()).
-				destinatariEmail(destinatari.getEmail());
 			}
 			EntregaPostal entregaPostal = enviament.getEntregaPostal();
 			if (entregaPostal != null) {
