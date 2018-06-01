@@ -378,20 +378,22 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				titular.setRazonSocial(enviament.getTitularRaoSocial());
 				titular.setCodigoDestino(enviament.getTitularCodiDesti());
 				envio.setTitular(titular);
-				Destinatarios destinatarios = new Destinatarios();
-				Persona destinatario = new Persona();
-				destinatario.setNif(enviament.getDestinatariNif());
-				destinatario.setNombre(enviament.getDestinatariNom());
-				destinatario.setApellidos(
-						concatenarLlinatges(
-								enviament.getDestinatariLlinatge1(),
-								enviament.getDestinatariLlinatge2()));
-				destinatario.setTelefono(enviament.getDestinatariTelefon());
-				destinatario.setEmail(enviament.getDestinatariEmail());
-				destinatario.setRazonSocial(enviament.getDestinatariRaoSocial());
-				destinatario.setCodigoDestino(enviament.getDestinatariCodiDesti());
-				destinatarios.getDestinatario().add(destinatario);
-				envio.setDestinatarios(destinatarios);
+				if (enviament.getDestinatariNif() != null) {
+					Destinatarios destinatarios = new Destinatarios();
+					Persona destinatario = new Persona();
+					destinatario.setNif(enviament.getDestinatariNif());
+					destinatario.setNombre(enviament.getDestinatariNom());
+					destinatario.setApellidos(
+							concatenarLlinatges(
+									enviament.getDestinatariLlinatge1(),
+									enviament.getDestinatariLlinatge2()));
+					destinatario.setTelefono(enviament.getDestinatariTelefon());
+					destinatario.setEmail(enviament.getDestinatariEmail());
+					destinatario.setRazonSocial(enviament.getDestinatariRaoSocial());
+					destinatario.setCodigoDestino(enviament.getDestinatariCodiDesti());
+					destinatarios.getDestinatario().add(destinatario);
+					envio.setDestinatarios(destinatarios);
+				}
 				if (enviament.getDomiciliConcretTipus() != null) {
 					EntregaPostal entregaPostal = new EntregaPostal();
 					OrganismoPagadorPostal pagadorPostal = new OrganismoPagadorPostal();
