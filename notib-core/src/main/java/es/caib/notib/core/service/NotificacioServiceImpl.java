@@ -410,9 +410,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override
-//	@Scheduled(
-//			fixedRateString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.periode}",
-//			initialDelayString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.retard.inicial}")
+	@Scheduled(
+			fixedRateString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.periode}",
+			initialDelayString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.retard.inicial}")
 	public void enviamentRefrescarEstatPendents() {
 		logger.debug("Cercant enviaments pendents de refrescar l'estat de Notifica");
 		if (isTasquesActivesProperty() && notificaHelper.isConnexioNotificaDisponible()) {

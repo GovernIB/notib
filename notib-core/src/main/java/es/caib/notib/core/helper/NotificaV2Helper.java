@@ -46,6 +46,7 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.NotificacioEventEntity.Builder;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
@@ -159,6 +160,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			Long enviamentId) throws SistemaExternException {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		NotificacioEntity notificacio = enviament.getNotificacio();
+		NotificacioEnviamentEstatEnumDto estatOriginal = enviament.getNotificaEstat();
+		
 		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb NotificaV2 (" +
 				"notificacioId=" + notificacio.getId() + ", " +
 				"notificaIdentificador=" + enviament.getNotificaIdentificador() + ")";
@@ -183,8 +186,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					event.setEstat(datado.getResultado());
 				}
 				if (datatDarrer != null) {
-					NotificacioEnviamentEstatEnumDto estat = getEstatNotifica(
-							datatDarrer.getResultado());
+					NotificacioEnviamentEstatEnumDto estat = getEstatNotifica(datatDarrer.getResultado());
 					CodigoDIR organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
 					CodigoDIR organismoEmisorRaiz = resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
 					enviament.updateNotificaInformacio(
@@ -244,11 +246,13 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						null,
 						null);
 			}
-			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+			Builder eventBuilder = NotificacioEventEntity.getBuilder(
 					NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
 					notificacio).
-					enviament(enviament).
-					build();
+					enviament(enviament);
+			if (!estatOriginal.equals(enviament.getNotificaEstat()))
+				eventBuilder.callbackInicialitza();
+			NotificacioEventEntity event = eventBuilder.build();
 			notificacio.updateEventAfegir(event);
 			return true;
 		} catch (Exception ex) {

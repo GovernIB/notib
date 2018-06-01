@@ -137,7 +137,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				break;
 			}
 		}
-		NotificacioComunicacioTipusEnumDto comunicacioTipus = NotificacioComunicacioTipusEnumDto.ASINCRON;
+		NotificacioComunicacioTipusEnumDto comunicacioTipus = pluginHelper.getNotibTipusComunicacioDefecte();
 		if (notificacio.getComunicacioTipus() != null && ComunicacioTipusEnum.SINCRON.equals(notificacio.getComunicacioTipus())) {
 			comunicacioTipus = NotificacioComunicacioTipusEnumDto.SINCRON;
 		}

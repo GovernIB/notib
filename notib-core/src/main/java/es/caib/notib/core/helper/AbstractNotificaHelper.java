@@ -89,15 +89,23 @@ public abstract class AbstractNotificaHelper {
 	public boolean enviamentSeu(Long enviamentId) {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		NotificacioEntity notificacio = enviament.getNotificacio();
+//		enviament.updateNotificaFiOperacio();
 		
 		if (NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
-			SeuDocument fitxer = pluginHelper.obtenirJustificant(enviament);
-			ArxiuDto certificacio = new ArxiuDto(
-					fitxer.getArxiuNom(), 
-					"application/pdf", 
-					fitxer.getArxiuContingut(), 
-					fitxer.getArxiuContingut().length);
-			return enviamentCertificacioSeu(enviamentId, certificacio, null);
+//			try {
+//				SeuDocument fitxer = pluginHelper.obtenirJustificant(enviament);
+//				ArxiuDto certificacio = new ArxiuDto(
+//						fitxer.getArxiuNom(), 
+//						"application/pdf", 
+//						fitxer.getArxiuContingut(), 
+//						fitxer.getArxiuContingut().length);
+				return enviamentCertificacioSeu(enviamentId, null, null);
+//			} catch (Exception ex) {
+//				throw new SistemaExternException(
+//						IntegracioHelper.INTCODI_SEU,
+//						"Error al obtenir el justificant de la notificació de la Seu.",
+//						ex);
+//			}
 		} else {
 			return enviamentComunicacioSeu(enviamentId, null);
 		}
@@ -116,7 +124,7 @@ public abstract class AbstractNotificaHelper {
 			comunicacionSede.setIdentificadorDestinatario(enviament.getNotificaIdentificador());
 			Date fecha = enviament.getSeuDataFi();
 			if (fecha == null) {
-				fecha = comunicacioData;
+				fecha = comunicacioData != null ? comunicacioData : new Date();
 			}
 			comunicacionSede.setFecha(toXmlGregorianCalendar(fecha));
 			comunicacionSede.setOrganismoRemisor(notificacio.getEntitat().getDir3Codi());
@@ -131,6 +139,7 @@ public abstract class AbstractNotificaHelper {
 				enviament.updateNotificaError(
 						false,
 						null);
+				enviament.updateSeuNotificaInformat();
 			} else {
 				event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.SEU_NOTIFICA_COMUNICACIO,
@@ -164,7 +173,6 @@ public abstract class AbstractNotificaHelper {
 			notificacioEventRepository.save(event);
 			error = true;
 		}
-		enviament.updateSeuNotificaInformat();
 		enviament.updateNotificaFiOperacio();
 		notificacio.updateEventAfegir(event);
 		return !error;
@@ -179,6 +187,17 @@ public abstract class AbstractNotificaHelper {
 		NotificacioEventEntity event;
 		boolean error = false;
 		try {
+			
+			if (certificacio == null) {
+				SeuDocument fitxer = pluginHelper.obtenirJustificant(enviament);
+				if (fitxer != null)
+					certificacio = new ArxiuDto(
+							fitxer.getArxiuNom(), 
+							"application/pdf", 
+							fitxer.getArxiuContingut(), 
+							fitxer.getArxiuContingut().length);
+			}
+			
 			CertificacionSede certificacionSede = new CertificacionSede();
 			certificacionSede.setEnvioDestinatario(enviament.getNotificaIdentificador());
 			if (SeuEstatEnumDto.LLEGIDA.equals(enviament.getSeuEstat())) {
@@ -196,7 +215,7 @@ public abstract class AbstractNotificaHelper {
 			certificacionSede.setHashDocumento(
 					Base64.encodeBase64String(
 							Hex.decodeHex(
-									DigestUtils.sha256Hex(certificacio.getContingut()).toCharArray())));
+									DigestUtils.sha1Hex(certificacio.getContingut()).toCharArray())));
 			//certificacionSede.setCsv(value);
 			certificacionSede.setOrganismoRemisor(notificacio.getEntitat().getDir3Codi());
 			ResultadoCertificacionSede resultadoCertificacion = getSedeWs().certificacionSede(certificacionSede);
@@ -207,6 +226,7 @@ public abstract class AbstractNotificaHelper {
 						enviament(enviament).
 						build();
 				notificacioEventRepository.save(event);
+				enviament.updateSeuNotificaInformat();
 			} else {
 				event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.SEU_NOTIFICA_CERTIFICACIO,
@@ -241,7 +261,6 @@ public abstract class AbstractNotificaHelper {
 			notificacioEventRepository.save(event);
 			error = true;
 		}
-		enviament.updateSeuNotificaInformat();
 		enviament.updateNotificaFiOperacio();
 		notificacio.updateEventAfegir(event);
 		return !error;

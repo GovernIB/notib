@@ -37,7 +37,7 @@ public class CallbackServiceImpl implements CallbackService {
 	@Override
 	@Scheduled(
 			fixedRateString = "${config:es.caib.notib.tasca.callback.pendents.periode}",
-			initialDelayString = "${config:es.caib.notib.tasca.retard.inicial}")
+			initialDelayString = "${config:es.caib.notib.tasca.callback.pendents.retard.inicial}")
 	public void processarPendents() {
 		logger.debug("Cercant notificacions pendents d'enviar al client");
 		int maxPendents = getEventsProcessarMaxProperty(); 

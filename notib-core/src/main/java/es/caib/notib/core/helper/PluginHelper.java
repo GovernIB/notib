@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -695,6 +696,19 @@ public class PluginHelper {
 	}
 	public int getSeuReintentsConsultaPeriodeProperty() {
 		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.seu.consulta.periode", 300000);
+	}
+	public NotificacioComunicacioTipusEnumDto getNotibTipusComunicacioDefecte() {
+		NotificacioComunicacioTipusEnumDto tipus = NotificacioComunicacioTipusEnumDto.SINCRON;
+		
+		try {
+			String tipusStr = PropertiesHelper.getProperties().getProperty("es.caib.notib.comunicacio.tipus.defecte", "SINCRON");
+			if (tipusStr != null && !tipusStr.isEmpty())
+				tipus = NotificacioComunicacioTipusEnumDto.valueOf(tipusStr);
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut obtenir el tipus de comunicació per defecte. S'utilitzarà el tipus SINCRON.");
+		}
+				
+		return tipus;
 	}
 	
 

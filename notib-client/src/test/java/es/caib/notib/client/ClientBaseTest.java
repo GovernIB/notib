@@ -60,7 +60,7 @@ public class ClientBaseTest {
 		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
 		notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
 //		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
-		notificacio.setComunicacioTipus(ComunicacioTipusEnum.ASINCRON);
+//		notificacio.setComunicacioTipus(ComunicacioTipusEnum.ASINCRON);
 		notificacio.setConcepte(
 				"concepte_" + notificacioId);
 		notificacio.setDescripcio(
@@ -69,7 +69,7 @@ public class ClientBaseTest {
 		notificacio.setRetard(5);
 		notificacio.setCaducitat(
 				toXmlGregorianCalendar(
-						new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000)));
+						new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000)));
 		Document document = new Document();
 		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
 		
