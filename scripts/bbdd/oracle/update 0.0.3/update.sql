@@ -15,4 +15,5 @@ UPDATE NOT_NOTIFICACIO SET notifica_datenv = sysdate where notifica_datenv is nu
 UPDATE NOT_NOTIFICACIO SET not_reintents_env = 0 where not_reintents_env is null;
 UPDATE NOT_NOTIFICACIO_ENV SET SEU_INTENT_DATA = sysdate where SEU_INTENT_DATA is null;
 UPDATE NOT_NOTIFICACIO_ENV SET INTENT_NUM = 0 where INTENT_NUM is null;
+update not_notificacio_env set notifica_estat_dataact = sysdate where notifica_estat_dataact is null;
 

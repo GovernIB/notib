@@ -18,7 +18,6 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 
-import es.caib.notib.ws.notificacio.ComunicacioTipusEnum;
 import es.caib.notib.ws.notificacio.Document;
 import es.caib.notib.ws.notificacio.EntregaDeh;
 import es.caib.notib.ws.notificacio.EntregaPostal;
@@ -155,7 +154,7 @@ public class ClientBaseTest {
 		ParametresSeu parametresSeu = new ParametresSeu();
 		parametresSeu.setExpedientSerieDocumental("0000S");
 		parametresSeu.setExpedientUnitatOrganitzativa(UNITAT_ADMINISTRATIVA_SISTRA);
-		parametresSeu.setExpedientIdentificadorEni("ES_" + ORGAN_CODI + "_2018_EXP_NOTIB" + "0000000000000000000000006");//+ String.format("%25s", notificacioId).replace(' ', '0'));
+		parametresSeu.setExpedientIdentificadorEni("ES_" + ORGAN_CODI + "_2018_EXP_NOTIB" + "0000000000000000000000008"); //+ String.format("%25s", notificacioId).replace(' ', '0'));
 		parametresSeu.setExpedientTitol("seuExpedientTitol_" + notificacioId);
 		parametresSeu.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT_SISTRA);
 		parametresSeu.setRegistreLlibre(LLIBRE);

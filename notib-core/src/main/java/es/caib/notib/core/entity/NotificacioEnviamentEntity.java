@@ -584,6 +584,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaErrorEvent = null;
 		this.seuIntentData = new Date();
 		this.notificaIntentData = new Date();
+		this.notificaEstatDataActualitzacio = new Date();
 	}
 	public void updateNotificaInformacio(
 			Date notificaDataCreacio,
@@ -741,6 +742,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			this.intentNum = 0;
 			this.notificaIntentData = new Date();
 		}
+	}
+	public void updateNotificaDataRefrescEstat() {
+		this.notificaEstatDataActualitzacio = new Date();
 	}
 	
 	public static Builder getBuilder(

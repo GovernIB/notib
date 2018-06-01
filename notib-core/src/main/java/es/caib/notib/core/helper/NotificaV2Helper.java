@@ -161,6 +161,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		NotificacioEntity notificacio = enviament.getNotificacio();
 		NotificacioEnviamentEstatEnumDto estatOriginal = enviament.getNotificaEstat();
+		enviament.updateNotificaDataRefrescEstat();
 		
 		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb NotificaV2 (" +
 				"notificacioId=" + notificacio.getId() + ", " +
@@ -169,8 +170,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			InfoEnvioV2 infoEnvio = new InfoEnvioV2();
 			infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
 			ResultadoInfoEnvioV2 resultadoInfoEnvio = getNotificaWs().infoEnvioV2(infoEnvio);
+			Datado datatDarrer = null;
 			if (resultadoInfoEnvio.getDatados() != null) {
-				Datado datatDarrer = null;
 				for (Datado datado: resultadoInfoEnvio.getDatados().getDatado()) {
 					Date datatData = toDate(datado.getFecha());
 					if (datatDarrer == null) {
@@ -246,14 +247,23 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						null,
 						null);
 			}
-			Builder eventBuilder = NotificacioEventEntity.getBuilder(
+			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
 					NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
 					notificacio).
-					enviament(enviament);
-			if (!estatOriginal.equals(enviament.getNotificaEstat()))
-				eventBuilder.callbackInicialitza();
-			NotificacioEventEntity event = eventBuilder.build();
+					enviament(enviament).build();
 			notificacio.updateEventAfegir(event);
+			
+			if (!estatOriginal.equals(enviament.getNotificaEstat())) {
+				NotificacioEventEntity eventDatat = NotificacioEventEntity.getBuilder(
+						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
+						enviament.getNotificacio()).
+						enviament(enviament).
+						descripcio(datatDarrer.getResultado()).
+						callbackInicialitza().
+						build();
+				notificacio.updateEventAfegir(eventDatat);
+			}
+			
 			return true;
 		} catch (Exception ex) {
 			logger.error(

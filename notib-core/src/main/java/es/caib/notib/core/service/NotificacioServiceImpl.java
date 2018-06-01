@@ -417,7 +417,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		logger.debug("Cercant enviaments pendents de refrescar l'estat de Notifica");
 		if (isTasquesActivesProperty() && notificaHelper.isConnexioNotificaDisponible()) {
 			int maxPendents = getEnviamentActualitzacioEstatProcessarMaxProperty();
-			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByNotificaEstatFinalFalseOrderByEstatDataActualitzacioAsc(
+			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByNotificaRefresc(
 					new PageRequest(0, maxPendents));
 			if (!pendents.isEmpty()) {
 				logger.debug("Realitzant refresc de l'estat de Notifica per a " + pendents.size() + " enviaments (màxim=" + maxPendents + ")");
