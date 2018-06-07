@@ -27,8 +27,9 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 
 	/** Recupera la llista de notificacions pendents */
 	@Query("select ne.id " + 
-		   "from NotificacioEventEntity ne " +
-	       "where ne.callbackEstat = es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT ")
+		   "  from NotificacioEventEntity ne " +
+	       " where ne.callbackEstat = es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
+	       " order by ne.callbackData asc nulls first, data asc")
 	List<Long> findEventsPendentsIds(Pageable page);
 
 }

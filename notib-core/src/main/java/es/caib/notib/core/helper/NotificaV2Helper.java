@@ -46,7 +46,6 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity.Builder;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
@@ -160,7 +159,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			Long enviamentId) throws SistemaExternException {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		NotificacioEntity notificacio = enviament.getNotificacio();
-		NotificacioEnviamentEstatEnumDto estatOriginal = enviament.getNotificaEstat();
+		
+//		NotificacioEnviamentEstatEnumDto estatActual = enviament.getNotificaEstat();
+		Date dataUltimDatat = enviament.getNotificaDataCreacio();
+		Date dataUltimaCertificacio = enviament.getNotificaCertificacioData();
+		
 		enviament.updateNotificaDataRefrescEstat();
 		
 		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb NotificaV2 (" +
@@ -187,30 +190,42 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					event.setEstat(datado.getResultado());
 				}
 				if (datatDarrer != null) {
-					NotificacioEnviamentEstatEnumDto estat = getEstatNotifica(datatDarrer.getResultado());
-					CodigoDIR organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
-					CodigoDIR organismoEmisorRaiz = resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
-					enviament.updateNotificaInformacio(
-							toDate(resultadoInfoEnvio.getFechaCreacion()),
-							toDate(resultadoInfoEnvio.getFechaPuestaDisposicion()),
-							toDate(resultadoInfoEnvio.getFechaCaducidad()),
-							(organismoEmisor != null) ? organismoEmisor.getCodigo() : null,
-							(organismoEmisor != null) ? organismoEmisor.getDescripcionCodigoDIR() : null,
-							(organismoEmisor != null) ? organismoEmisor.getNifDIR() : null,
-							(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getCodigo() : null,
-							(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getDescripcionCodigoDIR() : null,
-							(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getNifDIR() : null);
-					enviamentUpdateDatat(
-							estat,
-							toDate(datatDarrer.getFecha()),
-							null,
-							datatDarrer.getOrigen(),
-							datatDarrer.getNifReceptor(),
-							datatDarrer.getNombreReceptor(),
-							null,
-							null,
-							enviament);
-					enviament.updateNotificaError(false, null);
+					
+					Date dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
+					if (!dataDatat.equals(dataUltimDatat)) {
+						NotificacioEnviamentEstatEnumDto estat = getEstatNotifica(datatDarrer.getResultado());
+						CodigoDIR organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
+						CodigoDIR organismoEmisorRaiz = resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
+						enviament.updateNotificaInformacio(
+								dataDatat,
+								toDate(resultadoInfoEnvio.getFechaPuestaDisposicion()),
+								toDate(resultadoInfoEnvio.getFechaCaducidad()),
+								(organismoEmisor != null) ? organismoEmisor.getCodigo() : null,
+								(organismoEmisor != null) ? organismoEmisor.getDescripcionCodigoDIR() : null,
+								(organismoEmisor != null) ? organismoEmisor.getNifDIR() : null,
+								(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getCodigo() : null,
+								(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getDescripcionCodigoDIR() : null,
+								(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getNifDIR() : null);
+						enviamentUpdateDatat(
+								estat,
+								toDate(datatDarrer.getFecha()),
+								null,
+								datatDarrer.getOrigen(),
+								datatDarrer.getNifReceptor(),
+								datatDarrer.getNombreReceptor(),
+								null,
+								null,
+								enviament);
+						NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
+								enviament.getNotificacio()).
+								enviament(enviament).
+								descripcio(datatDarrer.getResultado()).
+								callbackInicialitza().
+								build();
+						notificacio.updateEventAfegir(event);
+						enviament.updateNotificaError(false, null);
+					}
 				} else {
 					throw new ValidationException(
 							enviament,
@@ -225,45 +240,45 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			}
 			if (resultadoInfoEnvio.getCertificacion() != null) {
 				Certificacion certificacio = resultadoInfoEnvio.getCertificacion();
-				byte[] decodificat = certificacio.getContenidoCertificacion();
-				if (enviament.getNotificaCertificacioArxiuId() != null) {
-					pluginHelper.gestioDocumentalDelete(
-							enviament.getNotificaCertificacioArxiuId(),
-							PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
+				
+				Date dataCertificacio = toDate(certificacio.getFechaCertificacion());
+				if (!dataCertificacio.equals(dataUltimaCertificacio)) {
+					byte[] decodificat = certificacio.getContenidoCertificacion();
+					if (enviament.getNotificaCertificacioArxiuId() != null) {
+						pluginHelper.gestioDocumentalDelete(
+								enviament.getNotificaCertificacioArxiuId(),
+								PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
+					}
+					String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
+							PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
+							new ByteArrayInputStream(decodificat));
+					
+					enviament.updateNotificaCertificacio(
+							dataCertificacio,
+							gestioDocumentalId,
+							certificacio.getHash(),
+							certificacio.getOrigen(),
+							certificacio.getMetadatos(),
+							certificacio.getCsv(),
+							certificacio.getMime(),
+							Integer.parseInt(certificacio.getSize()),
+							null,
+							null,
+							null);
+					NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+							NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
+							enviament.getNotificacio()).
+							enviament(enviament).
+							callbackInicialitza().
+							build();
+					notificacio.updateEventAfegir(event);
 				}
-				String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
-						PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
-						new ByteArrayInputStream(decodificat));
-				enviament.updateNotificaCertificacio(
-						toDate(certificacio.getFechaCertificacion()),
-						gestioDocumentalId,
-						certificacio.getHash(),
-						certificacio.getOrigen(),
-						certificacio.getMetadatos(),
-						certificacio.getCsv(),
-						certificacio.getMime(),
-						Integer.parseInt(certificacio.getSize()),
-						null,
-						null,
-						null);
 			}
 			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
 					NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
 					notificacio).
 					enviament(enviament).build();
 			notificacio.updateEventAfegir(event);
-			
-			if (!estatOriginal.equals(enviament.getNotificaEstat())) {
-				NotificacioEventEntity eventDatat = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-						enviament.getNotificacio()).
-						enviament(enviament).
-						descripcio(datatDarrer.getResultado()).
-						callbackInicialitza().
-						build();
-				notificacio.updateEventAfegir(eventDatat);
-			}
-			
 			return true;
 		} catch (Exception ex) {
 			logger.error(

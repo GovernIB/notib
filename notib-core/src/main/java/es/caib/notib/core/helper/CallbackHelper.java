@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.core.util.Base64;
 
 import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
@@ -303,7 +304,7 @@ public class CallbackHelper {
 	/** Propietat que assenayala el màxim de reintents. Si la propietat és null llavors no hi ha un màxim. */
 	private Integer getEventsIntentsMaxProperty() {
 		Integer ret = null;
-		String maxIntents = PropertiesHelper.getProperties().getProperty("es.caib.notib.callback.notifica.events.intents.max");
+		String maxIntents = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasca.callback.pendents.notifica.events.intents.max");
 		if (maxIntents != null && !"".equals(maxIntents))
 			ret = Integer.parseInt(maxIntents);
 		return ret;
@@ -311,7 +312,8 @@ public class CallbackHelper {
 
 	private Client getClient(AplicacioEntity aplicacio) {
 		Client jerseyClient =  new Client();
-		// Només per depurar la sortida, esborrar o comentar-ho: jerseyClient.addFilter(new LoggingFilter(System.out));		
+		// Només per depurar la sortida, esborrar o comentar-ho: 
+		jerseyClient.addFilter(new LoggingFilter(System.out));		
 		String username = null;
 		String password = null;
 		switch (aplicacio.getTipusAutenticacio()) {

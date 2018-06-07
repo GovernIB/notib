@@ -43,8 +43,8 @@ public class CallbackServiceImpl implements CallbackService {
 		int maxPendents = getEventsProcessarMaxProperty(); 
 		Pageable page = new PageRequest(
 				0,
-				maxPendents,
-				new Sort(new Order(Direction.ASC, "data")));
+				maxPendents);
+//				new Sort(new Order(Direction.ASC, "data")));
 		List<Long> pendentsIds = notificacioEventRepository.findEventsPendentsIds(page);
 		if (pendentsIds.size() > 0) {
 			logger.debug("Inici de les notificacions pendents cap a les aplicacions.");
@@ -63,7 +63,7 @@ public class CallbackServiceImpl implements CallbackService {
 	/* Màxim d'events a processar en cada període */
 	private int getEventsProcessarMaxProperty() {
 		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.notib.callback.events.processar.max",
+				"es.caib.notib.tasca.callback.pendents.processar.max",
 				50);
 	}
 

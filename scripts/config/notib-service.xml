@@ -52,7 +52,9 @@
 				
 				<!-- # Enviament a Seu -->
 				es.caib.notib.tasca.callback.pendents.periode=3600000
+				es.caib.notib.tasca.callback.pendents.processar.max=50
 				es.caib.notib.tasca.callback.pendents.retard.inicial=120000
+				es.caib.notib.tasca.callback.pendents.notifica.events.intents.max=10
 								
 
 				<!-- # ### -->

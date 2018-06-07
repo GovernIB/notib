@@ -145,6 +145,7 @@ public class NotificacioRestClient implements NotificacioService {
 	private Client generarClient() {
 		Client jerseyClient = Client.create();
 		if (!isExecucioDinsJBoss()) {
+//			jerseyClient.addFilter(new LoggingFilter(System.out));
 			jerseyClient.addFilter(
 					new ClientFilter() {
 						private ArrayList<Object> cookies;

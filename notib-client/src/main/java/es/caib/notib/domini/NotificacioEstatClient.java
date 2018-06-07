@@ -1,20 +1,12 @@
-package es.caib.notib.core.api.ws.callback;
+package es.caib.notib.domini;
 
 import java.util.Date;
-
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 /**
  * Informació sobre l'estat d'una notificació.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@XmlRootElement
-@JsonAutoDetect
 public class NotificacioEstatClient {
 
 	private NotificacioDestinatariEstatEnum estat;
@@ -89,7 +81,4 @@ public class NotificacioEstatClient {
 		this.referenciaEnviament = referenciaEnviament;
 	}
 
-	public String toString() {
-		return ReflectionToStringBuilder.toString(this);
-	}
 }

@@ -50,7 +50,6 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.wsdl.notificaV1.ArrayOfTipoDestinatario;
@@ -89,8 +88,6 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
-	@Autowired
-	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 
 	@Autowired
 	private PluginHelper pluginHelper;
@@ -177,25 +174,26 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 
 	public boolean enviamentRefrescarEstat(
 			Long enviamentId) throws SistemaExternException {
-		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
-		NotificaRespostaDatatDto respostaDatat = enviamentDatat(enviament);
-		enviamentUpdateDatat(
-				getEstatNotifica(respostaDatat.getEstatActual()),
-				respostaDatat.getDataActualitzacio(),
-				respostaDatat.getEstatActualDescripcio(),
-				null,
-				null,
-				null,
-				respostaDatat.getNumSeguiment(),
-				null,
-				enviament);
-		enviament.updateNotificaError(false, null);
-		if (isEstatFinal(respostaDatat.getEstatActual())) {
-			//NotificaRespostaCertificacioDto respostaCertificacio = enviamentCertificacio(destinatari);
-			enviamentCertificacio(enviament);
-			// TODO
-		}
-		return true;
+//		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+//		NotificaRespostaDatatDto respostaDatat = enviamentDatat(enviament);
+//		enviamentUpdateDatat(
+//				getEstatNotifica(respostaDatat.getEstatActual()),
+//				respostaDatat.getDataActualitzacio(),
+//				respostaDatat.getEstatActualDescripcio(),
+//				null,
+//				null,
+//				null,
+//				respostaDatat.getNumSeguiment(),
+//				null,
+//				enviament);
+//		enviament.updateNotificaError(false, null);
+//		if (isEstatFinal(respostaDatat.getEstatActual())) {
+//			//NotificaRespostaCertificacioDto respostaCertificacio = enviamentCertificacio(destinatari);
+//			enviamentCertificacio(enviament);
+//			// TODO
+//		}
+//		return true;
+		throw new SistemaExternException("Notifica v.1", "Mètode no implementat. Utilitzeu la versió 2 de Notifica.");
 	}
 
 
@@ -565,6 +563,7 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 		}
 	}*/
 
+	@SuppressWarnings("unused")
 	private NotificaRespostaDatatDto enviamentDatat(
 			NotificacioEnviamentEntity enviament) {
 		NotificacioEntity notificacio = enviament.getNotificacio();
@@ -654,6 +653,7 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private NotificaRespostaCertificacioDto enviamentCertificacio(
 			NotificacioEnviamentEntity enviament) {
 		NotificacioEntity notificacio = enviament.getNotificacio();

@@ -150,6 +150,7 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 		public Builder callbackInicialitza() {
 			built.callbackEstat = CallbackEstatEnumDto.PENDENT;
 			built.callbackIntents = 0;
+			built.callbackData = new Date();
 			return this;
 		}
 		public NotificacioEventEntity build() {
