@@ -112,6 +112,12 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 		this.callbackError = StringUtils.abbreviate(error, ERROR_DESC_MAX_LENGTH);
 	}
 	
+	public void callbackInicialitza() {
+		this.callbackEstat = CallbackEstatEnumDto.PENDENT;
+		this.callbackIntents = 0;
+		this.callbackData = new Date();
+	}
+	
 	public static Builder getBuilder(
 			NotificacioEventTipusEnumDto tipus,
 			NotificacioEntity notificacio) {

@@ -24,6 +24,7 @@ import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.ws.callback.CertificacioArxiuTipusEnum;
 import es.caib.notib.core.api.ws.callback.CertificacioTipusEnum;
+import es.caib.notib.core.api.ws.callback.NotificacioCanviClient;
 import es.caib.notib.core.api.ws.callback.NotificacioCertificacioClient;
 import es.caib.notib.core.api.ws.callback.NotificacioDestinatariEstatEnum;
 import es.caib.notib.core.api.ws.callback.NotificacioEstatClient;
@@ -34,6 +35,7 @@ import es.caib.notib.core.entity.NotificacioEventEntity.Builder;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
+import net.sf.ehcache.transaction.XidTransactionIDSerializedForm;
 
 /**
  * Classe per englobar la tasca de notificar l'estat o la certificació a l'aplicació
@@ -50,16 +52,19 @@ import es.caib.notib.core.repository.NotificacioEventRepository;
 @Component
 public class CallbackHelper {
 
-	private static final String NOTIFICACIO_ESTAT = "notificaEstat";
-	private static final String NOTIFICACIO_CERTIFICACIO = "notificaCertificacio";
+	private static final String NOTIFICACIO_CANVI = "notificaCanvi";
+//	private static final String NOTIFICACIO_ESTAT = "notificaEstat";
+//	private static final String NOTIFICACIO_CERTIFICACIO = "notificaCertificacio";
 
 	@Autowired
 	private AplicacioRepository aplicacioRepository;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
 
+//	@Autowired
+//	private PluginHelper pluginHelper;
 	@Autowired
-	private PluginHelper pluginHelper;
+	private NotificaHelper notificaHelper;
 
 
 
@@ -83,11 +88,13 @@ public class CallbackHelper {
 			try {
 				if (event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT
 						|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) {
-					// Invoca el mètode de notificació de l'aplicació client segons és estat o certificat:
-					if (event.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT))
-						notificaEstat(event.getEnviament());
-					else if (event.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO))
-						notificaCertificat(event.getEnviament());					
+					// Avisa al client que hi ha hagut una modificació a l'enviament
+					notificaCanvi(event.getEnviament());
+//					// Invoca el mètode de notificació de l'aplicació client segons és estat o certificat:
+//					if (event.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT))
+//						notificaEstat(event.getEnviament());
+//					else if (event.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO))
+//						notificaCertificat(event.getEnviament());					
 					// Marca l'event com a notificat
 					event.updateCallbackClient(CallbackEstatEnumDto.NOTIFICAT, ara, intents, null);
 					ret = true;
@@ -129,7 +136,7 @@ public class CallbackHelper {
 		return ret;
 	}
 
-	private String notificaEstat(NotificacioEnviamentEntity enviament) throws Exception {
+	private String notificaCanvi(NotificacioEnviamentEntity enviament) throws Exception {
 		if (enviament == null)
 			throw new Exception("El destinatari no pot ser nul.");
 		
@@ -141,27 +148,30 @@ public class CallbackHelper {
 		if (aplicacio.getCallbackUrl() == null)
 			throw new Exception("La aplicació " + aplicacio.getUsuariCodi() + " no té cap url de callback configurada");
 				
-		// Omple l'objecte amb la informació cap a l'aplicació client
-		NotificacioEstatClient notificacioEstat = new NotificacioEstatClient(
-					calcularEstat(enviament),
-					enviament.getNotificaEstatData(),
-					enviament.getDestinatariNom(),
-					enviament.getDestinatariNif(),
-					enviament.getNotificaDatatOrigen(),
-					enviament.getNotificaDatatNumSeguiment(),
-					enviament.getNotificaReferencia() 
-				);
+//		// Omple l'objecte amb la informació cap a l'aplicació client
+//		NotificacioEstatClient notificacioEstat = new NotificacioEstatClient(
+//					calcularEstat(enviament),
+//					enviament.getNotificaEstatData(),
+//					enviament.getDestinatariNom(),
+//					enviament.getDestinatariNif(),
+//					enviament.getNotificaDatatOrigen(),
+//					enviament.getNotificaDatatNumSeguiment(),
+//					enviament.getNotificaReferencia() 
+//				);
+		NotificacioCanviClient notificacioCanvi = new NotificacioCanviClient(
+				notificaHelper.xifrarId(enviament.getNotificacio().getId()), 
+				enviament.getNotificaReferencia());
 
 		// Passa l'objecte a JSON
 		ObjectMapper mapper  = new ObjectMapper();
-		String body = mapper.writeValueAsString(notificacioEstat);
+		String body = mapper.writeValueAsString(notificacioCanvi);
 				
 		// Prepara el client JSON per a la crida POST
 		Client jerseyClient = this.getClient(aplicacio);
 
 		// Completa la URL al mètode
 		String urlBase = aplicacio.getCallbackUrl();
-		String urlAmbMetode = urlBase + (urlBase.endsWith("/") ? "" : "/") +  NOTIFICACIO_ESTAT;
+		String urlAmbMetode = urlBase + (urlBase.endsWith("/") ? "" : "/") +  NOTIFICACIO_CANVI;
 		
 		// Fa la crida POST passant les dades JSON
 		ClientResponse response = jerseyClient.
@@ -175,60 +185,107 @@ public class CallbackHelper {
 
 		return response.getEntity(String.class);
 	}
+	
+//	private String notificaEstat(NotificacioEnviamentEntity enviament) throws Exception {
+//		if (enviament == null)
+//			throw new Exception("El destinatari no pot ser nul.");
+//		
+//		// Resol si hi ha una aplicació pel codi d'usuari que ha creat l'enviament
+//		UsuariEntity usuari = enviament.getCreatedBy();
+//		AplicacioEntity aplicacio = aplicacioRepository.findByUsuariCodi(usuari.getCodi());
+//		if (aplicacio == null)
+//			throw new NotFoundException("codi usuari: " + usuari.getCodi(), AplicacioEntity.class);
+//		if (aplicacio.getCallbackUrl() == null)
+//			throw new Exception("La aplicació " + aplicacio.getUsuariCodi() + " no té cap url de callback configurada");
+//				
+//		// Omple l'objecte amb la informació cap a l'aplicació client
+//		NotificacioEstatClient notificacioEstat = new NotificacioEstatClient(
+//					calcularEstat(enviament),
+//					enviament.getNotificaEstatData(),
+//					enviament.getDestinatariNom(),
+//					enviament.getDestinatariNif(),
+//					enviament.getNotificaDatatOrigen(),
+//					enviament.getNotificaDatatNumSeguiment(),
+//					enviament.getNotificaReferencia() 
+//				);
+//
+//		// Passa l'objecte a JSON
+//		ObjectMapper mapper  = new ObjectMapper();
+//		String body = mapper.writeValueAsString(notificacioEstat);
+//				
+//		// Prepara el client JSON per a la crida POST
+//		Client jerseyClient = this.getClient(aplicacio);
+//
+//		// Completa la URL al mètode
+//		String urlBase = aplicacio.getCallbackUrl();
+//		String urlAmbMetode = urlBase + (urlBase.endsWith("/") ? "" : "/") +  NOTIFICACIO_ESTAT;
+//		
+//		// Fa la crida POST passant les dades JSON
+//		ClientResponse response = jerseyClient.
+//				resource(urlAmbMetode).
+//				type("application/json").
+//				post(ClientResponse.class, body);
+//		
+//		// Comprova que la resposta sigui 200 OK
+//		if ( ClientResponse.Status.OK.getStatusCode() != response.getStatusInfo().getStatusCode())
+//			throw new Exception("La resposta del client és: " + response.getStatusInfo().getStatusCode() + " - " + response.getStatusInfo().getReasonPhrase());
+//
+//		return response.getEntity(String.class);
+//	}
 
-	private String notificaCertificat(NotificacioEnviamentEntity enviament) throws Exception{
-		if (enviament == null)
-			throw new Exception("El destinatari no pot ser nul.");
-		// Resol si hi ha una aplicació pel codi d'usuari que ha creat l'enviament
-		UsuariEntity usuari = enviament.getCreatedBy();
-		AplicacioEntity aplicacio = aplicacioRepository.findByUsuariCodi(usuari.getCodi());
-		if (aplicacio == null)
-			throw new NotFoundException("codi usuari: " + usuari.getCodi(), AplicacioEntity.class);
-		if (aplicacio.getCallbackUrl() == null)
-			throw new Exception("La aplicació " + aplicacio.getUsuariCodi() + " no té cap url de callback configurada");
-		// Comprova que l'event tingui un fitxer associat
-		if (enviament.getNotificaCertificacioArxiuId() == null)
-			throw new Exception("L'event no té un fitxer associat.");
-		if (aplicacio.getCallbackUrl() == null)
-			throw new Exception("La aplicació " + aplicacio.getUsuariCodi() + " no té cap url de callback configurada");
-		
-
-		// Omple l'objecte amb la informació cap a l'aplicació client
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		pluginHelper.gestioDocumentalGet(
-				enviament.getNotificaCertificacioArxiuId(),
-				PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
-				baos);
-		NotificacioCertificacioClient notificacioCertificacio = new NotificacioCertificacioClient(
-				CertificacioTipusEnum.toCertificacioTipusEnum(enviament.getNotificaCertificacioTipus()),
-				CertificacioArxiuTipusEnum.toCertificacioArxiuTipusEnum(enviament.getNotificaCertificacioArxiuTipus()), 
-				new String(Base64.encode(baos.toByteArray())),
-				enviament.getNotificaCertificacioNumSeguiment(),
-				enviament.getNotificaCertificacioData() );
-
-		// Passa l'objecte a JSON
-		ObjectMapper mapper  = new ObjectMapper();
-		String body = mapper.writeValueAsString(notificacioCertificacio);
-		
-		// Prepara el client JSON per a la crida POST
-		Client jerseyClient = this.getClient(aplicacio); 
-
-		// Completa la URL al mètode
-		String urlBase = aplicacio.getCallbackUrl();
-    	String urlAmbMetode = urlBase + (urlBase.endsWith("/") ? "" : "/") +  NOTIFICACIO_CERTIFICACIO;
-
-		// Fa la crida POST passant les dades JSON
-		ClientResponse response = jerseyClient.
-				resource(urlAmbMetode).
-				type("application/json").
-				post(ClientResponse.class, body);
-		
-		// Comprova que la resposta sigui 200 OK
-		if ( ClientResponse.Status.OK.getStatusCode() != response.getStatusInfo().getStatusCode())
-			throw new Exception("La resposta del client és: " + response.getStatusInfo().getStatusCode() + " - " + response.getStatusInfo().getReasonPhrase());
-
-		return response.getEntity(String.class);
-	}
+//	private String notificaCertificat(NotificacioEnviamentEntity enviament) throws Exception{
+//		if (enviament == null)
+//			throw new Exception("El destinatari no pot ser nul.");
+//		// Resol si hi ha una aplicació pel codi d'usuari que ha creat l'enviament
+//		UsuariEntity usuari = enviament.getCreatedBy();
+//		AplicacioEntity aplicacio = aplicacioRepository.findByUsuariCodi(usuari.getCodi());
+//		if (aplicacio == null)
+//			throw new NotFoundException("codi usuari: " + usuari.getCodi(), AplicacioEntity.class);
+//		if (aplicacio.getCallbackUrl() == null)
+//			throw new Exception("La aplicació " + aplicacio.getUsuariCodi() + " no té cap url de callback configurada");
+//		// Comprova que l'event tingui un fitxer associat
+//		if (enviament.getNotificaCertificacioArxiuId() == null)
+//			throw new Exception("L'event no té un fitxer associat.");
+//		if (aplicacio.getCallbackUrl() == null)
+//			throw new Exception("La aplicació " + aplicacio.getUsuariCodi() + " no té cap url de callback configurada");
+//		
+//
+//		// Omple l'objecte amb la informació cap a l'aplicació client
+//		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//		pluginHelper.gestioDocumentalGet(
+//				enviament.getNotificaCertificacioArxiuId(),
+//				PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
+//				baos);
+//		NotificacioCertificacioClient notificacioCertificacio = new NotificacioCertificacioClient(
+//				CertificacioTipusEnum.toCertificacioTipusEnum(enviament.getNotificaCertificacioTipus()),
+//				CertificacioArxiuTipusEnum.toCertificacioArxiuTipusEnum(enviament.getNotificaCertificacioArxiuTipus()), 
+//				new String(Base64.encode(baos.toByteArray())),
+//				enviament.getNotificaCertificacioNumSeguiment(),
+//				enviament.getNotificaCertificacioData() );
+//
+//		// Passa l'objecte a JSON
+//		ObjectMapper mapper  = new ObjectMapper();
+//		String body = mapper.writeValueAsString(notificacioCertificacio);
+//		
+//		// Prepara el client JSON per a la crida POST
+//		Client jerseyClient = this.getClient(aplicacio); 
+//
+//		// Completa la URL al mètode
+//		String urlBase = aplicacio.getCallbackUrl();
+//    	String urlAmbMetode = urlBase + (urlBase.endsWith("/") ? "" : "/") +  NOTIFICACIO_CERTIFICACIO;
+//
+//		// Fa la crida POST passant les dades JSON
+//		ClientResponse response = jerseyClient.
+//				resource(urlAmbMetode).
+//				type("application/json").
+//				post(ClientResponse.class, body);
+//		
+//		// Comprova que la resposta sigui 200 OK
+//		if ( ClientResponse.Status.OK.getStatusCode() != response.getStatusInfo().getStatusCode())
+//			throw new Exception("La resposta del client és: " + response.getStatusInfo().getStatusCode() + " - " + response.getStatusInfo().getReasonPhrase());
+//
+//		return response.getEntity(String.class);
+//	}
 
 	private NotificacioDestinatariEstatEnum calcularEstat(
 			NotificacioEnviamentEntity enviament) {

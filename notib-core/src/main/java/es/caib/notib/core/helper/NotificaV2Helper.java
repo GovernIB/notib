@@ -163,12 +163,16 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 //		NotificacioEnviamentEstatEnumDto estatActual = enviament.getNotificaEstat();
 		Date dataUltimDatat = enviament.getNotificaDataCreacio();
 		Date dataUltimaCertificacio = enviament.getNotificaCertificacioData();
+
+		NotificacioEventEntity eventDatat  = null;
+		NotificacioEventEntity eventCert  = null;
 		
 		enviament.updateNotificaDataRefrescEstat();
 		
 		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb NotificaV2 (" +
 				"notificacioId=" + notificacio.getId() + ", " +
 				"notificaIdentificador=" + enviament.getNotificaIdentificador() + ")";
+		
 		try {
 			InfoEnvioV2 infoEnvio = new InfoEnvioV2();
 			infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
@@ -216,14 +220,14 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 								null,
 								null,
 								enviament);
-						NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+						eventDatat = NotificacioEventEntity.getBuilder(
 								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
 								enviament.getNotificacio()).
 								enviament(enviament).
 								descripcio(datatDarrer.getResultado()).
-								callbackInicialitza().
+//								callbackInicialitza().
 								build();
-						notificacio.updateEventAfegir(event);
+						notificacio.updateEventAfegir(eventDatat);
 						enviament.updateNotificaError(false, null);
 					}
 				} else {
@@ -265,14 +269,19 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 							null,
 							null,
 							null);
-					NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+					eventCert = NotificacioEventEntity.getBuilder(
 							NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
 							enviament.getNotificacio()).
 							enviament(enviament).
-							callbackInicialitza().
+//							callbackInicialitza().
 							build();
-					notificacio.updateEventAfegir(event);
+					notificacio.updateEventAfegir(eventCert);
 				}
+			}
+			if (eventDatat != null) {
+				eventDatat.callbackInicialitza();
+			} else if (eventCert != null) {
+				eventCert.callbackInicialitza();
 			}
 			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
 					NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
