@@ -316,6 +316,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!pendents.isEmpty()) {
 				logger.debug("Realitzant enviaments a Notifica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
 				for (NotificacioEntity pendent: pendents) {
+					logger.debug(">>> Realitzant enviament a Notifica de la notificació amb identificador: " + pendent.getId());
 					notificaHelper.notificacioEnviar(pendent.getId());
 				}
 			} else {
@@ -343,6 +344,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!pendents.isEmpty()) {
 				logger.debug("Realitzant enviaments a la seu electrònica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
 				for (NotificacioEnviamentEntity pendent: pendents) {
+					logger.debug(">>> Realitzant enviament a la Seu de la notificació amb identificador: " + pendent.getId());
 					seuHelper.enviament(pendent.getId());
 				}
 			} else {
@@ -368,8 +370,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!pendents.isEmpty()) {
 				logger.debug("Realitzant consulta d'estat a la seu electrònica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
 				for (NotificacioEnviamentEntity pendent: pendents) {
+					logger.debug(">>> Consultant l'estat de la notificació a la Seu amb identificador: " + pendent.getId());
 					boolean estatActualitzat = seuHelper.consultaEstat(pendent.getId());
 					if (estatActualitzat) {
+						logger.debug(">>>>>> La notificació amb identificador " + pendent.getId() + " ha canviat d'estat a la Seu. Enviant el canvi a Notific@");
 						notificaHelper.enviamentSeu(pendent.getId());
 					}
 				}
@@ -396,6 +400,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!pendents.isEmpty()) {
 				logger.debug("Realitzant actualització d'estat a Notifica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
 				for (NotificacioEnviamentEntity pendent: pendents) {
+					logger.debug(">>> Enviant el canvi d'estat de la Seu cap a Notific@ de la notificació amb identificador: " + pendent.getId());
 					notificaHelper.enviamentSeu(pendent.getId());
 				}
 			} else {
@@ -422,6 +427,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!pendents.isEmpty()) {
 				logger.debug("Realitzant refresc de l'estat de Notifica per a " + pendents.size() + " enviaments (màxim=" + maxPendents + ")");
 				for (NotificacioEnviamentEntity pendent: pendents) {
+					logger.debug(">>> Consultat l'estat a Notific@ de la notificació amb identificador " + pendent.getId() + ", i actualitzant les dades a Notib.");
 					notificaHelper.enviamentRefrescarEstat(pendent.getId());
 				}
 			} else {

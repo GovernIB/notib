@@ -401,9 +401,11 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 					"REFERENCIA",
 					"Error: No s'ha trobat cap notificació amb la referencia " + referencia);
 		} else {
+//			Es canosulta l'estat periòdicament, no es necessita realitzar una consulta actica a Notifica
 			// Si Notib no utilitza el servei Adviser de @Notifica, i ja ha estat enviat a @Notifica
 			// serà necessari consultar l'estat de la notificació a Notifica
 			if (	!notificaHelper.isAdviserActiu() &&
+					!enviament.isNotificaEstatFinal() &&
 					!enviament.getNotificaEstat().equals(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT)) {
 				notificaHelper.enviamentRefrescarEstat(enviament.getId());
 			}

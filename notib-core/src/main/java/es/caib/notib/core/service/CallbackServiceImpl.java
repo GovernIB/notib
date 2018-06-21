@@ -47,6 +47,7 @@ public class CallbackServiceImpl implements CallbackService {
 			logger.debug("Inici de les notificacions pendents cap a les aplicacions.");
 			int errors = 0;
 			for (Long pendentsId: pendentsIds) {
+				logger.debug(">>> Enviant avís a aplicació client de canvi d'estat de la notificació amb identificador: " + pendentsId);
 				if (!callbackHelper.notifica(pendentsId)) {
 					errors++;
 				}

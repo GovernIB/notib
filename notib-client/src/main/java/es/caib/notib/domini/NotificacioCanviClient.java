@@ -1,5 +1,7 @@
 package es.caib.notib.domini;
 
+import java.util.Date;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -15,6 +17,7 @@ public class NotificacioCanviClient {
 
 	private String identificador;
 	private String referenciaEnviament;
+	private Date data;
 	
 	public NotificacioCanviClient() {
 		super();
@@ -26,6 +29,7 @@ public class NotificacioCanviClient {
 		super();
 		this.identificador = identificador;
 		this.referenciaEnviament = referenciaEnviament;
+		this.data = new Date();
 	}
 	
 	public String getIdentificador() {
@@ -40,6 +44,13 @@ public class NotificacioCanviClient {
 	}
 	public void setReferenciaEnviament(String referenciaEnviament) {
 		this.referenciaEnviament = referenciaEnviament;
+	}
+	
+	public Date getData() {
+		return data;
+	}
+	public void setData(Date data) {
+		this.data = data;
 	}
 
 }

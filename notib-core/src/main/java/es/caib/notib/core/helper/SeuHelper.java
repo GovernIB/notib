@@ -142,7 +142,7 @@ public class SeuHelper {
 					enviament(enviament).
 					descripcio((estat != null) ? estat.toString() : null).
 					build();
-			estatActualitzat = !estat.equals(enviament.getSeuEstat());
+			estatActualitzat = !estat.equals(enviament.getSeuEstat()) && !estat.equals(SeuEstatEnumDto.ENVIADA);
 		} catch (Exception ex) {
 			logger.error(
 					"Error al consultar l'estat de la notificació a la seu electrònica (" +

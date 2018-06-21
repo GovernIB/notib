@@ -196,8 +196,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				if (datatDarrer != null) {
 					
 					Date dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
-					if (!dataDatat.equals(dataUltimDatat)) {
-						NotificacioEnviamentEstatEnumDto estat = getEstatNotifica(datatDarrer.getResultado());
+					NotificacioEnviamentEstatEnumDto estat = getEstatNotifica(datatDarrer.getResultado());
+					
+					if (!dataDatat.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
 						CodigoDIR organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
 						CodigoDIR organismoEmisorRaiz = resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
 						enviament.updateNotificaInformacio(

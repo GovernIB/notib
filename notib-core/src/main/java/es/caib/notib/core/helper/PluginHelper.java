@@ -276,16 +276,30 @@ public class PluginHelper {
 		boolean isNotificacio = NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus());
 		long t0 = System.currentTimeMillis();
 		try {
-			SeuPersona destinatari = new SeuPersona();
-			destinatari.setNif(
-					notificacioDestinatari.getDestinatariNif());
-			destinatari.setNom(
-					notificacioDestinatari.getDestinatariNom());
-			destinatari.setLlinatge1(
-					notificacioDestinatari.getDestinatariLlinatge1());
-			destinatari.setLlinatge2(
-					notificacioDestinatari.getDestinatariLlinatge2());
+			SeuPersona representant = new SeuPersona();
 			SeuPersona representat = null;
+			
+			if (notificacioDestinatari.getDestinatariNif() != null) {
+				// Representant
+				representant.setNif(notificacioDestinatari.getDestinatariNif());
+				representant.setNom(notificacioDestinatari.getDestinatariNom());
+				representant.setLlinatge1(notificacioDestinatari.getDestinatariLlinatge1());
+				representant.setLlinatge2(notificacioDestinatari.getDestinatariLlinatge2());
+				// Representat
+				representat.setNif(notificacioDestinatari.getTitularNif());
+				representat.setNom(notificacioDestinatari.getTitularNom());
+				representat.setLlinatge1(notificacioDestinatari.getTitularLlinatge1());
+				representat.setLlinatge2(notificacioDestinatari.getTitularLlinatge2());
+			} else {
+				// Representant
+				representant.setNif(notificacioDestinatari.getTitularNif());
+				representant.setNom(notificacioDestinatari.getTitularNom());
+				representant.setLlinatge1(notificacioDestinatari.getTitularLlinatge1());
+				representant.setLlinatge2(notificacioDestinatari.getTitularLlinatge2());
+			}
+			
+			
+			
 			String telefonMobil = null;
 			if (isTelefonMobil(notificacioDestinatari.getDestinatariTelefon())) {
 				telefonMobil = notificacioDestinatari.getDestinatariTelefon();
@@ -296,7 +310,7 @@ public class PluginHelper {
 					notificacio.getSeuProcedimentCodi(),
 					notificacio.getSeuIdioma(),
 					notificacio.getSeuExpedientTitol(),
-					destinatari,
+					representant,
 					representat,
 					null, //bantelNumeroEntrada,
 					true,
@@ -318,7 +332,7 @@ public class PluginHelper {
 					notificacio.getSeuRegistreLlibre(),
 					notificacio.getSeuRegistreOficina(),
 					notificacio.getSeuRegistreOrgan(),
-					destinatari,
+					representant,
 					representat,
 					notificacio.getSeuIdioma(),
 					notificacio.getSeuOficiTitol(),
