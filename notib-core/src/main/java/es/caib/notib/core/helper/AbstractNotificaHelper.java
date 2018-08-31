@@ -207,7 +207,7 @@ public abstract class AbstractNotificaHelper {
 			}
 			Date fecha = enviament.getSeuDataFi();
 			if (fecha == null) {
-				fecha = certificacioData;
+				fecha = certificacioData != null ? certificacioData : new Date();
 			}
 			certificacionSede.setFecha(toXmlGregorianCalendar(fecha));
 			certificacionSede.setDocumento(
@@ -242,24 +242,34 @@ public abstract class AbstractNotificaHelper {
 				notificacioEventRepository.save(event);
 			}
 		} catch (Exception ex) {
-			logger.error(
-					"Error al enviar la certificació d'una notificació de la seu a Notifica (" +
-					"notificacioId=" + notificacio.getId() + ", " +
-					"notificaIdentificador=" + enviament.getNotificaIdentificador() + ")",
-					ex);
-			event = NotificacioEventEntity.getBuilder(
-					NotificacioEventTipusEnumDto.SEU_NOTIFICA_CERTIFICACIO,
-					notificacio).
-					enviament(enviament).
-					error(true).
-					errorDescripcio(ExceptionUtils.getStackTrace(ex)).
-					build();
-			enviament.updateSeuError(
-					true,
-					event,
-					true);
-			notificacioEventRepository.save(event);
-			error = true;
+			if (ex.getMessage() != null && ex.getMessage().contains("El envio ya esta comparecido")) {
+				event = NotificacioEventEntity.getBuilder(
+						NotificacioEventTipusEnumDto.SEU_NOTIFICA_CERTIFICACIO,
+						notificacio).
+						enviament(enviament).
+						build();
+				notificacioEventRepository.save(event);
+				enviament.updateSeuNotificaInformat();
+			} else {
+				logger.error(
+						"Error al enviar la certificació d'una notificació de la seu a Notifica (" +
+						"notificacioId=" + notificacio.getId() + ", " +
+						"notificaIdentificador=" + enviament.getNotificaIdentificador() + ")",
+						ex);
+				event = NotificacioEventEntity.getBuilder(
+						NotificacioEventTipusEnumDto.SEU_NOTIFICA_CERTIFICACIO,
+						notificacio).
+						enviament(enviament).
+						error(true).
+						errorDescripcio(ExceptionUtils.getStackTrace(ex)).
+						build();
+				enviament.updateSeuError(
+						true,
+						event,
+						true);
+				notificacioEventRepository.save(event);
+				error = true;
+			}
 		}
 		enviament.updateNotificaFiOperacio();
 		notificacio.updateEventAfegir(event);

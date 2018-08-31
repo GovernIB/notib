@@ -87,7 +87,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private boolean documentNormalitzat;
 	@Column(name = "doc_gen_csv", nullable = false)
 	private boolean documentGenerarCsv;
-	@Column(name = "seu_exp_serdoc", length = 10, nullable = false)
+	@Column(name = "seu_exp_serdoc", length = 10)
 	private String seuExpedientSerieDocumental;
 	@Column(name = "seu_exp_uniorg", length = 10, nullable = false)
 	private String seuExpedientUnitatOrganitzativa;
