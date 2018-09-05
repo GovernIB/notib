@@ -31,6 +31,7 @@ CREATE TABLE NOT_APLICACIO
   ID                   BIGSERIAL                NOT NULL,
   USUARI_CODI          character varying(64)    NOT NULL,
   CALLBACK_URL         character varying(256),
+  TIPUS_AUTENTICACIO   integer,
   CREATEDBY_CODI       character varying(64),
   CREATEDDATE          timestamp without time zone,
   LASTMODIFIEDBY_CODI  character varying(64),
