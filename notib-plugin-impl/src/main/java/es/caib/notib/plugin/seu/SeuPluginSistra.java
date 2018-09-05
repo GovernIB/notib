@@ -36,6 +36,7 @@ import es.caib.regtel.ws.v2.model.datosinteresado.IdentificacionInteresadoDesglo
 import es.caib.regtel.ws.v2.model.datosnotificacion.DatosNotificacion;
 import es.caib.regtel.ws.v2.model.datosregistrosalida.DatosRegistroSalida;
 import es.caib.regtel.ws.v2.model.datosrepresentado.DatosRepresentado;
+import es.caib.regtel.ws.v2.model.datosrepresentado.IdentificacionRepresentadoDesglosada;
 import es.caib.regtel.ws.v2.model.detalleacuserecibo.DetalleAcuseRecibo;
 import es.caib.regtel.ws.v2.model.documento.Documento;
 import es.caib.regtel.ws.v2.model.documento.Documentos;
@@ -86,7 +87,7 @@ public class SeuPluginSistra implements SeuPlugin {
 			expediente.setIdentificadorExpediente(identificadorSistra);
 			expediente.setUnidadAdministrativa(new Long(unitatAdministrativa).longValue());
 			expediente.setClaveExpediente(clauSistra);
-			expediente.setIdioma(idioma);
+			expediente.setIdioma(idioma.toLowerCase());
 			expediente.setDescripcion(descripcio);
 			expediente.setAutenticado(true);
 			expediente.setIdentificadorProcedimiento(
@@ -318,7 +319,7 @@ public class SeuPluginSistra implements SeuPlugin {
 			String assumpteTipus = getNotificacioAssumpteTipus();
 			datosNotificacion.setTipoAsunto(
 					(assumpteTipus != null) ? assumpteTipus : "OT");
-			datosNotificacion.setIdioma(idioma);
+			datosNotificacion.setIdioma(idioma.toLowerCase());
 			OficioRemision oficioRemision = new OficioRemision();
 			oficioRemision.setTitulo(oficiTitol);
 			oficioRemision.setTexto(oficiText);
@@ -355,6 +356,11 @@ public class SeuPluginSistra implements SeuPlugin {
 				DatosRepresentado datosRepresentado = new DatosRepresentado();
 				datosRepresentado.setNif(representat.getNif());
 				datosRepresentado.setNombreApellidos(representat.getLlinatgesComaNom());
+				IdentificacionRepresentadoDesglosada idRepresentado = new IdentificacionRepresentadoDesglosada();
+				idRepresentado.setNombre(destinatari.getNom());
+				idRepresentado.setApellido1(destinatari.getLlinatge1());
+				idRepresentado.setApellido2(destinatari.getLlinatge2());
+				datosRepresentado.setNombreApellidosDesglosado(idRepresentado);
 				notificacion.setDatosRepresentado(datosRepresentado);
 			}
 			if (annexos != null && !annexos.isEmpty()) {
@@ -412,6 +418,47 @@ public class SeuPluginSistra implements SeuPlugin {
 					ex);
 		}
 	}
+	
+//	private DatosInteresado getInteressat(SeuPersona interessat) {
+//		DatosInteresado datosInteresado = new DatosInteresado();
+//		datosInteresado.setNif(interessat.getNif());
+//		IdentificacionInteresadoDesglosada idInteresado = new IdentificacionInteresadoDesglosada();
+//		idInteresado.setNombre(interessat.getNom());
+//		idInteresado.setApellido1(interessat.getLlinatge1());
+//		idInteresado.setApellido2(interessat.getLlinatge2());
+//		datosInteresado.setNombreApellidosDesglosado(idInteresado);
+//		datosInteresado.setCodigoPais(
+//				newJAXBElement(
+//						"codigoPais",
+//						interessat.getPaisCodi(),
+//						String.class));
+//		datosInteresado.setNombrePais(
+//				newJAXBElement(
+//						"nombrePais",
+//						interessat.getPaisNom(),
+//						String.class));
+//		datosInteresado.setCodigoProvincia(
+//				newJAXBElement(
+//						"codigoProvincia",
+//						interessat.getProvinciaCodi(),
+//						String.class));
+//		datosInteresado.setNombreProvincia(
+//				newJAXBElement(
+//						"nombreProvincia",
+//						interessat.getProvinciaNom(),
+//						String.class));
+//		datosInteresado.setCodigoLocalidad(
+//				newJAXBElement(
+//						"codigoLocalidad",
+//						interessat.getMunicipiCodi(),
+//						String.class));
+//		datosInteresado.setNombreLocalidad(
+//				newJAXBElement(
+//						"nombreLocalidad",
+//						interessat.getMunicipiNom(),
+//						String.class));
+//		return datosInteresado;
+//	}
 
 	public SeuNotificacioEstat notificacioObtenirJustificantRecepcio(
 			String registreNumero) throws SistemaExternException {
@@ -584,8 +631,15 @@ public class SeuPluginSistra implements SeuPlugin {
 	private String getExpedientIdentificadorPerSistra(
 			String expedientIdentificador) {
 		if (expedientIdentificador.length() > 50 && expedientIdentificador.startsWith(NTI_EXPID_PREFIX)) {
-			return expedientIdentificador.substring(NTI_EXPID_PREFIX.length() + 19);
-			//return expedientIdentificador.substring(NTI_EXPID_PREFIX.length());
+			String identificadorSistra = expedientIdentificador.substring(NTI_EXPID_PREFIX.length() + 19);
+			identificadorSistra = identificadorSistra.replace("_", "-");
+			identificadorSistra = identificadorSistra.replace("[", "-");
+			identificadorSistra = identificadorSistra.replace("]", "-");
+			identificadorSistra = identificadorSistra.replace("{", "-");
+			identificadorSistra = identificadorSistra.replace("}", "-");
+			identificadorSistra = identificadorSistra.replace("(", "-");
+			identificadorSistra = identificadorSistra.replace(")", "-");
+			return identificadorSistra;
 		} else {
 			return expedientIdentificador;
 		}

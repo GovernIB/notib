@@ -84,7 +84,7 @@ public class NotificacioServiceController extends BaseController {
 			method = RequestMethod.GET,
 			produces="application/json")
 	@ApiOperation(
-			value = "Consulta de la informació d'una notificació",
+			value = "Consulta de la informació d'un enviament",
 			response = Notificacio.class)
 	@ResponseBody
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(

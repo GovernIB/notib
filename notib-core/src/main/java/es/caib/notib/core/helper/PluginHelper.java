@@ -286,6 +286,7 @@ public class PluginHelper {
 				representant.setLlinatge1(notificacioDestinatari.getDestinatariLlinatge1());
 				representant.setLlinatge2(notificacioDestinatari.getDestinatariLlinatge2());
 				// Representat
+				representat = new SeuPersona();
 				representat.setNif(notificacioDestinatari.getTitularNif());
 				representat.setNom(notificacioDestinatari.getTitularNom());
 				representat.setLlinatge1(notificacioDestinatari.getTitularLlinatge1());

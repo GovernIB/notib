@@ -119,7 +119,8 @@ $(document).ready(function() {
 					</tr>
 					<tr>
 						<td><strong><spring:message code="enviament.info.dada.servei.tipus"/></strong></td>
-						<td colspan="4"><spring:message code="es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto.${enviament.serveiTipus}"/></td>
+						<c:choose><c:when test="${not empty enviament.serveiTipus}"><c:set var="envTip" value="${enviament.serveiTipus}"/></c:when><c:otherwise><c:set var="envTip" value="NORMAL"/></c:otherwise></c:choose>
+						<td colspan="4"><spring:message code="es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto.${envTip}"/></td>
 					</tr>
 					<tr>
 						<td width="30%"><strong><spring:message code="enviament.info.dada.estat"/></strong></td>
@@ -500,7 +501,7 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.seu.estat"/></strong></td>
-							<td><spring:message code="es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto.${enviament.seuEstat}"/></td>
+							<td><spring:message code="es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.${enviament.seuEstat}"/></td>
 						</tr>
 					</tbody>
 					</table>
