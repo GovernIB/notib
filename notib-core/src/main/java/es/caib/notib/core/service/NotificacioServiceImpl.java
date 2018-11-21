@@ -307,8 +307,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 			fixedRateString = "${config:es.caib.notib.tasca.notifica.enviaments.periode}",
 			initialDelayString = "${config:es.caib.notib.tasca.notifica.enviaments.retard.inicial}")
 	public void notificaEnviamentsPendents() {
-		logger.debug("Cercant notificacions pendents d'enviar a Notifica");
-		if (isTasquesActivesProperty() && notificaHelper.isConnexioNotificaDisponible()) {
+		if (isTasquesActivesProperty() && isNotificaEnviamentsActiu() && notificaHelper.isConnexioNotificaDisponible()) {
+			logger.debug("Cercant notificacions pendents d'enviar a Notifica");
 			int maxPendents = getNotificaEnviamentsProcessarMaxProperty();
 			List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatPendent(
 					pluginHelper.getNotificaReintentsMaxProperty(), 
@@ -329,14 +329,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	// 2. Envia les notificacions ja enviades a Notifica, i pendents d'enviar a la Seu, cap a la Seu
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	@Override
 	@Scheduled(
 			fixedRateString = "${config:es.caib.notib.tasca.seu.enviaments.periode}",
 			initialDelayString = "${config:es.caib.notib.tasca.seu.enviaments.retard.inicial}")
 	public void seuEnviamentsPendents() {
-		logger.debug("Cercant notificacions pendents d'enviar a la seu electrònica");
-		if (pluginHelper.isSeuPluginDisponible() && isTasquesActivesProperty() && pluginHelper.isSeuPluginDisponible()) {
+		if (pluginHelper.isSeuPluginDisponible() && isTasquesActivesProperty() && isSeuEnviamentsActiu() && pluginHelper.isSeuPluginDisponible()) {
+			logger.debug("Cercant notificacions pendents d'enviar a la seu electrònica");
 			int maxPendents = getSeuEnviamentsProcessarMaxProperty();
 			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findBySeuEstatPendent(
 					pluginHelper.getSeuReintentsMaxProperty(),
@@ -357,14 +356,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	// 3. Consulta les notificacions que es troben a la Seu, i que encara no han estat finalitzades a Notifica
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	@Override
 	@Scheduled(
 			fixedRateString = "${config:es.caib.notib.tasca.seu.consulta.periode}",
 			initialDelayString = "${config:es.caib.notib.tasca.seu.consulta.retard.inicial}")
 	public void seuConsultaEstatNotificacions() {
-		logger.debug("Cercant notificacions pendents de consulta d'estat a la seu electrònica");
-		if (pluginHelper.isSeuPluginDisponible() && isTasquesActivesProperty() && pluginHelper.isSeuPluginDisponible()) {
+		if (pluginHelper.isSeuPluginDisponible() && isTasquesActivesProperty() && isSeuConsultaActiu() && pluginHelper.isSeuPluginDisponible()) {
+			logger.debug("Cercant notificacions pendents de consulta d'estat a la seu electrònica");
 			int maxPendents = getSeuConsultaProcessarMaxProperty();
 			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findBySeuEstatEnviat(new PageRequest(0, maxPendents));
 			if (!pendents.isEmpty()) {
@@ -387,14 +385,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	// 4. Envia les actualitzacions d'estat les notificacions de la Seu cap a Notifica
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	@Override
 	@Scheduled(
 			fixedRateString = "${config:es.caib.notib.tasca.notifica.enviament.estat.seu.periode}",
 			initialDelayString = "${config:es.caib.notib.tasca.notifica.enviament.estat.seu.retard.inicial}")
 	public void notificaInformaCanviEstatSeu() {
-		logger.debug("Cercant notificacions de la seu pendents d'actualitzar l'estat a Notifica");
-		if (pluginHelper.isSeuPluginDisponible() && isTasquesActivesProperty() && pluginHelper.isSeuPluginDisponible()) {
+		if (pluginHelper.isSeuPluginDisponible() && isTasquesActivesProperty() && isNotificaCanviEstatSeuActiu() && pluginHelper.isSeuPluginDisponible()) {
+			logger.debug("Cercant notificacions de la seu pendents d'actualitzar l'estat a Notifica");
 			int maxPendents = getNotificaCanviEstatSeuProcessarMaxProperty();
 			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findBySeuEstatModificat(new PageRequest(0, maxPendents));
 			if (!pendents.isEmpty()) {
@@ -413,14 +410,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	// 5. Refresca l'estat de les notificacions segons l'estat de Notifica
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	@Override
 	@Scheduled(
 			fixedRateString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.periode}",
 			initialDelayString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.retard.inicial}")
 	public void enviamentRefrescarEstatPendents() {
-		logger.debug("Cercant enviaments pendents de refrescar l'estat de Notifica");
-		if (isTasquesActivesProperty() && notificaHelper.isConnexioNotificaDisponible()) {
+		if (isTasquesActivesProperty() && isEnviamentActualitzacioEstatActiu() && notificaHelper.isConnexioNotificaDisponible()) {
+			logger.debug("Cercant enviaments pendents de refrescar l'estat de Notifica");
 			int maxPendents = getEnviamentActualitzacioEstatProcessarMaxProperty();
 			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByNotificaRefresc(
 					new PageRequest(0, maxPendents));
@@ -512,25 +508,69 @@ public class NotificacioServiceImpl implements NotificacioService {
 		return "certificacio_" + enviament.getNotificaIdentificador() + ".pdf";
 	}
 
+	private boolean isNotificaEnviamentsActiu() {
+		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.notifica.enviaments.actiu");
+		if (actives != null) {
+			return new Boolean(actives).booleanValue();
+		} else {
+			return true;
+		}
+	}
 	private int getNotificaEnviamentsProcessarMaxProperty() {
 		return propertiesHelper.getAsInt(
 				"es.caib.notib.tasca.notifica.enviaments.processar.max",
 				10);
+	}
+
+	private boolean isSeuEnviamentsActiu() {
+		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.seu.enviaments.actiu");
+		if (actives != null) {
+			return new Boolean(actives).booleanValue();
+		} else {
+			return true;
+		}
 	}
 	private int getSeuEnviamentsProcessarMaxProperty() {
 		return propertiesHelper.getAsInt(
 				"es.caib.notib.tasca.seu.enviaments.processar.max",
 				10);
 	}
+
+	private boolean isSeuConsultaActiu() {
+		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.seu.consulta.actiu");
+		if (actives != null) {
+			return new Boolean(actives).booleanValue();
+		} else {
+			return true;
+		}
+	}
 	private int getSeuConsultaProcessarMaxProperty() {
 		return propertiesHelper.getAsInt(
 				"es.caib.notib.tasca.seu.consulta.processar.max",
 				10);
 	}
+
+	private boolean isNotificaCanviEstatSeuActiu() {
+		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.notifica.enviament.estat.actiu");
+		if (actives != null) {
+			return new Boolean(actives).booleanValue();
+		} else {
+			return true;
+		}
+	}
 	private int getNotificaCanviEstatSeuProcessarMaxProperty() {
 		return propertiesHelper.getAsInt(
 				"es.caib.notib.tasca.notifica.enviament.estat.seu.processar.max",
 				10);
+	}
+
+	private boolean isEnviamentActualitzacioEstatActiu() {
+		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.enviament.actualitzacio.estat.actiu");
+		if (actives != null) {
+			return new Boolean(actives).booleanValue();
+		} else {
+			return true;
+		}
 	}
 	private int getEnviamentActualitzacioEstatProcessarMaxProperty() {
 		return propertiesHelper.getAsInt(
@@ -546,8 +586,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			return true;
 		}
 	}
-	
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceImpl.class);
 
 }

@@ -28,37 +28,54 @@ public class CallbackServiceImpl implements CallbackService {
 	private NotificacioEventRepository notificacioEventRepository;
     @Autowired
 	private CallbackHelper callbackHelper;
-
-
+    @Autowired
+	private PropertiesHelper propertiesHelper;
 
 	@Override
 	@Scheduled(
 			fixedRateString = "${config:es.caib.notib.tasca.callback.pendents.periode}",
 			initialDelayString = "${config:es.caib.notib.tasca.callback.pendents.retard.inicial}")
 	public void processarPendents() {
-		logger.debug("Cercant notificacions pendents d'enviar al client");
-		int maxPendents = getEventsProcessarMaxProperty(); 
-		Pageable page = new PageRequest(
-				0,
-				maxPendents);
-//				new Sort(new Order(Direction.ASC, "data")));
-		List<Long> pendentsIds = notificacioEventRepository.findEventsPendentsIds(page);
-		if (pendentsIds.size() > 0) {
-			logger.debug("Inici de les notificacions pendents cap a les aplicacions.");
-			int errors = 0;
-			for (Long pendentsId: pendentsIds) {
-				logger.debug(">>> Enviant avís a aplicació client de canvi d'estat de la notificació amb identificador: " + pendentsId);
-				if (!callbackHelper.notifica(pendentsId)) {
-					errors++;
+		if (isTasquesActivesProperty() && isCallbackPendentsActiu()) {
+			logger.debug("Cercant notificacions pendents d'enviar al client");
+			int maxPendents = getEventsProcessarMaxProperty(); 
+			Pageable page = new PageRequest(
+					0,
+					maxPendents);
+			List<Long> pendentsIds = notificacioEventRepository.findEventsPendentsIds(page);
+			if (pendentsIds.size() > 0) {
+				logger.debug("Inici de les notificacions pendents cap a les aplicacions.");
+				int errors = 0;
+				for (Long pendentsId: pendentsIds) {
+					logger.debug(">>> Enviant avís a aplicació client de canvi d'estat de la notificació amb identificador: " + pendentsId);
+					if (!callbackHelper.notifica(pendentsId)) {
+						errors++;
+					}
 				}
+				logger.debug("Fi de les notificacions pendents cap a les aplicacions: " + pendentsIds.size() + ", " + errors + " errors");
 			}
-			logger.debug("Fi de les notificacions pendents cap a les aplicacions: " + pendentsIds.size() + ", " + errors + " errors");
 		}
 	}
 
 
 
-	/* Màxim d'events a processar en cada període */
+	private boolean isTasquesActivesProperty() {
+		String actives = propertiesHelper.getProperty("es.caib.notib.tasques.actives");
+		if (actives != null) {
+			return new Boolean(actives).booleanValue();
+		} else {
+			return true;
+		}
+	}
+	
+	private boolean isCallbackPendentsActiu() {
+		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.callback.pendents.actiu");
+		if (actives != null) {
+			return new Boolean(actives).booleanValue();
+		} else {
+			return true;
+		}
+	}
 	private int getEventsProcessarMaxProperty() {
 		return PropertiesHelper.getProperties().getAsInt(
 				"es.caib.notib.tasca.callback.pendents.processar.max",

@@ -3,7 +3,6 @@
  */
 package es.caib.notib.core.helper;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
 import org.slf4j.Logger;
@@ -17,17 +16,11 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.client.filter.LoggingFilter;
-import com.sun.jersey.core.util.Base64;
 
 import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.ws.callback.CertificacioArxiuTipusEnum;
-import es.caib.notib.core.api.ws.callback.CertificacioTipusEnum;
 import es.caib.notib.core.api.ws.callback.NotificacioCanviClient;
-import es.caib.notib.core.api.ws.callback.NotificacioCertificacioClient;
-import es.caib.notib.core.api.ws.callback.NotificacioDestinatariEstatEnum;
-import es.caib.notib.core.api.ws.callback.NotificacioEstatClient;
 import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
@@ -35,7 +28,6 @@ import es.caib.notib.core.entity.NotificacioEventEntity.Builder;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
-import net.sf.ehcache.transaction.XidTransactionIDSerializedForm;
 
 /**
  * Classe per englobar la tasca de notificar l'estat o la certificació a l'aplicació
@@ -287,76 +279,76 @@ public class CallbackHelper {
 //		return response.getEntity(String.class);
 //	}
 
-	private NotificacioDestinatariEstatEnum calcularEstat(
-			NotificacioEnviamentEntity enviament) {
-		NotificacioDestinatariEstatEnum estat = null;
-		switch (enviament.getNotificaEstat()) {
-		case ABSENT:
-			estat = NotificacioDestinatariEstatEnum.ABSENT;
-			break;
-		case ADRESA_INCORRECTA:
-			estat = NotificacioDestinatariEstatEnum.ADRESA_INCORRECTA;
-			break;
-		case DESCONEGUT:
-			estat = NotificacioDestinatariEstatEnum.DESCONEGUT;
-			break;
-		case ENTREGADA_OP:
-			estat = NotificacioDestinatariEstatEnum.ENTREGADA_OP;
-			break;
-		case ENVIADA_CI:
-			estat = NotificacioDestinatariEstatEnum.ENVIADA_CI;
-			break;
-		case ENVIADA_DEH:
-			estat = NotificacioDestinatariEstatEnum.ENVIADA_DEH;
-			break;
-		case ENVIAMENT_PROGRAMAT:
-			estat = NotificacioDestinatariEstatEnum.ENVIAMENT_PROGRAMAT;
-			break;
-		case ERROR_ENTREGA:
-			estat = NotificacioDestinatariEstatEnum.ERROR_ENTREGA;
-			break;
-		case EXPIRADA:
-			estat = NotificacioDestinatariEstatEnum.EXPIRADA;
-			break;
-		case EXTRAVIADA:
-			estat = NotificacioDestinatariEstatEnum.EXTRAVIADA;
-			break;
-		case LLEGIDA:
-			estat = NotificacioDestinatariEstatEnum.LLEGIDA;
-			break;
-		case MORT:
-			estat = NotificacioDestinatariEstatEnum.MORT;
-			break;
-		case NOTIFICADA:
-			estat = NotificacioDestinatariEstatEnum.NOTIFICADA;
-			break;
-		case PENDENT_CIE:
-			estat = NotificacioDestinatariEstatEnum.PENDENT_CIE;
-			break;
-		case PENDENT_DEH:
-			estat = NotificacioDestinatariEstatEnum.PENDENT_DEH;
-			break;
-		case PENDENT_ENVIAMENT:
-			estat = NotificacioDestinatariEstatEnum.PENDENT_ENVIAMENT;
-			break;
-		case PENDENT_SEU:
-			estat = NotificacioDestinatariEstatEnum.PENDENT_SEU;
-			break;
-		case REBUTJADA:
-			estat = NotificacioDestinatariEstatEnum.REBUTJADA;
-			break;
-		case SENSE_INFORMACIO:
-			estat = NotificacioDestinatariEstatEnum.SENSE_INFORMACIO;
-			break;
-		case NOTIB_ENVIADA:
-			estat = NotificacioDestinatariEstatEnum.NOTIB_ENVIADA;
-			break;
-		case NOTIB_PENDENT:
-			estat = NotificacioDestinatariEstatEnum.NOTIB_PENDENT;
-			break;
-		}
-		return estat;
-	}
+//	private NotificacioDestinatariEstatEnum calcularEstat(
+//			NotificacioEnviamentEntity enviament) {
+//		NotificacioDestinatariEstatEnum estat = null;
+//		switch (enviament.getNotificaEstat()) {
+//		case ABSENT:
+//			estat = NotificacioDestinatariEstatEnum.ABSENT;
+//			break;
+//		case ADRESA_INCORRECTA:
+//			estat = NotificacioDestinatariEstatEnum.ADRESA_INCORRECTA;
+//			break;
+//		case DESCONEGUT:
+//			estat = NotificacioDestinatariEstatEnum.DESCONEGUT;
+//			break;
+//		case ENTREGADA_OP:
+//			estat = NotificacioDestinatariEstatEnum.ENTREGADA_OP;
+//			break;
+//		case ENVIADA_CI:
+//			estat = NotificacioDestinatariEstatEnum.ENVIADA_CI;
+//			break;
+//		case ENVIADA_DEH:
+//			estat = NotificacioDestinatariEstatEnum.ENVIADA_DEH;
+//			break;
+//		case ENVIAMENT_PROGRAMAT:
+//			estat = NotificacioDestinatariEstatEnum.ENVIAMENT_PROGRAMAT;
+//			break;
+//		case ERROR_ENTREGA:
+//			estat = NotificacioDestinatariEstatEnum.ERROR_ENTREGA;
+//			break;
+//		case EXPIRADA:
+//			estat = NotificacioDestinatariEstatEnum.EXPIRADA;
+//			break;
+//		case EXTRAVIADA:
+//			estat = NotificacioDestinatariEstatEnum.EXTRAVIADA;
+//			break;
+//		case LLEGIDA:
+//			estat = NotificacioDestinatariEstatEnum.LLEGIDA;
+//			break;
+//		case MORT:
+//			estat = NotificacioDestinatariEstatEnum.MORT;
+//			break;
+//		case NOTIFICADA:
+//			estat = NotificacioDestinatariEstatEnum.NOTIFICADA;
+//			break;
+//		case PENDENT_CIE:
+//			estat = NotificacioDestinatariEstatEnum.PENDENT_CIE;
+//			break;
+//		case PENDENT_DEH:
+//			estat = NotificacioDestinatariEstatEnum.PENDENT_DEH;
+//			break;
+//		case PENDENT_ENVIAMENT:
+//			estat = NotificacioDestinatariEstatEnum.PENDENT_ENVIAMENT;
+//			break;
+//		case PENDENT_SEU:
+//			estat = NotificacioDestinatariEstatEnum.PENDENT_SEU;
+//			break;
+//		case REBUTJADA:
+//			estat = NotificacioDestinatariEstatEnum.REBUTJADA;
+//			break;
+//		case SENSE_INFORMACIO:
+//			estat = NotificacioDestinatariEstatEnum.SENSE_INFORMACIO;
+//			break;
+//		case NOTIB_ENVIADA:
+//			estat = NotificacioDestinatariEstatEnum.NOTIB_ENVIADA;
+//			break;
+//		case NOTIB_PENDENT:
+//			estat = NotificacioDestinatariEstatEnum.NOTIB_PENDENT;
+//			break;
+//		}
+//		return estat;
+//	}
 
 	/** Propietat que assenayala el màxim de reintents. Si la propietat és null llavors no hi ha un màxim. */
 	private Integer getEventsIntentsMaxProperty() {
