@@ -300,8 +300,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 				new Date());
 	}
 
-	// 1. Envia les notificacions pendents d'enviar a Notifica cap a Notifica
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 1. Enviament de notificacions pendents a Notific@
+	////////////////////////////////////////////////////
 	@Override
 	@Scheduled(
 			fixedRateString = "${config:es.caib.notib.tasca.notifica.enviaments.periode}",
@@ -323,12 +323,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 				logger.debug("No hi ha notificacions pendents d'enviar a la seu electrònica");
 			}
 		} else {
-			logger.warn("La connexió amb Notifica no està configurada i no es realitzarà cap enviament");
+			logger.warn("L'enviament de notificacions a Notific@ està deshabilitada");
 		}
 	}
 
-	// 2. Envia les notificacions ja enviades a Notifica, i pendents d'enviar a la Seu, cap a la Seu
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 2. Enviament de notificacions pendents a la seu electrònica
+	//////////////////////////////////////////////////////////////
 	@Override
 	@Scheduled(
 			fixedRateString = "${config:es.caib.notib.tasca.seu.enviaments.periode}",
@@ -350,12 +350,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 				logger.debug("No hi ha notificacions pendents d'enviar a la seu electrònica");
 			}
 		} else {
-			logger.warn("La connexió amb la seu electrònica no està activa i no es realitzarà cap enviament");
+			logger.warn("L'enviament de notificacions a la seu electrònica està deshabilitada");
 		}
 	}
-	
-	// 3. Consulta les notificacions que es troben a la Seu, i que encara no han estat finalitzades a Notifica
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// 3. Actualització de l'estat dels enviaments amb l'estat de la seu electrònica
+	////////////////////////////////////////////////////////////////////////////////
 	@Override
 	@Scheduled(
 			fixedRateString = "${config:es.caib.notib.tasca.seu.consulta.periode}",
@@ -379,12 +379,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 				logger.debug("No hi ha notificacions pendents de consultar estat a la seu electrònica");
 			}
 		} else {
-			logger.warn("La connexió amb la seu electrònica no està activa i no es realitzarà cap enviament");
+			logger.warn("L'actualització de l'estat dels enviaments amb l'estat de la seu electrònica està deshabilitada");
 		}
 	}
-	
-	// 4. Envia les actualitzacions d'estat les notificacions de la Seu cap a Notifica
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// 4. Actualització dels estats dels enviaments a Notifica@ amb l'estat de la seu electrònica
+	/////////////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	@Scheduled(
 			fixedRateString = "${config:es.caib.notib.tasca.notifica.enviament.estat.seu.periode}",
@@ -404,12 +404,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 				logger.debug("No hi ha notificacions pendents d'actualització d'estat a Notifica");
 			}
 		} else {
-			logger.warn("La connexió amb la seu electrònica no està activa i no es realitzarà cap enviament");
+			logger.warn("L'actualització de l'estat dels enviaments a Notifica@ amb l'estat de la seu electrònica està deshabilitat");
 		}
 	}
 
-	// 5. Refresca l'estat de les notificacions segons l'estat de Notifica
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 5. Actualització de l'estat dels enviaments amb l'estat de Notific@
+	//////////////////////////////////////////////////////////////////
 	@Override
 	@Scheduled(
 			fixedRateString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.periode}",
@@ -430,7 +430,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				logger.debug("No hi ha enviaments pendents de refrescar l'estat de Notifica");
 			}
 		} else {
-			logger.warn("La connexió amb Notific@ no està activa i no es realitzarà cap refresca d'estat");
+			logger.debug("L'actualització de l'estat dels enviaments amb l'estat de Notific@ està deshabilitada");
 		}
 	}
 
