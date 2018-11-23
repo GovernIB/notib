@@ -24,6 +24,8 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.slf4j.Logger;
@@ -45,7 +47,7 @@ public class WsClientHelper<T> {
 			String password,
 			String soapAction,
 			boolean logMissatgesActiu,
-			boolean disableChunking,
+			boolean disableCxfChunking,
 			Class<T> clazz,
 			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
 		URL url = wsdlResourceUrl;
@@ -102,12 +104,18 @@ public class WsClientHelper<T> {
 					BindingProvider.SOAPACTION_URI_PROPERTY,
 					soapAction);
 		}
-		if (disableChunking) {
-			org.apache.cxf.endpoint.Client client = org.apache.cxf.frontend.ClientProxy.getClient(servicePort);
-			HTTPConduit http = (HTTPConduit) client.getConduit();
-			HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-			httpClientPolicy.setAllowChunking(false);
-			http.setClient(httpClientPolicy);
+		if (disableCxfChunking) {
+			try {
+				// Verifica si CXF es troba disponible
+				Class.forName("org.apache.cxf.endpoint.Client");
+				Client client = ClientProxy.getClient(servicePort);
+				HTTPConduit http = (HTTPConduit) client.getConduit();
+				HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+				httpClientPolicy.setAllowChunking(false);
+				http.setClient(httpClientPolicy);
+			} catch( ClassNotFoundException e ) {
+				// Si CXF no es troba disponible no fa res
+			}
 		}
 		return servicePort;
 	}
@@ -118,7 +126,7 @@ public class WsClientHelper<T> {
 			QName qname,
 			String userName,
 			String password,
-			boolean disableChunking,
+			boolean disableCxfChunking,
 			Class<T> clazz,
 			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
 		return this.generarClientWs(
@@ -129,7 +137,7 @@ public class WsClientHelper<T> {
 				password,
 				null,
 				false,
-				disableChunking,
+				disableCxfChunking,
 				clazz,
 				handlers);
 	}
