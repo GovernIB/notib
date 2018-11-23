@@ -28,6 +28,13 @@ import es.caib.notib.ws.notificacio.RespostaAlta;
  */
 public class ClientRestTest extends ClientBaseTest {
 
+	/*private static final String URL = "http://localhost:8180/notib";
+	private static final String USERNAME = "notapp";
+	private static final String PASSWORD = "notapp";*/
+	private static final String URL = "http://dev.caib.es/notib";
+	private static final String USERNAME = "$ripea_notib";
+	private static final String PASSWORD = "ripea_notib";
+
 	/*@Rule
 	public ExpectedException expectedException = ExpectedException.none();*/
 
@@ -36,11 +43,10 @@ public class ClientRestTest extends ClientBaseTest {
 	@Before
 	public void setUp() throws IOException, DecoderException {
 		client = NotificacioRestClientFactory.getRestClient(
-				"http://localhost:8180/notib",
-				"notapp",
-				"notapp");
-
-//		client.setServeiDesplegatDamuntJboss(false);
+				URL,
+				USERNAME,
+				PASSWORD);
+		// client.setServeiDesplegatDamuntJboss(false);
 	}
 
 	@Test
@@ -51,6 +57,12 @@ public class ClientRestTest extends ClientBaseTest {
 						notificacioId,
 						1,
 						false));
+		if (respostaAlta.isError()) {
+			System.out.println(">>> Reposta amb error: " + respostaAlta.getErrorDescripcio());
+			
+		} else {
+			System.out.println(">>> Reposta Ok");
+		}
 		assertNotNull(respostaAlta);
 		assertFalse(respostaAlta.isError());
 		assertNull(respostaAlta.getErrorDescripcio());
