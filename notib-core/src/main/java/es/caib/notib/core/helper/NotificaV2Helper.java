@@ -523,9 +523,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						"NotificaWsV2Service"),
 				getUsernameProperty(),
 				getPasswordProperty(),
+				true,
 				NotificaWsV2PortType.class,
-				new ApiKeySOAPHandlerV2(getApiKeyProperty()),
-				new WsClientHelper.SOAPLoggingHandler(NotificaV2Helper.class));
+				new ApiKeySOAPHandlerV2(getApiKeyProperty()));
 		return port;
 	}
 
@@ -541,10 +541,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				try {
 					SOAPEnvelope envelope = context.getMessage().getSOAPPart().getEnvelope();
 					SOAPFactory factory = SOAPFactory.newInstance();
-					SOAPElement apiKeyElement = factory.createElement(
+					SOAPElement apiKeyElement = factory.createElement("apiKey");
+					/*SOAPElement apiKeyElement = factory.createElement(
 							new QName(
 									"https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/", 
-									"apiKey"));
+									"apiKey"));*/
 					apiKeyElement.addTextNode(apiKey);
 					SOAPHeader header = envelope.getHeader();
 					if (header == null) {

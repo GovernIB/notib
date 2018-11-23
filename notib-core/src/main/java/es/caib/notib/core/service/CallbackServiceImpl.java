@@ -67,7 +67,6 @@ public class CallbackServiceImpl implements CallbackService {
 			return true;
 		}
 	}
-	
 	private boolean isCallbackPendentsActiu() {
 		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.callback.pendents.actiu");
 		if (actives != null) {

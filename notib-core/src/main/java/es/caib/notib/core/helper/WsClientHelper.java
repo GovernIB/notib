@@ -24,6 +24,8 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,24 +45,27 @@ public class WsClientHelper<T> {
 			String password,
 			String soapAction,
 			boolean logMissatgesActiu,
+			boolean disableChunking,
 			Class<T> clazz,
 			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
 		URL url = wsdlResourceUrl;
 		if (url == null) {
-			if (!endpoint.endsWith("?wsdl"))
+			if (!endpoint.endsWith("?wsdl")) {
 				url = new URL(endpoint + "?wsdl");
-			else
+			} else {
 				url = new URL(endpoint);
+			}
 		}
 		Service service = Service.create(url, qname);
 		T servicePort = service.getPort(clazz);
 		BindingProvider bindingProvider = (BindingProvider)servicePort;
 		// Configura l'adreça del servei
 		String endpointAddress;
-		if (!endpoint.endsWith("?wsdl"))
+		if (!endpoint.endsWith("?wsdl")) {
 			endpointAddress = endpoint;
-		else
+		} else {
 			endpointAddress = endpoint.substring(0, endpoint.length() - "?wsdl".length());
+		}
 		bindingProvider.getRequestContext().put(
 				BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
 				endpointAddress);
@@ -77,11 +82,11 @@ public class WsClientHelper<T> {
 		@SuppressWarnings("rawtypes")
 		List<Handler> handlerChain = new ArrayList<Handler>();
 		if (logMissatgesActiu) {
-			/*System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
+			System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
 			System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
 			System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
-			System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", "true");*/
-			handlerChain.add(new SOAPLoggingHandler(clazz));
+			System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", "true");
+			// handlerChain.add(new SOAPLoggingHandler(clazz));
 		}
 		// Configura handlers addicionals
 		for (int i = 0; i < handlers.length; i++) {
@@ -97,7 +102,36 @@ public class WsClientHelper<T> {
 					BindingProvider.SOAPACTION_URI_PROPERTY,
 					soapAction);
 		}
+		if (disableChunking) {
+			org.apache.cxf.endpoint.Client client = org.apache.cxf.frontend.ClientProxy.getClient(servicePort);
+			HTTPConduit http = (HTTPConduit) client.getConduit();
+			HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+			httpClientPolicy.setAllowChunking(false);
+			http.setClient(httpClientPolicy);
+		}
 		return servicePort;
+	}
+
+	public T generarClientWs(
+			URL wsdlResourceUrl,
+			String endpoint,
+			QName qname,
+			String userName,
+			String password,
+			boolean disableChunking,
+			Class<T> clazz,
+			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
+		return this.generarClientWs(
+				wsdlResourceUrl,
+				endpoint,
+				qname,
+				userName,
+				password,
+				null,
+				false,
+				disableChunking,
+				clazz,
+				handlers);
 	}
 
 	public T generarClientWs(
@@ -116,6 +150,7 @@ public class WsClientHelper<T> {
 				password,
 				null,
 				false,
+				false,
 				clazz,
 				handlers);
 	}
@@ -135,6 +170,7 @@ public class WsClientHelper<T> {
 				password,
 				null,
 				false,
+				false,
 				clazz,
 				handlers);
 	}
@@ -151,6 +187,7 @@ public class WsClientHelper<T> {
 				null,
 				null,
 				null,
+				false,
 				false,
 				clazz,
 				handlers);
@@ -196,7 +233,7 @@ public class WsClientHelper<T> {
 			} catch (Exception ex) {
 				sb.append("Error al imprimir el missatge XML: " + ex.getMessage());
 			}
-			System.out.println(sb.toString());
+			//System.out.println(sb.toString());
 			LOGGER.debug(sb.toString());
 		}
 	}
