@@ -35,43 +35,43 @@ public class AplicacioServiceBean implements AplicacioService {
 
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public String getVersioActual() {
 		return delegate.getVersioActual();
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public void processarAutenticacioUsuari() {
 		delegate.processarAutenticacioUsuari();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public UsuariDto getUsuariActual() {
 		return delegate.getUsuariActual();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public UsuariDto findUsuariAmbCodi(String codi) {
 		return delegate.findUsuariAmbCodi(codi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<UsuariDto> findUsuariAmbText(String text) {
 		return delegate.findUsuariAmbText(text);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_SUPER"})
 	public List<IntegracioDto> integracioFindAll() {
 		return delegate.integracioFindAll();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_SUPER"})
 	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi) {
 		return delegate.integracioFindDarreresAccionsByCodi(codi);
 	}
@@ -82,13 +82,13 @@ public class AplicacioServiceBean implements AplicacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_SUPER"})
 	public ExcepcioLogDto excepcioFindOne(Long index) {
 		return delegate.excepcioFindOne(index);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_SUPER"})
 	public List<ExcepcioLogDto> excepcioFindAll() {
 		return delegate.excepcioFindAll();
 	}
@@ -99,19 +99,19 @@ public class AplicacioServiceBean implements AplicacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public String propertyGet(String property) {
 		return delegate.propertyGet(property);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public Map<String, String> propertyFindByPrefix(String prefix) {
 		return delegate.propertyFindByPrefix(prefix);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_SUPER"})
 	public boolean pluginSeuDisponible() {
 		return delegate.pluginSeuDisponible();
 	}

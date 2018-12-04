@@ -53,10 +53,12 @@ public class UsuariHelper {
 			List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
 			if (sessionContext.isCallerInRole("NOT_APL"))
 				authorities.add(new SimpleGrantedAuthority("NOT_APL"));
-			if (sessionContext.isCallerInRole("NOT_REP"))
-				authorities.add(new SimpleGrantedAuthority("NOT_REP"));
 			if (sessionContext.isCallerInRole("NOT_ADMIN"))
 				authorities.add(new SimpleGrantedAuthority("NOT_ADMIN"));
+			if (sessionContext.isCallerInRole("NOT_SUPER"))
+				authorities.add(new SimpleGrantedAuthority("NOT_SUPER"));
+			if (sessionContext.isCallerInRole("NOT_USER"))
+				authorities.add(new SimpleGrantedAuthority("NOT_USER"));
 			if (authorities.isEmpty())
 				authorities = null;
 			return generarUsuariAutenticat(

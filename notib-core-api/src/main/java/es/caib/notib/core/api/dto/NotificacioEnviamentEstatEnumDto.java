@@ -64,6 +64,7 @@ public enum NotificacioEnviamentEstatEnumDto implements Serializable {
 	MORT,
 	LLEGIDA,
 	NOTIFICADA,
+	PENDENT,
 	PENDENT_ENVIAMENT,		// 15
 	PENDENT_SEU,
 	PENDENT_CIE,

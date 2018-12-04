@@ -22,7 +22,9 @@ public class Document {
 	private String metadades;
 	private boolean normalitzat;
 	private boolean generarCsv;
-
+	private String uUID;
+	private String cSV;
+	
 	public String getArxiuNom() {
 		return arxiuNom;
 	}
@@ -65,7 +67,18 @@ public class Document {
 	public void setGenerarCsv(boolean generarCsv) {
 		this.generarCsv = generarCsv;
 	}
-
+	public String getUUID() {
+		return uUID;
+	}
+	public void setUUID(String uUID) {
+		this.uUID = uUID;
+	}
+	public String getCSV() {
+		return cSV;
+	}
+	public void setCSV(String cSV) {
+		this.cSV = cSV;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

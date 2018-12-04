@@ -12,6 +12,7 @@
 <%@ attribute name="optionItems" required="false" rtexprvalue="true" type="java.lang.Object"%>
 <%@ attribute name="optionValueAttribute" required="false" rtexprvalue="true"%>
 <%@ attribute name="optionTextAttribute" required="false" rtexprvalue="true"%>
+<%@ attribute name="optionAgrupableAttribute" required="false" rtexprvalue="true"%>
 <%@ attribute name="optionTextKeyAttribute" required="false" rtexprvalue="true"%>
 <%@ attribute name="optionNivellAttribute" required="false" rtexprvalue="true"%>
 <%@ attribute name="optionEnum" required="false" rtexprvalue="true"%>
@@ -54,9 +55,9 @@
 							<c:choose>
 								<c:when test="${not empty optionValueAttribute}">
 									<c:choose>
-										<c:when test="${not empty optionTextAttribute}"><form:option value="${opt[optionValueAttribute]}">${nivellTxt}${opt[optionTextAttribute]}</form:option></c:when>
-										<c:when test="${not empty optionTextKeyAttribute}"><form:option value="${opt[optionValueAttribute]}">${nivellTxt}<spring:message code="${opt[optionTextKeyAttribute]}"/></form:option></c:when>
-										<c:otherwise><form:option value="${opt[optionValueAttribute]}"/></c:otherwise>
+										<c:when test="${not empty optionTextAttribute}"><form:option cssClass="${opt[optionAgrupableAttribute]}" value="${opt[optionValueAttribute]}">${nivellTxt}${opt[optionTextAttribute]}</form:option></c:when>
+										<c:when test="${not empty optionTextKeyAttribute}"><form:option cssClass="${opt[optionAgrupableAttribute]}" value="${opt[optionValueAttribute]}">${nivellTxt}<spring:message code="${opt[optionTextKeyAttribute]}"/></form:option></c:when>
+										<c:otherwise><form:option cssClass="${opt[optionAgrupableAttribute]}" value="${opt[optionValueAttribute]}"/></c:otherwise>
 									</c:choose>
 								</c:when>
 								<c:otherwise><form:option value="${opt}"/></c:otherwise>

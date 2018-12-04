@@ -30,42 +30,42 @@ public class UsuariAplicacioServiceBean implements UsuariAplicacioService {
 	UsuariAplicacioService delegate;
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_SUPER"})
 	public AplicacioDto create(
 			AplicacioDto aplicacio) {
 		return delegate.create(aplicacio);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_SUPER"})
 	public AplicacioDto update(
 			AplicacioDto aplicacio) throws NotFoundException {
 		return delegate.update(aplicacio);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_SUPER"})
 	public AplicacioDto delete(
 			Long id) throws NotFoundException {
 		return delegate.delete(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_SUPER"})
 	public AplicacioDto findById(
 			Long aplicacioId) {
 		return delegate.findById(aplicacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_SUPER"})
 	public AplicacioDto findByUsuariCodi(
 			String usuariCodi) {
 		return delegate.findByUsuariCodi(usuariCodi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_SUPER"})
 	public PaginaDto<AplicacioDto> findPaginat(
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findPaginat(paginacioParams);

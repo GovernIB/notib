@@ -9,13 +9,17 @@ import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
+import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.exception.NotFoundException;
 
 /**
  * Declaració dels mètodes per a la consulta de notificacions i dels
@@ -26,13 +30,40 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 public interface NotificacioService {
 
 	/**
+	 * Crea una nova notificació.
+	 * 
+	 * @param notificacio
+	 *            Informació de la notificació a crear
+	 * @return La notificació amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public PaginaDto<NotificacioDto> create(
+			Long entitatId,
+			NotificacioDtoV2 notificacio,
+			PaginacioParamsDto paginacioParams);
+	
+
+	/**
+	 * Actualitza la informació de la notificacio que tengui el mateix
+	 * id que l'especificat per paràmetre.
+	 * 
+	 * @param procediment
+	 *            Informació del procediment a modificar.
+	 * @return El procediment modificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	public NotificacioDtoV2 update(NotificacioDtoV2 notificacio) throws NotFoundException;
+	
+	/**
 	 * Consulta una notificació donat el seu id.
 	 * 
 	 * @param id
 	 *            Atribut id de la notificació.
 	 * @return La notificació amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public NotificacioDto findAmbId(Long id);
 
 	/**
@@ -44,7 +75,7 @@ public interface NotificacioService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina amb les notificacions.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
@@ -56,7 +87,7 @@ public interface NotificacioService {
 	 *            Atribut id de la notificació.
 	 * @return els destinataris trobats.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public List<NotificacioEnviamentDto> enviamentFindAmbNotificacio(
 			Long notificacioId);
 
@@ -67,7 +98,7 @@ public interface NotificacioService {
 	 *            Atribut id de l'enviament.
 	 * @return el destinatari trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public NotificacioEnviamentDto enviamentFindAmbId(
 			Long enviamentId);
 
@@ -78,7 +109,7 @@ public interface NotificacioService {
 	 *            Atribut id de la notificació.
 	 * @return els events trobats.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public List<NotificacioEventDto> eventFindAmbNotificacio(
 			Long notificacioId);
 
@@ -91,7 +122,7 @@ public interface NotificacioService {
 	 *            Atribut id de l'enviament.
 	 * @return els destinataris trobats.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public List<NotificacioEventDto> eventFindAmbEnviament(
 			Long notificacioId,
 			Long enviamentId);
@@ -103,7 +134,7 @@ public interface NotificacioService {
 	 *            Atribut id de la notificació.
 	 * @return el fitxer associat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public ArxiuDto getDocumentArxiu(
 			Long notificacioId);
 
@@ -114,7 +145,7 @@ public interface NotificacioService {
 	 *            Atribut id de l'enviament.
 	 * @return el fitxer de certificació associat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public ArxiuDto enviamentGetCertificacioArxiu(
 			Long enviamentId);
 
@@ -173,19 +204,19 @@ public interface NotificacioService {
 	 * Mètode d'execució periòdica per a fer els enviaments pendents
 	 * a la seu.
 	 */
-	public void seuEnviamentsPendents();
+	//public void seuEnviamentsPendents();
 
 	/**
 	 * Mètode d'execució periòdica per a refrescar l'estat de les notificacions
 	 * pendents a la seu.
 	 */
-	public void seuConsultaEstatNotificacions();
+	//public void seuConsultaEstatNotificacions();
 
 	/**
 	 * Mètode d'execució periòdica per a comunicar a Notifica els canvis d'estat
 	 * de les notificacions de la seu.
 	 */
-	public void notificaInformaCanviEstatSeu();
+	//public void notificaInformaCanviEstatSeu();
 
 	/**
 	 * Mètode d'execució periòdica per a refrescar l'estat dels enviaments fets a

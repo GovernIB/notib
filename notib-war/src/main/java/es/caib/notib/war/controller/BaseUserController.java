@@ -23,8 +23,8 @@ public class BaseUserController extends BaseController {
 		if (entitat == null) {
 			throw new SecurityException("No te cap entitat assignada");
 		}
-		if (!entitat.isUsuariActualRepresentant()) {
-			throw new SecurityException("No te permisos per accedir a aquesta entitat com a representant");
+		if (!entitat.isUsuariActualAdministradorEntitat()) {
+			throw new SecurityException("No te permisos per accedir a aquesta entitat com a usuari entitat");
 		}
 		return entitat;
 	}

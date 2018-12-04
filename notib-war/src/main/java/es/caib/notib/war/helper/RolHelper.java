@@ -20,21 +20,24 @@ import es.caib.notib.core.api.dto.EntitatDto;
  */
 public class RolHelper {
 
-	private static final String ROLE_ADMIN = "NOT_ADMIN";
-	private static final String ROLE_REPRESENTANT = "NOT_REP";
+	private static final String ROLE_SUPER = "NOT_SUPER";
+	private static final String ROLE_ADMIN_ENTITAT = "NOT_ADMIN";
+	private static final String ROLE_USUARI = "NOT_USER";
 	private static final String ROLE_APLICACIO = "NOT_APL";
 
 	private static final String REQUEST_PARAMETER_CANVI_ROL = "canviRol";
 	private static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
 	
 	public static boolean teRolAdministrador(HttpServletRequest request) {
-		return request.isUserInRole(ROLE_ADMIN);
+		return request.isUserInRole(ROLE_SUPER);
 	}
 	
-	public static boolean teRolRepresentant(HttpServletRequest request) {
-		return request.isUserInRole(ROLE_REPRESENTANT);
+	public static boolean teRolAdministradorEntitat(HttpServletRequest request) {
+		return request.isUserInRole(ROLE_ADMIN_ENTITAT);
 	}
-	
+	public static boolean teRolUsuari(HttpServletRequest request) {
+		return request.isUserInRole(ROLE_USUARI);
+	}
 	public static boolean teRolAplicacio(HttpServletRequest request) {
 		return request.isUserInRole(ROLE_APLICACIO);
 	}
@@ -57,11 +60,13 @@ public class RolHelper {
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		List<String> rolsDisponibles = getRolsUsuariActual(request);
 		if (rolActual == null || !rolsDisponibles.contains(rolActual)) {
-			if (request.isUserInRole(ROLE_ADMIN) && rolsDisponibles.contains(ROLE_ADMIN)) {
-				rolActual = ROLE_ADMIN;
-			} else if (request.isUserInRole(ROLE_REPRESENTANT) && rolsDisponibles.contains(ROLE_REPRESENTANT)) {
-				rolActual = ROLE_REPRESENTANT;
-			} else if (request.isUserInRole(ROLE_APLICACIO) && rolsDisponibles.contains(ROLE_APLICACIO)) {
+			if (request.isUserInRole(ROLE_SUPER) && rolsDisponibles.contains(ROLE_SUPER)) {
+				rolActual = ROLE_SUPER;
+			}else if (request.isUserInRole(ROLE_ADMIN_ENTITAT) && rolsDisponibles.contains(ROLE_ADMIN_ENTITAT)) {
+				rolActual = ROLE_ADMIN_ENTITAT;
+			}else if (request.isUserInRole(ROLE_USUARI) && rolsDisponibles.contains(ROLE_USUARI)) {
+				rolActual = ROLE_USUARI;
+			}else if (request.isUserInRole(ROLE_APLICACIO) && rolsDisponibles.contains(ROLE_APLICACIO)) {
 				rolActual = ROLE_APLICACIO;
 			}
 			if (rolActual != null)
@@ -74,10 +79,13 @@ public class RolHelper {
 	}
 
 	public static boolean isUsuariActualAdministrador(HttpServletRequest request) {
-		return ROLE_ADMIN.equals(getRolActual(request));
+		return ROLE_SUPER.equals(getRolActual(request));
 	}
-	public static boolean isUsuariActualRepresentant( HttpServletRequest request ) {
-		return ROLE_REPRESENTANT.equals(getRolActual(request));
+	public static boolean isUsuariActualAdministradorEntitat( HttpServletRequest request ) {
+		return ROLE_ADMIN_ENTITAT.equals(getRolActual(request));
+	}
+	public static boolean isUsuariActualUsuari(HttpServletRequest request) {
+		return ROLE_USUARI.equals(getRolActual(request));
 	}
 	public static boolean isUsuariActualAplicacio( HttpServletRequest request ) {
 		return ROLE_APLICACIO.equals(getRolActual(request));
@@ -86,16 +94,19 @@ public class RolHelper {
 	public static List<String> getRolsUsuariActual(HttpServletRequest request) {
 		LOGGER.debug("Obtenint rols disponibles per a l'usuari actual");
 		List<String> rols = new ArrayList<String>();
-		if (request.isUserInRole(ROLE_ADMIN)) {
-			rols.add(ROLE_ADMIN);
+		if (request.isUserInRole(ROLE_SUPER)) {
+			rols.add(ROLE_SUPER);
+		}
+		if (request.isUserInRole(ROLE_USUARI)) {
+			rols.add(ROLE_USUARI);
 		}
 		if (request.isUserInRole(ROLE_APLICACIO)) {
 			rols.add(ROLE_APLICACIO);
 		}
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		if (entitatActual != null) {
-			if (entitatActual.isUsuariActualRepresentant() && request.isUserInRole(ROLE_REPRESENTANT))
-				rols.add(ROLE_REPRESENTANT);
+			if (entitatActual.isUsuariActualAdministradorEntitat() && request.isUserInRole(ROLE_ADMIN_ENTITAT))
+				rols.add(ROLE_ADMIN_ENTITAT);
 		}
 		return rols;
 	}

@@ -351,7 +351,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		envios.setConcepto(notificacio.getConcepte());
 		envios.setDescripcion(notificacio.getDescripcio());
 		envios.setProcedimiento(
-				notificacio.getProcedimentCodiSia());
+				notificacio.getProcedimentCodiNotib());
 		Documento documento = new Documento();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		pluginHelper.gestioDocumentalGet(

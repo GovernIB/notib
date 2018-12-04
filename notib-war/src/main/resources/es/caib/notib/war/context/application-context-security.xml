@@ -15,9 +15,10 @@
 		<sec:intercept-url pattern="/test/rest*" access="hasRole('NOT_APL')"/>
 		<sec:intercept-url pattern="/api*" access="hasRole('NOT_APL')"/>
 		<sec:intercept-url pattern="/api-docs*" access="hasRole('NOT_APL')"/>
-		<sec:intercept-url pattern="/entitat*" access="hasRole('NOT_ADMIN') or hasRole('NOT_REP')"/>
-		<sec:intercept-url pattern="/permis*" access="hasRole('NOT_ADMIN') or hasRole('NOT_REP')"/>
-		<sec:intercept-url pattern="/*" access="hasRole('NOT_ADMIN') or hasRole('NOT_REP') or hasRole('NOT_APL')"/>
+		<sec:intercept-url pattern="/entitat*" access="hasRole('NOT_SUPER')"/>
+		<sec:intercept-url pattern="/notificacio*" access="hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')"/>
+		<sec:intercept-url pattern="/permis*" access="hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')"/>
+		<sec:intercept-url pattern="/*" access="hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')"/>
  		<!-- <sec:intercept-url pattern="/*" access="isAnonymous()"/> -->
 		<sec:custom-filter position="PRE_AUTH_FILTER" ref="preauthFilter"/>
 		<sec:anonymous/>
@@ -45,8 +46,9 @@
 					<bean class="es.caib.notib.war.security.RolesBasedMappableAttributesRetriever">
 						<property name="defaultMappableAttributes">
 							<set>
+								<value>NOT_SUPER</value>
 								<value>NOT_ADMIN</value>
-								<value>NOT_REP</value>
+								<value>NOT_USER</value>
 								<value>NOT_APL</value>
 							</set>
 						</property>

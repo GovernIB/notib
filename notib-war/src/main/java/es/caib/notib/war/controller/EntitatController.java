@@ -50,7 +50,7 @@ public class EntitatController extends BaseController {
 					request,
 					entitatService.findAllPaginat(
 							DatatablesHelper.getPaginacioDtoFromRequest(request)));
-		} else if (RolHelper.isUsuariActualRepresentant(request)) {
+		} else if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
 			EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 			return DatatablesHelper.getDatatableResponse(
 					request,

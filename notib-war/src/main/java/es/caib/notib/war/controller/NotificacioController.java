@@ -10,12 +10,16 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +30,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
@@ -37,10 +44,18 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.api.ws.notificacio.Notificacio;
+import es.caib.notib.war.command.DocumentCommand;
+import es.caib.notib.war.command.NotificacioCommand;
+import es.caib.notib.war.command.NotificacioCommandV2;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
+import es.caib.notib.war.command.ProcedimentCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EntitatHelper;
@@ -65,8 +80,10 @@ public class NotificacioController extends BaseController {
 	private NotificacioService notificacioService;
 	@Autowired
 	private EntitatService entitatService;
-
-
+	@Autowired
+	private ProcedimentService procedimentService;
+	@Autowired
+	private GrupService grupService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -101,6 +118,81 @@ public class NotificacioController extends BaseController {
 		return "notificacioList";
 	}
 
+	@RequestMapping(value = "/new", method = RequestMethod.GET)
+	public String altaForm(
+			HttpServletRequest request,
+			Model model) {
+		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+		List<ProcedimentDto> procediment = procedimentService.findByEntitat(entitat.getId());
+		model.addAttribute(new NotificacioCommandV2());
+		model.addAttribute("entitat", entitat);
+		model.addAttribute("procediments", procediment);
+		
+		return "notificacioForm";
+	}
+	
+	@RequestMapping(value = "/{procedimentId}/grups", method = RequestMethod.GET)
+	@ResponseBody
+	public List<GrupDto> grups(
+			HttpServletRequest request,
+			@PathVariable Long procedimentId,
+			Model model) {
+		
+		List<GrupDto> grups = grupService.findByIdProcediment(procedimentId);
+		
+		return grups;
+	}
+	
+	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
+	public String save(
+			HttpServletRequest request,
+			@Valid NotificacioCommandV2 notificacioCommand,
+			BindingResult bindingResult,
+			Model model) throws IOException {		
+		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+		DocumentCommand document = notificacioCommand.getDocument();
+		
+		if (bindingResult.hasErrors()) {
+			return "procedimentAdminForm";
+		}
+		if (RolHelper.isUsuariActualAdministrador(request)) {
+			model.addAttribute(
+					"entitat",
+					entitatService.findAll());
+		}
+		
+		switch (notificacioCommand.getTipusDocument()) {
+		case ARXIU:
+			if (notificacioCommand.getArxiu() != null && !notificacioCommand.getArxiu().isEmpty()) {
+				document.setArxiuNom(notificacioCommand.getArxiu().getOriginalFilename());
+				document.setNormalitzat(notificacioCommand.getDocument().isNormalitzat());
+				document.setContingutBase64(notificacioCommand.getArxiu().getBytes());
+			}
+			break;
+		case CSV:
+			if (notificacioCommand.getDocumentArxiuUuidCsv() != null && !notificacioCommand.getDocumentArxiuUuidCsv().isEmpty()) {
+				document.setCSV(notificacioCommand.getDocumentArxiuUuidCsv());
+			}
+			break;
+		case UUID:
+			if (notificacioCommand.getDocumentArxiuUuidCsv() != null && !notificacioCommand.getDocumentArxiuUuidCsv().isEmpty()) {
+				document.setUUID(notificacioCommand.getDocumentArxiuUuidCsv());
+			}
+			break;
+		}
+		
+		if (notificacioCommand.getId() != null) {
+			notificacioService.update(
+					NotificacioCommandV2.asDto(notificacioCommand));
+		} else {
+			notificacioService.create(
+					entitat.getId(),
+					NotificacioCommandV2.asDto(notificacioCommand),
+					null);
+		}
+		return "notificacioList";
+	}
+	
 	@RequestMapping(method = RequestMethod.POST)
 	public String post(	
 			HttpServletRequest request,
@@ -118,9 +210,11 @@ public class NotificacioController extends BaseController {
 		NotificacioFiltreDto filtre = (NotificacioFiltreDto)
 				request.getSession().getAttribute( NOTIFICACIONS_FILTRE );
 		PaginaDto<NotificacioDto> notificacions = null;
-		if (RolHelper.isUsuariActualRepresentant(request)) {
+		if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
 			EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-			filtre.setEntitatId(entitat.getId());
+			if( filtre != null) {
+				filtre.setEntitatId(entitat.getId());
+			}
 		}
 		notificacions = notificacioService.findAmbFiltrePaginat(
 				filtre,

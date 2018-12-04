@@ -33,20 +33,20 @@ public class EntitatServiceBean implements EntitatService {
 	EntitatService delegate;
 
 	@Override
-	@RolesAllowed("NOT_ADMIN")
+	@RolesAllowed("NOT_SUPER")
 	public EntitatDto create(EntitatDto entitat) {
 		return delegate.create(entitat);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_SUPER"})
 	public EntitatDto update(
 			EntitatDto entitat) {
 		return delegate.update(entitat);
 	}
 
 	@Override
-	@RolesAllowed("NOT_ADMIN")
+	@RolesAllowed("NOT_SUPER")
 	public EntitatDto updateActiva(
 			Long id,
 			boolean activa) {
@@ -54,62 +54,62 @@ public class EntitatServiceBean implements EntitatService {
 	}
 
 	@Override
-	@RolesAllowed("NOT_ADMIN")
+	@RolesAllowed("NOT_SUPER")
 	public EntitatDto delete(
 			Long id) {
 		return delegate.delete(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public EntitatDto findById(Long id) {
 		return delegate.findById(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public EntitatDto findByCodi(String codi) {
 		return delegate.findByCodi(codi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public EntitatDto findByDir3codi(String dir3Codi) {
 		return delegate.findByDir3codi(dir3Codi);
 	}
 
 	@Override
-	@RolesAllowed("NOT_ADMIN")
+	@RolesAllowed("NOT_SUPER")
 	public List<EntitatDto> findAll() {
 		return delegate.findAll();
 	}
 
 	@Override
-	@RolesAllowed("NOT_ADMIN")
+	@RolesAllowed("NOT_SUPER")
 	public PaginaDto<EntitatDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		return delegate.findAllPaginat(paginacioParams);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public List<EntitatDto> findAccessiblesUsuariActual() {
 		return delegate.findAccessiblesUsuariActual();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<PermisDto> permisFindByEntitatId(Long id) throws NotFoundException {
 		return delegate.permisFindByEntitatId(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public void permisUpdate(Long entitatId, PermisDto permis) throws NotFoundException {
 		delegate.permisUpdate(entitatId, permis);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public void permisDelete(Long entitatId, Long permisId) throws NotFoundException {
 		delegate.permisDelete(entitatId, permisId);
 	}

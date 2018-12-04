@@ -27,7 +27,7 @@ public interface EntitatService {
 	 *            Informació de l'entitat a crear.
 	 * @return L'Entitat creada.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	public EntitatDto create(EntitatDto entitat);
 
 	/**
@@ -40,7 +40,7 @@ public interface EntitatService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	public EntitatDto update(EntitatDto entitat) throws NotFoundException;
 
 	/**
@@ -54,7 +54,7 @@ public interface EntitatService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	public EntitatDto updateActiva(
 			Long id,
 			boolean activa) throws NotFoundException;
@@ -68,7 +68,7 @@ public interface EntitatService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	public EntitatDto delete(
 			Long id) throws NotFoundException;
 
@@ -79,7 +79,7 @@ public interface EntitatService {
 	 *            Atribut id de l'entitat a trobar.
 	 * @return L'entitat amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
 	public EntitatDto findById(Long id);
 
 	/**
@@ -89,7 +89,7 @@ public interface EntitatService {
 	 *            Codi de l'entitat a trobar.
 	 * @return L'entitat amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
 	public EntitatDto findByCodi(String codi);
 
 	/**
@@ -99,7 +99,7 @@ public interface EntitatService {
 	 *            Codi DIR3 de l'entitat a trobar.
 	 * @return L'entitat amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
 	public EntitatDto findByDir3codi(String dir3Codi);
 
 	/**
@@ -107,7 +107,7 @@ public interface EntitatService {
 	 * 
 	 * @return La llista d'entitats.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	public List<EntitatDto> findAll();
 
 	/**
@@ -117,7 +117,7 @@ public interface EntitatService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina d'entitats.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	public PaginaDto<EntitatDto> findAllPaginat(PaginacioParamsDto paginacioParams);
 
 	/**
@@ -125,7 +125,7 @@ public interface EntitatService {
 	 * 
 	 * @return El llistat d'entitats.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<EntitatDto> findAccessiblesUsuariActual();
 
 	/**
@@ -137,7 +137,7 @@ public interface EntitatService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	public List<PermisDto> permisFindByEntitatId(
 			Long entitatId) throws NotFoundException;
 
@@ -152,7 +152,7 @@ public interface EntitatService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	public void permisUpdate(
 			Long entitatId,
 			PermisDto permis) throws NotFoundException;
@@ -168,7 +168,7 @@ public interface EntitatService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	public void permisDelete(
 			Long entitatId,
 			Long permisId) throws NotFoundException;

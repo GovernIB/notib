@@ -157,7 +157,8 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				caducitat(notificacio.getCaducitat()).
 				retardPostal(notificacio.getRetard()).
 				descripcio(notificacio.getDescripcio()).
-				procedimentCodiSia(notificacio.getProcedimentCodi());
+				//procedimentCodiSia(notificacio.getProcedimentCodi()
+				procedimentCodiNotib(notificacio.getProcedimentCodi());
 		PagadorPostal pagadorPostal = notificacio.getPagadorPostal();
 		if (pagadorPostal != null) {
 			notificacioBuilder.
@@ -172,7 +173,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			pagadorCieCodiDir3(pagadorCie.getDir3Codi()).
 			pagadorCieDataVigencia(pagadorCie.getContracteDataVigencia());
 		}
-		ParametresSeu parametresSeu = notificacio.getParametresSeu();
+		/*ParametresSeu parametresSeu = notificacio.getParametresSeu();
 		if (parametresSeu != null) {
 			notificacioBuilder.
 			seuExpedientSerieDocumental(parametresSeu.getExpedientSerieDocumental()).
@@ -189,7 +190,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			seuExpedientTitol(parametresSeu.getExpedientTitol()).
 			seuExpedientIdentificadorEni(parametresSeu.getExpedientIdentificadorEni()).
 			seuProcedimentCodi(parametresSeu.getProcedimentCodi());
-		}
+		}*/
 		NotificacioEntity notificacioEntity = notificacioBuilder.build();
 		notificacioRepository.saveAndFlush(notificacioEntity);
 		List<EnviamentReferencia> referencies = new ArrayList<EnviamentReferencia>();

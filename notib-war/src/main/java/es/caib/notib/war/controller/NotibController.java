@@ -38,14 +38,16 @@ public class NotibController {
 	public String get(
 			HttpServletRequest request) {
 		if (RolHelper.isUsuariActualAdministrador(request)) {
-			return "redirect:notificacio";
+			return "redirect:entitat";
 		} else if (RolHelper.isUsuariActualAplicacio(request)) {
 			return "redirect:api/apidoc";
+		} else if (RolHelper.isUsuariActualUsuari(request)) {
+			return "redirect:notificacio";
 		} else {
 			EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 			if (entitat == null)
 				throw new SecurityException("No te cap entitat assignada");
-			if (RolHelper.isUsuariActualRepresentant(request)) {
+			if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
 				return "redirect:notificacio";
 			} else {
 				return "index";

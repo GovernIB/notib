@@ -64,6 +64,7 @@ public class EntitatServiceImpl implements EntitatService {
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
+				false,
 				false );
 		EntitatEntity entity = EntitatEntity.getBuilder(
 				entitat.getCodi(),
@@ -82,9 +83,10 @@ public class EntitatServiceImpl implements EntitatService {
 	public EntitatDto update(EntitatDto entitat) {
 		logger.debug("Actualitzant entitat existent (entitat=" + entitat + ")");
 		entityComprovarHelper.comprovarPermisos(
-				entitat.getId(),
+				null,
 				true,
-				true );
+				false,
+				false );
 		EntitatEntity entity = entitatRepository.findOne(entitat.getId());
 		entity.update(
 				entitat.getCodi(),
@@ -108,7 +110,8 @@ public class EntitatServiceImpl implements EntitatService {
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
-				false);
+				false,
+				false );
 		EntitatEntity entitat = entitatRepository.findOne(id);
 		entitat.updateActiva(activa);
 		return conversioTipusHelper.convertir(
@@ -125,7 +128,8 @@ public class EntitatServiceImpl implements EntitatService {
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
-				false);
+				false,
+				false );
 		EntitatEntity entitat = entitatRepository.findOne( id );
 		entitatRepository.delete(entitat);
 		permisosHelper.deleteAcl(
@@ -142,9 +146,10 @@ public class EntitatServiceImpl implements EntitatService {
 			Long id) {
 		logger.debug("Consulta de l'entitat (id=" + id + ")");
 		entityComprovarHelper.comprovarPermisos(
-				id,
+				null,
 				true,
-				true);
+				true,
+				true );
 		return conversioTipusHelper.convertir(
 				entitatRepository.findOne(id),
 				EntitatDto.class);
@@ -157,9 +162,10 @@ public class EntitatServiceImpl implements EntitatService {
 		EntitatEntity entitat = entitatRepository.findByCodi(codi);
 		if (entitat == null) return null;
 		entityComprovarHelper.comprovarPermisos(
-				entitat.getId(),
+				null,
 				true,
-				true);
+				true,
+				true );
 		return conversioTipusHelper.convertir(
 				entitat,
 				EntitatDto.class);
@@ -183,7 +189,8 @@ public class EntitatServiceImpl implements EntitatService {
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
-				false);
+				false,
+				false );
 		return conversioTipusHelper.convertirList(
 					entitatRepository.findAll(),
 					EntitatDto.class);
@@ -196,7 +203,8 @@ public class EntitatServiceImpl implements EntitatService {
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
-				false);
+				false,
+				false );
 		PaginaDto<EntitatDto> resposta = paginacioHelper.toPaginaDto(
 					entitatRepository.findByFiltre(
 							paginacioParams.getFiltre(), 
@@ -225,9 +233,10 @@ public class EntitatServiceImpl implements EntitatService {
 			Long entitatId) {
 		logger.debug("Consulta dels permisos de l'entitat (entitatId=" + entitatId + ")");
 		entityComprovarHelper.comprovarPermisos(
-				entitatId,
+				null,
 				true,
-				true);
+				true,
+				true );
 		return permisosHelper.findPermisos(
 				entitatId,
 				EntitatEntity.class);
@@ -243,9 +252,10 @@ public class EntitatServiceImpl implements EntitatService {
 				"entitatId=" + entitatId + ", " +
 				"permis=" + permis + ")");
 		entityComprovarHelper.comprovarPermisos(
-				entitatId,
+				null,
 				true,
-				true);
+				true,
+				false );
 		permisosHelper.updatePermis(
 				entitatId,
 				EntitatEntity.class,
@@ -262,9 +272,10 @@ public class EntitatServiceImpl implements EntitatService {
 				"entitatId=" + entitatId + ", " +
 				"permisId=" + permisId + ")");
 		entityComprovarHelper.comprovarPermisos(
-				entitatId,
+				null,
 				true,
-				true);
+				true,
+				false );
 		permisosHelper.deletePermis(
 				entitatId,
 				EntitatEntity.class,

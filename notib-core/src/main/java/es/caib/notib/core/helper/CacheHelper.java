@@ -69,7 +69,7 @@ public class CacheHelper {
 				entitats,
 				EntitatDto.class);
 		
-		for(EntitatDto dto : resposta) dto.setUsuariActualRepresentant(true);
+		for(EntitatDto dto : resposta) dto.setUsuariActualAdministradorEntitat(true);
 		
 		return resposta;
 		

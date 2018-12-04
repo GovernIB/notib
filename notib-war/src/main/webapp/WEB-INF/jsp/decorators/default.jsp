@@ -24,8 +24,11 @@
 			"isRolActualAdministrador",
 			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
 	pageContext.setAttribute(
-			"isRolActualRepresentant",
-			es.caib.notib.war.helper.RolHelper.isUsuariActualRepresentant(request));
+			"isRolActualAdministradorEntitat",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
+	pageContext.setAttribute(
+			"isUsuariActualUsuari",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuari(request));
 	pageContext.setAttribute(
 			"requestParameterCanviRol",
 			es.caib.notib.war.helper.RolHelper.getRequestParameterCanviRol());
@@ -84,7 +87,7 @@ body {
 				<div class="nav navbar-nav navbar-right">
 					<ul class="list-inline pull-right">
 					
-						<c:if test="${hiHaEntitats && isRolActualRepresentant}">
+						<c:if test="${hiHaEntitats && isRolActualAdministradorEntitat}">
 							<li class="dropdown">
 								<c:if test="${hiHaMesEntitats}"><a href="#" data-toggle="dropdown"></c:if>
 		         				<span class="fa fa-home"></span> ${entitatActual.nom} <c:if test="${hiHaMesEntitats}"><b class="caret caret-white"></b></c:if>
@@ -144,19 +147,40 @@ body {
 					</ul>
 					<div class="clearfix"></div>
 					<div class="btn-group navbar-btn navbar-right">
-						<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
 						<div class="btn-group">
 							<c:if test="${isRolActualAdministrador}">
-							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
-							<ul class="dropdown-menu">
-								<li><a href="<c:url value="/entitat"/>"><spring:message code="decorator.menu.entitats"/></a></li>
-								
-								<li><a href="<c:url value="/aplicacio"/>"><spring:message code="decorator.menu.aplicacions"/></a></li>
-							</ul>
+							<div class="btn-group">
+								<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>							
+							</div>
+							<div class="btn-group">
+								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
+								<ul class="dropdown-menu">
+									<li><a href="<c:url value="/entitat"/>"><spring:message code="decorator.menu.entitats"/></a></li>
+									<!-- <li><a href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/></a></li>-->
+									<li><a href="<c:url value="/aplicacio"/>"><spring:message code="decorator.menu.aplicacions"/></a></li>		
+								</ul>
+							</div>
 							</c:if>
 							
-							<c:if test="${isRolActualRepresentant}">
+							<c:if test="${isRolActualUsuari}">
 								<a href="<c:url value="/entitats/${entitatActual.id}/permis/entitatactual"/>" class="btn btn-primary"><spring:message code="decorator.menu.permisos"/></a>
+							</c:if>
+							
+							<c:if test="${isRolActualAdministradorEntitat}">
+							<div class="btn-group">
+								<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
+							</div>
+							<div class="btn-group">
+								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>								
+								<ul class="dropdown-menu">
+									<li><a href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/></a></li>
+									<li><a href="<c:url value="/notificacio/new"/>"><spring:message code="decorator.menu.altanotificacio"/></a></li>								
+									<li class="divider"></li>
+									<li><a href="<c:url value="/pagadorPostal"/>"><spring:message code="decorator.menu.pagadorpostal"/></a></li>
+									<li><a href="<c:url value="/pagadorCie"/>"><spring:message code="decorator.menu.pagadorcie"/></a></li>
+									<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
+								</ul>
+							</div>
 							</c:if>
 						</div>
 						<%-- <c:choose> --%>
@@ -183,6 +207,7 @@ body {
 					<c:if test="${not empty metaTitleIconClass}"><span class="${metaTitleIconClass}"></span></c:if>
 					<decorator:title />
 					<small><decorator:getProperty property="meta.subtitle"/></small>
+					
 				</h2>
 			</div>
 			<div class="panel-body">

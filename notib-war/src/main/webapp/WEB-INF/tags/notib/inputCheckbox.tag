@@ -21,9 +21,9 @@
 		</c:choose>
 	</label>
 	<div class="controls col-xs-${campInputSize}">
-		<div class="checkbox">
-  			<label>
-				<form:checkbox path="${campPath}" cssClass="span12" id="${campPath}"/>
+		<div class="checkbox checkbox-primary">
+  			<label> 
+				<form:checkbox path="${campPath}" cssClass="span12 " id="${campPath}"/>
 			</label>
 		</div>
 		<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>

@@ -36,7 +36,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	NotificacioEnviamentEntity findByNotificacioEntitatAndNotificaIdentificador(
 			EntitatEntity entitat,
 			String notificaIdentificador);
-	
+	/*
 	@Query(
 			"select env " +
 			"  from	NotificacioEnviamentEntity env " +
@@ -83,7 +83,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 
 	List<NotificacioEnviamentEntity> findBySeuEstatInOrderBySeuDataNotificaDarreraPeticioAsc(
 			NotificacioEnviamentEstatEnumDto[] seuEstats);
-
+	 */
 	@Query(	"  from	NotificacioEnviamentEntity " +
 			" where	notificaEstatFinal = false " +
 			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT " +

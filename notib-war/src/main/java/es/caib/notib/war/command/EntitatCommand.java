@@ -15,7 +15,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
-import es.caib.notib.war.validation.DocumentIdentitat;
 import es.caib.notib.war.validation.EntitatValorsNoRepetits;
 
 /**

@@ -36,13 +36,13 @@ public class NotificacioServiceBean implements NotificacioService {
 	NotificacioService delegate;
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public NotificacioDto findAmbId(Long id) {
 		return delegate.findAmbId(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
@@ -52,28 +52,28 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<NotificacioEnviamentDto> enviamentFindAmbNotificacio(
 			Long notificacioId) {
 		return delegate.enviamentFindAmbNotificacio(notificacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public NotificacioEnviamentDto enviamentFindAmbId(
 			Long enviamentId) {
 		return delegate.enviamentFindAmbId(enviamentId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<NotificacioEventDto> eventFindAmbNotificacio(
 			Long notificacioId) {
 		return delegate.eventFindAmbNotificacio(notificacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<NotificacioEventDto> eventFindAmbEnviament(
 			Long notificacioId,
 			Long enviamentId) {
@@ -83,14 +83,14 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public ArxiuDto getDocumentArxiu(
 			Long notificacioId) {
 		return delegate.getDocumentArxiu(notificacioId);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_REP"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public ArxiuDto enviamentGetCertificacioArxiu(
 			Long enviamentId) {
 		return delegate.enviamentGetCertificacioArxiu(enviamentId);

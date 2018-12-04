@@ -26,7 +26,7 @@ public interface AplicacioService {
 	 * 
 	 * @return La versió actual.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public String getVersioActual();
 
 	/**
@@ -35,7 +35,7 @@ public interface AplicacioService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'usuari amb el codi de l'usuari autenticat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public void processarAutenticacioUsuari() throws NotFoundException;
 
 	/**
@@ -43,7 +43,7 @@ public interface AplicacioService {
 	 * 
 	 * @return L'usuari actual.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public UsuariDto getUsuariActual();
 
 	/**
@@ -53,7 +53,7 @@ public interface AplicacioService {
 	 *            Codi de l'usuari a cercar.
 	 * @return L'usuari obtingut o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public UsuariDto findUsuariAmbCodi(String codi);
 
 	/**
@@ -63,7 +63,7 @@ public interface AplicacioService {
 	 *            Text per a fer la consulta.
 	 * @return La llista d'usuaris.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public List<UsuariDto> findUsuariAmbText(String text);
 
 	/**
@@ -71,7 +71,7 @@ public interface AplicacioService {
 	 * 
 	 * @return La llista d'integracions.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	public List<IntegracioDto> integracioFindAll();
 
 	/**
@@ -83,7 +83,7 @@ public interface AplicacioService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat la integració amb el codi especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(
 			String codi) throws NotFoundException;
 
@@ -102,7 +102,7 @@ public interface AplicacioService {
 	 *             L'index de l'excepció.
 	 * @return L'excepció.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	public ExcepcioLogDto excepcioFindOne(Long index);
 
 	/**
@@ -110,7 +110,7 @@ public interface AplicacioService {
 	 * 
 	 * @return La llista amb les darreres excepcions.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	public List<ExcepcioLogDto> excepcioFindAll();
 
 	/**
@@ -128,7 +128,7 @@ public interface AplicacioService {
 	 *             El codi del paràmetre
 	 * @return el valor del paràmetre
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public String propertyGet(String property);
 
 	/**
@@ -138,7 +138,7 @@ public interface AplicacioService {
 	 *             El prefix dels paràmetres a consultar
 	 * @return un Map amb els paràmetres trobats.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_REP')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public Map<String, String> propertyFindByPrefix(String prefix);
 
 	/**
@@ -146,7 +146,7 @@ public interface AplicacioService {
 	 * 
 	 * @return true si el plugin està configurat i disponible o false si no.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	public boolean pluginSeuDisponible();
 
 }

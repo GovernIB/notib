@@ -237,7 +237,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaIntentData;
 	
-	/* Seu CAIB */
+	/* Seu CAIB 
 	@Column(name = "seu_reg_numero", length = 50)
 	private String seuRegistreNumero;
 	@Column(name = "seu_reg_data")
@@ -271,7 +271,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "seu_intent_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date seuIntentData;
-	
+	*/
 	@Column(name = "intent_num")
 	private int intentNum;
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -528,45 +528,6 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public Date getNotificaIntentData() {
 		return notificaIntentData;
 	}
-	public String getSeuRegistreNumero() {
-		return seuRegistreNumero;
-	}
-	public Date getSeuRegistreData() {
-		return seuRegistreData;
-	}
-	public Date getSeuDataFi() {
-		return seuDataFi;
-	}
-	public SeuEstatEnumDto getSeuEstat() {
-		return seuEstat;
-	}
-	public boolean isSeuError() {
-		return seuError;
-	}
-	public NotificacioEventEntity getSeuErrorEvent() {
-		return seuErrorEvent;
-	}
-	public Date getSeuIntentData() {
-		return seuIntentData;
-	}
-	public int getIntentNum() {
-		return intentNum;
-	}
-	public Date getSeuDataEstat() {
-		return seuDataEstat;
-	}
-	public Date getSeuDataNotificaInformat() {
-		return seuDataNotificaInformat;
-	}
-	public Date getSeuDataNotificaDarreraPeticio() {
-		return seuDataNotificaDarreraPeticio;
-	}
-	public Long getSeuFitxerCodi() {
-		return seuFitxerCodi;
-	}
-	public String getSeuFitxerClau() {
-		return seuFitxerClau;
-	}
 	public NotificacioEntity getNotificacio() {
 		return notificacio;
 	}
@@ -582,7 +543,6 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_ENVIADA;
 		this.notificaError = false;
 		this.notificaErrorEvent = null;
-		this.seuIntentData = new Date();
 		this.notificaIntentData = new Date();
 		this.notificaEstatDataActualitzacio = new Date();
 	}
@@ -657,7 +617,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaError = notificaError;
 		this.notificaErrorEvent = notificaErrorEvent;
 	}
-
+	/*
 	public void updateSeuEnviament(
 			String seuRegistreNumero,
 			Date seuRegistreData,
@@ -692,6 +652,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			this.seuDataNotificaDarreraPeticio = new Date();
 		}
 	}
+	*/
 //	public void updateSeuNouEnviament(int reintentsPeriodeSeu) {
 //		this.intentNum++;
 //		Calendar cal = GregorianCalendar.getInstance();
@@ -707,7 +668,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 //		cal.add(Calendar.MILLISECOND, reintentsPeriodeSeu*(2^intentNum));
 //		this.seuIntentData = cal.getTime();
 //	}
-
+	/*
 	public void updateSeuFitxer(
 			Long codi,
 			String clau) {
@@ -728,7 +689,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			this.seuIntentData = new Date();
 		}
 	}
-	
+	*/
 	public void updateNotificaFiOperacio() {
 		this.notificaIntentData = new Date();
 	}
@@ -768,14 +729,17 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built.serveiTipus = serveiTipus;
 			built.notificacio = notificacio;
 			built.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
-			built.seuEstat = SeuEstatEnumDto.PENDENT;
+			//built.seuEstat = SeuEstatEnumDto.PENDENT;
 			built.intentNum = 0;
 			// Definim la data en que s'ha d'enviar cap a la SEU
+			/* 
 			if (notificacio.getEnviamentDataProgramada() != null) {
+			 
 				built.seuIntentData = notificacio.getEnviamentDataProgramada();
 			} else {
 				built.seuIntentData = new Date();
 			}
+			*/
 		}
 		public Builder titularNom(String titularNom) {
 			built.titularNom = titularNom;

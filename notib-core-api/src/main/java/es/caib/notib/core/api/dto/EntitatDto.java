@@ -23,7 +23,7 @@ public class EntitatDto extends AuditoriaDto {
 	private boolean activa;
 
 	private List<PermisDto> permisos;
-	private boolean usuariActualRepresentant;
+	private boolean usuariActualAdministradorEntitat;
 
 
 
@@ -75,11 +75,11 @@ public class EntitatDto extends AuditoriaDto {
 	public void setPermisos(List<PermisDto> permisos) {
 		this.permisos = permisos;
 	}
-	public boolean isUsuariActualRepresentant() {
-		return usuariActualRepresentant;
+	public boolean isUsuariActualAdministradorEntitat() {
+		return usuariActualAdministradorEntitat;
 	}
-	public void setUsuariActualRepresentant(boolean usuariActualRepresentant) {
-		this.usuariActualRepresentant = usuariActualRepresentant;
+	public void setUsuariActualAdministradorEntitat(boolean usuariActualAdministradorEntitat) {
+		this.usuariActualAdministradorEntitat = usuariActualAdministradorEntitat;
 	}
 
 	public boolean getActiva() {

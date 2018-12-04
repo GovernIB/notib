@@ -43,13 +43,12 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 	@Override
 	@Transactional
 	public AplicacioDto create(AplicacioDto aplicacio) {
-		
 		logger.debug("Creant una nova aplicació (aplicació=" + aplicacio.toString() + ")");
-		
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
-				false );
+				false,
+				false);
 		
 		AplicacioEntity entity = AplicacioEntity.getBuilder(
 				aplicacio.getUsuariCodi(),
@@ -68,11 +67,11 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 	public AplicacioDto update(AplicacioDto aplicacio) throws NotFoundException {
 		
 		logger.debug("Actualitzant l'aplicació existent (aplicacio=" + aplicacio.toString() + ")");
-		
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
-				false );
+				false,
+				false);
 		
 		AplicacioEntity entity = aplicacioRepository.findOne(aplicacio.getId());
 		
@@ -92,12 +91,11 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 	public AplicacioDto delete(Long id) throws NotFoundException {
 		
 		logger.debug("Esborrant aplicacio (id=" + id +  ")");
-		
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
-				false );
-		
+				false,
+				false);
 		AplicacioEntity entity = aplicacioRepository.findOne( id );
 		
 		aplicacioRepository.delete(entity);
@@ -113,11 +111,11 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 	public AplicacioDto findById(Long aplicacioId) {
 		
 		logger.debug("Consulta una aplicació amb id = " + aplicacioId.toString());
-		
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
-				false );
+				false,
+				false);
 		
 		AplicacioEntity entity = aplicacioRepository.findOne(aplicacioId);
 		
@@ -132,11 +130,11 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 	public AplicacioDto findByUsuariCodi(String usuariCodi) {
 
 		logger.debug("Consulta una aplicació amb codi = " + usuariCodi);
-		
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
-				false );
+				false,
+				false);
 		
 		AplicacioEntity entity = aplicacioRepository.findByUsuariCodi(usuariCodi);
 		
@@ -151,11 +149,11 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 	public PaginaDto<AplicacioDto> findPaginat(PaginacioParamsDto paginacioParams) {
 		
 		logger.debug("Consulta de un llistat paginat de totes les aplicacions");
-		
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
-				false );
+				false,
+				false);
 		
 		Page<AplicacioEntity> aplicacions = aplicacioRepository.findAllFiltrat(
 				paginacioParams.getFiltre(),

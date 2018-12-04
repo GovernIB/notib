@@ -8,8 +8,11 @@
 			"isRolActualAdministrador",
 			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
 	pageContext.setAttribute(
-			"isRolActualRepresentant",
-			es.caib.notib.war.helper.RolHelper.isUsuariActualRepresentant(request));
+			"isRolActualAdministradorEntitat",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
+	pageContext.setAttribute(
+			"isRolActualUsuari",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuari(request));
 %>
 <html>
 <head>

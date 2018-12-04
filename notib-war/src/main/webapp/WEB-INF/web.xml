@@ -67,10 +67,13 @@
 	</login-config>
 
 	<security-role>
+		<role-name>NOT_SUPER</role-name>
+	</security-role>
+	<security-role>
 		<role-name>NOT_ADMIN</role-name>
 	</security-role>
 	<security-role>
-		<role-name>NOT_REP</role-name>
+		<role-name>NOT_USER</role-name>
 	</security-role>
 	<security-role>
 		<role-name>NOT_APL</role-name>
@@ -82,8 +85,9 @@
 			<url-pattern>/*</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
+			<role-name>NOT_SUPER</role-name>
 			<role-name>NOT_ADMIN</role-name>
-			<role-name>NOT_REP</role-name>
+			<role-name>NOT_USER</role-name>
 			<role-name>NOT_APL</role-name>
 		</auth-constraint>
 	</security-constraint>
