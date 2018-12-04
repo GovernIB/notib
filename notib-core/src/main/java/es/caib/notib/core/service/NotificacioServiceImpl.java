@@ -323,7 +323,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				logger.debug("No hi ha notificacions pendents d'enviar a la seu electrònica");
 			}
 		} else {
-			logger.warn("L'enviament de notificacions a Notific@ està deshabilitada");
+			logger.debug("L'enviament de notificacions a Notific@ està deshabilitada");
 		}
 	}
 
@@ -350,7 +350,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				logger.debug("No hi ha notificacions pendents d'enviar a la seu electrònica");
 			}
 		} else {
-			logger.warn("L'enviament de notificacions a la seu electrònica està deshabilitada");
+			logger.debug("L'enviament de notificacions a la seu electrònica està deshabilitada");
 		}
 	}
 
@@ -379,7 +379,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				logger.debug("No hi ha notificacions pendents de consultar estat a la seu electrònica");
 			}
 		} else {
-			logger.warn("L'actualització de l'estat dels enviaments amb l'estat de la seu electrònica està deshabilitada");
+			logger.debug("L'actualització de l'estat dels enviaments amb l'estat de la seu electrònica està deshabilitada");
 		}
 	}
 
@@ -404,7 +404,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				logger.debug("No hi ha notificacions pendents d'actualització d'estat a Notifica");
 			}
 		} else {
-			logger.warn("L'actualització de l'estat dels enviaments a Notifica@ amb l'estat de la seu electrònica està deshabilitat");
+			logger.debug("L'actualització de l'estat dels enviaments a Notifica@ amb l'estat de la seu electrònica està deshabilitat");
 		}
 	}
 
