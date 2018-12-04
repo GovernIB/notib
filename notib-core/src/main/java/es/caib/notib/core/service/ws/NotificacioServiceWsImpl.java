@@ -55,6 +55,7 @@ import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.wsdl.notificaV1.DatadoEnvio;
 
 
 /**
@@ -89,38 +90,47 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 	@Override
 	public RespostaAlta alta(
 			Notificacio notificacio) throws NotificacioServiceWsException {
+		
+		RespostaAlta resposta = new RespostaAlta();
+		
 		String emisorDir3Codi = notificacio.getEmisorDir3Codi();
 		if (emisorDir3Codi == null) {
-			throw new ValidationException(
-					"EMISOR", 
-					"El camp 'emisorDir3Codi' no pot ser null.");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[EMISOR] El camp 'emisorDir3Codi' no pot ser null.");
+			return resposta;
 		}
 		EntitatEntity entitat = entitatRepository.findByDir3Codi(emisorDir3Codi);
 		if (entitat == null) {
-			throw new ValidationException(
-					"ENTITAT", 
-					"No s'ha trobat cap entitat configurada a Notib amb el codi Dir3 " + emisorDir3Codi + ". (emisorDir3Codi)");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[ENTITAT] No s'ha trobat cap entitat configurada a Notib amb el codi Dir3 " + emisorDir3Codi + ". (emisorDir3Codi)");
+			return resposta;
 		}
 		if (!entitat.isActiva()) {
-			throw new ValidationException(
-					"ENTITAT", 
-					"L'entitat especificada està desactivada per a l'enviament de notificacions");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[ENTITAT] L'entitat especificada està desactivada per a l'enviament de notificacions");
+			return resposta;
 		}
 		if (notificacio.getConcepte() == null) {
-			throw new ValidationException(
-					"CONCEPTE", 
-					"El concepte de la notificació no pot ser null.");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[CONCEPTE] El concepte de la notificació no pot ser null.");
+			return resposta;
 		}
 		if (notificacio.getEnviamentTipus() == null) {
-			throw new ValidationException(
-					"ENVIAMENT_TIPUS", 
-					"El tipus d'enviament de la notificació no pot ser null.");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[ENVIAMENT_TIPUS] El tipus d'enviament de la notificació no pot ser null.");
+			return resposta;
 		}
 		Document document = notificacio.getDocument();
 		if (document == null) {
-			throw new ValidationException(
-					"DOCUMENT",
-					"El camp 'document' no pot ser null.");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[DOCUMENT] El camp 'document' no pot ser null.");
+			return resposta;
 		}
 		String documentGesdocId = pluginHelper.gestioDocumentalCreate(
 				PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
@@ -196,9 +206,10 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 		for (Enviament enviament: notificacio.getEnviaments()) {
 			Persona titular = enviament.getTitular();
 			if (titular == null) {
-				throw new ValidationException(
-						"TITULAR",
-						"El camp 'titular' no pot ser null.");
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[TITULAR] El camp 'titular' no pot ser null.");
+				return resposta;
 			}
 			NotificaServeiTipusEnumDto serveiTipus = null;
 			if (enviament.getServeiTipus() != null) {
@@ -222,9 +233,10 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 					titularEmail(titular.getEmail());
 			if (enviament.getDestinataris() != null) {
 				if (enviament.getDestinataris().size() > 1) {
-					throw new ValidationException(
-							"DESTINATARI",
-							"Únicament es pot indicar un destinatari");
+					resposta.setError(true);
+					resposta.setEstat(NotificacioEstatEnum.PENDENT);
+					resposta.setErrorDescripcio("[DESTINATARI] Únicament es pot indicar un destinatari");
+					return resposta;
 				} else if (enviament.getDestinataris().size() == 1) {
 					Persona destinatari = enviament.getDestinataris().get(0);
 					enviamentBuilder.
@@ -257,9 +269,10 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 					}
 					tipus = NotificaDomiciliTipusEnumDto.CONCRETO;
 				} else {
-					throw new ValidationException(
-							"ENTREGA_POSTAL",
-							"L'entrega postal te el camp tipus buit");
+					resposta.setError(true);
+					resposta.setEstat(NotificacioEstatEnum.PENDENT);
+					resposta.setErrorDescripcio("[ENTREGA_POSTAL] L'entrega postal te el camp tipus buit");
+					return resposta;
 				}
 				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
 				if (entregaPostal.getNumeroCasa() != null) {
@@ -309,9 +322,10 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			try {
 				referencia = notificaHelper.xifrarId(enviamentSaved.getId());
 			} catch (GeneralSecurityException ex) {
-				throw new RuntimeException(
-						"No s'ha pogut crear la referencia per al destinatari",
-						ex);
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("No s'ha pogut crear la referencia per al destinatari");
+				return resposta;
 			}
 			enviamentSaved.updateNotificaReferencia(referencia);
 			EnviamentReferencia enviamentReferencia = new EnviamentReferencia();
@@ -325,14 +339,14 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			notificaHelper.notificacioEnviar(notificacioEntity.getId());
 			notificacioEntity = notificacioRepository.findOne(notificacioEntity.getId());
 		}
-		RespostaAlta resposta = new RespostaAlta();
 		try {
 			resposta.setIdentificador(
 					notificaHelper.xifrarId(notificacioEntity.getId()));
 		} catch (GeneralSecurityException ex) {
-			throw new RuntimeException(
-					"No s'ha pogut crear l'identificador de la notificació",
-					ex);
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("No s'ha pogut crear l'identificador de la notificació");
+			return resposta;
 		}
 		switch (notificacioEntity.getEstat()) {
 		case PENDENT:
