@@ -40,7 +40,7 @@ public class NotificacioEnviamenEstatDto {
 	private String seuRegistreNumero;
 	private Date seuRegistreData;
 	private Date seuDataFi;
-	private NotificacioEnviamentEstatEnumDto seuEstat;
+	private SeuEstatEnumDto seuEstat;
 	private boolean seuError;
 	private Date seuErrorData;
 	private String seuErrorDescripcio;
@@ -206,10 +206,10 @@ public class NotificacioEnviamenEstatDto {
 	public void setSeuDataFi(Date seuDataFi) {
 		this.seuDataFi = seuDataFi;
 	}
-	public NotificacioEnviamentEstatEnumDto getSeuEstat() {
+	public SeuEstatEnumDto getSeuEstat() {
 		return seuEstat;
 	}
-	public void setSeuEstat(NotificacioEnviamentEstatEnumDto seuEstat) {
+	public void setSeuEstat(SeuEstatEnumDto seuEstat) {
 		this.seuEstat = seuEstat;
 	}
 	public boolean isSeuError() {
