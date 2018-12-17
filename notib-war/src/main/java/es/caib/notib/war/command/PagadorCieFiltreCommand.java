@@ -5,7 +5,7 @@ import es.caib.notib.core.api.dto.PagadorCieFiltreDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
 /**
- * Command per al manteniment de procediments.
+ * Command per al manteniment del filtre de pagadors cie.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

@@ -3,7 +3,6 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ attribute name="name" required="true" rtexprvalue="true"%>
 <%@ attribute name="id" required="true" rtexprvalue="true"%>
-
 <c:set var="campName" value="${name}"/>
 <c:set var="campId" value="${id}"/>
 

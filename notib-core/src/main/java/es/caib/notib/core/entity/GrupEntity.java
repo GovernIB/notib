@@ -6,16 +6,11 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
 import org.hibernate.annotations.ForeignKey;
-
 import es.caib.notib.core.audit.NotibAuditable;
-import es.caib.notib.core.entity.PagadorPostalEntity.Builder;
 
 /**
  * Classe de model de dades que conté la informació dels grups admesos.
@@ -55,19 +50,6 @@ public class GrupEntity extends NotibAuditable<Long> {
 		this.codi = codi;
 		this.nom = nom;
 	}
-	/**
-	 * Obté el Builder per a crear objectes de tipus Entitat.
-	 * 
-	 * @param codi
-	 *            El valor de l'atribut codi.
-	 * @param contracteNum
-	 *            El valor de l'atribut contracteNum.
-	 * @param contracteDataVig
-	 *            El valor de l'atribut contracteDataVig.
-	 * @param facturacioCodiClient
-	 *            El valor de l'atribut facturacioCodiClient.
-	 * @return Una nova instància del Builder.
-	 */
 	
 	public static Builder getBuilder(
 			String codi,

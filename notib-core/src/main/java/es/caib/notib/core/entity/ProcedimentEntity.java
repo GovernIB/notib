@@ -48,9 +48,6 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "agrupar", length = 64, nullable = false)
 	protected boolean agrupar;
-	
-	/*@Column(name = "grup", length = 64, nullable = false)
-	protected GrupEntity grup;*/
 
 	public String getCodi() {
 		return codi;
@@ -96,20 +93,6 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 		this.pagadorcie = pagadorcie;
 		this.agrupar = agrupar;
 	}
-
-	/**
-	 * Obté el Builder per a crear objectes de tipus Entitat.
-	 * 
-	 * @param codi
-	 *            El valor de l'atribut codi.
-	 * @param contracteNum
-	 *            El valor de l'atribut contracteNum.
-	 * @param contracteDataVig
-	 *            El valor de l'atribut contracteDataVig.
-	 * @param facturacioCodiClient
-	 *            El valor de l'atribut facturacioCodiClient.
-	 * @return Una nova instància del Builder.
-	 */
 	
 	public static Builder getBuilder(
 			String codi,

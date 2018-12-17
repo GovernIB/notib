@@ -5,7 +5,7 @@ import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
 /**
- * Command per al manteniment de procediments.
+ * Command per al manteniment del filtre de procediments.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

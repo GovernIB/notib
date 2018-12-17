@@ -10,18 +10,19 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 
 /**
- * Declaració dels mètodes per a la consulta dels pagadors postals associats a un procediment
+ * Declaració dels mètodes per a la consulta dels pagadors cie associats a un procediment
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface PagadorCieService {
 
 	/**
-	 * Crea un nou pagador postal.
-	 * 
-	 * @param procediment
-	 *            Informació del procediment a crear.
-	 * @return El procediment creat.
+	 * Crea un nou pagador cie.
+	 * @param entitatId	
+	 * 				Informació de l'entitat actual.
+	 * @param cie
+	 * 				Informació del pagador cie a crear
+	 * @return	El pagador cie creat
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public PagadorCieDto create(
@@ -29,24 +30,22 @@ public interface PagadorCieService {
 			PagadorCieDto cie);
 
 	/**
-	 * Actualitza la informació del procediment que tengui el mateix
-	 * id que l'especificat per paràmetre.
+	 * Actualitza la informació d'un pagador cie.
 	 * 
-	 * @param procediment
-	 *            Informació del procediment a modificar.
-	 * @return El procediment modificat.
+	 * @param cie	
+	 * 			Pagador cie a modificar amb els nous valors
+	 * @return
 	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public PagadorCieDto update(PagadorCieDto cie) throws NotFoundException;
 
 	/**
-	 * Esborra el procediment amb el mateix id que l'especificat.
+	 * Esborra el pagador cie amb el mateix id que l'especificat.
 	 * 
 	 * @param id
-	 *            Atribut id del procediment a esborrar.
-	 * @return El procediment esborrat.
+	 *            Atribut id del pagador cie a esborrar.
+	 * @return El pagador cie esborrat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
@@ -55,23 +54,25 @@ public interface PagadorCieService {
 			Long id) throws NotFoundException;
 
 	/**
-	 * Consulta un procediment donat el seu codi.
+	 * Consulta un pagador cie donat el seu codi.
 	 * 
-	 * @param codi
+	 * @param id
 	 *            Codi del procediment a trobar.
-	 * @return El procediment amb el codi especificat o null si no s'ha trobat.
+	 * @return El pagador cie amb el codi especificat o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public PagadorCieDto findById(Long id);
 
 	/**
-	 * Consulta de les notificacions segons els paràmetres del filtre.
+	 * Consulta de pagadors cie segons els paràmetres del filtre.
 	 * 
+	 * @param entitatId
+	 * 				Informació de l'entitat actual.
 	 * @param filtre
-	 *            Paràmetres per a filtrar els resultats.
+	 *            	Paràmetres per a filtrar els resultats.
 	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
-	 * @return La pàgina amb les notificacions.
+	 *            	Paràmetres per a dur a terme la paginació del resultats.
+	 * @return La pàgina amb els pagadors cie.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public PaginaDto<PagadorCieDto> findAmbFiltrePaginat(
@@ -80,19 +81,19 @@ public interface PagadorCieService {
 			PaginacioParamsDto paginacioParams);
 	
 	/**
-	 * Llistat amb tots els procediments.
+	 * Llistat amb tots els pagadors cie.
 	 * 
-	 * @return La llista dels procediments.
+	 * @return La llista dels pagadors cie.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') OR hasRole('NOT_SUPER')")
 	public List<PagadorCieDto> findAll();
 
 	/**
-	 * Llistat amb tots els procediments paginats.
+	 * Llistat amb tots els pagadros cie paginats.
 	 * 
 	 * @param paginacioParams
 	 *            Paràmetres per a dur a terme la paginació del resultats.
-	 * @return La pàgina de procediments.
+	 * @return La pàgina de pagadors cie.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public PaginaDto<PagadorCieDto> findAllPaginat(PaginacioParamsDto paginacioParams);

@@ -1,20 +1,14 @@
 package es.caib.notib.war.command;
 
-import java.util.Date;
 
 import javax.validation.constraints.Size;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
-
-import com.sun.istack.NotNull;
-
 import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.PagadorPostalDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
 /**
- * Command per al manteniment de procediments.
+ * Command per al manteniment de grups.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

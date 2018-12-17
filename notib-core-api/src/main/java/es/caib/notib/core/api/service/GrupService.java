@@ -1,21 +1,11 @@
 package es.caib.notib.core.api.service;
 
 import java.util.List;
-
 import org.springframework.security.access.prepost.PreAuthorize;
-
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.GrupFiltreDto;
-import es.caib.notib.core.api.dto.NotificacioDto;
-import es.caib.notib.core.api.dto.NotificacioFiltreDto;
-import es.caib.notib.core.api.dto.PagadorCieDto;
-import es.caib.notib.core.api.dto.PagadorCieFiltreDto;
-import es.caib.notib.core.api.dto.PagadorPostalDto;
-import es.caib.notib.core.api.dto.PagadorPostalFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 
 /**
@@ -28,15 +18,19 @@ public interface GrupService {
 	/**
 	 * Crea un nou grup.
 	 * 
-	 * @param procediment
-	 *            Informació del procediment a crear.
+	 * @param procedimentId
+	 *            	Informació del procediment al cual pertanyen els grups.
+	 * @param entitatId           
+	 * 				Informació de l'entitat actual
+	 * @param grups	
+	 * 				Llista amb els grups a crear
 	 * @return El procediment creat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public GrupDto create(
 			Long procedimentId,
 			Long entitatId,
-			List<GrupDto> grup);
+			List<GrupDto> grups);
 	
 	/**
 	 * Modifica els grups d'un procediment.
@@ -44,7 +38,7 @@ public interface GrupService {
 	 * @param codi
 	 *            codi del procediment del qual es vol modificar el grup.
 	 * @param grup
-	 *            El permís que es vol modificar.
+	 *            El grup que es vol modificar.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb el codi especificat.
 	 */
@@ -65,6 +59,13 @@ public interface GrupService {
 	public GrupDto delete(
 			Long id) throws NotFoundException;
 	
+	/**
+	 * Esborra els grups d'un procediment.
+	 * 
+	 * @param grups
+	 *          	Llista dels grups que es volen esborrar
+	 * @throws NotFoundException
+	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public List<GrupDto> deleteGrupsProcediment(
 			List<GrupDto> grups) throws NotFoundException;
@@ -102,33 +103,36 @@ public interface GrupService {
 			List<Long> grupsId);
 	
 	/**
-	 * Consulta de les notificacions segons els paràmetres del filtre.
+	 * Consulta dels grups segons els paràmetres del filtre.
 	 * 
+	 * @param entitatId
+	 * 			  Id de l'entitat actual
 	 * @param filtre
 	 *            Paràmetres per a filtrar els resultats.
 	 * @param paginacioParams
 	 *            Paràmetres per a dur a terme la paginació del resultats.
-	 * @return La pàgina amb les notificacions.
+	 * @return La pàgina amb els grups.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public PaginaDto<GrupDto> findAmbFiltrePaginat(
 			Long entitatId,
 			GrupFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
+	
 	/**
-	 * Llistat amb tots els procediments.
+	 * Llistat amb tots els grups.
 	 * 
-	 * @return La llista dels procediments.
+	 * @return La llista dels grups.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public List<GrupDto> findAll();
 
 	/**
-	 * Llistat amb tots els procediments paginats.
+	 * Llistat amb tots els grups paginats.
 	 * 
 	 * @param paginacioParams
 	 *            Paràmetres per a dur a terme la paginació del resultats.
-	 * @return La pàgina de procediments.
+	 * @return La pàgina de grups.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public PaginaDto<GrupDto> findAllPaginat(PaginacioParamsDto paginacioParams);

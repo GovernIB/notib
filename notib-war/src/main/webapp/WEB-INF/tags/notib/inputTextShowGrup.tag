@@ -30,7 +30,6 @@
 		<c:otherwise>${readonly}</c:otherwise>
 	</c:choose>
 </c:set>
-
 <div class='form-group'>
 	<label class='control-label col-xs-4'></label>
 	<div class='col-xs-8'>

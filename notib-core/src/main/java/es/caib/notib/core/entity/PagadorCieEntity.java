@@ -4,13 +4,10 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
 import es.caib.notib.core.audit.NotibAuditable;
-import es.caib.notib.core.entity.PagadorPostalEntity.Builder;
 
 /**
  * Classe de model de dades que conté la informació dels pagadors CIE.
@@ -42,20 +39,6 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 		this.dir3codi = dir3codi;
 		this.contracteDataVig = contracteDataVig;
 	}
-	
-	/**
-	 * Obté el Builder per a crear objectes de tipus Entitat.
-	 * 
-	 * @param codi
-	 *            El valor de l'atribut codi.
-	 * @param contracteNum
-	 *            El valor de l'atribut contracteNum.
-	 * @param contracteDataVig
-	 *            El valor de l'atribut contracteDataVig.
-	 * @param facturacioCodiClient
-	 *            El valor de l'atribut facturacioCodiClient.
-	 * @return Una nova instància del Builder.
-	 */
 	
 	public static Builder getBuilder(
 			String dir3codi,

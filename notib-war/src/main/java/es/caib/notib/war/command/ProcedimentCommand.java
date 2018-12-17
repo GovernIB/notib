@@ -2,14 +2,9 @@ package es.caib.notib.war.command;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.validation.constraints.Size;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
-
-import com.sun.istack.NotNull;
-
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.PagadorCieDto;
@@ -17,6 +12,12 @@ import es.caib.notib.core.api.dto.PagadorPostalDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
+/**
+ * Command per al manteniment de procediments
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ *
+ */
 public class ProcedimentCommand {
 	
 	private Long id;
