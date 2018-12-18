@@ -49,7 +49,7 @@ public class SeuHelper {
 //	public void updateSeuNovaConsulta(NotificacioEnviamentEntity enviament) {
 //		enviament.updateSeuNovaConsulta();
 //	}
-	
+	/*
 	@Transactional
 	public void enviament(Long notificacioEnviamentId) {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(notificacioEnviamentId);
@@ -186,7 +186,7 @@ public class SeuHelper {
 		return pluginHelper.obtenirJustificant(enviament);
 		
 	}
-
+*/
 	private static final Logger logger = LoggerFactory.getLogger(SeuHelper.class);
 
 }

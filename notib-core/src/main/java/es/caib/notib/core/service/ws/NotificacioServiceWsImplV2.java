@@ -8,15 +8,11 @@ import java.io.ByteArrayOutputStream;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.jws.WebService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.sun.jersey.core.util.Base64;
-
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliTipusEnumDto;
@@ -55,7 +51,7 @@ import es.caib.notib.core.repository.NotificacioRepository;
 
 
 /**
- * Implementació del servei per a l'enviament i consulta de notificacions.
+ * Implementació del servei per a l'enviament i consulta de notificacions V2 (Sense paràmetres SEU).
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

@@ -157,7 +157,6 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				caducitat(notificacio.getCaducitat()).
 				retardPostal(notificacio.getRetard()).
 				descripcio(notificacio.getDescripcio()).
-				//procedimentCodiSia(notificacio.getProcedimentCodi()
 				procedimentCodiNotib(notificacio.getProcedimentCodi());
 		PagadorPostal pagadorPostal = notificacio.getPagadorPostal();
 		if (pagadorPostal != null) {
@@ -173,8 +172,8 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			pagadorCieCodiDir3(pagadorCie.getDir3Codi()).
 			pagadorCieDataVigencia(pagadorCie.getContracteDataVigencia());
 		}
-		/*ParametresSeu parametresSeu = notificacio.getParametresSeu();
-		if (parametresSeu != null) {
+		ParametresSeu parametresSeu = notificacio.getParametresSeu();
+		/*if (parametresSeu != null) {
 			notificacioBuilder.
 			seuExpedientSerieDocumental(parametresSeu.getExpedientSerieDocumental()).
 			seuExpedientUnitatOrganitzativa(parametresSeu.getExpedientUnitatOrganitzativa()).

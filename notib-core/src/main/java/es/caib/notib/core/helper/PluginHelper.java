@@ -257,7 +257,7 @@ public class PluginHelper {
 					ex);
 		}
 	}
-
+	/*
 	public SeuNotificacioResultat seuNotificacioDestinatariEnviar(
 			NotificacioEnviamentEntity notificacioDestinatari) {
 		NotificacioEntity notificacio = notificacioDestinatari.getNotificacio();
@@ -420,7 +420,7 @@ public class PluginHelper {
 		}
 		return seuDocument;
 	}
-
+	 */
 	/*public RespostaAnotacioRegistre registreSortida(Notificacio notificacio) {
 		String accioDescripcio = "Anotació al registre de sortida";
 		Map<String, String> accioParams = new HashMap<String, String>();

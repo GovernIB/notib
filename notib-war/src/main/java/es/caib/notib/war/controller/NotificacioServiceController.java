@@ -14,13 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-
 import es.caib.notib.core.api.ws.notificacio.Notificacio;
-import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWs;
+import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
+import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
 import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
@@ -36,7 +35,7 @@ import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
 public class NotificacioServiceController extends BaseController {
 
 	@Autowired
-	private NotificacioServiceWs notificacioServiceWs;
+	private NotificacioServiceWsV2 notificacioServiceWs;
 
 	@RequestMapping(value = "/apidoc", method = RequestMethod.GET)
 	public String documentacio(HttpServletRequest request) {
@@ -57,7 +56,7 @@ public class NotificacioServiceController extends BaseController {
 					name = "notificacio",
 					value = "Objecte amb les dades necessàries per a generar una notificació",
 					required = true) 
-			@RequestBody Notificacio notificacio) {
+			@RequestBody NotificacioV2 notificacio) {
 		return notificacioServiceWs.alta(notificacio);
 	}
 

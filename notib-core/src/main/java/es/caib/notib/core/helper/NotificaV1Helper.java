@@ -241,7 +241,7 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 		documento.setContenido(new String(Base64.encodeBase64(baos.toByteArray())));
 		envio.setDocumento(documento);
 		TipoProcedimiento procedimiento = null;
-		if (notificacio.getProcedimentCodiSia() != null) {
+		/*if (notificacio.getProcedimentCodiSia() != null) {
 			if (procedimiento == null)
 				procedimiento = new TipoProcedimiento();
 			procedimiento.setCodigoSia(notificacio.getProcedimentCodiSia());
@@ -250,7 +250,7 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 			if (procedimiento == null)
 				procedimiento = new TipoProcedimiento();
 			procedimiento.setDescripcionSia(notificacio.getProcedimentDescripcioSia());
-		}
+		}*/
 		envio.setProcedimiento(procedimiento);
 		envio.setDestinatarios(generarDestinatarios(notificacio));
 		return envio;

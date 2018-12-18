@@ -85,7 +85,7 @@ public abstract class AbstractNotificaHelper {
 	public abstract boolean enviamentRefrescarEstat(
 			Long enviamentId) throws SistemaExternException;
 
-	
+/*	
 	public boolean enviamentSeu(Long enviamentId) {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		NotificacioEntity notificacio = enviament.getNotificacio();
@@ -275,7 +275,7 @@ public abstract class AbstractNotificaHelper {
 		notificacio.updateEventAfegir(event);
 		return !error;
 	}
-
+*/
 	public String generarReferencia(NotificacioEnviamentEntity notificacioDestinatari) throws GeneralSecurityException {
 		return xifrarId(notificacioDestinatari.getId());
 	}

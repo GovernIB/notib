@@ -14,12 +14,14 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
+import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.NotificacioService;
 
 /**
@@ -110,7 +112,7 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.enviamentRefrescarEstat(enviamentId);
 	}
 
-	@Override
+/*	@Override
 	@RolesAllowed({"NOT_ADMIN"})
 	public boolean enviamentComunicacioSeu(
 			Long enviamentId) {
@@ -126,30 +128,28 @@ public class NotificacioServiceBean implements NotificacioService {
 				enviamentId,
 				certificacioArxiu);
 	}
-
+*/
 	@Override
 	public void notificaEnviamentsPendents() {
 		delegate.notificaEnviamentsPendents();
-	}
-
-	@Override
-	public void seuEnviamentsPendents() {
-		delegate.seuEnviamentsPendents();
-	}
-
-	@Override
-	public void seuConsultaEstatNotificacions() {
-		delegate.seuConsultaEstatNotificacions();
-	}
-
-	@Override
-	public void notificaInformaCanviEstatSeu() {
-		delegate.notificaInformaCanviEstatSeu();
 	}
 	
 	@Override
 	public void enviamentRefrescarEstatPendents() {
 		delegate.enviamentRefrescarEstatPendents();
+	}
+
+	@Override
+	public PaginaDto<NotificacioDto> create(Long entitatId, NotificacioDtoV2 notificacio,
+			PaginacioParamsDto paginacioParams) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public NotificacioDtoV2 update(NotificacioDtoV2 notificacio) throws NotFoundException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	

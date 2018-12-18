@@ -43,6 +43,7 @@ public class NotificaHelper {
 		return getNotificaHelper().enviamentRefrescarEstat(enviamentId);
 	}
 
+	/*
 	@Transactional
 	public boolean enviamentSeu(
 			Long enviamentId,
@@ -74,7 +75,7 @@ public class NotificaHelper {
 	public boolean enviamentSeu(Long enviamentId) {
 		return getNotificaHelper().enviamentSeu(enviamentId);
 	}
-
+	 */
 	public String xifrarId(Long id) throws GeneralSecurityException {
 		return getNotificaHelper().xifrarId(id);
 	}

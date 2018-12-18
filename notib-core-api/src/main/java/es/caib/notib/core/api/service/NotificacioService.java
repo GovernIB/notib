@@ -3,13 +3,9 @@
  */
 package es.caib.notib.core.api.service;
 
-
 import java.util.List;
-
 import org.springframework.security.access.prepost.PreAuthorize;
-
 import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
@@ -18,7 +14,6 @@ import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 
 /**
@@ -177,10 +172,10 @@ public interface NotificacioService {
 	 * @param enviamentId
 	 *            Atribut id de l'enviament.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+/*	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public boolean enviamentComunicacioSeu(
 			Long enviamentId);
-
+*/
 	/**
 	 * Enviar a Notific@ la certificació d'un enviament.
 	 * 
@@ -189,11 +184,11 @@ public interface NotificacioService {
 	 * @param certificacioArxiu
 	 *            Arxiu amb el certificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+/*	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public boolean enviamentCertificacioSeu(
 			Long enviamentId,
 			ArxiuDto certificacioArxiu);
-
+*/
 	/**
 	 * Mètode d'execució periòdica per a fer els enviaments pendents
 	 * a Notific@.

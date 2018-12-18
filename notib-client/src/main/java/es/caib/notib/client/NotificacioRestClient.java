@@ -175,12 +175,22 @@ public class NotificacioRestClient implements NotificacioService {
 			String username,
 			String password) throws InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
 		if (isExecucioDinsJBoss()) {
+			logger.debug(
+					"Autenticant client REST executant-se a dins jBoss (" +
+					"urlAmbMetode=" + urlAmbMetode + ", " +
+					"username=" + username +
+					"password=********)");
 			ControladorSesion controlador = new ControladorSesion();
 			controlador.autenticar(username, password);
 			AuthorizationToken token = controlador.getToken();
 			jerseyClient.addFilter(
 					new HTTPBasicAuthFilter(token.getUser(), token.getPassword()));
 		} else if (serveiDesplegatDamuntJboss) {
+			logger.debug(
+					"Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (" +
+					"urlAmbMetode=" + urlAmbMetode + ", " +
+					"username=" + username +
+					"password=********)");
 			jerseyClient.resource(urlAmbMetode).get(String.class);
 			Form form = new Form();
 			form.putSingle("j_username", username);
@@ -190,6 +200,11 @@ public class NotificacioRestClient implements NotificacioService {
 			type("application/x-www-form-urlencoded").
 			post(form);
 		} else {
+			logger.debug(
+					"Autenticant REST amb autenticació de tipus HTTP basic (" +
+					"urlAmbMetode=" + urlAmbMetode + ", " +
+					"username=" + username +
+					"password=********)");
 			jerseyClient.addFilter(
 					new HTTPBasicAuthFilter(username, password));
 		}
