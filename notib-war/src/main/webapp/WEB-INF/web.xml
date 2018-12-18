@@ -90,6 +90,7 @@
 			<role-name>NOT_USER</role-name>
 			<role-name>NOT_APL</role-name>
 		</auth-constraint>
+		
 	</security-constraint>
 	<security-constraint>
 		<web-resource-collection>

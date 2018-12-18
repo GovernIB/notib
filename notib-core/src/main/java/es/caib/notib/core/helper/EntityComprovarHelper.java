@@ -33,7 +33,6 @@ import es.caib.notib.core.repository.PagadorPostalRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 
-
 /**
  * Helper per a la comprovació de l'existencia d'entitats de base de dades.
  * 

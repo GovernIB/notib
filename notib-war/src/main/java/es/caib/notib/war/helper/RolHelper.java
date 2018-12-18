@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import es.caib.notib.core.api.dto.EntitatDto;
 
 /**

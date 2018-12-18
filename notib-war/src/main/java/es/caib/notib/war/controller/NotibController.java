@@ -37,6 +37,7 @@ public class NotibController {
 	@RequestMapping(value = "/index", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request) {
+		
 		if (RolHelper.isUsuariActualAdministrador(request)) {
 			return "redirect:entitat";
 		} else if (RolHelper.isUsuariActualAplicacio(request)) {

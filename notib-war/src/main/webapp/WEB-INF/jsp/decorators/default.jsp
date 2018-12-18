@@ -4,6 +4,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib tagdir="/WEB-INF/tags/notib" prefix="not"%>
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
+
 <%
 	pageContext.setAttribute(
 			"sessionEntitats",
