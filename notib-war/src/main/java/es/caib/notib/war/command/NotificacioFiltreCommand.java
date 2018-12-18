@@ -14,7 +14,7 @@ import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
 /**
- * Command per al manteniment d'entitats.
+ * Command per al manteniment del filtre de notificacions.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

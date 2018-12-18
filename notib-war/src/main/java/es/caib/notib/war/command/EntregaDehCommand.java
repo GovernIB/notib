@@ -6,6 +6,12 @@ import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.EntregaDehDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
+/**
+ * Command per al manteniment de entregues direcció electrònica
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ *
+ */
 public class EntregaDehCommand {
 	
 	private boolean obligat;

@@ -49,7 +49,7 @@ $(document).ready(function() {
 	$('.enviamentsForm').hide();
 	$('.entregapostalForm').hide();
 	$('.entregapostal').hide();
-	//$('.entregadireccioForm').hide();
+	$('.entregadireccioForm').hide();
 	
 	$('#tipusDocument').on('change', function() {
 		if ($(this).val() == 'ARXIU') {
@@ -90,11 +90,11 @@ $(document).ready(function() {
 	});
 
 
-	var agrupable = $("#procediment").children(":selected").attr("class");
-	var procedimentId = $("#procediment").children(":selected").attr("value");
+	var agrupable = $("#procedimentId").children(":selected").attr("class");
+	var procedimentId = $("#procedimentId").children(":selected").attr("value");
 	comprovarGrups(agrupable, procedimentId);
 	
-	$('#procediment').on('change', function() {
+	$('#procedimentId').on('change', function() {
 		var agrupable = $(this).children(":selected").attr("class");
 		var procedimentId = $(this).children(":selected").attr("value");
 		comprovarGrups(agrupable, procedimentId)
@@ -112,27 +112,32 @@ function addDestinatari() {
 
 function comprovarGrups(agrupable, procedimentId) {
 	var notificacioGrupsUrl = "<c:url value="/notificacio/"/>" + procedimentId + "/grups";
-	
+	console.log(notificacioGrupsUrl);
 	if (agrupable == 'true') {
-		$.get(notificacioGrupsUrl).done(function(grups) {
-			if ($('#grup option').length == 0) {
+		var procediments = [{}];
+			$.get(notificacioGrupsUrl).done(function(grups) {
+				
+				console.log(procediments);
 				for (i = 0; i < grups.length; i++) {
-					var select = document.getElementById("grup");
-						var option = document.createElement("option");
-						option.name = "grup";
-						option.text = grups[i].nom;
-					    option.value = grups[i].id;
-					    select.add(option);
+					var select = document.getElementById('grup');
+					var option = document.createElement('option');
+					option.name = 'grup';
+					option.text = grups[i].nom;
+					option.value = grups[i].id;
+					select.add(option);
 					
+					procediments.push({
+						nom: grups[i].nom,
+						id: grups[i].id
+					});
 				}
-			}
-		})
-		$('.agrupable').removeClass('hidden');
-	} else {
-		$('.agrupable').addClass('hidden');
+			})
+			$('#grup').find('option').remove();
+			$('.agrupable').removeClass('hidden');
+		} else {
+			$('.agrupable').addClass('hidden');
+		}
 	}
-}
-
 </script>
 </head>
 <body>
@@ -165,16 +170,16 @@ function comprovarGrups(agrupable, procedimentId) {
 				<not:inputSelect name="procedimentId" textKey="notificacio.form.camp.procediment" optionItems="${procediments}" optionAgrupableAttribute="agrupar" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2"/>
 			</div>
 			<div class="col-md-12 agrupable hidden">
-				<!--
+				
 				<div class="form-group">
 					<label class="control-label col-xs-2" for="grup"><spring:message code="notificacio.form.camp.grup"/></label>
 					<div class="controls col-xs-10">
 						<select class="form-control" path="grup" style="width:100%" id="grup"></select>
 					</div>
 				</div>
-				-->
+				<!--
 				<not:inputSelect name="grupId" textKey="notificacio.form.camp.grup" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2"/>
-			
+				-->
 			</div>
 		</div>
 		<not:notTitol name="${document}" id="document"></not:notTitol>

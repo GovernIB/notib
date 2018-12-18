@@ -31,6 +31,7 @@ import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 
+
 /**
  * Classe del model de dades que representa una notificació.
  * 

@@ -4,24 +4,19 @@
 package es.caib.notib.war.command;
 
 import java.util.Date;
-import java.util.List;
 import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.web.multipart.MultipartFile;
-
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.EntregaDehDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.NotificaComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
-import es.caib.notib.core.api.ws.notificacio.Document;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
 /**
- * Command per al manteniment d'entitats.
+ * Command per al manteniment de notificacions manuals.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

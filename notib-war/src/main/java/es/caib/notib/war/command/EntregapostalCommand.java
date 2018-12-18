@@ -5,6 +5,12 @@ import com.sun.istack.NotNull;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 
+/**
+ * Command per al manteniment de entregues postals
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ *
+ */
 public class EntregapostalCommand {
 
 	@NotNull
