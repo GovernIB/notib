@@ -4,7 +4,6 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ attribute name="tipus" required="true" rtexprvalue="true"%>
 <%@ attribute name="titol" required="true" rtexprvalue="true"%>
-
 <c:set var="campTipus" value="${tipus}"/>
 <c:set var="campTitol" value="${titol}"/>
 
