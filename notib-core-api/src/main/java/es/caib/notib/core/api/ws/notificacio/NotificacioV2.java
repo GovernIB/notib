@@ -34,7 +34,7 @@ public class NotificacioV2 {
 	private List<Enviament> enviaments;
 	private String codiUsuari;
 	private String codiProcediment;
-	private String codiGrupProcediment;
+	private String codiGrup;
 	private ParametresRegistre parametresRegistre;
 	
 	public String getEmisorDir3Codi() {
@@ -103,11 +103,11 @@ public class NotificacioV2 {
 	public void setCodiUsuari(String codiUsuari) {
 		this.codiUsuari = codiUsuari;
 	}
-	public String getCodiGrupProcediment() {
-		return codiGrupProcediment;
+	public String getCodiGrup() {
+		return codiGrup;
 	}
-	public void setCodiGrupProcediment(String codiGrupProcediment) {
-		this.codiGrupProcediment = codiGrupProcediment;
+	public void setCodiGrup(String codiGrup) {
+		this.codiGrup = codiGrup;
 	}
 	public String getCodiProcediment() {
 		return codiProcediment;

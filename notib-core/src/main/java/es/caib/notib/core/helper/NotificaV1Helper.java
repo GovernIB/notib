@@ -9,6 +9,7 @@ import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -52,6 +53,7 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.wsdl.notificaV1.ArrayOfTipoDestinatario;
 import es.caib.notib.core.wsdl.notificaV1.CertificacionEnvioRespuesta;
 import es.caib.notib.core.wsdl.notificaV1.DatadoEnvio;
@@ -88,7 +90,9 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
-
+	@Autowired
+	private ProcedimentRepository procedimentRepository;
+	
 	@Autowired
 	private PluginHelper pluginHelper;
 
@@ -202,18 +206,28 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 			NotificacioEntity notificacio) throws GeneralSecurityException, DatatypeConfigurationException {
 		TipoEnvio envio = new TipoEnvio();
 		TipoOrganismoEmisor organismoEmisor = new TipoOrganismoEmisor();
+		Date dataProgramada;
+		
 		organismoEmisor.setCodigoDir3(notificacio.getEntitat().getDir3Codi());
 		organismoEmisor.setNombre(notificacio.getEntitat().getNom());
 		envio.setOrganismoEmisor(organismoEmisor);
 		envio.setConcepto(notificacio.getConcepte());
-		if (notificacio.getEnviamentDataProgramada() != null) {
+		//V1 rest
+		//if (notificacio != null) {
+		//	envio.setFechaEnvioProgramado(
+		//			toXmlGregorianCalendar(dataProgramada));
+		//}
+		
+		dataProgramada = procedimentRepository.findByCodi(notificacio.getProcedimentCodiNotib()).getEnviamentDataProgramada();
+		
+		if (dataProgramada != null) {
 			envio.setFechaEnvioProgramado(
-					toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
+					toXmlGregorianCalendar(dataProgramada));
 		}
 		if (notificacio.getEnviamentTipus() != null) {
 			envio.setTipoEnvio(notificacio.getEnviamentTipus().getText());
 		}
-		if (notificacio.getPagadorCorreusCodiDir3() != null) {
+		/*if (notificacio.getPagadorCorreusCodiDir3() != null) {
 			TipoOrganismoPagadorCorreos pagadorCorreos = new TipoOrganismoPagadorCorreos();
 			pagadorCorreos.setCodigoDir3(notificacio.getPagadorCorreusCodiDir3());
 			pagadorCorreos.setCodigoClienteFacturacionCorreos(notificacio.getPagadorCorreusCodiClientFacturacio());
@@ -228,7 +242,7 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 			pagadorCie.setFechaVigencia(
 					toXmlGregorianCalendar(notificacio.getPagadorCieDataVigencia()));
 			envio.setOrganismoPagadorCie(pagadorCie);
-		}
+		}*/
 		Documento documento = new Documento();
 		documento.setHashSha1(notificacio.getDocumentHash());
 		documento.setNormalizado(notificacio.isDocumentNormalitzat() ? "si" : "no");
@@ -260,6 +274,8 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 			NotificacioEntity notificacio) throws GeneralSecurityException {
 		SimpleDateFormat sdfCaducitat = new SimpleDateFormat("yyyy-MM-dd");
 		ArrayOfTipoDestinatario destinatarios = new ArrayOfTipoDestinatario();
+		Integer retardPostal;
+
 		for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
 			TipoDestinatario destinatario = new TipoDestinatario();
 			if (enviament.getNotificaReferencia() == null) {
@@ -389,10 +405,16 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 				opcionesEmision.setCaducidad(
 						sdfCaducitat.format(notificacio.getCaducitat()));
 			}
-			if (notificacio.getRetardPostal() != null) {
-				opcionesEmision.setRetardoPostalDeh(
-						new Integer(notificacio.getRetardPostal()));
+			
+			//if (notificacio.getRetardPostal() != null) {
+			//	opcionesEmision.setRetardoPostalDeh(
+			//			new Integer(notificacio.getRetardPostal()));
+			//}
+			retardPostal = procedimentRepository.findByCodi(notificacio.getProcedimentCodiNotib()).getRetard();
+			if (retardPostal != null) {
+				opcionesEmision.setRetardoPostalDeh(retardPostal);
 			}
+			
 			destinatario.setOpcionesEmision(opcionesEmision);
 			DireccionElectronicaHabilitada deh = new DireccionElectronicaHabilitada();
 			deh.setCodigoProcedimiento(enviament.getDehProcedimentCodi());

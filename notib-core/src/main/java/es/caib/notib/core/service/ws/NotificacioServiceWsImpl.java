@@ -146,19 +146,18 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				emisorDir3Codi,
 				comunicacioTipus,
 				enviamentTipus, 
-				notificacio.getEnviamentDataProgramada(),
 				notificacio.getConcepte(),
 				document.getArxiuNom(),
 				documentGesdocId,
+				document.getCsv() != null ? document.getCsv() : document.getUuid(),
 				document.getHash(),
 				document.isNormalitzat(),
 				document.isGenerarCsv()).
 				descripcio(notificacio.getDescripcio()).
 				caducitat(notificacio.getCaducitat()).
-				retardPostal(notificacio.getRetard()).
 				descripcio(notificacio.getDescripcio()).
 				procedimentCodiNotib(notificacio.getProcedimentCodi());
-		PagadorPostal pagadorPostal = notificacio.getPagadorPostal();
+		/*PagadorPostal pagadorPostal = notificacio.getPagadorPostal();
 		if (pagadorPostal != null) {
 			notificacioBuilder.
 			pagadorCorreusCodiDir3(pagadorPostal.getDir3Codi()).
@@ -173,7 +172,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			pagadorCieDataVigencia(pagadorCie.getContracteDataVigencia());
 		}
 		ParametresSeu parametresSeu = notificacio.getParametresSeu();
-		/*if (parametresSeu != null) {
+		if (parametresSeu != null) {
 			notificacioBuilder.
 			seuExpedientSerieDocumental(parametresSeu.getExpedientSerieDocumental()).
 			seuExpedientUnitatOrganitzativa(parametresSeu.getExpedientUnitatOrganitzativa()).

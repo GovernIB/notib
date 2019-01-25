@@ -31,8 +31,8 @@ public class DocumentCommand {
 	private List<String> metadades;
 	private boolean normalitzat;
 	private boolean generarCsv;
-	private String uUID;
-	private String cSV;
+	private String csv;
+	private String uuid;
 	
 	public String getArxiuNom() {
 		return arxiuNom;
@@ -76,17 +76,17 @@ public class DocumentCommand {
 	public void setGenerarCsv(boolean generarCsv) {
 		this.generarCsv = generarCsv;
 	}
-	public String getUUID() {
-		return uUID;
+	public String getCsv() {
+		return csv;
 	}
-	public void setUUID(String uUID) {
-		this.uUID = uUID;
+	public void setCsv(String csv) {
+		this.csv = csv;
 	}
-	public String getCSV() {
-		return cSV;
+	public String getUuid() {
+		return uuid;
 	}
-	public void setCSV(String cSV) {
-		this.cSV = cSV;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 	
 	public static DocumentCommand asCommand(DocumentDto dto) {

@@ -35,6 +35,7 @@ import es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsException;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
+import es.caib.notib.core.api.ws.notificacio.ParametresRegistre;
 import es.caib.notib.core.api.ws.notificacio.Persona;
 import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
@@ -57,11 +58,11 @@ import es.caib.notib.core.repository.NotificacioRepository;
  */
 @Service
 @WebService(
-		name = "NotificacioService",
-		serviceName = "NotificacioService",
-		portName = "NotificacioServicePort",
+		name = "NotificacioServiceV2",
+		serviceName = "NotificacioServiceV2",
+		portName = "NotificacioServiceV2Port",
 		targetNamespace = "http://www.caib.es/notib/ws/notificacio",
-		endpointInterface = "es.caib.notib.core.api.service.ws.NotificacioService")
+		endpointInterface = "es.caib.notib.core.api.service.ws.NotificacioServiceV2")
 public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 	@Autowired
@@ -70,7 +71,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
-
 	@Autowired
 	private NotificaHelper notificaHelper;
 	@Autowired
@@ -139,20 +139,27 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				emisorDir3Codi,
 				comunicacioTipus,
 				enviamentTipus, 
-				notificacio.getEnviamentDataProgramada(),
 				notificacio.getConcepte(),
 				document.getArxiuNom(),
 				documentGesdocId,
+				document.getCsv() != null ? document.getCsv() : document.getUuid(),
 				document.getHash(),
 				document.isNormalitzat(),
 				document.isGenerarCsv()).
 				descripcio(notificacio.getDescripcio()).
 				caducitat(notificacio.getCaducitat()).
-				retardPostal(notificacio.getRetard()).
 				descripcio(notificacio.getDescripcio()).
-				procedimentCodiNotib(notificacio.getCodiProcediment());
-
-		//falta afegir paràmetres registre
+				procedimentCodiNotib(notificacio.getCodiProcediment()).
+				grupCodi(notificacio.getCodiGrup());
+		
+		ParametresRegistre parametresRegistre = notificacio.getParametresRegistre();
+		if (parametresRegistre != null) {
+			notificacioBuilder.
+			registreOrgan(parametresRegistre.getOrgan()).
+			registreOficina(parametresRegistre.getOficina()).
+			registreLlibre(parametresRegistre.getLlibre());
+		}
+		
 		
 		NotificacioEntity notificacioEntity = notificacioBuilder.build();
 		notificacioRepository.saveAndFlush(notificacioEntity);
