@@ -12,12 +12,14 @@
 			selectionEnabled: false,
 			dragEnabled: false,
 			pagingStyle: 'page', // 'page', 'scroll'
+			pagingStyleX: false,
 			scrollBuffer: 9,
 			scrollOverflow: 'fixed', // 'fixed', 'adaptMax', 'adapt'
 			scrollFixedHeight: 300,
 			scrollMaxHeight: 200,
 			scrollMinHeight: 100,
-			rowInfo: false, 
+			rowInfo: false,
+			individualFilter: false,
 			campsAddicionals: false,
 			ordering: true,
 			defaultDir: 'asc',
@@ -29,8 +31,10 @@
 		plugin.settings = {}
 		plugin.serverParams = [];
 		plugin.init = function() {
+			
 			plugin.settings = $.extend(defaults, $element.data(), options);
 			// Inicialització de les options per a crear la datatable
+			
 			if (plugin.settings.dragEnabled) {
 				$('thead tr,tfoot tr', $taula).each(function() {
 					$(this).prepend($('<th width="1">&nbsp;</th>'));
@@ -132,9 +136,16 @@
 					}
 				},
 				preDrawCallback: function(settings_) {
+					
+					var targetBotons = $('.botons', this.parent());
+					
+					//El pare es diferent si el scroll està activat
+					if (plugin.settings.pagingStyleX == true) {
+						targetBotons = $('.botons', this.parent().parent().parent());
+					}
+					
 					if (plugin.settings.botonsTemplate && plugin.settings.botonsTemplate.length > 0) {
 						$.templates("templateNew", $(plugin.settings.botonsTemplate).html());
-						var targetBotons = $('.botons', this.parent());
 						if (!targetBotons.data('botons-creats')) {
 							targetBotons.html($.render.templateNew());
 							targetBotons.data('botons-creats', 'true');
@@ -208,8 +219,10 @@
 					}
 					if (plugin.settings.selectionEnabled) {
 						var $row = headerTrFunction();
+						
 						$row.addClass('selectable');
 						var $cell = $('th:first', $row);
+						
 						$cell.off('click');
 						$cell.on('click', function() {
 							var api = $taula.dataTable().api();
@@ -224,8 +237,33 @@
 							}
 							return false;
 						});
+						
 						$cell.empty().append('<span class="fa fa-square-o"></span>');
+						
 					}
+					if (plugin.settings.individualFilter) {
+						var $rowFilter = headerTrFilterFunction();
+						var $formFilter = getFilterForm();
+						var $buttonFilter;
+						
+						var $cellFilter = $('th:first', $rowFilter);
+						
+						//ACABAR
+						$cellFilter.append($(plugin.settings.cellTemplate).html());
+						//$cellFilter.attr("disabled", "disabled");
+						//$buttonFilter = getButtonFiltrer();
+						
+						$cellFilter.on('click', function() {
+							$rowFilter.each(function(index) {
+								$(this).each(function(index) {
+									$(this).children().each(function(){
+										$formFilter.append($(this).find("div"));
+									});
+								});
+							});
+						});
+					}
+					
 					if (plugin.settings.pagingStyle == 'scroll') {
 						recalcularDimensions();
 					}
@@ -284,7 +322,7 @@
 							data: '<null>',
 							orderable: false,
 							visible: true});
-					} if ((!plugin.settings.selectionEnabled && plugin.settings.dragEnabled && index == 0) || (plugin.settings.selectionEnabled && plugin.settings.dragEnabled && index == 1)) {
+					} else if ((!plugin.settings.selectionEnabled && plugin.settings.dragEnabled && index == 0) || (plugin.settings.selectionEnabled && plugin.settings.dragEnabled && index == 1)) {
 						columns.push({
 							data: '<null>',
 							orderable: false,
@@ -334,6 +372,7 @@
 						}
 					}
 				});
+				
 				dataTableOptions['columns'] = columns;
 				if (typeof defaultOrder != 'undefined') {
 					dataTableOptions['order'] = [[defaultOrder, defaultDir]];
@@ -367,6 +406,10 @@
 			}
 			// Configuració de la paginació
 			if (plugin.settings.pagingEnabled) {
+				//Scroll horitzontal
+				if (plugin.settings.pagingStyleX == true) {
+					dataTableOptions['scrollX'] = plugin.settings.pagingStyleX;
+				}
 				if (plugin.settings.pagingStyle == 'page') {
 					dataTableOptions = $.extend({
 						paging: true,
@@ -374,6 +417,7 @@
 						lengthMenu: plugin.settings.lengthMenu,
 						dom: domPrefix + 't<"row"<"col-md-' + colMd25p + '"l><"col-md-' + colMd75p + '"p>>'
 					}, dataTableOptions);
+					
 				} else if (plugin.settings.pagingStyle == 'scroll') {
 					var paramScrollY;
 					if (plugin.settings.scrollOverflow === 'fixed') {
@@ -430,13 +474,26 @@
 						selected: true}).data();
 					var numSelected = selectedRowsData.length;
 					var $row = headerTrFunction();
+					var $rowFilter = headerTrFilterFunction();
+					
 					var $cell = $('th:first', $row);
+					var $cellFilter = $('th:first', $rowFilter);
+					
 					if (numSelected == 0) {
 						$cell.empty().append('<span class="fa fa-square-o"></span>');
+						
+						$cellFilter.html('');
+						$cellFilter.append($(plugin.settings.cellTemplate).html());
 					} else if (numSelected < numRows) {
 						$cell.empty().append('<span class="fa fa-minus-square-o"></span>');
+						
+						$cellFilter.html('');
+						$cellFilter.append($(plugin.settings.cellTemplate).html());
 					} else {
 						$cell.empty().append('<span class="fa fa-check-square-o"></span>');
+						
+						$cellFilter.html('');
+						$cellFilter.append($(plugin.settings.cellTemplate).html());
 					}
 					var ids = [];
 					for (var d = 0; d < selectedRowsData.length; d++) {
@@ -595,6 +652,21 @@
 					});
 				}
 			}
+			
+			//Configuració filtre individual columnes
+			if (plugin.settings.individualFilter) {
+				$('thead tr ', $taula).clone(true).off().appendTo('thead');
+				$('thead tr:eq(1) th').each( function (i) {
+					var title = $(this).text();
+					var html = $(this).children().html();
+					
+					$(this).html($(html));
+					$(this).find(".inputDate").attr("placeholder", title)
+				
+			    });
+				
+				dataTableOptions['bSortCellsTop'] = true;
+			}
 			// Creació del datatable
 			$taula.dataTable(dataTableOptions);
 		}
@@ -622,8 +694,19 @@
 		}
 		// Mètodes privats
 		var headerTrFunction = function() {
-			return $('thead:first tr', $taula.closest('.dataTables_wrapper'));
+			return $('thead:first tr:first', $taula.closest('.dataTables_wrapper'));
 		}
+		// (Filtre individual)
+		var headerTrFilterFunction = function() {
+			return $('thead:first tr:nth-child(2)', $taula.closest('.dataTables_wrapper'));
+		}
+		var getFilterForm = function() {
+			return $('#enviamentFiltreForm');
+		}
+		var getButtonFiltrer = function() {
+			return $('#btnFiltrar');
+		}
+		
 		var getBaseUrl = function() {
 			var baseUrl = plugin.settings.url;
 			if (/datatable$/.test(baseUrl) || /datatable\/$/.test(baseUrl)) {

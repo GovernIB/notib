@@ -14,15 +14,15 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class EnviamentDto extends AuditoriaDto {
 
-	private NotificaServeiTipusEnumDto serveiTipus;
+	private ServeiTipusEnumDto serveiTipus;
 	private PersonaDto titular;
 	private List<PersonaDto> destinataris;
 	
 	
-	public NotificaServeiTipusEnumDto getServeiTipus() {
+	public ServeiTipusEnumDto getServeiTipus() {
 		return serveiTipus;
 	}
-	public void setServeiTipus(NotificaServeiTipusEnumDto serveiTipus) {
+	public void setServeiTipus(ServeiTipusEnumDto serveiTipus) {
 		this.serveiTipus = serveiTipus;
 	}
 	public PersonaDto getTitular() {
@@ -37,7 +37,6 @@ public class EnviamentDto extends AuditoriaDto {
 	public void setDestinataris(List<PersonaDto> destinataris) {
 		this.destinataris = destinataris;
 	}
-	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
