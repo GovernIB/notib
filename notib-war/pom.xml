@@ -286,10 +286,22 @@
 			<build>
 				<plugins>
 					<plugin>
-						<artifactId>maven-war-plugin</artifactId>
-						<configuration>
-							<packagingExcludes>META-INF/context.xml</packagingExcludes>
-						</configuration>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>unpack dependencies</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>unpack-dependencies</goal>
+								</goals>
+								<configuration>
+									<includeGroupIds>org.webjars</includeGroupIds>
+									<includes>**/*</includes>
+									<outputDirectory>${project.build.directory}/notib</outputDirectory>
+								</configuration>
+							</execution>
+						</executions>
 					</plugin>
 				</plugins>
 			</build>

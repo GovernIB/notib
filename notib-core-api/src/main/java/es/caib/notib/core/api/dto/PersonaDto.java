@@ -15,6 +15,7 @@ public class PersonaDto implements Serializable{
 	private String email;
 	private String codiAdministracio;
 	
+	
 	public String getNom() {
 		return nom;
 	}
@@ -63,7 +64,7 @@ public class PersonaDto implements Serializable{
 	public void setCodiAdministracio(String codiAdministracio) {
 		this.codiAdministracio = codiAdministracio;
 	}
-	
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

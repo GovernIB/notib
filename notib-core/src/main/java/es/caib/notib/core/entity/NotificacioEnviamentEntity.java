@@ -236,6 +236,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaIntentData;
 	
+	
 	/* Seu CAIB 
 	@Column(name = "seu_reg_numero", length = 50)
 	private String seuRegistreNumero;
@@ -530,7 +531,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public NotificacioEntity getNotificacio() {
 		return notificacio;
 	}
-
+	
 	public void updateNotificaReferencia(
 			String notificaReferencia) {
 		this.notificaReferencia = notificaReferencia;

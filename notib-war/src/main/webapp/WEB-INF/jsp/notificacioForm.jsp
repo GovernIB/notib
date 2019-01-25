@@ -16,6 +16,7 @@
 <c:set var="enviaments"><spring:message code="notificacio.form.titol.enviaments"/></c:set>
 <c:set var="titular"><spring:message code="notificacio.form.titol.enviaments.titular"/></c:set>
 <c:set var="destinataris"><spring:message code="notificacio.form.titol.enviaments.destinataris"/></c:set>
+<c:set var="metodeEntrega"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega"/></c:set>
 <c:set var="entregaPostal"><spring:message code="notificacio.form.titol.entregapostal"/></c:set>
 <c:set var="entregaPostalDades"><spring:message code="notificacio.form.titol.entregapostal.dades"/></c:set>
 <c:set var="entregaDireccio"><spring:message code="notificacio.form.titol.entregadireccio"/></c:set>
@@ -40,16 +41,16 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<not:modalHead/>
 	
+<style type="text/css">
+
+.form-horizontal .control-label{
+    text-align: left;
+}
+</style>
 <script type="text/javascript">
 $(document).ready(function() {
-
-	//$('.dadesgeneralsForm').hide();
-	$('.documentForm').hide();
-	$('.parametresregistreForm').hide();
-	$('.enviamentsForm').hide();
-	$('.entregapostalForm').hide();
+	var count = 0;
 	$('.entregapostal').hide();
-	$('.entregadireccioForm').hide();
 	
 	$('#tipusDocument').on('change', function() {
 		if ($(this).val() == 'ARXIU') {
@@ -62,33 +63,11 @@ $(document).ready(function() {
 		webutilModalAdjustHeight();
 	});
 	
+	
+	
 	$('#entregaPostalActiva').change(function(){
 		$('.entregapostal').slideToggle();
 	});
-	
-	$('#addDestinatariButton').on('click', function() {
-		addDestinatari();
-	});
-	
-	$('#dadesgenerals').on('click', function() {
-		$('.dadesgeneralsForm').slideToggle();
-	});
-	$('#document').on('click', function() {
-		$('.documentForm').slideToggle();
-	});
-	$('#parametresregistre').on('click', function() {
-		$('.parametresregistreForm').slideToggle();
-	});
-	$('#enviaments').on('click', function() {
-		$('.enviamentsForm').slideToggle();
-	});
-	$('#entregapostal').on('click', function() {
-		$('.entregapostalForm').slideToggle();
-	});
-	$('#entregadireccio').on('click', function() {
-		$('.entregadireccioForm').slideToggle();
-	});
-
 
 	var agrupable = $("#procedimentId").children(":selected").attr("class");
 	var procedimentId = $("#procedimentId").children(":selected").attr("value");
@@ -100,36 +79,109 @@ $(document).ready(function() {
 		comprovarGrups(agrupable, procedimentId)
 		webutilModalAdjustHeight();
 	});
+	
+	//Add metadata
+	$('#add').on('click', function () {
+		//Input to add
+		var metadataInput = 
+			"<div class='form-group'>" +
+				"<label class='control-label col-xs-2'></label>" +
+				"<div class='col-xs-10'>" +
+					"<div class='input-group'>" +
+					"<input name='metadades' id='metadades' type='text' class='form-control add grupVal_" + count + "' readonly/>" +
+					"<span class='input-group-addon' id='remove'><span class='fa fa-remove'></span></span>" +
+					"</div>" +
+				"</div>" +
+			"</div>";
+
+		var val = $(".input-add").children().val();
+		if (val != '') {
+			$("#list").prepend(metadataInput);
+			$(".grupVal_" + count).attr("value", val);
+			$("#list").find("#remove").addClass("grupVal_" + count);
+			count++;
+		}
+		
+		webutilModalAdjustHeight();
+	});
+	
+	//Eliminar grups
+	$(document).on('click', "#remove", function () {
+		
+		var grupId = $(this).parent().children().attr('id'); 
+		var grupsClass = $(this).attr('class'); 
+		var lastClass = grupsClass.split(' ').pop();
+		var parentRemove = $("." + lastClass).parent();
+		var parentInput = parentRemove.parent();
+		var parentDiv = parentInput.parent();
+		
+		var grupUrl = "grup/" + grupId + "/delete";
+		
+		if (confirm('<spring:message code="grup.list.confirmacio.esborrar"/>') && !isNaN(grupId)) 
+			$.ajax({
+		        type: "GET",
+		        url: grupUrl,
+		        success: function (data) {
+		        	//Remove div parent
+					parentDiv.slideUp("normal", function() {
+						$(this).remove(); 
+						webutilModalAdjustHeight();
+					});
+		        },
+		        error: function (data) {
+		        	//Remove div parent
+					alert("ERROR ELIMINANT GRUP");
+		        }
+		    });
+		else
+			//Remove div parent
+			parentDiv.slideUp("normal", function() {
+				$(this).remove(); 
+				webutilModalAdjustHeight();
+			});
+			
+	});
+
 });	
 
 function addDestinatari() {
-	var destinatariForm = $(".personaForm:first").clone();
+	var number;
 	
-	$(destinatariForm).appendTo(".newDestinatari").find("input[type='text']").val("");
-	
-	webutilModalAdjustHeight();
+	if ($(".personaForm").hasClass("hidden")) {
+		$(".personaForm").removeClass("hidden").show();
+	} else {
+		
+		var destinatariForm = $(".destinatariForm").last().clone();
+		
+		destinatariForm.find('input').each(function() {
+			number = this.name.substring( this.name.indexOf( '[' ) + 1, this.name.indexOf( ']' ) );
+			console.log(this.name);
+			var num = parseInt(number);
+			console.log(++num);
+		    this.name= this.name.replace(number, num);
+		    this.id= this.id.replace(number, num);
+		});
+		
+		$(destinatariForm).appendTo(".newDestinatari").slideDown("slow").find("input[type='text']").val("");
+		$(".destinatariForm:first").addClass("destinatari_" + number);
+		
+		webutilModalAdjustHeight();
+	}
 }
 
 function comprovarGrups(agrupable, procedimentId) {
 	var notificacioGrupsUrl = "<c:url value="/notificacio/"/>" + procedimentId + "/grups";
-	console.log(notificacioGrupsUrl);
 	if (agrupable == 'true') {
 		var procediments = [{}];
 			$.get(notificacioGrupsUrl).done(function(grups) {
-				
-				console.log(procediments);
 				for (i = 0; i < grups.length; i++) {
-					var select = document.getElementById('grup');
+					var select = document.getElementById('grupId');
 					var option = document.createElement('option');
-					option.name = 'grup';
+					option.id = 'grupId';
+					option.name = 'grupId';
 					option.text = grups[i].nom;
 					option.value = grups[i].id;
 					select.add(option);
-					
-					procediments.push({
-						nom: grups[i].nom,
-						id: grups[i].id
-					});
 				}
 			})
 			$('#grup').find('option').remove();
@@ -141,99 +193,191 @@ function comprovarGrups(agrupable, procedimentId) {
 </script>
 </head>
 <body>
+	<ul class="nav nav-tabs" role="tablist">
+		<li role="presentation" class="active"><a href="#dadesgeneralsForm" aria-controls="dadesgeneralsForm" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.dadesgenerals"/></a></li>
+		<li role="presentation"><a href="#documentForm" aria-controls="documentForm" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.document"/></a></li>
+		<li role="presentation"><a href="#parametresregistreForm" aria-controls="parametresregistreForm" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.parametresregistre"/></a></li>
+		<li role="presentation"><a href="#enviamentsForm" aria-controls="enviamentsForm" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.enviaments"/></a></li>
+	</ul>
+	<br/>
 	<c:set var="formAction"><not:modalUrl value="/notificacio/newOrModify"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="notificacioCommandV2" enctype="multipart/form-data">
-		<not:notTitol name="${dadesGenerals}" id="dadesgenerals"></not:notTitol>
-		<div class="row dadesgeneralsForm">
-			<div class="col-md-12">
-				<not:inputText name="emisorDir3Codi" textKey="notificacio.form.camp.codiemisor" value="${entitat.dir3Codi}" labelSize="2" readonly="true" required="true"/>
-			</div>
-			<div class="col-md-6">
-				<not:inputSelect name="comunicacioTipus" textKey="notificacio.form.camp.comunicaciotipus" required="true"/>
-			</div>
-			<div class="col-md-6">
-				<not:inputSelect name="enviamentTipus" textKey="notificacio.form.camp.enviamenttipus" required="true"/>
-			</div>
-			<div class="col-md-12">
-				<not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="2" required="true"/>
-			</div>
-			<div class="col-md-12">
-				<not:inputTextarea name="descripcio" textKey="notificacio.form.camp.descripcio" labelSize="2"/>
-			</div>
-			<div class="col-md-6">
-				<not:inputDate name="enviamentDataProgramada" textKey="notificacio.form.camp.enviamentdata" />
-			</div>
-			<div class="col-md-6">
-				<not:inputText name="retard" textKey="notificacio.form.camp.retard" labelSize="2"/>
-			</div>
-			<div class="col-md-12">
-				<not:inputSelect name="procedimentId" textKey="notificacio.form.camp.procediment" optionItems="${procediments}" optionAgrupableAttribute="agrupar" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2"/>
-			</div>
-			<div class="col-md-12 agrupable hidden">
-				
-				<div class="form-group">
-					<label class="control-label col-xs-2" for="grup"><spring:message code="notificacio.form.camp.grup"/></label>
-					<div class="controls col-xs-10">
-						<select class="form-control" path="grup" style="width:100%" id="grup"></select>
+		<div class="tab-content">
+			<div role="tabpanel" class="tab-pane active" id="dadesgeneralsForm">
+				<div class="row dadesgeneralsForm">
+					<div class="col-md-12">
+						<not:inputText name="emisorDir3Codi" textKey="notificacio.form.camp.codiemisor" value="${entitat.dir3Codi}" labelSize="2" readonly="true" required="true"/>
+					</div>
+					<div class="col-md-6">
+						<not:inputSelect name="comunicacioTipus" textKey="notificacio.form.camp.comunicaciotipus" required="true"/>
+					</div>
+					<div class="col-md-6">
+						<not:inputSelect name="enviamentTipus" textKey="notificacio.form.camp.enviamenttipus" required="true"/>
+					</div>
+					<div class="col-md-12">
+						<not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="2" required="true"/>
+					</div>
+					<div class="col-md-12">
+						<not:inputTextarea name="descripcio" textKey="notificacio.form.camp.descripcio" labelSize="2"/>
+					</div>
+					<div class="col-md-12">
+						<not:inputSelect name="procedimentId" textKey="notificacio.form.camp.procediment" optionItems="${procediments}" optionAgrupableAttribute="agrupar" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2"/>
+					</div>
+					<div class="col-md-12 agrupable hidden">
+						
+						<div class="form-group">
+							<label class="control-label col-xs-2" for="grup"><spring:message code="notificacio.form.camp.grup"/></label>
+							<div class="controls col-xs-10">
+								<select class="form-control" style="width:100%" name="grupId" id="grupId"></select>
+							</div>
+						</div>
+						<!--
+						<not:inputSelect name="grupId" textKey="notificacio.form.camp.grup" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2"/>
+						-->
 					</div>
 				</div>
-				<!--
-				<not:inputSelect name="grupId" textKey="notificacio.form.camp.grup" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2"/>
-				-->
+			</div>
+			<div role="tabpanel" class="tab-pane" id="documentForm">
+				<div class="row documentForm">
+					<div class="col-md-6">
+						<not:inputSelect name="tipusDocument" textKey="notificacio.form.camp.codiemisor" labelSize="4"/>
+					</div>
+					<div id="input-origen-csvuuid"  class="col-md-6">
+						<not:inputText name="documentArxiuUuidCsv" textKey="notificacio.form.camp.codiemisor" labelSize="3"/>
+					</div>
+					<div id="input-origen-arxiu" class="col-md-6 hidden" >
+						<not:inputFile  name="arxiu" textKey="notificacio.form.camp.arxiu" labelSize="3"/>
+					</div>
+					<div class="col-md-12">
+						<not:inputCheckbox name="document.normalitzat" textKey="notificacio.form.camp.normalitzat" labelSize="2"/>
+					</div>
+					<div class="col-md-12" id="metadades">
+						<not:inputTextAdd name="document.metadades" idIcon="add" textKey="notificacio.form.camp.metadades" labelSize="2"/>
+						<div id="list"></div>
+					</div>
+				</div>
+			</div>
+			<div role="tabpanel" class="tab-pane" id="parametresregistreForm">
+				<div class="row parametresregistreForm">
+					<div class="col-md-12">
+						<not:inputText name="organ" textKey="notificacio.form.camp.organ" labelSize="2"/>
+					</div>
+					<div class="col-md-12">
+						<not:inputText name="llibre" textKey="notificacio.form.camp.llibre" labelSize="2"/>
+					</div>
+					<div class="col-md-12">
+						<not:inputText name="oficina" textKey="notificacio.form.camp.oficina" labelSize="2"/>
+					</div>
+				</div>
+			</div>
+			<div role="tabpanel" class="tab-pane" id="enviamentsForm">
+				<div class="row enviamentsForm">
+						<div class="col-md-6">
+							<not:inputSelect name="serveiTipus" textKey="notificacio.form.camp.destinatari.serveitipus" labelSize="4" required="true" />
+						</div>
+						<div class="titular">
+							<div class="col-md-12">
+								<div>
+									<label class="text-primary">${titular}</label>
+								</div>
+							</div>
+							<div class="col-md-12 separacio"><hr></div>
+							<div class="personaForm">
+								<div>
+									<div class="col-md-6">
+										<not:inputText name="titular.nif" textKey="notificacio.form.camp.titular.nif" required="true" />
+									</div>
+									<div class="col-md-6">
+										<not:inputText name="titular.nom" textKey="notificacio.form.camp.titular.nom" required="true" />
+									</div>
+									<div class="col-md-6">
+										<not:inputText name="titular.llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" />
+									</div>
+									<div class="col-md-6">
+										<not:inputText name="titular.llinatge2" textKey="notificacio.form.camp.titular.llinatge2" />
+									</div>
+									<div class="col-md-6">
+										<not:inputText name="titular.email" textKey="notificacio.form.camp.titular.email" />
+									</div>
+									<div class="col-md-6">
+										<not:inputText name="titular.telefon" textKey="notificacio.form.camp.titular.telefon" />
+									</div>
+									<div class="col-md-6">
+										<not:inputText name="titular.dir3codi" textKey="notificacio.form.camp.titular.dir3codi" />
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="destinatari">
+							<div class="col-md-8">
+								<div>
+									<label class="text-primary">${destinataris}</label>
+								</div>
+							</div>
+							<div class="col-md-12">
+								<hr>
+							</div>
+							<c:set var="i" value="${0}"/>
+							<c:forEach items="destinataris" var="destinatari" varStatus="status">
+							<div class="newDestinatari">
+								<div class="col-md-12 personaForm destinatariForm hidden">
+									<div>
+										<div class="col-md-6">
+											<not:inputText name="destinataris[${i}].nif" textKey="notificacio.form.camp.titular.nif" required="true" />
+										</div>
+										<div class="col-md-6">
+											<not:inputText name="destinataris[${i}].nom" textKey="notificacio.form.camp.titular.nom" required="true" />
+										</div>
+										<div class="col-md-6">
+											<not:inputText name="destinataris[${i}].llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" />
+										</div>
+										<div class="col-md-6">
+											<not:inputText name="destinataris[${i}].llinatge2" textKey="notificacio.form.camp.titular.llinatge2" />
+										</div>
+										<div class="col-md-6">
+											<not:inputText name="destinataris[${i}].email" textKey="notificacio.form.camp.titular.email" />
+										</div>
+										<div class="col-md-6">
+											<not:inputText name="destinataris[${i}].telefon" textKey="notificacio.form.camp.titular.telefon" />
+										</div>
+										<div class="col-md-6">
+											<not:inputText name="destinataris[${i}].dir3codi" textKey="notificacio.form.camp.titular.dir3codi" />
+										</div>
+										<div class="col-md-12">
+											<hr>
+										</div>
+									</div>
+								</div>
+							</div>	
+							<div class="col-md-12">
+								<div class="text-right">
+									<input type="button" class="btn btn-default" id="addDestinatri" onclick="addDestinatari()" value="<spring:message code="notificacio.form.boto.nou.destinatari"/>"/>
+								</div>
+							</div>
+							</c:forEach>
+						</div>
+						<div class="col-md-12 separacio"></div>
+						
+						<div class="metodeEntrega">
+							<div class="col-md-8">
+								<div>
+									<label class="text-primary">${metodeEntrega}</label>
+								</div>
+							</div>
+							<div class="col-md-12">
+								<not:inputCheckbox name="entregaPostalActiva" textKey="notificacio.form.camp.entregapostal.activa" labelSize="2" />
+							</div>
+							<div class="entregapostal">
+								<not:entregaDefinir titol="${entregaPostalDades}" />
+							</div>
+							<div class="col-md-12">
+								<not:inputCheckbox name="entregaDeh.obligat" textKey="notificacio.form.camp.entregapostal.deh" labelSize="2" />
+							</div>
+						</div>
+				</div>
 			</div>
 		</div>
-		<not:notTitol name="${document}" id="document"></not:notTitol>
-		<div class="row documentForm">
-			<div class="col-md-6">
-				<not:inputSelect name="tipusDocument" textKey="notificacio.form.camp.codiemisor" labelSize="4"/>
-			</div>
-			<div id="input-origen-csvuuid"  class="col-md-6">
-				<not:inputText name="documentArxiuUuidCsv" textKey="notificacio.form.camp.codiemisor" labelSize="3"/>
-			</div>
-			<div id="input-origen-arxiu" class="col-md-6 hidden" >
-				<not:inputFile  name="arxiu" textKey="notificacio.form.camp.arxiu" labelSize="3"/>
-			</div>
-			<div class="col-md-12">
-				<not:inputCheckbox name="document.normalitzat" textKey="notificacio.form.camp.normalitzat" labelSize="2"/>
-			</div>
-			<div class="col-md-12">
-				<not:inputTextAddGrup name="document.metadades" textKey="notificacio.form.camp.metadades" labelSize="2"/>
-			</div>
-		</div>
-		<not:notTitol name="${parametresRegistre}" id="parametresregistre" />
-		<div class="row parametresregistreForm">
-			
-		</div>
-		<not:notTitol name="${enviaments}" id="enviaments"></not:notTitol>
-		<div class="row enviamentsForm">
-			<div class="col-md-6">
-				<not:inputSelect name="enviament.serveiTipus" textKey="notificacio.form.camp.destinatari.serveitipus" labelSize="4" required="true"/>
-			</div>
-			<div>
-				<not:personaDefinir tipus="titular" titol="${titular}" />
-			</div>
-			<div class="destinatari">
-				<not:personaDefinir tipus="destinatari" titol="${destinataris}" />
-			</div>
-			<div class="newDestinatari"></div>
-		</div>
-		
-		<not:notTitol name="${entregaPostal}" id="entregapostal"></not:notTitol>
-		<div class="row entregapostalForm">
-			<div class="col-md-12">
-				<not:inputCheckbox name="entregaPostalActiva" textKey="notificacio.form.camp.entregapostal.activa" labelSize="2" />
-			</div>
-			<div class="entregapostal">
-				<not:entregaDefinir titol="${entregaPostalDades}" />
-			</div>
-		</div>
-		<not:notTitol name="${entregaDireccio}" id="entregadireccio"></not:notTitol>
-		<div class="row entregadireccioForm">
-			<div class="col-md-12">
-				<not:inputCheckbox name="entregaDeh.obligat" textKey="notificacio.form.camp.entregapostal.deh" labelSize="2" />
-			</div>
-		</div>
-		<div id="modal-botons">
+		<div id="modal-botons text-right">
 			<button id="addNotificacioButton" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/notificacio/new"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>	

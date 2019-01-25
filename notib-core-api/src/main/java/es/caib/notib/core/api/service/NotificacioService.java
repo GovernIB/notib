@@ -9,7 +9,6 @@ import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -32,10 +31,9 @@ public interface NotificacioService {
 	 * @return La notificació amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public PaginaDto<NotificacioDto> create(
+	public List<NotificacioDto> create(
 			Long entitatId,
-			NotificacioDtoV2 notificacio,
-			PaginacioParamsDto paginacioParams);
+			NotificacioDtoV2 notificacio);
 	
 
 	/**
@@ -76,28 +74,6 @@ public interface NotificacioService {
 			PaginacioParamsDto paginacioParams);
 
 	/**
-	 * Consulta dels enviaments d'una notificació.
-	 * 
-	 * @param notificacioId
-	 *            Atribut id de la notificació.
-	 * @return els destinataris trobats.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public List<NotificacioEnviamentDto> enviamentFindAmbNotificacio(
-			Long notificacioId);
-
-	/**
-	 * Consulta d'un enviament donat el seu id.
-	 * 
-	 * @param enviamentId
-	 *            Atribut id de l'enviament.
-	 * @return el destinatari trobat.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public NotificacioEnviamentDto enviamentFindAmbId(
-			Long enviamentId);
-
-	/**
 	 * Consulta dels events d'una notificació.
 	 * 
 	 * @param notificacioId
@@ -132,7 +108,7 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public ArxiuDto getDocumentArxiu(
 			Long notificacioId);
-
+	
 	/**
 	 * Retorna l'arxiu de la certificació d'un enviament.
 	 * 

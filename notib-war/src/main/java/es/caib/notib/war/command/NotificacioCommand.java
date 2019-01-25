@@ -49,7 +49,7 @@ public class NotificacioCommand {
 	private boolean documentGenerarCsv;
 	private NotificacioEstatEnumDto estat;
 	private NotificacioEnviamentEstatEnumDto estatNotifica;
-	private EnviamentCommand enviament;
+	
 	private boolean entregaPostalActiva;
 	private EntregapostalCommand entregaPostal;
 	private boolean entregaDeh;
@@ -185,12 +185,6 @@ public class NotificacioCommand {
 	}
 	public void setGrup(GrupCommand grup) {
 		this.grup = grup;
-	}
-	public EnviamentCommand getEnviament() {
-		return enviament;
-	}
-	public void setEnviament(EnviamentCommand enviament) {
-		this.enviament = enviament;
 	}
 	public boolean isEntregaPostalActiva() {
 		return entregaPostalActiva;

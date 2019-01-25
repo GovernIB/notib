@@ -44,59 +44,70 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 
 	@Column(name = "emisor_dir3codi", length = 9, nullable = false)
 	private String emisorDir3Codi;
+	
 	@Column(name = "com_tipus", nullable = false)
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
+	
 	@Column(name = "env_tipus", nullable = false)
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
-	@Column(name = "env_data_prog")
-	@Temporal(TemporalType.DATE)
-	private Date enviamentDataProgramada;
+	
 	@Column(name = "concepte", length = 50, nullable = false)
 	private String concepte;
+	
 	@Column(name = "descripcio", length = 100)
 	private String descripcio;
-	@Column(name = "pagcor_dir3", length = 9)
-	private String pagadorCorreusCodiDir3;
-	@Column(name = "pagcor_numcont", length = 20)
-	private String pagadorCorreusContracteNum;
-	@Column(name = "pagcor_codi_client", length = 20)
-	private String pagadorCorreusCodiClientFacturacio;
-	@Column(name = "pagcor_data_vig")
-	@Temporal(TemporalType.DATE)
-	private Date pagadorCorreusDataVigencia;
-	@Column(name = "pagcie_dir3", length = 9)
-	private String pagadorCieCodiDir3;
-	@Column(name = "pagcie_data_vig")
-	@Temporal(TemporalType.DATE)
-	private Date pagadorCieDataVigencia;
-	@Column(name = "proc_codi_notib", length = 6, nullable = false)
-	private String procedimentCodiNotib;
-	@Column(name = "proc_desc_sia", length = 256)
-	private String procedimentDescripcioSia;
-	@Column(name = "retard_postal")
-	private Integer retardPostal;
+	
 	@Column(name = "caducitat")
 	@Temporal(TemporalType.DATE)
 	private Date caducitat;
+	
+	@Column(name = "proc_codi_notib", length = 6, nullable = false)
+	private String procedimentCodiNotib;
+	
+	@Column(name = "grup_codi", length = 6, nullable = false)
+	private String grupCodi;
+	
+	@Column(name = "proc_desc_sia", length = 256)
+	private String procedimentDescripcioSia;
+	
 	@Column(name = "doc_arxiu_nom", length = 256, nullable = false)
 	private String documentArxiuNom;
-	@Column(name = "doc_arxiu_id", length = 64, nullable = false)
+	
+	@Column(name = "csv_uuid", length = 64)
+	private String csv_uuid;
+	
+	@Column(name = "doc_arxiu_id", length = 64)
 	private String documentArxiuId;
+	
 	@Column(name = "doc_hash", length = 40, nullable = false)
 	private String documentHash;
+	
 	@Column(name = "doc_normalitzat", nullable = false)
 	private boolean documentNormalitzat;
+	
 	@Column(name = "doc_gen_csv", nullable = false)
 	private boolean documentGenerarCsv;
+	
+	@Column(name = "registre_organ", length = 10)
+	private String registreOrgan;
+	@Column(name = "registre_oficina", length = 52, nullable = false)
+	private String registreOficina;
+	@Column(name = "registre_llibre", length = 256, nullable = false)
+	private String registreLlibre;
+	
 	@Column(name = "estat", nullable = false)
 	private NotificacioEstatEnumDto estat;
+	
 	@Column(name = "not_error_tipus")
 	private NotificacioErrorTipusEnumDto notificaErrorTipus;
+	
 	@Column(name = "not_env_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaEnviamentData;
+	
 	@Column(name = "not_env_intent")
 	private int notificaEnviamentIntent;
+	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "not_error_event_id")
 	@ForeignKey(name = "not_noterrevent_notificacio_fk")
@@ -128,41 +139,20 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
 		return enviamentTipus;
 	}
-	public Date getEnviamentDataProgramada() {
-		return enviamentDataProgramada;
-	}
 	public String getConcepte() {
 		return concepte;
 	}
 	public String getDescripcio() {
 		return descripcio;
 	}
-	public String getPagadorCorreusCodiDir3() {
-		return pagadorCorreusCodiDir3;
-	}
-	public String getPagadorCorreusContracteNum() {
-		return pagadorCorreusContracteNum;
-	}
-	public String getPagadorCorreusCodiClientFacturacio() {
-		return pagadorCorreusCodiClientFacturacio;
-	}
-	public Date getPagadorCorreusDataVigencia() {
-		return pagadorCorreusDataVigencia;
-	}
-	public String getPagadorCieCodiDir3() {
-		return pagadorCieCodiDir3;
-	}
-	public Date getPagadorCieDataVigencia() {
-		return pagadorCieDataVigencia;
-	}
 	public String getProcedimentCodiNotib() {
 		return procedimentCodiNotib;
 	}
+	public String getGrupCodi() {
+		return grupCodi;
+	}
 	public String getProcedimentDescripcioSia() {
 		return procedimentDescripcioSia;
-	}
-	public Integer getRetardPostal() {
-		return retardPostal;
 	}
 	public Date getCaducitat() {
 		return caducitat;
@@ -173,6 +163,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public String getDocumentArxiuId() {
 		return documentArxiuId;
 	}
+	public String getCsv_uuid() {
+		return csv_uuid;
+	}
 	public String getDocumentHash() {
 		return documentHash;
 	}
@@ -181,6 +174,18 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	}
 	public boolean isDocumentGenerarCsv() {
 		return documentGenerarCsv;
+	}
+	public String getRegistreOrgan() {
+		return registreOrgan;
+	}
+	public String getRegistreOficina() {
+		return registreOficina;
+	}
+	public String getRegistreLlibre() {
+		return registreLlibre;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 	public NotificacioEstatEnumDto getEstat() {
 		return estat;
@@ -237,10 +242,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String emisorDir3Codi,
 			NotificacioComunicacioTipusEnumDto comunicacioTipus,
 			NotificaEnviamentTipusEnumDto enviamentTipus,
-			Date enviamentDataProgramada,
 			String concepte,
 			String documentArxiuNom,
 			String documentArxiuId,
+			String csv_uuid,
 			String documentHash,
 			boolean documentNormalitzat,
 			boolean documentGenerarCsv) {
@@ -249,10 +254,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				emisorDir3Codi,
 				comunicacioTipus,
 				enviamentTipus,
-				enviamentDataProgramada,
 				concepte,
 				documentArxiuNom,
 				documentArxiuId,
+				csv_uuid,
 				documentHash,
 				documentNormalitzat,
 				documentGenerarCsv);
@@ -265,10 +270,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				String emisorDir3Codi,
 				NotificacioComunicacioTipusEnumDto comunicacioTipus,
 				NotificaEnviamentTipusEnumDto enviamentTipus,
-				Date enviamentDataProgramada,
 				String concepte,
 				String documentArxiuNom,
 				String documentArxiuId,
+				String csv_uuid,
 				String documentHash,
 				boolean documentNormalitzat,
 				boolean documentGenerarCsv) {
@@ -277,10 +282,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.emisorDir3Codi = emisorDir3Codi;
 			built.comunicacioTipus = comunicacioTipus;
 			built.enviamentTipus = enviamentTipus;
-			built.enviamentDataProgramada = enviamentDataProgramada;
 			built.concepte = concepte;
 			built.documentArxiuNom = documentArxiuNom;
 			built.documentArxiuId = documentArxiuId;
+			built.csv_uuid = csv_uuid;
 			built.documentHash = documentHash;
 			built.documentNormalitzat = documentNormalitzat;
 			built.documentGenerarCsv = documentGenerarCsv;
@@ -288,44 +293,32 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.notificaEnviamentIntent = 0;
 			built.notificaEnviamentData = new Date();
 		}
+		public Builder registreOrgan(String registreOrgan) {
+			built.registreOrgan = registreOrgan;
+			return this;
+		}
+		public Builder registreOficina(String registreOficina) {
+			built.registreOficina = registreOficina;
+			return this;
+		}
+		public Builder registreLlibre(String registreLlibre) {
+			built.registreLlibre = registreLlibre;
+			return this;
+		}
 		public Builder descripcio(String descripcio) {
 			built.descripcio = descripcio;
-			return this;
-		}
-		public Builder pagadorCorreusCodiDir3(String pagadorCorreusCodiDir3) {
-			built.pagadorCorreusCodiDir3 = pagadorCorreusCodiDir3;
-			return this;
-		}
-		public Builder pagadorCorreusContracteNum(String pagadorCorreusContracteNum) {
-			built.pagadorCorreusContracteNum = pagadorCorreusContracteNum;
-			return this;
-		}
-		public Builder pagadorCorreusCodiClientFacturacio(String pagadorCorreusCodiClientFacturacio) {
-			built.pagadorCorreusCodiClientFacturacio = pagadorCorreusCodiClientFacturacio;
-			return this;
-		}
-		public Builder pagadorCorreusDataVigencia(Date pagadorCorreusDataVigencia) {
-			built.pagadorCorreusDataVigencia = pagadorCorreusDataVigencia;
-			return this;
-		}
-		public Builder pagadorCieCodiDir3(String pagadorCieCodiDir3) {
-			built.pagadorCieCodiDir3 = pagadorCieCodiDir3;
-			return this;
-		}
-		public Builder pagadorCieDataVigencia(Date pagadorCieDataVigencia) {
-			built.pagadorCieDataVigencia = pagadorCieDataVigencia;
 			return this;
 		}
 		public Builder procedimentCodiNotib(String procedimentCodiNotib) {
 			built.procedimentCodiNotib = procedimentCodiNotib;
 			return this;
 		}
-		public Builder procedimentDescripcioSia(String procedimentDescripcioSia) {
-			built.procedimentDescripcioSia = procedimentDescripcioSia;
+		public Builder grupCodi(String grupCodi) {
+			built.grupCodi = grupCodi;
 			return this;
 		}
-		public Builder retardPostal(Integer retardPostal) {
-			built.retardPostal = retardPostal;
+		public Builder procedimentDescripcioSia(String procedimentDescripcioSia) {
+			built.procedimentDescripcioSia = procedimentDescripcioSia;
 			return this;
 		}
 		public Builder caducitat(Date caducitat) {

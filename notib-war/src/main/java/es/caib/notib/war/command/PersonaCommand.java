@@ -1,6 +1,10 @@
 package es.caib.notib.war.command;
 
+import java.util.List;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
+import es.caib.notib.core.api.dto.PersonaDto;
+import es.caib.notib.war.helper.ConversioTipusHelper;
 
 public class PersonaCommand {
 
@@ -54,7 +58,37 @@ public class PersonaCommand {
 	public void setDir3codi(String dir3codi) {
 		this.dir3codi = dir3codi;
 	}
+
+	public List<PersonaCommand> toListCommand(PersonaCommand command){
+		try {
+			List<PersonaCommand> destinataris;
+			
+			command.getNom();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return null;
+	}
 	
+	public static PersonaCommand asCommand(PersonaDto dto) {
+		if (dto == null) {
+			return null;
+		}
+		PersonaCommand command = ConversioTipusHelper.convertir(
+				dto,
+				PersonaCommand.class );
+		return command;
+	}
+	public static PersonaDto asDto(PersonaCommand command) {
+		if (command == null) {
+			return null;
+		}
+		PersonaDto dto = ConversioTipusHelper.convertir(
+				command,
+				PersonaDto.class);
+		return dto;
+	}
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

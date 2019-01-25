@@ -35,6 +35,9 @@
 	<div class='col-xs-8'>
 		<div class='input-group'>
 			<input value="${campValue}" id="${campId}" class="form-control" readonly="${myReadonly}"/>
+			<span class='input-group-addon ${campClass}' id='showPermisCheck'>
+				<span class='fa fa-angle-down'></span>
+			</span>
 			<span class='input-group-addon ${campClass}' id='remove'>
 				<span class='fa fa-remove'></span>
 			</span>

@@ -29,10 +29,12 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			boolean activa,
 			Pageable paginacio);
 
-	Page<NotificacioEntity> findByEntitatId(
-			Long entitatId,
-			Pageable paginacio);
+	List<NotificacioEntity> findByEntitatId(
+			Long entitatId);
 
+	List<NotificacioEntity> findByCreatedBy_Codi(
+			String userCodi);
+	
 	List<NotificacioEntity> findByEstatOrderByCreatedDateAsc(
 			NotificacioEstatEnumDto estat,
 			Pageable pageable);

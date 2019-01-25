@@ -172,14 +172,16 @@ body {
 								<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
 							</div>
 							<div class="btn-group">
+								<a href="<c:url value="/enviament"/>" class="btn btn-primary"><spring:message code="decorator.menu.enviaments"/></a>
+							</div>
+							<div class="btn-group">
 								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>								
 								<ul class="dropdown-menu">
-									<li><a href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/></a></li>
 									<li><a href="<c:url value="/notificacio/new"/>"><spring:message code="decorator.menu.altanotificacio"/></a></li>								
+									<li><a href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/></a></li>
 									<li class="divider"></li>
 									<li><a href="<c:url value="/pagadorPostal"/>"><spring:message code="decorator.menu.pagadorpostal"/></a></li>
 									<li><a href="<c:url value="/pagadorCie"/>"><spring:message code="decorator.menu.pagadorcie"/></a></li>
-									<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
 								</ul>
 							</div>
 							</c:if>

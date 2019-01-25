@@ -5,6 +5,7 @@ package es.caib.notib.war.controller;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -40,12 +41,15 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.DocumentCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
+import es.caib.notib.war.command.PersonaCommand;
+import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EntitatHelper;
@@ -74,6 +78,8 @@ public class NotificacioController extends BaseController {
 	private ProcedimentService procedimentService;
 	@Autowired
 	private GrupService grupService;
+	@Autowired
+	private EnviamentService enviamentService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -114,11 +120,20 @@ public class NotificacioController extends BaseController {
 			Model model) {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 		List<ProcedimentDto> procediment = procedimentService.findByEntitat(entitat.getId());
-		model.addAttribute(new NotificacioCommandV2());
+		NotificacioCommandV2 notificacio = new NotificacioCommandV2();
+		model.addAttribute("notificacioCommandV2",notificacio);
 		model.addAttribute("entitat", entitat);
 		model.addAttribute("procediments", procediment);
-		
+
 		return "notificacioForm";
+	}
+	
+	@RequestMapping(value = "/new/destinatari", method = RequestMethod.GET)
+	public PersonaCommand altaDestinatari(
+			HttpServletRequest request,
+			Model model) {
+		PersonaCommand destinatari = new PersonaCommand();
+		return destinatari;
 	}
 	
 	@RequestMapping(value = "/{procedimentId}/grups", method = RequestMethod.GET)
@@ -150,6 +165,7 @@ public class NotificacioController extends BaseController {
 					"entitat",
 					entitatService.findAll());
 		}
+		model.addAttribute(new NotificacioFiltreCommand());
 		
 		switch (notificacioCommand.getTipusDocument()) {
 		case ARXIU:
@@ -161,15 +177,18 @@ public class NotificacioController extends BaseController {
 			break;
 		case CSV:
 			if (notificacioCommand.getDocumentArxiuUuidCsv() != null && !notificacioCommand.getDocumentArxiuUuidCsv().isEmpty()) {
-				document.setCSV(notificacioCommand.getDocumentArxiuUuidCsv());
+				document.setCsv(notificacioCommand.getDocumentArxiuUuidCsv());
 			}
 			break;
 		case UUID:
 			if (notificacioCommand.getDocumentArxiuUuidCsv() != null && !notificacioCommand.getDocumentArxiuUuidCsv().isEmpty()) {
-				document.setUUID(notificacioCommand.getDocumentArxiuUuidCsv());
+				document.setUuid(notificacioCommand.getDocumentArxiuUuidCsv());
 			}
 			break;
 		}
+
+		
+		//ConversioTipusHelper.convertirObjectList(destinatari, destinataris);
 		
 		if (notificacioCommand.getId() != null) {
 			notificacioService.update(
@@ -177,8 +196,7 @@ public class NotificacioController extends BaseController {
 		} else {
 			notificacioService.create(
 					entitat.getId(),
-					NotificacioCommandV2.asDto(notificacioCommand),
-					null);
+					NotificacioCommandV2.asDto(notificacioCommand));
 		}
 		return "notificacioList";
 	}
@@ -276,7 +294,7 @@ public class NotificacioController extends BaseController {
 			HttpServletRequest request,
 			Model model,
 			@PathVariable Long notificacioId) {
-		List<NotificacioEnviamentDto> destinataris = notificacioService.enviamentFindAmbNotificacio(
+		List<NotificacioEnviamentDto> destinataris = enviamentService.enviamentFindAmbNotificacio(
 				notificacioId);
 		return destinataris;
 	}
@@ -505,7 +523,7 @@ public class NotificacioController extends BaseController {
 				"notificacio",
 				notificacioService.findAmbId(notificacioId));
 		model.addAttribute("pipellaActiva", pipellaActiva);
-		NotificacioEnviamentDto enviament = notificacioService.enviamentFindAmbId(
+		NotificacioEnviamentDto enviament = enviamentService.enviamentFindAmbId(
 				enviamentId);
 		model.addAttribute("enviament", enviament);
 		model.addAttribute(

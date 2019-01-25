@@ -97,6 +97,7 @@
 			<web-resource-name>Public areas</web-resource-name>
 			<url-pattern>/ws/adviserWS</url-pattern>
 			<url-pattern>/ws/notificacioWS</url-pattern>
+			<url-pattern>/ws/notificacioV2WS</url-pattern>
 		</web-resource-collection>
 	</security-constraint>
 

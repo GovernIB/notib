@@ -31,11 +31,11 @@ import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.ParametresRegistreDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -43,6 +43,7 @@ import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.EnviamentReferencia;
 import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
@@ -53,7 +54,6 @@ import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
-import es.caib.notib.core.helper.SeuHelper;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
@@ -67,13 +67,6 @@ import es.caib.notib.core.repository.NotificacioRepository;
 public class NotificacioServiceImpl implements NotificacioService {
 
 	@Autowired
-	private NotificacioRepository notificacioRepository;
-	@Autowired
-	private NotificacioEnviamentRepository notificacioEnviamentRepository;
-	@Autowired
-	private NotificacioEventRepository notificacioEventRepository;
-
-	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
@@ -84,30 +77,34 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private NotificaHelper notificaHelper;
 	@Autowired
-	private SeuHelper seuHelper;
-	@Autowired
 	private PluginHelper pluginHelper;
+	@Autowired
+	private NotificacioRepository notificacioRepository;
+	@Autowired
+	private NotificacioEnviamentRepository notificacioEnviamentRepository;
+	@Autowired
+	private NotificacioEventRepository notificacioEventRepository;
 	
-
+	@Transactional
 	@Override
-	public PaginaDto<NotificacioDto> create(
+	public List<NotificacioDto> create(
 			Long entitatId, 
-			NotificacioDtoV2 notificacio,
-			PaginacioParamsDto paginacioParams) {
+			NotificacioDtoV2 notificacio) {
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-
+		String documentGesdocId = null;
+		
 		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
 				 	notificacio.getProcediment().getId());
 
-		/*
-		 * GrupEntity grup = entityComprovarHelper.comprovarGrup(
-		 * notificacio.getGrup().getId());
-		 */
-
-		String documentGesdocId = pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-				new ByteArrayInputStream(notificacio.getDocument().getContingutBase64()));
-
+		GrupEntity grup = entityComprovarHelper.comprovarGrup(
+					notificacio.getGrup().getId());
+		 
+		if (notificacio.getDocument().getContingutBase64() != null) {
+			documentGesdocId = pluginHelper.gestioDocumentalCreate(
+					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
+					new ByteArrayInputStream(notificacio.getDocument().getContingutBase64()));
+		} 
 		// Dades generals de la notificació
 		NotificacioEntity.Builder notificacioBuilder = NotificacioEntity.
 				getBuilder(
@@ -115,36 +112,43 @@ public class NotificacioServiceImpl implements NotificacioService {
 						notificacio.getEmisorDir3Codi(), 
 						notificacio.getComunicacioTipus(),
 						notificacio.getEnviamentTipus(), 
-						notificacio.getEnviamentDataProgramada(),
 						notificacio.getConcepte(), 
 						notificacio.getDocument().getArxiuNom(), 
 						documentGesdocId,
+						notificacio.getDocument().getCsv() != null ? notificacio.getDocument().getCsv() : notificacio.getDocument().getUuid(),
 						notificacio.getDocument().getHash(), 
 						notificacio.getDocument().isNormalitzat(),
 						notificacio.getDocument().isGenerarCsv()).
 						descripcio(notificacio.getDescripcio()).
 						caducitat(notificacio.getCaducitat()).
-						retardPostal(notificacio.getRetard()).
 						descripcio(notificacio.getDescripcio()).
-						procedimentCodiNotib(procediment.getCodi());
+						procedimentCodiNotib(procediment.getCodi()).
+						grupCodi(grup.getCodi());
 
 		/*
 		 * Falta afegir paràmetres registre S'han llevat els paràmetres de la seu
 		 */
+		ParametresRegistreDto parametresRegistre = notificacio.getParametresRegistre();
+		if (parametresRegistre != null) {
+			notificacioBuilder.
+			registreOrgan(parametresRegistre.getOrgan()).
+			registreOficina(parametresRegistre.getOficina()).
+			registreLlibre(parametresRegistre.getLlibre());
+		}
 
 		NotificacioEntity notificacioEntity = notificacioBuilder.build();
 		notificacioRepository.saveAndFlush(notificacioEntity);
 
 		List<EnviamentReferencia> referencies = new ArrayList<EnviamentReferencia>();
-		PersonaDto titular = notificacio.getEnviament().getTitular();
+		PersonaDto titular = notificacio.getTitular();
 		NotificacioEnviamentEntity.Builder enviamentBuilder = null;
 		
 		// Comprovar si hi ha titular
 		if (titular != null) {
 
 			NotificaServeiTipusEnumDto serveiTipus = null;
-			if (notificacio.getEnviament().getServeiTipus() != null) {
-				switch (notificacio.getEnviament().getServeiTipus()) {
+			if (notificacio.getServeiTipus() != null) {
+				switch (notificacio.getServeiTipus()) {
 				case NORMAL:
 					serveiTipus = NotificaServeiTipusEnumDto.NORMAL;
 					break;
@@ -165,9 +169,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 					titularCodiDesti(titular.getCodiAdministracio());
 
 			// Comprovar si hi ha destinataris
-			if (notificacio.getEnviament().getDestinataris() != null) {
+			if (notificacio.getDestinataris() != null) {
 				// Afegir un enviament per cada destinatari
-				for (PersonaDto destinatari : notificacio.getEnviament().getDestinataris()) {
+				for (PersonaDto destinatari : notificacio.getDestinataris()) {
 
 					// Rellenar dades enviament titular
 					enviamentBuilder = NotificacioEnviamentEntity.
@@ -183,6 +187,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							titularRaoSocial(titular.getRaoSocial()).
 							titularCodiDesti(titular.getCodiAdministracio());
 
+					
 					// Rellenar dades enviament destinatari
 					enviamentBuilder.destinatariNif(destinatari.getNif().toUpperCase()).
 					destinatariNom(destinatari.getNom()).
@@ -217,13 +222,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 			notificacioEntity = notificacioRepository.findOne(notificacioEntity.getId());
 		}
 
-		Page<NotificacioEntity> notificacions;
+		List<NotificacioEntity> notificacions = notificacioRepository.findByEntitatId(entitatId);
 
-		notificacions = notificacioRepository.findByEntitatId(
-				entitatId,
-				paginacioHelper.toSpringDataPageable(paginacioParams));
-
-		return paginacioHelper.toPaginaDto(
+		return conversioTipusHelper.convertirList(
 				notificacions, 
 				NotificacioDto.class);
 	}
@@ -312,37 +313,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				NotificacioDto.class);
 	}
 
-	@Override
-	@Transactional(readOnly = true)
-	public List<NotificacioEnviamentDto> enviamentFindAmbNotificacio(
-			Long notificacioId) {
-		logger.debug("Consulta els destinataris d'una notificació (" +
-				"notificacioId=" + notificacioId + ")");
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				true,
-				false);
-		return enviamentsToDto(
-				notificacioEnviamentRepository.findByNotificacioId(notificacioId));
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public NotificacioEnviamentDto enviamentFindAmbId(Long destinatariId) {
-		logger.debug("Consulta de destinatari donat el seu id (" +
-				"destinatariId=" + destinatariId + ")");
-		NotificacioEnviamentEntity destinatari =
-				notificacioEnviamentRepository.findOne(destinatariId);
-		NotificacioEntity notificacio = notificacioRepository.findOne( destinatari.getNotificacio().getId() );
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				true,
-				false);
-		return enviamentToDto(destinatari);
-	}
-
+	
 	@Override
 	@Transactional(readOnly = true)
 	public List<NotificacioEventDto> eventFindAmbNotificacio(
@@ -396,7 +367,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				output.toByteArray(),
 				output.size());
 	}
-
 	@Override
 	@Transactional(readOnly = true)
 	public ArxiuDto enviamentGetCertificacioArxiu(
@@ -600,54 +570,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 
-
-
-	private List<NotificacioEnviamentDto> enviamentsToDto(
-			List<NotificacioEnviamentEntity> enviaments) {
-		List<NotificacioEnviamentDto> destinatarisDto = conversioTipusHelper.convertirList(
-				enviaments,
-				NotificacioEnviamentDto.class);
-		for (int i = 0; i < enviaments.size(); i++) {
-			NotificacioEnviamentEntity destinatariEntity = enviaments.get(i);
-			NotificacioEnviamentDto destinatariDto = destinatarisDto.get(i);
-			destinatariCalcularCampsAddicionals(
-					destinatariEntity,
-					destinatariDto);
-		}
-		return destinatarisDto;
-	}
-
-	private NotificacioEnviamentDto enviamentToDto(
-			NotificacioEnviamentEntity enviament) {
-		NotificacioEnviamentDto destinatariDto = conversioTipusHelper.convertir(
-				enviament,
-				NotificacioEnviamentDto.class);
-		destinatariCalcularCampsAddicionals(
-				enviament,
-				destinatariDto);
-		return destinatariDto;
-	}
-
-	private void destinatariCalcularCampsAddicionals(
-			NotificacioEnviamentEntity enviament,
-			NotificacioEnviamentDto enviamentDto) {
-		if (enviament.isNotificaError()) {
-			NotificacioEventEntity event = enviament.getNotificaErrorEvent();
-			if (event != null) {
-				enviamentDto.setNotificaErrorData(event.getData());
-				enviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
-			}
-		}
-		/*if (enviament.isSeuError()) {
-			NotificacioEventEntity event = enviament.getSeuErrorEvent();
-			if (event != null) {
-				enviamentDto.setSeuErrorData(event.getData());
-				enviamentDto.setSeuErrorDescripcio(event.getErrorDescripcio());
-			}
-		}*/
-		enviamentDto.setNotificaCertificacioArxiuNom(
-				calcularNomArxiuCertificacio(enviament));
-	}
 	private void estatCalcularCampsAddicionals(
 			NotificacioEnviamentEntity enviament,
 			NotificacioEnviamenEstatDto estatDto) {
@@ -851,5 +773,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceImpl.class);
+
+
+	
+
 
 }

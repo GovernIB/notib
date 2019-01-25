@@ -31,6 +31,7 @@ public class NotificacioDto extends AuditoriaDto {
 	private String procedimentDescripcioSia;
 	private String documentArxiuNom;
 	private String documentArxiuId;
+	private String csv_uuid;
 	private String documentContingutBase64;
 	private String documentSha1;
 	private boolean documentNormalitzat;
@@ -147,6 +148,12 @@ public class NotificacioDto extends AuditoriaDto {
 	}
 	public void setDocumentArxiuId(String documentArxiuId) {
 		this.documentArxiuId = documentArxiuId;
+	}
+	public String getCsv_uuid() {
+		return csv_uuid;
+	}
+	public void setCsv_uuid(String csv_uuid) {
+		this.csv_uuid = csv_uuid;
 	}
 	public String getDocumentContingutBase64() {
 		return documentContingutBase64;

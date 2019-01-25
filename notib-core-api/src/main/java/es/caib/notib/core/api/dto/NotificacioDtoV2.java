@@ -3,12 +3,10 @@
  */
 package es.caib.notib.core.api.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
-
+import java.util.List;
 import org.apache.commons.lang.builder.ToStringBuilder;
-
-import es.caib.notib.core.api.ws.notificacio.Document;
-
 
 /**
  * Informació d'una anotació.
@@ -23,16 +21,21 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
 	private String concepte;
 	private String descripcio;
-	private Date enviamentDataProgramada;
-	private int retard;
 	private Date caducitat;
 	private DocumentDto document;
+	private String csv_uuid;
 	private ProcedimentDto procediment;
+	private String procedimentCodiNotib;
 	private GrupDto Grup;
+	private String grupCodi;
+	private ParametresRegistreDto parametresRegistre;
 	private NotificacioEstatEnumDto estat;
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
-	private EnviamentDto enviament;
+	private ServeiTipusEnumDto serveiTipus;
+	private PersonaDto titular;
+	private PersonaDto destinatari = new PersonaDto();
+	private List<PersonaDto> destinataris = new ArrayList<PersonaDto>();
 	private boolean entregaPostalActiva;
 	private EntregaPostalDto entregaPostal;
 	private EntregaDehDto entregaDeh;
@@ -75,18 +78,6 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	public void setDescripcio(String descripcio) {
 		this.descripcio = descripcio;
 	}
-	public Date getEnviamentDataProgramada() {
-		return enviamentDataProgramada;
-	}
-	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
-		this.enviamentDataProgramada = enviamentDataProgramada;
-	}
-	public int getRetard() {
-		return retard;
-	}
-	public void setRetard(int retard) {
-		this.retard = retard;
-	}
 	public Date getCaducitat() {
 		return caducitat;
 	}
@@ -99,17 +90,41 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	public void setDocument(DocumentDto document) {
 		this.document = document;
 	}
+	public String getCsv_uuid() {
+		return csv_uuid;
+	}
+	public void setCsv_uuid(String csv_uuid) {
+		this.csv_uuid = csv_uuid;
+	}
 	public ProcedimentDto getProcediment() {
 		return procediment;
 	}
 	public void setProcediment(ProcedimentDto procediment) {
 		this.procediment = procediment;
 	}
+	public String getProcedimentCodiNotib() {
+		return procedimentCodiNotib;
+	}
+	public void setProcedimentCodiNotib(String procedimentCodiNotib) {
+		this.procedimentCodiNotib = procedimentCodiNotib;
+	}
 	public GrupDto getGrup() {
 		return Grup;
 	}
 	public void setGrup(GrupDto grup) {
 		Grup = grup;
+	}
+	public String getGrupCodi() {
+		return grupCodi;
+	}
+	public void setGrupCodi(String grupCodi) {
+		this.grupCodi = grupCodi;
+	}
+	public ParametresRegistreDto getParametresRegistre() {
+		return parametresRegistre;
+	}
+	public void setParametresRegistre(ParametresRegistreDto parametresRegistre) {
+		this.parametresRegistre = parametresRegistre;
 	}
 	public NotificacioEstatEnumDto getEstat() {
 		return estat;
@@ -129,11 +144,29 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	public void setNotificaErrorDescripcio(String notificaErrorDescripcio) {
 		this.notificaErrorDescripcio = notificaErrorDescripcio;
 	}
-	public EnviamentDto getEnviament() {
-		return enviament;
+	public ServeiTipusEnumDto getServeiTipus() {
+		return serveiTipus;
 	}
-	public void setEnviament(EnviamentDto enviament) {
-		this.enviament = enviament;
+	public void setServeiTipus(ServeiTipusEnumDto serveiTipus) {
+		this.serveiTipus = serveiTipus;
+	}
+	public PersonaDto getTitular() {
+		return titular;
+	}
+	public void setTitular(PersonaDto titular) {
+		this.titular = titular;
+	}
+	public PersonaDto getDestinatari() {
+		return destinatari;
+	}
+	public void setDestinatari(PersonaDto destinatari) {
+		this.destinatari = destinatari;
+	}
+	public List<PersonaDto> getDestinataris() {
+		return destinataris;
+	}
+	public void setDestinataris(List<PersonaDto> destinataris) {
+		this.destinataris = destinataris;
 	}
 	public boolean isEntregaPostalActiva() {
 		return entregaPostalActiva;

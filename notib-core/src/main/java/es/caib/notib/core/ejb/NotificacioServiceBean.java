@@ -13,10 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.ColumnesDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -51,20 +54,6 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.findAmbFiltrePaginat(
 				filtre,
 				paginacioParams);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public List<NotificacioEnviamentDto> enviamentFindAmbNotificacio(
-			Long notificacioId) {
-		return delegate.enviamentFindAmbNotificacio(notificacioId);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public NotificacioEnviamentDto enviamentFindAmbId(
-			Long enviamentId) {
-		return delegate.enviamentFindAmbId(enviamentId);
 	}
 
 	@Override
@@ -140,15 +129,15 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-	public PaginaDto<NotificacioDto> create(Long entitatId, NotificacioDtoV2 notificacio,
-			PaginacioParamsDto paginacioParams) {
-		// TODO Auto-generated method stub
+	public List<NotificacioDto> create(
+			Long entitatId, 
+			NotificacioDtoV2 notificacio) {
 		return null;
 	}
 
 	@Override
-	public NotificacioDtoV2 update(NotificacioDtoV2 notificacio) throws NotFoundException {
-		// TODO Auto-generated method stub
+	public NotificacioDtoV2 update(
+			NotificacioDtoV2 notificacio) throws NotFoundException {
 		return null;
 	}
 

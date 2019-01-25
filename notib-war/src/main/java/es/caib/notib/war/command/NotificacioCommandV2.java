@@ -3,7 +3,10 @@
  */
 package es.caib.notib.war.command;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,6 +15,7 @@ import es.caib.notib.core.api.dto.NotificaComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
@@ -38,7 +42,16 @@ public class NotificacioCommandV2 {
 	private TipusDocumentEnumDto tipusDocument;
 	private String documentArxiuUuidCsv;
 	private MultipartFile arxiu;
-	private EnviamentCommand enviament;
+	private String organ;
+	private String llibre;
+	private String oficina;
+	
+	// Enviament
+	private ServeiTipusEnumDto serveiTipus;
+	private PersonaCommand titular;
+	private PersonaCommand destinatari = new PersonaCommand();
+	private List<PersonaCommand> destinataris = new ArrayList<PersonaCommand>();
+
 	private boolean entregaPostalActiva;
 	private EntregapostalCommand entregaPostal;
 	private EntregaDehCommand entregaDeh;
@@ -127,11 +140,29 @@ public class NotificacioCommandV2 {
 	public void setGrupId(Long grupId) {
 		this.grupId = grupId;
 	}
-	public EnviamentCommand getEnviament() {
-		return enviament;
+	public ServeiTipusEnumDto getServeiTipus() {
+		return serveiTipus;
 	}
-	public void setEnviament(EnviamentCommand enviament) {
-		this.enviament = enviament;
+	public void setServeiTipus(ServeiTipusEnumDto serveiTipus) {
+		this.serveiTipus = serveiTipus;
+	}
+	public PersonaCommand getTitular() {
+		return titular;
+	}
+	public void setTitular(PersonaCommand titular) {
+		this.titular = titular;
+	}
+	public PersonaCommand getDestinatari() {
+		return destinatari;
+	}
+	public void setDestinatari(PersonaCommand destinatari) {
+		this.destinatari = destinatari;
+	}
+	public List<PersonaCommand> getDestinataris() {
+		return destinataris;
+	}
+	public void setDestinataris(List<PersonaCommand> destinataris) {
+		this.destinataris = destinataris;
 	}
 	public boolean isEntregaPostalActiva() {
 		return entregaPostalActiva;
@@ -157,6 +188,25 @@ public class NotificacioCommandV2 {
 	public void setDocument(DocumentCommand document) {
 		this.document = document;
 	}
+	public String getOrgan() {
+		return organ;
+	}
+	public void setOrgan(String organ) {
+		this.organ = organ;
+	}
+	public String getLlibre() {
+		return llibre;
+	}
+	public void setLlibre(String llibre) {
+		this.llibre = llibre;
+	}
+	public String getOficina() {
+		return oficina;
+	}
+	public void setOficina(String oficina) {
+		this.oficina = oficina;
+	}
+	
 	public static NotificacioCommandV2 asCommand(NotificacioDtoV2 dto) {
 		if (dto == null) {
 			return null;
