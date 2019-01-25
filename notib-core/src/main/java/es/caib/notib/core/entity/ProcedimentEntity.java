@@ -8,6 +8,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.ForeignKey;
 
@@ -30,6 +32,13 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "codisia", length = 64, nullable = false)
 	protected String codisia;
+	
+	@Column(name = "data_programada")
+	@Temporal(TemporalType.TIMESTAMP)
+	protected Date enviamentDataProgramada;
+	
+	@Column(name = "retard")
+	protected Integer retard;
 	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "entitat")
@@ -77,6 +86,14 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 		return agrupar;
 	}
 	
+	public Date getEnviamentDataProgramada() {
+		return enviamentDataProgramada;
+	}
+
+	public Integer getRetard() {
+		return retard;
+	}
+
 	public void update(
 			String codi,
 			String nom,
@@ -98,6 +115,8 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			String codi,
 			String nom,
 			String codisia,
+			Date enviamentDataProgramada,
+			int retard,
 			EntitatEntity entitat,
 			PagadorPostalEntity pagadorpostal,
 			PagadorCieEntity pagadorcie,
@@ -106,6 +125,8 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 				codi,
 				nom,
 				codisia,
+				enviamentDataProgramada,
+				retard,
 				entitat,
 				pagadorpostal,
 				pagadorcie,
@@ -118,6 +139,8 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 				String codi,
 				String nom,
 				String codisia,
+				Date enviamentDataProgramada,
+				int retard,
 				EntitatEntity entitat,
 				PagadorPostalEntity pagadorpostal,
 				PagadorCieEntity pagadorcie,
@@ -126,6 +149,8 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			built.codi = codi;
 			built.nom = nom;
 			built.codisia = codisia;
+			built.enviamentDataProgramada = enviamentDataProgramada;
+			built.retard = retard;
 			built.entitat = entitat;
 			built.pagadorpostal = pagadorpostal;
 			built.pagadorcie = pagadorcie;

@@ -66,6 +66,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						procediment.getCodi(),
 						procediment.getNom(),
 						procediment.getCodisia(),
+						procediment.getEnviamentDataProgramada(),
+						procediment.getRetard(),
 						entitat,
 						pagadorPostal,
 						pagadorCie,

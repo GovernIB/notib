@@ -43,17 +43,6 @@ public class ProcedimentHelper {
 		
 		dto.setAgrupar(procediment.isAgrupar());
 		
-		/*dto.setCreatedBy(
-				conversioTipusHelper.convertir(
-				pagadorPostal.getCreatedBy(),
-				UsuariDto.class));
-		dto.setCreatedDate(pagadorPostal.getCreatedDate().toDate());
-		dto.setLastModifiedBy(
-				conversioTipusHelper.convertir(
-						pagadorPostal.getLastModifiedBy(),
-						UsuariDto.class));
-		dto.setLastModifiedDate(pagadorPostal.getLastModifiedDate().toDate());*/
-		
 		return dto;
 	}
 	

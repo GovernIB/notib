@@ -1,6 +1,7 @@
 package es.caib.notib.war.command;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -27,13 +28,18 @@ public class ProcedimentCommand {
 	private String nom;
 	@NotEmpty @Size(max=64)
 	private String codisia;
-	private List<String> grup;
-	
 	private Long entitatId;
 	private String entitatNom;
 	private Long pagadorPostalId;
 	private Long pagadorCieId;	
 	private boolean agrupar;
+	private List<String> grup;
+	private boolean consulta;
+	private boolean processar;
+	private boolean notificacio;
+	private boolean gestio;
+	private Date enviamentDataProgramada;
+	private int retard;
 	
 	public Long getId() {
 		return id;
@@ -65,6 +71,36 @@ public class ProcedimentCommand {
 	public void setAgrupar(boolean agrupar) {
 		this.agrupar = agrupar;
 	}
+	public List<String> getGrup() {
+		return grup;
+	}
+	public void setGrup(List<String> grup) {
+		this.grup = grup;
+	}
+	public boolean isConsulta() {
+		return consulta;
+	}
+	public void setConsulta(boolean consulta) {
+		this.consulta = consulta;
+	}
+	public boolean isProcessar() {
+		return processar;
+	}
+	public void setProcessar(boolean processar) {
+		this.processar = processar;
+	}
+	public boolean isNotificacio() {
+		return notificacio;
+	}
+	public void setNotificacio(boolean notificacio) {
+		this.notificacio = notificacio;
+	}
+	public boolean isGestio() {
+		return gestio;
+	}
+	public void setGestio(boolean gestio) {
+		this.gestio = gestio;
+	}
 	public Long getEntitatId() {
 		return entitatId;
 	}
@@ -83,17 +119,23 @@ public class ProcedimentCommand {
 	public void setPagadorCieId(Long pagadorCieId) {
 		this.pagadorCieId = pagadorCieId;
 	}
-	public List<String> getGrup() {
-		return grup;
-	}
-	public void setGrup(List<String> grup) {
-		this.grup = grup;
-	}
 	public String getEntitatNom() {
 		return entitatNom;
 	}
 	public void setEntitatNom(String entitatNom) {
 		this.entitatNom = entitatNom;
+	}
+	public Date getEnviamentDataProgramada() {
+		return enviamentDataProgramada;
+	}
+	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
+		this.enviamentDataProgramada = enviamentDataProgramada;
+	}
+	public int getRetard() {
+		return retard;
+	}
+	public void setRetard(int retard) {
+		this.retard = retard;
 	}
 	
 	public static ProcedimentCommand asCommand(ProcedimentDto dto) {

@@ -31,71 +31,106 @@
 <script type="text/javascript">
 $(document).ready(function() {
 		
-		var count = 0;
-		// Show input to add grup
-		$('#agrupar').change(function(){
-			if ($(this).is(':checked'))
-				$('#grups').slideDown("slow");
-			else
-				$('#grups').slideUp("slow");
-			
-			webutilModalAdjustHeight();
-		});
+	var count = 0;
+	
+	if(!$('#agrupar').is(':checked')){
+		$('#grups').hide();
+	};
+	
+	// Show input to add grup
+	$('#agrupar').change(function(){
+		if ($(this).is(':checked'))
+			$('#grups').slideDown("slow");
+		else
+			$('#grups').slideUp("slow");
 		
-		$('#add').on('click', function () {
-			//Input to add
-			var grup = "<div class='form-group'><label class='control-label col-xs-4'></label><div class='col-xs-8'><div class='input-group'><input name='grup' id='grup' type='text' class='form-control add' readonly/><span class='input-group-addon' id='remove'><span class='fa fa-remove'></span></span></div></div></div>";
-			$("#list").prepend(grup).find("#grup").addClass("grupVal_" + count);
-
-			//Get the value of the input added
-			var val = $(".input-group").children().val();
+		webutilModalAdjustHeight();
+	});
+	
+	//Afegir grups
+	$('#add').on('click', function () {
 			
-			//Assign the value (grup) to the input
+		var grupInput = 
+			"<div class='form-group'> " +
+				"<label class='control-label col-xs-4'></label>  " +
+				"<div class='col-xs-8'>  " +
+					"<div class='input-group'>  " +
+					"<input name='grup' id='grup' type='text' class='form-control add grupVal_" + count + "' readonly/>  " +
+					"<span class='input-group-addon' id='showPermisCheck'><span class='fa fa-angle-down'></span></span>  " +
+					"<span class='input-group-addon' id='remove'><span class='fa fa-remove'></span></span>  " +
+					"</div>  " +
+				"</div>  " +
+			"</div>";
+		
+		var val = $(".input-add").children().val();
+		if (val != ''){
+			
+			$("#list").prepend(grupInput);
 			$(".grupVal_" + count).attr("value", val);
-			//Add a variable class to identify a specific grup
 			$("#list").find("#remove").addClass("grupVal_" + count);
 			count++;
+		}
+		webutilModalAdjustHeight();
+	});
+	
+	//Eliminar grups
+	$(document).on('click', "#remove", function () {
+		
+		var grupId = $(this).parent().children().attr('id'); 
+		var grupsClass = $(this).attr('class'); 
+		var lastClass = grupsClass.split(' ').pop();
+		console.log(lastClass);
+		var parentRemove = $("." + lastClass).parent();
+		var parentInput = parentRemove.parent();
+		var parentDiv = parentInput.parent();
+		console.log(grupId);
+		var grupUrl = "grup/" + grupId + "/delete";
+		if (confirm('<spring:message code="grup.list.confirmacio.esborrar"/>') && !isNaN(grupId)) {
+			$.ajax({
+		        type: "GET",
+		        url: grupUrl,
+		        success: function (data) {
+					parentDiv.slideUp("normal", function() {
+						$(this).remove(); 
+						webutilModalAdjustHeight();
+					});
+		        }
+		    });
+		} else {
+			parentDiv.slideUp("normal", function() {
+				$(this).remove(); 
+				webutilModalAdjustHeight();
+			});
+		}
+	});
+	showPermisCheck();
+});		
 
-			webutilModalAdjustHeight();
+function addGrup() {
+
+}
+
+function showPermisCheck() {
+	//Mostrar permisos
+	$(document).on('click', "#showPermisCheck", function () {
+		
+		var grupId = $(this).parent().children().attr('id'); 
+		var grupsClass = $(this).attr('class'); 
+		var lastClass = grupsClass.split(' ').pop();
+		
+		var parentRemove = $("." + lastClass).parent();
+		var parentInput = parentRemove.parent();
+		var parentDiv = parentInput.parent();
+		var permisonDiv = document.getElementById("permision");
+		//var grupUrl = "grup/" + grupId + "/delete";
+		console.log(parentDiv);
+		parentDiv.on("click", function(){
+			$(this).append(permisonDiv);
 		});
 		
-		//Eliminar grups
-		$(document).on('click', "#remove", function () {
-			
-			var grupId = $(this).parent().children().attr('id'); 
-			var grupsClass = $(this).attr('class'); 
-			var lastClass = grupsClass.split(' ').pop();
-			var parentRemove = $("." + lastClass).parent();
-			var parentInput = parentRemove.parent();
-			var parentDiv = parentInput.parent();
-			
-			var grupUrl = "grup/" + grupId + "/delete";
-			
-			if (confirm('<spring:message code="grup.list.confirmacio.esborrar"/>') && !isNaN(grupId)) 
-				$.ajax({
-			        type: "GET",
-			        url: grupUrl,
-			        success: function (data) {
-			        	//Remove div parent
-						parentDiv.slideUp("normal", function() {
-							$(this).remove(); 
-							webutilModalAdjustHeight();
-						});
-			        },
-			        error: function (data) {
-			        	//Remove div parent
-						alert("ERROR ELIMINANT GRUP")
-			        }
-			    });
-			else
-				//Remove div parent
-				parentDiv.slideUp("normal", function() {
-					$(this).remove(); 
-					webutilModalAdjustHeight();
-				});
-				
-		});
-});				
+		$("#permision").toggleClass("hidden");
+	});
+}
 </script>	
 
 </head>
@@ -112,6 +147,12 @@ $(document).ready(function() {
 			</div>
 			<div class="col-md-2">
 				<not:inputText name="codisia" textKey="procediment.form.camp.codisia" required="true"/>
+			</div>
+			<div class="col-md-3">
+				<not:inputDate name="enviamentDataProgramada" textKey="notificacio.form.camp.enviamentdata" />
+			</div>
+			<div class="col-md-3">
+				<not:inputText name="retard" textKey="notificacio.form.camp.retard"/>
 			</div>
 			<c:choose>
 			  <c:when test="${entitats != null}">
@@ -136,13 +177,19 @@ $(document).ready(function() {
 				<not:inputCheckbox name="agrupar" textKey="procediment.form.camp.agrupar"/>
 			</div>
 			<div class="col-md-4" id="grups">	 	
-				<not:inputTextAddGrup name="grup" idIcon="add" textKey="procediment.form.camp.grups"/>
+				<not:inputTextAdd name="grup" idIcon="add" textKey="procediment.form.camp.grups"/>
 				<div id="list"></div>
 				<c:if test="${grups != null}">
 					<c:forEach var="grup" items="${grups}" varStatus="status">
 							<not:inputTextShowGrup name="grup" classe="${grup.codi}" id="${grup.id}" value="${grup.nom}" readonly="true"/>
 					</c:forEach>
 				</c:if>		
+				<div id="permision" class="hidden">
+					<not:inputCheckbox name="consulta"></not:inputCheckbox>
+					<not:inputCheckbox name="processar"></not:inputCheckbox>
+					<not:inputCheckbox name="notificacio"></not:inputCheckbox>
+					<not:inputCheckbox name="gestio"></not:inputCheckbox>
+				</div>
 			</div>
 			<div id="modal-botons">
 				<button id="addProcedimentButton" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
