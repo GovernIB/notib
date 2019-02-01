@@ -1,1 +1,0 @@
-<%=es.caib.notib.war.helper.AplicacioHelper.getVersioActual(request)%>
