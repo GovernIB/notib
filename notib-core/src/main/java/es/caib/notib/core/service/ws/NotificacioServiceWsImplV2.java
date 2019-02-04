@@ -337,25 +337,27 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		notificacio.getComunicacioTipus();
 		notificacio.getEnviamentTipus();
 		notificacio.getConcepte();
-		notificacio.getProcedimentDescripcioSia();
+		notificacio.getDescripcio();
 		notificacio.getNotificaEnviamentData();
+		notificacio.getCaducitat();
 		notificacio.getProcedimentCodiNotib();
+		
+		
+		
 		
 		
 		
 		notificacio.getDocumentArxiuId();
 		
+				
 		
-		registreAnotacio
-		
-		
-		registreAnotacio.setUnitatAdministrativa(notificacio.getSeuExpedientUnitatOrganitzativa());
-		registreAnotacio.setOficina(notificacio.getSeuRegistreOficina());
-		registreAnotacio.setLlibre(notificacio.getSeuRegistreLlibre());
-		registreAnotacio.setEntitatCodi(notificacio.getCifEntitat());
-		registreAnotacio.setAssumpteIdiomaCodi("ca");
-		registreAnotacio.setOrgan(notificacio.getPagadorCieCodiDir3());
-		registreAnotacio.setExpedientNumero(notificacio.getSeuExpedientIdentificadorEni());
+//		registreAnotacio.setUnitatAdministrativa(notificacio.getSeuExpedientUnitatOrganitzativa());
+//		registreAnotacio.setOficina(notificacio.getSeuRegistreOficina());
+//		registreAnotacio.setLlibre(notificacio.getSeuRegistreLlibre());
+//		registreAnotacio.setEntitatCodi(notificacio.getCifEntitat());
+//		registreAnotacio.setAssumpteIdiomaCodi("ca");
+//		registreAnotacio.setOrgan(notificacio.getPagadorCieCodiDir3());
+//		registreAnotacio.setExpedientNumero(notificacio.getSeuExpedientIdentificadorEni());
 //		notificacio.get
 		//		registreAnotacio.
 //		registreAnotacio.
