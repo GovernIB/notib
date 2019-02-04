@@ -1,13 +1,23 @@
-# Notib
+# ![Logo notib](https://github.com/GovernIB/notib/raw/master/assets/logo2.png)Notib
 
-Versió Estable: __notib-0.1.0__ (branca [notib-0.1](https://github.com/GovernIB/notib/tree/notib-0.1))<br/>
-Versió Desenvolupament: __notib-1.0.0__ (branca [notib-1.0](https://github.com/GovernIB/notib/tree/notib-1.0))
+> - Versió Estable: __notib-0.1.0__ (branca [notib-0.1](https://github.com/GovernIB/notib/tree/notib-0.1))
+> - Versió Desenvolupament: __notib-1.0.0__ (branca [notib-1.0](https://github.com/GovernIB/notib/tree/notib-1.0))
 
 **Descripció**
 
-Aplicació passarel·la entre les aplicacions de gestió d'expedients electrònics i els serveis de notificacions
+NOTIB és una solució tecnològica desenvolupada pel Govern de les Illes Balears que facilita la realització i consulta de notificacions telemàtiques
+NOTIB ofereix una plataforma  per a realitzar i gestionar totes les comunicacions i notificacions que es generen en els organismes emisors de les illes balears, i que s'envien a la plataforma Notific@, simplificant al màxim les dades a aportar en la seva creació. Al mateix temps ofereix una interfície web per a poder consultar les notificacions realitzades, de forma simple i òptima, donant la possibilitat d'exportar la informació per el seu posterior tractament.
 
-**Característiques**
-
+**Documentació**
+>- [Manual d'instal·lació](https://github.com/GovernIB/notib/raw/notib-0.1/doc/pdf/NOTIB_instalacio.pdf)
+>- [Manual d'integració](https://github.com/GovernIB/notib/raw/notib-0.1/doc/pdf/NOTIB_integracio.pdf)
+>- [Manual d'usuari](https://github.com/GovernIB/notib/raw/notib-0.1/doc/pdf/NOTIB_usuari.pdf)
+>- [Manual de plugins](https://github.com/GovernIB/notib/raw/notib-0.1/doc/pdf/NOTIB_plugins.pdf)
+>- [Model de dades](https://github.com/GovernIB/notib/raw/notib-0.1/doc/pdf/NOTIB_model_dades.pdf)
 
 **Captures de pantalla**
+![enter image description here](https://github.com/GovernIB/notib/raw/master/assets/Screenshot_1.png)
+![](https://github.com/GovernIB/notib/raw/master/assets/Screenshot_2.png)
+![](https://github.com/GovernIB/notib/raw/master/assets/Screenshot_3.png)
+![enter image description here](https://github.com/GovernIB/notib/raw/master/assets/Screenshot_4.png)
+![enter image description here](https://github.com/GovernIB/notib/raw/master/assets/Screenshot_5.png)
