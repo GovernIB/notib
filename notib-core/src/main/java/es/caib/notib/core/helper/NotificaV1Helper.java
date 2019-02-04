@@ -206,10 +206,10 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 		organismoEmisor.setNombre(notificacio.getEntitat().getNom());
 		envio.setOrganismoEmisor(organismoEmisor);
 		envio.setConcepto(notificacio.getConcepte());
-		if (notificacio.getEnviamentDataProgramada() != null) {
-			envio.setFechaEnvioProgramado(
-					toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
-		}
+//		if (notificacio.getEnviamentDataProgramada() != null) {
+//			envio.setFechaEnvioProgramado(
+//					toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
+//		}
 		if (notificacio.getEnviamentTipus() != null) {
 			envio.setTipoEnvio(notificacio.getEnviamentTipus().getText());
 		}
@@ -389,10 +389,10 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 				opcionesEmision.setCaducidad(
 						sdfCaducitat.format(notificacio.getCaducitat()));
 			}
-			if (notificacio.getRetardPostal() != null) {
-				opcionesEmision.setRetardoPostalDeh(
-						new Integer(notificacio.getRetardPostal()));
-			}
+//			if (notificacio.getRetardPostal() != null) {
+//				opcionesEmision.setRetardoPostalDeh(
+//						new Integer(notificacio.getRetardPostal()));
+//			}
 			destinatario.setOpcionesEmision(opcionesEmision);
 			DireccionElectronicaHabilitada deh = new DireccionElectronicaHabilitada();
 			deh.setCodigoProcedimiento(enviament.getDehProcedimentCodi());

@@ -18,6 +18,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import es.caib.notib.core.api.ws.notificacio.Notificacio;
+import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWs;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
 import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
@@ -35,7 +36,9 @@ import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
 public class NotificacioServiceController extends BaseController {
 
 	@Autowired
-	private NotificacioServiceWsV2 notificacioServiceWs;
+	private NotificacioServiceWs notificacioServiceWsV1;
+	@Autowired
+	private NotificacioServiceWsV2 notificacioServiceWsV2;
 
 	@RequestMapping(value = "/apidoc", method = RequestMethod.GET)
 	public String documentacio(HttpServletRequest request) {
@@ -57,7 +60,25 @@ public class NotificacioServiceController extends BaseController {
 					value = "Objecte amb les dades necessàries per a generar una notificació",
 					required = true) 
 			@RequestBody NotificacioV2 notificacio) {
-		return notificacioServiceWs.alta(notificacio);
+		return notificacioServiceWsV2.alta(notificacio);
+	}
+	
+	@RequestMapping(
+			value = "/services/notificacio/alta", 
+			method = RequestMethod.POST,
+			produces="application/json")
+	@ResponseStatus(HttpStatus.CREATED)
+	@ApiOperation(
+			value = "Genera una notificació", 
+			notes = "Retorna una llista amb els codis dels enviaments creats")
+	@ResponseBody
+	public RespostaAlta alta(
+			@ApiParam(
+					name = "notificacio",
+					value = "Objecte amb les dades necessàries per a generar una notificació",
+					required = true) 
+			@RequestBody Notificacio notificacio) {
+		return notificacioServiceWsV1.alta(notificacio);
 	}
 
 	@RequestMapping(
@@ -75,7 +96,7 @@ public class NotificacioServiceController extends BaseController {
 					required = true)
 			@PathVariable("identificador")
 			String identificador) {
-		return notificacioServiceWs.consultaEstatNotificacio(identificador);
+		return notificacioServiceWsV1.consultaEstatNotificacio(identificador);
 	}
 
 	@RequestMapping(
@@ -93,7 +114,7 @@ public class NotificacioServiceController extends BaseController {
 					required = true)
 			@PathVariable("referencia")
 			String referencia) {
-		return notificacioServiceWs.consultaEstatEnviament(referencia);
+		return notificacioServiceWsV1.consultaEstatEnviament(referencia);
 	}
 
 }

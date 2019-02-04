@@ -124,7 +124,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						notificacio.getDocument().isGenerarCsv()).
 						descripcio(notificacio.getDescripcio()).
 						caducitat(notificacio.getCaducitat()).
-						retardPostal(notificacio.getRetard()).
+//						retardPostal(notificacio.getRetard()).
 						descripcio(notificacio.getDescripcio()).
 						procedimentCodiNotib(procediment.getCodi());
 

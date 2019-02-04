@@ -16,7 +16,7 @@
 		<ehcache.version>2.10.1</ehcache.version>
 		<orika.version>1.4.6</orika.version>
 		<jackson.version>2.6.3</jackson.version>
-		<regweb.version>3.0.8</regweb.version>
+		<regweb.version>3.0.9</regweb.version>
 		<slf4j.version>1.6.6</slf4j.version>
 		<cxf.version>2.2.12</cxf.version>
 		<maven.compiler.source>1.7</maven.compiler.source>

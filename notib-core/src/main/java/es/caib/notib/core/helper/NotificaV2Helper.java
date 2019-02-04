@@ -346,8 +346,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			envios.setTipoEnvio(new BigInteger("2"));
 			break;
 		}
-		envios.setFechaEnvioProgramado(
-				toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
+//		envios.setFechaEnvioProgramado(
+//				toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
 		envios.setConcepto(notificacio.getConcepte());
 		envios.setDescripcion(notificacio.getDescripcio());
 		envios.setProcedimiento(
@@ -375,13 +375,13 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		envios.setDocumento(documento);
 		envios.setEnvios(generarEnvios(notificacio));
 		Opciones opcionesRemesa = new Opciones();
-		if (notificacio.getRetardPostal() != null) {
-			Opcion opcionRetardo = new Opcion();
-			opcionRetardo.setTipo("retardo");
-			opcionRetardo.setValue(
-					notificacio.getRetardPostal().toString()); // número de días
-			opcionesRemesa.getOpcion().add(opcionRetardo);
-		}
+//		if (notificacio.getRetardPostal() != null) {
+//			Opcion opcionRetardo = new Opcion();
+//			opcionRetardo.setTipo("retardo");
+//			opcionRetardo.setValue(
+//					notificacio.getRetardPostal().toString()); // número de días
+//			opcionesRemesa.getOpcion().add(opcionRetardo);
+//		}
 		if (notificacio.getCaducitat() != null) {
 			Opcion opcionCaducidad = new Opcion();
 			opcionCaducidad.setTipo("caducidad");

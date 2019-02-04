@@ -48,9 +48,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	@Column(name = "env_tipus", nullable = false)
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
-	@Column(name = "env_data_prog")
-	@Temporal(TemporalType.DATE)
-	private Date enviamentDataProgramada;
+//	@Column(name = "env_data_prog")
+//	@Temporal(TemporalType.DATE)
+//	private Date enviamentDataProgramada;
 	@Column(name = "concepte", length = 50, nullable = false)
 	private String concepte;
 	@Column(name = "descripcio", length = 100)
@@ -73,8 +73,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private String procedimentCodiNotib;
 	@Column(name = "proc_desc_sia", length = 256)
 	private String procedimentDescripcioSia;
-	@Column(name = "retard_postal")
-	private Integer retardPostal;
+//	@Column(name = "retard_postal")
+//	private Integer retardPostal;
 	@Column(name = "caducitat")
 	@Temporal(TemporalType.DATE)
 	private Date caducitat;
@@ -128,9 +128,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
 		return enviamentTipus;
 	}
-	public Date getEnviamentDataProgramada() {
-		return enviamentDataProgramada;
-	}
+//	public Date getEnviamentDataProgramada() {
+//		return enviamentDataProgramada;
+//	}
 	public String getConcepte() {
 		return concepte;
 	}
@@ -161,9 +161,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public String getProcedimentDescripcioSia() {
 		return procedimentDescripcioSia;
 	}
-	public Integer getRetardPostal() {
-		return retardPostal;
-	}
+//	public Integer getRetardPostal() {
+//		return retardPostal;
+//	}
 	public Date getCaducitat() {
 		return caducitat;
 	}
@@ -277,7 +277,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.emisorDir3Codi = emisorDir3Codi;
 			built.comunicacioTipus = comunicacioTipus;
 			built.enviamentTipus = enviamentTipus;
-			built.enviamentDataProgramada = enviamentDataProgramada;
+//			built.enviamentDataProgramada = enviamentDataProgramada;
 			built.concepte = concepte;
 			built.documentArxiuNom = documentArxiuNom;
 			built.documentArxiuId = documentArxiuId;
@@ -324,10 +324,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.procedimentDescripcioSia = procedimentDescripcioSia;
 			return this;
 		}
-		public Builder retardPostal(Integer retardPostal) {
-			built.retardPostal = retardPostal;
-			return this;
-		}
+//		public Builder retardPostal(Integer retardPostal) {
+//			built.retardPostal = retardPostal;
+//			return this;
+//		}
 		public Builder caducitat(Date caducitat) {
 			built.caducitat = caducitat;
 			return this;

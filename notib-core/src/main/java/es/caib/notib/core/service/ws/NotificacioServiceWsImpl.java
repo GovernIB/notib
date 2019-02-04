@@ -155,7 +155,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				document.isGenerarCsv()).
 				descripcio(notificacio.getDescripcio()).
 				caducitat(notificacio.getCaducitat()).
-				retardPostal(notificacio.getRetard()).
+//				retardPostal(notificacio.getRetard()).
 				descripcio(notificacio.getDescripcio()).
 				procedimentCodiNotib(notificacio.getProcedimentCodi());
 		PagadorPostal pagadorPostal = notificacio.getPagadorPostal();
@@ -322,6 +322,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 		}
 		notificacioRepository.saveAndFlush(notificacioEntity);
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioEntity.getComunicacioTipus())) {
+			//TODO: Registrar
 			notificaHelper.notificacioEnviar(notificacioEntity.getId());
 			notificacioEntity = notificacioRepository.findOne(notificacioEntity.getId());
 		}

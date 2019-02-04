@@ -20,7 +20,10 @@ import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.RegistreAnotacioDto;
+import es.caib.notib.core.api.exception.RegistrePluginException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.ws.notificacio.Certificacio;
 import es.caib.notib.core.api.ws.notificacio.ComunicacioTipusEnum;
@@ -43,6 +46,7 @@ import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.EntitatRepository;
@@ -70,11 +74,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
+	
 
 	@Autowired
 	private NotificaHelper notificaHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
 
 
 
@@ -148,7 +155,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				document.isGenerarCsv()).
 				descripcio(notificacio.getDescripcio()).
 				caducitat(notificacio.getCaducitat()).
-				retardPostal(notificacio.getRetard()).
+//				retardPostal(notificacio.getRetard()).
 				descripcio(notificacio.getDescripcio()).
 				procedimentCodiNotib(notificacio.getCodiProcediment());
 
@@ -290,6 +297,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 		notificacioRepository.saveAndFlush(notificacioEntity);
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioEntity.getComunicacioTipus())) {
+			//TODO: Registrar
 			notificaHelper.notificacioEnviar(notificacioEntity.getId());
 			notificacioEntity = notificacioRepository.findOne(notificacioEntity.getId());
 		}
@@ -321,6 +329,47 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		resposta.setReferencies(referencies);
 		return resposta;
 	}
+	
+	public void registrarSortidaAnotacio(Long notificacioId){
+		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
+		RegistreAnotacioDto registreAnotacio = new RegistreAnotacioDto();
+		
+		notificacio.getComunicacioTipus();
+		notificacio.getEnviamentTipus();
+		notificacio.getConcepte();
+		notificacio.getProcedimentDescripcioSia();
+		notificacio.getNotificaEnviamentData();
+		notificacio.getProcedimentCodiNotib();
+		
+		
+		
+		notificacio.getDocumentArxiuId();
+		
+		
+		registreAnotacio
+		
+		
+		registreAnotacio.setUnitatAdministrativa(notificacio.getSeuExpedientUnitatOrganitzativa());
+		registreAnotacio.setOficina(notificacio.getSeuRegistreOficina());
+		registreAnotacio.setLlibre(notificacio.getSeuRegistreLlibre());
+		registreAnotacio.setEntitatCodi(notificacio.getCifEntitat());
+		registreAnotacio.setAssumpteIdiomaCodi("ca");
+		registreAnotacio.setOrgan(notificacio.getPagadorCieCodiDir3());
+		registreAnotacio.setExpedientNumero(notificacio.getSeuExpedientIdentificadorEni());
+//		notificacio.get
+		//		registreAnotacio.
+//		registreAnotacio.
+//		registreAnotacio.
+//		registreAnotacio.
+//		registreAnotacio.
+		try {
+			pluginHelper.registrarSortida(registreAnotacio, "notib", "0.1");
+		} catch (RegistrePluginException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 
 	@Override
 	@Transactional

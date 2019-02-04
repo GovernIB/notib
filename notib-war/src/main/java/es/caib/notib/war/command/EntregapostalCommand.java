@@ -1,6 +1,7 @@
 package es.caib.notib.war.command;
 
-import com.sun.istack.NotNull;
+
+import javax.validation.constraints.NotNull;
 
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
