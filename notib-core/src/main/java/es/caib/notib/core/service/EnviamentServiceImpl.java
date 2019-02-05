@@ -3,32 +3,37 @@
  */
 package es.caib.notib.core.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+
+import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import es.caib.notib.core.api.dto.ColumnesDto;
 import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
-import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.entity.ColumnesEntity;
@@ -39,9 +44,11 @@ import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
+import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.NotificacioEnviamentHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.repository.ColumnesRepository;
+import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
@@ -75,86 +82,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private UsuariRepository usuariRepository;
 	@Autowired
 	private NotificacioEnviamentHelper notificacioEnviamentHelper;
+	@Autowired
+	private MessageHelper messageHelper;
 	
-	
-	@Transactional(readOnly = true)
-	@Override
-	public NotificacioDto findAmbId(Long id) {
-		logger.debug("Consulta de la notificacio amb id (id=" + id + ")");
-		NotificacioEntity dto = notificacioRepository.findOne(id);
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				true,
-				false);
-		
-		return  conversioTipusHelper.convertir(
-				dto,
-				NotificacioDto.class);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
-			NotificacioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				true,
-				false);
-		Page<NotificacioEntity> notificacions;
-		if (filtre == null) {
-			notificacions = notificacioRepository.findByEntitatActiva(
-					true,
-					paginacioHelper.toSpringDataPageable(paginacioParams));
-		} else {
-			Date dataInici = filtre.getDataInici();
-			if (dataInici != null) {
-				Calendar cal = Calendar.getInstance();
-				cal.setTime(dataInici);
-				cal.set(Calendar.HOUR, 0);
-				cal.set(Calendar.MINUTE, 0);
-				cal.set(Calendar.SECOND, 0);
-				cal.set(Calendar.MILLISECOND, 0);
-				dataInici = cal.getTime();
-			}
-			Date dataFi = filtre.getDataFi();
-			if (dataFi != null) {
-				Calendar cal = Calendar.getInstance();
-				cal.setTime(dataInici);
-				cal.set(Calendar.HOUR, 0);
-				cal.set(Calendar.MINUTE, 0);
-				cal.set(Calendar.SECOND, 0);
-				cal.set(Calendar.MILLISECOND, 0);
-				dataFi = cal.getTime();
-			}
-			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
-			notificacions = notificacioRepository.findAmbFiltre(
-					filtre.getEntitatId() == null,
-					filtre.getEntitatId(),
-					//filtre.getComunicacioTipus() == null,
-					//filtre.getComunicacioTipus(),
-					false,
-					NotificacioComunicacioTipusEnumDto.SINCRON,
-					filtre.getEnviamentTipus() == null,
-					filtre.getEnviamentTipus(),
-					filtre.getConcepte() == null,
-					filtre.getConcepte(),
-					filtre.getEstat() == null,
-					filtre.getEstat(),
-					dataInici == null && dataFi == null,
-					dataInici,
-					dataFi,
-					filtre.getTitular() == null || filtre.getTitular().isEmpty(), 
-					filtre.getTitular(),
-					pageable);
-		}
-		return paginacioHelper.toPaginaDto(
-				notificacions,
-				NotificacioDto.class);
-	}
-
 	@Override
 	@Transactional(readOnly = true)
 	public List<NotificacioEnviamentDto> enviamentFindAmbNotificacio(
@@ -169,6 +99,154 @@ public class EnviamentServiceImpl implements EnviamentService {
 		return enviamentsToDto(notificacioEnviamentRepository.findByNotificacioId(notificacioId));
 	}
 
+
+	@Override
+	public List<Long> findIdsAmbFiltre(
+			Long entitatId, 
+			NotificacioEnviamentFiltreDto filtre) throws NotFoundException {
+		logger.debug("Consultant els ids d'expedient segons el filtre ("
+				+ "entitatId=" + entitatId + ", "
+				+ "filtre=" + filtre + ")");
+		entityComprovarHelper.comprovarPermisos(
+				entitatId,
+				true,
+				false,
+				false);
+		return findIdsAmbFiltrePaginat(
+				entitatId,
+				filtre);
+	}
+	
+	private List<Long> findIdsAmbFiltrePaginat(
+			Long entitatId,
+			NotificacioEnviamentFiltreDto filtre) {
+		
+		UsuariDto usuariActualDto = aplicacioService.getUsuariActual();
+		UsuariEntity usuariActual = usuariRepository.findByCodi(usuariActualDto.getCodi());		
+		List<NotificacioEntity> notificacions = new ArrayList<NotificacioEntity>();
+		List<Long> enviamentIds = null;
+		Date dataProgramadaDisposicioInici = null,
+			 dataProgramadaDisposicioFi = null,
+			 dataRegistreInici = null,
+			 dataRegistreFi = null,
+			 dataCaducitatInici = null,
+			 dataCaducitatFi = null;
+		
+		if (filtre.getDataProgramadaDisposicioInici() != null) {
+			dataProgramadaDisposicioInici = filtre.getDataProgramadaDisposicioInici();
+			if (dataProgramadaDisposicioInici != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataProgramadaDisposicioInici);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataProgramadaDisposicioInici = cal.getTime();
+			}
+		}
+		if (filtre.getDataProgramadaDisposicioFi() != null) {
+			dataProgramadaDisposicioFi = filtre.getDataProgramadaDisposicioFi();
+			if (dataProgramadaDisposicioFi != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataProgramadaDisposicioFi);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataProgramadaDisposicioFi = cal.getTime();
+			}
+		}
+		if (filtre.getDataRegistreInici() != null) {
+			dataRegistreInici = filtre.getDataRegistreInici();
+			if (dataRegistreInici != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataRegistreInici);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataRegistreInici = cal.getTime();
+			}
+		}
+		if (filtre.getDataRegistreFi() != null) {
+			dataRegistreFi = filtre.getDataRegistreFi();
+			if (dataRegistreFi != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataRegistreFi);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataRegistreFi = cal.getTime();
+			}
+		}
+		if (filtre.getDataCaducitatInici() != null) {
+			dataCaducitatInici = filtre.getDataCaducitatInici();
+			if (dataCaducitatInici != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataCaducitatInici);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataCaducitatInici = cal.getTime();
+			}
+		}
+		if (filtre.getDataCaducitatFi() != null) {
+			dataCaducitatFi = filtre.getDataCaducitatFi();
+			if (dataCaducitatFi != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataCaducitatFi);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataCaducitatFi = cal.getTime();
+			}
+		}
+		notificacions = notificacioRepository.findNotificacioByFiltre(
+				filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
+				filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
+				filtre.getGrup() == null || filtre.getGrup().isEmpty(),
+				filtre.getGrup() == null ? "" : filtre.getGrup(),
+				filtre.getConcepte() == null || filtre.getConcepte().isEmpty(),
+				filtre.getConcepte() == null ? "" : filtre.getConcepte(),
+				filtre.getDescripcio() == null || filtre.getDescripcio().isEmpty(),
+				filtre.getDescripcio() == null ? "" : filtre.getDescripcio(),
+				(dataProgramadaDisposicioInici == null),
+				dataProgramadaDisposicioInici,
+				(dataProgramadaDisposicioFi == null),
+				dataProgramadaDisposicioFi,
+				(dataCaducitatInici == null),
+				dataCaducitatInici,
+				(dataCaducitatFi == null),
+				dataCaducitatFi,
+				(filtre.getTipusEnviament() == null),
+				(filtre.getTipusEnviament()),
+				//(filtre.getLlibreRegistre() == null || filtre.getLlibreRegistre().isEmpty()),
+				//filtre.getLlibreRegistre() == null ? "" : filtre.getLlibreRegistre(),
+				//(filtre.getNumeroRegistre() == null || filtre.getNumeroRegistre().isEmpty()),
+				//filtre.getNumeroRegistre() == null ? "" : filtre.getNumeroRegistre(),
+				//(dataRegistreInici == null),
+				//dataRegistreInici,
+				//(dataRegistreFi == null),
+				//dataRegistreFi,
+				(filtre.getCsv() == null || filtre.getCsv().isEmpty()),
+				filtre.getCsv(),
+				(filtre.getEstat() == null),
+				(filtre.getEstat()),
+				usuariActual);
+		
+		
+		for (NotificacioEntity notificacio : notificacions) {
+			enviamentIds = notificacioEnviamentRepository.findIdByEntitatAndFiltre(
+					filtre.getCodiNotifica() == null || "".equals(filtre.getCodiNotifica().trim()),
+					filtre.getCodiNotifica() == null ? "" : filtre.getCodiNotifica(),
+					notificacio);
+		}
+		return enviamentIds;
+	}
+	
 	@Override
 	@Transactional(readOnly = true)
 	public NotificacioEnviamentDto enviamentFindAmbId(Long destinatariId) {
@@ -186,7 +264,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 	}
 
 	@Override
-	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByUser(
+	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByUserAndFiltre(
 			NotificacioEnviamentFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		logger.debug("Consulta els enviaments d'una notificació que ha realitzat un usuari");
@@ -194,6 +272,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 		NotificacioEnviamentDtoV2 enviamentDto = new NotificacioEnviamentDtoV2();
 		List<NotificacioEnviamentDtoV2> enviamentsDto = new ArrayList<NotificacioEnviamentDtoV2>();
 		List<NotificacioEntity> notificacions = new ArrayList<NotificacioEntity>();
+		Date dataEnviamentInici = null,
+			 dataEnviamentFi = null,
+			 dataProgramadaDisposicioInici = null,
+			 dataProgramadaDisposicioFi = null,
+			 dataRegistreInici = null,
+			 dataRegistreFi = null,
+			 dataCaducitatInici = null,
+			 dataCaducitatFi = null;
 		
 		UsuariDto usuariActualDto = aplicacioService.getUsuariActual();
 		UsuariEntity usuariActual = usuariRepository.findByCodi(usuariActualDto.getCodi());
@@ -203,8 +289,135 @@ public class EnviamentServiceImpl implements EnviamentService {
 				true,
 				false);
 		
-		notificacions = notificacioRepository.findByCreatedBy_Codi(
-				usuariActual.getCodi());
+		if (filtre.getDataEnviamentInici() != null) {
+			dataEnviamentInici = filtre.getDataEnviamentInici();
+			if (dataEnviamentInici != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataEnviamentInici);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataEnviamentInici = cal.getTime();
+			}
+		}
+		if (filtre.getDataEnviamentFi() != null) {
+			dataEnviamentFi = filtre.getDataEnviamentFi();
+			if (dataEnviamentFi != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataEnviamentFi);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataEnviamentFi = cal.getTime();
+			}
+		}
+		if (filtre.getDataProgramadaDisposicioInici() != null) {
+			dataProgramadaDisposicioInici = filtre.getDataProgramadaDisposicioInici();
+			if (dataProgramadaDisposicioInici != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataProgramadaDisposicioInici);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataProgramadaDisposicioInici = cal.getTime();
+			}
+		}
+		if (filtre.getDataProgramadaDisposicioFi() != null) {
+			dataProgramadaDisposicioFi = filtre.getDataProgramadaDisposicioFi();
+			if (dataProgramadaDisposicioFi != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataProgramadaDisposicioFi);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataProgramadaDisposicioFi = cal.getTime();
+			}
+		}
+		if (filtre.getDataRegistreInici() != null) {
+			dataRegistreInici = filtre.getDataRegistreInici();
+			if (dataRegistreInici != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataRegistreInici);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataRegistreInici = cal.getTime();
+			}
+		}
+		if (filtre.getDataRegistreFi() != null) {
+			dataRegistreFi = filtre.getDataRegistreFi();
+			if (dataRegistreFi != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataRegistreFi);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataRegistreFi = cal.getTime();
+			}
+		}
+		if (filtre.getDataCaducitatInici() != null) {
+			dataCaducitatInici = filtre.getDataCaducitatInici();
+			if (dataCaducitatInici != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataCaducitatInici);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataCaducitatInici = cal.getTime();
+			}
+		}
+		if (filtre.getDataCaducitatFi() != null) {
+			dataCaducitatFi = filtre.getDataCaducitatFi();
+			if (dataCaducitatFi != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataCaducitatFi);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataCaducitatFi = cal.getTime();
+			}
+		}
+		//Filtres camps procediment
+		notificacions = notificacioRepository.findNotificacioByFiltre(
+				filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
+				filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
+				filtre.getGrup() == null || filtre.getGrup().isEmpty(),
+				filtre.getGrup() == null ? "" : filtre.getGrup(),
+				filtre.getConcepte() == null || filtre.getConcepte().isEmpty(),
+				filtre.getConcepte() == null ? "" : filtre.getConcepte(),
+				filtre.getDescripcio() == null || filtre.getDescripcio().isEmpty(),
+				filtre.getDescripcio() == null ? "" : filtre.getDescripcio(),
+				(dataProgramadaDisposicioInici == null),
+				dataProgramadaDisposicioInici,
+				(dataProgramadaDisposicioFi == null),
+				dataProgramadaDisposicioFi,
+				(dataCaducitatInici == null),
+				dataCaducitatInici,
+				(dataCaducitatFi == null),
+				dataCaducitatFi,
+				(filtre.getTipusEnviament() == null),
+				(filtre.getTipusEnviament()),
+				//(filtre.getLlibreRegistre() == null || filtre.getLlibreRegistre().isEmpty()),
+				//filtre.getLlibreRegistre() == null ? "" : filtre.getLlibreRegistre(),
+				//(filtre.getNumeroRegistre() == null || filtre.getNumeroRegistre().isEmpty()),
+				//filtre.getNumeroRegistre() == null ? "" : filtre.getNumeroRegistre(),
+				//(dataRegistreInici == null),
+				//dataRegistreInici,
+				//(dataRegistreFi == null),
+				//dataRegistreFi,
+				(filtre.getCsv() == null || filtre.getCsv().isEmpty()),
+				filtre.getCsv(),
+				(filtre.getEstat() == null),
+				(filtre.getEstat()),
+				usuariActual);
 		
 		entityComprovarHelper.comprovarPermisos(
 				null,
@@ -212,28 +425,260 @@ public class EnviamentServiceImpl implements EnviamentService {
 				true,
 				false);
 		Page<NotificacioEnviamentEntity> enviament = null;
-		//Obtenim els enviaments d'una notificació
-		for (NotificacioEntity notificacio : notificacions) {
-			enviament=  notificacioEnviamentRepository.findByNotificacio(
-					filtre.getCodiNotifica() == null || "".equals(filtre.getCodiNotifica().trim()),
-					filtre.getCodiNotifica() == null ? "" : filtre.getCodiNotifica(),
-					notificacio,
-					paginacioHelper.toSpringDataPageable(paginacioParams));
-			
-			if(enviament != null){
-				enviamentDto = notificacioEnviamentHelper.toNotificacioEnviamentDto(
-						notificacio, 
-						enviament);
-				if (enviamentDto != null) 
-					enviamentsDto.add(enviamentDto);
+		//Filtres camps enviaments que pertanyen a un procediment filtrat anteriorment
+		if (!notificacions.isEmpty()) {
+			for (NotificacioEntity notificacio : notificacions) {
+				enviament =  notificacioEnviamentRepository.findByNotificacio(
+						(dataEnviamentInici == null),
+						dataEnviamentInici,
+						(dataEnviamentFi == null),
+						dataEnviamentFi,
+						(filtre.getCodiNotifica() == null || filtre.getCodiNotifica().isEmpty()),
+						filtre.getCodiNotifica() == null ? "" : filtre.getCodiNotifica(),
+						(filtre.getCreatedBy() == null || filtre.getCreatedBy().getCodi().isEmpty()),
+						conversioTipusHelper.convertir(filtre.getCreatedBy(), UsuariEntity.class),
+						//filtre.getCodiNotifica() == null || "".equals(filtre.getCodiNotifica().trim()),
+						(filtre.getNifTitular() == null || filtre.getNifTitular().isEmpty()),
+						filtre.getNifTitular() == null ? "" : filtre.getNifTitular(),
+						(filtre.getNomTitular() == null || filtre.getNomTitular().isEmpty()),
+						filtre.getNomTitular() == null ? "" : filtre.getNomTitular(),
+						(filtre.getEmailTitular() == null || filtre.getEmailTitular().isEmpty()),
+						filtre.getEmailTitular() == null ? "" : filtre.getEmailTitular(),
+						//CODI DIR3
+						//(filtre.getDestinataris() == null || filtre.getDestinataris().isEmpty()),
+						//filtre.getDestinataris() == null ? "" : filtre.getDestinataris(),
+						//(filtre.getCodiNotib() == null || filtre.getCodiNotib().isEmpty()),
+						//filtre.getCodiNotib() == null ? "" : filtre.getCodiNotib(),
+						(filtre.getNumeroCertCorreus() == null || filtre.getNumeroCertCorreus().isEmpty()),
+						filtre.getNumeroCertCorreus() == null ? "" : filtre.getNumeroCertCorreus(),
+						notificacio,
+						paginacioHelper.toSpringDataPageable(paginacioParams));
+				
+				if(enviament != null){
+					enviamentDto = notificacioEnviamentHelper.toNotificacioEnviamentDto(
+							notificacio, 
+							enviament);
+					if (enviamentDto != null) 
+						enviamentsDto.add(enviamentDto);
+				}
 			}
 		}
+		
 		return paginacioHelper.toPaginaDto(
 				enviament,
 				enviamentsDto,
 				NotificacioEnviamentDtoV2.class);
 	}
 
+	@Transactional(readOnly = true)
+	@Override
+	public FitxerDto exportacio(
+			Long entitatId,
+			Collection<Long> enviamentIds,
+			String format,
+			NotificacioEnviamentFiltreDto filtre) throws IOException {
+		logger.debug("Exportant informació dels enviaments (" +
+				"entitatId=" + entitatId + ", " +
+				"enviamentsIds=" + enviamentIds + ", " +
+				"format=" + format + ")");
+		
+		List<NotificacioEntity> notificacions = new ArrayList<NotificacioEntity>();
+		UsuariDto usuariActualDto = aplicacioService.getUsuariActual();
+		UsuariEntity usuariActual = usuariRepository.findByCodi(usuariActualDto.getCodi());
+		Date dataProgramadaDisposicioInici = null,
+				 dataProgramadaDisposicioFi = null,
+				 dataRegistreInici = null,
+				 dataRegistreFi = null,
+				 dataCaducitatInici = null,
+				 dataCaducitatFi = null;
+			
+			if (filtre.getDataProgramadaDisposicioInici() != null) {
+				dataProgramadaDisposicioInici = filtre.getDataProgramadaDisposicioInici();
+				if (dataProgramadaDisposicioInici != null) {
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(dataProgramadaDisposicioInici);
+					cal.set(Calendar.HOUR_OF_DAY, 0);
+					cal.set(Calendar.MINUTE, 0);
+					cal.set(Calendar.SECOND, 0);
+					cal.set(Calendar.MILLISECOND, 0);
+					dataProgramadaDisposicioInici = cal.getTime();
+				}
+			}
+			if (filtre.getDataProgramadaDisposicioFi() != null) {
+				dataProgramadaDisposicioFi = filtre.getDataProgramadaDisposicioFi();
+				if (dataProgramadaDisposicioFi != null) {
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(dataProgramadaDisposicioFi);
+					cal.set(Calendar.HOUR_OF_DAY, 0);
+					cal.set(Calendar.MINUTE, 0);
+					cal.set(Calendar.SECOND, 0);
+					cal.set(Calendar.MILLISECOND, 0);
+					dataProgramadaDisposicioFi = cal.getTime();
+				}
+			}
+			if (filtre.getDataRegistreInici() != null) {
+				dataRegistreInici = filtre.getDataRegistreInici();
+				if (dataRegistreInici != null) {
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(dataRegistreInici);
+					cal.set(Calendar.HOUR_OF_DAY, 0);
+					cal.set(Calendar.MINUTE, 0);
+					cal.set(Calendar.SECOND, 0);
+					cal.set(Calendar.MILLISECOND, 0);
+					dataRegistreInici = cal.getTime();
+				}
+			}
+			if (filtre.getDataRegistreFi() != null) {
+				dataRegistreFi = filtre.getDataRegistreFi();
+				if (dataRegistreFi != null) {
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(dataRegistreFi);
+					cal.set(Calendar.HOUR_OF_DAY, 0);
+					cal.set(Calendar.MINUTE, 0);
+					cal.set(Calendar.SECOND, 0);
+					cal.set(Calendar.MILLISECOND, 0);
+					dataRegistreFi = cal.getTime();
+				}
+			}
+			if (filtre.getDataCaducitatInici() != null) {
+				dataCaducitatInici = filtre.getDataCaducitatInici();
+				if (dataCaducitatInici != null) {
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(dataCaducitatInici);
+					cal.set(Calendar.HOUR_OF_DAY, 0);
+					cal.set(Calendar.MINUTE, 0);
+					cal.set(Calendar.SECOND, 0);
+					cal.set(Calendar.MILLISECOND, 0);
+					dataCaducitatInici = cal.getTime();
+				}
+			}
+			if (filtre.getDataCaducitatFi() != null) {
+				dataCaducitatFi = filtre.getDataCaducitatFi();
+				if (dataCaducitatFi != null) {
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(dataCaducitatFi);
+					cal.set(Calendar.HOUR_OF_DAY, 0);
+					cal.set(Calendar.MINUTE, 0);
+					cal.set(Calendar.SECOND, 0);
+					cal.set(Calendar.MILLISECOND, 0);
+					dataCaducitatFi = cal.getTime();
+				}
+			}
+		notificacions = notificacioRepository.findNotificacioByFiltre(
+				filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
+				filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
+				filtre.getGrup() == null || filtre.getGrup().isEmpty(),
+				filtre.getGrup() == null ? "" : filtre.getGrup(),
+				filtre.getConcepte() == null || filtre.getConcepte().isEmpty(),
+				filtre.getConcepte() == null ? "" : filtre.getConcepte(),
+				filtre.getDescripcio() == null || filtre.getDescripcio().isEmpty(),
+				filtre.getDescripcio() == null ? "" : filtre.getDescripcio(),
+				(dataProgramadaDisposicioInici == null),
+				dataProgramadaDisposicioInici,
+				(dataProgramadaDisposicioFi == null),
+				dataProgramadaDisposicioFi,
+				(dataCaducitatInici == null),
+				dataCaducitatInici,
+				(dataCaducitatFi == null),
+				dataCaducitatFi,
+				(filtre.getTipusEnviament() == null),
+				(filtre.getTipusEnviament()),
+				//(filtre.getLlibreRegistre() == null || filtre.getLlibreRegistre().isEmpty()),
+				//filtre.getLlibreRegistre() == null ? "" : filtre.getLlibreRegistre(),
+				//(filtre.getNumeroRegistre() == null || filtre.getNumeroRegistre().isEmpty()),
+				//filtre.getNumeroRegistre() == null ? "" : filtre.getNumeroRegistre(),
+				//(dataRegistreInici == null),
+				//dataRegistreInici,
+				//(dataRegistreFi == null),
+				//dataRegistreFi,
+				(filtre.getCsv() == null || filtre.getCsv().isEmpty()),
+				filtre.getCsv(),
+				(filtre.getEstat() == null),
+				(filtre.getEstat()),
+				usuariActual);
+		
+		//Genera les columnes
+		int numColumnes = 22;
+		String[] columnes = new String[numColumnes];
+		columnes[0] = messageHelper.getMessage("enviament.service.exportacio.dataenviament");
+		columnes[1] = messageHelper.getMessage("enviament.service.exportacio.dataprogramada");
+		columnes[2] = messageHelper.getMessage("enviament.service.exportacio.codinotifica");
+		columnes[3] = messageHelper.getMessage("enviament.service.exportacio.codiprocediment");
+		columnes[4] = messageHelper.getMessage("enviament.service.exportacio.codigrup");
+		columnes[5] = messageHelper.getMessage("enviament.service.exportacio.dir3codi");
+		columnes[6] = messageHelper.getMessage("enviament.service.exportacio.usuari");
+		columnes[7] = messageHelper.getMessage("enviament.service.exportacio.tipusenviament");
+		columnes[8] = messageHelper.getMessage("enviament.service.exportacio.concepte");
+		columnes[9] = messageHelper.getMessage("enviament.service.exportacio.descripcio");
+		columnes[10] = messageHelper.getMessage("enviament.service.exportacio.niftitular");
+		columnes[11] = messageHelper.getMessage("enviament.service.exportacio.nomLlinatgetitular");
+		columnes[12] = messageHelper.getMessage("enviament.service.exportacio.emailtitular");
+		columnes[13] = messageHelper.getMessage("enviament.service.exportacio.destinataris");
+		columnes[14] = messageHelper.getMessage("enviament.service.exportacio.llibreregistre");
+		columnes[15] = messageHelper.getMessage("enviament.service.exportacio.numeroregistre");
+		columnes[16] = messageHelper.getMessage("enviament.service.exportacio.dataregistre");
+		columnes[17] = messageHelper.getMessage("enviament.service.exportacio.datacaducitat");
+		columnes[18] = messageHelper.getMessage("enviament.service.exportacio.codinotibenviament");
+		columnes[19] = messageHelper.getMessage("enviament.service.exportacio.numerocertificatcorreus");
+		columnes[20] = messageHelper.getMessage("enviament.service.exportacio.codicsvuuid");
+		columnes[21] = messageHelper.getMessage("enviament.service.exportacio.estat");
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		List<String[]> files = new ArrayList<String[]>();
+		
+		for (NotificacioEntity notificacio : notificacions) {
+			
+			String[] fila = new String[numColumnes];
+			
+			List<NotificacioEnviamentEntity> enviaments = notificacioEnviamentRepository.findByNotificacioAndIdInOrderByIdAsc(
+					notificacio,
+					enviamentIds);
+			
+			if(!enviaments.isEmpty() && enviaments != null) {
+				
+				for (NotificacioEnviamentEntity enviament : enviaments) {
+					fila[0] = enviament.getCreatedDate().toDate() != null ? sdf.format(enviament.getCreatedDate().toDate()) : "";
+					fila[1] = notificacio.getNotificaEnviamentData() != null ? sdf.format(notificacio.getNotificaEnviamentData()) : "";
+					fila[2] = enviament.getNotificaIdentificador();
+					fila[3] = notificacio.getProcedimentCodiNotib();
+					fila[4] = notificacio.getGrupCodi();
+					fila[5] = notificacio.getEmisorDir3Codi();
+					fila[6] = enviament.getCreatedBy().getCodi();
+					fila[7] = notificacio.getEnviamentTipus().getText();
+					fila[8] = notificacio.getConcepte();
+					fila[9] = notificacio.getDescripcio();
+					fila[10] = enviament.getTitularNif();
+					fila[11] = enviament.getTitularNom();
+					fila[12] = enviament.getTitularEmail();
+					fila[13] = enviament.getDestinatariNif();
+					fila[14] = notificacio.getRegistreLlibre();
+					fila[15] = "numero registre";
+					fila[16] = "data registre";
+					fila[17] = notificacio.getCaducitat() != null ? sdf.format(notificacio.getCaducitat()) : "";
+					fila[18] = "codi notib enviament";
+					fila[19] = enviament.getNotificaCertificacioNumSeguiment();	
+					fila[20] = notificacio.getCsv_uuid();
+					fila[21] = notificacio.getEstat().name();	
+					
+					files.add(fila);
+				}
+			}
+			
+		}
+		FitxerDto fitxer = new FitxerDto();
+		if ("ODS".equalsIgnoreCase(format)) {
+			Object[][] filesArray = files.toArray(new Object[files.size()][numColumnes]);
+			TableModel model = new DefaultTableModel(filesArray, columnes);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			SpreadSheet.createEmpty(model).getPackage().save(baos);
+			fitxer.setNom("exportacio.ods");
+			fitxer.setContentType("application/vnd.oasis.opendocument.spreadsheet");
+			fitxer.setContingut(baos.toByteArray());
+		} else {
+			throw new ValidationException("Format de fitxer no suportat: " + format);
+		}
+		return fitxer;
+	}
 
 	@Override
 	public void columnesCreate(
@@ -354,97 +799,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 				NotificacioEventDto.class);
 	}
 	
-	@Transactional(readOnly = true)
-	@Override
-	public FitxerDto exportacio(
-			Long entitatId,
-			Long enviamentId,
-			Collection<Long> enviamentIds,
-			String format) throws IOException {
-		logger.debug("Exportant informació dels enviaments (" +
-				"entitatId=" + entitatId + ", " +
-				"enviamentId=" + enviamentId + ", " +
-				"enviamentsIds=" + enviamentIds + ", " +
-				"format=" + format + ")");
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-		/*MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-				entitat,
-				metaExpedientId,
-				true,
-				false,
-				false,
-				false);
-		List<ExpedientEntity> expedients = expedientRepository.findByEntitatAndAndMetaNodeAndIdInOrderByIdAsc(
-				metaExpedient.getEntitat(),
-				metaExpedient,
-				expedientIds);
-		List<MetaDadaEntity> metaDades = dadaRepository.findDistinctMetaDadaByNodeIdInOrderByMetaDadaCodiAsc(expedientIds);
-		List<DadaEntity> dades = dadaRepository.findByNodeIdInOrderByNodeIdAscMetaDadaCodiAsc(expedientIds);
-		int numColumnes = 5 + metaDades.size();
-		String[] columnes = new String[numColumnes];
-		columnes[0] = messageHelper.getMessage("expedient.service.exportacio.numero");
-		columnes[1] = messageHelper.getMessage("expedient.service.exportacio.titol");
-		columnes[2] = messageHelper.getMessage("expedient.service.exportacio.estat");
-		columnes[3] = messageHelper.getMessage("expedient.service.exportacio.datcre");
-		columnes[4] = messageHelper.getMessage("expedient.service.exportacio.idnti");
-		for (int i = 0; i < metaDades.size(); i++) {
-			MetaDadaEntity metaDada = metaDades.get(i);
-			columnes[5 + i] = metaDada.getNom() + " (" + metaDada.getCodi() + ")";
-		}
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-		List<String[]> files = new ArrayList<String[]>();
-		int dadesIndex = 0;
-		for (ExpedientEntity expedient: expedients) {
-			String[] fila = new String[numColumnes];
-			fila[0] = expedient.getNumero();
-			fila[1] = expedient.getNom();
-			fila[2] = expedient.getEstat().name();
-			fila[3] = sdf.format(expedient.getCreatedDate().toDate());
-			fila[4] = expedient.getNtiIdentificador();
-			if (!dades.isEmpty()) {
-				DadaEntity dadaActual = dades.get(dadesIndex);
-				if (dadaActual.getNode().getId().equals(expedient.getId())) {
-					for (int i = 0; i < metaDades.size(); i++) {
-						MetaDadaEntity metaDada = metaDades.get(i);
-						int dadesIndexIncrement = 1;
-						while (dadaActual.getNode().getId().equals(expedient.getId())) {
-							if (dadaActual.getMetaDada().getCodi().equals(metaDada.getCodi())) {
-								break;
-							}
-							dadaActual = dades.get(dadesIndex + dadesIndexIncrement++);
-						}
-						if (dadaActual.getMetaDada().getCodi().equals(metaDada.getCodi())) {
-							fila[5 + i] = dadaActual.getValorComString();
-						}
-					}
-				}
-			}
-			files.add(fila);
-		}
-		FitxerDto fitxer = new FitxerDto();
-		if ("ODS".equalsIgnoreCase(format)) {
-			Object[][] filesArray = files.toArray(new Object[files.size()][numColumnes]);
-			TableModel model = new DefaultTableModel(filesArray, columnes);
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			SpreadSheet.createEmpty(model).getPackage().save(baos);
-			fitxer.setNom("exportacio.ods");
-			fitxer.setContentType("application/vnd.oasis.opendocument.spreadsheet");
-			fitxer.setContingut(baos.toByteArray());
-		} else if ("CSV".equalsIgnoreCase(format)) {
-			fitxer.setNom("exportacio.csv");
-			fitxer.setContentType("text/csv");
-			StringBuilder sb = new StringBuilder();
-			csvHelper.afegirLinia(sb, columnes, ';');
-			for (String[] fila: files) {
-				csvHelper.afegirLinia(sb, fila, ';');
-			}
-			fitxer.setContingut(sb.toString().getBytes());
-		} else {
-			throw new ValidationException("Format de fitxer no suportat: " + format);
-		}*/
-		return null;
-	}
 
 
 
@@ -496,10 +850,5 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private static final Logger logger = LoggerFactory.getLogger(EnviamentServiceImpl.class);
 
 
-	@Override
-	public List<Long> findIdsAmbFiltre(Long entitatId, NotificacioEnviamentFiltreDto filtre) throws NotFoundException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }

@@ -7,18 +7,12 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
-import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.ColumnesDto;
-import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.NotificacioDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
-import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.UsuariDto;
@@ -32,29 +26,6 @@ import es.caib.notib.core.api.exception.NotFoundException;
  */
 public interface EnviamentService {
 
-	/**
-	 * Consulta una notificació donat el seu id.
-	 * 
-	 * @param id
-	 *            Atribut id de la notificació.
-	 * @return La notificació amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public NotificacioDto findAmbId(Long id);
-
-	/**
-	 * Consulta de les notificacions segons els paràmetres del filtre.
-	 * 
-	 * @param filtre
-	 *            Paràmetres per a filtrar els resultats.
-	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
-	 * @return La pàgina amb les notificacions.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
-			NotificacioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams);
 
 	/**
 	 * Consulta la llista d'ids dels enviaments segons el filtre.
@@ -80,7 +51,7 @@ public interface EnviamentService {
 	 * @return els destinataris trobats.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByUser(
+	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByUserAndFiltre(
 			NotificacioEnviamentFiltreDto filtre,
 			PaginacioParamsDto paginacio);
 	
@@ -134,12 +105,12 @@ public interface EnviamentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public FitxerDto exportacio(
 			Long entitatId,
-			Long metaExpedientId,
 			Collection<Long> enviamentIds,
-			String format) throws IOException, NotFoundException;
+			String format,
+			NotificacioEnviamentFiltreDto filtreCommand) throws IOException, NotFoundException;
 	
 	/**
 	 * Crea les columnes s'han de mostrar

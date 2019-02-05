@@ -1,14 +1,18 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib tagdir="/WEB-INF/tags/notib" prefix="not"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%
-	pageContext.setAttribute(
-			"isRolActualAdministrador",
-			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
+pageContext.setAttribute(
+		"isRolActualAdministrador",
+		es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
+pageContext.setAttribute(
+		"notificacioComunicacioEnumOptions",
+		es.caib.notib.war.helper.EnumHelper.getOptionsForEnum(
+				es.caib.notib.core.api.dto.NotificacioTipusEnviamentEnumDto.class,
+				"notificacio.tipus.enviament.enum."));
 %>
 <c:set var="ampladaConcepte">
 	<c:choose>
@@ -69,29 +73,43 @@ table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
 table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr.selectable > :first-child {
 	cursor: pointer;
 }
+.buit {
+	color: #8e8e8e;
+}
+.input-group-addon {
+	padding: 0;
+}
 </style>
-<script type="text/javascript">
-
-	$('.data').datepicker();
+<script>
+$(document).ready(function() {
+	
+	$('#notificacio').select2({
+		width: '100%',
+        allowClear:true,
+        placeholder: '${placeholderText}'
+    });
+	
+	$('.data').datepicker({
+		orientation: "bottom"
+	});
 	
 	$('#enviament').on('selectionchange.dataTable', function (e, accio, ids) {
+		
 		$.get(
-				"expedient/" + accio,
+				"enviament/" + accio,
 				{ids: ids},
 				function(data) {
 					$("#seleccioCount").html(data);
 				}
 		);
 	});
-	console.log("test");
-	$('#enviament').on('draw', function () {
-		console.log("test2");
+	$('#enviament').on('draw.dt', function () {
 		$('#seleccioAll').on('click', function() {
 			$.get(
 					"enviament/select",
 					function(data) {
 						$("#seleccioCount").html(data);
-						$('#enviament').webutilDatatable('refresh');
+						$('#taulaDades').webutilDatatable('refresh');
 					}
 			);
 			return false;
@@ -108,6 +126,28 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 			return false;
 		});
 	});
+});
+function setCookie(cname,cvalue) {
+	var exdays = 30;
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires=" + d.toGMTString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
 </script>
 </head>
 <body>
@@ -123,7 +163,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
   						<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.exportar"/> <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu">
-						<li><a href="enviament/export/EXCEL"><spring:message code="enviament.list.user.exportar.EXCEL"/></a></li> 
+						<li><a href="enviament/export/ODS"><spring:message code="enviament.list.user.exportar.EXCEL"/></a></li> 
 					</ul>
 				</div>
 				<div class="btn-group">
@@ -137,8 +177,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 			<button type="submit" id="btnFiltrar" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-search"></span></button>
 		</div>
 	</script>
-	
-	<div id="msg-box"></div>
+	<script id="rowhrefTemplate" type="text/x-jsrender">enviament/{{:id}}/detall</script>
 	<table
 		id="enviament"
 		data-toggle="datatable"
@@ -154,7 +193,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 		data-scroll-overflow="adaptMax"
 		data-mantenir-paginacio="${mantenirPaginacio}"
 		data-selection-enabled="true"
-		data-save-state="false"
+		data-save-state="true"
 		style="width:100%">
 		<thead>
 			<tr>
@@ -168,10 +207,12 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				</c:choose>
 				<th data-col-name=createdDate data-converter="datetime" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dataenviament"/>
 					<script id="dataTemplate" type="text/x-jsrender">
-						<div class="input-group input-daterange" data-provide="daterangepicker">
-    						<input name="dataEnviamentInici" type="text" class="form-control data" placeholder="inici">
-    						<div class="input-group-addon"></div>
-    						<input name="dataEnviamentFi" type="text" class="form-control data" placeholder="final">
+						<div class="from-group">
+							<div class="input-group vdivide">
+    							<input name="dataEnviamentInici" type="text" class="form-control data" placeholder="Inici">
+    							<div class="input-group-addon"></div>
+    							<input name="dataEnviamentFi" type="text" class="form-control data" placeholder="Final">
+							</div>
 						</div>
 					</script>
 				</th>
@@ -185,10 +226,12 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				</c:choose>
 				<th data-col-name=notificacio.enviamentDataProgramada data-converter="datetime" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dataprogramada"/>
 					<script id="dataTemplate" type="text/x-jsrender">
-						<div class="input-group input-daterange" data-provide="daterangepicker">
-    						<input name="dataProgramadaDisposicioInici" type="text" class="form-control data" placeholder="inici">
-    						<div class="input-group-addon"></div>
-    						<input name="dataProgramadaDisposicioFi" type="text" class="form-control data" placeholder="final">
+						<div class="from-group input-daterange" data-provide="daterangepicker">
+							<div class="input-group vdivide">
+    							<input name="dataProgramadaDisposicioInici" type="text" class="form-control data" placeholder="Inici">
+    							<div class="input-group-addon"></div>
+    							<input name="dataProgramadaDisposicioFi" type="text" class="form-control data" placeholder="Final">
+							</div>
 						</div>
 					</script>
 				</th>
@@ -202,7 +245,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				</c:choose>
 				<th data-col-name="notificaIdentificador" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codinotifica"/>
 					<script type="text/x-jsrender">
-						<div class="input-group">
+						<div class="from-group">
 							<input name="codiNotifica" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codinotifica"/>"/>
 						</div>
 					</script>
@@ -217,7 +260,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				</c:choose>
 				<th data-col-name="notificacio.procedimentCodiNotib" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codiprocediment"/>
 					<script type="text/x-jsrender">
-						<div class="input-group">
+						<div class="from-group">
 							<input name="codiProcediment" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codiprocediment"/>"/>
 						</div>
 					</script>
@@ -232,7 +275,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				</c:choose>
 				<th data-col-name="notificacio.grupCodi" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codigrup"/>
 					<script type="text/x-jsrender">
-						<div class="input-group">
+						<div class="from-group">
 							<input name="grup" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codigrup"/>"/>
 						</div>
 					</script>
@@ -247,7 +290,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				</c:choose>
 				<th data-col-name="notificacio.emisorDir3Codi" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dir3codi"/>
 					<script type="text/x-jsrender">
-						<div class="input-group">
+						<div class="from-group">
 							<input name="dir3Codi" class="form-control" type="text" placeholder="<spring:message code="enviament.list.dir3codi"/>'"/>
 						</div>
 					</script>
@@ -262,9 +305,13 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				</c:choose>
 				<th data-col-name="notificacio.enviamentTipus" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.tipusenviament"/>
 					<script type="text/x-jsrender">
-						<div class="input-group">
-							<input name="tipusEnviament" class="form-control" type="text" placeholder="<spring:message code="enviament.list.tipusenviament"/>"/>
-						</div>
+					<div class="from-group">
+						<select class="form-control" id="notificacio" name="tipusEnviament">
+    						<c:forEach items="${notificacioComunicacioEnumOptions}" var="opt">
+        						<option name="tipusEnviament" value="${opt.value != 'buit' ? opt.value : ''}" class="${opt.value != 'buit' ? '' : 'buit'}"><span class="${opt.value != 'buit' ? '' : 'buit'}"><spring:message code="${opt.text}"/></span></option>
+    						</c:forEach>
+						</select>
+					</div>
 					</script>
 				</th>
 				<c:choose>
@@ -277,7 +324,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				</c:choose>
 				<th data-col-name="notificacio.concepte" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.concepte"/>
 					<script type="text/x-jsrender">
-						<div class="input-group">
+						<div class="from-group">
 							<input name="concepte" class="form-control" type="text" placeholder="<spring:message code="enviament.list.concepte"/>"/>
 						</div>
 					</script>
@@ -292,7 +339,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				</c:choose>
 				<th data-col-name="notificacio.descripcio"  data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.descripcio"/>
 					<script type="text/x-jsrender">
-						<div class="input-group">
+						<div class="from-group">
 							<input name="descripcio" class="form-control" type="text" placeholder="<spring:message code="enviament.list.descripcio"/>"/>
 						</div>
 					</script>
@@ -307,7 +354,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				</c:choose>
 				<th data-col-name="titularNif" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.niftitular"/>
 					<script type="text/x-jsrender">
-						<div class="input-group">
+						<div class="from-group">
 							<input name="nifTitular" class="form-control" type="text" placeholder="<spring:message code="enviament.list.niftitular"/>'"/>
 						</div>
 					</script>
@@ -320,10 +367,10 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="titularNom" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.nomLlinatgetitular"/>
+				<th data-col-name="titularNomLlinatges" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.nomLlinatgetitular"/>
 					<script type="text/x-jsrender">
-						<div class="input-group">
-							<input name="nomLlinatgeTitular" class="form-control" type="text" placeholder="<spring:message code="enviament.list.nomLlinatgetitular"/>'"/>
+						<div class="from-group">
+							<input name="titularNomLlinatges" class="form-control" type="text" placeholder="<spring:message code="enviament.list.nomLlinatgetitular"/>'"/>
 						</div>
 					</script>
 				</th>
@@ -337,7 +384,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				</c:choose>
 				<th data-col-name="titularEmail" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.emailtitular"/>
 					<script type="text/x-jsrender">
-						<div class="input-group">
+						<div class="from-group">
 							<input name="emailTitular" class="form-control" type="text" placeholder="<spring:message code="enviament.list.emailtitular"/>'"/>
 						</div>
 					</script>
@@ -350,10 +397,10 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="notificacio.destinatariNom" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.destinataris"/>
+				<th data-col-name="destinatariNomLlinatges" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.destinataris"/>
 					<script type="text/x-jsrender">
-						<div class="input-group">
-							<input name="destinataris" class="form-control" type="text" placeholder="<spring:message code="enviament.list.destinataris"/>'"/>
+						<div class="from-group">
+							<input name="destinatariNomLlinatges" class="form-control" type="text" placeholder="<spring:message code="enviament.list.destinataris"/>'"/>
 						</div>
 					</script>
 				</th>
@@ -367,8 +414,12 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				</c:choose>
 				<th data-col-name="notificacio.caducitat" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.datacaducitat"/>
 					<script type="text/x-jsrender">
-						<div class="input-group">
-							<input name="numeroRegistre" class="form-control" type="text" placeholder="<spring:message code="enviament.list.datacaducitat"/>'"/>
+						<div class="from-group" data-provide="daterangepicker">
+							<div class="input-group vdivide">
+    							<input name="dataCaducitatInici" type="text" class="form-control data" placeholder="Inici">
+    							<div class="input-group-addon"></div>
+    							<input name="dataCaducitatFi" type="text" class="form-control data" placeholder="Final">
+							</div>
 						</div>
 					</script>
 				</th>
@@ -382,8 +433,8 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				</c:choose>
 				<th data-col-name="notifica.notificaCertificacioArxiuId" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.numerocertificatcorreus"/>
 					<script type="text/x-jsrender">
-						<div class="input-group">
-							<input name="numeroRegistre" class="form-control" type="text" placeholder="<spring:message code="enviament.list.numerocertificatcorreus"/>'"/>
+						<div class="from-group">
+							<input name="numeroCertCorreus" class="form-control" type="text" placeholder="<spring:message code="enviament.list.numerocertificatcorreus"/>'"/>
 						</div>
 					</script>
 				</th>
@@ -397,8 +448,8 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				</c:choose>
 				<th data-col-name="notificacio.csv_uuid" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codicsvuuid"/>
 					<script type="text/x-jsrender">
-						<div class="input-group">
-							<input name="numeroRegistre" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codicsvuuid"/>'"/>
+						<div class="from-group">
+							<input name="csvUuid" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codicsvuuid"/>'"/>
 						</div>
 					</script>
 				</th>
@@ -412,7 +463,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				</c:choose>
 				<th data-col-name="notificacio.estat"  data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.estat"/>
 					<script type="text/x-jsrender">
-						<div class="input-group">
+						<div class="from-group">
 							<input name="estat" class="form-control" type="text" placeholder="<spring:message code="enviament.list.estat"/>'"/>
 						</div>
 					</script>

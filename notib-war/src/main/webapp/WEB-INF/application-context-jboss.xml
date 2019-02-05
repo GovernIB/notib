@@ -9,6 +9,7 @@
 		<property name="basenames">
 			<list>
 				<value>es/caib/notib/war/i18n/messages</value>
+				<value>es/caib/notib/core/i18n/messages</value>
 			</list>
 		</property>
 	</bean>

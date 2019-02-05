@@ -14,11 +14,11 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 
@@ -35,7 +35,9 @@ public class CacheHelper {
 
 	@Resource
 	private EntitatRepository entitatRepository;
-
+	@Resource
+	private ProcedimentRepository procedimentRepository;
+	
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
 	@Resource
@@ -60,9 +62,10 @@ public class CacheHelper {
 						return entitat.getId();
 					}
 				},
+				//revisar
 				EntitatEntity.class,
 				new Permission[] {
-					ExtendedPermission.REPRESENTANT},
+					ExtendedPermission.ADMINISTRADORENTITAT},
 				auth);
 		
 		List<EntitatDto> resposta = conversioTipusHelper.convertirList(
@@ -98,7 +101,6 @@ public class CacheHelper {
 //		
 //		return result;
 	}
-
 	@Cacheable(value = "usuariAmbCodi", key="#usuariCodi")
 	public DadesUsuari findUsuariAmbCodi(
 			String usuariCodi) {

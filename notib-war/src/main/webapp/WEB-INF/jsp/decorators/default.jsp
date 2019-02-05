@@ -28,11 +28,18 @@
 			"isRolActualAdministradorEntitat",
 			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
 	pageContext.setAttribute(
-			"isUsuariActualUsuari",
+			"isRolActualUsuari",
 			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuari(request));
 	pageContext.setAttribute(
 			"requestParameterCanviRol",
 			es.caib.notib.war.helper.RolHelper.getRequestParameterCanviRol());
+	pageContext.setAttribute(
+			"permisConsulta",
+			request.getAttribute("permisConsulta"));
+	pageContext.setAttribute(
+			"permisNotificacio",
+			request.getAttribute("permisNotificacio"));
+		
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
 <c:set var="hiHaMesEntitats" value="${fn:length(sessionEntitats) > 1}"/>
@@ -46,7 +53,7 @@
 	<meta name="author" content=""/>
 	<!-- Estils CSS -->
 	<link href="<c:url value="/webjars/bootstrap/3.3.6/dist/css/bootstrap.min.css"/>" rel="stylesheet"/>
-	<link href="<c:url value="/webjars/font-awesome/4.5.0/css/font-awesome.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/font-awesome/4.7.0/css/font-awesome.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/css/estils.css"/>" rel="stylesheet">
 	<link rel="shortcut icon" href="<c:url value="/img/favicon.png"/>" type="image/x-icon" />
 	<script src="<c:url value="/webjars/jquery/1.12.0/dist/jquery.min.js"/>"></script>
@@ -157,16 +164,23 @@ body {
 								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
 								<ul class="dropdown-menu">
 									<li><a href="<c:url value="/entitat"/>"><spring:message code="decorator.menu.entitats"/></a></li>
-									<!-- <li><a href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/></a></li>-->
+									<li><a href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/></a></li>
 									<li><a href="<c:url value="/aplicacio"/>"><spring:message code="decorator.menu.aplicacions"/></a></li>		
 								</ul>
 							</div>
 							</c:if>
-							
 							<c:if test="${isRolActualUsuari}">
-								<a href="<c:url value="/entitats/${entitatActual.id}/permis/entitatactual"/>" class="btn btn-primary"><spring:message code="decorator.menu.permisos"/></a>
+								<c:if test="${permisConsulta}">
+									<div class="btn-group">
+										<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
+									</div>
+								</c:if>
+								<c:if test="${permisNotificacio}">
+									<div class="btn-group">
+										<a href="<c:url value="/notificacio/new"/>" class="btn btn-primary"><spring:message code="decorator.menu.altanotificacio"/></a>
+									</div>
+								</c:if>
 							</c:if>
-							
 							<c:if test="${isRolActualAdministradorEntitat}">
 							<div class="btn-group">
 								<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
@@ -180,6 +194,7 @@ body {
 									<li><a href="<c:url value="/notificacio/new"/>"><spring:message code="decorator.menu.altanotificacio"/></a></li>								
 									<li><a href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/></a></li>
 									<li class="divider"></li>
+									<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
 									<li><a href="<c:url value="/pagadorPostal"/>"><spring:message code="decorator.menu.pagadorpostal"/></a></li>
 									<li><a href="<c:url value="/pagadorCie"/>"><spring:message code="decorator.menu.pagadorcie"/></a></li>
 								</ul>

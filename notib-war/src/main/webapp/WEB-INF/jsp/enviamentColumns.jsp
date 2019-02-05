@@ -15,10 +15,10 @@
 	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
-	<link href="<c:url value="/webjars/select2/4.0.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
-	<script src="<c:url value="/webjars/select2/4.0.1/dist/js/select2.min.js"/>"></script>
-	<script src="<c:url value="/webjars/select2/4.0.1/dist/js/i18n/${requestLocale}.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
@@ -38,8 +38,11 @@
 	<c:set var="formAction"><not:modalUrl value="/enviament/visualitzar/save"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="columnesCommand" role="form">
 		<form:hidden path="id"/>
-		<div class="row">
-			<div class="row col-md-6">
+		
+			<div class="row col-xs-6">
+				<div class="col-md-3">
+					<not:inputCheckbox name="dataEnviament" textKey="enviament.list.dataenviament" />
+				</div>
 				<div class="col-md-3">
 					<not:inputCheckbox name="dataProgramada" textKey="enviament.list.dataprogramada" />
 				</div>
@@ -70,8 +73,6 @@
 				<div class="col-md-2">
 					<not:inputCheckbox name="titularNif" textKey="enviament.list.niftitular"/>
 				</div>
-			</div>
-			<div class="row">
 				<div class="col-md-3">
 					<not:inputCheckbox name="titularNomLlinatge" textKey="enviament.list.nomLlinatgetitular"/>
 				</div>
@@ -109,8 +110,7 @@
 			<div id="modal-botons">
 				<button id="" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 				<a href="<c:url value="/enviament"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
-			</div>	
-		</div>
+			</div>
 	</form:form>
 	
 </body>
