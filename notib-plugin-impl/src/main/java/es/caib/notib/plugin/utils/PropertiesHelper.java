@@ -91,6 +91,38 @@ public class PropertiesHelper extends Properties {
 	public void setLlegirSystem(boolean llegirSystem) {
 		this.llegirSystem = llegirSystem;
 	}
+	
+	public Properties findAll() {
+		return findByPrefix(null);
+	}
+	public Properties findByPrefix(String prefix) {
+		Properties properties = new Properties();
+		if (llegirSystem) {
+			for (Object key: System.getProperties().keySet()) {
+				if (key instanceof String) {
+					String keystr = (String)key;
+					if (prefix == null || keystr.startsWith(prefix)) {
+						properties.put(
+								keystr,
+								System.getProperty(keystr));
+					}
+				}
+			}
+		} else {
+			for (Object key: this.keySet()) {
+				if (key instanceof String) {
+					String keystr = (String)key;
+					if (prefix == null || keystr.startsWith(prefix)) {
+						properties.put(
+								keystr,
+								getProperty(keystr));
+					}
+				}
+			}
+		}
+		return properties;
+	}
+	
 
 	private static final Logger logger = LoggerFactory.getLogger(PropertiesHelper.class);
 	private static final long serialVersionUID = 1L;

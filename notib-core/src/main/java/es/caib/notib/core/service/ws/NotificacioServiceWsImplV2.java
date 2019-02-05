@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.sun.jersey.core.util.Base64;
+
+import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliTipusEnumDto;
@@ -22,6 +24,7 @@ import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.RegistreAnotacioDto;
 import es.caib.notib.core.api.exception.RegistrePluginException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -46,12 +49,14 @@ import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.ProcedimentRepository;
 
 
 /**
@@ -74,6 +79,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
+	@Autowired
+	private ProcedimentRepository procedimentRepository;
 	
 
 	@Autowired
@@ -82,6 +89,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
+	
+	
 
 
 
@@ -333,7 +342,23 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	public void registrarSortidaAnotacio(Long notificacioId){
 		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
 		RegistreAnotacioDto registreAnotacio = new RegistreAnotacioDto();
+
 		
+		registreAnotacio.getOficina();
+		registreAnotacio.getLlibre();
+		registreAnotacio.getAssumpteExtracte();
+		registreAnotacio.getDocumentacioFisica();
+		registreAnotacio.getAssumpteIdiomaCodi();
+		registreAnotacio.getAssumpteTipus();		
+		registreAnotacio.getExpedientNumero();
+		registreAnotacio.getAssumpteCodi();
+		registreAnotacio.getObservacions();
+		
+		
+//		registreAnotacio.set
+		
+		/*Notificació*/
+		notificacio.getEmisorDir3Codi();
 		notificacio.getComunicacioTipus();
 		notificacio.getEnviamentTipus();
 		notificacio.getConcepte();
@@ -341,15 +366,80 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		notificacio.getNotificaEnviamentData();
 		notificacio.getCaducitat();
 		notificacio.getProcedimentCodiNotib();
+		/*-----------*/
 		
 		
-		
-		
-		
-		
+
+		/*Document*/
 		notificacio.getDocumentArxiuId();
+		DocumentDto document = new DocumentDto();
+		document.getArxiuNom();
+		document.getContingutBase64();
+		document.getHash();
+		document.getUrl();
+		document.getMetadades();
+		document.isNormalitzat();
+		document.isGenerarCsv();
+		document.getUUID();
+		document.getCSV();
+		/*--------*/
 		
-				
+		for(NotificacioEnviamentEntity enviament : notificacio.getEnviaments()) {
+			enviament.getNotificaReferencia();
+			enviament.getServeiTipus();
+			
+			/*Titular*/
+			enviament.getTitularNom();
+			enviament.getTitularLlinatge1();
+			enviament.getTitularLlinatge2();
+			enviament.getTitularNif();
+			enviament.getTitularTelefon();
+			enviament.getTitularEmail();
+			/*------*/
+			
+			/*Destinataris*/
+			enviament.getDestinatariNom();
+			enviament.getDestinatariLlinatge1();
+			enviament.getDestinatariLlinatge2();
+			enviament.getDestinatariNif();
+			enviament.getDestinatariTelefon();
+			enviament.getDestinatariEmail();
+			/*------------*/
+			
+			
+			/*Entrega Postal*/
+			enviament.getDomiciliTipus();
+			enviament.getDomiciliViaTipus();
+			enviament.getDomiciliViaNom();
+			enviament.getDomiciliNumeracioNumero();
+			enviament.getDomiciliNumeracioQualificador();
+			enviament.getDomiciliNumeracioPuntKm();
+			enviament.getDomiciliApartatCorreus();
+			enviament.getDomiciliPortal();
+			enviament.getDomiciliEscala();
+			enviament.getDomiciliPlanta();
+			enviament.getDomiciliPorta();
+			enviament.getDomiciliBloc();
+			enviament.getDomiciliComplement();
+			enviament.getDomiciliCodiPostal();
+			enviament.getDomiciliPoblacio();
+			enviament.getDomiciliMunicipiCodiIne();
+			enviament.getDomiciliProvinciaCodi();
+			enviament.getDomiciliPaisCodiIso();
+			enviament.getDomiciliLinea1();
+			enviament.getDomiciliLinea2();
+			enviament.getDomiciliCie();
+			enviament.getFormatSobre();
+			enviament.getFormatFulla();
+			/*-------------*/
+			
+			/*Entrega DEH*/
+			enviament.getDehObligat();
+			enviament.getDehProcedimentCodi();
+			/*-----------*/
+		}
+		
+//		ProcedimentDto procediment = procedimentRepository.findByCodi(notificacio.getProcedimentCodiNotib());
 		
 //		registreAnotacio.setUnitatAdministrativa(notificacio.getSeuExpedientUnitatOrganitzativa());
 //		registreAnotacio.setOficina(notificacio.getSeuRegistreOficina());
