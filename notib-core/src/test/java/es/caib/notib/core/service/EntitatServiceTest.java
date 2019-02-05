@@ -65,7 +65,6 @@ public class EntitatServiceTest extends BaseServiceTest {
 		entitatUpdate.setDir3Codi("23599771E");
 		entitatCreate.setActiva(true);
 		permisUserRepresentant = new PermisDto();
-		permisUserRepresentant.setRepresentant(true);
 		permisUserRepresentant.setTipus(TipusEnumDto.USUARI);
 		permisUserRepresentant.setPrincipal("user");
 	}
@@ -175,7 +174,6 @@ public class EntitatServiceTest extends BaseServiceTest {
 		autenticarUsuari("admin");
 		EntitatDto entitatCreada = entitatService.create(entitatCreate);
 		PermisDto permisRepresentat = new PermisDto();
-		permisRepresentat.setRepresentant(true);
 		permisRepresentat.setTipus(TipusEnumDto.USUARI);
 		permisRepresentat.setPrincipal("rep");
 		entitatService.permisUpdate(

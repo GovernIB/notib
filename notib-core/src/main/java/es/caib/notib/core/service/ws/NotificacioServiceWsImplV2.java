@@ -155,7 +155,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		ParametresRegistre parametresRegistre = notificacio.getParametresRegistre();
 		if (parametresRegistre != null) {
 			notificacioBuilder.
-			registreOrgan(parametresRegistre.getOrgan()).
 			registreOficina(parametresRegistre.getOficina()).
 			registreLlibre(parametresRegistre.getLlibre());
 		}

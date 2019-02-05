@@ -163,7 +163,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 		ParametresRegistreDto parametresRegistre = notificacio.getParametresRegistre();
 		if (parametresRegistre != null) {
 			notificacioBuilder.
-			registreOrgan(parametresRegistre.getOrgan()).
 			registreOficina(parametresRegistre.getOficina()).
 			registreLlibre(parametresRegistre.getLlibre());
 		}
