@@ -1,9 +1,12 @@
 package es.caib.notib.war.command;
 
 import java.util.Date;
+
 import javax.validation.constraints.Size;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
+
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 

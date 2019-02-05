@@ -40,6 +40,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.EnviamentService;
+import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.DocumentCommand;
@@ -74,6 +75,7 @@ public class NotificacioController extends BaseUserController {
 	private ProcedimentService procedimentService;
 	@Autowired
 	private EnviamentService enviamentService;
+	private GrupService grupService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(

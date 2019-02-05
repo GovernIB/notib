@@ -50,13 +50,32 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "env_tipus", nullable = false)
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
-	
+//	@Column(name = "env_data_prog")
+//	@Temporal(TemporalType.DATE)
+//	private Date enviamentDataProgramada;
 	@Column(name = "concepte", length = 50, nullable = false)
 	private String concepte;
 	
 	@Column(name = "descripcio", length = 100)
 	private String descripcio;
-	
+	@Column(name = "pagcor_dir3", length = 9)
+	private String pagadorCorreusCodiDir3;
+	@Column(name = "pagcor_numcont", length = 20)
+	private String pagadorCorreusContracteNum;
+	@Column(name = "pagcor_codi_client", length = 20)
+	private String pagadorCorreusCodiClientFacturacio;
+	@Column(name = "pagcor_data_vig")
+	@Temporal(TemporalType.DATE)
+	private Date pagadorCorreusDataVigencia;
+	@Column(name = "pagcie_dir3", length = 9)
+	private String pagadorCieCodiDir3;
+	@Column(name = "pagcie_data_vig")
+	@Temporal(TemporalType.DATE)
+	private Date pagadorCieDataVigencia;
+	@Column(name = "proc_desc_sia", length = 256)
+	private String procedimentDescripcioSia;
+//	@Column(name = "retard_postal")
+//	private Integer retardPostal;
 	@Column(name = "caducitat")
 	@Temporal(TemporalType.DATE)
 	private Date caducitat;
@@ -66,9 +85,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "grup_codi", length = 6, nullable = false)
 	private String grupCodi;
-	
-	@Column(name = "proc_desc_sia", length = 256)
-	private String procedimentDescripcioSia;
 	
 	@Column(name = "doc_arxiu_nom", length = 256, nullable = false)
 	private String documentArxiuNom;
@@ -153,6 +169,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
 		return enviamentTipus;
 	}
+//	public Date getEnviamentDataProgramada() {
+//		return enviamentDataProgramada;
+//	}
 	public String getConcepte() {
 		return concepte;
 	}
@@ -168,6 +187,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public String getProcedimentDescripcioSia() {
 		return procedimentDescripcioSia;
 	}
+//	public Integer getRetardPostal() {
+//		return retardPostal;
+//	}
 	public Date getCaducitat() {
 		return caducitat;
 	}
@@ -316,6 +338,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.emisorDir3Codi = emisorDir3Codi;
 			built.comunicacioTipus = comunicacioTipus;
 			built.enviamentTipus = enviamentTipus;
+//			built.enviamentDataProgramada = enviamentDataProgramada;
 			built.concepte = concepte;
 			built.documentArxiuNom = documentArxiuNom;
 			built.documentArxiuId = documentArxiuId;
@@ -384,6 +407,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.procedimentDescripcioSia = procedimentDescripcioSia;
 			return this;
 		}
+//		public Builder retardPostal(Integer retardPostal) {
+//			built.retardPostal = retardPostal;
+//			return this;
+//		}
 		public Builder caducitat(Date caducitat) {
 			built.caducitat = caducitat;
 			return this;

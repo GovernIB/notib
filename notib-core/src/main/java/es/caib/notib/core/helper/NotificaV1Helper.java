@@ -222,6 +222,10 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 			envio.setFechaEnvioProgramado(
 					toXmlGregorianCalendar(dataProgramada));
 		}
+//		if (notificacio.getEnviamentDataProgramada() != null) {
+//			envio.setFechaEnvioProgramado(
+//					toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
+//		}
 		if (notificacio.getEnviamentTipus() != null) {
 			envio.setTipoEnvio(notificacio.getEnviamentTipus().getText());
 		}
@@ -412,7 +416,10 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 			if (retardPostal != null) {
 				opcionesEmision.setRetardoPostalDeh(retardPostal);
 			}
-			
+//			if (notificacio.getRetardPostal() != null) {
+//				opcionesEmision.setRetardoPostalDeh(
+//						new Integer(notificacio.getRetardPostal()));
+//			}
 			destinatario.setOpcionesEmision(opcionesEmision);
 			DireccionElectronicaHabilitada deh = new DireccionElectronicaHabilitada();
 			deh.setCodigoProcedimiento(enviament.getDehProcedimentCodi());
