@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.EntregaDehDto;
 import es.caib.notib.core.api.dto.EntregaPostalDto;
@@ -37,8 +39,10 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.ParametresRegistreDto;
 import es.caib.notib.core.api.dto.PersonaDto;
+import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.EnviamentReferencia;
@@ -48,15 +52,19 @@ import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
+import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
+import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.ProcedimentRepository;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -84,6 +92,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
+	@Autowired
+	private EntitatRepository entitatRepository;
 	
 	@Transactional
 	@Override
@@ -92,13 +102,35 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotificacioDtoV2 notificacio) {
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		
+		NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(
+				entitat, 
+				notificacio.getId());
+		
+		entityComprovarHelper.comprovarNotificacio(
+				entitat, 
+				notificacio.getId(), 
+				false, 
+				false, 
+				true, 
+				false);
+		
+		
 		String documentGesdocId = null;
+		GrupEntity grup = null;
 		
 		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
-				 	notificacio.getProcediment().getId());
+					entitat,
+				 	notificacio.getProcediment().getId(),
+				 	true,
+				 	true,
+				 	true,
+				 	true);
 
-		GrupEntity grup = entityComprovarHelper.comprovarGrup(
-					notificacio.getGrup().getId());
+		if (notificacio.getGrup().getId() != null) {
+			grup = entityComprovarHelper.comprovarGrup(
+						notificacio.getGrup().getId());
+		}
 		 
 		if (notificacio.getDocument().getContingutBase64() != null) {
 			documentGesdocId = pluginHelper.gestioDocumentalCreate(
@@ -123,7 +155,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						caducitat(notificacio.getCaducitat()).
 						descripcio(notificacio.getDescripcio()).
 						procedimentCodiNotib(procediment.getCodi()).
-						grupCodi(grup.getCodi());
+						grupCodi(grup != null ? grup.getCodi() : null);
 
 		/*
 		 * Falta afegir paràmetres registre S'han llevat els paràmetres de la seu
@@ -136,7 +168,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			registreLlibre(parametresRegistre.getLlibre());
 		}
 
-		NotificacioEntity notificacioEntity = notificacioBuilder.build();
+		notificacioEntity = notificacioBuilder.build();
 		notificacioRepository.saveAndFlush(notificacioEntity);
 
 		List<EnviamentReferencia> referencies = new ArrayList<EnviamentReferencia>();
@@ -230,7 +262,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 	@Override
-	public NotificacioDtoV2 update(NotificacioDtoV2 procediment) throws NotFoundException {
+	public NotificacioDtoV2 update(
+			Long entitatId,
+			NotificacioDtoV2 procediment) throws NotFoundException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -240,6 +274,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public NotificacioDto findAmbId(Long id) {
 		logger.debug("Consulta de la notificacio amb id (id=" + id + ")");
 		NotificacioEntity dto = notificacioRepository.findOne(id);
+		
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
@@ -254,69 +289,159 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
+			Long entitatId, 
+			boolean isUsuari,
+			boolean isUsuariEntitat,
+			boolean isAdministrador,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
+		
+		entityComprovarHelper.comprovarEntitat(
+				entitatId, 
+				true, 
+				false, 
 				true,
 				false);
-		Page<NotificacioEntity> notificacions;
-		if (filtre == null) {
-			notificacions = notificacioRepository.findByEntitatActiva(
-					true,
-					paginacioHelper.toSpringDataPageable(paginacioParams));
-		} else {
-			Date dataInici = filtre.getDataInici();
-			if (dataInici != null) {
-				Calendar cal = Calendar.getInstance();
-				cal.setTime(dataInici);
-				cal.set(Calendar.HOUR, 0);
-				cal.set(Calendar.MINUTE, 0);
-				cal.set(Calendar.SECOND, 0);
-				cal.set(Calendar.MILLISECOND, 0);
-				dataInici = cal.getTime();
+	
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId);
+		List<EntitatEntity> entitatsActiva = entitatRepository.findByActiva(true);
+		PaginaDto<NotificacioDto> resultatPagina = null;
+		Page<NotificacioEntity> notificacions = null;
+		List<String> procedimentsCodisNotib = new ArrayList<String>();
+		List<ProcedimentDto> procedimentsAmbPermis = new ArrayList<ProcedimentDto>();
+		
+		if (isUsuari) {
+			procedimentsAmbPermis = entityComprovarHelper.findPermisConsultaProcedimentsUsuariActual();
+		
+			if (!procedimentsAmbPermis.isEmpty()) {
+					for (ProcedimentDto procedimentDto : procedimentsAmbPermis) {
+						procedimentsCodisNotib.add(procedimentDto.getCodi());
+					}
 			}
-			Date dataFi = filtre.getDataFi();
-			if (dataFi != null) {
-				Calendar cal = Calendar.getInstance();
-				cal.setTime(dataInici);
-				cal.set(Calendar.HOUR, 0);
-				cal.set(Calendar.MINUTE, 0);
-				cal.set(Calendar.SECOND, 0);
-				cal.set(Calendar.MILLISECOND, 0);
-				dataFi = cal.getTime();
-			}
-			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
-			notificacions = notificacioRepository.findAmbFiltre(
-					filtre.getEntitatId() == null,
-					filtre.getEntitatId(),
-					//filtre.getComunicacioTipus() == null,
-					//filtre.getComunicacioTipus(),
-					false,
-					NotificacioComunicacioTipusEnumDto.SINCRON,
-					filtre.getEnviamentTipus() == null,
-					filtre.getEnviamentTipus(),
-					filtre.getConcepte() == null,
-					filtre.getConcepte(),
-					filtre.getEstat() == null,
-					filtre.getEstat(),
-					dataInici == null && dataFi == null,
-					dataInici,
-					dataFi,
-					filtre.getTitular() == null || filtre.getTitular().isEmpty(), 
-					filtre.getTitular(),
-					pageable);
 		}
-		return paginacioHelper.toPaginaDto(
+		
+		if (filtre == null) {
+			//Consulta les notificacions sobre les quals té permis l'usuari actual
+			if (isUsuari) {
+				if (!procedimentsCodisNotib.isEmpty()) {
+					notificacions = notificacioRepository.findByEntitatActualAndProcedimentCodiNotib(
+							entitatActual,
+							procedimentsCodisNotib,
+							paginacioHelper.toSpringDataPageable(paginacioParams));
+					}
+			//Consulta els notificacions de l'entitat acutal
+			} else if (isUsuariEntitat) {
+				notificacions = notificacioRepository.findByEntitatActual(
+						entitatActual,
+						paginacioHelper.toSpringDataPageable(paginacioParams));
+			//Consulta totes les notificacions de les entitats actives
+			} else if (isAdministrador) {
+				notificacions = notificacioRepository.findByEntitatActiva(
+						entitatsActiva,
+						paginacioHelper.toSpringDataPageable(paginacioParams));
+			}
+		} else {
+				Date dataInici = filtre.getDataInici();
+				if (dataInici != null) {
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(dataInici);
+					cal.set(Calendar.HOUR, 0);
+					cal.set(Calendar.MINUTE, 0);
+					cal.set(Calendar.SECOND, 0);
+					cal.set(Calendar.MILLISECOND, 0);
+					dataInici = cal.getTime();
+				}
+				Date dataFi = filtre.getDataFi();
+				if (dataFi != null) {
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(dataInici);
+					cal.set(Calendar.HOUR, 0);
+					cal.set(Calendar.MINUTE, 0);
+					cal.set(Calendar.SECOND, 0);
+					cal.set(Calendar.MILLISECOND, 0);
+					dataFi = cal.getTime();
+				}
+				Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
+				if (isUsuari) {
+					if (!procedimentsCodisNotib.isEmpty()) {
+						notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotib(
+								filtre.getEntitatId() == null,
+								filtre.getEntitatId(),
+								//filtre.getComunicacioTipus() == null,
+								//filtre.getComunicacioTipus(),
+								false,
+								NotificacioComunicacioTipusEnumDto.SINCRON,
+								filtre.getEnviamentTipus() == null,
+								filtre.getEnviamentTipus(),
+								filtre.getConcepte() == null,
+								filtre.getConcepte() == null ? "" : filtre.getConcepte(),
+								filtre.getEstat() == null,
+								filtre.getEstat(),
+								dataInici == null && dataFi == null,
+								dataInici,
+								dataFi,
+								filtre.getTitular() == null || filtre.getTitular().isEmpty(), 
+								filtre.getTitular() == null ? "" : filtre.getTitular(),
+								procedimentsCodisNotib,
+								pageable);
+					}
+				} else if (isUsuariEntitat) {
+					notificacions = notificacioRepository.findAmbFiltre(
+							entitatId == null,
+							entitatId,
+							false,
+							NotificacioComunicacioTipusEnumDto.SINCRON,
+							filtre.getEnviamentTipus() == null,
+							filtre.getEnviamentTipus(),
+							filtre.getConcepte() == null,
+							filtre.getConcepte(),
+							filtre.getEstat() == null,
+							filtre.getEstat(),
+							dataInici == null && dataFi == null,
+							dataInici,
+							dataFi,
+							filtre.getTitular() == null || filtre.getTitular().isEmpty(), 
+							filtre.getTitular(),
+							pageable);
+				} else if (isAdministrador) {
+					notificacions = notificacioRepository.findAmbFiltre(
+							filtre.getEntitatId() == null,
+							filtre.getEntitatId(),
+							//filtre.getComunicacioTipus() == null,
+							//filtre.getComunicacioTipus(),
+							false,
+							NotificacioComunicacioTipusEnumDto.SINCRON,
+							filtre.getEnviamentTipus() == null,
+							filtre.getEnviamentTipus(),
+							filtre.getConcepte() == null,
+							filtre.getConcepte(),
+							filtre.getEstat() == null,
+							filtre.getEstat(),
+							dataInici == null && dataFi == null,
+							dataInici,
+							dataFi,
+							filtre.getTitular() == null || filtre.getTitular().isEmpty(), 
+							filtre.getTitular(),
+							pageable);
+				}
+			}
+		
+		if (notificacions == null)
+			resultatPagina = paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
+		 
+		else
+			resultatPagina = paginacioHelper.toPaginaDto(
 				notificacions,
 				NotificacioDto.class);
+		
+		return resultatPagina;
+		
 	}
-
 	
 	@Override
 	@Transactional(readOnly = true)
 	public List<NotificacioEventDto> eventFindAmbNotificacio(
+			Long entitatId, 
 			Long notificacioId) {
 		logger.debug("Consulta dels events de la notificació (" +
 				"notificacioId=" + notificacioId + ")");
@@ -333,6 +458,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<NotificacioEventDto> eventFindAmbEnviament(
+			Long entitatId, 
 			Long notificacioId,
 			Long enviamentId) {
 		logger.debug("Consulta dels events associats a un destinatari (" +
@@ -387,6 +513,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	public boolean enviar(
+			Long entitatId, 
 			Long notificacioId) {
 		logger.debug("Intentant enviament de la notificació pendent (" +
 				"notificacioId=" + notificacioId + ")");
@@ -396,6 +523,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	@Transactional
 	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(
+			Long entitatId, 
 			Long enviamentId) {
 		logger.debug("Refrescant l'estat de la notificació de Notific@ (" +
 				"enviamentId=" + enviamentId + ")");
@@ -771,7 +899,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 		referencies.add(enviamentReferencia);
 		notificacioEntity.addEnviament(enviamentSaved);
 	}
-	
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceImpl.class);
 
 

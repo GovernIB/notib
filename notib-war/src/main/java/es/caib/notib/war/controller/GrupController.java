@@ -2,7 +2,6 @@ package es.caib.notib.war.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,9 +18,9 @@ import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.war.command.GrupCommand;
 import es.caib.notib.war.command.GrupFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
+import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.RequestSessionHelper;
 import es.caib.notib.war.helper.RolHelper;
-import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
  * Controlador per el mantinemnt de grups
@@ -30,7 +29,7 @@ import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
  *
  */
 @Controller
-@RequestMapping("procediment/grup")
+@RequestMapping("/grup")
 public class GrupController extends BaseUserController{
 	
 	private final static String GRUP_FILTRE = "grup_filtre";
@@ -39,6 +38,7 @@ public class GrupController extends BaseUserController{
 	EntitatService entitatService;
 	@Autowired
 	GrupService grupService;
+	
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -100,9 +100,9 @@ public class GrupController extends BaseUserController{
 					"procediment.controller.modificat.ok");
 		//if it is new	
 		} else {
-			/*grupService.create(
+			grupService.create(
 					entitatActual.getId(),
-					GrupCommand.asDto(grupCommand));*/
+					GrupCommand.asDto(grupCommand));
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:pagadorsCie",
@@ -115,12 +115,14 @@ public class GrupController extends BaseUserController{
 			HttpServletRequest request,
 			@PathVariable Long grupId,
 			Model model) {
-		//EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		GrupCommand grupCommand = null;
 		GrupDto grup = null;
 		
 		if (grupId != null) {
-			grup = grupService.findById(grupId);
+			grup = grupService.findById(
+					entitatActual.getId(),
+					grupId);
 			
 			model.addAttribute(grup);
 		}

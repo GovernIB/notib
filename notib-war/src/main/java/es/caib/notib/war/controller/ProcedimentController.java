@@ -1,5 +1,7 @@
 package es.caib.notib.war.controller;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -59,15 +61,24 @@ public class ProcedimentController extends BaseUserController{
 		return "procedimentAdminList";
 	}
 	
+	
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable( 
 			HttpServletRequest request ) {
+		
+		boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
+		boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
+		boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
+		
 		ProcedimentFiltreCommand procedimentFiltreCommand = getFiltreCommand(request);
 		PaginaDto<ProcedimentDto> procediments = null;
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		procediments = procedimentService.findAmbFiltrePaginat(
 				entitat.getId(),
+				isUsuari,
+				isUsuariEntitat,
+				isAdministrador,
 				ProcedimentFiltreCommand.asDto(procedimentFiltreCommand),
 				DatatablesHelper.getPaginacioDtoFromRequest(request));
 				
@@ -86,27 +97,49 @@ public class ProcedimentController extends BaseUserController{
 		return vista;
 	}
 	
+	@RequestMapping(method = RequestMethod.POST)
+	public String post(	
+			HttpServletRequest request,
+			ProcedimentFiltreCommand command,
+			Model model) {
+		
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request, 
+				PROCEDIMENTS_FILTRE, 
+				command);
+		
+		return "procedimentAdminList";
+	}
+	
 	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
 			@Valid ProcedimentCommand procedimentCommand,
 			BindingResult bindingResult,
 			Model model) {		
+		
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		
 		if (bindingResult.hasErrors()) {
+			emplenarModelProcediment(
+					request,
+					procedimentCommand.getId(),
+					model);
 			return "procedimentAdminForm";
 		}
-		// if it is modified
+		
 		if (procedimentCommand.getId() != null) {
 			procedimentService.update(
+					entitat.getId(),
 					ProcedimentCommand.asDto(procedimentCommand));
 			
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:procediments",
 					"procediment.controller.modificat.ok");
-		//if it is new	
 		} else {
 			procedimentService.create(
+					entitat.getId(),
 					ProcedimentCommand.asDto(procedimentCommand));
 			return getModalControllerReturnValueSuccess(
 					request,
@@ -116,31 +149,24 @@ public class ProcedimentController extends BaseUserController{
 	}
 	
 	@RequestMapping(value = "/{procedimentId}", method = RequestMethod.GET)
-	public String formGet(HttpServletRequest request, @PathVariable Long procedimentId, Model model) {
-		ProcedimentDto procediment = null;
+	public String formGet(
+			HttpServletRequest request, 
+			@PathVariable Long procedimentId, 
+			Model model) {
+		
+		
 		ProcedimentCommand procedimentCommand;
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		ProcedimentDto procediment = emplenarModelProcediment(
+				request, 
+				procedimentId,
+				model);
 		
-		if (RolHelper.isUsuariActualAdministrador(request))
-			model.addAttribute("entitats", entitatService.findAll());
-		else
-			model.addAttribute("entitat", entitat);
-			model.addAttribute("entitatId", entitat.getId());
-		
-		if (procedimentId != null) {
-			procediment = procedimentService.findById(procedimentId);
-
-			model.addAttribute("grups", grupsService.findByIdProcediment(procedimentId));
-			model.addAttribute(procediment);
-		}
-
 		if (procediment != null) 
 			procedimentCommand = ProcedimentCommand.asCommand(procediment);
 		else
 			procedimentCommand = new ProcedimentCommand();
 		
-		model.addAttribute("pagadorsPostal", pagadorPostalService.findAll());
-		model.addAttribute("pagadorsCie", pagadorCieService.findAll());
+		
 		model.addAttribute(procedimentCommand);
 
 		return "procedimentAdminForm";
@@ -150,7 +176,12 @@ public class ProcedimentController extends BaseUserController{
 	public String delete(
 			HttpServletRequest request,
 			@PathVariable Long procedimentId) {		
-		procedimentService.delete(procedimentId);
+		
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		
+		procedimentService.delete(
+				entitat.getId(),
+				procedimentId);
 		
 		return getAjaxControllerReturnValueSuccess(
 				request,
@@ -160,9 +191,10 @@ public class ProcedimentController extends BaseUserController{
 	
 	private ProcedimentFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
-		ProcedimentFiltreCommand procedimentFiltreCommand = (ProcedimentFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				PROCEDIMENTS_FILTRE);
+		ProcedimentFiltreCommand procedimentFiltreCommand = (
+				ProcedimentFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
+						request,
+						PROCEDIMENTS_FILTRE);
 		if (procedimentFiltreCommand == null) {
 			procedimentFiltreCommand = new ProcedimentFiltreCommand();
 			RequestSessionHelper.actualitzarObjecteSessio(
@@ -171,6 +203,33 @@ public class ProcedimentController extends BaseUserController{
 					procedimentFiltreCommand);
 		}
 		return procedimentFiltreCommand;
+	}
+	
+	private ProcedimentDto emplenarModelProcediment(
+			HttpServletRequest request,
+			Long procedimentId,
+			Model model) {
+		
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		ProcedimentDto procediment = null;
+		
+		if (RolHelper.isUsuariActualAdministrador(request))
+			model.addAttribute("entitats", entitatService.findAll());
+		else
+			model.addAttribute("entitat", entitat);
+		
+		model.addAttribute("pagadorsPostal", pagadorPostalService.findAll());
+		model.addAttribute("pagadorsCie", pagadorCieService.findAll());
+		
+		if (procedimentId != null) {
+			procediment = procedimentService.findById(
+					entitat.getId(),
+					procedimentId);
+
+			model.addAttribute(procediment);
+		}
+		
+		return procediment;
 	}
 	
 }

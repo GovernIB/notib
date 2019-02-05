@@ -1,15 +1,14 @@
 package es.caib.notib.core.entity;
 
-import java.util.Date;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
 import org.hibernate.annotations.ForeignKey;
+
 import es.caib.notib.core.audit.NotibAuditable;
 
 /**
@@ -28,20 +27,19 @@ public class GrupEntity extends NotibAuditable<Long> {
 	private String nom;
 
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
-	@JoinColumn(name = "procediment")
-	@ForeignKey(name = "not_procediment_fk")
-	protected ProcedimentEntity procediment;
+	@JoinColumn(name = "entitat")
+	@ForeignKey(name = "not_entitat_grup_fk")
+	protected EntitatEntity entitat;
 	
 	public String getCodi() {
 		return codi;
 	}
-	
 	public String getNom() {
 		return nom;
 	}
 	
-	public ProcedimentEntity getProcediment() {
-		return procediment;
+	public EntitatEntity getEntitat() {
+		return entitat;
 	}
 	
 	public void update(
@@ -54,11 +52,11 @@ public class GrupEntity extends NotibAuditable<Long> {
 	public static Builder getBuilder(
 			String codi,
 			String nom,
-			ProcedimentEntity procediment) {
+			EntitatEntity entitat) {
 		return new Builder(
 				codi,
 				nom,
-				procediment);
+				entitat);
 	}
 	
 	public static class Builder {
@@ -66,11 +64,11 @@ public class GrupEntity extends NotibAuditable<Long> {
 		Builder(
 				String codi,
 				String nom,
-				ProcedimentEntity procediment) {
+				EntitatEntity entitat) {
 			built = new GrupEntity();
 			built.codi = codi;
 			built.nom = nom;
-			built.procediment = procediment;
+			built.entitat = entitat;
 		}
 		public GrupEntity build() {
 			return built;

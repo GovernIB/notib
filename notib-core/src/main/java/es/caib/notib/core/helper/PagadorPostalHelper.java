@@ -5,7 +5,6 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.PagadorPostalDto;
-import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.entity.PagadorPostalEntity;
 
 /**

@@ -3,24 +3,13 @@
  */
 package es.caib.notib.core.helper;
 
-import java.util.Date;
-
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.core.api.dto.SeuEstatEnumDto;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
-import es.caib.notib.plugin.seu.SeuDocument;
-import es.caib.notib.plugin.seu.SeuNotificacioEstat;
-import es.caib.notib.plugin.seu.SeuNotificacioResultat;
 
 /**
  * Mètodes per a interactuar amb la seu electrònica.

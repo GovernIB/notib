@@ -7,8 +7,6 @@ import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.sun.istack.NotNull;
-
 import es.caib.notib.core.api.dto.PagadorPostalDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
@@ -24,7 +22,6 @@ public class PagadorPostalCommand {
 	private String dir3codi;
 	@NotEmpty @Size(max=64)
 	private String contracteNum;
-	@NotNull
 	private Date contracteDataVig;
 	@NotEmpty @Size(max=64)
 	private String facturacioClientCodi;

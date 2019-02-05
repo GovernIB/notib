@@ -12,7 +12,26 @@ import es.caib.notib.core.entity.ProcedimentEntity;
 
 public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, Long> {
 
+	
+	List<ProcedimentEntity> findByEntitatActiva(boolean activa);
+	
+	@Query(
+			"from " +
+			"    ProcedimentEntity pro " +
+			"where pro.entitat = (:entitatActual)")
+	Page<ProcedimentEntity> findByEntitatActual(
+			@Param("entitatActual") EntitatEntity entitatActiva,
+			Pageable paginacio);
+	
 	ProcedimentEntity findByCodi(String codi);
+	
+	@Query(
+			"from " +
+			"    ProcedimentEntity pro " +
+			"where pro.entitat in (:entitatActiva)")
+	Page<ProcedimentEntity> findByEntitatActiva(
+			@Param("entitatActiva") List<EntitatEntity> entitatActiva,
+			Pageable paginacio);
 	
 	List<ProcedimentEntity> findByEntitat(
 			EntitatEntity entitat);
@@ -22,12 +41,19 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			Pageable paginacio);
 	
 	@Query(	"from " +
-			"    ProcedimentEntity eu " +
-			"where " +
-			"    lower(eu.codi) like concat('%', lower(:filtre), '%') " +
-			" or lower(eu.nom) like concat('%', lower(:filtre), '%') " +
-			" or lower(eu.codisia) like concat('%', lower(:filtre), '%') ")
+			"    ProcedimentEntity pro " +
+			"where (:isEntitatNull = true or pro.entitat = :entitat) "+ 
+			" and (:isCodiNull = true or pro.codi = :codi)" +
+			" and (:isNomNull = true or pro.nom = :nom) " +
+			" and (:isCodiSiaNull = true or pro.codisia = :codiSia) ")
 	public Page<ProcedimentEntity> findByFiltre(
-			@Param("filtre") String filtre,
+			@Param("isEntitatNull") boolean isEntitat,
+			@Param("entitat") EntitatEntity entitat,
+			@Param("isCodiNull") boolean isCodiNull,
+			@Param("codi") String codi,
+			@Param("isNomNull") boolean isNomNull,
+			@Param("nom") String nom,
+			@Param("isCodiSiaNull") boolean isCodiSiaNull,
+			@Param("codiSia") String codiSia,
 			Pageable paginacio);
 }

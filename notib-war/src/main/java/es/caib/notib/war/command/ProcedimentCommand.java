@@ -11,6 +11,7 @@ import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorPostalDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.TipusAssumpteEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
 /**
@@ -33,13 +34,14 @@ public class ProcedimentCommand {
 	private Long pagadorPostalId;
 	private Long pagadorCieId;	
 	private boolean agrupar;
-	private List<String> grup;
 	private boolean consulta;
 	private boolean processar;
 	private boolean notificacio;
 	private boolean gestio;
-	private Date enviamentDataProgramada;
 	private int retard;
+	private String oficina;
+	private String llibre;
+	private TipusAssumpteEnumDto tipusAssumpte;
 	
 	public Long getId() {
 		return id;
@@ -70,12 +72,6 @@ public class ProcedimentCommand {
 	}
 	public void setAgrupar(boolean agrupar) {
 		this.agrupar = agrupar;
-	}
-	public List<String> getGrup() {
-		return grup;
-	}
-	public void setGrup(List<String> grup) {
-		this.grup = grup;
 	}
 	public boolean isConsulta() {
 		return consulta;
@@ -125,17 +121,29 @@ public class ProcedimentCommand {
 	public void setEntitatNom(String entitatNom) {
 		this.entitatNom = entitatNom;
 	}
-	public Date getEnviamentDataProgramada() {
-		return enviamentDataProgramada;
-	}
-	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
-		this.enviamentDataProgramada = enviamentDataProgramada;
-	}
 	public int getRetard() {
 		return retard;
 	}
 	public void setRetard(int retard) {
 		this.retard = retard;
+	}
+	public String getOficina() {
+		return oficina;
+	}
+	public String getLlibre() {
+		return llibre;
+	}
+	public TipusAssumpteEnumDto getTipusAssumpte() {
+		return tipusAssumpte;
+	}
+	public void setOficina(String oficina) {
+		this.oficina = oficina;
+	}
+	public void setLlibre(String llibre) {
+		this.llibre = llibre;
+	}
+	public void setTipusAssumpte(TipusAssumpteEnumDto tipusAssumpte) {
+		this.tipusAssumpte = tipusAssumpte;
 	}
 	
 	public static ProcedimentCommand asCommand(ProcedimentDto dto) {
@@ -151,7 +159,6 @@ public class ProcedimentCommand {
 		if (command == null) {
 			return null;
 		}
-		List<GrupDto> grupsDto = new ArrayList<GrupDto>();
 		ProcedimentDto dto = ConversioTipusHelper.convertir(
 				command,
 				ProcedimentDto.class);
@@ -168,16 +175,6 @@ public class ProcedimentCommand {
 		pagadorCieDto.setId(command.getPagadorCieId());
 		dto.setPagadorcie(pagadorCieDto);
 		
-		if (command.getGrup() != null)
-			for (String grupNom: command.getGrup()) {
-				GrupDto grup = new GrupDto();
-				grup.setCodi(grupNom);
-				grup.setNom(grupNom);
-				
-				grupsDto.add(grup);
-				
-				dto.setGrups(grupsDto);
-			}
 		return dto;
 	}
 

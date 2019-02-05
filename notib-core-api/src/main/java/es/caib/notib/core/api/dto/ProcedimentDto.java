@@ -15,6 +15,16 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 	private PagadorCieDto pagadorcie;
 	private boolean agrupar;
 	private List<GrupDto> grups;
+	private String llibre;
+	private String oficina;
+	private TipusAssumpteEnumDto tipusAssumpte;
+	
+	private List<PermisDto> permisos;
+	private boolean usuariActualRead;
+	private boolean usuariActualProcessar;
+	private boolean usuariActualNotificacio;
+	private boolean usuariActualAdministration;
+	
 	private Date enviamentDataProgramada;
 	private int retard;
 	
@@ -84,6 +94,54 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 	}
 	public void setRetard(int retard) {
 		this.retard = retard;
+	}
+	public String getLlibre() {
+		return llibre;
+	}
+	public String getOficina() {
+		return oficina;
+	}
+	public TipusAssumpteEnumDto getTipusAssumpte() {
+		return tipusAssumpte;
+	}
+	public void setLlibre(String llibre) {
+		this.llibre = llibre;
+	}
+	public void setOficina(String oficina) {
+		this.oficina = oficina;
+	}
+	public void setTipusAssumpte(TipusAssumpteEnumDto tipusAssumpte) {
+		this.tipusAssumpte = tipusAssumpte;
+	}
+	public List<PermisDto> getPermisos() {
+		return permisos;
+	}
+	public boolean isUsuariActualRead() {
+		return usuariActualRead;
+	}
+	public boolean isUsuariActualProcessar() {
+		return usuariActualProcessar;
+	}
+	public boolean isUsuariActualNotificacio() {
+		return usuariActualNotificacio;
+	}
+	public boolean isUsuariActualAdministration() {
+		return usuariActualAdministration;
+	}
+	public void setPermisos(List<PermisDto> permisos) {
+		this.permisos = permisos;
+	}
+	public void setUsuariActualRead(boolean usuariActualRead) {
+		this.usuariActualRead = usuariActualRead;
+	}
+	public void setUsuariActualProcessar(boolean usuariActualProcessar) {
+		this.usuariActualProcessar = usuariActualProcessar;
+	}
+	public void setUsuariActualNotificacio(boolean usuariActualNotificacio) {
+		this.usuariActualNotificacio = usuariActualNotificacio;
+	}
+	public void setUsuariActualAdministration(boolean usuariActualAdministration) {
+		this.usuariActualAdministration = usuariActualAdministration;
 	}
 
 

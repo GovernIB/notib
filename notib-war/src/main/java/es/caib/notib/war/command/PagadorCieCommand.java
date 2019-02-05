@@ -4,7 +4,6 @@ import java.util.Date;
 import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
-import com.sun.istack.NotNull;
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
@@ -18,7 +17,6 @@ public class PagadorCieCommand {
 	private Long id;
 	@NotEmpty @Size(max=64)
 	private String dir3codi;
-	@NotNull
 	private Date contracteDataVig;
 	
 	

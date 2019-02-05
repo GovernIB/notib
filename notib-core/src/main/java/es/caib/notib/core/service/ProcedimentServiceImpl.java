@@ -1,28 +1,40 @@
 package es.caib.notib.core.service;
 
+import java.util.ArrayList;
 import java.util.List;
+
 import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
+import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.GrupEntity;
+import es.caib.notib.core.entity.GrupProcedimentEntity;
 import es.caib.notib.core.entity.PagadorCieEntity;
 import es.caib.notib.core.entity.PagadorPostalEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
+import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.ProcedimentHelper;
+import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 
@@ -40,19 +52,24 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Resource
 	private PaginacioHelper paginacioHelper;
 	@Resource
+	private PermisosHelper permisosHelper;
+	@Resource
 	private GrupService grupService;
 	@Resource
 	private GrupRepository grupRepository;
+	@Resource
+	private EntitatRepository entitatRepository;
+	@Resource
+	private GrupProcedimentRepository grupProcediment;
 	
 	@Override
-	public ProcedimentDto create(ProcedimentDto procediment) {
+	public ProcedimentDto create(
+			Long entitatId,
+			ProcedimentDto procediment) {
 		logger.debug("Creant un nou procediment ("
 				+ "procediment=" + procediment + ")");
 		
-		ProcedimentEntity procedimentEntity = null;
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				procediment.getEntitat().getId());
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 		
 		PagadorPostalEntity pagadorPostal = entityComprovarHelper.comprovarPagadorPostal(
 				procediment.getPagadorpostal().getId());
@@ -61,24 +78,19 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				procediment.getPagadorcie().getId());
 		
 		
-		procedimentEntity = procedimentRepository.save(
+		ProcedimentEntity procedimentEntity = procedimentRepository.save(
 				ProcedimentEntity.getBuilder(
 						procediment.getCodi(),
 						procediment.getNom(),
 						procediment.getCodisia(),
-						procediment.getEnviamentDataProgramada(),
 						procediment.getRetard(),
 						entitat,
 						pagadorPostal,
 						pagadorCie,
-						procediment.isAgrupar()).build());
-		
-		if (procediment.getGrups() != null)
-		grupService.create(
-				procedimentEntity.getId(), 
-				null, 
-				procediment.getGrups());
-		
+						procediment.isAgrupar(),
+						procediment.getLlibre(),
+						procediment.getOficina(),
+						procediment.getTipusAssumpte()).build());
 		
 		return conversioTipusHelper.convertir(
 				procedimentEntity, 
@@ -87,21 +99,22 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 
 	@Override
 	public ProcedimentDto update(
+			Long entitatId,
 			ProcedimentDto procediment) throws NotFoundException {
 		logger.debug("Actualitzant procediment ("
 				+ "procediment=" + procediment + ")");
 		
-		entityComprovarHelper.comprovarPermisos(
-				null,
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
 				true,
+				false,
 				true,
 				false);
 		
 		ProcedimentEntity procedimentEntity = entityComprovarHelper.comprovarProcediment(
+				entitat,
 				procediment.getId());
-		
-		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(
-				procediment.getEntitat().getId());
 		
 		PagadorPostalEntity pagadorPostalEntity = entityComprovarHelper.comprovarPagadorPostal(
 				procediment.getPagadorpostal().getId());
@@ -113,38 +126,37 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					procediment.getCodi(),
 					procediment.getNom(),
 					procediment.getCodisia(),
-					entitatEntity,
+					entitat,
 					pagadorPostalEntity,
 					pagadorCieEntity,
-					procediment.isAgrupar());
+					procediment.isAgrupar(),
+					procediment.getLlibre(),
+					procediment.getOficina(),
+					procediment.getTipusAssumpte());
 		
 		procedimentRepository.save(procedimentEntity);
-		
-		if (procediment.getGrups() != null)
-			grupService.create(
-					procedimentEntity.getId(), 
-					null, 
-					procediment.getGrups());
-		
-		//Si s'agrupen s'han d'eliminar els grups que li pertanyen
-		if(!procediment.isAgrupar()) {
-			List<GrupDto> grups = grupService.findByIdProcediment(procediment.getId());
 			
-			grupService.deleteGrupsProcediment(grups);
-		}
 		return conversioTipusHelper.convertir(
 				procedimentEntity, 
 				ProcedimentDto.class);
 	}
 
 	@Override
-	public ProcedimentDto delete(Long id) throws NotFoundException {
-		ProcedimentEntity procedimentEntity = entityComprovarHelper.comprovarProcediment(id);
+	public ProcedimentDto delete(
+			Long entitatId,
+			Long id) throws NotFoundException {
 		
-		//Eliminar grups
-		List<GrupEntity> grups = grupRepository.findByProcediment(procedimentEntity);
-		grupRepository.delete(grups);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				true,
+				false);
 		
+		ProcedimentEntity procedimentEntity = entityComprovarHelper.comprovarProcediment(
+				entitat, 
+				id);
+	
 		//Eliminar procediment
 		procedimentRepository.delete(procedimentEntity);
 		
@@ -153,20 +165,44 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				ProcedimentDto.class);
 	}
 
+	@Transactional(readOnly = true)
 	@Override
-	public ProcedimentDto findById(Long id) {
-		ProcedimentEntity procedimentEntity = procedimentRepository.findOne(id);
+	public ProcedimentDto findById(
+			Long entitatId,
+			Long id) {
+		logger.debug("Consulta del procediment ("
+				+ "entitatId=" + entitatId + ", "
+				+ "id=" + id + ")");
 		
-		return conversioTipusHelper.convertir(
-				procedimentEntity, 
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				true,
+				false);
+		
+		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
+				entitat,
+				id,
+				false,
+				false,
+				false,
+				false);
+		ProcedimentDto resposta = conversioTipusHelper.convertir(
+				procediment,
 				ProcedimentDto.class);
+		
+		if (resposta != null) {
+			procedimentHelper.omplirPermisosPerMetaNode(resposta, false);
+		}
+		
+		return resposta;
 	}
 
 	@Override
 	public List<ProcedimentDto> findByEntitat(Long entitatId) {
 		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 		
 		List<ProcedimentEntity> procediment = procedimentRepository.findByEntitat(entitat);
 		
@@ -177,33 +213,91 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 	
 	@Override
+	public List<ProcedimentDto> findProcedimnetsUsuariActual() {
+
+		return entityComprovarHelper.findPermisConsultaProcedimentsUsuariActual();
+	}
+	@Override
 	public PaginaDto<ProcedimentDto> findAmbFiltrePaginat(
 			Long entitatId,
+			boolean isUsuari,
+			boolean isUsuariEntitat,
+			boolean isAdministrador,
 			ProcedimentFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId);
-		
-		entityComprovarHelper.comprovarPermisos(
-				null,
+		entityComprovarHelper.comprovarEntitat(
+				entitatId,
 				true,
+				false,
 				true,
 				false);
-		Page<ProcedimentEntity> procediments = null;
-
-		procediments = procedimentRepository.findByEntitat(
-					entitat,
-					paginacioHelper.toSpringDataPageable(paginacioParams));
 		
-		return paginacioHelper.toPaginaDto(
-				procediments,
-				ProcedimentDto.class);
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId);
+		List<EntitatEntity> entitatsActiva = entitatRepository.findByActiva(true);
+		Page<ProcedimentEntity> procediments = null;
+		PaginaDto<ProcedimentDto> procedimentsPage = null;
+		
+		if (filtre == null) {
+			
+			if (isUsuariEntitat) {
+				procediments = procedimentRepository.findByEntitatActual(
+						entitatActual,
+						paginacioHelper.toSpringDataPageable(paginacioParams));
+				procedimentsPage =  paginacioHelper.toPaginaDto(
+						procediments,
+						ProcedimentDto.class);
+			} else if (isAdministrador) {
+				procediments = procedimentRepository.findByEntitatActiva(
+						entitatsActiva,
+						paginacioHelper.toSpringDataPageable(paginacioParams));
+				procedimentsPage =  paginacioHelper.toPaginaDto(
+						procediments,
+						ProcedimentDto.class);
+			}
+		} else {
+			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
+			
+			if (isUsuariEntitat) {
+				procediments = procedimentRepository.findByFiltre(
+						entitatActual == null,
+						entitatActual,
+						filtre.getCodi() == null || filtre.getCodi().isEmpty(), 
+						filtre.getCodi() == null ? "" : filtre.getCodi(),
+						filtre.getNom() == null || filtre.getNom().isEmpty(),
+						filtre.getNom() == null ? "" : filtre.getNom(),
+						filtre.getCodisia() == null || filtre.getCodisia().isEmpty(),
+						filtre.getCodisia() == null ? "" : filtre.getCodisia(),
+						pageable);
+				
+				procedimentsPage = paginacioHelper.toPaginaDto(
+						procediments, 
+						ProcedimentDto.class);
+				
+			} else if (isAdministrador) {
+				procediments = procedimentRepository.findByFiltre(
+						true,
+						entitatActual,
+						filtre.getCodi() == null || filtre.getCodi().isEmpty(), 
+						filtre.getCodi() == null ? "" : filtre.getCodi(),
+						filtre.getNom() == null || filtre.getNom().isEmpty(),
+						filtre.getNom() == null ? "" : filtre.getNom(),
+						filtre.getCodisia() == null || filtre.getCodisia().isEmpty(),
+						filtre.getCodisia() == null ? "" : filtre.getCodisia(),
+						pageable);
+				
+				procedimentsPage =  paginacioHelper.toPaginaDto(
+						procediments,
+						ProcedimentDto.class);
+			}
+		}
+		return procedimentsPage;
 	}
 	
 	@Override
 	public List<ProcedimentDto> findAll() {
 		logger.debug("Consulta de tots els procediments");
+		
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
@@ -221,12 +315,168 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 
 	@Override
-	public List<GrupDto> permisFindByProcedimentCodi(String codi) throws NotFoundException {
-		// TODO Auto-generated method stub
-		return null;
+	public List<GrupDto> permisFindByProcedimentCodi(
+			Long id) throws NotFoundException {
+		
+		List<GrupDto> grups = new ArrayList<GrupDto>();
+		
+		return grups;
 	}
 	
+	@Transactional
+	@Override
+	public List<PermisDto> permisFind(
+			Long entitatId,
+			Long id) {
+		logger.debug("Consulta dels permisos del meta-expedient ("
+				+ "entitatId=" + entitatId +  ", "
+				+ "id=" + id +  ")"); 
+		
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				true,
+				false);
+		
+		entityComprovarHelper.comprovarProcediment(
+				entitat, 
+				id, 
+				false, 
+				false, 
+				false, 
+				false);
+		
+		return permisosHelper.findPermisos(
+				id,
+				ProcedimentEntity.class);
+	}
+	
+	@Transactional
+	@Override
+	public void permisUpdate(
+			Long entitatId,
+			Long id,
+			PermisDto permis) {
+		logger.debug("Modificació del permis del procediment ("
+				+ "entitatId=" + entitatId +  ", "
+				+ "id=" + id + ", "
+				+ "permis=" + permis + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				true,
+				false);
+		entityComprovarHelper.comprovarProcediment(
+				entitat,
+				id,
+				false,
+				false,
+				false,
+				false);
+		permisosHelper.updatePermis(
+				id,
+				ProcedimentEntity.class,
+				permis);
+	}
+	
+	@Transactional
+	@Override
+	public void grupCreate(
+			Long entitatId, 
+			Long id, 
+			ProcedimentGrupDto procedimentGrup) throws NotFoundException {
+		logger.debug("Modificació del grup del procediment ("
+				+ "entitatId=" + entitatId +  ", "
+				+ "id=" + id + ", "
+				+ "permis=" + procedimentGrup + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				true,
+				false);
+		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
+				entitat,
+				id,
+				false,
+				false,
+				false,
+				false);
+		GrupEntity grup = entityComprovarHelper.comprovarGrup(procedimentGrup.getGrup().getId());
+		
+		GrupProcedimentEntity grupProcedimentEntity = GrupProcedimentEntity.getBuilder(
+				procediment, 
+				grup).build();
+		
+		grupProcediment.saveAndFlush(grupProcedimentEntity);
+	}
+	
+	@Transactional
+	@Override
+	public void grupUpdate(
+			Long entitatId, 
+			Long id, 
+			ProcedimentGrupDto procedimentGrup) throws NotFoundException {
+		logger.debug("Modificació del grup del procediment ("
+				+ "entitatId=" + entitatId +  ", "
+				+ "id=" + id + ", "
+				+ "permis=" + procedimentGrup + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				true,
+				false);
+		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
+				entitat,
+				id,
+				false,
+				false,
+				false,
+				false);
+		GrupEntity grup = entityComprovarHelper.comprovarGrup(procedimentGrup.getGrup().getId());
+		
+		GrupProcedimentEntity grupProcedimentEntity = entityComprovarHelper.comprovarGrupProcediment(
+				procedimentGrup.getId());
+		
+		grupProcedimentEntity.update(procediment, grup);
+		
+		grupProcediment.saveAndFlush(grupProcedimentEntity);
+	}
 
+
+	
+	@Override
+	public void permisDelete(
+			Long entitatId,
+			Long id,
+			Long permisId) {
+		logger.debug("Eliminació del permis del meta-expedient ("
+				+ "entitatId=" + entitatId +  ", "
+				+ "id=" + id + ", "
+				+ "permisId=" + permisId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				true,
+				false);
+		entityComprovarHelper.comprovarProcediment(
+				entitat,
+				id,
+				false,
+				false,
+				false,
+				false);
+		permisosHelper.deletePermis(
+				id,
+				ProcedimentEntity.class,
+				permisId);
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
 
 

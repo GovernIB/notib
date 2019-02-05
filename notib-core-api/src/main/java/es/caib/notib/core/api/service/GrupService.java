@@ -1,11 +1,14 @@
 package es.caib.notib.core.api.service;
 
 import java.util.List;
+
 import org.springframework.security.access.prepost.PreAuthorize;
+
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.GrupFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 
 /**
@@ -28,9 +31,8 @@ public interface GrupService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public GrupDto create(
-			Long procedimentId,
 			Long entitatId,
-			List<GrupDto> grups);
+			GrupDto grup);
 	
 	/**
 	 * Modifica els grups d'un procediment.
@@ -78,17 +80,21 @@ public interface GrupService {
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public GrupDto findById(Long id);
+	public GrupDto findById(
+			Long entitatId,
+			Long id);
 
 	/**
-	 * Consulta els  grups d'un procediment
+	 * Consulta un grup donat el seu codi.
 	 * 
 	 * @param id
 	 *            id del grup a trobar.
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public List<GrupDto> findByIdProcediment(Long procedimentId);
+	public PaginaDto<ProcedimentGrupDto> findByProcediment(
+			Long entitatId,
+			Long procedimentId);
 	
 	/**
 	 * Consulta un grup donat el seu codi.
@@ -98,9 +104,19 @@ public interface GrupService {
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public List<GrupDto> findByIdProcedimentAndGrupsId(
-			Long procedimentId,
-			List<Long> grupsId);
+	public ProcedimentGrupDto findGrupById(
+			Long entitatId,
+			Long grupId);
+	/**
+	 * Consulta els grups que pertanyen a una entitat
+	 * 
+	 * @param id
+	 *            id del grup a trobar.
+	 * @return El grup amb l'id especificat o null si no s'ha trobat.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public List<GrupDto> findByEntitat(Long entitatId);
+
 	
 	/**
 	 * Consulta dels grups segons els paràmetres del filtre.

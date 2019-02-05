@@ -15,10 +15,10 @@
 	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
-	<link href="<c:url value="/webjars/select2/4.0.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
-	<script src="<c:url value="/webjars/select2/4.0.1/dist/js/select2.min.js"/>"></script>
-	<script src="<c:url value="/webjars/select2/4.0.1/dist/js/i18n/${requestLocale}.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
@@ -26,176 +26,53 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
-	
 	<not:modalHead/>
 <script type="text/javascript">
 $(document).ready(function() {
-		
-	var count = 0;
-	
-	if(!$('#agrupar').is(':checked')){
-		$('#grups').hide();
-	};
-	
-	// Show input to add grup
-	$('#agrupar').change(function(){
-		if ($(this).is(':checked'))
-			$('#grups').slideDown("slow");
-		else
-			$('#grups').slideUp("slow");
-		
+	$('#tipusAssumpte').change(function(){
 		webutilModalAdjustHeight();
 	});
-	
-	//Afegir grups
-	$('#add').on('click', function () {
-			
-		var grupInput = 
-			"<div class='form-group'> " +
-				"<label class='control-label col-xs-4'></label>  " +
-				"<div class='col-xs-8'>  " +
-					"<div class='input-group'>  " +
-					"<input name='grup' id='grup' type='text' class='form-control add grupVal_" + count + "' readonly/>  " +
-					"<span class='input-group-addon' id='showPermisCheck'><span class='fa fa-angle-down'></span></span>  " +
-					"<span class='input-group-addon' id='remove'><span class='fa fa-remove'></span></span>  " +
-					"</div>  " +
-				"</div>  " +
-			"</div>";
-		
-		var val = $(".input-add").children().val();
-		if (val != ''){
-			
-			$("#list").prepend(grupInput);
-			$(".grupVal_" + count).attr("value", val);
-			$("#list").find("#remove").addClass("grupVal_" + count);
-			count++;
-		}
-		webutilModalAdjustHeight();
-	});
-	
-	//Eliminar grups
-	$(document).on('click', "#remove", function () {
-		
-		var grupId = $(this).parent().children().attr('id'); 
-		var grupsClass = $(this).attr('class'); 
-		var lastClass = grupsClass.split(' ').pop();
-		console.log(lastClass);
-		var parentRemove = $("." + lastClass).parent();
-		var parentInput = parentRemove.parent();
-		var parentDiv = parentInput.parent();
-		console.log(grupId);
-		var grupUrl = "grup/" + grupId + "/delete";
-		if (confirm('<spring:message code="grup.list.confirmacio.esborrar"/>') && !isNaN(grupId)) {
-			$.ajax({
-		        type: "GET",
-		        url: grupUrl,
-		        success: function (data) {
-					parentDiv.slideUp("normal", function() {
-						$(this).remove(); 
-						webutilModalAdjustHeight();
-					});
-		        }
-		    });
-		} else {
-			parentDiv.slideUp("normal", function() {
-				$(this).remove(); 
-				webutilModalAdjustHeight();
-			});
-		}
-	});
-	showPermisCheck();
-});		
-
-function addGrup() {
-
-}
-
-function showPermisCheck() {
-	//Mostrar permisos
-	$(document).on('click', "#showPermisCheck", function () {
-		
-		var grupId = $(this).parent().children().attr('id'); 
-		var grupsClass = $(this).attr('class'); 
-		var lastClass = grupsClass.split(' ').pop();
-		
-		var parentRemove = $("." + lastClass).parent();
-		var parentInput = parentRemove.parent();
-		var parentDiv = parentInput.parent();
-		var permisonDiv = document.getElementById("permision");
-		//var grupUrl = "grup/" + grupId + "/delete";
-		console.log(parentDiv);
-		parentDiv.on("click", function(){
-			$(this).append(permisonDiv);
-		});
-		
-		$("#permision").toggleClass("hidden");
-	});
-}
-</script>	
-
+});
+</script>
 </head>
 <body>
 	<c:set var="formAction"><not:modalUrl value="/procediment/newOrModify"/></c:set>
+	<ul class="nav nav-tabs" role="tablist">
+		<li role="presentation" class="active"><a href="#dadesgeneralsForm" aria-controls="dadesgeneralsForm" role="tab" data-toggle="tab"><spring:message code="procediment.form.titol.dadesgenerals"/></a></li>
+		<li role="presentation"><a href="#registreForm" aria-controls="registreForm" role="tab" data-toggle="tab"><spring:message code="procediment.form.titol.dadesregistre"/></a></li>
+	</ul>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="procedimentCommand" role="form">
 		<form:hidden path="id"/>
-		<div class="row">
-			<div class="col-md-3">
+		<div class="tab-content">
+			<div role="tabpanel" class="tab-pane active" id="dadesgeneralsForm">
 				<not:inputText name="codi" textKey="procediment.form.camp.codi" required="true"/>
-			</div>
-			<div class="col-md-3">
 				<not:inputText name="nom" textKey="procediment.form.camp.nom" required="true"/>
-			</div>
-			<div class="col-md-2">
 				<not:inputText name="codisia" textKey="procediment.form.camp.codisia" required="true"/>
-			</div>
-			<div class="col-md-3">
-				<not:inputDate name="enviamentDataProgramada" textKey="notificacio.form.camp.enviamentdata" />
-			</div>
-			<div class="col-md-3">
 				<not:inputText name="retard" textKey="notificacio.form.camp.retard"/>
-			</div>
-			<c:choose>
-			  <c:when test="${entitats != null}">
-			    <div class="col-md-2">
-					<not:inputSelect name="entitatId" textKey="procediment.form.camp.entitat" optionItems="${entitats}" optionValueAttribute="id" optionTextAttribute="nom" required="true"/>
-				</div>
-			  </c:when>
-			  <c:otherwise>
-			    <div class="col-md-2">
-			    	<form:hidden path="entitatId" value="${entitatId}"/>
-					<not:inputText name="entitatNom" textKey="procediment.form.camp.entitat" value="${entitat.nom}" required="true"></not:inputText>
-				</div>
-			  </c:otherwise>
-			</c:choose>
-			<div class="col-md-2">
+				<c:choose>
+				  <c:when test="${entitats != null}">
+						<not:inputSelect name="entitatId" textKey="procediment.form.camp.entitat" optionItems="${entitats}" optionValueAttribute="id" optionTextAttribute="nom" required="true"/>
+				  </c:when>
+				  <c:otherwise>
+				    	<form:hidden path="entitatId" value="${entitatId}"/>
+						<not:inputText name="entitatNom" textKey="procediment.form.camp.entitat" value="${entitat.nom}" required="true" readonly="true"/>
+				  </c:otherwise>
+				</c:choose>
 				<not:inputSelect name="pagadorPostalId" textKey="procediment.form.camp.postal" optionItems="${pagadorsPostal}" optionValueAttribute="id" optionTextAttribute="dir3codi" required="true"/>
-			</div>
-			<div class="col-md-2">
 				<not:inputSelect name="pagadorCieId" textKey="procediment.form.camp.cie" optionItems="${pagadorsCie}" optionValueAttribute="id" optionTextAttribute="dir3codi"/>
-			</div>
-			<div class="col-md-2">
 				<not:inputCheckbox name="agrupar" textKey="procediment.form.camp.agrupar"/>
+				
 			</div>
-			<div class="col-md-4" id="grups">	 	
-				<not:inputTextAdd name="grup" idIcon="add" textKey="procediment.form.camp.grups"/>
-				<div id="list"></div>
-				<c:if test="${grups != null}">
-					<c:forEach var="grup" items="${grups}" varStatus="status">
-							<not:inputTextShowGrup name="grup" classe="${grup.codi}" id="${grup.id}" value="${grup.nom}" readonly="true"/>
-					</c:forEach>
-				</c:if>		
-				<div id="permision" class="hidden">
-					<not:inputCheckbox name="consulta"></not:inputCheckbox>
-					<not:inputCheckbox name="processar"></not:inputCheckbox>
-					<not:inputCheckbox name="notificacio"></not:inputCheckbox>
-					<not:inputCheckbox name="gestio"></not:inputCheckbox>
-				</div>
+			<div role="tabpanel" class="tab-pane" id="registreForm">
+				<not:inputText name="llibre" textKey="procediment.form.camp.llibre"/>
+				<not:inputText name="oficina" textKey="procediment.form.camp.oficina"/>
+				<not:inputSelect name="tipusAssumpte" textKey="procediment.form.camp.tipusassumpte" optionItems="${tipusAssumpteEnum}"  optionValueAttribute="value" optionTextKeyAttribute="text"/>
 			</div>
-			<div id="modal-botons">
+		</div>
+		<div id="modal-botons">
 				<button id="addProcedimentButton" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 				<a href="<c:url value="/procediments"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
-			</div>	
-		</div>
+		</div>	
 	</form:form>
 	
 </body>

@@ -1,16 +1,29 @@
 package es.caib.notib.war.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.PagadorCieService;
 import es.caib.notib.core.api.service.PagadorPostalService;
 import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.war.command.PermisCommand;
+import es.caib.notib.war.helper.DatatablesHelper;
+import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
  * Controlador per el mantinemnt de permisos de procediments
@@ -38,11 +51,112 @@ public class ProcedimentPermisController extends BaseUserController{
 	@RequestMapping(value = "/{procedimentId}/permis", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
+			@PathVariable Long procedimentId,
 			Model model) {
-		/*model.addAttribute(new ProcedimentFiltreCommand());
-		ProcedimentFiltreCommand procedimentFiltreCommand = getFiltreCommand(request);
-		model.addAttribute("procedimentFiltreCommand", procedimentFiltreCommand);*/
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		model.addAttribute(
+				"procediment",
+				procedimentService.findById(
+						entitatActual.getId(),
+						procedimentId));
 		return "procedimentAdminPermis";
+	}
+
+	@RequestMapping(value = "/{procedimentId}/permis/datatable", method = RequestMethod.GET)
+	@ResponseBody
+	public DatatablesResponse datatable(
+			HttpServletRequest request, 
+			@PathVariable Long procedimentId, 
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return DatatablesHelper.getDatatableResponse(request,
+				procedimentService.permisFind(
+						entitatActual.getId(), 
+						procedimentId), 
+						"id");
+	}
+	
+	@RequestMapping(value = "/{procedimentId}/permis/new", method = RequestMethod.GET)
+	public String getNew(
+			HttpServletRequest request,
+			@PathVariable Long procedimentId,
+			Model model) {
+		return get(request, procedimentId, null, model);
+	}
+	
+	@RequestMapping(value = "/{procedimentId}/permis/{permisId}", method = RequestMethod.GET)
+	public String get(
+			HttpServletRequest request,
+			@PathVariable Long procedimentId,
+			@PathVariable Long permisId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		model.addAttribute(
+				"procediment",
+				procedimentService.findById(
+						entitatActual.getId(),
+						procedimentId));
+		PermisDto permis = null;
+		if (permisId != null) {
+			List<PermisDto> permisos = procedimentService.permisFind(
+					entitatActual.getId(),
+					procedimentId);
+			for (PermisDto p: permisos) {
+				if (p.getId().equals(permisId)) {
+					permis = p;
+					break;
+				}
+			}
+		}
+		if (permis != null)
+			model.addAttribute(PermisCommand.asCommand(permis));
+		else
+			model.addAttribute(new PermisCommand());
+		return "procedimentAdminPermisForm";
+	}
+	
+	@RequestMapping(value = "/{procedimentId}/permis", method = RequestMethod.POST)
+	public String save(
+			HttpServletRequest request,
+			@PathVariable Long procedimentId,
+			@Valid PermisCommand command,
+			BindingResult bindingResult,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		if (bindingResult.hasErrors()) {
+			model.addAttribute(
+					"entitat",
+					procedimentService.findById(
+							entitatActual.getId(),
+							procedimentId));
+			return "procedimentAdminPermisForm";
+		}
+		procedimentService.permisUpdate(
+				entitatActual.getId(),
+				procedimentId,
+				PermisCommand.asDto(command));
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../../procediment/" + procedimentId + "/permis",
+				"procediment.controller.permis.modificat.ok");
+	}
+	
+	@RequestMapping(value = "/{procedimentId}/permis/{permisId}/delete", method = RequestMethod.GET)
+	public String delete(
+			HttpServletRequest request,
+			@PathVariable Long procedimentId,
+			@PathVariable Long permisId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		procedimentService.permisDelete(
+				entitatActual.getId(),
+				procedimentId,
+				permisId);
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:../../../../procediment/" + procedimentId + "/permis",
+				"procediment.controller.permis.esborrat.ok");
 	}
 	
 }

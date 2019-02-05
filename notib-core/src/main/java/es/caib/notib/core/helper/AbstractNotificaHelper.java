@@ -33,32 +33,19 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.core.api.dto.SeuEstatEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
-import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
-import es.caib.notib.core.wsdl.seu.CertificacionSede;
-import es.caib.notib.core.wsdl.seu.ComunicacionSede;
-import es.caib.notib.core.wsdl.seu.ResultadoCertificacionSede;
-import es.caib.notib.core.wsdl.seu.ResultadoComunicacionSede;
 import es.caib.notib.core.wsdl.seu.SedeWsPortType;
-import es.caib.notib.plugin.seu.SeuDocument;
 
 /**
  * Mètodes comuns per a accedir a Notific@.

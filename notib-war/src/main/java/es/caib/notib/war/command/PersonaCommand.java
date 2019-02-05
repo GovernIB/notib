@@ -2,15 +2,21 @@ package es.caib.notib.war.command;
 
 import java.util.List;
 
+import javax.validation.constraints.Size;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.validator.constraints.NotEmpty;
+
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
 public class PersonaCommand {
 
+	@NotEmpty @Size(max=50)
 	private String nom;
 	private String llinatge1;
 	private String llinatge2;
+	@NotEmpty @Size(max=50)
 	private String nif;
 	private String telefon;
 	private String email;
