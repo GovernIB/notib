@@ -110,6 +110,7 @@
 						$('span', $cell).click(function() {
 							$(this).parent().trigger('click');
 						});
+						console.log($cell);
 					}
 					if (plugin.settings.dragEnabled) {
 						var $cell;
@@ -248,11 +249,9 @@
 						
 						var $cellFilter = $('th:first', $rowFilter);
 						
-						//ACABAR
-						$cellFilter.append($(plugin.settings.cellTemplate).html());
-						//$cellFilter.attr("disabled", "disabled");
-						//$buttonFilter = getButtonFiltrer();
-						
+						if($($cellFilter).children().get(0) == null){
+							$cellFilter.append($(plugin.settings.cellTemplate).html());
+						}
 						$cellFilter.on('click', function() {
 							$rowFilter.each(function(index) {
 								$(this).each(function(index) {
@@ -409,6 +408,12 @@
 				//Scroll horitzontal
 				if (plugin.settings.pagingStyleX == true) {
 					dataTableOptions['scrollX'] = plugin.settings.pagingStyleX;
+					dataTableOptions = $.extend({
+						fixedColumns:   {
+				            leftColumns: 1
+				        }
+					}, dataTableOptions);
+					
 				}
 				if (plugin.settings.pagingStyle == 'page') {
 					dataTableOptions = $.extend({
@@ -466,7 +471,7 @@
 						info: false
 					}
 				}, dataTableOptions);
-				var triggerSelectionChangeFunction = function () {
+				var triggerSelectionChangeFunction = function (accio, indexosAfectats) {
 					var api = $taula.dataTable().api();
 					var numRows = api.data().length;
 					var selectedRowsData = api.rows({
@@ -474,34 +479,25 @@
 						selected: true}).data();
 					var numSelected = selectedRowsData.length;
 					var $row = headerTrFunction();
-					var $rowFilter = headerTrFilterFunction();
-					
 					var $cell = $('th:first', $row);
-					var $cellFilter = $('th:first', $rowFilter);
-					
 					if (numSelected == 0) {
 						$cell.empty().append('<span class="fa fa-square-o"></span>');
-						
-						$cellFilter.html('');
-						$cellFilter.append($(plugin.settings.cellTemplate).html());
 					} else if (numSelected < numRows) {
 						$cell.empty().append('<span class="fa fa-minus-square-o"></span>');
-						
-						$cellFilter.html('');
-						$cellFilter.append($(plugin.settings.cellTemplate).html());
 					} else {
 						$cell.empty().append('<span class="fa fa-check-square-o"></span>');
-						
-						$cellFilter.html('');
-						$cellFilter.append($(plugin.settings.cellTemplate).html());
 					}
-					var ids = [];
+					var afectatIds = [];
+					for (var d = 0; d < indexosAfectats.length; d++) {
+						afectatIds.push(api.row(indexosAfectats[d]).data()['DT_Id']);
+					}
+					var selectedIds = [];
 					for (var d = 0; d < selectedRowsData.length; d++) {
-						ids.push(selectedRowsData[d]['DT_Id']);
+						selectedIds.push(selectedRowsData[d]['DT_Id']);
 					}
 					$taula.trigger(
 							'selectionchange.dataTable',
-							[ids]);
+							[accio, afectatIds, selectedIds]);
 				};
 				$taula.on('select.dt', function (e, dt, type, indexes) {
 					if (indexes) {
@@ -513,7 +509,7 @@
 								$(this).parent().trigger('click');
 							});
 						}
-						triggerSelectionChangeFunction();
+						triggerSelectionChangeFunction('select', indexes);
 					}
 				});
 				$taula.on('deselect.dt', function (e, dt, type, indexes) {
@@ -526,7 +522,7 @@
 								$(this).parent().trigger('click');
 							});
 						}
-						triggerSelectionChangeFunction();
+						triggerSelectionChangeFunction('deselect', indexes);
 					}
 				});
 			}

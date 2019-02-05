@@ -22,8 +22,16 @@ public class PermisDto implements Serializable {
 	private boolean create;
 	private boolean delete;
 	private boolean administration;
-	private boolean representant;
+	
+	private boolean usuari;
+	private boolean administrador;
+	private boolean administradorEntitat;
 	private boolean aplicacio;
+	
+	private boolean consulta;
+	private boolean processar;
+	private boolean notificacio;
+	private boolean gestio;
 
 	public Long getId() {
 		return id;
@@ -73,13 +81,25 @@ public class PermisDto implements Serializable {
 	public void setAdministration(boolean administration) {
 		this.administration = administration;
 	}
-	public boolean isRepresentant() {
-		return representant;
-	}
-	public void setRepresentant(boolean representant) {
-		this.representant = representant;
-	}
 	
+	public boolean isUsuari() {
+		return usuari;
+	}
+	public boolean isAdministrador() {
+		return administrador;
+	}
+	public boolean isAdministradorEntitat() {
+		return administradorEntitat;
+	}
+	public void setUsuari(boolean usuari) {
+		this.usuari = usuari;
+	}
+	public void setAdministrador(boolean administrador) {
+		this.administrador = administrador;
+	}
+	public void setAdministradorEntitat(boolean administradorEntitat) {
+		this.administradorEntitat = administradorEntitat;
+	}
 	public boolean isAplicacio() {
 		return aplicacio;
 	}
@@ -87,6 +107,30 @@ public class PermisDto implements Serializable {
 		this.aplicacio = aplicacio;
 	}
 	
+	public boolean isConsulta() {
+		return consulta;
+	}
+	public boolean isProcessar() {
+		return processar;
+	}
+	public boolean isNotificacio() {
+		return notificacio;
+	}
+	public boolean isGestio() {
+		return gestio;
+	}
+	public void setConsulta(boolean consulta) {
+		this.consulta = consulta;
+	}
+	public void setProcessar(boolean processar) {
+		this.processar = processar;
+	}
+	public void setNotificacio(boolean notificacio) {
+		this.notificacio = notificacio;
+	}
+	public void setGestio(boolean gestio) {
+		this.gestio = gestio;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

@@ -254,7 +254,7 @@ public class EntitatServiceImpl implements EntitatService {
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
-				true,
+				false,
 				false );
 		permisosHelper.updatePermis(
 				entitatId,

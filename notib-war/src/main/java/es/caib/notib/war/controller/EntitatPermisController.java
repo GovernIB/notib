@@ -95,10 +95,15 @@ public class EntitatPermisController extends BaseController {
 			@Valid PermisCommand command,
 			BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
+			model.addAttribute(
+					"entitat",
+					entitatService.findById(entitatId));
 			return "entitatPermisForm";
 		}
-		PermisDto dto = PermisCommand.asDto(command);
-		entitatService.permisUpdate(entitatId, dto);
+		
+		entitatService.permisUpdate(
+				entitatId, 
+				PermisCommand.asDto(command));
 		String msg;
 		if (command.getId() == null) {
 			msg = "entitat.controller.permis.creat.ok";

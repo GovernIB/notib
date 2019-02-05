@@ -10,6 +10,5 @@ package es.caib.notib.core.api.dto;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum PermisosEnumDto {
-	Representant,
-	Aplicacio
+	Grup
 }

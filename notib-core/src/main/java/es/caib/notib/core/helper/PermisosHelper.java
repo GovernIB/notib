@@ -374,10 +374,18 @@ public class PermisosHelper {
 						permis.setDelete(true);
 					if (ExtendedPermission.ADMINISTRATION.equals(ace.getPermission()))
 						permis.setAdministration(true);
-					if (ExtendedPermission.REPRESENTANT.equals(ace.getPermission()))
-						permis.setRepresentant(true);
+					if (ExtendedPermission.USUARI.equals(ace.getPermission()))
+						permis.setUsuari(true);
+					if (ExtendedPermission.ADMINISTRADOR.equals(ace.getPermission()))
+						permis.setAdministrador(true);
+					if (ExtendedPermission.ADMINISTRADORENTITAT.equals(ace.getPermission()))
+						permis.setAdministradorEntitat(true);
 					if (ExtendedPermission.APLICACIO.equals(ace.getPermission()))
 						permis.setAplicacio(true);
+					if (ExtendedPermission.PROCESSAR.equals(ace.getPermission()))
+						permis.setProcessar(true);
+					if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission()))
+						permis.setNotificacio(true);
 				}
 			}
 			resposta.addAll(permisosUsuari.values());
@@ -489,10 +497,22 @@ public class PermisosHelper {
 //			permissions.add(ExtendedPermission.DELETE);
 //		if (permis.isAdministration())
 //			permissions.add(ExtendedPermission.ADMINISTRATION);
-		if (permis.isRepresentant())
-			permissions.add(ExtendedPermission.REPRESENTANT);
+		if (permis.isUsuari())
+			permissions.add(ExtendedPermission.USUARI);
+		if (permis.isAdministrador())
+			permissions.add(ExtendedPermission.ADMINISTRADOR);
+		if (permis.isAdministradorEntitat())
+			permissions.add(ExtendedPermission.ADMINISTRADORENTITAT);
 		if (permis.isAplicacio())
 			permissions.add(ExtendedPermission.APLICACIO);
+		if (permis.isRead())
+			permissions.add(ExtendedPermission.READ);
+		if (permis.isAdministration())
+			permissions.add(ExtendedPermission.ADMINISTRATION);
+		if (permis.isProcessar())
+			permissions.add(ExtendedPermission.PROCESSAR);
+		if (permis.isNotificacio())
+			permissions.add(ExtendedPermission.NOTIFICACIO);
 		
 		return permissions.toArray(new Permission[permissions.size()]);
 	}

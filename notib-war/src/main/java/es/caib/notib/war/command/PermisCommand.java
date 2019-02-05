@@ -33,8 +33,16 @@ public class PermisCommand {
 	private boolean create;
 	private boolean delete;
 	private boolean administration;
-	private boolean representant;
+	
+	private boolean usuari;
+	private boolean administrador;
+	private boolean administradorEntitat;
 	private boolean aplicacio;
+	
+	private boolean processar;
+	private boolean notificacio;
+	
+	private boolean selectAll;
 
 	public Long getId() {
 		return id;
@@ -84,14 +92,25 @@ public class PermisCommand {
 	public void setAdministration(boolean administration) {
 		this.administration = administration;
 	}
-
-	public boolean isRepresentant() {
-		return representant;
-	}
-	public void setRepresentant(boolean representant) {
-		this.representant = representant;
-	}
 	
+	public boolean isUsuari() {
+		return usuari;
+	}
+	public boolean isAdministrador() {
+		return administrador;
+	}
+	public boolean isAdministradorEntitat() {
+		return administradorEntitat;
+	}
+	public void setUsuari(boolean usuari) {
+		this.usuari = usuari;
+	}
+	public void setAdministrador(boolean administrador) {
+		this.administrador = administrador;
+	}
+	public void setAdministradorEntitat(boolean administradorEntitat) {
+		this.administradorEntitat = administradorEntitat;
+	}
 	public boolean isAplicacio() {
 		return aplicacio;
 	}
@@ -99,6 +118,25 @@ public class PermisCommand {
 		this.aplicacio = aplicacio;
 	}
 	
+	public boolean isProcessar() {
+		return processar;
+	}
+	public boolean isNotificacio() {
+		return notificacio;
+	}
+	public void setProcessar(boolean processar) {
+		this.processar = processar;
+	}
+	public void setNotificacio(boolean notificacio) {
+		this.notificacio = notificacio;
+	}
+	
+	public boolean isSelectAll() {
+		return selectAll;
+	}
+	public void setSelectAll(boolean selectAll) {
+		this.selectAll = selectAll;
+	}
 	public static List<PermisCommand> toPermisCommands(
 			List<PermisDto> dtos) {
 		List<PermisCommand> commands = new ArrayList<PermisCommand>();

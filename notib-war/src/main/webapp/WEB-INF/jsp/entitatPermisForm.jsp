@@ -24,7 +24,32 @@
 				$("form#permisCommand *:disabled").attr('readonly', 'readonly');
 				$("form#permisCommand *:disabled").removeAttr('disabled');
 			});
+			
+			<c:if test="${empty permisCommand.id}">
+				disableGuardarIfNoneChecked();
+				$("input[type='checkbox']").change(function( index, element ) { 
+					disableGuardarIfNoneChecked();
+				});
+			</c:if>		
 		});
+		
+		function disableGuardarIfNoneChecked(){
+			var anyChecked=false;
+			$("input[type='checkbox']").each(function( index, element ) { 
+				if ($( element ).is(':checked')){
+				anyChecked=true;			
+				}
+			}); 
+			if(anyChecked==true){
+				$(".submitDialog",parent.document).prop('disabled',false)
+				$(".submitDialog").prop('disabled',false)
+
+			} else {
+				$(".submitDialog",parent.document).prop('disabled',true)
+				$(".submitDialog").prop('disabled',true)
+
+			}
+		}
 	</script>
 </head>
 <body>
@@ -32,8 +57,10 @@
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
 		<form:hidden path="id"/>
 		<not:inputSelect name="tipus" textKey="entitat.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="TipusEnumDto"/>
-		<not:inputText name="principal" textKey="entitat.permis.form.camp.principal" required="true" disabled="${not empty permisCommand.id}"/>
-		<not:inputCheckbox name="representant" textKey="entitat.permis.form.camp.representant"/>
+		<not:inputText name="principal" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}"/>
+		<not:inputCheckbox name="usuari" textKey="entitat.permis.form.camp.usuari"/>
+		<not:inputCheckbox name="administrador" textKey="entitat.permis.form.camp.administrador"/>
+		<not:inputCheckbox name="administradorEntitat" textKey="entitat.permis.form.camp.administradorentitat"/>
 		<not:inputCheckbox name="aplicacio" textKey="entitat.permis.form.camp.aplicacio"/>
 		<div id="modal-botons" class="col-xs-12 text-right">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>

@@ -35,7 +35,9 @@
 		class="table table-striped table-bordered">
 		<thead>
 			<tr>
-				<th data-col-name="representant" data-visible="false"></th>
+				<th data-col-name="usuari" data-visible="false"></th>
+				<th data-col-name="administrador" data-visible="false"></th>
+				<th data-col-name="administradorEntitat" data-visible="false"></th>
 				<th data-col-name="aplicacio" data-visible="false"></th>
 				<th data-col-name="tipus" data-renderer="enum(TipusEnumDto)">
 					<spring:message code="entitat.permis.list.columna.tipus"/>
@@ -44,7 +46,9 @@
 				<th data-template="#cellPermisosTemplate">
 					<spring:message code="entitat.permis.list.columna.permisos"/>
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
-						{{if representant}}<span class="label label-default"><spring:message code="entitat.permis.list.permis.representant"/></span>{{/if}}
+						{{if usuari}}<span class="label label-default"><spring:message code="entitat.permis.list.permis.usuari"/></span>{{/if}}
+						{{if administrador}}<span class="label label-default"><spring:message code="entitat.permis.list.permis.administrador"/></span>{{/if}}
+						{{if administradorEntitat}}<span class="label label-default"><spring:message code="entitat.permis.list.permis.administradorentitat"/></span>{{/if}}
 						{{if aplicacio}}<span class="label label-default"><spring:message code="entitat.permis.list.permis.aplicacio"/></span>{{/if}}
 					</script>
 				</th>
