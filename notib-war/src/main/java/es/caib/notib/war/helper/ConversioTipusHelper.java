@@ -3,7 +3,6 @@
  */
 package es.caib.notib.war.helper;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 

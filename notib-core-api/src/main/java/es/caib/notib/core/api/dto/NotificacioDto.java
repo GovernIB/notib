@@ -4,6 +4,7 @@
 package es.caib.notib.core.api.dto;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -52,6 +53,12 @@ public class NotificacioDto extends AuditoriaDto {
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
 	private EntitatDto entitat;
+	
+	private List<PermisDto> permisos;
+	private boolean usuariActualRead;
+	private boolean usuariActualProcessar;
+	private boolean usuariActualNotificacio;
+	private boolean usuariActualAdministration;
 
 	public Long getId() {
 		return id;
@@ -280,6 +287,36 @@ public class NotificacioDto extends AuditoriaDto {
 		return notificaErrorData != null;
 	}
 
+	public List<PermisDto> getPermisos() {
+		return permisos;
+	}
+	public boolean isUsuariActualRead() {
+		return usuariActualRead;
+	}
+	public boolean isUsuariActualProcessar() {
+		return usuariActualProcessar;
+	}
+	public boolean isUsuariActualNotificacio() {
+		return usuariActualNotificacio;
+	}
+	public boolean isUsuariActualAdministration() {
+		return usuariActualAdministration;
+	}
+	public void setPermisos(List<PermisDto> permisos) {
+		this.permisos = permisos;
+	}
+	public void setUsuariActualRead(boolean usuariActualRead) {
+		this.usuariActualRead = usuariActualRead;
+	}
+	public void setUsuariActualProcessar(boolean usuariActualProcessar) {
+		this.usuariActualProcessar = usuariActualProcessar;
+	}
+	public void setUsuariActualNotificacio(boolean usuariActualNotificacio) {
+		this.usuariActualNotificacio = usuariActualNotificacio;
+	}
+	public void setUsuariActualAdministration(boolean usuariActualAdministration) {
+		this.usuariActualAdministration = usuariActualAdministration;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

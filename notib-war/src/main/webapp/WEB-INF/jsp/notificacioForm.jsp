@@ -26,10 +26,10 @@
 	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
-	<link href="<c:url value="/webjars/select2/4.0.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
-	<script src="<c:url value="/webjars/select2/4.0.1/dist/js/select2.min.js"/>"></script>
-	<script src="<c:url value="/webjars/select2/4.0.1/dist/js/i18n/${requestLocale}.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<link href="<c:url value="/css/jasny-bootstrap.min.css"/>" rel="stylesheet">
 	<script src="<c:url value="/js/jasny-bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
@@ -231,9 +231,6 @@ function comprovarGrups(agrupable, procedimentId) {
 								<select class="form-control" style="width:100%" name="grupId" id="grupId"></select>
 							</div>
 						</div>
-						<!--
-						<not:inputSelect name="grupId" textKey="notificacio.form.camp.grup" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2"/>
-						-->
 					</div>
 				</div>
 			</div>
@@ -259,14 +256,35 @@ function comprovarGrups(agrupable, procedimentId) {
 			</div>
 			<div role="tabpanel" class="tab-pane" id="parametresregistreForm">
 				<div class="row parametresregistreForm">
-					<div class="col-md-12">
-						<not:inputText name="organ" textKey="notificacio.form.camp.organ" labelSize="2"/>
+					<div class="col-md-6">
+						<not:inputText name="oficina" textKey="notificacio.form.camp.oficina" labelSize="4"/>
+					</div>
+					<div class="col-md-6">
+						<not:inputText name="llibre" textKey="notificacio.form.camp.llibre" labelSize="4"/>
+					</div>
+					<div class="col-md-6">
+						<not:inputText name="extracte" textKey="notificacio.form.camp.extracte" labelSize="4"/>
+					</div>
+					<div class="col-md-6">
+						<not:inputText name="docFisica" textKey="notificacio.form.camp.doc" labelSize="4"/>
+					</div>
+					<div class="col-md-6">
+						<not:inputText name="idioma" textKey="notificacio.form.camp.idioma" labelSize="4"/>
+					</div>
+					<div class="col-md-6">
+						<not:inputText name="tipusAssumpte" textKey="notificacio.form.camp.tipus" labelSize="4"/>
+					</div>
+					<div class="col-md-6">
+						<not:inputText name="numExpedient" textKey="notificacio.form.camp.expedient" labelSize="4"/>
+					</div>
+					<div class="col-md-6">
+						<not:inputText name="refExterna" textKey="notificacio.form.camp.externa" labelSize="4"/>
+					</div>
+					<div class="col-md-6">
+						<not:inputText name="codiAssumpte" textKey="notificacio.form.camp.codi" labelSize="4"/>
 					</div>
 					<div class="col-md-12">
-						<not:inputText name="llibre" textKey="notificacio.form.camp.llibre" labelSize="2"/>
-					</div>
-					<div class="col-md-12">
-						<not:inputText name="oficina" textKey="notificacio.form.camp.oficina" labelSize="2"/>
+						<not:inputTextarea name="observacions" textKey="notificacio.form.camp.observacions" labelSize="2"/>
 					</div>
 				</div>
 			</div>

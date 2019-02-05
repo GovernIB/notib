@@ -3,7 +3,6 @@
  */
 package es.caib.notib.core.api.dto;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -20,12 +19,14 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private String usuari;
 	private NotificacioDtoV2 notificacio;
 	private String titularNom;
+	private String titularNomLlinatges;
 	private String titularLlinatge1;
 	private String titularLlinatge2;
 	private String titularNif;
 	private String titularEmail;
 	private String titularRaoSocial;
 	private String destinatariNom;
+	private String destinatariNomLlinatges;
 	private String destinatariLlinatge1;
 	private String destinatariLlinatge2;
 	private String destinatariRaoSocial;
@@ -141,6 +142,30 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	public void setDestinatariEmail(String destinatariEmail) {
 		this.destinatariEmail = destinatariEmail;
 	}
+	public void setTitularNomLlinatges(String titularNomLlinatges) {
+		this.titularNomLlinatges = titularNomLlinatges;
+	}
+	public String getTitularNomLlinatges() {
+		titularNomLlinatges = concatenarNomLlinatges(
+				getTitularLlinatges(),
+				titularNom,
+				titularRaoSocial,
+				null);
+		
+		return titularNomLlinatges;
+	}
+	public String getDestinatariNomLlinatges() {
+		destinatariNomLlinatges = concatenarNomLlinatges(
+				getDestinatariLlinatges(),
+				destinatariNom,
+				destinatariRaoSocial,
+				destinatariNif);
+		
+		return destinatariNomLlinatges;
+	}
+	public void setDestinatariNomLlinatges(String destinatariNomLlinatges) {
+		this.destinatariNomLlinatges = destinatariNomLlinatges;
+	}
 	public String getTitularLlinatges() {
 		return concatenarLlinatges(
 				titularLlinatge1,
@@ -196,6 +221,38 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 		if (llinatge2 != null && !llinatge2.isEmpty()) {
 			sb.append(" ");
 			sb.append(llinatge2);
+		}
+		return sb.toString();
+	}
+	
+	private String concatenarNomLlinatges(
+			String llinatges,
+			String nom,
+			String raoSocial,
+			String destinatariNif) {
+		StringBuilder sb = new StringBuilder();
+		
+		if (destinatariNif != null) {
+			sb.append(destinatariNif);
+			sb.append(" - ");
+		}
+		if (llinatges != null && !llinatges.isEmpty()) {
+			sb.append("[");
+			sb.append(llinatges);
+		}
+		
+		if (nom != null && !nom.isEmpty()) {
+			sb.append(", ");
+			sb.append(nom);
+			
+			if (raoSocial == null) {
+				sb.append("]");
+			}
+		}
+		if (raoSocial != null && !raoSocial.isEmpty()) {
+			sb.append(" | ");
+			sb.append(raoSocial);
+			sb.append("]");
 		}
 		return sb.toString();
 	}

@@ -47,7 +47,9 @@ public interface NotificacioService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public NotificacioDtoV2 update(NotificacioDtoV2 notificacio) throws NotFoundException;
+	public NotificacioDtoV2 update(
+			Long entitatId,
+			NotificacioDtoV2 notificacio) throws NotFoundException;
 	
 	/**
 	 * Consulta una notificació donat el seu id.
@@ -57,7 +59,8 @@ public interface NotificacioService {
 	 * @return La notificació amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public NotificacioDto findAmbId(Long id);
+	public NotificacioDto findAmbId(
+			Long id);
 
 	/**
 	 * Consulta de les notificacions segons els paràmetres del filtre.
@@ -70,6 +73,10 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
+			Long entitatId,
+			boolean isUsuari,
+			boolean isUsuariEntitat,
+			boolean isSuperUsuari,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
 
@@ -82,6 +89,7 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public List<NotificacioEventDto> eventFindAmbNotificacio(
+			Long entitatId,
 			Long notificacioId);
 
 	/**
@@ -95,6 +103,7 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public List<NotificacioEventDto> eventFindAmbEnviament(
+			Long entitatId,
 			Long notificacioId,
 			Long enviamentId);
 	
@@ -129,6 +138,7 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public boolean enviar(
+			Long entitatId,
 			Long notificacioId);
 
 	/**
@@ -140,54 +150,14 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(
+			Long entitatId,
 			Long enviamentId);
 
-	/**
-	 * Comunica a Notific@ la lectura en seu d'un enviament.
-	 * 
-	 * @param enviamentId
-	 *            Atribut id de l'enviament.
-	 */
-/*	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public boolean enviamentComunicacioSeu(
-			Long enviamentId);
-*/
-	/**
-	 * Enviar a Notific@ la certificació d'un enviament.
-	 * 
-	 * @param enviamentId
-	 *            Atribut id de l'enviament.
-	 * @param certificacioArxiu
-	 *            Arxiu amb el certificat.
-	 */
-/*	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public boolean enviamentCertificacioSeu(
-			Long enviamentId,
-			ArxiuDto certificacioArxiu);
-*/
 	/**
 	 * Mètode d'execució periòdica per a fer els enviaments pendents
 	 * a Notific@.
 	 */
 	public void notificaEnviamentsPendents();
-
-	/**
-	 * Mètode d'execució periòdica per a fer els enviaments pendents
-	 * a la seu.
-	 */
-	//public void seuEnviamentsPendents();
-
-	/**
-	 * Mètode d'execució periòdica per a refrescar l'estat de les notificacions
-	 * pendents a la seu.
-	 */
-	//public void seuConsultaEstatNotificacions();
-
-	/**
-	 * Mètode d'execució periòdica per a comunicar a Notifica els canvis d'estat
-	 * de les notificacions de la seu.
-	 */
-	//public void notificaInformaCanviEstatSeu();
 
 	/**
 	 * Mètode d'execució periòdica per a refrescar l'estat dels enviaments fets a

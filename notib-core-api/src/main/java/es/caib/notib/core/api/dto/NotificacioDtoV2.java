@@ -39,6 +39,17 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private boolean entregaPostalActiva;
 	private EntregaPostalDto entregaPostal;
 	private EntregaDehDto entregaDeh;
+	// Paràmetres registre
+	private String oficina;
+	private String llibre;
+	private String extracte;
+	private String docFisica;
+	private String idioma;
+	private TipusAssumpteEnumDto tipusAssumpte;
+	private String numeroExpedient;
+	private String refExterna;
+	private String codiAssumpte;
+	private String observacions;
 	
 	
 	
@@ -186,7 +197,66 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	public void setEntregaDeh(EntregaDehDto entregaDeh) {
 		this.entregaDeh = entregaDeh;
 	}
-
+	public String getOficina() {
+		return oficina;
+	}
+	public void setOficina(String oficina) {
+		this.oficina = oficina;
+	}
+	public String getLlibre() {
+		return llibre;
+	}
+	public void setLlibre(String llibre) {
+		this.llibre = llibre;
+	}
+	public String getExtracte() {
+		return extracte;
+	}
+	public String getDocFisica() {
+		return docFisica;
+	}
+	public String getIdioma() {
+		return idioma;
+	}
+	public TipusAssumpteEnumDto getTipusAssumpte() {
+		return tipusAssumpte;
+	}
+	public String getNumeroExpedient() {
+		return numeroExpedient;
+	}
+	public String getRefExterna() {
+		return refExterna;
+	}
+	public String getCodiAssumpte() {
+		return codiAssumpte;
+	}
+	public String getObservacions() {
+		return observacions;
+	}
+	public void setExtracte(String extracte) {
+		this.extracte = extracte;
+	}
+	public void setDocFisica(String docFisica) {
+		this.docFisica = docFisica;
+	}
+	public void setIdioma(String idioma) {
+		this.idioma = idioma;
+	}
+	public void setTipusAssumpte(TipusAssumpteEnumDto tipusAssumpte) {
+		this.tipusAssumpte = tipusAssumpte;
+	}
+	public void setNumeroExpedient(String numeroExpedient) {
+		this.numeroExpedient = numeroExpedient;
+	}
+	public void setRefExterna(String refExterna) {
+		this.refExterna = refExterna;
+	}
+	public void setCodiAssumpte(String codiAssumpte) {
+		this.codiAssumpte = codiAssumpte;
+	}
+	public void setObservacions(String observacions) {
+		this.observacions = observacions;
+	}
 	public boolean isNotificaError() {
 		return notificaErrorData != null;
 	}

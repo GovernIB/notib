@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.NotificaComunicacioTipusEnumDto;
@@ -16,6 +18,7 @@ import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
+import es.caib.notib.core.api.dto.TipusAssumpteEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
@@ -26,25 +29,39 @@ import es.caib.notib.war.helper.ConversioTipusHelper;
  */
 public class NotificacioCommandV2 {
 
+	
 	private Long id;
+	@NotEmpty @Size(max=64)
 	private String emisorDir3Codi;
+	@NotEmpty @Size(max=64)
 	private NotificaComunicacioTipusEnumDto comunicacioTipus;
+	@NotEmpty @Size(max=64)
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
-	@Size(max=50)
+	@NotEmpty @Size(max=50)
 	private String concepte;
 	private String descripcio;
 	private Date enviamentDataProgramada;
 	private int retard;
 	private Date caducitat;
+	@NotNull @Size(max=50)
 	private DocumentCommand document;
+	@NotEmpty @Size(max=50)
 	private Long procedimentId;
 	private Long grupId;
 	private TipusDocumentEnumDto tipusDocument;
 	private String documentArxiuUuidCsv;
 	private MultipartFile arxiu;
-	private String organ;
-	private String llibre;
+	//Paràmetres registre
 	private String oficina;
+	private String llibre;
+	private String extracte;
+	private String docFisica;
+	private String idioma;
+	private TipusAssumpteEnumDto tipusAssumpte;
+	private String numExpedient;
+	private String refExterna;
+	private String codiAssumpte;
+	private String observacions;
 	
 	// Enviament
 	private ServeiTipusEnumDto serveiTipus;
@@ -188,25 +205,66 @@ public class NotificacioCommandV2 {
 	public void setDocument(DocumentCommand document) {
 		this.document = document;
 	}
-	public String getOrgan() {
-		return organ;
-	}
-	public void setOrgan(String organ) {
-		this.organ = organ;
+	public String getOficina() {
+		return oficina;
 	}
 	public String getLlibre() {
 		return llibre;
 	}
-	public void setLlibre(String llibre) {
-		this.llibre = llibre;
-	}
-	public String getOficina() {
-		return oficina;
-	}
 	public void setOficina(String oficina) {
 		this.oficina = oficina;
 	}
-	
+	public void setLlibre(String llibre) {
+		this.llibre = llibre;
+	}
+	public String getExtracte() {
+		return extracte;
+	}
+	public String getDocFisica() {
+		return docFisica;
+	}
+	public String getIdioma() {
+		return idioma;
+	}
+	public TipusAssumpteEnumDto getTipusAssumpte() {
+		return tipusAssumpte;
+	}
+	public String getNumExpedient() {
+		return numExpedient;
+	}
+	public String getRefExterna() {
+		return refExterna;
+	}
+	public String getCodiAssumpte() {
+		return codiAssumpte;
+	}
+	public String getObservacions() {
+		return observacions;
+	}
+	public void setExtracte(String extracte) {
+		this.extracte = extracte;
+	}
+	public void setDocFisica(String docFisica) {
+		this.docFisica = docFisica;
+	}
+	public void setIdioma(String idioma) {
+		this.idioma = idioma;
+	}
+	public void setTipusAssumpte(TipusAssumpteEnumDto tipusAssumpte) {
+		this.tipusAssumpte = tipusAssumpte;
+	}
+	public void setNumExpedient(String numeroExpedient) {
+		this.numExpedient = numeroExpedient;
+	}
+	public void setRefExterna(String refExterna) {
+		this.refExterna = refExterna;
+	}
+	public void setCodiAssumpte(String codiAssumpte) {
+		this.codiAssumpte = codiAssumpte;
+	}
+	public void setObservacions(String observacions) {
+		this.observacions = observacions;
+	}
 	public static NotificacioCommandV2 asCommand(NotificacioDtoV2 dto) {
 		if (dto == null) {
 			return null;

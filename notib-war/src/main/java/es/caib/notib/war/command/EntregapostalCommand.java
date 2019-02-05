@@ -1,6 +1,8 @@
 package es.caib.notib.war.command;
 
-import com.sun.istack.NotNull;
+import javax.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
@@ -13,7 +15,7 @@ import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
  */
 public class EntregapostalCommand {
 
-	@NotNull
+	@NotEmpty @Size(max=50)
 	private EntregaPostalTipusEnum tipus;
 	private EntregaPostalViaTipusEnum tipusVia;
 	private String viaNom;
@@ -27,6 +29,7 @@ public class EntregapostalCommand {
 	private String porta;
 	private String bloc;
 	private String complement;
+	@NotEmpty @Size(max=50)
 	private String codiPostal;
 	private String poblacio;
 	private String municipiCodi; 

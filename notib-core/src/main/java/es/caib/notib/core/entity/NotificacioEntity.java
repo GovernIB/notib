@@ -88,12 +88,26 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "doc_gen_csv", nullable = false)
 	private boolean documentGenerarCsv;
 	
-	@Column(name = "registre_organ", length = 10)
-	private String registreOrgan;
 	@Column(name = "registre_oficina", length = 52, nullable = false)
 	private String registreOficina;
 	@Column(name = "registre_llibre", length = 256, nullable = false)
 	private String registreLlibre;
+	@Column(name = "registre_extracte", length = 52, nullable = false)
+	private String registreExtracte;
+	@Column(name = "registre_doc_fisica", length = 256, nullable = false)
+	private String registreDocFisica;
+	@Column(name = "registre_idioma", length = 52, nullable = false)
+	private String registreIdioma;
+	@Column(name = "registre_tipus_assumpte", length = 256, nullable = false)
+	private String registreTipusAssumpte;
+	@Column(name = "registre_num_expedient", length = 256, nullable = false)
+	private String registreNumExpedient;
+	@Column(name = "registre_ref_externa", length = 52, nullable = false)
+	private String registreRefExterna;
+	@Column(name = "registre_codi_assumpte", length = 256, nullable = false)
+	private String registreCodiAssumpte;
+	@Column(name = "registre_observacions", length = 256, nullable = false)
+	private String registreObservacions;
 	
 	@Column(name = "estat", nullable = false)
 	private NotificacioEstatEnumDto estat;
@@ -175,15 +189,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public boolean isDocumentGenerarCsv() {
 		return documentGenerarCsv;
 	}
-	public String getRegistreOrgan() {
-		return registreOrgan;
-	}
-	public String getRegistreOficina() {
-		return registreOficina;
-	}
-	public String getRegistreLlibre() {
-		return registreLlibre;
-	}
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
@@ -211,7 +216,36 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public EntitatEntity getEntitat() {
 		return entitat;
 	}
-	
+	public String getRegistreOficina() {
+		return registreOficina;
+	}
+	public String getRegistreLlibre() {
+		return registreLlibre;
+	}
+	public String getRegistreExtracte() {
+		return registreExtracte;
+	}
+	public String getRegistreDocFisica() {
+		return registreDocFisica;
+	}
+	public String getRegistreIdioma() {
+		return registreIdioma;
+	}
+	public String getRegistreTipusAssumpte() {
+		return registreTipusAssumpte;
+	}
+	public String getRegistreNumExpedient() {
+		return registreNumExpedient;
+	}
+	public String getRegistreRefExterna() {
+		return registreRefExterna;
+	}
+	public String getRegistreCodiAssumpte() {
+		return registreCodiAssumpte;
+	}
+	public String getRegistreObservacions() {
+		return registreObservacions;
+	}
 	public void addEnviament(
 			NotificacioEnviamentEntity enviament) {
 		this.enviaments.add(enviament);
@@ -293,10 +327,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.notificaEnviamentIntent = 0;
 			built.notificaEnviamentData = new Date();
 		}
-		public Builder registreOrgan(String registreOrgan) {
-			built.registreOrgan = registreOrgan;
-			return this;
-		}
 		public Builder registreOficina(String registreOficina) {
 			built.registreOficina = registreOficina;
 			return this;
@@ -305,6 +335,39 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.registreLlibre = registreLlibre;
 			return this;
 		}
+		public Builder registreExtracte(String registreExtracte) {
+			built.registreExtracte = registreExtracte;
+			return this;
+		}
+		public Builder registreDocFisica(String registreDocFisica) {
+			built.registreDocFisica = registreDocFisica;
+			return this;
+		}
+		public Builder registreIdioma(String registreIdioma) {
+			built.registreIdioma = registreIdioma;
+			return this;
+		}
+		public Builder registreTipusAssumpte(String registreTipusAssumpte) {
+			built.registreTipusAssumpte = registreTipusAssumpte;
+			return this;
+		}
+		public Builder registreNumExpedient(String registreNumExpedient) {
+			built.registreNumExpedient = registreNumExpedient;
+			return this;
+		}
+		public Builder registreRefExterna(String registreRefExterna) {
+			built.registreRefExterna = registreRefExterna;
+			return this;
+		}
+		public Builder registreCodiAssumpte(String registreCodiAssumpte) {
+			built.registreCodiAssumpte = registreCodiAssumpte;
+			return this;
+		}
+		public Builder registreObservacions(String registreObservacions) {
+			built.registreObservacions = registreObservacions;
+			return this;
+		}
+		
 		public Builder descripcio(String descripcio) {
 			built.descripcio = descripcio;
 			return this;

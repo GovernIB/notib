@@ -3,9 +3,8 @@
  */
 package es.caib.notib.core.api.dto;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -40,7 +39,7 @@ public class NotificacioEnviamentFiltreDto extends AuditoriaDto {
 	private String codiNotib;
 	private String numeroCertCorreus;
 	private String csv;
-	private String estat;
+	private NotificacioEstatEnumDto estat;
 	
 	public Long getId() {
 		return id;
@@ -192,10 +191,10 @@ public class NotificacioEnviamentFiltreDto extends AuditoriaDto {
 	public void setCsv(String csv) {
 		this.csv = csv;
 	}
-	public String getEstat() {
+	public NotificacioEstatEnumDto getEstat() {
 		return estat;
 	}
-	public void setEstat(String estat) {
+	public void setEstat(NotificacioEstatEnumDto estat) {
 		this.estat = estat;
 	}
 	

@@ -71,8 +71,6 @@ import es.caib.notib.core.wsdl.notificaV1.TipoEnvio;
 import es.caib.notib.core.wsdl.notificaV1.TipoIntento;
 import es.caib.notib.core.wsdl.notificaV1.TipoMunicipio;
 import es.caib.notib.core.wsdl.notificaV1.TipoOrganismoEmisor;
-import es.caib.notib.core.wsdl.notificaV1.TipoOrganismoPagadorCIE;
-import es.caib.notib.core.wsdl.notificaV1.TipoOrganismoPagadorCorreos;
 import es.caib.notib.core.wsdl.notificaV1.TipoPais;
 import es.caib.notib.core.wsdl.notificaV1.TipoPersonaDestinatario;
 import es.caib.notib.core.wsdl.notificaV1.TipoProcedimiento;

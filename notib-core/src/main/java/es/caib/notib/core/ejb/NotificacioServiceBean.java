@@ -4,22 +4,15 @@
 package es.caib.notib.core.ejb;
 
 import java.util.List;
-
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
 import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.ColumnesDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -49,9 +42,17 @@ public class NotificacioServiceBean implements NotificacioService {
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
+			Long entitatId,
+			boolean isUsuari,
+			boolean isUsuariEntitat,
+			boolean isSuperUsuari,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findAmbFiltrePaginat(
+				entitatId,
+				isUsuari,
+				isUsuariEntitat,
+				isSuperUsuari,
 				filtre,
 				paginacioParams);
 	}
@@ -59,16 +60,21 @@ public class NotificacioServiceBean implements NotificacioService {
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<NotificacioEventDto> eventFindAmbNotificacio(
+			Long entitatId,
 			Long notificacioId) {
-		return delegate.eventFindAmbNotificacio(notificacioId);
+		return delegate.eventFindAmbNotificacio(
+				entitatId,
+				notificacioId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<NotificacioEventDto> eventFindAmbEnviament(
+			Long entitatId,
 			Long notificacioId,
 			Long enviamentId) {
 		return delegate.eventFindAmbEnviament(
+				entitatId,
 				notificacioId,
 				enviamentId);
 	}
@@ -90,15 +96,21 @@ public class NotificacioServiceBean implements NotificacioService {
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
 	public boolean enviar(
+			Long entitatId,
 			Long notificacioId) {
-		return delegate.enviar(notificacioId);
+		return delegate.enviar(
+				entitatId,
+				notificacioId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
 	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(
+			Long entitatId,
 			Long enviamentId) {
-		return delegate.enviamentRefrescarEstat(enviamentId);
+		return delegate.enviamentRefrescarEstat(
+				entitatId,
+				enviamentId);
 	}
 
 /*	@Override
@@ -137,6 +149,7 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	public NotificacioDtoV2 update(
+			Long entitatId,
 			NotificacioDtoV2 notificacio) throws NotFoundException {
 		return null;
 	}

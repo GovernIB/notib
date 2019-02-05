@@ -5,7 +5,6 @@ package es.caib.notib.war.controller;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -25,11 +24,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
@@ -38,18 +37,15 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.EnviamentService;
-import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.DocumentCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
 import es.caib.notib.war.command.PersonaCommand;
-import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EntitatHelper;
@@ -64,7 +60,7 @@ import es.caib.notib.war.helper.RolHelper;
  */
 @Controller
 @RequestMapping("/notificacio")
-public class NotificacioController extends BaseController {
+public class NotificacioController extends BaseUserController {
 
 	private final static String NOTIFICACIONS_FILTRE = "notificacions_filtre";
 
@@ -77,8 +73,6 @@ public class NotificacioController extends BaseController {
 	@Autowired
 	private ProcedimentService procedimentService;
 	@Autowired
-	private GrupService grupService;
-	@Autowired
 	private EnviamentService enviamentService;
 
 	@RequestMapping(method = RequestMethod.GET)
@@ -86,6 +80,7 @@ public class NotificacioController extends BaseController {
 			HttpServletRequest request,
 			Model model) {
 		model.addAttribute(new NotificacioFiltreCommand());
+		
 		if (RolHelper.isUsuariActualAdministrador(request)) {
 			model.addAttribute(
 					"entitat",
@@ -119,12 +114,13 @@ public class NotificacioController extends BaseController {
 			HttpServletRequest request,
 			Model model) {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-		List<ProcedimentDto> procediment = procedimentService.findByEntitat(entitat.getId());
 		NotificacioCommandV2 notificacio = new NotificacioCommandV2();
 		model.addAttribute("notificacioCommandV2",notificacio);
 		model.addAttribute("entitat", entitat);
-		model.addAttribute("procediments", procediment);
+		
+		model.addAttribute("procediments", procedimentService.findProcedimnetsUsuariActual());
 
+		
 		return "notificacioForm";
 	}
 	
@@ -136,26 +132,14 @@ public class NotificacioController extends BaseController {
 		return destinatari;
 	}
 	
-	@RequestMapping(value = "/{procedimentId}/grups", method = RequestMethod.GET)
-	@ResponseBody
-	public List<GrupDto> grups(
-			HttpServletRequest request,
-			@PathVariable Long procedimentId,
-			Model model) {
-		
-		List<GrupDto> grups = grupService.findByIdProcediment(procedimentId);
-		
-		return grups;
-	}
-	
 	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
 			@Valid NotificacioCommandV2 notificacioCommand,
 			BindingResult bindingResult,
 			Model model) throws IOException {		
-		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 		DocumentCommand document = notificacioCommand.getDocument();
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		if (bindingResult.hasErrors()) {
 			return "procedimentAdminForm";
@@ -192,10 +176,11 @@ public class NotificacioController extends BaseController {
 		
 		if (notificacioCommand.getId() != null) {
 			notificacioService.update(
+					entitatActual.getId(),
 					NotificacioCommandV2.asDto(notificacioCommand));
 		} else {
 			notificacioService.create(
-					entitat.getId(),
+					entitatActual.getId(),
 					NotificacioCommandV2.asDto(notificacioCommand));
 		}
 		return "notificacioList";
@@ -218,6 +203,11 @@ public class NotificacioController extends BaseController {
 		NotificacioFiltreDto filtre = (NotificacioFiltreDto)
 				request.getSession().getAttribute( NOTIFICACIONS_FILTRE );
 		PaginaDto<NotificacioDto> notificacions = null;
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
+		boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
+		boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
+		
 		if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
 			EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 			if( filtre != null) {
@@ -225,6 +215,10 @@ public class NotificacioController extends BaseController {
 			}
 		}
 		notificacions = notificacioService.findAmbFiltrePaginat(
+				entitatActual.getId(),
+				isUsuari,
+				isUsuariEntitat,
+				isAdministrador,
 				filtre,
 				DatatablesHelper.getPaginacioDtoFromRequest(request));
 		return DatatablesHelper.getDatatableResponse(request, notificacions);
@@ -260,9 +254,14 @@ public class NotificacioController extends BaseController {
 	public DatatablesResponse eventDatatable(
 			HttpServletRequest request,
 			@PathVariable Long notificacioId) {
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
 		return DatatablesHelper.getDatatableResponse(
 				request,
-				notificacioService.eventFindAmbNotificacio(notificacioId));
+				notificacioService.eventFindAmbNotificacio(
+						entitatActual.getId(),
+						notificacioId));
 	}
 
 	@RequestMapping(value = "/{notificacioId}/enviar", method = RequestMethod.GET)
@@ -270,7 +269,11 @@ public class NotificacioController extends BaseController {
 			HttpServletRequest request,
 			@PathVariable Long notificacioId,
 			Model model) {
-		boolean enviada = notificacioService.enviar(notificacioId);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		boolean enviada = notificacioService.enviar(
+				entitatActual.getId(),
+				notificacioId);
 		emplenarModelNotificacioInfo(
 				notificacioId,
 				"accions",
@@ -334,9 +337,12 @@ public class NotificacioController extends BaseController {
 			HttpServletRequest request,
 			@PathVariable Long notificacioId,
 			@PathVariable Long enviamentId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
 		return DatatablesHelper.getDatatableResponse(
 				request,
 				notificacioService.eventFindAmbEnviament(
+						entitatActual.getId(),
 						notificacioId,
 						enviamentId));
 	}
@@ -363,7 +369,10 @@ public class NotificacioController extends BaseController {
 			@PathVariable Long notificacioId,
 			@PathVariable Long enviamentId,
 			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
 		NotificacioEnviamenEstatDto enviamentEstat = notificacioService.enviamentRefrescarEstat(
+				entitatActual.getId(),
 				enviamentId);
 		boolean totbe = !enviamentEstat.isNotificaError();
 		if (totbe) {
