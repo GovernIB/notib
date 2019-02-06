@@ -125,10 +125,14 @@ public class EnviamentController extends BaseUserController {
 		PaginaDto<NotificacioEnviamentDtoV2> enviaments = new PaginaDto<NotificacioEnviamentDtoV2>();
 		
 		if (enviaments != null) {
+			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().equals("")) {
+				filtreEnviaments.setEstat(null);
+			}
 			enviaments = enviamentService.enviamentFindByUserAndFiltre(
 					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 		}
+		
 		return DatatablesHelper.getDatatableResponse(
 				request, 
 				enviaments,

@@ -28,89 +28,103 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	
 	<not:modalHead/>
-<script type="text/javascript">
+<style type="text/css">
+input[type='checkbox'] {
+    width:30px;
+    height:30px;
+    background:white;
+    border-radius:5px;
+    border:2px solid #555;
+    top: -2px;
+}
 
-
-</script>	
+input[type='checkbox']:checked{
+    background: #abd;
+    top: -2px;
+}
+</style>
 
 </head>
 <body>
 	<c:set var="formAction"><not:modalUrl value="/enviament/visualitzar/save"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="columnesCommand" role="form">
 		<form:hidden path="id"/>
-		
+		<div class="row col-xs-12">
 			<div class="row col-xs-6">
 				<div class="col-md-3">
-					<not:inputCheckbox name="dataEnviament" textKey="enviament.list.dataenviament" />
+					<not:inputCheckboxGros name="dataEnviament" textKey="enviament.list.dataenviament" labelSize="10" />
 				</div>
 				<div class="col-md-3">
-					<not:inputCheckbox name="dataProgramada" textKey="enviament.list.dataprogramada" />
+					<not:inputCheckboxGros name="dataProgramada" textKey="enviament.list.dataprogramada" labelSize="10" />
 				</div>
 				<div class="col-md-2">
-					<not:inputCheckbox name="notIdentificador" textKey="enviament.list.codinotifica"/>
+					<not:inputCheckboxGros name="notIdentificador" textKey="enviament.list.codinotifica" labelSize="10"/>
 				</div>
 				<div class="col-md-3">
-					<not:inputCheckbox name="proCodi" textKey="enviament.list.codiprocediment"/>
+					<not:inputCheckboxGros name="proCodi" textKey="enviament.list.codiprocediment" labelSize="10"/>
 				</div>
 				<div class="col-md-3">
-					<not:inputCheckbox name="grupCodi" textKey="enviament.list.codigrup"/>
+					<not:inputCheckboxGros name="grupCodi" textKey="enviament.list.codigrup" labelSize="10"/>
 				</div>
 				<div class="col-md-3">
-					<not:inputCheckbox name="dir3Codi" textKey="enviament.list.dir3codi"/>
+					<not:inputCheckboxGros name="dir3Codi" textKey="enviament.list.dir3codi" labelSize="10"/>
 				</div>
 				<div class="col-md-3">
-					<not:inputCheckbox name="usuari" textKey="enviament.list.usuari"/>
+					<not:inputCheckboxGros name="usuari" textKey="enviament.list.usuari" labelSize="10"/>
 				</div>
 				<div class="col-md-2">
-					<not:inputCheckbox name="enviamentTipus" textKey="enviament.list.tipusenviament"/>
+					<not:inputCheckboxGros name="enviamentTipus" textKey="enviament.list.tipusenviament" labelSize="10"/>
 				</div>
 				<div class="col-md-3">
-					<not:inputCheckbox name="concepte" textKey="enviament.list.concepte"/>
+					<not:inputCheckbox name="concepte" textKey="enviament.list.concepte" labelSize="10"/>
 				</div>
 				<div class="col-md-3">
-					<not:inputCheckbox name="descripcio" textKey="enviament.list.descripcio"/>
+					<not:inputCheckbox name="descripcio" textKey="enviament.list.descripcio" labelSize="10"/>
 				</div>
 				<div class="col-md-2">
-					<not:inputCheckbox name="titularNif" textKey="enviament.list.niftitular"/>
-				</div>
-				<div class="col-md-3">
-					<not:inputCheckbox name="titularNomLlinatge" textKey="enviament.list.nomLlinatgetitular"/>
-				</div>
-				<div class="col-md-2">
-					<not:inputCheckbox name="titularEmail" textKey="enviament.list.emailtitular"/>
-				</div>
-				<div class="col-md-3">
-					<not:inputCheckbox name="destinataris" textKey="enviament.list.destinataris"/>
-				</div>
-				<div class="col-md-3">
-					<not:inputCheckbox name="llibreRegistre" textKey="enviament.list.llibreregistre"/>
-				</div>
-				<div class="col-md-2">
-					<not:inputCheckbox name="numeroRegistre" textKey="enviament.list.numeroregistre"/>
-				</div>
-				<div class="col-md-3">
-					<not:inputCheckbox name="dataRegistre" textKey="enviament.list.dataregistre"/>
-				</div>
-				<div class="col-md-3">
-					<not:inputCheckbox name="dataCaducitat" textKey="enviament.list.datacaducitat"/>
-				</div>
-				<div class="col-md-2">
-					<not:inputCheckbox name="codiNotibEnviament" textKey="enviament.list.codinotibenviament"/>
-				</div>
-				<div class="col-md-3">
-					<not:inputCheckbox name="numCertificacio" textKey="enviament.list.numerocertificatcorreus"/>
-				</div>
-				<div class="col-md-3">
-					<not:inputCheckbox name="csvUuid" textKey="enviament.list.codicsvuuid"/>
-				</div>
-				<div class="col-md-2">
-					<not:inputCheckbox name="estat" textKey="enviament.list.estat"/>
+					<not:inputCheckbox name="titularNif" textKey="enviament.list.niftitular" labelSize="10"/>
 				</div>
 			</div>
-			<div id="modal-botons">
-				<button id="" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
-				<a href="<c:url value="/enviament"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+			<div class="row col-xs-6">
+				<div class="col-md-3">
+					<not:inputCheckbox name="titularNomLlinatge" textKey="enviament.list.nomLlinatgetitular" labelSize="10"/>
+				</div>
+				<div class="col-md-2">
+					<not:inputCheckbox name="titularEmail" textKey="enviament.list.emailtitular" labelSize="10"/>
+				</div>
+				<div class="col-md-3">
+					<not:inputCheckbox name="destinataris" textKey="enviament.list.destinataris" labelSize="10"/>
+				</div>
+				<div class="col-md-3">
+					<not:inputCheckbox name="llibreRegistre" textKey="enviament.list.llibreregistre" labelSize="10"/>
+				</div>
+				<div class="col-md-2">
+					<not:inputCheckbox name="numeroRegistre" textKey="enviament.list.numeroregistre" labelSize="10"/>
+				</div>
+				<div class="col-md-3">
+					<not:inputCheckbox name="dataRegistre" textKey="enviament.list.dataregistre" labelSize="10"/>
+				</div>
+				<div class="col-md-3">
+					<not:inputCheckbox name="dataCaducitat" textKey="enviament.list.datacaducitat" labelSize="10"/>
+				</div>
+				<div class="col-md-2">
+					<not:inputCheckbox name="codiNotibEnviament" textKey="enviament.list.codinotibenviament" labelSize="10"/>
+				</div>
+				<div class="col-md-3">
+					<not:inputCheckbox name="numCertificacio" textKey="enviament.list.numerocertificatcorreus" labelSize="10"/>
+				</div>
+				<div class="col-md-3">
+					<not:inputCheckbox name="csvUuid" textKey="enviament.list.codicsvuuid" labelSize="10"/>
+				</div>
+				<div class="col-md-2">
+					<not:inputCheckbox name="estat" textKey="enviament.list.estat" labelSize="10"/>
+				</div>
 			</div>
+		</div>
+		<div id="modal-botons">
+			<button id="" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<a href="<c:url value="/enviament"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+		</div>
 	</form:form>
 	
 </body>
