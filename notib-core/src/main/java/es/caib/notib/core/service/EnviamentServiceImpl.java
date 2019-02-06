@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -204,6 +205,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				dataCaducitatFi = cal.getTime();
 			}
 		}
+		Integer estat = null;
+		if(filtre.getEstat()!=null){estat = filtre.getEstat().getNumVal();}else{estat = 0;}
 		notificacions = notificacioRepository.findNotificacioByFiltre(
 				filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 				filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
@@ -234,7 +237,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				(filtre.getCsv() == null || filtre.getCsv().isEmpty()),
 				filtre.getCsv(),
 				(filtre.getEstat() == null),
-				(filtre.getEstat()),
+				(estat),
 				usuariActual);
 		
 		
@@ -386,6 +389,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}
 		}
 		//Filtres camps procediment
+		Integer estat = null;
+		if(filtre.getEstat()!=null){estat = filtre.getEstat().getNumVal();}else{estat = 0;}
 		notificacions = notificacioRepository.findNotificacioByFiltre(
 				filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 				filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
@@ -416,7 +421,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				(filtre.getCsv() == null || filtre.getCsv().isEmpty()),
 				filtre.getCsv(),
 				(filtre.getEstat() == null),
-				(filtre.getEstat()),
+				(estat),
 				usuariActual);
 		
 		entityComprovarHelper.comprovarPermisos(
@@ -462,6 +467,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 						enviamentsDto.add(enviamentDto);
 				}
 			}
+		}else {
+			enviament = new PageImpl<>(new ArrayList<NotificacioEnviamentEntity>());
 		}
 		
 		return paginacioHelper.toPaginaDto(
@@ -564,6 +571,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 					dataCaducitatFi = cal.getTime();
 				}
 			}
+		Integer estat = null;
+		if(filtre.getEstat()!=null){estat = filtre.getEstat().getNumVal();}else{estat = 0;}
 		notificacions = notificacioRepository.findNotificacioByFiltre(
 				filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 				filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
@@ -594,7 +603,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				(filtre.getCsv() == null || filtre.getCsv().isEmpty()),
 				filtre.getCsv(),
 				(filtre.getEstat() == null),
-				(filtre.getEstat()),
+				(estat),
 				usuariActual);
 		
 		//Genera les columnes

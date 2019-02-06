@@ -16,7 +16,17 @@ import java.io.Serializable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum NotificacioEstatEnumDto implements Serializable {
-	PENDENT,
-	ENVIADA,
-	FINALITZADA
+	PENDENT(0),
+	ENVIADA(1),
+	FINALITZADA(2);
+	
+	private int numVal;
+	
+	NotificacioEstatEnumDto(int numVal) {
+        this.numVal = numVal;
+    }
+	
+	public int getNumVal() {
+		return numVal;
+	}
 }

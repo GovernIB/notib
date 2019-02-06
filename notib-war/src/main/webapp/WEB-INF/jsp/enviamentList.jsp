@@ -13,6 +13,12 @@ pageContext.setAttribute(
 		es.caib.notib.war.helper.EnumHelper.getOptionsForEnum(
 				es.caib.notib.core.api.dto.NotificacioTipusEnviamentEnumDto.class,
 				"notificacio.tipus.enviament.enum."));
+pageContext.setAttribute(
+		"notificacioEstatEnumOptions",
+		es.caib.notib.war.helper.EnumHelper.getOptionsForEnum(
+				es.caib.notib.core.api.dto.NotificacioEstatEnumDto.class,
+				"notificacio.estat.enum."));
+
 %>
 <c:set var="ampladaConcepte">
 	<c:choose>
@@ -82,11 +88,19 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 </style>
 <script>
 $(document).ready(function() {
+
+
 	
 	$('#notificacio').select2({
 		width: '100%',
         allowClear:true,
-        placeholder: '${placeholderText}'
+        placeholder: 'Selecciona una opció'//'${placeholderText}'
+    });
+
+	$('#estat').select2({
+		width: '100%',
+        allowClear:true,
+        placeholder: 'Selecciona una opció'//'${placeholderText}'
     });
 	
 	$('.data').datepicker({
@@ -125,6 +139,16 @@ $(document).ready(function() {
 			);
 			return false;
 		});
+	});
+	
+	$("#enviament th").last().empty();
+	$("#enviament th").last().css("padding", 0);
+
+	$("#enviament th").keypress(function(event) {
+	    if (event.which == 13) {
+	        event.preventDefault();
+	        $("#btnFiltrar").first().click();
+	    }
 	});
 });
 function setCookie(cname,cvalue) {
@@ -303,15 +327,15 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="notificacio.enviamentTipus" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.tipusenviament"/>
+				<th data-col-name="notificacio.enviamentTipus" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.tipusenviament" />
 					<script type="text/x-jsrender">
-					<div class="from-group">
-						<select class="form-control" id="notificacio" name="tipusEnviament">
-    						<c:forEach items="${notificacioComunicacioEnumOptions}" var="opt">
-        						<option name="tipusEnviament" value="${opt.value != 'buit' ? opt.value : ''}" class="${opt.value != 'buit' ? '' : 'buit'}"><span class="${opt.value != 'buit' ? '' : 'buit'}"><spring:message code="${opt.text}"/></span></option>
-    						</c:forEach>
-						</select>
-					</div>
+						<div class="from-group" style="padding: 0; font-weight: 100;">
+							<select class="form-control" id="notificacio" name="tipusEnviament">
+    							<c:forEach items="${notificacioComunicacioEnumOptions}" var="opt">
+        							<option name="tipusEnviament" value="${opt.value != 'buit' ? opt.value : ''}" class="${opt.value != 'buit' ? '' : 'buit'}"><span class="${opt.value != 'buit' ? '' : 'buit'}"><spring:message code="${opt.text}"/></span></option>
+    							</c:forEach>
+							</select>
+						</div>
 					</script>
 				</th>
 				<c:choose>
@@ -463,9 +487,21 @@ function getCookie(cname) {
 				</c:choose>
 				<th data-col-name="notificacio.estat"  data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.estat"/>
 					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="estat" class="form-control" type="text" placeholder="<spring:message code="enviament.list.estat"/>'"/>
+						<div class="from-group" style="padding: 0; font-weight: 100;">
+							<select class="form-control" id="estat" name="estat">
+								<option name="estat" class=""></option>
+    							<c:forEach items="${notificacioEstatEnumOptions}" var="opt">
+        							<option name="estat" value="${opt.value != 'buit' ? opt.value : ''}" class="${opt.value != 'buit' ? '' : 'buit'}"><span class="${opt.value != 'buit' ? '' : 'buit'}"><spring:message code="${opt.text}"/></span></option>
+    							</c:forEach>
+							</select>
 						</div>
+					</script>
+				</th>
+				<th data-col-name="id" data-visible="false"></th>
+				<th data-col-name="notificacio.id" data-visible="false"></th>
+				<th data-col-name="detalls" data-orderable="false" data-template="#cellAccionsTemplate" width="101">
+			 	 	<script id="cellAccionsTemplate" type="text/x-jsrender">
+						<a href="<c:url value="/notificacio/{{:notificacio.id}}/enviament/{{:id}}"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a>
 					</script>
 				</th>
 			</tr>

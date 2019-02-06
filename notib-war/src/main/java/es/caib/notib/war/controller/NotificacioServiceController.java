@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+
 import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWs;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
@@ -46,7 +47,7 @@ public class NotificacioServiceController extends BaseController {
 	}
 
 	@RequestMapping(
-			value = "/services/notificacio/alta", 
+			value = "/services/notificacioV2/alta", 
 			method = RequestMethod.POST,
 			produces="application/json")
 	@ResponseStatus(HttpStatus.CREATED)
@@ -82,7 +83,7 @@ public class NotificacioServiceController extends BaseController {
 	}
 
 	@RequestMapping(
-			value = "/services/notificacio/consultaEstatNotificacio/{referencia}", 
+			value = {"/services/notificacio/consultaEstatNotificacio/{referencia}", "/services/notificacioV2/consultaEstatNotificacio/{referencia}"}, 
 			method = RequestMethod.GET,
 			produces="application/json")
 	@ApiOperation(
@@ -100,7 +101,7 @@ public class NotificacioServiceController extends BaseController {
 	}
 
 	@RequestMapping(
-			value = "/services/notificacio/consultaEstatEnviament/{referencia}", 
+			value = {"/services/notificacio/consultaEstatEnviament/{referencia}", "/services/notificacioV2/consultaEstatEnviament/{referencia}"}, 
 			method = RequestMethod.GET,
 			produces="application/json")
 	@ApiOperation(

@@ -93,7 +93,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("isCsvNull") boolean isCsvNull,
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
-			@Param("estat") NotificacioEstatEnumDto estat,
+			@Param("estat") int estat,
 			@Param("usuari") UsuariEntity usuari);
 	
 	List<NotificacioEntity> findByEstatOrderByCreatedDateAsc(
