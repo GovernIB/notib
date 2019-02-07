@@ -19,6 +19,10 @@ pageContext.setAttribute(
 				es.caib.notib.core.api.dto.NotificacioEstatEnumDto.class,
 				"notificacio.estat.enum."));
 
+pageContext.setAttribute(
+		"filtreEnviament", 
+		request.getAttribute("filtreEnviaments"));
+
 %>
 <c:set var="ampladaConcepte">
 	<c:choose>
@@ -175,7 +179,6 @@ function getCookie(cname) {
 </script>
 </head>
 <body>
-
 	<form:form id="enviamentFiltreForm" action="" method="post" cssClass="well hidden" commandName="enviamentFiltreCommand"></form:form>
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<div class="text-right">
@@ -270,7 +273,7 @@ function getCookie(cname) {
 				<th data-col-name="notificaIdentificador" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codinotifica"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
-							<input name="codiNotifica" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codinotifica"/>"/>
+							<input name="codiNotifica" value="${filtreEnviament.codiNotifica}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codinotifica"/>"/>
 						</div>
 					</script>
 				</th>

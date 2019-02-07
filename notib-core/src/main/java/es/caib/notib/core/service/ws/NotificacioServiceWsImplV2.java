@@ -8,10 +8,13 @@ import java.io.ByteArrayOutputStream;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.jws.WebService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.sun.jersey.core.util.Base64;
 
 import es.caib.notib.core.api.dto.DocumentDto;
@@ -22,9 +25,7 @@ import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.RegistreAnotacioDto;
 import es.caib.notib.core.api.exception.RegistrePluginException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -50,14 +51,11 @@ import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
 
 
 /**
@@ -81,19 +79,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
-	private ProcedimentRepository procedimentRepository;
-	
-
-	@Autowired
 	private NotificaHelper notificaHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	
-	
-
-
 
 	@Transactional
 	@Override
@@ -167,8 +155,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				caducitat(notificacio.getCaducitat()).
 //				retardPostal(notificacio.getRetard()).
 				descripcio(notificacio.getDescripcio()).
-				procedimentCodiNotib(notificacio.getCodiProcediment()).
-				grupCodi(notificacio.getCodiGrup());
+				procedimentCodiNotib(notificacio.getProcedimentCodi()).
+				grupCodi(notificacio.getGrupCodi());
 		
 		ParametresRegistre parametresRegistre = notificacio.getParametresRegistre();
 		if (parametresRegistre != null) {

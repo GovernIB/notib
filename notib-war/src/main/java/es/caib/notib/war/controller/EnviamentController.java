@@ -68,6 +68,7 @@ public class EnviamentController extends BaseUserController {
 				RequestSessionHelper.obtenirObjecteSessio(
 						request,
 						SESSION_ATTRIBUTE_SELECCIO));
+		model.addAttribute("filtreEnviaments", getFiltreCommand(request));
 		
 		columnes = enviamentService.getColumnesUsuari(
 				entitatActual.getId(), 
@@ -132,7 +133,6 @@ public class EnviamentController extends BaseUserController {
 					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 		}
-		
 		return DatatablesHelper.getDatatableResponse(
 				request, 
 				enviaments,

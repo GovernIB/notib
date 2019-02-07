@@ -104,6 +104,35 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "doc_gen_csv", nullable = false)
 	private boolean documentGenerarCsv;
 	
+	/*@Column(name = "seu_exp_serdoc", length = 10)
+	private String seuExpedientSerieDocumental;
+	@Column(name = "seu_exp_uniorg", length = 10, nullable = false)
+	private String seuExpedientUnitatOrganitzativa;
+	@Column(name = "seu_exp_ideni", length = 52, nullable = false)
+	private String seuExpedientIdentificadorEni;
+	@Column(name = "seu_exp_titol", length = 256, nullable = false)
+	private String seuExpedientTitol;
+	@Column(name = "seu_proc_codi", length = 256, nullable = false)
+	private String seuProcedimentCodi;
+	@Column(name = "seu_reg_oficina", length = 256, nullable = false)
+	private String seuRegistreOficina;
+	@Column(name = "seu_reg_llibre", length = 256, nullable = false)
+	private String seuRegistreLlibre;
+	@Column(name = "seu_reg_organ", length = 256, nullable = false)
+	private String seuRegistreOrgan;
+	@Column(name = "seu_idioma", length = 256, nullable = false)
+	private String seuIdioma;
+	@Column(name = "seu_avis_titol", length = 256, nullable = false)
+	private String seuAvisTitol;
+	@Column(name = "seu_avis_text", length = 256, nullable = false)
+	private String seuAvisText;
+	@Column(name = "seu_avis_mobil", length = 256)
+	private String seuAvisTextMobil;
+	@Column(name = "seu_ofici_titol", length = 256, nullable = false)
+	private String seuOficiTitol;
+	@Column(name = "seu_ofici_text", length = 256, nullable = false)
+	private String seuOficiText;*/
+	
 	@Column(name = "registre_oficina", length = 52, nullable = false)
 	private String registreOficina;
 	@Column(name = "registre_llibre", length = 256, nullable = false)

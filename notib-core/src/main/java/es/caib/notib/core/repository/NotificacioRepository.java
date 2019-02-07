@@ -30,10 +30,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	@Query(
 			"from " +
 			"    NotificacioEntity ntf " +
-			"where ntf.entitat = :entitatActual " +
-			"and (ntf.procedimentCodiNotib in (:procedimentsCodisNotib))")
-	Page<NotificacioEntity> findByEntitatActualAndProcedimentCodiNotib(
-			@Param("entitatActual") EntitatEntity entitatActiva,
+			"where (ntf.procedimentCodiNotib in (:procedimentsCodisNotib))")
+	Page<NotificacioEntity> findByProcedimentCodiNotib(
 			@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
 			Pageable paginacio);
 

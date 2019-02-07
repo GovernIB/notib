@@ -32,9 +32,9 @@ public class NotificacioV2 {
 	private Date caducitat;
 	private Document document;
 	private List<Enviament> enviaments;
-	private String codiUsuari;
-	private String codiProcediment;
-	private String codiGrup;
+	private String usuariCodi;
+	private String procedimentCodi;
+	private String grupCodi;
 	private ParametresRegistre parametresRegistre;
 	
 	public String getEmisorDir3Codi() {
@@ -97,23 +97,23 @@ public class NotificacioV2 {
 	public void setEnviaments(List<Enviament> enviaments) {
 		this.enviaments = enviaments;
 	}
-	public String getCodiUsuari() {
-		return codiUsuari;
+	public String getUsuariCodi() {
+		return usuariCodi;
 	}
-	public void setCodiUsuari(String codiUsuari) {
-		this.codiUsuari = codiUsuari;
+	public void setUsuariCodi(String usuariCodi) {
+		this.usuariCodi = usuariCodi;
 	}
-	public String getCodiGrup() {
-		return codiGrup;
+	public String getProcedimentCodi() {
+		return procedimentCodi;
 	}
-	public void setCodiGrup(String codiGrup) {
-		this.codiGrup = codiGrup;
+	public void setProcedimentCodi(String procedimentCodi) {
+		this.procedimentCodi = procedimentCodi;
 	}
-	public String getCodiProcediment() {
-		return codiProcediment;
+	public String getGrupCodi() {
+		return grupCodi;
 	}
-	public void setCodiProcediment(String codiProcediment) {
-		this.codiProcediment = codiProcediment;
+	public void setGrupCodi(String grupCodi) {
+		this.grupCodi = grupCodi;
 	}
 	public ParametresRegistre getParametresRegistre() {
 		return parametresRegistre;

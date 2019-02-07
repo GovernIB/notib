@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,7 @@ import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.security.ExtendedPermission;
 
 @Service
 public class ProcedimentServiceImpl implements ProcedimentService{
@@ -60,7 +62,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Resource
 	private EntitatRepository entitatRepository;
 	@Resource
-	private GrupProcedimentRepository grupProcediment;
+	private GrupProcedimentRepository grupProcedimentRepository;
 	
 	@Override
 	public ProcedimentDto create(
@@ -173,13 +175,15 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		logger.debug("Consulta del procediment ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ")");
+		EntitatEntity entitat = null;
 		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				true,
-				false);
+		if (entitatId != null)
+			 entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId,
+					true,
+					false,
+					true,
+					false);
 		
 		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
 				entitat,
@@ -212,11 +216,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		
 	}
 	
-	@Override
-	public List<ProcedimentDto> findProcedimnetsUsuariActual() {
-
-		return entityComprovarHelper.findPermisConsultaProcedimentsUsuariActual();
-	}
 	@Override
 	public PaginaDto<ProcedimentDto> findAmbFiltrePaginat(
 			Long entitatId,
@@ -308,6 +307,20 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					ProcedimentDto.class);
 	}
 
+	@Override
+	public List<ProcedimentGrupDto> findAllGrups() {
+		logger.debug("Consulta de tots els procediments");
+		
+		entityComprovarHelper.comprovarPermisos(
+				null,
+				true,
+				true,
+				false);
+		return conversioTipusHelper.convertirList(
+					grupProcedimentRepository.findAll(),
+					ProcedimentGrupDto.class);
+	}
+	
 	@Override
 	public PaginaDto<ProcedimentDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		// TODO Auto-generated method stub
@@ -411,7 +424,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				procediment, 
 				grup).build();
 		
-		grupProcediment.saveAndFlush(grupProcedimentEntity);
+		grupProcedimentRepository.saveAndFlush(grupProcedimentEntity);
 	}
 	
 	@Transactional
@@ -444,9 +457,29 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		
 		grupProcedimentEntity.update(procediment, grup);
 		
-		grupProcediment.saveAndFlush(grupProcedimentEntity);
+		grupProcedimentRepository.saveAndFlush(grupProcedimentEntity);
 	}
 
+	@Transactional
+	@Override
+	public void grupDelete(
+			Long entitatId, 
+			Long procedimentGrupId) throws NotFoundException {
+		logger.debug("Modificació del grup del procediment ("
+				+ "entitatId=" + entitatId +  ", "
+				+ "procedimentGrupID=" + procedimentGrupId + ")");
+		
+		entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				true,
+				false);
+		
+		GrupProcedimentEntity grupProcedimentEntity = grupProcedimentRepository.findOne(procedimentGrupId);
+		
+		grupProcedimentRepository.delete(grupProcedimentEntity);
+	}
 
 	
 	@Override
@@ -478,6 +511,12 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
+
+	@Override
+	public List<ProcedimentDto> findProcedimnetsNotificacioUsuariActual() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 
 
