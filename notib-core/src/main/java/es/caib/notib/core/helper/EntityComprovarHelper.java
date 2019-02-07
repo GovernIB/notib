@@ -67,7 +67,6 @@ public class EntityComprovarHelper {
 	private PermisosHelper permisosHelper;
 	@Autowired
 	private GrupProcedimentRepository grupProcedimentRepository;
-	
 
 	public EntitatEntity comprovarEntitat(
 			Long entitatId,
@@ -307,7 +306,7 @@ public class EntityComprovarHelper {
 					ProcedimentEntity.class);
 		}
 		
-		if (!entitat.equals(procediment.getEntitat())) {
+		if (entitat != null && !entitat.equals(procediment.getEntitat())) {
 			throw new ValidationException(
 					id,
 					ProcedimentEntity.class,
@@ -537,7 +536,8 @@ public class EntityComprovarHelper {
 	}
 	
 
-	public List<ProcedimentDto> findPermisConsultaProcedimentsUsuariActual() {
+	public List<ProcedimentDto> findPermisProcedimentsUsuariActual(
+			Permission[] permisos) {
 		List<ProcedimentDto> resposta = null;
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<ProcedimentEntity> procediments = procedimentRepository.findByEntitatActiva(true);
@@ -549,8 +549,7 @@ public class EntityComprovarHelper {
 					}
 				},
 				ProcedimentEntity.class,
-				new Permission[] {
-					ExtendedPermission.READ},
+				permisos,
 				auth);
 		
 		resposta = conversioTipusHelper.convertirList(
@@ -560,41 +559,106 @@ public class EntityComprovarHelper {
 		return resposta;
 	}
 	
-	public List<ProcedimentDto> findPermisNotificacioProcedimentsUsuariActual() {
-		List<ProcedimentDto> resposta = null;
+	public List<ProcedimentDto> findByGrupAndPermisConsultaProcedimentsUsuariActual(
+			List<ProcedimentDto> procediments,
+			Permission[] permisos) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<ProcedimentEntity> procediments = procedimentRepository.findByEntitatActiva(true);
+		List<ProcedimentEntity> procedimentsEntity = new ArrayList<ProcedimentEntity>();
+		List<ProcedimentDto> resposta;
+		
+		//Conversió de dto a entity per comprovar permisos
+		for (ProcedimentDto procedimentDto : procediments) {
+			procedimentsEntity.add(procedimentRepository.findOne(procedimentDto.getId()));
+		}
 		permisosHelper.filterGrantedAny(
-				procediments,
+				procedimentsEntity,
 				new ObjectIdentifierExtractor<ProcedimentEntity>() {
-					public Long getObjectIdentifier(ProcedimentEntity procediment) {
-						return procediment.getId();
+					public Long getObjectIdentifier(ProcedimentEntity procedimentsEntity) {
+						return procedimentsEntity.getId();
 					}
 				},
 				ProcedimentEntity.class,
-				new Permission[] {
-					ExtendedPermission.NOTIFICACIO},
+				permisos,
 				auth);
 		
 		resposta = conversioTipusHelper.convertirList(
-				procediments,
+				procedimentsEntity,
 				ProcedimentDto.class);
 		
 		return resposta;
+	}
+	
+	public List<ProcedimentDto> findByGrupAndPermisNotificacioProcedimentsUsuariActual(
+			List<ProcedimentDto> procediments,
+			Permission[] permisos) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		List<ProcedimentEntity> procedimentsEntity = new ArrayList<ProcedimentEntity>();
+		List<ProcedimentDto> resposta;
+		
+		//Conversió de dto a entity per comprovar permisos
+		for (ProcedimentDto procedimentDto : procediments) {
+			procedimentsEntity.add(procedimentRepository.findOne(procedimentDto.getId()));
+		}
+		permisosHelper.filterGrantedAny(
+				procedimentsEntity,
+				new ObjectIdentifierExtractor<ProcedimentEntity>() {
+					public Long getObjectIdentifier(ProcedimentEntity procedimentsEntity) {
+						return procedimentsEntity.getId();
+					}
+				},
+				ProcedimentEntity.class,
+				permisos,
+				auth);
+		
+		resposta = conversioTipusHelper.convertirList(
+				procedimentsEntity,
+				ProcedimentDto.class);
+		
+		return resposta;
+	}
+	
+	public List<ProcedimentDto> findGrupProcedimentsUsuariActual() {
+		
+		return null;
 	}
 	
 	public boolean hasPermisConsultaProcediment() {
-		List<ProcedimentDto> resposta = findPermisConsultaProcedimentsUsuariActual();
+		List<ProcedimentDto> resposta = findPermisProcedimentsUsuariActual(
+				new Permission[] {
+						ExtendedPermission.READ}
+				);
 		
 		return (resposta.isEmpty()) ? false : true;
 	}
 	
 	public boolean hasPermisNotificacioProcediment() {
-		List<ProcedimentDto> resposta = findPermisNotificacioProcedimentsUsuariActual();
+		List<ProcedimentDto> resposta = findPermisProcedimentsUsuariActual(
+				new Permission[] {
+					ExtendedPermission.NOTIFICACIO}
+				);
 		
 		return (resposta.isEmpty()) ? false : true;
 	}
 	
+	public boolean hasGrupPermisConsultaProcediment(List<ProcedimentDto> procediments) {
+		List<ProcedimentDto> resposta = findByGrupAndPermisConsultaProcedimentsUsuariActual(
+				procediments,
+				new Permission[] {
+						ExtendedPermission.READ}
+				);
+		
+		return (resposta.isEmpty()) ? false : true;
+	}
+	
+	public boolean hasGrupPermisNotificacioProcediment(List<ProcedimentDto> procediments) {
+		List<ProcedimentDto> resposta = findByGrupAndPermisNotificacioProcedimentsUsuariActual(
+				procediments,
+				new Permission[] {
+						ExtendedPermission.NOTIFICACIO}
+				);
+		
+		return (resposta.isEmpty()) ? false : true;
+	}
 	
 	
 }

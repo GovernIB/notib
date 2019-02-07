@@ -17,6 +17,8 @@ import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.NotificacioService;
 
@@ -39,23 +41,6 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.findAmbId(id);
 	}
 
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
-			Long entitatId,
-			boolean isUsuari,
-			boolean isUsuariEntitat,
-			boolean isSuperUsuari,
-			NotificacioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findAmbFiltrePaginat(
-				entitatId,
-				isUsuari,
-				isUsuariEntitat,
-				isSuperUsuari,
-				filtre,
-				paginacioParams);
-	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
@@ -152,6 +137,52 @@ public class NotificacioServiceBean implements NotificacioService {
 			Long entitatId,
 			NotificacioDtoV2 notificacio) throws NotFoundException {
 		return null;
+	}
+
+	@Override
+	public List<ProcedimentDto> findNotificacionsAmbPermisConsulta() {
+		return delegate.findNotificacionsAmbPermisConsulta();
+	}
+
+	@Override
+	public List<ProcedimentDto> findNotificacionsAmbPermisNotificacio() {
+		return delegate.findNotificacionsAmbPermisNotificacio();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
+			Long entitatId,
+			boolean isUsuari,
+			boolean isUsuariEntitat,
+			boolean isSuperUsuari,
+			List<ProcedimentGrupDto> grupsProcediments,
+			List<ProcedimentDto> procediments,
+			NotificacioFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findAmbFiltrePaginat(
+				entitatId,
+				isUsuari,
+				isUsuariEntitat,
+				isSuperUsuari,
+				grupsProcediments,
+				procediments,
+				filtre,
+				paginacioParams);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public List<ProcedimentDto> findNotificacionsAmbPermisConsultaAndGrups(
+			List<ProcedimentDto> procediments) {
+		return delegate.findNotificacionsAmbPermisConsultaAndGrups(procediments);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public List<ProcedimentDto> findNotificacionsAmbPermisNotificacioAndGrups(
+			List<ProcedimentDto> procediments) {
+		return delegate.findNotificacionsAmbPermisNotificacioAndGrups(procediments);
 	}
 
 	

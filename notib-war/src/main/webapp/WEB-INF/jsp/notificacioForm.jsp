@@ -39,8 +39,6 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
-	<not:modalHead/>
-	
 <style type="text/css">
 
 .form-horizontal .control-label{
@@ -169,27 +167,6 @@ function addDestinatari() {
 	}
 }
 
-function comprovarGrups(agrupable, procedimentId) {
-	var notificacioGrupsUrl = "<c:url value="/notificacio/"/>" + procedimentId + "/grups";
-	if (agrupable == 'true') {
-		var procediments = [{}];
-			$.get(notificacioGrupsUrl).done(function(grups) {
-				for (i = 0; i < grups.length; i++) {
-					var select = document.getElementById('grupId');
-					var option = document.createElement('option');
-					option.id = 'grupId';
-					option.name = 'grupId';
-					option.text = grups[i].nom;
-					option.value = grups[i].id;
-					select.add(option);
-				}
-			})
-			$('#grup').find('option').remove();
-			$('.agrupable').removeClass('hidden');
-		} else {
-			$('.agrupable').addClass('hidden');
-		}
-	}
 </script>
 </head>
 <body>
@@ -221,17 +198,13 @@ function comprovarGrups(agrupable, procedimentId) {
 						<not:inputTextarea name="descripcio" textKey="notificacio.form.camp.descripcio" labelSize="2"/>
 					</div>
 					<div class="col-md-12">
-						<not:inputSelect name="procedimentId" textKey="notificacio.form.camp.procediment" optionItems="${procediments}" optionAgrupableAttribute="agrupar" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2"/>
+						<not:inputText name="procedimentId" textKey="notificacio.form.camp.procediment" value="${procediment.nom}" labelSize="2" readonly="true"/>
 					</div>
-					<div class="col-md-12 agrupable hidden">
-						
-						<div class="form-group">
-							<label class="control-label col-xs-2" for="grup"><spring:message code="notificacio.form.camp.grup"/></label>
-							<div class="controls col-xs-10">
-								<select class="form-control" style="width:100%" name="grupId" id="grupId"></select>
-							</div>
+					<c:if test="${not empty grups}">
+						<div class="col-md-12">
+							<not:inputSelect name="grupId" textKey="notificacio.form.camp.grup" optionItems="${grups}" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2"/>
 						</div>
-					</div>
+					</c:if>
 				</div>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="documentForm">
@@ -257,10 +230,10 @@ function comprovarGrups(agrupable, procedimentId) {
 			<div role="tabpanel" class="tab-pane" id="parametresregistreForm">
 				<div class="row parametresregistreForm">
 					<div class="col-md-6">
-						<not:inputText name="oficina" textKey="notificacio.form.camp.oficina" labelSize="4"/>
+						<not:inputText name="oficina" value="${procediment.oficina}" textKey="notificacio.form.camp.oficina" labelSize="4" readonly="true"/>
 					</div>
 					<div class="col-md-6">
-						<not:inputText name="llibre" textKey="notificacio.form.camp.llibre" labelSize="4"/>
+						<not:inputText name="llibre" value="${procediment.llibre}" textKey="notificacio.form.camp.llibre" labelSize="4" readonly="true"/>
 					</div>
 					<div class="col-md-6">
 						<not:inputText name="extracte" textKey="notificacio.form.camp.extracte" labelSize="4"/>
@@ -272,7 +245,7 @@ function comprovarGrups(agrupable, procedimentId) {
 						<not:inputText name="idioma" textKey="notificacio.form.camp.idioma" labelSize="4"/>
 					</div>
 					<div class="col-md-6">
-						<not:inputText name="tipusAssumpte" textKey="notificacio.form.camp.tipus" labelSize="4"/>
+						<not:inputText name="tipusAssumpte" value="${procediment.tipusAssumpte}" textKey="notificacio.form.camp.tipus" labelSize="4" readonly="true"/>
 					</div>
 					<div class="col-md-6">
 						<not:inputText name="numExpedient" textKey="notificacio.form.camp.expedient" labelSize="4"/>
@@ -397,7 +370,6 @@ function comprovarGrups(agrupable, procedimentId) {
 		</div>
 		<div id="modal-botons text-right">
 			<button id="addNotificacioButton" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
-			<a href="<c:url value="/notificacio/new"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>	
 	</form:form>
 	
