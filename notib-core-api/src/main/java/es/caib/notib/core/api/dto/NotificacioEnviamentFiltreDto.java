@@ -23,7 +23,7 @@ public class NotificacioEnviamentFiltreDto extends AuditoriaDto {
 	private String codiProcediment;
 	private String grup;
 	private String usuari;
-	private NotificaEnviamentTipusEnumDto tipusEnviament;
+	private NotificacioTipusEnviamentEnumDto enviamentTipus;
 	private String concepte;
 	private String descripcio;
 	private String nifTitular;
@@ -95,11 +95,14 @@ public class NotificacioEnviamentFiltreDto extends AuditoriaDto {
 	public void setUsuari(String usuari) {
 		this.usuari = usuari;
 	}
-	public NotificaEnviamentTipusEnumDto getTipusEnviament() {
-		return tipusEnviament;
+	public NotificacioTipusEnviamentEnumDto getEnviamentTipus() {
+		return enviamentTipus;
 	}
-	public void setTipusEnviament(NotificaEnviamentTipusEnumDto tipusEnviament) {
-		this.tipusEnviament = tipusEnviament;
+	public void setEnviamentTipus(NotificacioTipusEnviamentEnumDto enviamentTipus) {
+		this.enviamentTipus = enviamentTipus;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 	public String getConcepte() {
 		return concepte;

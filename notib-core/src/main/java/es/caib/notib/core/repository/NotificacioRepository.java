@@ -59,17 +59,17 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	@Query(	"from " +
 			"    NotificacioEntity n " +
 			"where " + 
-			"	 (:isCodiProcedimentNull = true or n.procedimentCodiNotib like lower('%'||:codiProcediment||'%')) " +
-			"and (:isGrupNull = true or n.grupCodi like lower('%'||:grup||'%')) " +
-			"and (:isConcepteNull = true or n.concepte like lower('%'||:concepte||'%')) " +
-			"and (:isDescripcioNull = true or n.descripcio like lower('%'||:descripcio||'%')) " +
-			"and (:isDataProgramadaDisposicioIniciNull = true or n.notificaEnviamentData >= :dataProgramadaDisposicioInici) " +
-			"and (:isDataProgramadaDisposicioFiNull = true or n.notificaEnviamentData <= :dataProgramadaDisposicioFi) " +
-			"and (:isDataCaducitatIniciNull = true or n.caducitat >= :dataCaducitatInici) " +
-			"and (:isDataCaducitatFiNull = true or n.caducitat <= :dataCaducitatFi) " +
-			"and (:isTipusEnviamentNull = true or n.enviamentTipus like lower('%'||:tipusEnviament||'%')) " +
-			"and (:isCsvNull = true or n.csv_uuid like lower('%'||:csv||'%')) " +
-			"and (:isEstatNull = true or n.estat like lower('%'||:estat||'%')) " +
+			"	 (:isCodiProcedimentNull = true or lower(n.procedimentCodiNotib) like lower('%'||:codiProcediment||'%')) " +
+			"and (:isGrupNull = true or lower(n.grupCodi) like lower('%'||:grup||'%')) " +
+			"and (:isConcepteNull = true or lower(n.concepte) like lower('%'||:concepte||'%')) " +
+			"and (:isDescripcioNull = true or lower(n.descripcio) like lower('%'||:descripcio||'%')) " +
+			"and (:isDataProgramadaDisposicioIniciNull = true or lower(n.notificaEnviamentData) >= :dataProgramadaDisposicioInici) " +
+			"and (:isDataProgramadaDisposicioFiNull = true or lower(n.notificaEnviamentData) <= :dataProgramadaDisposicioFi) " +
+			"and (:isDataCaducitatIniciNull = true or lower(n.caducitat) >= :dataCaducitatInici) " +
+			"and (:isDataCaducitatFiNull = true or lower(n.caducitat) <= :dataCaducitatFi) " +
+			"and (:isTipusEnviamentNull = true or lower(n.enviamentTipus) like lower('%'||:tipusEnviament||'%')) " +
+			"and (:isCsvNull = true or lower(n.csv_uuid) like lower('%'||:csv||'%')) " +
+			"and (:isEstatNull = true or lower(n.estat) like lower('%'||:estat||'%')) " +
 			"and (:usuari = n.createdBy) ")
 	List<NotificacioEntity> findNotificacioByFiltre(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
@@ -89,7 +89,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("isDataCaducitatFiNull") boolean dataCaducitatFiNull,
 			@Param("dataCaducitatFi") Date dataCaducitatFi,
 			@Param("isTipusEnviamentNull") boolean isTipusEnviamentNull,
-			@Param("tipusEnviament") NotificaEnviamentTipusEnumDto tipusEnviament,
+			@Param("tipusEnviament") int tipusEnviament,
 			@Param("isCsvNull") boolean isCsvNull,
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,

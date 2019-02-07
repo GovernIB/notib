@@ -22,6 +22,7 @@ import es.caib.notib.core.api.dto.ColumnesDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
@@ -79,9 +80,11 @@ public class EnviamentController extends BaseUserController {
 					entitatActual.getId(),
 					columnes);
 		}
-		
+		NotificacioEnviamentFiltreCommand filtreEnviaments = getFiltreCommand(request);
+
 		model.addAttribute(new NotificacioEnviamentCommand());
 		model.addAttribute("columnes", ColumnesCommand.asCommand(columnes));
+		model.addAttribute("filtreEnviaments", filtreEnviaments);
 		
 		return "enviamentList";
 	}
@@ -125,14 +128,13 @@ public class EnviamentController extends BaseUserController {
 		PaginaDto<NotificacioEnviamentDtoV2> enviaments = new PaginaDto<NotificacioEnviamentDtoV2>();
 		
 		if (enviaments != null) {
-			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().equals("")) {
+			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
 				filtreEnviaments.setEstat(null);
 			}
 			enviaments = enviamentService.enviamentFindByUserAndFiltre(
 					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 		}
-		
 		return DatatablesHelper.getDatatableResponse(
 				request, 
 				enviaments,
@@ -212,7 +214,7 @@ public class EnviamentController extends BaseUserController {
 					request, 
 					getMessage(
 							request, 
-							"expedient.controller.exportacio.seleccio.buida"));
+							"enviament.controller.exportacio.seleccio.buida"));
 			return "redirect:../../expedient";
 		} else {
 			filtreCommand = (NotificacioEnviamentFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(

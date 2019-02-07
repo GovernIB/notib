@@ -4,6 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%
 pageContext.setAttribute(
 		"isRolActualAdministrador",
@@ -96,12 +97,33 @@ $(document).ready(function() {
         allowClear:true,
         placeholder: 'Selecciona una opció'//'${placeholderText}'
     });
+    $('#notificacio').on('select2:select', function (e) {
+    	$("#enviament").dataTable().api().ajax.reload();
+	});
+	$('#notificacio').on('select2:unselect', function (e) {
+    	$("#enviament").dataTable().api().ajax.reload();
+	});
 
+	if("${filtreEnviaments.enviamentTipus}" != ""){
+		$('#notificacio').val("${filtreEnviaments.enviamentTipus}".toLowerCase()).trigger('change');
+	}
+	
 	$('#estat').select2({
 		width: '100%',
         allowClear:true,
         placeholder: 'Selecciona una opció'//'${placeholderText}'
     });
+    $('#estat').on('select2:select', function (e) {
+    	$("#enviament").dataTable().api().ajax.reload();
+	});
+    $('#estat').on('select2:unselect', function (e) {
+    	$("#enviament").dataTable().api().ajax.reload();
+	});
+	
+    if("${filtreEnviaments.estat}" != ""){
+    	$('#estat').val("${filtreEnviaments.estat}").trigger('change');
+    }
+    
 	
 	$('.data').datepicker({
 		orientation: "bottom"
@@ -139,6 +161,11 @@ $(document).ready(function() {
 			);
 			return false;
 		});
+		$('#btnNetejar').click(function() {
+			$(':input').val('');
+			event.preventDefault();
+	        $("#btnFiltrar").first().click();
+		});
 	});
 	
 	$("#enviament th").last().empty();
@@ -150,6 +177,9 @@ $(document).ready(function() {
 	        $("#btnFiltrar").first().click();
 	    }
 	});
+
+	
+
 });
 function setCookie(cname,cvalue) {
 	var exdays = 30;
@@ -175,11 +205,11 @@ function getCookie(cname) {
 </script>
 </head>
 <body>
-
 	<form:form id="enviamentFiltreForm" action="" method="post" cssClass="well hidden" commandName="enviamentFiltreCommand"></form:form>
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<div class="text-right">
 			<div class="btn-group">
+				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 				<button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></button>
 				<button id="seleccioNone" title="<spring:message code="enviament.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></button>
 				<div class="btn-group">
@@ -196,6 +226,7 @@ function getCookie(cname) {
 			</div>
 		</div>
 	</script>
+	
 	<script id="cellFilterTemplate" type="text/x-jsrender">
 		<div class="dropdown">
 			<button type="submit" id="btnFiltrar" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-search"></span></button>
@@ -229,14 +260,15 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
+				<c:out value = "${filtreEnviaments.estat}"/>
 				<th data-col-name=createdDate data-converter="datetime" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dataenviament"/>
 					<script id="dataTemplate" type="text/x-jsrender">
 						<div class="from-group">
 							<div class="input-group vdivide">
-    							<input name="dataEnviamentInici" type="text" class="form-control data" placeholder="Inici">
+    							<input name="dataEnviamentInici" value="<fmt:formatDate value="${filtreEnviaments.dataEnviamentInici}" pattern="dd/MM/yyyy" />" type="text" class="form-control data" placeholder="Inici">
     							<div class="input-group-addon"></div>
-    							<input name="dataEnviamentFi" type="text" class="form-control data" placeholder="Final">
-							</div>
+    							<input name="dataEnviamentFi" value="<fmt:formatDate value="${filtreEnviaments.dataEnviamentFi}" pattern="dd/MM/yyyy" />" type="text" class="form-control data" placeholder="Final">
+							</div>   
 						</div>
 					</script>
 				</th>
@@ -252,9 +284,9 @@ function getCookie(cname) {
 					<script id="dataTemplate" type="text/x-jsrender">
 						<div class="from-group input-daterange" data-provide="daterangepicker">
 							<div class="input-group vdivide">
-    							<input name="dataProgramadaDisposicioInici" type="text" class="form-control data" placeholder="Inici">
+    							<input name="dataProgramadaDisposicioInici" value="<fmt:formatDate value="${filtreEnviaments.dataProgramadaDisposicioInici}" pattern="dd/MM/yyyy" />" type="text" class="form-control data" placeholder="Inici">
     							<div class="input-group-addon"></div>
-    							<input name="dataProgramadaDisposicioFi" type="text" class="form-control data" placeholder="Final">
+    							<input name="dataProgramadaDisposicioFi" value="<fmt:formatDate value="${filtreEnviaments.dataProgramadaDisposicioFi}" pattern="dd/MM/yyyy" />" type="text" class="form-control data" placeholder="Final">
 							</div>
 						</div>
 					</script>
@@ -270,7 +302,7 @@ function getCookie(cname) {
 				<th data-col-name="notificaIdentificador" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codinotifica"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
-							<input name="codiNotifica" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codinotifica"/>"/>
+							<input name="codiNotifica" value="${filtreEnviaments.codiNotifica}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codinotifica"/>"/>
 						</div>
 					</script>
 				</th>
@@ -285,7 +317,7 @@ function getCookie(cname) {
 				<th data-col-name="notificacio.procedimentCodiNotib" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codiprocediment"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
-							<input name="codiProcediment" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codiprocediment"/>"/>
+							<input name="codiProcediment" value="${filtreEnviaments.codiProcediment}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codiprocediment"/>"/>
 						</div>
 					</script>
 				</th>
@@ -300,7 +332,7 @@ function getCookie(cname) {
 				<th data-col-name="notificacio.grupCodi" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codigrup"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
-							<input name="grup" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codigrup"/>"/>
+							<input name="grup" value="${filtreEnviaments.grup}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codigrup"/>"/>
 						</div>
 					</script>
 				</th>
@@ -315,7 +347,7 @@ function getCookie(cname) {
 				<th data-col-name="notificacio.emisorDir3Codi" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dir3codi"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
-							<input name="dir3Codi" class="form-control" type="text" placeholder="<spring:message code="enviament.list.dir3codi"/>'"/>
+							<input name="dir3Codi" value="${filtreEnviaments.dir3Codi}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.dir3codi"/>"/>
 						</div>
 					</script>
 				</th>
@@ -330,26 +362,26 @@ function getCookie(cname) {
 				<th data-col-name="notificacio.enviamentTipus" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.tipusenviament" />
 					<script type="text/x-jsrender">
 						<div class="from-group" style="padding: 0; font-weight: 100;">
-							<select class="form-control" id="notificacio" name="tipusEnviament">
+							<select class="form-control" id="notificacio" name="enviamentTipus">
     							<c:forEach items="${notificacioComunicacioEnumOptions}" var="opt">
-        							<option name="tipusEnviament" value="${opt.value != 'buit' ? opt.value : ''}" class="${opt.value != 'buit' ? '' : 'buit'}"><span class="${opt.value != 'buit' ? '' : 'buit'}"><spring:message code="${opt.text}"/></span></option>
+        							<option name="enviamentTipus" value="${opt.value != 'buit' ? opt.value : ''}" class="${opt.value != 'buit' ? '' : 'buit'}"><span class="${opt.value != 'buit' ? '' : 'buit'}"><spring:message code="${opt.text}"/></span></option>
     							</c:forEach>
 							</select>
 						</div>
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.concepte == true}"> 
+					<c:when test = "${columnes.concepte == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.concepte == false}"> 
+					<c:when test = "${columnes.concepte == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
 				<th data-col-name="notificacio.concepte" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.concepte"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
-							<input name="concepte" class="form-control" type="text" placeholder="<spring:message code="enviament.list.concepte"/>"/>
+							<input name="concepte" value="${filtreEnviaments.concepte}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.concepte"/>"/>
 						</div>
 					</script>
 				</th>
@@ -364,7 +396,7 @@ function getCookie(cname) {
 				<th data-col-name="notificacio.descripcio"  data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.descripcio"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
-							<input name="descripcio" class="form-control" type="text" placeholder="<spring:message code="enviament.list.descripcio"/>"/>
+							<input name="descripcio" value="${filtreEnviaments.descripcio}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.descripcio"/>"/>
 						</div>
 					</script>
 				</th>
@@ -379,7 +411,7 @@ function getCookie(cname) {
 				<th data-col-name="titularNif" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.niftitular"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
-							<input name="nifTitular" class="form-control" type="text" placeholder="<spring:message code="enviament.list.niftitular"/>'"/>
+							<input name="nifTitular" value="${filtreEnviaments.nifTitular}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.niftitular"/>"/>
 						</div>
 					</script>
 				</th>
@@ -391,10 +423,10 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="titularNomLlinatges" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.nomLlinatgetitular"/>
+				<th data-col-name="titularNomLlinatge" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.nomLlinatgetitular"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
-							<input name="titularNomLlinatges" class="form-control" type="text" placeholder="<spring:message code="enviament.list.nomLlinatgetitular"/>'"/>
+							<input name="titularNomLlinatge" value="${filtreEnviaments.titularNomLlinatge}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.nomLlinatgetitular"/>"/>
 						</div>
 					</script>
 				</th>
@@ -409,7 +441,7 @@ function getCookie(cname) {
 				<th data-col-name="titularEmail" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.emailtitular"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
-							<input name="emailTitular" class="form-control" type="text" placeholder="<spring:message code="enviament.list.emailtitular"/>'"/>
+							<input name="emailTitular" value="${filtreEnviaments.emailTitular}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.emailtitular"/>"/>
 						</div>
 					</script>
 				</th>
@@ -424,7 +456,7 @@ function getCookie(cname) {
 				<th data-col-name="destinatariNomLlinatges" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.destinataris"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
-							<input name="destinatariNomLlinatges" class="form-control" type="text" placeholder="<spring:message code="enviament.list.destinataris"/>'"/>
+							<input name="destinataris" value="${filtreEnviaments.destinataris}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.destinataris"/>"/>
 						</div>
 					</script>
 				</th>
@@ -440,9 +472,9 @@ function getCookie(cname) {
 					<script type="text/x-jsrender">
 						<div class="from-group" data-provide="daterangepicker">
 							<div class="input-group vdivide">
-    							<input name="dataCaducitatInici" type="text" class="form-control data" placeholder="Inici">
+    							<input name="dataCaducitatInici" value="<fmt:formatDate value="${filtreEnviaments.dataCaducitatInici}" pattern="dd/MM/yyyy" />" type="text" class="form-control data" placeholder="Inici">
     							<div class="input-group-addon"></div>
-    							<input name="dataCaducitatFi" type="text" class="form-control data" placeholder="Final">
+    							<input name="dataCaducitatFi" value="<fmt:formatDate value="${filtreEnviaments.dataCaducitatFi}" pattern="dd/MM/yyyy" />" type="text" class="form-control data" placeholder="Final">
 							</div>
 						</div>
 					</script>
@@ -458,7 +490,7 @@ function getCookie(cname) {
 				<th data-col-name="notifica.notificaCertificacioArxiuId" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.numerocertificatcorreus"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
-							<input name="numeroCertCorreus" class="form-control" type="text" placeholder="<spring:message code="enviament.list.numerocertificatcorreus"/>'"/>
+							<input name="numeroCertCorreus" value="${filtreEnviaments.numeroCertCorreus}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.numerocertificatcorreus"/>"/>
 						</div>
 					</script>
 				</th>
@@ -473,7 +505,7 @@ function getCookie(cname) {
 				<th data-col-name="notificacio.csv_uuid" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codicsvuuid"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
-							<input name="csvUuid" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codicsvuuid"/>'"/>
+							<input name="csvUuid" value="${filtreEnviaments.csvUuid}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codicsvuuid"/>'"/>
 						</div>
 					</script>
 				</th>
@@ -488,7 +520,7 @@ function getCookie(cname) {
 				<th data-col-name="notificacio.estat"  data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.estat"/>
 					<script type="text/x-jsrender">
 						<div class="from-group" style="padding: 0; font-weight: 100;">
-							<select class="form-control" id="estat" name="estat">
+							<select class="form-control" id="estat" name="estat" >
 								<option name="estat" class=""></option>
     							<c:forEach items="${notificacioEstatEnumOptions}" var="opt">
         							<option name="estat" value="${opt.value != 'buit' ? opt.value : ''}" class="${opt.value != 'buit' ? '' : 'buit'}"><span class="${opt.value != 'buit' ? '' : 'buit'}"><spring:message code="${opt.text}"/></span></option>

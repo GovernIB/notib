@@ -252,7 +252,7 @@
 						if($($cellFilter).children().get(0) == null){
 							$cellFilter.append($(plugin.settings.cellTemplate).html());
 						}
-						$cellFilter.on('click', function() {
+						$("#btnFiltrar").on('click', function(index, object) {
 							$rowFilter.each(function(index) {
 								$(this).each(function(index) {
 									$(this).children().each(function(){

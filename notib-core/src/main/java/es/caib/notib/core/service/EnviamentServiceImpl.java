@@ -30,6 +30,7 @@ import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
+import es.caib.notib.core.api.dto.NotificacioTipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.UsuariDto;
@@ -206,7 +207,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}
 		}
 		Integer estat = null;
+		Integer tipusEnviament = null;
 		if(filtre.getEstat()!=null){estat = filtre.getEstat().getNumVal();}else{estat = 0;}
+		if(filtre.getEnviamentTipus()!=null){tipusEnviament = NotificacioTipusEnviamentEnumDto.getNumVal(filtre.getEnviamentTipus()) ;}else{tipusEnviament = 0;}
 		notificacions = notificacioRepository.findNotificacioByFiltre(
 				filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 				filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
@@ -224,8 +227,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				dataCaducitatInici,
 				(dataCaducitatFi == null),
 				dataCaducitatFi,
-				(filtre.getTipusEnviament() == null),
-				(filtre.getTipusEnviament()),
+				(filtre.getEnviamentTipus() == null),
+				(tipusEnviament),
 				//(filtre.getLlibreRegistre() == null || filtre.getLlibreRegistre().isEmpty()),
 				//filtre.getLlibreRegistre() == null ? "" : filtre.getLlibreRegistre(),
 				//(filtre.getNumeroRegistre() == null || filtre.getNumeroRegistre().isEmpty()),
@@ -390,7 +393,17 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 		//Filtres camps procediment
 		Integer estat = null;
-		if(filtre.getEstat()!=null){estat = filtre.getEstat().getNumVal();}else{estat = 0;}
+		Integer tipusEnviament = null;
+		if(filtre.getEstat()!=null){
+			estat = filtre.getEstat().getNumVal();
+		}else{
+			estat = 0;
+		}
+		if(filtre.getEnviamentTipus()!=null){
+			tipusEnviament = NotificacioTipusEnviamentEnumDto.getNumVal(filtre.getEnviamentTipus());
+		}else{
+			tipusEnviament = 0;
+		}
 		notificacions = notificacioRepository.findNotificacioByFiltre(
 				filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 				filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
@@ -408,8 +421,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				dataCaducitatInici,
 				(dataCaducitatFi == null),
 				dataCaducitatFi,
-				(filtre.getTipusEnviament() == null),
-				(filtre.getTipusEnviament()),
+				(filtre.getEnviamentTipus() == null),
+				(tipusEnviament),
 				//(filtre.getLlibreRegistre() == null || filtre.getLlibreRegistre().isEmpty()),
 				//filtre.getLlibreRegistre() == null ? "" : filtre.getLlibreRegistre(),
 				//(filtre.getNumeroRegistre() == null || filtre.getNumeroRegistre().isEmpty()),
@@ -572,7 +585,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 				}
 			}
 		Integer estat = null;
+		Integer tipusEnviament = null;
 		if(filtre.getEstat()!=null){estat = filtre.getEstat().getNumVal();}else{estat = 0;}
+		if(filtre.getEnviamentTipus()!=null){tipusEnviament = NotificacioTipusEnviamentEnumDto.getNumVal(filtre.getEnviamentTipus()) ;}else{tipusEnviament = 0;}
 		notificacions = notificacioRepository.findNotificacioByFiltre(
 				filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 				filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
@@ -590,8 +605,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				dataCaducitatInici,
 				(dataCaducitatFi == null),
 				dataCaducitatFi,
-				(filtre.getTipusEnviament() == null),
-				(filtre.getTipusEnviament()),
+				(filtre.getEnviamentTipus() == null),
+				(tipusEnviament),
 				//(filtre.getLlibreRegistre() == null || filtre.getLlibreRegistre().isEmpty()),
 				//filtre.getLlibreRegistre() == null ? "" : filtre.getLlibreRegistre(),
 				//(filtre.getNumeroRegistre() == null || filtre.getNumeroRegistre().isEmpty()),

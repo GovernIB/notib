@@ -35,7 +35,7 @@ public class ColumnesCommand {
 	private boolean codiNotibEnviament; 
 	private boolean numCertificacio; 
 	private boolean csvUuid; 
-	private boolean estat; 
+	private boolean estat;
 	
 	public Long getId() {
 		return id;

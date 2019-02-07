@@ -19,7 +19,7 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private String usuari;
 	private NotificacioDtoV2 notificacio;
 	private String titularNom;
-	private String titularNomLlinatges;
+	private String titularNomLlinatge;
 	private String titularLlinatge1;
 	private String titularLlinatge2;
 	private String titularNif;
@@ -142,17 +142,17 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	public void setDestinatariEmail(String destinatariEmail) {
 		this.destinatariEmail = destinatariEmail;
 	}
-	public void setTitularNomLlinatges(String titularNomLlinatges) {
-		this.titularNomLlinatges = titularNomLlinatges;
+	public void setTitularNomLlinatge(String titularNomLlinatge) {
+		this.titularNomLlinatge = titularNomLlinatge;
 	}
-	public String getTitularNomLlinatges() {
-		titularNomLlinatges = concatenarNomLlinatges(
+	public String getTitularNomLlinatge() {
+		titularNomLlinatge = concatenarNomLlinatges(
 				getTitularLlinatges(),
 				titularNom,
 				titularRaoSocial,
 				null);
 		
-		return titularNomLlinatges;
+		return titularNomLlinatge;
 	}
 	public String getDestinatariNomLlinatges() {
 		destinatariNomLlinatges = concatenarNomLlinatges(

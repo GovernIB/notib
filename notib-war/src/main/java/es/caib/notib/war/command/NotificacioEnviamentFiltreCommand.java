@@ -4,8 +4,9 @@ import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
+import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioTipusEnviamentEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
 public class NotificacioEnviamentFiltreCommand {
@@ -19,11 +20,11 @@ public class NotificacioEnviamentFiltreCommand {
 	private String codiProcediment;
 	private String grup;
 	private String usuari;
-	private NotificaEnviamentTipusEnumDto tipusEnviament;
+	private NotificacioTipusEnviamentEnumDto enviamentTipus;
 	private String concepte;
 	private String descripcio;
 	private String nifTitular;
-	private String nomLlinatgeTitular;
+	private String titularNomLlinatge;
 	private String emailTitular;
 	private String dir3Codi;
 	private String destinataris;
@@ -36,7 +37,7 @@ public class NotificacioEnviamentFiltreCommand {
 	private String codiNotibEnviament;
 	private String numeroCertCorreus;
 	private String csvUuid;
-	private String estat;
+	private NotificacioEstatEnumDto estat;
 	
 	public Long getId() {
 		return id;
@@ -92,11 +93,11 @@ public class NotificacioEnviamentFiltreCommand {
 	public void setUsuari(String usuari) {
 		this.usuari = usuari;
 	}
-	public NotificaEnviamentTipusEnumDto getTipusEnviament() {
-		return tipusEnviament;
+	public NotificacioTipusEnviamentEnumDto getEnviamentTipus() {
+		return enviamentTipus;
 	}
-	public void setTipusEnviament(NotificaEnviamentTipusEnumDto tipusEnviament) {
-		this.tipusEnviament = tipusEnviament;
+	public void setEnviamentTipus(NotificacioTipusEnviamentEnumDto enviamentTipus) {
+		this.enviamentTipus = enviamentTipus;
 	}
 	public String getConcepte() {
 		return concepte;
@@ -116,11 +117,11 @@ public class NotificacioEnviamentFiltreCommand {
 	public void setNifTitular(String nifTitular) {
 		this.nifTitular = nifTitular;
 	}
-	public String getNomLlinatgeTitular() {
-		return nomLlinatgeTitular;
+	public String getTitularNomLlinatge() {
+		return titularNomLlinatge;
 	}
-	public void setNomLlinatgeTitular(String nomLlinatgeTitular) {
-		this.nomLlinatgeTitular = nomLlinatgeTitular;
+	public void setTitularNomLlinatge(String titularNomLlinatge) {
+		this.titularNomLlinatge = titularNomLlinatge;
 	}
 	public String getEmailTitular() {
 		return emailTitular;
@@ -188,10 +189,10 @@ public class NotificacioEnviamentFiltreCommand {
 	public void setCsvUuid(String csvUuid) {
 		this.csvUuid = csvUuid;
 	}
-	public String getEstat() {
+	public NotificacioEstatEnumDto getEstat() {
 		return estat;
 	}
-	public void setEstat(String estat) {
+	public void setEstat(NotificacioEstatEnumDto estat) {
 		this.estat = estat;
 	}
 	public String getDir3Codi() {
