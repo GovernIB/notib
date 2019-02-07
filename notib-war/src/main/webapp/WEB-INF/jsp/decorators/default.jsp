@@ -33,9 +33,9 @@
 	pageContext.setAttribute(
 			"requestParameterCanviRol",
 			es.caib.notib.war.helper.RolHelper.getRequestParameterCanviRol());
-	pageContext.setAttribute(
-			"permisConsulta",
-			request.getAttribute("permisConsulta"));
+	//pageContext.setAttribute(
+	//		"permisConsulta",
+	//		request.getAttribute("permisConsulta"));
 	pageContext.setAttribute(
 			"permisNotificacio",
 			request.getAttribute("permisNotificacio"));
@@ -170,16 +170,15 @@ body {
 							</div>
 							</c:if>
 							<c:if test="${isRolActualUsuari}">
-								<c:if test="${permisConsulta}">
+							
+								<c:if test="${permisNotificacio}">
+									<div class="btn-group">
+										<a data-toggle="modal" data-maximized="true" class="btn btn-primary" href="<c:url value="/notificacio/procediments"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.altanotificacio"/></a>
+									</div>
+								</c:if>
 									<div class="btn-group">
 										<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
 									</div>
-								</c:if>
-								<c:if test="${permisNotificacio}">
-									<div class="btn-group">
-										<a href="<c:url value="/notificacio/new"/>" class="btn btn-primary"><spring:message code="decorator.menu.altanotificacio"/></a>
-									</div>
-								</c:if>
 							</c:if>
 							<c:if test="${isRolActualAdministradorEntitat}">
 							<div class="btn-group">

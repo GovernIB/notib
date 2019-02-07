@@ -30,6 +30,24 @@ import es.caib.notib.plugin.utils.PropertiesHelper;
  */
 public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 
+
+	@Override
+	public List<String> consultarRolsAmbCodi(
+			String usuariCodi) throws SistemaExternException {
+		LOGGER.debug("Consulta dels rols de l'usuari (usuariCodi=" + usuariCodi + ")");
+		try {
+			return consultaRolsUsuari(
+					getLdapFiltreCodi(),
+					usuariCodi);
+			
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"Error al consultar els rols de l'usuari (usuariCodi=" + usuariCodi + ")",
+					ex);
+		}
+		
+	}
+	
 	@Override
 	public DadesUsuari consultarAmbCodi(
 			String usuariCodi) throws SistemaExternException {
@@ -76,6 +94,40 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 					"filtre=" + filtre + ", " +
 					"valor=" + valor + ")");
 		}
+	}
+	private List<String> consultaRolsUsuari(
+			String filtre,
+			String valor) throws NamingException {
+		
+		List<String> rolsUsuari = new ArrayList<String>();
+		Hashtable<String, String> entornLdap = new Hashtable<String, String>();
+		entornLdap.put(
+				Context.INITIAL_CONTEXT_FACTORY,
+				"com.sun.jndi.ldap.LdapCtxFactory");
+		entornLdap.put(Context.PROVIDER_URL, getLdapServerUrl());
+		entornLdap.put(Context.SECURITY_PRINCIPAL, getLdapPrincipal());
+		entornLdap.put(Context.SECURITY_CREDENTIALS, getLdapCredentials());
+		LdapContext ctx = new InitialLdapContext(entornLdap, null);
+		try {
+			String[] atributs = getLdapAtributs().split(",");
+			SearchControls searchCtls = new SearchControls();
+			searchCtls.setReturningAttributes(atributs);
+			searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+			NamingEnumeration<SearchResult> answer = ctx.search(
+					getLdapSearchBase(),
+					filtre.replace("XXX", valor),
+					searchCtls);
+			while (answer.hasMoreElements()) {
+				SearchResult result = answer.next();
+					rolsUsuari = obtenirAtributComListString(
+							result.getAttributes(),
+							atributs[5]);
+				
+			}
+		} finally {
+			ctx.close();
+		}
+		return rolsUsuari;
 	}
 	private List<DadesUsuari> consultaUsuaris(
 			String filtre,
@@ -146,6 +198,24 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 		Attribute atribut = atributs.get(atributNom);
 		return (atribut != null) ? (String)atribut.get() : null;
 	}
+	
+	private List<String> obtenirAtributComListString(
+			Attributes atributs,
+			String atributNom) throws NamingException {
+		Attribute atribut = atributs.get(atributNom);
+		List<String> listRols = new ArrayList<String>();
+		
+		NamingEnumeration rols = atribut.getAll();
+		
+		while (rols.hasMoreElements()) {
+			String rol = rols.next().toString();
+			int iniciIndexRol = rol.indexOf("CN=") + 3;
+			int fiIndexRol = rol.indexOf(",");
+			listRols.add(rol.substring(iniciIndexRol, fiIndexRol));
+		}
+		
+		return listRols;
+	}
 
 	private String getLdapServerUrl() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.server.url");
@@ -179,5 +249,6 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DadesUsuariPluginLdap.class);
+
 
 }

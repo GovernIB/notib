@@ -12,4 +12,5 @@ public interface GrupProcedimentRepository extends JpaRepository<GrupProcediment
 
 	public GrupProcedimentEntity findByGrup(GrupEntity grup);
 	public List<GrupProcedimentEntity> findByProcediment(ProcedimentEntity procediment);
+	public GrupProcedimentEntity findByGrupAndProcediment(GrupEntity grup, ProcedimentEntity procediment);
 }

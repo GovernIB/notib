@@ -24,6 +24,17 @@ public interface DadesUsuariPlugin {
 	 * @throws SistemaExternException
 	 *            Si es produeix un error al consultar les dades de l'usuari.
 	 */
+	public List<String> consultarRolsAmbCodi(String usuariCodi) throws SistemaExternException;
+	
+	/**
+	 * Retorna la informació d'un usuari donat el codi d'usuari.
+	 * 
+	 * @param usuariCodi
+	 *            Codi de l'usuari que es vol consultar.
+	 * @return la informació de l'usuari o null si no se troba.
+	 * @throws SistemaExternException
+	 *            Si es produeix un error al consultar les dades de l'usuari.
+	 */
 	public DadesUsuari consultarAmbCodi(String usuariCodi) throws SistemaExternException;
 
 	/**
