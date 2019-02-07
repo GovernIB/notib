@@ -116,33 +116,50 @@ public class GrupServiceImpl implements GrupService{
 	}
 	
 	@Override
+	public List<GrupDto> findByGrupsProcediment(Long procedimentId) {
+		List<GrupDto> grups = new ArrayList<GrupDto>();
+		
+		ProcedimentEntity procediment = procedimentRepositroy.findOne(procedimentId);
+		List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepositoy.findByProcediment(procediment); 
+		
+		for (GrupProcedimentEntity grupProcediment : grupsProcediment) {
+			grups.add(conversioTipusHelper.convertir(
+					grupReposity.findOne(grupProcediment.getGrup().getId()), 
+					GrupDto.class));
+					
+		}
+		
+		return grups;
+	}
+
+	@Override
 	public PaginaDto<ProcedimentGrupDto> findByProcediment(
 			Long entitatId, 
 			Long procedimentId) {
 		
-		entityComprovarHelper.comprovarEntitat(entitatId);
+		if (entitatId != null)
+			entityComprovarHelper.comprovarEntitat(
+					entitatId, 
+					true,
+					false,
+					false, 
+					false);
 		
 		ProcedimentEntity procediment = procedimentRepositroy.findOne(procedimentId);
-		List<GrupEntity> grups = new ArrayList<GrupEntity>();
 		List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepositoy.findByProcediment(procediment); 
 		
-		for (GrupProcedimentEntity grupProcedimentEntity : grupsProcediment) {
-			grups.add(grupReposity.findOne(grupProcedimentEntity.getGrup().getId()));
-		}
-		
 		return paginacioHelper.toPaginaDto(
-				grups, 
+				grupsProcediment, 
 				ProcedimentGrupDto.class);
 	}
 	
 	@Override
-	public ProcedimentGrupDto findGrupById(
+	public ProcedimentGrupDto findProcedimentGrupById(
 			Long entitatId, 
-			Long grupId) {
+			Long procedimentGrupId) {
 		
 		entityComprovarHelper.comprovarEntitat(entitatId);
-		GrupEntity grup = grupReposity.findOne(grupId);
-		GrupProcedimentEntity procedimentGrup = grupProcedimentRepositoy.findByGrup(grup);
+		GrupProcedimentEntity procedimentGrup = grupProcedimentRepositoy.findOne(procedimentGrupId);
 		
 		return conversioTipusHelper.convertir(
 				procedimentGrup, 
@@ -211,8 +228,6 @@ public class GrupServiceImpl implements GrupService{
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
-
-
 
 
 

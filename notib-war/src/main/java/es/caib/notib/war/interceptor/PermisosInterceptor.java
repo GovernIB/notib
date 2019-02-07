@@ -9,8 +9,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.helper.EntityComprovarHelper;
-import es.caib.notib.war.helper.RolHelper;
+import es.caib.notib.war.helper.PermisosHelper;
 
 /**
  * Interceptor per a redirigir les peticions a finestres modals.
@@ -19,8 +21,13 @@ import es.caib.notib.war.helper.RolHelper;
  */
 public class PermisosInterceptor extends HandlerInterceptorAdapter {
 
+
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
+	@Autowired
+	private ProcedimentService procedimentService; 
+	@Autowired
+	private AplicacioService aplicacioService;
 	
 	@Override
 	public boolean preHandle(
@@ -28,14 +35,12 @@ public class PermisosInterceptor extends HandlerInterceptorAdapter {
 			HttpServletResponse response,
 			Object handler) throws Exception {
 		
-		if (RolHelper.isUsuariActualUsuari(request)) {
-			request.setAttribute(
-					"permisConsulta", 
-					entityComprovarHelper.hasPermisConsultaProcediment());
-			request.setAttribute(
-					"permisNotificacio", 
-					entityComprovarHelper.hasPermisNotificacioProcediment());
-		}
+		PermisosHelper.comprovarPermisosUsuariActual(
+				request,
+				procedimentService,
+				aplicacioService,
+				entityComprovarHelper);
+		
 		return true;
 	}
 

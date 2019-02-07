@@ -57,6 +57,16 @@ public interface AplicacioService {
 	public UsuariDto findUsuariAmbCodi(String codi);
 
 	/**
+	 * Obté els rols d'un usuari donat el seu codi.
+	 * 
+	 * @param codi
+	 *            Codi de l'usuari a cercar.
+	 * @return L'usuari obtingut o null si no s'ha trobat.
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	public List<String> findRolsUsuariAmbCodi(String usuariCodi);
+	
+	/**
 	 * Consulta els usuaris donat un text.
 	 * 
 	 * @param text
