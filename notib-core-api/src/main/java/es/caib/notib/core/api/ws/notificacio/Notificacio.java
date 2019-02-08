@@ -31,7 +31,6 @@ public class Notificacio {
 	private Integer retard;
 	private Date caducitat;
 	private Document document;
-	private String procedimentCodi;
 	private PagadorPostal pagadorPostal;
 	private PagadorCie pagadorCie;
 	private List<Enviament> enviaments;
@@ -90,12 +89,6 @@ public class Notificacio {
 	}
 	public void setDocument(Document document) {
 		this.document = document;
-	}
-	public String getProcedimentCodi() {
-		return procedimentCodi;
-	}
-	public void setProcedimentCodi(String procedimentCodi) {
-		this.procedimentCodi = procedimentCodi;
 	}
 	public PagadorPostal getPagadorPostal() {
 		return pagadorPostal;

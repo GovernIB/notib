@@ -25,7 +25,9 @@ import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.exception.RegistrePluginException;
 import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.ws.notificacio.Certificacio;
 import es.caib.notib.core.api.ws.notificacio.ComunicacioTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.Document;
@@ -35,6 +37,7 @@ import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.EnviamentEstatEnum;
 import es.caib.notib.core.api.ws.notificacio.EnviamentReferencia;
+import es.caib.notib.core.api.ws.notificacio.EnviamentV2;
 import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWs;
@@ -79,6 +82,8 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 	private NotificaHelper notificaHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
+	@Autowired
+	private AplicacioService aplicacioService;
 
 
 
@@ -138,23 +143,25 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 		if (notificacio.getComunicacioTipus() != null && ComunicacioTipusEnum.SINCRON.equals(notificacio.getComunicacioTipus())) {
 			comunicacioTipus = NotificacioComunicacioTipusEnumDto.SINCRON;
 		}
-		NotificacioEntity.Builder notificacioBuilder = NotificacioEntity.getBuilder(
+		NotificacioEntity.BuilderV1 notificacioBuilder = NotificacioEntity.getBuilderV1(
 				entitat,
 				emisorDir3Codi,
 				comunicacioTipus,
 				enviamentTipus, 
 				notificacio.getConcepte(),
-				document.getArxiuNom(),
-				documentGesdocId,
-				document.getCsv() != null ? document.getCsv() : document.getUuid(),
-				document.getHash(),
-				document.isNormalitzat(),
-				document.isGenerarCsv()).
+				notificacio.getDescripcio(),
+				notificacio.getEnviamentDataProgramada(),
+				notificacio.getRetard(),
+				notificacio.getCaducitat(),
+				notificacio.getDocument(),
+				notificacio.getPagadorPostal(),
+				notificacio.getPagadorCie(),
+				notificacio.getEnviaments(),
+				notificacio.getParametresSeu()).
 				descripcio(notificacio.getDescripcio()).
 				caducitat(notificacio.getCaducitat()).
-//				retardPostal(notificacio.getRetard()).
-				descripcio(notificacio.getDescripcio()).
-				procedimentCodiNotib(notificacio.getProcedimentCodi());
+				retardPostal(notificacio.getRetard()).
+				descripcio(notificacio.getDescripcio());
 		/*PagadorPostal pagadorPostal = notificacio.getPagadorPostal();
 		if (pagadorPostal != null) {
 			notificacioBuilder.
@@ -319,9 +326,18 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 		}
 		notificacioRepository.saveAndFlush(notificacioEntity);
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioEntity.getComunicacioTipus())) {
-			//TODO: Registrar
-			notificaHelper.notificacioEnviar(notificacioEntity.getId());
-			notificacioEntity = notificacioRepository.findOne(notificacioEntity.getId());
+			if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus()) && notificacioEntity.getEnviaments().get(0).getTitularCodiDesti().equals("Administració")) {
+				//TODO: Registrar SIR
+			} else {
+				//TODO: Registrar Normal
+				try {
+					pluginHelper.registrarSortida(pluginHelper.notificacioToRegistreAnotacio(notificacioEntity), "NOTIB", aplicacioService.getVersioActual());
+				} catch (RegistrePluginException e) {
+					e.getMessage();
+				}
+				notificaHelper.notificacioEnviar(notificacioEntity.getId());
+				notificacioEntity = notificacioRepository.findOne(notificacioEntity.getId());
+			}
 		}
 		RespostaAlta resposta = new RespostaAlta();
 		try {

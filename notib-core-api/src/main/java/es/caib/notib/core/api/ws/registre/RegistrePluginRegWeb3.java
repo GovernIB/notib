@@ -15,11 +15,17 @@ public interface RegistrePluginRegWeb3 {
 	 * Crea un registre de sortida
 	 * 
 	 */
-	public RespostaAnotacioRegistre registrarSortida(
+	public String registrarSortida(
 			RegistreAssentament registreSortida,
 			String aplicacioNom,
 			String aplicacioVersio,
 			String entitat) throws RegistrePluginException;
+	
+//	public RespostaAnotacioRegistre registrarSortida(
+//			RegistreAssentament registreSortida,
+//			String aplicacioNom,
+//			String aplicacioVersio,
+//			String entitat) throws RegistrePluginException;
 
 	public RespostaConsultaRegistre obtenirRegistreSortida(
 			String numRegistre, 

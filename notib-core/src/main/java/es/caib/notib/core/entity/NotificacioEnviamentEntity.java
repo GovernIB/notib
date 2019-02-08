@@ -236,42 +236,6 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaIntentData;
 	
-	
-	/* Seu CAIB 
-	@Column(name = "seu_reg_numero", length = 50)
-	private String seuRegistreNumero;
-	@Column(name = "seu_reg_data")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date seuRegistreData;
-	@Column(name = "seu_data_fi")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date seuDataFi;
-	@Column(name = "seu_estat", nullable = false)
-	@Enumerated(EnumType.ORDINAL)
-	private SeuEstatEnumDto seuEstat;
-	@Column(name = "seu_error", nullable = false)
-	private boolean seuError;
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
-	@JoinColumn(name = "seu_error_event_id")
-	@ForeignKey(name = "not_noteve_seuerr_notdest_fk")
-	private NotificacioEventEntity seuErrorEvent;
-	@Column(name = "seu_data_estat")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date seuDataEstat;
-	@Column(name = "seu_data_notinf")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date seuDataNotificaInformat;
-	@Column(name = "seu_data_notidp")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date seuDataNotificaDarreraPeticio;
-	@Column(name = "seu_fitxer_codi")
-	private Long seuFitxerCodi;
-	@Column(name = "seu_fitxer_clau", length = 20)
-	private String seuFitxerClau;
-	@Column(name = "seu_intent_data")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date seuIntentData;
-	*/
 	@Column(name = "intent_num")
 	private int intentNum;
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)

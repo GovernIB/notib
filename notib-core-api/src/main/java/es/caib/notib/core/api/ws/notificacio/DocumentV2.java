@@ -13,8 +13,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @JsonAutoDetect
-public class Document {
-
+public class DocumentV2 {
+	
 	private String arxiuId;
 	private String arxiuNom;
 	private String contingutBase64;
@@ -23,6 +23,8 @@ public class Document {
 	private String metadades;
 	private boolean normalitzat;
 	private boolean generarCsv;
+	private String uuid;
+	private String csv;
 	
 	public String getArxiuNom() {
 		return arxiuNom;
@@ -65,6 +67,18 @@ public class Document {
 	}
 	public void setGenerarCsv(boolean generarCsv) {
 		this.generarCsv = generarCsv;
+	}
+	public String getUuid() {
+		return uuid;
+	}
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+	public String getCsv() {
+		return csv;
+	}
+	public void setCsv(String csv) {
+		this.csv = csv;
 	}
 	public String getArxiuId() {
 		return arxiuId;

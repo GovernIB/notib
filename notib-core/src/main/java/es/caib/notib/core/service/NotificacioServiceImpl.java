@@ -580,6 +580,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!pendents.isEmpty()) {
 				logger.debug("Realitzant enviaments a Notifica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
 				for (NotificacioEntity pendent: pendents) {
+					//TODO: Registrar
 					logger.debug(">>> Realitzant enviament a Notifica de la notificació amb identificador: " + pendent.getId());
 					notificaHelper.notificacioEnviar(pendent.getId());
 				}

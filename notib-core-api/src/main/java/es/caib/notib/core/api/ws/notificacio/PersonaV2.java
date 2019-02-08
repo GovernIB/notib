@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @JsonAutoDetect
-public class Persona {
+public class PersonaV2 {
 
 	private String nom;
 	private String llinatge1;
@@ -19,6 +19,8 @@ public class Persona {
 	private String nif;
 	private String telefon;
 	private String email;
+	private String raoSocial;
+	private String codiEntitatDesti;
 	
 	public String getNom() {
 		return nom;
@@ -55,5 +57,17 @@ public class Persona {
 	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	public String getRaoSocial() {
+		return raoSocial;
+	}
+	public void setRaoSocial(String raoSocial) {
+		this.raoSocial = raoSocial;
+	}
+	public String getCodiEntitatDesti() {
+		return codiEntitatDesti;
+	}
+	public void setCodiEntitatDesti(String codiEntitatDesti) {
+		this.codiEntitatDesti = codiEntitatDesti;
 	}
 }
