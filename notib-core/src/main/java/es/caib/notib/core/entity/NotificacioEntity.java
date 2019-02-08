@@ -230,9 +230,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
 		return enviamentTipus;
 	}
-//	public Date getEnviamentDataProgramada() {
-//		return enviamentDataProgramada;
-//	}
 	public String getConcepte() {
 		return concepte;
 	}
@@ -248,9 +245,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public String getProcedimentDescripcioSia() {
 		return procedimentDescripcioSia;
 	}
-//	public Integer getRetardPostal() {
-//		return retardPostal;
-//	}
 	public Date getCaducitat() {
 		return caducitat;
 	}

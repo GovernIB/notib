@@ -13,6 +13,8 @@ import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 
 /**
@@ -77,9 +79,62 @@ public interface NotificacioService {
 			boolean isUsuari,
 			boolean isUsuariEntitat,
 			boolean isSuperUsuari,
+			List<ProcedimentGrupDto> grupsProcediments,
+			List<ProcedimentDto> procediments,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
 
+	/**
+	 * Consulta de les notificacions segons els paràmetres del filtre.
+	 * 
+	 * @param filtre
+	 *            Paràmetres per a filtrar els resultats.
+	 * @param paginacioParams
+	 *            Paràmetres per a dur a terme la paginació del resultats.
+	 * @return La pàgina amb les notificacions.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	public List<ProcedimentDto> findNotificacionsAmbPermisConsultaAndGrups(
+			List<ProcedimentDto> procediments);
+	
+	/**
+	 * Consulta de les notificacions segons els paràmetres del filtre.
+	 * 
+	 * @param filtre
+	 *            Paràmetres per a filtrar els resultats.
+	 * @param paginacioParams
+	 *            Paràmetres per a dur a terme la paginació del resultats.
+	 * @return La pàgina amb les notificacions.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	public List<ProcedimentDto> findNotificacionsAmbPermisConsulta();
+	
+	/**
+	 * Consulta de les notificacions segons els paràmetres del filtre.
+	 * 
+	 * @param filtre
+	 *            Paràmetres per a filtrar els resultats.
+	 * @param paginacioParams
+	 *            Paràmetres per a dur a terme la paginació del resultats.
+	 * @return La pàgina amb les notificacions.
+	 */
+	
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	public List<ProcedimentDto> findNotificacionsAmbPermisNotificacio();
+	
+	/**
+	 * Consulta de les notificacions segons els paràmetres del filtre.
+	 * 
+	 * @param filtre
+	 *            Paràmetres per a filtrar els resultats.
+	 * @param paginacioParams
+	 *            Paràmetres per a dur a terme la paginació del resultats.
+	 * @return La pàgina amb les notificacions.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	public List<ProcedimentDto> findNotificacionsAmbPermisNotificacioAndGrups(
+			List<ProcedimentDto> procediments);
+	
 	/**
 	 * Consulta dels events d'una notificació.
 	 * 

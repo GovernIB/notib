@@ -88,7 +88,7 @@ public interface ProcedimentService {
 	public List<ProcedimentDto> findByEntitat(Long entitatId);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public List<ProcedimentDto> findProcedimnetsUsuariActual();
+	public List<ProcedimentDto> findProcedimnetsNotificacioUsuariActual();
 	/**
 	 * Consulta de les notificacions segons els paràmetres del filtre.
 	 * 
@@ -115,6 +115,13 @@ public interface ProcedimentService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public List<ProcedimentDto> findAll();
 
+	/**
+	 * Llistat amb tots els procediments.
+	 * 
+	 * @return La llista dels procediments.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	public List<ProcedimentGrupDto> findAllGrups();
 	/**
 	 * Llistat amb tots els procediments paginats.
 	 * 
@@ -209,6 +216,22 @@ public interface ProcedimentService {
 			Long id,
 			ProcedimentGrupDto procedimentGrup) throws NotFoundException;
 	
+	/**
+	 * Modifica els permisos d'un usuari o d'un rol per a un procediment.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param id
+	 *            Atribut id del procediment.
+	 * @param permis
+	 *            El permís que es vol modificar.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public void grupDelete(
+			Long entitatId,
+			Long GrupId) throws NotFoundException;
 	/**
 	 * Esborra els permisos d'un usuari o d'un rol per a un procediment.
 	 * 

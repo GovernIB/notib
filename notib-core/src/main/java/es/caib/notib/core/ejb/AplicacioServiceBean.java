@@ -54,6 +54,12 @@ public class AplicacioServiceBean implements AplicacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public List<String> findRolsUsuariAmbCodi(String usuariCodi) {
+		return delegate.findRolsUsuariAmbCodi(usuariCodi);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public UsuariDto findUsuariAmbCodi(String codi) {
 		return delegate.findUsuariAmbCodi(codi);
 	}
@@ -115,5 +121,6 @@ public class AplicacioServiceBean implements AplicacioService {
 	public boolean pluginSeuDisponible() {
 		return delegate.pluginSeuDisponible();
 	}
+
 
 }

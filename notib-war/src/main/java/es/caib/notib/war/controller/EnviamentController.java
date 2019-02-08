@@ -69,6 +69,7 @@ public class EnviamentController extends BaseUserController {
 				RequestSessionHelper.obtenirObjecteSessio(
 						request,
 						SESSION_ATTRIBUTE_SELECCIO));
+		model.addAttribute("filtreEnviaments", getFiltreCommand(request));
 		
 		columnes = enviamentService.getColumnesUsuari(
 				entitatActual.getId(), 

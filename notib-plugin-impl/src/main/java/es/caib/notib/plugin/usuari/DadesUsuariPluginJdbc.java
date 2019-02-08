@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.slf4j.Logger;
@@ -26,6 +27,23 @@ import es.caib.notib.plugin.utils.PropertiesHelper;
  */
 public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 
+
+	@Override
+	public List<String> consultarRolsAmbCodi(
+			String usuariCodi) throws SistemaExternException {
+		LOGGER.debug("Consulta dels rols de l'usuari (usuariCodi=" + usuariCodi + ")");
+		try {
+			return consultaRolsUsuariUnic(
+					getLdapFiltreRolsCodi(),
+					"codi",
+					usuariCodi);
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"Error al consultar els rols de l'usuari (usuariCodi=" + usuariCodi + ")",
+					ex);
+		}
+	}
+	
 	@Override
 	public DadesUsuari consultarAmbCodi(
 			String usuariCodi) throws SistemaExternException {
@@ -47,7 +65,46 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 	}
 
 
-
+	private List<String> consultaRolsUsuariUnic(
+			String sqlQuery,
+			String paramName,
+			String paramValue) throws SistemaExternException {
+		List<String> rols = new ArrayList<String>();
+		Connection con = null;
+		PreparedStatement ps = null;
+		try {
+			Context initContext = new InitialContext();
+			DataSource ds = (DataSource)initContext.lookup(getDatasourceJndiName());
+			con = ds.getConnection();
+			if (sqlQuery.contains("?")) {
+				ps = con.prepareStatement(sqlQuery);
+				ps.setString(1, paramValue);
+			} else if (sqlQuery.contains(":" + paramName)) {
+				ps = con.prepareStatement(
+						sqlQuery.replace(":" + paramName, "'" + paramValue + "'"));
+			} else {
+				ps = con.prepareStatement(sqlQuery);
+			}
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				rols.add(rs.getString(1));
+			}
+		} catch (Exception ex) {
+			throw new SistemaExternException(ex);
+		} finally {
+			try {
+				if (ps != null) ps.close();
+			} catch (Exception ex) {
+				LOGGER.error("Error al tancar el PreparedStatement", ex);
+			}
+			try {
+				if (con != null) con.close();
+			} catch (Exception ex) {
+				LOGGER.error("Error al tancar la connexió", ex);
+			}
+		}
+		return rols;
+	}
 	private DadesUsuari consultaDadesUsuariUnic(
 			String sqlQuery,
 			String paramName,
@@ -115,6 +172,10 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 		if (query == null || query.isEmpty())
 			query = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.jdbc.query.codi");
 		return query;
+	}
+	private String getLdapFiltreRolsCodi() {
+		// Exemple: (&(objectClass=inetOrgPersonCAIB)(cn=XXX))
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.jdbc.query.rols");
 	}
 	private String getJdbcQueryUsuariGrup() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.jdbc.query.grup");

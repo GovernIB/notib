@@ -29,8 +29,11 @@
 		style="width:100%">
 		<thead>
 			<tr>
-			<c:out value="${grup}"></c:out>
-				<th data-col-name="tipus" data-renderer="enum(TipusGrupEnumDto)"><spring:message code="procediment.permis.columna.tipus"/></th>
+				<th data-col-name="id" data-template="#cellTipusTemplate" ><spring:message code="procediment.grup.columna.tipus"/>
+					<script id="cellTipusTemplate" type="text/x-jsrender">
+						<td><spring:message code="procediment.grup.columna.tipus.grup"/></td>
+					</script>
+				</th>
 				<th data-col-name="grup.nom"><spring:message code="procediment.permis.columna.principal"/></th>
 				
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">

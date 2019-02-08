@@ -31,9 +31,13 @@ public class NotificacioV2 {
 	private Integer retard;
 	private Date caducitat;
 	private DocumentV2 document;
-//	private String codiUsuari;
+	private String codiUsuari;
 	private String codiProcediment;
 	private String codiGrup;
+	private String numExpedient;
+	private String refExterna;
+	private String idioma;
+	private String observacions;
 	private List<EnviamentV2> enviaments;
 	private ParametresRegistre parametresRegistre;
 	
@@ -97,17 +101,17 @@ public class NotificacioV2 {
 	public void setEnviaments(List<EnviamentV2> enviaments) {
 		this.enviaments = enviaments;
 	}
-//	public String getCodiUsuari() {
-//		return codiUsuari;
-//	}
-//	public void setCodiUsuari(String codiUsuari) {
-//		this.codiUsuari = codiUsuari;
-//	}
-	public String getCodiGrup() {
-		return codiGrup;
+	public ParametresRegistre getParametresRegistre() {
+		return parametresRegistre;
 	}
-	public void setCodiGrup(String codiGrup) {
-		this.codiGrup = codiGrup;
+	public void setParametresRegistre(ParametresRegistre parametresRegistre) {
+		this.parametresRegistre = parametresRegistre;
+	}
+	public String getCodiUsuari() {
+		return codiUsuari;
+	}
+	public void setCodiUsuari(String codiUsuari) {
+		this.codiUsuari = codiUsuari;
 	}
 	public String getCodiProcediment() {
 		return codiProcediment;
@@ -115,13 +119,36 @@ public class NotificacioV2 {
 	public void setCodiProcediment(String codiProcediment) {
 		this.codiProcediment = codiProcediment;
 	}
-	public ParametresRegistre getParametresRegistre() {
-		return parametresRegistre;
+	public String getCodiGrup() {
+		return codiGrup;
 	}
-	public void setParametresRegistre(ParametresRegistre parametresRegistre) {
-		this.parametresRegistre = parametresRegistre;
+	public void setCodiGrup(String codiGrup) {
+		this.codiGrup = codiGrup;
 	}
-	
+	public String getNumExpedient() {
+		return numExpedient;
+	}
+	public void setNumExpedient(String numExpedient) {
+		this.numExpedient = numExpedient;
+	}
+	public String getRefExterna() {
+		return refExterna;
+	}
+	public void setRefExterna(String refExterna) {
+		this.refExterna = refExterna;
+	}
+	public String getIdioma() {
+		return idioma;
+	}
+	public void setIdioma(String idioma) {
+		this.idioma = idioma;
+	}
+	public String getObservacions() {
+		return observacions;
+	}
+	public void setObservacions(String observacions) {
+		this.observacions = observacions;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

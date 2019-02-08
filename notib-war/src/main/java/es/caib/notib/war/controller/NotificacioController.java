@@ -5,6 +5,7 @@ package es.caib.notib.war.controller;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -37,6 +38,9 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.EnviamentService;
@@ -75,6 +79,7 @@ public class NotificacioController extends BaseUserController {
 	private ProcedimentService procedimentService;
 	@Autowired
 	private EnviamentService enviamentService;
+	@Autowired
 	private GrupService grupService;
 
 	@RequestMapping(method = RequestMethod.GET)
@@ -82,11 +87,44 @@ public class NotificacioController extends BaseUserController {
 			HttpServletRequest request,
 			Model model) {
 		model.addAttribute(new NotificacioFiltreCommand());
+		List<ProcedimentDto> procedimentsPermisConsulta = null;
+		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+		List<ProcedimentGrupDto> grupsProcediment = new ArrayList<ProcedimentGrupDto>();
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 		
 		if (RolHelper.isUsuariActualAdministrador(request)) {
 			model.addAttribute(
 					"entitat",
 					entitatService.findAll());
+		}
+		if (RolHelper.isUsuariActualUsuari(request)) {
+			//Llistat de procediments amb grups
+		    grupsProcediment = procedimentService.findAllGrups();
+			procediments = new ArrayList<ProcedimentDto>();
+			//Obté els procediments que tenen el mateix grup que el rol d'usuari
+			for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
+				for (String rol : rolsUsuariActual) {
+					if(rol.contains(grupProcediment.getGrup().getCodi())) {
+						procediments.add(grupProcediment.getProcediment());
+					}
+				}
+			}
+			
+			if (!procediments.isEmpty())
+				procedimentsPermisConsulta = notificacioService
+						.findNotificacionsAmbPermisConsultaAndGrups(procediments);
+			else if (grupsProcediment.isEmpty())
+				procedimentsPermisConsulta = notificacioService.findNotificacionsAmbPermisConsulta();
+			
+			
+			if (procedimentsPermisConsulta == null || procedimentsPermisConsulta.size() <= 0) {
+				MissatgesHelper.warning(
+						request, 
+						getMessage(
+								request, 
+								"notificacio.controller.sense.permis.lectura"));
+			}
 		}
 		model.addAttribute(
 				"notificacioEstats",
@@ -108,22 +146,67 @@ public class NotificacioController extends BaseUserController {
 				EnumHelper.getOptionsForEnum(
 						NotificaEnviamentTipusEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
+		
+		
 		return "notificacioList";
 	}
 
-	@RequestMapping(value = "/new", method = RequestMethod.GET)
+	@RequestMapping(value = "/new/{procedimentId}")
 	public String altaForm(
 			HttpServletRequest request,
+			@PathVariable Long procedimentId,
 			Model model) {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 		NotificacioCommandV2 notificacio = new NotificacioCommandV2();
+		
 		model.addAttribute("notificacioCommandV2",notificacio);
 		model.addAttribute("entitat", entitat);
-		
-		model.addAttribute("procediments", procedimentService.findProcedimnetsUsuariActual());
-
+		model.addAttribute("procediment", 
+				procedimentService.findById(null, procedimentId));
+		model.addAttribute("grups", 
+				grupService.findByGrupsProcediment(procedimentId));
 		
 		return "notificacioForm";
+	}
+	
+	@RequestMapping(value = "/procediments", method = RequestMethod.GET)
+	public String formProcediments(
+			HttpServletRequest request,
+			Model model) {
+		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+		List<ProcedimentDto> procedimentsPermisConsulta = null;
+		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+		List<ProcedimentGrupDto> grupsProcediment = new ArrayList<ProcedimentGrupDto>();
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
+		
+		model.addAttribute("entitat", entitat);
+		
+		if (RolHelper.isUsuariActualUsuari(request)) {
+			
+			//Llistat de procediments amb grups
+			grupsProcediment = procedimentService.findAllGrups();
+			procediments = new ArrayList<ProcedimentDto>();
+			//Obté els procediments que tenen el mateix grup que el rol d'usuari
+			for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
+				
+				for (String rol : rolsUsuariActual) {
+					if(rol.contains(grupProcediment.getGrup().getCodi())) {
+						procediments.add(grupProcediment.getProcediment());
+					}
+				}
+			}
+		}
+		
+		if (!procediments.isEmpty()) {
+			procedimentsPermisConsulta = notificacioService.findNotificacionsAmbPermisConsultaAndGrups(procediments);
+			model.addAttribute("procediments", procedimentsPermisConsulta);
+		} else if (grupsProcediment.isEmpty()) {
+			procedimentsPermisConsulta = notificacioService.findNotificacionsAmbPermisConsulta();
+			model.addAttribute("procediments", procedimentsPermisConsulta);
+		}
+
+		return "notificacioProcedimentsForm";
 	}
 	
 	@RequestMapping(value = "/new/destinatari", method = RequestMethod.GET)
@@ -206,6 +289,10 @@ public class NotificacioController extends BaseUserController {
 				request.getSession().getAttribute( NOTIFICACIONS_FILTRE );
 		PaginaDto<NotificacioDto> notificacions = null;
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+		List<ProcedimentGrupDto> grupsProcediment = new ArrayList<ProcedimentGrupDto>();
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 		boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
 		boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
 		boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
@@ -216,11 +303,26 @@ public class NotificacioController extends BaseUserController {
 				filtre.setEntitatId(entitat.getId());
 			}
 		}
+		if (RolHelper.isUsuariActualUsuari(request)) {
+			//Llistat de procediments amb grups
+			grupsProcediment = procedimentService.findAllGrups();
+			procediments = new ArrayList<ProcedimentDto>();
+			//Obté els procediments que tenen el mateix grup que el rol d'usuari
+			for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
+				for (String rol : rolsUsuariActual) {
+					if(rol.contains(grupProcediment.getGrup().getCodi())) {
+						procediments.add(grupProcediment.getProcediment());
+					}
+				}
+			}
+		}
 		notificacions = notificacioService.findAmbFiltrePaginat(
 				entitatActual.getId(),
 				isUsuari,
 				isUsuariEntitat,
 				isAdministrador,
+				grupsProcediment,
+				procediments,
 				filtre,
 				DatatablesHelper.getPaginacioDtoFromRequest(request));
 		return DatatablesHelper.getDatatableResponse(request, notificacions);
@@ -546,5 +648,29 @@ public class NotificacioController extends BaseUserController {
 						NotificacioEventTipusEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
 	}
-
+/*
+	private List<Object> getProcedimentsGrupsAndPermisos() {
+		List<Object> llista = new ArrayList<Object>();
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+		List<ProcedimentGrupDto> grupsProcediment = new ArrayList<ProcedimentGrupDto>();
+		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
+		
+		//Llistat de procediments amb grups
+	    grupsProcediment = procedimentService.findAllGrups();
+		procediments = new ArrayList<ProcedimentDto>();
+		//Obté els procediments que tenen el mateix grup que el rol d'usuari
+		for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
+			for (String rol : rolsUsuariActual) {
+				if(rol.contains(grupProcediment.getGrup().getCodi())) {
+					procediments.add(grupProcediment.getProcediment());
+				}
+			}
+		}
+		llista.addAll(grupsProcediment);
+		llista.addAll(procediments);
+		
+		return llista;
+	}
+	*/
 }

@@ -30,4 +30,10 @@ public class DadesUsuariPluginMock implements DadesUsuariPlugin {
 		throw new SistemaExternException("Mètode no implementat");
 	}
 
+	@Override
+	public List<String> consultarRolsAmbCodi(
+			String usuariCodi) throws SistemaExternException {
+		throw new SistemaExternException("Mètode no implementat");
+	}
+
 }

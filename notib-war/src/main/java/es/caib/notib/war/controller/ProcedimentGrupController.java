@@ -1,7 +1,5 @@
 package es.caib.notib.war.controller;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -13,18 +11,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.war.command.GrupCommand;
-import es.caib.notib.war.command.PermisCommand;
-import es.caib.notib.war.command.ProcedimentCommand;
 import es.caib.notib.war.command.ProcedimentGrupCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
-import es.caib.notib.war.helper.RolHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 /**
  * Controlador per el mantinemnt de grups
@@ -35,8 +29,7 @@ import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 @Controller
 @RequestMapping("/procediment")
 public class ProcedimentGrupController extends BaseUserController{
-	
-	private final static String GRUP_FILTRE = "grup_filtre";
+
 	
 	@Autowired
 	EntitatService entitatService;
@@ -94,6 +87,24 @@ public class ProcedimentGrupController extends BaseUserController{
 		return "procedimentAdminGrupForm";
 	}
 	
+	@RequestMapping(value = "/{procedimentId}/grup/{grupId}/delete", method = RequestMethod.GET)
+	public String delete(
+			HttpServletRequest request,
+			@PathVariable Long procedimentId,
+			@PathVariable Long grupId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		procedimentService.grupDelete(
+				entitatActual.getId(),
+				grupId);
+		
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../../procediment/" + procedimentId + "/grup",
+				"procediment.controller.grup.esborrat.ok");
+	}
+	
 	private ProcedimentGrupDto emplenarModelGrups(
 			HttpServletRequest request,
 			Long procedimentId,
@@ -115,7 +126,7 @@ public class ProcedimentGrupController extends BaseUserController{
 		
 		
 		if (grupId != null) {
-			procedimentGrups = grupService.findGrupById(
+			procedimentGrups = grupService.findProcedimentGrupById(
 					entitatActual.getId(),
 					grupId);
 

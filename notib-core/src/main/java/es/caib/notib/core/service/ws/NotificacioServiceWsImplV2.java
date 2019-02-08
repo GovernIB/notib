@@ -57,7 +57,6 @@ import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
 
 
 /**
@@ -81,10 +80,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
-	private ProcedimentRepository procedimentRepository;
-	
-
-	@Autowired
 	private NotificaHelper notificaHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
@@ -92,10 +87,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private AplicacioService aplicacioService;
-	
-	
-
-
 
 	@Transactional
 	@Override

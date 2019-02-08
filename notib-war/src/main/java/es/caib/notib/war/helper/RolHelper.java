@@ -110,6 +110,14 @@ public class RolHelper {
 		return rols;
 	}
 
+	public static List<String> getAllRolsUsuariActual(HttpServletRequest request) {
+		LOGGER.debug("Obtenint tots els rols per a l'usuari actual");
+		List<String> rols = new ArrayList<String>();
+		
+		
+		return rols;
+	}
+	
 	public static void esborrarRolActual(HttpServletRequest request) {
 		request.getSession().removeAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 	}

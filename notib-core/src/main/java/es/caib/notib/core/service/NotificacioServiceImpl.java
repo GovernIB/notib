@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,9 +41,9 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.ParametresRegistreDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.EnviamentReferencia;
@@ -52,19 +53,17 @@ import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
-import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.security.ExtendedPermission;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -293,6 +292,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 			boolean isUsuari,
 			boolean isUsuariEntitat,
 			boolean isAdministrador,
+			List<ProcedimentGrupDto> grupsProcediments,
+			List<ProcedimentDto> procediments,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		
@@ -308,24 +309,35 @@ public class NotificacioServiceImpl implements NotificacioService {
 		PaginaDto<NotificacioDto> resultatPagina = null;
 		Page<NotificacioEntity> notificacions = null;
 		List<String> procedimentsCodisNotib = new ArrayList<String>();
-		List<ProcedimentDto> procedimentsAmbPermis = new ArrayList<ProcedimentDto>();
+		List<ProcedimentDto> procedimentsPermisConsulta = new ArrayList<ProcedimentDto>();
 		
-		if (isUsuari) {
-			procedimentsAmbPermis = entityComprovarHelper.findPermisConsultaProcedimentsUsuariActual();
+		if (isUsuari)
+			if (grupsProcediments.isEmpty()) 
+				//Obté tots els procediments amb permís de consutla
+				procedimentsPermisConsulta = entityComprovarHelper.findPermisProcedimentsUsuariActual(
+					new Permission[] {
+							ExtendedPermission.READ}
+					);
+			else if (!procediments.isEmpty())
+				//Obté els procediments amb grup i permís de consulta
+				procedimentsPermisConsulta = entityComprovarHelper.findByGrupAndPermisConsultaProcedimentsUsuariActual(
+						procediments, 
+						new Permission[] {
+								ExtendedPermission.READ}
+						);
 		
-			if (!procedimentsAmbPermis.isEmpty()) {
-					for (ProcedimentDto procedimentDto : procedimentsAmbPermis) {
+			if (!procedimentsPermisConsulta.isEmpty()) {
+					for (ProcedimentDto procedimentDto : procedimentsPermisConsulta) {
 						procedimentsCodisNotib.add(procedimentDto.getCodi());
 					}
 			}
-		}
+		
 		
 		if (filtre == null) {
 			//Consulta les notificacions sobre les quals té permis l'usuari actual
 			if (isUsuari) {
 				if (!procedimentsCodisNotib.isEmpty()) {
-					notificacions = notificacioRepository.findByEntitatActualAndProcedimentCodiNotib(
-							entitatActual,
+					notificacions = notificacioRepository.findByProcedimentCodiNotib(
 							procedimentsCodisNotib,
 							paginacioHelper.toSpringDataPageable(paginacioParams));
 					}
@@ -436,6 +448,43 @@ public class NotificacioServiceImpl implements NotificacioService {
 		
 		return resultatPagina;
 		
+	}
+	
+	@Override
+	public List<ProcedimentDto> findNotificacionsAmbPermisConsultaAndGrups(
+			List<ProcedimentDto> procediments) {
+		return entityComprovarHelper.findByGrupAndPermisConsultaProcedimentsUsuariActual(
+				procediments,
+				new Permission[] {
+						ExtendedPermission.READ}
+				);	
+	}
+	
+	@Override
+	public List<ProcedimentDto> findNotificacionsAmbPermisConsulta() {
+		return entityComprovarHelper.findPermisProcedimentsUsuariActual(
+				new Permission[] {
+						ExtendedPermission.READ}
+				);	
+	}
+
+	@Override
+	public List<ProcedimentDto> findNotificacionsAmbPermisNotificacio() {
+		//Comprovar grup
+		return entityComprovarHelper.findPermisProcedimentsUsuariActual(
+				new Permission[] {
+						ExtendedPermission.NOTIFICACIO}
+				);	
+	}
+	
+	@Override
+	public List<ProcedimentDto> findNotificacionsAmbPermisNotificacioAndGrups(
+			List<ProcedimentDto> procediments) {
+		return entityComprovarHelper.findByGrupAndPermisConsultaProcedimentsUsuariActual(
+				procediments,
+				new Permission[] {
+						ExtendedPermission.NOTIFICACIO}
+				);	
 	}
 	
 	@Override

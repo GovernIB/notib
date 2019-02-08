@@ -108,6 +108,12 @@ public class CacheHelper {
 				usuariCodi);
 	}
 
+	@Cacheable(value = "RolsAmbCodi", key="#rolsCodi")
+	public List<String> findRolsUsuariAmbCodi(
+			String usuariCodi) {
+		return pluginHelper.consultarRolsAmbCodi(
+				usuariCodi);
+	}
 //	@Cacheable(value = "unitatsOrganitzatives", key="#entitatCodi")
 //	public ArbreDto<UnitatOrganitzativaDto> findUnitatsOrganitzativesPerEntitat(
 //			String entitatCodi) {
