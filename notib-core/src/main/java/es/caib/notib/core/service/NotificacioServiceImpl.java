@@ -3,9 +3,7 @@
  */
 package es.caib.notib.core.service;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -23,13 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.EntregaDehDto;
-import es.caib.notib.core.api.dto.EntregaPostalDto;
+import es.caib.notib.core.api.dto.EnviamentDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
@@ -38,20 +33,23 @@ import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.ParametresRegistreDto;
-import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.exception.RegistrePluginException;
 import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.EnviamentReferencia;
+import es.caib.notib.core.api.ws.notificacio.DocumentV2;
+import es.caib.notib.core.api.ws.notificacio.Enviament;
+import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
+import es.caib.notib.core.api.ws.notificacio.Persona;
 import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
@@ -63,6 +61,8 @@ import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.PersonaRepository;
+import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 
 /**
@@ -93,7 +93,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private NotificacioEventRepository notificacioEventRepository;
 	@Autowired
 	private EntitatRepository entitatRepository;
-	
+	@Autowired
+	private ProcedimentRepository procedimentRepository;
+	@Autowired
+	private PersonaRepository personaRepository;
+	@Autowired
+	private AplicacioService aplicacioService;
 	@Transactional
 	@Override
 	public List<NotificacioDto> create(
@@ -115,9 +120,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 				false);
 		
 		
-		String documentGesdocId = null;
-		GrupEntity grup = null;
-		
+//		String documentGesdocId = null;
+//		GrupEntity grup = null;
+//		
 		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
 					entitat,
 				 	notificacio.getProcediment().getId(),
@@ -125,132 +130,151 @@ public class NotificacioServiceImpl implements NotificacioService {
 				 	true,
 				 	true,
 				 	true);
-
-		if (notificacio.getGrup().getId() != null) {
-			grup = entityComprovarHelper.comprovarGrup(
-						notificacio.getGrup().getId());
-		}
+//
+//		if (notificacio.getGrup().getId() != null) {
+//			grup = entityComprovarHelper.comprovarGrup(
+//						notificacio.getGrup().getId());
+//		}
 		 
-		if (notificacio.getDocument().getContingutBase64() != null) {
-			documentGesdocId = pluginHelper.gestioDocumentalCreate(
-					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-					new ByteArrayInputStream(notificacio.getDocument().getContingutBase64()));
-		} 
+//		if (notificacio.getDocument().getContingutBase64() != null) {
+//			documentGesdocId = pluginHelper.gestioDocumentalCreate(
+//					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
+//					new ByteArrayInputStream(notificacio.getDocument().getContingutBase64()));
+//		} 
+		List<Enviament> enviaments = new ArrayList<Enviament>();
+		for(EnviamentDto enviament: notificacio.getEnviaments()) {
+			enviaments.add(conversioTipusHelper.convertir(enviament, Enviament.class));
+		}
 		// Dades generals de la notificació
-		NotificacioEntity.Builder notificacioBuilder = NotificacioEntity.
-				getBuilder(
+		NotificacioEntity.BuilderV2 notificacioBuilder = NotificacioEntity.
+				getBuilderV2(
 						entitat,
-						notificacio.getEmisorDir3Codi(), 
+						notificacio.getEmisorDir3Codi(),
 						notificacio.getComunicacioTipus(),
 						notificacio.getEnviamentTipus(), 
-						notificacio.getConcepte(), 
-						notificacio.getDocument().getArxiuNom(), 
-						documentGesdocId,
-						notificacio.getDocument().getCsv() != null ? notificacio.getDocument().getCsv() : notificacio.getDocument().getUuid(),
-						notificacio.getDocument().getHash(), 
-						notificacio.getDocument().isNormalitzat(),
-						notificacio.getDocument().isGenerarCsv()).
-						descripcio(notificacio.getDescripcio()).
-						caducitat(notificacio.getCaducitat()).
-//						retardPostal(notificacio.getRetard()).
-						descripcio(notificacio.getDescripcio()).
-						procedimentCodiNotib(procediment.getCodi()).
-						grupCodi(grup != null ? grup.getCodi() : null);
+						notificacio.getConcepte(),
+						notificacio.getDescripcio(),
+						notificacio.getEnviamentDataProgramada(),
+						notificacio.getRetard(),
+						notificacio.getCaducitat(),
+						conversioTipusHelper.convertir(notificacio.getDocument(), DocumentV2.class),
+						notificacio.getUsuariCodi(),
+						notificacio.getProcedimentCodiNotib(),
+						procediment,
+						notificacio.getGrupCodi(),
+						notificacio.getNumeroExpedient(),
+						notificacio.getRefExterna(),
+						enviaments,
+						notificacio.getObservacions()
+						);
 
 		/*
 		 * Falta afegir paràmetres registre S'han llevat els paràmetres de la seu
 		 */
-		ParametresRegistreDto parametresRegistre = notificacio.getParametresRegistre();
-		if (parametresRegistre != null) {
-			notificacioBuilder.
-			registreOficina(parametresRegistre.getOficina()).
-			registreLlibre(parametresRegistre.getLlibre());
-		}
+//		ParametresRegistreDto parametresRegistre = notificacio.getParametresRegistre();
+//		if (parametresRegistre != null) {
+//			notificacioBuilder.
+//			registreOficina(parametresRegistre.getOficina()).
+//			registreLlibre(parametresRegistre.getLlibre());
+//		}
 
 		notificacioEntity = notificacioBuilder.build();
-		notificacioRepository.saveAndFlush(notificacioEntity);
+		NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioEntity);
 
-		List<EnviamentReferencia> referencies = new ArrayList<EnviamentReferencia>();
-		PersonaDto titular = notificacio.getTitular();
-		NotificacioEnviamentEntity.Builder enviamentBuilder = null;
-		
-		// Comprovar si hi ha titular
-		if (titular != null) {
-
-			NotificaServeiTipusEnumDto serveiTipus = null;
-			if (notificacio.getServeiTipus() != null) {
-				switch (notificacio.getServeiTipus()) {
-				case NORMAL:
-					serveiTipus = NotificaServeiTipusEnumDto.NORMAL;
-					break;
-				case URGENT:
-					serveiTipus = NotificaServeiTipusEnumDto.URGENT;
-					break;
+		NotificacioEnviamentEntity.BuilderV2 enviamentBuilder = null;
+		for (Enviament enviament: enviaments) {
+			if (notificacio.getTitular() != null) {
+				ServeiTipusEnumDto serveiTipus = null;
+				if (notificacio.getServeiTipus() != null) {
+					switch (notificacio.getServeiTipus()) {
+					case NORMAL:
+						serveiTipus = ServeiTipusEnumDto.NORMAL;
+						break;
+					case URGENT:
+						serveiTipus = ServeiTipusEnumDto.URGENT;
+						break;
+					}
 				}
-			}
-			// Rellenar dades enviament titular
-			enviamentBuilder = NotificacioEnviamentEntity.
-					getBuilder(titular.getNif().toUpperCase(), serveiTipus, notificacioEntity).
-					titularNom(titular.getNom()).
-					titularLlinatge1(titular.getLlinatge1()).
-					titularLlinatge2(titular.getLlinatge2()).
-					titularTelefon(titular.getTelefon()).
-					titularEmail(titular.getEmail()).
-					titularRaoSocial(titular.getRaoSocial()).
-					titularCodiDesti(titular.getCodiAdministracio());
-
-			// Comprovar si hi ha destinataris
-			if (notificacio.getDestinataris() != null) {
-				// Afegir un enviament per cada destinatari
-				for (PersonaDto destinatari : notificacio.getDestinataris()) {
-
-					// Rellenar dades enviament titular
-					enviamentBuilder = NotificacioEnviamentEntity.
-							getBuilder(
-									titular.getNif().toUpperCase(), 
-									serveiTipus, 
-									notificacioEntity).
-							titularNom(titular.getNom()).
-							titularLlinatge1(titular.getLlinatge1()).
-							titularLlinatge2(titular.getLlinatge2()).
-							titularTelefon(titular.getTelefon()).
-							titularEmail(titular.getEmail()).
-							titularRaoSocial(titular.getRaoSocial()).
-							titularCodiDesti(titular.getCodiAdministracio());
-
-					
-					// Rellenar dades enviament destinatari
-					enviamentBuilder.destinatariNif(destinatari.getNif().toUpperCase()).
-					destinatariNom(destinatari.getNom()).
-					destinatariLlinatge1(destinatari.getLlinatge1()).
-					destinatariLlinatge2(destinatari.getLlinatge2()).
-					destinatariTelefon(destinatari.getTelefon()).
-					destinatariEmail(destinatari.getEmail()).
-					destinatariRaoSocial(destinatari.getRaoSocial()).
-					destinatariCodiDesti(destinatari.getCodiAdministracio());
-
-					//Registra enviament per cada destinatari
-					RellenarInformacioAdicional(
-							notificacio, 
-							notificacioEntity, 
-							referencies, 
-							enviamentBuilder, 
-							titular);
+				enviament.setTitular(conversioTipusHelper.convertir(notificacio.getTitular(), Persona.class));
+				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
+//				NotificaDomiciliTipusEnumDto tipus = null;
+				NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
+				if (enviament.getEntregaPostal() != null) {
+					if (enviament.getEntregaPostal().getTipus() != null) {
+						switch (enviament.getEntregaPostal().getTipus()) {
+						case APARTAT_CORREUS:
+							tipusConcret = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS;
+							break;
+						case ESTRANGER:
+							tipusConcret = NotificaDomiciliConcretTipusEnumDto.ESTRANGER;
+							break;
+						case NACIONAL:
+							tipusConcret = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+							break;
+						case SENSE_NORMALITZAR:
+							tipusConcret = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
+							break;
+						}
+//						tipus = NotificaDomiciliTipusEnumDto.CONCRETO;
+					} else {
+						throw new ValidationException(
+								"ENTREGA_POSTAL",
+								"L'entrega postal te el camp tipus buit");
+					}
+					if (enviament.getEntregaPostal().getNumeroCasa() != null) {
+						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.NUMERO;
+					} else if (enviament.getEntregaPostal().getApartatCorreus() != null) {
+						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.APARTAT_CORREUS;
+					} else if (enviament.getEntregaPostal().getPuntKm() != null) {
+						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.PUNT_KILOMETRIC;
+					} else {
+						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.SENSE_NUMERO;
+					}
 				}
+				
+				PersonaEntity titular = personaRepository.save(PersonaEntity.getBuilder(
+						enviament.getTitular().getEmail(), 
+						enviament.getTitular().getLlinatge1(), 
+						enviament.getTitular().getLlinatge2(), 
+						enviament.getTitular().getNif(), 
+						enviament.getTitular().getNom(), 
+						enviament.getTitular().getTelefon()).build());
+				
+				List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
+				for(Persona persona: enviament.getDestinataris()) {
+					PersonaEntity destinatari = personaRepository.save(PersonaEntity.getBuilder(
+							persona.getEmail(), 
+							persona.getLlinatge1(), 
+							persona.getLlinatge2(), 
+							persona.getNif(), 
+							persona.getNom(), 
+							persona.getTelefon()).build());
+					destinataris.add(destinatari);
+				}
+				
+				// Rellenar dades enviament titular
+				enviamentBuilder = NotificacioEnviamentEntity.
+						getBuilderV2(enviament, conversioTipusHelper.convertir(notificacio, NotificacioV2.class), numeracioTipus, tipusConcret, serveiTipus, notificacioGuardada).destinataris(destinataris).titular(titular);;
+
+				
 			}
-			//Registra enviament titular
-			RellenarInformacioAdicional(
-					notificacio, 
-					notificacioEntity, 
-					referencies, 
-					enviamentBuilder, 
-					titular);
 		}
+		
 		notificacioRepository.saveAndFlush(notificacioEntity);
 		// Comprovar on s'ha d'enviar
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioEntity.getComunicacioTipus())) {
-			notificaHelper.notificacioEnviar(notificacioEntity.getId());
-			notificacioEntity = notificacioRepository.findOne(notificacioEntity.getId());
+			if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus()) /*Si es administració*/) {
+				//TODO: Registrar SIR
+			} else {
+				//TODO: Registrar Normal
+				try {
+					pluginHelper.registrarSortida(pluginHelper.notificacioToRegistreAnotacio(notificacioEntity), "NOTIB", aplicacioService.getVersioActual());
+				} catch (RegistrePluginException e) {
+					e.getMessage();
+				}
+				notificaHelper.notificacioEnviar(notificacioEntity.getId());
+				notificacioEntity = notificacioRepository.findOne(notificacioEntity.getId());
+			}
 		}
 
 		List<NotificacioEntity> notificacions = notificacioRepository.findByEntitatId(entitatId);
@@ -853,102 +877,102 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 
-	private NotificaDomiciliViaTipusEnumDto toEnviamentViaTipusEnum(
-			EntregaPostalViaTipusEnum viaTipus) {
-		if (viaTipus == null) {
-			return null;
-		}
-		return NotificaDomiciliViaTipusEnumDto.valueOf(viaTipus.name());
-	}
+//	private NotificaDomiciliViaTipusEnumDto toEnviamentViaTipusEnum(
+//			EntregaPostalViaTipusEnum viaTipus) {
+//		if (viaTipus == null) {
+//			return null;
+//		}
+//		return NotificaDomiciliViaTipusEnumDto.valueOf(viaTipus.name());
+//	}
 	
 	
-	private void RellenarInformacioAdicional(
-			NotificacioDtoV2 notificacio,
-			NotificacioEntity notificacioEntity,
-			List<EnviamentReferencia> referencies,
-			NotificacioEnviamentEntity.Builder enviamentBuilder, 
-			PersonaDto titular) {
-		
-		// Definir entrega postal si hi ha
-		boolean entregaPostalActiva = notificacio.isEntregaPostalActiva();
-		if (entregaPostalActiva) {
-			EntregaPostalDto entregaPostal = notificacio.getEntregaPostal();
-			NotificaDomiciliTipusEnumDto tipus = null;
-			NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
-			if (entregaPostal.getTipus() != null) {
-				switch (entregaPostal.getTipus()) {
-				case APARTAT_CORREUS:
-					tipusConcret = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS;
-					break;
-				case ESTRANGER:
-					tipusConcret = NotificaDomiciliConcretTipusEnumDto.ESTRANGER;
-					break;
-				case NACIONAL:
-					tipusConcret = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
-					break;
-				case SENSE_NORMALITZAR:
-					tipusConcret = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
-					break;
-				}
-				tipus = NotificaDomiciliTipusEnumDto.CONCRETO;
-			} else {
-				throw new ValidationException("ENTREGA_POSTAL", "L'entrega postal te el camp tipus buit");
-			}
-			NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
-			if (entregaPostal.getNumeroCasa() != null) {
-				numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.NUMERO;
-			} else if (entregaPostal.getApartatCorreus() != null) {
-				numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.APARTAT_CORREUS;
-			} else if (entregaPostal.getPuntKm() != null) {
-				numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.PUNT_KILOMETRIC;
-			} else {
-				numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.SENSE_NUMERO;
-			}
-			enviamentBuilder.domiciliTipus(tipus).domiciliConcretTipus(tipusConcret).
-			domiciliViaTipus(toEnviamentViaTipusEnum(entregaPostal.getTipusVia())).
-			domiciliViaNom(entregaPostal.getViaNom()).
-			domiciliNumeracioTipus(numeracioTipus).
-			domiciliNumeracioNumero(entregaPostal.getNumeroCasa()).
-			domiciliNumeracioPuntKm(entregaPostal.getPuntKm()).
-			domiciliApartatCorreus(entregaPostal.getApartatCorreus()).
-			domiciliBloc(entregaPostal.getBloc()).
-			domiciliPortal(entregaPostal.getPortal()).
-			domiciliEscala(entregaPostal.getEscala()).
-			domiciliPlanta(entregaPostal.getPlanta()).
-			domiciliPorta(entregaPostal.getPorta()).
-			domiciliComplement(entregaPostal.getComplement()).
-			domiciliCodiPostal(entregaPostal.getCodiPostal()).
-			domiciliPoblacio(entregaPostal.getPoblacio()).
-			domiciliMunicipiCodiIne(entregaPostal.getMunicipiCodi()).
-			domiciliProvinciaCodi(entregaPostal.getProvinciaCodi()).
-			domiciliPaisCodiIso(entregaPostal.getPaisCodi()).
-			domiciliLinea1(entregaPostal.getLinea1()).
-			domiciliLinea2(entregaPostal.getLinea2());
-		}
-		EntregaDehDto entregaDeh = notificacio.getEntregaDeh();
-		if (entregaDeh != null) {
-			enviamentBuilder.dehObligat(entregaDeh.isObligat()).
-			dehNif(titular.getNif().toUpperCase()).
-			dehProcedimentCodi(entregaDeh.getProcedimentCodi());
-		}
-		
-		NotificacioEnviamentEntity enviamentSaved = notificacioEnviamentRepository.saveAndFlush(
-				enviamentBuilder.build());
-		String referencia;
-		try {
-			referencia = notificaHelper.xifrarId(enviamentSaved.getId());
-		} catch (GeneralSecurityException ex) {
-			throw new RuntimeException(
-					"No s'ha pogut crear la referencia per al destinatari",
-					ex);
-		}
-		enviamentSaved.updateNotificaReferencia(referencia);
-		EnviamentReferencia enviamentReferencia = new EnviamentReferencia();
-		enviamentReferencia.setTitularNif(titular.getNif().toUpperCase());
-		enviamentReferencia.setReferencia(referencia);
-		referencies.add(enviamentReferencia);
-		notificacioEntity.addEnviament(enviamentSaved);
-	}
+//	private void RellenarInformacioAdicional(
+//			NotificacioDtoV2 notificacio,
+//			NotificacioEntity notificacioEntity,
+//			List<EnviamentReferencia> referencies,
+//			NotificacioEnviamentEntity.Builder enviamentBuilder, 
+//			PersonaDto titular) {
+//		
+//		// Definir entrega postal si hi ha
+//		boolean entregaPostalActiva = notificacio.isEntregaPostalActiva();
+//		if (entregaPostalActiva) {
+//			EntregaPostalDto entregaPostal = notificacio.getEntregaPostal();
+//			NotificaDomiciliTipusEnumDto tipus = null;
+//			NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
+//			if (entregaPostal.getTipus() != null) {
+//				switch (entregaPostal.getTipus()) {
+//				case APARTAT_CORREUS:
+//					tipusConcret = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS;
+//					break;
+//				case ESTRANGER:
+//					tipusConcret = NotificaDomiciliConcretTipusEnumDto.ESTRANGER;
+//					break;
+//				case NACIONAL:
+//					tipusConcret = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+//					break;
+//				case SENSE_NORMALITZAR:
+//					tipusConcret = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
+//					break;
+//				}
+//				tipus = NotificaDomiciliTipusEnumDto.CONCRETO;
+//			} else {
+//				throw new ValidationException("ENTREGA_POSTAL", "L'entrega postal te el camp tipus buit");
+//			}
+//			NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
+//			if (entregaPostal.getNumeroCasa() != null) {
+//				numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.NUMERO;
+//			} else if (entregaPostal.getApartatCorreus() != null) {
+//				numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.APARTAT_CORREUS;
+//			} else if (entregaPostal.getPuntKm() != null) {
+//				numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.PUNT_KILOMETRIC;
+//			} else {
+//				numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.SENSE_NUMERO;
+//			}
+//			enviamentBuilder.domiciliTipus(tipus).domiciliConcretTipus(tipusConcret).
+//			domiciliViaTipus(entregaPostal.getTipusVia()).
+//			domiciliViaNom(entregaPostal.getViaNom()).
+//			domiciliNumeracioTipus(numeracioTipus).
+//			domiciliNumeracioNumero(entregaPostal.getNumeroCasa()).
+//			domiciliNumeracioPuntKm(entregaPostal.getPuntKm()).
+//			domiciliApartatCorreus(entregaPostal.getApartatCorreus()).
+//			domiciliBloc(entregaPostal.getBloc()).
+//			domiciliPortal(entregaPostal.getPortal()).
+//			domiciliEscala(entregaPostal.getEscala()).
+//			domiciliPlanta(entregaPostal.getPlanta()).
+//			domiciliPorta(entregaPostal.getPorta()).
+//			domiciliComplement(entregaPostal.getComplement()).
+//			domiciliCodiPostal(entregaPostal.getCodiPostal()).
+//			domiciliPoblacio(entregaPostal.getPoblacio()).
+//			domiciliMunicipiCodiIne(entregaPostal.getMunicipiCodi()).
+//			domiciliProvinciaCodi(entregaPostal.getProvinciaCodi()).
+//			domiciliPaisCodiIso(entregaPostal.getPaisCodi()).
+//			domiciliLinea1(entregaPostal.getLinea1()).
+//			domiciliLinea2(entregaPostal.getLinea2());
+//		}
+//		EntregaDehDto entregaDeh = notificacio.getEntregaDeh();
+//		if (entregaDeh != null) {
+//			enviamentBuilder.dehObligat(entregaDeh.isObligat()).
+//			dehNif(titular.getNif().toUpperCase()).
+//			dehProcedimentCodi(entregaDeh.getProcedimentCodi());
+//		}
+//		
+//		NotificacioEnviamentEntity enviamentSaved = notificacioEnviamentRepository.saveAndFlush(
+//				enviamentBuilder.build());
+//		String referencia;
+//		try {
+//			referencia = notificaHelper.xifrarId(enviamentSaved.getId());
+//		} catch (GeneralSecurityException ex) {
+//			throw new RuntimeException(
+//					"No s'ha pogut crear la referencia per al destinatari",
+//					ex);
+//		}
+//		enviamentSaved.updateNotificaReferencia(referencia);
+//		EnviamentReferencia enviamentReferencia = new EnviamentReferencia();
+//		enviamentReferencia.setTitularNif(titular.getNif().toUpperCase());
+//		enviamentReferencia.setReferencia(referencia);
+//		referencies.add(enviamentReferencia);
+//		notificacioEntity.addEnviament(enviamentSaved);
+//	}
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceImpl.class);
 
 

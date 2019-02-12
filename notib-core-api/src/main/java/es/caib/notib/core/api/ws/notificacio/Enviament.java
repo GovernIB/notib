@@ -7,6 +7,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
+import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
+
 /**
  * Informació d'un enviament d'una notificació.
  * 
@@ -16,12 +18,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 public class Enviament {
 
 	private String referencia;
-
 	private Persona titular;
 	private List<Persona> destinataris;
 	private EntregaPostal entregaPostal;
 	private EntregaDeh entregaDeh;
-	private ServeiTipusEnum serveiTipus;
+	private NotificaServeiTipusEnumDto serveiTipus;
 
 	public String getReferencia() {
 		return referencia;
@@ -53,10 +54,10 @@ public class Enviament {
 	public void setEntregaDeh(EntregaDeh entregaDeh) {
 		this.entregaDeh = entregaDeh;
 	}
-	public ServeiTipusEnum getServeiTipus() {
+	public NotificaServeiTipusEnumDto getServeiTipus() {
 		return serveiTipus;
 	}
-	public void setServeiTipus(ServeiTipusEnum serveiTipus) {
+	public void setServeiTipus(NotificaServeiTipusEnumDto serveiTipus) {
 		this.serveiTipus = serveiTipus;
 	}
 

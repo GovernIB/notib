@@ -15,6 +15,7 @@ public class EntregaDeh {
 
 	private boolean obligat;
 	private String procedimentCodi;
+	private String nif;
 
 	public boolean isObligat() {
 		return obligat;
@@ -28,5 +29,12 @@ public class EntregaDeh {
 	public void setProcedimentCodi(String procedimentCodi) {
 		this.procedimentCodi = procedimentCodi;
 	}
+	public String getNif() {
+		return nif;
+	}
+	public void setNif(String nif) {
+		this.nif = nif;
+	}
+	
 
 }

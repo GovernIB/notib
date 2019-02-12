@@ -46,6 +46,7 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
@@ -99,7 +100,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
 					for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
-						if (enviament.getTitularNif().equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
+						if (enviament.getTitular().getNif().equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
 							enviament.updateNotificaEnviada(
 									resultadoEnvio.getIdentificador());
 						}
@@ -429,38 +430,38 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				Envio envio = new Envio();
 				envio.setReferenciaEmisor(enviament.getNotificaReferencia());
 				Persona titular = new Persona();
-				titular.setNif(enviament.getTitularNif());
-				titular.setNombre(enviament.getTitularNom());
+				titular.setNif(enviament.getTitular().getNif());
+				titular.setNombre(enviament.getTitular().getNom());
 				titular.setApellidos(
 						concatenarLlinatges(
-								enviament.getTitularLlinatge1(),
-								enviament.getTitularLlinatge2()));
-				titular.setTelefono(enviament.getTitularTelefon());
-				titular.setEmail(enviament.getTitularEmail());
-				titular.setRazonSocial(enviament.getTitularRaoSocial());
-				titular.setCodigoDestino(enviament.getTitularCodiDesti());
+								enviament.getTitular().getLlinatge1(),
+								enviament.getTitular().getLlinatge2()));
+				titular.setTelefono(enviament.getTitular().getTelefon());
+				titular.setEmail(enviament.getTitular().getEmail());
+				titular.setRazonSocial(enviament.getTitular().getRaoSocial());
+				titular.setCodigoDestino(enviament.getTitular().getCodiEntitatDesti());
 				envio.setTitular(titular);
-				if (enviament.getDestinatariNif() != null) {
 					Destinatarios destinatarios = new Destinatarios();
-					Persona destinatario = new Persona();
-					destinatario.setNif(enviament.getDestinatariNif());
-					destinatario.setNombre(enviament.getDestinatariNom());
-					destinatario.setApellidos(
-							concatenarLlinatges(
-									enviament.getDestinatariLlinatge1(),
-									enviament.getDestinatariLlinatge2()));
-					destinatario.setTelefono(enviament.getDestinatariTelefon());
-					destinatario.setEmail(enviament.getDestinatariEmail());
-					destinatario.setRazonSocial(enviament.getDestinatariRaoSocial());
-					destinatario.setCodigoDestino(enviament.getDestinatariCodiDesti());
-					destinatarios.getDestinatario().add(destinatario);
+					for(PersonaEntity destinatari : enviament.getDestinataris()) {
+						if (destinatari.getNif() != null) {
+							Persona destinatario = new Persona();
+							destinatario.setNif(destinatari.getNif());
+							destinatario.setNombre(destinatari.getNom());
+							destinatario.setApellidos(
+									concatenarLlinatges(
+											destinatari.getLlinatge1(),
+											destinatari.getLlinatge2()));
+							destinatario.setTelefono(destinatari.getTelefon());
+							destinatario.setEmail(destinatari.getEmail());
+							destinatario.setRazonSocial(destinatari.getRaoSocial());
+							destinatario.setCodigoDestino(destinatari.getCodiEntitatDesti());
+							destinatarios.getDestinatario().add(destinatario);
+						}
+					}
 					envio.setDestinatarios(destinatarios);
-				}
 				if (enviament.getDehObligat() != null) {
 					EntregaDEH entregaDeh = new EntregaDEH();
 					entregaDeh.setObligado(enviament.getDehObligat());
-					entregaDeh.setCodigoProcedimiento(
-							enviament.getDehProcedimentCodi());
 					envio.setEntregaDEH(entregaDeh);
 				}
 				envios.getEnvio().add(envio);

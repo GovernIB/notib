@@ -124,8 +124,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"    select count(env.id) " +
 			"    from ntf.enviaments env " +
 			"    where " +
-			"       lower(concat(env.titularNom, ' ', env.titularLlinatge1, ' ', env.destinatariLlinatge2)) like concat('%', lower(:titular), '%') " +
-			"    or lower(env.titularNif) like concat('%', lower(:titular), '%') " +
+			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
+			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
 			"    ) > 0) ")
 	public Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotib(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
@@ -159,8 +159,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"    select count(env.id) " +
 			"    from ntf.enviaments env " +
 			"    where " +
-			"       lower(concat(env.titularNom, ' ', env.titularLlinatge1, ' ', env.destinatariLlinatge2)) like concat('%', lower(:titular), '%') " +
-			"    or lower(env.titularNif) like concat('%', lower(:titular), '%') " +
+			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
+			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
 			"    ) > 0) ")
 	public Page<NotificacioEntity> findAmbFiltre(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,

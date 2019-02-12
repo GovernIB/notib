@@ -2,9 +2,7 @@
  * 
  */
 package es.caib.notib.core.api.dto;
-import java.util.Date;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
+import java.util.List;
 
 /**
  * Informació d'un destinatari d'una anotació.
@@ -14,25 +12,15 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 
 	private Long id;
-	private Date createdDate;
-	private String notificaIdentificador;
-	private String usuari;
 	private NotificacioDtoV2 notificacio;
-	private String titularNom;
+	private PersonaDto titular;
+	private List<PersonaDto> destinataris;
+	private EntregaPostalDto entregaPostal;
+	private EntregaDehDto entregaDeh;
+	private ServeiTipusEnumDto serveiTipus;
 	private String titularNomLlinatge;
-	private String titularLlinatge1;
-	private String titularLlinatge2;
-	private String titularNif;
-	private String titularEmail;
-	private String titularRaoSocial;
-	private String destinatariNom;
-	private String destinatariNomLlinatges;
-	private String destinatariLlinatge1;
-	private String destinatariLlinatge2;
-	private String destinatariRaoSocial;
-	private String destinatariNif;
-	private String destinatariEmail;
-	private NotificaDto notifica;
+	private String usuari;
+	private String referencia;
 	
 	public Long getId() {
 		return id;
@@ -40,17 +28,44 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public Date getCreatedDate() {
-		return createdDate;
+	public NotificacioDtoV2 getNotificacio() {
+		return notificacio;
 	}
-	public void setCreatedDate(Date createdDate) {
-		this.createdDate = createdDate;
+	public void setNotificacio(NotificacioDtoV2 notificacio) {
+		this.notificacio = notificacio;
 	}
-	public String getNotificaIdentificador() {
-		return notificaIdentificador;
+	public List<PersonaDto> getDestinataris() {
+		return destinataris;
 	}
-	public void setNotificaIdentificador(String notificaIdentificador) {
-		this.notificaIdentificador = notificaIdentificador;
+	public void setDestinataris(List<PersonaDto> destinataris) {
+		this.destinataris = destinataris;
+	}
+	public EntregaPostalDto getEntregaPostal() {
+		return entregaPostal;
+	}
+	public void setEntregaPostal(EntregaPostalDto entregaPostal) {
+		this.entregaPostal = entregaPostal;
+	}
+	public EntregaDehDto getEntregaDeh() {
+		return entregaDeh;
+	}
+	public void setEntregaDeh(EntregaDehDto entregaDeh) {
+		this.entregaDeh = entregaDeh;
+	}
+	public ServeiTipusEnumDto getServeiTipus() {
+		return serveiTipus;
+	}
+	public void setServeiTipus(ServeiTipusEnumDto serveiTipus) {
+		this.serveiTipus = serveiTipus;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	public void setTitular(PersonaDto titular) {
+		this.titular = titular;
+	}
+	public void setTitularNomLlinatge(String titularNomLlinatge) {
+		this.titularNomLlinatge = titularNomLlinatge;
 	}
 	public String getUsuari() {
 		return usuari;
@@ -58,158 +73,42 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	public void setUsuari(String usuari) {
 		this.usuari = usuari;
 	}
-	public NotificacioDtoV2 getNotificacio() {
-		return notificacio;
+	public String getReferencia() {
+		return referencia;
 	}
-	public void setNotificacio(NotificacioDtoV2 notificacio) {
-		this.notificacio = notificacio;
-	}
-	public String getTitularNom() {
-		return titularNom;
-	}
-	public void setTitularNom(String titularNom) {
-		this.titularNom = titularNom;
-	}
-	public String getTitularLlinatge1() {
-		return titularLlinatge1;
-	}
-	public void setTitularLlinatge1(String titularLlinatge1) {
-		this.titularLlinatge1 = titularLlinatge1;
-	}
-	public String getTitularLlinatge2() {
-		return titularLlinatge2;
-	}
-	public void setTitularLlinatge2(String titularLlinatge2) {
-		this.titularLlinatge2 = titularLlinatge2;
-	}
-	public String getTitularNif() {
-		return titularNif;
-	}
-	public void setTitularNif(String titularNif) {
-		this.titularNif = titularNif;
-	}
-	public String getTitularRaoSocial() {
-		return titularRaoSocial;
-	}
-	public void setTitularRaoSocial(String titularRaoSocial) {
-		this.titularRaoSocial = titularRaoSocial;
-	}
-	public String getDestinatariNom() {
-		return destinatariNom;
-	}
-	public void setDestinatariNom(String destinatariNom) {
-		this.destinatariNom = destinatariNom;
-	}
-	public String getDestinatariLlinatge1() {
-		return destinatariLlinatge1;
-	}
-	public void setDestinatariLlinatge1(String destinatariLlinatge1) {
-		this.destinatariLlinatge1 = destinatariLlinatge1;
-	}
-	public String getDestinatariLlinatge2() {
-		return destinatariLlinatge2;
-	}
-	public void setDestinatariLlinatge2(String destinatariLlinatge2) {
-		this.destinatariLlinatge2 = destinatariLlinatge2;
-	}
-	public String getDestinatariRaoSocial() {
-		return destinatariRaoSocial;
-	}
-	public void setDestinatariRaoSocial(String destinatariRaoSocial) {
-		this.destinatariRaoSocial = destinatariRaoSocial;
-	}
-	public String getDestinatariNif() {
-		return destinatariNif;
-	}
-	public void setDestinatariNif(String destinatariNif) {
-		this.destinatariNif = destinatariNif;
-	}
-	public NotificaDto getNotifica() {
-		return notifica;
-	}
-	public void setNotifica(NotificaDto notifica) {
-		this.notifica = notifica;
-	}
-	public String getTitularEmail() {
-		return titularEmail;
-	}
-	public void setTitularEmail(String titularEmail) {
-		this.titularEmail = titularEmail;
-	}
-	public String getDestinatariEmail() {
-		return destinatariEmail;
-	}
-	public void setDestinatariEmail(String destinatariEmail) {
-		this.destinatariEmail = destinatariEmail;
-	}
-	public void setTitularNomLlinatge(String titularNomLlinatge) {
-		this.titularNomLlinatge = titularNomLlinatge;
+	public void setReferencia(String referencia) {
+		this.referencia = referencia;
 	}
 	public String getTitularNomLlinatge() {
 		titularNomLlinatge = concatenarNomLlinatges(
 				getTitularLlinatges(),
-				titularNom,
-				titularRaoSocial,
+				titular.getNom(),
+				titular.getRaoSocial(),
 				null);
 		
 		return titularNomLlinatge;
 	}
-	public String getDestinatariNomLlinatges() {
-		destinatariNomLlinatges = concatenarNomLlinatges(
-				getDestinatariLlinatges(),
-				destinatariNom,
-				destinatariRaoSocial,
-				destinatariNif);
-		
-		return destinatariNomLlinatges;
-	}
-	public void setDestinatariNomLlinatges(String destinatariNomLlinatges) {
-		this.destinatariNomLlinatges = destinatariNomLlinatges;
-	}
+	
 	public String getTitularLlinatges() {
 		return concatenarLlinatges(
-				titularLlinatge1,
-				titularLlinatge2);
+				titular.getLlinatge1(),
+				titular.getLlinatge2());
 	}
+	
 	public String getTitular() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(titularNom);
+		sb.append(titular.getNom());
 		String llinatges = getTitularLlinatges();
 		if (llinatges != null && !llinatges.isEmpty()) {
 			sb.append(" ");
 			sb.append(llinatges);
 		}
 		sb.append(" (");
-		sb.append(titularNif);
+		sb.append(titular.getNif());
 		sb.append(")");
 		return sb.toString();
 	}
-
-	public String getDestinatariLlinatges() {
-		return concatenarLlinatges(
-				destinatariLlinatge1,
-				destinatariLlinatge2);
-	}
-	public String getDestinatari() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(destinatariNom);
-		String llinatges = getDestinatariLlinatges();
-		if (llinatges != null && !llinatges.isEmpty()) {
-			sb.append(" ");
-			sb.append(llinatges);
-		}
-		sb.append(" (");
-		sb.append(destinatariNif);
-		sb.append(")");
-		
-		return sb.toString();
-	}
-
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
-	}
-
+	
 	private String concatenarLlinatges(
 			String llinatge1,
 			String llinatge2) {

@@ -28,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.service.EntitatService;
@@ -295,7 +297,7 @@ public class NotificacioServiceWsTest extends BaseServiceTest {
 			enviament.setDestinataris(destinataris);
 			if (ambEnviamentPostal) {
 				EntregaPostal entregaPostal = new EntregaPostal();
-				entregaPostal.setTipus(EntregaPostalTipusEnum.NACIONAL);
+				entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.NACIONAL);
 				entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLE);
 				entregaPostal.setViaNom("Bas");
 				entregaPostal.setNumeroCasa("25");
@@ -321,7 +323,7 @@ public class NotificacioServiceWsTest extends BaseServiceTest {
 			entregaDeh.setObligat(true);
 			entregaDeh.setProcedimentCodi("0000");
 			enviament.setEntregaDeh(entregaDeh);
-			enviament.setServeiTipus(ServeiTipusEnum.URGENT);
+			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
 			enviaments.add(enviament);
 		}
 		notificacio.setEnviaments(enviaments);

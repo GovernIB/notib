@@ -34,6 +34,7 @@ public class Notificacio {
 	private PagadorPostal pagadorPostal;
 	private PagadorCie pagadorCie;
 	private List<Enviament> enviaments;
+	private String procedimentCodi;
 	private ParametresSeu parametresSeu;
 
 	public String getEmisorDir3Codi() {
@@ -114,7 +115,12 @@ public class Notificacio {
 	public void setParametresSeu(ParametresSeu parametresSeu) {
 		this.parametresSeu = parametresSeu;
 	}
-
+	public String getProcedimentCodi() {
+		return procedimentCodi;
+	}
+	public void setProcedimentCodi(String procedimentCodi) {
+		this.procedimentCodi = procedimentCodi;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

@@ -5,6 +5,9 @@ package es.caib.notib.core.api.ws.notificacio;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
+import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
+
 /**
  * Informació de l'entrega postal.
  * 
@@ -13,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 @JsonAutoDetect
 public class EntregaPostal {
 
-	private EntregaPostalTipusEnum tipus;
+	private NotificaDomiciliConcretTipusEnumDto tipus;
 	private EntregaPostalViaTipusEnum viaTipus;
 	private String viaNom;
 	private String numeroCasa;
@@ -37,10 +40,10 @@ public class EntregaPostal {
 	private String formatSobre;
 	private String formatFulla;
 
-	public EntregaPostalTipusEnum getTipus() {
+	public NotificaDomiciliConcretTipusEnumDto getTipus() {
 		return tipus;
 	}
-	public void setTipus(EntregaPostalTipusEnum tipus) {
+	public void setTipus(NotificaDomiciliConcretTipusEnumDto tipus) {
 		this.tipus = tipus;
 	}
 	public EntregaPostalViaTipusEnum getViaTipus() {

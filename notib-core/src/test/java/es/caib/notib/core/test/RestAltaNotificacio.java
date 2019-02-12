@@ -18,6 +18,8 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 
+import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
 import es.caib.notib.core.api.ws.notificacio.Document;
 import es.caib.notib.core.api.ws.notificacio.EntregaDeh;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostal;
@@ -35,8 +37,8 @@ import es.caib.notib.core.api.ws.notificacio.ServeiTipusEnum;
 public class RestAltaNotificacio {
 
 	private static final int NUM_DESTINATARIS = 2;
-	private static final String ENTITAT_DIR3CODI = "A04013511";
-
+//	private static final String ENTITAT_DIR3CODI = "A04013511";
+	private static final String ENTITAT_DIR3CODI = "L01070276";
 	public static void main(String[] args) throws JsonProcessingException {
 		try {
 			new RestAltaNotificacio().testAlta();
@@ -49,14 +51,14 @@ public class RestAltaNotificacio {
 		Client jerseyClient = new Client();
 		ObjectMapper mapper  = new ObjectMapper();
 		String user = "admin";
-		String pass = "admin15";
-		String urlAmbMetode = "http://localhost:8080/notib/api/services/alta";
+		String pass = "admin";
+		String urlAmbMetode = "http://localhost:8081/notib/api/services/notificacio/alta";
 		String notificacioId = new Long(System.currentTimeMillis()).toString();
 		String body = mapper.writeValueAsString(
 				generarNotificacio(
 						notificacioId,
 						NUM_DESTINATARIS,
-						false));
+						true));
 		jerseyClient.addFilter(
 				new HTTPBasicAuthFilter(user, pass));
 		ClientResponse response = jerseyClient.
@@ -131,7 +133,7 @@ public class RestAltaNotificacio {
 			enviament.setDestinataris(destinataris);
 			if (ambEnviamentPostal) {
 				EntregaPostal entregaPostal = new EntregaPostal();
-				entregaPostal.setTipus(EntregaPostalTipusEnum.NACIONAL);
+				entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.NACIONAL);
 				entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLE);
 				entregaPostal.setViaNom("Bas");
 				entregaPostal.setNumeroCasa("25");
@@ -152,12 +154,13 @@ public class RestAltaNotificacio {
 				entregaPostal.setLinea1("linea1_" + i);
 				entregaPostal.setLinea2("linea2_" + i);
 				entregaPostal.setCie(new Integer(8));
+				enviament.setEntregaPostal(entregaPostal);
 			}
 			EntregaDeh entregaDeh = new EntregaDeh();
 			entregaDeh.setObligat(true);
 			entregaDeh.setProcedimentCodi("0000");
 			enviament.setEntregaDeh(entregaDeh);
-			enviament.setServeiTipus(ServeiTipusEnum.URGENT);
+			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
 			enviaments.add(enviament);
 		}
 		notificacio.setEnviaments(enviaments);

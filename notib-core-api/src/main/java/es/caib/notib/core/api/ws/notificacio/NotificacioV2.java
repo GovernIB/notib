@@ -38,8 +38,7 @@ public class NotificacioV2 {
 	private String refExterna;
 	private String idioma;
 	private String observacions;
-	private List<EnviamentV2> enviaments;
-	private ParametresRegistre parametresRegistre;
+	private List<Enviament> enviaments;
 	
 	public String getEmisorDir3Codi() {
 		return emisorDir3Codi;
@@ -95,17 +94,11 @@ public class NotificacioV2 {
 	public void setDocument(DocumentV2 document) {
 		this.document = document;
 	}
-	public List<EnviamentV2> getEnviaments() {
+	public List<Enviament> getEnviaments() {
 		return enviaments;
 	}
-	public void setEnviaments(List<EnviamentV2> enviaments) {
+	public void setEnviaments(List<Enviament> enviaments) {
 		this.enviaments = enviaments;
-	}
-	public ParametresRegistre getParametresRegistre() {
-		return parametresRegistre;
-	}
-	public void setParametresRegistre(ParametresRegistre parametresRegistre) {
-		this.parametresRegistre = parametresRegistre;
 	}
 	public String getCodiUsuari() {
 		return codiUsuari;

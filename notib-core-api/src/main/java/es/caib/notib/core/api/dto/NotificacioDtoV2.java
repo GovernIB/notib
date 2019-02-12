@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import es.caib.notib.core.api.ws.notificacio.Enviament;
+
 /**
  * Informació d'una anotació.
  * 
@@ -21,6 +23,8 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
 	private String concepte;
 	private String descripcio;
+	private Date enviamentDataProgramada;
+	private Integer retard;
 	private Date caducitat;
 	private DocumentDto document;
 	private String csv_uuid;
@@ -39,6 +43,9 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private boolean entregaPostalActiva;
 	private EntregaPostalDto entregaPostal;
 	private EntregaDehDto entregaDeh;
+	private List<EnviamentDto> enviaments;
+	private String usuariCodi;
+
 	// Paràmetres registre
 	private String oficina;
 	private String llibre;
@@ -260,7 +267,30 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	public boolean isNotificaError() {
 		return notificaErrorData != null;
 	}
-
+	public Date getEnviamentDataProgramada() {
+		return enviamentDataProgramada;
+	}
+	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
+		this.enviamentDataProgramada = enviamentDataProgramada;
+	}
+	public Integer getRetard() {
+		return retard;
+	}
+	public void setRetard(Integer retard) {
+		this.retard = retard;
+	}
+	public List<EnviamentDto> getEnviaments() {
+		return enviaments;
+	}
+	public void setEnviaments(List<EnviamentDto> enviaments) {
+		this.enviaments = enviaments;
+	}
+	public String getUsuariCodi() {
+		return usuariCodi;
+	}
+	public void setUsuariCodi(String usuariCodi) {
+		this.usuariCodi = usuariCodi;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

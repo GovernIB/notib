@@ -22,7 +22,6 @@ import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.RegistreAnnexDto;
 import es.caib.notib.core.api.dto.RegistreAnotacioDto;
-import es.caib.notib.core.api.dto.RegistreAnotacioDtoV2;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.RegistreInteressatDto;
 import es.caib.notib.core.api.exception.PluginException;
@@ -1402,11 +1401,6 @@ public class PluginHelper {
 	public RegistreAnotacioDto notificacioToRegistreAnotacio(NotificacioEntity notificaio) {
 		return null;
 	}
-	
-	public RegistreAnotacioDtoV2 notificacioToRegistreAnotacioV2(NotificacioEntity notificaio) {
-		return null;
-	}
-	
 
 	private static final Logger logger = LoggerFactory.getLogger(PluginHelper.class);
 

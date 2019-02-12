@@ -237,3 +237,17 @@ CREATE TABLE NOT_ACL_OBJECT_IDENTITY
   OWNER_SID           bigint                    NOT NULL,
   ENTRIES_INHERITING  boolean                   NOT NULL
 );
+
+CREATE TABLE NOT_PERSONA
+(
+  ID					BIGSERIAL					NOT NULL,
+  EMAIL					character varying(100),
+  LLINATGE1				character varying(100)		NOT NULL,
+  LLINATGE2				character varying(100),
+  NIF					character varying(9)		NOT NULL,
+  NOM					character varying(100),
+  TELEFON				character varying(16),
+  RAO_SOCIAL			character varying(100),
+  COD_ENTITAT_DESTI		character varying(9),
+  NOTIFICACIO_ENV_ID	BIGSERIAL
+);

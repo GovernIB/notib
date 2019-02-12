@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class DocumentDto implements Serializable{
 
-	
+	private String arxiuId;
 	private String arxiuNom;
 	private byte[] contingutBase64;
 	private String hash;
@@ -68,6 +68,16 @@ public class DocumentDto implements Serializable{
 	}
 	public void setCsv(String csv) {
 		this.csv = csv;
+	}
+
+	public String getArxiuId() {
+		return arxiuId;
+	}
+	public void setArxiuId(String arxiuId) {
+		this.arxiuId = arxiuId;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 
 	private static final long serialVersionUID = 299966599434094856L;

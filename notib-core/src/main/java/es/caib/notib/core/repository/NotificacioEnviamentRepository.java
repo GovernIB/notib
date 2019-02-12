@@ -42,15 +42,15 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	
 
 	@Query(	"from" +
-			"    NotificacioEnviamentEntity n " +
+			"    NotificacioEnviamentEntity n, PersonaEntity " +
 			"where " +
 			"    (:esDataEnviamentIniciNull = true or n.createdDate >= :dataEnviamentInici) " +
 			"and (:esDataEnviamentFiNull = true or n.createdDate <= :dataEnviamentFi) " +
 			"and (:esCodiNotificaNull = true or lower(n.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
 			"and (:esCreatedbyNull = true or lower(n.createdBy) like lower('%'||:createdBy||'%')) " +
-			"and (:esNifTitularNull = true or lower(n.titularNif) like lower('%'||:nifTitular||'%')) " +
-			"and (:esNomTitularNull = true or lower(n.titularNom) like lower('%'||:nomTitular||'%')) " +
-			"and (:esEmailTitularNull = true or n.titularEmail = :emailTitular) " +
+			"and (:esNifTitularNull = true or lower(n.titular.nif) like lower('%'||:nifTitular||'%')) " +
+			"and (:esNomTitularNull = true or lower(n.titular.nom) like lower('%'||:nomTitular||'%')) " +
+			"and (:esEmailTitularNull = true or n.titular.email = :emailTitular) " +
 			//"and   (:isDestinatarisNull = true or lower(c.destinatariNom) like lower('%'||:destinataris||'%'))" +
 			//"and  	or lower(c.destinatariLlinatge1) like lower('%'||:destinataris||'%'))" +
 			//"and 	or lower(c.destinatariLlinatge2) like lower('%'||:destinataris||'%'))" +

@@ -50,7 +50,6 @@ import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.NotificacioEnviamentHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.repository.ColumnesRepository;
-import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
@@ -473,7 +472,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						paginacioHelper.toSpringDataPageable(paginacioParams));
 				
 				if(enviament != null){
-					enviamentDto = notificacioEnviamentHelper.toNotificacioEnviamentDto(
+					enviamentDto = notificacioEnviamentHelper.toNotificacioEnviamentDtoV2(
 							notificacio, 
 							enviament);
 					if (enviamentDto != null) 
@@ -671,10 +670,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 					fila[7] = notificacio.getEnviamentTipus().getText();
 					fila[8] = notificacio.getConcepte();
 					fila[9] = notificacio.getDescripcio();
-					fila[10] = enviament.getTitularNif();
-					fila[11] = enviament.getTitularNom();
-					fila[12] = enviament.getTitularEmail();
-					fila[13] = enviament.getDestinatariNif();
+					fila[10] = enviament.getTitular().getNif();
+					fila[11] = enviament.getTitular().getNom();
+					fila[12] = enviament.getTitular().getEmail();
+					fila[13] = enviament.getDestinataris().get(0).getNif();
 					fila[14] = notificacio.getRegistreLlibre();
 					fila[15] = "numero registre";
 					fila[16] = "data registre";

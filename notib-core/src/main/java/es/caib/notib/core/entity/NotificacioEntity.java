@@ -32,7 +32,6 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.ws.notificacio.Document;
 import es.caib.notib.core.api.ws.notificacio.DocumentV2;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
-import es.caib.notib.core.api.ws.notificacio.EnviamentV2;
 import es.caib.notib.core.api.ws.notificacio.PagadorCie;
 import es.caib.notib.core.api.ws.notificacio.PagadorPostal;
 import es.caib.notib.core.api.ws.notificacio.ParametresRegistre;
@@ -52,7 +51,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 
 	/*Parametres generals*/
 	
-	
+	@Column(name = "usuari_codi", length = 64, nullable = false)
+	private String usuariCodi;
 	@Column(name = "emisor_dir3codi", length = 9, nullable = false)
 	private String emisorDir3Codi;
 	@Column(name = "com_tipus", nullable = false)
@@ -112,28 +112,36 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private EntitatEntity entitat;
 	
 	
-	/*Parametres del pagador a correus*/
+	/*Parametres del pagador a Postal*/
+	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@JoinColumn(name = "pagador_postal_id", insertable = false, updatable = false)
+	@ForeignKey(name = "not_pagador_postal_not_fk")
+	private PagadorPostalEntity pagadorPostal;
 	
 	
-	@Column(name = "pagcor_dir3", length = 9)
-	private String pagadorCorreusCodiDir3;
-	@Column(name = "pagcor_numcont", length = 20)
-	private String pagadorCorreusContracteNum;
-	@Column(name = "pagcor_codi_client", length = 20)
-	private String pagadorCorreusCodiClientFacturacio;
-	@Column(name = "pagcor_data_vig")
-	@Temporal(TemporalType.DATE)
-	private Date pagadorCorreusDataVigencia;
+//	@Column(name = "pagcor_dir3", length = 9)
+//	private String pagadorCorreusCodiDir3;
+//	@Column(name = "pagcor_numcont", length = 20)
+//	private String pagadorCorreusContracteNum;
+//	@Column(name = "pagcor_codi_client", length = 20)
+//	private String pagadorCorreusCodiClientFacturacio;
+//	@Column(name = "pagcor_data_vig")
+//	@Temporal(TemporalType.DATE)
+//	private Date pagadorCorreusDataVigencia;
 	
 	
 	/*Parametres del pagador CIE*/
+	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@JoinColumn(name = "pagador_cie_id", insertable = false, updatable = false)
+	@ForeignKey(name = "not_pagador_cie_not_fk")
+	private PagadorCieEntity pagadorCie;
 	
 	
-	@Column(name = "pagcie_dir3", length = 9)
-	private String pagadorCieCodiDir3;
-	@Column(name = "pagcie_data_vig")
-	@Temporal(TemporalType.DATE)
-	private Date pagadorCieDataVigencia;
+//	@Column(name = "pagcie_dir3", length = 9)
+//	private String pagadorCieCodiDir3;
+//	@Column(name = "pagcie_data_vig")
+//	@Temporal(TemporalType.DATE)
+//	private Date pagadorCieDataVigencia;
 	
 	
 	/*Parametres SIA*/
@@ -332,24 +340,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public Date getNotificaReEnviamentData() {
 		return notificaReEnviamentData;
 	}
-	public String getPagadorCorreusCodiDir3() {
-		return pagadorCorreusCodiDir3;
-	}
-	public String getPagadorCorreusContracteNum() {
-		return pagadorCorreusContracteNum;
-	}
-	public String getPagadorCorreusCodiClientFacturacio() {
-		return pagadorCorreusCodiClientFacturacio;
-	}
-	public Date getPagadorCorreusDataVigencia() {
-		return pagadorCorreusDataVigencia;
-	}
-	public String getPagadorCieCodiDir3() {
-		return pagadorCieCodiDir3;
-	}
-	public Date getPagadorCieDataVigencia() {
-		return pagadorCieDataVigencia;
-	}
 	public String getProcedimentCodiSia() {
 		return procedimentCodiSia;
 	}
@@ -461,8 +451,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			Integer retard,
 			Date caducitat,
 			Document document,
-			PagadorPostal pagadorPostal,
-			PagadorCie pagadorCie,
+			PagadorPostalEntity pagadorPostal,
+			PagadorCieEntity pagadorCie,
 			List<Enviament>enviaments,
 			ParametresSeu parametresSeu) {
 		return new BuilderV1(
@@ -494,10 +484,14 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			Integer retard,
 			Date caducitat,
 			DocumentV2 document,
-			String procediment,
+			String usuariCodi,
+			String procedimentCodi,
+			ProcedimentEntity procediment,
 			String grup,
-			List<EnviamentV2>enviaments,
-			ParametresRegistre parametresRegistre) {
+			String numExpedient,
+			String referenciaExterna,
+			List<Enviament>enviaments,
+			String observacions) {
 		return new BuilderV2(
 				entitat,
 				emisorDir3Codi,
@@ -509,11 +503,16 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				retard,
 				caducitat,
 				document,
+				usuariCodi,
+				procedimentCodi,
 				procediment,
 				grup,
+				numExpedient,
+				referenciaExterna,
 				enviaments,
-				parametresRegistre);
+				observacions);
 	}
+	
 
 	public static class Builder {
 		NotificacioEntity built;
@@ -630,8 +629,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				Integer retard,
 				Date caducitat,
 				Document document,
-				PagadorPostal pagadorPostal,
-				PagadorCie pagadorCie,
+				PagadorPostalEntity pagadorPostal,
+				PagadorCieEntity pagadorCie,
 				List<Enviament>enviaments,
 				ParametresSeu parametresSeu) {
 			built = new NotificacioEntity();
@@ -645,8 +644,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.retardPostal = retard;
 			built.caducitat = caducitat;
 			built.documentArxiuId = document.getArxiuId();
-			built.pagadorCorreusCodiDir3 = pagadorPostal.getDir3Codi();
-			built.pagadorCieCodiDir3 = pagadorCie.getDir3Codi();
+			built.pagadorPostal = pagadorPostal;
+			built.pagadorCie = pagadorCie;
 //			built.enviaments = enviaments;
 			built.seuAvisText = parametresSeu.getAvisText();
 			built.seuAvisTextMobil = parametresSeu.getAvisTextMobil();
@@ -667,7 +666,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.notificaEnviamentIntent = 0;
 			built.notificaEnviamentData = new Date();
 		}
-		
 		public BuilderV1 descripcio(String descripcio) {
 			built.descripcio = descripcio;
 			return this;
@@ -678,6 +676,62 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		}
 		public BuilderV1 retardPostal(Integer retard) {
 			built.retardPostal = retard;
+			return this;
+		}
+		public BuilderV1 seuExpedientSerieDocumental(String seuExpedientSerieDocumental) {
+			built.seuExpedientSerieDocumental = seuExpedientSerieDocumental;
+			return this;
+		}
+		public BuilderV1 seuExpedientUnitatOrganitzativa(String seuExpedientUnitatOrganitzativa) {
+			built.seuExpedientUnitatOrganitzativa = seuExpedientUnitatOrganitzativa;
+			return this;
+		}
+		public BuilderV1 seuAvisTitol(String seuAvisTitol) {
+			built.seuAvisTitol = seuAvisTitol;
+			return this;
+		}
+		public BuilderV1 seuAvisText(String seuAvisText) {
+			built.seuAvisText = seuAvisText;
+			return this;
+		}
+		public BuilderV1 seuAvisTextMobil(String seuAvisTextMobil) {
+			built.seuAvisTextMobil = seuAvisTextMobil;
+			return this;
+		}
+		public BuilderV1 seuOficiTitol(String seuOficiTitol) {
+			built.seuOficiTitol = seuOficiTitol;
+			return this;
+		}
+		public BuilderV1 seuOficiText(String seuOficiText) {
+			built.seuOficiText = seuOficiText;
+			return this;
+		}
+		public BuilderV1 seuRegistreLlibre(String seuRegistreLlibre) {
+			built.seuRegistreLlibre = seuRegistreLlibre;
+			return this;
+		}
+		public BuilderV1 seuRegistreOficina(String seuRegistreOficina) {
+			built.seuRegistreOficina = seuRegistreOficina;
+			return this;
+		}
+		public BuilderV1 seuRegistreOrgan(String seuRegistreOrgan) {
+			built.seuRegistreOrgan = seuRegistreOrgan;
+			return this;
+		}
+		public BuilderV1 seuIdioma(String seuIdioma) {
+			built.seuIdioma = seuIdioma;
+			return this;
+		}
+		public BuilderV1 seuExpedientTitol(String seuExpedientTitol) {
+			built.seuExpedientTitol = seuExpedientTitol;
+			return this;
+		}
+		public BuilderV1 seuExpedientIdentificadorEni(String seuExpedientIdentificadorEni) {
+			built.seuExpedientIdentificadorEni = seuExpedientIdentificadorEni;
+			return this;
+		}
+		public BuilderV1 seuProcedimentCodi(String seuProcedimentCodi) {
+			built.seuProcedimentCodi = seuProcedimentCodi;
 			return this;
 		}
 		public NotificacioEntity build() {
@@ -698,10 +752,14 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				Integer retard,
 				Date caducitat,
 				DocumentV2 document,
-				String procediment,
+				String usuariCodi,
+				String procedimentCodi,
+				ProcedimentEntity procediment,
 				String grup,
-				List<EnviamentV2>enviaments,
-				ParametresRegistre parametresRegistre) {
+				String numExpedient,
+				String referenciaExterna,
+				List<Enviament>enviaments,
+				String observacions) {
 			built = new NotificacioEntity();
 			built.entitat = entitat;
 			built.emisorDir3Codi = emisorDir3Codi;
@@ -713,13 +771,15 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.retardPostal = retard;
 			built.caducitat = caducitat;
 			built.documentArxiuId = document.getArxiuId();
-			built.procedimentCodiNotib = procediment;
+			built.usuariCodi = usuariCodi;
+			built.procedimentCodiNotib = procedimentCodi;
 			built.grupCodi = grup;
-//			built.enviaments = enviaments;
-			built.seuRegistreLlibre = parametresRegistre.getLlibre();
-			built.seuRegistreOficina = parametresRegistre.getOficina();
-			built.seuRegistreOrgan = parametresRegistre.getOrgan();
-			
+			built.registreNumExpedient = numExpedient;
+			built.registreRefExterna = referenciaExterna;
+			built.seuRegistreLlibre = procediment.getLlibre();
+			built.seuRegistreOficina = procediment.getOficina();
+			built.procedimentCodiSia = procediment.getCodisia();
+			built.registreObservacions = observacions;
 
 			built.estat = NotificacioEstatEnumDto.PENDENT;
 			built.notificaEnviamentIntent = 0;

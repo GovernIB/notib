@@ -51,6 +51,7 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
@@ -286,25 +287,16 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 			}
 			destinatario.setReferenciaEmisor(enviament.getNotificaReferencia());
 			TipoPersonaDestinatario personaTitular = new TipoPersonaDestinatario();
-			personaTitular.setNif(enviament.getTitularNif());
-			personaTitular.setNombre(enviament.getTitularNom());
+			personaTitular.setNif(enviament.getTitular().getNif());
+			personaTitular.setNombre(enviament.getTitular().getNom());
 			personaTitular.setApellidos(
 					concatenarLlinatges(
-							enviament.getTitularLlinatge1(),
-							enviament.getTitularLlinatge2()));
-			personaTitular.setTelefono(enviament.getTitularTelefon());
-			personaTitular.setEmail(enviament.getTitularEmail());
+							enviament.getTitular().getLlinatge1(),
+							enviament.getTitular().getLlinatge2()));
+			personaTitular.setTelefono(enviament.getTitular().getTelefon());
+			personaTitular.setEmail(enviament.getTitular().getEmail());
 			destinatario.setTitular(personaTitular);
-			TipoPersonaDestinatario personaDestinatario = new TipoPersonaDestinatario();
-			personaDestinatario.setNif(enviament.getDestinatariNif());
-			personaDestinatario.setNombre(enviament.getDestinatariNom());
-			personaDestinatario.setApellidos(
-					concatenarLlinatges(
-							enviament.getDestinatariLlinatge1(),
-							enviament.getDestinatariLlinatge2()));
-			personaDestinatario.setTelefono(enviament.getDestinatariTelefon());
-			personaDestinatario.setEmail(enviament.getDestinatariEmail());
-			destinatario.setDestinatario(personaDestinatario);
+			
 			String serveiTipusText = null;
 			if (enviament.getServeiTipus() != null) {
 				switch (enviament.getServeiTipus()) {
@@ -408,25 +400,32 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 						sdfCaducitat.format(notificacio.getCaducitat()));
 			}
 			
-			//if (notificacio.getRetardPostal() != null) {
-			//	opcionesEmision.setRetardoPostalDeh(
-			//			new Integer(notificacio.getRetardPostal()));
-			//}
 			retardPostal = procedimentRepository.findByCodi(notificacio.getProcedimentCodiNotib()).getRetard();
 			if (retardPostal != null) {
 				opcionesEmision.setRetardoPostalDeh(retardPostal);
 			}
-//			if (notificacio.getRetardPostal() != null) {
-//				opcionesEmision.setRetardoPostalDeh(
-//						new Integer(notificacio.getRetardPostal()));
-//			}
-			destinatario.setOpcionesEmision(opcionesEmision);
+			for(PersonaEntity destinatari: enviament.getDestinataris()) {
+
+				TipoPersonaDestinatario personaDestinatario = new TipoPersonaDestinatario();
+				personaDestinatario.setNif(destinatari.getNif());
+				personaDestinatario.setNombre(destinatari.getNom());
+				personaDestinatario.setApellidos(
+						concatenarLlinatges(
+								destinatari.getLlinatge1(),
+								destinatari.getLlinatge2()));
+				personaDestinatario.setTelefono(destinatari.getTelefon());
+				personaDestinatario.setEmail(destinatari.getEmail());
+				destinatario.setDestinatario(personaDestinatario);
+				
+				destinatario.setOpcionesEmision(opcionesEmision);
+				destinatarios.getItem().add(destinatario);
+			}
+
 			DireccionElectronicaHabilitada deh = new DireccionElectronicaHabilitada();
 			deh.setCodigoProcedimiento(enviament.getDehProcedimentCodi());
 			deh.setNif(enviament.getDehNif());
 			deh.setObligado((enviament.getDehObligat() != null) ? enviament.getDehObligat() : false);
 			destinatario.setDireccionElectronica(deh);
-			destinatarios.getItem().add(destinatario);
 		}
 		return destinatarios;
 	}
