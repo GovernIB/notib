@@ -24,9 +24,7 @@ import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.representation.Form;
 
-import es.caib.loginModule.auth.ControladorSesion;
 import es.caib.loginModule.client.AuthenticationFailureException;
-import es.caib.loginModule.client.AuthorizationToken;
 import es.caib.notib.ws.notificacio.Notificacio;
 import es.caib.notib.ws.notificacio.NotificacioService;
 import es.caib.notib.ws.notificacio.RespostaAlta;
@@ -144,28 +142,26 @@ public class NotificacioRestClient implements NotificacioService {
 
 	private Client generarClient() {
 		Client jerseyClient = Client.create();
-		if (!isExecucioDinsJBoss()) {
-//			jerseyClient.addFilter(new LoggingFilter(System.out));
-			jerseyClient.addFilter(
-					new ClientFilter() {
-						private ArrayList<Object> cookies;
-						@Override
-						public ClientResponse handle(ClientRequest request) throws ClientHandlerException {
-							if (cookies != null) {
-								request.getHeaders().put("Cookie", cookies);
-							}
-							ClientResponse response = getNext().handle(request);
-							if (response.getCookies() != null) {
-								if (cookies == null) {
-									cookies = new ArrayList<Object>();
-								}
-								cookies.addAll(response.getCookies());
-							}
-							return response;
+		//jerseyClient.addFilter(new LoggingFilter(System.out));
+		jerseyClient.addFilter(
+				new ClientFilter() {
+					private ArrayList<Object> cookies;
+					@Override
+					public ClientResponse handle(ClientRequest request) throws ClientHandlerException {
+						if (cookies != null) {
+							request.getHeaders().put("Cookie", cookies);
 						}
+						ClientResponse response = getNext().handle(request);
+						if (response.getCookies() != null) {
+							if (cookies == null) {
+								cookies = new ArrayList<Object>();
+							}
+							cookies.addAll(response.getCookies());
+						}
+						return response;
 					}
-			);
-		}
+				}
+		);
 		return jerseyClient;
 	}
 
@@ -174,18 +170,7 @@ public class NotificacioRestClient implements NotificacioService {
 			String urlAmbMetode,
 			String username,
 			String password) throws InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
-		if (isExecucioDinsJBoss()) {
-			logger.debug(
-					"Autenticant client REST executant-se a dins jBoss (" +
-					"urlAmbMetode=" + urlAmbMetode + ", " +
-					"username=" + username +
-					"password=********)");
-			ControladorSesion controlador = new ControladorSesion();
-			controlador.autenticar(username, password);
-			AuthorizationToken token = controlador.getToken();
-			jerseyClient.addFilter(
-					new HTTPBasicAuthFilter(token.getUser(), token.getPassword()));
-		} else if (serveiDesplegatDamuntJboss) {
+		if (serveiDesplegatDamuntJboss) {
 			logger.debug(
 					"Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (" +
 					"urlAmbMetode=" + urlAmbMetode + ", " +
