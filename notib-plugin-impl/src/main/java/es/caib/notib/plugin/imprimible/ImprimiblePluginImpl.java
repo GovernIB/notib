@@ -119,12 +119,12 @@ public class ImprimiblePluginImpl implements ImprimiblePlugin{
 					if (PropertiesHelper.getProperties().isLlegirSystem()) {
 						arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
 								String.class).newInstance(
-								"es.caib.distribucio.");
+								"es.caib.notib.");
 					} else {
 						arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
 								String.class,
 								Properties.class).newInstance(
-								"es.caib.distribucio.",
+								"es.caib.notib.",
 								PropertiesHelper.getProperties().findAll());
 					}
 				} catch (Exception ex) {

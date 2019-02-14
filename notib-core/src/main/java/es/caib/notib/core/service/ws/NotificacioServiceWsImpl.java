@@ -38,13 +38,11 @@ import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWs;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsException;
-import es.caib.notib.core.api.ws.notificacio.PagadorCie;
-import es.caib.notib.core.api.ws.notificacio.PagadorPostal;
-import es.caib.notib.core.api.ws.notificacio.ParametresSeu;
 import es.caib.notib.core.api.ws.notificacio.Persona;
 import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
+import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -54,6 +52,7 @@ import es.caib.notib.core.entity.PagadorPostalEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PluginHelper;
+import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
@@ -88,6 +87,8 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 	private PagadorPostalRepository pagadorPostalRepository;
 	@Autowired
 	private PagadorCieRepository pagadorCieRepository;
+	@Autowired
+	private DocumentRepository documentRepository;
 
 	@Autowired
 	private NotificaHelper notificaHelper;
@@ -133,10 +134,13 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 					"DOCUMENT",
 					"El camp 'document' no pot ser null.");
 		}
-		String documentGesdocId = pluginHelper.gestioDocumentalCreate(
-				PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-				new ByteArrayInputStream(
-						Base64.decode(notificacio.getDocument().getContingutBase64())));
+		String documentGesdocId = null;
+		if(notificacio.getDocument().getContingutBase64() != null) {
+			documentGesdocId = pluginHelper.gestioDocumentalCreate(
+					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
+					new ByteArrayInputStream(
+							Base64.decode(notificacio.getDocument().getContingutBase64())));
+		}
 		NotificaEnviamentTipusEnumDto enviamentTipus = null;
 		if (notificacio.getEnviamentTipus() != null) {
 			switch (notificacio.getEnviamentTipus()) {
@@ -162,6 +166,17 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				notificacio.getPagadorCie().getDir3Codi(),
 				notificacio.getPagadorCie().getContracteDataVigencia()).build());
 		
+		DocumentEntity documentEntity = documentRepository.saveAndFlush(DocumentEntity.getBuilder(
+				notificacio.getDocument().getArxiuId(), 
+				documentGesdocId, 
+				notificacio.getDocument().getArxiuNom(),  
+				notificacio.getDocument().getContingutBase64(),  
+				notificacio.getDocument().getHash(),  
+				notificacio.getDocument().getUrl(),  
+				notificacio.getDocument().getMetadades(),  
+				notificacio.getDocument().isNormalitzat(),  
+				notificacio.getDocument().isGenerarCsv()).build());
+		
 		NotificacioEntity.BuilderV1 notificacioBuilder = NotificacioEntity.getBuilderV1(
 				entitat,
 				emisorDir3Codi,
@@ -172,14 +187,13 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				notificacio.getEnviamentDataProgramada(),
 				notificacio.getRetard(),
 				notificacio.getCaducitat(),
-				notificacio.getDocument(),
+				documentEntity,
 				pagadorPostal,
 				pagadorCie,
 				notificacio.getEnviaments(),
 				notificacio.getParametresSeu());
 		
-		NotificacioEntity notificacioEntity = notificacioBuilder.build();
-		NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioEntity);
+		NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioBuilder.build());
 		List<EnviamentReferencia> referencies = new ArrayList<EnviamentReferencia>();
 		for (Enviament enviament: notificacio.getEnviaments()) {
 			if (enviament.getTitular() == null) {
@@ -252,13 +266,11 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 						persona.getNom(), 
 						persona.getTelefon()).build());
 				destinataris.add(destinatari);
-			}
-			NotificacioEnviamentEntity.BuilderV1 enviamentBuilder = NotificacioEnviamentEntity.getBuilderV1(
-					enviament, notificacio, numeracioTipus, tipusConcret, serveiTipus, notificacioGuardada)
-					.domiciliViaTipus(toEnviamentViaTipusEnum(enviament.getEntregaPostal().getViaTipus())).destinataris(destinataris).titular(titular);
-			
+			}			
 			NotificacioEnviamentEntity enviamentSaved = notificacioEnviamentRepository.saveAndFlush(
-					enviamentBuilder.build());
+					NotificacioEnviamentEntity.getBuilderV1(
+							enviament, notificacio, numeracioTipus, tipusConcret, serveiTipus, notificacioGuardada, titular, destinataris)
+							.domiciliViaTipus(toEnviamentViaTipusEnum(enviament.getEntregaPostal().getViaTipus())).build());
 			
 			String referencia;
 			try {
@@ -272,38 +284,38 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			EnviamentReferencia enviamentReferencia = new EnviamentReferencia();
 			enviamentReferencia.setReferencia(referencia);
 			referencies.add(enviamentReferencia);
-			notificacioEntity.addEnviament(enviamentSaved);
+			notificacioGuardada.addEnviament(enviamentSaved);
 		}
-		notificacioRepository.saveAndFlush(notificacioEntity);
+		notificacioRepository.saveAndFlush(notificacioGuardada);
 		/*Mirar que tots els enviaments siguin amb titular del mateix tipus.*/
 		Boolean esAdministracio = false;
-		for(NotificacioEnviamentEntity enviament: notificacioEntity.getEnviaments()) {
+		for(NotificacioEnviamentEntity enviament: notificacioGuardada.getEnviaments()) {
 			enviament.getTitular();
 		}
-		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioEntity.getComunicacioTipus())) {
-			if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus()) && esAdministracio /*Si es administració*/) {
+		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioGuardada.getComunicacioTipus())) {
+			if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioGuardada.getEnviamentTipus()) && esAdministracio /*Si es administració*/) {
 				//TODO: Registrar SIR
 			} else {
 				//TODO: Registrar Normal
 				try {
-					pluginHelper.registrarSortida(pluginHelper.notificacioToRegistreAnotacio(notificacioEntity), "NOTIB", aplicacioService.getVersioActual());
+					pluginHelper.registrarSortida(pluginHelper.notificacioToRegistreAnotacioV1(notificacioGuardada), "NOTIB", aplicacioService.getVersioActual());
 				} catch (RegistrePluginException e) {
 					e.getMessage();
 				}
-				notificaHelper.notificacioEnviar(notificacioEntity.getId());
-				notificacioEntity = notificacioRepository.findOne(notificacioEntity.getId());
+				notificaHelper.notificacioEnviar(notificacioGuardada.getId());
+				notificacioGuardada = notificacioRepository.findOne(notificacioGuardada.getId());
 			}
 		}
 		RespostaAlta resposta = new RespostaAlta();
 		try {
 			resposta.setIdentificador(
-					notificaHelper.xifrarId(notificacioEntity.getId()));
+					notificaHelper.xifrarId(notificacioGuardada.getId()));
 		} catch (GeneralSecurityException ex) {
 			throw new RuntimeException(
 					"No s'ha pogut crear l'identificador de la notificació",
 					ex);
 		}
-		switch (notificacioEntity.getEstat()) {
+		switch (notificacioGuardada.getEstat()) {
 		case PENDENT:
 			resposta.setEstat(NotificacioEstatEnum.PENDENT);
 			break;
@@ -314,10 +326,10 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			resposta.setEstat(NotificacioEstatEnum.FINALITZADA);
 			break;
 		}
-		if (notificacioEntity.getNotificaErrorEvent() != null) {
+		if (notificacioGuardada.getNotificaErrorEvent() != null) {
 			resposta.setError(true);
 			resposta.setErrorDescripcio(
-					notificacioEntity.getNotificaErrorEvent().getErrorDescripcio());
+					notificacioGuardada.getNotificaErrorEvent().getErrorDescripcio());
 		}
 		resposta.setReferencies(referencies);
 		return resposta;

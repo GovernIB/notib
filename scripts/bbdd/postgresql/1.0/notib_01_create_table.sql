@@ -41,6 +41,9 @@ CREATE TABLE NOT_APLICACIO
 CREATE TABLE NOT_NOTIFICACIO 
 (
   ID						BIGSERIAL					NOT NULL,
+  DOCUMENT_ID				BIGSERIAL					NOT NULL,
+  USUARI_CODI          		character varying(64),
+  PROCEDIMENT_ID			BIGSERIAL,
   EMISOR_DIR3CODI			character varying(9)		NOT NULL,
   COM_TIPUS					integer						NOT NULL,
   ENV_TIPUS					integer						NOT NULL,
@@ -249,5 +252,31 @@ CREATE TABLE NOT_PERSONA
   TELEFON				character varying(16),
   RAO_SOCIAL			character varying(100),
   COD_ENTITAT_DESTI		character varying(9),
-  NOTIFICACIO_ENV_ID	BIGSERIAL
+  NOTIFICACIO_ENV_ID	BIGSERIAL,
+  CREATEDBY_CODI       	character varying(64),
+  CREATEDDATE          	timestamp without time zone,
+  LASTMODIFIEDBY_CODI  	character varying(64),
+  LASTMODIFIEDDATE     	timestamp without time zone
 );
+
+CREATE TABLE NOT_DOCUMENT
+(
+  ID					BIGSERIAL(19)			NOT NULL,
+  ARXIU_ID				character varying(100),
+  ARXIU_GEST_DOC_ID		character varying(64),
+  ARXIU_NOM				character varying(100)	NOT NULL,
+  CONTINGUT_BASE_64		bytea,
+  HASH					character varying(2048),
+  URL					character varying(256),
+  TELEFON				character varying(16),
+  METADADES				character varying(256),
+  NORMALITZAT			BOOLEAN,
+  GENERAR_CSV			BOOLEAN,
+  UUID					character varying(64),
+  CSV					character varying(256),
+  CREATEDBY_CODI       	character varying(64),
+  CREATEDDATE          	timestamp without time zone,
+  LASTMODIFIEDBY_CODI  	character varying(64),
+  LASTMODIFIEDDATE     	timestamp without time zone
+);
+

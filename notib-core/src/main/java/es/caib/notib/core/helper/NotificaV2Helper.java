@@ -366,21 +366,21 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		Documento documento = new Documento();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		pluginHelper.gestioDocumentalGet(
-				notificacio.getDocumentArxiuId(),
+				notificacio.getDocument().getArxiuGestdocId(),
 				PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 				baos);
 		documento.setContenido(baos.toByteArray());
-		documento.setHash(notificacio.getDocumentHash());
+		documento.setHash(notificacio.getDocument().getHash());
 		Opciones opcionesDocumento = new Opciones();
 		Opcion opcionNormalizado = new Opcion();
 		opcionNormalizado.setTipo("normalizado");
 		opcionNormalizado.setValue(
-				notificacio.isDocumentNormalitzat() ? "si" : "no"); // si o no
+				notificacio.getDocument().getNormalitzat()  ? "si" : "no"); // si o no
 		opcionesDocumento.getOpcion().add(opcionNormalizado);
 		Opcion opcionGenerarCsv = new Opcion();
 		opcionGenerarCsv.setTipo("generarCsv");
 		opcionGenerarCsv.setValue(
-				notificacio.isDocumentGenerarCsv() ? "si" : "no"); // si o no
+				notificacio.getDocument().getGenerarCsv()  ? "si" : "no"); // si o no
 		opcionesDocumento.getOpcion().add(opcionGenerarCsv);
 		documento.setOpcionesDocumento(opcionesDocumento);
 		envios.setDocumento(documento);

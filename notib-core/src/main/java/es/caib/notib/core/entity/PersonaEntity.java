@@ -129,7 +129,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 				String nom,
 				String telefon
 				) {
-			
+			built = new PersonaEntity();
 			built.email = email;
 			built.llinatge1 = llinatge1;
 			built.llinatge2 = llinatge2;
@@ -174,7 +174,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 				String raoSocial,
 				String codiEntitatDesti
 				) {
-			
+			built = new PersonaEntity();
 			built.email = email;
 			built.codiEntitatDesti = codiEntitatDesti;
 			built.llinatge1 = llinatge1;

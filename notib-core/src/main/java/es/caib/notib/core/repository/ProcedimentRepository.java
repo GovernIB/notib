@@ -25,6 +25,8 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 	
 	ProcedimentEntity findByCodi(String codi);
 	
+	ProcedimentEntity findByCodisia(String codisia);
+	
 	@Query(
 			"from " +
 			"    ProcedimentEntity pro " +

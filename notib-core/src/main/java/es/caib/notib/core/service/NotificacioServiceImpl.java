@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -45,6 +46,7 @@ import es.caib.notib.core.api.ws.notificacio.DocumentV2;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
 import es.caib.notib.core.api.ws.notificacio.Persona;
+import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -57,6 +59,7 @@ import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
+import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
@@ -96,6 +99,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
 	@Autowired
+	private DocumentRepository documentRepository;
+
+	@Autowired
 	private PersonaRepository personaRepository;
 	@Autowired
 	private AplicacioService aplicacioService;
@@ -120,7 +126,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				false);
 		
 		
-//		String documentGesdocId = null;
+		String documentGesdocId = null;
 //		GrupEntity grup = null;
 //		
 		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
@@ -136,11 +142,25 @@ public class NotificacioServiceImpl implements NotificacioService {
 //						notificacio.getGrup().getId());
 //		}
 		 
-//		if (notificacio.getDocument().getContingutBase64() != null) {
-//			documentGesdocId = pluginHelper.gestioDocumentalCreate(
-//					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-//					new ByteArrayInputStream(notificacio.getDocument().getContingutBase64()));
-//		} 
+		if (notificacio.getDocument().getContingutBase64() != null) {
+			documentGesdocId = pluginHelper.gestioDocumentalCreate(
+					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
+					new ByteArrayInputStream(notificacio.getDocument().getContingutBase64().getBytes()));
+		} 
+		
+		DocumentEntity documentEntity = documentRepository.saveAndFlush(DocumentEntity.getBuilderV2(
+				notificacio.getDocument().getArxiuId(), 
+				documentGesdocId, 
+				notificacio.getDocument().getArxiuNom(),  
+				notificacio.getDocument().getContingutBase64(),  
+				notificacio.getDocument().getHash(),  
+				notificacio.getDocument().getUrl(),  
+				notificacio.getDocument().getMetadades(),  
+				notificacio.getDocument().isNormalitzat(),  
+				notificacio.getDocument().isGenerarCsv(),
+				notificacio.getDocument().getUuid(),
+				notificacio.getDocument().getCsv()).build());
+		
 		List<Enviament> enviaments = new ArrayList<Enviament>();
 		for(EnviamentDto enviament: notificacio.getEnviaments()) {
 			enviaments.add(conversioTipusHelper.convertir(enviament, Enviament.class));
@@ -157,7 +177,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						notificacio.getEnviamentDataProgramada(),
 						notificacio.getRetard(),
 						notificacio.getCaducitat(),
-						conversioTipusHelper.convertir(notificacio.getDocument(), DocumentV2.class),
+						documentEntity,
 						notificacio.getUsuariCodi(),
 						notificacio.getProcedimentCodiNotib(),
 						procediment,
@@ -254,7 +274,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				
 				// Rellenar dades enviament titular
 				enviamentBuilder = NotificacioEnviamentEntity.
-						getBuilderV2(enviament, conversioTipusHelper.convertir(notificacio, NotificacioV2.class), numeracioTipus, tipusConcret, serveiTipus, notificacioGuardada).destinataris(destinataris).titular(titular);;
+						getBuilderV2(enviament, conversioTipusHelper.convertir(notificacio, NotificacioV2.class), numeracioTipus, tipusConcret, serveiTipus, notificacioGuardada, titular, destinataris);
 
 				
 			}
@@ -268,7 +288,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			} else {
 				//TODO: Registrar Normal
 				try {
-					pluginHelper.registrarSortida(pluginHelper.notificacioToRegistreAnotacio(notificacioEntity), "NOTIB", aplicacioService.getVersioActual());
+					pluginHelper.registrarSortida(pluginHelper.notificacioToRegistreAnotacioV2(notificacioEntity), "NOTIB", aplicacioService.getVersioActual());
 				} catch (RegistrePluginException e) {
 					e.getMessage();
 				}
@@ -557,11 +577,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 		NotificacioEntity entity = notificacioRepository.findOne(notificacioId);
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		pluginHelper.gestioDocumentalGet(
-				entity.getDocumentArxiuId(),
+				entity.getDocument().getArxiuGestdocId(),
 				PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 				output);
 		return new ArxiuDto(
-				entity.getDocumentArxiuNom(),
+				entity.getDocument().getArxiuNom(),
 				"PDF",
 				output.toByteArray(),
 				output.size());

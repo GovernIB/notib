@@ -680,8 +680,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 					fila[17] = notificacio.getCaducitat() != null ? sdf.format(notificacio.getCaducitat()) : "";
 					fila[18] = "codi notib enviament";
 					fila[19] = enviament.getNotificaCertificacioNumSeguiment();	
-					fila[20] = notificacio.getCsv_uuid();
-					fila[21] = notificacio.getEstat().name();	
+//					fila[20] = notificacio.getCsv_uuid();
+					fila[20] = notificacio.getEstat().name();	
 					
 					files.add(fila);
 				}
@@ -830,13 +830,13 @@ public class EnviamentServiceImpl implements EnviamentService {
 		List<NotificacioEnviamentDto> destinatarisDto = conversioTipusHelper.convertirList(
 				enviaments,
 				NotificacioEnviamentDto.class);
-		for (int i = 0; i < enviaments.size(); i++) {
-			NotificacioEnviamentEntity destinatariEntity = enviaments.get(i);
-			NotificacioEnviamentDto destinatariDto = destinatarisDto.get(i);
-			destinatariCalcularCampsAddicionals(
-					destinatariEntity,
-					destinatariDto);
-		}
+//		for (int i = 0; i < enviaments.size(); i++) {
+//			NotificacioEnviamentEntity destinatariEntity = enviaments.get(i);
+//			NotificacioEnviamentDto destinatariDto = destinatarisDto.get(i);
+//			destinatariCalcularCampsAddicionals(
+//					destinatariEntity,
+//					destinatariDto);
+//		}
 		return destinatarisDto;
 	}
 

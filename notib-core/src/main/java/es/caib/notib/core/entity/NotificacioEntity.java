@@ -75,8 +75,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private String procedimentCodiNotib;
 	@Column(name = "grup_codi", length = 6, nullable = false)
 	private String grupCodi;
-	@Column(name = "csv_uuid", length = 64)
-	private String csv_uuid;
+//	@Column(name = "csv_uuid", length = 64)
+//	private String csv_uuid;
 	@Column(name = "estat", nullable = false)
 	private NotificacioEstatEnumDto estat;
 	@Column(name = "not_error_tipus")
@@ -112,61 +112,35 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private EntitatEntity entitat;
 	
 	
-	/*Parametres del pagador a Postal*/
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
-	@JoinColumn(name = "pagador_postal_id", insertable = false, updatable = false)
+	/*pagador a Postal*/
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "pagador_postal_id")
 	@ForeignKey(name = "not_pagador_postal_not_fk")
 	private PagadorPostalEntity pagadorPostal;
 	
 	
-//	@Column(name = "pagcor_dir3", length = 9)
-//	private String pagadorCorreusCodiDir3;
-//	@Column(name = "pagcor_numcont", length = 20)
-//	private String pagadorCorreusContracteNum;
-//	@Column(name = "pagcor_codi_client", length = 20)
-//	private String pagadorCorreusCodiClientFacturacio;
-//	@Column(name = "pagcor_data_vig")
-//	@Temporal(TemporalType.DATE)
-//	private Date pagadorCorreusDataVigencia;
 	
-	
-	/*Parametres del pagador CIE*/
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
-	@JoinColumn(name = "pagador_cie_id", insertable = false, updatable = false)
+	/*pagador CIE*/
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "pagador_cie_id")
 	@ForeignKey(name = "not_pagador_cie_not_fk")
 	private PagadorCieEntity pagadorCie;
 	
 	
-//	@Column(name = "pagcie_dir3", length = 9)
-//	private String pagadorCieCodiDir3;
-//	@Column(name = "pagcie_data_vig")
-//	@Temporal(TemporalType.DATE)
-//	private Date pagadorCieDataVigencia;
 	
 	
-	/*Parametres SIA*/
+	/*Procediment*/
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "procediment_id")
+	@ForeignKey(name = "not_procediment_not_fk")
+	private ProcedimentEntity procediment;
 	
 	
-	@Column(name = "proc_codi_sia", length = 6, nullable = false)
-	private String procedimentCodiSia;
-	@Column(name = "proc_desc_sia", length = 256)
-	private String procedimentDescripcioSia;
-	
-	
-	/*Parametres del document*/
-	
-	
-	@Column(name = "doc_arxiu_nom", length = 256, nullable = false)
-	private String documentArxiuNom;
-	@Column(name = "doc_arxiu_id", length = 64)
-	private String documentArxiuId;
-	@Column(name = "doc_hash", length = 40, nullable = false)
-	private String documentHash;
-	@Column(name = "doc_normalitzat", nullable = false)
-	private boolean documentNormalitzat;
-	@Column(name = "doc_gen_csv", nullable = false)
-	private boolean documentGenerarCsv;
-	
+	/*document*/
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "document_id")
+	@ForeignKey(name = "not_document_notificacio_fk")
+	private DocumentEntity document;
 	
 	/*Parametres de la seu*/
 	
@@ -250,30 +224,30 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public String getGrupCodi() {
 		return grupCodi;
 	}
-	public String getProcedimentDescripcioSia() {
-		return procedimentDescripcioSia;
-	}
+//	public String getProcedimentDescripcioSia() {
+//		return procedimentDescripcioSia;
+//	}
 	public Date getCaducitat() {
 		return caducitat;
 	}
-	public String getDocumentArxiuNom() {
-		return documentArxiuNom;
-	}
-	public String getDocumentArxiuId() {
-		return documentArxiuId;
-	}
-	public String getCsv_uuid() {
-		return csv_uuid;
-	}
-	public String getDocumentHash() {
-		return documentHash;
-	}
-	public boolean isDocumentNormalitzat() {
-		return documentNormalitzat;
-	}
-	public boolean isDocumentGenerarCsv() {
-		return documentGenerarCsv;
-	}
+//	public String getDocumentArxiuNom() {
+//		return documentArxiuNom;
+//	}
+//	public String getDocumentArxiuId() {
+//		return documentArxiuId;
+//	}
+////	public String getCsv_uuid() {
+////		return csv_uuid;
+////	}
+//	public String getDocumentHash() {
+//		return documentHash;
+//	}
+//	public boolean isDocumentNormalitzat() {
+//		return documentNormalitzat;
+//	}
+//	public boolean isDocumentGenerarCsv() {
+//		return documentGenerarCsv;
+//	}
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
@@ -340,9 +314,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public Date getNotificaReEnviamentData() {
 		return notificaReEnviamentData;
 	}
-	public String getProcedimentCodiSia() {
-		return procedimentCodiSia;
-	}
+//	public String getProcedimentCodiSia() {
+//		return procedimentCodiSia;
+//	}
 	public String getSeuExpedientSerieDocumental() {
 		return seuExpedientSerieDocumental;
 	}
@@ -388,11 +362,26 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public String getRegistreOrgan() {
 		return registreOrgan;
 	}
+	public String getUsuariCodi() {
+		return usuariCodi;
+	}
+	public PagadorPostalEntity getPagadorPostal() {
+		return pagadorPostal;
+	}
+	public PagadorCieEntity getPagadorCie() {
+		return pagadorCie;
+	}
+	public DocumentEntity getDocument() {
+		return document;
+	}
 	public void addEnviament(
 			NotificacioEnviamentEntity enviament) {
 		this.enviaments.add(enviament);
 	}
 
+	public ProcedimentEntity getProcediment() {
+		return procediment;
+	}
 	public void updateEstat(
 			NotificacioEstatEnumDto estat) {
 		this.estat = estat;
@@ -450,7 +439,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			Date enviamentDataProgramada,
 			Integer retard,
 			Date caducitat,
-			Document document,
+			DocumentEntity document,
 			PagadorPostalEntity pagadorPostal,
 			PagadorCieEntity pagadorCie,
 			List<Enviament>enviaments,
@@ -483,7 +472,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			Date enviamentDataProgramada,
 			Integer retard,
 			Date caducitat,
-			DocumentV2 document,
+			DocumentEntity document,
 			String usuariCodi,
 			String procedimentCodi,
 			ProcedimentEntity procediment,
@@ -535,12 +524,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.enviamentTipus = enviamentTipus;
 //			built.enviamentDataProgramada = enviamentDataProgramada;
 			built.concepte = concepte;
-			built.documentArxiuNom = documentArxiuNom;
-			built.documentArxiuId = documentArxiuId;
-			built.csv_uuid = csv_uuid;
-			built.documentHash = documentHash;
-			built.documentNormalitzat = documentNormalitzat;
-			built.documentGenerarCsv = documentGenerarCsv;
 			built.estat = NotificacioEstatEnumDto.PENDENT;
 			built.notificaEnviamentIntent = 0;
 			built.notificaEnviamentData = new Date();
@@ -598,10 +581,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.grupCodi = grupCodi;
 			return this;
 		}
-		public Builder procedimentDescripcioSia(String procedimentDescripcioSia) {
-			built.procedimentDescripcioSia = procedimentDescripcioSia;
-			return this;
-		}
+//		public Builder procedimentDescripcioSia(String procedimentDescripcioSia) {
+//			built.procedimentDescripcioSia = procedimentDescripcioSia;
+//			return this;
+//		}
 //		public Builder retardPostal(Integer retardPostal) {
 //			built.retardPostal = retardPostal;
 //			return this;
@@ -628,7 +611,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				Date enviamentDataProgramada,
 				Integer retard,
 				Date caducitat,
-				Document document,
+				DocumentEntity document,
 				PagadorPostalEntity pagadorPostal,
 				PagadorCieEntity pagadorCie,
 				List<Enviament>enviaments,
@@ -643,7 +626,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.enviamentDataProgramada = enviamentDataProgramada;
 			built.retardPostal = retard;
 			built.caducitat = caducitat;
-			built.documentArxiuId = document.getArxiuId();
+			built.document = document;
 			built.pagadorPostal = pagadorPostal;
 			built.pagadorCie = pagadorCie;
 //			built.enviaments = enviaments;
@@ -751,7 +734,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				Date enviamentDataProgramada,
 				Integer retard,
 				Date caducitat,
-				DocumentV2 document,
+				DocumentEntity document,
 				String usuariCodi,
 				String procedimentCodi,
 				ProcedimentEntity procediment,
@@ -770,15 +753,16 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.enviamentDataProgramada = enviamentDataProgramada;
 			built.retardPostal = retard;
 			built.caducitat = caducitat;
-			built.documentArxiuId = document.getArxiuId();
+			built.document = document;
 			built.usuariCodi = usuariCodi;
 			built.procedimentCodiNotib = procedimentCodi;
 			built.grupCodi = grup;
 			built.registreNumExpedient = numExpedient;
 			built.registreRefExterna = referenciaExterna;
-			built.seuRegistreLlibre = procediment.getLlibre();
-			built.seuRegistreOficina = procediment.getOficina();
-			built.procedimentCodiSia = procediment.getCodisia();
+			built.procediment = procediment;
+//			built.seuRegistreLlibre = procediment.getLlibre();
+//			built.seuRegistreOficina = procediment.getOficina();
+//			built.procedimentCodiSia = procediment.getCodisia();
 			built.registreObservacions = observacions;
 
 			built.estat = NotificacioEstatEnumDto.PENDENT;
@@ -860,7 +844,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((concepte == null) ? 0 : concepte.hashCode());
-		result = prime * result + ((documentHash == null) ? 0 : documentHash.hashCode());
+		result = prime * result + ((document.getHash() == null) ? 0 : document.getHash().hashCode());
 		result = prime * result + ((entitat == null) ? 0 : entitat.hashCode());
 		result = prime * result + ((enviamentTipus == null) ? 0 : enviamentTipus.hashCode());
 		return result;
@@ -879,10 +863,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				return false;
 		} else if (!concepte.equals(other.concepte))
 			return false;
-		if (documentHash == null) {
-			if (other.documentHash != null)
+		if (document.getHash() == null) {
+			if (other.document.getHash() != null)
 				return false;
-		} else if (!documentHash.equals(other.documentHash))
+		} else if (!document.getHash().equals(other.document.getHash()))
 			return false;
 		if (entitat == null) {
 			if (other.entitat != null)

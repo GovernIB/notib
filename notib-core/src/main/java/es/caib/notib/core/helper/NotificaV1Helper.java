@@ -247,12 +247,12 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 			envio.setOrganismoPagadorCie(pagadorCie);
 		}*/
 		Documento documento = new Documento();
-		documento.setHashSha1(notificacio.getDocumentHash());
-		documento.setNormalizado(notificacio.isDocumentNormalitzat() ? "si" : "no");
-		documento.setGenerarCsv(notificacio.isDocumentGenerarCsv() ? "si" : "no");
+		documento.setHashSha1(notificacio.getDocument().getHash());
+		documento.setNormalizado(notificacio.getDocument().getNormalitzat()  ? "si" : "no");
+		documento.setGenerarCsv(notificacio.getDocument().getGenerarCsv()  ? "si" : "no");
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		pluginHelper.gestioDocumentalGet(
-				notificacio.getDocumentArxiuId(),
+				notificacio.getDocument().getArxiuGestdocId(),
 				PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 				baos);
 		documento.setContenido(new String(Base64.encodeBase64(baos.toByteArray())));

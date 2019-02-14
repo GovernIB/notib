@@ -66,7 +66,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:isDataCaducitatIniciNull = true or lower(n.caducitat) >= :dataCaducitatInici) " +
 			"and (:isDataCaducitatFiNull = true or lower(n.caducitat) <= :dataCaducitatFi) " +
 			"and (:isTipusEnviamentNull = true or lower(n.enviamentTipus) like lower('%'||:tipusEnviament||'%')) " +
-			"and (:isCsvNull = true or lower(n.csv_uuid) like lower('%'||:csv||'%')) " +
+			"and (:isCsvNull = true or lower(n.document.csv) like lower('%'||:csv||'%')) " +
 			"and (:isEstatNull = true or lower(n.estat) like lower('%'||:estat||'%')) " +
 			"and (:usuari = n.createdBy) ")
 	List<NotificacioEntity> findNotificacioByFiltre(

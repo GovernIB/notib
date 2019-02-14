@@ -3,9 +3,6 @@ package es.caib.notib.plugin.imprimible;
 import java.util.Map;
 
 import es.caib.notib.plugin.SistemaExternException;
-import es.caib.notib.plugin.registre.sortida.RegistreAssentament;
-import es.caib.notib.plugin.registre.sortida.RegistrePluginException;
-import es.caib.notib.plugin.registre.sortida.RespostaAnotacioRegistre;
 import es.caib.plugins.arxiu.api.Document;
 
 public interface ImprimiblePlugin {

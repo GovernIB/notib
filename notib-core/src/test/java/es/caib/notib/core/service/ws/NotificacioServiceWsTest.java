@@ -37,7 +37,6 @@ import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.ws.notificacio.Document;
 import es.caib.notib.core.api.ws.notificacio.EntregaDeh;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostal;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostalTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.EnviamentEstatEnum;
@@ -51,7 +50,6 @@ import es.caib.notib.core.api.ws.notificacio.ParametresSeu;
 import es.caib.notib.core.api.ws.notificacio.Persona;
 import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
-import es.caib.notib.core.api.ws.notificacio.ServeiTipusEnum;
 import es.caib.notib.core.helper.NotificaV1Helper;
 import es.caib.notib.core.service.BaseServiceTest;
 

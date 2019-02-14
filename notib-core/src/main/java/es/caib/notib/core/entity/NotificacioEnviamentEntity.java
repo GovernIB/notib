@@ -51,9 +51,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	
 	
 	/* Titular */
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
-	@JoinColumn(name = "titular_id", insertable = false, updatable = false)
-	@ForeignKey(name = "not_persona_not_fk")
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "titular_id")
+	@ForeignKey(name = "not_persona_notificacio_env_fk")
 	private PersonaEntity titular;
 //	@Column(name = "titular_nom", length = 100)
 //	private String titularNom;
@@ -718,14 +718,18 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
 			NotificaDomiciliConcretTipusEnumDto tipusConcret,
 			ServeiTipusEnumDto tipusServei,
-			NotificacioEntity notificacioGuardada) {
+			NotificacioEntity notificacioGuardada,
+			PersonaEntity titular,
+			List<PersonaEntity> destinataris) {
 		return new BuilderV1(
 				enviament,
 				notificacio,
 				numeracioTipus,
 				tipusConcret,
 				tipusServei,
-				notificacioGuardada
+				notificacioGuardada,
+				titular,
+				destinataris
 				);
 	}
 
@@ -734,14 +738,18 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
 			NotificaDomiciliConcretTipusEnumDto tipusConcret,
 			ServeiTipusEnumDto tipusServei,
-			NotificacioEntity notificacioGuardada) {
+			NotificacioEntity notificacioGuardada,
+			PersonaEntity titular,
+			List<PersonaEntity> destinataris) {
 		return new BuilderV2(
 				enviament,
 				notificacio,
 				numeracioTipus,
 				tipusConcret,
 				tipusServei,
-				notificacioGuardada
+				notificacioGuardada,
+				titular,
+				destinataris
 				);
 	}
 	
@@ -968,7 +976,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
 				NotificaDomiciliConcretTipusEnumDto tipusConcret,
 				ServeiTipusEnumDto tipusServei,
-				NotificacioEntity notificacioGuardada) {
+				NotificacioEntity notificacioGuardada,
+				PersonaEntity titular,
+				List<PersonaEntity> destinataris) {
 			built = new NotificacioEnviamentEntity();
 			built.serveiTipus = tipusServei;
 			built.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
@@ -1000,6 +1010,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 
 			built.dehProcedimentCodi = enviament.getEntregaDeh().getProcedimentCodi();
 			built.dehObligat = enviament.getEntregaDeh().isObligat();			
+			
+			built.titular = titular;
+			built.destinataris = destinataris;
 		}
 		public BuilderV1 domiciliViaTipus(NotificaDomiciliViaTipusEnumDto domiciliViaTipus) {
 			built.domiciliViaTipus = domiciliViaTipus;
@@ -1028,7 +1041,10 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
 				NotificaDomiciliConcretTipusEnumDto tipusConcret,
 				ServeiTipusEnumDto tipusServei,
-				NotificacioEntity notificacioGuardada) {			
+				NotificacioEntity notificacioGuardada,
+				PersonaEntity titular,
+				List<PersonaEntity> destinataris) {	
+			built = new NotificacioEnviamentEntity();
 			built.serveiTipus = tipusServei;
 			built.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
 			built.intentNum = 0;
@@ -1056,8 +1072,10 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built.domiciliCie = enviament.getEntregaPostal().getCie();
 			built.formatSobre = enviament.getEntregaPostal().getFormatSobre();
 			built.formatFulla = enviament.getEntregaPostal().getFormatFulla();
+			built.dehObligat = enviament.getEntregaDeh().isObligat();
 			
-			built.dehObligat = enviament.getEntregaDeh().isObligat();			
+			built.titular = titular;
+			built.destinataris = destinataris;
 		}
 		
 		public BuilderV2 domiciliViaTipus(NotificaDomiciliViaTipusEnumDto domiciliViaTipus) {
@@ -1065,10 +1083,10 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			return this;
 		}
 		
-		public BuilderV2 titular(PersonaEntity titular) {
-			built.titular = titular;
-			return this;
-		}
+//		public BuilderV2 titular(PersonaEntity titular) {
+//			built.titular = titular;
+//			return this;
+//		}
 		
 		public BuilderV2 destinataris(List<PersonaEntity> destinataris) {
 			built.destinataris = destinataris;
