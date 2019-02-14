@@ -101,6 +101,18 @@ public class PropertiesHelper extends Properties {
 		return new Double(getProperty(key, Double.toString(defaultValue))).doubleValue();
 	}
 
+	public boolean isLlegirSystem() {
+		return llegirSystem;
+	}
+	public void setLlegirSystem(boolean llegirSystem) {
+		this.llegirSystem = llegirSystem;
+	}
+	
+
+	public Properties findAll() {
+		return findByPrefixProperties(null);
+	}
+	
 	public Map<String, String> findByPrefix(String prefix) {
 		Map<String, String> properties = new HashMap<String, String>();
 		if (llegirSystem) {
@@ -119,6 +131,34 @@ public class PropertiesHelper extends Properties {
 				if (key instanceof String) {
 					String keystr = (String)key;
 					if (keystr.startsWith(prefix)) {
+						properties.put(
+								keystr,
+								getProperty(keystr));
+					}
+				}
+			}
+		}
+		return properties;
+	}
+	
+	public Properties findByPrefixProperties(String prefix) {
+		Properties properties = new Properties();
+		if (llegirSystem) {
+			for (Object key: System.getProperties().keySet()) {
+				if (key instanceof String) {
+					String keystr = (String)key;
+					if (prefix == null || keystr.startsWith(prefix)) {
+						properties.put(
+								keystr,
+								System.getProperty(keystr));
+					}
+				}
+			}
+		} else {
+			for (Object key: this.keySet()) {
+				if (key instanceof String) {
+					String keystr = (String)key;
+					if (prefix == null || keystr.startsWith(prefix)) {
 						properties.put(
 								keystr,
 								getProperty(keystr));

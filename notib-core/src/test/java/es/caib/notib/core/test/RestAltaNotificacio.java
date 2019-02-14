@@ -24,7 +24,6 @@ import es.caib.notib.core.api.ws.notificacio.Document;
 import es.caib.notib.core.api.ws.notificacio.DocumentV2;
 import es.caib.notib.core.api.ws.notificacio.EntregaDeh;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostal;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostalTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.EnviamentTipusEnum;
@@ -34,7 +33,6 @@ import es.caib.notib.core.api.ws.notificacio.PagadorCie;
 import es.caib.notib.core.api.ws.notificacio.PagadorPostal;
 import es.caib.notib.core.api.ws.notificacio.ParametresSeu;
 import es.caib.notib.core.api.ws.notificacio.Persona;
-import es.caib.notib.core.api.ws.notificacio.ServeiTipusEnum;
 
 public class RestAltaNotificacio {
 
