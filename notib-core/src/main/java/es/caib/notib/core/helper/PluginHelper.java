@@ -3,11 +3,12 @@
  */
 package es.caib.notib.core.helper;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,12 +56,10 @@ import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
-import es.caib.notib.plugin.imprimible.ImprimiblePlugin;
 import es.caib.notib.plugin.imprimible.ImprimiblePlugin.IntegracioManager;
 import es.caib.notib.plugin.seu.SeuPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
-import es.caib.notib.plugin.utils.PropertiesHelper;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
@@ -1465,6 +1464,33 @@ public class PluginHelper {
 			} else if (document.getCsv() != null){
 				id = document.getCsv();
 				String urlDocument = getPropertyArxiuVerificacioBaseUrl() + document.getCsv();
+				
+				URL url;
+				try {
+					url = new URL(urlDocument);
+
+			        ByteArrayOutputStream output = new ByteArrayOutputStream();
+			         
+			        InputStream inputStream = url.openStream();
+			        
+		            int n = 0;
+		            byte [] buffer = new byte[ 1024 ];
+		            while (-1 != (n = inputStream.read(buffer))) {
+		                output.write(buffer, 0, n);
+		            }
+			        
+
+			        annex.setArxiuContingut(output.toByteArray());
+				} catch (MalformedURLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		     
+				
+				
 //				URL website = new URL(urlDocument);
 //				ReadableByteChannel rbc = Channels.newChannel(website.openStream());
 //				annex.setArxiuContingut(rbc.);
