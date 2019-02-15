@@ -5,6 +5,7 @@ package es.caib.notib.core.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -97,14 +98,16 @@ public class EnviamentServiceImpl implements EnviamentService {
 				true,
 				true,
 				false);
-		return enviamentsToDto(notificacioEnviamentRepository.findByNotificacioId(notificacioId));
+		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
+		List<NotificacioEnviamentEntity> enviaments = notificacioEnviamentRepository.findByNotificacio(notificacio);
+		return enviamentsToDto(enviaments);
 	}
 
 
 	@Override
 	public List<Long> findIdsAmbFiltre(
 			Long entitatId, 
-			NotificacioEnviamentFiltreDto filtre) throws NotFoundException {
+			NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException  {
 		logger.debug("Consultant els ids d'expedient segons el filtre ("
 				+ "entitatId=" + entitatId + ", "
 				+ "filtre=" + filtre + ")");
@@ -120,7 +123,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 	
 	private List<Long> findIdsAmbFiltrePaginat(
 			Long entitatId,
-			NotificacioEnviamentFiltreDto filtre) {
+			NotificacioEnviamentFiltreDto filtre) throws ParseException {
 		
 		UsuariDto usuariActualDto = aplicacioService.getUsuariActual();
 		UsuariEntity usuariActual = usuariRepository.findByCodi(usuariActualDto.getCodi());		
@@ -134,7 +137,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			 dataCaducitatFi = null;
 		
 		if (filtre.getDataProgramadaDisposicioInici() != null) {
-			dataProgramadaDisposicioInici = filtre.getDataProgramadaDisposicioInici();
+			dataProgramadaDisposicioInici = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataProgramadaDisposicioInici());
 			if (dataProgramadaDisposicioInici != null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(dataProgramadaDisposicioInici);
@@ -146,7 +149,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}
 		}
 		if (filtre.getDataProgramadaDisposicioFi() != null) {
-			dataProgramadaDisposicioFi = filtre.getDataProgramadaDisposicioFi();
+			dataProgramadaDisposicioFi = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataProgramadaDisposicioFi());
 			if (dataProgramadaDisposicioFi != null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(dataProgramadaDisposicioFi);
@@ -158,7 +161,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}
 		}
 		if (filtre.getDataRegistreInici() != null) {
-			dataRegistreInici = filtre.getDataRegistreInici();
+			dataRegistreInici = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataRegistreInici());
 			if (dataRegistreInici != null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(dataRegistreInici);
@@ -170,7 +173,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}
 		}
 		if (filtre.getDataRegistreFi() != null) {
-			dataRegistreFi = filtre.getDataRegistreFi();
+			dataRegistreFi = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataRegistreFi());
 			if (dataRegistreFi != null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(dataRegistreFi);
@@ -182,7 +185,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}
 		}
 		if (filtre.getDataCaducitatInici() != null) {
-			dataCaducitatInici = filtre.getDataCaducitatInici();
+			dataCaducitatInici = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataCaducitatInici());
 			if (dataCaducitatInici != null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(dataCaducitatInici);
@@ -194,7 +197,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}
 		}
 		if (filtre.getDataCaducitatFi() != null) {
-			dataCaducitatFi = filtre.getDataCaducitatFi();
+			dataCaducitatFi = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataCaducitatFi());
 			if (dataCaducitatFi != null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(dataCaducitatFi);
@@ -271,7 +274,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Override
 	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByUserAndFiltre(
 			NotificacioEnviamentFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams) throws ParseException {
 		logger.debug("Consulta els enviaments d'una notificació que ha realitzat un usuari");
 		
 		NotificacioEnviamentDtoV2 enviamentDto = new NotificacioEnviamentDtoV2();
@@ -294,8 +297,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				true,
 				false);
 		
-		if (filtre.getDataEnviamentInici() != null) {
-			dataEnviamentInici = filtre.getDataEnviamentInici();
+		if (filtre.getDataEnviamentInici() != null && filtre.getDataEnviamentInici() != "") {
+			dataEnviamentInici = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentInici());
 			if (dataEnviamentInici != null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(dataEnviamentInici);
@@ -306,8 +309,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				dataEnviamentInici = cal.getTime();
 			}
 		}
-		if (filtre.getDataEnviamentFi() != null) {
-			dataEnviamentFi = filtre.getDataEnviamentFi();
+		if (filtre.getDataEnviamentFi() != null && filtre.getDataEnviamentFi() != "") {
+			dataEnviamentFi = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentFi());
 			if (dataEnviamentFi != null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(dataEnviamentFi);
@@ -318,8 +321,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				dataEnviamentFi = cal.getTime();
 			}
 		}
-		if (filtre.getDataProgramadaDisposicioInici() != null) {
-			dataProgramadaDisposicioInici = filtre.getDataProgramadaDisposicioInici();
+		if (filtre.getDataProgramadaDisposicioInici() != null && filtre.getDataProgramadaDisposicioInici() != "") {
+			dataProgramadaDisposicioInici = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataProgramadaDisposicioInici());
 			if (dataProgramadaDisposicioInici != null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(dataProgramadaDisposicioInici);
@@ -330,8 +333,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				dataProgramadaDisposicioInici = cal.getTime();
 			}
 		}
-		if (filtre.getDataProgramadaDisposicioFi() != null) {
-			dataProgramadaDisposicioFi = filtre.getDataProgramadaDisposicioFi();
+		if (filtre.getDataProgramadaDisposicioFi() != null && filtre.getDataProgramadaDisposicioFi() != "") {
+			dataProgramadaDisposicioFi = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataProgramadaDisposicioFi());
 			if (dataProgramadaDisposicioFi != null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(dataProgramadaDisposicioFi);
@@ -342,8 +345,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				dataProgramadaDisposicioFi = cal.getTime();
 			}
 		}
-		if (filtre.getDataRegistreInici() != null) {
-			dataRegistreInici = filtre.getDataRegistreInici();
+		if (filtre.getDataRegistreInici() != null && filtre.getDataRegistreInici() != "") {
+			dataRegistreInici = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataRegistreInici());
 			if (dataRegistreInici != null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(dataRegistreInici);
@@ -354,8 +357,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				dataRegistreInici = cal.getTime();
 			}
 		}
-		if (filtre.getDataRegistreFi() != null) {
-			dataRegistreFi = filtre.getDataRegistreFi();
+		if (filtre.getDataRegistreFi() != null && filtre.getDataRegistreFi() != "") {
+			dataRegistreFi = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataRegistreFi());
 			if (dataRegistreFi != null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(dataRegistreFi);
@@ -366,8 +369,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				dataRegistreFi = cal.getTime();
 			}
 		}
-		if (filtre.getDataCaducitatInici() != null) {
-			dataCaducitatInici = filtre.getDataCaducitatInici();
+		if (filtre.getDataCaducitatInici() != null && filtre.getDataCaducitatInici() != "") {
+			dataCaducitatInici = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataCaducitatInici());
 			if (dataCaducitatInici != null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(dataCaducitatInici);
@@ -378,8 +381,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				dataCaducitatInici = cal.getTime();
 			}
 		}
-		if (filtre.getDataCaducitatFi() != null) {
-			dataCaducitatFi = filtre.getDataCaducitatFi();
+		if (filtre.getDataCaducitatFi() != null && filtre.getDataCaducitatFi() != "") {
+			dataCaducitatFi = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataCaducitatFi());
 			if (dataCaducitatFi != null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(dataCaducitatFi);
@@ -495,7 +498,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			Long entitatId,
 			Collection<Long> enviamentIds,
 			String format,
-			NotificacioEnviamentFiltreDto filtre) throws IOException {
+			NotificacioEnviamentFiltreDto filtre) throws IOException, ParseException {
 		logger.debug("Exportant informació dels enviaments (" +
 				"entitatId=" + entitatId + ", " +
 				"enviamentsIds=" + enviamentIds + ", " +
@@ -512,7 +515,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				 dataCaducitatFi = null;
 			
 			if (filtre.getDataProgramadaDisposicioInici() != null) {
-				dataProgramadaDisposicioInici = filtre.getDataProgramadaDisposicioInici();
+				dataProgramadaDisposicioInici = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataProgramadaDisposicioInici());
 				if (dataProgramadaDisposicioInici != null) {
 					Calendar cal = Calendar.getInstance();
 					cal.setTime(dataProgramadaDisposicioInici);
@@ -524,7 +527,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				}
 			}
 			if (filtre.getDataProgramadaDisposicioFi() != null) {
-				dataProgramadaDisposicioFi = filtre.getDataProgramadaDisposicioFi();
+				dataProgramadaDisposicioFi = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataProgramadaDisposicioFi());
 				if (dataProgramadaDisposicioFi != null) {
 					Calendar cal = Calendar.getInstance();
 					cal.setTime(dataProgramadaDisposicioFi);
@@ -536,7 +539,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				}
 			}
 			if (filtre.getDataRegistreInici() != null) {
-				dataRegistreInici = filtre.getDataRegistreInici();
+				dataRegistreInici = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataRegistreInici());
 				if (dataRegistreInici != null) {
 					Calendar cal = Calendar.getInstance();
 					cal.setTime(dataRegistreInici);
@@ -548,7 +551,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				}
 			}
 			if (filtre.getDataRegistreFi() != null) {
-				dataRegistreFi = filtre.getDataRegistreFi();
+				dataRegistreFi = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataRegistreFi());
 				if (dataRegistreFi != null) {
 					Calendar cal = Calendar.getInstance();
 					cal.setTime(dataRegistreFi);
@@ -560,7 +563,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				}
 			}
 			if (filtre.getDataCaducitatInici() != null) {
-				dataCaducitatInici = filtre.getDataCaducitatInici();
+				dataCaducitatInici = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataCaducitatInici());
 				if (dataCaducitatInici != null) {
 					Calendar cal = Calendar.getInstance();
 					cal.setTime(dataCaducitatInici);
@@ -572,7 +575,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				}
 			}
 			if (filtre.getDataCaducitatFi() != null) {
-				dataCaducitatFi = filtre.getDataCaducitatFi();
+				dataCaducitatFi = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataCaducitatFi());
 				if (dataCaducitatFi != null) {
 					Calendar cal = Calendar.getInstance();
 					cal.setTime(dataCaducitatFi);
@@ -827,16 +830,23 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 	private List<NotificacioEnviamentDto> enviamentsToDto(
 			List<NotificacioEnviamentEntity> enviaments) {
-		List<NotificacioEnviamentDto> destinatarisDto = conversioTipusHelper.convertirList(
-				enviaments,
-				NotificacioEnviamentDto.class);
-//		for (int i = 0; i < enviaments.size(); i++) {
-//			NotificacioEnviamentEntity destinatariEntity = enviaments.get(i);
-//			NotificacioEnviamentDto destinatariDto = destinatarisDto.get(i);
-//			destinatariCalcularCampsAddicionals(
-//					destinatariEntity,
-//					destinatariDto);
-//		}
+		List<NotificacioEnviamentDto> destinatarisDto = new ArrayList<NotificacioEnviamentDto>();
+		for(NotificacioEnviamentEntity enviament : enviaments) {
+			destinatarisDto.add(conversioTipusHelper.convertir(enviament, NotificacioEnviamentDto.class));
+			
+		}
+		
+//		List<NotificacioEnviamentDto> destinatarisDto = conversioTipusHelper.convertirList(
+//				enviaments,
+//				NotificacioEnviamentDto.class);
+		
+		for (int i = 0; i < enviaments.size(); i++) {
+			NotificacioEnviamentEntity destinatariEntity = enviaments.get(i);
+			NotificacioEnviamentDto destinatariDto = destinatarisDto.get(i);
+			destinatariCalcularCampsAddicionals(
+					destinatariEntity,
+					destinatariDto);
+		}
 		return destinatarisDto;
 	}
 

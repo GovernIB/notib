@@ -27,6 +27,8 @@ import es.caib.notib.core.entity.UsuariEntity;
  */
 public interface NotificacioRepository extends JpaRepository<NotificacioEntity, Long> {
 
+	NotificacioEntity findById(Long id);
+	
 	@Query(
 			"from " +
 			"    NotificacioEntity ntf " +

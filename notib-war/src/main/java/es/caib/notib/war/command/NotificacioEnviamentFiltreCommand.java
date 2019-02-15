@@ -12,10 +12,10 @@ import es.caib.notib.war.helper.ConversioTipusHelper;
 public class NotificacioEnviamentFiltreCommand {
 	
 	private Long id;
-	private Date dataEnviamentInici;
-	private Date dataEnviamentFi;
-	private Date dataProgramadaDisposicioInici;
-	private Date dataProgramadaDisposicioFi;
+	private String dataEnviamentInici;
+	private String dataEnviamentFi;
+	private String dataProgramadaDisposicioInici;
+	private String dataProgramadaDisposicioFi;
 	private String codiNotifica;
 	private String codiProcediment;
 	private String grup;
@@ -30,10 +30,10 @@ public class NotificacioEnviamentFiltreCommand {
 	private String destinataris;
 	private String llibreRegistre;
 	private String numeroRegistre;
-	private Date dataRegistreInici;
-	private Date dataRegistreFi;
-	private Date dataCaducitatInici;
-	private Date dataCaducitatFi;
+	private String dataRegistreInici;
+	private String dataRegistreFi;
+	private String dataCaducitatInici;
+	private String dataCaducitatFi;
 	private String codiNotibEnviament;
 	private String numeroCertCorreus;
 	private String csvUuid;
@@ -45,28 +45,28 @@ public class NotificacioEnviamentFiltreCommand {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public Date getDataEnviamentInici() {
+	public String getDataEnviamentInici() {
 		return dataEnviamentInici;
 	}
-	public void setDataEnviamentInici(Date dataEnviamentInici) {
+	public void setDataEnviamentInici(String dataEnviamentInici) {
 		this.dataEnviamentInici = dataEnviamentInici;
 	}
-	public Date getDataEnviamentFi() {
+	public String getDataEnviamentFi() {
 		return dataEnviamentFi;
 	}
-	public void setDataEnviamentFi(Date dataEnviamentFi) {
+	public void setDataEnviamentFi(String dataEnviamentFi) {
 		this.dataEnviamentFi = dataEnviamentFi;
 	}
-	public Date getDataProgramadaDisposicioInici() {
+	public String getDataProgramadaDisposicioInici() {
 		return dataProgramadaDisposicioInici;
 	}
-	public void setDataProgramadaDisposicioInici(Date dataProgramadaDisposicioInici) {
+	public void setDataProgramadaDisposicioInici(String dataProgramadaDisposicioInici) {
 		this.dataProgramadaDisposicioInici = dataProgramadaDisposicioInici;
 	}
-	public Date getDataProgramadaDisposicioFi() {
+	public String getDataProgramadaDisposicioFi() {
 		return dataProgramadaDisposicioFi;
 	}
-	public void setDataProgramadaDisposicioFi(Date dataProgramadaDisposicioFi) {
+	public void setDataProgramadaDisposicioFi(String dataProgramadaDisposicioFi) {
 		this.dataProgramadaDisposicioFi = dataProgramadaDisposicioFi;
 	}
 	public String getCodiNotifica() {
@@ -147,28 +147,28 @@ public class NotificacioEnviamentFiltreCommand {
 	public void setNumeroRegistre(String numeroRegistre) {
 		this.numeroRegistre = numeroRegistre;
 	}
-	public Date getDataRegistreInici() {
+	public String getDataRegistreInici() {
 		return dataRegistreInici;
 	}
-	public void setDataRegistreInici(Date dataRegistreInici) {
+	public void setDataRegistreInici(String dataRegistreInici) {
 		this.dataRegistreInici = dataRegistreInici;
 	}
-	public Date getDataRegistreFi() {
+	public String getDataRegistreFi() {
 		return dataRegistreFi;
 	}
-	public void setDataRegistreFi(Date dataRegistreFi) {
+	public void setDataRegistreFi(String dataRegistreFi) {
 		this.dataRegistreFi = dataRegistreFi;
 	}
-	public Date getDataCaducitatInici() {
+	public String getDataCaducitatInici() {
 		return dataCaducitatInici;
 	}
-	public void setDataCaducitatInici(Date dataCaducitatInici) {
+	public void setDataCaducitatInici(String dataCaducitatInici) {
 		this.dataCaducitatInici = dataCaducitatInici;
 	}
-	public Date getDataCaducitatFi() {
+	public String getDataCaducitatFi() {
 		return dataCaducitatFi;
 	}
-	public void setDataCaducitatFi(Date dataCaducitatFi) {
+	public void setDataCaducitatFi(String dataCaducitatFi) {
 		this.dataCaducitatFi = dataCaducitatFi;
 	}
 	public String getCodiNotibEnviament() {

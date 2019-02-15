@@ -4,6 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%
 pageContext.setAttribute(
 		"isRolActualAdministrador",
@@ -123,13 +124,12 @@ $(document).ready(function() {
     	$('#estat').val("${filtreEnviaments.estat}").trigger('change');
     }
     
-	
 	$('.data').datepicker({
-		orientation: "bottom"
+		orientation: "bottom",
+		format: 'dd/mm/yyyy'
 	});
 	
 	$('#enviament').on('selectionchange.dataTable', function (e, accio, ids) {
-		
 		$.get(
 				"enviament/" + accio,
 				{ids: ids},
@@ -138,6 +138,7 @@ $(document).ready(function() {
 				}
 		);
 	});
+	
 	$('#enviament').on('draw.dt', function () {
 		$('#seleccioAll').on('click', function() {
 			$.get(
@@ -176,9 +177,6 @@ $(document).ready(function() {
 	        $("#btnFiltrar").first().click();
 	    }
 	});
-
-	
-
 });
 function setCookie(cname,cvalue) {
 	var exdays = 30;
@@ -259,15 +257,14 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<c:out value = "${filtreEnviaments.estat}"/>
-				<th data-col-name=createdDate data-converter="datetime" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dataenviament"/>
+				<th data-col-name="createdDate" data-converter="datetime" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dataenviament"/>
 					<script id="dataTemplate" type="text/x-jsrender">
 						<div class="from-group">
 							<div class="input-group vdivide">
-    							<input name="dataEnviamentInici" value="<fmt:formatDate value="${filtreEnviaments.dataEnviamentInici}" pattern="dd/MM/yyyy" />" type="text" class="form-control data" placeholder="Inici">
+    							<input name="dataEnviamentInici" value="${filtreEnviaments.dataEnviamentInici}" type="text" class="form-control data" placeholder="Inici">
     							<div class="input-group-addon"></div>
-    							<input name="dataEnviamentFi" value="<fmt:formatDate value="${filtreEnviaments.dataEnviamentFi}" pattern="dd/MM/yyyy" />" type="text" class="form-control data" placeholder="Final">
-							</div>   
+    							<input name="dataEnviamentFi" value="${filtreEnviaments.dataEnviamentFi}" type="text" class="form-control data" placeholder="Final">
+							</div>
 						</div>
 					</script>
 				</th>
@@ -279,13 +276,13 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name=notificacio.enviamentDataProgramada data-converter="datetime" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dataprogramada"/>
+				<th data-col-name="notificacio.enviamentDataProgramada" data-converter="datetime" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dataprogramada"/>
 					<script id="dataTemplate" type="text/x-jsrender">
 						<div class="from-group input-daterange" data-provide="daterangepicker">
 							<div class="input-group vdivide">
-    							<input name="dataProgramadaDisposicioInici" value="<fmt:formatDate value="${filtreEnviaments.dataProgramadaDisposicioInici}" pattern="dd/MM/yyyy" />" type="text" class="form-control data" placeholder="Inici">
+    							<input name="dataProgramadaDisposicioInici" value="${filtreEnviaments.dataProgramadaDisposicioInici}" type="text" class="form-control data" placeholder="Inici">
     							<div class="input-group-addon"></div>
-    							<input name="dataProgramadaDisposicioFi" value="<fmt:formatDate value="${filtreEnviaments.dataProgramadaDisposicioFi}" pattern="dd/MM/yyyy" />" type="text" class="form-control data" placeholder="Final">
+    							<input name="dataProgramadaDisposicioFi" value="${filtreEnviaments.dataProgramadaDisposicioFi}" type="text" class="form-control data" placeholder="Final">
 							</div>
 						</div>
 					</script>
@@ -471,9 +468,9 @@ function getCookie(cname) {
 					<script type="text/x-jsrender">
 						<div class="from-group" data-provide="daterangepicker">
 							<div class="input-group vdivide">
-    							<input name="dataCaducitatInici" value="<fmt:formatDate value="${filtreEnviaments.dataCaducitatInici}" pattern="dd/MM/yyyy" />" type="text" class="form-control data" placeholder="Inici">
+    							<input name="dataCaducitatInici" value="${filtreEnviaments.dataCaducitatInici}" type="text" class="form-control data" placeholder="Inici">
     							<div class="input-group-addon"></div>
-    							<input name="dataCaducitatFi" value="<fmt:formatDate value="${filtreEnviaments.dataCaducitatFi}" pattern="dd/MM/yyyy" />" type="text" class="form-control data" placeholder="Final">
+    							<input name="dataCaducitatFi" value="${filtreEnviaments.dataCaducitatFi}" type="text" class="form-control data" placeholder="Final">
 							</div>
 						</div>
 					</script>

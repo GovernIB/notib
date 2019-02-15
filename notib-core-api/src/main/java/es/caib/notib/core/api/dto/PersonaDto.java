@@ -64,6 +64,9 @@ public class PersonaDto implements Serializable{
 	public void setCodiAdministracio(String codiAdministracio) {
 		this.codiAdministracio = codiAdministracio;
 	}
+	public String getLlinatges() {
+		return llinatge1 + " " + llinatge2; 
+	}
 
 	@Override
 	public String toString() {

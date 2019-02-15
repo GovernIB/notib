@@ -39,7 +39,7 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
-	<c:if test="${enviament.notificaError}">
+	<c:if test="${enviament.notificacio.notificaError}">
 		<div class="alert alert-danger well-sm">
 			<span class="fa fa-warning text-danger"></span>
 			<spring:message code="enviament.info.error.titol"/>
@@ -48,7 +48,7 @@ $(document).ready(function() {
 			</button>
 			<div id="collapseError" class="collapse">
 				<br/>
-				<textarea rows="10" style="width:100%">${fn:escapeXml(enviament.notificaErrorDescripcio)}</textarea>
+				<textarea rows="10" style="width:100%">${fn:escapeXml(enviament.notificacio.notificaErrorDescripcio)}</textarea>
 			</div>
 		</div>
 	</c:if>
@@ -88,11 +88,11 @@ $(document).ready(function() {
 					<tr>
 						<td width="30%"><strong><spring:message code="enviament.info.dada.identificadors"/></strong></td>
 						<c:choose>
-							<c:when test="${not empty enviament.notificaIdentificador}">
+							<c:when test="${not empty enviament.notificacio.id}">
 								<td width="1%"><strong>NOTIB</strong></td>
-								<td>${enviament.notificaReferencia}</td>
+								<td>${enviament.referencia}</td>
 								<td width="1%"><strong>Notific@</strong></td>
-								<td>${enviament.notificaIdentificador}</td>
+								<td>${enviament.notificacio.id}</td>
 							</c:when>
 							<c:otherwise>
 								<td colspan="2" width="1%"><strong>NOTIB</strong></td>
@@ -102,17 +102,17 @@ $(document).ready(function() {
 					</tr>
 					<tr>
 						<td><strong><spring:message code="enviament.info.dada.deh.nif"/></strong></td>
-						<td colspan="4">${enviament.dehNif}</td>
+						<td colspan="4">${enviament.entregaDeh.nif}</td>
 					</tr>
 					<tr>
 						<td><strong><spring:message code="enviament.info.dada.deh.procediment"/></strong></td>
-						<td colspan="4">${enviament.dehProcedimentCodi}</td>
+						<td colspan="4">${enviament.entregaDeh.procedimentCodi}</td>
 					</tr>
 					<tr>
 						<td><strong><spring:message code="enviament.info.dada.deh.obligada"/></strong></td>
 						<td colspan="4">
 							<c:choose>
-								<c:when test="${enviament.dehObligat}"><spring:message code="comu.si"/></c:when>
+								<c:when test="${enviament.entregaDeh.obligat}"><spring:message code="comu.si"/></c:when>
 								<c:otherwise><spring:message code="comu.no"/><</c:otherwise>
 							</c:choose>
 						</td>
@@ -124,14 +124,14 @@ $(document).ready(function() {
 					</tr>
 					<tr>
 						<td width="30%"><strong><spring:message code="enviament.info.dada.estat"/></strong></td>
-						<td colspan="4"><spring:message code="es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.${enviament.notificaEstat}"/></td>
+						<td colspan="4"><spring:message code="es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.${enviament.notificacio.estat}"/></td>
 					</tr>
 				</tbody>
 				</table>
 			</div>
 			<div class="row">
 				<c:set var="titularColSize" value="12"/>
-				<c:if test="${not empty enviament.destinatariNif}"><c:set var="titularColSize" value="6"/></c:if>
+				<c:if test="${not empty enviament.titular.nif}"><c:set var="titularColSize" value="6"/></c:if>
 				<div class="col-sm-${titularColSize}">
 					<div class="panel panel-default">
 						<div class="panel-heading">
@@ -143,37 +143,37 @@ $(document).ready(function() {
 						<tbody>
 							<tr>
 								<td><strong><spring:message code="enviament.info.titular.nif"/></strong></td>
-								<td>${enviament.titularNif}</td>
+								<td>${enviament.titular.nif}</td>
 							</tr>
-							<c:if test="${not empty enviament.titularNom}">
+							<c:if test="${not empty enviament.titular.nom}">
 								<tr>
 									<td width="30%"><strong><spring:message code="enviament.info.titular.nom"/></strong></td>
-									<td>${enviament.titularNom}</td>
+									<td>${enviament.titular.nom}</td>
 								</tr>
 							</c:if>
-							<c:if test="${not empty enviament.titularLlinatges}">
+							<c:if test="${not empty enviament.titular.llinatges}">
 								<tr>
 									<td><strong><spring:message code="enviament.info.titular.llinatges"/></strong></td>
-									<td>${enviament.titularLlinatges}</td>
+									<td>${enviament.titular.llinatges}</td>
 								</tr>
 							</c:if>
-							<c:if test="${not empty enviament.titularTelefon}">
+							<c:if test="${not empty enviament.titular.telefon}">
 								<tr>
 									<td><strong><spring:message code="enviament.info.titular.telefon"/></strong></td>
-									<td>${enviament.titularTelefon}</td>
+									<td>${enviament.titular.telefon}</td>
 								</tr>
 							</c:if>
-							<c:if test="${not empty enviament.titularEmail}">
+							<c:if test="${not empty enviament.titular.email}">
 								<tr>
 									<td><strong><spring:message code="enviament.info.titular.email"/></strong></td>
-									<td>${enviament.titularEmail}</td>
+									<td>${enviament.titular.email}</td>
 								</tr>
 							</c:if>
 						</tbody>
 						</table>
 					</div>
 				</div>
-				<c:if test="${not empty enviament.destinatariNif}">
+				<%-- <c:if test="${not empty enviament.destinatariNif}">
 					<div class="col-sm-6">
 						<div class="panel panel-default">
 							<div class="panel-heading">
@@ -215,9 +215,9 @@ $(document).ready(function() {
 							</table>
 						</div>
 					</div>
-				</c:if>
+				</c:if> --%>
 			</div>
-			<c:if test="${not empty enviament.domiciliConcretTipus}">
+			<c:if test="${not empty enviament.entregaPostal.ConcretTipus}">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">
@@ -228,80 +228,80 @@ $(document).ready(function() {
 					<tbody>
 						<tr>
 							<td width="30%"><strong><spring:message code="enviament.info.domicili.tipus"/></strong></td>
-							<td>${enviament.domiciliTipus}</td>
+							<td>${enviament.entregaPostal.tipus}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.tipus.concret"/></strong></td>
-							<td>${enviament.domiciliConcretTipus}</td>
+							<td>${enviament.entregaPostal.concretTipus}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.via"/></strong></td>
-							<td>${enviament.domiciliViaTipus} ${enviament.domiciliViaNom}</td>
+							<td>${enviament.entregaPostal.viaTipus} ${enviament.entregaPostal.viaNom}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.numeracio"/></strong></td>
 							<td>
-								${enviament.domiciliNumeracioTipus}
-								${enviament.domiciliNumeracioNumero}
-								${enviament.domiciliNumeracioPuntKm}
-								${enviament.domiciliApartatCorreus}
+								${enviament.entregaPostal.numeracioTipus}
+								${enviament.entregaPostal.numeracioNumero}
+								${enviament.entregaPostal.numeracioPuntKm}
+								${enviament.entregaPostal.apartatCorreus}
 							</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.bloc"/></strong></td>
-							<td>${enviament.domiciliBloc}</td>
+							<td>${enviament.entregaPostal.bloc}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.portal"/></strong></td>
-							<td>${enviament.domiciliPortal}</td>
+							<td>${enviament.entregaPostal.portal}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.escala"/></strong></td>
-							<td>${enviament.domiciliEscala}</td>
+							<td>${enviament.entregaPostal.escala}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.planta"/></strong></td>
-							<td>${enviament.domiciliPlanta}</td>
+							<td>${enviament.entregaPostal.planta}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.porta"/></strong></td>
-							<td>${enviament.domiciliPorta}</td>
+							<td>${enviament.entregaPostal.porta}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.complement"/></strong></td>
-							<td>${enviament.domiciliComplement}</td>
+							<td>${enviament.entregaPostal.complement}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.poblacio"/></strong></td>
-							<td>${enviament.domiciliPoblacio}</td>
+							<td>${enviament.entregaPostal.poblacio}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.codi.postal"/></strong></td>
-							<td>${enviament.domiciliCodiPostal}</td>
+							<td>${enviament.entregaPostal.codiPostal}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.municipi"/></strong></td>
-							<td>${enviament.domiciliMunicipiNom} (${enviament.domiciliMunicipiCodiIne})</td>
+							<td>${enviament.entregaPostal.municipiNom} (${enviament.entregaPostal.MunicipiCodiIne})</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.provincia"/></strong></td>
-							<td>${enviament.domiciliProvinciaNom} (${enviament.domiciliProvinciaCodi})</td>
+							<td>${enviament.entregaPostal.provinciaNom} (${enviament.entregaPostal.ProvinciaCodi})</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.pais"/></strong></td>
-							<td>${enviament.domiciliPaisNom} (${enviament.domiciliPaisCodiIso})</td>
+							<td>${enviament.entregaPostal.paisNom} (${enviament.entregaPostal.PaisCodiIso})</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.linea1"/></strong></td>
-							<td>${enviament.domiciliLinea1}</td>
+							<td>${enviament.entregaPostal.linea1}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.linea2"/></strong></td>
-							<td>${enviament.domiciliLinea2}</td>
+							<td>${enviament.entregaPostal.linea2}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.cie"/></strong></td>
-							<td>${enviament.domiciliCie}</td>
+							<td>${enviament.entregaPostal.cie}</td>
 						</tr>
 					</tbody>
 					</table>
@@ -309,12 +309,12 @@ $(document).ready(function() {
 			</c:if>
 		</div>
 		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'estatNotifica'}"> active</c:if>" id="estatNotifica">
-			<c:if test="${enviament.notificaEstat == 'NOTIB_PENDENT'}">
+			<c:if test="${enviament.notificacio.estat == 'PENDENT'}">
 				<div class="alert alert-warning well-sm" role="alert" style="margin-top: 1em">
 					<spring:message code="enviament.info.notifica.no.enviada"/>
 				</div>
 			</c:if>
-			<c:if test="${enviament.notificaEstat != 'NOTIB_PENDENT'}">
+			<c:if test="${enviament.notificacio.estat != 'PENDENT'}">
 				<p class="text-right" style="margin-top: 1em">
 					<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstatNotifica"/>" class="btn btn-default">
 						<span class="fa fa-refresh"></span>
@@ -449,11 +449,11 @@ $(document).ready(function() {
 			</c:if>
 		</div>
 		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'estatSeu'}"> active</c:if>" id="estatSeu">
-			<c:if test="${empty enviament.seuRegistreNumero}">
+			<c:if test="${empty enviament.notificacio.seuRegistreNumero}">
 				<div class="alert alert-warning well-sm" role="alert" style="margin-top: 1em">
 					<spring:message code="enviament.info.estat.seu.no.enviada"/>
 				</div>
-				<c:if test="${enviament.notificaEstat != 'NOTIB_PENDENT'}">
+				<c:if test="${enviament.notificacio.estat != 'PENDENT'}">
 					<c:if test="${notificacio.enviamentTipus == 'COMUNICACIO'}">
 						<p class="well well-sm text-right" style="margin-top: 1em">
 							<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/comunicacioSeu"/>" class="btn btn-default">
@@ -473,7 +473,7 @@ $(document).ready(function() {
 					</c:if>
 				</c:if>
 			</c:if>
-			<c:if test="${not empty enviament.seuRegistreNumero}">
+			<c:if test="${not empty enviament.notificacio.seuRegistreNumero}">
 				<p class="text-right" style="margin-top: 1em">
 					<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstatSeu"/>" class="btn btn-default">
 						<span class="fa fa-refresh"></span>
@@ -485,11 +485,11 @@ $(document).ready(function() {
 					<tbody>
 						<tr>
 							<td width="30%"><strong><spring:message code="enviament.info.seu.registre.num"/></strong></td>
-							<td>${enviament.seuRegistreNumero}</td>
+							<td>${enviament.notificacio.seuRegistreNumero}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.seu.registre.data"/></strong></td>
-							<td><fmt:formatDate value="${enviament.seuRegistreData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+							<td><fmt:formatDate value="${enviament.notificacio.seuRegistreData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.seu.data.fi"/></strong></td>
@@ -497,7 +497,7 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.seu.data.enviament"/></strong></td>
-							<td><fmt:formatDate value="${enviament.seuDataEnviament}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+							<td><fmt:formatDate value="${enviament.notificacio.seuDataEnviament}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.seu.estat"/></strong></td>

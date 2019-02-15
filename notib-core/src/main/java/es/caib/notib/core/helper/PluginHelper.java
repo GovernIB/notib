@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.security.Security;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,12 +19,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.xml.sax.SAXException;
 
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
@@ -1455,6 +1466,19 @@ public class PluginHelper {
 		return interessat;
 	}
 	
+	public static DocumentBuilder getDocumentBuilder() throws Exception {
+		try {
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			dbf.setIgnoringComments(true);
+			dbf.setCoalescing(true);
+			dbf.setIgnoringElementContentWhitespace(true);
+			dbf.setValidating(false);
+			return dbf.newDocumentBuilder();
+    	} catch (Exception exc) {
+    		throw new Exception(exc.getMessage());
+    	}
+	}
+	
 	public RegistreAnnexDto documentToRegistreAnnexDto (DocumentEntity document) {
 		RegistreAnnexDto annex = new RegistreAnnexDto();
 		if((document.getUuid() != null || document.getCsv() != null) && document.getUrl() == null && document.getContingutBase64() == null) {
@@ -1462,32 +1486,27 @@ public class PluginHelper {
 			if(document.getUuid() != null) {
 				id = document.getUuid();
 			} else if (document.getCsv() != null){
-				id = document.getCsv();
-				String urlDocument = getPropertyArxiuVerificacioBaseUrl() + document.getCsv();
-				
-				URL url;
 				try {
+					id = document.getCsv();
+					String urlDocument = getPropertyArxiuVerificacioBaseUrl() + document.getCsv();
+					URL url;
 					url = new URL(urlDocument);
-
-			        ByteArrayOutputStream output = new ByteArrayOutputStream();
-			         
-			        InputStream inputStream = url.openStream();
-			        
-		            int n = 0;
-		            byte [] buffer = new byte[ 1024 ];
-		            while (-1 != (n = inputStream.read(buffer))) {
-		                output.write(buffer, 0, n);
-		            }
-			        
-
-			        annex.setArxiuContingut(output.toByteArray());
+					URLConnection connection = url.openConnection();
+					Object objecte = connection.getContent();
+					
 				} catch (MalformedURLException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}catch (IOException e) {
-					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
+				
+				
+				System.out.println("ep");
+			        
+	            
+	            
 		     
 				
 				

@@ -114,7 +114,7 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 				titular.getLlinatge1(),
 				titular.getLlinatge2());
 	}
-	public String getTitular() {
+	public String getTitularNomLlinatges() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(titular.getNom());
 		String llinatges = getTitularLlinatges();
@@ -127,6 +127,11 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 		sb.append(")");
 		return sb.toString();
 	}
+	
+	public PersonaDto getTitular() {
+		return this.titular;
+	}
+
 
 
 	@Override

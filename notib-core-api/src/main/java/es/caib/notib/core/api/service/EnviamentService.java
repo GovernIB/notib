@@ -4,6 +4,7 @@
 package es.caib.notib.core.api.service;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,7 +42,7 @@ public interface EnviamentService {
 	@PreAuthorize("hasRole('tothom')")
 	public List<Long> findIdsAmbFiltre(
 			Long entitatId,
-			NotificacioEnviamentFiltreDto filtre) throws NotFoundException;
+			NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException;
 
 	/**
 	 * Consulta dels enviaments d'un usuari realitzats d'una notificació.
@@ -53,7 +54,7 @@ public interface EnviamentService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByUserAndFiltre(
 			NotificacioEnviamentFiltreDto filtre,
-			PaginacioParamsDto paginacio);
+			PaginacioParamsDto paginacio) throws ParseException;
 	
 	/**
 	 * Consulta dels enviaments d'una notificació.
@@ -110,7 +111,7 @@ public interface EnviamentService {
 			Long entitatId,
 			Collection<Long> enviamentIds,
 			String format,
-			NotificacioEnviamentFiltreDto filtreCommand) throws IOException, NotFoundException;
+			NotificacioEnviamentFiltreDto filtreCommand) throws IOException, NotFoundException, ParseException;
 	
 	/**
 	 * Crea les columnes s'han de mostrar

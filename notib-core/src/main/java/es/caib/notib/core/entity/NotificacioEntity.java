@@ -29,12 +29,7 @@ import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.ws.notificacio.Document;
-import es.caib.notib.core.api.ws.notificacio.DocumentV2;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
-import es.caib.notib.core.api.ws.notificacio.PagadorCie;
-import es.caib.notib.core.api.ws.notificacio.PagadorPostal;
-import es.caib.notib.core.api.ws.notificacio.ParametresRegistre;
 import es.caib.notib.core.api.ws.notificacio.ParametresSeu;
 import es.caib.notib.core.audit.NotibAuditable;
 
@@ -106,14 +101,14 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private List<NotificacioEventEntity> events = new ArrayList<NotificacioEventEntity>();
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "entitat_id")
 	@ForeignKey(name = "not_entitat_notificacio_fk")
 	private EntitatEntity entitat;
 	
 	
 	/*pagador a Postal*/
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "pagador_postal_id")
 	@ForeignKey(name = "not_pagador_postal_not_fk")
 	private PagadorPostalEntity pagadorPostal;
@@ -121,7 +116,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	
 	/*pagador CIE*/
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "pagador_cie_id")
 	@ForeignKey(name = "not_pagador_cie_not_fk")
 	private PagadorCieEntity pagadorCie;
@@ -130,14 +125,14 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	
 	/*Procediment*/
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "procediment_id")
 	@ForeignKey(name = "not_procediment_not_fk")
 	private ProcedimentEntity procediment;
 	
 	
 	/*document*/
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "document_id")
 	@ForeignKey(name = "not_document_notificacio_fk")
 	private DocumentEntity document;

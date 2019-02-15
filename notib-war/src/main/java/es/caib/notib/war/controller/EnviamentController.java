@@ -4,11 +4,14 @@
 package es.caib.notib.war.controller;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,13 +21,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import es.caib.notib.core.api.dto.ColumnesDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.UsuariDto;
+import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.war.command.ColumnesCommand;
@@ -132,9 +136,13 @@ public class EnviamentController extends BaseUserController {
 			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
 				filtreEnviaments.setEstat(null);
 			}
-			enviaments = enviamentService.enviamentFindByUserAndFiltre(
-					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
-					DatatablesHelper.getPaginacioDtoFromRequest(request));
+			try {
+				enviaments = enviamentService.enviamentFindByUserAndFiltre(
+						NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
+						DatatablesHelper.getPaginacioDtoFromRequest(request));
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
 		}
 		return DatatablesHelper.getDatatableResponse(
 				request, 
@@ -166,10 +174,14 @@ public class EnviamentController extends BaseUserController {
 		} else {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			NotificacioEnviamentFiltreCommand filtreCommand = getFiltreCommand(request);
-			seleccio.addAll(
-					enviamentService.findIdsAmbFiltre(
-							entitatActual.getId(),
-							NotificacioEnviamentFiltreCommand.asDto(filtreCommand)));
+			try {
+				seleccio.addAll(
+						enviamentService.findIdsAmbFiltre(
+								entitatActual.getId(),
+								NotificacioEnviamentFiltreCommand.asDto(filtreCommand)));
+			} catch (NotFoundException | ParseException e) {
+				e.printStackTrace();
+			}
 		}
 		return seleccio.size();
 	}
@@ -222,15 +234,21 @@ public class EnviamentController extends BaseUserController {
 					request,
 					ENVIAMENTS_FILTRE);
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-			FitxerDto fitxer = enviamentService.exportacio(
-					entitatActual.getId(),
-					seleccio,
-					format,
-					NotificacioEnviamentFiltreCommand.asDto(filtreCommand));
-			writeFileToResponse(
-					fitxer.getNom(),
-					fitxer.getContingut(),
-					response);
+			FitxerDto fitxer;
+			try {
+				fitxer = enviamentService.exportacio(
+						entitatActual.getId(),
+						seleccio,
+						format,
+						NotificacioEnviamentFiltreCommand.asDto(filtreCommand));
+				writeFileToResponse(
+						fitxer.getNom(),
+						fitxer.getContingut(),
+						response);
+			} catch (NotFoundException | ParseException e) {
+				e.printStackTrace();
+			}
+			
 			return null;
 		}
 	}
@@ -295,6 +313,7 @@ public class EnviamentController extends BaseUserController {
 					ENVIAMENTS_FILTRE,
 					filtreCommand);
 		}
+		
 		/*Cookie cookie = WebUtils.getCookie(request, COOKIE_MEUS_EXPEDIENTS);
 		filtreCommand.setMeusExpedients(cookie != null && "true".equals(cookie.getValue()));*/
 		return filtreCommand;

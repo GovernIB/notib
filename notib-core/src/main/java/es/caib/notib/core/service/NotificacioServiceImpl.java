@@ -343,9 +343,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 		
 		entityComprovarHelper.comprovarEntitat(
 				entitatId, 
-				true, 
 				false, 
-				true,
+				isAdministrador, 
+				isUsuariEntitat,
 				false);
 	
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId);

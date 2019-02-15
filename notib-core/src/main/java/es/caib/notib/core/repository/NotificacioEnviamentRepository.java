@@ -28,6 +28,9 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 
 	List<NotificacioEnviamentEntity> findByNotificacioId(
 			Long notificacioId);
+	
+	List<NotificacioEnviamentEntity> findByNotificacio(
+			NotificacioEntity notificacioId);
 
 	NotificacioEnviamentEntity findByNotificaReferencia(
 			String notificaReferencia);
@@ -42,7 +45,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	
 
 	@Query(	"from" +
-			"    NotificacioEnviamentEntity n, PersonaEntity " +
+			"    NotificacioEnviamentEntity n " +
 			"where " +
 			"    (:esDataEnviamentIniciNull = true or n.createdDate >= :dataEnviamentInici) " +
 			"and (:esDataEnviamentFiNull = true or n.createdDate <= :dataEnviamentFi) " +

@@ -51,7 +51,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	
 	
 	/* Titular */
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "titular_id")
 	@ForeignKey(name = "not_persona_notificacio_env_fk")
 	private PersonaEntity titular;
@@ -72,7 +72,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 //	@Column(name = "titular_email", length = 100)
 //	private String titularEmail;
 	/* Destinataris */
-	@OneToMany
+	@OneToMany(fetch = FetchType.EAGER)
 	@ForeignKey(name = "not_persona_not_fk")
     @JoinColumn(name = "notificacio_env_id") // we need to duplicate the physical information
 	private List<PersonaEntity> destinataris;
@@ -253,7 +253,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "intent_num")
 	private int intentNum;
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "notificacio_id")
 	@ForeignKey(name = "not_notificacio_notdest_fk")
 	private NotificacioEntity notificacio;

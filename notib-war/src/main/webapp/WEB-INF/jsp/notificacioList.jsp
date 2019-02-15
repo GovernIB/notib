@@ -68,16 +68,16 @@ $(document).ready(function() {
 	    	contingutTbody = '';
 			for (i = 0; i < data.length; i++) {
 				contingutTbody += '<tr>';
-				contingutTbody += '<td>' + data[i].titular + '</td>';
+				contingutTbody += '<td>' + data[i].titular.nom + '</td>';
 				//contingutTbody += '<td>' + data[i].destinatari + '</td>';
 				contingutTbody += '<td>';
-				contingutTbody += (data[i].notificaEstat) ? notificacioEnviamentEstats[data[i].notificaEstat] : '';
-				if (data[i].notificaError) {
+				contingutTbody += (data[i].notificacio.estat) ? notificacioEnviamentEstats[data[i].notificacio.estat] : '';
+				if (data[i].notificacio.notificaError) {
 					var errorTitle = '';
-					if (data[i].notificaErrorDescripcio) {
-						errorTitle = data[i].notificaErrorDescripcio;
+					if (data[i].notificacio.notificaErrorDescripcio) {
+						errorTitle = data[i].notificacio.notificaErrorDescripcio;
 					}
-					var escaped = data[i].notificaErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+					var escaped = data[i].notificacio.notificaErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 					contingutTbody += ' <span class="fa fa-warning text-danger" title="' + escaped + '"></span>';
 				}
 				contingutTbody += '</td>';
@@ -158,8 +158,8 @@ $(document).ready(function() {
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false">#</th>
-				<th data-col-name="notificaError" data-visible="false"></th>
-				<th data-col-name="notificaErrorDescripcio" data-visible="false"></th>
+				<th data-col-name="notificacio.notificaError" data-visible="false"></th>
+				<th data-col-name="notificacio.notificaErrorDescripcio" data-visible="false"></th>
 				<th data-col-name=createdDate data-converter="datetime" width="15%"><spring:message code="notificacio.list.columna.enviament.data"/></th>
 				<c:if test="${isRolActualAdministrador}">
 					<th data-col-name="entitat.nom" width="20%"><spring:message code="notificacio.list.columna.entitat"/></th>

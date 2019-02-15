@@ -49,10 +49,13 @@ public class NotificacioDto extends AuditoriaDto {
 	private String seuAvisTextMobil;
 	private String seuOficiTitol;
 	private String seuOficiText;
+	private String seuRegistreNumero;
 	private NotificacioEstatEnumDto estat;
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
 	private EntitatDto entitat;
+	private String referenciaExterna;
+	
 	
 	private List<PermisDto> permisos;
 	private boolean usuariActualRead;
@@ -316,6 +319,18 @@ public class NotificacioDto extends AuditoriaDto {
 	}
 	public void setUsuariActualAdministration(boolean usuariActualAdministration) {
 		this.usuariActualAdministration = usuariActualAdministration;
+	}
+	public String getReferenciaExterna() {
+		return referenciaExterna;
+	}
+	public void setReferenciaExterna(String referenciaExterna) {
+		this.referenciaExterna = referenciaExterna;
+	}
+	public String getSeuRegistreNumero() {
+		return seuRegistreNumero;
+	}
+	public void setSeuRegistreNumero(String seuRegistreNumero) {
+		this.seuRegistreNumero = seuRegistreNumero;
 	}
 	@Override
 	public String toString() {
