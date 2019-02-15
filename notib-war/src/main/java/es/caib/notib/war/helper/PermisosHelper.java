@@ -47,7 +47,7 @@ public class PermisosHelper {
 					}
 				}
 			}
-			//Comprova quins permisos té aquest usuari sobre els procediments
+			//Comprova quins permisos té aquest usuari sobre els procediments amb grups
 			if(!procediments.isEmpty()) {
 				request.setAttribute(
 						"permisConsulta", 
@@ -55,6 +55,15 @@ public class PermisosHelper {
 				request.setAttribute(
 						"permisNotificacio", 
 						entityComprovarHelper.hasGrupPermisNotificacioProcediment(procediments));
+			}
+			//Comprova quins permisos té aquest usuari sobre els procediments sense grups
+			if (grupsProcediment.isEmpty()) {
+				request.setAttribute(
+						"permisConsulta", 
+						entityComprovarHelper.hasPermisConsultaProcediment());
+				request.setAttribute(
+						"permisNotificacio", 
+						entityComprovarHelper.hasPermisNotificacioProcediment());
 			}
 		}
 	}

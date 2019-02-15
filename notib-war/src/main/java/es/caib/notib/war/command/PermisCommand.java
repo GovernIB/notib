@@ -24,9 +24,7 @@ import es.caib.notib.war.helper.ConversioTipusHelper;
 public class PermisCommand {
 
 	private Long id;
-	@NotEmpty @Size(max=64)
 	private String principal;
-	@NotNull
 	private TipusEnumDto tipus;
 	private boolean read;
 	private boolean write;
