@@ -209,7 +209,6 @@ public class ProcedimentController extends BaseUserController{
 			HttpServletRequest request,
 			Long procedimentId,
 			Model model) {
-		
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		ProcedimentDto procediment = null;
 		
@@ -224,6 +223,7 @@ public class ProcedimentController extends BaseUserController{
 		if (procedimentId != null) {
 			procediment = procedimentService.findById(
 					entitat.getId(),
+					isAdministrador(request),
 					procedimentId);
 
 			model.addAttribute(procediment);
@@ -231,5 +231,11 @@ public class ProcedimentController extends BaseUserController{
 		
 		return procediment;
 	}
+	
+	private boolean isAdministrador(
+			HttpServletRequest request) {
+		return RolHelper.isUsuariActualAdministrador(request);
+	}
+	
 	
 }

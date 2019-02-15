@@ -75,6 +75,7 @@ public interface ProcedimentService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public ProcedimentDto findById(
 			Long entitatId,
+			boolean isAdministrador,
 			Long id) throws NotFoundException;
 
 	/**
@@ -122,6 +123,15 @@ public interface ProcedimentService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public List<ProcedimentGrupDto> findAllGrups();
+	
+	/**
+	 * Llistat amb tots els procediments.
+	 * 
+	 * @return La llista dels procediments.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	public List<ProcedimentDto> findProcedimentsSenseGrups();
+	
 	/**
 	 * Llistat amb tots els procediments paginats.
 	 * 
@@ -160,6 +170,7 @@ public interface ProcedimentService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public List<PermisDto> permisFind(
 			Long entitatId,
+			boolean isAdministrador,
 			Long id) throws NotFoundException;
 	
 	/**

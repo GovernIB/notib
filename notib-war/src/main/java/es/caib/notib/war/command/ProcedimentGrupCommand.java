@@ -1,13 +1,9 @@
 package es.caib.notib.war.command;
 
 
-import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.hibernate.validator.constraints.NotEmpty;
 
-import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.TipusGrupEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;

@@ -19,6 +19,7 @@ import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.ProcedimentGrupCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
+import es.caib.notib.war.helper.RolHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 /**
  * Controlador per el mantinemnt de grups
@@ -49,6 +50,7 @@ public class ProcedimentGrupController extends BaseUserController{
 				"procediment",
 				procedimentService.findById(
 						entitatActual.getId(),
+						isAdministrador(request),
 						procedimentId));
 		return "procedimentAdminGrup";
 	}
@@ -110,7 +112,6 @@ public class ProcedimentGrupController extends BaseUserController{
 			Long procedimentId,
 			Long grupId,
 			Model model) {
-		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ProcedimentGrupDto procedimentGrups = null;
 		
@@ -122,6 +123,7 @@ public class ProcedimentGrupController extends BaseUserController{
 				"procediment",
 				procedimentService.findById(
 						entitatActual.getId(),
+						isAdministrador(request),
 						procedimentId));
 		
 		
@@ -185,6 +187,11 @@ public class ProcedimentGrupController extends BaseUserController{
 						entitatActual.getId(), 
 						procedimentId), 
 						"id");
+	}
+	
+	private boolean isAdministrador(
+			HttpServletRequest request) {
+		return RolHelper.isUsuariActualAdministrador(request);
 	}
 	
 }
