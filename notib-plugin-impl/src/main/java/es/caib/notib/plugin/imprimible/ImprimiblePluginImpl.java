@@ -26,8 +26,6 @@ public class ImprimiblePluginImpl implements ImprimiblePlugin{
 				ambContingut,
 				ambVersioImprimible);
 	}
-
-	
 	
 	private Document arxiuDocumentConsultar(
 			String arxiuUuid,

@@ -94,7 +94,7 @@ $(document).ready(function() {
 				<tbody>
 					<tr>
 						<td width="30%"><strong><spring:message code="notificacio.info.dada.entitat"/></strong></td>
-						<td>${notificacio.entitat.nom} (${notificacio.entitat.dir3Codi})</td>
+						<td>${notificacio.procediment.entitat.dir3Codi} (${notificacio.procediment.entitat.dir3Codi})</td>
 					</tr>
 					<tr>
 						<td><strong><spring:message code="notificacio.info.dada.concepte"/></strong></td>
@@ -106,7 +106,7 @@ $(document).ready(function() {
 					</tr>
 					<tr>
 						<td><strong><spring:message code="notificacio.info.dada.procediment.sia"/></strong></td>
-						<td>${notificacio.procedimentDescripcioSia} (${notificacio.procedimentCodiSia})</td>
+						<td>(${notificacio.procediment.codisia})</td>
 					</tr>
 					<tr>
 						<td><strong><spring:message code="notificacio.info.dada.estat"/></strong></td>
@@ -134,22 +134,22 @@ $(document).ready(function() {
 					<tr>
 						<td width="30%"><strong><spring:message code="notificacio.info.document.arxiu.nom"/></strong></td>
 						<td>
-							${notificacio.documentArxiuNom}
+							${notificacio.document.arxiuNom}
 							<a href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar"/>" class="btn btn-default btn-sm pull-right" title="<spring:message code="notificacio.info.document.descarregar"/>"><span class="fa fa-download"></span></a>
 						</td>
 					</tr>
 					<tr>
 						<td><strong><spring:message code="notificacio.info.document.normalitzat"/></strong></td>
-						<td>${notificacio.documentNormalitzat}</td>
+						<td>${notificacio.document.normalitzat}</td>
 					</tr>
 					<tr>
 						<td><strong><spring:message code="notificacio.info.document.generar.csv"/></strong></td>
-						<td>${notificacio.documentGenerarCsv}</td>
+						<td>${notificacio.document.generarCsv}</td>
 					</tr>
 				</tbody>
 				</table>
 			</div>
-			<c:if test="${not empty notificacio.pagadorCorreusCodiDir3 or not empty notificacio.pagadorCieCodiDir3}">
+			<c:if test="${not empty notificacio.procediment.pagadorpostal.dir3codi or not empty notificacio.pagadorcie.dir3codi}">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">
@@ -158,39 +158,39 @@ $(document).ready(function() {
 	 				</div>
 					<table class="table table-bordered" style="width:100%">
 					<tbody>
-						<c:if test="${not empty notificacio.pagadorCorreusCodiDir3}">
+						<c:if test="${not empty notificacio.procediment.pagadorpostal.dir3codi}">
 							<tr>
 								<td width="30%"><strong><spring:message code="notificacio.info.pagador.correus.codi.dir3"/></strong></td>
-								<td>${notificacio.pagadorCorreusCodiDir3}</td>
+								<td>${notificacio.procediment.pagadorpostal.dir3codi}</td>
 							</tr>
 							<tr>
 								<td><strong><spring:message code="notificacio.info.pagador.correus.contracte"/></strong></td>
-								<td>${notificacio.pagadorCorreusContracteNum}</td>
+								<td>${notificacio.procediment.pagadorpostal.contracteNum}</td>
 							</tr>
 							<tr>
 								<td><strong><spring:message code="notificacio.info.pagador.correus.client"/></strong></td>
-								<td>${notificacio.pagadorCorreusCodiClientFacturacio}</td>
+								<td>${notificacio.procediment.pagadorpostal.facturacioClientCodi}</td>
 							</tr>
 							<tr>
 								<td><strong><spring:message code="notificacio.info.pagador.correus.vigencia"/></strong></td>
-								<td>${notificacio.pagadorCorreusDataVigencia}</td>
+								<td>${notificacio.procediment.pagadorpostal.contracteDataVig}</td>
 							</tr>
 						</c:if>
-						<c:if test="${not empty notificacio.pagadorCieCodiDir3}">
+						<c:if test="${not empty notificacio.procediment.pagadorcie.dir3codi}">
 							<tr>
 								<td><strong><spring:message code="notificacio.info.pagador.cie.codi.dir3"/></strong></td>
-								<td>${notificacio.pagadorCieCodiDir3}</td>
+								<td>${notificacio.procediment.pagadorcie.dir3codi}</td>
 							</tr>
 							<tr>
 								<td><strong><spring:message code="notificacio.info.pagador.cie.vigencia"/></strong></td>
-								<td>${notificacio.pagadorCieDataVigencia}</td>
+								<td>${notificacio.procediment.pagadorcie.contracteDataVig}</td>
 							</tr>
 						</c:if>
 					</tbody>
 					</table>
 				</div>
 			</c:if>
-			<c:if test="${not empty notificacio.seuExpedientSerieDocumental}">
+			<%-- <c:if test="${not empty notificacio.seuExpedientSerieDocumental}">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">
@@ -251,7 +251,7 @@ $(document).ready(function() {
 					</table>
 				</div>
 			</c:if>
-		</div>
+		</div> --%>
 		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'events'}"> active</c:if>" id="events">
 			<table
 				id="events"

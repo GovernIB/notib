@@ -235,7 +235,8 @@ public class RestAltaNotificacio {
 		notificacio.setCaducitat(
 				new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000));
 		DocumentV2 document = new DocumentV2();
-		document.setCsv("0f91aa5f0e6a99d6be32c4f286f712128cf86b2ba4a5f1b28804abd5d2e1829a");
+//		document.setCsv("4edd743942cec762cdf9389dc626ee01209fd30e6884aca9845c9573a57f2df3");
+		document.setUuid("614841f4-a93f-4307-8009-32970cf01632");
 		document.setArxiuNom("prova");
 //		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
 //		document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));

@@ -37,7 +37,7 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public NotificacioDto findAmbId(Long id) {
+	public NotificacioDtoV2 findAmbId(Long id) {
 		return delegate.findAmbId(id);
 	}
 

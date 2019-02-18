@@ -314,9 +314,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public NotificacioDto findAmbId(Long id) {
+	public NotificacioDtoV2 findAmbId(Long id) {
 		logger.debug("Consulta de la notificacio amb id (id=" + id + ")");
-		NotificacioEntity dto = notificacioRepository.findOne(id);
+		NotificacioEntity dto = notificacioRepository.findById(id);
 		
 		entityComprovarHelper.comprovarPermisos(
 				null,
@@ -324,9 +324,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 				true,
 				false);
 		
-		return  conversioTipusHelper.convertir(
+		return conversioTipusHelper.convertir(
 				dto,
-				NotificacioDto.class);
+				NotificacioDtoV2.class);
 	}
 
 	@Transactional(readOnly = true)
@@ -574,17 +574,23 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public ArxiuDto getDocumentArxiu(
 			Long notificacioId) {
-		NotificacioEntity entity = notificacioRepository.findOne(notificacioId);
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		pluginHelper.gestioDocumentalGet(
-				entity.getDocument().getArxiuGestdocId(),
-				PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-				output);
-		return new ArxiuDto(
-				entity.getDocument().getArxiuNom(),
-				"PDF",
-				output.toByteArray(),
-				output.size());
+		NotificacioEntity entity = notificacioRepository.findById(notificacioId);
+		if(entity.getDocument() != null && entity.getDocument().getArxiuGestdocId() != null) {
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			pluginHelper.gestioDocumentalGet(
+					entity.getDocument().getArxiuGestdocId(),
+					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
+					output);
+			return new ArxiuDto(
+					entity.getDocument().getArxiuNom(),
+					"PDF",
+					output.toByteArray(),
+					output.size());	
+		}
+		/*TODO: controlar que si el document no du id de gestio documental
+		 *  no l'intenti descarregar d'aquest plugin si no del que correspongui 
+		 *  amb els parametres que tingui*/
+		return null;
 	}
 	@Override
 	@Transactional(readOnly = true)

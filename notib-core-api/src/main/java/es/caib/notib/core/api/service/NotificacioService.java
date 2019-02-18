@@ -61,7 +61,7 @@ public interface NotificacioService {
 	 * @return La notificació amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public NotificacioDto findAmbId(
+	public NotificacioDtoV2 findAmbId(
 			Long id);
 
 	/**

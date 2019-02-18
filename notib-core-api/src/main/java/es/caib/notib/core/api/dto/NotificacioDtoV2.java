@@ -30,7 +30,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private String csv_uuid;
 	private ProcedimentDto procediment;
 	private String procedimentCodiNotib;
-	private GrupDto Grup;
+	private GrupDto grup;
 	private String grupCodi;
 	private ParametresRegistreDto parametresRegistre;
 	private NotificacioEstatEnumDto estat;
@@ -127,10 +127,10 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 		this.procedimentCodiNotib = procedimentCodiNotib;
 	}
 	public GrupDto getGrup() {
-		return Grup;
+		return grup;
 	}
 	public void setGrup(GrupDto grup) {
-		Grup = grup;
+		grup = grup;
 	}
 	public String getGrupCodi() {
 		return grupCodi;

@@ -30,6 +30,7 @@ import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.ws.notificacio.Certificacio;
 import es.caib.notib.core.api.ws.notificacio.ComunicacioTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.Document;
+import es.caib.notib.core.api.ws.notificacio.DocumentV2;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.EnviamentEstatEnum;
@@ -102,37 +103,45 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 	public RespostaAlta alta(
 			Notificacio notificacio) throws NotificacioServiceWsException {
 		String emisorDir3Codi = notificacio.getEmisorDir3Codi();
+		RespostaAlta resposta = new RespostaAlta();
+
 		if (emisorDir3Codi == null) {
-			throw new ValidationException(
-					"EMISOR", 
-					"El camp 'emisorDir3Codi' no pot ser null.");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[EMISOR] El camp 'emisorDir3Codi' no pot ser null.");
+			return resposta;
 		}
 		EntitatEntity entitat = entitatRepository.findByDir3Codi(emisorDir3Codi);
 		if (entitat == null) {
-			throw new ValidationException(
-					"ENTITAT", 
-					"No s'ha trobat cap entitat configurada a Notib amb el codi Dir3 " + emisorDir3Codi + ". (emisorDir3Codi)");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[ENTITAT] No s'ha trobat cap entitat configurada a Notib amb el codi Dir3 " + emisorDir3Codi + ". (emisorDir3Codi)");
+			return resposta;
 		}
 		if (!entitat.isActiva()) {
-			throw new ValidationException(
-					"ENTITAT", 
-					"L'entitat especificada està desactivada per a l'enviament de notificacions");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[ENTITAT] L'entitat especificada està desactivada per a l'enviament de notificacions");
+			return resposta;
 		}
 		if (notificacio.getConcepte() == null) {
-			throw new ValidationException(
-					"CONCEPTE", 
-					"El concepte de la notificació no pot ser null.");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[CONCEPTE] El concepte de la notificació no pot ser null.");
+			return resposta;
 		}
 		if (notificacio.getEnviamentTipus() == null) {
-			throw new ValidationException(
-					"ENVIAMENT_TIPUS", 
-					"El tipus d'enviament de la notificació no pot ser null.");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[ENVIAMENT_TIPUS] El tipus d'enviament de la notificació no pot ser null.");
+			return resposta;
 		}
 		Document document = notificacio.getDocument();
 		if (document == null) {
-			throw new ValidationException(
-					"DOCUMENT",
-					"El camp 'document' no pot ser null.");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[DOCUMENT] El camp 'document' no pot ser null.");
+			return resposta;
 		}
 		String documentGesdocId = null;
 		if(notificacio.getDocument().getContingutBase64() != null) {
@@ -306,7 +315,6 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				notificacioGuardada = notificacioRepository.findOne(notificacioGuardada.getId());
 			}
 		}
-		RespostaAlta resposta = new RespostaAlta();
 		try {
 			resposta.setIdentificador(
 					notificaHelper.xifrarId(notificacioGuardada.getId()));
