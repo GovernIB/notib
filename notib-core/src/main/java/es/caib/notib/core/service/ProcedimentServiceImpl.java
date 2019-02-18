@@ -109,9 +109,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				true,
+				false,
+				false,
 				false);
 		
 		ProcedimentEntity procedimentEntity = entityComprovarHelper.comprovarProcediment(
@@ -150,9 +150,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				true,
+				false,
+				false,
 				false);
 		
 		ProcedimentEntity procedimentEntity = entityComprovarHelper.comprovarProcediment(
@@ -171,25 +171,26 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Override
 	public ProcedimentDto findById(
 			Long entitatId,
+			boolean isAdministrador,
 			Long id) {
 		logger.debug("Consulta del procediment ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ")");
 		EntitatEntity entitat = null;
 		
-		if (entitatId != null)
-			 entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId,
-					true,
-					false,
-					true,
+		if (entitatId != null && !isAdministrador)
+			entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId, 
+					false, 
+					false, 
+					false, 
 					false);
-		
+
 		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
-				entitat,
-				id,
-				false,
-				false,
+				entitat, 
+				id, 
+				false, 
+				false, 
 				false,
 				false);
 		ProcedimentDto resposta = conversioTipusHelper.convertir(
@@ -227,9 +228,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		
 		entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				true,
+				false,
+				false,
 				false);
 		
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId);
@@ -316,9 +317,29 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				true,
 				true,
 				false);
+		
+		List<GrupProcedimentEntity> grupsProcediments = grupProcedimentRepository.findAll();
 		return conversioTipusHelper.convertirList(
-					grupProcedimentRepository.findAll(),
+					grupsProcediments,
 					ProcedimentGrupDto.class);
+	}
+	
+	@Override
+	public List<ProcedimentDto> findProcedimentsSenseGrups() {
+		
+		entityComprovarHelper.comprovarPermisos(
+				null,
+				true,
+				true,
+				false);
+		List<GrupProcedimentEntity> grupsProcediments = grupProcedimentRepository.findAll();
+		
+		/*List<ProcedimentEntity> procediments = grupProcedimentRepository.findProcedimentsSenseGrups(grupsProcediments);
+		
+		return conversioTipusHelper.convertirList(
+				procediments,
+				ProcedimentDto.class);*/
+		return null;
 	}
 	
 	@Override
@@ -340,18 +361,20 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Override
 	public List<PermisDto> permisFind(
 			Long entitatId,
+			boolean isAdministrador,
 			Long id) {
 		logger.debug("Consulta dels permisos del meta-expedient ("
 				+ "entitatId=" + entitatId +  ", "
 				+ "id=" + id +  ")"); 
+		EntitatEntity entitat = null;
 		
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				true,
-				false);
+		if (entitatId != null && !isAdministrador)
+			entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId,
+					false,
+					false,
+					true,
+					false);
 		
 		entityComprovarHelper.comprovarProcediment(
 				entitat, 
@@ -378,7 +401,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				+ "permis=" + permis + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
+				false,
 				false,
 				true,
 				false);
@@ -407,7 +430,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				+ "permis=" + procedimentGrup + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
+				false,
 				false,
 				true,
 				false);
@@ -439,9 +462,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				+ "permis=" + procedimentGrup + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				true,
+				false,
+				false,
 				false);
 		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
 				entitat,
@@ -471,9 +494,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		
 		entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				true,
+				false,
+				false,
 				false);
 		
 		GrupProcedimentEntity grupProcedimentEntity = grupProcedimentRepository.findOne(procedimentGrupId);
@@ -493,7 +516,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				+ "permisId=" + permisId + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
+				false,
 				false,
 				true,
 				false);

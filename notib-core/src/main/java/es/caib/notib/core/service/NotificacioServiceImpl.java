@@ -42,7 +42,6 @@ import es.caib.notib.core.api.exception.RegistrePluginException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
-import es.caib.notib.core.api.ws.notificacio.DocumentV2;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
 import es.caib.notib.core.api.ws.notificacio.Persona;
@@ -112,30 +111,17 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotificacioDtoV2 notificacio) {
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-		
-		NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(
-				entitat, 
-				notificacio.getId());
-		
-		entityComprovarHelper.comprovarNotificacio(
-				entitat, 
-				notificacio.getId(), 
-				false, 
-				false, 
-				true, 
-				false);
-		
-		
+	
 		String documentGesdocId = null;
 //		GrupEntity grup = null;
 //		
 		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
 					entitat,
 				 	notificacio.getProcediment().getId(),
+				 	false,
+				 	false,
 				 	true,
-				 	true,
-				 	true,
-				 	true);
+				 	false);
 //
 //		if (notificacio.getGrup().getId() != null) {
 //			grup = entityComprovarHelper.comprovarGrup(
@@ -198,7 +184,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 //			registreLlibre(parametresRegistre.getLlibre());
 //		}
 
-		notificacioEntity = notificacioBuilder.build();
+		NotificacioEntity notificacioEntity = notificacioBuilder.build();
 		NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioEntity);
 
 		NotificacioEnviamentEntity.BuilderV2 enviamentBuilder = null;
@@ -495,7 +481,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	@Override
-	public List<ProcedimentDto> findNotificacionsAmbPermisConsultaAndGrups(
+	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaAndGrups(
 			List<ProcedimentDto> procediments) {
 		return entityComprovarHelper.findByGrupAndPermisConsultaProcedimentsUsuariActual(
 				procediments,
@@ -505,7 +491,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	@Override
-	public List<ProcedimentDto> findNotificacionsAmbPermisConsulta() {
+	public List<ProcedimentDto> findProcedimentsAmbPermisConsulta() {
 		return entityComprovarHelper.findPermisProcedimentsUsuariActual(
 				new Permission[] {
 						ExtendedPermission.READ}
@@ -513,7 +499,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 	@Override
-	public List<ProcedimentDto> findNotificacionsAmbPermisNotificacio() {
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacio() {
 		//Comprovar grup
 		return entityComprovarHelper.findPermisProcedimentsUsuariActual(
 				new Permission[] {
@@ -522,7 +508,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	@Override
-	public List<ProcedimentDto> findNotificacionsAmbPermisNotificacioAndGrups(
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrups(
 			List<ProcedimentDto> procediments) {
 		return entityComprovarHelper.findByGrupAndPermisConsultaProcedimentsUsuariActual(
 				procediments,

@@ -140,13 +140,13 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-	public List<ProcedimentDto> findNotificacionsAmbPermisConsulta() {
-		return delegate.findNotificacionsAmbPermisConsulta();
+	public List<ProcedimentDto> findProcedimentsAmbPermisConsulta() {
+		return delegate.findProcedimentsAmbPermisConsulta();
 	}
 
 	@Override
-	public List<ProcedimentDto> findNotificacionsAmbPermisNotificacio() {
-		return delegate.findNotificacionsAmbPermisNotificacio();
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacio() {
+		return delegate.findProcedimentsAmbPermisNotificacio();
 	}
 
 	@Override
@@ -173,16 +173,16 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public List<ProcedimentDto> findNotificacionsAmbPermisConsultaAndGrups(
+	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaAndGrups(
 			List<ProcedimentDto> procediments) {
-		return delegate.findNotificacionsAmbPermisConsultaAndGrups(procediments);
+		return delegate.findProcedimentsAmbPermisConsultaAndGrups(procediments);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public List<ProcedimentDto> findNotificacionsAmbPermisNotificacioAndGrups(
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrups(
 			List<ProcedimentDto> procediments) {
-		return delegate.findNotificacionsAmbPermisNotificacioAndGrups(procediments);
+		return delegate.findProcedimentsAmbPermisNotificacioAndGrups(procediments);
 	}
 
 	

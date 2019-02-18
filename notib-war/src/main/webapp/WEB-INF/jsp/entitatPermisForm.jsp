@@ -11,10 +11,10 @@
 <html>
 <head>
 	<title>${titol}</title>
-	<link href="<c:url value="/webjars/select2/4.0.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
-	<script src="<c:url value="/webjars/select2/4.0.1/dist/js/select2.min.js"/>"></script>
-	<script src="<c:url value="/webjars/select2/4.0.1/dist/js/i18n/${requestLocale}.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<link href="<c:url value="/css/permisos.css"/>" rel="stylesheet" type="text/css">
 	<not:modalHead/>
@@ -56,8 +56,8 @@
 	<c:set var="formAction"><not:modalUrl value="/entitat/${entitat.id}/permis"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
 		<form:hidden path="id"/>
-		<not:inputSelect name="tipus" textKey="entitat.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="TipusEnumDto"/>
-		<not:inputText name="principal" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}"/>
+		<not:inputSelect name="tipus" textKey="entitat.permis.form.camp.tipus" disabled="true" optionEnum="TipusEnumDto" />
+		<not:inputText name="principal" textKey="entitat.permis.form.camp.principal" readonly="true"/>
 		<not:inputCheckbox name="usuari" textKey="entitat.permis.form.camp.usuari"/>
 		<not:inputCheckbox name="administrador" textKey="entitat.permis.form.camp.administrador"/>
 		<not:inputCheckbox name="administradorEntitat" textKey="entitat.permis.form.camp.administradorentitat"/>

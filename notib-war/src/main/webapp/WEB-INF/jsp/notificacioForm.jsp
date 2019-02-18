@@ -61,15 +61,12 @@ $(document).ready(function() {
 		webutilModalAdjustHeight();
 	});
 	
-	
-	
 	$('#entregaPostalActiva').change(function(){
 		$('.entregapostal').slideToggle();
 	});
 
 	var agrupable = $("#procedimentId").children(":selected").attr("class");
 	var procedimentId = $("#procedimentId").children(":selected").attr("value");
-	comprovarGrups(agrupable, procedimentId);
 	
 	$('#procedimentId').on('change', function() {
 		var agrupable = $(this).children(":selected").attr("class");
@@ -103,67 +100,38 @@ $(document).ready(function() {
 		webutilModalAdjustHeight();
 	});
 	
-	//Eliminar grups
-	$(document).on('click', "#remove", function () {
-		
-		var grupId = $(this).parent().children().attr('id'); 
-		var grupsClass = $(this).attr('class'); 
-		var lastClass = grupsClass.split(' ').pop();
-		var parentRemove = $("." + lastClass).parent();
-		var parentInput = parentRemove.parent();
-		var parentDiv = parentInput.parent();
-		
-		var grupUrl = "grup/" + grupId + "/delete";
-		
-		if (confirm('<spring:message code="grup.list.confirmacio.esborrar"/>') && !isNaN(grupId)) 
-			$.ajax({
-		        type: "GET",
-		        url: grupUrl,
-		        success: function (data) {
-		        	//Remove div parent
-					parentDiv.slideUp("normal", function() {
-						$(this).remove(); 
-						webutilModalAdjustHeight();
-					});
-		        },
-		        error: function (data) {
-		        	//Remove div parent
-					alert("ERROR ELIMINANT GRUP");
-		        }
-		    });
-		else
-			//Remove div parent
-			parentDiv.slideUp("normal", function() {
-				$(this).remove(); 
-				webutilModalAdjustHeight();
-			});
-			
-	});
 
 });	
 
 function addDestinatari() {
 	var number;
-	
+	var num;
 	if ($(".personaForm").hasClass("hidden")) {
 		$(".personaForm").removeClass("hidden").show();
 	} else {
-		
 		var destinatariForm = $(".destinatariForm").last().clone();
-		
 		destinatariForm.find('input').each(function() {
-			number = this.name.substring( this.name.indexOf( '[' ) + 1, this.name.indexOf( ']' ) );
-			console.log(this.name);
-			var num = parseInt(number);
-			console.log(++num);
-		    this.name= this.name.replace(number, num);
-		    this.id= this.id.replace(number, num);
+			number = this.name.substring(this.name.lastIndexOf( '[' ) + 1, this.name.lastIndexOf( ']' ));
+			num = parseInt(number);
+			++num;
+		    this.name= this.name.replace("is[" + number, "is[" + num);
+		    this.id= this.id.replace("is[" + number, "is[" + num);
 		});
 		
 		$(destinatariForm).appendTo(".newDestinatari").slideDown("slow").find("input[type='text']").val("");
-		$(".destinatariForm:first").addClass("destinatari_" + number);
 		
 		webutilModalAdjustHeight();
+	}
+}
+
+function deleteDestinatari(className) {
+	var element = document.getElementById(className);
+	var parent = $(element).closest(".destinatariForm");
+	
+	if($(parent).parent().children().not(":eq(0)")) {
+		alert("no primer");
+	} else {
+		alert("primer");
 	}
 }
 
@@ -198,7 +166,8 @@ function addDestinatari() {
 						<not:inputTextarea name="descripcio" textKey="notificacio.form.camp.descripcio" labelSize="2"/>
 					</div>
 					<div class="col-md-12">
-						<not:inputText name="procedimentId" textKey="notificacio.form.camp.procediment" value="${procediment.nom}" labelSize="2" readonly="true"/>
+					<form:hidden path="procedimentId" value="${procediment.id}"/>
+						<not:inputText name="procedimentNom" textKey="notificacio.form.camp.procediment" value="${procediment.nom}" labelSize="2" readonly="true"/>
 					</div>
 					<c:if test="${not empty grups}">
 						<div class="col-md-12">
@@ -262,9 +231,11 @@ function addDestinatari() {
 				</div>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="enviamentsForm">
+			<c:set var="i" value="${0}"/>
+			<c:forEach items="enviaments" var="enviament" varStatus="status">
 				<div class="row enviamentsForm">
 						<div class="col-md-6">
-							<not:inputSelect name="serveiTipus" textKey="notificacio.form.camp.destinatari.serveitipus" labelSize="4" required="true" />
+							<not:inputSelect name="enviaments[${i}].serveiTipus" textKey="notificacio.form.camp.destinatari.serveitipus" labelSize="4" required="true" />
 						</div>
 						<div class="titular">
 							<div class="col-md-12">
@@ -276,25 +247,25 @@ function addDestinatari() {
 							<div class="personaForm">
 								<div>
 									<div class="col-md-6">
-										<not:inputText name="titular.nif" textKey="notificacio.form.camp.titular.nif" required="true" />
+										<not:inputText name="enviaments[${i}].titular.nif" textKey="notificacio.form.camp.titular.nif" required="true" />
 									</div>
 									<div class="col-md-6">
-										<not:inputText name="titular.nom" textKey="notificacio.form.camp.titular.nom" required="true" />
+										<not:inputText name="enviaments[${i}].titular.nom" textKey="notificacio.form.camp.titular.nom" required="true" />
 									</div>
 									<div class="col-md-6">
-										<not:inputText name="titular.llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" />
+										<not:inputText name="enviaments[${i}].titular.llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" />
 									</div>
 									<div class="col-md-6">
-										<not:inputText name="titular.llinatge2" textKey="notificacio.form.camp.titular.llinatge2" />
+										<not:inputText name="enviaments[${i}].titular.llinatge2" textKey="notificacio.form.camp.titular.llinatge2" />
 									</div>
 									<div class="col-md-6">
-										<not:inputText name="titular.email" textKey="notificacio.form.camp.titular.email" />
+										<not:inputText name="enviaments[${i}].titular.email" textKey="notificacio.form.camp.titular.email" />
 									</div>
 									<div class="col-md-6">
-										<not:inputText name="titular.telefon" textKey="notificacio.form.camp.titular.telefon" />
+										<not:inputText name="enviaments[${i}].titular.telefon" textKey="notificacio.form.camp.titular.telefon" />
 									</div>
 									<div class="col-md-6">
-										<not:inputText name="titular.dir3codi" textKey="notificacio.form.camp.titular.dir3codi" />
+										<not:inputText name="enviaments[${i}].titular.dir3codi" textKey="notificacio.form.camp.titular.dir3codi" />
 									</div>
 								</div>
 							</div>
@@ -314,25 +285,28 @@ function addDestinatari() {
 								<div class="col-md-12 personaForm destinatariForm hidden">
 									<div>
 										<div class="col-md-6">
-											<not:inputText name="destinataris[${i}].nif" textKey="notificacio.form.camp.titular.nif" required="true" />
+											<not:inputText name="enviaments[${i}].destinataris[${i}].nif" textKey="notificacio.form.camp.titular.nif" required="true" />
 										</div>
 										<div class="col-md-6">
-											<not:inputText name="destinataris[${i}].nom" textKey="notificacio.form.camp.titular.nom" required="true" />
+											<not:inputText name="enviaments[${i}].destinataris[${i}].nom" textKey="notificacio.form.camp.titular.nom" required="true" />
 										</div>
 										<div class="col-md-6">
-											<not:inputText name="destinataris[${i}].llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" />
+											<not:inputText name="enviaments[${i}].destinataris[${i}].llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" />
 										</div>
 										<div class="col-md-6">
-											<not:inputText name="destinataris[${i}].llinatge2" textKey="notificacio.form.camp.titular.llinatge2" />
+											<not:inputText name="enviaments[${i}].destinataris[${i}].llinatge2" textKey="notificacio.form.camp.titular.llinatge2" />
 										</div>
 										<div class="col-md-6">
-											<not:inputText name="destinataris[${i}].email" textKey="notificacio.form.camp.titular.email" />
+											<not:inputText name="enviaments[${i}].destinataris[${i}].email" textKey="notificacio.form.camp.titular.email" />
 										</div>
 										<div class="col-md-6">
-											<not:inputText name="destinataris[${i}].telefon" textKey="notificacio.form.camp.titular.telefon" />
+											<not:inputText name="enviaments[${i}].destinataris[${i}].telefon" textKey="notificacio.form.camp.titular.telefon" />
 										</div>
 										<div class="col-md-6">
-											<not:inputText name="destinataris[${i}].dir3codi" textKey="notificacio.form.camp.titular.dir3codi" />
+											<not:inputText name="enviaments[${i}].destinataris[${i}].dir3codi" textKey="notificacio.form.camp.titular.dir3codi" />
+										</div>
+										<div class="col-md-6 text-right">
+											<input type="button" class="btn btn-default first" name="destinatari_[${i}]"  onclick="deleteDestinatari(this.id)" id="destinatari[${i}]" value="<spring:message code="notificacio.form.boto.eliminar.destinatari"/>"/>
 										</div>
 										<div class="col-md-12">
 											<hr>
@@ -348,7 +322,7 @@ function addDestinatari() {
 							</c:forEach>
 						</div>
 						<div class="col-md-12 separacio"></div>
-						
+			</c:forEach>	
 						<div class="metodeEntrega">
 							<div class="col-md-8">
 								<div>

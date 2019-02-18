@@ -112,10 +112,9 @@ public class NotificacioController extends BaseUserController {
 			}
 			
 			if (!procediments.isEmpty())
-				procedimentsPermisConsulta = notificacioService
-						.findNotificacionsAmbPermisConsultaAndGrups(procediments);
+				procedimentsPermisConsulta = notificacioService.findProcedimentsAmbPermisConsultaAndGrups(procediments);
 			else if (grupsProcediment.isEmpty())
-				procedimentsPermisConsulta = notificacioService.findNotificacionsAmbPermisConsulta();
+				procedimentsPermisConsulta = notificacioService.findProcedimentsAmbPermisConsulta();
 			
 			
 			if (procedimentsPermisConsulta == null || procedimentsPermisConsulta.size() <= 0) {
@@ -162,7 +161,10 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("notificacioCommandV2",notificacio);
 		model.addAttribute("entitat", entitat);
 		model.addAttribute("procediment", 
-				procedimentService.findById(null, procedimentId));
+				procedimentService.findById(
+						null,
+						isAdministrador(request),
+						procedimentId));
 		model.addAttribute("grups", 
 				grupService.findByGrupsProcediment(procedimentId));
 		
@@ -174,8 +176,11 @@ public class NotificacioController extends BaseUserController {
 			HttpServletRequest request,
 			Model model) {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-		List<ProcedimentDto> procedimentsPermisConsulta = null;
-		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+		List<ProcedimentDto> procedimentsPermisNotificacioAndGrups = null;
+		List<ProcedimentDto> procedimentsPermisNotificacio = null;
+		List<ProcedimentDto> procediments = null;
+		List<ProcedimentDto> procedimentsAmbGrups = new ArrayList<ProcedimentDto>();
+		List<ProcedimentDto> procedimentsSenseGrups = new ArrayList<ProcedimentDto>();
 		List<ProcedimentGrupDto> grupsProcediment = new ArrayList<ProcedimentGrupDto>();
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
@@ -186,24 +191,31 @@ public class NotificacioController extends BaseUserController {
 			
 			//Llistat de procediments amb grups
 			grupsProcediment = procedimentService.findAllGrups();
-			procediments = new ArrayList<ProcedimentDto>();
+			procediments = procedimentService.findAll();
+			
+			procedimentsAmbGrups = new ArrayList<ProcedimentDto>();
+			procedimentsSenseGrups = new ArrayList<ProcedimentDto>();
 			//Obté els procediments que tenen el mateix grup que el rol d'usuari
 			for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
 				
 				for (String rol : rolsUsuariActual) {
 					if(rol.contains(grupProcediment.getGrup().getCodi())) {
-						procediments.add(grupProcediment.getProcediment());
+						procedimentsAmbGrups.add(grupProcediment.getProcediment());
+					}
+					if(grupProcediment.getGrup().getCodi().isEmpty()){
+						procedimentsSenseGrups.add(grupProcediment.getProcediment());
 					}
 				}
 			}
 		}
 		
-		if (!procediments.isEmpty()) {
-			procedimentsPermisConsulta = notificacioService.findNotificacionsAmbPermisConsultaAndGrups(procediments);
-			model.addAttribute("procediments", procedimentsPermisConsulta);
+		if (!procedimentsAmbGrups.isEmpty()) {
+			procedimentsPermisNotificacioAndGrups = notificacioService.findProcedimentsAmbPermisNotificacioAndGrups(procedimentsAmbGrups);
+			
+			model.addAttribute("procediments", procedimentsPermisNotificacioAndGrups);
 		} else if (grupsProcediment.isEmpty()) {
-			procedimentsPermisConsulta = notificacioService.findNotificacionsAmbPermisConsulta();
-			model.addAttribute("procediments", procedimentsPermisConsulta);
+			procedimentsPermisNotificacio = notificacioService.findProcedimentsAmbPermisNotificacio();
+			model.addAttribute("procediments", procedimentsPermisNotificacio);
 		}
 
 		return "notificacioProcedimentsForm";
@@ -227,7 +239,7 @@ public class NotificacioController extends BaseUserController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		if (bindingResult.hasErrors()) {
-			return "procedimentAdminForm";
+			return "notificacioForm";
 		}
 		if (RolHelper.isUsuariActualAdministrador(request)) {
 			model.addAttribute(
@@ -648,6 +660,12 @@ public class NotificacioController extends BaseUserController {
 						NotificacioEventTipusEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
 	}
+	
+	private boolean isAdministrador(
+			HttpServletRequest request) {
+		return RolHelper.isUsuariActualAdministrador(request);
+	}
+	
 /*
 	private List<Object> getProcedimentsGrupsAndPermisos() {
 		List<Object> llista = new ArrayList<Object>();

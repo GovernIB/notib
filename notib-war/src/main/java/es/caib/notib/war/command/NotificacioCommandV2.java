@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.NotificaComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
@@ -33,9 +34,7 @@ public class NotificacioCommandV2 {
 	private Long id;
 	@NotEmpty @Size(max=64)
 	private String emisorDir3Codi;
-	@NotEmpty @Size(max=64)
-	private NotificaComunicacioTipusEnumDto comunicacioTipus;
-	@NotEmpty @Size(max=64)
+	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
 	@NotEmpty @Size(max=50)
 	private String concepte;
@@ -43,10 +42,9 @@ public class NotificacioCommandV2 {
 	private Date enviamentDataProgramada;
 	private int retard;
 	private Date caducitat;
-	@NotNull @Size(max=50)
 	private DocumentCommand document;
-	@NotEmpty @Size(max=50)
 	private Long procedimentId;
+	private String procedimentNom;
 	private Long grupId;
 	private TipusDocumentEnumDto tipusDocument;
 	private String documentArxiuUuidCsv;
@@ -68,7 +66,8 @@ public class NotificacioCommandV2 {
 	private PersonaCommand titular;
 	private PersonaCommand destinatari = new PersonaCommand();
 	private List<PersonaCommand> destinataris = new ArrayList<PersonaCommand>();
-
+	private List<EnviamentCommand> enviaments = new ArrayList<EnviamentCommand>();
+	
 	private boolean entregaPostalActiva;
 	private EntregapostalCommand entregaPostal;
 	private EntregaDehCommand entregaDeh;
@@ -121,10 +120,10 @@ public class NotificacioCommandV2 {
 	public void setEmisorDir3Codi(String emisorDir3Codi) {
 		this.emisorDir3Codi = emisorDir3Codi;
 	}
-	public NotificaComunicacioTipusEnumDto getComunicacioTipus() {
+	public NotificacioComunicacioTipusEnumDto getComunicacioTipus() {
 		return comunicacioTipus;
 	}
-	public void setComunicacioTipus(NotificaComunicacioTipusEnumDto comunicacioTipus) {
+	public void setComunicacioTipus(NotificacioComunicacioTipusEnumDto comunicacioTipus) {
 		this.comunicacioTipus = comunicacioTipus;
 	}
 	public String getDescripcio() {
@@ -150,6 +149,12 @@ public class NotificacioCommandV2 {
 	}
 	public void setProcedimentId(Long procedimentId) {
 		this.procedimentId = procedimentId;
+	}
+	public String getProcedimentNom() {
+		return procedimentNom;
+	}
+	public void setProcedimentNom(String procedimentNom) {
+		this.procedimentNom = procedimentNom;
 	}
 	public Long getGrupId() {
 		return grupId;
@@ -180,6 +185,12 @@ public class NotificacioCommandV2 {
 	}
 	public void setDestinataris(List<PersonaCommand> destinataris) {
 		this.destinataris = destinataris;
+	}
+	public List<EnviamentCommand> getEnviaments() {
+		return enviaments;
+	}
+	public void setEnviaments(List<EnviamentCommand> enviaments) {
+		this.enviaments = enviaments;
 	}
 	public boolean isEntregaPostalActiva() {
 		return entregaPostalActiva;

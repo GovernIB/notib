@@ -2,8 +2,8 @@ package es.caib.notib.war.command;
 
 import com.sun.istack.NotNull;
 
-import es.caib.notib.core.api.ws.notificacio.EntregaPostalTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
+import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 
 /**
  * Command per al manteniment de entregues postals
@@ -14,8 +14,8 @@ import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 public class EntregapostalCommand {
 
 	@NotNull
-	private EntregaPostalTipusEnum tipus;
-	private EntregaPostalViaTipusEnum tipusVia;
+	private NotificaDomiciliNumeracioTipusEnumDto tipus;
+	private NotificaDomiciliViaTipusEnumDto tipusVia;
 	private String viaNom;
 	private String numeroCasa;
 	private String numeroQualificador;
@@ -37,16 +37,17 @@ public class EntregapostalCommand {
 	private String formatSobre;
 	private String formatFulla;
 	
-	public EntregaPostalTipusEnum getTipus() {
+	
+	public NotificaDomiciliNumeracioTipusEnumDto getTipus() {
 		return tipus;
 	}
-	public void setTipus(EntregaPostalTipusEnum tipus) {
+	public void setTipus(NotificaDomiciliNumeracioTipusEnumDto tipus) {
 		this.tipus = tipus;
 	}
-	public EntregaPostalViaTipusEnum getTipusVia() {
+	public NotificaDomiciliViaTipusEnumDto getTipusVia() {
 		return tipusVia;
 	}
-	public void setTipusVia(EntregaPostalViaTipusEnum tipusVia) {
+	public void setTipusVia(NotificaDomiciliViaTipusEnumDto tipusVia) {
 		this.tipusVia = tipusVia;
 	}
 	public String getViaNom() {

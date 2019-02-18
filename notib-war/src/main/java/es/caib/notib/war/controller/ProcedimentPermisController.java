@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.PagadorCieService;
@@ -23,6 +24,7 @@ import es.caib.notib.core.api.service.PagadorPostalService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.PermisCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
+import es.caib.notib.war.helper.RolHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
@@ -53,13 +55,18 @@ public class ProcedimentPermisController extends BaseUserController{
 			HttpServletRequest request,
 			@PathVariable Long procedimentId,
 			Model model) {
-		
+		boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		ProcedimentDto procediment = procedimentService.findById(
+				entitatActual.getId(),
+				isAdministrador,
+				procedimentId);
+					
 		model.addAttribute(
 				"procediment",
-				procedimentService.findById(
-						entitatActual.getId(),
-						procedimentId));
+				 procediment);
+		
 		return "procedimentAdminPermis";
 	}
 
@@ -73,6 +80,7 @@ public class ProcedimentPermisController extends BaseUserController{
 		return DatatablesHelper.getDatatableResponse(request,
 				procedimentService.permisFind(
 						entitatActual.getId(), 
+						isAdministrador(request),
 						procedimentId), 
 						"id");
 	}
@@ -96,11 +104,13 @@ public class ProcedimentPermisController extends BaseUserController{
 				"procediment",
 				procedimentService.findById(
 						entitatActual.getId(),
+						isAdministrador(request),
 						procedimentId));
 		PermisDto permis = null;
 		if (permisId != null) {
 			List<PermisDto> permisos = procedimentService.permisFind(
 					entitatActual.getId(),
+					isAdministrador(request),
 					procedimentId);
 			for (PermisDto p: permisos) {
 				if (p.getId().equals(permisId)) {
@@ -129,6 +139,7 @@ public class ProcedimentPermisController extends BaseUserController{
 					"entitat",
 					procedimentService.findById(
 							entitatActual.getId(),
+							isAdministrador(request),
 							procedimentId));
 			return "procedimentAdminPermisForm";
 		}
@@ -157,6 +168,11 @@ public class ProcedimentPermisController extends BaseUserController{
 				request,
 				"redirect:../../../../procediment/" + procedimentId + "/permis",
 				"procediment.controller.permis.esborrat.ok");
+	}
+	
+	private boolean isAdministrador(
+			HttpServletRequest request) {
+		return RolHelper.isUsuariActualAdministrador(request);
 	}
 	
 }
