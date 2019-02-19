@@ -5,7 +5,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
@@ -19,7 +24,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 
-import es.caib.notib.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.ws.notificacio.Document;
 import es.caib.notib.ws.notificacio.DocumentV2;
 import es.caib.notib.ws.notificacio.EntregaDeh;
@@ -27,6 +31,7 @@ import es.caib.notib.ws.notificacio.EntregaPostal;
 import es.caib.notib.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.ws.notificacio.Enviament;
 import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
+import es.caib.notib.ws.notificacio.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.ws.notificacio.NotificaServeiTipusEnumDto;
 import es.caib.notib.ws.notificacio.Notificacio;
 import es.caib.notib.ws.notificacio.NotificacioV2;
@@ -74,7 +79,7 @@ public class ClientRegistre {
 					">>> Resposta HTTP JSON: " + response.getEntity(String.class));
 		}
 
-		private void testAltaV2() throws JsonProcessingException, IOException, DecoderException {
+		private void testAltaV2() throws JsonProcessingException, IOException, DecoderException, DatatypeConfigurationException {
 			Client jerseyClient = new Client();
 			ObjectMapper mapper  = new ObjectMapper();
 			String user = "admin";
@@ -224,7 +229,7 @@ public class ClientRegistre {
 		private NotificacioV2 generarNotificacioV2(
 				String notificacioId,
 				int numDestinataris,
-				boolean ambEnviamentPostal) throws IOException, DecoderException {
+				boolean ambEnviamentPostal) throws IOException, DecoderException, DatatypeConfigurationException {
 //			byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 			NotificacioV2 notificacio = new NotificacioV2();
 			notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
@@ -235,8 +240,8 @@ public class ClientRegistre {
 					"descripcio_" + notificacioId);
 			notificacio.setEnviamentDataProgramada(null);
 			notificacio.setRetard(5);
-			notificacio.setCaducitat(
-					new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000));
+			notificacio.setCaducitat(toXmlGregorianCalendar(
+					new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000)));
 			DocumentV2 document = new DocumentV2();
 //			document.setCsv("4edd743942cec762cdf9389dc626ee01209fd30e6884aca9845c9573a57f2df3");
 			document.setUuid("614841f4-a93f-4307-8009-32970cf01632");
@@ -349,6 +354,13 @@ public class ClientRegistre {
 		private InputStream getContingutNotificacioAdjunt() {
 			return getClass().getResourceAsStream(
 					"/es/caib/notib/core/notificacio_adjunt.pdf");
+		}
+
+		
+		private XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
+			GregorianCalendar c = new GregorianCalendar();
+			c.setTime(date);
+			return DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
 		}
 
 	}

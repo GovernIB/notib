@@ -1,7 +1,7 @@
 /**
  * 
  */
-package es.caib.notib.dto;
+package es.caib.notib.ws.notificacio;
 
 import java.io.Serializable;
 

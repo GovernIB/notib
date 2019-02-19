@@ -29,6 +29,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 
 	NotificacioEntity findById(Long id);
 	
+	List<NotificacioEntity> findByCreatedBy(UsuariEntity usuari);
+	
 	@Query(
 			"from " +
 			"    NotificacioEntity ntf " +

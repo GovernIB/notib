@@ -7,7 +7,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -52,55 +55,64 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private String emisorDir3Codi;
 	@Column(name = "com_tipus", nullable = false)
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
+	
 	@Column(name = "env_tipus", nullable = false)
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
+	
 	@Column(name = "env_data_prog")
 	@Temporal(TemporalType.DATE)
 	private Date enviamentDataProgramada;
+	
 	@Column(name = "concepte", length = 50, nullable = false)
 	private String concepte;
+	
 	@Column(name = "descripcio", length = 100)
 	private String descripcio;
+	
 	@Column(name = "retard_postal")
 	private Integer retardPostal;
+	
 	@Column(name = "caducitat")
 	@Temporal(TemporalType.DATE)
 	private Date caducitat;
+	
 	@Column(name = "proc_codi_notib", length = 6, nullable = false)
 	private String procedimentCodiNotib;
+	
 	@Column(name = "grup_codi", length = 6, nullable = false)
 	private String grupCodi;
-//	@Column(name = "csv_uuid", length = 64)
-//	private String csv_uuid;
+	
 	@Column(name = "estat", nullable = false)
 	private NotificacioEstatEnumDto estat;
+	
 	@Column(name = "not_error_tipus")
 	private NotificacioErrorTipusEnumDto notificaErrorTipus;
+	
 	@Column(name = "not_env_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaEnviamentData;
+	
 	@Column(name = "not_reenv_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaReEnviamentData;
+	
 	@Column(name = "not_env_intent")
 	private int notificaEnviamentIntent;
+	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "not_error_event_id")
 	@ForeignKey(name = "not_noterrevent_notificacio_fk")
 	private NotificacioEventEntity notificaErrorEvent;
+	
 	@OneToMany(
 			mappedBy = "notificacio",
-			fetch = FetchType.LAZY,
-			cascade = CascadeType.ALL,
-			orphanRemoval = true)
-	@OrderBy(value="id")
-	private List<NotificacioEnviamentEntity> enviaments = new ArrayList<NotificacioEnviamentEntity>();
+			fetch = FetchType.EAGER)
+	private Set<NotificacioEnviamentEntity> enviaments = new LinkedHashSet<NotificacioEnviamentEntity>();
 	@OneToMany(
 			mappedBy = "notificacio",
-			fetch = FetchType.LAZY,
-			cascade = CascadeType.ALL,
-			orphanRemoval = true)
-	private List<NotificacioEventEntity> events = new ArrayList<NotificacioEventEntity>();
+			fetch = FetchType.LAZY)
+	private Set<NotificacioEventEntity> events = new LinkedHashSet<NotificacioEventEntity>();
+	
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "entitat_id")
 	@ForeignKey(name = "not_entitat_notificacio_fk")
@@ -112,7 +124,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@JoinColumn(name = "pagador_postal_id")
 	@ForeignKey(name = "not_pagador_postal_not_fk")
 	private PagadorPostalEntity pagadorPostal;
-	
 	
 	
 	/*pagador CIE*/
@@ -261,10 +272,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public NotificacioEventEntity getNotificaErrorEvent() {
 		return notificaErrorEvent;
 	}
-	public List<NotificacioEnviamentEntity> getEnviaments() {
+	public Set<NotificacioEnviamentEntity> getEnviaments() {
 		return enviaments;
 	}
-	public List<NotificacioEventEntity> getEvents() {
+	public Set<NotificacioEventEntity> getEvents() {
 		return events;
 	}
 	public EntitatEntity getEntitat() {
@@ -474,7 +485,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String grup,
 			String numExpedient,
 			String referenciaExterna,
-			List<Enviament>enviaments,
 			String observacions) {
 		return new BuilderV2(
 				entitat,
@@ -493,7 +503,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				grup,
 				numExpedient,
 				referenciaExterna,
-				enviaments,
 				observacions);
 	}
 	
@@ -736,7 +745,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				String grup,
 				String numExpedient,
 				String referenciaExterna,
-				List<Enviament>enviaments,
 				String observacions) {
 			built = new NotificacioEntity();
 			built.entitat = entitat;
@@ -804,6 +812,11 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 //			built.registreObservacions = registreObservacions;
 //			return this;
 //		}
+		
+		public BuilderV2 enviaments(Set<NotificacioEnviamentEntity> enviaments) {
+			built.enviaments = enviaments;
+			return this;
+		}
 //		
 		public BuilderV2 descripcio(String descripcio) {
 			built.descripcio = descripcio;
@@ -834,16 +847,16 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		}
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((concepte == null) ? 0 : concepte.hashCode());
-		result = prime * result + ((document.getHash() == null) ? 0 : document.getHash().hashCode());
-		result = prime * result + ((entitat == null) ? 0 : entitat.hashCode());
-		result = prime * result + ((enviamentTipus == null) ? 0 : enviamentTipus.hashCode());
-		return result;
-	}
+//	@Override
+//	public int hashCode() {
+//		final int prime = 31;
+//		int result = super.hashCode();
+//		result = prime * result + ((concepte == null) ? 0 : concepte.hashCode());
+//		result = prime * result + ((document.getHash() == null) ? 0 : document.getHash().hashCode());
+//		result = prime * result + ((entitat == null) ? 0 : entitat.hashCode());
+//		result = prime * result + ((enviamentTipus == null) ? 0 : enviamentTipus.hashCode());
+//		return result;
+//	}
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

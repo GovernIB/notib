@@ -22,6 +22,7 @@ import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.exception.RegistrePluginException;
@@ -49,6 +50,7 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.DocumentRepository;
@@ -85,6 +87,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private PersonaRepository personaRepository;
 	@Autowired
 	private DocumentRepository documentRepository;
+	@Autowired
+	private ConversioTipusHelper conversioHelper;
 	
 	
 	@Autowired
@@ -195,7 +199,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					notificacio.getCodiGrup(),
 					notificacio.getNumExpedient(),
 					notificacio.getRefExterna(),
-					notificacio.getEnviaments(),
 					notificacio.getObservacions());
 			
 			NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioBuilder.build());
@@ -265,7 +268,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
 				for(Persona persona: enviament.getDestinataris()) {
 					PersonaEntity destinatari = personaRepository.save(PersonaEntity.getBuilder(
-							persona.getEmail(), 
+							persona.getEmail(),
 							persona.getLlinatge1(), 
 							persona.getLlinatge2(), 
 							persona.getNif(), 
@@ -277,7 +280,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				
 				NotificacioEnviamentEntity enviamentSaved = notificacioEnviamentRepository.saveAndFlush(
 						NotificacioEnviamentEntity.getBuilderV2(
-								enviament, notificacio, numeracioTipus, tipusConcret, serveiTipus, notificacioGuardada, titular, destinataris)
+								enviament, conversioHelper.convertir(notificacio, NotificacioDtoV2.class), numeracioTipus, tipusConcret, serveiTipus, notificacioGuardada, titular, destinataris)
 								.domiciliViaTipus(toEnviamentViaTipusEnum(enviament.getEntregaPostal().getViaTipus())).build());
 				
 				String referencia;

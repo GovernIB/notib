@@ -22,6 +22,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.ForeignKey;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
@@ -30,11 +32,11 @@ import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.Notificacio;
-import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
 import es.caib.notib.core.audit.NotibAuditable;
 
 /**
@@ -48,200 +50,243 @@ import es.caib.notib.core.audit.NotibAuditable;
 @EntityListeners(AuditingEntityListener.class)
 public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "notificacio_id")
+	@ForeignKey(name = "NOT_NOTIFICACIO_NOTENV_FK")
+	@NotFound(action=NotFoundAction.IGNORE)
+	private NotificacioEntity notificacio;
 	
+	@Column(name="notificacio_id", insertable=false, updatable=false)
+	private Long notificacioId;
 	
 	/* Titular */
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "titular_id")
 	@ForeignKey(name = "not_persona_notificacio_env_fk")
 	private PersonaEntity titular;
-//	@Column(name = "titular_nom", length = 100)
-//	private String titularNom;
-//	@Column(name = "titular_llinatge1", length = 100)
-//	private String titularLlinatge1;
-//	@Column(name = "titular_llinatge2", length = 100)
-//	private String titularLlinatge2;
-//	@Column(name = "titular_nif", length = 9, nullable = false)
-//	private String titularNif;
-//	@Column(name = "titular_raosoc", length = 100)
-//	private String titularRaoSocial;
-//	@Column(name = "titular_coddes", length = 9)
-//	private String titularCodiDesti;
-//	@Column(name = "titular_telefon", length = 16)
-//	private String titularTelefon;
-//	@Column(name = "titular_email", length = 100)
-//	private String titularEmail;
+	
 	/* Destinataris */
 	@OneToMany(fetch = FetchType.EAGER)
 	@ForeignKey(name = "not_persona_not_fk")
     @JoinColumn(name = "notificacio_env_id") // we need to duplicate the physical information
 	private List<PersonaEntity> destinataris;
-//	@Column(name = "destinatari_nom", length = 100)
-//	private String destinatariNom;
-//	@Column(name = "destinatari_llinatge1", length = 100)
-//	private String destinatariLlinatge1;
-//	@Column(name = "destinatari_llinatge2", length = 100)
-//	private String destinatariLlinatge2;
-//	@Column(name = "destinatari_nif", length = 9)
-//	private String destinatariNif;
-//	@Column(name = "destinatari_raosoc", length = 100)
-//	private String destinatariRaoSocial;
-//	@Column(name = "destinatari_coddes", length = 9)
-//	private String destinatariCodiDesti;
-//	@Column(name = "destinatari_telefon", length = 16)
-//	private String destinatariTelefon;
-//	@Column(name = "destinatari_email", length = 100)
-//	private String destinatariEmail;
+	
 	/* Domicili */
 	@Column(name = "dom_tipus")
 	@Enumerated(EnumType.ORDINAL)
 	private NotificaDomiciliTipusEnumDto domiciliTipus;
+	
 	@Column(name = "dom_con_tipus")
 	@Enumerated(EnumType.ORDINAL)
 	private NotificaDomiciliConcretTipusEnumDto domiciliConcretTipus;
+	
 	@Column(name = "dom_via_tipus")
 	@Enumerated(EnumType.ORDINAL)
 	private NotificaDomiciliViaTipusEnumDto domiciliViaTipus;
+	
 	@Column(name = "dom_via_nom", length = 100)
 	private String domiciliViaNom;
 	@Column(name = "dom_num_tipus")
 	@Enumerated(EnumType.ORDINAL)
 	private NotificaDomiciliNumeracioTipusEnumDto domiciliNumeracioTipus;
+	
 	@Column(name = "dom_num_num", length = 10)
 	private String domiciliNumeracioNumero;
+	
 	@Column(name = "dom_num_qualif", length = 3)
 	private String domiciliNumeracioQualificador;
+	
 	@Column(name = "dom_num_puntkm", length = 10)
 	private String domiciliNumeracioPuntKm;
+	
 	@Column(name = "dom_apartat", length = 10)
 	private String domiciliApartatCorreus;
+	
 	@Column(name = "dom_bloc", length = 50)
 	private String domiciliBloc;
+	
 	@Column(name = "dom_portal", length = 50)
 	private String domiciliPortal;
+	
 	@Column(name = "dom_escala", length = 50)
 	private String domiciliEscala;
+	
 	@Column(name = "dom_planta", length = 50)
 	private String domiciliPlanta;
+	
 	@Column(name = "dom_porta", length = 50)
 	private String domiciliPorta;
+	
 	@Column(name = "dom_complem", length = 250)
 	private String domiciliComplement;
+	
 	@Column(name = "dom_poblacio", length = 30)
 	private String domiciliPoblacio;
+	
 	@Column(name = "dom_mun_codine", length = 6)
 	private String domiciliMunicipiCodiIne;
+	
 	@Column(name = "dom_mun_nom", length = 64)
 	private String domiciliMunicipiNom;
+	
 	@Column(name = "dom_codi_postal", length = 10)
 	private String domiciliCodiPostal;
+	
 	@Column(name = "dom_prv_codi", length = 2)
 	private String domiciliProvinciaCodi;
+	
 	@Column(name = "dom_prv_nom", length = 64)
 	private String domiciliProvinciaNom;
+	
 	@Column(name = "dom_pai_codiso", length = 3)
 	private String domiciliPaisCodiIso; // ISO-3166
+	
 	@Column(name = "dom_pai_nom", length = 64)
 	private String domiciliPaisNom;
+	
 	@Column(name = "dom_linea1", length = 50)
 	private String domiciliLinea1;
+	
 	@Column(name = "dom_linea2", length = 50)
 	private String domiciliLinea2;
+	
 	@Column(name = "dom_cie")
 	private Integer domiciliCie;
+	
 	/* DEH */
 	@Column(name = "deh_obligat")
+	
 	private Boolean dehObligat;
 	@Column(name = "deh_nif", length = 9)
+	
 	private String dehNif;
 	@Column(name = "deh_proc_codi", length = 6)
+	
 	private String dehProcedimentCodi;
 	/* Altres */
+	
 	@Column(name = "servei_tipus")
 	@Enumerated(EnumType.ORDINAL)
 	private ServeiTipusEnumDto serveiTipus;
+	
 	@Column(name = "format_sobre", length = 10)
 	private String formatSobre;
+	
 	@Column(name = "format_fulla", length = 10)
 	private String formatFulla;
+	
 	/* Notifica informació */
 	@Column(name = "notifica_ref", length = 20)
 	private String notificaReferencia;
+	
 	@Column(name = "notifica_id", length = 20)
 	private String notificaIdentificador;
+	
 	@Column(name = "notifica_datcre")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaDataCreacio;
+	
 	@Column(name = "notifica_datdisp")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaDataDisposicio;
+	
 	@Column(name = "notifica_datcad")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaDataCaducitat;
+	
 	@Column(name = "notifica_emi_dir3codi", length = 9)
 	private String notificaEmisorDir3;
+	
 	@Column(name = "notifica_emi_dir3desc", length = 100)
 	private String notificaEmisorDescripcio;
+	
 	@Column(name = "notifica_emi_dir3nif", length = 9)
 	private String notificaEmisorNif;
+	
 	@Column(name = "notifica_arr_dir3codi", length = 9)
 	private String notificaArrelDir3;
+	
 	@Column(name = "notifica_arr_dir3desc", length = 100)
 	private String notificaArrelDescripcio;
+	
 	@Column(name = "notifica_arr_dir3nif", length = 9)
 	private String notificaArrelNif;
+	
 	/* Notifica estat i datat */
 	@Column(name = "notifica_estat", nullable = false)
 	private NotificacioEnviamentEstatEnumDto notificaEstat;
+	
 	@Column(name = "notifica_estat_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaEstatData;
+	
 	@Column(name = "notifica_estat_dataact")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaEstatDataActualitzacio;
+	
 	@Column(name = "notifica_estat_final")
 	private boolean notificaEstatFinal;
+	
 	@Column(name = "notifica_estat_desc", length = 255)
 	private String notificaEstatDescripcio;
+	
 	@Column(name = "notifica_datat_origen", length = 20)
 	private String notificaDatatOrigen;
+	
 	@Column(name = "notifica_datat_recnif", length = 9)
 	private String notificaDatatReceptorNif;
+	
 	@Column(name = "notifica_datat_recnom", length = 100)
 	private String notificaDatatReceptorNom;
+	
 	@Column(name = "notifica_datat_numseg", length = 50)
 	private String notificaDatatNumSeguiment;
+	
 	@Column(name = "notifica_datat_errdes", length = 255)
 	private String notificaDatatErrorDescripcio;
+	
 	/* Notifica certificació */
 	@Column(name = "notifica_cer_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaCertificacioData;
+	
 	@Column(name = "notifica_cer_arxiuid", length = 50)
 	private String notificaCertificacioArxiuId;
+	
 	@Column(name = "notifica_cer_hash", length = 50)
 	private String notificaCertificacioHash;
+	
 	@Column(name = "notifica_cer_origen", length = 20)
 	private String notificaCertificacioOrigen;
+	
 	@Column(name = "notifica_cer_metas", length = 255)
 	private String notificaCertificacioMetadades;
+	
 	@Column(name = "notifica_cer_csv", length = 50)
 	private String notificaCertificacioCsv;
+	
 	@Column(name = "notifica_cer_mime", length = 20)
 	private String notificaCertificacioMime;
+	
 	@Column(name = "notifica_cer_tamany", length = 20)
 	private Integer notificaCertificacioTamany;
+	
 	@Column(name = "notifica_cer_tipus")
 	@Enumerated(EnumType.ORDINAL)
 	private NotificaCertificacioTipusEnumDto notificaCertificacioTipus;
+	
 	@Column(name = "notifica_cer_arxtip")
 	@Enumerated(EnumType.ORDINAL)
 	private NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus;
+	
 	@Column(name = "notifica_cer_numseg", length = 50)
 	private String notificaCertificacioNumSeguiment;
+	
 	/* Notifica error */
 	@Column(name = "notifica_error", nullable = false)
 	private boolean notificaError;
+	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "notifica_error_event_id")
 	@ForeignKey(name = "not_noteve_noterr_notdest_fk")
@@ -253,60 +298,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "intent_num")
 	private int intentNum;
-	@ManyToOne(optional = false, fetch = FetchType.EAGER)
-	@JoinColumn(name = "notificacio_id")
-	@ForeignKey(name = "not_notificacio_notdest_fk")
-	private NotificacioEntity notificacio;
 
-//	public String getTitularNom() {
-//		return titularNom;
-//	}
-//	public String getTitularLlinatge1() {
-//		return titularLlinatge1;
-//	}
-//	public String getTitularLlinatge2() {
-//		return titularLlinatge2;
-//	}
-//	public String getTitularNif() {
-//		return titularNif;
-//	}
-//	public String getTitularRaoSocial() {
-//		return titularRaoSocial;
-//	}
-//	public String getTitularCodiDesti() {
-//		return titularCodiDesti;
-//	}
-//	public String getTitularTelefon() {
-//		return titularTelefon;
-//	}
-//	public String getTitularEmail() {
-//		return titularEmail;
-//	}
-//	public String getDestinatariNom() {
-//		return destinatariNom;
-//	}
-//	public String getDestinatariLlinatge1() {
-//		return destinatariLlinatge1;
-//	}
-//	public String getDestinatariLlinatge2() {
-//		return destinatariLlinatge2;
-//	}
-//	public String getDestinatariNif() {
-//		return destinatariNif;
-//	}
-//	public String getDestinatariRaoSocial() {
-//		return destinatariRaoSocial;
-//	}
-//	public String getDestinatariCodiDesti() {
-//		return destinatariCodiDesti;
-//	}
-//	public String getDestinatariTelefon() {
-//		return destinatariTelefon;
-//	}
-//	public String getDestinatariEmail() {
-//		return destinatariEmail;
-//	}
-	
 	public NotificaDomiciliTipusEnumDto getDomiciliTipus() {
 		return domiciliTipus;
 	}
@@ -526,7 +518,12 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public NotificacioEntity getNotificacio() {
 		return notificacio;
 	}
-	
+	public void setNotificacio(NotificacioEntity notificacio) {
+		this.notificacio = notificacio;
+	}
+	public Long getNotificacioId() {
+		return notificacioId;
+	}
 	public void updateNotificaReferencia(
 			String notificaReferencia) {
 		this.notificaReferencia = notificaReferencia;
@@ -734,7 +731,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 
 	public static BuilderV2 getBuilderV2(
-			Enviament enviament, NotificacioV2 notificacio, 
+			Enviament enviament, NotificacioDtoV2 notificacio, 
 			NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
 			NotificaDomiciliConcretTipusEnumDto tipusConcret,
 			ServeiTipusEnumDto tipusServei,
@@ -1037,7 +1034,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public static class BuilderV2 {
 		NotificacioEnviamentEntity built;
 		BuilderV2(
-				Enviament enviament, NotificacioV2 notificacio, 
+				Enviament enviament, NotificacioDtoV2 notificacio, 
 				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
 				NotificaDomiciliConcretTipusEnumDto tipusConcret,
 				ServeiTipusEnumDto tipusServei,
@@ -1049,30 +1046,60 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
 			built.intentNum = 0;
 			built.notificacio = notificacioGuardada;
-			
 			built.domiciliTipus = NotificaDomiciliTipusEnumDto.CONCRETO;
-			built.domiciliViaNom = enviament.getEntregaPostal().getViaNom();
-			built.domiciliNumeracioNumero = enviament.getEntregaPostal().getNumeroCasa();
-			built.domiciliNumeracioQualificador = enviament.getEntregaPostal().getNumeroQualificador();
-			built.domiciliNumeracioPuntKm = enviament.getEntregaPostal().getPuntKm();
-			built.domiciliApartatCorreus = enviament.getEntregaPostal().getApartatCorreus();
-			built.domiciliPortal = enviament.getEntregaPostal().getPortal();
-			built.domiciliEscala = enviament.getEntregaPostal().getEscala();
-			built.domiciliPlanta = enviament.getEntregaPostal().getPlanta();
-			built.domiciliPorta = enviament.getEntregaPostal().getPorta();
-			built.domiciliBloc = enviament.getEntregaPostal().getBloc();
-			built.domiciliComplement = enviament.getEntregaPostal().getComplement();
-			built.domiciliCodiPostal = enviament.getEntregaPostal().getCodiPostal();
-			built.domiciliPoblacio = enviament.getEntregaPostal().getPoblacio();
-			built.domiciliMunicipiCodiIne = enviament.getEntregaPostal().getMunicipiCodi();
-			built.domiciliProvinciaCodi = enviament.getEntregaPostal().getProvinciaCodi();
-			built.domiciliPaisCodiIso = enviament.getEntregaPostal().getPaisCodi();
-			built.domiciliLinea1 = enviament.getEntregaPostal().getLinea1();
-			built.domiciliLinea2 = enviament.getEntregaPostal().getLinea2();
-			built.domiciliCie = enviament.getEntregaPostal().getCie();
-			built.formatSobre = enviament.getEntregaPostal().getFormatSobre();
-			built.formatFulla = enviament.getEntregaPostal().getFormatFulla();
-			built.dehObligat = enviament.getEntregaDeh().isObligat();
+
+			if(enviament.getEntregaPostal() != null) {
+				built.domiciliViaNom = enviament.getEntregaPostal().getViaNom();
+				built.domiciliNumeracioNumero = enviament.getEntregaPostal().getNumeroCasa();
+				built.domiciliNumeracioQualificador = enviament.getEntregaPostal().getNumeroQualificador();
+				built.domiciliNumeracioPuntKm = enviament.getEntregaPostal().getPuntKm();
+				built.domiciliApartatCorreus = enviament.getEntregaPostal().getApartatCorreus();
+				built.domiciliPortal = enviament.getEntregaPostal().getPortal();
+				built.domiciliEscala = enviament.getEntregaPostal().getEscala();
+				built.domiciliPlanta = enviament.getEntregaPostal().getPlanta();
+				built.domiciliPorta = enviament.getEntregaPostal().getPorta();
+				built.domiciliBloc = enviament.getEntregaPostal().getBloc();
+				built.domiciliComplement = enviament.getEntregaPostal().getComplement();
+				built.domiciliCodiPostal = enviament.getEntregaPostal().getCodiPostal();
+				built.domiciliPoblacio = enviament.getEntregaPostal().getPoblacio();
+				built.domiciliMunicipiCodiIne = enviament.getEntregaPostal().getMunicipiCodi();
+				built.domiciliProvinciaCodi = enviament.getEntregaPostal().getProvinciaCodi();
+				built.domiciliPaisCodiIso = enviament.getEntregaPostal().getPaisCodi();
+				built.domiciliLinea1 = enviament.getEntregaPostal().getLinea1();
+				built.domiciliLinea2 = enviament.getEntregaPostal().getLinea2();
+				built.domiciliCie = enviament.getEntregaPostal().getCie();
+				built.formatSobre = enviament.getEntregaPostal().getFormatSobre();
+				built.formatFulla = enviament.getEntregaPostal().getFormatFulla();
+				built.dehObligat = enviament.getEntregaDeh().isObligat();
+			}else if(notificacio.getEntregaPostal() != null) {
+				built.domiciliViaNom = notificacio.getEntregaPostal().getViaNom();
+				built.domiciliNumeracioNumero = notificacio.getEntregaPostal().getNumeroCasa();
+				built.domiciliNumeracioQualificador = notificacio.getEntregaPostal().getNumeroQualificador();
+				built.domiciliNumeracioPuntKm = notificacio.getEntregaPostal().getPuntKm();
+				built.domiciliApartatCorreus = notificacio.getEntregaPostal().getApartatCorreus();
+				built.domiciliPortal = notificacio.getEntregaPostal().getPortal();
+				built.domiciliEscala = notificacio.getEntregaPostal().getEscala();
+				built.domiciliPlanta = notificacio.getEntregaPostal().getPlanta();
+				built.domiciliPorta = notificacio.getEntregaPostal().getPorta();
+				built.domiciliBloc = notificacio.getEntregaPostal().getBloc();
+				built.domiciliComplement = notificacio.getEntregaPostal().getComplement();
+				built.domiciliCodiPostal = notificacio.getEntregaPostal().getCodiPostal();
+				built.domiciliPoblacio = notificacio.getEntregaPostal().getPoblacio();
+				built.domiciliMunicipiCodiIne = notificacio.getEntregaPostal().getMunicipiCodi();
+				built.domiciliProvinciaCodi = notificacio.getEntregaPostal().getProvinciaCodi();
+				built.domiciliPaisCodiIso = notificacio.getEntregaPostal().getPaisCodi();
+				built.domiciliLinea1 = notificacio.getEntregaPostal().getLinea1();
+				built.domiciliLinea2 = notificacio.getEntregaPostal().getLinea2();
+				built.domiciliCie = notificacio.getEntregaPostal().getCie();
+				built.formatSobre = notificacio.getEntregaPostal().getFormatSobre();
+				built.formatFulla = notificacio.getEntregaPostal().getFormatFulla();
+				built.dehObligat = notificacio.getEntregaDeh().isObligat();
+			}
+			
+			
+			
+			
+			
 			
 			built.titular = titular;
 			built.destinataris = destinataris;
@@ -1097,36 +1124,36 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			return built;
 		}
 	}
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((notificacio == null) ? 0 : notificacio.hashCode());
-//		result = prime * result + ((titularNif == null) ? 0 : titularNif.hashCode());
-		return result;
-	}
+//	@Override
+//	public int hashCode() {
+//		final int prime = 31;
+//		int result = super.hashCode();
+//		result = prime * result + ((notificacio == null) ? 0 : notificacio.hashCode());
+////		result = prime * result + ((titularNif == null) ? 0 : titularNif.hashCode());
+//		return result;
+//	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		NotificacioEnviamentEntity other = (NotificacioEnviamentEntity) obj;
-		if (notificacio == null) {
-			if (other.notificacio != null)
-				return false;
-		} else if (!notificacio.equals(other.notificacio))
-			return false;
-//		if (titularNif == null) {
-//			if (other.titularNif != null)
-//				return false;
-//		} else if (!titularNif.equals(other.titularNif))
+//	@Override
+//	public boolean equals(Object obj) {
+//		if (this == obj)
+//			return true;
+//		if (!super.equals(obj))
 //			return false;
-		return true;
-	}
+//		if (getClass() != obj.getClass())
+//			return false;
+//		NotificacioEnviamentEntity other = (NotificacioEnviamentEntity) obj;
+//		if (notificacio == null) {
+//			if (other.notificacio != null)
+//				return false;
+//		} else if (!notificacio.equals(other.notificacio))
+//			return false;
+////		if (titularNif == null) {
+////			if (other.titularNif != null)
+////				return false;
+////		} else if (!titularNif.equals(other.titularNif))
+////			return false;
+//		return true;
+//	}
 
 	private static final long serialVersionUID = -2299453443943600172L;
 

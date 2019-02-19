@@ -17,6 +17,7 @@ import org.jboss.mx.util.MBeanProxyCreationException;
 
 import es.caib.loginModule.client.AuthenticationFailureException;
 import es.caib.notib.ws.notificacio.NotificacioService;
+import es.caib.notib.ws.notificacio.NotificacioServiceV2;
 
 /**
  * Utilitat per a instanciar clients SOAP per al servei d'enviament
@@ -55,5 +56,37 @@ public class NotificacioWsClientFactory {
 				password,
 				NotificacioService.class);
 	}
+	
+
+	public static NotificacioServiceV2 getWsClientV2(
+			URL wsdlResourceUrl,
+			String endpoint,
+			String userName,
+			String password) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
+		return new WsClientHelper<NotificacioServiceV2>().generarClientWs(
+				wsdlResourceUrl,
+				endpoint,
+				new QName(
+						"http://www.caib.es/notib/ws/notificacioV2",
+						"NotificacioServiceV2"),
+				userName,
+				password,
+				NotificacioServiceV2.class);
+	}
+
+	public static NotificacioServiceV2 getWsClientV2(
+			String endpoint,
+			String userName,
+			String password) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
+		return new WsClientHelper<NotificacioServiceV2>().generarClientWs(
+				endpoint,
+				new QName(
+						"http://www.caib.es/notib/ws/notificaciov2",
+						"NotificacioServiceV2"),
+				userName,
+				password,
+				NotificacioServiceV2.class);
+	}
+
 
 }

@@ -45,6 +45,7 @@ import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.wsdl.seu.SedeWsPortType;
 
 /**
@@ -316,7 +317,8 @@ public abstract class AbstractNotificaHelper {
 				notificaDatatNumSeguiment,
 				notificaDatatErrorDescripcio);
 		boolean estatsEnviamentsFinals = true;
-		List<NotificacioEnviamentEntity> enviaments = enviament.getNotificacio().getEnviaments();
+		
+		Set<NotificacioEnviamentEntity> enviaments = enviament.getNotificacio().getEnviaments();
 		for (NotificacioEnviamentEntity env: enviaments) {
 			if (!env.isNotificaEstatFinal()) {
 				estatsEnviamentsFinals = false;

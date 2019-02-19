@@ -273,7 +273,7 @@ public class NotificacioController extends BaseUserController {
 		
 		if (notificacioCommand.getId() != null) {
 			notificacioService.update(
-					entitatActual.getId(),
+					notificacioCommand.getProcedimentId(),
 					NotificacioCommandV2.asDto(notificacioCommand));
 		} else {
 			notificacioService.create(

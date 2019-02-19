@@ -68,10 +68,7 @@ import es.caib.notib.core.api.ws.registre.TipusAssumpte;
 import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.PersonaEntity;
-import es.caib.notib.plugin.arxiu.ArxiuCaibClient;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
-import es.caib.notib.plugin.imprimible.ImprimiblePlugin;
-import es.caib.notib.plugin.imprimible.ImprimiblePlugin.IntegracioManager;
 import es.caib.notib.plugin.seu.SeuPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
@@ -105,12 +102,9 @@ public class PluginHelper {
 	private SeuPlugin seuPlugin;
 //	private RegistrePlugin registrePlugin;
 	private RegistrePluginRegWeb3 registrePluginRegWeb3;
-	private ImprimiblePlugin imprimiblePlugin;
-	private IntegracioManager integracioManager;
 	private IArxiuPlugin arxiuPlugin;
 	private String integracioArxiuCodi = "ARXIU";
 	
-	private ArxiuCaibClient arxiuClient;
 	private Client versioImprimibleClient;
 
 
@@ -1443,8 +1437,8 @@ public class PluginHelper {
 		registre.setAnnexos(new ArrayList<RegistreAnnexDto>());
 		registre.getAnnexos().add(documentToRegistreAnnexDto(notificacio.getDocument()));
 		List<RegistreInteressatDto> interessats = new ArrayList<RegistreInteressatDto>();
-		interessats.add(personaToRegistreInteresatDto(notificacio.getEnviaments().get(0).getTitular()));
-		for(PersonaEntity persona: notificacio.getEnviaments().get(0).getDestinataris()) {
+		interessats.add(personaToRegistreInteresatDto(notificacio.getEnviaments().iterator().next().getTitular()));
+		for(PersonaEntity persona: notificacio.getEnviaments().iterator().next().getDestinataris()) {
 			interessats.add(personaToRegistreInteresatDto(persona));
 		}
 		registre.setInteressats(interessats);
@@ -1465,7 +1459,7 @@ public class PluginHelper {
 		registre.setAnnexos(new ArrayList<RegistreAnnexDto>());
 		registre.getAnnexos().add(documentToRegistreAnnexDto(notificacio.getDocument()));
 		List<RegistreInteressatDto> interessats = new ArrayList<RegistreInteressatDto>();
-		interessats.add(personaToRegistreInteresatDto(notificacio.getEnviaments().get(0).getTitular()));
+		interessats.add(personaToRegistreInteresatDto(notificacio.getEnviaments().iterator().next().getTitular()));
 		registre.setInteressats(interessats);
 		return registre;
 	}
@@ -1545,71 +1539,6 @@ public class PluginHelper {
 		return annex;
 	}
 	
-	public Document documentDescarregar(String identificador, String versio, boolean ambContingut,
-			boolean ambVersioImprimible) throws SistemaExternException {
-		return arxiuDocumentConsultar(
-				identificador,
-				versio, 
-				ambContingut,
-				ambVersioImprimible);
-	}
-
-	
-	
-	private Document arxiuDocumentConsultar(
-			String arxiuUuid,
-			String versio,
-			boolean ambContingut,
-			boolean ambVersioImprimible) throws SistemaExternException {
-		String accioDescripcio = "Obtenint detalls del document";
-		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put("arxiuUuid", arxiuUuid);
-		accioParams.put("versio", versio);
-		accioParams.put("ambContingut", new Boolean(ambContingut).toString());
-		long t0 = System.currentTimeMillis();
-		Document documentDetalls = null;
-		try {
-			documentDetalls = getArxiuPlugin().documentDetalls(
-					arxiuUuid,
-					versio,
-					ambContingut);
-			integracioAddAccioOk(
-					integracioArxiuCodi,
-					accioDescripcio,
-					accioParams,
-					System.currentTimeMillis() - t0);
-		} catch (Exception ex) {
-			String errorDescripcio = "Error al obtenir detalls del document";
-			integracioAddAccioError(
-					integracioArxiuCodi,
-					accioDescripcio,
-					accioParams,
-					System.currentTimeMillis() - t0,
-					errorDescripcio,
-					ex);
-			throw new SistemaExternException(
-					integracioArxiuCodi,
-					errorDescripcio,
-					ex);
-		}
-		if (ambVersioImprimible && ambContingut && documentDetalls.getFirmes() != null && !documentDetalls.getFirmes().isEmpty()) {
-			boolean isPdf = false;
-			for (Firma firma : documentDetalls.getFirmes()) {
-				if (firma.getTipus() == FirmaTipus.PADES) {
-					isPdf = true;
-				}
-			}
-			if (isPdf) {
-				try {
-					generarVersioImprimibleUuid(arxiuUuid, null, null, null);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return documentDetalls;
-	}
-
 	private IArxiuPlugin getArxiuPlugin() throws SistemaExternException {
 		if (arxiuPlugin == null) {
 			String pluginClass = getPropertyPluginArxiu();
@@ -1645,38 +1574,6 @@ public class PluginHelper {
 	private String getPropertyPluginArxiu() {
 		return PropertiesHelper.getProperties().getProperty(
 				"es.caib.notib.plugin.arxiu.class");
-	}
-	
-	private void integracioAddAccioOk(
-			String integracioCodi,
-			String descripcio,
-			Map<String, String> parametres,
-			long tempsResposta) {
-		if (integracioManager != null) {
-			integracioManager.addAccioOk(
-					integracioCodi,
-					descripcio,
-					parametres,
-					tempsResposta);
-		}
-	}
-	
-	private void integracioAddAccioError(
-			String integracioCodi,
-			String descripcio,
-			Map<String, String> parametres,
-			long tempsResposta,
-			String errorDescripcio,
-			Throwable throwable) {
-		if (integracioManager != null) {
-			integracioManager.addAccioError(
-					integracioCodi,
-					descripcio,
-					parametres,
-					tempsResposta,
-					errorDescripcio,
-					throwable);
-		}
 	}
 	
 	public DocumentContingut documentImprimibleCsv(

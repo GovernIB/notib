@@ -20,5 +20,15 @@ public class NotificacioRestClientFactory {
 				username,
 				password);
 	}
+	
+	public static NotificacioRestClient getRestClientV2(
+			String baseUrl,
+			String username,
+			String password) {
+		return new NotificacioRestClient(
+				baseUrl,
+				username,
+				password);
+	}
 
 }

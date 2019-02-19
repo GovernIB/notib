@@ -147,10 +147,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				notificacio.getDocument().getUuid(),
 				notificacio.getDocument().getCsv()).build());
 		
-		List<Enviament> enviaments = new ArrayList<Enviament>();
-		for(EnviamentDto enviament: notificacio.getEnviaments()) {
-			enviaments.add(conversioTipusHelper.convertir(enviament, Enviament.class));
-		}
+		
 		// Dades generals de la notificació
 		NotificacioEntity.BuilderV2 notificacioBuilder = NotificacioEntity.
 				getBuilderV2(
@@ -170,10 +167,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 						notificacio.getGrupCodi(),
 						notificacio.getNumeroExpedient(),
 						notificacio.getRefExterna(),
-						enviaments,
 						notificacio.getObservacions()
 						);
 
+
+		
+		NotificacioEntity notificacioEntity = notificacioBuilder.build();
+		NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioEntity);
 		/*
 		 * Falta afegir paràmetres registre S'han llevat els paràmetres de la seu
 		 */
@@ -184,12 +184,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 //			registreLlibre(parametresRegistre.getLlibre());
 //		}
 
-		NotificacioEntity notificacioEntity = notificacioBuilder.build();
-		NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioEntity);
-
-		NotificacioEnviamentEntity.BuilderV2 enviamentBuilder = null;
+		List<Enviament> enviaments = new ArrayList<Enviament>();
+		List<NotificacioEnviamentEntity> enviamentsEntity = new ArrayList<NotificacioEnviamentEntity>();
+		for(EnviamentDto enviament: notificacio.getEnviaments()) {
+			enviaments.add(conversioTipusHelper.convertir(enviament, Enviament.class));
+		}
 		for (Enviament enviament: enviaments) {
-			if (notificacio.getTitular() != null) {
+			if (enviament.getTitular() != null) {
 				ServeiTipusEnumDto serveiTipus = null;
 				if (notificacio.getServeiTipus() != null) {
 					switch (notificacio.getServeiTipus()) {
@@ -201,7 +202,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						break;
 					}
 				}
-				enviament.setTitular(conversioTipusHelper.convertir(notificacio.getTitular(), Persona.class));
+//				enviament.setTitular(conversioTipusHelper.convertir(notificacio.getTitular(), Persona.class));
 				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
 //				NotificaDomiciliTipusEnumDto tipus = null;
 				NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
@@ -259,14 +260,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 				
 				// Rellenar dades enviament titular
-				enviamentBuilder = NotificacioEnviamentEntity.
-						getBuilderV2(enviament, conversioTipusHelper.convertir(notificacio, NotificacioV2.class), numeracioTipus, tipusConcret, serveiTipus, notificacioGuardada, titular, destinataris);
-
-				
+				enviamentsEntity.add(notificacioEnviamentRepository.saveAndFlush(NotificacioEnviamentEntity.
+						getBuilderV2(enviament, notificacio, numeracioTipus, tipusConcret, serveiTipus, notificacioGuardada, titular, destinataris).build()));
 			}
 		}
 		
-		notificacioRepository.saveAndFlush(notificacioEntity);
+		notificacioEntity = notificacioRepository.saveAndFlush(notificacioEntity);
 		// Comprovar on s'ha d'enviar
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioEntity.getComunicacioTipus())) {
 			if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus()) /*Si es administració*/) {
@@ -545,7 +544,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				"enviamentId=" + enviamentId + ")");
 		NotificacioEnviamentEntity destinatari = notificacioEnviamentRepository.findOne(enviamentId);
 		entityComprovarHelper.comprovarPermisos(
-				destinatari.getNotificacio().getId(),
+				destinatari.getNotificacioId(),
 				true,
 				true,
 				false);

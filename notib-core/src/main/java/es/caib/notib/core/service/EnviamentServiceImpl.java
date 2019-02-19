@@ -16,6 +16,7 @@ import java.util.List;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
+import org.hibernate.Hibernate;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -850,8 +851,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 		return destinatarisDto;
 	}
 
+	@Transactional
 	private NotificacioEnviamentDto enviamentToDto(
 			NotificacioEnviamentEntity enviament) {
+		enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
 		NotificacioEnviamentDto destinatariDto = conversioTipusHelper.convertir(
 				enviament,
 				NotificacioEnviamentDto.class);
