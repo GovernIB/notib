@@ -19,8 +19,15 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private EntregaDehDto entregaDeh;
 	private ServeiTipusEnumDto serveiTipus;
 	private String titularNomLlinatge;
+	private String destinatarisNomLlinatges;
+	private String titularEmail;
+	private String titularNif;
 	private String usuari;
 	private String referencia;
+	private String notificaIdentificador;
+	private String numeroCertCorreus;
+	private String csvUuid;
+	
 	
 	public Long getId() {
 		return id;
@@ -76,17 +83,58 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	public String getReferencia() {
 		return referencia;
 	}
+	public String getNotificaIdentificador() {
+		return notificaIdentificador;
+	}
+	public void setNotificaIdentificador(String notificaCodi) {
+		this.notificaIdentificador = notificaCodi;
+	}
 	public void setReferencia(String referencia) {
 		this.referencia = referencia;
 	}
+	public String getTitularEmail() {
+		return titularEmail;
+	}
+	public void setTitularEmail(String titularEmail) {
+		this.titularEmail = titularEmail;
+	}
+	public String getTitularNif() {
+		return titularNif;
+	}
+	public void setTitularNif(String titularNif) {
+		this.titularNif = titularNif;
+	}
+	public String getDestinatarisNomLlinatges() {
+		return destinatarisNomLlinatges;
+	}
+	public void setDestinatarisNomLlinatges(String destinatarisNomLlinatge) {
+		this.destinatarisNomLlinatges = destinatarisNomLlinatge;
+	}
+	public String getNumeroCertCorreus() {
+		return numeroCertCorreus;
+	}
+	public void setNumeroCertCorreus(String numeroCertCorreus) {
+		this.numeroCertCorreus = numeroCertCorreus;
+	}
+	public String getCsvUuid() {
+		return csvUuid;
+	}
+	public void setCsvUuid(String csvUuid) {
+		this.csvUuid = csvUuid;
+	}
 	public String getTitularNomLlinatge() {
-		titularNomLlinatge = concatenarNomLlinatges(
-				getTitularLlinatges(),
-				titular.getNom(),
-				titular.getRaoSocial(),
-				null);
-		
-		return titularNomLlinatge;
+		if(this.titularNomLlinatge != null) {
+			return this.titularNomLlinatge;
+		}else {
+			if(titular != null) {
+				titularNomLlinatge = concatenarNomLlinatges(
+						getTitularLlinatges(),
+						titular.getNom(),
+						titular.getRaoSocial(),
+						null);
+			}
+			return titularNomLlinatge;
+		}
 	}
 	
 	public String getTitularLlinatges() {

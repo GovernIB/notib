@@ -65,14 +65,14 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:isGrupNull = true or lower(n.grupCodi) like lower('%'||:grup||'%')) " +
 			"and (:isConcepteNull = true or lower(n.concepte) like lower('%'||:concepte||'%')) " +
 			"and (:isDescripcioNull = true or lower(n.descripcio) like lower('%'||:descripcio||'%')) " +
-			"and (:isDataProgramadaDisposicioIniciNull = true or lower(n.notificaEnviamentData) >= :dataProgramadaDisposicioInici) " +
-			"and (:isDataProgramadaDisposicioFiNull = true or lower(n.notificaEnviamentData) <= :dataProgramadaDisposicioFi) " +
-			"and (:isDataCaducitatIniciNull = true or lower(n.caducitat) >= :dataCaducitatInici) " +
-			"and (:isDataCaducitatFiNull = true or lower(n.caducitat) <= :dataCaducitatFi) " +
+			"and (:isDataProgramadaDisposicioIniciNull = true or n.enviamentDataProgramada >= :dataProgramadaDisposicioInici) " +
+			"and (:isDataProgramadaDisposicioFiNull = true or n.enviamentDataProgramada <= :dataProgramadaDisposicioFi) " +
+			"and (:isDataCaducitatIniciNull = true or n.caducitat >= :dataCaducitatInici) " +
+			"and (:isDataCaducitatFiNull = true or n.caducitat <= :dataCaducitatFi) " +
 			"and (:isTipusEnviamentNull = true or lower(n.enviamentTipus) like lower('%'||:tipusEnviament||'%')) " +
 			"and (:isCsvNull = true or lower(n.document.csv) like lower('%'||:csv||'%')) " +
 			"and (:isEstatNull = true or lower(n.estat) like lower('%'||:estat||'%')) " +
-			"and (:usuari = n.createdBy) ")
+			"and (:entitat = n.entitat) ")
 	List<NotificacioEntity> findNotificacioByFiltre(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
 			@Param("codiProcediment") String codiProcediment,
@@ -96,7 +96,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") int estat,
-			@Param("usuari") UsuariEntity usuari);
+			@Param("entitat") EntitatEntity entitat);
 	
 	List<NotificacioEntity> findByEstatOrderByCreatedDateAsc(
 			NotificacioEstatEnumDto estat,

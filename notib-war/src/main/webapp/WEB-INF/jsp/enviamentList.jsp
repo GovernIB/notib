@@ -449,7 +449,7 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="destinatariNomLlinatges" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.destinataris"/>
+				<th data-col-name="destinatarisNomLlinatges" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.destinataris"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="destinataris" value="${filtreEnviaments.destinataris}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.destinataris"/>"/>
@@ -464,9 +464,9 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="notificacio.caducitat" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.datacaducitat"/>
+				<th data-col-name="notificacio.caducitat" width="230" data-converter="datetime" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.datacaducitat"/>
 					<script type="text/x-jsrender">
-						<div class="from-group" data-provide="daterangepicker">
+						<div class="from-group" data-provide="daterangepicker" style="width: 230px;">
 							<div class="input-group vdivide">
     							<input name="dataCaducitatInici" value="${filtreEnviaments.dataCaducitatInici}" type="text" class="form-control data" placeholder="Inici">
     							<div class="input-group-addon"></div>
@@ -483,7 +483,7 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="notifica.notificaCertificacioArxiuId" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.numerocertificatcorreus"/>
+				<th data-col-name="numeroCertCorreus" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.numerocertificatcorreus"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="numeroCertCorreus" value="${filtreEnviaments.numeroCertCorreus}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.numerocertificatcorreus"/>"/>

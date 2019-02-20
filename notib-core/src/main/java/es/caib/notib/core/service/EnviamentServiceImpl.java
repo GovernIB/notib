@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.ColumnesDto;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
@@ -52,6 +53,7 @@ import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.NotificacioEnviamentHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.repository.ColumnesRepository;
+import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
@@ -83,6 +85,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private NotificacioEventRepository notificacioEventRepository;
 	@Autowired
 	private UsuariRepository usuariRepository;
+	@Autowired
+	private EntitatRepository entitatRepository;
 	@Autowired
 	private NotificacioEnviamentHelper notificacioEnviamentHelper;
 	@Autowired
@@ -125,9 +129,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private List<Long> findIdsAmbFiltrePaginat(
 			Long entitatId,
 			NotificacioEnviamentFiltreDto filtre) throws ParseException {
-		
-		UsuariDto usuariActualDto = aplicacioService.getUsuariActual();
-		UsuariEntity usuariActual = usuariRepository.findByCodi(usuariActualDto.getCodi());		
+
+//		UsuariDto usuariActualDto = aplicacioService.getUsuariActual();
+//		UsuariEntity usuariActual = usuariRepository.findByCodi(usuariActualDto.getCodi());
+		EntitatEntity entitatEntity = entitatRepository.findOne(entitatId);
 		List<NotificacioEntity> notificacions = new ArrayList<NotificacioEntity>();
 		List<Long> enviamentIds = null;
 		Date dataProgramadaDisposicioInici = null,
@@ -244,7 +249,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				filtre.getCsv(),
 				(filtre.getEstat() == null),
 				(estat),
-				usuariActual);
+				entitatEntity);
 		
 		
 		for (NotificacioEntity notificacio : notificacions) {
@@ -273,12 +278,13 @@ public class EnviamentServiceImpl implements EnviamentService {
 	}
 
 	@Override
-	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByUserAndFiltre(
+	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByEntityAndFiltre(
+			EntitatDto entitat,
 			NotificacioEnviamentFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws ParseException {
-		logger.debug("Consulta els enviaments d'una notificació que ha realitzat un usuari");
+		logger.debug("Consulta els enviaments de les notificacións que te una entitat");
 		
-		NotificacioEnviamentDtoV2 enviamentDto = new NotificacioEnviamentDtoV2();
+		List<NotificacioEnviamentDtoV2> enviamentDto = new ArrayList<NotificacioEnviamentDtoV2>();
 		List<NotificacioEnviamentDtoV2> enviamentsDto = new ArrayList<NotificacioEnviamentDtoV2>();
 		List<NotificacioEntity> notificacions = new ArrayList<NotificacioEntity>();
 		Date dataEnviamentInici = null,
@@ -290,8 +296,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 			 dataCaducitatInici = null,
 			 dataCaducitatFi = null;
 		
-		UsuariDto usuariActualDto = aplicacioService.getUsuariActual();
-		UsuariEntity usuariActual = usuariRepository.findByCodi(usuariActualDto.getCodi());
+//		UsuariDto usuariActualDto = aplicacioService.getUsuariActual();
+//		UsuariEntity usuariActual = usuariRepository.findByCodi(usuariActualDto.getCodi());
+		EntitatEntity entitatEntity = entitatRepository.findOne(entitat.getId());
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
@@ -371,7 +378,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}
 		}
 		if (filtre.getDataCaducitatInici() != null && filtre.getDataCaducitatInici() != "") {
-			dataCaducitatInici = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataCaducitatInici());
+			dataCaducitatInici = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataCaducitatInici());
 			if (dataCaducitatInici != null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(dataCaducitatInici);
@@ -383,7 +390,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}
 		}
 		if (filtre.getDataCaducitatFi() != null && filtre.getDataCaducitatFi() != "") {
-			dataCaducitatFi = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataCaducitatFi());
+			dataCaducitatFi = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataCaducitatFi());
 			if (dataCaducitatFi != null) {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(dataCaducitatFi);
@@ -438,7 +445,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				filtre.getCsv(),
 				(filtre.getEstat() == null),
 				(estat),
-				usuariActual);
+				entitatEntity);
 		
 		entityComprovarHelper.comprovarPermisos(
 				null,
@@ -461,10 +468,12 @@ public class EnviamentServiceImpl implements EnviamentService {
 						//filtre.getCodiNotifica() == null || "".equals(filtre.getCodiNotifica().trim()),
 						(filtre.getNifTitular() == null || filtre.getNifTitular().isEmpty()),
 						filtre.getNifTitular() == null ? "" : filtre.getNifTitular(),
-						(filtre.getNomTitular() == null || filtre.getNomTitular().isEmpty()),
-						filtre.getNomTitular() == null ? "" : filtre.getNomTitular(),
+						(filtre.getTitularNomLlinatge() == null || filtre.getTitularNomLlinatge().isEmpty()),
+						filtre.getTitularNomLlinatge() == null ? "" : filtre.getTitularNomLlinatge(),
 						(filtre.getEmailTitular() == null || filtre.getEmailTitular().isEmpty()),
 						filtre.getEmailTitular() == null ? "" : filtre.getEmailTitular(),
+						(filtre.getDir3Codi() == null || filtre.getDir3Codi().isEmpty()),
+						filtre.getDir3Codi() == null ? "" : filtre.getDir3Codi(),
 						//CODI DIR3
 						//(filtre.getDestinataris() == null || filtre.getDestinataris().isEmpty()),
 						//filtre.getDestinataris() == null ? "" : filtre.getDestinataris(),
@@ -480,7 +489,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 							notificacio, 
 							enviament);
 					if (enviamentDto != null) 
-						enviamentsDto.add(enviamentDto);
+						enviamentsDto.addAll(enviamentDto);
 				}
 			}
 		}else {
@@ -506,8 +515,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 				"format=" + format + ")");
 		
 		List<NotificacioEntity> notificacions = new ArrayList<NotificacioEntity>();
-		UsuariDto usuariActualDto = aplicacioService.getUsuariActual();
-		UsuariEntity usuariActual = usuariRepository.findByCodi(usuariActualDto.getCodi());
+//		UsuariDto usuariActualDto = aplicacioService.getUsuariActual();
+//		UsuariEntity usuariActual = usuariRepository.findByCodi(usuariActualDto.getCodi());
+		EntitatEntity entitatEntity = entitatRepository.findOne(entitatId);
 		Date dataProgramadaDisposicioInici = null,
 				 dataProgramadaDisposicioFi = null,
 				 dataRegistreInici = null,
@@ -622,7 +632,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				filtre.getCsv(),
 				(filtre.getEstat() == null),
 				(estat),
-				usuariActual);
+				entitatEntity);
 		
 		//Genera les columnes
 		int numColumnes = 22;

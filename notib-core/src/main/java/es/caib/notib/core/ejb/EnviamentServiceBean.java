@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.notib.core.api.dto.ColumnesDto;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
@@ -48,7 +49,8 @@ public class EnviamentServiceBean implements EnviamentService {
 	}
 
 	@Override
-	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByUserAndFiltre(
+	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByEntityAndFiltre(
+			EntitatDto entitat,
 			NotificacioEnviamentFiltreDto filtre,
 			PaginacioParamsDto paginacio) {
 		// TODO Auto-generated method stub
