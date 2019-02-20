@@ -91,7 +91,7 @@ public class WsClientHelper<T> {
 		bindingProvider.getBinding().setHandlerChain(handlerChain);
 		return bustiaWs;
 	}
-
+	
 	public T generarClientWs(
 			String endpoint,
 			QName qname,

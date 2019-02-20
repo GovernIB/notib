@@ -363,29 +363,50 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		envios.setDescripcion(notificacio.getDescripcio());
 		envios.setProcedimiento(
 				notificacio.getProcedimentCodiNotib());
-		Documento documento = new Documento();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		pluginHelper.gestioDocumentalGet(
-				notificacio.getDocument().getArxiuGestdocId(),
-				PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-				baos);
-		documento.setContenido(baos.toByteArray());
-		documento.setHash(notificacio.getDocument().getHash());
-		Opciones opcionesDocumento = new Opciones();
-		Opcion opcionNormalizado = new Opcion();
-		opcionNormalizado.setTipo("normalizado");
-		opcionNormalizado.setValue(
-				notificacio.getDocument().getNormalitzat()  ? "si" : "no"); // si o no
-		opcionesDocumento.getOpcion().add(opcionNormalizado);
-		Opcion opcionGenerarCsv = new Opcion();
-		opcionGenerarCsv.setTipo("generarCsv");
-		opcionGenerarCsv.setValue(
-				notificacio.getDocument().getGenerarCsv()  ? "si" : "no"); // si o no
-		opcionesDocumento.getOpcion().add(opcionGenerarCsv);
-		documento.setOpcionesDocumento(opcionesDocumento);
-		envios.setDocumento(documento);
-		envios.setEnvios(generarEnvios(notificacio));
-		Opciones opcionesRemesa = new Opciones();
+
+		if(notificacio.getDocument().getArxiuGestdocId() != null) {
+			Documento documento = new Documento();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			pluginHelper.gestioDocumentalGet(
+					notificacio.getDocument().getArxiuGestdocId(),
+					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
+					baos);
+
+			documento.setContenido(baos.toByteArray());
+			documento.setHash(notificacio.getDocument().getHash());
+			Opciones opcionesDocumento = new Opciones();
+			Opcion opcionNormalizado = new Opcion();
+			opcionNormalizado.setTipo("normalizado");
+			opcionNormalizado.setValue(
+					notificacio.getDocument().getNormalitzat()  ? "si" : "no"); // si o no
+			opcionesDocumento.getOpcion().add(opcionNormalizado);
+			Opcion opcionGenerarCsv = new Opcion();
+			opcionGenerarCsv.setTipo("generarCsv");
+			opcionGenerarCsv.setValue(
+					notificacio.getDocument().getGenerarCsv()  ? "si" : "no"); // si o no
+			opcionesDocumento.getOpcion().add(opcionGenerarCsv);
+			documento.setOpcionesDocumento(opcionesDocumento);
+			envios.setDocumento(documento);
+		} else {
+			Documento documento = new Documento();
+			documento.setHash(notificacio.getDocument().getHash());
+			if(notificacio.getDocument().getContingutBase64() != null) {
+				documento.setContenido(notificacio.getDocument().getContingutBase64().getBytes());	
+			}
+			Opciones opcionesDocumento = new Opciones();
+			Opcion opcionNormalizado = new Opcion();
+			opcionNormalizado.setTipo("normalizado");
+			opcionNormalizado.setValue(
+					notificacio.getDocument().getNormalitzat()  ? "si" : "no"); // si o no
+			opcionesDocumento.getOpcion().add(opcionNormalizado);
+			Opcion opcionGenerarCsv = new Opcion();
+			opcionGenerarCsv.setTipo("generarCsv");
+			opcionGenerarCsv.setValue(
+					notificacio.getDocument().getGenerarCsv()  ? "si" : "no"); // si o no
+			opcionesDocumento.getOpcion().add(opcionGenerarCsv);
+			documento.setOpcionesDocumento(opcionesDocumento);
+			envios.setDocumento(documento);
+		}
 		//V1 rest
 		//if (notificacio.getRetardPostal() != null) {
 		//	Opcion opcionRetardo = new Opcion();
@@ -394,7 +415,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		//			notificacio.getRetardPostal().toString()); // número de días
 		//	opcionesRemesa.getOpcion().add(opcionRetardo);
 		//}
-		
+		envios.setEnvios(generarEnvios(notificacio));
+		Opciones opcionesRemesa = new Opciones();
 		retardPostal = procedimentRepository.findByCodi(notificacio.getProcedimentCodiNotib()).getRetard();
 		if (retardPostal != null) {
 			Opcion opcionRetardo = new Opcion();
@@ -402,7 +424,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			opcionRetardo.setValue(retardPostal.toString()); // número de días
 			opcionesRemesa.getOpcion().add(opcionRetardo);
 		}
-		
 //		if (notificacio.getRetardPostal() != null) {
 //			Opcion opcionRetardo = new Opcion();
 //			opcionRetardo.setTipo("retardo");

@@ -29,8 +29,10 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	List<NotificacioEnviamentEntity> findByNotificacioId(
 			Long notificacioId);
 	
+	
+	@Query(value = "FROM NotificacioEnviamentEntity n WHERE n.notificacio = :notificacio")
 	List<NotificacioEnviamentEntity> findByNotificacio(
-			NotificacioEntity notificacioId);
+			@Param("notificacio") NotificacioEntity notificacio);
 
 	NotificacioEnviamentEntity findByNotificaReferencia(
 			String notificaReferencia);
@@ -52,13 +54,14 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:esCodiNotificaNull = true or lower(n.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
 			"and (:esCreatedbyNull = true or lower(n.createdBy) like lower('%'||:createdBy||'%')) " +
 			"and (:esNifTitularNull = true or lower(n.titular.nif) like lower('%'||:nifTitular||'%')) " +
-			"and (:esNomTitularNull = true or lower(n.titular.nom) like lower('%'||:nomTitular||'%')) " +
+			"and (:esNomTitularNull = true or lower(concat('[', n.titular.llinatge1, ' ', n.titular.llinatge2, ', ', n.titular.nom,']')) like lower('%'||:nomTitular||'%')) " +
 			"and (:esEmailTitularNull = true or n.titular.email = :emailTitular) " +
+			"and (:esDir3CodiNull = true or lower(n.notificacio.emisorDir3Codi) like lower('%'||:dir3Codi||'%')) " +
 			//"and   (:isDestinatarisNull = true or lower(c.destinatariNom) like lower('%'||:destinataris||'%'))" +
 			//"and  	or lower(c.destinatariLlinatge1) like lower('%'||:destinataris||'%'))" +
 			//"and 	or lower(c.destinatariLlinatge2) like lower('%'||:destinataris||'%'))" +
 			//"and   (:isCodiNotibNull = true or n.titularEmail = :codiNotib) " +
-			"and (:isNumeroCertCorreusNull = true or n.notificaCertificacioArxiuId like lower('%'||:numeroCertCorreus||'%')) " +
+			"and (:isNumeroCertCorreusNull = true or n.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
 			"and n.notificacio = :notificacio")
 	Page<NotificacioEnviamentEntity> findByNotificacio(
 			@Param("esDataEnviamentIniciNull") boolean esDataEnviamentIniciNull,
@@ -75,6 +78,8 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("nomTitular") String nomTitular,
 			@Param("esEmailTitularNull") boolean esEmailTitularNull,
 			@Param("emailTitular") String emailTitular,
+			@Param("esDir3CodiNull") boolean esdir3CodiNull,
+			@Param("dir3Codi") String dir3Codi,
 			//@Param("isDestinatarisNull") boolean isDestinatarisNull,
 			//@Param("destinataris") String destinataris,
 			//@Param("isCodiNotibNull") boolean isCodiNotibNull,

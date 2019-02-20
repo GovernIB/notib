@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import es.caib.notib.core.api.dto.ColumnesDto;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
@@ -52,7 +53,8 @@ public interface EnviamentService {
 	 * @return els destinataris trobats.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByUserAndFiltre(
+	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByEntityAndFiltre(
+			EntitatDto entitat,
 			NotificacioEnviamentFiltreDto filtre,
 			PaginacioParamsDto paginacio) throws ParseException;
 	

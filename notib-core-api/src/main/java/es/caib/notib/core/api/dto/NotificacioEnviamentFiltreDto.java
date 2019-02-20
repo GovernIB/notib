@@ -38,6 +38,8 @@ public class NotificacioEnviamentFiltreDto extends AuditoriaDto {
 	private String numeroCertCorreus;
 	private String csv;
 	private NotificacioEstatEnumDto estat;
+	private String dir3Codi;
+	private String titularNomLlinatge;
 	
 	public Long getId() {
 		return id;
@@ -198,7 +200,18 @@ public class NotificacioEnviamentFiltreDto extends AuditoriaDto {
 	public void setEstat(NotificacioEstatEnumDto estat) {
 		this.estat = estat;
 	}
-	
+	public String getDir3Codi() {
+		return dir3Codi;
+	}
+	public void setDir3Codi(String dir3Codi) {
+		this.dir3Codi = dir3Codi;
+	}
+	public String getTitularNomLlinatge() {
+		return titularNomLlinatge;
+	}
+	public void setTitularNomLlinatge(String titularNomLlinatge) {
+		this.titularNomLlinatge = titularNomLlinatge;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

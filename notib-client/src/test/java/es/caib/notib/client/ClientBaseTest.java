@@ -25,6 +25,8 @@ import es.caib.notib.ws.notificacio.EntregaPostalTipusEnum;
 import es.caib.notib.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.ws.notificacio.Enviament;
 import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
+import es.caib.notib.ws.notificacio.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.ws.notificacio.NotificaServeiTipusEnumDto;
 import es.caib.notib.ws.notificacio.Notificacio;
 import es.caib.notib.ws.notificacio.PagadorCie;
 import es.caib.notib.ws.notificacio.PagadorPostal;
@@ -66,9 +68,9 @@ public class ClientBaseTest {
 				"descripcio_" + notificacioId);
 		notificacio.setEnviamentDataProgramada(null);
 		notificacio.setRetard(5);
-		notificacio.setCaducitat(
-				toXmlGregorianCalendar(
-						new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000)));
+		notificacio.setCaducitat(toXmlGregorianCalendar(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000)));
+//				toXmlGregorianCalendar(
+//						);
 		Document document = new Document();
 		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
 		
@@ -93,13 +95,13 @@ public class ClientBaseTest {
 			pagadorPostal.setDir3Codi("A04013511");
 			pagadorPostal.setFacturacioClientCodi("ccFac_" + notificacioId);
 			pagadorPostal.setContracteNum("pccNum_" + notificacioId);
-			pagadorPostal.setContracteDataVigencia(
-					toXmlGregorianCalendar(new Date(0)));
+			pagadorPostal.setContracteDataVigencia(toXmlGregorianCalendar(new Date(0)));
+//					);
 			notificacio.setPagadorPostal(pagadorPostal);
 			PagadorCie pagadorCie = new PagadorCie();
 			pagadorCie.setDir3Codi("A04013511");
-			pagadorCie.setContracteDataVigencia(
-					toXmlGregorianCalendar(new Date(0)));
+			pagadorCie.setContracteDataVigencia(toXmlGregorianCalendar(new Date(0)));
+//					toXmlGregorianCalendar();
 			notificacio.setPagadorCie(pagadorCie);
 		}
 		for (int i = 0; i < numDestinataris; i++) {
@@ -122,7 +124,7 @@ public class ClientBaseTest {
 			enviament.getDestinataris().add(destinatari);
 			if (ambEnviamentPostal) {
 				EntregaPostal entregaPostal = new EntregaPostal();
-				entregaPostal.setTipus(EntregaPostalTipusEnum.NACIONAL);
+				entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.NACIONAL);
 				entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLE);
 				entregaPostal.setViaNom("Bas");
 				entregaPostal.setNumeroCasa("25");
@@ -148,7 +150,7 @@ public class ClientBaseTest {
 			entregaDeh.setObligat(true);
 			entregaDeh.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 			enviament.setEntregaDeh(entregaDeh);
-			enviament.setServeiTipus(ServeiTipusEnum.URGENT);
+			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
 			notificacio.getEnviaments().add(enviament);
 		}
 		ParametresSeu parametresSeu = new ParametresSeu();

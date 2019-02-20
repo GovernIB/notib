@@ -10,7 +10,7 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 	private String codi;
 	private String nom;
 	private String codisia;
-	private EntitatDto  entitat;
+	private EntitatDto entitat;
 	private PagadorPostalDto pagadorpostal;
 	private PagadorCieDto pagadorcie;
 	private boolean agrupar;

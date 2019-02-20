@@ -34,25 +34,27 @@ public class NotificacioEnviamentHelper {
 	
 	
 	
-	public NotificacioEnviamentDtoV2 toNotificacioEnviamentDtoV2(
+	public List<NotificacioEnviamentDtoV2> toNotificacioEnviamentDtoV2(
 			NotificacioEntity notificacio,
 			Page<NotificacioEnviamentEntity> enviamentsPage) {
 		
-		NotificacioEnviamentDtoV2 enviaments = null;
+		List<NotificacioEnviamentDtoV2> enviaments = null;
 		
 		if (!enviamentsPage.getContent().isEmpty()) {
-			enviaments = new NotificacioEnviamentDtoV2();
+			enviaments = new ArrayList<NotificacioEnviamentDtoV2>();
 			
 			for (NotificacioEnviamentEntity enviament : enviamentsPage.getContent()) {
-				enviaments.setId(enviament.getId());
-				enviaments.setCreatedDate(enviament.getCreatedDate().toDate());
-				enviaments.setUsuari(enviament.getCreatedBy().getCodi());
-				enviaments.setNotificacio(
+				NotificacioEnviamentDtoV2 env = new NotificacioEnviamentDtoV2();
+				env.setId(enviament.getId());
+				env.setCreatedDate(enviament.getCreatedDate().toDate());
+				env.setUsuari(enviament.getCreatedBy().getCodi());
+				env.setNotificacio(
 						conversioTipusHelper.convertir(
 						notificacio, 
 						NotificacioDtoV2.class));
+				env.setNotificaIdentificador(enviament.getNotificaIdentificador());
 				
-				enviaments.setTitular(
+				env.setTitular(
 						conversioTipusHelper.convertir(
 						enviament.getTitular(), 
 						PersonaDto.class));
@@ -61,10 +63,10 @@ public class NotificacioEnviamentHelper {
 				for(PersonaEntity persona : enviament.getDestinataris()) {
 					destinataris.add(conversioTipusHelper.convertir(persona, PersonaDto.class));
 				}
-				enviaments.setDestinataris(destinataris);
+				env.setDestinataris(destinataris);
 				EntregaDehDto entregaDehDto = new EntregaDehDto();
 				entregaDehDto.setObligat(enviament.getDehObligat());
-				enviaments.setEntregaDeh(entregaDehDto);
+				env.setEntregaDeh(entregaDehDto);
 				
 				EntregaPostalDto entregaPostalDto = new EntregaPostalDto();
 				entregaPostalDto.setTipus(enviament.getDomiciliNumeracioTipus());
@@ -90,11 +92,20 @@ public class NotificacioEnviamentHelper {
 				entregaPostalDto.setCie(enviament.getDomiciliCie());
 				entregaPostalDto.setFormatSobre(enviament.getFormatSobre());
 				entregaPostalDto.setFormatFulla(enviament.getFormatFulla());
-				enviaments.setEntregaPostal(entregaPostalDto);
+				env.setEntregaPostal(entregaPostalDto);
+				/*Revisar*/
+				env.setNumeroCertCorreus(enviament.getNotificaCertificacioNumSeguiment());
+				env.getNotificacio().setCsv_uuid(notificacio.getDocument().getArxiuGestdocId());
 				
-				enviaments.setServeiTipus(enviament.getServeiTipus());
+				for(PersonaEntity destinatari : enviament.getDestinataris()) {
+					env.setDestinatarisNomLlinatges("[" + destinatari.getLlinatge1() + " " + destinatari.getLlinatge1() + ", " + destinatari.getNom() + "] \n");
+				}
 				
-				enviaments.setReferencia(enviament.getNotificaReferencia());
+				env.setServeiTipus(enviament.getServeiTipus());
+				env.setTitularEmail(enviament.getTitular().getEmail());
+				env.setReferencia(enviament.getNotificaReferencia());
+				env.setTitularNif(enviament.getTitular().getNif());
+				enviaments.add(env);
 			}
 		}
 		return enviaments;

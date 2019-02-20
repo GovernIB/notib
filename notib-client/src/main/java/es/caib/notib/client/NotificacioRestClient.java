@@ -27,6 +27,8 @@ import com.sun.jersey.api.representation.Form;
 import es.caib.loginModule.client.AuthenticationFailureException;
 import es.caib.notib.ws.notificacio.Notificacio;
 import es.caib.notib.ws.notificacio.NotificacioService;
+import es.caib.notib.ws.notificacio.NotificacioServiceV2;
+import es.caib.notib.ws.notificacio.NotificacioV2;
 import es.caib.notib.ws.notificacio.RespostaAlta;
 import es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
@@ -36,7 +38,7 @@ import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class NotificacioRestClient implements NotificacioService {
+public class NotificacioRestClient implements NotificacioService, NotificacioServiceV2 {
 
 	private static final String NOTIFICACIO_SERVICE_PATH = "/api/services/notificacio";
 
@@ -59,6 +61,33 @@ public class NotificacioRestClient implements NotificacioService {
 	@Override
 	public RespostaAlta alta(
 			Notificacio notificacio) {
+		try {
+			String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/alta";
+			ObjectMapper mapper  = new ObjectMapper();
+			String body = mapper.writeValueAsString(notificacio);
+			Client jerseyClient = generarClient();
+			if (username != null) {
+				autenticarClient(
+						jerseyClient,
+						urlAmbMetode,
+						username,
+						password);
+			}
+			logger.debug("Missatge REST enviat: " + body);
+			String json = jerseyClient.
+					resource(urlAmbMetode).
+					type("application/json").
+					post(String.class, body);
+			logger.debug("Missatge REST rebut: " + json);
+			return mapper.readValue(json, RespostaAlta.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+	
+	@Override
+	public RespostaAlta alta(
+			NotificacioV2 notificacio) {
 		try {
 			String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/alta";
 			ObjectMapper mapper  = new ObjectMapper();

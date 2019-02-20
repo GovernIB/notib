@@ -1048,7 +1048,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built.notificacio = notificacioGuardada;
 			built.domiciliTipus = NotificaDomiciliTipusEnumDto.CONCRETO;
 
-			if(enviament.isEntregaPostalActiva()) {
+			if(enviament.getEntregaPostal() != null) {
 				built.domiciliViaNom = enviament.getEntregaPostal().getViaNom();
 				built.domiciliNumeracioNumero = enviament.getEntregaPostal().getNumeroCasa();
 				built.domiciliNumeracioQualificador = enviament.getEntregaPostal().getNumeroQualificador();
@@ -1072,6 +1072,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 				built.formatFulla = enviament.getEntregaPostal().getFormatFulla();
 				built.dehObligat = enviament.getEntregaDeh().isObligat();
 			}
+			
 			built.titular = titular;
 			built.destinataris = destinataris;
 		}

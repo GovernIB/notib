@@ -128,15 +128,16 @@ public class EnviamentController extends BaseUserController {
 	public DatatablesResponse datatable(
 			HttpServletRequest request,
 			Model model) throws ParseException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		NotificacioEnviamentFiltreCommand filtreEnviaments = getFiltreCommand(request);
 		PaginaDto<NotificacioEnviamentDtoV2> enviaments = new PaginaDto<NotificacioEnviamentDtoV2>();
-		
 		if (enviaments != null) {
 			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
 				filtreEnviaments.setEstat(null);
 			}
-			enviaments = enviamentService.enviamentFindByUserAndFiltre(
+			
+			enviaments = enviamentService.enviamentFindByEntityAndFiltre(entitatActual, 
 						NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
 						DatatablesHelper.getPaginacioDtoFromRequest(request));
 			
