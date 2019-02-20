@@ -30,7 +30,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private String csv_uuid;
 	private ProcedimentDto procediment;
 	private String procedimentCodiNotib;
-	private GrupDto Grup;
+	private GrupDto grup;
 	private String grupCodi;
 	private ParametresRegistreDto parametresRegistre;
 	private NotificacioEstatEnumDto estat;
@@ -40,10 +40,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private PersonaDto titular;
 	private PersonaDto destinatari = new PersonaDto();
 	private List<PersonaDto> destinataris = new ArrayList<PersonaDto>();
-	private boolean entregaPostalActiva;
-	private EntregaPostalDto entregaPostal;
-	private EntregaDehDto entregaDeh;
-	private List<EnviamentDto> enviaments;
+	private List<EnviamentDto> enviaments = new ArrayList<EnviamentDto>();
 	private String usuariCodi;
 
 	// Paràmetres registre
@@ -127,10 +124,10 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 		this.procedimentCodiNotib = procedimentCodiNotib;
 	}
 	public GrupDto getGrup() {
-		return Grup;
+		return grup;
 	}
 	public void setGrup(GrupDto grup) {
-		Grup = grup;
+		grup = grup;
 	}
 	public String getGrupCodi() {
 		return grupCodi;
@@ -185,27 +182,6 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	}
 	public void setDestinataris(List<PersonaDto> destinataris) {
 		this.destinataris = destinataris;
-	}
-	public boolean isEntregaPostalActiva() {
-		return entregaPostalActiva;
-	}
-	public void setEntregaPostalActiva(boolean entregaPostalActiva) {
-		this.entregaPostalActiva = entregaPostalActiva;
-	}
-	public EntregaPostalDto getEntregaPostal() {
-		return entregaPostal;
-	}
-	public void setEntregaPostal(EntregaPostalDto entregaPostal) {
-		this.entregaPostal = entregaPostal;
-	}
-	public EntregaDehDto getEntregaDeh() {
-		return entregaDeh;
-	}
-	public void setEntregaDeh(EntregaDehDto entregaDeh) {
-		this.entregaDeh = entregaDeh;
-	}
-	public String getOficina() {
-		return oficina;
 	}
 	public void setOficina(String oficina) {
 		this.oficina = oficina;

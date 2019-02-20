@@ -37,7 +37,7 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public NotificacioDto findAmbId(Long id) {
+	public NotificacioDtoV2 findAmbId(Long id) {
 		return delegate.findAmbId(id);
 	}
 
@@ -183,6 +183,21 @@ public class NotificacioServiceBean implements NotificacioService {
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrups(
 			List<ProcedimentDto> procediments) {
 		return delegate.findProcedimentsAmbPermisNotificacioAndGrups(procediments);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrups(
+			List<ProcedimentDto> procediments) {
+		return delegate.findProcedimentsAmbPermisNotificacioSenseGrups(procediments);
+	}
+
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrups(
+			List<ProcedimentDto> procediments) {
+		return delegate.findProcedimentsAmbPermisConsultaSenseGrups(procediments);
 	}
 
 	

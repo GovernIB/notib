@@ -61,7 +61,7 @@ public interface NotificacioService {
 	 * @return La notificació amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public NotificacioDto findAmbId(
+	public NotificacioDtoV2 findAmbId(
 			Long id);
 
 	/**
@@ -133,6 +133,33 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrups(
+			List<ProcedimentDto> procediments);
+	
+	/**
+	 * Consulta de les notificacions segons els paràmetres del filtre.
+	 * 
+	 * @param filtre
+	 *            Paràmetres per a filtrar els resultats.
+	 * @param paginacioParams
+	 *            Paràmetres per a dur a terme la paginació del resultats.
+	 * @return La pàgina amb les notificacions.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrups(
+			List<ProcedimentDto> procediments);
+	
+	
+	/**
+	 * Consulta de les notificacions segons els paràmetres del filtre.
+	 * 
+	 * @param filtre
+	 *            Paràmetres per a filtrar els resultats.
+	 * @param paginacioParams
+	 *            Paràmetres per a dur a terme la paginació del resultats.
+	 * @return La pàgina amb les notificacions.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrups(
 			List<ProcedimentDto> procediments);
 	
 	/**
