@@ -333,13 +333,16 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				true,
 				false);
 		List<GrupProcedimentEntity> grupsProcediments = grupProcedimentRepository.findAll();
+		List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
 		
-		/*List<ProcedimentEntity> procediments = grupProcedimentRepository.findProcedimentsSenseGrups(grupsProcediments);
+		for (GrupProcedimentEntity grupProcedimentEntity : grupsProcediments) {
+			procediments.add(procedimentRepository.findOne(grupProcedimentEntity.getProcediment().getId()));
+		}
+		List<ProcedimentEntity> procedimentsSenseGrups = procedimentRepository.findProcedimentsSenseGrups(procediments);
 		
 		return conversioTipusHelper.convertirList(
-				procediments,
-				ProcedimentDto.class);*/
-		return null;
+				procedimentsSenseGrups,
+				ProcedimentDto.class);
 	}
 	
 	@Override
@@ -399,14 +402,14 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				+ "entitatId=" + entitatId +  ", "
 				+ "id=" + id + ", "
 				+ "permis=" + permis + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				false,
 				true,
 				false);
 		entityComprovarHelper.comprovarProcediment(
-				entitat,
+				null,
 				id,
 				false,
 				false,

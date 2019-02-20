@@ -125,6 +125,7 @@ public class ProcedimentController extends BaseUserController{
 					request,
 					procedimentCommand.getId(),
 					model);
+			model.addAttribute("errors", bindingResult.getAllErrors());
 			return "procedimentAdminForm";
 		}
 		

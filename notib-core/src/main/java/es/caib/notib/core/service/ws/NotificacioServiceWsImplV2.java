@@ -22,6 +22,7 @@ import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.exception.RegistrePluginException;
@@ -49,6 +50,7 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.DocumentRepository;
@@ -85,6 +87,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private PersonaRepository personaRepository;
 	@Autowired
 	private DocumentRepository documentRepository;
+	@Autowired
+	private ConversioTipusHelper conversioHelper;
 	
 	
 	@Autowired
@@ -99,37 +103,45 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	public RespostaAlta alta(
 			NotificacioV2 notificacio) throws NotificacioServiceWsException {
 		String emisorDir3Codi = notificacio.getEmisorDir3Codi();
+		RespostaAlta resposta = new RespostaAlta();
+
 		if (emisorDir3Codi == null) {
-			throw new ValidationException(
-					"EMISOR", 
-					"El camp 'emisorDir3Codi' no pot ser null.");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[EMISOR] El camp 'emisorDir3Codi' no pot ser null.");
+			return resposta;
 		}
 		EntitatEntity entitat = entitatRepository.findByDir3Codi(emisorDir3Codi);
 		if (entitat == null) {
-			throw new ValidationException(
-					"ENTITAT", 
-					"No s'ha trobat cap entitat configurada a Notib amb el codi Dir3 " + emisorDir3Codi + ". (emisorDir3Codi)");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[ENTITAT] No s'ha trobat cap entitat configurada a Notib amb el codi Dir3 " + emisorDir3Codi + ". (emisorDir3Codi)");
+			return resposta;
 		}
 		if (!entitat.isActiva()) {
-			throw new ValidationException(
-					"ENTITAT", 
-					"L'entitat especificada està desactivada per a l'enviament de notificacions");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[ENTITAT] L'entitat especificada està desactivada per a l'enviament de notificacions");
+			return resposta;
 		}
 		if (notificacio.getConcepte() == null) {
-			throw new ValidationException(
-					"CONCEPTE", 
-					"El concepte de la notificació no pot ser null.");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[CONCEPTE] El concepte de la notificació no pot ser null.");
+			return resposta;
 		}
 		if (notificacio.getEnviamentTipus() == null) {
-			throw new ValidationException(
-					"ENVIAMENT_TIPUS", 
-					"El tipus d'enviament de la notificació no pot ser null.");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[ENVIAMENT_TIPUS] El tipus d'enviament de la notificació no pot ser null.");
+			return resposta;
 		}
 		DocumentV2 document = notificacio.getDocument();
 		if (document == null) {
-			throw new ValidationException(
-					"DOCUMENT",
-					"El camp 'document' no pot ser null.");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[DOCUMENT] El camp 'document' no pot ser null.");
+			return resposta;
 		}
 		String documentGesdocId = null;
 		if(notificacio.getDocument().getContingutBase64() != null) {
@@ -187,7 +199,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					notificacio.getCodiGrup(),
 					notificacio.getNumExpedient(),
 					notificacio.getRefExterna(),
-					notificacio.getEnviaments(),
 					notificacio.getObservacions());
 			
 			NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioBuilder.build());
@@ -257,7 +268,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
 				for(Persona persona: enviament.getDestinataris()) {
 					PersonaEntity destinatari = personaRepository.save(PersonaEntity.getBuilder(
-							persona.getEmail(), 
+							persona.getEmail(),
 							persona.getLlinatge1(), 
 							persona.getLlinatge2(), 
 							persona.getNif(), 
@@ -269,7 +280,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				
 				NotificacioEnviamentEntity enviamentSaved = notificacioEnviamentRepository.saveAndFlush(
 						NotificacioEnviamentEntity.getBuilderV2(
-								enviament, notificacio, numeracioTipus, tipusConcret, serveiTipus, notificacioGuardada, titular, destinataris)
+								enviament, conversioHelper.convertir(notificacio, NotificacioDtoV2.class), numeracioTipus, tipusConcret, serveiTipus, notificacioGuardada, titular, destinataris)
 								.domiciliViaTipus(toEnviamentViaTipusEnum(enviament.getEntregaPostal().getViaTipus())).build());
 				
 				String referencia;
@@ -306,7 +317,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					notificacioGuardada = notificacioRepository.findOne(notificacioGuardada.getId());
 				}
 			}
-			RespostaAlta resposta = new RespostaAlta();
 			try {
 				resposta.setIdentificador(
 						notificaHelper.xifrarId(notificacioGuardada.getId()));
@@ -334,9 +344,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			resposta.setReferencies(referencies);
 			return resposta;
 		}else {
-			throw new ValidationException(
-					"PROCEDIMENT",
-					"No s'ha trobat cap procediment amb el codi indicat");
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[PROCEDIMENT] No s'ha trobat cap procediment amb el codi indicat.");
+			return resposta;
 		}
 		
 	}

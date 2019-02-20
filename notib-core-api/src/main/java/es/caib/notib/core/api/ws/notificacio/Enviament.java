@@ -21,6 +21,7 @@ public class Enviament {
 	private Persona titular;
 	private List<Persona> destinataris;
 	private EntregaPostal entregaPostal;
+	private boolean entregaPostalActiva;
 	private EntregaDeh entregaDeh;
 	private NotificaServeiTipusEnumDto serveiTipus;
 
@@ -41,6 +42,12 @@ public class Enviament {
 	}
 	public void setDestinataris(List<Persona> destinataris) {
 		this.destinataris = destinataris;
+	}
+	public boolean isEntregaPostalActiva() {
+		return entregaPostalActiva;
+	}
+	public void setEntregaPostalActiva(boolean entregaPostalActiva) {
+		this.entregaPostalActiva = entregaPostalActiva;
 	}
 	public EntregaPostal getEntregaPostal() {
 		return entregaPostal;

@@ -20,6 +20,10 @@ public class EnviamentCommand {
 	private ServeiTipusEnumDto serveiTipus;
 	private PersonaCommand titular;
 	private List<PersonaCommand> destinataris;
+
+	private boolean entregaPostalActiva;
+	private EntregapostalCommand entregaPostal;
+	private EntregaDehCommand entregaDeh;
 	
 	
 	public ServeiTipusEnumDto getServeiTipus() {
@@ -41,6 +45,24 @@ public class EnviamentCommand {
 		this.destinataris = destinataris;
 	}
 
+	public boolean isEntregaPostalActiva() {
+		return entregaPostalActiva;
+	}
+	public void setEntregaPostalActiva(boolean entregaPostalActiva) {
+		this.entregaPostalActiva = entregaPostalActiva;
+	}
+	public EntregapostalCommand getEntregaPostal() {
+		return entregaPostal;
+	}
+	public void setEntregaPostal(EntregapostalCommand entregaPostal) {
+		this.entregaPostal = entregaPostal;
+	}
+	public EntregaDehCommand getEntregaDeh() {
+		return entregaDeh;
+	}
+	public void setEntregaDeh(EntregaDehCommand entregaDeh) {
+		this.entregaDeh = entregaDeh;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

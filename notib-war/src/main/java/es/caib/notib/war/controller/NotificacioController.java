@@ -19,6 +19,7 @@ import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -176,9 +177,9 @@ public class NotificacioController extends BaseUserController {
 			HttpServletRequest request,
 			Model model) {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-		List<ProcedimentDto> procedimentsPermisNotificacioAndGrups = null;
-		List<ProcedimentDto> procedimentsPermisNotificacio = null;
-		List<ProcedimentDto> procediments = null;
+		List<ProcedimentDto> procedimentsPermisNotificacioAmbGrupsAndSenseGrups = new ArrayList<ProcedimentDto>();
+		List<ProcedimentDto> procedimentsPermisNotificacioSenseGrups = new ArrayList<ProcedimentDto>();
+		List<ProcedimentDto> procedimentsPermisNotificacio = new ArrayList<ProcedimentDto>();
 		List<ProcedimentDto> procedimentsAmbGrups = new ArrayList<ProcedimentDto>();
 		List<ProcedimentDto> procedimentsSenseGrups = new ArrayList<ProcedimentDto>();
 		List<ProcedimentGrupDto> grupsProcediment = new ArrayList<ProcedimentGrupDto>();
@@ -191,10 +192,9 @@ public class NotificacioController extends BaseUserController {
 			
 			//Llistat de procediments amb grups
 			grupsProcediment = procedimentService.findAllGrups();
-			procediments = procedimentService.findAll();
-			
+		
 			procedimentsAmbGrups = new ArrayList<ProcedimentDto>();
-			procedimentsSenseGrups = new ArrayList<ProcedimentDto>();
+			procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups();
 			//Obté els procediments que tenen el mateix grup que el rol d'usuari
 			for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
 				
@@ -202,22 +202,25 @@ public class NotificacioController extends BaseUserController {
 					if(rol.contains(grupProcediment.getGrup().getCodi())) {
 						procedimentsAmbGrups.add(grupProcediment.getProcediment());
 					}
-					if(grupProcediment.getGrup().getCodi().isEmpty()){
-						procedimentsSenseGrups.add(grupProcediment.getProcediment());
-					}
 				}
 			}
 		}
 		
 		if (!procedimentsAmbGrups.isEmpty()) {
-			procedimentsPermisNotificacioAndGrups = notificacioService.findProcedimentsAmbPermisNotificacioAndGrups(procedimentsAmbGrups);
+			//Procedimments amb i sense grups amb permís notificació
+			procedimentsPermisNotificacioAmbGrupsAndSenseGrups = notificacioService.findProcedimentsAmbPermisNotificacioAndGrups(procedimentsAmbGrups);
+			procedimentsPermisNotificacioSenseGrups = notificacioService.findProcedimentsAmbPermisNotificacioSenseGrups(procedimentsSenseGrups);
 			
-			model.addAttribute("procediments", procedimentsPermisNotificacioAndGrups);
+			for (ProcedimentDto procedimentSenseGrupAmbPermis : procedimentsPermisNotificacioSenseGrups) {
+				procedimentsPermisNotificacioAmbGrupsAndSenseGrups.add(procedimentSenseGrupAmbPermis);
+			}
+			model.addAttribute("procediments", procedimentsPermisNotificacioAmbGrupsAndSenseGrups);
 		} else if (grupsProcediment.isEmpty()) {
+			//Procediments sense grups amb permís notificació
 			procedimentsPermisNotificacio = notificacioService.findProcedimentsAmbPermisNotificacio();
 			model.addAttribute("procediments", procedimentsPermisNotificacio);
 		}
-
+		
 		return "notificacioProcedimentsForm";
 	}
 	
@@ -239,6 +242,7 @@ public class NotificacioController extends BaseUserController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		if (bindingResult.hasErrors()) {
+			model.addAttribute("errors", bindingResult.getAllErrors());
 			return "notificacioForm";
 		}
 		if (RolHelper.isUsuariActualAdministrador(request)) {
@@ -303,6 +307,8 @@ public class NotificacioController extends BaseUserController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
 		List<ProcedimentGrupDto> grupsProcediment = new ArrayList<ProcedimentGrupDto>();
+		List<ProcedimentDto> procedimentsSenseGrups = new ArrayList<ProcedimentDto>();
+		List<ProcedimentDto> procedimentsPermisConsultaSenseGrups = new ArrayList<ProcedimentDto>();
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 		boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
@@ -327,6 +333,18 @@ public class NotificacioController extends BaseUserController {
 					}
 				}
 			}
+
+			//Procediments sense grups però amb perís consulta
+			procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups();
+			
+			if (!procedimentsSenseGrups.isEmpty()) {
+				procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrups(procedimentsSenseGrups);
+				
+				for (ProcedimentDto procedimentSenseGrupAmbPermis : procedimentsPermisConsultaSenseGrups) {
+					procediments.add(procedimentSenseGrupAmbPermis);
+				}
+			}
+			
 		}
 		notificacions = notificacioService.findAmbFiltrePaginat(
 				entitatActual.getId(),

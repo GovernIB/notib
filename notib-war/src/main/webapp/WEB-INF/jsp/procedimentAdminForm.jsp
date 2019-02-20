@@ -37,12 +37,21 @@ $(document).ready(function() {
 </head>
 <body>
 	<c:set var="formAction"><not:modalUrl value="/procediment/newOrModify"/></c:set>
-	<ul class="nav nav-tabs" role="tablist">
-		<li role="presentation" class="active"><a href="#dadesgeneralsForm" aria-controls="dadesgeneralsForm" role="tab" data-toggle="tab"><spring:message code="procediment.form.titol.dadesgenerals"/></a></li>
-		<li role="presentation"><a href="#registreForm" aria-controls="registreForm" role="tab" data-toggle="tab"><spring:message code="procediment.form.titol.dadesregistre"/></a></li>
-	</ul>
+	<c:forEach items="${errors}" var="error" varStatus="status">
+		<c:if test="${error.field == 'llibre' || error.field == 'oficina'}">
+			<c:set var="errorsRegistre" value="${error.field}"></c:set>
+		</c:if>
+		<c:if test="${error.field == 'codi' || error.field == 'nom' || error.field == 'codisia'}">
+			<c:set var="errorsProc" value="${error.field}"></c:set>
+		</c:if>
+	</c:forEach>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="procedimentCommand" role="form">
 		<form:hidden path="id"/>
+		<ul class="nav nav-tabs" role="tablist">
+			<li role="presentation" class="active"><a href="#dadesgeneralsForm" aria-controls="dadesgeneralsForm" role="tab" data-toggle="tab"><spring:message code="procediment.form.titol.dadesgenerals"/><c:if test='${not empty errorsProc}'> <span class="fa fa-warning text-danger"></span></c:if></a></li>
+			<li role="presentation"><a href="#registreForm" aria-controls="registreForm" role="tab" data-toggle="tab"><spring:message code="procediment.form.titol.dadesregistre"/><c:if test='${not empty errorsRegistre}'> <span class="fa fa-warning text-danger"></span></c:if></a></li>
+		</ul>
+		<br>
 		<div class="tab-content">
 			<div role="tabpanel" class="tab-pane active" id="dadesgeneralsForm">
 				<not:inputText name="codi" textKey="procediment.form.camp.codi" required="true"/>
@@ -63,9 +72,9 @@ $(document).ready(function() {
 				<not:inputCheckbox name="agrupar" textKey="procediment.form.camp.agrupar"/>
 				
 			</div>
-			<div role="tabpanel" class="tab-pane" id="registreForm">
-				<not:inputText name="llibre" textKey="procediment.form.camp.llibre"/>
-				<not:inputText name="oficina" textKey="procediment.form.camp.oficina"/>
+			<div role="tabpanel" class="tab-pane <c:if test='${not empty errorRegistre}'>active</c:if>"" id="registreForm">
+				<not:inputText name="llibre" textKey="procediment.form.camp.llibre" required="true"/>
+				<not:inputText name="oficina" textKey="procediment.form.camp.oficina" required="true"/>
 				<not:inputSelect name="tipusAssumpte" textKey="procediment.form.camp.tipusassumpte" optionItems="${tipusAssumpteEnum}"  optionValueAttribute="value" optionTextKeyAttribute="text"/>
 			</div>
 		</div>

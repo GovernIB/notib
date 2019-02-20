@@ -17,7 +17,9 @@ public class EnviamentDto extends AuditoriaDto {
 	private ServeiTipusEnumDto serveiTipus;
 	private PersonaDto titular;
 	private List<PersonaDto> destinataris;
-	
+	private boolean entregaPostalActiva;
+	private EntregaPostalDto entregaPostal;
+	private EntregaDehDto entregaDeh;
 	
 	public ServeiTipusEnumDto getServeiTipus() {
 		return serveiTipus;
@@ -37,6 +39,25 @@ public class EnviamentDto extends AuditoriaDto {
 	public void setDestinataris(List<PersonaDto> destinataris) {
 		this.destinataris = destinataris;
 	}
+	public boolean isEntregaPostalActiva() {
+		return entregaPostalActiva;
+	}
+	public void setEntregaPostalActiva(boolean entregaPostalActiva) {
+		this.entregaPostalActiva = entregaPostalActiva;
+	}
+	public EntregaPostalDto getEntregaPostal() {
+		return entregaPostal;
+	}
+	public void setEntregaPostal(EntregaPostalDto entregaPostal) {
+		this.entregaPostal = entregaPostal;
+	}
+	public EntregaDehDto getEntregaDeh() {
+		return entregaDeh;
+	}
+	public void setEntregaDeh(EntregaDehDto entregaDeh) {
+		this.entregaDeh = entregaDeh;
+	}
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

@@ -39,7 +39,9 @@ public class ProcedimentCommand {
 	private boolean notificacio;
 	private boolean gestio;
 	private int retard;
+	@NotEmpty @Size(max=64)
 	private String oficina;
+	@NotEmpty @Size(max=64)
 	private String llibre;
 	private TipusAssumpteEnumDto tipusAssumpte;
 	
