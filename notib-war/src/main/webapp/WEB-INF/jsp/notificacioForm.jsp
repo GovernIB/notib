@@ -418,7 +418,7 @@ function validateForm() {
 										<div class="col-md-6">
 											<not:inputText name="enviaments[${j}].destinataris[${i}].dir3codi" textKey="notificacio.form.camp.titular.dir3codi" />
 										</div>
-										<div class="col-Vd-6 text-right">
+										<div class="col-md-6 text-right">
 											<input type="button" class="btn btn-default btn-group delete" name="destinatarisDelete[${j}][${i}]"  onclick="destinatarisDelete(this.id)" id="destinatarisDelete[${j}][${i}]" value="<spring:message code="notificacio.form.boto.eliminar.destinatari"/>"/>
 										</div>
 										<div class="col-md-12">
@@ -426,13 +426,13 @@ function validateForm() {
 										</div>
 									</div>
 								</div>
+							</div>	
+							<div class="col-md-12">
+								<div class="text-right">
+									<input type="button" class="btn btn-default" name="destinatari_[${i}]" id="destinatariAdd[${j}]" onclick="addDestinatari(this.id)" value="<spring:message code="notificacio.form.boto.nou.destinatari"/>"/>
+								</div>
 							</div>
 						</c:forEach>
-						</div>	
-						<div class="col-md-12">
-							<div class="text-right">
-								<input type="button" class="btn btn-default" id="addDestinatri" onclick="addDestinatari()" value="<spring:message code="notificacio.form.boto.nou.destinatari"/>"/>
-							</div>
 						</div>
 						<div class="col-md-12 separacio"></div>
 						<div class="metodeEntrega">
@@ -505,43 +505,23 @@ function validateForm() {
 								</div>
 							</div>
 						</div>
-						</div>
-						<div class="col-md-12 separacio"></div>
-							<div class="metodeEntrega">
-								<div class="col-md-8">
-									<div>
-										<label class="text-primary">${metodeEntrega}</label>
-									</div>
-								</div>
-							</div>
-							<div class="col-md-12 text-right">
-								<div class="btn-group">
-									<input type="button" class="btn btn-default" id="addEnviament" onclick="addEnv()" value="<spring:message code="notificacio.form.boto.nou.enviament"/>" />
-								</div>
-							</div>
-							<div class="col-md-12">
-								<hr>
-							</div>
-							<div class="text-right col-md-12">
-								<div class="btn-group">
-									<button type="submit" class="btn btn-success saveForm"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
-								<div class="col-md-12">
-									<not:inputCheckbox name="entregaPostalActiva" textKey="notificacio.form.camp.entregapostal.activa" labelSize="2" />
-								</div>
-								<div class="entregapostal">
-									<not:entregaDefinir titol="${entregaPostalDades}" />
-								</div>
-								<div class="col-md-12">
-									<not:inputCheckbox name="entregaDeh.obligat" textKey="notificacio.form.camp.entregapostal.deh" labelSize="2" />
-								</div>
-							</div>
+					</div>
+				</div>
+					<div class="col-md-12 text-right">
+						<div class="btn-group">
+							<input type="button" class="btn btn-default" id="addEnviament" onclick="addEnv()" value="<spring:message code="notificacio.form.boto.nou.enviament"/>" />
 						</div>
 					</div>
-			</c:forEach>	
+					<div class="col-md-12">
+						<hr>
+					</div>
+					<div class="text-right col-md-12">
+						<div class="btn-group">
+							<button type="submit" class="btn btn-success saveForm"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+						</div>
+					</div>
+				</c:forEach>	
 			</div>
-		</div>
-		<div id="modal-botons text-right">
-			<button id="addNotificacioButton" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 		</div>	
 	</form:form>
 	
