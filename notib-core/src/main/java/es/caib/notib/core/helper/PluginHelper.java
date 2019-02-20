@@ -3,14 +3,9 @@
  */
 package es.caib.notib.core.helper;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.security.Security;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,14 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.xml.sax.SAXException;
-
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.RegistreAnnexDto;
@@ -67,13 +57,12 @@ import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
-import es.caib.notib.plugin.imprimible.ImprimiblePlugin.IntegracioManager;
 import es.caib.notib.plugin.seu.SeuPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.Firma;
-import es.caib.plugins.arxiu.api.FirmaTipus;
+import es.caib.notib.plugin.utils.PropertiesHelper;
+import es.caib.plugins.arxiu.api.ArxiuException;
+import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
 
 /**
@@ -86,16 +75,22 @@ public class PluginHelper {
 
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
+	public static final String ARXIU_BASE_PROPERTY = "es.caib.notib.plugin.arxiu.";
+	private static final String ARXIUCAIB_BASE_PROPERTY = ARXIU_BASE_PROPERTY + "caib.";
+	private static final int NUM_PAGINES_RESULTAT_CERCA = 100;
+	private static final String VERSIO_INICIAL_CONTINGUT = "1.0";
+	private static final String JERSEY_TIMEOUT_CONNECT = "10000";
+	private static final String JERSEY_TIMEOUT_READ = "60000";
 
 	private DadesUsuariPlugin dadesUsuariPlugin;
 	private GestioDocumentalPlugin gestioDocumentalPlugin;
 	private SeuPlugin seuPlugin;
 //	private RegistrePlugin registrePlugin;
 	private RegistrePluginRegWeb3 registrePluginRegWeb3;
-//	private ImprimiblePlugin imprimiblePlugin;
-	private IntegracioManager integracioManager;
 	private IArxiuPlugin arxiuPlugin;
 	private String integracioArxiuCodi = "ARXIU";
+	
+	private Client versioImprimibleClient;
 
 
 	@Autowired
@@ -1427,8 +1422,8 @@ public class PluginHelper {
 		registre.setAnnexos(new ArrayList<RegistreAnnexDto>());
 		registre.getAnnexos().add(documentToRegistreAnnexDto(notificacio.getDocument()));
 		List<RegistreInteressatDto> interessats = new ArrayList<RegistreInteressatDto>();
-		interessats.add(personaToRegistreInteresatDto(notificacio.getEnviaments().get(0).getTitular()));
-		for(PersonaEntity persona: notificacio.getEnviaments().get(0).getDestinataris()) {
+		interessats.add(personaToRegistreInteresatDto(notificacio.getEnviaments().iterator().next().getTitular()));
+		for(PersonaEntity persona: notificacio.getEnviaments().iterator().next().getDestinataris()) {
 			interessats.add(personaToRegistreInteresatDto(persona));
 		}
 		registre.setInteressats(interessats);
@@ -1449,7 +1444,7 @@ public class PluginHelper {
 		registre.setAnnexos(new ArrayList<RegistreAnnexDto>());
 		registre.getAnnexos().add(documentToRegistreAnnexDto(notificacio.getDocument()));
 		List<RegistreInteressatDto> interessats = new ArrayList<RegistreInteressatDto>();
-		interessats.add(personaToRegistreInteresatDto(notificacio.getEnviaments().get(0).getTitular()));
+		interessats.add(personaToRegistreInteresatDto(notificacio.getEnviaments().iterator().next().getTitular()));
 		registre.setInteressats(interessats);
 		return registre;
 	}
@@ -1485,53 +1480,36 @@ public class PluginHelper {
 			String id = "";
 			if(document.getUuid() != null) {
 				id = document.getUuid();
+				DocumentContingut doc = documentImprimibleUuid(id);			
+				annex.setArxiuContingut(doc.getContingut());
+				annex.setArxiuNom(doc.getArxiuNom());
+				annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
+				annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
+				annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
+				annex.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA);
+				annex.setData(new Date());
+				annex.setIdiomaCodi("ca");
 			} else if (document.getCsv() != null){
-				try {
-					id = document.getCsv();
-					String urlDocument = getPropertyArxiuVerificacioBaseUrl() + document.getCsv();
-					URL url;
-					url = new URL(urlDocument);
-					URLConnection connection = url.openConnection();
-					Object objecte = connection.getContent();
-					
-				} catch (MalformedURLException e) {
-					e.printStackTrace();
-				}catch (IOException e) {
-					e.printStackTrace();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-				
-				System.out.println("ep");
-			        
-	            
-	            
-		     
-				
-				
-//				URL website = new URL(urlDocument);
-//				ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-//				annex.setArxiuContingut(rbc.);
-//				annex.setArxiuContingut(documentImprimible.getContingut().getContingut());
-//				annex.setArxiuNom(documentImprimible.getNom());
-//				annex.setData(new Date());
-//				annex.setIdiomaCodi("ca");
-//				annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
-//				annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
-//				annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
-//				annex.setModeFirma(RegistreModeFirmaEnum.AUTOFIRMA_SI);
+				id = document.getCsv();
+				DocumentContingut doc = documentImprimibleCsv(id);
+				annex.setArxiuContingut(doc.getContingut());
+				annex.setArxiuNom(doc.getArxiuNom());
+				annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
+				annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
+				annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
+				annex.setModeFirma(RegistreModeFirmaEnum.AUTOFIRMA_SI);
+				annex.setData(new Date());
+				annex.setIdiomaCodi("ca");
 			}
-			
-//				RegistreModeFirmaEnum modeFirma = null;
-//				if(documentImprimible.getFirmes().size() > 0) {
-//					modeFirma = RegistreModeFirmaEnum.AUTOFIRMA_NO;
-//				}else {
-//					modeFirma = RegistreModeFirmaEnum.AUTOFIRMA_SI; 
-//				}
-//				annex.setModeFirma(modeFirma);
 		}else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
-			
+			annex.setNom(document.getUrl());
+			annex.setArxiuNom(document.getUrl());
+			annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
+			annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
+			annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
+			annex.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA);
+			annex.setData(new Date());
+			annex.setIdiomaCodi("ca");
 		}else if(document.getContingutBase64() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
 			annex.setArxiuContingut(document.getContingutBase64().getBytes());
 			annex.setArxiuNom(document.getArxiuNom());
@@ -1542,104 +1520,10 @@ public class PluginHelper {
 			annex.setData(new Date());
 			annex.setIdiomaCodi("ca");
 		}
-		
-		
 		/*Llogica de recerca de document*/
 		return annex;
 	}
 	
-	public Document documentDescarregar(String identificador, String versio, boolean ambContingut,
-			boolean ambVersioImprimible) throws SistemaExternException {
-		return arxiuDocumentConsultar(
-				identificador,
-				versio, 
-				ambContingut,
-				ambVersioImprimible);
-	}
-
-	
-	
-	private Document arxiuDocumentConsultar(
-			String arxiuUuid,
-			String versio,
-			boolean ambContingut,
-			boolean ambVersioImprimible) throws SistemaExternException {
-		String accioDescripcio = "Obtenint detalls del document";
-		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put("arxiuUuid", arxiuUuid);
-		accioParams.put("versio", versio);
-		accioParams.put("ambContingut", new Boolean(ambContingut).toString());
-		long t0 = System.currentTimeMillis();
-		Document documentDetalls = null;
-		try {
-			documentDetalls = getArxiuPlugin().documentDetalls(
-					arxiuUuid,
-					versio,
-					ambContingut);
-			integracioAddAccioOk(
-					integracioArxiuCodi,
-					accioDescripcio,
-					accioParams,
-					System.currentTimeMillis() - t0);
-		} catch (Exception ex) {
-			String errorDescripcio = "Error al obtenir detalls del document";
-			integracioAddAccioError(
-					integracioArxiuCodi,
-					accioDescripcio,
-					accioParams,
-					System.currentTimeMillis() - t0,
-					errorDescripcio,
-					ex);
-			throw new SistemaExternException(
-					integracioArxiuCodi,
-					errorDescripcio,
-					ex);
-		}
-		if (ambVersioImprimible && ambContingut && documentDetalls.getFirmes() != null && !documentDetalls.getFirmes().isEmpty()) {
-			boolean isPdf = false;
-			for (Firma firma : documentDetalls.getFirmes()) {
-				if (firma.getTipus() == FirmaTipus.PADES) {
-					isPdf = true;
-				}
-			}
-			if (isPdf) {
-				generarVersioImprimible(documentDetalls);
-			}
-		}
-		return documentDetalls;
-	}
-
-	private void generarVersioImprimible(
-			Document documentDetalls) throws SistemaExternException {
-		String accioDescripcio = "Generant versió imprimible del document";
-		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put("identificador", documentDetalls.getIdentificador());
-		long t0 = System.currentTimeMillis();
-		try {
-			documentDetalls.setContingut(
-					getArxiuPlugin().documentImprimible(
-							documentDetalls.getIdentificador()));
-			integracioAddAccioOk(
-					integracioArxiuCodi,
-					accioDescripcio,
-					accioParams,
-					System.currentTimeMillis() - t0);
-		} catch (Exception ex) {
-			String errorDescripcio = "Error al generar la versió imprimible del document";
-			integracioAddAccioError(
-					integracioArxiuCodi,
-					accioDescripcio,
-					accioParams,
-					System.currentTimeMillis() - t0,
-					errorDescripcio,
-					ex);
-			throw new SistemaExternException(
-					integracioArxiuCodi,
-					errorDescripcio,
-					ex);
-		}
-	}
-
 	private IArxiuPlugin getArxiuPlugin() throws SistemaExternException {
 		if (arxiuPlugin == null) {
 			String pluginClass = getPropertyPluginArxiu();
@@ -1677,42 +1561,168 @@ public class PluginHelper {
 				"es.caib.notib.plugin.arxiu.class");
 	}
 	
-	private void integracioAddAccioOk(
-			String integracioCodi,
-			String descripcio,
-			Map<String, String> parametres,
-			long tempsResposta) {
-		if (integracioManager != null) {
-			integracioManager.addAccioOk(
-					integracioCodi,
-					descripcio,
-					parametres,
-					tempsResposta);
+	public DocumentContingut documentImprimibleCsv(
+			final String identificador) throws ArxiuException {
+		/*
+		 * Les URLs de consulta son les següents:
+		 *   https://intranet.caib.es/concsv/rest/printable/uuid/IDENTIFICADOR?metadata1=METADADA_1&metadata2=METADADA_2&watermark=MARCA_AIGUA
+		 *   https://intranet.caib.es/concsv/rest/printable/CSV?metadata1=METADADA_1&metadata2=METADADA_2&watermark=MARCA_AIGUA
+		 * A on:
+		 *   - CSV és el CSV del document a consultar [OBLIGATORI]
+		 *   - IDENTIFICADOR és el UUID del document a consultar [OBLIGATORI]
+		 *   - METADADA_1 és la primera metadada [OPCIONAL]
+		 *   - METADADA_2 és la segona metadada [OPCIONAL]
+		 *   - MARCA_AIGUA és el text de la marca d'aigua que apareixerà impresa a cada fulla [OPCIONAL]
+		 * Només es obligatori informa la HASH, la resta d'elements son opcionals. Si no s'informen metadades s'imprimeix l'hora i dia de la generació del document imprimible.
+		 */
+		try {
+			InputStream is = generarVersioImprimibleCsv(
+					identificador,
+					null, // metadada 1
+					null, // metadada 2
+					null); // marca d'aigua
+			DocumentContingut contingut = new DocumentContingut();
+			contingut.setArxiuNom("versio_imprimible.pdf");
+			contingut.setTipusMime("application/pdf");
+			contingut.setContingut(IOUtils.toByteArray(is));
+			contingut.setTamany(contingut.getContingut().length);
+			return contingut;
+		} catch (Exception ex) {
+			throw new ArxiuException(
+					"S'ha produit un error generant la versió imprimible del document",
+					ex);
 		}
+		
 	}
 	
-	private void integracioAddAccioError(
-			String integracioCodi,
-			String descripcio,
-			Map<String, String> parametres,
-			long tempsResposta,
-			String errorDescripcio,
-			Throwable throwable) {
-		if (integracioManager != null) {
-			integracioManager.addAccioError(
-					integracioCodi,
-					descripcio,
-					parametres,
-					tempsResposta,
-					errorDescripcio,
-					throwable);
+	public DocumentContingut documentImprimibleUuid(
+			final String identificador) throws ArxiuException {
+		/*
+		 * Les URLs de consulta son les següents:
+		 *   https://intranet.caib.es/concsv/rest/printable/uuid/IDENTIFICADOR?metadata1=METADADA_1&metadata2=METADADA_2&watermark=MARCA_AIGUA
+		 *   https://intranet.caib.es/concsv/rest/printable/CSV?metadata1=METADADA_1&metadata2=METADADA_2&watermark=MARCA_AIGUA
+		 * A on:
+		 *   - CSV és el CSV del document a consultar [OBLIGATORI]
+		 *   - IDENTIFICADOR és el UUID del document a consultar [OBLIGATORI]
+		 *   - METADADA_1 és la primera metadada [OPCIONAL]
+		 *   - METADADA_2 és la segona metadada [OPCIONAL]
+		 *   - MARCA_AIGUA és el text de la marca d'aigua que apareixerà impresa a cada fulla [OPCIONAL]
+		 * Només es obligatori informa la HASH, la resta d'elements son opcionals. Si no s'informen metadades s'imprimeix l'hora i dia de la generació del document imprimible.
+		 */
+		try {
+			InputStream is = generarVersioImprimibleUuid(
+					identificador,
+					null, // metadada 1
+					null, // metadada 2
+					null); // marca d'aigua
+			DocumentContingut contingut = new DocumentContingut();
+			contingut.setArxiuNom("versio_imprimible.pdf");
+			contingut.setTipusMime("application/pdf");
+			contingut.setContingut(IOUtils.toByteArray(is));
+			contingut.setTamany(contingut.getContingut().length);
+			return contingut;
+		} catch (Exception ex) {
+			throw new ArxiuException(
+					"S'ha produit un error generant la versió imprimible del document",
+					ex);
 		}
+		
 	}
 	
-	private String getPropertyArxiuVerificacioBaseUrl() {
-		return PropertiesHelper.getProperties().getProperty(
-				"app.arxiu.verificacio.baseurl");
+	private InputStream generarVersioImprimibleCsv(
+			String identificador,
+			String metadada1,
+			String metadada2,
+			String marcaAigua) throws IOException {
+		String url = getPropertyConversioImprimibleUrlCsv();
+		WebResource webResource;
+		if (url.endsWith("/")) {
+			webResource = getVersioImprimibleClient().
+					resource(url + identificador);
+		} else {
+			webResource = getVersioImprimibleClient().
+					resource(url + "/" + identificador);
+		}
+		if (metadada1 != null) {
+			webResource.queryParam("metadata1", metadada1);
+		}
+		if (metadada2 != null) {
+			webResource.queryParam("metadata2", metadada2);
+		}
+		if (marcaAigua != null) {
+			webResource.queryParam("watermark", marcaAigua);
+		}
+		return webResource.get(InputStream.class);
 	}
+	
+	private InputStream generarVersioImprimibleUuid(
+			String identificador,
+			String metadada1,
+			String metadada2,
+			String marcaAigua) throws IOException {
+		String url = getPropertyConversioImprimibleUrlUuid();
+		WebResource webResource;
+		if (url.endsWith("/")) {
+			webResource = getVersioImprimibleClient().
+					resource(url + identificador);
+		} else {
+			webResource = getVersioImprimibleClient().
+					resource(url + "/" + identificador);
+		}
+		if (metadada1 != null) {
+			webResource.queryParam("metadata1", metadada1);
+		}
+		if (metadada2 != null) {
+			webResource.queryParam("metadata2", metadada2);
+		}
+		if (marcaAigua != null) {
+			webResource.queryParam("watermark", marcaAigua);
+		}
+		return webResource.get(InputStream.class);
+	}
+	
+	private Client getVersioImprimibleClient() {
+		if (versioImprimibleClient == null) {
+			versioImprimibleClient = Client.create();
+			versioImprimibleClient.setConnectTimeout(
+					getPropertyTimeoutConnect());
+			versioImprimibleClient.setReadTimeout(
+					getPropertyTimeoutRead());
+			String usuari = getPropertyConversioImprimibleUsuari();
+			String contrasenya = getPropertyConversioImprimibleContrasenya();
+			if (usuari != null) {
+				versioImprimibleClient.addFilter(
+						new HTTPBasicAuthFilter(usuari, contrasenya));
+			}
+		}
+		return versioImprimibleClient;
+	}
+	
+	private String getPropertyConversioImprimibleUrlCsv() {
+		return PropertiesHelper.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "conversio.imprimible.url.csv");
+	}
+	private String getPropertyConversioImprimibleUrlUuid() {
+		return PropertiesHelper.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "conversio.imprimible.url.uuid");
+	}
+	private String getPropertyConversioImprimibleUsuari() {
+		return PropertiesHelper.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "conversio.imprimible.usuari");
+	}
+	private String getPropertyConversioImprimibleContrasenya() {
+		return PropertiesHelper.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "conversio.imprimible.contrasenya");
+	}
+	private int getPropertyTimeoutConnect() {
+		String timeout = PropertiesHelper.getProperties().getProperty(
+				ARXIUCAIB_BASE_PROPERTY + "timeout.connect",
+				JERSEY_TIMEOUT_CONNECT);
+		return Integer.parseInt(timeout);
+	}
+	private int getPropertyTimeoutRead() {
+		String timeout = PropertiesHelper.getProperties().getProperty(
+				ARXIUCAIB_BASE_PROPERTY + "timeout.read",
+				JERSEY_TIMEOUT_READ);
+		return Integer.parseInt(timeout);
+	}
+
 	
 
 	private static final Logger logger = LoggerFactory.getLogger(PluginHelper.class);
