@@ -136,6 +136,33 @@ public interface NotificacioService {
 			List<ProcedimentDto> procediments);
 	
 	/**
+	 * Consulta de les notificacions segons els paràmetres del filtre.
+	 * 
+	 * @param filtre
+	 *            Paràmetres per a filtrar els resultats.
+	 * @param paginacioParams
+	 *            Paràmetres per a dur a terme la paginació del resultats.
+	 * @return La pàgina amb les notificacions.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrups(
+			List<ProcedimentDto> procediments);
+	
+	
+	/**
+	 * Consulta de les notificacions segons els paràmetres del filtre.
+	 * 
+	 * @param filtre
+	 *            Paràmetres per a filtrar els resultats.
+	 * @param paginacioParams
+	 *            Paràmetres per a dur a terme la paginació del resultats.
+	 * @return La pàgina amb les notificacions.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrups(
+			List<ProcedimentDto> procediments);
+	
+	/**
 	 * Consulta dels events d'una notificació.
 	 * 
 	 * @param notificacioId

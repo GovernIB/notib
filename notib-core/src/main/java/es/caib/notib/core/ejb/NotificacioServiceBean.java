@@ -185,6 +185,21 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.findProcedimentsAmbPermisNotificacioAndGrups(procediments);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrups(
+			List<ProcedimentDto> procediments) {
+		return delegate.findProcedimentsAmbPermisNotificacioSenseGrups(procediments);
+	}
+
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrups(
+			List<ProcedimentDto> procediments) {
+		return delegate.findProcedimentsAmbPermisConsultaSenseGrups(procediments);
+	}
+
 	
 
 }

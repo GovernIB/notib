@@ -7,11 +7,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 
 public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, Long> {
 
+
+	
+	@Query(
+			"from " + 
+			"	ProcedimentEntity pro " +
+			"where pro not in (:procediments)")
+	public List<ProcedimentEntity> findProcedimentsSenseGrups(
+			@Param("procediments") List<ProcedimentEntity> procediments);
 	
 	List<ProcedimentEntity> findByEntitatActiva(boolean activa);
 	

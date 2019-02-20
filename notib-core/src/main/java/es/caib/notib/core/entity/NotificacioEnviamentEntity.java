@@ -1071,35 +1071,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 				built.formatSobre = enviament.getEntregaPostal().getFormatSobre();
 				built.formatFulla = enviament.getEntregaPostal().getFormatFulla();
 				built.dehObligat = enviament.getEntregaDeh().isObligat();
-			}else if(notificacio.getEntregaPostal() != null) {
-				built.domiciliViaNom = notificacio.getEntregaPostal().getViaNom();
-				built.domiciliNumeracioNumero = notificacio.getEntregaPostal().getNumeroCasa();
-				built.domiciliNumeracioQualificador = notificacio.getEntregaPostal().getNumeroQualificador();
-				built.domiciliNumeracioPuntKm = notificacio.getEntregaPostal().getPuntKm();
-				built.domiciliApartatCorreus = notificacio.getEntregaPostal().getApartatCorreus();
-				built.domiciliPortal = notificacio.getEntregaPostal().getPortal();
-				built.domiciliEscala = notificacio.getEntregaPostal().getEscala();
-				built.domiciliPlanta = notificacio.getEntregaPostal().getPlanta();
-				built.domiciliPorta = notificacio.getEntregaPostal().getPorta();
-				built.domiciliBloc = notificacio.getEntregaPostal().getBloc();
-				built.domiciliComplement = notificacio.getEntregaPostal().getComplement();
-				built.domiciliCodiPostal = notificacio.getEntregaPostal().getCodiPostal();
-				built.domiciliPoblacio = notificacio.getEntregaPostal().getPoblacio();
-				built.domiciliMunicipiCodiIne = notificacio.getEntregaPostal().getMunicipiCodi();
-				built.domiciliProvinciaCodi = notificacio.getEntregaPostal().getProvinciaCodi();
-				built.domiciliPaisCodiIso = notificacio.getEntregaPostal().getPaisCodi();
-				built.domiciliLinea1 = notificacio.getEntregaPostal().getLinea1();
-				built.domiciliLinea2 = notificacio.getEntregaPostal().getLinea2();
-				built.domiciliCie = notificacio.getEntregaPostal().getCie();
-				built.formatSobre = notificacio.getEntregaPostal().getFormatSobre();
-				built.formatFulla = notificacio.getEntregaPostal().getFormatFulla();
-				built.dehObligat = notificacio.getEntregaDeh().isObligat();
 			}
-			
-			
-			
-			
-			
 			
 			built.titular = titular;
 			built.destinataris = destinataris;

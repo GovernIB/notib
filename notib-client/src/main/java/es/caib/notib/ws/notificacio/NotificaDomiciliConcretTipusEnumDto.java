@@ -1,19 +1,42 @@
-/**
- * 
- */
+
 package es.caib.notib.ws.notificacio;
 
-import java.io.Serializable;
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlType;
+
 
 /**
- * Enumerat que indica el tipus de domicili concret per a un destinatari
- * de Notific@.
+ * <p>Clase Java para notificaDomiciliConcretTipusEnumDto.
  * 
- * @author Limit Tecnologies <limit@limit.es>
+ * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
+ * <p>
+ * <pre>
+ * &lt;simpleType name="notificaDomiciliConcretTipusEnumDto">
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
+ *     &lt;enumeration value="NACIONAL"/>
+ *     &lt;enumeration value="ESTRANGER"/>
+ *     &lt;enumeration value="APARTAT_CORREUS"/>
+ *     &lt;enumeration value="SENSE_NORMALITZAR"/>
+ *   &lt;/restriction>
+ * &lt;/simpleType>
+ * </pre>
+ * 
  */
-public enum NotificaDomiciliConcretTipusEnumDto implements Serializable {
-	NACIONAL,
-	ESTRANGER,
-	APARTAT_CORREUS,
-	SENSE_NORMALITZAR
+@XmlType(name = "notificaDomiciliConcretTipusEnumDto")
+@XmlEnum
+public enum NotificaDomiciliConcretTipusEnumDto {
+
+    NACIONAL,
+    ESTRANGER,
+    APARTAT_CORREUS,
+    SENSE_NORMALITZAR;
+
+    public String value() {
+        return name();
+    }
+
+    public static NotificaDomiciliConcretTipusEnumDto fromValue(String v) {
+        return valueOf(v);
+    }
+
 }

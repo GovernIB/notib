@@ -14,6 +14,7 @@ public class PersonaCommand {
 
 	@NotEmpty @Size(max=50)
 	private String nom;
+	@NotEmpty @Size(max=50)
 	private String llinatge1;
 	private String llinatge2;
 	@NotEmpty @Size(max=50)

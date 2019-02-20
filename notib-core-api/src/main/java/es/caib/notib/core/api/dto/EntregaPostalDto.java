@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
+
 public class EntregaPostalDto implements Serializable{
 
 	private NotificaDomiciliNumeracioTipusEnumDto tipus;

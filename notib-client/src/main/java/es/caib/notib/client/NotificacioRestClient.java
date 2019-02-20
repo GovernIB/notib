@@ -27,6 +27,7 @@ import com.sun.jersey.api.representation.Form;
 import es.caib.loginModule.client.AuthenticationFailureException;
 import es.caib.notib.ws.notificacio.Notificacio;
 import es.caib.notib.ws.notificacio.NotificacioService;
+import es.caib.notib.ws.notificacio.NotificacioServiceV2;
 import es.caib.notib.ws.notificacio.NotificacioV2;
 import es.caib.notib.ws.notificacio.RespostaAlta;
 import es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament;
@@ -37,7 +38,7 @@ import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class NotificacioRestClient implements NotificacioService {
+public class NotificacioRestClient implements NotificacioService, NotificacioServiceV2 {
 
 	private static final String NOTIFICACIO_SERVICE_PATH = "/api/services/notificacio";
 

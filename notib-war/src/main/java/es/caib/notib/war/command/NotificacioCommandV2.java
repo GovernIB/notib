@@ -66,11 +66,8 @@ public class NotificacioCommandV2 {
 	private PersonaCommand titular;
 	private PersonaCommand destinatari = new PersonaCommand();
 	private List<PersonaCommand> destinataris = new ArrayList<PersonaCommand>();
+	@NotNull
 	private List<EnviamentCommand> enviaments = new ArrayList<EnviamentCommand>();
-	
-	private boolean entregaPostalActiva;
-	private EntregapostalCommand entregaPostal;
-	private EntregaDehCommand entregaDeh;
 	
 	public Long getId() {
 		return id;
@@ -191,24 +188,6 @@ public class NotificacioCommandV2 {
 	}
 	public void setEnviaments(List<EnviamentCommand> enviaments) {
 		this.enviaments = enviaments;
-	}
-	public boolean isEntregaPostalActiva() {
-		return entregaPostalActiva;
-	}
-	public void setEntregaPostalActiva(boolean entregaPostalActiva) {
-		this.entregaPostalActiva = entregaPostalActiva;
-	}
-	public EntregapostalCommand getEntregaPostal() {
-		return entregaPostal;
-	}
-	public void setEntregaPostal(EntregapostalCommand entregaPostal) {
-		this.entregaPostal = entregaPostal;
-	}
-	public EntregaDehCommand getEntregaDeh() {
-		return entregaDeh;
-	}
-	public void setEntregaDeh(EntregaDehCommand entregaDeh) {
-		this.entregaDeh = entregaDeh;
 	}
 	public DocumentCommand getDocument() {
 		return document;

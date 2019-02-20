@@ -116,7 +116,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 //		GrupEntity grup = null;
 //		
 		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
-					entitat,
+					null,
 				 	notificacio.getProcediment().getId(),
 				 	false,
 				 	false,
@@ -192,8 +192,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 		for (Enviament enviament: enviaments) {
 			if (enviament.getTitular() != null) {
 				ServeiTipusEnumDto serveiTipus = null;
-				if (notificacio.getServeiTipus() != null) {
-					switch (notificacio.getServeiTipus()) {
+				if (enviament.getServeiTipus() != null) {
+					switch (enviament.getServeiTipus()) {
 					case NORMAL:
 						serveiTipus = ServeiTipusEnumDto.NORMAL;
 						break;
@@ -223,10 +223,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 							break;
 						}
 //						tipus = NotificaDomiciliTipusEnumDto.CONCRETO;
-					} else {
-						throw new ValidationException(
-								"ENTREGA_POSTAL",
-								"L'entrega postal te el camp tipus buit");
 					}
 					if (enviament.getEntregaPostal().getNumeroCasa() != null) {
 						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.NUMERO;
@@ -273,9 +269,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 			} else {
 				//TODO: Registrar Normal
 				try {
-					pluginHelper.registrarSortida(pluginHelper.notificacioToRegistreAnotacioV2(notificacioEntity), "NOTIB", aplicacioService.getVersioActual());
+					pluginHelper.registrarSortida(
+							pluginHelper.notificacioToRegistreAnotacioV2(notificacioEntity), 
+							"NOTIB", 
+							aplicacioService.getVersioActual());
 				} catch (RegistrePluginException e) {
-					e.getMessage();
+					throw new ValidationException(
+							"REGISTRE_SORTIDA",
+							"No s'ha pogut registrar la sortida: " + e.getMessage());
 				}
 				notificaHelper.notificacioEnviar(notificacioEntity.getId());
 				notificacioEntity = notificacioRepository.findOne(notificacioEntity.getId());
@@ -513,6 +514,26 @@ public class NotificacioServiceImpl implements NotificacioService {
 				procediments,
 				new Permission[] {
 						ExtendedPermission.NOTIFICACIO}
+				);	
+	}
+	
+	@Override
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrups(
+			List<ProcedimentDto> procediments) {
+		return entityComprovarHelper.findByGrupAndPermisConsultaProcedimentsUsuariActual(
+				procediments,
+				new Permission[] {
+						ExtendedPermission.NOTIFICACIO}
+				);	
+	}
+	
+	@Override
+	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrups(
+			List<ProcedimentDto> procediments) {
+		return entityComprovarHelper.findByGrupAndPermisConsultaProcedimentsUsuariActual(
+				procediments,
+				new Permission[] {
+						ExtendedPermission.READ}
 				);	
 	}
 	
