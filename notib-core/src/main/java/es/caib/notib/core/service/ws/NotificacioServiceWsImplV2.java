@@ -279,11 +279,24 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					destinataris.add(destinatari);
 				}
 //				NotificacioEnviamentEntity.BuilderV2 enviamentBuilder = ;
+				EntregaPostalViaTipusEnum viaTipus = null;
 				
+				if (enviament.getEntregaPostal() != null) {
+					viaTipus = enviament.getEntregaPostal().getViaTipus();
+				}
 				NotificacioEnviamentEntity enviamentSaved = notificacioEnviamentRepository.saveAndFlush(
 						NotificacioEnviamentEntity.getBuilderV2(
-								enviament, conversioHelper.convertir(notificacio, NotificacioDtoV2.class), numeracioTipus, tipusConcret, serveiTipus, notificacioGuardada, titular, destinataris)
-								.domiciliViaTipus(toEnviamentViaTipusEnum(enviament.getEntregaPostal().getViaTipus())).build());
+								enviament, 
+								conversioHelper.convertir(
+										notificacio, 
+										NotificacioDtoV2.class), 
+								numeracioTipus, 
+								tipusConcret, 
+								serveiTipus, 
+								notificacioGuardada, 
+								titular, 
+								destinataris)
+						.domiciliViaTipus(toEnviamentViaTipusEnum(viaTipus)).build());
 				
 				String referencia;
 				try {

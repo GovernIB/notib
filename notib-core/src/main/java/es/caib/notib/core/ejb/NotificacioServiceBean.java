@@ -23,7 +23,7 @@ import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.NotificacioService;
 
 /**
- * Implementació de EntitatService com a EJB que empra una clase
+ * Implementació de NotificacioService com a EJB que empra una clase
  * delegada per accedir a la funcionalitat del servei.
  * 
  * @author Limit Tecnologies <limit@limit.es>
@@ -40,7 +40,6 @@ public class NotificacioServiceBean implements NotificacioService {
 	public NotificacioDtoV2 findAmbId(Long id) {
 		return delegate.findAmbId(id);
 	}
-
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
@@ -192,7 +191,6 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.findProcedimentsAmbPermisNotificacioSenseGrups(procediments);
 	}
 
-
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrups(
@@ -200,13 +198,10 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.findProcedimentsAmbPermisConsultaSenseGrups(procediments);
 	}
 
-
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public NotificacioEnviamenEstatDto marcarComProcessada(Long entitatId, Long enviamentId) {
 		return delegate.marcarComProcessada(entitatId, enviamentId);
 	}
-
-	
 
 }

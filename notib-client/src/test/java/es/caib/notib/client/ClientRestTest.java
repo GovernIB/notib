@@ -28,14 +28,14 @@ import es.caib.notib.ws.notificacio.RespostaAlta;
  */
 public class ClientRestTest extends ClientBaseTest {
 
-	/*
-	private static final String URL = "http://localhost:8180/notib";
-	private static final String USERNAME = "notapp";
-	private static final String PASSWORD = "notapp";
-	*/
-	private static final String URL = "http://dev.caib.es/notib";
-	private static final String USERNAME = "$ripea_notib";
-	private static final String PASSWORD = "ripea_notib";
+	
+	private static final String URL = "http://localhost:8081/notib";
+	private static final String USERNAME = "admin";
+	private static final String PASSWORD = "admin";
+	
+	//private static final String URL = "http://dev.caib.es/notib";
+	//private static final String USERNAME = "$ripea_notib";
+	//private static final String PASSWORD = "ripea_notib";
 
 	/*
 	@Rule

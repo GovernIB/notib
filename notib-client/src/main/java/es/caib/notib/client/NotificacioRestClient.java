@@ -40,13 +40,14 @@ import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
  */
 public class NotificacioRestClient implements NotificacioService, NotificacioServiceV2 {
 
-	private static final String NOTIFICACIO_SERVICE_PATH = "/api/services/notificacioV2";
-
+	private static final String NOTIFICACIO_SERVICE_PATH = "/api/services/notificacio";
+	private static final String NOTIFICACIOV2_SERVICE_PATH = "/api/services/notificacioV2";
+	
 	private String baseUrl;
 	private String username;
 	private String password;
 
-	private boolean serveiDesplegatDamuntJboss = true;
+	private boolean serveiDesplegatDamuntJboss = false;
 
 	public NotificacioRestClient(
 			String baseUrl,
@@ -89,7 +90,7 @@ public class NotificacioRestClient implements NotificacioService, NotificacioSer
 	public RespostaAlta alta(
 			NotificacioV2 notificacio) {
 		try {
-			String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/alta";
+			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/alta";
 			ObjectMapper mapper  = new ObjectMapper();
 			String body = mapper.writeValueAsString(notificacio);
 			Client jerseyClient = generarClient();

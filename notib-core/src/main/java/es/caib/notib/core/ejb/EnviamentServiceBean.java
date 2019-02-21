@@ -4,9 +4,11 @@
 package es.caib.notib.core.ejb;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 
@@ -27,7 +29,7 @@ import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.EnviamentService;
 
 /**
- * Implementació de EntitatService com a EJB que empra una clase
+ * Implementació de EnviamentService com a EJB que empra una clase
  * delegada per accedir a la funcionalitat del servei.
  * 
  * @author Limit Tecnologies <limit@limit.es>
@@ -41,74 +43,88 @@ public class EnviamentServiceBean implements EnviamentService {
 
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public List<Long> findIdsAmbFiltre(
 			Long entitatId, 
-			NotificacioEnviamentFiltreDto filtre) throws NotFoundException {
-		// TODO Auto-generated method stub
-		return null;
+			NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException {
+		return delegate.findIdsAmbFiltre(entitatId, filtre);
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByEntityAndFiltre(
 			EntitatDto entitat,
 			NotificacioEnviamentFiltreDto filtre,
-			PaginacioParamsDto paginacio) {
-		// TODO Auto-generated method stub
-		return null;
+			PaginacioParamsDto paginacio) throws ParseException {
+		return delegate.enviamentFindByEntityAndFiltre(
+				entitat, 
+				filtre, 
+				paginacio);
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public List<NotificacioEnviamentDto> enviamentFindAmbNotificacio(Long notificacioId) {
-		// TODO Auto-generated method stub
-		return null;
+		return delegate.enviamentFindAmbNotificacio(notificacioId);
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public NotificacioEnviamentDto enviamentFindAmbId(Long enviamentId) {
-		// TODO Auto-generated method stub
-		return null;
+		return delegate.enviamentFindAmbId(enviamentId);
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public List<NotificacioEventDto> eventFindAmbNotificacio(Long notificacioId) {
-		// TODO Auto-generated method stub
-		return null;
+		return delegate.eventFindAmbNotificacio(notificacioId);
 	}
 	
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public void columnesCreate(
 			UsuariDto usuaris, 
 			Long entitatId, 
 			ColumnesDto columnes) {
-		// TODO Auto-generated method stub
-		
+		delegate.columnesCreate(
+				usuaris, 
+				entitatId, 
+				columnes);
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public void columnesUpdate(
 			Long entitatId, 
 			ColumnesDto columnes) {
-		// TODO Auto-generated method stub
-		
+		delegate.columnesUpdate(
+				entitatId, 
+				columnes);
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public ColumnesDto getColumnesUsuari(
 			Long entitatId, 
 			UsuariDto usuari) {
-		// TODO Auto-generated method stub
-		return null;
+		return delegate.getColumnesUsuari(
+				entitatId, 
+				usuari);
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public FitxerDto exportacio(
 			Long entitatId, 
 			Collection<Long> enviamentIds, 
 			String format,
 			NotificacioEnviamentFiltreDto filtre)
-			throws IOException, NotFoundException {
-		// TODO Auto-generated method stub
-		return null;
+			throws IOException, NotFoundException, ParseException {
+		return delegate.exportacio(
+				entitatId, 
+				enviamentIds, 
+				format, 
+				filtre);
 	}
 
 	

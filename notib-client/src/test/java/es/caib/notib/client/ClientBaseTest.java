@@ -42,13 +42,13 @@ import es.caib.notib.ws.notificacio.Persona;
 public class ClientBaseTest {
 
 //	Entitat: A04013511 (DGTIC) ò A04003003 (Govern)
-	protected static final String ENTITAT_DIR3CODI = "A04013511";
+	protected static final String ENTITAT_DIR3CODI = "L01070276";
 //	protected static final String ORGAN_CODI = "A04013501";
-	protected static final String ORGAN_CODI = "A04013511";
+	protected static final String ORGAN_CODI = "L01070276";
 	protected static final String LLIBRE = "L99";
 	protected static final String OFICINA = "O00009390";
 	protected static final String UNITAT_ADMINISTRATIVA_SISTRA = "1";
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "846823";
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "AJINCA";
 	protected static final String IDENTIFICADOR_PROCEDIMENT_SISTRA = "IN0026NSPI";
 	protected static final String IDIOMA = "ca";
 
@@ -68,7 +68,7 @@ public class ClientBaseTest {
 				"descripcio_" + notificacioId);
 		notificacio.setEnviamentDataProgramada(null);
 		notificacio.setRetard(5);
-		notificacio.setCaducitat(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000));
+		notificacio.setCaducitat(toXmlGregorianCalendar(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000)));
 //				toXmlGregorianCalendar(
 //						);
 		Document document = new Document();
@@ -95,12 +95,12 @@ public class ClientBaseTest {
 			pagadorPostal.setDir3Codi("A04013511");
 			pagadorPostal.setFacturacioClientCodi("ccFac_" + notificacioId);
 			pagadorPostal.setContracteNum("pccNum_" + notificacioId);
-			pagadorPostal.setContracteDataVigencia(new Date(0));
+			pagadorPostal.setContracteDataVigencia(toXmlGregorianCalendar(new Date(0)));
 //					);
 			notificacio.setPagadorPostal(pagadorPostal);
 			PagadorCie pagadorCie = new PagadorCie();
 			pagadorCie.setDir3Codi("A04013511");
-			pagadorCie.setContracteDataVigencia(new Date(0));
+			pagadorCie.setContracteDataVigencia(toXmlGregorianCalendar(new Date(0)));
 //					toXmlGregorianCalendar();
 			notificacio.setPagadorCie(pagadorCie);
 		}

@@ -263,18 +263,17 @@ public class EnviamentServiceImpl implements EnviamentService {
 	
 	@Override
 	@Transactional(readOnly = true)
-	public NotificacioEnviamentDto enviamentFindAmbId(Long destinatariId) {
+	public NotificacioEnviamentDto enviamentFindAmbId(Long enviamentId) {
 		logger.debug("Consulta de destinatari donat el seu id (" +
-				"destinatariId=" + destinatariId + ")");
-		NotificacioEnviamentEntity destinatari =
-				notificacioEnviamentRepository.findOne(destinatariId);
+				"destinatariId=" + enviamentId + ")");
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		//NotificacioEntity notificacio = notificacioRepository.findOne( destinatari.getNotificacio().getId() );
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
 				true,
 				false);
-		return enviamentToDto(destinatari);
+		return enviamentToDto(enviament);
 	}
 
 	@Override

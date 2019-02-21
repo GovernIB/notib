@@ -10,9 +10,15 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.notib.core.api.dto.RegistreAnotacioDto;
 import es.caib.notib.core.api.service.RegistreService;
 
+/**
+ * Implementació de RegistreService com a EJB que empra una clase
+ * delegada per accedir a la funcionalitat del servei.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
 @Stateless
 @Interceptors(SpringBeanAutowiringInterceptor.class)
-public class RegistreServiceBean implements RegistreService{
+public class RegistreServiceBean implements RegistreService {
 
 	@Autowired
 	RegistreService delegate;
