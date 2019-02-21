@@ -29,6 +29,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	List<NotificacioEnviamentEntity> findByNotificacioId(
 			Long notificacioId);
 	
+	NotificacioEnviamentEntity findById(Long id);
 	
 	@Query(value = "FROM NotificacioEnviamentEntity n WHERE n.notificacio = :notificacio")
 	List<NotificacioEnviamentEntity> findByNotificacio(
