@@ -200,6 +200,13 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.findProcedimentsAmbPermisConsultaSenseGrups(procediments);
 	}
 
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public NotificacioEnviamenEstatDto marcarComProcessada(Long entitatId, Long enviamentId) {
+		return delegate.marcarComProcessada(entitatId, enviamentId);
+	}
+
 	
 
 }
