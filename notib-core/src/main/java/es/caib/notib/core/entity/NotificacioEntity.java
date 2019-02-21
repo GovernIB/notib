@@ -208,6 +208,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private String registreObservacions;
 	
 	
+	
+	
 
 	public String getEmisorDir3Codi() {
 		return emisorDir3Codi;
@@ -721,6 +723,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.seuProcedimentCodi = seuProcedimentCodi;
 			return this;
 		}
+		public BuilderV1 usuariCodi(String usuariCodi) {
+			built.usuariCodi = usuariCodi;
+			return this;
+		}
 		public NotificacioEntity build() {
 			return built;
 		}
@@ -778,6 +784,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		}
 		public BuilderV2 registreLlibre(String registreLlibre) {
 			built.registreLlibre = registreLlibre;
+			return this;
+		}
+		public BuilderV2 usuariCodi(String usuariCodi) {
+			built.usuariCodi = usuariCodi;
 			return this;
 		}
 //		public Builder registreExtracte(String registreExtracte) {

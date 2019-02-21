@@ -28,6 +28,14 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
 	private String notificaCertificacioArxiuNom;
+	private Date notificaCertificacioData;
+	private NotificacioEnviamentEstatEnumDto notificaEstat;
+	private Date notificaEstatData;
+	private String notificaDatatErrorDescripcio;
+	private String notificaDatatOrigen;
+	private String notificaDatatReceptorNif;
+	private String notificaDatatReceptorNom;
+	private String notificaDatatNumSeguiment;
 
 	
 
@@ -108,6 +116,54 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	}
 	public void setNotificaCertificacioArxiuNom(String notificaCertificacioArxiuNom) {
 		this.notificaCertificacioArxiuNom = notificaCertificacioArxiuNom;
+	}
+	public Date getNotificaCertificacioData() {
+		return notificaCertificacioData;
+	}
+	public void setNotificaCertificacioData(Date notificaCertificacioData) {
+		this.notificaCertificacioData = notificaCertificacioData;
+	}
+	public NotificacioEnviamentEstatEnumDto getNotificaEstat() {
+		return notificaEstat;
+	}
+	public Date getNotificaEstatData() {
+		return notificaEstatData;
+	}
+	public void setNotificaEstatData(Date notificaEstatData) {
+		this.notificaEstatData = notificaEstatData;
+	}
+	public void setNotificaEstat(NotificacioEnviamentEstatEnumDto notificaEstat) {
+		this.notificaEstat = notificaEstat;
+	}
+	public String getNotificaDatatErrorDescripcio() {
+		return notificaDatatErrorDescripcio;
+	}
+	public void setNotificaDatatErrorDescripcio(String notificaDatatErrorDescripcio) {
+		this.notificaDatatErrorDescripcio = notificaDatatErrorDescripcio;
+	}
+	public String getNotificaDatatOrigen() {
+		return notificaDatatOrigen;
+	}
+	public void setNotificaDatatOrigen(String notificaDatatOrigen) {
+		this.notificaDatatOrigen = notificaDatatOrigen;
+	}
+	public String getNotificaDatatReceptorNif() {
+		return notificaDatatReceptorNif;
+	}
+	public void setNotificaDatatReceptorNif(String notificaDatatReceptorNif) {
+		this.notificaDatatReceptorNif = notificaDatatReceptorNif;
+	}
+	public String getNotificaDatatReceptorNom() {
+		return notificaDatatReceptorNom;
+	}
+	public void setNotificaDatatReceptorNom(String notificaDatatReceptorNom) {
+		this.notificaDatatReceptorNom = notificaDatatReceptorNom;
+	}
+	public String getNotificaDatatNumSeguiment() {
+		return notificaDatatNumSeguiment;
+	}
+	public void setNotificaDatatNumSeguiment(String notificaDatatNumSeguiment) {
+		this.notificaDatatNumSeguiment = notificaDatatNumSeguiment;
 	}
 	public String getTitularLlinatges() {
 		return concatenarLlinatges(

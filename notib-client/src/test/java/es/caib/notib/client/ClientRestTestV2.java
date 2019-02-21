@@ -26,38 +26,38 @@ import es.caib.notib.ws.notificacio.RespostaAlta;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class ClientRestTest extends ClientBaseTest {
+public class ClientRestTestV2 extends ClientBaseTest {
 
-	/*
-	private static final String URL = "http://localhost:8180/notib";
-	private static final String USERNAME = "notapp";
-	private static final String PASSWORD = "notapp";
-	*/
-	private static final String URL = "http://dev.caib.es/notib";
-	private static final String USERNAME = "$ripea_notib";
-	private static final String PASSWORD = "ripea_notib";
+	
+	private static final String URL = "http://localhost:8081/notib";
+	private static final String USERNAME = "admin";
+	private static final String PASSWORD = "admin";
+	
+//	private static final String URL = "http://dev.caib.es/notib";
+//	private static final String USERNAME = "$ripea_notib";
+//	private static final String PASSWORD = "ripea_notib";
 
 	/*
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
 	*/
 
-	private NotificacioRestClient client;
+	private NotificacioRestClient clientV2;
 
 	@Before
 	public void setUp() throws IOException, DecoderException {
-		client = NotificacioRestClientFactory.getRestClient(
+		clientV2 = NotificacioRestClientFactory.getRestClientV2(
 				URL,
 				USERNAME,
 				PASSWORD);
 		// client.setServeiDesplegatDamuntJboss(false);
 	}
-
+	
 	@Test
-	public void test() throws DatatypeConfigurationException, IOException, DecoderException {
+	public void testV2() throws DatatypeConfigurationException, IOException, DecoderException {
 		String notificacioId = new Long(System.currentTimeMillis()).toString();
-		RespostaAlta respostaAlta = client.alta(
-				generarNotificacio(
+		RespostaAlta respostaAlta = clientV2.alta(
+				generarNotificacioV2(
 						notificacioId,
 						1,
 						false));
@@ -85,6 +85,5 @@ public class ClientRestTest extends ClientBaseTest {
 				EnviamentEstatEnum.PENDENT_SEU,
 				respostaConsultaEstatEnviament.getEstat());*/
 	}
-	
 
 }

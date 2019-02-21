@@ -38,6 +38,7 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
+import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistrePluginException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -113,6 +114,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 	
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		
 		String documentGesdocId = null;
 //		GrupEntity grup = null;
 //		
@@ -133,7 +136,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			documentGesdocId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 					new ByteArrayInputStream(notificacio.getDocument().getContingutBase64().getBytes()));
-		} 
+		}
 		
 		DocumentEntity documentEntity = documentRepository.saveAndFlush(DocumentEntity.getBuilderV2(
 				notificacio.getDocument().getArxiuId(), 
@@ -163,13 +166,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 						notificacio.getCaducitat(),
 						documentEntity,
 						notificacio.getUsuariCodi(),
-						notificacio.getProcedimentCodiNotib(),
+						procediment.getCodi(),
 						procediment,
 						notificacio.getGrupCodi(),
 						notificacio.getNumeroExpedient(),
 						notificacio.getRefExterna(),
 						notificacio.getObservacions()
-						);
+						).usuariCodi(usuariActual.getCodi());
 
 
 		
@@ -261,7 +264,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						getBuilderV2(enviament, notificacio, numeracioTipus, tipusConcret, serveiTipus, notificacioGuardada, titular, destinataris).build()));
 			}
 		}
-		
+		notificacioEntity.getEnviaments().addAll(enviamentsEntity);
 		notificacioEntity = notificacioRepository.saveAndFlush(notificacioEntity);
 		// Comprovar on s'ha d'enviar
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioEntity.getComunicacioTipus())) {
@@ -1044,9 +1047,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 //		notificacioEntity.addEnviament(enviamentSaved);
 //	}
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceImpl.class);
-
-
-	
 
 
 }

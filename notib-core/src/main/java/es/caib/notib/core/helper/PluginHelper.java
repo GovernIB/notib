@@ -1483,26 +1483,34 @@ public class PluginHelper {
 			String id = "";
 			if(document.getUuid() != null) {
 				id = document.getUuid();
-				DocumentContingut doc = documentImprimibleUuid(id);			
-				annex.setArxiuContingut(doc.getContingut());
-				annex.setArxiuNom(doc.getArxiuNom());
-				annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
-				annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
-				annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
-				annex.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA);
-				annex.setData(new Date());
-				annex.setIdiomaCodi("ca");
+				try {
+					annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
+					annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
+					annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
+					annex.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA);
+					annex.setData(new Date());
+					annex.setIdiomaCodi("ca");
+					DocumentContingut doc = documentImprimibleUuid(id);
+					annex.setArxiuContingut(doc.getContingut());
+					annex.setArxiuNom(doc.getArxiuNom());
+				}catch(ArxiuException ae) {
+					logger.error("Error Obtenint el document per l'uuid");
+				}
 			} else if (document.getCsv() != null){
 				id = document.getCsv();
-				DocumentContingut doc = documentImprimibleCsv(id);
-				annex.setArxiuContingut(doc.getContingut());
-				annex.setArxiuNom(doc.getArxiuNom());
-				annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
-				annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
-				annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
-				annex.setModeFirma(RegistreModeFirmaEnum.AUTOFIRMA_SI);
-				annex.setData(new Date());
-				annex.setIdiomaCodi("ca");
+				try {
+					annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
+					annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
+					annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
+					annex.setModeFirma(RegistreModeFirmaEnum.AUTOFIRMA_SI);
+					annex.setData(new Date());
+					annex.setIdiomaCodi("ca");
+					DocumentContingut doc = documentImprimibleCsv(id);
+					annex.setArxiuContingut(doc.getContingut());
+					annex.setArxiuNom(doc.getArxiuNom());
+				}catch(ArxiuException ae) {
+					logger.error("Error Obtenint el document per l'uuid");
+				}
 			}
 		}else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
 			annex.setNom(document.getUrl());
