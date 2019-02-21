@@ -40,7 +40,7 @@ import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
  */
 public class NotificacioRestClient implements NotificacioService, NotificacioServiceV2 {
 
-	private static final String NOTIFICACIO_SERVICE_PATH = "/api/services/notificacio";
+	private static final String NOTIFICACIO_SERVICE_PATH = "/api/services/notificacioV2";
 
 	private String baseUrl;
 	private String username;

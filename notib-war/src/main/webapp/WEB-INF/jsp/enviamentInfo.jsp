@@ -65,7 +65,7 @@ $(document).ready(function() {
 		</li>
 		<li role="presentation"<c:if test="${pipellaActiva == 'estatSeu'}"> class="active"</c:if>>
 			<a href="#estatSeu" aria-controls="estatSeu" role="tab" data-toggle="tab">
-				<spring:message code="enviament.info.tab.estat.seu"/>
+				<spring:message code="enviament.info.tab.estat.registre"/>
 			</a>
 		</li>
 		<li role="presentation"<c:if test="${pipellaActiva == 'events'}"> class="active"</c:if>>
@@ -459,7 +459,7 @@ $(document).ready(function() {
 		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'estatSeu'}"> active</c:if>" id="estatSeu">
 			<c:if test="${empty enviament.notificacio.seuRegistreNumero}">
 				<div class="alert alert-warning well-sm" role="alert" style="margin-top: 1em">
-					<spring:message code="enviament.info.estat.seu.no.enviada"/>
+					<spring:message code="enviament.info.estat.registre.no.enviada"/>
 				</div>
 				<c:if test="${enviament.notificacio.estat != 'PENDENT'}">
 					<c:if test="${notificacio.enviamentTipus == 'COMUNICACIO'}">
