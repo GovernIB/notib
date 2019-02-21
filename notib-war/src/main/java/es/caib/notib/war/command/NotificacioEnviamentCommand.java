@@ -3,6 +3,11 @@ package es.caib.notib.war.command;
 import java.util.Date;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+/**
+ * Command per al manteniment d'enviaments de l'interfície rest.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
 public class NotificacioEnviamentCommand {
 	
 	private Long id;

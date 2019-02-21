@@ -17,7 +17,7 @@ import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
 /**
- * Command per al manteniment de notificacions.
+ * Command per al manteniment de notificacions V1.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -49,7 +49,6 @@ public class NotificacioCommand {
 	private boolean documentGenerarCsv;
 	private NotificacioEstatEnumDto estat;
 	private NotificacioEnviamentEstatEnumDto estatNotifica;
-	
 	private boolean entregaPostalActiva;
 	private EntregapostalCommand entregaPostal;
 	private boolean entregaDeh;

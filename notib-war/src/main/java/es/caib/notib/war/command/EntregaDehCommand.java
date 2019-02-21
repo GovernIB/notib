@@ -4,13 +4,12 @@ import javax.validation.constraints.Size;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
-
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.EntregaDehDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
 /**
- * Command per al manteniment de entregues direcció electrònica
+ * Command per al manteniment de entregues direcció electrònica.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  *

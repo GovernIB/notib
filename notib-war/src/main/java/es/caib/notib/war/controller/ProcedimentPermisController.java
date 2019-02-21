@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
@@ -28,7 +26,7 @@ import es.caib.notib.war.helper.RolHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
- * Controlador per el mantinemnt de permisos de procediments
+ * Controlador per el mantinemnt de permisos de procediments.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  *

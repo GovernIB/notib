@@ -1,10 +1,7 @@
 package es.caib.notib.war.controller;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,12 +21,12 @@ import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.ProcedimentCommand;
 import es.caib.notib.war.command.ProcedimentFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
+import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.RequestSessionHelper;
 import es.caib.notib.war.helper.RolHelper;
-import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
- * Controlador per el mantinemnt de procediments
+ * Controlador per el mantinemnt de procediments.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  *

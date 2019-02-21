@@ -1,13 +1,9 @@
 package es.caib.notib.war.command;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorPostalDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
@@ -15,7 +11,7 @@ import es.caib.notib.core.api.dto.TipusAssumpteEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
 /**
- * Command per al manteniment de procediments
+ * Command per al manteniment de procediments.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  *

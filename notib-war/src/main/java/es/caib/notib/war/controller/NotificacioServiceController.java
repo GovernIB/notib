@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-
 import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWs;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;

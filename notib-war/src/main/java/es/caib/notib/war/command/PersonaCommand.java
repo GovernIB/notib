@@ -1,14 +1,16 @@
 package es.caib.notib.war.command;
 
-import java.util.List;
-
 import javax.validation.constraints.Size;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
-
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
+
+/**
+ * Command per al manteniment de persones (Titulars | Destinataris).
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
 
 public class PersonaCommand {
 
@@ -66,17 +68,6 @@ public class PersonaCommand {
 		this.dir3codi = dir3codi;
 	}
 
-	public List<PersonaCommand> toListCommand(PersonaCommand command){
-		try {
-			List<PersonaCommand> destinataris;
-			
-			command.getNom();
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-		return null;
-	}
-	
 	public static PersonaCommand asCommand(PersonaDto dto) {
 		if (dto == null) {
 			return null;

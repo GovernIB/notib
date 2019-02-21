@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import es.caib.notib.core.api.dto.ColumnesDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
@@ -41,7 +40,7 @@ import es.caib.notib.war.helper.EntitatHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
 /**
- * Controlador per a la consulta i gestió de notificacions.
+ * Controlador per el mantinement d'enviaments.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -279,14 +278,12 @@ public class EnviamentController extends BaseUserController {
 			BindingResult bindingResult,
 			Model model) throws IOException {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-		UsuariDto usuari = aplicacioService.getUsuariActual();
 		
 		if (bindingResult.hasErrors()) {
 			return "procedimentAdminForm";
 		}
-		
+	
 		model.addAttribute(new NotificacioFiltreCommand());
-		
 		enviamentService.columnesUpdate(
 					entitat.getId(),
 					ColumnesCommand.asDto(columnesCommand));
