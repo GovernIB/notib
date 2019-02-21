@@ -4,15 +4,12 @@
 package es.caib.notib.war.controller;
 
 import java.io.IOException;
-
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.web.servlet.support.RequestContext;
-
 import es.caib.notib.war.helper.AjaxHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.ModalHelper;

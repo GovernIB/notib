@@ -4,7 +4,6 @@
 package es.caib.notib.war.controller;
 
 import javax.servlet.http.HttpServletRequest;
-
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.war.helper.EntitatHelper;
 

@@ -13,7 +13,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
 import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.NotificaComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
@@ -24,7 +23,7 @@ import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
 /**
- * Command per al manteniment de notificacions manuals.
+ * Command per al manteniment de notificacions manuals (V2).
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -49,7 +48,6 @@ public class NotificacioCommandV2 {
 	private TipusDocumentEnumDto tipusDocument;
 	private String documentArxiuUuidCsv;
 	private MultipartFile arxiu;
-	//Paràmetres registre
 	private String oficina;
 	private String llibre;
 	private String extracte;
@@ -60,8 +58,6 @@ public class NotificacioCommandV2 {
 	private String refExterna;
 	private String codiAssumpte;
 	private String observacions;
-	
-	// Enviament
 	private ServeiTipusEnumDto serveiTipus;
 	private PersonaCommand titular;
 	private PersonaCommand destinatari = new PersonaCommand();

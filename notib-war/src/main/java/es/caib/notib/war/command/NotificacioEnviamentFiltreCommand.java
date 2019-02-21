@@ -9,6 +9,11 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioTipusEnviamentEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
+/**
+ * Command per al manteniment del filtre d'enviaments.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
 public class NotificacioEnviamentFiltreCommand {
 	
 	private Long id;

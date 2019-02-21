@@ -4,14 +4,11 @@
 package es.caib.notib.war.command;
 
 import java.util.List;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
-
-import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 
 /**
- * Command per al manteniment de notificacions manuals.
+ * Command per al manteniment d'enviaments.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

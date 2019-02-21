@@ -25,7 +25,7 @@ import es.caib.notib.war.helper.RolHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
- * Controlador per el mantinemnt de pagadors cie
+ * Controlador per el mantinemnt de pagadors cie.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  *

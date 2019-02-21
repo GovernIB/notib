@@ -9,7 +9,7 @@ import es.caib.notib.core.api.dto.TipusGrupEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
 /**
- * Command per al manteniment de grups.
+ * Command per al manteniment dels grups d'un procediments (VERIÓ ANTERIOR).
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
