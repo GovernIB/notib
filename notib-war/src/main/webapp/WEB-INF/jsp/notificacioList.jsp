@@ -193,7 +193,13 @@ $(document).ready(function() {
 				</th>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="5%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<a href="<c:url value="/notificacio/{{:id}}"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a>
+						<div class="dropdown">
+							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+							<ul class="dropdown-menu">
+								<li><a href="<c:url value="/notificacio/{{:id}}/processar"/>"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a></li>
+								<li><a href="<c:url value="/notificacio/{{:id}}"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="comu.boto.detalls"/></a></li>
+							</ul>
+						</div>
 					</script>
 				</th>
 			</tr>

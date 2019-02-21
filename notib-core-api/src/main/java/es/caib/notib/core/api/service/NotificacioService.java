@@ -236,6 +236,18 @@ public interface NotificacioService {
 			Long enviamentId);
 
 	/**
+	 * Refresca l'estat d'un enviament (datat i certificació).
+	 * 
+	 * @param enviamentId
+	 *            Atribut id de l'enviament.
+	 * @return l'estat de l'enviament.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	public NotificacioEnviamenEstatDto marcarComProcessada(
+			Long entitatId,
+			Long enviamentId);
+	
+	/**
 	 * Mètode d'execució periòdica per a fer els enviaments pendents
 	 * a Notific@.
 	 */

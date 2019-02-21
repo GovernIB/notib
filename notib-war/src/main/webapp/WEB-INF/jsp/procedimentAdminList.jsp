@@ -64,11 +64,16 @@
 				<th data-col-name="pagadorpostal.dir3codi"><spring:message code="procediment.list.columna.pagadorpostal"/></th>
 				<th data-col-name="pagadorcie.dir3codi"><spring:message code="procediment.list.columna.pagadorcie"/></th>
 				<th data-col-name="agrupar" data-visible="false" id="agrupable"></th>
+			
 				<th data-col-name="id" data-template="#cellGrupsTemplate" data-orderable="false" width="10%">
 					<script id="cellGrupsTemplate" type="text/x-jsrender">
-					<a href="${unitatCodiUrlPrefix}procediment/{{:id}}/grup" class="btn btn-default"><span class="fa fa-users"></span>&nbsp;<spring:message code="procediment.list.boto.grups"/>&nbsp;</a>
+					{{if agrupar != true}}
+						<button class="btn btn-default" disabled><span class="fa fa-users"></span>&nbsp;<spring:message code="procediment.list.boto.grups"/>&nbsp;</a>
+					{{else}}
+						<a href="${unitatCodiUrlPrefix}procediment/{{:id}}/grup" class="btn btn-default"><span class="fa fa-users"></span>&nbsp;<spring:message code="procediment.list.boto.grups"/>&nbsp;</button>
+					{{/if}}
 					</script>
-				</th>
+				</th>	
 				<th data-col-name="id" data-template="#cellPermisosTemplate" data-orderable="false" width="10%">
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
 						<a href="${unitatCodiUrlPrefix}procediment/{{:id}}/permis" class="btn btn-default"><span class="fa fa-key"></span>&nbsp;<spring:message code="procediment.list.boto.permisos"/>&nbsp;</a>
