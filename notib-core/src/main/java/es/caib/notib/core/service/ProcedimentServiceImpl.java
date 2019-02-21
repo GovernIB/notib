@@ -124,6 +124,12 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(
 				procediment.getPagadorcie().getId());
 		
+		List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepository.findByProcediment(procedimentEntity);
+		
+		if (!procediment.isAgrupar()) {
+			grupProcedimentRepository.delete(grupsProcediment);
+		}
+		
 		procedimentEntity.update(
 					procediment.getCodi(),
 					procediment.getNom(),

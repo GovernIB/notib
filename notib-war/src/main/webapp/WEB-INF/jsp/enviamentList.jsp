@@ -214,7 +214,7 @@ function getCookie(cname) {
   						<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.exportar"/> <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu">
-						<li><a href="enviament/export/ODS"><spring:message code="enviament.list.user.exportar.EXCEL"/></a></li> 
+						<li><a href="<c:url value="enviament/export/ODS"/>"><spring:message code="enviament.list.user.exportar.EXCEL"/></a></li> 
 					</ul>
 				</div>
 				<div class="btn-group">

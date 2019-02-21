@@ -30,6 +30,7 @@ import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
+import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -279,7 +280,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							"No s'ha pogut registrar la sortida: " + e.getMessage());
 				}
 				notificaHelper.notificacioEnviar(notificacioEntity.getId());
-				notificacioEntity = notificacioRepository.findOne(notificacioEntity.getId());
+				notificacioEntity = notificacioRepository.findById(notificacioEntity.getId());
 			}
 		}
 
@@ -339,29 +340,50 @@ public class NotificacioServiceImpl implements NotificacioService {
 		PaginaDto<NotificacioDto> resultatPagina = null;
 		Page<NotificacioEntity> notificacions = null;
 		List<String> procedimentsCodisNotib = new ArrayList<String>();
+		List<ProcedimentDto> procedimentsPermisConsultaAndAgrupable = new ArrayList<ProcedimentDto>();
 		List<ProcedimentDto> procedimentsPermisConsulta = new ArrayList<ProcedimentDto>();
 		
-		if (isUsuari)
-			if (grupsProcediments.isEmpty()) 
+		if (isUsuari) {
+			if (grupsProcediments.isEmpty()) {
 				//Obté tots els procediments amb permís de consutla
-				procedimentsPermisConsulta = entityComprovarHelper.findPermisProcedimentsUsuariActual(
+				procedimentsPermisConsultaAndAgrupable = entityComprovarHelper.findPermisProcedimentsUsuariActual(
 					new Permission[] {
 							ExtendedPermission.READ}
 					);
-			else if (!procediments.isEmpty())
+			} else if (!procediments.isEmpty()) {
 				//Obté els procediments amb grup i permís de consulta
-				procedimentsPermisConsulta = entityComprovarHelper.findByGrupAndPermisConsultaProcedimentsUsuariActual(
+				procedimentsPermisConsultaAndAgrupable = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActual(
 						procediments, 
 						new Permission[] {
 								ExtendedPermission.READ}
 						);
-		
-			if (!procedimentsPermisConsulta.isEmpty()) {
-					for (ProcedimentDto procedimentDto : procedimentsPermisConsulta) {
+				//Procediments amb permís de consulta no agurpables
+
+				List<ProcedimentDto> procedimentsNoAgrupables = new ArrayList<ProcedimentDto>();
+				for(ProcedimentDto procediment: procediments) {
+					if (!procediment.isAgrupar()) {
+						procedimentsNoAgrupables.add(procediment);
+					}
+				}
+				
+				procedimentsPermisConsulta = entityComprovarHelper.findByPermisProcedimentsUsuariActual(
+						procedimentsNoAgrupables, 
+						new Permission[] {
+								ExtendedPermission.READ}
+						);
+				
+			}
+			if (!procedimentsPermisConsultaAndAgrupable.isEmpty()) {
+					for (ProcedimentDto procedimentDto : procedimentsPermisConsultaAndAgrupable) {
 						procedimentsCodisNotib.add(procedimentDto.getCodi());
 					}
 			}
-		
+			if (!procedimentsPermisConsulta.isEmpty()) {
+				for (ProcedimentDto procedimentDto : procedimentsPermisConsulta) {
+					procedimentsCodisNotib.add(procedimentDto.getCodi());
+				}
+			}
+		}
 		
 		if (filtre == null) {
 			//Consulta les notificacions sobre les quals té permis l'usuari actual
@@ -483,7 +505,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaAndGrups(
 			List<ProcedimentDto> procediments) {
-		return entityComprovarHelper.findByGrupAndPermisConsultaProcedimentsUsuariActual(
+		return entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActual(
 				procediments,
 				new Permission[] {
 						ExtendedPermission.READ}
@@ -510,7 +532,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrups(
 			List<ProcedimentDto> procediments) {
-		return entityComprovarHelper.findByGrupAndPermisConsultaProcedimentsUsuariActual(
+		return entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActual(
 				procediments,
 				new Permission[] {
 						ExtendedPermission.NOTIFICACIO}
@@ -520,7 +542,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrups(
 			List<ProcedimentDto> procediments) {
-		return entityComprovarHelper.findByGrupAndPermisConsultaProcedimentsUsuariActual(
+		return entityComprovarHelper.findByPermisProcedimentsUsuariActual(
 				procediments,
 				new Permission[] {
 						ExtendedPermission.NOTIFICACIO}
@@ -530,7 +552,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrups(
 			List<ProcedimentDto> procediments) {
-		return entityComprovarHelper.findByGrupAndPermisConsultaProcedimentsUsuariActual(
+		return entityComprovarHelper.findByPermisProcedimentsUsuariActual(
 				procediments,
 				new Permission[] {
 						ExtendedPermission.READ}
@@ -641,6 +663,22 @@ public class NotificacioServiceImpl implements NotificacioService {
 				enviament,
 				estatDto);
 		return estatDto;
+	}
+	
+	@Override
+	public NotificacioEnviamenEstatDto marcarComProcessada(
+			Long entitatId, 
+			Long notificacioId) {
+		logger.debug("Refrescant l'estat de la notificació a PROCESSAT (" +
+				"notificacioId=" + notificacioId + ")");
+		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId);
+		
+		NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(
+				entitatEntity, 
+				notificacioId);
+		notificacioEntity.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
+		notificacioRepository.saveAndFlush(notificacioEntity);
+		return null;
 	}
 /*
 	@Override

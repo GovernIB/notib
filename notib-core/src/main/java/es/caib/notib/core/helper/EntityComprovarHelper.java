@@ -340,7 +340,7 @@ public class EntityComprovarHelper {
 			EntitatEntity entitat,
 			Long id) {
 		
-		NotificacioEntity notificacio = notificacioRepository.findOne(id);
+		NotificacioEntity notificacio = notificacioRepository.findById(id);
 		if (notificacio == null) {
 			throw new NotFoundException(
 					id,
@@ -559,7 +559,7 @@ public class EntityComprovarHelper {
 		return resposta;
 	}
 	
-	public List<ProcedimentDto> findByGrupAndPermisConsultaProcedimentsUsuariActual(
+	public List<ProcedimentDto> findByGrupAndPermisProcedimentsUsuariActual(
 			List<ProcedimentDto> procediments,
 			Permission[] permisos) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -568,7 +568,10 @@ public class EntityComprovarHelper {
 		
 		//Conversió de dto a entity per comprovar permisos
 		for (ProcedimentDto procedimentDto : procediments) {
-			procedimentsEntity.add(procedimentRepository.findOne(procedimentDto.getId()));
+			ProcedimentEntity procedimentEntity = procedimentRepository.findOne(procedimentDto.getId());
+			if (procedimentEntity.isAgrupar()) {
+					procedimentsEntity.add(procedimentEntity);
+			}
 		}
 		permisosHelper.filterGrantedAny(
 				procedimentsEntity,
@@ -588,7 +591,7 @@ public class EntityComprovarHelper {
 		return resposta;
 	}
 	
-	public List<ProcedimentDto> findByGrupAndPermisNotificacioProcedimentsUsuariActual(
+	public List<ProcedimentDto> findByPermisConsultaProcedimentsUsuariActual(
 			List<ProcedimentDto> procediments,
 			Permission[] permisos) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -597,7 +600,38 @@ public class EntityComprovarHelper {
 		
 		//Conversió de dto a entity per comprovar permisos
 		for (ProcedimentDto procedimentDto : procediments) {
-			procedimentsEntity.add(procedimentRepository.findOne(procedimentDto.getId()));
+			ProcedimentEntity procedimentEntity = procedimentRepository.findOne(procedimentDto.getId());
+			procedimentsEntity.add(procedimentEntity);
+		}
+		permisosHelper.filterGrantedAny(
+				procedimentsEntity,
+				new ObjectIdentifierExtractor<ProcedimentEntity>() {
+					public Long getObjectIdentifier(ProcedimentEntity procedimentsEntity) {
+						return procedimentsEntity.getId();
+					}
+				},
+				ProcedimentEntity.class,
+				permisos,
+				auth);
+		
+		resposta = conversioTipusHelper.convertirList(
+				procedimentsEntity,
+				ProcedimentDto.class);
+		
+		return resposta;
+	}
+	
+	public List<ProcedimentDto> findByPermisProcedimentsUsuariActual(
+			List<ProcedimentDto> procediments,
+			Permission[] permisos) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		List<ProcedimentEntity> procedimentsEntity = new ArrayList<ProcedimentEntity>();
+		List<ProcedimentDto> resposta;
+		
+		//Conversió de dto a entity per comprovar permisos
+		for (ProcedimentDto procedimentDto : procediments) {
+			ProcedimentEntity procedimentEntity = procedimentRepository.findOne(procedimentDto.getId());
+			procedimentsEntity.add(procedimentEntity);
 		}
 		permisosHelper.filterGrantedAny(
 				procedimentsEntity,
@@ -641,7 +675,7 @@ public class EntityComprovarHelper {
 	}
 	
 	public boolean hasGrupPermisConsultaProcediment(List<ProcedimentDto> procediments) {
-		List<ProcedimentDto> resposta = findByGrupAndPermisConsultaProcedimentsUsuariActual(
+		List<ProcedimentDto> resposta = findByGrupAndPermisProcedimentsUsuariActual(
 				procediments,
 				new Permission[] {
 						ExtendedPermission.READ}
@@ -651,7 +685,7 @@ public class EntityComprovarHelper {
 	}
 	
 	public boolean hasGrupPermisNotificacioProcediment(List<ProcedimentDto> procediments) {
-		List<ProcedimentDto> resposta = findByGrupAndPermisNotificacioProcedimentsUsuariActual(
+		List<ProcedimentDto> resposta = findByGrupAndPermisProcedimentsUsuariActual(
 				procediments,
 				new Permission[] {
 						ExtendedPermission.NOTIFICACIO}
