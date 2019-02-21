@@ -22,7 +22,6 @@ import es.caib.notib.ws.notificacio.Document;
 import es.caib.notib.ws.notificacio.DocumentV2;
 import es.caib.notib.ws.notificacio.EntregaDeh;
 import es.caib.notib.ws.notificacio.EntregaPostal;
-import es.caib.notib.ws.notificacio.EntregaPostalTipusEnum;
 import es.caib.notib.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.ws.notificacio.Enviament;
 import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
@@ -34,7 +33,6 @@ import es.caib.notib.ws.notificacio.PagadorCie;
 import es.caib.notib.ws.notificacio.PagadorPostal;
 import es.caib.notib.ws.notificacio.ParametresSeu;
 import es.caib.notib.ws.notificacio.Persona;
-import es.caib.notib.ws.notificacio.ServeiTipusEnum;
 
 /**
  * Base per als tests del servei de notificacions de NOTIB.
@@ -70,7 +68,7 @@ public class ClientBaseTest {
 				"descripcio_" + notificacioId);
 		notificacio.setEnviamentDataProgramada(null);
 		notificacio.setRetard(5);
-		notificacio.setCaducitat(toXmlGregorianCalendar(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000)));
+		notificacio.setCaducitat(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000));
 //				toXmlGregorianCalendar(
 //						);
 		Document document = new Document();
@@ -97,12 +95,12 @@ public class ClientBaseTest {
 			pagadorPostal.setDir3Codi("A04013511");
 			pagadorPostal.setFacturacioClientCodi("ccFac_" + notificacioId);
 			pagadorPostal.setContracteNum("pccNum_" + notificacioId);
-			pagadorPostal.setContracteDataVigencia(toXmlGregorianCalendar(new Date(0)));
+			pagadorPostal.setContracteDataVigencia(new Date(0));
 //					);
 			notificacio.setPagadorPostal(pagadorPostal);
 			PagadorCie pagadorCie = new PagadorCie();
 			pagadorCie.setDir3Codi("A04013511");
-			pagadorCie.setContracteDataVigencia(toXmlGregorianCalendar(new Date(0)));
+			pagadorCie.setContracteDataVigencia(new Date(0));
 //					toXmlGregorianCalendar();
 			notificacio.setPagadorCie(pagadorCie);
 		}
