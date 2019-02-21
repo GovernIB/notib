@@ -65,6 +65,9 @@ public class NotificacioEnviamentHelper {
 				}
 				env.setDestinataris(destinataris);
 				EntregaDehDto entregaDehDto = new EntregaDehDto();
+				if(enviament.getDehObligat() == null) {
+					enviament.setDehObligat(false);
+				}
 				entregaDehDto.setObligat(enviament.getDehObligat());
 				env.setEntregaDeh(entregaDehDto);
 				

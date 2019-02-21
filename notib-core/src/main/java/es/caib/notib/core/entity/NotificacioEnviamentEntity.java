@@ -528,6 +528,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			String notificaReferencia) {
 		this.notificaReferencia = notificaReferencia;
 	}
+	public void setDehObligat(Boolean dehObligat) {
+		this.dehObligat = dehObligat;
+	}
 	public void updateNotificaEnviada(
 			String notificaIdentificador) {
 		this.notificaIdentificador = notificaIdentificador;
