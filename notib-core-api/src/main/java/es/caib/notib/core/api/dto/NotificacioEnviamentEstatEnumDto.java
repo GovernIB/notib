@@ -49,26 +49,27 @@ import java.io.Serializable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum NotificacioEnviamentEstatEnumDto implements Serializable {
-	NOTIB_PENDENT,			// 0
+	NOTIB_PENDENT,			
 	NOTIB_ENVIADA,
 	ABSENT,
 	ADRESA_INCORRECTA,
 	DESCONEGUT,
-	ENVIADA_CI,				// 5
+	ENVIADA_CI,				
 	ENVIADA_DEH,
 	ENVIAMENT_PROGRAMAT,
 	ENTREGADA_OP,
 	ERROR_ENTREGA,
-	EXPIRADA,				// 10
+	EXPIRADA,				
 	EXTRAVIADA,
 	MORT,
 	LLEGIDA,
 	NOTIFICADA,
 	PENDENT,
-	PENDENT_ENVIAMENT,		// 15
+	PENDENT_ENVIAMENT,		
 	PENDENT_SEU,
 	PENDENT_CIE,
 	PENDENT_DEH,
 	REBUTJADA,
-	SENSE_INFORMACIO		// 20
+	SENSE_INFORMACIO,
+	FINALITZADA
 }

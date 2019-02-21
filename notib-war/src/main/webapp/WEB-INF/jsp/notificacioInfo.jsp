@@ -250,8 +250,8 @@ $(document).ready(function() {
 					</tbody>
 					</table>
 				</div>
-			</c:if>
-		</div> --%>
+			</c:if> --%>
+		</div>
 		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'events'}"> active</c:if>" id="events">
 			<table
 				id="events"

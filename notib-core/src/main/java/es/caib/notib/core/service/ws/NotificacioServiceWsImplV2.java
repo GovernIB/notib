@@ -25,6 +25,7 @@ import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
+import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.RegistrePluginException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
@@ -104,6 +105,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			NotificacioV2 notificacio) throws NotificacioServiceWsException {
 		String emisorDir3Codi = notificacio.getEmisorDir3Codi();
 		RespostaAlta resposta = new RespostaAlta();
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 
 		if (emisorDir3Codi == null) {
 			resposta.setError(true);
@@ -199,7 +201,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					notificacio.getCodiGrup(),
 					notificacio.getNumExpedient(),
 					notificacio.getRefExterna(),
-					notificacio.getObservacions());
+					notificacio.getObservacions()).usuariCodi(usuariActual.getCodi());
 			
 			NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioBuilder.build());
 			List<EnviamentReferencia> referencies = new ArrayList<EnviamentReferencia>();

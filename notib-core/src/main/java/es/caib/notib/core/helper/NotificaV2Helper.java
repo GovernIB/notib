@@ -93,7 +93,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 	public boolean notificacioEnviar(
 			Long notificacioId) {
-		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
+		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
 		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
 		try {
 			ResultadoAltaRemesaEnvios resultadoAlta = enviaNotificacio(notificacio);

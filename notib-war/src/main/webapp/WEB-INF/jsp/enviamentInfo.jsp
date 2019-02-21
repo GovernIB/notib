@@ -151,10 +151,13 @@ $(document).ready(function() {
 									<td>${enviament.titular.nom}</td>
 								</tr>
 							</c:if>
-							<c:if test="${not empty enviament.titular.llinatges}">
+							<c:if test="${not empty enviament.titular.llinatge1}">
 								<tr>
 									<td><strong><spring:message code="enviament.info.titular.llinatges"/></strong></td>
-									<td>${enviament.titular.llinatges}</td>
+									<td>${enviament.titular.llinatge1}</td>
+									<c:if test="${not empty titular.llinatge2}">
+										<td>${titular.llinatge2}</td>
+									</c:if>
 								</tr>
 							</c:if>
 							<c:if test="${not empty enviament.titular.telefon}">
@@ -173,49 +176,54 @@ $(document).ready(function() {
 						</table>
 					</div>
 				</div>
-				<%-- <c:if test="${not empty enviament.destinatariNif}">
-					<div class="col-sm-6">
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<h3 class="panel-title">
-									<strong><spring:message code="enviament.info.seccio.destinatari"/></strong>
-								</h3>
-			 				</div>
-							<table class="table table-bordered" style="width:100%">
-							<tbody>
-								<tr>
-									<td><strong><spring:message code="enviament.info.destinatari.nif"/></strong></td>
-									<td>${enviament.destinatariNif}</td>
-								</tr>
-								<c:if test="${not empty enviament.destinatariNom}">
+				<c:forEach var="destinatari" items="${enviament.destinataris}" varStatus="loop">
+					<c:if test="${not empty destinatari.nif}">
+						<div class="col-sm-6">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h3 class="panel-title">
+										<strong><spring:message code="enviament.info.seccio.destinatari"/> nº ${loop.index+1}</strong>
+									</h3>
+				 				</div>
+								<table class="table table-bordered" style="width:100%">
+								<tbody>
 									<tr>
-										<td width="30%"><strong><spring:message code="enviament.info.destinatari.nom"/></strong></td>
-										<td>${enviament.destinatariNom}</td>
+										<td><strong><spring:message code="enviament.info.destinatari.nif"/></strong></td>
+										<td>${destinatari.nif}</td>
 									</tr>
-								</c:if>
-								<c:if test="${not empty enviament.destinatariLlinatges}">
-									<tr>
-										<td><strong><spring:message code="enviament.info.destinatari.llinatges"/></strong></td>
-										<td>${enviament.destinatariLlinatges}</td>
-									</tr>
-								</c:if>
-								<c:if test="${not empty enviament.destinatariTelefon}">
-									<tr>
-										<td><strong><spring:message code="enviament.info.destinatari.telefon"/></strong></td>
-										<td>${enviament.destinatariTelefon}</td>
-									</tr>
-								</c:if>
-								<c:if test="${not empty enviament.destinatariEmail}">
-									<tr>
-										<td><strong><spring:message code="enviament.info.destinatari.email"/></strong></td>
-										<td>${enviament.destinatariEmail}</td>
-									</tr>
-								</c:if>
-							</tbody>
-							</table>
+									<c:if test="${not empty destinatari.nom}">
+										<tr>
+											<td width="30%"><strong><spring:message code="enviament.info.destinatari.nom"/></strong></td>
+											<td>${destinatari.nom}</td>
+										</tr>
+									</c:if>
+									<c:if test="${not empty destinatari.llinatge1}">
+										<tr>
+											<td><strong><spring:message code="enviament.info.destinatari.llinatges"/></strong></td>
+											<td>${destinatari.llinatge1}</td>
+											<c:if test="${not empty destinatari.llinatge2}">
+												<td>${destinatari.llinatge2}</td>
+											</c:if>
+										</tr>
+									</c:if>
+									<c:if test="${not empty destinatari.telefon}">
+										<tr>
+											<td><strong><spring:message code="enviament.info.destinatari.telefon"/></strong></td>
+											<td>${destinatari.telefon}</td>
+										</tr>
+									</c:if>
+									<c:if test="${not empty destinatari.email}">
+										<tr>
+											<td><strong><spring:message code="enviament.info.destinatari.email"/></strong></td>
+											<td>${destinatari.email}</td>
+										</tr>
+									</c:if>
+								</tbody>
+								</table>
+							</div>
 						</div>
-					</div>
-				</c:if> --%>
+					</c:if>
+				</c:forEach>
 			</div>
 			<c:if test="${not empty enviament.entregaPostal.ConcretTipus}">
 				<div class="panel panel-default">

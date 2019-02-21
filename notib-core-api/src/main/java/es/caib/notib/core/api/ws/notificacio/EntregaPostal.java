@@ -6,6 +6,7 @@ package es.caib.notib.core.api.ws.notificacio;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 
 /**
