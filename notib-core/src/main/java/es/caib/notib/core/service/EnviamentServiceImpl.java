@@ -266,8 +266,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 	public NotificacioEnviamentDto enviamentFindAmbId(Long destinatariId) {
 		logger.debug("Consulta de destinatari donat el seu id (" +
 				"destinatariId=" + destinatariId + ")");
-		NotificacioEnviamentEntity destinatari =
-				notificacioEnviamentRepository.findOne(destinatariId);
+		NotificacioEnviamentEntity destinatari = notificacioEnviamentRepository.findById(destinatariId);
 		//NotificacioEntity notificacio = notificacioRepository.findOne( destinatari.getNotificacio().getId() );
 		entityComprovarHelper.comprovarPermisos(
 				null,

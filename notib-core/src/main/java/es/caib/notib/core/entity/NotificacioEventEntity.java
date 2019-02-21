@@ -19,6 +19,8 @@ import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.ForeignKey;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
@@ -52,7 +54,10 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_id")
 	@ForeignKey(name = "not_notifi_noteve_fk")
+	@NotFound(action = NotFoundAction.IGNORE)
 	private NotificacioEntity notificacio;
+	@Column(name="notificacio_id")
+	private Long notificacioId;
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_env_id")
 	@ForeignKey(name = "not_notenv_noteve_fk")
@@ -100,6 +105,12 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	}
 	public String getCallbackError() {
 		return callbackError;
+	}
+	public Long getNotificacioId() {
+		return notificacioId;
+	}
+	public void setNotificacio(NotificacioEntity notificacio) {
+		this.notificacio = notificacio;
 	}
 	public void updateCallbackClient(
 			CallbackEstatEnumDto estat,

@@ -159,8 +159,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	public boolean enviamentRefrescarEstat(
 			Long enviamentId) throws SistemaExternException {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
-		NotificacioEntity notificacio = enviament.getNotificacio();
-		
+		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
+		enviament.setNotificacio(notificacio);
 //		NotificacioEnviamentEstatEnumDto estatActual = enviament.getNotificaEstat();
 		Date dataUltimDatat = enviament.getNotificaDataCreacio();
 		Date dataUltimaCertificacio = enviament.getNotificaCertificacioData();

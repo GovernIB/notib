@@ -154,10 +154,11 @@ $(document).ready(function() {
 							<c:if test="${not empty enviament.titular.llinatge1}">
 								<tr>
 									<td><strong><spring:message code="enviament.info.titular.llinatges"/></strong></td>
-									<td>${enviament.titular.llinatge1}</td>
+									<td>${enviament.titular.llinatge1} 
 									<c:if test="${not empty titular.llinatge2}">
-										<td>${titular.llinatge2}</td>
+										${titular.llinatge2}
 									</c:if>
+									</td>
 								</tr>
 							</c:if>
 							<c:if test="${not empty enviament.titular.telefon}">
@@ -200,10 +201,11 @@ $(document).ready(function() {
 									<c:if test="${not empty destinatari.llinatge1}">
 										<tr>
 											<td><strong><spring:message code="enviament.info.destinatari.llinatges"/></strong></td>
-											<td>${destinatari.llinatge1}</td>
+											<td>${destinatari.llinatge1} 
 											<c:if test="${not empty destinatari.llinatge2}">
-												<td>${destinatari.llinatge2}</td>
+												${destinatari.llinatge2}
 											</c:if>
+											</td>
 										</tr>
 									</c:if>
 									<c:if test="${not empty destinatari.telefon}">

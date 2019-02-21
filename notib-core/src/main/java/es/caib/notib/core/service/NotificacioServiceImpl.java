@@ -657,7 +657,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 			Long enviamentId) {
 		logger.debug("Refrescant l'estat de la notificació de Notific@ (" +
 				"enviamentId=" + enviamentId + ")");
-		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
+		enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
 		notificaHelper.enviamentRefrescarEstat(enviament.getId());
 		NotificacioEnviamenEstatDto estatDto = conversioTipusHelper.convertir(
 				enviament,
