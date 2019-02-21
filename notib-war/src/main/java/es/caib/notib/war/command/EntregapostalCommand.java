@@ -16,7 +16,7 @@ import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 public class EntregapostalCommand {
 
 	@NotNull
-	private NotificaDomiciliNumeracioTipusEnumDto tipus;
+	private NotificaDomiciliConcretTipusEnumDto tipus;
 	private NotificaDomiciliViaTipusEnumDto tipusVia;
 	private String viaNom;
 	private String numeroCasa;
@@ -40,10 +40,10 @@ public class EntregapostalCommand {
 	private String formatFulla;
 	
 	
-	public NotificaDomiciliNumeracioTipusEnumDto getTipus() {
+	public NotificaDomiciliConcretTipusEnumDto getTipus() {
 		return tipus;
 	}
-	public void setTipus(NotificaDomiciliNumeracioTipusEnumDto tipus) {
+	public void setTipus(NotificaDomiciliConcretTipusEnumDto tipus) {
 		this.tipus = tipus;
 	}
 	public NotificaDomiciliViaTipusEnumDto getTipusVia() {
