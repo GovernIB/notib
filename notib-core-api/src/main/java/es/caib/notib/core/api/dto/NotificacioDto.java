@@ -55,6 +55,7 @@ public class NotificacioDto extends AuditoriaDto {
 	private String notificaErrorDescripcio;
 	private EntitatDto entitat;
 	private String referenciaExterna;
+	private String notificacio;
 	
 	
 	private List<PermisDto> permisos;
@@ -331,6 +332,15 @@ public class NotificacioDto extends AuditoriaDto {
 	}
 	public void setSeuRegistreNumero(String seuRegistreNumero) {
 		this.seuRegistreNumero = seuRegistreNumero;
+	}
+	public String getNotificacio() {
+		return notificacio;
+	}
+	public void setNotificacio(String notificacio) {
+		this.notificacio = notificacio;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 	@Override
 	public String toString() {
