@@ -30,6 +30,7 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private String csv;
 	private String uuid;
 	private String notificaCertificacioNumSeguiment;
+	private String detalls;
 	
 	
 	
@@ -244,6 +245,12 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	}
 	public void setNotificaCertificacioNumSeguiment(String notificaCertificacioNumSeguiment) {
 		this.notificaCertificacioNumSeguiment = notificaCertificacioNumSeguiment;
+	}
+	public String getDetalls() {
+		return detalls;
+	}
+	public void setDetalls(String detalls) {
+		this.detalls = detalls;
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;

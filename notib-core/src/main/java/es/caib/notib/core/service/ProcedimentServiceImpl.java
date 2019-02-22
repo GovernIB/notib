@@ -348,7 +348,10 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		for (GrupProcedimentEntity grupProcedimentEntity : grupsProcediments) {
 			procediments.add(procedimentRepository.findOne(grupProcedimentEntity.getProcediment().getId()));
 		}
-		List<ProcedimentEntity> procedimentsSenseGrups = procedimentRepository.findProcedimentsSenseGrups(procediments);
+		List<ProcedimentEntity> procedimentsSenseGrups = new ArrayList<ProcedimentEntity>();
+		if(procediments.size() > 0) {
+			procedimentsSenseGrups = procedimentRepository.findProcedimentsSenseGrups(procediments);	
+		}
 		
 		return conversioTipusHelper.convertirList(
 				procedimentsSenseGrups,

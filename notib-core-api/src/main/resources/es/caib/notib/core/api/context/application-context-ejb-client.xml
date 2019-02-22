@@ -17,15 +17,15 @@
 			jndi-name="notib/GrupServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.GrupService"/>	
 	<jee:local-slsb
-			id="PagadorCieService"
+			id="pagadorCieService"
 			jndi-name="notib/PagadorCieServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.PagadorCieService"/>	
 	<jee:local-slsb
-			id="PagadorPostalService"
+			id="pagadorPostalService"
 			jndi-name="notib/PagadorPostalServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.PagadorPostalService"/>	
 	<jee:local-slsb
-			id="ProcedimentService"
+			id="procedimentService"
 			jndi-name="notib/ProcedimentServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.ProcedimentService"/>	
 	<jee:local-slsb
@@ -48,11 +48,14 @@
 			id="usuariAplicacioService"
 			jndi-name="notib/UsuariAplicacioServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.UsuariAplicacioService"/>
-
 	<jee:local-slsb
 			id="notificacioServiceWs"
 			jndi-name="notib/NotificacioServiceWsBean/local"
 			business-interface="es.caib.notib.core.api.ws.notificacio.NotificacioServiceWs"/>
+	<jee:local-slsb
+			id="notificacioServiceWsV2"
+			jndi-name="notib/NotificacioServiceWsBeanV2/local"
+			business-interface="es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2"/>
 	<jee:local-slsb
 			id="adviserWsService"
 			jndi-name="notib/NotificaAdviserWsBean/local"

@@ -21,7 +21,7 @@ import es.caib.notib.war.helper.PermisosHelper;
 public class PermisosInterceptor extends HandlerInterceptorAdapter {
 
 	@Autowired
-	private ProcedimentService procedimentService; 
+	private ProcedimentService procedimentService;
 	@Autowired
 	private AplicacioService aplicacioService;
 	
