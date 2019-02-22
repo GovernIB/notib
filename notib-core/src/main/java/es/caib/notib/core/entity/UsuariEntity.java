@@ -10,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**

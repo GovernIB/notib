@@ -656,43 +656,4 @@ public class EntityComprovarHelper {
 		return null;
 	}
 	
-	public boolean hasPermisConsultaProcediment() {
-		List<ProcedimentDto> resposta = findPermisProcedimentsUsuariActual(
-				new Permission[] {
-						ExtendedPermission.READ}
-				);
-		
-		return (resposta.isEmpty()) ? false : true;
-	}
-	
-	public boolean hasPermisNotificacioProcediment() {
-		List<ProcedimentDto> resposta = findPermisProcedimentsUsuariActual(
-				new Permission[] {
-					ExtendedPermission.NOTIFICACIO}
-				);
-		
-		return (resposta.isEmpty()) ? false : true;
-	}
-	
-	public boolean hasGrupPermisConsultaProcediment(List<ProcedimentDto> procediments) {
-		List<ProcedimentDto> resposta = findByGrupAndPermisProcedimentsUsuariActual(
-				procediments,
-				new Permission[] {
-						ExtendedPermission.READ}
-				);
-		
-		return (resposta.isEmpty()) ? false : true;
-	}
-	
-	public boolean hasGrupPermisNotificacioProcediment(List<ProcedimentDto> procediments) {
-		List<ProcedimentDto> resposta = findByGrupAndPermisProcedimentsUsuariActual(
-				procediments,
-				new Permission[] {
-						ExtendedPermission.NOTIFICACIO}
-				);
-		
-		return (resposta.isEmpty()) ? false : true;
-	}
-	
-	
 }

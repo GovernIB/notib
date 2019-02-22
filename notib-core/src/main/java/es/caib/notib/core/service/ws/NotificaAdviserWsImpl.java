@@ -30,7 +30,6 @@ import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.wsdl.adviser.AdviserWS;
 import es.caib.notib.core.wsdl.adviser.CertificadoRequest;
 import es.caib.notib.core.wsdl.adviser.DatadoRequest;
@@ -53,9 +52,6 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 	private EntitatRepository entitatRepository;
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
-	@Autowired
-	private NotificacioRepository notificacioRepository;
-
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired

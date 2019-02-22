@@ -7,6 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import es.caib.notib.core.entity.PagadorPostalEntity;
 
+/**
+ * Definició dels mètodes necessaris per a gestionar una entitat de base
+ * de dades del tipus pagador postal.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
 public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEntity, Long> {
 
 	PagadorPostalEntity findByDir3codi(String dir3codi);

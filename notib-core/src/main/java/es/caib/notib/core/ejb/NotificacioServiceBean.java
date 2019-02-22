@@ -78,7 +78,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public boolean enviar(
 			Long entitatId,
 			Long notificacioId) {
@@ -88,7 +88,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(
 			Long entitatId,
 			Long enviamentId) {
@@ -115,16 +115,19 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 */
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public void notificaEnviamentsPendents() {
 		delegate.notificaEnviamentsPendents();
 	}
 	
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public void enviamentRefrescarEstatPendents() {
 		delegate.enviamentRefrescarEstatPendents();
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<NotificacioDto> create(
 			Long entitatId, 
 			NotificacioDtoV2 notificacio) {
@@ -132,18 +135,23 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public NotificacioDtoV2 update(
 			Long entitatId,
 			NotificacioDtoV2 notificacio) throws NotFoundException {
-		return null;
+		return delegate.update(
+				entitatId, 
+				notificacio);
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsulta() {
 		return delegate.findProcedimentsAmbPermisConsulta();
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacio() {
 		return delegate.findProcedimentsAmbPermisNotificacio();
 	}

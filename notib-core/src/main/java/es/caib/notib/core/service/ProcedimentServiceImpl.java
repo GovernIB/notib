@@ -13,7 +13,6 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
@@ -40,6 +39,11 @@ import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 
+/**
+ * Implementació del servei de gestió de procediments.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
 @Service
 public class ProcedimentServiceImpl implements ProcedimentService{
 
@@ -351,21 +355,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				ProcedimentDto.class);
 	}
 	
-	@Override
-	public PaginaDto<ProcedimentDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<GrupDto> permisFindByProcedimentCodi(
-			Long id) throws NotFoundException {
-		
-		List<GrupDto> grups = new ArrayList<GrupDto>();
-		
-		return grups;
-	}
-	
 	@Transactional
 	@Override
 	public List<PermisDto> permisFind(
@@ -545,10 +534,47 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
 
 	@Override
-	public List<ProcedimentDto> findProcedimnetsNotificacioUsuariActual() {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean hasPermisConsultaProcediment() {
+		List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcedimentsUsuariActual(
+				new Permission[] {
+						ExtendedPermission.READ}
+				);
+		
+		return (resposta.isEmpty()) ? false : true;
 	}
+	
+	@Override
+	public boolean hasPermisNotificacioProcediment() {
+		List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcedimentsUsuariActual(
+				new Permission[] {
+					ExtendedPermission.NOTIFICACIO}
+				);
+		
+		return (resposta.isEmpty()) ? false : true;
+	}
+	
+	@Override
+	public boolean hasGrupPermisConsultaProcediment(List<ProcedimentDto> procediments) {
+		List<ProcedimentDto> resposta = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActual(
+				procediments,
+				new Permission[] {
+						ExtendedPermission.READ}
+				);
+		
+		return (resposta.isEmpty()) ? false : true;
+	}
+	
+	@Override
+	public boolean hasGrupPermisNotificacioProcediment(List<ProcedimentDto> procediments) {
+		List<ProcedimentDto> resposta = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActual(
+				procediments,
+				new Permission[] {
+						ExtendedPermission.NOTIFICACIO}
+				);
+		
+		return (resposta.isEmpty()) ? false : true;
+	}
+	
 
 
 

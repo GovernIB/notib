@@ -46,11 +46,16 @@ public interface EnviamentService {
 			NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException;
 
 	/**
-	 * Consulta dels enviaments d'un usuari realitzats d'una notificació.
+	 * Consulta dels enviaments d'una entitat realitzats d'una notificació.
 	 * 
-	 * @param notificacioId
-	 *            Atribut id de la notificació.
-	 * @return els destinataris trobats.
+	 * @param entitat
+	 * 			Entitat de la que es vol consultar els enviaments
+	 * @param filtre
+	 * 			Filtre per a la consulta
+	 * @param paginacio
+	 * @return Pàgina d'enviaments
+	 * 
+	 * @throws ParseException
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByEntityAndFiltre(

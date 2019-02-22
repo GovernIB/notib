@@ -45,7 +45,6 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
-import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
 import es.caib.notib.core.api.ws.notificacio.Persona;
 import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -66,7 +65,6 @@ import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.PersonaRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 
 /**
@@ -97,8 +95,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private NotificacioEventRepository notificacioEventRepository;
 	@Autowired
 	private EntitatRepository entitatRepository;
-	@Autowired
-	private ProcedimentRepository procedimentRepository;
 	@Autowired
 	private DocumentRepository documentRepository;
 

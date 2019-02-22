@@ -9,6 +9,26 @@
 				http://www.springframework.org/schema/jee/spring-jee-3.0.xsd">
 
 	<jee:local-slsb
+			id="enviamentService"
+			jndi-name="notib/EnviamentServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.EnviamentService"/>
+	<jee:local-slsb
+			id="grupService"
+			jndi-name="notib/GrupServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.GrupService"/>	
+	<jee:local-slsb
+			id="PagadorCieService"
+			jndi-name="notib/PagadorCieServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.PagadorCieService"/>	
+	<jee:local-slsb
+			id="PagadorPostalService"
+			jndi-name="notib/PagadorPostalServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.PagadorPostalService"/>	
+	<jee:local-slsb
+			id="ProcedimentService"
+			jndi-name="notib/ProcedimentServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.ProcedimentService"/>	
+	<jee:local-slsb
 			id="aplicacioService"
 			jndi-name="notib/AplicacioServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.AplicacioService"/>

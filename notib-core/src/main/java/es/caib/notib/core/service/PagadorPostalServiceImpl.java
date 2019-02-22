@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+
 import es.caib.notib.core.api.dto.PagadorPostalDto;
 import es.caib.notib.core.api.dto.PagadorPostalFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -17,12 +18,16 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.PagadorPostalService;
 import es.caib.notib.core.entity.PagadorPostalEntity;
-import es.caib.notib.core.helper.PagadorPostalHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.repository.PagadorPostalRepository;
 
+/**
+ * Implementació del servei de gestió de pagadors postals.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
 @Service
 public class PagadorPostalServiceImpl implements PagadorPostalService{
 
@@ -32,8 +37,6 @@ public class PagadorPostalServiceImpl implements PagadorPostalService{
 	private PagadorPostalRepository pagadorPostalReposity;
 	@Resource
 	private PaginacioHelper paginacioHelper;
-	@Resource
-	private PagadorPostalHelper pagadorPostalHelper;
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
 	

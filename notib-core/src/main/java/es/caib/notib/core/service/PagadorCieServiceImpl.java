@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorCieFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -17,12 +18,16 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.PagadorCieService;
 import es.caib.notib.core.entity.PagadorCieEntity;
-import es.caib.notib.core.helper.PagadorCieHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.repository.PagadorCieRepository;
 
+/**
+ * Implementació del servei de gestió de pagadors cie.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
 @Service
 public class PagadorCieServiceImpl implements PagadorCieService{
 
@@ -32,8 +37,6 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	private PagadorCieRepository pagadorCieReposity;
 	@Resource
 	private PaginacioHelper paginacioHelper;
-	@Resource
-	private PagadorCieHelper conversioHelper;
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
 	

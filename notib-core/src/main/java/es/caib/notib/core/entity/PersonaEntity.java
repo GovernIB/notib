@@ -1,24 +1,20 @@
 package es.caib.notib.core.entity;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
-import es.caib.notib.core.entity.NotificacioEntity.Builder;
 
+/**
+ * Classe del model de dades que representa una persona
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
 @Entity
 @Table(name="not_persona")
 @EntityListeners(AuditingEntityListener.class)

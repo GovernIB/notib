@@ -81,7 +81,7 @@ public class NotificacioWsClientFactory {
 		return new WsClientHelper<NotificacioServiceV2>().generarClientWs(
 				endpoint,
 				new QName(
-						"http://www.caib.es/notib/ws/notificaciov2",
+						"http://www.caib.es/notib/ws/notificacioV2",
 						"NotificacioServiceV2"),
 				userName,
 				password,

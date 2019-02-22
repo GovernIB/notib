@@ -35,8 +35,6 @@ import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 @RequestMapping("/procediment")
 public class ProcedimentPermisController extends BaseUserController{
 	
-	private final static String PROCEDIMENTS_FILTRE = "procediments_filtre";
-	
 	@Autowired
 	ProcedimentService procedimentService;
 	@Autowired

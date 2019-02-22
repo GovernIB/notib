@@ -17,7 +17,7 @@ import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.UsuariAplicacioService;
 
 /**
- * Implementació de EntitatService com a EJB que empra una clase
+ * Implementació de UsuariAplicacioService com a EJB que empra una clase
  * delegada per accedir a la funcionalitat del servei.
  * 
  * @author Limit Tecnologies <limit@limit.es>

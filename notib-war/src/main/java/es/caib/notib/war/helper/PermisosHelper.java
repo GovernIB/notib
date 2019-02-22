@@ -8,15 +8,11 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.core.helper.EntityComprovarHelper;
 
 /**
  * Utilitat per a gestionar els permisos de l'usuari actual.
@@ -29,8 +25,7 @@ public class PermisosHelper {
 	public static void comprovarPermisosUsuariActual(
 			HttpServletRequest request,
 			ProcedimentService procedimentService,
-			AplicacioService aplicacioService,
-			EntityComprovarHelper entityComprovarHelper) { 
+			AplicacioService aplicacioService) { 
 		
 		if (RolHelper.isUsuariActualUsuari(request)) {
 			UsuariDto usuariActual = aplicacioService.getUsuariActual();
@@ -51,22 +46,20 @@ public class PermisosHelper {
 			if(!procediments.isEmpty()) {
 				request.setAttribute(
 						"permisConsulta", 
-						entityComprovarHelper.hasGrupPermisConsultaProcediment(procediments));
+						procedimentService.hasGrupPermisConsultaProcediment(procediments));
 				request.setAttribute(
 						"permisNotificacio", 
-						entityComprovarHelper.hasGrupPermisNotificacioProcediment(procediments));
+						procedimentService.hasGrupPermisNotificacioProcediment(procediments));
 			}
 			//Comprova quins permisos té aquest usuari sobre els procediments sense grups
 			if (grupsProcediment.isEmpty()) {
 				request.setAttribute(
 						"permisConsulta", 
-						entityComprovarHelper.hasPermisConsultaProcediment());
+						procedimentService.hasPermisConsultaProcediment());
 				request.setAttribute(
 						"permisNotificacio", 
-						entityComprovarHelper.hasPermisNotificacioProcediment());
+						procedimentService.hasPermisNotificacioProcediment());
 			}
 		}
 	}
-	private static final Logger LOGGER = LoggerFactory.getLogger(PermisosHelper.class);
-
 }

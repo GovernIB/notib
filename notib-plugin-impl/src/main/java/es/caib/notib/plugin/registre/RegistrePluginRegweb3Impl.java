@@ -40,7 +40,6 @@ import es.caib.regweb3.ws.api.v3.RegWebRegistroSalidaWs;
 import es.caib.regweb3.ws.api.v3.RegistroEntradaResponseWs;
 import es.caib.regweb3.ws.api.v3.RegistroEntradaWs;
 import es.caib.regweb3.ws.api.v3.RegistroSalidaResponseWs;
-import es.caib.regweb3.ws.api.v3.RegistroSalidaWs;
 import es.caib.regweb3.ws.api.v3.TipoAsuntoWs;
 import es.caib.regweb3.ws.api.v3.WsI18NException;
 import es.caib.regweb3.ws.api.v3.WsValidationException;
