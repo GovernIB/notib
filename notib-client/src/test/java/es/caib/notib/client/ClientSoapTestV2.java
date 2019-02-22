@@ -47,10 +47,10 @@ public class ClientSoapTestV2 extends ClientBaseTest {
 	@Before
 	public void setUp() throws IOException, InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, NamingException, CreateException, AuthenticationFailureException {
 		client = NotificacioWsClientFactory.getWsClientV2(
-				getClass().getResource("/es/caib/notib/client/wsdl/NotificacioServiceWs.wsdl"),
-				"http://localhost:8080/notib/ws/notificacioV2",
-				"notapp",
-				"notapp");
+				getClass().getResource("/es/caib/notib/client/wsdl/NotificacioServiceWsV2.wsdl"),
+				"http://localhost:8081/notib/ws/notificacioV2",
+				"admin",
+				"admin");
 	}
 
 	@Test
