@@ -1,11 +1,9 @@
 package es.caib.notib.war.command;
 
-import com.sun.istack.NotNull;
+import javax.validation.constraints.NotNull;
 
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 
 /**
  * Command per al manteniment de entregues postals

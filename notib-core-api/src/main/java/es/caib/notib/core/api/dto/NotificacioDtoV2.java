@@ -6,9 +6,8 @@ package es.caib.notib.core.api.dto;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.apache.commons.lang.builder.ToStringBuilder;
 
-import es.caib.notib.core.api.ws.notificacio.Enviament;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  * Informació d'una anotació.

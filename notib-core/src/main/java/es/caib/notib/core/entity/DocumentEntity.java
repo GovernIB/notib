@@ -4,20 +4,19 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import es.caib.notib.core.api.dto.TipusAssumpteEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
-import es.caib.notib.core.entity.ProcedimentEntity.Builder;
 
+/**
+ * Classe del model de dades que representa un document.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
 @Entity
 @Table(name = "not_document")
 public class DocumentEntity  extends NotibAuditable<Long> {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
-	
 	@Column(name = "arxiu_gest_doc_id", length = 64)
 	protected String arxiuGestdocId;
 	

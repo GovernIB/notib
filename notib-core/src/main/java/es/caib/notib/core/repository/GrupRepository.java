@@ -11,6 +11,12 @@ import org.springframework.data.repository.query.Param;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.GrupEntity;
 
+/**
+ * Definició dels mètodes necessaris per a gestionar una entitat de base
+ * de dades del tipus grup.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
 public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 
 	public List<GrupEntity> findByEntitat(EntitatEntity entitat);

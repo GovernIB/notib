@@ -11,6 +11,12 @@ import org.springframework.data.repository.query.Param;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 
+/**
+ * Definició dels mètodes necessaris per a gestionar una entitat de base
+ * de dades del tipus procediment.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
 public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, Long> {
 
 

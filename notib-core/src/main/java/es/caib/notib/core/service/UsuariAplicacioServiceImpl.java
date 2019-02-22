@@ -23,7 +23,7 @@ import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.repository.AplicacioRepository;
 
 /**
- * Implementació del servei de gestió d'entitats.
+ * Implementació del servei de gestió d'usuaris.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

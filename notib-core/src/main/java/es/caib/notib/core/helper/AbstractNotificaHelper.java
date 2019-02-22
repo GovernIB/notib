@@ -8,7 +8,6 @@ import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -35,7 +34,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
@@ -43,9 +41,6 @@ import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.repository.NotificacioEventRepository;
-import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.wsdl.seu.SedeWsPortType;
 
 /**
@@ -56,17 +51,8 @@ import es.caib.notib.core.wsdl.seu.SedeWsPortType;
 @Component
 public abstract class AbstractNotificaHelper {
 
-	@Autowired
-	private NotificacioEnviamentRepository notificacioEnviamentRepository;
-	@Autowired
-	private NotificacioEventRepository notificacioEventRepository;
-	
-	@Autowired
-	private PluginHelper pluginHelper;
-
 	private boolean modeTest;
-
-
+	
 	public abstract boolean notificacioEnviar(
 			Long notificacioId);
 

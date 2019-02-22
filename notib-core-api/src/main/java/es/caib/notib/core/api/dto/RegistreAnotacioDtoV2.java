@@ -14,22 +14,6 @@ import es.caib.notib.core.api.ws.registre.RegistreDocumentacioFisicaEnum;
 public class RegistreAnotacioDtoV2 {
 
 	private RegistreIdDto id;
-
-	private String emisorDir3Codi;
-	private String comunicacioTipus;
-	private String enviamentTipus;
-	private String concepte;
-	private String descripcio;
-	private String enviamentDataProgramada;
-	private String retard;
-	private String caducitat;
-	private String procedimentCodi;
-	private String grup;
-	private String codiUsuari;
-	private DocumentDto document;
-	private List<NotificacioEnviamentDto> enviaments;
-	
-	
 	private String organ;
 	private String llibre;
 	private String oficina;

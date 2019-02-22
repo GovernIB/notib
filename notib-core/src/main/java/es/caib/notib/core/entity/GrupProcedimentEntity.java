@@ -11,7 +11,7 @@ import org.hibernate.annotations.ForeignKey;
 import es.caib.notib.core.audit.NotibAuditable;
 
 /**
- * Classe de model de dades que conté la informació dels grups admesos.
+ * Classe de model de dades que conté la informació dels grups.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

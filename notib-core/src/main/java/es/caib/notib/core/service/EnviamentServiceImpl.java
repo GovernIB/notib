@@ -16,7 +16,6 @@ import java.util.List;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import org.hibernate.Hibernate;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +38,6 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.entity.ColumnesEntity;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -60,15 +58,13 @@ import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.UsuariRepository;
 
 /**
- * Implementació del servei de gestió de notificacions.
+ * Implementació del servei de gestió de enviaments.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Service
 public class EnviamentServiceImpl implements EnviamentService {
 
-	@Autowired
-	private AplicacioService aplicacioService;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired

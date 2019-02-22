@@ -29,6 +29,11 @@ import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 
+/**
+ * Implementació del servei de gestió de grups.
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
 @Service
 public class GrupServiceImpl implements GrupService{
 

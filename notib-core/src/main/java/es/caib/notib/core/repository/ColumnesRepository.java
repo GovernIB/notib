@@ -10,7 +10,7 @@ import es.caib.notib.core.entity.UsuariEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
- * de dades del tipus entitat.
+ * de dades del tipus columnes.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

@@ -11,7 +11,6 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.war.helper.PermisosHelper;
 
 /**
@@ -21,9 +20,6 @@ import es.caib.notib.war.helper.PermisosHelper;
  */
 public class PermisosInterceptor extends HandlerInterceptorAdapter {
 
-
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
 	private ProcedimentService procedimentService; 
 	@Autowired
@@ -38,8 +34,7 @@ public class PermisosInterceptor extends HandlerInterceptorAdapter {
 		PermisosHelper.comprovarPermisosUsuariActual(
 				request,
 				procedimentService,
-				aplicacioService,
-				entityComprovarHelper);
+				aplicacioService);
 		
 		return true;
 	}

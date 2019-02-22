@@ -21,13 +21,11 @@ public interface GrupService {
 	/**
 	 * Crea un nou grup.
 	 * 
-	 * @param procedimentId
-	 *            	Informació del procediment al cual pertanyen els grups.
 	 * @param entitatId           
 	 * 				Informació de l'entitat actual
-	 * @param grups	
-	 * 				Llista amb els grups a crear
-	 * @return El procediment creat.
+	 * @param grup
+	 * 				Informació del grup a crear
+	 * @return El grup creat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public GrupDto create(
@@ -35,10 +33,8 @@ public interface GrupService {
 			GrupDto grup);
 	
 	/**
-	 * Modifica els grups d'un procediment.
+	 * Modifica la informació d'un grup.
 	 * 
-	 * @param codi
-	 *            codi del procediment del qual es vol modificar el grup.
 	 * @param grup
 	 *            El grup que es vol modificar.
 	 * @throws NotFoundException
@@ -48,12 +44,10 @@ public interface GrupService {
 	public GrupDto update(GrupDto grup) throws NotFoundException;
 
 	/**
-	 * Esborra els grups d'un procediment.
+	 * Esborra un grup donat el seu id.
 	 * 
-	 * @param codi
-	 *            Atribut codi del procediment del qual es vol esborrar el grup.
-	 * @param codiGrup
-	 *            Atribut codiGrup del grup que es vol esborrar.
+	 * @param id
+	 *            Atribut id del grup que es vol esborrar
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
@@ -85,10 +79,12 @@ public interface GrupService {
 			Long id);
 
 	/**
-	 * Consulta un grup donat el seu codi.
+	 * Consulta un grup donat l'id d'un procediment.
 	 * 
-	 * @param id
-	 *            id del grup a trobar.
+	 * @param entitatId 
+	 * 			Attribut id de l'entitat acutal
+	 * @param procedimentId
+	 *            id del procediment a trobar.
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")

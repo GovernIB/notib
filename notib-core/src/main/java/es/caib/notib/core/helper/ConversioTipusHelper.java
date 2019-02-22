@@ -6,10 +6,8 @@ package es.caib.notib.core.helper;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
-
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.entity.NotificacioEntity;
 import ma.glasnost.orika.CustomConverter;
