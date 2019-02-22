@@ -36,10 +36,11 @@ public class NotificacioEnviamentFiltreDto extends AuditoriaDto {
 	private String dataCaducitatFi;
 	private String codiNotib;
 	private String numeroCertCorreus;
-	private String csv;
+	private String csvUuid;
 	private NotificacioEstatEnumDto estat;
 	private String dir3Codi;
 	private String titularNomLlinatge;
+	private String uuid;
 	
 	public Long getId() {
 		return id;
@@ -188,12 +189,6 @@ public class NotificacioEnviamentFiltreDto extends AuditoriaDto {
 	public void setNumeroCertCorreus(String numeroCertCorreus) {
 		this.numeroCertCorreus = numeroCertCorreus;
 	}
-	public String getCsv() {
-		return csv;
-	}
-	public void setCsv(String csv) {
-		this.csv = csv;
-	}
 	public NotificacioEstatEnumDto getEstat() {
 		return estat;
 	}
@@ -211,6 +206,18 @@ public class NotificacioEnviamentFiltreDto extends AuditoriaDto {
 	}
 	public void setTitularNomLlinatge(String titularNomLlinatge) {
 		this.titularNomLlinatge = titularNomLlinatge;
+	}
+	public String getUuid() {
+		return uuid;
+	}
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+	public String getCsvUuid() {
+		return csvUuid;
+	}
+	public void setCsvUuid(String csvUuid) {
+		this.csvUuid = csvUuid;
 	}
 	@Override
 	public String toString() {

@@ -245,8 +245,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				//dataRegistreInici,
 				//(dataRegistreFi == null),
 				//dataRegistreFi,
-				(filtre.getCsv() == null || filtre.getCsv().isEmpty()),
-				filtre.getCsv(),
+				(filtre.getCsvUuid() == null || filtre.getCsvUuid().isEmpty()),
+				filtre.getCsvUuid(),
 				(filtre.getEstat() == null),
 				(estat),
 				entitatEntity);
@@ -413,91 +413,182 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}else{
 			tipusEnviament = 0;
 		}
-		notificacions = notificacioRepository.findNotificacioByFiltre(
-				filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
-				filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
-				filtre.getGrup() == null || filtre.getGrup().isEmpty(),
-				filtre.getGrup() == null ? "" : filtre.getGrup(),
-				filtre.getConcepte() == null || filtre.getConcepte().isEmpty(),
-				filtre.getConcepte() == null ? "" : filtre.getConcepte(),
-				filtre.getDescripcio() == null || filtre.getDescripcio().isEmpty(),
-				filtre.getDescripcio() == null ? "" : filtre.getDescripcio(),
-				(dataProgramadaDisposicioInici == null),
-				dataProgramadaDisposicioInici,
-				(dataProgramadaDisposicioFi == null),
-				dataProgramadaDisposicioFi,
-				(dataCaducitatInici == null),
-				dataCaducitatInici,
-				(dataCaducitatFi == null),
-				dataCaducitatFi,
-				(filtre.getEnviamentTipus() == null),
-				(tipusEnviament),
-				//(filtre.getLlibreRegistre() == null || filtre.getLlibreRegistre().isEmpty()),
-				//filtre.getLlibreRegistre() == null ? "" : filtre.getLlibreRegistre(),
-				//(filtre.getNumeroRegistre() == null || filtre.getNumeroRegistre().isEmpty()),
-				//filtre.getNumeroRegistre() == null ? "" : filtre.getNumeroRegistre(),
-				//(dataRegistreInici == null),
-				//dataRegistreInici,
-				//(dataRegistreFi == null),
-				//dataRegistreFi,
-				(filtre.getCsv() == null || filtre.getCsv().isEmpty()),
-				filtre.getCsv(),
-				(filtre.getEstat() == null),
-				(estat),
-				entitatEntity);
+		Page<NotificacioEnviamentEntity> enviament = null;
+//		enviament = notificacioEnviamentRepository.findByNotificacio(
+//				filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
+//				filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
+//				filtre.getGrup() == null || filtre.getGrup().isEmpty(),
+//				filtre.getGrup() == null ? "" : filtre.getGrup(),
+//				filtre.getConcepte() == null || filtre.getConcepte().isEmpty(),
+//				filtre.getConcepte() == null ? "" : filtre.getConcepte(),
+//				filtre.getDescripcio() == null || filtre.getDescripcio().isEmpty(),
+//				filtre.getDescripcio() == null ? "" : filtre.getDescripcio(),
+//				(dataProgramadaDisposicioInici == null),
+//				dataProgramadaDisposicioInici,
+//				(dataProgramadaDisposicioFi == null),
+//				dataProgramadaDisposicioFi,
+//				(dataCaducitatInici == null),
+//				dataCaducitatInici,
+//				(dataCaducitatFi == null),
+//				dataCaducitatFi,
+//				(filtre.getEnviamentTipus() == null),
+//				(tipusEnviament),
+//				//(filtre.getLlibreRegistre() == null || filtre.getLlibreRegistre().isEmpty()),
+//				//filtre.getLlibreRegistre() == null ? "" : filtre.getLlibreRegistre(),
+//				//(filtre.getNumeroRegistre() == null || filtre.getNumeroRegistre().isEmpty()),
+//				//filtre.getNumeroRegistre() == null ? "" : filtre.getNumeroRegistre(),
+//				//(dataRegistreInici == null),
+//				//dataRegistreInici,
+//				//(dataRegistreFi == null),
+//				//dataRegistreFi,
+//				(filtre.getCsv() == null || filtre.getCsv().isEmpty()),
+//				filtre.getCsv(),
+//				(filtre.getEstat() == null),
+//				(estat),
+//				entitatEntity,
+//				(dataEnviamentInici == null),
+//				dataEnviamentInici,
+//				(dataEnviamentFi == null),
+//				dataEnviamentFi,
+//				(filtre.getCodiNotifica() == null || filtre.getCodiNotifica().isEmpty()),
+//				filtre.getCodiNotifica() == null ? "" : filtre.getCodiNotifica(),
+//				(filtre.getCreatedBy() == null || filtre.getCreatedBy().getCodi().isEmpty()),
+//				conversioTipusHelper.convertir(filtre.getCreatedBy(), UsuariEntity.class),
+//				//filtre.getCodiNotifica() == null || "".equals(filtre.getCodiNotifica().trim()),
+//				(filtre.getNifTitular() == null || filtre.getNifTitular().isEmpty()),
+//				filtre.getNifTitular() == null ? "" : filtre.getNifTitular(),
+//				(filtre.getTitularNomLlinatge() == null || filtre.getTitularNomLlinatge().isEmpty()),
+//				filtre.getTitularNomLlinatge() == null ? "" : filtre.getTitularNomLlinatge(),
+//				(filtre.getEmailTitular() == null || filtre.getEmailTitular().isEmpty()),
+//				filtre.getEmailTitular() == null ? "" : filtre.getEmailTitular(),
+//				(filtre.getDir3Codi() == null || filtre.getDir3Codi().isEmpty()),
+//				filtre.getDir3Codi() == null ? "" : filtre.getDir3Codi(),
+//				//CODI DIR3
+//				//(filtre.getDestinataris() == null || filtre.getDestinataris().isEmpty()),
+//				//filtre.getDestinataris() == null ? "" : filtre.getDestinataris(),
+//				//(filtre.getCodiNotib() == null || filtre.getCodiNotib().isEmpty()),
+//				//filtre.getCodiNotib() == null ? "" : filtre.getCodiNotib(),
+//				(filtre.getNumeroCertCorreus() == null || filtre.getNumeroCertCorreus().isEmpty()),
+//				filtre.getNumeroCertCorreus() == null ? "" : filtre.getNumeroCertCorreus(),
+//				paginacioHelper.toSpringDataPageable(paginacioParams));
 		
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
 				true,
 				false);
-		Page<NotificacioEnviamentEntity> enviament = null;
+//		Page<NotificacioEnviamentEntity> enviament = null;
 		//Filtres camps enviaments que pertanyen a un procediment filtrat anteriorment
-		if (!notificacions.isEmpty()) {
-			for (NotificacioEntity notificacio : notificacions) {
-				enviament =  notificacioEnviamentRepository.findByNotificacio(
-						(dataEnviamentInici == null),
-						dataEnviamentInici,
-						(dataEnviamentFi == null),
-						dataEnviamentFi,
-						(filtre.getCodiNotifica() == null || filtre.getCodiNotifica().isEmpty()),
-						filtre.getCodiNotifica() == null ? "" : filtre.getCodiNotifica(),
-						(filtre.getCreatedBy() == null || filtre.getCreatedBy().getCodi().isEmpty()),
-						conversioTipusHelper.convertir(filtre.getCreatedBy(), UsuariEntity.class),
-						//filtre.getCodiNotifica() == null || "".equals(filtre.getCodiNotifica().trim()),
-						(filtre.getNifTitular() == null || filtre.getNifTitular().isEmpty()),
-						filtre.getNifTitular() == null ? "" : filtre.getNifTitular(),
-						(filtre.getTitularNomLlinatge() == null || filtre.getTitularNomLlinatge().isEmpty()),
-						filtre.getTitularNomLlinatge() == null ? "" : filtre.getTitularNomLlinatge(),
-						(filtre.getEmailTitular() == null || filtre.getEmailTitular().isEmpty()),
-						filtre.getEmailTitular() == null ? "" : filtre.getEmailTitular(),
-						(filtre.getDir3Codi() == null || filtre.getDir3Codi().isEmpty()),
-						filtre.getDir3Codi() == null ? "" : filtre.getDir3Codi(),
-						//CODI DIR3
-						//(filtre.getDestinataris() == null || filtre.getDestinataris().isEmpty()),
-						//filtre.getDestinataris() == null ? "" : filtre.getDestinataris(),
-						//(filtre.getCodiNotib() == null || filtre.getCodiNotib().isEmpty()),
-						//filtre.getCodiNotib() == null ? "" : filtre.getCodiNotib(),
-						(filtre.getNumeroCertCorreus() == null || filtre.getNumeroCertCorreus().isEmpty()),
-						filtre.getNumeroCertCorreus() == null ? "" : filtre.getNumeroCertCorreus(),
-						notificacio,
-						paginacioHelper.toSpringDataPageable(paginacioParams));
-				
-				if(enviament != null){
-					enviamentDto = notificacioEnviamentHelper.toNotificacioEnviamentDtoV2(
-							notificacio, 
-							enviament);
-					if (enviamentDto != null) 
-						enviamentsDto.addAll(enviamentDto);
-				}
-			}
-		}else {
+//		if (!notificacions.isEmpty()) {
+			
+			enviament = notificacioEnviamentRepository.findByNotificacio(
+					filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
+					filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
+					filtre.getGrup() == null || filtre.getGrup().isEmpty(),
+					filtre.getGrup() == null ? "" : filtre.getGrup(),
+					filtre.getConcepte() == null || filtre.getConcepte().isEmpty(),
+					filtre.getConcepte() == null ? "" : filtre.getConcepte(),
+					filtre.getDescripcio() == null || filtre.getDescripcio().isEmpty(),
+					filtre.getDescripcio() == null ? "" : filtre.getDescripcio(),
+					(dataProgramadaDisposicioInici == null),
+					dataProgramadaDisposicioInici,
+					(dataProgramadaDisposicioFi == null),
+					dataProgramadaDisposicioFi,
+					(dataCaducitatInici == null),
+					dataCaducitatInici,
+					(dataCaducitatFi == null),
+					dataCaducitatFi,
+					(filtre.getEnviamentTipus() == null),
+					(tipusEnviament),
+					//(filtre.getLlibreRegistre() == null || filtre.getLlibreRegistre().isEmpty()),
+					//filtre.getLlibreRegistre() == null ? "" : filtre.getLlibreRegistre(),
+					//(filtre.getNumeroRegistre() == null || filtre.getNumeroRegistre().isEmpty()),
+					//filtre.getNumeroRegistre() == null ? "" : filtre.getNumeroRegistre(),
+					//(dataRegistreInici == null),
+					//dataRegistreInici,
+					//(dataRegistreFi == null),
+					//dataRegistreFi,
+					(filtre.getCsvUuid() == null || filtre.getCsvUuid().isEmpty()),
+					filtre.getCsvUuid(),
+					(filtre.getEstat() == null),
+					(estat),
+					entitatEntity,
+					(dataEnviamentInici == null),
+					dataEnviamentInici,
+					(dataEnviamentFi == null),
+					dataEnviamentFi,
+					(filtre.getCodiNotifica() == null || filtre.getCodiNotifica().isEmpty()),
+					filtre.getCodiNotifica() == null ? "" : filtre.getCodiNotifica(),
+					(filtre.getCreatedBy() == null || filtre.getCreatedBy().getCodi().isEmpty()),
+					conversioTipusHelper.convertir(filtre.getCreatedBy(), UsuariEntity.class),
+					//filtre.getCodiNotifica() == null || "".equals(filtre.getCodiNotifica().trim()),
+					(filtre.getNifTitular() == null || filtre.getNifTitular().isEmpty()),
+					filtre.getNifTitular() == null ? "" : filtre.getNifTitular(),
+					(filtre.getTitularNomLlinatge() == null || filtre.getTitularNomLlinatge().isEmpty()),
+					filtre.getTitularNomLlinatge() == null ? "" : filtre.getTitularNomLlinatge(),
+					(filtre.getEmailTitular() == null || filtre.getEmailTitular().isEmpty()),
+					filtre.getEmailTitular() == null ? "" : filtre.getEmailTitular(),
+					(filtre.getDir3Codi() == null || filtre.getDir3Codi().isEmpty()),
+					filtre.getDir3Codi() == null ? "" : filtre.getDir3Codi(),
+					//CODI DIR3
+					//(filtre.getDestinataris() == null || filtre.getDestinataris().isEmpty()),
+					//filtre.getDestinataris() == null ? "" : filtre.getDestinataris(),
+					//(filtre.getCodiNotib() == null || filtre.getCodiNotib().isEmpty()),
+					//filtre.getCodiNotib() == null ? "" : filtre.getCodiNotib(),
+					(filtre.getNumeroCertCorreus() == null || filtre.getNumeroCertCorreus().isEmpty()),
+					filtre.getNumeroCertCorreus() == null ? "" : filtre.getNumeroCertCorreus(),
+					paginacioHelper.toSpringDataPageable(paginacioParams));
+			
+//			for (NotificacioEntity notificacio : notificacions) {
+//				enviament =  notificacioEnviamentRepository.findByNotificacio(
+//						(dataEnviamentInici == null),
+//						dataEnviamentInici,
+//						(dataEnviamentFi == null),
+//						dataEnviamentFi,
+//						(filtre.getCodiNotifica() == null || filtre.getCodiNotifica().isEmpty()),
+//						filtre.getCodiNotifica() == null ? "" : filtre.getCodiNotifica(),
+//						(filtre.getCreatedBy() == null || filtre.getCreatedBy().getCodi().isEmpty()),
+//						conversioTipusHelper.convertir(filtre.getCreatedBy(), UsuariEntity.class),
+//						//filtre.getCodiNotifica() == null || "".equals(filtre.getCodiNotifica().trim()),
+//						(filtre.getNifTitular() == null || filtre.getNifTitular().isEmpty()),
+//						filtre.getNifTitular() == null ? "" : filtre.getNifTitular(),
+//						(filtre.getTitularNomLlinatge() == null || filtre.getTitularNomLlinatge().isEmpty()),
+//						filtre.getTitularNomLlinatge() == null ? "" : filtre.getTitularNomLlinatge(),
+//						(filtre.getEmailTitular() == null || filtre.getEmailTitular().isEmpty()),
+//						filtre.getEmailTitular() == null ? "" : filtre.getEmailTitular(),
+//						(filtre.getDir3Codi() == null || filtre.getDir3Codi().isEmpty()),
+//						filtre.getDir3Codi() == null ? "" : filtre.getDir3Codi(),
+//						//CODI DIR3
+//						//(filtre.getDestinataris() == null || filtre.getDestinataris().isEmpty()),
+//						//filtre.getDestinataris() == null ? "" : filtre.getDestinataris(),
+//						//(filtre.getCodiNotib() == null || filtre.getCodiNotib().isEmpty()),
+//						//filtre.getCodiNotib() == null ? "" : filtre.getCodiNotib(),
+//						(filtre.getNumeroCertCorreus() == null || filtre.getNumeroCertCorreus().isEmpty()),
+//						filtre.getNumeroCertCorreus() == null ? "" : filtre.getNumeroCertCorreus(),
+//						notificacio,
+//						paginacioHelper.toSpringDataPageable(paginacioParams));
+//				
+//				if(enviament != null){
+//					enviamentDto = notificacioEnviamentHelper.toNotificacioEnviamentDtoV2(
+//							notificacio, 
+//							enviament);
+//					if (enviamentDto != null) 
+//						enviamentsDto.addAll(enviamentDto);
+//				}
+//			}
+//		}else {
+		if(enviament == null || !enviament.hasContent()) {
 			enviament = new PageImpl<>(new ArrayList<NotificacioEnviamentEntity>());
+		}
+			
+//		}
+		
+		for(NotificacioEnviamentEntity nee: enviament.getContent()) {
+			nee.setNotificacio(notificacioRepository.findById(nee.getNotificacioId()));
 		}
 		
 		return paginacioHelper.toPaginaDto(
 				enviament,
-				enviamentsDto,
 				NotificacioEnviamentDtoV2.class);
 	}
 
@@ -627,8 +718,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				//dataRegistreInici,
 				//(dataRegistreFi == null),
 				//dataRegistreFi,
-				(filtre.getCsv() == null || filtre.getCsv().isEmpty()),
-				filtre.getCsv(),
+				(filtre.getCsvUuid() == null || filtre.getCsvUuid().isEmpty()),
+				filtre.getCsvUuid(),
 				(filtre.getEstat() == null),
 				(estat),
 				entitatEntity);

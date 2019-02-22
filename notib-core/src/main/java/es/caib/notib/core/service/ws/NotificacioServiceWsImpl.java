@@ -181,7 +181,6 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				notificacio.getDocument().getArxiuId(), 
 				documentGesdocId, 
 				notificacio.getDocument().getArxiuNom(),  
-				notificacio.getDocument().getContingutBase64(),  
 				notificacio.getDocument().getHash(),  
 				notificacio.getDocument().getUrl(),  
 				notificacio.getDocument().getMetadades(),  
@@ -208,9 +207,10 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 		List<EnviamentReferencia> referencies = new ArrayList<EnviamentReferencia>();
 		for (Enviament enviament: notificacio.getEnviaments()) {
 			if (enviament.getTitular() == null) {
-				throw new ValidationException(
-						"TITULAR",
-						"El camp 'titular' no pot ser null.");
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[TITULAR] El camp 'titular' no pot ser null.");
+				return resposta;
 			}
 			ServeiTipusEnumDto serveiTipus = null;
 			if (enviament.getServeiTipus() != null) {

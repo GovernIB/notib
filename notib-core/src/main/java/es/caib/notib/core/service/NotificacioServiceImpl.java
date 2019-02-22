@@ -142,7 +142,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				notificacio.getDocument().getArxiuId(), 
 				documentGesdocId, 
 				notificacio.getDocument().getArxiuNom(),  
-				notificacio.getDocument().getContingutBase64(),  
 				notificacio.getDocument().getHash(),  
 				notificacio.getDocument().getUrl(),  
 				notificacio.getDocument().getMetadades(),  
