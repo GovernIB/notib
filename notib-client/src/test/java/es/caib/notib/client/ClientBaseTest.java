@@ -68,18 +68,11 @@ public class ClientBaseTest {
 				"descripcio_" + notificacioId);
 		notificacio.setEnviamentDataProgramada(null);
 		notificacio.setRetard(5);
-		notificacio.setCaducitat(toXmlGregorianCalendar(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000)));
-//				toXmlGregorianCalendar(
-//						);
+		notificacio.setCaducitat(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000));
 		Document document = new Document();
 		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
 		
 		String arxiuB64 = Base64.encodeBase64String(arxiuBytes);
-		
-//		System.out.println("Hash: " + new String(DigestUtils.sha256(arxiuBytes)));
-//		System.out.println("Hash: " + new String(DigestUtils.sha256(arxiuB64)));
-//		System.out.println("Hash: " + Base64.encodeBase64String(DigestUtils.sha256(arxiuBytes)));
-//		System.out.println("Hash: " + Base64.encodeBase64String(DigestUtils.sha256(arxiuB64)));
 		
 		document.setContingutBase64(arxiuB64);
 		document.setHash(
@@ -95,13 +88,11 @@ public class ClientBaseTest {
 			pagadorPostal.setDir3Codi("A04013511");
 			pagadorPostal.setFacturacioClientCodi("ccFac_" + notificacioId);
 			pagadorPostal.setContracteNum("pccNum_" + notificacioId);
-			pagadorPostal.setContracteDataVigencia(toXmlGregorianCalendar(new Date(0)));
-//					);
+			pagadorPostal.setContracteDataVigencia(new Date(0));
 			notificacio.setPagadorPostal(pagadorPostal);
 			PagadorCie pagadorCie = new PagadorCie();
 			pagadorCie.setDir3Codi("A04013511");
-			pagadorCie.setContracteDataVigencia(toXmlGregorianCalendar(new Date(0)));
-//					toXmlGregorianCalendar();
+			pagadorCie.setContracteDataVigencia(new Date(0));
 			notificacio.setPagadorCie(pagadorCie);
 		}
 		for (int i = 0; i < numDestinataris; i++) {
@@ -274,22 +265,6 @@ public class ClientBaseTest {
 			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
 			notificacio.getEnviaments().add(enviament);
 		}
-//		ParametresSeu parametresSeu = new ParametresSeu();
-//		parametresSeu.setExpedientSerieDocumental("0000S");
-//		parametresSeu.setExpedientUnitatOrganitzativa(UNITAT_ADMINISTRATIVA_SISTRA);
-//		parametresSeu.setExpedientIdentificadorEni("ES_" + ORGAN_CODI + "_2018_EXP_NOTIB" + "0000000000000000000000009"); //+ String.format("%25s", notificacioId).replace(' ', '0'));
-//		parametresSeu.setExpedientTitol("seuExpedientTitol_" + notificacioId);
-//		parametresSeu.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT_SISTRA);
-//		parametresSeu.setRegistreLlibre(LLIBRE);
-//		parametresSeu.setRegistreOficina(OFICINA);
-//		parametresSeu.setRegistreOrgan(ORGAN_CODI);
-//		parametresSeu.setIdioma(IDIOMA);
-//		parametresSeu.setAvisTitol("seuAvisTitol_" + notificacioId);
-//		parametresSeu.setAvisText("seuAvisText_" + notificacioId);
-//		parametresSeu.setAvisTextMobil("seuAvisTextMobil_" + notificacioId);
-//		parametresSeu.setOficiTitol("seuOficiTitol_" + notificacioId);
-//		parametresSeu.setOficiText("seuOficiText_" + notificacioId);
-//		notificacio.setParametresSeu(parametresSeu);
 		return notificacio;
 	}
 

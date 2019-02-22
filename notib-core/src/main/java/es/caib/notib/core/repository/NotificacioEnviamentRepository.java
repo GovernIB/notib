@@ -51,6 +51,27 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"    NotificacioEnviamentEntity n " +
 			"where " +
 			"    (:esDataEnviamentIniciNull = true or n.createdDate >= :dataEnviamentInici) " +
+			
+			
+			
+			"and (:isCodiProcedimentNull = true or lower(n.notificacio.procedimentCodiNotib) like lower('%'||:codiProcediment||'%')) " +
+			"and (:isGrupNull = true or lower(n.notificacio.grupCodi) like lower('%'||:grup||'%')) " +
+			"and (:isConcepteNull = true or lower(n.notificacio.concepte) like lower('%'||:concepte||'%')) " +
+			"and (:isDescripcioNull = true or lower(n.notificacio.descripcio) like lower('%'||:descripcio||'%')) " +
+			"and (:isDataProgramadaDisposicioIniciNull = true or n.notificacio.enviamentDataProgramada >= :dataProgramadaDisposicioInici) " +
+			"and (:isDataProgramadaDisposicioFiNull = true or n.notificacio.enviamentDataProgramada <= :dataProgramadaDisposicioFi) " +
+			"and (:isDataCaducitatIniciNull = true or n.notificacio.caducitat >= :dataCaducitatInici) " +
+			"and (:isDataCaducitatFiNull = true or n.notificacio.caducitat <= :dataCaducitatFi) " +
+			"and (:isTipusEnviamentNull = true or lower(n.notificacio.enviamentTipus) like lower('%'||:tipusEnviament||'%')) " +
+			"and (:isCsvNull = true or lower(concat(n.notificacio.document.uuid, n.notificacio.document.csv)) like lower('%'||:csv||'%')) " +
+			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%')) " +
+			"and (:entitat = n.notificacio.entitat) " +
+			
+			
+			
+			
+			
+			
 			"and (:esDataEnviamentFiNull = true or n.createdDate <= :dataEnviamentFi) " +
 			"and (:esCodiNotificaNull = true or lower(n.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
 			"and (:esCreatedbyNull = true or lower(n.createdBy) like lower('%'||:createdBy||'%')) " +
@@ -62,9 +83,34 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			//"and  	or lower(c.destinatariLlinatge1) like lower('%'||:destinataris||'%'))" +
 			//"and 	or lower(c.destinatariLlinatge2) like lower('%'||:destinataris||'%'))" +
 			//"and   (:isCodiNotibNull = true or n.titularEmail = :codiNotib) " +
-			"and (:isNumeroCertCorreusNull = true or n.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
-			"and n.notificacio = :notificacio")
+			"and (:isNumeroCertCorreusNull = true or n.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " )
 	Page<NotificacioEnviamentEntity> findByNotificacio(
+			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
+			@Param("codiProcediment") String codiProcediment,
+			@Param("isGrupNull") boolean isGrupNull,
+			@Param("grup") String grup,
+			@Param("isConcepteNull") boolean isConcepteNull,
+			@Param("concepte") String concepte,
+			@Param("isDescripcioNull") boolean isDescripcioNull,
+			@Param("descripcio") String descripcio,
+			@Param("isDataProgramadaDisposicioIniciNull") boolean isDataProgramadaDisposicioIniciNull,
+			@Param("dataProgramadaDisposicioInici") Date dataProgramadaDisposicioInici,
+			@Param("isDataProgramadaDisposicioFiNull") boolean isDataProgramadaDisposicioFiNull,
+			@Param("dataProgramadaDisposicioFi") Date dataProgramadaDisposicioFi,
+			@Param("isDataCaducitatIniciNull") boolean isDataCaducitatIniciNull,
+			@Param("dataCaducitatInici") Date dataCaducitatInici,
+			@Param("isDataCaducitatFiNull") boolean dataCaducitatFiNull,
+			@Param("dataCaducitatFi") Date dataCaducitatFi,
+			@Param("isTipusEnviamentNull") boolean isTipusEnviamentNull,
+			@Param("tipusEnviament") int tipusEnviament,
+			@Param("isCsvNull") boolean isCsvNull,
+			@Param("csv") String csv,
+			@Param("isEstatNull") boolean isEstatNull,
+			@Param("estat") int estat,
+			@Param("entitat") EntitatEntity entitat,
+			
+			
+			
 			@Param("esDataEnviamentIniciNull") boolean esDataEnviamentIniciNull,
 			@Param("dataEnviamentInici") Date dataEnviamentInici,
 			@Param("esDataEnviamentFiNull") boolean esDataEnviamentFiNull,
@@ -87,7 +133,6 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			//@Param("codiNotib") String codiNotib,
 			@Param("isNumeroCertCorreusNull") boolean isNumeroCertCorreusNull,
 			@Param("numeroCertCorreus") String numeroCertCorreus,
-			@Param("notificacio") NotificacioEntity notificacio,
 			Pageable pageable);
 	
 	@Query(	"from" +

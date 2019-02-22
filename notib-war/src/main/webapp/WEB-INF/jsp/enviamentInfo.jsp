@@ -63,8 +63,13 @@ $(document).ready(function() {
 				<spring:message code="enviament.info.tab.estat.notifica"/>
 			</a>
 		</li>
-		<li role="presentation"<c:if test="${pipellaActiva == 'estatSeu'}"> class="active"</c:if>>
+		<%-- <li role="presentation"<c:if test="${pipellaActiva == 'estatSeu'}"> class="active"</c:if>>
 			<a href="#estatSeu" aria-controls="estatSeu" role="tab" data-toggle="tab">
+				<spring:message code="enviament.info.tab.estat.seu"/>
+			</a>
+		</li> --%>
+		<li role="presentation"<c:if test="${pipellaActiva == 'estatSeu'}"> class="active"</c:if>>
+			<a href="#estatRegistre" aria-controls="estatRegistre" role="tab" data-toggle="tab">
 				<spring:message code="enviament.info.tab.estat.registre"/>
 			</a>
 		</li>
@@ -458,7 +463,67 @@ $(document).ready(function() {
 				</div>
 			</c:if>
 		</div>
-		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'estatSeu'}"> active</c:if>" id="estatSeu">
+		<%-- <div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'estatSeu'}"> active</c:if>" id="estatSeu">
+			<c:if test="${empty enviament.notificacio.seuRegistreNumero}">
+				<div class="alert alert-warning well-sm" role="alert" style="margin-top: 1em">
+					<spring:message code="enviament.info.estat.seu.no.enviada"/>
+				</div>
+				<c:if test="${enviament.notificacio.estat != 'PENDENT'}">
+					<c:if test="${notificacio.enviamentTipus == 'COMUNICACIO'}">
+						<p class="well well-sm text-right" style="margin-top: 1em">
+							<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/comunicacioSeu"/>" class="btn btn-default">
+								<span class="fa fa-check-square-o"></span>
+								<spring:message code="enviament.info.accio.seu.informar.obertura"/>
+							</a>
+						</p>
+					</c:if>
+					<c:if test="${notificacio.enviamentTipus == 'NOTIFICACIO'}">
+						<form action="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/certificacioSeu"/>" class="well well-sm text-right" style="margin-top: 1em" method="post" enctype="multipart/form-data">
+							<input type="file" name="certificat" class="pull-left"/>
+							<button type="submit" class="btn btn-default">
+								<span class="fa fa-send-o"></span>
+								<spring:message code="enviament.info.accio.seu.enviar.certificacio"/>
+							</button>
+						</form>
+					</c:if>
+				</c:if>
+			</c:if>
+			<c:if test="${not empty enviament.notificacio.seuRegistreNumero}">
+				<p class="text-right" style="margin-top: 1em">
+					<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstatSeu"/>" class="btn btn-default">
+						<span class="fa fa-refresh"></span>
+						<spring:message code="enviament.info.accio.refrescar.estat"/>
+					</a>
+				</p>
+				<div class="panel panel-default">
+					<table class="table table-bordered" style="width:100%">
+					<tbody>
+						<tr>
+							<td width="30%"><strong><spring:message code="enviament.info.seu.registre.num"/></strong></td>
+							<td>${enviament.notificacio.seuRegistreNumero}</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="enviament.info.seu.registre.data"/></strong></td>
+							<td><fmt:formatDate value="${enviament.notificacio.seuRegistreData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="enviament.info.seu.data.fi"/></strong></td>
+							<td>${enviament.seuDataFi}</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="enviament.info.seu.data.enviament"/></strong></td>
+							<td><fmt:formatDate value="${enviament.notificacio.seuDataEnviament}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="enviament.info.seu.estat"/></strong></td>
+							<td><spring:message code="es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.${enviament.seuEstat}"/></td>
+						</tr>
+					</tbody>
+					</table>
+				</div>
+			</c:if>
+		</div> --%>
+		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'estatRegistre'}"> active</c:if>" id="estatRegistre">
 			<c:if test="${empty enviament.notificacio.seuRegistreNumero}">
 				<div class="alert alert-warning well-sm" role="alert" style="margin-top: 1em">
 					<spring:message code="enviament.info.estat.registre.no.enviada"/>

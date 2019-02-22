@@ -404,7 +404,7 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="titularNif" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.niftitular"/>
+				<th data-col-name="titular.nif" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.niftitular"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="nifTitular" value="${filtreEnviaments.nifTitular}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.niftitular"/>"/>
@@ -434,7 +434,7 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="titularEmail" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.emailtitular"/>
+				<th data-col-name="titular.email" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.emailtitular"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="emailTitular" value="${filtreEnviaments.emailTitular}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.emailtitular"/>"/>
@@ -483,7 +483,7 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="numeroCertCorreus" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.numerocertificatcorreus"/>
+				<th data-col-name="notificaCertificacioNumSeguiment" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.numerocertificatcorreus"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="numeroCertCorreus" value="${filtreEnviaments.numeroCertCorreus}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.numerocertificatcorreus"/>"/>
@@ -498,10 +498,10 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="notificacio.csv_uuid" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codicsvuuid"/>
+				<th data-col-name="csvUuid" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codicsvuuid"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
-							<input name="csvUuid" value="${filtreEnviaments.csvUuid}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codicsvuuid"/>'"/>
+							<input name="csvUuid" value="${filtreEnviaments.csvUuid}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codicsvuuid"/>"/>
 						</div>
 					</script>
 				</th>

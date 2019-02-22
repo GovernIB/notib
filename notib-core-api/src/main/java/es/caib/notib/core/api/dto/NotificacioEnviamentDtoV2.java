@@ -27,6 +27,10 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private String notificaIdentificador;
 	private String numeroCertCorreus;
 	private String csvUuid;
+	private String csv;
+	private String uuid;
+	private String notificaCertificacioNumSeguiment;
+	
 	
 	
 	public Long getId() {
@@ -105,6 +109,10 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 		this.titularNif = titularNif;
 	}
 	public String getDestinatarisNomLlinatges() {
+		destinatarisNomLlinatges = "";
+		for(PersonaDto destinatari: destinataris) {
+			destinatarisNomLlinatges += concatenarNomLlinatges(llinatgesDestinatari(destinatari), destinatari.getNom(), destinatari.getRaoSocial(), null)+"</br>";
+		}
 		return destinatarisNomLlinatges;
 	}
 	public void setDestinatarisNomLlinatges(String destinatarisNomLlinatge) {
@@ -117,7 +125,13 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 		this.numeroCertCorreus = numeroCertCorreus;
 	}
 	public String getCsvUuid() {
-		return csvUuid;
+		if(notificacio.getDocument().getUuid() != null) {
+			this.setCsvUuid(notificacio.getDocument().getUuid());
+		}
+		if(notificacio.getDocument().getCsv() != null) {
+			this.setCsvUuid(notificacio.getDocument().getCsv());
+		}
+		return this.csvUuid;
 	}
 	public void setCsvUuid(String csvUuid) {
 		this.csvUuid = csvUuid;
@@ -143,19 +157,25 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 				titular.getLlinatge2());
 	}
 	
-	public String getTitular() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(titular.getNom());
-		String llinatges = getTitularLlinatges();
-		if (llinatges != null && !llinatges.isEmpty()) {
-			sb.append(" ");
-			sb.append(llinatges);
-		}
-		sb.append(" (");
-		sb.append(titular.getNif());
-		sb.append(")");
-		return sb.toString();
+	public String llinatgesDestinatari(PersonaDto destinatari) {
+		return concatenarLlinatges(
+				destinatari.getLlinatge1(),
+				destinatari.getLlinatge2());
 	}
+	
+//	public String getTitular() {
+//		StringBuilder sb = new StringBuilder();
+//		sb.append(titular.getNom());
+//		String llinatges = getTitularLlinatges();
+//		if (llinatges != null && !llinatges.isEmpty()) {
+//			sb.append(" ");
+//			sb.append(llinatges);
+//		}
+//		sb.append(" (");
+//		sb.append(titular.getNif());
+//		sb.append(")");
+//		return sb.toString();
+//	}
 	
 	private String concatenarLlinatges(
 			String llinatge1,
@@ -172,6 +192,9 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 		return sb.toString();
 	}
 	
+	public PersonaDto getTitular() {
+		return titular;
+	}
 	private String concatenarNomLlinatges(
 			String llinatges,
 			String nom,
@@ -202,6 +225,25 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 			sb.append("]");
 		}
 		return sb.toString();
+	}
+
+	public String getCsv() {
+		return csv;
+	}
+	public void setCsv(String csv) {
+		this.csv = csv;
+	}
+	public String getUuid() {
+		return uuid;
+	}
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+	public String getNotificaCertificacioNumSeguiment() {
+		return notificaCertificacioNumSeguiment;
+	}
+	public void setNotificaCertificacioNumSeguiment(String notificaCertificacioNumSeguiment) {
+		this.notificaCertificacioNumSeguiment = notificaCertificacioNumSeguiment;
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;
