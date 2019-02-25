@@ -119,9 +119,9 @@ public class NotificacioController extends BaseUserController {
 			procedimentsPermisConsultaSenseGrups = notificacioService
 					.findProcedimentsAmbPermisConsultaSenseGrups(procedimentsSenseGrups);
 
-			if ((procedimentsPermisConsulta == null || procedimentsPermisConsulta.size() <= 0)
+			if ((procedimentsPermisConsulta == null || procedimentsPermisConsulta.size() < 0)
 					|| (procedimentsPermisConsultaSenseGrups == null
-							|| procedimentsPermisConsultaSenseGrups.size() <= 0)) {
+							|| procedimentsPermisConsultaSenseGrups.size() < 0)) {
 				MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.lectura"));
 			}
 		}
@@ -257,6 +257,16 @@ public class NotificacioController extends BaseUserController {
 					NotificacioCommandV2.asDto(notificacioCommand));
 		} else {
 			notificacioService.create(entitatActual.getId(), NotificacioCommandV2.asDto(notificacioCommand));
+			model.addAttribute("notificacioEstats", EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
+					"es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
+			model.addAttribute("notificacioEnviamentEstats",
+					EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
+							"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
+			model.addAttribute("notificacioComunicacioTipus",
+					EnumHelper.getOptionsForEnum(NotificacioComunicacioTipusEnumDto.class,
+							"es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto."));
+			model.addAttribute("notificacioEnviamentTipus", EnumHelper.getOptionsForEnum(
+					NotificaEnviamentTipusEnumDto.class, "es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
 		}
 		return "notificacioList";
 	}

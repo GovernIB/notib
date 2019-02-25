@@ -3,6 +3,7 @@ package es.caib.notib.core.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import es.caib.notib.core.audit.NotibAuditable;
 
@@ -23,7 +24,7 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 	@Column(name = "arxiu_nom", length = 256)
 	protected String arxiuNom;
 	
-	@Column(name = "contingut_base_64")
+	@Transient
 	protected String contingutBase64;
 	
 	@Column(name = "hash", length = 256)
