@@ -131,7 +131,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	public List<NotificacioDto> create(
 			Long entitatId, 
 			NotificacioDtoV2 notificacio) {
-		return null;
+		return delegate.create(entitatId, notificacio);
 	}
 
 	@Override
