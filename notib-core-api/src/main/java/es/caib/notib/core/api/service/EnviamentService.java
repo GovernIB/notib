@@ -156,5 +156,17 @@ public interface EnviamentService {
 	public ColumnesDto getColumnesUsuari(
 			Long entitatId,
 			UsuariDto usuari);
+	
+	/**
+	 * Obté les columnes visibles per un usuari i entitat
+	 * 
+	 * @param columnes
+	 *            Attribut amb les columnes a visualitzar.
+	 * @return columnes que s'han de visualitzar.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public NotificacioEnviamentDtoV2 getOne(
+			Long entitatId);
+
 
 }

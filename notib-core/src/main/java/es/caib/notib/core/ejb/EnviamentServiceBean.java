@@ -127,6 +127,11 @@ public class EnviamentServiceBean implements EnviamentService {
 				filtre);
 	}
 
+	@Override
+	public NotificacioEnviamentDtoV2 getOne(Long entitatId) {
+		return delegate.getOne(entitatId);
+	}
+
 	
 	
 

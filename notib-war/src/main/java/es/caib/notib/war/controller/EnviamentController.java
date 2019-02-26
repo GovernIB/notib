@@ -5,7 +5,9 @@ package es.caib.notib.war.controller;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,12 +26,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.notib.core.api.dto.ColumnesDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EnviamentService;
+import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.war.command.ColumnesCommand;
 import es.caib.notib.war.command.NotificacioEnviamentCommand;
 import es.caib.notib.war.command.NotificacioEnviamentFiltreCommand;
@@ -56,6 +60,8 @@ public class EnviamentController extends BaseUserController {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private EnviamentService enviamentService;
+	@Autowired
+	private NotificacioService notificacioService;
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -250,6 +256,38 @@ public class EnviamentController extends BaseUserController {
 				e.printStackTrace();
 			}
 			
+			return null;
+		}
+	}
+	
+	@RequestMapping(value = "/reintentar/notificacio", method = RequestMethod.GET)
+	@ResponseBody
+	public String reintentarNotificacio(
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		if (seleccio == null || seleccio.isEmpty()) {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"enviament.controller.exportacio.seleccio.buida"));
+			return "error";
+		} else {
+			List<Long> notificacioIds = new ArrayList<Long>();
+			for(Long id: seleccio) {
+				NotificacioEnviamentDtoV2 e = enviamentService.getOne(id);
+				if(!notificacioIds.contains(e.getNotificacioId())) {
+					notificacioIds.add(e.getNotificacioId());
+				}
+			}
+			for(Long notificacioId: notificacioIds) {
+				notificacioService.enviar(entitatActual.getId(), notificacioId);
+			}
 			return null;
 		}
 	}
