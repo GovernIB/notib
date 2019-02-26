@@ -212,5 +212,17 @@ public class ProcedimentServiceBean implements ProcedimentService {
 		return delegate.hasGrupPermisNotificacioProcediment(procediments);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public boolean hasPermisGestioProcediment(String procedimentCodi) {
+		return delegate.hasPermisGestioProcediment(procedimentCodi);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public boolean hasPermisProcessarProcediment(String procedimentCodi) {
+		return delegate.hasPermisProcessarProcediment(procedimentCodi);
+	}
+
 
 }

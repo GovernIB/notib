@@ -550,93 +550,140 @@ public class EnviamentServiceImpl implements EnviamentService {
 				"entitatId=" + entitatId + ", " +
 				"enviamentsIds=" + enviamentIds + ", " +
 				"format=" + format + ")");
+			Date dataEnviamentInici = null,
+			 dataEnviamentFi = null,
+			 dataProgramadaDisposicioInici = null,
+			 dataProgramadaDisposicioFi = null,
+			 dataRegistreInici = null,
+			 dataRegistreFi = null,
+			 dataCaducitatInici = null,
+			 dataCaducitatFi = null;
 		
-		List<NotificacioEntity> notificacions = new ArrayList<NotificacioEntity>();
 		EntitatEntity entitatEntity = entitatRepository.findOne(entitatId);
-		Date dataProgramadaDisposicioInici = null,
-				 dataProgramadaDisposicioFi = null,
-				 dataRegistreInici = null,
-				 dataRegistreFi = null,
-				 dataCaducitatInici = null,
-				 dataCaducitatFi = null;
-			
-			if (filtre.getDataProgramadaDisposicioInici() != null) {
-				dataProgramadaDisposicioInici = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataProgramadaDisposicioInici());
-				if (dataProgramadaDisposicioInici != null) {
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(dataProgramadaDisposicioInici);
-					cal.set(Calendar.HOUR_OF_DAY, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-					dataProgramadaDisposicioInici = cal.getTime();
-				}
+		entityComprovarHelper.comprovarPermisos(
+				null,
+				true,
+				true,
+				false);
+		
+		if (filtre.getDataEnviamentInici() != null && filtre.getDataEnviamentInici() != "") {
+			dataEnviamentInici = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentInici());
+			if (dataEnviamentInici != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataEnviamentInici);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataEnviamentInici = cal.getTime();
 			}
-			if (filtre.getDataProgramadaDisposicioFi() != null) {
-				dataProgramadaDisposicioFi = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataProgramadaDisposicioFi());
-				if (dataProgramadaDisposicioFi != null) {
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(dataProgramadaDisposicioFi);
-					cal.set(Calendar.HOUR_OF_DAY, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-					dataProgramadaDisposicioFi = cal.getTime();
-				}
+		}
+		if (filtre.getDataEnviamentFi() != null && filtre.getDataEnviamentFi() != "") {
+			dataEnviamentFi = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentFi());
+			if (dataEnviamentFi != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataEnviamentFi);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataEnviamentFi = cal.getTime();
 			}
-			if (filtre.getDataRegistreInici() != null) {
-				dataRegistreInici = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataRegistreInici());
-				if (dataRegistreInici != null) {
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(dataRegistreInici);
-					cal.set(Calendar.HOUR_OF_DAY, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-					dataRegistreInici = cal.getTime();
-				}
+		}
+		if (filtre.getDataProgramadaDisposicioInici() != null && filtre.getDataProgramadaDisposicioInici() != "") {
+			dataProgramadaDisposicioInici = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataProgramadaDisposicioInici());
+			if (dataProgramadaDisposicioInici != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataProgramadaDisposicioInici);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataProgramadaDisposicioInici = cal.getTime();
 			}
-			if (filtre.getDataRegistreFi() != null) {
-				dataRegistreFi = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataRegistreFi());
-				if (dataRegistreFi != null) {
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(dataRegistreFi);
-					cal.set(Calendar.HOUR_OF_DAY, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-					dataRegistreFi = cal.getTime();
-				}
+		}
+		if (filtre.getDataProgramadaDisposicioFi() != null && filtre.getDataProgramadaDisposicioFi() != "") {
+			dataProgramadaDisposicioFi = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataProgramadaDisposicioFi());
+			if (dataProgramadaDisposicioFi != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataProgramadaDisposicioFi);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataProgramadaDisposicioFi = cal.getTime();
 			}
-			if (filtre.getDataCaducitatInici() != null) {
-				dataCaducitatInici = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataCaducitatInici());
-				if (dataCaducitatInici != null) {
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(dataCaducitatInici);
-					cal.set(Calendar.HOUR_OF_DAY, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-					dataCaducitatInici = cal.getTime();
-				}
+		}
+		if (filtre.getDataRegistreInici() != null && filtre.getDataRegistreInici() != "") {
+			dataRegistreInici = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataRegistreInici());
+			if (dataRegistreInici != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataRegistreInici);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataRegistreInici = cal.getTime();
 			}
-			if (filtre.getDataCaducitatFi() != null) {
-				dataCaducitatFi = new SimpleDateFormat("dd/mm/yyyy").parse(filtre.getDataCaducitatFi());
-				if (dataCaducitatFi != null) {
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(dataCaducitatFi);
-					cal.set(Calendar.HOUR_OF_DAY, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-					dataCaducitatFi = cal.getTime();
-				}
+		}
+		if (filtre.getDataRegistreFi() != null && filtre.getDataRegistreFi() != "") {
+			dataRegistreFi = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataRegistreFi());
+			if (dataRegistreFi != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataRegistreFi);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataRegistreFi = cal.getTime();
 			}
+		}
+		if (filtre.getDataCaducitatInici() != null && filtre.getDataCaducitatInici() != "") {
+			dataCaducitatInici = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataCaducitatInici());
+			if (dataCaducitatInici != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataCaducitatInici);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataCaducitatInici = cal.getTime();
+			}
+		}
+		if (filtre.getDataCaducitatFi() != null && filtre.getDataCaducitatFi() != "") {
+			dataCaducitatFi = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataCaducitatFi());
+			if (dataCaducitatFi != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataCaducitatFi);
+				cal.set(Calendar.HOUR_OF_DAY, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataCaducitatFi = cal.getTime();
+			}
+		}
+		//Filtres camps procediment
 		Integer estat = null;
 		Integer tipusEnviament = null;
-		if(filtre.getEstat()!=null){estat = filtre.getEstat().getNumVal();}else{estat = 0;}
-		if(filtre.getEnviamentTipus()!=null){tipusEnviament = NotificacioTipusEnviamentEnumDto.getNumVal(filtre.getEnviamentTipus()) ;}else{tipusEnviament = 0;}
-		notificacions = notificacioRepository.findNotificacioByFiltre(
+		if(filtre.getEstat()!=null){
+			estat = filtre.getEstat().getNumVal();
+		}else{
+			estat = 0;
+		}
+		if(filtre.getEnviamentTipus()!=null){
+			tipusEnviament = NotificacioTipusEnviamentEnumDto.getNumVal(filtre.getEnviamentTipus());
+		}else{
+			tipusEnviament = 0;
+		}
+		List<NotificacioEnviamentEntity> enviaments = null;
+		
+		entityComprovarHelper.comprovarPermisos(
+				null,
+				true,
+				true,
+				false);
+			
+		enviaments = notificacioEnviamentRepository.findByNotificacio(
 				filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 				filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
 				filtre.getGrup() == null || filtre.getGrup().isEmpty(),
@@ -655,19 +702,56 @@ public class EnviamentServiceImpl implements EnviamentService {
 				dataCaducitatFi,
 				(filtre.getEnviamentTipus() == null),
 				(tipusEnviament),
-				//(filtre.getLlibreRegistre() == null || filtre.getLlibreRegistre().isEmpty()),
-				//filtre.getLlibreRegistre() == null ? "" : filtre.getLlibreRegistre(),
-				//(filtre.getNumeroRegistre() == null || filtre.getNumeroRegistre().isEmpty()),
-				//filtre.getNumeroRegistre() == null ? "" : filtre.getNumeroRegistre(),
-				//(dataRegistreInici == null),
-				//dataRegistreInici,
-				//(dataRegistreFi == null),
-				//dataRegistreFi,
 				(filtre.getCsvUuid() == null || filtre.getCsvUuid().isEmpty()),
 				filtre.getCsvUuid(),
 				(filtre.getEstat() == null),
 				(estat),
-				entitatEntity);
+				entitatEntity,
+				(dataEnviamentInici == null),
+				dataEnviamentInici,
+				(dataEnviamentFi == null),
+				dataEnviamentFi,
+				(filtre.getCodiNotifica() == null || filtre.getCodiNotifica().isEmpty()),
+				filtre.getCodiNotifica() == null ? "" : filtre.getCodiNotifica(),
+				(filtre.getCreatedBy() == null || filtre.getCreatedBy().getCodi().isEmpty()),
+				conversioTipusHelper.convertir(filtre.getCreatedBy(), UsuariEntity.class),
+				(filtre.getNifTitular() == null || filtre.getNifTitular().isEmpty()),
+				filtre.getNifTitular() == null ? "" : filtre.getNifTitular(),
+				(filtre.getTitularNomLlinatge() == null || filtre.getTitularNomLlinatge().isEmpty()),
+				filtre.getTitularNomLlinatge() == null ? "" : filtre.getTitularNomLlinatge(),
+				(filtre.getEmailTitular() == null || filtre.getEmailTitular().isEmpty()),
+				filtre.getEmailTitular() == null ? "" : filtre.getEmailTitular(),
+				(filtre.getDir3Codi() == null || filtre.getDir3Codi().isEmpty()),
+				filtre.getDir3Codi() == null ? "" : filtre.getDir3Codi(),
+				(filtre.getNumeroCertCorreus() == null || filtre.getNumeroCertCorreus().isEmpty()),
+				filtre.getNumeroCertCorreus() == null ? "" : filtre.getNumeroCertCorreus(),
+				(filtre.getUsuari() == null || filtre.getUsuari().isEmpty()),
+				filtre.getUsuari() == null ? "" : filtre.getUsuari(),
+				(filtre.getRegistreLlibre() == null || filtre.getRegistreLlibre().isEmpty()),
+				filtre.getRegistreLlibre() == null ? "" : filtre.getRegistreLlibre(),
+				(filtre.getRegistreNumero() == null || filtre.getRegistreNumero().isEmpty()),
+				filtre.getRegistreNumero() == null ? "" : filtre.getRegistreNumero(),
+				(dataRegistreInici == null),
+				dataRegistreInici,
+				(dataRegistreFi == null),
+				dataRegistreFi);
+			
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		for(NotificacioEnviamentEntity nee: enviaments) {
+			nee.setNotificacio(notificacioRepository.findById(nee.getNotificacioId()));
+		}
+		
+		
+		
+		
 		
 		//Genera les columnes
 		int numColumnes = 22;
@@ -698,45 +782,47 @@ public class EnviamentServiceImpl implements EnviamentService {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		List<String[]> files = new ArrayList<String[]>();
 		
-		for (NotificacioEntity notificacio : notificacions) {
+		String[] fila = new String[numColumnes];
+		
+		
 			
-			String[] fila = new String[numColumnes];
-			
-			List<NotificacioEnviamentEntity> enviaments = notificacioEnviamentRepository.findByNotificacioAndIdInOrderByIdAsc(
-					notificacio,
-					enviamentIds);
-			
-			if(!enviaments.isEmpty() && enviaments != null) {
-				
-				for (NotificacioEnviamentEntity enviament : enviaments) {
-					fila[0] = enviament.getCreatedDate().toDate() != null ? sdf.format(enviament.getCreatedDate().toDate()) : "";
-					fila[1] = notificacio.getNotificaEnviamentData() != null ? sdf.format(notificacio.getNotificaEnviamentData()) : "";
-					fila[2] = enviament.getNotificaIdentificador();
-					fila[3] = notificacio.getProcedimentCodiNotib();
-					fila[4] = notificacio.getGrupCodi();
-					fila[5] = notificacio.getEmisorDir3Codi();
-					fila[6] = enviament.getCreatedBy().getCodi();
-					fila[7] = notificacio.getEnviamentTipus().getText();
-					fila[8] = notificacio.getConcepte();
-					fila[9] = notificacio.getDescripcio();
-					fila[10] = enviament.getTitular().getNif();
-					fila[11] = enviament.getTitular().getNom();
-					fila[12] = enviament.getTitular().getEmail();
-					fila[13] = enviament.getDestinataris().get(0).getNif();
-					fila[14] = notificacio.getRegistreLlibre();
-					fila[15] = "numero registre";
-					fila[16] = "data registre";
-					fila[17] = notificacio.getCaducitat() != null ? sdf.format(notificacio.getCaducitat()) : "";
-					fila[18] = "codi notib enviament";
-					fila[19] = enviament.getNotificaCertificacioNumSeguiment();	
-//					fila[20] = notificacio.getCsv_uuid();
-					fila[20] = notificacio.getEstat().name();	
-					
-					files.add(fila);
+		for (NotificacioEnviamentEntity enviament : enviaments) {
+			if(enviamentIds.contains(enviament.getId())) {
+				String csvUuid = "";
+				if(enviament.getNotificacio().getDocument().getCsv() != null) {
+					csvUuid = enviament.getNotificacio().getDocument().getCsv();
 				}
+				if(enviament.getNotificacio().getDocument().getUuid() != null) {
+					csvUuid = enviament.getNotificacio().getDocument().getUuid();
+				}
+				
+				
+				fila[0] = enviament.getCreatedDate().toDate() != null ? sdf.format(enviament.getCreatedDate().toDate()) : "";
+				fila[1] = enviament.getNotificacio().getEnviamentDataProgramada() != null ? sdf.format(enviament.getNotificacio().getEnviamentDataProgramada()) : "";
+				fila[2] = enviament.getNotificaIdentificador();
+				fila[3] = enviament.getNotificacio().getProcedimentCodiNotib();
+				fila[4] = enviament.getNotificacio().getGrupCodi();
+				fila[5] = enviament.getNotificacio().getEmisorDir3Codi();
+				fila[6] = enviament.getCreatedBy().getCodi();
+				fila[7] = enviament.getNotificacio().getEnviamentTipus().getText();
+				fila[8] = enviament.getNotificacio().getConcepte();
+				fila[9] = enviament.getNotificacio().getDescripcio();
+				fila[10] = enviament.getTitular().getNif();
+				fila[11] = enviament.getTitular().getNom();
+				fila[12] = enviament.getTitular().getEmail();
+				fila[13] = (enviament.getDestinataris().size() > 0) ? enviament.getDestinataris().get(0).getNif() : null;
+				fila[14] = enviament.getNotificacio().getRegistreLlibre();
+				fila[15] = enviament.getNotificacio().getRegistreNumero();
+				fila[16] = (enviament.getNotificacio().getRegistreData() != null)? enviament.getNotificacio().getRegistreData().toString() : "";
+				fila[17] = enviament.getNotificacio().getCaducitat() != null ? sdf.format(enviament.getNotificacio().getCaducitat()) : "";
+				fila[19] = enviament.getNotificaCertificacioNumSeguiment();
+				fila[20] = csvUuid;
+				fila[21] = enviament.getNotificacio().getEstat().name();	
+				
+				files.add(fila);	
 			}
-			
 		}
+			
 		FitxerDto fitxer = new FitxerDto();
 		if ("ODS".equalsIgnoreCase(format)) {
 			Object[][] filesArray = files.toArray(new Object[files.size()][numColumnes]);

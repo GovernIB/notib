@@ -26,8 +26,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.notib.core.api.dto.ColumnesDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -192,6 +194,7 @@ public class EnviamentController extends BaseUserController {
 		}
 		return seleccio.size();
 	}
+	
 	@RequestMapping(value = "/deselect", method = RequestMethod.GET)
 	@ResponseBody
 	public int deselect(
@@ -235,7 +238,7 @@ public class EnviamentController extends BaseUserController {
 					getMessage(
 							request, 
 							"enviament.controller.exportacio.seleccio.buida"));
-			return "redirect:../../expedient";
+			return "redirect:../../enviament";
 		} else {
 			filtreCommand = (NotificacioEnviamentFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
 					request,
@@ -270,13 +273,14 @@ public class EnviamentController extends BaseUserController {
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				SESSION_ATTRIBUTE_SELECCIO);
+		String resposta = "";
 		if (seleccio == null || seleccio.isEmpty()) {
 			MissatgesHelper.error(
 					request, 
 					getMessage(
 							request, 
-							"enviament.controller.exportacio.seleccio.buida"));
-			return "error";
+							"enviament.controller.notificacio.seleccio.buida"));
+			resposta = "error";
 		} else {
 			List<Long> notificacioIds = new ArrayList<Long>();
 			for(Long id: seleccio) {
@@ -285,11 +289,43 @@ public class EnviamentController extends BaseUserController {
 					notificacioIds.add(e.getNotificacioId());
 				}
 			}
+			Integer notificacionsNoPendents = 0;
 			for(Long notificacioId: notificacioIds) {
-				notificacioService.enviar(entitatActual.getId(), notificacioId);
+				NotificacioDtoV2 notificacio = notificacioService.findAmbId(notificacioId);
+				if(notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)) {
+					notificacioService.enviar(entitatActual.getId(), notificacioId);	
+				}else {
+					notificacionsNoPendents++;	
+				}
 			}
-			return null;
+			if(notificacionsNoPendents.equals((Integer)notificacioIds.size()) && notificacionsNoPendents > 1) {
+				MissatgesHelper.error(
+						request, 
+						getMessage(
+								request, 
+								"enviament.controller.reintent.notificacions.pendents.KO"));
+			} else if(notificacionsNoPendents.equals((Integer)notificacioIds.size()) && notificacionsNoPendents == 1){
+				MissatgesHelper.error(
+						request, 
+						getMessage(
+								request, 
+								"enviament.controller.reintent.notificacio.pendent.KO"));
+			} else if(notificacioIds.size() > 1){
+				MissatgesHelper.info(
+						request, 
+						getMessage(
+								request, 
+								"enviament.controller.reintent.notificacions.pendents.OK"));
+			} else {
+				MissatgesHelper.info(
+						request, 
+						getMessage(
+								request, 
+								"enviament.controller.reintent.notificacio.pendent.OK"));
+			}
+			resposta = "ok";
 		}
+		return resposta;
 	}
 	
 	@RequestMapping(value = "/visualitzar", method = RequestMethod.GET)

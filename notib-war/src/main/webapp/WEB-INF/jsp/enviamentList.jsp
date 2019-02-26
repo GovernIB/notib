@@ -172,7 +172,7 @@ $(document).ready(function() {
 				$.get(
 					"enviament/reintentar/notificacio",
 					function(data) {
-						console.log(data);
+						location.reload();
 					}
 				);
 			}
@@ -552,7 +552,7 @@ function getCookie(cname) {
 						</div>
 					</script>
 				</th>
-				<c:choose>
+				<%-- <c:choose>
 					<c:when test = "${columnes.codiNotibEnviament == true}"> 
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
@@ -566,7 +566,7 @@ function getCookie(cname) {
 							<input name="codiNotibEnviament" value="${filtreEnviaments.codiNotibEnviament}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codinotibenviament"/>"/>
 						</div>
 					</script>
-				</th>
+				</th> --%>
 				<c:choose>
 					<c:when test = "${columnes.numCertificacio == true}"> 
 					  <c:set value="true" var="visible"></c:set>
