@@ -146,11 +146,14 @@ public class NotificacioController extends BaseUserController {
 			HttpServletRequest request, 
 			@PathVariable Long procedimentId, 
 			Model model) {
-		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+		ProcedimentDto procedimentActual = procedimentService.findById(
+				null, 
+				isAdministrador(request), 
+				procedimentId);
 		NotificacioCommandV2 notificacio = new NotificacioCommandV2();
 
 		model.addAttribute("notificacioCommandV2", notificacio);
-		model.addAttribute("entitat", entitat);
+		model.addAttribute("entitat", procedimentActual.getEntitat());
 		model.addAttribute("procediment", procedimentService.findById(null, isAdministrador(request), procedimentId));
 		model.addAttribute("grups", grupService.findByGrupsProcediment(procedimentId));
 
@@ -228,7 +231,11 @@ public class NotificacioController extends BaseUserController {
 			Model model) throws IOException {
 		DocumentCommand document = notificacioCommand.getDocument();
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-
+		ProcedimentDto procedimentActual = procedimentService.findById(
+				null, 
+				isAdministrador(request), 
+				notificacioCommand.getProcedimentId());
+		
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("enviosGuardats", notificacioCommand.getEnviaments());
             model.addAttribute("errors", bindingResult.getAllErrors());
@@ -262,10 +269,14 @@ public class NotificacioController extends BaseUserController {
 		}
 		
 		if (notificacioCommand.getId() != null) {
-			notificacioService.update(notificacioCommand.getProcedimentId(),
+			notificacioService.update(
+					notificacioCommand.getProcedimentId(),
 					NotificacioCommandV2.asDto(notificacioCommand));
 		} else {
-			notificacioService.create(entitatActual.getId(), NotificacioCommandV2.asDto(notificacioCommand));
+			notificacioService.create(
+					procedimentActual.getEntitat().getId(), 
+					NotificacioCommandV2.asDto(notificacioCommand));
+			
 			model.addAttribute("notificacioEstats", 
 					EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
 							"es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));

@@ -115,7 +115,7 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 		Page<PagadorCieEntity> pagadorCie = null;
 
 		pagadorCie = pagadorCieReposity.findByCodiDir3NotNullFiltrePaginat(
-				filtre.getDir3codi() == null,
+				filtre.getDir3codi() == null || filtre.getDir3codi().isEmpty(),
 				filtre.getDir3codi(),
 				paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio));
 		

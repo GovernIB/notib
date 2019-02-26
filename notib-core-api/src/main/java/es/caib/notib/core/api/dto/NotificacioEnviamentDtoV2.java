@@ -13,6 +13,7 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 
 	private Long id;
 	private NotificacioDtoV2 notificacio;
+	private Long notificacioId;
 	private PersonaDto titular;
 	private List<PersonaDto> destinataris;
 	private EntregaPostalDto entregaPostal;
@@ -258,6 +259,13 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	}
 	public void setDetalls(String detalls) {
 		this.detalls = detalls;
+	}
+
+	public Long getNotificacioId() {
+		return notificacioId;
+	}
+	public void setNotificacioId(Long notificacioId) {
+		this.notificacioId = notificacioId;
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;

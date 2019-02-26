@@ -930,6 +930,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(EnviamentServiceImpl.class);
 
+	@Override
+	public NotificacioEnviamentDtoV2 getOne(Long entitatId) {
+		return conversioTipusHelper.convertir(notificacioEnviamentRepository.findOne(entitatId), NotificacioEnviamentDtoV2.class);
+	}
+
 
 
 }

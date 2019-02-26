@@ -18,6 +18,7 @@ import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.PagadorCieService;
 import es.caib.notib.core.api.service.PagadorPostalService;
 import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.war.command.GrupFiltreCommand;
 import es.caib.notib.war.command.PagadorPostalCommand;
 import es.caib.notib.war.command.PagadorPostalFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
@@ -85,6 +86,20 @@ public class PagadorPostalController extends BaseUserController{
 			Model model) {
 		String vista = formGet(request, null, model);
 		return vista;
+	}
+	
+	@RequestMapping(method = RequestMethod.POST)
+	public String post(	
+			HttpServletRequest request,
+			PagadorPostalFiltreCommand command,
+			Model model) {
+		
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request, 
+				PAGADOR_POSTAL_FILTRE, 
+				command);
+		
+		return "pagadorPostalAdminList";
 	}
 	
 	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)

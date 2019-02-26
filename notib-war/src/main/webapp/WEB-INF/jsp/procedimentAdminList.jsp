@@ -21,7 +21,6 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
-	
 </head>
 <body>
 	<form:form id="filtre" action="" method="post" cssClass="well" commandName="procedimentFiltreCommand">

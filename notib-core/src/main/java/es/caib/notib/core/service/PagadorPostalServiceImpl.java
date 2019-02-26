@@ -118,9 +118,9 @@ public class PagadorPostalServiceImpl implements PagadorPostalService{
 		Page<PagadorPostalEntity> pagadorPostal = null;
 
 		pagadorPostal = pagadorPostalReposity.findByCodiDir3AndNumContacteNotNullFiltrePaginat(
-				filtre.getDir3codi() == null,
+				filtre.getDir3codi() == null || filtre.getDir3codi().isEmpty(),
 				filtre.getDir3codi(),
-				filtre.getContracteNum() == null,
+				filtre.getContracteNum() == null || filtre.getContracteNum().isEmpty(),
 				filtre.getContracteNum(),
 				paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio));
 		

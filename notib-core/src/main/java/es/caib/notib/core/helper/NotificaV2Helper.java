@@ -94,6 +94,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	public boolean notificacioEnviar(
 			Long notificacioId) {
 		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
+		if (!NotificacioEstatEnumDto.PENDENT.equals(notificacio.getEstat())) {
+			throw new ValidationException(
+					notificacioId,
+					NotificacioEntity.class,
+					"La notificació no te l'estat " + NotificacioEstatEnumDto.PENDENT);
+		}
 		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
 		try {
 			ResultadoAltaRemesaEnvios resultadoAlta = enviaNotificacio(notificacio);

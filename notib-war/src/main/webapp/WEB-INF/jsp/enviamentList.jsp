@@ -134,7 +134,7 @@ $(document).ready(function() {
 				"enviament/" + accio,
 				{ids: ids},
 				function(data) {
-					$("#seleccioCount").html(data);
+					$(".seleccioCount").html(data);
 				}
 		);
 	});
@@ -144,7 +144,7 @@ $(document).ready(function() {
 			$.get(
 					"enviament/select",
 					function(data) {
-						$("#seleccioCount").html(data);
+						$(".seleccioCount").html(data);
 						$('#taulaDades').webutilDatatable('refresh');
 					}
 			);
@@ -154,7 +154,7 @@ $(document).ready(function() {
 			$.get(
 					"enviament/deselect",
 					function(data) {
-						$("#seleccioCount").html(data);
+						$(".seleccioCount").html(data);
 						$('#enviament').webutilDatatable('select-none');
 						$('#enviament').webutilDatatable('refresh');
 					}
@@ -165,6 +165,18 @@ $(document).ready(function() {
 			$(':input').val('');
 			event.preventDefault();
 	        $("#btnFiltrar").first().click();
+		});
+
+		$('#reintentarNotificacio').on('click', function() {
+			if(confirm("<spring:message code="enviament.list.user.reintentar.notificacio.misatge.avis"/>")){
+				$.get(
+					"enviament/reintentar/notificacio",
+					function(data) {
+						console.log(data);
+					}
+				);
+			}
+			return false;
 		});
 	});
 	
@@ -211,15 +223,16 @@ function getCookie(cname) {
 				<button id="seleccioNone" title="<spring:message code="enviament.list.user.seleccio.cap" />" class="btn btn-default" ><span class="fa fa-square-o"></span></button>
 				<div class="btn-group">
 					<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-  						<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.exportar"/> <span class="caret"></span>
+  						<span class="badge seleccioCount">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.accions.massives"/> <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu">
-						<li><a href="<c:url value="enviament/export/ODS"/>"><spring:message code="enviament.list.user.exportar.EXCEL"/></a></li> 
+						<li><a href="<c:url value="enviament/export/ODS"/>"><spring:message code="enviament.list.user.exportar"/> a <spring:message code="enviament.list.user.exportar.EXCEL"/></a></li> 
+						<li><a style="cursor: pointer;" id="reintentarNotificacio"><spring:message code="enviament.list.user.reintentar"/> <spring:message code="enviament.list.user.reintentar.notificacio"/></a></li>
 					</ul>
 				</div>
-				<div class="btn-group">
-						<a href="<c:url value="/enviament/visualitzar"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-eye-slash"></span> <spring:message code="enviament.list.show"/></a>		
-				</div>
+			</div>
+			<div class="btn-group">
+				<a href="<c:url value="/enviament/visualitzar"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-eye-slash"></span> <spring:message code="enviament.list.show"/></a>		
 			</div>
 		</div>
 	</script>

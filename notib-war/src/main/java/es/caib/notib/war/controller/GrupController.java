@@ -17,6 +17,7 @@ import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.war.command.GrupCommand;
 import es.caib.notib.war.command.GrupFiltreCommand;
+import es.caib.notib.war.command.ProcedimentFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.RequestSessionHelper;
@@ -79,6 +80,19 @@ public class GrupController extends BaseUserController{
 		return vista;
 	}
 	
+	@RequestMapping(method = RequestMethod.POST)
+	public String post(	
+			HttpServletRequest request,
+			GrupFiltreCommand command,
+			Model model) {
+		
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request, 
+				GRUP_FILTRE, 
+				command);
+		
+		return "grupAdminList";
+	}
 	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,

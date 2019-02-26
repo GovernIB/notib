@@ -1251,7 +1251,7 @@ public class PluginHelper {
 		            														//				'01' = Formulari		
 		            														//				'02' = Document adjunt al formulari
 		            														//				'03' = Fitxer tècnic intern
-        	annex.setTipusDocumental(an.getTipusDocumental().getValor());	// annex.setTipus("TD01");
+        	annex.setTipusDocumental(an.getTipusDocumental() != null ? an.getTipusDocumental().getValor() : null);	// annex.setTipus("TD01");
 																			//            	Documentos de decisión:
 																			//            		- Resolución.
 																			//            		- Acuerdo.
@@ -1278,7 +1278,7 @@ public class PluginHelper {
 																			//            		- Factura.
 																			//            		- Otros incautados.
 																			//            		Otros.
-        	annex.setOrigen(an.getOrigen().getValor());						// annex.setOrigenCiudadanoAdmin(ANEXO_ORIGEN_CIUDADANO.intValue());
+        	annex.setOrigen(an.getOrigen() != null ?  an.getOrigen().getValor() : null);						// annex.setOrigenCiudadanoAdmin(ANEXO_ORIGEN_CIUDADANO.intValue());
 		            														//				0 = Ciutadà
 		            														//				1 = aDMINISTRACIÓ
         	annex.setObservacions(an.getObservacions());					// annex.setObservaciones("");

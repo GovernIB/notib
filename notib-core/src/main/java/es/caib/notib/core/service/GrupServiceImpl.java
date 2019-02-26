@@ -210,7 +210,7 @@ public class GrupServiceImpl implements GrupService{
 		Page<GrupEntity> grup = null;
 
 		grup = grupReposity.findByCodiNotNullFiltrePaginat(
-				filtre.getCodi() == null,
+				filtre.getCodi() == null || filtre.getCodi().isEmpty(),
 				filtre.getCodi(),
 				entitat,
 				paginacioHelper.toSpringDataPageable(paginacioParams));

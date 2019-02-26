@@ -19,6 +19,7 @@ import es.caib.notib.core.api.service.PagadorCieService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.PagadorCieCommand;
 import es.caib.notib.war.command.PagadorCieFiltreCommand;
+import es.caib.notib.war.command.PagadorPostalFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
 import es.caib.notib.war.helper.RolHelper;
@@ -82,6 +83,20 @@ public class PagadorCieController extends BaseUserController{
 			Model model) {
 		String vista = formGet(request, null, model);
 		return vista;
+	}
+	
+	@RequestMapping(method = RequestMethod.POST)
+	public String post(	
+			HttpServletRequest request,
+			PagadorCieFiltreCommand command,
+			Model model) {
+		
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request, 
+				PAGADOR_CIE_FILTRE, 
+				command);
+		
+		return "pagadorCieAdminList";
 	}
 	
 	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
