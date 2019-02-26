@@ -5,6 +5,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
+import es.caib.notib.war.validation.ValidIfVisible;
 
 /**
  * Command per al manteniment de persones (Titulars | Destinataris).
@@ -12,18 +13,30 @@ import es.caib.notib.war.helper.ConversioTipusHelper;
  * @author Limit Tecnologies <limit@limit.es>
  */
 
+@ValidIfVisible.List({
+	@ValidIfVisible(
+        fieldName = "visible",
+        fieldValue = "true",
+        dependFieldName = "nom"),
+	@ValidIfVisible(
+	    fieldName = "visible",
+	    fieldValue = "true",
+	   dependFieldName = "llinatge1"),
+	@ValidIfVisible(
+	    fieldName = "visible",
+	    fieldValue = "true",
+	    dependFieldName = "nif")
+})
 public class PersonaCommand {
 
-	@NotEmpty @Size(max=50)
 	private String nom;
-	@NotEmpty @Size(max=50)
 	private String llinatge1;
 	private String llinatge2;
-	@NotEmpty @Size(max=50)
 	private String nif;
 	private String telefon;
 	private String email;
 	private String dir3codi;
+	private boolean visible = true;
 	
 	public String getNom() {
 		return nom;
@@ -68,6 +81,12 @@ public class PersonaCommand {
 		this.dir3codi = dir3codi;
 	}
 
+	public boolean isVisible() {
+		return visible;
+	}
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
 	public static PersonaCommand asCommand(PersonaDto dto) {
 		if (dto == null) {
 			return null;

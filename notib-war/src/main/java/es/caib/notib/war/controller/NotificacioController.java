@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
@@ -48,6 +49,7 @@ import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.DocumentCommand;
+import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
 import es.caib.notib.war.command.PersonaCommand;
@@ -108,8 +110,8 @@ public class NotificacioController extends BaseUserController {
             //Obté els procediments que tenen el mateix grup que el rol d'usuari
             for (ProcedimentGrupDto grupProcediment : procedimentsAmbGrups) {
                 for (String rol : rolsUsuariActual) {
-if(rol.contains(grupProcediment.getGrup().getCodi())) {
-procediments.add(grupProcediment.getProcediment());
+                	if(rol.contains(grupProcediment.getGrup().getCodi())) {
+                		procediments.add(grupProcediment.getProcediment());
                     }
                 }
             }
@@ -127,29 +129,29 @@ procediments.add(grupProcediment.getProcediment());
                         request,
                         getMessage(
                                 request,
-"notificacio.controller.sense.permis.lectura"));
+                        		"notificacio.controller.sense.permis.lectura"));
             }
         }
         model.addAttribute(
                 "notificacioEstats",
                 EnumHelper.getOptionsForEnum(
                         NotificacioEstatEnumDto.class,
-"es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
+                		"es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
         model.addAttribute(
                 "notificacioEnviamentEstats",
                 EnumHelper.getOptionsForEnum(
                         NotificacioEnviamentEstatEnumDto.class,
-"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
+                		"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
         model.addAttribute(
                 "notificacioComunicacioTipus",
                 EnumHelper.getOptionsForEnum(
                         NotificacioComunicacioTipusEnumDto.class,
-"es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto."));
+                		"es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto."));
         model.addAttribute(
                 "notificacioEnviamentTipus",
                 EnumHelper.getOptionsForEnum(
                         NotificaEnviamentTipusEnumDto.class,
-"es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
+                		"es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
 
 
         return "notificacioList";
@@ -171,7 +173,7 @@ procediments.add(grupProcediment.getProcediment());
                         isAdministrador(request),
                         procedimentId));
         model.addAttribute("grups",
-grupService.findByGrupsProcediment(procedimentId));
+        		grupService.findByGrupsProcediment(procedimentId));
 
         return "notificacioForm";
     }
@@ -203,8 +205,8 @@ grupService.findByGrupsProcediment(procedimentId));
             for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
 
                 for (String rol : rolsUsuariActual) {
-if(rol.contains(grupProcediment.getGrup().getCodi())) {
-procedimentsAmbGrups.add(grupProcediment.getProcediment());
+                	if(rol.contains(grupProcediment.getGrup().getCodi())) {
+                		procedimentsAmbGrups.add(grupProcediment.getProcediment());
                     }
                 }
             }
@@ -226,7 +228,7 @@ procedimentsAmbGrups.add(grupProcediment.getProcediment());
 
         if (procedimentsPermisNotificacioSenseGrups != null)
             for (ProcedimentDto procedimentSenseGrupAmbPermis : procedimentsPermisNotificacioSenseGrups) {
-procedimentsPermisNotificacioAmbGrupsAndSenseGrups.add(procedimentSenseGrupAmbPermis);
+            	procedimentsPermisNotificacioAmbGrupsAndSenseGrups.add(procedimentSenseGrupAmbPermis);
             }
 
         return "notificacioProcedimentsForm";
@@ -248,8 +250,8 @@ procedimentsPermisNotificacioAmbGrupsAndSenseGrups.add(procedimentSenseGrupAmbPe
             Model model) throws IOException {
         DocumentCommand document = notificacioCommand.getDocument();
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-
         if (bindingResult.hasErrors()) {
+        	model.addAttribute("enviosGuardats", notificacioCommand.getEnviaments());
             model.addAttribute("errors", bindingResult.getAllErrors());
             return "notificacioForm";
         }
@@ -263,19 +265,19 @@ procedimentsPermisNotificacioAmbGrupsAndSenseGrups.add(procedimentSenseGrupAmbPe
         switch (notificacioCommand.getTipusDocument()) {
         case ARXIU:
             if (notificacioCommand.getArxiu() != null && !notificacioCommand.getArxiu().isEmpty()) {
-document.setArxiuNom(notificacioCommand.getArxiu().getOriginalFilename());
-document.setNormalitzat(notificacioCommand.getDocument().isNormalitzat());
-document.setContingutBase64(notificacioCommand.getArxiu().getBytes());
+            	document.setArxiuNom(notificacioCommand.getArxiu().getOriginalFilename());
+            	document.setNormalitzat(notificacioCommand.getDocument().isNormalitzat());
+            	document.setContingutBase64(notificacioCommand.getArxiu().getBytes());
             }
             break;
         case CSV:
             if (notificacioCommand.getDocumentArxiuUuidCsv() != null && !notificacioCommand.getDocumentArxiuUuidCsv().isEmpty()) {
-document.setCsv(notificacioCommand.getDocumentArxiuUuidCsv());
+            	document.setCsv(notificacioCommand.getDocumentArxiuUuidCsv());
             }
             break;
         case UUID:
             if (notificacioCommand.getDocumentArxiuUuidCsv() != null && !notificacioCommand.getDocumentArxiuUuidCsv().isEmpty()) {
-document.setUuid(notificacioCommand.getDocumentArxiuUuidCsv());
+            	document.setUuid(notificacioCommand.getDocumentArxiuUuidCsv());
             }
             break;
         }
@@ -286,11 +288,11 @@ document.setUuid(notificacioCommand.getDocumentArxiuUuidCsv());
         if (notificacioCommand.getId() != null) {
             notificacioService.update(
                     notificacioCommand.getProcedimentId(),
-NotificacioCommandV2.asDto(notificacioCommand));
+                    NotificacioCommandV2.asDto(notificacioCommand));
         } else {
             notificacioService.create(
                     entitatActual.getId(),
-NotificacioCommandV2.asDto(notificacioCommand));
+                    NotificacioCommandV2.asDto(notificacioCommand));
         }
         return "notificacioList";
     }
@@ -336,8 +338,8 @@ NotificacioCommandV2.asDto(notificacioCommand));
             //Obté els procediments que tenen el mateix grup que el rol d'usuari
             for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
                 for (String rol : rolsUsuariActual) {
-if(rol.contains(grupProcediment.getGrup().getCodi())) {
-procediments.add(grupProcediment.getProcediment());
+                	if(rol.contains(grupProcediment.getGrup().getCodi())) {
+                		procediments.add(grupProcediment.getProcediment());
                     }
                 }
             }
@@ -349,7 +351,7 @@ procediments.add(grupProcediment.getProcediment());
                 procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrups(procedimentsSenseGrups);
 
                 for (ProcedimentDto procedimentSenseGrupAmbPermis : procedimentsPermisConsultaSenseGrups) {
-procediments.add(procedimentSenseGrupAmbPermis);
+                		procediments.add(procedimentSenseGrupAmbPermis);
                 }
             }
 
@@ -364,7 +366,7 @@ procediments.add(procedimentSenseGrupAmbPermis);
                 grupsProcediment,
                 procediments,
                 filtre,
-DatatablesHelper.getPaginacioDtoFromRequest(request));
+                DatatablesHelper.getPaginacioDtoFromRequest(request));
         return DatatablesHelper.getDatatableResponse(request, notificacions);
     }
 
@@ -406,7 +408,7 @@ DatatablesHelper.getPaginacioDtoFromRequest(request));
                 "eventTipus",
                 EnumHelper.getOptionsForEnum(
                         NotificacioEventTipusEnumDto.class,
-"es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
+                		"es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
         return "notificacioEvents";
     }
     @RequestMapping(value = "/{notificacioId}/event/datatable", method = RequestMethod.GET)
@@ -488,7 +490,7 @@ DatatablesHelper.getPaginacioDtoFromRequest(request));
                 "eventTipus",
                 EnumHelper.getOptionsForEnum(
                         NotificacioEventTipusEnumDto.class,
-"es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
+	"es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
         return "enviamentEvents";
     }*/
     @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/event/datatable", method = RequestMethod.GET)
@@ -516,7 +518,7 @@ DatatablesHelper.getPaginacioDtoFromRequest(request));
             Model model) {
 
         try {
-notificacioService.enviamentRefrescarEstat(enviamentId);
+	notificacioService.enviamentRefrescarEstat(enviamentId);
             return true;
         } catch (Exception e) {
             return false;
@@ -540,13 +542,13 @@ notificacioService.enviamentRefrescarEstat(enviamentId);
                     request,
                     getMessage(
                             request,
-"notificacio.controller.refrescar.estat.ok"));
+                    		"notificacio.controller.refrescar.estat.ok"));
         } else {
             MissatgesHelper.error(
                     request,
                     getMessage(
                             request,
-"notificacio.controller.refrescar.estat.error"));
+                    		"notificacio.controller.refrescar.estat.error"));
         }
         emplenarModelEnviamentInfo(
                 notificacioId,
@@ -569,13 +571,13 @@ notificacioService.enviamentRefrescarEstat(enviamentId);
                     request,
                     getMessage(
                             request,
-"notificacio.controller.comunicacio.seu.ok"));
+							"notificacio.controller.comunicacio.seu.ok"));
         } else {
             MissatgesHelper.error(
                     request,
                     getMessage(
                             request,
-"notificacio.controller.comunicacio.seu.error"));
+							"notificacio.controller.comunicacio.seu.error"));
         }
         emplenarModelEnviamentInfo(
                 notificacioId,

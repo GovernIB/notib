@@ -4,8 +4,12 @@
 package es.caib.notib.war.command;
 
 import java.util.List;
+
+import javax.validation.Valid;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
+import es.caib.notib.war.validation.ValidIfVisible;
 
 /**
  * Command per al manteniment d'enviaments.
@@ -14,11 +18,15 @@ import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
  */
 public class EnviamentCommand {
 
+	@Valid
 	private ServeiTipusEnumDto serveiTipus;
+	@Valid
 	private PersonaCommand titular;
+	@Valid
 	private List<PersonaCommand> destinataris;
 
 	private boolean entregaPostalActiva;
+	@Valid
 	private EntregapostalCommand entregaPostal;
 	private EntregaDehCommand entregaDeh;
 	

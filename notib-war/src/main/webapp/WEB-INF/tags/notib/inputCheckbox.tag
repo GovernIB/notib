@@ -6,6 +6,7 @@
 <%@ attribute name="textKey" required="false" rtexprvalue="true"%>
 <%@ attribute name="inline" required="false" rtexprvalue="true"%>
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
+<%@ attribute name="funcio" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
 <c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
@@ -23,7 +24,7 @@
 	<div class="controls col-xs-${campInputSize}">
 		<div class="checkbox checkbox-primary">
   			<label> 
-				<form:checkbox path="${campPath}" cssClass="span12 " id="${campPath}"/>
+				<form:checkbox path="${campPath}" cssClass="span12 " id="${campPath}" onclick="${funcio}"/>
 			</label>
 		</div>
 		<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>

@@ -4,6 +4,7 @@ import javax.validation.constraints.NotNull;
 
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
+import es.caib.notib.war.validation.ValidIfVisible;
 
 /**
  * Command per al manteniment de entregues postals
@@ -11,6 +12,12 @@ import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
  * @author Limit Tecnologies <limit@limit.es>
  *
  */
+@ValidIfVisible.List({
+	@ValidIfVisible(
+        fieldName = "visible",
+        fieldValue = "true",
+        dependFieldName = "viaNom")
+})
 public class EntregapostalCommand {
 
 	@NotNull
@@ -36,7 +43,7 @@ public class EntregapostalCommand {
 	private String linia2;
 	private String formatSobre;
 	private String formatFulla;
-	
+	private boolean visible = true;
 	
 	public NotificaDomiciliConcretTipusEnumDto getTipus() {
 		return tipus;
@@ -169,6 +176,12 @@ public class EntregapostalCommand {
 	}
 	public void setFormatFulla(String formatFulla) {
 		this.formatFulla = formatFulla;
+	}
+	public boolean isVisible() {
+		return visible;
+	}
+	public void setVisible(boolean visible) {
+		this.visible = visible;
 	}
 	
 	

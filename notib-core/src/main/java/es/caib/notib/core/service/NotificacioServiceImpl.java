@@ -244,14 +244,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 				
 				List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
 				for(Persona persona: enviament.getDestinataris()) {
-					PersonaEntity destinatari = personaRepository.save(PersonaEntity.getBuilder(
-							persona.getEmail(), 
-							persona.getLlinatge1(), 
-							persona.getLlinatge2(), 
-							persona.getNif(), 
-							persona.getNom(), 
-							persona.getTelefon()).build());
-					destinataris.add(destinatari);
+					if (!persona.getNif().isEmpty()) {
+						PersonaEntity destinatari = personaRepository.save(PersonaEntity.getBuilder(
+								persona.getEmail(), 
+								persona.getLlinatge1(), 
+								persona.getLlinatge2(), 
+								persona.getNif(), 
+								persona.getNom(), 
+								persona.getTelefon()).build());
+						destinataris.add(destinatari);
+					}
 				}
 				
 				// Rellenar dades enviament titular

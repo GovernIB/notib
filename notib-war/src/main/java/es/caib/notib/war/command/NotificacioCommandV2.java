@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -62,7 +63,7 @@ public class NotificacioCommandV2 {
 	private PersonaCommand titular;
 	private PersonaCommand destinatari = new PersonaCommand();
 	private List<PersonaCommand> destinataris = new ArrayList<PersonaCommand>();
-	@NotNull
+	@Valid
 	private List<EnviamentCommand> enviaments = new ArrayList<EnviamentCommand>();
 	
 	public Long getId() {
