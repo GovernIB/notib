@@ -83,7 +83,12 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			//"and  	or lower(c.destinatariLlinatge1) like lower('%'||:destinataris||'%'))" +
 			//"and 	or lower(c.destinatariLlinatge2) like lower('%'||:destinataris||'%'))" +
 			//"and   (:isCodiNotibNull = true or n.titularEmail = :codiNotib) " +
-			"and (:isNumeroCertCorreusNull = true or n.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " )
+			"and (:isNumeroCertCorreusNull = true or n.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
+			"and (:isUsuariNull = true or n.notificacio.usuariCodi like lower('%'||:usuari||'%')) "+
+			"and (:isLlibreRegistreNull = true or n.notificacio.registreLlibre like lower('%'||:llibreRegistre||'%')) " +
+			"and (:isNumeroRegistreNull = true or n.notificacio.registreNumero like lower('%'||:numeroRegistre||'%')) "+
+			"and (:esDataRegistreIniciNull = true or n.notificacio.registreData >= :dataRegistreInici) " +
+			"and (:esDataRegistreFiNull = true or n.notificacio.registreData <= :dataRegistreFi) " )
 	Page<NotificacioEnviamentEntity> findByNotificacio(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
 			@Param("codiProcediment") String codiProcediment,
@@ -127,12 +132,19 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("emailTitular") String emailTitular,
 			@Param("esDir3CodiNull") boolean esdir3CodiNull,
 			@Param("dir3Codi") String dir3Codi,
-			//@Param("isDestinatarisNull") boolean isDestinatarisNull,
-			//@Param("destinataris") String destinataris,
-			//@Param("isCodiNotibNull") boolean isCodiNotibNull,
-			//@Param("codiNotib") String codiNotib,
 			@Param("isNumeroCertCorreusNull") boolean isNumeroCertCorreusNull,
 			@Param("numeroCertCorreus") String numeroCertCorreus,
+			@Param("isUsuariNull") boolean isUsuariNull,
+			@Param("usuari") String usuari,
+			@Param("isLlibreRegistreNull") boolean isLlibreRegistreNull,
+			@Param("llibreRegistre") String llibreRegistre,
+			@Param("isNumeroRegistreNull") boolean isNumeroRegistreNull,
+			@Param("numeroRegistre") String numeroRegistre,
+			@Param("esDataRegistreIniciNull") boolean esDataRegistreIniciNull,
+			@Param("dataRegistreInici") Date dataRegistreInici,
+			@Param("esDataRegistreFiNull") boolean esDataRegistreFiNull,
+			@Param("dataRegistreFi") Date dataRegistreFi,
+			
 			Pageable pageable);
 	
 	@Query(	"from" +

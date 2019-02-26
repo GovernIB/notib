@@ -28,8 +28,8 @@ public class NotificacioEnviamentFiltreDto extends AuditoriaDto {
 	private String nomTitular;
 	private String emailTitular;
 	private String destinataris;
-	private String llibreRegistre;
-	private String numeroRegistre;
+	private String registreLlibre;
+	private String registreNumero;
 	private String dataRegistreInici;
 	private String dataRegistreFi;
 	private String dataCaducitatInici;
@@ -141,17 +141,17 @@ public class NotificacioEnviamentFiltreDto extends AuditoriaDto {
 	public void setDestinataris(String destinataris) {
 		this.destinataris = destinataris;
 	}
-	public String getLlibreRegistre() {
-		return llibreRegistre;
+	public String getRegistreLlibre() {
+		return registreLlibre;
 	}
-	public void setLlibreRegistre(String llibreRegistre) {
-		this.llibreRegistre = llibreRegistre;
+	public void setRegistreLlibre(String registreLlibre) {
+		this.registreLlibre = registreLlibre;
 	}
-	public String getNumeroRegistre() {
-		return numeroRegistre;
+	public String getRegistreNumero() {
+		return registreNumero;
 	}
-	public void setNumeroRegistre(String numeroRegistre) {
-		this.numeroRegistre = numeroRegistre;
+	public void setRegistreNumero(String registreNumero) {
+		this.registreNumero = registreNumero;
 	}
 	public String getDataRegistreInici() {
 		return dataRegistreInici;

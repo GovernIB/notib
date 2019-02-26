@@ -31,6 +31,7 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private String uuid;
 	private String notificaCertificacioNumSeguiment;
 	private String detalls;
+	private String codiNotibEnviament;
 	
 	
 	
@@ -124,6 +125,12 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	}
 	public void setNumeroCertCorreus(String numeroCertCorreus) {
 		this.numeroCertCorreus = numeroCertCorreus;
+	}
+	public String getCodiNotibEnviament() {
+		return codiNotibEnviament;
+	}
+	public void setCodiNotibEnviament(String codiNotibEnviament) {
+		this.codiNotibEnviament = codiNotibEnviament;
 	}
 	public String getCsvUuid() {
 		if(notificacio.getDocument().getUuid() != null) {

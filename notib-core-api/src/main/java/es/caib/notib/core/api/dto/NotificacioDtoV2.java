@@ -44,7 +44,9 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 
 	// Paràmetres registre
 	private String oficina;
-	private String llibre;
+	private String registreLlibre;
+	private String registreNumero;
+	private Date registreData;
 	private String extracte;
 	private String docFisica;
 	private String idioma;
@@ -185,11 +187,26 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	public void setOficina(String oficina) {
 		this.oficina = oficina;
 	}
-	public String getLlibre() {
-		return llibre;
+	public String getRegistreLlibre() {
+		return registreLlibre;
 	}
-	public void setLlibre(String llibre) {
-		this.llibre = llibre;
+	public void setRegistreLlibre(String registreLlibre) {
+		this.registreLlibre = registreLlibre;
+	}
+	public String getRegistreNumero() {
+		return registreNumero;
+	}
+	public void setRegistreNumero(String registreNumero) {
+		this.registreNumero = registreNumero;
+	}
+	public Date getRegistreData() {
+		return registreData;
+	}
+	public void setRegistreData(Date registreData) {
+		this.registreData = registreData;
+	}
+	public String getOficina() {
+		return oficina;
 	}
 	public String getExtracte() {
 		return extracte;
