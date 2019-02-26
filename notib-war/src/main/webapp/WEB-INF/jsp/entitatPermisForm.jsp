@@ -57,7 +57,7 @@
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
 		<form:hidden path="id"/>
 		<not:inputSelect name="tipus" textKey="entitat.permis.form.camp.tipus" disabled="true" optionEnum="TipusEnumDto" />
-		<not:inputText name="principal" textKey="entitat.permis.form.camp.principal" readonly="true"/>
+		<not:inputText name="principal" textKey="entitat.permis.form.camp.principal" readonly="${not empty permisCommand.id}"/>
 		<not:inputCheckbox name="usuari" textKey="entitat.permis.form.camp.usuari"/>
 		<not:inputCheckbox name="administrador" textKey="entitat.permis.form.camp.administrador"/>
 		<not:inputCheckbox name="administradorEntitat" textKey="entitat.permis.form.camp.administradorentitat"/>

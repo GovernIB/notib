@@ -32,7 +32,7 @@ public class ColumnesCommand {
 	private boolean numeroRegistre; 
 	private boolean dataRegistre; 
 	private boolean dataCaducitat; 
-	private boolean codiNotibEnviament; 
+	private boolean codiNotibEnviament;
 	private boolean numCertificacio; 
 	private boolean csvUuid; 
 	private boolean estat;

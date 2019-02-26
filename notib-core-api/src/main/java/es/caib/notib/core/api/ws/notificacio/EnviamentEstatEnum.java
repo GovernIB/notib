@@ -34,6 +34,8 @@ public enum EnviamentEstatEnum implements Serializable {
 	SENSE_INFORMACIO,
 	ERROR_REGISTRE,
 	SIR_PENDENT,
+	SIR_COMUNICAT,
+	SIR_ERROR,
 	SIR_NO_DISPONIBLE,
 	SIR_NOTIFICAT
 }

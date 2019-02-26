@@ -40,7 +40,7 @@ public interface EnviamentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public List<Long> findIdsAmbFiltre(
 			Long entitatId,
 			NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException;

@@ -76,5 +76,13 @@ public class ClientRestTestV2 extends ClientBaseTest {
 		assertEquals(
 				NotificacioEstatEnum.ENVIADA,
 				respostaAlta.getEstat());
+		
+//		clientV2.consultaEstatNotificacio(respostaAlta.getIdentificador());
+//		// asserts
+//		
+//		for (EnviamentReferencia referencia: respostaAlta.getReferencies()) {
+//			clientV2.consultaEstatEnviament(referencia.getReferencia());
+//			// aserts
+//		}
 	}
 }

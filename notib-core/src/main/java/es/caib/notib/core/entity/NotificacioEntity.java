@@ -182,8 +182,13 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private String registreOficina;
 	@Column(name = "registre_organ", length = 10)
 	private String registreOrgan;
-	@Column(name = "registre_llibre", length = 256, nullable = false)
+	@Column(name = "registre_llibre", length = 256)
 	private String registreLlibre;
+	@Column(name = "registre_numero", length = 256)
+	private String registreNumero;
+	@Column(name = "registre_data")
+	@Temporal(TemporalType.DATE)
+	private Date registreData;
 	@Column(name = "registre_extracte", length = 52, nullable = false)
 	private String registreExtracte;
 	@Column(name = "registre_doc_fisica", length = 256, nullable = false)
@@ -381,6 +386,12 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		this.enviaments.add(enviament);
 	}
 
+	public String getRegistreNumero() {
+		return registreNumero;
+	}
+	public Date getRegistreData() {
+		return registreData;
+	}
 	public ProcedimentEntity getProcediment() {
 		return procediment;
 	}

@@ -166,16 +166,20 @@ public class EnviamentController extends BaseUserController {
 		}
 		if (ids != null) {
 			for (Long id: ids) {
-				seleccio.add(id);
+				if(!seleccio.contains(id)) {
+					seleccio.add(id);	
+				}
 			}
 		} else {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			NotificacioEnviamentFiltreCommand filtreCommand = getFiltreCommand(request);
 			try {
-				seleccio.addAll(
-						enviamentService.findIdsAmbFiltre(
-								entitatActual.getId(),
-								NotificacioEnviamentFiltreCommand.asDto(filtreCommand)));
+				
+				for(Long id: enviamentService.findIdsAmbFiltre(entitatActual.getId(),NotificacioEnviamentFiltreCommand.asDto(filtreCommand))) {
+					if(!seleccio.contains(id)) {
+						seleccio.add(id);	
+					}
+				}
 			} catch (NotFoundException | ParseException e) {
 				e.printStackTrace();
 			}
