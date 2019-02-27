@@ -24,7 +24,9 @@ import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
+import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.RegistrePluginException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -40,6 +42,7 @@ import es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsException;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
+import es.caib.notib.core.api.ws.notificacio.PermisConsulta;
 import es.caib.notib.core.api.ws.notificacio.Persona;
 import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
@@ -53,6 +56,7 @@ import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.NotificaHelper;
+import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.EntitatRepository;
@@ -90,7 +94,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private DocumentRepository documentRepository;
 	@Autowired
 	private ConversioTipusHelper conversioHelper;
-	
+	@Autowired 
+	private PermisosHelper permisosHelper;
 	
 	@Autowired
 	private NotificaHelper notificaHelper;
@@ -365,6 +370,54 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			return resposta;
 		}
 		
+	}
+	
+	@Override
+	public boolean donarPermisConsulta(PermisConsulta permisConsulta) {
+		boolean totbe = false;
+		try {
+			
+			EntitatEntity entitat = entitatRepository.findByDir3Codi(permisConsulta.getCodiDir3Entitat());
+			ProcedimentEntity procediment = procedimentRepository.findByEntitatAndCodiProcediment(
+					entitat,
+					permisConsulta.getProcedimentCodi());
+			
+
+			List<PermisDto> permisos = permisosHelper.findPermisos(
+					procediment.getId(),
+					ProcedimentEntity.class);
+			
+			if (permisos == null || permisos.isEmpty()) {
+				PermisDto permisNou = new PermisDto();
+				permisos = new ArrayList<PermisDto>();
+				
+				permisNou.setPrincipal(permisConsulta.getUsuariCodi());
+				permisNou.setTipus(TipusEnumDto.USUARI);
+				//Consulta
+				permisNou.setRead(permisConsulta.isPermisConsulta());
+				permisNou.setProcessar(false);
+				permisNou.setNotificacio(false);
+				//gestió
+				permisNou.setAdministration(false);
+				
+				permisos.add(permisNou);
+			}
+			for (PermisDto permisDto : permisos) {
+				if (permisDto.getPrincipal().equals(permisConsulta.getUsuariCodi())) {
+					permisDto.setRead(permisConsulta.isPermisConsulta());
+					permisosHelper.updatePermis(
+							procediment.getId(),
+							ProcedimentEntity.class,
+							permisDto);
+				}
+			}
+			totbe = true;
+		} catch (Exception ex) {
+			throw new RuntimeException(
+					"No s'ha pogut assignar el permís a l'usuari: " + permisConsulta.getUsuariCodi(),
+					ex);
+		}
+		return totbe;
 	}
 	
 

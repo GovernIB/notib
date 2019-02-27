@@ -47,7 +47,7 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 	
 	@Column(name = "csv", length = 256)
 	protected String csv;
-
+	
 	public static Builder getBuilder(
 			String arxiuId,
 			String arxiuGestdocId,
@@ -120,8 +120,7 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 				normalitzat,
 				generarCsv,
 				uuid,
-				csv
-				);
+				csv);
 	}
 	
 	public static class BuilderV2{
@@ -148,7 +147,6 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			built.normalitzat = normalitzat;
 			built.url = url;
 			built.uuid = uuid;
-			
 		}
 		public DocumentEntity build() {
 			return built;

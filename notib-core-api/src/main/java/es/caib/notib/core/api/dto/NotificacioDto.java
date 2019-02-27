@@ -56,7 +56,7 @@ public class NotificacioDto extends AuditoriaDto {
 	private EntitatDto entitat;
 	private String referenciaExterna;
 	private String notificacio;
-	
+	private boolean permisProcessar;
 	
 	private List<PermisDto> permisos;
 	private boolean usuariActualRead;
@@ -342,6 +342,13 @@ public class NotificacioDto extends AuditoriaDto {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
+	public boolean isPermisProcessar() {
+		return permisProcessar;
+	}
+	public void setPermisProcessar(boolean permisProcessar) {
+		this.permisProcessar = permisProcessar;
+	}
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

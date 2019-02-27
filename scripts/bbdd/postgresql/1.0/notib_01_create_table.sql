@@ -365,7 +365,6 @@ CREATE TABLE NOT_DOCUMENT
   ARXIU_ID				character varying(64),
   ARXIU_GEST_DOC_ID		character varying(64),
   ARXIU_NOM				character varying(100)	NOT NULL,
-  CONTINGUT_BASE_64		bytea,
   HASH					character varying(2048),
   URL					character varying(256),
   TELEFON				character varying(16),

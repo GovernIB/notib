@@ -27,6 +27,16 @@ public interface NotificacioServiceWsV2 {
 	public RespostaAlta alta(
 			@WebParam(name="notificacio") @XmlElement(required = true) NotificacioV2 notificacio);
 
+
+	/**
+	 * Dona permís de consulta sobre un procediment.
+	 * 
+	 * @param notificacio
+	 *            Dades per a donar d'alta la notificació.
+	 * @return la llista de referencies generades per NOTIB (una per enviament)).
+	 */
+	public boolean donarPermisConsulta(
+			PermisConsulta permisConsulta);
 	/**
 	 * Consulta l'estat d'un enviament d'una notificació.
 	 * 

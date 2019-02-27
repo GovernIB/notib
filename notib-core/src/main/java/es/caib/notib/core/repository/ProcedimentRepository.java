@@ -38,6 +38,15 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			@Param("entitatActual") EntitatEntity entitatActiva,
 			Pageable paginacio);
 	
+	@Query(
+			"from " +
+			"    ProcedimentEntity pro " +
+			"where pro.entitat = (:entitatActual) and " + 
+			"lower(pro.codi) = (lower(:codiProcediment))")
+	ProcedimentEntity findByEntitatAndCodiProcediment(
+			@Param("entitatActual") EntitatEntity entitat,
+			@Param("codiProcediment") String codiProcediment);
+	
 	ProcedimentEntity findByCodi(String codi);
 	
 	ProcedimentEntity findByCodisia(String codisia);

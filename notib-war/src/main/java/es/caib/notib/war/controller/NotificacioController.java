@@ -31,6 +31,7 @@ import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
+import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
@@ -137,7 +138,6 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("notificacioEnviamentTipus", 
 				EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class, 
 						"es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
-
 		return "notificacioList";
 	}
 
@@ -230,7 +230,6 @@ public class NotificacioController extends BaseUserController {
 			BindingResult bindingResult, 
 			Model model) throws IOException {
 		DocumentCommand document = notificacioCommand.getDocument();
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ProcedimentDto procedimentActual = procedimentService.findById(
 				null, 
 				isAdministrador(request), 
@@ -367,7 +366,10 @@ public class NotificacioController extends BaseUserController {
 			HttpServletRequest request, 
 			Model model,
 			@PathVariable Long notificacioId) {
-		emplenarModelNotificacioInfo(notificacioId, "dades", model);
+		emplenarModelNotificacioInfo(
+				notificacioId, 
+				"dades", 
+				model);
 		return "notificacioInfo";
 	}
 
@@ -377,8 +379,7 @@ public class NotificacioController extends BaseUserController {
 			Model model, 
 			@PathVariable 
 			Long notificacioId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		notificacioService.marcarComProcessada(entitatActual.getId(), notificacioId);
+		notificacioService.marcarComProcessada(notificacioId);
 
 		return getModalControllerReturnValueSuccess(request, "redirect:../../notificacio",
 				"notificacio.controller.refrescar.estat.ok");
@@ -521,11 +522,18 @@ public class NotificacioController extends BaseUserController {
 			Long notificacioId, 
 			String pipellaActiva, 
 			Model model) {
+		NotificacioDtoV2 notificacio = notificacioService.findAmbId(notificacioId);
+		
 		model.addAttribute("pipellaActiva", pipellaActiva);
-		model.addAttribute("notificacio", notificacioService.findAmbId(notificacioId));
+		model.addAttribute("notificacio", notificacio);
 		model.addAttribute("eventTipus", 
 				EnumHelper.getOptionsForEnum(NotificacioEventTipusEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
+		if (notificacio.getProcediment() != null && !notificacio.getProcedimentCodiNotib().isEmpty()) {
+			model.addAttribute("permisGestio", procedimentService.hasPermisGestioProcediment(notificacio.getProcedimentCodiNotib()));
+		} else {
+			model.addAttribute("permisGestio", null);
+		}
 	}
 
 	private void emplenarModelEnviamentInfo(
