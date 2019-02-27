@@ -1,3 +1,103 @@
+CREATE TABLE NOT_PROCEDIMENT 
+(
+  ID						BIGSERIAL(19)	    	NOT NULL,
+  CODI          			character varying(64),		NOT NULL,
+  NOM						character varying(100),
+  CODISIA					character varying(64),
+  ENTITAT					BIGSERIAL(19),
+  PAGADORPOSTAL				BIGSERIAL(19),
+  PAGADORCIE				BIGSERIAL(19),
+  AGRUPAR					BOOLEAN,
+  RETARD 					BIGSERIAL(19),
+  LLIBRE					character varying(64),
+  OFICINA					character varying(64),
+  TIPUSASSUMPTE				BOOLEAN,
+  DATA_PROGRAMADA 			timestamp without time zone,
+  CREATEDBY_CODI       		character varying(64),
+  CREATEDDATE          		timestamp without time zone,
+  LASTMODIFIEDBY_CODI  		character varying(64),
+  LASTMODIFIEDDATE     		timestamp without time zone
+);
+
+CREATE TABLE NOT_COLUMNES
+(
+  ID                   		BIGSERIAL(19),
+  CREATED_DATE      		BOOLEAN,
+  DATA_PROGRAMADA           BOOLEAN,
+  NOT_IDENTIFICADOR         BOOLEAN,
+  PRO_CODI             		BOOLEAN,
+  GRUP_CODI           		BOOLEAN,
+  DIR3_CODI					BOOLEAN,
+  USUARI					BOOLEAN,
+  ENVIAMENT_TIPUS          	BOOLEAN,
+  CONCEPTE       			BOOLEAN,
+  DESCRIPCIO   				BOOLEAN,
+  TITULAR_NIF      			BOOLEAN,
+  TITULAR_NOM_LLINATGE      BOOLEAN,
+  TITULAR_EMAIL      		BOOLEAN,
+  DESTINATARIS        	    BOOLEAN,
+  LLIBRE_REGISTRE        	BOOLEAN,
+  NUMERO_REGISTRE           BOOLEAN,
+  DATA_REGISTRE        		BOOLEAN,
+  DATA_CADUCITAT         	BOOLEAN,
+  CODI_NOTIB_ENV            BOOLEAN,
+  NUM_CERTIFICACIO      	BOOLEAN,
+  CSV_UUID          		BOOLEAN,
+  ESTAT                		BOOLEAN,
+  ENTITAT_ID				BIGSERIAL(19),
+  USUARI_CODI				character varying(64),
+  CREATEDBY_CODI       		character varying(64),
+  CREATEDDATE          		timestamp without time zone,
+  LASTMODIFIEDBY_CODI  		character varying(64),
+  LASTMODIFIEDDATE     		timestamp without time zone
+)
+
+CREATE TABLE NOT_PRO_GRUP 
+(
+  ID						BIGSERIAL(19)	    	NOT NULL,
+  GRUP						BIGSERIAL(19),			
+  PROCEDIMENT				BIGSERIAL(19),
+  CREATEDBY_CODI       		character varying(64),
+  CREATEDDATE          		timestamp without time zone,
+  LASTMODIFIEDBY_CODI  		character varying(64),
+  LASTMODIFIEDDATE     		timestamp without time zone
+);
+
+CREATE TABLE NOT_GRUP 
+(
+  ID						BIGSERIAL(19)	    	NOT NULL,
+  CODI						character varying(64),		NOT NULL,
+  NOM						character varying(100),
+  ENTITAT					BIGSERIAL(19),
+  CREATEDBY_CODI       		character varying(64),
+  CREATEDDATE          		timestamp without time zone,
+  LASTMODIFIEDBY_CODI  		character varying(64),
+  LASTMODIFIEDDATE     		timestamp without time zone
+);
+
+CREATE TABLE NOT_PAGADOR_POSTAL
+(
+  ID						BIGSERIAL(19)	    	NOT NULL,
+  DIR3_CODI            		character varying(9),  		NOT NULL,
+  CONTRACTE_NUM		        character varying(20),
+  CONTRACTE_DATA_VIG      	DATE,
+  FACTURACIO_CODI_CLIENT   	character varying(20),
+  CREATEDBY_CODI       		character varying(64),
+  CREATEDDATE          		timestamp without time zone,
+  LASTMODIFIEDBY_CODI  		character varying(64),
+  LASTMODIFIEDDATE     		timestamp without time zone
+);
+
+CREATE TABLE NOT_PAGADOR_CIE
+(
+  ID						BIGSERIAL(19)	   	 	NOT NULL,
+  DIR3_CODI            		character varying(9), 		NOT NULL,
+  CONTRACTE_DATA_VIG      	DATE,
+  CREATEDBY_CODI       		character varying(64),
+  CREATEDDATE          		timestamp without time zone,
+  LASTMODIFIEDBY_CODI  		character varying(64),
+  LASTMODIFIEDDATE     		timestamp without time zone
+);
 
 CREATE TABLE NOT_USUARI
 (
@@ -262,7 +362,7 @@ CREATE TABLE NOT_PERSONA
 CREATE TABLE NOT_DOCUMENT
 (
   ID					BIGSERIAL(19)			NOT NULL,
-  ARXIU_ID				character varying(100),
+  ARXIU_ID				character varying(64),
   ARXIU_GEST_DOC_ID		character varying(64),
   ARXIU_NOM				character varying(100)	NOT NULL,
   CONTINGUT_BASE_64		bytea,
