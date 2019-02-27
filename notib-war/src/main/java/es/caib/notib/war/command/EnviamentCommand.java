@@ -3,13 +3,13 @@
  */
 package es.caib.notib.war.command;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
-import es.caib.notib.war.validation.ValidIfVisible;
 
 /**
  * Command per al manteniment d'enviaments.
@@ -20,11 +20,12 @@ public class EnviamentCommand {
 
 	@Valid
 	private ServeiTipusEnumDto serveiTipus;
+	private Date caducitat;
 	@Valid
 	private PersonaCommand titular;
 	@Valid
 	private List<PersonaCommand> destinataris;
-
+	@Valid
 	private boolean entregaPostalActiva;
 	@Valid
 	private EntregapostalCommand entregaPostal;
@@ -36,6 +37,12 @@ public class EnviamentCommand {
 	}
 	public void setServeiTipus(ServeiTipusEnumDto serveiTipus) {
 		this.serveiTipus = serveiTipus;
+	}
+	public Date getCaducitat() {
+		return caducitat;
+	}
+	public void setCaducitat(Date caducitat) {
+		this.caducitat = caducitat;
 	}
 	public PersonaCommand getTitular() {
 		return titular;
