@@ -20,7 +20,6 @@ import es.caib.notib.war.validation.ValidIfVisible;
 })
 public class EntregapostalCommand {
 
-	@NotNull
 	private NotificaDomiciliConcretTipusEnumDto tipus;
 	private NotificaDomiciliViaTipusEnumDto tipusVia;
 	private String viaNom;

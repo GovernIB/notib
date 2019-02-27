@@ -493,7 +493,7 @@ function mostrarEntregaPostal(className) {
 							</div>
 							<input id="entregaPostalAmagat" name="enviaments[${j}].entregaPostal.visible" class="hidden" value="false">
 							
-							<c:if test="${not empty enviament}">
+							<c:if test="${not empty enviosGuardats}">
 								<c:set var="entregaPostalActiva" value="${enviament.entregaPostalActiva}"></c:set>
 							</c:if>
 							<div id="entregaPostal" class="entregaPostal_${j}" <c:if test="${!entregaPostalActiva}">style="display:none"</c:if>>

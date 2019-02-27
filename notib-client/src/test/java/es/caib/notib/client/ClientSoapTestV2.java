@@ -42,15 +42,19 @@ public class ClientSoapTestV2 extends ClientBaseTest {
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
 
+	private static final String WSDL = "/es/caib/notib/client/wsdl/NotificacioServiceWsV2.wsdl";
+	private static final String URL = "http://localhost:8081/notib/ws/notificacioV2";
+	private static final String USERNAME = "admin";
+	private static final String PASSWORD = "admin";
 	private NotificacioServiceV2 client;
 
 	@Before
 	public void setUp() throws IOException, InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, NamingException, CreateException, AuthenticationFailureException {
 		client = NotificacioWsClientFactory.getWsClientV2(
-				getClass().getResource("/es/caib/notib/client/wsdl/NotificacioServiceWsV2.wsdl"),
-				"http://localhost:8081/notib/ws/notificacioV2",
-				"admin",
-				"admin");
+				getClass().getResource(WSDL),
+				URL,
+				USERNAME,
+				PASSWORD);
 	}
 
 	@Test
