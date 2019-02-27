@@ -44,6 +44,7 @@ import es.caib.notib.core.api.exception.RegistrePluginException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.Persona;
 import es.caib.notib.core.entity.DocumentEntity;
@@ -97,7 +98,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private EntitatRepository entitatRepository;
 	@Autowired
 	private DocumentRepository documentRepository;
-
+	@Autowired
+	private ProcedimentService procedimentService;
 	@Autowired
 	private PersonaRepository personaRepository;
 	@Autowired
@@ -490,6 +492,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			}
 		
+		for (NotificacioEntity notificacio : notificacions) {
+			if (notificacio.getProcediment() != null)
+				notificacio.setPermisProcessar(procedimentService.hasPermisProcessarProcediment(notificacio.getProcediment().getCodi()));
+		}
 		if (notificacions == null)
 			resultatPagina = paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
 		 
@@ -668,14 +674,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Override
 	public NotificacioEnviamenEstatDto marcarComProcessada(
-			Long entitatId, 
 			Long notificacioId) {
 		logger.debug("Refrescant l'estat de la notificació a PROCESSAT (" +
 				"notificacioId=" + notificacioId + ")");
-		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId);
 		
 		NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(
-				entitatEntity, 
+				null,
 				notificacioId);
 		notificacioEntity.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
 		notificacioRepository.saveAndFlush(notificacioEntity);

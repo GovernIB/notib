@@ -547,6 +547,38 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 	
 	@Override
+	public boolean hasPermisGestioProcediment(String procedimentCodi) {
+		List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
+		ProcedimentEntity procediment = procedimentRepository.findByCodi(procedimentCodi);
+		
+		procediments.add(procediment);
+		
+		List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcediments(
+				procediments,
+				new Permission[] {
+						ExtendedPermission.ADMINISTRATION}
+				);
+		
+		return (resposta.isEmpty()) ? false : true;
+	}
+	
+	@Override
+	public boolean hasPermisProcessarProcediment(String procedimentCodi) {
+		List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
+		ProcedimentEntity procediment = procedimentRepository.findByCodi(procedimentCodi);
+		
+		procediments.add(procediment);
+		
+		List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcediments(
+				procediments,
+				new Permission[] {
+						ExtendedPermission.PROCESSAR}
+				);
+		
+		return (resposta.isEmpty()) ? false : true;
+	}
+	
+	@Override
 	public boolean hasPermisNotificacioProcediment() {
 		List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcedimentsUsuariActual(
 				new Permission[] {

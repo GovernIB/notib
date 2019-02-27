@@ -347,7 +347,7 @@ public class EntityComprovarHelper {
 					ProcedimentEntity.class);
 		}
 		
-		if (!entitat.equals(notificacio.getEntitat())) {
+		if (entitat != null && !entitat.equals(notificacio.getEntitat())) {
 			throw new ValidationException(
 					id,
 					ProcedimentEntity.class,
@@ -541,6 +541,28 @@ public class EntityComprovarHelper {
 		List<ProcedimentDto> resposta = null;
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<ProcedimentEntity> procediments = procedimentRepository.findByEntitatActiva(true);
+		permisosHelper.filterGrantedAny(
+				procediments,
+				new ObjectIdentifierExtractor<ProcedimentEntity>() {
+					public Long getObjectIdentifier(ProcedimentEntity procediment) {
+						return procediment.getId();
+					}
+				},
+				ProcedimentEntity.class,
+				permisos,
+				auth);
+		
+		resposta = conversioTipusHelper.convertirList(
+				procediments,
+				ProcedimentDto.class);
+		
+		return resposta;
+	}
+	public List<ProcedimentDto> findPermisProcediments(
+			List<ProcedimentEntity> procediments,
+			Permission[] permisos) {
+		List<ProcedimentDto> resposta = null;
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		permisosHelper.filterGrantedAny(
 				procediments,
 				new ObjectIdentifierExtractor<ProcedimentEntity>() {

@@ -256,15 +256,31 @@ public interface ProcedimentService {
 	 * @return true / false
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
-	boolean hasPermisNotificacioProcediment();
-
+	public boolean hasPermisNotificacioProcediment();
+	
+	/**
+	 * Comprova si l'usuari actual té permisos de notificació sobre algun procediment
+	 * 
+	 * @return true / false
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	public boolean hasPermisGestioProcediment(String procedimentCodi);
+	
+	/**
+	 * Comprova si l'usuari actual té permisos de notificació sobre algun procediment
+	 * 
+	 * @return true / false
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	public boolean hasPermisProcessarProcediment(String procedimentCodi);
+	
 	/**
 	 * Comprova si l'usuari actual té permisos de consulta i pertany al grup d'un procediment
 	 * 
 	 * @return true / false
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
-	boolean hasGrupPermisConsultaProcediment(List<ProcedimentDto> procediments);
+	public boolean hasGrupPermisConsultaProcediment(List<ProcedimentDto> procediments);
 
 	/**
 	 * Comprova si l'usuari actual té permisos de notificació i pertany al grup d'un procediment
@@ -272,7 +288,7 @@ public interface ProcedimentService {
 	 * @return true / false
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
-	boolean hasGrupPermisNotificacioProcediment(List<ProcedimentDto> procediments);
+	public boolean hasGrupPermisNotificacioProcediment(List<ProcedimentDto> procediments);
 
 	
 

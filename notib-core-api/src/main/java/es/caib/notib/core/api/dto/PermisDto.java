@@ -28,10 +28,8 @@ public class PermisDto implements Serializable {
 	private boolean administradorEntitat;
 	private boolean aplicacio;
 	
-	private boolean consulta;
 	private boolean processar;
 	private boolean notificacio;
-	private boolean gestio;
 
 	public Long getId() {
 		return id;
@@ -106,30 +104,17 @@ public class PermisDto implements Serializable {
 	public void setAplicacio(boolean aplicacio) {
 		this.aplicacio = aplicacio;
 	}
-	
-	public boolean isConsulta() {
-		return consulta;
-	}
 	public boolean isProcessar() {
 		return processar;
 	}
 	public boolean isNotificacio() {
 		return notificacio;
 	}
-	public boolean isGestio() {
-		return gestio;
-	}
-	public void setConsulta(boolean consulta) {
-		this.consulta = consulta;
-	}
 	public void setProcessar(boolean processar) {
 		this.processar = processar;
 	}
 	public void setNotificacio(boolean notificacio) {
 		this.notificacio = notificacio;
-	}
-	public void setGestio(boolean gestio) {
-		this.gestio = gestio;
 	}
 	@Override
 	public String toString() {

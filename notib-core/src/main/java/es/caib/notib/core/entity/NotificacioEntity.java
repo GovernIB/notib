@@ -20,6 +20,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
@@ -206,7 +208,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "registre_observacions", length = 256, nullable = false)
 	private String registreObservacions;
 	
-	
+	@Transient
+	private boolean permisProcessar;
 	
 	
 
@@ -394,6 +397,12 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	}
 	public ProcedimentEntity getProcediment() {
 		return procediment;
+	}
+	public boolean isPermisProcessar() {
+		return permisProcessar;
+	}
+	public void setPermisProcessar(boolean permisProcessar) {
+		this.permisProcessar = permisProcessar;
 	}
 	public void updateEstat(
 			NotificacioEstatEnumDto estat) {

@@ -244,7 +244,6 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public NotificacioEnviamenEstatDto marcarComProcessada(
-			Long entitatId,
 			Long enviamentId);
 	
 	/**

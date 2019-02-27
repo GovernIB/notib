@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
+import es.caib.notib.core.api.ws.notificacio.PermisConsulta;
 import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
@@ -76,6 +77,14 @@ public class NotificacioServiceWsBeanV2 implements NotificacioServiceWsV2 {
 				sessionContext,
 				true);
 		return delegate.consultaEstatEnviament(referencia);
+	}
+
+	@Override
+	public boolean donarPermisConsulta(PermisConsulta permisConsulta) {
+		usuariHelper.generarUsuariAutenticatEjb(
+				sessionContext,
+				true);
+		return delegate.donarPermisConsulta(permisConsulta);
 	}
 
 }

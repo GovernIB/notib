@@ -21,6 +21,7 @@ import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWs;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
+import es.caib.notib.core.api.ws.notificacio.PermisConsulta;
 import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
@@ -115,6 +116,29 @@ public class NotificacioServiceController extends BaseController {
 			@PathVariable("referencia")
 			String referencia) {
 		return notificacioServiceWsV1.consultaEstatEnviament(referencia);
+	}
+	
+	@RequestMapping(
+			value = "/services/notificacioV2/permisConsulta", 
+			method = RequestMethod.POST,
+			produces="application/json")
+	@ResponseStatus(HttpStatus.CREATED)
+	@ApiOperation(
+			value = "Donar permis de consulta sobre un procediment", 
+			notes = "Retorna un string amb el valor de resposta (Permís creat / ERROR)")
+	@ResponseBody
+	public String donarPermisos(
+			@ApiParam(
+					name = "permisConsulta",
+					value = "Objecte amb les dades necessàries per donar el permís",
+					required = true) 
+			@RequestBody PermisConsulta permisConsulta) {
+		String messatge = null;
+		
+		if (notificacioServiceWsV2.donarPermisConsulta(permisConsulta)) {
+			messatge = "OK";
+		}
+		return messatge;
 	}
 
 }

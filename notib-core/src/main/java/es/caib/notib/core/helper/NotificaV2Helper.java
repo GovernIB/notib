@@ -359,7 +359,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		//envios.setFechaEnvioProgramado(
 		//		toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
 
-		dataProgramada = procedimentRepository.findByCodi(notificacio.getProcedimentCodiNotib()).getEnviamentDataProgramada();
+		if (notificacio.getProcedimentCodiNotib() != null) {
+			dataProgramada = procedimentRepository.findByCodi(notificacio.getProcedimentCodiNotib()).getEnviamentDataProgramada();
+		} else {
+			dataProgramada = notificacio.getEnviamentDataProgramada();
+		}
 		envios.setFechaEnvioProgramado(
 				toXmlGregorianCalendar(dataProgramada));
 		
@@ -423,7 +427,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		//}
 		envios.setEnvios(generarEnvios(notificacio));
 		Opciones opcionesRemesa = new Opciones();
-		retardPostal = procedimentRepository.findByCodi(notificacio.getProcedimentCodiNotib()).getRetard();
+		if(notificacio.getProcedimentCodiNotib() != null) {
+			retardPostal = procedimentRepository.findByCodi(notificacio.getProcedimentCodiNotib()).getRetard();
+		} else {
+			retardPostal = notificacio.getRetardPostal();
+		}
+		
 		if (retardPostal != null) {
 			Opcion opcionRetardo = new Opcion();
 			opcionRetardo.setTipo("retardo");
