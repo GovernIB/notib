@@ -68,7 +68,7 @@ $(document).ready(function() {
 				  </c:otherwise>
 				</c:choose>
 				<not:inputSelect name="pagadorPostalId" textKey="procediment.form.camp.postal" optionItems="${pagadorsPostal}" optionValueAttribute="id" optionTextAttribute="dir3codi" required="true"/>
-				<not:inputSelect name="pagadorCieId" textKey="procediment.form.camp.cie" optionItems="${pagadorsCie}" optionValueAttribute="id" optionTextAttribute="dir3codi"/>
+				<not:inputSelect name="pagadorCieId" textKey="procediment.form.camp.cie" optionItems="${pagadorsCie}" optionValueAttribute="id" optionTextAttribute="dir3codi" required="true"/>
 				<not:inputCheckbox name="agrupar" textKey="procediment.form.camp.agrupar"/>
 				
 			</div>

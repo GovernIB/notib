@@ -44,7 +44,8 @@ public interface ProcedimentService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public ProcedimentDto update(
 			Long entitatId,
-			ProcedimentDto procediment) throws NotFoundException;
+			ProcedimentDto procediment,
+			boolean isAdmin) throws NotFoundException;
 
 	/**
 	 * Esborra el procediment amb el mateix id que l'especificat.

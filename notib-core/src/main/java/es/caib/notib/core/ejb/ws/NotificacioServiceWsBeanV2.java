@@ -81,6 +81,9 @@ public class NotificacioServiceWsBeanV2 implements NotificacioServiceWsV2 {
 
 	@Override
 	public boolean donarPermisConsulta(PermisConsulta permisConsulta) {
+		usuariHelper.generarUsuariAutenticatEjb(
+				sessionContext,
+				true);
 		return delegate.donarPermisConsulta(permisConsulta);
 	}
 

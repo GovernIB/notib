@@ -268,9 +268,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 		// Comprovar on s'ha d'enviar
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioEntity.getComunicacioTipus())) {
 			if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus()) /*Si es administració*/) {
-				//TODO: Registrar SIR
+				//Regweb3 + SIR
+				//Crida callback
 			} else {
-				//TODO: Registrar Normal
+				//Regweb3 + Notifica
 				try {
 					pluginHelper.registrarSortida(
 							pluginHelper.notificacioToRegistreAnotacioV2(notificacioEntity), 
@@ -492,10 +493,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			}
 		
-		for (NotificacioEntity notificacio : notificacions) {
-			if (notificacio.getProcediment() != null)
-				notificacio.setPermisProcessar(procedimentService.hasPermisProcessarProcediment(notificacio.getProcediment().getCodi()));
-		}
 		if (notificacions == null)
 			resultatPagina = paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
 		 
@@ -503,6 +500,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 			resultatPagina = paginacioHelper.toPaginaDto(
 				notificacions,
 				NotificacioDto.class);
+		
+		if(notificacions != null) {
+			for (NotificacioEntity notificacio : notificacions) {
+				if (notificacio.getProcediment() != null)
+					notificacio.setPermisProcessar(procedimentService.hasPermisProcessarProcediment(notificacio.getProcediment().getCodi()));
+			}	
+		}
+		
 		
 		return resultatPagina;
 		

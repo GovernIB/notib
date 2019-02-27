@@ -11,8 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.PagadorCieService;
@@ -21,6 +24,7 @@ import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.ProcedimentCommand;
 import es.caib.notib.war.command.ProcedimentFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
+import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.RequestSessionHelper;
 import es.caib.notib.war.helper.RolHelper;
@@ -69,15 +73,27 @@ public class ProcedimentController extends BaseUserController{
 		boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
 		
 		ProcedimentFiltreCommand procedimentFiltreCommand = getFiltreCommand(request);
-		PaginaDto<ProcedimentDto> procediments = null;
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		procediments = procedimentService.findAmbFiltrePaginat(
-				entitat.getId(),
-				isUsuari,
-				isUsuariEntitat,
-				isAdministrador,
-				ProcedimentFiltreCommand.asDto(procedimentFiltreCommand),
-				DatatablesHelper.getPaginacioDtoFromRequest(request));
+		PaginaDto<ProcedimentDto> procediments = new PaginaDto<ProcedimentDto>();
+		
+		try {
+			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+
+			procediments = procedimentService.findAmbFiltrePaginat(
+					entitat.getId(),
+					isUsuari,
+					isUsuariEntitat,
+					isAdministrador,
+					ProcedimentFiltreCommand.asDto(procedimentFiltreCommand),
+					DatatablesHelper.getPaginacioDtoFromRequest(request));
+		}catch(SecurityException e) {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"notificacio.controller.entitat.cap.assignada"));
+		}
+		
+		
 				
 		return DatatablesHelper.getDatatableResponse(
 				request, 
@@ -127,10 +143,15 @@ public class ProcedimentController extends BaseUserController{
 		}
 		
 		if (procedimentCommand.getId() != null) {
-			procedimentService.update(
-					entitat.getId(),
-					ProcedimentCommand.asDto(procedimentCommand));
-			
+			try {
+				procedimentService.update(
+						entitat.getId(),
+						ProcedimentCommand.asDto(procedimentCommand),
+						isAdministrador(request));
+				
+			}catch(NotFoundException | ValidationException ev) {
+				System.out.print("Error");
+			}
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:procediments",

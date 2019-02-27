@@ -1,5 +1,6 @@
 package es.caib.notib.war.command;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -27,7 +28,9 @@ public class ProcedimentCommand {
 	private String codisia;
 	private Long entitatId;
 	private String entitatNom;
+	@NotNull
 	private Long pagadorPostalId;
+	@NotNull
 	private Long pagadorCieId;	
 	private boolean agrupar;
 	private boolean consulta;

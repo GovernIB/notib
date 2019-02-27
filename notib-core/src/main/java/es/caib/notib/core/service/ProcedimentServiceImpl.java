@@ -106,7 +106,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Override
 	public ProcedimentDto update(
 			Long entitatId,
-			ProcedimentDto procediment) throws NotFoundException {
+			ProcedimentDto procediment,
+			boolean isAdmin) throws NotFoundException {
 		logger.debug("Actualitzant procediment ("
 				+ "procediment=" + procediment + ")");
 		
@@ -117,10 +118,14 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				false,
 				false,
 				false);
-		
-		ProcedimentEntity procedimentEntity = entityComprovarHelper.comprovarProcediment(
-				entitat,
-				procediment.getId());
+		ProcedimentEntity procedimentEntity = null;
+		if(!isAdmin) {
+			procedimentEntity = entityComprovarHelper.comprovarProcediment(
+					entitat,
+					procediment.getId());
+		} else {
+			procedimentEntity = procedimentRepository.findOne(procediment.getId());
+		}
 		
 		PagadorPostalEntity pagadorPostalEntity = entityComprovarHelper.comprovarPagadorPostal(
 				procediment.getPagadorpostal().getId());
@@ -141,6 +146,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					entitat,
 					pagadorPostalEntity,
 					pagadorCieEntity,
+					procediment.getRetard(),
 					procediment.isAgrupar(),
 					procediment.getLlibre(),
 					procediment.getOficina(),

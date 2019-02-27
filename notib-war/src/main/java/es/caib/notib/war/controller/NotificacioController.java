@@ -34,6 +34,7 @@ import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
@@ -305,8 +306,7 @@ public class NotificacioController extends BaseUserController {
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request) {
 		NotificacioFiltreDto filtre = (NotificacioFiltreDto) request.getSession().getAttribute(NOTIFICACIONS_FILTRE);
-		PaginaDto<NotificacioDto> notificacions = null;
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		PaginaDto<NotificacioDto> notificacions = new PaginaDto<NotificacioDto>();
 		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
 		List<ProcedimentGrupDto> grupsProcediment = new ArrayList<ProcedimentGrupDto>();
 		List<ProcedimentDto> procedimentsSenseGrups = new ArrayList<ProcedimentDto>();
@@ -349,15 +349,26 @@ public class NotificacioController extends BaseUserController {
 
 		}
 
-		notificacions = notificacioService.findAmbFiltrePaginat(
-				entitatActual.getId(), 
-				isUsuari, 
-				isUsuariEntitat,
-				isAdministrador, 
-				grupsProcediment, 
-				procediments, 
-				filtre,
-				DatatablesHelper.getPaginacioDtoFromRequest(request));
+		try {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+			notificacions = notificacioService.findAmbFiltrePaginat(
+					entitatActual.getId(), 
+					isUsuari, 
+					isUsuariEntitat,
+					isAdministrador, 
+					grupsProcediment, 
+					procediments, 
+					filtre,
+					DatatablesHelper.getPaginacioDtoFromRequest(request));
+		}catch(SecurityException e) {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"notificacio.controller.entitat.cap.assignada"));
+		}
+		
 		return DatatablesHelper.getDatatableResponse(request, notificacions);
 	}
 

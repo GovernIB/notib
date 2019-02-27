@@ -48,10 +48,12 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public ProcedimentDto update(
 			Long entitatId, 
-			ProcedimentDto procediment) throws NotFoundException {
+			ProcedimentDto procediment,
+			boolean isAdmin) throws NotFoundException {
 		return delegate.update(
 				entitatId, 
-				procediment);
+				procediment,
+				isAdmin);
 	}
 
 	@Override

@@ -80,17 +80,23 @@ public class EnviamentController extends BaseUserController {
 				RequestSessionHelper.obtenirObjecteSessio(
 						request,
 						SESSION_ATTRIBUTE_SELECCIO));
-		model.addAttribute("filtreEnviaments", getFiltreCommand(request));
-		
-		columnes = enviamentService.getColumnesUsuari(
-				entitatActual.getId(), 
-				usuariAcutal);
-		
-		if (columnes == null) {			
-			enviamentService.columnesCreate(
-					usuariAcutal,
-					entitatActual.getId(),
-					columnes);
+		if(entitatActual != null) {
+			columnes = enviamentService.getColumnesUsuari(
+					entitatActual.getId(), 
+					usuariAcutal);
+			
+			if (columnes == null) {			
+				enviamentService.columnesCreate(
+						usuariAcutal,
+						entitatActual.getId(),
+						columnes);
+			}
+		}else {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"enviament.controller.entitat.cap.creada"));
 		}
 		NotificacioEnviamentFiltreCommand filtreEnviaments = getFiltreCommand(request);
 
@@ -135,20 +141,30 @@ public class EnviamentController extends BaseUserController {
 	public DatatablesResponse datatable(
 			HttpServletRequest request,
 			Model model) throws ParseException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
+			
 		NotificacioEnviamentFiltreCommand filtreEnviaments = getFiltreCommand(request);
 		PaginaDto<NotificacioEnviamentDtoV2> enviaments = new PaginaDto<NotificacioEnviamentDtoV2>();
-		if (enviaments != null) {
-			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
-				filtreEnviaments.setEstat(null);
-			}
+		
+		if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
+			filtreEnviaments.setEstat(null);
+		}
+		
+		try {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			
 			enviaments = enviamentService.enviamentFindByEntityAndFiltre(entitatActual, 
-						NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
-						DatatablesHelper.getPaginacioDtoFromRequest(request));
+					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
+					DatatablesHelper.getPaginacioDtoFromRequest(request));
 			
+		}catch(SecurityException e) {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"enviament.controller.entitat.cap.assignada"));
 		}
+		
 		return DatatablesHelper.getDatatableResponse(
 				request, 
 				enviaments,

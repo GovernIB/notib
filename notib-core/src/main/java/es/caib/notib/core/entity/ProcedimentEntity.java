@@ -121,6 +121,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			EntitatEntity entitat,
 			PagadorPostalEntity pagadorcostal,
 			PagadorCieEntity pagadorcie,
+			int retard,
 			boolean agrupar,
 			String llibre,
 			String oficina,
@@ -134,6 +135,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 		this.agrupar = agrupar;
 		this.llibre = llibre;
 		this.oficina = oficina;
+		this.retard = retard;
 		this.tipusAssumpte = tipusAssumpte;
 	}
 	
