@@ -13,6 +13,8 @@ import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
+
+import es.caib.notib.core.api.dto.EnviamentDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
@@ -269,6 +271,12 @@ public class NotificacioCommandV2 {
 				command,
 				NotificacioDtoV2.class);
 		
+		
+		for(EnviamentDto enviament: dto.getEnviaments()){
+			for(EnviamentCommand enviamentCommand: command.getEnviaments()) {
+				enviament.setCaducitat(enviamentCommand.getCaducitat());
+			}
+		}
 		ProcedimentDto procedimentDto = new ProcedimentDto();
 		procedimentDto.setId(command.getProcedimentId());
 		dto.setProcediment(procedimentDto);
@@ -276,6 +284,8 @@ public class NotificacioCommandV2 {
 		GrupDto grupDto = new GrupDto();
 		grupDto.setId(command.getGrupId());
 		dto.setGrup(grupDto);
+		
+		
 		
 		return dto;
 	}

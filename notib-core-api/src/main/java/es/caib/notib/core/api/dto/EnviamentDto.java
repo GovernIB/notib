@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.api.dto;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -20,6 +21,7 @@ public class EnviamentDto extends AuditoriaDto {
 	private boolean entregaPostalActiva;
 	private EntregaPostalDto entregaPostal;
 	private EntregaDehDto entregaDeh;
+	private Date caducitat;
 	
 	public ServeiTipusEnumDto getServeiTipus() {
 		return serveiTipus;
@@ -58,6 +60,12 @@ public class EnviamentDto extends AuditoriaDto {
 		this.entregaDeh = entregaDeh;
 	}
 	
+	public Date getCaducitat() {
+		return caducitat;
+	}
+	public void setCaducitat(Date caducitat) {
+		this.caducitat = caducitat;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

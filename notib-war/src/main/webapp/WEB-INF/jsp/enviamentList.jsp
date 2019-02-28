@@ -541,7 +541,7 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="notificacio.caducitat" width="230" data-converter="datetime" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.datacaducitat"/>
+				<th data-col-name="notificaDataCaducitat" width="230" data-converter="datetime" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.datacaducitat"/>
 					<script type="text/x-jsrender">
 						<div class="from-group" data-provide="daterangepicker" style="width: 230px;">
 							<div class="input-group vdivide">

@@ -1049,6 +1049,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built.domiciliTipus = NotificaDomiciliTipusEnumDto.CONCRETO;
 			built.domiciliNumeracioTipus = numeracioTipus;
 			built.domiciliConcretTipus = tipusConcret;
+			built.notificaDataCaducitat = enviament.getCaducitat();
 
 			if(enviament.getEntregaPostal() != null) {
 				built.domiciliViaNom = enviament.getEntregaPostal().getViaNom();

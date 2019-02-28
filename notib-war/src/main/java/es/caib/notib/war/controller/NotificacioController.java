@@ -152,7 +152,7 @@ public class NotificacioController extends BaseUserController {
 				isAdministrador(request), 
 				procedimentId);
 		NotificacioCommandV2 notificacio = new NotificacioCommandV2();
-
+		
 		model.addAttribute("notificacioCommandV2", notificacio);
 		model.addAttribute("entitat", procedimentActual.getEntitat());
 		model.addAttribute("procediment", procedimentService.findById(null, isAdministrador(request), procedimentId));

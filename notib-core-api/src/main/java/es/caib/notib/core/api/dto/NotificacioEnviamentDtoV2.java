@@ -33,6 +33,7 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private String notificaCertificacioNumSeguiment;
 	private String detalls;
 	private String codiNotibEnviament;
+	private String notificaDataCaducitat;
 	
 	
 	
@@ -266,6 +267,12 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	}
 	public void setNotificacioId(Long notificacioId) {
 		this.notificacioId = notificacioId;
+	}
+	public String getNotificaDataCaducitat() {
+		return notificaDataCaducitat;
+	}
+	public void setNotificaDataCaducitat(String notificaDataCaducitat) {
+		this.notificaDataCaducitat = notificaDataCaducitat;
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;
