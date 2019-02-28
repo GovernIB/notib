@@ -262,16 +262,16 @@ function mostrarEntregaPostal(className) {
 	</c:if>
 	</c:forEach>
 	<ul class="nav nav-tabs" role="tablist">
-		<li role="presentation"><a href="#dadesgeneralsForm" aria-controls="dadesgeneralsForm" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.dadesgenerals"/><c:if test="${not empty errorConcepte}"> <span class="fa fa-warning text-danger"></span></c:if></a> </li>
+		<li role="presentation" class="active"><a href="#dadesgeneralsForm" aria-controls="dadesgeneralsForm" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.dadesgenerals"/><c:if test="${not empty errorConcepte}"> <span class="fa fa-warning text-danger"></span></c:if></a> </li>
 		<li role="presentation"><a href="#documentForm" aria-controls="documentForm" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.document"/></a></li>
 		<li role="presentation"><a href="#parametresregistreForm" aria-controls="parametresregistreForm" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.parametresregistre"/></a></li>
-		<li role="presentation" class="active"><a href="#enviamentsForm" aria-controls="enviamentsForm" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.enviaments"/><c:if test="${not empty errorEnviament}"> <span class="fa fa-warning text-danger"></span></c:if></a></li>
+		<li role="presentation"><a href="#enviamentsForm" aria-controls="enviamentsForm" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.enviaments"/><c:if test="${not empty errorEnviament}"> <span class="fa fa-warning text-danger"></span></c:if></a></li>
 	</ul>
 	<br/>
 	<c:set var="formAction"><not:modalUrl value="/notificacio/newOrModify"/></c:set>
 	<form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" commandName="notificacioCommandV2" enctype="multipart/form-data">
 		<div class="tab-content">
-			<div role="tabpanel" class="tab-pane " id="dadesgeneralsForm">
+			<div role="tabpanel" class="tab-pane active" id="dadesgeneralsForm">
 				<div class="row dadesgeneralsForm">
 					<div class="col-md-12">
 						<not:inputText name="emisorDir3Codi" textKey="notificacio.form.camp.codiemisor" value="${entitat.dir3Codi}" labelSize="2" readonly="true" required="true"/>
@@ -368,7 +368,7 @@ function mostrarEntregaPostal(className) {
 					</div>
 				</div>
 			</div>
-			<div role="tabpanel" class="tab-pane active" id="enviamentsForm">
+			<div role="tabpanel" class="tab-pane" id="enviamentsForm">
 				<c:choose>
 				<c:when test="${not empty enviosGuardats}">
 					<c:set value="${enviosGuardats}" var="envios"></c:set>

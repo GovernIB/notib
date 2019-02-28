@@ -3,8 +3,16 @@
  */
 package es.caib.notib.core.service;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -67,6 +75,8 @@ import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.security.ExtendedPermission;
+import es.caib.plugins.arxiu.api.ArxiuException;
+import es.caib.plugins.arxiu.api.DocumentContingut;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -613,6 +623,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public ArxiuDto getDocumentArxiu(
 			Long notificacioId) {
+		String nomDocumetnDefault = "document";
 		NotificacioEntity entity = notificacioRepository.findById(notificacioId);
 		if(entity.getDocument() != null && entity.getDocument().getArxiuGestdocId() != null) {
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -621,10 +632,35 @@ public class NotificacioServiceImpl implements NotificacioService {
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 					output);
 			return new ArxiuDto(
-					entity.getDocument().getArxiuNom(),
+					entity.getDocument().getArxiuNom() != null ? entity.getDocument().getArxiuNom() : nomDocumetnDefault,
 					"PDF",
 					output.toByteArray(),
 					output.size());	
+		}else if(entity.getDocument().getUuid() != null){
+			DocumentContingut dc = pluginHelper.documentImprimibleUuid(entity.getDocument().getUuid());
+			return new ArxiuDto(
+					entity.getDocument().getArxiuNom() != null ? entity.getDocument().getArxiuNom() : nomDocumetnDefault,
+					dc.getTipusMime(),
+					dc.getContingut(),
+					dc.getTamany());
+		}else if(entity.getDocument().getCsv() != null){
+			DocumentContingut dc = pluginHelper.documentImprimibleCsv(entity.getDocument().getCsv());
+			return new ArxiuDto(
+					entity.getDocument().getArxiuNom() != null ? entity.getDocument().getArxiuNom() : nomDocumetnDefault,
+					dc.getTipusMime(),
+					dc.getContingut(),
+					dc.getTamany());	
+		}else if(entity.getDocument().getUrl() != null){
+			try {
+				byte[] contingut = downloadUsingStream(entity.getDocument().getUrl(), "document");
+				return new ArxiuDto(
+						entity.getDocument().getArxiuNom() != null ? entity.getDocument().getArxiuNom() : nomDocumetnDefault,
+						"PDF",
+						contingut,
+						contingut.length);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		/*TODO: controlar que si el document no du id de gestio documental
 		 *  no l'intenti descarregar d'aquest plugin si no del que correspongui 
@@ -1053,6 +1089,23 @@ public class NotificacioServiceImpl implements NotificacioService {
 //		referencies.add(enviamentReferencia);
 //		notificacioEntity.addEnviament(enviamentSaved);
 //	}
+	
+	
+	private byte[] downloadUsingStream(String urlStr, String file) throws IOException{
+        URL url = new URL(urlStr);
+        BufferedInputStream bis = new BufferedInputStream(url.openStream());
+        FileOutputStream fis = new FileOutputStream(file);
+        byte[] buffer = new byte[1024];
+        int count=0;
+        while((count = bis.read(buffer,0,1024)) != -1)
+        {
+            fis.write(buffer, 0, count);
+        }
+        fis.close();
+        bis.close();
+        return buffer;
+    }
+	
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceImpl.class);
 
 
