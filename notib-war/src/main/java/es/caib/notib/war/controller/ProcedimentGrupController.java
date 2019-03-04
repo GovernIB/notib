@@ -17,6 +17,7 @@ import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.ProcedimentGrupCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
+import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RolHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 
@@ -89,6 +90,7 @@ public class ProcedimentGrupController extends BaseUserController{
 	}
 	
 	@RequestMapping(value = "/{procedimentId}/grup/{grupId}/delete", method = RequestMethod.GET)
+	@ResponseBody
 	public String delete(
 			HttpServletRequest request,
 			@PathVariable Long procedimentId,
@@ -100,10 +102,12 @@ public class ProcedimentGrupController extends BaseUserController{
 				entitatActual.getId(),
 				grupId);
 		
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:../../procediment/" + procedimentId + "/grup",
-				"procediment.controller.grup.esborrat.ok");
+		MissatgesHelper.success(
+				request, 
+				getMessage(
+						request, 
+						"procediment.controller.grup.esborrat.ok"));
+		return "ok";
 	}
 	
 	private ProcedimentGrupDto emplenarModelGrups(
