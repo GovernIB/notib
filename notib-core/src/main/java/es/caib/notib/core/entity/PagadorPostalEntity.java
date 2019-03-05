@@ -108,6 +108,24 @@ public class PagadorPostalEntity extends NotibAuditable<Long> {
 		return true;
 	}
 	
+	
+	public void setDir3codi(String dir3codi) {
+		this.dir3codi = dir3codi;
+	}
+
+	public void setContracteNum(String contracteNum) {
+		this.contracteNum = contracteNum;
+	}
+
+	public void setContracteDataVig(Date contracteDataVig) {
+		this.contracteDataVig = contracteDataVig;
+	}
+
+	public void setFacturacioClientCodi(String facturacioClientCodi) {
+		this.facturacioClientCodi = facturacioClientCodi;
+	}
+
+
 	private static final long serialVersionUID = 4863376704844981591L;
 
 	

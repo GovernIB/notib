@@ -52,249 +52,249 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@JoinColumn(name = "notificacio_id")
 	@ForeignKey(name = "NOT_NOTIFICACIO_NOTENV_FK")
 	@NotFound(action = NotFoundAction.IGNORE)
-	private NotificacioEntity notificacio;
+	protected NotificacioEntity notificacio;
 	
 	@Column(name="notificacio_id", insertable=false, updatable=false)
-	private Long notificacioId;
+	protected Long notificacioId;
 	
 	/* Titular */
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "titular_id")
 	@ForeignKey(name = "not_persona_notificacio_env_fk")
-	private PersonaEntity titular;
+	protected PersonaEntity titular;
 	
 	/* Destinataris */
 	@OneToMany(fetch = FetchType.EAGER)
 	@ForeignKey(name = "not_persona_not_fk")
     @JoinColumn(name = "notificacio_env_id") // we need to duplicate the physical information
-	private List<PersonaEntity> destinataris;
+	protected List<PersonaEntity> destinataris;
 	
 	/* Domicili */
 	@Column(name = "dom_tipus")
 	@Enumerated(EnumType.ORDINAL)
-	private NotificaDomiciliTipusEnumDto domiciliTipus;
+	protected NotificaDomiciliTipusEnumDto domiciliTipus;
 	
 	@Column(name = "dom_con_tipus")
 	@Enumerated(EnumType.ORDINAL)
-	private NotificaDomiciliConcretTipusEnumDto domiciliConcretTipus;
+	protected NotificaDomiciliConcretTipusEnumDto domiciliConcretTipus;
 	
 	@Column(name = "dom_via_tipus")
 	@Enumerated(EnumType.ORDINAL)
-	private NotificaDomiciliViaTipusEnumDto domiciliViaTipus;
+	protected NotificaDomiciliViaTipusEnumDto domiciliViaTipus;
 	
 	@Column(name = "dom_via_nom", length = 100)
-	private String domiciliViaNom;
+	protected String domiciliViaNom;
 	@Column(name = "dom_num_tipus")
 	@Enumerated(EnumType.ORDINAL)
-	private NotificaDomiciliNumeracioTipusEnumDto domiciliNumeracioTipus;
+	protected NotificaDomiciliNumeracioTipusEnumDto domiciliNumeracioTipus;
 	
 	@Column(name = "dom_num_num", length = 10)
-	private String domiciliNumeracioNumero;
+	protected String domiciliNumeracioNumero;
 	
 	@Column(name = "dom_num_qualif", length = 3)
-	private String domiciliNumeracioQualificador;
+	protected String domiciliNumeracioQualificador;
 	
 	@Column(name = "dom_num_puntkm", length = 10)
-	private String domiciliNumeracioPuntKm;
+	protected String domiciliNumeracioPuntKm;
 	
 	@Column(name = "dom_apartat", length = 10)
-	private String domiciliApartatCorreus;
+	protected String domiciliApartatCorreus;
 	
 	@Column(name = "dom_bloc", length = 50)
-	private String domiciliBloc;
+	protected String domiciliBloc;
 	
 	@Column(name = "dom_portal", length = 50)
-	private String domiciliPortal;
+	protected String domiciliPortal;
 	
 	@Column(name = "dom_escala", length = 50)
-	private String domiciliEscala;
+	protected String domiciliEscala;
 	
 	@Column(name = "dom_planta", length = 50)
-	private String domiciliPlanta;
+	protected String domiciliPlanta;
 	
 	@Column(name = "dom_porta", length = 50)
-	private String domiciliPorta;
+	protected String domiciliPorta;
 	
 	@Column(name = "dom_complem", length = 250)
-	private String domiciliComplement;
+	protected String domiciliComplement;
 	
 	@Column(name = "dom_poblacio", length = 30)
-	private String domiciliPoblacio;
+	protected String domiciliPoblacio;
 	
 	@Column(name = "dom_mun_codine", length = 6)
-	private String domiciliMunicipiCodiIne;
+	protected String domiciliMunicipiCodiIne;
 	
 	@Column(name = "dom_mun_nom", length = 64)
-	private String domiciliMunicipiNom;
+	protected String domiciliMunicipiNom;
 	
 	@Column(name = "dom_codi_postal", length = 10)
-	private String domiciliCodiPostal;
+	protected String domiciliCodiPostal;
 	
 	@Column(name = "dom_prv_codi", length = 2)
-	private String domiciliProvinciaCodi;
+	protected String domiciliProvinciaCodi;
 	
 	@Column(name = "dom_prv_nom", length = 64)
-	private String domiciliProvinciaNom;
+	protected String domiciliProvinciaNom;
 	
 	@Column(name = "dom_pai_codiso", length = 3)
-	private String domiciliPaisCodiIso; // ISO-3166
+	protected String domiciliPaisCodiIso; // ISO-3166
 	
 	@Column(name = "dom_pai_nom", length = 64)
-	private String domiciliPaisNom;
+	protected String domiciliPaisNom;
 	
 	@Column(name = "dom_linea1", length = 50)
-	private String domiciliLinea1;
+	protected String domiciliLinea1;
 	
 	@Column(name = "dom_linea2", length = 50)
-	private String domiciliLinea2;
+	protected String domiciliLinea2;
 	
 	@Column(name = "dom_cie")
-	private Integer domiciliCie;
+	protected Integer domiciliCie;
 	
 	/* DEH */
 	@Column(name = "deh_obligat")
 	
-	private Boolean dehObligat;
+	protected Boolean dehObligat;
 	@Column(name = "deh_nif", length = 9)
 	
-	private String dehNif;
+	protected String dehNif;
 	@Column(name = "deh_proc_codi", length = 6)
 	
-	private String dehProcedimentCodi;
+	protected String dehProcedimentCodi;
 	/* Altres */
 	
 	@Column(name = "servei_tipus")
 	@Enumerated(EnumType.ORDINAL)
-	private ServeiTipusEnumDto serveiTipus;
+	protected ServeiTipusEnumDto serveiTipus;
 	
 	@Column(name = "format_sobre", length = 10)
-	private String formatSobre;
+	protected String formatSobre;
 	
 	@Column(name = "format_fulla", length = 10)
-	private String formatFulla;
+	protected String formatFulla;
 	
 	/* Notifica informació */
 	@Column(name = "notifica_ref", length = 20)
-	private String notificaReferencia;
+	protected String notificaReferencia;
 	
 	@Column(name = "notifica_id", length = 20)
-	private String notificaIdentificador;
+	protected String notificaIdentificador;
 	
 	@Column(name = "notifica_datcre")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date notificaDataCreacio;
+	protected Date notificaDataCreacio;
 	
 	@Column(name = "notifica_datdisp")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date notificaDataDisposicio;
+	protected Date notificaDataDisposicio;
 	
 	@Column(name = "notifica_datcad")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date notificaDataCaducitat;
+	protected Date notificaDataCaducitat;
 	
 	@Column(name = "notifica_emi_dir3codi", length = 9)
-	private String notificaEmisorDir3;
+	protected String notificaEmisorDir3;
 	
 	@Column(name = "notifica_emi_dir3desc", length = 100)
-	private String notificaEmisorDescripcio;
+	protected String notificaEmisorDescripcio;
 	
 	@Column(name = "notifica_emi_dir3nif", length = 9)
-	private String notificaEmisorNif;
+	protected String notificaEmisorNif;
 	
 	@Column(name = "notifica_arr_dir3codi", length = 9)
-	private String notificaArrelDir3;
+	protected String notificaArrelDir3;
 	
 	@Column(name = "notifica_arr_dir3desc", length = 100)
-	private String notificaArrelDescripcio;
+	protected String notificaArrelDescripcio;
 	
 	@Column(name = "notifica_arr_dir3nif", length = 9)
-	private String notificaArrelNif;
+	protected String notificaArrelNif;
 	
 	/* Notifica estat i datat */
 	@Column(name = "notifica_estat", nullable = false)
-	private NotificacioEnviamentEstatEnumDto notificaEstat;
+	protected NotificacioEnviamentEstatEnumDto notificaEstat;
 	
 	@Column(name = "notifica_estat_data")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date notificaEstatData;
+	protected Date notificaEstatData;
 	
 	@Column(name = "notifica_estat_dataact")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date notificaEstatDataActualitzacio;
+	protected Date notificaEstatDataActualitzacio;
 	
 	@Column(name = "notifica_estat_final")
-	private boolean notificaEstatFinal;
+	protected boolean notificaEstatFinal;
 	
 	@Column(name = "notifica_estat_desc", length = 255)
-	private String notificaEstatDescripcio;
+	protected String notificaEstatDescripcio;
 	
 	@Column(name = "notifica_datat_origen", length = 20)
-	private String notificaDatatOrigen;
+	protected String notificaDatatOrigen;
 	
 	@Column(name = "notifica_datat_recnif", length = 9)
-	private String notificaDatatReceptorNif;
+	protected String notificaDatatReceptorNif;
 	
 	@Column(name = "notifica_datat_recnom", length = 100)
-	private String notificaDatatReceptorNom;
+	protected String notificaDatatReceptorNom;
 	
 	@Column(name = "notifica_datat_numseg", length = 50)
-	private String notificaDatatNumSeguiment;
+	protected String notificaDatatNumSeguiment;
 	
 	@Column(name = "notifica_datat_errdes", length = 255)
-	private String notificaDatatErrorDescripcio;
+	protected String notificaDatatErrorDescripcio;
 	
 	/* Notifica certificació */
 	@Column(name = "notifica_cer_data")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date notificaCertificacioData;
+	protected Date notificaCertificacioData;
 	
 	@Column(name = "notifica_cer_arxiuid", length = 50)
-	private String notificaCertificacioArxiuId;
+	protected String notificaCertificacioArxiuId;
 	
 	@Column(name = "notifica_cer_hash", length = 50)
-	private String notificaCertificacioHash;
+	protected String notificaCertificacioHash;
 	
 	@Column(name = "notifica_cer_origen", length = 20)
-	private String notificaCertificacioOrigen;
+	protected String notificaCertificacioOrigen;
 	
 	@Column(name = "notifica_cer_metas", length = 255)
-	private String notificaCertificacioMetadades;
+	protected String notificaCertificacioMetadades;
 	
 	@Column(name = "notifica_cer_csv", length = 50)
-	private String notificaCertificacioCsv;
+	protected String notificaCertificacioCsv;
 	
 	@Column(name = "notifica_cer_mime", length = 20)
-	private String notificaCertificacioMime;
+	protected String notificaCertificacioMime;
 	
 	@Column(name = "notifica_cer_tamany", length = 20)
-	private Integer notificaCertificacioTamany;
+	protected Integer notificaCertificacioTamany;
 	
 	@Column(name = "notifica_cer_tipus")
 	@Enumerated(EnumType.ORDINAL)
-	private NotificaCertificacioTipusEnumDto notificaCertificacioTipus;
+	protected NotificaCertificacioTipusEnumDto notificaCertificacioTipus;
 	
 	@Column(name = "notifica_cer_arxtip")
 	@Enumerated(EnumType.ORDINAL)
-	private NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus;
+	protected NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus;
 	
 	@Column(name = "notifica_cer_numseg", length = 50)
-	private String notificaCertificacioNumSeguiment;
+	protected String notificaCertificacioNumSeguiment;
 	
 	/* Notifica error */
 	@Column(name = "notifica_error", nullable = false)
-	private boolean notificaError;
+	protected boolean notificaError;
 	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "notifica_error_event_id")
 	@ForeignKey(name = "not_noteve_noterr_notdest_fk")
-	private NotificacioEventEntity notificaErrorEvent;
+	protected NotificacioEventEntity notificaErrorEvent;
 	
 	@Column(name = "notifica_intent_data")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date notificaIntentData;
+	protected Date notificaIntentData;
 	
 	@Column(name = "intent_num")
-	private int intentNum;
+	protected int intentNum;
 
 	public NotificaDomiciliTipusEnumDto getDomiciliTipus() {
 		return domiciliTipus;
@@ -524,6 +524,10 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public void updateNotificaReferencia(
 			String notificaReferencia) {
 		this.notificaReferencia = notificaReferencia;
+	}
+	public void updateNotificaIdentificador(
+			String notificaidentificador) {
+		this.notificaIdentificador = notificaidentificador;
 	}
 	public void setDehObligat(Boolean dehObligat) {
 		this.dehObligat = dehObligat;

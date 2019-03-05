@@ -79,6 +79,18 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 		return true;
 	}
 	
+	
+	
+	public void setDir3codi(String dir3codi) {
+		this.dir3codi = dir3codi;
+	}
+
+	public void setContracteDataVig(Date contracteDataVig) {
+		this.contracteDataVig = contracteDataVig;
+	}
+
+
+
 	private static final long serialVersionUID = 8596990469127710436L;
 	
 }

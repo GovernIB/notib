@@ -46,87 +46,87 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	/*Parametres generals*/
 	
 	@Column(name = "usuari_codi", length = 64, nullable = false)
-	private String usuariCodi;
+	protected String usuariCodi;
 	@Column(name = "emisor_dir3codi", length = 9, nullable = false)
-	private String emisorDir3Codi;
+	protected String emisorDir3Codi;
 	@Column(name = "com_tipus", nullable = false)
-	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
+	protected NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	
 	@Column(name = "env_tipus", nullable = false)
-	private NotificaEnviamentTipusEnumDto enviamentTipus;
+	protected NotificaEnviamentTipusEnumDto enviamentTipus;
 	
 	@Column(name = "env_data_prog")
 	@Temporal(TemporalType.DATE)
-	private Date enviamentDataProgramada;
+	protected Date enviamentDataProgramada;
 	
 	@Column(name = "concepte", length = 50, nullable = false)
-	private String concepte;
+	protected String concepte;
 	
 	@Column(name = "descripcio", length = 100)
-	private String descripcio;
+	protected String descripcio;
 	
 	@Column(name = "retard_postal")
-	private Integer retardPostal;
+	protected Integer retardPostal;
 	
 	@Column(name = "caducitat")
 	@Temporal(TemporalType.DATE)
-	private Date caducitat;
+	protected Date caducitat;
 	
 	@Column(name = "proc_codi_notib", length = 6, nullable = false)
-	private String procedimentCodiNotib;
+	protected String procedimentCodiNotib;
 	
 	@Column(name = "grup_codi", length = 6, nullable = false)
-	private String grupCodi;
+	protected String grupCodi;
 	
 	@Column(name = "estat", nullable = false)
-	private NotificacioEstatEnumDto estat;
+	protected NotificacioEstatEnumDto estat;
 	
 	@Column(name = "not_error_tipus")
-	private NotificacioErrorTipusEnumDto notificaErrorTipus;
+	protected NotificacioErrorTipusEnumDto notificaErrorTipus;
 	
 	@Column(name = "not_env_data")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date notificaEnviamentData;
+	protected Date notificaEnviamentData;
 	
 	@Column(name = "not_reenv_data")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date notificaReEnviamentData;
+	protected Date notificaReEnviamentData;
 	
 	@Column(name = "not_env_intent")
-	private int notificaEnviamentIntent;
+	protected int notificaEnviamentIntent;
 	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "not_error_event_id")
 	@ForeignKey(name = "not_noterrevent_notificacio_fk")
-	private NotificacioEventEntity notificaErrorEvent;
+	protected NotificacioEventEntity notificaErrorEvent;
 	
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.EAGER)
-	private Set<NotificacioEnviamentEntity> enviaments = new LinkedHashSet<NotificacioEnviamentEntity>();
+	protected Set<NotificacioEnviamentEntity> enviaments = new LinkedHashSet<NotificacioEnviamentEntity>();
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY)
-	private Set<NotificacioEventEntity> events = new LinkedHashSet<NotificacioEventEntity>();
+	protected Set<NotificacioEventEntity> events = new LinkedHashSet<NotificacioEventEntity>();
 	
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "entitat_id")
 	@ForeignKey(name = "not_entitat_notificacio_fk")
-	private EntitatEntity entitat;
+	protected EntitatEntity entitat;
 	
 	
 	/*pagador a Postal*/
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "pagador_postal_id")
 	@ForeignKey(name = "not_pagador_postal_not_fk")
-	private PagadorPostalEntity pagadorPostal;
+	protected PagadorPostalEntity pagadorPostal;
 	
 	
 	/*pagador CIE*/
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "pagador_cie_id")
 	@ForeignKey(name = "not_pagador_cie_not_fk")
-	private PagadorCieEntity pagadorCie;
+	protected PagadorCieEntity pagadorCie;
 	
 	
 	
@@ -135,81 +135,81 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "procediment_id")
 	@ForeignKey(name = "not_procediment_not_fk")
-	private ProcedimentEntity procediment;
+	protected ProcedimentEntity procediment;
 	
 	
 	/*document*/
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "document_id")
 	@ForeignKey(name = "not_document_notificacio_fk")
-	private DocumentEntity document;
+	protected DocumentEntity document;
 	
 	/*Parametres de la seu*/
 	
 	
 	@Column(name = "seu_exp_serdoc", length = 10)
-	private String seuExpedientSerieDocumental;
+	protected String seuExpedientSerieDocumental;
 	@Column(name = "seu_exp_uniorg", length = 10, nullable = false)
-	private String seuExpedientUnitatOrganitzativa;
+	protected String seuExpedientUnitatOrganitzativa;
 	@Column(name = "seu_exp_ideni", length = 52, nullable = false)
-	private String seuExpedientIdentificadorEni;
+	protected String seuExpedientIdentificadorEni;
 	@Column(name = "seu_exp_titol", length = 256, nullable = false)
-	private String seuExpedientTitol;
+	protected String seuExpedientTitol;
 	@Column(name = "seu_proc_codi", length = 256, nullable = false)
-	private String seuProcedimentCodi;
+	protected String seuProcedimentCodi;
 	@Column(name = "seu_reg_oficina", length = 256, nullable = false)
-	private String seuRegistreOficina;
+	protected String seuRegistreOficina;
 	@Column(name = "seu_reg_llibre", length = 256, nullable = false)
-	private String seuRegistreLlibre;
+	protected String seuRegistreLlibre;
 	@Column(name = "seu_reg_organ", length = 256, nullable = false)
-	private String seuRegistreOrgan;
+	protected String seuRegistreOrgan;
 	@Column(name = "seu_idioma", length = 256, nullable = false)
-	private String seuIdioma;
+	protected String seuIdioma;
 	@Column(name = "seu_avis_titol", length = 256, nullable = false)
-	private String seuAvisTitol;
+	protected String seuAvisTitol;
 	@Column(name = "seu_avis_text", length = 256, nullable = false)
-	private String seuAvisText;
+	protected String seuAvisText;
 	@Column(name = "seu_avis_mobil", length = 256)
-	private String seuAvisTextMobil;
+	protected String seuAvisTextMobil;
 	@Column(name = "seu_ofici_titol", length = 256, nullable = false)
-	private String seuOficiTitol;
+	protected String seuOficiTitol;
 	@Column(name = "seu_ofici_text", length = 256, nullable = false)
-	private String seuOficiText;
+	protected String seuOficiText;
 	
 	
 	/*Parametres del registre*/
 	
 	
 	@Column(name = "registre_oficina", length = 52, nullable = false)
-	private String registreOficina;
+	protected String registreOficina;
 	@Column(name = "registre_organ", length = 10)
-	private String registreOrgan;
+	protected String registreOrgan;
 	@Column(name = "registre_llibre", length = 256)
-	private String registreLlibre;
+	protected String registreLlibre;
 	@Column(name = "registre_numero", length = 256)
-	private String registreNumero;
+	protected String registreNumero;
 	@Column(name = "registre_data")
 	@Temporal(TemporalType.DATE)
-	private Date registreData;
+	protected Date registreData;
 	@Column(name = "registre_extracte", length = 52, nullable = false)
-	private String registreExtracte;
+	protected String registreExtracte;
 	@Column(name = "registre_doc_fisica", length = 256, nullable = false)
-	private String registreDocFisica;
+	protected String registreDocFisica;
 	@Column(name = "registre_idioma", length = 52, nullable = false)
-	private String registreIdioma;
+	protected String registreIdioma;
 	@Column(name = "registre_tipus_assumpte", length = 256, nullable = false)
-	private String registreTipusAssumpte;
+	protected String registreTipusAssumpte;
 	@Column(name = "registre_num_expedient", length = 256, nullable = false)
-	private String registreNumExpedient;
+	protected String registreNumExpedient;
 	@Column(name = "registre_ref_externa", length = 52, nullable = false)
-	private String registreRefExterna;
+	protected String registreRefExterna;
 	@Column(name = "registre_codi_assumpte", length = 256, nullable = false)
-	private String registreCodiAssumpte;
+	protected String registreCodiAssumpte;
 	@Column(name = "registre_observacions", length = 256, nullable = false)
-	private String registreObservacions;
+	protected String registreObservacions;
 	
 	@Transient
-	private boolean permisProcessar;
+	protected boolean permisProcessar;
 	
 	
 

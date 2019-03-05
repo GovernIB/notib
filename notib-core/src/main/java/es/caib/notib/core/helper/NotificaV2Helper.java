@@ -317,9 +317,23 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 	}
 
+	
+	public ResultadoInfoEnvioV2 infoEnviament(
+			NotificacioEnviamentEntity enviament) throws SistemaExternException {
+		try {
+			InfoEnvioV2 infoEnvio = new InfoEnvioV2();
+			infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
+			return getNotificaWs().infoEnvioV2(infoEnvio);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
+
+	
 
 
-	private ResultadoAltaRemesaEnvios enviaNotificacio(
+	public ResultadoAltaRemesaEnvios enviaNotificacio(
 			NotificacioEntity notificacio) throws Exception {
 		ResultadoAltaRemesaEnvios resultat = null;
 		if (!NotificacioEstatEnumDto.PENDENT.equals(notificacio.getEstat())) {

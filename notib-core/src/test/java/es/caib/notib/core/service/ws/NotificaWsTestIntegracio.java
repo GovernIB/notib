@@ -2,55 +2,56 @@
  * 
  */
 package es.caib.notib.core.service.ws;
-/*
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+//import static org.hamcrest.CoreMatchers.is;
+//import static org.junit.Assert.assertNotNull;
+//import static org.junit.Assert.assertThat;
+//
+//import java.io.ByteArrayInputStream;
+//import java.io.IOException;
+//import java.io.InputStream;
+//import java.util.Date;
+//import java.util.HashSet;
+//import java.util.Set;
+//
+//import org.apache.commons.codec.DecoderException;
+//import org.apache.commons.codec.binary.Base64;
+//import org.apache.commons.codec.binary.Hex;
+//import org.apache.commons.codec.digest.DigestUtils;
+//import org.apache.commons.io.IOUtils;
+//import org.junit.Before;
+//import org.junit.FixMethodOrder;
+//import org.junit.Rule;
+//import org.junit.Test;
+//import org.junit.rules.ExpectedException;
+//import org.junit.runner.RunWith;
+//import org.junit.runners.MethodSorters;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.test.context.ContextConfiguration;
+//import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+//import org.springframework.transaction.annotation.Transactional;
+//
+//import es.caib.notib.core.api.dto.EntitatDto;
+//import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
+//import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
+//import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
+//import es.caib.notib.core.api.dto.NotificaDomiciliTipusEnumDto;
+//import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
+//import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+//import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+//import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
+//import es.caib.notib.core.api.dto.PermisDto;
+//import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
+//import es.caib.notib.core.api.dto.TipusEnumDto;
+//import es.caib.notib.core.api.ws.notificacio.EntregaPostalTipusEnum;
+//import es.caib.notib.core.entity.NotificacioEntity;
+//import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+//import es.caib.notib.core.helper.NotificaV2Helper;
+//import es.caib.notib.core.helper.PluginHelper;
+//import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
+//import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
+//import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
-
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDestinatariEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.TipusEnumDto;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostalTipusEnum;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.helper.NotificaV2Helper;
-import es.caib.notib.core.helper.PluginHelper;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
 
 /**
  * Test per al client REST del servei de notificacions de NOTIB.
@@ -145,6 +146,7 @@ public class NotificaWsTestIntegracio {
 		}
 		
 	}
+	
 	
 	
 	// PETICIÓN CORRECTA DE TIPO CENTRO DE IMPRESIÓN, DOMICILIO CONCRETO E INTERNACIONAL.
@@ -552,8 +554,8 @@ public class NotificaWsTestIntegracio {
 				ambRetard);
 		
 		// Nif del titular no vàlid
-		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
-		env.setTitularNif("00000000A");
+		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().iterator().next();
+		env.getTitular().setNif("00000000A");
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
 		assertNotNull(resultat);
@@ -587,10 +589,10 @@ public class NotificaWsTestIntegracio {
 				ambRetard);
 		
 		// Nom del titular buid
-		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
-		env.setTitularNom(null);
-		env.setTitularLlinatge1(null);
-		env.setTitularLlinatge2(null);
+		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().iterator().next();
+		env.getTitular().setNom(null);
+		env.getTitular().setLlinatge1(null);
+		env.getTitular().setLlinatge2(null);
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
 		assertNotNull(resultat);
@@ -627,7 +629,7 @@ public class NotificaWsTestIntegracio {
 				ambRetard);
 
 		// Document buid
-		notificacio.setDocumentArxiuId(null);
+		notificacio.getDocument().setArxiuGestdocId(null);
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
 		assertNotNull(resultat);
@@ -664,7 +666,7 @@ public class NotificaWsTestIntegracio {
 				ambRetard);
 		
 		// Hash del document incorrecte
-		notificacio.setDocumentHash("AAA");
+		notificacio.getDocument().setHash("AAA");
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
 		assertNotNull(resultat);
@@ -739,7 +741,7 @@ public class NotificaWsTestIntegracio {
 				ambRetard);
 		
 		// Tipus de servei buid
-		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
+		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().iterator().next();
 		env.setServeiTipus(null);
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
@@ -881,7 +883,7 @@ public class NotificaWsTestIntegracio {
 				ambEnviamentDEHObligat,
 				ambRetard);
 		
-		notificacio.setProcedimentCodiSia("XYZ");
+		notificacio.getProcediment().setCodisia("XYZ");
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
 		assertNotNull(resultat);
@@ -956,7 +958,7 @@ public class NotificaWsTestIntegracio {
 				ambRetard);
 		
 		// Punt kilomètric emplenat (el número de casa també està emplenat)
-		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
+		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().iterator().next();
 		env.setDomiciliNumeracioPuntKm("pk01");
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
@@ -994,7 +996,7 @@ public class NotificaWsTestIntegracio {
 				ambRetard);
 		
 		// Tipus de domicili buit
-		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
+		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().iterator().next();
 		env.setDomiciliTipus(null);
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
@@ -1031,7 +1033,7 @@ public class NotificaWsTestIntegracio {
 				ambRetard);
 		
 		// Nom de la via buit
-		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
+		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().iterator().next();
 		env.setDomiciliViaNom(null);
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
@@ -1067,7 +1069,7 @@ public class NotificaWsTestIntegracio {
 				ambRetard);
 		
 		// Tipus de via buid
-		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
+		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().iterator().next();
 		env.setDomiciliViaTipus(null);
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
@@ -1104,7 +1106,7 @@ public class NotificaWsTestIntegracio {
 				ambRetard);
 		
 		// Número de casa buit (el punt kilomètric també està buid)
-		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
+		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().iterator().next();
 		env.setDomiciliNumeracioNumero(null);
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
@@ -1141,7 +1143,7 @@ public class NotificaWsTestIntegracio {
 				ambRetard);
 		
 		// Codi postal buid
-		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
+		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().iterator().next();
 		env.setDomiciliCodiPostal(null);
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
@@ -1178,7 +1180,7 @@ public class NotificaWsTestIntegracio {
 				ambRetard);
 		
 		// Apartat de correus buit
-		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
+		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().iterator().next();
 		env.setDomiciliApartatCorreus(null);
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
@@ -1214,7 +1216,7 @@ public class NotificaWsTestIntegracio {
 				ambRetard);
 		
 		// Codi de municipi buit
-		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
+		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().iterator().next();
 		env.setDomiciliMunicipiCodiIne(null);
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
@@ -1250,7 +1252,7 @@ public class NotificaWsTestIntegracio {
 				ambRetard);
 		
 		// Codi de municipi no vàlid
-		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
+		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().iterator().next();
 		env.setDomiciliMunicipiCodiIne("CODI");
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
@@ -1286,7 +1288,7 @@ public class NotificaWsTestIntegracio {
 				ambRetard);
 		
 		// codi de provincia buit
-		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
+		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().iterator().next();
 		env.setDomiciliProvinciaCodi(null);
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
@@ -1322,7 +1324,7 @@ public class NotificaWsTestIntegracio {
 				ambRetard);
 		
 		// Codi de província no vàlid
-		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
+		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().iterator().next();
 		env.setDomiciliProvinciaCodi("CODI");
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
@@ -1358,7 +1360,7 @@ public class NotificaWsTestIntegracio {
 				ambRetard);
 		
 		// Codi de país buid
-		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
+		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().iterator().next();
 		env.setDomiciliPaisCodiIso(null);
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
@@ -1394,7 +1396,7 @@ public class NotificaWsTestIntegracio {
 				ambRetard);
 		
 		// Codi de país no vàlid
-		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
+		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().iterator().next();
 		env.setDomiciliPaisCodiIso("CODI");
 		
 		ResultadoAltaRemesaEnvios resultat = notificaHelper.enviaNotificacio(notificacio);
@@ -1683,26 +1685,26 @@ public class NotificaWsTestIntegracio {
 		notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.COMUNICACIO);
 		notificacio.setEnviamentDataProgramada(null);
 		notificacio.setConcepte("concepte_" + notificacioId);
-		notificacio.setDocumentArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
-		notificacio.setDocumentArxiuId(documentGesdocId);
-		notificacio.setDocumentHash(Base64.encodeBase64String(
+		notificacio.getDocument().setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
+		notificacio.getDocument().setArxiuGestdocId(documentGesdocId);
+		notificacio.getDocument().setHash(Base64.encodeBase64String(
 				Hex.decodeHex(
 						DigestUtils.sha256Hex(arxiuBytes).toCharArray())));
-		notificacio.setDocumentNormalitzat(false);
-		notificacio.setDocumentGenerarCsv(false);
+		notificacio.getDocument().setNormalitzat(false);
+		notificacio.getDocument().setGenerarCsv(false);
 		notificacio.setEstat(NotificacioEstatEnumDto.PENDENT);
 		notificacio.setDescripcio("descripcio_" + notificacioId);
 		notificacio.setCaducitat(new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000));
 		notificacio.setRetardPostal(5);
-		notificacio.setProcedimentCodiSia("0000");
+		notificacio.getProcediment().setCodisia("0000");
 		
 		if (ambEnviamentPostal) {
-			notificacio.setPagadorCorreusCodiDir3("A04013511");
-			notificacio.setPagadorCorreusContracteNum("pccNum_" + notificacioId);
-			notificacio.setPagadorCorreusCodiClientFacturacio("ccFac_" + notificacioId);
-			notificacio.setPagadorCorreusDataVigencia(new Date(0));
-			notificacio.setPagadorCieCodiDir3("A04013511");
-			notificacio.setPagadorCieDataVigencia(new Date(0));
+			notificacio.getPagadorPostal().setDir3codi("A04013511");
+			notificacio.getPagadorPostal().setContracteNum("pccNum_" + notificacioId);
+			notificacio.getPagadorPostal().setFacturacioClientCodi("ccFac_" + notificacioId);
+			notificacio.getPagadorPostal().setContracteDataVig(new Date(0));
+			notificacio.getPagadorCie().setDir3codi("A04013511");
+			notificacio.getPagadorCie().setContracteDataVig(new Date(0));
 		}
 		
 		notificacio.setSeuExpedientSerieDocumental("0000S");
@@ -1718,27 +1720,27 @@ public class NotificaWsTestIntegracio {
 		notificacio.setSeuExpedientTitol("seuExpedientTitol_" + notificacioId);
 		notificacio.setSeuExpedientIdentificadorEni("seuExpedientIdentificadorEni_" + notificacioId);
 
-		List<NotificacioEnviamentEntity> enviaments = new ArrayList<NotificacioEnviamentEntity>();
+		Set<NotificacioEnviamentEntity> enviaments = new HashSet<NotificacioEnviamentEntity>();
 		for (int i = 0; i < numDestinataris; i++) {
 
 			NotificacioEnviamentTest enviament = new NotificacioEnviamentTest();
-			enviament.setTitularNif("00000000T");
-			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+			enviament.getTitular().setNif("00000000T");
+			enviament.setServeiTipus(ServeiTipusEnumDto.URGENT);
 			enviament.setNotificacio(notificacio);
-			enviament.setNotificaEstat(NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT);
-			enviament.setSeuEstat(NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT);
-			enviament.setTitularNom("titularNom" + i);
-			enviament.setTitularLlinatge1("titLlinatge1_" + i);
-			enviament.setTitularLlinatge2("titLlinatge2_" + i);
-			enviament.setTitularTelefon("666010101");
-			enviament.setTitularEmail("titular@gmail.com");
+			enviament.setNotificaEstat(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT);
+//			enviament.setSeuEstat(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT);
+			enviament.getTitular().setNom("titularNom" + i);
+			enviament.getTitular().setLlinatge1("titLlinatge1_" + i);
+			enviament.getTitular().setLlinatge2("titLlinatge2_" + i);
+			enviament.getTitular().setTelefon("666010101");
+			enviament.getTitular().setEmail("titular@gmail.com");
 			
-			enviament.setDestinatariNif("12345678Z");
-			enviament.setDestinatariNom("destinatariNom" + i);
-			enviament.setDestinatariLlinatge1("destLlinatge1_" + i);
-			enviament.setDestinatariLlinatge2("destLlinatge2_" + i);
-			enviament.setDestinatariTelefon("666020202");
-			enviament.setDestinatariEmail("destinatari@gmail.com");
+			enviament.getDestinataris().iterator().next().setNif("12345678Z");
+			enviament.getDestinataris().iterator().next().setNom("destinatariNom" + i);
+			enviament.getDestinataris().iterator().next().setLlinatge1("destLlinatge1_" + i);
+			enviament.getDestinataris().iterator().next().setLlinatge2("destLlinatge2_" + i);
+			enviament.getDestinataris().iterator().next().setTelefon("666020202");
+			enviament.getDestinataris().iterator().next().setEmail("destinatari@gmail.com");
 			
 			if (ambEnviamentPostal) {
 				
@@ -1831,48 +1833,48 @@ public class NotificaWsTestIntegracio {
 		public void setConcepte(String concepte) {
 			this.concepte = concepte;
 		}
-		public void setDocumentGenerarCsv(boolean documentGenerarCsv) {
-			this.documentGenerarCsv = documentGenerarCsv;
-		}
-		public void setDocumentNormalitzat(boolean documentNormalitzat) {
-			this.documentNormalitzat = documentNormalitzat;
-		}
-		public void setDocumentHash(String documentHash) {
-			this.documentHash = documentHash;
-		}
-		public void setDocumentArxiuId(String documentArxiuId) {
-			this.documentArxiuId = documentArxiuId;
-		}
-		public void setDocumentArxiuNom(String documentArxiuNom) {
-			this.documentArxiuNom = documentArxiuNom;
-		}
+//		public void setDocumentGenerarCsv(boolean documentGenerarCsv) {
+//			this.documentGenerarCsv = documentGenerarCsv;
+//		}
+//		public void setDocumentNormalitzat(boolean documentNormalitzat) {
+//			this.documentNormalitzat = documentNormalitzat;
+//		}
+//		public void setDocumentHash(String documentHash) {
+//			this.documentHash = documentHash;
+//		}
+//		public void setDocumentArxiuId(String documentArxiuId) {
+//			this.documentArxiuId = documentArxiuId;
+//		}
+//		public void setDocumentArxiuNom(String documentArxiuNom) {
+//			this.documentArxiuNom = documentArxiuNom;
+//		}
 		public void setEmisorDir3Codi(String emisorDir3Codi) {
 			this.emisorDir3Codi = emisorDir3Codi;
 		}
 		public void setDescripcio(String descripcio) {
 			this.descripcio = descripcio;
 		}
-		public void setPagadorCorreusCodiDir3(String pagadorCorreusCodiDir3) {
-			this.pagadorCorreusCodiDir3 = pagadorCorreusCodiDir3;
-		}
-		public void setPagadorCorreusContracteNum(String pagadorCorreusContracteNum) {
-			this.pagadorCorreusContracteNum = pagadorCorreusContracteNum;
-		}
-		public void setPagadorCorreusCodiClientFacturacio(String pagadorCorreusCodiClientFacturacio) {
-			this.pagadorCorreusCodiClientFacturacio = pagadorCorreusCodiClientFacturacio;
-		}
-		public void setPagadorCorreusDataVigencia(Date pagadorCorreusDataVigencia) {
-			this.pagadorCorreusDataVigencia = pagadorCorreusDataVigencia;
-		}
-		public void setPagadorCieCodiDir3(String pagadorCieCodiDir3) {
-			this.pagadorCieCodiDir3 = pagadorCieCodiDir3;
-		}
-		public void setPagadorCieDataVigencia(Date pagadorCieDataVigencia) {
-			this.pagadorCieDataVigencia = pagadorCieDataVigencia;
-		}
-		public void setProcedimentCodiSia(String procedimentCodiSia) {
-			this.procedimentCodiSia = procedimentCodiSia;
-		}
+//		public void setPagadorCorreusCodiDir3(String pagadorCorreusCodiDir3) {
+//			this.pagadorCorreusCodiDir3 = pagadorCorreusCodiDir3;
+//		}
+//		public void setPagadorCorreusContracteNum(String pagadorCorreusContracteNum) {
+//			this.pagadorCorreusContracteNum = pagadorCorreusContracteNum;
+//		}
+//		public void setPagadorCorreusCodiClientFacturacio(String pagadorCorreusCodiClientFacturacio) {
+//			this.pagadorCorreusCodiClientFacturacio = pagadorCorreusCodiClientFacturacio;
+//		}
+//		public void setPagadorCorreusDataVigencia(Date pagadorCorreusDataVigencia) {
+//			this.pagadorCorreusDataVigencia = pagadorCorreusDataVigencia;
+//		}
+//		public void setPagadorCieCodiDir3(String pagadorCieCodiDir3) {
+//			this.pagadorCieCodiDir3 = pagadorCieCodiDir3;
+//		}
+//		public void setPagadorCieDataVigencia(Date pagadorCieDataVigencia) {
+//			this.pagadorCieDataVigencia = pagadorCieDataVigencia;
+//		}
+//		public void setProcedimentCodiSia(String procedimentCodiSia) {
+//			this.procedimentCodiSia = procedimentCodiSia;
+//		}
 		public void setRetardPostal(Integer retardPostal) {
 			this.retardPostal = retardPostal;
 		}
@@ -1918,7 +1920,7 @@ public class NotificaWsTestIntegracio {
 		public void setEstat(NotificacioEstatEnumDto estat) {
 			this.estat = estat;
 		}
-		public void setEnviaments(List<NotificacioEnviamentEntity> enviaments) {
+		public void setEnviaments(Set<NotificacioEnviamentEntity> enviaments) {
 			this.enviaments = enviaments;
 		}
 	}
@@ -1926,42 +1928,42 @@ public class NotificaWsTestIntegracio {
 		
 		private static final long serialVersionUID = 1L;
 		
-		public void setTitularNom(String titularNom) {
-			this.titularNom = titularNom;
-		}
-		public void setTitularLlinatge1(String titularLlinatge1) {
-			this.titularLlinatge1 = titularLlinatge1;
-		}
-		public void setTitularLlinatge2(String titularLlinatge2) {
-			this.titularLlinatge2 = titularLlinatge2;
-		}
-		public void setTitularNif(String titularNif) {
-			this.titularNif = titularNif;
-		}
-		public void setTitularTelefon(String titularTelefon) {
-			this.titularTelefon = titularTelefon;
-		}
-		public void setTitularEmail(String titularEmail) {
-			this.titularEmail = titularEmail;
-		}
-		public void setDestinatariNom(String destinatariNom) {
-			this.destinatariNom = destinatariNom;
-		}
-		public void setDestinatariLlinatge1(String destinatariLlinatge1) {
-			this.destinatariLlinatge1 = destinatariLlinatge1;
-		}
-		public void setDestinatariLlinatge2(String destinatariLlinatge2) {
-			this.destinatariLlinatge2 = destinatariLlinatge2;
-		}
-		public void setDestinatariNif(String destinatariNif) {
-			this.destinatariNif = destinatariNif;
-		}
-		public void setDestinatariTelefon(String destinatariTelefon) {
-			this.destinatariTelefon = destinatariTelefon;
-		}
-		public void setDestinatariEmail(String destinatariEmail) {
-			this.destinatariEmail = destinatariEmail;
-		}
+//		public void setTitularNom(String titularNom) {
+//			this.titularNom = titularNom;
+//		}
+//		public void setTitularLlinatge1(String titularLlinatge1) {
+//			this.titularLlinatge1 = titularLlinatge1;
+//		}
+//		public void setTitularLlinatge2(String titularLlinatge2) {
+//			this.titularLlinatge2 = titularLlinatge2;
+//		}
+//		public void setTitularNif(String titularNif) {
+//			this.titularNif = titularNif;
+//		}
+//		public void setTitularTelefon(String titularTelefon) {
+//			this.titularTelefon = titularTelefon;
+//		}
+//		public void setTitularEmail(String titularEmail) {
+//			this.titularEmail = titularEmail;
+////		}
+//		public void setDestinatariNom(String destinatariNom) {
+//			this.destinatariNom = destinatariNom;
+//		}
+//		public void setDestinatariLlinatge1(String destinatariLlinatge1) {
+//			this.destinatariLlinatge1 = destinatariLlinatge1;
+//		}
+//		public void setDestinatariLlinatge2(String destinatariLlinatge2) {
+//			this.destinatariLlinatge2 = destinatariLlinatge2;
+//		}
+//		public void setDestinatariNif(String destinatariNif) {
+//			this.destinatariNif = destinatariNif;
+//		}
+//		public void setDestinatariTelefon(String destinatariTelefon) {
+//			this.destinatariTelefon = destinatariTelefon;
+//		}
+//		public void setDestinatariEmail(String destinatariEmail) {
+//			this.destinatariEmail = destinatariEmail;
+//		}
 		public void setDomiciliTipus(NotificaDomiciliTipusEnumDto domiciliTipus) {
 			this.domiciliTipus = domiciliTipus;
 		}
@@ -2037,21 +2039,21 @@ public class NotificaWsTestIntegracio {
 		public void setDehProcedimentCodi(String dehProcedimentCodi) {
 			this.dehProcedimentCodi = dehProcedimentCodi;
 		}
-		public void setServeiTipus(NotificaServeiTipusEnumDto serveiTipus) {
+		public void setServeiTipus(ServeiTipusEnumDto serveiTipus) {
 			this.serveiTipus = serveiTipus;
 		}
 		public void setNotificaReferencia(String notificaReferencia) {
 			this.notificaReferencia = notificaReferencia;
 		}
-		public void setNotificaEstat(NotificacioDestinatariEstatEnumDto notificaEstat) {
+		public void setNotificaEstat(NotificacioEnviamentEstatEnumDto notificaEstat) {
 			this.notificaEstat = notificaEstat;
 		}
-		public void setSeuEstat(NotificacioDestinatariEstatEnumDto seuEstat) {
-			this.seuEstat = seuEstat;
-		}
+//		public void setSeuEstat(NotificacioEnviamentEstatEnumDto seuEstat) {
+//			this.seuEstat = seuEstat;
+//		}
 		public void setNotificacio(NotificacioEntity notificacio) {
 			this.notificacio = notificacio;
 		}
 	}
-*/
+	*/
 }
