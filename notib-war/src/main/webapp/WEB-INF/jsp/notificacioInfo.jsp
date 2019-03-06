@@ -44,7 +44,7 @@
 					api.rows().every(function(rowIdx, tableLoop, rowLoop) {
 						var data = this.data();
 						if (!data.error) {
-							$('td:last-child', this.node()).empty();
+						$('td:last-child', this.node()).empty();
 						}
 					});
 				});
@@ -167,8 +167,7 @@
 							<tr>
 								<td width="30%"><strong><spring:message
 											code="notificacio.info.document.arxiu.nom" /></strong></td>
-								<td>${notificacio.document.arxiuNom} <a
-									href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar"/>"
+								<td>${notificacio.document.arxiuNom} <a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar"/>"
 									class="btn btn-default btn-sm pull-right"
 									title="<spring:message code="notificacio.info.document.descarregar"/>"><span
 										class="fa fa-download"></span></a>

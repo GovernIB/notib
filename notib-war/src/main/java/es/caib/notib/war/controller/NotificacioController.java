@@ -5,6 +5,7 @@
 package es.caib.notib.war.controller;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,6 +60,7 @@ import es.caib.notib.war.helper.EntitatHelper;
 import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RolHelper;
+import es.caib.plugins.arxiu.api.ArxiuException;
 
 /**
  * Controlador per a la consulta i gestió de notificacions.
@@ -500,10 +502,14 @@ public class NotificacioController extends BaseUserController {
 	@RequestMapping(value = "/{notificacioId}/documentDescarregar", method = RequestMethod.GET)
 	@ResponseBody
 	public void documentDescarregar(
-			HttpServletResponse response, 
+			HttpServletResponse response,
 			@PathVariable Long notificacioId) throws IOException {
 		ArxiuDto arxiu = notificacioService.getDocumentArxiu(notificacioId);
-		writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
+		String mimeType = ".pdf";
+//		if(arxiu.getContentType() == "application_pdf" || arxiu.getContentType() == "application/pdf" ) {
+//			mimeType = ".pdf";
+//		}
+		writeFileToResponse(arxiu.getNom() + mimeType, arxiu.getContingut(), response);
 	}
 
 	@RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/certificacioDescarregar", method = RequestMethod.GET)
