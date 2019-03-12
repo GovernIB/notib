@@ -4,44 +4,14 @@
 package es.caib.notib.client;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.runners.MethodSorters;
-
-import es.caib.notib.ws.notificacio.AltaResposta;
-import es.caib.notib.ws.notificacio.Document;
-import es.caib.notib.ws.notificacio.EntregaDeh;
-import es.caib.notib.ws.notificacio.EntregaPostal;
-import es.caib.notib.ws.notificacio.EntregaPostalTipusEnum;
-import es.caib.notib.ws.notificacio.EntregaPostalViaTipusEnum;
-import es.caib.notib.ws.notificacio.Enviament;
-import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
-import es.caib.notib.ws.notificacio.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.ws.notificacio.NotificaServeiTipusEnumDto;
-import es.caib.notib.ws.notificacio.Notificacio;
-import es.caib.notib.ws.notificacio.PagadorCie;
-import es.caib.notib.ws.notificacio.PagadorPostal;
-import es.caib.notib.ws.notificacio.ParametresSeu;
-import es.caib.notib.ws.notificacio.Persona;
-import es.caib.notib.ws.notificacio.ServeiTipusEnum;
 
 /**
  * Test per al client REST del servei de notificacions de NOTIB.

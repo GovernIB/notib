@@ -63,6 +63,56 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	@ForeignKey(name = "not_pagador_cie_fk")
 	protected PagadorCieEntity pagadorcie;
 	
+	
+	
+	public void setCodi(String codi) {
+		this.codi = codi;
+	}
+
+	public void setNom(String nom) {
+		this.nom = nom;
+	}
+
+	public void setCodisia(String codisia) {
+		this.codisia = codisia;
+	}
+
+	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
+		this.enviamentDataProgramada = enviamentDataProgramada;
+	}
+
+	public void setRetard(Integer retard) {
+		this.retard = retard;
+	}
+
+	public void setLlibre(String llibre) {
+		this.llibre = llibre;
+	}
+
+	public void setOficina(String oficina) {
+		this.oficina = oficina;
+	}
+
+	public void setTipusAssumpte(TipusAssumpteEnumDto tipusAssumpte) {
+		this.tipusAssumpte = tipusAssumpte;
+	}
+
+	public void setEntitat(EntitatEntity entitat) {
+		this.entitat = entitat;
+	}
+
+	public void setPagadorpostal(PagadorPostalEntity pagadorpostal) {
+		this.pagadorpostal = pagadorpostal;
+	}
+
+	public void setPagadorcie(PagadorCieEntity pagadorcie) {
+		this.pagadorcie = pagadorcie;
+	}
+
+	public void setAgrupar(boolean agrupar) {
+		this.agrupar = agrupar;
+	}
+
 	@Column(name = "agrupar", length = 64, nullable = false)
 	protected boolean agrupar;
 
