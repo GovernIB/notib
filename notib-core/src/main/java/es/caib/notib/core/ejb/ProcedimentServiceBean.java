@@ -12,6 +12,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
@@ -192,38 +193,54 @@ public class ProcedimentServiceBean implements ProcedimentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public boolean hasPermisConsultaProcediment() {
-		return delegate.hasPermisConsultaProcediment();
+	public boolean hasPermisConsultaProcediment(EntitatDto entitat) {
+		return delegate.hasPermisConsultaProcediment(entitat);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public boolean hasPermisNotificacioProcediment() {
-		return delegate.hasPermisNotificacioProcediment();
+	public boolean hasPermisNotificacioProcediment(EntitatDto entitat) {
+		return delegate.hasPermisNotificacioProcediment(entitat);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public boolean hasGrupPermisConsultaProcediment(List<ProcedimentDto> procediments) {
-		return delegate.hasGrupPermisConsultaProcediment(procediments);
+	public boolean hasGrupPermisConsultaProcediment(
+			List<ProcedimentDto> procediments,
+			EntitatDto entitat) {
+		return delegate.hasGrupPermisConsultaProcediment(
+				procediments,
+				entitat);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public boolean hasGrupPermisNotificacioProcediment(List<ProcedimentDto> procediments) {
-		return delegate.hasGrupPermisNotificacioProcediment(procediments);
+	public boolean hasGrupPermisNotificacioProcediment(
+			List<ProcedimentDto> procediments,
+			EntitatDto entitat) {
+		return delegate.hasGrupPermisNotificacioProcediment(
+				procediments,
+				entitat);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public boolean hasPermisGestioProcediment(String procedimentCodi) {
-		return delegate.hasPermisGestioProcediment(procedimentCodi);
+	public boolean hasPermisGestioProcediment(
+			String procedimentCodi,
+			EntitatDto entitat) {
+		return delegate.hasPermisGestioProcediment(
+				procedimentCodi,
+				entitat);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public boolean hasPermisProcessarProcediment(String procedimentCodi) {
-		return delegate.hasPermisProcessarProcediment(procedimentCodi);
+	public boolean hasPermisProcessarProcediment(
+			String procedimentCodi,
+			EntitatDto entitat) {
+		return delegate.hasPermisProcessarProcediment(
+				procedimentCodi,
+				entitat);
 	}
 
 

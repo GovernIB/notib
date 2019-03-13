@@ -564,7 +564,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	@Override
-	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrups(
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
 			List<ProcedimentDto> procediments,
 			EntitatDto entitat) {
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
@@ -578,7 +578,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	@Override
-	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrups(
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(
 			List<ProcedimentDto> procediments,
 			EntitatDto entitat) {
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
@@ -592,7 +592,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	@Override
-	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrups(
+	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
 			List<ProcedimentDto> procediments,
 			EntitatDto entitat) {
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());

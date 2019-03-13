@@ -10,6 +10,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
@@ -146,14 +147,14 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public List<ProcedimentDto> findProcedimentsAmbPermisConsulta() {
-		return delegate.findProcedimentsAmbPermisConsulta();
+	public List<ProcedimentDto> findProcedimentsAmbPermisConsulta(EntitatDto entitat) {
+		return delegate.findProcedimentsAmbPermisConsulta(entitat);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacio() {
-		return delegate.findProcedimentsAmbPermisNotificacio();
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacio(EntitatDto entitat) {
+		return delegate.findProcedimentsAmbPermisNotificacio(entitat);
 	}
 
 	@Override
@@ -180,30 +181,42 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaAndGrups(
-			List<ProcedimentDto> procediments) {
-		return delegate.findProcedimentsAmbPermisConsultaAndGrups(procediments);
+	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaAndGrupsAndEntitat(
+			List<ProcedimentDto> procediments,
+			EntitatDto entitat) {
+		return delegate.findProcedimentsAmbPermisConsultaAndGrupsAndEntitat(
+				procediments,
+				entitat);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrups(
-			List<ProcedimentDto> procediments) {
-		return delegate.findProcedimentsAmbPermisNotificacioAndGrups(procediments);
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
+			List<ProcedimentDto> procediments,
+			EntitatDto entitat) {
+		return delegate.findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
+				procediments,
+				entitat);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrups(
-			List<ProcedimentDto> procediments) {
-		return delegate.findProcedimentsAmbPermisNotificacioSenseGrups(procediments);
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(
+			List<ProcedimentDto> procediments,
+			EntitatDto entitat) {
+		return delegate.findProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(
+				procediments,
+				entitat);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrups(
-			List<ProcedimentDto> procediments) {
-		return delegate.findProcedimentsAmbPermisConsultaSenseGrups(procediments);
+	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
+			List<ProcedimentDto> procediments,
+			EntitatDto entitat) {
+		return delegate.findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
+				procediments,
+				entitat);
 	}
 
 	@Override

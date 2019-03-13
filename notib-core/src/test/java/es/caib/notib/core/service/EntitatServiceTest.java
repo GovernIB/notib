@@ -166,7 +166,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 	@Test
 	public void managePermisRepresentant() {
 		autenticarUsuari("rep");
-		List<EntitatDto> entitatsAccessibles = entitatService.findAccessiblesUsuariActual();
+		List<EntitatDto> entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
 		assertThat(
 				entitatsAccessibles.size(),
 				is(0));
@@ -186,7 +186,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 		assertThat(
 				permisos.size(),
 				is(1));
-		entitatsAccessibles = entitatService.findAccessiblesUsuariActual();
+		entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
 		assertThat(
 				entitatsAccessibles.size(),
 				is(1));
@@ -199,7 +199,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 				entitatCreada.getId(),
 				permisRepresentat.getId());
 		autenticarUsuari("rep");
-		entitatsAccessibles = entitatService.findAccessiblesUsuariActual();
+		entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
 		assertThat(
 				entitatsAccessibles.size(),
 				is(0));

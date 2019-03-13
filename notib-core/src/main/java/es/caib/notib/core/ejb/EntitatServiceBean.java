@@ -92,8 +92,8 @@ public class EntitatServiceBean implements EntitatService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
-	public List<EntitatDto> findAccessiblesUsuariActual() {
-		return delegate.findAccessiblesUsuariActual();
+	public List<EntitatDto> findAccessiblesUsuariActual(String rolActual) {
+		return delegate.findAccessiblesUsuariActual(rolActual);
 	}
 
 	@Override
@@ -112,6 +112,24 @@ public class EntitatServiceBean implements EntitatService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public void permisDelete(Long entitatId, Long permisId) throws NotFoundException {
 		delegate.permisDelete(entitatId, permisId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public boolean hasPermisUsuariEntitat() {
+		return delegate.hasPermisUsuariEntitat();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public boolean hasPermisAdminEntitat() {
+		return delegate.hasPermisAdminEntitat();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public boolean hasPermisAplicacioEntitat() {
+		return delegate.hasPermisAplicacioEntitat();
 	}
 
 }

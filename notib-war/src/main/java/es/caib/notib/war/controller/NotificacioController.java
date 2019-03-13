@@ -126,7 +126,7 @@ public class NotificacioController extends BaseUserController {
 				procedimentsPermisConsulta = notificacioService.findProcedimentsAmbPermisConsulta(entitatActual);
 			}
 
-			procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrups(
+			procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
 					procedimentsSenseGrups,
 					entitatActual);
 
@@ -204,7 +204,7 @@ public class NotificacioController extends BaseUserController {
 
 		if (!procedimentsAmbGrups.isEmpty()) {
 			// Procedimments amb i sense grups amb permís notificació
-			procedimentsPermisNotificacioAmbGrupsAndSenseGrups = notificacioService.findProcedimentsAmbPermisNotificacioAndGrups(
+			procedimentsPermisNotificacioAmbGrupsAndSenseGrups = notificacioService.findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
 					procedimentsAmbGrups,
 					entitatActual);
 
@@ -215,7 +215,7 @@ public class NotificacioController extends BaseUserController {
 			model.addAttribute("procediments", procedimentsPermisNotificacio);
 		}
 
-		procedimentsPermisNotificacioSenseGrups = notificacioService.findProcedimentsAmbPermisNotificacioSenseGrups(
+		procedimentsPermisNotificacioSenseGrups = notificacioService.findProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(
 				procedimentsSenseGrups,
 				entitatActual);
 
@@ -351,7 +351,7 @@ public class NotificacioController extends BaseUserController {
 			procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups();
 
 			if (!procedimentsSenseGrups.isEmpty()) {
-				procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrups(
+				procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
 								procedimentsSenseGrups,
 								entitatActual);
 

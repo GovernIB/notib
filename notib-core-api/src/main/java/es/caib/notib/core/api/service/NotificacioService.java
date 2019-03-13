@@ -134,7 +134,7 @@ public interface NotificacioService {
 	 * @return La pàgina amb les notificacions.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrups(
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
 			List<ProcedimentDto> procediments,
 			EntitatDto entitat);
 	
@@ -148,7 +148,7 @@ public interface NotificacioService {
 	 * @return La pàgina amb les notificacions.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrups(
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(
 			List<ProcedimentDto> procediments,
 			EntitatDto entitat);
 	
@@ -163,7 +163,7 @@ public interface NotificacioService {
 	 * @return La pàgina amb les notificacions.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrups(
+	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
 			List<ProcedimentDto> procediments,
 			EntitatDto entitat);
 	
