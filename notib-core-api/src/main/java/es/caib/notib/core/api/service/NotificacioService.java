@@ -6,6 +6,7 @@ package es.caib.notib.core.api.service;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
@@ -94,8 +95,9 @@ public interface NotificacioService {
 	 * @return La pàgina amb les notificacions.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaAndGrups(
-			List<ProcedimentDto> procediments);
+	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaAndGrupsAndEntitat(
+			List<ProcedimentDto> procediments,
+			EntitatDto entitat);
 	
 	/**
 	 * Consulta de les notificacions segons els paràmetres del filtre.
@@ -107,7 +109,7 @@ public interface NotificacioService {
 	 * @return La pàgina amb les notificacions.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public List<ProcedimentDto> findProcedimentsAmbPermisConsulta();
+	public List<ProcedimentDto> findProcedimentsAmbPermisConsulta(EntitatDto entitat);
 	
 	/**
 	 * Consulta de les notificacions segons els paràmetres del filtre.
@@ -120,7 +122,7 @@ public interface NotificacioService {
 	 */
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacio();
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacio(EntitatDto entitat);
 	
 	/**
 	 * Consulta de les notificacions segons els paràmetres del filtre.
@@ -133,7 +135,8 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrups(
-			List<ProcedimentDto> procediments);
+			List<ProcedimentDto> procediments,
+			EntitatDto entitat);
 	
 	/**
 	 * Consulta de les notificacions segons els paràmetres del filtre.
@@ -146,7 +149,8 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrups(
-			List<ProcedimentDto> procediments);
+			List<ProcedimentDto> procediments,
+			EntitatDto entitat);
 	
 	
 	/**
@@ -160,7 +164,8 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrups(
-			List<ProcedimentDto> procediments);
+			List<ProcedimentDto> procediments,
+			EntitatDto entitat);
 	
 	/**
 	 * Consulta dels events d'una notificació.

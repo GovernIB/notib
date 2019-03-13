@@ -146,7 +146,6 @@ public class GrupServiceImpl implements GrupService{
 			entityComprovarHelper.comprovarEntitat(
 					entitatId, 
 					false,
-					false,
 					false, 
 					false);
 		

@@ -92,6 +92,7 @@ public class NotificacioController extends BaseUserController {
 			Model model) {
 		
 		model.addAttribute(new NotificacioFiltreCommand());
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<ProcedimentDto> procedimentsPermisConsulta = null;
 		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
 		List<ProcedimentGrupDto> procedimentsAmbGrups = new ArrayList<ProcedimentGrupDto>();
@@ -118,12 +119,16 @@ public class NotificacioController extends BaseUserController {
 			}
 
 			if (!procediments.isEmpty()) {
-				procedimentsPermisConsulta = notificacioService.findProcedimentsAmbPermisConsultaAndGrups(procediments);
+				procedimentsPermisConsulta = notificacioService.findProcedimentsAmbPermisConsultaAndGrupsAndEntitat(
+						procediments,
+						entitatActual);
 			} else if (procedimentsAmbGrups.isEmpty()) {
-				procedimentsPermisConsulta = notificacioService.findProcedimentsAmbPermisConsulta();
+				procedimentsPermisConsulta = notificacioService.findProcedimentsAmbPermisConsulta(entitatActual);
 			}
 
-			procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrups(procedimentsSenseGrups);
+			procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrups(
+					procedimentsSenseGrups,
+					entitatActual);
 
 			if ((procedimentsPermisConsulta == null || procedimentsPermisConsulta.size() < 0) || (procedimentsPermisConsultaSenseGrups == null || procedimentsPermisConsultaSenseGrups.size() < 0)) {
 				MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.lectura"));
@@ -167,7 +172,7 @@ public class NotificacioController extends BaseUserController {
 	public String formProcediments(
 			HttpServletRequest request, 
 			Model model) {
-		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		List<ProcedimentDto> procedimentsPermisNotificacioAmbGrupsAndSenseGrups = new ArrayList<ProcedimentDto>();
 		List<ProcedimentDto> procedimentsPermisNotificacioSenseGrups = new ArrayList<ProcedimentDto>();
 		List<ProcedimentDto> procedimentsPermisNotificacio = new ArrayList<ProcedimentDto>();
@@ -177,7 +182,7 @@ public class NotificacioController extends BaseUserController {
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 
-		model.addAttribute("entitat", entitat);
+		model.addAttribute("entitat", entitatActual);
 
 		if (RolHelper.isUsuariActualUsuari(request)) {
 
@@ -199,16 +204,20 @@ public class NotificacioController extends BaseUserController {
 
 		if (!procedimentsAmbGrups.isEmpty()) {
 			// Procedimments amb i sense grups amb permís notificació
-			procedimentsPermisNotificacioAmbGrupsAndSenseGrups = notificacioService.findProcedimentsAmbPermisNotificacioAndGrups(procedimentsAmbGrups);
+			procedimentsPermisNotificacioAmbGrupsAndSenseGrups = notificacioService.findProcedimentsAmbPermisNotificacioAndGrups(
+					procedimentsAmbGrups,
+					entitatActual);
 
 			model.addAttribute("procediments", procedimentsPermisNotificacioAmbGrupsAndSenseGrups);
 		} else if (grupsProcediment.isEmpty()) {
 			// Procediments sense grups amb permís notificació
-			procedimentsPermisNotificacio = notificacioService.findProcedimentsAmbPermisNotificacio();
+			procedimentsPermisNotificacio = notificacioService.findProcedimentsAmbPermisNotificacio(entitatActual);
 			model.addAttribute("procediments", procedimentsPermisNotificacio);
 		}
 
-		procedimentsPermisNotificacioSenseGrups = notificacioService.findProcedimentsAmbPermisNotificacioSenseGrups(procedimentsSenseGrups);
+		procedimentsPermisNotificacioSenseGrups = notificacioService.findProcedimentsAmbPermisNotificacioSenseGrups(
+				procedimentsSenseGrups,
+				entitatActual);
 
 		if (procedimentsPermisNotificacioSenseGrups != null)
 			for (ProcedimentDto procedimentSenseGrupAmbPermis : procedimentsPermisNotificacioSenseGrups) {
@@ -308,6 +317,7 @@ public class NotificacioController extends BaseUserController {
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request) {
 		NotificacioFiltreDto filtre = (NotificacioFiltreDto) request.getSession().getAttribute(NOTIFICACIONS_FILTRE);
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		PaginaDto<NotificacioDto> notificacions = new PaginaDto<NotificacioDto>();
 		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
 		List<ProcedimentGrupDto> grupsProcediment = new ArrayList<ProcedimentGrupDto>();
@@ -341,8 +351,9 @@ public class NotificacioController extends BaseUserController {
 			procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups();
 
 			if (!procedimentsSenseGrups.isEmpty()) {
-				procedimentsPermisConsultaSenseGrups = notificacioService
-						.findProcedimentsAmbPermisConsultaSenseGrups(procedimentsSenseGrups);
+				procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrups(
+								procedimentsSenseGrups,
+								entitatActual);
 
 				for (ProcedimentDto procedimentSenseGrupAmbPermis : procedimentsPermisConsultaSenseGrups) {
 					procediments.add(procedimentSenseGrupAmbPermis);
@@ -352,8 +363,6 @@ public class NotificacioController extends BaseUserController {
 		}
 
 		try {
-			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-
 			notificacions = notificacioService.findAmbFiltrePaginat(
 					entitatActual.getId(), 
 					isUsuari, 
@@ -379,7 +388,10 @@ public class NotificacioController extends BaseUserController {
 			HttpServletRequest request, 
 			Model model,
 			@PathVariable Long notificacioId) {
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		
 		emplenarModelNotificacioInfo(
+				entitatActual,
 				notificacioId, 
 				"dades", 
 				model);
@@ -431,7 +443,11 @@ public class NotificacioController extends BaseUserController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
 		boolean enviada = notificacioService.enviar(entitatActual.getId(), notificacioId);
-		emplenarModelNotificacioInfo(notificacioId, "accions", model);
+		emplenarModelNotificacioInfo(
+				entitatActual,
+				notificacioId, 
+				"accions", 
+				model);
 		if (enviada) {
 			return getAjaxControllerReturnValueSuccess(request, "notificacioInfo",
 					"notificacio.controller.enviament.ok");
@@ -536,6 +552,7 @@ public class NotificacioController extends BaseUserController {
 	}
 
 	private void emplenarModelNotificacioInfo(
+			EntitatDto entitatActual,
 			Long notificacioId, 
 			String pipellaActiva, 
 			Model model) {
@@ -547,7 +564,9 @@ public class NotificacioController extends BaseUserController {
 				EnumHelper.getOptionsForEnum(NotificacioEventTipusEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
 		if (notificacio.getProcediment() != null && !notificacio.getProcedimentCodiNotib().isEmpty()) {
-			model.addAttribute("permisGestio", procedimentService.hasPermisGestioProcediment(notificacio.getProcedimentCodiNotib()));
+			model.addAttribute("permisGestio", procedimentService.hasPermisGestioProcediment(
+					notificacio.getProcedimentCodiNotib(),
+					entitatActual));
 		} else {
 			model.addAttribute("permisGestio", null);
 		}

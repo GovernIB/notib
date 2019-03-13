@@ -93,18 +93,29 @@ public class RolHelper {
 	public static List<String> getRolsUsuariActual(HttpServletRequest request) {
 		LOGGER.debug("Obtenint rols disponibles per a l'usuari actual");
 		List<String> rols = new ArrayList<String>();
+		boolean permisUsuariSobreEntitat = request.isUserInRole(ROLE_USUARI);
+		boolean permisAdminSobreEntitat = request.isUserInRole(ROLE_ADMIN_ENTITAT);
+		boolean permisAplicacioSobreEntitat = request.isUserInRole(ROLE_APLICACIO);
+		
+		if (request.getAttribute("permisUsuariEntitat") != null) 
+			permisUsuariSobreEntitat = (boolean) request.getAttribute("permisUsuariEntitat");
+		if (request.getAttribute("permisAdminEntitat") != null)
+			permisAdminSobreEntitat = (boolean) request.getAttribute("permisAdminEntitat");
+		if (request.getAttribute("permisAplicacioEntitat") != null)
+			permisAplicacioSobreEntitat = (boolean) request.getAttribute("permisAplicacioEntitat");
+		
 		if (request.isUserInRole(ROLE_SUPER)) {
 			rols.add(ROLE_SUPER);
 		}
-		if (request.isUserInRole(ROLE_USUARI)) {
+		if (request.isUserInRole(ROLE_USUARI) && permisUsuariSobreEntitat) {
 			rols.add(ROLE_USUARI);
 		}
-		if (request.isUserInRole(ROLE_APLICACIO)) {
+		if (request.isUserInRole(ROLE_APLICACIO) && permisAplicacioSobreEntitat) {
 			rols.add(ROLE_APLICACIO);
 		}
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		if (entitatActual != null) {
-			if (entitatActual.isUsuariActualAdministradorEntitat() && request.isUserInRole(ROLE_ADMIN_ENTITAT))
+			if (entitatActual.isUsuariActualAdministradorEntitat() && request.isUserInRole(ROLE_ADMIN_ENTITAT) && permisAdminSobreEntitat)
 				rols.add(ROLE_ADMIN_ENTITAT);
 		}
 		return rols;

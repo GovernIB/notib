@@ -13,6 +13,7 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
@@ -116,7 +117,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				entitatId,
 				false,
 				false,
-				false,
 				false);
 		ProcedimentEntity procedimentEntity = null;
 		if(!isAdmin) {
@@ -168,7 +168,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				entitatId,
 				false,
 				false,
-				false,
 				false);
 		
 		ProcedimentEntity procedimentEntity = entityComprovarHelper.comprovarProcediment(
@@ -197,7 +196,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		if (entitatId != null && !isAdministrador)
 			entitat = entityComprovarHelper.comprovarEntitat(
 					entitatId, 
-					false, 
 					false, 
 					false, 
 					false);
@@ -244,7 +242,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		
 		entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				false,
 				false,
 				false,
 				false);
@@ -379,7 +376,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			entitat = entityComprovarHelper.comprovarEntitat(
 					entitatId,
 					false,
-					false,
 					true,
 					false);
 		
@@ -409,7 +405,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
-				false,
 				true,
 				false);
 		entityComprovarHelper.comprovarProcediment(
@@ -437,7 +432,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				+ "permis=" + procedimentGrup + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				false,
 				false,
 				true,
 				false);
@@ -471,7 +465,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				entitatId,
 				false,
 				false,
-				false,
 				false);
 		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
 				entitat,
@@ -503,7 +496,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				entitatId,
 				false,
 				false,
-				false,
 				false);
 		
 		GrupProcedimentEntity grupProcedimentEntity = grupProcedimentRepository.findOne(procedimentGrupId);
@@ -524,7 +516,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
-				false,
 				true,
 				false);
 		entityComprovarHelper.comprovarProcediment(
@@ -543,19 +534,27 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
 
 	@Override
-	public boolean hasPermisConsultaProcediment() {
-		List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcedimentsUsuariActual(
+	public boolean hasPermisConsultaProcediment(EntitatDto entitat) {
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		
+		List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
 				new Permission[] {
-						ExtendedPermission.READ}
+						ExtendedPermission.READ},
+				entitatActual
 				);
 		
 		return (resposta.isEmpty()) ? false : true;
 	}
 	
 	@Override
-	public boolean hasPermisGestioProcediment(String procedimentCodi) {
+	public boolean hasPermisGestioProcediment(
+			String procedimentCodi,
+			EntitatDto entitat) {
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
 		List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
-		ProcedimentEntity procediment = procedimentRepository.findByCodi(procedimentCodi);
+		ProcedimentEntity procediment = procedimentRepository.findByEntitatAndCodiProcediment(
+				entitatActual,
+				procedimentCodi);
 		
 		procediments.add(procediment);
 		
@@ -569,9 +568,14 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 	
 	@Override
-	public boolean hasPermisProcessarProcediment(String procedimentCodi) {
+	public boolean hasPermisProcessarProcediment(
+			String procedimentCodi,
+			EntitatDto entitat) {
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
 		List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
-		ProcedimentEntity procediment = procedimentRepository.findByCodi(procedimentCodi);
+		ProcedimentEntity procediment = procedimentRepository.findByEntitatAndCodiProcediment(
+				entitatActual,
+				procedimentCodi);
 		
 		procediments.add(procediment);
 		
@@ -585,19 +589,27 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 	
 	@Override
-	public boolean hasPermisNotificacioProcediment() {
-		List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcedimentsUsuariActual(
+	public boolean hasPermisNotificacioProcediment(EntitatDto entitat) {
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		
+		List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
 				new Permission[] {
-					ExtendedPermission.NOTIFICACIO}
+					ExtendedPermission.NOTIFICACIO},
+				entitatActual
 				);
 		
 		return (resposta.isEmpty()) ? false : true;
 	}
 	
 	@Override
-	public boolean hasGrupPermisConsultaProcediment(List<ProcedimentDto> procediments) {
-		List<ProcedimentDto> resposta = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActual(
+	public boolean hasGrupPermisConsultaProcediment(
+			List<ProcedimentDto> procediments,
+			EntitatDto entitat) {
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		
+		List<ProcedimentDto> resposta = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
 				procediments,
+				entitatActual,
 				new Permission[] {
 						ExtendedPermission.READ}
 				);
@@ -606,18 +618,19 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 	
 	@Override
-	public boolean hasGrupPermisNotificacioProcediment(List<ProcedimentDto> procediments) {
-		List<ProcedimentDto> resposta = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActual(
+	public boolean hasGrupPermisNotificacioProcediment(
+			List<ProcedimentDto> procediments,
+			EntitatDto entitat) {
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		
+		List<ProcedimentDto> resposta = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
 				procediments,
+				entitatActual,
 				new Permission[] {
 						ExtendedPermission.NOTIFICACIO}
 				);
 		
 		return (resposta.isEmpty()) ? false : true;
 	}
-	
 
-
-
-	
 }

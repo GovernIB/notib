@@ -126,8 +126,32 @@ public interface EntitatService {
 	 * @return El llistat d'entitats.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
-	public List<EntitatDto> findAccessiblesUsuariActual();
+	public List<EntitatDto> findAccessiblesUsuariActual(String rolActual);
 
+	/**
+	 * Comprova si l'usuari acutal té permisos d'usuari de l'entitat actual
+	 * 
+	 * @return El llistat d'entitats.
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public boolean hasPermisUsuariEntitat();
+	
+	/**
+	 * Comprova si l'usuari acutal té permisos d'administrador de l'entitat actual
+	 * 
+	 * @return El llistat d'entitats.
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public boolean hasPermisAdminEntitat();
+	
+	/**
+	 * Comprova si l'usuari acutal té permisos d'aplicació de l'entitat actual
+	 * 
+	 * @return El llistat d'entitats.
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public boolean hasPermisAplicacioEntitat();
+	
 	/**
 	 * Consulta els permisos de l'entitat.
 	 * 

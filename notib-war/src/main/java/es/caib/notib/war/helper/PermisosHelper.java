@@ -8,10 +8,12 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.ProcedimentService;
 
 /**
@@ -22,13 +24,14 @@ import es.caib.notib.core.api.service.ProcedimentService;
 public class PermisosHelper {
 
 	
-	public static void comprovarPermisosUsuariActual(
+	public static void comprovarPermisosProcedimentsUsuariActual(
 			HttpServletRequest request,
 			ProcedimentService procedimentService,
 			AplicacioService aplicacioService) { 
 		
 		if (RolHelper.isUsuariActualUsuari(request)) {
 			UsuariDto usuariActual = aplicacioService.getUsuariActual();
+			EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 			List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 			
 			List<ProcedimentGrupDto> grupsProcediment = procedimentService.findAllGrups();
@@ -46,20 +49,40 @@ public class PermisosHelper {
 			if(!procediments.isEmpty()) {
 				request.setAttribute(
 						"permisConsulta", 
-						procedimentService.hasGrupPermisConsultaProcediment(procediments));
+						procedimentService.hasGrupPermisConsultaProcediment(
+								procediments,
+								entitatActual));
 				request.setAttribute(
 						"permisNotificacio", 
-						procedimentService.hasGrupPermisNotificacioProcediment(procediments));
+						procedimentService.hasGrupPermisNotificacioProcediment(
+								procediments,
+								entitatActual));
 			}
 			//Comprova quins permisos té aquest usuari sobre els procediments sense grups
 			if (grupsProcediment.isEmpty()) {
 				request.setAttribute(
 						"permisConsulta", 
-						procedimentService.hasPermisConsultaProcediment());
+						procedimentService.hasPermisConsultaProcediment(entitatActual));
 				request.setAttribute(
 						"permisNotificacio", 
-						procedimentService.hasPermisNotificacioProcediment());
+						procedimentService.hasPermisNotificacioProcediment(entitatActual));
 			}
 		}
+	}
+	
+	public static void comprovarPermisosEntitatsUsuariActual(
+			HttpServletRequest request,
+			EntitatService entitatService) {
+		//Comprovar si té permisos sobre alguna entitat
+		request.setAttribute(
+				"permisUsuariEntitat", 
+				entitatService.hasPermisUsuariEntitat());
+		request.setAttribute(
+				"permisAdminEntitat", 
+				entitatService.hasPermisAdminEntitat());
+		request.setAttribute(
+				"permisAplicacioEntitat", 
+				entitatService.hasPermisAplicacioEntitat());
+
 	}
 }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.helper.PermisosHelper;
 
@@ -31,11 +32,10 @@ public class PermisosInterceptor extends HandlerInterceptorAdapter {
 			HttpServletResponse response,
 			Object handler) throws Exception {
 		
-		PermisosHelper.comprovarPermisosUsuariActual(
+		PermisosHelper.comprovarPermisosProcedimentsUsuariActual(
 				request,
 				procedimentService,
 				aplicacioService);
-		
 		return true;
 	}
 

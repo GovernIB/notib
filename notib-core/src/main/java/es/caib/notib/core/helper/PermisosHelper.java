@@ -13,6 +13,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
@@ -31,8 +33,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 
 
@@ -48,7 +54,12 @@ public class PermisosHelper {
 	private LookupStrategy lookupStrategy;
 	@Resource
 	private MutableAclService aclService;
-
+	@Resource
+	private EntitatRepository entitatRepository;
+	@Resource
+	private PermisosHelper permisosHelper;
+	@Resource
+	private ConversioTipusHelper conversioTipusHelper;
 
 
 	public void assignarPermisUsuari(
@@ -527,10 +538,69 @@ public class PermisosHelper {
 			return rol;
 	}
 
-
+	public List<EntitatDto> findEntitatsAccessiblesUsuari(
+			String usuariCodi,
+			String rolActual) {
+		logger.debug("Consulta entitats accessibles (usuariCodi=" + usuariCodi + ")");
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		List<EntitatEntity> entitats = entitatRepository.findByActiva(true);
+		Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT};
+		
+		if (rolActual.equals("NOT_USER")) {
+			permisos = new Permission[] {ExtendedPermission.USUARI};
+		}
+		
+		permisosHelper.filterGrantedAny(
+				entitats,
+				new ObjectIdentifierExtractor<EntitatEntity>() {
+					public Long getObjectIdentifier(EntitatEntity entitat) {
+						return entitat.getId();
+					}
+				},
+				//revisar
+				EntitatEntity.class,
+				permisos,
+				auth);
+		
+		List<EntitatDto> resposta = conversioTipusHelper.convertirList(
+				entitats,
+				EntitatDto.class);
+		
+		for(EntitatDto dto : resposta) dto.setUsuariActualAdministradorEntitat(true);
+		
+		return resposta;
+		
+//		usuarisEntitatHelper.omplirUsuarisPerEntitats(
+//				resposta,
+//				false);
+		
+		//////////////////////////////////////////////////////////////////
+		
+//		List<EntitatDto> entitats = conversioTipusHelper.convertirList(
+//				entitatRepository.findAll(),
+//				EntitatDto.class );
+//		
+//		List<EntitatDto> result = new ArrayList<>();
+//		for(EntitatDto e : entitats) {
+//			List<PermisDto> permisos = permisosHelper.findPermisos(
+//					e.getId(),
+//					EntitatEntity.class);
+//			for(PermisDto p : permisos) {
+//				if(p.getNom().equals(usuariCodi)) {
+//					e.setUsuariActualRepresentant(p.isRepresentant());
+//					result.add(e);
+//				}
+//			}
+//		}
+//		
+//		return result;
+	}
 
 	public interface ObjectIdentifierExtractor<T> {
 		public Long getObjectIdentifier(T object);
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(PermisosHelper.class);
 	
 }

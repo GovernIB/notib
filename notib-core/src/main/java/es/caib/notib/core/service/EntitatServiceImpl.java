@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.helper.CacheHelper;
@@ -28,6 +30,7 @@ import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.UsuariHelper;
 import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.security.ExtendedPermission;
 
 /**
  * Implementació del servei de gestió d'entitats.
@@ -221,10 +224,10 @@ public class EntitatServiceImpl implements EntitatService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<EntitatDto> findAccessiblesUsuariActual() {
+	public List<EntitatDto> findAccessiblesUsuariActual(String rolActual) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		logger.debug("Consulta les entitats accessibles per l'usuari actual (usuari=" + auth.getName() + ")");
-		return cacheHelper.findEntitatsAccessiblesUsuari(auth.getName());
+		return permisosHelper.findEntitatsAccessiblesUsuari(auth.getName(), rolActual);
 	}
 
 	@Transactional
@@ -282,6 +285,37 @@ public class EntitatServiceImpl implements EntitatService {
 				permisId);
 	}
 
+
+	@Override
+	public boolean hasPermisUsuariEntitat() {
+		List<EntitatDto> resposta = entityComprovarHelper.findPermisEntitat(
+				new Permission[] {
+						ExtendedPermission.USUARI}
+				);
+		
+		return (resposta.isEmpty()) ? false : true;
+	}
+
+	@Override
+	public boolean hasPermisAdminEntitat() {		
+		List<EntitatDto> resposta = entityComprovarHelper.findPermisEntitat(
+				new Permission[] {
+						ExtendedPermission.ADMINISTRADORENTITAT}
+				);
+		
+		return (resposta.isEmpty()) ? false : true;
+	}
+
+	@Override
+	public boolean hasPermisAplicacioEntitat() {		
+		List<EntitatDto> resposta = entityComprovarHelper.findPermisEntitat(
+				new Permission[] {
+						ExtendedPermission.APLICACIO}
+				);
+		
+		return (resposta.isEmpty()) ? false : true;
+	}
+	
 	/*@Override
 	@Transactional
 	public Map<Long, List<PermisDto>> findPermisos(List<Long> entitatIds) {
@@ -382,5 +416,7 @@ public class EntitatServiceImpl implements EntitatService {
 //	}
 
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
+
+
 
 }

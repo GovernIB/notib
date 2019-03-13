@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
@@ -249,7 +250,7 @@ public interface ProcedimentService {
 	 * @return true / false
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
-	public boolean hasPermisConsultaProcediment();
+	public boolean hasPermisConsultaProcediment(EntitatDto entitat);
 
 	/**
 	 * Comprova si l'usuari actual té permisos de notificació sobre algun procediment
@@ -257,7 +258,7 @@ public interface ProcedimentService {
 	 * @return true / false
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
-	public boolean hasPermisNotificacioProcediment();
+	public boolean hasPermisNotificacioProcediment(EntitatDto entitat);
 	
 	/**
 	 * Comprova si l'usuari actual té permisos de notificació sobre algun procediment
@@ -265,7 +266,9 @@ public interface ProcedimentService {
 	 * @return true / false
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
-	public boolean hasPermisGestioProcediment(String procedimentCodi);
+	public boolean hasPermisGestioProcediment(
+			String procedimentCodi,
+			EntitatDto entitat);
 	
 	/**
 	 * Comprova si l'usuari actual té permisos de notificació sobre algun procediment
@@ -273,7 +276,9 @@ public interface ProcedimentService {
 	 * @return true / false
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
-	public boolean hasPermisProcessarProcediment(String procedimentCodi);
+	public boolean hasPermisProcessarProcediment(
+			String procedimentCodi,
+			EntitatDto entitat);
 	
 	/**
 	 * Comprova si l'usuari actual té permisos de consulta i pertany al grup d'un procediment
@@ -281,7 +286,9 @@ public interface ProcedimentService {
 	 * @return true / false
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
-	public boolean hasGrupPermisConsultaProcediment(List<ProcedimentDto> procediments);
+	public boolean hasGrupPermisConsultaProcediment(
+			List<ProcedimentDto> procediments,
+			EntitatDto entitat);
 
 	/**
 	 * Comprova si l'usuari actual té permisos de notificació i pertany al grup d'un procediment
@@ -289,7 +296,9 @@ public interface ProcedimentService {
 	 * @return true / false
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
-	public boolean hasGrupPermisNotificacioProcediment(List<ProcedimentDto> procediments);
+	public boolean hasGrupPermisNotificacioProcediment(
+			List<ProcedimentDto> procediments,
+			EntitatDto entitat);
 
 	
 
