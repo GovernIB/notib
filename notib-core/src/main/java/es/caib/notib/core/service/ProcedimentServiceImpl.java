@@ -570,14 +570,20 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Override
 	public boolean hasPermisProcessarProcediment(
 			String procedimentCodi,
-			EntitatDto entitat) {
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
+			Long procedimentId,
+			EntitatDto entitat,
+			boolean isAdministrador) {
 		List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
-		ProcedimentEntity procediment = procedimentRepository.findByEntitatAndCodiProcediment(
-				entitatActual,
-				procedimentCodi);
+		ProcedimentEntity procediment;
 		
-		procediments.add(procediment);
+		if (!isAdministrador) {
+			EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
+				procediment = procedimentRepository.findByIdAndEntitat(procedimentId, entitatActual);
+		} else {
+			procediment = procedimentRepository.findOne(procedimentId);
+		}
+		if (procediment != null)
+			procediments.add(procediment);
 		
 		List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcediments(
 				procediments,

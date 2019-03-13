@@ -278,7 +278,9 @@ public interface ProcedimentService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public boolean hasPermisProcessarProcediment(
 			String procedimentCodi,
-			EntitatDto entitat);
+			Long procedimentId,
+			EntitatDto entitat,
+			boolean isAdministrador);
 	
 	/**
 	 * Comprova si l'usuari actual té permisos de consulta i pertany al grup d'un procediment

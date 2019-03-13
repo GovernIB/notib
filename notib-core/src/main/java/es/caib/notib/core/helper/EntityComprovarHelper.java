@@ -561,11 +561,10 @@ public class EntityComprovarHelper {
 				ProcedimentEntity.class,
 				permisos,
 				auth);
-		
+	
 		resposta = conversioTipusHelper.convertirList(
 				procediments,
 				ProcedimentDto.class);
-		
 		return resposta;
 	}
 	
@@ -579,9 +578,9 @@ public class EntityComprovarHelper {
 		
 		//Conversió de dto a entity per comprovar permisos
 		for (ProcedimentDto procedimentDto : procediments) {
-			ProcedimentEntity procedimentEntity = procedimentRepository.findByEntitatAndCodiProcediment(
-					entitatActual, 
-					procedimentDto.getCodi());
+			ProcedimentEntity procedimentEntity = procedimentRepository.findByIdAndEntitat(
+					procedimentDto.getId(),
+					entitatActual);
 			if (procedimentEntity.isAgrupar()) {
 					procedimentsEntity.add(procedimentEntity);
 			}
@@ -644,10 +643,11 @@ public class EntityComprovarHelper {
 		
 		//Conversió de dto a entity per comprovar permisos
 		for (ProcedimentDto procedimentDto : procediments) {
-			ProcedimentEntity procedimentEntity = procedimentRepository.findByEntitatAndCodiProcediment(
-					entitatActual,
-					procedimentDto.getCodi());
-			procedimentsEntity.add(procedimentEntity);
+			ProcedimentEntity procedimentEntity = procedimentRepository.findByIdAndEntitat(
+					procedimentDto.getId(),
+					entitatActual);
+			if (procedimentEntity != null)
+				procedimentsEntity.add(procedimentEntity);
 		}
 		permisosHelper.filterGrantedAny(
 				procedimentsEntity,

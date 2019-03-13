@@ -237,10 +237,14 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public boolean hasPermisProcessarProcediment(
 			String procedimentCodi,
-			EntitatDto entitat) {
+			Long procedimentId,
+			EntitatDto entitat,
+			boolean isAdministrador) {
 		return delegate.hasPermisProcessarProcediment(
 				procedimentCodi,
-				entitat);
+				procedimentId,
+				entitat,
+				isAdministrador);
 	}
 
 
