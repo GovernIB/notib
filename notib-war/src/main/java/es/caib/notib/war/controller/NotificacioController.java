@@ -301,7 +301,7 @@ public class NotificacioController extends BaseUserController {
 					EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class, 
 							"es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
 		}
-		return "notificacioList";
+		return "redirect:../notificacio";
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
@@ -565,7 +565,7 @@ public class NotificacioController extends BaseUserController {
 						"es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
 		if (notificacio.getProcediment() != null && !notificacio.getProcedimentCodiNotib().isEmpty()) {
 			model.addAttribute("permisGestio", procedimentService.hasPermisGestioProcediment(
-					notificacio.getProcedimentCodiNotib(),
+					notificacio.getProcediment().getId(),
 					entitatActual));
 		} else {
 			model.addAttribute("permisGestio", null);

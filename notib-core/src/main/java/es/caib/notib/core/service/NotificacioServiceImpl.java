@@ -514,9 +514,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 					notificacio.setPermisProcessar(
 							procedimentService.hasPermisProcessarProcediment(
 									notificacio.getProcediment().getCodi(),
+									notificacio.getProcediment().getId(),
 									conversioTipusHelper.convertir(
 											entitatActual, 
-											EntitatDto.class)));
+											EntitatDto.class),
+											isAdministrador));
 			}	
 		}
 		

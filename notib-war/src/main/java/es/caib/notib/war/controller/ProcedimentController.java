@@ -131,8 +131,6 @@ public class ProcedimentController extends BaseUserController{
 			BindingResult bindingResult,
 			Model model) {		
 		
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		
 		if (bindingResult.hasErrors()) {
 			emplenarModelProcediment(
 					request,
@@ -145,7 +143,7 @@ public class ProcedimentController extends BaseUserController{
 		if (procedimentCommand.getId() != null) {
 			try {
 				procedimentService.update(
-						entitat.getId(),
+						procedimentCommand.getEntitatId(),
 						ProcedimentCommand.asDto(procedimentCommand),
 						isAdministrador(request));
 				
@@ -158,7 +156,7 @@ public class ProcedimentController extends BaseUserController{
 					"procediment.controller.modificat.ok");
 		} else {
 			procedimentService.create(
-					entitat.getId(),
+					procedimentCommand.getEntitatId(),
 					ProcedimentCommand.asDto(procedimentCommand));
 			return getModalControllerReturnValueSuccess(
 					request,

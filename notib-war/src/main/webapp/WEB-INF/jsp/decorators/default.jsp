@@ -179,6 +179,9 @@ body {
 									<div class="btn-group">
 										<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
 									</div>
+									<div class="btn-group">
+										<a href="<c:url value="/enviament"/>" class="btn btn-primary"><spring:message code="decorator.menu.enviaments"/></a>
+									</div>
 							</c:if>
 							<c:if test="${isRolActualAdministradorEntitat}">
 							<div class="btn-group">
