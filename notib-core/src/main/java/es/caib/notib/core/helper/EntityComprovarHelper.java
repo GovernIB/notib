@@ -581,7 +581,7 @@ public class EntityComprovarHelper {
 			ProcedimentEntity procedimentEntity = procedimentRepository.findByIdAndEntitat(
 					procedimentDto.getId(),
 					entitatActual);
-			if (procedimentEntity.isAgrupar()) {
+			if (procedimentEntity != null && procedimentEntity.isAgrupar()) {
 					procedimentsEntity.add(procedimentEntity);
 			}
 		}

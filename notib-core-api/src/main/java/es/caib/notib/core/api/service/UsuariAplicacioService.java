@@ -66,7 +66,7 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return L'aplicació amb l'identificador assenyalat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public AplicacioDto findById(Long aplicacioId);
 	
 	/**
@@ -77,7 +77,7 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return L'aplicació amb el codi assenyalat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public AplicacioDto findByUsuariCodi(String usuariCodi);
 	
 	/**
@@ -88,7 +88,7 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return La pàgina d'aplicacions.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public PaginaDto<AplicacioDto> findPaginat(PaginacioParamsDto paginacioParams);
 	
 }

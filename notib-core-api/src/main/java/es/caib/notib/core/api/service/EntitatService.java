@@ -79,7 +79,7 @@ public interface EntitatService {
 	 *            Atribut id de l'entitat a trobar.
 	 * @return L'entitat amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public EntitatDto findById(Long id);
 
 	/**
@@ -89,7 +89,7 @@ public interface EntitatService {
 	 *            Codi de l'entitat a trobar.
 	 * @return L'entitat amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public EntitatDto findByCodi(String codi);
 
 	/**
@@ -99,7 +99,7 @@ public interface EntitatService {
 	 *            Codi DIR3 de l'entitat a trobar.
 	 * @return L'entitat amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public EntitatDto findByDir3codi(String dir3Codi);
 
 	/**
@@ -107,7 +107,7 @@ public interface EntitatService {
 	 * 
 	 * @return La llista d'entitats.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<EntitatDto> findAll();
 
 	/**
@@ -117,7 +117,7 @@ public interface EntitatService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina d'entitats.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public PaginaDto<EntitatDto> findAllPaginat(PaginacioParamsDto paginacioParams);
 
 	/**

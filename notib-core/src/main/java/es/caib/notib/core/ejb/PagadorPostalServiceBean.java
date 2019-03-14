@@ -55,13 +55,13 @@ public class PagadorPostalServiceBean implements PagadorPostalService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PagadorPostalDto findById(Long id) {
 		return delegate.findById(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PaginaDto<PagadorPostalDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			PagadorPostalFiltreDto filtre,
@@ -73,13 +73,13 @@ public class PagadorPostalServiceBean implements PagadorPostalService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<PagadorPostalDto> findAll() {
 		return delegate.findAll();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PaginaDto<PagadorPostalDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		return delegate.findAllPaginat(paginacioParams);
 	}

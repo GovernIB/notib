@@ -315,8 +315,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 		
 		entityComprovarHelper.comprovarPermisos(
 				null,
-				true,
-				true,
+				false,
+				false,
 				false);
 		
 		return conversioTipusHelper.convertir(
@@ -456,7 +456,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 								dataFi,
 								filtre.getTitular() == null || filtre.getTitular().isEmpty(), 
 								filtre.getTitular() == null ? "" : filtre.getTitular(),
-								procedimentsCodisNotib,
+								entitatActual,
 								pageable);
 					}
 				} else if (isUsuariEntitat) {
@@ -500,26 +500,27 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			}
 		
-		if (notificacions == null)
+		if (notificacions == null) {
 			resultatPagina = paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
 		 
-		else
+		} else {
+			if(notificacions != null) {
+				for (NotificacioEntity notificacio : notificacions) {
+					if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.FINALITZADA)
+						notificacio.setPermisProcessar(
+								procedimentService.hasPermisProcessarProcediment(
+										notificacio.getProcediment().getCodi(),
+										notificacio.getProcediment().getId(),
+										conversioTipusHelper.convertir(
+												entitatActual, 
+												EntitatDto.class),
+												isAdministrador));
+				}	
+			}
 			resultatPagina = paginacioHelper.toPaginaDto(
 				notificacions,
 				NotificacioDto.class);
 		
-		if(notificacions != null) {
-			for (NotificacioEntity notificacio : notificacions) {
-				if (notificacio.getProcediment() != null)
-					notificacio.setPermisProcessar(
-							procedimentService.hasPermisProcessarProcediment(
-									notificacio.getProcediment().getCodi(),
-									notificacio.getProcediment().getId(),
-									conversioTipusHelper.convertir(
-											entitatActual, 
-											EntitatDto.class),
-											isAdministrador));
-			}	
 		}
 		
 		

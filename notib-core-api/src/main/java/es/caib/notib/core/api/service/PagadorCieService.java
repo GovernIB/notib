@@ -24,7 +24,7 @@ public interface PagadorCieService {
 	 * 				Informació del pagador cie a crear
 	 * @return	El pagador cie creat
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public PagadorCieDto create(
 			Long entitatId,
 			PagadorCieDto cie);
@@ -37,7 +37,7 @@ public interface PagadorCieService {
 	 * @return
 	 * @throws NotFoundException
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public PagadorCieDto update(PagadorCieDto cie) throws NotFoundException;
 
 	/**
@@ -49,7 +49,7 @@ public interface PagadorCieService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public PagadorCieDto delete(
 			Long id) throws NotFoundException;
 
@@ -60,7 +60,7 @@ public interface PagadorCieService {
 	 *            Codi del procediment a trobar.
 	 * @return El pagador cie amb el codi especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public PagadorCieDto findById(Long id);
 
 	/**
@@ -74,7 +74,7 @@ public interface PagadorCieService {
 	 *            	Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina amb els pagadors cie.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public PaginaDto<PagadorCieDto> findAmbFiltrePaginat(
 			Long entitatId,
 			PagadorCieFiltreDto filtre,
@@ -85,7 +85,7 @@ public interface PagadorCieService {
 	 * 
 	 * @return La llista dels pagadors cie.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') OR hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public List<PagadorCieDto> findAll();
 
 	/**
@@ -95,7 +95,7 @@ public interface PagadorCieService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina de pagadors cie.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public PaginaDto<PagadorCieDto> findAllPaginat(PaginacioParamsDto paginacioParams);
 
 	

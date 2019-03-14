@@ -51,21 +51,21 @@ public class UsuariAplicacioServiceBean implements UsuariAplicacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN"})
 	public AplicacioDto findById(
 			Long aplicacioId) {
 		return delegate.findById(aplicacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN"})
 	public AplicacioDto findByUsuariCodi(
 			String usuariCodi) {
 		return delegate.findByUsuariCodi(usuariCodi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN"})
 	public PaginaDto<AplicacioDto> findPaginat(
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findPaginat(paginacioParams);

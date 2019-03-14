@@ -24,7 +24,7 @@ public class RegistreServiceBean implements RegistreService {
 	RegistreService delegate;
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN"})
 	public void registrarSortida(RegistreAnotacioDto registreAnotacio) {
 		delegate.registrarSortida(registreAnotacio);
 	}

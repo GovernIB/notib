@@ -326,8 +326,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 		//NotificacioEntity notificacio = notificacioRepository.findOne( destinatari.getNotificacio().getId() );
 		entityComprovarHelper.comprovarPermisos(
 				null,
-				true,
-				true,
+				false,
+				false,
 				false);
 		return enviamentToDto(enviament);
 	}

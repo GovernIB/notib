@@ -397,16 +397,19 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	public void permisUpdate(
 			Long entitatId,
 			Long id,
-			PermisDto permis) {
+			PermisDto permis,
+			boolean isAdministrador) {
 		logger.debug("Modificació del permis del procediment ("
 				+ "entitatId=" + entitatId +  ", "
 				+ "id=" + id + ", "
 				+ "permis=" + permis + ")");
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
+		
+		if (entitatId != null && !isAdministrador)
+			entityComprovarHelper.comprovarEntitat(
+					entitatId,
+					false,
+					true,
+					false);
 		entityComprovarHelper.comprovarProcediment(
 				null,
 				id,
@@ -430,13 +433,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				+ "entitatId=" + entitatId +  ", "
 				+ "id=" + id + ", "
 				+ "permis=" + procedimentGrup + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
 		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
-				entitat,
+				null,
 				id,
 				false,
 				false,
@@ -461,13 +459,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				+ "entitatId=" + entitatId +  ", "
 				+ "id=" + id + ", "
 				+ "permis=" + procedimentGrup + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false);
 		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
-				entitat,
+				null,
 				id,
 				false,
 				false,
@@ -508,16 +501,21 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	public void permisDelete(
 			Long entitatId,
 			Long id,
-			Long permisId) {
+			Long permisId,
+			boolean isAdministrador) {
 		logger.debug("Eliminació del permis del meta-expedient ("
 				+ "entitatId=" + entitatId +  ", "
 				+ "id=" + id + ", "
 				+ "permisId=" + permisId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false);
+		EntitatEntity entitat = null;
+		
+		if (entitatId != null && !isAdministrador)
+			entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId,
+					false,
+					true,
+					false);
+		
 		entityComprovarHelper.comprovarProcediment(
 				entitat,
 				id,
