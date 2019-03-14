@@ -494,14 +494,15 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			Date enviamentDataProgramada,
 			Integer retard,
 			Date caducitat,
-			DocumentEntity document,
 			String usuariCodi,
 			String procedimentCodi,
 			ProcedimentEntity procediment,
 			String grup,
 			String numExpedient,
 			String referenciaExterna,
-			String observacions) {
+			String observacions,
+			String tipusAssumpte,
+			String resum) {
 		return new BuilderV2(
 				entitat,
 				emisorDir3Codi,
@@ -512,14 +513,15 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				enviamentDataProgramada,
 				retard,
 				caducitat,
-				document,
 				usuariCodi,
 				procedimentCodi,
 				procediment,
 				grup,
 				numExpedient,
 				referenciaExterna,
-				observacions);
+				observacions,
+				tipusAssumpte,
+				resum);
 	}
 	
 
@@ -758,14 +760,15 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				Date enviamentDataProgramada,
 				Integer retard,
 				Date caducitat,
-				DocumentEntity document,
 				String usuariCodi,
 				String procedimentCodi,
 				ProcedimentEntity procediment,
 				String grup,
 				String numExpedient,
 				String referenciaExterna,
-				String observacions) {
+				String observacions,
+				String tipusAssumpte,
+				String resum) {
 			built = new NotificacioEntity();
 			built.entitat = entitat;
 			built.emisorDir3Codi = emisorDir3Codi;
@@ -776,17 +779,16 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.enviamentDataProgramada = enviamentDataProgramada;
 			built.retardPostal = retard;
 			built.caducitat = caducitat;
-			built.document = document;
 			built.usuariCodi = usuariCodi;
 			built.procedimentCodiNotib = procedimentCodi;
 			built.grupCodi = grup;
 			built.registreNumExpedient = numExpedient;
 			built.registreRefExterna = referenciaExterna;
 			built.procediment = procediment;
-//			built.seuRegistreLlibre = procediment.getLlibre();
-//			built.seuRegistreOficina = procediment.getOficina();
-//			built.procedimentCodiSia = procediment.getCodisia();
 			built.registreObservacions = observacions;
+			built.registreTipusAssumpte = tipusAssumpte;
+			built.registreExtracte = resum;
+			built.registreOrgan = "A04018961";
 
 			built.estat = NotificacioEstatEnumDto.PENDENT;
 			built.notificaEnviamentIntent = 0;
@@ -804,38 +806,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.usuariCodi = usuariCodi;
 			return this;
 		}
-//		public Builder registreExtracte(String registreExtracte) {
-//			built.registreExtracte = registreExtracte;
-//			return this;
-//		}
-//		public Builder registreDocFisica(String registreDocFisica) {
-//			built.registreDocFisica = registreDocFisica;
-//			return this;
-//		}
-//		public Builder registreIdioma(String registreIdioma) {
-//			built.registreIdioma = registreIdioma;
-//			return this;
-//		}
-//		public Builder registreTipusAssumpte(String registreTipusAssumpte) {
-//			built.registreTipusAssumpte = registreTipusAssumpte;
-//			return this;
-//		}
-//		public Builder registreNumExpedient(String registreNumExpedient) {
-//			built.registreNumExpedient = registreNumExpedient;
-//			return this;
-//		}
-//		public Builder registreRefExterna(String registreRefExterna) {
-//			built.registreRefExterna = registreRefExterna;
-//			return this;
-//		}
-//		public Builder registreCodiAssumpte(String registreCodiAssumpte) {
-//			built.registreCodiAssumpte = registreCodiAssumpte;
-//			return this;
-//		}
-//		public Builder registreObservacions(String registreObservacions) {
-//			built.registreObservacions = registreObservacions;
-//			return this;
-//		}
 		
 		public BuilderV2 enviaments(Set<NotificacioEnviamentEntity> enviaments) {
 			built.enviaments = enviaments;
@@ -864,6 +834,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		}
 		public BuilderV2 caducitat(Date caducitat) {
 			built.caducitat = caducitat;
+			return this;
+		}
+		public BuilderV2 document(DocumentEntity document) {
+			built.document = document;
 			return this;
 		}
 		public NotificacioEntity build() {

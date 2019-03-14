@@ -12,6 +12,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
+import es.caib.notib.core.api.dto.TipusAssumpteEnumDto;
+
 /**
  * Informació d'una notificació per al seu enviament.
  * 
@@ -38,7 +40,9 @@ public class NotificacioV2 {
 	private String refExterna;
 	private String idioma;
 	private String observacions;
+	private TipusAssumpteEnumDto tipusAssumpte;
 	private List<Enviament> enviaments;
+	private String extracte;
 	
 	public String getEmisorDir3Codi() {
 		return emisorDir3Codi;
@@ -141,6 +145,18 @@ public class NotificacioV2 {
 	}
 	public void setObservacions(String observacions) {
 		this.observacions = observacions;
+	}
+	public TipusAssumpteEnumDto getTipusAssumpte() {
+		return tipusAssumpte;
+	}
+	public void setTipusAssumpte(TipusAssumpteEnumDto tipusAssumpte) {
+		this.tipusAssumpte = tipusAssumpte;
+	}
+	public String getExtracte() {
+		return extracte;
+	}
+	public void setExtracte(String extracte) {
+		this.extracte = extracte;
 	}
 	@Override
 	public String toString() {

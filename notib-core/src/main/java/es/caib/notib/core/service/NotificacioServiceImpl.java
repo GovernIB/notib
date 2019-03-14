@@ -14,6 +14,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +76,10 @@ import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.security.ExtendedPermission;
+import es.caib.notib.plugin.registre.RegWeb3Utils;
 import es.caib.plugins.arxiu.api.DocumentContingut;
+import es.caib.regweb3.ws.v3.impl.AsientoRegistralBean;
+import es.caib.regweb3.ws.v3.impl.AsientoRegistralWs;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -140,19 +147,37 @@ public class NotificacioServiceImpl implements NotificacioService {
 			documentGesdocId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 					new ByteArrayInputStream(notificacio.getDocument().getContingutBase64().getBytes()));
+//			notificacio.getDocument().setHash(DigestUtils.sha256Hex(notificacio.getDocument().getContingutBase64()));
+			try {
+				notificacio.getDocument().setHash(
+						Base64.encodeBase64String(
+								Hex.decodeHex(
+										DigestUtils.sha256Hex(notificacio.getDocument().getContingutBase64().getBytes()).toCharArray()))
+						);
+			} catch (DecoderException e) {
+				e.printStackTrace();
+			}
+			
 		}
+		DocumentEntity documentEntity = null;
 		
-		DocumentEntity documentEntity = documentRepository.saveAndFlush(DocumentEntity.getBuilderV2(
-				notificacio.getDocument().getArxiuId(), 
-				documentGesdocId, 
-				notificacio.getDocument().getArxiuNom(),  
-				notificacio.getDocument().getHash(),  
-				notificacio.getDocument().getUrl(),  
-				notificacio.getDocument().getMetadades(),  
-				notificacio.getDocument().isNormalitzat(),  
-				notificacio.getDocument().isGenerarCsv(),
-				notificacio.getDocument().getUuid(),
-				notificacio.getDocument().getCsv()).build());
+		if(notificacio.getDocument().getCsv() != null || 
+		   notificacio.getDocument().getUuid() != null || 
+		   notificacio.getDocument().getContingutBase64() != null || 
+		   notificacio.getDocument().getArxiuId() != null) {
+
+			documentEntity = documentRepository.saveAndFlush(DocumentEntity.getBuilderV2(
+					notificacio.getDocument().getArxiuId(), 
+					documentGesdocId, 
+					notificacio.getDocument().getArxiuNom(),  
+					notificacio.getDocument().getHash(),  
+					notificacio.getDocument().getUrl(),  
+					notificacio.getDocument().getMetadades(),  
+					notificacio.getDocument().isNormalitzat(),  
+					notificacio.getDocument().isGenerarCsv(),
+					notificacio.getDocument().getUuid(),
+					notificacio.getDocument().getCsv()).build());
+		}
 		
 		
 		// Dades generals de la notificació
@@ -167,15 +192,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 						notificacio.getEnviamentDataProgramada(),
 						notificacio.getRetard(),
 						notificacio.getCaducitat(),
-						documentEntity,
 						notificacio.getUsuariCodi(),
 						procediment.getCodi(),
 						procediment,
 						notificacio.getGrupCodi(),
 						notificacio.getNumeroExpedient(),
 						notificacio.getRefExterna(),
-						notificacio.getObservacions()
-						).usuariCodi(usuariActual.getCodi());
+						notificacio.getObservacions(),
+						notificacio.getTipusAssumpte().getText(),
+						notificacio.getExtracte()
+						).document(documentEntity).usuariCodi(usuariActual.getCodi());
 
 
 		
@@ -274,19 +300,26 @@ public class NotificacioServiceImpl implements NotificacioService {
 		// Comprovar on s'ha d'enviar
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioEntity.getComunicacioTipus())) {
 			if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus()) /*Si es administració*/) {
+				
 				//Regweb3 + SIR
 			} else {
-				//Regweb3 + Notifica
 				try {
-					pluginHelper.registrarSortida(
-							pluginHelper.notificacioToRegistreAnotacioV2(notificacioEntity), 
-							"NOTIB", 
-							aplicacioService.getVersioActual());
-				} catch (RegistrePluginException e) {
-					throw new ValidationException(
-							"REGISTRE_SORTIDA",
-							"No s'ha pogut registrar la sortida: " + e.getMessage());
+					AsientoRegistralBean arb = pluginHelper.notificacioToAsientoRegistralBean(notificacioGuardada);
+					pluginHelper.comunicarAsientoRegistral(entitat.getDir3Codi(), arb, 1L);
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
+				//Regweb3 + Notifica
+//				try {
+//					pluginHelper.registrarSortida(
+//							pluginHelper.notificacioToRegistreAnotacioV2(notificacioEntity), 
+//							"NOTIB", 
+//							aplicacioService.getVersioActual());
+//				} catch (RegistrePluginException e) {
+//					throw new ValidationException(
+//							"REGISTRE_SORTIDA",
+//							"No s'ha pogut registrar la sortida: " + e.getMessage());
+//				}
 				notificaHelper.notificacioEnviar(notificacioEntity.getId());
 				notificacioEntity = notificacioRepository.findById(notificacioEntity.getId());
 			}

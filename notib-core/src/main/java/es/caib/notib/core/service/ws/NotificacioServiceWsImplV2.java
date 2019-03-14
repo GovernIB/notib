@@ -5,12 +5,19 @@ package es.caib.notib.core.service.ws;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.jws.WebService;
+import javax.xml.ws.BindingProvider;
 
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,6 +71,10 @@ import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.plugin.registre.RegWeb3Utils;
+import es.caib.regweb3.ws.v3.impl.AsientoRegistralBean;
+import es.caib.regweb3.ws.v3.impl.AsientoRegistralWs;
+import es.caib.regweb3.ws.v3.impl.AsientoRegistralWsService;
 
 
 /**
@@ -154,8 +165,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		if(notificacio.getDocument().getContingutBase64() != null) {
 			documentGesdocId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-					new ByteArrayInputStream(
-							Base64.decode(notificacio.getDocument().getContingutBase64())));	
+					new ByteArrayInputStream(notificacio.getDocument().getContingutBase64().getBytes()));
+				notificacio.getDocument().setHash(DigestUtils.sha256Hex(notificacio.getDocument().getContingutBase64()));
 		}
 		
 		NotificaEnviamentTipusEnumDto enviamentTipus = null;
@@ -174,17 +185,25 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			comunicacioTipus = NotificacioComunicacioTipusEnumDto.SINCRON;
 		}
 		
-		DocumentEntity documentEntity = documentRepository.saveAndFlush(DocumentEntity.getBuilderV2(
-				notificacio.getDocument().getArxiuId(), 
-				documentGesdocId, 
-				notificacio.getDocument().getArxiuNom(),  
-				notificacio.getDocument().getHash(),  
-				notificacio.getDocument().getUrl(),  
-				notificacio.getDocument().getMetadades(),  
-				notificacio.getDocument().isNormalitzat(),  
-				notificacio.getDocument().isGenerarCsv(),
-				notificacio.getDocument().getUuid(),
-				notificacio.getDocument().getCsv()).build());
+		DocumentEntity documentEntity = null;
+		
+		if(notificacio.getDocument().getCsv() != null || 
+		   notificacio.getDocument().getUuid() != null || 
+		   notificacio.getDocument().getContingutBase64() != null || 
+		   notificacio.getDocument().getArxiuId() != null) {
+
+			documentEntity = documentRepository.saveAndFlush(DocumentEntity.getBuilderV2(
+					notificacio.getDocument().getArxiuId(), 
+					documentGesdocId, 
+					notificacio.getDocument().getArxiuNom(),  
+					notificacio.getDocument().getHash(),  
+					notificacio.getDocument().getUrl(),  
+					notificacio.getDocument().getMetadades(),  
+					notificacio.getDocument().isNormalitzat(),  
+					notificacio.getDocument().isGenerarCsv(),
+					notificacio.getDocument().getUuid(),
+					notificacio.getDocument().getCsv()).build());
+		}
 		
 		ProcedimentEntity procediment = procedimentRepository.findByCodi(notificacio.getCodiProcediment());
 		if(procediment != null) {
@@ -198,14 +217,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					notificacio.getEnviamentDataProgramada(),
 					notificacio.getRetard(),
 					notificacio.getCaducitat(),
-					documentEntity,
 					notificacio.getCodiUsuari(),
 					notificacio.getCodiProcediment(),
 					procediment,
 					notificacio.getCodiGrup(),
 					notificacio.getNumExpedient(),
 					notificacio.getRefExterna(),
-					notificacio.getObservacions()).usuariCodi(usuariActual.getCodi());
+					notificacio.getObservacions(),
+					notificacio.getTipusAssumpte().getText(),
+					notificacio.getExtracte()
+					).document(documentEntity).usuariCodi(usuariActual.getCodi());
 			
 			NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioBuilder.build());
 			List<EnviamentReferencia> referencies = new ArrayList<EnviamentReferencia>();
@@ -325,6 +346,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			notificacioRepository.saveAndFlush(notificacioGuardada);
 			if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioGuardada.getComunicacioTipus())) {
 				if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioGuardada.getEnviamentTipus()) && esAdministracio /*Si es administració*/) {
+					
+					
+					try {
+						AsientoRegistralBean arb = pluginHelper.notificacioToAsientoRegistralBean(notificacioGuardada);
+						arb = pluginHelper.comunicarAsientoRegistral(entitat.getDir3Codi(), arb, 1L);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+					
 					//TODO: Registrar SIR
 				} else {
 					//TODO: Registrar Normal

@@ -3,20 +3,29 @@
  */
 package es.caib.notib.core.helper;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +47,7 @@ import es.caib.notib.core.api.dto.RegistreInteressatDto;
 import es.caib.notib.core.api.exception.PluginException;
 import es.caib.notib.core.api.exception.RegistrePluginException;
 import es.caib.notib.core.api.exception.SistemaExternException;
+import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.ws.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.core.api.ws.registre.CodiAssumpte;
 import es.caib.notib.core.api.ws.registre.DocumentRegistre;
@@ -61,12 +71,20 @@ import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
+import es.caib.notib.plugin.registre.RegWeb3Utils;
 import es.caib.notib.plugin.seu.SeuPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
 import es.caib.plugins.arxiu.api.ArxiuException;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import es.caib.regweb3.ws.v3.impl.AnexoWs;
+import es.caib.regweb3.ws.v3.impl.AsientoRegistralBean;
+import es.caib.regweb3.ws.v3.impl.AsientoRegistralWs;
+import es.caib.regweb3.ws.v3.impl.DatosInteresadoWs;
+import es.caib.regweb3.ws.v3.impl.InteresadoWs;
+import es.caib.regweb3.ws.v3.impl.WsI18NException;
+import es.caib.regweb3.ws.v3.impl.WsValidationException;
 
 /**
  * Helper per a interactuar amb els plugins.
@@ -91,6 +109,7 @@ public class PluginHelper {
 //	private RegistrePlugin registrePlugin;
 	private RegistrePluginRegWeb3 registrePluginRegWeb3;
 	private IArxiuPlugin arxiuPlugin;
+	private AsientoRegistralWs asientoRegistralApi;
 	private String integracioArxiuCodi = "ARXIU";
 	
 	private Client versioImprimibleClient;
@@ -98,6 +117,10 @@ public class PluginHelper {
 
 	@Autowired
 	private IntegracioHelper integracioHelper;
+	
+
+	@Autowired
+	private AplicacioService aplicacioService;
 
 
 	public List<String> consultarRolsAmbCodi(
@@ -1432,6 +1455,91 @@ public class PluginHelper {
 		registre.setInteressats(interessats);
 		return registre;
 	}
+	/*----------------*/
+	public AsientoRegistralBean notificacioToAsientoRegistralBean(NotificacioEntity notificacio) {
+		AsientoRegistralBean registre = new AsientoRegistralBean();
+		registre.setEntidadCodigo(notificacio.getEntitat().getCodi());
+		registre.setEntidadDenominacion(notificacio.getEntitat().getNom());
+		registre.setEntidadRegistralInicioCodigo(notificacio.getProcediment().getOficina());
+		registre.setEntidadRegistralInicioDenominacion(notificacio.getProcediment().getOficina());
+		registre.setEntidadRegistralOrigenCodigo(notificacio.getProcediment().getOficina());
+		registre.setEntidadRegistralOrigenDenominacion(notificacio.getProcediment().getOficina());
+		registre.setEntidadRegistralDestinoCodigo(notificacio.getProcediment().getOficina());
+		registre.setEntidadRegistralDestinoDenominacion(notificacio.getProcediment().getOficina());
+		registre.setUnidadTramitacionOrigenCodigo(notificacio.getRegistreOrgan());
+		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getRegistreOrgan());
+		registre.setUnidadTramitacionDestinoCodigo(notificacio.getProcediment().getOficina());
+		registre.setUnidadTramitacionDestinoDenominacion(notificacio.getProcediment().getOficina());
+		registre.setTipoRegistro(2L);
+		registre.setLibroCodigo(notificacio.getProcediment().getLlibre());
+		registre.setResumen(notificacio.getRegistreExtracte());
+		/* 1 = Documentació adjunta en suport Paper
+		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper
+		 * 3 = Documentació adjunta digitalitzada */
+		registre.setTipoDocumentacionFisicaCodigo(3L);
+		registre.setTipoAsunto(notificacio.getRegistreTipusAssumpte());
+		registre.setTipoAsuntoDenominacion(notificacio.getRegistreTipusAssumpte());
+		registre.setCodigoAsunto(notificacio.getRegistreTipusAssumpte());
+		registre.setCodigoAsuntoDenominacion(notificacio.getRegistreTipusAssumpte());
+		registre.setIdioma(1L);
+		registre.setReferenciaExterna(notificacio.getRegistreRefExterna());
+		registre.setNumeroExpediente(notificacio.getRegistreNumExpedient());
+		/*
+		 * 
+		 * '01' : Servei de missatgers
+		 * '02' : Correu postal
+		 * '03' : Correu postal certificat
+		 * '04' : Burofax
+		 * '05' : En ma
+		 * '06' : Fax
+		 * '07' : Altres
+		 * 
+		 * */
+		if(notificacio.getPagadorPostal() != null) {
+			registre.setTipoTransporte("02");
+		}else {
+			registre.setTipoTransporte("07");
+		}
+//		registre.setNumeroTransporte();
+		registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodisia()));
+		registre.setCodigoUsuario(notificacio.getUsuariCodi());
+		registre.setAplicacionTelematica("NOTIB");
+		registre.setAplicacion("NOTIB");
+		registre.setVersion(aplicacioService.getVersioActual());
+		registre.setObservaciones(notificacio.getRegistreObservacions());
+//		registre.setExpone();
+//		registre.setSolicita();
+		registre.setPresencial(true);
+//		registre.setTipoEnvioDocumentacion();
+		registre.setEstado(notificacio.getEstat().getLongVal());
+		registre.setUnidadTramitacionOrigenCodigo(notificacio.getRegistreOrgan());
+		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getRegistreOrgan());
+		try {
+			if(notificacio.getRegistreData() != null) {
+				registre.setFechaRegistro(toXmlGregorianCalendar(notificacio.getRegistreData()));	
+			}
+		} catch (DatatypeConfigurationException e) {
+			e.printStackTrace();
+		}
+		registre.setNumeroRegistroFormateado(notificacio.getRegistreNumero());
+		if(notificacio.getRegistreNumero() != null) {
+			registre.setNumeroRegistro(Integer.parseInt(notificacio.getRegistreNumero()));	
+		}
+//		registre.setIdentificadorIntercambio();
+//		registre.setFechaRecepcion();
+//		registre.setCodigoError();
+//		registre.setNumeroRegistroDestino();
+//		registre.setFechaRegistroDestino();
+		registre.setMotivo(notificacio.getDescripcio());
+		registre.getInteresados().add(personaToInteresadoWs(notificacio.getEnviaments().iterator().next().getTitular()));
+		if(notificacio.getDocument() != null) {
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument()));	
+		}
+		
+		
+		return registre;
+	}
+	/*------------------*/
 	
 	public RegistreAnotacioDto notificacioToRegistreAnotacioV2(NotificacioEntity notificacio) {
 		RegistreAnotacioDto registre = new RegistreAnotacioDto();
@@ -1461,6 +1569,29 @@ public class PluginHelper {
 		interessat.setTelefon(persona.getTelefon());
 		interessat.setDocumentNumero(persona.getNif());
 		interessat.setDocumentTipus(RegistreInteressatDocumentTipusEnum.NIF);
+		return interessat;
+	}
+	
+	public InteresadoWs personaToInteresadoWs (PersonaEntity persona) {
+		InteresadoWs interessat = new InteresadoWs();
+		DatosInteresadoWs interessatDades = new DatosInteresadoWs();
+		interessatDades.setTipoInteresado(1L);
+		interessatDades.setTipoDocumentoIdentificacion(RegistreInteressatDocumentTipusEnum.NIF.toString());
+		interessatDades.setDocumento(persona.getNif());
+		interessatDades.setRazonSocial(persona.getRaoSocial());
+		interessatDades.setNombre(persona.getNom());
+		interessatDades.setApellido1(persona.getLlinatge1());
+		interessatDades.setApellido2(persona.getLlinatge2());
+//		interessatDades.setPais(persona.getEnviament().getDomiciliPaisCodiIso());
+//		interessatDades.setProvincia(persona.getEnviament().getDomiciliProvinciaCodi());
+//		interessatDades.setLocalidad(persona.getEnviament().getNoti);
+//		interessatDades.setDireccion();
+//		interessatDades.getCp(persona.getEnviament);
+		interessatDades.setEmail(persona.getEmail());
+		interessatDades.setDireccionElectronica(persona.getEmail());
+//		interessatDades.setCanal();
+		interessatDades.setTelefono(persona.getTelefon());
+		interessat.setInteresado(interessatDades);
 		return interessat;
 	}
 	
@@ -1534,6 +1665,71 @@ public class PluginHelper {
 		/*Llogica de recerca de document*/
 		return annex;
 	}
+	
+	/*-------------------------*/
+	
+	public AnexoWs documentToAnexoWs (DocumentEntity document) {
+		AnexoWs annex = new AnexoWs();
+		if((document.getUuid() != null || document.getCsv() != null) && document.getUrl() == null && document.getContingutBase64() == null) {
+			String id = "";
+			if(document.getUuid() != null) {
+				id = document.getUuid();
+				try {
+					DocumentContingut doc = documentImprimibleUuid(id);
+					annex.setFicheroAnexado(doc.getContingut());
+					annex.setNombreFicheroAnexado(doc.getArxiuNom());
+				}catch(ArxiuException ae) {
+					logger.error("Error Obtenint el document per l'uuid");
+				}
+			} else if (document.getCsv() != null){
+				id = document.getCsv();
+				try {
+					DocumentContingut doc = documentImprimibleCsv(id);
+					annex.setFicheroAnexado(doc.getContingut());
+					annex.setNombreFicheroAnexado(doc.getArxiuNom());
+				}catch(ArxiuException ae) {
+					logger.error("Error Obtenint el document per l'uuid");
+				}
+			}
+		}else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			InputStream is = null;
+			try {
+				URL url = new URL(document.getUrl());
+
+				is = url.openStream();
+				byte[] byteChunk = new byte[4096]; // Or whatever size you want to read in at a time.
+				int n;
+
+				while ((n = is.read(byteChunk)) > 0) {
+					baos.write(byteChunk, 0, n);
+				}
+			} catch (IOException e) {
+				System.err.printf("Failed while reading bytes from %s: %s", document.getUrl(), e.getMessage());
+				e.printStackTrace();
+				// Perform any other exception handling that's appropriate.
+			} finally {
+				if (is != null) {
+					try {
+						is.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			annex.setFicheroAnexado(baos.toByteArray());
+			annex.setNombreFicheroAnexado(FilenameUtils.getName(document.getUrl()));
+		}else if(document.getContingutBase64() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
+			annex.setFicheroAnexado(document.getContingutBase64().getBytes());
+			annex.setNombreFicheroAnexado(document.getArxiuNom());
+		}
+		
+		
+		/*Llogica de recerca de document*/
+		return annex;
+	}
+	
+	/*-------------------------*/
 	
 	private IArxiuPlugin getArxiuPlugin() throws SistemaExternException {
 		if (arxiuPlugin == null) {
@@ -1734,6 +1930,33 @@ public class PluginHelper {
 		return Integer.parseInt(timeout);
 	}
 
+	private XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
+		GregorianCalendar c = new GregorianCalendar();
+		c.setTime(date);
+		return DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+	}
+	
+	private AsientoRegistralWs getAsientoRegistralApi() {
+		if (asientoRegistralApi == null) {
+			try {
+				asientoRegistralApi = RegWeb3Utils.getAsientoRegistralApi();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return asientoRegistralApi;
+	}
+	
+	public AsientoRegistralBean comunicarAsientoRegistral(String codiDir3Entitat, AsientoRegistralBean arb, Long tipusOperacio) {
+		try {
+			return getAsientoRegistralApi().comunicarAsientoRegistral(codiDir3Entitat, arb, tipusOperacio);
+		} catch (WsI18NException e) {
+			e.printStackTrace();
+		} catch (WsValidationException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
 
 	private static final Logger logger = LoggerFactory.getLogger(PluginHelper.class);

@@ -20,7 +20,7 @@ public enum NotificacioEstatEnumDto implements Serializable {
 	ENVIADA(1),
 	FINALITZADA(2);
 	
-	private int numVal;
+	private Integer numVal;
 	
 	NotificacioEstatEnumDto(int numVal) {
         this.numVal = numVal;
@@ -28,5 +28,9 @@ public enum NotificacioEstatEnumDto implements Serializable {
 	
 	public int getNumVal() {
 		return numVal;
+	}
+	
+	public Long getLongVal() {
+		return Long.parseLong(numVal.toString());
 	}
 }
