@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.war.helper.SessioHelper;
 
 /**
@@ -21,7 +22,8 @@ public class SessioInterceptor extends HandlerInterceptorAdapter {
 
 	@Autowired
 	private AplicacioService aplicacioService;
-	
+	@Autowired
+	EntitatService entitatService;
 
 	@Override
 	public boolean preHandle(

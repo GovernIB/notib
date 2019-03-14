@@ -138,11 +138,13 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	public void permisUpdate(
 			Long entitatId, 
 			Long id, 
-			PermisDto permis) throws NotFoundException {
+			PermisDto permis,
+			boolean isAdministrador) throws NotFoundException {
 		delegate.permisUpdate(
 				entitatId, 
 				id, 
-				permis);
+				permis,
+				isAdministrador);
 	}
 
 	@Override
@@ -150,11 +152,13 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	public void permisDelete(
 			Long entitatId,
 			Long id,
-			Long permisId) throws NotFoundException {
+			Long permisId,
+			boolean isAdministrador) throws NotFoundException {
 		delegate.permisDelete(
 				entitatId, 
 				id, 
-				permisId);
+				permisId,
+				isAdministrador);
 	}
 
 	@Override

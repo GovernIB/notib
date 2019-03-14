@@ -51,13 +51,13 @@ public class PagadorCieServiceBean implements PagadorCieService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PagadorCieDto findById(Long id) {
 		return delegate.findById(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PaginaDto<PagadorCieDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			PagadorCieFiltreDto filtre,
@@ -69,13 +69,13 @@ public class PagadorCieServiceBean implements PagadorCieService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<PagadorCieDto> findAll() {
 		return delegate.findAll();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PaginaDto<PagadorCieDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		return delegate.findAllPaginat(paginacioParams);
 	}

@@ -142,7 +142,8 @@ public class ProcedimentPermisController extends BaseUserController{
 		procedimentService.permisUpdate(
 				entitatActual.getId(),
 				procedimentId,
-				PermisCommand.asDto(command));
+				PermisCommand.asDto(command),
+				isAdministrador(request));
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../procediment/" + procedimentId + "/permis",
@@ -159,7 +160,8 @@ public class ProcedimentPermisController extends BaseUserController{
 		procedimentService.permisDelete(
 				entitatActual.getId(),
 				procedimentId,
-				permisId);
+				permisId,
+				isAdministrador(request));
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../../../procediment/" + procedimentId + "/permis",

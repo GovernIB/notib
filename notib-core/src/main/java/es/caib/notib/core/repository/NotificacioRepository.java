@@ -120,7 +120,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"     NotificacioEntity ntf " +
 			"where " +
 			"    (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
-			"and (ntf.procedimentCodiNotib in (:procedimentsCodisNotib))" +
+			//"and (ntf.procedimentCodiNotib in (:procedimentsCodisNotib))" +
+			"and (:entitat = ntf.entitat) " +
 			"and (:isComunicacioTipusNull = true or ntf.comunicacioTipus = :comunicacioTipus) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
@@ -149,7 +150,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("dataFi") Date dataFi,
 			@Param("isTitularNull") boolean isTitularNull,
 			@Param("titular") String titular,
-			@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
+			//@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
+			@Param("entitat") EntitatEntity entitat,
 			Pageable paginacio);
 	
 	@Query(	"from " +

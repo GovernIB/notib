@@ -33,7 +33,7 @@ public interface NotificacioService {
 	 *            Informació de la notificació a crear
 	 * @return La notificació amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<NotificacioDto> create(
 			Long entitatId,
 			NotificacioDtoV2 notificacio);
@@ -49,7 +49,7 @@ public interface NotificacioService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public NotificacioDtoV2 update(
 			Long entitatId,
 			NotificacioDtoV2 notificacio) throws NotFoundException;
@@ -61,7 +61,7 @@ public interface NotificacioService {
 	 *            Atribut id de la notificació.
 	 * @return La notificació amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public NotificacioDtoV2 findAmbId(
 			Long id);
 
@@ -74,7 +74,7 @@ public interface NotificacioService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina amb les notificacions.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
 			Long entitatId,
 			boolean isUsuari,
@@ -94,7 +94,7 @@ public interface NotificacioService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina amb les notificacions.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaAndGrupsAndEntitat(
 			List<ProcedimentDto> procediments,
 			EntitatDto entitat);
@@ -108,7 +108,7 @@ public interface NotificacioService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina amb les notificacions.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsulta(EntitatDto entitat);
 	
 	/**
@@ -121,7 +121,7 @@ public interface NotificacioService {
 	 * @return La pàgina amb les notificacions.
 	 */
 	
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacio(EntitatDto entitat);
 	
 	/**
@@ -133,7 +133,7 @@ public interface NotificacioService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina amb les notificacions.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
 			List<ProcedimentDto> procediments,
 			EntitatDto entitat);
@@ -147,7 +147,7 @@ public interface NotificacioService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina amb les notificacions.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(
 			List<ProcedimentDto> procediments,
 			EntitatDto entitat);
@@ -162,7 +162,7 @@ public interface NotificacioService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina amb les notificacions.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
 			List<ProcedimentDto> procediments,
 			EntitatDto entitat);
@@ -174,7 +174,7 @@ public interface NotificacioService {
 	 *            Atribut id de la notificació.
 	 * @return els events trobats.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public List<NotificacioEventDto> eventFindAmbNotificacio(
 			Long entitatId,
 			Long notificacioId);
@@ -188,7 +188,7 @@ public interface NotificacioService {
 	 *            Atribut id de l'enviament.
 	 * @return els destinataris trobats.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public List<NotificacioEventDto> eventFindAmbEnviament(
 			Long entitatId,
 			Long notificacioId,
@@ -201,7 +201,7 @@ public interface NotificacioService {
 	 *            Atribut id de la notificació.
 	 * @return el fitxer associat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public ArxiuDto getDocumentArxiu(
 			Long notificacioId);
 	
@@ -212,7 +212,7 @@ public interface NotificacioService {
 	 *            Atribut id de l'enviament.
 	 * @return el fitxer de certificació associat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public ArxiuDto enviamentGetCertificacioArxiu(
 			Long enviamentId);
 
@@ -223,7 +223,7 @@ public interface NotificacioService {
 	 *            Atribut id de la notificació.
 	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public boolean enviar(
 			Long entitatId,
 			Long notificacioId);
@@ -235,7 +235,7 @@ public interface NotificacioService {
 	 *            Atribut id de l'enviament.
 	 * @return l'estat de l'enviament.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(
 			Long entitatId,
 			Long enviamentId);
@@ -247,7 +247,7 @@ public interface NotificacioService {
 	 *            Atribut id de l'enviament.
 	 * @return l'estat de l'enviament.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public NotificacioEnviamenEstatDto marcarComProcessada(
 			Long enviamentId);
 	

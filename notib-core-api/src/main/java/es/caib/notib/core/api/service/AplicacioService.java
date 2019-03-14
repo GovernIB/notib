@@ -156,7 +156,7 @@ public interface AplicacioService {
 	 * 
 	 * @return true si el plugin està configurat i disponible o false si no.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public boolean pluginSeuDisponible();
 
 }

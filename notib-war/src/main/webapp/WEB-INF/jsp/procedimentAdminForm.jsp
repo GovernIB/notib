@@ -63,7 +63,7 @@ $(document).ready(function() {
 						<not:inputSelect name="entitatId" textKey="procediment.form.camp.entitat" optionItems="${entitats}" optionValueAttribute="id" optionTextAttribute="nom" required="true"/>
 				  </c:when>
 				  <c:otherwise>
-				    	<form:hidden path="entitatId" value="${entitatId}"/>
+				    	<form:hidden path="entitatId" value="${entitat.id}"/>
 						<not:inputText name="entitatNom" textKey="procediment.form.camp.entitat" value="${entitat.nom}" required="true" readonly="true"/>
 				  </c:otherwise>
 				</c:choose>

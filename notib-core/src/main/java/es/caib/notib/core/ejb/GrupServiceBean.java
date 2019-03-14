@@ -56,19 +56,19 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<GrupDto> deleteGrupsProcediment(List<GrupDto> grups) throws NotFoundException {
 		return delegate.deleteGrupsProcediment(grups);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public GrupDto findById(Long entitatId, Long id) {
 		return delegate.findById(entitatId, id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PaginaDto<ProcedimentGrupDto> findByProcediment(
 			Long entitatId, 
 			Long procedimentId) {
@@ -78,13 +78,13 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<GrupDto> findByGrupsProcediment(Long procedimentId) {
 		return delegate.findByGrupsProcediment(procedimentId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public ProcedimentGrupDto findProcedimentGrupById(
 			Long entitatId, 
 			Long procedimentGrupId) {
@@ -94,13 +94,13 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<GrupDto> findByEntitat(Long entitatId) {
 		return delegate.findByEntitat(entitatId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PaginaDto<GrupDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			GrupFiltreDto filtre,
@@ -112,13 +112,13 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<GrupDto> findAll() {
 		return delegate.findAll();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PaginaDto<GrupDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		return delegate.findAllPaginat(paginacioParams);
 	}

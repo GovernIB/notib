@@ -73,7 +73,7 @@ public interface ProcedimentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public ProcedimentDto findById(
 			Long entitatId,
 			boolean isAdministrador,
@@ -86,7 +86,7 @@ public interface ProcedimentService {
 	 *            Codi del procediment a trobar.
 	 * @return El procediment amb el codi especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public List<ProcedimentDto> findByEntitat(Long entitatId);
 	
 	
@@ -105,7 +105,7 @@ public interface ProcedimentService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina amb les notificacions.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public PaginaDto<ProcedimentDto> findAmbFiltrePaginat(
 			Long entitatId,
 			boolean isUsuari,
@@ -119,7 +119,7 @@ public interface ProcedimentService {
 	 * 
 	 * @return La llista dels procediments.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public List<ProcedimentDto> findAll();
 
 	/**
@@ -127,7 +127,7 @@ public interface ProcedimentService {
 	 * 
 	 * @return La llista dels procediments.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public List<ProcedimentGrupDto> findAllGrups();
 	
 	/**
@@ -135,7 +135,7 @@ public interface ProcedimentService {
 	 * 
 	 * @return La llista dels procediments.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public List<ProcedimentDto> findProcedimentsSenseGrups();
 	
 	/**
@@ -151,7 +151,7 @@ public interface ProcedimentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public List<PermisDto> permisFind(
 			Long entitatId,
 			boolean isAdministrador,
@@ -169,11 +169,12 @@ public interface ProcedimentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public void permisUpdate(
 			Long entitatId,
 			Long id,
-			PermisDto permis) throws NotFoundException;
+			PermisDto permis,
+			boolean isAdministrador) throws NotFoundException;
 	
 	/**
 	 * Esborra els permisos d'un usuari o d'un rol per a un procediment.
@@ -187,11 +188,12 @@ public interface ProcedimentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public void permisDelete(
 			Long entitatId,
 			Long id,
-			Long permisId) throws NotFoundException;
+			Long permisId,
+			boolean isAdministrador) throws NotFoundException;
 	
 	/**
 	 * Assigna un grup a un procediment.
@@ -205,7 +207,7 @@ public interface ProcedimentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public void grupCreate(
 			Long entitatId,
 			Long id,
@@ -223,7 +225,7 @@ public interface ProcedimentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public void grupUpdate(
 			Long entitatId,
 			Long id,
@@ -239,7 +241,7 @@ public interface ProcedimentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public void grupDelete(
 			Long entitatId,
 			Long GrupId) throws NotFoundException;

@@ -136,7 +136,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public NotificacioDtoV2 update(
 			Long entitatId,
 			NotificacioDtoV2 notificacio) throws NotFoundException {

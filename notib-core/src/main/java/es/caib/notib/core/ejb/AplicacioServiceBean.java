@@ -117,7 +117,7 @@ public class AplicacioServiceBean implements AplicacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public boolean pluginSeuDisponible() {
 		return delegate.pluginSeuDisponible();
 	}
