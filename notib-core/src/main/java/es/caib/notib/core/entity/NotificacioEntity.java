@@ -178,8 +178,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	
 	/*Parametres del registre*/
-	
-	
 	@Column(name = "registre_oficina", length = 52, nullable = false)
 	protected String registreOficina;
 	@Column(name = "registre_organ", length = 10)
@@ -210,8 +208,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	@Transient
 	protected boolean permisProcessar;
-	
-	
 
 	public String getEmisorDir3Codi() {
 		return emisorDir3Codi;
@@ -498,11 +494,18 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String procedimentCodi,
 			ProcedimentEntity procediment,
 			String grup,
+			String registreOficina,
+			String registreLlibre,
+			String registreNumero,
+			Date registreData,
+			String extracte,
+			String docFisica,
+			String idioma,
+			String tipusAssumpte,
 			String numExpedient,
 			String referenciaExterna,
-			String observacions,
-			String tipusAssumpte,
-			String resum) {
+			String codiAssumpte,
+			String observacions) {
 		return new BuilderV2(
 				entitat,
 				emisorDir3Codi,
@@ -517,11 +520,18 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				procedimentCodi,
 				procediment,
 				grup,
+				registreOficina,
+				registreLlibre,
+				registreNumero,
+				registreData,
+				extracte,
+				docFisica,
+				idioma,
+				tipusAssumpte,
 				numExpedient,
 				referenciaExterna,
-				observacions,
-				tipusAssumpte,
-				resum);
+				codiAssumpte,
+				observacions);
 	}
 	
 
@@ -764,11 +774,18 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				String procedimentCodi,
 				ProcedimentEntity procediment,
 				String grup,
+				String registreOficina,
+				String registreLlibre,
+				String registreNumero,
+				Date registreDate,
+				String extracte,
+				String docFisica,
+				String idioma,
+				String tipusAssumpte,
 				String numExpedient,
 				String referenciaExterna,
-				String observacions,
-				String tipusAssumpte,
-				String resum) {
+				String codiAssumpte,
+				String observacions) {
 			built = new NotificacioEntity();
 			built.entitat = entitat;
 			built.emisorDir3Codi = emisorDir3Codi;
@@ -785,10 +802,19 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.registreNumExpedient = numExpedient;
 			built.registreRefExterna = referenciaExterna;
 			built.procediment = procediment;
-			built.registreObservacions = observacions;
+			built.registreOficina = registreOficina;
+			built.registreLlibre = registreLlibre;
+			built.registreNumero = registreNumero;
+			built.registreData = registreDate;
+			built.registreExtracte = extracte;
+			built.registreDocFisica = docFisica;
+			built.registreIdioma = idioma;
 			built.registreTipusAssumpte = tipusAssumpte;
-			built.registreExtracte = resum;
-			built.registreOrgan = "A04018961";
+			built.registreNumExpedient = numExpedient;
+			built.registreRefExterna = referenciaExterna;
+			built.registreCodiAssumpte = codiAssumpte;
+			built.registreObservacions = observacions;
+			built.registreOrgan = entitat.getCodi();
 
 			built.estat = NotificacioEstatEnumDto.PENDENT;
 			built.notificaEnviamentIntent = 0;
@@ -806,6 +832,38 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.usuariCodi = usuariCodi;
 			return this;
 		}
+//		public Builder registreExtracte(String registreExtracte) {
+//			built.registreExtracte = registreExtracte;
+//			return this;
+//		}
+//		public Builder registreDocFisica(String registreDocFisica) {
+//			built.registreDocFisica = registreDocFisica;
+//			return this;
+//		}
+//		public Builder registreIdioma(String registreIdioma) {
+//			built.registreIdioma = registreIdioma;
+//			return this;
+//		}
+//		public Builder registreTipusAssumpte(String registreTipusAssumpte) {
+//			built.registreTipusAssumpte = registreTipusAssumpte;
+//			return this;
+//		}
+//		public Builder registreNumExpedient(String registreNumExpedient) {
+//			built.registreNumExpedient = registreNumExpedient;
+//			return this;
+//		}
+//		public Builder registreRefExterna(String registreRefExterna) {
+//			built.registreRefExterna = registreRefExterna;
+//			return this;
+//		}
+//		public Builder registreCodiAssumpte(String registreCodiAssumpte) {
+//			built.registreCodiAssumpte = registreCodiAssumpte;
+//			return this;
+//		}
+//		public Builder registreObservacions(String registreObservacions) {
+//			built.registreObservacions = registreObservacions;
+//			return this;
+//		}
 		
 		public BuilderV2 enviaments(Set<NotificacioEnviamentEntity> enviaments) {
 			built.enviaments = enviaments;

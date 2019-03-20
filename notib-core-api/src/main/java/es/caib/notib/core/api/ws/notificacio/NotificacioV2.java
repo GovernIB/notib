@@ -36,13 +36,19 @@ public class NotificacioV2 {
 	private String codiUsuari;
 	private String codiProcediment;
 	private String codiGrup;
-	private String numExpedient;
-	private String refExterna;
-	private String idioma;
-	private String observacions;
-	private TipusAssumpteEnumDto tipusAssumpte;
-	private List<Enviament> enviaments;
+	private String registreOficina;
+	private String registreLlibre;
+	private String registreNumero;
+	private Date registreData;
 	private String extracte;
+	private String docFisica;
+	private String idioma;
+	private String tipusAssumpte;
+	private String numExpedient;
+	private String codiAssumpte;
+	private String refExterna;
+	private String observacions;
+	private List<Enviament> enviaments;
 	
 	public String getEmisorDir3Codi() {
 		return emisorDir3Codi;
@@ -146,17 +152,53 @@ public class NotificacioV2 {
 	public void setObservacions(String observacions) {
 		this.observacions = observacions;
 	}
-	public TipusAssumpteEnumDto getTipusAssumpte() {
-		return tipusAssumpte;
+	public String getRegistreOficina() {
+		return registreOficina;
 	}
-	public void setTipusAssumpte(TipusAssumpteEnumDto tipusAssumpte) {
-		this.tipusAssumpte = tipusAssumpte;
+	public void setRegistreOficina(String registreOficina) {
+		this.registreOficina = registreOficina;
+	}
+	public String getRegistreLlibre() {
+		return registreLlibre;
+	}
+	public void setRegistreLlibre(String registreLlibre) {
+		this.registreLlibre = registreLlibre;
+	}
+	public String getRegistreNumero() {
+		return registreNumero;
+	}
+	public void setRegistreNumero(String registreNumero) {
+		this.registreNumero = registreNumero;
+	}
+	public Date getRegistreData() {
+		return registreData;
+	}
+	public void setRegistreData(Date registreData) {
+		this.registreData = registreData;
 	}
 	public String getExtracte() {
 		return extracte;
 	}
 	public void setExtracte(String extracte) {
 		this.extracte = extracte;
+	}
+	public String getDocFisica() {
+		return docFisica;
+	}
+	public void setDocFisica(String docFisica) {
+		this.docFisica = docFisica;
+	}
+	public String getTipusAssumpte() {
+		return tipusAssumpte;
+	}
+	public void setTipusAssumpte(String tipusAssumpte) {
+		this.tipusAssumpte = tipusAssumpte;
+	}
+	public String getCodiAssumpte() {
+		return codiAssumpte;
+	}
+	public void setCodiAssumpte(String codiAssumpte) {
+		this.codiAssumpte = codiAssumpte;
 	}
 	@Override
 	public String toString() {

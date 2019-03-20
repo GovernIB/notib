@@ -221,11 +221,18 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					notificacio.getCodiProcediment(),
 					procediment,
 					notificacio.getCodiGrup(),
+					notificacio.getRegistreOficina(),
+					notificacio.getRegistreLlibre(),
+					notificacio.getRegistreNumero(),
+					notificacio.getRegistreData(),
+					notificacio.getExtracte(),
+					notificacio.getDocFisica(),
+					notificacio.getIdioma(),
+					notificacio.getTipusAssumpte(),
 					notificacio.getNumExpedient(),
 					notificacio.getRefExterna(),
-					notificacio.getObservacions(),
-					notificacio.getTipusAssumpte().getText(),
-					notificacio.getExtracte()
+					notificacio.getCodiAssumpte(),
+					notificacio.getObservacions()
 					).document(documentEntity).usuariCodi(usuariActual.getCodi());
 			
 			NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioBuilder.build());
@@ -360,9 +367,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				} else {
 					//TODO: Registrar Normal
 					try {
-						pluginHelper.registrarSortida(pluginHelper.notificacioToRegistreAnotacioV2(notificacioGuardada), "NOTIB", aplicacioService.getVersioActual());
-					} catch (RegistrePluginException e) {
-						e.getMessage();
+						AsientoRegistralBean arb = pluginHelper.notificacioToAsientoRegistralBean(notificacioGuardada);
+						arb = pluginHelper.comunicarAsientoRegistral(entitat.getDir3Codi(), arb, 1L);
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
 					notificaHelper.notificacioEnviar(notificacioGuardada.getId());
 					notificacioGuardada = notificacioRepository.findOne(notificacioGuardada.getId());

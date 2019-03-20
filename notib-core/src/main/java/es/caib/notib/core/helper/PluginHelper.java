@@ -3,12 +3,15 @@
  */
 package es.caib.notib.core.helper;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,6 +36,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
@@ -1355,19 +1361,19 @@ public class PluginHelper {
 	}
 
 	
-	public List<TipusAssumpte> llistarTipusAssumpte() throws RegistrePluginException {
+	public List<TipusAssumpte> llistarTipusAssumpte(String entitatCodi) throws RegistrePluginException {
 		
-		List<TipusAssumpte> tipusAssumptes = getRegistrePluginRegWeb3().llistarTipusAssumpte(
-				getPropertyPluginCodiEntitatDir3());
+		List<TipusAssumpte> tipusAssumptes = getRegistrePluginRegWeb3().llistarTipusAssumpte(entitatCodi);
 		
 		return tipusAssumptes;
 	}
 
 	public List<CodiAssumpte> llistarCodisAssumpte(
+			String entitatcodi,
 			String tipusAssumpte) throws RegistrePluginException {
 		
 		List<CodiAssumpte> assumptes = getRegistrePluginRegWeb3().llistarCodisAssumpte(
-				getPropertyPluginCodiEntitatDir3(), 
+				entitatcodi, 
 				tipusAssumpte);
 
 		return assumptes;
@@ -1433,28 +1439,28 @@ public class PluginHelper {
 		return usuari;
 	}
 	
-	public RegistreAnotacioDto notificacioToRegistreAnotacioV1(NotificacioEntity notificacio) {
-		RegistreAnotacioDto registre = new RegistreAnotacioDto();
-		registre.setAssumpteCodi(notificacio.getRegistreCodiAssumpte());
-		registre.setAssumpteExtracte(notificacio.getConcepte());
-		registre.setAssumpteIdiomaCodi(notificacio.getRegistreIdioma());
-		registre.setAssumpteTipus(notificacio.getRegistreTipusAssumpte());
-		registre.setEntitatCodi(notificacio.getEntitat().getCodi());
-		registre.setExpedientNumero(notificacio.getRegistreNumExpedient());
-		registre.setObservacions(notificacio.getRegistreObservacions());
-		registre.setLlibre(notificacio.getRegistreLlibre());
-		registre.setOficina(notificacio.getRegistreOficina());
-		registre.setOrgan(notificacio.getRegistreOrgan());
-		registre.setAnnexos(new ArrayList<RegistreAnnexDto>());
-		registre.getAnnexos().add(documentToRegistreAnnexDto(notificacio.getDocument()));
-		List<RegistreInteressatDto> interessats = new ArrayList<RegistreInteressatDto>();
-		interessats.add(personaToRegistreInteresatDto(notificacio.getEnviaments().iterator().next().getTitular()));
-		for(PersonaEntity persona: notificacio.getEnviaments().iterator().next().getDestinataris()) {
-			interessats.add(personaToRegistreInteresatDto(persona));
-		}
-		registre.setInteressats(interessats);
-		return registre;
-	}
+//	public RegistreAnotacioDto notificacioToRegistreAnotacioV1(NotificacioEntity notificacio) {
+//		RegistreAnotacioDto registre = new RegistreAnotacioDto();
+//		registre.setAssumpteCodi(notificacio.getRegistreCodiAssumpte());
+//		registre.setAssumpteExtracte(notificacio.getConcepte());
+//		registre.setAssumpteIdiomaCodi(notificacio.getRegistreIdioma());
+//		registre.setAssumpteTipus(notificacio.getRegistreTipusAssumpte());
+//		registre.setEntitatCodi(notificacio.getEntitat().getCodi());
+//		registre.setExpedientNumero(notificacio.getRegistreNumExpedient());
+//		registre.setObservacions(notificacio.getRegistreObservacions());
+//		registre.setLlibre(notificacio.getRegistreLlibre());
+//		registre.setOficina(notificacio.getRegistreOficina());
+//		registre.setOrgan(notificacio.getRegistreOrgan());
+//		registre.setAnnexos(new ArrayList<RegistreAnnexDto>());
+//		registre.getAnnexos().add(documentToRegistreAnnexDto(notificacio.getDocument()));
+//		List<RegistreInteressatDto> interessats = new ArrayList<RegistreInteressatDto>();
+//		interessats.add(personaToRegistreInteresatDto(notificacio.getEnviaments().iterator().next().getTitular()));
+//		for(PersonaEntity persona: notificacio.getEnviaments().iterator().next().getDestinataris()) {
+//			interessats.add(personaToRegistreInteresatDto(persona));
+//		}
+//		registre.setInteressats(interessats);
+//		return registre;
+//	}
 	/*----------------*/
 	public AsientoRegistralBean notificacioToAsientoRegistralBean(NotificacioEntity notificacio) {
 		AsientoRegistralBean registre = new AsientoRegistralBean();
@@ -1505,11 +1511,11 @@ public class PluginHelper {
 		registre.setCodigoUsuario(notificacio.getUsuariCodi());
 		registre.setAplicacionTelematica("NOTIB");
 		registre.setAplicacion("NOTIB");
-		registre.setVersion(aplicacioService.getVersioActual());
+		registre.setVersion("3.1");
 		registre.setObservaciones(notificacio.getRegistreObservacions());
-//		registre.setExpone();
-//		registre.setSolicita();
-		registre.setPresencial(true);
+		registre.setExpone("");
+		registre.setSolicita("");
+		registre.setPresencial(false);
 //		registre.setTipoEnvioDocumentacion();
 		registre.setEstado(notificacio.getEstat().getLongVal());
 		registre.setUnidadTramitacionOrigenCodigo(notificacio.getRegistreOrgan());
@@ -1541,24 +1547,24 @@ public class PluginHelper {
 	}
 	/*------------------*/
 	
-	public RegistreAnotacioDto notificacioToRegistreAnotacioV2(NotificacioEntity notificacio) {
-		RegistreAnotacioDto registre = new RegistreAnotacioDto();
-		registre.setAssumpteCodi(notificacio.getRegistreCodiAssumpte());
-		registre.setAssumpteExtracte(notificacio.getConcepte());
-		registre.setAssumpteIdiomaCodi(notificacio.getRegistreIdioma());
-		registre.setAssumpteTipus(notificacio.getRegistreTipusAssumpte());
-		registre.setEntitatCodi(notificacio.getEntitat().getCodi());
-		registre.setExpedientNumero(notificacio.getRegistreNumExpedient());
-		registre.setObservacions(notificacio.getRegistreObservacions());
-		registre.setLlibre(notificacio.getProcediment().getLlibre());
-		registre.setOficina(notificacio.getProcediment().getOficina());
-		registre.setAnnexos(new ArrayList<RegistreAnnexDto>());
-		registre.getAnnexos().add(documentToRegistreAnnexDto(notificacio.getDocument()));
-		List<RegistreInteressatDto> interessats = new ArrayList<RegistreInteressatDto>();
-		interessats.add(personaToRegistreInteresatDto(notificacio.getEnviaments().iterator().next().getTitular()));
-		registre.setInteressats(interessats);
-		return registre;
-	}
+//	public RegistreAnotacioDto notificacioToRegistreAnotacioV2(NotificacioEntity notificacio) {
+//		RegistreAnotacioDto registre = new RegistreAnotacioDto();
+//		registre.setAssumpteCodi(notificacio.getRegistreCodiAssumpte());
+//		registre.setAssumpteExtracte(notificacio.getConcepte());
+//		registre.setAssumpteIdiomaCodi(notificacio.getRegistreIdioma());
+//		registre.setAssumpteTipus(notificacio.getRegistreTipusAssumpte());
+//		registre.setEntitatCodi(notificacio.getEntitat().getCodi());
+//		registre.setExpedientNumero(notificacio.getRegistreNumExpedient());
+//		registre.setObservacions(notificacio.getRegistreObservacions());
+//		registre.setLlibre(notificacio.getProcediment().getLlibre());
+//		registre.setOficina(notificacio.getProcediment().getOficina());
+//		registre.setAnnexos(new ArrayList<RegistreAnnexDto>());
+//		registre.getAnnexos().add(documentToRegistreAnnexDto(notificacio.getDocument()));
+//		List<RegistreInteressatDto> interessats = new ArrayList<RegistreInteressatDto>();
+//		interessats.add(personaToRegistreInteresatDto(notificacio.getEnviaments().iterator().next().getTitular()));
+//		registre.setInteressats(interessats);
+//		return registre;
+//	}
 	
 	public RegistreInteressatDto personaToRegistreInteresatDto (PersonaEntity persona) {
 		RegistreInteressatDto interessat = new RegistreInteressatDto();
@@ -1582,14 +1588,12 @@ public class PluginHelper {
 		interessatDades.setNombre(persona.getNom());
 		interessatDades.setApellido1(persona.getLlinatge1());
 		interessatDades.setApellido2(persona.getLlinatge2());
-//		interessatDades.setPais(persona.getEnviament().getDomiciliPaisCodiIso());
-//		interessatDades.setProvincia(persona.getEnviament().getDomiciliProvinciaCodi());
-//		interessatDades.setLocalidad(persona.getEnviament().getNoti);
-//		interessatDades.setDireccion();
-//		interessatDades.getCp(persona.getEnviament);
+		interessatDades.setCodigoDire("");
+		interessatDades.setDireccion("");
+		interessatDades.setCp("");
+		interessatDades.setObservaciones("");
 		interessatDades.setEmail(persona.getEmail());
 		interessatDades.setDireccionElectronica(persona.getEmail());
-//		interessatDades.setCanal();
 		interessatDades.setTelefono(persona.getTelefon());
 		interessat.setInteresado(interessatDades);
 		return interessat;
@@ -1608,125 +1612,190 @@ public class PluginHelper {
     	}
 	}
 	
-	public RegistreAnnexDto documentToRegistreAnnexDto (DocumentEntity document) {
-		RegistreAnnexDto annex = new RegistreAnnexDto();
-		if((document.getUuid() != null || document.getCsv() != null) && document.getUrl() == null && document.getContingutBase64() == null) {
-			String id = "";
-			if(document.getUuid() != null) {
-				id = document.getUuid();
-				try {
-					annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
-					annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
-					annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
-					annex.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA);
-					annex.setData(new Date());
-					annex.setIdiomaCodi("ca");
-					DocumentContingut doc = documentImprimibleUuid(id);
-					annex.setArxiuContingut(doc.getContingut());
-					annex.setArxiuNom(doc.getArxiuNom());
-				}catch(ArxiuException ae) {
-					logger.error("Error Obtenint el document per l'uuid");
-				}
-			} else if (document.getCsv() != null){
-				id = document.getCsv();
-				try {
-					annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
-					annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
-					annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
-					annex.setModeFirma(RegistreModeFirmaEnum.AUTOFIRMA_SI);
-					annex.setData(new Date());
-					annex.setIdiomaCodi("ca");
-					DocumentContingut doc = documentImprimibleCsv(id);
-					annex.setArxiuContingut(doc.getContingut());
-					annex.setArxiuNom(doc.getArxiuNom());
-				}catch(ArxiuException ae) {
-					logger.error("Error Obtenint el document per l'uuid");
-				}
-			}
-		}else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
-			annex.setNom(document.getUrl());
-			annex.setArxiuNom(document.getUrl());
-			annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
-			annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
-			annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
-			annex.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA);
-			annex.setData(new Date());
-			annex.setIdiomaCodi("ca");
-		}else if(document.getContingutBase64() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
-			annex.setArxiuContingut(document.getContingutBase64().getBytes());
-			annex.setArxiuNom(document.getArxiuNom());
-			annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
-			annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
-			annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
-			annex.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA);
-			annex.setData(new Date());
-			annex.setIdiomaCodi("ca");
-		}
-		/*Llogica de recerca de document*/
-		return annex;
-	}
+//	public RegistreAnnexDto documentToRegistreAnnexDto (DocumentEntity document) {
+//		RegistreAnnexDto annex = new RegistreAnnexDto();
+//		if((document.getUuid() != null || document.getCsv() != null) && document.getUrl() == null && document.getContingutBase64() == null) {
+//			String id = "";
+//			if(document.getUuid() != null) {
+//				id = document.getUuid();
+//				try {
+//					annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
+//					annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
+//					annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
+//					annex.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA);
+//					annex.setData(new Date());
+//					annex.setIdiomaCodi("ca");
+//					DocumentContingut doc = documentImprimibleUuid(id);
+//					annex.setArxiuContingut(doc.getContingut());
+//					annex.setArxiuNom(doc.getArxiuNom());
+//				}catch(ArxiuException ae) {
+//					logger.error("Error Obtenint el document per l'uuid");
+//				}
+//			} else if (document.getCsv() != null){
+//				id = document.getCsv();
+//				try {
+//					annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
+//					annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
+//					annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
+//					annex.setModeFirma(RegistreModeFirmaEnum.AUTOFIRMA_SI);
+//					annex.setData(new Date());
+//					annex.setIdiomaCodi("ca");
+//					DocumentContingut doc = documentImprimibleCsv(id);
+//					annex.setArxiuContingut(doc.getContingut());
+//					annex.setArxiuNom(doc.getArxiuNom());
+//				}catch(ArxiuException ae) {
+//					logger.error("Error Obtenint el document per l'uuid");
+//				}
+//			}
+//		}else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
+//			annex.setNom(document.getUrl());
+//			annex.setArxiuNom(document.getUrl());
+//			annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
+//			annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
+//			annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
+//			annex.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA);
+//			annex.setData(new Date());
+//			annex.setIdiomaCodi("ca");
+//		}else if(document.getContingutBase64() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
+//			annex.setArxiuContingut(document.getContingutBase64().getBytes());
+//			annex.setArxiuNom(document.getArxiuNom());
+//			annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
+//			annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
+//			annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
+//			annex.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA);
+//			annex.setData(new Date());
+//			annex.setIdiomaCodi("ca");
+//		}
+//		/*Llogica de recerca de document*/
+//		return annex;
+//	}
 	
 	/*-------------------------*/
 	
 	public AnexoWs documentToAnexoWs (DocumentEntity document) {
-		AnexoWs annex = new AnexoWs();
-		if((document.getUuid() != null || document.getCsv() != null) && document.getUrl() == null && document.getContingutBase64() == null) {
-			String id = "";
-			if(document.getUuid() != null) {
-				id = document.getUuid();
-				try {
-					DocumentContingut doc = documentImprimibleUuid(id);
-					annex.setFicheroAnexado(doc.getContingut());
-					annex.setNombreFicheroAnexado(doc.getArxiuNom());
-				}catch(ArxiuException ae) {
-					logger.error("Error Obtenint el document per l'uuid");
-				}
-			} else if (document.getCsv() != null){
-				id = document.getCsv();
-				try {
-					DocumentContingut doc = documentImprimibleCsv(id);
-					annex.setFicheroAnexado(doc.getContingut());
-					annex.setNombreFicheroAnexado(doc.getArxiuNom());
-				}catch(ArxiuException ae) {
-					logger.error("Error Obtenint el document per l'uuid");
-				}
-			}
-		}else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			InputStream is = null;
-			try {
-				URL url = new URL(document.getUrl());
-
-				is = url.openStream();
-				byte[] byteChunk = new byte[4096]; // Or whatever size you want to read in at a time.
-				int n;
-
-				while ((n = is.read(byteChunk)) > 0) {
-					baos.write(byteChunk, 0, n);
-				}
-			} catch (IOException e) {
-				System.err.printf("Failed while reading bytes from %s: %s", document.getUrl(), e.getMessage());
-				e.printStackTrace();
-				// Perform any other exception handling that's appropriate.
-			} finally {
-				if (is != null) {
+		try {
+			document.setMetadades("<tipoDocumental>C1045</tipoDocumental>  \n" + 
+					"    <validezDocumento>2012</validezDocumento>  \n" + 
+					"    <tipoDocumento>Calculs</tipoDocumento>  \n" + 
+					"    <observaciones>4</observaciones>  \n" + 
+					"    <fechaCaptura>4</fechaCaptura>  \n" + 
+					"    <csv>4</csv>  \n" + 
+					"    <origenCiudadanoAdmin>7</origenCiudadanoAdmin> ");
+			AnexoWs annex = null;
+			Path path = null;
+			Map<String, Object> metadades = convertNodesFromXml(document.getMetadades());
+			
+			if((document.getUuid() != null || document.getCsv() != null) && document.getUrl() == null && document.getContingutBase64() == null) {
+				annex = new AnexoWs();
+				String id = "";
+				if(document.getUuid() != null) {
+					id = document.getUuid();
 					try {
-						is.close();
-					} catch (IOException e) {
-						e.printStackTrace();
+						DocumentContingut doc = documentImprimibleUuid(id);
+						annex.setFicheroAnexado(doc.getContingut());
+						annex.setNombreFicheroAnexado(doc.getArxiuNom());
+					}catch(ArxiuException ae) {
+						logger.error("Error Obtenint el document per l'uuid");
+					}
+				} else if (document.getCsv() != null){
+					id = document.getCsv();
+					try {
+						DocumentContingut doc = documentImprimibleCsv(id);
+						annex.setFicheroAnexado(doc.getContingut());
+						annex.setNombreFicheroAnexado(doc.getArxiuNom());
+					}catch(ArxiuException ae) {
+						logger.error("Error Obtenint el document per el csv");
 					}
 				}
+				path = new File(document.getArxiuNom()).toPath(); 
+			}else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
+				annex = new AnexoWs();
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				InputStream is = null;
+				try {
+					URL url = new URL(document.getUrl());
+	
+					is = url.openStream();
+					byte[] byteChunk = new byte[4096]; // Or whatever size you want to read in at a time.
+					int n;
+	
+					while ((n = is.read(byteChunk)) > 0) {
+						baos.write(byteChunk, 0, n);
+					}
+				} catch (IOException e) {
+					System.err.printf("Failed while reading bytes from %s: %s", document.getUrl(), e.getMessage());
+					e.printStackTrace();
+					// Perform any other exception handling that's appropriate.
+				} finally {
+					if (is != null) {
+						try {
+							is.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+				annex.setFicheroAnexado(baos.toByteArray());
+				annex.setNombreFicheroAnexado(FilenameUtils.getName(document.getUrl()));
+				path = new File(FilenameUtils.getName(document.getUrl())).toPath();
+			}else if(document.getContingutBase64() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
+				annex = new AnexoWs();
+				annex.setFicheroAnexado(document.getContingutBase64().getBytes());
+				annex.setNombreFicheroAnexado(document.getArxiuNom());
+				path = new File(document.getArxiuNom()).toPath();
 			}
-			annex.setFicheroAnexado(baos.toByteArray());
-			annex.setNombreFicheroAnexado(FilenameUtils.getName(document.getUrl()));
-		}else if(document.getContingutBase64() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
-			annex.setFicheroAnexado(document.getContingutBase64().getBytes());
-			annex.setNombreFicheroAnexado(document.getArxiuNom());
+			try {
+				annex.setTipoMIMEFicheroAnexado(Files.probeContentType(path));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			annex.setTipoDocumental((String)metadades.get("tipoDocumental"));
+			annex.setValidezDocumento((String)metadades.get("validezDocumento"));
+			annex.setTipoDocumento((String)metadades.get("tipoDocumento"));
+			annex.setObservaciones((String)metadades.get("observaciones"));
+			annex.setOrigenCiudadanoAdmin((Integer)metadades.get("origenCiudadanoAdmin"));
+			annex.setFechaCaptura((XMLGregorianCalendar)metadades.get("fechaCaptura"));
+			annex.setCsv((String)metadades.get("csv"));
+			annex.setTitulo("Annex 1");
+			annex.setModoFirma(0);
+			/*Llogica de recerca de document*/
+			return annex;
+		} catch (Exception e1) {
+			e1.printStackTrace();
 		}
-		
-		
-		/*Llogica de recerca de document*/
-		return annex;
+		return null;
+	}
+	
+	
+	public static Map<String, Object> convertNodesFromXml(String xml) throws Exception {
+	    InputStream is = new ByteArrayInputStream(xml.getBytes());
+	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	    dbf.setNamespaceAware(true);
+	    DocumentBuilder db = dbf.newDocumentBuilder();
+	    Document document = db.parse(is);
+	    return createMap(document.getDocumentElement());
+	}
+	
+	
+	public static Map<String, Object> createMap(Node node) {
+	    Map<String, Object> map = new HashMap<String, Object>();
+	    NodeList nodeList = node.getChildNodes();
+	    for (int i = 0; i < nodeList.getLength(); i++) {
+	        Node currentNode = nodeList.item(i);
+	        if (currentNode.hasAttributes()) {
+	            for (int j = 0; j < currentNode.getAttributes().getLength(); j++) {
+	                Node item = currentNode.getAttributes().item(i);
+	                map.put(item.getNodeName(), item.getTextContent());
+	            }
+	        }
+	        if (node.getFirstChild() != null && node.getFirstChild().getNodeType() == Node.ELEMENT_NODE) {
+	            map.putAll(createMap(currentNode));
+	        } else if (node.getFirstChild().getNodeType() == Node.TEXT_NODE) {
+	            map.put(node.getLocalName(), node.getTextContent());
+	        }
+	    }
+	    return map;
 	}
 	
 	/*-------------------------*/

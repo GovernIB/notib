@@ -60,6 +60,7 @@ import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.PagadorCieRepository;
 import es.caib.notib.core.repository.PagadorPostalRepository;
 import es.caib.notib.core.repository.PersonaRepository;
+import es.caib.regweb3.ws.v3.impl.AsientoRegistralBean;
 
 
 /**
@@ -305,12 +306,19 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioGuardada.getComunicacioTipus())) {
 			if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioGuardada.getEnviamentTipus()) && esAdministracio /*Si es administració*/) {
 				//TODO: Registrar SIR
+				try {
+					AsientoRegistralBean arb = pluginHelper.notificacioToAsientoRegistralBean(notificacioGuardada);
+					arb = pluginHelper.comunicarAsientoRegistral(entitat.getDir3Codi(), arb, 1L);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			} else {
 				//TODO: Registrar Normal
 				try {
-					pluginHelper.registrarSortida(pluginHelper.notificacioToRegistreAnotacioV1(notificacioGuardada), "NOTIB", aplicacioService.getVersioActual());
-				} catch (RegistrePluginException e) {
-					e.getMessage();
+					AsientoRegistralBean arb = pluginHelper.notificacioToAsientoRegistralBean(notificacioGuardada);
+					arb = pluginHelper.comunicarAsientoRegistral(entitat.getDir3Codi(), arb, 1L);
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 				notificaHelper.notificacioEnviar(notificacioGuardada.getId());
 				notificacioGuardada = notificacioRepository.findOne(notificacioGuardada.getId());
