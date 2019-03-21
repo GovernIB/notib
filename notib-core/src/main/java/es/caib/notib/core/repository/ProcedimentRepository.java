@@ -70,15 +70,24 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 	
 	@Query(	"from " +
 			"    ProcedimentEntity pro " +
-			"where (:isEntitatNull = true or pro.entitat = :entitat) "+ 
-			" and (:isCodiNull = true or pro.codi = :codi)" +
-			" and (:isNomNull = true or pro.nom = :nom)")
-	public Page<ProcedimentEntity> findByFiltre(
-			@Param("isEntitatNull") boolean isEntitat,
-			@Param("entitat") EntitatEntity entitat,
+			"where (:isCodiNull = true or lower(pro.codi) like lower('%'||:codi||'%'))" +
+			" and (:isNomNull = true or lower(pro.nom) like lower('%'||:nom||'%'))")
+	public Page<ProcedimentEntity> findAmbEntitatAndFiltre(
 			@Param("isCodiNull") boolean isCodiNull,
 			@Param("codi") String codi,
 			@Param("isNomNull") boolean isNomNull,
 			@Param("nom") String nom,
 			Pageable paginacio);
+	
+	@Query(	"from " +
+			"    ProcedimentEntity pro " +
+			"where ((:isCodiNull = true) or (lower(pro.codi) like lower('%'||:codi||'%')))" + 
+			" and ((:isNomNull = true) or (lower(pro.nom) like lower('%'||:nom||'%')))")
+	public Page<ProcedimentEntity> findAmbFiltre(
+			@Param("isCodiNull") boolean isCodiNull,
+			@Param("codi") String codi,
+			@Param("isNomNull") boolean isNomNull,
+			@Param("nom") String nom,
+			Pageable paginacio);
+	
 }

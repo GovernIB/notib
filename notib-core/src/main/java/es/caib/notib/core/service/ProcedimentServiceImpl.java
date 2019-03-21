@@ -20,6 +20,7 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
+import es.caib.notib.core.api.dto.ProcedimentFormDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
@@ -35,6 +36,7 @@ import es.caib.notib.core.entity.GrupProcedimentEntity;
 import es.caib.notib.core.entity.PagadorCieEntity;
 import es.caib.notib.core.entity.PagadorPostalEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.ProcedimentFormEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
@@ -44,6 +46,7 @@ import es.caib.notib.core.helper.ProcedimentHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.GrupRepository;
+import es.caib.notib.core.repository.ProcedimentFormRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 
@@ -57,6 +60,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 
 	@Resource
 	private ProcedimentRepository procedimentRepository;
+	@Resource
+	private ProcedimentFormRepository procedimentFormRepository;
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
 	@Resource
@@ -86,13 +91,16 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				+ "procediment=" + procediment + ")");
 		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-		
-		PagadorPostalEntity pagadorPostal = entityComprovarHelper.comprovarPagadorPostal(
-				procediment.getPagadorpostal().getId());
-				
-		PagadorCieEntity pagadorCie = entityComprovarHelper.comprovarPagadorCie(
-				procediment.getPagadorcie().getId());
-		
+		PagadorPostalEntity pagadorPostal = null;
+		PagadorCieEntity pagadorCie = null;
+		if (procediment.getPagadorpostal() != null) {
+			pagadorPostal = entityComprovarHelper.comprovarPagadorPostal(
+					procediment.getPagadorpostal().getId());
+		}
+		if (procediment.getPagadorcie() != null) {
+			pagadorCie = entityComprovarHelper.comprovarPagadorCie(
+					procediment.getPagadorcie().getId());
+		}
 		
 		ProcedimentEntity procedimentEntity = procedimentRepository.save(
 				ProcedimentEntity.getBuilder(
@@ -128,6 +136,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				false,
 				false);
 		ProcedimentEntity procedimentEntity = null;
+		PagadorPostalEntity pagadorPostal = null;
+		PagadorCieEntity pagadorCie = null;
 		if(!isAdmin) {
 			procedimentEntity = entityComprovarHelper.comprovarProcediment(
 					entitat,
@@ -136,11 +146,14 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			procedimentEntity = procedimentRepository.findOne(procediment.getId());
 		}
 		
-		PagadorPostalEntity pagadorPostalEntity = entityComprovarHelper.comprovarPagadorPostal(
-				procediment.getPagadorpostal().getId());
-		
-		PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(
-				procediment.getPagadorcie().getId());
+		if (procediment.getPagadorpostal() != null) {
+			pagadorPostal = entityComprovarHelper.comprovarPagadorPostal(
+					procediment.getPagadorpostal().getId());
+		}
+		if (procediment.getPagadorcie() != null) {
+			pagadorCie = entityComprovarHelper.comprovarPagadorCie(
+					procediment.getPagadorcie().getId());
+		}
 		
 		List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepository.findByProcediment(procedimentEntity);
 		
@@ -152,8 +165,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					procediment.getCodi(),
 					procediment.getNom(),
 					entitat,
-					pagadorPostalEntity,
-					pagadorCieEntity,
+					pagadorPostal,
+					pagadorCie,
 					procediment.getRetard(),
 					procediment.isAgrupar(),
 					procediment.getLlibre(),
@@ -241,7 +254,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 	
 	@Override
-	public PaginaDto<ProcedimentDto> findAmbFiltrePaginat(
+	@Transactional
+	public PaginaDto<ProcedimentFormDto> findAmbFiltrePaginat(
 			Long entitatId,
 			boolean isUsuari,
 			boolean isUsuariEntitat,
@@ -257,33 +271,37 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId);
 		List<EntitatEntity> entitatsActiva = entitatRepository.findByActiva(true);
-		Page<ProcedimentEntity> procediments = null;
-		PaginaDto<ProcedimentDto> procedimentsPage = null;
+		List<Long> entitatsActivaId = new ArrayList<Long>();
+		
+		for (EntitatEntity entitatActiva : entitatsActiva) {
+			entitatsActivaId.add(entitatActiva.getId());
+		}
+		Page<ProcedimentFormEntity> procediments = null;
+		PaginaDto<ProcedimentFormDto> procedimentsPage = null;
 		
 		if (filtre == null) {
 			
 			if (isUsuariEntitat) {
-				procediments = procedimentRepository.findByEntitatActual(
-						entitatActual,
+				procediments = procedimentFormRepository.findAmbEntitatActual(
+						entitatActual.getId(),
 						paginacioHelper.toSpringDataPageable(paginacioParams));
 				procedimentsPage =  paginacioHelper.toPaginaDto(
 						procediments,
-						ProcedimentDto.class);
+						ProcedimentFormDto.class);
 			} else if (isAdministrador) {
-				procediments = procedimentRepository.findByEntitatActiva(
-						entitatsActiva,
+				procediments = procedimentFormRepository.findAmbEntitatActiva(
+						entitatsActivaId,
 						paginacioHelper.toSpringDataPageable(paginacioParams));
 				procedimentsPage =  paginacioHelper.toPaginaDto(
 						procediments,
-						ProcedimentDto.class);
+						ProcedimentFormDto.class);
 			}
 		} else {
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
 			
 			if (isUsuariEntitat) {
-				procediments = procedimentRepository.findByFiltre(
-						entitatActual == null,
-						entitatActual,
+				procediments = procedimentFormRepository.findAmbEntitatAndFiltre(
+						entitatActual.getId(),
 						filtre.getCodi() == null || filtre.getCodi().isEmpty(), 
 						filtre.getCodi() == null ? "" : filtre.getCodi(),
 						filtre.getNom() == null || filtre.getNom().isEmpty(),
@@ -292,12 +310,10 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				
 				procedimentsPage = paginacioHelper.toPaginaDto(
 						procediments, 
-						ProcedimentDto.class);
+						ProcedimentFormDto.class);
 				
 			} else if (isAdministrador) {
-				procediments = procedimentRepository.findByFiltre(
-						true,
-						entitatActual,
+				procediments = procedimentFormRepository.findAmbFiltre(
 						filtre.getCodi() == null || filtre.getCodi().isEmpty(), 
 						filtre.getCodi() == null ? "" : filtre.getCodi(),
 						filtre.getNom() == null || filtre.getNom().isEmpty(),
@@ -306,7 +322,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				
 				procedimentsPage =  paginacioHelper.toPaginaDto(
 						procediments,
-						ProcedimentDto.class);
+						ProcedimentFormDto.class);
 			}
 		}
 		return procedimentsPage;
