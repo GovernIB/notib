@@ -12,8 +12,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
-import es.caib.notib.core.api.dto.TipusAssumpteEnumDto;
-
 /**
  * Informació d'una notificació per al seu enviament.
  * 

@@ -30,32 +30,6 @@ public class ProcedimentHelper {
 	@Resource
 	private PermisosHelper permisosHelper;
 	
-	public ProcedimentDto toProcedimentDto(
-			ProcedimentEntity procediment) {
-		
-		ProcedimentDto dto = new ProcedimentDto();
-		
-		dto.setCodi(procediment.getCodi());
-		dto.setNom(procediment.getNom());
-		dto.setCodisia(procediment.getCodisia());
-		dto.setEntitat(
-				conversioTipusHelper.convertir(
-						procediment.getEntitat(), 
-						EntitatDto.class));
-		dto.setPagadorpostal(
-				conversioTipusHelper.convertir(
-						procediment.getPagadorpostal(), 
-						PagadorPostalDto.class));
-		dto.setPagadorcie(
-				conversioTipusHelper.convertir(
-						procediment.getPagadorcie(), 
-						PagadorCieDto.class));
-		
-		dto.setAgrupar(procediment.isAgrupar());
-		
-		return dto;
-	}
-	
 	public void omplirPermisosPerMetaNode(
 			ProcedimentDto procediment,
 			boolean ambLlistaPermisos) {

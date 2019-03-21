@@ -12,6 +12,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.notib.core.api.dto.CodiAssumpteDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
@@ -19,6 +20,7 @@ import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.ProcedimentService;
 
@@ -249,6 +251,22 @@ public class ProcedimentServiceBean implements ProcedimentService {
 				procedimentId,
 				entitat,
 				isAdministrador);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	public List<TipusAssumpteDto> findTipusAssumpte(EntitatDto entitat) {
+		return delegate.findTipusAssumpte(entitat);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	public List<CodiAssumpteDto> findCodisAssumpte(
+			EntitatDto entitat, 
+			String codiTipusAssumpte) {
+		return delegate.findCodisAssumpte(
+				entitat, 
+				codiTipusAssumpte);
 	}
 
 

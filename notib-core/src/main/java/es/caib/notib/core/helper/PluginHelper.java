@@ -27,7 +27,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -44,6 +43,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 
+import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.RegistreAnnexDto;
@@ -54,6 +54,7 @@ import es.caib.notib.core.api.exception.PluginException;
 import es.caib.notib.core.api.exception.RegistrePluginException;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.ws.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.core.api.ws.registre.CodiAssumpte;
 import es.caib.notib.core.api.ws.registre.DocumentRegistre;
@@ -89,6 +90,8 @@ import es.caib.regweb3.ws.v3.impl.AsientoRegistralBean;
 import es.caib.regweb3.ws.v3.impl.AsientoRegistralWs;
 import es.caib.regweb3.ws.v3.impl.DatosInteresadoWs;
 import es.caib.regweb3.ws.v3.impl.InteresadoWs;
+import es.caib.regweb3.ws.v3.impl.JustificanteWs;
+import es.caib.regweb3.ws.v3.impl.OficioBean;
 import es.caib.regweb3.ws.v3.impl.WsI18NException;
 import es.caib.regweb3.ws.v3.impl.WsValidationException;
 
@@ -123,10 +126,6 @@ public class PluginHelper {
 
 	@Autowired
 	private IntegracioHelper integracioHelper;
-	
-
-	@Autowired
-	private AplicacioService aplicacioService;
 
 
 	public List<String> consultarRolsAmbCodi(
@@ -1507,7 +1506,7 @@ public class PluginHelper {
 			registre.setTipoTransporte("07");
 		}
 //		registre.setNumeroTransporte();
-		registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodisia()));
+		registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
 		registre.setCodigoUsuario(notificacio.getUsuariCodi());
 		registre.setAplicacionTelematica("NOTIB");
 		registre.setAplicacion("NOTIB");
@@ -1581,8 +1580,8 @@ public class PluginHelper {
 	public InteresadoWs personaToInteresadoWs (PersonaEntity persona) {
 		InteresadoWs interessat = new InteresadoWs();
 		DatosInteresadoWs interessatDades = new DatosInteresadoWs();
-		interessatDades.setTipoInteresado(1L);
-		interessatDades.setTipoDocumentoIdentificacion(RegistreInteressatDocumentTipusEnum.NIF.toString());
+//		interessatDades.setTipoInteresado(persona.getTipusInteressat());/*--------------*/
+		interessatDades.setTipoDocumentoIdentificacion("N");
 		interessatDades.setDocumento(persona.getNif());
 		interessatDades.setRazonSocial(persona.getRaoSocial());
 		interessatDades.setNombre(persona.getNom());
@@ -1612,75 +1611,69 @@ public class PluginHelper {
     	}
 	}
 	
-//	public RegistreAnnexDto documentToRegistreAnnexDto (DocumentEntity document) {
-//		RegistreAnnexDto annex = new RegistreAnnexDto();
-//		if((document.getUuid() != null || document.getCsv() != null) && document.getUrl() == null && document.getContingutBase64() == null) {
-//			String id = "";
-//			if(document.getUuid() != null) {
-//				id = document.getUuid();
-//				try {
-//					annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
-//					annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
-//					annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
-//					annex.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA);
-//					annex.setData(new Date());
-//					annex.setIdiomaCodi("ca");
-//					DocumentContingut doc = documentImprimibleUuid(id);
-//					annex.setArxiuContingut(doc.getContingut());
-//					annex.setArxiuNom(doc.getArxiuNom());
-//				}catch(ArxiuException ae) {
-//					logger.error("Error Obtenint el document per l'uuid");
-//				}
-//			} else if (document.getCsv() != null){
-//				id = document.getCsv();
-//				try {
-//					annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
-//					annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
-//					annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
-//					annex.setModeFirma(RegistreModeFirmaEnum.AUTOFIRMA_SI);
-//					annex.setData(new Date());
-//					annex.setIdiomaCodi("ca");
-//					DocumentContingut doc = documentImprimibleCsv(id);
-//					annex.setArxiuContingut(doc.getContingut());
-//					annex.setArxiuNom(doc.getArxiuNom());
-//				}catch(ArxiuException ae) {
-//					logger.error("Error Obtenint el document per l'uuid");
-//				}
-//			}
-//		}else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
-//			annex.setNom(document.getUrl());
-//			annex.setArxiuNom(document.getUrl());
-//			annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
-//			annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
-//			annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
-//			annex.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA);
-//			annex.setData(new Date());
-//			annex.setIdiomaCodi("ca");
-//		}else if(document.getContingutBase64() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
-//			annex.setArxiuContingut(document.getContingutBase64().getBytes());
-//			annex.setArxiuNom(document.getArxiuNom());
-//			annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
-//			annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
-//			annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
-//			annex.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA);
-//			annex.setData(new Date());
-//			annex.setIdiomaCodi("ca");
-//		}
-//		/*Llogica de recerca de document*/
-//		return annex;
-//	}
+	public RegistreAnnexDto documentToRegistreAnnexDto (DocumentEntity document) {
+		RegistreAnnexDto annex = new RegistreAnnexDto();
+		if((document.getUuid() != null || document.getCsv() != null) && document.getUrl() == null && document.getContingutBase64() == null) {
+			String id = "";
+			if(document.getUuid() != null) {
+				id = document.getUuid();
+				try {
+					annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
+					annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
+					annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
+					annex.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA);
+					annex.setData(new Date());
+					annex.setIdiomaCodi("ca");
+					DocumentContingut doc = documentImprimibleUuid(id);
+					annex.setArxiuContingut(doc.getContingut());
+					annex.setArxiuNom(doc.getArxiuNom());
+				}catch(ArxiuException ae) {
+					logger.error("Error Obtenint el document per l'uuid");
+				}
+			} else if (document.getCsv() != null){
+				id = document.getCsv();
+				try {
+					annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
+					annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
+					annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
+					annex.setModeFirma(RegistreModeFirmaEnum.AUTOFIRMA_SI);
+					annex.setData(new Date());
+					annex.setIdiomaCodi("ca");
+					DocumentContingut doc = documentImprimibleCsv(id);
+					annex.setArxiuContingut(doc.getContingut());
+					annex.setArxiuNom(doc.getArxiuNom());
+				}catch(ArxiuException ae) {
+					logger.error("Error Obtenint el document per l'uuid");
+				}
+			}
+		}else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
+			annex.setNom(document.getUrl());
+			annex.setArxiuNom(document.getUrl());
+			annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
+			annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
+			annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
+			annex.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA);
+			annex.setData(new Date());
+			annex.setIdiomaCodi("ca");
+		}else if(document.getContingutBase64() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
+			annex.setArxiuContingut(document.getContingutBase64().getBytes());
+			annex.setArxiuNom(document.getArxiuNom());
+			annex.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI);
+			annex.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO);
+			annex.setOrigen(RegistreOrigenEnum.ADMINISTRACIO);
+			annex.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA);
+			annex.setData(new Date());
+			annex.setIdiomaCodi("ca");
+		}
+		/*Llogica de recerca de document*/
+		return annex;
+	}
 	
 	/*-------------------------*/
 	
 	public AnexoWs documentToAnexoWs (DocumentEntity document) {
 		try {
-			document.setMetadades("<tipoDocumental>C1045</tipoDocumental>  \n" + 
-					"    <validezDocumento>2012</validezDocumento>  \n" + 
-					"    <tipoDocumento>Calculs</tipoDocumento>  \n" + 
-					"    <observaciones>4</observaciones>  \n" + 
-					"    <fechaCaptura>4</fechaCaptura>  \n" + 
-					"    <csv>4</csv>  \n" + 
-					"    <origenCiudadanoAdmin>7</origenCiudadanoAdmin> ");
+			document.setMetadades("<?xml version=\"1.0\" encoding=\"UTF-8\"?><metadades><tipoDocumental>TD01</tipoDocumental><validezDocumento>02</validezDocumento><tipoDocumento>01</tipoDocumento><observaciones>anexo detached</observaciones><origenCiudadanoAdmin>0</origenCiudadanoAdmin></metadades>");
 			AnexoWs annex = null;
 			Path path = null;
 			Map<String, Object> metadades = convertNodesFromXml(document.getMetadades());
@@ -1738,9 +1731,14 @@ public class PluginHelper {
 				annex.setFicheroAnexado(baos.toByteArray());
 				annex.setNombreFicheroAnexado(FilenameUtils.getName(document.getUrl()));
 				path = new File(FilenameUtils.getName(document.getUrl())).toPath();
-			}else if(document.getContingutBase64() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
+			}else if(document.getArxiuGestdocId() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
 				annex = new AnexoWs();
-				annex.setFicheroAnexado(document.getContingutBase64().getBytes());
+				ByteArrayOutputStream output = new ByteArrayOutputStream();
+				gestioDocumentalGet(
+						document.getArxiuGestdocId(),
+						PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
+						output);
+				annex.setFicheroAnexado(output.toByteArray());
 				annex.setNombreFicheroAnexado(document.getArxiuNom());
 				path = new File(document.getArxiuNom()).toPath();
 			}
@@ -1754,7 +1752,7 @@ public class PluginHelper {
 			annex.setValidezDocumento((String)metadades.get("validezDocumento"));
 			annex.setTipoDocumento((String)metadades.get("tipoDocumento"));
 			annex.setObservaciones((String)metadades.get("observaciones"));
-			annex.setOrigenCiudadanoAdmin((Integer)metadades.get("origenCiudadanoAdmin"));
+			annex.setOrigenCiudadanoAdmin(Integer.parseInt((String)metadades.get("origenCiudadanoAdmin")));
 			annex.setFechaCaptura((XMLGregorianCalendar)metadades.get("fechaCaptura"));
 			annex.setCsv((String)metadades.get("csv"));
 			annex.setTitulo("Annex 1");
@@ -2019,6 +2017,39 @@ public class PluginHelper {
 	public AsientoRegistralBean comunicarAsientoRegistral(String codiDir3Entitat, AsientoRegistralBean arb, Long tipusOperacio) {
 		try {
 			return getAsientoRegistralApi().comunicarAsientoRegistral(codiDir3Entitat, arb, tipusOperacio);
+		} catch (WsI18NException e) {
+			e.printStackTrace();
+		} catch (WsValidationException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public AsientoRegistralBean salidaAsientoRegistral(String codiDir3Entitat, AsientoRegistralBean arb, Long tipusOperacio) {
+		try {
+			return getAsientoRegistralApi().salidaAsientoRegistral(codiDir3Entitat, arb, tipusOperacio);
+		} catch (WsI18NException e) {
+			e.printStackTrace();
+		} catch (WsValidationException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public JustificanteWs obtenerJustificante(String codiDir3Entitat, String numeroRegistreFormatat, String llibre, Long tipusRegistre) {
+		try {
+			return getAsientoRegistralApi().obtenerJustificante(codiDir3Entitat, numeroRegistreFormatat, llibre, tipusRegistre);
+		} catch (WsI18NException e) {
+			e.printStackTrace();
+		} catch (WsValidationException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public OficioBean obtenerOficioExterno(String codiDir3Entitat, String numeroRegistreFormatat, String llibre) {
+		try {
+			return getAsientoRegistralApi().obtenerOficioExterno(codiDir3Entitat, numeroRegistreFormatat, llibre);
 		} catch (WsI18NException e) {
 			e.printStackTrace();
 		} catch (WsValidationException e) {

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.notib.core.api.dto.CodiAssumpteDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -12,6 +13,7 @@ import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 
 /**
@@ -137,6 +139,24 @@ public interface ProcedimentService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public List<ProcedimentDto> findProcedimentsSenseGrups();
+	
+	/**
+	 * Recupera els tipus d'assumpte d'una entitat.
+	 * 
+	 * @return La llista dels tipus d'assumpte.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	public List<TipusAssumpteDto> findTipusAssumpte(EntitatDto entitat);
+	
+	/**
+	 * Recupera els codis d'assumpte d'un tipus d'assumpte.
+	 * 
+	 * @return La llista dels codis d'assumpte.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	public List<CodiAssumpteDto> findCodisAssumpte(
+			EntitatDto entitat,
+			String codiTipusAssumpte);
 	
 	/**
 	 * Consulta els permisos d'un procediment.

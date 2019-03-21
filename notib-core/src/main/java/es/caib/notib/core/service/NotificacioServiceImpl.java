@@ -49,8 +49,6 @@ import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.exception.RegistrePluginException;
-import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
@@ -76,10 +74,9 @@ import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.security.ExtendedPermission;
-import es.caib.notib.plugin.registre.RegWeb3Utils;
+import es.caib.notib.plugin.registre.EstatRegistre;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.regweb3.ws.v3.impl.AsientoRegistralBean;
-import es.caib.regweb3.ws.v3.impl.AsientoRegistralWs;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -146,7 +143,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			} catch (DecoderException e) {
 				e.printStackTrace();
 			}
-			
 		}
 		DocumentEntity documentEntity = null;
 		
@@ -169,6 +165,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 		
 		
+
 		// Dades generals de la notificació
 		NotificacioEntity.BuilderV2 notificacioBuilder = NotificacioEntity.
 				getBuilderV2(
@@ -279,29 +276,29 @@ public class NotificacioServiceImpl implements NotificacioService {
 		notificacioEntity = notificacioRepository.saveAndFlush(notificacioEntity);
 		// Comprovar on s'ha d'enviar
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioEntity.getComunicacioTipus())) {
+			AsientoRegistralBean arb = pluginHelper.notificacioToAsientoRegistralBean(notificacioGuardada);
+			AsientoRegistralBean arbResposta = null;
 			if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus()) /*Si es administració*/) {
-				
 				//Regweb3 + SIR
+				arbResposta = pluginHelper.salidaAsientoRegistral(entitat.getDir3Codi(), arb, 1L);
+				if(arbResposta.getEstado().equals(EstatRegistre.DISTRIBUIT.geValorLong())) {
+					
+				}else if(arbResposta.getEstado().equals(EstatRegistre.OFICI_EXTERN.geValorLong())) {
+					
+				}else if(arbResposta.getEstado().equals(EstatRegistre.OFICI_SIR.geValorLong())) {
+					
+				}
 			} else {
+				//Regweb3 + Notifica
 				try {
-					AsientoRegistralBean arb = pluginHelper.notificacioToAsientoRegistralBean(notificacioGuardada);
-					pluginHelper.comunicarAsientoRegistral(entitat.getDir3Codi(), arb, 1L);
+					arbResposta = pluginHelper.comunicarAsientoRegistral(entitat.getDir3Codi(), arb, 1L);
+					notificacio.setRegistreNumero(arbResposta.getNumeroRegistroFormateado());
+					notificacio.setRegistreData(arbResposta.getFechaRegistro().toGregorianCalendar().getTime());
+					notificaHelper.notificacioEnviar(notificacioEntity.getId());
+					notificacioEntity = notificacioRepository.findById(notificacioEntity.getId());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				//Regweb3 + Notifica
-//				try {
-//					pluginHelper.registrarSortida(
-//							pluginHelper.notificacioToRegistreAnotacioV2(notificacioEntity), 
-//							"NOTIB", 
-//							aplicacioService.getVersioActual());
-//				} catch (RegistrePluginException e) {
-//					throw new ValidationException(
-//							"REGISTRE_SORTIDA",
-//							"No s'ha pogut registrar la sortida: " + e.getMessage());
-//				}
-				notificaHelper.notificacioEnviar(notificacioEntity.getId());
-				notificacioEntity = notificacioRepository.findById(notificacioEntity.getId());
 			}
 		}
 

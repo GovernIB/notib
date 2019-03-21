@@ -7,6 +7,7 @@ package es.caib.notib.war.controller;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -261,18 +262,25 @@ public class NotificacioController extends BaseUserController {
 				document.setArxiuNom(notificacioCommand.getArxiu().getOriginalFilename());
 				document.setNormalitzat(notificacioCommand.getDocument().isNormalitzat());
 				document.setContingutBase64(notificacioCommand.getArxiu().getBytes());
+				document.setMetadades(notificacioCommand.getDocument().getMetadades());
 			}
 			break;
 		case CSV:
-			if (notificacioCommand.getDocumentArxiuUuidCsv() != null
-					&& !notificacioCommand.getDocumentArxiuUuidCsv().isEmpty()) {
-				document.setCsv(notificacioCommand.getDocumentArxiuUuidCsv());
+			if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
+					&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
+				document.setCsv(notificacioCommand.getDocumentArxiuUuidCsvUrl());
 			}
 			break;
 		case UUID:
-			if (notificacioCommand.getDocumentArxiuUuidCsv() != null
-					&& !notificacioCommand.getDocumentArxiuUuidCsv().isEmpty()) {
-				document.setUuid(notificacioCommand.getDocumentArxiuUuidCsv());
+			if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
+					&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
+				document.setUuid(notificacioCommand.getDocumentArxiuUuidCsvUrl());
+			}
+			break;
+		case URL:
+			if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
+					&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
+				document.setUrl(notificacioCommand.getDocumentArxiuUuidCsvUrl());
 			}
 			break;
 		}

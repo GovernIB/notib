@@ -31,9 +31,6 @@
 			<div class="col-md-2">
 				<not:inputText name="nom" inline="true" placeholderKey="procediment.list.columna.nom"/>
 			</div>
-			<div class="col-md-2">
-				<not:inputText name="codisia" inline="true" placeholderKey="procediment.list.columna.codisia"/>
-			</div>
 			<div class="col-md-3 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -58,7 +55,6 @@
 			<tr>
 				<th data-col-name="codi"><spring:message code="procediment.list.columna.codi"/></th>
 				<th data-col-name="nom"><spring:message code="procediment.list.columna.nom"/></th>
-				<th data-col-name="codisia"><spring:message code="procediment.list.columna.codisia"/></th>
 				<th data-col-name="entitat.nom"><spring:message code="procediment.list.columna.entitat"/></th>
 				<th data-col-name="pagadorpostal.dir3codi"><spring:message code="procediment.list.columna.pagadorpostal"/></th>
 				<th data-col-name="pagadorcie.dir3codi"><spring:message code="procediment.list.columna.pagadorcie"/></th>
@@ -83,7 +79,7 @@
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}" data-toggle="modal" data-maximized="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="pagadorpostal.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
 						</div>
@@ -94,7 +90,7 @@
 	</table>
 	
 	<script id="botonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a id="procediment-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}procediment/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="procediment.list.boto.nou.procediment"/></a></p>
+		<p style="text-align:right"><a id="procediment-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}procediment/new" data-toggle="modal" data-maximized="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="procediment.list.boto.nou.procediment"/></a></p>
 	</script>
 	
 </body>

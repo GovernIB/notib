@@ -1,14 +1,14 @@
 package es.caib.notib.war.command;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
+
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorPostalDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.TipusAssumpteEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
 /**
@@ -20,17 +20,13 @@ import es.caib.notib.war.helper.ConversioTipusHelper;
 public class ProcedimentCommand {
 	
 	private Long id;
-	@NotEmpty @Size(max=64)
+	@NotEmpty @Size(max=6)
 	private String codi;
 	@NotEmpty @Size(max=100)
 	private String nom;
-	@NotEmpty @Size(max=64)
-	private String codisia;
 	private Long entitatId;
 	private String entitatNom;
-	@NotNull
 	private Long pagadorPostalId;
-	@NotNull
 	private Long pagadorCieId;	
 	private boolean agrupar;
 	private boolean consulta;
@@ -42,7 +38,8 @@ public class ProcedimentCommand {
 	private String oficina;
 	@NotEmpty @Size(max=64)
 	private String llibre;
-	private TipusAssumpteEnumDto tipusAssumpte;
+	private String tipusAssumpte;
+	private String codiAssumpte;
 	
 	public Long getId() {
 		return id;
@@ -61,12 +58,6 @@ public class ProcedimentCommand {
 	}
 	public void setNom(String nom) {
 		this.nom = nom;
-	}
-	public String getCodisia() {
-		return codisia;
-	}
-	public void setCodisia(String codisia) {
-		this.codisia = codisia;
 	}
 	public boolean isAgrupar() {
 		return agrupar;
@@ -134,17 +125,23 @@ public class ProcedimentCommand {
 	public String getLlibre() {
 		return llibre;
 	}
-	public TipusAssumpteEnumDto getTipusAssumpte() {
-		return tipusAssumpte;
-	}
 	public void setOficina(String oficina) {
 		this.oficina = oficina;
 	}
 	public void setLlibre(String llibre) {
 		this.llibre = llibre;
 	}
-	public void setTipusAssumpte(TipusAssumpteEnumDto tipusAssumpte) {
+	public String getTipusAssumpte() {
+		return tipusAssumpte;
+	}
+	public void setTipusAssumpte(String tipusAssumpte) {
 		this.tipusAssumpte = tipusAssumpte;
+	}
+	public String getCodiAssumpte() {
+		return codiAssumpte;
+	}
+	public void setCodiAssumpte(String codiAssumpte) {
+		this.codiAssumpte = codiAssumpte;
 	}
 	
 	public static ProcedimentCommand asCommand(ProcedimentDto dto) {

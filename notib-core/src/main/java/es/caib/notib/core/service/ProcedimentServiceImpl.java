@@ -13,6 +13,7 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.notib.core.api.dto.CodiAssumpteDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
@@ -20,9 +21,14 @@ import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.TipusAssumpteDto;
+import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.exception.RegistrePluginException;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.api.ws.registre.CodiAssumpte;
+import es.caib.notib.core.api.ws.registre.TipusAssumpte;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.GrupProcedimentEntity;
@@ -33,6 +39,7 @@ import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PermisosHelper;
+import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.ProcedimentHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.GrupProcedimentRepository;
@@ -68,6 +75,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private EntitatRepository entitatRepository;
 	@Resource
 	private GrupProcedimentRepository grupProcedimentRepository;
+	@Resource
+	private PluginHelper pluginHelper;
 	
 	@Override
 	public ProcedimentDto create(
@@ -89,7 +98,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				ProcedimentEntity.getBuilder(
 						procediment.getCodi(),
 						procediment.getNom(),
-						procediment.getCodisia(),
 						procediment.getRetard(),
 						entitat,
 						pagadorPostal,
@@ -97,7 +105,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						procediment.isAgrupar(),
 						procediment.getLlibre(),
 						procediment.getOficina(),
-						procediment.getTipusAssumpte()).build());
+						procediment.getTipusAssumpte(),
+						procediment.getCodiAssumpte()).build());
 		
 		return conversioTipusHelper.convertir(
 				procedimentEntity, 
@@ -142,7 +151,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		procedimentEntity.update(
 					procediment.getCodi(),
 					procediment.getNom(),
-					procediment.getCodisia(),
 					entitat,
 					pagadorPostalEntity,
 					pagadorCieEntity,
@@ -150,7 +158,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					procediment.isAgrupar(),
 					procediment.getLlibre(),
 					procediment.getOficina(),
-					procediment.getTipusAssumpte());
+					procediment.getTipusAssumpte(),
+					procediment.getCodiAssumpte());
 		
 		procedimentRepository.save(procedimentEntity);
 			
@@ -279,8 +288,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						filtre.getCodi() == null ? "" : filtre.getCodi(),
 						filtre.getNom() == null || filtre.getNom().isEmpty(),
 						filtre.getNom() == null ? "" : filtre.getNom(),
-						filtre.getCodisia() == null || filtre.getCodisia().isEmpty(),
-						filtre.getCodisia() == null ? "" : filtre.getCodisia(),
 						pageable);
 				
 				procedimentsPage = paginacioHelper.toPaginaDto(
@@ -295,8 +302,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						filtre.getCodi() == null ? "" : filtre.getCodi(),
 						filtre.getNom() == null || filtre.getNom().isEmpty(),
 						filtre.getNom() == null ? "" : filtre.getNom(),
-						filtre.getCodisia() == null || filtre.getCodisia().isEmpty(),
-						filtre.getCodisia() == null ? "" : filtre.getCodisia(),
 						pageable);
 				
 				procedimentsPage =  paginacioHelper.toPaginaDto(
@@ -528,9 +533,60 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				ProcedimentEntity.class,
 				permisId);
 	}
-	
-	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
 
+	@Override
+	public List<TipusAssumpteDto> findTipusAssumpte(EntitatDto entitat) {
+		List<TipusAssumpteDto> tipusAssumpte = new ArrayList<TipusAssumpteDto>();
+	
+		try {
+			List<TipusAssumpte> tipusAssumpteRegistre = pluginHelper.llistarTipusAssumpte(entitat.getDir3Codi());
+			
+			if (tipusAssumpteRegistre != null)
+				for (TipusAssumpte assumpteRegistre : tipusAssumpteRegistre) {
+					TipusAssumpteDto assumpte = new TipusAssumpteDto();
+					assumpte.setCodi(assumpteRegistre.getCodi());
+					assumpte.setNom(assumpteRegistre.getNom());
+					
+					tipusAssumpte.add(assumpte);
+				}
+		} catch (RegistrePluginException e) {
+			String errorMessage = "No s'han pogut recuperar els codis d'assumpte de l'entitat: " + entitat.getDir3Codi();
+			logger.error(
+					errorMessage, 
+					e.getMessage());
+		}
+		return tipusAssumpte;
+	}
+
+	@Override
+	public List<CodiAssumpteDto> findCodisAssumpte(
+			EntitatDto entitat,
+			String codiTipusAssumpte) {
+		List<CodiAssumpteDto> codiAssumpte = new ArrayList<CodiAssumpteDto>();
+		
+		try {
+			List<CodiAssumpte> tipusAssumpteRegistre = pluginHelper.llistarCodisAssumpte(
+					entitat.getDir3Codi(),
+					codiTipusAssumpte);
+			
+			if (tipusAssumpteRegistre != null)
+				for (CodiAssumpte assumpteRegistre : tipusAssumpteRegistre) {
+					CodiAssumpteDto assumpte = new CodiAssumpteDto();
+					assumpte.setCodi(assumpteRegistre.getCodi());
+					assumpte.setNom(assumpteRegistre.getNom());
+					assumpte.setTipusAssumpte(assumpteRegistre.getTipusAssumpte());
+					
+					codiAssumpte.add(assumpte);
+				}
+		} catch (RegistrePluginException e) {
+			String errorMessage = "No s'han pogut recuperar els codis d'assumpte del tipus d'assumpte: " + codiTipusAssumpte;
+			logger.error(
+					errorMessage, 
+					e.getMessage());
+		}
+		return codiAssumpte;
+	}
+	
 	@Override
 	public boolean hasPermisConsultaProcediment(EntitatDto entitat) {
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
@@ -634,5 +690,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		
 		return (resposta.isEmpty()) ? false : true;
 	}
+
+	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
 
 }

@@ -777,7 +777,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				String registreOficina,
 				String registreLlibre,
 				String registreNumero,
-				Date registreDate,
+				Date registreData,
 				String extracte,
 				String docFisica,
 				String idioma,
@@ -805,7 +805,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.registreOficina = registreOficina;
 			built.registreLlibre = registreLlibre;
 			built.registreNumero = registreNumero;
-			built.registreData = registreDate;
+			built.registreData = registreData;
 			built.registreExtracte = extracte;
 			built.registreDocFisica = docFisica;
 			built.registreIdioma = idioma;
@@ -814,7 +814,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.registreRefExterna = referenciaExterna;
 			built.registreCodiAssumpte = codiAssumpte;
 			built.registreObservacions = observacions;
-			built.registreOrgan = entitat.getCodi();
+			built.registreOrgan = entitat.getDir3Codi();
 
 			built.estat = NotificacioEstatEnumDto.PENDENT;
 			built.notificaEnviamentIntent = 0;

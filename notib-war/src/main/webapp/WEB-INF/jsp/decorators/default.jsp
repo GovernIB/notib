@@ -173,7 +173,7 @@ body {
 							
 								<c:if test="${permisNotificacio}">
 									<div class="btn-group">
-										<a data-toggle="modal" data-maximized="true" class="btn btn-primary" href="<c:url value="/notificacio/procediments"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.altanotificacio"/></a>
+										<a data-toggle="modal" class="btn btn-primary" href="<c:url value="/notificacio/procediments"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.altanotificacio"/></a>
 									</div>
 								</c:if>
 									<div class="btn-group">

@@ -14,7 +14,8 @@ public enum TipusDocumentEnumDto implements Serializable {
 
 	UUID("UUID"),
 	CSV("CSV"),
-	ARXIU("ARXIU");
+	ARXIU("ARXIU"),
+	URL("URL");
 	
 
 	private final String text;
