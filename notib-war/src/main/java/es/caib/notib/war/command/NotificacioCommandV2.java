@@ -8,8 +8,8 @@ import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +21,6 @@ import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
-import es.caib.notib.core.api.dto.TipusAssumpteEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
@@ -49,14 +48,14 @@ public class NotificacioCommandV2 {
 	private String procedimentNom;
 	private Long grupId;
 	private TipusDocumentEnumDto tipusDocument;
-	private String documentArxiuUuidCsv;
+	private String documentArxiuUuidCsvUrl;
 	private MultipartFile arxiu;
 	private String oficina;
 	private String llibre;
 	private String extracte;
 	private String docFisica;
 	private String idioma;
-	private TipusAssumpteEnumDto tipusAssumpte;
+	private String tipusAssumpte;
 	private String numExpedient;
 	private String refExterna;
 	private String codiAssumpte;
@@ -104,11 +103,11 @@ public class NotificacioCommandV2 {
 	public void setArxiu(MultipartFile arxiu) {
 		this.arxiu = arxiu;
 	}
-	public String getDocumentArxiuUuidCsv() {
-		return documentArxiuUuidCsv;
+	public String getDocumentArxiuUuidCsvUrl() {
+		return documentArxiuUuidCsvUrl;
 	}
-	public void setDocumentArxiuUuidCsv(String documentArxiuUuidCsv) {
-		this.documentArxiuUuidCsv = documentArxiuUuidCsv;
+	public void setDocumentArxiuUuidCsvUrl(String documentArxiuUuidCsvUrl) {
+		this.documentArxiuUuidCsvUrl = documentArxiuUuidCsvUrl;
 	}
 	public String getEmisorDir3Codi() {
 		return emisorDir3Codi;
@@ -215,7 +214,7 @@ public class NotificacioCommandV2 {
 	public String getIdioma() {
 		return idioma;
 	}
-	public TipusAssumpteEnumDto getTipusAssumpte() {
+	public String getTipusAssumpte() {
 		return tipusAssumpte;
 	}
 	public String getNumExpedient() {
@@ -239,7 +238,7 @@ public class NotificacioCommandV2 {
 	public void setIdioma(String idioma) {
 		this.idioma = idioma;
 	}
-	public void setTipusAssumpte(TipusAssumpteEnumDto tipusAssumpte) {
+	public void setTipusAssumpte(String tipusAssumpte) {
 		this.tipusAssumpte = tipusAssumpte;
 	}
 	public void setNumExpedient(String numeroExpedient) {

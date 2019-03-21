@@ -31,9 +31,6 @@
 			<div class="col-md-3">
 				<not:inputText name="nom" textKey="procediment.form.camp.nom"/>
 			</div>
-			<div class="col-md-2">
-				<not:inputText name="codisia" textKey="procediment.form.camp.codisia"/>
-			</div>
 			<c:choose>
 			  <c:when test="${entitats != null}">
 			    <div class="col-md-2">

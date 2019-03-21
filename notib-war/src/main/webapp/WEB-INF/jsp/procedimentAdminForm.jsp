@@ -29,8 +29,70 @@
 	<not:modalHead/>
 <script type="text/javascript">
 $(document).ready(function() {
-	$('#tipusAssumpte').change(function(){
-		webutilModalAdjustHeight();
+	$('#entitatId').change(function(value){
+		var entitatId = $(this).val();
+		
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value="/procediment/tipusAssumpte/"/>" + entitatId,
+			success: function(data) {
+				var selTipusAssumpte = $('#tipusAssumpte');
+				var selCodiAssumpte = $('#codiAssumpte');
+				selTipusAssumpte.empty();
+				selTipusAssumpte.append("<option value=\"\"></option>");
+				selCodiAssumpte.empty();
+				selCodiAssumpte.append("<option value=\"\"></option>");
+				if (data && data.length > 0) {
+						var items = [];
+						$.each(data, function(i, val) {
+							items.push({
+								"id": val.codi,
+								"text": val.nom
+							});
+							selTipusAssumpte.append("<option value=\"" + val.codi + "\">" + val.nom + "</option>");
+						});
+					}
+				var select2Options = {theme: 'bootstrap'};
+				selTipusAssumpte.select2("destroy");
+				selTipusAssumpte.select2(select2Options);
+				selCodiAssumpte.select2("destroy");
+				selCodiAssumpte.select2(select2Options);
+			},
+			error: function() {
+				console.log("error obtenint els codis d'assumpte..");
+			}
+		});
+	});
+	
+	$('#tipusAssumpte').change(function(value){
+		var codiTipusAssumpte = $(this).val();
+		var entitatId = $('#entitatId').val();
+		
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value="/procediment/codiAssumpte/"/>" + entitatId + "/" + codiTipusAssumpte,
+			success: function(data) {
+				var selCodiAssumpte = $('#codiAssumpte');
+				selCodiAssumpte.empty();
+				selCodiAssumpte.append("<option value=\"\"></option>");
+				if (data && data.length > 0) {
+						var items = [];
+						$.each(data, function(i, val) {
+							items.push({
+								"id": val.codi,
+								"text": val.nom
+							});
+							selCodiAssumpte.append("<option value=\"" + val.codi + "\">" + val.nom + "</option>");
+						});
+					}
+				var select2Options = {theme: 'bootstrap'};
+				selCodiAssumpte.select2("destroy");
+				selCodiAssumpte.select2(select2Options);
+			},
+			error: function() {
+				console.log("error obtenint els codis d'assumpte..");
+			}
+		});
 	});
 });
 </script>
@@ -41,7 +103,7 @@ $(document).ready(function() {
 		<c:if test="${error.field == 'llibre' || error.field == 'oficina'}">
 			<c:set var="errorsRegistre" value="${error.field}"></c:set>
 		</c:if>
-		<c:if test="${error.field == 'codi' || error.field == 'nom' || error.field == 'codisia'}">
+		<c:if test="${error.field == 'codi' || error.field == 'nom'}">
 			<c:set var="errorsProc" value="${error.field}"></c:set>
 		</c:if>
 	</c:forEach>
@@ -54,28 +116,27 @@ $(document).ready(function() {
 		<br>
 		<div class="tab-content">
 			<div role="tabpanel" class="tab-pane active" id="dadesgeneralsForm">
-				<not:inputText name="codi" textKey="procediment.form.camp.codi" required="true"/>
-				<not:inputText name="nom" textKey="procediment.form.camp.nom" required="true"/>
-				<not:inputText name="codisia" textKey="procediment.form.camp.codisia" required="true"/>
-				<not:inputText name="retard" textKey="notificacio.form.camp.retard"/>
+				<not:inputText name="codi" textKey="procediment.form.camp.codi" required="true" labelSize="2"/>
+				<not:inputText name="nom" textKey="procediment.form.camp.nom" required="true" labelSize="2"/>
+				<not:inputText name="retard" textKey="notificacio.form.camp.retard" labelSize="2"/>
 				<c:choose>
 				  <c:when test="${entitats != null}">
-						<not:inputSelect name="entitatId" textKey="procediment.form.camp.entitat" optionItems="${entitats}" optionValueAttribute="id" optionTextAttribute="nom" required="true"/>
+						<not:inputSelect name="entitatId" textKey="procediment.form.camp.entitat" optionItems="${entitats}" optionValueAttribute="id" optionTextAttribute="nom" required="true" labelSize="2"/>
 				  </c:when>
 				  <c:otherwise>
 				    	<form:hidden path="entitatId" value="${entitat.id}"/>
-						<not:inputText name="entitatNom" textKey="procediment.form.camp.entitat" value="${entitat.nom}" required="true" readonly="true"/>
+						<not:inputText name="entitatNom" textKey="procediment.form.camp.entitat" value="${entitat.nom}" required="true" readonly="true" labelSize="2"/>
 				  </c:otherwise>
 				</c:choose>
-				<not:inputSelect name="pagadorPostalId" textKey="procediment.form.camp.postal" optionItems="${pagadorsPostal}" optionValueAttribute="id" optionTextAttribute="dir3codi" required="true"/>
-				<not:inputSelect name="pagadorCieId" textKey="procediment.form.camp.cie" optionItems="${pagadorsCie}" optionValueAttribute="id" optionTextAttribute="dir3codi" required="true"/>
-				<not:inputCheckbox name="agrupar" textKey="procediment.form.camp.agrupar"/>
-				
+				<not:inputSelect name="pagadorPostalId" emptyOption="true" textKey="procediment.form.camp.postal" optionItems="${pagadorsPostal}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>
+				<not:inputSelect name="pagadorCieId" emptyOption="true" textKey="procediment.form.camp.cie" optionItems="${pagadorsCie}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>
+				<not:inputCheckbox name="agrupar" textKey="procediment.form.camp.agrupar" labelSize="2"/>
 			</div>
 			<div role="tabpanel" class="tab-pane <c:if test='${not empty errorRegistre}'>active</c:if>"" id="registreForm">
-				<not:inputText name="llibre" textKey="procediment.form.camp.llibre" required="true"/>
-				<not:inputText name="oficina" textKey="procediment.form.camp.oficina" required="true"/>
-				<not:inputSelect name="tipusAssumpte" textKey="procediment.form.camp.tipusassumpte" optionItems="${tipusAssumpteEnum}"  optionValueAttribute="value" optionTextKeyAttribute="text"/>
+				<not:inputText name="llibre" textKey="procediment.form.camp.llibre" required="true" labelSize="2"/>
+				<not:inputText name="oficina" textKey="procediment.form.camp.oficina" required="true" labelSize="2"/>
+				<not:inputSelect name="tipusAssumpte" id="tipusAssumpte" textKey="procediment.form.camp.tipusassumpte" optionItems="${tipusAssumpte}"  optionValueAttribute="codi" optionTextAttribute="nom" labelSize="2"/>
+				<not:inputSelect name="codiAssumpte" id="codiAssumpte" textKey="procediment.form.camp.codiassumpte" optionItems="${codiAssumpte}"  optionValueAttribute="codi" optionTextAttribute="nom" labelSize="2"/>
 			</div>
 		</div>
 		<div id="modal-botons">

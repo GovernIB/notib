@@ -28,7 +28,6 @@ public class NotificacioDto extends AuditoriaDto {
 	private Date pagadorCorreusDataVigencia;
 	private String pagadorCieCodiDir3;
 	private Date pagadorCieDataVigencia;
-	private String procedimentCodiSia;
 	private String procedimentDescripcioSia;
 	private String documentArxiuNom;
 	private String documentArxiuId;
@@ -135,12 +134,6 @@ public class NotificacioDto extends AuditoriaDto {
 	}
 	public void setPagadorCieDataVigencia(Date pagadorCieDataVigencia) {
 		this.pagadorCieDataVigencia = pagadorCieDataVigencia;
-	}
-	public String getProcedimentCodiSia() {
-		return procedimentCodiSia;
-	}
-	public void setProcedimentCodiSia(String procedimentCodiSia) {
-		this.procedimentCodiSia = procedimentCodiSia;
 	}
 	public String getProcedimentDescripcioSia() {
 		return procedimentDescripcioSia;

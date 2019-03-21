@@ -4,6 +4,7 @@
 <%@ attribute name="name" required="true" rtexprvalue="true"%>
 <%@ attribute name="required" required="false" rtexprvalue="true"%>
 <%@ attribute name="text" required="false" rtexprvalue="true"%>
+<%@ attribute name="orientacio" required="false" rtexprvalue="true"%>
 <%@ attribute name="textKey" required="false" rtexprvalue="true"%>
 <%@ attribute name="placeholder" required="false" rtexprvalue="true"%>
 <%@ attribute name="placeholderKey" required="false" rtexprvalue="true"%>
@@ -20,11 +21,19 @@
 <c:set var="campInputSize">${12 - campLabelSize}</c:set>
 <div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>"<c:if test="${multiple}"> data-toggle="multifield"</c:if>>
 <c:choose>
+   <c:when test="${not empty orientacio}">
+   	<c:set value="${orientacio}" var="orientacio"></c:set>
+   </c:when>
+   <c:otherwise>
+    <c:set value="auto" var="orientacio"></c:set>
+   </c:otherwise>
+</c:choose>
+<c:choose>
 	<c:when test="${not inline}">
 		<label class="control-label col-xs-${campLabelSize}" for="${campPath}">${campLabelText}</label>
 		<div class="col-xs-${campInputSize}">
 			<div class="input-group" style="width:100%">
-				<form:input path="${campPath}" cssClass="form-control datepicker" id="${campPath}" disabled="${disabled}" data-toggle="datepicker" data-idioma="${idioma}"/>
+				<form:input path="${campPath}" cssClass="form-control datepicker" id="${campPath}" disabled="${disabled}" data-toggle="datepicker" data-idioma="${idioma}" data-orientacio="${orientacio}"/>
 				<span class="input-group-addon" style="width:1%"><span class="fa fa-calendar"></span></span>
 			</div>
 			<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
@@ -33,7 +42,7 @@
 	<c:otherwise>
 		<label class="sr-only" for="${campPath}">${campLabelText}</label>
 		<div class="input-group">
-			<form:input path="${campPath}" cssClass="form-control datepicker" id="${campPath}" placeholder="${campPlaceholder}" disabled="${disabled}" data-toggle="datepicker" data-idioma="${idioma}"/>
+			<form:input path="${campPath}" cssClass="form-control datepicker classe" id="${campPath}" placeholder="${campPlaceholder}" disabled="${disabled}" data-toggle="datepicker" data-idioma="${idioma}" data-orientacio="bottom"/>
 			<span class="input-group-addon" style="width:auto"><span class="fa fa-calendar"></span></span>
 		</div>
 	</c:otherwise>

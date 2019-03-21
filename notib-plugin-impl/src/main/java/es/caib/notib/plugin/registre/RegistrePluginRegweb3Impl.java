@@ -627,7 +627,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 				CodiAssumpte codiAssumpte = new CodiAssumpte();
 				codiAssumpte.setCodi(codigoAsunto.getCodigo());
 				codiAssumpte.setNom(codigoAsunto.getNombre());
-				codiAssumpte.setTipusAssumpte(codigoAsunto.getTipoAsunto().getCodigo());
+				if (codigoAsunto.getTipoAsunto() != null)
+					codiAssumpte.setTipusAssumpte(codigoAsunto.getTipoAsunto().getCodigo());
+				
 				codiAssumptes.add(codiAssumpte);
 			}
 			

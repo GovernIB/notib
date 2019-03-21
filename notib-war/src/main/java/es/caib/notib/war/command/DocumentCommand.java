@@ -3,6 +3,7 @@
  */
 package es.caib.notib.war.command;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import es.caib.notib.core.api.dto.DocumentDto;
@@ -19,7 +20,7 @@ public class DocumentCommand {
 	private byte[] contingutBase64;
 	private String hash;
 	private String url;
-	private List<String> metadades;
+	private List<String> metadades = new ArrayList<String>();
 	private boolean normalitzat;
 	private boolean generarCsv;
 	private String csv;

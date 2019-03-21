@@ -131,8 +131,8 @@
 						</tr>
 						<tr>
 							<td><strong><spring:message
-										code="notificacio.info.dada.procediment.sia" /></strong></td>
-							<td>(${notificacio.procediment.codisia})</td>
+										code="notificacio.info.dada.procediment.codi" /></strong></td>
+							<td>(${notificacio.procediment.codi})</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message

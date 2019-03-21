@@ -1332,19 +1332,19 @@ public class PluginHelper {
 	}
 
 	
-	public List<TipusAssumpte> llistarTipusAssumpte() throws RegistrePluginException {
+	public List<TipusAssumpte> llistarTipusAssumpte(String entitatCodi) throws RegistrePluginException {
 		
-		List<TipusAssumpte> tipusAssumptes = getRegistrePluginRegWeb3().llistarTipusAssumpte(
-				getPropertyPluginCodiEntitatDir3());
+		List<TipusAssumpte> tipusAssumptes = getRegistrePluginRegWeb3().llistarTipusAssumpte(entitatCodi);
 		
 		return tipusAssumptes;
 	}
 
 	public List<CodiAssumpte> llistarCodisAssumpte(
+			String entitatcodi,
 			String tipusAssumpte) throws RegistrePluginException {
 		
 		List<CodiAssumpte> assumptes = getRegistrePluginRegWeb3().llistarCodisAssumpte(
-				getPropertyPluginCodiEntitatDir3(), 
+				entitatcodi, 
 				tipusAssumpte);
 
 		return assumptes;

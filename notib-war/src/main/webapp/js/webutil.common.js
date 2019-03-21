@@ -370,7 +370,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 			format: 'dd/mm/yyyy',
 			weekStart: 1,
 			autoclose: true,
-			orientation: 'auto',
+			orientation: $(this).data('orientacio'),
 			language: $(this).data('idioma')
 		}).on('show', function() {
 			webutilModalAdjustHeight();

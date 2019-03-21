@@ -52,14 +52,18 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
-
+    var destinatariForm = $('.destinatariForm');
     $('.nextForm').click(function(){
         $('.nav-tabs > .active').next('li').find('a').trigger('click');
     });
+	
+    $('#concepte').on('input',function(e){
+    	 $('#extracte').val($(this).val());
+    });
 
-
-    var destinatariForm = $('.destinatariForm');
-
+    $('#caducitat').datepicker({
+        orientation: 'auto top'
+    });
     destinatariForm.find('input').each(function() {
         if($(this).val().length > 0) {
             $(destinatariForm).removeClass('hidden');
@@ -97,7 +101,7 @@ $(document).ready(function() {
                 "<label class='control-label col-xs-2'></label>" +
                 "<div class='col-xs-10'>" +
                     "<div class='input-group'>" +
-                    "<input name='metadades' id='metadades' type='text' class='form-control add grupVal_" + count + "' readonly/>" +
+                    "<input name='document.metadades' id='document.metadades' type='text' class='form-control add grupVal_" + count + "' readonly/>" +
                     "<span class='input-group-addon' id='remove'><span class='fa fa-remove'></span></span>" +
                     "</div>" +
                 "</div>" +
@@ -110,9 +114,23 @@ $(document).ready(function() {
             $("#list").find("#remove").addClass("grupVal_" + count);
             count++;
         }
-
         webutilModalAdjustHeight();
     });
+  	//Eliminar grups
+	$(document).on('click', "#remove", function () {
+		var grupId = $(this).parent().children().attr('id'); 
+		var grupsClass = $(this).attr('class'); 
+		var lastClass = grupsClass.split(' ').pop();
+		var parentRemove = $("." + lastClass).parent();
+		var parentInput = parentRemove.parent();
+		var parentDiv = parentInput.parent();
+		
+		parentDiv.slideUp("normal", function() {
+			$(this).remove(); 
+			webutilModalAdjustHeight();
+		});
+			
+	});
 });
 
 function addDestinatari(enviament_id) {
@@ -176,13 +194,13 @@ function addEnv() {
     });
     $(enviamentForm).find('p').remove();
     $(enviamentForm).find('div').removeClass('has-error');
-$(enviamentForm).appendTo(".newEnviament").slideDown("slow").find("input[type='text']").val("");
+	$(enviamentForm).appendTo(".newEnviament").slideDown("slow").find("input[type='text']").val("");
 
     if($(enviamentForm).find('.eliminar_enviament').attr('id') != 'enviamentDelete[0]') {
-$(enviamentForm).find('.eliminar_enviament').removeClass('hidden');
+	$(enviamentForm).find('.eliminar_enviament').removeClass('hidden');
     }
     var newDestinatariForm = $('.newDestinatari_' + number + ':last');
-newDestinatariForm.removeClass('newDestinatari_'+number).addClass('newDestinatari_'+num);
+	newDestinatariForm.removeClass('newDestinatari_'+number).addClass('newDestinatari_'+num);
 
     $('.newDestinatari_' + num).children('div').each(function (i) {
 
@@ -193,7 +211,7 @@ newDestinatariForm.removeClass('newDestinatari_'+number).addClass('newDestinatar
         enviamentForm.removeClass('enviamentForm_' + number).addClass('enviamentForm_' + num);
 
         var entregaPostal = $('.entregaPostal_'+number + ':last');
-entregaPostal.removeClass('entregaPostal_'+number).addClass('entregaPostal_'+num);
+	entregaPostal.removeClass('entregaPostal_'+number).addClass('entregaPostal_'+num);
 
         if (i === 0){
             $(this).addClass('hidden');
@@ -310,7 +328,7 @@ function mostrarEntregaPostal(className) {
                         <not:inputSelect name="tipusDocument" textKey="notificacio.form.camp.codiemisor" labelSize="4"/>
                     </div>
                     <div id="input-origen-csvuuid" class="col-md-6">
-                        <not:inputText name="documentArxiuUuidCsv" textKey="notificacio.form.camp.csvuuid" labelSize="3"/>
+                        <not:inputText name="documentArxiuUuidCsvUrl" textKey="notificacio.form.camp.csvuuid" labelSize="3"/>
                     </div>
                     <div id="input-origen-arxiu" class="col-md-6 hidden" >
                         <not:inputFile  name="arxiu" textKey="notificacio.form.camp.arxiu" labelSize="3"/>
@@ -332,10 +350,10 @@ function mostrarEntregaPostal(className) {
             <div role="tabpanel" class="tab-pane" id="parametresregistreForm">
                 <div class="row parametresregistreForm">
                     <div class="col-md-6">
-                        <not:inputText name="oficina" value="${procediment.oficina}" textKey="notificacio.form.camp.oficina" labelSize="4" readonly="true"/>
+                        <not:inputText name="oficina" value="${procediment.oficina}" textKey="notificacio.form.camp.oficina" labelSize="4"/>
                     </div>
                     <div class="col-md-6">
-                        <not:inputText name="llibre" value="${procediment.llibre}" textKey="notificacio.form.camp.llibre" labelSize="4" readonly="true"/>
+                        <not:inputText name="llibre" value="${procediment.llibre}" textKey="notificacio.form.camp.llibre" labelSize="4"/>
                     </div>
                     <div class="col-md-6">
                         <not:inputText name="extracte" textKey="notificacio.form.camp.extracte" labelSize="4"/>
@@ -346,8 +364,16 @@ function mostrarEntregaPostal(className) {
                     <div class="col-md-6">
                         <not:inputText name="idioma" textKey="notificacio.form.camp.idioma" labelSize="4"/>
                     </div>
+                    <c:choose>
+						<c:when test = "${not empty procediment.tipusAssumpte}"> 
+						  <c:set value="${procediment.tipusAssumpte}" var="tipusAssumpte"></c:set>
+						</c:when>
+						<c:otherwise> 
+						  <c:set value="" var="tipusAssumpte"></c:set>
+						</c:otherwise>
+					</c:choose>
                     <div class="col-md-6">
-                        <not:inputText name="tipusAssumpte" value="${procediment.tipusAssumpte}" textKey="notificacio.form.camp.tipus" labelSize="4" readonly="true"/>
+                        <not:inputText name="tipusAssumpte" value="${tipusAssumpte}" textKey="notificacio.form.camp.tipus" labelSize="4"/>
                     </div>
                     <div class="col-md-6">
                         <not:inputText name="numExpedient" textKey="notificacio.form.camp.expedient" labelSize="4"/>
@@ -355,8 +381,16 @@ function mostrarEntregaPostal(className) {
                     <div class="col-md-6">
                         <not:inputText name="refExterna" textKey="notificacio.form.camp.externa" labelSize="4"/>
                     </div>
+                    <c:choose>
+						<c:when test = "${not empty procediment.codiAssumpte}"> 
+						  <c:set value="${procediment.codiAssumpte}" var="codiAssumpte"></c:set>
+						</c:when>
+						<c:otherwise> 
+						  <c:set value="" var="codiAssumpte"></c:set>
+						</c:otherwise>
+					</c:choose>
                     <div class="col-md-6">
-                        <not:inputText name="codiAssumpte" textKey="notificacio.form.camp.codi" labelSize="4"/>
+                        <not:inputText name="codiAssumpte" value="${codiAssumpte}" textKey="notificacio.form.camp.codi" labelSize="4"/>
                     </div>
                     <div class="col-md-12">
                         <not:inputTextarea name="observacions" textKey="notificacio.form.camp.observacions" labelSize="2"/>
@@ -386,7 +420,7 @@ function mostrarEntregaPostal(className) {
                             <not:inputSelect name="enviaments[${j}].serveiTipus" textKey="notificacio.form.camp.serveitipus" labelSize="4" required="true" />
                         </div>
                         <div class="col-md-6">
-                            <not:inputDate name="enviaments[${j}].caducitat" textKey="notificacio.form.camp.caducitat" labelSize="4"/>
+                            <not:inputDate name="enviaments[${j}].caducitat" textKey="notificacio.form.camp.caducitat" orientacio="bottom" labelSize="4"/>
                         </div>
                         <div class="titular">
                             <div class="col-md-12">
@@ -445,25 +479,25 @@ function mostrarEntregaPostal(className) {
                                             <input id="amagat" name="enviaments[${j}].destinataris[${i}].visible" class="hidden" value="true">
                                             <div>
                                                 <div class="col-md-6">
-<not:inputText name="enviaments[${j}].destinataris[${i}].nif" textKey="notificacio.form.camp.titular.nif" required="true" />
+													<not:inputText name="enviaments[${j}].destinataris[${i}].nif" textKey="notificacio.form.camp.titular.nif" required="true" />
                                                 </div>
                                                 <div class="col-md-6">
-<not:inputText name="enviaments[${j}].destinataris[${i}].nom" textKey="notificacio.form.camp.titular.nom" required="true" />
+													<not:inputText name="enviaments[${j}].destinataris[${i}].nom" textKey="notificacio.form.camp.titular.nom" required="true" />
                                                 </div>
                                                 <div class="col-md-6">
-<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" />
+													<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" />
                                                 </div>
                                                 <div class="col-md-6">
-<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge2" textKey="notificacio.form.camp.titular.llinatge2" />
+													<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge2" textKey="notificacio.form.camp.titular.llinatge2" />
                                                 </div>
                                                 <div class="col-md-6">
-<not:inputText name="enviaments[${j}].destinataris[${i}].email" textKey="notificacio.form.camp.titular.email" />
+													<not:inputText name="enviaments[${j}].destinataris[${i}].email" textKey="notificacio.form.camp.titular.email" />
                                                 </div>
                                                 <div class="col-md-6">
-<not:inputText name="enviaments[${j}].destinataris[${i}].telefon" textKey="notificacio.form.camp.titular.telefon" />
+													<not:inputText name="enviaments[${j}].destinataris[${i}].telefon" textKey="notificacio.form.camp.titular.telefon" />
                                                 </div>
                                                 <div class="col-md-6">
-<not:inputText name="enviaments[${j}].destinataris[${i}].dir3codi" textKey="notificacio.form.camp.titular.dir3codi" />
+													<not:inputText name="enviaments[${j}].destinataris[${i}].dir3codi" textKey="notificacio.form.camp.titular.dir3codi" />
                                                 </div>
                                                 <div class="col-md-12 text-right">
                                                     <input type="button" class="btn btn-default btn-group delete" name="destinatarisDelete[${j}][${i}]" onclick="destinatarisDelete(this.id)" id="destinatarisDelete[${j}][${i}]" value="<spring:message code="notificacio.form.boto.eliminar.destinatari"/>"/>

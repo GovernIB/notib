@@ -203,8 +203,17 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					notificacio.getCodiProcediment(),
 					procediment,
 					notificacio.getCodiGrup(),
+					notificacio.getEmisorDir3Codi(),
+					notificacio.getRegistreLlibre(),
+					notificacio.getRegistreNumero(),
+					notificacio.getRegistreData(),
+					notificacio.getExtracte(),
+					notificacio.getDocFisica(),
+					notificacio.getIdioma(),
+					notificacio.getTipusAssumpte(),
 					notificacio.getNumExpedient(),
 					notificacio.getRefExterna(),
+					notificacio.getCodiAssumpte(),
 					notificacio.getObservacions()).usuariCodi(usuariActual.getCodi());
 			
 			NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioBuilder.build());
