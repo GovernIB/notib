@@ -9,7 +9,8 @@
 			refreshDatatable: false,
 			elementBotons: "#modal-botons",
 			elementForm: "#modal-form",
-			elementTancarData: "modal-cancel"
+			elementTancarData: "modal-cancel",
+			height: "100%"
 		}
 		var $element = $(element), element = element;
 		var plugin = this;
@@ -71,7 +72,8 @@
 								elementForm: plugin.settings.elementForm,
 								elementTancarData: plugin.settings.elementTancarData,
 								contentUrl: webutilUrlAmbPrefix(href, '/modal'),
-								dataTableId: dataTableId
+								dataTableId: dataTableId,
+								height: plugin.settings.height
 							});
 						} else {
 							$('#' + modalDivId).webutilModalShow({
@@ -82,7 +84,8 @@
 								elementBotons: plugin.settings.elementBotons,
 								elementForm: plugin.settings.elementForm,
 								elementTancarData: plugin.settings.elementTancarData,
-								dataTableId: dataTableId
+								dataTableId: dataTableId,
+								height: plugin.settings.height
 							});
 						}
 					} else {
@@ -115,7 +118,7 @@
 				modalobj.on('show.bs.modal', function () {
 					iframe.empty();
 					if (settings.height)
-						iframe.css('height', '' + settings.height + 'px');
+						iframe.css('height', '' + settings.height);
 					iframe.attr("src", settings.contentUrl);
 					iframe.load(function() {
 						// Copiar el titol de la modal

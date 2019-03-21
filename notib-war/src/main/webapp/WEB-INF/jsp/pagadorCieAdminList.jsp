@@ -66,7 +66,7 @@
 	</table>
 	
 	<script id="botonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a id="pagadorcie-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}pagadorCie/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="pagadorcie.list.boto.nou.pagadorcie"/></a></p>
+		<p style="text-align:right"><a id="pagadorcie-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}pagadorCie/new" data-toggle="modal" data-height="350px"><span class="fa fa-plus"></span>&nbsp;<spring:message code="pagadorcie.list.boto.nou.pagadorcie"/></a></p>
 	</script>
 	
 	

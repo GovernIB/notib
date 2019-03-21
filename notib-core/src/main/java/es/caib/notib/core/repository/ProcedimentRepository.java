@@ -53,8 +53,6 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 	
 	ProcedimentEntity findByCodi(String codi);
 	
-	ProcedimentEntity findByCodisia(String codisia);
-	
 	@Query(
 			"from " +
 			"    ProcedimentEntity pro " +
@@ -74,8 +72,7 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			"    ProcedimentEntity pro " +
 			"where (:isEntitatNull = true or pro.entitat = :entitat) "+ 
 			" and (:isCodiNull = true or pro.codi = :codi)" +
-			" and (:isNomNull = true or pro.nom = :nom) " +
-			" and (:isCodiSiaNull = true or pro.codisia = :codiSia) ")
+			" and (:isNomNull = true or pro.nom = :nom)")
 	public Page<ProcedimentEntity> findByFiltre(
 			@Param("isEntitatNull") boolean isEntitat,
 			@Param("entitat") EntitatEntity entitat,
@@ -83,7 +80,5 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			@Param("codi") String codi,
 			@Param("isNomNull") boolean isNomNull,
 			@Param("nom") String nom,
-			@Param("isCodiSiaNull") boolean isCodiSiaNull,
-			@Param("codiSia") String codiSia,
 			Pageable paginacio);
 }

@@ -9,7 +9,6 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 	private Long id;
 	private String codi;
 	private String nom;
-	private String codisia;
 	private EntitatDto entitat;
 	private PagadorPostalDto pagadorpostal;
 	private PagadorCieDto pagadorcie;
@@ -17,7 +16,8 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 	private List<GrupDto> grups;
 	private String llibre;
 	private String oficina;
-	private TipusAssumpteEnumDto tipusAssumpte;
+	private String tipusAssumpte;
+	private String codiAssumpte;
 	
 	private List<PermisDto> permisos;
 	private boolean usuariActualRead;
@@ -46,12 +46,6 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 	}
 	public void setNom(String nom) {
 		this.nom = nom;
-	}
-	public String getCodisia() {
-		return codisia;
-	}
-	public void setCodisia(String codisia) {
-		this.codisia = codisia;
 	}
 	public boolean isAgrupar() {
 		return agrupar;
@@ -101,8 +95,11 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 	public String getOficina() {
 		return oficina;
 	}
-	public TipusAssumpteEnumDto getTipusAssumpte() {
+	public String getTipusAssumpte() {
 		return tipusAssumpte;
+	}
+	public String getCodiAssumpte() {
+		return codiAssumpte;
 	}
 	public void setLlibre(String llibre) {
 		this.llibre = llibre;
@@ -110,8 +107,11 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 	public void setOficina(String oficina) {
 		this.oficina = oficina;
 	}
-	public void setTipusAssumpte(TipusAssumpteEnumDto tipusAssumpte) {
+	public void setTipusAssumpte(String tipusAssumpte) {
 		this.tipusAssumpte = tipusAssumpte;
+	}
+	public void setCodiAssumpte(String codiAssumpte) {
+		this.codiAssumpte = codiAssumpte;
 	}
 	public List<PermisDto> getPermisos() {
 		return permisos;

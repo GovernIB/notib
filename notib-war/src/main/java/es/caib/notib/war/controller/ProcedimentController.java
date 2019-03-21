@@ -1,7 +1,10 @@
 package es.caib.notib.war.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,10 +13,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import es.caib.notib.core.api.dto.CodiAssumpteDto;
 import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.EntitatService;
@@ -24,8 +28,8 @@ import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.ProcedimentCommand;
 import es.caib.notib.war.command.ProcedimentFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
-import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
 import es.caib.notib.war.helper.RolHelper;
 
@@ -170,22 +174,20 @@ public class ProcedimentController extends BaseUserController{
 			HttpServletRequest request, 
 			@PathVariable Long procedimentId, 
 			Model model) {
-		
-		
 		ProcedimentCommand procedimentCommand;
 		ProcedimentDto procediment = emplenarModelProcediment(
 				request, 
 				procedimentId,
 				model);
-		
-		if (procediment != null) 
+		if (procediment != null) {
 			procedimentCommand = ProcedimentCommand.asCommand(procediment);
-		else
+			procedimentCommand.setEntitatId(procediment.getEntitat().getId());
+			procedimentCommand.setPagadorCieId(procediment.getPagadorcie().getId());
+			procedimentCommand.setPagadorPostalId(procediment.getPagadorpostal().getId());
+		} else {
 			procedimentCommand = new ProcedimentCommand();
-		
-		
+		}
 		model.addAttribute(procedimentCommand);
-
 		return "procedimentAdminForm";
 	}
 	
@@ -229,24 +231,57 @@ public class ProcedimentController extends BaseUserController{
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		ProcedimentDto procediment = null;
 		
-		if (RolHelper.isUsuariActualAdministrador(request))
-			model.addAttribute("entitats", entitatService.findAll());
-		else
-			model.addAttribute("entitat", entitat);
-		
-		model.addAttribute("pagadorsPostal", pagadorPostalService.findAll());
-		model.addAttribute("pagadorsCie", pagadorCieService.findAll());
-		
 		if (procedimentId != null) {
 			procediment = procedimentService.findById(
 					entitat.getId(),
 					isAdministrador(request),
 					procedimentId);
-
 			model.addAttribute(procediment);
+			model.addAttribute("tipusAssumpte", procedimentService.findTipusAssumpte(procediment.getEntitat()));
+			if (procediment.getCodiAssumpte() != null)
+				model.addAttribute("codiAssumpte", procedimentService.findCodisAssumpte(procediment.getEntitat(), procediment.getTipusAssumpte()));
+		} else {
+			model.addAttribute("tipusAssumpte", procedimentService.findTipusAssumpte(entitat));
 		}
+		model.addAttribute("pagadorsPostal", pagadorPostalService.findAll());
+		model.addAttribute("pagadorsCie", pagadorCieService.findAll());
+		
+		if (procediment != null) {
+			model.addAttribute("entitatId", procediment.getEntitat().getId());
+		}
+		if (RolHelper.isUsuariActualAdministrador(request))
+			model.addAttribute("entitats", entitatService.findAll());
+		else
+			model.addAttribute("entitat", entitat);
 		
 		return procediment;
+	}
+	
+	@RequestMapping(value = "/tipusAssumpte/{entitatId}", method = RequestMethod.GET)
+	@ResponseBody
+	private List<TipusAssumpteDto> getTipusAssumpte(
+		HttpServletRequest request,
+		Model model,
+		@PathVariable Long entitatId) {
+		EntitatDto entitat = entitatService.findById(entitatId);
+		
+		model.addAttribute("tipusAssumpte", procedimentService.findTipusAssumpte(entitat));
+		
+		return procedimentService.findTipusAssumpte(entitat);
+	}
+	
+	@RequestMapping(value = "/codiAssumpte/{entitatId}/{codiTipusAssumpte}", method = RequestMethod.GET)
+	@ResponseBody
+	private List<CodiAssumpteDto> getCodiAssumpte(
+		HttpServletRequest request,
+		Model model,
+		@PathVariable Long entitatId,
+		@PathVariable String codiTipusAssumpte) {
+		EntitatDto entitat = entitatService.findById(entitatId);
+		
+		return procedimentService.findCodisAssumpte(
+				entitat,
+				codiTipusAssumpte);
 	}
 	
 	private boolean isAdministrador(

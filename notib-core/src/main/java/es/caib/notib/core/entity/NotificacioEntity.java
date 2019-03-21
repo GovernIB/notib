@@ -178,8 +178,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	
 	/*Parametres del registre*/
-	
-	
 	@Column(name = "registre_oficina", length = 52, nullable = false)
 	protected String registreOficina;
 	@Column(name = "registre_organ", length = 10)
@@ -210,8 +208,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	@Transient
 	protected boolean permisProcessar;
-	
-	
 
 	public String getEmisorDir3Codi() {
 		return emisorDir3Codi;
@@ -499,8 +495,17 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String procedimentCodi,
 			ProcedimentEntity procediment,
 			String grup,
+			String registreOficina,
+			String registreLlibre,
+			String registreNumero,
+			Date registreDate,
+			String extracte,
+			String docFisica,
+			String idioma,
+			String tipusAssumpte,
 			String numExpedient,
 			String referenciaExterna,
+			String codiAssumpte,
 			String observacions) {
 		return new BuilderV2(
 				entitat,
@@ -517,8 +522,17 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				procedimentCodi,
 				procediment,
 				grup,
+				registreOficina,
+				registreLlibre,
+				registreNumero,
+				registreDate,
+				extracte,
+				docFisica,
+				idioma,
+				tipusAssumpte,
 				numExpedient,
 				referenciaExterna,
+				codiAssumpte,
 				observacions);
 	}
 	
@@ -763,8 +777,17 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				String procedimentCodi,
 				ProcedimentEntity procediment,
 				String grup,
+				String registreOficina,
+				String registreLlibre,
+				String registreNumero,
+				Date registreDate,
+				String extracte,
+				String docFisica,
+				String idioma,
+				String tipusAssumpte,
 				String numExpedient,
 				String referenciaExterna,
+				String codiAssumpte,
 				String observacions) {
 			built = new NotificacioEntity();
 			built.entitat = entitat;
@@ -783,9 +806,17 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.registreNumExpedient = numExpedient;
 			built.registreRefExterna = referenciaExterna;
 			built.procediment = procediment;
-//			built.seuRegistreLlibre = procediment.getLlibre();
-//			built.seuRegistreOficina = procediment.getOficina();
-//			built.procedimentCodiSia = procediment.getCodisia();
+			built.registreOficina = registreOficina;
+			built.registreLlibre = registreLlibre;
+			built.registreNumero = registreNumero;
+			built.registreData = registreDate;
+			built.registreExtracte = extracte;
+			built.registreDocFisica = docFisica;
+			built.registreIdioma = idioma;
+			built.registreTipusAssumpte = tipusAssumpte;
+			built.registreNumExpedient = numExpedient;
+			built.registreRefExterna = referenciaExterna;
+			built.registreCodiAssumpte = codiAssumpte;
 			built.registreObservacions = observacions;
 
 			built.estat = NotificacioEstatEnumDto.PENDENT;

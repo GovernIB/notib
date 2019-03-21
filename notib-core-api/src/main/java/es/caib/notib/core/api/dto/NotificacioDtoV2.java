@@ -35,7 +35,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private NotificacioEstatEnumDto estat;
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
-	private ServeiTipusEnumDto serveiTipus;
+	private String serveiTipus;
 	private PersonaDto titular;
 	private PersonaDto destinatari = new PersonaDto();
 	private List<PersonaDto> destinataris = new ArrayList<PersonaDto>();
@@ -44,14 +44,14 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 
 	// Paràmetres registre
 	private String oficina;
-	private String registreLlibre;
+	private String llibre;
 	private String registreNumero;
 	private Date registreData;
 	private String extracte;
 	private String docFisica;
 	private String idioma;
-	private TipusAssumpteEnumDto tipusAssumpte;
-	private String numeroExpedient;
+	private String tipusAssumpte;
+	private String numExpedient;
 	private String refExterna;
 	private String codiAssumpte;
 	private String observacions;
@@ -160,10 +160,10 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	public void setNotificaErrorDescripcio(String notificaErrorDescripcio) {
 		this.notificaErrorDescripcio = notificaErrorDescripcio;
 	}
-	public ServeiTipusEnumDto getServeiTipus() {
+	public String getServeiTipus() {
 		return serveiTipus;
 	}
-	public void setServeiTipus(ServeiTipusEnumDto serveiTipus) {
+	public void setServeiTipus(String serveiTipus) {
 		this.serveiTipus = serveiTipus;
 	}
 	public PersonaDto getTitular() {
@@ -187,11 +187,11 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	public void setOficina(String oficina) {
 		this.oficina = oficina;
 	}
-	public String getRegistreLlibre() {
-		return registreLlibre;
+	public String getLlibre() {
+		return llibre;
 	}
-	public void setRegistreLlibre(String registreLlibre) {
-		this.registreLlibre = registreLlibre;
+	public void setLlibre(String llibre) {
+		this.llibre = llibre;
 	}
 	public String getRegistreNumero() {
 		return registreNumero;
@@ -217,11 +217,8 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	public String getIdioma() {
 		return idioma;
 	}
-	public TipusAssumpteEnumDto getTipusAssumpte() {
+	public String getTipusAssumpte() {
 		return tipusAssumpte;
-	}
-	public String getNumeroExpedient() {
-		return numeroExpedient;
 	}
 	public String getRefExterna() {
 		return refExterna;
@@ -241,11 +238,14 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	public void setIdioma(String idioma) {
 		this.idioma = idioma;
 	}
-	public void setTipusAssumpte(TipusAssumpteEnumDto tipusAssumpte) {
+	public void setTipusAssumpte(String tipusAssumpte) {
 		this.tipusAssumpte = tipusAssumpte;
 	}
-	public void setNumeroExpedient(String numeroExpedient) {
-		this.numeroExpedient = numeroExpedient;
+	public String getNumExpedient() {
+		return numExpedient;
+	}
+	public void setNumExpedient(String numExpedient) {
+		this.numExpedient = numExpedient;
 	}
 	public void setRefExterna(String refExterna) {
 		this.refExterna = refExterna;

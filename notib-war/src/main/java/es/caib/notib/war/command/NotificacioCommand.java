@@ -35,10 +35,6 @@ public class NotificacioCommand {
 	private Date enviamentDataProgramada;
 	@Size(max=50)
 	private String concepte;
-	@Size(max=6)
-	private String procedimentCodiSia;
-	@Size(max=256)
-	private String procedimentDescripcioSia;
 	private TipusDocumentEnumDto tipusDocument;
 	private MultipartFile arxiu;
 	private String documentArxiuId;
@@ -76,18 +72,6 @@ public class NotificacioCommand {
 	}
 	public void setConcepte(String concepte) {
 		this.concepte = concepte;
-	}
-	public String getProcedimentCodiSia() {
-		return procedimentCodiSia;
-	}
-	public void setProcedimentCodiSia(String procedimentCodiSia) {
-		this.procedimentCodiSia = procedimentCodiSia;
-	}
-	public String getProcedimentDescripcioSia() {
-		return procedimentDescripcioSia;
-	}
-	public void setProcedimentDescripcioSia(String procedimentDescripcioSia) {
-		this.procedimentDescripcioSia = procedimentDescripcioSia;
 	}
 	public TipusDocumentEnumDto getTipusDocument() {
 		return tipusDocument;

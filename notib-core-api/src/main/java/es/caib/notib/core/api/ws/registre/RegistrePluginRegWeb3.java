@@ -66,8 +66,6 @@ public interface RegistrePluginRegWeb3 {
 			String entitat,
 			boolean anular) throws RegistrePluginException;
 
-	
-	
 	public List<TipusAssumpte> llistarTipusAssumpte(
 			String entitat) throws RegistrePluginException;
 

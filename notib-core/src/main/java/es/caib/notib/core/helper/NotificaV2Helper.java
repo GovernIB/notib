@@ -397,6 +397,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					baos);
 
 			documento.setContenido(baos.toByteArray());
+			documento.setMetadatos(notificacio.getDocument().getMetadades());
 			documento.setHash(notificacio.getDocument().getHash());
 			Opciones opcionesDocumento = new Opciones();
 			Opcion opcionNormalizado = new Opcion();
@@ -411,7 +412,55 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			opcionesDocumento.getOpcion().add(opcionGenerarCsv);
 			documento.setOpcionesDocumento(opcionesDocumento);
 			envios.setDocumento(documento);
-		} else {
+		} else if (notificacio.getDocument().getCsv() != null) {
+            Documento documento = new Documento();
+            documento.setContenido(pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut());
+            Opciones opcionesDocumento = new Opciones();
+            Opcion opcionNormalizado = new Opcion();
+            opcionNormalizado.setTipo("normalizado");
+            opcionNormalizado.setValue(
+                    notificacio.getDocument().getNormalitzat()  ? "si" : "no"); // si o no
+            opcionesDocumento.getOpcion().add(opcionNormalizado);
+            Opcion opcionGenerarCsv = new Opcion();
+            opcionGenerarCsv.setTipo("generarCsv");
+            opcionGenerarCsv.setValue(
+                    notificacio.getDocument().getGenerarCsv()  ? "si" : "no"); // si o no
+            opcionesDocumento.getOpcion().add(opcionGenerarCsv);
+            documento.setOpcionesDocumento(opcionesDocumento);
+            envios.setDocumento(documento);
+        } else if (notificacio.getDocument().getUrl() != null) {
+            Documento documento = new Documento();
+            documento.setEnlaceDocumento(notificacio.getDocument().getUrl());
+            Opciones opcionesDocumento = new Opciones();
+            Opcion opcionNormalizado = new Opcion();
+            opcionNormalizado.setTipo("normalizado");
+            opcionNormalizado.setValue(
+                    notificacio.getDocument().getNormalitzat()  ? "si" : "no"); // si o no
+            opcionesDocumento.getOpcion().add(opcionNormalizado);
+            Opcion opcionGenerarCsv = new Opcion();
+            opcionGenerarCsv.setTipo("generarCsv");
+            opcionGenerarCsv.setValue(
+                    notificacio.getDocument().getGenerarCsv()  ? "si" : "no"); // si o no
+            opcionesDocumento.getOpcion().add(opcionGenerarCsv);
+            documento.setOpcionesDocumento(opcionesDocumento);
+            envios.setDocumento(documento);
+        } else if (notificacio.getDocument().getUuid() != null) {
+            Documento documento = new Documento();
+            documento.setContenido(pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut());
+            Opciones opcionesDocumento = new Opciones();
+            Opcion opcionNormalizado = new Opcion();
+            opcionNormalizado.setTipo("normalizado");
+            opcionNormalizado.setValue(
+                    notificacio.getDocument().getNormalitzat()  ? "si" : "no"); // si o no
+            opcionesDocumento.getOpcion().add(opcionNormalizado);
+            Opcion opcionGenerarCsv = new Opcion();
+            opcionGenerarCsv.setTipo("generarCsv");
+            opcionGenerarCsv.setValue(
+                    notificacio.getDocument().getGenerarCsv()  ? "si" : "no"); // si o no
+            opcionesDocumento.getOpcion().add(opcionGenerarCsv);
+            documento.setOpcionesDocumento(opcionesDocumento);
+            envios.setDocumento(documento);
+        } else {
 			Documento documento = new Documento();
 			documento.setHash(notificacio.getDocument().getHash());
 			if(notificacio.getDocument().getContingutBase64() != null) {

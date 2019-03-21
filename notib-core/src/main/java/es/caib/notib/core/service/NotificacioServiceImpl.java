@@ -115,14 +115,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public List<NotificacioDto> create(
 			Long entitatId, 
 			NotificacioDtoV2 notificacio) {
-
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-	
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
-		
 		String documentGesdocId = null;
-//		GrupEntity grup = null;
-//		
 		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
 					null,
 				 	notificacio.getProcediment().getId(),
@@ -130,18 +125,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 				 	false,
 				 	true,
 				 	false);
-//
-//		if (notificacio.getGrup().getId() != null) {
-//			grup = entityComprovarHelper.comprovarGrup(
-//						notificacio.getGrup().getId());
-//		}
-		 
 		if (notificacio.getDocument().getContingutBase64() != null) {
 			documentGesdocId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 					new ByteArrayInputStream(notificacio.getDocument().getContingutBase64().getBytes()));
 		}
-		
 		DocumentEntity documentEntity = documentRepository.saveAndFlush(DocumentEntity.getBuilderV2(
 				notificacio.getDocument().getArxiuId(), 
 				documentGesdocId, 
@@ -153,8 +141,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				notificacio.getDocument().isGenerarCsv(),
 				notificacio.getDocument().getUuid(),
 				notificacio.getDocument().getCsv()).build());
-		
-		
 		// Dades generals de la notificació
 		NotificacioEntity.BuilderV2 notificacioBuilder = NotificacioEntity.
 				getBuilderV2(
@@ -172,24 +158,22 @@ public class NotificacioServiceImpl implements NotificacioService {
 						procediment.getCodi(),
 						procediment,
 						notificacio.getGrupCodi(),
-						notificacio.getNumeroExpedient(),
+						notificacio.getEmisorDir3Codi(),
+						notificacio.getLlibre(),
+						notificacio.getRegistreNumero(),
+						notificacio.getRegistreData(),
+						notificacio.getExtracte(),
+						notificacio.getDocFisica(),
+						notificacio.getIdioma(),
+						notificacio.getTipusAssumpte(),
+						notificacio.getNumExpedient(),
 						notificacio.getRefExterna(),
+						notificacio.getCodiAssumpte(),
 						notificacio.getObservacions()
 						).usuariCodi(usuariActual.getCodi());
 
-
-		
 		NotificacioEntity notificacioEntity = notificacioBuilder.build();
 		NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioEntity);
-		/*
-		 * Falta afegir paràmetres registre S'han llevat els paràmetres de la seu
-		 */
-//		ParametresRegistreDto parametresRegistre = notificacio.getParametresRegistre();
-//		if (parametresRegistre != null) {
-//			notificacioBuilder.
-//			registreOficina(parametresRegistre.getOficina()).
-//			registreLlibre(parametresRegistre.getLlibre());
-//		}
 
 		List<Enviament> enviaments = new ArrayList<Enviament>();
 		List<NotificacioEnviamentEntity> enviamentsEntity = new ArrayList<NotificacioEnviamentEntity>();
@@ -209,9 +193,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						break;
 					}
 				}
-//				enviament.setTitular(conversioTipusHelper.convertir(notificacio.getTitular(), Persona.class));
 				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
-//				NotificaDomiciliTipusEnumDto tipus = null;
 				NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
 				if (enviament.getEntregaPostal() != null) {
 					if (enviament.getEntregaPostal().getTipus() != null) {
@@ -229,7 +211,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 							tipusConcret = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
 							break;
 						}
-//						tipus = NotificaDomiciliTipusEnumDto.CONCRETO;
 					}
 					if (enviament.getEntregaPostal().getNumeroCasa() != null) {
 						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.NUMERO;
@@ -241,7 +222,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.SENSE_NUMERO;
 					}
 				}
-				
 				PersonaEntity titular = personaRepository.save(PersonaEntity.getBuilder(
 						enviament.getTitular().getEmail(), 
 						enviament.getTitular().getLlinatge1(), 
@@ -263,7 +243,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 						destinataris.add(destinatari);
 					}
 				}
-				
 				// Rellenar dades enviament titular
 				enviamentsEntity.add(notificacioEnviamentRepository.saveAndFlush(NotificacioEnviamentEntity.
 						getBuilderV2(enviament, notificacio, numeracioTipus, tipusConcret, serveiTipus, notificacioGuardada, titular, destinataris).build()));
@@ -303,7 +282,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public NotificacioDtoV2 update(
 			Long entitatId,
 			NotificacioDtoV2 procediment) throws NotFoundException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

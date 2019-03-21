@@ -30,6 +30,12 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<not:modalHead/>
 </head>
+<style>
+.rmodal {
+    max-height:400px; 
+    overflow-y: auto;
+}
+</style>
 <body>
 	<c:set var="formAction"><not:modalUrl value="/pagadorPostal/newOrModify"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="pagadorPostalCommand" role="form">

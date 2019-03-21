@@ -13,7 +13,6 @@ public class ProcedimentFiltreDto extends AuditoriaDto implements Serializable {
 	private String id;
 	private String codi;
 	private String nom;
-	private String codisia;
 	private Long entitatId;
 	
 	public String getId() {
@@ -33,12 +32,6 @@ public class ProcedimentFiltreDto extends AuditoriaDto implements Serializable {
 	}
 	public void setNom(String nom) {
 		this.nom = nom;
-	}
-	public String getCodisia() {
-		return codisia;
-	}
-	public void setCodisia(String codisia) {
-		this.codisia = codisia;
 	}
 	public Long getEntitatId() {
 		return entitatId;

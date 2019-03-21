@@ -13,7 +13,6 @@ public class ProcedimentFiltreCommand {
 	
 	private String codi;
 	private String nom;
-	private String codisia;
 	private Long entitatId;
 	
 	
@@ -28,12 +27,6 @@ public class ProcedimentFiltreCommand {
 	}
 	public void setNom(String nom) {
 		this.nom = nom;
-	}
-	public String getCodisia() {
-		return codisia;
-	}
-	public void setCodisia(String codisia) {
-		this.codisia = codisia;
 	}
 	public Long getEntitatId() {
 		return entitatId;
