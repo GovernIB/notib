@@ -19,7 +19,7 @@ import es.caib.notib.core.audit.NotibAuditable;
 @Table(name = "not_pagador_postal")
 public class PagadorPostalEntity extends NotibAuditable<Long> {
 	
-	@Column(name = "dir3_codi", length = 9, nullable = false)
+	@Column(name = "dir3_codi", length = 9)
 	private String dir3codi;
 	
 	@Column(name = "contracte_num", length = 20)

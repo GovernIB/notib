@@ -17,6 +17,7 @@ import es.caib.notib.core.api.dto.CodiAssumpteDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.ProcedimentFormDto;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -77,7 +78,7 @@ public class ProcedimentController extends BaseUserController{
 		boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
 		
 		ProcedimentFiltreCommand procedimentFiltreCommand = getFiltreCommand(request);
-		PaginaDto<ProcedimentDto> procediments = new PaginaDto<ProcedimentDto>();
+		PaginaDto<ProcedimentFormDto> procediments = new PaginaDto<ProcedimentFormDto>();
 		
 		try {
 			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
@@ -182,8 +183,10 @@ public class ProcedimentController extends BaseUserController{
 		if (procediment != null) {
 			procedimentCommand = ProcedimentCommand.asCommand(procediment);
 			procedimentCommand.setEntitatId(procediment.getEntitat().getId());
-			procedimentCommand.setPagadorCieId(procediment.getPagadorcie().getId());
-			procedimentCommand.setPagadorPostalId(procediment.getPagadorpostal().getId());
+			if (procediment.getPagadorcie() != null)
+				procedimentCommand.setPagadorCieId(procediment.getPagadorcie().getId());
+			if (procediment.getPagadorpostal() != null)
+				procedimentCommand.setPagadorPostalId(procediment.getPagadorpostal().getId());
 		} else {
 			procedimentCommand = new ProcedimentCommand();
 		}
