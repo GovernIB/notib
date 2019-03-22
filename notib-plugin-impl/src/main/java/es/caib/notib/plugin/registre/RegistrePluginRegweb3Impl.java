@@ -1,49 +1,29 @@
 package es.caib.notib.plugin.registre;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLConnection;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
+import es.caib.notib.core.api.dto.NotificacioDto;
+import es.caib.notib.core.api.dto.PersonaDto;
+import es.caib.notib.core.api.dto.RegistreInteressatDto;
 import es.caib.notib.core.api.exception.RegistrePluginException;
-import es.caib.notib.core.api.ws.registre.CodiAssumpte;
-import es.caib.notib.core.api.ws.registre.DocumentRegistre;
-import es.caib.notib.core.api.ws.registre.Llibre;
-import es.caib.notib.core.api.ws.registre.Oficina;
-import es.caib.notib.core.api.ws.registre.Organisme;
 import es.caib.notib.core.api.ws.registre.RegistreAssentament;
-import es.caib.notib.core.api.ws.registre.RegistreAssentamentInteressat;
-import es.caib.notib.core.api.ws.registre.RegistrePluginRegWeb3;
-import es.caib.notib.core.api.ws.registre.RespostaAnotacioRegistre;
+import es.caib.notib.core.api.ws.registre.RegistreInteressatDocumentTipusEnum;
 import es.caib.notib.core.api.ws.registre.RespostaConsultaRegistre;
 import es.caib.notib.core.api.ws.registre.RespostaJustificantRecepcio;
-import es.caib.notib.core.api.ws.registre.TipusAssumpte;
-import es.caib.regweb3.ws.api.v3.AnexoWs;
-import es.caib.regweb3.ws.api.v3.CodigoAsuntoWs;
-import es.caib.regweb3.ws.api.v3.DatosInteresadoWs;
-import es.caib.regweb3.ws.api.v3.IdentificadorWs;
-import es.caib.regweb3.ws.api.v3.InteresadoWs;
-import es.caib.regweb3.ws.api.v3.JustificanteWs;
-import es.caib.regweb3.ws.api.v3.LibroWs;
-import es.caib.regweb3.ws.api.v3.OficinaWs;
-import es.caib.regweb3.ws.api.v3.OrganismoWs;
-import es.caib.regweb3.ws.api.v3.RegWebInfoWs;
-import es.caib.regweb3.ws.api.v3.RegWebRegistroEntradaWs;
-import es.caib.regweb3.ws.api.v3.RegWebRegistroSalidaWs;
-import es.caib.regweb3.ws.api.v3.RegistroEntradaResponseWs;
-import es.caib.regweb3.ws.api.v3.RegistroEntradaWs;
-import es.caib.regweb3.ws.api.v3.RegistroSalidaResponseWs;
-import es.caib.regweb3.ws.api.v3.TipoAsuntoWs;
-import es.caib.regweb3.ws.api.v3.WsI18NException;
-import es.caib.regweb3.ws.api.v3.WsValidationException;
-import es.caib.regweb3.ws.api.v3.utils.WsClientUtils;
+import es.caib.notib.plugin.registre.sortida.RegistrePlugin;
+import es.caib.regweb3.ws.v3.impl.AnexoWs;
+import es.caib.regweb3.ws.v3.impl.AsientoRegistralBean;
+import es.caib.regweb3.ws.v3.impl.DatosInteresadoWs;
+import es.caib.regweb3.ws.v3.impl.InteresadoWs;
+import es.caib.regweb3.ws.v3.impl.JustificanteWs;
+import es.caib.regweb3.ws.v3.impl.OficioBean;
+import es.caib.regweb3.ws.v3.impl.WsI18NException;
+import es.caib.regweb3.ws.v3.impl.WsValidationException;
 
 
 /**
@@ -53,12 +33,14 @@ import es.caib.regweb3.ws.api.v3.utils.WsClientUtils;
  * @author Limit Tecnologies <limit@limit.es>
  */
 
-public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistrePluginRegWeb3{
+public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistrePlugin{
 	
 //	protected static RegWebRegistroEntradaWs registroEntradaApi;
 //	protected static RegWebRegistroSalidaWs registroSalidaApi;
 //	protected static RegWebInfoWs registroInfoApi;
+	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
 
+	@Override
 	public String registrarSortida(
 			RegistreAssentament registreSortida,
 			String aplicacioNom,
@@ -67,677 +49,296 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		return "OK";
 	}
 	
-	
-	
-//	public RespostaAnotacioRegistre registrarSortida(
-//			RegistreAssentament registreSortida,
-//			String aplicacioNom,
-//			String aplicacioVersio,
-//			String entitat) throws RegistrePluginException {
-//		
-//		RegWebRegistroSalidaWs registroSalidaApi = null;
-//		try {
-//			registroSalidaApi = getRegistroSalidaApi();
-//		} catch (Exception e) {
-//        	logger.error("Error al registrar l'anotació de registre de sortida", e);
-//        	throw new RegistrePluginException("Error al registrar l'anotació de registre de sortida", e);
-//		}
-//		
-//		RegistroSalidaWs registroSalidaWs = new RegistroSalidaWs();
-//		
-//        registroSalidaWs.setOrigen(registreSortida.getOrgan());
-//        registroSalidaWs.setOficina(registreSortida.getOficinaCodi());
-//        registroSalidaWs.setLibro(registreSortida.getLlibreCodi());
-//
-//        registroSalidaWs.setExtracto(registreSortida.getExtracte());
-//        registroSalidaWs.setDocFisica(registreSortida.getDocumentacioFisicaCodi() != null ? new Long(registreSortida.getDocumentacioFisicaCodi()) : (long)3);
-//        registroSalidaWs.setIdioma(registreSortida.getIdiomaCodi());
-//        registroSalidaWs.setTipoAsunto(registreSortida.getAssumpteTipusCodi());
-//
-//        registroSalidaWs.setAplicacion(aplicacioNom);
-//        registroSalidaWs.setVersion(aplicacioVersio);
-//
-//        registroSalidaWs.setCodigoUsuario(registreSortida.getUsuariCodi());
-//        registroSalidaWs.setContactoUsuario(registreSortida.getUsuariContacte());
-//
-//        registroSalidaWs.setNumExpediente(registreSortida.getExpedientNumero());
-//
-//        registroSalidaWs.setNumTransporte(registreSortida.getTransportNumero());
-//        registroSalidaWs.setObservaciones(registreSortida.getObservacions());
-//
-//        registroSalidaWs.setRefExterna(registreSortida.getReferencia());
-//        registroSalidaWs.setCodigoAsunto(registreSortida.getAssumpteCodi());
-//        registroSalidaWs.setTipoTransporte(registreSortida.getTransportTipusCodi());
-//
-//        registroSalidaWs.setExpone(registreSortida.getExposa());
-//        registroSalidaWs.setSolicita(registreSortida.getSolicita());
-//
-//        // Interesados
-//        for (RegistreAssentamentInteressat inter: registreSortida.getInteressats()) {
-//        	
-//        	InteresadoWs interesadoWs = new InteresadoWs();
-//
-//            DatosInteresadoWs interesado = new DatosInteresadoWs();
-//            interesado.setTipoInteresado(Long.valueOf(inter.getTipus().getValor()));
-//            interesado.setTipoDocumentoIdentificacion(inter.getDocumentTipus());
-//            interesado.setDocumento(inter.getDocumentNum());
-//            interesado.setEmail(inter.getEmail());
-//            interesado.setNombre(inter.getNom());
-//            interesado.setApellido1(inter.getLlinatge1());
-//            interesado.setApellido2(inter.getLlinatge2());
-//            interesado.setRazonSocial(inter.getRaoSocial());
-//            interesado.setPais(inter.getPais() != null ? new Long(inter.getPais()) : null);
-//            interesado.setProvincia(inter.getProvincia() != null ? new Long(inter.getProvincia()) : null);
-//            interesado.setDireccion(inter.getAdresa());
-//            interesado.setCp(inter.getCodiPostal());
-//            interesado.setLocalidad(inter.getMunicipi() != null ? new Long(inter.getMunicipi()) : null);
-//            interesado.setTelefono(inter.getTelefon());
-//            interesadoWs.setInteresado(interesado);
-//
-//            if (inter.getRepresentant() != null) {
-//            	RegistreAssentamentInteressat repre = inter.getRepresentant();
-//	            DatosInteresadoWs representante = new DatosInteresadoWs();
-//	            representante.setTipoInteresado(Long.valueOf(repre.getTipus().getValor()));
-//	            representante.setTipoDocumentoIdentificacion(repre.getDocumentTipus());
-//	            representante.setDocumento(repre.getDocumentNum());
-//	            representante.setEmail(repre.getEmail());
-//	            representante.setNombre(repre.getNom());
-//	            representante.setApellido1(repre.getLlinatge1());
-//	            representante.setApellido2(repre.getLlinatge2());
-//	            representante.setRazonSocial(repre.getRaoSocial());
-//	            representante.setPais(repre.getPais() != null ? new Long(repre.getPais()) : null);
-//	            representante.setProvincia(repre.getProvincia() != null ? new Long(repre.getProvincia()) : null);
-//	            representante.setDireccion(repre.getAdresa());
-//	            representante.setCp(repre.getCodiPostal());
-//	            representante.setLocalidad(repre.getMunicipi() != null ? new Long(repre.getMunicipi()) : null);
-//	            representante.setTelefono(repre.getTelefon());
-//	            interesadoWs.setRepresentante(representante);
-//            }
-//            
-//            registroSalidaWs.getInteresados().add(interesadoWs);
-//        }
-//        
-//        for (DocumentRegistre document: registreSortida.getDocuments()) {
-//        	AnexoWs anexoWs = new AnexoWs();
-//        	
-//        	anexoWs.setTitulo(document.getNom());
-//            anexoWs.setTipoDocumental("TD01");
-//            anexoWs.setTipoDocumento("02");
-//            anexoWs.setOrigenCiudadanoAdmin(ANEXO_ORIGEN_CIUDADANO.intValue());
-//            anexoWs.setObservaciones("");
-//            anexoWs.setModoFirma(MODO_FIRMA_ANEXO_SINFIRMA);
-//
-//            anexoWs.setFicheroAnexado(document.getArxiuContingut());
-//            anexoWs.setNombreFicheroAnexado(document.getArxiuNom());
-//            anexoWs.setFechaCaptura(new Timestamp(document.getData().getTime()));
-//            
-//            InputStream is = new BufferedInputStream(new ByteArrayInputStream(document.getArxiuContingut()));
-//            try {
-//				String mimeType = URLConnection.guessContentTypeFromStream(is);
-//				anexoWs.setTipoMIMEFicheroAnexado(mimeType);
-//			} catch (IOException e) {
-//				throw new RegistrePluginException("Error IOException: " + e);
-//			}
-//        	
-//        	registroSalidaWs.getAnexos().add(anexoWs);
-//        }
-//
-//       
-//        RespostaAnotacioRegistre resposta = null;
-//        
-//        try {
-//        	registroSalidaApi = getRegistroSalidaApi();
-////            IdentificadorWs identificadorWs = registroSalidaApi.altaRegistroSalida(registroSalidaWs);
-//        	IdentificadorWs identificadorWs = registroSalidaApi.nuevoRegistroSalida(entitat, registroSalidaWs);
-//            resposta = new RespostaAnotacioRegistre();
-//            resposta.setData(identificadorWs.getFecha());
-//            resposta.setNumero(identificadorWs.getNumero());
-//            resposta.setNumeroRegistroFormateado(identificadorWs.getNumeroRegistroFormateado());
-//            resposta.setErrorCodi(RespostaAnotacioRegistre.ERROR_CODI_OK);
-//        } catch (WsI18NException e) {
-//            String msg = WsClientUtils.toString(e);
-//            throw new RegistrePluginException("Error WsI18NException: " + msg);
-//        } catch (WsValidationException e) {
-//            String msg = WsClientUtils.toString(e);
-//            throw new RegistrePluginException("Error WsValidationException: " + msg);
-//        } catch (Exception e) {
-//        	throw new RegistrePluginException("Error WsValidationException: ", e);
-//		}
-//        return resposta;
-//	}
-	
+	@Override
+	public RespostaConsultaRegistre comunicarAsientoRegistral(String codiDir3Entitat, AsientoRegistralBeanDto arb, Long tipusOperacio) {
+		RespostaConsultaRegistre rc = new RespostaConsultaRegistre();
+		try {
+			return toRespostaConsultaRegistre(getAsientoRegistralApi().comunicarAsientoRegistral(codiDir3Entitat, toAsientoRegistralBean(arb), tipusOperacio));
+		} catch (WsI18NException e) {
+			rc.setErrorCodi("0");
+			rc.setErrorDescripcio(e.getMessage());
+			return rc;
+		} catch (WsValidationException e) {
+			rc.setErrorCodi("1");
+			rc.setErrorDescripcio(e.getMessage());
+			return rc;
+		} catch (Exception e) {
+			rc.setErrorCodi("2");
+			rc.setErrorDescripcio(e.getMessage());
+			return rc;
+		}
+	}
 	
 	@Override
-	public RespostaConsultaRegistre obtenirRegistreSortida(String numRegistre, String usuariCodi, String entitatCodi)
-			throws RegistrePluginException {
+	public RespostaConsultaRegistre salidaAsientoRegistral(String codiDir3Entitat, AsientoRegistralBeanDto arb, Long tipusOperacio) {
+		RespostaConsultaRegistre rc = new RespostaConsultaRegistre();
+		try {
+			return toRespostaConsultaRegistre(getAsientoRegistralApi().crearAsientoRegistral(codiDir3Entitat, toAsientoRegistralBean(arb)));
+		} catch (WsI18NException e) {
+			rc.setErrorCodi("0");
+			rc.setErrorDescripcio(e.getMessage());
+			return rc;
+		} catch (WsValidationException e) {
+			rc.setErrorCodi("1");
+			rc.setErrorDescripcio(e.getMessage());
+			return rc;
+		} catch (Exception e) {
+			rc.setErrorCodi("2");
+			rc.setErrorDescripcio(e.getMessage());
+			return rc;
+		}
+	}
+	
+	@Override
+	public RespostaJustificantRecepcio obtenerJustificante(String codiDir3Entitat, String numeroRegistreFormatat, String llibre, Long tipusRegistre) {
+		RespostaJustificantRecepcio rj = new RespostaJustificantRecepcio();
+		try {
+			return toRespostaJustificantRecepcio(getAsientoRegistralApi().obtenerJustificante(codiDir3Entitat, numeroRegistreFormatat, llibre, tipusRegistre));
+		} catch (WsI18NException e) {
+			rj.setErrorCodi("0");
+			rj.setErrorDescripcio("No s'ha pogut obtenir el justificant");
+			return rj;
+		} catch (WsValidationException e) {
+			rj.setErrorCodi("1");
+			rj.setErrorDescripcio("Error de validació a l'obtenir el justificant");
+			return rj;
+		} catch (Exception e) {
+			rj.setErrorCodi("2");
+			rj.setErrorDescripcio("Error obtenint el justificant");
+			return rj;
+		}
+	}
+	
+	@Override
+	public RespostaJustificantRecepcio obtenerOficioExterno(String codiDir3Entitat, String numeroRegistreFormatat, String llibre) {
+		RespostaJustificantRecepcio rj = new RespostaJustificantRecepcio();
+		try {
+			return toRespostaJustificantRecepcio(getAsientoRegistralApi().obtenerOficioExterno(codiDir3Entitat, numeroRegistreFormatat, llibre));
+		} catch (WsI18NException e) {
+			rj.setErrorCodi("0");
+			rj.setErrorDescripcio("No s'ha pogut obtenir l'ofici extern");
+			return rj;
+		} catch (WsValidationException e) {
+			rj.setErrorCodi("1");
+			rj.setErrorDescripcio("Error de validació a l'obtenir l'ofici extern");
+			return rj;
+		} catch (Exception e) {
+			rj.setErrorCodi("2");
+			rj.setErrorDescripcio("Error obtenint l'ofici extern");
+			return rj;
+		}
+	}
+	
+	public RespostaJustificantRecepcio toRespostaJustificantRecepcio(JustificanteWs ofici){
+		RespostaJustificantRecepcio rj = new RespostaJustificantRecepcio();
+		rj.setJustificant(ofici.getJustificante());
+		return rj;
+	}
 
-		RegWebRegistroSalidaWs registroSalidaApi = null;
+	public RespostaJustificantRecepcio toRespostaJustificantRecepcio(OficioBean ofici){
+		RespostaJustificantRecepcio rj = new RespostaJustificantRecepcio();
+		rj.setJustificant(ofici.getOficio());
+		return rj;
+	}
+	
+	public AsientoRegistralBean toAsientoRegistralBean(AsientoRegistralBeanDto dto) {
+		AsientoRegistralBean ar = new AsientoRegistralBean();
+		ar.setAplicacion(dto.getAplicacion());
+		ar.setAplicacionTelematica(dto.getAplicacionTelematica());
+		ar.setCodigoAsunto(dto.getCodigoAsunto());
+		ar.setCodigoAsuntoDenominacion(dto.getCodigoAsuntoDenominacion());
+		ar.setCodigoError(dto.getCodigoError());
+		ar.setCodigoSia(dto.getCodigoSia());
+		ar.setCodigoUsuario(dto.getCodigoUsuario());
+		ar.setDescripcionError(dto.getDescripcionError());
+		ar.setEntidadCodigo(dto.getEntidadCodigo());
+		ar.setEntidadDenominacion(dto.getEntidadDenominacion());
+		ar.setEntidadRegistralDestinoCodigo(dto.getEntidadRegistralDestinoCodigo());
+		ar.setEntidadRegistralDestinoDenominacion(dto.getEntidadRegistralDestinoDenominacion());
+		ar.setEntidadRegistralInicioCodigo(dto.getEntidadRegistralInicioCodigo());
+		ar.setEntidadRegistralInicioDenominacion(dto.getEntidadRegistralInicioDenominacion());
+		ar.setEntidadRegistralOrigenCodigo(dto.getEntidadRegistralOrigenCodigo());
+		ar.setEntidadRegistralOrigenDenominacion(dto.getEntidadRegistralOrigenDenominacion());
+		ar.setEstado(dto.getEstado());
+		ar.setExpone(dto.getExpone());
+		ar.setFechaRecepcion(dto.getFechaRecepcion());
+		ar.setFechaRegistro(dto.getFechaRegistro());
+		ar.setFechaRegistroDestino(dto.getFechaRegistroDestino());
+		ar.setId(dto.getId());
+		ar.setIdentificadorIntercambio(dto.getIdentificadorIntercambio());
+		ar.setIdioma(dto.getIdioma());
+		ar.setLibroCodigo(dto.getLibroCodigo());
+		ar.setMotivo(dto.getMotivo());
+		ar.setNumeroExpediente(dto.getNumeroExpediente());
+		ar.setNumeroRegistro(dto.getNumeroRegistro());
+		ar.setNumeroRegistroDestino(dto.getNumeroRegistroDestino());
+		ar.setNumeroRegistroFormateado(dto.getNumeroRegistroFormateado());
+		ar.setNumeroTransporte(dto.getNumeroTransporte());
+		ar.setObservaciones(dto.getObservaciones());
+		ar.setPresencial(dto.isPresencial());
+		ar.setReferenciaExterna(dto.getReferenciaExterna());
+		ar.setResumen(dto.getResumen());
+		ar.setSolicita(dto.getSolicita());
+		ar.setTipoAsunto(dto.getTipoAsunto());
+		ar.setTipoAsuntoDenominacion(dto.getTipoAsuntoDenominacion());
+		ar.setTipoDocumentacionFisicaCodigo(dto.getTipoDocumentacionFisicaCodigo());
+		ar.setTipoEnvioDocumentacion(dto.getTipoEnvioDocumentacion());
+		ar.setTipoRegistro(dto.getTipoRegistro());
+		ar.setTipoTransporte(dto.getTipoTransporte());
+		ar.setUnidadTramitacionDestinoCodigo(dto.getUnidadTramitacionDestinoCodigo());
+		ar.setUnidadTramitacionDestinoDenominacion(dto.getUnidadTramitacionDestinoDenominacion());
+		ar.setUnidadTramitacionOrigenCodigo(dto.getUnidadTramitacionOrigenCodigo());
+		ar.setUnidadTramitacionOrigenDenominacion(dto.getUnidadTramitacionOrigenDenominacion());
+		ar.setVersion(dto.getVersion());
+		return ar;
+	}
+	
+	
+	public RespostaConsultaRegistre toRespostaConsultaRegistre(AsientoRegistralBean ar) {
 		RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
 		
-		try {
-			registroSalidaApi = getRegistroSalidaApi();
-			
-            RegistroSalidaResponseWs registroSalida = registroSalidaApi.obtenerRegistroSalida(numRegistre, usuariCodi, entitatCodi);
-            
-            resposta.setRegistreNumero(registroSalida.getNumeroRegistroFormateado());
-            resposta.setRegistreData(registroSalida.getFechaRegistro());
-            resposta.setEntitatCodi(registroSalida.getEntidadCodigo());
-            resposta.setEntitatDenominacio(registroSalida.getEntidadDenominacion());
-            resposta.setOficinaCodi(registroSalida.getOficinaCodigo());
-            resposta.setOficinaDenominacio(registroSalida.getOficinaDenominacion());
-            
-		} catch (WsI18NException e) {
-            String msg = WsClientUtils.toString(e);
-            throw new RegistrePluginException("Error WsI18NException: " + msg);
-        } catch (WsValidationException e) {
-            String msg = WsClientUtils.toString(e);
-            throw new RegistrePluginException("Error WsValidationException: " + msg);
-        } catch (Exception e) {
-        	logger.error("Error al obtenir l'anotació de registre de sortida", e);
-			throw new RegistrePluginException("Error al obtenir l'anotació de registre de sortida", e);
-		}
-		
 		return resposta;
 	}
 	
-	@Override
-	public void anularRegistreSortida(
-			String registreNumero,
-			String usuari,
-			String entitat,
-			boolean anular) throws RegistrePluginException {
-		
-		RegWebRegistroSalidaWs registroSalidaApi = null;
-		
-		try {
-			registroSalidaApi = getRegistroSalidaApi();
-			
-			registroSalidaApi.anularRegistroSalida(
-					registreNumero, 			// Numero de l'assentament formatejat
-					usuari, 					// Codi de l'usuari que vol realitzar l'operació
-					entitat, 					// Codi DIR3 de l'entitat al que pertany l'usuari
-					anular);					// Indica si s'ha d'anular o no l'assentament.
-			
-		} catch (Exception e) {
-        	logger.error("Error al intentar anular el registre de sortida", e);
-			throw new RegistrePluginException("Error al intentar anular el registre de sortida", e);
-		}
-	}
 	
-	@Override
-	public RespostaAnotacioRegistre registrarEntrada(
-			RegistreAssentament registreEntrada,
-			String aplicacioNom,
-			String aplicacioVersio,
-			String entitat) throws RegistrePluginException {
-		
-		RegWebRegistroEntradaWs registroEntradaApi = null;
-				
-		try {
-			registroEntradaApi = getRegistroEntradaApi();
-		} catch (Exception e) {
-			logger.error("Error al registrar l'anotació de registre d'entrada", e);
-        	throw new RegistrePluginException("Error al registrar l'anotació de registre d'entrada", e);
-		}
-		
-		// 		Camps del registre
-		//		------------------------------------------------------------------------------------------------------------------------------------------
-		//		Camp								| 	Obligatori	|	Descripció
-		//		------------------------------------------------------------------------------------------------------------------------------------------
-		//		Dades de l'ENVIAMENT
-		//		------------------------------------------------------------------------------------------------------------------------------------------
-		//		String desti;  						|	Si			|	Codi DIR3 de l'òrgan destinatari de l'assentament.
-		//		String oficina;						|	Si			|	Codi DIR3 de l'entitat registral on es registre l'assentament
-		//		String libro;						|	Si			|	Codi del llibre al qual fer l'assentament.
-		//		Long docFisica;						|	Si			|	Indica si a l'assentament l'acompanya documentació física o tota la documentació és electrònica. 
-		//											|				|	Codi definit a SICRES3:
-		//											|				|		'01' = Acompanya documentació física requerida.
-		//											|				|		'02' = Acompanya documentació física complementària.
-		//											|	Si			|		'03' = No acompanya documentació física ni altres suports.
-		//		String idioma;						|				|	Codi de l'idioma en què es fa l'assentament.
-		//											|				|	Els codis disponibles són:
-		//											|				|		'ca' = Català.
-		//											|				|		'es' = Castellà.
-		//											|				|		'gl' = Gallec.
-		//											|				|		'eu' = Basc.
-		//											|				|		'en' = Anglès.
-		//		String aplicacion;					|	No			|	Codi de l'aplicació que fa l'assentament
-		//		String version;						|	No			|	Versió de l'aplicació que fa l'assentament
-		//		String codigoUsuario;				|	Si			|	Nom de l'usuari que fa l'assentament. Si és un registre electrònic serà el nom de l'aplicació
-		//		String contactoUsuario;				|	No			|	Contacte de l'usuari d'origen. Si és un registre electrònic serà el responsable del tràmit.
-		//		String numExpediente;				|	No			|	Referència al nombre d'expedient de l'assentament
-		//	    String numTransporte;				|	No			|	Número del transport d'entrada
-		//	    String tipoTransporte;				|	No			|	Forma d'arribada del registre d'entrada. 
-		//											|				|	Codi definit a SICRES3:
-		//											|				|		'01' = Servei de missatgers
-		//											|				|		'02' = Correu postal
-		//											|				|		'03' = Correu postal certificat
-		//											|				|		'04' = Burofax
-		//											|				|		'05' = En ma
-		//											|				|		'06' = Fax
-		//											|				|		'07' = Altres
-		//											|				|		En cas de ser un registre electrònic aquest camp prendrà el valor Altres (07).
-		//		String extracto;					|	Si			|	Extracte o resum de l'assentament
-		//		String tipoAsunto;					|	Si			|	Codi del tipus assumpte de l'expedient
-		//	    String codigoAsunto;				|	No			|	Codi de l'assumpte en destí. Aquest camp contindrà el codi del procediment/tràmit a què pertany l'assentament. Està tipificat a dins REGWEB.
-		//	    String refExterna;					|	No			|	Referència externa a qualque element de l'assentament (matrícula de cotxe, rebut,...)
-		//	    String observaciones;				|	No			|	Observacions de l'assentament.
-		//											|				|
-	    //		String expone;						|	No			|	Exposició de fets. Només s'ha d'emprar quan l'assentament és una sol·licitud genèrica electrònica.
-		//	    String solicita;					|	No			|	Objecte de la sol·licitud. Només s'ha d'emprar quan l'assentament és una sol·licitud genèrica electrònica.
-		//											|				|
-		//		List<InteresadoWs> interesados;		|	Si			|	Dades de l'interessat en l'assentament. Pot haver-n'hi més d'1.
-		//		List<AnexoWs> anexos;				|	No			|	Fitxers annexes a l'assentament
-		//											|				|		
-		//											|				|
-		//		------------------------------------------------------------------------------------------------------------------------------------------
-		//		Dades de la RESPOSTA
-		//		------------------------------------------------------------------------------------------------------------------------------------------
-		//	    Timestamp fecha;					|				|	Data del assentament
-		//	    Integer numero;						|				|	Número de l'assentament
-		//	    String numeroRegistroFormateado;	|				|	Número de l'assentament formateat
-		
-		RegistroEntradaWs registroEntradaWs = new RegistroEntradaWs();
-
-		registroEntradaWs.setDestino(registreEntrada.getOrgan());
-		registroEntradaWs.setOficina(registreEntrada.getOficinaCodi());
-		registroEntradaWs.setLibro(registreEntrada.getLlibreCodi());
-		registroEntradaWs.setDocFisica(registreEntrada.getDocumentacioFisicaCodi() != null ? new Long(registreEntrada.getDocumentacioFisicaCodi()) : (long)3);
-		registroEntradaWs.setIdioma(registreEntrada.getIdiomaCodi() == null? "ca" : registreEntrada.getIdiomaCodi().toLowerCase());
-		registroEntradaWs.setAplicacion(aplicacioNom);
-		registroEntradaWs.setVersion(aplicacioVersio);
-		registroEntradaWs.setCodigoUsuario(registreEntrada.getUsuariCodi());
-		registroEntradaWs.setContactoUsuario(registreEntrada.getUsuariContacte());
-		registroEntradaWs.setNumExpediente(registreEntrada.getExpedientNumero());
-		registroEntradaWs.setNumTransporte(registreEntrada.getTransportNumero());
-		registroEntradaWs.setTipoTransporte(registreEntrada.getTransportNumero());	// En cas de ser un registre electrònic aquest camp prendrà el valor Altres ("07").
-		registroEntradaWs.setExtracto(registreEntrada.getExtracte());
-		registroEntradaWs.setTipoAsunto(registreEntrada.getAssumpteTipusCodi());
-		registroEntradaWs.setCodigoAsunto(registreEntrada.getAssumpteCodi());
-		registroEntradaWs.setRefExterna(registreEntrada.getReferencia());
-		registroEntradaWs.setObservaciones(registreEntrada.getObservacions());
-		
-        registroEntradaWs.setExpone(registreEntrada.getExposa());		// Només s'ha d'emprar quan l'assentament és una sol·licitud genèrica electrònica.
-        registroEntradaWs.setSolicita(registreEntrada.getSolicita());	// Només s'ha d'emprar quan l'assentament és una sol·licitud genèrica electrònica.
-
-        // Interesados
-        for (RegistreAssentamentInteressat inter: registreEntrada.getInteressats()) {
-        	InteresadoWs interesadoWs = new InteresadoWs();
-
-            DatosInteresadoWs interesado = new DatosInteresadoWs();
-            interesado.setTipoInteresado(Long.valueOf(inter.getTipus().getValor()));
-            interesado.setTipoDocumentoIdentificacion(inter.getDocumentTipus());
-            interesado.setDocumento(inter.getDocumentNum());
-            interesado.setEmail(inter.getEmail());
-            interesado.setNombre(inter.getNom());
-            interesado.setApellido1(inter.getLlinatge1());
-            interesado.setApellido2(inter.getLlinatge2());
-            interesado.setRazonSocial(inter.getRaoSocial());
-            interesado.setPais(inter.getPais() != null ? new Long(inter.getPais()) : null);
-            interesado.setProvincia(inter.getProvincia() != null ? new Long(inter.getProvincia()) : null);
-            interesado.setDireccion(inter.getAdresa());
-            interesado.setCp(inter.getCodiPostal());
-            interesado.setLocalidad(inter.getMunicipi() != null ? new Long(inter.getMunicipi()) : null);
-            interesado.setTelefono(inter.getTelefon());
-            interesadoWs.setInteresado(interesado);
-
-            if (inter.getRepresentant() != null) {
-            	RegistreAssentamentInteressat repre = inter.getRepresentant();
-	            DatosInteresadoWs representante = new DatosInteresadoWs();
-	            representante.setTipoInteresado(Long.valueOf(repre.getTipus().getValor()));
-	            representante.setTipoDocumentoIdentificacion(repre.getDocumentTipus());
-	            representante.setDocumento(repre.getDocumentNum());
-	            representante.setEmail(repre.getEmail());
-	            representante.setNombre(repre.getNom());
-	            representante.setApellido1(repre.getLlinatge1());
-	            representante.setApellido2(repre.getLlinatge2());
-	            representante.setPais(repre.getPais() != null ? new Long(repre.getPais()) : null);
-	            representante.setProvincia(repre.getProvincia() != null ? new Long(repre.getProvincia()) : null);
-	            representante.setDireccion(repre.getAdresa());
-	            representante.setCp(repre.getCodiPostal());
-	            representante.setLocalidad(repre.getMunicipi() != null ? new Long(repre.getMunicipi()) : null);
-	            representante.setTelefono(repre.getTelefon());
-	            interesadoWs.setRepresentante(representante);
-            }
-            
-            registroEntradaWs.getInteresados().add(interesadoWs);
-        }
-        
-        for (DocumentRegistre document: registreEntrada.getDocuments()) {
-        	AnexoWs anexoWs = new AnexoWs();
-        	
-        	anexoWs.setTitulo(document.getNom());
-            anexoWs.setTipoDocumental(document.getTipusDocumental());
-            anexoWs.setTipoDocumento(document.getTipusDocument());
-            anexoWs.setOrigenCiudadanoAdmin(document.getOrigen());
-            anexoWs.setObservaciones(document.getObservacions());
-            anexoWs.setModoFirma(document.getModeFirma());
-
-            anexoWs.setFicheroAnexado(document.getArxiuContingut());
-            anexoWs.setNombreFicheroAnexado(document.getArxiuNom());
-            anexoWs.setFechaCaptura(new Timestamp(document.getData().getTime()));
-            
-            InputStream is = new BufferedInputStream(new ByteArrayInputStream(document.getArxiuContingut()));
-            try {
-				String mimeType = URLConnection.guessContentTypeFromStream(is);
-				anexoWs.setTipoMIMEFicheroAnexado(mimeType);
-			} catch (IOException e) {
-				throw new RegistrePluginException("Error IOException: " + e);
-			}
-        	
-            registroEntradaWs.getAnexos().add(anexoWs);
-        }
-
-       
-        RespostaAnotacioRegistre resposta = null;
-        try {
-//            IdentificadorWs identificadorWs = registroEntradaApi.altaRegistroEntrada(registroEntradaWs);
-        	IdentificadorWs identificadorWs = registroEntradaApi.nuevoRegistroEntrada(entitat, registroEntradaWs);
-            resposta = new RespostaAnotacioRegistre();
-            resposta.setData(identificadorWs.getFecha());
-            resposta.setNumero(identificadorWs.getNumero());
-            resposta.setNumeroRegistroFormateado(identificadorWs.getNumeroRegistroFormateado());
-            resposta.setErrorCodi(RespostaAnotacioRegistre.ERROR_CODI_OK);
-        } catch (WsI18NException e) {
-            String msg = WsClientUtils.toString(e);
-            throw new RegistrePluginException("Error WsI18NException: " + msg);
-        } catch (WsValidationException e) {
-            String msg = WsClientUtils.toString(e);
-            throw new RegistrePluginException("Error WsValidationException: " + msg);
-        } catch (Exception e) {
-        	throw new RegistrePluginException("Error WsValidationException: ", e);
-		}
-        return resposta;
-	}
-
-	@Override
-	public RespostaConsultaRegistre obtenirRegistreEntrada(
-			String numRegistre,
-			String usuariCodi,
-			String entitatCodi) throws RegistrePluginException {
-		
-		RegWebRegistroEntradaWs registroEntradaApi = null;
-		RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
-		
-		try {
-			registroEntradaApi = getRegistroEntradaApi();
-			
-			
-			RegistroEntradaResponseWs registroEntrada = registroEntradaApi.obtenerRegistroEntrada(numRegistre, usuariCodi, entitatCodi);
-            
-            resposta.setRegistreNumero(registroEntrada.getNumeroRegistroFormateado());
-            resposta.setRegistreData(registroEntrada.getFechaRegistro());
-            resposta.setEntitatCodi(registroEntrada.getEntidadCodigo());
-            resposta.setEntitatDenominacio(registroEntrada.getEntidadDenominacion());
-            resposta.setOficinaCodi(registroEntrada.getOficinaCodigo());
-            resposta.setOficinaDenominacio(registroEntrada.getOficinaDenominacion());
-            
-		} catch (WsI18NException e) {
-            String msg = WsClientUtils.toString(e);
-            throw new RegistrePluginException("Error WsI18NException: " + msg);
-        } catch (WsValidationException e) {
-            String msg = WsClientUtils.toString(e);
-            throw new RegistrePluginException("Error WsValidationException: " + msg);
-		} catch (Exception e) {
-        	logger.error("Error al obtenir l'anotació de registre d'entrada", e);
-			throw new RegistrePluginException("Error al obtenir l'anotació de registre d'entrada", e);
-		}
-		
-		return resposta;
-	}
 	
-//	@Override
-//	private RespostaAnotacioRegistre obtenirRegistreEntradaId(
-//			Integer anyRegistre,
-//			Integer numRegistre,
-//			String llibre,
-//			String usuariCodi,
-//			String entitatCodi) throws RegistrePluginException {
-//		
-//		RegWebRegistroEntradaWs registroEntradaApi = null;
-//		RespostaAnotacioRegistre resposta = null;
-//		
-//		try {
-//			registroEntradaApi = getRegistroEntradaApi();
-//			
-//			
-//			IdentificadorWs registroEntrada = registroEntradaApi.obtenerRegistroEntradaID(anyRegistre, numRegistre, llibre, usuariCodi, entitatCodi);
-//            
-//			resposta.setNumero(registroEntrada.getNumero());
-//			resposta.setData(registroEntrada.getFecha());
-//			resposta.setNumeroRegistroFormateado(registroEntrada.getNumeroRegistroFormateado());
-//            
-//            
-//		} catch (WsI18NException e) {
-//            String msg = WsClientUtils.toString(e);
-//            throw new RegistrePluginException("Error WsI18NException: " + msg);
-//        } catch (WsValidationException e) {
-//            String msg = WsClientUtils.toString(e);
-//            throw new RegistrePluginException("Error WsValidationException: " + msg);
-//		} catch (Exception e) {
-//        	logger.error("Error al obtenir l'Id de l'anotació de registre d'entrada", e);
-//			throw new RegistrePluginException("Error al obtenir l'Id de l'anotació de registre d'entrada", e);
-//		}
-//		
-//		return resposta;
+	public AsientoRegistralBean notificacioToAsientoRegistralBean(NotificacioDto notificacio, AnexoWs anexe) {
+		AsientoRegistralBean registre = new AsientoRegistralBean();
+		registre.setEntidadCodigo(notificacio.getEntitat().getCodi());
+		registre.setEntidadDenominacion(notificacio.getEntitat().getNom());
+		registre.setEntidadRegistralInicioCodigo(notificacio.getProcediment().getOficina());
+		registre.setEntidadRegistralInicioDenominacion(notificacio.getProcediment().getOficina());
+		registre.setEntidadRegistralOrigenCodigo(notificacio.getProcediment().getOficina());
+		registre.setEntidadRegistralOrigenDenominacion(notificacio.getProcediment().getOficina());
+		registre.setEntidadRegistralDestinoCodigo(notificacio.getProcediment().getOficina());
+		registre.setEntidadRegistralDestinoDenominacion(notificacio.getProcediment().getOficina());
+		registre.setUnidadTramitacionOrigenCodigo(notificacio.getRegistreOrgan());
+		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getRegistreOrgan());
+		registre.setUnidadTramitacionDestinoCodigo(notificacio.getProcediment().getOficina());
+		registre.setUnidadTramitacionDestinoDenominacion(notificacio.getProcediment().getOficina());
+		registre.setTipoRegistro(2L);
+		registre.setLibroCodigo(notificacio.getProcediment().getLlibre());
+		registre.setResumen(notificacio.getRegistreExtracte());
+		/* 1 = Documentació adjunta en suport Paper
+		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper
+		 * 3 = Documentació adjunta digitalitzada */
+		registre.setTipoDocumentacionFisicaCodigo(3L);
+		registre.setTipoAsunto(notificacio.getRegistreTipusAssumpte());
+		registre.setTipoAsuntoDenominacion(notificacio.getRegistreTipusAssumpte());
+		registre.setCodigoAsunto(notificacio.getRegistreTipusAssumpte());
+		registre.setCodigoAsuntoDenominacion(notificacio.getRegistreTipusAssumpte());
+		registre.setIdioma(1L);
+		registre.setReferenciaExterna(notificacio.getRegistreRefExterna());
+		registre.setNumeroExpediente(notificacio.getRegistreNumExpedient());
+		/*
+		 * 
+		 * '01' : Servei de missatgers
+		 * '02' : Correu postal
+		 * '03' : Correu postal certificat
+		 * '04' : Burofax
+		 * '05' : En ma
+		 * '06' : Fax
+		 * '07' : Altres
+		 * 
+		 * */
+		if(notificacio.getPagadorPostal() != null) {
+			registre.setTipoTransporte("02");
+		}else {
+			registre.setTipoTransporte("07");
+		}
+//		registre.setNumeroTransporte();
+		registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
+		registre.setCodigoUsuario(notificacio.getUsuariCodi());
+		registre.setAplicacionTelematica("NOTIB");
+		registre.setAplicacion("NOTIB");
+		registre.setVersion("3.1");
+		registre.setObservaciones(notificacio.getRegistreObservacions());
+		registre.setExpone("");
+		registre.setSolicita("");
+		registre.setPresencial(false);
+//		registre.setTipoEnvioDocumentacion();
+		registre.setEstado(notificacio.getEstat().getLongVal());
+		registre.setUnidadTramitacionOrigenCodigo(notificacio.getRegistreOrgan());
+		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getRegistreOrgan());
+//		registre.setIdentificadorIntercambio();
+//		registre.setFechaRecepcion();
+//		registre.setCodigoError();
+//		registre.setNumeroRegistroDestino();
+//		registre.setFechaRegistroDestino();
+		registre.setMotivo(notificacio.getDescripcio());
+		registre.getInteresados().add(personaToInteresadoWs(notificacio.getEnviaments().iterator().next().getTitular()));
+		if(notificacio.getDocument() != null) {
+			registre.getAnexos().add(anexe);	
+		}
+		return registre;
+	}
+	/*------------------*/
+	
+//	public RegistreAnotacioDto notificacioToRegistreAnotacioV2(NotificacioEntity notificacio) {
+//		RegistreAnotacioDto registre = new RegistreAnotacioDto();
+//		registre.setAssumpteCodi(notificacio.getRegistreCodiAssumpte());
+//		registre.setAssumpteExtracte(notificacio.getConcepte());
+//		registre.setAssumpteIdiomaCodi(notificacio.getRegistreIdioma());
+//		registre.setAssumpteTipus(notificacio.getRegistreTipusAssumpte());
+//		registre.setEntitatCodi(notificacio.getEntitat().getCodi());
+//		registre.setExpedientNumero(notificacio.getRegistreNumExpedient());
+//		registre.setObservacions(notificacio.getRegistreObservacions());
+//		registre.setLlibre(notificacio.getProcediment().getLlibre());
+//		registre.setOficina(notificacio.getProcediment().getOficina());
+//		registre.setAnnexos(new ArrayList<RegistreAnnexDto>());
+//		registre.getAnnexos().add(documentToRegistreAnnexDto(notificacio.getDocument()));
+//		List<RegistreInteressatDto> interessats = new ArrayList<RegistreInteressatDto>();
+//		interessats.add(personaToRegistreInteresatDto(notificacio.getEnviaments().iterator().next().getTitular()));
+//		registre.setInteressats(interessats);
+//		return registre;
 //	}
 	
-	@Override
-	public RespostaJustificantRecepcio obtenirJustificantEntrada(
-			Integer anyRegistre,
-			Integer numRegistre,
-			String llibre,
-			String usuariCodi,
-			String entitatCodi) throws RegistrePluginException {
-		
-		RegWebRegistroEntradaWs registroEntradaApi = null;
-		RespostaJustificantRecepcio resposta = new RespostaJustificantRecepcio();
-		
-		try {
-			registroEntradaApi = getRegistroEntradaApi();
-			
-			IdentificadorWs registroEntrada = registroEntradaApi.obtenerRegistroEntradaID(anyRegistre, numRegistre, llibre, usuariCodi, entitatCodi);
-			JustificanteWs justificant = registroEntradaApi.obtenerJustificante(entitatCodi, registroEntrada.getNumeroRegistroFormateado());
-			
-			resposta.setJustificant(justificant.getJustificante());
-			resposta.setErrorCodi(RespostaAnotacioRegistre.ERROR_CODI_OK);
-			
-		} catch (WsI18NException e) {
-            String msg = WsClientUtils.toString(e);
-            throw new RegistrePluginException("Error WsI18NException: " + msg);
-        } catch (WsValidationException e) {
-            String msg = WsClientUtils.toString(e);
-            throw new RegistrePluginException("Error WsValidationException: " + msg);
-		} catch (Exception e) {
-        	logger.error("Error al obtenir l'anotació de registre d'entrada", e);
-			throw new RegistrePluginException("Error al obtenir l'anotació de registre d'entrada", e);
-		}
-		
-		return resposta;
-		
+	public RegistreInteressatDto personaToRegistreInteresatDto (PersonaDto persona) {
+		RegistreInteressatDto interessat = new RegistreInteressatDto();
+		interessat.setNom(persona.getNom());
+		interessat.setLlinatge1(persona.getLlinatge1());
+		interessat.setLlinatge2(persona.getLlinatge2());
+		interessat.setRaoSocial(persona.getRaoSocial());
+		interessat.setTelefon(persona.getTelefon());
+		interessat.setDocumentNumero(persona.getNif());
+		interessat.setDocumentTipus(RegistreInteressatDocumentTipusEnum.NIF);
+		return interessat;
 	}
 	
-	@Override
-	public void anularRegistreEntrada(
-			String registreNumero,
-			String usuari,
-			String entitat,
-			boolean anular) throws RegistrePluginException {
-		
-		RegWebRegistroEntradaWs registroEntradaApi = null;
-		
-		try {
-			registroEntradaApi = getRegistroEntradaApi();
-			
-			registroEntradaApi.anularRegistroEntrada(
-					registreNumero, 			// Numero de l'assentament formatejat
-					usuari, 					// Codi de l'usuari que vol realitzar l'operació
-					entitat, 					// Codi DIR3 de l'entitat al que pertany l'usuari
-					anular);					// Indica si s'ha d'anular o no l'assentament.
-			
-		} catch (Exception e) {
-        	logger.error("Error al intentar anular el registre d'entrada", e);
-			throw new RegistrePluginException("Error al intentar anular el registre d'entrada", e);
-		}
+	public InteresadoWs personaToInteresadoWs (PersonaDto persona) {
+		InteresadoWs interessat = new InteresadoWs();
+		DatosInteresadoWs interessatDades = new DatosInteresadoWs();
+//		interessatDades.setTipoInteresado(persona.getTipusInteressat());/*--------------*/
+		interessatDades.setTipoDocumentoIdentificacion("N");
+		interessatDades.setDocumento(persona.getNif());
+		interessatDades.setRazonSocial(persona.getRaoSocial());
+		interessatDades.setNombre(persona.getNom());
+		interessatDades.setApellido1(persona.getLlinatge1());
+		interessatDades.setApellido2(persona.getLlinatge2());
+		interessatDades.setCodigoDire("");
+		interessatDades.setDireccion("");
+		interessatDades.setCp("");
+		interessatDades.setObservaciones("");
+		interessatDades.setEmail(persona.getEmail());
+		interessatDades.setDireccionElectronica(persona.getEmail());
+		interessatDades.setTelefono(persona.getTelefon());
+		interessat.setInteresado(interessatDades);
+		return interessat;
 	}
 	
-	
-	@Override
-	public List<TipusAssumpte> llistarTipusAssumpte(
-			String entitat) throws RegistrePluginException {
-		
-		RegWebInfoWs registroInfoApi = null;
-		List<TipusAssumpte> tipusAssumptes = new ArrayList<TipusAssumpte>();
-		
+	public static DocumentBuilder getDocumentBuilder() throws Exception {
 		try {
-			registroInfoApi = getInfoApi();
-			
-			List<TipoAsuntoWs> tiposAsunto = registroInfoApi.listarTipoAsunto(
-					entitat);					// Codi DIR3 de l'òrgan arrel de l'entitat a consultar
-			for (TipoAsuntoWs tipoAsunto : tiposAsunto) {
-				TipusAssumpte tipusAssumpte = new TipusAssumpte();
-				tipusAssumpte.setCodi(tipoAsunto.getCodigo());
-				tipusAssumpte.setNom(tipoAsunto.getNombre());
-				tipusAssumptes.add(tipusAssumpte);
-			}
-			
-		} catch (Exception e) {
-        	logger.error("Error al intentar llistar els tipus d'assumpte", e);
-			throw new RegistrePluginException("Error al intentar llistar els tipus d'assumpte", e);
-		}
-		
-		return tipusAssumptes;
-	}
-	
-	@Override
-	public List<CodiAssumpte> llistarCodisAssumpte(
-			String entitat,
-			String tipusAssumpte) throws RegistrePluginException {
-		
-		RegWebInfoWs registroInfoApi = null;
-		List<CodiAssumpte> codiAssumptes = new ArrayList<CodiAssumpte>();
-		
-		try {
-			registroInfoApi = getInfoApi();
-			
-			List<CodigoAsuntoWs> codigosAsunto = registroInfoApi.listarCodigoAsunto(
-					entitat,					// Codi de l'usuari que vol realitzar l'operació
-					tipusAssumpte);				// Codi SICRES del tipus d'assumpte.
-			for (CodigoAsuntoWs codigoAsunto : codigosAsunto) {
-				CodiAssumpte codiAssumpte = new CodiAssumpte();
-				codiAssumpte.setCodi(codigoAsunto.getCodigo());
-				codiAssumpte.setNom(codigoAsunto.getNombre());
-				if (codigoAsunto.getTipoAsunto() != null)
-					codiAssumpte.setTipusAssumpte(codigoAsunto.getTipoAsunto().getCodigo());
-				
-				codiAssumptes.add(codiAssumpte);
-			}
-			
-		} catch (Exception e) {
-        	logger.error("Error al intentar llistar els codis d'assumpte", e);
-			throw new RegistrePluginException("Error al intentar llistar els codis d'assumpte", e);
-		}
-		
-		return codiAssumptes;
-	}
-	
-	@Override
-	public List<Oficina> llistarOficines(
-			String entitat,
-			Long autoritzacio) throws RegistrePluginException {
-		
-		RegWebInfoWs registroInfoApi = null;
-		List<Oficina> oficines = new ArrayList<Oficina>();
-		
-		try {
-			registroInfoApi = getInfoApi();
-			
-			List<OficinaWs> oficinas = registroInfoApi.listarOficinas(
-					entitat,					// Codi DIR3 de l'òrgan arrel de l'entitat a consultar
-					autoritzacio);				// Tipo de permís damunt els llibres que vol consultar. 
-												// 		1 = Registro entrada 
-												//		2 = Registro salida
-												// 		3 = Consulta Registro entrada.
-												//		4 = Consulta Registro salida.
-			for (OficinaWs ofic : oficinas) {
-				Oficina oficina = new Oficina();
-				oficina.setCodi(ofic.getCodigo());
-				oficina.setNom(ofic.getNombre());
-				oficines.add(oficina);
-			}
-			
-		} catch (Exception e) {
-        	logger.error("Error al intentar llistar les oficines", e);
-			throw new RegistrePluginException("Error al intentar llistar les oficines", e);
-		}
-		
-		return oficines;
-	}
-	
-	@Override
-	public List<Llibre> llistarLlibres(
-			String entitat,
-			String oficina,
-			Long autoritzacio) throws RegistrePluginException {
-		
-		RegWebInfoWs registroInfoApi = null;
-		List<Llibre> llibres = new ArrayList<Llibre>();
-	
-		try {
-			registroInfoApi = getInfoApi();
-			
-			List<LibroWs> libros = registroInfoApi.listarLibros(
-					entitat,					// Codi DIR3 de l'òrgan arrel de l'entitat a consultar
-					oficina,					// Codi DIR3 de l'oficina a consultar
-					autoritzacio);				// Tipo de permís damunt els llibres que vol consultar. 
-												// 		1 = Registro entrada 
-												//		2 = Registro salida
-												// 		3 = Consulta Registro entrada.
-												//		4 = Consulta Registro salida.
-			for (LibroWs libro : libros) {
-				Llibre llibre = new Llibre();
-				llibre.setCodi(libro.getCodigoLibro());
-				llibre.setOrganisme(libro.getCodigoOrganismo());
-				llibre.setNomCurt(libro.getNombreCorto());
-				llibre.setNomLlarg(libro.getNombreLargo());
-				llibres.add(llibre);
-			}
-			
-		} catch (Exception e) {
-        	logger.error("Error al intentar llistar els llibres", e);
-			throw new RegistrePluginException("Error al intentar llistar els llibres", e);
-		}
-		
-		return llibres;
-	}
-	
-	@Override
-	public List<Organisme> llistarOrganismes(
-			String entitat) throws RegistrePluginException {
-		
-		RegWebInfoWs registroInfoApi = null;
-		List<Organisme> organismes = new ArrayList<Organisme>(); 
-		
-		try {
-			registroInfoApi = getInfoApi();
-			
-			List<OrganismoWs> organismos = registroInfoApi.listarOrganismos(
-					entitat);					// Codi DIR3 de l'òrgan arrel de l'entitat a consultar
-			
-			for (OrganismoWs organismo : organismos) {
-				Organisme organisme = new Organisme();
-				organisme.setCodi(organismo.getCodigo());
-				organisme.setNom(organismo.getNombre());
-				organismes.add(organisme);
-			}
-			
-		} catch (Exception e) {
-        	logger.error("Error al intentar llistar els organismes", e);
-			throw new RegistrePluginException("Error al intentar llistar els organismes", e);
-		}
-		
-		return organismes;
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			dbf.setIgnoringComments(true);
+			dbf.setCoalescing(true);
+			dbf.setIgnoringElementContentWhitespace(true);
+			dbf.setValidating(false);
+			return dbf.newDocumentBuilder();
+    	} catch (Exception exc) {
+    		throw new Exception(exc.getMessage());
+    	}
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(RegistrePluginRegweb3Impl.class);
+	
 }

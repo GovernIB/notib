@@ -19,6 +19,7 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
+import es.caib.notib.core.api.dto.ProcedimentFormDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -89,7 +90,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public PaginaDto<ProcedimentDto> findAmbFiltrePaginat(
+	public PaginaDto<ProcedimentFormDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			boolean isUsuari, 
 			boolean isUsuariEntitat,

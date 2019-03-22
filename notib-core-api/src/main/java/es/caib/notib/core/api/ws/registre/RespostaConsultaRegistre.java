@@ -7,7 +7,7 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class RespostaConsultaRegistre {
+public class RespostaConsultaRegistre extends RespostaBase {
 
 	private String registreNumero;
 	private Date registreData;
@@ -15,7 +15,7 @@ public class RespostaConsultaRegistre {
 	private String oficinaDenominacio;
 	private String entitatCodi;
 	private String entitatDenominacio;
-	
+	private String registreNumeroFormatat;
 	
 	public String getRegistreNumero() {
 		return registreNumero;
@@ -52,6 +52,12 @@ public class RespostaConsultaRegistre {
 	}
 	public void setEntitatDenominacio(String entitatDenominacio) {
 		this.entitatDenominacio = entitatDenominacio;
+	}
+	public String getRegistreNumeroFormatat() {
+		return registreNumeroFormatat;
+	}
+	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
+		this.registreNumeroFormatat = registreNumeroFormatat;
 	}
 
 }

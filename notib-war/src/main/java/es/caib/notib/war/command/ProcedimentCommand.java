@@ -164,15 +164,20 @@ public class ProcedimentCommand {
 		EntitatDto entitatDto = new EntitatDto();
 		entitatDto.setId(command.getEntitatId());
 		dto.setEntitat(entitatDto);
-		
-		PagadorPostalDto pagadoPostalDto = new PagadorPostalDto();
-		pagadoPostalDto.setId(command.getPagadorPostalId());
+
+		PagadorPostalDto pagadoPostalDto = null;
+		if (command.getPagadorPostalId() != null) {
+			pagadoPostalDto = new PagadorPostalDto();
+			pagadoPostalDto.setId(command.getPagadorPostalId());
+		}
 		dto.setPagadorpostal(pagadoPostalDto);
-		
-		PagadorCieDto pagadorCieDto = new PagadorCieDto();
-		pagadorCieDto.setId(command.getPagadorCieId());
+
+		PagadorCieDto pagadorCieDto = null;
+		if (command.getPagadorCieId() != null) {
+			pagadorCieDto = new PagadorCieDto();
+			pagadorCieDto.setId(command.getPagadorCieId());
+		}
 		dto.setPagadorcie(pagadorCieDto);
-		
 		return dto;
 	}
 

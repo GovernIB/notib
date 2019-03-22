@@ -6,12 +6,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.core.api.dto.CodiAssumpteDto;
 import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
+import es.caib.notib.core.api.dto.ProcedimentFormDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -108,7 +108,7 @@ public interface ProcedimentService {
 	 * @return La pàgina amb les notificacions.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
-	public PaginaDto<ProcedimentDto> findAmbFiltrePaginat(
+	public PaginaDto<ProcedimentFormDto> findAmbFiltrePaginat(
 			Long entitatId,
 			boolean isUsuari,
 			boolean isUsuariEntitat,

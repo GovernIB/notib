@@ -30,6 +30,7 @@ import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 import javax.xml.ws.soap.SOAPFaultException;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -479,6 +480,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			opcionesDocumento.getOpcion().add(opcionGenerarCsv);
 			documento.setOpcionesDocumento(opcionesDocumento);
 			envios.setDocumento(documento);
+		}
+		if(notificacio.getDocument() != null) {
+			notificacio.getDocument().setHash(DigestUtils.sha256Hex(notificacio.getDocument().getContingutBase64()));	
 		}
 		//V1 rest
 		//if (notificacio.getRetardPostal() != null) {

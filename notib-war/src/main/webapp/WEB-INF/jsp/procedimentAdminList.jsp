@@ -55,9 +55,9 @@
 			<tr>
 				<th data-col-name="codi"><spring:message code="procediment.list.columna.codi"/></th>
 				<th data-col-name="nom"><spring:message code="procediment.list.columna.nom"/></th>
-				<th data-col-name="entitat.nom"><spring:message code="procediment.list.columna.entitat"/></th>
-				<th data-col-name="pagadorpostal.dir3codi"><spring:message code="procediment.list.columna.pagadorpostal"/></th>
-				<th data-col-name="pagadorcie.dir3codi"><spring:message code="procediment.list.columna.pagadorcie"/></th>
+				<th data-col-name="entitatNom"><spring:message code="procediment.list.columna.entitat"/></th>
+				<th data-col-name="pagadorpostal"><spring:message code="procediment.list.columna.pagadorpostal"/></th>
+				<th data-col-name="pagadorcie"><spring:message code="procediment.list.columna.pagadorcie"/></th>
 				<th data-col-name="agrupar" data-visible="false" id="agrupable"></th>
 			
 				<th data-col-name="id" data-template="#cellGrupsTemplate" data-orderable="false" width="10%">
