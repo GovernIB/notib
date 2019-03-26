@@ -3,6 +3,8 @@ package es.caib.notib.war.command;
 import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
+
+import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.ValidIfVisible;
@@ -29,6 +31,7 @@ import es.caib.notib.war.validation.ValidIfVisible;
 })
 public class PersonaCommand {
 
+	private InteressatTipusEnumDto interessatTipus;
 	private String nom;
 	private String llinatge1;
 	private String llinatge2;
@@ -38,6 +41,12 @@ public class PersonaCommand {
 	private String dir3codi;
 	private boolean visible = true;
 	
+	public InteressatTipusEnumDto getInteressatTipus() {
+		return interessatTipus;
+	}
+	public void setInteressatTipus(InteressatTipusEnumDto interessatTipus) {
+		this.interessatTipus = interessatTipus;
+	}
 	public String getNom() {
 		return nom;
 	}

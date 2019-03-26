@@ -1,7 +1,5 @@
 package es.caib.notib.war.command;
 
-import javax.validation.constraints.NotNull;
-
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.war.validation.ValidIfVisible;

@@ -152,7 +152,7 @@ public class ProcedimentController extends BaseUserController{
 						ProcedimentCommand.asDto(procedimentCommand),
 						isAdministrador(request));
 				
-			}catch(NotFoundException | ValidationException ev) {
+			} catch(NotFoundException | ValidationException ev) {
 				System.out.print("Error");
 			}
 			return getModalControllerReturnValueSuccess(

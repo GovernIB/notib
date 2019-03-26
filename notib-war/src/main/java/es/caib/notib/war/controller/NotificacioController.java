@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
@@ -43,6 +44,7 @@ import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
@@ -153,17 +155,7 @@ public class NotificacioController extends BaseUserController {
 			HttpServletRequest request, 
 			@PathVariable Long procedimentId, 
 			Model model) {
-		ProcedimentDto procedimentActual = procedimentService.findById(
-				null, 
-				isAdministrador(request), 
-				procedimentId);
-		NotificacioCommandV2 notificacio = new NotificacioCommandV2();
-		
-		model.addAttribute("notificacioCommandV2", notificacio);
-		model.addAttribute("entitat", procedimentActual.getEntitat());
-		model.addAttribute("procediment", procedimentService.findById(null, isAdministrador(request), procedimentId));
-		model.addAttribute("grups", grupService.findByGrupsProcediment(procedimentId));
-
+		emplenarModelNotificacio(request, procedimentId, model);
 		return "notificacioForm";
 	}
 
@@ -247,6 +239,22 @@ public class NotificacioController extends BaseUserController {
 				notificacioCommand.getProcedimentId());
 		
 		if (bindingResult.hasErrors()) {
+			model.addAttribute("comunicacioTipus", 
+					EnumHelper.getOptionsForEnum(
+							NotificacioComunicacioTipusEnumDto.class,
+							"es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto."));
+			model.addAttribute("enviamentTipus", 
+					EnumHelper.getOptionsForEnum(
+							NotificaEnviamentTipusEnumDto.class,
+							"notificacio.tipus.enviament.enum."));
+			model.addAttribute("serveiTipus", 
+					EnumHelper.getOptionsForEnum(
+							ServeiTipusEnumDto.class,
+							"es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto."));
+			model.addAttribute("interessatTipus", 
+					EnumHelper.getOptionsForEnum(
+							InteressatTipusEnumDto.class,
+							"es.caib.notib.core.api.dto.interessatTipusEnumDto."));
 			model.addAttribute("enviosGuardats", notificacioCommand.getEnviaments());
             model.addAttribute("errors", bindingResult.getAllErrors());
 			return "notificacioForm";
@@ -592,6 +600,41 @@ public class NotificacioController extends BaseUserController {
 				"es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
 	}
 
+	private void emplenarModelNotificacio(
+			HttpServletRequest request, 
+			@PathVariable Long procedimentId, 
+			Model model) {
+		
+		ProcedimentDto procedimentActual = procedimentService.findById(
+				null, 
+				isAdministrador(request), 
+				procedimentId);
+		NotificacioCommandV2 notificacio = new NotificacioCommandV2();
+		
+		model.addAttribute("notificacioCommandV2", notificacio);
+		model.addAttribute("entitat", procedimentActual.getEntitat());
+		model.addAttribute("procediment", procedimentService.findById(
+				null, 
+				isAdministrador(request), 
+				procedimentId));
+		model.addAttribute("grups", grupService.findByGrupsProcediment(procedimentId));
+		model.addAttribute("comunicacioTipus", 
+				EnumHelper.getOptionsForEnum(
+						NotificacioComunicacioTipusEnumDto.class,
+						"es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto."));
+		model.addAttribute("enviamentTipus", 
+				EnumHelper.getOptionsForEnum(
+						NotificaEnviamentTipusEnumDto.class,
+						"notificacio.tipus.enviament.enum."));
+		model.addAttribute("serveiTipus", 
+				EnumHelper.getOptionsForEnum(
+						ServeiTipusEnumDto.class,
+						"es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto."));
+		model.addAttribute("interessatTipus", 
+				EnumHelper.getOptionsForEnum(
+						InteressatTipusEnumDto.class,
+						"es.caib.notib.core.api.dto.interessatTipusEnumDto."));
+	}
 	private boolean isAdministrador(HttpServletRequest request) {
 		return RolHelper.isUsuariActualAdministrador(request);
 	}
