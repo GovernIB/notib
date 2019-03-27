@@ -23,6 +23,8 @@ import es.caib.regweb3.ws.api.v3.RegWebRegistroEntradaWs;
 import es.caib.regweb3.ws.api.v3.RegWebRegistroEntradaWsService;
 import es.caib.regweb3.ws.api.v3.RegWebRegistroSalidaWs;
 import es.caib.regweb3.ws.api.v3.RegWebRegistroSalidaWsService;
+import es.caib.regweb3.ws.v3.impl.AsientoRegistralWs;
+import es.caib.regweb3.ws.v3.impl.AsientoRegistralWsService;
 
 /**
  * 
@@ -38,6 +40,8 @@ public abstract class RegWeb3Utils implements RegwebConstantes {
 	public static final String REGWEB3_REGISTRO_ENTRADA = "RegWebRegistroEntrada";
 	public static final String REGWEB3_REGISTRO_SALIDA = "RegWebRegistroSalida";
 	public static final String REGWEB3_INFO = "RegWebInfo";
+	public static final String REGWEB3_ASIENTO_REGISTRAL = "AsientoRegistral";
+	
 
 
 
@@ -112,7 +116,7 @@ public abstract class RegWeb3Utils implements RegwebConstantes {
 		return api;
 	}
 
-	public static RegWebRegistroEntradaWs getRegistroEntradaApi() throws Exception  {
+	public static RegWebRegistroEntradaWs getRegistroEntradaApi() throws Exception {
 		final String endpoint = getEndPoint(REGWEB3_REGISTRO_ENTRADA);
 
 		final URL wsdl = new URL(endpoint + "?wsdl");
@@ -125,13 +129,26 @@ public abstract class RegWeb3Utils implements RegwebConstantes {
 		return api;
 	}
 
-	public static RegWebRegistroSalidaWs getRegistroSalidaApi() throws Exception  {
+	public static RegWebRegistroSalidaWs getRegistroSalidaApi() throws Exception {
 		
 		final String endpoint = getEndPoint(REGWEB3_REGISTRO_SALIDA);
 		final URL wsdl = new URL(endpoint + "?wsdl");
 		
 		RegWebRegistroSalidaWsService service = new RegWebRegistroSalidaWsService(wsdl);
 		RegWebRegistroSalidaWs api = service.getRegWebRegistroSalidaWs();
+
+		configAddressUserPassword(getAppUserName(), getAppPassword(), endpoint, api);
+
+		return api;
+	}
+	
+	public static AsientoRegistralWs getAsientoRegistralApi() throws Exception {
+		
+		final String endpoint = getEndPoint(REGWEB3_ASIENTO_REGISTRAL);
+		final URL wsdl = new URL(endpoint + "?wsdl");
+		
+		AsientoRegistralWsService service = new AsientoRegistralWsService(wsdl);
+		AsientoRegistralWs api = service.getAsientoRegistralWs();
 
 		configAddressUserPassword(getAppUserName(), getAppPassword(), endpoint, api);
 

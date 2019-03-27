@@ -53,9 +53,24 @@ public class NotificacioDto extends AuditoriaDto {
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
 	private EntitatDto entitat;
+	private ProcedimentDto procediment;
 	private String referenciaExterna;
 	private String notificacio;
 	private boolean permisProcessar;
+	private String registreOrgan;
+	private String registreExtracte;
+	private String registreTipusAssumpte;
+	private String registreRefExterna;
+	private String registreNumExpedient;
+	private PagadorPostalDto pagadorPostal;
+	private String usuariCodi;
+	private String registreObservacions;
+	private Date registreData;
+	private Integer registreNumero;
+	private DocumentDto document;
+	private String descripcio;
+
+	private List<EnviamentDto> enviaments;
 	
 	private List<PermisDto> permisos;
 	private boolean usuariActualRead;
@@ -341,7 +356,90 @@ public class NotificacioDto extends AuditoriaDto {
 	public void setPermisProcessar(boolean permisProcessar) {
 		this.permisProcessar = permisProcessar;
 	}
-	
+	public ProcedimentDto getProcediment() {
+		return procediment;
+	}
+	public void setProcediment(ProcedimentDto procediment) {
+		this.procediment = procediment;
+	}
+	public String getRegistreOrgan() {
+		return registreOrgan;
+	}
+	public void setRegistreOrgan(String registreOrgan) {
+		this.registreOrgan = registreOrgan;
+	}
+	public String getRegistreExtracte() {
+		return registreExtracte;
+	}
+	public void setRegistreExtracte(String registreExtracte) {
+		this.registreExtracte = registreExtracte;
+	}
+	public String getRegistreTipusAssumpte() {
+		return registreTipusAssumpte;
+	}
+	public void setRegistreTipusAssumpte(String registreTipusAssumpte) {
+		this.registreTipusAssumpte = registreTipusAssumpte;
+	}
+	public String getRegistreRefExterna() {
+		return registreRefExterna;
+	}
+	public void setRegistreRefExterna(String registreRefExterna) {
+		this.registreRefExterna = registreRefExterna;
+	}
+	public String getRegistreNumExpedient() {
+		return registreNumExpedient;
+	}
+	public void setRegistreNumExpedient(String registreNumExpedient) {
+		this.registreNumExpedient = registreNumExpedient;
+	}
+	public PagadorPostalDto getPagadorPostal() {
+		return pagadorPostal;
+	}
+	public void setPagadorPostal(PagadorPostalDto pagadorPostal) {
+		this.pagadorPostal = pagadorPostal;
+	}
+	public String getUsuariCodi() {
+		return usuariCodi;
+	}
+	public void setUsuariCodi(String usuariCodi) {
+		this.usuariCodi = usuariCodi;
+	}
+	public String getRegistreObservacions() {
+		return registreObservacions;
+	}
+	public void setRegistreObservacions(String registreObservacions) {
+		this.registreObservacions = registreObservacions;
+	}
+	public Date getRegistreData() {
+		return registreData;
+	}
+	public void setRegistreData(Date registreData) {
+		this.registreData = registreData;
+	}
+	public Integer getRegistreNumero() {
+		return registreNumero;
+	}
+	public void setRegistreNumero(Integer registreNumero) {
+		this.registreNumero = registreNumero;
+	}
+	public DocumentDto getDocument() {
+		return document;
+	}
+	public void setDocument(DocumentDto document) {
+		this.document = document;
+	}
+	public String getDescripcio() {
+		return descripcio;
+	}
+	public void setDescripcio(String descripcio) {
+		this.descripcio = descripcio;
+	}
+	public List<EnviamentDto> getEnviaments() {
+		return enviaments;
+	}
+	public void setEnviaments(List<EnviamentDto> enviaments) {
+		this.enviaments = enviaments;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

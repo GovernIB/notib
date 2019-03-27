@@ -166,16 +166,16 @@ function addDestinatari(enviament_id) {
                 this.id= this.id.replace("][" + number, "][" + num);
             }
         });
-        $(destinatariForm).find("span.select2").remove();
-        
-        $(destinatariForm).find("select").webutilInputSelect2();
-        $(destinatariForm).find("select").attr('data-select2-eval', 'true');
+        $(destinatariForm).find('select').select2('destroy');
         
         $(destinatariForm).find('p').remove();
         $(destinatariForm).find('div').removeClass('has-error');
-        $(destinatariForm).appendTo('.newDestinatari_'+ enviament_id_num).slideDown("slow").find("input[type='text']").val("");
         
-      $()
+        $(destinatariForm).appendTo('.newDestinatari_'+ enviament_id_num).slideDown("slow").find("input[type='text']").val("");
+
+        $(destinatariForm).find('select').webutilInputSelect2();
+        $(destinatariForm).find('select').attr('data-select2-eval', 'true');
+      
         webutilModalAdjustHeight();
     }
 }

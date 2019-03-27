@@ -490,7 +490,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			Date enviamentDataProgramada,
 			Integer retard,
 			Date caducitat,
-			DocumentEntity document,
 			String usuariCodi,
 			String procedimentCodi,
 			ProcedimentEntity procediment,
@@ -498,7 +497,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String registreOficina,
 			String registreLlibre,
 			String registreNumero,
-			Date registreDate,
+			Date registreData,
 			String extracte,
 			String docFisica,
 			String idioma,
@@ -517,7 +516,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				enviamentDataProgramada,
 				retard,
 				caducitat,
-				document,
 				usuariCodi,
 				procedimentCodi,
 				procediment,
@@ -525,7 +523,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				registreOficina,
 				registreLlibre,
 				registreNumero,
-				registreDate,
+				registreData,
 				extracte,
 				docFisica,
 				idioma,
@@ -772,7 +770,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				Date enviamentDataProgramada,
 				Integer retard,
 				Date caducitat,
-				DocumentEntity document,
 				String usuariCodi,
 				String procedimentCodi,
 				ProcedimentEntity procediment,
@@ -780,7 +777,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				String registreOficina,
 				String registreLlibre,
 				String registreNumero,
-				Date registreDate,
+				Date registreData,
 				String extracte,
 				String docFisica,
 				String idioma,
@@ -799,7 +796,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.enviamentDataProgramada = enviamentDataProgramada;
 			built.retardPostal = retard;
 			built.caducitat = caducitat;
-			built.document = document;
 			built.usuariCodi = usuariCodi;
 			built.procedimentCodiNotib = procedimentCodi;
 			built.grupCodi = grup;
@@ -809,7 +805,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.registreOficina = registreOficina;
 			built.registreLlibre = registreLlibre;
 			built.registreNumero = registreNumero;
-			built.registreData = registreDate;
+			built.registreData = registreData;
 			built.registreExtracte = extracte;
 			built.registreDocFisica = docFisica;
 			built.registreIdioma = idioma;
@@ -818,6 +814,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.registreRefExterna = referenciaExterna;
 			built.registreCodiAssumpte = codiAssumpte;
 			built.registreObservacions = observacions;
+			built.registreOrgan = entitat.getDir3Codi();
 
 			built.estat = NotificacioEstatEnumDto.PENDENT;
 			built.notificaEnviamentIntent = 0;
@@ -895,6 +892,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		}
 		public BuilderV2 caducitat(Date caducitat) {
 			built.caducitat = caducitat;
+			return this;
+		}
+		public BuilderV2 document(DocumentEntity document) {
+			built.document = document;
 			return this;
 		}
 		public NotificacioEntity build() {
