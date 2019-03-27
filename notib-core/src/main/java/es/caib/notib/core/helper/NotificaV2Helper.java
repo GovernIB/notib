@@ -482,7 +482,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			envios.setDocumento(documento);
 		}
 		if(notificacio.getDocument() != null) {
-			notificacio.getDocument().setHash(DigestUtils.sha256Hex(notificacio.getDocument().getContingutBase64()));	
+			notificacio.getDocument().setHash(DigestUtils.sha256Hex(notificacio.getDocument().getContingutBase64()));
 		}
 		//V1 rest
 		//if (notificacio.getRetardPostal() != null) {
