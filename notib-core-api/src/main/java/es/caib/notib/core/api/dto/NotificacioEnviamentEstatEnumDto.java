@@ -71,5 +71,7 @@ public enum NotificacioEnviamentEstatEnumDto implements Serializable {
 	PENDENT_DEH,
 	REBUTJADA,
 	SENSE_INFORMACIO,
-	FINALITZADA
+	FINALITZADA,
+	ENVIADA,
+	REGISTRADA
 }
