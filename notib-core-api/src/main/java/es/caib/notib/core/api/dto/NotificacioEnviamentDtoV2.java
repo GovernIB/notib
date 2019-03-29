@@ -13,8 +13,7 @@ import java.util.List;
 public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 
 	private Long id;
-	private NotificacioDtoV2 notificacio;
-	private Long notificacioId;
+	//private NotificacioDtoV2 notificacio;
 	private PersonaDto titular;
 	private List<PersonaDto> destinataris;
 	private EntregaPostalDto entregaPostal;
@@ -28,7 +27,6 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private String referencia;
 	private String notificaIdentificador;
 	private String numeroCertCorreus;
-	private String csvUuid;
 	private String csv;
 	private String uuid;
 	private String notificaCertificacioNumSeguiment;
@@ -37,6 +35,22 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private String notificaDataCaducitat;
 	private Date caducitat;
 	
+	//Info notificació
+	private Date enviamentDataProgramada;
+	private String procedimentCodiNotib;
+	private String grupCodi;
+	private String emisorDir3Codi;
+	private String usuariCodi;
+	private NotificaEnviamentTipusEnumDto enviamentTipus;
+	private String concepte;
+	private String descripcio;
+	private String llibre;
+	private int registreNumero;
+	private Date registreData;
+	private NotificacioEstatEnumDto estat;
+	private Long notificacioId;
+	private String csvUuid;
+	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	
 	public Long getId() {
 		return id;
@@ -44,12 +58,12 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public NotificacioDtoV2 getNotificacio() {
-		return notificacio;
-	}
-	public void setNotificacio(NotificacioDtoV2 notificacio) {
-		this.notificacio = notificacio;
-	}
+	//public NotificacioDtoV2 getNotificacio() {
+	//	return notificacio;
+	//}
+	//public void setNotificacio(NotificacioDtoV2 notificacio) {
+	//	this.notificacio = notificacio;
+	//}
 	public List<PersonaDto> getDestinataris() {
 		return destinataris;
 	}
@@ -141,18 +155,102 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	public void setCodiNotibEnviament(String codiNotibEnviament) {
 		this.codiNotibEnviament = codiNotibEnviament;
 	}
+	public Date getEnviamentDataProgramada() {
+		return enviamentDataProgramada;
+	}
+	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
+		this.enviamentDataProgramada = enviamentDataProgramada;
+	}
+	public String getProcedimentCodiNotib() {
+		return procedimentCodiNotib;
+	}
+	public void setProcedimentCodiNotib(String procedimentCodiNotib) {
+		this.procedimentCodiNotib = procedimentCodiNotib;
+	}
+	public String getGrupCodi() {
+		return grupCodi;
+	}
+	public void setGrupCodi(String grupCodi) {
+		this.grupCodi = grupCodi;
+	}
+	public String getEmisorDir3Codi() {
+		return emisorDir3Codi;
+	}
+	public void setEmisorDir3Codi(String emisorDir3Codi) {
+		this.emisorDir3Codi = emisorDir3Codi;
+	}
+	public String getUsuariCodi() {
+		return usuariCodi;
+	}
+	public void setUsuariCodi(String usuariCodi) {
+		this.usuariCodi = usuariCodi;
+	}
+	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
+		return enviamentTipus;
+	}
+	public void setEnviamentTipus(NotificaEnviamentTipusEnumDto enviamentTipus) {
+		this.enviamentTipus = enviamentTipus;
+	}
+	public String getConcepte() {
+		return concepte;
+	}
+	public void setConcepte(String concepte) {
+		this.concepte = concepte;
+	}
+	public String getDescripcio() {
+		return descripcio;
+	}
+	public void setDescripcio(String descripcio) {
+		this.descripcio = descripcio;
+	}
+	public String getLlibre() {
+		return llibre;
+	}
+	public void setLlibre(String llibre) {
+		this.llibre = llibre;
+	}
+	public int getRegistreNumero() {
+		return registreNumero;
+	}
+	public void setRegistreNumero(int registreNumero) {
+		this.registreNumero = registreNumero;
+	}
+	public Date getRegistreData() {
+		return registreData;
+	}
+	public void setRegistreData(Date registreData) {
+		this.registreData = registreData;
+	}
+	public NotificacioEstatEnumDto getEstat() {
+		return estat;
+	}
+	public void setEstat(NotificacioEstatEnumDto estat) {
+		this.estat = estat;
+	}
 	public String getCsvUuid() {
-		if(notificacio.getDocument().getUuid() != null) {
-			this.setCsvUuid(notificacio.getDocument().getUuid());
-		}
-		if(notificacio.getDocument().getCsv() != null) {
-			this.setCsvUuid(notificacio.getDocument().getCsv());
-		}
-		return this.csvUuid;
+		return csvUuid;
 	}
 	public void setCsvUuid(String csvUuid) {
 		this.csvUuid = csvUuid;
 	}
+	public NotificacioComunicacioTipusEnumDto getComunicacioTipus() {
+		return comunicacioTipus;
+	}
+	public void setComunicacioTipus(NotificacioComunicacioTipusEnumDto comunicacioTipus) {
+		this.comunicacioTipus = comunicacioTipus;
+	}
+	//public String getCsvUuid() {
+	//	if(notificacio.getDocument().getUuid() != null) {
+	//		this.setCsvUuid(notificacio.getDocument().getUuid());
+	//	}
+	//	if(notificacio.getDocument().getCsv() != null) {
+	//		this.setCsvUuid(notificacio.getDocument().getCsv());
+	//	}
+	//	return this.csvUuid;
+	//}
+	//public void setCsvUuid(String csvUuid) {
+	//	this.csvUuid = csvUuid;
+	//}
 	public String getTitularNomLlinatge() {
 		if(this.titularNomLlinatge != null) {
 			return this.titularNomLlinatge;

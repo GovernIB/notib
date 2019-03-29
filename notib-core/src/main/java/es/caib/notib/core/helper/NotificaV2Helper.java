@@ -391,18 +391,16 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		envios.setDescripcion(notificacio.getDescripcio());
 		envios.setProcedimiento(
 				notificacio.getProcedimentCodiNotib());
-
-		Documento documento = new Documento();
+		Documento  documento = new Documento();
 		if(notificacio.getDocument().getArxiuGestdocId() != null) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			pluginHelper.gestioDocumentalGet(
 					notificacio.getDocument().getArxiuGestdocId(),
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 					baos);
-
 			documento.setContenido(baos.toByteArray());
 			documento.setMetadatos(notificacio.getDocument().getMetadades());
-			documento.setHash(notificacio.getDocument().getHash());
+			//documento.setHash(notificacio.getDocument().getHash());
 			Opciones opcionesDocumento = new Opciones();
 			Opcion opcionNormalizado = new Opcion();
 			opcionNormalizado.setTipo("normalizado");
@@ -415,9 +413,20 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					notificacio.getDocument().getGenerarCsv()  ? "si" : "no"); // si o no
 			opcionesDocumento.getOpcion().add(opcionGenerarCsv);
 			documento.setOpcionesDocumento(opcionesDocumento);
+			if(baos.toByteArray() != null) {
+				String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(baos.toByteArray()).toCharArray()));
+				//Hash a enviar
+				documento.setHash(hash256);
+			}			
 			envios.setDocumento(documento);
 		} else if (notificacio.getDocument().getCsv() != null) {
-            documento.setContenido(pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut());
+			byte[] contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
+            documento.setContenido(contingut);       
+            if(contingut != null) {
+				String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(contingut).toCharArray()));
+				//Hash a enviar
+				documento.setHash(hash256);
+			}
             Opciones opcionesDocumento = new Opciones();
             Opcion opcionNormalizado = new Opcion();
             opcionNormalizado.setTipo("normalizado");
@@ -432,7 +441,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
             documento.setOpcionesDocumento(opcionesDocumento);
             envios.setDocumento(documento);
         } else if (notificacio.getDocument().getUrl() != null) {
-            documento.setEnlaceDocumento(notificacio.getDocument().getUrl());
+        	String url = notificacio.getDocument().getUrl();
+            documento.setEnlaceDocumento(url);           
+            String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(url).toCharArray()));
+			//Hash a enviar
+			documento.setHash(hash256);
             Opciones opcionesDocumento = new Opciones();
             Opcion opcionNormalizado = new Opcion();
             opcionNormalizado.setTipo("normalizado");
@@ -447,7 +460,13 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
             documento.setOpcionesDocumento(opcionesDocumento);
             envios.setDocumento(documento);
         } else if (notificacio.getDocument().getUuid() != null) {
-            documento.setContenido(pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut());
+            byte[] contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
+        	documento.setContenido(contingut);
+            if(contingut != null) {
+				String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(contingut).toCharArray()));
+				//Hash a enviar
+				documento.setHash(hash256);
+			}
             Opciones opcionesDocumento = new Opciones();
             Opcion opcionNormalizado = new Opcion();
             opcionNormalizado.setTipo("normalizado");
@@ -464,7 +483,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
         } else {
 			documento.setHash(notificacio.getDocument().getHash());
 			if(notificacio.getDocument().getContingutBase64() != null) {
-				documento.setContenido(notificacio.getDocument().getContingutBase64().getBytes());	
+	        	byte[] contingut = notificacio.getDocument().getContingutBase64().getBytes();
+				documento.setContenido(contingut);	
+				String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(contingut).toCharArray()));
+				//Hash a enviar
+				documento.setHash(hash256);
 			}
 			Opciones opcionesDocumento = new Opciones();
 			Opcion opcionNormalizado = new Opcion();
@@ -479,12 +502,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			opcionesDocumento.getOpcion().add(opcionGenerarCsv);
 			documento.setOpcionesDocumento(opcionesDocumento);
 			envios.setDocumento(documento);
-		}
-		if(documento.getContenido() != null) {
-			notificacio.getDocument().setHash(
-					Base64.encodeBase64String(
-							Hex.decodeHex(
-									DigestUtils.sha256Hex(documento.getContenido()).toCharArray())));
 		}
 		//V1 rest
 		//if (notificacio.getRetardPostal() != null) {
@@ -567,6 +584,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				if (enviament.getDehObligat() != null) {
 					EntregaDEH entregaDeh = new EntregaDEH();
 					entregaDeh.setObligado(enviament.getDehObligat());
+					if (enviament.getDehObligat() != true) {
+						entregaDeh.setCodigoProcedimiento(notificacio.getProcedimentCodiNotib());
+					}
 					envio.setEntregaDEH(entregaDeh);
 				}
 				envios.getEnvio().add(envio);

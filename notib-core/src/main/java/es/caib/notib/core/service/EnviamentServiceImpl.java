@@ -22,12 +22,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.jaxb.SpringDataJaxb.PageDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.ColumnesDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
@@ -35,6 +38,7 @@ import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioTipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -332,6 +336,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		return enviamentToDto(enviament);
 	}
 
+	@Transactional
 	@Override
 	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByEntityAndFiltre(
 			EntitatDto entitat,
@@ -470,7 +475,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 				true,
 				true,
 				false);
-			
+		
+		campsOrdre(paginacioParams);
+		
+		Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
+		
 			enviament = notificacioEnviamentRepository.findByNotificacio(
 					filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 					filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
@@ -523,8 +532,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					dataRegistreInici,
 					(dataRegistreFi == null),
 					dataRegistreFi,
-							
-					paginacioHelper.toSpringDataPageable(paginacioParams));
+					pageable);
 			
 		if(enviament == null || !enviament.hasContent()) {
 			enviament = new PageImpl<>(new ArrayList<NotificacioEnviamentEntity>());
@@ -534,11 +542,112 @@ public class EnviamentServiceImpl implements EnviamentService {
 			nee.setNotificacio(notificacioRepository.findById(nee.getNotificacioId()));
 		}
 		
-		return paginacioHelper.toPaginaDto(
+		/*for (NotificacioEnviamentEntity notificacioEnviamentEntity : enviament.getContent()) {
+			notificacioEnviamentEntity.setProcedimentCodiNotib(notificacioEnviamentEntity.getNotificacio().getProcedimentCodiNotib());
+			notificacioEnviamentEntity.setEnviamentDataProgramada(notificacioEnviamentEntity.getNotificacio().getEnviamentDataProgramada());
+			notificacioEnviamentEntity.setGrupCodi(notificacioEnviamentEntity.getNotificacio().getGrupCodi());
+			notificacioEnviamentEntity.setEmisorDir3Codi(notificacioEnviamentEntity.getNotificacio().getEmisorDir3Codi());
+			notificacioEnviamentEntity.setUsuariCodi(notificacioEnviamentEntity.getNotificacio().getUsuariCodi());
+			notificacioEnviamentEntity.setEnviamentTipus(notificacioEnviamentEntity.getNotificacio().getEnviamentTipus());
+			notificacioEnviamentEntity.setConcepte(notificacioEnviamentEntity.getNotificacio().getConcepte());
+			notificacioEnviamentEntity.setDescripcio(notificacioEnviamentEntity.getNotificacio().getDescripcio());
+			notificacioEnviamentEntity.setLlibre(notificacioEnviamentEntity.getNotificacio().getLlibre());
+			notificacioEnviamentEntity.setRegistreNumero(notificacioEnviamentEntity.getNotificacio().getRegistreNumero());
+			notificacioEnviamentEntity.setRegistreData(notificacioEnviamentEntity.getNotificacio().getRegistreData());
+			notificacioEnviamentEntity.setEstat(notificacioEnviamentEntity.getNotificacio().getEstat());
+			notificacioEnviamentEntity.setComunicacioTipus(notificacioEnviamentEntity.getComunicacioTipus());
+		}*/
+		PaginaDto<NotificacioEnviamentDtoV2> paginaDto = paginacioHelper.toPaginaDto(
 				enviament,
 				NotificacioEnviamentDtoV2.class);
+		int i = 0;
+		for (NotificacioEnviamentDtoV2 notificacioEnviamentDtoV2 : paginaDto.getContingut()) {
+			if (enviament.getContent().get(i).getNotificacio().getProcedimentCodiNotib() != null)
+				notificacioEnviamentDtoV2.setProcedimentCodiNotib(enviament.getContent().get(i).getNotificacio().getProcedimentCodiNotib());
+			if (enviament.getContent().get(i).getNotificacio().getEnviamentDataProgramada() != null)
+				notificacioEnviamentDtoV2.setEnviamentDataProgramada(enviament.getContent().get(i).getNotificacio().getEnviamentDataProgramada());
+			if (enviament.getContent().get(i).getNotificacio().getGrupCodi() != null)
+				notificacioEnviamentDtoV2.setGrupCodi(enviament.getContent().get(i).getNotificacio().getGrupCodi());
+			if (enviament.getContent().get(i).getNotificacio().getEmisorDir3Codi() != null)
+				notificacioEnviamentDtoV2.setEmisorDir3Codi(enviament.getContent().get(i).getNotificacio().getEmisorDir3Codi());
+			if (enviament.getContent().get(i).getNotificacio().getUsuariCodi() != null)
+				notificacioEnviamentDtoV2.setUsuariCodi(enviament.getContent().get(i).getNotificacio().getUsuariCodi());
+			if (enviament.getContent().get(i).getNotificacio().getEnviamentTipus() != null)
+				notificacioEnviamentDtoV2.setEnviamentTipus(enviament.getContent().get(i).getNotificacio().getEnviamentTipus());
+			if (enviament.getContent().get(i).getNotificacio().getConcepte() != null)
+				notificacioEnviamentDtoV2.setConcepte(enviament.getContent().get(i).getNotificacio().getConcepte());
+			if (enviament.getContent().get(i).getNotificacio().getDescripcio() != null)
+				notificacioEnviamentDtoV2.setDescripcio(enviament.getContent().get(i).getNotificacio().getDescripcio());
+			if (enviament.getContent().get(i).getNotificacio().getLlibre() != null)
+				notificacioEnviamentDtoV2.setLlibre(enviament.getContent().get(i).getNotificacio().getLlibre());
+			if (enviament.getContent().get(i).getNotificacio().getRegistreNumero() != null)
+				notificacioEnviamentDtoV2.setRegistreNumero(enviament.getContent().get(i).getNotificacio().getRegistreNumero());
+			if (enviament.getContent().get(i).getNotificacio().getRegistreData() != null)
+				notificacioEnviamentDtoV2.setRegistreData(enviament.getContent().get(i).getNotificacio().getRegistreData());
+			if (enviament.getContent().get(i).getNotificacio().getEstat() != null)
+				notificacioEnviamentDtoV2.setEstat(enviament.getContent().get(i).getNotificacio().getEstat());
+			if (enviament.getContent().get(i).getComunicacioTipus() != null)
+				notificacioEnviamentDtoV2.setComunicacioTipus(enviament.getContent().get(i).getComunicacioTipus());
+			i++;
+		}
+		return paginaDto;
 	}
 
+	private void campsOrdre(PaginacioParamsDto paginacioParams) {
+		PaginacioParamsDto paginacioParamsNou = paginacioParams;
+		
+		OrdreDto ordreAntic = paginacioParams.getOrdres().get(0);
+		OrdreDto ordrenNou = null;
+		
+		switch (ordreAntic.getCamp()) {
+		case "procedimentCodiNotib":
+			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.procedimentCodiNotib", ordreAntic.getDireccio());
+			break;
+		case "enviamentDataProgramada":
+			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.enviamentDataProgramada", ordreAntic.getDireccio());
+			break;
+		case "grupCodi":
+			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.grupCodi", ordreAntic.getDireccio());
+			break;
+		case "emisorDir3Codi":
+			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.emisorDir3Codi", ordreAntic.getDireccio());
+			break;
+		case "usuariCodi":
+			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.usuariCodi", ordreAntic.getDireccio());
+			break;
+		case "enviamentTipus":
+			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.enviamentTipus", ordreAntic.getDireccio());
+			break;
+		case "concepte":
+			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.concepte", ordreAntic.getDireccio());
+			break;
+		case "descripcio":
+			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.descripcio", ordreAntic.getDireccio());
+			break;
+		case "llibre":
+			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.llibre", ordreAntic.getDireccio());
+			break;
+		case "registreNumero":
+			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.registreNumero", ordreAntic.getDireccio());
+			break;
+		case "estat":
+			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.estat", ordreAntic.getDireccio());
+			break;
+		case "comunicacioTipus":
+			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.comunicacioTipus", ordreAntic.getDireccio());
+			break;
+		case "titularNomLlinatge":
+			ordrenNou = paginacioParamsNou.new OrdreDto("titular.nom", ordreAntic.getDireccio());
+			break;
+		case "destinatarisNomLlinatges":
+			ordrenNou = paginacioParamsNou.new OrdreDto("destinataris.get(0).llinatge1", ordreAntic.getDireccio());
+			break;
+		default:
+			ordrenNou = paginacioParamsNou.new OrdreDto(ordreAntic.getCamp(), ordreAntic.getDireccio());;
+			break;
+		}
+		paginacioParams.getOrdres().set(0, ordrenNou);
+	}
 	@Transactional(readOnly = true)
 	@Override
 	public FitxerDto exportacio(

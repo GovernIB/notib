@@ -17,7 +17,6 @@ import java.util.List;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -31,6 +30,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.sun.jersey.core.util.Base64;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.EntitatDto;
@@ -136,19 +137,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 				 	false,
 				 	true,
 				 	false);
-		if (notificacio.getDocument().getContingutBase64() != null) {
+		if(notificacio.getDocument().getContingutBase64() != null) {
 			documentGesdocId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-					new ByteArrayInputStream(notificacio.getDocument().getContingutBase64().getBytes()));
-			/*try {
-				notificacio.getDocument().setHash(
-						Base64.encodeBase64String(
-								Hex.decodeHex(
-										DigestUtils.sha256Hex(notificacio.getDocument().getContingutBase64().getBytes()).toCharArray()))
-						);
-			} catch (DecoderException e) {
-				e.printStackTrace();
-			}*/
+					new ByteArrayInputStream(
+							Base64.decode(notificacio.getDocument().getContingutBase64())));
+
 		}
 		DocumentEntity documentEntity = null;
 		
@@ -160,8 +154,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			documentEntity = documentRepository.saveAndFlush(DocumentEntity.getBuilderV2(
 					notificacio.getDocument().getArxiuGestdocId(), 
 					documentGesdocId, 
-					notificacio.getDocument().getArxiuNom(),  
-					notificacio.getDocument().getHash(),  
+					notificacio.getDocument().getArxiuNom(), 
 					notificacio.getDocument().getUrl(),  
 					notificacio.getDocument().getMetadades(),  
 					notificacio.getDocument().isNormalitzat(),  
@@ -917,32 +910,28 @@ public class NotificacioServiceImpl implements NotificacioService {
 	// 1. Enviament de notificacions pendents al registre
 	////////////////////////////////////////////////////
 	@Override
-	@Scheduled(fixedRateString = "${config:es.caib.notib.tasca.notifica.enviaments.periode}", initialDelayString = "${config:es.caib.notib.tasca.notifica.enviaments.retard.inicial}")
+	@Scheduled(
+			fixedRateString = "${config:es.caib.notib.tasca.notifica.registre.periode}", 
+			initialDelayString = "${config:es.caib.notib.tasca.notifica.registre.retard.inicial}")
 	public void registrarEnviamentsPendents() {
-		if (isTasquesActivesProperty() && isNotificaEnviamentsActiu()
-				&& notificaHelper.isConnexioNotificaDisponible()) {
-			logger.debug("Cercant notificacions pendents d'enviar a Notifica");
-			int maxPendents = getNotificaEnviamentsProcessarMaxProperty();
-			List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatPendent(
-					pluginHelper.getNotificaReintentsMaxProperty(), new PageRequest(0, maxPendents));
-			if (!pendents.isEmpty()) {
-				logger.debug("Realitzant enviaments a Notifica per a " + pendents.size()
-						+ " notificacions pendents (màxim=" + maxPendents + ")");
-				for (NotificacioEntity pendent : pendents) {
-					// TODO: Registrar
-					logger.debug(">>> Realitzant enviament a Notifica de la notificació amb identificador: "
-							+ pendent.getId());
-					notificaHelper.notificacioEnviar(pendent.getId());
-				}
-			} else {
-				logger.debug("No hi ha notificacions pendents d'enviar a la seu electrònica");
+		logger.debug("Cercant notificacions pendents de registrar");
+		int maxPendents = getRegistreEnviamentsProcessarMaxProperty();
+		List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatPendent(new PageRequest(0, maxPendents));
+		if (!pendents.isEmpty()) {
+			logger.debug("Realitzant registre per a " + pendents.size()
+					+ " notificacions pendents (màxim=" + maxPendents + ")");
+			for (NotificacioEntity pendent : pendents) {
+				// TODO: Registrar
+				logger.debug(">>> Realitzant registre de la notificació amb identificador: "
+						+ pendent.getId());
+				registrar(pendent.getId());
 			}
 		} else {
-			logger.debug("L'enviament de notificacions a Notific@ està deshabilitada");
+			logger.debug("No hi ha notificacions pendents de registrar");
 		}
 	}
 	
-	// 1. Enviament de notificacions pendents a Notific@
+	// 1. Enviament de notificacions registrades a Notific@
 	////////////////////////////////////////////////////
 	@Override
 	@Scheduled(
@@ -950,9 +939,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 			initialDelayString = "${config:es.caib.notib.tasca.notifica.enviaments.retard.inicial}")
 	public void notificaEnviamentsPendents() {
 		if (isTasquesActivesProperty() && isNotificaEnviamentsActiu() && notificaHelper.isConnexioNotificaDisponible()) {
-			logger.debug("Cercant notificacions pendents d'enviar a Notifica");
+			logger.debug("Cercant notificacions registrades pendents d'enviar a Notifica");
 			int maxPendents = getNotificaEnviamentsProcessarMaxProperty();
-			List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatPendent(
+			List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatRegistrada(
 					pluginHelper.getNotificaReintentsMaxProperty(), 
 					new PageRequest(0, maxPendents));
 			if (!pendents.isEmpty()) {
@@ -1114,6 +1103,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private int getNotificaEnviamentsProcessarMaxProperty() {
 		return propertiesHelper.getAsInt(
 				"es.caib.notib.tasca.notifica.enviaments.processar.max",
+				10);
+	}
+	
+	private int getRegistreEnviamentsProcessarMaxProperty() {
+		return propertiesHelper.getAsInt(
+				"es.caib.notib.tasca.notifica.registre.processar.max",
 				10);
 	}
 

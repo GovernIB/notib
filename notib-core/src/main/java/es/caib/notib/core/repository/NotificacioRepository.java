@@ -110,17 +110,28 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"where " +
 			"    comunicacioTipus = es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto.ASINCRON " +
 			"and estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.PENDENT " +
+			"and notificaEnviamentData is not null " +
+			"order by " +
+			"    notificaEnviamentData ASC")
+	List<NotificacioEntity> findByNotificaEstatPendent(Pageable pageable);
+
+	@Query(
+			"from " +
+			"    NotificacioEntity " +
+			"where " +
+			"    comunicacioTipus = es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto.ASINCRON " +
+			"and estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.REGISTRADA " +
 			"and notificaEnviamentIntent < :maxReintents " +
 			"and notificaEnviamentData is not null " +
 			"order by " +
 			"    notificaEnviamentData ASC")
-	List<NotificacioEntity> findByNotificaEstatPendent(@Param("maxReintents")Integer maxReintents, Pageable pageable);
+	List<NotificacioEntity> findByNotificaEstatRegistrada(@Param("maxReintents")Integer maxReintents, Pageable pageable);
 
 	@Query(	"from " +
 			"     NotificacioEntity ntf " +
 			"where " +
 			"    (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
-			//"and (ntf.procedimentCodiNotib in (:procedimentsCodisNotib))" +
+			//"and (ntf.proc_codi_notib in (:procedimentsCodisNotib))" +
 			"and (:entitat = ntf.entitat) " +
 			"and (:isComunicacioTipusNull = true or ntf.comunicacioTipus = :comunicacioTipus) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +

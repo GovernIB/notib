@@ -17,7 +17,7 @@ import es.caib.notib.war.helper.ConversioTipusHelper;
 public class DocumentCommand {
 
 	private String arxiuNom;
-	private byte[] contingutBase64;
+	private String contingutBase64;
 	private String hash;
 	private String url;
 	private List<String> metadades = new ArrayList<String>();
@@ -32,10 +32,10 @@ public class DocumentCommand {
 	public void setArxiuNom(String arxiuNom) {
 		this.arxiuNom = arxiuNom;
 	}
-	public byte[] getContingutBase64() {
+	public String getContingutBase64() {
 		return contingutBase64;
 	}
-	public void setContingutBase64(byte[] contingutBase64) {
+	public void setContingutBase64(String contingutBase64) {
 		this.contingutBase64 = contingutBase64;
 	}
 	public String getHash() {

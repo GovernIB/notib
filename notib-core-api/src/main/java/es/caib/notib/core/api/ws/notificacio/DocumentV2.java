@@ -18,7 +18,6 @@ public class DocumentV2 {
 	private String arxiuId;
 	private String arxiuNom;
 	private String contingutBase64;
-	private String hash;
 	private String url;
 	private String metadades;
 	private boolean normalitzat;
@@ -37,12 +36,6 @@ public class DocumentV2 {
 	}
 	public void setContingutBase64(String contingutBase64) {
 		this.contingutBase64 = contingutBase64;
-	}
-	public String getHash() {
-		return hash;
-	}
-	public void setHash(String hash) {
-		this.hash = hash;
 	}
 	public String getUrl() {
 		return url;

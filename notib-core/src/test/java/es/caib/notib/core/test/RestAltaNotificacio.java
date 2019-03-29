@@ -241,10 +241,10 @@ public class RestAltaNotificacio {
 //		document.setArxiuNom("prova");
 		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
 		document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
-		document.setHash(
-				Base64.encodeBase64String(
-						Hex.decodeHex(
-								DigestUtils.sha1Hex(arxiuBytes).toCharArray())));
+//		document.setHash(
+//				Base64.encodeBase64String(
+//						Hex.decodeHex(
+//								DigestUtils.sha1Hex(arxiuBytes).toCharArray())));
 		document.setNormalitzat(false);
 		document.setGenerarCsv(false);
 		notificacio.setDocument(document);

@@ -23,11 +23,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import es.caib.notib.core.api.dto.ColumnesDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -156,7 +156,7 @@ public class EnviamentController extends BaseUserController {
 			enviaments = enviamentService.enviamentFindByEntityAndFiltre(entitatActual, 
 					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
-			
+
 		}catch(SecurityException e) {
 			MissatgesHelper.error(
 					request, 
@@ -304,39 +304,39 @@ public class EnviamentController extends BaseUserController {
 					notificacioIds.add(e.getNotificacioId());
 				}
 			}
-			Integer notificacionsNoPendents = 0;
+			Integer notificacionsNoRegistrades = 0;
 			for(Long notificacioId: notificacioIds) {
 				NotificacioDtoV2 notificacio = notificacioService.findAmbId(notificacioId);
 				if(notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)) {
 					notificacioService.enviar(notificacioId);	
 				}else {
-					notificacionsNoPendents++;	
+					notificacionsNoRegistrades++;	
 				}
 			}
-			if(notificacionsNoPendents.equals((Integer)notificacioIds.size()) && notificacionsNoPendents > 1) {
+			if(notificacionsNoRegistrades.equals((Integer)notificacioIds.size()) && notificacionsNoRegistrades > 1) {
 				MissatgesHelper.error(
 						request, 
 						getMessage(
 								request, 
-								"enviament.controller.reintent.notificacions.pendents.KO"));
-			} else if(notificacionsNoPendents.equals((Integer)notificacioIds.size()) && notificacionsNoPendents == 1){
+								"enviament.controller.reintent.notificacions.registrada.KO"));
+			} else if(notificacionsNoRegistrades.equals((Integer)notificacioIds.size()) && notificacionsNoRegistrades == 1){
 				MissatgesHelper.error(
 						request, 
 						getMessage(
 								request, 
-								"enviament.controller.reintent.notificacio.pendent.KO"));
+								"enviament.controller.reintent.notificacio.registrada.KO"));
 			} else if(notificacioIds.size() > 1){
 				MissatgesHelper.info(
 						request, 
 						getMessage(
 								request, 
-								"enviament.controller.reintent.notificacions.pendents.OK"));
+								"enviament.controller.reintent.notificacions.registrada.OK"));
 			} else {
 				MissatgesHelper.info(
 						request, 
 						getMessage(
 								request, 
-								"enviament.controller.reintent.notificacio.pendent.OK"));
+								"enviament.controller.reintent.notificacio.registrada.OK"));
 			}
 			resposta = "ok";
 		}

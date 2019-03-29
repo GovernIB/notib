@@ -44,13 +44,36 @@ public class NotificacioEnviamentHelper {
 			
 			for (NotificacioEnviamentEntity enviament : enviamentsPage.getContent()) {
 				NotificacioEnviamentDtoV2 env = new NotificacioEnviamentDtoV2();
+				NotificacioDtoV2 notificacioDto = conversioTipusHelper.convertir(
+						notificacio, 
+						NotificacioDtoV2.class);
 				env.setId(enviament.getId());
 				env.setCreatedDate(enviament.getCreatedDate().toDate());
 				env.setUsuari(enviament.getCreatedBy().getCodi());
-				env.setNotificacio(
-						conversioTipusHelper.convertir(
-						notificacio, 
-						NotificacioDtoV2.class));
+				//Notificació
+				env.setEnviamentDataProgramada(notificacioDto.getEnviamentDataProgramada());
+				env.setProcedimentCodiNotib(notificacioDto.getProcedimentCodiNotib());
+				env.setGrupCodi(notificacioDto.getGrupCodi());
+				env.setEmisorDir3Codi(notificacioDto.getEmisorDir3Codi());
+				env.setUsuariCodi(notificacioDto.getUsuariCodi());
+				env.setEnviamentTipus(notificacioDto.getEnviamentTipus());
+				env.setConcepte(notificacioDto.getConcepte());
+				env.setDescripcio(notificacioDto.getDescripcio());
+				env.setLlibre(notificacioDto.getLlibre());
+				//env.setRegistreNumero(notificacioDto.getRegistreNumero());
+				env.setEstat(notificacioDto.getEstat());
+				env.setNotificacioId(notificacioDto.getId());
+				
+				if(notificacioDto.getDocument().getUuid() != null) {
+					env.setCsvUuid(notificacioDto.getDocument().getUuid());
+				}
+				if(notificacioDto.getDocument().getCsv() != null) {
+					env.setCsvUuid(notificacioDto.getDocument().getCsv());
+				} else {
+					env.setCsvUuid(notificacioDto.getDocument().getArxiuGestdocId());
+				}
+
+				//--
 				env.setNotificaIdentificador(enviament.getNotificaIdentificador());
 				
 				env.setTitular(
@@ -97,7 +120,6 @@ public class NotificacioEnviamentHelper {
 				env.setEntregaPostal(entregaPostalDto);
 				/*Revisar*/
 				env.setNumeroCertCorreus(enviament.getNotificaCertificacioNumSeguiment());
-				env.getNotificacio().setCsv_uuid(notificacio.getDocument().getArxiuGestdocId());
 				
 				for(PersonaEntity destinatari : enviament.getDestinataris()) {
 					env.setDestinatarisNomLlinatges("[" + destinatari.getLlinatge1() + " " + destinatari.getLlinatge1() + ", " + destinatari.getNom() + "] \n");

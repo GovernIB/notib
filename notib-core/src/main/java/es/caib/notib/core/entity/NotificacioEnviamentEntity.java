@@ -16,21 +16,29 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.SecondaryTable;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
+import org.codehaus.jackson.annotate.JsonBackReference;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.Notificacio;
@@ -44,11 +52,12 @@ import es.caib.notib.core.audit.NotibAuditable;
  */
 @Entity
 @Table(name="not_notificacio_env")
+@SecondaryTable(name="not_notificacio")
 @EntityListeners(AuditingEntityListener.class)
 public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "notificacio_id")
 	@ForeignKey(name = "NOT_NOTIFICACIO_NOTENV_FK")
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -293,10 +302,125 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "notifica_intent_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date notificaIntentData;
-	
 	@Column(name = "intent_num")
 	protected int intentNum;
 
+
+	
+	@Column(name="proc_codi_notib", table = "not_notificacio")
+	protected String procedimentCodiNotib;
+	@Column(name="env_data_prog", table = "not_notificacio")
+	private Date enviamentDataProgramada;
+	@Column(name="grup_codi", table = "not_notificacio")
+	private String grupCodi;
+	@Column(name="emisor_dir3codi", table = "not_notificacio")
+	private String emisorDir3Codi;
+	@Column(name="usuari_codi", table = "not_notificacio")
+	private String usuariCodi;
+	@Column(name="env_tipus", table = "not_notificacio")
+	private NotificaEnviamentTipusEnumDto enviamentTipus;
+	@Column(name="concepte", table = "not_notificacio")
+	private String concepte;
+	@Column(name="descripcio", table = "not_notificacio")
+	private String descripcio;
+	@Column(name="registre_llibre", table = "not_notificacio")
+	private String llibre;
+	@Column(name="registre_numero", table = "not_notificacio")
+	private Integer registreNumero;
+	@Column(name="registre_data", table = "not_notificacio")
+	private Date registreData;
+	@Column(name="estat", table = "not_notificacio")
+	private NotificacioEstatEnumDto estat;
+	@Column(name = "com_tipus", table = "not_notificacio")
+	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
+	
+	@Transient
+	private String csvUuid;
+	
+	public String getProcedimentCodiNotib() {
+		return procedimentCodiNotib;
+	}
+	public void setProcedimentCodiNotib(String procedimentCodiNotib) {
+		this.procedimentCodiNotib = procedimentCodiNotib;
+	}
+	public Date getEnviamentDataProgramada() {
+		return enviamentDataProgramada;
+	}
+	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
+		this.enviamentDataProgramada = enviamentDataProgramada;
+	}
+	public String getGrupCodi() {
+		return grupCodi;
+	}
+	public void setGrupCodi(String grupCodi) {
+		this.grupCodi = grupCodi;
+	}
+	public String getEmisorDir3Codi() {
+		return emisorDir3Codi;
+	}
+	public void setEmisorDir3Codi(String emisorDir3Codi) {
+		this.emisorDir3Codi = emisorDir3Codi;
+	}
+	public String getUsuariCodi() {
+		return usuariCodi;
+	}
+	public void setUsuariCodi(String usuariCodi) {
+		this.usuariCodi = usuariCodi;
+	}
+	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
+		return enviamentTipus;
+	}
+	public void setEnviamentTipus(NotificaEnviamentTipusEnumDto enviamentTipus) {
+		this.enviamentTipus = enviamentTipus;
+	}
+	public String getConcepte() {
+		return concepte;
+	}
+	public void setConcepte(String concepte) {
+		this.concepte = concepte;
+	}
+	public String getDescripcio() {
+		return descripcio;
+	}
+	public void setDescripcio(String descripcio) {
+		this.descripcio = descripcio;
+	}
+	public String getLlibre() {
+		return llibre;
+	}
+	public void setLlibre(String llibre) {
+		this.llibre = llibre;
+	}
+	public Integer getRegistreNumero() {
+		return registreNumero;
+	}
+	public void setRegistreNumero(Integer registreNumero) {
+		this.registreNumero = registreNumero;
+	}
+	public Date getRegistreData() {
+		return registreData;
+	}
+	public void setRegistreData(Date registreData) {
+		this.registreData = registreData;
+	}
+	public NotificacioEstatEnumDto getEstat() {
+		return estat;
+	}
+	public void setEstat(NotificacioEstatEnumDto estat) {
+		this.estat = estat;
+	}
+	public String getCsvUuid() {
+		return csvUuid;
+	}
+	public void setCsvUuid(String csvUuid) {
+		this.csvUuid = csvUuid;
+	}
+	public NotificacioComunicacioTipusEnumDto getComunicacioTipus() {
+		return comunicacioTipus;
+	}
+	public void setComunicacioTipus(NotificacioComunicacioTipusEnumDto comunicacioTipus) {
+		this.comunicacioTipus = comunicacioTipus;
+	}
 	public NotificaDomiciliTipusEnumDto getDomiciliTipus() {
 		return domiciliTipus;
 	}
@@ -305,9 +429,6 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 	public int getIntentNum() {
 		return intentNum;
-	}
-	public static long getSerialversionuid() {
-		return serialVersionUID;
 	}
 	public PersonaEntity getTitular() {
 		return titular;
@@ -1104,37 +1225,37 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			return built;
 		}
 	}
-//	@Override
-//	public int hashCode() {
-//		final int prime = 31;
-//		int result = super.hashCode();
-//		result = prime * result + ((notificacio == null) ? 0 : notificacio.hashCode());
-////		result = prime * result + ((titularNif == null) ? 0 : titularNif.hashCode());
-//		return result;
-//	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((notificacio == null) ? 0 : notificacio.hashCode());
+		result = prime * result + ((titular.getNif() == null) ? 0 : titular.getNif().hashCode());
+		return result;
+	}
 
-//	@Override
-//	public boolean equals(Object obj) {
-//		if (this == obj)
-//			return true;
-//		if (!super.equals(obj))
-//			return false;
-//		if (getClass() != obj.getClass())
-//			return false;
-//		NotificacioEnviamentEntity other = (NotificacioEnviamentEntity) obj;
-//		if (notificacio == null) {
-//			if (other.notificacio != null)
-//				return false;
-//		} else if (!notificacio.equals(other.notificacio))
-//			return false;
-////		if (titularNif == null) {
-////			if (other.titularNif != null)
-////				return false;
-////		} else if (!titularNif.equals(other.titularNif))
-////			return false;
-//		return true;
-//	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		NotificacioEnviamentEntity other = (NotificacioEnviamentEntity) obj;
+		if (notificacio == null) {
+			if (other.notificacio != null)
+				return false;
+		} else if (!notificacio.equals(other.notificacio))
+			return false;
+		if (titular.getNif() == null) {
+			if (other.titular.getNif() != null)
+				return false;
+		} else if (!titular.getNif().equals(other.titular.getNif()))
+			return false;
+		return true;
+	}
+	
 
-	private static final long serialVersionUID = -2299453443943600172L;
-
+	private static final long serialVersionUID = 6993171107561077019L;
 }

@@ -9,6 +9,7 @@ import java.util.GregorianCalendar;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,6 +25,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -256,9 +259,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 //	public boolean isDocumentGenerarCsv() {
 //		return documentGenerarCsv;
 //	}
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
 	public NotificacioEstatEnumDto getEstat() {
 		return estat;
 	}
@@ -908,16 +908,15 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		}
 	}
 
-//	@Override
-//	public int hashCode() {
-//		final int prime = 31;
-//		int result = super.hashCode();
-//		result = prime * result + ((concepte == null) ? 0 : concepte.hashCode());
-//		result = prime * result + ((document.getHash() == null) ? 0 : document.getHash().hashCode());
-//		result = prime * result + ((entitat == null) ? 0 : entitat.hashCode());
-//		result = prime * result + ((enviamentTipus == null) ? 0 : enviamentTipus.hashCode());
-//		return result;
-//	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((concepte == null) ? 0 : concepte.hashCode());
+		result = prime * result + ((entitat == null) ? 0 : entitat.hashCode());
+		result = prime * result + ((enviamentTipus == null) ? 0 : enviamentTipus.hashCode());
+		return result;
+	}
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -947,6 +946,5 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		return true;
 	}
 
-	private static final long serialVersionUID = -2299453443943600172L;
-
+	private static final long serialVersionUID = 7206301266966284277L;
 }

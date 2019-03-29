@@ -29,6 +29,7 @@ import es.caib.notib.ws.notificacio.Notificacio;
 import es.caib.notib.ws.notificacio.NotificacioService;
 import es.caib.notib.ws.notificacio.NotificacioServiceV2;
 import es.caib.notib.ws.notificacio.NotificacioV2;
+import es.caib.notib.ws.notificacio.PermisConsulta;
 import es.caib.notib.ws.notificacio.RespostaAlta;
 import es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
@@ -230,5 +231,31 @@ public class NotificacioRestClient implements NotificacioService, NotificacioSer
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioRestClient.class);
+
+	@Override
+	public boolean donarPermisConsulta(PermisConsulta permisConsulta) {
+		try {
+			String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/permisConsulta";
+			ObjectMapper mapper  = new ObjectMapper();
+			String body = mapper.writeValueAsString(permisConsulta);
+			Client jerseyClient = generarClient();
+			if (username != null) {
+				autenticarClient(
+						jerseyClient,
+						urlAmbMetode,
+						username,
+						password);
+			}
+			logger.debug("Missatge REST enviat: " + body);
+			String json = jerseyClient.
+					resource(urlAmbMetode).
+					type("application/json").
+					post(String.class, body);
+			logger.debug("Missatge REST rebut: " + json);
+			return mapper.readValue(json, boolean.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
 
 }

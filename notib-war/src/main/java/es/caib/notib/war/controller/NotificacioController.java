@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -280,7 +281,8 @@ public class NotificacioController extends BaseUserController {
 			if (notificacioCommand.getArxiu() != null && !notificacioCommand.getArxiu().isEmpty()) {
 				document.setArxiuNom(notificacioCommand.getArxiu().getOriginalFilename());
 				document.setNormalitzat(notificacioCommand.getDocument().isNormalitzat());
-				document.setContingutBase64(notificacioCommand.getArxiu().getBytes());
+				String contingutBase64 = Base64.encodeBase64String(notificacioCommand.getArxiu().getBytes());
+				document.setContingutBase64(contingutBase64);
 				document.setMetadades(notificacioCommand.getDocument().getMetadades());
 			}
 			break;

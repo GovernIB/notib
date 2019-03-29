@@ -36,9 +36,6 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
 	private String serveiTipus;
-	private PersonaDto titular;
-	private PersonaDto destinatari = new PersonaDto();
-	private List<PersonaDto> destinataris = new ArrayList<PersonaDto>();
 	private List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<NotificacioEnviamentDtoV2>();
 	private String usuariCodi;
 
@@ -166,24 +163,6 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	}
 	public void setServeiTipus(String serveiTipus) {
 		this.serveiTipus = serveiTipus;
-	}
-	public PersonaDto getTitular() {
-		return titular;
-	}
-	public void setTitular(PersonaDto titular) {
-		this.titular = titular;
-	}
-	public PersonaDto getDestinatari() {
-		return destinatari;
-	}
-	public void setDestinatari(PersonaDto destinatari) {
-		this.destinatari = destinatari;
-	}
-	public List<PersonaDto> getDestinataris() {
-		return destinataris;
-	}
-	public void setDestinataris(List<PersonaDto> destinataris) {
-		this.destinataris = destinataris;
 	}
 	public void setOficina(String oficina) {
 		this.oficina = oficina;

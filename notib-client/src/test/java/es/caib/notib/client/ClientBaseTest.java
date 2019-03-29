@@ -42,13 +42,13 @@ import es.caib.notib.ws.notificacio.Persona;
 public class ClientBaseTest {
 
 //	Entitat: A04013511 (DGTIC) ò A04003003 (Govern)
-	protected static final String ENTITAT_DIR3CODI = "L01070276";
+	protected static final String ENTITAT_DIR3CODI = "A04013511";
 //	protected static final String ORGAN_CODI = "A04013501";
-	protected static final String ORGAN_CODI = "L01070276";
+	protected static final String ORGAN_CODI = "A04013511";
 	protected static final String LLIBRE = "L99";
 	protected static final String OFICINA = "O00009390";
 	protected static final String UNITAT_ADMINISTRATIVA_SISTRA = "1";
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "AJINCA";
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "846823";
 	protected static final String IDENTIFICADOR_PROCEDIMENT_SISTRA = "IN0026NSPI";
 	protected static final String IDIOMA = "ca";
 
@@ -193,10 +193,10 @@ public class ClientBaseTest {
 //		System.out.println("Hash: " + Base64.encodeBase64String(DigestUtils.sha256(arxiuB64)));
 		
 		document.setContingutBase64(arxiuB64);
-		document.setHash(
-				Base64.encodeBase64String(
-						Hex.decodeHex(
-								DigestUtils.sha256Hex(arxiuBytes).toCharArray())));
+		//document.setHash(
+		//		Base64.encodeBase64String(
+		//				Hex.decodeHex(
+		//						DigestUtils.sha256Hex(arxiuBytes).toCharArray())));
 		document.setNormalitzat(false);
 		document.setGenerarCsv(false);
 		notificacio.setDocument(document);

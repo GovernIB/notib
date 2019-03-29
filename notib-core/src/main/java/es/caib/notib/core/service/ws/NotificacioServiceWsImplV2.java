@@ -193,7 +193,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		if(notificacio.getDocument().getContingutBase64() != null) {
 			documentGesdocId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-					new ByteArrayInputStream(notificacio.getDocument().getContingutBase64().getBytes()));
+					new ByteArrayInputStream(
+							Base64.decode(notificacio.getDocument().getContingutBase64())));
 		}
 		
 		NotificaEnviamentTipusEnumDto enviamentTipus = null;
@@ -223,7 +224,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					notificacio.getDocument().getArxiuId(), 
 					documentGesdocId, 
 					notificacio.getDocument().getArxiuNom(),  
-					notificacio.getDocument().getHash(),  
 					notificacio.getDocument().getUrl(),  
 					notificacio.getDocument().getMetadades(),  
 					notificacio.getDocument().isNormalitzat(),  
@@ -370,7 +370,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				referencies.add(enviamentReferencia);
 				notificacioGuardada.addEnviament(enviamentSaved);
 			}
-			Boolean esAdministracio = false;
 			for(NotificacioEnviamentEntity ne : notificacioGuardada.getEnviaments()) {
 				if(ne.getTitular().getNom() != null && ne.getTitular().getLlinatge1() != null && ne.getTitular().getLlinatge2() != null) {
 					

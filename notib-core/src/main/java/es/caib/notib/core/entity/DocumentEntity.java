@@ -102,7 +102,6 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			String arxiuId,
 			String arxiuGestdocId,
 			String arxiuNom,
-			String hash,
 			String url,
 			String metadades,
 			Boolean normalitzat,
@@ -114,7 +113,6 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 				arxiuId,
 				arxiuGestdocId,
 				arxiuNom,
-				hash,
 				url,
 				metadades,
 				normalitzat,
@@ -129,7 +127,6 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 				String arxiuId,
 				String arxiuGestdocId,
 				String arxiuNom,
-				String hash,
 				String url,
 				String metadades,
 				Boolean normalitzat,
@@ -142,7 +139,6 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			built.arxiuNom = arxiuNom;
 			built.csv = csv;
 			built.generarCsv = generarCsv;
-			built.hash = hash;
 			built.metadades = metadades;
 			built.normalitzat = normalitzat;
 			built.url = url;
