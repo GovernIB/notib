@@ -95,9 +95,9 @@ $(document).ready(function() {
 						<c:choose>
 							<c:when test="${not empty enviament.notificacio.id}">
 								<td width="1%"><strong>NOTIB</strong></td>
-								<td>${enviament.referencia}</td>
+								<td>${enviament.notificaReferencia}</td>
 								<td width="1%"><strong>Notific@</strong></td>
-								<td>${enviament.notificacio.id}</td>
+								<td>${enviament.notificaIdentificador}</td>
 							</c:when>
 							<c:otherwise>
 								<td colspan="2" width="1%"><strong>NOTIB</strong></td>
@@ -118,7 +118,7 @@ $(document).ready(function() {
 						<td colspan="4">
 							<c:choose>
 								<c:when test="${enviament.entregaDeh.obligat}"><spring:message code="comu.si"/></c:when>
-								<c:otherwise><spring:message code="comu.no"/><</c:otherwise>
+								<c:otherwise><spring:message code="comu.no"/></c:otherwise>
 							</c:choose>
 						</td>
 					</tr>
