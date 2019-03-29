@@ -30,6 +30,9 @@ import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 import javax.xml.ws.soap.SOAPFaultException;
 
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -95,11 +98,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	public boolean notificacioEnviar(
 			Long notificacioId) {
 		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
-		if (!NotificacioEstatEnumDto.PENDENT.equals(notificacio.getEstat())) {
+		if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())) {
 			throw new ValidationException(
 					notificacioId,
 					NotificacioEntity.class,
-					"La notificació no te l'estat " + NotificacioEstatEnumDto.PENDENT);
+					"La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA);
 		}
 		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
 		try {
@@ -337,11 +340,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	public ResultadoAltaRemesaEnvios enviaNotificacio(
 			NotificacioEntity notificacio) throws Exception {
 		ResultadoAltaRemesaEnvios resultat = null;
-		if (!NotificacioEstatEnumDto.PENDENT.equals(notificacio.getEstat())) {
+		if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())) {
 			throw new ValidationException(
 					notificacio.getId(),
 					NotificacioEntity.class,
-					"La notificació no te l'estat " + NotificacioEstatEnumDto.PENDENT);
+					"La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA);
 		}
 		try {
 			AltaRemesaEnvios altaRemesaEnvios = generarAltaRemesaEnvios(notificacio);
@@ -357,7 +360,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	}
 
 	private AltaRemesaEnvios generarAltaRemesaEnvios(
-			NotificacioEntity notificacio) throws GeneralSecurityException, DatatypeConfigurationException {
+			NotificacioEntity notificacio) throws GeneralSecurityException, DatatypeConfigurationException, DecoderException {
 		AltaRemesaEnvios envios = new AltaRemesaEnvios();
 		Date dataProgramada;
 		Integer retardPostal;
@@ -375,7 +378,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		//		toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
 
 		if (notificacio.getProcedimentCodiNotib() != null) {
-			dataProgramada = procedimentRepository.findByCodi(notificacio.getProcedimentCodiNotib()).getEnviamentDataProgramada();
+			dataProgramada = procedimentRepository.findOne(notificacio.getProcediment().getId()).getEnviamentDataProgramada();
 		} else {
 			dataProgramada = notificacio.getEnviamentDataProgramada();
 		}
@@ -389,8 +392,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		envios.setProcedimiento(
 				notificacio.getProcedimentCodiNotib());
 
+		Documento documento = new Documento();
 		if(notificacio.getDocument().getArxiuGestdocId() != null) {
-			Documento documento = new Documento();
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			pluginHelper.gestioDocumentalGet(
 					notificacio.getDocument().getArxiuGestdocId(),
@@ -414,7 +417,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			documento.setOpcionesDocumento(opcionesDocumento);
 			envios.setDocumento(documento);
 		} else if (notificacio.getDocument().getCsv() != null) {
-            Documento documento = new Documento();
             documento.setContenido(pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut());
             Opciones opcionesDocumento = new Opciones();
             Opcion opcionNormalizado = new Opcion();
@@ -430,7 +432,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
             documento.setOpcionesDocumento(opcionesDocumento);
             envios.setDocumento(documento);
         } else if (notificacio.getDocument().getUrl() != null) {
-            Documento documento = new Documento();
             documento.setEnlaceDocumento(notificacio.getDocument().getUrl());
             Opciones opcionesDocumento = new Opciones();
             Opcion opcionNormalizado = new Opcion();
@@ -446,7 +447,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
             documento.setOpcionesDocumento(opcionesDocumento);
             envios.setDocumento(documento);
         } else if (notificacio.getDocument().getUuid() != null) {
-            Documento documento = new Documento();
             documento.setContenido(pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut());
             Opciones opcionesDocumento = new Opciones();
             Opcion opcionNormalizado = new Opcion();
@@ -462,7 +462,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
             documento.setOpcionesDocumento(opcionesDocumento);
             envios.setDocumento(documento);
         } else {
-			Documento documento = new Documento();
 			documento.setHash(notificacio.getDocument().getHash());
 			if(notificacio.getDocument().getContingutBase64() != null) {
 				documento.setContenido(notificacio.getDocument().getContingutBase64().getBytes());	
@@ -481,8 +480,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			documento.setOpcionesDocumento(opcionesDocumento);
 			envios.setDocumento(documento);
 		}
-		if(notificacio.getDocument() != null) {
-			notificacio.getDocument().setHash(DigestUtils.sha256Hex(notificacio.getDocument().getContingutBase64()));
+		if(documento.getContenido() != null) {
+			notificacio.getDocument().setHash(
+					Base64.encodeBase64String(
+							Hex.decodeHex(
+									DigestUtils.sha256Hex(documento.getContenido()).toCharArray())));
 		}
 		//V1 rest
 		//if (notificacio.getRetardPostal() != null) {
@@ -495,9 +497,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		envios.setEnvios(generarEnvios(notificacio));
 		Opciones opcionesRemesa = new Opciones();
 		if(notificacio.getProcedimentCodiNotib() != null) {
-			retardPostal = procedimentRepository.findByCodi(notificacio.getProcedimentCodiNotib()).getRetard();
+			retardPostal = procedimentRepository.findOne(notificacio.getProcediment().getId()).getRetard();
 		} else {
-			retardPostal = notificacio.getRetardPostal();
+			retardPostal = notificacio.getRetard();
 		}
 		
 		if (retardPostal != null) {

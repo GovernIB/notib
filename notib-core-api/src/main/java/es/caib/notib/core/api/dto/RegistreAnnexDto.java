@@ -2,11 +2,6 @@ package es.caib.notib.core.api.dto;
 
 import java.util.Date;
 
-import es.caib.notib.core.api.ws.registre.RegistreModeFirmaEnum;
-import es.caib.notib.core.api.ws.registre.RegistreOrigenEnum;
-import es.caib.notib.core.api.ws.registre.RegistreTipusDocumentEnum;
-import es.caib.notib.core.api.ws.registre.RegistreTipusDocumentalEnum;
-
 
 
 /**
@@ -22,10 +17,10 @@ public class RegistreAnnexDto {
 	private String arxiuNom;
 	private byte[] arxiuContingut;
 	
-	private RegistreTipusDocumentEnum tipusDocument;
-	private RegistreTipusDocumentalEnum tipusDocumental;
-	private RegistreOrigenEnum origen;
-	private RegistreModeFirmaEnum modeFirma;
+	private RegistreTipusDocumentDtoEnum tipusDocument;
+	private RegistreTipusDocumentalDtoEnum tipusDocumental;
+	private RegistreOrigenDtoEnum origen;
+	private RegistreModeFirmaDtoEnum modeFirma;
 	private String observacions;
 
 	public String getNom() {
@@ -58,32 +53,28 @@ public class RegistreAnnexDto {
 	public void setArxiuContingut(byte[] arxiuContingut) {
 		this.arxiuContingut = arxiuContingut;
 	}
-	public RegistreTipusDocumentEnum getTipusDocument() {
+	public RegistreTipusDocumentDtoEnum getTipusDocument() {
 		return tipusDocument;
 	}
-	public void setTipusDocument(
-			RegistreTipusDocumentEnum tipusDocument) {
+	public void setTipusDocument(RegistreTipusDocumentDtoEnum tipusDocument) {
 		this.tipusDocument = tipusDocument;
 	}
-	public RegistreTipusDocumentalEnum getTipusDocumental() {
+	public RegistreTipusDocumentalDtoEnum getTipusDocumental() {
 		return tipusDocumental;
 	}
-	public void setTipusDocumental(
-			RegistreTipusDocumentalEnum tipusDocumental) {
+	public void setTipusDocumental(RegistreTipusDocumentalDtoEnum tipusDocumental) {
 		this.tipusDocumental = tipusDocumental;
 	}
-	public RegistreOrigenEnum getOrigen() {
+	public RegistreOrigenDtoEnum getOrigen() {
 		return origen;
 	}
-	public void setOrigen(
-			RegistreOrigenEnum origen) {
+	public void setOrigen(RegistreOrigenDtoEnum origen) {
 		this.origen = origen;
 	}
-	public RegistreModeFirmaEnum getModeFirma() {
+	public RegistreModeFirmaDtoEnum getModeFirma() {
 		return modeFirma;
 	}
-	public void setModeFirma(
-			RegistreModeFirmaEnum modeFirma) {
+	public void setModeFirma(RegistreModeFirmaDtoEnum modeFirma) {
 		this.modeFirma = modeFirma;
 	}
 	public String getObservacions() {

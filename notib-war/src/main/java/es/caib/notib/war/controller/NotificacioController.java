@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
@@ -44,6 +45,8 @@ import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
+import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
@@ -255,6 +258,14 @@ public class NotificacioController extends BaseUserController {
 					EnumHelper.getOptionsForEnum(
 							InteressatTipusEnumDto.class,
 							"es.caib.notib.core.api.dto.interessatTipusEnumDto."));
+			model.addAttribute("registreDocumentacioFisica", 
+					EnumHelper.getOptionsForEnum(
+							RegistreDocumentacioFisicaEnumDto.class,
+							"es.caib.notib.core.api.dto.registreDocumentacioFisicaEnumDto."));
+			model.addAttribute("idioma", 
+					EnumHelper.getOptionsForEnum(
+							IdiomaEnumDto.class,
+							"es.caib.notib.core.api.dto.idiomaEnumDto."));
 			model.addAttribute("enviosGuardats", notificacioCommand.getEnviaments());
             model.addAttribute("errors", bindingResult.getAllErrors());
 			return "notificacioForm";
@@ -456,7 +467,7 @@ public class NotificacioController extends BaseUserController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
-		boolean enviada = notificacioService.enviar(entitatActual.getId(), notificacioId);
+		boolean enviada = notificacioService.enviar(notificacioId);
 		emplenarModelNotificacioInfo(
 				entitatActual,
 				notificacioId, 
@@ -468,6 +479,29 @@ public class NotificacioController extends BaseUserController {
 		} else {
 			return getAjaxControllerReturnValueError(request, "notificacioInfo",
 					"notificacio.controller.enviament.error");
+		}
+	}
+	
+	@RequestMapping(value = "/{notificacioId}/registrar", method = RequestMethod.GET)
+	public String registrar(
+			HttpServletRequest request, 
+			@PathVariable Long notificacioId, 
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+		RegistreIdDto registreIdDto = notificacioService.registrar(notificacioId);
+		
+		emplenarModelNotificacioInfo(
+				entitatActual,
+				notificacioId, 
+				"accions", 
+				model);
+		if (registreIdDto.getNumero() != null) {
+			return getAjaxControllerReturnValueSuccess(request, "notificacioInfo",
+					"notificacio.controller.registrar.ok");
+		} else {
+			return getAjaxControllerReturnValueError(request, "notificacioInfo",
+					"notificacio.controller.registrar.error");
 		}
 	}
 
@@ -579,8 +613,7 @@ public class NotificacioController extends BaseUserController {
 						"es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
 		if (notificacio.getProcediment() != null && !notificacio.getProcedimentCodiNotib().isEmpty()) {
 			model.addAttribute("permisGestio", procedimentService.hasPermisGestioProcediment(
-					notificacio.getProcediment().getId(),
-					entitatActual));
+					notificacio.getProcediment().getId()));
 		} else {
 			model.addAttribute("permisGestio", null);
 		}
@@ -634,6 +667,14 @@ public class NotificacioController extends BaseUserController {
 				EnumHelper.getOptionsForEnum(
 						InteressatTipusEnumDto.class,
 						"es.caib.notib.core.api.dto.interessatTipusEnumDto."));
+		model.addAttribute("registreDocumentacioFisica", 
+				EnumHelper.getOptionsForEnum(
+						RegistreDocumentacioFisicaEnumDto.class,
+						"es.caib.notib.core.api.dto.registreDocumentacioFisicaEnumDto."));
+		model.addAttribute("idioma", 
+				EnumHelper.getOptionsForEnum(
+						IdiomaEnumDto.class,
+						"es.caib.notib.core.api.dto.idiomaEnumDto."));
 	}
 	private boolean isAdministrador(HttpServletRequest request) {
 		return RolHelper.isUsuariActualAdministrador(request);

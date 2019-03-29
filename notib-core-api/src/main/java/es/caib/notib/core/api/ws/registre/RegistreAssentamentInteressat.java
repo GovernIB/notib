@@ -7,7 +7,6 @@ package es.caib.notib.core.api.ws.registre;
  */
 public class RegistreAssentamentInteressat {
 
-	private RegistreInteressatTipusEnum tipus;
 	private String documentTipus;
 	private String documentNum;
 	private String nom;
@@ -26,14 +25,6 @@ public class RegistreAssentamentInteressat {
 	private String observacions;
 	private RegistreAssentamentInteressat representant;
 
-
-
-	public RegistreInteressatTipusEnum getTipus() {
-		return tipus;
-	}
-	public void setTipus(RegistreInteressatTipusEnum tipus) {
-		this.tipus = tipus;
-	}
 	public String getDocumentTipus() {
 		return documentTipus;
 	}

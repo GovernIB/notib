@@ -14,10 +14,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.ws.soap.SOAPFaultException;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,13 +42,17 @@ import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
+import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -54,7 +61,6 @@ import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.Persona;
-import es.caib.notib.core.api.ws.registre.RespostaConsultaRegistre;
 import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
@@ -75,6 +81,7 @@ import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.security.ExtendedPermission;
+import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 
 /**
@@ -114,7 +121,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private AplicacioService aplicacioService;
 	
-	@Transactional
+	@Transactional(rollbackFor=Exception.class)
 	@Override
 	public List<NotificacioDto> create(
 			Long entitatId, 
@@ -133,8 +140,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			documentGesdocId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 					new ByteArrayInputStream(notificacio.getDocument().getContingutBase64().getBytes()));
-//			notificacio.getDocument().setHash(DigestUtils.sha256Hex(notificacio.getDocument().getContingutBase64()));
-			try {
+			/*try {
 				notificacio.getDocument().setHash(
 						Base64.encodeBase64String(
 								Hex.decodeHex(
@@ -142,7 +148,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						);
 			} catch (DecoderException e) {
 				e.printStackTrace();
-			}
+			}*/
 		}
 		DocumentEntity documentEntity = null;
 		
@@ -163,9 +169,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 					notificacio.getDocument().getUuid(),
 					notificacio.getDocument().getCsv()).build());
 		}
-		
-		
-
 		// Dades generals de la notificació
 		NotificacioEntity.BuilderV2 notificacioBuilder = NotificacioEntity.
 				getBuilderV2(
@@ -182,10 +185,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 						procediment.getCodi(),
 						procediment,
 						notificacio.getGrupCodi(),
-						notificacio.getEmisorDir3Codi(),
+						notificacio.getOficina(),
 						notificacio.getLlibre(),
-						notificacio.getRegistreNumero(),
-						notificacio.getRegistreData(),
 						notificacio.getExtracte(),
 						notificacio.getDocFisica(),
 						notificacio.getIdioma(),
@@ -193,15 +194,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 						notificacio.getNumExpedient(),
 						notificacio.getRefExterna(),
 						notificacio.getCodiAssumpte(),
-						notificacio.getObservacions()
-						).document(documentEntity).usuariCodi(usuariActual.getCodi());
+						notificacio.getObservacions()).document(documentEntity).usuariCodi(usuariActual.getCodi());
 
 		NotificacioEntity notificacioEntity = notificacioBuilder.build();
 		NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioEntity);
 
 		List<Enviament> enviaments = new ArrayList<Enviament>();
 		List<NotificacioEnviamentEntity> enviamentsEntity = new ArrayList<NotificacioEnviamentEntity>();
-		for(EnviamentDto enviament: notificacio.getEnviaments()) {
+		for(NotificacioEnviamentDtoV2 enviament: notificacio.getEnviaments()) {
 			enviaments.add(conversioTipusHelper.convertir(enviament, Enviament.class));
 		}
 		for (Enviament enviament: enviaments) {
@@ -246,30 +246,44 @@ public class NotificacioServiceImpl implements NotificacioService {
 						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.SENSE_NUMERO;
 					}
 				}
-				PersonaEntity titular = personaRepository.save(PersonaEntity.getBuilder(
+				PersonaEntity titular = personaRepository.save(PersonaEntity.getBuilderV2(
+						enviament.getTitular().getInteressatTipus(),
 						enviament.getTitular().getEmail(), 
 						enviament.getTitular().getLlinatge1(), 
 						enviament.getTitular().getLlinatge2(), 
 						enviament.getTitular().getNif(), 
 						enviament.getTitular().getNom(), 
-						enviament.getTitular().getTelefon()).build());
+						enviament.getTitular().getTelefon(),
+						enviament.getTitular().getRaoSocial(),
+						enviament.getTitular().getDir3codi()).build());
 				
 				List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
 				for(Persona persona: enviament.getDestinataris()) {
 					if (!persona.getNif().isEmpty()) {
-						PersonaEntity destinatari = personaRepository.save(PersonaEntity.getBuilder(
+						PersonaEntity destinatari = personaRepository.save(PersonaEntity.getBuilderV2(
+								persona.getInteressatTipus(),
 								persona.getEmail(), 
 								persona.getLlinatge1(), 
 								persona.getLlinatge2(), 
 								persona.getNif(), 
 								persona.getNom(), 
-								persona.getTelefon()).build());
+								persona.getTelefon(),
+								persona.getRaoSocial(),
+								persona.getDir3codi()).build());
 						destinataris.add(destinatari);
 					}
 				}
 				// Rellenar dades enviament titular
 				enviamentsEntity.add(notificacioEnviamentRepository.saveAndFlush(NotificacioEnviamentEntity.
-						getBuilderV2(enviament, notificacio, numeracioTipus, tipusConcret, serveiTipus, notificacioGuardada, titular, destinataris).build()));
+						getBuilderV2(
+								enviament, 
+								notificacio, 
+								numeracioTipus, 
+								tipusConcret, 
+								serveiTipus, 
+								notificacioGuardada, 
+								titular, 
+								destinataris).build()));
 			}
 		}
 		notificacioEntity.getEnviaments().addAll(enviamentsEntity);
@@ -277,25 +291,69 @@ public class NotificacioServiceImpl implements NotificacioService {
 		// Comprovar on s'ha d'enviar
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioEntity.getComunicacioTipus())) {
 			for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-//				RespostaConsultaRegistre arbResposta = null;
-				if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus()) /*Si es administració*/) {
-					//Regweb3 + SIR
-//					arbResposta = pluginHelper.registreSortidaAsientoRegistral(entitat.getDir3Codi(), notificacioEntity, enviament, 1L);
-//					if(arbResposta.getEstado().equals(EstatRegistre.DISTRIBUIT.geValorLong())) {
-//						JustificanteWs justificant = pluginHelper.obtenerJustificante(entitat.getDir3Codi(), arbResposta.getNumeroRegistroFormateado(), arbResposta.getLibroCodigo(), arbResposta.getTipoRegistro());
-//					}else if(arbResposta.getEstado().equals(EstatRegistre.OFICI_EXTERN.geValorLong())) {
-//						JustificanteWs justificant = pluginHelper.obtenerJustificante(entitat.getDir3Codi(), arbResposta.getNumeroRegistroFormateado(), arbResposta.getLibroCodigo(), arbResposta.getTipoRegistro());
-//					}else if(arbResposta.getEstado().equals(EstatRegistre.OFICI_SIR.geValorLong())) {
-//						OficioBean ofici = pluginHelper.obtenerOficioExterno(entitat.getDir3Codi(), arbResposta.getNumeroRegistroFormateado(), arbResposta.getLibroCodigo());
-//					}
+				if (pluginHelper.isArxiuEmprarSir()) {
+	//				RespostaConsultaRegistre arbResposta = null;
+					if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus()) /*Si es administració*/) {
+						//Regweb3 + SIR
+	//					arbResposta = pluginHelper.registreSortidaAsientoRegistral(entitat.getDir3Codi(), notificacioEntity, enviament, 1L);
+	//					if(arbResposta.getEstado().equals(EstatRegistre.DISTRIBUIT.geValorLong())) {
+	//						JustificanteWs justificant = pluginHelper.obtenerJustificante(entitat.getDir3Codi(), arbResposta.getNumeroRegistroFormateado(), arbResposta.getLibroCodigo(), arbResposta.getTipoRegistro());
+	//					}else if(arbResposta.getEstado().equals(EstatRegistre.OFICI_EXTERN.geValorLong())) {
+	//						JustificanteWs justificant = pluginHelper.obtenerJustificante(entitat.getDir3Codi(), arbResposta.getNumeroRegistroFormateado(), arbResposta.getLibroCodigo(), arbResposta.getTipoRegistro());
+	//					}else if(arbResposta.getEstado().equals(EstatRegistre.OFICI_SIR.geValorLong())) {
+	//						OficioBean ofici = pluginHelper.obtenerOficioExterno(entitat.getDir3Codi(), arbResposta.getNumeroRegistroFormateado(), arbResposta.getLibroCodigo());
+	//					}
+					} else {
+						//Regweb3 + Notifica
+	//					arbResposta = pluginHelper.registreSortidaAsientoRegistral(entitat.getDir3Codi(), notificacioEntity, enviament, 1L);
+	//						arbResposta = pluginHelper.salidaAsientoRegistral(entitat.getDir3Codi(), arb, 1L);
+	//						notificacio.setRegistreNumero(arbResposta.getNumeroRegistroFormateado());
+	//						notificacio.setRegistreData(arbResposta.getFechaRegistro().toGregorianCalendar().getTime());
+						notificaHelper.notificacioEnviar(notificacioEntity.getId());
+						notificacioEntity = notificacioRepository.findById(notificacioEntity.getId());
+					}
 				} else {
-					//Regweb3 + Notifica
-//					arbResposta = pluginHelper.registreSortidaAsientoRegistral(entitat.getDir3Codi(), notificacioEntity, enviament, 1L);
-//						arbResposta = pluginHelper.salidaAsientoRegistral(entitat.getDir3Codi(), arb, 1L);
-//						notificacio.setRegistreNumero(arbResposta.getNumeroRegistroFormateado());
-//						notificacio.setRegistreData(arbResposta.getFechaRegistro().toGregorianCalendar().getTime());
-					notificaHelper.notificacioEnviar(notificacioEntity.getId());
-					notificacioEntity = notificacioRepository.findById(notificacioEntity.getId());
+					RegistreIdDto registreIdDto = new RegistreIdDto();
+					try {
+						registreIdDto = pluginHelper.registreAnotacioSortida(
+								conversioTipusHelper.convertir(
+										notificacioEntity, 
+										NotificacioDtoV2.class), 
+								conversioTipusHelper.convertir(
+										enviament, 
+										NotificacioEnviamentDtoV2.class), 
+								1L);
+						//Registrar event
+						if (registreIdDto.getDescripcioError() != null) {
+							NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+									NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
+									notificacioEntity).
+									error(true).
+									errorDescripcio(registreIdDto.getDescripcioError()).
+									build();
+							notificacioEntity.updateNotificaError(
+									NotificacioErrorTipusEnumDto.ERROR_REMOT,
+									event);
+							notificacioEntity.updateEventAfegir(event);
+							notificacioEventRepository.save(event);						
+						} else {
+							NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+									NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
+									notificacioEntity).build();
+							notificacioEntity.updateRegistreNumero(registreIdDto.getNumero());
+							notificacioEntity.updateRegistreNumeroFormatat(registreIdDto.getNumeroRegistreFormat());
+							notificacioEntity.updateRegistreData(registreIdDto.getData());
+							
+							notificacioEntity.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
+							notificacioEntity.updateEventAfegir(event);
+							notificacioEventRepository.save(event);
+							notificaHelper.notificacioEnviar(notificacioEntity.getId());
+						}
+					} catch (Exception ex) {
+						logger.error(
+								"Error al donar d'alta la notificació a Notific@ (notificacioId=" + notificacio.getId() + ")",
+								ex);
+					}
 				}
 			}
 		}
@@ -518,10 +576,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 								procedimentService.hasPermisProcessarProcediment(
 										notificacio.getProcediment().getCodi(),
 										notificacio.getProcediment().getId(),
-										conversioTipusHelper.convertir(
-												entitatActual, 
-												EntitatDto.class),
-												isAdministrador));
+										isAdministrador));
 				}	
 			}
 			resultatPagina = paginacioHelper.toPaginaDto(
@@ -529,10 +584,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				NotificacioDto.class);
 		
 		}
-		
-		
 		return resultatPagina;
-		
 	}
 	
 	@Override
@@ -721,12 +773,86 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 	@Override
-	public boolean enviar(
-			Long entitatId, 
-			Long notificacioId) {
+	public boolean enviar(Long notificacioId) {
 		logger.debug("Intentant enviament de la notificació pendent (" +
 				"notificacioId=" + notificacioId + ")");
 		return notificaHelper.notificacioEnviar(notificacioId);
+	}
+	
+	@Transactional
+	@Override
+	public RegistreIdDto registrar(Long notificacioId) {
+		logger.debug("Intentant registrar la notificació pendent (" +
+				"notificacioId=" + notificacioId + ")");
+		RegistreIdDto registreIdDto = new RegistreIdDto();
+		NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioId);
+		
+		for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+			if (pluginHelper.isArxiuEmprarSir()) {
+//				RespostaConsultaRegistre arbResposta = null;
+				if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus()) /*Si es administració*/) {
+					//Regweb3 + SIR
+//					arbResposta = pluginHelper.registreSortidaAsientoRegistral(entitat.getDir3Codi(), notificacioEntity, enviament, 1L);
+//					if(arbResposta.getEstado().equals(EstatRegistre.DISTRIBUIT.geValorLong())) {
+//						JustificanteWs justificant = pluginHelper.obtenerJustificante(entitat.getDir3Codi(), arbResposta.getNumeroRegistroFormateado(), arbResposta.getLibroCodigo(), arbResposta.getTipoRegistro());
+//					}else if(arbResposta.getEstado().equals(EstatRegistre.OFICI_EXTERN.geValorLong())) {
+//						JustificanteWs justificant = pluginHelper.obtenerJustificante(entitat.getDir3Codi(), arbResposta.getNumeroRegistroFormateado(), arbResposta.getLibroCodigo(), arbResposta.getTipoRegistro());
+//					}else if(arbResposta.getEstado().equals(EstatRegistre.OFICI_SIR.geValorLong())) {
+//						OficioBean ofici = pluginHelper.obtenerOficioExterno(entitat.getDir3Codi(), arbResposta.getNumeroRegistroFormateado(), arbResposta.getLibroCodigo());
+//					}
+				} else {
+					//Regweb3 + Notifica
+//					arbResposta = pluginHelper.registreSortidaAsientoRegistral(entitat.getDir3Codi(), notificacioEntity, enviament, 1L);
+//						arbResposta = pluginHelper.salidaAsientoRegistral(entitat.getDir3Codi(), arb, 1L);
+//						notificacio.setRegistreNumero(arbResposta.getNumeroRegistroFormateado());
+//						notificacio.setRegistreData(arbResposta.getFechaRegistro().toGregorianCalendar().getTime());
+					notificaHelper.notificacioEnviar(notificacioEntity.getId());
+					notificacioEntity = notificacioRepository.findById(notificacioEntity.getId());
+				}
+			} else {
+				try {
+					registreIdDto = pluginHelper.registreAnotacioSortida(
+							conversioTipusHelper.convertir(
+									notificacioEntity, 
+									NotificacioDtoV2.class), 
+							conversioTipusHelper.convertir(
+									enviament, 
+									NotificacioEnviamentDtoV2.class), 
+							1L);
+					//Registrar event
+					if (registreIdDto.getDescripcioError() != null) {
+						NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+								NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
+								notificacioEntity).
+								error(true).
+								errorDescripcio(registreIdDto.getDescripcioError()).
+								build();
+						notificacioEntity.updateNotificaError(
+								NotificacioErrorTipusEnumDto.ERROR_REMOT,
+								event);
+						notificacioEntity.updateEventAfegir(event);
+						notificacioEventRepository.save(event);						
+					} else {
+						NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+								NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
+								notificacioEntity).build();
+						notificacioEntity.updateRegistreNumero(registreIdDto.getNumero());
+						notificacioEntity.updateRegistreNumeroFormatat(registreIdDto.getNumeroRegistreFormat());
+						notificacioEntity.updateRegistreData(registreIdDto.getData());
+						
+						notificacioEntity.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
+						notificacioEntity.updateEventAfegir(event);
+						notificacioEventRepository.save(event);
+						notificaHelper.notificacioEnviar(notificacioEntity.getId());
+					}
+				} catch (Exception ex) {
+					logger.error(
+							"Error al donar d'alta la notificació a Notific@ (notificacioId=" + notificacioEntity.getId() + ")",
+							ex);
+				}
+			}
+		}
+		return registreIdDto;
 	}
 
 	@Override
@@ -788,6 +914,34 @@ public class NotificacioServiceImpl implements NotificacioService {
 				new Date());
 	}
 */
+	// 1. Enviament de notificacions pendents al registre
+	////////////////////////////////////////////////////
+	@Override
+	@Scheduled(fixedRateString = "${config:es.caib.notib.tasca.notifica.enviaments.periode}", initialDelayString = "${config:es.caib.notib.tasca.notifica.enviaments.retard.inicial}")
+	public void registrarEnviamentsPendents() {
+		if (isTasquesActivesProperty() && isNotificaEnviamentsActiu()
+				&& notificaHelper.isConnexioNotificaDisponible()) {
+			logger.debug("Cercant notificacions pendents d'enviar a Notifica");
+			int maxPendents = getNotificaEnviamentsProcessarMaxProperty();
+			List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatPendent(
+					pluginHelper.getNotificaReintentsMaxProperty(), new PageRequest(0, maxPendents));
+			if (!pendents.isEmpty()) {
+				logger.debug("Realitzant enviaments a Notifica per a " + pendents.size()
+						+ " notificacions pendents (màxim=" + maxPendents + ")");
+				for (NotificacioEntity pendent : pendents) {
+					// TODO: Registrar
+					logger.debug(">>> Realitzant enviament a Notifica de la notificació amb identificador: "
+							+ pendent.getId());
+					notificaHelper.notificacioEnviar(pendent.getId());
+				}
+			} else {
+				logger.debug("No hi ha notificacions pendents d'enviar a la seu electrònica");
+			}
+		} else {
+			logger.debug("L'enviament de notificacions a Notific@ està deshabilitada");
+		}
+	}
+	
 	// 1. Enviament de notificacions pendents a Notific@
 	////////////////////////////////////////////////////
 	@Override

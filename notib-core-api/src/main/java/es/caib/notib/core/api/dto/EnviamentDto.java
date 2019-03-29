@@ -22,6 +22,8 @@ public class EnviamentDto extends AuditoriaDto {
 	private EntregaPostalDto entregaPostal;
 	private EntregaDehDto entregaDeh;
 	private Date caducitat;
+	private String raoSocial;
+	private String codiEntitatDesti;
 	
 	public ServeiTipusEnumDto getServeiTipus() {
 		return serveiTipus;
@@ -59,7 +61,18 @@ public class EnviamentDto extends AuditoriaDto {
 	public void setEntregaDeh(EntregaDehDto entregaDeh) {
 		this.entregaDeh = entregaDeh;
 	}
-	
+	public String getRaoSocial() {
+		return raoSocial;
+	}
+	public void setRaoSocial(String raoSocial) {
+		this.raoSocial = raoSocial;
+	}
+	public String getCodiEntitatDesti() {
+		return codiEntitatDesti;
+	}
+	public void setCodiEntitatDesti(String codiEntitatDesti) {
+		this.codiEntitatDesti = codiEntitatDesti;
+	}
 	public Date getCaducitat() {
 		return caducitat;
 	}

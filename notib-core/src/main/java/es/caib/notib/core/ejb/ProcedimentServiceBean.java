@@ -233,11 +233,9 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public boolean hasPermisGestioProcediment(
-			Long procedimentId,
-			EntitatDto entitat) {
+			Long procedimentId) {
 		return delegate.hasPermisGestioProcediment(
-				procedimentId,
-				entitat);
+				procedimentId);
 	}
 
 	@Override
@@ -245,12 +243,10 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	public boolean hasPermisProcessarProcediment(
 			String procedimentCodi,
 			Long procedimentId,
-			EntitatDto entitat,
 			boolean isAdministrador) {
 		return delegate.hasPermisProcessarProcediment(
 				procedimentCodi,
 				procedimentId,
-				entitat,
 				isAdministrador);
 	}
 

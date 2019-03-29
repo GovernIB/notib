@@ -67,6 +67,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@OneToMany(fetch = FetchType.EAGER)
 	@ForeignKey(name = "not_persona_not_fk")
     @JoinColumn(name = "notificacio_env_id") // we need to duplicate the physical information
+	@NotFound(action = NotFoundAction.IGNORE)
 	protected List<PersonaEntity> destinataris;
 	
 	/* Domicili */

@@ -4,6 +4,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ attribute name="name" required="true" rtexprvalue="true"%>
 <%@ attribute name="id" required="false" rtexprvalue="true"%>
+<%@ attribute name="generalClass" required="false" rtexprvalue="true"%>
 <%@ attribute name="required" required="false" rtexprvalue="true"%>
 <%@ attribute name="text" required="false" rtexprvalue="true"%>
 <%@ attribute name="textKey" required="false" rtexprvalue="true"%>
@@ -41,7 +42,7 @@
 	<c:when test="${not inline}">
 		<label class="control-label col-xs-${campLabelSize}" for="${campPath}">${campLabelText}</label>
 		<div class="controls col-xs-${campInputSize}">
-			<form:select path="${campPath}" cssClass="form-control" id="${campId}" disabled="${disabled}" style="width:100%" data-toggle="select2" data-placeholder="${campPlaceholder}" data-minimumresults="${minimumResultsForSearch}" data-enum="${optionEnum}" data-enum-value="${campValue}">
+			<form:select path="${campPath}" cssClass="form-control ${generalClass}" id="${campId}" disabled="${disabled}" style="width:100%" data-toggle="select2" data-placeholder="${campPlaceholder}" data-minimumresults="${minimumResultsForSearch}" data-enum="${optionEnum}" data-enum-value="${campValue}">
 				<c:if test="${emptyOption == 'true'}">
 					<c:choose>
 						<c:when test="${not empty emptyOptionTextKey}"><option value=""><spring:message code="${emptyOptionTextKey}"/></option></c:when>
@@ -74,7 +75,7 @@
 	</c:when>
 	<c:otherwise>
    		<label class="sr-only" for="${campPath}">${campLabelText}</label>
-		<form:select path="${campPath}" cssClass="form-control" id="${campId}" disabled="${disabled}" data-toggle="select2" data-placeholder="${campPlaceholder}" data-minimumresults="${minimumResultsForSearch}" data-enum="${optionEnum}" data-enum-value="${campValue}">
+		<form:select path="${campPath}" cssClass="form-control ${generalClass}" id="${campId}" disabled="${disabled}" data-toggle="select2" data-placeholder="${campPlaceholder}" data-minimumresults="${minimumResultsForSearch}" data-enum="${optionEnum}" data-enum-value="${campValue}">
 			<c:if test="${emptyOption == 'true'}">
 				<c:choose>
 					<c:when test="${not empty emptyOptionTextKey}"><option value=""><spring:message code="${emptyOptionTextKey}"/></option></c:when>

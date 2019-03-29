@@ -3,7 +3,6 @@ package es.caib.notib.core.api.ws.registre;
 import java.util.Date;
 import java.util.List;
 
-
 /**
  * Classe que representa una anotació de registre.
  * 
@@ -43,7 +42,7 @@ public class RegistreAssentament {
 	private String exposa;
 	private String solicita;
 	private List<RegistreAssentamentInteressat> interessats;
-	private List<DocumentRegistre> documents;
+	//private List<DocumentRegistre> documents;
 
 
 	public int getNumero() {
@@ -244,11 +243,11 @@ public class RegistreAssentament {
 //	public void setAnnexos(List<RegistreAnnex> annexos) {
 //		this.annexos = annexos;
 //	}
-	public List<DocumentRegistre> getDocuments() {
-		return documents;
-	}
-	public void setDocuments(List<DocumentRegistre> documents) {
-		this.documents = documents;
-	}
-
+//	public List<DocumentRegistre> getDocuments() {
+//		return documents;
+//	}
+//	public void setDocuments(List<DocumentRegistre> documents) {
+//		this.documents = documents;
+//	}
+//
 }

@@ -51,6 +51,9 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			Long procedimentId, 
 			EntitatEntity entitat);
 	
+	ProcedimentEntity findById(
+			Long procedimentId);
+	
 	ProcedimentEntity findByCodi(String codi);
 	
 	@Query(

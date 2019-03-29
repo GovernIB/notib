@@ -12,8 +12,8 @@ import java.io.Serializable;
  */
 public enum IdiomaEnumDto implements Serializable {
 
-	CATALÀ("CA"),
-	CASTELLA("ES");
+	ca("ca"),
+	es("es");
 	
 	private final String text;
 

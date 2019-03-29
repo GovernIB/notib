@@ -1,11 +1,9 @@
 package es.caib.notib.core.api.dto;
 
-import es.caib.notib.core.api.ws.registre.RegistreInteressatDocumentTipusEnum;
-
 public class RegistreInteressatDto {
 
 	private String tipus;
-	private RegistreInteressatDocumentTipusEnum documentTipus;
+	private RegistreInteressatDocumentTipusDtoEnum documentTipus;
 	private String documentNumero;
 	private String email;
 	private String telefon;
@@ -28,11 +26,11 @@ public class RegistreInteressatDto {
 			String tipus) {
 		this.tipus = tipus;
 	}
-	public RegistreInteressatDocumentTipusEnum getDocumentTipus() {
+	public RegistreInteressatDocumentTipusDtoEnum getDocumentTipus() {
 		return documentTipus;
 	}
 	public void setDocumentTipus(
-			RegistreInteressatDocumentTipusEnum documentTipus) {
+			RegistreInteressatDocumentTipusDtoEnum documentTipus) {
 		this.documentTipus = documentTipus;
 	}
 	public String getDocumentNumero() {

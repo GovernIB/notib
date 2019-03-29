@@ -352,19 +352,36 @@
 			id="accions">
 			<c:set var="algunaAccioDisponible" value="${false}" />
 			<ul class="list-group">
-				<c:if test="${notificacio.estat == 'PENDENT'}">
+				<c:if test="${notificacio.estat == 'REGISTRADA'}">
 					<c:set var="algunaAccioDisponible" value="${true}" />
+					
 					<li class="list-group-item">
 						<div class="row">
 							<div class="col-sm-6" style="height: 100%">
-								<strong><spring:message
-										code="notificacio.info.accio.enviar" /></strong>
+								<strong><spring:message code="notificacio.info.accio.enviar" /></strong>
 							</div>
 							<div class="col-sm-6 text-right">
 								<a
 									href="<not:modalUrl value="/notificacio/${notificacio.id}/enviar"/>"
 									class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
 									<spring:message code="notificacio.info.accio.enviar.boto" />
+								</a>
+							</div>
+						</div>
+					</li>
+				</c:if>	
+				<c:if test="${notificacio.estat == 'PENDENT'}">
+					<c:set var="algunaAccioDisponible" value="${true}" />
+					<li class="list-group-item">
+						<div class="row">
+							<div class="col-sm-6" style="height: 100%">
+								<strong><spring:message code="notificacio.info.accio.registrar" /></strong>
+							</div>
+							<div class="col-sm-6 text-right">
+								<a
+									href="<not:modalUrl value="/notificacio/${notificacio.id}/registrar"/>"
+									class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
+									<spring:message code="notificacio.info.accio.registrar.boto" />
 								</a>
 							</div>
 						</div>

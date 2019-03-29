@@ -25,11 +25,8 @@ import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.exception.RegistrePluginException;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.core.api.ws.registre.CodiAssumpte;
-import es.caib.notib.core.api.ws.registre.TipusAssumpte;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.GrupProcedimentEntity;
@@ -49,6 +46,9 @@ import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.ProcedimentFormRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
+import es.caib.notib.plugin.registre.CodiAssumpte;
+import es.caib.notib.plugin.registre.RegistrePluginException;
+import es.caib.notib.plugin.registre.TipusAssumpte;
 
 /**
  * Implementació del servei de gestió de procediments.
@@ -618,11 +618,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	
 	@Override
 	public boolean hasPermisGestioProcediment(
-			Long procedimentId,
-			EntitatDto entitat) {
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
+			Long procedimentId) {
 		List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
-		ProcedimentEntity procediment = procedimentRepository.findByIdAndEntitat(procedimentId, entitatActual);
+		ProcedimentEntity procediment = procedimentRepository.findById(procedimentId);
 		
 		procediments.add(procediment);
 		
@@ -639,14 +637,12 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	public boolean hasPermisProcessarProcediment(
 			String procedimentCodi,
 			Long procedimentId,
-			EntitatDto entitat,
 			boolean isAdministrador) {
 		List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
 		ProcedimentEntity procediment;
 		
 		if (!isAdministrador) {
-			EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
-				procediment = procedimentRepository.findByIdAndEntitat(procedimentId, entitatActual);
+				procediment = procedimentRepository.findById(procedimentId);
 		} else {
 			procediment = procedimentRepository.findOne(procedimentId);
 		}

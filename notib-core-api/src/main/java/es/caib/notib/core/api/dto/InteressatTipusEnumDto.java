@@ -3,17 +3,16 @@
  */
 package es.caib.notib.core.api.dto;
 
-import java.io.Serializable;
-
 /**
  * Enumerat que indica el tipus de comunicació de Notific@.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public enum InteressatTipusEnumDto implements Serializable {
-
-	FISICA("FISICA"),
-	JURIDICA("JURIDICA");
+public enum InteressatTipusEnumDto {
+	
+	ADMINISTRACIO("A"),
+	FISICA("F"),
+	JURIDICA("J");
 
 	private final String text;
 
@@ -32,7 +31,7 @@ public enum InteressatTipusEnumDto implements Serializable {
 				return valor;
 			}
 		}
-		throw new IllegalArgumentException("No s'ha trobat cap correspondència a dins l'enumeració " + 	InteressatTipusEnumDto.class.getName() + " per al text " + text);
+		throw new IllegalArgumentException("No s'ha trobat cap correspondència a dins l'enumeració " + InteressatTipusEnumDto.class.getName() + " per al text " + text);
 	}
 
 }

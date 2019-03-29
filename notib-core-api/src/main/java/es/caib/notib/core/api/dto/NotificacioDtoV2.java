@@ -39,17 +39,18 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private PersonaDto titular;
 	private PersonaDto destinatari = new PersonaDto();
 	private List<PersonaDto> destinataris = new ArrayList<PersonaDto>();
-	private List<EnviamentDto> enviaments = new ArrayList<EnviamentDto>();
+	private List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<NotificacioEnviamentDtoV2>();
 	private String usuariCodi;
 
 	// Paràmetres registre
 	private String oficina;
+	private String organ;
 	private String llibre;
 	private String registreNumero;
 	private Date registreData;
 	private String extracte;
-	private String docFisica;
-	private String idioma;
+	private RegistreDocumentacioFisicaEnumDto docFisica;
+	private IdiomaEnumDto idioma;
 	private String tipusAssumpte;
 	private String numExpedient;
 	private String refExterna;
@@ -128,7 +129,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 		return grup;
 	}
 	public void setGrup(GrupDto grup) {
-		grup = grup;
+		this.grup = grup;
 	}
 	public String getGrupCodi() {
 		return grupCodi;
@@ -211,10 +212,10 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	public String getExtracte() {
 		return extracte;
 	}
-	public String getDocFisica() {
+	public RegistreDocumentacioFisicaEnumDto getDocFisica() {
 		return docFisica;
 	}
-	public String getIdioma() {
+	public IdiomaEnumDto getIdioma() {
 		return idioma;
 	}
 	public String getTipusAssumpte() {
@@ -232,10 +233,10 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	public void setExtracte(String extracte) {
 		this.extracte = extracte;
 	}
-	public void setDocFisica(String docFisica) {
+	public void setDocFisica(RegistreDocumentacioFisicaEnumDto docFisica) {
 		this.docFisica = docFisica;
 	}
-	public void setIdioma(String idioma) {
+	public void setIdioma(IdiomaEnumDto idioma) {
 		this.idioma = idioma;
 	}
 	public void setTipusAssumpte(String tipusAssumpte) {
@@ -271,10 +272,10 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	public void setRetard(Integer retard) {
 		this.retard = retard;
 	}
-	public List<EnviamentDto> getEnviaments() {
+	public List<NotificacioEnviamentDtoV2> getEnviaments() {
 		return enviaments;
 	}
-	public void setEnviaments(List<EnviamentDto> enviaments) {
+	public void setEnviaments(List<NotificacioEnviamentDtoV2> enviaments) {
 		this.enviaments = enviaments;
 	}
 	public String getUsuariCodi() {
@@ -282,6 +283,12 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	}
 	public void setUsuariCodi(String usuariCodi) {
 		this.usuariCodi = usuariCodi;
+	}
+	public String getOrgan() {
+		return organ;
+	}
+	public void setOrgan(String organ) {
+		this.organ = organ;
 	}
 	@Override
 	public String toString() {

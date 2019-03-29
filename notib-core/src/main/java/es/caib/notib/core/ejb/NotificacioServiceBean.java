@@ -20,6 +20,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.NotificacioService;
 
@@ -80,12 +81,8 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public boolean enviar(
-			Long entitatId,
-			Long notificacioId) {
-		return delegate.enviar(
-				entitatId,
-				notificacioId);
+	public boolean enviar(Long notificacioId) {
+		return delegate.enviar(notificacioId);
 	}
 
 	@Override
@@ -223,5 +220,17 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public NotificacioEnviamenEstatDto marcarComProcessada(Long enviamentId) {
 		return delegate.marcarComProcessada(enviamentId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public RegistreIdDto registrar(Long notificacioId) {
+		return delegate.registrar(notificacioId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public void registrarEnviamentsPendents() {
+		delegate.registrarEnviamentsPendents();
 	}
 }

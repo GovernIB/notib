@@ -12,6 +12,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
+import es.caib.notib.core.api.dto.IdiomaEnumDto;
+import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
+
 /**
  * Informació d'una notificació per al seu enviament.
  * 
@@ -39,8 +42,8 @@ public class NotificacioV2 {
 	private String registreNumero;
 	private Date registreData;
 	private String extracte;
-	private String docFisica;
-	private String idioma;
+	private RegistreDocumentacioFisicaEnumDto docFisica;
+	private IdiomaEnumDto idioma;
 	private String tipusAssumpte;
 	private String numExpedient;
 	private String codiAssumpte;
@@ -138,10 +141,10 @@ public class NotificacioV2 {
 	public void setRefExterna(String refExterna) {
 		this.refExterna = refExterna;
 	}
-	public String getIdioma() {
+	public IdiomaEnumDto getIdioma() {
 		return idioma;
 	}
-	public void setIdioma(String idioma) {
+	public void setIdioma(IdiomaEnumDto idioma) {
 		this.idioma = idioma;
 	}
 	public String getObservacions() {
@@ -180,10 +183,10 @@ public class NotificacioV2 {
 	public void setExtracte(String extracte) {
 		this.extracte = extracte;
 	}
-	public String getDocFisica() {
+	public RegistreDocumentacioFisicaEnumDto getDocFisica() {
 		return docFisica;
 	}
-	public void setDocFisica(String docFisica) {
+	public void setDocFisica(RegistreDocumentacioFisicaEnumDto docFisica) {
 		this.docFisica = docFisica;
 	}
 	public String getTipusAssumpte() {

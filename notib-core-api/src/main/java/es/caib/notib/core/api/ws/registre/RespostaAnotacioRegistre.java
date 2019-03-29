@@ -7,7 +7,7 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class RespostaAnotacioRegistre extends RespostaBase {
+public class RespostaAnotacioRegistre {
 
 	private Integer numero;
 	private String numeroRegistroFormateado;

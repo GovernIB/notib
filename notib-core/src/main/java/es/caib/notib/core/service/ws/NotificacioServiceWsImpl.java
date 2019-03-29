@@ -42,7 +42,6 @@ import es.caib.notib.core.api.ws.notificacio.Persona;
 import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
-import es.caib.notib.core.api.ws.registre.RespostaConsultaRegistre;
 import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
@@ -60,6 +59,7 @@ import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.PagadorCieRepository;
 import es.caib.notib.core.repository.PagadorPostalRepository;
 import es.caib.notib.core.repository.PersonaRepository;
+import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 
 
 /**

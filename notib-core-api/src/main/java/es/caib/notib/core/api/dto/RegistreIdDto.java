@@ -12,9 +12,17 @@ public class RegistreIdDto {
 
 	private Integer numero;
 	private Date data;
+	private String descripcioError;
 	private String hora;
 	private String numeroRegistreFormat;
 
+	
+	public String getDescripcioError() {
+		return descripcioError;
+	}
+	public void setDescripcioError(String descripcioError) {
+		this.descripcioError = descripcioError;
+	}
 	public Integer getNumero() {
 		return numero;
 	}

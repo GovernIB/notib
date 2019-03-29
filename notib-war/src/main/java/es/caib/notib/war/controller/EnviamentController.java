@@ -284,7 +284,6 @@ public class EnviamentController extends BaseUserController {
 	public String reintentarNotificacio(
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
@@ -308,8 +307,8 @@ public class EnviamentController extends BaseUserController {
 			Integer notificacionsNoPendents = 0;
 			for(Long notificacioId: notificacioIds) {
 				NotificacioDtoV2 notificacio = notificacioService.findAmbId(notificacioId);
-				if(notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)) {
-					notificacioService.enviar(entitatActual.getId(), notificacioId);	
+				if(notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)) {
+					notificacioService.enviar(notificacioId);	
 				}else {
 					notificacionsNoPendents++;	
 				}

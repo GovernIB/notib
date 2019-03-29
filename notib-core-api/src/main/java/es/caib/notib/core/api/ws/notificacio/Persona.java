@@ -5,6 +5,9 @@ package es.caib.notib.core.api.ws.notificacio;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
+import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
+
 /**
  * Informació d'una persona per a un enviament.
  * 
@@ -13,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 @JsonAutoDetect
 public class Persona {
 
+	private InteressatTipusEnumDto interessatTipus;
 	private String nom;
 	private String llinatge1;
 	private String llinatge2;
@@ -20,8 +24,15 @@ public class Persona {
 	private String telefon;
 	private String email;
 	private String raoSocial;
-	private String codiEntitatDesti;
+	private String dir3codi;
 	
+	
+	public InteressatTipusEnumDto getInteressatTipus() {
+		return interessatTipus;
+	}
+	public void setInteressatTipus(InteressatTipusEnumDto interessatTipus) {
+		this.interessatTipus = interessatTipus;
+	}
 	public String getNom() {
 		return nom;
 	}
@@ -64,10 +75,10 @@ public class Persona {
 	public void setRaoSocial(String raoSocial) {
 		this.raoSocial = raoSocial;
 	}
-	public String getCodiEntitatDesti() {
-		return codiEntitatDesti;
+	public String getDir3codi() {
+		return dir3codi;
 	}
-	public void setCodiEntitatDesti(String codiEntitatDesti) {
-		this.codiEntitatDesti = codiEntitatDesti;
+	public void setDir3codi(String dir3codi) {
+		this.dir3codi = dir3codi;
 	}
 }

@@ -16,9 +16,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import es.caib.notib.core.api.dto.EnviamentDto;
 import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
@@ -54,7 +56,7 @@ public class NotificacioCommandV2 {
 	private String llibre;
 	private String extracte;
 	private String docFisica;
-	private String idioma;
+	private IdiomaEnumDto idioma;
 	private String tipusAssumpte;
 	private String numExpedient;
 	private String refExterna;
@@ -211,7 +213,7 @@ public class NotificacioCommandV2 {
 	public String getDocFisica() {
 		return docFisica;
 	}
-	public String getIdioma() {
+	public IdiomaEnumDto getIdioma() {
 		return idioma;
 	}
 	public String getTipusAssumpte() {
@@ -235,7 +237,7 @@ public class NotificacioCommandV2 {
 	public void setDocFisica(String docFisica) {
 		this.docFisica = docFisica;
 	}
-	public void setIdioma(String idioma) {
+	public void setIdioma(IdiomaEnumDto idioma) {
 		this.idioma = idioma;
 	}
 	public void setTipusAssumpte(String tipusAssumpte) {
@@ -271,7 +273,7 @@ public class NotificacioCommandV2 {
 				NotificacioDtoV2.class);
 		
 		
-		for(EnviamentDto enviament: dto.getEnviaments()){
+		for(NotificacioEnviamentDtoV2 enviament: dto.getEnviaments()){
 			for(EnviamentCommand enviamentCommand: command.getEnviaments()) {
 				enviament.setCaducitat(enviamentCommand.getCaducitat());
 			}

@@ -289,8 +289,7 @@ public interface ProcedimentService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public boolean hasPermisGestioProcediment(
-			Long procedimentId,
-			EntitatDto entitat);
+			Long procedimentId);
 	
 	/**
 	 * Comprova si l'usuari actual té permisos de notificació sobre algun procediment
@@ -301,7 +300,6 @@ public interface ProcedimentService {
 	public boolean hasPermisProcessarProcediment(
 			String procedimentCodi,
 			Long procedimentId,
-			EntitatDto entitat,
 			boolean isAdministrador);
 	
 	/**

@@ -2,14 +2,19 @@ package es.caib.notib.plugin.registre;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Map;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.commons.io.IOUtils;
-//import org.fundaciobit.genapp.common.utils.Utils;
 
 import es.caib.notib.plugin.utils.PropertiesHelper;
+//import org.fundaciobit.genapp.common.utils.Utils;
 import es.caib.regweb3.utils.RegwebConstantes;
 import es.caib.regweb3.ws.api.v3.RegWebHelloWorldWithSecurityWs;
 import es.caib.regweb3.ws.api.v3.RegWebHelloWorldWithSecurityWsService;
@@ -21,10 +26,10 @@ import es.caib.regweb3.ws.api.v3.RegWebPersonasWs;
 import es.caib.regweb3.ws.api.v3.RegWebPersonasWsService;
 import es.caib.regweb3.ws.api.v3.RegWebRegistroEntradaWs;
 import es.caib.regweb3.ws.api.v3.RegWebRegistroEntradaWsService;
-import es.caib.regweb3.ws.api.v3.RegWebRegistroSalidaWs;
-import es.caib.regweb3.ws.api.v3.RegWebRegistroSalidaWsService;
 import es.caib.regweb3.ws.v3.impl.AsientoRegistralWs;
 import es.caib.regweb3.ws.v3.impl.AsientoRegistralWsService;
+import es.caib.regweb3.ws.v3.impl.RegWebRegistroSalidaWs;
+import es.caib.regweb3.ws.v3.impl.RegWebRegistroSalidaWsService;
 
 /**
  * 
@@ -46,18 +51,18 @@ public abstract class RegWeb3Utils implements RegwebConstantes {
 
 
 	public static String getEndPoint(String api) {
-		String url = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.regweb.url");
+		String url = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.registre.url");
 		if (!url.endsWith("/"))
 			url = url + "/";
 		return url + api;
 	}
 
 	public static String getAppUserName() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.regweb.usuari");
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.registre.usuari");
 	}
 
 	public static String getAppPassword() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.regweb.password");
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.registre.password");
 	}
 
 	public static void configAddressUserPassword(
@@ -190,7 +195,22 @@ public abstract class RegWeb3Utils implements RegwebConstantes {
 		}
 
 	}
-
+	
+	protected Date toDate(XMLGregorianCalendar calendar) throws DatatypeConfigurationException {
+		if (calendar == null) {
+			return null;
+		}
+		return calendar.toGregorianCalendar().getTime();
+	}
+	
+	protected XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
+		if (date == null) {
+			return null;
+		}
+		GregorianCalendar gc = new GregorianCalendar();
+		gc.setTime(date);
+		return DatatypeFactory.newInstance().newXMLGregorianCalendar(gc);
+	}
 
 	//    protected List<AnexoWs> getAnexos() throws Exception {
 	//

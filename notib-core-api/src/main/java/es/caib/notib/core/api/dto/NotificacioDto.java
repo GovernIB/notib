@@ -58,6 +58,8 @@ public class NotificacioDto extends AuditoriaDto {
 	private String notificacio;
 	private boolean permisProcessar;
 	private String registreOrgan;
+	private String registreOficina;
+	private String registreLlibre;
 	private String registreExtracte;
 	private String registreTipusAssumpte;
 	private String registreRefExterna;
@@ -69,7 +71,6 @@ public class NotificacioDto extends AuditoriaDto {
 	private Integer registreNumero;
 	private DocumentDto document;
 	private String descripcio;
-
 	private List<EnviamentDto> enviaments;
 	
 	private List<PermisDto> permisos;
@@ -294,11 +295,9 @@ public class NotificacioDto extends AuditoriaDto {
 	public void setEntitat(EntitatDto entitat) {
 		this.entitat = entitat;
 	}
-
 	public boolean isNotificaError() {
 		return notificaErrorData != null;
 	}
-
 	public List<PermisDto> getPermisos() {
 		return permisos;
 	}
@@ -440,6 +439,19 @@ public class NotificacioDto extends AuditoriaDto {
 	public void setEnviaments(List<EnviamentDto> enviaments) {
 		this.enviaments = enviaments;
 	}
+	public String getRegistreOficina() {
+		return registreOficina;
+	}
+	public void setRegistreOficina(String registreOficina) {
+		this.registreOficina = registreOficina;
+	}
+	public String getRegistreLlibre() {
+		return registreLlibre;
+	}
+	public void setRegistreLlibre(String registreLlibre) {
+		this.registreLlibre = registreLlibre;
+	}
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

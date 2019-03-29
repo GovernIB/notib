@@ -2,8 +2,6 @@ package es.caib.notib.core.api.dto;
 
 import java.util.List;
 
-import es.caib.notib.core.api.ws.registre.RegistreDocumentacioFisicaEnum;
-
 
 
 /**
@@ -32,7 +30,7 @@ public class RegistreAnotacioDtoV2 {
 	private String exposa;
 	private String solicita;
 	
-	private RegistreDocumentacioFisicaEnum documentacioFisica;
+	private RegistreDocumentacioFisicaEnumDto documentacioFisica;
 	
 	private String observacions;
 
@@ -127,11 +125,11 @@ public class RegistreAnotacioDtoV2 {
 			String assumpteCodi) {
 		this.assumpteCodi = assumpteCodi;
 	}
-	public RegistreDocumentacioFisicaEnum getDocumentacioFisica() {
+	public RegistreDocumentacioFisicaEnumDto getDocumentacioFisica() {
 		return documentacioFisica;
 	}
 	public void setDocumentacioFisica(
-			RegistreDocumentacioFisicaEnum documentacioFisica) {
+			RegistreDocumentacioFisicaEnumDto documentacioFisica) {
 		this.documentacioFisica = documentacioFisica;
 	}
 	public String getObservacions() {

@@ -1,13 +1,12 @@
 package es.caib.notib.war.command;
 
-import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.ValidIfVisible;
+import es.caib.notib.war.validation.ValidLlinatgeIfFisic;
 
 /**
  * Command per al manteniment de persones (Titulars | Destinataris).
@@ -23,12 +22,15 @@ import es.caib.notib.war.validation.ValidIfVisible;
 	@ValidIfVisible(
 	    fieldName = "visible",
 	    fieldValue = "true",
-	   dependFieldName = "llinatge1"),
-	@ValidIfVisible(
-	    fieldName = "visible",
-	    fieldValue = "true",
 	    dependFieldName = "nif")
 })
+@ValidLlinatgeIfFisic(
+        fieldName = "interessatTipus",
+        fieldName2 = "visible",
+        fieldValue = "FISICA",
+        fieldValue2 = "true",
+        dependFieldName = "llinatge1"
+)
 public class PersonaCommand {
 
 	private InteressatTipusEnumDto interessatTipus;

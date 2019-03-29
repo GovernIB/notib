@@ -16,6 +16,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 
 /**
@@ -224,9 +225,17 @@ public interface NotificacioService {
 	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
-	public boolean enviar(
-			Long entitatId,
-			Long notificacioId);
+	public boolean enviar(Long notificacioId);
+	
+	/**
+	 * Prova de fer de registrar una notificació que no s'ha pogut resgistrar a l'hora de crearla.
+	 * 
+	 * @param notificacioId
+	 *            Atribut id de la notificació.
+	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	public RegistreIdDto registrar(Long notificacioId);
 
 	/**
 	 * Refresca l'estat d'un enviament (datat i certificació).
@@ -256,6 +265,12 @@ public interface NotificacioService {
 	 * a Notific@.
 	 */
 	public void notificaEnviamentsPendents();
+	
+	/**
+	 * Mètode d'execució periòdica per a fer els enviaments pendents
+	 * al registre.
+	 */
+	public void registrarEnviamentsPendents();
 
 	/**
 	 * Mètode d'execució periòdica per a refrescar l'estat dels enviaments fets a

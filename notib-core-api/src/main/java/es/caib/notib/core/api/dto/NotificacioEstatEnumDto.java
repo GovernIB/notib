@@ -18,7 +18,8 @@ import java.io.Serializable;
 public enum NotificacioEstatEnumDto implements Serializable {
 	PENDENT(0),
 	ENVIADA(1),
-	FINALITZADA(2);
+	REGISTRADA(2),
+	FINALITZADA(3);
 	
 	private Integer numVal;
 	

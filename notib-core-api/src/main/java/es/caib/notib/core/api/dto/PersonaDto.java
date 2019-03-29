@@ -6,6 +6,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class PersonaDto implements Serializable{
 
+	private InteressatTipusEnumDto interessatTipus;
 	private String nom;
 	private String llinatge1;
 	private String llinatge2;
@@ -13,9 +14,15 @@ public class PersonaDto implements Serializable{
 	private String nif;
 	private String telefon;
 	private String email;
-	private String codiAdministracio;
+	private String dir3codi;
 	
 	
+	public InteressatTipusEnumDto getInteressatTipus() {
+		return interessatTipus;
+	}
+	public void setInteressatTipus(InteressatTipusEnumDto interessatTipus) {
+		this.interessatTipus = interessatTipus;
+	}
 	public String getNom() {
 		return nom;
 	}
@@ -58,12 +65,13 @@ public class PersonaDto implements Serializable{
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public String getCodiAdministracio() {
-		return codiAdministracio;
+	public String getDir3codi() {
+		return dir3codi;
 	}
-	public void setCodiAdministracio(String codiAdministracio) {
-		this.codiAdministracio = codiAdministracio;
+	public void setDir3codi(String dir3codi) {
+		this.dir3codi = dir3codi;
 	}
+	
 	public String getLlinatges() {
 		return llinatge1 + " " + llinatge2; 
 	}

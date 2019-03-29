@@ -3,11 +3,18 @@ package es.caib.notib.core.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 
 /**
@@ -19,11 +26,11 @@ import es.caib.notib.core.audit.NotibAuditable;
 @Table(name="not_persona")
 @EntityListeners(AuditingEntityListener.class)
 public class PersonaEntity extends NotibAuditable<Long> {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	
+	@Column(name = "interessattipus", nullable = false)
+	@Enumerated(EnumType.STRING)
+	private InteressatTipusEnumDto interessatTipus;
+	
 	@Column(name = "email", length = 100)
 	private String email;
 	@Column(name = "llinatge1", length = 100)
@@ -44,6 +51,12 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	@JoinColumn(name = "notificacio_env_id")
 	private NotificacioEnviamentEntity enviament;
 	
+	public InteressatTipusEnumDto getInteressatTipus() {
+		return interessatTipus;
+	}
+	public void setInteressatTipus(InteressatTipusEnumDto interessatTipus) {
+		this.interessatTipus = interessatTipus;
+	}
 	public String getEmail() {
 		return email;
 	}
@@ -139,6 +152,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	}
 	
 	public static BuilderV2 getBuilderV2(
+			InteressatTipusEnumDto interessatTipus,
 			String email,
 			String llinatge1,
 			String llinatge2,
@@ -148,6 +162,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 			String raoSocial,
 			String codiEntitatDesti) {
 		return new BuilderV2(
+				interessatTipus,
 				email,
 				llinatge1,
 				llinatge2,
@@ -161,6 +176,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	public static class BuilderV2 {
 		PersonaEntity built;
 		BuilderV2(
+				InteressatTipusEnumDto interessatTipus,
 				String email,
 				String llinatge1,
 				String llinatge2,
@@ -171,6 +187,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 				String codiEntitatDesti
 				) {
 			built = new PersonaEntity();
+			built.interessatTipus = interessatTipus;
 			built.email = email;
 			built.codiEntitatDesti = codiEntitatDesti;
 			built.llinatge1 = llinatge1;
@@ -185,4 +202,5 @@ public class PersonaEntity extends NotibAuditable<Long> {
 		}
 	}
 	
+	private static final long serialVersionUID = 4569697366006085907L;
 }
