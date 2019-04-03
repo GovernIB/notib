@@ -61,9 +61,6 @@ $(document).ready(function() {
     	 $('#extracte').val($(this).val());
     });
 
-    $('#caducitat').datepicker({
-        orientation: 'auto top'
-    });
     destinatariForm.find('input').each(function() {
         if($(this).val().length > 0) {
             $(destinatariForm).removeClass('hidden');
@@ -340,6 +337,9 @@ function mostrarEntregaPostal(className) {
                     <div class="col-md-12">
                         <not:inputTextarea name="descripcio" textKey="notificacio.form.camp.descripcio" labelSize="2"/>
                     </div>
+                    <div class="col-md-6">
+                        <not:inputDate name="caducitat" textKey="notificacio.form.camp.caducitat" orientacio="bottom" labelSize="4"/>
+                    </div>
                     <div class="col-md-12">
                     <form:hidden path="procedimentId" value="${procediment.id}"/>
                         <not:inputText name="procedimentNom" textKey="notificacio.form.camp.procediment" value="${procediment.nom}" labelSize="2" readonly="true"/>
@@ -452,9 +452,6 @@ function mostrarEntregaPostal(className) {
                     <div class="row enviamentsForm formEnviament enviamentForm_${j}">
                         <div class="col-md-6">
                             <not:inputSelect name="enviaments[${j}].serveiTipus" textKey="notificacio.form.camp.serveitipus" labelSize="4" optionItems="${serveiTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
-                        </div>
-                        <div class="col-md-6">
-                            <not:inputDate name="enviaments[${j}].caducitat" textKey="notificacio.form.camp.caducitat" orientacio="bottom" labelSize="4"/>
                         </div>
                         <div class="titular">
                             <div class="col-md-12">
