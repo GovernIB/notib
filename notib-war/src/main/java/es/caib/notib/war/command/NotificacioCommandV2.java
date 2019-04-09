@@ -25,6 +25,7 @@ import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
+import es.caib.notib.war.validation.ValidConcepte;
 
 /**
  * Command per al manteniment de notificacions manuals (V2).
@@ -39,6 +40,7 @@ public class NotificacioCommandV2 {
 	private String emisorDir3Codi;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
+	@ValidConcepte
 	@NotEmpty @Size(max=50)
 	private String concepte;
 	private String descripcio;
