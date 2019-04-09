@@ -12,6 +12,7 @@
 	</excludes>
 	<decorator name="senseCapNiPeus" page="senseCapNiPeus.jsp">
 		<pattern>/api/apidoc</pattern>
+		<pattern>/api/rest</pattern>
 	</decorator>
 	<decorator name="default" page="default.jsp">
 		<pattern>/*</pattern>

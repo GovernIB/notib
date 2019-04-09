@@ -41,7 +41,7 @@ public class NotificacioServiceController extends BaseController {
 	@Autowired
 	private NotificacioServiceWsV2 notificacioServiceWsV2;
 
-	@RequestMapping(value = "/apidoc", method = RequestMethod.GET)
+	@RequestMapping(value = {"/apidoc", "/rest"}, method = RequestMethod.GET)
 	public String documentacio(HttpServletRequest request) {
 		return "apidoc";
 	}

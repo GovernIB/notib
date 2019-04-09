@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class ApiController extends BaseUserController {
 
 	
-	@RequestMapping(value = "/rest")
-	public String altaForm(
-			HttpServletRequest request) {
-		return "redirect:apidoc";
-	}
+//	@RequestMapping(value = "/rest")
+//	public String altaForm(
+//			HttpServletRequest request) {
+//		return "redirect:apidoc";
+//	}
 }

@@ -60,16 +60,42 @@ $(document).ready(function() {
 	    			'<table class="table teble-striped table-bordered"><thead>' +
 	    			'<tr>' +
 					'<th><spring:message code="notificacio.list.enviament.list.titular"/></th>' + 
-	    			//'<th><spring:message code="notificacio.list.enviament.list.destinatari"/></th>' + 
+	    			'<th><spring:message code="notificacio.list.enviament.list.destinataris"/></th>' +
 	    			'<th><spring:message code="notificacio.list.enviament.list.estat"/></th>' +
 	    			'<th></th>' +
 	    			'</tr>' +
 					'</thead><tbody></tbody></table>');
 	    	contingutTbody = '';
 			for (i = 0; i < data.length; i++) {
+				var llinatge1 = '', llinatge2 = '', destinataris = '';
+				if (data[i].titular.llinatge1 != null) {
+					llinatge1 = data[i].titular.llinatge1;
+				}
+				if (data[i].titular.llinatge2 != null) {
+					llinatge2 = data[i].titular.llinatge2;
+				}
+				
+				$.each(data[i].destinataris, function (index, destinatari) {
+					var llinatge1Dest = '', llinatge2Dest = '';
+					if (destinatari.llinatge1 != null) {
+						llinatge1Dest = data[i].destinatari.llinatge1;
+					}
+					if (destinatari.llinatge2 != null) {
+						llinatge2Dest = data[i].destinatari.llinatge2;
+					}
+					destinataris += destinatari.nom + ' ' + llinatge1Dest + ' ' + llinatge2Dest + ' (' + destinatari.nif + '), ';	
+				});
 				contingutTbody += '<tr>';
-				contingutTbody += '<td>' + data[i].titular.nom + '</td>';
-				//contingutTbody += '<td>' + data[i].destinatari + '</td>';
+				contingutTbody += '<td>' + data[i].titular.nom + ' ' + llinatge1 + ' ' + llinatge2 + '('+ data[i].titular.nif +') </td>';
+				if (destinataris != ''){
+					//Remove last white space
+					destinataris = destinataris.substr(0, destinataris.length-1);
+					//Remove last comma
+					destinataris = destinataris.substr(0, destinataris.length-1);
+				} else {
+					destinataris = '<spring:message code="notificacio.list.enviament.list.sensedestinataris"/>';
+				}
+				contingutTbody += '<td>' + destinataris + '</td>';
 				contingutTbody += '<td>';
 				contingutTbody += (data[i].notificacio.estat) ? notificacioEnviamentEstats[data[i].notificacio.estat] : '';
 				if (data[i].notificacio.notificaError) {
@@ -137,6 +163,9 @@ $(document).ready(function() {
 				<not:inputText name="titular" inline="true" placeholderKey="notificacio.list.filtre.camp.titular"/>
 			</div>
 			<div class="col-md-3">
+				<not:inputSelect name="procedimentId" optionItems="${procedimentsPermisLectura}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.procediment" inline="true"/>
+			</div>
+			<div class="col-md-3">
 			</div>
 			<div class="col-md-2 pull-right form-buttons">
 				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -176,6 +205,7 @@ $(document).ready(function() {
 						{{:~eval('comunicacioTipus["' + comunicacioTipus + '"]')}}
 					</script>
 				</th--%>
+				<th data-col-name="procediment.nom"><spring:message code="notificacio.list.columna.procediment"/></th>
 				<th data-col-name="concepte" width="${ampladaConcepte}"><spring:message code="notificacio.list.columna.concepte"/></th>
 				<th data-col-name="estat" data-template="#cellEstatTemplate" width="20%">
 					<spring:message code="notificacio.list.columna.estat"/>

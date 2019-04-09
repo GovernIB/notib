@@ -43,7 +43,7 @@ public class NotibController {
 		if (RolHelper.isUsuariActualAdministrador(request)) {
 			return "redirect:entitat";
 		} else if (RolHelper.isUsuariActualAplicacio(request)) {
-			return "redirect:api/apidoc";
+			return "redirect:api/rest";
 		} else if (RolHelper.isUsuariActualUsuari(request)) {
 			return "redirect:notificacio";
 		} else {
@@ -91,7 +91,7 @@ public class NotibController {
 	public String api(
 			HttpServletRequest request,
 			Model model) {
-		return "redirect:api/apidoc";
+		return "redirect:api/rest";
 	}
 
 	public static class ErrorObject {
