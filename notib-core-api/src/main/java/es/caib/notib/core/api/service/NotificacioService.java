@@ -262,15 +262,18 @@ public interface NotificacioService {
 			Long enviamentId);
 
 	/**
-	 * Refresca l'estat d'un enviament (datat i certificació).
+	 * Marca com a processada una notificació de forma manual.
 	 * 
-	 * @param enviamentId
-	 *            Atribut id de l'enviament.
+	 * @param notificacioId
+	 *            	Atribut id de la notificació que es vol processar.
+	 * @param motiu
+	 *         		el motiu per el que es vol marcar la notificació com a processada.
 	 * @return l'estat de l'enviament.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public NotificacioEnviamenEstatDto marcarComProcessada(
-			Long enviamentId);
+			Long notificacioId,
+			String motiu);
 	
 	/**
 	 * Mètode d'execució periòdica per a fer els enviaments pendents

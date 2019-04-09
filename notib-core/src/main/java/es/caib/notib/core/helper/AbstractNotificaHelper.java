@@ -313,6 +313,7 @@ public abstract class AbstractNotificaHelper {
 		}
 		if (estatsEnviamentsFinals) {
 			enviament.getNotificacio().updateEstat(NotificacioEstatEnumDto.FINALITZADA);
+			enviament.getNotificacio().updateMotiu(notificaEstat.name());
 		}
 	}
 

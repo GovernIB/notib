@@ -879,7 +879,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Override
 	public NotificacioEnviamenEstatDto marcarComProcessada(
-			Long notificacioId) {
+			Long notificacioId,
+			String motiu) {
 		logger.debug("Refrescant l'estat de la notificació a PROCESSAT (" +
 				"notificacioId=" + notificacioId + ")");
 		
@@ -887,6 +888,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 				null,
 				notificacioId);
 		notificacioEntity.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
+		notificacioEntity.updateMotiu(motiu);
+		
 		notificacioRepository.saveAndFlush(notificacioEntity);
 		return null;
 	}
