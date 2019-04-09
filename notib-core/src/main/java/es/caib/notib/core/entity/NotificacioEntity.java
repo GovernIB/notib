@@ -86,6 +86,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "estat", nullable = false)
 	protected NotificacioEstatEnumDto estat;
 	
+	@Column(name = "motiu")
+	protected String motiu;
+	
 	@Column(name = "not_error_tipus")
 	protected NotificacioErrorTipusEnumDto notificaErrorTipus;
 	
@@ -259,6 +262,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public NotificacioEstatEnumDto getEstat() {
 		return estat;
 	}
+	public String getMotiu() {
+		return motiu;
+	}
 	public NotificacioErrorTipusEnumDto getNotificaErrorTipus() {
 		return notificaErrorTipus;
 	}
@@ -401,7 +407,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public void setPermisProcessar(boolean permisProcessar) {
 		this.permisProcessar = permisProcessar;
 	}
-//	
 	public void updateRegistreNumero(Integer registreNumero) {
 		this.registreNumero = registreNumero;
 	}
@@ -415,6 +420,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			NotificacioEstatEnumDto estat) {
 		this.estat = estat;
 	}
+	public void updateMotiu(String motiu) {
+		this.motiu = motiu;
+	}
+	
 	public void updateNotificaNouEnviament(int reintentsPeriodeNotifica) {
 		this.notificaEnviamentIntent++;
 		Calendar cal = GregorianCalendar.getInstance();

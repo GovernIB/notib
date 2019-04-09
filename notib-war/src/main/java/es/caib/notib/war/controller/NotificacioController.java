@@ -57,6 +57,7 @@ import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.DocumentCommand;
+import es.caib.notib.war.command.MarcarProcessatCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
 import es.caib.notib.war.command.PersonaCommand;
@@ -428,12 +429,26 @@ public class NotificacioController extends BaseUserController {
 	}
 
 	@RequestMapping(value = "/{notificacioId}/processar", method = RequestMethod.GET)
-	public String processar(
+	public String processarGet(
 			HttpServletRequest request, 
 			Model model, 
 			@PathVariable 
 			Long notificacioId) {
-		notificacioService.marcarComProcessada(notificacioId);
+		MarcarProcessatCommand command = new MarcarProcessatCommand();
+		model.addAttribute(command);
+		return "notificacioMarcarProcessat";
+	}
+	
+	@RequestMapping(value = "/{notificacioId}/processar", method = RequestMethod.POST)
+	public String processarPost(
+			HttpServletRequest request, 
+			Model model, 
+			@PathVariable 
+			Long notificacioId,
+			@Valid MarcarProcessatCommand command) {
+		notificacioService.marcarComProcessada(
+				notificacioId,
+				command.getMotiu());
 
 		return getModalControllerReturnValueSuccess(request, "redirect:../../notificacio",
 				"notificacio.controller.refrescar.estat.ok");

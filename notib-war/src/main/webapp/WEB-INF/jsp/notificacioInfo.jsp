@@ -369,7 +369,7 @@
 						</div>
 					</li>
 				</c:if>
-				<c:if test="${notificacio.estat == 'REGISTRADA'}">
+				<c:if test="${notificacio.estat == 'PENDENT'}">
 					<c:set var="algunaAccioDisponible" value="${true}" />
 					<li class="list-group-item">
 						<div class="row">
