@@ -521,7 +521,30 @@ public class EntityComprovarHelper {
 		}
 	}
 	
-
+	public List<ProcedimentDto> findPermisProcediments(
+			Permission[] permisos) {
+		List<ProcedimentDto> resposta = null;
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		List<ProcedimentEntity> procediments = procedimentRepository.findAll();
+		
+		permisosHelper.filterGrantedAny(
+				procediments,
+				new ObjectIdentifierExtractor<ProcedimentEntity>() {
+					public Long getObjectIdentifier(ProcedimentEntity procediment) {
+						return procediment.getId();
+					}
+				},
+				ProcedimentEntity.class,
+				permisos,
+				auth);
+		
+		resposta = conversioTipusHelper.convertirList(
+				procediments,
+				ProcedimentDto.class);
+		
+		return resposta;
+	}
+	
 	public List<ProcedimentDto> findPermisProcedimentsUsuariActualAndEntitat(
 			Permission[] permisos,
 			EntitatEntity entitatActual) {

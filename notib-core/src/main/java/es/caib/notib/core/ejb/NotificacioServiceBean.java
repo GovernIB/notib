@@ -144,8 +144,8 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public List<ProcedimentDto> findProcedimentsAmbPermisConsulta(EntitatDto entitat) {
-		return delegate.findProcedimentsAmbPermisConsulta(entitat);
+	public List<ProcedimentDto> findProcedimentsEntitatAmbPermisConsulta(EntitatDto entitat) {
+		return delegate.findProcedimentsEntitatAmbPermisConsulta(entitat);
 	}
 
 	@Override
@@ -232,5 +232,11 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public void registrarEnviamentsPendents() {
 		delegate.registrarEnviamentsPendents();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public List<ProcedimentDto> findProcedimentsAmbPermisConsulta() {
+		return delegate.findProcedimentsAmbPermisConsulta();
 	}
 }

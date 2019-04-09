@@ -4,6 +4,8 @@
 package es.caib.notib.war.command;
 
 import java.util.Date;
+import java.util.List;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
@@ -26,6 +28,7 @@ public class NotificacioFiltreCommand {
 	private Date dataInici;
 	private Date dataFi;
 	private String titular;
+	private Long procedimentId;
 	
 	public Long getEntitatId() {
 		return entitatId;
@@ -75,7 +78,12 @@ public class NotificacioFiltreCommand {
 	public void setTitular(String titular) {
 		this.titular = titular;
 	}
-
+	public Long getProcedimentId() {
+		return procedimentId;
+	}
+	public void setProcedimentId(Long procedimentId) {
+		this.procedimentId = procedimentId;
+	}
 	public static NotificacioFiltreCommand asCommand(NotificacioFiltreDto dto) {
 		if (dto == null) {
 			return null;

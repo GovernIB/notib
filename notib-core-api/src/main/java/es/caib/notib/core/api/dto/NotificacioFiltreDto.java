@@ -23,6 +23,7 @@ public class NotificacioFiltreDto implements Serializable {
 	private Date dataInici;
 	private Date dataFi;
 	private String titular;
+	private Long procedimentId;
 	
 	public Long getEntitatId() {
 		return entitatId;
@@ -71,6 +72,12 @@ public class NotificacioFiltreDto implements Serializable {
 	}
 	public void setTitular(String titular) {
 		this.titular = titular;
+	}
+	public Long getProcedimentId() {
+		return procedimentId;
+	}
+	public void setProcedimentId(Long procedimentId) {
+		this.procedimentId = procedimentId;
 	}
 	
 	@Override

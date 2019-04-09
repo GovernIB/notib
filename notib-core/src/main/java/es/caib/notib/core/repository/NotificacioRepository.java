@@ -17,6 +17,7 @@ import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 
 /**
@@ -138,6 +139,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
 			"and (:isEstatNull = true or ntf.estat = :estat) " +
 			"and (:isDatesNull = true or ntf.createdDate between :dataInici and :dataFi) " +
+			"and (:isProcedimentNull = true or ntf.procediment = :procediment) " +
 			"and (:isTitularNull = true or (" +
 			"    select count(env.id) " +
 			"    from ntf.enviaments env " +
@@ -163,6 +165,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("titular") String titular,
 			//@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
 			@Param("entitat") EntitatEntity entitat,
+			@Param("isProcedimentNull") boolean isProcedimentNull,
+			@Param("procediment") ProcedimentEntity procediment,
 			Pageable paginacio);
 	
 	@Query(	"from " +
@@ -174,6 +178,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
 			"and (:isEstatNull = true or ntf.estat = :estat) " +
 			"and (:isDatesNull = true or ntf.createdDate between :dataInici and :dataFi) " +
+			"and (:isProcedimentNull = true or ntf.procediment = :procediment) " +
 			"and (:isTitularNull = true or (" +
 			"    select count(env.id) " +
 			"    from ntf.enviaments env " +
@@ -197,6 +202,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("dataFi") Date dataFi,
 			@Param("isTitularNull") boolean isTitularNull,
 			@Param("titular") String titular,
+			@Param("isProcedimentNull") boolean isProcedimentNull,
+			@Param("procediment") ProcedimentEntity procediment,
 			Pageable paginacio);
 
 }

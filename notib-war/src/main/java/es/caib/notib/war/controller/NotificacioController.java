@@ -108,6 +108,7 @@ public class NotificacioController extends BaseUserController {
 
 		if (RolHelper.isUsuariActualAdministrador(request)) {
 			model.addAttribute("entitat", entitatService.findAll());
+			model.addAttribute("procedimentsPermisLectura", notificacioService.findProcedimentsAmbPermisConsulta());
 		}
 		if (RolHelper.isUsuariActualUsuari(request)) {
 			// Llistat de procediments amb grups
@@ -128,7 +129,7 @@ public class NotificacioController extends BaseUserController {
 						procediments,
 						entitatActual);
 			} else if (procedimentsAmbGrups.isEmpty()) {
-				procedimentsPermisConsulta = notificacioService.findProcedimentsAmbPermisConsulta(entitatActual);
+				procedimentsPermisConsulta = notificacioService.findProcedimentsEntitatAmbPermisConsulta(entitatActual);
 			}
 
 			procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
@@ -138,6 +139,8 @@ public class NotificacioController extends BaseUserController {
 			if ((procedimentsPermisConsulta == null || procedimentsPermisConsulta.size() < 0) || (procedimentsPermisConsultaSenseGrups == null || procedimentsPermisConsultaSenseGrups.size() < 0) || (procedimentsPermisConsultaSenseGrups== null || procedimentsPermisConsultaSenseGrups.size() < 0)) {
 				MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.lectura"));
 			}
+
+			model.addAttribute("procedimentsPermisLectura", procedimentsPermisConsulta);
 		}
 		model.addAttribute("notificacioEstats", 
 				EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
@@ -388,7 +391,6 @@ public class NotificacioController extends BaseUserController {
 			}
 
 		}
-
 		try {
 			notificacions = notificacioService.findAmbFiltrePaginat(
 					entitatActual.getId(), 

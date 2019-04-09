@@ -359,7 +359,7 @@ function mostrarEntregaPostal(className) {
             <div role="tabpanel" class="tab-pane" id="documentForm">
                 <div class="row documentForm">
                     <div class="col-md-6">
-                        <not:inputSelect name="tipusDocument" textKey="notificacio.form.camp.codiemisor" labelSize="4"/>
+                        <not:inputSelect name="tipusDocument" textKey="notificacio.form.camp.document" labelSize="4"/>
                     </div>
                     <div id="input-origen-csvuuid" class="col-md-6">
                         <not:inputText name="documentArxiuUuidCsvUrl" textKey="notificacio.form.camp.csvuuid" labelSize="3"/>

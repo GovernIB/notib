@@ -81,6 +81,7 @@ import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.PersonaRepository;
+import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import es.caib.plugins.arxiu.api.DocumentContingut;
@@ -121,6 +122,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private PersonaRepository personaRepository;
 	@Autowired
 	private AplicacioService aplicacioService;
+	@Autowired
+	private ProcedimentRepository procedimentRepository;
 	
 	@Transactional(rollbackFor=Exception.class)
 	@Override
@@ -424,14 +427,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 								ExtendedPermission.READ}
 						);
 				//Procediments amb permís de consulta no agurpables
-
 				List<ProcedimentDto> procedimentsNoAgrupables = new ArrayList<ProcedimentDto>();
 				for(ProcedimentDto procediment: procediments) {
 					if (!procediment.isAgrupar()) {
 						procedimentsNoAgrupables.add(procediment);
 					}
 				}
-				
 				procedimentsPermisConsulta = entityComprovarHelper.findByPermisProcedimentsUsuariActual(
 						procedimentsNoAgrupables, 
 						entitatActual,
@@ -451,7 +452,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			}
 		}
-		
 		if (filtre == null) {
 			//Consulta les notificacions sobre les quals té permis l'usuari actual
 			if (isUsuari) {
@@ -473,90 +473,93 @@ public class NotificacioServiceImpl implements NotificacioService {
 						paginacioHelper.toSpringDataPageable(paginacioParams));
 			}
 		} else {
-				Date dataInici = filtre.getDataInici();
-				if (dataInici != null) {
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(dataInici);
-					cal.set(Calendar.HOUR, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-					dataInici = cal.getTime();
-				}
-				Date dataFi = filtre.getDataFi();
-				if (dataFi != null) {
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(dataInici);
-					cal.set(Calendar.HOUR, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-					dataFi = cal.getTime();
-				}
-				Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
-				if (isUsuari) {
-					if (!procedimentsCodisNotib.isEmpty()) {
-						notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotib(
-								filtre.getEntitatId() == null,
-								filtre.getEntitatId(),
-								//filtre.getComunicacioTipus() == null,
-								//filtre.getComunicacioTipus(),
-								false,
-								NotificacioComunicacioTipusEnumDto.SINCRON,
-								filtre.getEnviamentTipus() == null,
-								filtre.getEnviamentTipus(),
-								filtre.getConcepte() == null,
-								filtre.getConcepte() == null ? "" : filtre.getConcepte(),
-								filtre.getEstat() == null,
-								filtre.getEstat(),
-								dataInici == null && dataFi == null,
-								dataInici,
-								dataFi,
-								filtre.getTitular() == null || filtre.getTitular().isEmpty(), 
-								filtre.getTitular() == null ? "" : filtre.getTitular(),
-								entitatActual,
-								pageable);
-					}
-				} else if (isUsuariEntitat) {
-					notificacions = notificacioRepository.findAmbFiltre(
-							entitatId == null,
-							entitatId,
-							false,
-							NotificacioComunicacioTipusEnumDto.SINCRON,
-							filtre.getEnviamentTipus() == null,
-							filtre.getEnviamentTipus(),
-							filtre.getConcepte() == null,
-							filtre.getConcepte(),
-							filtre.getEstat() == null,
-							filtre.getEstat(),
-							dataInici == null && dataFi == null,
-							dataInici,
-							dataFi,
-							filtre.getTitular() == null || filtre.getTitular().isEmpty(), 
-							filtre.getTitular(),
-							pageable);
-				} else if (isAdministrador) {
-					notificacions = notificacioRepository.findAmbFiltre(
+			Date dataInici = filtre.getDataInici();
+			if (dataInici != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataInici);
+				cal.set(Calendar.HOUR, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataInici = cal.getTime();
+			}
+			Date dataFi = filtre.getDataFi();
+			if (dataFi != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataInici);
+				cal.set(Calendar.HOUR, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataFi = cal.getTime();
+			}
+			ProcedimentEntity procediment = null;
+			if (filtre.getProcedimentId() != null) {
+				procediment = procedimentRepository.findById(filtre.getProcedimentId());
+			}
+			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
+			if (isUsuari) {
+				if (!procedimentsCodisNotib.isEmpty()) {
+					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotib(
 							filtre.getEntitatId() == null,
 							filtre.getEntitatId(),
-							//filtre.getComunicacioTipus() == null,
-							//filtre.getComunicacioTipus(),
-							false,
-							NotificacioComunicacioTipusEnumDto.SINCRON,
+							// filtre.getComunicacioTipus() == null,
+							// filtre.getComunicacioTipus(),
+							false, NotificacioComunicacioTipusEnumDto.SINCRON,
 							filtre.getEnviamentTipus() == null,
 							filtre.getEnviamentTipus(),
 							filtre.getConcepte() == null,
-							filtre.getConcepte(),
+							filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
 							filtre.getEstat() == null,
-							filtre.getEstat(),
-							dataInici == null && dataFi == null,
+							filtre.getEstat(), dataInici == null && dataFi == null,
 							dataInici,
 							dataFi,
-							filtre.getTitular() == null || filtre.getTitular().isEmpty(), 
-							filtre.getTitular(),
+							filtre.getTitular() == null || filtre.getTitular().isEmpty(),
+							filtre.getTitular() == null ? "" : filtre.getTitular(),
+							entitatActual, 
+							procediment == null,
+							procediment,
 							pageable);
 				}
+			} else if (isUsuariEntitat) {
+				notificacions = notificacioRepository.findAmbFiltre(entitatId == null, entitatId, false,
+						NotificacioComunicacioTipusEnumDto.SINCRON,
+						filtre.getEnviamentTipus() == null,
+						filtre.getEnviamentTipus(),
+						filtre.getConcepte() == null,
+						filtre.getConcepte(),
+						filtre.getEstat() == null,
+						filtre.getEstat(),
+						dataInici == null && dataFi == null,
+						dataInici,
+						dataFi,
+						filtre.getTitular() == null || filtre.getTitular().isEmpty(),
+						filtre.getTitular(),
+						procediment == null,
+						procediment,
+						pageable);
+			} else if (isAdministrador) {
+				notificacions = notificacioRepository.findAmbFiltre(filtre.getEntitatId() == null,
+						filtre.getEntitatId(),
+						// filtre.getComunicacioTipus() == null,
+						// filtre.getComunicacioTipus(),
+						false, NotificacioComunicacioTipusEnumDto.SINCRON,
+						filtre.getEnviamentTipus() == null,
+						filtre.getEnviamentTipus(),
+						filtre.getConcepte() == null,
+						filtre.getConcepte(),
+						filtre.getEstat() == null,
+						filtre.getEstat(),
+						dataInici == null && dataFi == null,
+						dataInici,
+						dataFi,
+						filtre.getTitular() == null || filtre.getTitular().isEmpty(),
+						filtre.getTitular(),
+						procediment == null,
+						procediment,
+						pageable);
 			}
+		}
 		
 		if (notificacions == null) {
 			resultatPagina = paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
@@ -595,7 +598,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	@Override
-	public List<ProcedimentDto> findProcedimentsAmbPermisConsulta(
+	public List<ProcedimentDto> findProcedimentsEntitatAmbPermisConsulta(
 			EntitatDto entitat) {
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
 		
@@ -604,6 +607,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 						ExtendedPermission.READ},
 				entitatActual
 				);	
+	}
+	
+	@Override
+	public List<ProcedimentDto> findProcedimentsAmbPermisConsulta() {		
+		return entityComprovarHelper.findPermisProcediments(
+				new Permission[] {
+						ExtendedPermission.READ});	
 	}
 
 	@Override
