@@ -143,8 +143,9 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 			while (rs.next()) {
 				DadesUsuari dadesUsuari = new DadesUsuari();
 				dadesUsuari.setCodi(rs.getString(1));
-				dadesUsuari.setNomSencer(rs.getString(2));
-				dadesUsuari.setEmail(rs.getString(3));
+				dadesUsuari.setNom(rs.getString(2));
+				dadesUsuari.setNif(rs.getString(3));
+				dadesUsuari.setEmail(rs.getString(4));
 				llistaUsuaris.add(dadesUsuari);
 			}
 		} catch (Exception ex) {

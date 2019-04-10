@@ -89,11 +89,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
-	
 	@Autowired
 	private PluginHelper pluginHelper;
-
-
+	@Autowired 
+	private EmailHelper emailHelper;
 
 	public boolean notificacioEnviar(
 			Long notificacioId) {
@@ -241,6 +240,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 								build();
 						notificacio.updateEventAfegir(eventDatat);
 						enviament.updateNotificaError(false, null);
+						if (notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
+							emailHelper.prepararEnvioEmailNotificacio(
+									notificacio.getProcediment(), 
+									notificacio);
+						}
 					}
 				} else {
 					throw new ValidationException(

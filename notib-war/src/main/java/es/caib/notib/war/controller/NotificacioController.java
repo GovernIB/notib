@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -445,7 +446,7 @@ public class NotificacioController extends BaseUserController {
 			Model model, 
 			@PathVariable 
 			Long notificacioId,
-			@Valid MarcarProcessatCommand command) {
+			@Valid MarcarProcessatCommand command) throws MessagingException {
 		notificacioService.marcarComProcessada(
 				notificacioId,
 				command.getMotiu());

@@ -5,6 +5,7 @@ package es.caib.notib.war.helper;
 
 import javax.servlet.http.HttpServletRequest;
 
+import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
 
 /**
@@ -16,7 +17,8 @@ public class SessioHelper {
 
 	public static final String SESSION_ATTRIBUTE_AUTH_PROCESSADA = "SessioHelper.autenticacioProcessada";
 	public static final String SESSION_ATTRIBUTE_CONTENIDOR_VISTA = "SessioHelper.contenidorVista";
-	
+	public static final String SESSION_ATTRIBUTE_USUARI_ACTUAL = "SessioHelper.usuariActual";
+
 
 	public static void processarAutenticacio(
 			HttpServletRequest request,
@@ -34,6 +36,10 @@ public class SessioHelper {
 	}
 	public static boolean isAutenticacioProcessada(HttpServletRequest request) {
 		return request.getSession().getAttribute(SESSION_ATTRIBUTE_AUTH_PROCESSADA) != null;
+	}
+	
+	public static void setUsuariActual(HttpServletRequest request, UsuariDto usuari) {
+		request.getSession().setAttribute(SESSION_ATTRIBUTE_USUARI_ACTUAL, usuari);
 	}
 
 }

@@ -4,6 +4,9 @@
 package es.caib.notib.core.api.service;
 
 import java.util.List;
+
+import javax.mail.MessagingException;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.EntitatDto;
@@ -269,11 +272,12 @@ public interface NotificacioService {
 	 * @param motiu
 	 *         		el motiu per el que es vol marcar la notificació com a processada.
 	 * @return l'estat de l'enviament.
+	 * @throws MessagingException 
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public NotificacioEnviamenEstatDto marcarComProcessada(
 			Long notificacioId,
-			String motiu);
+			String motiu) throws MessagingException;
 	
 	/**
 	 * Mètode d'execució periòdica per a fer els enviaments pendents

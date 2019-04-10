@@ -123,13 +123,22 @@ public class AplicacioServiceImpl implements AplicacioService {
 		}
 	}
 
+	@Transactional
+	@Override
+	public UsuariDto updateUsuariActual(UsuariDto dto) {
+		logger.debug("Actualitzant configuració de usuari actual");
+		UsuariEntity usuari = usuariRepository.findOne(dto.getCodi());
+		usuari.update(dto.getRebreEmailsNotificacio());
+		
+		return toUsuariDtoAmbRols(usuari);
+	}
+	
 	@Transactional(readOnly = true)
 	@Override
 	public UsuariDto getUsuariActual() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		logger.debug("Obtenint usuari actual");
-		return toUsuariDtoAmbRols(
-				usuariRepository.findOne(auth.getName()));
+		return toUsuariDtoAmbRols(usuariRepository.findOne(auth.getName()));
 	}
 
 	@Transactional(readOnly = true)
@@ -229,7 +238,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			for (GrantedAuthority grantedAuthority: auth.getAuthorities()) {
 				rols[index++] = grantedAuthority.getAuthority();
 			}
-//			dto.setRols(rols);
+			dto.setRols(rols);
 		}
 		return dto;
 	}

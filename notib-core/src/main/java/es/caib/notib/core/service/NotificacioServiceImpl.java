@@ -14,6 +14,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.mail.MessagingException;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.commons.codec.DecoderException;
@@ -70,6 +71,7 @@ import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.EmailHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
@@ -124,6 +126,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
+	@Autowired
+	private EmailHelper emailHelper;
 	
 	@Transactional(rollbackFor=Exception.class)
 	@Override
@@ -880,7 +884,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public NotificacioEnviamenEstatDto marcarComProcessada(
 			Long notificacioId,
-			String motiu) {
+			String motiu) throws MessagingException {
 		logger.debug("Refrescant l'estat de la notificació a PROCESSAT (" +
 				"notificacioId=" + notificacioId + ")");
 		
@@ -890,6 +894,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 		notificacioEntity.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
 		notificacioEntity.updateMotiu(motiu);
 		
+		emailHelper.prepararEnvioEmailNotificacio(
+				notificacioEntity.getProcediment(), 
+				notificacioEntity);
 		notificacioRepository.saveAndFlush(notificacioEntity);
 		return null;
 	}

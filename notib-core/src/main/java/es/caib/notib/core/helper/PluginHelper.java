@@ -6,8 +6,6 @@ package es.caib.notib.core.helper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,7 +13,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -43,9 +40,6 @@ import es.caib.notib.core.api.dto.InteresadoWsDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
-import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.RegistreAnnexDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
@@ -59,9 +53,7 @@ import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.PersonaEntity;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.registre.CodiAssumpte;
@@ -83,7 +75,6 @@ import es.caib.notib.plugin.registre.RegistreTipusDocumentEnum;
 import es.caib.notib.plugin.registre.RegistreTipusDocumentalEnum;
 import es.caib.notib.plugin.registre.RespostaAnotacioRegistre;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
-import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
 import es.caib.notib.plugin.registre.TipusAssumpte;
 import es.caib.notib.plugin.seu.SeuPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
@@ -108,9 +99,6 @@ public class PluginHelper {
 	private SeuPlugin seuPlugin;
 	private RegistrePlugin registrePlugin;
 	private IArxiuPlugin arxiuPlugin;
-	private RegistrePluginRegWeb3 registrePluginRegWeb3;
-	
-
 
 	@Autowired
 	private IntegracioHelper integracioHelper;

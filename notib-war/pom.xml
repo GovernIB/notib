@@ -160,6 +160,12 @@
 			<artifactId>autoNumeric</artifactId>
 			<version>1.9.30</version>
 		</dependency>
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.2</version>
+			<scope>provided</scope>
+		</dependency>
 		<!-- <dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>

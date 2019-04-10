@@ -122,5 +122,11 @@ public class AplicacioServiceBean implements AplicacioService {
 		return delegate.pluginSeuDisponible();
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public UsuariDto updateUsuariActual(UsuariDto usuariDto) {
+		return delegate.updateUsuariActual(usuariDto);
+	}
+
 
 }

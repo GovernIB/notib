@@ -158,5 +158,13 @@ public interface AplicacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public boolean pluginSeuDisponible();
+	
+	/**
+	 * Modifica la configuració de l'usuari actual
+	 * 
+	 * @return L'usuari actual.
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('tothom')")
+	public UsuariDto updateUsuariActual(UsuariDto asDto);
 
 }

@@ -178,11 +178,15 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 					String email = obtenirAtributComString(
 							result.getAttributes(),
 							atributs[3]);
+					String nif = obtenirAtributComString(
+							result.getAttributes(),
+							atributs[4]);
 					DadesUsuari dadesUsuari = new DadesUsuari();
 					dadesUsuari.setCodi(codi);
 					dadesUsuari.setNom(nom);
 					dadesUsuari.setLlinatges(llinatges);
 					dadesUsuari.setEmail(email);
+					dadesUsuari.setNif(nif);
 					usuaris.add(dadesUsuari);
 				}
 			}
