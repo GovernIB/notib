@@ -7,6 +7,8 @@ import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
+import javax.mail.MessagingException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.notib.core.api.dto.ArxiuDto;
@@ -220,7 +222,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public NotificacioEnviamenEstatDto marcarComProcessada(
 			Long enviamentId,
-			String motiu) {
+			String motiu) throws MessagingException {
 		return delegate.marcarComProcessada(
 				enviamentId,
 				motiu);

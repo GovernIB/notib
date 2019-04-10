@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -107,10 +108,6 @@ public class NotificacioController extends BaseUserController {
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 
-		if (RolHelper.isUsuariActualAdministrador(request)) {
-			model.addAttribute("entitat", entitatService.findAll());
-			model.addAttribute("procedimentsPermisLectura", notificacioService.findProcedimentsAmbPermisConsulta());
-		}
 		if (RolHelper.isUsuariActualUsuari(request)) {
 			// Llistat de procediments amb grups
 			procedimentsAmbGrups = procedimentService.findAllGrups();
@@ -140,8 +137,11 @@ public class NotificacioController extends BaseUserController {
 			if ((procedimentsPermisConsulta == null || procedimentsPermisConsulta.size() < 0) || (procedimentsPermisConsultaSenseGrups == null || procedimentsPermisConsultaSenseGrups.size() < 0) || (procedimentsPermisConsultaSenseGrups== null || procedimentsPermisConsultaSenseGrups.size() < 0)) {
 				MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.lectura"));
 			}
-
-			model.addAttribute("procedimentsPermisLectura", procedimentsPermisConsulta);
+		}
+		model.addAttribute("procedimentsPermisLectura", notificacioService.findProcedimentsEntitatAmbPermisConsulta(entitatActual));
+		if (RolHelper.isUsuariActualAdministrador(request)) {
+			model.addAttribute("entitat", entitatService.findAll());
+			model.addAttribute("procedimentsPermisLectura", notificacioService.findProcedimentsAmbPermisConsulta());
 		}
 		model.addAttribute("notificacioEstats", 
 				EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
@@ -445,13 +445,21 @@ public class NotificacioController extends BaseUserController {
 			Model model, 
 			@PathVariable 
 			Long notificacioId,
-			@Valid MarcarProcessatCommand command) {
-		notificacioService.marcarComProcessada(
-				notificacioId,
-				command.getMotiu());
+			@Valid MarcarProcessatCommand command) throws MessagingException {
+		try {
+			notificacioService.marcarComProcessada(
+					notificacioId,
+					command.getMotiu());
 
-		return getModalControllerReturnValueSuccess(request, "redirect:../../notificacio",
-				"notificacio.controller.refrescar.estat.ok");
+			return getModalControllerReturnValueSuccess(
+					request, 
+					"redirect:../../notificacio",
+					"notificacio.controller.refrescar.estat.ok");
+		} catch (Exception exception) {
+			MissatgesHelper.error(request, exception.getMessage());
+			return "notificacioMarcarProcessat";
+		}
+
 	}
 
 	@RequestMapping(value = "/{notificacioId}/event", method = RequestMethod.GET)

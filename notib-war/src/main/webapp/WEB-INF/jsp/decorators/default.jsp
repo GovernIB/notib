@@ -144,12 +144,22 @@ body {
 							</c:choose>
 						</li>
 						
-						<li>
-							<span class="fa fa-user"></span>
-							<c:choose>
-								<c:when test="${not empty dadesUsuariActual}">${dadesUsuariActual.nom}</c:when>
-								<c:otherwise>${pageContext.request.userPrincipal.name}</c:otherwise>
-							</c:choose>
+						<li class="dropdown">
+							<a href="#" data-toggle="dropdown">
+								<span class="fa fa-user"></span>
+								<c:choose>
+									<c:when test="${not empty dadesUsuariActual}">${dadesUsuariActual.nom}</c:when>
+									<c:otherwise>${pageContext.request.userPrincipal.name}</c:otherwise>
+								</c:choose>
+								<span class="caret caret-white"></span>
+							</a>
+							<ul class="dropdown-menu">
+								<li>
+									<a href="<c:url value="/usuari/configuracio"/>" data-toggle="modal" data-maximized="true">
+										<spring:message code="decorator.menu.configuracio.user"/>
+									</a>
+								</li>
+							</ul>
 						</li>
 						
 					</ul>

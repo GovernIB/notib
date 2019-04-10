@@ -11,6 +11,7 @@ import java.io.Serializable;
  * Els possibles estats son:
  *  - PENDENT: Pendent d'enviament a Notifica.
  *  - ENVIADA: Enviada a Notifica.
+ *  - REGISTRADA: Enviada al registre.
  *  - FINALITZADA: Estat final de la notificació.
  * 
  * @author Limit Tecnologies <limit@limit.es>

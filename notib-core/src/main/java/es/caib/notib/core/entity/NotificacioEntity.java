@@ -514,12 +514,12 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String procedimentCodi,
 			ProcedimentEntity procediment,
 			String grup,
-			String registreOficina,
-			String registreLlibre,
-			String extracte,
+			//String registreOficina,
+			//String registreLlibre,
+			//String extracte,
 			RegistreDocumentacioFisicaEnumDto docFisica,
+			//String tipusAssumpte,
 			IdiomaEnumDto idioma,
-			String tipusAssumpte,
 			String numExpedient,
 			String referenciaExterna,
 			String codiAssumpte,
@@ -538,12 +538,12 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				procedimentCodi,
 				procediment,
 				grup,
-				registreOficina,
-				registreLlibre,
-				extracte,
+				//registreOficina,
+				//registreLlibre,
+				//extracte,
 				docFisica,
+				//tipusAssumpte,
 				idioma,
-				tipusAssumpte,
 				numExpedient,
 				referenciaExterna,
 				codiAssumpte,
@@ -790,12 +790,12 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				String procedimentCodi,
 				ProcedimentEntity procediment,
 				String grup,
-				String oficina,
-				String llibre,
-				String extracte,
+				//String oficina,
+				//String llibre,
+				//String extracte,
 				RegistreDocumentacioFisicaEnumDto docFisica,
+				//String tipusAssumpte,
 				IdiomaEnumDto idioma,
-				String tipusAssumpte,
 				String numExpedient,
 				String refExterna,
 				String codiAssumpte,
@@ -815,12 +815,12 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.grupCodi = grup;
 			built.numExpedient = numExpedient;
 			built.procediment = procediment;
-			built.oficina = oficina;
-			built.llibre = llibre;
-			built.extracte = extracte;
+			//built.oficina = oficina;
+			//built.llibre = llibre;
+			//built.extracte = extracte;
 			built.docFisica = docFisica;
+			//built.tipusAssumpte = tipusAssumpte;
 			built.idioma = idioma;
-			built.tipusAssumpte = tipusAssumpte;
 			built.numExpedient = numExpedient;
 			built.refExterna = refExterna;
 			built.codiAssumpte = codiAssumpte;

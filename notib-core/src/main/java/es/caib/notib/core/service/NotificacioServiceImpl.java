@@ -12,14 +12,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import javax.xml.ws.soap.SOAPFaultException;
+import javax.mail.MessagingException;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +33,7 @@ import com.sun.jersey.core.util.Base64;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.EnviamentDto;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
@@ -70,7 +68,9 @@ import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.EmailHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
+import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PluginHelper;
@@ -83,7 +83,6 @@ import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
-import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 
 /**
@@ -93,7 +92,9 @@ import es.caib.plugins.arxiu.api.DocumentContingut;
  */
 @Service
 public class NotificacioServiceImpl implements NotificacioService {
-
+	
+	@Autowired
+	private IntegracioHelper integracioHelper;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
@@ -124,6 +125,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
+	@Autowired
+	private EmailHelper emailHelper;
 	
 	@Transactional(rollbackFor=Exception.class)
 	@Override
@@ -181,12 +184,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 						procediment.getCodi(),
 						procediment,
 						notificacio.getGrupCodi(),
-						notificacio.getOficina(),
-						notificacio.getLlibre(),
-						notificacio.getExtracte(),
+						//notificacio.getOficina(),
+						//notificacio.getLlibre(),
+						//notificacio.getExtracte(),
 						notificacio.getDocFisica(),
+						//notificacio.getTipusAssumpte(),
 						notificacio.getIdioma(),
-						notificacio.getTipusAssumpte(),
 						notificacio.getNumExpedient(),
 						notificacio.getRefExterna(),
 						notificacio.getCodiAssumpte(),
@@ -880,46 +883,18 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public NotificacioEnviamenEstatDto marcarComProcessada(
 			Long notificacioId,
-			String motiu) {
+			String motiu) throws MessagingException {
 		logger.debug("Refrescant l'estat de la notificació a PROCESSAT (" +
-				"notificacioId=" + notificacioId + ")");
-		
+				"notificacioId=" + notificacioId + ")");		
 		NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(
 				null,
 				notificacioId);
 		notificacioEntity.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
 		notificacioEntity.updateMotiu(motiu);
-		
+		emailHelper.prepararEnvioEmailNotificacio(notificacioEntity);
 		notificacioRepository.saveAndFlush(notificacioEntity);
 		return null;
 	}
-/*
-	@Override
-	@Transactional
-	public boolean enviamentComunicacioSeu(
-			Long enviamentId) {
-		logger.debug("Enviant canvi d'estat de la seu electrònica a Notific@ (" +
-				"enviamentId=" + enviamentId + ")");
-		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
-		return notificaHelper.enviamentComunicacioSeu(
-				enviament.getId(),
-				new Date());
-	}
-
-	@Override
-	@Transactional
-	public boolean enviamentCertificacioSeu(
-			Long enviamentId,
-			ArxiuDto certificacioArxiu) {
-		logger.debug("Enviant certificació de la seu electrònica a Notific@ (" +
-				"enviamentId=" + enviamentId + ")");
-		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
-		return notificaHelper.enviamentCertificacioSeu(
-				enviament.getId(),
-				certificacioArxiu,
-				new Date());
-	}
-*/
 	// 1. Enviament de notificacions pendents al registre
 	////////////////////////////////////////////////////
 	@Override
@@ -1121,48 +1096,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private int getRegistreEnviamentsProcessarMaxProperty() {
 		return propertiesHelper.getAsInt(
 				"es.caib.notib.tasca.notifica.registre.processar.max",
-				10);
-	}
-
-	private boolean isSeuEnviamentsActiu() {
-		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.seu.enviaments.actiu");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
-	}
-	private int getSeuEnviamentsProcessarMaxProperty() {
-		return propertiesHelper.getAsInt(
-				"es.caib.notib.tasca.seu.enviaments.processar.max",
-				10);
-	}
-
-	private boolean isSeuConsultaActiu() {
-		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.seu.consulta.actiu");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
-	}
-	private int getSeuConsultaProcessarMaxProperty() {
-		return propertiesHelper.getAsInt(
-				"es.caib.notib.tasca.seu.consulta.processar.max",
-				10);
-	}
-
-	private boolean isNotificaCanviEstatSeuActiu() {
-		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.notifica.enviament.estat.actiu");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
-	}
-	private int getNotificaCanviEstatSeuProcessarMaxProperty() {
-		return propertiesHelper.getAsInt(
-				"es.caib.notib.tasca.notifica.enviament.estat.seu.processar.max",
 				10);
 	}
 

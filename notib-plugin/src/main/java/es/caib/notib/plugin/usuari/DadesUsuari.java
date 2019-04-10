@@ -13,16 +13,32 @@ import java.io.Serializable;
 public class DadesUsuari implements Serializable {
 
 	private String codi;
+	private String nomSencer;
 	private String nom;
 	private String llinatges;
-	private String nomSencer;
+	private String nif;
 	private String email;
-
 	public String getCodi() {
 		return codi;
 	}
 	public void setCodi(String codi) {
 		this.codi = codi;
+	}
+	public String getNomSencer() {
+		if (nomSencer != null) {
+			return nomSencer;
+		} else if (nom != null) {
+			if (llinatges != null) {
+				return nom + " " + llinatges;
+			} else {
+				return nom;
+			}
+		} else {
+			return null;
+		}
+	}
+	public void setNomSencer(String nomSencer) {
+		this.nomSencer = nomSencer;
 	}
 	public String getNom() {
 		return nom;
@@ -36,11 +52,11 @@ public class DadesUsuari implements Serializable {
 	public void setLlinatges(String llinatges) {
 		this.llinatges = llinatges;
 	}
-	public String getNomSencer() {
-		return nomSencer;
+	public String getNif() {
+		return nif;
 	}
-	public void setNomSencer(String nomSencer) {
-		this.nomSencer = nomSencer;
+	public void setNif(String nif) {
+		this.nif = nif;
 	}
 	public String getEmail() {
 		return email;
@@ -48,7 +64,6 @@ public class DadesUsuari implements Serializable {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
 	private static final long serialVersionUID = -139254994389509932L;
 
 }
