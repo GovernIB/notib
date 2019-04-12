@@ -28,6 +28,7 @@ import es.caib.loginModule.client.AuthenticationFailureException;
 import es.caib.notib.ws.notificacio.EnviamentEstatEnum;
 import es.caib.notib.ws.notificacio.EnviamentReferencia;
 import es.caib.notib.ws.notificacio.NotificacioService;
+import es.caib.notib.ws.notificacio.NotificacioServiceV2;
 import es.caib.notib.ws.notificacio.RespostaAlta;
 import es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament;
 
@@ -41,12 +42,12 @@ public class ClientSoapTest extends ClientBaseTest {
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
 
-	private NotificacioService client;
+	private NotificacioServiceV2 client;
 
 	@Before
 	public void setUp() throws IOException, InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, NamingException, CreateException, AuthenticationFailureException {
-		client = NotificacioWsClientFactory.getWsClient(
-				getClass().getResource("/es/caib/notib/client/wsdl/NotificacioServiceWs.wsdl"),
+		client = NotificacioWsClientFactory.getWsClientV2(
+				getClass().getResource("/es/caib/notib/client/wsdl/NotificacioServiceWsV2.wsdl"),
 				"http://localhost:8080/notib/ws/notificacio",
 				"notapp",
 				"notapp");
@@ -56,7 +57,7 @@ public class ClientSoapTest extends ClientBaseTest {
 	public void test() throws IOException, DecoderException, DatatypeConfigurationException  {
 		String notificacioId = new Long(System.currentTimeMillis()).toString();
 		RespostaAlta respostaAlta = client.alta(
-				generarNotificacio(
+				generarNotificacioV2(
 						notificacioId,
 						1,
 						false));

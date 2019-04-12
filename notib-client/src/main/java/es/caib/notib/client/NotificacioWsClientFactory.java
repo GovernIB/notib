@@ -27,37 +27,6 @@ import es.caib.notib.ws.notificacio.NotificacioServiceV2;
  */
 public class NotificacioWsClientFactory {
 
-	public static NotificacioService getWsClient(
-			URL wsdlResourceUrl,
-			String endpoint,
-			String userName,
-			String password) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
-		return new WsClientHelper<NotificacioService>().generarClientWs(
-				wsdlResourceUrl,
-				endpoint,
-				new QName(
-						"http://www.caib.es/notib/ws/notificacio",
-						"NotificacioService"),
-				userName,
-				password,
-				NotificacioService.class);
-	}
-
-	public static NotificacioService getWsClient(
-			String endpoint,
-			String userName,
-			String password) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
-		return new WsClientHelper<NotificacioService>().generarClientWs(
-				endpoint,
-				new QName(
-						"http://www.caib.es/notib/ws/notificacio",
-						"NotificacioService"),
-				userName,
-				password,
-				NotificacioService.class);
-	}
-	
-
 	public static NotificacioServiceV2 getWsClientV2(
 			URL wsdlResourceUrl,
 			String endpoint,

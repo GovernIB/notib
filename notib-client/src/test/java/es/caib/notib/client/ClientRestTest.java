@@ -57,7 +57,7 @@ public class ClientRestTest extends ClientBaseTest {
 	public void test() throws DatatypeConfigurationException, IOException, DecoderException {
 		String notificacioId = new Long(System.currentTimeMillis()).toString();
 		RespostaAlta respostaAlta = client.alta(
-				generarNotificacio(
+				generarNotificacioV2(
 						notificacioId,
 						1,
 						false));
