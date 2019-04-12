@@ -39,9 +39,9 @@ import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class NotificacioRestClient implements NotificacioService, NotificacioServiceV2 {
+public class NotificacioRestClient implements NotificacioServiceV2 {
 
-	private static final String NOTIFICACIO_SERVICE_PATH = "/api/services/notificacio";
+	//private static final String NOTIFICACIO_SERVICE_PATH = "/api/services/notificacio";
 	private static final String NOTIFICACIOV2_SERVICE_PATH = "/api/services/notificacioV2";
 	
 	private String baseUrl;
@@ -60,33 +60,6 @@ public class NotificacioRestClient implements NotificacioService, NotificacioSer
 		this.password = password;
 	}
 
-	@Override
-	public RespostaAlta alta(
-			Notificacio notificacio) {
-		try {
-			String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/alta";
-			ObjectMapper mapper  = new ObjectMapper();
-			String body = mapper.writeValueAsString(notificacio);
-			Client jerseyClient = generarClient();
-			if (username != null) {
-				autenticarClient(
-						jerseyClient,
-						urlAmbMetode,
-						username,
-						password);
-			}
-			logger.debug("Missatge REST enviat: " + body);
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					post(String.class, body);
-			logger.debug("Missatge REST rebut: " + json);
-			return mapper.readValue(json, RespostaAlta.class);
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
-	}
-	
 	@Override
 	public RespostaAlta alta(
 			NotificacioV2 notificacio) {
@@ -118,7 +91,7 @@ public class NotificacioRestClient implements NotificacioService, NotificacioSer
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
 			String identificador) {
 		try {
-			String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
+			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
 			Client jerseyClient = generarClient();
 			if (username != null) {
 				autenticarClient(
@@ -142,7 +115,7 @@ public class NotificacioRestClient implements NotificacioService, NotificacioSer
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(
 			String referencia) {
 		try {
-			String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
+			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
 			Client jerseyClient = generarClient();
 			if (username != null) {
 				autenticarClient(
@@ -226,16 +199,10 @@ public class NotificacioRestClient implements NotificacioService, NotificacioSer
 		}
 	}
 
-	private boolean isExecucioDinsJBoss() {
-		return System.getProperty("jboss.server.name") != null;
-	}
-
-	private static final Logger logger = LoggerFactory.getLogger(NotificacioRestClient.class);
-
 	@Override
 	public boolean donarPermisConsulta(PermisConsulta permisConsulta) {
 		try {
-			String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH + "/permisConsulta";
+			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/permisConsulta";
 			ObjectMapper mapper  = new ObjectMapper();
 			String body = mapper.writeValueAsString(permisConsulta);
 			Client jerseyClient = generarClient();
@@ -257,5 +224,11 @@ public class NotificacioRestClient implements NotificacioService, NotificacioSer
 			throw new RuntimeException(ex);
 		}
 	}
+
+	private boolean isExecucioDinsJBoss() {
+		return System.getProperty("jboss.server.name") != null;
+	}
+
+	private static final Logger logger = LoggerFactory.getLogger(NotificacioRestClient.class);
 
 }

@@ -11,5 +11,6 @@ package es.caib.notib.core.api.dto;
  */
 public enum IntegracioAccioTipusEnumDto {
 	ENVIAMENT,
-	RECEPCIO
+	RECEPCIO,
+	PROCESSAR
 }

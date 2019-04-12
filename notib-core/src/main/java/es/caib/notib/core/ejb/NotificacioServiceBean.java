@@ -116,8 +116,8 @@ public class NotificacioServiceBean implements NotificacioService {
 */
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public void notificaEnviamentsPendents() {
-		delegate.notificaEnviamentsPendents();
+	public void notificaEnviamentsRegistrats() {
+		delegate.notificaEnviamentsRegistrats();
 	}
 	
 	@Override

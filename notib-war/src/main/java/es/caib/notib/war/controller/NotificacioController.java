@@ -108,10 +108,6 @@ public class NotificacioController extends BaseUserController {
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 
-		if (RolHelper.isUsuariActualAdministrador(request)) {
-			model.addAttribute("entitat", entitatService.findAll());
-			model.addAttribute("procedimentsPermisLectura", notificacioService.findProcedimentsAmbPermisConsulta());
-		}
 		if (RolHelper.isUsuariActualUsuari(request)) {
 			// Llistat de procediments amb grups
 			procedimentsAmbGrups = procedimentService.findAllGrups();
@@ -141,8 +137,11 @@ public class NotificacioController extends BaseUserController {
 			if ((procedimentsPermisConsulta == null || procedimentsPermisConsulta.size() < 0) || (procedimentsPermisConsultaSenseGrups == null || procedimentsPermisConsultaSenseGrups.size() < 0) || (procedimentsPermisConsultaSenseGrups== null || procedimentsPermisConsultaSenseGrups.size() < 0)) {
 				MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.lectura"));
 			}
-
-			model.addAttribute("procedimentsPermisLectura", procedimentsPermisConsulta);
+		}
+		model.addAttribute("procedimentsPermisLectura", notificacioService.findProcedimentsEntitatAmbPermisConsulta(entitatActual));
+		if (RolHelper.isUsuariActualAdministrador(request)) {
+			model.addAttribute("entitat", entitatService.findAll());
+			model.addAttribute("procedimentsPermisLectura", notificacioService.findProcedimentsAmbPermisConsulta());
 		}
 		model.addAttribute("notificacioEstats", 
 				EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
@@ -447,12 +446,19 @@ public class NotificacioController extends BaseUserController {
 			@PathVariable 
 			Long notificacioId,
 			@Valid MarcarProcessatCommand command) throws MessagingException {
-		notificacioService.marcarComProcessada(
-				notificacioId,
-				command.getMotiu());
+		try {
+			notificacioService.marcarComProcessada(
+					notificacioId,
+					command.getMotiu());
+			return getModalControllerReturnValueSuccess(
+					request, 
+					"redirect:../../notificacio",
+					"notificacio.controller.refrescar.estat.ok");
+		} catch (Exception exception) {
+			MissatgesHelper.error(request, exception.getMessage());
+			return "notificacioMarcarProcessat";
+		}
 
-		return getModalControllerReturnValueSuccess(request, "redirect:../../notificacio",
-				"notificacio.controller.refrescar.estat.ok");
 	}
 
 	@RequestMapping(value = "/{notificacioId}/event", method = RequestMethod.GET)

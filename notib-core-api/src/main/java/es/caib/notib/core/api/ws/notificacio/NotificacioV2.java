@@ -34,17 +34,17 @@ public class NotificacioV2 {
 	private Integer retard;
 	private Date caducitat;
 	private DocumentV2 document;
-	private String codiUsuari;
-	private String codiProcediment;
-	private String codiGrup;
-	private String registreOficina;
-	private String registreLlibre;
-	private String registreNumero;
-	private Date registreData;
-	private String extracte;
+	private String usuariCodi;
+	private String procedimentCodi;
+	private String grupCodi;
+	//private String registreOficina;
+	//private String registreLlibre;
+	//private String registreNumero;
+	//private Date registreData;
+	//private String extracte;
 	private RegistreDocumentacioFisicaEnumDto docFisica;
+	//private String tipusAssumpte;
 	private IdiomaEnumDto idioma;
-	private String tipusAssumpte;
 	private String numExpedient;
 	private String codiAssumpte;
 	private String refExterna;
@@ -111,23 +111,23 @@ public class NotificacioV2 {
 	public void setEnviaments(List<Enviament> enviaments) {
 		this.enviaments = enviaments;
 	}
-	public String getCodiUsuari() {
-		return codiUsuari;
+	public String getUsuariCodi() {
+		return usuariCodi;
 	}
-	public void setCodiUsuari(String codiUsuari) {
-		this.codiUsuari = codiUsuari;
+	public void setUsuariCodi(String usuariCodi) {
+		this.usuariCodi = usuariCodi;
 	}
-	public String getCodiProcediment() {
-		return codiProcediment;
+	public String getProcedimentCodi() {
+		return procedimentCodi;
 	}
-	public void setCodiProcediment(String codiProcediment) {
-		this.codiProcediment = codiProcediment;
+	public void setProcedimentCodi(String procedimentCodi) {
+		this.procedimentCodi = procedimentCodi;
 	}
-	public String getCodiGrup() {
-		return codiGrup;
+	public String getGrupCodi() {
+		return grupCodi;
 	}
-	public void setCodiGrup(String codiGrup) {
-		this.codiGrup = codiGrup;
+	public void setGrupCodi(String grupCodi) {
+		this.grupCodi = grupCodi;
 	}
 	public String getNumExpedient() {
 		return numExpedient;
@@ -153,53 +153,18 @@ public class NotificacioV2 {
 	public void setObservacions(String observacions) {
 		this.observacions = observacions;
 	}
-	public String getRegistreOficina() {
-		return registreOficina;
-	}
-	public void setRegistreOficina(String registreOficina) {
-		this.registreOficina = registreOficina;
-	}
-	public String getRegistreLlibre() {
-		return registreLlibre;
-	}
-	public void setRegistreLlibre(String registreLlibre) {
-		this.registreLlibre = registreLlibre;
-	}
-	public String getRegistreNumero() {
-		return registreNumero;
-	}
-	public void setRegistreNumero(String registreNumero) {
-		this.registreNumero = registreNumero;
-	}
-	public Date getRegistreData() {
-		return registreData;
-	}
-	public void setRegistreData(Date registreData) {
-		this.registreData = registreData;
-	}
-	public String getExtracte() {
-		return extracte;
-	}
-	public void setExtracte(String extracte) {
-		this.extracte = extracte;
-	}
-	public RegistreDocumentacioFisicaEnumDto getDocFisica() {
-		return docFisica;
-	}
-	public void setDocFisica(RegistreDocumentacioFisicaEnumDto docFisica) {
-		this.docFisica = docFisica;
-	}
-	public String getTipusAssumpte() {
-		return tipusAssumpte;
-	}
-	public void setTipusAssumpte(String tipusAssumpte) {
-		this.tipusAssumpte = tipusAssumpte;
-	}
 	public String getCodiAssumpte() {
 		return codiAssumpte;
 	}
 	public void setCodiAssumpte(String codiAssumpte) {
 		this.codiAssumpte = codiAssumpte;
+	}
+	public RegistreDocumentacioFisicaEnumDto getDocFisica() {
+		return docFisica;
+	}
+	
+	public void setDocFisica(RegistreDocumentacioFisicaEnumDto docFisica) {
+		this.docFisica = docFisica;
 	}
 	@Override
 	public String toString() {

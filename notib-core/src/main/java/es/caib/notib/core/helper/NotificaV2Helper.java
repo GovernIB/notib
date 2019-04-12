@@ -47,6 +47,7 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
@@ -93,7 +94,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private PluginHelper pluginHelper;
 	@Autowired 
 	private EmailHelper emailHelper;
-
+	@Autowired
+	private NotificacioService notificacioService;
+	@Autowired 
+	ConversioTipusHelper conversioTipusHelper;
+	
 	public boolean notificacioEnviar(
 			Long notificacioId) {
 		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
@@ -241,9 +246,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						notificacio.updateEventAfegir(eventDatat);
 						enviament.updateNotificaError(false, null);
 						if (notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
-							emailHelper.prepararEnvioEmailNotificacio(
-									notificacio.getProcediment(), 
-									notificacio);
+							emailHelper.prepararEnvioEmailNotificacio(notificacio);
 						}
 					}
 				} else {

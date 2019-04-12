@@ -134,7 +134,7 @@ public class NotificacioServiceWsTest extends BaseServiceTest {
 			assertThat(
 					informacio.getEstat(),
 					is(EnviamentEstatEnum.NOTIB_PENDENT));
-			notificacioService.notificaEnviamentsPendents();
+			notificacioService.notificaEnviamentsRegistrats();
 			RespostaConsultaEstatEnviament informacio2 = notificacioServiceWs.consultaEstatEnviament(
 					respostAlta.getReferencies().get(0).getReferencia());
 			assertThat(
@@ -178,7 +178,7 @@ public class NotificacioServiceWsTest extends BaseServiceTest {
 		for (EnviamentReferencia referencia: respostAlta.getReferencies()) {
 			System.out.println("    - " + referencia.getReferencia());
 		}
-		notificacioService.notificaEnviamentsPendents();
+		notificacioService.notificaEnviamentsRegistrats();
 		RespostaConsultaEstatEnviament informacio2 = notificacioServiceWs.consultaEstatEnviament(
 				respostAlta.getReferencies().get(0).getReferencia());
 		assertThat(

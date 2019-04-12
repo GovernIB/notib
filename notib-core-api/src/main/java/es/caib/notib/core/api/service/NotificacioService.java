@@ -8,6 +8,7 @@ import java.util.List;
 import javax.mail.MessagingException;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
@@ -283,7 +284,7 @@ public interface NotificacioService {
 	 * Mètode d'execució periòdica per a fer els enviaments pendents
 	 * a Notific@.
 	 */
-	public void notificaEnviamentsPendents();
+	public void notificaEnviamentsRegistrats();
 	
 	/**
 	 * Mètode d'execució periòdica per a fer els enviaments pendents
@@ -296,5 +297,7 @@ public interface NotificacioService {
 	 * Notific@.
 	 */
 	public void enviamentRefrescarEstatPendents();
+
+	
 
 }

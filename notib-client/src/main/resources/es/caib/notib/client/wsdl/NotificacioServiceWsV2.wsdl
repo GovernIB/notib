@@ -42,9 +42,6 @@
 <xs:sequence>
 <xs:element minOccurs="0" name="caducitat" type="xs:dateTime" />
 <xs:element minOccurs="0" name="codiAssumpte" type="xs:string" />
-<xs:element minOccurs="0" name="codiGrup" type="xs:string" />
-<xs:element minOccurs="0" name="codiProcediment" type="xs:string" />
-<xs:element minOccurs="0" name="codiUsuari" type="xs:string" />
 <xs:element minOccurs="0" name="comunicacioTipus" type="tns:comunicacioTipusEnum" />
 <xs:element minOccurs="0" name="concepte" type="xs:string" />
 <xs:element minOccurs="0" name="descripcio" type="xs:string" />
@@ -54,17 +51,14 @@
 <xs:element minOccurs="0" name="enviamentDataProgramada" type="xs:dateTime" />
 <xs:element minOccurs="0" name="enviamentTipus" type="tns:enviamentTipusEnum" />
 <xs:element maxOccurs="unbounded" minOccurs="0" name="enviaments" nillable="true" type="tns:enviament" />
-<xs:element minOccurs="0" name="extracte" type="xs:string" />
+<xs:element minOccurs="0" name="grupCodi" type="xs:string" />
 <xs:element minOccurs="0" name="idioma" type="tns:idiomaEnumDto" />
 <xs:element minOccurs="0" name="numExpedient" type="xs:string" />
 <xs:element minOccurs="0" name="observacions" type="xs:string" />
+<xs:element minOccurs="0" name="procedimentCodi" type="xs:string" />
 <xs:element minOccurs="0" name="refExterna" type="xs:string" />
-<xs:element minOccurs="0" name="registreData" type="xs:dateTime" />
-<xs:element minOccurs="0" name="registreLlibre" type="xs:string" />
-<xs:element minOccurs="0" name="registreNumero" type="xs:string" />
-<xs:element minOccurs="0" name="registreOficina" type="xs:string" />
 <xs:element minOccurs="0" name="retard" type="xs:int" />
-<xs:element minOccurs="0" name="tipusAssumpte" type="xs:string" />
+<xs:element minOccurs="0" name="usuariCodi" type="xs:string" />
 </xs:sequence>
 </xs:complexType>
 <xs:complexType name="documentV2">
@@ -82,7 +76,6 @@
 </xs:complexType>
 <xs:complexType name="enviament">
 <xs:sequence>
-<xs:element minOccurs="0" name="caducitat" type="xs:dateTime" />
 <xs:element maxOccurs="unbounded" minOccurs="0" name="destinataris" nillable="true" type="tns:persona" />
 <xs:element minOccurs="0" name="entregaDeh" type="tns:entregaDeh" />
 <xs:element minOccurs="0" name="entregaPostal" type="tns:entregaPostal" />
@@ -217,6 +210,7 @@
 <xs:restriction base="xs:string">
 <xs:enumeration value="PENDENT" />
 <xs:enumeration value="ENVIADA" />
+<xs:enumeration value="REGISTRADA" />
 <xs:enumeration value="FINALITZADA" />
 </xs:restriction>
 </xs:simpleType>
