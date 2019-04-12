@@ -726,8 +726,8 @@ public class PluginHelper {
 			break;
 		}
 		dadesOficina.setOrgan(notificacio.getEmisorDir3Codi());
-		dadesOficina.setOficina(notificacio.getOficina());
-		dadesOficina.setLlibre(notificacio.getLlibre());
+		dadesOficina.setOficina(notificacio.getProcediment().getOficina());
+		dadesOficina.setLlibre(notificacio.getProcediment().getLlibre());
 		registreSortida.setDadesOficina(dadesOficina);
 		
 		DadesInteressat dadesInteressat = new DadesInteressat();
@@ -752,8 +752,8 @@ public class PluginHelper {
 		
 		DadesAnotacio dadesAnotacio = new DadesAnotacio();
 		dadesAnotacio.setIdiomaCodi(notificacio.getIdioma().getText());
-		dadesAnotacio.setTipusAssumpte(notificacio.getTipusAssumpte());
-		dadesAnotacio.setCodiAssumpte(notificacio.getCodiAssumpte());
+		dadesAnotacio.setTipusAssumpte(notificacio.getProcediment().getTipusAssumpte());
+		dadesAnotacio.setCodiAssumpte(notificacio.getProcediment().getCodiAssumpte());
 		dadesAnotacio.setExtracte(notificacio.getExtracte());
 		dadesAnotacio.setUnitatAdministrativa(null);
 		dadesAnotacio.setDocfisica(docFisica);
