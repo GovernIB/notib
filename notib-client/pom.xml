@@ -75,7 +75,7 @@
 						</goals>
 						<configuration>
 							<wsdlUrls>
-								<wsdlUrl>${basedir}/src/main/resources/es/caib/notib/client/wsdl/NotificacioServiceWs.wsdl</wsdlUrl>
+								<!-- <wsdlUrl>${basedir}/src/main/resources/es/caib/notib/client/wsdl/NotificacioServiceWs.wsdl</wsdlUrl> -->
 								<wsdlUrl>${basedir}/src/main/resources/es/caib/notib/client/wsdl/NotificacioServiceWsV2.wsdl</wsdlUrl>
 							</wsdlUrls>
 							<vmArgs>

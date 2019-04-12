@@ -52,117 +52,6 @@ public class ClientBaseTest {
 	protected static final String IDENTIFICADOR_PROCEDIMENT_SISTRA = "IN0026NSPI";
 	protected static final String IDIOMA = "ca";
 
-	protected Notificacio generarNotificacio(
-			String notificacioId,
-			int numDestinataris,
-			boolean ambEnviamentPostal) throws DatatypeConfigurationException, IOException, DecoderException {
-		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
-		Notificacio notificacio = new Notificacio();
-		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
-//		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
-//		notificacio.setComunicacioTipus(ComunicacioTipusEnum.ASINCRON);
-		notificacio.setConcepte(
-				"concepte_" + notificacioId);
-		notificacio.setDescripcio(
-				"descripcio_" + notificacioId);
-		notificacio.setEnviamentDataProgramada(null);
-		notificacio.setRetard(5);
-		notificacio.setCaducitat(toXmlGregorianCalendar(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000)));
-		Document document = new Document();
-		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
-		
-		String arxiuB64 = Base64.encodeBase64String(arxiuBytes);
-		
-		document.setContingutBase64(arxiuB64);
-		document.setHash(
-				Base64.encodeBase64String(
-						Hex.decodeHex(
-								DigestUtils.sha256Hex(arxiuBytes).toCharArray())));
-		document.setNormalitzat(false);
-		document.setGenerarCsv(false);
-		notificacio.setDocument(document);
-		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
-		if (ambEnviamentPostal) {
-			PagadorPostal pagadorPostal = new PagadorPostal();
-			pagadorPostal.setDir3Codi("A04013511");
-			pagadorPostal.setFacturacioClientCodi("ccFac_" + notificacioId);
-			pagadorPostal.setContracteNum("pccNum_" + notificacioId);
-			pagadorPostal.setContracteDataVigencia(toXmlGregorianCalendar(new Date(0)));
-			notificacio.setPagadorPostal(pagadorPostal);
-			PagadorCie pagadorCie = new PagadorCie();
-			pagadorCie.setDir3Codi("A04013511");
-			pagadorCie.setContracteDataVigencia(toXmlGregorianCalendar(new Date(0)));
-			notificacio.setPagadorCie(pagadorCie);
-		}
-		for (int i = 0; i < numDestinataris; i++) {
-			Enviament enviament = new Enviament();
-			Persona titular = new Persona();
-			titular.setNom("Siòn");
-			titular.setLlinatge1("Andreu");
-			titular.setLlinatge2("Nadal");
-			titular.setNif("00000000T");
-			titular.setTelefon("666010101");
-			titular.setEmail("sandreu@limit.es");
-			enviament.setTitular(titular);
-			Persona destinatari = new Persona();
-			destinatari.setNom("melcior");
-			destinatari.setLlinatge1("Andreu");
-			destinatari.setLlinatge2("Nadal");
-			destinatari.setNif("18225486x");
-			destinatari.setTelefon("666020202");
-			destinatari.setEmail("sandreu@limit.es");
-			enviament.getDestinataris().add(destinatari);
-			if (ambEnviamentPostal) {
-				EntregaPostal entregaPostal = new EntregaPostal();
-				entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.NACIONAL);
-				entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLE);
-				entregaPostal.setViaNom("Bas");
-				entregaPostal.setNumeroCasa("25");
-				entregaPostal.setNumeroQualificador("bis");
-				//entregaPostal.setApartatCorreus("0228");
-				entregaPostal.setPortal("pt" + i);
-				entregaPostal.setEscala("es" + i);
-				entregaPostal.setPlanta("pl" + i);
-				entregaPostal.setPorta("pr" + i);
-				entregaPostal.setBloc("bl" + i);
-				entregaPostal.setComplement("complement" + i);
-				entregaPostal.setCodiPostal("07500");
-				entregaPostal.setPoblacio("poblacio" + i);
-				entregaPostal.setMunicipiCodi("070337");
-				entregaPostal.setProvinciaCodi("07");
-				entregaPostal.setPaisCodi("ES");
-				entregaPostal.setLinea1("linea1_" + i);
-				entregaPostal.setLinea2("linea2_" + i);
-				entregaPostal.setCie(new Integer(0));
-				enviament.setEntregaPostal(entregaPostal);
-			}
-			EntregaDeh entregaDeh = new EntregaDeh();
-			entregaDeh.setObligat(true);
-			entregaDeh.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
-			enviament.setEntregaDeh(entregaDeh);
-			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
-			notificacio.getEnviaments().add(enviament);
-		}
-		ParametresSeu parametresSeu = new ParametresSeu();
-		parametresSeu.setExpedientSerieDocumental("0000S");
-		parametresSeu.setExpedientUnitatOrganitzativa(UNITAT_ADMINISTRATIVA_SISTRA);
-		parametresSeu.setExpedientIdentificadorEni("ES_" + ORGAN_CODI + "_2018_EXP_NOTIB" + "0000000000000000000000009"); //+ String.format("%25s", notificacioId).replace(' ', '0'));
-		parametresSeu.setExpedientTitol("seuExpedientTitol_" + notificacioId);
-		parametresSeu.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT_SISTRA);
-		parametresSeu.setRegistreLlibre(LLIBRE);
-		parametresSeu.setRegistreOficina(OFICINA);
-		parametresSeu.setRegistreOrgan(ORGAN_CODI);
-		parametresSeu.setIdioma(IDIOMA);
-		parametresSeu.setAvisTitol("seuAvisTitol_" + notificacioId);
-		parametresSeu.setAvisText("seuAvisText_" + notificacioId);
-		parametresSeu.setAvisTextMobil("seuAvisTextMobil_" + notificacioId);
-		parametresSeu.setOficiTitol("seuOficiTitol_" + notificacioId);
-		parametresSeu.setOficiText("seuOficiText_" + notificacioId);
-		notificacio.setParametresSeu(parametresSeu);
-		return notificacio;
-	}
-	
 	protected NotificacioV2 generarNotificacioV2(
 			String notificacioId,
 			int numDestinataris,
@@ -200,7 +89,7 @@ public class ClientBaseTest {
 		document.setNormalitzat(false);
 		document.setGenerarCsv(false);
 		notificacio.setDocument(document);
-		notificacio.setCodiProcediment(IDENTIFICADOR_PROCEDIMENT);
+		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 //		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 //		if (ambEnviamentPostal) {
 //			PagadorPostal pagadorPostal = new PagadorPostal();

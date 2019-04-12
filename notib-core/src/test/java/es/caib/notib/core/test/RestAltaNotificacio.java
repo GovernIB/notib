@@ -248,7 +248,7 @@ public class RestAltaNotificacio {
 		document.setNormalitzat(false);
 		document.setGenerarCsv(false);
 		notificacio.setDocument(document);
-		notificacio.setCodiProcediment("AJINCA");
+		notificacio.setProcedimentCodi("AJINCA");
 		List<Enviament> enviaments = new ArrayList<Enviament>();
 		if (ambEnviamentPostal) {
 			PagadorPostal pagadorPostal = new PagadorPostal();

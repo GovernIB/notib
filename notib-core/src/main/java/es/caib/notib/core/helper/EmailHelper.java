@@ -19,6 +19,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
+import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
@@ -35,7 +36,6 @@ import es.caib.notib.plugin.usuari.DadesUsuari;
 public class EmailHelper {
 
 	private static final String PREFIX_NOTIB = "[NOTIB]";
-	
 	@Resource
 	private ProcedimentHelper procedimentHelper;
 	@Resource
@@ -47,11 +47,9 @@ public class EmailHelper {
 	@Resource
 	private MessageHelper messageHelper;
 	
-	public void prepararEnvioEmailNotificacio(
-			ProcedimentEntity procediment,
-			NotificacioEntity notificacio) throws MessagingException {
-		logger.info("Desant emails del procediment (" + procediment.getId() + ") per a l'enviament");
-		List<UsuariDto> destinataris = obtenirCodiDestinatarisPerProcediment(procediment);
+	public void prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws MessagingException {
+		logger.info("Desant emails del procediment (" + notificacio.getProcediment().getId() + ") per a l'enviament");
+		List<UsuariDto> destinataris = obtenirCodiDestinatarisPerProcediment(notificacio.getProcediment());
 		
 		if (destinataris != null && !destinataris.isEmpty()) {
 			for (UsuariDto usuariDto : destinataris) {
@@ -59,7 +57,7 @@ public class EmailHelper {
 						usuariDto.getEmail(),
 						notificacio);
 			}
-		}
+		}	
 	}
 	
 	public void sendEmailBustiaPendentContingut(
@@ -200,7 +198,7 @@ public class EmailHelper {
 				"\t"+messageHelper.getMessage("notificacio.email.procediment")+
 				"\t\t\t\t"+ Objects.toString(notificacio.getProcediment().getNom(), "")+"\n"+
 				"\t"+messageHelper.getMessage("notificacio.email.entitat")+
-				"\t\t\t\t"+ Objects.toString(notificacio.getEntitat().getNom(), "")+"\n"+
+				"\t\t\t\t"+ Objects.toString(notificacio.getEmisorDir3Codi(), "")+"\n"+
 				"\t"+messageHelper.getMessage("notificacio.email.estat.nou") + 
 				"\t\t\t\t"+ Objects.toString(notificacio.getEstat().name(), "") +"\n"+		
 				"\t"+messageHelper.getMessage("notificacio.email.estat.motiu") + 
@@ -229,14 +227,17 @@ public class EmailHelper {
 		return destinataris;
 	}
 	
-	private String getRemitent() {
+	public String getRemitent() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.email.remitent");
 	}
 	
-	private String getEmailFooter() {
+	public String getEmailFooter() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.email.footer");
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(EmailHelper.class);
 
+	public void setMessageHelper(MessageHelper messageHelper) {
+		this.messageHelper = messageHelper;		
+	}
 }

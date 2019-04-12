@@ -28,6 +28,7 @@ public class IntegracioHelper {
 
 	public static final int DEFAULT_MAX_ACCIONS = 20;
 
+	public static final String INTCODI_EMAIL = "EMAIL";
 	public static final String INTCODI_USUARIS = "USUARIS";
 	public static final String INTCODI_UNITATS = "UNITATS";
 	public static final String INTCODI_SEU = "SEU";
@@ -46,6 +47,9 @@ public class IntegracioHelper {
 
 	public List<IntegracioDto> findAll() {
 		List<IntegracioDto> integracions = new ArrayList<IntegracioDto>();
+		integracions.add(
+				novaIntegracio(
+						INTCODI_EMAIL));
 		integracions.add(
 				novaIntegracio(
 						INTCODI_REGISTRE));
@@ -215,6 +219,8 @@ public class IntegracioHelper {
 			integracio.setNom("Callback PF");
 		} else if (INTCODI_DADESEXT.equals(codi)) {
 			integracio.setNom("Dades ext.");
+		} else if (INTCODI_EMAIL.equals(codi)) {
+			integracio.setNom("Email");
 		}
 		return integracio;
 	}

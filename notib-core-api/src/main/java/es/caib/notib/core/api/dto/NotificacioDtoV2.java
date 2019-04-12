@@ -38,7 +38,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private String serveiTipus;
 	private List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<NotificacioEnviamentDtoV2>();
 	private String usuariCodi;
-
+	private String motiu;
 	// Paràmetres registre
 	private String oficina;
 	private String organ;
@@ -172,6 +172,12 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	}
 	public void setLlibre(String llibre) {
 		this.llibre = llibre;
+	}
+	public String getMotiu() {
+		return motiu;
+	}
+	public void setMotiu(String motiu) {
+		this.motiu = motiu;
 	}
 	public String getRegistreNumero() {
 		return registreNumero;

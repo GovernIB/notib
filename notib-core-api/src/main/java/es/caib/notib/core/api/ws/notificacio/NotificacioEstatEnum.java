@@ -13,5 +13,6 @@ import java.io.Serializable;
 public enum NotificacioEstatEnum implements Serializable {
 	PENDENT,
 	ENVIADA,
+	REGISTRADA,
 	FINALITZADA
 }

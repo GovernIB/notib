@@ -384,13 +384,13 @@ function mostrarEntregaPostal(className) {
             <div role="tabpanel" class="tab-pane" id="parametresregistreForm">
                 <div class="row parametresregistreForm">
                     <div class="col-md-6">
-                        <not:inputText name="oficina" value="${procediment.oficina}" textKey="notificacio.form.camp.oficina" labelSize="4"/>
+                        <not:inputText name="oficina" value="${procediment.oficina}" textKey="notificacio.form.camp.oficina" labelSize="4" readonly="true"/>
                     </div>
                     <div class="col-md-6">
-                        <not:inputText name="llibre" value="${procediment.llibre}" textKey="notificacio.form.camp.llibre" labelSize="4"/>
+                        <not:inputText name="llibre" value="${procediment.llibre}" textKey="notificacio.form.camp.llibre" labelSize="4" readonly="true"/>
                     </div>
                     <div class="col-md-6">
-                        <not:inputText name="extracte" textKey="notificacio.form.camp.extracte" labelSize="4"/>
+                        <not:inputText name="extracte" textKey="notificacio.form.camp.extracte" labelSize="4" readonly="true"/>
                     </div>
                     <div class="col-md-6">
                     	<not:inputSelect name="docFisica" textKey="notificacio.form.camp.doc" labelSize="4" optionItems="${registreDocumentacioFisica}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
@@ -407,7 +407,7 @@ function mostrarEntregaPostal(className) {
 						</c:otherwise>
 					</c:choose>
                     <div class="col-md-6">
-                        <not:inputText name="tipusAssumpte" value="${tipusAssumpte}" textKey="notificacio.form.camp.tipus" labelSize="4"/>
+                        <not:inputText name="tipusAssumpte" value="${tipusAssumpte}" textKey="notificacio.form.camp.tipus" labelSize="4" readonly="true"/>
                     </div>
                     <div class="col-md-6">
                         <not:inputText name="numExpedient" textKey="notificacio.form.camp.expedient" labelSize="4"/>
@@ -424,7 +424,7 @@ function mostrarEntregaPostal(className) {
 						</c:otherwise>
 					</c:choose>
                     <div class="col-md-6">
-                        <not:inputText name="codiAssumpte" value="${codiAssumpte}" textKey="notificacio.form.camp.codi" labelSize="4"/>
+                        <not:inputText name="codiAssumpte" value="${codiAssumpte}" textKey="notificacio.form.camp.codi" labelSize="4" readonly="true"/>
                     </div>
                     <div class="col-md-12">
                         <not:inputTextarea name="observacions" textKey="notificacio.form.camp.observacions" labelSize="2"/>

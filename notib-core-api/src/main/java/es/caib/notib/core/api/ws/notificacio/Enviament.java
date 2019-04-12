@@ -24,7 +24,6 @@ public class Enviament {
 	private EntregaPostal entregaPostal;
 	private boolean entregaPostalActiva;
 	private EntregaDeh entregaDeh;
-	private Date caducitat;
 	private NotificaServeiTipusEnumDto serveiTipus;
 
 	public String getReferencia() {
@@ -68,12 +67,6 @@ public class Enviament {
 	}
 	public void setServeiTipus(NotificaServeiTipusEnumDto serveiTipus) {
 		this.serveiTipus = serveiTipus;
-	}
-	public Date getCaducitat() {
-		return caducitat;
-	}
-	public void setCaducitat(Date caducitat) {
-		this.caducitat = caducitat;
 	}
 
 }

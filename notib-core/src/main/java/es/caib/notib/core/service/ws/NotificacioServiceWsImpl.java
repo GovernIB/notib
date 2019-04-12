@@ -379,6 +379,9 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 		case ENVIADA:
 			resposta.setEstat(NotificacioEstatEnum.ENVIADA);
 			break;
+		case REGISTRADA:
+			resposta.setEstat(NotificacioEstatEnum.REGISTRADA);
+			break;
 		case FINALITZADA:
 			resposta.setEstat(NotificacioEstatEnum.FINALITZADA);
 			break;

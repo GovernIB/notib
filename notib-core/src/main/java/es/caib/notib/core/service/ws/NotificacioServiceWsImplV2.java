@@ -232,7 +232,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					notificacio.getDocument().getCsv()).build());
 		}
 		
-		ProcedimentEntity procediment = procedimentRepository.findByCodi(notificacio.getCodiProcediment());
+		ProcedimentEntity procediment = procedimentRepository.findByCodi(notificacio.getProcedimentCodi());
 		if(procediment != null) {
 			NotificacioEntity.BuilderV2 notificacioBuilder = NotificacioEntity.getBuilderV2(
 					entitat,
@@ -244,16 +244,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					notificacio.getEnviamentDataProgramada(),
 					notificacio.getRetard(),
 					notificacio.getCaducitat(),
-					notificacio.getCodiUsuari(),
-					notificacio.getCodiProcediment(),
+					notificacio.getUsuariCodi(),
+					notificacio.getProcedimentCodi(),
 					procediment,
-					notificacio.getCodiGrup(),
-					notificacio.getRegistreOficina(),
-					notificacio.getRegistreLlibre(),
-					notificacio.getExtracte(),
+					notificacio.getGrupCodi(),
+					//notificacio.getRegistreOficina(),
+					//notificacio.getRegistreLlibre(),
+					//notificacio.getExtracte(),
 					notificacio.getDocFisica(),
+					//notificacio.getTipusAssumpte(),
 					notificacio.getIdioma(),
-					notificacio.getTipusAssumpte(),
 					notificacio.getNumExpedient(),
 					notificacio.getRefExterna(),
 					notificacio.getCodiAssumpte(),
@@ -472,8 +472,13 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			case ENVIADA:
 				resposta.setEstat(NotificacioEstatEnum.ENVIADA);
 				break;
+			case REGISTRADA:
+				resposta.setEstat(NotificacioEstatEnum.REGISTRADA);
+				break;
 			case FINALITZADA:
 				resposta.setEstat(NotificacioEstatEnum.FINALITZADA);
+				break;
+			default:
 				break;
 			}
 			if (notificacioGuardada.getNotificaErrorEvent() != null) {
@@ -561,6 +566,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			break;
 		case ENVIADA:
 			resposta.setEstat(NotificacioEstatEnum.ENVIADA);
+			break;
+		case REGISTRADA:
+			resposta.setEstat(NotificacioEstatEnum.REGISTRADA);
 			break;
 		case FINALITZADA:
 			resposta.setEstat(NotificacioEstatEnum.FINALITZADA);
