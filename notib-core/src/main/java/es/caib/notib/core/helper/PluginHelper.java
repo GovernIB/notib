@@ -121,16 +121,36 @@ public class PluginHelper {
 			NotificacioEnviamentDtoV2 enviament, 
 			Long tipusOperacio) throws Exception {
 		RegistreIdDto rs = new RegistreIdDto();
-		RespostaAnotacioRegistre resposta = getRegistrePlugin().registrarSalida(
-				toRegistreSortida(
-						notificacio,
-						enviament),
-				"notib");
-		if (resposta.getErrorDescripcio() != null) {
-			rs.setDescripcioError(resposta.getErrorDescripcio());
-		} else {
-			rs.setNumeroRegistreFormat(resposta.getNumeroRegistroFormateado());
-			rs.setData(resposta.getData());
+		String accioDescripcio = "Enviament notificació a registre";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("notificacioID", String.valueOf(notificacio.getId()));
+		long t0 = System.currentTimeMillis();
+		try {
+			RespostaAnotacioRegistre resposta = getRegistrePlugin().registrarSalida(
+					toRegistreSortida(
+							notificacio,
+							enviament),
+					"notib");
+			if (resposta.getErrorDescripcio() != null) {
+				rs.setDescripcioError(resposta.getErrorDescripcio());
+			} else {
+				rs.setNumeroRegistreFormat(resposta.getNumeroRegistroFormateado());
+				rs.setData(resposta.getData());
+			}
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de registre";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_REGISTRE,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_USUARIS,
+					errorDescripcio,
+					ex);
 		}
 		return rs;
 	}
