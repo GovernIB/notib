@@ -754,7 +754,7 @@ public class PluginHelper {
 		dadesAnotacio.setIdiomaCodi(notificacio.getIdioma().getText());
 		dadesAnotacio.setTipusAssumpte(notificacio.getProcediment().getTipusAssumpte());
 		dadesAnotacio.setCodiAssumpte(notificacio.getProcediment().getCodiAssumpte());
-		dadesAnotacio.setExtracte(notificacio.getExtracte());
+		dadesAnotacio.setExtracte(notificacio.getConcepte());
 		dadesAnotacio.setUnitatAdministrativa(null);
 		dadesAnotacio.setDocfisica(docFisica);
 		dadesAnotacio.setNumExpedient(notificacio.getNumExpedient());

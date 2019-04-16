@@ -32,13 +32,16 @@ public class ValidConcepteValidator implements ConstraintValidator<ValidConcepte
 		}
 	}
 	// Validació del concepte
-	private static final String CONTROL_CARACTERS = "aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-\\u2013_'\"/:().,¿?!¡;";
+	private static final String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-\\u2013_'\"/:().,¿?!¡;";
 	private static boolean validacioConcepte(String concepte) {
 		char[] concepte_chars = concepte.toCharArray();
 		
 		boolean esCaracterValid = true;
 		for (int i = 0; esCaracterValid && i < concepte_chars.length; i++) {
 			esCaracterValid = !(CONTROL_CARACTERS.indexOf(concepte_chars[i]) < 0);
+			if (!esCaracterValid) {
+				break;
+			}
 	    }
 		return esCaracterValid;
 	}

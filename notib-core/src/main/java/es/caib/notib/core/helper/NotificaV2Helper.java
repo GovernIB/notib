@@ -189,125 +189,129 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				"notificaIdentificador=" + enviament.getNotificaIdentificador() + ")";
 		
 		try {
-			InfoEnvioV2 infoEnvio = new InfoEnvioV2();
-			infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
-			ResultadoInfoEnvioV2 resultadoInfoEnvio = getNotificaWs().infoEnvioV2(infoEnvio);
-			Datado datatDarrer = null;
-			if (resultadoInfoEnvio.getDatados() != null) {
-				for (Datado datado: resultadoInfoEnvio.getDatados().getDatado()) {
-					Date datatData = toDate(datado.getFecha());
-					if (datatDarrer == null) {
-						datatDarrer = datado;
-					} else if (datado.getFecha() != null) {
-						Date datatDarrerData = toDate(datatDarrer.getFecha());
-						if (datatData.after(datatDarrerData)) {
+			if (enviament.getNotificaIdentificador() != null) {
+				InfoEnvioV2 infoEnvio = new InfoEnvioV2();
+				infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
+				ResultadoInfoEnvioV2 resultadoInfoEnvio = getNotificaWs().infoEnvioV2(infoEnvio);
+				Datado datatDarrer = null;
+				if (resultadoInfoEnvio.getDatados() != null) {
+					for (Datado datado: resultadoInfoEnvio.getDatados().getDatado()) {
+						Date datatData = toDate(datado.getFecha());
+						if (datatDarrer == null) {
 							datatDarrer = datado;
+						} else if (datado.getFecha() != null) {
+							Date datatDarrerData = toDate(datatDarrer.getFecha());
+							if (datatData.after(datatDarrerData)) {
+								datatDarrer = datado;
+							}
 						}
+						NotificaRespostaDatatEventDto event = new NotificaRespostaDatatEventDto();
+						event.setData(datatData);
+						event.setEstat(datado.getResultado());
 					}
-					NotificaRespostaDatatEventDto event = new NotificaRespostaDatatEventDto();
-					event.setData(datatData);
-					event.setEstat(datado.getResultado());
-				}
-				if (datatDarrer != null) {
-					
-					Date dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
-					NotificacioEnviamentEstatEnumDto estat = getEstatNotifica(datatDarrer.getResultado());
-					
-					if (!dataDatat.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
-						CodigoDIR organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
-						CodigoDIR organismoEmisorRaiz = resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
-						enviament.updateNotificaInformacio(
-								dataDatat,
-								toDate(resultadoInfoEnvio.getFechaPuestaDisposicion()),
-								toDate(resultadoInfoEnvio.getFechaCaducidad()),
-								(organismoEmisor != null) ? organismoEmisor.getCodigo() : null,
-								(organismoEmisor != null) ? organismoEmisor.getDescripcionCodigoDIR() : null,
-								(organismoEmisor != null) ? organismoEmisor.getNifDIR() : null,
-								(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getCodigo() : null,
-								(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getDescripcionCodigoDIR() : null,
-								(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getNifDIR() : null);
-						enviamentUpdateDatat(
-								estat,
-								toDate(datatDarrer.getFecha()),
-								null,
-								datatDarrer.getOrigen(),
-								datatDarrer.getNifReceptor(),
-								datatDarrer.getNombreReceptor(),
-								null,
-								null,
-								enviament);
-						eventDatat = NotificacioEventEntity.getBuilder(
-								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-								enviament.getNotificacio()).
-								enviament(enviament).
-								descripcio(datatDarrer.getResultado()).
-//								callbackInicialitza().
-								build();
-						notificacio.updateEventAfegir(eventDatat);
-						enviament.updateNotificaError(false, null);
-						if (notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
-							emailHelper.prepararEnvioEmailNotificacio(notificacio);
+					if (datatDarrer != null) {
+						
+						Date dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
+						NotificacioEnviamentEstatEnumDto estat = getEstatNotifica(datatDarrer.getResultado());
+						
+						if (!dataDatat.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
+							CodigoDIR organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
+							CodigoDIR organismoEmisorRaiz = resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
+							enviament.updateNotificaInformacio(
+									dataDatat,
+									toDate(resultadoInfoEnvio.getFechaPuestaDisposicion()),
+									toDate(resultadoInfoEnvio.getFechaCaducidad()),
+									(organismoEmisor != null) ? organismoEmisor.getCodigo() : null,
+									(organismoEmisor != null) ? organismoEmisor.getDescripcionCodigoDIR() : null,
+									(organismoEmisor != null) ? organismoEmisor.getNifDIR() : null,
+									(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getCodigo() : null,
+									(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getDescripcionCodigoDIR() : null,
+									(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getNifDIR() : null);
+							enviamentUpdateDatat(
+									estat,
+									toDate(datatDarrer.getFecha()),
+									null,
+									datatDarrer.getOrigen(),
+									datatDarrer.getNifReceptor(),
+									datatDarrer.getNombreReceptor(),
+									null,
+									null,
+									enviament);
+							eventDatat = NotificacioEventEntity.getBuilder(
+									NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
+									enviament.getNotificacio()).
+									enviament(enviament).
+									descripcio(datatDarrer.getResultado()).
+	//								callbackInicialitza().
+									build();
+							notificacio.updateEventAfegir(eventDatat);
+							enviament.updateNotificaError(false, null);
+							if (notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
+								emailHelper.prepararEnvioEmailNotificacio(notificacio);
+							}
 						}
+					} else {
+						throw new ValidationException(
+								enviament,
+								NotificacioEnviamentEntity.class,
+								"No s'ha pogut trobar el darrer datat dins la resposta rebuda de Notific@");
 					}
 				} else {
 					throw new ValidationException(
 							enviament,
 							NotificacioEnviamentEntity.class,
-							"No s'ha pogut trobar el darrer datat dins la resposta rebuda de Notific@");
+							"La resposta rebuda de Notific@ no conté informació de datat");
 				}
-			} else {
-				throw new ValidationException(
-						enviament,
-						NotificacioEnviamentEntity.class,
-						"La resposta rebuda de Notific@ no conté informació de datat");
-			}
-			if (resultadoInfoEnvio.getCertificacion() != null) {
-				Certificacion certificacio = resultadoInfoEnvio.getCertificacion();
-				
-				Date dataCertificacio = toDate(certificacio.getFechaCertificacion());
-				if (!dataCertificacio.equals(dataUltimaCertificacio)) {
-					byte[] decodificat = certificacio.getContenidoCertificacion();
-					if (enviament.getNotificaCertificacioArxiuId() != null) {
-						pluginHelper.gestioDocumentalDelete(
-								enviament.getNotificaCertificacioArxiuId(),
-								PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
-					}
-					String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
-							PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
-							new ByteArrayInputStream(decodificat));
+				if (resultadoInfoEnvio.getCertificacion() != null) {
+					Certificacion certificacio = resultadoInfoEnvio.getCertificacion();
 					
-					enviament.updateNotificaCertificacio(
-							dataCertificacio,
-							gestioDocumentalId,
-							certificacio.getHash(),
-							certificacio.getOrigen(),
-							certificacio.getMetadatos(),
-							certificacio.getCsv(),
-							certificacio.getMime(),
-							Integer.parseInt(certificacio.getSize()),
-							null,
-							null,
-							null);
-					eventCert = NotificacioEventEntity.getBuilder(
-							NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-							enviament.getNotificacio()).
-							enviament(enviament).
-//							callbackInicialitza().
-							build();
-					notificacio.updateEventAfegir(eventCert);
+					Date dataCertificacio = toDate(certificacio.getFechaCertificacion());
+					if (!dataCertificacio.equals(dataUltimaCertificacio)) {
+						byte[] decodificat = certificacio.getContenidoCertificacion();
+						if (enviament.getNotificaCertificacioArxiuId() != null) {
+							pluginHelper.gestioDocumentalDelete(
+									enviament.getNotificaCertificacioArxiuId(),
+									PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
+						}
+						String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
+								PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
+								new ByteArrayInputStream(decodificat));
+						
+						enviament.updateNotificaCertificacio(
+								dataCertificacio,
+								gestioDocumentalId,
+								certificacio.getHash(),
+								certificacio.getOrigen(),
+								certificacio.getMetadatos(),
+								certificacio.getCsv(),
+								certificacio.getMime(),
+								Integer.parseInt(certificacio.getSize()),
+								null,
+								null,
+								null);
+						eventCert = NotificacioEventEntity.getBuilder(
+								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
+								enviament.getNotificacio()).
+								enviament(enviament).
+	//							callbackInicialitza().
+								build();
+						notificacio.updateEventAfegir(eventCert);
+					}
 				}
+				if (eventDatat != null) {
+					eventDatat.callbackInicialitza();
+				} else if (eventCert != null) {
+					eventCert.callbackInicialitza();
+				}
+				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
+						notificacio).
+						enviament(enviament).build();
+				notificacio.updateEventAfegir(event);
+				return true;
+			} else {
+				return false;
 			}
-			if (eventDatat != null) {
-				eventDatat.callbackInicialitza();
-			} else if (eventCert != null) {
-				eventCert.callbackInicialitza();
-			}
-			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
-					NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
-					notificacio).
-					enviament(enviament).build();
-			notificacio.updateEventAfegir(event);
-			return true;
 		} catch (Exception ex) {
 			logger.error(
 					errorPrefix,
