@@ -51,6 +51,8 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private Long notificacioId;
 	private String csvUuid;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
+	private String registreNumeroFormatat;
+	private NotificacioRegistreEstatEnumDto registreEstat;
 	
 	public Long getId() {
 		return id;
@@ -378,6 +380,18 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	}
 	public void setNotificaDataCaducitat(String notificaDataCaducitat) {
 		this.notificaDataCaducitat = notificaDataCaducitat;
+	}
+	public String getRegistreNumeroFormatat() {
+		return registreNumeroFormatat;
+	}
+	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
+		this.registreNumeroFormatat = registreNumeroFormatat;
+	}
+	public NotificacioRegistreEstatEnumDto getRegistreEstat() {
+		return registreEstat;
+	}
+	public void setRegistreEstat(NotificacioRegistreEstatEnumDto registreEstat) {
+		this.registreEstat = registreEstat;
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;

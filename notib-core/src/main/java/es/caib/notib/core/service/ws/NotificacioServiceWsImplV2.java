@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sun.jersey.core.util.Base64;
 
+import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
+import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
@@ -70,6 +72,7 @@ import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 
 
 /**
@@ -174,12 +177,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				resposta.setErrorDescripcio("[TITULAR_NIF] El camp 'nif' del titular d'un enviament no pot ser null.");
 				return resposta;
 			}
-//			if(enviament.getTitular().getTipus().equals() && enviament.getTitular().getCodiEntitatDesti() == null || enviament.getTitular().getRaoSocial() == null) {
-//				resposta.setError(true);
-//				resposta.setEstat(NotificacioEstatEnum.PENDENT);
-//				resposta.setErrorDescripcio("[TITULAR_NIF] El camp 'nif' del titular d'un enviament no pot ser null.");
-//				return resposta;
-//			}
 			for(Persona destinatari : enviament.getDestinataris()) {
 				if(destinatari.getNif() == null) {
 					resposta.setError(true);
@@ -234,7 +231,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		
 		ProcedimentEntity procediment = procedimentRepository.findByCodi(notificacio.getProcedimentCodi());
 		if(procediment != null) {
-			NotificacioEntity.BuilderV2 notificacioBuilder = NotificacioEntity.getBuilderV2(
+			NotificacioEntity.BuilderV2 notificacioBuilder = NotificacioEntity.
+				getBuilderV2(
 					entitat,
 					emisorDir3Codi,
 					comunicacioTipus,
@@ -250,7 +248,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					notificacio.getGrupCodi(),
 					//notificacio.getRegistreOficina(),
 					//notificacio.getRegistreLlibre(),
-					//notificacio.getExtracte(),
+					notificacio.getExtracte(),
 					notificacio.getDocFisica(),
 					//notificacio.getTipusAssumpte(),
 					notificacio.getIdioma(),
@@ -282,7 +280,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				}
 				
 				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
-//				NotificaDomiciliTipusEnumDto tipus = null;
 				NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
 				if (enviament.getEntregaPostal() != null) {
 					if (enviament.getEntregaPostal().getTipus() != null) {
@@ -317,26 +314,32 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					}
 				}
 				
-				PersonaEntity titular = personaRepository.save(PersonaEntity.getBuilder(
+				PersonaEntity titular = personaRepository.save(PersonaEntity.getBuilderV2(
+						enviament.getTitular().getInteressatTipus(),
 						enviament.getTitular().getEmail(), 
 						enviament.getTitular().getLlinatge1(), 
 						enviament.getTitular().getLlinatge2(), 
 						enviament.getTitular().getNif(), 
 						enviament.getTitular().getNom(), 
-						enviament.getTitular().getTelefon()).build());
+						enviament.getTitular().getTelefon(),
+						enviament.getTitular().getRaoSocial(),
+						enviament.getTitular().getDir3codi()).build());
+				
 				
 				List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
 				for(Persona persona: enviament.getDestinataris()) {
-					PersonaEntity destinatari = personaRepository.save(PersonaEntity.getBuilder(
-							persona.getEmail(),
+					PersonaEntity destinatari = personaRepository.save(PersonaEntity.getBuilderV2(
+							persona.getInteressatTipus(),
+							persona.getEmail(), 
 							persona.getLlinatge1(), 
 							persona.getLlinatge2(), 
 							persona.getNif(), 
 							persona.getNom(), 
-							persona.getTelefon()).build());
+							persona.getTelefon(),
+							persona.getRaoSocial(),
+							persona.getDir3codi()).build());
 					destinataris.add(destinatari);
 				}
-//				NotificacioEnviamentEntity.BuilderV2 enviamentBuilder = ;
 				EntregaPostalViaTipusEnum viaTipus = null;
 				
 				if (enviament.getEntregaPostal() != null) {
@@ -370,48 +373,124 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				referencies.add(enviamentReferencia);
 				notificacioGuardada.addEnviament(enviamentSaved);
 			}
-			for(NotificacioEnviamentEntity ne : notificacioGuardada.getEnviaments()) {
-				if(ne.getTitular().getNom() != null && ne.getTitular().getLlinatge1() != null && ne.getTitular().getLlinatge2() != null) {
-					
-				}else if(ne.getTitular().getRaoSocial() != null) {
-					
-				}else if(ne.getTitular().getNom() != null) {
-					
-				}
-			}
 			
-			for(NotificacioEnviamentEntity enviament: notificacioGuardada.getEnviaments()) {
-				enviament.getTitular().getCodiEntitatDesti();
-			}
 			notificacioRepository.saveAndFlush(notificacioGuardada);
 			if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioGuardada.getComunicacioTipus())) {
-				for(NotificacioEnviamentEntity enviament : notificacioGuardada.getEnviaments()) {
-					if (pluginHelper.isArxiuEmprarSir()) {
-	//					AsientoRegistralBean arb = pluginHelper.notificacioToAsientoRegistralBean(notificacioGuardada);
-	//					RespostaConsultaRegistre arbResposta = null;
-						if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioGuardada.getEnviamentTipus())/*Administracio*/) {
-							//Regweb3 + SIR
-	//						arbResposta = pluginHelper.registreSortidaAsientoRegistral(entitat.getDir3Codi(), notificacioGuardada, enviament, 1L);
-	//						if(arbResposta.getEstado().equals(EstatRegistre.DISTRIBUIT.geValorLong())) {
-	//							
-	//						}else if(arbResposta.getEstado().equals(EstatRegistre.OFICI_EXTERN.geValorLong())) {
-	//							JustificanteWs justificant = pluginHelper.obtenerJustificante(entitat.getDir3Codi(), arbResposta.getNumeroRegistroFormateado(), arbResposta.getLibroCodigo(), 2L);
-	//						}else if(arbResposta.getEstado().equals(EstatRegistre.OFICI_SIR.geValorLong())) {
-	//							OficioBean oficiExtern = pluginHelper.obtenerOficioExterno(entitat.getDir3Codi(), arbResposta.getNumeroRegistroFormateado(), arbResposta.getLibroCodigo());
-	//						}
+				if (pluginHelper.isArxiuEmprarSir()) {
+					if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioGuardada.getEnviamentTipus())) {
+						//Regweb3 + SIR
+						boolean totsAdministracio = true;
+						for(NotificacioEnviamentEntity enviament : notificacioGuardada.getEnviaments()) {
+							if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+								totsAdministracio = false;
+							}
+						}
+						if(totsAdministracio) {
+							for(NotificacioEnviamentEntity enviament : notificacioGuardada.getEnviaments()) {
+								AsientoRegistralBeanDto arb = pluginHelper.notificacioToAsientoRegistralBean(notificacioGuardada, enviament);
+								RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(notificacioGuardada.getEntitat().getDir3Codi(), arb, 2L);
+								if(arbResposta.getErrorDescripcio() != null) {
+									NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+											NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
+											notificacioGuardada).
+											error(true).
+											errorDescripcio(arbResposta.getErrorDescripcio()).
+											build();
+									notificacioGuardada.updateNotificaError(
+											NotificacioErrorTipusEnumDto.ERROR_REMOT,
+											event);
+									notificacioGuardada.updateEventAfegir(event);
+									notificacioEventRepository.saveAndFlush(event);
+								} else {
+									NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+											NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
+											notificacioGuardada).build();
+									notificacioGuardada.updateRegistreNumero(Integer.parseInt(arbResposta.getRegistreNumero()));
+									notificacioGuardada.updateRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
+									notificacioGuardada.updateRegistreData(arbResposta.getRegistreData());
+									notificacioGuardada.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
+									notificacioGuardada.updateEventAfegir(event);
+									notificacioEventRepository.saveAndFlush(event);
+									enviament.setRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
+									enviament.setRegistreData(arbResposta.getRegistreData());
+									enviament.setRegistreEstat(arbResposta.getEstat());
+								}
+							}
 						} else {
-							//Regweb3 + Notifica
-							try {
-	//							arbResposta = pluginHelper.comunicarAsientoRegistral(entitat.getDir3Codi(), arb, 1L);
-	//							notificacio.setRegistreNumero(arbResposta.getNumeroRegistroFormateado());
-	//							notificacio.setRegistreData(arbResposta.getFechaRegistro().toGregorianCalendar().getTime());
+							AsientoRegistralBeanDto arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(notificacioGuardada, notificacioGuardada.getEnviaments());
+							RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(notificacioGuardada.getEntitat().getDir3Codi(), arb, 1L);
+							if(arbResposta.getErrorCodi() != null) {
+								NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+										NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
+										notificacioGuardada).
+										error(true).
+										errorDescripcio(arbResposta.getErrorDescripcio()).
+										build();
+								notificacioGuardada.updateNotificaError(
+										NotificacioErrorTipusEnumDto.ERROR_REMOT,
+										event);
+								notificacioGuardada.updateEventAfegir(event);
+								notificacioEventRepository.saveAndFlush(event);
+							} else {
+								NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+										NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
+										notificacioGuardada).build();
+								notificacioGuardada.updateRegistreNumero(Integer.parseInt(arbResposta.getRegistreNumero()));
+								notificacioGuardada.updateRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
+								notificacioGuardada.updateRegistreData(arbResposta.getRegistreData());
+								notificacioGuardada.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
+								notificacioGuardada.updateEventAfegir(event);
+								notificacioEventRepository.saveAndFlush(event);
 								notificaHelper.notificacioEnviar(notificacioGuardada.getId());
-								notificacioGuardada = notificacioRepository.findById(notificacioGuardada.getId());
-							} catch (Exception e) {
-								e.printStackTrace();
+								for(NotificacioEnviamentEntity enviament: notificacioGuardada.getEnviaments()) {
+									enviament.setRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
+									enviament.setRegistreData(arbResposta.getRegistreData());
+									enviament.setRegistreEstat(arbResposta.getEstat());
+								}
 							}
 						}
 					} else {
+						//Regweb3 + Notifica
+						try {
+							AsientoRegistralBeanDto arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(notificacioGuardada, notificacioGuardada.getEnviaments());
+							RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(notificacioGuardada.getEntitat().getDir3Codi(), arb, 1L);
+							if(arbResposta.getErrorCodi() != null) {
+								NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+										NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
+										notificacioGuardada).
+										error(true).
+										errorDescripcio(arbResposta.getErrorDescripcio()).
+										build();
+								notificacioGuardada.updateNotificaError(
+										NotificacioErrorTipusEnumDto.ERROR_REMOT,
+										event);
+								notificacioGuardada.updateEventAfegir(event);
+								notificacioEventRepository.saveAndFlush(event);
+							} else {
+								NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+										NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
+										notificacioGuardada).build();
+								notificacioGuardada.updateRegistreNumero(Integer.parseInt(arbResposta.getRegistreNumero()));
+								notificacioGuardada.updateRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
+								notificacioGuardada.updateRegistreData(arbResposta.getRegistreData());
+								notificacioGuardada.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
+								notificacioGuardada.updateEventAfegir(event);
+								notificacioEventRepository.saveAndFlush(event);
+								notificaHelper.notificacioEnviar(notificacioGuardada.getId());
+								for(NotificacioEnviamentEntity enviament: notificacioGuardada.getEnviaments()) {
+									enviament.setRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
+									enviament.setRegistreData(arbResposta.getRegistreData());
+									enviament.setRegistreEstat(arbResposta.getEstat());	
+								}
+							}
+						} catch (Exception ex) {
+							logger.error(
+									"Error al donar d'alta la notificació a Notific@ (notificacioId=" + notificacioGuardada.getId() + ")",
+									ex);
+						}
+					}
+				} else {
+					for(NotificacioEnviamentEntity enviament : notificacioGuardada.getEnviaments()) {
 						RegistreIdDto registreIdDto = new RegistreIdDto();
 						try {
 							registreIdDto = pluginHelper.registreAnotacioSortida(

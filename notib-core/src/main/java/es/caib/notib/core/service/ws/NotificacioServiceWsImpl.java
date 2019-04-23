@@ -59,7 +59,6 @@ import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.PagadorCieRepository;
 import es.caib.notib.core.repository.PagadorPostalRepository;
 import es.caib.notib.core.repository.PersonaRepository;
-import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 
 
 /**

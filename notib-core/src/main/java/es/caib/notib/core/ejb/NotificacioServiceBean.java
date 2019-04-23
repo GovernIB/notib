@@ -230,7 +230,7 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public RegistreIdDto registrar(Long notificacioId) {
+	public List<RegistreIdDto> registrar(Long notificacioId) {
 		return delegate.registrar(notificacioId);
 	}
 

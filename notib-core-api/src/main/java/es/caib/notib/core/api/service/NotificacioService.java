@@ -251,7 +251,7 @@ public interface NotificacioService {
 	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
-	public RegistreIdDto registrar(Long notificacioId);
+	public List<RegistreIdDto> registrar(Long notificacioId);
 
 	/**
 	 * Refresca l'estat d'un enviament (datat i certificació).

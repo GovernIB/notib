@@ -1,5 +1,8 @@
 package es.caib.notib.core.entity;
 
+import java.util.Iterator;
+import java.util.Map;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -103,7 +106,7 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			String arxiuGestdocId,
 			String arxiuNom,
 			String url,
-			String metadades,
+			Map<String, String> metadades,
 			Boolean normalitzat,
 			Boolean generarCsv,
 			String uuid,
@@ -123,12 +126,13 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 	
 	public static class BuilderV2{
 		DocumentEntity built;
+		@SuppressWarnings("rawtypes")
 		BuilderV2(
 				String arxiuId,
 				String arxiuGestdocId,
 				String arxiuNom,
 				String url,
-				String metadades,
+				Map<String, String> metadades,
 				Boolean normalitzat,
 				Boolean generarCsv,
 				String uuid,
@@ -139,7 +143,13 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			built.arxiuNom = arxiuNom;
 			built.csv = csv;
 			built.generarCsv = generarCsv;
-			built.metadades = metadades;
+			String metadadesStr = "";
+			Iterator it = metadades.entrySet().iterator();
+		    while (it.hasNext()) {
+		        Map.Entry pair = (Map.Entry)it.next();
+		        metadadesStr += "<" + pair.getKey()+ ">" + pair.getValue() + "</" + pair.getKey() + ">";
+		    }
+			built.metadades = metadadesStr;
 			built.normalitzat = normalitzat;
 			built.url = url;
 			built.uuid = uuid;

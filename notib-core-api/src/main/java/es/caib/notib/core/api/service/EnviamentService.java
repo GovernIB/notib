@@ -168,5 +168,15 @@ public interface EnviamentService {
 	public NotificacioEnviamentDtoV2 getOne(
 			Long entitatId);
 
+	/**
+	 * Obté les el justificant del registre.
+	 * 
+	 * @param enviamentId
+	 *            id de l'enviament registrat.
+	 * @return document justificant descarregat.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	public byte[] getDocumentJustificant(
+			Long enviamentId);
 
 }

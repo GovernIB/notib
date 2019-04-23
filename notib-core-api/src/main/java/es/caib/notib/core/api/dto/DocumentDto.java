@@ -1,6 +1,8 @@
 package es.caib.notib.core.api.dto;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DocumentDto implements Serializable {
 
@@ -10,7 +12,7 @@ public class DocumentDto implements Serializable {
 	private String contingutBase64;
 	private String hash;
 	private String url;
-	private String metadades;
+	private Map<String, String> metadades = new HashMap<String, String>();
 	private boolean normalitzat;
 	private boolean generarCsv;
 	private String uuid;
@@ -40,10 +42,10 @@ public class DocumentDto implements Serializable {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	public String getMetadades() {
+	public Map<String, String> getMetadades() {
 		return metadades;
 	}
-	public void setMetadades(String metadades) {
+	public void setMetadades(Map<String, String> metadades) {
 		this.metadades = metadades;
 	}
 	public boolean isNormalitzat() {

@@ -33,6 +33,8 @@ public class ArxiuDto implements Serializable {
 		this.tamany = tamany;
 	}
 	
+	public ArxiuDto() {}
+	
 	
 	public String getNom() {
 		return nom;

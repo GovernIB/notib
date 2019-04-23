@@ -188,7 +188,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	protected String llibre;
 	@Column(name = "registre_numero", length = 19)
 	protected Integer registreNumero;
-	@Column(name = "registre_numero_formatat", length = 50)
+	@Column(name = "registre_numero_formatat", length = 200)
 	protected String registreNumeroFormatat;
 	@Column(name = "registre_data")
 	@Temporal(TemporalType.DATE)
@@ -514,9 +514,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String procedimentCodi,
 			ProcedimentEntity procediment,
 			String grup,
-			//String registreOficina,
-			//String registreLlibre,
-			//String extracte,
+			String extracte,
 			RegistreDocumentacioFisicaEnumDto docFisica,
 			//String tipusAssumpte,
 			IdiomaEnumDto idioma,
@@ -538,9 +536,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				procedimentCodi,
 				procediment,
 				grup,
-				//registreOficina,
-				//registreLlibre,
-				//extracte,
+				extracte,
 				docFisica,
 				//tipusAssumpte,
 				idioma,
@@ -792,7 +788,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				String grup,
 				//String oficina,
 				//String llibre,
-				//String extracte,
+				String extracte,
 				RegistreDocumentacioFisicaEnumDto docFisica,
 				//String tipusAssumpte,
 				IdiomaEnumDto idioma,
@@ -817,7 +813,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.procediment = procediment;
 			//built.oficina = oficina;
 			//built.llibre = llibre;
-			//built.extracte = extracte;
+			built.extracte = extracte;
 			built.docFisica = docFisica;
 			//built.tipusAssumpte = tipusAssumpte;
 			built.idioma = idioma;

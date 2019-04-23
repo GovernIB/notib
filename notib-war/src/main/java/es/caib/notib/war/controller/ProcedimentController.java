@@ -240,11 +240,19 @@ public class ProcedimentController extends BaseUserController{
 					isAdministrador(request),
 					procedimentId);
 			model.addAttribute(procediment);
-			model.addAttribute("tipusAssumpte", procedimentService.findTipusAssumpte(procediment.getEntitat()));
-			if (procediment.getCodiAssumpte() != null)
+			List<TipusAssumpteDto> tipusAssumpte = procedimentService.findTipusAssumpte(procediment.getEntitat());
+			model.addAttribute("tipusAssumpte", tipusAssumpte);
+			if (procediment.getTipusAssumpte() != null) {
 				model.addAttribute("codiAssumpte", procedimentService.findCodisAssumpte(procediment.getEntitat(), procediment.getTipusAssumpte()));
+			}else if(tipusAssumpte.get(0) != null && tipusAssumpte.get(0).getCodi() != null){
+				model.addAttribute("codiAssumpte", procedimentService.findCodisAssumpte(procediment.getEntitat(), tipusAssumpte.get(0).getCodi()));
+			}
 		} else {
-			model.addAttribute("tipusAssumpte", procedimentService.findTipusAssumpte(entitat));
+			List<TipusAssumpteDto> tipusAssumpte = procedimentService.findTipusAssumpte(entitat);
+			model.addAttribute("tipusAssumpte", tipusAssumpte);
+			if(tipusAssumpte.get(0) != null && tipusAssumpte.get(0).getCodi() != null){
+				model.addAttribute("codiAssumpte", procedimentService.findCodisAssumpte(entitat, tipusAssumpte.get(0).getCodi()));
+			}
 		}
 		model.addAttribute("pagadorsPostal", pagadorPostalService.findAll());
 		model.addAttribute("pagadorsCie", pagadorCieService.findAll());

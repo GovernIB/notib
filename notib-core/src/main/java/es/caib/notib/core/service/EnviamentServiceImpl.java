@@ -24,14 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.jaxb.SpringDataJaxb.PageDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.ColumnesDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
@@ -54,6 +52,7 @@ import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
+import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.ColumnesRepository;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
@@ -75,6 +74,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
+	@Autowired
+	private PluginHelper pluginHelper;
 	@Autowired
 	private NotificacioRepository notificacioRepository;
 	@Autowired
@@ -543,21 +544,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 			nee.setNotificacio(notificacioRepository.findById(nee.getNotificacioId()));
 		}
 		
-		/*for (NotificacioEnviamentEntity notificacioEnviamentEntity : enviament.getContent()) {
-			notificacioEnviamentEntity.setProcedimentCodiNotib(notificacioEnviamentEntity.getNotificacio().getProcedimentCodiNotib());
-			notificacioEnviamentEntity.setEnviamentDataProgramada(notificacioEnviamentEntity.getNotificacio().getEnviamentDataProgramada());
-			notificacioEnviamentEntity.setGrupCodi(notificacioEnviamentEntity.getNotificacio().getGrupCodi());
-			notificacioEnviamentEntity.setEmisorDir3Codi(notificacioEnviamentEntity.getNotificacio().getEmisorDir3Codi());
-			notificacioEnviamentEntity.setUsuariCodi(notificacioEnviamentEntity.getNotificacio().getUsuariCodi());
-			notificacioEnviamentEntity.setEnviamentTipus(notificacioEnviamentEntity.getNotificacio().getEnviamentTipus());
-			notificacioEnviamentEntity.setConcepte(notificacioEnviamentEntity.getNotificacio().getConcepte());
-			notificacioEnviamentEntity.setDescripcio(notificacioEnviamentEntity.getNotificacio().getDescripcio());
-			notificacioEnviamentEntity.setLlibre(notificacioEnviamentEntity.getNotificacio().getLlibre());
-			notificacioEnviamentEntity.setRegistreNumero(notificacioEnviamentEntity.getNotificacio().getRegistreNumero());
-			notificacioEnviamentEntity.setRegistreData(notificacioEnviamentEntity.getNotificacio().getRegistreData());
-			notificacioEnviamentEntity.setEstat(notificacioEnviamentEntity.getNotificacio().getEstat());
-			notificacioEnviamentEntity.setComunicacioTipus(notificacioEnviamentEntity.getComunicacioTipus());
-		}*/
 		PaginaDto<NotificacioEnviamentDtoV2> paginaDto = paginacioHelper.toPaginaDto(
 				enviament,
 				NotificacioEnviamentDtoV2.class);
@@ -587,8 +573,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				notificacioEnviamentDtoV2.setRegistreData(enviament.getContent().get(i).getNotificacio().getRegistreData());
 			if (enviament.getContent().get(i).getNotificacio().getEstat() != null)
 				notificacioEnviamentDtoV2.setEstat(enviament.getContent().get(i).getNotificacio().getEstat());
-			if (enviament.getContent().get(i).getComunicacioTipus() != null)
-				notificacioEnviamentDtoV2.setComunicacioTipus(enviament.getContent().get(i).getComunicacioTipus());
+//			if (enviament.getContent().get(i).getComunicacioTipus() != null)
+//				notificacioEnviamentDtoV2.setComunicacioTipus(enviament.getContent().get(i).getComunicacioTipus());
 			i++;
 		}
 		return paginaDto;
@@ -1096,13 +1082,15 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private NotificacioEnviamentDto enviamentToDto(
 			NotificacioEnviamentEntity enviament) {
 		enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
-		NotificacioEnviamentDto destinatariDto = conversioTipusHelper.convertir(
+		NotificacioEnviamentDto enviamentDto = conversioTipusHelper.convertir(
 				enviament,
 				NotificacioEnviamentDto.class);
+		enviamentDto.setRegistreNumeroFormatat(enviament.getRegistreNumeroFormatat());
+		enviamentDto.setRegistreData(enviament.getRegistreData());
 		destinatariCalcularCampsAddicionals(
 				enviament,
-				destinatariDto);
-		return destinatariDto;
+				enviamentDto);
+		return enviamentDto;
 	}
 
 	private void destinatariCalcularCampsAddicionals(
@@ -1130,7 +1118,17 @@ public class EnviamentServiceImpl implements EnviamentService {
 	public NotificacioEnviamentDtoV2 getOne(Long entitatId) {
 		return conversioTipusHelper.convertir(notificacioEnviamentRepository.findOne(entitatId), NotificacioEnviamentDtoV2.class);
 	}
-
-
-
+	
+	public byte[] getDocumentJustificant(Long enviamentId) {
+		
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
+		enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
+		
+		switch (enviament.getRegistreEstat()) {
+		case OFICI_EXTERN:
+			return pluginHelper.obtenirOficiExtern(enviament.getNotificacio().getEmisorDir3Codi(), enviament.getRegistreNumeroFormatat()).getJustificant();	
+		default:
+			return pluginHelper.obtenirJustificant(enviament.getNotificacio().getEmisorDir3Codi(), enviament.getRegistreNumeroFormatat()).getJustificant();
+		}
+	}
 }

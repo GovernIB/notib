@@ -59,9 +59,8 @@ public interface RegistrePlugin {
 	 */
 	public RespostaJustificantRecepcio obtenerJustificante(
 			String codiDir3Entitat, 
-			String numeroRegistreFormatat, 
-			String llibre, 
-			Long tipusRegistre);
+			String numeroRegistreFormatat,
+			long tipusRegistre);
 	
 	/**
 	 * Crea un registre de sortida
@@ -74,8 +73,7 @@ public interface RegistrePlugin {
 	 */
 	public RespostaJustificantRecepcio obtenerOficioExterno(
 			String codiDir3Entitat, 
-			String numeroRegistreFormatat, 
-			String llibre);
+			String numeroRegistreFormatat);
 	
 	/**
 	 * 

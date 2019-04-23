@@ -10,7 +10,6 @@ import javax.validation.Valid;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 
 /**

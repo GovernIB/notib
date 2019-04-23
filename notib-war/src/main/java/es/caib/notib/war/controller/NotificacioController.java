@@ -7,7 +7,6 @@ package es.caib.notib.war.controller;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -240,7 +239,6 @@ public class NotificacioController extends BaseUserController {
 			@Valid NotificacioCommandV2 notificacioCommand,
 			BindingResult bindingResult, 
 			Model model) throws IOException {
-		DocumentCommand document = notificacioCommand.getDocument();
 		ProcedimentDto procedimentActual = procedimentService.findById(
 				null, 
 				isAdministrador(request), 
@@ -283,29 +281,30 @@ public class NotificacioController extends BaseUserController {
 		switch (notificacioCommand.getTipusDocument()) {
 		case ARXIU:
 			if (notificacioCommand.getArxiu() != null && !notificacioCommand.getArxiu().isEmpty()) {
-				document.setArxiuNom(notificacioCommand.getArxiu().getOriginalFilename());
-				document.setNormalitzat(notificacioCommand.getDocument().isNormalitzat());
+				notificacioCommand.getDocument().setArxiuNom(notificacioCommand.getArxiu().getOriginalFilename());
+				notificacioCommand.getDocument().setNormalitzat(notificacioCommand.getDocument().isNormalitzat());
 				String contingutBase64 = Base64.encodeBase64String(notificacioCommand.getArxiu().getBytes());
-				document.setContingutBase64(contingutBase64);
-				document.setMetadades(notificacioCommand.getDocument().getMetadades());
+				notificacioCommand.getDocument().setContingutBase64(contingutBase64);
+				notificacioCommand.getDocument().setMetadadesKeys(notificacioCommand.getDocument().getMetadadesKeys());
+				notificacioCommand.getDocument().setMetadadesValues(notificacioCommand.getDocument().getMetadadesValues());
 			}
 			break;
 		case CSV:
 			if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
 					&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
-				document.setCsv(notificacioCommand.getDocumentArxiuUuidCsvUrl());
+				notificacioCommand.getDocument().setCsv(notificacioCommand.getDocumentArxiuUuidCsvUrl());
 			}
 			break;
 		case UUID:
 			if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
 					&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
-				document.setUuid(notificacioCommand.getDocumentArxiuUuidCsvUrl());
+				notificacioCommand.getDocument().setUuid(notificacioCommand.getDocumentArxiuUuidCsvUrl());
 			}
 			break;
 		case URL:
 			if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
 					&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
-				document.setUrl(notificacioCommand.getDocumentArxiuUuidCsvUrl());
+				notificacioCommand.getDocument().setUrl(notificacioCommand.getDocumentArxiuUuidCsvUrl());
 			}
 			break;
 		}
@@ -515,20 +514,39 @@ public class NotificacioController extends BaseUserController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
-		RegistreIdDto registreIdDto = notificacioService.registrar(notificacioId);
+		List<RegistreIdDto> registresIdDto = notificacioService.registrar(notificacioId);
 		
 		emplenarModelNotificacioInfo(
 				entitatActual,
 				notificacioId, 
 				"accions", 
 				model);
-		if (registreIdDto.getNumero() != null) {
-			return getAjaxControllerReturnValueSuccess(request, "notificacioInfo",
-					"notificacio.controller.registrar.ok");
+		if(registresIdDto.size() > 0) {
+			for(RegistreIdDto registreIdDto :registresIdDto) {
+				if (registreIdDto.getNumero() != null) {
+					MissatgesHelper.success(request, "(" + registreIdDto.getNumeroRegistreFormat() + ")" + getMessage(
+							request,
+							"notificacio.controller.registrar.ok"));
+				} else {
+					MissatgesHelper.error(request, getMessage(
+							request,
+							"notificacio.controller.registrar.error"));
+				}
+			}	
 		} else {
-			return getAjaxControllerReturnValueError(request, "notificacioInfo",
-					"notificacio.controller.registrar.error");
+			MissatgesHelper.error(request, getMessage(
+					request, 
+					"notificacio.controller.registrar.error"));
 		}
+		
+		return "notificacioInfo";
+//		if (registreIdDto.getNumeroRegistreFormat() != null) {
+//			return getAjaxControllerReturnValueSuccess(request, "notificacioInfo",
+//					"notificacio.controller.registrar.ok");
+//		} else {
+//			return getAjaxControllerReturnValueError(request, "notificacioInfo",
+//					"notificacio.controller.registrar.error");
+//		}
 	}
 
 	@RequestMapping(value = "/{notificacioId}/enviament", method = RequestMethod.GET)
@@ -595,10 +613,10 @@ public class NotificacioController extends BaseUserController {
 			HttpServletResponse response,
 			@PathVariable Long notificacioId) throws IOException {
 		ArxiuDto arxiu = notificacioService.getDocumentArxiu(notificacioId);
-		String mimeType = ".pdf";
-//		if(arxiu.getContentType() == "application_pdf" || arxiu.getContentType() == "application/pdf" ) {
-//			mimeType = ".pdf";
-//		}
+		String mimeType = "";
+		if(arxiu.getContentType() == "application_pdf" || arxiu.getContentType() == "application/pdf" || arxiu.getContentType() == "PDF" && !arxiu.getNom().contains(".pdf")) {
+			mimeType = ".pdf";
+		}
 		writeFileToResponse(arxiu.getNom() + mimeType, arxiu.getContingut(), response);
 	}
 
@@ -613,6 +631,20 @@ public class NotificacioController extends BaseUserController {
 				arxiu.getNom(), 
 				arxiu.getContingut(), 
 				response);
+	}
+	
+	@RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/justificantDescarregar", method = RequestMethod.GET)
+	@ResponseBody
+	public void justificantDescarregar(
+			HttpServletResponse response,
+			HttpServletRequest request, 
+			@PathVariable Long notificacioId,
+			@PathVariable Long enviamentId) throws IOException {
+		ArxiuDto arxiu = new ArxiuDto();
+		arxiu.setContingut(enviamentService.getDocumentJustificant(enviamentId));
+		arxiu.setNom("justificant");
+		String mimeType = ".pdf";
+		writeFileToResponse(arxiu.getNom() + mimeType, arxiu.getContingut(), response);
 	}
 
 	@InitBinder

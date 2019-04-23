@@ -524,7 +524,7 @@ $(document).ready(function() {
 			</c:if>
 		</div> --%>
 		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'estatRegistre'}"> active</c:if>" id="estatRegistre">
-			<c:if test="${empty enviament.notificacio.seuRegistreNumero}">
+			<c:if test="${empty enviament.registreNumeroFormatat}">
 				<div class="alert alert-warning well-sm" role="alert" style="margin-top: 1em">
 					<spring:message code="enviament.info.estat.registre.no.enviada"/>
 				</div>
@@ -548,25 +548,35 @@ $(document).ready(function() {
 					</c:if>
 				</c:if>
 			</c:if>
-			<c:if test="${not empty enviament.notificacio.seuRegistreNumero}">
-				<p class="text-right" style="margin-top: 1em">
+			<c:if test="${not empty enviament.registreNumeroFormatat}">
+				<%-- <p class="text-right" style="margin-top: 1em">
 					<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstatSeu"/>" class="btn btn-default">
 						<span class="fa fa-refresh"></span>
 						<spring:message code="enviament.info.accio.refrescar.estat"/>
 					</a>
-				</p>
+				</p> --%>
+				<br>
 				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							<strong><spring:message code="enviament.info.seccio.registre"/></strong>
+						</h3>
+	 				</div>
 					<table class="table table-bordered" style="width:100%">
 					<tbody>
 						<tr>
 							<td width="30%"><strong><spring:message code="enviament.info.seu.registre.num"/></strong></td>
-							<td>${enviament.notificacio.seuRegistreNumero}</td>
+							<td>${enviament.registreNumeroFormatat}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.seu.registre.data"/></strong></td>
-							<td><fmt:formatDate value="${enviament.notificacio.seuRegistreData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+							<td><fmt:formatDate value="${enviament.registreData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 						</tr>
 						<tr>
+							<td width="30%"><strong><spring:message code="enviament.info.seu.registre.estat"/></strong></td>
+							<td>${enviament.registreEstat}</td>
+						</tr>
+						<%-- <tr>
 							<td><strong><spring:message code="enviament.info.seu.data.fi"/></strong></td>
 							<td>${enviament.seuDataFi}</td>
 						</tr>
@@ -577,10 +587,24 @@ $(document).ready(function() {
 						<tr>
 							<td><strong><spring:message code="enviament.info.seu.estat"/></strong></td>
 							<td><spring:message code="es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.${enviament.seuEstat}"/></td>
-						</tr>
+						</tr> --%>
 					</tbody>
 					</table>
 				</div>
+				<c:if test="${enviament.notificacio.estat == 'REGISTRADA'}">
+					<c:if test="${enviament.registreEstat == 'DISTRIBUIT' || enviament.registreEstat == 'OFICI_EXTERN'  || enviament.registreEstat == 'OFICI_SIR' }">
+						<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/justificantDescarregar"/>" onerror="location.reload();" class="btn btn-default btn-sm pull-right">
+							<span class="fa fa-download"></span>
+							<spring:message code="enviament.info.accio.descarregar.justificant"/>
+						</a>
+						<%-- <form action="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/justificantDescarregar"/>" class="well well-sm text-right" style="margin-top: 1em" method="get" enctype="multipart/form-data">
+							<button type="submit" class="btn btn-default">
+								<span class="fa fa-download"></span>
+								<spring:message code="enviament.info.accio.descarregar.justificant"/>
+							</button>
+						</form> --%>
+					</c:if>
+				</c:if>
 			</c:if>
 		</div>
 		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'events'}"> active</c:if>" id="events">

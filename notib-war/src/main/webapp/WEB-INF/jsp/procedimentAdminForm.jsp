@@ -136,12 +136,12 @@ $(document).ready(function() {
 				<not:inputText name="llibre" textKey="procediment.form.camp.llibre" required="true" labelSize="2"/>
 				<not:inputText name="oficina" textKey="procediment.form.camp.oficina" required="true" labelSize="2"/>
 				<not:inputSelect name="tipusAssumpte" id="tipusAssumpte" textKey="procediment.form.camp.tipusassumpte" optionItems="${tipusAssumpte}"  optionValueAttribute="codi" optionTextAttribute="nom" labelSize="2"/>
-				<not:inputSelect name="codiAssumpte" id="codiAssumpte" textKey="procediment.form.camp.codiassumpte" optionItems="${codiAssumpte}"  optionValueAttribute="codi" optionTextAttribute="nom" labelSize="2"/>
+				<not:inputSelect name="codiAssumpte" id="codiAssumpte" textKey="procediment.form.camp.codiassumpte" optionItems="${codiAssumpte}" emptyOption="true" emptyOptionTextKey="procediment.form.cap" optionValueAttribute="codi" optionTextAttribute="nom" labelSize="2"/>
 			</div>
 		</div>
 		<div id="modal-botons">
-				<button id="addProcedimentButton" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
-				<a href="<c:url value="/procediments"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+			<button id="addProcedimentButton" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<a href="<c:url value="/procediments"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>	
 	</form:form>
 	

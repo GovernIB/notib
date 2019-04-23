@@ -98,15 +98,18 @@ $(document).ready(function() {
                 "<label class='control-label col-xs-2'></label>" +
                 "<div class='col-xs-10'>" +
                     "<div class='input-group'>" +
-                    "<input name='document.metadades' id='document.metadades' type='text' class='form-control add grupVal_" + count + "' readonly/>" +
+                    "<input name='document.metadadesKeys' id='document.metadadesKeys' type='text' class='form-control width50 add grupKey_" + count + "' readonly/>" +
+                    "<input name='document.metadadesValues' id='document.metadadesValues' type='text' class='form-control width50 add grupVal_" + count + "' readonly/>" +
                     "<span class='input-group-addon' id='remove'><span class='fa fa-remove'></span></span>" +
                     "</div>" +
                 "</div>" +
             "</div>";
-
-        var val = $(".input-add").children().val();
-        if (val != '') {
+    		
+        var keyVal = $(".input-add").children().val();
+        var val = $(".input-add").children().eq(1).val();
+        if (keyVal != '') {
             $("#list").prepend(metadataInput);
+            $(".grupKey_" + count).attr("value", keyVal);
             $(".grupVal_" + count).attr("value", val);
             $("#list").find("#remove").addClass("grupVal_" + count);
             count++;
@@ -371,7 +374,12 @@ function mostrarEntregaPostal(className) {
                         <not:inputCheckbox name="document.normalitzat" textKey="notificacio.form.camp.normalitzat" labelSize="2"/>
                     </div>
                     <div class="col-md-12 hidden" id="metadades">
-                        <not:inputTextAdd name="document.metadades" idIcon="add" textKey="notificacio.form.camp.metadades" labelSize="2"/>
+                    <label class="control-label" for="document.normalitzat">Metadades</label>
+						<div class="input-group input-add" style="margin-bottom: 25px;">
+                       		<input value="" class="form-control width50"/>		
+                       		<input value="" class="form-control width50"/>		
+							<span class="input-group-addon" id="add"><span class="fa fa-plus"></span></span>
+						</div>
                         <div id="list"></div>
                     </div>
                 </div>

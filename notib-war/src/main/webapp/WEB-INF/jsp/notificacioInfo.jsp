@@ -155,37 +155,42 @@
 					</tbody>
 				</table>
 			</div>
-			<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title">
-							<strong><spring:message
-									code="notificacio.info.seccio.document" /></strong>
-						</h3>
-					</div>
-					<table class="table table-bordered" style="width: 100%">
-						<tbody>
-							<tr>
-								<td width="30%"><strong><spring:message
-											code="notificacio.info.document.arxiu.nom" /></strong></td>
-								<td>${notificacio.document.arxiuNom} <a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar"/>"
-									class="btn btn-default btn-sm pull-right"
-									title="<spring:message code="notificacio.info.document.descarregar"/>"><span
-										class="fa fa-download"></span></a>
-								</td>
-							</tr>
-							<tr>
-								<td><strong><spring:message
-											code="notificacio.info.document.normalitzat" /></strong></td>
-								<td>${notificacio.document.normalitzat}</td>
-							</tr>
-							<tr>
-								<td><strong><spring:message
-											code="notificacio.info.document.generar.csv" /></strong></td>
-								<td>${notificacio.document.generarCsv}</td>
-							</tr>
-						</tbody>
-					</table>
-			</div>
+			<c:if test="${not empty notificacio.document}">
+				<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								<strong><spring:message
+										code="notificacio.info.seccio.document" /></strong>
+							</h3>
+						</div>
+						<table class="table table-bordered" style="width: 100%">
+							<tbody>
+								<tr>
+									<td width="30%">
+										<strong><spring:message	code="notificacio.info.document.arxiu.nom" /></strong>
+									</td>
+									<td>${notificacio.document.arxiuNom} 
+										<a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar"/>"
+											class="btn btn-default btn-sm pull-right"
+											title="<spring:message code="notificacio.info.document.descarregar"/>">
+												<span class="fa fa-download"></span>
+										</a>
+									</td>
+								</tr>
+								<tr>
+									<td><strong><spring:message
+												code="notificacio.info.document.normalitzat" /></strong></td>
+									<td>${notificacio.document.normalitzat}</td>
+								</tr>
+								<tr>
+									<td><strong><spring:message
+												code="notificacio.info.document.generar.csv" /></strong></td>
+									<td>${notificacio.document.generarCsv}</td>
+								</tr>
+							</tbody>
+						</table>
+				</div>
+			</c:if>
 			<c:if test="${not empty notificacio.procediment}">
 				<div class="panel panel-default">
 					<div class="panel-heading">

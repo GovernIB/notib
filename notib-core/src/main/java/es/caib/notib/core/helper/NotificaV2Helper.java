@@ -403,7 +403,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		envios.setProcedimiento(
 				notificacio.getProcedimentCodiNotib());
 		Documento  documento = new Documento();
-		if(notificacio.getDocument().getArxiuGestdocId() != null) {
+		if(notificacio.getDocument() != null && notificacio.getDocument().getArxiuGestdocId() != null) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			pluginHelper.gestioDocumentalGet(
 					notificacio.getDocument().getArxiuGestdocId(),
@@ -430,7 +430,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				documento.setHash(hash256);
 			}			
 			envios.setDocumento(documento);
-		} else if (notificacio.getDocument().getCsv() != null) {
+		} else if (notificacio.getDocument() != null && notificacio.getDocument().getCsv() != null) {
 			byte[] contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
             documento.setContenido(contingut);       
             if(contingut != null) {
@@ -451,7 +451,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
             opcionesDocumento.getOpcion().add(opcionGenerarCsv);
             documento.setOpcionesDocumento(opcionesDocumento);
             envios.setDocumento(documento);
-        } else if (notificacio.getDocument().getUrl() != null) {
+        } else if (notificacio.getDocument() != null && notificacio.getDocument().getUrl() != null) {
         	String url = notificacio.getDocument().getUrl();
             documento.setEnlaceDocumento(url);           
             String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(url).toCharArray()));
@@ -470,7 +470,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
             opcionesDocumento.getOpcion().add(opcionGenerarCsv);
             documento.setOpcionesDocumento(opcionesDocumento);
             envios.setDocumento(documento);
-        } else if (notificacio.getDocument().getUuid() != null) {
+        } else if (notificacio.getDocument() != null && notificacio.getDocument().getUuid() != null) {
             byte[] contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
         	documento.setContenido(contingut);
             if(contingut != null) {
@@ -491,7 +491,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
             opcionesDocumento.getOpcion().add(opcionGenerarCsv);
             documento.setOpcionesDocumento(opcionesDocumento);
             envios.setDocumento(documento);
-        } else {
+        } else if(notificacio.getDocument() != null) {
 			documento.setHash(notificacio.getDocument().getHash());
 			if(notificacio.getDocument().getContingutBase64() != null) {
 	        	byte[] contingut = notificacio.getDocument().getContingutBase64().getBytes();

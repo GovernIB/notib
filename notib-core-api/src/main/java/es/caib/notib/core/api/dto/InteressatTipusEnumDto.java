@@ -10,24 +10,24 @@ package es.caib.notib.core.api.dto;
  */
 public enum InteressatTipusEnumDto {
 	
-	ADMINISTRACIO("A"),
-	FISICA("F"),
-	JURIDICA("J");
+	ADMINISTRACIO(1L),
+	FISICA(2L),
+	JURIDICA(3L);
 
-	private final String text;
+	private final Long val;
 
-	InteressatTipusEnumDto(String text) {
-		this.text = text;
+	InteressatTipusEnumDto(Long val) {
+		this.val = val;
 	}
-	public String getText() {
-		return text;
+	public Long getLongVal() {
+		return val;
 	}
 
-	public static InteressatTipusEnumDto toEnum(String text) {
+	public static InteressatTipusEnumDto toEnum(Long text) {
 		if (text == null)
 			return null;
 		for (InteressatTipusEnumDto valor : InteressatTipusEnumDto.values()) {
-			if (text.equals(valor.getText())) {
+			if (text.equals(valor.getLongVal())) {
 				return valor;
 			}
 		}

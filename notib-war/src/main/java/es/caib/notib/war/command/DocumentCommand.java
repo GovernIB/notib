@@ -5,7 +5,9 @@ package es.caib.notib.war.command;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
+
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
@@ -20,7 +22,8 @@ public class DocumentCommand {
 	private String contingutBase64;
 	private String hash;
 	private String url;
-	private List<String> metadades = new ArrayList<String>();
+	private List<String> metadadesKeys = new ArrayList<String>();
+	private List<String> metadadesValues = new ArrayList<String>();
 	private boolean normalitzat;
 	private boolean generarCsv;
 	private String csv;
@@ -50,11 +53,17 @@ public class DocumentCommand {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	public List<String> getMetadades() {
-		return metadades;
+	public List<String> getMetadadesKeys() {
+		return metadadesKeys;
 	}
-	public void setMetadades(List<String> metadades) {
-		this.metadades = metadades;
+	public void setMetadadesKeys(List<String> metadadesKeys) {
+		this.metadadesKeys = metadadesKeys;
+	}
+	public List<String> getMetadadesValues() {
+		return metadadesValues;
+	}
+	public void setMetadadesValues(List<String> metadadesValues) {
+		this.metadadesValues = metadadesValues;
 	}
 	public boolean isNormalitzat() {
 		return normalitzat;

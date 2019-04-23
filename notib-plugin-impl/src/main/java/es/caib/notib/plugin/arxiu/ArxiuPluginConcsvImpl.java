@@ -2,13 +2,7 @@ package es.caib.notib.plugin.arxiu;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.io.IOUtils;
 
@@ -34,8 +28,8 @@ public class ArxiuPluginConcsvImpl implements IArxiuPlugin {
 	public static final String ARXIU_BASE_PROPERTY = "es.caib.notib.plugin.arxiu.";
 
 	private static final String ARXIUCAIB_BASE_PROPERTY = ARXIU_BASE_PROPERTY + "caib.";
-	private static final int NUM_PAGINES_RESULTAT_CERCA = 100;
-	private static final String VERSIO_INICIAL_CONTINGUT = "1.0";
+//	private static final int NUM_PAGINES_RESULTAT_CERCA = 100;
+//	private static final String VERSIO_INICIAL_CONTINGUT = "1.0";
 	private static final String JERSEY_TIMEOUT_CONNECT = "10000";
 	private static final String JERSEY_TIMEOUT_READ = "60000";
 	private Client versioImprimibleClient;
@@ -206,11 +200,11 @@ public class ArxiuPluginConcsvImpl implements IArxiuPlugin {
 		return Integer.parseInt(timeout);
 	}
 
-	private XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
-		GregorianCalendar c = new GregorianCalendar();
-		c.setTime(date);
-		return DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
-	}
+//	private XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
+//		GregorianCalendar c = new GregorianCalendar();
+//		c.setTime(date);
+//		return DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+//	}
 
 	@Override
 	public ContingutArxiu carpetaCopiar(String arg0, String arg1) throws ArxiuException {

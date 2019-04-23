@@ -41,7 +41,7 @@ public class NotificacioV2 {
 	//private String registreLlibre;
 	//private String registreNumero;
 	//private Date registreData;
-	//private String extracte;
+	private String extracte;
 	private RegistreDocumentacioFisicaEnumDto docFisica;
 	//private String tipusAssumpte;
 	private IdiomaEnumDto idioma;
@@ -162,9 +162,14 @@ public class NotificacioV2 {
 	public RegistreDocumentacioFisicaEnumDto getDocFisica() {
 		return docFisica;
 	}
-	
 	public void setDocFisica(RegistreDocumentacioFisicaEnumDto docFisica) {
 		this.docFisica = docFisica;
+	}
+	public String getExtracte() {
+		return extracte;
+	}
+	public void setExtracte(String extracte) {
+		this.extracte = extracte;
 	}
 	@Override
 	public String toString() {

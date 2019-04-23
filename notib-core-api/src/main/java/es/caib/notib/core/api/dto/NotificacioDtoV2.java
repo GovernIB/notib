@@ -24,6 +24,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private String descripcio;
 	private Date enviamentDataProgramada;
 	private Integer retard;
+	protected int notificaEnviamentIntent;
 	private Date caducitat;
 	private DocumentDto document;
 	private String csv_uuid;
@@ -274,6 +275,12 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	}
 	public void setOrgan(String organ) {
 		this.organ = organ;
+	}
+	public int getNotificaEnviamentIntent() {
+		return notificaEnviamentIntent;
+	}
+	public void setNotificaEnviamentIntent(int notificaEnviamentIntent) {
+		this.notificaEnviamentIntent = notificaEnviamentIntent;
 	}
 	@Override
 	public String toString() {

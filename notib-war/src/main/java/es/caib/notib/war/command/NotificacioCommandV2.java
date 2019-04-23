@@ -14,7 +14,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
 
-import es.caib.notib.core.api.dto.EnviamentDto;
+import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
@@ -289,7 +289,22 @@ public class NotificacioCommandV2 {
 		dto.setGrup(grupDto);
 		
 		
-		
+
+		DocumentDto document = new DocumentDto();
+		document.setArxiuGestdocId(dto.getDocument().getArxiuGestdocId());
+		document.setArxiuNom(dto.getDocument().getArxiuNom());
+		document.setContingutBase64(dto.getDocument().getContingutBase64());
+		document.setCsv(dto.getDocument().getCsv());
+		document.setHash(dto.getDocument().getHash());
+		document.setId(dto.getDocument().getId());
+		document.setUuid(dto.getDocument().getUuid());
+		document.setUrl(dto.getDocument().getUrl());
+		document.setNormalitzat(dto.getDocument().isNormalitzat());
+		document.setGenerarCsv(dto.getDocument().isGenerarCsv());
+		for (int i = 0; i < command.getDocument().getMetadadesKeys().size(); i++) {
+			document.getMetadades().put(command.getDocument().getMetadadesKeys().get(i), command.getDocument().getMetadadesValues().get(i));
+		}
+		dto.setDocument(document);
 		return dto;
 	}
 

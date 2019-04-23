@@ -14,8 +14,9 @@ import javax.xml.ws.BindingProvider;
 import org.apache.commons.io.IOUtils;
 
 import es.caib.notib.plugin.utils.PropertiesHelper;
+import es.caib.regweb3.ws.api.v3.RegWebAsientoRegistralWs;
+import es.caib.regweb3.ws.api.v3.RegWebAsientoRegistralWsService;
 //import org.fundaciobit.genapp.common.utils.Utils;
-import es.caib.regweb3.utils.RegwebConstantes;
 import es.caib.regweb3.ws.api.v3.RegWebHelloWorldWithSecurityWs;
 import es.caib.regweb3.ws.api.v3.RegWebHelloWorldWithSecurityWsService;
 import es.caib.regweb3.ws.api.v3.RegWebHelloWorldWs;
@@ -26,17 +27,16 @@ import es.caib.regweb3.ws.api.v3.RegWebPersonasWs;
 import es.caib.regweb3.ws.api.v3.RegWebPersonasWsService;
 import es.caib.regweb3.ws.api.v3.RegWebRegistroEntradaWs;
 import es.caib.regweb3.ws.api.v3.RegWebRegistroEntradaWsService;
-import es.caib.regweb3.ws.v3.impl.AsientoRegistralWs;
-import es.caib.regweb3.ws.v3.impl.AsientoRegistralWsService;
-import es.caib.regweb3.ws.v3.impl.RegWebRegistroSalidaWs;
-import es.caib.regweb3.ws.v3.impl.RegWebRegistroSalidaWsService;
-
+import es.caib.regweb3.ws.api.v3.RegWebRegistroSalidaWs;
+import es.caib.regweb3.ws.api.v3.RegWebRegistroSalidaWsService;
+//import es.caib.regweb3.ws.v3.impl.RegWebAsientoRegistralWs;
+//import es.caib.regweb3.ws.v3.impl.RegWebAsientoRegistralWsService;
 /**
  * 
  * @author anadal
  * 
  */
-public abstract class RegWeb3Utils implements RegwebConstantes {
+public abstract class RegWeb3Utils {
 
 	public static final String HELLO_WORLD = "RegWebHelloWorld";
 	public static final String HELLO_WORLD_WITH_SECURITY = "RegWebHelloWorldWithSecurity";
@@ -45,7 +45,7 @@ public abstract class RegWeb3Utils implements RegwebConstantes {
 	public static final String REGWEB3_REGISTRO_ENTRADA = "RegWebRegistroEntrada";
 	public static final String REGWEB3_REGISTRO_SALIDA = "RegWebRegistroSalida";
 	public static final String REGWEB3_INFO = "RegWebInfo";
-	public static final String REGWEB3_ASIENTO_REGISTRAL = "AsientoRegistral";
+	public static final String REGWEB3_ASIENTO_REGISTRAL = "RegWebAsientoRegistral";
 	
 
 
@@ -147,13 +147,13 @@ public abstract class RegWeb3Utils implements RegwebConstantes {
 		return api;
 	}
 	
-	public static AsientoRegistralWs getAsientoRegistralApi() throws Exception {
+	public static RegWebAsientoRegistralWs getAsientoRegistralApi() throws Exception {
 		
 		final String endpoint = getEndPoint(REGWEB3_ASIENTO_REGISTRAL);
 		final URL wsdl = new URL(endpoint + "?wsdl");
 		
-		AsientoRegistralWsService service = new AsientoRegistralWsService(wsdl);
-		AsientoRegistralWs api = service.getAsientoRegistralWs();
+		RegWebAsientoRegistralWsService service = new RegWebAsientoRegistralWsService(wsdl);
+		RegWebAsientoRegistralWs api = service.getRegWebAsientoRegistralWs();
 
 		configAddressUserPassword(getAppUserName(), getAppPassword(), endpoint, api);
 

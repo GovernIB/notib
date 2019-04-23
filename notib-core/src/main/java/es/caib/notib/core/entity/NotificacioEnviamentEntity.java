@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -21,6 +22,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -32,11 +34,9 @@ import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.Notificacio;
@@ -295,7 +295,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "notifica_error_event_id")
 	@ForeignKey(name = "not_noteve_noterr_notdest_fk")
-	protected NotificacioEventEntity notificaErrorEvent;
+	protected NotificacioEventEntity notificacioErrorEvent;
 	
 	@Column(name = "notifica_intent_data")
 	@Temporal(TemporalType.TIMESTAMP)
@@ -303,17 +303,37 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "intent_num")
 	protected int intentNum;
 
-	@Column(name = "com_tipus", table = "not_notificacio")
-	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
+	@Column(name="registre_numero_formatat", length = 50)
+	private String registreNumeroFormatat;
+
+	@Column(name="registre_data")
+	private Date registreData;
+	
+	@Column(name="estat_registre")
+	private NotificacioRegistreEstatEnumDto registreEstat;
 	
 	@Transient
 	private String csvUuid;
 
-	public NotificacioComunicacioTipusEnumDto getComunicacioTipus() {
-		return comunicacioTipus;
+	
+	public NotificacioRegistreEstatEnumDto getRegistreEstat() {
+		return registreEstat;
 	}
-	public void setComunicacioTipus(NotificacioComunicacioTipusEnumDto comunicacioTipus) {
-		this.comunicacioTipus = comunicacioTipus;
+
+	public void setRegistreEstat(NotificacioRegistreEstatEnumDto registreEstat) {
+		this.registreEstat = registreEstat;
+	}
+	public NotificacioEventEntity getNotificacioErrorEvent() {
+		return notificacioErrorEvent;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	public Date getRegistreData() {
+		return registreData;
+	}
+	public void setRegistreData(Date registreData) {
+		this.registreData = registreData;
 	}
 	public String getCsvUuid() {
 		return csvUuid;
@@ -529,7 +549,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		return notificaError;
 	}
 	public NotificacioEventEntity getNotificaErrorEvent() {
-		return notificaErrorEvent;
+		return notificacioErrorEvent;
 	}
 	public Date getNotificaIntentData() {
 		return notificaIntentData;
@@ -554,13 +574,19 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public void setDehObligat(Boolean dehObligat) {
 		this.dehObligat = dehObligat;
 	}
+	public String getRegistreNumeroFormatat() {
+		return registreNumeroFormatat;
+	}
+	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
+		this.registreNumeroFormatat = registreNumeroFormatat;
+	}
 	public void updateNotificaEnviada(
 			String notificaIdentificador) {
 		this.notificaIdentificador = notificaIdentificador;
 		this.notificaEstatData = new Date();
 		this.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_ENVIADA;
 		this.notificaError = false;
-		this.notificaErrorEvent = null;
+		this.notificacioErrorEvent = null;
 		this.notificaIntentData = new Date();
 		this.notificaEstatDataActualitzacio = new Date();
 	}
@@ -633,7 +659,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			boolean notificaError,
 			NotificacioEventEntity notificaErrorEvent) {
 		this.notificaError = notificaError;
-		this.notificaErrorEvent = notificaErrorEvent;
+		this.notificacioErrorEvent = notificaErrorEvent;
 	}
 	/*
 	public void updateSeuEnviament(
@@ -1075,7 +1101,6 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built.domiciliTipus = NotificaDomiciliTipusEnumDto.CONCRETO;
 			built.domiciliNumeracioTipus = numeracioTipus;
 			built.domiciliConcretTipus = tipusConcret;
-
 			if(enviament.getEntregaPostal() != null) {
 				built.domiciliViaNom = enviament.getEntregaPostal().getViaNom();
 				built.domiciliNumeracioNumero = enviament.getEntregaPostal().getNumeroCasa();

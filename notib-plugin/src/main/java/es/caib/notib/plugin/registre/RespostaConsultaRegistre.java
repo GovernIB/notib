@@ -2,6 +2,8 @@ package es.caib.notib.plugin.registre;
 
 import java.util.Date;
 
+import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
+
 /**
  * Resposta a una consulta de registre d'entrada
  * 
@@ -16,6 +18,8 @@ public class RespostaConsultaRegistre extends RespostaBase {
 	private String entitatCodi;
 	private String entitatDenominacio;
 	private String registreNumeroFormatat;
+	private String codiLlibre;
+	private NotificacioRegistreEstatEnumDto estat;
 	
 	public String getRegistreNumero() {
 		return registreNumero;
@@ -59,5 +63,16 @@ public class RespostaConsultaRegistre extends RespostaBase {
 	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
 		this.registreNumeroFormatat = registreNumeroFormatat;
 	}
-
+	public NotificacioRegistreEstatEnumDto getEstat() {
+		return estat;
+	}
+	public void setEstat(NotificacioRegistreEstatEnumDto estat) {
+		this.estat = estat;
+	}
+	public String getCodiLlibre() {
+		return codiLlibre;
+	}
+	public void setCodiLlibre(String codiLlibre) {
+		this.codiLlibre = codiLlibre;
+	}
 }

@@ -22,14 +22,11 @@
 <c:set var="campLabelText"><spring:message code="${textKey}"/></c:set>
 <c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
 <c:set var="campInputSize">${12 - campLabelSize}</c:set>
+<c:set var="placeHolderClau"><spring:message code="notificacio.document.clau"/></c:set>
+<c:set var="placeHolderValor"><spring:message code="notificacio.document.valor"/></c:set>
 
 
 <div class="form-group">
 <label class="control-label col-xs-${campLabelSize}">${campLabelText}</label>
-	<div class="col-xs-${campInputSize} ">
-		<div class="input-group input-add">
-			<form:input value="${campValue}" path="" cssClass="form-control ${campPath}" disabled="false" readonly="${myReadonly}"/>
-			<span class="input-group-addon" id="${campIdIcon}"><span class="fa fa-plus"></span></span>
-		</div>		
-	</div>
+	<form:input value="${campValue}" path="" placeholder="${placeHolderClau}" cssClass="form-control" disabled="false" readonly="${myReadonly}"/>		
 </div>

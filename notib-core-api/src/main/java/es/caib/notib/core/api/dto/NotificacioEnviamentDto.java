@@ -46,7 +46,16 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	private NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus;
 	private String notificaCertificacioNumSeguiment;
 	
+	private Date registreData;
+	private String registreNumeroFormatat;
+	private NotificacioRegistreEstatEnumDto registreEstat;
 	
+	public NotificacioRegistreEstatEnumDto getRegistreEstat() {
+		return registreEstat;
+	}
+	public void setRegistreEstat(NotificacioRegistreEstatEnumDto registreEstat) {
+		this.registreEstat = registreEstat;
+	}
 	public Long getId() {
 		return id;
 	}
@@ -226,6 +235,18 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	}
 	public void setNotificaCertificacioNumSeguiment(String notificaCertificacioNumSeguiment) {
 		this.notificaCertificacioNumSeguiment = notificaCertificacioNumSeguiment;
+	}
+	public Date getRegistreData() {
+		return registreData;
+	}
+	public void setRegistreData(Date registreData) {
+		this.registreData = registreData;
+	}
+	public String getRegistreNumeroFormatat() {
+		return registreNumeroFormatat;
+	}
+	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
+		this.registreNumeroFormatat = registreNumeroFormatat;
 	}
 	public String getTitularLlinatges() {
 		return concatenarLlinatges(
