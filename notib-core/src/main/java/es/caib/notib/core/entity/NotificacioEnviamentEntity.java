@@ -303,121 +303,23 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "intent_num")
 	protected int intentNum;
 
-
-	
-	@Column(name="proc_codi_notib", table = "not_notificacio")
-	protected String procedimentCodiNotib;
-	@Column(name="env_data_prog", table = "not_notificacio")
-	private Date enviamentDataProgramada;
-	@Column(name="grup_codi", table = "not_notificacio")
-	private String grupCodi;
-	@Column(name="emisor_dir3codi", table = "not_notificacio")
-	private String emisorDir3Codi;
-	@Column(name="usuari_codi", table = "not_notificacio")
-	private String usuariCodi;
-	@Column(name="env_tipus", table = "not_notificacio")
-	private NotificaEnviamentTipusEnumDto enviamentTipus;
-	@Column(name="concepte", table = "not_notificacio")
-	private String concepte;
-	@Column(name="descripcio", table = "not_notificacio")
-	private String descripcio;
-	@Column(name="registre_llibre", table = "not_notificacio")
-	private String llibre;
-	@Column(name="registre_numero", table = "not_notificacio")
-	private Integer registreNumero;
-	@Column(name="registre_data", table = "not_notificacio")
-	private Date registreData;
-	@Column(name="estat", table = "not_notificacio")
-	private NotificacioEstatEnumDto estat;
 	@Column(name = "com_tipus", table = "not_notificacio")
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	
 	@Transient
 	private String csvUuid;
-	
-	public String getProcedimentCodiNotib() {
-		return procedimentCodiNotib;
+
+	public NotificacioComunicacioTipusEnumDto getComunicacioTipus() {
+		return comunicacioTipus;
 	}
-	public void setProcedimentCodiNotib(String procedimentCodiNotib) {
-		this.procedimentCodiNotib = procedimentCodiNotib;
-	}
-	public Date getEnviamentDataProgramada() {
-		return enviamentDataProgramada;
-	}
-	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
-		this.enviamentDataProgramada = enviamentDataProgramada;
-	}
-	public String getGrupCodi() {
-		return grupCodi;
-	}
-	public void setGrupCodi(String grupCodi) {
-		this.grupCodi = grupCodi;
-	}
-	public String getEmisorDir3Codi() {
-		return emisorDir3Codi;
-	}
-	public void setEmisorDir3Codi(String emisorDir3Codi) {
-		this.emisorDir3Codi = emisorDir3Codi;
-	}
-	public String getUsuariCodi() {
-		return usuariCodi;
-	}
-	public void setUsuariCodi(String usuariCodi) {
-		this.usuariCodi = usuariCodi;
-	}
-	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
-		return enviamentTipus;
-	}
-	public void setEnviamentTipus(NotificaEnviamentTipusEnumDto enviamentTipus) {
-		this.enviamentTipus = enviamentTipus;
-	}
-	public String getConcepte() {
-		return concepte;
-	}
-	public void setConcepte(String concepte) {
-		this.concepte = concepte;
-	}
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
-	}
-	public String getLlibre() {
-		return llibre;
-	}
-	public void setLlibre(String llibre) {
-		this.llibre = llibre;
-	}
-	public Integer getRegistreNumero() {
-		return registreNumero;
-	}
-	public void setRegistreNumero(Integer registreNumero) {
-		this.registreNumero = registreNumero;
-	}
-	public Date getRegistreData() {
-		return registreData;
-	}
-	public void setRegistreData(Date registreData) {
-		this.registreData = registreData;
-	}
-	public NotificacioEstatEnumDto getEstat() {
-		return estat;
-	}
-	public void setEstat(NotificacioEstatEnumDto estat) {
-		this.estat = estat;
+	public void setComunicacioTipus(NotificacioComunicacioTipusEnumDto comunicacioTipus) {
+		this.comunicacioTipus = comunicacioTipus;
 	}
 	public String getCsvUuid() {
 		return csvUuid;
 	}
 	public void setCsvUuid(String csvUuid) {
 		this.csvUuid = csvUuid;
-	}
-	public NotificacioComunicacioTipusEnumDto getComunicacioTipus() {
-		return comunicacioTipus;
-	}
-	public void setComunicacioTipus(NotificacioComunicacioTipusEnumDto comunicacioTipus) {
-		this.comunicacioTipus = comunicacioTipus;
 	}
 	public NotificaDomiciliTipusEnumDto getDomiciliTipus() {
 		return domiciliTipus;
