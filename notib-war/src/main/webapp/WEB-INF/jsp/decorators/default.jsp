@@ -84,7 +84,7 @@ body {
 				</button--%>
 				<div class="navbar-brand">
 					<div id="govern-logo" class="pull-left">
-						<img src="<c:url value="/img/Logo_APB_notib.png"/>" alt="Govern de les Illes Balears" height="80px"/>
+						<img src="<c:url value="/img/govern-logo.png"/>" alt="Govern de les Illes Balears" height="80px"/>
 					</div>
 					<div id="app-logo" class="pull-left">
 						<img src="<c:url value="/img/logo.png"/>" alt="NOTIB" />
