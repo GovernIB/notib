@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.PagadorCieDto;
-import es.caib.notib.core.api.dto.PagadorPostalDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.entity.ProcedimentEntity;
@@ -34,8 +29,6 @@ public class ProcedimentHelper {
 	
 	@Autowired
 	private PluginHelper pluginHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private PermisosHelper permisosHelper;
 	

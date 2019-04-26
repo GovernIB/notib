@@ -5,8 +5,11 @@ import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.audit.NotibAuditable;
 
@@ -17,6 +20,7 @@ import es.caib.notib.core.audit.NotibAuditable;
  */
 @Entity
 @Table(name = "not_document")
+@EntityListeners(AuditingEntityListener.class)
 public class DocumentEntity  extends NotibAuditable<Long> {
 
 	private static final long serialVersionUID = 1L;

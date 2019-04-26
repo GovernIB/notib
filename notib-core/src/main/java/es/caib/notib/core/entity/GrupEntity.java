@@ -2,12 +2,14 @@ package es.caib.notib.core.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.audit.NotibAuditable;
 
@@ -18,6 +20,7 @@ import es.caib.notib.core.audit.NotibAuditable;
  */
 @Entity
 @Table(name = "not_grup")
+@EntityListeners(AuditingEntityListener.class)
 public class GrupEntity extends NotibAuditable<Long> {
 
 	@Column(name = "codi", length = 64, nullable = false)

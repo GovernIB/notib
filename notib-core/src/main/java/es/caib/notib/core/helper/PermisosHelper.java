@@ -36,9 +36,7 @@ import org.springframework.stereotype.Component;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
-import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 

@@ -297,7 +297,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 		}
 		notificacioRepository.saveAndFlush(notificacioGuardada);
 		/*Mirar que tots els enviaments siguin amb titular del mateix tipus.*/
-		Boolean esAdministracio = false;
+//		Boolean esAdministracio = false;
 		for(NotificacioEnviamentEntity enviament: notificacioGuardada.getEnviaments()) {
 			enviament.getTitular();
 		}

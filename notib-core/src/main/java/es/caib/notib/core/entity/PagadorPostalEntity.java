@@ -4,9 +4,12 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.audit.NotibAuditable;
 
@@ -17,6 +20,7 @@ import es.caib.notib.core.audit.NotibAuditable;
  */
 @Entity
 @Table(name = "not_pagador_postal")
+@EntityListeners(AuditingEntityListener.class)
 public class PagadorPostalEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "dir3_codi", length = 9)

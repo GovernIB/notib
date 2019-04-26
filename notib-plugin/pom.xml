@@ -33,6 +33,18 @@
 			</exclusions>
 		</dependency>
 	</dependencies>
+	<profiles>
+		<profile>
+			<id>apb</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.fundaciobit.plugins</groupId>
+					<artifactId>plugin-arxiu-apb</artifactId>
+					<version>1.0.0</version>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 	<repositories>
 		<repository>
 			<id>github-governib-maven-repos</id>

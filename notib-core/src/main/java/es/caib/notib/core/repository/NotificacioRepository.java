@@ -18,7 +18,6 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.UsuariEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -29,8 +28,6 @@ import es.caib.notib.core.entity.UsuariEntity;
 public interface NotificacioRepository extends JpaRepository<NotificacioEntity, Long> {
 
 	NotificacioEntity findById(Long id);
-	
-	List<NotificacioEntity> findByCreatedBy(UsuariEntity usuari);
 	
 	@Query(
 			"from " +

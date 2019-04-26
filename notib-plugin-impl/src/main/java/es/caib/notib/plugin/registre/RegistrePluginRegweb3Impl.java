@@ -27,6 +27,7 @@ import es.caib.regweb3.ws.api.v3.IdentificadorWs;
 import es.caib.regweb3.ws.api.v3.InteresadoWs;
 import es.caib.regweb3.ws.api.v3.JustificanteWs;
 import es.caib.regweb3.ws.api.v3.OficioWs;
+import es.caib.regweb3.ws.api.v3.RegistroSalidaWs;
 import es.caib.regweb3.ws.api.v3.TipoAsuntoWs;
 //import es.caib.regweb3.ws.v3.impl.AnexoWs;
 //import es.caib.regweb3.ws.v3.impl.AsientoRegistralWs;
@@ -57,12 +58,11 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			String aplicacion) throws RegistrePluginException {
 		RespostaAnotacioRegistre resposta = new RespostaAnotacioRegistre();
 		try {
-			return null;
-//			resposta = toRespostaAnotacioRegistre(getRegistroSalidaApi().altaRegistroSalida(
-//							toRegistroSalidaWs(
-//									registreSortida,
-//									aplicacion)));
-//					
+			resposta = toRespostaAnotacioRegistre(getRegistroSalidaApi().altaRegistroSalida(
+					toRegistroSalidaWs(
+									registreSortida,
+									aplicacion)));
+					
 		} catch (Exception ex) {
 			resposta.setErrorDescripcio(ex.getMessage());
 			resposta.setData(new Date());
@@ -147,61 +147,61 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		return rj;
 	}
 
-//	private RegistroSalidaWs toRegistroSalidaWs(
-//			RegistreSortida registreSortida,
-//			String aplicacion) throws RegistrePluginException {
-//		RegistroSalidaWs rsw = new RegistroSalidaWs();
-//		es.caib.regweb3.ws.api.v3.DatosInteresadoWs datosInteresado = new es.caib.regweb3.ws.api.v3.DatosInteresadoWs();
-//		es.caib.regweb3.ws.api.v3.InteresadoWs interesado = new es.caib.regweb3.ws.api.v3.InteresadoWs();
-//		es.caib.regweb3.ws.api.v3.AnexoWs anexo = null;
-//		try {
-//			rsw.setCodigoUsuario(registreSortida.getDadesAnotacio().getCodiUsuari());
-//			rsw.setAplicacion(aplicacion);
-//			rsw.setTipoAsunto(registreSortida.getDadesAnotacio().getTipusAssumpte());
-//			rsw.setCodigoAsunto(registreSortida.getDadesAnotacio().getCodiAssumpte());
-//			rsw.setDocFisica(registreSortida.getDadesAnotacio().getDocfisica());
-//			rsw.setExpone(null);
-//			rsw.setSolicita(null);
-//			rsw.setExtracto(registreSortida.getDadesAnotacio().getExtracte());
-//			rsw.setFecha(new Timestamp((new Date()).getTime()));
-//			rsw.setIdioma(registreSortida.getDadesAnotacio().getIdiomaCodi().toLowerCase());
-//			rsw.setLibro(registreSortida.getDadesOficina().getLlibre());
-//			rsw.setNumExpediente(registreSortida.getDadesAnotacio().getNumExpedient());
-//			rsw.setObservaciones(registreSortida.getDadesAnotacio().getObservacions());
-//			rsw.setOficina(registreSortida.getDadesOficina().getOficina());
-//			rsw.setOrigen(registreSortida.getDadesOficina().getOrgan());
-//			rsw.setRefExterna(registreSortida.getDadesAnotacio().getRefExterna());
-//			
-//			if (registreSortida.getDocuments() != null) {
-//				for (DocumentRegistre document : registreSortida.getDocuments()) {
-//					anexo = new es.caib.regweb3.ws.api.v3.AnexoWs();
-//					anexo.setTitulo(document.getArxiuNom());
-//					anexo.setFicheroAnexado(document.getArxiuContingut());
-//					anexo.setModoFirma(document.getModeFirma());
-//					anexo.setNombreFicheroAnexado(document.getArxiuNom());
-//					anexo.setTipoDocumento("0" + 2L); //Documento adjunto
-//					anexo.setValidezDocumento("0" + 1L); //Copia
-//					anexo.setOrigenCiudadanoAdmin(1); //Administaración
-//					anexo.setTipoDocumental("TD01");
-//				}
-//			}
-//			if (anexo != null) {
-//				rsw.getAnexos().add(anexo);
-//			}
-//			datosInteresado.setApellido1(registreSortida.getDadesInteressat().getCognom1());
-//			datosInteresado.setApellido2(registreSortida.getDadesInteressat().getCognom2());
-//			datosInteresado.setDocumento(registreSortida.getDadesInteressat().getNif());
-//			datosInteresado.setNombre(registreSortida.getDadesInteressat().getNom());
-//			datosInteresado.setTipoInteresado(registreSortida.getDadesInteressat().getTipusInteressat());
-//			interesado.setInteresado(datosInteresado);
-//			
-//			rsw.getInteresados().add(interesado);
-//		} catch (Exception ex) {
-//			logger.error("Error a l'hora de fer la conversió a registroSalidaWs", ex);
-//			throw new RegistrePluginException("Error conversió a registroSalidaWs", ex);
-//		}
-//		return rsw;
-//	}
+	private RegistroSalidaWs toRegistroSalidaWs(
+			RegistreSortida registreSortida,
+			String aplicacion) throws RegistrePluginException {
+		RegistroSalidaWs rsw = new RegistroSalidaWs();
+		es.caib.regweb3.ws.api.v3.DatosInteresadoWs datosInteresado = new es.caib.regweb3.ws.api.v3.DatosInteresadoWs();
+		es.caib.regweb3.ws.api.v3.InteresadoWs interesado = new es.caib.regweb3.ws.api.v3.InteresadoWs();
+		es.caib.regweb3.ws.api.v3.AnexoWs anexo = null;
+		try {
+			rsw.setCodigoUsuario(registreSortida.getDadesAnotacio().getCodiUsuari());
+			rsw.setAplicacion(aplicacion);
+			rsw.setTipoAsunto(registreSortida.getDadesAnotacio().getTipusAssumpte());
+			rsw.setCodigoAsunto(registreSortida.getDadesAnotacio().getCodiAssumpte());
+			rsw.setDocFisica(registreSortida.getDadesAnotacio().getDocfisica());
+			rsw.setExpone(null);
+			rsw.setSolicita(null);
+			rsw.setExtracto(registreSortida.getDadesAnotacio().getExtracte());
+			rsw.setFecha(new Timestamp((new Date()).getTime()));
+			rsw.setIdioma(registreSortida.getDadesAnotacio().getIdiomaCodi().toLowerCase());
+			rsw.setLibro(registreSortida.getDadesOficina().getLlibre());
+			rsw.setNumExpediente(registreSortida.getDadesAnotacio().getNumExpedient());
+			rsw.setObservaciones(registreSortida.getDadesAnotacio().getObservacions());
+			rsw.setOficina(registreSortida.getDadesOficina().getOficina());
+			rsw.setOrigen(registreSortida.getDadesOficina().getOrgan());
+			rsw.setRefExterna(registreSortida.getDadesAnotacio().getRefExterna());
+			
+			if (registreSortida.getDocuments() != null) {
+				for (DocumentRegistre document : registreSortida.getDocuments()) {
+					anexo = new es.caib.regweb3.ws.api.v3.AnexoWs();
+					anexo.setTitulo(document.getArxiuNom());
+					anexo.setFicheroAnexado(document.getArxiuContingut());
+					anexo.setModoFirma(document.getModeFirma());
+					anexo.setNombreFicheroAnexado(document.getArxiuNom());
+					anexo.setTipoDocumento("0" + 2L); //Documento adjunto
+					anexo.setValidezDocumento("0" + 1L); //Copia
+					anexo.setOrigenCiudadanoAdmin(1); //Administaración
+					anexo.setTipoDocumental("TD01");
+				}
+			}
+			if (anexo != null) {
+				rsw.getAnexos().add(anexo);
+			}
+			datosInteresado.setApellido1(registreSortida.getDadesInteressat().getCognom1());
+			datosInteresado.setApellido2(registreSortida.getDadesInteressat().getCognom2());
+			datosInteresado.setDocumento(registreSortida.getDadesInteressat().getNif());
+			datosInteresado.setNombre(registreSortida.getDadesInteressat().getNom());
+			datosInteresado.setTipoInteresado(registreSortida.getDadesInteressat().getTipusInteressat());
+			interesado.setInteresado(datosInteresado);
+			
+			rsw.getInteresados().add(interesado);
+		} catch (Exception ex) {
+			logger.error("Error a l'hora de fer la conversió a registroSalidaWs", ex);
+			throw new RegistrePluginException("Error conversió a registroSalidaWs", ex);
+		}
+		return rsw;
+	}
 	
 	public AsientoRegistralWs toAsientoRegistralBean(AsientoRegistralBeanDto dto) {
 		AsientoRegistralWs ar = new AsientoRegistralWs();

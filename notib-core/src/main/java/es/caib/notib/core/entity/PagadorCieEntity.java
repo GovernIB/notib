@@ -20,6 +20,7 @@ import es.caib.notib.core.audit.NotibAuditable;
  */
 @Entity
 @Table(name = "not_pagador_cie")
+@EntityListeners(AuditingEntityListener.class)
 public class PagadorCieEntity extends NotibAuditable<Long> {
 
 	@Column(name = "dir3_codi", length = 9)

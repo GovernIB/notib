@@ -19,8 +19,6 @@ import es.caib.notib.core.entity.ProcedimentEntity;
  */
 public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, Long> {
 
-
-	
 	@Query(
 			"from " + 
 			"	ProcedimentEntity pro " +

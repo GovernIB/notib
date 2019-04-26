@@ -3,8 +3,6 @@
  */
 package es.caib.notib.core.helper;
 
-import java.net.MalformedURLException;
-import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -13,10 +11,6 @@ import java.util.TreeSet;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import javax.ejb.CreateException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MalformedObjectNameException;
-import javax.naming.NamingException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -41,7 +35,6 @@ import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.wsdl.seu.SedeWsPortType;
 
 /**
  * Mètodes comuns per a accedir a Notific@.
@@ -283,12 +276,12 @@ public abstract class AbstractNotificaHelper {
 			String notificaDatatErrorDescripcio,
 			NotificacioEnviamentEntity enviament) {
 		boolean estatFinal = 
-//				NotificacioEnviamentEstatEnumDto.ABSENT.equals(notificaEstat) ||
-//				NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA.equals(notificaEstat) ||
-//				NotificacioEnviamentEstatEnumDto.ERROR_ENTREGA.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.ABSENT.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.ERROR_ENTREGA.equals(notificaEstat) ||
 				NotificacioEnviamentEstatEnumDto.EXPIRADA.equals(notificaEstat) ||
-//				NotificacioEnviamentEstatEnumDto.EXTRAVIADA.equals(notificaEstat) ||
-//				NotificacioEnviamentEstatEnumDto.MORT.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.EXTRAVIADA.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.MORT.equals(notificaEstat) ||
 				NotificacioEnviamentEstatEnumDto.LLEGIDA.equals(notificaEstat) ||
 				NotificacioEnviamentEstatEnumDto.NOTIFICADA.equals(notificaEstat) ||
 				NotificacioEnviamentEstatEnumDto.REBUTJADA.equals(notificaEstat);
@@ -574,20 +567,20 @@ public abstract class AbstractNotificaHelper {
 		}
 	}*/
 
-	private SedeWsPortType getSedeWs() throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
-		SedeWsPortType port = new WsClientHelper<SedeWsPortType>().generarClientWs(
-				getClass().getResource("/es/caib/notib/core/wsdl/SedeWs.wsdl"),
-				getSedeUrlProperty(),
-				new QName(
-						"https://administracionelectronica.gob.es/notifica/ws/notifica/1.0/",
-						"SedeWsService"),
-				getUsernameProperty(),
-				getPasswordProperty(),
-				SedeWsPortType.class,
-				new ApiKeySOAPHandler(getApiKeyProperty()),
-				new WsClientHelper.SOAPLoggingHandler(AbstractNotificaHelper.class));
-		return port;
-	}
+//	private SedeWsPortType getSedeWs() throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
+//		SedeWsPortType port = new WsClientHelper<SedeWsPortType>().generarClientWs(
+//				getClass().getResource("/es/caib/notib/core/wsdl/SedeWs.wsdl"),
+//				getSedeUrlProperty(),
+//				new QName(
+//						"https://administracionelectronica.gob.es/notifica/ws/notifica/1.0/",
+//						"SedeWsService"),
+//				getUsernameProperty(),
+//				getPasswordProperty(),
+//				SedeWsPortType.class,
+//				new ApiKeySOAPHandler(getApiKeyProperty()),
+//				new WsClientHelper.SOAPLoggingHandler(AbstractNotificaHelper.class));
+//		return port;
+//	}
 
 	protected String getNotificaUrlProperty() {
 		return PropertiesHelper.getProperties().getProperty(

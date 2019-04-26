@@ -243,7 +243,7 @@ public class NotificacioController extends BaseUserController {
 				null, 
 				isAdministrador(request), 
 				notificacioCommand.getProcedimentId());
-		
+		notificacioCommand.setUsuariCodi(aplicacioService.getUsuariActual().getCodi());
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("comunicacioTipus", 
 					EnumHelper.getOptionsForEnum(

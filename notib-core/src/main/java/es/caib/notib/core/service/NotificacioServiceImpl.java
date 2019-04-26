@@ -53,9 +53,7 @@ import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
-import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
@@ -121,8 +119,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private PersonaRepository personaRepository;
 	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
 	private ProcedimentRepository procedimentRepository;
 	@Autowired
 	private EmailHelper emailHelper;
@@ -133,7 +129,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			Long entitatId, 
 			NotificacioDtoV2 notificacio) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		String documentGesdocId = null;
 		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
 					null,
@@ -192,7 +187,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						notificacio.getRefExterna(),
 						notificacio.getCodiAssumpte(),
 						notificacio.getObservacions()
-						).document(documentEntity).usuariCodi(propertiesHelper.getProperty("es.caib.notib.plugin.registre.codi.usuari"));
+						).document(documentEntity);
 
 		NotificacioEntity notificacioEntity = notificacioBuilder.build();
 		notificacioEntity = notificacioRepository.saveAndFlush(notificacioEntity);

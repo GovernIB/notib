@@ -51,6 +51,7 @@ public class NotificacioCommandV2 {
 	private Long procedimentId;
 	private String procedimentNom;
 	private Long grupId;
+	private String usuariCodi;
 	private TipusDocumentEnumDto tipusDocument;
 	private String documentArxiuUuidCsvUrl;
 	private MultipartFile arxiu;
@@ -160,6 +161,12 @@ public class NotificacioCommandV2 {
 	}
 	public void setGrupId(Long grupId) {
 		this.grupId = grupId;
+	}
+	public String getUsuariCodi() {
+		return usuariCodi;
+	}
+	public void setUsuariCodi(String usuariCodi) {
+		this.usuariCodi = usuariCodi;
 	}
 	public ServeiTipusEnumDto getServeiTipus() {
 		return serveiTipus;

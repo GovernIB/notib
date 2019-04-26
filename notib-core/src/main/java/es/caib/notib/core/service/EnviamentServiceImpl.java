@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Resource;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
