@@ -19,6 +19,7 @@ public class EntitatDto extends AuditoriaDto {
 	private String nom;
 	private EntitatTipusEnumDto tipus;
 	private String dir3Codi;
+	private String apiKey;
 	private String descripcio;
 	private boolean activa;
 
@@ -56,6 +57,12 @@ public class EntitatDto extends AuditoriaDto {
 	}
 	public void setDir3Codi(String dir3Codi) {
 		this.dir3Codi = dir3Codi;
+	}
+	public String getApiKey() {
+		return apiKey;
+	}
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
 	}
 	public String getDescripcio() {
 		return descripcio;

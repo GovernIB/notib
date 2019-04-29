@@ -189,7 +189,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			if (enviament.getNotificaIdentificador() != null) {
 				InfoEnvioV2 infoEnvio = new InfoEnvioV2();
 				infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
-				ResultadoInfoEnvioV2 resultadoInfoEnvio = getNotificaWs().infoEnvioV2(infoEnvio);
+				String apiKey = enviament.getNotificacio().getEntitat().getApiKey();
+				ResultadoInfoEnvioV2 resultadoInfoEnvio = getNotificaWs(apiKey).infoEnvioV2(infoEnvio);
 				Datado datatDarrer = null;
 				if (resultadoInfoEnvio.getDatados() != null) {
 					for (Datado datado: resultadoInfoEnvio.getDatados().getDatado()) {
@@ -335,7 +336,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		try {
 			InfoEnvioV2 infoEnvio = new InfoEnvioV2();
 			infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
-			return getNotificaWs().infoEnvioV2(infoEnvio);
+			String apiKey = enviament.getNotificacio().getEntitat().getApiKey();
+			return getNotificaWs(apiKey).infoEnvioV2(infoEnvio);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -355,8 +357,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					"La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA);
 		}
 		try {
+			String apiKey = notificacio.getEntitat().getApiKey();
 			AltaRemesaEnvios altaRemesaEnvios = generarAltaRemesaEnvios(notificacio);
-			resultat = getNotificaWs().altaRemesaEnvios(altaRemesaEnvios);
+			resultat = getNotificaWs(apiKey).altaRemesaEnvios(altaRemesaEnvios);
 		} catch (SOAPFaultException sfe) {
 			String codiResposta = sfe.getFault().getFaultCode();
 			String descripcioResposta = sfe.getFault().getFaultString();
@@ -603,7 +606,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return envios;
 	}
 
-	private NotificaWsV2PortType getNotificaWs() throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
+	private NotificaWsV2PortType getNotificaWs(String apiKey) throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
 		NotificaWsV2PortType port = new WsClientHelper<NotificaWsV2PortType>().generarClientWs(
 				getClass().getResource("/es/caib/notib/core/wsdl/NotificaWsV21.wsdl"),
 				getNotificaUrlProperty(),
@@ -614,7 +617,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				getPasswordProperty(),
 				true,
 				NotificaWsV2PortType.class,
-				new ApiKeySOAPHandlerV2(getApiKeyProperty()));
+				new ApiKeySOAPHandlerV2(apiKey));
 		return port;
 	}
 

@@ -35,6 +35,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	private EntitatTipusEnumDto tipus;
 	@Column(name = "dir3_codi", length = 9, nullable = false)
 	private String dir3Codi;
+	@Column(name = "api_key", length = 64, nullable = false)
+	private String apiKey;
 	@Column(name = "descripcio", length = 1024)
 	private String descripcio;
 	@Column(name = "activa", nullable = false)
@@ -54,6 +56,9 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	public String getDir3Codi() {
 		return dir3Codi;
 	}
+	public String getApiKey() {
+		return apiKey;
+	}
 	public String getDescripcio() {
 		return descripcio;
 	}
@@ -66,12 +71,14 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			String nom,
 			EntitatTipusEnumDto tipus,
 			String dir3Codi,
+			String apiKey,
 			String descripcio) {
 		this.codi = codi;
 		this.nom = nom;
 		this.descripcio = descripcio;
 		this.tipus = tipus;
 		this.dir3Codi = dir3Codi;
+		this.apiKey = apiKey;
 	}
 
 	public void updateActiva(
@@ -83,12 +90,14 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			String codi,
 			String nom,
 			EntitatTipusEnumDto tipus,
-			String dir3Codi) {
+			String dir3Codi,
+			String apiKey) {
 		return new Builder(
 				codi,
 				nom,
 				tipus,
-				dir3Codi);
+				dir3Codi,
+				apiKey);
 	}
 
 	public static class Builder {
@@ -97,13 +106,15 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				String codi,
 				String nom,
 				EntitatTipusEnumDto tipus,
-				String dir3Codi) {
+				String dir3Codi,
+				String apiKey) {
 			built = new EntitatEntity();
 			built.codi = codi;
 			built.nom = nom;
 			built.tipus = tipus;
 			built.dir3Codi = dir3Codi;
 			built.activa = true;
+			built.apiKey = apiKey;
 		}
 		public Builder descripcio(String descripcio) {
 			built.descripcio = descripcio;

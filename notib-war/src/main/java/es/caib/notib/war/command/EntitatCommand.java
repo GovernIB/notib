@@ -33,6 +33,8 @@ public class EntitatCommand {
 	@Size(max=9)
 //	@DocumentIdentitat
 	private String dir3Codi;
+	@NotEmpty
+	private String apiKey;
 	private String descripcio;
 
 	public Long getId() {
@@ -64,6 +66,12 @@ public class EntitatCommand {
 	}
 	public void setDir3Codi(String dir3Codi) {
 		this.dir3Codi = dir3Codi;
+	}
+	public String getApiKey() {
+		return apiKey;
+	}
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
 	}
 	public String getDescripcio() {
 		return descripcio;

@@ -31,6 +31,7 @@ import com.sun.jersey.core.util.Base64;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
+import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
@@ -82,6 +83,7 @@ import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
+import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 
 /**
@@ -142,6 +144,35 @@ public class NotificacioServiceImpl implements NotificacioService {
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 					new ByteArrayInputStream(
 							Base64.decode(notificacio.getDocument().getContingutBase64())));
+		} else if (notificacio.getDocument().getUuid() != null) {
+			DocumentDto document = new DocumentDto();
+			String arxiuUuid = notificacio.getDocument().getUuid();
+			if (pluginHelper.isArxiuPluginDisponible()) {
+				Document documentArxiu = pluginHelper.arxiuDocumentConsultar(
+						arxiuUuid, 
+						null, 
+						true);
+				document.setArxiuNom(documentArxiu.getContingut().getArxiuNom());
+				document.setNormalitzat(notificacio.getDocument().isNormalitzat());
+				document.setGenerarCsv(notificacio.getDocument().isGenerarCsv());
+				document.setUuid(arxiuUuid);
+				notificacio.setDocument(document);
+			}
+		} else if (notificacio.getDocument().getCsv() != null) {
+			DocumentDto document = new DocumentDto();
+			String arxiuCsv = notificacio.getDocument().getCsv();
+			if (pluginHelper.isArxiuPluginDisponible()) {
+				Document documentArxiu = pluginHelper.arxiuDocumentConsultar(
+						arxiuCsv, 
+						null, 
+						false);
+				document.setArxiuNom(documentArxiu.getContingut().getArxiuNom());
+				document.setNormalitzat(notificacio.getDocument().isNormalitzat());
+				document.setGenerarCsv(notificacio.getDocument().isGenerarCsv());
+				document.setCsv(arxiuCsv);
+				notificacio.setDocument(document);
+				notificacio.setDocument(document);
+			}
 		}
 		DocumentEntity documentEntity = null;
 		

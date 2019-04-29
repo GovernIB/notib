@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -28,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -81,6 +81,7 @@ import es.caib.notib.plugin.seu.SeuPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
 import es.caib.plugins.arxiu.api.ArxiuException;
+import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
 
@@ -626,7 +627,7 @@ public class PluginHelper {
 	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	    dbf.setNamespaceAware(true);
 	    DocumentBuilder db = dbf.newDocumentBuilder();
-	    Document document = db.parse(is);
+	    org.w3c.dom.Document document = db.parse(is);
 	    return createMap(document.getDocumentElement());
 	}
 	
@@ -661,6 +662,49 @@ public class PluginHelper {
 			id = "csv:" + id;
 		}
 		return getArxiuPlugin().documentImprimible(id);	
+	}
+
+	public Document arxiuDocumentConsultar(
+			String arxiuUuid,
+			String versio,
+			boolean isUuid) {
+		if(isUuid) {
+			arxiuUuid = "uuid:" + arxiuUuid;
+		} else {
+			arxiuUuid = "csv:" + arxiuUuid;
+		}
+		
+		String accioDescripcio = "Consulta d'un document";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("arxiuUuid", arxiuUuid);
+		long t0 = System.currentTimeMillis();
+		try {
+			Document documentDetalls = getArxiuPlugin().documentDetalls(
+					arxiuUuid,
+					versio,
+					false);
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_CUSTODIA,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0);
+			return documentDetalls;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_CUSTODIA,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_CUSTODIA,
+					errorDescripcio,
+					ex);
+		}
 	}
 	
 	public List<TipusAssumpte> llistarTipusAssumpte(String entitatCodi) throws RegistrePluginException {
@@ -841,7 +885,7 @@ public class PluginHelper {
 		}
 //		registre.setNumeroTransporte();
 		registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
-		registre.setCodigoUsuario(PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.registre.codi.usuari"));
+		registre.setCodigoUsuario(notificacio.getUsuariCodi());
 		registre.setAplicacionTelematica("SISTRA");
 		registre.setAplicacion("RWE");
 		registre.setVersion("3.1");
@@ -1497,25 +1541,34 @@ public class PluginHelper {
 		return registrePlugin;
 	}
 	
-	private boolean arxiuPluginConfiguracioProvada = false;
+//	private boolean arxiuPluginConfiguracioProvada = false;
 	private IArxiuPlugin getArxiuPlugin() {
-		if (arxiuPlugin == null && !arxiuPluginConfiguracioProvada) {
-			arxiuPluginConfiguracioProvada = true;
+		if (arxiuPlugin == null) {
 			String pluginClass = getPropertyPluginArxiu();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
-					arxiuPlugin = (IArxiuPlugin)clazz.newInstance();
+					if (PropertiesHelper.getProperties().isLlegirSystem()) {
+						arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
+								String.class).newInstance(
+								"es.caib.notib.");
+					} else {
+						arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
+								String.class,
+								Properties.class).newInstance(
+								"es.caib.notib.",
+								PropertiesHelper.getProperties().findAll());
+					}
 				} catch (Exception ex) {
 					throw new SistemaExternException(
-							IntegracioHelper.INTCODI_REGISTRE,
-							"Error al crear la instància del plugin d'arxiu",
+							IntegracioHelper.INTCODI_CUSTODIA,
+							"Error al crear la instància del plugin d'arxiu digital",
 							ex);
 				}
 			} else {
 				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_REGISTRE,
-						"La classe del plugin d'arxiu no està configurada");
+						IntegracioHelper.INTCODI_CUSTODIA,
+						"No està configurada la classe per al plugin d'arxiu digital");
 			}
 		}
 		return arxiuPlugin;

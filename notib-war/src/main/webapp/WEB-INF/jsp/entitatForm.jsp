@@ -27,6 +27,7 @@
 		<not:inputText name="nom" textKey="entitat.form.camp.nom" required="true"/>
 		<not:inputSelect name="tipus" textKey="entitat.form.camp.tipus" optionEnum="EntitatTipusEnumDto" required="true"/>
 		<not:inputText name="dir3Codi" textKey="entitat.form.camp.codidir3" required="true"/>
+		<not:inputText name="apiKey" textKey="entitat.form.camp.apiKey" required="true"/>
 		<not:inputTextarea name="descripcio" textKey="entitat.form.camp.descripcio"/>
 		<div id="modal-botons" class="col-xs-12 text-right">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
