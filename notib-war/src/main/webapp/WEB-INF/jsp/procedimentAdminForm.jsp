@@ -7,7 +7,7 @@
 
 <c:choose>
 	<c:when test="${empty procedimentCommand.codi}"><c:set var="titol"><spring:message code="procediment.form.titol.crear"/> ${entitat.nom} <c:out value=" (${entitat.dir3Codi})"></c:out></c:set></c:when>
-	<c:otherwise><c:set var="titol"><spring:message code="procediment.form.titol.modificar"/></c:set></c:otherwise>
+	<c:otherwise><c:set var="titol"><spring:message code="procediment.form.titol.modificar"/> ${entitat.nom} <c:out value=" (${entitat.dir3Codi})"></c:out></c:set></c:otherwise>
 </c:choose>
 <html>
 <head>
