@@ -726,31 +726,32 @@ public class PluginHelper {
 	}
 	
 	public List<Oficina> llistarOficines(
+			String entitatcodi,
 			AutoritzacioRegiWeb3Enum autoritzacio) throws RegistrePluginException {
 		
 		List<Oficina> oficines = getRegistrePlugin().llistarOficines(
-				getPropertyPluginCodiEntitatDir3(), 
+				entitatcodi, 
 				autoritzacio.getValor());
 	
 		return oficines;
 	}
 	
 	public List<Llibre> llistarLlibres(
+			String entitatcodi,
 			String oficina,
 			AutoritzacioRegiWeb3Enum autoritzacio) throws RegistrePluginException {
 		
 		List<Llibre> llibres = getRegistrePlugin().llistarLlibres(
-				getPropertyPluginCodiEntitatDir3(), 
+				entitatcodi, 
 				oficina, 
 				autoritzacio.getValor());
 	
 		return llibres;
 	}
 	
-	public List<Organisme> llistarOrganismes() throws RegistrePluginException {
+	public List<Organisme> llistarOrganismes(String entitatcodi) throws RegistrePluginException {
 		
-		List<Organisme> organismes = getRegistrePlugin().llistarOrganismes(
-				getPropertyPluginCodiEntitatDir3());
+		List<Organisme> organismes = getRegistrePlugin().llistarOrganismes(entitatcodi);
 	
 		return organismes;
 	}

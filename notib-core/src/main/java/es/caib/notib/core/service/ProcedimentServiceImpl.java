@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.jdom.PFilterIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.CodiAssumpteDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.LlibreDto;
+import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
@@ -45,7 +49,11 @@ import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.ProcedimentFormRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
+import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.registre.CodiAssumpte;
+import es.caib.notib.plugin.registre.Llibre;
+import es.caib.notib.plugin.registre.Oficina;
+import es.caib.notib.plugin.registre.Organisme;
 import es.caib.notib.plugin.registre.RegistrePluginException;
 import es.caib.notib.plugin.registre.TipusAssumpte;
 
@@ -106,14 +114,21 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						procediment.getCodi(),
 						procediment.getNom(),
 						procediment.getRetard(),
+						procediment.getEnviamentDataProgramada(),
 						entitat,
 						pagadorPostal,
 						pagadorCie,
 						procediment.isAgrupar(),
 						procediment.getLlibre(),
+						procediment.getLlibreNom(),
 						procediment.getOficina(),
+						procediment.getOficinaNom(),
+						procediment.getOrganGestor(),
+						procediment.getOrganGestorNom(),
 						procediment.getTipusAssumpte(),
-						procediment.getCodiAssumpte()).build());
+						procediment.getTipusAssumpteNom(),
+						procediment.getCodiAssumpte(),
+						procediment.getCodiAssumpteNom()).build());
 		
 		return conversioTipusHelper.convertir(
 				procedimentEntity, 
@@ -167,11 +182,18 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					pagadorPostal,
 					pagadorCie,
 					procediment.getRetard(),
+					procediment.getEnviamentDataProgramada(),
 					procediment.isAgrupar(),
 					procediment.getLlibre(),
+					procediment.getLlibreNom(),
 					procediment.getOficina(),
+					procediment.getOficinaNom(),
+					procediment.getOrganGestor(),
+					procediment.getOrganGestorNom(),
 					procediment.getTipusAssumpte(),
-					procediment.getCodiAssumpte());
+					procediment.getTipusAssumpteNom(),
+					procediment.getCodiAssumpte(),
+					procediment.getCodiAssumpteNom());
 		
 		procedimentRepository.save(procedimentEntity);
 			
@@ -548,59 +570,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				ProcedimentEntity.class,
 				permisId);
 	}
-
-	@Override
-	public List<TipusAssumpteDto> findTipusAssumpte(EntitatDto entitat) {
-		List<TipusAssumpteDto> tipusAssumpte = new ArrayList<TipusAssumpteDto>();
-	
-		try {
-			List<TipusAssumpte> tipusAssumpteRegistre = pluginHelper.llistarTipusAssumpte(entitat.getDir3Codi());
-			
-			if (tipusAssumpteRegistre != null)
-				for (TipusAssumpte assumpteRegistre : tipusAssumpteRegistre) {
-					TipusAssumpteDto assumpte = new TipusAssumpteDto();
-					assumpte.setCodi(assumpteRegistre.getCodi());
-					assumpte.setNom(assumpteRegistre.getNom());
-					
-					tipusAssumpte.add(assumpte);
-				}
-		} catch (RegistrePluginException e) {
-			String errorMessage = "No s'han pogut recuperar els codis d'assumpte de l'entitat: " + entitat.getDir3Codi();
-			logger.error(
-					errorMessage, 
-					e.getMessage());
-		}
-		return tipusAssumpte;
-	}
-
-	@Override
-	public List<CodiAssumpteDto> findCodisAssumpte(
-			EntitatDto entitat,
-			String codiTipusAssumpte) {
-		List<CodiAssumpteDto> codiAssumpte = new ArrayList<CodiAssumpteDto>();
-		
-		try {
-			List<CodiAssumpte> tipusAssumpteRegistre = pluginHelper.llistarCodisAssumpte(
-					entitat.getDir3Codi(),
-					codiTipusAssumpte);
-			
-			if (tipusAssumpteRegistre != null)
-				for (CodiAssumpte assumpteRegistre : tipusAssumpteRegistre) {
-					CodiAssumpteDto assumpte = new CodiAssumpteDto();
-					assumpte.setCodi(assumpteRegistre.getCodi());
-					assumpte.setNom(assumpteRegistre.getNom());
-					assumpte.setTipusAssumpte(assumpteRegistre.getTipusAssumpte());
-					
-					codiAssumpte.add(assumpte);
-				}
-		} catch (RegistrePluginException e) {
-			String errorMessage = "No s'han pogut recuperar els codis d'assumpte del tipus d'assumpte: " + codiTipusAssumpte;
-			logger.error(
-					errorMessage, 
-					e.getMessage());
-		}
-		return codiAssumpte;
-	}
 	
 	@Override
 	public boolean hasPermisConsultaProcediment(EntitatDto entitat) {
@@ -702,6 +671,134 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		return (resposta.isEmpty()) ? false : true;
 	}
 
+	@Override
+	public List<TipusAssumpteDto> findTipusAssumpte(EntitatDto entitat) {
+		List<TipusAssumpteDto> tipusAssumpte = new ArrayList<TipusAssumpteDto>();
+	
+		try {
+			List<TipusAssumpte> tipusAssumpteRegistre = pluginHelper.llistarTipusAssumpte(entitat.getDir3Codi());
+			
+			if (tipusAssumpteRegistre != null)
+				for (TipusAssumpte assumpteRegistre : tipusAssumpteRegistre) {
+					TipusAssumpteDto assumpte = new TipusAssumpteDto();
+					assumpte.setCodi(assumpteRegistre.getCodi());
+					assumpte.setNom(assumpteRegistre.getNom());
+					
+					tipusAssumpte.add(assumpte);
+				}
+		} catch (RegistrePluginException e) {
+			String errorMessage = "No s'han pogut recuperar els codis d'assumpte de l'entitat: " + entitat.getDir3Codi();
+			logger.error(
+					errorMessage, 
+					e.getMessage());
+		}
+		return tipusAssumpte;
+	}
+
+	@Override
+	public List<CodiAssumpteDto> findCodisAssumpte(
+			EntitatDto entitat,
+			String codiTipusAssumpte) {
+		List<CodiAssumpteDto> codiAssumpte = new ArrayList<CodiAssumpteDto>();
+		
+		try {
+			List<CodiAssumpte> tipusAssumpteRegistre = pluginHelper.llistarCodisAssumpte(
+					entitat.getDir3Codi(),
+					codiTipusAssumpte);
+			
+			if (tipusAssumpteRegistre != null)
+				for (CodiAssumpte assumpteRegistre : tipusAssumpteRegistre) {
+					CodiAssumpteDto assumpte = new CodiAssumpteDto();
+					assumpte.setCodi(assumpteRegistre.getCodi());
+					assumpte.setNom(assumpteRegistre.getNom());
+					assumpte.setTipusAssumpte(assumpteRegistre.getTipusAssumpte());
+					
+					codiAssumpte.add(assumpte);
+				}
+		} catch (RegistrePluginException e) {
+			String errorMessage = "No s'han pogut recuperar els codis d'assumpte del tipus d'assumpte: " + codiTipusAssumpte;
+			logger.error(
+					errorMessage, 
+					e.getMessage());
+		}
+		return codiAssumpte;
+	}
+	
+
+	@Override
+	public List<OrganismeDto> findOrganismes(EntitatDto entitat) {
+		List<OrganismeDto> organismes = new ArrayList<OrganismeDto>();
+		
+		try {
+			List<Organisme> organismesRegistre = pluginHelper.llistarOrganismes(entitat.getDir3Codi());
+			if (organismes != null) {
+				for (Organisme organismeRegistre : organismesRegistre) {
+					OrganismeDto organisme = new OrganismeDto();
+					organisme.setCodi(organismeRegistre.getCodi());
+					organisme.setNom(organismeRegistre.getNom());
+					organismes.add(organisme);
+				}
+			}
+		} catch (Exception e) {
+			String errorMessage = "No s'han pogut recuperar els organismes de l'entitat: " + entitat.getDir3Codi();
+			logger.error(
+					errorMessage, 
+					e.getMessage());
+		}
+		return organismes;
+	}
+
+	@Override
+	public List<OficinaDto> findOficines(EntitatDto entitat) {
+		List<OficinaDto> oficines = new ArrayList<OficinaDto>();
+		
+		try {
+			List<Oficina> oficinesRegistre = pluginHelper.llistarOficines(
+					entitat.getDir3Codi(), 
+					AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
+			for (Oficina oficinaRegistre : oficinesRegistre) {
+				OficinaDto oficina = new OficinaDto();
+				oficina.setCodi(oficinaRegistre.getCodi());
+				oficina.setNom(oficinaRegistre.getNom());
+				oficines.add(oficina);
+			}
+		} catch (Exception e) {
+			String errorMessage = "No s'han pogut recuperar les oficines de l'entitat: " + entitat.getDir3Codi();
+			logger.error(
+					errorMessage, 
+					e.getMessage());
+		}
+		return oficines;
+	}
+
+	@Override
+	public List<LlibreDto> findLlibres(
+			EntitatDto entitat, 
+			String oficina) {
+		List<LlibreDto> llibres = new ArrayList<LlibreDto>();
+		
+		try {
+			List<Llibre> llibresRegistre = pluginHelper.llistarLlibres(
+					entitat.getDir3Codi(), 
+					oficina, 
+					AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
+			for (Llibre llibreRegistre : llibresRegistre) {
+				LlibreDto llibre = new LlibreDto();
+				llibre.setCodi(llibreRegistre.getCodi());
+				llibre.setNomCurt(llibreRegistre.getNomCurt());
+				llibre.setNomLlarg(llibreRegistre.getNomLlarg());
+				llibre.setOrganismeCodi(llibreRegistre.getOrganisme());
+				llibres.add(llibre);
+			}
+ 		} catch (Exception e) {
+ 			String errorMessage = "No s'han pogut recuperar els llibres de l'entitat: " + entitat.getDir3Codi();
+			logger.error(
+					errorMessage, 
+					e.getMessage());
+		}
+		return llibres;
+	}
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
+
 
 }

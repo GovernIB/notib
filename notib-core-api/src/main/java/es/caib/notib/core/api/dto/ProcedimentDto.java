@@ -15,9 +15,15 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 	private boolean agrupar;
 	private List<GrupDto> grups;
 	private String llibre;
+	private String llibreNom;
 	private String oficina;
+	private String oficinaNom;
+	private String organGestor;
+	private String organGestorNom;
 	private String tipusAssumpte;
+	private String tipusAssumpteNom;
 	private String codiAssumpte;
+	private String codiAssumpteNom;
 	
 	private List<PermisDto> permisos;
 	private boolean usuariActualRead;
@@ -95,6 +101,12 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 	public String getOficina() {
 		return oficina;
 	}
+	public String getOrganGestor() {
+		return organGestor;
+	}
+	public void setOrganGestor(String organGestor) {
+		this.organGestor = organGestor;
+	}
 	public String getTipusAssumpte() {
 		return tipusAssumpte;
 	}
@@ -142,6 +154,36 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 	}
 	public void setUsuariActualAdministration(boolean usuariActualAdministration) {
 		this.usuariActualAdministration = usuariActualAdministration;
+	}
+	public String getLlibreNom() {
+		return llibreNom;
+	}
+	public void setLlibreNom(String llibreNom) {
+		this.llibreNom = llibreNom;
+	}
+	public String getOficinaNom() {
+		return oficinaNom;
+	}
+	public void setOficinaNom(String oficinaNom) {
+		this.oficinaNom = oficinaNom;
+	}
+	public String getOrganGestorNom() {
+		return organGestorNom;
+	}
+	public void setOrganGestorNom(String organGestorNom) {
+		this.organGestorNom = organGestorNom;
+	}
+	public String getTipusAssumpteNom() {
+		return tipusAssumpteNom;
+	}
+	public void setTipusAssumpteNom(String tipusAssumpteNom) {
+		this.tipusAssumpteNom = tipusAssumpteNom;
+	}
+	public String getCodiAssumpteNom() {
+		return codiAssumpteNom;
+	}
+	public void setCodiAssumpteNom(String codiAssumpteNom) {
+		this.codiAssumpteNom = codiAssumpteNom;
 	}
 
 

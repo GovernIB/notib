@@ -34,7 +34,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	protected String nom;
 
 	@Column(name = "data_programada")
-	@Temporal(TemporalType.TIMESTAMP)
+	@Temporal(TemporalType.DATE)
 	protected Date enviamentDataProgramada;
 	
 	@Column(name = "retard")
@@ -43,14 +43,32 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	@Column(name = "llibre")
 	protected String llibre;
 	
+	@Column(name = "llibre_nom")
+	protected String llibreNom;
+	
 	@Column(name = "oficina")
 	protected String oficina;
+	
+	@Column(name = "oficina_nom")
+	protected String oficinaNom;
+	
+	@Column(name = "organ_gestor")
+	protected String organGestor;
+	
+	@Column(name = "organ_gestor_nom")
+	protected String organGestorNom;
 	
 	@Column(name = "tipusassumpte", length = 255)
 	protected String tipusAssumpte;
 	
+	@Column(name = "tipusassumpte_nom", length = 255)
+	protected String tipusAssumpteNom;
+	
 	@Column(name = "codiassumpte", length = 255)
 	protected String codiAssumpte;
+	
+	@Column(name = "codiassumpte_nom", length = 255)
+	protected String codiAssumpteNom;
 	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "entitat")
@@ -93,6 +111,10 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 		this.oficina = oficina;
 	}
 	
+	public String getOrganGestor() {
+		return organGestor;
+	}
+
 	public void setTipusAssumpte(String tipusAssumpte) {
 		this.tipusAssumpte = tipusAssumpte;
 	}
@@ -115,6 +137,26 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 
 	public void setAgrupar(boolean agrupar) {
 		this.agrupar = agrupar;
+	}
+
+	public String getLlibreNom() {
+		return llibreNom;
+	}
+
+	public String getOficinaNom() {
+		return oficinaNom;
+	}
+
+	public String getOrganGestorNom() {
+		return organGestorNom;
+	}
+
+	public String getTipusAssumpteNom() {
+		return tipusAssumpteNom;
+	}
+
+	public String getCodiAssumpteNom() {
+		return codiAssumpteNom;
 	}
 
 	@Column(name = "agrupar", length = 64, nullable = false)
@@ -175,11 +217,18 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			PagadorPostalEntity pagadorcostal,
 			PagadorCieEntity pagadorcie,
 			int retard,
+			Date enviamentDataProgramada,
 			boolean agrupar,
 			String llibre,
+			String llibreNom,
 			String oficina,
+			String oficinaNom,
+			String organGestor,
+			String organGestorNom,
 			String tipusAssumpte,
-			String codiAssumpte) {
+			String tipusAssumpteNom,
+			String codiAssumpte,
+			String codiAssumpteNom) {
 		this.codi = codi;
 		this.nom = nom;
 		this.entitat = entitat;
@@ -187,36 +236,57 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 		this.pagadorcie = pagadorcie;
 		this.agrupar = agrupar;
 		this.llibre = llibre;
+		this.llibreNom = llibreNom;
 		this.oficina = oficina;
+		this.oficinaNom = oficinaNom;
+		this.organGestor = organGestor;
+		this.organGestorNom = organGestorNom;
 		this.retard = retard;
+		this.enviamentDataProgramada = enviamentDataProgramada;
 		this.tipusAssumpte = tipusAssumpte;
+		this.tipusAssumpteNom = tipusAssumpteNom;
 		this.codiAssumpte = codiAssumpte;
+		this.codiAssumpteNom = codiAssumpteNom;
 	}
 	
 	public static Builder getBuilder(
 			String codi,
 			String nom,
 			int retard,
+			Date enviamentDataProgramada,
 			EntitatEntity entitat,
 			PagadorPostalEntity pagadorpostal,
 			PagadorCieEntity pagadorcie,
 			boolean agrupar,
 			String llibre,
+			String llibreNom,
 			String oficina,
+			String oficinaNom,
+			String organGestor,
+			String organGestorNom,
 			String tipusAssumpte,
-			String codiAssumpte) {
+			String tipusAssumpteNom,
+			String codiAssumpte,
+			String codiAssumpteNom) {
 		return new Builder(
 				codi,
 				nom,
 				retard,
+				enviamentDataProgramada,
 				entitat,
 				pagadorpostal,
 				pagadorcie,
 				agrupar,
 				llibre,
+				llibreNom,
 				oficina,
+				oficinaNom,
+				organGestor,
+				organGestorNom,
 				tipusAssumpte,
-				codiAssumpte);
+				tipusAssumpteNom,
+				codiAssumpte,
+				codiAssumpteNom);
 	}
 	
 	public static class Builder {
@@ -225,14 +295,21 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 				String codi,
 				String nom,
 				int retard,
+				Date enviamentDataProgramada,
 				EntitatEntity entitat,
 				PagadorPostalEntity pagadorpostal,
 				PagadorCieEntity pagadorcie,
 				boolean agrupar,
 				String llibre,
+				String llibreNom,
 				String oficina,
+				String oficinaNom,
+				String organGestor,
+				String organGestorNom,
 				String tipusAssumpte,
-				String codiAssumpte) {
+				String tipusAssumpteNom,
+				String codiAssumpte,
+				String codiAssumpteNom) {
 			built = new ProcedimentEntity();
 			built.codi = codi;
 			built.nom = nom;
@@ -242,9 +319,15 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			built.pagadorcie = pagadorcie;
 			built.agrupar = agrupar;
 			built.llibre = llibre;
+			built.llibreNom = llibreNom;
 			built.oficina = oficina;
+			built.oficinaNom = oficinaNom;
+			built.organGestor = organGestor;
+			built.organGestorNom = organGestorNom;
 			built.tipusAssumpte = tipusAssumpte;
+			built.tipusAssumpteNom = tipusAssumpteNom;
 			built.codiAssumpte = codiAssumpte;
+			built.codiAssumpteNom = codiAssumpteNom;
 		}
 		public ProcedimentEntity build() {
 			return built;

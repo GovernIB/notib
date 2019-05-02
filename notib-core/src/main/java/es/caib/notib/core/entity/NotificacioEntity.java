@@ -54,6 +54,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	protected String usuariCodi;
 	@Column(name = "emisor_dir3codi", length = 9, nullable = false)
 	protected String emisorDir3Codi;
+	@Column(name = "organ_gestor", length = 9, nullable = false)
+	protected String organGestor;
 	@Column(name = "com_tipus", nullable = false)
 	protected NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	
@@ -216,6 +218,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 
 	public String getEmisorDir3Codi() {
 		return emisorDir3Codi;
+	}
+	public String getOrganGestor() {
+		return organGestor;
 	}
 	public NotificacioComunicacioTipusEnumDto getComunicacioTipus() {
 		return comunicacioTipus;
@@ -444,6 +449,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public static Builder getBuilder(
 			EntitatEntity entitat,
 			String emisorDir3Codi,
+			String organGestor,
 			NotificacioComunicacioTipusEnumDto comunicacioTipus,
 			NotificaEnviamentTipusEnumDto enviamentTipus,
 			String concepte,
@@ -456,6 +462,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		return new Builder(
 				entitat,
 				emisorDir3Codi,
+				organGestor,
 				comunicacioTipus,
 				enviamentTipus,
 				concepte,
@@ -503,6 +510,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public static BuilderV2 getBuilderV2(
 			EntitatEntity entitat,
 			String emisorDir3Codi,
+			String organGestor,
 			NotificacioComunicacioTipusEnumDto comunicacioTipus,
 			NotificaEnviamentTipusEnumDto enviamentTipus,
 			String concepte,
@@ -525,6 +533,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		return new BuilderV2(
 				entitat,
 				emisorDir3Codi,
+				organGestor,
 				comunicacioTipus,
 				enviamentTipus,
 				concepte,
@@ -552,6 +561,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		Builder(
 				EntitatEntity entitat,
 				String emisorDir3Codi,
+				String organGestor,
 				NotificacioComunicacioTipusEnumDto comunicacioTipus,
 				NotificaEnviamentTipusEnumDto enviamentTipus,
 				String concepte,
@@ -564,6 +574,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built = new NotificacioEntity();
 			built.entitat = entitat;
 			built.emisorDir3Codi = emisorDir3Codi;
+			built.organGestor = organGestor;
 			built.comunicacioTipus = comunicacioTipus;
 			built.enviamentTipus = enviamentTipus;
 //			built.enviamentDataProgramada = enviamentDataProgramada;
@@ -775,6 +786,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		BuilderV2(
 				EntitatEntity entitat,
 				String emisorDir3Codi,
+				String organGestor,
 				NotificacioComunicacioTipusEnumDto comunicacioTipus,
 				NotificaEnviamentTipusEnumDto enviamentTipus,
 				String concepte,

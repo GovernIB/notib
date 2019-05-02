@@ -1,5 +1,6 @@
 package es.caib.notib.war.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.notib.core.api.dto.CodiAssumpteDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.LlibreDto;
+import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentFormDto;
@@ -97,9 +101,6 @@ public class ProcedimentController extends BaseUserController{
 							request, 
 							"notificacio.controller.entitat.cap.assignada"));
 		}
-		
-		
-				
 		return DatatablesHelper.getDatatableResponse(
 				request, 
 				procediments,
@@ -240,19 +241,19 @@ public class ProcedimentController extends BaseUserController{
 					isAdministrador(request),
 					procedimentId);
 			model.addAttribute(procediment);
-			List<TipusAssumpteDto> tipusAssumpte = procedimentService.findTipusAssumpte(procediment.getEntitat());
-			model.addAttribute("tipusAssumpte", tipusAssumpte);
-			if (procediment.getTipusAssumpte() != null) {
-				model.addAttribute("codiAssumpte", procedimentService.findCodisAssumpte(procediment.getEntitat(), procediment.getTipusAssumpte()));
-			}else if(tipusAssumpte.get(0) != null && tipusAssumpte.get(0).getCodi() != null){
-				model.addAttribute("codiAssumpte", procedimentService.findCodisAssumpte(procediment.getEntitat(), tipusAssumpte.get(0).getCodi()));
-			}
+//			List<TipusAssumpteDto> tipusAssumpte = procedimentService.findTipusAssumpte(procediment.getEntitat());
+//			model.addAttribute("tipusAssumpte", tipusAssumpte);
+//			if (procediment.getTipusAssumpte() != null) {
+//				model.addAttribute("codiAssumpte", procedimentService.findCodisAssumpte(procediment.getEntitat(), procediment.getTipusAssumpte()));
+//			}else if(tipusAssumpte.get(0) != null && tipusAssumpte.get(0).getCodi() != null){
+//				model.addAttribute("codiAssumpte", procedimentService.findCodisAssumpte(procediment.getEntitat(), tipusAssumpte.get(0).getCodi()));
+//			}
 		} else {
-			List<TipusAssumpteDto> tipusAssumpte = procedimentService.findTipusAssumpte(entitat);
-			model.addAttribute("tipusAssumpte", tipusAssumpte);
-			if(tipusAssumpte.get(0) != null && tipusAssumpte.get(0).getCodi() != null){
-				model.addAttribute("codiAssumpte", procedimentService.findCodisAssumpte(entitat, tipusAssumpte.get(0).getCodi()));
-			}
+//			List<TipusAssumpteDto> tipusAssumpte = procedimentService.findTipusAssumpte(entitat);
+//			model.addAttribute("tipusAssumpte", tipusAssumpte);
+//			if(! tipusAssumpte.isEmpty() && tipusAssumpte.get(0) != null && tipusAssumpte.get(0).getCodi() != null){
+//				model.addAttribute("codiAssumpte", procedimentService.findCodisAssumpte(entitat, tipusAssumpte.get(0).getCodi()));
+//			}
 		}
 		model.addAttribute("pagadorsPostal", pagadorPostalService.findAll());
 		model.addAttribute("pagadorsCie", pagadorCieService.findAll());
@@ -266,6 +267,15 @@ public class ProcedimentController extends BaseUserController{
 			model.addAttribute("entitat", entitat);
 		
 		return procediment;
+	}
+	
+	@RequestMapping(value = "/organisme/{organGestorCodi}", method = RequestMethod.GET)
+	private String emplenarOrganismeProcediment(
+			HttpServletRequest request,
+			@PathVariable String organGestorCodi,
+			Model model) {
+		model.addAttribute("organisme", organGestorCodi);
+		return "redirect:/procediment/new";
 	}
 	
 	@RequestMapping(value = "/tipusAssumpte/{entitatId}", method = RequestMethod.GET)
@@ -293,6 +303,37 @@ public class ProcedimentController extends BaseUserController{
 		return procedimentService.findCodisAssumpte(
 				entitat,
 				codiTipusAssumpte);
+	}
+	
+	@RequestMapping(value = "/organismes/{entitatId}", method = RequestMethod.GET)
+	@ResponseBody
+	private List<OrganismeDto> getOrganismes(
+		HttpServletRequest request,
+		Model model,
+		@PathVariable Long entitatId) {
+		EntitatDto entitat = entitatService.findById(entitatId);
+		return procedimentService.findOrganismes(entitat);
+	}
+	
+	@RequestMapping(value = "/oficines/{entitatId}", method = RequestMethod.GET)
+	@ResponseBody
+	private List<OficinaDto> getOficines(
+		HttpServletRequest request,
+		Model model,
+		@PathVariable Long entitatId) {
+		EntitatDto entitat = entitatService.findById(entitatId);
+		return procedimentService.findOficines(entitat);
+	}
+	
+	@RequestMapping(value = "/llibres/{entitatId}/{oficina}", method = RequestMethod.GET)
+	@ResponseBody
+	private List<LlibreDto> getLlibres(
+		HttpServletRequest request,
+		Model model,
+		@PathVariable Long entitatId,
+		@PathVariable String oficina) {
+		EntitatDto entitat = entitatService.findById(entitatId);
+		return procedimentService.findLlibres(entitat, oficina);
 	}
 	
 	private boolean isAdministrador(

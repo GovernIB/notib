@@ -38,6 +38,7 @@ public class NotificacioCommandV2 {
 	private Long id;
 	@NotEmpty @Size(max=64)
 	private String emisorDir3Codi;
+	private String organGestor;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
 	@ValidConcepte
@@ -119,6 +120,12 @@ public class NotificacioCommandV2 {
 	}
 	public void setEmisorDir3Codi(String emisorDir3Codi) {
 		this.emisorDir3Codi = emisorDir3Codi;
+	}
+	public String getOrganGestor() {
+		return organGestor;
+	}
+	public void setOrganGestor(String organGestor) {
+		this.organGestor = organGestor;
 	}
 	public NotificacioComunicacioTipusEnumDto getComunicacioTipus() {
 		return comunicacioTipus;

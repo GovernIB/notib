@@ -26,7 +26,10 @@ import es.caib.regweb3.ws.api.v3.DatosInteresadoWs;
 import es.caib.regweb3.ws.api.v3.IdentificadorWs;
 import es.caib.regweb3.ws.api.v3.InteresadoWs;
 import es.caib.regweb3.ws.api.v3.JustificanteWs;
+import es.caib.regweb3.ws.api.v3.LibroWs;
+import es.caib.regweb3.ws.api.v3.OficinaWs;
 import es.caib.regweb3.ws.api.v3.OficioWs;
+import es.caib.regweb3.ws.api.v3.OrganismoWs;
 import es.caib.regweb3.ws.api.v3.RegistroSalidaWs;
 import es.caib.regweb3.ws.api.v3.TipoAsuntoWs;
 //import es.caib.regweb3.ws.v3.impl.AnexoWs;
@@ -547,28 +550,98 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	}
 
 	@Override
-	public List<Oficina> llistarOficines(String entitatCodi, Long autoritzacioValor) {
-		return null;
+	public List<Oficina> llistarOficines(String entitatCodi, Long autoritzacioValor) throws RegistrePluginException {
+		try {
+			return toOficines(getInfoApi().listarOficinas(
+					entitatCodi,
+					autoritzacioValor));
+		} catch (Exception ex) {
+			logger.error("Error a l'hora d'obtenir el tipus d'assumpte", ex);
+			throw new RegistrePluginException("Error obtenint tipus assumpte", ex);
+		}
 	}
 
 	@Override
-	public List<Llibre> llistarLlibres(String entitatCodi, String oficina, Long autoritzacioValor) {
-		return null;
+	public List<Llibre> llistarLlibres(String entitatCodi, String oficina, Long autoritzacioValor) throws RegistrePluginException {
+		try {
+			return toLlibres(getInfoApi().listarLibros(
+					entitatCodi,
+					oficina,
+					autoritzacioValor));
+		} catch (Exception ex) {
+			logger.error("Error a l'hora d'obtenir el tipus d'assumpte", ex);
+			throw new RegistrePluginException("Error obtenint tipus assumpte", ex);
+		}
 	}
 
 	@Override
-	public List<Organisme> llistarOrganismes(String entitatCodi) {
-		return null;
+	public List<Organisme> llistarOrganismes(String entitatCodi) throws RegistrePluginException {
+		try {
+			return toOrganismes(getInfoApi().listarOrganismos(
+					entitatCodi));
+		} catch (Exception ex) {
+			logger.error("Error a l'hora d'obtenir el tipus d'assumpte", ex);
+			throw new RegistrePluginException("Error obtenint tipus assumpte", ex);
+		}
 	}
-
-	private List<TipusAssumpte> toTipusAssumpte(List<TipoAsuntoWs> tipoAsunto) throws RegistrePluginException {
+	
+	private List<Llibre> toLlibres(List<LibroWs> llibresWs) throws RegistrePluginException {
+		List<Llibre> llibres = new ArrayList<Llibre>();
+		try {
+			for (LibroWs llibreWs : llibresWs) {
+				Llibre llibre = new Llibre();
+				llibre.setCodi(llibreWs.getCodigoLibro());
+				llibre.setNomCurt(llibreWs.getNombreCorto());
+				llibre.setNomLlarg(llibreWs.getNombreLargo());
+				llibre.setOrganisme(llibreWs.getCodigoOrganismo());
+				llibres.add(llibre);
+			}
+		} catch (Exception ex) {
+			logger.error("Error a l'hora de fer la conversió dels llibres", ex);
+			throw new RegistrePluginException("Error conversió de llibres", ex);
+		}
+		return llibres;
+	}
+	private List<Oficina> toOficines(List<OficinaWs> oficinesWs) throws RegistrePluginException {
+		List<Oficina> oficines = new ArrayList<Oficina>();
+		
+		try {
+			for (OficinaWs oficinaWs : oficinesWs) {
+				Oficina oficina = new Oficina();
+				oficina.setCodi(oficinaWs.getCodigo());
+				oficina.setNom(oficinaWs.getNombre());
+				oficines.add(oficina);
+			}
+		} catch (Exception ex) {
+			logger.error("Error a l'hora de fer la conversió de les oficines", ex);
+			throw new RegistrePluginException("Error conversió de oficines", ex);
+		}
+		return oficines;
+	}
+	private List<Organisme> toOrganismes(List<OrganismoWs> organismesWs) throws RegistrePluginException {
+		List<Organisme> organismes = new ArrayList<Organisme>();
+		
+		try {
+			for (OrganismoWs organWs : organismesWs) {
+				Organisme organ = new Organisme();
+				organ.setCodi(organWs.getCodigo());
+				organ.setNom(organWs.getNombre());
+				organismes.add(organ);
+			}
+		} catch (Exception ex) {
+			logger.error("Error a l'hora de fer la conversió dels organismes", ex);
+			throw new RegistrePluginException("Error conversió organismes", ex);
+		}
+		return organismes;
+	}
+	
+	private List<TipusAssumpte> toTipusAssumpte(List<TipoAsuntoWs> tipusAssumpteWs) throws RegistrePluginException {
 		List<TipusAssumpte> tipusAssumpte = new ArrayList<TipusAssumpte>();
 		try {
-			TipusAssumpte tipus = new TipusAssumpte();
-			
-			for (TipoAsuntoWs tipo : tipoAsunto) {
-				tipus.setCodi(tipo.getCodigo());
-				tipus.setNom(tipo.getNombre());
+			for (TipoAsuntoWs tipusWs : tipusAssumpteWs) {
+				TipusAssumpte tipus = new TipusAssumpte();
+				tipus.setCodi(tipusWs.getCodigo());
+				tipus.setNom(tipusWs.getNombre());
 				tipusAssumpte.add(tipus);
 			}
 		} catch (Exception ex) {
@@ -578,14 +651,13 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		return tipusAssumpte;
 	}
 	
-	private List<CodiAssumpte> toCodisAssumpte(List<CodigoAsuntoWs> codigoAsunto) throws RegistrePluginException {
+	private List<CodiAssumpte> toCodisAssumpte(List<CodigoAsuntoWs> codisAssumpteWs) throws RegistrePluginException {
 		List<CodiAssumpte> codisAssumpte = new ArrayList<CodiAssumpte>();
 		try {
-			CodiAssumpte codi = new CodiAssumpte();
-			
-			for (CodigoAsuntoWs codigo : codigoAsunto) {
-				codi.setCodi(codigo.getCodigo());
-				codi.setNom(codigo.getNombre());
+			for (CodigoAsuntoWs codiWs : codisAssumpteWs) {
+				CodiAssumpte codi = new CodiAssumpte();
+				codi.setCodi(codiWs.getCodigo());
+				codi.setNom(codiWs.getNombre());
 				codisAssumpte.add(codi);
 			}
 		} catch (Exception ex) {

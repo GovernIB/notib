@@ -6,7 +6,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <c:choose>
-	<c:when test="${empty procedimentCommand.codi}"><c:set var="titol"><spring:message code="procediment.form.titol.crear"/></c:set></c:when>
+	<c:when test="${empty procedimentCommand.codi}"><c:set var="titol"><spring:message code="procediment.form.titol.crear"/> ${entitat.nom} <c:out value=" (${entitat.dir3Codi})"></c:out></c:set></c:when>
 	<c:otherwise><c:set var="titol"><spring:message code="procediment.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
 <html>
@@ -27,21 +27,171 @@
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<not:modalHead/>
+<style type="text/css">
+.select2-container {
+	width: auto;
+}
+.body {
+	height: 250px;
+}
+.modal-backdrop {
+    visibility: hidden !important;
+}
+.modal.in {
+    background-color: rgba(0,0,0,0.5);
+}
+</style>
 <script type="text/javascript">
 $(document).ready(function() {
-	$('#entitatId').change(function(value){
-		var entitatId = $(this).val();
-		
+	//var oficina = $('#oficina').val();
+	//var tipusAssumpte = $('#tipusAssumpte').val();
+	//$('#selOficines').trigger('change');
+	//$('#selTipusAssumpte').trigger('change');
+	//
+	//$('#selOficines').on('change', function(){
+	//	if ($(this).val() == '') {
+	//		$('.llibre').addClass('hidden');
+	//	} else {
+	//		$('.llibre').removeClass('hidden');
+	//	}
+	//})
+	//$('#selTipusAssumpte').on('change', function(){
+	//	if ($(this).val() == '') {
+	//		$('.codiAssumpte').addClass('hidden');
+	//	} else {
+	//		$('.codiAssumpte').removeClass('hidden');
+	//	}
+	//})
+	
+	//Organismes
+	$("#searchOrgan").click(function(){
+		$("#organismesModal").modal();
+		var entitatId = $('#entitatId').val();
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value="/procediment/organismes/"/>" + entitatId,
+			success: function(data) {
+				var selOrganismes = $('#selOrganismes');
+				selOrganismes.empty();
+				selOrganismes.append("<option value=\"\"></option>");
+				if (data && data.length > 0) {
+						var items = [];
+						$.each(data, function(i, val) {
+							items.push({
+								"id": val.codi,
+								"text": val.nom
+							});
+							selOrganismes.append("<option value=\"" + val.codi + "\">" + val.nom + "</option>");
+						});
+				}
+				var select2Options = {
+						theme: 'bootstrap',
+						width: 'auto'};
+				selOrganismes.select2(select2Options);
+			},
+			error: function() {
+				console.log("error obtenint els organismes...");
+			}
+		});
+	});
+	$('#addOrganismeButton').on('click', function(){
+		var organSelect = document.getElementById('selOrganismes');
+		var organSeleccionatValue = organSelect.options[organSelect.selectedIndex].value;
+		var organSeleccionatText = organSelect.options[organSelect.selectedIndex].text;
+		$('#organGestor').val(organSeleccionatValue);
+		$('#organGestorNom').val(organSeleccionatText);
+	});
+	//Oficines
+	$("#searchOficina").click(function(){
+		$("#oficinesModal").modal();
+		var entitatId = $('#entitatId').val();
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value="/procediment/oficines/"/>" + entitatId,
+			success: function(data) {
+				var selOficines = $('#selOficines');
+				selOficines.empty();
+				selOficines.append("<option value=\"\"></option>");
+				if (data && data.length > 0) {
+						var items = [];
+						$.each(data, function(i, val) {
+							items.push({
+								"id": val.codi,
+								"text": val.nom
+							});
+							selOficines.append("<option value=\"" + val.codi + "\">" + val.nom + "</option>");
+						});
+					}
+				var select2Options = {
+						theme: 'bootstrap',
+						width: 'auto'};
+				selOficines.select2(select2Options);
+			},
+			error: function() {
+				console.log("error obtenint les oficines...");
+			}
+		});
+	});
+	$('#addOficinaButton').on('click', function(){
+		var oficinaSelect = document.getElementById('selOficines');
+		var oficinaSeleccionatValue = oficinaSelect.options[oficinaSelect.selectedIndex].value;
+		var oficinaSeleccionatText = oficinaSelect.options[oficinaSelect.selectedIndex].text;
+		$('#oficina').val(oficinaSeleccionatValue);
+		$('#oficinaNom').val(oficinaSeleccionatText);
+	});
+	//Llibres
+	$("#searchLlibre").click(function(){
+		$("#llibresModal").modal();
+		var entitatId = $('#entitatId').val();
+		var oficina = $('#oficina').val();
+		if (oficina == '') {
+			oficina = '0';
+		}
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value="/procediment/llibres/"/>" + entitatId + "/" + oficina,
+			success: function(data) {
+				var selLlibres = $('#selLlibres');
+				selLlibres.empty();
+				selLlibres.append("<option value=\"\"></option>");
+				if (data && data.length > 0) {
+						var items = [];
+						$.each(data, function(i, val) {
+							items.push({
+								"id": val.codi,
+								"text": val.nom
+							});
+							selLlibres.append("<option value=\"" + val.codi + "\">" + val.nom + "</option>");
+						});
+					}
+				var select2Options = {
+						theme: 'bootstrap',
+						width: 'auto'};
+				selLlibres.select2(select2Options);
+			},
+			error: function() {
+				console.log("error obtenint els llibres...");
+			}
+		});
+	});
+	$('#addLlibreButton').on('click', function(){
+		var llibreSelect = document.getElementById('selLlibres');
+		var llibreSeleccionatValue = llibreSelect.options[llibreSelect.selectedIndex].value;
+		var llibreSeleccionatText = llibreSelect.options[llibreSelect.selectedIndex].text;
+		$('#llibre').val(llibreSeleccionatValue);
+		$('#llibreNom').val(llibreSeleccionatText);
+	});
+	//TipusAssumpte
+	$("#searchTipusAssumpte").click(function(){
+		$("#TipusAssumptesModal").modal();
+		var entitatId = $('#entitatId').val();
 		$.ajax({
 			type: 'GET',
 			url: "<c:url value="/procediment/tipusAssumpte/"/>" + entitatId,
 			success: function(data) {
-				var selTipusAssumpte = $('#tipusAssumpte');
-				var selCodiAssumpte = $('#codiAssumpte');
+				var selTipusAssumpte = $('#selTipusAssumpte');
 				selTipusAssumpte.empty();
 				selTipusAssumpte.append("<option value=\"\"></option>");
-				selCodiAssumpte.empty();
-				selCodiAssumpte.append("<option value=\"\"></option>");
 				if (data && data.length > 0) {
 						var items = [];
 						$.each(data, function(i, val) {
@@ -52,29 +202,38 @@ $(document).ready(function() {
 							selTipusAssumpte.append("<option value=\"" + val.codi + "\">" + val.nom + "</option>");
 						});
 					}
-				var select2Options = {theme: 'bootstrap'};
-				selTipusAssumpte.select2("destroy");
+				var select2Options = {
+						theme: 'bootstrap',
+						width: 'auto'};
 				selTipusAssumpte.select2(select2Options);
-				selCodiAssumpte.select2("destroy");
-				selCodiAssumpte.select2(select2Options);
 			},
 			error: function() {
-				console.log("error obtenint els codis d'assumpte..");
+				console.log("error obtenint els tipus d'assumpte...");
 			}
 		});
 	});
-	
-	$('#tipusAssumpte').change(function(value){
-		var codiTipusAssumpte = $(this).val();
+	$('#addTipusAssumpteButton').on('click', function(){
+		var tipusAssumpteSelect = document.getElementById('selTipusAssumpte');
+		var tipusAssumpteSeleccionatValue = tipusAssumpteSelect.options[tipusAssumpteSelect.selectedIndex].value;
+		var tipusAssumpteSeleccionatText = tipusAssumpteSelect.options[tipusAssumpteSelect.selectedIndex].text;
+		$('#tipusAssumpte').val(tipusAssumpteSeleccionatValue);
+		$('#tipusAssumpteNom').val(tipusAssumpteSeleccionatText);
+	});
+	//CodiAssumpte
+	$("#searchCodiAssumpte").click(function(){
+		$("#codisAssumpteModal").modal();
 		var entitatId = $('#entitatId').val();
-		
+		var tipusAssumpte = $('#tipusAssumpte').val();
+		if (tipusAssumpte == '') {
+			tipusAssumpte = 'NONE';
+		}
 		$.ajax({
 			type: 'GET',
-			url: "<c:url value="/procediment/codiAssumpte/"/>" + entitatId + "/" + codiTipusAssumpte,
+			url: "<c:url value="/procediment/codiAssumpte/"/>" + entitatId + "/" + tipusAssumpte,
 			success: function(data) {
-				var selCodiAssumpte = $('#codiAssumpte');
-				selCodiAssumpte.empty();
-				selCodiAssumpte.append("<option value=\"\"></option>");
+				var selCodisAssumpte = $('#selCodiAssumpte');
+				selCodisAssumpte.empty();
+				selCodisAssumpte.append("<option value=\"\"></option>");
 				if (data && data.length > 0) {
 						var items = [];
 						$.each(data, function(i, val) {
@@ -82,17 +241,25 @@ $(document).ready(function() {
 								"id": val.codi,
 								"text": val.nom
 							});
-							selCodiAssumpte.append("<option value=\"" + val.codi + "\">" + val.nom + "</option>");
+							selCodisAssumpte.append("<option value=\"" + val.codi + "\">" + val.nom + "</option>");
 						});
 					}
-				var select2Options = {theme: 'bootstrap'};
-				selCodiAssumpte.select2("destroy");
-				selCodiAssumpte.select2(select2Options);
+				var select2Options = {
+						theme: 'bootstrap',
+						width: 'auto'};
+				selCodisAssumpte.select2(select2Options);
 			},
 			error: function() {
-				console.log("error obtenint els codis d'assumpte..");
+				console.log("error obtenint els codis d'assumpte...");
 			}
 		});
+	});
+	$('#addCodiAssumpteButton').on('click', function(){
+		var codiAssumpteSelect = document.getElementById('selCodiAssumpte');
+		var codiAssumpteSeleccionatValue = codiAssumpteSelect.options[codiAssumpteSelect.selectedIndex].value;
+		var codiAssumpteSeleccionatText = codiAssumpteSelect.options[codiAssumpteSelect.selectedIndex].text;
+		$('#codiAssumpte').val(codiAssumpteSeleccionatValue);
+		$('#codiAssumpteNom').val(codiAssumpteSeleccionatText);
 	});
 });
 </script>
@@ -118,25 +285,24 @@ $(document).ready(function() {
 			<div role="tabpanel" class="tab-pane active" id="dadesgeneralsForm">
 				<not:inputText name="codi" textKey="procediment.form.camp.codi" required="true" labelSize="2"/>
 				<not:inputText name="nom" textKey="procediment.form.camp.nom" required="true" labelSize="2"/>
+				<not:inputDate name="enviamentDataProgramada" textKey="procediment.form.camp.dataProgramada" labelSize="2"/>
 				<not:inputText name="retard" textKey="notificacio.form.camp.retard" labelSize="2"/>
-				<c:choose>
-				  <c:when test="${entitats != null}">
-						<not:inputSelect name="entitatId" textKey="procediment.form.camp.entitat" optionItems="${entitats}" optionValueAttribute="id" optionTextAttribute="nom" required="true" labelSize="2"/>
-				  </c:when>
-				  <c:otherwise>
-				    	<form:hidden path="entitatId" value="${entitat.id}"/>
-						<not:inputText name="entitatNom" textKey="procediment.form.camp.entitat" value="${entitat.nom}" required="true" readonly="true" labelSize="2"/>
-				  </c:otherwise>
-				</c:choose>
+				<form:hidden path="entitatId" value="${entitat.id}"/>
+				<form:hidden path="organGestor"/>
+				<not:inputTextSearch name="organGestorNom" textKey="procediment.form.camp.organ" searchButton="searchOrgan" readonly="true" labelSize="2"/>
 				<not:inputSelect name="pagadorPostalId" emptyOption="true" textKey="procediment.form.camp.postal" optionItems="${pagadorsPostal}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>
 				<not:inputSelect name="pagadorCieId" emptyOption="true" textKey="procediment.form.camp.cie" optionItems="${pagadorsCie}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>
 				<not:inputCheckbox name="agrupar" textKey="procediment.form.camp.agrupar" labelSize="2"/>
 			</div>
 			<div role="tabpanel" class="tab-pane <c:if test='${not empty errorRegistre}'>active</c:if>"" id="registreForm">
-				<not:inputText name="llibre" textKey="procediment.form.camp.llibre" required="true" labelSize="2"/>
-				<not:inputText name="oficina" textKey="procediment.form.camp.oficina" required="true" labelSize="2"/>
-				<not:inputSelect name="tipusAssumpte" id="tipusAssumpte" textKey="procediment.form.camp.tipusassumpte" optionItems="${tipusAssumpte}"  optionValueAttribute="codi" optionTextAttribute="nom" labelSize="2"/>
-				<not:inputSelect name="codiAssumpte" id="codiAssumpte" textKey="procediment.form.camp.codiassumpte" optionItems="${codiAssumpte}" emptyOption="true" emptyOptionTextKey="procediment.form.cap" optionValueAttribute="codi" optionTextAttribute="nom" labelSize="2"/>
+				<form:hidden path="oficina"/>
+				<not:inputTextSearch name="oficinaNom" textKey="procediment.form.camp.oficina" searchButton="searchOficina" labelSize="2" readonly="true" required="true"/>
+				<form:hidden path="llibre"/>
+				<not:inputTextSearch name="llibreNom" textKey="procediment.form.camp.llibre" searchButton="searchLlibre" labelSize="2" readonly="true" required="true"/>
+				<form:hidden path="tipusAssumpte"/>
+				<not:inputTextSearch name="tipusAssumpteNom" textKey="procediment.form.camp.tipusassumpte" searchButton="searchTipusAssumpte" labelSize="2" readonly="true" required="true"/>
+				<form:hidden path="codiAssumpte"/>
+				<not:inputTextSearch name="codiAssumpteNom" textKey="procediment.form.camp.codiassumpte" searchButton="searchCodiAssumpte" labelSize="2" readonly="true"/>
 			</div>
 		</div>
 		<div id="modal-botons">
@@ -144,5 +310,95 @@ $(document).ready(function() {
 			<a href="<c:url value="/procediments"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>	
 	</form:form>
-	
+	<!-- Organismes Modal -->
+	<div class="modal fade" id="organismesModal" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title"><spring:message code="procediment.form.titol.organismes"/></h4>
+				</div>
+				<div class="modal-body body">
+					<select id="selOrganismes"></select> 
+				</div>
+				<div class="modal-footer">
+					<button id="addOrganismeButton" type="button" class="btn btn-info" data-dismiss="modal"><span class="fa fa-plus"></span> <spring:message code="comu.boto.afegir"/></button>
+					<button type="button" class="btn btn-default" data-dismiss="modal"><spring:message code="comu.boto.cancelar" /></button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Oficines Modal -->
+	<div class="modal fade" id="oficinesModal" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title"><spring:message code="procediment.form.titol.oficines"/></h4>
+				</div>
+				<div class="modal-body body">
+					<select id="selOficines"></select> 
+				</div>
+				<div class="modal-footer">
+					<button id="addOficinaButton" type="button" class="btn btn-info" data-dismiss="modal"><span class="fa fa-plus"></span> <spring:message code="comu.boto.afegir"/></button>
+					<button type="button" class="btn btn-default" data-dismiss="modal"><spring:message code="comu.boto.cancelar" /></button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Llibres Modal -->
+	<div class="modal fade" id="llibresModal" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title"><spring:message code="procediment.form.titol.llibres"/></h4>
+				</div>
+				<div class="modal-body body">
+					<select id="selLlibres"></select> 
+				</div>
+				<div class="modal-footer">
+					<button id="addLlibreButton" type="button" class="btn btn-info" data-dismiss="modal"><span class="fa fa-plus"></span> <spring:message code="comu.boto.afegir"/></button>
+					<button type="button" class="btn btn-default" data-dismiss="modal"><spring:message code="comu.boto.cancelar" /></button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Tipus Assumpte Modal -->
+	<div class="modal fade" id="TipusAssumptesModal" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title"><spring:message code="procediment.form.titol.tipusAssumpte"/></h4>
+				</div>
+				<div class="modal-body body">
+					<select id="selTipusAssumpte"></select> 
+				</div>
+				<div class="modal-footer">
+					<button id="addTipusAssumpteButton" type="button" class="btn btn-info" data-dismiss="modal"><span class="fa fa-plus"></span> <spring:message code="comu.boto.afegir"/></button>
+					<button type="button" class="btn btn-default" data-dismiss="modal"><spring:message code="comu.boto.cancelar" /></button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Codis Assumpte Modal -->
+	<div class="modal fade" id="codisAssumpteModal" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title"><spring:message code="procediment.form.titol.codiAssumpte"/></h4>
+				</div>
+				<div class="modal-body body">
+					<select id="selCodiAssumpte"></select> 
+				</div>
+				<div class="modal-footer">
+					<button id="addCodiAssumpteButton" type="button" class="btn btn-info" data-dismiss="modal"><span class="fa fa-plus"></span> <spring:message code="comu.boto.afegir"/></button>
+					<button type="button" class="btn btn-default" data-dismiss="modal"><spring:message code="comu.boto.cancelar" /></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 </body>

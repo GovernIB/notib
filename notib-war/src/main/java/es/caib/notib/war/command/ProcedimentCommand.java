@@ -1,5 +1,7 @@
 package es.caib.notib.war.command;
 
+import java.util.Date;
+
 import javax.validation.constraints.Size;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -34,12 +36,19 @@ public class ProcedimentCommand {
 	private boolean notificacio;
 	private boolean gestio;
 	private int retard;
+	private Date enviamentDataProgramada;
 	@NotEmpty @Size(max=64)
 	private String oficina;
+	private String oficinaNom;
 	@NotEmpty @Size(max=64)
 	private String llibre;
+	private String llibreNom;
+	private String organGestor;
+	private String organGestorNom;
 	private String tipusAssumpte;
+	private String tipusAssumpteNom;
 	private String codiAssumpte;
+	private String codiAssumpteNom;
 	
 	public Long getId() {
 		return id;
@@ -119,6 +128,12 @@ public class ProcedimentCommand {
 	public void setRetard(int retard) {
 		this.retard = retard;
 	}
+	public Date getEnviamentDataProgramada() {
+		return enviamentDataProgramada;
+	}
+	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
+		this.enviamentDataProgramada = enviamentDataProgramada;
+	}
 	public String getOficina() {
 		return oficina;
 	}
@@ -130,6 +145,12 @@ public class ProcedimentCommand {
 	}
 	public void setLlibre(String llibre) {
 		this.llibre = llibre;
+	}
+	public String getOrganGestor() {
+		return organGestor;
+	}
+	public void setOrganGestor(String organGestor) {
+		this.organGestor = organGestor;
 	}
 	public String getTipusAssumpte() {
 		return tipusAssumpte;
@@ -143,7 +164,36 @@ public class ProcedimentCommand {
 	public void setCodiAssumpte(String codiAssumpte) {
 		this.codiAssumpte = codiAssumpte;
 	}
-	
+	public String getOficinaNom() {
+		return oficinaNom;
+	}
+	public void setOficinaNom(String oficinaNom) {
+		this.oficinaNom = oficinaNom;
+	}
+	public String getLlibreNom() {
+		return llibreNom;
+	}
+	public void setLlibreNom(String llibreNom) {
+		this.llibreNom = llibreNom;
+	}
+	public String getOrganGestorNom() {
+		return organGestorNom;
+	}
+	public void setOrganGestorNom(String organGestorNom) {
+		this.organGestorNom = organGestorNom;
+	}
+	public String getTipusAssumpteNom() {
+		return tipusAssumpteNom;
+	}
+	public void setTipusAssumpteNom(String tipusAssumpteNom) {
+		this.tipusAssumpteNom = tipusAssumpteNom;
+	}
+	public String getCodiAssumpteNom() {
+		return codiAssumpteNom;
+	}
+	public void setCodiAssumpteNom(String codiAssumpteNom) {
+		this.codiAssumpteNom = codiAssumpteNom;
+	}
 	public static ProcedimentCommand asCommand(ProcedimentDto dto) {
 		if (dto == null) {
 			return null;

@@ -376,7 +376,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		Date dataProgramada;
 		Integer retardPostal;
 		
-		envios.setCodigoOrganismoEmisor(notificacio.getEmisorDir3Codi());
+		envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
 		switch (notificacio.getEnviamentTipus()) {
 		case COMUNICACIO:
 			envios.setTipoEnvio(new BigInteger("1"));

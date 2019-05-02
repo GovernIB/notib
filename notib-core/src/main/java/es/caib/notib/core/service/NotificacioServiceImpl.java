@@ -197,6 +197,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				getBuilderV2(
 						entitat,
 						notificacio.getEmisorDir3Codi(),
+						notificacio.getOrganGestor(),
 						notificacio.getComunicacioTipus(),
 						notificacio.getEnviamentTipus(), 
 						notificacio.getConcepte(),

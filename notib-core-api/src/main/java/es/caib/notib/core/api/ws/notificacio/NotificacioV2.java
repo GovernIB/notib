@@ -26,6 +26,7 @@ import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
 public class NotificacioV2 {
 
 	private String emisorDir3Codi;
+	private String organGestor;
 	private ComunicacioTipusEnum comunicacioTipus;
 	private EnviamentTipusEnum enviamentTipus;
 	private String concepte;
@@ -56,6 +57,12 @@ public class NotificacioV2 {
 	}
 	public void setEmisorDir3Codi(String emisorDir3Codi) {
 		this.emisorDir3Codi = emisorDir3Codi;
+	}
+	public String getOrganGestor() {
+		return organGestor;
+	}
+	public void setOrganGestor(String organGestor) {
+		this.organGestor = organGestor;
 	}
 	public ComunicacioTipusEnum getComunicacioTipus() {
 		return comunicacioTipus;

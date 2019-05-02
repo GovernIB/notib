@@ -326,7 +326,10 @@ function mostrarEntregaPostal(className) {
             <div role="tabpanel" class="tab-pane active" id="dadesgeneralsForm">
                 <div class="row dadesgeneralsForm">
                     <div class="col-md-12">
-                        <not:inputText name="emisorDir3Codi" textKey="notificacio.form.camp.codiemisor" value="${entitat.dir3Codi}" labelSize="2" readonly="true" required="true"/>
+                        <form:hidden path="emisorDir3Codi" value="${entitat.dir3Codi}"/>
+                    </div>
+                    <div class="col-md-12">
+                        <not:inputText name="organGestor" textKey="notificacio.form.camp.organGestor" value="${procediment.organGestor}" labelSize="2" readonly="true" required="true"/>
                     </div>
                     <div class="col-md-6">
                         <not:inputSelect name="comunicacioTipus" textKey="notificacio.form.camp.comunicaciotipus" optionItems="${comunicacioTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>

@@ -235,6 +235,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				getBuilderV2(
 					entitat,
 					emisorDir3Codi,
+					notificacio.getOrganGestor(),
 					comunicacioTipus,
 					enviamentTipus, 
 					notificacio.getConcepte(),

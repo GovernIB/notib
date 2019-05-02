@@ -27,7 +27,7 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 	private String dir3codi;
 	
 	@Column(name = "contracte_data_vig")
-	@Temporal(TemporalType.TIMESTAMP)
+	@Temporal(TemporalType.DATE)
 	private Date contracteDataVig;
 
 	public String getDir3codi() {

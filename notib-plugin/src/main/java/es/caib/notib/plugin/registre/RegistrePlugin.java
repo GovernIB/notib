@@ -99,10 +99,11 @@ public interface RegistrePlugin {
 	 * @param entitatCodi
 	 * @param autoritzacioValor
 	 * @return
+	 * @throws RegistrePluginException 
 	 */
 	public List<Oficina> llistarOficines(
 			String entitatCodi, 
-			Long autoritzacioValor);
+			Long autoritzacioValor) throws RegistrePluginException;
 	
 	/**
 	 * 
@@ -110,17 +111,19 @@ public interface RegistrePlugin {
 	 * @param oficina
 	 * @param autoritzacioValor
 	 * @return
+	 * @throws RegistrePluginException 
 	 */
 	public List<Llibre> llistarLlibres(
 			String entitatCodi, 
 			String oficina,
-			Long autoritzacioValor);
+			Long autoritzacioValor) throws RegistrePluginException;
 	
 	/**
 	 * 
 	 * @param entitatCodi
 	 * @return
+	 * @throws RegistrePluginException 
 	 */
 	public List<Organisme> llistarOrganismes(
-			String entitatCodi);
+			String entitatCodi) throws RegistrePluginException;
 }
