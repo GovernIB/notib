@@ -46,6 +46,16 @@
 					<groupId>axis</groupId>
 					<artifactId>axis</artifactId>
 					<version>1.4</version>
+					<exclusions>
+						<exclusion>
+							<groupId>axis</groupId>
+					       	<artifactId>axis-jaxrpc</artifactId>
+						</exclusion>
+						<exclusion>
+							<groupId>axis</groupId>
+					        <artifactId>axis-saaj</artifactId>
+						</exclusion>
+					</exclusions>
 				</dependency>
 			</dependencies>
 		</profile>

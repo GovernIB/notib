@@ -43,14 +43,8 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	@Column(name = "llibre")
 	protected String llibre;
 	
-	@Column(name = "llibre_nom")
-	protected String llibreNom;
-	
 	@Column(name = "oficina")
 	protected String oficina;
-	
-	@Column(name = "oficina_nom")
-	protected String oficinaNom;
 	
 	@Column(name = "organ_gestor")
 	protected String organGestor;
@@ -137,14 +131,6 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 
 	public void setAgrupar(boolean agrupar) {
 		this.agrupar = agrupar;
-	}
-
-	public String getLlibreNom() {
-		return llibreNom;
-	}
-
-	public String getOficinaNom() {
-		return oficinaNom;
 	}
 
 	public String getOrganGestorNom() {
@@ -236,9 +222,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 		this.pagadorcie = pagadorcie;
 		this.agrupar = agrupar;
 		this.llibre = llibre;
-		this.llibreNom = llibreNom;
 		this.oficina = oficina;
-		this.oficinaNom = oficinaNom;
 		this.organGestor = organGestor;
 		this.organGestorNom = organGestorNom;
 		this.retard = retard;
@@ -319,9 +303,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			built.pagadorcie = pagadorcie;
 			built.agrupar = agrupar;
 			built.llibre = llibre;
-			built.llibreNom = llibreNom;
 			built.oficina = oficina;
-			built.oficinaNom = oficinaNom;
 			built.organGestor = organGestor;
 			built.organGestorNom = organGestorNom;
 			built.tipusAssumpte = tipusAssumpte;

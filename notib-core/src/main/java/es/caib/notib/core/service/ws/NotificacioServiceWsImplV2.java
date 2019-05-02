@@ -205,10 +205,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				break;
 			}
 		}
-		NotificacioComunicacioTipusEnumDto comunicacioTipus = pluginHelper.getNotibTipusComunicacioDefecte();
-		if (notificacio.getComunicacioTipus() != null && ComunicacioTipusEnum.SINCRON.equals(notificacio.getComunicacioTipus())) {
-			comunicacioTipus = NotificacioComunicacioTipusEnumDto.SINCRON;
-		}
+//		NotificacioComunicacioTipusEnumDto comunicacioTipus = pluginHelper.getNotibTipusComunicacioDefecte();
+//		if (notificacio.getComunicacioTipus() != null && ComunicacioTipusEnum.SINCRON.equals(notificacio.getComunicacioTipus())) {
+//			comunicacioTipus = NotificacioComunicacioTipusEnumDto.SINCRON;
+//		}
 		
 		DocumentEntity documentEntity = null;
 		
@@ -236,7 +236,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					entitat,
 					emisorDir3Codi,
 					notificacio.getOrganGestor(),
-					comunicacioTipus,
+					pluginHelper.getNotibTipusComunicacioDefecte(),
 					enviamentTipus, 
 					notificacio.getConcepte(),
 					notificacio.getDescripcio(),
@@ -376,7 +376,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			}
 			
 			notificacioRepository.saveAndFlush(notificacioGuardada);
-			if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioGuardada.getComunicacioTipus())) {
+			if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
 				if (pluginHelper.isArxiuEmprarSir()) {
 					if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioGuardada.getEnviamentTipus())) {
 						//Regweb3 + SIR

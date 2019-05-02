@@ -64,6 +64,7 @@ import es.caib.notib.plugin.registre.DadesOficina;
 import es.caib.notib.plugin.registre.DadesRepresentat;
 import es.caib.notib.plugin.registre.DocumentRegistre;
 import es.caib.notib.plugin.registre.Llibre;
+import es.caib.notib.plugin.registre.LlibreOficina;
 import es.caib.notib.plugin.registre.Oficina;
 import es.caib.notib.plugin.registre.Organisme;
 import es.caib.notib.plugin.registre.RegistreModeFirmaEnum;
@@ -77,6 +78,7 @@ import es.caib.notib.plugin.registre.RespostaAnotacioRegistre;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
 import es.caib.notib.plugin.registre.TipusAssumpte;
+import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
 import es.caib.notib.plugin.seu.SeuPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
@@ -422,7 +424,7 @@ public class PluginHelper {
 				document.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA.getValor());
 			} else if (documentDto.getCsv() != null) {
 				id = documentDto.getCsv();
-				document.setModeFirma(RegistreModeFirmaEnum.AUTOFIRMA_SI.getValor());
+				document.setModeFirma(RegistreModeFirmaEnum.AUTOFIRMA_NO.getValor());
 			}
 			try {
 				DocumentContingut doc = arxiuGetImprimible(id, true);
@@ -736,6 +738,19 @@ public class PluginHelper {
 		return oficines;
 	}
 	
+	public List<LlibreOficina> llistarLlibresOficines(
+			String entitatCodi,
+			String usuariCodi,
+			TipusRegistreRegweb3Enum tipusRegistre){
+		
+		List<LlibreOficina> llibresOficines = getRegistrePlugin().llistarLlibresOficines(
+				entitatCodi, 
+				usuariCodi,
+				tipusRegistre.getValor());
+	
+		return llibresOficines;
+	}
+	
 	public List<Llibre> llistarLlibres(
 			String entitatcodi,
 			String oficina,
@@ -757,11 +772,10 @@ public class PluginHelper {
 	}
 	private RegistreSortida toRegistreSortida(
 			NotificacioDtoV2 notificacio,
-			NotificacioEnviamentDtoV2 enviament) {
+			NotificacioEnviamentDtoV2 enviament) throws RegistrePluginException {
 		RegistreSortida registreSortida = new RegistreSortida();
 		DadesOficina dadesOficina = new DadesOficina();
 		Long tipusInteressat;
-		Long docFisica;
 		
 		switch (enviament.getTitular().getInteressatTipus()) {
 		case ADMINISTRACIO:
@@ -778,23 +792,40 @@ public class PluginHelper {
 			break;
 		}
 		
-		switch (notificacio.getDocFisica()) {
-		case ACOMPANYA_DOCUMENTACIO_FISICA_REQUERIDA:
-			docFisica = 1L;
-			break;
-		case ACOMPANYA_DOCUMENTACIO_FISICA_COMPLEMENTARIA:
-			docFisica = 2L;
-			break;
-		case NO_ACOMPANYA_DOCUMENTACIO:
-			docFisica = 3L;
-			break;
-		default:
-			docFisica = 1L;
-			break;
+//		switch (notificacio.getDocFisica()) {
+//		case ACOMPANYA_DOCUMENTACIO_FISICA_REQUERIDA:
+//			docFisica = 1L;
+//			break;
+//		case ACOMPANYA_DOCUMENTACIO_FISICA_COMPLEMENTARIA:
+//			docFisica = 2L;
+//			break;
+//		case NO_ACOMPANYA_DOCUMENTACIO:
+//			docFisica = 3L;
+//			break;
+//		default:
+//			docFisica = 1L;
+//			break;
+//		}
+		List<LlibreOficina> llibreOficina = llistarLlibresOficines(
+				notificacio.getEmisorDir3Codi(), 
+				notificacio.getUsuariCodi(),
+				TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
+		
+		if (notificacio.getProcediment().getOficina() != null) {
+			dadesOficina.setOficina(notificacio.getProcediment().getOficina());
+		} else if (llibreOficina != null && ! llibreOficina.isEmpty()) {
+			String oficinaCodi = llibreOficina.get(0).getOficina().getCodi();
+			dadesOficina.setOficina(oficinaCodi);
 		}
+		
+		if (notificacio.getProcediment().getOficina() != null) {
+			dadesOficina.setLlibre(notificacio.getProcediment().getLlibre());
+		} else if (llibreOficina != null && ! llibreOficina.isEmpty()) {
+			String llibreCodi = llibreOficina.get(0).getLlibre().getCodi();
+			dadesOficina.setLlibre(llibreCodi);
+		}
+
 		dadesOficina.setOrgan(notificacio.getEmisorDir3Codi());
-		dadesOficina.setOficina(notificacio.getProcediment().getOficina());
-		dadesOficina.setLlibre(notificacio.getProcediment().getLlibre());
 		registreSortida.setDadesOficina(dadesOficina);
 		
 		DadesInteressat dadesInteressat = new DadesInteressat();
@@ -818,12 +849,32 @@ public class PluginHelper {
 		registreSortida.setDadesRepresentat(dadesRepresentat);
 		
 		DadesAnotacio dadesAnotacio = new DadesAnotacio();
-		dadesAnotacio.setIdiomaCodi(notificacio.getIdioma().getText());
-		dadesAnotacio.setTipusAssumpte(notificacio.getProcediment().getTipusAssumpte());
-		dadesAnotacio.setCodiAssumpte(notificacio.getProcediment().getCodiAssumpte());
+		dadesAnotacio.setIdiomaCodi("ca");
+		
+		List<TipusAssumpte> tipusAssumpte = llistarTipusAssumpte(notificacio.getEmisorDir3Codi());
+		
+		if(notificacio.getProcediment().getTipusAssumpte() != null) {
+			dadesAnotacio.setTipusAssumpte(notificacio.getProcediment().getTipusAssumpte());
+		} else if (tipusAssumpte != null && ! tipusAssumpte.isEmpty()) {
+			String tipusAssumpteCodi = tipusAssumpte.get(0).getCodi();
+			dadesAnotacio.setTipusAssumpte(tipusAssumpteCodi);
+		}
+		
+		if(notificacio.getProcediment().getCodiAssumpte() != null) {
+			dadesAnotacio.setCodiAssumpte(notificacio.getProcediment().getCodiAssumpte());
+		} else if (tipusAssumpte != null && ! tipusAssumpte.isEmpty()) {
+			List<CodiAssumpte> codisAssumpte = llistarCodisAssumpte(
+					notificacio.getEmisorDir3Codi(), 
+					tipusAssumpte.get(0).getCodi());
+			if (codisAssumpte != null && ! codisAssumpte.isEmpty()) {
+				String codiAssumpte = codisAssumpte.get(0).getCodi();
+				dadesAnotacio.setCodiAssumpte(codiAssumpte);
+			}
+		}
+		
 		dadesAnotacio.setExtracte(notificacio.getConcepte());
 		dadesAnotacio.setUnitatAdministrativa(null);
-		dadesAnotacio.setDocfisica(docFisica);
+		dadesAnotacio.setDocfisica(1L);
 		dadesAnotacio.setNumExpedient(notificacio.getNumExpedient());
 		dadesAnotacio.setObservacions(notificacio.getObservacions());
 		dadesAnotacio.setRefExterna(notificacio.getRefExterna());

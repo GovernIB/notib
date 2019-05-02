@@ -198,7 +198,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						entitat,
 						notificacio.getEmisorDir3Codi(),
 						notificacio.getOrganGestor(),
-						notificacio.getComunicacioTipus(),
+						pluginHelper.getNotibTipusComunicacioDefecte(),
 						notificacio.getEnviamentTipus(), 
 						notificacio.getConcepte(),
 						notificacio.getDescripcio(),
@@ -319,7 +319,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		notificacioEntity.getEnviaments().addAll(enviamentsEntity);
 		notificacioEntity = notificacioRepository.saveAndFlush(notificacioEntity);
 		// Comprovar on s'ha d'enviar
-		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioEntity.getComunicacioTipus())) {
+		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
 			if (pluginHelper.isArxiuEmprarSir()) {
 				if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus())) {
 					//Regweb3 + SIR

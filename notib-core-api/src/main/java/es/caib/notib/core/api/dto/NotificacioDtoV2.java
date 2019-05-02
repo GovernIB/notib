@@ -19,7 +19,6 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private Long id;
 	private String emisorDir3Codi;
 	private String organGestor;
-	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
 	private String concepte;
 	private String descripcio;
@@ -75,12 +74,6 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	}
 	public void setOrganGestor(String organGestor) {
 		this.organGestor = organGestor;
-	}
-	public NotificacioComunicacioTipusEnumDto getComunicacioTipus() {
-		return comunicacioTipus;
-	}
-	public void setComunicacioTipus(NotificacioComunicacioTipusEnumDto comunicacioTipus) {
-		this.comunicacioTipus = comunicacioTipus;
 	}
 	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
 		return enviamentTipus;

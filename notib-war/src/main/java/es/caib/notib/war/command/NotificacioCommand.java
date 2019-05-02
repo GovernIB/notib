@@ -5,10 +5,12 @@ package es.caib.notib.war.command;
 
 import java.util.Date;
 import java.util.List;
+
 import javax.validation.constraints.Size;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.web.multipart.MultipartFile;
-import es.caib.notib.core.api.dto.NotificaComunicacioTipusEnumDto;
+
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
@@ -25,7 +27,6 @@ public class NotificacioCommand {
 
 	private Long id;
 	private String codiEmisor;
-	private NotificaComunicacioTipusEnumDto comunicacioTipus;
 	private String descripcio;
 	private int retard;
 	private Date caducitat;
@@ -132,12 +133,6 @@ public class NotificacioCommand {
 	}
 	public void setCodiEmisor(String codiEmisor) {
 		this.codiEmisor = codiEmisor;
-	}
-	public NotificaComunicacioTipusEnumDto getComunicacioTipus() {
-		return comunicacioTipus;
-	}
-	public void setComunicacioTipus(NotificaComunicacioTipusEnumDto comunicacioTipus) {
-		this.comunicacioTipus = comunicacioTipus;
 	}
 	public String getDescripcio() {
 		return descripcio;

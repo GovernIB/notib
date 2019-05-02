@@ -7,7 +7,7 @@
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
 
 <c:choose>
-    <c:when test="${empty notificacioCommand.id}"><c:set var="titol"><spring:message code="notificacio.form.titol.crear"/></c:set></c:when>
+    <c:when test="${empty notificacioCommand.id}"><c:set var="titol"><spring:message code="notificacio.form.titol.crear"/><small>  ${procediment.nom}</small></c:set></c:when>
     <c:otherwise><c:set var="titol"><spring:message code="notificacio.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
 <c:set var="dadesGenerals"><spring:message code="notificacio.form.titol.dadesgenerals"/></c:set>
@@ -316,7 +316,6 @@ function mostrarEntregaPostal(className) {
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" class="active"><a href="#dadesgeneralsForm" aria-controls="dadesgeneralsForm" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.dadesgenerals"/><c:if test="${not empty errorConcepte}"> <span class="fa fa-warning text-danger"></span></c:if></a> </li>
         <li role="presentation"><a href="#documentForm" aria-controls="documentForm" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.document"/></a></li>
-        <li role="presentation"><a href="#parametresregistreForm" aria-controls="parametresregistreForm" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.parametresregistre"/></a></li>
         <li role="presentation"><a href="#enviamentsForm" aria-controls="enviamentsForm" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.enviaments"/><c:if test="${not empty errorEnviament}"> <span class="fa fa-warning text-danger"></span></c:if></a></li>
     </ul>
     <br/>
@@ -326,27 +325,6 @@ function mostrarEntregaPostal(className) {
             <div role="tabpanel" class="tab-pane active" id="dadesgeneralsForm">
                 <div class="row dadesgeneralsForm">
                     <div class="col-md-12">
-                        <form:hidden path="emisorDir3Codi" value="${entitat.dir3Codi}"/>
-                    </div>
-                    <div class="col-md-12">
-                        <not:inputText name="organGestor" textKey="notificacio.form.camp.organGestor" value="${procediment.organGestor}" labelSize="2" readonly="true" required="true"/>
-                    </div>
-                    <div class="col-md-6">
-                        <not:inputSelect name="comunicacioTipus" textKey="notificacio.form.camp.comunicaciotipus" optionItems="${comunicacioTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
-                    </div>
-                    <div class="col-md-6">
-                        <not:inputSelect name="enviamentTipus" textKey="notificacio.form.camp.enviamenttipus" optionItems="${enviamentTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
-                    </div>
-                    <div class="col-md-12">
-                        <not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="2" required="true" />
-                    </div>
-                    <div class="col-md-12">
-                        <not:inputTextarea name="descripcio" textKey="notificacio.form.camp.descripcio" labelSize="2"/>
-                    </div>
-                    <div class="col-md-6">
-                        <not:inputDate name="caducitat" textKey="notificacio.form.camp.caducitat" orientacio="bottom" labelSize="4"/>
-                    </div>
-                    <div class="col-md-12">
                     <form:hidden path="procedimentId" value="${procediment.id}"/>
                         <not:inputText name="procedimentNom" textKey="notificacio.form.camp.procediment" value="${procediment.nom}" labelSize="2" readonly="true"/>
                     </div>
@@ -355,6 +333,27 @@ function mostrarEntregaPostal(className) {
                             <not:inputSelect name="grupId" textKey="notificacio.form.camp.grup" optionItems="${grups}" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2"/>
                         </div>
                     </c:if>
+                    <div class="col-md-12">
+                        <form:hidden path="emisorDir3Codi" value="${entitat.dir3Codi}"/>
+                    </div>
+                    <div class="col-md-12">
+                        <not:inputText name="organGestor" textKey="notificacio.form.camp.organGestor" value="${procediment.organGestor}" labelSize="2" readonly="true" required="true"/>
+                    </div>
+                    <div class="col-md-6">
+                        <not:inputSelect name="enviamentTipus" textKey="notificacio.form.camp.enviamenttipus" optionItems="${enviamentTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
+                    </div>
+                    <div class="col-md-6">
+                        <not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="3" required="true" />
+                    </div>
+                    <div class="col-md-12">
+                        <not:inputTextarea name="descripcio" textKey="notificacio.form.camp.descripcio" labelSize="2"/>
+                    </div>
+                    <div class="col-md-6">
+                        <not:inputDate name="caducitat" textKey="notificacio.form.camp.caducitat" orientacio="bottom" labelSize="4"/>
+                    </div>
+                     <div class="col-md-6">
+                        <not:inputText name="numExpedient" textKey="notificacio.form.camp.expedient" labelSize="4"/>
+                    </div>
                 </div>
                 <div class="text-right col-md-12">
                     <div class="btn-group">
@@ -384,61 +383,6 @@ function mostrarEntregaPostal(className) {
 							<span class="input-group-addon" id="add"><span class="fa fa-plus"></span></span>
 						</div>
                         <div id="list"></div>
-                    </div>
-                </div>
-                <div class="text-right col-md-12">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-info nextForm"><spring:message code="comu.boto.seguent"/> <span class="fa fa-forward"></span></button>
-                    </div>
-                </div>
-            </div>
-            <div role="tabpanel" class="tab-pane" id="parametresregistreForm">
-                <div class="row parametresregistreForm">
-                    <div class="col-md-6">
-                        <not:inputText name="oficina" value="${procediment.oficina}" textKey="notificacio.form.camp.oficina" labelSize="4" readonly="true"/>
-                    </div>
-                    <div class="col-md-6">
-                        <not:inputText name="llibre" value="${procediment.llibre}" textKey="notificacio.form.camp.llibre" labelSize="4" readonly="true"/>
-                    </div>
-                    <div class="col-md-6">
-                        <not:inputText name="extracte" textKey="notificacio.form.camp.extracte" labelSize="4" readonly="true"/>
-                    </div>
-                    <div class="col-md-6">
-                    	<not:inputSelect name="docFisica" textKey="notificacio.form.camp.doc" labelSize="4" optionItems="${registreDocumentacioFisica}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-                    </div>
-                    <div class="col-md-6">
-                    	<not:inputSelect name="idioma" textKey="notificacio.form.camp.idioma" labelSize="4" optionItems="${idioma}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-                    </div>
-                    <c:choose>
-						<c:when test = "${not empty procediment.tipusAssumpte}"> 
-						  <c:set value="${procediment.tipusAssumpte}" var="tipusAssumpte"></c:set>
-						</c:when>
-						<c:otherwise> 
-						  <c:set value="" var="tipusAssumpte"></c:set>
-						</c:otherwise>
-					</c:choose>
-                    <div class="col-md-6">
-                        <not:inputText name="tipusAssumpte" value="${tipusAssumpte}" textKey="notificacio.form.camp.tipus" labelSize="4" readonly="true"/>
-                    </div>
-                    <div class="col-md-6">
-                        <not:inputText name="numExpedient" textKey="notificacio.form.camp.expedient" labelSize="4"/>
-                    </div>
-                    <div class="col-md-6">
-                        <not:inputText name="refExterna" textKey="notificacio.form.camp.externa" labelSize="4"/>
-                    </div>
-                    <c:choose>
-						<c:when test = "${not empty procediment.codiAssumpte}"> 
-						  <c:set value="${procediment.codiAssumpte}" var="codiAssumpte"></c:set>
-						</c:when>
-						<c:otherwise> 
-						  <c:set value="" var="codiAssumpte"></c:set>
-						</c:otherwise>
-					</c:choose>
-                    <div class="col-md-6">
-                        <not:inputText name="codiAssumpte" value="${codiAssumpte}" textKey="notificacio.form.camp.codi" labelSize="4" readonly="true"/>
-                    </div>
-                    <div class="col-md-12">
-                        <not:inputTextarea name="observacions" textKey="notificacio.form.camp.observacions" labelSize="2"/>
                     </div>
                 </div>
                 <div class="text-right col-md-12">

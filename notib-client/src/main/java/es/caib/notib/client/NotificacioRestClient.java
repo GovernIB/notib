@@ -25,8 +25,6 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.representation.Form;
 
 import es.caib.loginModule.client.AuthenticationFailureException;
-import es.caib.notib.ws.notificacio.Notificacio;
-import es.caib.notib.ws.notificacio.NotificacioService;
 import es.caib.notib.ws.notificacio.NotificacioServiceV2;
 import es.caib.notib.ws.notificacio.NotificacioV2;
 import es.caib.notib.ws.notificacio.PermisConsulta;

@@ -12,8 +12,8 @@ import java.io.Serializable;
  */
 public enum TipusDocumentEnumDto implements Serializable {
 
-	UUID("UUID"),
 	CSV("CSV"),
+	UUID("UUID"),
 	ARXIU("ARXIU"),
 	URL("URL");
 	
