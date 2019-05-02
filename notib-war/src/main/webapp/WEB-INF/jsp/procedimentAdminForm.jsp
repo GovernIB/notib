@@ -40,29 +40,13 @@
 .modal.in {
     background-color: rgba(0,0,0,0.5);
 }
+.habilitat {
+	background-color: white !important;
+	cursor: pointer;
+}
 </style>
 <script type="text/javascript">
 $(document).ready(function() {
-	//var oficina = $('#oficina').val();
-	//var tipusAssumpte = $('#tipusAssumpte').val();
-	//$('#selOficines').trigger('change');
-	//$('#selTipusAssumpte').trigger('change');
-	//
-	//$('#selOficines').on('change', function(){
-	//	if ($(this).val() == '') {
-	//		$('.llibre').addClass('hidden');
-	//	} else {
-	//		$('.llibre').removeClass('hidden');
-	//	}
-	//})
-	//$('#selTipusAssumpte').on('change', function(){
-	//	if ($(this).val() == '') {
-	//		$('.codiAssumpte').addClass('hidden');
-	//	} else {
-	//		$('.codiAssumpte').removeClass('hidden');
-	//	}
-	//})
-	
 	//Organismes
 	$("#searchOrgan").click(function(){
 		$("#organismesModal").modal();
@@ -294,13 +278,14 @@ $(document).ready(function() {
 				<not:inputSelect name="pagadorCieId" emptyOption="true" textKey="procediment.form.camp.cie" optionItems="${pagadorsCie}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>
 				<not:inputCheckbox name="agrupar" textKey="procediment.form.camp.agrupar" labelSize="2"/>
 			</div>
-			<div role="tabpanel" class="tab-pane <c:if test='${not empty errorRegistre}'>active</c:if>"" id="registreForm">
-				<form:hidden path="oficina"/>
-				<not:inputTextSearch name="oficinaNom" textKey="procediment.form.camp.oficina" searchButton="searchOficina" labelSize="2" readonly="true" required="true"/>
-				<form:hidden path="llibre"/>
-				<not:inputTextSearch name="llibreNom" textKey="procediment.form.camp.llibre" searchButton="searchLlibre" labelSize="2" readonly="true" required="true"/>
+			<div role="tabpanel" class="tab-pane <c:if test='${not empty errorRegistre}'>active</c:if>" id="registreForm">
+				<div class="alert alert-warning" role="alert">
+				 	<spring:message code="procediment.form.warning"></spring:message>
+				</div>
+				<not:inputText name="oficina" textKey="procediment.form.camp.oficina" labelSize="2"/>
+				<not:inputText name="llibre" textKey="procediment.form.camp.llibre" labelSize="2"/>
 				<form:hidden path="tipusAssumpte"/>
-				<not:inputTextSearch name="tipusAssumpteNom" textKey="procediment.form.camp.tipusassumpte" searchButton="searchTipusAssumpte" labelSize="2" readonly="true" required="true"/>
+				<not:inputTextSearch name="tipusAssumpteNom" textKey="procediment.form.camp.tipusassumpte" searchButton="searchTipusAssumpte" labelSize="2" readonly="true"/>
 				<form:hidden path="codiAssumpte"/>
 				<not:inputTextSearch name="codiAssumpteNom" textKey="procediment.form.camp.codiassumpte" searchButton="searchCodiAssumpte" labelSize="2" readonly="true"/>
 			</div>

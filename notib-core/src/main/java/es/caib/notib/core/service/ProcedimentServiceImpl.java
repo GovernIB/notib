@@ -235,7 +235,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ")");
 		EntitatEntity entitat = null;
-		
+			
 		if (entitatId != null && !isAdministrador)
 			entitat = entityComprovarHelper.comprovarEntitat(
 					entitatId, 

@@ -37,10 +37,8 @@ public class ProcedimentCommand {
 	private boolean gestio;
 	private int retard;
 	private Date enviamentDataProgramada;
-	@NotEmpty @Size(max=64)
 	private String oficina;
 	private String oficinaNom;
-	@NotEmpty @Size(max=64)
 	private String llibre;
 	private String llibreNom;
 	private String organGestor;
