@@ -2,7 +2,6 @@ package es.caib.notib.plugin.arxiu;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
@@ -12,29 +11,32 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 
 import es.caib.notib.plugin.utils.PropertiesHelper;
 import es.caib.plugins.arxiu.api.ArxiuException;
-import es.caib.plugins.arxiu.api.Carpeta;
-import es.caib.plugins.arxiu.api.ConsultaFiltre;
-import es.caib.plugins.arxiu.api.ConsultaResultat;
-import es.caib.plugins.arxiu.api.ContingutArxiu;
-import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
-import es.caib.plugins.arxiu.api.DocumentRepositori;
-import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
 
-public class ArxiuPluginConcsvImpl implements IArxiuPlugin {
+public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlugin {
 
 	
 	public static final String ARXIU_BASE_PROPERTY = "es.caib.notib.plugin.arxiu.";
 
 	private static final String ARXIUCAIB_BASE_PROPERTY = ARXIU_BASE_PROPERTY + "caib.";
-//	private static final int NUM_PAGINES_RESULTAT_CERCA = 100;
-//	private static final String VERSIO_INICIAL_CONTINGUT = "1.0";
 	private static final String JERSEY_TIMEOUT_CONNECT = "10000";
 	private static final String JERSEY_TIMEOUT_READ = "60000";
 	private Client versioImprimibleClient;
 
-	public DocumentContingut documentImprimibleCsv(
+	@Override
+	public DocumentContingut documentImprimible(String identificador) throws ArxiuException {
+		if(identificador.contains("uuid:")) {
+			identificador = identificador.replace("uuid:", "");
+			return documentImprimibleCsv(identificador);
+		}else {
+			identificador = identificador.replace("csv:", "");
+			return documentImprimibleUuid(identificador);
+		}
+	}
+	
+	private DocumentContingut documentImprimibleCsv(
 			final String identificador) throws ArxiuException {
 		/*
 		 * Les URLs de consulta son les següents:
@@ -69,7 +71,7 @@ public class ArxiuPluginConcsvImpl implements IArxiuPlugin {
 	}
 	
 	
-	public DocumentContingut documentImprimibleUuid(
+	private DocumentContingut documentImprimibleUuid(
 			final String identificador) throws ArxiuException {
 		/*
 		 * Les URLs de consulta son les següents:
@@ -101,7 +103,7 @@ public class ArxiuPluginConcsvImpl implements IArxiuPlugin {
 					ex);
 		}
 	}
-	
+
 	private InputStream generarVersioImprimibleCsv(
 			String identificador,
 			String metadada1,
@@ -185,8 +187,6 @@ public class ArxiuPluginConcsvImpl implements IArxiuPlugin {
 		return PropertiesHelper.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "conversio.imprimible.contrasenya");
 	}
 	
-
-	
 	private int getPropertyTimeoutConnect() {
 		String timeout = PropertiesHelper.getProperties().getProperty(
 				ARXIUCAIB_BASE_PROPERTY + "timeout.connect",
@@ -198,205 +198,6 @@ public class ArxiuPluginConcsvImpl implements IArxiuPlugin {
 				ARXIUCAIB_BASE_PROPERTY + "timeout.read",
 				JERSEY_TIMEOUT_READ);
 		return Integer.parseInt(timeout);
-	}
-
-//	private XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
-//		GregorianCalendar c = new GregorianCalendar();
-//		c.setTime(date);
-//		return DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
-//	}
-
-	@Override
-	public ContingutArxiu carpetaCopiar(String arg0, String arg1) throws ArxiuException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ContingutArxiu carpetaCrear(Carpeta arg0, String arg1) throws ArxiuException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Carpeta carpetaDetalls(String arg0) throws ArxiuException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void carpetaEsborrar(String arg0) throws ArxiuException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public ContingutArxiu carpetaModificar(Carpeta arg0) throws ArxiuException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void carpetaMoure(String arg0, String arg1) throws ArxiuException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public ConsultaResultat documentConsulta(List<ConsultaFiltre> arg0, Integer arg1, Integer arg2,
-			DocumentRepositori arg3) throws ArxiuException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ContingutArxiu documentCopiar(String arg0, String arg1) throws ArxiuException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ContingutArxiu documentCrear(Document arg0, String arg1) throws ArxiuException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Document documentDetalls(String arg0, String arg1, boolean arg2) throws ArxiuException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void documentEsborrar(String arg0) throws ArxiuException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String documentExportarEni(String arg0) throws ArxiuException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public DocumentContingut documentImprimible(String identificador) throws ArxiuException {
-		if(identificador.contains("uuid:")) {
-			identificador = identificador.replace("uuid:", "");
-			return documentImprimibleCsv(identificador);
-		}else {
-			identificador = identificador.replace("csv:", "");
-			return documentImprimibleUuid(identificador);
-		}
-	}
-
-	@Override
-	public ContingutArxiu documentModificar(Document arg0) throws ArxiuException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void documentMoure(String arg0, String arg1) throws ArxiuException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public List<ContingutArxiu> documentVersions(String arg0) throws ArxiuException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ConsultaResultat expedientConsulta(List<ConsultaFiltre> arg0, Integer arg1, Integer arg2)
-			throws ArxiuException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ContingutArxiu expedientCrear(Expedient arg0) throws ArxiuException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ContingutArxiu expedientCrearSubExpedient(Expedient arg0, String arg1) throws ArxiuException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Expedient expedientDetalls(String arg0, String arg1) throws ArxiuException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void expedientEsborrar(String arg0) throws ArxiuException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String expedientExportarEni(String arg0) throws ArxiuException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ContingutArxiu expedientModificar(Expedient arg0) throws ArxiuException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void expedientReobrir(String arg0) throws ArxiuException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void expedientTancar(String arg0) throws ArxiuException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public List<ContingutArxiu> expedientVersions(String arg0) throws ArxiuException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean generaIdentificadorNti() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean suportaMetadadesNti() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean suportaVersionatCarpeta() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean suportaVersionatDocument() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean suportaVersionatExpedient() {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 }
