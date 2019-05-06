@@ -103,7 +103,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 			}
 		} else {
 			logger.debug("Consultant plugin de dades d'usuari (" + "usuariCodi=" + auth.getName() + ")");
-			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+			//DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+			DadesUsuari dadesUsuari = pluginHelper.dadesUsuariConsultarAmbCodi(auth.getName());
 			if (dadesUsuari != null) {
 				if (dadesUsuari.getNomSencer() != null) {
 					usuari.update(

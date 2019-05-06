@@ -62,7 +62,7 @@ public class EmailHelper {
 			String emailDestinatari,
 			NotificacioEntity notificacio) throws MessagingException {
 		logger.debug("Enviament emails nou contenidor a bústies");
-
+		String appBaseUrl = PropertiesHelper.getProperties().getProperty("es.caib.notib.app.base.url");
 		MimeMessage missatge = mailSender.createMimeMessage();
 		missatge.setHeader("Content-Type", "text/html charset=UTF-8");
 		MimeMessageHelper helper;
@@ -179,6 +179,11 @@ public class EmailHelper {
 					"			<th>"+ messageHelper.getMessage("notificacio.email.estat.motiu") +"</th>"+
 					"			<td>"+ notificacio.getMotiu() + "</td>"+
 					"		</tr>"+	
+					"		<tr>"+
+					"			<th>"+ messageHelper.getMessage("notificacio.email.notificacio.info") + "</th>"+
+					"			<td> <a href=\""+appBaseUrl+"/notificacio/"+notificacio.getId()+"\">"+ messageHelper.getMessage("notificacio.email.notificacio.detall") + "</a>" +
+					"			</td>"+
+					"		</tr>"+
 					"	</table>" +
 					"</div>"+
 					"<div class=\"footer\">"+
@@ -201,6 +206,8 @@ public class EmailHelper {
 				"\t\t\t\t"+ Objects.toString(notificacio.getEstat().name(), "") +"\n"+		
 				"\t"+messageHelper.getMessage("notificacio.email.estat.motiu") + 
 				"\t\t\t\t"+ Objects.toString(notificacio.getMotiu(), "") +"\n"+
+				"\t"+messageHelper.getMessage("notificacio.email.notificacio.info") + 
+				"\t\t\t\t"+ "<a href=\""+appBaseUrl+"/notificacio/"+notificacio.getId()+"\">"+ messageHelper.getMessage("notificacio.email.notificacio.detall") + "</a> \n"+
 				"";
 		
 		helper.setText(plainText, htmlText);
