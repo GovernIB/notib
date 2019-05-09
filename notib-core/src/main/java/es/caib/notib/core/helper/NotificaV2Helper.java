@@ -350,12 +350,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	public ResultadoAltaRemesaEnvios enviaNotificacio(
 			NotificacioEntity notificacio) throws Exception {
 		ResultadoAltaRemesaEnvios resultat = null;
-		if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())) {
-			throw new ValidationException(
-					notificacio.getId(),
-					NotificacioEntity.class,
-					"La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA);
-		}
 		try {
 			String apiKey = notificacio.getEntitat().getApiKey();
 			AltaRemesaEnvios altaRemesaEnvios = generarAltaRemesaEnvios(notificacio);

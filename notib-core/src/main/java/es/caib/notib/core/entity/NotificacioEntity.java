@@ -88,6 +88,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "estat", nullable = false)
 	protected NotificacioEstatEnumDto estat;
 	
+//	@Column(name = "estat_date")
+//	protected Date estatDate;
+	
 	@Column(name = "motiu")
 	protected String motiu;
 	

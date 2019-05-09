@@ -572,10 +572,12 @@ $(document).ready(function() {
 							<td><strong><spring:message code="enviament.info.seu.registre.data"/></strong></td>
 							<td><fmt:formatDate value="${enviament.registreData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 						</tr>
-						<tr>
-							<td width="30%"><strong><spring:message code="enviament.info.seu.registre.estat"/></strong></td>
-							<td>${enviament.registreEstat}</td>
-						</tr>
+						<c:if test="${not empty enviament.registreEstat}">
+							<tr>
+								<td width="30%"><strong><spring:message code="enviament.info.seu.registre.estat"/></strong></td>
+								<td>${enviament.registreEstat}</td>
+							</tr>
+						</c:if>
 						<%-- <tr>
 							<td><strong><spring:message code="enviament.info.seu.data.fi"/></strong></td>
 							<td>${enviament.seuDataFi}</td>
