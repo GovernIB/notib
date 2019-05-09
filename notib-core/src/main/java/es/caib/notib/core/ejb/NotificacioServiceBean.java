@@ -220,10 +220,10 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public NotificacioEnviamenEstatDto marcarComProcessada(
+	public void marcarComProcessada(
 			Long enviamentId,
 			String motiu) throws MessagingException {
-		return delegate.marcarComProcessada(
+		delegate.marcarComProcessada(
 				enviamentId,
 				motiu);
 	}

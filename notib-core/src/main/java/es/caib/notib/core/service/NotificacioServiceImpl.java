@@ -1092,8 +1092,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 		return estatDto;
 	}
 	
+	@Transactional
 	@Override
-	public NotificacioEnviamenEstatDto marcarComProcessada(
+	public void marcarComProcessada(
 			Long notificacioId,
 			String motiu) throws MessagingException {
 		logger.debug("Refrescant l'estat de la notificació a PROCESSAT (" +
@@ -1105,8 +1106,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 		notificacioEntity.updateMotiu(motiu);
 		emailHelper.prepararEnvioEmailNotificacio(notificacioEntity);
 		notificacioRepository.saveAndFlush(notificacioEntity);
-		return null;
 	}
+	
 	// 1. Enviament de notificacions pendents al registre
 	////////////////////////////////////////////////////
 	@Override

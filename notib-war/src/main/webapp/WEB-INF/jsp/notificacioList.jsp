@@ -216,6 +216,8 @@ $(document).ready(function() {
 							<span class="fa fa-send-o"></span>
 						{{else estat == 'FINALITZADA'}}
 							<span class="fa fa-check"></span>
+						{{else estat == 'REGISTRADA'}}
+							<span class="fa fa-file-o"></span>
 						{{/if}}
 						{{:~eval('notificacioEstats["' + estat + '"]')}}
 						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>errorNotificaDescripcio}}"></span>{{/if}}

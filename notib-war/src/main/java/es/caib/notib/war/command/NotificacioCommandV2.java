@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -47,6 +48,7 @@ public class NotificacioCommandV2 {
 	private String descripcio;
 	private Date enviamentDataProgramada;
 	private int retard;
+	@NotNull
 	private Date caducitat;
 	private DocumentCommand document;
 	private Long procedimentId;
@@ -326,5 +328,7 @@ public class NotificacioCommandV2 {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
+	
+	public interface NotificacioCaducitat {}
 
 }

@@ -7,6 +7,7 @@ package es.caib.notib.war.controller;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -701,7 +702,7 @@ public class NotificacioController extends BaseUserController {
 				isAdministrador(request), 
 				procedimentId);
 		NotificacioCommandV2 notificacio = new NotificacioCommandV2();
-		
+		notificacio.setCaducitat(sumarDiesData(new Date()));
 		model.addAttribute("notificacioCommandV2", notificacio);
 		model.addAttribute("entitat", procedimentActual.getEntitat());
 		model.addAttribute("procediment", procedimentService.findById(
@@ -734,6 +735,14 @@ public class NotificacioController extends BaseUserController {
 						IdiomaEnumDto.class,
 						"es.caib.notib.core.api.dto.idiomaEnumDto."));
 	}
+	
+	private Date sumarDiesData(Date dataActual) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(dataActual);
+		calendar.add(Calendar.DAY_OF_YEAR, 10);
+		return calendar.getTime();
+	}
+	
 	private boolean isAdministrador(HttpServletRequest request) {
 		return RolHelper.isUsuariActualAdministrador(request);
 	}

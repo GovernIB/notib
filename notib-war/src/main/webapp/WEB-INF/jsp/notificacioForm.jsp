@@ -349,7 +349,7 @@ function mostrarEntregaPostal(className) {
                         <not:inputTextarea name="descripcio" textKey="notificacio.form.camp.descripcio" labelSize="2"/>
                     </div>
                     <div class="col-md-6">
-                        <not:inputDate name="caducitat" textKey="notificacio.form.camp.caducitat" orientacio="bottom" labelSize="4"/>
+                        <not:inputDate name="caducitat" textKey="notificacio.form.camp.caducitat" orientacio="bottom" labelSize="4" required="true"/>
                     </div>
                      <div class="col-md-6">
                         <not:inputText name="numExpedient" textKey="notificacio.form.camp.expedient" labelSize="4"/>

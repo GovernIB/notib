@@ -50,6 +50,7 @@ public class NotificacioDto extends AuditoriaDto {
 	private String seuOficiText;
 	private String seuRegistreNumero;
 	private NotificacioEstatEnumDto estat;
+	private Date estatDate;
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
 	private EntitatDto entitat;
@@ -276,6 +277,12 @@ public class NotificacioDto extends AuditoriaDto {
 	}
 	public void setEstat(NotificacioEstatEnumDto estat) {
 		this.estat = estat;
+	}
+	public Date getEstatDate() {
+		return estatDate;
+	}
+	public void setEstatDate(Date estatDate) {
+		this.estatDate = estatDate;
 	}
 	public Date getNotificaErrorData() {
 		return notificaErrorData;
