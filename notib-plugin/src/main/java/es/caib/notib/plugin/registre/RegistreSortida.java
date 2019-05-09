@@ -11,6 +11,7 @@ import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
  */
 public class RegistreSortida {
 
+	private String codiEntitat;
 	private String codiUsuari;
 	private DadesOficina dadesOficina;
 	private DadesInteressat dadesInteressat;
@@ -19,6 +20,12 @@ public class RegistreSortida {
 	private List<DocumentRegistre> documents;
 	
 	
+	public String getCodiEntitat() {
+		return codiEntitat;
+	}
+	public void setCodiEntitat(String codiEntitat) {
+		this.codiEntitat = codiEntitat;
+	}
 	public String getCodiUsuari() {
 		return codiUsuari;
 	}

@@ -1060,6 +1060,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 						
 						notificacioEntity.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
 						notificacioEntity.updateEventAfegir(event);
+						enviament.setRegistreNumeroFormatat(registreIdDto.getNumeroRegistreFormat());
+						enviament.setRegistreData(registreIdDto.getData());
 						notificacioEventRepository.save(event);
 						notificaHelper.notificacioEnviar(notificacioEntity.getId());
 					}
@@ -1103,6 +1105,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				null,
 				notificacioId);
 		notificacioEntity.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
+		//notificacioEntity.updateEstatDate(new Date());
 		notificacioEntity.updateMotiu(motiu);
 		emailHelper.prepararEnvioEmailNotificacio(notificacioEntity);
 		notificacioRepository.saveAndFlush(notificacioEntity);

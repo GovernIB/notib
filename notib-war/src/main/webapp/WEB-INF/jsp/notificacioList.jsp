@@ -207,7 +207,7 @@ $(document).ready(function() {
 				</th--%>
 				<th data-col-name="procediment.nom"><spring:message code="notificacio.list.columna.procediment"/></th>
 				<th data-col-name="concepte" width="${ampladaConcepte}"><spring:message code="notificacio.list.columna.concepte"/></th>
-				<th data-col-name="estat" data-template="#cellEstatTemplate" width="20%">
+				<th data-col-name="estat" data-template="#cellEstatTemplate" width="30%">
 					<spring:message code="notificacio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						{{if estat == 'PENDENT'}}

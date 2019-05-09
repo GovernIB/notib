@@ -418,24 +418,35 @@ public class PluginHelper {
 		
 		if((documentDto.getUuid() != null || documentDto.getCsv() != null) && documentDto.getUrl() == null && documentDto.getContingutBase64() == null) {
 			String id = "";
-			
+			boolean uuid = false;
 			if(documentDto.getUuid() != null) {
 				id = documentDto.getUuid();
 				document.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA.getValor());
+				uuid = true;
 			} else if (documentDto.getCsv() != null) {
 				id = documentDto.getCsv();
-				document.setModeFirma(RegistreModeFirmaEnum.AUTOFIRMA_NO.getValor());
+				document.setModeFirma(RegistreModeFirmaEnum.AUTOFIRMA_SI.getValor());
+				uuid = false;
 			}
 			try {
-				DocumentContingut doc = arxiuGetImprimible(id, true);
+				Document doc = arxiuDocumentConsultar(id, null, uuid);
 					
-				document.setArxiuNom(doc.getArxiuNom());
-				document.setArxiuContingut(doc.getContingut());
+//				document.setArxiuNom(doc.getNom());
+//				document.setArxiuContingut(doc.getContingut().getContingut());
+//				document.setIdiomaCodi("ca");
+//				document.setData(new Date());
+//				document.setOrigen(RegistreOrigenEnum.ADMINISTRACIO.getValor());
+//				document.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI.name());
+//				document.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO.name());
+				document.setArxiuNom(doc.getNom());
+				document.setArxiuContingut(doc.getContingut().getContingut());
 				document.setIdiomaCodi("ca");
-				document.setData(new Date());
-				document.setOrigen(RegistreOrigenEnum.ADMINISTRACIO.getValor());
 				document.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI.name());
-				document.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO.name());
+				if (doc.getMetadades() != null) {
+					document.setData(doc.getMetadades().getDataCaptura());
+					document.setOrigen(doc.getMetadades().getOrigen().ordinal());
+					document.setTipusDocumental(doc.getMetadades().getTipusDocumental().name());
+				}
 			} catch(ArxiuException ae) {
 				logger.error("Error Obtenint el document uuid/csv: " + id);
 			}
@@ -498,7 +509,7 @@ public class PluginHelper {
 					annex.setArxiuContingut(doc.getContingut());
 					annex.setArxiuNom(doc.getArxiuNom());
 				}catch(ArxiuException ae) {
-					logger.error("Error Obtenint el document per l'uuid");
+					logger.error("Error Obtenint el document per csv");
 				}
 			}
 		}else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
@@ -776,6 +787,7 @@ public class PluginHelper {
 		RegistreSortida registreSortida = new RegistreSortida();
 		DadesOficina dadesOficina = new DadesOficina();
 		Long tipusInteressat;
+		List<LlibreOficina> llibreOficina = null;
 		
 		switch (enviament.getTitular().getInteressatTipus()) {
 		case ADMINISTRACIO:
@@ -806,10 +818,12 @@ public class PluginHelper {
 //			docFisica = 1L;
 //			break;
 //		}
-		List<LlibreOficina> llibreOficina = llistarLlibresOficines(
-				notificacio.getEmisorDir3Codi(), 
-				notificacio.getUsuariCodi(),
-				TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
+		if (notificacio.getProcediment().getOrganGestor() != null) {
+			llibreOficina = llistarLlibresOficines(
+					notificacio.getProcediment().getOrganGestor(), 
+					notificacio.getUsuariCodi(),
+					TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
+		}
 		
 		if (notificacio.getProcediment().getOficina() != null) {
 			dadesOficina.setOficina(notificacio.getProcediment().getOficina());
@@ -818,14 +832,15 @@ public class PluginHelper {
 			dadesOficina.setOficina(oficinaCodi);
 		}
 		
-		if (notificacio.getProcediment().getOficina() != null) {
+		if (notificacio.getProcediment().getLlibre() != null) {
 			dadesOficina.setLlibre(notificacio.getProcediment().getLlibre());
 		} else if (llibreOficina != null && ! llibreOficina.isEmpty()) {
 			String llibreCodi = llibreOficina.get(0).getLlibre().getCodi();
 			dadesOficina.setLlibre(llibreCodi);
 		}
 
-		dadesOficina.setOrgan(notificacio.getEmisorDir3Codi());
+		registreSortida.setCodiEntitat(notificacio.getEmisorDir3Codi());
+		dadesOficina.setOrgan(notificacio.getProcediment().getOrganGestor());
 		registreSortida.setDadesOficina(dadesOficina);
 		
 		DadesInteressat dadesInteressat = new DadesInteressat();

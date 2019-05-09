@@ -19,6 +19,7 @@ import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.RegistreInteressatDocumentTipusDtoEnum;
 import es.caib.notib.core.api.dto.RegistreInteressatDto;
+import es.caib.plugins.arxiu.api.ArxiuException;
 import es.caib.regweb3.ws.api.v3.AnexoWs;
 import es.caib.regweb3.ws.api.v3.AsientoRegistralWs;
 import es.caib.regweb3.ws.api.v3.CodigoAsuntoWs;
@@ -54,7 +55,8 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			String aplicacion) {
 		RespostaAnotacioRegistre resposta = new RespostaAnotacioRegistre();
 		try {
-			resposta = toRespostaAnotacioRegistre(getRegistroSalidaApi().altaRegistroSalida(
+			resposta = toRespostaAnotacioRegistre(getRegistroSalidaApi().nuevoRegistroSalida(
+					registreSortida.getCodiEntitat(),
 					toRegistroSalidaWs(
 									registreSortida,
 									aplicacion)));
@@ -185,12 +187,15 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 					anexo.setNombreFicheroAnexado(document.getArxiuNom());
 					anexo.setTipoDocumento("0" + 2L); //Documento adjunto
 					anexo.setValidezDocumento("0" + 1L); //Copia
-					anexo.setOrigenCiudadanoAdmin(1); //Administaración
-					anexo.setTipoDocumental("TD01");
+//					anexo.setOrigenCiudadanoAdmin(1); //Administaración
+//					anexo.setTipoDocumental("TD01");
+					anexo.setOrigenCiudadanoAdmin(document.getOrigen());
+					anexo.setTipoDocumental(getTipusDocumental(document.getTipusDocumental()));
 					//Dettached
-					if (document.getModeFirma().equals(2)) {
+					if (document.getModeFirma().equals(2)) { 
+						anexo.setValidezDocumento("0" + 4L); //Original
 						anexo.setNombreFirmaAnexada(document.getArxiuNom());
-						anexo.setFirmaAnexada(document.getArxiuContingut());
+						anexo.setFirmaAnexada(document.getArxiuContingut()); //doc.getFirmes().get(0).getContingut()
 					}
 				}
 			}
@@ -203,13 +208,92 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			datosInteresado.setNombre(registreSortida.getDadesInteressat().getNom());
 			datosInteresado.setTipoInteresado(registreSortida.getDadesInteressat().getTipusInteressat());
 			interesado.setInteresado(datosInteresado);
-			
+			rsw.setAplicacion("NOTIB");
+			rsw.setVersion("1.0.0");
 			rsw.getInteresados().add(interesado);
 		} catch (Exception ex) {
 			logger.error("Error a l'hora de fer la conversió a registroSalidaWs", ex);
 			throw new RegistrePluginException("Error conversió a registroSalidaWs", ex);
 		}
 		return rsw;
+	}
+	
+	private String getTipusDocumental(String tipusDocumental) {
+		String ntiTipusDocumental = null;
+		
+		try {
+			logger.info("Conversió a la metadada ntiTipusDocumental...");
+			if (tipusDocumental != null) {
+				switch (tipusDocumental) {
+				case "RESOLUCIO":
+					ntiTipusDocumental = "TD01";
+					break;
+				case "ACORD":
+					ntiTipusDocumental = "TD02";
+					break;
+				case "CONTRACTE":
+					ntiTipusDocumental = "TD03";
+					break;
+				case "CONVENI":
+					ntiTipusDocumental = "TD04";
+					break;
+				case "DECLARACIO":
+					ntiTipusDocumental = "TD05";
+					break;
+				case "COMUNICACIO":
+					ntiTipusDocumental = "TD06";
+					break;
+				case "NOTIFICACIO":
+					ntiTipusDocumental = "TD07";
+					break;
+				case "PUBLICACIO":
+					ntiTipusDocumental = "TD08";
+					break;
+				case "JUSTIFICANT_RECEPCIO":
+					ntiTipusDocumental = "TD09";
+					break;
+				case "ACTA":
+					ntiTipusDocumental = "TD10";
+					break;
+				case "CERTIFICAT":
+					ntiTipusDocumental = "TD11";
+					break;
+				case "DILIGENCIA":
+					ntiTipusDocumental = "TD12";
+					break;
+				case "INFORME":
+					ntiTipusDocumental = "TD13";
+					break;
+				case "SOLICITUD":
+					ntiTipusDocumental = "TD14";
+					break;
+				case "DENUNCIA":
+					ntiTipusDocumental = "TD15";
+					break;
+				case "ALEGACIO":
+					ntiTipusDocumental = "TD16";
+					break;
+				case "RECURS":
+					ntiTipusDocumental = "TD17";
+					break;
+				case "COMUNICACIO_CIUTADA":
+					ntiTipusDocumental = "TD18";
+					break;
+				case "FACTURA":
+					ntiTipusDocumental = "TD19";
+					break;
+				case "ALTRES_INCAUTATS":
+					ntiTipusDocumental = "TD20";
+					break;
+				default:
+					ntiTipusDocumental = "TD99";
+					break;
+				}
+			}
+		} catch (Exception ex) {
+			throw new ArxiuException("Error a l'hora de fer la conversió de la metadada ntiTipusDocumental: ", ex);
+		}
+		return ntiTipusDocumental;
 	}
 	
 	public AsientoRegistralWs toAsientoRegistralBean(AsientoRegistralBeanDto dto) {
