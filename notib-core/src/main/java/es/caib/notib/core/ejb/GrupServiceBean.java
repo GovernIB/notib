@@ -62,13 +62,13 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public GrupDto findById(Long entitatId, Long id) {
 		return delegate.findById(entitatId, id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public PaginaDto<ProcedimentGrupDto> findByProcediment(
 			Long entitatId, 
 			Long procedimentId) {
@@ -78,13 +78,13 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public List<GrupDto> findByGrupsProcediment(Long procedimentId) {
 		return delegate.findByGrupsProcediment(procedimentId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public ProcedimentGrupDto findProcedimentGrupById(
 			Long entitatId, 
 			Long procedimentGrupId) {
@@ -94,7 +94,7 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public List<GrupDto> findByEntitat(Long entitatId) {
 		return delegate.findByEntitat(entitatId);
 	}
@@ -112,7 +112,7 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public List<GrupDto> findAll() {
 		return delegate.findAll();
 	}

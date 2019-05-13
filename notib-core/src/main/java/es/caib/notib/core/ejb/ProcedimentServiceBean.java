@@ -74,7 +74,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
 	public ProcedimentDto findById(
 			Long entitatId, 
 			boolean isAdministrador,
@@ -86,7 +86,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
 	public List<ProcedimentDto> findByEntitat(Long entitatId) {
 		return delegate.findByEntitat(entitatId);
 	}
@@ -110,25 +110,25 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
 	public List<ProcedimentDto> findAll() {
 		return delegate.findAll();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
 	public List<ProcedimentGrupDto> findAllGrups() {
 		return delegate.findAllGrups();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
 	public List<ProcedimentDto> findProcedimentsSenseGrups() {
 		return delegate.findProcedimentsSenseGrups();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
 	public List<PermisDto> permisFind(
 			Long entitatId, 
 			boolean isAdministrador, 
@@ -202,19 +202,19 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
 	public boolean hasPermisConsultaProcediment(EntitatDto entitat) {
 		return delegate.hasPermisConsultaProcediment(entitat);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
 	public boolean hasPermisNotificacioProcediment(EntitatDto entitat) {
 		return delegate.hasPermisNotificacioProcediment(entitat);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
 	public boolean hasGrupPermisConsultaProcediment(
 			List<ProcedimentDto> procediments,
 			EntitatDto entitat) {
@@ -224,7 +224,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
 	public boolean hasGrupPermisNotificacioProcediment(
 			List<ProcedimentDto> procediments,
 			EntitatDto entitat) {
@@ -234,7 +234,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
 	public boolean hasPermisGestioProcediment(
 			Long procedimentId) {
 		return delegate.hasPermisGestioProcediment(
@@ -242,7 +242,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
 	public boolean hasPermisProcessarProcediment(
 			String procedimentCodi,
 			Long procedimentId,

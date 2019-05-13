@@ -55,7 +55,7 @@ public class PagadorPostalServiceBean implements PagadorPostalService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public PagadorPostalDto findById(Long id) {
 		return delegate.findById(id);
 	}
@@ -73,7 +73,7 @@ public class PagadorPostalServiceBean implements PagadorPostalService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public List<PagadorPostalDto> findAll() {
 		return delegate.findAll();
 	}

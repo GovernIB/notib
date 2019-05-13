@@ -192,7 +192,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 					anexo.setOrigenCiudadanoAdmin(document.getOrigen());
 					anexo.setTipoDocumental(getTipusDocumental(document.getTipusDocumental()));
 					//Dettached
-					if (document.getModeFirma().equals(2)) { 
+					if (document.getModeFirma() != null && document.getModeFirma().equals(2)) { 
 						anexo.setValidezDocumento("0" + 4L); //Original
 						anexo.setNombreFirmaAnexada(document.getArxiuNom());
 						anexo.setFirmaAnexada(document.getArxiuContingut()); //doc.getFirmes().get(0).getContingut()

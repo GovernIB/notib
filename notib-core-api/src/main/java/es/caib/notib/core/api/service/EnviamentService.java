@@ -40,7 +40,7 @@ public interface EnviamentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<Long> findIdsAmbFiltre(
 			Long entitatId,
 			NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException;
@@ -70,7 +70,7 @@ public interface EnviamentService {
 	 *            Atribut id de la notificació.
 	 * @return els destinataris trobats.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<NotificacioEnviamentDto> enviamentFindAmbNotificacio(
 			Long notificacioId);
 
@@ -81,7 +81,7 @@ public interface EnviamentService {
 	 *            Atribut id de l'enviament.
 	 * @return el destinatari trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public NotificacioEnviamentDto enviamentFindAmbId(
 			Long enviamentId);
 

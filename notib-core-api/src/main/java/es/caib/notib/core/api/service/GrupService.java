@@ -73,7 +73,7 @@ public interface GrupService {
 	 *            id del grup a trobar.
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public GrupDto findById(
 			Long entitatId,
 			Long id);
@@ -87,7 +87,7 @@ public interface GrupService {
 	 *            id del procediment a trobar.
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public PaginaDto<ProcedimentGrupDto> findByProcediment(
 			Long entitatId,
 			Long procedimentId);
@@ -99,7 +99,7 @@ public interface GrupService {
 	 *            id del grup a trobar.
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<GrupDto> findByGrupsProcediment(
 			Long procedimentId);
 	
@@ -110,7 +110,7 @@ public interface GrupService {
 	 *            id del grup a trobar.
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public ProcedimentGrupDto findProcedimentGrupById(
 			Long entitatId,
 			Long procedimentGrupId);
@@ -121,7 +121,7 @@ public interface GrupService {
 	 *            id del grup a trobar.
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<GrupDto> findByEntitat(Long entitatId);
 
 	
@@ -147,7 +147,7 @@ public interface GrupService {
 	 * 
 	 * @return La llista dels grups.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<GrupDto> findAll();
 
 	/**

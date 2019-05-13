@@ -61,7 +61,7 @@ public interface PagadorPostalService {
 	 *            Codi del procediment a trobar.
 	 * @return El pagador postal amb el codi especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public PagadorPostalDto findById(Long id);
 
 	/**
@@ -86,7 +86,7 @@ public interface PagadorPostalService {
 	 * 
 	 * @return La llista dels pagadors postals.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<PagadorPostalDto> findAll();
 
 	/**

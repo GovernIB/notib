@@ -228,8 +228,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					notificacio.getDocument().getUuid(),
 					notificacio.getDocument().getCsv()).build());
 		}
-		
-		ProcedimentEntity procediment = procedimentRepository.findByCodi(notificacio.getProcedimentCodi());
+
+		ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(notificacio.getProcedimentCodi(), entitat);
 		if(procediment != null) {
 			NotificacioEntity.BuilderV2 notificacioBuilder = NotificacioEntity.
 				getBuilderV2(

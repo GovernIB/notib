@@ -51,7 +51,7 @@ public class PagadorCieServiceBean implements PagadorCieService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public PagadorCieDto findById(Long id) {
 		return delegate.findById(id);
 	}
@@ -69,7 +69,7 @@ public class PagadorCieServiceBean implements PagadorCieService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public List<PagadorCieDto> findAll() {
 		return delegate.findAll();
 	}

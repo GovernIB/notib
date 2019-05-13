@@ -416,7 +416,10 @@ public class PluginHelper {
 	public DocumentRegistre documentToDocumentRegistreDto (DocumentDto documentDto) throws SistemaExternException {
 		DocumentRegistre document = new DocumentRegistre();
 		
-		if((documentDto.getUuid() != null || documentDto.getCsv() != null) && documentDto.getUrl() == null && documentDto.getContingutBase64() == null) {
+		if(((documentDto.getUuid() != null && !documentDto.getUuid().isEmpty())
+			|| (documentDto.getCsv() != null && !documentDto.getCsv().isEmpty()))
+			&& (documentDto.getUrl() == null || documentDto.getUrl().isEmpty())
+			&& (documentDto.getContingutBase64() == null) || documentDto.getContingutBase64().isEmpty()) {
 			String id = "";
 			boolean uuid = false;
 			if(documentDto.getUuid() != null) {
@@ -450,7 +453,10 @@ public class PluginHelper {
 			} catch(ArxiuException ae) {
 				logger.error("Error Obtenint el document uuid/csv: " + id);
 			}
-		} else if(documentDto.getUrl() != null && (documentDto.getUuid() == null && documentDto.getCsv() == null) && documentDto.getContingutBase64() == null) {
+		} else if((documentDto.getUrl() != null && !documentDto.getUrl().isEmpty()) 
+				&& (documentDto.getUuid() == null || documentDto.getUuid().isEmpty()) 
+				&& (documentDto.getCsv() == null || documentDto.getCsv().isEmpty()) 
+				&& (documentDto.getContingutBase64() == null || documentDto.getContingutBase64().isEmpty())) {
 			document.setNom(documentDto.getUrl());
 			document.setArxiuNom(documentDto.getUrl());
 			document.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI.name());
@@ -459,7 +465,10 @@ public class PluginHelper {
 			document.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA.getValor());
 			document.setData(new Date());
 			document.setIdiomaCodi("ca");
-		} else if(documentDto.getArxiuGestdocId() != null && documentDto.getUrl() == null && (documentDto.getUuid() == null && documentDto.getCsv() == null)) {
+		} else if((documentDto.getArxiuGestdocId() != null && !documentDto.getArxiuGestdocId().isEmpty()) 
+				&& (documentDto.getUrl() == null || documentDto.getUrl().isEmpty())
+				&& (documentDto.getUuid() == null || documentDto.getUuid().isEmpty()) 
+				&& (documentDto.getCsv() == null || documentDto.getCsv().isEmpty())) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			gestioDocumentalGet(
 					documentDto.getArxiuGestdocId(), 
