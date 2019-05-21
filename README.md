@@ -15,11 +15,3 @@ NOTIB ofereix una plataforma  per a realitzar i gestionar totes les comunicacion
 >- [Manual d'usuari](https://github.com/GovernIB/notib/raw/notib-0.1/doc/pdf/NOTIB_usuari.pdf)
 >- [Manual de plugins](https://github.com/GovernIB/notib/raw/notib-0.1/doc/pdf/NOTIB_plugins.pdf)
 >- [Model de dades](https://github.com/GovernIB/notib/raw/notib-0.1/doc/pdf/NOTIB_model_dades.pdf)
-
-**Captures de pantalla**
-
-![enter image description here](https://github.com/GovernIB/notib/raw/master/assets/Screenshot_1.png)
-![](https://github.com/GovernIB/notib/raw/master/assets/Screenshot_2.png)
-![](https://github.com/GovernIB/notib/raw/master/assets/Screenshot_3.png)
-![enter image description here](https://github.com/GovernIB/notib/raw/master/assets/Screenshot_4.png)
-![enter image description here](https://github.com/GovernIB/notib/raw/master/assets/Screenshot_5.png)
