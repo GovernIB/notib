@@ -14,11 +14,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 
-import es.caib.notib.ws.notificacio.Document;
 import es.caib.notib.ws.notificacio.DocumentV2;
 import es.caib.notib.ws.notificacio.EntregaDeh;
 import es.caib.notib.ws.notificacio.EntregaPostal;
@@ -27,11 +24,7 @@ import es.caib.notib.ws.notificacio.Enviament;
 import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
 import es.caib.notib.ws.notificacio.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.ws.notificacio.NotificaServeiTipusEnumDto;
-import es.caib.notib.ws.notificacio.Notificacio;
 import es.caib.notib.ws.notificacio.NotificacioV2;
-import es.caib.notib.ws.notificacio.PagadorCie;
-import es.caib.notib.ws.notificacio.PagadorPostal;
-import es.caib.notib.ws.notificacio.ParametresSeu;
 import es.caib.notib.ws.notificacio.Persona;
 
 /**
@@ -87,7 +80,7 @@ public class ClientBaseTest {
 		//				Hex.decodeHex(
 		//						DigestUtils.sha256Hex(arxiuBytes).toCharArray())));
 		document.setNormalitzat(false);
-		document.setGenerarCsv(false);
+//		document.setGenerarCsv(false);
 		notificacio.setDocument(document);
 		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 //		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);

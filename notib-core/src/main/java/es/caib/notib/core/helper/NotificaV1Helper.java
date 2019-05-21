@@ -249,7 +249,7 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 		Documento documento = new Documento();
 		documento.setHashSha1(notificacio.getDocument().getHash());
 		documento.setNormalizado(notificacio.getDocument().getNormalitzat()  ? "si" : "no");
-		documento.setGenerarCsv(notificacio.getDocument().getGenerarCsv()  ? "si" : "no");
+//		documento.setGenerarCsv(notificacio.getDocument().getGenerarCsv()  ? "si" : "no");
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		pluginHelper.gestioDocumentalGet(
 				notificacio.getDocument().getArxiuGestdocId(),

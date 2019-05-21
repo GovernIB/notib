@@ -301,7 +301,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 		for(NotificacioEnviamentEntity enviament: notificacioGuardada.getEnviaments()) {
 			enviament.getTitular();
 		}
-		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(notificacioGuardada.getComunicacioTipus())) {
+		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
 			for(NotificacioEnviamentEntity enviament : notificacioGuardada.getEnviaments()) {
 //				AsientoRegistralBean arb = pluginHelper.notificacioToAsientoRegistralBean(notificacioGuardada);
 //				RespostaConsultaRegistre arbResposta = null;

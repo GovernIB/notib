@@ -21,7 +21,6 @@ import es.caib.notib.core.api.dto.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
@@ -290,12 +289,6 @@ public class NotificacioCommandV2 {
 				command,
 				NotificacioDtoV2.class);
 		
-		
-		for(NotificacioEnviamentDtoV2 enviament: dto.getEnviaments()){
-			for(EnviamentCommand enviamentCommand: command.getEnviaments()) {
-				enviament.setCaducitat(enviamentCommand.getCaducitat());
-			}
-		}
 		ProcedimentDto procedimentDto = new ProcedimentDto();
 		procedimentDto.setId(command.getProcedimentId());
 		dto.setProcediment(procedimentDto);

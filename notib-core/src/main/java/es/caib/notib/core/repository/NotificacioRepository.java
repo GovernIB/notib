@@ -13,7 +13,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
@@ -106,8 +105,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"from " +
 			"    NotificacioEntity " +
 			"where " +
-			"    comunicacioTipus = es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto.ASINCRON " +
-			"and estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.PENDENT " +
+			"    estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.PENDENT " +
 			"and notificaEnviamentData is not null " +
 			"order by " +
 			"    notificaEnviamentData ASC")
@@ -117,8 +115,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"from " +
 			"    NotificacioEntity " +
 			"where " +
-			"    comunicacioTipus = es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto.ASINCRON " +
-			"and estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.REGISTRADA " +
+			"    estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.REGISTRADA " +
 			"and notificaEnviamentIntent < :maxReintents " +
 			"and notificaEnviamentData is not null " +
 			"order by " +
@@ -131,7 +128,6 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"    (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
 			//"and (ntf.proc_codi_notib in (:procedimentsCodisNotib))" +
 			"and (:entitat = ntf.entitat) " +
-			"and (:isComunicacioTipusNull = true or ntf.comunicacioTipus = :comunicacioTipus) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
 			"and (:isEstatNull = true or ntf.estat = :estat) " +
@@ -147,8 +143,6 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	public Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotib(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
-			@Param("isComunicacioTipusNull") boolean isComunicacioTipusNull,
-			@Param("comunicacioTipus") NotificacioComunicacioTipusEnumDto comunicacioTipus,
 			@Param("isEnviamentTipusNull") boolean isEnviamentTipusNull,
 			@Param("enviamentTipus") NotificaEnviamentTipusEnumDto enviamentTipus,
 			@Param("isConcepteNull") boolean isConcepteNull,
@@ -160,7 +154,6 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("dataFi") Date dataFi,
 			@Param("isTitularNull") boolean isTitularNull,
 			@Param("titular") String titular,
-			//@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("isProcedimentNull") boolean isProcedimentNull,
 			@Param("procediment") ProcedimentEntity procediment,
@@ -170,7 +163,6 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"     NotificacioEntity ntf " +
 			"where " +
 			"    (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
-			"and (:isComunicacioTipusNull = true or ntf.comunicacioTipus = :comunicacioTipus) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
 			"and (:isEstatNull = true or ntf.estat = :estat) " +
@@ -186,8 +178,6 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	public Page<NotificacioEntity> findAmbFiltre(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
-			@Param("isComunicacioTipusNull") boolean isComunicacioTipusNull,
-			@Param("comunicacioTipus") NotificacioComunicacioTipusEnumDto comunicacioTipus,
 			@Param("isEnviamentTipusNull") boolean isEnviamentTipusNull,
 			@Param("enviamentTipus") NotificaEnviamentTipusEnumDto enviamentTipus,
 			@Param("isConcepteNull") boolean isConcepteNull,

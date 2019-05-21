@@ -186,9 +186,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 					documentGesdocId, 
 					notificacio.getDocument().getArxiuNom(), 
 					notificacio.getDocument().getUrl(),  
-					notificacio.getDocument().getMetadades(),  
+//					notificacio.getDocument().getMetadades(),  
 					notificacio.getDocument().isNormalitzat(),  
-					notificacio.getDocument().isGenerarCsv(),
+//					notificacio.getDocument().isGenerarCsv(),
 					notificacio.getDocument().getUuid(),
 					notificacio.getDocument().getCsv()).build());
 		}
@@ -197,7 +197,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				getBuilderV2(
 						entitat,
 						notificacio.getEmisorDir3Codi(),
-						notificacio.getOrganGestor(),
+//						notificacio.getOrganGestor(),
 						pluginHelper.getNotibTipusComunicacioDefecte(),
 						notificacio.getEnviamentTipus(), 
 						notificacio.getConcepte(),
@@ -209,16 +209,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 						procediment.getCodi(),
 						procediment,
 						notificacio.getGrupCodi(),
-						//notificacio.getOficina(),
-						//notificacio.getLlibre(),
-						notificacio.getExtracte(),
-						notificacio.getDocFisica(),
-						//notificacio.getTipusAssumpte(),
-						notificacio.getIdioma(),
-						notificacio.getNumExpedient(),
-						notificacio.getRefExterna(),
-						notificacio.getCodiAssumpte(),
-						notificacio.getObservacions()
+						notificacio.getNumExpedient()
+//						//notificacio.getOficina(),
+//						//notificacio.getLlibre(),
+//						notificacio.getExtracte(),
+//						notificacio.getDocFisica(),
+//						//notificacio.getTipusAssumpte(),
+//						notificacio.getIdioma(),
+//						notificacio.getRefExterna(),
+//						notificacio.getCodiAssumpte(),
+//						notificacio.getObservacions()
 						).document(documentEntity);
 
 		NotificacioEntity notificacioEntity = notificacioBuilder.build();
@@ -629,9 +629,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotib(
 							filtre.getEntitatId() == null,
 							filtre.getEntitatId(),
-							// filtre.getComunicacioTipus() == null,
-							// filtre.getComunicacioTipus(),
-							false, NotificacioComunicacioTipusEnumDto.SINCRON,
 							filtre.getEnviamentTipus() == null,
 							filtre.getEnviamentTipus(),
 							filtre.getConcepte() == null,
@@ -648,8 +645,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 							pageable);
 				}
 			} else if (isUsuariEntitat) {
-				notificacions = notificacioRepository.findAmbFiltre(entitatId == null, entitatId, false,
-						NotificacioComunicacioTipusEnumDto.SINCRON,
+				notificacions = notificacioRepository.findAmbFiltre(
+						entitatId == null, 
+						entitatId, 
 						filtre.getEnviamentTipus() == null,
 						filtre.getEnviamentTipus(),
 						filtre.getConcepte() == null,
@@ -665,11 +663,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 						procediment,
 						pageable);
 			} else if (isAdministrador) {
-				notificacions = notificacioRepository.findAmbFiltre(filtre.getEntitatId() == null,
+				notificacions = notificacioRepository.findAmbFiltre(
+						filtre.getEntitatId() == null,
 						filtre.getEntitatId(),
-						// filtre.getComunicacioTipus() == null,
-						// filtre.getComunicacioTipus(),
-						false, NotificacioComunicacioTipusEnumDto.SINCRON,
 						filtre.getEnviamentTipus() == null,
 						filtre.getEnviamentTipus(),
 						filtre.getConcepte() == null,
@@ -686,14 +682,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 						pageable);
 			}
 		}
-		
 		if (notificacions == null) {
 			resultatPagina = paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
-		 
 		} else {
 			if(notificacions != null) {
 				for (NotificacioEntity notificacio : notificacions) {
-					if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.FINALITZADA)
+					if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA)
 						notificacio.setPermisProcessar(
 								procedimentService.hasPermisProcessarProcediment(
 										notificacio.getProcediment().getCodi(),
@@ -1104,7 +1098,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(
 				null,
 				notificacioId);
-		notificacioEntity.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
+		notificacioEntity.updateEstat(NotificacioEstatEnumDto.PROCESSADA);
 		//notificacioEntity.updateEstatDate(new Date());
 		notificacioEntity.updateMotiu(motiu);
 		emailHelper.prepararEnvioEmailNotificacio(notificacioEntity);

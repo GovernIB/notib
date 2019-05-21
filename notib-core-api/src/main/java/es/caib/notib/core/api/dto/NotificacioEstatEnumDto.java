@@ -20,7 +20,8 @@ public enum NotificacioEstatEnumDto implements Serializable {
 	PENDENT(0),
 	ENVIADA(1),
 	REGISTRADA(2),
-	FINALITZADA(3);
+	FINALITZADA(3),
+	PROCESSADA(4);
 	
 	private Integer numVal;
 	

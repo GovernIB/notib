@@ -1,8 +1,5 @@
 package es.caib.notib.core.entity;
 
-import java.util.Iterator;
-import java.util.Map;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -40,14 +37,14 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 	@Column(name = "url", length = 256)
 	protected String url;
 	
-	@Column(name = "metadades")
-	protected String metadades;
+//	@Column(name = "metadades")
+//	protected String metadades;
 	
 	@Column(name = "normalitzat")
 	protected Boolean normalitzat;
 	
-	@Column(name = "generar_csv")
-	protected Boolean generarCsv;
+//	@Column(name = "generar_csv")
+//	protected Boolean generarCsv;
 	
 	@Column(name = "uuid", length = 256)
 	protected String uuid;
@@ -92,9 +89,7 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			built = new DocumentEntity();
 			built.arxiuGestdocId = arxiuGestdocId;
 			built.arxiuNom = arxiuNom;
-			built.generarCsv = generarCsv;
 			built.hash = hash;
-			built.metadades = metadades;
 			built.normalitzat = normalitzat;
 			built.url = url;
 			
@@ -110,9 +105,7 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			String arxiuGestdocId,
 			String arxiuNom,
 			String url,
-			Map<String, String> metadades,
 			Boolean normalitzat,
-			Boolean generarCsv,
 			String uuid,
 			String csv
 			) {
@@ -121,24 +114,20 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 				arxiuGestdocId,
 				arxiuNom,
 				url,
-				metadades,
 				normalitzat,
-				generarCsv,
 				uuid,
 				csv);
 	}
 	
 	public static class BuilderV2{
 		DocumentEntity built;
-		@SuppressWarnings("rawtypes")
+//		@SuppressWarnings("rawtypes")
 		BuilderV2(
 				String arxiuId,
 				String arxiuGestdocId,
 				String arxiuNom,
 				String url,
-				Map<String, String> metadades,
 				Boolean normalitzat,
-				Boolean generarCsv,
 				String uuid,
 				String csv
 				) {
@@ -146,14 +135,13 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			built.arxiuGestdocId = arxiuGestdocId;
 			built.arxiuNom = arxiuNom;
 			built.csv = csv;
-			built.generarCsv = generarCsv;
-			String metadadesStr = "";
-			Iterator it = metadades.entrySet().iterator();
-		    while (it.hasNext()) {
-		        Map.Entry pair = (Map.Entry)it.next();
-		        metadadesStr += "<" + pair.getKey()+ ">" + pair.getValue() + "</" + pair.getKey() + ">";
-		    }
-			built.metadades = metadadesStr;
+//			String metadadesStr = "";
+//			Iterator it = metadades.entrySet().iterator();
+//		    while (it.hasNext()) {
+//		        Map.Entry pair = (Map.Entry)it.next();
+//		        metadadesStr += "<" + pair.getKey()+ ">" + pair.getValue() + "</" + pair.getKey() + ">";
+//		    }
+//			built.metadades = metadadesStr;
 			built.normalitzat = normalitzat;
 			built.url = url;
 			built.uuid = uuid;
@@ -196,28 +184,12 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 		this.url = url;
 	}
 
-	public String getMetadades() {
-		return metadades;
-	}
-
-	public void setMetadades(String metadades) {
-		this.metadades = metadades;
-	}
-
 	public Boolean getNormalitzat() {
 		return normalitzat;
 	}
 
 	public void setNormalitzat(Boolean normalitzat) {
 		this.normalitzat = normalitzat;
-	}
-
-	public Boolean getGenerarCsv() {
-		return generarCsv;
-	}
-
-	public void setGenerarCsv(Boolean generarCsv) {
-		this.generarCsv = generarCsv;
 	}
 
 	public String getUuid() {

@@ -27,7 +27,6 @@ import org.junit.rules.ExpectedException;
 import es.caib.loginModule.client.AuthenticationFailureException;
 import es.caib.notib.ws.notificacio.EnviamentEstatEnum;
 import es.caib.notib.ws.notificacio.EnviamentReferencia;
-import es.caib.notib.ws.notificacio.NotificacioService;
 import es.caib.notib.ws.notificacio.NotificacioServiceV2;
 import es.caib.notib.ws.notificacio.RespostaAlta;
 import es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament;

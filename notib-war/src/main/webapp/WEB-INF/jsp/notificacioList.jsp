@@ -97,7 +97,8 @@ $(document).ready(function() {
 				}
 				contingutTbody += '<td>' + destinataris + '</td>';
 				contingutTbody += '<td>';
-				contingutTbody += (data[i].notificacio.estat) ? notificacioEnviamentEstats[data[i].notificacio.estat] : '';
+				//contingutTbody += (data[i].notificacio.estat) ? notificacioEnviamentEstats[data[i].notificacio.estat] : '';
+				contingutTbody += (data[i].notificaEstat) ? notificacioEnviamentEstats[data[i].notificaEstat] : '';
 				if (data[i].notificacio.notificaError) {
 					var errorTitle = '';
 					if (data[i].notificacio.notificaErrorDescripcio) {
@@ -218,6 +219,8 @@ $(document).ready(function() {
 							<span class="fa fa-check"></span>
 						{{else estat == 'REGISTRADA'}}
 							<span class="fa fa-file-o"></span>
+						{{else estat == 'PROCESSADA'}}
+							<span class="fa fa-check-circle"></span>
 						{{/if}}
 						{{:~eval('notificacioEstats["' + estat + '"]')}}
 						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>errorNotificaDescripcio}}"></span>{{/if}}

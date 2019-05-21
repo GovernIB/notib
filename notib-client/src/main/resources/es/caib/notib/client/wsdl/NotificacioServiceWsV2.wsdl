@@ -41,22 +41,16 @@
 <xs:complexType name="notificacioV2">
 <xs:sequence>
 <xs:element minOccurs="0" name="caducitat" type="xs:dateTime" />
-<xs:element minOccurs="0" name="codiAssumpte" type="xs:string" />
-<xs:element minOccurs="0" name="comunicacioTipus" type="tns:comunicacioTipusEnum" />
 <xs:element minOccurs="0" name="concepte" type="xs:string" />
 <xs:element minOccurs="0" name="descripcio" type="xs:string" />
-<xs:element minOccurs="0" name="docFisica" type="tns:registreDocumentacioFisicaEnumDto" />
 <xs:element minOccurs="0" name="document" type="tns:documentV2" />
 <xs:element minOccurs="0" name="emisorDir3Codi" type="xs:string" />
 <xs:element minOccurs="0" name="enviamentDataProgramada" type="xs:dateTime" />
 <xs:element minOccurs="0" name="enviamentTipus" type="tns:enviamentTipusEnum" />
 <xs:element maxOccurs="unbounded" minOccurs="0" name="enviaments" nillable="true" type="tns:enviament" />
 <xs:element minOccurs="0" name="grupCodi" type="xs:string" />
-<xs:element minOccurs="0" name="idioma" type="tns:idiomaEnumDto" />
 <xs:element minOccurs="0" name="numExpedient" type="xs:string" />
-<xs:element minOccurs="0" name="observacions" type="xs:string" />
 <xs:element minOccurs="0" name="procedimentCodi" type="xs:string" />
-<xs:element minOccurs="0" name="refExterna" type="xs:string" />
 <xs:element minOccurs="0" name="retard" type="xs:int" />
 <xs:element minOccurs="0" name="usuariCodi" type="xs:string" />
 </xs:sequence>
@@ -67,8 +61,6 @@
 <xs:element minOccurs="0" name="arxiuNom" type="xs:string" />
 <xs:element minOccurs="0" name="contingutBase64" type="xs:string" />
 <xs:element minOccurs="0" name="csv" type="xs:string" />
-<xs:element name="generarCsv" type="xs:boolean" />
-<xs:element minOccurs="0" name="metadades" type="xs:string" />
 <xs:element name="normalitzat" type="xs:boolean" />
 <xs:element minOccurs="0" name="url" type="xs:string" />
 <xs:element minOccurs="0" name="uuid" type="xs:string" />
@@ -113,8 +105,6 @@
 <xs:element minOccurs="0" name="codiPostal" type="xs:string" />
 <xs:element minOccurs="0" name="complement" type="xs:string" />
 <xs:element minOccurs="0" name="escala" type="xs:string" />
-<xs:element minOccurs="0" name="formatFulla" type="xs:string" />
-<xs:element minOccurs="0" name="formatSobre" type="xs:string" />
 <xs:element minOccurs="0" name="linea1" type="xs:string" />
 <xs:element minOccurs="0" name="linea2" type="xs:string" />
 <xs:element minOccurs="0" name="municipiCodi" type="xs:string" />
@@ -214,19 +204,6 @@
 <xs:enumeration value="FINALITZADA" />
 </xs:restriction>
 </xs:simpleType>
-<xs:simpleType name="comunicacioTipusEnum">
-<xs:restriction base="xs:string">
-<xs:enumeration value="SINCRON" />
-<xs:enumeration value="ASINCRON" />
-</xs:restriction>
-</xs:simpleType>
-<xs:simpleType name="registreDocumentacioFisicaEnumDto">
-<xs:restriction base="xs:string">
-<xs:enumeration value="ACOMPANYA_DOCUMENTACIO_FISICA_REQUERIDA" />
-<xs:enumeration value="ACOMPANYA_DOCUMENTACIO_FISICA_COMPLEMENTARIA" />
-<xs:enumeration value="NO_ACOMPANYA_DOCUMENTACIO" />
-</xs:restriction>
-</xs:simpleType>
 <xs:simpleType name="enviamentTipusEnum">
 <xs:restriction base="xs:string">
 <xs:enumeration value="NOTIFICACIO" />
@@ -298,12 +275,6 @@
 <xs:restriction base="xs:string">
 <xs:enumeration value="NORMAL" />
 <xs:enumeration value="URGENT" />
-</xs:restriction>
-</xs:simpleType>
-<xs:simpleType name="idiomaEnumDto">
-<xs:restriction base="xs:string">
-<xs:enumeration value="ca" />
-<xs:enumeration value="es" />
 </xs:restriction>
 </xs:simpleType>
 <xs:simpleType name="enviamentEstatEnum">
@@ -438,7 +409,7 @@
   </wsdl:binding>
   <wsdl:service name="NotificacioServiceV2">
     <wsdl:port binding="tns:NotificacioServiceV2SoapBinding" name="NotificacioServiceV2Port">
-      <soap:address location="http://127.0.0.1:8080/notib/ws/notificacioV2WS" />
+      <soap:address location="http://127.0.0.1:8180/notib/ws/notificacioV2WS" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

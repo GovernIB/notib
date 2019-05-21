@@ -367,7 +367,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private AltaRemesaEnvios generarAltaRemesaEnvios(
 			NotificacioEntity notificacio) throws GeneralSecurityException, DatatypeConfigurationException, DecoderException {
 		AltaRemesaEnvios envios = new AltaRemesaEnvios();
-		Date dataProgramada;
 		Integer retardPostal;
 		
 		envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
@@ -379,19 +378,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			envios.setTipoEnvio(new BigInteger("2"));
 			break;
 		}
-		//envios.setFechaEnvioProgramado(
-		//		toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
-
-		if (notificacio.getProcedimentCodiNotib() != null) {
-			dataProgramada = procedimentRepository.findOne(notificacio.getProcediment().getId()).getEnviamentDataProgramada();
-		} else {
-			dataProgramada = notificacio.getEnviamentDataProgramada();
-		}
-		envios.setFechaEnvioProgramado(
-				toXmlGregorianCalendar(dataProgramada));
 		
-//		envios.setFechaEnvioProgramado(
-//				toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
+//		if (notificacio.getProcedimentCodiNotib() != null) {
+//			dataProgramada = procedimentRepository.findOne(notificacio.getProcediment().getId()).getEnviamentDataProgramada();
+//		} else {
+//			dataProgramada = notificacio.getEnviamentDataProgramada();
+//		}
+		envios.setFechaEnvioProgramado(
+				toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
+		
 		envios.setConcepto(notificacio.getConcepte());
 		envios.setDescripcion(notificacio.getDescripcio());
 		envios.setProcedimiento(
@@ -404,18 +399,16 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 					baos);
 			documento.setContenido(baos.toByteArray());
-			documento.setMetadatos(notificacio.getDocument().getMetadades());
-			//documento.setHash(notificacio.getDocument().getHash());
+//			documento.setMetadatos(notificacio.getDocument().getMetadades());
 			Opciones opcionesDocumento = new Opciones();
 			Opcion opcionNormalizado = new Opcion();
 			opcionNormalizado.setTipo("normalizado");
 			opcionNormalizado.setValue(
-					notificacio.getDocument().getNormalitzat()  ? "si" : "no"); // si o no
+					notificacio.getDocument().getNormalitzat()  ? "si" : "no");
 			opcionesDocumento.getOpcion().add(opcionNormalizado);
 			Opcion opcionGenerarCsv = new Opcion();
 			opcionGenerarCsv.setTipo("generarCsv");
-			opcionGenerarCsv.setValue(
-					notificacio.getDocument().getGenerarCsv()  ? "si" : "no"); // si o no
+			opcionGenerarCsv.setValue("no");
 			opcionesDocumento.getOpcion().add(opcionGenerarCsv);
 			documento.setOpcionesDocumento(opcionesDocumento);
 			if(baos.toByteArray() != null) {
@@ -436,12 +429,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
             Opcion opcionNormalizado = new Opcion();
             opcionNormalizado.setTipo("normalizado");
             opcionNormalizado.setValue(
-                    notificacio.getDocument().getNormalitzat()  ? "si" : "no"); // si o no
+                    notificacio.getDocument().getNormalitzat()  ? "si" : "no");
             opcionesDocumento.getOpcion().add(opcionNormalizado);
             Opcion opcionGenerarCsv = new Opcion();
             opcionGenerarCsv.setTipo("generarCsv");
-            opcionGenerarCsv.setValue(
-                    notificacio.getDocument().getGenerarCsv()  ? "si" : "no"); // si o no
+            opcionGenerarCsv.setValue("no");
             opcionesDocumento.getOpcion().add(opcionGenerarCsv);
             documento.setOpcionesDocumento(opcionesDocumento);
             envios.setDocumento(documento);
@@ -455,12 +447,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
             Opcion opcionNormalizado = new Opcion();
             opcionNormalizado.setTipo("normalizado");
             opcionNormalizado.setValue(
-                    notificacio.getDocument().getNormalitzat()  ? "si" : "no"); // si o no
+                    notificacio.getDocument().getNormalitzat()  ? "si" : "no");
             opcionesDocumento.getOpcion().add(opcionNormalizado);
             Opcion opcionGenerarCsv = new Opcion();
             opcionGenerarCsv.setTipo("generarCsv");
-            opcionGenerarCsv.setValue(
-                    notificacio.getDocument().getGenerarCsv()  ? "si" : "no"); // si o no
+            opcionGenerarCsv.setValue("no");
             opcionesDocumento.getOpcion().add(opcionGenerarCsv);
             documento.setOpcionesDocumento(opcionesDocumento);
             envios.setDocumento(documento);
@@ -476,12 +467,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
             Opcion opcionNormalizado = new Opcion();
             opcionNormalizado.setTipo("normalizado");
             opcionNormalizado.setValue(
-                    notificacio.getDocument().getNormalitzat()  ? "si" : "no"); // si o no
+                    notificacio.getDocument().getNormalitzat()  ? "si" : "no");
             opcionesDocumento.getOpcion().add(opcionNormalizado);
             Opcion opcionGenerarCsv = new Opcion();
             opcionGenerarCsv.setTipo("generarCsv");
-            opcionGenerarCsv.setValue(
-                    notificacio.getDocument().getGenerarCsv()  ? "si" : "no"); // si o no
+            opcionGenerarCsv.setValue("no");
             opcionesDocumento.getOpcion().add(opcionGenerarCsv);
             documento.setOpcionesDocumento(opcionesDocumento);
             envios.setDocumento(documento);
@@ -498,12 +488,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			Opcion opcionNormalizado = new Opcion();
 			opcionNormalizado.setTipo("normalizado");
 			opcionNormalizado.setValue(
-					notificacio.getDocument().getNormalitzat()  ? "si" : "no"); // si o no
+					notificacio.getDocument().getNormalitzat()  ? "si" : "no");
 			opcionesDocumento.getOpcion().add(opcionNormalizado);
 			Opcion opcionGenerarCsv = new Opcion();
 			opcionGenerarCsv.setTipo("generarCsv");
-			opcionGenerarCsv.setValue(
-					notificacio.getDocument().getGenerarCsv()  ? "si" : "no"); // si o no
+			opcionGenerarCsv.setValue("no");
 			opcionesDocumento.getOpcion().add(opcionGenerarCsv);
 			documento.setOpcionesDocumento(opcionesDocumento);
 			envios.setDocumento(documento);

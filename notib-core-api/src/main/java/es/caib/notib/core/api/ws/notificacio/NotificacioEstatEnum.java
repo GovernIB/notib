@@ -14,5 +14,6 @@ public enum NotificacioEstatEnum implements Serializable {
 	PENDENT,
 	ENVIADA,
 	REGISTRADA,
-	FINALITZADA
+	FINALITZADA,
+	PROCESSADA
 }

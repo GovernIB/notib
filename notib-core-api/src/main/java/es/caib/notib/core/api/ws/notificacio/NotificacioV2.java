@@ -12,9 +12,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
-import es.caib.notib.core.api.dto.IdiomaEnumDto;
-import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
-
 /**
  * Informació d'una notificació per al seu enviament.
  * 
@@ -26,11 +23,11 @@ import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
 public class NotificacioV2 {
 
 	private String emisorDir3Codi;
-	private String organGestor;
-	private ComunicacioTipusEnum comunicacioTipus;
+//	private String organGestor;
+//	private ComunicacioTipusEnum comunicacioTipus;
 	private EnviamentTipusEnum enviamentTipus;
 	private String concepte;
-	private String descripcio;
+	private String descripcio; //Observacions
 	private Date enviamentDataProgramada;
 	private Integer retard;
 	private Date caducitat;
@@ -38,18 +35,13 @@ public class NotificacioV2 {
 	private String usuariCodi;
 	private String procedimentCodi;
 	private String grupCodi;
-	//private String registreOficina;
-	//private String registreLlibre;
-	//private String registreNumero;
-	//private Date registreData;
-	private String extracte;
-	private RegistreDocumentacioFisicaEnumDto docFisica;
-	//private String tipusAssumpte;
-	private IdiomaEnumDto idioma;
+//	private String extracte;
+//	private RegistreDocumentacioFisicaEnumDto docFisica;
+//	private IdiomaEnumDto idioma;
 	private String numExpedient;
-	private String codiAssumpte;
-	private String refExterna;
-	private String observacions;
+//	private String codiAssumpte;
+//	private String refExterna;
+//	private String observacions;
 	private List<Enviament> enviaments;
 	
 	public String getEmisorDir3Codi() {
@@ -57,18 +49,6 @@ public class NotificacioV2 {
 	}
 	public void setEmisorDir3Codi(String emisorDir3Codi) {
 		this.emisorDir3Codi = emisorDir3Codi;
-	}
-	public String getOrganGestor() {
-		return organGestor;
-	}
-	public void setOrganGestor(String organGestor) {
-		this.organGestor = organGestor;
-	}
-	public ComunicacioTipusEnum getComunicacioTipus() {
-		return comunicacioTipus;
-	}
-	public void setComunicacioTipus(ComunicacioTipusEnum comunicacioTipus) {
-		this.comunicacioTipus = comunicacioTipus;
 	}
 	public EnviamentTipusEnum getEnviamentTipus() {
 		return enviamentTipus;
@@ -141,42 +121,6 @@ public class NotificacioV2 {
 	}
 	public void setNumExpedient(String numExpedient) {
 		this.numExpedient = numExpedient;
-	}
-	public String getRefExterna() {
-		return refExterna;
-	}
-	public void setRefExterna(String refExterna) {
-		this.refExterna = refExterna;
-	}
-	public IdiomaEnumDto getIdioma() {
-		return idioma;
-	}
-	public void setIdioma(IdiomaEnumDto idioma) {
-		this.idioma = idioma;
-	}
-	public String getObservacions() {
-		return observacions;
-	}
-	public void setObservacions(String observacions) {
-		this.observacions = observacions;
-	}
-	public String getCodiAssumpte() {
-		return codiAssumpte;
-	}
-	public void setCodiAssumpte(String codiAssumpte) {
-		this.codiAssumpte = codiAssumpte;
-	}
-	public RegistreDocumentacioFisicaEnumDto getDocFisica() {
-		return docFisica;
-	}
-	public void setDocFisica(RegistreDocumentacioFisicaEnumDto docFisica) {
-		this.docFisica = docFisica;
-	}
-	public String getExtracte() {
-		return extracte;
-	}
-	public void setExtracte(String extracte) {
-		this.extracte = extracte;
 	}
 	@Override
 	public String toString() {

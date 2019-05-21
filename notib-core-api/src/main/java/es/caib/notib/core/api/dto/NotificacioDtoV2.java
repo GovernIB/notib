@@ -18,7 +18,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 
 	private Long id;
 	private String emisorDir3Codi;
-	private String organGestor;
+//	private String organGestor;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
 	private String concepte;
 	private String descripcio;
@@ -32,7 +32,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private String procedimentCodiNotib;
 	private GrupDto grup;
 	private String grupCodi;
-	private ParametresRegistreDto parametresRegistre;
+//	private ParametresRegistreDto parametresRegistre;
 	private NotificacioEstatEnumDto estat;
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
@@ -40,21 +40,21 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<NotificacioEnviamentDtoV2>();
 	private String usuariCodi;
 	private String motiu;
-	// Paràmetres registre
-	private String oficina;
-	private String organ;
-	private String llibre;
-	private String registreNumero;
-	private Date registreData;
-	private String extracte;
-	private RegistreDocumentacioFisicaEnumDto docFisica;
-	private IdiomaEnumDto idioma;
-	private String tipusAssumpte;
-	private String numExpedient;
-	private String refExterna;
-	private String codiAssumpte;
-	private String observacions;
 	
+//	private String oficina;
+//	private String organ;
+//	private String llibre;
+//	private String registreNumero;
+//	private Date registreData;
+//	private String extracte;
+//	private RegistreDocumentacioFisicaEnumDto docFisica;
+//	private IdiomaEnumDto idioma;
+//	private String tipusAssumpte;
+	private String numExpedient;
+//	private String refExterna;
+//	private String codiAssumpte;
+//	private String observacions;
+//	
 	
 	
 	public Long getId() {
@@ -68,12 +68,6 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	}
 	public void setEmisorDir3Codi(String emisorDir3Codi) {
 		this.emisorDir3Codi = emisorDir3Codi;
-	}
-	public String getOrganGestor() {
-		return organGestor;
-	}
-	public void setOrganGestor(String organGestor) {
-		this.organGestor = organGestor;
 	}
 	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
 		return enviamentTipus;
@@ -135,12 +129,6 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	public void setGrupCodi(String grupCodi) {
 		this.grupCodi = grupCodi;
 	}
-	public ParametresRegistreDto getParametresRegistre() {
-		return parametresRegistre;
-	}
-	public void setParametresRegistre(ParametresRegistreDto parametresRegistre) {
-		this.parametresRegistre = parametresRegistre;
-	}
 	public NotificacioEstatEnumDto getEstat() {
 		return estat;
 	}
@@ -165,83 +153,11 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	public void setServeiTipus(String serveiTipus) {
 		this.serveiTipus = serveiTipus;
 	}
-	public void setOficina(String oficina) {
-		this.oficina = oficina;
-	}
-	public String getLlibre() {
-		return llibre;
-	}
-	public void setLlibre(String llibre) {
-		this.llibre = llibre;
-	}
 	public String getMotiu() {
 		return motiu;
 	}
 	public void setMotiu(String motiu) {
 		this.motiu = motiu;
-	}
-	public String getRegistreNumero() {
-		return registreNumero;
-	}
-	public void setRegistreNumero(String registreNumero) {
-		this.registreNumero = registreNumero;
-	}
-	public Date getRegistreData() {
-		return registreData;
-	}
-	public void setRegistreData(Date registreData) {
-		this.registreData = registreData;
-	}
-	public String getOficina() {
-		return oficina;
-	}
-	public String getExtracte() {
-		return extracte;
-	}
-	public RegistreDocumentacioFisicaEnumDto getDocFisica() {
-		return docFisica;
-	}
-	public IdiomaEnumDto getIdioma() {
-		return idioma;
-	}
-	public String getTipusAssumpte() {
-		return tipusAssumpte;
-	}
-	public String getRefExterna() {
-		return refExterna;
-	}
-	public String getCodiAssumpte() {
-		return codiAssumpte;
-	}
-	public String getObservacions() {
-		return observacions;
-	}
-	public void setExtracte(String extracte) {
-		this.extracte = extracte;
-	}
-	public void setDocFisica(RegistreDocumentacioFisicaEnumDto docFisica) {
-		this.docFisica = docFisica;
-	}
-	public void setIdioma(IdiomaEnumDto idioma) {
-		this.idioma = idioma;
-	}
-	public void setTipusAssumpte(String tipusAssumpte) {
-		this.tipusAssumpte = tipusAssumpte;
-	}
-	public String getNumExpedient() {
-		return numExpedient;
-	}
-	public void setNumExpedient(String numExpedient) {
-		this.numExpedient = numExpedient;
-	}
-	public void setRefExterna(String refExterna) {
-		this.refExterna = refExterna;
-	}
-	public void setCodiAssumpte(String codiAssumpte) {
-		this.codiAssumpte = codiAssumpte;
-	}
-	public void setObservacions(String observacions) {
-		this.observacions = observacions;
 	}
 	public boolean isNotificaError() {
 		return notificaErrorData != null;
@@ -264,17 +180,17 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	public void setEnviaments(List<NotificacioEnviamentDtoV2> enviaments) {
 		this.enviaments = enviaments;
 	}
+	public String getNumExpedient() {
+		return numExpedient;
+	}
+	public void setNumExpedient(String numExpedient) {
+		this.numExpedient = numExpedient;
+	}
 	public String getUsuariCodi() {
 		return usuariCodi;
 	}
 	public void setUsuariCodi(String usuariCodi) {
 		this.usuariCodi = usuariCodi;
-	}
-	public String getOrgan() {
-		return organ;
-	}
-	public void setOrgan(String organ) {
-		this.organ = organ;
 	}
 	public int getNotificaEnviamentIntent() {
 		return notificaEnviamentIntent;

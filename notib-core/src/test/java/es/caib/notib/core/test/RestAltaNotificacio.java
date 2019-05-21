@@ -246,7 +246,7 @@ public class RestAltaNotificacio {
 //						Hex.decodeHex(
 //								DigestUtils.sha1Hex(arxiuBytes).toCharArray())));
 		document.setNormalitzat(false);
-		document.setGenerarCsv(false);
+//		document.setGenerarCsv(false);
 		notificacio.setDocument(document);
 		notificacio.setProcedimentCodi("AJINCA");
 		List<Enviament> enviaments = new ArrayList<Enviament>();

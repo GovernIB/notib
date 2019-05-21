@@ -33,7 +33,7 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private String detalls;
 	private String codiNotibEnviament;
 	private String notificaDataCaducitat;
-	private Date caducitat;
+//	private Date caducitat;
 	
 	//Info notificació
 	private Date enviamentDataProgramada;
@@ -128,12 +128,6 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	}
 	public void setTitularNif(String titularNif) {
 		this.titularNif = titularNif;
-	}
-	public Date getCaducitat() {
-		return caducitat;
-	}
-	public void setCaducitat(Date caducitat) {
-		this.caducitat = caducitat;
 	}
 	public String getDestinatarisNomLlinatges() {
 		destinatarisNomLlinatges = "";

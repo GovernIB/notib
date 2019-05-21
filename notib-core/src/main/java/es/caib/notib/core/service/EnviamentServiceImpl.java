@@ -305,8 +305,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 					filtre.getNumeroCertCorreus() == null ? "" : filtre.getNumeroCertCorreus(),
 					(filtre.getUsuari() == null || filtre.getUsuari().isEmpty()),
 					filtre.getUsuari() == null ? "" : filtre.getUsuari(),
-					(filtre.getRegistreLlibre() == null || filtre.getRegistreLlibre().isEmpty()),
-					filtre.getRegistreLlibre() == null ? "" : filtre.getRegistreLlibre(),
 					(filtre.getRegistreNumero() == null || filtre.getRegistreNumero().isEmpty()),
 					filtre.getRegistreNumero() == null ? "" : filtre.getRegistreNumero(),
 					(dataRegistreInici == null),
@@ -525,8 +523,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 					filtre.getNumeroCertCorreus() == null ? "" : filtre.getNumeroCertCorreus(),
 					(filtre.getUsuari() == null || filtre.getUsuari().isEmpty()),
 					filtre.getUsuari() == null ? "" : filtre.getUsuari(),
-					(filtre.getRegistreLlibre() == null || filtre.getRegistreLlibre().isEmpty()),
-					filtre.getRegistreLlibre() == null ? "" : filtre.getRegistreLlibre(),
 					(filtre.getRegistreNumero() == null || filtre.getRegistreNumero().isEmpty()),
 					filtre.getRegistreNumero() == null ? "" : filtre.getRegistreNumero(),
 					(dataRegistreInici == null),
@@ -564,8 +560,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				notificacioEnviamentDtoV2.setConcepte(enviament.getContent().get(i).getNotificacio().getConcepte());
 			if (enviament.getContent().get(i).getNotificacio().getDescripcio() != null)
 				notificacioEnviamentDtoV2.setDescripcio(enviament.getContent().get(i).getNotificacio().getDescripcio());
-			if (enviament.getContent().get(i).getNotificacio().getLlibre() != null)
-				notificacioEnviamentDtoV2.setLlibre(enviament.getContent().get(i).getNotificacio().getLlibre());
+			if (enviament.getContent().get(i).getNotificacio().getProcediment().getLlibre() != null)
+				notificacioEnviamentDtoV2.setLlibre(enviament.getContent().get(i).getNotificacio().getProcediment().getLlibre());
 			if (enviament.getContent().get(i).getNotificacio().getRegistreNumero() != null)
 				notificacioEnviamentDtoV2.setRegistreNumero(enviament.getContent().get(i).getNotificacio().getRegistreNumero());
 			if (enviament.getContent().get(i).getNotificacio().getRegistreData() != null)
@@ -822,31 +818,16 @@ public class EnviamentServiceImpl implements EnviamentService {
 				filtre.getNumeroCertCorreus() == null ? "" : filtre.getNumeroCertCorreus(),
 				(filtre.getUsuari() == null || filtre.getUsuari().isEmpty()),
 				filtre.getUsuari() == null ? "" : filtre.getUsuari(),
-				(filtre.getRegistreLlibre() == null || filtre.getRegistreLlibre().isEmpty()),
-				filtre.getRegistreLlibre() == null ? "" : filtre.getRegistreLlibre(),
 				(filtre.getRegistreNumero() == null || filtre.getRegistreNumero().isEmpty()),
 				filtre.getRegistreNumero() == null ? "" : filtre.getRegistreNumero(),
 				(dataRegistreInici == null),
 				dataRegistreInici,
 				(dataRegistreFi == null),
 				dataRegistreFi);
-			
-		
-		
-		
-		
-		
-		
-		
-		
 		
 		for(NotificacioEnviamentEntity nee: enviaments) {
 			nee.setNotificacio(notificacioRepository.findById(nee.getNotificacioId()));
 		}
-		
-		
-		
-		
 		
 		//Genera les columnes
 		int numColumnes = 22;
@@ -906,7 +887,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				fila[11] = enviament.getTitular().getNom();
 				fila[12] = enviament.getTitular().getEmail();
 				fila[13] = (enviament.getDestinataris().size() > 0) ? enviament.getDestinataris().get(0).getNif() : null;
-				fila[14] = enviament.getNotificacio().getLlibre();
+				fila[14] = enviament.getNotificacio().getProcediment().getLlibre();
 				fila[15] = String.valueOf(enviament.getNotificacio().getRegistreNumero());
 				fila[16] = (enviament.getNotificacio().getRegistreData() != null)? enviament.getNotificacio().getRegistreData().toString() : "";
 				fila[17] = enviament.getNotificacio().getCaducitat() != null ? sdf.format(enviament.getNotificacio().getCaducitat()) : "";

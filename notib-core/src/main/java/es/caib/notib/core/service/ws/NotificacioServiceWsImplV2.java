@@ -40,7 +40,6 @@ import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.ws.notificacio.Certificacio;
-import es.caib.notib.core.api.ws.notificacio.ComunicacioTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.EnviamentEstatEnum;
@@ -205,13 +204,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				break;
 			}
 		}
-//		NotificacioComunicacioTipusEnumDto comunicacioTipus = pluginHelper.getNotibTipusComunicacioDefecte();
-//		if (notificacio.getComunicacioTipus() != null && ComunicacioTipusEnum.SINCRON.equals(notificacio.getComunicacioTipus())) {
-//			comunicacioTipus = NotificacioComunicacioTipusEnumDto.SINCRON;
-//		}
 		
 		DocumentEntity documentEntity = null;
-		
 		if(notificacio.getDocument().getCsv() != null || 
 		   notificacio.getDocument().getUuid() != null || 
 		   notificacio.getDocument().getContingutBase64() != null || 
@@ -222,9 +216,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					documentGesdocId, 
 					notificacio.getDocument().getArxiuNom(),  
 					notificacio.getDocument().getUrl(),  
-					notificacio.getDocument().getMetadades(),  
+//					notificacio.getDocument().getMetadades(),  
 					notificacio.getDocument().isNormalitzat(),  
-					notificacio.getDocument().isGenerarCsv(),
+//					notificacio.getDocument().isGenerarCsv(),
 					notificacio.getDocument().getUuid(),
 					notificacio.getDocument().getCsv()).build());
 		}
@@ -235,7 +229,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				getBuilderV2(
 					entitat,
 					emisorDir3Codi,
-					notificacio.getOrganGestor(),
+//					notificacio.getOrganGestor(),
 					pluginHelper.getNotibTipusComunicacioDefecte(),
 					enviamentTipus, 
 					notificacio.getConcepte(),
@@ -247,16 +241,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					notificacio.getProcedimentCodi(),
 					procediment,
 					notificacio.getGrupCodi(),
-					//notificacio.getRegistreOficina(),
-					//notificacio.getRegistreLlibre(),
-					notificacio.getExtracte(),
-					notificacio.getDocFisica(),
-					//notificacio.getTipusAssumpte(),
-					notificacio.getIdioma(),
-					notificacio.getNumExpedient(),
-					notificacio.getRefExterna(),
-					notificacio.getCodiAssumpte(),
-					notificacio.getObservacions()
+					notificacio.getNumExpedient()
+//					notificacio.getExtracte(),
+//					notificacio.getDocFisica(),
+//					//notificacio.getTipusAssumpte(),
+//					notificacio.getIdioma(),
+//					notificacio.getRefExterna(),
+//					notificacio.getCodiAssumpte(),
+//					notificacio.getObservacions()
 					).document(documentEntity).usuariCodi(usuariActual.getCodi());
 			
 			NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioBuilder.build());
@@ -652,6 +644,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			break;
 		case FINALITZADA:
 			resposta.setEstat(NotificacioEstatEnum.FINALITZADA);
+			break;
+		case PROCESSADA:
+			resposta.setEstat(NotificacioEstatEnum.PROCESSADA);
 			break;
 		}
 		if (notificacio.getNotificaErrorEvent() != null) {

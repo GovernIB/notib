@@ -400,7 +400,7 @@
 		</div>
 	</div>
 	<div id="modal-botons" class="text-right">
-		<a href="<c:url value="/notificacions"/>" class="btn btn-default"
+		<a href="<c:url value="/notificacio"/>" class="btn btn-default"
 			data-modal-cancel="true"><spring:message code="comu.boto.tancar" /></a>
 	</div>
 </body>

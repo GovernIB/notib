@@ -546,13 +546,13 @@ public class PluginHelper {
 	
 	public AnexoWsDto documentToAnexoWs(DocumentEntity document) {
 		try {
-			if(!document.getMetadades().contains("<?xml version=\"1.0\" encoding=\"UTF-8\"?><metadades>")) {
-				document.setMetadades("<?xml version=\"1.0\" encoding=\"UTF-8\"?><metadades>" + document.getMetadades() + "</metadades>");
-			}
+//			if(!document.getMetadades().contains("<?xml version=\"1.0\" encoding=\"UTF-8\"?><metadades>")) {
+//				document.setMetadades("<?xml version=\"1.0\" encoding=\"UTF-8\"?><metadades>" + document.getMetadades() + "</metadades>");
+//			}
 			
 			AnexoWsDto annex = null;
 			Path path = null;
-			Map<String, Object> metadades = convertNodesFromXml(document.getMetadades());
+			Map<String, Object> metadades = new HashMap<String, Object>();//convertNodesFromXml(document.getMetadades());
 			
 			if((document.getUuid() != null || document.getCsv() != null) && document.getUrl() == null && document.getContingutBase64() == null) {
 				annex = new AnexoWsDto();
@@ -813,20 +813,6 @@ public class PluginHelper {
 			break;
 		}
 		
-//		switch (notificacio.getDocFisica()) {
-//		case ACOMPANYA_DOCUMENTACIO_FISICA_REQUERIDA:
-//			docFisica = 1L;
-//			break;
-//		case ACOMPANYA_DOCUMENTACIO_FISICA_COMPLEMENTARIA:
-//			docFisica = 2L;
-//			break;
-//		case NO_ACOMPANYA_DOCUMENTACIO:
-//			docFisica = 3L;
-//			break;
-//		default:
-//			docFisica = 1L;
-//			break;
-//		}
 		if (notificacio.getProcediment().getOrganGestor() != null) {
 			llibreOficina = llistarLlibresOficines(
 					notificacio.getProcediment().getOrganGestor(), 
@@ -900,8 +886,8 @@ public class PluginHelper {
 		dadesAnotacio.setUnitatAdministrativa(null);
 		dadesAnotacio.setDocfisica(1L);
 		dadesAnotacio.setNumExpedient(notificacio.getNumExpedient());
-		dadesAnotacio.setObservacions(notificacio.getObservacions());
-		dadesAnotacio.setRefExterna(notificacio.getRefExterna());
+		dadesAnotacio.setObservacions(notificacio.getDescripcio());
+//		dadesAnotacio.setRefExterna(notificacio.getRefExterna());
 		dadesAnotacio.setCodiUsuari(notificacio.getUsuariCodi());
 		registreSortida.setDadesAnotacio(dadesAnotacio);
 		if (notificacio.getDocument() != null) {
@@ -925,13 +911,13 @@ public class PluginHelper {
 		registre.setEntidadRegistralOrigenDenominacion(notificacio.getProcediment().getOficina());
 		registre.setEntidadRegistralDestinoCodigo(notificacio.getProcediment().getOficina());
 		registre.setEntidadRegistralDestinoDenominacion(notificacio.getProcediment().getOficina());
-		registre.setUnidadTramitacionOrigenCodigo(notificacio.getOrgan());
-		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getOrgan());
+		registre.setUnidadTramitacionOrigenCodigo(notificacio.getProcediment().getOrganGestor());
+		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getProcediment().getOrganGestor());
 		registre.setUnidadTramitacionDestinoCodigo(notificacio.getProcediment().getOficina());
 		registre.setUnidadTramitacionDestinoDenominacion(notificacio.getProcediment().getOficina());
 		registre.setTipoRegistro(2L);
 		registre.setLibroCodigo(notificacio.getProcediment().getLlibre());
-		registre.setResumen(notificacio.getExtracte());
+		registre.setResumen(notificacio.getConcepte());
 		/* 1 = Documentació adjunta en suport Paper
 		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper
 		 * 3 = Documentació adjunta digitalitzada */
@@ -941,7 +927,7 @@ public class PluginHelper {
 		registre.setCodigoAsunto(notificacio.getProcediment().getCodiAssumpte());
 		registre.setCodigoAsuntoDenominacion(notificacio.getProcediment().getCodiAssumpte());
 		registre.setIdioma(1L);
-		registre.setReferenciaExterna(notificacio.getRefExterna());
+//		registre.setReferenciaExterna(notificacio.getRefExterna());
 		registre.setNumeroExpediente(notificacio.getNumExpedient());
 		/*
 		 * 
@@ -965,7 +951,7 @@ public class PluginHelper {
 		registre.setAplicacionTelematica("SISTRA");
 		registre.setAplicacion("RWE");
 		registre.setVersion("3.1");
-		registre.setObservaciones(notificacio.getObservacions());
+		registre.setObservaciones(notificacio.getDescripcio());
 		registre.setExpone("");
 		registre.setSolicita("");
 		registre.setPresencial(false);
@@ -1000,13 +986,13 @@ public class PluginHelper {
 		registre.setEntidadRegistralOrigenDenominacion(notificacio.getProcediment().getOficina());
 		registre.setEntidadRegistralDestinoCodigo(notificacio.getProcediment().getOficina());
 		registre.setEntidadRegistralDestinoDenominacion(notificacio.getProcediment().getOficina());
-		registre.setUnidadTramitacionOrigenCodigo(notificacio.getOrgan());
-		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getOrgan());
+		registre.setUnidadTramitacionOrigenCodigo(notificacio.getProcediment().getOrganGestor());
+		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getProcediment().getOrganGestor());
 		registre.setUnidadTramitacionDestinoCodigo(notificacio.getProcediment().getOficina());
 		registre.setUnidadTramitacionDestinoDenominacion(notificacio.getProcediment().getOficina());
 		registre.setTipoRegistro(2L);
 		registre.setLibroCodigo(notificacio.getProcediment().getLlibre());
-		registre.setResumen(notificacio.getExtracte());
+		registre.setResumen(notificacio.getConcepte());
 		/* 1 = Documentació adjunta en suport Paper
 		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper
 		 * 3 = Documentació adjunta digitalitzada */
@@ -1016,7 +1002,7 @@ public class PluginHelper {
 		registre.setCodigoAsunto(notificacio.getProcediment().getCodiAssumpte());
 		registre.setCodigoAsuntoDenominacion(notificacio.getProcediment().getCodiAssumpte());
 		registre.setIdioma(1L);
-		registre.setReferenciaExterna(notificacio.getRefExterna());
+//		registre.setReferenciaExterna(notificacio.getRefExterna());
 		registre.setNumeroExpediente(notificacio.getNumExpedient());
 		/*
 		 * 
@@ -1040,14 +1026,14 @@ public class PluginHelper {
 		registre.setAplicacionTelematica("NOTIB");
 		registre.setAplicacion("NOTIB");
 		registre.setVersion("3.1");
-		registre.setObservaciones(notificacio.getObservacions());
+		registre.setObservaciones(notificacio.getDescripcio());
 		registre.setExpone("");
 		registre.setSolicita("");
 		registre.setPresencial(false);
 //		registre.setTipoEnvioDocumentacion();
 		registre.setEstado(notificacio.getEstat().getLongVal());
-		registre.setUnidadTramitacionOrigenCodigo(notificacio.getOrgan());
-		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getOrgan());
+		registre.setUnidadTramitacionOrigenCodigo(notificacio.getProcediment().getOrganGestor());
+		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getProcediment().getOrganGestor());
 //		registre.setIdentificadorIntercambio();
 //		registre.setFechaRecepcion();
 //		registre.setCodigoError();

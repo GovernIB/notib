@@ -14,8 +14,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -24,15 +22,14 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.notib.core.api.dto.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.ParametresSeu;
 import es.caib.notib.core.audit.NotibAuditable;
@@ -48,14 +45,12 @@ import es.caib.notib.core.audit.NotibAuditable;
 @EntityListeners(AuditingEntityListener.class)
 public class NotificacioEntity extends NotibAuditable<Long> {
 
-	/*Parametres generals*/
-	
 	@Column(name = "usuari_codi", length = 64, nullable = false)
 	protected String usuariCodi;
 	@Column(name = "emisor_dir3codi", length = 9, nullable = false)
 	protected String emisorDir3Codi;
-	@Column(name = "organ_gestor", length = 9, nullable = false)
-	protected String organGestor;
+//	@Column(name = "organ_gestor", length = 9, nullable = false)
+//	protected String organGestor;
 	@Column(name = "com_tipus", nullable = false)
 	protected NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	
@@ -185,12 +180,12 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	
 	/*Parametres del registre*/
-	@Column(name = "registre_oficina", length = 52, nullable = false)
-	protected String oficina;
-	@Column(name = "registre_organ", length = 10)
-	protected String organ;
-	@Column(name = "registre_llibre", length = 256)
-	protected String llibre;
+//	@Column(name = "registre_oficina", length = 52, nullable = false)
+//	protected String oficina;
+//	@Column(name = "registre_organ", length = 10)
+//	protected String organ;
+//	@Column(name = "registre_llibre", length = 256)
+//	protected String llibre;
 	@Column(name = "registre_numero", length = 19)
 	protected Integer registreNumero;
 	@Column(name = "registre_numero_formatat", length = 200)
@@ -198,35 +193,29 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "registre_data")
 	@Temporal(TemporalType.DATE)
 	protected Date registreData;
-	@Column(name = "registre_extracte", length = 52, nullable = false)
-	protected String extracte;
-	@Column(name = "registre_doc_fisica", nullable = false)
-	protected RegistreDocumentacioFisicaEnumDto docFisica;
-	@Column(name = "registre_idioma", length = 2, nullable = false)
-	@Enumerated(EnumType.STRING)
-	protected IdiomaEnumDto idioma;
-	@Column(name = "registre_tipus_assumpte", length = 256, nullable = false)
-	protected String tipusAssumpte;
+//	@Column(name = "registre_extracte", length = 52, nullable = false)
+//	protected String extracte;
+//	@Column(name = "registre_doc_fisica", nullable = false)
+//	protected RegistreDocumentacioFisicaEnumDto docFisica;
+//	@Column(name = "registre_idioma", length = 2, nullable = false)
+//	@Enumerated(EnumType.STRING)
+//	protected IdiomaEnumDto idioma;
+//	@Column(name = "registre_tipus_assumpte", length = 256, nullable = false)
+//	protected String tipusAssumpte;
 	@Column(name = "registre_num_expedient", length = 256, nullable = false)
 	protected String numExpedient;
-	@Column(name = "registre_ref_externa", length = 52, nullable = false)
-	protected String refExterna;
-	@Column(name = "registre_codi_assumpte", length = 256, nullable = false)
-	protected String codiAssumpte;
-	@Column(name = "registre_observacions", length = 256, nullable = false)
-	protected String observacions;
+//	@Column(name = "registre_ref_externa", length = 52, nullable = false)
+//	protected String refExterna;
+//	@Column(name = "registre_codi_assumpte", length = 256, nullable = false)
+//	protected String codiAssumpte;
+//	@Column(name = "registre_observacions", length = 256, nullable = false)
+//	protected String observacions;
 	
 	@Transient
 	protected boolean permisProcessar;
 
 	public String getEmisorDir3Codi() {
 		return emisorDir3Codi;
-	}
-	public String getOrganGestor() {
-		return organGestor;
-	}
-	public NotificacioComunicacioTipusEnumDto getComunicacioTipus() {
-		return comunicacioTipus;
 	}
 	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
 		return enviamentTipus;
@@ -376,38 +365,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public Integer getRetard() {
 		return retard;
 	}
-	public String getOficina() {
-		return oficina;
-	}
-	public String getOrgan() {
-		return organ;
-	}
-	public String getLlibre() {
-		return llibre;
-	}
-	public String getExtracte() {
-		return extracte;
-	}
-	public RegistreDocumentacioFisicaEnumDto getDocFisica() {
-		return docFisica;
-	}
-	public IdiomaEnumDto getIdioma() {
-		return idioma;
-	}
-	public String getTipusAssumpte() {
-		return tipusAssumpte;
-	}
 	public String getNumExpedient() {
 		return numExpedient;
-	}
-	public String getRefExterna() {
-		return refExterna;
-	}
-	public String getCodiAssumpte() {
-		return codiAssumpte;
-	}
-	public String getObservacions() {
-		return observacions;
 	}
 	public boolean isPermisProcessar() {
 		return permisProcessar;
@@ -452,8 +411,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public static Builder getBuilder(
 			EntitatEntity entitat,
 			String emisorDir3Codi,
-			String organGestor,
-			NotificacioComunicacioTipusEnumDto comunicacioTipus,
 			NotificaEnviamentTipusEnumDto enviamentTipus,
 			String concepte,
 			String documentArxiuNom,
@@ -465,8 +422,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		return new Builder(
 				entitat,
 				emisorDir3Codi,
-				organGestor,
-				comunicacioTipus,
 				enviamentTipus,
 				concepte,
 				documentArxiuNom,
@@ -513,7 +468,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public static BuilderV2 getBuilderV2(
 			EntitatEntity entitat,
 			String emisorDir3Codi,
-			String organGestor,
 			NotificacioComunicacioTipusEnumDto comunicacioTipus,
 			NotificaEnviamentTipusEnumDto enviamentTipus,
 			String concepte,
@@ -525,18 +479,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String procedimentCodi,
 			ProcedimentEntity procediment,
 			String grup,
-			String extracte,
-			RegistreDocumentacioFisicaEnumDto docFisica,
-			//String tipusAssumpte,
-			IdiomaEnumDto idioma,
-			String numExpedient,
-			String referenciaExterna,
-			String codiAssumpte,
-			String observacions) {
+			String numExpedient) {
 		return new BuilderV2(
 				entitat,
 				emisorDir3Codi,
-				organGestor,
 				comunicacioTipus,
 				enviamentTipus,
 				concepte,
@@ -548,14 +494,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				procedimentCodi,
 				procediment,
 				grup,
-				extracte,
-				docFisica,
-				//tipusAssumpte,
-				idioma,
-				numExpedient,
-				referenciaExterna,
-				codiAssumpte,
-				observacions);
+				numExpedient);
 	}
 	
 
@@ -564,8 +503,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		Builder(
 				EntitatEntity entitat,
 				String emisorDir3Codi,
-				String organGestor,
-				NotificacioComunicacioTipusEnumDto comunicacioTipus,
 				NotificaEnviamentTipusEnumDto enviamentTipus,
 				String concepte,
 				String documentArxiuNom,
@@ -577,56 +514,16 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built = new NotificacioEntity();
 			built.entitat = entitat;
 			built.emisorDir3Codi = emisorDir3Codi;
-			built.organGestor = organGestor;
-			built.comunicacioTipus = comunicacioTipus;
 			built.enviamentTipus = enviamentTipus;
-//			built.enviamentDataProgramada = enviamentDataProgramada;
 			built.concepte = concepte;
 			built.estat = NotificacioEstatEnumDto.PENDENT;
 			built.notificaEnviamentIntent = 0;
 			built.notificaEnviamentData = new Date();
 		}
-		public Builder oficina(String oficina) {
-			built.oficina = oficina;
-			return this;
-		}
-		public Builder llibre(String llibre) {
-			built.llibre = llibre;
-			return this;
-		}
-		public Builder extracte(String extracte) {
-			built.extracte = extracte;
-			return this;
-		}
-		public Builder docFisica(RegistreDocumentacioFisicaEnumDto docFisica) {
-			built.docFisica = docFisica;
-			return this;
-		}
-		public Builder idioma(IdiomaEnumDto idioma) {
-			built.idioma = idioma;
-			return this;
-		}
-		public Builder tipusAssumpte(String tipusAssumpte) {
-			built.tipusAssumpte = tipusAssumpte;
-			return this;
-		}
 		public Builder numExpedient(String numExpedient) {
 			built.numExpedient = numExpedient;
 			return this;
 		}
-		public Builder refExterna(String refExterna) {
-			built.refExterna = refExterna;
-			return this;
-		}
-		public Builder codiAssumpte(String codiAssumpte) {
-			built.codiAssumpte = codiAssumpte;
-			return this;
-		}
-		public Builder observacions(String observacions) {
-			built.observacions = observacions;
-			return this;
-		}
-		
 		public Builder descripcio(String descripcio) {
 			built.descripcio = descripcio;
 			return this;
@@ -639,14 +536,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.grupCodi = grupCodi;
 			return this;
 		}
-//		public Builder procedimentDescripcioSia(String procedimentDescripcioSia) {
-//			built.procedimentDescripcioSia = procedimentDescripcioSia;
-//			return this;
-//		}
-//		public Builder retardPostal(Integer retardPostal) {
-//			built.retardPostal = retardPostal;
-//			return this;
-//		}
+		public Builder retard(Integer retard) {
+			built.retard = retard;
+			return this;
+		}
 		public Builder caducitat(Date caducitat) {
 			built.caducitat = caducitat;
 			return this;
@@ -789,7 +682,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		BuilderV2(
 				EntitatEntity entitat,
 				String emisorDir3Codi,
-				String organGestor,
 				NotificacioComunicacioTipusEnumDto comunicacioTipus,
 				NotificaEnviamentTipusEnumDto enviamentTipus,
 				String concepte,
@@ -801,16 +693,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				String procedimentCodi,
 				ProcedimentEntity procediment,
 				String grup,
-				//String oficina,
-				//String llibre,
-				String extracte,
-				RegistreDocumentacioFisicaEnumDto docFisica,
-				//String tipusAssumpte,
-				IdiomaEnumDto idioma,
-				String numExpedient,
-				String refExterna,
-				String codiAssumpte,
-				String observacions) {
+				String numExpedient) {
 			built = new NotificacioEntity();
 			built.entitat = entitat;
 			built.emisorDir3Codi = emisorDir3Codi;
@@ -826,29 +709,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.grupCodi = grup;
 			built.numExpedient = numExpedient;
 			built.procediment = procediment;
-			//built.oficina = oficina;
-			//built.llibre = llibre;
-			built.extracte = extracte;
-			built.docFisica = docFisica;
-			//built.tipusAssumpte = tipusAssumpte;
-			built.idioma = idioma;
-			built.numExpedient = numExpedient;
-			built.refExterna = refExterna;
-			built.codiAssumpte = codiAssumpte;
-			built.observacions = observacions;
-			built.organ = entitat.getDir3Codi();
-
 			built.estat = NotificacioEstatEnumDto.PENDENT;
 			built.notificaEnviamentIntent = 0;
 			built.notificaEnviamentData = new Date();
-		}
-		public BuilderV2 oficina(String oficina) {
-			built.oficina = oficina;
-			return this;
-		}
-		public BuilderV2 llibre(String llibre) {
-			built.llibre = llibre;
-			return this;
 		}
 		public BuilderV2 usuariCodi(String usuariCodi) {
 			built.usuariCodi = usuariCodi;

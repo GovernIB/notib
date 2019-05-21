@@ -76,7 +76,6 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			//"and   (:isCodiNotibNull = true or n.titularEmail = :codiNotib) " +
 			"and (:isNumeroCertCorreusNull = true or n.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
 			"and (:isUsuariNull = true or n.notificacio.usuariCodi like lower('%'||:usuari||'%')) "+
-			"and (:isLlibreRegistreNull = true or n.notificacio.llibre like lower('%'||:llibreRegistre||'%')) " +
 			"and (:isNumeroRegistreNull = true or n.notificacio.registreNumero like lower('%'||:numeroRegistre||'%')) "+
 			"and (:esDataRegistreIniciNull = true or n.notificacio.registreData >= :dataRegistreInici) " +
 			"and (:esDataRegistreFiNull = true or n.notificacio.registreData <= :dataRegistreFi) " )
@@ -124,8 +123,6 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("numeroCertCorreus") String numeroCertCorreus,
 			@Param("isUsuariNull") boolean isUsuariNull,
 			@Param("usuari") String usuari,
-			@Param("isLlibreRegistreNull") boolean isLlibreRegistreNull,
-			@Param("llibreRegistre") String llibreRegistre,
 			@Param("isNumeroRegistreNull") boolean isNumeroRegistreNull,
 			@Param("numeroRegistre") String numeroRegistre,
 			@Param("esDataRegistreIniciNull") boolean esDataRegistreIniciNull,
@@ -164,7 +161,6 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			//"and   (:isCodiNotibNull = true or n.titularEmail = :codiNotib) " +
 			"and (:isNumeroCertCorreusNull = true or n.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
 			"and (:isUsuariNull = true or n.notificacio.usuariCodi like lower('%'||:usuari||'%')) "+
-			"and (:isLlibreRegistreNull = true or n.notificacio.llibre like lower('%'||:llibreRegistre||'%')) " +
 			"and (:isNumeroRegistreNull = true or n.notificacio.registreNumero like lower('%'||:numeroRegistre||'%')) "+
 			"and (:esDataRegistreIniciNull = true or n.notificacio.registreData >= :dataRegistreInici) " +
 			"and (:esDataRegistreFiNull = true or n.notificacio.registreData <= :dataRegistreFi) " )
@@ -212,8 +208,6 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("numeroCertCorreus") String numeroCertCorreus,
 			@Param("isUsuariNull") boolean isUsuariNull,
 			@Param("usuari") String usuari,
-			@Param("isLlibreRegistreNull") boolean isLlibreRegistreNull,
-			@Param("llibreRegistre") String llibreRegistre,
 			@Param("isNumeroRegistreNull") boolean isNumeroRegistreNull,
 			@Param("numeroRegistre") String numeroRegistre,
 			@Param("esDataRegistreIniciNull") boolean esDataRegistreIniciNull,

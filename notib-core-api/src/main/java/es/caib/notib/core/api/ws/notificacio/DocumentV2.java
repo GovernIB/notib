@@ -3,8 +3,6 @@
  */
 package es.caib.notib.core.api.ws.notificacio;
 
-import java.util.Map;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -21,9 +19,9 @@ public class DocumentV2 {
 	private String arxiuNom;
 	private String contingutBase64;
 	private String url;
-	private Map<String, String> metadades;
+//	private Map<String, String> metadades;
 	private boolean normalitzat;
-	private boolean generarCsv;
+//	private boolean generarCsv;
 	private String uuid;
 	private String csv;
 	
@@ -45,23 +43,11 @@ public class DocumentV2 {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	public Map<String, String> getMetadades() {
-		return metadades;
-	}
-	public void setMetadades(Map<String, String> metadades) {
-		this.metadades = metadades;
-	}
 	public boolean isNormalitzat() {
 		return normalitzat;
 	}
 	public void setNormalitzat(boolean normalitzat) {
 		this.normalitzat = normalitzat;
-	}
-	public boolean isGenerarCsv() {
-		return generarCsv;
-	}
-	public void setGenerarCsv(boolean generarCsv) {
-		this.generarCsv = generarCsv;
 	}
 	public String getUuid() {
 		return uuid;

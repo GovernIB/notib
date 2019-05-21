@@ -59,7 +59,7 @@ public class NotificacioEnviamentHelper {
 				env.setEnviamentTipus(notificacioDto.getEnviamentTipus());
 				env.setConcepte(notificacioDto.getConcepte());
 				env.setDescripcio(notificacioDto.getDescripcio());
-				env.setLlibre(notificacioDto.getLlibre());
+//				env.setLlibre(notificacioDto.getLlibre());
 				//env.setRegistreNumero(notificacioDto.getRegistreNumero());
 				env.setEstat(notificacioDto.getEstat());
 				env.setNotificacioId(notificacioDto.getId());
@@ -115,8 +115,8 @@ public class NotificacioEnviamentHelper {
 				entregaPostalDto.setLinea1(enviament.getDomiciliLinea1());
 				entregaPostalDto.setLinea2(enviament.getDomiciliLinea2());
 				entregaPostalDto.setCie(enviament.getDomiciliCie());
-				entregaPostalDto.setFormatSobre(enviament.getFormatSobre());
-				entregaPostalDto.setFormatFulla(enviament.getFormatFulla());
+//				entregaPostalDto.setFormatSobre(enviament.getFormatSobre());
+//				entregaPostalDto.setFormatFulla(enviament.getFormatFulla());
 				env.setEntregaPostal(entregaPostalDto);
 				/*Revisar*/
 				env.setNumeroCertCorreus(enviament.getNotificaCertificacioNumSeguiment());
@@ -190,8 +190,8 @@ public class NotificacioEnviamentHelper {
 				entregaPostalDto.setLinea1(enviament.getDomiciliLinea1());
 				entregaPostalDto.setLinea2(enviament.getDomiciliLinea2());
 				entregaPostalDto.setCie(enviament.getDomiciliCie());
-				entregaPostalDto.setFormatSobre(enviament.getFormatSobre());
-				entregaPostalDto.setFormatFulla(enviament.getFormatFulla());
+//				entregaPostalDto.setFormatSobre(enviament.getFormatSobre());
+//				entregaPostalDto.setFormatFulla(enviament.getFormatFulla());
 				enviaments.setEntregaPostal(entregaPostalDto);
 				
 				enviaments.setServeiTipus(enviament.getServeiTipus());
