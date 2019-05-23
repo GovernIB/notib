@@ -351,6 +351,12 @@ function mostrarEntregaPostal(className) {
                     <div class="col-md-6">
                         <not:inputDate name="caducitat" textKey="notificacio.form.camp.caducitat" orientacio="bottom" labelSize="4" required="true"/>
                     </div>
+                    <div class="col-md-6">
+                    	<not:inputDate name="enviamentDataProgramada" textKey="notificacio.form.camp.dataProgramada" labelSize="2"/>
+                    </div>
+                    <div class="col-md-6">
+                    	<not:inputText name="retard" textKey="notificacio.form.camp.retard" value="${procediment.retard}" labelSize="2"/>
+                    </div>
                      <div class="col-md-6">
                         <not:inputText name="numExpedient" textKey="notificacio.form.camp.expedient" labelSize="4"/>
                     </div>

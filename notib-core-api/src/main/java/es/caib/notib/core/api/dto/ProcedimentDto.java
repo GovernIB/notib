@@ -1,7 +1,6 @@
 package es.caib.notib.core.api.dto;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 public class ProcedimentDto extends AuditoriaDto implements Serializable{
@@ -31,9 +30,8 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 	private boolean usuariActualNotificacio;
 	private boolean usuariActualAdministration;
 	
-	private Date enviamentDataProgramada;
 	private int retard;
-	
+	private int caducitat;
 	
 	public Long getId() {
 		return id;
@@ -82,12 +80,6 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 	}
 	public void setGrups(List<GrupDto> grupsDto) {
 		this.grups = grupsDto;
-	}
-	public Date getEnviamentDataProgramada() {
-		return enviamentDataProgramada;
-	}
-	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
-		this.enviamentDataProgramada = enviamentDataProgramada;
 	}
 	public int getRetard() {
 		return retard;
@@ -184,6 +176,12 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 	}
 	public void setCodiAssumpteNom(String codiAssumpteNom) {
 		this.codiAssumpteNom = codiAssumpteNom;
+	}
+	public int getCaducitat() {
+		return caducitat;
+	}
+	public void setCaducitat(int caducitat) {
+		this.caducitat = caducitat;
 	}
 
 

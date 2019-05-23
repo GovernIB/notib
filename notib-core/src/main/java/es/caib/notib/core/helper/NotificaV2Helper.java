@@ -507,11 +507,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		//}
 		envios.setEnvios(generarEnvios(notificacio));
 		Opciones opcionesRemesa = new Opciones();
-		if(notificacio.getProcedimentCodiNotib() != null) {
-			retardPostal = procedimentRepository.findOne(notificacio.getProcediment().getId()).getRetard();
-		} else {
-			retardPostal = notificacio.getRetard();
-		}
+		retardPostal = notificacio.getRetard();
 		
 		if (retardPostal != null) {
 			Opcion opcionRetardo = new Opcion();

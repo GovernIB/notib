@@ -7,7 +7,6 @@ package es.caib.notib.war.controller;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -57,11 +56,11 @@ import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.war.command.DocumentCommand;
 import es.caib.notib.war.command.MarcarProcessatCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
 import es.caib.notib.war.command.PersonaCommand;
+import es.caib.notib.war.helper.CaducitatHelper;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EntitatHelper;
@@ -702,7 +701,7 @@ public class NotificacioController extends BaseUserController {
 				isAdministrador(request), 
 				procedimentId);
 		NotificacioCommandV2 notificacio = new NotificacioCommandV2();
-		notificacio.setCaducitat(sumarDiesData(new Date()));
+		notificacio.setCaducitat(CaducitatHelper.sumarDiesLaborals(procedimentActual.getCaducitat()));
 		model.addAttribute("notificacioCommandV2", notificacio);
 		model.addAttribute("entitat", procedimentActual.getEntitat());
 		model.addAttribute("procediment", procedimentService.findById(
@@ -734,13 +733,6 @@ public class NotificacioController extends BaseUserController {
 				EnumHelper.getOptionsForEnum(
 						IdiomaEnumDto.class,
 						"es.caib.notib.core.api.dto.idiomaEnumDto."));
-	}
-	
-	private Date sumarDiesData(Date dataActual) {
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(dataActual);
-		calendar.add(Calendar.DAY_OF_YEAR, 10);
-		return calendar.getTime();
 	}
 	
 	private boolean isAdministrador(HttpServletRequest request) {

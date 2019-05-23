@@ -217,7 +217,8 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 		//			toXmlGregorianCalendar(dataProgramada));
 		//}
 		
-		dataProgramada = procedimentRepository.findByCodi(notificacio.getProcedimentCodiNotib()).getEnviamentDataProgramada();
+		dataProgramada = notificacio.getEnviamentDataProgramada();
+//		dataProgramada = procedimentRepository.findByCodi(notificacio.getProcedimentCodiNotib()).getEnviamentDataProgramada();
 		
 		if (dataProgramada != null) {
 			envio.setFechaEnvioProgramado(
