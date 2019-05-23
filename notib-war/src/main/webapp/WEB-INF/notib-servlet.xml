@@ -35,8 +35,7 @@
 			<mvc:exclude-mapping path="/webjars/**"/>
 			<mvc:exclude-mapping path="/**/datatable/**"/>
 			<mvc:exclude-mapping path="/**/selection/**"/>
-			<mvc:exclude-mapping path="/**/rest/notib/**"/>
-			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/**/api/rest/**"/>
 			<bean class="es.caib.notib.war.interceptor.AplicacioInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -49,8 +48,7 @@
 			<mvc:exclude-mapping path="/webjars/**"/>
 			<mvc:exclude-mapping path="/**/datatable/**"/>
 			<mvc:exclude-mapping path="/**/selection/**"/>
-			<mvc:exclude-mapping path="/**/rest/notib/**"/>
-			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/**/api/rest/**"/>
 			<bean class="es.caib.notib.war.interceptor.SessioInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -63,8 +61,7 @@
 			<mvc:exclude-mapping path="/webjars/**"/>
 			<mvc:exclude-mapping path="/**/datatable/**"/>
 			<mvc:exclude-mapping path="/**/selection/**"/>
-			<mvc:exclude-mapping path="/**/rest/notib/**"/>
-			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/**/api/rest/**"/>
 			<bean class="es.caib.notib.war.interceptor.LlistaEntitatsInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -77,8 +74,7 @@
 			<mvc:exclude-mapping path="/webjars/**"/>
 			<mvc:exclude-mapping path="/**/datatable/**"/>
 			<mvc:exclude-mapping path="/**/selection/**"/>
-			<mvc:exclude-mapping path="/**/rest/notib/**"/>
-			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/**/api/rest/**"/>
 			<bean class="es.caib.notib.war.interceptor.LlistaRolsInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -91,8 +87,7 @@
 			<mvc:exclude-mapping path="/webjars/**"/>
 			<mvc:exclude-mapping path="/**/datatable/**"/>
 			<mvc:exclude-mapping path="/**/selection/**"/>
-			<mvc:exclude-mapping path="/**/rest/notib/**"/>
-			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/**/api/rest/**"/>
 			<bean class="es.caib.notib.war.interceptor.ModalInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -105,8 +100,7 @@
 			<mvc:exclude-mapping path="/webjars/**"/>
 			<mvc:exclude-mapping path="/**/datatable/**"/>
 			<mvc:exclude-mapping path="/**/selection/**"/>
-			<mvc:exclude-mapping path="/**/rest/notib/**"/>
-			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/**/api/rest/**"/>
 			<bean class="es.caib.notib.war.interceptor.NodecoInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -119,8 +113,7 @@
 			<mvc:exclude-mapping path="/webjars/**"/>
 			<mvc:exclude-mapping path="/**/datatable/**"/>
 			<mvc:exclude-mapping path="/**/selection/**"/>
-			<mvc:exclude-mapping path="/**/rest/notib/**"/>
-			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/**/api/rest/**"/>
 			<bean class="es.caib.notib.war.interceptor.AjaxInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -133,8 +126,7 @@
 			<mvc:exclude-mapping path="/webjars/**"/>
 			<mvc:exclude-mapping path="/**/datatable/**"/>
 			<mvc:exclude-mapping path="/**/selection/**"/>
-			<mvc:exclude-mapping path="/**/rest/notib/**"/>
-			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/**/api/rest/**"/>
 			<bean class="es.caib.notib.war.interceptor.PermisosInterceptor"/>
 		</mvc:interceptor>
 	</mvc:interceptors>
