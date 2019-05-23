@@ -1,6 +1,6 @@
 # ![Logo notib](https://github.com/GovernIB/notib/raw/master/assets/logo2.png) Notib
 
-> - Versió Estable: __notib-1.0.0_ (branca [notib-1.0](https://github.com/GovernIB/notib/tree/notib-1.0))
+> - Versió Estable: __notib-1.0.0__ (branca [notib-1.0.0](https://github.com/GovernIB/notib/tree/notib-1.0.0))
 > - Versió Desenvolupament: __notib-1.0.1__ (branca [notib-1.0.1](https://github.com/GovernIB/notib/tree/notib-1.0.1))
 
 **Descripció**
@@ -10,8 +10,8 @@ NOTIB ofereix una plataforma  per a realitzar i gestionar totes les comunicacion
 
 **Documentació**
 
->- [Manual d'instal·lació](https://github.com/GovernIB/notib/raw/notib-0.1/doc/pdf/NOTIB_instalacio.pdf)
->- [Manual d'integració](https://github.com/GovernIB/notib/raw/notib-0.1/doc/pdf/NOTIB_integracio.pdf)
->- [Manual d'usuari](https://github.com/GovernIB/notib/raw/notib-0.1/doc/pdf/NOTIB_usuari.pdf)
->- [Manual de plugins](https://github.com/GovernIB/notib/raw/notib-0.1/doc/pdf/NOTIB_plugins.pdf)
->- [Model de dades](https://github.com/GovernIB/notib/raw/notib-0.1/doc/pdf/NOTIB_model_dades.pdf)
+>- [Manual d'instal·lació](https://github.com/GovernIB/notib/raw/notib-1.0/doc/pdf/NOTIB_instalacio.pdf)
+>- [Manual d'integració](https://github.com/GovernIB/notib/raw/notib-1.0/doc/pdf/NOTIB_integracio.pdf)
+>- [Manual d'usuari](https://github.com/GovernIB/notib/raw/notib-1.0/doc/pdf/NOTIB_usuari.pdf)
+>- [Manual de plugins](https://github.com/GovernIB/notib/raw/notib-1.0/doc/pdf/NOTIB_plugins.pdf)
+>- [Model de dades](https://github.com/GovernIB/notib/raw/notib-1.0/doc/pdf/NOTIB_model_dades.pdf)
