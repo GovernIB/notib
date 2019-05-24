@@ -161,25 +161,24 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	
 	/* DEH */
 	@Column(name = "deh_obligat")
-	
 	protected Boolean dehObligat;
+	
 	@Column(name = "deh_nif", length = 9)
-	
 	protected String dehNif;
+	
 	@Column(name = "deh_proc_codi", length = 6)
-	
 	protected String dehProcedimentCodi;
-	/* Altres */
 	
+	/* Altres */
 	@Column(name = "servei_tipus")
 	@Enumerated(EnumType.ORDINAL)
 	protected ServeiTipusEnumDto serveiTipus;
 	
-//	@Column(name = "format_sobre", length = 10)
-//	protected String formatSobre;
-//	
-//	@Column(name = "format_fulla", length = 10)
-//	protected String formatFulla;
+	@Column(name = "format_sobre", length = 10)
+	protected String formatSobre;
+	
+	@Column(name = "format_fulla", length = 10)
+	protected String formatFulla;
 	
 	/* Notifica informació */
 	@Column(name = "notifica_ref", length = 20)
@@ -400,6 +399,12 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 	public String getDomiciliPoblacio() {
 		return domiciliPoblacio;
+	}
+	public String getFormatSobre() {
+		return formatSobre;
+	}
+	public String getFormatFulla() {
+		return formatFulla;
 	}
 	public String getDomiciliMunicipiCodiIne() {
 		return domiciliMunicipiCodiIne;
@@ -777,7 +782,8 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 
 	public static BuilderV2 getBuilderV2(
-			Enviament enviament, NotificacioDtoV2 notificacio, 
+			Enviament enviament, 
+			NotificacioDtoV2 notificacio, 
 			NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
 			NotificaDomiciliConcretTipusEnumDto tipusConcret,
 			ServeiTipusEnumDto tipusServei,
@@ -1072,7 +1078,8 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public static class BuilderV2 {
 		NotificacioEnviamentEntity built;
 		BuilderV2(
-				Enviament enviament, NotificacioDtoV2 notificacio, 
+				Enviament enviament, 
+				NotificacioDtoV2 notificacio, 
 				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
 				NotificaDomiciliConcretTipusEnumDto tipusConcret,
 				ServeiTipusEnumDto tipusServei,
@@ -1107,8 +1114,8 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 				built.domiciliLinea1 = enviament.getEntregaPostal().getLinea1();
 				built.domiciliLinea2 = enviament.getEntregaPostal().getLinea2();
 				built.domiciliCie = enviament.getEntregaPostal().getCie();
-//				built.formatSobre = enviament.getEntregaPostal().getFormatSobre();
-//				built.formatFulla = enviament.getEntregaPostal().getFormatFulla();
+				built.formatSobre = enviament.getEntregaPostal().getFormatSobre();
+				built.formatFulla = enviament.getEntregaPostal().getFormatFulla();
 				built.dehObligat = enviament.getEntregaDeh().isObligat();
 			}
 			

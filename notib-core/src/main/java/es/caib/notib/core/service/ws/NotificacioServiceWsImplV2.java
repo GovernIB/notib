@@ -274,7 +274,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				
 				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
 				NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
-				if (enviament.getEntregaPostal() != null) {
+				if (enviament.getEntregaPostal() != null && !enviament.getEntregaPostal().getViaNom().isEmpty()) {
 					if (enviament.getEntregaPostal().getTipus() != null) {
 						switch (enviament.getEntregaPostal().getTipus()) {
 						case APARTAT_CORREUS:

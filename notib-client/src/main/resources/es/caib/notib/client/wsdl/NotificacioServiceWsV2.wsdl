@@ -105,6 +105,8 @@
 <xs:element minOccurs="0" name="codiPostal" type="xs:string" />
 <xs:element minOccurs="0" name="complement" type="xs:string" />
 <xs:element minOccurs="0" name="escala" type="xs:string" />
+<xs:element minOccurs="0" name="formatFulla" type="xs:string" />
+<xs:element minOccurs="0" name="formatSobre" type="xs:string" />
 <xs:element minOccurs="0" name="linea1" type="xs:string" />
 <xs:element minOccurs="0" name="linea2" type="xs:string" />
 <xs:element minOccurs="0" name="municipiCodi" type="xs:string" />
@@ -202,6 +204,7 @@
 <xs:enumeration value="ENVIADA" />
 <xs:enumeration value="REGISTRADA" />
 <xs:enumeration value="FINALITZADA" />
+<xs:enumeration value="PROCESSADA" />
 </xs:restriction>
 </xs:simpleType>
 <xs:simpleType name="enviamentTipusEnum">

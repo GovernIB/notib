@@ -57,7 +57,6 @@ import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.war.command.DocumentCommand;
 import es.caib.notib.war.command.MarcarProcessatCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
