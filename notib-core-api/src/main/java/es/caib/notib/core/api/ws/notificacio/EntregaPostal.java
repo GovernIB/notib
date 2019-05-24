@@ -36,8 +36,8 @@ public class EntregaPostal {
 	private String linea1;
 	private String linea2;
 	private Integer cie;
-//	private String formatSobre;
-//	private String formatFulla;
+	private String formatSobre;
+	private String formatFulla;
 
 	public NotificaDomiciliConcretTipusEnumDto getTipus() {
 		return tipus;
@@ -164,5 +164,17 @@ public class EntregaPostal {
 	}
 	public void setCie(Integer cie) {
 		this.cie = cie;
+	}
+	public String getFormatSobre() {
+		return formatSobre;
+	}
+	public void setFormatSobre(String formatSobre) {
+		this.formatSobre = formatSobre;
+	}
+	public String getFormatFulla() {
+		return formatFulla;
+	}
+	public void setFormatFulla(String formatFulla) {
+		this.formatFulla = formatFulla;
 	}
 }

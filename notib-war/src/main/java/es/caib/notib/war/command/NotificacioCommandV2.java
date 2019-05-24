@@ -52,6 +52,7 @@ public class NotificacioCommandV2 {
 	private DocumentCommand document;
 	private Long procedimentId;
 	private String procedimentNom;
+	private String codiSia;
 	private Long grupId;
 	private String usuariCodi;
 	private TipusDocumentEnumDto tipusDocument;
@@ -163,6 +164,12 @@ public class NotificacioCommandV2 {
 	}
 	public void setProcedimentNom(String procedimentNom) {
 		this.procedimentNom = procedimentNom;
+	}
+	public String getCodiSia() {
+		return codiSia;
+	}
+	public void setCodiSia(String codiSia) {
+		this.codiSia = codiSia;
 	}
 	public Long getGrupId() {
 		return grupId;
