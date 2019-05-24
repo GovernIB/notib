@@ -36,6 +36,7 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 //	private Date caducitat;
 	
 	//Info notificació
+	private boolean isEntregaPostalActiva;
 	private Date enviamentDataProgramada;
 	private String procedimentCodiNotib;
 	private String grupCodi;
@@ -150,6 +151,12 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	}
 	public void setCodiNotibEnviament(String codiNotibEnviament) {
 		this.codiNotibEnviament = codiNotibEnviament;
+	}
+	public boolean isEntregaPostalActiva() {
+		return isEntregaPostalActiva;
+	}
+	public void setEntregaPostalActiva(boolean isEntregaPostalActiva) {
+		this.isEntregaPostalActiva = isEntregaPostalActiva;
 	}
 	public Date getEnviamentDataProgramada() {
 		return enviamentDataProgramada;
