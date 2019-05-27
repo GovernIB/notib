@@ -271,6 +271,8 @@ public class NotificacioController extends BaseUserController {
 							"es.caib.notib.core.api.dto.idiomaEnumDto."));
 			model.addAttribute("enviosGuardats", notificacioCommand.getEnviaments());
             model.addAttribute("errors", bindingResult.getAllErrors());
+            if (notificacioCommand.getEnviaments().get(0).getDestinataris() != null)
+            	model.addAttribute("isVisible", notificacioCommand.getEnviaments().get(0).getDestinataris().get(0).isVisible());
 			return "notificacioForm";
 		}
 		if (RolHelper.isUsuariActualAdministrador(request)) {
@@ -708,6 +710,7 @@ public class NotificacioController extends BaseUserController {
 				null, 
 				isAdministrador(request), 
 				procedimentId));
+		model.addAttribute("amagat", Boolean.FALSE);
 		model.addAttribute("grups", grupService.findByGrupsProcediment(procedimentId));
 		model.addAttribute("comunicacioTipus", 
 				EnumHelper.getOptionsForEnum(

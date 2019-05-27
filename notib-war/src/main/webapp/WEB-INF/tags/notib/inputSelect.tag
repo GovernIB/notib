@@ -33,7 +33,7 @@
 <c:set var="campPlaceholder"><c:choose><c:when test="${not empty placeholderKey}"><spring:message code="${placeholderKey}"/></c:when><c:otherwise>${placeholder}</c:otherwise></c:choose></c:set>
 <c:set var="minimumResultsForSearch"><c:choose><c:when test="${not empty optionMinimumResultsForSearch}">${optionMinimumResultsForSearch}</c:when><c:otherwise>${-1}</c:otherwise></c:choose></c:set>
 <c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
-<c:set var="campInputSize">${12 - campLabelSize}</c:set>
+<c:set var="campInputSize"><c:choose><c:when test="${not empty inputSize}">${inputSize}</c:when><c:otherwise>${12 - campLabelSize}</c:otherwise></c:choose></c:set>
 <spring:bind path="${name}">
 	<c:set var="campValue" value="${status.value}"/>
 </spring:bind>
