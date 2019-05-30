@@ -16,6 +16,7 @@
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="inputSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="readonly" required="false" rtexprvalue="true"%>
+<%@ attribute name="picker" required="false" rtexprvalue="true"%>
 <c:set var="campValue" value="${value}"/>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
@@ -35,11 +36,26 @@
 	<c:when test="${not inline}">
 		<label class="control-label col-xs-${campLabelSize}" for="${campPath}">${campLabelText}</label>
 		<div class="col-xs-${campInputSize}">
-			<form:input value="${campValue}" path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}"/>
-			<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
-			<c:if test="${info == true}">
-				<p class="comentari col-xs-12 col-xs-offset-">${campInfoText}</p>
-			</c:if>
+		<c:choose>
+			<c:when test="${picker}">
+				<div id="${campPath}" class="input-group colorpicker-component">
+					<form:input value="${campValue}" path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}"/>
+					<span class="input-group-addon"><i></i></span>
+					<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
+					<c:if test="${info == true}">
+						<p class="comentari col-xs-12 col-xs-offset-">${campInfoText}</p>
+					</c:if>
+				</div>
+			</c:when>
+			<c:otherwise>
+				<form:input value="${campValue}" path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}"/>
+				<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
+				<c:if test="${info == true}">
+					<p class="comentari col-xs-12 col-xs-offset-">${campInfoText}</p>
+				</c:if>
+			</c:otherwise>
+		</c:choose>
+			
 		</div>
 	</c:when>
 	<c:otherwise>

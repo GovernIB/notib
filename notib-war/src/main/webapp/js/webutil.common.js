@@ -11,6 +11,30 @@ function webutilAjaxEnumPath(enumClass) {
 function webutilRefreshMissatges() {
 	$('#contingut-missatges').load(webutilContextPath() + "/nodeco/missatges");
 }
+function addDefault(option) {
+	var selOrganismes = $('#tipusDocDefault');
+	selOrganismes.empty();
+	selOrganismes.append("<option value=\"\"></option>");
+	if (option && option.length > 0) {
+			var items = [];
+			$.each(option, function(i, val) {
+				items.push({
+					"id": val,
+					"text": val
+				});
+				var selected = $('#tipusDocDefaultSelected').val();
+				if (val == selected) {
+					selOrganismes.append("<option value=\"" + val + "\" selected='true'>" + val + "</option>");
+				} else {
+					selOrganismes.append("<option value=\"" + val + "\">" + val + "</option>");
+				}
+			});
+	}
+	var select2Options = {
+			theme: 'bootstrap',
+			width: 'auto'};
+	selOrganismes.select2(select2Options);	
+}
 
 function webutilModalAdjustHeight(iframe) {
 	var $iframe = (iframe) ? $(iframe) : $(window.frameElement);
@@ -349,15 +373,17 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		    allowClear: $(this).data('placeholder') ? true : false,
 		    minimumResultsForSearch: $(this).data('minimumresults')
 		});
+		
 		if (selectValue !== undefined) {
-			console.log(selectValue);
+			addDefault(selectValue);
 			var vals = selectValue;
 
-			vals.forEach(function(e){
-			if(!s2.find('option:contains(' + e + ')').length) 
-			  s2.append($('<option>').text(e));
-			});
-
+			if(!!vals) {
+				vals.forEach(function(e){
+					if(!s2.find('option:contains(' + e + ')').length) 
+					  s2.append($('<option>').text(e));
+					});
+			}
 			s2.val(vals).trigger("change"); 
 		}
 		$(this).on('select2:open', function() {

@@ -19,6 +19,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
+import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.EntitatService;
 
@@ -151,4 +152,9 @@ public class EntitatServiceBean implements EntitatService {
 		return delegate.findTipusDocumentByEntitat(entitatId);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public TipusDocumentEnumDto findTipusDocumentDefaultByEntitat(Long entitatId) {
+		return delegate.findTipusDocumentDefaultByEntitat(entitatId);
+	}
 }

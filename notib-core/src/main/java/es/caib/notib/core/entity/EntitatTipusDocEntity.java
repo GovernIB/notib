@@ -35,21 +35,14 @@ public class EntitatTipusDocEntity extends NotibAuditable<Long> {
 	@ForeignKey(name = "not_entitat_tipus_doc_fk")
 	protected EntitatEntity entitat;
 	
-	@Enumerated(EnumType.STRING)
 	@Column(name = "tipus_doc")
 	protected TipusDocumentEnumDto tipusDocEnum;
-	
-	@Column(name = "tipus_doc_default")
-	protected boolean tipusDocDefault;
 	
 	public EntitatEntity getEntitat() {
 		return entitat;
 	}
 	public TipusDocumentEnumDto getTipusDocEnum() {
 		return tipusDocEnum;
-	}
-	public boolean isTipusDocDefault() {
-		return tipusDocDefault;
 	}
 	public String getEnumValue() {
 		return tipusDocEnum.name();

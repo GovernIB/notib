@@ -40,6 +40,9 @@
     <script src="<c:url value="/js/webutil.datatable.js"/>"></script>
     <script src="<c:url value="/js/webutil.modal.js"/>"></script>
 <style type="text/css">
+.select2-container--bootstrap {
+	width: 100% !important;
+}
 .comentari {
 	font-size: 12px;
 	color: #999;
@@ -94,6 +97,12 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
+	var tipusDocumentDefault = $('#tipusDocumentDefault').val();
+	$('.customSelect').webutilInputSelect2(null);
+	if (tipusDocumentDefault != '') {
+		$(".customSelect").val(tipusDocumentDefault).trigger("change");
+	}
+	
     $('.nextForm').click(function(){
         $('.nav-tabs > .active').next('li').find('a').trigger('click');
     });
@@ -201,6 +210,7 @@ $(document).ready(function() {
 		}
 	});
 	$('.interessat').trigger('change');
+	$('#tipusDocument').trigger('change');
 });
 
 function addDestinatari(enviament_id) {
@@ -441,7 +451,17 @@ function mostrarEntregaPostal(className) {
 			</div>
 			<div class="row">
 				<div class="col-md-6">
-					<not:inputSelect name="tipusDocument" textKey="notificacio.form.camp.document" labelSize="4" />
+					<div class="form-group">
+						<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
+						<div class="controls col-xs-8">
+							<form:hidden path="tipusDocumentDefault"/>
+							<select id="tipusDocument" name="tipusDocument" class="customSelect">
+							<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
+								<option value="${enumValue}" selected>${enumValue}</option>
+							</c:forEach>
+							</select>
+						</div>
+					</div>
 				</div>
 				<div id="input-origen-csvuuid" class="col-md-6">
 					<not:inputText name="documentArxiuUuidCsvUrl" textKey="notificacio.form.camp.csvuuid" labelSize="3" />

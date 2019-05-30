@@ -78,7 +78,11 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			Long tipusOperacio) {
 		RespostaConsultaRegistre rc = new RespostaConsultaRegistre();
 		try {
-			return toRespostaConsultaRegistre(getAsientoRegistralApi().crearAsientoRegistral(codiDir3Entitat, toAsientoRegistralBean(arb), tipusOperacio));
+			return toRespostaConsultaRegistre(getAsientoRegistralApi().crearAsientoRegistral(
+					codiDir3Entitat, 
+					toAsientoRegistralBean(arb), 
+					tipusOperacio,
+					false));
 		} catch (WsI18NException e) {
 			rc.setErrorCodi("0");
 			rc.setErrorDescripcio(e.getMessage());
