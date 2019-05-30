@@ -3,6 +3,8 @@
  */
 package es.caib.notib.core.ejb;
 
+import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -16,6 +18,7 @@ import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.EntitatService;
 
@@ -130,6 +133,22 @@ public class EntitatServiceBean implements EntitatService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public boolean hasPermisAplicacioEntitat() {
 		return delegate.hasPermisAplicacioEntitat();
+	}
+
+	@Override
+	public byte[] getCapLogo() throws NoSuchFileException, IOException {
+		return delegate.getCapLogo();
+	}
+
+	@Override
+	public byte[] getPeuLogo() throws NoSuchFileException, IOException {
+		return delegate.getPeuLogo();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public List<TipusDocumentDto> findTipusDocumentByEntitat(Long entitatId) {
+		return delegate.findTipusDocumentByEntitat(entitatId);
 	}
 
 }

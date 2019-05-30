@@ -33,6 +33,20 @@ public class SessioHelper {
 						new Boolean(true));
 			}
 		}
+		
+		request.getSession().setAttribute(
+				"SessionHelper.capsaleraCapLogo", 
+				aplicacioService.propertyFindByPrefix("es.caib.notib.capsalera.logo"));
+		request.getSession().setAttribute(
+				"SessionHelper.capsaleraPeuLogo", 
+				aplicacioService.propertyFindByPrefix("es.caib.notib.peu.logo"));
+		request.getSession().setAttribute(
+				"SessionHelper.capsaleraColorFons", 
+				aplicacioService.propertyFindByPrefix("es.caib.notib.capsalera.color.fons"));
+		request.getSession().setAttribute(
+				"SessionHelper.capsaleraColorLletra", 
+				aplicacioService.propertyFindByPrefix("es.caib.notib.capsalera.color.lletra"));
+		
 	}
 	public static boolean isAutenticacioProcessada(HttpServletRequest request) {
 		return request.getSession().getAttribute(SESSION_ATTRIBUTE_AUTH_PROCESSADA) != null;

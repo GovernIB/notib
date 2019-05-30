@@ -22,7 +22,11 @@ public class EntitatDto extends AuditoriaDto {
 	private String apiKey;
 	private String descripcio;
 	private boolean activa;
-
+	private byte[] logoCapBytes;
+	private byte[] logoPeuBytes;
+	private String colorFons;
+	private String colorLletra;
+	private List<TipusDocumentDto> tipusDoc;
 	private List<PermisDto> permisos;
 	private boolean usuariActualAdministradorEntitat;
 
@@ -75,6 +79,36 @@ public class EntitatDto extends AuditoriaDto {
 	}
 	public void setActiva(boolean activa) {
 		this.activa = activa;
+	}
+	public byte[] getLogoCapBytes() {
+		return logoCapBytes;
+	}
+	public void setLogoCapBytes(byte[] logoCapBytes) {
+		this.logoCapBytes = logoCapBytes;
+	}
+	public byte[] getLogoPeuBytes() {
+		return logoPeuBytes;
+	}
+	public void setLogoPeuBytes(byte[] logoPeuBytes) {
+		this.logoPeuBytes = logoPeuBytes;
+	}
+	public String getColorFons() {
+		return colorFons;
+	}
+	public void setColorFons(String colorFons) {
+		this.colorFons = colorFons;
+	}
+	public String getColorLletra() {
+		return colorLletra;
+	}
+	public void setColorLletra(String colorLletra) {
+		this.colorLletra = colorLletra;
+	}
+	public List<TipusDocumentDto> getTipusDoc() {
+		return tipusDoc;
+	}
+	public void setTipusDoc(List<TipusDocumentDto> tipusDoc) {
+		this.tipusDoc = tipusDoc;
 	}
 	public List<PermisDto> getPermisos() {
 		return permisos;

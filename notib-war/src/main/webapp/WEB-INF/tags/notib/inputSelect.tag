@@ -23,6 +23,7 @@
 <%@ attribute name="inline" required="false" rtexprvalue="true"%>
 <%@ attribute name="disabled" required="false" rtexprvalue="true"%>
 <%@ attribute name="multiple" required="false" rtexprvalue="true"%>
+<%@ attribute name="multipleCustom" required="false" rtexprvalue="true"%>
 <%@ attribute name="optionMinimumResultsForSearch" required="false" rtexprvalue="true"%>
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="inputSize" required="false" rtexprvalue="true"%>
@@ -70,6 +71,9 @@
 					<c:otherwise><form:options/></c:otherwise>
 				</c:choose>
 			</form:select>
+			<c:if test="${multipleCustom}">
+				<button class="btn btn-default pull-right"><span class="fa fa-plus"></span></button>
+			</c:if>
 			<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 		</div>
 	</c:when>

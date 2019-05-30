@@ -323,7 +323,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		});
 	}
 
-	$.fn.webutilInputSelect2 = function() {
+	$.fn.webutilInputSelect2 = function(selectValue) {
 		if ($(this).data('enum')) {
 			var enumValue = $(this).data('enum-value');
 			var $select = $(this);
@@ -343,16 +343,30 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 				}
 			});
 		}
-		$(this).select2({
+		var s2 = $(this).select2({
 		    placeholder: $(this).data('placeholder'),
 		    theme: "bootstrap",
 		    allowClear: $(this).data('placeholder') ? true : false,
 		    minimumResultsForSearch: $(this).data('minimumresults')
 		});
+		if (selectValue !== undefined) {
+			console.log(selectValue);
+			var vals = selectValue;
+
+			vals.forEach(function(e){
+			if(!s2.find('option:contains(' + e + ')').length) 
+			  s2.append($('<option>').text(e));
+			});
+
+			s2.val(vals).trigger("change"); 
+		}
 		$(this).on('select2:open', function() {
 			webutilModalAdjustHeight();
 		});
 		$(this).on('select2:close', function() {
+			webutilModalAdjustHeight();
+		});
+		$(this).on('select2:select', function() {
 			webutilModalAdjustHeight();
 		});
 	}

@@ -38,9 +38,7 @@
 			<form:input value="${campValue}" path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}"/>
 			<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 			<c:if test="${info == true}">
-				<div class="info">
-					<i class="alert alert-info">${campInfoText}</i>
-				</div>
+				<p class="comentari col-xs-12 col-xs-offset-">${campInfoText}</p>
 			</c:if>
 		</div>
 	</c:when>

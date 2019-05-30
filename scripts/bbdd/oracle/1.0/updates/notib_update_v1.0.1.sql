@@ -1,0 +1,3 @@
+-- Update for version (1.0 -> 1.0.1)
+-- #92
+ALTER TABLE NOT_PROCEDIMENT ADD CADUCITAT NUMBER(19);

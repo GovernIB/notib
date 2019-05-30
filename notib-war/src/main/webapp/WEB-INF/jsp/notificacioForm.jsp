@@ -40,8 +40,10 @@
     <script src="<c:url value="/js/webutil.datatable.js"/>"></script>
     <script src="<c:url value="/js/webutil.modal.js"/>"></script>
 <style type="text/css">
-.info .alert {
-	padding: 0%;
+.comentari {
+	font-size: 12px;
+	color: #999;
+	margin-bottom: 0px;
 }
 .delete {
 	top: 27px;
@@ -608,9 +610,7 @@ function mostrarEntregaPostal(className) {
 									<hr/>
 								</div>
 								<div class="col-md-12">
-								<div class="info">
-									<i class="alert alert-info"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></i>
-								</div>
+									<p class="comentari col-xs-offset-"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
 									<not:inputCheckbox name="enviaments[${j}].entregaPostalActiva" textKey="notificacio.form.camp.entregapostal.activa" labelSize="2" funcio="mostrarEntregaPostal(this.id)" />
 								</div>
 								<input id="entregaPostalAmagat" name="enviaments[${j}].entregaPostal.visible" class="hidden" value="false">
