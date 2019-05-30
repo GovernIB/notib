@@ -14,6 +14,8 @@ import javax.persistence.Version;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
+import es.caib.notib.core.api.dto.TipusDocumentDto;
+import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 
 /**
@@ -49,6 +51,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	private String colorFons;
 	@Column(name = "color_lletra", length = 1024)
 	private String colorLletra;
+	@Column(name = "tipus_doc_default")
+	private TipusDocumentEnumDto tipusDocDefault;
 	
 	@Version
 	private long version = 0;
@@ -89,7 +93,9 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	public long getVersion() {
 		return version;
 	}
-	
+	public TipusDocumentEnumDto getTipusDocDefault() {
+		return tipusDocDefault;
+	}
 	public void update(
 			String codi,
 			String nom,
@@ -100,7 +106,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			byte[] logoCapBytes,
 			byte[] logoPeuBytes,
 			String colorFons,
-			String colorLletra) {
+			String colorLletra,
+			TipusDocumentEnumDto tipusDocDefault) {
 		this.codi = codi;
 		this.nom = nom;
 		this.descripcio = descripcio;
@@ -111,6 +118,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 		this.logoPeuBytes = logoPeuBytes;
 		this.colorFons = colorFons;
 		this.colorLletra = colorLletra;
+		this.tipusDocDefault = tipusDocDefault;
 	}
 
 	public void updateActiva(
@@ -127,7 +135,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			byte[] logoCapBytes,
 			byte[] logoPeuBytes,
 			String colorFons,
-			String colorLletra) {
+			String colorLletra,
+			TipusDocumentEnumDto tipusDocDefault) {
 		return new Builder(
 				codi,
 				nom,
@@ -137,7 +146,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				logoCapBytes,
 				logoPeuBytes,
 				colorFons,
-				colorLletra);
+				colorLletra,
+				tipusDocDefault);
 	}
 
 	public static class Builder {
@@ -151,7 +161,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				byte[] logoCapBytes,
 				byte[] logoPeuBytes,
 				String colorFons,
-				String colorLletra) {
+				String colorLletra,
+				TipusDocumentEnumDto tipusDocDefault) {
 			built = new EntitatEntity();
 			built.codi = codi;
 			built.nom = nom;
@@ -163,6 +174,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			built.logoPeuBytes = logoPeuBytes;
 			built.colorFons = colorFons;
 			built.colorLletra = colorLletra;
+			built.tipusDocDefault = tipusDocDefault;
 		}
 		public Builder descripcio(String descripcio) {
 			built.descripcio = descripcio;

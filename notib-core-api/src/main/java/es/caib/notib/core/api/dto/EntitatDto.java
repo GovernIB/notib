@@ -23,10 +23,13 @@ public class EntitatDto extends AuditoriaDto {
 	private String descripcio;
 	private boolean activa;
 	private byte[] logoCapBytes;
+	private boolean eliminarLogoCap;
 	private byte[] logoPeuBytes;
+	private boolean eliminarLogoPeu;
 	private String colorFons;
 	private String colorLletra;
 	private List<TipusDocumentDto> tipusDoc;
+	private TipusDocumentDto tipusDocDefault;
 	private List<PermisDto> permisos;
 	private boolean usuariActualAdministradorEntitat;
 
@@ -92,6 +95,18 @@ public class EntitatDto extends AuditoriaDto {
 	public void setLogoPeuBytes(byte[] logoPeuBytes) {
 		this.logoPeuBytes = logoPeuBytes;
 	}
+	public boolean isEliminarLogoCap() {
+		return eliminarLogoCap;
+	}
+	public void setEliminarLogoCap(boolean eliminarLogoCap) {
+		this.eliminarLogoCap = eliminarLogoCap;
+	}
+	public boolean isEliminarLogoPeu() {
+		return eliminarLogoPeu;
+	}
+	public void setEliminarLogoPeu(boolean eliminarLogoPeu) {
+		this.eliminarLogoPeu = eliminarLogoPeu;
+	}
 	public String getColorFons() {
 		return colorFons;
 	}
@@ -109,6 +124,12 @@ public class EntitatDto extends AuditoriaDto {
 	}
 	public void setTipusDoc(List<TipusDocumentDto> tipusDoc) {
 		this.tipusDoc = tipusDoc;
+	}
+	public TipusDocumentDto getTipusDocDefault() {
+		return tipusDocDefault;
+	}
+	public void setTipusDocDefault(TipusDocumentDto tipusDocDefault) {
+		this.tipusDocDefault = tipusDocDefault;
 	}
 	public List<PermisDto> getPermisos() {
 		return permisos;

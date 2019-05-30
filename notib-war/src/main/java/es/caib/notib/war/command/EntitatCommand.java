@@ -44,11 +44,15 @@ public class EntitatCommand {
 	private String apiKey;
 	private String descripcio;
 	private MultipartFile logoCap;
+	private boolean eliminarLogoCap;
 	private MultipartFile logoPeu;
+	private boolean eliminarLogoPeu;
 	private String colorFons;
 	private String colorLletra;
+	@NotEmpty
 	private String[] tipusDocName;
-	
+	private String tipusDocDefault;
+	private String tipusDocDefaultSelected;
 	public Long getId() {
 		return id;
 	}
@@ -103,6 +107,18 @@ public class EntitatCommand {
 	public void setLogoPeu(MultipartFile logoPeu) {
 		this.logoPeu = logoPeu;
 	}
+	public boolean isEliminarLogoCap() {
+		return eliminarLogoCap;
+	}
+	public void setEliminarLogoCap(boolean eliminarLogoCap) {
+		this.eliminarLogoCap = eliminarLogoCap;
+	}
+	public boolean isEliminarLogoPeu() {
+		return eliminarLogoPeu;
+	}
+	public void setEliminarLogoPeu(boolean eliminarLogoPeu) {
+		this.eliminarLogoPeu = eliminarLogoPeu;
+	}
 	public String getColorFons() {
 		return colorFons;
 	}
@@ -121,6 +137,18 @@ public class EntitatCommand {
 	public void setTipusDocName(String[] tipusDocName) {
 		this.tipusDocName = tipusDocName;
 	}
+	public String getTipusDocDefault() {
+		return tipusDocDefault;
+	}
+	public void setTipusDocDefault(String tipusDocDefault) {
+		this.tipusDocDefault = tipusDocDefault;
+	}
+	public String getTipusDocDefaultSelected() {
+		return tipusDocDefaultSelected;
+	}
+	public void setTipusDocDefaultSelected(String tipusDocDefaultSelected) {
+		this.tipusDocDefaultSelected = tipusDocDefaultSelected;
+	}
 	public static List<EntitatCommand> toEntitatCommands(
 			List<EntitatDto> dtos) {
 		List<EntitatCommand> commands = new ArrayList<EntitatCommand>();
@@ -134,15 +162,19 @@ public class EntitatCommand {
 	}
 
 	public static EntitatCommand asCommand(EntitatDto dto) {	
-		return ConversioTipusHelper.convertir(
+		EntitatCommand entitat = ConversioTipusHelper.convertir(
 				dto,
 				EntitatCommand.class);
+		if (dto.getTipusDocDefault().getTipusDocEnum() != null)
+			entitat.setTipusDocDefault(dto.getTipusDocDefault().getTipusDocEnum().name());
+		return entitat;
 	}
 	public static EntitatDto asDto(EntitatCommand command) throws IOException {
 		EntitatDto entitat = ConversioTipusHelper.convertir(
 				command,
 				EntitatDto.class);
 		List<TipusDocumentDto> tipusDocuments = new ArrayList<TipusDocumentDto>();
+		TipusDocumentDto tipusDocumentDefault = new TipusDocumentDto();
 		entitat.setLogoCapBytes(command.getLogoCap().getBytes());
 		entitat.setLogoPeuBytes(command.getLogoPeu().getBytes());
 		
@@ -154,6 +186,11 @@ public class EntitatCommand {
 				tipusDocuments.add(tipusDocument);
 			}
 		}
+		if (command.getTipusDocDefault() != null && !command.getTipusDocDefault().isEmpty()) {
+			TipusDocumentEnumDto tipusDocumentDefaultEnum = TipusDocumentEnumDto.valueOf(command.getTipusDocDefault());
+			tipusDocumentDefault.setTipusDocEnum(tipusDocumentDefaultEnum);
+		}
+		entitat.setTipusDocDefault(tipusDocumentDefault);
 		entitat.setTipusDoc(tipusDocuments);
 		return entitat;
 	}

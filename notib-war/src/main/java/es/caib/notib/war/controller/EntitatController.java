@@ -84,6 +84,7 @@ public class EntitatController extends BaseController {
 		}
 		if (entitat != null) {
 			EntitatCommand command = EntitatCommand.asCommand( entitat );
+			model.addAttribute("tipusDocumentDefault", command.getTipusDocDefault());
 			model.addAttribute( command );
 		} else {
 			model.addAttribute(new EntitatCommand());
@@ -95,8 +96,10 @@ public class EntitatController extends BaseController {
 	public String save(
 			HttpServletRequest request,
 			@Valid EntitatCommand command,
-			BindingResult bindingResult) throws NotFoundException, IOException {
+			BindingResult bindingResult,
+			Model model) throws NotFoundException, IOException {
 		if (bindingResult.hasErrors()) {
+			model.addAttribute("errors", bindingResult.getAllErrors());
 			return "entitatForm";
 		}
 		if (command.getId() != null) {
@@ -154,13 +157,13 @@ public class EntitatController extends BaseController {
 		
 		if (entitatActual.getLogoCapBytes() != null) {
 			writeFileToResponse(
-					null,
+					"Logo_cap.png",
 					entitatActual.getLogoCapBytes(),
 					response);
 		} else {
 			try {
 				writeFileToResponse(
-						null, 
+						"Logo_cap.png", 
 						entitatService.getCapLogo(), 
 						response);
 			} catch (Exception ex) {
@@ -178,13 +181,13 @@ public class EntitatController extends BaseController {
 		
 		if (entitatActual.getLogoPeuBytes() != null) {
 			writeFileToResponse(
-					null,
+					"Logo_peu.png",
 					entitatActual.getLogoPeuBytes(),
 					response);
 		} else {
 			try {
 				writeFileToResponse(
-						null, 
+						"Logo_peu.png", 
 						entitatService.getPeuLogo(), 
 						response);
 			} catch (Exception ex) {
@@ -205,10 +208,10 @@ public class EntitatController extends BaseController {
 		
 		if (tipusDocuments != null && !tipusDocuments.isEmpty()) {
 			tipusDoc = new String[tipusDocuments.size()];
-		}
-		for (int i = 0; i < tipusDocuments.size(); i++) {
-			tipusDoc[i] = tipusDocuments.get(i).getTipusDocEnum().name();
-			
+			for (int i = 0; i < tipusDocuments.size(); i++) {
+				tipusDoc[i] = tipusDocuments.get(i).getTipusDocEnum().name();
+				
+			}
 		}
 		return tipusDoc;
 	}

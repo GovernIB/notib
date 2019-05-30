@@ -14,6 +14,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
+import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 
 /**
@@ -123,6 +124,16 @@ public interface EntitatService {
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public List<TipusDocumentDto> findTipusDocumentByEntitat(Long entitatId);
 	
+	/**
+	 * Consulta els tipus de document d'una entitat.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat.
+	 * @return L'entitat amb l'id especificat o null si no s'ha trobat.
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	public TipusDocumentEnumDto findTipusDocumentDefaultByEntitat(Long entitatId);
+	
 
 	/**
 	 * Llistat amb totes les entitats paginades.
@@ -211,10 +222,11 @@ public interface EntitatService {
 			Long entitatId,
 			Long permisId) throws NotFoundException;
 	
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	byte[] getCapLogo() throws NoSuchFileException, IOException;
 	
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	byte[] getPeuLogo() throws NoSuchFileException, IOException;
 
 }

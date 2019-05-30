@@ -27,6 +27,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
+import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.EntitatTipusDocEntity;
@@ -90,7 +91,8 @@ public class EntitatServiceImpl implements EntitatService {
 				entitat.getLogoCapBytes(),
 				entitat.getLogoPeuBytes(),
 				entitat.getColorFons(),
-				entitat.getColorLletra()).
+				entitat.getColorLletra(),
+				entitat.getTipusDocDefault().getTipusDocEnum()).
 				descripcio(entitat.getDescripcio()).
 				build();
 		
@@ -119,13 +121,14 @@ public class EntitatServiceImpl implements EntitatService {
 				true,
 				false,
 				false );
+		byte[] logoCapActual = null;
+		byte[] logoPeuActual = null;
 		EntitatEntity entity = entitatRepository.findOne(entitat.getId());
-		
 		List<EntitatTipusDocEntity> tipusDocsEntity = entitatTipusDocRepository.findByEntitat(entity);
 		
 		if (tipusDocsEntity != null && !tipusDocsEntity.isEmpty()) {
 			for (TipusDocumentDto tipusDocDto : entitat.getTipusDoc()) {
-				entitatTipusDocRepository.deleteNotInList(
+				 entitatTipusDocRepository.deleteNotInList(
 						entitat.getId(),
 						tipusDocDto.getTipusDocEnum());
 			}
@@ -134,12 +137,30 @@ public class EntitatServiceImpl implements EntitatService {
 			entitatTipusDocRepository.delete(tipusDocsEntity);
 		}
 		
-		if (entitat.getTipusDoc() != null) {
+		if ((entitat.getTipusDoc() != null && entitat.getTipusDoc().size() > 1) || tipusDocsEntity.isEmpty()) {
 			for (TipusDocumentDto tipusDocument : entitat.getTipusDoc()) {
-				EntitatTipusDocEntity tipusDocEntity = EntitatTipusDocEntity.getBuilder(
-						entity, 
-						tipusDocument.getTipusDocEnum()).build();
-				entitatTipusDocRepository.save(tipusDocEntity);
+				EntitatTipusDocEntity tipusDocumentActual = entitatTipusDocRepository.findByEntitatAndTipus(entity.getId(), tipusDocument.getTipusDocEnum());
+				if (tipusDocumentActual == null) {
+					EntitatTipusDocEntity tipusDocEntity = EntitatTipusDocEntity.getBuilder(
+							entity, 
+							tipusDocument.getTipusDocEnum()).build();
+					entitatTipusDocRepository.save(tipusDocEntity);
+				}
+			}
+		}
+		if (!entitat.isEliminarLogoCap()) {
+			if (entitat.getLogoCapBytes() != null && entitat.getLogoCapBytes().length != 0) {
+				logoCapActual = entitat.getLogoCapBytes();
+			} else {
+				logoCapActual = entity.getLogoCapBytes();
+			}
+		}
+		
+		if (!entitat.isEliminarLogoPeu()) {
+			if (entitat.getLogoPeuBytes() != null && entitat.getLogoPeuBytes().length != 0) {
+				logoPeuActual = entitat.getLogoPeuBytes();
+			} else {
+				logoPeuActual = entity.getLogoPeuBytes();
 			}
 		}
 		
@@ -150,10 +171,11 @@ public class EntitatServiceImpl implements EntitatService {
 				entitat.getDir3Codi(),
 				entitat.getApiKey(),
 				entitat.getDescripcio(),
-				entitat.getLogoCapBytes(),
-				entitat.getLogoPeuBytes(),
+				logoCapActual,
+				logoPeuActual,
 				entitat.getColorFons(),
-				entitat.getColorLletra());
+				entitat.getColorLletra(),
+				entitat.getTipusDocDefault().getTipusDocEnum());
 		return conversioTipusHelper.convertir(
 				entity,
 				EntitatDto.class);
@@ -169,12 +191,19 @@ public class EntitatServiceImpl implements EntitatService {
 		
 		for (EntitatTipusDocEntity entitatTipusDocEntity : tipusDocsEntity) {
 			TipusDocumentDto tipusDocumentDto = new TipusDocumentDto();
-			tipusDocumentDto.setEntitat(entitatId);
 			tipusDocumentDto.setTipusDocEnum(entitatTipusDocEntity.getTipusDocEnum());
 			tipusDocumentsDto.add(tipusDocumentDto);
 		}
 		return tipusDocumentsDto;
 	}
+	
+	@Override
+	public TipusDocumentEnumDto findTipusDocumentDefaultByEntitat(Long entitatId) {
+		EntitatEntity entitat = entitatRepository.findOne(entitatId);
+		
+		return entitat.getTipusDocDefault();
+	}
+
 
 	@Transactional
 	@Override
@@ -231,9 +260,15 @@ public class EntitatServiceImpl implements EntitatService {
 				true,
 				true,
 				true );
-		return conversioTipusHelper.convertir(
+		TipusDocumentDto tipusDocumentDto = new TipusDocumentDto();
+		EntitatEntity entitat = entitatRepository.findOne(id);
+		EntitatDto entitatDto = conversioTipusHelper.convertir(
 				entitatRepository.findOne(id),
 				EntitatDto.class);
+		tipusDocumentDto.setEntitat(entitat.getId());
+		tipusDocumentDto.setTipusDocEnum(entitat.getTipusDocDefault());
+		entitatDto.setTipusDocDefault(tipusDocumentDto);
+		return entitatDto;
 	}
 
 	@Transactional(readOnly = true)
@@ -307,7 +342,7 @@ public class EntitatServiceImpl implements EntitatService {
 		logger.debug("Consulta les entitats accessibles per l'usuari actual (usuari=" + auth.getName() + ")");
 		return permisosHelper.findEntitatsAccessiblesUsuari(auth.getName(), rolActual);
 	}
-
+	
 	@Transactional
 	@Override
 	public List<PermisDto> permisFindByEntitatId(
@@ -515,5 +550,7 @@ public class EntitatServiceImpl implements EntitatService {
 		
 		return Files.readAllBytes(path);
 	}
+
+
 
 }

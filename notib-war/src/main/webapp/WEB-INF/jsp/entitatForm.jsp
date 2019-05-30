@@ -45,6 +45,10 @@
 .select2-container--bootstrap {
 	width: 100% !important;
 }
+
+.icon {
+	float: left;
+}
 </style>
 <script type="text/javascript">
 $(document).ready(function() { 
@@ -57,20 +61,34 @@ $(document).ready(function() {
 	} else {
 		$('.customSelect').webutilInputSelect2(null);
 	}
-});
+	
+	var data = new Array();
+	
+	$('.customSelect').on("select2:select select2:unselect select2-loaded", function (e) {
+	    var items = $(this).val();
+	    addDefault(items);
+	});
+	
+	$('#colorFons, #colorLletra').colorpicker();
+});	
 </script>
 </head>
 <body>
+	<c:forEach items="${errors}" var="error" varStatus="status">
+	    <c:if test="${error.field == 'tipusDocName'}">
+	        <c:set var="errorTipusDoc" value="${error}"></c:set>
+	    </c:if>
+    </c:forEach>
 	<ul class="nav nav-tabs" role="tablist">
-        <li role="presentation"><a href="#dadesForm" aria-controls="dadesForm" role="tab" data-toggle="tab"><spring:message code="entitat.form.titol.dades"/></a></li>
-        <li role="presentation" class="active"><a href="#configuracioForm" aria-controls="configuracioForm" role="tab" data-toggle="tab"><spring:message code="entitat.form.titol.configuracio"/></a></li>
+        <li role="presentation" class="active"><a href="#dadesForm" aria-controls="dadesForm" role="tab" data-toggle="tab"><spring:message code="entitat.form.titol.dades"/></a></li>
+        <li role="presentation"><a href="#configuracioForm" aria-controls="configuracioForm" role="tab" data-toggle="tab"><c:if test="${not empty errorTipusDoc}"> <span class="fa fa-warning text-danger"></span></c:if> <spring:message code="entitat.form.titol.configuracio"/></a></li>
     </ul>
 	<c:set var="formAction"><not:modalUrl value="/entitat"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="entitatCommand" role="form"  enctype="multipart/form-data">
 		<br>
 		<div class="tab-content">
 		<form:hidden path="id"/>
-		<div role="tabpanel" class="tab-pane " id="dadesForm">
+		<div role="tabpanel" class="tab-pane active" id="dadesForm">
 			<not:inputText name="codi" textKey="entitat.form.camp.codi" required="true"/>
 			<not:inputText name="nom" textKey="entitat.form.camp.nom" required="true"/>
 			<not:inputSelect name="tipus" textKey="entitat.form.camp.tipus" optionEnum="EntitatTipusEnumDto" required="true"/>
@@ -78,30 +96,34 @@ $(document).ready(function() {
 			<not:inputText name="apiKey" textKey="entitat.form.camp.apiKey" required="true"/>
 			<not:inputTextarea name="descripcio" textKey="entitat.form.camp.descripcio"/>
 		</div>
-		<div role="tabpanel" class="tab-pane active" id="configuracioForm">
+		<div role="tabpanel" class="tab-pane " id="configuracioForm">
 			<div class="container-fluid col-md-12">
 				<div class="title">
 					<label><spring:message code="entitat.form.camp.conf.aspecte" /></label>
 					<hr/>
 				</div>
-				<not:inputFile name="logoCap" textKey="entitat.form.camp.conf.logocap"/>
-				<not:inputFile name="logoPeu" textKey="entitat.form.camp.conf.logopeu"/>
-				<not:inputText name="colorFons" textKey="entitat.form.camp.conf.fons"/>
-				<not:inputText name="colorLletra" textKey="entitat.form.camp.conf.lletra"/>
+				<not:inputFile name="logoCap" textKey="entitat.form.camp.conf.logocap" fileEntitat="true" logoMenu="true" inputSize="6"/>
+				<not:inputFile name="logoPeu" textKey="entitat.form.camp.conf.logopeu" fileEntitat="true" logoMenu="false" inputSize="6"/>
+				<not:inputText name="colorFons" textKey="entitat.form.camp.conf.fons" picker="true"/>
+				<not:inputText name="colorLletra" textKey="entitat.form.camp.conf.lletra" picker="true"/>
 				<div class="title">
 					<label><spring:message code="entitat.form.camp.conf.tipusdoc" /></label>
 					<hr/>
 				</div>
-				<div class="form-group">
-					<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
+				<c:set var="campErrors"><form:errors path="tipusDocName"/></c:set>
+				<div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>">
+					<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/> *</label>
 					<div class="controls col-xs-8">
 						<select name="tipusDocName" class="customSelect" multiple>
 						<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
-							<option value="${enumValue}">${enumValue}</option>
+							<option value="${enumValue}" selected>${enumValue}</option>
 						</c:forEach>
 						</select>
+						<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="tipusDocName"/></p></c:if>
 					</div>
 				</div>
+				<form:hidden path="tipusDocDefaultSelected" value="${tipusDocumentDefault}"/>
+				<not:inputSelect name="tipusDocDefault" textKey="entitat.form.camp.conf.tipusdoc.default"/>
 			</div>
 		</div>
 		</div>
