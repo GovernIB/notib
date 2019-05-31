@@ -419,7 +419,7 @@ public class PluginHelper {
 		if(((documentDto.getUuid() != null && !documentDto.getUuid().isEmpty())
 			|| (documentDto.getCsv() != null && !documentDto.getCsv().isEmpty()))
 			&& (documentDto.getUrl() == null || documentDto.getUrl().isEmpty())
-			&& (documentDto.getContingutBase64() == null) || documentDto.getContingutBase64().isEmpty()) {
+			&& (documentDto.getContingutBase64() == null || documentDto.getContingutBase64().isEmpty())) {
 			String id = "";
 			boolean uuid = false;
 			if(documentDto.getUuid() != null) {

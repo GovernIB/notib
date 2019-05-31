@@ -560,7 +560,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				notificacioEnviamentDtoV2.setConcepte(enviament.getContent().get(i).getNotificacio().getConcepte());
 			if (enviament.getContent().get(i).getNotificacio().getDescripcio() != null)
 				notificacioEnviamentDtoV2.setDescripcio(enviament.getContent().get(i).getNotificacio().getDescripcio());
-			if (enviament.getContent().get(i).getNotificacio().getProcediment().getLlibre() != null)
+			if (enviament.getContent().get(i).getNotificacio().getProcediment() != null)
 				notificacioEnviamentDtoV2.setLlibre(enviament.getContent().get(i).getNotificacio().getProcediment().getLlibre());
 			if (enviament.getContent().get(i).getNotificacio().getRegistreNumero() != null)
 				notificacioEnviamentDtoV2.setRegistreNumero(enviament.getContent().get(i).getNotificacio().getRegistreNumero());
