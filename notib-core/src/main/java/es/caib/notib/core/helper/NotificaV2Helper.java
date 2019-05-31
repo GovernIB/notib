@@ -695,11 +695,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				try {
 					SOAPEnvelope envelope = context.getMessage().getSOAPPart().getEnvelope();
 					SOAPFactory factory = SOAPFactory.newInstance();
-					SOAPElement apiKeyElement = factory.createElement("apiKey");
-					/*SOAPElement apiKeyElement = factory.createElement(
+					/*SOAPElement apiKeyElement = factory.createElement("apiKey");*/
+					SOAPElement apiKeyElement = factory.createElement(
 							new QName(
 									"https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/", 
-									"apiKey"));*/
+									"apiKey"));
 					apiKeyElement.addTextNode(apiKey);
 					SOAPHeader header = envelope.getHeader();
 					if (header == null) {
