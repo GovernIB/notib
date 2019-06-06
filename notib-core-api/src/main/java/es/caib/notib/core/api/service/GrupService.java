@@ -100,7 +100,7 @@ public interface GrupService {
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
-	public List<GrupDto> findByGrupsProcediment(
+	public List<GrupDto> findByProcedimentGrups(
 			Long procedimentId);
 	
 	/**

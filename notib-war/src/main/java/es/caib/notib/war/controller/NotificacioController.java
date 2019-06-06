@@ -735,7 +735,9 @@ public class NotificacioController extends BaseUserController {
 				isAdministrador(request), 
 				procedimentId));
 		model.addAttribute("amagat", Boolean.FALSE);
-		model.addAttribute("grups", grupService.findByGrupsProcediment(procedimentId));
+		
+		model.addAttribute("grups", grupService.findByProcedimentGrups(procedimentId));
+		
 		model.addAttribute("comunicacioTipus", 
 				EnumHelper.getOptionsForEnum(
 						NotificacioComunicacioTipusEnumDto.class,
