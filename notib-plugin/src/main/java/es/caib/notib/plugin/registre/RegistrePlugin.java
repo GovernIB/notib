@@ -142,6 +142,19 @@ public interface RegistrePlugin {
 			Long tipusRegistre);
 	
 	/**
+	 * Llista el llibre d'una oficina
+	 * 
+	 * @param entitatCodi	Codi de l'entitat de la qual es vol consultar el llibre
+	 * @param organismeCodi	Codi de l'organisme del que es vol consultar el llibre
+	 * @return
+	 * 		El llibre de l'organisme
+	 * @throws RegistrePluginException 
+	 */
+	public Llibre llistarLlibreOrganisme(
+			String entitatCodi, 
+			String organismeCodi) throws RegistrePluginException;
+	
+	/**
 	 * Llista els òrgans d'una entitat
 	 * 
 	 * @param entitatCodi	Codi de l'entitat de la qual es volen llistar els organismes
