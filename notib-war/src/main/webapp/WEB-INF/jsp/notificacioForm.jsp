@@ -321,7 +321,7 @@ function addEnvio() {
         if (num != null) {
         	var numPlus = num + 1;
        		$('.envio\\['+num+'\\]:last').removeClass('envio[' + num + ']').addClass('envio[' + numPlus + ']');
-       		$('.envio\\['+numPlus+'\\]')[0].innerText = "Envio#" + numPlus;
+       		$('.envio\\['+numPlus+'\\]')[0].innerText = "Enviament " + numPlus;
         }
         
         if (i === 0){
@@ -457,7 +457,7 @@ function mostrarEntregaPostal(className) {
 							<form:hidden path="tipusDocumentDefault"/>
 							<select id="tipusDocument" name="tipusDocument" class="customSelect">
 							<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
-								<option value="${enumValue}" selected>${enumValue}</option>
+								<option value="${enumValue}" selected><spring:message code="tipus.document.enum.${enumValue}"/></option>
 							</c:forEach>
 							</select>
 						</div>
@@ -497,7 +497,7 @@ function mostrarEntregaPostal(className) {
 					<c:set var="k" value="${status.index + 1}" />
 						<div class="row enviamentsForm formEnviament enviamentForm_${j}">
 							<div class="col-md-12">
-								<label class="envio[${k}] badge badge-light">Envio#${k}</label>
+								<label class="envio[${k}] badge badge-light">Enviament ${k}</label>
 							</div>
 							<div>
 							<div class="col-md-6">
@@ -596,15 +596,15 @@ function mostrarEntregaPostal(className) {
 													<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge2" textKey="notificacio.form.camp.titular.llinatge2" labelSize="12" inputSize="12"/>
 												</div>
 												<div class="col-md-3">
-													<not:inputText name="enviaments[${j}].destinataris[${i}].email" textKey="notificacio.form.camp.titular.email" labelSize="12" inputSize="12"/>
+													<not:inputText name="enviaments[${j}].destinataris[${i}].telefon" textKey="notificacio.form.camp.titular.telefon" labelSize="12" inputSize="12"/>
 												</div>
 												<div class="col-md-4">
-													<not:inputText name="enviaments[${j}].destinataris[${i}].telefon" textKey="notificacio.form.camp.titular.telefon" labelSize="12" inputSize="12"/>
+													<not:inputText name="enviaments[${j}].destinataris[${i}].email" textKey="notificacio.form.camp.titular.email" labelSize="12" inputSize="12"/>
 												</div>
 												<div class="col-md-3 dir3codi hidden">
 													<not:inputText name="enviaments[${j}].destinataris[${i}].dir3codi" textKey="notificacio.form.camp.titular.dir3codi" labelSize="12" inputSize="12"/>
 												</div>
-												<div class="col-md-3 offset-col-md-3">
+												<div class="col-md-2 offset-col-md-2">
 													<div class="float-right">
 														<input type="button" class="btn btn-danger btn-group delete" name="destinatarisDelete[${j}][${i}]" onclick="destinatarisDelete(this.id)" id="destinatarisDelete[${j}][${i}]" value="<spring:message code="notificacio.form.boto.eliminar.destinatari"/>" />
 													</div>
