@@ -51,6 +51,7 @@ import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
@@ -147,6 +148,9 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("notificacioEstats", 
 				EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
+		model.addAttribute("tipusUsuari", 
+				EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
+						"es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
 		model.addAttribute("notificacioEnviamentEstats",
 				EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
@@ -325,6 +329,9 @@ public class NotificacioController extends BaseUserController {
 			model.addAttribute("notificacioEstats", 
 					EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
 							"es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
+			model.addAttribute("tipusUsuari", 
+					EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
+							"es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
 			model.addAttribute("notificacioEnviamentEstats",
 					EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
 							"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));

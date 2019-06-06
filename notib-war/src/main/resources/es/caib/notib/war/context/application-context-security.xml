@@ -9,15 +9,15 @@
 				http://www.springframework.org/schema/security
 				http://www.springframework.org/schema/security/spring-security.xsd">
 
-	<sec:http pattern="/api/rest**" security="none"/>
-	<sec:http pattern="/api/rest/**" security="none"/>
+	<sec:http pattern="/api/rest" security="none"/>
+	<sec:http pattern="/apidoc" security="none"/>
+	<sec:http pattern="/api-docs" security="none"/>
 	<sec:http create-session="never" use-expressions="true" auto-config="true" entry-point-ref="preAuthenticatedProcessingFilterEntryPoint">
 		<sec:intercept-url pattern="/error" access="isAnonymous()"/>
-		<sec:intercept-url pattern="/api/rest*" access="isAnonymous()"/>
 		<sec:intercept-url pattern="/notificacio/rest*" access="hasRole('NOT_APL')"/>
 		<sec:intercept-url pattern="/test/rest*" access="hasRole('NOT_APL')"/>
 		<sec:intercept-url pattern="/api/services*" access="hasRole('NOT_APL')"/>
-		<sec:intercept-url pattern="/api-docs*" access="hasRole('NOT_APL')"/>
+		<!--  <sec:intercept-url pattern="/api-docs*" access="hasRole('NOT_APL')"/>  -->
 		<sec:intercept-url pattern="/entitat*" access="hasRole('NOT_SUPER')"/>
 		<sec:intercept-url pattern="/notificacio*" access="hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')"/>
 		<sec:intercept-url pattern="/permis*" access="hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')"/>

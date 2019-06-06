@@ -11,6 +11,7 @@ import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
 /**
@@ -29,6 +30,7 @@ public class NotificacioFiltreCommand {
 	private Date dataFi;
 	private String titular;
 	private Long procedimentId;
+	private TipusUsuariEnumDto tipusUsuari;
 	
 	public Long getEntitatId() {
 		return entitatId;
@@ -83,6 +85,12 @@ public class NotificacioFiltreCommand {
 	}
 	public void setProcedimentId(Long procedimentId) {
 		this.procedimentId = procedimentId;
+	}
+	public TipusUsuariEnumDto getTipusUsuari() {
+		return tipusUsuari;
+	}
+	public void setTipusUsuari(TipusUsuariEnumDto tipusUsuari) {
+		this.tipusUsuari = tipusUsuari;
 	}
 	public static NotificacioFiltreCommand asCommand(NotificacioFiltreDto dto) {
 		if (dto == null) {

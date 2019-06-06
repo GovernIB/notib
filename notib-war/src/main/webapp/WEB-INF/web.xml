@@ -100,6 +100,11 @@
 			<url-pattern>/ws/notificacioWS</url-pattern>
 			<url-pattern>/ws/notificacioV2WS</url-pattern>
 			<url-pattern>/api/rest</url-pattern>
+			<url-pattern>/api/apidoc</url-pattern>
+			<!-- <url-pattern>/webjars/*</url-pattern>
+			<url-pattern>/js/*</url-pattern>
+			<url-pattern>/img/*</url-pattern>
+			<url-pattern>/api-docs/*</url-pattern>-->
 		</web-resource-collection>
 	</security-constraint>
 
