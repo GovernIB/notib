@@ -52,9 +52,7 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 		
 		AplicacioEntity entity = AplicacioEntity.getBuilder(
 				aplicacio.getUsuariCodi(),
-				aplicacio.getCallbackUrl(),
-				aplicacio.getTipusAutenticacio()
-				).build();
+				aplicacio.getCallbackUrl()).build();
 		
 		return conversioTipusHelper.convertir(
 				aplicacioRepository.save(entity),
@@ -77,8 +75,7 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 		
 		entity.update(
 				aplicacio.getUsuariCodi(),
-				aplicacio.getCallbackUrl(),
-				aplicacio.getTipusAutenticacio());
+				aplicacio.getCallbackUrl());
 		
 		return conversioTipusHelper.convertir(
 				entity,
