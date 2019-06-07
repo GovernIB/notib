@@ -78,7 +78,11 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			Long tipusOperacio) {
 		RespostaConsultaRegistre rc = new RespostaConsultaRegistre();
 		try {
-			return toRespostaConsultaRegistre(getAsientoRegistralApi().crearAsientoRegistral(codiDir3Entitat, toAsientoRegistralBean(arb), tipusOperacio));
+			return toRespostaConsultaRegistre(getAsientoRegistralApi().crearAsientoRegistral(
+					codiDir3Entitat, 
+					toAsientoRegistralBean(arb), 
+					tipusOperacio,
+					false));
 		} catch (WsI18NException e) {
 			rc.setErrorCodi("0");
 			rc.setErrorDescripcio(e.getMessage());
@@ -696,6 +700,26 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		return llibreOficina;
 	}
 	
+	@Override
+	public Llibre llistarLlibreOrganisme(
+			String entitatCodi, 
+			String organismeCodi) throws RegistrePluginException {
+		Llibre llibreOrganisme = new Llibre();
+		try {
+			llibreOrganisme = toLlibreOrganisme(getInfoApi().listarLibroOrganismo(
+					entitatCodi, 
+					organismeCodi));
+			
+		} catch (RegistrePluginException rex) {
+			logger.error("Error a plugin registre obtenció llibres i oficina", rex);
+		} catch (WsI18NException wse) {
+			logger.error("Error ws obtenció llibres i oficina", wse);
+		} catch (Exception ex) {
+			logger.error("Error a l'hora d'obtenir els llibres i oficina", ex);
+		}
+		return llibreOrganisme;
+	}
+	
 	private List<LlibreOficina> toLlibreOficina(List<LibroOficinaWs> llibresOficinaWs) throws RegistrePluginException {
 		List<LlibreOficina> llibresOficina = new ArrayList<LlibreOficina>();
 		try {
@@ -721,6 +745,20 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			throw new RegistrePluginException("Error conversió de llibres i oficines", ex);
 		}
 		return llibresOficina;
+	}
+	
+	private Llibre toLlibreOrganisme(LibroWs llibreWs) throws RegistrePluginException {
+		Llibre llibre = new Llibre();
+		try {
+			llibre.setCodi(llibreWs.getCodigoLibro());
+			llibre.setNomCurt(llibreWs.getNombreCorto());
+			llibre.setNomLlarg(llibreWs.getNombreLargo());
+			llibre.setOrganisme(llibreWs.getCodigoOrganismo());
+		} catch (Exception ex) {
+			logger.error("Error a l'hora de fer la conversió dels llibres i oficines", ex);
+			throw new RegistrePluginException("Error conversió de llibres i oficines", ex);
+		}
+		return llibre;
 	}
 	
 	private List<Llibre> toLlibres(List<LibroWs> llibresWs) throws RegistrePluginException {

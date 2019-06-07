@@ -24,6 +24,7 @@ public class NotificacioFiltreDto implements Serializable {
 	private Date dataFi;
 	private String titular;
 	private Long procedimentId;
+	private TipusUsuariEnumDto tipusUsuari;
 	
 	public Long getEntitatId() {
 		return entitatId;
@@ -78,6 +79,12 @@ public class NotificacioFiltreDto implements Serializable {
 	}
 	public void setProcedimentId(Long procedimentId) {
 		this.procedimentId = procedimentId;
+	}
+	public TipusUsuariEnumDto getTipusUsuari() {
+		return tipusUsuari;
+	}
+	public void setTipusUsuari(TipusUsuariEnumDto tipusUsuari) {
+		this.tipusUsuari = tipusUsuari;
 	}
 	
 	@Override

@@ -15,7 +15,10 @@ import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.TipusEnumDto;
+import es.caib.notib.core.entity.GrupProcedimentEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 
@@ -31,6 +34,8 @@ public class ProcedimentHelper {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private PermisosHelper permisosHelper;
+	@Autowired
+	private GrupProcedimentRepository grupProcedimentRepository;
 	
 	public void omplirPermisosPerMetaNode(
 			ProcedimentDto procediment,
@@ -96,6 +101,29 @@ public class ProcedimentHelper {
 				sb.append(")");
 				break;
 			}
+		}
+		logger.debug(sb.toString());
+		return usuaris;
+	}
+	
+	public Set<String> findUsuarisAmbPermisReadPerGrup(
+			ProcedimentEntity procediment) {
+		StringBuilder sb = new StringBuilder("Preparant la llista d'usuaris per enviar l'email: ");
+		List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepository.findByProcediment(procediment);
+		
+		Set<String> usuaris = new HashSet<String>();
+		for (GrupProcedimentEntity permisGrup: grupsProcediment) {
+			List<DadesUsuari> usuarisGrup = pluginHelper.dadesUsuariConsultarAmbGrup(
+					permisGrup.getGrup().getCodi());
+				sb.append(" rol ").append(permisGrup.getGrup().getCodi()).append(" (");
+				if (usuarisGrup != null) {
+					for (DadesUsuari usuariGrup: usuarisGrup) {
+						usuaris.add(usuariGrup.getCodi());
+						sb.append(" ").append(usuariGrup.getCodi());
+					}
+				}
+				sb.append(")");
+			
 		}
 		logger.debug(sb.toString());
 		return usuaris;

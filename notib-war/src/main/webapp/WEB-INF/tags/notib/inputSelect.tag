@@ -27,6 +27,7 @@
 <%@ attribute name="optionMinimumResultsForSearch" required="false" rtexprvalue="true"%>
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="inputSize" required="false" rtexprvalue="true"%>
+<%@ attribute name="value" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campId" value="${campPath}"/><c:if test="${not empty id}"><c:set var="campId" value="${id}"/></c:if>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
@@ -71,9 +72,6 @@
 					<c:otherwise><form:options/></c:otherwise>
 				</c:choose>
 			</form:select>
-			<c:if test="${multipleCustom}">
-				<button class="btn btn-default pull-right"><span class="fa fa-plus"></span></button>
-			</c:if>
 			<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 		</div>
 	</c:when>

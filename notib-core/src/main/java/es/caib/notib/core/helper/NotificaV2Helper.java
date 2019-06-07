@@ -54,7 +54,6 @@ import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.wsdl.notificaV2.NotificaWsV2PortType;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.AltaRemesaEnvios;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Destinatarios;
@@ -90,8 +89,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private NotificacioEventRepository notificacioEventRepository;
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
-	@Autowired
-	private ProcedimentRepository procedimentRepository;
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired 
@@ -691,11 +688,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				try {
 					SOAPEnvelope envelope = context.getMessage().getSOAPPart().getEnvelope();
 					SOAPFactory factory = SOAPFactory.newInstance();
-					SOAPElement apiKeyElement = factory.createElement("apiKey");
-					/*SOAPElement apiKeyElement = factory.createElement(
+					/*SOAPElement apiKeyElement = factory.createElement("apiKey");*/
+					SOAPElement apiKeyElement = factory.createElement(
 							new QName(
 									"https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/", 
-									"apiKey"));*/
+									"apiKey"));
 					apiKeyElement.addTextNode(apiKey);
 					SOAPHeader header = envelope.getHeader();
 					if (header == null) {

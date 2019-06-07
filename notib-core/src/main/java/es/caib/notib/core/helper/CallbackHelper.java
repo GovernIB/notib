@@ -361,21 +361,21 @@ public class CallbackHelper {
 		Client jerseyClient =  new Client();
 		// Només per depurar la sortida, esborrar o comentar-ho: 
 		jerseyClient.addFilter(new LoggingFilter(System.out));		
-		String username = null;
-		String password = null;
-		switch (aplicacio.getTipusAutenticacio()) {
-		case TOKEN_CAIB:
-			username = "";
-			password = "";
-			jerseyClient.addFilter(new HTTPBasicAuthFilter(username, password));
-			break;
-		case TEXT_CLAR:
-			jerseyClient.addFilter(new HTTPBasicAuthFilter(username, password));
-			break;
-		case CAP:
-		default:
-			break;
-		}	
+//		String username = null;
+//		String password = null;
+//		switch (aplicacio.getTipusAutenticacio()) {
+//		case TOKEN_CAIB:
+//			username = "";
+//			password = "";
+//			jerseyClient.addFilter(new HTTPBasicAuthFilter(username, password));
+//			break;
+//		case TEXT_CLAR:
+//			jerseyClient.addFilter(new HTTPBasicAuthFilter(username, password));
+//			break;
+//		case CAP:
+//		default:
+//			break;
+//		}	
 		return jerseyClient;
 	}
 

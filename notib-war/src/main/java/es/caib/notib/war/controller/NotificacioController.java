@@ -49,6 +49,9 @@ import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
+import es.caib.notib.core.api.dto.TipusDocumentDto;
+import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
@@ -145,6 +148,9 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("notificacioEstats", 
 				EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
+		model.addAttribute("tipusUsuari", 
+				EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
+						"es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
 		model.addAttribute("notificacioEnviamentEstats",
 				EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
@@ -323,6 +329,9 @@ public class NotificacioController extends BaseUserController {
 			model.addAttribute("notificacioEstats", 
 					EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
 							"es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
+			model.addAttribute("tipusUsuari", 
+					EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
+							"es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
 			model.addAttribute("notificacioEnviamentEstats",
 					EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
 							"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
@@ -702,16 +711,33 @@ public class NotificacioController extends BaseUserController {
 				null, 
 				isAdministrador(request), 
 				procedimentId);
-		NotificacioCommandV2 notificacio = new NotificacioCommandV2();
+		NotificacioCommandV2 notificacio = new NotificacioCommandV2();		
+		List<String> tipusDocumentEnumDto = new ArrayList<String>();
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		List<TipusDocumentDto>  tipusDocuments =  entitatService.findTipusDocumentByEntitat(entitatActual.getId());
+		TipusDocumentEnumDto tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
 		notificacio.setCaducitat(CaducitatHelper.sumarDiesLaborals(procedimentActual.getCaducitat()));
+
+		if (tipusDocuments != null) {
+			for (TipusDocumentDto tipusDocument: tipusDocuments) {
+				tipusDocumentEnumDto.add(tipusDocument.getTipusDocEnum().name());
+			}
+			if (tipusDocumentDefault != null) {
+				notificacio.setTipusDocumentDefault(tipusDocumentDefault.name());
+			}
+		}
 		model.addAttribute("notificacioCommandV2", notificacio);
+		
+		model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
 		model.addAttribute("entitat", procedimentActual.getEntitat());
 		model.addAttribute("procediment", procedimentService.findById(
 				null, 
 				isAdministrador(request), 
 				procedimentId));
 		model.addAttribute("amagat", Boolean.FALSE);
-		model.addAttribute("grups", grupService.findByGrupsProcediment(procedimentId));
+		
+		model.addAttribute("grups", grupService.findByProcedimentGrups(procedimentId));
+		
 		model.addAttribute("comunicacioTipus", 
 				EnumHelper.getOptionsForEnum(
 						NotificacioComunicacioTipusEnumDto.class,
