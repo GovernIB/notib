@@ -79,8 +79,8 @@ public class GrupServiceBean implements GrupService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
-	public List<GrupDto> findByGrupsProcediment(Long procedimentId) {
-		return delegate.findByGrupsProcediment(procedimentId);
+	public List<GrupDto> findByProcedimentGrups(Long procedimentId) {
+		return delegate.findByProcedimentGrups(procedimentId);
 	}
 
 	@Override

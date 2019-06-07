@@ -36,6 +36,7 @@ import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
@@ -241,7 +242,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					notificacio.getProcedimentCodi(),
 					procediment,
 					notificacio.getGrupCodi(),
-					notificacio.getNumExpedient()
+					notificacio.getNumExpedient(),
+					TipusUsuariEnumDto.APLICACIO 
 //					notificacio.getExtracte(),
 //					notificacio.getDocFisica(),
 //					//notificacio.getTipusAssumpte(),
