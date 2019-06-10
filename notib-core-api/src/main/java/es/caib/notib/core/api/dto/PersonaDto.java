@@ -14,7 +14,7 @@ public class PersonaDto implements Serializable{
 	private String nif;
 	private String telefon;
 	private String email;
-	private String dir3codi;
+	private String dir3Codi;
 	
 	
 	public InteressatTipusEnumDto getInteressatTipus() {
@@ -65,13 +65,12 @@ public class PersonaDto implements Serializable{
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public String getDir3codi() {
-		return dir3codi;
+	public String getDir3Codi() {
+		return dir3Codi;
 	}
-	public void setDir3codi(String dir3codi) {
-		this.dir3codi = dir3codi;
+	public void setDir3Codi(String dir3Codi) {
+		this.dir3Codi = dir3Codi;
 	}
-	
 	public String getLlinatges() {
 		return llinatge1 + " " + llinatge2; 
 	}

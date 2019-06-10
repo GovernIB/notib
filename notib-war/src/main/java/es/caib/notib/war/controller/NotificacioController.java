@@ -433,6 +433,7 @@ public class NotificacioController extends BaseUserController {
 		emplenarModelNotificacioInfo(
 				entitatActual,
 				notificacioId, 
+				request,
 				"dades", 
 				model);
 		return "notificacioInfo";
@@ -507,6 +508,7 @@ public class NotificacioController extends BaseUserController {
 		emplenarModelNotificacioInfo(
 				entitatActual,
 				notificacioId, 
+				request,
 				"accions", 
 				model);
 		if (enviada) {
@@ -530,6 +532,7 @@ public class NotificacioController extends BaseUserController {
 		emplenarModelNotificacioInfo(
 				entitatActual,
 				notificacioId, 
+				request,
 				"accions", 
 				model);
 		if(registresIdDto.size() > 0) {
@@ -671,6 +674,7 @@ public class NotificacioController extends BaseUserController {
 	private void emplenarModelNotificacioInfo(
 			EntitatDto entitatActual,
 			Long notificacioId, 
+			HttpServletRequest request,
 			String pipellaActiva, 
 			Model model) {
 		NotificacioDtoV2 notificacio = notificacioService.findAmbId(notificacioId);
@@ -686,6 +690,7 @@ public class NotificacioController extends BaseUserController {
 		} else {
 			model.addAttribute("permisGestio", null);
 		}
+		model.addAttribute("permisAdmin", request.isUserInRole("NOT_ADMIN"));
 	}
 
 	private void emplenarModelEnviamentInfo(

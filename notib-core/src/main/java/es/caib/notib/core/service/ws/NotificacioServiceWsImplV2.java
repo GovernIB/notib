@@ -326,7 +326,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						enviament.getTitular().getNom(), 
 						enviament.getTitular().getTelefon(),
 						enviament.getTitular().getRaoSocial(),
-						enviament.getTitular().getDir3codi()).build());
+						enviament.getTitular().getDir3Codi()).build());
 				
 				
 				List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
@@ -340,7 +340,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							persona.getNom(), 
 							persona.getTelefon(),
 							persona.getRaoSocial(),
-							persona.getDir3codi()).build());
+							persona.getDir3Codi()).build());
 					destinataris.add(destinatari);
 				}
 				EntregaPostalViaTipusEnum viaTipus = null;
