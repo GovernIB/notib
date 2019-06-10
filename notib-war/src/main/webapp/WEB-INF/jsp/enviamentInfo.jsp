@@ -91,13 +91,13 @@ $(document).ready(function() {
 				<table class="table table-bordered" style="width:100%">
 				<tbody>
 					<tr>
-						<td width="30%"><strong><spring:message code="enviament.info.dada.identificadors"/></strong></td>
+						<!-- <td width="30%"><strong><spring:message code="enviament.info.dada.identificadors"/></strong></td> -->
 						<c:choose>
 							<c:when test="${not empty enviament.notificacio.id}">
-								<td width="1%"><strong>NOTIB</strong></td>
-								<td>${enviament.notificaReferencia}</td>
-								<td width="1%"><strong>Notific@</strong></td>
+								<td width="1%"><strong><spring:message code="enviament.info.dada.identificadors.identificador"/></strong></td>
 								<td>${enviament.notificaIdentificador}</td>
+								<td width="1%"><strong><spring:message code="enviament.info.dada.identificadors.referencia"/></strong></td>
+								<td>${enviament.notificaReferencia}</td>
 							</c:when>
 							<c:otherwise>
 								<td colspan="2" width="1%"><strong>NOTIB</strong></td>

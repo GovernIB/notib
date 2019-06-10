@@ -50,6 +50,16 @@
 			<tr>
 				<th data-col-name="dir3codi"><spring:message code="pagadorcie.list.columna.dir3codi"/></th>
 				<th data-col-name="contracteDataVig" data-converter="date"><spring:message code="pagadorcie.list.columna.contracteDataVig"/></th>
+				<th data-col-name="id" data-template="#cellFullaTemplate" data-orderable="false" width="10%">
+					<script id="cellFullaTemplate" type="text/x-jsrender">
+						<a href="${unitatCodiUrlPrefix}pagadorCie/{{:id}}/formats/fulla" class="btn btn-default"><span class="fa fa-sticky-note"></span>&nbsp;<spring:message code="pagadorcie.list.boto.format.fulla"/>&nbsp;</a>
+					</script>
+				</th>
+				<th data-col-name="id" data-template="#cellSobreTemplate" data-orderable="false" width="10%">
+					<script id="cellSobreTemplate" type="text/x-jsrender">
+						<a href="${unitatCodiUrlPrefix}pagadorCie/{{:id}}/formats/sobre" class="btn btn-default"><span class="fa fa-envelope-open"></span>&nbsp;<spring:message code="pagadorcie.list.boto.format.sobre"/>&nbsp;</a>
+					</script>
+				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
