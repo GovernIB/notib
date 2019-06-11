@@ -387,13 +387,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 //		} else {
 //			dataProgramada = notificacio.getEnviamentDataProgramada();
 //		}
-		envios.setFechaEnvioProgramado(
-				toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
+		envios.setFechaEnvioProgramado(toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
 		
 		envios.setConcepto(notificacio.getConcepte());
 		envios.setDescripcion(notificacio.getDescripcio());
-		envios.setProcedimiento(
-				notificacio.getProcedimentCodiNotib());
+		envios.setProcedimiento(notificacio.getProcedimentCodiNotib());
 		Documento  documento = new Documento();
 		if(notificacio.getDocument() != null && notificacio.getDocument().getArxiuGestdocId() != null) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -406,8 +404,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			Opciones opcionesDocumento = new Opciones();
 			Opcion opcionNormalizado = new Opcion();
 			opcionNormalizado.setTipo("normalizado");
-			opcionNormalizado.setValue(
-					notificacio.getDocument().getNormalitzat()  ? "si" : "no");
+			opcionNormalizado.setValue(notificacio.getDocument().getNormalitzat()  ? "si" : "no");
 			opcionesDocumento.getOpcion().add(opcionNormalizado);
 			Opcion opcionGenerarCsv = new Opcion();
 			opcionGenerarCsv.setTipo("generarCsv");
@@ -510,10 +507,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		//}
 		envios.setEnvios(generarEnvios(notificacio));
 		Opciones opcionesRemesa = new Opciones();
-		if(notificacio.getProcedimentCodiNotib() != null) {
-			retardPostal = procedimentRepository.findOne(notificacio.getProcediment().getId()).getRetard();
-		} else {
+		if(notificacio.getRetard() != null) {
 			retardPostal = notificacio.getRetard();
+		} else {
+			retardPostal = procedimentRepository.findOne(notificacio.getProcediment().getId()).getRetard();
 		}
 		
 		if (retardPostal != null) {
@@ -533,8 +530,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			Opcion opcionCaducidad = new Opcion();
 			opcionCaducidad.setTipo("caducidad");
 			SimpleDateFormat sdfCaducitat = new SimpleDateFormat("yyyy-MM-dd");
-			opcionCaducidad.setValue(
-					sdfCaducitat.format(notificacio.getCaducitat())); // formato YYYY-MM-DD
+			opcionCaducidad.setValue(sdfCaducitat.format(notificacio.getCaducitat())); // formato YYYY-MM-DD
 			opcionesRemesa.getOpcion().add(opcionCaducidad);
 		}
 		envios.setOpcionesRemesa(opcionesRemesa);

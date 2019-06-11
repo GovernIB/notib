@@ -120,13 +120,13 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		String emisorDir3Codi = notificacio.getEmisorDir3Codi();
 		RespostaAlta resposta = new RespostaAlta();
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		EntitatEntity entitat = entitatRepository.findByDir3Codi(emisorDir3Codi);
 		if (emisorDir3Codi == null) {
 			resposta.setError(true);
 			resposta.setEstat(NotificacioEstatEnum.PENDENT);
 			resposta.setErrorDescripcio("[EMISOR] El camp 'emisorDir3Codi' no pot ser null.");
 			return resposta;
 		}
-		EntitatEntity entitat = entitatRepository.findByDir3Codi(emisorDir3Codi);
 		if (entitat == null) {
 			resposta.setError(true);
 			resposta.setEstat(NotificacioEstatEnum.PENDENT);
@@ -137,6 +137,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			resposta.setError(true);
 			resposta.setEstat(NotificacioEstatEnum.PENDENT);
 			resposta.setErrorDescripcio("[ENTITAT] L'entitat especificada està desactivada per a l'enviament de notificacions");
+			return resposta;
+		}
+		if (notificacio.getProcedimentCodi() == null) {
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[PROCEDIMENT_CODI] El camp 'procedimentCodi' no pot ser null.");
 			return resposta;
 		}
 		if (notificacio.getConcepte() == null) {
@@ -157,18 +163,44 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			resposta.setErrorDescripcio("[DOCUMENT] El camp 'document' no pot ser null.");
 			return resposta;
 		}
+		if (notificacio.getEnviaments() == null) {
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[ENVIAMENTS] El camp 'enviaments' no pot ser null.");
+			return resposta;
+		}
 		for(Enviament enviament : notificacio.getEnviaments()) {
-			if(enviament.isEntregaPostalActiva() && enviament.getEntregaPostal().getViaNom() == null) {
+			if(enviament.isEntregaPostalActiva() && (enviament.getEntregaPostal().getViaNom() == null || enviament.getEntregaPostal().getViaNom().isEmpty())) {
 				resposta.setError(true);
 				resposta.setEstat(NotificacioEstatEnum.PENDENT);
 				resposta.setErrorDescripcio("[ENTREGA_POSTAL_NOM_VIA] El camp 'viaNom' de l'entrega postal d'un enviament no pot ser null.");
 				return resposta;
 			}
+			if(enviament.getServeiTipus() == null) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[SERVEI_TIPUS] El camp 'serveiTipus' d'un enviament no pot ser null.");
+				return resposta;
+			}
 			if(enviament.getTitular() == null) {
 				resposta.setError(true);
 				resposta.setEstat(NotificacioEstatEnum.PENDENT);
-				resposta.setErrorDescripcio("[TITULAR_NIF] El camp 'nif' del titular d'un enviament no pot ser null.");
+				resposta.setErrorDescripcio("[TITULAR] El titular d'un enviament no pot ser null.");
 				return resposta;
+			}
+			if(enviament.getTitular().getInteressatTipus() == null) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[TITULAR_INTERESSATTIPUS] El camp 'interessat_tipus' del titular d'un enviament no pot ser null.");
+				return resposta;
+			}
+			if(enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.FISICA)) {
+				if (enviament.getTitular().getLlinatge1() == null) {
+					resposta.setError(true);
+					resposta.setEstat(NotificacioEstatEnum.PENDENT);
+					resposta.setErrorDescripcio("[TITULAR_LLINATGE1] El camp 'llinatge1' del titular d'un enviament no pot ser null en el cas de persones físiques.");
+					return resposta;
+				}
 			}
 			if(enviament.getTitular().getNif() == null) {
 				resposta.setError(true);
@@ -176,12 +208,35 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				resposta.setErrorDescripcio("[TITULAR_NIF] El camp 'nif' del titular d'un enviament no pot ser null.");
 				return resposta;
 			}
-			for(Persona destinatari : enviament.getDestinataris()) {
-				if(destinatari.getNif() == null) {
-					resposta.setError(true);
-					resposta.setEstat(NotificacioEstatEnum.PENDENT);
-					resposta.setErrorDescripcio("[TITULAR_NIF] El camp 'nif' del destinatari d'un enviament no pot ser null.");
-					return resposta;
+			
+			if (enviament.getDestinataris() != null) {
+				for(Persona destinatari : enviament.getDestinataris()) {
+					if(destinatari.getInteressatTipus() == null) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[DESTINATARI_INTERESSATTIPUS] El camp 'interessat_tipus' del destinatari d'un enviament no pot ser null.");
+						return resposta;
+					}
+					if(destinatari.getNom() == null) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[DESTINATARI_NOM] El camp 'nom' del destinatari d'un enviament no pot ser null.");
+						return resposta;
+					}
+					if(destinatari.getNif() == null) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[DESTINATARI_NIF] El camp 'nif' del destinatari d'un enviament no pot ser null.");
+						return resposta;
+					}
+					if(destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.FISICA)) {
+						if(destinatari.getLlinatge1() == null) {
+							resposta.setError(true);
+							resposta.setEstat(NotificacioEstatEnum.PENDENT);
+							resposta.setErrorDescripcio("[DESTINATARI_LLINATGE1] El camp 'llinatge1' del destinatari d'un enviament no pot ser null en cas de persone físiques.");
+							return resposta;
+						}
+					}
 				}
 			}
 		}
