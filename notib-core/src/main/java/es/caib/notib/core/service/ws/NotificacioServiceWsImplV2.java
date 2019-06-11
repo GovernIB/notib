@@ -170,18 +170,26 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				resposta.setErrorDescripcio("[TITULAR_NIF] El camp 'nif' del titular d'un enviament no pot ser null.");
 				return resposta;
 			}
+			if(enviament.getTitular().getInteressatTipus() == null) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[TITULAR_INTERESSATTIPUS] El camp 'interessat_tipus' del titular d'un enviament no pot ser null.");
+				return resposta;
+			}
 			if(enviament.getTitular().getNif() == null) {
 				resposta.setError(true);
 				resposta.setEstat(NotificacioEstatEnum.PENDENT);
 				resposta.setErrorDescripcio("[TITULAR_NIF] El camp 'nif' del titular d'un enviament no pot ser null.");
 				return resposta;
 			}
-			for(Persona destinatari : enviament.getDestinataris()) {
-				if(destinatari.getNif() == null) {
-					resposta.setError(true);
-					resposta.setEstat(NotificacioEstatEnum.PENDENT);
-					resposta.setErrorDescripcio("[TITULAR_NIF] El camp 'nif' del destinatari d'un enviament no pot ser null.");
-					return resposta;
+			if (enviament.getDestinataris() != null) {
+				for(Persona destinatari : enviament.getDestinataris()) {
+					if(destinatari.getNif() == null) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[TITULAR_NIF] El camp 'nif' del destinatari d'un enviament no pot ser null.");
+						return resposta;
+					}
 				}
 			}
 		}
