@@ -1116,6 +1116,8 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 				built.domiciliCie = enviament.getEntregaPostal().getCie();
 				built.formatSobre = enviament.getEntregaPostal().getFormatSobre();
 				built.formatFulla = enviament.getEntregaPostal().getFormatFulla();
+			}
+			if (enviament.getEntregaDeh() != null) {
 				built.dehObligat = enviament.getEntregaDeh().isObligat();
 			}
 			
