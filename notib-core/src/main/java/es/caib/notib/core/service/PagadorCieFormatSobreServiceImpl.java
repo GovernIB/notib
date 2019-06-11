@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorCieFormatSobreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
@@ -37,37 +36,37 @@ public class PagadorCieFormatSobreServiceImpl implements PagadorCieFormatSobreSe
 	private EntityComprovarHelper entityComprovarHelper;
 
 	@Override
-	public PagadorCieDto create(Long entitatId, PagadorCieFormatSobreDto formatSobre) {
+	public PagadorCieFormatSobreDto create(Long entitatId, PagadorCieFormatSobreDto formatSobre) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public PagadorCieDto update(PagadorCieFormatSobreDto formatSobre) throws NotFoundException {
+	public PagadorCieFormatSobreDto update(PagadorCieFormatSobreDto formatSobre) throws NotFoundException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public PagadorCieDto delete(Long id) throws NotFoundException {
+	public PagadorCieFormatSobreDto delete(Long id) throws NotFoundException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public PagadorCieDto findById(Long id) {
+	public PagadorCieFormatSobreDto findById(Long id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<PagadorCieDto> findAll() {
+	public List<PagadorCieFormatSobreDto> findAll() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public PaginaDto<PagadorCieDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
+	public PaginaDto<PagadorCieFormatSobreDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		// TODO Auto-generated method stub
 		return null;
 	}

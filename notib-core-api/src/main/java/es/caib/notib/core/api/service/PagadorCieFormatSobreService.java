@@ -26,7 +26,7 @@ public interface PagadorCieFormatSobreService {
 	 * @return	El pagador cie creat
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public PagadorCieDto create(
+	public PagadorCieFormatSobreDto create(
 			Long entitatId,
 			PagadorCieFormatSobreDto formatSobre);
 
@@ -39,7 +39,7 @@ public interface PagadorCieFormatSobreService {
 	 * @throws NotFoundException
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public PagadorCieDto update(PagadorCieFormatSobreDto formatSobre) throws NotFoundException;
+	public PagadorCieFormatSobreDto update(PagadorCieFormatSobreDto formatSobre) throws NotFoundException;
 
 	/**
 	 * Esborra un format de sobre d'un pagador cie.
@@ -51,7 +51,7 @@ public interface PagadorCieFormatSobreService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public PagadorCieDto delete(
+	public PagadorCieFormatSobreDto delete(
 			Long id) throws NotFoundException;
 
 	/**
@@ -62,7 +62,7 @@ public interface PagadorCieFormatSobreService {
 	 * @return El pagador cie amb el codi especificat o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
-	public PagadorCieDto findById(Long id);
+	public PagadorCieFormatSobreDto findById(Long id);
 
 	
 	/**
@@ -71,7 +71,7 @@ public interface PagadorCieFormatSobreService {
 	 * @return La llista dels pagadors cie.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
-	public List<PagadorCieDto> findAll();
+	public List<PagadorCieFormatSobreDto> findAll();
 
 	/**
 	 * Llistat amb tots els formats de sobre d'un pagadro cie paginats.
@@ -81,7 +81,7 @@ public interface PagadorCieFormatSobreService {
 	 * @return La pàgina de pagadors cie.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
-	public PaginaDto<PagadorCieDto> findAllPaginat(PaginacioParamsDto paginacioParams);
+	public PaginaDto<PagadorCieFormatSobreDto> findAllPaginat(PaginacioParamsDto paginacioParams);
 
 	
 }

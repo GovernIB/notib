@@ -21,6 +21,14 @@
 			jndi-name="notib/PagadorCieServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.PagadorCieService"/>	
 	<jee:local-slsb
+			id="pagadorCieFormatFullaService"
+			jndi-name="notib/PagadorCieFormatFullaServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.PagadorCieFormatFullaService"/>	
+	<jee:local-slsb
+			id="pagadorCieFormatSobreService"
+			jndi-name="notib/PagadorCieFormatSobreServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.PagadorCieFormatSobreService"/>	
+	<jee:local-slsb
 			id="pagadorPostalService"
 			jndi-name="notib/PagadorPostalServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.PagadorPostalService"/>	
