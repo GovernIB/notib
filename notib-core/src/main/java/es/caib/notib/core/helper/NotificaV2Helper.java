@@ -91,13 +91,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
-	private ProcedimentRepository procedimentRepository;
-	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired 
 	private EmailHelper emailHelper;
 	@Autowired 
 	ConversioTipusHelper conversioTipusHelper;
+	@Autowired ProcedimentRepository procedimentRepository;
 	
 	public boolean notificacioEnviar(
 			Long notificacioId) {
@@ -507,6 +506,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		//}
 		envios.setEnvios(generarEnvios(notificacio));
 		Opciones opcionesRemesa = new Opciones();
+
 		if(notificacio.getRetard() != null) {
 			retardPostal = notificacio.getRetard();
 		} else {

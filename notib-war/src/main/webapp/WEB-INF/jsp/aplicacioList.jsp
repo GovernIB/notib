@@ -47,20 +47,6 @@
 			<tr>
 				<th data-col-name="usuariCodi" width="20%"><spring:message code="aplicacio.list.columna.codi"/></th>
 				<th data-col-name="callbackUrl" width="50%"><spring:message code="aplicacio.list.columna.callback.url"/></th>
-				<th data-col-name="tipusAutenticacio" data-template="#cellTipusAutenticacioTemplate" width="20%">
-					<spring:message code="aplicacio.list.columna.autenticacio.tipus"/>
-					<script id="cellTipusAutenticacioTemplate" type="text/x-jsrender">
-						{{if tipusAutenticacio == 'TOKEN_CAIB'}}
-							<spring:message code="tipus.autenticacio.enum.TOKEN_CAIB"/>
-						{{else tipusAutenticacio == 'TEXT_CLAR'}}
-							<spring:message code="tipus.autenticacio.enum.TEXT_CLAR"/>
-						{{else tipusAutenticacio == 'CAP'}}
-							<spring:message code="tipus.autenticacio.enum.CAP"/>
-						{{else}}
-							{{:estat}}
-						{{/if}}
-					</script>
-				</th>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">

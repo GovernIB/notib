@@ -1,7 +1,5 @@
 package es.caib.notib.core.entity;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -9,8 +7,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -32,13 +28,12 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "nom", length = 100, nullable = false)
 	protected String nom;
-
-	@Column(name = "data_programada")
-	@Temporal(TemporalType.DATE)
-	protected Date enviamentDataProgramada;
 	
 	@Column(name = "retard")
 	protected Integer retard;
+	
+	@Column(name = "caducitat")
+	protected Integer caducitat;
 	
 	@Column(name = "llibre")
 	protected String llibre;
@@ -88,13 +83,13 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	public void setNom(String nom) {
 		this.nom = nom;
 	}
-
-	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
-		this.enviamentDataProgramada = enviamentDataProgramada;
-	}
-
+	
 	public void setRetard(Integer retard) {
 		this.retard = retard;
+	}
+
+	public Integer getCaducitat() {
+		return caducitat;
 	}
 
 	public void setLlibre(String llibre) {
@@ -176,10 +171,6 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 		return retard;
 	}
 
-	public Date getEnviamentDataProgramada() {
-		return enviamentDataProgramada;
-	}
-
 	public String getLlibre() {
 		return llibre;
 	}
@@ -203,7 +194,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			PagadorPostalEntity pagadorcostal,
 			PagadorCieEntity pagadorcie,
 			int retard,
-			Date enviamentDataProgramada,
+			int caducitat,
 			boolean agrupar,
 			String llibre,
 			String llibreNom,
@@ -226,7 +217,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 		this.organGestor = organGestor;
 		this.organGestorNom = organGestorNom;
 		this.retard = retard;
-		this.enviamentDataProgramada = enviamentDataProgramada;
+		this.caducitat = caducitat;
 		this.tipusAssumpte = tipusAssumpte;
 		this.tipusAssumpteNom = tipusAssumpteNom;
 		this.codiAssumpte = codiAssumpte;
@@ -237,7 +228,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			String codi,
 			String nom,
 			int retard,
-			Date enviamentDataProgramada,
+			int caducitat,
 			EntitatEntity entitat,
 			PagadorPostalEntity pagadorpostal,
 			PagadorCieEntity pagadorcie,
@@ -256,7 +247,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 				codi,
 				nom,
 				retard,
-				enviamentDataProgramada,
+				caducitat,
 				entitat,
 				pagadorpostal,
 				pagadorcie,
@@ -279,7 +270,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 				String codi,
 				String nom,
 				int retard,
-				Date enviamentDataProgramada,
+				int caducitat,
 				EntitatEntity entitat,
 				PagadorPostalEntity pagadorpostal,
 				PagadorCieEntity pagadorcie,
@@ -298,6 +289,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			built.codi = codi;
 			built.nom = nom;
 			built.retard = retard;
+			built.caducitat = caducitat;
 			built.entitat = entitat;
 			built.pagadorpostal = pagadorpostal;
 			built.pagadorcie = pagadorcie;

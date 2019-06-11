@@ -57,7 +57,9 @@ $(document).ready(function() {
 	    $.get(getUrl).done(function(data) {
 	    	$(td).empty();
 	    	$(td).append(
-	    			'<table class="table teble-striped table-bordered"><thead>' +
+	    			'<table class="table teble-striped table-bordered">' +
+	    			'<caption><spring:message code="notificacio.list.enviament.list.titol"/></caption>' +
+	    			'<thead>' +
 	    			'<tr>' +
 					'<th><spring:message code="notificacio.list.enviament.list.titular"/></th>' + 
 	    			'<th><spring:message code="notificacio.list.enviament.list.destinataris"/></th>' +
@@ -165,6 +167,9 @@ $(document).ready(function() {
 			</div>
 			<div class="col-md-3">
 				<not:inputSelect name="procedimentId" optionItems="${procedimentsPermisLectura}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.procediment" inline="true"/>
+			</div>
+			<div class="col-md-3">
+				<not:inputSelect name="tipusUsuari" optionItems="${tipusUsuari}" optionValueAttribute="value" optionTextKeyAttribute="text"  emptyOption="true"  placeholderKey="notificacio.list.filtre.camp.tipususuari" inline="true" />
 			</div>
 			<div class="col-md-3">
 			</div>

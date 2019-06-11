@@ -11,13 +11,11 @@ import java.io.Serializable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum TipusDocumentEnumDto implements Serializable {
-
-	CSV("CSV"),
-	UUID("UUID"),
-	ARXIU("ARXIU"),
-	URL("URL");
+	CSV("0"),
+	UUID("1"),
+	ARXIU("2"),
+	URL("3");
 	
-
 	private final String text;
 
 	TipusDocumentEnumDto(String text) {
@@ -35,7 +33,6 @@ public enum TipusDocumentEnumDto implements Serializable {
 				return valor;
 			}
 		}
-		throw new IllegalArgumentException("No s'ha trobat cap correspondència a dins l'enumeració " + TipusDocumentEnumDto.class.getName() + " per al text " + text);
+		throw new IllegalArgumentException("No s'ha trobat cap correspondència a dins l'enumeració " + 	TipusDocumentEnumDto.class.getName() + " per al text " + text);
 	}
-
 }

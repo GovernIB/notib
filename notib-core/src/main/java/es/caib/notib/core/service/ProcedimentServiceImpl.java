@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.jdom.PFilterIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -114,7 +113,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						procediment.getCodi(),
 						procediment.getNom(),
 						procediment.getRetard(),
-						procediment.getEnviamentDataProgramada(),
+						procediment.getCaducitat(),
 						entitat,
 						pagadorPostal,
 						pagadorCie,
@@ -182,7 +181,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					pagadorPostal,
 					pagadorCie,
 					procediment.getRetard(),
-					procediment.getEnviamentDataProgramada(),
+					procediment.getCaducitat(),
 					procediment.isAgrupar(),
 					procediment.getLlibre(),
 					procediment.getLlibreNom(),

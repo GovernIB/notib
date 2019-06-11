@@ -54,6 +54,7 @@ import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
@@ -209,7 +210,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 						procediment.getCodi(),
 						procediment,
 						notificacio.getGrupCodi(),
-						notificacio.getNumExpedient()
+						notificacio.getNumExpedient(),
+						TipusUsuariEnumDto.INTERFICIE_WEB
 //						//notificacio.getOficina(),
 //						//notificacio.getLlibre(),
 //						notificacio.getExtracte(),
@@ -280,7 +282,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						enviament.getTitular().getNom(), 
 						enviament.getTitular().getTelefon(),
 						enviament.getTitular().getRaoSocial(),
-						enviament.getTitular().getDir3codi()).build());
+						enviament.getTitular().getDir3Codi()).build());
 				
 				List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
 				for(Persona persona: enviament.getDestinataris()) {
@@ -294,7 +296,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 								persona.getNom(), 
 								persona.getTelefon(),
 								persona.getRaoSocial(),
-								persona.getDir3codi()).build());
+								persona.getDir3Codi()).build());
 						destinataris.add(destinatari);
 					}
 				}
@@ -642,6 +644,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							entitatActual, 
 							procediment == null,
 							procediment,
+							filtre.getTipusUsuari() == null,
+							filtre.getTipusUsuari(),
 							pageable);
 				}
 			} else if (isUsuariEntitat) {
@@ -661,6 +665,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 						filtre.getTitular(),
 						procediment == null,
 						procediment,
+						filtre.getTipusUsuari() == null,
+						filtre.getTipusUsuari(),
 						pageable);
 			} else if (isAdministrador) {
 				notificacions = notificacioRepository.findAmbFiltre(
@@ -679,6 +685,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 						filtre.getTitular(),
 						procediment == null,
 						procediment,
+						filtre.getTipusUsuari() == null,
+						filtre.getTipusUsuari(),
 						pageable);
 			}
 		}
@@ -687,12 +695,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 		} else {
 			if(notificacions != null) {
 				for (NotificacioEntity notificacio : notificacions) {
-					if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA)
+					if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
 						notificacio.setPermisProcessar(
 								procedimentService.hasPermisProcessarProcediment(
 										notificacio.getProcediment().getCodi(),
 										notificacio.getProcediment().getId(),
 										isAdministrador));
+						}
 				}	
 			}
 			resultatPagina = paginacioHelper.toPaginaDto(

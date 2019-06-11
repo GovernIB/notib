@@ -36,6 +36,7 @@ import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
@@ -194,6 +195,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				resposta.setErrorDescripcio("[TITULAR_INTERESSATTIPUS] El camp 'interessat_tipus' del titular d'un enviament no pot ser null.");
 				return resposta;
 			}
+			
 			if(enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.FISICA)) {
 				if (enviament.getTitular().getLlinatge1() == null) {
 					resposta.setError(true);
@@ -296,7 +298,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					notificacio.getProcedimentCodi(),
 					procediment,
 					notificacio.getGrupCodi(),
-					notificacio.getNumExpedient()
+					notificacio.getNumExpedient(),
+					TipusUsuariEnumDto.APLICACIO 
 //					notificacio.getExtracte(),
 //					notificacio.getDocFisica(),
 //					//notificacio.getTipusAssumpte(),
@@ -371,7 +374,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						enviament.getTitular().getNom(), 
 						enviament.getTitular().getTelefon(),
 						enviament.getTitular().getRaoSocial(),
-						enviament.getTitular().getDir3codi()).build());
+						enviament.getTitular().getDir3Codi()).build());
 				
 				
 				List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
@@ -385,7 +388,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							persona.getNom(), 
 							persona.getTelefon(),
 							persona.getRaoSocial(),
-							persona.getDir3codi()).build());
+							persona.getDir3Codi()).build());
 					destinataris.add(destinatari);
 				}
 				EntregaPostalViaTipusEnum viaTipus = null;

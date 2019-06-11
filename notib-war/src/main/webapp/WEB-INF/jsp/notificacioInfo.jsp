@@ -115,8 +115,8 @@
 						<tr>
 							<td width="30%"><strong><spring:message
 										code="notificacio.info.dada.entitat" /></strong></td>
-							<td>${notificacio.procediment.entitat.dir3Codi}
-								(${notificacio.procediment.entitat.dir3Codi})</td>
+							<td>${notificacio.procediment.entitat.nom}<br>
+							<small>${notificacio.procediment.entitat.dir3Codi}</small></td>
 						</tr>
 						<tr>
 							<td><strong><spring:message
@@ -125,14 +125,8 @@
 						</tr>
 						<tr>
 							<td><strong><spring:message
-										code="notificacio.info.dada.tipus" /></strong></td>
-							<td><spring:message
-									code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.${notificacio.enviamentTipus}" /></td>
-						</tr>
-						<tr>
-							<td><strong><spring:message
-										code="notificacio.info.dada.procediment.codi" /></strong></td>
-							<td>(${notificacio.procediment.codi})</td>
+										code="notificacio.info.dada.descripcio" /></strong></td>
+							<td>${notificacio.descripcio}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message
@@ -151,6 +145,17 @@
 										code="notificacio.info.dada.creacio.usuari" /></strong></td>
 							<td>${notificacio.createdBy.nom}
 								(${notificacio.createdBy.codi})</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message
+										code="notificacio.info.dada.tipus" /></strong></td>
+							<td><spring:message
+									code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.${notificacio.enviamentTipus}" /></td>
+						</tr>
+						<tr>
+							<td><strong><spring:message
+										code="notificacio.info.dada.procediment.codi" /></strong></td>
+							<td>${notificacio.procediment.nom}<br>${notificacio.procediment.codi}</td>
 						</tr>
 					</tbody>
 				</table>
@@ -173,6 +178,7 @@
 										<a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar"/>"
 											class="btn btn-default btn-sm pull-right"
 											title="<spring:message code="notificacio.info.document.descarregar"/>">
+											<spring:message code="notificacio.info.document.descarregar"/> 
 												<span class="fa fa-download"></span>
 										</a>
 									</td>

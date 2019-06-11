@@ -3,14 +3,12 @@
  */
 package es.caib.notib.war.command;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.notib.core.api.dto.AplicacioDto;
-import es.caib.notib.core.api.dto.TipusAutenticacioEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.CodiAplicacioNoRepetit;
 
@@ -27,8 +25,6 @@ public class AplicacioCommand {
 	private String usuariCodi;
 	@NotEmpty @Size(max=256) 
 	private String callbackUrl;
-	@NotNull
-	private TipusAutenticacioEnumDto tipusAutenticacio;
 
 	public Long getId() {
 		return id;
@@ -47,12 +43,6 @@ public class AplicacioCommand {
 	}
 	public void setCallbackUrl(String callbackUrl) {
 		this.callbackUrl = callbackUrl;
-	}
-	public TipusAutenticacioEnumDto getTipusAutenticacio() {
-		return tipusAutenticacio;
-	}
-	public void setTipusAutenticacio(TipusAutenticacioEnumDto tipusAutenticacio) {
-		this.tipusAutenticacio = tipusAutenticacio;
 	}
 	
 	

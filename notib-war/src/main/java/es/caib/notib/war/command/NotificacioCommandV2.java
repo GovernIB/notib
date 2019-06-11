@@ -52,9 +52,11 @@ public class NotificacioCommandV2 {
 	private DocumentCommand document;
 	private Long procedimentId;
 	private String procedimentNom;
+	private String codiSia;
 	private Long grupId;
 	private String usuariCodi;
 	private TipusDocumentEnumDto tipusDocument;
+	private String tipusDocumentDefault;
 	private String documentArxiuUuidCsvUrl;
 	private MultipartFile arxiu;
 	private String oficina;
@@ -67,6 +69,8 @@ public class NotificacioCommandV2 {
 	private String refExterna;
 	private String codiAssumpte;
 	private String observacions;
+	private boolean eliminarLogoPeu;
+	private boolean eliminarLogoCap;
 	private ServeiTipusEnumDto serveiTipus;
 	private PersonaCommand titular;
 	private PersonaCommand destinatari = new PersonaCommand();
@@ -95,14 +99,20 @@ public class NotificacioCommandV2 {
 	public String getConcepte() {
 		return concepte;
 	}
-	public void setConcepte(String concepte) {
-		this.concepte = concepte;
-	}
 	public TipusDocumentEnumDto getTipusDocument() {
 		return tipusDocument;
 	}
 	public void setTipusDocument(TipusDocumentEnumDto tipusDocument) {
 		this.tipusDocument = tipusDocument;
+	}
+	public String getTipusDocumentDefault() {
+		return tipusDocumentDefault;
+	}
+	public void setTipusDocumentDefault(String tipusDocumentDefault) {
+		this.tipusDocumentDefault = tipusDocumentDefault;
+	}
+	public void setConcepte(String concepte) {
+		this.concepte = concepte;
 	}
 	public MultipartFile getArxiu() {
 		return arxiu;
@@ -163,6 +173,12 @@ public class NotificacioCommandV2 {
 	}
 	public void setProcedimentNom(String procedimentNom) {
 		this.procedimentNom = procedimentNom;
+	}
+	public String getCodiSia() {
+		return codiSia;
+	}
+	public void setCodiSia(String codiSia) {
+		this.codiSia = codiSia;
 	}
 	public Long getGrupId() {
 		return grupId;
@@ -247,6 +263,18 @@ public class NotificacioCommandV2 {
 	}
 	public String getObservacions() {
 		return observacions;
+	}
+	public boolean isEliminarLogoPeu() {
+		return eliminarLogoPeu;
+	}
+	public void setEliminarLogoPeu(boolean eliminarLogoPeu) {
+		this.eliminarLogoPeu = eliminarLogoPeu;
+	}
+	public boolean isEliminarLogoCap() {
+		return eliminarLogoCap;
+	}
+	public void setEliminarLogoCap(boolean eliminarLogoCap) {
+		this.eliminarLogoCap = eliminarLogoCap;
 	}
 	public void setExtracte(String extracte) {
 		this.extracte = extracte;

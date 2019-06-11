@@ -1,7 +1,5 @@
 package es.caib.notib.war.command;
 
-import java.util.Date;
-
 import javax.validation.constraints.Size;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -36,7 +34,6 @@ public class ProcedimentCommand {
 	private boolean notificacio;
 	private boolean gestio;
 	private int retard;
-	private Date enviamentDataProgramada;
 	private String oficina;
 	private String oficinaNom;
 	private String llibre;
@@ -47,6 +44,7 @@ public class ProcedimentCommand {
 	private String tipusAssumpteNom;
 	private String codiAssumpte;
 	private String codiAssumpteNom;
+	private int caducitat;
 	
 	public Long getId() {
 		return id;
@@ -126,12 +124,6 @@ public class ProcedimentCommand {
 	public void setRetard(int retard) {
 		this.retard = retard;
 	}
-	public Date getEnviamentDataProgramada() {
-		return enviamentDataProgramada;
-	}
-	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
-		this.enviamentDataProgramada = enviamentDataProgramada;
-	}
 	public String getOficina() {
 		return oficina;
 	}
@@ -191,6 +183,12 @@ public class ProcedimentCommand {
 	}
 	public void setCodiAssumpteNom(String codiAssumpteNom) {
 		this.codiAssumpteNom = codiAssumpteNom;
+	}
+	public int getCaducitat() {
+		return caducitat;
+	}
+	public void setCaducitat(int caducitat) {
+		this.caducitat = caducitat;
 	}
 	public static ProcedimentCommand asCommand(ProcedimentDto dto) {
 		if (dto == null) {

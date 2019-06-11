@@ -14,6 +14,8 @@ import javax.persistence.Version;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
+import es.caib.notib.core.api.dto.TipusDocumentDto;
+import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 
 /**
@@ -41,6 +43,17 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	private String descripcio;
 	@Column(name = "activa", nullable = false)
 	private boolean activa;
+	@Column(name = "logo_cap", length = 1024)
+	private byte[] logoCapBytes;
+	@Column(name = "logo_peu", length = 1024)
+	private byte[] logoPeuBytes;
+	@Column(name = "color_fons", length = 1024)
+	private String colorFons;
+	@Column(name = "color_lletra", length = 1024)
+	private String colorLletra;
+	@Column(name = "tipus_doc_default")
+	private TipusDocumentEnumDto tipusDocDefault;
+	
 	@Version
 	private long version = 0;
 
@@ -65,39 +78,76 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	public boolean isActiva() {
 		return activa;
 	}
-
+	public byte[] getLogoCapBytes() {
+		return logoCapBytes;
+	}
+	public byte[] getLogoPeuBytes() {
+		return logoPeuBytes;
+	}
+	public String getColorFons() {
+		return colorFons;
+	}
+	public String getColorLletra() {
+		return colorLletra;
+	}
+	public long getVersion() {
+		return version;
+	}
+	public TipusDocumentEnumDto getTipusDocDefault() {
+		return tipusDocDefault;
+	}
 	public void update(
 			String codi,
 			String nom,
 			EntitatTipusEnumDto tipus,
 			String dir3Codi,
 			String apiKey,
-			String descripcio) {
+			String descripcio,
+			byte[] logoCapBytes,
+			byte[] logoPeuBytes,
+			String colorFons,
+			String colorLletra,
+			TipusDocumentEnumDto tipusDocDefault) {
 		this.codi = codi;
 		this.nom = nom;
 		this.descripcio = descripcio;
 		this.tipus = tipus;
 		this.dir3Codi = dir3Codi;
 		this.apiKey = apiKey;
+		this.logoCapBytes = logoCapBytes;
+		this.logoPeuBytes = logoPeuBytes;
+		this.colorFons = colorFons;
+		this.colorLletra = colorLletra;
+		this.tipusDocDefault = tipusDocDefault;
 	}
 
 	public void updateActiva(
 			boolean activa) {
 		this.activa = activa;
 	}
-
+	
 	public static Builder getBuilder(
 			String codi,
 			String nom,
 			EntitatTipusEnumDto tipus,
 			String dir3Codi,
-			String apiKey) {
+			String apiKey,
+			byte[] logoCapBytes,
+			byte[] logoPeuBytes,
+			String colorFons,
+			String colorLletra,
+			TipusDocumentEnumDto tipusDocDefault) {
 		return new Builder(
 				codi,
 				nom,
 				tipus,
 				dir3Codi,
-				apiKey);
+				apiKey,
+				logoCapBytes,
+				logoPeuBytes,
+				colorFons,
+				colorLletra,
+				tipusDocDefault);
 	}
 
 	public static class Builder {
@@ -107,7 +157,12 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				String nom,
 				EntitatTipusEnumDto tipus,
 				String dir3Codi,
-				String apiKey) {
+				String apiKey,
+				byte[] logoCapBytes,
+				byte[] logoPeuBytes,
+				String colorFons,
+				String colorLletra,
+				TipusDocumentEnumDto tipusDocDefault) {
 			built = new EntitatEntity();
 			built.codi = codi;
 			built.nom = nom;
@@ -115,6 +170,11 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			built.dir3Codi = dir3Codi;
 			built.activa = true;
 			built.apiKey = apiKey;
+			built.logoCapBytes = logoCapBytes;
+			built.logoPeuBytes = logoPeuBytes;
+			built.colorFons = colorFons;
+			built.colorLletra = colorLletra;
+			built.tipusDocDefault = tipusDocDefault;
 		}
 		public Builder descripcio(String descripcio) {
 			built.descripcio = descripcio;

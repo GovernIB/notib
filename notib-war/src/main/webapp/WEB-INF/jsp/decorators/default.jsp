@@ -55,13 +55,16 @@
 	<link href="<c:url value="/webjars/bootstrap/3.3.6/dist/css/bootstrap.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/font-awesome/4.7.0/css/font-awesome.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/css/estils.css"/>" rel="stylesheet">
-	<link rel="shortcut icon" href="<c:url value="/img/favicon.png"/>" type="image/x-icon" />
 	<script src="<c:url value="/webjars/jquery/1.12.0/dist/jquery.min.js"/>"></script>
+	<link rel="shortcut icon" href="<c:url value="/img/favicon.png"/>" type="image/x-icon" />
+	
 	<!-- Llibreria per a compatibilitat amb HTML5 -->
 	<!--[if lt IE 9]>
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 	<script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
+	<link href="<c:url value="/css/bootstrap-colorpicker.min.css"/>" rel="stylesheet">
+	<script src="<c:url value="/js/bootstrap-colorpicker.min.js"/>"></script>
 	<decorator:head />
 <style>
 body {
@@ -69,6 +72,48 @@ body {
 	color:#666666;
 	padding-top: 120px;
 }
+
+<c:choose>
+	<c:when test="${sessionScope['EntitatHelper.entitatActual'].colorFons!=null  && not empty sessionScope['EntitatHelper.entitatActual'].colorFons}">
+		.navbar-app {
+			background-color: ${sessionScope['EntitatHelper.entitatActual'].colorFons};
+		}
+		.navbar-app .list-inline li.dropdown>a {
+			background-color: ${sessionScope['EntitatHelper.entitatActual'].colorFons};
+		}
+	</c:when>
+	<c:otherwise>
+		<c:if test="${sessionScope['SessionHelper.capsaleraColorFons']!=null  && not empty sessionScope['SessionHelper.capsaleraColorFons']}">
+			.navbar-app {
+				background-color: ${sessionScope['SessionHelper.capsaleraColorFons']};
+			}		
+			.navbar-app .list-inline li.dropdown>a { 
+				background-color: ${sessionScope['SessionHelper.capsaleraColorFons']};
+			}
+		</c:if>		
+	</c:otherwise>
+</c:choose>
+
+<c:choose>
+	<c:when test="${sessionScope['EntitatHelper.entitatActual'].colorLletra!=null  && not empty sessionScope['EntitatHelper.entitatActual'].colorLletra}">
+		.navbar-app .list-inline li.dropdown>a {
+			color: ${sessionScope['EntitatHelper.entitatActual'].colorLletra};
+		}
+		.caret-white {
+			border-top-color: ${sessionScope['EntitatHelper.entitatActual'].colorLletra} !important;
+		}
+	</c:when>
+	<c:otherwise>
+		<c:if test="${sessionScope['SessionHelper.capsaleraColorLletra']!=null  && not empty sessionScope['SessionHelper.capsaleraColorLletra']}">
+			.navbar-app .list-inline li.dropdown>a {
+				color: ${sessionScope['SessionHelper.capsaleraColorLletra']};
+			}	
+			.caret-white {
+				border-top-color: ${sessionScope['SessionHelper.capsaleraColorLletra']} !important;
+			}	
+		</c:if>		
+	</c:otherwise>
+</c:choose>
 </style>
 </head>
 <body>
@@ -84,7 +129,14 @@ body {
 				</button--%>
 				<div class="navbar-brand">
 					<div id="govern-logo" class="pull-left">
-						<img src="<c:url value="/img/Logo_APB_notib.png"/>" alt="Govern de les Illes Balears" height="80px"/>
+						<c:choose>
+							<c:when test="${sessionScope['SessionHelper.capsaleraCapLogo']!=null  && not empty sessionScope['SessionHelper.capsaleraCapLogo'] || sessionScope['EntitatHelper.entitatActual'].logoCapBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoCapBytes)!=0}">
+								<img src="<c:url value="/entitat/getEntitatLogoCap"/>"  height="65" alt="Govern de les Illes Balears" />
+							</c:when>
+							<c:otherwise>
+								<img src="<c:url value="/img/govern-logo.png"/>"  height="65" alt="Govern de les Illes Balears" />
+							</c:otherwise>
+						</c:choose>
 					</div>
 					<div id="app-logo" class="pull-left">
 						<img src="<c:url value="/img/logo.png"/>" alt="NOTIB" />
@@ -249,7 +301,14 @@ body {
     	<div class="pull-left app-version"><p>NOTIB v<not:versio/></p></div>
         <div class="pull-right govern-footer">
         	<p>
-	        	<img src="<c:url value="/img/govern-logo-neg.png"/>" hspace="5" height="30" alt="<spring:message code='decorator.logo.govern'/>" />
+        		<c:choose>
+	        		<c:when test="${sessionScope['SessionHelper.capsaleraPeuLogo']!=null  && not empty sessionScope['SessionHelper.capsaleraPeuLogo'] || sessionScope['EntitatHelper.entitatActual'].logoPeuBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoPeuBytes)!=0}">
+						<img src="<c:url value="/entitat/getEntitatLogoPeu"/>"  height="65" alt="Govern de les Illes Balears" />
+					</c:when>
+					<c:otherwise>
+						<img src="<c:url value="/img/govern-logo-neg.png"/>" hspace="5" height="30" alt="<spring:message code='decorator.logo.govern'/>" />
+					</c:otherwise>
+				</c:choose>
 	        	<img src="<c:url value="/img/una_manera.png"/>" 	 hspace="5" height="30" alt="<spring:message code='decorator.logo.manera'/>" />
 	        	<img src="<c:url value="/img/feder7.png"/>" 	     hspace="5" height="35" alt="<spring:message code='decorator.logo.feder'/>" />
 	        	<img src="<c:url value="/img/uenegroma.png"/>"	     hspace="5" height="50" alt="<spring:message code='decorator.logo.ue'/>" />

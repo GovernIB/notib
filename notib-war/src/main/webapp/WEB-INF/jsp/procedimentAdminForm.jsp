@@ -269,8 +269,8 @@ $(document).ready(function() {
 			<div role="tabpanel" class="tab-pane active" id="dadesgeneralsForm">
 				<not:inputText name="codi" textKey="procediment.form.camp.codi" required="true" labelSize="2"/>
 				<not:inputText name="nom" textKey="procediment.form.camp.nom" required="true" labelSize="2"/>
-				<not:inputDate name="enviamentDataProgramada" textKey="procediment.form.camp.dataProgramada" labelSize="2"/>
-				<not:inputText name="retard" textKey="notificacio.form.camp.retard" labelSize="2"/>
+				<not:inputText name="retard" textKey="procediment.form.camp.retard" labelSize="2"/>
+				<not:inputText name="caducitat" textKey="procediment.form.camp.caducitat" labelSize="2"/>
 				<form:hidden path="entitatId" value="${entitat.id}"/>
 				<!--
 				<form:hidden path="organGestor"/>

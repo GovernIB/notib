@@ -771,6 +771,15 @@ public class PluginHelper {
 		return llibresOficines;
 	}
 	
+	public Llibre llistarLlibreOrganisme(
+			String entitatCodi,
+			String organismeCodi) throws RegistrePluginException{
+		
+		return getRegistrePlugin().llistarLlibreOrganisme(
+				entitatCodi, 
+				organismeCodi);
+	}
+	
 	public List<Llibre> llistarLlibres(
 			String entitatcodi,
 			String oficina,
@@ -796,7 +805,7 @@ public class PluginHelper {
 		RegistreSortida registreSortida = new RegistreSortida();
 		DadesOficina dadesOficina = new DadesOficina();
 		Long tipusInteressat;
-		List<LlibreOficina> llibreOficina = null;
+		Llibre llibreOrganisme = null;
 		
 		switch (enviament.getTitular().getInteressatTipus()) {
 		case ADMINISTRACIO:
@@ -814,23 +823,26 @@ public class PluginHelper {
 		}
 		
 		if (notificacio.getProcediment().getOrganGestor() != null) {
-			llibreOficina = llistarLlibresOficines(
-					notificacio.getProcediment().getOrganGestor(), 
-					notificacio.getUsuariCodi(),
-					TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
+//			llibreOficina = llistarLlibresOficines(
+//					notificacio.getProcediment().getOrganGestor(), 
+//					notificacio.getUsuariCodi(),
+//					TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
+			llibreOrganisme = llistarLlibreOrganisme(
+					notificacio.getEmisorDir3Codi(),
+					notificacio.getProcediment().getOrganGestor());
 		}
-		
-		if (notificacio.getProcediment().getOficina() != null) {
-			dadesOficina.setOficina(notificacio.getProcediment().getOficina());
-		} else if (llibreOficina != null && ! llibreOficina.isEmpty()) {
-			String oficinaCodi = llibreOficina.get(0).getOficina().getCodi();
-			dadesOficina.setOficina(oficinaCodi);
-		}
+		//oficina virtual
+//		if (notificacio.getProcediment().getOficina() != null) {
+//			dadesOficina.setOficina(notificacio.getProcediment().getOficina());
+//		} else if (llibreOficina != null && ! llibreOficina.) {
+//			String oficinaCodi = llibreOficina.get(0).getOficina().getCodi();
+//			dadesOficina.setOficina(oficinaCodi);
+//		}
 		
 		if (notificacio.getProcediment().getLlibre() != null) {
 			dadesOficina.setLlibre(notificacio.getProcediment().getLlibre());
-		} else if (llibreOficina != null && ! llibreOficina.isEmpty()) {
-			String llibreCodi = llibreOficina.get(0).getLlibre().getCodi();
+		} else if (llibreOrganisme != null) {
+			String llibreCodi = llibreOrganisme.getCodi();
 			dadesOficina.setLlibre(llibreCodi);
 		}
 

@@ -7,7 +7,6 @@ package es.caib.notib.war.controller;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -50,6 +49,9 @@ import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
+import es.caib.notib.core.api.dto.TipusDocumentDto;
+import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
@@ -61,6 +63,7 @@ import es.caib.notib.war.command.MarcarProcessatCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
 import es.caib.notib.war.command.PersonaCommand;
+import es.caib.notib.war.helper.CaducitatHelper;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EntitatHelper;
@@ -145,6 +148,9 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("notificacioEstats", 
 				EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
+		model.addAttribute("tipusUsuari", 
+				EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
+						"es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
 		model.addAttribute("notificacioEnviamentEstats",
 				EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
@@ -271,6 +277,8 @@ public class NotificacioController extends BaseUserController {
 							"es.caib.notib.core.api.dto.idiomaEnumDto."));
 			model.addAttribute("enviosGuardats", notificacioCommand.getEnviaments());
             model.addAttribute("errors", bindingResult.getAllErrors());
+            if (notificacioCommand.getEnviaments().get(0).getDestinataris() != null)
+            	model.addAttribute("isVisible", notificacioCommand.getEnviaments().get(0).getDestinataris().get(0).isVisible());
 			return "notificacioForm";
 		}
 		if (RolHelper.isUsuariActualAdministrador(request)) {
@@ -321,6 +329,9 @@ public class NotificacioController extends BaseUserController {
 			model.addAttribute("notificacioEstats", 
 					EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
 							"es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
+			model.addAttribute("tipusUsuari", 
+					EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
+							"es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
 			model.addAttribute("notificacioEnviamentEstats",
 					EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
 							"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
@@ -422,6 +433,7 @@ public class NotificacioController extends BaseUserController {
 		emplenarModelNotificacioInfo(
 				entitatActual,
 				notificacioId, 
+				request,
 				"dades", 
 				model);
 		return "notificacioInfo";
@@ -496,6 +508,7 @@ public class NotificacioController extends BaseUserController {
 		emplenarModelNotificacioInfo(
 				entitatActual,
 				notificacioId, 
+				request,
 				"accions", 
 				model);
 		if (enviada) {
@@ -519,6 +532,7 @@ public class NotificacioController extends BaseUserController {
 		emplenarModelNotificacioInfo(
 				entitatActual,
 				notificacioId, 
+				request,
 				"accions", 
 				model);
 		if(registresIdDto.size() > 0) {
@@ -660,6 +674,7 @@ public class NotificacioController extends BaseUserController {
 	private void emplenarModelNotificacioInfo(
 			EntitatDto entitatActual,
 			Long notificacioId, 
+			HttpServletRequest request,
 			String pipellaActiva, 
 			Model model) {
 		NotificacioDtoV2 notificacio = notificacioService.findAmbId(notificacioId);
@@ -675,6 +690,7 @@ public class NotificacioController extends BaseUserController {
 		} else {
 			model.addAttribute("permisGestio", null);
 		}
+		model.addAttribute("permisAdmin", request.isUserInRole("NOT_ADMIN"));
 	}
 
 	private void emplenarModelEnviamentInfo(
@@ -700,15 +716,33 @@ public class NotificacioController extends BaseUserController {
 				null, 
 				isAdministrador(request), 
 				procedimentId);
-		NotificacioCommandV2 notificacio = new NotificacioCommandV2();
-		notificacio.setCaducitat(sumarDiesData(new Date()));
+		NotificacioCommandV2 notificacio = new NotificacioCommandV2();		
+		List<String> tipusDocumentEnumDto = new ArrayList<String>();
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		List<TipusDocumentDto>  tipusDocuments =  entitatService.findTipusDocumentByEntitat(entitatActual.getId());
+		TipusDocumentEnumDto tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
+		notificacio.setCaducitat(CaducitatHelper.sumarDiesLaborals(procedimentActual.getCaducitat()));
+
+		if (tipusDocuments != null) {
+			for (TipusDocumentDto tipusDocument: tipusDocuments) {
+				tipusDocumentEnumDto.add(tipusDocument.getTipusDocEnum().name());
+			}
+			if (tipusDocumentDefault != null) {
+				notificacio.setTipusDocumentDefault(tipusDocumentDefault.name());
+			}
+		}
 		model.addAttribute("notificacioCommandV2", notificacio);
+		
+		model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
 		model.addAttribute("entitat", procedimentActual.getEntitat());
 		model.addAttribute("procediment", procedimentService.findById(
 				null, 
 				isAdministrador(request), 
 				procedimentId));
-		model.addAttribute("grups", grupService.findByGrupsProcediment(procedimentId));
+		model.addAttribute("amagat", Boolean.FALSE);
+		
+		model.addAttribute("grups", grupService.findByProcedimentGrups(procedimentId));
+		
 		model.addAttribute("comunicacioTipus", 
 				EnumHelper.getOptionsForEnum(
 						NotificacioComunicacioTipusEnumDto.class,
@@ -733,13 +767,6 @@ public class NotificacioController extends BaseUserController {
 				EnumHelper.getOptionsForEnum(
 						IdiomaEnumDto.class,
 						"es.caib.notib.core.api.dto.idiomaEnumDto."));
-	}
-	
-	private Date sumarDiesData(Date dataActual) {
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(dataActual);
-		calendar.add(Calendar.DAY_OF_YEAR, 10);
-		return calendar.getTime();
 	}
 	
 	private boolean isAdministrador(HttpServletRequest request) {

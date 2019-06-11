@@ -7,7 +7,7 @@
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
 
 <c:choose>
-    <c:when test="${empty notificacioCommand.id}"><c:set var="titol"><spring:message code="notificacio.form.titol.crear"/><small>  ${procediment.nom}</small></c:set></c:when>
+    <c:when test="${empty notificacioCommand.id}"><c:set var="titol"><spring:message code="notificacio.form.titol.crear"/> <br> <small>  ${procediment.nom}</small></c:set></c:when>
     <c:otherwise><c:set var="titol"><spring:message code="notificacio.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
 <c:set var="dadesGenerals"><spring:message code="notificacio.form.titol.dadesgenerals"/></c:set>
@@ -40,7 +40,20 @@
     <script src="<c:url value="/js/webutil.datatable.js"/>"></script>
     <script src="<c:url value="/js/webutil.modal.js"/>"></script>
 <style type="text/css">
-
+.select2-container--bootstrap {
+	width: 100% !important;
+}
+.comentari {
+	font-size: 12px;
+	color: #999;
+	margin-bottom: 0px;
+}
+.delete {
+	top: 27px;
+}
+.dest .form-group {
+	margin-bottom: 0px;
+}
 .separacioEnviaments {
     border-top: 8px solid #eee;
 }
@@ -48,11 +61,48 @@
 .form-horizontal .control-label{
     text-align: left;
 }
+.title {
+	margin-top: 2%;
+	font-size: larger;
+}
+.title > label {
+	color: #ff9523;
+}
+.title > hr {
+	margin-top: 0%;
+}
+.title-envios {
+	color: #ffffff;
+	margin-top: 1%;
+	font-size: larger;
+}
+.title-envios > hr {
+	margin-top: 0%;
+	height: 1px;
+	background-color: #696666;
+}
+.newEnviament {
+	padding: 1%;
+	border-radius: 5px;
+}
+.container-envios {
+	background-color: #EFE8EA;
+}
+.title-container {
+	text-align: center;
+	background-color: #696666;
+	width: 12%;
+}
 </style>
 <script type="text/javascript">
 
 $(document).ready(function() {
-    var destinatariForm = $('.destinatariForm');
+	var tipusDocumentDefault = $('#tipusDocumentDefault').val();
+	$('.customSelect').webutilInputSelect2(null);
+	if (tipusDocumentDefault != '') {
+		$(".customSelect").val(tipusDocumentDefault).trigger("change");
+	}
+	
     $('.nextForm').click(function(){
         $('.nav-tabs > .active').next('li').find('a').trigger('click');
     });
@@ -60,12 +110,20 @@ $(document).ready(function() {
     $('#concepte').on('input',function(e){
     	 $('#extracte').val($(this).val());
     });
-
-    destinatariForm.find('input').each(function() {
-        if($(this).val().length > 0) {
-            $(destinatariForm).removeClass('hidden');
-        }
+	var numPlus = 1;
+	//$('.envio\\[0\\]')[0].innerText = "Envio#" + numPlus;
+    //var destinatariForm = $('.destinatariForm');
+    //destinatariForm.find('input').each(function() {
+    //    if($(this).val().length > 0) {
+    //        $(destinatariForm).removeClass('hidden');
+    //    }
+    //});
+    $(".container-envios").find('.enviamentsForm').each(function() {
+    	if($(this).find('.eliminar_enviament').attr('id') != 'enviamentDelete[0]') {
+    		$(this).find('.eliminar_enviament').removeClass('hidden');
+    	}
     });
+    
     $('#tipusDocument').on('change', function() {
         if ($(this).val() == 'ARXIU') {
             $('#metadades').removeClass('hidden');
@@ -152,6 +210,7 @@ $(document).ready(function() {
 		}
 	});
 	$('.interessat').trigger('change');
+	$('#tipusDocument').trigger('change');
 });
 
 function addDestinatari(enviament_id) {
@@ -162,7 +221,7 @@ function addDestinatari(enviament_id) {
     
     if ($("div[class*=' personaForm_" + enviament_id_num + "']").hasClass("hidden")) {
         $("div[class*=' personaForm_" + enviament_id_num + "']").removeClass("hidden").show();
-        $('#amagat').attr('value', 'true');
+        $('#isVisible').attr('value', 'true');
     } else {
         var destinatariForm = $("div[class*=' personaForm_" + enviament_id_num + "']").last().clone();
         var enviamentsForm = $('.enviamentsForm');
@@ -183,10 +242,20 @@ function addDestinatari(enviament_id) {
                 this.id= this.id.replace("][" + number, "][" + num);
             }
         });
-        $(destinatariForm).find("span.select2").remove();
-        
-        //$(destinatariForm).find("select").webutilInputSelect2();
-        $(destinatariForm).find("select").select2();
+        //$('.newDestinatari_' + enviament_id_num).find('.destinatariForm').each(function() {
+		//	var $this = $(this);
+			
+        //    $this.find("span.select2").remove();
+            
+            //$(destinatariForm).find("select").select2();
+            //Cercar tots els selects i canviar valor
+        //    $this.find("select").webutilInputSelect2();
+        //    $this.find("select").attr('data-select2-eval', 'true');
+        //});
+       
+		$(destinatariForm).find("span.select2").remove();
+        $(destinatariForm).find("select").webutilInputSelect2();
+        //$(destinatariForm).find("select").select2();
         $(destinatariForm).find("select").attr('data-select2-eval', 'true');
        
         $(destinatariForm).find('p').remove();
@@ -197,7 +266,7 @@ function addDestinatari(enviament_id) {
     }
 }
 
-function addEnv() {
+function addEnvio() {
     var number;
     var num;
     var enviamentForm = $(".enviamentsForm").last().clone();
@@ -209,6 +278,7 @@ function addEnv() {
         ++num;
         this.name= this.name.replace(number,num);
         this.id= this.id.replace(number,num);
+        this.value = this.value.replace(number,num);
 		$(this).attr('data-select2-id', num);
 		
         if($(this).attr("id") == "envioTooltip") {
@@ -221,6 +291,7 @@ function addEnv() {
             this.id= this.id.replace("[" + number, "[" + num);
         }
     });
+    //select
     $(enviamentForm).find("span.select2").remove();
     
     $(enviamentForm).find("select").webutilInputSelect2();
@@ -245,18 +316,20 @@ function addEnv() {
         enviamentForm.removeClass('enviamentForm_' + number).addClass('enviamentForm_' + num);
 
         var entregaPostal = $('.entregaPostal_'+number + ':last');
-	entregaPostal.removeClass('entregaPostal_'+number).addClass('entregaPostal_'+num);
-
+		entregaPostal.removeClass('entregaPostal_'+number).addClass('entregaPostal_'+num);
+		//Titol enviament
+        if (num != null) {
+        	var numPlus = num + 1;
+       		$('.envio\\['+num+'\\]:last').removeClass('envio[' + num + ']').addClass('envio[' + numPlus + ']');
+       		$('.envio\\['+numPlus+'\\]')[0].innerText = "Enviament " + numPlus;
+        }
+        
         if (i === 0){
             $(this).addClass('hidden');
         } else {
-
-
             $(this).remove();
         }
     });
-
-
     webutilModalAdjustHeight();
 }
 
@@ -270,7 +343,7 @@ function destinatarisDelete(className) {
     //Si es el primer destinatari (0)
     if (destinatari_id_num == 0) {
         $(parent).addClass('hidden');
-        $('#amagat').attr('value', 'false');
+        $('#isVisible').attr('value', 'false');
         $(parent).find("input[type='text']").val("");
     } else {
         $(parent).remove();
@@ -305,308 +378,354 @@ function mostrarEntregaPostal(className) {
 </script>
 </head>
 <body>
-    <c:forEach items="${errors}" var="error" varStatus="status">
-    <c:if test="${error.field == 'concepte'}">
-        <c:set var="errorConcepte" value="${error}"></c:set>
-    </c:if>
-    <c:if test="${fn:contains(error.field, 'enviaments')}">
-        <c:set var="errorEnviament" value="${error}"></c:set>
-    </c:if>
-    </c:forEach>
-    <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active"><a href="#dadesgeneralsForm" aria-controls="dadesgeneralsForm" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.dadesgenerals"/><c:if test="${not empty errorConcepte}"> <span class="fa fa-warning text-danger"></span></c:if></a> </li>
-        <li role="presentation"><a href="#documentForm" aria-controls="documentForm" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.document"/></a></li>
-        <li role="presentation"><a href="#enviamentsForm" aria-controls="enviamentsForm" role="tab" data-toggle="tab"><spring:message code="notificacio.form.titol.enviaments"/><c:if test="${not empty errorEnviament}"> <span class="fa fa-warning text-danger"></span></c:if></a></li>
-    </ul>
-    <br/>
     <c:set var="formAction"><not:modalUrl value="/notificacio/newOrModify"/></c:set>
     <form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" commandName="notificacioCommandV2" enctype="multipart/form-data">
-        <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="dadesgeneralsForm">
-                <div class="row dadesgeneralsForm">
-                    <div class="col-md-12">
-                    <form:hidden path="procedimentId" value="${procediment.id}"/>
-                        <not:inputText name="procedimentNom" textKey="notificacio.form.camp.procediment" value="${procediment.nom}" labelSize="2" readonly="true"/>
-                    </div>
-                    <c:if test="${not empty grups}">
-                        <div class="col-md-12">
-                            <not:inputSelect name="grupId" textKey="notificacio.form.camp.grup" optionItems="${grups}" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2"/>
-                        </div>
-                    </c:if>
-                    <div class="col-md-12">
-                        <form:hidden path="emisorDir3Codi" value="${entitat.dir3Codi}"/>
-                    </div>
-                    <div class="col-md-12">
-                        <not:inputText name="organGestor" textKey="notificacio.form.camp.organGestor" value="${procediment.organGestor}" labelSize="2" readonly="true" required="true"/>
-                    </div>
-                    <div class="col-md-6">
-                        <not:inputSelect name="enviamentTipus" textKey="notificacio.form.camp.enviamenttipus" optionItems="${enviamentTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
-                    </div>
-                    <div class="col-md-6">
-                        <not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="3" required="true" />
-                    </div>
-                    <div class="col-md-12">
-                        <not:inputTextarea name="descripcio" textKey="notificacio.form.camp.descripcio" labelSize="2"/>
-                    </div>
-                    <div class="col-md-6">
-                        <not:inputDate name="caducitat" textKey="notificacio.form.camp.caducitat" orientacio="bottom" labelSize="4" required="true"/>
-                    </div>
-                     <div class="col-md-6">
-                        <not:inputText name="numExpedient" textKey="notificacio.form.camp.expedient" labelSize="4"/>
-                    </div>
-                </div>
-                <div class="text-right col-md-12">
-                    <div class="btn-group">
-                        <button type="button" onclick="validateForm()" class="btn btn-info nextForm"><spring:message code="comu.boto.seguent"/> <span class="fa fa-forward"></span></button>
-                    </div>
-                </div>
-            </div>
-            <div role="tabpanel" class="tab-pane" id="documentForm">
-                <div class="row documentForm">
-                    <div class="col-md-6">
-                        <not:inputSelect name="tipusDocument" textKey="notificacio.form.camp.document" labelSize="4"/>
-                    </div>
-                    <div id="input-origen-csvuuid" class="col-md-6">
-                        <not:inputText name="documentArxiuUuidCsvUrl" textKey="notificacio.form.camp.csvuuid" labelSize="3"/>
-                    </div>
-                    <div id="input-origen-arxiu" class="col-md-6 hidden" >
-                        <not:inputFile  name="arxiu" textKey="notificacio.form.camp.arxiu" labelSize="3"/>
-                    </div>
-                    <div class="col-md-12">
-                        <not:inputCheckbox name="document.normalitzat" textKey="notificacio.form.camp.normalitzat" labelSize="2"/>
-                    </div>
-                    <div class="col-md-12 hidden" id="metadades">
-                    <label class="control-label" for="document.normalitzat">Metadades</label>
-						<div class="input-group input-add" style="margin-bottom: 25px;">
-                       		<input value="" class="form-control width50"/>		
-                       		<input value="" class="form-control width50"/>		
-							<span class="input-group-addon" id="add"><span class="fa fa-plus"></span></span>
+		<div class="container-fluid">
+			<div class="title">
+				<span class="fa fa-address-book"></span>
+				<label><spring:message code="notificacio.form.titol.dadesgenerals" /></label>
+				<hr/>
+			</div>
+			<form:hidden path="procedimentId" value="${procediment.id}" />
+			<form:hidden path="emisorDir3Codi" value="${entitat.dir3Codi}" />
+			<div class="row">
+				<div class="col-md-12">
+					<not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="2" required="true" />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<not:inputTextarea name="descripcio" textKey="notificacio.form.camp.descripcio" labelSize="2" />
+				</div>
+			</div>
+			<c:if test="${not empty grups}">
+				<div class="row">
+					<div class="col-md-12">
+						<not:inputSelect name="grupId" textKey="notificacio.form.camp.grup" optionItems="${grups}" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2" />
+					</div>
+				</div>
+			</c:if>
+			<div class="row">
+				<div class="col-md-6">
+					<div class="form-group">
+						<label class="control-label col-xs-4" for="enviamentTipus"><spring:message code="notificacio.form.camp.enviamenttipus" /></label>
+						<div class="controls col-xs-8">
+							<div class="col-xs-6">
+								<form:radiobutton path="enviamentTipus" value="NOTIFICACIO" checked="checked"/>
+								<spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.NOTIFICACIO" />
+							</div>
+							<div class="col-xs-6">
+								<form:radiobutton path="enviamentTipus" value="COMUNICACIO" />
+								<spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.COMUNICACIO" />
+							</div>
 						</div>
-                        <div id="list"></div>
-                    </div>
-                </div>
-                <div class="text-right col-md-12">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-info nextForm"><spring:message code="comu.boto.seguent"/> <span class="fa fa-forward"></span></button>
-                    </div>
-                </div>
-            </div>
-            <div role="tabpanel" class="tab-pane" id="enviamentsForm">
-                <c:choose>
-                <c:when test="${not empty enviosGuardats}">
-                    <c:set value="${enviosGuardats}" var="envios"></c:set>
-                </c:when>
-                <c:otherwise>
-                    <c:set value="enviaments" var="envios"></c:set>
-                </c:otherwise>
-                </c:choose>
-
-                <c:forEach items="${envios}" var="enviament" varStatus="status">
-                <c:set var="j" value="${status.index}"/>
-                <div class="newEnviament">
-                    <div class="row enviamentsForm formEnviament enviamentForm_${j}">
-                        <div class="col-md-6">
-                            <not:inputSelect name="enviaments[${j}].serveiTipus" textKey="notificacio.form.camp.serveitipus" labelSize="4" optionItems="${serveiTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
-                        </div>
-                        <div class="titular">
-                            <div class="col-md-12">
-                                <div>
-                                    <label class="text-primary">${titular}</label>
-                                </div>
-                            </div>
-                            <div class="col-md-12 separacio"><hr></div>
-                            <div class="personaForm">
-                                <div>
-                                    <div class="col-md-6">
-                           			 	<not:inputSelect name="enviaments[${j}].titular.interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="4" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-                        			</div>
-                                    <div class="col-md-6">
-                                        <not:inputText name="enviaments[${j}].titular.nif" textKey="notificacio.form.camp.titular.nif" required="true" />
-                                    </div>
-                                    <div class="col-md-6">
-                                        <not:inputText name="enviaments[${j}].titular.nom" textKey="notificacio.form.camp.titular.nom" required="true" />
-                                    </div>
-                                    <div class="col-md-6 llinatge1">
-                                        <not:inputText name="enviaments[${j}].titular.llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" />
-                                    </div>
-                                    <div class="col-md-6 llinatge2">
-                                        <not:inputText name="enviaments[${j}].titular.llinatge2" textKey="notificacio.form.camp.titular.llinatge2" />
-                                    </div>
-                                    <div class="col-md-6">
-                                        <not:inputText name="enviaments[${j}].titular.email" textKey="notificacio.form.camp.titular.email" />
-                                    </div>
-                                    <div class="col-md-6">
-                                        <not:inputText name="enviaments[${j}].titular.telefon" textKey="notificacio.form.camp.titular.telefon" />
-                                    </div>
-                                    <div class="col-md-6 dir3codi hidden">
-                                        <not:inputText name="enviaments[${j}].titular.dir3codi" textKey="notificacio.form.camp.titular.dir3codi" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="destinatari">
-                            <div class="col-md-8">
-                                <div>
-                                    <label class="text-primary">${destinatarisTitol}</label>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <hr>
-                            </div>
-                            <c:choose>
-                                <c:when test="${not empty enviosGuardats}">
-                                    <c:set value="${enviament.destinataris}" var="destinataris"></c:set>
-                                </c:when>
-                                <c:otherwise>
-                                     <c:set value="destinataris" var="destinataris"></c:set>
-                                </c:otherwise>
-                            </c:choose>
-                            <div class="newDestinatari_${j}">
-                                <c:forEach items="${destinataris}" var="destinatari" varStatus="status">
-                                    <c:set var="i" value="${status.index}"/>
-                                        <div class="col-md-12 destinatariForm hidden personaForm_${j}_${i}">
-                                            <input id="amagat" name="enviaments[${j}].destinataris[${i}].visible" class="hidden" value="true">
-                                            <div>
-                                                <div class="col-md-6">
-                           			 				<not:inputSelect name="enviaments[${j}].destinataris[${i}].interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="4" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-                        						</div>
-                                                <div class="col-md-6">
-													<not:inputText name="enviaments[${j}].destinataris[${i}].nif" textKey="notificacio.form.camp.titular.nif" required="true" />
-                                                </div>
-                                                <div class="col-md-6">
-													<not:inputText name="enviaments[${j}].destinataris[${i}].nom" textKey="notificacio.form.camp.titular.nom" required="true" />
-                                                </div>
-                                                <div class="col-md-6 llinatge1">
-													<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" />
-                                                </div>
-                                                <div class="col-md-6 llinatge2">
-													<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge2" textKey="notificacio.form.camp.titular.llinatge2" />
-                                                </div>
-                                                <div class="col-md-6">
-													<not:inputText name="enviaments[${j}].destinataris[${i}].email" textKey="notificacio.form.camp.titular.email" />
-                                                </div>
-                                                <div class="col-md-6">
-													<not:inputText name="enviaments[${j}].destinataris[${i}].telefon" textKey="notificacio.form.camp.titular.telefon" />
-                                                </div>
-                                                <div class="col-md-6 dir3codi hidden">
-													<not:inputText name="enviaments[${j}].destinataris[${i}].dir3codi" textKey="notificacio.form.camp.titular.dir3codi" />
-                                                </div>
-                                                <div class="col-md-12 text-right">
-                                                    <input type="button" class="btn btn-default btn-group delete" name="destinatarisDelete[${j}][${i}]" onclick="destinatarisDelete(this.id)" id="destinatarisDelete[${j}][${i}]" value="<spring:message code="notificacio.form.boto.eliminar.destinatari"/>"/>
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <hr>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </c:forEach>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="text-right">
-                                        <input type="button" class="btn btn-default" name="enviaments[${j}]" id="enviaments[${j}]" onclick="addDestinatari(this.id)" value="<spring:message code="notificacio.form.boto.nou.destinatari"/>"/>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-12 separacio"></div>
-                            <div class="metodeEntrega">
-                                <div class="col-md-8">
-                                    <div>
-                                        <label class="text-primary">${metodeEntrega}</label>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-12">
-                                    <not:inputCheckbox name="enviaments[${j}].entregaPostalActiva" textKey="notificacio.form.camp.entregapostal.activa" labelSize="2" funcio="mostrarEntregaPostal(this.id)"/>
-                                </div>
-                                <input id="entregaPostalAmagat" name="enviaments[${j}].entregaPostal.visible" class="hidden" value="false">
-
-                                <c:if test="${not empty enviosGuardats}">
-                                    <c:set var="entregaPostalActiva" value="${enviament.entregaPostalActiva}"></c:set>
-                                </c:if>
-                                <div id="entregaPostal" class="entregaPostal_${j}" <c:if test="${!entregaPostalActiva}">style="display:none"</c:if>>
-
-                                    <div class="col-md-12">
-                                        <div class="col-md-12">
-                                            <not:inputSelect name="enviaments[${j}].entregaPostal.tipus" textKey="notificacio.form.camp.entregapostal.tipus" required="true" labelSize="2"/>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <not:inputSelect name="enviaments[${j}].entregaPostal.tipusVia" textKey="notificacio.form.camp.entregapostal.tipusvia" required="true" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <not:inputText name="enviaments[${j}].entregaPostal.viaNom" textKey="notificacio.form.camp.entregapostal.vianom" required="true" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <not:inputText name="enviaments[${j}].entregaPostal.numeroCasa" textKey="notificacio.form.camp.entregapostal.numerocasa" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <not:inputText name="enviaments[${j}].entregaPostal.portal" textKey="notificacio.form.camp.entregapostal.portal" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <not:inputText name="enviaments[${j}].entregaPostal.escala" textKey="notificacio.form.camp.entregapostal.escala" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <not:inputText name="enviaments[${j}].entregaPostal.planta" textKey="notificacio.form.camp.entregapostal.planta" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <not:inputText name="enviaments[${j}].entregaPostal.porta" textKey="notificacio.form.camp.entregapostal.porta" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <not:inputText name="enviaments[${j}].entregaPostal.bloc" textKey="notificacio.form.camp.entregapostal.bloc" />
-                                        </div>
-                                        <div class="col-md-12">
-                                            <not:inputText name="enviaments[${j}].entregaPostal.complement" textKey="notificacio.form.camp.entregapostal.complement" labelSize="2"/>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <not:inputText name="enviaments[${j}].entregaPostal.codiPostal" textKey="notificacio.form.camp.entregapostal.codipostal" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <not:inputText name="enviaments[${j}].entregaPostal.poblacio" textKey="notificacio.form.camp.entregapostal.poblacio" />
-                                        </div>
-                                        <div class="col-md-12">
-                                            <not:inputText name="enviaments[${j}].entregaPostal.paisCodi" textKey="notificacio.form.camp.entregapostal.paiscodi" labelSize="2" inputSize="4"/>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <not:inputText name="enviaments[${j}].entregaPostal.formatSobre" textKey="notificacio.form.camp.entregapostal.formatsobre" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <not:inputText name="enviaments[${j}].entregaPostal.formatFulla" textKey="notificacio.form.camp.entregapostal.formatfulla" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <not:inputCheckbox name="enviaments[${j}].entregaDeh.obligat" textKey="notificacio.form.camp.entregapostal.deh" labelSize="2" />
-                                </div>
-                                <div class="col-md-12 text-right">
-                                    <input name="enviamentDelete[${j}]" id="enviamentDelete[${j}]" class="id_enviament hidden">
-                                    <div class="btn-group">
-                                        <input type="button" class="btn btn-default formEnviament eliminar_enviament hidden" name="enviamentDelete[${j}]"  onclick="enviamentDelete(this.id)" id="enviamentDelete[${j}]" value="<spring:message code="notificacio.form.boto.eliminar.enviament"/>"/>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <hr class="separacioEnviaments">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    </c:forEach>
-                    <div class="col-md-12 text-left">
-                        <div class="btn-group">
-                            <input type="button" class="btn btn-default" id="addEnviament" onclick="addEnv()" value="<spring:message code="notificacio.form.boto.nou.enviament"/>" />
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <hr>
-                    </div>
-                    <div class="text-right col-md-12">
-                        <div class="btn-group">
-                            <a href="<c:url value="/notificacio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
-                        </div>
-                        <div class="btn-group">
-                            <button type="submit" class="btn btn-success saveForm"><span class="fa fa-paper-plane"></span> <spring:message code="comu.boto.enviar.notificacio"/></button>
-                        </div>
-                    </div>
-            </div>
-        </div>
-    </form:form>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<not:inputDate name="enviamentDataProgramada" textKey="notificacio.form.camp.dataProgramada" info="true" messageInfo="notificacio.form.camp.dataProgramada.info" labelSize="2" inputSize="6" />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<not:inputText name="retard" textKey="notificacio.form.camp.retard" info="true" messageInfo="notificacio.form.camp.retard.info" value="${procediment.retard}" labelSize="2" inputSize="6"/>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<not:inputDate name="caducitat" textKey="notificacio.form.camp.caducitat" info="true" messageInfo="notificacio.form.camp.caducitat.info" orientacio="bottom" labelSize="2" inputSize="6" required="true" />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<not:inputText name="numExpedient" textKey="notificacio.form.camp.expedient" labelSize="2" inputSize="6" />
+				</div>
+			</div>
+		</div>
+		<div class="container-fluid">
+			<div class="title">
+				<span class="fa fa-file"></span>
+				<label><spring:message code="notificacio.form.titol.document" /></label>
+				<hr/>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					<div class="form-group">
+						<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
+						<div class="controls col-xs-8">
+							<form:hidden path="tipusDocumentDefault"/>
+							<select id="tipusDocument" name="tipusDocument" class="customSelect">
+							<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
+								<option value="${enumValue}" selected><spring:message code="tipus.document.enum.${enumValue}"/></option>
+							</c:forEach>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div id="input-origen-csvuuid" class="col-md-6">
+					<not:inputText name="documentArxiuUuidCsvUrl" textKey="notificacio.form.camp.csvuuid" labelSize="3" />
+				</div>
+				<div id="input-origen-arxiu" class="col-md-6 hidden">
+					<not:inputFile name="arxiu" textKey="notificacio.form.camp.arxiu" labelSize="3" />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<not:inputCheckbox name="document.normalitzat" textKey="notificacio.form.camp.normalitzat" info="true" messageInfo="notificacio.form.camp.normalitzat.info" labelSize="2" />
+				</div>
+			</div>
+		</div>
+		<div class="container-fluid">
+			<div class="title">
+				<span class="fa fa-vcard"></span>
+				<label><spring:message code="notificacio.form.titol.enviaments" /></label>
+				<hr/>
+			</div>
+			<c:choose>
+				<c:when test="${not empty enviosGuardats}">
+					<c:set value="${enviosGuardats}" var="envios"></c:set>
+				</c:when>
+				<c:otherwise>
+					<c:set value="enviaments" var="envios"></c:set>
+				</c:otherwise>
+			</c:choose>
+			<div class="container-envios">
+				<div class="newEnviament">
+				<c:forEach items="${envios}" var="enviament" varStatus="status">
+					<c:set var="j" value="${status.index}" />
+					<c:set var="k" value="${status.index + 1}" />
+						<div class="row enviamentsForm formEnviament enviamentForm_${j}">
+							<div class="col-md-12">
+								<label class="envio[${k}] badge badge-light">Enviament ${k}</label>
+							</div>
+							<div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label class="control-label col-xs-4" for="enviaments[${j}].serveiTipus"><spring:message code="notificacio.form.camp.serveitipus" /></label>
+									<div class="controls col-xs-8">
+										<div class="col-xs-6">
+											<form:radiobutton path="enviaments[${j}].serveiTipus" value="NORMAL" checked="checked"/>
+											<spring:message code="es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto.NORMAL" />
+										</div>
+										<div class="col-xs-6">
+											<form:radiobutton path="enviaments[${j}].serveiTipus" value="URGENT" />
+											<spring:message code="es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto.URGENT" />
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="titular">
+								<div class="col-md-12 title-envios">
+									<div class="title-container">
+										<label>${titular}</label>
+									</div>
+									<hr/>
+								</div>
+								<div class="personaForm">
+									<div>
+										<div class="col-md-6">
+											<not:inputSelect name="enviaments[${j}].titular.interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="4" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+										</div>
+										<div class="col-md-6">
+											<not:inputText name="enviaments[${j}].titular.nif" textKey="notificacio.form.camp.titular.nif" required="true" />
+										</div>
+										<div class="col-md-6">
+											<not:inputText name="enviaments[${j}].titular.nom" textKey="notificacio.form.camp.titular.nom" required="true" />
+										</div>
+										<div class="col-md-6 llinatge1">
+											<not:inputText name="enviaments[${j}].titular.llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" />
+										</div>
+										<div class="col-md-6 llinatge2">
+											<not:inputText name="enviaments[${j}].titular.llinatge2" textKey="notificacio.form.camp.titular.llinatge2" />
+										</div>
+										<div class="col-md-6">
+											<not:inputText name="enviaments[${j}].titular.email" textKey="notificacio.form.camp.titular.email" />
+										</div>
+										<div class="col-md-6">
+											<not:inputText name="enviaments[${j}].titular.telefon" textKey="notificacio.form.camp.titular.telefon" />
+										</div>
+										<div class="col-md-6 dir3codi hidden">
+											<not:inputText name="enviaments[${j}].titular.dir3codi" textKey="notificacio.form.camp.titular.dir3codi" />
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="destinatari">
+								<div class="col-md-12 title-envios">
+									<div class="title-container">
+										<label> ${destinatarisTitol} </label>
+									</div>
+									<hr/>
+								</div>
+								<c:choose>
+									<c:when test="${not empty enviosGuardats}">
+										<c:set value="${enviament.destinataris}" var="destinataris"></c:set>
+									</c:when>
+									<c:otherwise>
+										<c:set value="destinataris" var="destinataris"></c:set>
+									</c:otherwise>
+								</c:choose>
+								<div class="newDestinatari_${j} dest">
+									<c:forEach items="${destinataris}" var="destinatari"
+										varStatus="status">
+										<c:set var="i" value="${status.index}" />
+										<c:choose>
+											<c:when test="${isVisible == true}">
+												<c:set value="" var="visible"></c:set>
+											</c:when>
+											<c:otherwise>
+												<c:set value="hidden" var="visible"></c:set>
+											</c:otherwise>
+										</c:choose>
+										<div class="col-md-12 destinatariForm ${visible} personaForm_${j}_${i}">
+											<input id="isVisible" name="enviaments[${j}].destinataris[${i}].visible" class="hidden" value="false">
+												<div class="col-md-3">
+													<not:inputSelect name="enviaments[${j}].destinataris[${i}].interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="12" inputSize="12" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+												</div>
+												<div class="col-md-3">
+													<not:inputText name="enviaments[${j}].destinataris[${i}].nif" textKey="notificacio.form.camp.titular.nif" labelSize="12" inputSize="12" required="true" />
+												</div>
+												<div class="col-md-3">
+													<not:inputText name="enviaments[${j}].destinataris[${i}].nom" textKey="notificacio.form.camp.titular.nom" labelSize="12" inputSize="12" required="true" />
+												</div>
+												<div class="col-md-3 llinatge1">
+													<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge1" textKey="notificacio.form.camp.titular.llinatge1" labelSize="12" inputSize="12" required="true" />
+												</div>
+												<div class="col-md-3 llinatge2">
+													<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge2" textKey="notificacio.form.camp.titular.llinatge2" labelSize="12" inputSize="12"/>
+												</div>
+												<div class="col-md-3">
+													<not:inputText name="enviaments[${j}].destinataris[${i}].telefon" textKey="notificacio.form.camp.titular.telefon" labelSize="12" inputSize="12"/>
+												</div>
+												<div class="col-md-4">
+													<not:inputText name="enviaments[${j}].destinataris[${i}].email" textKey="notificacio.form.camp.titular.email" labelSize="12" inputSize="12"/>
+												</div>
+												<div class="col-md-3 dir3codi hidden">
+													<not:inputText name="enviaments[${j}].destinataris[${i}].dir3codi" textKey="notificacio.form.camp.titular.dir3codi" labelSize="12" inputSize="12"/>
+												</div>
+												<div class="col-md-2 offset-col-md-2">
+													<div class="float-right">
+														<input type="button" class="btn btn-danger btn-group delete" name="destinatarisDelete[${j}][${i}]" onclick="destinatarisDelete(this.id)" id="destinatarisDelete[${j}][${i}]" value="<spring:message code="notificacio.form.boto.eliminar.destinatari"/>" />
+													</div>
+												</div>
+												<div class="col-md-12">
+													<hr style="border-top: 1px dotted #BBB">
+												</div>
+										</div>
+									</c:forEach>
+								</div>
+								<div class="col-md-12">
+									<div class="text-left">	
+										<input type="button" class="btn btn-default" name="enviaments[${j}]" id="enviaments[${j}]" onclick="addDestinatari(this.id)" value="<spring:message code="notificacio.form.boto.nou.destinatari"/>" />
+									</div>
+								</div>
+							</div>
+							<div class="col-md-12 separacio"></div>
+							<div class="metodeEntrega">
+								<div class="col-md-12 title-envios">
+									<div class="title-container entrega">
+										<label> ${metodeEntrega} </label>
+									</div>
+									<hr/>
+								</div>
+								<div class="col-md-12">
+									<p class="comentari col-xs-offset-"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
+									<not:inputCheckbox name="enviaments[${j}].entregaPostalActiva" textKey="notificacio.form.camp.entregapostal.activa" labelSize="2" funcio="mostrarEntregaPostal(this.id)" />
+								</div>
+								<input id="entregaPostalAmagat" name="enviaments[${j}].entregaPostal.visible" class="hidden" value="false">
+	
+								<c:if test="${not empty enviosGuardats}">
+									<c:set var="entregaPostalActiva" value="${enviament.entregaPostalActiva}"></c:set>
+								</c:if>
+								<div id="entregaPostal" class="entregaPostal_${j}"
+									<c:if test="${!entregaPostalActiva}">style="display:none"</c:if>>
+	
+									<div class="col-md-12">
+										<div class="col-md-12">
+											<not:inputSelect name="enviaments[${j}].entregaPostal.tipus" textKey="notificacio.form.camp.entregapostal.tipus" required="true" labelSize="2" />
+										</div>
+										<div class="col-md-4">
+											<not:inputSelect name="enviaments[${j}].entregaPostal.tipusVia" textKey="notificacio.form.camp.entregapostal.tipusvia" labelSize="6"  inputSize="6" required="true" />
+										</div>
+										<div class="col-md-5">
+											<not:inputText name="enviaments[${j}].entregaPostal.viaNom" textKey="notificacio.form.camp.entregapostal.vianom" labelSize="4"  inputSize="7" required="true" />
+										</div>
+										<div class="col-md-3">
+											<not:inputText name="enviaments[${j}].entregaPostal.numeroCasa" textKey="notificacio.form.camp.entregapostal.numerocasa" labelSize="6"  inputSize="6" />
+										</div>
+										<div class="col-md-3">
+											<not:inputText name="enviaments[${j}].entregaPostal.portal" textKey="notificacio.form.camp.entregapostal.portal" labelSize="8"  inputSize="4" />
+										</div>
+										<div class="col-md-3">
+											<not:inputText name="enviaments[${j}].entregaPostal.escala" textKey="notificacio.form.camp.entregapostal.escala" labelSize="4"  inputSize="6" />
+										</div>
+										<div class="col-md-3">
+											<not:inputText name="enviaments[${j}].entregaPostal.planta" textKey="notificacio.form.camp.entregapostal.planta" labelSize="4"  inputSize="6" />
+										</div>
+										<div class="col-md-3">
+											<not:inputText name="enviaments[${j}].entregaPostal.porta" textKey="notificacio.form.camp.entregapostal.porta"labelSize="6"  inputSize="6" />
+										</div>
+										<div class="col-md-3">
+											<not:inputText name="enviaments[${j}].entregaPostal.bloc" textKey="notificacio.form.camp.entregapostal.bloc" labelSize="8"  inputSize="4" />
+										</div>
+										<div class="col-md-3">
+											<not:inputText name="enviaments[${j}].entregaPostal.complement" textKey="notificacio.form.camp.entregapostal.complement" labelSize="4"  inputSize="6" />
+										</div>
+										<div class="col-md-3">
+											<not:inputText name="enviaments[${j}].entregaPostal.codiPostal" textKey="notificacio.form.camp.entregapostal.codipostal" labelSize="5"  inputSize="5"/>
+										</div>
+										<div class="col-md-3">
+											<not:inputText name="enviaments[${j}].entregaPostal.poblacio" textKey="notificacio.form.camp.entregapostal.poblacio" />
+										</div>
+										<div class="col-md-3">
+											<not:inputText name="enviaments[${j}].entregaPostal.paisCodi" textKey="notificacio.form.camp.entregapostal.paiscodi" labelSize="8"  inputSize="4"/>
+										</div>
+										<!-- 
+										<div class="col-md-6">
+											<not:inputText name="enviaments[${j}].entregaPostal.formatSobre" textKey="notificacio.form.camp.entregapostal.formatsobre" />
+										</div>
+										<div class="col-md-6">
+											<not:inputText name="enviaments[${j}].entregaPostal.formatFulla" textKey="notificacio.form.camp.entregapostal.formatfulla" />
+										</div>
+										-->
+									</div>
+								</div>
+								<div class="col-md-12">
+									<not:inputCheckbox name="enviaments[${j}].entregaDeh.obligat" textKey="notificacio.form.camp.entregapostal.deh" labelSize="2" />
+								</div>
+								<div class="col-md-12 text-right">
+									<input name="enviamentDelete[${j}]" id="enviamentDelete[${j}]" class="id_enviament hidden">
+									<div class="btn-group">
+										<input type="button" class="btn btn-default formEnviament eliminar_enviament hidden" name="enviamentDelete[${j}]" onclick="enviamentDelete(this.id)" id="enviamentDelete[${j}]" value="<spring:message code="notificacio.form.boto.eliminar.enviament"/>" />
+									</div>
+								</div>
+							</div>
+						</div>
+						</div>
+				</c:forEach>
+				</div>
+			</div>
+			<div class="text-left">
+				<div class="btn-group">
+					<input type="button" class="btn btn-default" id="addEnviament" onclick="addEnvio()" value="<spring:message code="notificacio.form.boto.nou.enviament"/>" />
+				</div>
+			</div>
+			<div class="col-md-12">
+				<hr>
+			</div>
+			<div class="text-right col-md-12">
+				<div class="btn-group">
+					<a href="<c:url value="/notificacio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar" /></a>
+				</div>
+				<div class="btn-group">
+					<button type="submit" class="btn btn-success saveForm">
+						<span class="fa fa-paper-plane"></span>
+						<spring:message code="comu.boto.enviar.notificacio" />
+					</button>
+				</div>
+			</div>
+		</div>
+	</form:form>
 
 </body> 
