@@ -24,7 +24,7 @@ public class Persona {
 	private String telefon;
 	private String email;
 	private String raoSocial;
-	private String dir3codi;
+	private String dir3Codi;
 	
 	
 	public InteressatTipusEnumDto getInteressatTipus() {
@@ -75,10 +75,10 @@ public class Persona {
 	public void setRaoSocial(String raoSocial) {
 		this.raoSocial = raoSocial;
 	}
-	public String getDir3codi() {
-		return dir3codi;
+	public String getDir3Codi() {
+		return dir3Codi;
 	}
-	public void setDir3codi(String dir3codi) {
-		this.dir3codi = dir3codi;
+	public void setDir3Codi(String dir3Codi) {
+		this.dir3Codi = dir3Codi;
 	}
 }

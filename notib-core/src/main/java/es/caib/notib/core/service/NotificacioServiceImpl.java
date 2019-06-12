@@ -280,7 +280,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						enviament.getTitular().getNom(), 
 						enviament.getTitular().getTelefon(),
 						enviament.getTitular().getRaoSocial(),
-						enviament.getTitular().getDir3codi()).build());
+						enviament.getTitular().getDir3Codi()).build());
 				
 				List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
 				for(Persona persona: enviament.getDestinataris()) {
@@ -294,7 +294,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 								persona.getNom(), 
 								persona.getTelefon(),
 								persona.getRaoSocial(),
-								persona.getDir3codi()).build());
+								persona.getDir3Codi()).build());
 						destinataris.add(destinatari);
 					}
 				}
