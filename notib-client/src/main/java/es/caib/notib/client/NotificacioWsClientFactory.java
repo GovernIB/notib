@@ -16,7 +16,6 @@ import javax.xml.namespace.QName;
 import org.jboss.mx.util.MBeanProxyCreationException;
 
 import es.caib.loginModule.client.AuthenticationFailureException;
-import es.caib.notib.ws.notificacio.NotificacioService;
 import es.caib.notib.ws.notificacio.NotificacioServiceV2;
 
 /**
