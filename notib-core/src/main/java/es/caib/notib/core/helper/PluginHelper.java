@@ -831,10 +831,12 @@ public class PluginHelper {
 					notificacio.getEmisorDir3Codi(),
 					notificacio.getProcediment().getOrganGestor());
 		}
+		
+		if (notificacio.getProcediment().getOficina() != null) {
+			dadesOficina.setOficina(notificacio.getProcediment().getOficina());
+		}
 		//oficina virtual
-//		if (notificacio.getProcediment().getOficina() != null) {
-//			dadesOficina.setOficina(notificacio.getProcediment().getOficina());
-//		} else if (llibreOficina != null && ! llibreOficina.) {
+//		else if (llibreOficina != null && ! llibreOficina.) {
 //			String oficinaCodi = llibreOficina.get(0).getOficina().getCodi();
 //			dadesOficina.setOficina(oficinaCodi);
 //		}

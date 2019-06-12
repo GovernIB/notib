@@ -683,12 +683,12 @@ function mostrarEntregaPostal(className) {
 										</div>
 										<c:if test="${not empty formatsFulla}">
 											<div class="col-md-4">
-												<not:inputSelect name="enviaments[${j}].entregaPostal.formatFulla" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatfulla" optionItems="${formatsFulla}" optionValueAttribute="id" optionTextAttribute="codi" labelSize="6"  inputSize="6"/>
+												<not:inputSelect name="enviaments[${j}].entregaPostal.formatFulla" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatfulla" optionItems="${formatsFulla}" optionValueAttribute="codi" optionTextAttribute="codi" labelSize="6"  inputSize="6"/>
 											</div>
 										</c:if>
 										<c:if test="${not empty formatsSobre}">
 											<div class="col-md-4">
-												<not:inputSelect name="enviaments[${j}].entregaPostal.formatSobre" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatsobre" optionItems="${formatsSobre}" optionValueAttribute="id" optionTextAttribute="codi" labelSize="6"  inputSize="6"/>
+												<not:inputSelect name="enviaments[${j}].entregaPostal.formatSobre" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatsobre" optionItems="${formatsSobre}" optionValueAttribute="codi" optionTextAttribute="codi" labelSize="6"  inputSize="6"/>
 											</div>
 										</c:if>
 									</div>

@@ -251,12 +251,33 @@ public class NotificacioController extends BaseUserController {
 			@Valid NotificacioCommandV2 notificacioCommand,
 			BindingResult bindingResult, 
 			Model model) throws IOException {
+		List<String> tipusDocumentEnumDto = new ArrayList<String>();
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		ProcedimentDto procedimentActual = procedimentService.findById(
 				null, 
 				isAdministrador(request), 
 				notificacioCommand.getProcedimentId());
 		notificacioCommand.setUsuariCodi(aplicacioService.getUsuariActual().getCodi());
 		if (bindingResult.hasErrors()) {
+			if (procedimentActual.getPagadorcie() != null) {
+				model.addAttribute("formatsFulla", pagadorCieFormatFullaService.findFormatFullaByPagadorCie(procedimentActual.getPagadorcie().getId()));
+				model.addAttribute("formatsSobre", pagadorCieFormatSobreService.findFormatSobreByPagadorCie(procedimentActual.getPagadorcie().getId()));
+			}
+			
+			List<TipusDocumentDto>  tipusDocuments =  entitatService.findTipusDocumentByEntitat(entitatActual.getId());
+			TipusDocumentEnumDto tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
+
+			if (tipusDocuments != null) {
+				for (TipusDocumentDto tipusDocument: tipusDocuments) {
+					tipusDocumentEnumDto.add(tipusDocument.getTipusDocEnum().name());
+				}
+				if (tipusDocumentDefault != null) {
+					notificacioCommand.setTipusDocumentDefault(tipusDocumentDefault.name());
+				}
+			}
+			
+			model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
+			
 			model.addAttribute("comunicacioTipus", 
 					EnumHelper.getOptionsForEnum(
 							NotificacioComunicacioTipusEnumDto.class,
