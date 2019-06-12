@@ -375,18 +375,20 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				
 				
 				List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
-				for(Persona persona: enviament.getDestinataris()) {
-					PersonaEntity destinatari = personaRepository.save(PersonaEntity.getBuilderV2(
-							persona.getInteressatTipus(),
-							persona.getEmail(), 
-							persona.getLlinatge1(), 
-							persona.getLlinatge2(), 
-							persona.getNif(), 
-							persona.getNom(), 
-							persona.getTelefon(),
-							persona.getRaoSocial(),
-							persona.getDir3Codi()).build());
-					destinataris.add(destinatari);
+				if (enviament.getDestinataris() != null) {
+					for(Persona persona: enviament.getDestinataris()) {
+						PersonaEntity destinatari = personaRepository.save(PersonaEntity.getBuilderV2(
+								persona.getInteressatTipus(),
+								persona.getEmail(), 
+								persona.getLlinatge1(), 
+								persona.getLlinatge2(), 
+								persona.getNif(), 
+								persona.getNom(), 
+								persona.getTelefon(),
+								persona.getRaoSocial(),
+								persona.getDir3Codi()).build());
+						destinataris.add(destinatari);
+					}
 				}
 				EntregaPostalViaTipusEnum viaTipus = null;
 				
@@ -418,6 +420,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				enviamentSaved.updateNotificaReferencia(referencia);
 				EnviamentReferencia enviamentReferencia = new EnviamentReferencia();
 				enviamentReferencia.setReferencia(referencia);
+				enviamentReferencia.setTitularNif(titular.getNif().toUpperCase());
 				referencies.add(enviamentReferencia);
 				notificacioGuardada.addEnviament(enviamentSaved);
 			}
