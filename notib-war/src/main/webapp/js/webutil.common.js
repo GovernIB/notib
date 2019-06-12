@@ -413,9 +413,11 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 			orientation: $(this).data('orientacio'),
 			language: $(this).data('idioma')
 		}).on('show', function() {
-			webutilModalAdjustHeight();
+			if($(this).data('custom') != true) 
+				webutilModalAdjustHeight();
 		}).on('hide', function() {
-			webutilModalAdjustHeight();
+			if($(this).data('custom') != true) 
+				webutilModalAdjustHeight();
 		});
 		$('.input-group-addon', $(this).parent()).click(function() {
 			$('[data-toggle="datepicker"]', $(this).parent()).datepicker('show');

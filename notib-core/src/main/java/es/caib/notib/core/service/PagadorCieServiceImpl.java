@@ -62,12 +62,8 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	@Override
 	public PagadorCieDto update(PagadorCieDto cie) throws NotFoundException {
 		logger.debug("Actualitzant pagador cie ("
-				+ "pagador=" + cie + ")");
-		
-				
+				+ "pagador=" + cie + ")");	
 		PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(cie.getId());
-		
-		
 		pagadorCieEntity.update(
 						cie.getDir3codi(),
 						cie.getContracteDataVig());
@@ -81,9 +77,7 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 
 	@Override
 	public PagadorCieDto delete(Long id) throws NotFoundException {
-		
 		PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(id);
-		
 		
 		pagadorCieReposity.delete(id);
 		return conversioTipusHelper.convertir(
@@ -93,7 +87,6 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 
 	@Override
 	public PagadorCieDto findById(Long id) {
-		
 		PagadorCieEntity pagadorCieEntity = pagadorCieReposity.findOne(id);
 		
 		return conversioTipusHelper.convertir(
@@ -104,7 +97,6 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	@Override
 	public PaginaDto<PagadorCieDto> findAmbFiltrePaginat(Long entitatId, PagadorCieFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
-		
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
@@ -139,7 +131,6 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 
 	@Override
 	public PaginaDto<PagadorCieDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	

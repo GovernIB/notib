@@ -1,13 +1,12 @@
 package es.caib.notib.core.api.dto;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class PagadorCieFormatSobreDto extends AuditoriaDto implements Serializable{
 
 	private Long id;
 	private String codi;
-	private Date pagadorCieId;	
+	private Long pagadorCieId;	
 
 	public Long getId() {
 		return id;
@@ -21,12 +20,12 @@ public class PagadorCieFormatSobreDto extends AuditoriaDto implements Serializab
 	public void setCodi(String codi) {
 		this.codi = codi;
 	}
-	public Date getPagadorCieId() {
+	public Long getPagadorCieId() {
 		return pagadorCieId;
 	}
-	public void setPagadorCieId(Date pagadorCieId) {
+	public void setPagadorCieId(Long pagadorCieId) {
 		this.pagadorCieId = pagadorCieId;
 	}
-	
+
 	private static final long serialVersionUID = -2057306471713763412L;
 }

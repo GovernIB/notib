@@ -7,6 +7,7 @@
 <%@ attribute name="messageInfo" required="false" rtexprvalue="true"%>
 <%@ attribute name="info" required="false" rtexprvalue="true"%>
 <%@ attribute name="orientacio" required="false" rtexprvalue="true"%>
+<%@ attribute name="custom" required="false" rtexprvalue="true"%>
 <%@ attribute name="textKey" required="false" rtexprvalue="true"%>
 <%@ attribute name="placeholder" required="false" rtexprvalue="true"%>
 <%@ attribute name="placeholderKey" required="false" rtexprvalue="true"%>
@@ -33,11 +34,19 @@
    </c:otherwise>
 </c:choose>
 <c:choose>
+   <c:when test="${not empty custom}">
+   	<c:set value="${custom}" var="custom"></c:set>
+   </c:when>
+   <c:otherwise>
+    <c:set value="false" var="custom"></c:set>
+   </c:otherwise>
+</c:choose>
+<c:choose>
 	<c:when test="${not inline}">
 		<label class="control-label col-xs-${campLabelSize}" for="${campPath}">${campLabelText}</label>
 		<div class="col-xs-${campInputSize}">
 			<div class="input-group" style="width:100%">
-				<form:input path="${campPath}" cssClass="form-control datepicker" id="${campPath}" disabled="${disabled}" data-toggle="datepicker" data-idioma="${idioma}" data-orientacio="${orientacio}"/>
+				<form:input path="${campPath}" cssClass="form-control datepicker" id="${campPath}" disabled="${disabled}" data-toggle="datepicker" data-idioma="${idioma}" data-orientacio="${orientacio}" data-custom="${custom}"/>
 				<span class="input-group-addon" style="width:1%"><span class="fa fa-calendar"></span></span>
 			</div>
 			<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>

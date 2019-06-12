@@ -27,6 +27,8 @@ import es.caib.notib.core.entity.GrupProcedimentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.PagadorCieEntity;
+import es.caib.notib.core.entity.PagadorCieFormatFullaEntity;
+import es.caib.notib.core.entity.PagadorCieFormatSobreEntity;
 import es.caib.notib.core.entity.PagadorPostalEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
@@ -35,6 +37,8 @@ import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.PagadorCieFormatFullaRepository;
+import es.caib.notib.core.repository.PagadorCieFormatSobreRepository;
 import es.caib.notib.core.repository.PagadorCieRepository;
 import es.caib.notib.core.repository.PagadorPostalRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
@@ -58,6 +62,10 @@ public class EntityComprovarHelper {
 	private PagadorPostalRepository pagadorPostalRepository;
 	@Resource
 	private PagadorCieRepository pagadorCieRepository;
+	@Resource
+	private PagadorCieFormatFullaRepository pagadorCieFormatFullaRepository;
+	@Resource
+	private PagadorCieFormatSobreRepository pagadorCieFormatSobreRepository;
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
 	@Resource
@@ -266,6 +274,30 @@ public class EntityComprovarHelper {
 		}
 		
 		return pagadorCie;
+	}
+	
+	public PagadorCieFormatFullaEntity comprovarPagadorCieFormatFulla(
+			Long formatFullaId) {
+		PagadorCieFormatFullaEntity pagadorCieFormatFulla = pagadorCieFormatFullaRepository.findOne(formatFullaId);
+		if (pagadorCieFormatFulla == null) {
+			throw new NotFoundException(
+					formatFullaId,
+					PagadorPostalEntity.class);
+		}
+		
+		return pagadorCieFormatFulla;
+	}
+	
+	public PagadorCieFormatSobreEntity comprovarPagadorCieFormatSobre(
+			Long formatSobreId) {
+		PagadorCieFormatSobreEntity pagadorCieFormatSobre = pagadorCieFormatSobreRepository.findOne(formatSobreId);
+		if (pagadorCieFormatSobre == null) {
+			throw new NotFoundException(
+					formatSobreId,
+					PagadorPostalEntity.class);
+		}
+		
+		return pagadorCieFormatSobre;
 	}
 	
 	public GrupProcedimentEntity comprovarGrupProcediment(

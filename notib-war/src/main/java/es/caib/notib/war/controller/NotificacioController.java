@@ -58,6 +58,8 @@ import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
+import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.MarcarProcessatCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
@@ -94,6 +96,10 @@ public class NotificacioController extends BaseUserController {
 	private EnviamentService enviamentService;
 	@Autowired
 	private GrupService grupService;
+	@Autowired
+	private PagadorCieFormatSobreService pagadorCieFormatSobreService;
+	@Autowired
+	private PagadorCieFormatFullaService pagadorCieFormatFullaService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -742,7 +748,10 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("amagat", Boolean.FALSE);
 		
 		model.addAttribute("grups", grupService.findByProcedimentGrups(procedimentId));
-		
+		if (procedimentActual.getPagadorcie() != null) {
+			model.addAttribute("formatsFulla", pagadorCieFormatFullaService.findFormatFullaByPagadorCie(procedimentActual.getPagadorcie().getId()));
+			model.addAttribute("formatsSobre", pagadorCieFormatSobreService.findFormatSobreByPagadorCie(procedimentActual.getPagadorcie().getId()));
+		}
 		model.addAttribute("comunicacioTipus", 
 				EnumHelper.getOptionsForEnum(
 						NotificacioComunicacioTipusEnumDto.class,

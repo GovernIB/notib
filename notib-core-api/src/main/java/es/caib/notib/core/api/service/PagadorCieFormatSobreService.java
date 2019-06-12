@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorCieFormatSobreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
@@ -19,7 +18,7 @@ public interface PagadorCieFormatSobreService {
 
 	/**
 	 * Crea un nou format de sobre per un pagador cie.
-	 * @param entitatId	
+	 * @param pagadorCieId	
 	 * 				Informació de l'entitat actual.
 	 * @param cie
 	 * 				Informació del pagador cie a crear
@@ -27,7 +26,7 @@ public interface PagadorCieFormatSobreService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public PagadorCieFormatSobreDto create(
-			Long entitatId,
+			Long pagadorCieId,
 			PagadorCieFormatSobreDto formatSobre);
 
 	/**
@@ -72,6 +71,14 @@ public interface PagadorCieFormatSobreService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<PagadorCieFormatSobreDto> findAll();
+	
+	/**
+	 * Llistat amb tots els formats de sobre d'un pagador cie.
+	 * 
+	 * @return La llista dels pagadors cie.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public List<PagadorCieFormatSobreDto> findFormatSobreByPagadorCie(Long pagadorCieId);
 
 	/**
 	 * Llistat amb tots els formats de sobre d'un pagadro cie paginats.
@@ -81,7 +88,9 @@ public interface PagadorCieFormatSobreService {
 	 * @return La pàgina de pagadors cie.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
-	public PaginaDto<PagadorCieFormatSobreDto> findAllPaginat(PaginacioParamsDto paginacioParams);
+	public PaginaDto<PagadorCieFormatSobreDto> findAllPaginat(
+			Long pagadorCieId,
+			PaginacioParamsDto paginacioParams);
 
 	
 }

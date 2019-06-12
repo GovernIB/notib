@@ -62,8 +62,17 @@ public class PagadorCieFormatFullaServiceBean implements PagadorCieFormatFullaSe
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
-	public PaginaDto<PagadorCieFormatFullaDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
-		return delegate.findAllPaginat(paginacioParams);
+	public PaginaDto<PagadorCieFormatFullaDto> findAllPaginat(
+			Long pagadorCieId,
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findAllPaginat(
+				pagadorCieId,
+				paginacioParams);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	public List<PagadorCieFormatFullaDto> findFormatFullaByPagadorCie(Long pagadorCieId) {
+		return delegate.findFormatFullaByPagadorCie(pagadorCieId);
+	}
 }

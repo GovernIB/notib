@@ -681,14 +681,16 @@ function mostrarEntregaPostal(className) {
 										<div class="col-md-3">
 											<not:inputText name="enviaments[${j}].entregaPostal.paisCodi" textKey="notificacio.form.camp.entregapostal.paiscodi" labelSize="8"  inputSize="4"/>
 										</div>
-										<!-- 
-										<div class="col-md-6">
-											<not:inputText name="enviaments[${j}].entregaPostal.formatSobre" textKey="notificacio.form.camp.entregapostal.formatsobre" />
-										</div>
-										<div class="col-md-6">
-											<not:inputText name="enviaments[${j}].entregaPostal.formatFulla" textKey="notificacio.form.camp.entregapostal.formatfulla" />
-										</div>
-										-->
+										<c:if test="${not empty formatsFulla}">
+											<div class="col-md-4">
+												<not:inputSelect name="enviaments[${j}].entregaPostal.formatFulla" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatfulla" optionItems="${formatsFulla}" optionValueAttribute="id" optionTextAttribute="codi" labelSize="6"  inputSize="6"/>
+											</div>
+										</c:if>
+										<c:if test="${not empty formatsSobre}">
+											<div class="col-md-4">
+												<not:inputSelect name="enviaments[${j}].entregaPostal.formatSobre" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatsobre" optionItems="${formatsSobre}" optionValueAttribute="id" optionTextAttribute="codi" labelSize="6"  inputSize="6"/>
+											</div>
+										</c:if>
 									</div>
 								</div>
 								<div class="col-md-12">

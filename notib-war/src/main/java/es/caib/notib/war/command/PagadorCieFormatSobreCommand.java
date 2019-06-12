@@ -5,7 +5,7 @@ import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import es.caib.notib.core.api.dto.PagadorCieDto;
+import es.caib.notib.core.api.dto.PagadorCieFormatSobreDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
 /**
@@ -18,7 +18,7 @@ public class PagadorCieFormatSobreCommand {
 	private Long id;
 	@NotEmpty @Size(max=64)
 	private String codi;
-	private String pagadorCieId;
+	private Long pagadorCieId;
 	
 	public Long getId() {
 		return id;
@@ -32,13 +32,13 @@ public class PagadorCieFormatSobreCommand {
 	public void setCodi(String codi) {
 		this.codi = codi;
 	}
-	public String getPagadorCieId() {
+	public Long getPagadorCieId() {
 		return pagadorCieId;
 	}
-	public void setPagadorCieId(String pagadorCieId) {
+	public void setPagadorCieId(Long pagadorCieId) {
 		this.pagadorCieId = pagadorCieId;
 	}
-	public static PagadorCieFormatSobreCommand asCommand(PagadorCieDto dto) {
+	public static PagadorCieFormatSobreCommand asCommand(PagadorCieFormatSobreDto dto) {
 		if (dto == null) {
 			return null;
 		}
@@ -47,13 +47,13 @@ public class PagadorCieFormatSobreCommand {
 				PagadorCieFormatSobreCommand.class );
 		return command;
 	}
-	public static PagadorCieDto asDto(PagadorCieFormatSobreCommand command) {
+	public static PagadorCieFormatSobreDto asDto(PagadorCieFormatSobreCommand command) {
 		if (command == null) {
 			return null;
 		}
-		PagadorCieDto dto = ConversioTipusHelper.convertir(
+		PagadorCieFormatSobreDto dto = ConversioTipusHelper.convertir(
 				command,
-				PagadorCieDto.class);
+				PagadorCieFormatSobreDto.class);
 		return dto;
 	}
 

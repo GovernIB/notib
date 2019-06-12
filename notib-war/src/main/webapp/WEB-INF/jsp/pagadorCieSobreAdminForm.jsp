@@ -6,8 +6,8 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <c:choose>
-	<c:when test="${empty procedimentCommand.codi}"><c:set var="titol"><spring:message code="pagadorcie.form.titol.crear"/></c:set></c:when>
-	<c:otherwise><c:set var="titol"><spring:message code="pagadorcie.form.titol.modificar"/></c:set></c:otherwise>
+	<c:when test="${empty pagadorCieFormatSobreCommand.id}"><c:set var="titol"><spring:message code="pagadorcie.form.format.sobre.titol.crear"/></c:set></c:when>
+	<c:otherwise><c:set var="titol"><spring:message code="pagadorcie.form.format.sobre.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
 <html>
 <head>
@@ -29,26 +29,18 @@
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<not:modalHead/>
-<style type="text/css">
-.modal-body {
-	height: 300px !important;
-}
-</style>
 </head>
 <body>
-	<c:set var="formAction"><not:modalUrl value="/pagadorCie/newOrModify"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="pagadorCieCommand" role="form">
+	<c:set var="formAction"><not:modalUrl value="/pagadorCie/${pagadorCie.id}/formats/sobre/newOrModify"/></c:set>
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="pagadorCieFormatSobreCommand" role="form">
 		<form:hidden path="id"/>
 		<div class="row">
 			<div class="col-md-2">
-				<not:inputText name="dir3codi" textKey="pagadorcie.form.camp.dir3codi"/>
-			</div>
-			<div class="col-md-2">
-				<not:inputDate name="contracteDataVig" disabled="false" textKey="pagadorcie.form.camp.contracteDataVig" custom="true"/>
+				<not:inputText name="codi" textKey="pagadorcie.form.format.sobre.camp.codi"/>
 			</div>
 			<div id="modal-botons">
 				<button id="addPagadorCieButton" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
-				<a href="<c:url value="/pagadorcie"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+				<a href="<c:url value="/pagadorcie/${pagadorCie.id}/formats/sobre"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 			</div>	
 		</div>
 	</form:form>

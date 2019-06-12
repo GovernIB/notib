@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorCieFormatFullaDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
@@ -72,6 +71,14 @@ public interface PagadorCieFormatFullaService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<PagadorCieFormatFullaDto> findAll();
+	
+	/**
+	 * Llistat amb tots els formats de fulla d'un pagador cie.
+	 * 
+	 * @return La llista dels pagadors cie.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public List<PagadorCieFormatFullaDto> findFormatFullaByPagadorCie(Long pagadorCieId);
 
 	/**
 	 * Llistat amb tots els formats de fulla d'un pagadro cie paginats.
@@ -81,7 +88,9 @@ public interface PagadorCieFormatFullaService {
 	 * @return La pàgina de pagadors cie.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
-	public PaginaDto<PagadorCieFormatFullaDto> findAllPaginat(PaginacioParamsDto paginacioParams);
+	public PaginaDto<PagadorCieFormatFullaDto> findAllPaginat(
+			Long pagadorCieId,
+			PaginacioParamsDto paginacioParams);
 
 	
 }

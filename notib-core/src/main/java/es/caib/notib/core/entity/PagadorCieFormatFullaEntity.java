@@ -39,11 +39,8 @@ public class PagadorCieFormatFullaEntity extends NotibAuditable<Long> {
 		return pagadorCie;
 	}
 
-	public void update(
-			String codi,
-			PagadorCieEntity pagadorCie) {
+	public void update(String codi) {
 		this.codi = codi;
-		this.pagadorCie = pagadorCie;
 	}
 	
 	public static Builder getBuilder(

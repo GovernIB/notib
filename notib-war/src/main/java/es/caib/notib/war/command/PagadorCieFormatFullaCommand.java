@@ -18,7 +18,7 @@ public class PagadorCieFormatFullaCommand {
 	private Long id;
 	@NotEmpty @Size(max=64)
 	private String codi;
-	private String pagadorCieId;
+	private Long pagadorCieId;
 	
 	public Long getId() {
 		return id;
@@ -32,13 +32,12 @@ public class PagadorCieFormatFullaCommand {
 	public void setCodi(String codi) {
 		this.codi = codi;
 	}
-	public String getPagadorCieId() {
+	public Long getPagadorCieId() {
 		return pagadorCieId;
 	}
-	public void setPagadorCieId(String pagadorCieId) {
+	public void setPagadorCieId(Long pagadorCieId) {
 		this.pagadorCieId = pagadorCieId;
 	}
-	
 	public static PagadorCieFormatFullaCommand asCommand(PagadorCieFormatFullaDto dto) {
 		if (dto == null) {
 			return null;
