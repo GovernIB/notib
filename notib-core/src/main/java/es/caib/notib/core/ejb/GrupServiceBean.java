@@ -123,4 +123,10 @@ public class GrupServiceBean implements GrupService {
 		return delegate.findAllPaginat(paginacioParams);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	public GrupDto findByCodi(String grupCodi) {
+		return delegate.findByCodi(grupCodi);
+	}
+
 }

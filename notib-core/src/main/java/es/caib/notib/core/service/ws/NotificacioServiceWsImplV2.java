@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.jws.WebService;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sun.jersey.core.util.Base64;
 
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
+import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
@@ -40,6 +42,8 @@ import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.ws.notificacio.Certificacio;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
@@ -113,6 +117,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private AplicacioService aplicacioService;
+	@Autowired
+	private GrupService grupService;
 
 	@Transactional
 	@Override
@@ -242,6 +248,35 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				}
 			}
 		}
+		ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(
+				notificacio.getProcedimentCodi(), 
+				entitat);
+		if (procediment.isAgrupar() && notificacio.getGrupCodi() != null && !notificacio.getGrupCodi().isEmpty()) {
+			// Llistat de procediments amb grups
+			List<GrupDto> grupsProcediment = grupService.findByProcedimentGrups(procediment.getId());
+			GrupDto grupNotificacio = grupService.findByCodi(notificacio.getGrupCodi());
+			if (grupNotificacio == null) {
+				if (!grupsProcediment.contains(grupNotificacio)) {
+					resposta.setError(true);
+					resposta.setEstat(NotificacioEstatEnum.PENDENT);
+					resposta.setErrorDescripcio("[GRUP] El grup indicat " + notificacio.getGrupCodi() + " no està definit dins NOTIB.");
+					return resposta;
+				}
+			}
+			if (grupsProcediment == null || grupsProcediment.isEmpty()) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[GRUP_PROCEDIMENT] S'ha indicat un grup per les notificacions però el procediment " + notificacio.getProcedimentCodi() + " no té cap grup assignat.");
+				return resposta;
+			} else {
+				if(! Arrays.asList(grupsProcediment).contains(grupsProcediment)) {
+					resposta.setError(true);
+					resposta.setEstat(NotificacioEstatEnum.PENDENT);
+					resposta.setErrorDescripcio("[GRUP_PROCEDIMENT] El grup indicat " + notificacio.getGrupCodi() + " no està assignat al procediment " + notificacio.getProcedimentCodi());
+					return resposta;
+				}
+			}
+		}
 		String documentGesdocId = null;
 		if(notificacio.getDocument().getContingutBase64() != null) {
 			documentGesdocId = pluginHelper.gestioDocumentalCreate(
@@ -278,9 +313,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 //					notificacio.getDocument().isGenerarCsv(),
 					notificacio.getDocument().getUuid(),
 					notificacio.getDocument().getCsv()).build());
-		}
-
-		ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(notificacio.getProcedimentCodi(), entitat);
+		}		
 		if(procediment != null) {
 			NotificacioEntity.BuilderV2 notificacioBuilder = NotificacioEntity.
 				getBuilderV2(

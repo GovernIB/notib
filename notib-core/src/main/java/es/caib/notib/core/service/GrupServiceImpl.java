@@ -127,6 +127,16 @@ public class GrupServiceImpl implements GrupService{
 	}
 	
 	@Override
+	public GrupDto findByCodi(String grupCodi) {
+		GrupEntity grupEntity = grupReposity.findByCodi(grupCodi);
+		
+		return conversioTipusHelper.convertir(
+				grupEntity, 
+				GrupDto.class);
+	}
+
+	
+	@Override
 	public List<GrupDto> findByProcedimentGrups(Long procedimentId) {
 		List<GrupDto> grups = new ArrayList<GrupDto>();
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -245,8 +255,6 @@ public class GrupServiceImpl implements GrupService{
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
-
-
 
 
 }
