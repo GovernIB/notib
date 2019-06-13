@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.entity.GrupProcedimentEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.repository.GrupProcedimentRepository;

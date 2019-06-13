@@ -59,7 +59,7 @@ public class PermisosHelper {
 								entitatActual));
 			}
 			//Comprova quins permisos té aquest usuari sobre els procediments sense grups
-			if (grupsProcediment.isEmpty()) {
+			if ((!grupsProcediment.isEmpty() && procediments.isEmpty()) || (grupsProcediment.isEmpty())) {
 				request.setAttribute(
 						"permisConsulta", 
 						procedimentService.hasPermisConsultaProcediment(entitatActual));

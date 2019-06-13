@@ -6,7 +6,6 @@ package es.caib.notib.core.api.ws.notificacio;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
-import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 
 /**
  * Informació d'una persona per a un enviament.

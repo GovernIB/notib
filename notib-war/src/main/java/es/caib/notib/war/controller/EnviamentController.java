@@ -31,11 +31,14 @@ import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.ColumnesCommand;
 import es.caib.notib.war.command.NotificacioEnviamentCommand;
 import es.caib.notib.war.command.NotificacioEnviamentFiltreCommand;
@@ -45,6 +48,7 @@ import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EntitatHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
+import es.caib.notib.war.helper.RolHelper;
 /**
  * Controlador per el mantinement d'enviaments.
  * 
@@ -64,6 +68,8 @@ public class EnviamentController extends BaseUserController {
 	private EnviamentService enviamentService;
 	@Autowired
 	private NotificacioService notificacioService;
+	@Autowired
+	private ProcedimentService procedimentService;
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -141,19 +147,56 @@ public class EnviamentController extends BaseUserController {
 	public DatatablesResponse datatable(
 			HttpServletRequest request,
 			Model model) throws ParseException {
-		
-			
 		NotificacioEnviamentFiltreCommand filtreEnviaments = getFiltreCommand(request);
 		PaginaDto<NotificacioEnviamentDtoV2> enviaments = new PaginaDto<NotificacioEnviamentDtoV2>();
-		
-		if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
-			filtreEnviaments.setEstat(null);
-		}
-		
+		boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
+		boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
+		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+		List<ProcedimentGrupDto> grupsProcediment = new ArrayList<ProcedimentGrupDto>();
+		List<ProcedimentDto> procedimentsSenseGrups = new ArrayList<ProcedimentDto>();
+		List<ProcedimentDto> procedimentsPermisConsultaSenseGrups = new ArrayList<ProcedimentDto>();
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 		try {
+			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
+				filtreEnviaments.setEstat(null);
+			}
+			
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			
-			enviaments = enviamentService.enviamentFindByEntityAndFiltre(entitatActual, 
+			if (RolHelper.isUsuariActualUsuari(request)) {
+				// Llistat de procediments amb grups
+				grupsProcediment = procedimentService.findAllGrups();
+				procediments = new ArrayList<ProcedimentDto>();
+				// Obté els procediments que tenen el mateix grup que el rol d'usuari
+				for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
+					for (String rol : rolsUsuariActual) {
+						if (rol.contains(grupProcediment.getGrup().getCodi())) {
+							procediments.add(grupProcediment.getProcediment());
+						}
+					}
+				}
+				// Procediments sense grups però amb perís consulta
+				procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups();
+
+				if (!procedimentsSenseGrups.isEmpty()) {
+					procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
+									procedimentsSenseGrups,
+									entitatActual);
+
+					for (ProcedimentDto procedimentSenseGrupAmbPermis : procedimentsPermisConsultaSenseGrups) {
+						procediments.add(procedimentSenseGrupAmbPermis);
+					}
+				}
+
+			}
+			
+			enviaments = enviamentService.enviamentFindByEntityAndFiltre(
+					entitatActual, 
+					isUsuari, 
+					isUsuariEntitat,
+					grupsProcediment, 
+					procediments,
 					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 

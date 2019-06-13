@@ -653,9 +653,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				if (enviament.getDehObligat() != null) {
 					EntregaDEH entregaDeh = new EntregaDEH();
 					entregaDeh.setObligado(enviament.getDehObligat());
-					if (enviament.getDehObligat() != true) {
-						entregaDeh.setCodigoProcedimiento(notificacio.getProcedimentCodiNotib());
-					}
+					entregaDeh.setCodigoProcedimiento(enviament.getDehProcedimentCodi());
 					envio.setEntregaDEH(entregaDeh);
 				}
 				envios.getEnvio().add(envio);
