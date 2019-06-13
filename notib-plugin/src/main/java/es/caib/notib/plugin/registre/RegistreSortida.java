@@ -2,8 +2,6 @@ package es.caib.notib.plugin.registre;
 
 import java.util.List;
 
-import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
-
 /**
  * Registre de sortida o notificació
  * 

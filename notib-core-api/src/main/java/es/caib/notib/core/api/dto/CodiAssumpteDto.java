@@ -3,6 +3,7 @@ package es.caib.notib.core.api.dto;
 import java.io.Serializable;
 
 public class CodiAssumpteDto implements Serializable {
+
 	private String codi;
 	private String nom;
 	private String tipusAssumpte;
@@ -28,4 +29,7 @@ public class CodiAssumpteDto implements Serializable {
 			String tipusAssumpte) {
 		this.tipusAssumpte = tipusAssumpte;
 	}
+	
+
+	private static final long serialVersionUID = -8835856793759657155L;
 }
