@@ -19,6 +19,7 @@ import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.PaisosDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
@@ -202,6 +203,16 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<LocalitatsDto> llistarLocalitats(String codiProvincia);
+	
+	/**
+	 * Consulta els paisos disponibles dins DIR3.
+	 * 
+	 * @param codiProvincia 
+	 * 				Codi de la provincia de la que es vol recuperar les localitats
+	 * @return Una llista amb el codi i el nom de la localitat.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public List<PaisosDto> llistarPaisos();
 	
 	/**
 	 * Consulta dels events d'una notificació.

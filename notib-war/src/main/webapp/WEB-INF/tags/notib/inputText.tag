@@ -4,6 +4,7 @@
 <%@ attribute name="name" required="true" rtexprvalue="true"%>
 <%@ attribute name="value" required="false" rtexprvalue="true"%>
 <%@ attribute name="required" required="false" rtexprvalue="true"%>
+<%@ attribute name="generalClass" required="false" rtexprvalue="true"%>
 <%@ attribute name="text" required="false" rtexprvalue="true"%>
 <%@ attribute name="messageInfo" required="false" rtexprvalue="true"%>
 <%@ attribute name="info" required="false" rtexprvalue="true"%>

@@ -45,13 +45,13 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.PaisosDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
-import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
@@ -777,6 +777,14 @@ public class NotificacioController extends BaseUserController {
 						"es.caib.notib.core.api.dto.idiomaEnumDto."));
 	}
 	
+	@RequestMapping(value = "/paisos", method = RequestMethod.GET)
+	@ResponseBody
+	private List<PaisosDto> getPaisos(
+		HttpServletRequest request,
+		Model model) {		
+		return notificacioService.llistarPaisos();
+	}
+	
 	@RequestMapping(value = "/provincies", method = RequestMethod.GET)
 	@ResponseBody
 	private List<ProvinciesDto> getProvincies(
@@ -793,6 +801,7 @@ public class NotificacioController extends BaseUserController {
 		@PathVariable String provinciaId) {
 		return notificacioService.llistarLocalitats(provinciaId);
 	}
+	
 	
 	private boolean isAdministrador(HttpServletRequest request) {
 		return RolHelper.isUsuariActualAdministrador(request);

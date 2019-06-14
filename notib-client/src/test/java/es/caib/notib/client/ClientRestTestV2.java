@@ -54,32 +54,32 @@ public class ClientRestTestV2 extends ClientBaseTest {
 	
 	@Test
 	public void testV2() throws DatatypeConfigurationException, IOException, DecoderException {
-		String notificacioId = new Long(System.currentTimeMillis()).toString();
-		RespostaAlta respostaAlta = clientV2.alta(
-				generarNotificacioV2(
-						notificacioId,
-						1,
-						false));
-		if (respostaAlta.isError()) {
-			System.out.println(">>> Reposta amb error: " + respostaAlta.getErrorDescripcio());
-			
-		} else {
-			System.out.println(">>> Reposta Ok");
-		}
-		assertNotNull(respostaAlta);
-		assertFalse(respostaAlta.isError());
-		assertNull(respostaAlta.getErrorDescripcio());
-		assertNotNull(respostaAlta.getReferencies());
-		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
-		assertEquals(1, referencies.size());
-		assertNotNull(referencies.get(0).getReferencia());
-		assertEquals(
-				NotificacioEstatEnum.ENVIADA,
-				respostaAlta.getEstat());
+//		String notificacioId = new Long(System.currentTimeMillis()).toString();
+//		RespostaAlta respostaAlta = clientV2.alta(
+//				generarNotificacioV2(
+//						notificacioId,
+//						1,
+//						false));
+//		if (respostaAlta.isError()) {
+//			System.out.println(">>> Reposta amb error: " + respostaAlta.getErrorDescripcio());
+//			
+//		} else {
+//			System.out.println(">>> Reposta Ok");
+//		}
+//		assertNotNull(respostaAlta);
+//		assertFalse(respostaAlta.isError());
+//		assertNull(respostaAlta.getErrorDescripcio());
+//		assertNotNull(respostaAlta.getReferencies());
+//		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+//		assertEquals(1, referencies.size());
+//		assertNotNull(referencies.get(0).getReferencia());
+//		assertEquals(
+//				NotificacioEstatEnum.ENVIADA,
+//				respostaAlta.getEstat());
 		
-//		clientV2.consultaEstatNotificacio(respostaAlta.getIdentificador());
-//		// asserts
-//		
+		clientV2.consultaEstatNotificacio("dsad");
+		// asserts
+		
 //		for (EnviamentReferencia referencia: respostaAlta.getReferencies()) {
 //			clientV2.consultaEstatEnviament(referencia.getReferencia());
 //			// aserts

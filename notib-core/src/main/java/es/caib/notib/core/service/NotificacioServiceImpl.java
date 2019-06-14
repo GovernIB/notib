@@ -51,6 +51,7 @@ import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.PaisosDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
@@ -87,6 +88,7 @@ import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import es.caib.notib.plugin.unitat.CodiValor;
+import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 
@@ -824,6 +826,18 @@ public class NotificacioServiceImpl implements NotificacioService {
 					"Error recuperant les provincies de DIR3CAIB: " + ex);
 		}
 		return conversioTipusHelper.convertirList(codiValor, LocalitatsDto.class);
+	}
+	
+	@Override
+	public List<PaisosDto> llistarPaisos() {
+		List<CodiValorPais> codiValorPais = new ArrayList<CodiValorPais>();
+		try {
+			codiValorPais = pluginHelper.llistarPaisos();
+		} catch (Exception ex) {
+			logger.error(
+					"Error recuperant les provincies de DIR3CAIB: " + ex);
+		}
+		return conversioTipusHelper.convertirList(codiValorPais, PaisosDto.class);
 	}
 	
 	@Override

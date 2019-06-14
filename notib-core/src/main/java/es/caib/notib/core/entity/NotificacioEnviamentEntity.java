@@ -1041,7 +1041,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built.domiciliCodiPostal = enviament.getEntregaPostal().getCodiPostal();
 			built.domiciliPoblacio = enviament.getEntregaPostal().getPoblacio();
 			built.domiciliMunicipiCodiIne = enviament.getEntregaPostal().getMunicipiCodi();
-			built.domiciliProvinciaCodi = enviament.getEntregaPostal().getProvinciaCodi();
+			built.domiciliProvinciaCodi = enviament.getEntregaPostal().getProvincia();
 			built.domiciliPaisCodiIso = enviament.getEntregaPostal().getPaisCodi();
 			built.domiciliLinea1 = enviament.getEntregaPostal().getLinea1();
 			built.domiciliLinea2 = enviament.getEntregaPostal().getLinea2();
@@ -1109,7 +1109,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 				built.domiciliCodiPostal = enviament.getEntregaPostal().getCodiPostal();
 				built.domiciliPoblacio = enviament.getEntregaPostal().getPoblacio();
 				built.domiciliMunicipiCodiIne = enviament.getEntregaPostal().getMunicipiCodi();
-				built.domiciliProvinciaCodi = enviament.getEntregaPostal().getProvinciaCodi();
+				built.domiciliProvinciaCodi = enviament.getEntregaPostal().getProvincia();
 				built.domiciliPaisCodiIso = enviament.getEntregaPostal().getPaisCodi();
 				built.domiciliLinea1 = enviament.getEntregaPostal().getLinea1();
 				built.domiciliLinea2 = enviament.getEntregaPostal().getLinea2();

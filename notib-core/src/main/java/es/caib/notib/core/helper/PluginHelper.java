@@ -81,6 +81,7 @@ import es.caib.notib.plugin.registre.TipusAssumpte;
 import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
 import es.caib.notib.plugin.seu.SeuPlugin;
 import es.caib.notib.plugin.unitat.CodiValor;
+import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
@@ -809,6 +810,10 @@ public class PluginHelper {
 	
 	public List<CodiValor> llistarLocalitats(String codiProvincia) throws es.caib.notib.plugin.SistemaExternException {
 		return getUnitatsOrganitzativesPlugin().localitats(codiProvincia);
+	}
+	
+	public List<CodiValorPais> llistarPaisos() throws es.caib.notib.plugin.SistemaExternException {
+		return getUnitatsOrganitzativesPlugin().paisos();
 	}
 	
 	private RegistreSortida toRegistreSortida(

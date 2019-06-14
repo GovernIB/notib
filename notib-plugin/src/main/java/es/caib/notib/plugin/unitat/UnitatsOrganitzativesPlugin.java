@@ -88,6 +88,14 @@ public interface UnitatsOrganitzativesPlugin {
 	public List<CodiValor> nivellsAdministracio() throws SistemaExternException;
 	
 	/**
+	 * @return la llista del paisos disponibles dins DIR3.
+	 * 
+	 * @throws SistemaExternException
+	 *            Si es produeix un error al consultar els nivells d'administració.
+	 */
+	public List<CodiValorPais> paisos() throws SistemaExternException;
+	
+	/**
 	 * @return la llista de comunitats autònomes
 	 * 
 	 * @throws SistemaExternException
