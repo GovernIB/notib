@@ -21,6 +21,7 @@ import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.PaisosDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
@@ -255,8 +256,14 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"NOT_USER"})
 	public List<LocalitatsDto> llistarLocalitats(String codiProvincia) {
 		return delegate.llistarLocalitats(codiProvincia);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_USER"})
+	public List<PaisosDto> llistarPaisos() {
+		return delegate.llistarPaisos();
 	}
 }

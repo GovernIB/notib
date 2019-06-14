@@ -835,7 +835,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			codiValorPais = pluginHelper.llistarPaisos();
 		} catch (Exception ex) {
 			logger.error(
-					"Error recuperant les provincies de DIR3CAIB: " + ex);
+					"Error recuperant els paisos de DIR3CAIB: " + ex);
 		}
 		return conversioTipusHelper.convertirList(codiValorPais, PaisosDto.class);
 	}
