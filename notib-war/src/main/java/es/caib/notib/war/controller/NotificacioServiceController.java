@@ -83,12 +83,12 @@ public class NotificacioServiceController extends BaseController {
 	}
 
 	@RequestMapping(
-			value = {"/services/notificacio/consultaEstatNotificacio/{referencia}", "/services/notificacioV2/consultaEstatNotificacio/{referencia}"}, 
+			value = {"/services/notificacio/consultaEstatNotificacio/{identificador}", "/services/notificacioV2/consultaEstatNotificacio/{identificador}"}, 
 			method = RequestMethod.GET,
 			produces="application/json")
 	@ApiOperation(
 			value = "Consulta de la informació d'una notificació",
-			response = Notificacio.class)
+			response = RespostaConsultaEstatNotificacio.class)
 	@ResponseBody
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
 			@ApiParam(
@@ -106,7 +106,7 @@ public class NotificacioServiceController extends BaseController {
 			produces="application/json")
 	@ApiOperation(
 			value = "Consulta de la informació d'un enviament",
-			response = Notificacio.class)
+			response = RespostaConsultaEstatEnviament.class)
 	@ResponseBody
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(
 			@ApiParam(
