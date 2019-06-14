@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.LocalitatsDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
@@ -22,6 +23,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.NotificacioService;
@@ -241,8 +243,20 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsulta() {
 		return delegate.findProcedimentsAmbPermisConsulta();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_USER"})
+	public List<ProvinciesDto> llistarProvincies() {
+		return delegate.llistarProvincies();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public List<LocalitatsDto> llistarLocalitats(String codiProvincia) {
+		return delegate.llistarLocalitats(codiProvincia);
 	}
 }

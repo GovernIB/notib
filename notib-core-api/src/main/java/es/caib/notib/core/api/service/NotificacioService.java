@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.LocalitatsDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
@@ -20,9 +21,9 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.exception.NotFoundException;
-
 /**
  * Declaració dels mètodes per a la consulta de notificacions i dels
  * destinataris i events associats.
@@ -183,6 +184,24 @@ public interface NotificacioService {
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
 			List<ProcedimentDto> procediments,
 			EntitatDto entitat);
+	
+	/**
+	 * Consulta les provincies.
+	 * 
+	 * @return Una llista amb el codi i el nom de la provincia.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public List<ProvinciesDto> llistarProvincies();
+	
+	/**
+	 * Consulta les localitats d'una provincia.
+	 * 
+	 * @param codiProvincia 
+	 * 				Codi de la provincia de la que es vol recuperar les localitats
+	 * @return Una llista amb el codi i el nom de la localitat.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public List<LocalitatsDto> llistarLocalitats(String codiProvincia);
 	
 	/**
 	 * Consulta dels events d'una notificació.

@@ -23,6 +23,7 @@
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<arxiu.api.version>1.0.4</arxiu.api.version>
+		<lombok.version>1.18.6</lombok.version>
 	</properties>
 	<modules>
 		<module>notib-client</module>

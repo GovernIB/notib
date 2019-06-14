@@ -17,6 +17,8 @@
 <%@ attribute name="inputSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="readonly" required="false" rtexprvalue="true"%>
 <%@ attribute name="picker" required="false" rtexprvalue="true"%>
+<%@ attribute name="labelClass" required="false" rtexprvalue="true"%>
+<%@ attribute name="inputClass" required="false" rtexprvalue="true"%>
 <c:set var="campValue" value="${value}"/>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
@@ -34,8 +36,8 @@
 <div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>"<c:if test="${multiple}"> data-toggle="multifield"</c:if>>
 <c:choose>
 	<c:when test="${not inline}">
-		<label class="control-label col-xs-${campLabelSize}" for="${campPath}">${campLabelText}</label>
-		<div class="col-xs-${campInputSize}">
+		<label class="control-label col-xs-${campLabelSize} ${labelClass}" for="${campPath}">${campLabelText}</label>
+		<div class="col-xs-${campInputSize} ${inputClass}">
 		<c:choose>
 			<c:when test="${picker}">
 				<div id="${campPath}" class="input-group colorpicker-component">

@@ -28,6 +28,8 @@
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="inputSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="value" required="false" rtexprvalue="true"%>
+<%@ attribute name="labelClass" required="false" rtexprvalue="true"%>
+<%@ attribute name="inputClass" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campId" value="${campPath}"/><c:if test="${not empty id}"><c:set var="campId" value="${id}"/></c:if>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
@@ -42,8 +44,8 @@
 <div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>"<c:if test="${multiple}"> data-toggle="multifield"</c:if>>
 <c:choose>
 	<c:when test="${not inline}">
-		<label class="control-label col-xs-${campLabelSize}" for="${campPath}">${campLabelText}</label>
-		<div class="controls col-xs-${campInputSize}">
+		<label class="control-label col-xs-${campLabelSize} ${labelClass}" for="${campPath}">${campLabelText}</label>
+		<div class="controls col-xs-${campInputSize} ${inputClass}">
 			<form:select path="${campPath}" cssClass="form-control ${generalClass}" id="${campId}" disabled="${disabled}" style="width:100%" data-toggle="select2" data-placeholder="${campPlaceholder}" data-minimumresults="${minimumResultsForSearch}" data-enum="${optionEnum}" data-enum-value="${campValue}">
 				<c:if test="${emptyOption == 'true'}">
 					<c:choose>

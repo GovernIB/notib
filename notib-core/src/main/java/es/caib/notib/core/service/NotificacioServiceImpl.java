@@ -34,6 +34,7 @@ import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.LocalitatsDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
@@ -52,6 +53,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
@@ -84,6 +86,7 @@ import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
+import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 
@@ -797,6 +800,30 @@ public class NotificacioServiceImpl implements NotificacioService {
 				new Permission[] {
 						ExtendedPermission.READ}
 				);	
+	}
+	
+	@Override
+	public List<ProvinciesDto> llistarProvincies() {
+		List<CodiValor> codiValor = new ArrayList<CodiValor>();
+		try {
+			codiValor = pluginHelper.llistarProvincies();
+		} catch (Exception ex) {
+			logger.error(
+					"Error recuperant les provincies de DIR3CAIB: " + ex);
+		}
+		return conversioTipusHelper.convertirList(codiValor, ProvinciesDto.class);
+	}
+
+	@Override
+	public List<LocalitatsDto> llistarLocalitats(String codiProvincia) {
+		List<CodiValor> codiValor = new ArrayList<CodiValor>();
+		try {
+			codiValor = pluginHelper.llistarLocalitats(codiProvincia);
+		} catch (Exception ex) {
+			logger.error(
+					"Error recuperant les provincies de DIR3CAIB: " + ex);
+		}
+		return conversioTipusHelper.convertirList(codiValor, LocalitatsDto.class);
 	}
 	
 	@Override
