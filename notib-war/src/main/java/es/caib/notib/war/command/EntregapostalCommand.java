@@ -2,6 +2,7 @@ package es.caib.notib.war.command;
 
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
+import es.caib.notib.war.validation.ValidIfVisibleAndNormalitzat;
 import es.caib.notib.war.validation.ValidIfVisible;
 
 /**
@@ -15,6 +16,45 @@ import es.caib.notib.war.validation.ValidIfVisible;
         fieldName = "visible",
         fieldValue = "true",
         dependFieldName = "viaNom")
+})
+@ValidIfVisibleAndNormalitzat.List({
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+	    fieldName = "tipus",
+	    fieldValue = NotificaDomiciliConcretTipusEnumDto.NACIONAL,
+	    dependFieldName = "provincia"),
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+		fieldName = "tipus",
+		fieldValue = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS,
+		dependFieldName = "provincia"),
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+        fieldName = "tipus",
+        fieldValue = NotificaDomiciliConcretTipusEnumDto.ESTRANGER,
+        dependFieldName = "paisCodi"),
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+		fieldName = "tipus",
+		fieldValue = NotificaDomiciliConcretTipusEnumDto.ESTRANGER,
+		dependFieldName = "poblacio"),
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+	    fieldName = "tipus",
+	    fieldValue = NotificaDomiciliConcretTipusEnumDto.NACIONAL,
+	    dependFieldName = "poblacio"),
+	
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+		fieldName = "tipus",
+		fieldValue = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS,
+		dependFieldName = "poblacio")
 })
 public class EntregapostalCommand {
 
