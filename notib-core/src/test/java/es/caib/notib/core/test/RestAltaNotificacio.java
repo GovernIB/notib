@@ -174,7 +174,7 @@ public class RestAltaNotificacio {
 				entregaPostal.setCodiPostal("07500");
 				entregaPostal.setPoblacio("poblacio" + i);
 				entregaPostal.setMunicipiCodi("07033");
-				entregaPostal.setProvinciaCodi("07");
+				entregaPostal.setProvincia("07");
 				entregaPostal.setPaisCodi("ES");
 				entregaPostal.setLinea1("linea1_" + i);
 				entregaPostal.setLinea2("linea2_" + i);
@@ -300,7 +300,7 @@ public class RestAltaNotificacio {
 				entregaPostal.setCodiPostal("07500");
 				entregaPostal.setPoblacio("poblacio" + i);
 				entregaPostal.setMunicipiCodi("07033");
-				entregaPostal.setProvinciaCodi("07");
+				entregaPostal.setProvincia("07");
 				entregaPostal.setPaisCodi("ES");
 				entregaPostal.setLinea1("linea1_" + i);
 				entregaPostal.setLinea2("linea2_" + i);
