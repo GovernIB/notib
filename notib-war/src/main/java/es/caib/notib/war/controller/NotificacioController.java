@@ -34,6 +34,7 @@ import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.LocalitatsDto;
+import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
@@ -271,6 +272,10 @@ public class NotificacioController extends BaseUserController {
 					EnumHelper.getOptionsForEnum(
 							InteressatTipusEnumDto.class,
 							"es.caib.notib.core.api.dto.interessatTipusEnumDto."));
+			model.addAttribute("entregaPostalTipus", 
+					EnumHelper.getOptionsForEnum(
+							NotificaDomiciliConcretTipusEnumDto.class,
+							"es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto."));
 			model.addAttribute("registreDocumentacioFisica", 
 					EnumHelper.getOptionsForEnum(
 							RegistreDocumentacioFisicaEnumDto.class,
@@ -767,6 +772,10 @@ public class NotificacioController extends BaseUserController {
 				EnumHelper.getOptionsForEnum(
 						InteressatTipusEnumDto.class,
 						"es.caib.notib.core.api.dto.interessatTipusEnumDto."));
+		model.addAttribute("entregaPostalTipus", 
+				EnumHelper.getOptionsForEnum(
+						NotificaDomiciliConcretTipusEnumDto.class,
+						"es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto."));
 		model.addAttribute("registreDocumentacioFisica", 
 				EnumHelper.getOptionsForEnum(
 						RegistreDocumentacioFisicaEnumDto.class,

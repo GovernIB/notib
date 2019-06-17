@@ -43,6 +43,7 @@
 .inputcss {
 	width: calc(100% - 175px);
 	float: left;
+	height: 44px;
 }
 .labelcss {
 	width: 175px;
@@ -116,7 +117,12 @@ $(document).ready(function() {
 			selPaisos.append("<option value=\"\"></option>");
 			if (data && data.length > 0) {
 				$.each(data, function(i, val) {
-					selPaisos.append("<option value=\"" + val.alfa2Pais + "\">" + val.descripcioPais + "</option>");
+					if (val.alfa2Pais == 'ES') {
+						selPaisos.append("<option value=\"" + val.alfa2Pais + "\" selected>" + val.descripcioPais + "</option>");
+					} else {
+						selPaisos.append("<option value=\"" + val.alfa2Pais + "\">" + val.descripcioPais + "</option>");
+					}
+					
 				});
 			}
 			var select2Options = {
@@ -126,6 +132,21 @@ $(document).ready(function() {
 		},
 		error: function() {
 			console.log("error obtenint les provincies...");
+		}
+	});
+	
+	$(document).on('change','select.paisos', function() {
+		var provincia = $(this).closest("#entregaPostal").find("select[class*='provincies']");
+		var poblacioSelect = $(this).closest("#entregaPostal").find("div[class*='poblacioSelect']");
+		var poblacioText = $(this).closest("#entregaPostal").find("div[class*='poblacioText']");
+		if ($(this).val() != 'ES') {
+			$(poblacioSelect).addClass('hidden');
+			$(poblacioText).removeClass('hidden');
+			$(provincia).prop('disabled', 'disabled');
+		} else {
+			$(poblacioSelect).removeClass('hidden');
+			$(poblacioText).addClass('hidden');
+			$(provincia).removeAttr('disabled');
 		}
 	});
 	
@@ -151,32 +172,35 @@ $(document).ready(function() {
 			console.log("error obtenint les provincies...");
 		}
 	});
-	
+
+	//Localitats
 	$(document).on('change','select.provincies', function() {
 		var provincia = $(this);
-		//Localitats
-		$.ajax({
-			type: 'GET',
-			url: "<c:url value="/notificacio/localitats/"/>" + $(provincia).val(),
-			success: function(data) {
-				debugger
-				var selLocalitats = $(provincia).closest("#entregaPostal").find("select[class*='localitats']");
-				selLocalitats.empty();
-				selLocalitats.append("<option value=\"\"></option>");
-				if (data && data.length > 0) {
-					$.each(data, function(i, val) {
-						selLocalitats.append("<option value=\"" + val.id + "\">" + val.descripcio + "</option>");
-					});
+		var selLocalitats = $(provincia).closest("#entregaPostal").find("select[class*='localitats']");
+		if ($(this).val() == '') {
+			$(selLocalitats).find('option').remove();
+		} else {
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value="/notificacio/localitats/"/>" + $(provincia).val(),
+				success: function(data) {
+					selLocalitats.empty();
+					selLocalitats.append("<option value=\"\"></option>");
+					if (data && data.length > 0) {
+						$.each(data, function(i, val) {
+							selLocalitats.append("<option value=\"" + val.id + "\">" + val.descripcio + "</option>");
+						});
+					}
+					var select2Options = {
+							theme: 'bootstrap',
+							width: 'auto'};
+					selLocalitats.select2(select2Options);
+				},
+				error: function() {
+					console.log("error obtenint les provincies...");
 				}
-				var select2Options = {
-						theme: 'bootstrap',
-						width: 'auto'};
-				selLocalitats.select2(select2Options);
-			},
-			error: function() {
-				console.log("error obtenint les provincies...");
-			}
-		});
+			});
+		}
 	});
 	var tipusDocumentDefault = $('#tipusDocumentDefault').val();
 	$('.customSelect').webutilInputSelect2(null);
@@ -714,17 +738,20 @@ function mostrarEntregaPostal(className) {
 									<p class="comentari col-xs-offset-"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
 									<not:inputCheckbox name="enviaments[${j}].entregaPostalActiva" textKey="notificacio.form.camp.entregapostal.activa" labelSize="2" funcio="mostrarEntregaPostal(this.id)" />
 								</div>
-								<input id="entregaPostalAmagat" name="enviaments[${j}].entregaPostal.visible" class="hidden" value="false">
-	
-								<c:if test="${not empty enviosGuardats}">
-									<c:set var="entregaPostalActiva" value="${enviament.entregaPostalActiva}"></c:set>
-								</c:if>
-								<div id="entregaPostal" class="entregaPostal_${j}"
-									<c:if test="${!entregaPostalActiva}">style="display:none"</c:if>>
+								<c:choose>
+									<c:when test="${not empty enviosGuardats}">
+										<input id="entregaPostalAmagat" name="enviaments[${j}].entregaPostal.visible" class="hidden" value="${enviament.entregaPostalActiva}">
+										<c:set var="entregaPostalActiva" value="${enviament.entregaPostalActiva}"></c:set>
+									</c:when>
+									<c:otherwise>
+										<input id="entregaPostalAmagat" name="enviaments[${j}].entregaPostal.visible" class="hidden" value="false">
+									</c:otherwise>
+								</c:choose>
+								<div id="entregaPostal" class="entregaPostal_${j}" <c:if test="${!entregaPostalActiva}">style="display:none"</c:if>>
 	
 									<div class="col-md-12">
 										<div class="col-md-12">
-											<not:inputSelect name="enviaments[${j}].entregaPostal.tipus" textKey="notificacio.form.camp.entregapostal.tipus" required="true" labelClass="labelcss" inputClass="inputcss"/>
+											<not:inputSelect name="enviaments[${j}].entregaPostal.tipus" textKey="notificacio.form.camp.entregapostal.tipus" required="true" optionItems="${entregaPostalTipus}" optionValueAttribute="value" optionTextKeyAttribute="text"  labelClass="labelcss" inputClass="inputcss"/>
 										</div>
 										<div class="col-md-4">
 											<not:inputSelect name="enviaments[${j}].entregaPostal.tipusVia" textKey="notificacio.form.camp.entregapostal.tipusvia" labelClass="labelcss" inputClass="inputcss" required="true" />
@@ -750,20 +777,23 @@ function mostrarEntregaPostal(className) {
 										<div class="col-md-4">
 											<not:inputText name="enviaments[${j}].entregaPostal.bloc" textKey="notificacio.form.camp.entregapostal.bloc" labelClass="labelcss" inputClass="inputcss" />
 										</div>
-										<div class="col-md-8">
-											<not:inputText name="enviaments[${j}].entregaPostal.complement" textKey="notificacio.form.camp.entregapostal.complement" labelClass="labelcss" inputClass="inputcss" />
+										<div class="col-md-6">
+											<not:inputSelect name="enviaments[${j}].entregaPostal.paisCodi" generalClass="paisos" emptyOption="true" textKey="notificacio.form.camp.entregapostal.paiscodi" labelClass="labelcss" inputClass="inputcss"/>
+										</div>
+										<div class="col-md-6">
+											<not:inputSelect name="enviaments[${j}].entregaPostal.provincia" generalClass="provincies" emptyOption="true" textKey="notificacio.form.camp.entregapostal.provincia" labelClass="labelcss" inputClass="inputcss"/>
+										</div>
+										<div class="col-md-6 poblacioSelect">
+											<not:inputSelect name="enviaments[${j}].entregaPostal.poblacio" generalClass="localitats" emptyOption="true" textKey="notificacio.form.camp.entregapostal.poblacio" labelClass="labelcss" inputClass="inputcss"/>
+										</div>
+										<div class="col-md-6 poblacioText hidden">
+											<not:inputText name="enviaments[${j}].entregaPostal.poblacio" textKey="notificacio.form.camp.entregapostal.poblacio" labelClass="labelcss" inputClass="inputcss" />
 										</div>
 										<div class="col-md-4">
 											<not:inputText name="enviaments[${j}].entregaPostal.codiPostal" textKey="notificacio.form.camp.entregapostal.codipostal" labelClass="labelcss" inputClass="inputcss"/>
 										</div>
 										<div class="col-md-6">
-											<not:inputSelect name="enviaments[${j}].entregaPostal.provincia" generalClass="provincies" emptyOption="true" textKey="notificacio.form.camp.entregapostal.provincia" labelClass="labelcss" inputClass="inputcss"/>
-										</div>
-										<div class="col-md-6">
-											<not:inputSelect name="enviaments[${j}].entregaPostal.poblacio" generalClass="localitats" emptyOption="true" textKey="notificacio.form.camp.entregapostal.poblacio" labelClass="labelcss" inputClass="inputcss"/>
-										</div>
-										<div class="col-md-6">
-											<not:inputSelect name="enviaments[${j}].entregaPostal.paisCodi" generalClass="paisos" emptyOption="true" textKey="notificacio.form.camp.entregapostal.paiscodi" labelClass="labelcss" inputClass="inputcss"/>
+											<not:inputText name="enviaments[${j}].entregaPostal.complement" textKey="notificacio.form.camp.entregapostal.complement" labelClass="labelcss" inputClass="inputcss" />
 										</div>
 										<c:choose>
 											<c:when test="${not empty formatsFulla}">
