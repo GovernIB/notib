@@ -170,10 +170,16 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_USUARIS,
-					errorDescripcio,
-					ex);
+			if (ex.getCause() != null) {
+				rs.setDescripcioError(errorDescripcio + " :" + ex.getCause().getMessage());
+				return rs;
+			} else {
+				throw new SistemaExternException(
+				IntegracioHelper.INTCODI_USUARIS,
+				errorDescripcio,
+				ex);
+			}
+
 		}
 		return rs;
 	}

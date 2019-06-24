@@ -80,10 +80,10 @@ $(document).ready(function() {
 				$.each(data[i].destinataris, function (index, destinatari) {
 					var llinatge1Dest = '', llinatge2Dest = '';
 					if (destinatari.llinatge1 != null) {
-						llinatge1Dest = data[i].destinatari.llinatge1;
+						llinatge1Dest = destinatari.llinatge1;
 					}
 					if (destinatari.llinatge2 != null) {
-						llinatge2Dest = data[i].destinatari.llinatge2;
+						llinatge2Dest = destinatari.llinatge2;
 					}
 					destinataris += destinatari.nom + ' ' + llinatge1Dest + ' ' + llinatge2Dest + ' (' + destinatari.nif + '), ';	
 				});
