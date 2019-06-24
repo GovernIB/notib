@@ -3,15 +3,49 @@
  */
 package es.caib.notib.client;
 
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runners.MethodSorters;
+
+import es.caib.notib.ws.notificacio.DocumentV2;
+import es.caib.notib.ws.notificacio.EntregaDeh;
+import es.caib.notib.ws.notificacio.EntregaPostal;
+import es.caib.notib.ws.notificacio.EntregaPostalViaTipusEnum;
+import es.caib.notib.ws.notificacio.Enviament;
+import es.caib.notib.ws.notificacio.EnviamentReferencia;
+import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
+import es.caib.notib.ws.notificacio.InteressatTipusEnumDto;
+import es.caib.notib.ws.notificacio.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.ws.notificacio.NotificaServeiTipusEnumDto;
+import es.caib.notib.ws.notificacio.NotificacioV2;
+import es.caib.notib.ws.notificacio.Persona;
+import es.caib.notib.ws.notificacio.RespostaAlta;
+import es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament;
+import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
 
 /**
  * Test per al client REST del servei de notificacions de NOTIB.
@@ -40,10 +74,14 @@ public class NotificaWsTestIntegracioRest {
 
 	@BeforeClass
 	public static void setUpClass() throws IOException, DecoderException {
+//		client = NotificacioRestClientFactory.getRestClient(
+//				"https://dev.caib.es/notib",
+//				"$ripea_notib",
+//				"ripea_notib");
 		client = NotificacioRestClientFactory.getRestClient(
 				"http://localhost:8180/notib",
-				"notapp",
-				"notapp");
+				"usuari2",
+				"usuari2");
 	}
 	
 	@Before
@@ -75,8 +113,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 000. OK
 	
 	// TODO: Necessitam tenir un CIE vàlid
-//	@Test
-	/*
+	@Test
 	public void pruebaEmision01() throws Exception {
 	
 		int numDestinataris = 1;
@@ -86,7 +123,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = false;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacioV2 = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -94,31 +131,35 @@ public class NotificaWsTestIntegracioRest {
 				ambEnviamentDEHObligat,
 				ambRetard);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacioV2);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.getErrorDescripcio(),
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
+					info.isError(),
 					is(false));
-			assertNotNull(info.getIdentificador());
-			assertNotNull(info.getReferencia());
-			assertNotNull(info.getTitular().getNif());
+			assertNotNull(referencia.getReferencia());
+			assertNotNull(info.getCertificacio());
+			assertNotNull(info.getReceptorNif());
 		}
 		
 	}
@@ -182,7 +223,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = false;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -190,31 +231,34 @@ public class NotificaWsTestIntegracioRest {
 				ambEnviamentDEHObligat,
 				ambRetard);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
+					info.isError(),
 					is(false));
-			assertNotNull(info.getIdentificador());
-			assertNotNull(info.getReferencia());
-			assertNotNull(info.getTitular().getNif());
+			assertNotNull(referencia.getReferencia());
+			assertNotNull(info.getCertificacio());
+			assertNotNull(info.getReceptorNif());
 		}
 	}
 
@@ -239,7 +283,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = false;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -247,32 +291,35 @@ public class NotificaWsTestIntegracioRest {
 				ambEnviamentDEHObligat,
 				ambRetard);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
+					info.isError(),
 					is(false));
-			assertNotNull(info.getIdentificador());
-			assertNotNull(info.getReferencia());
-			assertNotNull(info.getTitular().getNif());
-		}	
+			assertNotNull(referencia.getReferencia());
+			assertNotNull(info.getCertificacio());
+			assertNotNull(info.getReceptorNif());
+		}
 	}
 	
 	
@@ -295,7 +342,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = true;
 		boolean ambRetard = false;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -303,32 +350,35 @@ public class NotificaWsTestIntegracioRest {
 				ambEnviamentDEHObligat,
 				ambRetard);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
+					info.isError(),
 					is(false));
-			assertNotNull(info.getIdentificador());
-			assertNotNull(info.getReferencia());
-			assertNotNull(info.getTitular().getNif());
-		}	
+			assertNotNull(referencia.getReferencia());
+			assertNotNull(info.getCertificacio());
+			assertNotNull(info.getReceptorNif());
+		}
 	}
 	
 	
@@ -351,7 +401,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -359,33 +409,94 @@ public class NotificaWsTestIntegracioRest {
 				ambEnviamentDEHObligat,
 				ambRetard);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
+					info.isError(),
 					is(false));
-			assertNotNull(info.getIdentificador());
-			assertNotNull(info.getReferencia());
-			assertNotNull(info.getTitular().getNif());
+			assertNotNull(referencia.getReferencia());
+			assertNotNull(info.getCertificacio());
+			assertNotNull(info.getReceptorNif());
 		}
 	}
+	
+	// PETICIÓN CORRECTA DE ENVIO SOLO CARPETA Y TIPUS INTERESADO NULO.
+		// -------------------------------------------------------------------------------------
+		// Para cada destinatario se comprobará que devuelve un
+		// identificador, la referencia del emisor y el NIF del titular.
+		// -------------------------------------------------------------------------------------
+		// Código devuelto: 000. OK
+		
+//		@Test	// Resultat test: OK
+		public void pruebaEmision06() throws Exception {
+			
+			// Petició DE ENVIO SOLO CARPETA CON TIPUS INTERESADO NULO
+			String notificacioId = new Long(System.currentTimeMillis()).toString();
+			int numDestinataris = 1;
+			boolean ambEnviamentPostal = false;
+			NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+			boolean ambEnviamentDEH = false;
+			boolean ambEnviamentDEHObligat = false;
+			
+			NotificacioV2 notificacio = generarNotificacio(
+					notificacioId,
+					numDestinataris,
+					ambEnviamentPostal,
+					tipusEnviamentPostal,
+					ambEnviamentDEH,
+					ambEnviamentDEHObligat,
+					false);
+			
+			RespostaAlta respostaAlta = client.alta(notificacio);
+			assertThat(
+					respostaAlta.isError(),
+					is(false));
+			assertNotNull(respostaAlta);
+			List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+			assertNotNull(referencies);
+			assertThat(
+					referencies.size(),
+					is(numDestinataris));
+			
+			//Consulta estat notificacio
+			RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+			assertThat(
+					respostaInfo.isError(),
+					is(false));
+			assertNotNull(respostaInfo);
+			//Consulta estat enviament
+			for (EnviamentReferencia referencia: referencies) {
+				//Si no hay error
+				RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
+				assertNotNull(info);
+				assertThat(
+						info.isError(),
+						is(false));
+				assertNotNull(referencia.getReferencia());
+				assertNotNull(info.getCertificacio());
+				assertNotNull(info.getReceptorNif());
+			}
+		}
 	
 	
 	// PETICIÓN CORRECTA CON MAS DE UN DESTINATARIO.
@@ -397,7 +508,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 000. OK
 
 //	@Test	// Resultat test: OK
-	public void pruebaEmision06() throws Exception {
+	public void pruebaEmision07() throws Exception {
 		
 		// Petició CON MAS DE UN DESTINATARIO
 		
@@ -408,7 +519,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -416,31 +527,34 @@ public class NotificaWsTestIntegracioRest {
 				ambEnviamentDEHObligat,
 				ambRetard);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
+					info.isError(),
 					is(false));
-			assertNotNull(info.getIdentificador());
-			assertNotNull(info.getReferencia());
-			assertNotNull(info.getTitular().getNif());
+			assertNotNull(referencia.getReferencia());
+			assertNotNull(info.getCertificacio());
+			assertNotNull(info.getReceptorNif());
 		}
 	}
 	
@@ -456,7 +570,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4011. Organismo emisor no dado de alta
 
 //	@Test	// Resultat test: OK
-	public void pruebaEmision07() throws Exception {
+	public void pruebaEmision08() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = false;
@@ -465,7 +579,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -475,34 +589,38 @@ public class NotificaWsTestIntegracioRest {
 		
 		notificacio.setEmisorDir3Codi("A00000000");
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					anyOf(
 							containsString("[4011]"),
 							containsString("[ORGANISMO_NO_RECONOCIDO]")));
 		}
+		
 	}
 	
 	
@@ -513,7 +631,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4151. El campo normalizado está vacío
 	
 //	@Test	// Prova impossible: Document no permet el camp normalitzat buid.
-	public void pruebaEmision08() throws Exception {
+	public void pruebaEmision09() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = false;
@@ -522,7 +640,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -533,30 +651,33 @@ public class NotificaWsTestIntegracioRest {
 //		camp normalitzat a NULL
 //		notificacio.getDocument.setNormalitzat(null);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4151]"));
 		}
 	}
@@ -570,7 +691,7 @@ public class NotificaWsTestIntegracioRest {
 	
 
 //	@Test	// Prova impossible: NotificaHelper únicament permet els valors "si" i "no".
-	public void pruebaEmision09() throws Exception {
+	public void pruebaEmision10() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = false;
@@ -579,7 +700,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -590,32 +711,34 @@ public class NotificaWsTestIntegracioRest {
 //		valor del camp normalitzat incorrecte (diferent de "si" o "no")
 //		notificacio.getDocument.setNormalitzat("yes");
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
-					containsString("[4152]"));
+					info.getErrorDescripcio(),
+					containsString("[4151]"));
 		}
 	}
 	
@@ -627,7 +750,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4200. El documento de identificación no es válido
 	
 //	@Test	// Resultat test: OK
-	public void pruebaEmision10() throws Exception {
+	public void pruebaEmision11() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = false;
@@ -636,7 +759,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -647,32 +770,34 @@ public class NotificaWsTestIntegracioRest {
 		// Nif del titular no vàlid
 		Enviament env = notificacio.getEnviaments().get(0);
 		env.getTitular().setNif("00000000A");
-				
-		AltaResposta respostaAlta = client.alta(notificacio);
+		
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4200]"));
 		}
 		
@@ -685,7 +810,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4241. Indique el nombre
 	
 //	@Test	// Resultat test: OK
-	public void pruebaEmision11() throws Exception {
+	public void pruebaEmision12() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = false;
@@ -694,7 +819,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -708,31 +833,33 @@ public class NotificaWsTestIntegracioRest {
 		env.getTitular().setLlinatge1(null);
 		env.getTitular().setLlinatge2(null);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					anyOf(
 							containsString("[4210]"),
 							containsString("[4241]")));
@@ -748,7 +875,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4311. Documento no puede estar vacío
 	
 //	@Test	// Prova impossible: NotificaHelper valida que el document no sigui null.
-	public void pruebaEmision12() throws Exception {
+	public void pruebaEmision13() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = false;
@@ -757,7 +884,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -770,29 +897,31 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4311]"));
 		}
 	}
@@ -807,53 +936,55 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4320. No se corresponde el sha1 del documento con el contenido
 	
 //	@Test	// Resultat test: OK
-	public void pruebaEmision13() throws Exception {
+	public void pruebaEmision14() throws Exception {
 		
-		int numDestinataris = 1;
-		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
-		boolean ambEnviamentDEH = false;
-		boolean ambEnviamentDEHObligat = false;
-		boolean ambRetard = true;
-		
-		Notificacio notificacio = generaNotificacio(
-				numDestinataris,
-				ambEnviamentPostal,
-				tipusEnviamentPostal,
-				ambEnviamentDEH,
-				ambEnviamentDEHObligat,
-				ambRetard);
-		
-		// Hash del document incorrecte
-		notificacio.getDocument().setHash("AAA");
-		
-		AltaResposta respostaAlta = client.alta(notificacio);
-		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
-		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
-		assertNotNull(referencies);
-		assertThat(
-				referencies.size(),
-				is(numDestinataris));
-		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
-			assertNotNull(info);
-			assertThat(
-					info.isNotificaError(),
-					is(true));
-			assertThat(
-					info.getNotificaErrorDescripcio(),
-					containsString("[4320]"));
-		}
+//		int numDestinataris = 1;
+//		boolean ambEnviamentPostal = false;
+//		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+//		boolean ambEnviamentDEH = false;
+//		boolean ambEnviamentDEHObligat = false;
+//		boolean ambRetard = true;
+//		
+//		NotificacioV2 notificacio = generaNotificacio(
+//				numDestinataris,
+//				ambEnviamentPostal,
+//				tipusEnviamentPostal,
+//				ambEnviamentDEH,
+//				ambEnviamentDEHObligat,
+//				ambRetard);
+//		
+//		// Hash del document incorrecte
+//		notificacio.getDocument().setHash("AAA");
+//		
+//		RespostaAlta respostaAlta = client.alta(notificacio);
+//		assertThat(
+//				respostaAlta.isError(),
+//				is(false));
+//		assertNotNull(respostaAlta);
+//		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+//		assertNotNull(referencies);
+//		assertThat(
+//				referencies.size(),
+//				is(numDestinataris));
+//		
+//		//Consulta estat notificacio
+//		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+//		assertThat(
+//				respostaInfo.isError(),
+//				is(false));
+//		assertNotNull(respostaInfo);
+//		//Consulta estat enviament
+//		for (EnviamentReferencia referencia: referencies) {
+//			//Si no hay error
+//			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
+//			assertNotNull(info);
+//			assertThat(
+//					info.isError(),
+//					is(false));
+//			assertThat(
+//					info.getErrorDescripcio(),
+//					anyOf(containsString("[4320]")));
+//		}
 	}
 	
 	
@@ -864,7 +995,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4402. El campo Servicio solo puede contener los valores 'urgente' o 'normal'
 	
 //	@Test	// Prova impossible: ServeiTipus únicament pot ser null, NORMAL o URGENT, i el camp no existeix a la v.2.
-	public void pruebaEmision14() throws Exception {
+	public void pruebaEmision15() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = false;
@@ -873,7 +1004,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -885,31 +1016,33 @@ public class NotificaWsTestIntegracioRest {
 //		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
 //		env.setServeiTipus(NotificaServeiTipusEnumDto.ALTRE);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4402]"));
 		}
 	}
@@ -922,7 +1055,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4403. Debe rellenar el campo 'servicio'
 	
 //	@Test	// Prova impossible: ServeiTipus no existeix a la v.2.
-	public void pruebaEmision15() throws Exception {
+	public void pruebaEmision16() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = false;
@@ -931,7 +1064,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -943,31 +1076,33 @@ public class NotificaWsTestIntegracioRest {
 		Enviament env = notificacio.getEnviaments().get(0);
 		env.setServeiTipus(null);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4403]"));
 		}
 	}
@@ -980,7 +1115,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4500. Indique el concepto
 	
 //	@Test	// Prova impossible: Notib no permet el concepte buit.
-	public void pruebaEmision16() throws Exception {
+	public void pruebaEmision17() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = false;
@@ -989,7 +1124,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -1000,31 +1135,33 @@ public class NotificaWsTestIntegracioRest {
 		// Concepte buit
 		notificacio.setConcepte(null);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4500]"));
 		}
 	}
@@ -1036,7 +1173,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4510. Tipo de envío vacío
 	
 //	@Test	// Prova impossible: Notib no permet l'enviament tipus buit.
-	public void pruebaEmision17() throws Exception {
+	public void pruebaEmision18() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = false;
@@ -1045,7 +1182,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -1056,31 +1193,33 @@ public class NotificaWsTestIntegracioRest {
 		// Enviament tipus buid
 		notificacio.setEnviamentTipus(null);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4510]"));
 		}
 	}
@@ -1093,7 +1232,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4511. Tipo de envío no permitido
 	
 //	@Test	// Prova impossible: el sistema només permet tipus d'enviament COMUNICACIO i NOTIFICACIO
-	public void pruebaEmision18() throws Exception {
+	public void pruebaEmision19() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = false;
@@ -1102,7 +1241,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -1113,31 +1252,33 @@ public class NotificaWsTestIntegracioRest {
 		// Enviament tipus no vàlid
 //		notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.ALTRE);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4511]"));
 		}
 	}
@@ -1151,7 +1292,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4531. Código SIA incorrecto
 	
 //	@Test	// Resultat test: Notifica no dona error al no indicar el codi del procediment SIA, o posant qualsevol valor
-	public void pruebaEmision19() throws Exception {
+	public void pruebaEmision20() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = false;
@@ -1160,7 +1301,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -1170,31 +1311,33 @@ public class NotificaWsTestIntegracioRest {
 
 		notificacio.setProcedimentCodi("XYZ");
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4531]"));
 		}
 	}
@@ -1207,7 +1350,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4600. Tipo domicilio incorrecto
 	
 //	@Test	// Prova impossible: el sistema només permet tipus de domicili CONCRET o FISCAL
-	public void pruebaEmision20() throws Exception {
+	public void pruebaEmision21() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = true;
@@ -1216,7 +1359,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -1228,31 +1371,33 @@ public class NotificaWsTestIntegracioRest {
 //		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
 //		env.getEntregaPostal().setTipus(NotificaDomiciliTipusEnumDto.ALTRE);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4600]"));
 		}
 	}
@@ -1267,7 +1412,7 @@ public class NotificaWsTestIntegracioRest {
 	// Número de casa y Punto kilométrico
 	
 //	@Test	// Resultat test: OK
-	public void pruebaEmision21() throws Exception {
+	public void pruebaEmision22() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = true;
@@ -1276,7 +1421,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -1288,31 +1433,33 @@ public class NotificaWsTestIntegracioRest {
 		Enviament env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setPuntKm("pk01");
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4631]"));
 		}
 	}
@@ -1325,7 +1472,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4602. Tipo de domicilio vacío
 	
 //	@Test	//	Prova impossible: NotificaHelper no permet el camp tipus domicili buit
-	public void pruebaEmision22() throws Exception {
+	public void pruebaEmision23() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = true;
@@ -1334,7 +1481,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -1346,31 +1493,33 @@ public class NotificaWsTestIntegracioRest {
 		Enviament env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setTipus(null);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4602]"));
 		}
 	}
@@ -1384,7 +1533,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4610. El Nombre de vía no puede estar vacío
 	
 //	@Test	// Resultat test: OK
-	public void pruebaEmision23() throws Exception {
+	public void pruebaEmision24() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = true;
@@ -1393,7 +1542,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -1405,31 +1554,33 @@ public class NotificaWsTestIntegracioRest {
 		Enviament env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setViaNom(null);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4610]"));
 		}
 	}
@@ -1442,7 +1593,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4620. El Tipo de Vía no puede estar vacío
 	
 //	@Test	// Resultat test: OK
-	public void pruebaEmision24() throws Exception {
+	public void pruebaEmision25() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = true;
@@ -1451,7 +1602,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -1463,31 +1614,33 @@ public class NotificaWsTestIntegracioRest {
 		Enviament env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setViaTipus(null);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4620]"));
 		}
 	}
@@ -1502,7 +1655,7 @@ public class NotificaWsTestIntegracioRest {
 	
 	// TODO: Necessitam tenir un CIE vàlid
 //	@Test
-	public void pruebaEmision25() throws Exception {
+	public void pruebaEmision26() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = true;
@@ -1511,7 +1664,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -1523,31 +1676,33 @@ public class NotificaWsTestIntegracioRest {
 		Enviament env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setNumeroCasa(null);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4630]"));
 		}
 	}
@@ -1561,7 +1716,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4650. Código Postal no puede estar vacío
 	
 //	@Test	// Resultat test: OK
-	public void pruebaEmision26() throws Exception {
+	public void pruebaEmision27() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = true;
@@ -1570,7 +1725,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -1582,31 +1737,33 @@ public class NotificaWsTestIntegracioRest {
 		Enviament env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setCodiPostal(null);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4650]"));
 		}
 	}
@@ -1620,7 +1777,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4660. Apartado de correos no puede estar vacío
 	
 //	@Test	// Resultat test: OK
-	public void pruebaEmision27() throws Exception {
+	public void pruebaEmision28() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = true;
@@ -1629,7 +1786,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -1641,31 +1798,33 @@ public class NotificaWsTestIntegracioRest {
 		Enviament env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setApartatCorreus(null);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4660]"));
 		}
 	}
@@ -1678,7 +1837,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4670. Código de municipio vacío
 	
 //	@Test	// Resultat test: OK
-	public void pruebaEmision28() throws Exception {
+	public void pruebaEmision29() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = true;
@@ -1687,7 +1846,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -1699,31 +1858,33 @@ public class NotificaWsTestIntegracioRest {
 		Enviament env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setMunicipiCodi(null);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4670]"));
 		}
 	}
@@ -1736,7 +1897,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4671. Código de municipio (COD_MUNICIPIO) erróneo
 	
 //	@Test	// Resultat test: OK
-	public void pruebaEmision29() throws Exception {
+	public void pruebaEmision30() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = true;
@@ -1745,7 +1906,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -1757,31 +1918,33 @@ public class NotificaWsTestIntegracioRest {
 		Enviament env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setMunicipiCodi("CODI");
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4671]"));
 		}
 	}
@@ -1794,7 +1957,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4680. Código de provincia vacío
 	
 //	@Test	// Resultat test: OK
-	public void pruebaEmision30() throws Exception {
+	public void pruebaEmision31() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = true;
@@ -1803,7 +1966,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -1813,34 +1976,36 @@ public class NotificaWsTestIntegracioRest {
 		
 		// codi de provincia buit
 		Enviament env = notificacio.getEnviaments().get(0);
-		env.getEntregaPostal().setProvinciaCodi(null);
+		env.getEntregaPostal().setProvincia(null);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
-					containsString("[4680]"));
+					info.getErrorDescripcio(),
+					containsString("[4631]"));
 		}
 	}
 	
@@ -1852,7 +2017,7 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4681. Código de provincia no válido
 	
 //	@Test	// Resultat test: OK
-	public void pruebaEmision31() throws Exception {
+	public void pruebaEmision32() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = true;
@@ -1861,7 +2026,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -1871,33 +2036,35 @@ public class NotificaWsTestIntegracioRest {
 		
 		// Codi de província no vàlid
 		Enviament env = notificacio.getEnviaments().get(0);
-		env.getEntregaPostal().setProvinciaCodi("99");
+		env.getEntregaPostal().setProvincia("99");
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4681]"));
 		}
 	}
@@ -1911,7 +2078,7 @@ public class NotificaWsTestIntegracioRest {
 	
 	// TODO: Necessitam tenir un CIE vàlid
 //	@Test
-	public void pruebaEmision32() throws Exception {
+	public void pruebaEmision33() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = true;
@@ -1920,7 +2087,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -1932,31 +2099,33 @@ public class NotificaWsTestIntegracioRest {
 		Enviament env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setPaisCodi(null);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4690]"));
 		}
 	}
@@ -1970,7 +2139,7 @@ public class NotificaWsTestIntegracioRest {
 	
 	// TODO: Necessitam tenir un CIE vàlid
 //	@Test
-	public void pruebaEmision33() throws Exception {
+	public void pruebaEmision34() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = true;
@@ -1979,7 +2148,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -1991,31 +2160,33 @@ public class NotificaWsTestIntegracioRest {
 		Enviament env = notificacio.getEnviaments().get(0);
 		env.getEntregaPostal().setPaisCodi("ZZ");
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
-					is(true));
+					info.isError(),
+					is(false));
 			assertThat(
-					info.getNotificaErrorDescripcio(),
+					info.getErrorDescripcio(),
 					containsString("[4691]"));
 		}
 	}
@@ -2036,7 +2207,7 @@ public class NotificaWsTestIntegracioRest {
 	// sus datados y sus certificaciones.
 	
 //	@Test	// Resultat test: OK
-	public void pruebaEmision34() throws Exception {
+	public void pruebaEmision35() throws Exception {
 		
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = false;
@@ -2045,7 +2216,7 @@ public class NotificaWsTestIntegracioRest {
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
 		
-		Notificacio notificacio = generaNotificacio(
+		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
@@ -2053,32 +2224,34 @@ public class NotificaWsTestIntegracioRest {
 				ambEnviamentDEHObligat,
 				ambRetard);
 		
-		AltaResposta respostaAlta = client.alta(notificacio);
+		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
-				respostaAlta.getCodiResposta(),
-				is("OK"));
+				respostaAlta.isError(),
+				is(false));
 		assertNotNull(respostaAlta);
-		List<String> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
 				is(numDestinataris));
 		
-		for (String referencia: referencies) {
-			InformacioResposta respostaInfo = client.consulta(referencia);
-			assertNotNull(respostaInfo);
-			assertThat(
-					respostaInfo.getCodiResposta(),
-					is("OK"));
-			InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
 			assertThat(
-					info.isNotificaError(),
+					info.isError(),
 					is(false));
-			assertNotNull(info.getIdentificador());
-			assertNotNull(info.getReferencia());
-			assertNotNull(info.getTitular().getNif());
+			assertNotNull(respostaAlta.getIdentificador());
+			assertNotNull(referencia.getReferencia());
+			assertNotNull(info.getReceptorNif());
 		}
 	}
 	
@@ -2093,18 +2266,20 @@ public class NotificaWsTestIntegracioRest {
 	// “Identificador de envío vacío”.
 	
 //	@Test	//	Prova impossible: Notib no permet una referència nula
-	public void pruebaEmision35() throws Exception {
+	public void pruebaEmision36() throws Exception {
 		
-		InformacioResposta respostaInfo = client.consulta(null);
+		//Consulta estat notificacio amb identificador buit
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(null);
 		assertNotNull(respostaInfo);
 		assertThat(
-				respostaInfo.getCodiResposta(),
-				is("OK"));
-		InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+				respostaInfo.isError(),
+				is(false));
+		//Consulta estat enviament amb referencia buida
+		RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(null);
 		assertThat(
-				info.getIdentificador(), 
-				is("XXX"));		
+				info.isError(),
+				is(false));
+	
 	}
 	
 	// IDENTIFICADOR DE ENVÍO ERRÓNEO.
@@ -2115,23 +2290,80 @@ public class NotificaWsTestIntegracioRest {
 	// “Identificador de envío erróneo”.
 	
 //	@Test	//	Prova impossible: Notib controla que la referència sigui vàlida.
-	public void pruebaEmision36() throws Exception {
-		
-		InformacioResposta respostaInfo = client.consulta("XXX");
+	public void pruebaEmision37() throws Exception {
+		//Consulta estat notificacio amb identificador incorrecte
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio("XXX");
 		assertNotNull(respostaInfo);
 		assertThat(
-				respostaInfo.getCodiResposta(),
-				is("REFERENCIA"));
-		InformacioEnviament info = respostaInfo.getInformacioEnviament();
-		
+				respostaInfo.isError(),
+				is(false));
+		//Consulta estat enviament amb referencia incorrecte
+		RespostaConsultaEstatEnviament info = client.consultaEstatEnviament("XXX");
 		assertThat(
-				info.getIdentificador(), 
-				is("REFERENCIA"));		
+				info.isError(),
+				is(false));
 	}
 	
+	//Versió nova
+	// IDENTIFICADOR PROCEDIMIENTO NO VÁLIDO.
+	// -------------------------------------------------------------------------------------
+	// Se realizará una petición SOAP con un identificador del procedimienot erroneo.
+	// -------------------------------------------------------------------------------------
+	// Se comprobará que el servicio web responde con el mensaje
+	// “Identificador de envío erróneo”.
+	@Test
+	public void pruebaEmision38() throws Exception {
+	
+		int numDestinataris = 1;
+		boolean ambEnviamentPostal = true;
+		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		boolean ambEnviamentDEH = false;
+		boolean ambEnviamentDEHObligat = false;
+		boolean ambRetard = false;
+		
+		NotificacioV2 notificacioV2 = generaNotificacio(
+				numDestinataris,
+				ambEnviamentPostal,
+				tipusEnviamentPostal,
+				ambEnviamentDEH,
+				ambEnviamentDEHObligat,
+				ambRetard);
+		
+		RespostaAlta respostaAlta = client.alta(notificacioV2);
+		assertThat(
+				respostaAlta.getErrorDescripcio(),
+				respostaAlta.isError(),
+				is(false));
+		assertNotNull(respostaAlta);
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+		assertNotNull(referencies);
+		assertThat(
+				referencies.size(),
+				is(numDestinataris));
+		
+		//Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertThat(
+				respostaInfo.isError(),
+				is(false));
+		assertNotNull(respostaInfo);
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
+			assertNotNull(info);
+			assertThat(
+					info.isError(),
+					is(false));
+			assertNotNull(referencia.getReferencia());
+			assertNotNull(info.getCertificacio());
+			assertNotNull(info.getReceptorNif());
+		}
+		
+	}
 	
 			
-	private Notificacio generaNotificacio(
+	private NotificacioV2 generaNotificacio(
 					int numDestinataris,
 					boolean ambEnviamentPostal,
 					NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal,
@@ -2140,16 +2372,17 @@ public class NotificaWsTestIntegracioRest {
 					boolean ambRetard) throws IOException, DecoderException, DatatypeConfigurationException {
 	
 		String notificacioId = new Long(System.currentTimeMillis()).toString();
-		Notificacio notificacio = generarNotificacio(
+		NotificacioV2 notificacioV2 = generarNotificacio(
 				notificacioId,
 				numDestinataris,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
-				ambEnviamentDEHObligat);
+				ambEnviamentDEHObligat,
+				true);
 		
 		if (!ambRetard)
-			notificacio.setRetard(0);
+			notificacioV2.setRetard(0);
 		
 //		List<String> referencies = notificacioServiceWs.alta(notificacio);
 //		assertNotNull(referencies);
@@ -2158,63 +2391,78 @@ public class NotificaWsTestIntegracioRest {
 //				is(numDestinataris));
 		
 //		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findByNotificaReferencia(referencies.get(0));
-		return notificacio;
+		return notificacioV2;
 		
 	}
 			
-	private Notificacio generarNotificacio(
+	private NotificacioV2 generarNotificacio(
 			String notificacioId,
 			int numDestinataris,
 			boolean ambEnviamentPostal,
 			NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal,
 			boolean ambEnviamentDEH,
-			boolean enviamentDEHObligat) throws IOException, DecoderException, DatatypeConfigurationException {
+			boolean enviamentDEHObligat,
+			boolean ambTipusInteressat) throws IOException, DecoderException, DatatypeConfigurationException {
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
-		Notificacio notificacio = new Notificacio();
-		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
-		notificacio.setConcepte("concepte_" + notificacioId);
-		notificacio.setDescripcio("descripcio_" + notificacioId);
-		notificacio.setEnviamentDataProgramada(null);
-		notificacio.setRetard(5);
-		notificacio.setCaducitat(
+		NotificacioV2 notificacioV2 = new NotificacioV2();
+		notificacioV2.setEmisorDir3Codi(ENTITAT_DIR3CODI);
+		notificacioV2.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
+		notificacioV2.setConcepte("concepte_" + notificacioId);
+		notificacioV2.setDescripcio("descripcio_" + notificacioId);
+		notificacioV2.setEnviamentDataProgramada(null);
+		notificacioV2.setRetard(5);
+		notificacioV2.setCaducitat(
 				toXmlGregorianCalendar(
 						new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000)));
-		Document document = new Document();
-		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
-		document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
-		document.setHash(
-				Base64.encodeBase64String(
-						Hex.decodeHex(
-								DigestUtils.sha256Hex(arxiuBytes).toCharArray())));
-		document.setNormalitzat(false);
-		document.setGenerarCsv(false);
-		notificacio.setDocument(document);
-		notificacio.setProcedimentCodi("0000");
-		if (ambEnviamentPostal) {
-			PagadorPostal pagadorPostal = new PagadorPostal();
-			pagadorPostal.setDir3Codi("A04013511");
-			pagadorPostal.setFacturacioClientCodi("ccFac_" + notificacioId);
-			pagadorPostal.setContracteNum("pccNum_" + notificacioId);
-			pagadorPostal.setContracteDataVigencia(toXmlGregorianCalendar(new Date(0)));
-			notificacio.setPagadorPostal(pagadorPostal);
-			PagadorCie pagadorCie = new PagadorCie();
-			pagadorCie.setDir3Codi("A04013511");
-			pagadorCie.setContracteDataVigencia(toXmlGregorianCalendar(new Date(0)));
-			notificacio.setPagadorCie(pagadorCie);
-		}
+		DocumentV2 documentV2 = new DocumentV2();
+		documentV2.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
+		documentV2.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
+//		document.setHash(
+//				Base64.encodeBase64String(
+//						Hex.decodeHex(
+//								DigestUtils.sha256Hex(arxiuBytes).toCharArray())));
+		documentV2.setNormalitzat(false);
+//		document.setGenerarCsv(false);
+		notificacioV2.setDocument(documentV2);
+		notificacioV2.setProcedimentCodi("0000");
+		
+		//Els pagadors postals i cie ja estan definits a nivell de procediment
+//		if (ambEnviamentPostal) {
+//			PagadorPostal pagadorPostal = new PagadorPostal();
+//			pagadorPostal.setDir3Codi("A04013511");
+//			pagadorPostal.setFacturacioClientCodi("ccFac_" + notificacioId);
+//			pagadorPostal.setContracteNum("pccNum_" + notificacioId);
+//			pagadorPostal.setContracteDataVigencia(toXmlGregorianCalendar(new Date(0)));
+//			notificacio.setPagadorPostal(pagadorPostal);
+//			PagadorCie pagadorCie = new PagadorCie();
+//			pagadorCie.setDir3Codi("A04013511");
+//			pagadorCie.setContracteDataVigencia(toXmlGregorianCalendar(new Date(0)));
+//			notificacio.setPagadorCie(pagadorCie);
+//		}
+		
 		for (int i = 0; i < numDestinataris; i++) {
-			Enviament enviament = new Enviament();
+			Enviament enviaments = new Enviament();
 			Persona titular = new Persona();
+			if (ambTipusInteressat) {
+				titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+			} else {
+				titular.setInteressatTipus(null);
+			}
 			titular.setNom("titularNom" + i);
 			titular.setLlinatge1("titLlinatge1_" + i);
 			titular.setLlinatge2("titLlinatge2_" + i);
 			titular.setNif("00000000T");
 			titular.setTelefon("666010101");
 			titular.setEmail("titular@gmail.com");
-			enviament.setTitular(titular);
+			enviaments.setTitular(titular);
 			List<Persona> destinataris = new ArrayList<Persona>();
 			Persona destinatari = new Persona();
+			if (ambTipusInteressat) {
+				destinatari.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+			} else {
+				destinatari.setInteressatTipus(null);
+			}
+			
 			destinatari.setNom("destinatariNom" + i);
 			destinatari.setLlinatge1("destLlinatge1_" + i);
 			destinatari.setLlinatge2("destLlinatge2_" + i);
@@ -2222,11 +2470,11 @@ public class NotificaWsTestIntegracioRest {
 			destinatari.setTelefon("666020202");
 			destinatari.setEmail("destinatari@gmail.com");
 			destinataris.add(destinatari);
-			enviament.getDestinataris().add(destinatari);
+			enviaments.getDestinataris().add(destinatari);
 			if (ambEnviamentPostal) {
 				EntregaPostal entregaPostal = new EntregaPostal();
 				entregaPostal.setTipus(tipusEnviamentPostal);
-				if (tipusEnviamentPostal.equals(EntregaPostalTipusEnum.ESTRANGER)) {
+				if (tipusEnviamentPostal.equals(NotificaDomiciliConcretTipusEnumDto.ESTRANGER)) {
 					entregaPostal.setPaisCodi("UK");
 					entregaPostal.setViaNom("Prime Minister's Office, 10 Downing Street");
 					entregaPostal.setPoblacio("London");
@@ -2247,40 +2495,40 @@ public class NotificaWsTestIntegracioRest {
 					entregaPostal.setCodiPostal("07500");
 					entregaPostal.setPoblacio("poblacio" + i);
 					entregaPostal.setMunicipiCodi("070337");
-					entregaPostal.setProvinciaCodi("07");
+					entregaPostal.setProvincia("07");
 					entregaPostal.setPaisCodi("ES");
 					entregaPostal.setLinea1("linea1_" + i);
 					entregaPostal.setLinea2("linea2_" + i);
-					if (tipusEnviamentPostal.equals(EntregaPostalTipusEnum.APARTAT_CORREUS))
+					if (tipusEnviamentPostal.equals(NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS))
 						entregaPostal.setApartatCorreus("0228");
 				}
 				entregaPostal.setCie(new Integer(8));
-				enviament.setEntregaPostal(entregaPostal);
+				enviaments.setEntregaPostal(entregaPostal);
 			}
 			if (ambEnviamentDEH) {
 				EntregaDeh entregaDeh = new EntregaDeh();
 				entregaDeh.setObligat(enviamentDEHObligat);
 				entregaDeh.setProcedimentCodi("0000");
-				enviament.setEntregaDeh(entregaDeh);
+				enviaments.setEntregaDeh(entregaDeh);
 			}
-			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
-			notificacio.getEnviaments().add(enviament);
+			enviaments.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
+			notificacioV2.getEnviaments().add(enviaments);
 		}
-		ParametresSeu parametresSeu = new ParametresSeu();
-		parametresSeu.setExpedientSerieDocumental("0000S");
-		parametresSeu.setExpedientUnitatOrganitzativa("00000000T");
-		parametresSeu.setExpedientIdentificadorEni("seuExpedientIdentificadorEni_" + notificacioId);
-		parametresSeu.setExpedientTitol("seuExpedientTitol_" + notificacioId);
-		parametresSeu.setRegistreOficina("seuRegistreOficina_" + notificacioId);
-		parametresSeu.setRegistreLlibre("seuRegistreLlibre_" + notificacioId);
-		parametresSeu.setIdioma("seuIdioma_" + notificacioId);
-		parametresSeu.setAvisTitol("seuAvisTitol_" + notificacioId);
-		parametresSeu.setAvisText("seuAvisText_" + notificacioId);
-		parametresSeu.setAvisTextMobil("seuAvisTextMobil_" + notificacioId);
-		parametresSeu.setOficiTitol("seuOficiTitol_" + notificacioId);
-		parametresSeu.setOficiText("seuOficiText_" + notificacioId);
-		notificacio.setParametresSeu(parametresSeu);
-		return notificacio;
+//		ParametresSeu parametresSeu = new ParametresSeu();
+//		parametresSeu.setExpedientSerieDocumental("0000S");
+//		parametresSeu.setExpedientUnitatOrganitzativa("00000000T");
+//		parametresSeu.setExpedientIdentificadorEni("seuExpedientIdentificadorEni_" + notificacioId);
+//		parametresSeu.setExpedientTitol("seuExpedientTitol_" + notificacioId);
+//		parametresSeu.setRegistreOficina("seuRegistreOficina_" + notificacioId);
+//		parametresSeu.setRegistreLlibre("seuRegistreLlibre_" + notificacioId);
+//		parametresSeu.setIdioma("seuIdioma_" + notificacioId);
+//		parametresSeu.setAvisTitol("seuAvisTitol_" + notificacioId);
+//		parametresSeu.setAvisText("seuAvisText_" + notificacioId);
+//		parametresSeu.setAvisTextMobil("seuAvisTextMobil_" + notificacioId);
+//		parametresSeu.setOficiTitol("seuOficiTitol_" + notificacioId);
+//		parametresSeu.setOficiText("seuOficiText_" + notificacioId);
+//		notificacio.setParametresSeu(parametresSeu);
+		return notificacioV2;
 	}
 	
 //	public NotificacioTest generarNotificacio(
@@ -2441,5 +2689,4 @@ public class NotificaWsTestIntegracioRest {
 		c.setTime(date);
 		return DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
 	}
-	*/
 }

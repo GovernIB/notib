@@ -372,7 +372,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			resposta.setErrorDescripcio("No s'ha pogut desxifrar l'identificador de la notificació " + identificador);
 			return resposta;
 		}
-		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
+		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
 		
 		if (notificacio == null) {
 			resposta.setError(true);

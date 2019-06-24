@@ -512,8 +512,8 @@ public abstract class AbstractNotificaHelper {
 		SecretKeySpec rc4Key = new SecretKeySpec(getClauXifratIdsProperty().getBytes(),"RC4");
 		cipher.init(Cipher.ENCRYPT_MODE, rc4Key);
 		byte[] xifrat = cipher.doFinal(bytes);
-		//return new String(Base64.encodeBase64(xifrat));
-		return new String(Hex.encodeHex(xifrat));
+		return new String(Base64.encodeBase64(xifrat));
+//		return new String(Hex.encodeHex(xifrat));
 	}
 	protected Long desxifrarId(String idXifrat) throws GeneralSecurityException {
 		Cipher cipher = Cipher.getInstance("RC4");
