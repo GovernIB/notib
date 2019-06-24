@@ -3,23 +3,13 @@
  */
 package es.caib.notib.client;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import java.io.IOException;
-import java.util.List;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.apache.commons.codec.DecoderException;
 import org.junit.Before;
 import org.junit.Test;
-
-import es.caib.notib.ws.notificacio.EnviamentReferencia;
-import es.caib.notib.ws.notificacio.NotificacioEstatEnum;
-import es.caib.notib.ws.notificacio.RespostaAlta;
 
 /**
  * Test per al client REST del servei de notificacions de NOTIB.

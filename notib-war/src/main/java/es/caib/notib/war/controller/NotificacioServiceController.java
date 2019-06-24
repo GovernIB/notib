@@ -3,6 +3,7 @@
  */
 package es.caib.notib.war.controller;
 
+import javax.ejb.EJBAccessException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+
+import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.util.UtilitatsNotib;
 import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWs;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
@@ -36,6 +40,8 @@ import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
 @Api(value = "/services", description = "Notificacio API")
 public class NotificacioServiceController extends BaseController {
 
+	@Autowired
+	private AplicacioService aplicacioService;
 	@Autowired
 	private NotificacioServiceWs notificacioServiceWsV1;
 	@Autowired
@@ -61,7 +67,21 @@ public class NotificacioServiceController extends BaseController {
 					value = "Objecte amb les dades necessàries per a generar una notificació",
 					required = true) 
 			@RequestBody NotificacioV2 notificacio) {
-		return notificacioServiceWsV2.alta(notificacio);
+		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
+		try {
+			return notificacioServiceWsV2.alta(notificacio);
+		} catch (Exception e) {
+			RespostaAlta resp = new RespostaAlta();
+			resp.setError(true);
+			if (UtilitatsNotib.isExceptionOrCauseInstanceOf(e, EJBAccessException.class)) {
+				resp.setErrorDescripcio("L'usuari " + usuariActualCodi + " no té els permisos necessaris: " + e.getMessage());
+			} else {
+				resp.setErrorDescripcio(UtilitatsNotib.getMessageExceptionOrCauseInstanceOf(
+						e, 
+						EJBAccessException.class));
+			}
+			return resp;
+		}
 	}
 	
 	@RequestMapping(
@@ -79,7 +99,21 @@ public class NotificacioServiceController extends BaseController {
 					value = "Objecte amb les dades necessàries per a generar una notificació",
 					required = true) 
 			@RequestBody Notificacio notificacio) {
-		return notificacioServiceWsV1.alta(notificacio);
+		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
+		try {
+			return notificacioServiceWsV1.alta(notificacio);
+		} catch (Exception e) {
+			RespostaAlta resp = new RespostaAlta();
+			resp.setError(true);
+			if (UtilitatsNotib.isExceptionOrCauseInstanceOf(e, EJBAccessException.class)) {
+				resp.setErrorDescripcio("L'usuari " + usuariActualCodi + " no té els permisos necessaris: " + e.getMessage());
+			} else {
+				resp.setErrorDescripcio(UtilitatsNotib.getMessageExceptionOrCauseInstanceOf(
+						e, 
+						EJBAccessException.class));
+			}
+			return resp;
+		}
 	}
 
 	@RequestMapping(
@@ -97,7 +131,21 @@ public class NotificacioServiceController extends BaseController {
 					required = true)
 			@PathVariable("identificador")
 			String identificador) {
-		return notificacioServiceWsV1.consultaEstatNotificacio(identificador);
+		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
+		try {
+			return notificacioServiceWsV1.consultaEstatNotificacio(identificador);
+		} catch (Exception e) {
+			RespostaConsultaEstatNotificacio resp = new RespostaConsultaEstatNotificacio();
+			resp.setError(true);
+			if (UtilitatsNotib.isExceptionOrCauseInstanceOf(e, EJBAccessException.class)) {
+				resp.setErrorDescripcio("L'usuari " + usuariActualCodi + " no té els permisos necessaris: " + e.getMessage());
+			} else {
+				resp.setErrorDescripcio(UtilitatsNotib.getMessageExceptionOrCauseInstanceOf(
+						e, 
+						EJBAccessException.class));
+			}
+			return resp;
+		}
 	}
 
 	@RequestMapping(
@@ -115,7 +163,21 @@ public class NotificacioServiceController extends BaseController {
 					required = true)
 			@PathVariable("referencia")
 			String referencia) {
-		return notificacioServiceWsV1.consultaEstatEnviament(referencia);
+		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
+		try {
+			return notificacioServiceWsV1.consultaEstatEnviament(referencia);
+		} catch (Exception e) {
+			RespostaConsultaEstatEnviament resp = new RespostaConsultaEstatEnviament();
+			resp.setError(true);
+			if (UtilitatsNotib.isExceptionOrCauseInstanceOf(e, EJBAccessException.class)) {
+				resp.setErrorDescripcio("L'usuari " + usuariActualCodi + " no té els permisos necessaris: " + e.getMessage());
+			} else {
+				resp.setErrorDescripcio(UtilitatsNotib.getMessageExceptionOrCauseInstanceOf(
+						e, 
+						EJBAccessException.class));
+			}
+			return resp;
+		}
 	}
 	
 	@RequestMapping(
@@ -133,12 +195,23 @@ public class NotificacioServiceController extends BaseController {
 					value = "Objecte amb les dades necessàries per donar el permís",
 					required = true) 
 			@RequestBody PermisConsulta permisConsulta) {
+		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
 		String messatge = null;
-		
-		if (notificacioServiceWsV2.donarPermisConsulta(permisConsulta)) {
-			messatge = "OK";
+		try {
+			if (notificacioServiceWsV2.donarPermisConsulta(permisConsulta)) {
+				messatge = "OK";
+			}
+			return messatge;
+		} catch (Exception e) {
+			if (UtilitatsNotib.isExceptionOrCauseInstanceOf(e, EJBAccessException.class)) {
+				messatge = "L'usuari " + usuariActualCodi + " no té els permisos necessaris: " + e.getMessage();
+			} else {
+				messatge = UtilitatsNotib.getMessageExceptionOrCauseInstanceOf(
+						e, 
+						EJBAccessException.class);
+			}
+			return messatge;
 		}
-		return messatge;
 	}
 
 }
