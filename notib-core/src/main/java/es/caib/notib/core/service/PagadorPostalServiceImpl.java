@@ -144,10 +144,21 @@ public class PagadorPostalServiceImpl implements PagadorPostalService{
 					pagadorPostalReposity.findAll(),
 					PagadorPostalDto.class);
 	}
+	
+	@Override
+	public List<PagadorPostalDto> findByEntitat(Long entitatId) {
+		logger.debug("Consulta els pagadors postal de l'entitat: " + entitatId);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		List<PagadorPostalEntity> pagadorsPostal = pagadorPostalReposity.findByEntitat(entitat);
+		
+		return conversioTipusHelper.convertirList(
+				pagadorsPostal,
+				PagadorPostalDto.class);
+	}
+
 
 	@Override
 	public PaginaDto<PagadorPostalDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	

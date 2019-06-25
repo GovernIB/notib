@@ -1,5 +1,7 @@
 package es.caib.notib.core.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -32,5 +34,7 @@ public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEnti
 			@Param("numContracte") String filtreNumContracte,	
 			@Param("entitat") EntitatEntity entitat,
 			Pageable paginacio);
+	
+	List<PagadorPostalEntity> findByEntitat(EntitatEntity entitat);
 	
 }

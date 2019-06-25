@@ -2412,6 +2412,7 @@ public class NotificaWsTestIntegracioRest {
 		notificacioV2.setDescripcio("descripcio_" + notificacioId);
 		notificacioV2.setEnviamentDataProgramada(null);
 		notificacioV2.setRetard(5);
+		notificacioV2.setUsuariCodi("e43110511r");
 		notificacioV2.setCaducitat(
 				toXmlGregorianCalendar(
 						new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000)));

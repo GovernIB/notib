@@ -39,7 +39,6 @@ import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
-import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.GrupService;
@@ -125,7 +124,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			NotificacioV2 notificacio) throws NotificacioServiceWsException {
 		String emisorDir3Codi = notificacio.getEmisorDir3Codi();
 		RespostaAlta resposta = new RespostaAlta();
-		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		EntitatEntity entitat = entitatRepository.findByDir3Codi(emisorDir3Codi);
 		if (emisorDir3Codi == null) {
 			resposta.setError(true);
@@ -175,6 +173,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			resposta.setErrorDescripcio("[ENVIAMENTS] El camp 'enviaments' no pot ser null.");
 			return resposta;
 		}
+		if (notificacio.getUsuariCodi() == null || notificacio.getUsuariCodi().isEmpty()) {
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[USUARI_CODI] El camp 'usuariCodi' no pot ser null (Requisit per fer el registre de sortida).");
+			return resposta;
+		} 
 		for(Enviament enviament : notificacio.getEnviaments()) {
 			if(enviament.isEntregaPostalActiva() && (enviament.getEntregaPostal().getViaNom() == null || enviament.getEntregaPostal().getViaNom().isEmpty())) {
 				resposta.setError(true);
@@ -340,7 +344,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	//					notificacio.getRefExterna(),
 	//					notificacio.getCodiAssumpte(),
 	//					notificacio.getObservacions()
-						).document(documentEntity).usuariCodi(usuariActual.getCodi());
+						).document(documentEntity);
 				
 				NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioBuilder.build());
 				List<EnviamentReferencia> referencies = new ArrayList<EnviamentReferencia>();

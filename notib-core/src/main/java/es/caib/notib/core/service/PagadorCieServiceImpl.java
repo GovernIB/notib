@@ -133,6 +133,17 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 					pagadorCieReposity.findAll(),
 					PagadorCieDto.class);
 	}
+	
+	@Override
+	public List<PagadorCieDto> findByEntitat(Long entitatId) {
+		logger.debug("Consulta els pagadors postal de l'entitat: " + entitatId);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		List<PagadorCieEntity> pagadorsCie = pagadorCieReposity.findByEntitat(entitat);
+		
+		return conversioTipusHelper.convertirList(
+				pagadorsCie,
+				PagadorCieDto.class);
+	}
 
 	@Override
 	public PaginaDto<PagadorCieDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
