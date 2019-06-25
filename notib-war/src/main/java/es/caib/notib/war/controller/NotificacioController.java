@@ -393,7 +393,7 @@ public class NotificacioController extends BaseUserController {
 				// Obté els procediments que tenen el mateix grup que el rol d'usuari
 				for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
 					for (String rol : rolsUsuariActual) {
-						if (rol.contains(grupProcediment.getGrup().getCodi())) {
+						if (rol.contains(grupProcediment.getGrup().getCodi()) && (grupProcediment.getProcediment().getEntitat().equals(entitatActual))) {
 							procediments.add(grupProcediment.getProcediment());
 						}
 					}

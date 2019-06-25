@@ -55,8 +55,8 @@ import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class NotificaWsTestIntegracioRest {
 
-	private static final String ENTITAT_DIR3CODI = "A04013511";
-
+//	private static final String ENTITAT_DIR3CODI = "A04013511";
+	private static final String ENTITAT_DIR3CODI = "A04003003";
 //	@Autowired
 //	private NotificaV2Helper notificaHelper;
 //	@Autowired
@@ -74,14 +74,14 @@ public class NotificaWsTestIntegracioRest {
 
 	@BeforeClass
 	public static void setUpClass() throws IOException, DecoderException {
-//		client = NotificacioRestClientFactory.getRestClient(
-//				"https://dev.caib.es/notib",
-//				"$ripea_notib",
-//				"ripea_notib");
 		client = NotificacioRestClientFactory.getRestClient(
-				"http://localhost:8180/notib",
-				"usuari2",
-				"usuari2");
+				"https://dev.caib.es/notib",
+				"$ripea_notib",
+				"ripea_notib");
+//		client = NotificacioRestClientFactory.getRestClient(
+//				"http://localhost:8081/notib",
+//				"usuari2",
+//				"usuari2");
 	}
 	
 	@Before
@@ -146,6 +146,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -2311,7 +2312,7 @@ public class NotificaWsTestIntegracioRest {
 	// -------------------------------------------------------------------------------------
 	// Se comprobará que el servicio web responde con el mensaje
 	// “Identificador de envío erróneo”.
-	@Test
+//	@Test
 	public void pruebaEmision38() throws Exception {
 	
 		int numDestinataris = 1;
@@ -2424,7 +2425,7 @@ public class NotificaWsTestIntegracioRest {
 		documentV2.setNormalitzat(false);
 //		document.setGenerarCsv(false);
 		notificacioV2.setDocument(documentV2);
-		notificacioV2.setProcedimentCodi("0000");
+		notificacioV2.setProcedimentCodi("234257");
 		
 		//Els pagadors postals i cie ja estan definits a nivell de procediment
 //		if (ambEnviamentPostal) {

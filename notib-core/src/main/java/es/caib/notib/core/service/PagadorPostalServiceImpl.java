@@ -17,6 +17,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.PagadorPostalService;
+import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.PagadorPostalEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
@@ -46,7 +47,7 @@ public class PagadorPostalServiceImpl implements PagadorPostalService{
 			PagadorPostalDto postal) {
 		logger.debug("Creant un nou pagador postal ("
 				+ "pagador=" + postal + ")");
-		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 		PagadorPostalEntity pagadorPostalEntity = null;
 		
 		pagadorPostalEntity = pagadorPostalReposity.save(
@@ -54,7 +55,8 @@ public class PagadorPostalServiceImpl implements PagadorPostalService{
 						postal.getDir3codi(),
 						postal.getContracteNum(),
 						postal.getContracteDataVig(),
-						postal.getFacturacioClientCodi()).build());
+						postal.getFacturacioClientCodi(),
+						entitat).build());
 		
 		return conversioTipusHelper.convertir(
 				pagadorPostalEntity, 
@@ -113,15 +115,16 @@ public class PagadorPostalServiceImpl implements PagadorPostalService{
 				true,
 				true,
 				false);
-		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 		Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 		Page<PagadorPostalEntity> pagadorPostal = null;
 
-		pagadorPostal = pagadorPostalReposity.findByCodiDir3AndNumContacteNotNullFiltrePaginat(
+		pagadorPostal = pagadorPostalReposity.findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitat(
 				filtre.getDir3codi() == null || filtre.getDir3codi().isEmpty(),
 				filtre.getDir3codi(),
 				filtre.getContracteNum() == null || filtre.getContracteNum().isEmpty(),
 				filtre.getContracteNum(),
+				entitat,
 				paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio));
 		
 		return paginacioHelper.toPaginaDto(
