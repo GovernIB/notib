@@ -170,11 +170,13 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				 notificacio.getPagadorPostal().getDir3Codi(),
 				 notificacio.getPagadorPostal().getContracteNum(),
 				 notificacio.getPagadorPostal().getContracteDataVigencia(),
-				 notificacio.getPagadorPostal().getFacturacioClientCodi()).build());
+				 notificacio.getPagadorPostal().getFacturacioClientCodi(),
+				 entitat).build());
 		
 		PagadorCieEntity pagadorCie = pagadorCieRepository.saveAndFlush(PagadorCieEntity.getBuilder(
 				notificacio.getPagadorCie().getDir3Codi(),
-				notificacio.getPagadorCie().getContracteDataVigencia()).build());
+				notificacio.getPagadorCie().getContracteDataVigencia(),
+				entitat).build());
 		
 		DocumentEntity documentEntity = documentRepository.saveAndFlush(DocumentEntity.getBuilder(
 				notificacio.getDocument().getArxiuId(), 

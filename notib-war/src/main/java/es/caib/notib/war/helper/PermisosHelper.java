@@ -40,7 +40,7 @@ public class PermisosHelper {
 			for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
 				
 				for (String rol : rolsUsuariActual) {
-					if(rol.contains((grupProcediment.getGrup().getCodi()))) {
+					if(rol.contains((grupProcediment.getGrup().getCodi())) && (grupProcediment.getProcediment().getEntitat().equals(entitatActual))) {
 						procediments.add(grupProcediment.getProcediment());
 					}
 				}
