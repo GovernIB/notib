@@ -1149,7 +1149,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				null,
 				notificacioId);
 		notificacioEntity.updateEstat(NotificacioEstatEnumDto.PROCESSADA);
-		//notificacioEntity.updateEstatDate(new Date());
+		notificacioEntity.updateEstatDate(new Date());
 		notificacioEntity.updateMotiu(motiu);
 		emailHelper.prepararEnvioEmailNotificacio(notificacioEntity);
 		notificacioRepository.saveAndFlush(notificacioEntity);

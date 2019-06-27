@@ -173,7 +173,7 @@ public class EmailHelper {
 					"		</tr>"+
 					"		<tr>"+
 					"			<th>"+ messageHelper.getMessage("notificacio.email.estat.nou") +"</th>"+
-					"			<td>"+ messageHelper.getMessage("notificacio.estat.enum.FINALITZADA") + "</td>"+
+					"			<td>"+ messageHelper.getMessage("notificacio.estat.enum.PROCESSADA") + "</td>"+
 					"		</tr>"+	
 					"		<tr>"+
 					"			<th>"+ messageHelper.getMessage("notificacio.email.estat.motiu") +"</th>"+

@@ -183,7 +183,9 @@ public class NotificacioController extends BaseUserController {
 
 				for (String rol : rolsUsuariActual) {
 					if (rol.contains(grupProcediment.getGrup().getCodi())) {
-						procedimentsAmbGrups.add(grupProcediment.getProcediment());
+						if ((grupProcediment.getProcediment().getEntitat().getDir3Codi().equals(entitatActual.getDir3Codi()))) {
+							procedimentsAmbGrups.add(grupProcediment.getProcediment());
+						}
 					}
 				}
 			}
@@ -393,8 +395,11 @@ public class NotificacioController extends BaseUserController {
 				// Obté els procediments que tenen el mateix grup que el rol d'usuari
 				for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
 					for (String rol : rolsUsuariActual) {
-						if (rol.contains(grupProcediment.getGrup().getCodi()) && (grupProcediment.getProcediment().getEntitat().equals(entitatActual))) {
-							procediments.add(grupProcediment.getProcediment());
+						if (rol.contains(grupProcediment.getGrup().getCodi())) {
+							//si el procediment es de l'entitat actual
+							if ((grupProcediment.getProcediment().getEntitat().getDir3Codi().equals(entitatActual.getDir3Codi()))) {
+								procediments.add(grupProcediment.getProcediment());
+							}
 						}
 					}
 				}

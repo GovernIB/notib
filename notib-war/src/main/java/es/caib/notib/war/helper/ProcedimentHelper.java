@@ -51,7 +51,9 @@ public class ProcedimentHelper {
 			for (ProcedimentGrupDto grupProcediment : procedimentsAmbGrups) {
 				for (String rol : rolsUsuariActual) {
 					if (rol.contains(grupProcediment.getGrup().getCodi())) {
-						procediments.add(grupProcediment.getProcediment());
+						if ((grupProcediment.getProcediment().getEntitat().getDir3Codi().equals(entitatActual.getDir3Codi()))) {
+							procediments.add(grupProcediment.getProcediment());
+						}
 					}
 				}
 			}
@@ -96,7 +98,9 @@ public class ProcedimentHelper {
 		for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
 			for (String rol : rolsUsuariActual) {
 				if (rol.contains(grupProcediment.getGrup().getCodi())) {
-					procediments.add(grupProcediment.getProcediment());
+					if ((grupProcediment.getProcediment().getEntitat().getDir3Codi().equals(entitatActual.getDir3Codi()))) {
+						procediments.add(grupProcediment.getProcediment());
+					}
 				}
 			}
 		}

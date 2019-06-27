@@ -32,6 +32,7 @@ public @interface ValidIfVisibleAndNormalitzat {
 	String fieldName();
 	NotificaDomiciliConcretTipusEnumDto fieldValue();
 	String dependFieldName();
+	String dependFieldNameSecond();
 
 	String message() default "Aquest camp és obligatori";
 	Class<?>[] groups() default {};

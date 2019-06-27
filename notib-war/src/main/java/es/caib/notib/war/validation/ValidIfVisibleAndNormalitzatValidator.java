@@ -26,15 +26,17 @@ public class ValidIfVisibleAndNormalitzatValidator implements ConstraintValidato
 	private String fieldName;
     private NotificaDomiciliConcretTipusEnumDto expectedFieldValue;
     private String dependFieldName;
+    private String dependFieldNameSecond;
 	
 	@Override
 	public void initialize(ValidIfVisibleAndNormalitzat annotation) {
 		fieldNameVisible   = annotation.fieldNameVisible();
 		expectedFieldValueVisible = annotation.fieldValueVisble();
 		
-		fieldName          = annotation.fieldName();
-	    expectedFieldValue = annotation.fieldValue();
-	    dependFieldName    = annotation.dependFieldName();
+		fieldName          		= annotation.fieldName();
+	    expectedFieldValue 		= annotation.fieldValue();
+	    dependFieldName    		= annotation.dependFieldName();
+	    dependFieldNameSecond   = annotation.dependFieldNameSecond();
 	}
 
 	@Override
@@ -46,14 +48,37 @@ public class ValidIfVisibleAndNormalitzatValidator implements ConstraintValidato
             return true;
         }
 		try {
-			String fieldValueVisible       = BeanUtils.getProperty(value, fieldNameVisible);
+            boolean dependFieldValueEmpty = true;
+            boolean validarDependFieldNameSecondValue = true;
             
+			String fieldValueVisible       = BeanUtils.getProperty(value, fieldNameVisible);
 			String fieldValue       = BeanUtils.getProperty(value, fieldName);
             String dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
-            dependFieldValue = dependFieldValue.replaceAll(",", "");
+            String dependFieldNameSecondValue = BeanUtils.getProperty(value, dependFieldNameSecond);
+            
+            if (dependFieldValue != null) {
+            	dependFieldValue = dependFieldValue.replaceAll(",", "");
+            	dependFieldValueEmpty  = dependFieldValue.isEmpty();
+            }
+            
+            if (dependFieldValue != null && dependFieldNameSecondValue != null) {
+	            if (fieldValue.equals("NACIONAL") && 
+	            		(dependFieldName.equals("puntKm") && dependFieldValue.isEmpty()) &&
+	            		(dependFieldNameSecond.equals("numeroCasa") && !dependFieldNameSecondValue.isEmpty())) {
+	            	validarDependFieldNameSecondValue = false;
+	            }
+	            
+	            if (fieldValue.equals("NACIONAL") && 
+	            		(dependFieldName.equals("numeroCasa") && dependFieldValue.isEmpty()) && 
+	            		(dependFieldNameSecond.equals("puntKm") && !dependFieldNameSecondValue.isEmpty())) {
+	            	validarDependFieldNameSecondValue = false;
+	            }
+            }
+            
             if (expectedFieldValueVisible.equals(fieldValueVisible) && 
             		fieldValue.equalsIgnoreCase(expectedFieldValue.name()) && 
-            		dependFieldValue.isEmpty()) {
+            		dependFieldValueEmpty &&
+            		validarDependFieldNameSecondValue) {
             	context.disableDefaultConstraintViolation();
             	context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate())
                     .addNode(dependFieldName)

@@ -12,6 +12,8 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
+import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
+
 /**
  * Constraint de validació que controla que no es repeteixi
  * el codi d'entitat.
@@ -20,13 +22,15 @@ import javax.validation.Payload;
  */
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy=ValidIfVisibleValidator.class)
+@Constraint(validatedBy=ValidIfVisibleAndNotEqualValidator.class)
 @Documented
-public @interface ValidIfVisible {
+public @interface ValidIfVisibleAndNotEqual {
 
 	String fieldName();
 	String fieldValue();
 	String dependFieldName();
+	String noDependFieldName();
+	NotificaDomiciliConcretTipusEnumDto noExpectedFieldValue();
 	
 	String message() default "Aquest camp és obligatori";
 	Class<?>[] groups() default {};
@@ -37,6 +41,6 @@ public @interface ValidIfVisible {
     @Retention(RetentionPolicy.RUNTIME)
     @Documented
     @interface List {
-		ValidIfVisible[] value();
+		ValidIfVisibleAndNotEqual[] value();
     }
 }

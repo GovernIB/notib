@@ -579,6 +579,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
 		this.registreNumeroFormatat = registreNumeroFormatat;
 	}
+	
 	public void updateNotificaEnviada(
 			String notificaIdentificador) {
 		this.notificaIdentificador = notificaIdentificador;
@@ -798,8 +799,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 				tipusServei,
 				notificacioGuardada,
 				titular,
-				destinataris
-				);
+				destinataris);
 	}
 	
 	public static class Builder {
@@ -1094,28 +1094,33 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built.domiciliTipus = NotificaDomiciliTipusEnumDto.CONCRETO;
 			built.domiciliNumeracioTipus = numeracioTipus;
 			built.domiciliConcretTipus = tipusConcret;
-			if(enviament.getEntregaPostal() != null) {
-				built.domiciliViaNom = enviament.getEntregaPostal().getViaNom();
-				built.domiciliNumeracioNumero = enviament.getEntregaPostal().getNumeroCasa();
-				built.domiciliNumeracioQualificador = enviament.getEntregaPostal().getNumeroQualificador();
-				built.domiciliNumeracioPuntKm = enviament.getEntregaPostal().getPuntKm();
-				built.domiciliApartatCorreus = enviament.getEntregaPostal().getApartatCorreus();
-				built.domiciliPortal = enviament.getEntregaPostal().getPortal();
-				built.domiciliEscala = enviament.getEntregaPostal().getEscala();
-				built.domiciliPlanta = enviament.getEntregaPostal().getPlanta();
-				built.domiciliPorta = enviament.getEntregaPostal().getPorta();
-				built.domiciliBloc = enviament.getEntregaPostal().getBloc();
-				built.domiciliComplement = enviament.getEntregaPostal().getComplement();
-				built.domiciliCodiPostal = enviament.getEntregaPostal().getCodiPostal();
-				built.domiciliPoblacio = enviament.getEntregaPostal().getPoblacio();
-				built.domiciliMunicipiCodiIne = enviament.getEntregaPostal().getMunicipiCodi();
-				built.domiciliProvinciaCodi = enviament.getEntregaPostal().getProvincia();
-				built.domiciliPaisCodiIso = enviament.getEntregaPostal().getPaisCodi();
-				built.domiciliLinea1 = enviament.getEntregaPostal().getLinea1();
-				built.domiciliLinea2 = enviament.getEntregaPostal().getLinea2();
-				built.domiciliCie = enviament.getEntregaPostal().getCie();
-				built.formatSobre = enviament.getEntregaPostal().getFormatSobre();
-				built.formatFulla = enviament.getEntregaPostal().getFormatFulla();
+			if (enviament.getEntregaPostal() != null) {
+				if(! enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR)) {
+					built.domiciliViaNom = enviament.getEntregaPostal().getViaNom();
+					built.domiciliNumeracioNumero = enviament.getEntregaPostal().getNumeroCasa();
+					built.domiciliNumeracioQualificador = enviament.getEntregaPostal().getNumeroQualificador();
+					built.domiciliNumeracioPuntKm = enviament.getEntregaPostal().getPuntKm();
+					built.domiciliApartatCorreus = enviament.getEntregaPostal().getApartatCorreus();
+					built.domiciliPortal = enviament.getEntregaPostal().getPortal();
+					built.domiciliEscala = enviament.getEntregaPostal().getEscala();
+					built.domiciliPlanta = enviament.getEntregaPostal().getPlanta();
+					built.domiciliPorta = enviament.getEntregaPostal().getPorta();
+					built.domiciliBloc = enviament.getEntregaPostal().getBloc();
+					built.domiciliComplement = enviament.getEntregaPostal().getComplement();
+					built.domiciliCodiPostal = enviament.getEntregaPostal().getCodiPostal();
+					built.domiciliPoblacio = enviament.getEntregaPostal().getPoblacio();
+					built.domiciliMunicipiCodiIne = enviament.getEntregaPostal().getMunicipiCodi();
+					built.domiciliProvinciaCodi = enviament.getEntregaPostal().getProvincia();
+					built.domiciliPaisCodiIso = enviament.getEntregaPostal().getPaisCodi();
+					built.domiciliLinea1 = enviament.getEntregaPostal().getLinea1();
+					built.domiciliLinea2 = enviament.getEntregaPostal().getLinea2();
+					built.domiciliCie = enviament.getEntregaPostal().getCie();
+					built.formatSobre = enviament.getEntregaPostal().getFormatSobre();
+					built.formatFulla = enviament.getEntregaPostal().getFormatFulla();
+				} else if (enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR)) {
+					built.domiciliLinea1 = enviament.getEntregaPostal().getLinea1();
+					built.domiciliLinea2 = enviament.getEntregaPostal().getLinea2();
+				}
 			}
 			if (enviament.getEntregaDeh() != null) {
 				built.dehObligat = enviament.getEntregaDeh().isObligat();
