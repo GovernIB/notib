@@ -210,6 +210,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			for (DadesInteressat dadesInteressat : registreSortida.getDadesInteressat()) {
 				datosInteresado.setApellido1(dadesInteressat.getCognom1());
 				datosInteresado.setApellido2(dadesInteressat.getCognom2());
+				datosInteresado.setTipoDocumentoIdentificacion(RegistreInteressatDocumentTipusDtoEnum.NIF.name());
 				datosInteresado.setDocumento(dadesInteressat.getNif());
 				datosInteresado.setNombre(dadesInteressat.getNom());
 				datosInteresado.setTipoInteresado(dadesInteressat.getTipusInteressat());

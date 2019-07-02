@@ -1,5 +1,6 @@
 package es.caib.notib.plugin.registre;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ public class RegistreSortida {
 	private String codiEntitat;
 	private String codiUsuari;
 	private DadesOficina dadesOficina;
-	private List<DadesInteressat> dadesInteressat;
+	private List<DadesInteressat> dadesInteressat = new ArrayList<DadesInteressat>();
 	private DadesRepresentat dadesRepresentat;
 	private DadesAnotacio dadesAnotacio;
 	private List<DocumentRegistre> documents;
