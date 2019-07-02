@@ -80,6 +80,9 @@ import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
 import es.caib.notib.plugin.registre.TipusAssumpte;
 import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
 import es.caib.notib.plugin.seu.SeuPlugin;
+import es.caib.notib.plugin.unitat.CodiValor;
+import es.caib.notib.plugin.unitat.CodiValorPais;
+import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
 import es.caib.plugins.arxiu.api.ArxiuException;
@@ -103,6 +106,7 @@ public class PluginHelper {
 	private SeuPlugin seuPlugin;
 	private RegistrePlugin registrePlugin;
 	private IArxiuPlugin arxiuPlugin;
+	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin;
 
 	@Autowired
 	private IntegracioHelper integracioHelper;
@@ -166,10 +170,16 @@ public class PluginHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_USUARIS,
-					errorDescripcio,
-					ex);
+			if (ex.getCause() != null) {
+				rs.setDescripcioError(errorDescripcio + " :" + ex.getCause().getMessage());
+				return rs;
+			} else {
+				throw new SistemaExternException(
+				IntegracioHelper.INTCODI_USUARIS,
+				errorDescripcio,
+				ex);
+			}
+
 		}
 		return rs;
 	}
@@ -799,6 +809,19 @@ public class PluginHelper {
 	
 		return organismes;
 	}
+	
+	public List<CodiValor> llistarProvincies() throws SistemaExternException, es.caib.notib.plugin.SistemaExternException {
+		return getUnitatsOrganitzativesPlugin().provincies();
+	}
+	
+	public List<CodiValor> llistarLocalitats(String codiProvincia) throws es.caib.notib.plugin.SistemaExternException {
+		return getUnitatsOrganitzativesPlugin().localitats(codiProvincia);
+	}
+	
+	public List<CodiValorPais> llistarPaisos() throws es.caib.notib.plugin.SistemaExternException {
+		return getUnitatsOrganitzativesPlugin().paisos();
+	}
+	
 	private RegistreSortida toRegistreSortida(
 			NotificacioDtoV2 notificacio,
 			NotificacioEnviamentDtoV2 enviament) throws RegistrePluginException {
@@ -1650,6 +1673,32 @@ public class PluginHelper {
 		return arxiuPlugin;
 	}
 
+	private UnitatsOrganitzativesPlugin getUnitatsOrganitzativesPlugin() {
+		if (unitatsOrganitzativesPlugin == null) {
+			String pluginClass = getPropertyPluginUnitats();
+			if (pluginClass != null && pluginClass.length() > 0) {
+				try {
+					Class<?> clazz = Class.forName(pluginClass);
+					unitatsOrganitzativesPlugin = (UnitatsOrganitzativesPlugin)clazz.newInstance();
+				} catch (Exception ex) {
+					throw new SistemaExternException(
+							IntegracioHelper.INTCODI_REGISTRE,
+							"Error al crear la instància del plugin de registre",
+							ex);
+				}
+			} else {
+				throw new SistemaExternException(
+						IntegracioHelper.INTCODI_REGISTRE,
+						"La classe del plugin de registre no està configurada");
+			}
+		}
+		
+		return unitatsOrganitzativesPlugin;
+	}
+
+	private String getPropertyPluginUnitats() {
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.unitats.class");
+	}
 	private String getPropertyEmprarSir() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.emprar.sir");
 	}
@@ -1682,9 +1731,6 @@ public class PluginHelper {
 	}
 	public int getSeuReintentsConsultaPeriodeProperty() {
 		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.seu.consulta.periode");
-	}
-	private String getPropertyPluginCodiEntitatDir3() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.regweb.entitat.dir3");
 	}
 	
 	public NotificacioComunicacioTipusEnumDto getNotibTipusComunicacioDefecte() {

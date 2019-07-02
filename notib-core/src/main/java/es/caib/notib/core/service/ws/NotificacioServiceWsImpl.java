@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.jws.WebService;
@@ -169,11 +170,13 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				 notificacio.getPagadorPostal().getDir3Codi(),
 				 notificacio.getPagadorPostal().getContracteNum(),
 				 notificacio.getPagadorPostal().getContracteDataVigencia(),
-				 notificacio.getPagadorPostal().getFacturacioClientCodi()).build());
+				 notificacio.getPagadorPostal().getFacturacioClientCodi(),
+				 entitat).build());
 		
 		PagadorCieEntity pagadorCie = pagadorCieRepository.saveAndFlush(PagadorCieEntity.getBuilder(
 				notificacio.getPagadorCie().getDir3Codi(),
-				notificacio.getPagadorCie().getContracteDataVigencia()).build());
+				notificacio.getPagadorCie().getContracteDataVigencia(),
+				entitat).build());
 		
 		DocumentEntity documentEntity = documentRepository.saveAndFlush(DocumentEntity.getBuilder(
 				notificacio.getDocument().getArxiuId(), 
@@ -362,35 +365,47 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
 			String identificador) {
 		Long notificacioId;
+		RespostaConsultaEstatNotificacio resposta = new RespostaConsultaEstatNotificacio();
 		try {
 			notificacioId = notificaHelper.desxifrarId(identificador);
 		} catch (GeneralSecurityException ex) {
-			throw new RuntimeException(
-					"No s'ha pogut desxifrar l'identificador de la notificació",
-					ex);
-		}
-		NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
-		RespostaConsultaEstatNotificacio resposta = new RespostaConsultaEstatNotificacio();
-		switch (notificacio.getEstat()) {
-		case PENDENT:
-			resposta.setEstat(NotificacioEstatEnum.PENDENT);
-			break;
-		case ENVIADA:
-			resposta.setEstat(NotificacioEstatEnum.ENVIADA);
-			break;
-		case REGISTRADA:
-			resposta.setEstat(NotificacioEstatEnum.REGISTRADA);
-			break;
-		case FINALITZADA:
-			resposta.setEstat(NotificacioEstatEnum.FINALITZADA);
-			break;
-		}
-		if (notificacio.getNotificaErrorEvent() != null) {
 			resposta.setError(true);
-			resposta.setErrorData(
-					notificacio.getNotificaErrorEvent().getData());
-			resposta.setErrorDescripcio(
-					notificacio.getNotificaErrorEvent().getErrorDescripcio());
+			resposta.setErrorData(new Date());
+			resposta.setErrorDescripcio("No s'ha pogut desxifrar l'identificador de la notificació " + identificador);
+			return resposta;
+		}
+		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
+		
+		if (notificacio == null) {
+			resposta.setError(true);
+			resposta.setErrorData(new Date());
+			resposta.setErrorDescripcio("Error: No s'ha trobat cap notificació amb l'identificador " + identificador);
+			return resposta;
+		} else {
+			switch (notificacio.getEstat()) {
+			case PENDENT:
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				break;
+			case ENVIADA:
+				resposta.setEstat(NotificacioEstatEnum.ENVIADA);
+				break;
+			case REGISTRADA:
+				resposta.setEstat(NotificacioEstatEnum.REGISTRADA);
+				break;
+			case FINALITZADA:
+				resposta.setEstat(NotificacioEstatEnum.FINALITZADA);
+				break;
+			case PROCESSADA:
+				resposta.setEstat(NotificacioEstatEnum.PROCESSADA);
+				break;
+			}
+			if (notificacio.getNotificaErrorEvent() != null) {
+				resposta.setError(true);
+				resposta.setErrorData(
+						notificacio.getNotificaErrorEvent().getData());
+				resposta.setErrorDescripcio(
+						notificacio.getNotificaErrorEvent().getErrorDescripcio());
+			}
 		}
 		return resposta;
 	}
@@ -402,10 +417,10 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findByNotificaReferencia(referencia);
 		RespostaConsultaEstatEnviament resposta = new RespostaConsultaEstatEnviament();
 		if (enviament == null) {
-			// Error de no trobat
-			throw new ValidationException(
-					"REFERENCIA",
-					"Error: No s'ha trobat cap notificació amb la referencia " + referencia);
+			resposta.setError(true);
+			resposta.setErrorData(new Date());
+			resposta.setErrorDescripcio("Error: No s'ha trobat cap enviament amb la referencia " + referencia);
+			return resposta;
 		} else {
 //			Es canosulta l'estat periòdicament, no es necessita realitzar una consulta actica a Notifica
 			// Si Notib no utilitza el servei Adviser de @Notifica, i ja ha estat enviat a @Notifica

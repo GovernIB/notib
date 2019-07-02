@@ -17,6 +17,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.PagadorCieService;
+import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.PagadorCieEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
@@ -46,13 +47,14 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 			PagadorCieDto cie) {
 		logger.debug("Creant un nou pagador cie ("
 				+ "pagador=" + cie + ")");
-		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 		PagadorCieEntity pagadorCieEntity = null;
 		
 		pagadorCieEntity = pagadorCieReposity.save(
 				PagadorCieEntity.getBuilder(
 						cie.getDir3codi(),
-						cie.getContracteDataVig()).build());
+						cie.getContracteDataVig(),
+						entitat).build());
 		
 		return conversioTipusHelper.convertir(
 				pagadorCieEntity, 
@@ -95,20 +97,23 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	}
 
 	@Override
-	public PaginaDto<PagadorCieDto> findAmbFiltrePaginat(Long entitatId, PagadorCieFiltreDto filtre,
+	public PaginaDto<PagadorCieDto> findAmbFiltrePaginat(
+			Long entitatId, 
+			PagadorCieFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
 				true,
 				false);
-		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 		Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 		Page<PagadorCieEntity> pagadorCie = null;
 
-		pagadorCie = pagadorCieReposity.findByCodiDir3NotNullFiltrePaginat(
+		pagadorCie = pagadorCieReposity.findByCodiDir3NotNullFiltrePaginatAndEntitat(
 				filtre.getDir3codi() == null || filtre.getDir3codi().isEmpty(),
 				filtre.getDir3codi(),
+				entitat,
 				paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio));
 		
 		return paginacioHelper.toPaginaDto(
@@ -127,6 +132,17 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 		return conversioTipusHelper.convertirList(
 					pagadorCieReposity.findAll(),
 					PagadorCieDto.class);
+	}
+	
+	@Override
+	public List<PagadorCieDto> findByEntitat(Long entitatId) {
+		logger.debug("Consulta els pagadors postal de l'entitat: " + entitatId);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		List<PagadorCieEntity> pagadorsCie = pagadorCieReposity.findByEntitat(entitat);
+		
+		return conversioTipusHelper.convertirList(
+				pagadorsCie,
+				PagadorCieDto.class);
 	}
 
 	@Override

@@ -3,6 +3,8 @@
  */
 package es.caib.notib.core.api.dto;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -10,7 +12,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class TipusDocumentDto {
+public class TipusDocumentDto implements Serializable{
 
 	private Long id;
 	private Long entitat;
@@ -34,6 +36,9 @@ public class TipusDocumentDto {
 	public void setTipusDocEnum(TipusDocumentEnumDto tipusDocEnum) {
 		this.tipusDocEnum = tipusDocEnum;
 	}
+	
+
+	private static final long serialVersionUID = 5695764618684273126L;
 	
 	@Override
 	public String toString() {

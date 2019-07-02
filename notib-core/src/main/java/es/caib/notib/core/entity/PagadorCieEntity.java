@@ -5,10 +5,14 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.audit.NotibAuditable;
@@ -29,6 +33,11 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 	@Column(name = "contracte_data_vig")
 	@Temporal(TemporalType.DATE)
 	private Date contracteDataVig;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "entitat")
+	@ForeignKey(name = "not_pagador_cie_entitat_fk")
+	private EntitatEntity entitat;
 
 	public String getDir3codi() {
 		return dir3codi;
@@ -47,20 +56,24 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 	
 	public static Builder getBuilder(
 			String dir3codi,
-			Date contracteDataVig) {
+			Date contracteDataVig,
+			EntitatEntity entitat) {
 		return new Builder(
 				dir3codi,
-				contracteDataVig);
+				contracteDataVig,
+				entitat);
 	}
 	
 	public static class Builder {
 		PagadorCieEntity built;
 		Builder(
 				String dir3codi,
-				Date contracteDataVig) {
+				Date contracteDataVig,
+				EntitatEntity entitat) {
 			built = new PagadorCieEntity();
 			built.dir3codi = dir3codi;
 			built.contracteDataVig = contracteDataVig;
+			built.entitat = entitat;
 		}
 		public PagadorCieEntity build() {
 			return built;

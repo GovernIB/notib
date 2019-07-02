@@ -27,7 +27,7 @@
 	<div class="controls col-xs-${campInputSize}">
 		<div class="checkbox checkbox-primary">
   			<label> 
-				<form:checkbox path="${campPath}" cssClass="span12 " id="${campPath}" onclick="${funcio}"/>
+				<form:checkbox path="${campPath}" cssClass="span12 " id="${campPath}" onclick="${funcio}"  autocomplete="off"/>
 				
 			</label>
 		</div>

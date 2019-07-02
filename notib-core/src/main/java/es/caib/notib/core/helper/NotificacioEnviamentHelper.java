@@ -110,7 +110,7 @@ public class NotificacioEnviamentHelper {
 				entregaPostalDto.setCodiPostal(enviament.getDomiciliCodiPostal());
 				entregaPostalDto.setPoblacio(enviament.getDomiciliPoblacio());
 				entregaPostalDto.setMunicipiCodi(enviament.getDomiciliMunicipiCodiIne());
-				entregaPostalDto.setProvinciaCodi(enviament.getDomiciliProvinciaCodi());
+				entregaPostalDto.setProvincia(enviament.getDomiciliProvinciaCodi());
 				entregaPostalDto.setPaisCodi(enviament.getDomiciliPaisCodiIso());
 				entregaPostalDto.setLinea1(enviament.getDomiciliLinea1());
 				entregaPostalDto.setLinea2(enviament.getDomiciliLinea2());
@@ -185,7 +185,7 @@ public class NotificacioEnviamentHelper {
 				entregaPostalDto.setCodiPostal(enviament.getDomiciliCodiPostal());
 				entregaPostalDto.setPoblacio(enviament.getDomiciliPoblacio());
 				entregaPostalDto.setMunicipiCodi(enviament.getDomiciliMunicipiCodiIne());
-				entregaPostalDto.setProvinciaCodi(enviament.getDomiciliProvinciaCodi());
+				entregaPostalDto.setProvincia(enviament.getDomiciliProvinciaCodi());
 				entregaPostalDto.setPaisCodi(enviament.getDomiciliPaisCodiIso());
 				entregaPostalDto.setLinea1(enviament.getDomiciliLinea1());
 				entregaPostalDto.setLinea2(enviament.getDomiciliLinea2());

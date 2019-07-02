@@ -5,10 +5,14 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.audit.NotibAuditable;
@@ -35,6 +39,11 @@ public class PagadorPostalEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "facturacio_codi_client", length = 20)
 	private String facturacioClientCodi;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "entitat")
+	@ForeignKey(name = "not_pagador_postal_entitat_fk")
+	private EntitatEntity entitat;
 
 	
 
@@ -54,6 +63,10 @@ public class PagadorPostalEntity extends NotibAuditable<Long> {
 		return facturacioClientCodi;
 	}
 	
+	public EntitatEntity getEntitat() {
+		return entitat;
+	}
+
 	public void update(
 			String dir3codi,
 			String contracteNum,
@@ -69,12 +82,14 @@ public class PagadorPostalEntity extends NotibAuditable<Long> {
 			String dir3codi,
 			String contracteNum,
 			Date contracteDataVig,
-			String facturacioClientCodi) {
+			String facturacioClientCodi,
+			EntitatEntity entitat) {
 		return new Builder(
 				dir3codi,
 				contracteNum,
 				contracteDataVig,
-				facturacioClientCodi);
+				facturacioClientCodi,
+				entitat);
 	}
 	
 	public static class Builder {
@@ -83,12 +98,14 @@ public class PagadorPostalEntity extends NotibAuditable<Long> {
 				String dir3codi,
 				String contracteNum,
 				Date contracteDataVig,
-				String facturacioClientCodi) {
+				String facturacioClientCodi,
+				EntitatEntity entitat) {
 			built = new PagadorPostalEntity();
 			built.dir3codi = dir3codi;
 			built.contracteNum = contracteNum;
 			built.contracteDataVig = contracteDataVig;
 			built.facturacioClientCodi = facturacioClientCodi;
+			built.entitat = entitat;
 		}
 		public PagadorPostalEntity build() {
 			return built;

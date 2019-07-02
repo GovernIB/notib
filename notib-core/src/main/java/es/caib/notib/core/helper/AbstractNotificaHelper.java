@@ -512,13 +512,20 @@ public abstract class AbstractNotificaHelper {
 		SecretKeySpec rc4Key = new SecretKeySpec(getClauXifratIdsProperty().getBytes(),"RC4");
 		cipher.init(Cipher.ENCRYPT_MODE, rc4Key);
 		byte[] xifrat = cipher.doFinal(bytes);
-		//return new String(Base64.encodeBase64(xifrat));
-		return new String(Hex.encodeHex(xifrat));
+		return new String(Base64.encodeBase64(xifrat));
+//		return new String(Hex.encodeHex(xifrat));
 	}
 	protected Long desxifrarId(String idXifrat) throws GeneralSecurityException {
 		Cipher cipher = Cipher.getInstance("RC4");
 		SecretKeySpec rc4Key = new SecretKeySpec(getClauXifratIdsProperty().getBytes(),"RC4");
 		cipher.init(Cipher.DECRYPT_MODE, rc4Key);
+
+		if (idXifrat.length() < 11) {
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_SEU,
+					"La longitud mínima del identificar ha de ser 11 caràcters.");
+		}
+		
 		byte[] desxifrat = cipher.doFinal(Base64.decodeBase64(idXifrat.getBytes()));
 		return new Long(bytesToLong(desxifrat));
 	}

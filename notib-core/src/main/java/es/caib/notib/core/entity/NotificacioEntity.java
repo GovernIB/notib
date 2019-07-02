@@ -84,8 +84,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "estat", nullable = false)
 	protected NotificacioEstatEnumDto estat;
 	
-//	@Column(name = "estat_date")
-//	protected Date estatDate;
+	@Column(name = "estat_date")
+	protected Date estatDate;
+	
 	@Column(name = "tipus_usuari")
 	protected TipusUsuariEnumDto tipusUsuari;
 	
@@ -262,6 +263,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public NotificacioEstatEnumDto getEstat() {
 		return estat;
 	}
+	public Date getEstatDate() {
+		return estatDate;
+	}
 	public String getMotiu() {
 		return motiu;
 	}
@@ -392,6 +396,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public void updateEstat(
 			NotificacioEstatEnumDto estat) {
 		this.estat = estat;
+	}
+	public void updateEstatDate(
+			Date estatDate) {
+		this.estatDate = estatDate;
 	}
 	public void updateMotiu(String motiu) {
 		this.motiu = motiu;

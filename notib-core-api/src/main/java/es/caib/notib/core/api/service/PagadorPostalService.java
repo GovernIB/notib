@@ -88,6 +88,14 @@ public interface PagadorPostalService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<PagadorPostalDto> findAll();
+	
+	/**
+	 * Llistat amb els pagadors postal d'una entitat.
+	 * 
+	 * @return La llista dels pagadors postals.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public List<PagadorPostalDto> findByEntitat(Long entitatId);
 
 	/**
 	 * Llistat amb tots els pagadros postals paginats.

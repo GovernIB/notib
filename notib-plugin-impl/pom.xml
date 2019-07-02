@@ -16,6 +16,11 @@
 			<version>${regweb.version}</version>
 		</dependency>
 		<dependency>
+        	<artifactId>dir3caib-ws-api</artifactId>
+        	<groupId>es.caib.dir3caib</groupId>
+        	<version>${dir3caib.version}</version>
+   		</dependency>
+		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.4</version>

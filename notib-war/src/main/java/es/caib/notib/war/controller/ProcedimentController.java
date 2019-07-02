@@ -255,8 +255,8 @@ public class ProcedimentController extends BaseUserController{
 //				model.addAttribute("codiAssumpte", procedimentService.findCodisAssumpte(entitat, tipusAssumpte.get(0).getCodi()));
 //			}
 		}
-		model.addAttribute("pagadorsPostal", pagadorPostalService.findAll());
-		model.addAttribute("pagadorsCie", pagadorCieService.findAll());
+		model.addAttribute("pagadorsPostal", pagadorPostalService.findByEntitat(entitat.getId()));
+		model.addAttribute("pagadorsCie", pagadorCieService.findByEntitat(entitat.getId()));
 		
 		if (procediment != null) {
 			model.addAttribute("entitatId", procediment.getEntitat().getId());

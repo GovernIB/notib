@@ -40,6 +40,18 @@
     <script src="<c:url value="/js/webutil.datatable.js"/>"></script>
     <script src="<c:url value="/js/webutil.modal.js"/>"></script>
 <style type="text/css">
+.help-block {
+	font-size: x-small;
+}
+.inputcss {
+	width: calc(100% - 175px);
+	float: left;
+	height: 44px;
+}
+.labelcss {
+	width: 175px;
+	float: left;
+}
 .select2-container--bootstrap {
 	width: 100% !important;
 }
@@ -97,6 +109,115 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
+	
+	//Paisos
+	$.ajax({
+		type: 'GET',
+		url: "<c:url value="/notificacio/paisos/"/>",
+		success: function(data) {
+			var selPaisos = $('.paisos');
+			selPaisos.empty();
+			selPaisos.append("<option value=\"\"></option>");
+			if (data && data.length > 0) {
+				$.each(data, function(i, val) {
+					if (val.alfa2Pais == 'ES') {
+						selPaisos.append("<option value=\"" + val.alfa2Pais + "\" selected>" + val.descripcioPais + "</option>");
+					} else {
+						selPaisos.append("<option value=\"" + val.alfa2Pais + "\">" + val.descripcioPais + "</option>");
+					}
+					
+				});
+			}
+			var select2Options = {
+					theme: 'bootstrap',
+					width: 'auto'};
+			selPaisos.select2(select2Options);
+		},
+		error: function() {
+			console.log("error obtenint les provincies...");
+		}
+	});
+	
+	$(document).on('change','select.paisos', function() {
+		var provincia = $(this).closest("#entregaPostal").find("select[class*='provincies']");
+		var poblacioSelect = $(this).closest("#entregaPostal").find("div[class*='poblacioSelect']");
+		var poblacioText = $(this).closest("#entregaPostal").find("div[class*='poblacioText']");
+		if ($(this).val() != 'ES') {
+			$(poblacioSelect).addClass('hidden');
+			$(poblacioText).removeClass('hidden');
+			$(provincia).prop('disabled', 'disabled');
+		} else {
+			$(poblacioSelect).removeClass('hidden');
+			$(poblacioText).addClass('hidden');
+			$(provincia).removeAttr('disabled');
+		}
+	});
+	
+	$(document).on('change','select.enviamentTipus', function() {
+		var dadesNormalitzat = $(this).closest("#entregaPostal").find("div[class*='normalitzat']");
+		var dadesSenseNormalitzar = $(this).closest("#entregaPostal").find("div[class*='senseNormalitzar']");
+		
+		if ($(this).val() == 'SENSE_NORMALITZAR') {
+			$(dadesNormalitzat).addClass('hidden');
+			$(dadesSenseNormalitzar).removeClass('hidden');
+		} else {
+			$(dadesNormalitzat).removeClass('hidden');
+			$(dadesSenseNormalitzar).addClass('hidden');
+		}
+	});
+	
+	//Provincies
+	$.ajax({
+		type: 'GET',
+		url: "<c:url value="/notificacio/provincies/"/>",
+		success: function(data) {
+			var selProvincies = $('.provincies');
+			selProvincies.empty();
+			selProvincies.append("<option value=\"\"></option>");
+			if (data && data.length > 0) {
+				$.each(data, function(i, val) {
+					selProvincies.append("<option value=\"" + val.id + "\">" + val.descripcio + "</option>");
+				});
+			}
+			var select2Options = {
+					theme: 'bootstrap',
+					width: 'auto'};
+			selProvincies.select2(select2Options);
+		},
+		error: function() {
+			console.log("error obtenint les provincies...");
+		}
+	});
+
+	//Localitats
+	$(document).on('change','select.provincies', function() {
+		var provincia = $(this);
+		var selLocalitats = $(provincia).closest("#entregaPostal").find("select[class*='localitats']");
+		if ($(this).val() == '') {
+			$(selLocalitats).find('option').remove();
+		} else {
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value="/notificacio/localitats/"/>" + $(provincia).val(),
+				success: function(data) {
+					selLocalitats.empty();
+					selLocalitats.append("<option value=\"\"></option>");
+					if (data && data.length > 0) {
+						$.each(data, function(i, val) {
+							selLocalitats.append("<option value=\"" + val.id + "\">" + val.descripcio + "</option>");
+						});
+					}
+					var select2Options = {
+							theme: 'bootstrap',
+							width: 'auto'};
+					selLocalitats.select2(select2Options);
+				},
+				error: function() {
+					console.log("error obtenint les provincies...");
+				}
+			});
+		}
+	});
 	var tipusDocumentDefault = $('#tipusDocumentDefault').val();
 	$('.customSelect').webutilInputSelect2(null);
 	if (tipusDocumentDefault != '') {
@@ -211,6 +332,7 @@ $(document).ready(function() {
 	});
 	$('.interessat').trigger('change');
 	$('#tipusDocument').trigger('change');
+	$('.enviamentTipus').trigger('change');
 });
 
 function addDestinatari(enviament_id) {
@@ -633,64 +755,104 @@ function mostrarEntregaPostal(className) {
 									<p class="comentari col-xs-offset-"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
 									<not:inputCheckbox name="enviaments[${j}].entregaPostalActiva" textKey="notificacio.form.camp.entregapostal.activa" labelSize="2" funcio="mostrarEntregaPostal(this.id)" />
 								</div>
-								<input id="entregaPostalAmagat" name="enviaments[${j}].entregaPostal.visible" class="hidden" value="false">
-	
-								<c:if test="${not empty enviosGuardats}">
-									<c:set var="entregaPostalActiva" value="${enviament.entregaPostalActiva}"></c:set>
-								</c:if>
-								<div id="entregaPostal" class="entregaPostal_${j}"
-									<c:if test="${!entregaPostalActiva}">style="display:none"</c:if>>
+								<c:choose>
+									<c:when test="${not empty enviosGuardats}">
+										<input id="entregaPostalAmagat" name="enviaments[${j}].entregaPostal.visible" class="hidden" value="${enviament.entregaPostalActiva}">
+										<c:set var="entregaPostalActiva" value="${enviament.entregaPostalActiva}"></c:set>
+									</c:when>
+									<c:otherwise>
+										<input id="entregaPostalAmagat" name="enviaments[${j}].entregaPostal.visible" class="hidden" value="false">
+									</c:otherwise>
+								</c:choose>
+								<div id="entregaPostal" class="entregaPostal_${j}" <c:if test="${!entregaPostalActiva}">style="display:none"</c:if>>
 	
 									<div class="col-md-12">
 										<div class="col-md-12">
-											<not:inputSelect name="enviaments[${j}].entregaPostal.tipus" textKey="notificacio.form.camp.entregapostal.tipus" required="true" labelSize="2" />
-										</div>
-										<div class="col-md-4">
-											<not:inputSelect name="enviaments[${j}].entregaPostal.tipusVia" textKey="notificacio.form.camp.entregapostal.tipusvia" labelSize="6"  inputSize="6" required="true" />
-										</div>
-										<div class="col-md-5">
-											<not:inputText name="enviaments[${j}].entregaPostal.viaNom" textKey="notificacio.form.camp.entregapostal.vianom" labelSize="4"  inputSize="7" required="true" />
-										</div>
-										<div class="col-md-3">
-											<not:inputText name="enviaments[${j}].entregaPostal.numeroCasa" textKey="notificacio.form.camp.entregapostal.numerocasa" labelSize="6"  inputSize="6" />
-										</div>
-										<div class="col-md-3">
-											<not:inputText name="enviaments[${j}].entregaPostal.portal" textKey="notificacio.form.camp.entregapostal.portal" labelSize="8"  inputSize="4" />
-										</div>
-										<div class="col-md-3">
-											<not:inputText name="enviaments[${j}].entregaPostal.escala" textKey="notificacio.form.camp.entregapostal.escala" labelSize="4"  inputSize="6" />
-										</div>
-										<div class="col-md-3">
-											<not:inputText name="enviaments[${j}].entregaPostal.planta" textKey="notificacio.form.camp.entregapostal.planta" labelSize="4"  inputSize="6" />
-										</div>
-										<div class="col-md-3">
-											<not:inputText name="enviaments[${j}].entregaPostal.porta" textKey="notificacio.form.camp.entregapostal.porta"labelSize="6"  inputSize="6" />
-										</div>
-										<div class="col-md-3">
-											<not:inputText name="enviaments[${j}].entregaPostal.bloc" textKey="notificacio.form.camp.entregapostal.bloc" labelSize="8"  inputSize="4" />
-										</div>
-										<div class="col-md-3">
-											<not:inputText name="enviaments[${j}].entregaPostal.complement" textKey="notificacio.form.camp.entregapostal.complement" labelSize="4"  inputSize="6" />
-										</div>
-										<div class="col-md-3">
-											<not:inputText name="enviaments[${j}].entregaPostal.codiPostal" textKey="notificacio.form.camp.entregapostal.codipostal" labelSize="5"  inputSize="5"/>
-										</div>
-										<div class="col-md-3">
-											<not:inputText name="enviaments[${j}].entregaPostal.poblacio" textKey="notificacio.form.camp.entregapostal.poblacio" />
-										</div>
-										<div class="col-md-3">
-											<not:inputText name="enviaments[${j}].entregaPostal.paisCodi" textKey="notificacio.form.camp.entregapostal.paiscodi" labelSize="8"  inputSize="4"/>
-										</div>
-										<c:if test="${not empty formatsFulla}">
+											<not:inputSelect name="enviaments[${j}].entregaPostal.tipus" generalClass="enviamentTipus" textKey="notificacio.form.camp.entregapostal.tipus" required="true" optionItems="${entregaPostalTipus}" optionValueAttribute="value" optionTextKeyAttribute="text"  labelClass="labelcss" inputClass="inputcss"/>
+										</div>	
+										<div class="normalitzat">
 											<div class="col-md-4">
-												<not:inputSelect name="enviaments[${j}].entregaPostal.formatFulla" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatfulla" optionItems="${formatsFulla}" optionValueAttribute="codi" optionTextAttribute="codi" labelSize="6"  inputSize="6"/>
+												<not:inputSelect name="enviaments[${j}].entregaPostal.tipusVia" textKey="notificacio.form.camp.entregapostal.tipusvia" labelClass="labelcss" inputClass="inputcss" required="true" />
 											</div>
-										</c:if>
-										<c:if test="${not empty formatsSobre}">
+											<div class="col-md-8">
+												<not:inputText name="enviaments[${j}].entregaPostal.viaNom" textKey="notificacio.form.camp.entregapostal.vianom" labelClass="labelcss" inputClass="inputcss" required="true" />
+											</div>
 											<div class="col-md-4">
-												<not:inputSelect name="enviaments[${j}].entregaPostal.formatSobre" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatsobre" optionItems="${formatsSobre}" optionValueAttribute="codi" optionTextAttribute="codi" labelSize="6"  inputSize="6"/>
+												<not:inputText name="enviaments[${j}].entregaPostal.apartatCorreus" textKey="notificacio.form.camp.entregapostal.apartatcorreus" labelClass="labelcss" inputClass="inputcss" />
 											</div>
-										</c:if>
+											<div class="col-md-4">
+												<not:inputText name="enviaments[${j}].entregaPostal.numeroCasa" textKey="notificacio.form.camp.entregapostal.numerocasa" labelClass="labelcss" inputClass="inputcss" />
+											</div>
+											<div class="col-md-4">
+												<not:inputText name="enviaments[${j}].entregaPostal.puntKm" textKey="notificacio.form.camp.entregapostal.puntkm" labelClass="labelcss" inputClass="inputcss" />
+											</div>
+											<div class="col-md-4">
+												<not:inputText name="enviaments[${j}].entregaPostal.portal" textKey="notificacio.form.camp.entregapostal.portal" labelClass="labelcss" inputClass="inputcss" />
+											</div>
+											<div class="col-md-4">
+												<not:inputText name="enviaments[${j}].entregaPostal.escala" textKey="notificacio.form.camp.entregapostal.escala" labelClass="labelcss" inputClass="inputcss" />
+											</div>
+											<div class="col-md-4">
+												<not:inputText name="enviaments[${j}].entregaPostal.planta" textKey="notificacio.form.camp.entregapostal.planta" labelClass="labelcss" inputClass="inputcss" />
+											</div>
+											<div class="col-md-4">
+												<not:inputText name="enviaments[${j}].entregaPostal.porta" textKey="notificacio.form.camp.entregapostal.porta" labelClass="labelcss" inputClass="inputcss" />
+											</div>
+											<div class="col-md-4">
+												<not:inputText name="enviaments[${j}].entregaPostal.bloc" textKey="notificacio.form.camp.entregapostal.bloc" labelClass="labelcss" inputClass="inputcss" />
+											</div>
+											<div class="col-md-4">
+												<not:inputText name="enviaments[${j}].entregaPostal.codiPostal" textKey="notificacio.form.camp.entregapostal.codipostal" labelClass="labelcss" inputClass="inputcss"/>
+											</div>
+											<div class="col-md-6">
+												<not:inputSelect name="enviaments[${j}].entregaPostal.paisCodi" generalClass="paisos" emptyOption="true" textKey="notificacio.form.camp.entregapostal.paiscodi" labelClass="labelcss" inputClass="inputcss"/>
+											</div>
+											<div class="col-md-6">
+												<not:inputSelect name="enviaments[${j}].entregaPostal.provincia" generalClass="provincies" emptyOption="true" textKey="notificacio.form.camp.entregapostal.provincia" labelClass="labelcss" inputClass="inputcss"/>
+											</div>
+											<div class="col-md-6 poblacioSelect">
+												<not:inputSelect name="enviaments[${j}].entregaPostal.poblacio" generalClass="localitats" emptyOption="true" textKey="notificacio.form.camp.entregapostal.poblacio" labelClass="labelcss" inputClass="inputcss"/>
+											</div>
+											<div class="col-md-6 poblacioText hidden">
+												<not:inputText name="enviaments[${j}].entregaPostal.poblacio" textKey="notificacio.form.camp.entregapostal.poblacio" labelClass="labelcss" inputClass="inputcss" />
+											</div>
+											<c:choose>
+												<c:when test="${not empty formatsFulla}">
+												<div class="col-md-3">
+													<not:inputSelect name="enviaments[${j}].entregaPostal.formatFulla" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatfulla" optionItems="${formatsFulla}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>
+												</div>
+												</c:when>
+												<c:otherwise>
+												<div class="col-md-3">
+													<not:inputText name="enviaments[${j}].entregaPostal.formatFulla" textKey="notificacio.form.camp.entregapostal.formatfulla" labelClass="labelcss" inputClass="inputcss"/>
+												</div>
+												</c:otherwise>
+											</c:choose>
+											<c:choose>
+												<c:when test="${not empty formatsSobre}">
+												<div class="col-md-3">
+													<not:inputSelect name="enviaments[${j}].entregaPostal.formatSobre" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatsobre" optionItems="${formatsSobre}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>
+												</div>
+												</c:when>
+												<c:otherwise>
+												<div class="col-md-3">
+													<not:inputText name="enviaments[${j}].entregaPostal.formatSobre" textKey="notificacio.form.camp.entregapostal.formatsobre" labelClass="labelcss" inputClass="inputcss"/>
+												</div>
+												</c:otherwise>
+											</c:choose>	
+											<div class="col-md-12">
+												<not:inputText name="enviaments[${j}].entregaPostal.complement" textKey="notificacio.form.camp.entregapostal.complement" labelClass="labelcss" inputClass="inputcss" />
+											</div>
+										</div>	
+										<div class="senseNormalitzar hidden">
+											<div class="col-md-6">
+												<not:inputTextarea name="enviaments[${j}].entregaPostal.linea1" textKey="notificacio.form.camp.entregapostal.linea1"/>
+											</div>
+											<div class="col-md-6">
+												<not:inputTextarea name="enviaments[${j}].entregaPostal.linea2" textKey="notificacio.form.camp.entregapostal.linea2"/>
+											</div>
+											<p class="comentari col-xs-12 col-xs-offset-"><spring:message code="notificacio.form.camp.entregapostal.linea.info"/></p>
+										</div>
 									</div>
 								</div>
 								<div class="col-md-12">

@@ -41,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.NotificaRespostaDatatDto.NotificaRespostaDatatEventDto;
+import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
@@ -608,26 +609,28 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 								break;
 							}
 						}
-						entregaPostal.setTipoVia(
-								viaTipusToString(enviament.getDomiciliViaTipus()));
-						entregaPostal.setNombreVia(enviament.getDomiciliViaNom());
-						entregaPostal.setNumeroCasa(enviament.getDomiciliNumeracioNumero());
-						entregaPostal.setPuntoKilometrico(enviament.getDomiciliNumeracioPuntKm());
-						entregaPostal.setPortal(enviament.getDomiciliPortal());
-						entregaPostal.setPuerta(enviament.getDomiciliPorta());
-						entregaPostal.setEscalera(enviament.getDomiciliEscala());
-						entregaPostal.setPlanta(enviament.getDomiciliPlanta());
-						entregaPostal.setBloque(enviament.getDomiciliBloc());
-						entregaPostal.setComplemento(enviament.getDomiciliComplement());
-						entregaPostal.setCalificadorNumero(enviament.getDomiciliNumeracioQualificador());
-						entregaPostal.setCodigoPostal(enviament.getDomiciliCodiPostal());
-						entregaPostal.setApartadoCorreos(enviament.getDomiciliApartatCorreus());
-						entregaPostal.setMunicipio(enviament.getDomiciliMunicipiCodiIne());
-						entregaPostal.setProvincia(enviament.getDomiciliProvinciaCodi());
-						entregaPostal.setPais(enviament.getDomiciliPaisCodiIso());
-						entregaPostal.setPoblacion(enviament.getDomiciliPoblacio());
-						entregaPostal.setLinea1(enviament.getDomiciliLinea1());
-						entregaPostal.setLinea2(enviament.getDomiciliLinea2());
+						if (!enviament.getDomiciliConcretTipus().equals(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR)) {
+							entregaPostal.setTipoVia(viaTipusToString(enviament.getDomiciliViaTipus()));
+							entregaPostal.setNombreVia(enviament.getDomiciliViaNom());
+							entregaPostal.setNumeroCasa(enviament.getDomiciliNumeracioNumero());
+							entregaPostal.setPuntoKilometrico(enviament.getDomiciliNumeracioPuntKm());
+							entregaPostal.setPortal(enviament.getDomiciliPortal());
+							entregaPostal.setPuerta(enviament.getDomiciliPorta());
+							entregaPostal.setEscalera(enviament.getDomiciliEscala());
+							entregaPostal.setPlanta(enviament.getDomiciliPlanta());
+							entregaPostal.setBloque(enviament.getDomiciliBloc());
+							entregaPostal.setComplemento(enviament.getDomiciliComplement());
+							entregaPostal.setCalificadorNumero(enviament.getDomiciliNumeracioQualificador());
+							entregaPostal.setCodigoPostal(enviament.getDomiciliCodiPostal());
+							entregaPostal.setApartadoCorreos(enviament.getDomiciliApartatCorreus());
+							entregaPostal.setMunicipio(enviament.getDomiciliMunicipiCodiIne());
+							entregaPostal.setProvincia(enviament.getDomiciliProvinciaCodi());
+							entregaPostal.setPais(enviament.getDomiciliPaisCodiIso());
+							entregaPostal.setPoblacion(enviament.getDomiciliPoblacio());
+						} else if (enviament.getDomiciliConcretTipus().equals(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR)) {
+							entregaPostal.setLinea1(enviament.getDomiciliLinea1());
+							entregaPostal.setLinea2(enviament.getDomiciliLinea2());
+						}
 						Opciones opcionesCie = new Opciones();
 						if (enviament.getDomiciliCie() != null) {
 							Opcion opcionCie = new Opcion();

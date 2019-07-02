@@ -33,6 +33,8 @@ import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.LocalitatsDto;
+import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
@@ -44,8 +46,10 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.PaisosDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
@@ -179,7 +183,9 @@ public class NotificacioController extends BaseUserController {
 
 				for (String rol : rolsUsuariActual) {
 					if (rol.contains(grupProcediment.getGrup().getCodi())) {
-						procedimentsAmbGrups.add(grupProcediment.getProcediment());
+						if ((grupProcediment.getProcediment().getEntitat().getDir3Codi().equals(entitatActual.getDir3Codi()))) {
+							procedimentsAmbGrups.add(grupProcediment.getProcediment());
+						}
 					}
 				}
 			}
@@ -268,6 +274,10 @@ public class NotificacioController extends BaseUserController {
 					EnumHelper.getOptionsForEnum(
 							InteressatTipusEnumDto.class,
 							"es.caib.notib.core.api.dto.interessatTipusEnumDto."));
+			model.addAttribute("entregaPostalTipus", 
+					EnumHelper.getOptionsForEnum(
+							NotificaDomiciliConcretTipusEnumDto.class,
+							"es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto."));
 			model.addAttribute("registreDocumentacioFisica", 
 					EnumHelper.getOptionsForEnum(
 							RegistreDocumentacioFisicaEnumDto.class,
@@ -386,7 +396,10 @@ public class NotificacioController extends BaseUserController {
 				for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
 					for (String rol : rolsUsuariActual) {
 						if (rol.contains(grupProcediment.getGrup().getCodi())) {
-							procediments.add(grupProcediment.getProcediment());
+							//si el procediment es de l'entitat actual
+							if ((grupProcediment.getProcediment().getEntitat().getDir3Codi().equals(entitatActual.getDir3Codi()))) {
+								procediments.add(grupProcediment.getProcediment());
+							}
 						}
 					}
 				}
@@ -747,6 +760,7 @@ public class NotificacioController extends BaseUserController {
 			model.addAttribute("formatsFulla", pagadorCieFormatFullaService.findFormatFullaByPagadorCie(procedimentActual.getPagadorcie().getId()));
 			model.addAttribute("formatsSobre", pagadorCieFormatSobreService.findFormatSobreByPagadorCie(procedimentActual.getPagadorcie().getId()));
 		}
+		
 		model.addAttribute("comunicacioTipus", 
 				EnumHelper.getOptionsForEnum(
 						NotificacioComunicacioTipusEnumDto.class,
@@ -763,6 +777,10 @@ public class NotificacioController extends BaseUserController {
 				EnumHelper.getOptionsForEnum(
 						InteressatTipusEnumDto.class,
 						"es.caib.notib.core.api.dto.interessatTipusEnumDto."));
+		model.addAttribute("entregaPostalTipus", 
+				EnumHelper.getOptionsForEnum(
+						NotificaDomiciliConcretTipusEnumDto.class,
+						"es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto."));
 		model.addAttribute("registreDocumentacioFisica", 
 				EnumHelper.getOptionsForEnum(
 						RegistreDocumentacioFisicaEnumDto.class,
@@ -772,6 +790,32 @@ public class NotificacioController extends BaseUserController {
 						IdiomaEnumDto.class,
 						"es.caib.notib.core.api.dto.idiomaEnumDto."));
 	}
+	
+	@RequestMapping(value = "/paisos", method = RequestMethod.GET)
+	@ResponseBody
+	private List<PaisosDto> getPaisos(
+		HttpServletRequest request,
+		Model model) {		
+		return notificacioService.llistarPaisos();
+	}
+	
+	@RequestMapping(value = "/provincies", method = RequestMethod.GET)
+	@ResponseBody
+	private List<ProvinciesDto> getProvincies(
+		HttpServletRequest request,
+		Model model) {		
+		return notificacioService.llistarProvincies();
+	}
+	
+	@RequestMapping(value = "/localitats/{provinciaId}", method = RequestMethod.GET)
+	@ResponseBody
+	private List<LocalitatsDto> getLocalitats(
+		HttpServletRequest request,
+		Model model,
+		@PathVariable String provinciaId) {
+		return notificacioService.llistarLocalitats(provinciaId);
+	}
+	
 	
 	private boolean isAdministrador(HttpServletRequest request) {
 		return RolHelper.isUsuariActualAdministrador(request);
