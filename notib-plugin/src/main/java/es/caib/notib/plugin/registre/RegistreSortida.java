@@ -12,7 +12,7 @@ public class RegistreSortida {
 	private String codiEntitat;
 	private String codiUsuari;
 	private DadesOficina dadesOficina;
-	private DadesInteressat dadesInteressat;
+	private List<DadesInteressat> dadesInteressat;
 	private DadesRepresentat dadesRepresentat;
 	private DadesAnotacio dadesAnotacio;
 	private List<DocumentRegistre> documents;
@@ -36,10 +36,10 @@ public class RegistreSortida {
 	public void setDadesOficina(DadesOficina dadesOficina) {
 		this.dadesOficina = dadesOficina;
 	}
-	public DadesInteressat getDadesInteressat() {
+	public List<DadesInteressat> getDadesInteressat() {
 		return dadesInteressat;
 	}
-	public void setDadesInteressat(DadesInteressat dadesInteressat) {
+	public void setDadesInteressat(List<DadesInteressat> dadesInteressat) {
 		this.dadesInteressat = dadesInteressat;
 	}
 	public DadesRepresentat getDadesRepresentat() {

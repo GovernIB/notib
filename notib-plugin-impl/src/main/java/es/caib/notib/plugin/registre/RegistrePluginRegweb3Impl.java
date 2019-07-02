@@ -47,7 +47,8 @@ import es.caib.regweb3.ws.api.v3.WsValidationException;
 public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistrePlugin{
 	
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
-
+	
+	private static final String OFICINA_VIRTUAL = "Oficina Virtual";
 
 	@Override
 	public RespostaAnotacioRegistre registrarSalida(
@@ -206,15 +207,20 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			if (anexo != null) {
 				rsw.getAnexos().add(anexo);
 			}
-			datosInteresado.setApellido1(registreSortida.getDadesInteressat().getCognom1());
-			datosInteresado.setApellido2(registreSortida.getDadesInteressat().getCognom2());
-			datosInteresado.setDocumento(registreSortida.getDadesInteressat().getNif());
-			datosInteresado.setNombre(registreSortida.getDadesInteressat().getNom());
-			datosInteresado.setTipoInteresado(registreSortida.getDadesInteressat().getTipusInteressat());
-			interesado.setInteresado(datosInteresado);
+			for (DadesInteressat dadesInteressat : registreSortida.getDadesInteressat()) {
+				datosInteresado.setApellido1(dadesInteressat.getCognom1());
+				datosInteresado.setApellido2(dadesInteressat.getCognom2());
+				datosInteresado.setDocumento(dadesInteressat.getNif());
+				datosInteresado.setNombre(dadesInteressat.getNom());
+				datosInteresado.setTipoInteresado(dadesInteressat.getTipusInteressat());
+				interesado.setInteresado(datosInteresado);
+			}
+			rsw.getInteresados().add(interesado);
+			
 			rsw.setAplicacion("NOTIB");
 			rsw.setVersion("1.0.0");
-			rsw.getInteresados().add(interesado);
+			
+			
 		} catch (Exception ex) {
 			logger.error("Error a l'hora de fer la conversió a registroSalidaWs", ex);
 			throw new RegistrePluginException("Error conversió a registroSalidaWs", ex);
@@ -627,7 +633,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			return toTipusAssumpte(getInfoApi().listarTipoAsunto(entitatcodi));
 		} catch (Exception ex) {
 			logger.error("Error a l'hora d'obtenir el tipus d'assumpte", ex);
-			throw new RegistrePluginException("Error obtenint tipus assumpte", ex);
+			throw new RegistrePluginException("Error recuperant tipus assumpte", ex);
 		}
 	}
 
@@ -638,11 +644,33 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 					entitatCodi,
 					tipusAssumpte));
 		} catch (Exception ex) {
-			logger.error("Error a l'hora d'obtenir el tipus d'assumpte", ex);
-			throw new RegistrePluginException("Error obtenint tipus assumpte", ex);
+			logger.error("Error a l'hora d'obtenir el codi d'assumpte", ex);
+			throw new RegistrePluginException("Error recuperant codi assumpte", ex);
 		}
 	}
 
+	@Override
+	public Oficina llistarOficinaVirtual(String entitatCodi, Long autoritzacioValor) throws RegistrePluginException {
+		List<Oficina> oficines = new ArrayList<Oficina>();
+		Oficina oficinaVirtual = new Oficina();
+		try {
+			oficines = toOficines(getInfoApi().listarOficinas(
+					entitatCodi,
+					autoritzacioValor));
+			if (oficines != null) {
+				for (Oficina oficina : oficines) {
+					if (oficina.getNom().equalsIgnoreCase(OFICINA_VIRTUAL)) {
+						oficinaVirtual = oficina;
+					}
+				}
+			}
+		} catch (Exception ex) {
+			logger.error("Error a l'hora d'obtenir l'oficina virtual", ex);
+			throw new RegistrePluginException("Error recuperant oficina virtual", ex);
+		}
+		return oficinaVirtual;
+	}
+	
 	@Override
 	public List<Oficina> llistarOficines(String entitatCodi, Long autoritzacioValor) throws RegistrePluginException {
 		try {
@@ -654,7 +682,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			throw new RegistrePluginException("Error obtenint tipus assumpte", ex);
 		}
 	}
-
+	
 	@Override
 	public List<Llibre> llistarLlibres(String entitatCodi, String oficina, Long autoritzacioValor) throws RegistrePluginException {
 		try {
@@ -663,8 +691,8 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 					oficina,
 					autoritzacioValor));
 		} catch (Exception ex) {
-			logger.error("Error a l'hora d'obtenir el tipus d'assumpte", ex);
-			throw new RegistrePluginException("Error obtenint tipus assumpte", ex);
+			logger.error("Error a l'hora d'obtenir els llibres", ex);
+			throw new RegistrePluginException("Error obtenint els llibres", ex);
 		}
 	}
 
@@ -674,8 +702,8 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			return toOrganismes(getInfoApi().listarOrganismos(
 					entitatCodi));
 		} catch (Exception ex) {
-			logger.error("Error a l'hora d'obtenir el tipus d'assumpte", ex);
-			throw new RegistrePluginException("Error obtenint tipus assumpte", ex);
+			logger.error("Error a l'hora d'obtenir els organismes", ex);
+			throw new RegistrePluginException("Error obtenint els organismes", ex);
 		}
 	}
 

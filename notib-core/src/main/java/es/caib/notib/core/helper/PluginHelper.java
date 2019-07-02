@@ -141,7 +141,7 @@ public class PluginHelper {
 
 	public RegistreIdDto registreAnotacioSortida(
 			NotificacioDtoV2 notificacio, 
-			NotificacioEnviamentDtoV2 enviament, 
+			List<NotificacioEnviamentDtoV2> enviaments, 
 			Long tipusOperacio) throws Exception {
 		RegistreIdDto rs = new RegistreIdDto();
 		String accioDescripcio = "Enviament notificació a registre";
@@ -152,7 +152,7 @@ public class PluginHelper {
 			RespostaAnotacioRegistre resposta = getRegistrePlugin().registrarSalida(
 					toRegistreSortida(
 							notificacio,
-							enviament),
+							enviaments),
 					"notib");
 			if (resposta.getErrorDescripcio() != null) {
 				rs.setDescripcioError(resposta.getErrorDescripcio());
@@ -757,6 +757,17 @@ public class PluginHelper {
 		return assumptes;
 	}
 	
+	public Oficina llistarOficinaVirtual(
+			String entitatcodi,
+			TipusRegistreRegweb3Enum autoritzacio) throws RegistrePluginException {
+		
+		Oficina oficina = getRegistrePlugin().llistarOficinaVirtual(
+				entitatcodi, 
+				autoritzacio.getValor());
+	
+		return oficina;
+	}
+	
 	public List<Oficina> llistarOficines(
 			String entitatcodi,
 			AutoritzacioRegiWeb3Enum autoritzacio) throws RegistrePluginException {
@@ -824,32 +835,13 @@ public class PluginHelper {
 	
 	private RegistreSortida toRegistreSortida(
 			NotificacioDtoV2 notificacio,
-			NotificacioEnviamentDtoV2 enviament) throws RegistrePluginException {
+			List<NotificacioEnviamentDtoV2> enviaments) throws RegistrePluginException {
 		RegistreSortida registreSortida = new RegistreSortida();
 		DadesOficina dadesOficina = new DadesOficina();
-		Long tipusInteressat;
 		Llibre llibreOrganisme = null;
-		
-		switch (enviament.getTitular().getInteressatTipus()) {
-		case ADMINISTRACIO:
-			tipusInteressat = 1L;
-			break;
-		case FISICA:
-			tipusInteressat = 2L;
-			break;
-		case JURIDICA:
-			tipusInteressat = 3L;
-			break;
-		default:
-			tipusInteressat = 1L;
-			break;
-		}
+		Oficina oficinaVirtual = null;
 		
 		if (notificacio.getProcediment().getOrganGestor() != null) {
-//			llibreOficina = llistarLlibresOficines(
-//					notificacio.getProcediment().getOrganGestor(), 
-//					notificacio.getUsuariCodi(),
-//					TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
 			llibreOrganisme = llistarLlibreOrganisme(
 					notificacio.getEmisorDir3Codi(),
 					notificacio.getProcediment().getOrganGestor());
@@ -857,11 +849,16 @@ public class PluginHelper {
 		
 		if (notificacio.getProcediment().getOficina() != null) {
 			dadesOficina.setOficina(notificacio.getProcediment().getOficina());
-		}
-		//oficina virtual
-//		else if (llibreOficina != null && ! llibreOficina.) {
-//			String oficinaCodi = llibreOficina.get(0).getOficina().getCodi();
-//			dadesOficina.setOficina(oficinaCodi);
+		} 
+//		else {
+//			//oficina virtual
+//			oficinaVirtual = llistarOficinaVirtual(
+//					notificacio.getEmisorDir3Codi(), 
+//					TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
+//			
+//			if (oficinaVirtual != null) {
+//				dadesOficina.setOficina(oficinaVirtual.getCodi());
+//			}
 //		}
 		
 		if (notificacio.getProcediment().getLlibre() != null) {
@@ -875,22 +872,29 @@ public class PluginHelper {
 		dadesOficina.setOrgan(notificacio.getProcediment().getOrganGestor());
 		registreSortida.setDadesOficina(dadesOficina);
 		
-		DadesInteressat dadesInteressat = new DadesInteressat();
-		dadesInteressat.setEntitatCodi(notificacio.getEmisorDir3Codi());
-		dadesInteressat.setAutenticat(false);
-		dadesInteressat.setNif(enviament.getTitularNif());
-		dadesInteressat.setNom(enviament.getTitular().getNom());
-		dadesInteressat.setCognom1(enviament.getTitular().getLlinatge1());
-		dadesInteressat.setCognom2(enviament.getTitular().getLlinatge2());
-		dadesInteressat.setNomAmbCognoms(enviament.getTitularNomLlinatge());
-		dadesInteressat.setTipusInteressat(tipusInteressat);
-		dadesInteressat.setPaisCodi(null);
-		dadesInteressat.setPaisNom(null);
-		dadesInteressat.setProvinciaCodi(null);
-		dadesInteressat.setProvinciaNom(null);
-		dadesInteressat.setMunicipiCodi(null);
-		dadesInteressat.setMunicipiNom(null);
-		registreSortida.setDadesInteressat(dadesInteressat);
+		
+		for(NotificacioEnviamentDtoV2 enviament : enviaments) {
+			registreSortida.getDadesInteressat().add(personaToDadesInteressat(
+					notificacio, 
+					enviament.getTitular()));	
+		}
+		
+//		DadesInteressat dadesInteressat = new DadesInteressat();
+//		dadesInteressat.setEntitatCodi(notificacio.getEmisorDir3Codi());
+//		dadesInteressat.setAutenticat(false);
+//		dadesInteressat.setNif(enviament.getTitularNif());
+//		dadesInteressat.setNom(enviament.getTitular().getNom());
+//		dadesInteressat.setCognom1(enviament.getTitular().getLlinatge1());
+//		dadesInteressat.setCognom2(enviament.getTitular().getLlinatge2());
+//		dadesInteressat.setNomAmbCognoms(enviament.getTitularNomLlinatge());
+//		dadesInteressat.setTipusInteressat(tipusInteressat);
+//		dadesInteressat.setPaisCodi(null);
+//		dadesInteressat.setPaisNom(null);
+//		dadesInteressat.setProvinciaCodi(null);
+//		dadesInteressat.setProvinciaNom(null);
+//		dadesInteressat.setMunicipiCodi(null);
+//		dadesInteressat.setMunicipiNom(null);
+//		registreSortida.setDadesInteressat(dadesInteressat);
 		
 		DadesRepresentat dadesRepresentat = new DadesRepresentat();
 		registreSortida.setDadesRepresentat(dadesRepresentat);
@@ -1141,6 +1145,29 @@ public class PluginHelper {
 		interessatDades.setTelefono(persona.getTelefon());
 		interessat.setInteresado(interessatDades);
 		return interessat;
+	}
+	
+	public DadesInteressat personaToDadesInteressat (
+			NotificacioDtoV2 notificacio, 
+			PersonaDto persona) {
+		DadesInteressat dadesInteressat = new DadesInteressat();
+		if (persona != null && notificacio != null) {
+			dadesInteressat.setEntitatCodi(notificacio.getEmisorDir3Codi());
+			dadesInteressat.setAutenticat(false);
+			dadesInteressat.setNif(persona.getNif());
+			dadesInteressat.setNom(persona.getNom());
+			dadesInteressat.setCognom1(persona.getLlinatge1());
+			dadesInteressat.setCognom2(persona.getLlinatge2());
+			dadesInteressat.setNomAmbCognoms(persona.getNom() + " " + persona.getLlinatges());
+			dadesInteressat.setTipusInteressat(persona.getInteressatTipus().getLongVal());
+			dadesInteressat.setPaisCodi(null);
+			dadesInteressat.setPaisNom(null);
+			dadesInteressat.setProvinciaCodi(null);
+			dadesInteressat.setProvinciaNom(null);
+			dadesInteressat.setMunicipiCodi(null);
+			dadesInteressat.setMunicipiNom(null);
+		}
+		return dadesInteressat;
 	}
 	
 	public InteresadoWsDto personaToRepresentanteEInteresadoWs (PersonaEntity titular, PersonaEntity destinatari) {

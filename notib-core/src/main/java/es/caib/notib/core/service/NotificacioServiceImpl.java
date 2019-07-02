@@ -441,15 +441,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 					}
 				}
 			} else {
-				for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+//				for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
 					RegistreIdDto registreIdDto = new RegistreIdDto();
 					try {
 						registreIdDto = pluginHelper.registreAnotacioSortida(
 								conversioTipusHelper.convertir(
 										notificacioEntity, 
 										NotificacioDtoV2.class), 
-								conversioTipusHelper.convertir(
-										enviament, 
+								conversioTipusHelper.convertirList(
+										notificacio.getEnviaments(), 
 										NotificacioEnviamentDtoV2.class), 
 								1L);
 						//Registrar event
@@ -472,18 +472,21 @@ public class NotificacioServiceImpl implements NotificacioService {
 							notificacioEntity.updateRegistreNumero(registreIdDto.getNumero());
 							notificacioEntity.updateRegistreNumeroFormatat(registreIdDto.getNumeroRegistreFormat());
 							notificacioEntity.updateRegistreData(registreIdDto.getData());
-							
 							notificacioEntity.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
 							notificacioEntity.updateEventAfegir(event);
 							notificacioEventRepository.saveAndFlush(event);
 							notificaHelper.notificacioEnviar(notificacioEntity.getId());
+							for(NotificacioEnviamentEntity enviament: notificacioEntity.getEnviaments()) {
+								enviament.setRegistreNumeroFormatat(registreIdDto.getNumeroRegistreFormat());
+								enviament.setRegistreData(registreIdDto.getData());
+							}
 						}
 					} catch (Exception ex) {
 						logger.error(
 								"Error al donar d'alta la notificació a Notific@ (notificacioId=" + notificacio.getId() + ")",
 								ex);
 					}
-				}
+//				}
 			}		
 		}
 
@@ -1070,15 +1073,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			}
 		} else {
-			for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+//			for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
 				RegistreIdDto registreIdDto = new RegistreIdDto();
+				NotificacioDtoV2 notificacio = conversioTipusHelper.convertir(notificacioEntity, NotificacioDtoV2.class);
 				try {
 					registreIdDto = pluginHelper.registreAnotacioSortida(
 							conversioTipusHelper.convertir(
 									notificacioEntity, 
 									NotificacioDtoV2.class), 
-							conversioTipusHelper.convertir(
-									enviament, 
+							conversioTipusHelper.convertirList(
+									notificacio.getEnviaments(), 
 									NotificacioEnviamentDtoV2.class), 
 							1L);
 					//Registrar event
@@ -1104,17 +1108,19 @@ public class NotificacioServiceImpl implements NotificacioService {
 						
 						notificacioEntity.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
 						notificacioEntity.updateEventAfegir(event);
-						enviament.setRegistreNumeroFormatat(registreIdDto.getNumeroRegistreFormat());
-						enviament.setRegistreData(registreIdDto.getData());
 						notificacioEventRepository.save(event);
 						notificaHelper.notificacioEnviar(notificacioEntity.getId());
+						for(NotificacioEnviamentEntity enviament: notificacioEntity.getEnviaments()) {
+							enviament.setRegistreNumeroFormatat(registreIdDto.getNumeroRegistreFormat());
+							enviament.setRegistreData(registreIdDto.getData());
+						}
 					}
 				} catch (Exception ex) {
 					logger.error(
 							"Error al donar d'alta la notificació a Notific@ (notificacioId=" + notificacioEntity.getId() + ")",
 							ex);
 				}
-			}
+//			}
 		}
 		return registresIdDto;
 	}

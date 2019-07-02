@@ -675,15 +675,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							}
 						}
 					} else {
-						for(NotificacioEnviamentEntity enviament : notificacioGuardada.getEnviaments()) {
+//						for(NotificacioEnviamentEntity enviament : notificacioGuardada.getEnviaments()) {
+						NotificacioDtoV2 notificacioDto = conversioTipusHelper.convertir(notificacioGuardada, NotificacioDtoV2.class);
 							RegistreIdDto registreIdDto = new RegistreIdDto();
 							try {
 								registreIdDto = pluginHelper.registreAnotacioSortida(
 										conversioTipusHelper.convertir(
 												notificacioGuardada, 
 												NotificacioDtoV2.class), 
-										conversioTipusHelper.convertir(
-												enviament, 
+										conversioTipusHelper.convertirList(
+												notificacioDto.getEnviaments(), 
 												NotificacioEnviamentDtoV2.class), 
 										1L);
 								//Registrar event
@@ -706,18 +707,21 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 									notificacioGuardada.updateRegistreNumero(registreIdDto.getNumero());
 									notificacioGuardada.updateRegistreNumeroFormatat(registreIdDto.getNumeroRegistreFormat());
 									notificacioGuardada.updateRegistreData(registreIdDto.getData());
-									
 									notificacioGuardada.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
 									notificacioGuardada.updateEventAfegir(event);
 									notificacioEventRepository.save(event);
 									notificaHelper.notificacioEnviar(notificacioGuardada.getId());
+									for(NotificacioEnviamentEntity enviament: notificacioGuardada.getEnviaments()) {
+										enviament.setRegistreNumeroFormatat(registreIdDto.getNumeroRegistreFormat());
+										enviament.setRegistreData(registreIdDto.getData());
+									}
 								}
 							} catch (Exception ex) {
 								logger.error(
 										"Error al donar d'alta la notificació a Notific@ (notificacioId=" + notificacioGuardada.getId() + ")",
 										ex);
 							}
-						}
+//						}
 					}
 				}
 	

@@ -99,7 +99,19 @@ public interface RegistrePlugin {
 			String tipusAssumpte) throws RegistrePluginException;
 	
 	/**
-	 * Llista les oficines d'una entitat depenent dels permisos
+	 * Retorn l'oficina virtual d'una entitat
+	 * 
+	 * @param entitatCodi	Codi de l'entitat de la qual es volen llistar les oficines
+	 * @param autoritzacioValor	Tipus de registre del que es volen llistar les oficines	
+	 * @return
+	 * 		Retorna una llista amb les oficines de l'entitat
+	 * @throws RegistrePluginException 
+	 */
+	public Oficina llistarOficinaVirtual(
+			String entitatCodi, 
+			Long autoritzacioValor) throws RegistrePluginException;
+	
+	/** Llista les oficines d'una entitat depenent dels permisos
 	 * 
 	 * @param entitatCodi	Codi de l'entitat de la qual es volen llistar les oficines
 	 * @param autoritzacioValor	Tipus de registre del que es volen llistar les oficines	
