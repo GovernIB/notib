@@ -208,7 +208,7 @@ public class NotificacioController extends BaseUserController {
 				procedimentsSenseGrups,
 				entitatActual);
 
-		if (procedimentsPermisNotificacioSenseGrups != null) {
+		if (procedimentsPermisNotificacioSenseGrups != null && !procedimentsPermisNotificacioSenseGrups.isEmpty()) {
 			for (ProcedimentDto procedimentSenseGrupAmbPermis : procedimentsPermisNotificacioSenseGrups) {
 				procedimentsPermisNotificacioAmbGrupsAndSenseGrups.add(procedimentSenseGrupAmbPermis);
 			}
