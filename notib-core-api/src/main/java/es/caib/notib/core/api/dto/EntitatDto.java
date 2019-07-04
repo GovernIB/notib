@@ -20,6 +20,7 @@ public class EntitatDto extends AuditoriaDto {
 	private EntitatTipusEnumDto tipus;
 	private String dir3Codi;
 	private String apiKey;
+	private boolean ambEntregaDeh;
 	private String descripcio;
 	private boolean activa;
 	private byte[] logoCapBytes;
@@ -76,6 +77,12 @@ public class EntitatDto extends AuditoriaDto {
 	}
 	public void setDescripcio(String descripcio) {
 		this.descripcio = descripcio;
+	}
+	public boolean isAmbEntregaDeh() {
+		return ambEntregaDeh;
+	}
+	public void setAmbEntregaDeh(boolean ambEntregaDeh) {
+		this.ambEntregaDeh = ambEntregaDeh;
 	}
 	public boolean isActiva() {
 		return activa;

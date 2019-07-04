@@ -325,7 +325,6 @@ public class NotificacioCommandV2 {
 		grupDto.setId(command.getGrupId());
 		dto.setGrup(grupDto);
 		
-		
 
 		DocumentDto document = new DocumentDto();
 		document.setArxiuGestdocId(dto.getDocument().getArxiuGestdocId());

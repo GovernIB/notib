@@ -784,6 +784,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 
 	public static BuilderV2 getBuilderV2(
 			Enviament enviament, 
+			boolean isAmbEntregaDeh,
 			NotificacioDtoV2 notificacio, 
 			NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
 			NotificaDomiciliConcretTipusEnumDto tipusConcret,
@@ -793,6 +794,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			List<PersonaEntity> destinataris) {
 		return new BuilderV2(
 				enviament,
+				isAmbEntregaDeh,
 				notificacio,
 				numeracioTipus,
 				tipusConcret,
@@ -1079,6 +1081,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		NotificacioEnviamentEntity built;
 		BuilderV2(
 				Enviament enviament, 
+				boolean isAmbEntregaDeh,
 				NotificacioDtoV2 notificacio, 
 				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
 				NotificaDomiciliConcretTipusEnumDto tipusConcret,
@@ -1122,8 +1125,10 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 					built.domiciliLinea2 = enviament.getEntregaPostal().getLinea2();
 				}
 			}
-			if (enviament.getEntregaDeh() != null) {
+			if (isAmbEntregaDeh && enviament.isEntregaDehActiva() && enviament.getEntregaDeh() != null) {
+				built.dehNif = enviament.getTitular().getNif();
 				built.dehObligat = enviament.getEntregaDeh().isObligat();
+				built.dehProcedimentCodi = enviament.getEntregaDeh().getProcedimentCodi();
 			}
 			
 			built.titular = titular;

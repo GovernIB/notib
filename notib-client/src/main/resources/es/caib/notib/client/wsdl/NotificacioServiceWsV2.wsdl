@@ -70,6 +70,7 @@
 <xs:sequence>
 <xs:element maxOccurs="unbounded" minOccurs="0" name="destinataris" nillable="true" type="tns:persona" />
 <xs:element minOccurs="0" name="entregaDeh" type="tns:entregaDeh" />
+<xs:element name="entregaDehActiva" type="xs:boolean" />
 <xs:element minOccurs="0" name="entregaPostal" type="tns:entregaPostal" />
 <xs:element name="entregaPostalActiva" type="xs:boolean" />
 <xs:element minOccurs="0" name="referencia" type="xs:string" />
@@ -92,7 +93,7 @@
 </xs:complexType>
 <xs:complexType name="entregaDeh">
 <xs:sequence>
-<xs:element minOccurs="0" name="nif" type="xs:string" />
+<xs:element minOccurs="0" name="emisorNif" type="xs:string" />
 <xs:element name="obligat" type="xs:boolean" />
 <xs:element minOccurs="0" name="procedimentCodi" type="xs:string" />
 </xs:sequence>
@@ -412,7 +413,7 @@
   </wsdl:binding>
   <wsdl:service name="NotificacioServiceV2">
     <wsdl:port binding="tns:NotificacioServiceV2SoapBinding" name="NotificacioServiceV2Port">
-      <soap:address location="http://10.215.9.173:28080/notib/ws/notificacioV2WS" />
+      <soap:address location="http://127.0.0.1:8180/notib/ws/notificacioV2WS" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

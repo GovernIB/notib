@@ -72,7 +72,9 @@ body {
 	color:#666666;
 	padding-top: 120px;
 }
-
+.modal-body {
+	height: auto !important;
+}
 <c:choose>
 	<c:when test="${sessionScope['EntitatHelper.entitatActual'].colorFons!=null  && not empty sessionScope['EntitatHelper.entitatActual'].colorFons}">
 		.navbar-app {

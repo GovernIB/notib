@@ -228,9 +228,9 @@ $(document).ready(function() {
         $('.nav-tabs > .active').next('li').find('a').trigger('click');
     });
 	
-    $('#concepte').on('input',function(e){
-    	 $('#extracte').val($(this).val());
-    });
+    //$('#concepte').on('input',function(e){
+    //	 $('#extracte').val($(this).val());
+    //});
 	var numPlus = 1;
 	//$('.envio\\[0\\]')[0].innerText = "Envio#" + numPlus;
     //var destinatariForm = $('.destinatariForm');
@@ -330,6 +330,12 @@ $(document).ready(function() {
 			$(dir3codi).addClass('hidden');
 		}
 	});
+	
+	
+	$(document).on('input', ".titularNif", function () {
+		$(this).closest('.enviamentsForm').find('.nifemisor').val($(this).val());
+   	});
+	
 	$('.interessat').trigger('change');
 	$('#tipusDocument').trigger('change');
 	$('.enviamentTipus').trigger('change');
@@ -421,7 +427,8 @@ function addEnvio() {
     
     $(enviamentForm).find('p').remove();
     $(enviamentForm).find('div').removeClass('has-error');
-	$(enviamentForm).appendTo(".newEnviament").slideDown("slow").find("input[type='text']").val("");
+    debugger
+	$(enviamentForm).appendTo(".newEnviament").slideDown("slow").find("input[type='text']").not(".procedimentcodi").val("");
 
     if($(enviamentForm).find('.eliminar_enviament').attr('id') != 'enviamentDelete[0]') {
 	$(enviamentForm).find('.eliminar_enviament').removeClass('hidden');
@@ -437,8 +444,12 @@ function addEnvio() {
         var enviamentForm = $('.enviamentForm_' + number + ':last');
         enviamentForm.removeClass('enviamentForm_' + number).addClass('enviamentForm_' + num);
 
+        //Aumentar index div entrega postal i deh
         var entregaPostal = $('.entregaPostal_'+number + ':last');
 		entregaPostal.removeClass('entregaPostal_'+number).addClass('entregaPostal_'+num);
+		var entregaDeh = $('.entregaDeh_'+number + ':last');
+		entregaDeh.removeClass('entregaDeh_'+number).addClass('entregaDeh_'+num);
+		
 		//Titol enviament
         if (num != null) {
         	var numPlus = num + 1;
@@ -494,6 +505,21 @@ function mostrarEntregaPostal(className) {
     } else {
         $('#entregaPostalAmagat').attr('value', 'true');
         $('.entregaPostal_'+enviament_id_num).show();
+    }
+}
+
+function mostrarEntregaDeh(className) {
+    var element = document.getElementById(className);
+    var parent = $(element).closest(".enviamentsForm");
+    var classParent = $(parent).attr('class');
+
+    var enviament_id_num = className.substring(className.lastIndexOf('[') + 1, className.lastIndexOf(']'));
+    if($('.entregaDeh_'+enviament_id_num).css('display') != 'none') {
+        $('#entregaDehAmagat').attr('value', 'false');
+        $('.entregaDeh_'+enviament_id_num).hide();
+    } else {
+        $('#entregaDehAmagat').attr('value', 'true');
+        $('.entregaDeh_'+enviament_id_num).show();
     }
 }
 
@@ -650,7 +676,7 @@ function mostrarEntregaPostal(className) {
 											<not:inputSelect name="enviaments[${j}].titular.interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="4" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
 										</div>
 										<div class="col-md-6">
-											<not:inputText name="enviaments[${j}].titular.nif" textKey="notificacio.form.camp.titular.nif" required="true" />
+											<not:inputText name="enviaments[${j}].titular.nif" generalClass="titularNif" textKey="notificacio.form.camp.titular.nif" required="true" />
 										</div>
 										<div class="col-md-6">
 											<not:inputText name="enviaments[${j}].titular.nom" textKey="notificacio.form.camp.titular.nom" required="true" />
@@ -753,7 +779,7 @@ function mostrarEntregaPostal(className) {
 								</div>
 								<div class="col-md-12">
 									<p class="comentari col-xs-offset-"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
-									<not:inputCheckbox name="enviaments[${j}].entregaPostalActiva" textKey="notificacio.form.camp.entregapostal.activa" labelSize="2" funcio="mostrarEntregaPostal(this.id)" />
+									<not:inputCheckbox name="enviaments[${j}].entregaPostalActiva" textKey="notificacio.form.camp.entregapostal.activa" labelSize="4" funcio="mostrarEntregaPostal(this.id)" />
 								</div>
 								<c:choose>
 									<c:when test="${not empty enviosGuardats}">
@@ -765,7 +791,6 @@ function mostrarEntregaPostal(className) {
 									</c:otherwise>
 								</c:choose>
 								<div id="entregaPostal" class="entregaPostal_${j}" <c:if test="${!entregaPostalActiva}">style="display:none"</c:if>>
-	
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<not:inputSelect name="enviaments[${j}].entregaPostal.tipus" generalClass="enviamentTipus" textKey="notificacio.form.camp.entregapostal.tipus" required="true" optionItems="${entregaPostalTipus}" optionValueAttribute="value" optionTextKeyAttribute="text"  labelClass="labelcss" inputClass="inputcss"/>
@@ -855,9 +880,33 @@ function mostrarEntregaPostal(className) {
 										</div>
 									</div>
 								</div>
+								<c:choose>
+									<c:when test="${not empty enviosGuardats}">
+										<input id="entregaDehAmagat" name="enviaments[${j}].entregaDeh.visible" class="hidden" value="${enviament.entregaDehActiva}">
+										<c:set var="entregaDehActiva" value="${enviament.entregaDehActiva}"></c:set>
+									</c:when>
+									<c:otherwise>
+										<input id="entregaDehAmagat" name="enviaments[${j}].entregaDeh.visible" class="hidden" value="false">
+									</c:otherwise>
+								</c:choose>
+								<c:if test="${ambEntregaDeh}">
 								<div class="col-md-12">
-									<not:inputCheckbox name="enviaments[${j}].entregaDeh.obligat" textKey="notificacio.form.camp.entregapostal.deh" labelSize="2" />
+									<not:inputCheckbox name="enviaments[${j}].entregaDehActiva" textKey="notificacio.form.camp.entregadeh.activa" labelSize="4" funcio="mostrarEntregaDeh(this.id)" />
 								</div>
+									<div id="entregaDeh" class="entregaDeh_${j}" <c:if test="${!entregaDehActiva}">style="display:none"</c:if>>
+										<div class="col-md-12">
+											<div class="col-md-4">
+												<not:inputText name="enviaments[${j}].entregaDeh.emisorNif" generalClass="nifemisor" textKey="notificacio.form.camp.entregadeh.emisorNif" labelClass="labelcss" inputClass="inputcss" readonly="true"/>
+											</div>
+											<div class="col-md-12">
+												<not:inputCheckbox name="enviaments[${j}].entregaDeh.obligat" textKey="notificacio.form.camp.entregadeh.obligat" labelSize="2" />
+											</div>
+											<div class="col-md-4">
+												<not:inputText name="enviaments[${j}].entregaDeh.procedimentCodi" generalClass="procedimentcodi" value="${procediment.codi}" textKey="notificacio.form.camp.entregadeh.codiprocediment" labelClass="labelcss" inputClass="inputcss" readonly="true"/>
+											</div>
+										</div>
+									</div>
+								</c:if>
 								<div class="col-md-12 text-right">
 									<input name="enviamentDelete[${j}]" id="enviamentDelete[${j}]" class="id_enviament hidden">
 									<div class="btn-group">

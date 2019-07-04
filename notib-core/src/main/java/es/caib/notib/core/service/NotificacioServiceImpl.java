@@ -314,6 +314,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				enviamentsEntity.add(notificacioEnviamentRepository.saveAndFlush(NotificacioEnviamentEntity.
 						getBuilderV2(
 								enviament,
+								entitat.isAmbEntregaDeh(),
 								notificacio, 
 								numeracioTipus, 
 								tipusConcret, 

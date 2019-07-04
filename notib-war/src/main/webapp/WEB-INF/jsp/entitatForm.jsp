@@ -94,6 +94,7 @@ $(document).ready(function() {
 			<not:inputSelect name="tipus" textKey="entitat.form.camp.tipus" optionEnum="EntitatTipusEnumDto" required="true"/>
 			<not:inputText name="dir3Codi" textKey="entitat.form.camp.codidir3" required="true"/>
 			<not:inputText name="apiKey" textKey="entitat.form.camp.apiKey" required="true"/>
+			<not:inputCheckbox name="ambEntregaDeh" textKey="entitat.form.camp.entregadeh"/>
 			<not:inputTextarea name="descripcio" textKey="entitat.form.camp.descripcio"/>
 		</div>
 		<div role="tabpanel" class="tab-pane " id="configuracioForm">

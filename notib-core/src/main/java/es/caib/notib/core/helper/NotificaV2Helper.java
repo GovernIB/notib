@@ -653,10 +653,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						entregaPostal.setOpcionesCIE(opcionesCie);
 						envio.setEntregaPostal(entregaPostal);
 					}	
-				if (enviament.getDehObligat() != null) {
+				if (enviament.getDehNif() != null && enviament.getDehProcedimentCodi() != null && enviament.getDehObligat() != null) {
 					EntregaDEH entregaDeh = new EntregaDEH();
 					entregaDeh.setObligado(enviament.getDehObligat());
-					entregaDeh.setCodigoProcedimiento(notificacio.getProcedimentCodiNotib());
+					entregaDeh.setCodigoProcedimiento(enviament.getDehProcedimentCodi());
 					envio.setEntregaDEH(entregaDeh);
 				}
 				envios.getEnvio().add(envio);

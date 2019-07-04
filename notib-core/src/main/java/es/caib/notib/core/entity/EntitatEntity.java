@@ -14,7 +14,6 @@ import javax.persistence.Version;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
-import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 
@@ -39,6 +38,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	private String dir3Codi;
 	@Column(name = "api_key", length = 64, nullable = false)
 	private String apiKey;
+	@Column(name = "amb_entrega_deh", nullable = false)
+	private boolean ambEntregaDeh;
 	@Column(name = "descripcio", length = 1024)
 	private String descripcio;
 	@Column(name = "activa", nullable = false)
@@ -72,6 +73,9 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	public String getApiKey() {
 		return apiKey;
 	}
+	public boolean isAmbEntregaDeh() {
+		return ambEntregaDeh;
+	}
 	public String getDescripcio() {
 		return descripcio;
 	}
@@ -102,6 +106,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			EntitatTipusEnumDto tipus,
 			String dir3Codi,
 			String apiKey,
+			boolean ambEntregaDeh,
 			String descripcio,
 			byte[] logoCapBytes,
 			byte[] logoPeuBytes,
@@ -114,6 +119,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 		this.tipus = tipus;
 		this.dir3Codi = dir3Codi;
 		this.apiKey = apiKey;
+		this.ambEntregaDeh = ambEntregaDeh;
 		this.logoCapBytes = logoCapBytes;
 		this.logoPeuBytes = logoPeuBytes;
 		this.colorFons = colorFons;
@@ -132,6 +138,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			EntitatTipusEnumDto tipus,
 			String dir3Codi,
 			String apiKey,
+			boolean ambEntregaDeh,
 			byte[] logoCapBytes,
 			byte[] logoPeuBytes,
 			String colorFons,
@@ -143,6 +150,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				tipus,
 				dir3Codi,
 				apiKey,
+				ambEntregaDeh,
 				logoCapBytes,
 				logoPeuBytes,
 				colorFons,
@@ -158,6 +166,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				EntitatTipusEnumDto tipus,
 				String dir3Codi,
 				String apiKey,
+				boolean ambEntregaDeh,
 				byte[] logoCapBytes,
 				byte[] logoPeuBytes,
 				String colorFons,
@@ -170,6 +179,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			built.dir3Codi = dir3Codi;
 			built.activa = true;
 			built.apiKey = apiKey;
+			built.ambEntregaDeh = ambEntregaDeh;
 			built.logoCapBytes = logoCapBytes;
 			built.logoPeuBytes = logoPeuBytes;
 			built.colorFons = colorFons;

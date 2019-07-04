@@ -40,7 +40,6 @@ import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.ws.notificacio.Certificacio;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
@@ -113,8 +112,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private NotificaHelper notificaHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
-	@Autowired
-	private AplicacioService aplicacioService;
 	@Autowired
 	private GrupService grupService;
 
@@ -279,6 +276,13 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					resposta.setErrorDescripcio("[CODI_POSTAL] El camp 'codiPostal' no pot ser null (indicar 00000 en cas de no disposar del codi postal).");
 					return resposta;
 				}
+			}
+
+			if (entitat.isAmbEntregaDeh() && enviament.getEntregaDeh() == null) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[ENTREGA_DEH] El camp 'entregaDeh' d'un enviament no pot ser null");
+				return resposta;
 			}
 			if(enviament.getServeiTipus() == null) {
 				resposta.setError(true);
@@ -532,6 +536,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					NotificacioEnviamentEntity enviamentSaved = notificacioEnviamentRepository.saveAndFlush(
 							NotificacioEnviamentEntity.getBuilderV2(
 									enviament, 
+									entitat.isAmbEntregaDeh(),
 									conversioTipusHelper.convertir(
 											notificacio, 
 											NotificacioDtoV2.class), 

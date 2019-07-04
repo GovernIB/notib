@@ -42,6 +42,7 @@ public class EntitatCommand {
 	private String dir3Codi;
 	@NotEmpty
 	private String apiKey;
+	private boolean ambEntregaDeh;
 	private String descripcio;
 	private MultipartFile logoCap;
 	private boolean eliminarLogoCap;
@@ -88,6 +89,12 @@ public class EntitatCommand {
 	}
 	public void setApiKey(String apiKey) {
 		this.apiKey = apiKey;
+	}
+	public boolean isAmbEntregaDeh() {
+		return ambEntregaDeh;
+	}
+	public void setAmbEntregaDeh(boolean ambEntregaDeh) {
+		this.ambEntregaDeh = ambEntregaDeh;
 	}
 	public String getDescripcio() {
 		return descripcio;

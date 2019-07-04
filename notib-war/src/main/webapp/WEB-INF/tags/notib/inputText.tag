@@ -42,7 +42,7 @@
 		<c:choose>
 			<c:when test="${picker}">
 				<div id="${campPath}" class="input-group colorpicker-component">
-					<form:input value="${campValue}" path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}"/>
+					<form:input value="${campValue}" path="${campPath}" cssClass="form-control ${generalClass}" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}"/>
 					<span class="input-group-addon"><i></i></span>
 					<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 					<c:if test="${info == true}">
@@ -51,7 +51,7 @@
 				</div>
 			</c:when>
 			<c:otherwise>
-				<form:input value="${campValue}" path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}"/>
+				<form:input value="${campValue}" path="${campPath}" cssClass="form-control ${generalClass}" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}"/>
 				<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 				<c:if test="${info == true}">
 					<p class="comentari col-xs-12 col-xs-offset-">${campInfoText}</p>

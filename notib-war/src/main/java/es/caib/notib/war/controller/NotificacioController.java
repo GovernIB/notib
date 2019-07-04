@@ -296,36 +296,37 @@ public class NotificacioController extends BaseUserController {
 			model.addAttribute("entitat", entitatService.findAll());
 		}
 		model.addAttribute(new NotificacioFiltreCommand());
-
-		switch (notificacioCommand.getTipusDocument()) {
-		case ARXIU:
-			if (notificacioCommand.getArxiu() != null && !notificacioCommand.getArxiu().isEmpty()) {
-				notificacioCommand.getDocument().setArxiuNom(notificacioCommand.getArxiu().getOriginalFilename());
-				notificacioCommand.getDocument().setNormalitzat(notificacioCommand.getDocument().isNormalitzat());
-				String contingutBase64 = Base64.encodeBase64String(notificacioCommand.getArxiu().getBytes());
-				notificacioCommand.getDocument().setContingutBase64(contingutBase64);
-				notificacioCommand.getDocument().setMetadadesKeys(notificacioCommand.getDocument().getMetadadesKeys());
-				notificacioCommand.getDocument().setMetadadesValues(notificacioCommand.getDocument().getMetadadesValues());
+		if (notificacioCommand.getTipusDocument() != null) {
+			switch (notificacioCommand.getTipusDocument()) {
+			case ARXIU:
+				if (notificacioCommand.getArxiu() != null && !notificacioCommand.getArxiu().isEmpty()) {
+					notificacioCommand.getDocument().setArxiuNom(notificacioCommand.getArxiu().getOriginalFilename());
+					notificacioCommand.getDocument().setNormalitzat(notificacioCommand.getDocument().isNormalitzat());
+					String contingutBase64 = Base64.encodeBase64String(notificacioCommand.getArxiu().getBytes());
+					notificacioCommand.getDocument().setContingutBase64(contingutBase64);
+					notificacioCommand.getDocument().setMetadadesKeys(notificacioCommand.getDocument().getMetadadesKeys());
+					notificacioCommand.getDocument().setMetadadesValues(notificacioCommand.getDocument().getMetadadesValues());
+				}
+				break;
+			case CSV:
+				if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
+						&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
+					notificacioCommand.getDocument().setCsv(notificacioCommand.getDocumentArxiuUuidCsvUrl());
+				}
+				break;
+			case UUID:
+				if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
+						&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
+					notificacioCommand.getDocument().setUuid(notificacioCommand.getDocumentArxiuUuidCsvUrl());
+				}
+				break;
+			case URL:
+				if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
+						&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
+					notificacioCommand.getDocument().setUrl(notificacioCommand.getDocumentArxiuUuidCsvUrl());
+				}
+				break;
 			}
-			break;
-		case CSV:
-			if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
-					&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
-				notificacioCommand.getDocument().setCsv(notificacioCommand.getDocumentArxiuUuidCsvUrl());
-			}
-			break;
-		case UUID:
-			if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
-					&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
-				notificacioCommand.getDocument().setUuid(notificacioCommand.getDocumentArxiuUuidCsvUrl());
-			}
-			break;
-		case URL:
-			if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
-					&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
-				notificacioCommand.getDocument().setUrl(notificacioCommand.getDocumentArxiuUuidCsvUrl());
-			}
-			break;
 		}
 		
 		if (notificacioCommand.getId() != null) {
@@ -746,7 +747,7 @@ public class NotificacioController extends BaseUserController {
 			}
 		}
 		model.addAttribute("notificacioCommandV2", notificacio);
-		
+		model.addAttribute("ambEntregaDeh", entitatActual.isAmbEntregaDeh());
 		model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
 		model.addAttribute("entitat", procedimentActual.getEntitat());
 		model.addAttribute("procediment", procedimentService.findById(

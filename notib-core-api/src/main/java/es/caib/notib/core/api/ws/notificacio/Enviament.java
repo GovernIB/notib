@@ -20,8 +20,9 @@ public class Enviament {
 	private String referencia;
 	private Persona titular;
 	private List<Persona> destinataris;
-	private EntregaPostal entregaPostal;
 	private boolean entregaPostalActiva;
+	private EntregaPostal entregaPostal;
+	private boolean entregaDehActiva;
 	private EntregaDeh entregaDeh;
 	private NotificaServeiTipusEnumDto serveiTipus;
 
@@ -48,6 +49,12 @@ public class Enviament {
 	}
 	public void setEntregaPostalActiva(boolean entregaPostalActiva) {
 		this.entregaPostalActiva = entregaPostalActiva;
+	}
+	public boolean isEntregaDehActiva() {
+		return entregaDehActiva;
+	}
+	public void setEntregaDehActiva(boolean entregaDehActiva) {
+		this.entregaDehActiva = entregaDehActiva;
 	}
 	public EntregaPostal getEntregaPostal() {
 		return entregaPostal;
