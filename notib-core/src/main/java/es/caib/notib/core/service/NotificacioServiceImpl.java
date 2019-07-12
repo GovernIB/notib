@@ -182,6 +182,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 		DocumentEntity documentEntity = null;
 		
+		// Guardar document 
 		if(notificacio.getDocument().getCsv() != null || 
 		   notificacio.getDocument().getUuid() != null || 
 		   notificacio.getDocument().getContingutBase64() != null || 
@@ -192,9 +193,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					documentGesdocId, 
 					notificacio.getDocument().getArxiuNom(), 
 					notificacio.getDocument().getUrl(),  
-//					notificacio.getDocument().getMetadades(),  
 					notificacio.getDocument().isNormalitzat(),  
-//					notificacio.getDocument().isGenerarCsv(),
 					notificacio.getDocument().getUuid(),
 					notificacio.getDocument().getCsv()).build());
 		}
@@ -203,7 +202,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				getBuilderV2(
 						entitat,
 						notificacio.getEmisorDir3Codi(),
-//						notificacio.getOrganGestor(),
 						pluginHelper.getNotibTipusComunicacioDefecte(),
 						notificacio.getEnviamentTipus(), 
 						notificacio.getConcepte(),
@@ -217,15 +215,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 						notificacio.getGrupCodi(),
 						notificacio.getNumExpedient(),
 						TipusUsuariEnumDto.INTERFICIE_WEB
-//						//notificacio.getOficina(),
-//						//notificacio.getLlibre(),
-//						notificacio.getExtracte(),
-//						notificacio.getDocFisica(),
-//						//notificacio.getTipusAssumpte(),
-//						notificacio.getIdioma(),
-//						notificacio.getRefExterna(),
-//						notificacio.getCodiAssumpte(),
-//						notificacio.getObservacions()
 						).document(documentEntity);
 
 		NotificacioEntity notificacioEntity = notificacioBuilder.build();
@@ -279,6 +268,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					}
 				}
 				PersonaEntity titular = personaRepository.saveAndFlush(PersonaEntity.getBuilderV2(
+						enviament.getTitular().isIncapacitat(),
 						enviament.getTitular().getInteressatTipus(),
 						enviament.getTitular().getEmail(), 
 						enviament.getTitular().getLlinatge1(), 
@@ -293,6 +283,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				for(Persona persona: enviament.getDestinataris()) {
 					if (!persona.getNif().isEmpty()) {
 						PersonaEntity destinatari = personaRepository.saveAndFlush(PersonaEntity.getBuilderV2(
+								false,
 								persona.getInteressatTipus(),
 								persona.getEmail(), 
 								persona.getLlinatge1(), 
@@ -442,7 +433,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 					}
 				}
 			} else {
-//				for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
 					RegistreIdDto registreIdDto = new RegistreIdDto();
 					try {
 						registreIdDto = pluginHelper.registreAnotacioSortida(
@@ -487,7 +477,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 								"Error al donar d'alta la notificació a Notific@ (notificacioId=" + notificacio.getId() + ")",
 								ex);
 					}
-//				}
 			}		
 		}
 

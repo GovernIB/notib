@@ -33,6 +33,7 @@ import es.caib.notib.war.validation.ValidLlinatgeIfFisic;
 )
 public class PersonaCommand {
 
+	private boolean incapacitat;
 	private InteressatTipusEnumDto interessatTipus;
 	private String nom;
 	private String llinatge1;
@@ -43,6 +44,13 @@ public class PersonaCommand {
 	private String dir3codi;
 	private boolean visible = true;
 	
+	
+	public boolean isIncapacitat() {
+		return incapacitat;
+	}
+	public void setIncapacitat(boolean incapacitat) {
+		this.incapacitat = incapacitat;
+	}
 	public InteressatTipusEnumDto getInteressatTipus() {
 		return interessatTipus;
 	}

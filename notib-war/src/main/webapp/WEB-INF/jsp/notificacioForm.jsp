@@ -696,6 +696,10 @@ function mostrarEntregaDeh(className) {
 										<div class="col-md-6 dir3codi hidden">
 											<not:inputText name="enviaments[${j}].titular.dir3codi" textKey="notificacio.form.camp.titular.dir3codi" />
 										</div>
+										
+										<div class="col-md-12">
+											<not:inputCheckboxGros name="enviaments[${j}].titular.incapacitat" textKey="notificacio.form.camp.titular.incapacitat" />
+										</div>
 									</div>
 								</div>
 							</div>

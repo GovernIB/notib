@@ -6,6 +6,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class PersonaDto implements Serializable{
 
+	boolean incapacitat;
 	private InteressatTipusEnumDto interessatTipus;
 	private String nom;
 	private String llinatge1;
@@ -17,6 +18,12 @@ public class PersonaDto implements Serializable{
 	private String dir3Codi;
 	
 	
+	public boolean isIncapacitat() {
+		return incapacitat;
+	}
+	public void setIncapacitat(boolean incapacitat) {
+		this.incapacitat = incapacitat;
+	}
 	public InteressatTipusEnumDto getInteressatTipus() {
 		return interessatTipus;
 	}

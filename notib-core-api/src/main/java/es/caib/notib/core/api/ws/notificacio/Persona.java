@@ -15,6 +15,7 @@ import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 @JsonAutoDetect
 public class Persona {
 
+	private boolean incapacitat;
 	private InteressatTipusEnumDto interessatTipus;
 	private String nom;
 	private String llinatge1;
@@ -25,7 +26,12 @@ public class Persona {
 	private String raoSocial;
 	private String dir3Codi;
 	
-	
+	public boolean isIncapacitat() {
+		return incapacitat;
+	}
+	public void setIncapacitat(boolean incapacitat) {
+		this.incapacitat = incapacitat;
+	}
 	public InteressatTipusEnumDto getInteressatTipus() {
 		return interessatTipus;
 	}

@@ -26,6 +26,7 @@ public class Enviament {
 	private EntregaDeh entregaDeh;
 	private NotificaServeiTipusEnumDto serveiTipus;
 
+
 	public String getReferencia() {
 		return referencia;
 	}

@@ -36,6 +36,7 @@ import es.caib.notib.ws.notificacio.EntregaDeh;
 import es.caib.notib.ws.notificacio.EntregaPostal;
 import es.caib.notib.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.ws.notificacio.Enviament;
+import es.caib.notib.ws.notificacio.EnviamentEstatEnum;
 import es.caib.notib.ws.notificacio.EnviamentReferencia;
 import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
 import es.caib.notib.ws.notificacio.InteressatTipusEnumDto;
@@ -57,6 +58,7 @@ public class NotificaWsTestIntegracioRest {
 
 //	private static final String ENTITAT_DIR3CODI = "A04013511";
 	private static final String ENTITAT_DIR3CODI = "A04003003";
+//	private static final String ENTITAT_DIR3CODI = "EA0004518";
 //	@Autowired
 //	private NotificaV2Helper notificaHelper;
 //	@Autowired
@@ -110,13 +112,14 @@ public class NotificaWsTestIntegracioRest {
 	// Para cada destinatario se comprobará que devuelve un
 	// identificador, la referencia del emisor y el NIF del titular.
 	// -------------------------------------------------------------------------------------
-	// Código devuelto: 000. OK
+	// Código devuelto: 4011. Pagador postal no vàlid
 	
-	// TODO: Necessitam tenir un CIE vàlid
-	@Test
+	// TODO: Necessitam tenir un CIE vàlid si retard = 0
+//	@Test 
 	public void pruebaEmision01() throws Exception {
 	
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -125,6 +128,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacioV2 = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -171,7 +175,7 @@ public class NotificaWsTestIntegracioRest {
 	// Para cada destinatario se comprobará que devuelve un
 	// identificador, la referencia del emisor y el NIF del titular.
 	// -------------------------------------------------------------------------------------
-	// Código devuelto: 000. OK
+	// Código devuelto: 4011. Pagador postal no vàlid
 	
 	// TODO: Necessitam tenir un CIE vàlid
 //	@Test
@@ -218,6 +222,7 @@ public class NotificaWsTestIntegracioRest {
 //		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findByNotificaReferencia(referencies.get(0));
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.ESTRANGER;
 		boolean ambEnviamentDEH = false;
@@ -226,6 +231,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -269,7 +275,7 @@ public class NotificaWsTestIntegracioRest {
 	// Para cada destinatario se comprobará que devuelve un
 	// identificador, la referencia del emisor y el NIF del titular.
 	// -------------------------------------------------------------------------------------
-	// Código devuelto: 000. OK
+	// Código devuelto: 4011. Pagador postal no vàlid
 	
 	// TODO: Necessitam tenir un CIE vàlid
 //	@Test
@@ -278,6 +284,7 @@ public class NotificaWsTestIntegracioRest {
 		// Petició TIPO DEH VOLUNTARIO + CIE
 
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = true;
@@ -286,6 +293,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -322,6 +330,8 @@ public class NotificaWsTestIntegracioRest {
 			assertNotNull(info.getReceptorNif());
 		}
 	}
+	
+/*****************************************************************************************************/
 	
 	
 	// PETICIÓN CORRECTA DE TIPO DEH OBLIGADO.
@@ -337,6 +347,7 @@ public class NotificaWsTestIntegracioRest {
 		// Petició TIPO DEH OBLIGADO
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = true;
@@ -345,6 +356,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -377,8 +389,10 @@ public class NotificaWsTestIntegracioRest {
 					info.isError(),
 					is(false));
 			assertNotNull(referencia.getReferencia());
-			assertNotNull(info.getCertificacio());
-			assertNotNull(info.getReceptorNif());
+			if (info.getEstat() == EnviamentEstatEnum.LLEGIDA) {
+				assertNotNull(info.getCertificacio());
+				assertNotNull(info.getReceptorNif());
+			}
 		}
 	}
 	
@@ -390,12 +404,13 @@ public class NotificaWsTestIntegracioRest {
 	// -------------------------------------------------------------------------------------
 	// Código devuelto: 000. OK
 	
-//	@Test	// Resultat test: OK
+	@Test	// Resultat test: OK
 	public void pruebaEmision05() throws Exception {
 		
 		// Petició DE ENVIO SOLO CARPETA
 		
-		int numDestinataris = 1;
+		int numDestinataris = 0;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -404,6 +419,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -436,8 +452,10 @@ public class NotificaWsTestIntegracioRest {
 					info.isError(),
 					is(false));
 			assertNotNull(referencia.getReferencia());
-			assertNotNull(info.getCertificacio());
-			assertNotNull(info.getReceptorNif());
+			if (info.getEstat() == EnviamentEstatEnum.LLEGIDA) {
+				assertNotNull(info.getCertificacio());
+				assertNotNull(info.getReceptorNif());
+			}
 		}
 	}
 	
@@ -454,6 +472,7 @@ public class NotificaWsTestIntegracioRest {
 			// Petició DE ENVIO SOLO CARPETA CON TIPUS INTERESADO NULO
 			String notificacioId = new Long(System.currentTimeMillis()).toString();
 			int numDestinataris = 1;
+			int numEnviaments = 1;
 			boolean ambEnviamentPostal = false;
 			NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 			boolean ambEnviamentDEH = false;
@@ -462,6 +481,7 @@ public class NotificaWsTestIntegracioRest {
 			NotificacioV2 notificacio = generarNotificacio(
 					notificacioId,
 					numDestinataris,
+					numEnviaments,
 					ambEnviamentPostal,
 					tipusEnviamentPostal,
 					ambEnviamentDEH,
@@ -470,6 +490,7 @@ public class NotificaWsTestIntegracioRest {
 			
 			RespostaAlta respostaAlta = client.alta(notificacio);
 			assertThat(
+					respostaAlta.getErrorDescripcio(),
 					respostaAlta.isError(),
 					is(false));
 			assertNotNull(respostaAlta);
@@ -482,6 +503,7 @@ public class NotificaWsTestIntegracioRest {
 			//Consulta estat notificacio
 			RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 			assertThat(
+					respostaInfo.getErrorDescripcio(),
 					respostaInfo.isError(),
 					is(false));
 			assertNotNull(respostaInfo);
@@ -494,8 +516,10 @@ public class NotificaWsTestIntegracioRest {
 						info.isError(),
 						is(false));
 				assertNotNull(referencia.getReferencia());
-				assertNotNull(info.getCertificacio());
-				assertNotNull(info.getReceptorNif());
+				if (info.getEstat() == EnviamentEstatEnum.LLEGIDA) {
+					assertNotNull(info.getCertificacio());
+					assertNotNull(info.getReceptorNif());
+				}
 			}
 		}
 	
@@ -514,6 +538,7 @@ public class NotificaWsTestIntegracioRest {
 		// Petició CON MAS DE UN DESTINATARIO
 		
 		int numDestinataris = 3;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -522,6 +547,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -530,6 +556,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -537,11 +564,12 @@ public class NotificaWsTestIntegracioRest {
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
-				is(numDestinataris));
+				is(numEnviaments));
 		
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -554,8 +582,10 @@ public class NotificaWsTestIntegracioRest {
 					info.isError(),
 					is(false));
 			assertNotNull(referencia.getReferencia());
-			assertNotNull(info.getCertificacio());
-			assertNotNull(info.getReceptorNif());
+			if (info.getEstat() == EnviamentEstatEnum.LLEGIDA) {
+				assertNotNull(info.getCertificacio());
+				assertNotNull(info.getReceptorNif());
+			}
 		}
 	}
 	
@@ -574,6 +604,7 @@ public class NotificaWsTestIntegracioRest {
 	public void pruebaEmision08() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -582,6 +613,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -592,6 +624,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -604,6 +637,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -623,18 +657,52 @@ public class NotificaWsTestIntegracioRest {
 		}
 		
 	}
-	
-	
+	// PRUEBAS DE EMISIÓN – ERRÓNEAS
+	// =====================================================================================
+
+	// [ENTITAT] No s'ha trobat cap entitat configurada a Notib amb el codi Dir3
+	// A00000000. (emisorDir3Codi)
+	// -------------------------------------------------------------------------------------
+	// Se enviará una petición con un organismo emisor cuyo código
+	// DIR3 no se encuentre en BBDD.
+	// -------------------------------------------------------------------------------------
+	// Código devuelto: 4011. Organismo emisor no dado de alta
+
+//	@Test // Resultat test: OK
+	public void pruebaEmision08_1() throws Exception {
+
+		int numDestinataris = 1;
+		int numEnviaments = 1;
+		boolean ambEnviamentPostal = false;
+		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		boolean ambEnviamentDEH = false;
+		boolean ambEnviamentDEHObligat = false;
+		boolean ambRetard = true;
+
+		NotificacioV2 notificacio = generaNotificacio(numDestinataris, numEnviaments, ambEnviamentPostal,
+				tipusEnviamentPostal, ambEnviamentDEH, ambEnviamentDEHObligat, ambRetard);
+
+		notificacio.setEmisorDir3Codi("A00000000");
+
+		RespostaAlta respostaAlta = client.alta(notificacio);
+		assertThat(
+				respostaAlta.getErrorDescripcio(), 
+				anyOf(
+						containsString("[ENTITAT]"), 
+						containsString("No s'ha trobat cap entitat configurada a Notib amb el codi Dir3 A00000000. (emisorDir3Codi)")));
+	}
+
 	// PETICIÓN CON EL VALOR DE PDF NORMALIZADO VACÍO.
 	// -------------------------------------------------------------------------------------
 	// Petición en la que el valor del campo normalizado está sin rellenar.
 	// -------------------------------------------------------------------------------------
 	// Código devuelto: 4151. El campo normalizado está vacío
 	
-//	@Test	// Prova impossible: Document no permet el camp normalitzat buid.
+//	@Test	// Resultat test: Document no permet el camp normalitzat buid. (OK)
 	public void pruebaEmision09() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -643,6 +711,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -654,6 +723,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -666,6 +736,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -688,13 +759,14 @@ public class NotificaWsTestIntegracioRest {
 	// -------------------------------------------------------------------------------------
 	// Petición en la que el valor del campo normalizado no es ni si ni no
 	// -------------------------------------------------------------------------------------
-	// Código devuelto: 4152. El valor de normalizado no es válido, debe ser 'si' o 'no'
+	// Código devuelto: 4152. NotificaHelper únicament permet els valors "true" i "false".
 	
 
-//	@Test	// Prova impossible: NotificaHelper únicament permet els valors "si" i "no".
+//	@Test // Resultat test: OK
 	public void pruebaEmision10() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -703,17 +775,19 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
 				ambEnviamentDEHObligat,
 				ambRetard);
 		
-//		valor del camp normalitzat incorrecte (diferent de "si" o "no")
+//		valor del camp normalitzat incorrecte (diferent de "true" o "false")
 //		notificacio.getDocument.setNormalitzat("yes");
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -726,6 +800,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -748,12 +823,13 @@ public class NotificaWsTestIntegracioRest {
 	// -------------------------------------------------------------------------------------
 	// Petición en la que el NIF que se proporciona del titular es incorrecto
 	// -------------------------------------------------------------------------------------
-	// Código devuelto: 4200. El documento de identificación no es válido
+	// Resultat test: El registre no permet un Nif no vàlid. No es pot enviar una notificació a Notific@ amb nif no vàlid. 
 	
 //	@Test	// Resultat test: OK
 	public void pruebaEmision11() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -762,6 +838,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -774,46 +851,22 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
-		assertNotNull(respostaAlta);
-		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
-		assertNotNull(referencies);
-		assertThat(
-				referencies.size(),
-				is(numDestinataris));
-		
-		//Consulta estat notificacio
-		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
-		assertThat(
-				respostaInfo.isError(),
-				is(false));
-		assertNotNull(respostaInfo);
-		//Consulta estat enviament
-		for (EnviamentReferencia referencia: referencies) {
-			//Si no hay error
-			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
-			assertNotNull(info);
-			assertThat(
-					info.isError(),
-					is(false));
-			assertThat(
-					info.getErrorDescripcio(),
-					containsString("[4200]"));
-		}
-		
 	}
 	
 	// PETICIÓN CON NOMBRE DEL TITULAR VACÍO.
 	// -------------------------------------------------------------------------------------
 	// Petición en la que el campo nombre del titular está vacío.
 	// -------------------------------------------------------------------------------------
-	// Código devuelto: 4241. Indique el nombre
+	// Resultat test: NotificacioServiceWsImplV2 valida que el titular/destinataris no siguin null (OK)
 	
 //	@Test	// Resultat test: OK
 	public void pruebaEmision12() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -822,6 +875,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -836,36 +890,9 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
-		assertNotNull(respostaAlta);
-		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
-		assertNotNull(referencies);
-		assertThat(
-				referencies.size(),
-				is(numDestinataris));
-		
-		//Consulta estat notificacio
-		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
-		assertThat(
-				respostaInfo.isError(),
-				is(false));
-		assertNotNull(respostaInfo);
-		//Consulta estat enviament
-		for (EnviamentReferencia referencia: referencies) {
-			//Si no hay error
-			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
-			assertNotNull(info);
-			assertThat(
-					info.isError(),
-					is(false));
-			assertThat(
-					info.getErrorDescripcio(),
-					anyOf(
-							containsString("[4210]"),
-							containsString("[4241]")));
-		}
-		
 	}
 	
 	
@@ -875,10 +902,11 @@ public class NotificaWsTestIntegracioRest {
 	// -------------------------------------------------------------------------------------
 	// Código devuelto: 4311. Documento no puede estar vacío
 	
-//	@Test	// Prova impossible: NotificaHelper valida que el document no sigui null.
+//	@Test	// Resultat test: OK
 	public void pruebaEmision13() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -887,6 +915,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -898,6 +927,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -910,6 +940,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -928,64 +959,39 @@ public class NotificaWsTestIntegracioRest {
 	}
 	
 	
-	// PETICIÓN EN LA QUE EL HASH ENVIADO NO COINCIDE CON EL HASH DEL DOCUMENTO.
+	// PETICIÓN TIPO DE ENVIO VACIO.
 	// -------------------------------------------------------------------------------------
-	// Se enviará una petición en la que el Hash calculado del PDF no
-	// coincida con el que se recibe del WS. El algoritmo que se usa es
-	// SHA256 y posteriormente codificado en Base64.
+	// Petición en la que el tipo de envio es vacio.
 	// -------------------------------------------------------------------------------------
 	// Código devuelto: 4320. No se corresponde el sha1 del documento con el contenido
 	
-//	@Test	// Resultat test: OK
+//	@Test	// Resultat test: [ENVIAMENT_TIPUS] El tipus d'enviament de la notificació no pot ser null. (OK)
 	public void pruebaEmision14() throws Exception {
+		int numDestinataris = 1;
+		int numEnviaments = 1;
+		boolean ambEnviamentPostal = false;
+		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		boolean ambEnviamentDEH = false;
+		boolean ambEnviamentDEHObligat = false;
+		boolean ambRetard = true;
 		
-//		int numDestinataris = 1;
-//		boolean ambEnviamentPostal = false;
-//		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
-//		boolean ambEnviamentDEH = false;
-//		boolean ambEnviamentDEHObligat = false;
-//		boolean ambRetard = true;
-//		
-//		NotificacioV2 notificacio = generaNotificacio(
-//				numDestinataris,
-//				ambEnviamentPostal,
-//				tipusEnviamentPostal,
-//				ambEnviamentDEH,
-//				ambEnviamentDEHObligat,
-//				ambRetard);
-//		
-//		// Hash del document incorrecte
-//		notificacio.getDocument().setHash("AAA");
-//		
-//		RespostaAlta respostaAlta = client.alta(notificacio);
-//		assertThat(
-//				respostaAlta.isError(),
-//				is(false));
-//		assertNotNull(respostaAlta);
-//		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
-//		assertNotNull(referencies);
-//		assertThat(
-//				referencies.size(),
-//				is(numDestinataris));
-//		
-//		//Consulta estat notificacio
-//		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
-//		assertThat(
-//				respostaInfo.isError(),
-//				is(false));
-//		assertNotNull(respostaInfo);
-//		//Consulta estat enviament
-//		for (EnviamentReferencia referencia: referencies) {
-//			//Si no hay error
-//			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
-//			assertNotNull(info);
-//			assertThat(
-//					info.isError(),
-//					is(false));
-//			assertThat(
-//					info.getErrorDescripcio(),
-//					anyOf(containsString("[4320]")));
-//		}
+		NotificacioV2 notificacio = generaNotificacio(
+				numDestinataris,
+				numEnviaments,
+				ambEnviamentPostal,
+				tipusEnviamentPostal,
+				ambEnviamentDEH,
+				ambEnviamentDEHObligat,
+				ambRetard);
+		
+		// Nom del titular buid
+		notificacio.setEnviamentTipus(null);
+		
+		RespostaAlta respostaAlta = client.alta(notificacio);
+		assertThat(
+				respostaAlta.getErrorDescripcio(),
+				respostaAlta.isError(),
+				is(false));
 	}
 	
 	
@@ -995,10 +1001,11 @@ public class NotificaWsTestIntegracioRest {
 	// -------------------------------------------------------------------------------------
 	// Código devuelto: 4402. El campo Servicio solo puede contener los valores 'urgente' o 'normal'
 	
-//	@Test	// Prova impossible: ServeiTipus únicament pot ser null, NORMAL o URGENT, i el camp no existeix a la v.2.
+//	@Test	// Resultat test: ServeiTipus únicament pot ser null, NORMAL o URGENT, i el camp no existeix a la v.2 (BAD REQUEST). (OK)
 	public void pruebaEmision15() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -1007,6 +1014,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -1014,7 +1022,7 @@ public class NotificaWsTestIntegracioRest {
 				ambRetard);
 		
 		// Tipus de servei no vàlid 
-//		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
+//		Enviament env = (Enviament)notificacio.getEnviaments().get(0);
 //		env.setServeiTipus(NotificaServeiTipusEnumDto.ALTRE);
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
@@ -1055,10 +1063,11 @@ public class NotificaWsTestIntegracioRest {
 	// -------------------------------------------------------------------------------------
 	// Código devuelto: 4403. Debe rellenar el campo 'servicio'
 	
-//	@Test	// Prova impossible: ServeiTipus no existeix a la v.2.
+//	@Test	// Resultat test: [SERVEI_TIPUS] El camp 'serveiTipus' d'un enviament no pot ser null. (OK)
 	public void pruebaEmision16() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -1067,6 +1076,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -1079,6 +1089,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -1091,6 +1102,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -1113,12 +1125,13 @@ public class NotificaWsTestIntegracioRest {
 	// -------------------------------------------------------------------------------------
 	// Se enviará una petición con el campo concepto vacío.
 	// -------------------------------------------------------------------------------------
-	// Código devuelto: 4500. Indique el concepto
+	// Prova impossible: NotificacioServiceWsImplV2 valida que el camp 'concepte' no sigui null.
 	
-//	@Test	// Prova impossible: Notib no permet el concepte buit.
+//	@Test	// Resultat test: [CONCEPTE] El concepte de la notificació no pot ser null. (OK)
 	public void pruebaEmision17() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -1127,6 +1140,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -1138,6 +1152,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -1150,6 +1165,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -1173,10 +1189,11 @@ public class NotificaWsTestIntegracioRest {
 	// -------------------------------------------------------------------------------------
 	// Código devuelto: 4510. Tipo de envío vacío
 	
-//	@Test	// Prova impossible: Notib no permet l'enviament tipus buit.
+//	@Test	// Resultat test: [ENVIAMENT_TIPUS] El tipus d'enviament de la notificació no pot ser null. (OK)
 	public void pruebaEmision18() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -1185,6 +1202,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -1196,6 +1214,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -1208,6 +1227,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -1232,10 +1252,11 @@ public class NotificaWsTestIntegracioRest {
 	// -------------------------------------------------------------------------------------
 	// Código devuelto: 4511. Tipo de envío no permitido
 	
-//	@Test	// Prova impossible: el sistema només permet tipus d'enviament COMUNICACIO i NOTIFICACIO
+//	@Test	// Resultat test: Tipus enviament únicament pot ser COMUNICACIO o NOTIFICACIO en cas contrari: BAD REQUEST. (OK)
 	public void pruebaEmision19() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -1244,6 +1265,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -1255,6 +1277,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -1267,6 +1290,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -1290,12 +1314,13 @@ public class NotificaWsTestIntegracioRest {
 	// Petición en la que el Código SIA enviado no es correcto o no se
 	// corresponde con el emisor.
 	// -------------------------------------------------------------------------------------
-	// Código devuelto: 4531. Código SIA incorrecto
+	// Código devuelto: 4531. Código SIA (PROCEDIMENT) incorrecto
 	
-//	@Test	// Resultat test: Notifica no dona error al no indicar el codi del procediment SIA, o posant qualsevol valor
+//	@Test	// Resultat test: Notifica no dona error al no indicar el codi del procediment SIA, o posant qualsevol valor (OK)
 	public void pruebaEmision20() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -1304,6 +1329,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -1314,6 +1340,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -1326,6 +1353,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -1350,10 +1378,11 @@ public class NotificaWsTestIntegracioRest {
 	// -------------------------------------------------------------------------------------
 	// Código devuelto: 4600. Tipo domicilio incorrecto
 	
-//	@Test	// Prova impossible: el sistema només permet tipus de domicili CONCRET o FISCAL
+//	@Test	// Resultat impossible: el sistema només permet tipus de domicili ESTRANGER, NACIONAL, APARTAT_CORREUS o SENSE_NORMALITZAR en cas contrar: BAD REQUEST. (OK)
 	public void pruebaEmision21() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -1362,6 +1391,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -1370,10 +1400,11 @@ public class NotificaWsTestIntegracioRest {
 		
 		// Tipus domicili no vàlid
 //		NotificacioEnviamentTest env = (NotificacioEnviamentTest)notificacio.getEnviaments().get(0);
-//		env.getEntregaPostal().setTipus(NotificaDomiciliTipusEnumDto.ALTRE);
+//		env.getEntregaPostal().setTipus(NotificaDomiciliConcretTipusEnumDto.ALTRE);
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -1386,6 +1417,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -1416,6 +1448,7 @@ public class NotificaWsTestIntegracioRest {
 	public void pruebaEmision22() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -1424,6 +1457,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -1436,6 +1470,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -1448,6 +1483,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -1472,10 +1508,11 @@ public class NotificaWsTestIntegracioRest {
 	// -------------------------------------------------------------------------------------
 	// Código devuelto: 4602. Tipo de domicilio vacío
 	
-//	@Test	//	Prova impossible: NotificaHelper no permet el camp tipus domicili buit
+//	@Test	//	Resultat impossible: [ENTREGA_POSTAL_TIPUS] El camp 'entregaPostalTipus' no pot ser null. (OK)
 	public void pruebaEmision23() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -1484,6 +1521,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -1496,6 +1534,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -1508,6 +1547,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -1533,10 +1573,11 @@ public class NotificaWsTestIntegracioRest {
 	// -------------------------------------------------------------------------------------
 	// Código devuelto: 4610. El Nombre de vía no puede estar vacío
 	
-//	@Test	// Resultat test: OK
+//	@Test	//	Resultat test: [ENTREGA_POSTAL_NOM_VIA] El camp 'viaNom' de l'entrega postal d'un enviament no pot ser null. (OK)
 	public void pruebaEmision24() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -1545,6 +1586,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -1557,6 +1599,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -1569,6 +1612,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -1593,10 +1637,11 @@ public class NotificaWsTestIntegracioRest {
 	// -------------------------------------------------------------------------------------
 	// Código devuelto: 4620. El Tipo de Vía no puede estar vacío
 	
-//	@Test	// Resultat test: OK
+//	@Test	// Resultat test: [VIA_TIPUS] El camp 'viaTipus' no pot ser null en cas d'entrega NACIONAL NORMALITZAT. (OK)
 	public void pruebaEmision25() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -1605,6 +1650,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -1617,6 +1663,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -1629,6 +1676,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -1655,10 +1703,11 @@ public class NotificaWsTestIntegracioRest {
 	// Código devuelto: 4630. Dirección no válida, falta Número de casa o Punto kilométrico
 	
 	// TODO: Necessitam tenir un CIE vàlid
-//	@Test
+//	@Test // Resultat test: [PUNT_KM_NUM_CASA] S'ha d'indicar almenys un 'numeroCasa' o 'puntKm'. (OK)
 	public void pruebaEmision26() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -1667,6 +1716,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -1679,6 +1729,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -1691,6 +1742,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -1716,10 +1768,11 @@ public class NotificaWsTestIntegracioRest {
 	// -------------------------------------------------------------------------------------
 	// Código devuelto: 4650. Código Postal no puede estar vacío
 	
-//	@Test	// Resultat test: OK
+//	@Test	// Resultat test: [CODI_POSTAL] El camp 'codiPostal' no pot ser null (indicar 00000 en cas de no disposar del codi postal). (OK)
 	public void pruebaEmision27() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS;
 		boolean ambEnviamentDEH = false;
@@ -1728,6 +1781,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -1740,6 +1794,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -1752,6 +1807,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -1777,10 +1833,11 @@ public class NotificaWsTestIntegracioRest {
 	// -------------------------------------------------------------------------------------
 	// Código devuelto: 4660. Apartado de correos no puede estar vacío
 	
-//	@Test	// Resultat test: OK
+//	@Test	// Resultat test: [APARTAT_CORREUS] El camp 'apartatCorreus' no pot ser null en cas d'entrega APARTAT CORREUS. (OK)
 	public void pruebaEmision28() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS;
 		boolean ambEnviamentDEH = false;
@@ -1789,6 +1846,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -1801,6 +1859,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -1813,6 +1872,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -1837,10 +1897,11 @@ public class NotificaWsTestIntegracioRest {
 	// -------------------------------------------------------------------------------------
 	// Código devuelto: 4670. Código de municipio vacío
 	
-//	@Test	// Resultat test: OK
+//	@Test	// Resultat test: [MUNICIPI_CODI] El camp 'municipiCodi' no pot ser null en cas d'entrega APARTAT CORREUS. OK
 	public void pruebaEmision29() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -1849,6 +1910,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -1861,6 +1923,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -1873,6 +1936,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -1900,7 +1964,8 @@ public class NotificaWsTestIntegracioRest {
 //	@Test	// Resultat test: OK
 	public void pruebaEmision30() throws Exception {
 		
-		int numDestinataris = 1;
+		int numDestinataris = 1; 
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -1909,6 +1974,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -1921,6 +1987,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -1933,6 +2000,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -1957,10 +2025,11 @@ public class NotificaWsTestIntegracioRest {
 	// -------------------------------------------------------------------------------------
 	// Código devuelto: 4680. Código de provincia vacío
 	
-//	@Test	// Resultat test: OK
+//	@Test	// Resultat test: [PROVINCIA] El camp 'provincia' no pot ser null en cas d'entrega NACIONAL NORMALITZAT. (OK)
 	public void pruebaEmision31() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -1969,6 +2038,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -1981,6 +2051,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -1993,6 +2064,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -2021,6 +2093,7 @@ public class NotificaWsTestIntegracioRest {
 	public void pruebaEmision32() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -2029,6 +2102,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -2041,6 +2115,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -2053,6 +2128,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -2082,6 +2158,7 @@ public class NotificaWsTestIntegracioRest {
 	public void pruebaEmision33() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -2090,6 +2167,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -2102,6 +2180,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -2114,6 +2193,7 @@ public class NotificaWsTestIntegracioRest {
 		//Consulta estat notificacio
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
 		assertThat(
+				respostaInfo.getErrorDescripcio(),
 				respostaInfo.isError(),
 				is(false));
 		assertNotNull(respostaInfo);
@@ -2143,6 +2223,7 @@ public class NotificaWsTestIntegracioRest {
 	public void pruebaEmision34() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -2151,6 +2232,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -2211,6 +2293,7 @@ public class NotificaWsTestIntegracioRest {
 	public void pruebaEmision35() throws Exception {
 		
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -2219,6 +2302,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacio = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -2266,7 +2350,7 @@ public class NotificaWsTestIntegracioRest {
 	// Se comprobará que el servicio web responde con el mensaje 
 	// “Identificador de envío vacío”.
 	
-//	@Test	//	Prova impossible: Notib no permet una referència nula
+//	@Test	//	Resultat test: Notib no permet una referència nula
 	public void pruebaEmision36() throws Exception {
 		
 		//Consulta estat notificacio amb identificador buit
@@ -2290,7 +2374,7 @@ public class NotificaWsTestIntegracioRest {
 	// Se comprobará que el servicio web responde con el mensaje
 	// “Identificador de envío erróneo”.
 	
-//	@Test	//	Prova impossible: Notib controla que la referència sigui vàlida.
+//	@Test	//	Resultat test: Notib controla que la referència sigui vàlida.
 	public void pruebaEmision37() throws Exception {
 		//Consulta estat notificacio amb identificador incorrecte
 		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio("XXX");
@@ -2316,6 +2400,7 @@ public class NotificaWsTestIntegracioRest {
 	public void pruebaEmision38() throws Exception {
 	
 		int numDestinataris = 1;
+		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = false;
@@ -2324,6 +2409,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		NotificacioV2 notificacioV2 = generaNotificacio(
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -2366,6 +2452,7 @@ public class NotificaWsTestIntegracioRest {
 			
 	private NotificacioV2 generaNotificacio(
 					int numDestinataris,
+					int numEnviaments,
 					boolean ambEnviamentPostal,
 					NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal,
 					boolean ambEnviamentDEH,
@@ -2376,6 +2463,7 @@ public class NotificaWsTestIntegracioRest {
 		NotificacioV2 notificacioV2 = generarNotificacio(
 				notificacioId,
 				numDestinataris,
+				numEnviaments,
 				ambEnviamentPostal,
 				tipusEnviamentPostal,
 				ambEnviamentDEH,
@@ -2399,6 +2487,7 @@ public class NotificaWsTestIntegracioRest {
 	private NotificacioV2 generarNotificacio(
 			String notificacioId,
 			int numDestinataris,
+			int numEnviaments,
 			boolean ambEnviamentPostal,
 			NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal,
 			boolean ambEnviamentDEH,
@@ -2411,7 +2500,8 @@ public class NotificaWsTestIntegracioRest {
 		notificacioV2.setConcepte("concepte_" + notificacioId);
 		notificacioV2.setDescripcio("descripcio_" + notificacioId);
 		notificacioV2.setEnviamentDataProgramada(null);
-		notificacioV2.setRetard(5);
+		
+		notificacioV2.setRetard(0);
 		notificacioV2.setUsuariCodi("e43110511r");
 		notificacioV2.setCaducitat(
 				toXmlGregorianCalendar(
@@ -2428,6 +2518,9 @@ public class NotificaWsTestIntegracioRest {
 		notificacioV2.setDocument(documentV2);
 		notificacioV2.setProcedimentCodi("234257");
 		
+//		notificacioV2.setProcedimentCodi("846823");
+
+		
 		//Els pagadors postals i cie ja estan definits a nivell de procediment
 //		if (ambEnviamentPostal) {
 //			PagadorPostal pagadorPostal = new PagadorPostal();
@@ -2441,8 +2534,8 @@ public class NotificaWsTestIntegracioRest {
 //			pagadorCie.setContracteDataVigencia(toXmlGregorianCalendar(new Date(0)));
 //			notificacio.setPagadorCie(pagadorCie);
 //		}
-		
-		for (int i = 0; i < numDestinataris; i++) {
+
+		for (int i = 0; i < numEnviaments; i++) {
 			Enviament enviaments = new Enviament();
 			Persona titular = new Persona();
 			if (ambTipusInteressat) {
@@ -2453,31 +2546,34 @@ public class NotificaWsTestIntegracioRest {
 			titular.setNom("titularNom" + i);
 			titular.setLlinatge1("titLlinatge1_" + i);
 			titular.setLlinatge2("titLlinatge2_" + i);
-			titular.setNif("00000000T");
+			titular.setNif("43120476F");
 			titular.setTelefon("666010101");
-			titular.setEmail("titular@gmail.com");
+			titular.setEmail("departamentals1@dgtic.caib.es");
 			enviaments.setTitular(titular);
 			List<Persona> destinataris = new ArrayList<Persona>();
-			Persona destinatari = new Persona();
-			if (ambTipusInteressat) {
-				destinatari.setInteressatTipus(InteressatTipusEnumDto.FISICA);
-			} else {
-				destinatari.setInteressatTipus(null);
+
+			for (int k = 0; k < numDestinataris; k++) {
+				Persona destinatari = new Persona();
+				if (ambTipusInteressat) {
+					destinatari.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+				} else {
+					destinatari.setInteressatTipus(null);
+				}
+				destinatari.setNom("destinatariNom" + k);
+				destinatari.setLlinatge1("destLlinatge1_" + k);
+				destinatari.setLlinatge2("destLlinatge2_" + k);
+				destinatari.setNif("12345678Z");
+				destinatari.setTelefon("666020202");
+				destinatari.setEmail("destinatari@gmail.com");
+				destinataris.add(destinatari);
 			}
-			
-			destinatari.setNom("destinatariNom" + i);
-			destinatari.setLlinatge1("destLlinatge1_" + i);
-			destinatari.setLlinatge2("destLlinatge2_" + i);
-			destinatari.setNif("12345678Z");
-			destinatari.setTelefon("666020202");
-			destinatari.setEmail("destinatari@gmail.com");
-			destinataris.add(destinatari);
-			enviaments.getDestinataris().add(destinatari);
+			enviaments.getDestinataris().addAll(destinataris);
 			if (ambEnviamentPostal) {
+				enviaments.setEntregaPostalActiva(true);
 				EntregaPostal entregaPostal = new EntregaPostal();
 				entregaPostal.setTipus(tipusEnviamentPostal);
 				if (tipusEnviamentPostal.equals(NotificaDomiciliConcretTipusEnumDto.ESTRANGER)) {
-					entregaPostal.setPaisCodi("UK");
+					entregaPostal.setPaisCodi("FR");
 					entregaPostal.setViaNom("Prime Minister's Office, 10 Downing Street");
 					entregaPostal.setPoblacio("London");
 					entregaPostal.setCodiPostal("00000");
@@ -2504,13 +2600,15 @@ public class NotificaWsTestIntegracioRest {
 					if (tipusEnviamentPostal.equals(NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS))
 						entregaPostal.setApartatCorreus("0228");
 				}
-				entregaPostal.setCie(new Integer(8));
+				
+				//entregaPostal.setCie(new Integer(8));
 				enviaments.setEntregaPostal(entregaPostal);
 			}
 			if (ambEnviamentDEH) {
+				enviaments.setEntregaDehActiva(true);
 				EntregaDeh entregaDeh = new EntregaDeh();
 				entregaDeh.setObligat(enviamentDEHObligat);
-				entregaDeh.setProcedimentCodi("0000");
+				entregaDeh.setProcedimentCodi("234257");
 				enviaments.setEntregaDeh(entregaDeh);
 			}
 			enviaments.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);

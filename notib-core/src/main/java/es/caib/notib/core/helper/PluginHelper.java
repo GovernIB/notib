@@ -874,9 +874,14 @@ public class PluginHelper {
 		
 		
 		for(NotificacioEnviamentDtoV2 enviament : enviaments) {
+			PersonaDto destinatari = null;
+			if(enviament.getDestinataris() != null && enviament.getDestinataris().size() > 0) {
+				destinatari =  enviament.getDestinataris().get(0);
+			}
 			registreSortida.getDadesInteressat().add(personaToDadesInteressat(
 					notificacio, 
-					enviament.getTitular()));	
+					enviament.getTitular(),
+					destinatari));	
 		}
 		
 //		DadesInteressat dadesInteressat = new DadesInteressat();
@@ -1006,8 +1011,13 @@ public class PluginHelper {
 		registre.setMotivo(notificacio.getDescripcio());
 		registre.setInteresados(new ArrayList<InteresadoWsDto>());
 		registre.setAnexos(new ArrayList<AnexoWsDto>());
+		
 		for(NotificacioEnviamentEntity enviament : enviaments) {
-			registre.getInteresados().add(personaToInteresadoWs(enviament.getTitular()));	
+			PersonaEntity destinatari = null;
+			if(enviament.getDestinataris() != null && enviament.getDestinataris().size() > 0) {
+				destinatari =  enviament.getDestinataris().get(0);
+			}
+			registre.getInteresados().add(personaToRepresentanteEInteresadoWs(enviament.getTitular(), destinatari));	
 		}
 		if(notificacio.getDocument() != null) {
 			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument()));
@@ -1087,7 +1097,9 @@ public class PluginHelper {
 		if(enviament.getDestinataris() != null && enviament.getDestinataris().size() > 0) {
 			destinatari =  enviament.getDestinataris().get(0);
 		}
-		registre.getInteresados().add(personaToRepresentanteEInteresadoWs(enviament.getTitular(), destinatari));
+		registre.getInteresados().add(personaToRepresentanteEInteresadoWs(
+						enviament.getTitular(), 
+						destinatari));
 		if(notificacio.getDocument() != null) {
 			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument()));
 		}
@@ -1149,17 +1161,19 @@ public class PluginHelper {
 	
 	public DadesInteressat personaToDadesInteressat (
 			NotificacioDtoV2 notificacio, 
-			PersonaDto persona) {
+			PersonaDto titular,
+			PersonaDto destinatari) {
 		DadesInteressat dadesInteressat = new DadesInteressat();
-		if (persona != null && notificacio != null) {
+		DadesRepresentat dadesRepresentat = new DadesRepresentat();
+		if (titular != null && notificacio != null) {
 			dadesInteressat.setEntitatCodi(notificacio.getEmisorDir3Codi());
 			dadesInteressat.setAutenticat(false);
-			dadesInteressat.setNif(persona.getNif());
-			dadesInteressat.setNom(persona.getNom());
-			dadesInteressat.setCognom1(persona.getLlinatge1());
-			dadesInteressat.setCognom2(persona.getLlinatge2());
-			dadesInteressat.setNomAmbCognoms(persona.getNom() + " " + persona.getLlinatges());
-			dadesInteressat.setTipusInteressat(persona.getInteressatTipus().getLongVal());
+			dadesInteressat.setNif(titular.getNif());
+			dadesInteressat.setNom(titular.getNom());
+			dadesInteressat.setCognom1(titular.getLlinatge1());
+			dadesInteressat.setCognom2(titular.getLlinatge2());
+			dadesInteressat.setNomAmbCognoms(titular.getNom() + " " + titular.getLlinatges());
+			dadesInteressat.setTipusInteressat(titular.getInteressatTipus().getLongVal());
 			dadesInteressat.setPaisCodi(null);
 			dadesInteressat.setPaisNom(null);
 			dadesInteressat.setProvinciaCodi(null);
@@ -1167,6 +1181,23 @@ public class PluginHelper {
 			dadesInteressat.setMunicipiCodi(null);
 			dadesInteressat.setMunicipiNom(null);
 		}
+		if (destinatari != null && titular.isIncapacitat()) {
+			dadesRepresentat.setEntitatCodi(notificacio.getEmisorDir3Codi());
+			dadesRepresentat.setAutenticat(false);
+			dadesRepresentat.setNif(titular.getNif());
+			dadesRepresentat.setNom(titular.getNom());
+			dadesRepresentat.setCognom1(titular.getLlinatge1());
+			dadesRepresentat.setCognom2(titular.getLlinatge2());
+			dadesRepresentat.setNomAmbCognoms(titular.getNom() + " " + titular.getLlinatges());
+			dadesRepresentat.setTipusInteressat(titular.getInteressatTipus().getLongVal());
+			dadesRepresentat.setPaisCodi(null);
+			dadesRepresentat.setPaisNom(null);
+			dadesRepresentat.setProvinciaCodi(null);
+			dadesRepresentat.setProvinciaNom(null);
+			dadesRepresentat.setMunicipiCodi(null);
+			dadesRepresentat.setMunicipiNom(null);
+		}
+		
 		return dadesInteressat;
 	}
 	
@@ -1190,7 +1221,7 @@ public class PluginHelper {
 			interessatDades.setTelefono(titular.getTelefon());
 			interessat.setInteresado(interessatDades);
 		}
-		if(destinatari != null) {
+		if(destinatari != null && titular.isIncapacitat()) {
 			DatosInteresadoWsDto representantDades = new DatosInteresadoWsDto();
 			representantDades.setTipoInteresado(destinatari.getInteressatTipus().getLongVal());
 			representantDades.setTipoDocumentoIdentificacion("N");
@@ -1728,6 +1759,12 @@ public class PluginHelper {
 	}
 	private String getPropertyEmprarSir() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.emprar.sir");
+	}
+	private String getPropertyAmbTitularIncapacitat() {
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.titular.incapacitat");
+	}
+	private String getPropertyIsMultipleDestinatari() {
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.destinatari.multiple");
 	}
 	private String getPropertyPluginDadesUsuari() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.class");

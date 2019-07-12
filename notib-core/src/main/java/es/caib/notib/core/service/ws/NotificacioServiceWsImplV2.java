@@ -215,6 +215,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						resposta.setErrorDescripcio("[PROVINCIA] El camp 'provincia' no pot ser null en cas d'entrega NACIONAL NORMALITZAT.");
 						return resposta;
 					}
+					if (enviament.getEntregaPostal().getMunicipiCodi() == null || enviament.getEntregaPostal().getMunicipiCodi().isEmpty()) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[MUNICIPI_CODI] El camp 'municipiCodi' no pot ser null en cas d'entrega NACIONAL NORMALITZAT.");
+						return resposta;
+					}
 				}
 				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.ESTRANGER)) {
 					if (enviament.getEntregaPostal().getViaNom() == null || enviament.getEntregaPostal().getViaNom().isEmpty()) {
@@ -253,6 +259,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						resposta.setError(true);
 						resposta.setEstat(NotificacioEstatEnum.PENDENT);
 						resposta.setErrorDescripcio("[POBLACIO] El camp 'poblacio' no pot ser null en cas d'entrega APARTAT CORREUS.");
+						return resposta;
+					}
+					if (enviament.getEntregaPostal().getMunicipiCodi() == null || enviament.getEntregaPostal().getMunicipiCodi().isEmpty()) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[MUNICIPI_CODI] El camp 'municipiCodi' no pot ser null en cas d'entrega APARTAT CORREUS.");
 						return resposta;
 					}
 				}
@@ -501,6 +513,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					}
 					
 					PersonaEntity titular = personaRepository.save(PersonaEntity.getBuilderV2(
+							enviament.getTitular().isIncapacitat(),
 							enviament.getTitular().getInteressatTipus(),
 							enviament.getTitular().getEmail(), 
 							enviament.getTitular().getLlinatge1(), 
@@ -516,6 +529,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					if (enviament.getDestinataris() != null) {
 						for(Persona persona: enviament.getDestinataris()) {
 							PersonaEntity destinatari = personaRepository.save(PersonaEntity.getBuilderV2(
+									false,
 									persona.getInteressatTipus(),
 									persona.getEmail(), 
 									persona.getLlinatge1(), 
