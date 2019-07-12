@@ -442,7 +442,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 					}
 				}
 			} else {
-//				for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
 					RegistreIdDto registreIdDto = new RegistreIdDto();
 					try {
 						registreIdDto = pluginHelper.registreAnotacioSortida(
@@ -487,7 +486,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 								"Error al donar d'alta la notificació a Notific@ (notificacioId=" + notificacio.getId() + ")",
 								ex);
 					}
-//				}
 			}		
 		}
 
