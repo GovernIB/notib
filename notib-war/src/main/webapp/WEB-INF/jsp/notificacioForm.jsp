@@ -223,11 +223,7 @@ $(document).ready(function() {
 	if (tipusDocumentDefault != '') {
 		$(".customSelect").val(tipusDocumentDefault).trigger("change");
 	}
-	
-    $('.nextForm').click(function(){
-        $('.nav-tabs > .active').next('li').find('a').trigger('click');
-    });
-	
+
     //$('#concepte').on('input',function(e){
     //	 $('#extracte').val($(this).val());
     //});
@@ -346,10 +342,15 @@ function addDestinatari(enviament_id) {
     var num;
     var enviament_id_num = enviament_id.substring(enviament_id.indexOf( '[' ) + 1, enviament_id.indexOf( ']' ));
     enviament_id_num = parseInt(enviament_id_num);
-    
+    var isMultiple = ($("div[class*=' personaForm_" + enviament_id_num + "']").find('#isMultiple').val() == 'true');
+
     if ($("div[class*=' personaForm_" + enviament_id_num + "']").hasClass("hidden")) {
         $("div[class*=' personaForm_" + enviament_id_num + "']").removeClass("hidden").show();
         $('#isVisible').attr('value', 'true');
+        
+        if (!isMultiple) {
+        	$("div[class*=' personaForm_" + enviament_id_num + "']").closest('div.destinatari').find('.addDestinatari').addClass('hidden');
+        }
     } else {
         var destinatariForm = $("div[class*=' personaForm_" + enviament_id_num + "']").last().clone();
         var enviamentsForm = $('.enviamentsForm');
@@ -427,16 +428,25 @@ function addEnvio() {
     
     $(enviamentForm).find('p').remove();
     $(enviamentForm).find('div').removeClass('has-error');
-    debugger
 	$(enviamentForm).appendTo(".newEnviament").slideDown("slow").find("input[type='text']").not(".procedimentcodi").val("");
 
+	//Remove last button addEnviament
     if($(enviamentForm).find('.eliminar_enviament').attr('id') != 'enviamentDelete[0]') {
-	$(enviamentForm).find('.eliminar_enviament').removeClass('hidden');
+		$(enviamentForm).find('.eliminar_enviament').removeClass('hidden');
     }
+	//Increment destinatari envio id
     var newDestinatariForm = $('.newDestinatari_' + number + ':last');
 	newDestinatariForm.removeClass('newDestinatari_'+number).addClass('newDestinatari_'+num);
 
-    $('.newDestinatari_' + num).children('div').each(function (i) {
+	//Show button addDestinatari
+	$(enviamentForm).find('.addDestinatari').removeClass('hidden');
+    //Inicialitzar chechbox incapacitat
+	$(enviamentForm).find('input:checkbox').removeAttr('checked');
+    //Inicialitzar entregapostal
+	$(enviamentForm).find('#entregaPostalAmagat').attr('value', 'false');
+	$(enviamentForm).find('.entregaPostal_'+number).hide();
+    
+	$('.newDestinatari_' + num).children('div').each(function (i) {
 
         var destinatariForm = $('.personaForm_' + number + '_' + 0 + ':last');
         destinatariForm.removeClass('personaForm_'+number + '_' + 0).addClass('personaForm_' + num + '_' + 0);
@@ -476,12 +486,13 @@ function destinatarisDelete(className) {
     //Si es el primer destinatari (0)
     if (destinatari_id_num == 0) {
     	var incapacitatCheck = $(parent).closest('.enviamentsForm').find("input[class*='incapacitat']");
-    	debugger
     	$(incapacitatCheck).prop('checked', false);
     	
         $(parent).addClass('hidden');
         $('#isVisible').attr('value', 'false');
         $(parent).find("input[type='text']").val("");
+        
+        $("div[class*=' personaForm_" + enviament_id_num + "']").closest('div.destinatari').find('.addDestinatari').removeClass('hidden')
         
     } else {
         $(parent).remove();
@@ -518,10 +529,15 @@ function mostrarDestinatari(enviament_id) {
     var num;
     var enviament_id_num = enviament_id.substring(enviament_id.indexOf( '[' ) + 1, enviament_id.indexOf( ']' ));
     enviament_id_num = parseInt(enviament_id_num);
+    var isMultiple = ($("div[class*=' personaForm_" + enviament_id_num + "']").find('#isMultiple').val() == 'true');
     
     if ($("div[class*=' personaForm_" + enviament_id_num + "']").hasClass("hidden")) {
         $("div[class*=' personaForm_" + enviament_id_num + "']").removeClass("hidden").show();
         $('#isVisible').attr('value', 'true');
+        
+        if (!isMultiple) {
+        	$("div[class*=' personaForm_" + enviament_id_num + "']").closest('div.destinatari').find('.addDestinatari').addClass('hidden');
+        }
     }
 }
 
@@ -699,10 +715,11 @@ function mostrarDestinatari(enviament_id) {
 										<div class="col-md-6 dir3codi hidden">
 											<not:inputText name="enviaments[${j}].titular.dir3codi" textKey="notificacio.form.camp.titular.dir3codi" />
 										</div>
-										
-										<div class="col-md-12">
-											<not:inputCheckbox name="enviaments[${j}].titular.incapacitat" generalClass="incapacitat" textKey="notificacio.form.camp.titular.incapacitat" funcio="mostrarDestinatari(this.id)"/>
-										</div>
+										<c:if test="${isTitularAmbIncapacitat}">
+											<div class="col-md-12">
+												<not:inputCheckbox name="enviaments[${j}].titular.incapacitat" generalClass="incapacitat" textKey="notificacio.form.camp.titular.incapacitat" funcio="mostrarDestinatari(this.id)"/>
+											</div>
+										</c:if>
 									</div>
 								</div>
 							</div>
@@ -735,6 +752,7 @@ function mostrarDestinatari(enviament_id) {
 										</c:choose>
 										<div class="col-md-12 destinatariForm ${visible} personaForm_${j}_${i}">
 											<input id="isVisible" name="enviaments[${j}].destinataris[${i}].visible" class="hidden" value="false">
+											<input id="isMultiple" class="hidden" value="${isMultiplesDestinataris}">
 												<div class="col-md-3">
 													<not:inputSelect name="enviaments[${j}].destinataris[${i}].interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="12" inputSize="12" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
 												</div>
@@ -770,11 +788,13 @@ function mostrarDestinatari(enviament_id) {
 										</div>
 									</c:forEach>
 								</div>
+									
 								<div class="col-md-12">
 									<div class="text-left">	
-										<input type="button" class="btn btn-default" name="enviaments[${j}]" id="enviaments[${j}]" onclick="addDestinatari(this.id)" value="<spring:message code="notificacio.form.boto.nou.destinatari"/>" />
+										<input type="button" class="btn btn-default addDestinatari" name="enviaments[${j}]" id="enviaments[${j}]" onclick="addDestinatari(this.id)" value="<spring:message code="notificacio.form.boto.nou.destinatari"/>" />
 									</div>
 								</div>
+							
 							</div>
 							<div class="col-md-12 separacio"></div>
 							<div class="metodeEntrega">

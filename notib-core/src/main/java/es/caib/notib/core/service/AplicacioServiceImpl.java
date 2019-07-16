@@ -226,7 +226,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 
 
-
 	private UsuariDto toUsuariDtoAmbRols(
 			UsuariEntity usuari) {
 		UsuariDto dto = conversioTipusHelper.convertir(
