@@ -475,9 +475,14 @@ function destinatarisDelete(className) {
 
     //Si es el primer destinatari (0)
     if (destinatari_id_num == 0) {
+    	var incapacitatCheck = $(parent).closest('.enviamentsForm').find("input[class*='incapacitat']");
+    	debugger
+    	$(incapacitatCheck).prop('checked', false);
+    	
         $(parent).addClass('hidden');
         $('#isVisible').attr('value', 'false');
         $(parent).find("input[type='text']").val("");
+        
     } else {
         $(parent).remove();
     }
@@ -508,20 +513,18 @@ function mostrarEntregaPostal(className) {
     }
 }
 
-function mostrarEntregaDeh(className) {
-    var element = document.getElementById(className);
-    var parent = $(element).closest(".enviamentsForm");
-    var classParent = $(parent).attr('class');
-
-    var enviament_id_num = className.substring(className.lastIndexOf('[') + 1, className.lastIndexOf(']'));
-    if($('.entregaDeh_'+enviament_id_num).css('display') != 'none') {
-        $('#entregaDehAmagat').attr('value', 'false');
-        $('.entregaDeh_'+enviament_id_num).hide();
-    } else {
-        $('#entregaDehAmagat').attr('value', 'true');
-        $('.entregaDeh_'+enviament_id_num).show();
+function mostrarDestinatari(enviament_id) {
+    var number;
+    var num;
+    var enviament_id_num = enviament_id.substring(enviament_id.indexOf( '[' ) + 1, enviament_id.indexOf( ']' ));
+    enviament_id_num = parseInt(enviament_id_num);
+    
+    if ($("div[class*=' personaForm_" + enviament_id_num + "']").hasClass("hidden")) {
+        $("div[class*=' personaForm_" + enviament_id_num + "']").removeClass("hidden").show();
+        $('#isVisible').attr('value', 'true');
     }
 }
+
 
 </script>
 </head>
@@ -698,7 +701,7 @@ function mostrarEntregaDeh(className) {
 										</div>
 										
 										<div class="col-md-12">
-											<not:inputCheckboxGros name="enviaments[${j}].titular.incapacitat" textKey="notificacio.form.camp.titular.incapacitat" />
+											<not:inputCheckbox name="enviaments[${j}].titular.incapacitat" generalClass="incapacitat" textKey="notificacio.form.camp.titular.incapacitat" funcio="mostrarDestinatari(this.id)"/>
 										</div>
 									</div>
 								</div>

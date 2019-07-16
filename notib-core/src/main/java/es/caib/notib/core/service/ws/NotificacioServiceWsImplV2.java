@@ -177,6 +177,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			return resposta;
 		} 
 		for(Enviament enviament : notificacio.getEnviaments()) {
+			if (enviament.getTitular().isIncapacitat() && (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty())) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[DESTINATARI] En cas de titular amb incapacitat es obligatori indicar un destinatari.");
+				return resposta;
+			}
 			if(enviament.isEntregaPostalActiva()){
 				if((enviament.getEntregaPostal().getViaNom() == null || enviament.getEntregaPostal().getViaNom().isEmpty())) {
 					resposta.setError(true);

@@ -163,6 +163,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			String aplicacion) throws RegistrePluginException {
 		RegistroSalidaWs rsw = new RegistroSalidaWs();
 		DatosInteresadoWs datosInteresado = new DatosInteresadoWs();
+		DatosInteresadoWs datosRepresentante = new DatosInteresadoWs();
 		InteresadoWs interesado = new InteresadoWs();
 		AnexoWs anexo = null;
 		try {
@@ -216,10 +217,20 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 				datosInteresado.setTipoInteresado(dadesInteressat.getTipusInteressat());
 				interesado.setInteresado(datosInteresado);
 			}
+			if (registreSortida.getDadesRepresentat() != null) {
+				DadesRepresentat dadesRepresentat = registreSortida.getDadesRepresentat();
+				datosRepresentante.setApellido1(dadesRepresentat.getCognom1());
+				datosRepresentante.setApellido2(dadesRepresentat.getCognom2());
+				datosRepresentante.setTipoDocumentoIdentificacion(RegistreInteressatDocumentTipusDtoEnum.NIF.name());
+				datosRepresentante.setDocumento(dadesRepresentat.getNif());
+				datosRepresentante.setNombre(dadesRepresentat.getNom());
+				datosRepresentante.setTipoInteresado(dadesRepresentat.getTipusInteressat());
+				interesado.setRepresentante(datosRepresentante);
+			}
 			rsw.getInteresados().add(interesado);
 			
-			rsw.setAplicacion("NOTIB");
-			rsw.setVersion("1.0.0");
+			rsw.setAplicacion(registreSortida.getAplicacio());
+			rsw.setVersion(registreSortida.getVersioNotib());
 			
 			
 		} catch (Exception ex) {
@@ -374,7 +385,11 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			anexe.setValidezDocumento(dto.getAnexos().get(0).getValidezDocumento());
 			ar.getAnexos().add(anexe);
 		}
-		ar.getInteresados().add(interesadoWsDtoToInteresadoWs(dto.getInteresados().get(0)));
+		//Interessat + representant
+		if (dto.getInteresados() != null) {
+			InteresadoWs interessat = interesadoWsDtoToInteresadoWs(dto.getInteresados().get(0));
+			ar.getInteresados().add(interessat);
+		}
 		ar.setVersion(dto.getVersion());
 		return ar;
 	}
@@ -613,6 +628,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		
 		return interessat;
 	}
+	
 	
 	public static DocumentBuilder getDocumentBuilder() throws Exception {
 		try {
@@ -876,9 +892,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	@Override
 	public RespostaConsultaRegistre comunicarAsientoRegistral(String codiDir3Entitat, AsientoRegistralBeanDto arb,
 			Long tipusOperacio) {
-		// TODO Auto-generated method stub
 		return null;
 	}
+
 	private static final Logger logger = LoggerFactory.getLogger(RegistrePluginRegweb3Impl.class);
 
 }

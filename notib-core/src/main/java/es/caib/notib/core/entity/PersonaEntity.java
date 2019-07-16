@@ -29,7 +29,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	@Enumerated(EnumType.STRING)
 	private InteressatTipusEnumDto interessatTipus;
 	@Column(name = "incapacitat")
-	private boolean incapacitat;
+	private boolean incapacitat = false;
 	@Column(name = "email", length = 100)
 	private String email;
 	@Column(name = "llinatge1", length = 100)

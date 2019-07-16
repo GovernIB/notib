@@ -546,16 +546,30 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				Envio envio = new Envio();
 				envio.setReferenciaEmisor(enviament.getNotificaReferencia());
 				Persona titular = new Persona();
-				titular.setNif(enviament.getTitular().getNif());
-				titular.setNombre(enviament.getTitular().getNom());
-				titular.setApellidos(
-						concatenarLlinatges(
-								enviament.getTitular().getLlinatge1(),
-								enviament.getTitular().getLlinatge2()));
-				titular.setTelefono(enviament.getTitular().getTelefon());
-				titular.setEmail(enviament.getTitular().getEmail());
-				titular.setRazonSocial(enviament.getTitular().getRaoSocial());
-				titular.setCodigoDestino(enviament.getTitular().getCodiEntitatDesti());
+				if (enviament.getTitular().isIncapacitat() && enviament.getDestinataris() != null) {
+					titular.setNif(enviament.getDestinataris().get(0).getNif());
+					titular.setNombre(enviament.getDestinataris().get(0).getNom());
+					titular.setApellidos(
+							concatenarLlinatges(
+									enviament.getDestinataris().get(0).getLlinatge1(),
+									enviament.getDestinataris().get(0).getLlinatge2()));
+					titular.setTelefono(enviament.getDestinataris().get(0).getTelefon());
+					titular.setEmail(enviament.getDestinataris().get(0).getEmail());
+					titular.setRazonSocial(enviament.getDestinataris().get(0).getRaoSocial());
+					titular.setCodigoDestino(enviament.getDestinataris().get(0).getCodiEntitatDesti());
+				} else {
+					titular.setNif(enviament.getTitular().getNif());
+					titular.setNombre(enviament.getTitular().getNom());
+					titular.setApellidos(
+							concatenarLlinatges(
+									enviament.getTitular().getLlinatge1(),
+									enviament.getTitular().getLlinatge2()));
+					titular.setTelefono(enviament.getTitular().getTelefon());
+					titular.setEmail(enviament.getTitular().getEmail());
+					titular.setRazonSocial(enviament.getTitular().getRaoSocial());
+					titular.setCodigoDestino(enviament.getTitular().getCodiEntitatDesti());
+				}
+				
 				envio.setTitular(titular);
 					Destinatarios destinatarios = new Destinatarios();
 					for(PersonaEntity destinatari : enviament.getDestinataris()) {

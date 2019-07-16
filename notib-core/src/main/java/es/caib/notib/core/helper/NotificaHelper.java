@@ -40,39 +40,6 @@ public class NotificaHelper {
 		return getNotificaHelper().enviamentRefrescarEstat(enviamentId);
 	}
 
-	/*
-	@Transactional
-	public boolean enviamentSeu(
-			Long enviamentId,
-			Date comunicacioData) {
-		return getNotificaHelper().enviamentSeu(enviamentId);
-	}
-	
-	@Transactional
-	public boolean enviamentComunicacioSeu(
-			Long enviamentId,
-			Date comunicacioData) {
-		return getNotificaHelper().enviamentComunicacioSeu(
-				enviamentId,
-				comunicacioData);
-	}
-
-	@Transactional
-	public boolean enviamentCertificacioSeu(
-			Long enviamentId,
-			ArxiuDto certificacioArxiu,
-			Date certificacioData) {
-		return getNotificaHelper().enviamentCertificacioSeu(
-				enviamentId,
-				certificacioArxiu,
-				certificacioData);
-	}
-	
-	@Transactional
-	public boolean enviamentSeu(Long enviamentId) {
-		return getNotificaHelper().enviamentSeu(enviamentId);
-	}
-	 */
 	public String xifrarId(Long id) throws GeneralSecurityException {
 		return getNotificaHelper().xifrarId(id);
 	}

@@ -17,7 +17,8 @@ public class RegistreSortida {
 	private DadesRepresentat dadesRepresentat;
 	private DadesAnotacio dadesAnotacio;
 	private List<DocumentRegistre> documents;
-	
+	private String versioNotib;
+	private String aplicacio;
 	
 	public String getCodiEntitat() {
 		return codiEntitat;
@@ -60,5 +61,17 @@ public class RegistreSortida {
 	}
 	public void setDocuments(List<DocumentRegistre> documents) {
 		this.documents = documents;
+	}
+	public String getVersioNotib() {
+		return versioNotib;
+	}
+	public void setVersioNotib(String versioNotib) {
+		this.versioNotib = versioNotib;
+	}
+	public String getAplicacio() {
+		return aplicacio;
+	}
+	public void setAplicacio(String aplicacio) {
+		this.aplicacio = aplicacio;
 	}
 }
