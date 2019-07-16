@@ -40,6 +40,7 @@ import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.ws.notificacio.Certificacio;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
@@ -66,6 +67,7 @@ import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PluginHelper;
+import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
@@ -181,6 +183,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				resposta.setError(true);
 				resposta.setEstat(NotificacioEstatEnum.PENDENT);
 				resposta.setErrorDescripcio("[DESTINATARI] En cas de titular amb incapacitat es obligatori indicar un destinatari.");
+				return resposta;
+			}
+			if (!Boolean.getBoolean(isMultipleDestinataris()) && enviament.getDestinataris().size() > 1) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[DESTINATARI_MULTIPLE] El numero de destinatais està limitat a un destinatari.");
 				return resposta;
 			}
 			if(enviament.isEntregaPostalActiva()){
@@ -990,6 +998,13 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		default:
 			return null;
 		}
+	}
+	
+	private String isMultipleDestinataris() {
+		String property = "es.caib.notib.destinatari.multiple";
+		logger.debug("Consulta del valor de la property (" +
+				"property=" + property + ")");
+		return PropertiesHelper.getProperties().getProperty(property);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceWsImplV2.class);

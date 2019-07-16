@@ -746,6 +746,8 @@ public class NotificacioController extends BaseUserController {
 				notificacio.setTipusDocumentDefault(tipusDocumentDefault.name());
 			}
 		}
+		model.addAttribute("isTitularAmbIncapacitat", aplicacioService.propertyGet("es.caib.notib.titular.incapacitat"));
+		model.addAttribute("isMultiplesDestinataris", aplicacioService.propertyGet("es.caib.notib.destinatari.multiple"));
 		model.addAttribute("notificacioCommandV2", notificacio);
 		model.addAttribute("ambEntregaDeh", entitatActual.isAmbEntregaDeh());
 		model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
