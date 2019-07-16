@@ -57,8 +57,8 @@ import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
 public class NotificaWsTestIntegracioRest {
 
 //	private static final String ENTITAT_DIR3CODI = "A04013511";
-	private static final String ENTITAT_DIR3CODI = "A04003003";
-//	private static final String ENTITAT_DIR3CODI = "EA0004518";
+//	private static final String ENTITAT_DIR3CODI = "A04003003";
+	private static final String ENTITAT_DIR3CODI = "EA0004518";
 //	@Autowired
 //	private NotificaV2Helper notificaHelper;
 //	@Autowired
@@ -76,14 +76,14 @@ public class NotificaWsTestIntegracioRest {
 
 	@BeforeClass
 	public static void setUpClass() throws IOException, DecoderException {
-		client = NotificacioRestClientFactory.getRestClient(
-				"https://dev.caib.es/notib",
-				"$ripea_notib",
-				"ripea_notib");
 //		client = NotificacioRestClientFactory.getRestClient(
-//				"http://localhost:8081/notib",
-//				"usuari2",
-//				"usuari2");
+//				"https://dev.caib.es/notib",
+//				"$ripea_notib",
+//				"ripea_notib");
+		client = NotificacioRestClientFactory.getRestClient(
+				"http://localhost:8081/notib",
+				"usuari2",
+				"usuari2");
 	}
 	
 	@Before
@@ -409,7 +409,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		// Petició DE ENVIO SOLO CARPETA
 		
-		int numDestinataris = 0;
+		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
@@ -428,6 +428,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		RespostaAlta respostaAlta = client.alta(notificacio);
 		assertThat(
+				respostaAlta.getErrorDescripcio(),
 				respostaAlta.isError(),
 				is(false));
 		assertNotNull(respostaAlta);
@@ -2516,9 +2517,9 @@ public class NotificaWsTestIntegracioRest {
 		documentV2.setNormalitzat(false);
 //		document.setGenerarCsv(false);
 		notificacioV2.setDocument(documentV2);
-		notificacioV2.setProcedimentCodi("234257");
+//		notificacioV2.setProcedimentCodi("234257");
 		
-//		notificacioV2.setProcedimentCodi("846823");
+		notificacioV2.setProcedimentCodi("846823");
 
 		
 		//Els pagadors postals i cie ja estan definits a nivell de procediment
@@ -2608,7 +2609,8 @@ public class NotificaWsTestIntegracioRest {
 				enviaments.setEntregaDehActiva(true);
 				EntregaDeh entregaDeh = new EntregaDeh();
 				entregaDeh.setObligat(enviamentDEHObligat);
-				entregaDeh.setProcedimentCodi("234257");
+//				entregaDeh.setProcedimentCodi("234257");
+				entregaDeh.setProcedimentCodi("846823");
 				enviaments.setEntregaDeh(entregaDeh);
 			}
 			enviaments.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);

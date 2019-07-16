@@ -1296,10 +1296,6 @@ public class PluginHelper {
 		}
 	}
 	
-	public boolean isArxiuEmprarSir() {
-		String sir = getPropertyEmprarSir();
-		return Boolean.valueOf(sir);
-	}
 
 	private boolean dadesUsuariPluginConfiguracioProvada = false;
 	private DadesUsuariPlugin getDadesUsuariPlugin() {
@@ -1454,9 +1450,6 @@ public class PluginHelper {
 
 	private String getPropertyPluginUnitats() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.unitats.class");
-	}
-	private String getPropertyEmprarSir() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.emprar.sir");
 	}
 	private String getPropertyAmbTitularIncapacitat() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.titular.incapacitat");

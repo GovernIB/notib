@@ -147,7 +147,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			}
 		} catch (Exception ex) {
 			logger.error(
-					"Error al donar d'alta la notificació a Notific@ (notificacioId=" + notificacioId + ")",
+					ex.getMessage(),
 					ex);
 			String errorDescripcio;
 			if (ex instanceof SOAPFaultException) {
@@ -358,11 +358,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			AltaRemesaEnvios altaRemesaEnvios = generarAltaRemesaEnvios(notificacio);
 			resultat = getNotificaWs(apiKey).altaRemesaEnvios(altaRemesaEnvios);
 		} catch (SOAPFaultException sfe) {
+			
 			String codiResposta = sfe.getFault().getFaultCode();
 			String descripcioResposta = sfe.getFault().getFaultString();
 			resultat = new ResultadoAltaRemesaEnvios();
 			resultat.setCodigoRespuesta(codiResposta);
 			resultat.setDescripcionRespuesta(descripcioResposta);
+			logger.error(
+					"Error al donar d'alta la notificació a Notific@ (notificacioId=" + notificacio.getId() + ")",
+					descripcioResposta);
 		}
 		return resultat;
 	}
@@ -372,169 +376,156 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		AltaRemesaEnvios envios = new AltaRemesaEnvios();
 		Integer retardPostal;
 		
-		envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
-		switch (notificacio.getEnviamentTipus()) {
-		case COMUNICACIO:
-			envios.setTipoEnvio(new BigInteger("1"));
-			break;
-		case NOTIFICACIO:
-			envios.setTipoEnvio(new BigInteger("2"));
-			break;
-		}
+		try {
+			envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
+			switch (notificacio.getEnviamentTipus()) {
+			case COMUNICACIO:
+				envios.setTipoEnvio(new BigInteger("1"));
+				break;
+			case NOTIFICACIO:
+				envios.setTipoEnvio(new BigInteger("2"));
+				break;
+			}
 		
-//		if (notificacio.getProcedimentCodiNotib() != null) {
-//			dataProgramada = procedimentRepository.findOne(notificacio.getProcediment().getId()).getEnviamentDataProgramada();
-//		} else {
-//			dataProgramada = notificacio.getEnviamentDataProgramada();
-//		}
-		envios.setFechaEnvioProgramado(toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
-		
-		envios.setConcepto(notificacio.getConcepte());
-		envios.setDescripcion(notificacio.getDescripcio());
-		envios.setProcedimiento(notificacio.getProcedimentCodiNotib());
-		Documento  documento = new Documento();
-		if(notificacio.getDocument() != null && notificacio.getDocument().getArxiuGestdocId() != null) {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			pluginHelper.gestioDocumentalGet(
-					notificacio.getDocument().getArxiuGestdocId(),
-					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-					baos);
-			documento.setContenido(baos.toByteArray());
-//			documento.setMetadatos(notificacio.getDocument().getMetadades());
-			Opciones opcionesDocumento = new Opciones();
-			Opcion opcionNormalizado = new Opcion();
-			opcionNormalizado.setTipo("normalizado");
-			opcionNormalizado.setValue(notificacio.getDocument().getNormalitzat()  ? "si" : "no");
-			opcionesDocumento.getOpcion().add(opcionNormalizado);
-			Opcion opcionGenerarCsv = new Opcion();
-			opcionGenerarCsv.setTipo("generarCsv");
-			opcionGenerarCsv.setValue("no");
-			opcionesDocumento.getOpcion().add(opcionGenerarCsv);
-			documento.setOpcionesDocumento(opcionesDocumento);
-			if(baos.toByteArray() != null) {
-				String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(baos.toByteArray()).toCharArray()));
+			envios.setFechaEnvioProgramado(toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
+			
+			envios.setConcepto(notificacio.getConcepte());
+			envios.setDescripcion(notificacio.getDescripcio());
+			envios.setProcedimiento(notificacio.getProcedimentCodiNotib());
+			Documento  documento = new Documento();
+			if(notificacio.getDocument() != null && notificacio.getDocument().getArxiuGestdocId() != null) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				pluginHelper.gestioDocumentalGet(
+						notificacio.getDocument().getArxiuGestdocId(),
+						PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
+						baos);
+				documento.setContenido(baos.toByteArray());
+				Opciones opcionesDocumento = new Opciones();
+				Opcion opcionNormalizado = new Opcion();
+				opcionNormalizado.setTipo("normalizado");
+				opcionNormalizado.setValue(notificacio.getDocument().getNormalitzat()  ? "si" : "no");
+				opcionesDocumento.getOpcion().add(opcionNormalizado);
+				Opcion opcionGenerarCsv = new Opcion();
+				opcionGenerarCsv.setTipo("generarCsv");
+				opcionGenerarCsv.setValue("no");
+				opcionesDocumento.getOpcion().add(opcionGenerarCsv);
+				documento.setOpcionesDocumento(opcionesDocumento);
+				if(baos.toByteArray() != null) {
+					String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(baos.toByteArray()).toCharArray()));
+					//Hash a enviar
+					documento.setHash(hash256);
+				}			
+				envios.setDocumento(documento);
+			} else if (notificacio.getDocument() != null && notificacio.getDocument().getCsv() != null) {
+				byte[] contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
+	            documento.setContenido(contingut);       
+	            if(contingut != null) {
+					String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(contingut).toCharArray()));
+					//Hash a enviar
+					documento.setHash(hash256);
+				}
+	            Opciones opcionesDocumento = new Opciones();
+	            Opcion opcionNormalizado = new Opcion();
+	            opcionNormalizado.setTipo("normalizado");
+	            opcionNormalizado.setValue(
+	                    notificacio.getDocument().getNormalitzat()  ? "si" : "no");
+	            opcionesDocumento.getOpcion().add(opcionNormalizado);
+	            Opcion opcionGenerarCsv = new Opcion();
+	            opcionGenerarCsv.setTipo("generarCsv");
+	            opcionGenerarCsv.setValue("no");
+	            opcionesDocumento.getOpcion().add(opcionGenerarCsv);
+	            documento.setOpcionesDocumento(opcionesDocumento);
+	            envios.setDocumento(documento);
+	        } else if (notificacio.getDocument() != null && notificacio.getDocument().getUrl() != null) {
+	        	String url = notificacio.getDocument().getUrl();
+	            documento.setEnlaceDocumento(url);           
+	            String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(url).toCharArray()));
 				//Hash a enviar
 				documento.setHash(hash256);
-			}			
-			envios.setDocumento(documento);
-		} else if (notificacio.getDocument() != null && notificacio.getDocument().getCsv() != null) {
-			byte[] contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
-            documento.setContenido(contingut);       
-            if(contingut != null) {
-				String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(contingut).toCharArray()));
-				//Hash a enviar
-				documento.setHash(hash256);
+	            Opciones opcionesDocumento = new Opciones();
+	            Opcion opcionNormalizado = new Opcion();
+	            opcionNormalizado.setTipo("normalizado");
+	            opcionNormalizado.setValue(
+	                    notificacio.getDocument().getNormalitzat()  ? "si" : "no");
+	            opcionesDocumento.getOpcion().add(opcionNormalizado);
+	            Opcion opcionGenerarCsv = new Opcion();
+	            opcionGenerarCsv.setTipo("generarCsv");
+	            opcionGenerarCsv.setValue("no");
+	            opcionesDocumento.getOpcion().add(opcionGenerarCsv);
+	            documento.setOpcionesDocumento(opcionesDocumento);
+	            envios.setDocumento(documento);
+	        } else if (notificacio.getDocument() != null && notificacio.getDocument().getUuid() != null) {
+	            byte[] contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
+	        	documento.setContenido(contingut);
+	            if(contingut != null) {
+					String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(contingut).toCharArray()));
+					//Hash a enviar
+					documento.setHash(hash256);
+				}
+	            Opciones opcionesDocumento = new Opciones();
+	            Opcion opcionNormalizado = new Opcion();
+	            opcionNormalizado.setTipo("normalizado");
+	            opcionNormalizado.setValue(
+	                    notificacio.getDocument().getNormalitzat()  ? "si" : "no");
+	            opcionesDocumento.getOpcion().add(opcionNormalizado);
+	            Opcion opcionGenerarCsv = new Opcion();
+	            opcionGenerarCsv.setTipo("generarCsv");
+	            opcionGenerarCsv.setValue("no");
+	            opcionesDocumento.getOpcion().add(opcionGenerarCsv);
+	            documento.setOpcionesDocumento(opcionesDocumento);
+	            envios.setDocumento(documento);
+	        } else if(notificacio.getDocument() != null) {
+				documento.setHash(notificacio.getDocument().getHash());
+				if(notificacio.getDocument().getContingutBase64() != null) {
+		        	byte[] contingut = notificacio.getDocument().getContingutBase64().getBytes();
+					documento.setContenido(contingut);	
+					String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(contingut).toCharArray()));
+					//Hash a enviar
+					documento.setHash(hash256);
+				}
+				Opciones opcionesDocumento = new Opciones();
+				Opcion opcionNormalizado = new Opcion();
+				opcionNormalizado.setTipo("normalizado");
+				opcionNormalizado.setValue(
+						notificacio.getDocument().getNormalitzat()  ? "si" : "no");
+				opcionesDocumento.getOpcion().add(opcionNormalizado);
+				Opcion opcionGenerarCsv = new Opcion();
+				opcionGenerarCsv.setTipo("generarCsv");
+				opcionGenerarCsv.setValue("no");
+				opcionesDocumento.getOpcion().add(opcionGenerarCsv);
+				documento.setOpcionesDocumento(opcionesDocumento);
+				envios.setDocumento(documento);
 			}
-            Opciones opcionesDocumento = new Opciones();
-            Opcion opcionNormalizado = new Opcion();
-            opcionNormalizado.setTipo("normalizado");
-            opcionNormalizado.setValue(
-                    notificacio.getDocument().getNormalitzat()  ? "si" : "no");
-            opcionesDocumento.getOpcion().add(opcionNormalizado);
-            Opcion opcionGenerarCsv = new Opcion();
-            opcionGenerarCsv.setTipo("generarCsv");
-            opcionGenerarCsv.setValue("no");
-            opcionesDocumento.getOpcion().add(opcionGenerarCsv);
-            documento.setOpcionesDocumento(opcionesDocumento);
-            envios.setDocumento(documento);
-        } else if (notificacio.getDocument() != null && notificacio.getDocument().getUrl() != null) {
-        	String url = notificacio.getDocument().getUrl();
-            documento.setEnlaceDocumento(url);           
-            String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(url).toCharArray()));
-			//Hash a enviar
-			documento.setHash(hash256);
-            Opciones opcionesDocumento = new Opciones();
-            Opcion opcionNormalizado = new Opcion();
-            opcionNormalizado.setTipo("normalizado");
-            opcionNormalizado.setValue(
-                    notificacio.getDocument().getNormalitzat()  ? "si" : "no");
-            opcionesDocumento.getOpcion().add(opcionNormalizado);
-            Opcion opcionGenerarCsv = new Opcion();
-            opcionGenerarCsv.setTipo("generarCsv");
-            opcionGenerarCsv.setValue("no");
-            opcionesDocumento.getOpcion().add(opcionGenerarCsv);
-            documento.setOpcionesDocumento(opcionesDocumento);
-            envios.setDocumento(documento);
-        } else if (notificacio.getDocument() != null && notificacio.getDocument().getUuid() != null) {
-            byte[] contingut = pluginHelper.documentToRegistreAnnexDto(notificacio.getDocument()).getArxiuContingut();
-        	documento.setContenido(contingut);
-            if(contingut != null) {
-				String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(contingut).toCharArray()));
-				//Hash a enviar
-				documento.setHash(hash256);
-			}
-            Opciones opcionesDocumento = new Opciones();
-            Opcion opcionNormalizado = new Opcion();
-            opcionNormalizado.setTipo("normalizado");
-            opcionNormalizado.setValue(
-                    notificacio.getDocument().getNormalitzat()  ? "si" : "no");
-            opcionesDocumento.getOpcion().add(opcionNormalizado);
-            Opcion opcionGenerarCsv = new Opcion();
-            opcionGenerarCsv.setTipo("generarCsv");
-            opcionGenerarCsv.setValue("no");
-            opcionesDocumento.getOpcion().add(opcionGenerarCsv);
-            documento.setOpcionesDocumento(opcionesDocumento);
-            envios.setDocumento(documento);
-        } else if(notificacio.getDocument() != null) {
-			documento.setHash(notificacio.getDocument().getHash());
-			if(notificacio.getDocument().getContingutBase64() != null) {
-	        	byte[] contingut = notificacio.getDocument().getContingutBase64().getBytes();
-				documento.setContenido(contingut);	
-				String hash256 = Base64.encodeBase64String(Hex.decodeHex(DigestUtils.sha256Hex(contingut).toCharArray()));
-				//Hash a enviar
-				documento.setHash(hash256);
-			}
-			Opciones opcionesDocumento = new Opciones();
-			Opcion opcionNormalizado = new Opcion();
-			opcionNormalizado.setTipo("normalizado");
-			opcionNormalizado.setValue(
-					notificacio.getDocument().getNormalitzat()  ? "si" : "no");
-			opcionesDocumento.getOpcion().add(opcionNormalizado);
-			Opcion opcionGenerarCsv = new Opcion();
-			opcionGenerarCsv.setTipo("generarCsv");
-			opcionGenerarCsv.setValue("no");
-			opcionesDocumento.getOpcion().add(opcionGenerarCsv);
-			documento.setOpcionesDocumento(opcionesDocumento);
-			envios.setDocumento(documento);
-		}
-		//V1 rest
-		//if (notificacio.getRetardPostal() != null) {
-		//	Opcion opcionRetardo = new Opcion();
-		//	opcionRetardo.setTipo("retardo");
-		//	opcionRetardo.setValue(
-		//			notificacio.getRetardPostal().toString()); // número de días
-		//	opcionesRemesa.getOpcion().add(opcionRetardo);
-		//}
-		envios.setEnvios(generarEnvios(notificacio));
-		Opciones opcionesRemesa = new Opciones();
 
-		if(notificacio.getRetard() != null) {
-			retardPostal = notificacio.getRetard();
-		} else {
-			retardPostal = procedimentRepository.findOne(notificacio.getProcediment().getId()).getRetard();
+			envios.setEnvios(generarEnvios(notificacio));
+			Opciones opcionesRemesa = new Opciones();
+
+			if(notificacio.getRetard() != null) {
+				retardPostal = notificacio.getRetard();
+			} else {
+				retardPostal = procedimentRepository.findOne(notificacio.getProcediment().getId()).getRetard();
+			}
+			
+			if (retardPostal != null) {
+				Opcion opcionRetardo = new Opcion();
+				opcionRetardo.setTipo("retardo");
+				opcionRetardo.setValue(retardPostal.toString()); // número de días
+				opcionesRemesa.getOpcion().add(opcionRetardo);
+			}
+
+			if (notificacio.getCaducitat() != null) {
+				Opcion opcionCaducidad = new Opcion();
+				opcionCaducidad.setTipo("caducidad");
+				SimpleDateFormat sdfCaducitat = new SimpleDateFormat("yyyy-MM-dd");
+				opcionCaducidad.setValue(sdfCaducitat.format(notificacio.getCaducitat())); // formato YYYY-MM-DD
+				opcionesRemesa.getOpcion().add(opcionCaducidad);
+			}
+			envios.setOpcionesRemesa(opcionesRemesa);
+		} catch (Exception ex) {
+			logger.error(
+					"Error generant la petició (notificacioId=" + notificacio.getId() + ")",
+					ex);
 		}
-		
-		if (retardPostal != null) {
-			Opcion opcionRetardo = new Opcion();
-			opcionRetardo.setTipo("retardo");
-			opcionRetardo.setValue(retardPostal.toString()); // número de días
-			opcionesRemesa.getOpcion().add(opcionRetardo);
-		}
-//		if (notificacio.getRetardPostal() != null) {
-//			Opcion opcionRetardo = new Opcion();
-//			opcionRetardo.setTipo("retardo");
-//			opcionRetardo.setValue(
-//					notificacio.getRetardPostal().toString()); // número de días
-//			opcionesRemesa.getOpcion().add(opcionRetardo);
-//		}
-		if (notificacio.getCaducitat() != null) {
-			Opcion opcionCaducidad = new Opcion();
-			opcionCaducidad.setTipo("caducidad");
-			SimpleDateFormat sdfCaducitat = new SimpleDateFormat("yyyy-MM-dd");
-			opcionCaducidad.setValue(sdfCaducitat.format(notificacio.getCaducitat())); // formato YYYY-MM-DD
-			opcionesRemesa.getOpcion().add(opcionCaducidad);
-		}
-		envios.setOpcionesRemesa(opcionesRemesa);
 		return envios;
 	}
 
