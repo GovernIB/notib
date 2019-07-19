@@ -1,6 +1,6 @@
 # ![Logo notib](https://github.com/GovernIB/notib/raw/master/assets/logo2.png) Notib
 
-> - Versió Estable: __notib-1.0.0__ (branca [notib-1.0.0](https://github.com/GovernIB/notib/tree/notib-1.0))
+> - Versió Estable: __notib-1.0.0__ (tag [notib-1.0.0](https://github.com/GovernIB/notib/releases/tag/notib-1.0.0))
 > - Versió Desenvolupament: __notib-1.0__ (branca [notib-1.0](https://github.com/GovernIB/notib/tree/notib-1.0))
 
 **Descripció**
