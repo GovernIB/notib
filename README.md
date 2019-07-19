@@ -1,5 +1,8 @@
 # ![Logo notib](https://github.com/GovernIB/notib/raw/master/assets/logo2.png) Notib
 
+> - Versió Estable: __notib-1.0.0__ (tag [notib-1.0.0](https://github.com/GovernIB/notib/releases/tag/notib-1.0.0))
+> - Versió Desenvolupament: __notib-1.0__ (branca [notib-1.0](https://github.com/GovernIB/notib/tree/notib-1.0))
+
 **Descripció**
 
 NOTIB és una solució tecnològica desenvolupada pel Govern de les Illes Balears que facilita la realització i consulta de notificacions telemàtiques
@@ -14,5 +17,5 @@ NOTIB ofereix una plataforma  per a realitzar i gestionar totes les comunicacion
 >- [Model de dades](https://github.com/GovernIB/notib/raw/notib-1.0/doc/pdf/NOTIB_model_dades.pdf)
 
 
-> - Versió Estable: __notib-1.0.0__ (tag [notib-1.0.0](https://github.com/GovernIB/notib/releases/tag/notib-1.0.0))
-> - Versió Desenvolupament: __notib-1.0__ (branca [notib-1.0](https://github.com/GovernIB/notib/tree/notib-1.0))
+- Versió Estable: __notib-1.0.0__ (tag [notib-1.0.0](https://github.com/GovernIB/notib/releases/tag/notib-1.0.0))
+- Versió Desenvolupament: __notib-1.0__ (branca [notib-1.0](https://github.com/GovernIB/notib/tree/notib-1.0))
