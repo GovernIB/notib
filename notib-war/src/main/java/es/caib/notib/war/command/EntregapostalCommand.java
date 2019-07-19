@@ -2,7 +2,8 @@ package es.caib.notib.war.command;
 
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
-import es.caib.notib.war.validation.ValidIfVisible;
+import es.caib.notib.war.validation.ValidIfVisibleAndNormalitzat;
+import es.caib.notib.war.validation.ValidIfVisibleAndNotEqual;
 
 /**
  * Command per al manteniment de entregues postals
@@ -10,11 +11,110 @@ import es.caib.notib.war.validation.ValidIfVisible;
  * @author Limit Tecnologies <limit@limit.es>
  *
  */
-@ValidIfVisible.List({
-	@ValidIfVisible(
+
+@ValidIfVisibleAndNotEqual.List({
+	@ValidIfVisibleAndNotEqual(
         fieldName = "visible",
         fieldValue = "true",
-        dependFieldName = "viaNom")
+        noDependFieldName = "tipus",
+        noExpectedFieldValue =  NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR,
+        dependFieldName = "codiPostal")
+})
+@ValidIfVisibleAndNormalitzat.List({
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+	    fieldName = "tipus",
+	    fieldValue = NotificaDomiciliConcretTipusEnumDto.NACIONAL,
+	    dependFieldName = "provincia",
+	    dependFieldNameSecond = "numeroCasa"),
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+		fieldName = "tipus",
+		fieldValue = NotificaDomiciliConcretTipusEnumDto.NACIONAL,
+		dependFieldName = "poblacio",
+		dependFieldNameSecond = "numeroCasa"),
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+		fieldName = "tipus",
+		fieldValue = NotificaDomiciliConcretTipusEnumDto.NACIONAL,
+		dependFieldName = "tipusVia",
+		dependFieldNameSecond = "numeroCasa"),
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+		fieldName = "tipus",
+		fieldValue = NotificaDomiciliConcretTipusEnumDto.NACIONAL,
+		dependFieldName = "viaNom",
+		dependFieldNameSecond = "numeroCasa"),
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+		fieldName = "tipus",
+		fieldValue = NotificaDomiciliConcretTipusEnumDto.NACIONAL,
+		dependFieldName = "puntKm",
+		dependFieldNameSecond = "numeroCasa"),
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+		fieldName = "tipus",
+		fieldValue = NotificaDomiciliConcretTipusEnumDto.NACIONAL,
+		dependFieldName = "numeroCasa",
+		dependFieldNameSecond = "puntKm"),
+	
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+        fieldName = "tipus",
+        fieldValue = NotificaDomiciliConcretTipusEnumDto.ESTRANGER,
+        dependFieldName = "paisCodi",
+        dependFieldNameSecond = "numeroCasa"),
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+	    fieldName = "tipus",
+	    fieldValue = NotificaDomiciliConcretTipusEnumDto.ESTRANGER,
+	    dependFieldName = "viaNom",
+	    dependFieldNameSecond = "numeroCasa"),
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+		fieldName = "tipus",
+		fieldValue = NotificaDomiciliConcretTipusEnumDto.ESTRANGER,
+		dependFieldName = "poblacio",
+		dependFieldNameSecond = "numeroCasa"),
+	
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+		fieldName = "tipus",
+		fieldValue = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS,
+		dependFieldName = "apartatCorreus",
+		dependFieldNameSecond = "numeroCasa"),
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+		fieldName = "tipus",
+		fieldValue = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS,
+		dependFieldName = "provincia",
+		dependFieldNameSecond = "numeroCasa"),
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+		fieldName = "tipus",
+		fieldValue = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS,
+		dependFieldName = "poblacio",
+		dependFieldNameSecond = "numeroCasa"),
+	
+	@ValidIfVisibleAndNormalitzat(
+		fieldNameVisible =  "visible",
+		fieldValueVisble =  "true",
+		fieldName = "tipus",
+		fieldValue = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR,
+		dependFieldName = "linea2",
+		dependFieldNameSecond = "numeroCasa")
 })
 public class EntregapostalCommand {
 
@@ -34,10 +134,10 @@ public class EntregapostalCommand {
 	private String codiPostal;
 	private String poblacio;
 	private String municipiCodi; 
-	private String provinciaCodi;
+	private String provincia;
 	private String paisCodi;
-	private String linia1;
-	private String linia2;
+	private String linea1;
+	private String linea2;
 	private String formatSobre;
 	private String formatFulla;
 	private boolean visible = true;
@@ -138,11 +238,11 @@ public class EntregapostalCommand {
 	public void setMunicipiCodi(String municipiCodi) {
 		this.municipiCodi = municipiCodi;
 	}
-	public String getProvinciaCodi() {
-		return provinciaCodi;
+	public String getProvincia() {
+		return provincia;
 	}
-	public void setProvinciaCodi(String provinciaCodi) {
-		this.provinciaCodi = provinciaCodi;
+	public void setProvincia(String provincia) {
+		this.provincia = provincia;
 	}
 	public String getPaisCodi() {
 		return paisCodi;
@@ -150,17 +250,17 @@ public class EntregapostalCommand {
 	public void setPaisCodi(String paisCodi) {
 		this.paisCodi = paisCodi;
 	}
-	public String getLinia1() {
-		return linia1;
+	public String getLinea1() {
+		return linea1;
 	}
-	public void setLinia1(String linia1) {
-		this.linia1 = linia1;
+	public void setLinea1(String linea1) {
+		this.linea1 = linea1;
 	}
-	public String getLinia2() {
-		return linia2;
+	public String getLinea2() {
+		return linea2;
 	}
-	public void setLinia2(String linia2) {
-		this.linia2 = linia2;
+	public void setLinea2(String linea2) {
+		this.linea2 = linea2;
 	}
 	public String getFormatSobre() {
 		return formatSobre;

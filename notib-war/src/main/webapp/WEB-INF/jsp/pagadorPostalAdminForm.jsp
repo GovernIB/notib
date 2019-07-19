@@ -48,7 +48,7 @@
 				<not:inputText name="contracteNum" textKey="pagadorpostal.form.camp.contracteNum"/>
 			</div>
 			<div class="col-md-2">
-				<not:inputDate name="contracteDataVig" disabled="false" textKey="pagadorpostal.form.camp.contracteDataVig"/>
+				<not:inputDate name="contracteDataVig" disabled="false" textKey="pagadorpostal.form.camp.contracteDataVig" custom="true"/>
 			</div>
 			<div class="col-md-2">
 				<not:inputText name="facturacioClientCodi" textKey="pagadorpostal.form.camp.facturacioClientCodi"/>

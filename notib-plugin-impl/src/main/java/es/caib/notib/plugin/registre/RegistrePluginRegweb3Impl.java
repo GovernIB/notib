@@ -47,7 +47,8 @@ import es.caib.regweb3.ws.api.v3.WsValidationException;
 public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistrePlugin{
 	
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
-
+	
+	private static final String OFICINA_VIRTUAL = "Oficina Virtual";
 
 	@Override
 	public RespostaAnotacioRegistre registrarSalida(
@@ -162,6 +163,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			String aplicacion) throws RegistrePluginException {
 		RegistroSalidaWs rsw = new RegistroSalidaWs();
 		DatosInteresadoWs datosInteresado = new DatosInteresadoWs();
+		DatosInteresadoWs datosRepresentante = new DatosInteresadoWs();
 		InteresadoWs interesado = new InteresadoWs();
 		AnexoWs anexo = null;
 		try {
@@ -206,15 +208,31 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			if (anexo != null) {
 				rsw.getAnexos().add(anexo);
 			}
-			datosInteresado.setApellido1(registreSortida.getDadesInteressat().getCognom1());
-			datosInteresado.setApellido2(registreSortida.getDadesInteressat().getCognom2());
-			datosInteresado.setDocumento(registreSortida.getDadesInteressat().getNif());
-			datosInteresado.setNombre(registreSortida.getDadesInteressat().getNom());
-			datosInteresado.setTipoInteresado(registreSortida.getDadesInteressat().getTipusInteressat());
-			interesado.setInteresado(datosInteresado);
-			rsw.setAplicacion("NOTIB");
-			rsw.setVersion("1.0.0");
+			for (DadesInteressat dadesInteressat : registreSortida.getDadesInteressat()) {
+				datosInteresado.setApellido1(dadesInteressat.getCognom1());
+				datosInteresado.setApellido2(dadesInteressat.getCognom2());
+				datosInteresado.setTipoDocumentoIdentificacion(RegistreInteressatDocumentTipusDtoEnum.NIF.name());
+				datosInteresado.setDocumento(dadesInteressat.getNif());
+				datosInteresado.setNombre(dadesInteressat.getNom());
+				datosInteresado.setTipoInteresado(dadesInteressat.getTipusInteressat());
+				interesado.setInteresado(datosInteresado);
+			}
+			if (registreSortida.getDadesRepresentat() != null) {
+				DadesRepresentat dadesRepresentat = registreSortida.getDadesRepresentat();
+				datosRepresentante.setApellido1(dadesRepresentat.getCognom1());
+				datosRepresentante.setApellido2(dadesRepresentat.getCognom2());
+				datosRepresentante.setTipoDocumentoIdentificacion(RegistreInteressatDocumentTipusDtoEnum.NIF.name());
+				datosRepresentante.setDocumento(dadesRepresentat.getNif());
+				datosRepresentante.setNombre(dadesRepresentat.getNom());
+				datosRepresentante.setTipoInteresado(dadesRepresentat.getTipusInteressat());
+				interesado.setRepresentante(datosRepresentante);
+			}
 			rsw.getInteresados().add(interesado);
+			
+			rsw.setAplicacion(registreSortida.getAplicacio());
+			rsw.setVersion(registreSortida.getVersioNotib());
+			
+			
 		} catch (Exception ex) {
 			logger.error("Error a l'hora de fer la conversió a registroSalidaWs", ex);
 			throw new RegistrePluginException("Error conversió a registroSalidaWs", ex);
@@ -367,7 +385,11 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			anexe.setValidezDocumento(dto.getAnexos().get(0).getValidezDocumento());
 			ar.getAnexos().add(anexe);
 		}
-		ar.getInteresados().add(interesadoWsDtoToInteresadoWs(dto.getInteresados().get(0)));
+		//Interessat + representant
+		if (dto.getInteresados() != null) {
+			InteresadoWs interessat = interesadoWsDtoToInteresadoWs(dto.getInteresados().get(0));
+			ar.getInteresados().add(interessat);
+		}
 		ar.setVersion(dto.getVersion());
 		return ar;
 	}
@@ -607,6 +629,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		return interessat;
 	}
 	
+	
 	public static DocumentBuilder getDocumentBuilder() throws Exception {
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -627,7 +650,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			return toTipusAssumpte(getInfoApi().listarTipoAsunto(entitatcodi));
 		} catch (Exception ex) {
 			logger.error("Error a l'hora d'obtenir el tipus d'assumpte", ex);
-			throw new RegistrePluginException("Error obtenint tipus assumpte", ex);
+			throw new RegistrePluginException("Error recuperant tipus assumpte", ex);
 		}
 	}
 
@@ -638,11 +661,33 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 					entitatCodi,
 					tipusAssumpte));
 		} catch (Exception ex) {
-			logger.error("Error a l'hora d'obtenir el tipus d'assumpte", ex);
-			throw new RegistrePluginException("Error obtenint tipus assumpte", ex);
+			logger.error("Error a l'hora d'obtenir el codi d'assumpte", ex);
+			throw new RegistrePluginException("Error recuperant codi assumpte", ex);
 		}
 	}
 
+	@Override
+	public Oficina llistarOficinaVirtual(String entitatCodi, Long autoritzacioValor) throws RegistrePluginException {
+		List<Oficina> oficines = new ArrayList<Oficina>();
+		Oficina oficinaVirtual = new Oficina();
+		try {
+			oficines = toOficines(getInfoApi().listarOficinas(
+					entitatCodi,
+					autoritzacioValor));
+			if (oficines != null) {
+				for (Oficina oficina : oficines) {
+					if (oficina.getNom().equalsIgnoreCase(OFICINA_VIRTUAL)) {
+						oficinaVirtual = oficina;
+					}
+				}
+			}
+		} catch (Exception ex) {
+			logger.error("Error a l'hora d'obtenir l'oficina virtual", ex);
+			throw new RegistrePluginException("Error recuperant oficina virtual", ex);
+		}
+		return oficinaVirtual;
+	}
+	
 	@Override
 	public List<Oficina> llistarOficines(String entitatCodi, Long autoritzacioValor) throws RegistrePluginException {
 		try {
@@ -654,7 +699,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			throw new RegistrePluginException("Error obtenint tipus assumpte", ex);
 		}
 	}
-
+	
 	@Override
 	public List<Llibre> llistarLlibres(String entitatCodi, String oficina, Long autoritzacioValor) throws RegistrePluginException {
 		try {
@@ -663,8 +708,8 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 					oficina,
 					autoritzacioValor));
 		} catch (Exception ex) {
-			logger.error("Error a l'hora d'obtenir el tipus d'assumpte", ex);
-			throw new RegistrePluginException("Error obtenint tipus assumpte", ex);
+			logger.error("Error a l'hora d'obtenir els llibres", ex);
+			throw new RegistrePluginException("Error obtenint els llibres", ex);
 		}
 	}
 
@@ -674,8 +719,8 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			return toOrganismes(getInfoApi().listarOrganismos(
 					entitatCodi));
 		} catch (Exception ex) {
-			logger.error("Error a l'hora d'obtenir el tipus d'assumpte", ex);
-			throw new RegistrePluginException("Error obtenint tipus assumpte", ex);
+			logger.error("Error a l'hora d'obtenir els organismes", ex);
+			throw new RegistrePluginException("Error obtenint els organismes", ex);
 		}
 	}
 
@@ -698,6 +743,26 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			logger.error("Error a l'hora d'obtenir els llibres i oficina", ex);
 		}
 		return llibreOficina;
+	}
+	
+	@Override
+	public Llibre llistarLlibreOrganisme(
+			String entitatCodi, 
+			String organismeCodi) throws RegistrePluginException {
+		Llibre llibreOrganisme = new Llibre();
+		try {
+			llibreOrganisme = toLlibreOrganisme(getInfoApi().listarLibroOrganismo(
+					entitatCodi, 
+					organismeCodi));
+			
+		} catch (RegistrePluginException rex) {
+			logger.error("Error a plugin registre obtenció llibres i oficina", rex);
+		} catch (WsI18NException wse) {
+			logger.error("Error ws obtenció llibres i oficina", wse);
+		} catch (Exception ex) {
+			logger.error("Error a l'hora d'obtenir els llibres i oficina", ex);
+		}
+		return llibreOrganisme;
 	}
 	
 	private List<LlibreOficina> toLlibreOficina(List<LibroOficinaWs> llibresOficinaWs) throws RegistrePluginException {
@@ -725,6 +790,20 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			throw new RegistrePluginException("Error conversió de llibres i oficines", ex);
 		}
 		return llibresOficina;
+	}
+	
+	private Llibre toLlibreOrganisme(LibroWs llibreWs) throws RegistrePluginException {
+		Llibre llibre = new Llibre();
+		try {
+			llibre.setCodi(llibreWs.getCodigoLibro());
+			llibre.setNomCurt(llibreWs.getNombreCorto());
+			llibre.setNomLlarg(llibreWs.getNombreLargo());
+			llibre.setOrganisme(llibreWs.getCodigoOrganismo());
+		} catch (Exception ex) {
+			logger.error("Error a l'hora de fer la conversió dels llibres i oficines", ex);
+			throw new RegistrePluginException("Error conversió de llibres i oficines", ex);
+		}
+		return llibre;
 	}
 	
 	private List<Llibre> toLlibres(List<LibroWs> llibresWs) throws RegistrePluginException {
@@ -813,9 +892,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	@Override
 	public RespostaConsultaRegistre comunicarAsientoRegistral(String codiDir3Entitat, AsientoRegistralBeanDto arb,
 			Long tipusOperacio) {
-		// TODO Auto-generated method stub
 		return null;
 	}
+
 	private static final Logger logger = LoggerFactory.getLogger(RegistrePluginRegweb3Impl.class);
 
 }

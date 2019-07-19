@@ -10,11 +10,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.client.filter.LoggingFilter;
+
 import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -361,21 +362,21 @@ public class CallbackHelper {
 		Client jerseyClient =  new Client();
 		// Només per depurar la sortida, esborrar o comentar-ho: 
 		jerseyClient.addFilter(new LoggingFilter(System.out));		
-		String username = null;
-		String password = null;
-		switch (aplicacio.getTipusAutenticacio()) {
-		case TOKEN_CAIB:
-			username = "";
-			password = "";
-			jerseyClient.addFilter(new HTTPBasicAuthFilter(username, password));
-			break;
-		case TEXT_CLAR:
-			jerseyClient.addFilter(new HTTPBasicAuthFilter(username, password));
-			break;
-		case CAP:
-		default:
-			break;
-		}	
+//		String username = null;
+//		String password = null;
+//		switch (aplicacio.getTipusAutenticacio()) {
+//		case TOKEN_CAIB:
+//			username = "";
+//			password = "";
+//			jerseyClient.addFilter(new HTTPBasicAuthFilter(username, password));
+//			break;
+//		case TEXT_CLAR:
+//			jerseyClient.addFilter(new HTTPBasicAuthFilter(username, password));
+//			break;
+//		case CAP:
+//		default:
+//			break;
+//		}	
 		return jerseyClient;
 	}
 

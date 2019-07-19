@@ -41,17 +41,19 @@ public class PermisosHelper {
 				
 				for (String rol : rolsUsuariActual) {
 					if(rol.contains((grupProcediment.getGrup().getCodi()))) {
-						procediments.add(grupProcediment.getProcediment());
+						if ((grupProcediment.getProcediment().getEntitat().getDir3Codi().equals(entitatActual.getDir3Codi()))) {
+							procediments.add(grupProcediment.getProcediment());
+						}
 					}
 				}
 			}
 			//Comprova quins permisos té aquest usuari sobre els procediments amb grups
 			if(!procediments.isEmpty()) {
-				request.setAttribute(
-						"permisConsulta", 
-						procedimentService.hasGrupPermisConsultaProcediment(
-								procediments,
-								entitatActual));
+//				request.setAttribute(
+//						"permisConsulta", 
+//						procedimentService.hasGrupPermisConsultaProcediment(
+//								procediments,
+//								entitatActual));
 				request.setAttribute(
 						"permisNotificacio", 
 						procedimentService.hasGrupPermisNotificacioProcediment(
@@ -59,10 +61,10 @@ public class PermisosHelper {
 								entitatActual));
 			}
 			//Comprova quins permisos té aquest usuari sobre els procediments sense grups
-			if (grupsProcediment.isEmpty()) {
-				request.setAttribute(
-						"permisConsulta", 
-						procedimentService.hasPermisConsultaProcediment(entitatActual));
+			if ((!grupsProcediment.isEmpty() && procediments.isEmpty()) || (grupsProcediment.isEmpty())) {
+//				request.setAttribute(
+//						"permisConsulta", 
+//						procedimentService.hasPermisConsultaProcediment(entitatActual));
 				request.setAttribute(
 						"permisNotificacio", 
 						procedimentService.hasPermisNotificacioProcediment(entitatActual));

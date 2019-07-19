@@ -28,7 +28,8 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	@Column(name = "interessattipus", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private InteressatTipusEnumDto interessatTipus;
-	
+	@Column(name = "incapacitat")
+	private boolean incapacitat = false;
 	@Column(name = "email", length = 100)
 	private String email;
 	@Column(name = "llinatge1", length = 100)
@@ -54,6 +55,9 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	}
 	public void setInteressatTipus(InteressatTipusEnumDto interessatTipus) {
 		this.interessatTipus = interessatTipus;
+	}
+	public boolean isIncapacitat() {
+		return incapacitat;
 	}
 	public String getEmail() {
 		return email;
@@ -150,6 +154,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	}
 	
 	public static BuilderV2 getBuilderV2(
+			boolean incapacitat,
 			InteressatTipusEnumDto interessatTipus,
 			String email,
 			String llinatge1,
@@ -160,6 +165,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 			String raoSocial,
 			String codiEntitatDesti) {
 		return new BuilderV2(
+				incapacitat,
 				interessatTipus,
 				email,
 				llinatge1,
@@ -174,6 +180,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	public static class BuilderV2 {
 		PersonaEntity built;
 		BuilderV2(
+				boolean incapacitat,
 				InteressatTipusEnumDto interessatTipus,
 				String email,
 				String llinatge1,
@@ -185,6 +192,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 				String codiEntitatDesti
 				) {
 			built = new PersonaEntity();
+			built.incapacitat = incapacitat;
 			built.interessatTipus = interessatTipus;
 			built.email = email;
 			built.codiEntitatDesti = codiEntitatDesti;

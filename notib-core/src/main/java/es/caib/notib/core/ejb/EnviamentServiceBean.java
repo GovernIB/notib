@@ -24,6 +24,8 @@ import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.EnviamentService;
@@ -53,14 +55,24 @@ public class EnviamentServiceBean implements EnviamentService {
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByEntityAndFiltre(
-			EntitatDto entitat,
-			NotificacioEnviamentFiltreDto filtre,
-			PaginacioParamsDto paginacio) throws ParseException {
+			EntitatDto entitat, 
+			boolean isUsuari,
+			boolean isUsuariEntitat, 
+			List<ProcedimentGrupDto> grupsProcediments,
+			List<ProcedimentDto> procediments, 
+			NotificacioEnviamentFiltreDto filtre, 
+			PaginacioParamsDto paginacio)
+			throws ParseException {
 		return delegate.enviamentFindByEntityAndFiltre(
 				entitat, 
+				isUsuari, 
+				isUsuariEntitat, 
+				grupsProcediments, 
+				procediments, 
 				filtre, 
 				paginacio);
 	}
+
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})

@@ -5,6 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorCieFiltreDto;
+import es.caib.notib.core.api.dto.PagadorPostalDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -87,6 +88,14 @@ public interface PagadorCieService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<PagadorCieDto> findAll();
+	
+	/**
+	 * Llistat amb els pagadors cie d'una entitat.
+	 * 
+	 * @return La llista dels pagadors postals.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public List<PagadorCieDto> findByEntitat(Long entitatId);
 
 	/**
 	 * Llistat amb tots els pagadros cie paginats.

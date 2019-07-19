@@ -26,7 +26,6 @@
 		<form:hidden path="id"/>
 		<not:inputText name="usuariCodi" textKey="aplicacio.form.camp.codi" required="true" readonly="${!empty aplicacioCommand.id}"/>
 		<not:inputText name="callbackUrl" textKey="aplicacio.form.camp.callback.url" required="true"/>
-		<not:inputSelect name="tipusAutenticacio" textKey="aplicacio.form.camp.autenticacio.tipus" optionEnum="TipusAutenticacioEnumDto"/>
 		<div id="modal-botons">
 			<button id="btnSubmit" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/aplicacions"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

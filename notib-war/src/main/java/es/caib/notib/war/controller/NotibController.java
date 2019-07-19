@@ -91,7 +91,7 @@ public class NotibController {
 	public String api(
 			HttpServletRequest request,
 			Model model) {
-		return "redirect:api/rest";
+		return "redirect:/api/rest";
 	}
 
 	public static class ErrorObject {

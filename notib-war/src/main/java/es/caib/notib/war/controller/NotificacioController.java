@@ -7,7 +7,6 @@ package es.caib.notib.war.controller;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -34,6 +33,8 @@ import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.LocalitatsDto;
+import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
@@ -45,27 +46,36 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.PaisosDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
+import es.caib.notib.core.api.dto.TipusDocumentDto;
+import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
+import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.MarcarProcessatCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
 import es.caib.notib.war.command.PersonaCommand;
+import es.caib.notib.war.helper.CaducitatHelper;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EntitatHelper;
 import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
+import es.caib.notib.war.helper.ProcedimentHelper;
 import es.caib.notib.war.helper.RolHelper;
 
 /**
@@ -91,6 +101,10 @@ public class NotificacioController extends BaseUserController {
 	private EnviamentService enviamentService;
 	@Autowired
 	private GrupService grupService;
+	@Autowired
+	private PagadorCieFormatSobreService pagadorCieFormatSobreService;
+	@Autowired
+	private PagadorCieFormatFullaService pagadorCieFormatFullaService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -99,41 +113,13 @@ public class NotificacioController extends BaseUserController {
 		
 		model.addAttribute(new NotificacioFiltreCommand());
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		List<ProcedimentDto> procedimentsPermisConsulta = null;
-		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
-		List<ProcedimentGrupDto> procedimentsAmbGrups = new ArrayList<ProcedimentGrupDto>();
-		List<ProcedimentDto> procedimentsSenseGrups = new ArrayList<ProcedimentDto>();
-		List<ProcedimentDto> procedimentsPermisConsultaSenseGrups = new ArrayList<ProcedimentDto>();
-		UsuariDto usuariActual = aplicacioService.getUsuariActual();
-		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
-
 		if (RolHelper.isUsuariActualUsuari(request)) {
-			// Llistat de procediments amb grups
-			procedimentsAmbGrups = procedimentService.findAllGrups();
-			procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups();
-			procediments = new ArrayList<ProcedimentDto>();
-			// Obté els procediments que tenen el mateix grup que el rol d'usuari
-			for (ProcedimentGrupDto grupProcediment : procedimentsAmbGrups) {
-				for (String rol : rolsUsuariActual) {
-					if (rol.contains(grupProcediment.getGrup().getCodi())) {
-						procediments.add(grupProcediment.getProcediment());
-					}
-				}
-			}
-
-			if (!procediments.isEmpty()) {
-				procedimentsPermisConsulta = notificacioService.findProcedimentsAmbPermisConsultaAndGrupsAndEntitat(
-						procediments,
-						entitatActual);
-			} else if (procedimentsAmbGrups.isEmpty()) {
-				procedimentsPermisConsulta = notificacioService.findProcedimentsEntitatAmbPermisConsulta(entitatActual);
-			}
-
-			procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
-					procedimentsSenseGrups,
-					entitatActual);
-
-			if ((procedimentsPermisConsulta == null || procedimentsPermisConsulta.size() < 0) || (procedimentsPermisConsultaSenseGrups == null || procedimentsPermisConsultaSenseGrups.size() < 0) || (procedimentsPermisConsultaSenseGrups== null || procedimentsPermisConsultaSenseGrups.size() < 0)) {
+			if (ProcedimentHelper.sensePermisos(
+					request, 
+					entitatActual, 
+					aplicacioService, 
+					notificacioService, 
+					procedimentService)) {
 				MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.lectura"));
 			}
 		}
@@ -145,6 +131,9 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("notificacioEstats", 
 				EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
+		model.addAttribute("tipusUsuari", 
+				EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
+						"es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
 		model.addAttribute("notificacioEnviamentEstats",
 				EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
@@ -194,7 +183,9 @@ public class NotificacioController extends BaseUserController {
 
 				for (String rol : rolsUsuariActual) {
 					if (rol.contains(grupProcediment.getGrup().getCodi())) {
-						procedimentsAmbGrups.add(grupProcediment.getProcediment());
+						if ((grupProcediment.getProcediment().getEntitat().getDir3Codi().equals(entitatActual.getDir3Codi()))) {
+							procedimentsAmbGrups.add(grupProcediment.getProcediment());
+						}
 					}
 				}
 			}
@@ -217,11 +208,12 @@ public class NotificacioController extends BaseUserController {
 				procedimentsSenseGrups,
 				entitatActual);
 
-		if (procedimentsPermisNotificacioSenseGrups != null)
+		if (procedimentsPermisNotificacioSenseGrups != null && !procedimentsPermisNotificacioSenseGrups.isEmpty()) {
 			for (ProcedimentDto procedimentSenseGrupAmbPermis : procedimentsPermisNotificacioSenseGrups) {
 				procedimentsPermisNotificacioAmbGrupsAndSenseGrups.add(procedimentSenseGrupAmbPermis);
 			}
-
+			model.addAttribute("procediments", procedimentsPermisNotificacioAmbGrupsAndSenseGrups);
+		}
 		return "notificacioProcedimentsForm";
 	}
 
@@ -239,12 +231,33 @@ public class NotificacioController extends BaseUserController {
 			@Valid NotificacioCommandV2 notificacioCommand,
 			BindingResult bindingResult, 
 			Model model) throws IOException {
+		List<String> tipusDocumentEnumDto = new ArrayList<String>();
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		ProcedimentDto procedimentActual = procedimentService.findById(
 				null, 
 				isAdministrador(request), 
 				notificacioCommand.getProcedimentId());
 		notificacioCommand.setUsuariCodi(aplicacioService.getUsuariActual().getCodi());
 		if (bindingResult.hasErrors()) {
+			if (procedimentActual.getPagadorcie() != null) {
+				model.addAttribute("formatsFulla", pagadorCieFormatFullaService.findFormatFullaByPagadorCie(procedimentActual.getPagadorcie().getId()));
+				model.addAttribute("formatsSobre", pagadorCieFormatSobreService.findFormatSobreByPagadorCie(procedimentActual.getPagadorcie().getId()));
+			}
+			
+			List<TipusDocumentDto>  tipusDocuments =  entitatService.findTipusDocumentByEntitat(entitatActual.getId());
+			TipusDocumentEnumDto tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
+
+			if (tipusDocuments != null) {
+				for (TipusDocumentDto tipusDocument: tipusDocuments) {
+					tipusDocumentEnumDto.add(tipusDocument.getTipusDocEnum().name());
+				}
+				if (tipusDocumentDefault != null) {
+					notificacioCommand.setTipusDocumentDefault(tipusDocumentDefault.name());
+				}
+			}
+			
+			model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
+			
 			model.addAttribute("comunicacioTipus", 
 					EnumHelper.getOptionsForEnum(
 							NotificacioComunicacioTipusEnumDto.class,
@@ -261,6 +274,10 @@ public class NotificacioController extends BaseUserController {
 					EnumHelper.getOptionsForEnum(
 							InteressatTipusEnumDto.class,
 							"es.caib.notib.core.api.dto.interessatTipusEnumDto."));
+			model.addAttribute("entregaPostalTipus", 
+					EnumHelper.getOptionsForEnum(
+							NotificaDomiciliConcretTipusEnumDto.class,
+							"es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto."));
 			model.addAttribute("registreDocumentacioFisica", 
 					EnumHelper.getOptionsForEnum(
 							RegistreDocumentacioFisicaEnumDto.class,
@@ -271,42 +288,45 @@ public class NotificacioController extends BaseUserController {
 							"es.caib.notib.core.api.dto.idiomaEnumDto."));
 			model.addAttribute("enviosGuardats", notificacioCommand.getEnviaments());
             model.addAttribute("errors", bindingResult.getAllErrors());
+            if (notificacioCommand.getEnviaments().get(0).getDestinataris() != null)
+            	model.addAttribute("isVisible", notificacioCommand.getEnviaments().get(0).getDestinataris().get(0).isVisible());
 			return "notificacioForm";
 		}
 		if (RolHelper.isUsuariActualAdministrador(request)) {
 			model.addAttribute("entitat", entitatService.findAll());
 		}
 		model.addAttribute(new NotificacioFiltreCommand());
-
-		switch (notificacioCommand.getTipusDocument()) {
-		case ARXIU:
-			if (notificacioCommand.getArxiu() != null && !notificacioCommand.getArxiu().isEmpty()) {
-				notificacioCommand.getDocument().setArxiuNom(notificacioCommand.getArxiu().getOriginalFilename());
-				notificacioCommand.getDocument().setNormalitzat(notificacioCommand.getDocument().isNormalitzat());
-				String contingutBase64 = Base64.encodeBase64String(notificacioCommand.getArxiu().getBytes());
-				notificacioCommand.getDocument().setContingutBase64(contingutBase64);
-				notificacioCommand.getDocument().setMetadadesKeys(notificacioCommand.getDocument().getMetadadesKeys());
-				notificacioCommand.getDocument().setMetadadesValues(notificacioCommand.getDocument().getMetadadesValues());
+		if (notificacioCommand.getTipusDocument() != null) {
+			switch (notificacioCommand.getTipusDocument()) {
+			case ARXIU:
+				if (notificacioCommand.getArxiu() != null && !notificacioCommand.getArxiu().isEmpty()) {
+					notificacioCommand.getDocument().setArxiuNom(notificacioCommand.getArxiu().getOriginalFilename());
+					notificacioCommand.getDocument().setNormalitzat(notificacioCommand.getDocument().isNormalitzat());
+					String contingutBase64 = Base64.encodeBase64String(notificacioCommand.getArxiu().getBytes());
+					notificacioCommand.getDocument().setContingutBase64(contingutBase64);
+					notificacioCommand.getDocument().setMetadadesKeys(notificacioCommand.getDocument().getMetadadesKeys());
+					notificacioCommand.getDocument().setMetadadesValues(notificacioCommand.getDocument().getMetadadesValues());
+				}
+				break;
+			case CSV:
+				if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
+						&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
+					notificacioCommand.getDocument().setCsv(notificacioCommand.getDocumentArxiuUuidCsvUrl());
+				}
+				break;
+			case UUID:
+				if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
+						&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
+					notificacioCommand.getDocument().setUuid(notificacioCommand.getDocumentArxiuUuidCsvUrl());
+				}
+				break;
+			case URL:
+				if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
+						&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
+					notificacioCommand.getDocument().setUrl(notificacioCommand.getDocumentArxiuUuidCsvUrl());
+				}
+				break;
 			}
-			break;
-		case CSV:
-			if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
-					&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
-				notificacioCommand.getDocument().setCsv(notificacioCommand.getDocumentArxiuUuidCsvUrl());
-			}
-			break;
-		case UUID:
-			if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
-					&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
-				notificacioCommand.getDocument().setUuid(notificacioCommand.getDocumentArxiuUuidCsvUrl());
-			}
-			break;
-		case URL:
-			if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
-					&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
-				notificacioCommand.getDocument().setUrl(notificacioCommand.getDocumentArxiuUuidCsvUrl());
-			}
-			break;
 		}
 		
 		if (notificacioCommand.getId() != null) {
@@ -321,6 +341,9 @@ public class NotificacioController extends BaseUserController {
 			model.addAttribute("notificacioEstats", 
 					EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
 							"es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
+			model.addAttribute("tipusUsuari", 
+					EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
+							"es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
 			model.addAttribute("notificacioEnviamentEstats",
 					EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
 							"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
@@ -359,39 +382,42 @@ public class NotificacioController extends BaseUserController {
 		boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
 		boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
 
-		if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
-			EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-			if (filtre != null) {
-				filtre.setEntitatId(entitat.getId());
+		try {
+			if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
+				EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+				if (filtre != null) {
+					filtre.setEntitatId(entitat.getId());
+				}
 			}
-		}
-		if (RolHelper.isUsuariActualUsuari(request)) {
-			// Llistat de procediments amb grups
-			grupsProcediment = procedimentService.findAllGrups();
-			procediments = new ArrayList<ProcedimentDto>();
-			// Obté els procediments que tenen el mateix grup que el rol d'usuari
-			for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
-				for (String rol : rolsUsuariActual) {
-					if (rol.contains(grupProcediment.getGrup().getCodi())) {
-						procediments.add(grupProcediment.getProcediment());
+			if (RolHelper.isUsuariActualUsuari(request)) {
+				// Llistat de procediments amb grups
+				grupsProcediment = procedimentService.findAllGrups();
+				procediments = new ArrayList<ProcedimentDto>();
+				// Obté els procediments que tenen el mateix grup que el rol d'usuari
+				for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
+					for (String rol : rolsUsuariActual) {
+						if (rol.contains(grupProcediment.getGrup().getCodi())) {
+							//si el procediment es de l'entitat actual
+							if ((grupProcediment.getProcediment().getEntitat().getDir3Codi().equals(entitatActual.getDir3Codi()))) {
+								procediments.add(grupProcediment.getProcediment());
+							}
+						}
 					}
 				}
-			}
-			// Procediments sense grups però amb perís consulta
-			procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups();
-
-			if (!procedimentsSenseGrups.isEmpty()) {
-				procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
-								procedimentsSenseGrups,
-								entitatActual);
-
-				for (ProcedimentDto procedimentSenseGrupAmbPermis : procedimentsPermisConsultaSenseGrups) {
-					procediments.add(procedimentSenseGrupAmbPermis);
+				// Procediments sense grups però amb perís consulta
+				procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups();
+	
+				if (!procedimentsSenseGrups.isEmpty()) {
+					procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
+									procedimentsSenseGrups,
+									entitatActual);
+	
+					for (ProcedimentDto procedimentSenseGrupAmbPermis : procedimentsPermisConsultaSenseGrups) {
+						procediments.add(procedimentSenseGrupAmbPermis);
+					}
 				}
+	
 			}
-
-		}
-		try {
 			notificacions = notificacioService.findAmbFiltrePaginat(
 					entitatActual.getId(), 
 					isUsuari, 
@@ -422,6 +448,7 @@ public class NotificacioController extends BaseUserController {
 		emplenarModelNotificacioInfo(
 				entitatActual,
 				notificacioId, 
+				request,
 				"dades", 
 				model);
 		return "notificacioInfo";
@@ -496,6 +523,7 @@ public class NotificacioController extends BaseUserController {
 		emplenarModelNotificacioInfo(
 				entitatActual,
 				notificacioId, 
+				request,
 				"accions", 
 				model);
 		if (enviada) {
@@ -519,6 +547,7 @@ public class NotificacioController extends BaseUserController {
 		emplenarModelNotificacioInfo(
 				entitatActual,
 				notificacioId, 
+				request,
 				"accions", 
 				model);
 		if(registresIdDto.size() > 0) {
@@ -660,6 +689,7 @@ public class NotificacioController extends BaseUserController {
 	private void emplenarModelNotificacioInfo(
 			EntitatDto entitatActual,
 			Long notificacioId, 
+			HttpServletRequest request,
 			String pipellaActiva, 
 			Model model) {
 		NotificacioDtoV2 notificacio = notificacioService.findAmbId(notificacioId);
@@ -675,6 +705,7 @@ public class NotificacioController extends BaseUserController {
 		} else {
 			model.addAttribute("permisGestio", null);
 		}
+		model.addAttribute("permisAdmin", request.isUserInRole("NOT_ADMIN"));
 	}
 
 	private void emplenarModelEnviamentInfo(
@@ -700,15 +731,39 @@ public class NotificacioController extends BaseUserController {
 				null, 
 				isAdministrador(request), 
 				procedimentId);
-		NotificacioCommandV2 notificacio = new NotificacioCommandV2();
-		notificacio.setCaducitat(sumarDiesData(new Date()));
+		NotificacioCommandV2 notificacio = new NotificacioCommandV2();		
+		List<String> tipusDocumentEnumDto = new ArrayList<String>();
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		List<TipusDocumentDto>  tipusDocuments =  entitatService.findTipusDocumentByEntitat(entitatActual.getId());
+		TipusDocumentEnumDto tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
+		notificacio.setCaducitat(CaducitatHelper.sumarDiesLaborals(procedimentActual.getCaducitat()));
+
+		if (tipusDocuments != null) {
+			for (TipusDocumentDto tipusDocument: tipusDocuments) {
+				tipusDocumentEnumDto.add(tipusDocument.getTipusDocEnum().name());
+			}
+			if (tipusDocumentDefault != null) {
+				notificacio.setTipusDocumentDefault(tipusDocumentDefault.name());
+			}
+		}
+		model.addAttribute("isTitularAmbIncapacitat", aplicacioService.propertyGet("es.caib.notib.titular.incapacitat"));
+		model.addAttribute("isMultiplesDestinataris", aplicacioService.propertyGet("es.caib.notib.destinatari.multiple"));
 		model.addAttribute("notificacioCommandV2", notificacio);
+		model.addAttribute("ambEntregaDeh", entitatActual.isAmbEntregaDeh());
+		model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
 		model.addAttribute("entitat", procedimentActual.getEntitat());
 		model.addAttribute("procediment", procedimentService.findById(
 				null, 
 				isAdministrador(request), 
 				procedimentId));
-		model.addAttribute("grups", grupService.findByGrupsProcediment(procedimentId));
+		model.addAttribute("amagat", Boolean.FALSE);
+		
+		model.addAttribute("grups", grupService.findByProcedimentGrups(procedimentId));
+		if (procedimentActual.getPagadorcie() != null) {
+			model.addAttribute("formatsFulla", pagadorCieFormatFullaService.findFormatFullaByPagadorCie(procedimentActual.getPagadorcie().getId()));
+			model.addAttribute("formatsSobre", pagadorCieFormatSobreService.findFormatSobreByPagadorCie(procedimentActual.getPagadorcie().getId()));
+		}
+		
 		model.addAttribute("comunicacioTipus", 
 				EnumHelper.getOptionsForEnum(
 						NotificacioComunicacioTipusEnumDto.class,
@@ -725,6 +780,10 @@ public class NotificacioController extends BaseUserController {
 				EnumHelper.getOptionsForEnum(
 						InteressatTipusEnumDto.class,
 						"es.caib.notib.core.api.dto.interessatTipusEnumDto."));
+		model.addAttribute("entregaPostalTipus", 
+				EnumHelper.getOptionsForEnum(
+						NotificaDomiciliConcretTipusEnumDto.class,
+						"es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto."));
 		model.addAttribute("registreDocumentacioFisica", 
 				EnumHelper.getOptionsForEnum(
 						RegistreDocumentacioFisicaEnumDto.class,
@@ -735,12 +794,31 @@ public class NotificacioController extends BaseUserController {
 						"es.caib.notib.core.api.dto.idiomaEnumDto."));
 	}
 	
-	private Date sumarDiesData(Date dataActual) {
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(dataActual);
-		calendar.add(Calendar.DAY_OF_YEAR, 10);
-		return calendar.getTime();
+	@RequestMapping(value = "/paisos", method = RequestMethod.GET)
+	@ResponseBody
+	private List<PaisosDto> getPaisos(
+		HttpServletRequest request,
+		Model model) {		
+		return notificacioService.llistarPaisos();
 	}
+	
+	@RequestMapping(value = "/provincies", method = RequestMethod.GET)
+	@ResponseBody
+	private List<ProvinciesDto> getProvincies(
+		HttpServletRequest request,
+		Model model) {		
+		return notificacioService.llistarProvincies();
+	}
+	
+	@RequestMapping(value = "/localitats/{provinciaId}", method = RequestMethod.GET)
+	@ResponseBody
+	private List<LocalitatsDto> getLocalitats(
+		HttpServletRequest request,
+		Model model,
+		@PathVariable String provinciaId) {
+		return notificacioService.llistarLocalitats(provinciaId);
+	}
+	
 	
 	private boolean isAdministrador(HttpServletRequest request) {
 		return RolHelper.isUsuariActualAdministrador(request);

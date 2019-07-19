@@ -3,16 +3,11 @@
  */
 package es.caib.notib.core.api.ws.notificacio;
 
-import java.util.Date;
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-
-import es.caib.notib.core.api.dto.TipusEnumDto;
 
 /**
  * Informació d'una notificació per al seu enviament.

@@ -29,6 +29,11 @@
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<not:modalHead/>
+<style type="text/css">
+.modal-body {
+	height: 300px !important;
+}
+</style>
 </head>
 <body>
 	<c:set var="formAction"><not:modalUrl value="/pagadorCie/newOrModify"/></c:set>
@@ -39,7 +44,7 @@
 				<not:inputText name="dir3codi" textKey="pagadorcie.form.camp.dir3codi"/>
 			</div>
 			<div class="col-md-2">
-				<not:inputDate name="contracteDataVig" disabled="false" textKey="pagadorcie.form.camp.contracteDataVig"/>
+				<not:inputDate name="contracteDataVig" disabled="false" textKey="pagadorcie.form.camp.contracteDataVig" custom="true"/>
 			</div>
 			<div id="modal-botons">
 				<button id="addPagadorCieButton" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

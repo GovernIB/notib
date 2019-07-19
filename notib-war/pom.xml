@@ -5,7 +5,7 @@
   	<parent>
     	<groupId>es.caib.notib</groupId>
     	<artifactId>notib</artifactId>
-    	<version>1.0</version>
+    	<version>1.0.2</version>
  	</parent>
  	<artifactId>notib-war</artifactId>
  	<packaging>war</packaging>
@@ -24,6 +24,12 @@
 			<artifactId>jsp-api</artifactId>
 			<version>2.1</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+		    <groupId>javax</groupId>
+		    <artifactId>javaee-api</artifactId>
+		    <version>8.0</version>
+		    <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>

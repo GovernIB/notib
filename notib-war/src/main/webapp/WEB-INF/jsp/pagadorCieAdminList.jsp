@@ -50,12 +50,22 @@
 			<tr>
 				<th data-col-name="dir3codi"><spring:message code="pagadorcie.list.columna.dir3codi"/></th>
 				<th data-col-name="contracteDataVig" data-converter="date"><spring:message code="pagadorcie.list.columna.contracteDataVig"/></th>
+				<th data-col-name="id" data-template="#cellFullaTemplate" data-orderable="false" width="10%">
+					<script id="cellFullaTemplate" type="text/x-jsrender">
+						<a href="${unitatCodiUrlPrefix}pagadorCie/{{:id}}/formats/fulla" class="btn btn-default"><span class="fa fa-sticky-note"></span>&nbsp;<spring:message code="pagadorcie.list.boto.format.fulla"/>&nbsp;</a>
+					</script>
+				</th>
+				<th data-col-name="id" data-template="#cellSobreTemplate" data-orderable="false" width="10%">
+					<script id="cellSobreTemplate" type="text/x-jsrender">
+						<a href="${unitatCodiUrlPrefix}pagadorCie/{{:id}}/formats/sobre" class="btn btn-default"><span class="fa fa-envelope-open"></span>&nbsp;<spring:message code="pagadorcie.list.boto.format.sobre"/>&nbsp;</a>
+					</script>
+				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="${unitatCodiUrlPrefix}pagadorCie/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								<li><a href="${unitatCodiUrlPrefix}pagadorCie/{{:id}}" data-toggle="modal" data-height="350px" data-custom="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								<li><a href="${unitatCodiUrlPrefix}pagadorCie/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="pagadorcie.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
 						</div>
@@ -66,7 +76,7 @@
 	</table>
 	
 	<script id="botonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a id="pagadorcie-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}pagadorCie/new" data-toggle="modal" data-height="350px"><span class="fa fa-plus"></span>&nbsp;<spring:message code="pagadorcie.list.boto.nou.pagadorcie"/></a></p>
+		<p style="text-align:right"><a id="pagadorcie-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}pagadorCie/new" data-toggle="modal" data-height="350px" data-custom="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="pagadorcie.list.boto.nou.pagadorcie"/></a></p>
 	</script>
 	
 	

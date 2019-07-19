@@ -14,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
@@ -139,7 +140,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"    where " +
 			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
 			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
-			"    ) > 0) ")
+			"    ) > 0) " + 
+			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari)")
 	public Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotib(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
@@ -157,6 +159,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("entitat") EntitatEntity entitat,
 			@Param("isProcedimentNull") boolean isProcedimentNull,
 			@Param("procediment") ProcedimentEntity procediment,
+			@Param("isTipusUsuariNull") boolean isTipusUsuariNull,
+			@Param("tipusUsuari") TipusUsuariEnumDto tipusUsuar,
 			Pageable paginacio);
 	
 	@Query(	"from " +
@@ -174,7 +178,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"    where " +
 			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
 			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
-			"    ) > 0) ")
+			"    ) > 0) " +
+			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari)")
 	public Page<NotificacioEntity> findAmbFiltre(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
@@ -191,6 +196,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("titular") String titular,
 			@Param("isProcedimentNull") boolean isProcedimentNull,
 			@Param("procediment") ProcedimentEntity procediment,
+			@Param("isTipusUsuariNull") boolean isTipusUsuariNull,
+			@Param("tipusUsuari") TipusUsuariEnumDto tipusUsuar,
 			Pageable paginacio);
 
 }

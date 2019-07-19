@@ -3,7 +3,6 @@
  */
 package es.caib.notib.core.api.ws.notificacio;
 
-import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -21,10 +20,12 @@ public class Enviament {
 	private String referencia;
 	private Persona titular;
 	private List<Persona> destinataris;
-	private EntregaPostal entregaPostal;
 	private boolean entregaPostalActiva;
+	private EntregaPostal entregaPostal;
+	private boolean entregaDehActiva;
 	private EntregaDeh entregaDeh;
 	private NotificaServeiTipusEnumDto serveiTipus;
+
 
 	public String getReferencia() {
 		return referencia;
@@ -49,6 +50,12 @@ public class Enviament {
 	}
 	public void setEntregaPostalActiva(boolean entregaPostalActiva) {
 		this.entregaPostalActiva = entregaPostalActiva;
+	}
+	public boolean isEntregaDehActiva() {
+		return entregaDehActiva;
+	}
+	public void setEntregaDehActiva(boolean entregaDehActiva) {
+		this.entregaDehActiva = entregaDehActiva;
 	}
 	public EntregaPostal getEntregaPostal() {
 		return entregaPostal;

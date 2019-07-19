@@ -10,7 +10,6 @@ import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.notib.core.api.dto.TipusAutenticacioEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 
 /**
@@ -28,8 +27,6 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 	protected String usuariCodi;
 	@Column(name = "callback_url", length = 256)
 	private String callbackUrl;
-	@Column(name = "tipus_autenticacio", length = 32)
-	private TipusAutenticacioEnumDto tipusAutenticacio;
 
 	public String getUsuariCodi() {
 		return usuariCodi;
@@ -37,39 +34,30 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 	public String getCallbackUrl() {
 		return callbackUrl;
 	}
-	public TipusAutenticacioEnumDto getTipusAutenticacio() {
-		return tipusAutenticacio;
-	}
 	
 	public void update(
 			String usuariCodi,
-			String callbackUrl,
-			TipusAutenticacioEnumDto tipusAutenticacio) {
+			String callbackUrl) {
 		this.usuariCodi = usuariCodi;
 		this.callbackUrl = callbackUrl;
-		this.tipusAutenticacio = tipusAutenticacio;
 	}
 	
 	public static Builder getBuilder(
 			String codi,
-			String urlCallback,
-			TipusAutenticacioEnumDto tipusAutenticacio) {
+			String urlCallback) {
 		return new Builder(
 				codi,
-				urlCallback,
-				tipusAutenticacio);
+				urlCallback);
 	}
 
 	public static class Builder {
 		AplicacioEntity built;
 		Builder(
 				String usuariCodi,
-				String callbackUrl,
-				TipusAutenticacioEnumDto tipusAutenticacio) {
+				String callbackUrl) {
 			built = new AplicacioEntity();
 			built.usuariCodi = usuariCodi;
 			built.callbackUrl = callbackUrl;
-			built.tipusAutenticacio = tipusAutenticacio;
 		}
 		public AplicacioEntity build() {
 			return built;

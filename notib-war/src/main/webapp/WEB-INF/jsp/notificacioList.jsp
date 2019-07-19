@@ -34,7 +34,35 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+
+<style type="text/css">
+.horaProcessat {
+	font-size: small;
+}
+</style>
 <script type="text/javascript">
+function formatDate(data) {
+	//Añadir ceros a los numeros de un dígito
+	Number.prototype.padLeft = function(base,chr){
+		var  len = (String(base || 10).length - String(this).length)+1;
+			return len > 0? new Array(len).join(chr || '0')+this : this;
+		}
+	if (data !== null) {
+		//dd/MM/yyyy HH:mm:SS
+		debugger
+		var procesDate = new Date(data),
+		procesDateFormat = [(procesDate.getMonth()+1).padLeft(),
+			procesDate.getDate().padLeft(),
+			procesDate.getFullYear()].join('/') +' ' +
+           [procesDate.getHours().padLeft(),
+        	   procesDate.getMinutes().padLeft(),
+        	   procesDate.getSeconds().padLeft()].join(':');
+		return procesDateFormat;
+	} else {
+		return null;
+	}
+}
+
 var notificacioEstats = [];
 <c:forEach var="estat" items="${notificacioEstats}">
 notificacioEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
@@ -57,7 +85,9 @@ $(document).ready(function() {
 	    $.get(getUrl).done(function(data) {
 	    	$(td).empty();
 	    	$(td).append(
-	    			'<table class="table teble-striped table-bordered"><thead>' +
+	    			'<table class="table teble-striped table-bordered">' +
+	    			'<caption><spring:message code="notificacio.list.enviament.list.titol"/></caption>' +
+	    			'<thead>' +
 	    			'<tr>' +
 					'<th><spring:message code="notificacio.list.enviament.list.titular"/></th>' + 
 	    			'<th><spring:message code="notificacio.list.enviament.list.destinataris"/></th>' +
@@ -78,10 +108,10 @@ $(document).ready(function() {
 				$.each(data[i].destinataris, function (index, destinatari) {
 					var llinatge1Dest = '', llinatge2Dest = '';
 					if (destinatari.llinatge1 != null) {
-						llinatge1Dest = data[i].destinatari.llinatge1;
+						llinatge1Dest = destinatari.llinatge1;
 					}
 					if (destinatari.llinatge2 != null) {
-						llinatge2Dest = data[i].destinatari.llinatge2;
+						llinatge2Dest = destinatari.llinatge2;
 					}
 					destinataris += destinatari.nom + ' ' + llinatge1Dest + ' ' + llinatge2Dest + ' (' + destinatari.nif + '), ';	
 				});
@@ -167,6 +197,9 @@ $(document).ready(function() {
 				<not:inputSelect name="procedimentId" optionItems="${procedimentsPermisLectura}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.procediment" inline="true"/>
 			</div>
 			<div class="col-md-3">
+				<not:inputSelect name="tipusUsuari" optionItems="${tipusUsuari}" optionValueAttribute="value" optionTextKeyAttribute="text"  emptyOption="true"  placeholderKey="notificacio.list.filtre.camp.tipususuari" inline="true" />
+			</div>
+			<div class="col-md-3">
 			</div>
 			<div class="col-md-2 pull-right form-buttons">
 				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -208,6 +241,7 @@ $(document).ready(function() {
 				</th--%>
 				<th data-col-name="procediment.nom"><spring:message code="notificacio.list.columna.procediment"/></th>
 				<th data-col-name="concepte" width="${ampladaConcepte}"><spring:message code="notificacio.list.columna.concepte"/></th>
+				<th data-col-name="estatDate" data-converter="datetime" data-visible="false"></th>
 				<th data-col-name="estat" data-template="#cellEstatTemplate" width="30%">
 					<spring:message code="notificacio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
@@ -221,8 +255,13 @@ $(document).ready(function() {
 							<span class="fa fa-file-o"></span>
 						{{else estat == 'PROCESSADA'}}
 							<span class="fa fa-check-circle"></span>
+							
 						{{/if}}
 						{{:~eval('notificacioEstats["' + estat + '"]')}}
+						{{if estat == 'PROCESSADA' && estatDate != ''}}
+							<br>
+							<p class="horaProcessat">{{:~eval('formatDate(' + estatDate+ ')')}}</p>
+						{{/if}}
 						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>errorNotificaDescripcio}}"></span>{{/if}}
 					</script>
 				</th>

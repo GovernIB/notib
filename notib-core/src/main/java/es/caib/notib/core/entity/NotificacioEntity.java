@@ -30,6 +30,7 @@ import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.ParametresSeu;
 import es.caib.notib.core.audit.NotibAuditable;
@@ -83,8 +84,11 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "estat", nullable = false)
 	protected NotificacioEstatEnumDto estat;
 	
-//	@Column(name = "estat_date")
-//	protected Date estatDate;
+	@Column(name = "estat_date")
+	protected Date estatDate;
+	
+	@Column(name = "tipus_usuari")
+	protected TipusUsuariEnumDto tipusUsuari;
 	
 	@Column(name = "motiu")
 	protected String motiu;
@@ -213,7 +217,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	@Transient
 	protected boolean permisProcessar;
-
+	
 	public String getEmisorDir3Codi() {
 		return emisorDir3Codi;
 	}
@@ -258,6 +262,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 //	}
 	public NotificacioEstatEnumDto getEstat() {
 		return estat;
+	}
+	public Date getEstatDate() {
+		return estatDate;
 	}
 	public String getMotiu() {
 		return motiu;
@@ -374,6 +381,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public void setPermisProcessar(boolean permisProcessar) {
 		this.permisProcessar = permisProcessar;
 	}
+	public NotificacioComunicacioTipusEnumDto getComunicacioTipus() {
+		return comunicacioTipus;
+	}
 	public void updateRegistreNumero(Integer registreNumero) {
 		this.registreNumero = registreNumero;
 	}
@@ -387,8 +397,15 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			NotificacioEstatEnumDto estat) {
 		this.estat = estat;
 	}
+	public void updateEstatDate(
+			Date estatDate) {
+		this.estatDate = estatDate;
+	}
 	public void updateMotiu(String motiu) {
 		this.motiu = motiu;
+	}
+	public TipusUsuariEnumDto getTipusUsuari() {
+		return tipusUsuari;
 	}
 	
 	public void updateNotificaNouEnviament(int reintentsPeriodeNotifica) {
@@ -479,7 +496,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String procedimentCodi,
 			ProcedimentEntity procediment,
 			String grup,
-			String numExpedient) {
+			String numExpedient,
+			TipusUsuariEnumDto tipusUsuari) {
 		return new BuilderV2(
 				entitat,
 				emisorDir3Codi,
@@ -494,7 +512,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				procedimentCodi,
 				procediment,
 				grup,
-				numExpedient);
+				numExpedient,
+				tipusUsuari);
 	}
 	
 
@@ -693,7 +712,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				String procedimentCodi,
 				ProcedimentEntity procediment,
 				String grup,
-				String numExpedient) {
+				String numExpedient,
+				TipusUsuariEnumDto tipusUsuari) {
 			built = new NotificacioEntity();
 			built.entitat = entitat;
 			built.emisorDir3Codi = emisorDir3Codi;
@@ -712,6 +732,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.estat = NotificacioEstatEnumDto.PENDENT;
 			built.notificaEnviamentIntent = 0;
 			built.notificaEnviamentData = new Date();
+			built.tipusUsuari = tipusUsuari;
 		}
 		public BuilderV2 usuariCodi(String usuariCodi) {
 			built.usuariCodi = usuariCodi;

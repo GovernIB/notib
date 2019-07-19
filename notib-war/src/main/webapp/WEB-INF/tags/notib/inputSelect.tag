@@ -23,9 +23,13 @@
 <%@ attribute name="inline" required="false" rtexprvalue="true"%>
 <%@ attribute name="disabled" required="false" rtexprvalue="true"%>
 <%@ attribute name="multiple" required="false" rtexprvalue="true"%>
+<%@ attribute name="multipleCustom" required="false" rtexprvalue="true"%>
 <%@ attribute name="optionMinimumResultsForSearch" required="false" rtexprvalue="true"%>
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="inputSize" required="false" rtexprvalue="true"%>
+<%@ attribute name="value" required="false" rtexprvalue="true"%>
+<%@ attribute name="labelClass" required="false" rtexprvalue="true"%>
+<%@ attribute name="inputClass" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campId" value="${campPath}"/><c:if test="${not empty id}"><c:set var="campId" value="${id}"/></c:if>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
@@ -33,15 +37,15 @@
 <c:set var="campPlaceholder"><c:choose><c:when test="${not empty placeholderKey}"><spring:message code="${placeholderKey}"/></c:when><c:otherwise>${placeholder}</c:otherwise></c:choose></c:set>
 <c:set var="minimumResultsForSearch"><c:choose><c:when test="${not empty optionMinimumResultsForSearch}">${optionMinimumResultsForSearch}</c:when><c:otherwise>${-1}</c:otherwise></c:choose></c:set>
 <c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
-<c:set var="campInputSize">${12 - campLabelSize}</c:set>
+<c:set var="campInputSize"><c:choose><c:when test="${not empty inputSize}">${inputSize}</c:when><c:otherwise>${12 - campLabelSize}</c:otherwise></c:choose></c:set>
 <spring:bind path="${name}">
 	<c:set var="campValue" value="${status.value}"/>
 </spring:bind>
 <div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>"<c:if test="${multiple}"> data-toggle="multifield"</c:if>>
 <c:choose>
 	<c:when test="${not inline}">
-		<label class="control-label col-xs-${campLabelSize}" for="${campPath}">${campLabelText}</label>
-		<div class="controls col-xs-${campInputSize}">
+		<label class="control-label col-xs-${campLabelSize} ${labelClass}" for="${campPath}">${campLabelText}</label>
+		<div class="controls col-xs-${campInputSize} ${inputClass}">
 			<form:select path="${campPath}" cssClass="form-control ${generalClass}" id="${campId}" disabled="${disabled}" style="width:100%" data-toggle="select2" data-placeholder="${campPlaceholder}" data-minimumresults="${minimumResultsForSearch}" data-enum="${optionEnum}" data-enum-value="${campValue}">
 				<c:if test="${emptyOption == 'true'}">
 					<c:choose>

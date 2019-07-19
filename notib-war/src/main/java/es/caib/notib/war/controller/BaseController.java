@@ -157,7 +157,8 @@ public class BaseController implements MessageSourceAware {
 		response.setHeader("Expires", "");
 		response.setHeader("Cache-Control", "");
 		response.setHeader("Content-Disposition","attachment; filename=\"" + fileName + "\"");
-		response.setContentType(new MimetypesFileTypeMap().getContentType(fileName));
+		if (fileName != null && !fileName.isEmpty())
+			response.setContentType(new MimetypesFileTypeMap().getContentType(fileName));
 		response.getOutputStream().write(fileContent);
 	}
 

@@ -71,7 +71,7 @@
 	</table>
 	
 	<script id="botonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a id="pagadorpostal-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}pagadorPostal/new" data-toggle="modal" data-height="400px"><span class="fa fa-plus"></span>&nbsp;<spring:message code="pagadorpostal.list.boto.nou.pagadorpostal"/></a></p>
+		<p style="text-align:right"><a id="pagadorpostal-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}pagadorPostal/new" data-toggle="modal" data-height="400px" data-custom="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="pagadorpostal.list.boto.nou.pagadorpostal"/></a></p>
 	</script>
 	
 </body>
