@@ -30,6 +30,8 @@ public class EnviamentCommand {
 	private boolean entregaPostalActiva;
 	@Valid
 	private EntregapostalCommand entregaPostal;
+	@Valid
+	private boolean entregaDehActiva;
 	private EntregaDehCommand entregaDeh;
 	
 	
@@ -57,7 +59,6 @@ public class EnviamentCommand {
 	public void setDestinataris(List<PersonaCommand> destinataris) {
 		this.destinataris = destinataris;
 	}
-
 	public boolean isEntregaPostalActiva() {
 		return entregaPostalActiva;
 	}
@@ -69,6 +70,12 @@ public class EnviamentCommand {
 	}
 	public void setEntregaPostal(EntregapostalCommand entregaPostal) {
 		this.entregaPostal = entregaPostal;
+	}
+	public boolean isEntregaDehActiva() {
+		return entregaDehActiva;
+	}
+	public void setEntregaDehActiva(boolean entregaDehActiva) {
+		this.entregaDehActiva = entregaDehActiva;
 	}
 	public EntregaDehCommand getEntregaDeh() {
 		return entregaDeh;

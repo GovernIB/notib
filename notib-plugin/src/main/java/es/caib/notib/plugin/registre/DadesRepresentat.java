@@ -8,10 +8,12 @@ package es.caib.notib.plugin.registre;
  */
 public class DadesRepresentat {
 
+	
 	private String entitatCodi;
 	private boolean autenticat;
 	private String nif;
 	private String nom;
+	private Long tipusInteressat;
 	private String cognom1;
 	private String cognom2;
 	private String nomAmbCognoms;
@@ -44,6 +46,12 @@ public class DadesRepresentat {
 	}
 	public void setNom(String nom) {
 		this.nom = nom;
+	}
+	public Long getTipusInteressat() {
+		return tipusInteressat;
+	}
+	public void setTipusInteressat(Long tipusInteressat) {
+		this.tipusInteressat = tipusInteressat;
 	}
 	public String getCognom1() {
 		return cognom1;

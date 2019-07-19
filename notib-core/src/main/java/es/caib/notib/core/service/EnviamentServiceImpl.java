@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,8 @@ import es.caib.notib.core.api.dto.NotificacioTipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDto;
+import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -58,6 +61,7 @@ import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.UsuariRepository;
+import es.caib.notib.core.security.ExtendedPermission;
 
 /**
  * Implementació del servei de gestió de enviaments.
@@ -339,6 +343,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Override
 	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByEntityAndFiltre(
 			EntitatDto entitat,
+			boolean isUsuari,
+			boolean isUsuariEntitat,
+			List<ProcedimentGrupDto> grupsProcediments,
+			List<ProcedimentDto> procediments,
 			NotificacioEnviamentFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws ParseException {
 		logger.debug("Consulta els enviaments de les notificacións que te una entitat");
@@ -350,6 +358,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 			 dataRegistreFi = null,
 			 dataCaducitatInici = null,
 			 dataCaducitatFi = null;
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		List<String> procedimentsCodisNotib = new ArrayList<String>();
+		List<ProcedimentDto> procedimentsPermisConsultaAndAgrupable = new ArrayList<ProcedimentDto>();
+		List<ProcedimentDto> procedimentsPermisConsulta = new ArrayList<ProcedimentDto>();
 		
 		EntitatEntity entitatEntity = entitatRepository.findOne(entitat.getId());
 		entityComprovarHelper.comprovarPermisos(
@@ -357,6 +369,48 @@ public class EnviamentServiceImpl implements EnviamentService {
 				true,
 				true,
 				false);
+		
+		if (isUsuari) {
+			if (grupsProcediments.isEmpty()) {
+				//Obté tots els procediments amb permís de consutla d'una entitat
+				procedimentsPermisConsultaAndAgrupable = entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
+					new Permission[] {
+							ExtendedPermission.READ},
+					entitatActual);
+			} else if (!procediments.isEmpty()) {
+				//Obté els procediments amb grup i permís de consulta
+				procedimentsPermisConsultaAndAgrupable = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
+						procediments, 
+						entitatActual,
+						new Permission[] {
+								ExtendedPermission.READ}
+						);
+				//Procediments amb permís de consulta no agurpables
+				List<ProcedimentDto> procedimentsNoAgrupables = new ArrayList<ProcedimentDto>();
+				for(ProcedimentDto procediment: procediments) {
+					if (!procediment.isAgrupar()) {
+						procedimentsNoAgrupables.add(procediment);
+					}
+				}
+				procedimentsPermisConsulta = entityComprovarHelper.findByPermisProcedimentsUsuariActual(
+						procedimentsNoAgrupables, 
+						entitatActual,
+						new Permission[] {
+								ExtendedPermission.READ}
+						);
+				
+			}
+			if (!procedimentsPermisConsultaAndAgrupable.isEmpty()) {
+					for (ProcedimentDto procedimentDto : procedimentsPermisConsultaAndAgrupable) {
+						procedimentsCodisNotib.add(procedimentDto.getCodi());
+					}
+			}
+			if (!procedimentsPermisConsulta.isEmpty()) {
+				for (ProcedimentDto procedimentDto : procedimentsPermisConsulta) {
+					procedimentsCodisNotib.add(procedimentDto.getCodi());
+				}
+			}
+		}
 		
 		if (filtre.getDataEnviamentInici() != null && filtre.getDataEnviamentInici() != "") {
 			dataEnviamentInici = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentInici());
@@ -478,7 +532,61 @@ public class EnviamentServiceImpl implements EnviamentService {
 		campsOrdre(paginacioParams);
 		
 		Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
-		
+		if (isUsuari && !procedimentsCodisNotib.isEmpty()) {
+			enviament = notificacioEnviamentRepository.findByNotificacio(
+					filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
+					filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
+					filtre.getGrup() == null || filtre.getGrup().isEmpty(),
+					filtre.getGrup() == null ? "" : filtre.getGrup(),
+					filtre.getConcepte() == null || filtre.getConcepte().isEmpty(),
+					filtre.getConcepte() == null ? "" : filtre.getConcepte(),
+					filtre.getDescripcio() == null || filtre.getDescripcio().isEmpty(),
+					filtre.getDescripcio() == null ? "" : filtre.getDescripcio(),
+					(dataProgramadaDisposicioInici == null),
+					dataProgramadaDisposicioInici,
+					(dataProgramadaDisposicioFi == null),
+					dataProgramadaDisposicioFi,
+					(dataCaducitatInici == null),
+					dataCaducitatInici,
+					(dataCaducitatFi == null),
+					dataCaducitatFi,
+					(filtre.getEnviamentTipus() == null),
+					(tipusEnviament),
+					(filtre.getCsvUuid() == null || filtre.getCsvUuid().isEmpty()),
+					filtre.getCsvUuid(),
+					(filtre.getEstat() == null),
+					(estat),
+					entitatEntity,
+					(dataEnviamentInici == null),
+					dataEnviamentInici,
+					(dataEnviamentFi == null),
+					dataEnviamentFi,
+					(filtre.getCodiNotifica() == null || filtre.getCodiNotifica().isEmpty()),
+					filtre.getCodiNotifica() == null ? "" : filtre.getCodiNotifica(),
+					(filtre.getCreatedBy() == null || filtre.getCreatedBy().getCodi().isEmpty()),
+					conversioTipusHelper.convertir(filtre.getCreatedBy(), UsuariEntity.class),
+					(filtre.getNifTitular() == null || filtre.getNifTitular().isEmpty()),
+					filtre.getNifTitular() == null ? "" : filtre.getNifTitular(),
+					(filtre.getTitularNomLlinatge() == null || filtre.getTitularNomLlinatge().isEmpty()),
+					filtre.getTitularNomLlinatge() == null ? "" : filtre.getTitularNomLlinatge(),
+					(filtre.getEmailTitular() == null || filtre.getEmailTitular().isEmpty()),
+					filtre.getEmailTitular() == null ? "" : filtre.getEmailTitular(),
+					(filtre.getDir3Codi() == null || filtre.getDir3Codi().isEmpty()),
+					filtre.getDir3Codi() == null ? "" : filtre.getDir3Codi(),
+					(filtre.getNumeroCertCorreus() == null || filtre.getNumeroCertCorreus().isEmpty()),
+					filtre.getNumeroCertCorreus() == null ? "" : filtre.getNumeroCertCorreus(),
+					(filtre.getUsuari() == null || filtre.getUsuari().isEmpty()),
+					filtre.getUsuari() == null ? "" : filtre.getUsuari(),
+					(filtre.getRegistreNumero() == null || filtre.getRegistreNumero().isEmpty()),
+					filtre.getRegistreNumero() == null ? "" : filtre.getRegistreNumero(),
+					(dataRegistreInici == null),
+					dataRegistreInici,
+					(dataRegistreFi == null),
+					dataRegistreFi,
+					(procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty()),
+					procedimentsCodisNotib,
+					pageable);
+		} else if (isUsuariEntitat) {
 			enviament = notificacioEnviamentRepository.findByNotificacio(
 					filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 					filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
@@ -530,7 +638,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					(dataRegistreFi == null),
 					dataRegistreFi,
 					pageable);
-			
+		}
 		if(enviament == null || !enviament.hasContent()) {
 			enviament = new PageImpl<>(new ArrayList<NotificacioEnviamentEntity>());
 		}

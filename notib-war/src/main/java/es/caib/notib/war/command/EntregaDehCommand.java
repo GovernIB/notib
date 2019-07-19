@@ -16,10 +16,18 @@ import es.caib.notib.war.helper.ConversioTipusHelper;
  */
 public class EntregaDehCommand {
 
+	private String emisorNif;
 	@NotEmpty @Size(max=50)
 	private boolean obligat;
 	private String procedimentCodi;
-
+	private boolean visible = true;
+	
+	public String getEmisorNif() {
+		return emisorNif;
+	}
+	public void setEmisorNif(String emisorNif) {
+		this.emisorNif = emisorNif;
+	}
 	public boolean isObligat() {
 		return obligat;
 	}
@@ -31,6 +39,12 @@ public class EntregaDehCommand {
 	}
 	public void setProcedimentCodi(String procedimentCodi) {
 		this.procedimentCodi = procedimentCodi;
+	}
+	public boolean isVisible() {
+		return visible;
+	}
+	public void setVisible(boolean visible) {
+		this.visible = visible;
 	}
 	
 	public static EntregaDehCommand asCommand(DocumentDto dto) {

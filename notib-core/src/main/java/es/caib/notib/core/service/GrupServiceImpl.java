@@ -8,6 +8,8 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import es.caib.notib.core.api.dto.GrupDto;
@@ -25,9 +27,11 @@ import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.GrupHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
+import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.plugin.usuari.DadesUsuari;
 
 /**
  * Implementació del servei de gestió de grups.
@@ -51,6 +55,8 @@ public class GrupServiceImpl implements GrupService{
 	private GrupProcedimentRepository grupProcedimentRepositoy;
 	@Resource
 	private ProcedimentRepository procedimentRepositroy;
+	@Resource
+	private PluginHelper pluginHelper;
 	
 	@Override
 	public GrupDto create(
@@ -121,16 +127,33 @@ public class GrupServiceImpl implements GrupService{
 	}
 	
 	@Override
-	public List<GrupDto> findByGrupsProcediment(Long procedimentId) {
-		List<GrupDto> grups = new ArrayList<GrupDto>();
+	public GrupDto findByCodi(String grupCodi) {
+		GrupEntity grupEntity = grupReposity.findByCodi(grupCodi);
 		
+		return conversioTipusHelper.convertir(
+				grupEntity, 
+				GrupDto.class);
+	}
+
+	
+	@Override
+	public List<GrupDto> findByProcedimentGrups(Long procedimentId) {
+		List<GrupDto> grups = new ArrayList<GrupDto>();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		ProcedimentEntity procediment = procedimentRepositroy.findOne(procedimentId);
 		List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepositoy.findByProcediment(procediment); 
 		
 		for (GrupProcedimentEntity grupProcediment : grupsProcediment) {
-			grups.add(conversioTipusHelper.convertir(
-					grupReposity.findOne(grupProcediment.getGrup().getId()), 
-					GrupDto.class));
+			DadesUsuari usuariGrup = pluginHelper.dadesUsuariConsultarAmbCodi(auth.getName());
+			if (usuariGrup != null) {
+				List<String> rols = pluginHelper.consultarRolsAmbCodi(usuariGrup.getCodi());
+				if (rols.contains(grupProcediment.getGrup().getCodi())) {
+					grups.add(conversioTipusHelper.convertir(
+							grupReposity.findOne(grupProcediment.getGrup().getId()), 
+							GrupDto.class));
+				}
+			}
+			
 					
 		}
 		
@@ -232,8 +255,6 @@ public class GrupServiceImpl implements GrupService{
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
-
-
 
 
 }

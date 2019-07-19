@@ -17,6 +17,8 @@ import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 
@@ -60,6 +62,10 @@ public interface EnviamentService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByEntityAndFiltre(
 			EntitatDto entitat,
+			boolean isUsuari,
+			boolean isUsuariEntitat,
+			List<ProcedimentGrupDto> grupsProcediments,
+			List<ProcedimentDto> procediments,
 			NotificacioEnviamentFiltreDto filtre,
 			PaginacioParamsDto paginacio) throws ParseException;
 	

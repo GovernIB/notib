@@ -6,8 +6,8 @@ package es.caib.notib.core.service;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +42,8 @@ import es.caib.notib.plugin.usuari.DadesUsuari;
 @Service
 public class AplicacioServiceImpl implements AplicacioService {
 
-	private String version;
-
+	private Properties versionProperties;
+	
 	@Autowired
 	private UsuariRepository usuariRepository;
 	@Autowired
@@ -61,21 +61,17 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private PluginHelper pluginHelper;
 
 
-
 	@Override
 	public String getVersioActual() {
 		logger.debug("Obtenint versió actual de l'aplicació");
-		if (version == null) {
-			try {
-				version = IOUtils.toString(
-						getClass().getResourceAsStream("versio"),
-						"UTF-8");
-			} catch (IOException e) {
-				version = "???";
-			}
+		try {
+			return getVersionProperties().getProperty("app.version");
+		} catch (IOException ex) {
+			logger.error("No s'ha pogut llegir el fitxer version.properties", ex);
+			return "???";
 		}
-		return version;
 	}
+	
 
 	@Transactional
 	@Override
@@ -225,7 +221,15 @@ public class AplicacioServiceImpl implements AplicacioService {
 		return pluginHelper.isSeuPluginDisponible();
 	}
 
-
+	private Properties getVersionProperties() throws IOException {
+		if (versionProperties == null) {
+			versionProperties = new Properties();
+			versionProperties.load(
+					getClass().getResourceAsStream(
+							"/es/caib/notib/core/version/version.properties"));
+		}
+		return versionProperties;
+	}
 
 	private UsuariDto toUsuariDtoAmbRols(
 			UsuariEntity usuari) {

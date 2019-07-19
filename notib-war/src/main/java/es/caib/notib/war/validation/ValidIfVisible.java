@@ -27,7 +27,7 @@ public @interface ValidIfVisible {
 	String fieldName();
 	String fieldValue();
 	String dependFieldName();
-
+	
 	String message() default "Aquest camp és obligatori";
 	Class<?>[] groups() default {};
 

@@ -21,6 +21,8 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 
 	public List<GrupEntity> findByEntitat(EntitatEntity entitat);
 	
+	public GrupEntity findByCodi(String codi);
+	
 	public Page<GrupEntity> findByEntitat(
 			EntitatEntity entitat,
 			Pageable pageable);

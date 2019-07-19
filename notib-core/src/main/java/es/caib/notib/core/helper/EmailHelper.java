@@ -173,7 +173,7 @@ public class EmailHelper {
 					"		</tr>"+
 					"		<tr>"+
 					"			<th>"+ messageHelper.getMessage("notificacio.email.estat.nou") +"</th>"+
-					"			<td>"+ messageHelper.getMessage("notificacio.estat.enum.FINALITZADA") + "</td>"+
+					"			<td>"+ messageHelper.getMessage("notificacio.estat.enum.PROCESSADA") + "</td>"+
 					"		</tr>"+	
 					"		<tr>"+
 					"			<th>"+ messageHelper.getMessage("notificacio.email.estat.motiu") +"</th>"+
@@ -216,7 +216,12 @@ public class EmailHelper {
 	
 	private List<UsuariDto> obtenirCodiDestinatarisPerProcediment(ProcedimentEntity procediment) {
 		List<UsuariDto> destinataris = new ArrayList<UsuariDto>();
-		Set<String> usuaris = procedimentHelper.findUsuarisAmbPermisReadPerProcediment(procediment);
+		Set<String> usuaris;
+		if (procediment.isAgrupar()) {
+			usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrup(procediment);
+		} else {
+			usuaris = procedimentHelper.findUsuarisAmbPermisReadPerProcediment(procediment);
+		}
 		for (String usuari: usuaris) {
 			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
 			if (dadesUsuari != null && dadesUsuari.getEmail() != null) {

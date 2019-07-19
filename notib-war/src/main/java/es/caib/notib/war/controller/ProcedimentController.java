@@ -1,6 +1,5 @@
 package es.caib.notib.war.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import es.caib.notib.core.api.dto.CodiAssumpteDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.LlibreDto;
@@ -255,8 +255,8 @@ public class ProcedimentController extends BaseUserController{
 //				model.addAttribute("codiAssumpte", procedimentService.findCodisAssumpte(entitat, tipusAssumpte.get(0).getCodi()));
 //			}
 		}
-		model.addAttribute("pagadorsPostal", pagadorPostalService.findAll());
-		model.addAttribute("pagadorsCie", pagadorCieService.findAll());
+		model.addAttribute("pagadorsPostal", pagadorPostalService.findByEntitat(entitat.getId()));
+		model.addAttribute("pagadorsCie", pagadorCieService.findByEntitat(entitat.getId()));
 		
 		if (procediment != null) {
 			model.addAttribute("entitatId", procediment.getEntitat().getId());

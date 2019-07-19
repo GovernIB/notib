@@ -70,6 +70,7 @@
 <xs:sequence>
 <xs:element maxOccurs="unbounded" minOccurs="0" name="destinataris" nillable="true" type="tns:persona" />
 <xs:element minOccurs="0" name="entregaDeh" type="tns:entregaDeh" />
+<xs:element name="entregaDehActiva" type="xs:boolean" />
 <xs:element minOccurs="0" name="entregaPostal" type="tns:entregaPostal" />
 <xs:element name="entregaPostalActiva" type="xs:boolean" />
 <xs:element minOccurs="0" name="referencia" type="xs:string" />
@@ -92,7 +93,7 @@
 </xs:complexType>
 <xs:complexType name="entregaDeh">
 <xs:sequence>
-<xs:element minOccurs="0" name="nif" type="xs:string" />
+<xs:element minOccurs="0" name="emisorNif" type="xs:string" />
 <xs:element name="obligat" type="xs:boolean" />
 <xs:element minOccurs="0" name="procedimentCodi" type="xs:string" />
 </xs:sequence>
@@ -117,7 +118,7 @@
 <xs:element minOccurs="0" name="poblacio" type="xs:string" />
 <xs:element minOccurs="0" name="porta" type="xs:string" />
 <xs:element minOccurs="0" name="portal" type="xs:string" />
-<xs:element minOccurs="0" name="provinciaCodi" type="xs:string" />
+<xs:element minOccurs="0" name="provincia" type="xs:string" />
 <xs:element minOccurs="0" name="puntKm" type="xs:string" />
 <xs:element minOccurs="0" name="tipus" type="tns:notificaDomiciliConcretTipusEnumDto" />
 <xs:element minOccurs="0" name="viaNom" type="xs:string" />

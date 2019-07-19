@@ -22,7 +22,7 @@ public class EntregaPostalDto implements Serializable{
 	private String codiPostal;
 	private String poblacio;
 	private String municipiCodi;
-	private String provinciaCodi;
+	private String provincia;
 	private String paisCodi;
 	private String linea1;
 	private String linea2;
@@ -160,12 +160,12 @@ public class EntregaPostalDto implements Serializable{
 		this.municipiCodi = municipiCodi;
 	}
 
-	public String getProvinciaCodi() {
-		return provinciaCodi;
+	public String getProvincia() {
+		return provincia;
 	}
 
-	public void setProvinciaCodi(String provinciaCodi) {
-		this.provinciaCodi = provinciaCodi;
+	public void setProvincia(String provincia) {
+		this.provincia = provincia;
 	}
 
 	public String getPaisCodi() {

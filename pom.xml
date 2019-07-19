@@ -6,7 +6,7 @@
   <version>1.0</version>
   <packaging>pom</packaging>
   <properties>
-		<notib.version>1.0</notib.version>
+		<notib.version>1.0.2</notib.version>
 		<github.global.server>github</github.global.server>
 		<spring.version>3.2.16.RELEASE</spring.version>
 		<spring-security.version>3.2.9.RELEASE</spring-security.version>
@@ -17,12 +17,16 @@
 		<orika.version>1.4.6</orika.version>
 		<jackson.version>2.6.3</jackson.version>
 		<regweb.version>3.1.1</regweb.version>
+		<dir3caib.version>1.0.7</dir3caib.version>
 		<slf4j.version>1.6.6</slf4j.version>
 		<cxf.version>2.2.12</cxf.version>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<arxiu.api.version>1.0.4</arxiu.api.version>
+		<lombok.version>1.18.6</lombok.version>
+		<version.revision>2</version.revision>
+		<version.full>${project.version}.${version.revision}</version.full>
 	</properties>
 	<modules>
 		<module>notib-client</module>

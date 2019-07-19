@@ -80,5 +80,11 @@ public class PagadorCieServiceBean implements PagadorCieService {
 		return delegate.findAllPaginat(paginacioParams);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public List<PagadorCieDto> findByEntitat(Long entitatId) {
+		return delegate.findByEntitat(entitatId);
+	}
+
 
 }

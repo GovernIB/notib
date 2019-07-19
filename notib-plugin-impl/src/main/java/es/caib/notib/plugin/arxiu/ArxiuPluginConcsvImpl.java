@@ -2,6 +2,7 @@ package es.caib.notib.plugin.arxiu;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 
@@ -25,14 +26,18 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 	private static final String JERSEY_TIMEOUT_READ = "60000";
 	private Client versioImprimibleClient;
 
+	public ArxiuPluginConcsvImpl(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
+	
 	@Override
 	public DocumentContingut documentImprimible(String identificador) throws ArxiuException {
 		if(identificador.contains("uuid:")) {
 			identificador = identificador.replace("uuid:", "");
-			return documentImprimibleCsv(identificador);
+			return documentImprimibleUuid(identificador);
 		}else {
 			identificador = identificador.replace("csv:", "");
-			return documentImprimibleUuid(identificador);
+			return documentImprimibleCsv(identificador);
 		}
 	}
 	

@@ -1,8 +1,7 @@
 package es.caib.notib.plugin.registre;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
 
 /**
  * Registre de sortida o notificació
@@ -14,11 +13,12 @@ public class RegistreSortida {
 	private String codiEntitat;
 	private String codiUsuari;
 	private DadesOficina dadesOficina;
-	private DadesInteressat dadesInteressat;
+	private List<DadesInteressat> dadesInteressat = new ArrayList<DadesInteressat>();
 	private DadesRepresentat dadesRepresentat;
 	private DadesAnotacio dadesAnotacio;
 	private List<DocumentRegistre> documents;
-	
+	private String versioNotib;
+	private String aplicacio;
 	
 	public String getCodiEntitat() {
 		return codiEntitat;
@@ -38,10 +38,10 @@ public class RegistreSortida {
 	public void setDadesOficina(DadesOficina dadesOficina) {
 		this.dadesOficina = dadesOficina;
 	}
-	public DadesInteressat getDadesInteressat() {
+	public List<DadesInteressat> getDadesInteressat() {
 		return dadesInteressat;
 	}
-	public void setDadesInteressat(DadesInteressat dadesInteressat) {
+	public void setDadesInteressat(List<DadesInteressat> dadesInteressat) {
 		this.dadesInteressat = dadesInteressat;
 	}
 	public DadesRepresentat getDadesRepresentat() {
@@ -61,5 +61,17 @@ public class RegistreSortida {
 	}
 	public void setDocuments(List<DocumentRegistre> documents) {
 		this.documents = documents;
+	}
+	public String getVersioNotib() {
+		return versioNotib;
+	}
+	public void setVersioNotib(String versioNotib) {
+		this.versioNotib = versioNotib;
+	}
+	public String getAplicacio() {
+		return aplicacio;
+	}
+	public void setAplicacio(String aplicacio) {
+		this.aplicacio = aplicacio;
 	}
 }

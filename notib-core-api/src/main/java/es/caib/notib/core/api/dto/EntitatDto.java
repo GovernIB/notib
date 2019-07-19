@@ -20,9 +20,17 @@ public class EntitatDto extends AuditoriaDto {
 	private EntitatTipusEnumDto tipus;
 	private String dir3Codi;
 	private String apiKey;
+	private boolean ambEntregaDeh;
 	private String descripcio;
 	private boolean activa;
-
+	private byte[] logoCapBytes;
+	private boolean eliminarLogoCap;
+	private byte[] logoPeuBytes;
+	private boolean eliminarLogoPeu;
+	private String colorFons;
+	private String colorLletra;
+	private List<TipusDocumentDto> tipusDoc;
+	private TipusDocumentDto tipusDocDefault;
 	private List<PermisDto> permisos;
 	private boolean usuariActualAdministradorEntitat;
 
@@ -70,11 +78,65 @@ public class EntitatDto extends AuditoriaDto {
 	public void setDescripcio(String descripcio) {
 		this.descripcio = descripcio;
 	}
+	public boolean isAmbEntregaDeh() {
+		return ambEntregaDeh;
+	}
+	public void setAmbEntregaDeh(boolean ambEntregaDeh) {
+		this.ambEntregaDeh = ambEntregaDeh;
+	}
 	public boolean isActiva() {
 		return activa;
 	}
 	public void setActiva(boolean activa) {
 		this.activa = activa;
+	}
+	public byte[] getLogoCapBytes() {
+		return logoCapBytes;
+	}
+	public void setLogoCapBytes(byte[] logoCapBytes) {
+		this.logoCapBytes = logoCapBytes;
+	}
+	public byte[] getLogoPeuBytes() {
+		return logoPeuBytes;
+	}
+	public void setLogoPeuBytes(byte[] logoPeuBytes) {
+		this.logoPeuBytes = logoPeuBytes;
+	}
+	public boolean isEliminarLogoCap() {
+		return eliminarLogoCap;
+	}
+	public void setEliminarLogoCap(boolean eliminarLogoCap) {
+		this.eliminarLogoCap = eliminarLogoCap;
+	}
+	public boolean isEliminarLogoPeu() {
+		return eliminarLogoPeu;
+	}
+	public void setEliminarLogoPeu(boolean eliminarLogoPeu) {
+		this.eliminarLogoPeu = eliminarLogoPeu;
+	}
+	public String getColorFons() {
+		return colorFons;
+	}
+	public void setColorFons(String colorFons) {
+		this.colorFons = colorFons;
+	}
+	public String getColorLletra() {
+		return colorLletra;
+	}
+	public void setColorLletra(String colorLletra) {
+		this.colorLletra = colorLletra;
+	}
+	public List<TipusDocumentDto> getTipusDoc() {
+		return tipusDoc;
+	}
+	public void setTipusDoc(List<TipusDocumentDto> tipusDoc) {
+		this.tipusDoc = tipusDoc;
+	}
+	public TipusDocumentDto getTipusDocDefault() {
+		return tipusDocDefault;
+	}
+	public void setTipusDocDefault(TipusDocumentDto tipusDocDefault) {
+		this.tipusDocDefault = tipusDocDefault;
 	}
 	public List<PermisDto> getPermisos() {
 		return permisos;

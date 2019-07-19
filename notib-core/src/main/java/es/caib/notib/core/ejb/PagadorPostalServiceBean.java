@@ -84,5 +84,11 @@ public class PagadorPostalServiceBean implements PagadorPostalService {
 		return delegate.findAllPaginat(paginacioParams);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public List<PagadorPostalDto> findByEntitat(Long entitatId) {
+		return delegate.findByEntitat(entitatId);
+	}
+
 
 }

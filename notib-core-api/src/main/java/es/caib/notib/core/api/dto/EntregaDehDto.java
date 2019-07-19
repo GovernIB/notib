@@ -7,7 +7,7 @@ public class EntregaDehDto implements Serializable{
 	
 	private boolean obligat;
 	private String procedimentCodi;
-	private String nif;
+	private String emisorNif;
 
 	public boolean isObligat() {
 		return obligat;
@@ -21,12 +21,12 @@ public class EntregaDehDto implements Serializable{
 	public void setProcedimentCodi(String procedimentCodi) {
 		this.procedimentCodi = procedimentCodi;
 	}
-	public String getNif() {
-		return nif;
+	public String getEmisorNif() {
+		return emisorNif;
 	}
-	public void setNif(String nif) {
-		this.nif = nif;
+	public void setEmisorNif(String emisorNif) {
+		this.emisorNif = emisorNif;
 	}
-
+	
 	private static final long serialVersionUID = 5160556424872017273L;
 }

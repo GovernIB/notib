@@ -10,7 +10,8 @@
 			elementBotons: "#modal-botons",
 			elementForm: "#modal-form",
 			elementTancarData: "modal-cancel",
-			height: "100%"
+			height: "100%",
+			custom: false
 		}
 		var $element = $(element), element = element;
 		var plugin = this;
@@ -73,7 +74,8 @@
 								elementTancarData: plugin.settings.elementTancarData,
 								contentUrl: webutilUrlAmbPrefix(href, '/modal'),
 								dataTableId: dataTableId,
-								height: plugin.settings.height
+								height: plugin.settings.height,
+								custom: plugin.settings.custom
 							});
 						} else {
 							$('#' + modalDivId).webutilModalShow({
@@ -85,7 +87,8 @@
 								elementForm: plugin.settings.elementForm,
 								elementTancarData: plugin.settings.elementTancarData,
 								dataTableId: dataTableId,
-								height: plugin.settings.height
+								height: plugin.settings.height,
+								custom: plugin.settings.custom
 							});
 						}
 					} else {
@@ -169,7 +172,8 @@
 							$('.modal-body', modalobj).css('height', maxBodyHeight + 'px');
 							$(iframe).contents().find("body").css('height', maxBodyHeight + 'px');
 						}
-						webutilModalAdjustHeight(iframe);
+						if (settings.custom != true)
+							webutilModalAdjustHeight(iframe);
 					});
 				});
 				iframe.on('load', function () {
