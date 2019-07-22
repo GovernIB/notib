@@ -65,8 +65,8 @@
 			jndi-name="notib/NotificacioServiceWsBeanV2/local"
 			business-interface="es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2"/>
 	<jee:local-slsb
-			id="adviserWsService"
-			jndi-name="notib/NotificaAdviserWsBean/local"
-			business-interface="es.caib.notib.core.wsdl.adviser.AdviserWS"/>
+			id="adviserWsV2Service"
+			jndi-name="notib/NotificaAdviserWsV2Bean/local"
+			business-interface="es.caib.notib.core.wsdl.adviser.AdviserWsV2PortType"/>
 
 </beans>

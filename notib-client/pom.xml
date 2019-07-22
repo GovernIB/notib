@@ -6,6 +6,7 @@
 		<artifactId>notib</artifactId>
 		<version>1.0</version>
 	</parent>
+	<version>${parent.version}.${version.revision}</version>
 	<artifactId>notib-client</artifactId>
 	<dependencies>
 		<dependency>

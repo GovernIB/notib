@@ -295,7 +295,7 @@ public abstract class AbstractNotificaHelper {
 				notificaDatatReceptorNom,
 				notificaDatatNumSeguiment,
 				notificaDatatErrorDescripcio);
-		boolean estatsEnviamentsFinals = true;		
+		boolean estatsEnviamentsFinals = true;
 		Set<NotificacioEnviamentEntity> enviaments = enviament.getNotificacio().getEnviaments();
 		for (NotificacioEnviamentEntity env: enviaments) {
 			if (!env.isNotificaEstatFinal()) {

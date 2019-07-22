@@ -23,9 +23,9 @@
 	<import resource="classpath:es/caib/notib/core/context/application-context-war.xml" />
 	<import resource="classpath:es/caib/notib/war/context/application-context-security.xml" />
 
- 	<wss:binding url="/ws/adviserWS">
+ 	<wss:binding url="/ws/adviserWsV2">
 		<wss:service>
-			<ws:service bean="#notificaAdviserWsImpl" impl="es.caib.notib.core.service.ws.NotificaAdviserWsImpl"/>
+			<ws:service bean="#notificaAdviserWsV2Impl" impl="es.caib.notib.core.service.ws.NotificaAdviserWsV2Impl"/>
 		</wss:service>
 	</wss:binding>
 

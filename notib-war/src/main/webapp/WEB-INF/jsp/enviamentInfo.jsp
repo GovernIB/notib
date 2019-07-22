@@ -338,7 +338,7 @@ $(document).ready(function() {
 				</p>
 				<div class="row">
 					<c:set var="datatColSize" value="12"/>
-					<c:if test="${not empty enviament.notificaCertificacioData}"><c:set var="datatColSize" value="6"/></c:if>
+					<c:if test="${not empty enviament.notificaCertificacioData}"><c:set var="datatColSize" value="5"/></c:if>
 					<div class="col-sm-${datatColSize}">
 						<div class="panel panel-default">
 							<div class="panel-heading">
@@ -397,7 +397,7 @@ $(document).ready(function() {
 						</div>
 					</div>
 					<c:if test="${not empty enviament.notificaCertificacioData}">
-						<div class="col-sm-6">
+						<div class="col-sm-7">
 							<div class="panel panel-default">
 								<div class="panel-heading">
 									<h3 class="panel-title">
@@ -410,10 +410,12 @@ $(document).ready(function() {
 										<td width="30%"><strong><spring:message code="enviament.info.notifica.certificacio.data"/></strong></td>
 										<td><fmt:formatDate value="${enviament.notificaCertificacioData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 									</tr>
-									<tr>
-										<td><strong><spring:message code="enviament.info.notifica.certificacio.mime"/></strong></td>
-										<td>${enviament.notificaCertificacioMime}</td>
-									</tr>
+									<c:if test="${not empty enviament.notificaCertificacioMime}">
+										<tr>
+											<td><strong><spring:message code="enviament.info.notifica.certificacio.mime"/></strong></td>
+											<td>${enviament.notificaCertificacioMime}</td>
+										</tr>
+									</c:if>
 									<tr>
 										<td><strong><spring:message code="enviament.info.notifica.certificacio.origen"/></strong></td>
 										<td><spring:message code="enviament.datat.origen.enum.${enviament.notificaCertificacioOrigen}"/> (${enviament.notificaCertificacioOrigen})</td>
@@ -451,6 +453,7 @@ $(document).ready(function() {
 									<tr>
 										<td><strong><spring:message code="enviament.info.notifica.certificacio.document"/></strong></td>
 										<td>
+										<div></div>
 											${enviament.notificaCertificacioArxiuNom}
 											<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/certificacioDescarregar"/>" class="btn btn-default btn-sm pull-right" title="<spring:message code="notificacio.info.document.descarregar"/>"><span class="fa fa-download"></span></a>
 										</td>

@@ -262,7 +262,7 @@
 						<configuration>
 							<packageName>es.caib.notib.core.wsdl.adviser</packageName>
 							<wsdlUrls>
-								<wsdlUrl>${basedir}/src/main/resources/es/caib/notib/core/wsdl/adviserWS.wsdl</wsdlUrl>
+								<wsdlUrl>${basedir}/src/main/resources/es/caib/notib/core/wsdl/AdviserWsV2.wsdl</wsdlUrl>
 							</wsdlUrls>
 							<vmArgs>
 								<vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
@@ -292,6 +292,22 @@
 				</executions>
 			</plugin>
 		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/version.properties</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/version.properties</include>
+				</includes>
+			</resource>
+		</resources>
 	</build>
 	<repositories>
 		<repository>

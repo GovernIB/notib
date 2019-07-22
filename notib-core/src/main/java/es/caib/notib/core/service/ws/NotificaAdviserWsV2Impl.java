@@ -4,6 +4,7 @@
 package es.caib.notib.core.service.ws;
 
 import java.io.ByteArrayInputStream;
+import java.math.BigInteger;
 import java.util.Date;
 
 import javax.jws.WebService;
@@ -24,15 +25,18 @@ import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.wsdl.adviser.AdviserWS;
-import es.caib.notib.core.wsdl.adviser.CertificadoRequest;
-import es.caib.notib.core.wsdl.adviser.DatadoRequest;
+import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.wsdl.adviser.Acuse;
+import es.caib.notib.core.wsdl.adviser.AdviserWsV2PortType;
+import es.caib.notib.core.wsdl.adviser.Opciones;
+import es.caib.notib.core.wsdl.adviser.Receptor;
 
 /**
  * Implementació del servei adviser de Notifica.
@@ -41,15 +45,17 @@ import es.caib.notib.core.wsdl.adviser.DatadoRequest;
  */
 @Service
 @WebService(
-		name = "adviserWS",
-		serviceName = "AdviserWSService",
-		portName = "AdviserWSServicePort",
-		endpointInterface = "es.caib.notib.core.wsdl.adviser.AdviserWS",
-		targetNamespace = "https://administracionelectronica.gob.es/notifica/ws/notifica/1.0/")
-public class NotificaAdviserWsImpl implements AdviserWS {
+		name = "adviserWsV2",
+		serviceName = "AdviserWsV2Service",
+		portName = "AdviserWsV2PortType",
+		endpointInterface = "es.caib.notib.core.wsdl.adviser.AdviserWsV2PortType",
+		targetNamespace = "https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/")
+public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 
 	@Autowired
 	private EntitatRepository entitatRepository;
+	@Autowired
+	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
@@ -58,75 +64,89 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 	private NotificaHelper notificaHelper;
 
 
-
 	@Override
-	@Transactional
-	public void datadoOrganismo(
-			DatadoRequest datadoOrganismo,
+	public void sincronizarEnvio(
+			String organismoEmisor, 
+			Holder<String> identificador, 
+			BigInteger tipoEntrega,
+			BigInteger modoNotificacion, 
+			String estado, 
+			XMLGregorianCalendar fechaEstado, 
+			Receptor receptor,
+			Acuse acusePDF, 
+			Acuse acuseXML, 
+			Opciones opcionesSincronizarEnvio, 
 			Holder<String> codigoRespuesta,
-			Holder<String> textoRespuesta) {
+			Holder<String> descripcionRespuesta, 
+			Holder<Opciones> opcionesResultadoSincronizarEnvio) {
 		NotificacioEnviamentEntity enviament = null;
 		NotificacioEventEntity event = null;
 		try {
-			if (datadoOrganismo.getOrganismoEmisor().getCodigoDir3() != null) {
-				EntitatEntity entitat = entitatRepository.findByDir3Codi(
-						datadoOrganismo.getOrganismoEmisor().getCodigoDir3());
+			if (organismoEmisor != null) {
+				EntitatEntity entitat = entitatRepository.findByDir3Codi(organismoEmisor);
+				
 				if (entitat != null) {
 					enviament = notificacioEnviamentRepository.findByNotificacioEntitatAndNotificaIdentificador(
 							entitat,
-							datadoOrganismo.getIdentificadorDestinatario());
+							identificador.value);
+					//Problema hibernate
+					if (enviament != null && enviament.getNotificacio() == null) {
+						NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
+						enviament.setNotificacio(notificacio);
+					}
 					if (enviament != null) {
 						String receptorNombre = null;
 						String receptorNif = null;
-						if (datadoOrganismo.getReceptor() != null) {
-							receptorNombre = datadoOrganismo.getReceptor().getNombre();
-							receptorNif = datadoOrganismo.getReceptor().getNif();
+						if (receptor != null) {
+							receptorNombre = receptor.getNombreReceptor();
+							receptorNif = receptor.getNifReceptor();
 						}
 						NotificacioEnviamentEstatEnumDto notificaEstat = null;
-						if ("pendiente_envio".equals(datadoOrganismo.getResultado())) {
+						if ("pendiente_envio".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_ENVIAMENT;
-						} else if ("enviado_ci".equals(datadoOrganismo.getResultado())) {
+						} else if ("enviado_ci".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIADA_CI;
-						} else if ("notificada".equals(datadoOrganismo.getResultado())) {
+						} else if ("notificada".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIFICADA;
-						} else if ("extraviada".equals(datadoOrganismo.getResultado())) {
+						} else if ("extraviada".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.EXTRAVIADA;
-						} else if ("rehusada".equals(datadoOrganismo.getResultado())) {
+						} else if ("rehusada".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.REBUTJADA;
-						} else if ("desconocido".equals(datadoOrganismo.getResultado())) {
+						} else if ("desconocido".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.DESCONEGUT;
-						} else if ("fallecido".equals(datadoOrganismo.getResultado())) {
+						} else if ("fallecido".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.MORT;
-						} else if ("ausente".equals(datadoOrganismo.getResultado())) {
+						} else if ("ausente".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.ABSENT;
-						} else if ("direccion_incorrecta".equals(datadoOrganismo.getResultado())) {
+						} else if ("direccion_incorrecta".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA;
-						} else if ("sin_informacion".equals(datadoOrganismo.getResultado())) {
+						} else if ("sin_informacion".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO;
-						} else if ("error".equals(datadoOrganismo.getResultado())) {
+						} else if ("error".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.ERROR_ENTREGA;
-						} else if ("pendiente_sede".equals(datadoOrganismo.getResultado())) {
+						} else if ("pendiente_sede".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_SEU;
-						} else if ("enviado_deh".equals(datadoOrganismo.getResultado())) {
+						} else if ("enviado_deh".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIADA_DEH;
-						} else if ("leida".equals(datadoOrganismo.getResultado())) {
+						} else if ("leida".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.LLEGIDA;
-						} else if ("envio_programado".equals(datadoOrganismo.getResultado())) {
+						} else if ("envio_programado".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIAMENT_PROGRAMAT;
-						} else if ("pendiente_cie".equals(datadoOrganismo.getResultado())) {
+						} else if ("pendiente_cie".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_CIE;
-						} else if ("pendiente_deh".equals(datadoOrganismo.getResultado())) {
+						} else if ("pendiente_deh".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_DEH;
-						} else if ("entregado_op".equals(datadoOrganismo.getResultado())) {
+						} else if ("entregado_op".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.ENTREGADA_OP;
-						} else if ("expirada".equals(datadoOrganismo.getResultado())) {
+						} else if ("expirada".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.EXPIRADA;
 						}
+						//Update enviament
 						notificaHelper.enviamentUpdateDatat(
 								notificaEstat,
-								toDate(datadoOrganismo.getFecha()),
-								null,
-								datadoOrganismo.getModo(),
+								toDate(fechaEstado),
+								estado,
+								getModoNotificacion(modoNotificacion),
 								receptorNif,
 								receptorNombre,
 								null,
@@ -136,49 +156,59 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
 								enviament.getNotificacio()).
 								enviament(enviament).
-								descripcio(datadoOrganismo.getResultado()).
+								descripcio(estado).
 								callbackInicialitza().
 								build();
 						codigoRespuesta.value = "000";
-						textoRespuesta.value = "OK";
+						descripcionRespuesta.value = "OK";
 					} else {
 						logger.error(
 								"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
-								"identificadorDestinatario=" + datadoOrganismo.getIdentificadorDestinatario() + "): " +
-								"No s'ha trobat cap destinatari de notificació amb l'identificador especificat (" + datadoOrganismo.getIdentificadorDestinatario() + ").");
+								"identificadorDestinatario=" + identificador + "): " +
+								"No s'ha trobat cap destinatari de notificació amb l'identificador especificat (" + identificador + ").");
 						codigoRespuesta.value = "002";
-						textoRespuesta.value = "Identificador no encontrado";
+						descripcionRespuesta.value = "Identificador no encontrado";
 					}
 				} else {
 					logger.error(
 							"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
-							"identificadorDestinatario=" + datadoOrganismo.getIdentificadorDestinatario() + "): " +
-							"No s'ha trobat cap entitat amb el codi DIR3 especificat (" + datadoOrganismo.getOrganismoEmisor().getCodigoDir3() + ").");
+							"identificadorDestinatario=" + identificador + "): " +
+							"No s'ha trobat cap entitat amb el codi DIR3 especificat (" + organismoEmisor + ").");
 					codigoRespuesta.value = "001";
-					textoRespuesta.value = "Organismo Desconocido";
+					descripcionRespuesta.value = "Organismo Desconocido";
 				}
 			} else {
 				logger.error(
 						"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
-						"identificadorDestinatario=" + datadoOrganismo.getIdentificadorDestinatario() + "): " +
+						"identificadorDestinatario=" + identificador + "): " +
 						"No s'ha trobat el camp amb l'organisme emissor a dins la petició rebuda.");
 				codigoRespuesta.value = "001";
-				textoRespuesta.value = "Organismo Desconocido";
+				descripcionRespuesta.value = "Organismo Desconocido";
+			}
+			//if datado + certificació
+			if (tipoEntrega.equals(BigInteger.valueOf(2L))) {
+				certificacionOrganismo(
+						acusePDF,
+						organismoEmisor,
+						modoNotificacion,
+						identificador,
+						codigoRespuesta,
+						descripcionRespuesta);
 			}
 		} catch (DatatypeConfigurationException ex) {
 			codigoRespuesta.value = "004";
-			textoRespuesta.value = "Fecha incorrecta";
+			descripcionRespuesta.value = "Fecha incorrecta";
 		} catch (Exception ex) {
 			logger.error(
 					"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
-					"identificadorDestinatario=" + datadoOrganismo.getIdentificadorDestinatario() + ")",
+					"identificadorDestinatario=" + identificador + ")",
 					ex);
 			if (enviament != null) {
 				event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
 						enviament.getNotificacio()).
 						enviament(enviament).
-						descripcio(datadoOrganismo.getResultado()).
+						descripcio(estado).
 						error(true).
 						errorDescripcio(ExceptionUtils.getStackTrace(ex)).
 						build();
@@ -187,7 +217,7 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 						event);
 			}
 			codigoRespuesta.value = "666";
-			textoRespuesta.value = "Error procesando peticion";
+			descripcionRespuesta.value = "Error procesando peticion";
 		}
 		if (enviament != null) {
 			if (event == null) {
@@ -195,9 +225,9 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
 						enviament.getNotificacio()).
 						enviament(enviament).
-						descripcio(datadoOrganismo.getResultado()).
+						descripcio(estado).
 						error(true).
-						errorDescripcio("Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + textoRespuesta.value).
+						errorDescripcio("Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value).
 						build();
 				enviament.updateNotificaError(
 						true,
@@ -207,39 +237,50 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 		}
 	}
 
-	@Override
 	@Transactional
-	public void certificacionOrganismo(
-			CertificadoRequest certificacionOrganismo,
+	private void certificacionOrganismo(
+			Acuse acusePDF,
+			String organismoEmisor,
+			BigInteger modoNotificacion,
+			Holder<String> identificador,
 			Holder<String> codigoRespuesta,
-			Holder<String> textoRespuesta) {
+			Holder<String> descripcionRespuesta) {
 		NotificacioEnviamentEntity enviament = null;
 		NotificacioEventEntity event = null;
 		try {
-			if (certificacionOrganismo.getOrganismoEmisor() != null) {
-				EntitatEntity entitat = entitatRepository.findByDir3Codi(
-						certificacionOrganismo.getOrganismoEmisor());
+			if (acusePDF != null) {
+				EntitatEntity entitat = entitatRepository.findByDir3Codi(organismoEmisor);
 				if (entitat != null) {
 					enviament = notificacioEnviamentRepository.findByNotificacioEntitatAndNotificaIdentificador(
 							entitat,
-							certificacionOrganismo.getIdentificadorDestinatario());
+							identificador.value);
+					//Problema hibernate
+					if (enviament != null && enviament.getNotificacio() == null) {
+						NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
+						enviament.setNotificacio(notificacio);
+					}
 					if (enviament != null) {
+						if (enviament.getNotificaCertificacioArxiuId() != null) {
+							pluginHelper.gestioDocumentalDelete(
+									enviament.getNotificaCertificacioArxiuId(),
+									PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
+						}
 						//certificacionOrganismo.getHashSha1(); // Hash document certificacio
 						String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
 								PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
 								new ByteArrayInputStream(
 										Base64.decode(
-												certificacionOrganismo.getCertificacion().getBytes())));
+												acusePDF.getContenido())));
 						enviament.updateNotificaCertificacio(
 								new Date(),
 								gestioDocumentalId,
-								certificacionOrganismo.getHashSha1(), // hash
-								null, // origen
+								acusePDF.getHash(), // hash
+								getModoNotificacion(modoNotificacion), // origen
 								null, // metadades
-								null, // csv
+								acusePDF.getCsvResguardo(), // csv
 								null, // tipus mime
 								null, // tamany
-								NotificaCertificacioTipusEnumDto.toEnum(certificacionOrganismo.getAcuseOSobre()),
+								NotificaCertificacioTipusEnumDto.ACUSE,
 								NotificaCertificacioArxiuTipusEnumDto.PDF,
 								null); // núm. seguiment
 						event = NotificacioEventEntity.getBuilder(
@@ -249,35 +290,35 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 								callbackInicialitza().
 								build();
 						codigoRespuesta.value = "000";
-						textoRespuesta.value = "OK";
+						descripcionRespuesta.value = "OK";
 					} else {
 						logger.error(
 								"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
-								"identificadorDestinatario=" + certificacionOrganismo.getIdentificadorDestinatario() + "): " +
-								"No s'ha trobat cap destinatari de notificació amb l'identificador especificat (" + certificacionOrganismo.getIdentificadorDestinatario() + ").");
+								"identificadorDestinatario=" + identificador + "): " +
+								"No s'ha trobat cap destinatari de notificació amb l'identificador especificat (" + identificador + ").");
 						codigoRespuesta.value = "002";
-						textoRespuesta.value = "Identificador no encontrado";
+						descripcionRespuesta.value = "Identificador no encontrado";
 					}
 				} else {
 					logger.error(
 							"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
-							"identificadorDestinatario=" + certificacionOrganismo.getIdentificadorDestinatario() + "): " +
-							"No s'ha trobat cap entitat amb el codi DIR3 especificat (" + certificacionOrganismo.getOrganismoEmisor() + ").");
+							"identificadorDestinatario=" + identificador + "): " +
+							"No s'ha trobat cap entitat amb el codi DIR3 especificat (" + organismoEmisor + ").");
 					codigoRespuesta.value = "001";
-					textoRespuesta.value = "Organismo Desconocido";
+					descripcionRespuesta.value = "Organismo Desconocido";
 				}
 			} else {
 				logger.error(
 						"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
-						"identificadorDestinatario=" + certificacionOrganismo.getIdentificadorDestinatario() + "): " +
+						"identificadorDestinatario=" + identificador + "): " +
 						"No s'ha trobat el camp amb l'organisme emissor a dins la petició rebuda.");
 				codigoRespuesta.value = "001";
-				textoRespuesta.value = "Organismo Desconocido";
+				descripcionRespuesta.value = "Organismo Desconocido";
 			}
 		} catch (Exception ex) {
 			logger.error(
 					"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
-					"identificadorDestinatario=" + certificacionOrganismo.getIdentificadorDestinatario() + ")",
+					"identificadorDestinatario=" + identificador + ")",
 					ex);
 			if (enviament != null) {
 				event = NotificacioEventEntity.getBuilder(
@@ -292,7 +333,7 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 						event);
 			}
 			codigoRespuesta.value = "666";
-			textoRespuesta.value = "Error procesando peticion";
+			descripcionRespuesta.value = "Error procesando peticion";
 		}
 		if (enviament != null) {
 			if (event == null) {
@@ -301,7 +342,7 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 						enviament.getNotificacio()).
 						enviament(enviament).
 						error(true).
-						errorDescripcio("Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + textoRespuesta.value).
+						errorDescripcio("Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value).
 						build();
 				enviament.updateNotificaError(
 						true,
@@ -311,7 +352,27 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 		}
 	}
 
-
+	private String getModoNotificacion(BigInteger modo) {
+		String modoNotificacion = null;
+		switch (modo.intValue()) {
+		case 1:
+			modoNotificacion = "sede";
+			break;
+		case 2:
+			modoNotificacion = "funcionario_habilitado";
+			break;
+		case 3:
+			modoNotificacion = "postal";
+			break;
+		case 4:
+			modoNotificacion = "electronico";
+			break;
+		case 5:
+			modoNotificacion = "carpeta";
+			break;
+		}
+		return modoNotificacion;
+	}
 
 	private Date toDate(XMLGregorianCalendar calendar) throws DatatypeConfigurationException {
 		if (calendar == null) {
@@ -320,6 +381,6 @@ public class NotificaAdviserWsImpl implements AdviserWS {
 		return calendar.toGregorianCalendar().getTime();
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(NotificaAdviserWsImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(NotificaAdviserWsV2Impl.class);
 
 }

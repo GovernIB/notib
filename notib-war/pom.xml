@@ -244,17 +244,17 @@
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>notib-core</artifactId>
-					<version>${notib.version}</version>
+					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>notib-plugin-impl</artifactId>
-					<version>${notib.version}</version>
+					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>notib-lib-common</artifactId>
-					<version>${notib.version}</version>
+					<version>${project.version}</version>
 					<type>pom</type>
 				</dependency>
 				<!-- LIBRARIES TOMCAT -->

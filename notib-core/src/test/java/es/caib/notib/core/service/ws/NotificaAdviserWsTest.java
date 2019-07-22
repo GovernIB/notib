@@ -1,6 +1,9 @@
 package es.caib.notib.core.service.ws;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,12 +31,10 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import es.caib.notib.core.wsdl.adviser.AdviserWS;
-import es.caib.notib.core.wsdl.adviser.CertificadoRequest;
-import es.caib.notib.core.wsdl.adviser.DatadoRequest;
-import es.caib.notib.core.wsdl.adviser.OrganismoEmisor;
-import es.caib.notib.core.wsdl.adviser.ReceptorEnvio;
-
+import es.caib.notib.core.wsdl.adviser.Acuse;
+import es.caib.notib.core.wsdl.adviser.AdviserWsV2PortType;
+import es.caib.notib.core.wsdl.adviser.Opciones;
+import es.caib.notib.core.wsdl.adviser.Receptor;
 /** Prova del WS Adviser des de Notific@ que rep notificacions sobre
  * canvis d'estat de notificacions o de certificat.
  *
@@ -41,8 +42,8 @@ import es.caib.notib.core.wsdl.adviser.ReceptorEnvio;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class NotificaAdviserWsTest {
 	
-	private static final String ENDPOINT_ADDRESS = "http://localhost:8080/notib/ws/adviser";
-	private static final String EMISOR_DIR3 = "A04013511";
+	private static final String ENDPOINT_ADDRESS = "http://localhost:8180/notib/ws/adviserV2";
+	private static final String EMISOR_DIR3 = "EA0004518";
 	private static final String EMISOR_NOM = "Dirección General de Desarrollo Tecnológico";
 	private static final String CERIFICACIO_B64 = 
 			  "JVBERi0xLjQKJcOkw7zDtsOfCjIgMCBvYmoKPDwvTGVuZ3RoIDMgMCBSL0ZpbHRlci9GbGF0ZURl"
@@ -163,64 +164,75 @@ public class NotificaAdviserWsTest {
 	
 	@Test
 	public void a_datadoOrganismoTest() throws Exception {
-		AdviserWS ws = this.getWS();
-		
+		AdviserWsV2PortType ws = this.getWS();
+		Holder<String> codigoRespuesta = new Holder<String>();
+		Holder<String> descripcionRespuesta = new Holder<String>();
 		// Data
 		GregorianCalendar c = new GregorianCalendar();
 		c.setTime(new Date());
 		XMLGregorianCalendar date = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
 		
-		// Organisme emisor
-		OrganismoEmisor organisme = new OrganismoEmisor();
-		organisme.setCodigoDir3(EMISOR_DIR3);
-		organisme.setNombre(EMISOR_NOM);
-		
 		// Receptor enviament
-		ReceptorEnvio receptor = new ReceptorEnvio();
-		receptor.setNif("12345678Z");
-		receptor.setNombre("destinatariNom0 destLlinatge1_0 destLlinatge2_0");
+		Receptor receptor = new Receptor();
+		receptor.setNifReceptor("12345678Z");
+		receptor.setNombreReceptor("destinatariNom0 destLlinatge1_0 destLlinatge2_0");
 		
-		DatadoRequest datado = new DatadoRequest();
+		Acuse acusePDF = new Acuse();
 		
-		datado.setFecha(date);
-		datado.setIdentificadorDestinatario("59bf6af6cc3ee");
-		datado.setModo("correos_cie");
-		datado.setOrganismoEmisor(organisme);
-		datado.setReceptor(receptor);
-		datado.setResultado("notificada");
-		
+		acusePDF.setContenido(CERIFICACIO_B64.getBytes());
+		acusePDF.setCsvResguardo("dasd-dsadad-asdasd-asda-sda-das");
+		acusePDF.setHash(CERIFICACIO_SHA1);
 
-		ws.datadoOrganismo(
-				datado, 
-				new Holder<String>(), 
-				new Holder<String>());
+		Holder<Opciones> opcionesResultadoSincronizarEnvio = new Holder<Opciones>();
+		
+		Holder<String> identificador = new Holder<String>();
+		identificador.value = "39128285cf121cb00453";
+		
+		ws.sincronizarEnvio(
+				EMISOR_DIR3, 
+				identificador, 
+				new BigInteger("2"), 
+				new BigInteger("5"), 
+				"notificada", 
+				date, 
+				receptor, 
+				acusePDF, 
+				null, 
+				null, 
+				codigoRespuesta, 
+				descripcionRespuesta, 
+				opcionesResultadoSincronizarEnvio);
+		
+		assertNotNull(
+				descripcionRespuesta.value,
+				codigoRespuesta);
 	}
 	
-	@Test
-	public void b_certificacionOrganismoTest() throws Exception {
-		AdviserWS ws = this.getWS();
-		
-		CertificadoRequest certificado = new CertificadoRequest();
-		
-		certificado.setAcuseOSobre("acuse");
-		certificado.setCertificacion(CERIFICACIO_B64);
-		certificado.setHashSha1(CERIFICACIO_SHA1);
-		certificado.setIdentificadorDestinatario("59bf6af6cc3ee");
-		certificado.setOrganismoEmisor(EMISOR_DIR3);
-		
-		ws.certificacionOrganismo(
-				certificado, 
-				new Holder<String>(), 
-				new Holder<String>());
-	}
+//	@Test
+//	public void b_certificacionOrganismoTest() throws Exception {
+//		AdviserWS ws = this.getWS();
+//		
+//		CertificadoRequest certificado = new CertificadoRequest();
+//		
+//		certificado.setAcuseOSobre("acuse");
+//		certificado.setCertificacion(CERIFICACIO_B64);
+//		certificado.setHashSha1(CERIFICACIO_SHA1);
+//		certificado.setIdentificadorDestinatario("39128285cf121cb00453");
+//		certificado.setOrganismoEmisor(EMISOR_DIR3);
+//		
+//		ws.certificacionOrganismo(
+//				certificado, 
+//				new Holder<String>(), 
+//				new Holder<String>());
+//	}
 	
-	private AdviserWS getWS() throws Exception {
+	private AdviserWsV2PortType getWS() throws Exception {
 		URL url = new URL(ENDPOINT_ADDRESS + "?wsdl");
 		QName qname = new QName(
-				"https://administracionelectronica.gob.es/notifica/ws/notifica/1.0/",
-				"AdviserWSService");
+				"https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/",
+				"AdviserWsV2Service");
 		Service service = Service.create(url, qname);
-		AdviserWS backofficeWs = service.getPort(AdviserWS.class);
+		AdviserWsV2PortType backofficeWs = service.getPort(AdviserWsV2PortType.class);
 		BindingProvider bp = (BindingProvider)backofficeWs;
 		@SuppressWarnings("rawtypes")
 		List<Handler> handlerChain = new ArrayList<Handler>();
@@ -233,7 +245,7 @@ public class NotificaAdviserWsTest {
 				"admin");
 		bp.getRequestContext().put(
 				BindingProvider.PASSWORD_PROPERTY,
-				"admin15");
+				"admin");
 		 
 		return backofficeWs;
 	}
