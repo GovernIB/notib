@@ -35,7 +35,6 @@ public class Notificacio {
 	private PagadorCie pagadorCie;
 	private List<Enviament> enviaments;
 	private String procedimentCodi;
-	private ParametresSeu parametresSeu;
 
 	public String getEmisorDir3Codi() {
 		return emisorDir3Codi;
@@ -108,12 +107,6 @@ public class Notificacio {
 	}
 	public void setEnviaments(List<Enviament> enviaments) {
 		this.enviaments = enviaments;
-	}
-	public ParametresSeu getParametresSeu() {
-		return parametresSeu;
-	}
-	public void setParametresSeu(ParametresSeu parametresSeu) {
-		this.parametresSeu = parametresSeu;
 	}
 	public String getProcedimentCodi() {
 		return procedimentCodi;

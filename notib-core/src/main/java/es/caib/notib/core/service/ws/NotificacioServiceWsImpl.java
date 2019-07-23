@@ -201,8 +201,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				documentEntity,
 				pagadorPostal,
 				pagadorCie,
-				notificacio.getEnviaments(),
-				notificacio.getParametresSeu()).usuariCodi(usuariActual.getCodi());
+				notificacio.getEnviaments()).usuariCodi(usuariActual.getCodi());
 		
 		NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioBuilder.build());
 		List<EnviamentReferencia> referencies = new ArrayList<EnviamentReferencia>();
@@ -225,7 +224,6 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				}
 			}
 			NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
-//			NotificaDomiciliTipusEnumDto tipus = null;
 			NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
 			if (enviament.getEntregaPostal() != null) {
 				if (enviament.getEntregaPostal().getTipus() != null) {

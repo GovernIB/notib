@@ -29,6 +29,7 @@ public class ValidIfVisibleValidator implements ConstraintValidator<ValidIfVisib
 	     dependFieldName    = annotation.dependFieldName();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isValid(
 			final Object value, 

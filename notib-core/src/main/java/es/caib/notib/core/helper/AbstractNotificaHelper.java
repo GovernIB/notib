@@ -25,7 +25,6 @@ import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -52,197 +51,6 @@ public abstract class AbstractNotificaHelper {
 	public abstract boolean enviamentRefrescarEstat(
 			Long enviamentId) throws SistemaExternException;
 
-/*	
-	public boolean enviamentSeu(Long enviamentId) {
-		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
-		NotificacioEntity notificacio = enviament.getNotificacio();
-//		enviament.updateNotificaFiOperacio();
-		
-		if (NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
-//			try {
-//				SeuDocument fitxer = pluginHelper.obtenirJustificant(enviament);
-//				ArxiuDto certificacio = new ArxiuDto(
-//						fitxer.getArxiuNom(), 
-//						"application/pdf", 
-//						fitxer.getArxiuContingut(), 
-//						fitxer.getArxiuContingut().length);
-				return enviamentCertificacioSeu(enviamentId, null, null);
-//			} catch (Exception ex) {
-//				throw new SistemaExternException(
-//						IntegracioHelper.INTCODI_SEU,
-//						"Error al obtenir el justificant de la notificació de la Seu.",
-//						ex);
-//			}
-		} else {
-			return enviamentComunicacioSeu(enviamentId, null);
-		}
-		
-	}
-	
-	public boolean enviamentComunicacioSeu(
-			Long enviamentId,
-			Date comunicacioData) {
-		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
-		NotificacioEntity notificacio = enviament.getNotificacio();
-		NotificacioEventEntity event;
-		boolean error = false;
-		try {
-			ComunicacionSede comunicacionSede = new ComunicacionSede();
-			comunicacionSede.setIdentificadorDestinatario(enviament.getNotificaIdentificador());
-			Date fecha = enviament.getSeuDataFi();
-			if (fecha == null) {
-				fecha = comunicacioData != null ? comunicacioData : new Date();
-			}
-			comunicacionSede.setFecha(toXmlGregorianCalendar(fecha));
-			comunicacionSede.setOrganismoRemisor(notificacio.getEntitat().getDir3Codi());
-			ResultadoComunicacionSede resultadoComunicacion = getSedeWs().comunicacionSede(comunicacionSede);
-			if ("000".equals(resultadoComunicacion.getCodigoRespuesta())) {
-				event = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.SEU_NOTIFICA_COMUNICACIO,
-						notificacio).
-						enviament(enviament).
-						build();
-				notificacioEventRepository.save(event);
-				enviament.updateNotificaError(
-						false,
-						null);
-				enviament.updateSeuNotificaInformat();
-			} else {
-				event = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.SEU_NOTIFICA_COMUNICACIO,
-						notificacio).
-						enviament(enviament).
-						error(true).
-						errorDescripcio("Error retornat per notifica: [" + resultadoComunicacion.getCodigoRespuesta() + "] " + resultadoComunicacion.getDescripcionRespuesta()).
-						build();
-				enviament.updateNotificaError(
-						true,
-						event);
-				notificacioEventRepository.save(event);
-				error = true;
-			}
-		} catch (Exception ex) {
-			logger.error(
-					"Error al comunicar el canvi d'estat d'una notificació de la seu a Notifica (" +
-					"notificacioId=" + notificacio.getId() + ", " +
-					"notificaIdentificador=" + enviament.getNotificaIdentificador() + ")",
-					ex);
-			event = NotificacioEventEntity.getBuilder(
-					NotificacioEventTipusEnumDto.SEU_NOTIFICA_COMUNICACIO,
-					notificacio).
-					enviament(enviament).
-					error(true).
-					errorDescripcio(ExceptionUtils.getStackTrace(ex)).
-					build();
-			enviament.updateNotificaError(
-					true,
-					event);
-			notificacioEventRepository.save(event);
-			error = true;
-		}
-		enviament.updateNotificaFiOperacio();
-		notificacio.updateEventAfegir(event);
-		return !error;
-	}
-
-	public boolean enviamentCertificacioSeu(
-			Long enviamentId,
-			ArxiuDto certificacio,
-			Date certificacioData) {
-		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
-		NotificacioEntity notificacio = enviament.getNotificacio();
-		NotificacioEventEntity event;
-		boolean error = false;
-		try {
-			
-			if (certificacio == null) {
-				SeuDocument fitxer = pluginHelper.obtenirJustificant(enviament);
-				if (fitxer != null)
-					certificacio = new ArxiuDto(
-							fitxer.getArxiuNom(), 
-							"application/pdf", 
-							fitxer.getArxiuContingut(), 
-							fitxer.getArxiuContingut().length);
-			}
-			
-			CertificacionSede certificacionSede = new CertificacionSede();
-			certificacionSede.setEnvioDestinatario(enviament.getNotificaIdentificador());
-			if (SeuEstatEnumDto.LLEGIDA.equals(enviament.getSeuEstat())) {
-				certificacionSede.setEstado("notificada");
-			} else if (SeuEstatEnumDto.REBUTJADA.equals(enviament.getSeuEstat())) {
-				certificacionSede.setEstado("rehusada");
-			}
-			Date fecha = enviament.getSeuDataFi();
-			if (fecha == null) {
-				fecha = certificacioData != null ? certificacioData : new Date();
-			}
-			certificacionSede.setFecha(toXmlGregorianCalendar(fecha));
-			certificacionSede.setDocumento(
-					Base64.encodeBase64String(certificacio.getContingut()));
-			certificacionSede.setHashDocumento(
-					Base64.encodeBase64String(
-							Hex.decodeHex(
-									DigestUtils.sha1Hex(certificacio.getContingut()).toCharArray())));
-			//certificacionSede.setCsv(value);
-			certificacionSede.setOrganismoRemisor(notificacio.getEntitat().getDir3Codi());
-			ResultadoCertificacionSede resultadoCertificacion = getSedeWs().certificacionSede(certificacionSede);
-			if ("000".equals(resultadoCertificacion.getCodigoRespuesta())) {
-				event = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.SEU_NOTIFICA_CERTIFICACIO,
-						notificacio).
-						enviament(enviament).
-						build();
-				notificacioEventRepository.save(event);
-				enviament.updateSeuNotificaInformat();
-			} else {
-				event = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.SEU_NOTIFICA_CERTIFICACIO,
-						notificacio).
-						enviament(enviament).
-						error(true).
-						errorDescripcio("Error retornat per notifica: [" + resultadoCertificacion.getCodigoRespuesta() + "] " + resultadoCertificacion.getDescripcionRespuesta()).
-						build();
-				enviament.updateSeuError(
-						true,
-						event,
-						true);
-				notificacioEventRepository.save(event);
-			}
-		} catch (Exception ex) {
-			if (ex.getMessage() != null && ex.getMessage().contains("El envio ya esta comparecido")) {
-				event = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.SEU_NOTIFICA_CERTIFICACIO,
-						notificacio).
-						enviament(enviament).
-						build();
-				notificacioEventRepository.save(event);
-				enviament.updateSeuNotificaInformat();
-			} else {
-				logger.error(
-						"Error al enviar la certificació d'una notificació de la seu a Notifica (" +
-						"notificacioId=" + notificacio.getId() + ", " +
-						"notificaIdentificador=" + enviament.getNotificaIdentificador() + ")",
-						ex);
-				event = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.SEU_NOTIFICA_CERTIFICACIO,
-						notificacio).
-						enviament(enviament).
-						error(true).
-						errorDescripcio(ExceptionUtils.getStackTrace(ex)).
-						build();
-				enviament.updateSeuError(
-						true,
-						event,
-						true);
-				notificacioEventRepository.save(event);
-				error = true;
-			}
-		}
-		enviament.updateNotificaFiOperacio();
-		notificacio.updateEventAfegir(event);
-		return !error;
-	}
-*/
 	public String generarReferencia(NotificacioEnviamentEntity notificacioDestinatari) throws GeneralSecurityException {
 		return xifrarId(notificacioDestinatari.getId());
 	}
@@ -258,7 +66,7 @@ public abstract class AbstractNotificaHelper {
 	}
 
 	public boolean isConnexioNotificaDisponible() {
-		return getNotificaUrlProperty() != null && getApiKeyProperty() != null;
+		return getNotificaUrlProperty() != null;
 	}
 
 	public void setModeTest(boolean modeTest) {
@@ -347,7 +155,6 @@ public abstract class AbstractNotificaHelper {
 			NotificacioEnviamentEstatEnumDto.PENDENT_ENVIAMENT,
 			NotificacioEnviamentEstatEnumDto.PENDENT_CIE,
 			NotificacioEnviamentEstatEnumDto.PENDENT_DEH,
-			NotificacioEnviamentEstatEnumDto.PENDENT_SEU,
 			NotificacioEnviamentEstatEnumDto.REBUTJADA,
 			NotificacioEnviamentEstatEnumDto.EXPIRADA,
 			NotificacioEnviamentEstatEnumDto.ENVIAMENT_PROGRAMAT,
@@ -522,7 +329,7 @@ public abstract class AbstractNotificaHelper {
 
 		if (idXifrat.length() < 11) {
 			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_SEU,
+					IntegracioHelper.INTCODI_DADESEXT,
 					"La longitud mínima del identificar ha de ser 11 caràcters.");
 		}
 		
@@ -597,10 +404,6 @@ public abstract class AbstractNotificaHelper {
 	protected String getSedeUrlProperty() {
 		return PropertiesHelper.getProperties().getProperty(
 				"es.caib.notib.notifica.sede.url");
-	}
-	protected String getApiKeyProperty() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.notifica.apikey");
 	}
 	protected String getUsernameProperty() {
 		return PropertiesHelper.getProperties().getProperty(

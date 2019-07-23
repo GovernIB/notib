@@ -661,79 +661,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaError = notificaError;
 		this.notificacioErrorEvent = notificaErrorEvent;
 	}
-	/*
-	public void updateSeuEnviament(
-			String seuRegistreNumero,
-			Date seuRegistreData,
-			SeuEstatEnumDto seuEstat) {
-		this.seuRegistreNumero = seuRegistreNumero;
-		this.seuRegistreData = seuRegistreData;
-		this.seuEstat = seuEstat;
-		
-		if (this.seuRegistreNumero != null && SeuEstatEnumDto.ENVIADA.equals(this.seuEstat)) {
-			this.seuIntentData = new Date();
-			this.intentNum = 0;
-		}
-	}
-	public void updateSeuEstat(
-			Date seuDataFi,
-			SeuEstatEnumDto seuEstat) {
-		this.seuDataEstat = new Date();
-		this.seuDataFi = seuDataFi;
-		this.seuEstat = seuEstat;
-	}
-	public void updateSeuNotificaInformat() {
-		this.seuDataNotificaInformat = new Date();
-		this.seuDataNotificaDarreraPeticio = new Date();
-	}
-	public void updateSeuError(
-			boolean seuError,
-			NotificacioEventEntity seuErrorEvent,
-			boolean esNotificaPeticio) {
-		this.seuError = seuError;
-		this.seuErrorEvent = seuErrorEvent;
-		if (esNotificaPeticio) {
-			this.seuDataNotificaDarreraPeticio = new Date();
-		}
-	}
-	*/
-//	public void updateSeuNouEnviament(int reintentsPeriodeSeu) {
-//		this.intentNum++;
-//		Calendar cal = GregorianCalendar.getInstance();
-//		cal.add(Calendar.MILLISECOND, reintentsPeriodeSeu*(2^intentNum));
-//		this.seuIntentData = cal.getTime();
-//	}
-//	public void updateSeuNovaConsulta() {
-//		this.seuIntentData = new Date();
-//	}
-//	public void updateSeuConsultaError(int reintentsPeriodeSeu) {
-//		this.intentNum++;
-//		Calendar cal = GregorianCalendar.getInstance();
-//		cal.add(Calendar.MILLISECOND, reintentsPeriodeSeu*(2^intentNum));
-//		this.seuIntentData = cal.getTime();
-//	}
-	/*
-	public void updateSeuFitxer(
-			Long codi,
-			String clau) {
-		this.seuFitxerCodi = codi;
-		this.seuFitxerClau = clau;
-	}
-	public void updateSeuFiOperacio() {
-		this.seuIntentData = new Date();
-	}
-	public void updateSeuFiOperacio(boolean isError, Integer reintentPeriode) {
-		if (isError) {
-			this.intentNum++;
-			Calendar cal = GregorianCalendar.getInstance();
-			cal.add(Calendar.MILLISECOND, reintentPeriode*(2^intentNum));
-			this.seuIntentData = cal.getTime();
-		} else {
-			this.intentNum = 0;
-			this.seuIntentData = new Date();
-		}
-	}
-	*/
+	
 	public void updateNotificaFiOperacio() {
 		this.notificaIntentData = new Date();
 	}
@@ -811,82 +739,11 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 				ServeiTipusEnumDto serveiTipus,
 				NotificacioEntity notificacio) {
 			built = new NotificacioEnviamentEntity();
-//			built.titularNif = titularNif;
 			built.serveiTipus = serveiTipus;
 			built.notificacio = notificacio;
 			built.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
-			//built.seuEstat = SeuEstatEnumDto.PENDENT;
 			built.intentNum = 0;
-			// Definim la data en que s'ha d'enviar cap a la SEU
-			/* 
-			if (notificacio.getEnviamentDataProgramada() != null) {
-			 
-				built.seuIntentData = notificacio.getEnviamentDataProgramada();
-			} else {
-				built.seuIntentData = new Date();
-			}
-			*/
 		}
-//		public Builder titularNom(String titularNom) {
-//			built.titularNom = titularNom;
-//			return this;
-//		}
-//		public Builder titularLlinatge1(String titularLlinatge1) {
-//			built.titularLlinatge1 = titularLlinatge1;
-//			return this;
-//		}
-//		public Builder titularLlinatge2(String titularLlinatge2) {
-//			built.titularLlinatge2 = titularLlinatge2;
-//			return this;
-//		}
-//		public Builder titularRaoSocial(String titularRaoSocial) {
-//			built.titularRaoSocial = titularRaoSocial;
-//			return this;
-//		}
-//		public Builder titularCodiDesti(String titularCodiDesti) {
-//			built.titularCodiDesti = titularCodiDesti;
-//			return this;
-//		}
-//		public Builder titularTelefon(String titularTelefon) {
-//			built.titularTelefon = titularTelefon;
-//			return this;
-//		}
-//		public Builder titularEmail(String titularEmail) {
-//			built.titularEmail = titularEmail;
-//			return this;
-//		}
-//		public Builder destinatariNif(String destinatariNif) {
-//			built.destinatariNif = destinatariNif;
-//			return this;
-//		}
-//		public Builder destinatariNom(String destinatariNom) {
-//			built.destinatariNom = destinatariNom;
-//			return this;
-//		}
-//		public Builder destinatariLlinatge1(String destinatariLlinatge1) {
-//			built.destinatariLlinatge1 = destinatariLlinatge1;
-//			return this;
-//		}
-//		public Builder destinatariLlinatge2(String destinatariLlinatge2) {
-//			built.destinatariLlinatge2 = destinatariLlinatge2;
-//			return this;
-//		}
-//		public Builder destinatariRaoSocial(String destinatariRaoSocial) {
-//			built.destinatariRaoSocial = destinatariRaoSocial;
-//			return this;
-//		}
-//		public Builder destinatariCodiDesti(String destinatariCodiDesti) {
-//			built.destinatariCodiDesti = destinatariCodiDesti;
-//			return this;
-//		}
-//		public Builder destinatariTelefon(String destinatariTelefon) {
-//			built.destinatariTelefon = destinatariTelefon;
-//			return this;
-//		}
-//		public Builder destinatariEmail(String destinatariEmail) {
-//			built.destinatariEmail = destinatariEmail;
-//			return this;
-//		}
 		public Builder domiciliTipus(NotificaDomiciliTipusEnumDto domiciliTipus) {
 			built.domiciliTipus = domiciliTipus;
 			return this;
@@ -1048,9 +905,6 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built.domiciliLinea1 = enviament.getEntregaPostal().getLinea1();
 			built.domiciliLinea2 = enviament.getEntregaPostal().getLinea2();
 			built.domiciliCie = enviament.getEntregaPostal().getCie();
-//			built.formatSobre = enviament.getEntregaPostal().getFormatSobre();
-//			built.formatFulla = enviament.getEntregaPostal().getFormatFulla();
-
 			built.dehProcedimentCodi = enviament.getEntregaDeh().getProcedimentCodi();
 			built.dehObligat = enviament.getEntregaDeh().isObligat();			
 			

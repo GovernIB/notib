@@ -151,13 +151,6 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public Map<String, String> propertyFindByPrefix(String prefix);
 
-	/**
-	 * Indica la disponibilitat del plugin de seu electonica.
-	 * 
-	 * @return true si el plugin està configurat i disponible o false si no.
-	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
-	public boolean pluginSeuDisponible();
 	
 	/**
 	 * Modifica la configuració de l'usuari actual

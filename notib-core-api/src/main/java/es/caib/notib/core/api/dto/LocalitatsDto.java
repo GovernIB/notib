@@ -19,5 +19,9 @@ public class LocalitatsDto implements Serializable {
 		this.descripcio = descripcio;
 	}
 	
-	
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3032765440260385079L;
 }

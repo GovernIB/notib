@@ -37,18 +37,6 @@ public class NotificacioEnviamenEstatDto {
 	private boolean notificaError;
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
-	private String seuRegistreNumero;
-	private Date seuRegistreData;
-	private Date seuDataFi;
-	private SeuEstatEnumDto seuEstat;
-	private boolean seuError;
-	private Date seuErrorData;
-	private String seuErrorDescripcio;
-	private Date seuDataEnviament;
-	private int seuReintentsEnviament;
-	private Date seuDataEstat;
-	private Date seuDataNotificaInformat;
-	private Date seuDataNotificaDarreraPeticio;
 
 	public NotificacioEnviamentEstatEnumDto getNotificaEstat() {
 		return notificaEstat;
@@ -188,79 +176,6 @@ public class NotificacioEnviamenEstatDto {
 	public void setNotificaErrorDescripcio(String notificaErrorDescripcio) {
 		this.notificaErrorDescripcio = notificaErrorDescripcio;
 	}
-	public String getSeuRegistreNumero() {
-		return seuRegistreNumero;
-	}
-	public void setSeuRegistreNumero(String seuRegistreNumero) {
-		this.seuRegistreNumero = seuRegistreNumero;
-	}
-	public Date getSeuRegistreData() {
-		return seuRegistreData;
-	}
-	public void setSeuRegistreData(Date seuRegistreData) {
-		this.seuRegistreData = seuRegistreData;
-	}
-	public Date getSeuDataFi() {
-		return seuDataFi;
-	}
-	public void setSeuDataFi(Date seuDataFi) {
-		this.seuDataFi = seuDataFi;
-	}
-	public SeuEstatEnumDto getSeuEstat() {
-		return seuEstat;
-	}
-	public void setSeuEstat(SeuEstatEnumDto seuEstat) {
-		this.seuEstat = seuEstat;
-	}
-	public boolean isSeuError() {
-		return seuError;
-	}
-	public void setSeuError(boolean seuError) {
-		this.seuError = seuError;
-	}
-	public Date getSeuErrorData() {
-		return seuErrorData;
-	}
-	public void setSeuErrorData(Date seuErrorData) {
-		this.seuErrorData = seuErrorData;
-	}
-	public String getSeuErrorDescripcio() {
-		return seuErrorDescripcio;
-	}
-	public void setSeuErrorDescripcio(String seuErrorDescripcio) {
-		this.seuErrorDescripcio = seuErrorDescripcio;
-	}
-	public Date getSeuDataEnviament() {
-		return seuDataEnviament;
-	}
-	public void setSeuDataEnviament(Date seuDataEnviament) {
-		this.seuDataEnviament = seuDataEnviament;
-	}
-	public int getSeuReintentsEnviament() {
-		return seuReintentsEnviament;
-	}
-	public void setSeuReintentsEnviament(int seuReintentsEnviament) {
-		this.seuReintentsEnviament = seuReintentsEnviament;
-	}
-	public Date getSeuDataEstat() {
-		return seuDataEstat;
-	}
-	public void setSeuDataEstat(Date seuDataEstat) {
-		this.seuDataEstat = seuDataEstat;
-	}
-	public Date getSeuDataNotificaInformat() {
-		return seuDataNotificaInformat;
-	}
-	public void setSeuDataNotificaInformat(Date seuDataNotificaInformat) {
-		this.seuDataNotificaInformat = seuDataNotificaInformat;
-	}
-	public Date getSeuDataNotificaDarreraPeticio() {
-		return seuDataNotificaDarreraPeticio;
-	}
-	public void setSeuDataNotificaDarreraPeticio(Date seuDataNotificaDarreraPeticio) {
-		this.seuDataNotificaDarreraPeticio = seuDataNotificaDarreraPeticio;
-	}
-
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

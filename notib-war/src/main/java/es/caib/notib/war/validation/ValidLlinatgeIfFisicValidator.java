@@ -33,6 +33,7 @@ public class ValidLlinatgeIfFisicValidator implements ConstraintValidator<ValidL
 	     dependFieldName     = annotation.dependFieldName();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isValid(
 			final Object value, 

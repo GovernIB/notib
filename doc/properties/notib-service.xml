@@ -1,96 +1,101 @@
-	# ### -->
-	# Par� metres accés a base de dades -->
-	# ### -->
+<?xml version="1.0" encoding="UTF-8"?> 
+<server> 
+        <mbean code="org.jboss.varia.property.SystemPropertiesService" name="jboss:type=Service,name=NotibProperties"> 
+                <attribute name="Properties"> 
+
+					<!-- ### -->
+	<!-- ParÃ metres accÃ©s a base de dades -->
+	<!-- ### -->
 	es.caib.notib.datasource.jndi=jdbc/NotibDS
 	es.caib.notib.hibernate.dialect=es.caib.notib.core.dialect.NotibOracleDialect
 	es.caib.notib.hibernate.show_sql=true
 	es.caib.notib.hibernate.hbm2ddl.auto=none
 
-	# ### -->
-	# Envio de correus -->
-	# ### -->
+	<!-- ### -->
+	<!-- Envio de correus -->
+	<!--### -->
 	es.caib.notib.app.base.url=http://localhost:8080/notib
 	es.caib.notib.email.jndi=java:/comp/env/jdbc/NotibMail
 	es.caib.notib.email.remitent=no-reply@caib.es
 	es.caib.notib.email.footer= Notib - Govern de les Illes Balears
 	
-	# ### -->
-	# Emprar SIR o registre normal -->
-	# ### -->
+	<!--### -->
+	<!--Emprar SIR o registre normal -->
+	<!--### -->
 	es.caib.notib.emprar.sir=false
 	
-	# ### -->
-	# Enviament de correus -->
-	# ### -->
-	#es.caib.notib.email.jndi=mail/LimitSession -->
-	#es.caib.notib.email.remitent=notib@limit.es -->
+	<!--### -->
+	<!-- Enviament de correus -->
+	<!-- ## -->
+	<!-- es.caib.notib.email.jndi=mail/LimitSession -->
+	<!-- es.caib.notib.email.remitent=notib@limit.es -->
 
-	# Possibles valors: SINCRON, ASINCRON. Per defecte agafar� el valor de SINCRON -->
+	<!-- Possibles valors: SINCRON, ASINCRON. Per defecte agafarÃ el valor de SINCRON -->
 	es.caib.notib.comunicacio.tipus.defecte=SINCRON
-	# ### -->
-	# Execució de tasques periòdiques -->
-	# ### -->
+	<!-- ### -->
+	<!-- ExecuciÃ³ de tasques periÃ²diques -->
+	<!-- ### -->
 
-	# Enviament a Notifica -->
+	<!-- Enviament a Notifica -->
 	es.caib.notib.tasca.notifica.enviaments.periode=120000
 	es.caib.notib.tasca.notifica.enviaments.processar.max=10
 	es.caib.notib.tasca.notifica.enviaments.reintents.maxim=3
 	es.caib.notib.tasca.notifica.enviaments.retard.inicial=10000
 	
-	# Enviaments al registre
+	<!-- Enviaments al registre
 	es.caib.notib.tasca.registre.enviaments.periode=120000
 	es.caib.notib.tasca.registre.enviaments.processar.max=10
 	es.caib.notib.tasca.registre.enviaments.retard.inicial=10000
 	
 
-	# Enviament a Seu -->
+	<!-- Enviament a Seu -->
 	es.caib.notib.tasca.seu.enviaments.periode=120000
 	es.caib.notib.tasca.seu.enviaments.processar.max=10
 	es.caib.notib.tasca.seu.enviaments.reintents.maxim=3
 	es.caib.notib.tasca.seu.enviaments.retard.inicial=20000
 
-	# Consulta a Seu -->
+	<!-- Consulta a Seu -->
 	es.caib.notib.tasca.seu.consulta.periode=120000
 	es.caib.notib.tasca.seu.consulta.processar.max=10
 	es.caib.notib.tasca.seu.consulta.retard.inicial=30000
 
-	# Informa notifica canvi estat de la Seu -->
+	<!-- Informa notifica canvi estat de la Seu -->
 	es.caib.notib.tasca.notifica.enviament.estat.seu.periode=300000
 	es.caib.notib.tasca.notifica.enviament.estat.seu.processar.max=10
 	es.caib.notib.tasca.notifica.enviament.estat.seu.retard.inicial=40000
 
-	# Refresca estat de la notificació consultat notifica -->
+	<!-- Refresca estat de la notificaciÃ³ consultat notifica -->
 	es.caib.notib.tasca.enviament.actualitzacio.estat.periode=300000
 	es.caib.notib.tasca.enviament.actualitzacio.estat.processar.max=10
 	es.caib.notib.tasca.enviament.actualitzacio.estat.retard.inicial=50000
 
-	# Enviament a Seu -->
+	<!-- Enviament a Seu -->
 	es.caib.notib.tasca.callback.pendents.periode=300000
 	es.caib.notib.tasca.callback.pendents.processar.max=50
 	es.caib.notib.tasca.callback.pendents.retard.inicial=60000
 	es.caib.notib.tasca.callback.pendents.notifica.events.intents.max=10
 
 
-	# ### -->
-	# Connexió amb Notific@ -->
-	# ### -->
-	#es.caib.notib.notifica.versio=1 -->
-	#es.caib.notib.notifica.url=https://se-notificaws.redsara.es:1443/ws/soap/NotificaWS -->
+	<!-- ### -->
+	<!-- ConnexiÃ³ amb Notific@ -->
+	<!-- ### -->
+	<!-- es.caib.notib.notifica.versio=1 -->
+	<!-- es.caib.notib.notifica.url=https://se-notificaws.redsara.es:1443/ws/soap/NotificaWS -->
 	es.caib.notib.notifica.versio=2
 	es.caib.notib.notifica.url=https://se-notificaws.redsara.es:1443/ws/notificaWsV21
-	#es.caib.notib.notifica.url=http://localhost:8088/mockNotificaWsPortBinding -->
-	#es.caib.notib.notifica.enviament.sincron=true -->
+	<!-- es.caib.notib.notifica.url=http://localhost:8088/mockNotificaWsPortBinding -->
+	<!-- es.caib.notib.notifica.enviament.sincron=true -->
 	es.caib.notib.notifica.sede.url=https://se-notificaws.redsara.es:1443/ws/soap/SedeWs
 
-	# ### -->
-	# Plugin de gestió documental -->
-	# ### -->
+	<!-- ### <!-- >
+	<!-- Plugin de gestiÃ³ documental -->
+	<!-- ### -->
 	es.caib.notib.plugin.gesdoc.class=es.caib.notib.plugin.gesdoc.GestioDocumentalPluginFilesystem
 	es.caib.notib.plugin.gesdoc.filesystem.base.dir=/opt/
 
-	# ### -->
-	# Plugin de dades d'usuari -->
-	# ### -->
+	<!-- ### -->
+	<!-- Plugin de dades d'usuari -->
+	<!-- ### -->
 	es.caib.notib.plugin.dades.usuari.class=es.caib.notib.plugin.usuari.DadesUsuariPluginJdbc
 	es.caib.notib.plugin.dades.usuari.jdbc.datasource.jndi.name=java:/comp/env/jdbc/UsuarisDS
 	es.caib.notib.plugin.dades.usuari.jdbc.query.codi=select usu_codi, usu_nom, usu_nif, usu_codi||'@limit.es' from sc_wl_usuari where usu_codi=:codi
@@ -109,9 +114,9 @@
 	#es.caib.distribucio.plugin.dades.usuari.ldap.excloure.grup=
 	#es.caib.distribucio.plugin.dades.usuari.ldap.excloure.membre=
 
-	# ### -->
-	# Tests -->
-	# ### -->
+	<!-- ### -->
+	<!-- Tests -->
+	<!-- ### -->
 	es.caib.notib.test.db.driver=org.hsqldb.jdbcDriver
 	es.caib.notib.test.db.url=jdbc:hsqldb:hsql://localhost:9001
 	es.caib.notib.test.db.username=sa
@@ -122,9 +127,9 @@
 	com.sun.xml.ws.transport.http.HttpAdapter.dump=true
 	com.sun.xml.internal.ws.transport.http.HttpAdapter.dump=true
 	
-	 # Pluguin Registre
-	 # ###
-	 # WS
+	 <!-- Pluguin Registre -->
+	 <!-- ### -->
+	 <!-- WS -->
 	 es.caib.notib.plugin.registre.class=es.caib.notib.plugin.registre.RegistrePluginRegweb3Impl
 	 es.caib.notib.plugin.registre.url=http://localhost:8080/regweb3/ws/v3
 	 es.caib.notib.plugin.registre.namespaceuri=urn:es:caib:regweb:ws:v1:services
@@ -133,9 +138,9 @@
 	 es.caib.notib.plugin.registre.usuari=USUARI_REGWEB
 	 es.caib.notib.plugin.registre.password=CONTRASENYA_REGWEB
 	 
-	 # Pluguin arxiu
-	 # ###
-	 # WS
+	 <!-- Pluguin arxiu -->
+	 <!-- ### -->
+	 <!-- WS -->
 	 es.caib.notib.plugin.arxiu.caib.afirmaBaseurl=https://afirmades.caib.es:4430/afirmaws/services
 	 es.caib.notib.plugin.arxiu.class=es.caib.plugins.arxiu.caib.ArxiuPluginCaib
 	 es.caib.notib.plugin.arxiu.caib.base.url=https://afirmades.caib.es:4430/esb
@@ -150,18 +155,26 @@
 	 es.caib.notib.plugin.arxiu.caib.timeout.connect=20000
 	 es.caib.notib.plugin.arxiu.caib.timeout.read=20000
 	 
-	 # Aspecte defecte
-	 # ###
+	 <!-- Aspecte defecte -->
+	 <!-- ### -->
 	 es.caib.notib.capsalera.logo=
 	 es.caib.notib.peu.logo=
 	 es.caib.notib.capsalera.color.fons=
 	 es.caib.notib.capsalera.color.lletra=
 	 
-	 # Pluguin dir3caib
-	 # ###
-	 # REST / WS
+	 <!-- Pluguin dir3caib -->
+	 <!-- ### -->
+	 <!-- REST / WS -->
 	 es.caib.notib.plugin.unitats.class=es.caib.notib.plugin.unitat.UnitatsOrganitzativesPluginDir3
 	 es.caib.notib.plugin.unitats.dir3.url=https://localhost:8080/dir3caib
  	 es.caib.notib.plugin.unitats.dir3.username=
 	 es.caib.notib.plugin.unitats.dir3.password=
 	 
+	 es.caib.notib.titular.incapacitat=true
+	 es.caib.notib.destinatari.multiple=false	
+	 
+	
+
+                </attribute> 
+        </mbean> 
+</server>

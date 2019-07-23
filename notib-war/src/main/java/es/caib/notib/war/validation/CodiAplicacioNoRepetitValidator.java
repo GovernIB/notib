@@ -39,6 +39,7 @@ public class CodiAplicacioNoRepetitValidator implements ConstraintValidator<Codi
 		request = attr.getRequest();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isValid(
 			final Object value, 

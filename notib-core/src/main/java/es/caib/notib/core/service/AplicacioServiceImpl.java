@@ -215,12 +215,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 		return PropertiesHelper.getProperties().findByPrefix(prefix);
 	}
 
-	@Override
-	public boolean pluginSeuDisponible() {
-		logger.debug("Consulta de la disponibilidad del plugin de seu electrònica");
-		return pluginHelper.isSeuPluginDisponible();
-	}
-
 	private Properties getVersionProperties() throws IOException {
 		if (versionProperties == null) {
 			versionProperties = new Properties();

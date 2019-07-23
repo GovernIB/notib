@@ -11,6 +11,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,7 +32,6 @@ import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
 import es.caib.notib.core.api.ws.notificacio.PagadorCie;
 import es.caib.notib.core.api.ws.notificacio.PagadorPostal;
-import es.caib.notib.core.api.ws.notificacio.ParametresSeu;
 import es.caib.notib.core.api.ws.notificacio.Persona;
 
 public class RestAltaNotificacio {
@@ -46,7 +46,7 @@ public class RestAltaNotificacio {
 			ex.printStackTrace();
 		}
 	}
-
+	@Test
 	private void testAlta() throws JsonProcessingException, IOException, DecoderException {
 		Client jerseyClient = new Client();
 		ObjectMapper mapper  = new ObjectMapper();
@@ -70,7 +70,7 @@ public class RestAltaNotificacio {
 		System.out.println(
 				">>> Resposta HTTP JSON: " + response.getEntity(String.class));
 	}
-
+	@Test
 	private void testAltaV2() throws JsonProcessingException, IOException, DecoderException {
 		Client jerseyClient = new Client();
 		ObjectMapper mapper  = new ObjectMapper();
@@ -189,32 +189,6 @@ public class RestAltaNotificacio {
 			enviaments.add(enviament);
 		}
 		notificacio.setEnviaments(enviaments);
-		ParametresSeu parametresSeu = new ParametresSeu();
-		parametresSeu.setExpedientSerieDocumental(
-				"0000S");
-		parametresSeu.setExpedientUnitatOrganitzativa(
-				"00000000T");
-		parametresSeu.setExpedientIdentificadorEni(
-				"seuExpedientIdentificadorEni_" + notificacioId);
-		parametresSeu.setExpedientTitol(
-				"seuExpedientTitol_" + notificacioId);
-		parametresSeu.setRegistreOficina(
-				"seuRegistreOficina_" + notificacioId);
-		parametresSeu.setRegistreLlibre(
-				"seuRegistreLlibre_" + notificacioId);
-		parametresSeu.setIdioma(
-				"seuIdioma_" + notificacioId);
-		parametresSeu.setAvisTitol(
-				"seuAvisTitol_" + notificacioId);
-		parametresSeu.setAvisText(
-				"seuAvisText_" + notificacioId);
-		parametresSeu.setAvisTextMobil(
-				"seuAvisTextMobil_" + notificacioId);
-		parametresSeu.setOficiTitol(
-				"seuOficiTitol_" + notificacioId);
-		parametresSeu.setOficiText(
-				"seuOficiText_" + notificacioId);
-		notificacio.setParametresSeu(parametresSeu);
 		return notificacio;
 	}
 	

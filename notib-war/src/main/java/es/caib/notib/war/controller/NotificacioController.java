@@ -717,7 +717,6 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("pipellaActiva", pipellaActiva);
 		NotificacioEnviamentDto enviament = enviamentService.enviamentFindAmbId(enviamentId);
 		model.addAttribute("enviament", enviament);
-		model.addAttribute("pluginSeuDisponible", aplicacioService.pluginSeuDisponible());
 		model.addAttribute("eventTipus", EnumHelper.getOptionsForEnum(NotificacioEventTipusEnumDto.class,
 				"es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
 	}

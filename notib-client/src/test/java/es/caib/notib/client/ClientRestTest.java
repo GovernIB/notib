@@ -77,13 +77,6 @@ public class ClientRestTest extends ClientBaseTest {
 		assertEquals(
 				NotificacioEstatEnum.ENVIADA,
 				respostaAlta.getEstat());
-		/*RespostaConsultaEstatEnviament respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencies.get(0).getReferencia());
-		assertNotNull(respostaConsultaEstatEnviament);
-		assertFalse(respostaConsultaEstatEnviament.isError());
-		assertNull(respostaConsultaEstatEnviament.getErrorDescripcio());
-		assertEquals(
-				EnviamentEstatEnum.PENDENT_SEU,
-				respostaConsultaEstatEnviament.getEstat());*/
 	}
 	
 

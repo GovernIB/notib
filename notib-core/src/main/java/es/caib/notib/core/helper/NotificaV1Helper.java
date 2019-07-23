@@ -813,7 +813,7 @@ public class NotificaV1Helper extends AbstractNotificaHelper {
 				getUsernameProperty(),
 				getPasswordProperty(),
 				NotificaWsPortType.class,
-				new ApiKeySOAPHandlerV1(getApiKeyProperty()),
+				new ApiKeySOAPHandlerV1(""),
 				/*new FirmaSOAPHandler(
 						getKeystorePathProperty(),
 						getKeystoreTypeProperty(),

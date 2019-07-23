@@ -330,9 +330,6 @@ public class CallbackHelper {
 //		case PENDENT_ENVIAMENT:
 //			estat = NotificacioDestinatariEstatEnum.PENDENT_ENVIAMENT;
 //			break;
-//		case PENDENT_SEU:
-//			estat = NotificacioDestinatariEstatEnum.PENDENT_SEU;
-//			break;
 //		case REBUTJADA:
 //			estat = NotificacioDestinatariEstatEnum.REBUTJADA;
 //			break;

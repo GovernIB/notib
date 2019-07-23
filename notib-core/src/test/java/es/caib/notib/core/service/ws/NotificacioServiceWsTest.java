@@ -46,7 +46,6 @@ import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWs;
 import es.caib.notib.core.api.ws.notificacio.PagadorCie;
 import es.caib.notib.core.api.ws.notificacio.PagadorPostal;
-import es.caib.notib.core.api.ws.notificacio.ParametresSeu;
 import es.caib.notib.core.api.ws.notificacio.Persona;
 import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
@@ -325,32 +324,6 @@ public class NotificacioServiceWsTest extends BaseServiceTest {
 			enviaments.add(enviament);
 		}
 		notificacio.setEnviaments(enviaments);
-		ParametresSeu parametresSeu = new ParametresSeu();
-		parametresSeu.setExpedientSerieDocumental(
-				"0000S");
-		parametresSeu.setExpedientUnitatOrganitzativa(
-				"00000000T");
-		parametresSeu.setExpedientIdentificadorEni(
-				"seuExpedientIdentificadorEni_" + notificacioId);
-		parametresSeu.setExpedientTitol(
-				"seuExpedientTitol_" + notificacioId);
-		parametresSeu.setRegistreOficina(
-				"seuRegistreOficina_" + notificacioId);
-		parametresSeu.setRegistreLlibre(
-				"seuRegistreLlibre_" + notificacioId);
-		parametresSeu.setIdioma(
-				"seuIdioma_" + notificacioId);
-		parametresSeu.setAvisTitol(
-				"seuAvisTitol_" + notificacioId);
-		parametresSeu.setAvisText(
-				"seuAvisText_" + notificacioId);
-		parametresSeu.setAvisTextMobil(
-				"seuAvisTextMobil_" + notificacioId);
-		parametresSeu.setOficiTitol(
-				"seuOficiTitol_" + notificacioId);
-		parametresSeu.setOficiText(
-				"seuOficiText_" + notificacioId);
-		notificacio.setParametresSeu(parametresSeu);
 		return notificacio;
 	}
 

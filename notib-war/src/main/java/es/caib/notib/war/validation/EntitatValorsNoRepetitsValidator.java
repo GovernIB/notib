@@ -40,6 +40,7 @@ public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<Ent
 		request = attr.getRequest();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isValid(
 			final Object value, 
