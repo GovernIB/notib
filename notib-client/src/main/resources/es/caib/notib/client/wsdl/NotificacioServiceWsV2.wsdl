@@ -82,6 +82,7 @@
 <xs:sequence>
 <xs:element minOccurs="0" name="dir3Codi" type="xs:string" />
 <xs:element minOccurs="0" name="email" type="xs:string" />
+<xs:element name="incapacitat" type="xs:boolean" />
 <xs:element minOccurs="0" name="interessatTipus" type="tns:interessatTipusEnumDto" />
 <xs:element minOccurs="0" name="llinatge1" type="xs:string" />
 <xs:element minOccurs="0" name="llinatge2" type="xs:string" />

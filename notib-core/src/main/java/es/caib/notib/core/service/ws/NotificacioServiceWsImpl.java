@@ -303,32 +303,32 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			enviament.getTitular();
 		}
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
-			for(NotificacioEnviamentEntity enviament : notificacioGuardada.getEnviaments()) {
-//				AsientoRegistralBean arb = pluginHelper.notificacioToAsientoRegistralBean(notificacioGuardada);
-//				RespostaConsultaRegistre arbResposta = null;
-				if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioGuardada.getEnviamentTipus())/*Administracio*/) {
-					//Regweb3 + SIR
-//					arbResposta = pluginHelper.registreSortidaAsientoRegistral(entitat.getDir3Codi(), notificacioGuardada, enviament, 1L);
-//					if(arbResposta.getEstado().equals(EstatRegistre.DISTRIBUIT.geValorLong())) {
-//						
-//					}else if(arbResposta.getEstado().equals(EstatRegistre.OFICI_EXTERN.geValorLong())) {
-//						JustificanteWs justificant = pluginHelper.obtenerJustificante(entitat.getDir3Codi(), arbResposta.getNumeroRegistroFormateado(), arbResposta.getLibroCodigo(), 2L);
-//					}else if(arbResposta.getEstado().equals(EstatRegistre.OFICI_SIR.geValorLong())) {
-//						OficioBean oficiExtern = pluginHelper.obtenerOficioExterno(entitat.getDir3Codi(), arbResposta.getNumeroRegistroFormateado(), arbResposta.getLibroCodigo());
+//			for(NotificacioEnviamentEntity enviament : notificacioGuardada.getEnviaments()) {
+////				AsientoRegistralBean arb = pluginHelper.notificacioToAsientoRegistralBean(notificacioGuardada);
+////				RespostaConsultaRegistre arbResposta = null;
+//				if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioGuardada.getEnviamentTipus())/*Administracio*/) {
+//					//Regweb3 + SIR
+////					arbResposta = pluginHelper.registreSortidaAsientoRegistral(entitat.getDir3Codi(), notificacioGuardada, enviament, 1L);
+////					if(arbResposta.getEstado().equals(EstatRegistre.DISTRIBUIT.geValorLong())) {
+////						
+////					}else if(arbResposta.getEstado().equals(EstatRegistre.OFICI_EXTERN.geValorLong())) {
+////						JustificanteWs justificant = pluginHelper.obtenerJustificante(entitat.getDir3Codi(), arbResposta.getNumeroRegistroFormateado(), arbResposta.getLibroCodigo(), 2L);
+////					}else if(arbResposta.getEstado().equals(EstatRegistre.OFICI_SIR.geValorLong())) {
+////						OficioBean oficiExtern = pluginHelper.obtenerOficioExterno(entitat.getDir3Codi(), arbResposta.getNumeroRegistroFormateado(), arbResposta.getLibroCodigo());
+////					}
+//				} else {
+//					//Regweb3 + Notifica
+//					try {
+////						arbResposta = pluginHelper.comunicarAsientoRegistral(entitat.getDir3Codi(), arb, 1L);
+////						notificacio.setRegistreNumero(arbResposta.getNumeroRegistroFormateado());
+////						notificacio.setRegistreData(arbResposta.getFechaRegistro().toGregorianCalendar().getTime());
+//						notificaHelper.notificacioEnviar(notificacioGuardada.getId());
+//						notificacioGuardada = notificacioRepository.findById(notificacioGuardada.getId());
+//					} catch (Exception e) {
+//						e.printStackTrace();
 //					}
-				} else {
-					//Regweb3 + Notifica
-					try {
-//						arbResposta = pluginHelper.comunicarAsientoRegistral(entitat.getDir3Codi(), arb, 1L);
-//						notificacio.setRegistreNumero(arbResposta.getNumeroRegistroFormateado());
-//						notificacio.setRegistreData(arbResposta.getFechaRegistro().toGregorianCalendar().getTime());
-						notificaHelper.notificacioEnviar(notificacioGuardada.getId());
-						notificacioGuardada = notificacioRepository.findById(notificacioGuardada.getId());
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
+//				}
+//			}
 		}
 		try {
 			resposta.setIdentificador(
@@ -347,6 +347,14 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			break;
 		case FINALITZADA:
 			resposta.setEstat(NotificacioEstatEnum.FINALITZADA);
+			break;
+		case PROCESSADA:
+			resposta.setEstat(NotificacioEstatEnum.PROCESSADA);
+			break;
+		case REGISTRADA:
+			resposta.setEstat(NotificacioEstatEnum.REGISTRADA);
+			break;
+		default:
 			break;
 		}
 		if (notificacioGuardada.getNotificaErrorEvent() != null) {
