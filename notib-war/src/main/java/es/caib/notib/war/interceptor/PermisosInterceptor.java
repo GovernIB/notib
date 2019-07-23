@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.helper.PermisosHelper;
 
@@ -24,6 +25,8 @@ public class PermisosInterceptor extends HandlerInterceptorAdapter {
 	private ProcedimentService procedimentService;
 	@Autowired
 	private AplicacioService aplicacioService;
+	@Autowired
+	private NotificacioService notificacioService;
 	
 	@Override
 	public boolean preHandle(
@@ -34,6 +37,7 @@ public class PermisosInterceptor extends HandlerInterceptorAdapter {
 		PermisosHelper.comprovarPermisosProcedimentsUsuariActual(
 				request,
 				procedimentService,
+				notificacioService,
 				aplicacioService);
 		return true;
 	}

@@ -127,7 +127,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"     NotificacioEntity ntf " +
 			"where " +
 			"    (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
-			//"and (ntf.proc_codi_notib in (:procedimentsCodisNotib))" +
+			"and (ntf.procedimentCodiNotib in (:procedimentsCodisNotib))" +
 			"and (:entitat = ntf.entitat) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
@@ -146,6 +146,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	public Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotib(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
+			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
 			@Param("isEnviamentTipusNull") boolean isEnviamentTipusNull,
 			@Param("enviamentTipus") NotificaEnviamentTipusEnumDto enviamentTipus,
 			@Param("isConcepteNull") boolean isConcepteNull,

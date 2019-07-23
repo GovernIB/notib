@@ -14,6 +14,7 @@ import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 
 /**
@@ -27,13 +28,15 @@ public class PermisosHelper {
 	public static void comprovarPermisosProcedimentsUsuariActual(
 			HttpServletRequest request,
 			ProcedimentService procedimentService,
+			NotificacioService notificacioService,
 			AplicacioService aplicacioService) { 
 		
 		if (RolHelper.isUsuariActualUsuari(request)) {
 			UsuariDto usuariActual = aplicacioService.getUsuariActual();
 			EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 			List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
-			
+			List<ProcedimentDto> procedimentsPermisConsultaSenseGrups = new ArrayList<ProcedimentDto>();
+			List<ProcedimentDto> procedimentsSenseGrups = new ArrayList<ProcedimentDto>();
 			List<ProcedimentGrupDto> grupsProcediment = procedimentService.findAllGrups();
 			List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
 			//Obté els procediments que tenen el mateix grup que el rol d'usuari
@@ -49,25 +52,24 @@ public class PermisosHelper {
 			}
 			//Comprova quins permisos té aquest usuari sobre els procediments amb grups
 			if(!procediments.isEmpty()) {
-//				request.setAttribute(
-//						"permisConsulta", 
-//						procedimentService.hasGrupPermisConsultaProcediment(
-//								procediments,
-//								entitatActual));
 				request.setAttribute(
 						"permisNotificacio", 
 						procedimentService.hasGrupPermisNotificacioProcediment(
 								procediments,
 								entitatActual));
 			}
-			//Comprova quins permisos té aquest usuari sobre els procediments sense grups
-			if ((!grupsProcediment.isEmpty() && procediments.isEmpty()) || (grupsProcediment.isEmpty())) {
-//				request.setAttribute(
-//						"permisConsulta", 
-//						procedimentService.hasPermisConsultaProcediment(entitatActual));
-				request.setAttribute(
-						"permisNotificacio", 
-						procedimentService.hasPermisNotificacioProcediment(entitatActual));
+			// Procediments sense grups però amb perís consulta
+			procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups();
+
+			if (!procedimentsSenseGrups.isEmpty()) {
+				procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
+								procedimentsSenseGrups,
+								entitatActual);
+				if (!procedimentsPermisConsultaSenseGrups.isEmpty()) {
+					request.setAttribute(
+							"permisNotificacio", 
+							procedimentService.hasPermisNotificacioProcediment(entitatActual));
+				}
 			}
 		}
 	}

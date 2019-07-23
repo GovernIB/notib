@@ -474,6 +474,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotib(
 							filtre.getEntitatId() == null,
 							filtre.getEntitatId(),
+							procedimentsCodisNotib,
 							filtre.getEnviamentTipus() == null,
 							filtre.getEnviamentTipus(),
 							filtre.getConcepte() == null,
