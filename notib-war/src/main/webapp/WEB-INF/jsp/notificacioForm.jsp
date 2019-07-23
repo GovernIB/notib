@@ -541,7 +541,20 @@ function mostrarDestinatari(enviament_id) {
     }
 }
 
+function mostrarEntregaDeh(className) {
+    var element = document.getElementById(className);
+    var parent = $(element).closest(".enviamentsForm");
+    var classParent = $(parent).attr('class');
 
+    var enviament_id_num = className.substring(className.lastIndexOf('[') + 1, className.lastIndexOf(']'));
+    if($('.entregaDeh_'+enviament_id_num).css('display') != 'none') {
+        $('#entregaDehAmagat').attr('value', 'false');
+        $('.entregaDeh_'+enviament_id_num).hide();
+    } else {
+        $('#entregaDehAmagat').attr('value', 'true');
+        $('.entregaDeh_'+enviament_id_num).show();
+    }
+}
 </script>
 </head>
 <body>
