@@ -132,7 +132,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
 			"and (:isEstatNull = true or ntf.estat = :estat) " +
-			"and (:isDatesNull = true or ntf.createdDate between :dataInici and :dataFi) " +
+			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
+			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) "+
 			"and (:isProcedimentNull = true or ntf.procediment = :procediment) " +
 			"and (:isTitularNull = true or (" +
 			"    select count(env.id) " +
@@ -151,8 +152,9 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") NotificacioEstatEnumDto estat,
-			@Param("isDatesNull") boolean isDatesNull,
+			@Param("isDataIniciNull") boolean isDataIniciNull,
 			@Param("dataInici") Date dataInici,
+			@Param("isDataFiNull") boolean isDataFiNull,
 			@Param("dataFi") Date dataFi,
 			@Param("isTitularNull") boolean isTitularNull,
 			@Param("titular") String titular,
@@ -170,7 +172,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
 			"and (:isEstatNull = true or ntf.estat = :estat) " +
-			"and (:isDatesNull = true or ntf.createdDate between :dataInici and :dataFi) " +
+			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
+			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) "+
 			"and (:isProcedimentNull = true or ntf.procediment = :procediment) " +
 			"and (:isTitularNull = true or (" +
 			"    select count(env.id) " +
@@ -189,8 +192,9 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") NotificacioEstatEnumDto estat,
-			@Param("isDatesNull") boolean isDatesNull,
+			@Param("isDataIniciNull") boolean isDataIniciNull,
 			@Param("dataInici") Date dataInici,
+			@Param("isDataFiNull") boolean isDataFiNull,
 			@Param("dataFi") Date dataFi,
 			@Param("isTitularNull") boolean isTitularNull,
 			@Param("titular") String titular,

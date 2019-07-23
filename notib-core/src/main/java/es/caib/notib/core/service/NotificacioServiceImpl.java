@@ -457,7 +457,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			Date dataFi = filtre.getDataFi();
 			if (dataFi != null) {
 				Calendar cal = Calendar.getInstance();
-				cal.setTime(dataInici);
+				cal.setTime(dataFi);
 				cal.set(Calendar.HOUR, 0);
 				cal.set(Calendar.MINUTE, 0);
 				cal.set(Calendar.SECOND, 0);
@@ -479,8 +479,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getConcepte() == null,
 							filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
 							filtre.getEstat() == null,
-							filtre.getEstat(), dataInici == null && dataFi == null,
+							filtre.getEstat(), 
+							dataInici == null,
 							dataInici,
+							dataFi == null,
 							dataFi,
 							filtre.getTitular() == null || filtre.getTitular().isEmpty(),
 							filtre.getTitular() == null ? "" : filtre.getTitular(),
@@ -501,8 +503,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 						filtre.getConcepte(),
 						filtre.getEstat() == null,
 						filtre.getEstat(),
-						dataInici == null && dataFi == null,
+						dataInici == null,
 						dataInici,
+						dataFi == null,
 						dataFi,
 						filtre.getTitular() == null || filtre.getTitular().isEmpty(),
 						filtre.getTitular(),
@@ -521,8 +524,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 						filtre.getConcepte(),
 						filtre.getEstat() == null,
 						filtre.getEstat(),
-						dataInici == null && dataFi == null,
+						dataInici == null,
 						dataInici,
+						dataFi == null,
 						dataFi,
 						filtre.getTitular() == null || filtre.getTitular().isEmpty(),
 						filtre.getTitular(),
@@ -789,7 +793,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Transactional
 	@Override
-	public List<RegistreIdDto> registrar(Long notificacioId) {
+	public List<RegistreIdDto> registrarNotificar(Long notificacioId) {
 		logger.debug("Intentant registrar la notificació pendent (" +
 				"notificacioId=" + notificacioId + ")");
 		List<RegistreIdDto> registresIdDto = new ArrayList<RegistreIdDto>();
@@ -843,8 +847,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 		notificacioRepository.saveAndFlush(notificacioEntity);
 	}
 	
-	// 1. Enviament de notificacions pendents al registre
-	////////////////////////////////////////////////////
+	// 1. Enviament de notificacions pendents al registre y notific@
+	////////////////////////////////////////////////////////////////
 	@Override
 	@Scheduled(
 			fixedRateString = "${config:es.caib.notib.tasca.registre.enviaments.periode}", 
@@ -859,7 +863,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			for (NotificacioEntity pendent : pendents) {
 				logger.debug(">>> Realitzant registre de la notificació amb identificador: "
 						+ pendent.getId());
-				registrar(pendent.getId());
+				registrarNotificar(pendent.getId());
 			}
 		} else {
 			logger.debug("No hi ha notificacions pendents de registrar");
@@ -867,7 +871,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	// 2. Enviament de notificacions registrades a Notific@
-	////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////
 	@Override
 	@Scheduled(
 			fixedRateString = "${config:es.caib.notib.tasca.notifica.enviaments.periode}",
@@ -893,6 +897,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 	// 2. Actualització de l'estat dels enviaments amb l'estat de Notific@
+	// PENDENT ELIMINAR DESPRÉS DE PROVAR ADVISER
 	//////////////////////////////////////////////////////////////////
 	@Override
 	@Scheduled(

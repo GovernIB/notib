@@ -274,14 +274,14 @@ public interface NotificacioService {
 	public boolean enviar(Long notificacioId);
 	
 	/**
-	 * Prova de fer de registrar una notificació que no s'ha pogut resgistrar a l'hora de crearla.
+	 * Registra i notifica una notificació
 	 * 
 	 * @param notificacioId
 	 *            Atribut id de la notificació.
 	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
-	public List<RegistreIdDto> registrar(Long notificacioId);
+	public List<RegistreIdDto> registrarNotificar(Long notificacioId);
 
 	/**
 	 * Refresca l'estat d'un enviament (datat i certificació).

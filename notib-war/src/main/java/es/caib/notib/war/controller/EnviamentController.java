@@ -352,8 +352,8 @@ public class EnviamentController extends BaseUserController {
 			Integer notificacionsNoRegistrades = 0;
 			for(Long notificacioId: notificacioIds) {
 				NotificacioDtoV2 notificacio = notificacioService.findAmbId(notificacioId);
-				if(notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)) {
-					notificacioService.enviar(notificacioId);	
+				if(notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)) {
+					notificacioService.registrarNotificar(notificacioId);	
 				}else {
 					notificacionsNoRegistrades++;	
 				}
@@ -363,25 +363,25 @@ public class EnviamentController extends BaseUserController {
 						request, 
 						getMessage(
 								request, 
-								"enviament.controller.reintent.notificacions.registrada.KO"));
+								"enviament.controller.reintent.notificacions.pendents.KO"));
 			} else if(notificacionsNoRegistrades.equals((Integer)notificacioIds.size()) && notificacionsNoRegistrades == 1){
 				MissatgesHelper.error(
 						request, 
 						getMessage(
 								request, 
-								"enviament.controller.reintent.notificacio.registrada.KO"));
+								"enviament.controller.reintent.notificacio.pendents.KO"));
 			} else if(notificacioIds.size() > 1){
 				MissatgesHelper.info(
 						request, 
 						getMessage(
 								request, 
-								"enviament.controller.reintent.notificacions.registrada.OK"));
+								"enviament.controller.reintent.notificacions.pendents.OK"));
 			} else {
 				MissatgesHelper.info(
 						request, 
 						getMessage(
 								request, 
-								"enviament.controller.reintent.notificacio.registrada.OK"));
+								"enviament.controller.reintent.notificacio.pendents.OK"));
 			}
 			resposta = "ok";
 		}

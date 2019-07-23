@@ -966,11 +966,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		List<String[]> files = new ArrayList<String[]>();
 		
-		String[] fila = new String[numColumnes];
-		
-		
-			
 		for (NotificacioEnviamentEntity enviament : enviaments) {
+			String[] fila = new String[numColumnes];
 			if(enviamentIds.contains(enviament.getId())) {
 				String csvUuid = "";
 				if(enviament.getNotificacio().getDocument().getCsv() != null) {
@@ -995,7 +992,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				fila[11] = enviament.getTitular().getNom();
 				fila[12] = enviament.getTitular().getEmail();
 				fila[13] = (enviament.getDestinataris().size() > 0) ? enviament.getDestinataris().get(0).getNif() : null;
-				fila[14] = enviament.getNotificacio().getProcediment().getLlibre();
+				if (enviament.getNotificacio().getProcediment() != null)
+					fila[14] = enviament.getNotificacio().getProcediment().getLlibre();
 				fila[15] = String.valueOf(enviament.getNotificacio().getRegistreNumero());
 				fila[16] = (enviament.getNotificacio().getRegistreData() != null)? enviament.getNotificacio().getRegistreData().toString() : "";
 				fila[17] = enviament.getNotificacio().getCaducitat() != null ? sdf.format(enviament.getNotificacio().getCaducitat()) : "";

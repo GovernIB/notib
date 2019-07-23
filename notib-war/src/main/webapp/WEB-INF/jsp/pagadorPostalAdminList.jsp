@@ -60,7 +60,7 @@
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="${unitatCodiUrlPrefix}pagadorPostal/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								<li><a href="${unitatCodiUrlPrefix}pagadorPostal/{{:id}}" data-toggle="modal" data-height="400px" data-custom="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								<li><a href="${unitatCodiUrlPrefix}pagadorPostal/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="pagadorpostal.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
 						</div>

@@ -542,7 +542,7 @@ public class NotificacioController extends BaseUserController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
-		List<RegistreIdDto> registresIdDto = notificacioService.registrar(notificacioId);
+		List<RegistreIdDto> registresIdDto = notificacioService.registrarNotificar(notificacioId);
 		
 		emplenarModelNotificacioInfo(
 				entitatActual,

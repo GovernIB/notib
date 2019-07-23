@@ -442,6 +442,9 @@ function addEnvio() {
 	$(enviamentForm).find('.addDestinatari').removeClass('hidden');
     //Inicialitzar chechbox incapacitat
 	$(enviamentForm).find('input:checkbox').removeAttr('checked');
+	//Inicialitzar deh
+	$(enviamentForm).find('#entregaDehAmagat').attr('value', 'false');
+	$(enviamentForm).find('.entregaDeh_'+number).hide();
     //Inicialitzar entregapostal
 	$(enviamentForm).find('#entregaPostalAmagat').attr('value', 'false');
 	$(enviamentForm).find('.entregaPostal_'+number).hide();
