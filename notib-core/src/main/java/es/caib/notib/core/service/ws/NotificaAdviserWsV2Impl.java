@@ -89,7 +89,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					enviament = notificacioEnviamentRepository.findByNotificacioEntitatAndNotificaIdentificador(
 							entitat,
 							identificador.value);
-					//Problema hibernate
+					//TODO: Revisar pq arriba la notificació sempre null
 					if (enviament != null && enviament.getNotificacio() == null) {
 						NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
 						enviament.setNotificacio(notificacio);
@@ -260,6 +260,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						enviament.setNotificacio(notificacio);
 					}
 					if (enviament != null) {
+						//si hi ha una certificació
 						if (enviament.getNotificaCertificacioArxiuId() != null) {
 							pluginHelper.gestioDocumentalDelete(
 									enviament.getNotificaCertificacioArxiuId(),
@@ -269,7 +270,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
 								PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
 								new ByteArrayInputStream(
-										Base64.decode(
+										Base64.encode(
 												acusePDF.getContenido())));
 						enviament.updateNotificaCertificacio(
 								new Date(),

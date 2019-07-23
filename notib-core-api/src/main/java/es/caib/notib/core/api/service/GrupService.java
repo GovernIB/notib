@@ -88,6 +88,7 @@ public interface GrupService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public GrupDto findByCodi(String grupCodi);
 
+	
 	/**
 	 * Consulta un grup donat l'id d'un procediment.
 	 * 
@@ -111,6 +112,17 @@ public interface GrupService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<GrupDto> findByProcedimentGrups(
+			Long procedimentId);
+	
+	/**
+	 * Consulta un grup donat el seu codi.
+	 * 
+	 * @param id
+	 *            id del grup a trobar.
+	 * @return El grup amb l'id especificat o null si no s'ha trobat.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public List<GrupDto> findGrupsByProcediment(
 			Long procedimentId);
 	
 	/**

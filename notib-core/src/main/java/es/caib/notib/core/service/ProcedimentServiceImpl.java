@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.CodiAssumpteDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
@@ -344,6 +345,14 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						procediments,
 						ProcedimentFormDto.class);
 			}
+		}
+		for (ProcedimentFormDto procediment: procedimentsPage.getContingut()) {
+			List<PermisDto> permisos = permisosHelper.findPermisos(
+					procediment.getId(),
+					ProcedimentEntity.class);
+			List<GrupDto> grups = grupService.findGrupsByProcediment(procediment.getId());
+			procediment.setGrups(grups);
+			procediment.setPermisos(permisos);
 		}
 		return procedimentsPage;
 	}

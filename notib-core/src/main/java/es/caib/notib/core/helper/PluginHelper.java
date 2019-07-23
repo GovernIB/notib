@@ -1119,7 +1119,9 @@ public class PluginHelper {
 			dadesInteressat.setCognom1(titular.getLlinatge1());
 			dadesInteressat.setCognom2(titular.getLlinatge2());
 			dadesInteressat.setNomAmbCognoms(titular.getNom() + " " + titular.getLlinatges());
-			dadesInteressat.setTipusInteressat(titular.getInteressatTipus().getLongVal());
+			if (titular.getInteressatTipus() != null) {
+				dadesInteressat.setTipusInteressat(titular.getInteressatTipus().getLongVal());
+			}
 			dadesInteressat.setPaisCodi(null);
 			dadesInteressat.setPaisNom(null);
 			dadesInteressat.setProvinciaCodi(null);

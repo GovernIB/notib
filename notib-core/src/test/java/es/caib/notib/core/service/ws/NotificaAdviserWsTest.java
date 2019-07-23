@@ -190,8 +190,8 @@ public class NotificaAdviserWsTest {
 		ws.sincronizarEnvio(
 				EMISOR_DIR3, 
 				identificador, 
-				new BigInteger("2"), 
-				new BigInteger("5"), 
+				unmarshal("2"), 
+				unmarshal("5"), 
 				"notificada", 
 				date, 
 				receptor, 
@@ -288,5 +288,12 @@ public class NotificaAdviserWsTest {
 		}
 	}
 	
+	public BigInteger unmarshal(String s) throws Exception {
+		try {
+			return new BigInteger(s);
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
 
 }

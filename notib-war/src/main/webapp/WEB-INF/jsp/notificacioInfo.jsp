@@ -197,7 +197,7 @@
 						</table>
 				</div>
 			</c:if>
-			<c:if test="${not empty notificacio.procediment}">
+			<c:if test="${not empty notificacio.procediment.pagadorpostal}">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">
@@ -232,6 +232,8 @@
 						</tbody>
 					</table>
 				</div>
+				</c:if>
+				<c:if test="${not empty notificacio.procediment.pagadorpostal}">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">
@@ -256,7 +258,7 @@
 						</tbody>
 					</table>
 				</div>
-			</c:if>
+				</c:if>
 		</div>
 		<div role="tabpanel"
 			class="tab-pane<c:if test="${pipellaActiva == 'events'}"> active</c:if>"

@@ -159,6 +159,22 @@ public class GrupServiceImpl implements GrupService{
 		
 		return grups;
 	}
+	
+	@Override
+	public List<GrupDto> findGrupsByProcediment(Long procedimentId) {
+		List<GrupDto> grups = new ArrayList<GrupDto>();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		ProcedimentEntity procediment = procedimentRepositroy.findOne(procedimentId);
+		List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepositoy.findByProcediment(procediment); 
+		
+		for (GrupProcedimentEntity grupProcediment : grupsProcediment) {
+			grups.add(conversioTipusHelper.convertir(
+				grupReposity.findOne(grupProcediment.getGrup().getId()), 
+				GrupDto.class));	
+		}
+		
+		return grups;
+	}
 
 	@Override
 	public PaginaDto<ProcedimentGrupDto> findByProcediment(

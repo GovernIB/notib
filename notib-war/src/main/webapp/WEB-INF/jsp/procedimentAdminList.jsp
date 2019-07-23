@@ -53,6 +53,7 @@
 		data-filter="#filtre">
 		<thead>
 			<tr>
+				<th data-col-name="id" data-visible="false" width="4%">#</th>
 				<th data-col-name="codi"><spring:message code="procediment.list.columna.codi"/></th>
 				<th data-col-name="nom"><spring:message code="procediment.list.columna.nom"/></th>
 				<th data-col-name="entitatNom"><spring:message code="procediment.list.columna.entitat"/></th>
@@ -60,18 +61,18 @@
 				<th data-col-name="pagadorcie"><spring:message code="procediment.list.columna.pagadorcie"/></th>
 				<th data-col-name="agrupar" data-visible="false" id="agrupable"></th>
 			
-				<th data-col-name="id" data-template="#cellGrupsTemplate" data-orderable="false" width="10%">
+				<th data-col-name="grupsCount" data-template="#cellGrupsTemplate" data-orderable="false" width="10%">
 					<script id="cellGrupsTemplate" type="text/x-jsrender">
 					{{if agrupar != true}}
 						<button class="btn btn-default" disabled><span class="fa fa-users"></span>&nbsp;<spring:message code="procediment.list.boto.grups"/>&nbsp;</a>
 					{{else}}
-						<a href="${unitatCodiUrlPrefix}procediment/{{:id}}/grup" class="btn btn-default"><span class="fa fa-users"></span>&nbsp;<spring:message code="procediment.list.boto.grups"/>&nbsp;</button>
+						<a href="${unitatCodiUrlPrefix}procediment/{{:id}}/grup" class="btn btn-default"><span class="fa fa-users"></span>&nbsp;<spring:message code="procediment.list.boto.grups"/>&nbsp;<span class="badge">{{:grupsCount}}</span></button>
 					{{/if}}
 					</script>
 				</th>	
-				<th data-col-name="id" data-template="#cellPermisosTemplate" data-orderable="false" width="10%">
+				<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="10%">
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
-						<a href="${unitatCodiUrlPrefix}procediment/{{:id}}/permis" class="btn btn-default"><span class="fa fa-key"></span>&nbsp;<spring:message code="procediment.list.boto.permisos"/>&nbsp;</a>
+						<a href="${unitatCodiUrlPrefix}procediment/{{:id}}/permis" class="btn btn-default"><span class="fa fa-key"></span>&nbsp;<spring:message code="procediment.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
 					</script>
 				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">

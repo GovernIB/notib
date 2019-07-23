@@ -1,6 +1,7 @@
 package es.caib.notib.core.api.dto;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class ProcedimentFormDto extends AuditoriaDto implements Serializable{
 
@@ -12,6 +13,8 @@ public class ProcedimentFormDto extends AuditoriaDto implements Serializable{
 	private String pagadorcie;
 	private boolean agrupar;
 	private Integer retard;
+	private List<PermisDto> permisos;
+	private List<GrupDto> grups;
 	
 	public Long getId() {
 		return id;
@@ -76,6 +79,36 @@ public class ProcedimentFormDto extends AuditoriaDto implements Serializable{
 	public void setAgrupar(boolean agrupar) {
 		this.agrupar = agrupar;
 	}
+
+	public List<PermisDto> getPermisos() {
+		return permisos;
+	}
+
+	public void setPermisos(List<PermisDto> permisos) {
+		this.permisos = permisos;
+	}	
+	
+	public List<GrupDto> getGrups() {
+		return grups;
+	}
+
+	public void setGrups(List<GrupDto> grups) {
+		this.grups = grups;
+	}
+
+	public int getPermisosCount() {
+		if  (permisos == null)
+			return 0;
+		else
+			return permisos.size();
+	}
+	public int getGrupsCount() {
+		if  (grups == null)
+			return 0;
+		else
+			return grups.size();
+	}
+
 
 	private static final long serialVersionUID = 6058789232924135932L;
 

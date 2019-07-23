@@ -1,5 +1,11 @@
 package es.caib.notib.plugin.unitat;
 
+/**
+ * Informació d'un pais
+ * 
+ * @author Limit Tecnologies <limit@limit.es>
+ */
+
 public class CodiValorPais {
 
 	private String alfa2Pais;
@@ -31,6 +37,5 @@ public class CodiValorPais {
 	public void setDescripcioPais(String descripcioPais) {
 		this.descripcioPais = descripcioPais;
 	}
-	
-	
+		
 }

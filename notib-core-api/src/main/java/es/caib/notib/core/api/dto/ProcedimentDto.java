@@ -184,8 +184,6 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 		this.caducitat = caducitat;
 	}
 
-
-
 	private static final long serialVersionUID = 6058789232924135932L;
 
 }

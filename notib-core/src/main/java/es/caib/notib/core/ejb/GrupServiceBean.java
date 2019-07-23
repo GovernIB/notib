@@ -129,4 +129,10 @@ public class GrupServiceBean implements GrupService {
 		return delegate.findByCodi(grupCodi);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	public List<GrupDto> findGrupsByProcediment(Long procedimentId) {
+		return delegate.findGrupsByProcediment(procedimentId);
+	}
+
 }

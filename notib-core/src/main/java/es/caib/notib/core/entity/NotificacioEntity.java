@@ -149,13 +149,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@ForeignKey(name = "not_document_notificacio_fk")
 	protected DocumentEntity document;
 
-	/*Parametres del registre*/
-//	@Column(name = "registre_oficina", length = 52, nullable = false)
-//	protected String oficina;
-//	@Column(name = "registre_organ", length = 10)
-//	protected String organ;
-//	@Column(name = "registre_llibre", length = 256)
-//	protected String llibre;
 	@Column(name = "registre_numero", length = 19)
 	protected Integer registreNumero;
 	@Column(name = "registre_numero_formatat", length = 200)
@@ -163,24 +156,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "registre_data")
 	@Temporal(TemporalType.DATE)
 	protected Date registreData;
-//	@Column(name = "registre_extracte", length = 52, nullable = false)
-//	protected String extracte;
-//	@Column(name = "registre_doc_fisica", nullable = false)
-//	protected RegistreDocumentacioFisicaEnumDto docFisica;
-//	@Column(name = "registre_idioma", length = 2, nullable = false)
-//	@Enumerated(EnumType.STRING)
-//	protected IdiomaEnumDto idioma;
-//	@Column(name = "registre_tipus_assumpte", length = 256, nullable = false)
-//	protected String tipusAssumpte;
 	@Column(name = "registre_num_expedient", length = 256, nullable = false)
 	protected String numExpedient;
-//	@Column(name = "registre_ref_externa", length = 52, nullable = false)
-//	protected String refExterna;
-//	@Column(name = "registre_codi_assumpte", length = 256, nullable = false)
-//	protected String codiAssumpte;
-//	@Column(name = "registre_observacions", length = 256, nullable = false)
-//	protected String observacions;
-	
+
 	@Transient
 	protected boolean permisProcessar;
 	
@@ -202,30 +180,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public String getGrupCodi() {
 		return grupCodi;
 	}
-//	public String getProcedimentDescripcioSia() {
-//		return procedimentDescripcioSia;
-//	}
 	public Date getCaducitat() {
 		return caducitat;
 	}
-//	public String getDocumentArxiuNom() {
-//		return documentArxiuNom;
-//	}
-//	public String getDocumentArxiuId() {
-//		return documentArxiuId;
-//	}
-////	public String getCsv_uuid() {
-////		return csv_uuid;
-////	}
-//	public String getDocumentHash() {
-//		return documentHash;
-//	}
-//	public boolean isDocumentNormalitzat() {
-//		return documentNormalitzat;
-//	}
-//	public boolean isDocumentGenerarCsv() {
-//		return documentGenerarCsv;
-//	}
 	public NotificacioEstatEnumDto getEstat() {
 		return estat;
 	}

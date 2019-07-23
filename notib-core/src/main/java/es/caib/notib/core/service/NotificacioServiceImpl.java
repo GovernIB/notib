@@ -61,6 +61,8 @@ import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.Persona;
 import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.GrupEntity;
+import es.caib.notib.core.entity.GrupProcedimentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
@@ -76,6 +78,8 @@ import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.helper.RegistreNotificaHelper;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.GrupProcedimentRepository;
+import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
@@ -127,6 +131,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private EmailHelper emailHelper;
 	@Autowired
 	private RegistreNotificaHelper registreNotificaHelper;
+	@Autowired
+	private GrupRepository grupRepository;
+	@Autowired
+	GrupProcedimentRepository grupProcedimentRepository;
 	
 	@Transactional(rollbackFor=Exception.class)
 	@Override
@@ -134,6 +142,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			Long entitatId, 
 			NotificacioDtoV2 notificacio) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		GrupEntity grupNotificacio = null;
 		String documentGesdocId = null;
 		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
 					null,
@@ -142,6 +151,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 				 	false,
 				 	true,
 				 	false);
+		if (notificacio.getGrup() != null && notificacio.getGrup().getId() != null) {
+			grupNotificacio = grupRepository.findOne(notificacio.getGrup().getId());
+		}
 		if(notificacio.getDocument().getContingutBase64() != null) {
 			documentGesdocId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
@@ -209,7 +221,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						notificacio.getUsuariCodi(),
 						procediment.getCodi(),
 						procediment,
-						notificacio.getGrupCodi(),
+						grupNotificacio != null ? grupNotificacio.getCodi() : null,
 						notificacio.getNumExpedient(),
 						TipusUsuariEnumDto.INTERFICIE_WEB
 						).document(documentEntity);
@@ -379,6 +391,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		PaginaDto<NotificacioDto> resultatPagina = null;
 		Page<NotificacioEntity> notificacions = null;
 		List<String> procedimentsCodisNotib = new ArrayList<String>();
+		List<String> grupsProcedimentsCodis = new ArrayList<String>();
 		List<ProcedimentDto> procedimentsPermisConsultaAndAgrupable = new ArrayList<ProcedimentDto>();
 		List<ProcedimentDto> procedimentsPermisConsulta = new ArrayList<ProcedimentDto>();
 		
@@ -423,15 +436,33 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			}
 		}
+		//Recuperar els grups dels procediment per poder filtrar les notificacions amb grups
+		for (String codiProcediment : procedimentsCodisNotib) {
+			ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(codiProcediment, entitatActual);
+			
+			List<GrupProcedimentEntity> grups = grupProcedimentRepository.findByProcediment(procediment);
+			for (GrupProcedimentEntity grup : grups) {
+				grupsProcedimentsCodis.add(grup.getGrup().getCodi());
+			}
+		}
 		if (filtre == null) {
 			//Consulta les notificacions sobre les quals té permis l'usuari actual
 			if (isUsuari) {
+				//Només notificacions sense grups
 				if (!procedimentsCodisNotib.isEmpty()) {
 					notificacions = notificacioRepository.findByProcedimentCodiNotibAndEntitat(
 							procedimentsCodisNotib,
 							entitatActual,
 							paginacioHelper.toSpringDataPageable(paginacioParams));
-					}
+				}
+				//Notificacions específiques per un grup
+				if (!grupsProcedimentsCodis.isEmpty()) {
+					notificacions = notificacioRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
+							procedimentsCodisNotib,
+							grupsProcedimentsCodis,
+							entitatActual,
+							paginacioHelper.toSpringDataPageable(paginacioParams));
+				}
 			//Consulta els notificacions de l'entitat acutal
 			} else if (isUsuariEntitat) {
 				notificacions = notificacioRepository.findByEntitatActual(
@@ -475,6 +506,31 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getEntitatId() == null,
 							filtre.getEntitatId(),
 							procedimentsCodisNotib,
+							filtre.getEnviamentTipus() == null,
+							filtre.getEnviamentTipus(),
+							filtre.getConcepte() == null,
+							filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
+							filtre.getEstat() == null,
+							filtre.getEstat(), 
+							dataInici == null,
+							dataInici,
+							dataFi == null,
+							dataFi,
+							filtre.getTitular() == null || filtre.getTitular().isEmpty(),
+							filtre.getTitular() == null ? "" : filtre.getTitular(),
+							entitatActual, 
+							procediment == null,
+							procediment,
+							filtre.getTipusUsuari() == null,
+							filtre.getTipusUsuari(),
+							pageable);
+				}
+				if (!grupsProcedimentsCodis.isEmpty()) {
+					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
+							filtre.getEntitatId() == null,
+							filtre.getEntitatId(),
+							procedimentsCodisNotib,
+							grupsProcedimentsCodis,
 							filtre.getEnviamentTipus() == null,
 							filtre.getEnviamentTipus(),
 							filtre.getConcepte() == null,

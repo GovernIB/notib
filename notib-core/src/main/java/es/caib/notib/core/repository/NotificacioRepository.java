@@ -38,6 +38,18 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
 			@Param("entitat") EntitatEntity entitat,
 			Pageable paginacio);
+	
+	@Query(
+			"from " +
+			"    NotificacioEntity ntf " +
+			"where (ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " + 
+			"and (ntf.grupCodi in (:grupsProcedimentCodisNotib)) or (ntf.grupCodi = null) " +
+			"and (ntf.entitat = :entitat)")
+	Page<NotificacioEntity> findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
+			@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
+			@Param("grupsProcedimentCodisNotib") List<? extends String> grupsProcedimentCodisNotib,
+			@Param("entitat") EntitatEntity entitat,
+			Pageable paginacio);
 
 	@Query(
 			"from " +
@@ -147,6 +159,51 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
 			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
+			@Param("isEnviamentTipusNull") boolean isEnviamentTipusNull,
+			@Param("enviamentTipus") NotificaEnviamentTipusEnumDto enviamentTipus,
+			@Param("isConcepteNull") boolean isConcepteNull,
+			@Param("concepte") String concepte,
+			@Param("isEstatNull") boolean isEstatNull,
+			@Param("estat") NotificacioEstatEnumDto estat,
+			@Param("isDataIniciNull") boolean isDataIniciNull,
+			@Param("dataInici") Date dataInici,
+			@Param("isDataFiNull") boolean isDataFiNull,
+			@Param("dataFi") Date dataFi,
+			@Param("isTitularNull") boolean isTitularNull,
+			@Param("titular") String titular,
+			@Param("entitat") EntitatEntity entitat,
+			@Param("isProcedimentNull") boolean isProcedimentNull,
+			@Param("procediment") ProcedimentEntity procediment,
+			@Param("isTipusUsuariNull") boolean isTipusUsuariNull,
+			@Param("tipusUsuari") TipusUsuariEnumDto tipusUsuar,
+			Pageable paginacio);
+	
+	@Query(	"from " +
+			"     NotificacioEntity ntf " +
+			"where " +
+			"    (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
+			"and (ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " +
+			"and (ntf.grupCodi in (:grupsProcedimentCodisNotib)) " +
+			"and (:entitat = ntf.entitat) " +
+			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
+			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
+			"and (:isEstatNull = true or ntf.estat = :estat) " +
+			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
+			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) "+
+			"and (:isProcedimentNull = true or ntf.procediment = :procediment) " +
+			"and (:isTitularNull = true or (" +
+			"    select count(env.id) " +
+			"    from ntf.enviaments env " +
+			"    where " +
+			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
+			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
+			"    ) > 0) " + 
+			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari)")
+	public Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
+			@Param("isEntitatIdNull") boolean isEntitatIdNull,
+			@Param("entitatId") Long entitatId,
+			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
+			@Param("grupsProcedimentCodisNotib") List<String> grupsProcedimentCodisNotib,
 			@Param("isEnviamentTipusNull") boolean isEnviamentTipusNull,
 			@Param("enviamentTipus") NotificaEnviamentTipusEnumDto enviamentTipus,
 			@Param("isConcepteNull") boolean isConcepteNull,

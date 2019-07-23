@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.util.UtilitatsNotib;
-import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWs;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
@@ -58,8 +58,8 @@ public class NotificacioServiceController extends BaseController {
 			produces="application/json")
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation(
-			value = "Genera una notificació", 
-			notes = "Retorna una llista amb els codis dels enviaments creats")
+			value = "Registra i envia la notificació a Notific@.", 
+			notes = "Retorna una llista amb els codis dels enviaments creats per poder consultar el seu estat posteriorment")
 	@ResponseBody
 	public RespostaAlta alta(
 			@ApiParam(
@@ -83,45 +83,14 @@ public class NotificacioServiceController extends BaseController {
 			return resp;
 		}
 	}
-	
-	@RequestMapping(
-			value = "/services/notificacio/alta", 
-			method = RequestMethod.POST,
-			produces="application/json")
-	@ResponseStatus(HttpStatus.CREATED)
-	@ApiOperation(
-			value = "Genera una notificació", 
-			notes = "Retorna una llista amb els codis dels enviaments creats")
-	@ResponseBody
-	public RespostaAlta alta(
-			@ApiParam(
-					name = "notificacio",
-					value = "Objecte amb les dades necessàries per a generar una notificació",
-					required = true) 
-			@RequestBody Notificacio notificacio) {
-		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
-		try {
-			return notificacioServiceWsV1.alta(notificacio);
-		} catch (Exception e) {
-			RespostaAlta resp = new RespostaAlta();
-			resp.setError(true);
-			if (UtilitatsNotib.isExceptionOrCauseInstanceOf(e, EJBAccessException.class)) {
-				resp.setErrorDescripcio("L'usuari " + usuariActualCodi + " no té els permisos necessaris: " + e.getMessage());
-			} else {
-				resp.setErrorDescripcio(UtilitatsNotib.getMessageExceptionOrCauseInstanceOf(
-						e, 
-						EJBAccessException.class));
-			}
-			return resp;
-		}
-	}
 
 	@RequestMapping(
-			value = {"/services/notificacio/consultaEstatNotificacio/{identificador}", "/services/notificacioV2/consultaEstatNotificacio/{identificador}"}, 
+			value = {"/services/notificacioV2/consultaEstatNotificacio/{identificador}"}, 
 			method = RequestMethod.GET,
 			produces="application/json")
 	@ApiOperation(
 			value = "Consulta de la informació d'una notificació",
+			notes = "Retorna la informació sobre l'estat de l'enviament dins Notib o Notific@",
 			response = RespostaConsultaEstatNotificacio.class)
 	@ResponseBody
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
@@ -149,11 +118,12 @@ public class NotificacioServiceController extends BaseController {
 	}
 
 	@RequestMapping(
-			value = {"/services/notificacio/consultaEstatEnviament/{referencia}", "/services/notificacioV2/consultaEstatEnviament/{referencia}"}, 
+			value = {"/services/notificacioV2/consultaEstatEnviament/{referencia}"}, 
 			method = RequestMethod.GET,
 			produces="application/json")
 	@ApiOperation(
-			value = "Consulta de la informació d'un enviament",
+			value = "Consulta la informació de l'estat d'un enviament dins Notific@",
+			notes = "Retorna la informació sobre l'estat de l'enviament dins Notific@.",
 			response = RespostaConsultaEstatEnviament.class)
 	@ResponseBody
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(
@@ -186,10 +156,10 @@ public class NotificacioServiceController extends BaseController {
 			produces="application/json")
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation(
-			value = "Donar permis de consulta sobre un procediment", 
-			notes = "Retorna un string amb el valor de resposta (Permís creat / ERROR)")
+			value = "Donar permis de consulta a un usuari sobre un procediment", 
+			notes = "Aquest mètode permet donar el permís de consulta a un usuari específic")
 	@ResponseBody
-	public String donarPermisos(
+	public String donarPermisConsulta(
 			@ApiParam(
 					name = "permisConsulta",
 					value = "Objecte amb les dades necessàries per donar el permís",

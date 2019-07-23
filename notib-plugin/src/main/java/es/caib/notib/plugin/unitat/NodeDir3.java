@@ -41,12 +41,6 @@ public class NodeDir3 implements Serializable, Comparable<NodeDir3> {
 	@JsonProperty("idPadre")
 	private String idPare;
 	
-
-//	@JsonProperty("codigo")
-//	public void setCodi(String codi) {
-//		this.codi = codi;
-//	}
-
 	
 	@Override
 	public int compareTo(NodeDir3 o) {

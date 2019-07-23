@@ -26,6 +26,10 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 	private static final String JERSEY_TIMEOUT_READ = "60000";
 	private Client versioImprimibleClient;
 
+	public ArxiuPluginConcsvImpl(String propertyKeyBase) {
+		super(propertyKeyBase);
+	}
+	
 	public ArxiuPluginConcsvImpl(String propertyKeyBase, Properties properties) {
 		super(propertyKeyBase, properties);
 	}

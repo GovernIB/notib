@@ -253,6 +253,7 @@
 							<sourceDestDir>${basedir}/src/main/java</sourceDestDir>
 						</configuration>
 					</execution>
+					<!-- 
 					<execution>
 						<id>adviser</id>
 						<phase>generate-sources</phase>
@@ -271,6 +272,7 @@
 							<sourceDestDir>${basedir}/src/main/java</sourceDestDir>
 						</configuration>
 					</execution>
+					-->
 				</executions>
 			</plugin>
 		</plugins>
