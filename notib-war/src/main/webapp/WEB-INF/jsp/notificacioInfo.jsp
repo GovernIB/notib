@@ -257,67 +257,6 @@
 					</table>
 				</div>
 			</c:if>
-			<%-- <c:if test="${not empty notificacio.seuExpedientSerieDocumental}">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title">
-							<strong><spring:message code="notificacio.info.seccio.seucaib"/></strong>
-						</h3>
-	 				</div>
-					<table class="table table-bordered" style="width:100%">
-					<tbody>
-						<tr>
-							<td><strong><spring:message code="notificacio.info.seucaib.expedient.serie"/></strong></td>
-							<td>${notificacio.seuExpedientSerieDocumental}</td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="notificacio.info.seucaib.expedient.unitat"/></strong></td>
-							<td>${notificacio.seuExpedientUnitatOrganitzativa}</td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="notificacio.info.seucaib.expedient.id"/></strong></td>
-							<td>${notificacio.seuExpedientIdentificadorEni}</td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="notificacio.info.seucaib.expedient.titol"/></strong></td>
-							<td>${notificacio.seuExpedientTitol}</td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="notificacio.info.seucaib.registre.oficina"/></strong></td>
-							<td>${notificacio.seuRegistreOficina}</td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="notificacio.info.seucaib.registre.llibre"/></strong></td>
-							<td>${notificacio.seuRegistreLlibre}</td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="notificacio.info.seucaib.idioma"/></strong></td>
-							<td>${notificacio.seuIdioma}</td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="notificacio.info.seucaib.avis.titol"/></strong></td>
-							<td>${notificacio.seuAvisTitol}</td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="notificacio.info.seucaib.avis.text"/></strong></td>
-							<td>${notificacio.seuAvisText}</td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="notificacio.info.seucaib.avis.text.mobil"/></strong></td>
-							<td>${notificacio.seuAvisTextMobil}</td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="notificacio.info.seucaib.ofici.titol"/></strong></td>
-							<td>${notificacio.seuOficiTitol}</td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="notificacio.info.seucaib.ofici.text"/></strong></td>
-							<td>${notificacio.seuOficiText}</td>
-						</tr>
-					</tbody>
-					</table>
-				</div>
-			</c:if> --%>
 		</div>
 		<div role="tabpanel"
 			class="tab-pane<c:if test="${pipellaActiva == 'events'}"> active</c:if>"

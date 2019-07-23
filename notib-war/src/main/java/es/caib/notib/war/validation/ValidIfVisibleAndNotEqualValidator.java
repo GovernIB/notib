@@ -35,6 +35,7 @@ public class ValidIfVisibleAndNotEqualValidator implements ConstraintValidator<V
 	     noExpectedFieldValue = annotation.noExpectedFieldValue();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isValid(
 			final Object value, 

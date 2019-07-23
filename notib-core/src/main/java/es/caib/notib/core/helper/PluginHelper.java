@@ -1,6 +1,5 @@
 package es.caib.notib.core.helper;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -26,8 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import es.caib.notib.core.api.dto.AnexoWsDto;
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
@@ -77,7 +74,6 @@ import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
 import es.caib.notib.plugin.registre.TipusAssumpte;
 import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
-import es.caib.notib.plugin.seu.SeuPlugin;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
@@ -101,7 +97,6 @@ public class PluginHelper {
 
 	private DadesUsuariPlugin dadesUsuariPlugin;
 	private GestioDocumentalPlugin gestioDocumentalPlugin;
-	private SeuPlugin seuPlugin;
 	private RegistrePlugin registrePlugin;
 	private IArxiuPlugin arxiuPlugin;
 	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin;
@@ -839,7 +834,7 @@ public class PluginHelper {
 		RegistreSortida registreSortida = new RegistreSortida();
 		DadesOficina dadesOficina = new DadesOficina();
 		Llibre llibreOrganisme = null;
-		Oficina oficinaVirtual = null;
+//		Oficina oficinaVirtual = null;
 		
 		if (notificacio.getProcediment().getOrganGestor() != null) {
 			llibreOrganisme = llistarLlibreOrganisme(
@@ -1247,23 +1242,7 @@ public class PluginHelper {
 			return false;
 		}
 	}
-
-	public boolean isSeuPluginDisponible() {
-		String pluginClass = getPropertyPluginSeu();
-		if (pluginClass != null && pluginClass.length() > 0) {
-			try {
-				return getSeuPlugin() != null;
-			} catch (SistemaExternException sex) {
-				logger.error(
-						"Error al obtenir la instància del plugin de seu electrònica",
-						sex);
-				return false;
-			}
-		} else {
-			return false;
-		}
-	}
-
+	
 	public boolean isRegistrePluginDisponible() {
 		String pluginClass = getPropertyPluginRegistre();
 		if (pluginClass != null && pluginClass.length() > 0) {
@@ -1343,30 +1322,6 @@ public class PluginHelper {
 			}
 		}
 		return gestioDocumentalPlugin;
-	}
-
-	private boolean seuPluginConfiguracioProvada = false;
-	private SeuPlugin getSeuPlugin() {
-		if (seuPlugin == null && !seuPluginConfiguracioProvada) {
-			seuPluginConfiguracioProvada = true;
-			String pluginClass = getPropertyPluginSeu();
-			if (pluginClass != null && pluginClass.length() > 0) {
-				try {
-					Class<?> clazz = Class.forName(pluginClass);
-					seuPlugin = (SeuPlugin)clazz.newInstance();
-				} catch (Exception ex) {
-					throw new SistemaExternException(
-							IntegracioHelper.INTCODI_GESDOC,
-							"Error al crear la instància del plugin de seu electrònica",
-							ex);
-				}
-			} else {
-				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_USUARIS,
-						"La classe del plugin de seu electrònica no està configurada");
-			}
-		}
-		return seuPlugin;
 	}
 
 	private boolean registrePluginConfiguracioProvada = false;
@@ -1451,20 +1406,11 @@ public class PluginHelper {
 	private String getPropertyPluginUnitats() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.unitats.class");
 	}
-	private String getPropertyAmbTitularIncapacitat() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.titular.incapacitat");
-	}
-	private String getPropertyIsMultipleDestinatari() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.destinatari.multiple");
-	}
 	private String getPropertyPluginDadesUsuari() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.class");
 	}
 	private String getPropertyPluginGestioDocumental() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesdoc.class");
-	}
-	private String getPropertyPluginSeu() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.seu.class");
 	}
 	private String getPropertyPluginRegistre() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.registre.class");
@@ -1477,15 +1423,6 @@ public class PluginHelper {
 	}
 	public int getNotificaReintentsPeriodeProperty() {
 		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.notifica.enviaments.periode");
-	}
-	public int getSeuReintentsMaxProperty() {
-		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.seu.enviaments.reintents.maxim");
-	}
-	public int getSeuReintentsEnviamentPeriodeProperty() {
-		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.seu.enviaments.periode");
-	}
-	public int getSeuReintentsConsultaPeriodeProperty() {
-		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.seu.consulta.periode");
 	}
 	
 	public NotificacioComunicacioTipusEnumDto getNotibTipusComunicacioDefecte() {

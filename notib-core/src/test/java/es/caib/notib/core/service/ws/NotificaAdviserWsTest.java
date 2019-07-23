@@ -44,7 +44,6 @@ public class NotificaAdviserWsTest {
 	
 	private static final String ENDPOINT_ADDRESS = "http://localhost:8180/notib/ws/adviserV2";
 	private static final String EMISOR_DIR3 = "EA0004518";
-	private static final String EMISOR_NOM = "Dirección General de Desarrollo Tecnológico";
 	private static final String CERIFICACIO_B64 = 
 			  "JVBERi0xLjQKJcOkw7zDtsOfCjIgMCBvYmoKPDwvTGVuZ3RoIDMgMCBSL0ZpbHRlci9GbGF0ZURl"
 			+ "Y29kZT4+CnN0cmVhbQp4nDPQM1Qo5ypUMFAwALJMLU31jBQsTAz1LBSKUrnCtRTyIHJAWJTO5RTC"

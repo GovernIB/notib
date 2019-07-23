@@ -36,19 +36,6 @@ public class NotificacioDto extends AuditoriaDto {
 	private String documentSha1;
 	private boolean documentNormalitzat;
 	private boolean documentGenerarCsv;
-	private String seuExpedientSerieDocumental;
-	private String seuExpedientUnitatOrganitzativa;
-	private String seuExpedientIdentificadorEni;
-	private String seuExpedientTitol;
-	private String seuRegistreOficina;
-	private String seuRegistreLlibre;
-	private String seuIdioma;
-	private String seuAvisTitol;
-	private String seuAvisText;
-	private String seuAvisTextMobil;
-	private String seuOficiTitol;
-	private String seuOficiText;
-	private String seuRegistreNumero;
 	private NotificacioEstatEnumDto estat;
 	private Date estatDate;
 	private Date notificaErrorData;
@@ -200,78 +187,6 @@ public class NotificacioDto extends AuditoriaDto {
 	public void setDocumentGenerarCsv(boolean documentGenerarCsv) {
 		this.documentGenerarCsv = documentGenerarCsv;
 	}
-	public String getSeuExpedientSerieDocumental() {
-		return seuExpedientSerieDocumental;
-	}
-	public void setSeuExpedientSerieDocumental(String seuExpedientSerieDocumental) {
-		this.seuExpedientSerieDocumental = seuExpedientSerieDocumental;
-	}
-	public String getSeuExpedientUnitatOrganitzativa() {
-		return seuExpedientUnitatOrganitzativa;
-	}
-	public void setSeuExpedientUnitatOrganitzativa(String seuExpedientUnitatOrganitzativa) {
-		this.seuExpedientUnitatOrganitzativa = seuExpedientUnitatOrganitzativa;
-	}
-	public String getSeuExpedientIdentificadorEni() {
-		return seuExpedientIdentificadorEni;
-	}
-	public void setSeuExpedientIdentificadorEni(String seuExpedientIdentificadorEni) {
-		this.seuExpedientIdentificadorEni = seuExpedientIdentificadorEni;
-	}
-	public String getSeuExpedientTitol() {
-		return seuExpedientTitol;
-	}
-	public void setSeuExpedientTitol(String seuExpedientTitol) {
-		this.seuExpedientTitol = seuExpedientTitol;
-	}
-	public String getSeuRegistreOficina() {
-		return seuRegistreOficina;
-	}
-	public void setSeuRegistreOficina(String seuRegistreOficina) {
-		this.seuRegistreOficina = seuRegistreOficina;
-	}
-	public String getSeuRegistreLlibre() {
-		return seuRegistreLlibre;
-	}
-	public void setSeuRegistreLlibre(String seuRegistreLlibre) {
-		this.seuRegistreLlibre = seuRegistreLlibre;
-	}
-	public String getSeuIdioma() {
-		return seuIdioma;
-	}
-	public void setSeuIdioma(String seuIdioma) {
-		this.seuIdioma = seuIdioma;
-	}
-	public String getSeuAvisTitol() {
-		return seuAvisTitol;
-	}
-	public void setSeuAvisTitol(String seuAvisTitol) {
-		this.seuAvisTitol = seuAvisTitol;
-	}
-	public String getSeuAvisText() {
-		return seuAvisText;
-	}
-	public void setSeuAvisText(String seuAvisText) {
-		this.seuAvisText = seuAvisText;
-	}
-	public String getSeuAvisTextMobil() {
-		return seuAvisTextMobil;
-	}
-	public void setSeuAvisTextMobil(String seuAvisTextMobil) {
-		this.seuAvisTextMobil = seuAvisTextMobil;
-	}
-	public String getSeuOficiTitol() {
-		return seuOficiTitol;
-	}
-	public void setSeuOficiTitol(String seuOficiTitol) {
-		this.seuOficiTitol = seuOficiTitol;
-	}
-	public String getSeuOficiText() {
-		return seuOficiText;
-	}
-	public void setSeuOficiText(String seuOficiText) {
-		this.seuOficiText = seuOficiText;
-	}
 	public NotificacioEstatEnumDto getEstat() {
 		return estat;
 	}
@@ -340,12 +255,6 @@ public class NotificacioDto extends AuditoriaDto {
 	}
 	public void setReferenciaExterna(String referenciaExterna) {
 		this.referenciaExterna = referenciaExterna;
-	}
-	public String getSeuRegistreNumero() {
-		return seuRegistreNumero;
-	}
-	public void setSeuRegistreNumero(String seuRegistreNumero) {
-		this.seuRegistreNumero = seuRegistreNumero;
 	}
 	public String getNotificacio() {
 		return notificacio;

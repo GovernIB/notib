@@ -30,7 +30,6 @@ public enum NotificacioDestinatariEstatEnum implements Serializable {
 	NOTIFICADA,
 	REGISTRADA,
 	PENDENT_ENVIAMENT,
-	PENDENT_SEU,
 	PENDENT_CIE,
 	PENDENT_DEH,
 	REBUTJADA,
@@ -55,7 +54,6 @@ public enum NotificacioDestinatariEstatEnum implements Serializable {
 			case NOTIFICADA: return NotificacioEnviamentEstatEnumDto.NOTIFICADA;
 			case REGISTRADA: return NotificacioEnviamentEstatEnumDto.REGISTRADA;
 			case PENDENT_ENVIAMENT: return NotificacioEnviamentEstatEnumDto.PENDENT_ENVIAMENT;
-			case PENDENT_SEU: return NotificacioEnviamentEstatEnumDto.PENDENT_SEU;
 			case PENDENT_CIE: return NotificacioEnviamentEstatEnumDto.PENDENT_CIE;
 			case PENDENT_DEH: return NotificacioEnviamentEstatEnumDto.PENDENT_DEH;
 			case REBUTJADA: return NotificacioEnviamentEstatEnumDto.REBUTJADA;
@@ -84,7 +82,6 @@ public enum NotificacioDestinatariEstatEnum implements Serializable {
 			case NOTIFICADA: return NOTIFICADA;
 			case REGISTRADA: return REGISTRADA;
 			case PENDENT_ENVIAMENT: return PENDENT_ENVIAMENT;
-			case PENDENT_SEU: return PENDENT_SEU;
 			case PENDENT_CIE: return PENDENT_CIE;
 			case PENDENT_DEH: return PENDENT_DEH;
 			case REBUTJADA: return REBUTJADA;

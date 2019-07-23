@@ -100,23 +100,6 @@ public class NotificacioServiceBean implements NotificacioService {
 				enviamentId);
 	}
 
-/*	@Override
-	@RolesAllowed({"NOT_ADMIN"})
-	public boolean enviamentComunicacioSeu(
-			Long enviamentId) {
-		return delegate.enviamentComunicacioSeu(enviamentId);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN"})
-	public boolean enviamentCertificacioSeu(
-			Long enviamentId,
-			ArxiuDto certificacioArxiu) {
-		return delegate.enviamentCertificacioSeu(
-				enviamentId,
-				certificacioArxiu);
-	}
-*/
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public void notificaEnviamentsRegistrats() {

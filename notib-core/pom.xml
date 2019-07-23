@@ -271,24 +271,6 @@
 							<sourceDestDir>${basedir}/src/main/java</sourceDestDir>
 						</configuration>
 					</execution>
-					<execution>
-						<id>seu</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>wsimport</goal>
-						</goals>
-						<configuration>
-							<packageName>es.caib.notib.core.wsdl.seu</packageName>
-							<wsdlUrls>
-								<wsdlUrl>${basedir}/src/main/resources/es/caib/notib/core/wsdl/SedeWs.wsdl</wsdlUrl>
-							</wsdlUrls>
-							<vmArgs>
-								<vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
-							</vmArgs>
-							<verbose>true</verbose>
-							<sourceDestDir>${basedir}/src/main/java</sourceDestDir>
-						</configuration>
-					</execution>
 				</executions>
 			</plugin>
 		</plugins>

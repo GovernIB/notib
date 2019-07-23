@@ -39,6 +39,7 @@ public class ValidIfVisibleAndNormalitzatValidator implements ConstraintValidato
 	    dependFieldNameSecond   = annotation.dependFieldNameSecond();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isValid(
 			final Object value, 

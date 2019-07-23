@@ -2616,20 +2616,7 @@ public class NotificaWsTestIntegracioRest {
 			enviaments.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
 			notificacioV2.getEnviaments().add(enviaments);
 		}
-//		ParametresSeu parametresSeu = new ParametresSeu();
-//		parametresSeu.setExpedientSerieDocumental("0000S");
-//		parametresSeu.setExpedientUnitatOrganitzativa("00000000T");
-//		parametresSeu.setExpedientIdentificadorEni("seuExpedientIdentificadorEni_" + notificacioId);
-//		parametresSeu.setExpedientTitol("seuExpedientTitol_" + notificacioId);
-//		parametresSeu.setRegistreOficina("seuRegistreOficina_" + notificacioId);
-//		parametresSeu.setRegistreLlibre("seuRegistreLlibre_" + notificacioId);
-//		parametresSeu.setIdioma("seuIdioma_" + notificacioId);
-//		parametresSeu.setAvisTitol("seuAvisTitol_" + notificacioId);
-//		parametresSeu.setAvisText("seuAvisText_" + notificacioId);
-//		parametresSeu.setAvisTextMobil("seuAvisTextMobil_" + notificacioId);
-//		parametresSeu.setOficiTitol("seuOficiTitol_" + notificacioId);
-//		parametresSeu.setOficiText("seuOficiText_" + notificacioId);
-//		notificacio.setParametresSeu(parametresSeu);
+
 		return notificacioV2;
 	}
 	
@@ -2674,18 +2661,6 @@ public class NotificaWsTestIntegracioRest {
 //			notificacio.setPagadorCieDataVigencia(new Date(0));
 //		}
 //		
-//		notificacio.setSeuExpedientSerieDocumental("0000S");
-//		notificacio.setSeuExpedientUnitatOrganitzativa("00000000T");
-//		notificacio.setSeuAvisTitol("seuAvisTitol_" + notificacioId);
-//		notificacio.setSeuAvisText("seuAvisText_" + notificacioId);
-//		notificacio.setSeuAvisTextMobil("seuAvisTextMobil_" + notificacioId);
-//		notificacio.setSeuOficiTitol("seuOficiTitol_" + notificacioId);
-//		notificacio.setSeuOficiText("seuOficiText_" + notificacioId);
-//		notificacio.setSeuRegistreLlibre("seuRegistreLlibre_" + notificacioId);
-//		notificacio.setSeuRegistreOficina("seuRegistreOficina_" + notificacioId);
-//		notificacio.setSeuIdioma("seuIdioma_" + notificacioId);
-//		notificacio.setSeuExpedientTitol("seuExpedientTitol_" + notificacioId);
-//		notificacio.setSeuExpedientIdentificadorEni("seuExpedientIdentificadorEni_" + notificacioId);
 //
 //		List<NotificacioEnviamentEntity> enviaments = new ArrayList<NotificacioEnviamentEntity>();
 //		for (int i = 0; i < numDestinataris; i++) {
@@ -2695,7 +2670,6 @@ public class NotificaWsTestIntegracioRest {
 //			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
 //			enviament.setNotificacio(notificacio);
 //			enviament.setNotificaEstat(NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT);
-//			enviament.setSeuEstat(NotificacioDestinatariEstatEnumDto.NOTIB_PENDENT);
 //			enviament.setTitularNom("titularNom" + i);
 //			enviament.setTitularLlinatge1("titLlinatge1_" + i);
 //			enviament.setTitularLlinatge2("titLlinatge2_" + i);

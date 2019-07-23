@@ -32,7 +32,6 @@ import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
-import es.caib.notib.core.api.ws.notificacio.ParametresSeu;
 import es.caib.notib.core.audit.NotibAuditable;
 
 
@@ -50,8 +49,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	protected String usuariCodi;
 	@Column(name = "emisor_dir3codi", length = 9, nullable = false)
 	protected String emisorDir3Codi;
-//	@Column(name = "organ_gestor", length = 9, nullable = false)
-//	protected String organGestor;
 	@Column(name = "com_tipus", nullable = false)
 	protected NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	
@@ -151,38 +148,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@JoinColumn(name = "document_id")
 	@ForeignKey(name = "not_document_notificacio_fk")
 	protected DocumentEntity document;
-	
-	/*Parametres de la seu*/
-	@Column(name = "seu_exp_serdoc", length = 10)
-	protected String seuExpedientSerieDocumental;
-	@Column(name = "seu_exp_uniorg", length = 10, nullable = false)
-	protected String seuExpedientUnitatOrganitzativa;
-	@Column(name = "seu_exp_ideni", length = 52, nullable = false)
-	protected String seuExpedientIdentificadorEni;
-	@Column(name = "seu_exp_titol", length = 256, nullable = false)
-	protected String seuExpedientTitol;
-	@Column(name = "seu_proc_codi", length = 256, nullable = false)
-	protected String seuProcedimentCodi;
-	@Column(name = "seu_reg_oficina", length = 256, nullable = false)
-	protected String seuRegistreOficina;
-	@Column(name = "seu_reg_llibre", length = 256, nullable = false)
-	protected String seuRegistreLlibre;
-	@Column(name = "seu_reg_organ", length = 256, nullable = false)
-	protected String seuRegistreOrgan;
-	@Column(name = "seu_idioma", length = 256, nullable = false)
-	protected String seuIdioma;
-	@Column(name = "seu_avis_titol", length = 256, nullable = false)
-	protected String seuAvisTitol;
-	@Column(name = "seu_avis_text", length = 256, nullable = false)
-	protected String seuAvisText;
-	@Column(name = "seu_avis_mobil", length = 256)
-	protected String seuAvisTextMobil;
-	@Column(name = "seu_ofici_titol", length = 256, nullable = false)
-	protected String seuOficiTitol;
-	@Column(name = "seu_ofici_text", length = 256, nullable = false)
-	protected String seuOficiText;
-	
-	
+
 	/*Parametres del registre*/
 //	@Column(name = "registre_oficina", length = 52, nullable = false)
 //	protected String oficina;
@@ -295,51 +261,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	}
 	public Date getNotificaReEnviamentData() {
 		return notificaReEnviamentData;
-	}
-//	public String getProcedimentCodiSia() {
-//		return procedimentCodiSia;
-//	}
-	public String getSeuExpedientSerieDocumental() {
-		return seuExpedientSerieDocumental;
-	}
-	public String getSeuExpedientUnitatOrganitzativa() {
-		return seuExpedientUnitatOrganitzativa;
-	}
-	public String getSeuExpedientIdentificadorEni() {
-		return seuExpedientIdentificadorEni;
-	}
-	public String getSeuExpedientTitol() {
-		return seuExpedientTitol;
-	}
-	public String getSeuProcedimentCodi() {
-		return seuProcedimentCodi;
-	}
-	public String getSeuRegistreOficina() {
-		return seuRegistreOficina;
-	}
-	public String getSeuRegistreLlibre() {
-		return seuRegistreLlibre;
-	}
-	public String getSeuRegistreOrgan() {
-		return seuRegistreOrgan;
-	}
-	public String getSeuIdioma() {
-		return seuIdioma;
-	}
-	public String getSeuAvisTitol() {
-		return seuAvisTitol;
-	}
-	public String getSeuAvisText() {
-		return seuAvisText;
-	}
-	public String getSeuAvisTextMobil() {
-		return seuAvisTextMobil;
-	}
-	public String getSeuOficiTitol() {
-		return seuOficiTitol;
-	}
-	public String getSeuOficiText() {
-		return seuOficiText;
 	}
 	public String getUsuariCodi() {
 		return usuariCodi;
@@ -462,8 +383,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			DocumentEntity document,
 			PagadorPostalEntity pagadorPostal,
 			PagadorCieEntity pagadorCie,
-			List<Enviament>enviaments,
-			ParametresSeu parametresSeu) {
+			List<Enviament>enviaments) {
 		return new BuilderV1(
 				entitat,
 				emisorDir3Codi,
@@ -477,8 +397,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				document,
 				pagadorPostal,
 				pagadorCie,
-				enviaments,
-				parametresSeu);
+				enviaments);
 	}
 	
 	
@@ -584,8 +503,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				DocumentEntity document,
 				PagadorPostalEntity pagadorPostal,
 				PagadorCieEntity pagadorCie,
-				List<Enviament>enviaments,
-				ParametresSeu parametresSeu) {
+				List<Enviament>enviaments) {
 			built = new NotificacioEntity();
 			built.entitat = entitat;
 			built.emisorDir3Codi = emisorDir3Codi;
@@ -599,21 +517,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.document = document;
 			built.pagadorPostal = pagadorPostal;
 			built.pagadorCie = pagadorCie;
-//			built.enviaments = enviaments;
-			built.seuAvisText = parametresSeu.getAvisText();
-			built.seuAvisTextMobil = parametresSeu.getAvisTextMobil();
-			built.seuAvisTitol = parametresSeu.getAvisTitol();
-			built.seuExpedientIdentificadorEni = parametresSeu.getExpedientIdentificadorEni();
-			built.seuExpedientSerieDocumental = parametresSeu.getExpedientSerieDocumental();
-			built.seuExpedientTitol = parametresSeu.getExpedientTitol();
-			built.seuExpedientUnitatOrganitzativa = parametresSeu.getExpedientUnitatOrganitzativa();
-			built.seuIdioma = parametresSeu.getIdioma();
-			built.seuOficiText = parametresSeu.getOficiText();
-			built.seuOficiTitol = parametresSeu.getOficiTitol();
-			built.seuProcedimentCodi = parametresSeu.getProcedimentCodi();
-			built.seuRegistreLlibre = parametresSeu.getRegistreLlibre();
-			built.seuRegistreOficina = parametresSeu.getRegistreOficina();
-			built.seuRegistreOrgan = parametresSeu.getRegistreOrgan();
 			
 			built.estat = NotificacioEstatEnumDto.PENDENT;
 			built.notificaEnviamentIntent = 0;
@@ -629,62 +532,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		}
 		public BuilderV1 retardPostal(Integer retard) {
 			built.retard = retard;
-			return this;
-		}
-		public BuilderV1 seuExpedientSerieDocumental(String seuExpedientSerieDocumental) {
-			built.seuExpedientSerieDocumental = seuExpedientSerieDocumental;
-			return this;
-		}
-		public BuilderV1 seuExpedientUnitatOrganitzativa(String seuExpedientUnitatOrganitzativa) {
-			built.seuExpedientUnitatOrganitzativa = seuExpedientUnitatOrganitzativa;
-			return this;
-		}
-		public BuilderV1 seuAvisTitol(String seuAvisTitol) {
-			built.seuAvisTitol = seuAvisTitol;
-			return this;
-		}
-		public BuilderV1 seuAvisText(String seuAvisText) {
-			built.seuAvisText = seuAvisText;
-			return this;
-		}
-		public BuilderV1 seuAvisTextMobil(String seuAvisTextMobil) {
-			built.seuAvisTextMobil = seuAvisTextMobil;
-			return this;
-		}
-		public BuilderV1 seuOficiTitol(String seuOficiTitol) {
-			built.seuOficiTitol = seuOficiTitol;
-			return this;
-		}
-		public BuilderV1 seuOficiText(String seuOficiText) {
-			built.seuOficiText = seuOficiText;
-			return this;
-		}
-		public BuilderV1 seuRegistreLlibre(String seuRegistreLlibre) {
-			built.seuRegistreLlibre = seuRegistreLlibre;
-			return this;
-		}
-		public BuilderV1 seuRegistreOficina(String seuRegistreOficina) {
-			built.seuRegistreOficina = seuRegistreOficina;
-			return this;
-		}
-		public BuilderV1 seuRegistreOrgan(String seuRegistreOrgan) {
-			built.seuRegistreOrgan = seuRegistreOrgan;
-			return this;
-		}
-		public BuilderV1 seuIdioma(String seuIdioma) {
-			built.seuIdioma = seuIdioma;
-			return this;
-		}
-		public BuilderV1 seuExpedientTitol(String seuExpedientTitol) {
-			built.seuExpedientTitol = seuExpedientTitol;
-			return this;
-		}
-		public BuilderV1 seuExpedientIdentificadorEni(String seuExpedientIdentificadorEni) {
-			built.seuExpedientIdentificadorEni = seuExpedientIdentificadorEni;
-			return this;
-		}
-		public BuilderV1 seuProcedimentCodi(String seuProcedimentCodi) {
-			built.seuProcedimentCodi = seuProcedimentCodi;
 			return this;
 		}
 		public BuilderV1 usuariCodi(String usuariCodi) {

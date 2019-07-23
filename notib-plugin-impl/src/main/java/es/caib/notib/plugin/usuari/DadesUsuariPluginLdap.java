@@ -203,6 +203,7 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 		return (atribut != null) ? (String)atribut.get() : null;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	private List<String> obtenirAtributComListString(
 			Attributes atributs,
 			String atributNom) throws NamingException {

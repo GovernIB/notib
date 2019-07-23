@@ -27,7 +27,6 @@ public enum NotificacioDestinatariEstatEnum implements Serializable {
 	LLEGIDA,
 	NOTIFICADA,
 	PENDENT_ENVIAMENT,
-	PENDENT_SEU,
 	PENDENT_CIE,
 	PENDENT_DEH,
 	REBUTJADA,

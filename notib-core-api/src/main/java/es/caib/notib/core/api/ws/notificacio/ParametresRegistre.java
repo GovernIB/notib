@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 /**
  * Informació sobre els paràmetres necessaris per a enviar
- * la notificació a la seu.
+ * la notificació al registre.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

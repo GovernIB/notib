@@ -23,8 +23,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 public class NotificacioV2 {
 
 	private String emisorDir3Codi;
-//	private String organGestor;
-//	private ComunicacioTipusEnum comunicacioTipus;
 	private EnviamentTipusEnum enviamentTipus;
 	private String concepte;
 	private String descripcio; //Observacions
@@ -35,13 +33,7 @@ public class NotificacioV2 {
 	private String usuariCodi;
 	private String procedimentCodi;
 	private String grupCodi;
-//	private String extracte;
-//	private RegistreDocumentacioFisicaEnumDto docFisica;
-//	private IdiomaEnumDto idioma;
 	private String numExpedient;
-//	private String codiAssumpte;
-//	private String refExterna;
-//	private String observacions;
 	private List<Enviament> enviaments;
 	
 	public String getEmisorDir3Codi() {
