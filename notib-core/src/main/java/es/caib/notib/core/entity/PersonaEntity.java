@@ -29,7 +29,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	@Enumerated(EnumType.STRING)
 	private InteressatTipusEnumDto interessatTipus;
 	@Column(name = "incapacitat")
-	private boolean incapacitat = false;
+	private boolean incapacitat;
 	@Column(name = "email", length = 100)
 	private String email;
 	@Column(name = "llinatge1", length = 100)
@@ -154,7 +154,6 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	}
 	
 	public static BuilderV2 getBuilderV2(
-			boolean incapacitat,
 			InteressatTipusEnumDto interessatTipus,
 			String email,
 			String llinatge1,
@@ -165,7 +164,6 @@ public class PersonaEntity extends NotibAuditable<Long> {
 			String raoSocial,
 			String codiEntitatDesti) {
 		return new BuilderV2(
-				incapacitat,
 				interessatTipus,
 				email,
 				llinatge1,
@@ -180,7 +178,6 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	public static class BuilderV2 {
 		PersonaEntity built;
 		BuilderV2(
-				boolean incapacitat,
 				InteressatTipusEnumDto interessatTipus,
 				String email,
 				String llinatge1,
@@ -192,7 +189,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 				String codiEntitatDesti
 				) {
 			built = new PersonaEntity();
-			built.incapacitat = incapacitat;
+			built.incapacitat = false;
 			built.interessatTipus = interessatTipus;
 			built.email = email;
 			built.codiEntitatDesti = codiEntitatDesti;
@@ -202,6 +199,10 @@ public class PersonaEntity extends NotibAuditable<Long> {
 			built.nom = nom;
 			built.raoSocial = raoSocial;
 			built.telefon = telefon;
+		}
+		public BuilderV2 incapacitat(boolean incapacitat) {
+			built.incapacitat = incapacitat;
+			return this;
 		}
 		public PersonaEntity build() {
 			return built;

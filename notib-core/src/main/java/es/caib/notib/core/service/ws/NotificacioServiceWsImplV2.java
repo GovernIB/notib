@@ -523,7 +523,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					}
 					
 					PersonaEntity titular = personaRepository.save(PersonaEntity.getBuilderV2(
-							enviament.getTitular().isIncapacitat(),
 							enviament.getTitular().getInteressatTipus(),
 							enviament.getTitular().getEmail(), 
 							enviament.getTitular().getLlinatge1(), 
@@ -532,14 +531,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							enviament.getTitular().getNom(), 
 							enviament.getTitular().getTelefon(),
 							enviament.getTitular().getRaoSocial(),
-							enviament.getTitular().getDir3Codi()).build());
+							enviament.getTitular().getDir3Codi()
+							).incapacitat(enviament.getTitular().isIncapacitat()).build());
 					
 					
 					List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
 					if (enviament.getDestinataris() != null) {
 						for(Persona persona: enviament.getDestinataris()) {
 							PersonaEntity destinatari = personaRepository.save(PersonaEntity.getBuilderV2(
-									false,
 									persona.getInteressatTipus(),
 									persona.getEmail(), 
 									persona.getLlinatge1(), 
@@ -548,7 +547,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 									persona.getNom(), 
 									persona.getTelefon(),
 									persona.getRaoSocial(),
-									persona.getDir3Codi()).build());
+									persona.getDir3Codi()
+									).incapacitat(false).build());
 							destinataris.add(destinatari);
 						}
 					}
