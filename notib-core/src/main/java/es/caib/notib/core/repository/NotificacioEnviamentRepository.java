@@ -319,7 +319,10 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	
 	@Query(	"  from	NotificacioEnviamentEntity " +
 			" where	notificaEstatFinal = false " +
+			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT " +
 			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REGISTRADA " +
+			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.FINALITZADA " +
+			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.PROCESSADA " +
 			" order by notificaEstatDataActualitzacio asc")
 	List<NotificacioEnviamentEntity> findByNotificaRefresc(
 			Pageable pageable);
