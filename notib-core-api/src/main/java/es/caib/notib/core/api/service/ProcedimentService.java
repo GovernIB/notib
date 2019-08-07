@@ -141,7 +141,7 @@ public interface ProcedimentService {
 	 * @return La llista dels procediments.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public List<ProcedimentDto> findProcedimentsSenseGrups();
+	public List<ProcedimentDto> findProcedimentsSenseGrups(EntitatDto entitatActual);
 	
 	/**
 	 * Recupera els tipus d'assumpte d'una entitat.

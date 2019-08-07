@@ -123,8 +123,8 @@ public class ProcedimentServiceBean implements ProcedimentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
-	public List<ProcedimentDto> findProcedimentsSenseGrups() {
-		return delegate.findProcedimentsSenseGrups();
+	public List<ProcedimentDto> findProcedimentsSenseGrups(EntitatDto entitatActual) {
+		return delegate.findProcedimentsSenseGrups(entitatActual);
 	}
 
 	@Override

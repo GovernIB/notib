@@ -388,7 +388,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 	
 	@Override
-	public List<ProcedimentDto> findProcedimentsSenseGrups() {
+	public List<ProcedimentDto> findProcedimentsSenseGrups(EntitatDto entitatActual) {
 		
 		entityComprovarHelper.comprovarPermisos(
 				null,
@@ -397,6 +397,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				false);
 		List<GrupProcedimentEntity> grupsProcediments = grupProcedimentRepository.findAll();
 		List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActual.getId());
 		
 		for (GrupProcedimentEntity grupProcedimentEntity : grupsProcediments) {
 			procediments.add(procedimentRepository.findOne(grupProcedimentEntity.getProcediment().getId()));
@@ -405,7 +406,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		if(procediments.size() > 0) {
 			procedimentsSenseGrups = procedimentRepository.findProcedimentsSenseGrups(procediments);	
 		}
-		
+		if (procediments.isEmpty() && procedimentsSenseGrups.isEmpty()) {
+			procedimentsSenseGrups = procedimentRepository.findByEntitat(entitat);
+		}
 		return conversioTipusHelper.convertirList(
 				procedimentsSenseGrups,
 				ProcedimentDto.class);

@@ -32,7 +32,7 @@ public class ProcedimentHelper {
 			AplicacioService aplicacioService,
 			NotificacioService notificacioService,
 			ProcedimentService procedimentService) {
-		LOGGER.info("Cercant procediments amb grups i/o permís de consulta");
+		LOGGER.debug("Cercant procediments amb grups i/o permís de consulta");
 		boolean sensePermis = false;
 		List<ProcedimentDto> procedimentsPermisConsulta = null;
 		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
@@ -45,7 +45,7 @@ public class ProcedimentHelper {
 		if (RolHelper.isUsuariActualUsuari(request)) {
 			// Llistat de procediments amb grups
 			procedimentsAmbGrups = procedimentService.findAllGrups();
-			procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups();
+			procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups(entitatActual);
 			procediments = new ArrayList<ProcedimentDto>();
 			// Obté els procediments que tenen el mateix grup que el rol d'usuari
 			for (ProcedimentGrupDto grupProcediment : procedimentsAmbGrups) {
@@ -105,7 +105,7 @@ public class ProcedimentHelper {
 			}
 		}
 		// Procediments sense grups però amb perís consulta
-		procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups();
+		procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups(entitatActual);
 
 		if (!procedimentsSenseGrups.isEmpty()) {
 			procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(

@@ -177,7 +177,7 @@ public class NotificacioController extends BaseUserController {
 			grupsProcediment = procedimentService.findAllGrups();
 
 			procedimentsAmbGrups = new ArrayList<ProcedimentDto>();
-			procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups();
+			procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups(entitatActual);
 			// Obté els procediments que tenen el mateix grup que el rol d'usuari
 			for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
 
@@ -405,7 +405,7 @@ public class NotificacioController extends BaseUserController {
 					}
 				}
 				// Procediments sense grups però amb perís consulta
-				procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups();
+				procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups(entitatActual);
 	
 				if (!procedimentsSenseGrups.isEmpty()) {
 					procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(

@@ -179,7 +179,7 @@ public class EnviamentController extends BaseUserController {
 					}
 				}
 				// Procediments sense grups però amb perís consulta
-				procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups();
+				procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups(entitatActual);
 
 				if (!procedimentsSenseGrups.isEmpty()) {
 					procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(

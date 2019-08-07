@@ -59,10 +59,10 @@ public class PermisosHelper {
 								entitatActual));
 			}
 			// Procediments sense grups però amb perís consulta
-			procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups();
+			procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups(entitatActual);
 
 			if (!procedimentsSenseGrups.isEmpty()) {
-				procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
+				procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(
 								procedimentsSenseGrups,
 								entitatActual);
 				if (!procedimentsPermisConsultaSenseGrups.isEmpty()) {
