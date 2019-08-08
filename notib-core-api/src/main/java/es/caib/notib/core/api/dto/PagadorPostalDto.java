@@ -4,15 +4,12 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class PagadorPostalDto extends AuditoriaDto implements Serializable {
-
+	
 	private Long id;
 	private String dir3codi;
 	private String contracteNum;
 	private Date contracteDataVig;
 	private String facturacioClientCodi;
-	
-	
-	
 	
 	public Long getId() {
 		return id;
@@ -45,11 +42,6 @@ public class PagadorPostalDto extends AuditoriaDto implements Serializable {
 		this.facturacioClientCodi = facturacioClientCodi;
 	}
 
-
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 6875716151909763392L;
 
 }

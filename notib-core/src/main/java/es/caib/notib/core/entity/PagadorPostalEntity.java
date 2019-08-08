@@ -34,7 +34,7 @@ public class PagadorPostalEntity extends NotibAuditable<Long> {
 	private String contracteNum;
 	
 	@Column(name = "contracte_data_vig")
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date contracteDataVig;
 	
 	@Column(name = "facturacio_codi_client", length = 20)

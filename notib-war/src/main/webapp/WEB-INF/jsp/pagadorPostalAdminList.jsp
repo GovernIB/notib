@@ -53,7 +53,7 @@
 			<tr>
 				<th data-col-name="dir3codi"><spring:message code="pagadorpostal.list.columna.dir3codi"/></th>
 				<th data-col-name="contracteNum"><spring:message code="pagadorpostal.list.columna.contracteNum"/></th>
-				<th data-col-name="contracteDataVig" data-converter="date"><spring:message code="pagadorpostal.list.columna.contracteDataVig"/></th>
+				<th data-col-name="contracteDataVig" data-type="date" data-converter="date"><spring:message code="pagadorpostal.list.columna.contracteDataVig"/></th>
 				<th data-col-name="facturacioClientCodi"><spring:message code="pagadorpostal.list.columna.facturacioClientCodi"/></th>				
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">

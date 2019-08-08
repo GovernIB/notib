@@ -36,6 +36,12 @@
     overflow-y: auto;
 }
 </style>
+
+<script type="text/javascript">
+$(document).ready(function () {
+	$('#contracteDataVig').datepicker( "option", "dateFormat", "dd/mm/yy" );
+})
+</script>
 <body>
 	<c:set var="formAction"><not:modalUrl value="/pagadorPostal/newOrModify"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="pagadorPostalCommand" role="form">
@@ -48,7 +54,7 @@
 				<not:inputText name="contracteNum" textKey="pagadorpostal.form.camp.contracteNum"/>
 			</div>
 			<div class="col-md-2">
-				<not:inputDate name="contracteDataVig" disabled="false" textKey="pagadorpostal.form.camp.contracteDataVig" custom="true"/>
+				<not:inputDate name="contracteDataVig" textKey="pagadorpostal.form.camp.contracteDataVig"/>
 			</div>
 			<div class="col-md-2">
 				<not:inputText name="facturacioClientCodi" textKey="pagadorpostal.form.camp.facturacioClientCodi"/>

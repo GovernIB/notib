@@ -145,7 +145,6 @@ public class PagadorPostalController extends BaseUserController{
 		
 		if (pagadorPostalId != null) {
 			pagadorPostal = pagadorPostalService.findById(pagadorPostalId);
-			
 			model.addAttribute(pagadorPostal);
 		}
 		
