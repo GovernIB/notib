@@ -20,7 +20,7 @@ import es.caib.notib.war.helper.ConversioTipusHelper;
 public class ProcedimentCommand {
 	
 	private Long id;
-	@NotEmpty @Size(max=6)
+	@NotEmpty @Size(max=9)
 	private String codi;
 	@NotEmpty @Size(max=100)
 	private String nom;
