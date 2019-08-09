@@ -1046,9 +1046,9 @@ public class PluginHelper {
 			registre.setTipoTransporte("07");
 		}
 		registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
-		registre.setCodigoUsuario(PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.registre.codi.usuari"));
+		registre.setCodigoUsuario(notificacio.getUsuariCodi());
 		registre.setAplicacionTelematica("NOTIB");
-		registre.setAplicacion("NOTIB");
+		registre.setAplicacion("RWE");
 		registre.setVersion("3.1");
 		registre.setObservaciones(notificacio.getDescripcio());
 		registre.setExpone("");
@@ -1166,7 +1166,7 @@ public class PluginHelper {
 			interessatDades.setTipoInteresado(titular.getInteressatTipus().getLongVal());
 			interessatDades.setTipoDocumentoIdentificacion("N");
 			interessatDades.setDocumento(titular.getNif());
-			interessatDades.setRazonSocial(titular.getRaoSocial());
+			interessatDades.setRazonSocial(titular.getNom());
 			interessatDades.setNombre(titular.getNom());
 			interessatDades.setApellido1(titular.getLlinatge1());
 			interessatDades.setApellido2(titular.getLlinatge2());
@@ -1184,7 +1184,7 @@ public class PluginHelper {
 			representantDades.setTipoInteresado(destinatari.getInteressatTipus().getLongVal());
 			representantDades.setTipoDocumentoIdentificacion("N");
 			representantDades.setDocumento(destinatari.getNif());
-			representantDades.setRazonSocial(destinatari.getRaoSocial());
+			representantDades.setRazonSocial(destinatari.getNom());
 			representantDades.setNombre(destinatari.getNom());
 			representantDades.setApellido1(destinatari.getLlinatge1());
 			representantDades.setApellido2(destinatari.getLlinatge2());
