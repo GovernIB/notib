@@ -879,10 +879,18 @@ function mostrarEntregaDeh(className) {
 												<not:inputSelect name="enviaments[${j}].entregaPostal.provincia" generalClass="provincies" emptyOption="true" textKey="notificacio.form.camp.entregapostal.provincia" labelClass="labelcss" inputClass="inputcss"/>
 											</div>
 											<div class="col-md-6 poblacioSelect">
-												<not:inputSelect name="enviaments[${j}].entregaPostal.poblacio" generalClass="localitats" emptyOption="true" textKey="notificacio.form.camp.entregapostal.poblacio" labelClass="labelcss" inputClass="inputcss"/>
+												<not:inputSelect name="enviaments[${j}].entregaPostal.municipiCodi" generalClass="localitats" emptyOption="true" textKey="notificacio.form.camp.entregapostal.poblacio" labelClass="labelcss" inputClass="inputcss"/>
 											</div>
+<%-- 											
 											<div class="col-md-6 poblacioText hidden">
-												<not:inputText name="enviaments[${j}].entregaPostal.poblacio" textKey="notificacio.form.camp.entregapostal.poblacio" labelClass="labelcss" inputClass="inputcss" />
+ 												<not:inputText name="enviaments[${j}].entregaPostal.municipi" textKey="notificacio.form.camp.entregapostal.municipi" labelClass="labelcss" inputClass="inputcss" />
+ 											</div> 
+--%>
+											<div class="col-md-6">
+												<not:inputText name="enviaments[${j}].entregaPostal.poblacio" textKey="notificacio.form.camp.entregapostal.poblacio" labelClass="labelcss" inputClass="inputcss"/>
+											</div>
+											<div class="col-md-12">
+												<not:inputText name="enviaments[${j}].entregaPostal.complement" textKey="notificacio.form.camp.entregapostal.complement" labelClass="labelcss" inputClass="inputcss" />
 											</div>
 											<c:choose>
 												<c:when test="${not empty formatsFulla}">
@@ -908,9 +916,6 @@ function mostrarEntregaDeh(className) {
 												</div>
 												</c:otherwise>
 											</c:choose>	
-											<div class="col-md-12">
-												<not:inputText name="enviaments[${j}].entregaPostal.complement" textKey="notificacio.form.camp.entregapostal.complement" labelClass="labelcss" inputClass="inputcss" />
-											</div>
 										</div>	
 										<div class="senseNormalitzar hidden">
 											<div class="col-md-6">
