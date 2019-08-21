@@ -138,7 +138,13 @@ $(document).ready(function() {
 					contingutTbody += ' <span class="fa fa-warning text-danger" title="' + escaped + '"></span>';
 				}
 				contingutTbody += '</td>';
-				contingutTbody += '<td width="5%">';
+				contingutTbody += '<td width="114px">';
+				if (data[i].notificaCertificacioData != null) {
+					contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/certificacioDescarregar"/>" class="btn btn-default btn-sm" title="<spring:message code="enviament.info.accio.descarregar.certificacio"/>"><span class="fa fa-download"></span></a>';
+				} else if (data[i].notificacio.estat == 'REGISTRADA' && 
+						(data[i].registreEstat == 'DISTRIBUIT' || data[i].registreEstat == 'OFICI_EXTERN' || data[i].registreEstat == 'OFICI_SIR')) {
+					contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/justificantDescarregar"/>" class="btn btn-default btn-sm" title="<spring:message code="enviament.info.accio.descarregar.justificant"/>"><span class="fa fa-download"></span></a>';
+				}
 				contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" data-toggle="modal" class="btn btn-default btn-sm"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>';
 				contingutTbody += '</td>';
 				contingutTbody += '</tr>';

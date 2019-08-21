@@ -6,9 +6,13 @@ package es.caib.notib.core.helper;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
+
+import es.caib.notib.core.api.dto.EntregaPostalDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
+import es.caib.notib.core.api.ws.notificacio.EntregaPostal;
 import es.caib.notib.core.entity.NotificacioEntity;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
@@ -173,11 +177,22 @@ public class ConversioTipusHelper {
 					}
 				});*/
 		mapperFactory.classMap(NotificacioEntity.class, NotificacioDto.class).
-		field("notificaErrorEvent.data", "notificaErrorData").
-		field("notificaErrorEvent.errorDescripcio", "notificaErrorDescripcio").
-		exclude("destinataris").
-		byDefault().
-		register();
+			field("notificaErrorEvent.data", "notificaErrorData").
+			field("notificaErrorEvent.errorDescripcio", "notificaErrorDescripcio").
+			exclude("destinataris").
+			byDefault().
+			register();
+		
+		mapperFactory.classMap(EntregaPostalDto.class, EntregaPostal.class).
+			field("tipusVia", "viaTipus").
+			byDefault().
+			register();
+		
+		mapperFactory.classMap(EntregaPostal.class, EntregaPostalDto.class).
+			field("viaTipus", "tipusVia").
+			byDefault().
+			register();
+		
 	}
 
 	public <T> T convertir(Object source, Class<T> targetType) {

@@ -615,7 +615,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 							}
 						}
 						if (!enviament.getDomiciliConcretTipus().equals(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR)) {
-							entregaPostal.setTipoVia(viaTipusToString(enviament.getDomiciliViaTipus()));
+							entregaPostal.setTipoVia(enviament.getDomiciliViaTipus() != null ? enviament.getDomiciliViaTipus().getVal() : null); //viaTipusToString(enviament.getDomiciliViaTipus()));
 							entregaPostal.setNombreVia(enviament.getDomiciliViaNom());
 							entregaPostal.setNumeroCasa(enviament.getDomiciliNumeracioNumero());
 							entregaPostal.setPuntoKilometrico(enviament.getDomiciliNumeracioPuntKm());
@@ -709,6 +709,18 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					}
 					header.addChildElement(apiKeyElement);
 					context.getMessage().saveChanges();
+					
+//					// Debug 
+//					StringBuilder sb = new StringBuilder();
+//					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//					try {
+//						context.getMessage().writeTo(baos);
+//						sb.append(baos.toString());
+//					} catch (Exception ex) {
+//						sb.append("Error al processar el missatge XML: " + ex.getMessage());
+//					}
+//					logger.info(sb.toString());
+					
 				} catch (SOAPException ex) {
 					logger.error(
 							"No s'ha pogut afegir l'API key a la petició SOAP per Notifica",

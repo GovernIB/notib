@@ -100,17 +100,23 @@ public class NotificacioServiceBean implements NotificacioService {
 				enviamentId);
 	}
 
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public void notificaEnviamentsRegistrats() {
-		delegate.notificaEnviamentsRegistrats();
-	}
-	
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public void enviamentRefrescarEstatPendents() {
-		delegate.enviamentRefrescarEstatPendents();
-	}
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+//	public void notificaEnviamentsRegistrats() {
+//		delegate.notificaEnviamentsRegistrats();
+//	}
+//	
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+//	public void enviamentRefrescarEstatPendents() {
+//		delegate.enviamentRefrescarEstatPendents();
+//	}
+//
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+//	public void registrarEnviamentsPendents() {
+//		delegate.registrarEnviamentsPendents();
+//	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
@@ -119,7 +125,7 @@ public class NotificacioServiceBean implements NotificacioService {
 			NotificacioDtoV2 notificacio) {
 		return delegate.create(entitatId, notificacio);
 	}
-
+	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public NotificacioDtoV2 update(
@@ -220,11 +226,6 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.registrarNotificar(notificacioId);
 	}
 
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
-	public void registrarEnviamentsPendents() {
-		delegate.registrarEnviamentsPendents();
-	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
@@ -248,5 +249,20 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"NOT_USER"})
 	public List<PaisosDto> llistarPaisos() {
 		return delegate.llistarPaisos();
+	}
+
+	@Override
+	public void notificacioRegistrar(Long notificacioId) {
+		delegate.notificacioRegistrar(notificacioId);
+	}
+
+	@Override
+	public void notificacioEnviar(Long notificacioId) {
+		delegate.notificacioEnviar(notificacioId);
+	}
+
+	@Override
+	public void enviamentRefrescarEstat(Long notificacioId) {
+		delegate.enviamentRefrescarEstat(notificacioId);
 	}
 }
