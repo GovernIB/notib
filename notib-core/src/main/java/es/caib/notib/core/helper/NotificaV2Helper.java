@@ -582,22 +582,22 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					envio.setDestinatarios(destinatarios);
 					if (enviament.getDomiciliConcretTipus() != null) {
 						EntregaPostal entregaPostal = new EntregaPostal();
-						OrganismoPagadorPostal pagadorPostal = new OrganismoPagadorPostal();
 						if (notificacio.getPagadorPostal() != null) {
+							OrganismoPagadorPostal pagadorPostal = new OrganismoPagadorPostal();
 							pagadorPostal.setCodigoDIR3Postal(notificacio.getPagadorPostal().getDir3codi());
 							pagadorPostal.setCodClienteFacturacionPostal(notificacio.getPagadorPostal().getFacturacioClientCodi());
 							pagadorPostal.setNumContratoPostal(notificacio.getPagadorPostal().getContracteNum());
 							pagadorPostal.setFechaVigenciaPostal(
 								toXmlGregorianCalendar(notificacio.getPagadorPostal().getContracteDataVig()));
+							entregaPostal.setOrganismoPagadorPostal(pagadorPostal);
 						}
-						entregaPostal.setOrganismoPagadorPostal(pagadorPostal);
-						OrganismoPagadorCIE pagadorCie = new OrganismoPagadorCIE();
 						if (notificacio.getPagadorCie() != null) {
+							OrganismoPagadorCIE pagadorCie = new OrganismoPagadorCIE();
 							pagadorCie.setCodigoDIR3CIE(notificacio.getPagadorCie().getDir3codi());
 							pagadorCie.setFechaVigenciaCIE(
 								toXmlGregorianCalendar(notificacio.getPagadorCie().getContracteDataVig()));
+							entregaPostal.setOrganismoPagadorCIE(pagadorCie);
 						}
-						entregaPostal.setOrganismoPagadorCIE(pagadorCie);
 						if (enviament.getDomiciliConcretTipus() != null) {
 							switch (enviament.getDomiciliConcretTipus())  {
 							case NACIONAL:
@@ -710,7 +710,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					header.addChildElement(apiKeyElement);
 					context.getMessage().saveChanges();
 					
-//					// Debug 
+					// Debug 
 //					StringBuilder sb = new StringBuilder();
 //					ByteArrayOutputStream baos = new ByteArrayOutputStream();
 //					try {
