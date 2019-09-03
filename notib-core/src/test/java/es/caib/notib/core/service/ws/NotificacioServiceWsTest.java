@@ -34,6 +34,7 @@ import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.SchedulledService;
 import es.caib.notib.core.api.ws.notificacio.Document;
 import es.caib.notib.core.api.ws.notificacio.EntregaDeh;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostal;
@@ -70,6 +71,8 @@ public class NotificacioServiceWsTest extends BaseServiceTest {
 	private EntitatService entitatService;
 	@Autowired
 	private NotificacioService notificacioService;
+	@Autowired
+	private SchedulledService schedulledService;
 	@Autowired
 	private NotificacioServiceWs notificacioServiceWs;
 
@@ -133,7 +136,7 @@ public class NotificacioServiceWsTest extends BaseServiceTest {
 			assertThat(
 					informacio.getEstat(),
 					is(EnviamentEstatEnum.NOTIB_PENDENT));
-			notificacioService.notificaEnviamentsRegistrats();
+			schedulledService.notificaEnviamentsRegistrats();
 			RespostaConsultaEstatEnviament informacio2 = notificacioServiceWs.consultaEstatEnviament(
 					respostAlta.getReferencies().get(0).getReferencia());
 			assertThat(
@@ -177,7 +180,7 @@ public class NotificacioServiceWsTest extends BaseServiceTest {
 		for (EnviamentReferencia referencia: respostAlta.getReferencies()) {
 			System.out.println("    - " + referencia.getReferencia());
 		}
-		notificacioService.notificaEnviamentsRegistrats();
+		schedulledService.notificaEnviamentsRegistrats();
 		RespostaConsultaEstatEnviament informacio2 = notificacioServiceWs.consultaEstatEnviament(
 				respostAlta.getReferencies().get(0).getReferencia());
 		assertThat(

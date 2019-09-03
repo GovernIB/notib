@@ -13,6 +13,8 @@ import javax.validation.constraints.Size;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.caib.notib.core.api.dto.DocumentDto;
@@ -21,6 +23,7 @@ import es.caib.notib.core.api.dto.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
@@ -32,6 +35,7 @@ import es.caib.notib.war.validation.ValidConcepte;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+//@ValidEnviament
 public class NotificacioCommandV2 {
 
 	
@@ -341,6 +345,29 @@ public class NotificacioCommandV2 {
 			document.getMetadades().put(command.getDocument().getMetadadesKeys().get(i), command.getDocument().getMetadadesValues().get(i));
 		}
 		dto.setDocument(document);
+		
+		// Format de municipi i província
+		if (dto.getEnviaments() != null) {
+			for (NotificacioEnviamentDtoV2 enviament: dto.getEnviaments()) {
+				if (enviament.getEntregaPostal() != null) {
+					String codiProvincia = enviament.getEntregaPostal().getProvincia();
+					if (codiProvincia != null && !codiProvincia.isEmpty()) {
+						try {
+							codiProvincia = String.format("%02d", Integer.parseInt(codiProvincia));
+							enviament.getEntregaPostal().setProvincia(codiProvincia);
+							String codiMunicipi = enviament.getEntregaPostal().getMunicipiCodi();
+							if (codiMunicipi != null && !codiMunicipi.isEmpty()) {
+								codiMunicipi = codiProvincia + String.format("%04d", Integer.parseInt(codiMunicipi));
+								enviament.getEntregaPostal().setMunicipiCodi(codiMunicipi);
+							}
+						} catch (Exception e) {
+							logger.error("Error al donar format a la provincia: '" + enviament.getEntregaPostal().getProvincia() + 
+									"' i al municipi '" + enviament.getEntregaPostal().getMunicipiCodi() + "'");
+						}
+					}
+				}
+			}
+		}
 		return dto;
 	}
 
@@ -350,5 +377,7 @@ public class NotificacioCommandV2 {
 	}
 	
 	public interface NotificacioCaducitat {}
+	
+	private static final Logger logger = LoggerFactory.getLogger(NotificacioCommandV2.class);
 
 }

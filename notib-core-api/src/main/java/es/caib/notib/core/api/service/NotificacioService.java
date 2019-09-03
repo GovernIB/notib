@@ -310,23 +310,31 @@ public interface NotificacioService {
 			Long notificacioId,
 			String motiu) throws MessagingException;
 	
-	/**
-	 * Mètode d'execució periòdica per a fer els enviaments pendents
-	 * a Notific@.
-	 */
-	public void notificaEnviamentsRegistrats();
-	
-	/**
-	 * Mètode d'execució periòdica per a fer els enviaments pendents
-	 * al registre.
-	 */
-	public void registrarEnviamentsPendents();
+//	/**
+//	 * Mètode d'execució periòdica per a fer els enviaments pendents
+//	 * a Notific@.
+//	 */
+//	public void notificaEnviamentsRegistrats();
+//	
+//	/**
+//	 * Mètode d'execució periòdica per a fer els enviaments pendents
+//	 * al registre.
+//	 */
+//	public void registrarEnviamentsPendents();
+//
+//	/**
+//	 * Mètode d'execució periòdica per a refrescar l'estat dels enviaments fets a
+//	 * Notific@.
+//	 */
+//	public void enviamentRefrescarEstatPendents();
 
-	/**
-	 * Mètode d'execució periòdica per a refrescar l'estat dels enviaments fets a
-	 * Notific@.
-	 */
-	public void enviamentRefrescarEstatPendents();
+
+	// Mètodes per cridar des de l'schedulled
+	void notificacioRegistrar(Long notificacioId);
+	void notificacioEnviar(Long notificacioId);
+	void enviamentRefrescarEstat(Long notificacioId);
+
+
 
 	
 
