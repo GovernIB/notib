@@ -10,12 +10,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -44,6 +47,7 @@ import es.caib.notib.core.api.dto.RegistreModeFirmaDtoEnum;
 import es.caib.notib.core.api.dto.RegistreOrigenDtoEnum;
 import es.caib.notib.core.api.dto.RegistreTipusDocumentDtoEnum;
 import es.caib.notib.core.api.dto.RegistreTipusDocumentalDtoEnum;
+import es.caib.notib.core.api.dto.RegistreValidezDocumentDtoEnum;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.entity.DocumentEntity;
@@ -217,13 +221,12 @@ public class PluginHelper {
 	
 	public Document arxiuDocumentConsultar(
 			String arxiuUuid,
-			String versio,
-			boolean isUuid) {
-		if(isUuid) {
-			arxiuUuid = "uuid:" + arxiuUuid;
-		} else {
-			arxiuUuid = "csv:" + arxiuUuid;
-		}
+			String versio) {
+//		if(custom && isUuid) {
+//			arxiuUuid = "uuid:" + arxiuUuid;
+//		} else if (custom && !isUuid) {
+//			arxiuUuid = "csv:" + arxiuUuid;
+//		}
 		
 		String accioDescripcio = "Consulta d'un document";
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -567,36 +570,35 @@ public class PluginHelper {
 			|| (documentDto.getCsv() != null && !documentDto.getCsv().isEmpty()))
 			&& (documentDto.getUrl() == null || documentDto.getUrl().isEmpty())
 			&& (documentDto.getContingutBase64() == null || documentDto.getContingutBase64().isEmpty())) {
+			DocumentContingut doc = null;
 			String id = "";
-			boolean uuid = false;
 			if(documentDto.getUuid() != null) {
 				id = documentDto.getUuid();
 				document.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA.getValor());
-				uuid = true;
+				doc = arxiuGetImprimible(id, true);	
+				Document docDetall = arxiuDocumentConsultar(id, null);
+				if (docDetall.getMetadades() != null) {
+					document.setData(docDetall.getMetadades().getDataCaptura());
+					document.setOrigen(docDetall.getMetadades().getOrigen().ordinal());
+					document.setTipusDocumental(docDetall.getMetadades().getTipusDocumental().toString());
+				}
 			} else if (documentDto.getCsv() != null) {
 				id = documentDto.getCsv();
+				doc = arxiuGetImprimible(id, false);	
 				document.setModeFirma(RegistreModeFirmaEnum.AUTOFIRMA_SI.getValor());
-				uuid = false;
+				
+				document.setData(new Date());
+				document.setOrigen(RegistreOrigenEnum.ADMINISTRACIO.getValor());
+				document.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO.getValor());
 			}
 			try {
-				Document doc = arxiuDocumentConsultar(id, null, uuid);
-					
-//				document.setArxiuNom(doc.getNom());
-//				document.setArxiuContingut(doc.getContingut().getContingut());
-//				document.setIdiomaCodi("ca");
-//				document.setData(new Date());
-//				document.setOrigen(RegistreOrigenEnum.ADMINISTRACIO.getValor());
-//				document.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI.name());
-//				document.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO.name());
-				document.setArxiuNom(doc.getNom());
-				document.setArxiuContingut(doc.getContingut().getContingut());
-				document.setIdiomaCodi("ca");
-				document.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI.name());
-				if (doc.getMetadades() != null) {
-					document.setData(doc.getMetadades().getDataCaptura());
-					document.setOrigen(doc.getMetadades().getOrigen().ordinal());
-					document.setTipusDocumental(doc.getMetadades().getTipusDocumental().name());
+				if (doc != null) {
+					document.setArxiuNom(doc.getArxiuNom());
+					document.setArxiuContingut(doc.getContingut());
 				}
+				document.setIdiomaCodi("ca");
+				document.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
+				
 			} catch(ArxiuException ae) {
 				logger.error("Error Obtenint el document uuid/csv: " + id);
 			}
@@ -606,8 +608,8 @@ public class PluginHelper {
 				&& (documentDto.getContingutBase64() == null || documentDto.getContingutBase64().isEmpty())) {
 			document.setNom(documentDto.getUrl());
 			document.setArxiuNom(documentDto.getUrl());
-			document.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI.name());
-			document.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO.name());
+			document.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
+			document.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO.getValor());
 			document.setOrigen(RegistreOrigenEnum.ADMINISTRACIO.getValor());
 			document.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA.getValor());
 			document.setData(new Date());
@@ -623,8 +625,8 @@ public class PluginHelper {
 					baos);
 			document.setArxiuContingut(baos.toByteArray());
 			document.setArxiuNom(documentDto.getArxiuNom());
-			document.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI.name());
-			document.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO.name());
+			document.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
+			document.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO.getValor());
 			document.setOrigen(RegistreOrigenEnum.ADMINISTRACIO.getValor());
 			document.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA.getValor());
 			document.setData(new Date());
@@ -695,30 +697,46 @@ public class PluginHelper {
 		try {
 			AnexoWsDto annex = null;
 			Path path = null;
-			Map<String, Object> metadades = new HashMap<String, Object>();
-			
 			if((document.getUuid() != null || document.getCsv() != null) && document.getUrl() == null && document.getContingutBase64() == null) {
 				annex = new AnexoWsDto();
 				String id = "";
+				DocumentContingut doc;
+				Document docDetall = null;
 				if(document.getUuid() != null) {
 					id = document.getUuid();
 					try {
-						DocumentContingut doc = arxiuGetImprimible(id, true);
+						doc = arxiuGetImprimible(id, true);
 						annex.setFicheroAnexado(doc.getContingut());
 						annex.setNombreFicheroAnexado(doc.getArxiuNom());
+						docDetall = arxiuDocumentConsultar(id, null);
+						
+						if (docDetall != null) {
+							annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumental().toString());
+							annex.setOrigenCiudadanoAdmin(docDetall.getMetadades().getOrigen().ordinal());
+							annex.setFechaCaptura(toXmlGregorianCalendar(docDetall.getMetadades().getDataCaptura()));
+						}
 					}catch(ArxiuException ae) {
 						logger.error("Error Obtenint el document per l'uuid");
 					}
 				} else if (document.getCsv() != null){
 					id = document.getCsv();
 					try {
-						DocumentContingut doc = arxiuGetImprimible(id, false);
+						doc = arxiuGetImprimible(id, false);
 						annex.setFicheroAnexado(doc.getContingut());
 						annex.setNombreFicheroAnexado(doc.getArxiuNom());
+						annex.setCsv(document.getCsv());
+						
+						annex.setTipoDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO.getValor());
+						annex.setOrigenCiudadanoAdmin(0);	
+						annex.setFechaCaptura(toXmlGregorianCalendar(new Date()));
 					}catch(ArxiuException ae) {
 						logger.error("Error Obtenint el document per el csv");
 					}
 				}
+				
+				annex.setTipoDocumento(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
+				annex.setValidezDocumento(RegistreValidezDocumentDtoEnum.ORIGINAL.getValor());
+				
 				path = new File(document.getArxiuNom()).toPath(); 
 			}else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
 				annex = new AnexoWsDto();
@@ -749,6 +767,13 @@ public class PluginHelper {
 				}
 				annex.setFicheroAnexado(baos.toByteArray());
 				annex.setNombreFicheroAnexado(FilenameUtils.getName(document.getUrl()));
+				
+				//Metadades
+				annex.setTipoDocumento(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
+				annex.setTipoDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO.getValor());
+				annex.setOrigenCiudadanoAdmin(0);	
+				annex.setValidezDocumento(RegistreValidezDocumentDtoEnum.ORIGINAL.getValor());
+				annex.setFechaCaptura(toXmlGregorianCalendar(new Date()));
 				path = new File(FilenameUtils.getName(document.getUrl())).toPath();
 			}else if(document.getArxiuGestdocId() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
 				annex = new AnexoWsDto();
@@ -759,6 +784,14 @@ public class PluginHelper {
 						output);
 				annex.setFicheroAnexado(output.toByteArray());
 				annex.setNombreFicheroAnexado(document.getArxiuNom());
+
+				//Metadades
+				annex.setTipoDocumento(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
+				annex.setTipoDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO.getValor());
+				annex.setOrigenCiudadanoAdmin(0);	
+				annex.setValidezDocumento(RegistreValidezDocumentDtoEnum.ORIGINAL.getValor());
+				annex.setFechaCaptura(toXmlGregorianCalendar(new Date()));
+				
 				path = new File(document.getArxiuNom()).toPath();
 			}
 			try {
@@ -766,17 +799,6 @@ public class PluginHelper {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
-			annex.setTipoDocumental((String)metadades.get("tipoDocumental"));
-			annex.setValidezDocumento((String)metadades.get("validezDocumento"));
-			annex.setTipoDocumento((String)metadades.get("tipoDocumento"));
-			annex.setObservaciones((String)metadades.get("observaciones"));
-			String origenCiudadanoAdmin = (String)metadades.get("origenCiudadanoAdmin");
-			if(origenCiudadanoAdmin != null) {
-				annex.setOrigenCiudadanoAdmin(Integer.parseInt(origenCiudadanoAdmin));	
-			}
-			annex.setFechaCaptura((XMLGregorianCalendar)metadades.get("fechaCaptura"));
-			annex.setCsv((String)metadades.get("csv"));
 			annex.setTitulo("Annex 1");
 			annex.setModoFirma(0);
 			/*Llogica de recerca de document*/
@@ -1211,6 +1233,15 @@ public class PluginHelper {
     	} catch (Exception exc) {
     		throw new Exception(exc.getMessage());
     	}
+	}
+	
+	private XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
+		if (date == null) {
+			return null;
+		}
+		GregorianCalendar gc = new GregorianCalendar();
+		gc.setTime(date);
+		return DatatypeFactory.newInstance().newXMLGregorianCalendar(gc);
 	}
 	
 	public boolean isDadesUsuariPluginDisponible() {

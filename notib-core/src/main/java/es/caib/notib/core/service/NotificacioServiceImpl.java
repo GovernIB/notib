@@ -16,14 +16,11 @@ import java.util.List;
 
 import javax.mail.MessagingException;
 
-import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,7 +72,6 @@ import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PluginHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.helper.RegistreNotificaHelper;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.EntitatRepository;
@@ -106,8 +102,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
-	@Autowired
-	private PropertiesHelper propertiesHelper;
 	@Autowired
 	private NotificaHelper notificaHelper;
 	@Autowired
@@ -166,9 +160,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (pluginHelper.isArxiuPluginDisponible()) {
 				Document documentArxiu = pluginHelper.arxiuDocumentConsultar(
 						arxiuUuid, 
-						null, 
-						true);
-				document.setArxiuNom(documentArxiu.getContingut().getArxiuNom());
+						null);
+				document.setArxiuNom(documentArxiu.getNom());
 				document.setNormalitzat(notificacio.getDocument().isNormalitzat());
 				document.setGenerarCsv(notificacio.getDocument().isGenerarCsv());
 				document.setUuid(arxiuUuid);
@@ -178,11 +171,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 			DocumentDto document = new DocumentDto();
 			String arxiuCsv = notificacio.getDocument().getCsv();
 			if (pluginHelper.isArxiuPluginDisponible()) {
-				Document documentArxiu = pluginHelper.arxiuDocumentConsultar(
-						arxiuCsv, 
-						null, 
-						false);
-				document.setArxiuNom(documentArxiu.getContingut().getArxiuNom());
+				DocumentContingut documentArxiu = pluginHelper.arxiuGetImprimible(arxiuCsv, false);
+				document.setArxiuNom(documentArxiu.getArxiuNom());
 				document.setNormalitzat(notificacio.getDocument().isNormalitzat());
 				document.setGenerarCsv(notificacio.getDocument().isGenerarCsv());
 				document.setCsv(arxiuCsv);
