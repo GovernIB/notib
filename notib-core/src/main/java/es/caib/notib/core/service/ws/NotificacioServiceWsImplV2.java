@@ -188,12 +188,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				return resposta;
 			}
 			if(enviament.isEntregaPostalActiva()){
-				if((enviament.getEntregaPostal().getViaNom() == null || enviament.getEntregaPostal().getViaNom().isEmpty())) {
-					resposta.setError(true);
-					resposta.setEstat(NotificacioEstatEnum.PENDENT);
-					resposta.setErrorDescripcio("[ENTREGA_POSTAL_NOM_VIA] El camp 'viaNom' de l'entrega postal d'un enviament no pot ser null.");
-					return resposta;
-				}
 				if (enviament.getEntregaPostal().getTipus() == null) {
 					resposta.setError(true);
 					resposta.setEstat(NotificacioEstatEnum.PENDENT);
@@ -201,6 +195,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					return resposta;
 				}
 				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.NACIONAL)) {
+					if((enviament.getEntregaPostal().getViaNom() == null || enviament.getEntregaPostal().getViaNom().isEmpty())) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[ENTREGA_POSTAL_NOM_VIA] El camp 'viaNom' de l'entrega postal d'un enviament no pot ser null.");
+						return resposta;
+					}
 					if (enviament.getEntregaPostal().getViaTipus() == null) {
 						resposta.setError(true);
 						resposta.setEstat(NotificacioEstatEnum.PENDENT);
@@ -233,6 +233,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					}
 				}
 				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.ESTRANGER)) {
+					if((enviament.getEntregaPostal().getViaNom() == null || enviament.getEntregaPostal().getViaNom().isEmpty())) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[ENTREGA_POSTAL_NOM_VIA] El camp 'viaNom' de l'entrega postal d'un enviament no pot ser null.");
+						return resposta;
+					}
 					if (enviament.getEntregaPostal().getViaNom() == null || enviament.getEntregaPostal().getViaNom().isEmpty()) {
 						resposta.setError(true);
 						resposta.setEstat(NotificacioEstatEnum.PENDENT);
