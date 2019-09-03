@@ -356,8 +356,8 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		ar.setReferenciaExterna(dto.getReferenciaExterna());
 		ar.setResumen(dto.getResumen());
 		ar.setSolicita(dto.getSolicita());
-		ar.setTipoAsunto(dto.getTipoAsunto());
-		ar.setTipoAsuntoDenominacion(dto.getTipoAsuntoDenominacion());
+		//ar.setTipoAsunto(dto.getTipoAsunto());
+		//ar.setTipoAsuntoDenominacion(dto.getTipoAsuntoDenominacion());
 		ar.setTipoDocumentacionFisicaCodigo(dto.getTipoDocumentacionFisicaCodigo());
 		ar.setTipoEnvioDocumentacion(dto.getTipoEnvioDocumentacion());
 		ar.setTipoRegistro(dto.getTipoRegistro());
@@ -475,8 +475,8 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper
 		 * 3 = Documentació adjunta digitalitzada */
 		registre.setTipoDocumentacionFisicaCodigo(3L);
-		registre.setTipoAsunto(notificacio.getRegistreTipusAssumpte());
-		registre.setTipoAsuntoDenominacion(notificacio.getRegistreTipusAssumpte());
+		//registre.setTipoAsunto(notificacio.getRegistreTipusAssumpte());
+		//registre.setTipoAsuntoDenominacion(notificacio.getRegistreTipusAssumpte());
 		registre.setCodigoAsunto(notificacio.getRegistreTipusAssumpte());
 		registre.setCodigoAsuntoDenominacion(notificacio.getRegistreTipusAssumpte());
 		registre.setIdioma(1L);
