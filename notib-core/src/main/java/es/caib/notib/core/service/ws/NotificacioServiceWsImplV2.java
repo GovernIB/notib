@@ -306,7 +306,13 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				}
 			}
 
-			if (entitat.isAmbEntregaDeh() && enviament.getEntregaDeh() == null) {
+			if (!entitat.isAmbEntregaDeh() && enviament.isEntregaDehActiva()) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[ENTREGA_DEH] El camp 'entrega DEH' de l'entitat ha d'estar actiu en cas d'enviaments amb entrega DEH");
+				return resposta;
+			}
+			if (enviament.isEntregaDehActiva() && enviament.getEntregaDeh() == null) {
 				resposta.setError(true);
 				resposta.setEstat(NotificacioEstatEnum.PENDENT);
 				resposta.setErrorDescripcio("[ENTREGA_DEH] El camp 'entregaDeh' d'un enviament no pot ser null");
@@ -495,7 +501,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					
 					NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
 					NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
-					if (enviament.getEntregaPostal() != null && !enviament.getEntregaPostal().getViaNom().isEmpty()) {
+					if (enviament.isEntregaPostalActiva() && enviament.getEntregaPostal() != null) {
 						if (enviament.getEntregaPostal().getTipus() != null) {
 							switch (enviament.getEntregaPostal().getTipus()) {
 							case APARTAT_CORREUS:
