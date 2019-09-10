@@ -867,6 +867,7 @@ public class PluginHelper {
 		if (notificacio.getProcediment().getOficina() != null) {
 			dadesOficina.setOficina(notificacio.getProcediment().getOficina());
 		} 
+//TODO Pendent aprovació Toni Trobat
 //		else {
 //			//oficina virtual
 //			oficinaVirtual = llistarOficinaVirtual(

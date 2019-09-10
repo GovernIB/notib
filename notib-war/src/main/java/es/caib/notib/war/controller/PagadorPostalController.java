@@ -1,12 +1,19 @@
 package es.caib.notib.war.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomBooleanEditor;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -184,6 +191,13 @@ public class PagadorPostalController extends BaseUserController{
 					pagadorPostalFiltreCommand);
 		}
 		return pagadorPostalFiltreCommand;
+	}
+	
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+		binder.registerCustomEditor(
+				Date.class, 
+				new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
 	}
 	
 }
