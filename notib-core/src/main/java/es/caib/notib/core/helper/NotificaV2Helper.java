@@ -46,6 +46,7 @@ import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.entity.NotificacioEntity;
@@ -120,9 +121,14 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						}
 					}
 				}
-				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+				//Crea un nou event
+				NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
-						notificacio).build();
+						notificacio);
+				if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+					eventBulider.callbackInicialitza();
+				NotificacioEventEntity event = eventBulider.build();
+				
 				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
 				notificacio.updateEventAfegir(event);
 				notificacio.updateNotificaError(
@@ -130,12 +136,17 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						null);
 				notificacioEventRepository.save(event);
 			} else {
-				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+				//Crea un nou event
+				NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
 						notificacio).
 						error(true).
-						errorDescripcio("[" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta()).
-						build();
+						errorDescripcio("[" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta());
+				
+				if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+					eventBulider.callbackInicialitza();
+				NotificacioEventEntity event = eventBulider.build();
+				
 				notificacio.updateNotificaError(
 						NotificacioErrorTipusEnumDto.ERROR_REMOT,
 						event);
@@ -179,8 +190,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		Date dataUltimDatat = enviament.getNotificaDataCreacio();
 		Date dataUltimaCertificacio = enviament.getNotificaCertificacioData();
 
-		NotificacioEventEntity eventDatat  = null;
-		NotificacioEventEntity eventCert  = null;
+		NotificacioEventEntity.Builder eventDatatBuilder  = null;
+		NotificacioEventEntity.Builder eventCertBuilder  = null;
 		
 		enviament.updateNotificaDataRefrescEstat();
 		
@@ -238,13 +249,18 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 									null,
 									null,
 									enviament);
-							eventDatat = NotificacioEventEntity.getBuilder(
+							
+							//Crea un nou event
+							eventDatatBuilder = NotificacioEventEntity.getBuilder(
 									NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
 									enviament.getNotificacio()).
 									enviament(enviament).
-									descripcio(datatDarrer.getResultado()).
-	//								callbackInicialitza().
-									build();
+									descripcio(datatDarrer.getResultado());
+							
+							if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+								eventDatatBuilder.callbackInicialitza();
+							NotificacioEventEntity eventDatat = eventDatatBuilder.build();
+							
 							notificacio.updateEventAfegir(eventDatat);
 							enviament.updateNotificaError(false, null);
 							if (notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
@@ -290,20 +306,25 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 								null,
 								null,
 								null);
-						eventCert = NotificacioEventEntity.getBuilder(
+						//Crea un nou event
+						eventCertBuilder = NotificacioEventEntity.getBuilder(
 								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
 								enviament.getNotificacio()).
 								enviament(enviament).
-	//							callbackInicialitza().
-								build();
+								descripcio(datatDarrer.getResultado());
+						
+						if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+							eventCertBuilder.callbackInicialitza();
+						NotificacioEventEntity eventCert = eventCertBuilder.build();
+						
 						notificacio.updateEventAfegir(eventCert);
 					}
 				}
-				if (eventDatat != null) {
-					eventDatat.callbackInicialitza();
-				} else if (eventCert != null) {
-					eventCert.callbackInicialitza();
-				}
+//				if (eventDatat != null) {
+//					eventDatat.callbackInicialitza();
+//				} else if (eventCert != null) {
+//					eventCert.callbackInicialitza();
+//				}
 				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
 						notificacio).
@@ -582,20 +603,20 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					envio.setDestinatarios(destinatarios);
 					if (enviament.getDomiciliConcretTipus() != null) {
 						EntregaPostal entregaPostal = new EntregaPostal();
-						if (notificacio.getPagadorPostal() != null) {
+						if (notificacio.getProcediment().getPagadorpostal() != null) {
 							OrganismoPagadorPostal pagadorPostal = new OrganismoPagadorPostal();
-							pagadorPostal.setCodigoDIR3Postal(notificacio.getPagadorPostal().getDir3codi());
-							pagadorPostal.setCodClienteFacturacionPostal(notificacio.getPagadorPostal().getFacturacioClientCodi());
-							pagadorPostal.setNumContratoPostal(notificacio.getPagadorPostal().getContracteNum());
+							pagadorPostal.setCodigoDIR3Postal(notificacio.getProcediment().getPagadorpostal().getDir3codi());
+							pagadorPostal.setCodClienteFacturacionPostal(notificacio.getProcediment().getPagadorpostal().getFacturacioClientCodi());
+							pagadorPostal.setNumContratoPostal(notificacio.getProcediment().getPagadorpostal().getContracteNum());
 							pagadorPostal.setFechaVigenciaPostal(
-								toXmlGregorianCalendar(notificacio.getPagadorPostal().getContracteDataVig()));
+								toXmlGregorianCalendar(notificacio.getProcediment().getPagadorpostal().getContracteDataVig()));
 							entregaPostal.setOrganismoPagadorPostal(pagadorPostal);
 						}
-						if (notificacio.getPagadorCie() != null) {
+						if (notificacio.getProcediment().getPagadorcie() != null) {
 							OrganismoPagadorCIE pagadorCie = new OrganismoPagadorCIE();
-							pagadorCie.setCodigoDIR3CIE(notificacio.getPagadorCie().getDir3codi());
+							pagadorCie.setCodigoDIR3CIE(notificacio.getProcediment().getPagadorcie().getDir3codi());
 							pagadorCie.setFechaVigenciaCIE(
-								toXmlGregorianCalendar(notificacio.getPagadorCie().getContracteDataVig()));
+								toXmlGregorianCalendar(notificacio.getProcediment().getPagadorcie().getContracteDataVig()));
 							entregaPostal.setOrganismoPagadorCIE(pagadorCie);
 						}
 						if (enviament.getDomiciliConcretTipus() != null) {
