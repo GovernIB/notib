@@ -131,7 +131,7 @@ $(document).ready(function() {
 			</div>
 			<div class="row">
 				<c:set var="titularColSize" value="12"/>
-				<c:if test="${not empty enviament.titular.nif}"><c:set var="titularColSize" value="6"/></c:if>
+				<c:if test="${not empty enviament.titular.nif}"><c:set var="titularColSize" value="12"/></c:if>
 				<div class="col-sm-${titularColSize}">
 					<div class="panel panel-default">
 						<div class="panel-heading">

@@ -676,16 +676,6 @@ public class NotificacioController extends BaseUserController {
 		writeFileToResponse(arxiu.getNom() + mimeType, arxiu.getContingut(), response);
 	}
 
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-		binder.registerCustomEditor(
-				Date.class, 
-				new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
-		binder.registerCustomEditor(
-				Boolean.class, 
-				new CustomBooleanEditor("SI", "NO", false));
-	}
-
 	private void emplenarModelNotificacioInfo(
 			EntitatDto entitatActual,
 			Long notificacioId, 
@@ -817,9 +807,18 @@ public class NotificacioController extends BaseUserController {
 		@PathVariable String provinciaId) {
 		return notificacioService.llistarLocalitats(provinciaId);
 	}
-	
-	
+
 	private boolean isAdministrador(HttpServletRequest request) {
 		return RolHelper.isUsuariActualAdministrador(request);
+	}
+	
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+		binder.registerCustomEditor(
+				Date.class, 
+				new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
+		binder.registerCustomEditor(
+				Boolean.class, 
+				new CustomBooleanEditor("SI", "NO", false));
 	}
 }

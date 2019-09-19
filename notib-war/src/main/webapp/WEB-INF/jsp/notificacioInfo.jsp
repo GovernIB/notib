@@ -242,8 +242,7 @@
 					</div>
 					<table class="table table-bordered" style="width: 100%">
 						<tbody>
-							<c:if
-								test="${not empty notificacio.procediment.pagadorcie.dir3codi}">
+							<c:if test="${not empty notificacio.procediment.pagadorcie.dir3codi}">
 								<tr>
 									<td><strong><spring:message
 												code="notificacio.info.pagador.cie.codi.dir3" /></strong></td>
