@@ -144,6 +144,8 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 			built.data = new Date();
 			built.error = false;
 			built.notificacio = notificacio;
+			if (notificacio != null)
+				built.notificacioId = notificacio.getId();
 		}
 		public Builder descripcio(String descripcio) {
 			built.descripcio = descripcio;

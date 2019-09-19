@@ -24,6 +24,7 @@ import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -80,6 +81,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			Holder<String> descripcionRespuesta, 
 			Holder<Opciones> opcionesResultadoSincronizarEnvio) {
 		NotificacioEnviamentEntity enviament = null;
+		NotificacioEventEntity.Builder eventBuilder = null;
 		NotificacioEventEntity event = null;
 		try {
 			if (organismoEmisor != null) {
@@ -152,13 +154,18 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 								null,
 								null,
 								enviament);
-						event = NotificacioEventEntity.getBuilder(
+						
+						//Crea un nou event builder
+						eventBuilder = NotificacioEventEntity.getBuilder(
 								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
 								enviament.getNotificacio()).
 								enviament(enviament).
-								descripcio(estado).
-								callbackInicialitza().
-								build();
+								descripcio(estado);
+						
+						if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+							eventBuilder.callbackInicialitza();
+						event = eventBuilder.build();
+						
 						codigoRespuesta.value = "000";
 						descripcionRespuesta.value = "OK";
 					} else {
@@ -204,14 +211,19 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					"identificadorDestinatario=" + identificador + ")",
 					ex);
 			if (enviament != null) {
-				event = NotificacioEventEntity.getBuilder(
+				//Crea un nou event
+				eventBuilder = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
 						enviament.getNotificacio()).
 						enviament(enviament).
 						descripcio(estado).
 						error(true).
-						errorDescripcio(ExceptionUtils.getStackTrace(ex)).
-						build();
+						errorDescripcio(ExceptionUtils.getStackTrace(ex));
+				
+				if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+					eventBuilder.callbackInicialitza();
+				
+				event = eventBuilder.build();
 				enviament.updateNotificaError(
 						true,
 						event);
@@ -221,14 +233,14 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		}
 		if (enviament != null) {
 			if (event == null) {
-				event = NotificacioEventEntity.getBuilder(
+				eventBuilder = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
 						enviament.getNotificacio()).
 						enviament(enviament).
 						descripcio(estado).
 						error(true).
-						errorDescripcio("Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value).
-						build();
+						errorDescripcio("Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value);
+				event = eventBuilder.build();
 				enviament.updateNotificaError(
 						true,
 						event);
@@ -246,6 +258,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			Holder<String> codigoRespuesta,
 			Holder<String> descripcionRespuesta) {
 		NotificacioEnviamentEntity enviament = null;
+		NotificacioEventEntity.Builder eventBuilder = null;
 		NotificacioEventEntity event = null;
 		try {
 			if (acusePDF != null) {
@@ -284,12 +297,15 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 								NotificaCertificacioTipusEnumDto.ACUSE,
 								NotificaCertificacioArxiuTipusEnumDto.PDF,
 								null); // núm. seguiment
-						event = NotificacioEventEntity.getBuilder(
+						eventBuilder = NotificacioEventEntity.getBuilder(
 								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
 								enviament.getNotificacio()).
-								enviament(enviament).
-								callbackInicialitza().
-								build();
+								enviament(enviament);;
+						if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+							eventBuilder.callbackInicialitza();
+						
+						event = eventBuilder.build();
+						
 						codigoRespuesta.value = "000";
 						descripcionRespuesta.value = "OK";
 					} else {
@@ -322,13 +338,15 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					"identificadorDestinatario=" + identificador + ")",
 					ex);
 			if (enviament != null) {
-				event = NotificacioEventEntity.getBuilder(
+				eventBuilder = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
 						enviament.getNotificacio()).
 						enviament(enviament).
 						error(true).
-						errorDescripcio(ExceptionUtils.getStackTrace(ex)).
-						build();
+						errorDescripcio(ExceptionUtils.getStackTrace(ex));
+				if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+					eventBuilder.callbackInicialitza();
+				event = eventBuilder.build();
 				enviament.updateNotificaError(
 						true,
 						event);
@@ -338,13 +356,16 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		}
 		if (enviament != null) {
 			if (event == null) {
-				event = NotificacioEventEntity.getBuilder(
+				eventBuilder = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
 						enviament.getNotificacio()).
 						enviament(enviament).
 						error(true).
-						errorDescripcio("Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value).
-						build();
+						errorDescripcio("Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value);
+				if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+					eventBuilder.callbackInicialitza();
+			
+				event = eventBuilder.build();
 				enviament.updateNotificaError(
 						true,
 						event);

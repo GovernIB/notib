@@ -21,12 +21,14 @@ import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.ws.callback.NotificacioCanviClient;
 import es.caib.notib.core.entity.AplicacioEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity.Builder;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
 
 /**
  * Classe per englobar la tasca de notificar l'estat o la certificació a l'aplicació
@@ -51,7 +53,8 @@ public class CallbackHelper {
 	private AplicacioRepository aplicacioRepository;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
-
+	@Autowired
+	private NotificacioRepository notificacioRepository;
 //	@Autowired
 //	private PluginHelper pluginHelper;
 	@Autowired
@@ -77,8 +80,10 @@ public class CallbackHelper {
 		if (referencia != null) {
 			// Notifica al client
 			try {
-				if (event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT
-						|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) {
+				if (event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT
+						|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT
+						|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO
+						|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) {
 					// Avisa al client que hi ha hagut una modificació a l'enviament
 					notificaCanvi(event.getEnviament());
 //					// Invoca el mètode de notificació de l'aplicació client segons és estat o certificat:
@@ -87,10 +92,12 @@ public class CallbackHelper {
 //					else if (event.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO))
 //						notificaCertificat(event.getEnviament());					
 					// Marca l'event com a notificat
+					event.setNotificacio(event.getEnviament().getNotificacio());
 					event.updateCallbackClient(CallbackEstatEnumDto.NOTIFICAT, ara, intents, null);
 					ret = true;
 				} else {
 					// És un event pendent de notificar que no és del tipus esperat
+					event.setNotificacio(event.getEnviament().getNotificacio());
 					event.updateCallbackClient(CallbackEstatEnumDto.ERROR, ara, intents, "L'event id=" + event.getId() + " és del tipus " + event.getTipus() + " i no es pot notificar a l'aplicació client.");
 				}
 			} catch (Exception ex) {
@@ -100,6 +107,7 @@ public class CallbackHelper {
 				CallbackEstatEnumDto estatNou = maxIntents == null || intents < maxIntents ? 
 													CallbackEstatEnumDto.PENDENT
 													: CallbackEstatEnumDto.ERROR;
+				event.setNotificacio(event.getEnviament().getNotificacio());
 				event.updateCallbackClient(
 						estatNou,
 						ara,
@@ -112,18 +120,31 @@ public class CallbackHelper {
 		}
 		
 		// Crea una nova entrada a la taula d'events per deixar constància de la notificació a l'aplicació client
-		Builder eventBuilder = NotificacioEventEntity.getBuilder(
+		Builder eventBuilder = null;
+		if (event.getEnviament() != null) {
+		eventBuilder = NotificacioEventEntity.getBuilder(
 				NotificacioEventTipusEnumDto.CALLBACK_CLIENT,
-				event.getNotificacio()).
+				event.getEnviament().getNotificacio()).
 				enviament(event.getEnviament()).
 				descripcio("Callback " + event.getTipus());
-		if (!ret) {
+		} else {
+			NotificacioEntity notificacio = notificacioRepository.findById(event.getNotificacioId());
+			event.setNotificacio(notificacio);
+			
+			eventBuilder = NotificacioEventEntity.getBuilder(
+					NotificacioEventTipusEnumDto.CALLBACK_CLIENT,
+					event.getNotificacio()).
+					descripcio("Callback " + event.getTipus());
+		}
+		if (!ret && eventBuilder != null) {
 			eventBuilder.error(true)
 						.errorDescripcio(event.getCallbackError());
 		}
 		NotificacioEventEntity callbackEvent = eventBuilder.build();
-		event.getNotificacio().updateEventAfegir(callbackEvent);
-		
+		if (event.getEnviament() != null)
+			event.getEnviament().getNotificacio().updateEventAfegir(callbackEvent);
+		else
+			event.getNotificacio().updateEventAfegir(callbackEvent);
 		return ret;
 	}
 

@@ -30,6 +30,7 @@ import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
@@ -445,9 +446,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						documentGesdocId, 
 						notificacio.getDocument().getArxiuNom(),  
 						notificacio.getDocument().getUrl(),  
-	//					notificacio.getDocument().getMetadades(),  
 						notificacio.getDocument().isNormalitzat(),  
-	//					notificacio.getDocument().isGenerarCsv(),
 						notificacio.getDocument().getUuid(),
 						notificacio.getDocument().getCsv()).build());
 			}		
@@ -455,7 +454,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					getBuilderV2(
 						entitat,
 						emisorDir3Codi,
-	//					notificacio.getOrganGestor(),
 						pluginHelper.getNotibTipusComunicacioDefecte(),
 						enviamentTipus, 
 						notificacio.getConcepte(),
@@ -469,13 +467,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						notificacio.getGrupCodi(),
 						notificacio.getNumExpedient(),
 						TipusUsuariEnumDto.APLICACIO 
-	//					notificacio.getExtracte(),
-	//					notificacio.getDocFisica(),
-	//					//notificacio.getTipusAssumpte(),
-	//					notificacio.getIdioma(),
-	//					notificacio.getRefExterna(),
-	//					notificacio.getCodiAssumpte(),
-	//					notificacio.getObservacions()
 						).document(documentEntity);
 				
 				NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioBuilder.build());
@@ -611,6 +602,19 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					registreNotificaHelper.realitzarProcesRegistrarNotificar(
 							notificacioGuardada,
 							enviaments);
+				} else {
+					List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacioGuardada);
+					for (NotificacioEnviamentEntity enviament : enviamentsEntity) {
+						NotificacioEventEntity eventDatat = NotificacioEventEntity.getBuilder(
+								NotificacioEventTipusEnumDto.CALLBACK_CLIENT_PENDENT,
+								notificacioGuardada).
+								enviament(enviament).
+								callbackInicialitza().
+								build();
+						notificacioGuardada.updateEventAfegir(eventDatat);
+						notificacioEventRepository.saveAndFlush(eventDatat);
+					}
+					
 				}
 	
 				try {

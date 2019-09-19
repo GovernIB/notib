@@ -1186,7 +1186,8 @@ public class PluginHelper {
 		InteresadoWsDto interessat = new InteresadoWsDto();
 		if(titular != null) {
 			DatosInteresadoWsDto interessatDades = new DatosInteresadoWsDto();
-			interessatDades.setTipoInteresado(titular.getInteressatTipus().getLongVal());
+			if (titular.getInteressatTipus() != null)
+				interessatDades.setTipoInteresado(titular.getInteressatTipus().getLongVal());
 			interessatDades.setTipoDocumentoIdentificacion("N");
 			interessatDades.setDocumento(titular.getNif());
 			interessatDades.setRazonSocial(titular.getNom());

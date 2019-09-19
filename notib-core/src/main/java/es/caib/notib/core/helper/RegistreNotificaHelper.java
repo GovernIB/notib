@@ -20,6 +20,7 @@ import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
@@ -68,7 +69,9 @@ public class RegistreNotificaHelper {
 								updateEventWithError(
 										arbResposta,
 										null,
-										notificacioEntity);
+										notificacioEntity,
+										enviament,
+										notificacioEntity.getEnviaments());
 							} else {
 								updateEventWithoutError(
 										arbResposta,
@@ -96,7 +99,9 @@ public class RegistreNotificaHelper {
 							updateEventWithError(
 									arbResposta,
 									null,
-									notificacioEntity);
+									notificacioEntity,
+									null,
+									notificacioEntity.getEnviaments());
 						} else {
 							updateEventWithoutError(
 									arbResposta,
@@ -124,7 +129,9 @@ public class RegistreNotificaHelper {
 						updateEventWithError(
 								arbResposta,
 								null,
-								notificacioEntity);
+								notificacioEntity,
+								null,
+								notificacioEntity.getEnviaments());
 					} else {
 						updateEventWithoutError(
 								arbResposta,
@@ -155,7 +162,9 @@ public class RegistreNotificaHelper {
 					updateEventWithError(
 							null,
 							registreIdDto,
-							notificacioEntity);				
+							notificacioEntity,
+							null,
+							notificacioEntity.getEnviaments());				
 				} else {
 					updateEventWithoutError(
 							null,
@@ -176,7 +185,9 @@ public class RegistreNotificaHelper {
 	private void updateEventWithError(
 			RespostaConsultaRegistre arbResposta,
 			RegistreIdDto registreIdDto,
-			NotificacioEntity notificacioEntity) {
+			NotificacioEntity notificacioEntity,
+			NotificacioEnviamentEntity enviament,
+			Set<NotificacioEnviamentEntity> enviaments) {
 		String errorDescripcio;
 		
 		if (arbResposta != null) {
@@ -184,17 +195,34 @@ public class RegistreNotificaHelper {
 		} else {
 			errorDescripcio = registreIdDto.getDescripcioError();
 		}
-		NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+		
+		//Crea un nou event
+		NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
 				NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
 				notificacioEntity).
 				error(true).
-				errorDescripcio(errorDescripcio).
-				build();
+				errorDescripcio(errorDescripcio);
+		
+		if (notificacioEntity.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
+			eventBulider.callbackInicialitza();
+		}
+		NotificacioEventEntity event = eventBulider.build();
+		//Actualitza l'event per cada enviament
+		if (enviament != null) {
+			eventBulider.enviament(enviament);
+		} else {
+			for (NotificacioEnviamentEntity enviamentEntity : enviaments) {
+				enviamentEntity.updateNotificaError(true, event);
+				eventBulider.enviament(enviamentEntity);
+			}
+		} 
+		
 		notificacioEntity.updateNotificaError(
-				NotificacioErrorTipusEnumDto.ERROR_REMOT,
+				NotificacioErrorTipusEnumDto.ERROR_REGISTRE,
 				event);
 		notificacioEntity.updateEventAfegir(event);
 		notificacioEventRepository.saveAndFlush(event);
+		
 	}
 	
 	private void updateEventWithoutError(
@@ -204,10 +232,23 @@ public class RegistreNotificaHelper {
 			NotificacioEnviamentEntity enviament,
 			Set<NotificacioEnviamentEntity> enviaments,
 			boolean enviarNotificacio) {
-		
-		NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+		//Crea un nou event
+		NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
 				NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
-				notificacioEntity).build();
+				notificacioEntity);
+		
+		if (notificacioEntity.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+			eventBulider.callbackInicialitza();
+		
+		NotificacioEventEntity event = eventBulider.build();
+		
+		if (enviament != null) {
+			eventBulider.enviament(enviament);
+		} else {
+			for (NotificacioEnviamentEntity enviamentEntity : enviaments) {
+				eventBulider.enviament(enviamentEntity);
+			}
+		}
 		
 		if (arbResposta != null) {
 			notificacioEntity.updateRegistreNumero(Integer.parseInt(arbResposta.getRegistreNumero()));
