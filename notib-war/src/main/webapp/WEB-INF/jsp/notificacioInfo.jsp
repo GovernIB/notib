@@ -186,12 +186,30 @@
 								<tr>
 									<td><strong><spring:message
 												code="notificacio.info.document.normalitzat" /></strong></td>
-									<td>${notificacio.document.normalitzat}</td>
+									<td>
+									<c:choose>
+									    <c:when test="${notificacio.document.normalitzat}">
+									       Si
+									    </c:when>
+									    <c:otherwise>
+									        No
+									    </c:otherwise>
+									</c:choose>
+									</td>
 								</tr>
 								<tr>
 									<td><strong><spring:message
 												code="notificacio.info.document.generar.csv" /></strong></td>
-									<td>${notificacio.document.generarCsv}</td>
+									<td>
+									<c:choose>
+									    <c:when test="${notificacio.document.generarCsv}">
+									       Si
+									    </c:when>
+									    <c:otherwise>
+									        No
+									    </c:otherwise>
+									</c:choose>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -226,7 +244,9 @@
 								<tr>
 									<td><strong><spring:message
 												code="notificacio.info.pagador.correus.vigencia" /></strong></td>
-									<td>${notificacio.procediment.pagadorpostal.contracteDataVig}</td>
+									<td>
+									<fmt:formatDate pattern="dd/MM/yyyy" value="${notificacio.procediment.pagadorpostal.contracteDataVig}" />
+									</td>
 								</tr>
 							</c:if>
 						</tbody>
@@ -251,7 +271,9 @@
 								<tr>
 									<td><strong><spring:message
 												code="notificacio.info.pagador.cie.vigencia" /></strong></td>
-									<td>${notificacio.procediment.pagadorcie.contracteDataVig}</td>
+									<td>
+									<fmt:formatDate pattern="dd/MM/yyyy" value="${notificacio.procediment.pagadorcie.contracteDataVig}" />
+									</td>
 								</tr>
 							</c:if>
 						</tbody>
