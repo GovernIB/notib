@@ -17,7 +17,7 @@ public class PagadorPostalCommand {
 	private Long id;
 	@NotEmpty @Size(max=64)
 	private String dir3codi;
-	@NotEmpty @Size(max=64)
+	@NotEmpty @Size(max=8)
 	private String contracteNum;
 	private Date contracteDataVig;
 	@NotEmpty @Size(max=64)
