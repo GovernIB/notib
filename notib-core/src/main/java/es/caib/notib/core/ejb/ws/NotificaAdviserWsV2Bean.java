@@ -29,13 +29,13 @@ import es.caib.notib.core.wsdl.adviser.Receptor;
  */
 @Stateless
 @WebService(
-		name = "adviserWsV2",
+		name = "adviserWs",
 		serviceName = "AdviserWsV2Service",
 		portName = "AdviserWsV2PortType",
 		targetNamespace = "https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/")
 @WebContext(
 		contextRoot = "/notib/ws",
-		urlPattern = "/adviserV2",
+		urlPattern = "/adviser",
 		authMethod = "WSBASIC",
 		transportGuarantee = "NONE",
 		secureWSDLAccess = false)

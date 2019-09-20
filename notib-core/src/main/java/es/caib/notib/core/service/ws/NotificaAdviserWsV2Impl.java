@@ -46,7 +46,7 @@ import es.caib.notib.core.wsdl.adviser.Receptor;
  */
 @Service
 @WebService(
-		name = "adviserWsV2",
+		name = "adviserWs",
 		serviceName = "AdviserWsV2Service",
 		portName = "AdviserWsV2PortType",
 		endpointInterface = "es.caib.notib.core.wsdl.adviser.AdviserWsV2PortType",

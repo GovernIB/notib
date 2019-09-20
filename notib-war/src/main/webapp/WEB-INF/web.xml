@@ -96,7 +96,7 @@
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>Public areas</web-resource-name>
-			<url-pattern>/ws/adviserWsV2</url-pattern>
+			<url-pattern>/ws/adviserWs</url-pattern>
 			<url-pattern>/ws/notificacioWS</url-pattern>
 			<url-pattern>/ws/notificacioV2WS</url-pattern>
 			<url-pattern>/api/rest</url-pattern>
