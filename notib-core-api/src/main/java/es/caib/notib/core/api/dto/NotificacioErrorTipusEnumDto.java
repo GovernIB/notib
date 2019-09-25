@@ -19,7 +19,7 @@ import java.io.Serializable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum NotificacioErrorTipusEnumDto implements Serializable {
-	ERROR_REGISTRE,
 	ERROR_XARXA,
-	ERROR_REMOT
+	ERROR_REMOT,
+	ERROR_REGISTRE
 }

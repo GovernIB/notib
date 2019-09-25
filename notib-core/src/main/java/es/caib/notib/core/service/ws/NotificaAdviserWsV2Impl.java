@@ -33,6 +33,7 @@ import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
+import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.wsdl.adviser.Acuse;
 import es.caib.notib.core.wsdl.adviser.AdviserWsV2PortType;
@@ -60,6 +61,8 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
+	private NotificacioEventRepository notificacioEventRepository;
+	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired
 	private NotificaHelper notificaHelper;
@@ -80,6 +83,8 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			Holder<String> codigoRespuesta,
 			Holder<String> descripcionRespuesta, 
 			Holder<Opciones> opcionesResultadoSincronizarEnvio) {
+		logger.info("--------------------------------------------------------------");
+		logger.info("Processar petició dins l'Adviser...");
 		NotificacioEnviamentEntity enviament = null;
 		NotificacioEventEntity.Builder eventBuilder = null;
 		NotificacioEventEntity event = null;
@@ -154,7 +159,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 								null,
 								null,
 								enviament);
-						
+						logger.info("Registrant event callbackdatat de l'Adviser...");
 						//Crea un nou event builder
 						eventBuilder = NotificacioEventEntity.getBuilder(
 								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
@@ -246,6 +251,8 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						event);
 			}
 			enviament.getNotificacio().updateEventAfegir(event);
+			notificacioEventRepository.save(event);
+			logger.info("Peticició processada correctament.");
 		}
 	}
 
