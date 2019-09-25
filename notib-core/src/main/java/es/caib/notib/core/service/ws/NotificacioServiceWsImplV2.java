@@ -118,271 +118,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	@Override
 	public RespostaAlta alta(
 			NotificacioV2 notificacio) throws NotificacioServiceWsException {
-		String emisorDir3Codi = notificacio.getEmisorDir3Codi();
 		RespostaAlta resposta = new RespostaAlta();
+		String emisorDir3Codi = notificacio.getEmisorDir3Codi();
 		EntitatEntity entitat = entitatRepository.findByDir3Codi(emisorDir3Codi);
-		if (emisorDir3Codi == null) {
-			resposta.setError(true);
-			resposta.setEstat(NotificacioEstatEnum.PENDENT);
-			resposta.setErrorDescripcio("[EMISOR] El camp 'emisorDir3Codi' no pot ser null.");
+		resposta = validarNotificacio(
+				notificacio,
+				emisorDir3Codi,
+				entitat);
+		
+		if (resposta.isError()) {
 			return resposta;
-		}
-		if (entitat == null) {
-			resposta.setError(true);
-			resposta.setEstat(NotificacioEstatEnum.PENDENT);
-			resposta.setErrorDescripcio("[ENTITAT] No s'ha trobat cap entitat configurada a Notib amb el codi Dir3 " + emisorDir3Codi + ". (emisorDir3Codi)");
-			return resposta;
-		}
-		if (!entitat.isActiva()) {
-			resposta.setError(true);
-			resposta.setEstat(NotificacioEstatEnum.PENDENT);
-			resposta.setErrorDescripcio("[ENTITAT] L'entitat especificada està desactivada per a l'enviament de notificacions");
-			return resposta;
-		}
-		if (notificacio.getProcedimentCodi() == null) {
-			resposta.setError(true);
-			resposta.setEstat(NotificacioEstatEnum.PENDENT);
-			resposta.setErrorDescripcio("[PROCEDIMENT_CODI] El camp 'procedimentCodi' no pot ser null.");
-			return resposta;
-		}
-		if (notificacio.getConcepte() == null) {
-			resposta.setError(true);
-			resposta.setEstat(NotificacioEstatEnum.PENDENT);
-			resposta.setErrorDescripcio("[CONCEPTE] El concepte de la notificació no pot ser null.");
-			return resposta;
-		}
-		if (notificacio.getEnviamentTipus() == null) {
-			resposta.setError(true);
-			resposta.setEstat(NotificacioEstatEnum.PENDENT);
-			resposta.setErrorDescripcio("[ENVIAMENT_TIPUS] El tipus d'enviament de la notificació no pot ser null.");
-			return resposta;
-		}
-		if (notificacio.getDocument() == null) {
-			resposta.setError(true);
-			resposta.setEstat(NotificacioEstatEnum.PENDENT);
-			resposta.setErrorDescripcio("[DOCUMENT] El camp 'document' no pot ser null.");
-			return resposta;
-		}
-		if (notificacio.getEnviaments() == null) {
-			resposta.setError(true);
-			resposta.setEstat(NotificacioEstatEnum.PENDENT);
-			resposta.setErrorDescripcio("[ENVIAMENTS] El camp 'enviaments' no pot ser null.");
-			return resposta;
-		}
-		if (notificacio.getUsuariCodi() == null || notificacio.getUsuariCodi().isEmpty()) {
-			resposta.setError(true);
-			resposta.setEstat(NotificacioEstatEnum.PENDENT);
-			resposta.setErrorDescripcio("[USUARI_CODI] El camp 'usuariCodi' no pot ser null (Requisit per fer el registre de sortida).");
-			return resposta;
-		} 
-		for(Enviament enviament : notificacio.getEnviaments()) {
-			if (enviament.getTitular().isIncapacitat() && (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty())) {
-				resposta.setError(true);
-				resposta.setEstat(NotificacioEstatEnum.PENDENT);
-				resposta.setErrorDescripcio("[DESTINATARI] En cas de titular amb incapacitat es obligatori indicar un destinatari.");
-				return resposta;
-			}
-			if (!Boolean.getBoolean(isMultipleDestinataris()) && enviament.getDestinataris() != null && enviament.getDestinataris().size() > 1) {
-				resposta.setError(true);
-				resposta.setEstat(NotificacioEstatEnum.PENDENT);
-				resposta.setErrorDescripcio("[DESTINATARI_MULTIPLE] El numero de destinatais està limitat a un destinatari.");
-				return resposta;
-			}
-			if(enviament.isEntregaPostalActiva()){
-				if (enviament.getEntregaPostal().getTipus() == null) {
-					resposta.setError(true);
-					resposta.setEstat(NotificacioEstatEnum.PENDENT);
-					resposta.setErrorDescripcio("[ENTREGA_POSTAL_TIPUS] El camp 'entregaPostalTipus' no pot ser null.");
-					return resposta;
-				}
-				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.NACIONAL)) {
-					if((enviament.getEntregaPostal().getViaNom() == null || enviament.getEntregaPostal().getViaNom().isEmpty())) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[ENTREGA_POSTAL_NOM_VIA] El camp 'viaNom' de l'entrega postal d'un enviament no pot ser null.");
-						return resposta;
-					}
-					if (enviament.getEntregaPostal().getViaTipus() == null) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[VIA_TIPUS] El camp 'viaTipus' no pot ser null en cas d'entrega NACIONAL NORMALITZAT.");
-						return resposta;
-					}
-					if (enviament.getEntregaPostal().getViaNom() == null || enviament.getEntregaPostal().getViaNom().isEmpty()) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[VIA_NOM] El camp 'viaNom' no pot ser null en cas d'entrega NACIONAL NORMALITZAT.");
-						return resposta;
-					}
-					if (enviament.getEntregaPostal().getPuntKm() == null && enviament.getEntregaPostal().getNumeroCasa() == null) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[PUNT_KM_NUM_CASA] S'ha d'indicar almenys un 'numeroCasa' o 'puntKm'");
-						return resposta;
-					}
-					if (enviament.getEntregaPostal().getProvincia() == null || enviament.getEntregaPostal().getProvincia().isEmpty()) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[PROVINCIA] El camp 'provincia' no pot ser null en cas d'entrega NACIONAL NORMALITZAT.");
-						return resposta;
-					}
-					if (enviament.getEntregaPostal().getMunicipiCodi() == null || enviament.getEntregaPostal().getMunicipiCodi().isEmpty()) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[MUNICIPI_CODI] El camp 'municipiCodi' no pot ser null en cas d'entrega NACIONAL NORMALITZAT.");
-						return resposta;
-					}
-				}
-				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.ESTRANGER)) {
-					if((enviament.getEntregaPostal().getViaNom() == null || enviament.getEntregaPostal().getViaNom().isEmpty())) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[ENTREGA_POSTAL_NOM_VIA] El camp 'viaNom' de l'entrega postal d'un enviament no pot ser null.");
-						return resposta;
-					}
-					if (enviament.getEntregaPostal().getViaNom() == null || enviament.getEntregaPostal().getViaNom().isEmpty()) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[VIA_NOM] El camp 'viaNom' no pot ser null en cas d'entrega ESTRANGER NORMALITZAT.");
-						return resposta;
-					}
-					if (enviament.getEntregaPostal().getPaisCodi() == null || enviament.getEntregaPostal().getPaisCodi().isEmpty()) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[PAIS] El camp 'paisCodi' no pot ser null en cas d'entrega ESTRANGER NORMALITZAT.");
-						return resposta;
-					}
-					if (enviament.getEntregaPostal().getPoblacio() == null || enviament.getEntregaPostal().getPoblacio().isEmpty()) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[POBLACIO] El camp 'poblacio' no pot ser null en cas d'entrega ESTRANGER NORMALITZAT.");
-						return resposta;
-					}
-				}
-				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS)) {
-					if (enviament.getEntregaPostal().getApartatCorreus() == null || enviament.getEntregaPostal().getApartatCorreus().isEmpty()) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[APARTAT_CORREUS] El camp 'apartatCorreus' no pot ser null en cas d'entrega APARTAT CORREUS.");
-						return resposta;
-					}
-					if (enviament.getEntregaPostal().getProvincia() == null || enviament.getEntregaPostal().getProvincia().isEmpty()) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[PROVINCIA] El camp 'provincia' no pot ser null en cas d'entrega APARTAT CORREUS.");
-						return resposta;
-					}
-					if (enviament.getEntregaPostal().getPoblacio() == null || enviament.getEntregaPostal().getPoblacio().isEmpty()) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[POBLACIO] El camp 'poblacio' no pot ser null en cas d'entrega APARTAT CORREUS.");
-						return resposta;
-					}
-					if (enviament.getEntregaPostal().getMunicipiCodi() == null || enviament.getEntregaPostal().getMunicipiCodi().isEmpty()) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[MUNICIPI_CODI] El camp 'municipiCodi' no pot ser null en cas d'entrega APARTAT CORREUS.");
-						return resposta;
-					}
-				}
-				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR)) {
-					if (enviament.getEntregaPostal().getLinea1() == null || enviament.getEntregaPostal().getLinea1().isEmpty()) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[LINEA1] El camp 'linea1' no pot ser null.");
-						return resposta;
-					}
-					if (enviament.getEntregaPostal().getLinea2() == null || enviament.getEntregaPostal().getLinea2().isEmpty()) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[LINEA2] El camp 'linea2' no pot ser null.");
-						return resposta;
-					}
-				}
-				if(enviament.getEntregaPostal().getCodiPostal() == null || enviament.getEntregaPostal().getCodiPostal().isEmpty()) {
-					resposta.setError(true);
-					resposta.setEstat(NotificacioEstatEnum.PENDENT);
-					resposta.setErrorDescripcio("[CODI_POSTAL] El camp 'codiPostal' no pot ser null (indicar 00000 en cas de no disposar del codi postal).");
-					return resposta;
-				}
-			}
-
-			if (!entitat.isAmbEntregaDeh() && enviament.isEntregaDehActiva()) {
-				resposta.setError(true);
-				resposta.setEstat(NotificacioEstatEnum.PENDENT);
-				resposta.setErrorDescripcio("[ENTREGA_DEH] El camp 'entrega DEH' de l'entitat ha d'estar actiu en cas d'enviaments amb entrega DEH");
-				return resposta;
-			}
-			if (enviament.isEntregaDehActiva() && enviament.getEntregaDeh() == null) {
-				resposta.setError(true);
-				resposta.setEstat(NotificacioEstatEnum.PENDENT);
-				resposta.setErrorDescripcio("[ENTREGA_DEH] El camp 'entregaDeh' d'un enviament no pot ser null");
-				return resposta;
-			}
-			if(enviament.getServeiTipus() == null) {
-				resposta.setError(true);
-				resposta.setEstat(NotificacioEstatEnum.PENDENT);
-				resposta.setErrorDescripcio("[SERVEI_TIPUS] El camp 'serveiTipus' d'un enviament no pot ser null.");
-				return resposta;
-			}
-			if(enviament.getTitular() == null) {
-				resposta.setError(true);
-				resposta.setEstat(NotificacioEstatEnum.PENDENT);
-				resposta.setErrorDescripcio("[TITULAR] El titular d'un enviament no pot ser null.");
-				return resposta;
-			}
-			if(enviament.getTitular().getInteressatTipus() == null) {
-				resposta.setError(true);
-				resposta.setEstat(NotificacioEstatEnum.PENDENT);
-				resposta.setErrorDescripcio("[TITULAR_INTERESSATTIPUS] El camp 'interessat_tipus' del titular d'un enviament no pot ser null.");
-				return resposta;
-			}
-			
-			if(enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.FISICA)) {
-				if (enviament.getTitular().getLlinatge1() == null) {
-					resposta.setError(true);
-					resposta.setEstat(NotificacioEstatEnum.PENDENT);
-					resposta.setErrorDescripcio("[TITULAR_LLINATGE1] El camp 'llinatge1' del titular d'un enviament no pot ser null en el cas de persones físiques.");
-					return resposta;
-				}
-			}
-			if(enviament.getTitular().getNif() == null) {
-				resposta.setError(true);
-				resposta.setEstat(NotificacioEstatEnum.PENDENT);
-				resposta.setErrorDescripcio("[TITULAR_NIF] El camp 'nif' del titular d'un enviament no pot ser null.");
-				return resposta;
-			}
-			
-			if (enviament.getDestinataris() != null) {
-				for(Persona destinatari : enviament.getDestinataris()) {
-					if(destinatari.getInteressatTipus() == null) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[DESTINATARI_INTERESSATTIPUS] El camp 'interessat_tipus' del destinatari d'un enviament no pot ser null.");
-						return resposta;
-					}
-					if(destinatari.getNom() == null) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[DESTINATARI_NOM] El camp 'nom' del destinatari d'un enviament no pot ser null.");
-						return resposta;
-					}
-					if(destinatari.getNif() == null) {
-						resposta.setError(true);
-						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[DESTINATARI_NIF] El camp 'nif' del destinatari d'un enviament no pot ser null.");
-						return resposta;
-					}
-					if(destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.FISICA)) {
-						if(destinatari.getLlinatge1() == null) {
-							resposta.setError(true);
-							resposta.setEstat(NotificacioEstatEnum.PENDENT);
-							resposta.setErrorDescripcio("[DESTINATARI_LLINATGE1] El camp 'llinatge1' del destinatari d'un enviament no pot ser null en cas de persone físiques.");
-							return resposta;
-						}
-					}
-				}
-			}
 		}
 		ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(
 				notificacio.getProcedimentCodi(), 
@@ -799,9 +544,285 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 		return resposta;
 	}
+	
+	protected RespostaAlta validarNotificacio(
+			NotificacioV2 notificacio,
+			String emisorDir3Codi,
+			EntitatEntity entitat) {
+		RespostaAlta resposta = new RespostaAlta();
+		
+		if (emisorDir3Codi == null) {
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[EMISOR] El camp 'emisorDir3Codi' no pot ser null.");
+			return resposta;
+		}
+		if (entitat == null) {
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[ENTITAT] No s'ha trobat cap entitat configurada a Notib amb el codi Dir3 " + emisorDir3Codi + ". (emisorDir3Codi)");
+			return resposta;
+		}
+		if (!entitat.isActiva()) {
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[ENTITAT] L'entitat especificada està desactivada per a l'enviament de notificacions");
+			return resposta;
+		}
+		if (notificacio.getProcedimentCodi() == null) {
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[PROCEDIMENT_CODI] El camp 'procedimentCodi' no pot ser null.");
+			return resposta;
+		}
+		if (notificacio.getConcepte() == null) {
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[CONCEPTE] El concepte de la notificació no pot ser null.");
+			return resposta;
+		}
+		if (notificacio.getConcepte().length() > 50) {
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[CONCEPTE] El concepte de la notificació no pot contenir més de 50 caràcters.");
+			return resposta;
+		}
+		if (notificacio.getEnviamentTipus() == null) {
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[ENVIAMENT_TIPUS] El tipus d'enviament de la notificació no pot ser null.");
+			return resposta;
+		}
+		if (notificacio.getDocument() == null) {
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[DOCUMENT] El camp 'document' no pot ser null.");
+			return resposta;
+		}
+		if (notificacio.getEnviaments() == null) {
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[ENVIAMENTS] El camp 'enviaments' no pot ser null.");
+			return resposta;
+		}
+		if (notificacio.getUsuariCodi() == null || notificacio.getUsuariCodi().isEmpty()) {
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[USUARI_CODI] El camp 'usuariCodi' no pot ser null (Requisit per fer el registre de sortida).");
+			return resposta;
+		} 
+		for(Enviament enviament : notificacio.getEnviaments()) {
+			if (enviament.getTitular().isIncapacitat() && (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty())) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[DESTINATARI] En cas de titular amb incapacitat es obligatori indicar un destinatari.");
+				return resposta;
+			}
+			if (!Boolean.getBoolean(isMultipleDestinataris()) && enviament.getDestinataris() != null && enviament.getDestinataris().size() > 1) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[DESTINATARI_MULTIPLE] El numero de destinatais està limitat a un destinatari.");
+				return resposta;
+			}
+			if(enviament.isEntregaPostalActiva()){
+				if (enviament.getEntregaPostal().getTipus() == null) {
+					resposta.setError(true);
+					resposta.setEstat(NotificacioEstatEnum.PENDENT);
+					resposta.setErrorDescripcio("[ENTREGA_POSTAL_TIPUS] El camp 'entregaPostalTipus' no pot ser null.");
+					return resposta;
+				}
+				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.NACIONAL)) {
+					if((enviament.getEntregaPostal().getViaNom() == null || enviament.getEntregaPostal().getViaNom().isEmpty())) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[ENTREGA_POSTAL_NOM_VIA] El camp 'viaNom' de l'entrega postal d'un enviament no pot ser null.");
+						return resposta;
+					}
+					if (enviament.getEntregaPostal().getViaTipus() == null) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[VIA_TIPUS] El camp 'viaTipus' no pot ser null en cas d'entrega NACIONAL NORMALITZAT.");
+						return resposta;
+					}
+					if (enviament.getEntregaPostal().getViaNom() == null || enviament.getEntregaPostal().getViaNom().isEmpty()) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[VIA_NOM] El camp 'viaNom' no pot ser null en cas d'entrega NACIONAL NORMALITZAT.");
+						return resposta;
+					}
+					if (enviament.getEntregaPostal().getPuntKm() == null && enviament.getEntregaPostal().getNumeroCasa() == null) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[PUNT_KM_NUM_CASA] S'ha d'indicar almenys un 'numeroCasa' o 'puntKm'");
+						return resposta;
+					}
+					if (enviament.getEntregaPostal().getProvincia() == null || enviament.getEntregaPostal().getProvincia().isEmpty()) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[PROVINCIA] El camp 'provincia' no pot ser null en cas d'entrega NACIONAL NORMALITZAT.");
+						return resposta;
+					}
+					if (enviament.getEntregaPostal().getMunicipiCodi() == null || enviament.getEntregaPostal().getMunicipiCodi().isEmpty()) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[MUNICIPI_CODI] El camp 'municipiCodi' no pot ser null en cas d'entrega NACIONAL NORMALITZAT.");
+						return resposta;
+					}
+				}
+				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.ESTRANGER)) {
+					if((enviament.getEntregaPostal().getViaNom() == null || enviament.getEntregaPostal().getViaNom().isEmpty())) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[ENTREGA_POSTAL_NOM_VIA] El camp 'viaNom' de l'entrega postal d'un enviament no pot ser null.");
+						return resposta;
+					}
+					if (enviament.getEntregaPostal().getViaNom() == null || enviament.getEntregaPostal().getViaNom().isEmpty()) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[VIA_NOM] El camp 'viaNom' no pot ser null en cas d'entrega ESTRANGER NORMALITZAT.");
+						return resposta;
+					}
+					if (enviament.getEntregaPostal().getPaisCodi() == null || enviament.getEntregaPostal().getPaisCodi().isEmpty()) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[PAIS] El camp 'paisCodi' no pot ser null en cas d'entrega ESTRANGER NORMALITZAT.");
+						return resposta;
+					}
+					if (enviament.getEntregaPostal().getPoblacio() == null || enviament.getEntregaPostal().getPoblacio().isEmpty()) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[POBLACIO] El camp 'poblacio' no pot ser null en cas d'entrega ESTRANGER NORMALITZAT.");
+						return resposta;
+					}
+				}
+				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS)) {
+					if (enviament.getEntregaPostal().getApartatCorreus() == null || enviament.getEntregaPostal().getApartatCorreus().isEmpty()) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[APARTAT_CORREUS] El camp 'apartatCorreus' no pot ser null en cas d'entrega APARTAT CORREUS.");
+						return resposta;
+					}
+					if (enviament.getEntregaPostal().getProvincia() == null || enviament.getEntregaPostal().getProvincia().isEmpty()) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[PROVINCIA] El camp 'provincia' no pot ser null en cas d'entrega APARTAT CORREUS.");
+						return resposta;
+					}
+					if (enviament.getEntregaPostal().getPoblacio() == null || enviament.getEntregaPostal().getPoblacio().isEmpty()) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[POBLACIO] El camp 'poblacio' no pot ser null en cas d'entrega APARTAT CORREUS.");
+						return resposta;
+					}
+					if (enviament.getEntregaPostal().getMunicipiCodi() == null || enviament.getEntregaPostal().getMunicipiCodi().isEmpty()) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[MUNICIPI_CODI] El camp 'municipiCodi' no pot ser null en cas d'entrega APARTAT CORREUS.");
+						return resposta;
+					}
+				}
+				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR)) {
+					if (enviament.getEntregaPostal().getLinea1() == null || enviament.getEntregaPostal().getLinea1().isEmpty()) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[LINEA1] El camp 'linea1' no pot ser null.");
+						return resposta;
+					}
+					if (enviament.getEntregaPostal().getLinea2() == null || enviament.getEntregaPostal().getLinea2().isEmpty()) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[LINEA2] El camp 'linea2' no pot ser null.");
+						return resposta;
+					}
+				}
+				if(enviament.getEntregaPostal().getCodiPostal() == null || enviament.getEntregaPostal().getCodiPostal().isEmpty()) {
+					resposta.setError(true);
+					resposta.setEstat(NotificacioEstatEnum.PENDENT);
+					resposta.setErrorDescripcio("[CODI_POSTAL] El camp 'codiPostal' no pot ser null (indicar 00000 en cas de no disposar del codi postal).");
+					return resposta;
+				}
+			}
 
-
-
+			if (!entitat.isAmbEntregaDeh() && enviament.isEntregaDehActiva()) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[ENTREGA_DEH] El camp 'entrega DEH' de l'entitat ha d'estar actiu en cas d'enviaments amb entrega DEH");
+				return resposta;
+			}
+			if (enviament.isEntregaDehActiva() && enviament.getEntregaDeh() == null) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[ENTREGA_DEH] El camp 'entregaDeh' d'un enviament no pot ser null");
+				return resposta;
+			}
+			if(enviament.getServeiTipus() == null) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[SERVEI_TIPUS] El camp 'serveiTipus' d'un enviament no pot ser null.");
+				return resposta;
+			}
+			if(enviament.getTitular() == null) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[TITULAR] El titular d'un enviament no pot ser null.");
+				return resposta;
+			}
+			if(enviament.getTitular().getInteressatTipus() == null) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[TITULAR_INTERESSATTIPUS] El camp 'interessat_tipus' del titular d'un enviament no pot ser null.");
+				return resposta;
+			}
+			
+			if(enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.FISICA)) {
+				if (enviament.getTitular().getLlinatge1() == null) {
+					resposta.setError(true);
+					resposta.setEstat(NotificacioEstatEnum.PENDENT);
+					resposta.setErrorDescripcio("[TITULAR_LLINATGE1] El camp 'llinatge1' del titular d'un enviament no pot ser null en el cas de persones físiques.");
+					return resposta;
+				}
+			}
+			if(enviament.getTitular().getNif() == null) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[TITULAR_NIF] El camp 'nif' del titular d'un enviament no pot ser null.");
+				return resposta;
+			}
+			
+			if (enviament.getDestinataris() != null) {
+				for(Persona destinatari : enviament.getDestinataris()) {
+					if(destinatari.getInteressatTipus() == null) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[DESTINATARI_INTERESSATTIPUS] El camp 'interessat_tipus' del destinatari d'un enviament no pot ser null.");
+						return resposta;
+					}
+					if(destinatari.getNom() == null) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[DESTINATARI_NOM] El camp 'nom' del destinatari d'un enviament no pot ser null.");
+						return resposta;
+					}
+					if(destinatari.getNif() == null) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[DESTINATARI_NIF] El camp 'nif' del destinatari d'un enviament no pot ser null.");
+						return resposta;
+					}
+					if(destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.FISICA)) {
+						if(destinatari.getLlinatge1() == null) {
+							resposta.setError(true);
+							resposta.setEstat(NotificacioEstatEnum.PENDENT);
+							resposta.setErrorDescripcio("[DESTINATARI_LLINATGE1] El camp 'llinatge1' del destinatari d'un enviament no pot ser null en cas de persone físiques.");
+							return resposta;
+						}
+					}
+				}
+			}
+		}
+		return resposta;
+	}
+	
 	private NotificaDomiciliViaTipusEnumDto toEnviamentViaTipusEnum(
 			EntregaPostalViaTipusEnum viaTipus) {
 		if (viaTipus == null) {
@@ -809,6 +830,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 		return NotificaDomiciliViaTipusEnumDto.valueOf(viaTipus.name());
 	}
+	
 	private EnviamentEstatEnum toEnviamentEstat(NotificacioEnviamentEstatEnumDto estat) {
 		if (estat == null) return null;
 		switch (estat) {
@@ -859,7 +881,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 	}
 	
-	private String isMultipleDestinataris() {
+	private static String isMultipleDestinataris() {
 		String property = "es.caib.notib.destinatari.multiple";
 		logger.debug("Consulta del valor de la property (" +
 				"property=" + property + ")");
