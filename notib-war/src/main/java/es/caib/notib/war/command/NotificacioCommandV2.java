@@ -48,6 +48,7 @@ public class NotificacioCommandV2 {
 	@ValidConcepte
 	@NotEmpty @Size(max=50)
 	private String concepte;
+	@Size(max=1000)
 	private String descripcio;
 	private Date enviamentDataProgramada;
 	private int retard;

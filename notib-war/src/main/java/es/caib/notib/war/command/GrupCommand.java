@@ -15,9 +15,9 @@ import es.caib.notib.war.helper.ConversioTipusHelper;
 public class GrupCommand {
 	
 	private Long id;
-	@NotEmpty @Size(max=64)
+	@NotEmpty @Size(max=255)
 	private String codi;
-	@NotEmpty @Size(max=64)
+	@NotEmpty @Size(max=255)
 	private String nom;
 	
 	public Long getId() {
