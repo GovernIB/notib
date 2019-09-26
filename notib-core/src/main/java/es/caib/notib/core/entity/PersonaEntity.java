@@ -30,15 +30,15 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	private InteressatTipusEnumDto interessatTipus;
 	@Column(name = "incapacitat")
 	private boolean incapacitat;
-	@Column(name = "email", length = 100)
+	@Column(name = "email", length = 255)
 	private String email;
-	@Column(name = "llinatge1", length = 100)
+	@Column(name = "llinatge1", length = 40)
 	private String llinatge1;
-	@Column(name = "llinatge2", length = 100)
+	@Column(name = "llinatge2", length = 40)
 	private String llinatge2;
 	@Column(name = "nif", length = 9)
 	private String nif;
-	@Column(name = "nom", length = 100)
+	@Column(name = "nom", length = 255)
 	private String nom;
 	@Column(name = "telefon", length = 16)
 	private String telefon;

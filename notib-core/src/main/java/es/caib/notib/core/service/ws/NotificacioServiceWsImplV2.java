@@ -612,6 +612,36 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			return resposta;
 		} 
 		for(Enviament enviament : notificacio.getEnviaments()) {
+			if(enviament.getTitular() == null) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[TITULAR] El titular d'un enviament no pot ser null.");
+				return resposta;
+			}
+			if (enviament.getTitular().getNom().length() > 255) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[NOM] El camp 'nom' del titular no pot ser major que 255 caràcters.");
+				return resposta;
+			}
+			if (enviament.getTitular().getLlinatge1().length() > 40) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[LLINATGE1] El camp 'llinatge1' del titular no pot ser major que 40 caràcters.");
+				return resposta;
+			}
+			if (enviament.getTitular().getLlinatge2().length() > 40) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[LLINATGE2] El camp 'llinatge2' del titular no pot ser major que 40 caràcters.");
+				return resposta;
+			}
+			if (enviament.getTitular().getEmail().length() > 255) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[EMAIL] El camp 'email' del titular no pot ser major que 40 caràcters.");
+				return resposta;
+			}
 			if (enviament.getTitular().isIncapacitat() && (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty())) {
 				resposta.setError(true);
 				resposta.setEstat(NotificacioEstatEnum.PENDENT);
@@ -721,6 +751,20 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						return resposta;
 					}
 				}
+				if(!enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR)) {
+					if (enviament.getEntregaPostal().getViaNom().length() > 50) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[VIA_NOM] El camp 'viaNom' de l'entrega postal no pot contenir més de 50 caràcters.");
+						return resposta;
+					}
+					if (enviament.getEntregaPostal().getNumeroCasa() != null && enviament.getEntregaPostal().getNumeroCasa().length() > 5) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[NUM_CASA] El camp 'numeroCasa' de l'entrega postal no pot contenir més de 5 caràcters.");
+						return resposta;
+					}
+				}
 				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR)) {
 					if (enviament.getEntregaPostal().getLinea1() == null || enviament.getEntregaPostal().getLinea1().isEmpty()) {
 						resposta.setError(true);
@@ -732,6 +776,18 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						resposta.setError(true);
 						resposta.setEstat(NotificacioEstatEnum.PENDENT);
 						resposta.setErrorDescripcio("[LINEA2] El camp 'linea2' no pot ser null.");
+						return resposta;
+					}
+					if (enviament.getEntregaPostal().getLinea1().length() > 50) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[LINEA1] El camp 'linea1' de l'entrega postal no pot contenir més de 50 caràcters.");
+						return resposta;
+					}
+					if (enviament.getEntregaPostal().getLinea2().length() > 50) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[LINEA2] El camp 'linea2' de l'entrega postal no pot contenir més de 50 caràcters.");
 						return resposta;
 					}
 				}
@@ -759,12 +815,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				resposta.setError(true);
 				resposta.setEstat(NotificacioEstatEnum.PENDENT);
 				resposta.setErrorDescripcio("[SERVEI_TIPUS] El camp 'serveiTipus' d'un enviament no pot ser null.");
-				return resposta;
-			}
-			if(enviament.getTitular() == null) {
-				resposta.setError(true);
-				resposta.setEstat(NotificacioEstatEnum.PENDENT);
-				resposta.setErrorDescripcio("[TITULAR] El titular d'un enviament no pot ser null.");
 				return resposta;
 			}
 			if(enviament.getTitular().getInteressatTipus() == null) {
