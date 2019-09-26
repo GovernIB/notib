@@ -239,6 +239,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 									(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getCodigo() : null,
 									(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getDescripcionCodigoDIR() : null,
 									(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getNifDIR() : null);
+							if (estat.name() != null)
+								logger.info(estat.name());
 							enviamentUpdateDatat(
 									estat,
 									toDate(datatDarrer.getFecha()),
