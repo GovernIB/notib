@@ -90,13 +90,13 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Enumerated(EnumType.ORDINAL)
 	protected NotificaDomiciliViaTipusEnumDto domiciliViaTipus;
 	
-	@Column(name = "dom_via_nom", length = 100)
+	@Column(name = "dom_via_nom", length = 50)
 	protected String domiciliViaNom;
 	@Column(name = "dom_num_tipus")
 	@Enumerated(EnumType.ORDINAL)
 	protected NotificaDomiciliNumeracioTipusEnumDto domiciliNumeracioTipus;
 	
-	@Column(name = "dom_num_num", length = 10)
+	@Column(name = "dom_num_num", length = 5)
 	protected String domiciliNumeracioNumero;
 	
 	@Column(name = "dom_num_qualif", length = 3)

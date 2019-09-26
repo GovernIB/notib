@@ -1,6 +1,7 @@
 package es.caib.notib.war.command;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
@@ -171,7 +172,9 @@ public class EntregapostalCommand {
 
 	private NotificaDomiciliConcretTipusEnumDto tipus;
 	private NotificaDomiciliViaTipusEnumDto tipusVia;
+	@Size(max=50)
 	private String viaNom;
+	@Size(max=5)
 	private String numeroCasa;
 	private String numeroQualificador;
 	private String puntKm;
@@ -182,13 +185,16 @@ public class EntregapostalCommand {
 	private String porta;
 	private String bloc;
 	private String complement;
-	@NotEmpty
+	@NotEmpty @Size(max=10)
 	private String codiPostal;
+	@Size(max=255)
 	private String poblacio;
 	private String municipiCodi; 
 	private String provincia;
 	private String paisCodi;
+	@Size(max=50)
 	private String linea1;
+	@Size(max=50)
 	private String linea2;
 	private String formatSobre;
 	private String formatFulla;

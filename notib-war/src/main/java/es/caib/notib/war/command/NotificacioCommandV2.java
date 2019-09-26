@@ -76,8 +76,10 @@ public class NotificacioCommandV2 {
 	private boolean eliminarLogoPeu;
 	private boolean eliminarLogoCap;
 	private ServeiTipusEnumDto serveiTipus;
+	@Valid
 	private PersonaCommand titular;
 	private PersonaCommand destinatari = new PersonaCommand();
+	@Valid
 	private List<PersonaCommand> destinataris = new ArrayList<PersonaCommand>();
 	@Valid
 	private List<EnviamentCommand> enviaments = new ArrayList<EnviamentCommand>();

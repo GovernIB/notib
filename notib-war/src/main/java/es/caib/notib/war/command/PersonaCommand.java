@@ -1,5 +1,7 @@
 package es.caib.notib.war.command;
 
+import javax.validation.constraints.Size;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
@@ -35,11 +37,15 @@ public class PersonaCommand {
 
 	private boolean incapacitat;
 	private InteressatTipusEnumDto interessatTipus;
+	@Size(max=255)
 	private String nom;
+	@Size(max=40)	
 	private String llinatge1;
+	@Size(max=40)
 	private String llinatge2;
 	private String nif;
 	private String telefon;
+	@Size(max=255)
 	private String email;
 	private String dir3codi;
 	private boolean visible = true;

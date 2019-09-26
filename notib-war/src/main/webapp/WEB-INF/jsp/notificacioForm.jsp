@@ -43,6 +43,9 @@
 .help-block {
 	font-size: x-small;
 }
+#entregaPostal .help-block {
+	font-size: 8px;
+}
 .inputcss {
 	width: calc(100% - 175px);
 	float: left;
