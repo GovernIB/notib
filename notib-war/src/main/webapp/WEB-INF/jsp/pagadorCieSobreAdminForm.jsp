@@ -36,7 +36,7 @@
 		<form:hidden path="id"/>
 		<div class="row">
 			<div class="col-md-2">
-				<not:inputText name="codi" textKey="pagadorcie.form.format.sobre.camp.codi"/>
+				<not:inputText name="codi" textKey="pagadorcie.form.format.sobre.camp.codi" required="true"/>
 			</div>
 			<div id="modal-botons">
 				<button id="addPagadorCieButton" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

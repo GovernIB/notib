@@ -933,7 +933,7 @@ public class PluginHelper {
 		dadesAnotacio.setUnitatAdministrativa(null);
 		dadesAnotacio.setDocfisica(1L);
 		dadesAnotacio.setNumExpedient(notificacio.getNumExpedient());
-		dadesAnotacio.setObservacions(notificacio.getDescripcio());
+		dadesAnotacio.setObservacions("Notib: " + notificacio.getUsuariCodi());
 //		dadesAnotacio.setRefExterna(notificacio.getRefExterna());
 		dadesAnotacio.setCodiUsuari(notificacio.getUsuariCodi());
 		registreSortida.setDadesAnotacio(dadesAnotacio);
@@ -1000,7 +1000,7 @@ public class PluginHelper {
 		registre.setAplicacionTelematica("NOTIB");
 		registre.setAplicacion("RWE");
 		registre.setVersion("3.1");
-		registre.setObservaciones(notificacio.getDescripcio());
+		registre.setObservaciones("Notib: " + notificacio.getUsuariCodi());
 		registre.setExpone("");
 		registre.setSolicita("");
 		registre.setPresencial(false);
@@ -1073,7 +1073,7 @@ public class PluginHelper {
 		registre.setAplicacionTelematica("NOTIB");
 		registre.setAplicacion("RWE");
 		registre.setVersion("3.1");
-		registre.setObservaciones(notificacio.getDescripcio());
+		registre.setObservaciones("Notib: " + notificacio.getUsuariCodi());
 		registre.setExpone("");
 		registre.setSolicita("");
 		registre.setPresencial(false);

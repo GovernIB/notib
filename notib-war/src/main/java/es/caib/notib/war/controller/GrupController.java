@@ -102,7 +102,7 @@ public class GrupController extends BaseUserController{
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			return "pagadorCieAdminForm";
+			return "grupAdminForm";
 		}
 		// if it is modified
 		if (grupCommand.getId() != null) {
@@ -111,7 +111,7 @@ public class GrupController extends BaseUserController{
 			
 			return getModalControllerReturnValueSuccess(
 					request,
-					"redirect:pagadorsCie",
+					"redirect:grupAdminList",
 					"procediment.controller.modificat.ok");
 		//if it is new	
 		} else {
@@ -120,7 +120,7 @@ public class GrupController extends BaseUserController{
 					GrupCommand.asDto(grupCommand));
 			return getModalControllerReturnValueSuccess(
 					request,
-					"redirect:pagadorsCie",
+					"redirect:grupAdminList",
 					"procediment.controller.creat.ok");
 		}
 	}

@@ -75,6 +75,9 @@ body {
 .modal-body {
 	height: auto !important;
 }
+.container-custom {
+	width: 96%;
+}
 <c:choose>
 	<c:when test="${sessionScope['EntitatHelper.entitatActual'].colorFons!=null  && not empty sessionScope['EntitatHelper.entitatActual'].colorFons}">
 		.navbar-app {
@@ -288,7 +291,7 @@ body {
 			</div>
 		</div>
 	</div>
-	<div class="container container-main">
+	<div class="container container-main container-custom">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h2>
