@@ -104,6 +104,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "not_env_intent")
 	protected int notificaEnviamentIntent;
 	
+	@Column(name = "registre_env_intent")
+	protected int registreEnviamentIntent;
+	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "not_error_event_id")
 	@ForeignKey(name = "not_noterrevent_notificacio_fk")
@@ -201,6 +204,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public int getNotificaEnviamentIntent() {
 		return notificaEnviamentIntent;
 	}
+	public int getRegistreEnviamentIntent() {
+		return registreEnviamentIntent;
+	}
 	public NotificacioEventEntity getNotificaErrorEvent() {
 		return notificaErrorEvent;
 	}
@@ -292,6 +298,14 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		cal.add(Calendar.MILLISECOND, reintentsPeriodeNotifica*(2^notificaEnviamentIntent));
 		this.notificaEnviamentData = cal.getTime();
 	}
+	
+	public void updateRegistreNouEnviament(int reintentsPeriodeRegistre) {
+		this.registreEnviamentIntent++;
+		Calendar cal = GregorianCalendar.getInstance();
+		cal.add(Calendar.MILLISECOND, reintentsPeriodeRegistre*(2^registreEnviamentIntent));
+		this.registreData = cal.getTime();
+	}
+	
 	public void updateNotificaError(
 			NotificacioErrorTipusEnumDto errorTipus,
 			NotificacioEventEntity errorEvent) {

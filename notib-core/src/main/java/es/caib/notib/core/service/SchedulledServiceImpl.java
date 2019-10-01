@@ -53,7 +53,9 @@ public class SchedulledServiceImpl implements SchedulledService {
 	public void registrarEnviamentsPendents() {
 		logger.debug("Cercant notificacions pendents de registrar");
 		int maxPendents = getRegistreEnviamentsProcessarMaxProperty();
-		List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatPendent(new PageRequest(0, maxPendents));
+		List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatPendent(
+				pluginHelper.getRegistreReintentsMaxProperty(),
+				new PageRequest(0, maxPendents));
 		if (!pendents.isEmpty()) {
 			logger.debug("Realitzant registre per a " + pendents.size()
 					+ " notificacions pendents (màxim=" + maxPendents + ")");

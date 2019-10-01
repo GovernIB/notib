@@ -197,6 +197,7 @@ CREATE TABLE NOT_NOTIFICACIO
   REGISTRE_NUM_EXPEDIENT	character varying(20),
   REGISTRE_REF_EXTERNA		character varying(64),
   REGISTRE_CODI_ASSUMPTE	character varying(255),
+  REGISTRE_ENV_INTENT 		BIGSERIAL(10),
   REGISTRE_OBSERVACIONS		character varying(256),
   GRUP_CODI					character varying(64),
   ORGAN_GESTOR 				character varying(19),

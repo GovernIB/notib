@@ -63,6 +63,7 @@ public class RegistreNotificaHelper {
 							AsientoRegistralBeanDto arb = pluginHelper.notificacioToAsientoRegistralBean(
 									notificacioEntity, 
 									enviament);
+							notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
 							RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(notificacioEntity.getEntitat().getDir3Codi(), arb, 2L);
 							//Registrar event
 							if(arbResposta.getErrorDescripcio() != null) {
@@ -93,6 +94,7 @@ public class RegistreNotificaHelper {
 						AsientoRegistralBeanDto arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(
 								notificacioEntity, 
 								notificacioEntity.getEnviaments());
+						notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
 						RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(notificacioEntity.getEntitat().getDir3Codi(), arb, 1L);
 						//Registrar event
 						if(arbResposta.getErrorCodi() != null) {
@@ -123,6 +125,7 @@ public class RegistreNotificaHelper {
 					AsientoRegistralBeanDto arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(
 							notificacioEntity, 
 							notificacioEntity.getEnviaments());
+					notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
 					RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(notificacioEntity.getEntitat().getDir3Codi(), arb, 1L);
 					//Registrar event
 					if(arbResposta.getErrorCodi() != null) {
@@ -151,6 +154,7 @@ public class RegistreNotificaHelper {
 			//Crea registre sortida + Notific@
 			RegistreIdDto registreIdDto = new RegistreIdDto();
 			try {
+				notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
 				registreIdDto = pluginHelper.registreAnotacioSortida(
 						conversioTipusHelper.convertir(
 								notificacioEntity, 
