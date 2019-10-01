@@ -1454,13 +1454,17 @@ public class PluginHelper {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.arxiu.class");
 	}
 	public int getRegistreReintentsMaxProperty() {
-		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.registre.enviaments.reintents.maxim");
+		return PropertiesHelper.getProperties().getAsInt(
+				"es.caib.notib.tasca.registre.enviaments.reintents.maxim",
+				3);
 	}
 	public int getRegistreReintentsPeriodeProperty() {
 		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.registre.enviaments.periode");
 	}
 	public int getNotificaReintentsMaxProperty() {
-		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.notifica.enviaments.reintents.maxim");
+		return PropertiesHelper.getProperties().getAsInt(
+				"es.caib.notib.tasca.notifica.enviaments.reintents.maxim",
+				3);
 	}
 	public int getNotificaReintentsPeriodeProperty() {
 		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.notifica.enviaments.periode");

@@ -427,6 +427,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.concepte = concepte;
 			built.estat = NotificacioEstatEnumDto.PENDENT;
 			built.notificaEnviamentIntent = 0;
+			built.registreEnviamentIntent = 0;
 			built.notificaEnviamentData = new Date();
 		}
 		public Builder numExpedient(String numExpedient) {
@@ -549,6 +550,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.procediment = procediment;
 			built.estat = NotificacioEstatEnumDto.PENDENT;
 			built.notificaEnviamentIntent = 0;
+			built.registreEnviamentIntent = 0;
 			built.notificaEnviamentData = new Date();
 			built.tipusUsuari = tipusUsuari;
 		}

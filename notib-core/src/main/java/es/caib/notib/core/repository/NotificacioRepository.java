@@ -120,7 +120,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"where " +
 			"    estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.PENDENT " +
 			"and registreEnviamentIntent < :maxReintents " +
-			"and notificaEnviamentData is not null " +
+			//"and registreData is not null " +
 			"order by " +
 			"    notificaEnviamentData ASC")
 	List<NotificacioEntity> findByNotificaEstatPendent(
