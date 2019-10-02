@@ -36,7 +36,6 @@ import es.caib.notib.core.wsdl.adviser.Receptor;
 @WebContext(
 		contextRoot = "/notib/ws",
 		urlPattern = "/adviser",
-		authMethod = "WSBASIC",
 		transportGuarantee = "NONE",
 		secureWSDLAccess = false)
 //@RolesAllowed({"NOT_NOTIFICA"})
