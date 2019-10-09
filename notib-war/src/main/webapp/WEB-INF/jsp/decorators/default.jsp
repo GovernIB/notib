@@ -130,7 +130,7 @@ body {
 <body>
 
 	<div class="navbar navbar-default navbar-fixed-top navbar-app" role="navigation">
-		<div class="container">
+		<div class="container container-custom">
 			<div class="navbar-header">
 				<%--button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
 					<span class="sr-only">Toggle navigation</span>
@@ -308,7 +308,7 @@ body {
 			</div>
 		</div>
 	</div>
-    <div class="container container-foot">
+    <div class="container container-foot container-custom">
     	<div class="pull-left app-version"><p>NOTIB v<not:versio/></p></div>
         <div class="pull-right govern-footer">
         	<p>
