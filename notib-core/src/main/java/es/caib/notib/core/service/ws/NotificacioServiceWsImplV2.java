@@ -618,28 +618,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				resposta.setErrorDescripcio("[TITULAR] El titular d'un enviament no pot ser null.");
 				return resposta;
 			}
+			if (enviament.getTitular().getEmail() != null && enviament.getTitular().getEmail().length() > 255) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[EMAIL] El camp 'email' del titular no pot ser major que 40 caràcters.");
+				return resposta;
+			}
 			if (enviament.getTitular().getNom().length() > 255) {
 				resposta.setError(true);
 				resposta.setEstat(NotificacioEstatEnum.PENDENT);
 				resposta.setErrorDescripcio("[NOM] El camp 'nom' del titular no pot ser major que 255 caràcters.");
-				return resposta;
-			}
-			if (enviament.getTitular().getLlinatge1().length() > 40) {
-				resposta.setError(true);
-				resposta.setEstat(NotificacioEstatEnum.PENDENT);
-				resposta.setErrorDescripcio("[LLINATGE1] El camp 'llinatge1' del titular no pot ser major que 40 caràcters.");
-				return resposta;
-			}
-			if (enviament.getTitular().getLlinatge2().length() > 40) {
-				resposta.setError(true);
-				resposta.setEstat(NotificacioEstatEnum.PENDENT);
-				resposta.setErrorDescripcio("[LLINATGE2] El camp 'llinatge2' del titular no pot ser major que 40 caràcters.");
-				return resposta;
-			}
-			if (enviament.getTitular().getEmail().length() > 255) {
-				resposta.setError(true);
-				resposta.setEstat(NotificacioEstatEnum.PENDENT);
-				resposta.setErrorDescripcio("[EMAIL] El camp 'email' del titular no pot ser major que 40 caràcters.");
 				return resposta;
 			}
 			if (enviament.getTitular().isIncapacitat() && (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty())) {
@@ -829,6 +817,18 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					resposta.setError(true);
 					resposta.setEstat(NotificacioEstatEnum.PENDENT);
 					resposta.setErrorDescripcio("[TITULAR_LLINATGE1] El camp 'llinatge1' del titular d'un enviament no pot ser null en el cas de persones físiques.");
+					return resposta;
+				}
+				if (enviament.getTitular().getLlinatge1().length() > 40) {
+					resposta.setError(true);
+					resposta.setEstat(NotificacioEstatEnum.PENDENT);
+					resposta.setErrorDescripcio("[LLINATGE1] El camp 'llinatge1' del titular no pot ser major que 40 caràcters.");
+					return resposta;
+				}
+				if (enviament.getTitular().getLlinatge2() != null && enviament.getTitular().getLlinatge2().length() > 40) {
+					resposta.setError(true);
+					resposta.setEstat(NotificacioEstatEnum.PENDENT);
+					resposta.setErrorDescripcio("[LLINATGE2] El camp 'llinatge2' del titular no pot ser major que 40 caràcters.");
 					return resposta;
 				}
 			}
