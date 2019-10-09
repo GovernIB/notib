@@ -13,9 +13,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import es.caib.notib.core.api.dto.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.war.command.UsuariCommand;
+import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.SessioHelper;
 
 /**
@@ -37,6 +39,11 @@ public class UsuariController extends BaseController {
 			Model model) {
 		UsuariDto usuari = aplicacioService.getUsuariActual();
 		model.addAttribute(UsuariCommand.asCommand(usuari));
+		model.addAttribute(
+				"idiomaEnumOptions",
+				EnumHelper.getOptionsForEnum(
+						IdiomaEnumDto.class,
+						"usuari.form.camp.idioma.enum."));
 		return "usuariForm";
 	}
 	@RequestMapping(value = "/configuracio", method = RequestMethod.POST)

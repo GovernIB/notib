@@ -4,6 +4,11 @@
 package es.caib.notib.war.helper;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
@@ -18,10 +23,11 @@ public class SessioHelper {
 	public static final String SESSION_ATTRIBUTE_AUTH_PROCESSADA = "SessioHelper.autenticacioProcessada";
 	public static final String SESSION_ATTRIBUTE_CONTENIDOR_VISTA = "SessioHelper.contenidorVista";
 	public static final String SESSION_ATTRIBUTE_USUARI_ACTUAL = "SessioHelper.usuariActual";
-
+	private static final String SESSION_ATTRIBUTE_IDIOMA_USUARI = "SessionHelper.idiomaUsuari";
 
 	public static void processarAutenticacio(
 			HttpServletRequest request,
+			HttpServletResponse response,
 			AplicacioService aplicacioService) {
 		if (request.getUserPrincipal() != null) {
 			Boolean autenticacioProcessada = (Boolean)request.getSession().getAttribute(
@@ -33,7 +39,9 @@ public class SessioHelper {
 						new Boolean(true));
 			}
 		}
-		
+		String idioma_usuari = aplicacioService.getUsuariActual().getIdioma();
+		LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
+        
 		request.getSession().setAttribute(
 				"SessionHelper.capsaleraCapLogo", 
 				aplicacioService.propertyFindByPrefix("es.caib.notib.capsalera.logo"));
@@ -47,6 +55,16 @@ public class SessioHelper {
 				"SessionHelper.capsaleraColorLletra", 
 				aplicacioService.propertyFindByPrefix("es.caib.notib.capsalera.color.lletra"));
 		
+		request.getSession().setAttribute(
+				SESSION_ATTRIBUTE_IDIOMA_USUARI, 
+				idioma_usuari);
+		
+        localeResolver.setLocale(
+        		request, 
+        		response, 
+        		StringUtils.parseLocaleString(
+        				(String)request.getSession().getAttribute(SESSION_ATTRIBUTE_IDIOMA_USUARI))
+        		);
 	}
 	public static boolean isAutenticacioProcessada(HttpServletRequest request) {
 		return request.getSession().getAttribute(SESSION_ATTRIBUTE_AUTH_PROCESSADA) != null;

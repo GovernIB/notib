@@ -176,6 +176,7 @@
 		</property>
 	</bean>
 
+	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver" />
 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
 	
 	<bean name="/swaggerConfig" class="es.caib.notib.war.config.SwaggerConfig"/>

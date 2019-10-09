@@ -117,11 +117,13 @@ public class UsuariHelper {
 			logger.debug("Consultant plugin de dades d'usuari (" +
 					"usuariCodi=" + auth.getName() + ")");
 			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+			String idioma = PropertiesHelper.getProperties().getProperty("es.caib.notib.default.user.language");
 			if (dadesUsuari != null) {
 				usuari = usuariRepository.save(
 						UsuariEntity.getBuilder(
 								dadesUsuari.getCodi(),
-								dadesUsuari.getEmail()).
+								dadesUsuari.getEmail(),
+								idioma).
 						nom(dadesUsuari.getNom()).
 						llinatges(dadesUsuari.getLlinatges()).
 						nomSencer(dadesUsuari.getNomSencer()).

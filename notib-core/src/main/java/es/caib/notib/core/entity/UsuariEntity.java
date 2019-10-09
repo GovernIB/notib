@@ -34,6 +34,8 @@ public class UsuariEntity implements Serializable {
 	private String email;
 	@Column(name = "rebre_emails")
 	private boolean rebreEmailsNotificacio = true;
+	@Column(name="idioma", length = 2)
+	private String idioma;
 	
 	@Version
 	private long version = 0;
@@ -56,6 +58,9 @@ public class UsuariEntity implements Serializable {
 	public boolean isRebreEmailsNotificacio() {
 		return rebreEmailsNotificacio;
 	}
+	public String getIdioma() {
+		return idioma;
+	}
 	public void update(
 			String nom,
 			String llinatges,
@@ -71,25 +76,32 @@ public class UsuariEntity implements Serializable {
 		this.email = email;
 	}
 	
-	public void update(boolean rebreEmailsNotificacio) {
+	public void update(
+			boolean rebreEmailsNotificacio,
+			String idioma) {
 		this.rebreEmailsNotificacio = rebreEmailsNotificacio;
+		this.idioma = idioma;
 	}
 
 	public static Builder getBuilder(
 			String codi,
-			String email) {
+			String email,
+			String idioma) {
 		return new Builder(
 				codi,
-				email);
+				email,
+				idioma);
 	}
 
 	public static class Builder {
 		UsuariEntity built;
 		Builder(String codi,
-				String email) {
+				String email,
+				String idioma) {
 			built = new UsuariEntity();
 			built.codi = codi;
 			built.email = email;
+			built.idioma = idioma;
 		}
 		public Builder nom(String nom) {
 			built.nom = nom;

@@ -83,11 +83,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 			logger.debug("Consultant plugin de dades d'usuari (" +
 					"usuariCodi=" + auth.getName() + ")");
 			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+			String idioma = PropertiesHelper.getProperties().getProperty("es.caib.notib.default.user.language");
 			if (dadesUsuari != null) {
 				usuari = usuariRepository.save(
 						UsuariEntity.getBuilder(
 								dadesUsuari.getCodi(),
-								dadesUsuari.getEmail()).
+								dadesUsuari.getEmail(),
+								idioma).
 						nom(dadesUsuari.getNom()).
 						llinatges(dadesUsuari.getLlinatges()).
 						nomSencer(dadesUsuari.getNomSencer()).
@@ -125,7 +127,9 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public UsuariDto updateUsuariActual(UsuariDto dto) {
 		logger.debug("Actualitzant configuració de usuari actual");
 		UsuariEntity usuari = usuariRepository.findOne(dto.getCodi());
-		usuari.update(dto.getRebreEmailsNotificacio());
+		usuari.update(
+				dto.getRebreEmailsNotificacio(),
+				dto.getIdioma());
 		
 		return toUsuariDtoAmbRols(usuari);
 	}
