@@ -287,6 +287,7 @@ public class NotificacioController extends BaseUserController {
 							IdiomaEnumDto.class,
 							"es.caib.notib.core.api.dto.idiomaEnumDto."));
 			model.addAttribute("enviosGuardats", notificacioCommand.getEnviaments());
+			model.addAttribute("tipusDocument", notificacioCommand.getTipusDocument());
             model.addAttribute("errors", bindingResult.getAllErrors());
             if (notificacioCommand.getEnviaments().get(0).getDestinataris() != null)
             	model.addAttribute("isVisible", notificacioCommand.getEnviaments().get(0).getDestinataris().get(0).isVisible());
@@ -309,21 +310,21 @@ public class NotificacioController extends BaseUserController {
 				}
 				break;
 			case CSV:
-				if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
-						&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
-					notificacioCommand.getDocument().setCsv(notificacioCommand.getDocumentArxiuUuidCsvUrl());
+				if (notificacioCommand.getDocumentArxiuCsv() != null
+						&& !notificacioCommand.getDocumentArxiuCsv().isEmpty()) {
+					notificacioCommand.getDocument().setCsv(notificacioCommand.getDocumentArxiuCsv());
 				}
 				break;
 			case UUID:
-				if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
-						&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
-					notificacioCommand.getDocument().setUuid(notificacioCommand.getDocumentArxiuUuidCsvUrl());
+				if (notificacioCommand.getDocumentArxiuUuid() != null
+						&& !notificacioCommand.getDocumentArxiuUuid().isEmpty()) {
+					notificacioCommand.getDocument().setUuid(notificacioCommand.getDocumentArxiuUuid());
 				}
 				break;
 			case URL:
-				if (notificacioCommand.getDocumentArxiuUuidCsvUrl() != null
-						&& !notificacioCommand.getDocumentArxiuUuidCsvUrl().isEmpty()) {
-					notificacioCommand.getDocument().setUrl(notificacioCommand.getDocumentArxiuUuidCsvUrl());
+				if (notificacioCommand.getDocumentArxiuUrl() != null
+						&& !notificacioCommand.getDocumentArxiuUrl().isEmpty()) {
+					notificacioCommand.getDocument().setUrl(notificacioCommand.getDocumentArxiuUrl());
 				}
 				break;
 			}

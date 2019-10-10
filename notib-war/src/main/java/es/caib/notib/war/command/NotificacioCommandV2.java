@@ -3,6 +3,7 @@
  */
 package es.caib.notib.war.command;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,24 +29,47 @@ import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
+import es.caib.notib.war.validation.ValidArxiuDocument;
 import es.caib.notib.war.validation.ValidConcepte;
+import es.caib.notib.war.validation.ValidCsvDocument;
+import es.caib.notib.war.validation.ValidUrlDocument;
+import es.caib.notib.war.validation.ValidUuidDocument;
 
 /**
  * Command per al manteniment de notificacions manuals (V2).
  * 
  * @author Limit Tecnologies <limit@limit.es>
- */
-//@ValidEnviament
+ */	
+@ValidCsvDocument (
+		fieldName 	= "tipusDocument",
+		dependFieldName = "documentArxiuCsv"
+)
+
+@ValidUuidDocument (
+		fieldName 	= "tipusDocument",
+		dependFieldName = "documentArxiuUuid"
+)
+
+@ValidUrlDocument (
+		fieldName 	= "tipusDocument",
+		dependFieldName = "documentArxiuUrl"
+)
+
+@ValidArxiuDocument (
+		fieldName 	= "tipusDocument",
+		dependFieldName = "contingutArxiu"
+)
+@ValidConcepte (
+		fieldName = "concepte"
+	)
 public class NotificacioCommandV2 {
 
-	
 	private Long id;
 	@NotEmpty @Size(max=64)
 	private String emisorDir3Codi;
 	private String organGestor;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
-	@ValidConcepte
 	@NotEmpty @Size(max=50)
 	private String concepte;
 	@Size(max=1000)
@@ -61,8 +85,11 @@ public class NotificacioCommandV2 {
 	private Long grupId;
 	private String usuariCodi;
 	private TipusDocumentEnumDto tipusDocument;
+	private String tipusDocumentSelected;
 	private String tipusDocumentDefault;
-	private String documentArxiuUuidCsvUrl;
+	private String documentArxiuCsv;
+	private String documentArxiuUuid;
+	private String documentArxiuUrl;
 	private MultipartFile arxiu;
 	private String oficina;
 	private String llibre;
@@ -121,17 +148,37 @@ public class NotificacioCommandV2 {
 	public void setConcepte(String concepte) {
 		this.concepte = concepte;
 	}
+	public String getDocumentArxiuCsv() {
+		return documentArxiuCsv;
+	}
+	public void setDocumentArxiuCsv(String documentArxiuCsv) {
+		this.documentArxiuCsv = documentArxiuCsv;
+	}
+	public String getDocumentArxiuUuid() {
+		return documentArxiuUuid;
+	}
+	public void setDocumentArxiuUuid(String documentArxiuUuid) {
+		this.documentArxiuUuid = documentArxiuUuid;
+	}
+	public String getDocumentArxiuUrl() {
+		return documentArxiuUrl;
+	}
+	public void setDocumentArxiuUrl(String documentArxiuUrl) {
+		this.documentArxiuUrl = documentArxiuUrl;
+	}
 	public MultipartFile getArxiu() {
 		return arxiu;
 	}
 	public void setArxiu(MultipartFile arxiu) {
 		this.arxiu = arxiu;
 	}
-	public String getDocumentArxiuUuidCsvUrl() {
-		return documentArxiuUuidCsvUrl;
-	}
-	public void setDocumentArxiuUuidCsvUrl(String documentArxiuUuidCsvUrl) {
-		this.documentArxiuUuidCsvUrl = documentArxiuUuidCsvUrl;
+	public byte[]  getContingutArxiu() {
+		try {
+			return arxiu.getBytes();
+		} catch (IOException e) {
+			logger.error("No s'ha pogut recuperar el contingut del fitxer per validar");
+		}
+		return null;
 	}
 	public String getEmisorDir3Codi() {
 		return emisorDir3Codi;
@@ -306,6 +353,12 @@ public class NotificacioCommandV2 {
 	}
 	public void setObservacions(String observacions) {
 		this.observacions = observacions;
+	}
+	public String getTipusDocumentSelected() {
+		return tipusDocumentSelected;
+	}
+	public void setTipusDocumentSelected(String tipusDocumentSelected) {
+		this.tipusDocumentSelected = tipusDocumentSelected;
 	}
 	public static NotificacioCommandV2 asCommand(NotificacioDtoV2 dto) {
 		if (dto == null) {

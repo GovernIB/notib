@@ -18,12 +18,14 @@ import javax.validation.Payload;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy=ValidConcepteValidator.class)
 public @interface ValidConcepte {
 
-	String message() default "Format del concepte es incorrecte";
+	String fieldName();
+	
+	String message() default "El format del concepte és incorrecte";
 
 	Class<?>[] groups() default {};
 

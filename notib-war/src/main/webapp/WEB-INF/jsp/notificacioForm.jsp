@@ -117,7 +117,15 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
-	
+	var tipusDocumentDefault = $('#tipusDocumentDefault').val();
+	var tipusDocumentSelected = $('#tipusDocumentSelected').val();
+	$('.customSelect').webutilInputSelect2(null);
+
+	if (tipusDocumentSelected != '') {
+		$(".customSelect").val(tipusDocumentSelected).trigger("change");
+	} else if (tipusDocumentDefault != '') {
+		$(".customSelect").val(tipusDocumentDefault).trigger("change");
+	}
 	//Paisos
 	$.ajax({
 		type: 'GET',
@@ -226,12 +234,6 @@ $(document).ready(function() {
 			});
 		}
 	});
-	var tipusDocumentDefault = $('#tipusDocumentDefault').val();
-	$('.customSelect').webutilInputSelect2(null);
-	if (tipusDocumentDefault != '') {
-		$(".customSelect").val(tipusDocumentDefault).trigger("change");
-	}
-
     //$('#concepte').on('input',function(e){
     //	 $('#extracte').val($(this).val());
     //});
@@ -250,14 +252,27 @@ $(document).ready(function() {
     });
     
     $('#tipusDocument').on('change', function() {
-        if ($(this).val() == 'ARXIU') {
+        if ($(this).val() == 'CSV') {
             $('#metadades').removeClass('hidden');
-            $('#input-origen-arxiu').removeClass('hidden');
-            $('#input-origen-csvuuid').addClass('hidden');
-        } else {
-            $('#metadades').addClass('hidden');
-            $('#input-origen-csvuuid').removeClass('hidden');
+            $('#input-origen-csv').removeClass('hidden');
+            $('#input-origen-uuid').addClass('hidden');
+            $('#input-origen-url').addClass('hidden');
             $('#input-origen-arxiu').addClass('hidden');
+        } else if ($(this).val() == 'UUID') {
+        	$('#input-origen-csv').addClass('hidden');
+            $('#input-origen-uuid').removeClass('hidden');
+            $('#input-origen-url').addClass('hidden');
+            $('#input-origen-arxiu').addClass('hidden');
+    	} else if ($(this).val() == 'URL') {
+    		$('#input-origen-csv').addClass('hidden');
+            $('#input-origen-uuid').addClass('hidden');
+            $('#input-origen-url').removeClass('hidden');
+            $('#input-origen-arxiu').addClass('hidden');
+    	} else if ($(this).val() == 'ARXIU'){
+    		$('#input-origen-csv').addClass('hidden');
+            $('#input-origen-uuid').addClass('hidden');
+            $('#input-origen-url').addClass('hidden');
+            $('#input-origen-arxiu').removeClass('hidden');
         }
         webutilModalAdjustHeight();
     });
@@ -644,18 +659,25 @@ function mostrarEntregaDeh(className) {
 				<div class="col-md-6">
 					<div class="form-group">
 						<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
+						<form:hidden path="tipusDocumentSelected" value="${tipusDocument}"/>
 						<div class="controls col-xs-8">
 							<form:hidden path="tipusDocumentDefault"/>
 							<select id="tipusDocument" name="tipusDocument" class="customSelect">
 							<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
-								<option value="${enumValue}" selected><spring:message code="tipus.document.enum.${enumValue}"/></option>
+								<option value="${enumValue}" <c:if test="${not empty tipusDocument && tipusDocument == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
 							</c:forEach>
 							</select>
 						</div>
 					</div>
 				</div>
-				<div id="input-origen-csvuuid" class="col-md-6">
-					<not:inputText name="documentArxiuUuidCsvUrl" textKey="notificacio.form.camp.csvuuid" labelSize="3" />
+				<div id="input-origen-csv" class="col-md-6">
+					<not:inputText name="documentArxiuCsv" textKey="notificacio.form.camp.csvuuid" labelSize="3" />
+				</div>
+				<div id="input-origen-uuid" class="col-md-6 hidden">
+					<not:inputText name="documentArxiuUuid" textKey="notificacio.form.camp.csvuuid" labelSize="3" />
+				</div>
+				<div id="input-origen-url" class="col-md-6 hidden">
+					<not:inputText name="documentArxiuUrl" textKey="notificacio.form.camp.csvuuid" labelSize="3" />
 				</div>
 				<div id="input-origen-arxiu" class="col-md-6 hidden">
 					<not:inputFile name="arxiu" textKey="notificacio.form.camp.arxiu" labelSize="3" />
