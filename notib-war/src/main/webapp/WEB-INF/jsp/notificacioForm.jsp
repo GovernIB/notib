@@ -256,22 +256,34 @@ $(document).ready(function() {
             $('#metadades').removeClass('hidden');
             $('#input-origen-csv').removeClass('hidden');
             $('#input-origen-uuid').addClass('hidden');
+            $('#documentArxiuUuid').val('');
             $('#input-origen-url').addClass('hidden');
+            $('#documentArxiuUrl').val('');
             $('#input-origen-arxiu').addClass('hidden');
+            $('#arxiu').val('');
         } else if ($(this).val() == 'UUID') {
         	$('#input-origen-csv').addClass('hidden');
+        	$('#documentArxiuCsv').val('');
             $('#input-origen-uuid').removeClass('hidden');
             $('#input-origen-url').addClass('hidden');
+            $('#documentArxiuUrl').val('');
             $('#input-origen-arxiu').addClass('hidden');
+            $('#arxiu').val('');
     	} else if ($(this).val() == 'URL') {
     		$('#input-origen-csv').addClass('hidden');
+    		$('#documentArxiuCsv').val('');
             $('#input-origen-uuid').addClass('hidden');
+            $('#documentArxiuUuid').val('');
             $('#input-origen-url').removeClass('hidden');
             $('#input-origen-arxiu').addClass('hidden');
+            $('#arxiu').val('');
     	} else if ($(this).val() == 'ARXIU'){
     		$('#input-origen-csv').addClass('hidden');
+    		$('#documentArxiuCsv').val('');
             $('#input-origen-uuid').addClass('hidden');
+            $('#documentArxiuUuid').val('');
             $('#input-origen-url').addClass('hidden');
+            $('#documentArxiuUrl').val('');
             $('#input-origen-arxiu').removeClass('hidden');
         }
         webutilModalAdjustHeight();

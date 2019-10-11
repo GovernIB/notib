@@ -239,58 +239,13 @@ public class NotificacioController extends BaseUserController {
 				notificacioCommand.getProcedimentId());
 		notificacioCommand.setUsuariCodi(aplicacioService.getUsuariActual().getCodi());
 		if (bindingResult.hasErrors()) {
-			if (procedimentActual.getPagadorcie() != null) {
-				model.addAttribute("formatsFulla", pagadorCieFormatFullaService.findFormatFullaByPagadorCie(procedimentActual.getPagadorcie().getId()));
-				model.addAttribute("formatsSobre", pagadorCieFormatSobreService.findFormatSobreByPagadorCie(procedimentActual.getPagadorcie().getId()));
-			}
-			
-			List<TipusDocumentDto>  tipusDocuments =  entitatService.findTipusDocumentByEntitat(entitatActual.getId());
-			TipusDocumentEnumDto tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
-
-			if (tipusDocuments != null) {
-				for (TipusDocumentDto tipusDocument: tipusDocuments) {
-					tipusDocumentEnumDto.add(tipusDocument.getTipusDocEnum().name());
-				}
-				if (tipusDocumentDefault != null) {
-					notificacioCommand.setTipusDocumentDefault(tipusDocumentDefault.name());
-				}
-			}
-			
-			model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
-			
-			model.addAttribute("comunicacioTipus", 
-					EnumHelper.getOptionsForEnum(
-							NotificacioComunicacioTipusEnumDto.class,
-							"es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto."));
-			model.addAttribute("enviamentTipus", 
-					EnumHelper.getOptionsForEnum(
-							NotificaEnviamentTipusEnumDto.class,
-							"notificacio.tipus.enviament.enum."));
-			model.addAttribute("serveiTipus", 
-					EnumHelper.getOptionsForEnum(
-							ServeiTipusEnumDto.class,
-							"es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto."));
-			model.addAttribute("interessatTipus", 
-					EnumHelper.getOptionsForEnum(
-							InteressatTipusEnumDto.class,
-							"es.caib.notib.core.api.dto.interessatTipusEnumDto."));
-			model.addAttribute("entregaPostalTipus", 
-					EnumHelper.getOptionsForEnum(
-							NotificaDomiciliConcretTipusEnumDto.class,
-							"es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto."));
-			model.addAttribute("registreDocumentacioFisica", 
-					EnumHelper.getOptionsForEnum(
-							RegistreDocumentacioFisicaEnumDto.class,
-							"es.caib.notib.core.api.dto.registreDocumentacioFisicaEnumDto."));
-			model.addAttribute("idioma", 
-					EnumHelper.getOptionsForEnum(
-							IdiomaEnumDto.class,
-							"es.caib.notib.core.api.dto.idiomaEnumDto."));
-			model.addAttribute("enviosGuardats", notificacioCommand.getEnviaments());
-			model.addAttribute("tipusDocument", notificacioCommand.getTipusDocument());
-            model.addAttribute("errors", bindingResult.getAllErrors());
-            if (notificacioCommand.getEnviaments().get(0).getDestinataris() != null)
-            	model.addAttribute("isVisible", notificacioCommand.getEnviaments().get(0).getDestinataris().get(0).isVisible());
+			ompliModelFormulari(
+					procedimentActual, 
+					entitatActual,
+					notificacioCommand,
+					bindingResult,
+					tipusDocumentEnumDto,
+					model);
 			return "notificacioForm";
 		}
 		if (RolHelper.isUsuariActualAdministrador(request)) {
@@ -330,31 +285,44 @@ public class NotificacioController extends BaseUserController {
 			}
 		}
 		
-		if (notificacioCommand.getId() != null) {
+		try {
+			if (notificacioCommand.getId() != null) {
 			notificacioService.update(
 					notificacioCommand.getProcedimentId(),
 					NotificacioCommandV2.asDto(notificacioCommand));
-		} else {
-			notificacioService.create(
-					procedimentActual.getEntitat().getId(), 
-					NotificacioCommandV2.asDto(notificacioCommand));
-			
-			model.addAttribute("notificacioEstats", 
-					EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
-							"es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
-			model.addAttribute("tipusUsuari", 
-					EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
-							"es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
-			model.addAttribute("notificacioEnviamentEstats",
-					EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
-							"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
-			model.addAttribute("notificacioComunicacioTipus",
-					EnumHelper.getOptionsForEnum(NotificacioComunicacioTipusEnumDto.class,
-							"es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto."));
-			model.addAttribute("notificacioEnviamentTipus", 
-					EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class, 
-							"es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
+			} else {
+				notificacioService.create(
+						procedimentActual.getEntitat().getId(), 
+						NotificacioCommandV2.asDto(notificacioCommand));
+				
+				model.addAttribute("notificacioEstats", 
+						EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
+								"es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
+				model.addAttribute("tipusUsuari", 
+						EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
+								"es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
+				model.addAttribute("notificacioEnviamentEstats",
+						EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
+								"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
+				model.addAttribute("notificacioComunicacioTipus",
+						EnumHelper.getOptionsForEnum(NotificacioComunicacioTipusEnumDto.class,
+								"es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto."));
+				model.addAttribute("notificacioEnviamentTipus", 
+						EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class, 
+								"es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
+			}
+		} catch (Exception ex) {
+			MissatgesHelper.error(request, ex.getMessage());
+			ompliModelFormulari(
+					procedimentActual, 
+					entitatActual,
+					notificacioCommand,
+					bindingResult,
+					tipusDocumentEnumDto,
+					model);
+			return "notificacioForm";
 		}
+		
 		return "redirect:../notificacio";
 	}
 
@@ -809,6 +777,66 @@ public class NotificacioController extends BaseUserController {
 		return notificacioService.llistarLocalitats(provinciaId);
 	}
 
+	private void ompliModelFormulari(
+			ProcedimentDto procedimentActual,
+			EntitatDto entitatActual,
+			NotificacioCommandV2 notificacioCommand,
+			BindingResult bindingResult,
+			List<String> tipusDocumentEnumDto,
+			Model model) {
+		if (procedimentActual.getPagadorcie() != null) {
+			model.addAttribute("formatsFulla", pagadorCieFormatFullaService.findFormatFullaByPagadorCie(procedimentActual.getPagadorcie().getId()));
+			model.addAttribute("formatsSobre", pagadorCieFormatSobreService.findFormatSobreByPagadorCie(procedimentActual.getPagadorcie().getId()));
+		}
+		
+		List<TipusDocumentDto>  tipusDocuments =  entitatService.findTipusDocumentByEntitat(entitatActual.getId());
+		TipusDocumentEnumDto tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
+
+		if (tipusDocuments != null) {
+			for (TipusDocumentDto tipusDocument: tipusDocuments) {
+				tipusDocumentEnumDto.add(tipusDocument.getTipusDocEnum().name());
+			}
+			if (tipusDocumentDefault != null) {
+				notificacioCommand.setTipusDocumentDefault(tipusDocumentDefault.name());
+			}
+		}
+		
+		model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
+		
+		model.addAttribute("comunicacioTipus", 
+				EnumHelper.getOptionsForEnum(
+						NotificacioComunicacioTipusEnumDto.class,
+						"es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto."));
+		model.addAttribute("enviamentTipus", 
+				EnumHelper.getOptionsForEnum(
+						NotificaEnviamentTipusEnumDto.class,
+						"notificacio.tipus.enviament.enum."));
+		model.addAttribute("serveiTipus", 
+				EnumHelper.getOptionsForEnum(
+						ServeiTipusEnumDto.class,
+						"es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto."));
+		model.addAttribute("interessatTipus", 
+				EnumHelper.getOptionsForEnum(
+						InteressatTipusEnumDto.class,
+						"es.caib.notib.core.api.dto.interessatTipusEnumDto."));
+		model.addAttribute("entregaPostalTipus", 
+				EnumHelper.getOptionsForEnum(
+						NotificaDomiciliConcretTipusEnumDto.class,
+						"es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto."));
+		model.addAttribute("registreDocumentacioFisica", 
+				EnumHelper.getOptionsForEnum(
+						RegistreDocumentacioFisicaEnumDto.class,
+						"es.caib.notib.core.api.dto.registreDocumentacioFisicaEnumDto."));
+		model.addAttribute("idioma", 
+				EnumHelper.getOptionsForEnum(
+						IdiomaEnumDto.class,
+						"es.caib.notib.core.api.dto.idiomaEnumDto."));
+		model.addAttribute("enviosGuardats", notificacioCommand.getEnviaments());
+		model.addAttribute("tipusDocument", notificacioCommand.getTipusDocument());
+        model.addAttribute("errors", bindingResult.getAllErrors());
+        if (notificacioCommand.getEnviaments().get(0).getDestinataris() != null)
+        	model.addAttribute("isVisible", notificacioCommand.getEnviaments().get(0).getDestinataris().get(0).isVisible());
+	}
 	private boolean isAdministrador(HttpServletRequest request) {
 		return RolHelper.isUsuariActualAdministrador(request);
 	}
