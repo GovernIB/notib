@@ -283,7 +283,9 @@ public class RegistreNotificaHelper {
 			notificacioEntity.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
 			notificacioEntity.updateEventAfegir(event);
 			notificacioEventRepository.saveAndFlush(event);
-			notificaHelper.notificacioEnviar(notificacioEntity.getId());
+			if (enviarNotificacio) {
+				notificaHelper.notificacioEnviar(notificacioEntity.getId());
+			}
 			for(NotificacioEnviamentEntity enviamentEntity: notificacioEntity.getEnviaments()) {
 				enviamentEntity.setRegistreNumeroFormatat(registreIdDto.getNumeroRegistreFormat());
 				enviamentEntity.setRegistreData(registreIdDto.getData());
