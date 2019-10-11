@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.jws.WebService;
@@ -58,6 +59,7 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.helper.CaducitatHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PermisosHelper;
@@ -195,24 +197,34 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						notificacio.getDocument().getUuid(),
 						notificacio.getDocument().getCsv()).build());
 			}		
-				NotificacioEntity.BuilderV2 notificacioBuilder = NotificacioEntity.
-					getBuilderV2(
-						entitat,
-						emisorDir3Codi,
-						pluginHelper.getNotibTipusComunicacioDefecte(),
-						enviamentTipus, 
-						notificacio.getConcepte(),
-						notificacio.getDescripcio(),
-						notificacio.getEnviamentDataProgramada(),
-						notificacio.getRetard(),
+			//Comprovar si no hi ha una caducitat posar una per defecte (dia acutal + dies caducitat procediment)
+			if (notificacio.getCaducitat() != null) {
+				notificacio.setCaducitat(CaducitatHelper.sumarDiesLaborals(
 						notificacio.getCaducitat(),
-						notificacio.getUsuariCodi(),
-						notificacio.getProcedimentCodi(),
-						procediment,
-						notificacio.getGrupCodi(),
-						notificacio.getNumExpedient(),
-						TipusUsuariEnumDto.APLICACIO 
-						).document(documentEntity);
+						procediment.getCaducitat()));
+			} else {
+				notificacio.setCaducitat(CaducitatHelper.sumarDiesLaborals(
+						new Date(),
+						procediment.getCaducitat()));
+			}
+			NotificacioEntity.BuilderV2 notificacioBuilder = NotificacioEntity.
+				getBuilderV2(
+					entitat,
+					emisorDir3Codi,
+					pluginHelper.getNotibTipusComunicacioDefecte(),
+					enviamentTipus, 
+					notificacio.getConcepte(),
+					notificacio.getDescripcio(),
+					notificacio.getEnviamentDataProgramada(),
+					notificacio.getRetard(),
+					notificacio.getCaducitat(),
+					notificacio.getUsuariCodi(),
+					notificacio.getProcedimentCodi(),
+					procediment,
+					notificacio.getGrupCodi(),
+					notificacio.getNumExpedient(),
+					TipusUsuariEnumDto.APLICACIO 
+				).document(documentEntity);
 				
 				NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioBuilder.build());
 				List<EnviamentReferencia> referencies = new ArrayList<EnviamentReferencia>();
