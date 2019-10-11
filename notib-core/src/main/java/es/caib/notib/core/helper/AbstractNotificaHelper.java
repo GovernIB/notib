@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 
@@ -114,8 +115,15 @@ public abstract class AbstractNotificaHelper {
 		if (estatsEnviamentsFinals) {
 			enviament.getNotificacio().updateEstat(NotificacioEstatEnumDto.FINALITZADA);
 			enviament.getNotificacio().updateMotiu(notificaEstat.name());
-			//enviament.getNotificacio().updateEstatDate(new Date());
+
+			//Marcar com a processada si la notificació s'ha fet des de una aplicació
+			if (enviament.getNotificacio() != null && enviament.getNotificacio().getTipusUsuari() == TipusUsuariEnumDto.APLICACIO) {
+				enviament.getNotificacio().updateEstat(NotificacioEstatEnumDto.PROCESSADA);
+				enviament.getNotificacio().updateMotiu(notificaEstat.name());
+				enviament.getNotificacio().updateEstatDate(new Date());
+			}
 		}
+		
 	}
 
 

@@ -442,15 +442,18 @@ public class NotificacioController extends BaseUserController {
 			Long notificacioId,
 			@Valid MarcarProcessatCommand command) throws MessagingException {
 		try {
-			notificacioService.marcarComProcessada(
+			String resposta = notificacioService.marcarComProcessada(
 					notificacioId,
 					command.getMotiu());
+
+			if (resposta != null) {
+				MissatgesHelper.warning(request, resposta);
+			}
 			return getModalControllerReturnValueSuccess(
 					request, 
 					"redirect:../../notificacio",
 					"notificacio.controller.refrescar.estat.ok");
 		} catch (Exception exception) {
-			MissatgesHelper.error(request, exception.getMessage());
 			return "notificacioMarcarProcessat";
 		}
 

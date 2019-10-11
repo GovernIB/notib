@@ -265,7 +265,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 							
 							notificacio.updateEventAfegir(eventDatat);
 							enviament.updateNotificaError(false, null);
-							if (notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
+							if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
 								emailHelper.prepararEnvioEmailNotificacio(notificacio);
 							}
 						}

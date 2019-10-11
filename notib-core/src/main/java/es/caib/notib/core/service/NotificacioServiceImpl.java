@@ -878,19 +878,22 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Transactional
 	@Override
-	public void marcarComProcessada(
+	public String marcarComProcessada(
 			Long notificacioId,
 			String motiu) throws MessagingException {
 		logger.debug("Refrescant l'estat de la notificació a PROCESSAT (" +
 				"notificacioId=" + notificacioId + ")");		
+		String resposta;
 		NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(
 				null,
 				notificacioId);
 		notificacioEntity.updateEstat(NotificacioEstatEnumDto.PROCESSADA);
 		notificacioEntity.updateEstatDate(new Date());
 		notificacioEntity.updateMotiu(motiu);
-		emailHelper.prepararEnvioEmailNotificacio(notificacioEntity);
+		resposta = emailHelper.prepararEnvioEmailNotificacio(notificacioEntity);
 		notificacioRepository.saveAndFlush(notificacioEntity);
+		
+		return resposta;
 	}
 	
 //	// 1. Enviament de notificacions pendents al registre y notific@

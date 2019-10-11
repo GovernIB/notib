@@ -278,6 +278,7 @@ $(document).ready(function() {
 						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>errorNotificaDescripcio}}"></span>{{/if}}
 					</script>
 				</th>
+				<th data-col-name=createdBy.codi data-converter="String" width="15%"><spring:message code="notificacio.list.columna.enviament.creada"/></th>
 				<th data-col-name="permisProcessar" data-visible="false">
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="5%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">

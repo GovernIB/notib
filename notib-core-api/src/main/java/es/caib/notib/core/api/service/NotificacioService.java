@@ -306,7 +306,7 @@ public interface NotificacioService {
 	 * @throws MessagingException 
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
-	public void marcarComProcessada(
+	public String marcarComProcessada(
 			Long notificacioId,
 			String motiu) throws MessagingException;
 	

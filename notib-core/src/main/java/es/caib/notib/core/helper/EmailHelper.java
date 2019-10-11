@@ -45,17 +45,24 @@ public class EmailHelper {
 	@Resource
 	private MessageHelper messageHelper;
 	
-	public void prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws MessagingException {
+	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws MessagingException {
 		logger.info("Desant emails del procediment (" + notificacio.getProcediment().getId() + ") per a l'enviament");
 		List<UsuariDto> destinataris = obtenirCodiDestinatarisPerProcediment(notificacio.getProcediment());
-		
+		String resposta = null;
 		if (destinataris != null && !destinataris.isEmpty()) {
 			for (UsuariDto usuariDto : destinataris) {
-				sendEmailBustiaPendentContingut(
-						usuariDto.getEmail(),
-						notificacio);
+				try {
+					sendEmailBustiaPendentContingut(
+							usuariDto.getEmail(),
+							notificacio);
+				} catch (Exception ex) {
+					String errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
+					logger.error(errorDescripció);
+					resposta = errorDescripció;
+				}
 			}
 		}	
+		return resposta;
 	}
 	
 	public void sendEmailBustiaPendentContingut(
