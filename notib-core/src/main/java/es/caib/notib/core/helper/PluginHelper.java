@@ -222,12 +222,6 @@ public class PluginHelper {
 	public Document arxiuDocumentConsultar(
 			String arxiuUuid,
 			String versio) {
-//		if(custom && isUuid) {
-//			arxiuUuid = "uuid:" + arxiuUuid;
-//		} else if (custom && !isUuid) {
-//			arxiuUuid = "csv:" + arxiuUuid;
-//		}
-		
 		String accioDescripcio = "Consulta d'un document";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("arxiuUuid", arxiuUuid);
@@ -575,7 +569,6 @@ public class PluginHelper {
 			if(documentDto.getUuid() != null) {
 				id = documentDto.getUuid();
 				document.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA.getValor());
-				doc = arxiuGetImprimible(id, true);	
 				Document docDetall = arxiuDocumentConsultar(id, null);
 				if (docDetall.getMetadades() != null) {
 					document.setData(docDetall.getMetadades().getDataCaptura());
@@ -842,12 +835,34 @@ public class PluginHelper {
 	public DocumentContingut arxiuGetImprimible(
 			String id,
 			boolean uuidCsv) {
-		if(uuidCsv) {
-			id = "uuid:" + id;
-		} else {
-			id = "csv:" + id;
+		String accioDescripcio = "Consulta d'un document";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		DocumentContingut documentContingut = null;
+		long t0 = System.currentTimeMillis();
+		try {
+			if(uuidCsv) {
+				id = "uuid:" + id;
+			} else {
+				id = "csv:" + id;
+			}
+			accioParams.put("arxiuUuidCsv", id);
+			documentContingut = getArxiuPlugin().documentImprimible(id);
+		} catch (Exception ex) {
+			String errorDescripcio = "No s'ha pogut recuperar el document amb el uuid/csv proporcionat";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_CUSTODIA,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_REGISTRE,
+					errorDescripcio,
+					ex);
 		}
-		return getArxiuPlugin().documentImprimible(id);	
+		return documentContingut;	
 	}
 	
 	private RegistreSortida toRegistreSortida(
