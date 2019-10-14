@@ -11,8 +11,14 @@
 %>
 <c:set var="ampladaConcepte">
 	<c:choose>
-		<c:when test="${isRolActualAdministrador}">35%</c:when>
-		<c:otherwise>55%</c:otherwise>
+		<c:when test="${isRolActualAdministrador}">200px</c:when>
+		<c:otherwise>300px</c:otherwise>
+	</c:choose>
+</c:set>
+<c:set var="ampladaEnviament">
+	<c:choose>
+		<c:when test="${isRolActualAdministrador}">160px</c:when>
+		<c:otherwise>130px</c:otherwise>
 	</c:choose>
 </c:set>
 <c:set var="refresh_state_succes"><spring:message code="notificacio.list.enviament.list.refresca.estat.exitos"/></c:set>
@@ -236,11 +242,11 @@ $(document).ready(function() {
 				<th data-col-name="id" data-visible="false">#</th>
 				<th data-col-name="notificacio.notificaError" data-visible="false"></th>
 				<th data-col-name="notificacio.notificaErrorDescripcio" data-visible="false"></th>
-				<th data-col-name=createdDate data-converter="datetime" width="15%"><spring:message code="notificacio.list.columna.enviament.data"/></th>
+				<th data-col-name=createdDate data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>
 				<c:if test="${isRolActualAdministrador}">
-					<th data-col-name="entitat.nom" width="20%"><spring:message code="notificacio.list.columna.entitat"/></th>
+					<th data-col-name="entitat.nom" width="170px"><spring:message code="notificacio.list.columna.entitat"/></th>
 				</c:if>
-				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate">
+				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" width="60px">
 					<spring:message code="notificacio.list.columna.tipus.enviament"/>
 					<script id="cellEnviamentTipusTemplate" type="text/x-jsrender">
 						{{:~eval('enviamentTipus["' + enviamentTipus + '"]')}}
@@ -252,10 +258,10 @@ $(document).ready(function() {
 						{{:~eval('comunicacioTipus["' + comunicacioTipus + '"]')}}
 					</script>
 				</th--%>
-				<th data-col-name="procediment.nom"><spring:message code="notificacio.list.columna.procediment"/></th>
-				<th data-col-name="concepte" width="${ampladaConcepte}"><spring:message code="notificacio.list.columna.concepte"/></th>
+				<th data-col-name="procediment.nom"  width="200px"><spring:message code="notificacio.list.columna.procediment"/></th>
+				<th data-col-name="concepte" width="${ampladaConcepte}" ><spring:message code="notificacio.list.columna.concepte"/></th>
 				<th data-col-name="estatDate" data-converter="datetime" data-visible="false"></th>
-				<th data-col-name="estat" data-template="#cellEstatTemplate" width="30%">
+				<th data-col-name="estat" data-template="#cellEstatTemplate"  width="120px">
 					<spring:message code="notificacio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						{{if estat == 'PENDENT'}}
@@ -278,9 +284,9 @@ $(document).ready(function() {
 						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>errorNotificaDescripcio}}"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name=createdBy.codi data-converter="String" width="15%"><spring:message code="notificacio.list.columna.enviament.creada"/></th>
+				<th data-col-name=createdBy.codi data-converter="String" width="80px"><spring:message code="notificacio.list.columna.enviament.creada"/></th>
 				<th data-col-name="permisProcessar" data-visible="false">
-				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="5%">
+				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="60px">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
