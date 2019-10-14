@@ -31,26 +31,29 @@ public class ValidCsvDocumentValidator implements ConstraintValidator<ValidCsvDo
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isValid(final Object value, final ConstraintValidatorContext context) {
+		boolean valid = true;
 		try {
 			
 			String FieldType = BeanUtils.getProperty(value, fieldName);
-			String dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
-			boolean valid = true;
+			String dependFieldValue = BeanUtils.getProperty(value, dependFieldName);			
 			
 			if (FieldType == TipusDocumentEnumDto.CSV.name() && (dependFieldValue == null || dependFieldValue.isEmpty())){
 				context
 				.buildConstraintViolationWithTemplate(
-						MessageHelper.getInstance().getMessage("notificacio.form.valid.document"))
+						MessageHelper.getInstance().getMessage("NotEmpty"))
 				.addNode("documentArxiuCsv")
 				.addConstraintViolation();
 				valid = false;
 			} 
-
-			return valid;
 		} catch (final Exception ex) {
         	LOGGER.error("Ha d'informar el email quan hi ha entrega DEH", ex);
         	return false;
         }
+		
+		if (!valid)
+			context.disableDefaultConstraintViolation();
+		
+		return valid;
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ValidDocumentValidator.class);

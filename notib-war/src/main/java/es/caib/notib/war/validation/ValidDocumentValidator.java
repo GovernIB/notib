@@ -31,47 +31,51 @@ public class ValidDocumentValidator implements ConstraintValidator<ValidDocument
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isValid(final Object value, final ConstraintValidatorContext context) {
+		boolean valid = true;
+		
 		try {
 			
 			String FieldType = BeanUtils.getProperty(value, fieldName);
 			String dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
-			boolean valid = true;
 			
 			if (FieldType == TipusDocumentEnumDto.URL.name() && (dependFieldValue == null || dependFieldValue.isEmpty())) {
 				context
 				.buildConstraintViolationWithTemplate(
-						MessageHelper.getInstance().getMessage("notificacio.form.valid.document"))
+						MessageHelper.getInstance().getMessage("NotEmpty"))
 				.addNode("documentArxiuUrl")
 				.addConstraintViolation();
 				valid = false;
 			} else if (FieldType == TipusDocumentEnumDto.UUID.name() && (dependFieldValue == null || dependFieldValue.isEmpty())) {
 				context
 				.buildConstraintViolationWithTemplate(
-						MessageHelper.getInstance().getMessage("notificacio.form.valid.document"))
+						MessageHelper.getInstance().getMessage("NotEmpty"))
 				.addNode("documentArxiuUuid")
 				.addConstraintViolation();
 				valid = false;
 			} else if (FieldType == TipusDocumentEnumDto.ARXIU.name() && (dependFieldValue == null || dependFieldValue.isEmpty())){
 				context
 				.buildConstraintViolationWithTemplate(
-						MessageHelper.getInstance().getMessage("notificacio.form.valid.document"))
+						MessageHelper.getInstance().getMessage("NotEmpty"))
 				.addNode("arxiu")
 				.addConstraintViolation();
 				valid = false;
 			} else if (FieldType == TipusDocumentEnumDto.CSV.name() && (dependFieldValue == null || dependFieldValue.isEmpty())){
 				context
 				.buildConstraintViolationWithTemplate(
-						MessageHelper.getInstance().getMessage("notificacio.form.valid.document"))
+						MessageHelper.getInstance().getMessage("NotEmpty"))
 				.addNode("documentArxiuCsv")
 				.addConstraintViolation();
 				valid = false;
 			} 
-
-			return valid;
 		} catch (final Exception ex) {
         	LOGGER.error("Ha d'informar el email quan hi ha entrega DEH", ex);
-        	return false;
+        	valid = false;
         }
+		
+		if (!valid)
+			context.disableDefaultConstraintViolation();
+		
+		return valid;
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ValidDocumentValidator.class);

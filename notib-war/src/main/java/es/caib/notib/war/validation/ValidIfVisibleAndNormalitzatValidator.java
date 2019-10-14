@@ -11,6 +11,7 @@ import javax.validation.ConstraintValidatorContext;
 import org.apache.commons.beanutils.BeanUtils;
 
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.war.helper.MessageHelper;
 
 /**
  * Constraint de validació que controla que no es repeteixi
@@ -45,9 +46,7 @@ public class ValidIfVisibleAndNormalitzatValidator implements ConstraintValidato
 			final Object value, 
 			final ConstraintValidatorContext context) {
 		
-		if (value == null) {
-            return true;
-        }
+		boolean valid = true;
 		try {
             boolean dependFieldValueEmpty = true;
             boolean validarDependFieldNameSecondValue = true;
@@ -80,17 +79,20 @@ public class ValidIfVisibleAndNormalitzatValidator implements ConstraintValidato
             		fieldValue.equalsIgnoreCase(expectedFieldValue.name()) && 
             		dependFieldValueEmpty &&
             		validarDependFieldNameSecondValue) {
-            	context.disableDefaultConstraintViolation();
-            	context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate())
+            	context.buildConstraintViolationWithTemplate(
+            			MessageHelper.getInstance().getMessage("NotEmpty"))
                     .addNode(dependFieldName)
                     .addConstraintViolation();
-                    return false;
+                    valid = false;
             }
 			
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
             throw new RuntimeException(ex);
         }
-        return true;
+		if (!valid)
+			context.disableDefaultConstraintViolation();
+		
+        return valid;
 	}
 
 }

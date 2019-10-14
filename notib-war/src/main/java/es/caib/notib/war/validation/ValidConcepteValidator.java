@@ -27,16 +27,20 @@ public class ValidConcepteValidator implements ConstraintValidator<ValidConcepte
 	public boolean isValid(
 			final Object value,
 			final ConstraintValidatorContext context) {
-		
+		boolean valid = true;
 		try {
 			String fieldValue = BeanUtils.getProperty(value,  fieldName);
 			if (fieldValue == null || fieldValue.isEmpty())
-				return true;
-			return validacioConcepte(fieldValue,context);
+				valid = true;
+			valid = validacioConcepte(fieldValue,context);
 		} catch (final Exception ex) {
 			LOGGER.error("Error en la validació del concepte", ex);
-			return false;
+			valid = false;
 		}
+		if (!valid)
+			context.disableDefaultConstraintViolation();
+		
+		return valid;
 	}
 	// Validació del concepte
 	private static final String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-\\u2013_'\"/:().,¿?!¡;";

@@ -31,26 +31,30 @@ public class ValidUuidDocumentValidator implements ConstraintValidator<ValidUuid
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isValid(final Object value, final ConstraintValidatorContext context) {
+		boolean valid = true;
 		try {
 			
 			String FieldType = BeanUtils.getProperty(value, fieldName);
 			String dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
-			boolean valid = true;
 			
 			if (FieldType == TipusDocumentEnumDto.UUID.name() && (dependFieldValue == null || dependFieldValue.isEmpty())) {
 				context
 				.buildConstraintViolationWithTemplate(
-						MessageHelper.getInstance().getMessage("notificacio.form.valid.document"))
+						MessageHelper.getInstance().getMessage("NotEmpty"))
 				.addNode("documentArxiuUuid")
 				.addConstraintViolation();
 				valid = false;
 			}
 
-			return valid;
 		} catch (final Exception ex) {
         	LOGGER.error("Ha d'informar el email quan hi ha entrega DEH", ex);
-        	return false;
+        	valid = false;
         }
+		
+		if (!valid)
+			context.disableDefaultConstraintViolation();
+		
+		return valid;
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ValidDocumentValidator.class);

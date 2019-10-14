@@ -10,6 +10,8 @@ import javax.validation.ConstraintValidatorContext;
 
 import org.apache.commons.beanutils.BeanUtils;
 
+import es.caib.notib.war.helper.MessageHelper;
+
 /**
  * Constraint de validació que controla que no es repeteixi
  * el codi d'entitat.
@@ -34,26 +36,28 @@ public class ValidIfVisibleValidator implements ConstraintValidator<ValidIfVisib
 	public boolean isValid(
 			final Object value, 
 			final ConstraintValidatorContext context) {
+		boolean valid = true;
 		
-		if (value == null) {
-            return true;
-        }
 		try {
 			String fieldValue       = BeanUtils.getProperty(value, fieldName);
             String dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
 			
             if (expectedFieldValue.equals(fieldValue) && dependFieldValue.isEmpty()) {
-            	context.disableDefaultConstraintViolation();
-            	context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate())
+            	context.buildConstraintViolationWithTemplate(
+            			MessageHelper.getInstance().getMessage("NotEmpty"))
                     .addNode(dependFieldName)
                     .addConstraintViolation();
-                    return false;
+                    valid = false;
             }
 			
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
             throw new RuntimeException(ex);
         }
-        return true;
+		
+		if (!valid)
+			context.disableDefaultConstraintViolation();
+		
+        return valid;
 	}
 
 }
