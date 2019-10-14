@@ -6,11 +6,10 @@ import javax.validation.constraints.Size;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.war.validation.ValidIfVisibleAndNormalitzat;
-import es.caib.notib.war.validation.ValidIfVisibleAndNotEqual;
 
 /**
  * Command per al manteniment de entregues postals
- * 
+ * 	
  * @author Limit Tecnologies <limit@limit.es>
  *
  */

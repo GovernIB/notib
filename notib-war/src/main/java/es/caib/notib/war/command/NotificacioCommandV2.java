@@ -32,6 +32,7 @@ import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.ValidArxiuDocument;
 import es.caib.notib.war.validation.ValidConcepte;
 import es.caib.notib.war.validation.ValidCsvDocument;
+import es.caib.notib.war.validation.ValidNotificacio;
 import es.caib.notib.war.validation.ValidUrlDocument;
 import es.caib.notib.war.validation.ValidUuidDocument;
 
@@ -61,7 +62,8 @@ import es.caib.notib.war.validation.ValidUuidDocument;
 )
 @ValidConcepte (
 		fieldName = "concepte"
-	)
+)
+@ValidNotificacio
 public class NotificacioCommandV2 {
 
 	private Long id;

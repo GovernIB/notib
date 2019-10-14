@@ -35,6 +35,7 @@ import es.caib.notib.core.api.dto.DatosInteresadoWsDto;
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.InteresadoWsDto;
+import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
@@ -949,7 +950,6 @@ public class PluginHelper {
 		dadesAnotacio.setDocfisica(1L);
 		dadesAnotacio.setNumExpedient(notificacio.getNumExpedient());
 		dadesAnotacio.setObservacions("Notib: " + notificacio.getUsuariCodi());
-//		dadesAnotacio.setRefExterna(notificacio.getRefExterna());
 		dadesAnotacio.setCodiUsuari(notificacio.getUsuariCodi());
 		registreSortida.setDadesAnotacio(dadesAnotacio);
 		if (notificacio.getDocument() != null) {
@@ -1119,8 +1119,13 @@ public class PluginHelper {
 		interessat.setLlinatge2(persona.getLlinatge2());
 		interessat.setRaoSocial(persona.getRaoSocial());
 		interessat.setTelefon(persona.getTelefon());
-		interessat.setDocumentNumero(persona.getNif());
-		interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.NIF);
+		if (persona.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
+			interessat.setDocumentNumero(persona.getDir3Codi());
+			interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
+		} else {
+			interessat.setDocumentNumero(persona.getNif());
+			interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.NIF);
+		}
 		return interessat;
 	}
 	
@@ -1128,8 +1133,13 @@ public class PluginHelper {
 		InteresadoWsDto interessat = new InteresadoWsDto();
 		DatosInteresadoWsDto interessatDades = new DatosInteresadoWsDto();
 		interessatDades.setTipoInteresado(persona.getInteressatTipus().getLongVal());
-		interessatDades.setTipoDocumentoIdentificacion("N");
-		interessatDades.setDocumento(persona.getNif());
+		if (persona.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
+			interessatDades.setDocumento(persona.getCodiEntitatDesti());
+			interessatDades.setTipoDocumentoIdentificacion("O");
+		} else {
+			interessatDades.setDocumento(persona.getNif());
+			interessatDades.setTipoDocumentoIdentificacion("N");
+		}
 		interessatDades.setRazonSocial(persona.getNom());
 		interessatDades.setNombre(persona.getNom());
 		interessatDades.setApellido1(persona.getLlinatge1());
@@ -1152,14 +1162,18 @@ public class PluginHelper {
 		if (titular != null && notificacio != null) {
 			dadesInteressat.setEntitatCodi(notificacio.getEmisorDir3Codi());
 			dadesInteressat.setAutenticat(false);
-			dadesInteressat.setNif(titular.getNif());
+			if (titular.getInteressatTipus() != null) {
+				dadesInteressat.setTipusInteressat(titular.getInteressatTipus().getLongVal());
+			}
+			if (titular.getInteressatTipus() != null && titular.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
+				dadesInteressat.setNif(titular.getDir3Codi());
+			} else {
+				dadesInteressat.setNif(titular.getNif());
+			}
 			dadesInteressat.setNom(titular.getNom());
 			dadesInteressat.setCognom1(titular.getLlinatge1());
 			dadesInteressat.setCognom2(titular.getLlinatge2());
 			dadesInteressat.setNomAmbCognoms(titular.getNom() + " " + titular.getLlinatges());
-			if (titular.getInteressatTipus() != null) {
-				dadesInteressat.setTipusInteressat(titular.getInteressatTipus().getLongVal());
-			}
 			dadesInteressat.setPaisCodi(null);
 			dadesInteressat.setPaisNom(null);
 			dadesInteressat.setProvinciaCodi(null);
@@ -1179,12 +1193,18 @@ public class PluginHelper {
 			dadesRepresentat = new DadesRepresentat();
 			dadesRepresentat.setEntitatCodi(notificacio.getEmisorDir3Codi());
 			dadesRepresentat.setAutenticat(false);
-			dadesRepresentat.setNif(destinatari.getNif());
+			if (destinatari.getInteressatTipus() != null) {
+				dadesRepresentat.setTipusInteressat(destinatari.getInteressatTipus().getLongVal());
+			}
+			if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
+				dadesRepresentat.setNif(destinatari.getDir3Codi());
+			} else {
+				dadesRepresentat.setNif(destinatari.getNif());
+			}
 			dadesRepresentat.setNom(destinatari.getNom());
 			dadesRepresentat.setCognom1(destinatari.getLlinatge1());
 			dadesRepresentat.setCognom2(destinatari.getLlinatge2());
 			dadesRepresentat.setNomAmbCognoms(destinatari.getNom() + " " + destinatari.getLlinatges());
-			dadesRepresentat.setTipusInteressat(destinatari.getInteressatTipus().getLongVal());
 			dadesRepresentat.setPaisCodi(null);
 			dadesRepresentat.setPaisNom(null);
 			dadesRepresentat.setProvinciaCodi(null);
@@ -1203,8 +1223,13 @@ public class PluginHelper {
 			DatosInteresadoWsDto interessatDades = new DatosInteresadoWsDto();
 			if (titular.getInteressatTipus() != null)
 				interessatDades.setTipoInteresado(titular.getInteressatTipus().getLongVal());
-			interessatDades.setTipoDocumentoIdentificacion("N");
-			interessatDades.setDocumento(titular.getNif());
+			if (titular.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
+				interessatDades.setDocumento(titular.getCodiEntitatDesti());
+				interessatDades.setTipoDocumentoIdentificacion("O");
+			} else {
+				interessatDades.setDocumento(titular.getNif());
+				interessatDades.setTipoDocumentoIdentificacion("N");
+			}
 			interessatDades.setRazonSocial(titular.getNom());
 			interessatDades.setNombre(titular.getNom());
 			interessatDades.setApellido1(titular.getLlinatge1());
@@ -1221,8 +1246,13 @@ public class PluginHelper {
 		if(destinatari != null && titular.isIncapacitat()) {
 			DatosInteresadoWsDto representantDades = new DatosInteresadoWsDto();
 			representantDades.setTipoInteresado(destinatari.getInteressatTipus().getLongVal());
-			representantDades.setTipoDocumentoIdentificacion("N");
-			representantDades.setDocumento(destinatari.getNif());
+			if (destinatari.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
+				representantDades.setDocumento(destinatari.getCodiEntitatDesti());
+				representantDades.setTipoDocumentoIdentificacion("O");
+			} else {
+				representantDades.setDocumento(destinatari.getNif());
+				representantDades.setTipoDocumentoIdentificacion("N");
+			}
 			representantDades.setRazonSocial(destinatari.getNom());
 			representantDades.setNombre(destinatari.getNom());
 			representantDades.setApellido1(destinatari.getLlinatge1());

@@ -43,6 +43,7 @@ import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.EnviamentEstatEnum;
 import es.caib.notib.core.api.ws.notificacio.EnviamentReferencia;
+import es.caib.notib.core.api.ws.notificacio.EnviamentTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsException;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
@@ -562,6 +563,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			String emisorDir3Codi,
 			EntitatEntity entitat) {
 		RespostaAlta resposta = new RespostaAlta();
+		boolean comunicacioSenseAdministracio = false;
+		boolean comunicacioAmbAdministracio = false;
 		
 		if (emisorDir3Codi == null) {
 			resposta.setError(true);
@@ -624,6 +627,15 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			return resposta;
 		} 
 		for(Enviament enviament : notificacio.getEnviaments()) {
+			//Si és comunicació a administració i altres mitjans (persona física/jurídica) --> Excepció
+			if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.COMUNICACIO) {
+				if (enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
+					comunicacioAmbAdministracio = true;
+				}
+				if ((enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.FISICA) || (enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.FISICA))  {
+					comunicacioSenseAdministracio = true;
+				}
+			}
 			if(enviament.getTitular() == null) {
 				resposta.setError(true);
 				resposta.setEstat(NotificacioEstatEnum.PENDENT);
@@ -881,6 +893,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					}
 				}
 			}
+		}
+		if (comunicacioAmbAdministracio && comunicacioSenseAdministracio) {
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("COMUNICACIO] Una comunicació no pot estar dirigida a una administració i a una persona física/jurídica a la vegada.");
+			return resposta;
 		}
 		return resposta;
 	}

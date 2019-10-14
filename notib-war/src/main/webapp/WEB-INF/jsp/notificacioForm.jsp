@@ -345,19 +345,23 @@ $(document).ready(function() {
 		var closest = $(this).closest('.destinatariForm, .personaForm');
 		var llinatge1 = closest.find('.llinatge1');
 		var llinatge2 = closest.find('.llinatge2');
+		var nif = closest.find('.nif');
 		var dir3codi = closest.find('.dir3codi');
 		
 		if ($(this).val() == 'ADMINISTRACIO') {
 			$(llinatge1).addClass('hidden');
 			$(llinatge2).addClass('hidden');
+			$(nif).addClass('hidden');
 			$(dir3codi).removeClass('hidden');
 		} else if ($(this).val() == 'FISICA') {
 			$(llinatge1).removeClass('hidden');
 			$(llinatge2).removeClass('hidden');
+			$(nif).removeClass('hidden');
 			$(dir3codi).addClass('hidden');
 		} else {
 			$(llinatge1).addClass('hidden');
 			$(llinatge2).addClass('hidden');
+			$(nif).removeClass('hidden');
 			$(dir3codi).addClass('hidden');
 		}
 	});
@@ -752,7 +756,7 @@ function mostrarEntregaDeh(className) {
 										<div class="col-md-6">
 											<not:inputSelect name="enviaments[${j}].titular.interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="4" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
 										</div>
-										<div class="col-md-6">
+										<div class="col-md-6 nif">
 											<not:inputText name="enviaments[${j}].titular.nif" generalClass="titularNif" textKey="notificacio.form.camp.titular.nif" required="true" />
 										</div>
 										<div class="col-md-6">
@@ -771,7 +775,7 @@ function mostrarEntregaDeh(className) {
 											<not:inputText name="enviaments[${j}].titular.telefon" textKey="notificacio.form.camp.titular.telefon" />
 										</div>
 										<div class="col-md-6 dir3codi hidden">
-											<not:inputText name="enviaments[${j}].titular.dir3codi" textKey="notificacio.form.camp.titular.dir3codi" />
+											<not:inputText name="enviaments[${j}].titular.dir3codi" textKey="notificacio.form.camp.titular.dir3codi" required="true"/>
 										</div>
 										<c:if test="${isTitularAmbIncapacitat}">
 											<div class="col-md-12">
@@ -814,7 +818,7 @@ function mostrarEntregaDeh(className) {
 												<div class="col-md-3">
 													<not:inputSelect name="enviaments[${j}].destinataris[${i}].interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="12" inputSize="12" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
 												</div>
-												<div class="col-md-3">
+												<div class="col-md-3 nif">
 													<not:inputText name="enviaments[${j}].destinataris[${i}].nif" textKey="notificacio.form.camp.titular.nif" labelSize="12" inputSize="12" required="true" />
 												</div>
 												<div class="col-md-3">
@@ -837,7 +841,7 @@ function mostrarEntregaDeh(className) {
 												</div>
 												<div class="col-md-2 offset-col-md-2">
 													<div class="float-right">
-														<input type="button" class="btn btn-danger btn-group delete" name="destinatarisDelete[${j}][${i}]" onclick="destinatarisDelete(this.id)" id="destinatarisDelete[${j}][${i}]" value="<spring:message code="notificacio.form.boto.eliminar.destinatari"/>" />
+														<input type="button" class="btn btn-danger btn-group delete" name="destinatarisDelete[${j}][${i}]" onclick="destinatarisDelete(this.id)" id="destinatarisDelete[${j}][${i}]" value="<spring:message code="notificacio.form.boto.eliminar.destinatari"/>" required="true"/>
 													</div>
 												</div>
 												<div class="col-md-12">

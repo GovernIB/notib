@@ -7,8 +7,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
+import es.caib.notib.war.validation.ValidDir3CodiIfAdm;
 import es.caib.notib.war.validation.ValidIfVisible;
 import es.caib.notib.war.validation.ValidLlinatgeIfFisic;
+import es.caib.notib.war.validation.ValidNifIfFisic;
 
 /**
  * Command per al manteniment de persones (Titulars | Destinataris).
@@ -20,11 +22,7 @@ import es.caib.notib.war.validation.ValidLlinatgeIfFisic;
 	@ValidIfVisible(
         fieldName = "visible",
         fieldValue = "true",
-        dependFieldName = "nom"),
-	@ValidIfVisible(
-	    fieldName = "visible",
-	    fieldValue = "true",
-	    dependFieldName = "nif")
+        dependFieldName = "nom")
 })
 @ValidLlinatgeIfFisic(
         fieldName = "interessatTipus",
@@ -32,6 +30,20 @@ import es.caib.notib.war.validation.ValidLlinatgeIfFisic;
         fieldValue = "FISICA",
         fieldValue2 = "true",
         dependFieldName = "llinatge1"
+)
+@ValidNifIfFisic(
+        fieldName = "interessatTipus",
+        fieldName2 = "visible",
+        fieldValue = "FISICA",
+        fieldValue2 = "true",
+        dependFieldName = "nif"
+)
+@ValidDir3CodiIfAdm(
+        fieldName = "interessatTipus",
+        fieldName2 = "visible",
+        fieldValue = "ADMINISTRACIO",
+        fieldValue2 = "true",
+        dependFieldName = "dir3codi"
 )
 public class PersonaCommand {
 
