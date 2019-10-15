@@ -20,6 +20,7 @@ public class EntregaPostalDto implements Serializable{
 	private String bloc;
 	private String complement;
 	private String codiPostal;
+	private String codiPostalNorm;
 	private String poblacio;
 	private String municipiCodi;
 	private String provincia;
@@ -142,6 +143,14 @@ public class EntregaPostalDto implements Serializable{
 
 	public void setCodiPostal(String codiPostal) {
 		this.codiPostal = codiPostal;
+	}
+
+	public String getCodiPostalNorm() {
+		return codiPostalNorm;
+	}
+
+	public void setCodiPostalNorm(String codiPostalNorm) {
+		this.codiPostalNorm = codiPostalNorm;
 	}
 
 	public String getPoblacio() {

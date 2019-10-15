@@ -658,6 +658,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						} else if (enviament.getDomiciliConcretTipus().equals(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR)) {
 							entregaPostal.setLinea1(enviament.getDomiciliLinea1());
 							entregaPostal.setLinea2(enviament.getDomiciliLinea2());
+							entregaPostal.setCodigoPostal(enviament.getDomiciliCodiPostal());
 						}
 						Opciones opcionesCie = new Opciones();
 						if (enviament.getDomiciliCie() != null) {

@@ -150,7 +150,7 @@ import es.caib.notib.war.validation.ValidIfVisibleAndNormalitzat;
 			fieldValueVisble =  "true",
 			fieldName = "tipus",
 			fieldValue = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR,
-			dependFieldName = "codiPostal",
+			dependFieldName = "codiPostalNorm",
 			dependFieldNameSecond = "numeroCasa"),
 	@ValidIfVisibleAndNormalitzat(
 			fieldNameVisible =  "visible",
@@ -186,6 +186,9 @@ public class EntregapostalCommand {
 	private String complement;
 	@NotEmpty @Size(max=10)
 	private String codiPostal;
+	@NotEmpty @Size(max=10)
+	private String codiPostalNorm;
+	
 	@Size(max=255)
 	private String poblacio;
 	private String municipiCodi; 
@@ -282,6 +285,12 @@ public class EntregapostalCommand {
 	}
 	public void setCodiPostal(String codiPostal) {
 		this.codiPostal = codiPostal;
+	}
+	public String getCodiPostalNorm() {
+		return codiPostalNorm;
+	}
+	public void setCodiPostalNorm(String codiPostalNorm) {
+		this.codiPostalNorm = codiPostalNorm;
 	}
 	public String getPoblacio() {
 		return poblacio;

@@ -20,7 +20,7 @@
 	<table class="table table-hover">
 		<thead>
 			<tr>
-				<th scope="col"><spring:message code="notificacio.procediment.codi"/><spr</th>
+				<th scope="col"><spring:message code="notificacio.procediment.codi"/></th>
 				<th scope="col"><spring:message code="notificacio.procediment.nom"/></th>
 				<th scope="col"></th>
 			</tr>
