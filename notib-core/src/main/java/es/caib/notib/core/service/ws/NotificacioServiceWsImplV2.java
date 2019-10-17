@@ -344,7 +344,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					enviamentSaved.updateNotificaReferencia(referencia);
 					EnviamentReferencia enviamentReferencia = new EnviamentReferencia();
 					enviamentReferencia.setReferencia(referencia);
-					enviamentReferencia.setTitularNif(titular.getNif().toUpperCase());
+					if (titular.getInteressatTipus() != InteressatTipusEnumDto.ADMINISTRACIO)
+						enviamentReferencia.setTitularNif(titular.getNif().toUpperCase());
+					else
+						enviamentReferencia.setTitularNif(titular.getCodiEntitatDesti().toUpperCase());
 					referencies.add(enviamentReferencia);
 					notificacioGuardada.addEnviament(enviamentSaved);
 				}
