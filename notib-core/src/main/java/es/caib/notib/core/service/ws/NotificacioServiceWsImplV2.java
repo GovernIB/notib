@@ -720,6 +720,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						resposta.setErrorDescripcio("[MUNICIPI_CODI] El camp 'municipiCodi' no pot ser null en cas d'entrega NACIONAL NORMALITZAT.");
 						return resposta;
 					}
+					if (enviament.getEntregaPostal().getPoblacio() == null || enviament.getEntregaPostal().getPoblacio().isEmpty()) {
+						resposta.setError(true);
+						resposta.setEstat(NotificacioEstatEnum.PENDENT);
+						resposta.setErrorDescripcio("[POBLACIO] El camp 'poblacio' no pot ser null en cas d'entrega ESTRANGER NORMALITZAT.");
+						return resposta;
+					}
 				}
 				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.ESTRANGER)) {
 					if((enviament.getEntregaPostal().getViaNom() == null || enviament.getEntregaPostal().getViaNom().isEmpty())) {
@@ -882,7 +888,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				if(enviament.getTitular().getDir3Codi() == null) {
 					resposta.setError(true);
 					resposta.setEstat(NotificacioEstatEnum.PENDENT);
-					resposta.setErrorDescripcio("[TITULAR_NIF] El camp 'dir3codi' del titular d'un enviament no pot ser null.");
+					resposta.setErrorDescripcio("[TITULAR_DIR3CAIB] El camp 'dir3codi' del titular d'un enviament no pot ser null.");
 					return resposta;
 				}
 			}
@@ -948,7 +954,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		if (comunicacioAmbAdministracio && comunicacioSenseAdministracio) {
 			resposta.setError(true);
 			resposta.setEstat(NotificacioEstatEnum.PENDENT);
-			resposta.setErrorDescripcio("COMUNICACIO] Una comunicació no pot estar dirigida a una administració i a una persona física/jurídica a la vegada.");
+			resposta.setErrorDescripcio("[COMUNICACIO] Una comunicació no pot estar dirigida a una administració i a una persona física/jurídica a la vegada.");
 			return resposta;
 		}
 		return resposta;

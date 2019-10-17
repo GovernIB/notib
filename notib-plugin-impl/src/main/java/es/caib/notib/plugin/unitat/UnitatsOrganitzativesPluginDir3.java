@@ -221,7 +221,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 			return provincies;
 		} catch (Exception ex) {
 			throw new SistemaExternException(
-					"No s'han pogut consultar les comunitats autònomes via REST",
+					"No s'han pogut consultar les províncies via REST",
 					ex);
 		}
 	}
