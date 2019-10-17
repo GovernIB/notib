@@ -84,6 +84,12 @@ public class ProcedimentServiceBean implements ProcedimentService {
 				isAdministrador, 
 				id);
 	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	public ProcedimentDto findByCodi(Long entitatId, String codiProcediment) throws NotFoundException {
+		return delegate.findByCodi(entitatId, codiProcediment);
+	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})

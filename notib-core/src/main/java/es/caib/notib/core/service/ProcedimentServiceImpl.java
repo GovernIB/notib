@@ -260,6 +260,31 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		
 		return resposta;
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public ProcedimentDto findByCodi(
+			Long entitatId,
+			String codiProcediment) throws NotFoundException {
+		logger.debug("Consulta del procediment ("
+				+ "entitatId=" + entitatId + ", "
+				+ "codi=" + codiProcediment + ")");
+		EntitatEntity entitat = null;
+			
+		if (entitatId != null)
+			entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId, 
+					false, 
+					false, 
+					false);
+		
+		ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(codiProcediment, entitat);
+		
+		return conversioTipusHelper.convertir(
+				procediment, 
+				ProcedimentDto.class);
+	}
+
 
 	@Override
 	public List<ProcedimentDto> findByEntitat(Long entitatId) {

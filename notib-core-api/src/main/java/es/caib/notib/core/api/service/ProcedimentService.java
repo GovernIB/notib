@@ -73,7 +73,7 @@ public interface ProcedimentService {
 	 * @param entitatId
 	 *            Id de l'entitat.
 	 * @param id
-	 *            Atribut id del meta-expedient a trobar.
+	 *            Atribut id del procediment a trobar.
 	 * @return El meta-expedient amb l'id especificat o null si no s'ha trobat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -83,6 +83,21 @@ public interface ProcedimentService {
 			Long entitatId,
 			boolean isAdministrador,
 			Long id) throws NotFoundException;
+	
+	/**
+	 * Consulta un procediment donat el seu codi i entitat.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param codiProcediment
+	 *            Atribut codi del procediment a trobar.
+	 * @return El meta-expedient amb l'id especificat o null si no s'ha trobat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	public ProcedimentDto findByCodi(
+			Long entitatId,
+			String codiProcediment) throws NotFoundException;
 
 	/**
 	 * Consulta els procediments d'una entitat.
@@ -231,7 +246,7 @@ public interface ProcedimentService {
 	 * @param entitatId
 	 *            Id de l'entitat.
 	 * @param id
-	 *            Atribut id del meta-expedient.
+	 *            Atribut id del procediment.
 	 * @param permisId
 	 *            Atribut id del permís que es vol esborrar.
 	 * @throws NotFoundException

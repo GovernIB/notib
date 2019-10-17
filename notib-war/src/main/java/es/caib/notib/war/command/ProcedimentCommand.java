@@ -10,6 +10,7 @@ import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorPostalDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
+import es.caib.notib.war.validation.CodiProcedimentNoRepetit;
 
 /**
  * Command per al manteniment de procediments.
@@ -17,6 +18,7 @@ import es.caib.notib.war.helper.ConversioTipusHelper;
  * @author Limit Tecnologies <limit@limit.es>
  *
  */
+@CodiProcedimentNoRepetit
 public class ProcedimentCommand {
 	
 	private Long id;
