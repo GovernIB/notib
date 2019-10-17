@@ -648,6 +648,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				resposta.setErrorDescripcio("[EMAIL] El camp 'email' del titular no pot ser major que 40 caràcters.");
 				return resposta;
 			}
+			if(enviament.getTitular().getNom() == null) {
+				resposta.setError(true);
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				resposta.setErrorDescripcio("[NOM] El camp 'nom' del titular no pot ser ser null.");
+				return resposta;
+			}
 			if (enviament.getTitular().getNom().length() > 255) {
 				resposta.setError(true);
 				resposta.setEstat(NotificacioEstatEnum.PENDENT);
