@@ -723,7 +723,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					if (enviament.getEntregaPostal().getPoblacio() == null || enviament.getEntregaPostal().getPoblacio().isEmpty()) {
 						resposta.setError(true);
 						resposta.setEstat(NotificacioEstatEnum.PENDENT);
-						resposta.setErrorDescripcio("[POBLACIO] El camp 'poblacio' no pot ser null en cas d'entrega ESTRANGER NORMALITZAT.");
+						resposta.setErrorDescripcio("[POBLACIO] El camp 'poblacio' no pot ser null en cas d'entrega NACIONAL NORMALITZAT.");
 						return resposta;
 					}
 				}
