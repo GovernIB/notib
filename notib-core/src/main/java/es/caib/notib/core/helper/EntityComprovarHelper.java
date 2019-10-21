@@ -5,6 +5,7 @@ package es.caib.notib.core.helper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -624,22 +625,34 @@ public class EntityComprovarHelper {
 	}
 	
 	public List<ProcedimentDto> findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
-			List<ProcedimentDto> procediments,
+			Map<String, ProcedimentDto> procediments,
 			EntitatEntity entitatActual,
 			Permission[] permisos) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<ProcedimentEntity> procedimentsEntity = new ArrayList<ProcedimentEntity>();
 		List<ProcedimentDto> resposta;
 		
-		//Conversió de dto a entity per comprovar permisos
-		for (ProcedimentDto procedimentDto : procediments) {
-			ProcedimentEntity procedimentEntity = procedimentRepository.findByIdAndEntitat(
-					procedimentDto.getId(),
-					entitatActual);
-			if (procedimentEntity != null && procedimentEntity.isAgrupar()) {
-					procedimentsEntity.add(procedimentEntity);
+		if (procediments != null) {
+			for (Map.Entry<String, ProcedimentDto> procediment : procediments.entrySet()) { 
+				ProcedimentEntity procedimentEntity = procedimentRepository.findByIdAndEntitat(
+						procediment.getValue().getId(),
+						entitatActual);
+				if (procedimentEntity != null && procedimentEntity.isAgrupar()) {
+						procedimentsEntity.add(procedimentEntity);
+				}
 			}
-		}
+		} 
+		
+//		//Conversió de dto a entity per comprovar permisos
+//		for (ProcedimentDto procedimentDto : procedimentsDto) {
+//			ProcedimentEntity procedimentEntity = procedimentRepository.findByIdAndEntitat(
+//					procedimentDto.getId(),
+//					entitatActual);
+//			if (procedimentEntity != null && procedimentEntity.isAgrupar()) {
+//					procedimentsEntity.add(procedimentEntity);
+//			}
+//		}
+		
 		permisosHelper.filterGrantedAny(
 				procedimentsEntity,
 				new ObjectIdentifierExtractor<ProcedimentEntity>() {

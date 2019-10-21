@@ -4,6 +4,8 @@
 package es.caib.notib.core.ejb;
 
 import java.util.List;
+import java.util.Map;
+
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
@@ -156,7 +158,7 @@ public class NotificacioServiceBean implements NotificacioService {
 			boolean isUsuariEntitat,
 			boolean isSuperUsuari,
 			List<ProcedimentGrupDto> grupsProcediments,
-			List<ProcedimentDto> procediments,
+			Map<String, ProcedimentDto> procediments,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findAmbFiltrePaginat(
@@ -173,7 +175,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaAndGrupsAndEntitat(
-			List<ProcedimentDto> procediments,
+			Map<String, ProcedimentDto> procediments,
 			EntitatDto entitat) {
 		return delegate.findProcedimentsAmbPermisConsultaAndGrupsAndEntitat(
 				procediments,
@@ -183,7 +185,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
-			List<ProcedimentDto> procediments,
+			Map<String, ProcedimentDto> procediments,
 			EntitatDto entitat) {
 		return delegate.findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
 				procediments,

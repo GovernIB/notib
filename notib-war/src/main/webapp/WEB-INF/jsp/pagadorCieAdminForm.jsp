@@ -33,6 +33,13 @@
 .modal-body {
 	height: 300px !important;
 }
+
+.datepicker table tr td.today, .datepicker table tr td.today:hover { 
+	color: #000000;
+	background: #a4a4a4 !important; 
+	background-color: #a4a4a4 !important;
+}
+
 </style>
 </head>
 <body>

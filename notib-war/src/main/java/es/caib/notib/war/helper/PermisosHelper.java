@@ -4,7 +4,9 @@
 package es.caib.notib.war.helper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -38,24 +40,25 @@ public class PermisosHelper {
 			List<ProcedimentDto> procedimentsPermisConsultaSenseGrups = new ArrayList<ProcedimentDto>();
 			List<ProcedimentDto> procedimentsSenseGrups = new ArrayList<ProcedimentDto>();
 			List<ProcedimentGrupDto> grupsProcediment = procedimentService.findAllGrups();
-			List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+//			List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+			Map<String, ProcedimentDto> uniqueProcediments = new HashMap<String, ProcedimentDto>();
 			//Obté els procediments que tenen el mateix grup que el rol d'usuari
 			for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
 				
 				for (String rol : rolsUsuariActual) {
 					if(rol.contains((grupProcediment.getGrup().getCodi()))) {
 						if ((grupProcediment.getProcediment().getEntitat().getDir3Codi().equals(entitatActual.getDir3Codi()))) {
-							procediments.add(grupProcediment.getProcediment());
+							uniqueProcediments.put(grupProcediment.getProcediment().getCodi(), grupProcediment.getProcediment());
 						}
 					}
 				}
 			}
 			//Comprova quins permisos té aquest usuari sobre els procediments amb grups
-			if(!procediments.isEmpty()) {
+			if(!uniqueProcediments.isEmpty()) {
 				request.setAttribute(
 						"permisNotificacio", 
 						procedimentService.hasGrupPermisNotificacioProcediment(
-								procediments,
+								uniqueProcediments,
 								entitatActual));
 			}
 			// Procediments sense grups però amb perís consulta

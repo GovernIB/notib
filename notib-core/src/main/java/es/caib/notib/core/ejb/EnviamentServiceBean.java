@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -59,7 +60,7 @@ public class EnviamentServiceBean implements EnviamentService {
 			boolean isUsuari,
 			boolean isUsuariEntitat, 
 			List<ProcedimentGrupDto> grupsProcediments,
-			List<ProcedimentDto> procediments, 
+			Map<String, ProcedimentDto> procediments, 
 			NotificacioEnviamentFiltreDto filtre, 
 			PaginacioParamsDto paginacio)
 			throws ParseException {

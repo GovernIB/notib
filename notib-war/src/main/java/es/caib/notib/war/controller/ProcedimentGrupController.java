@@ -190,7 +190,8 @@ public class ProcedimentGrupController extends BaseUserController{
 		return DatatablesHelper.getDatatableResponse(request,
 				grupService.findByProcediment(
 						entitatActual.getId(), 
-						procedimentId), 
+						procedimentId,
+						DatatablesHelper.getPaginacioDtoFromRequest(request)),
 						"id");
 	}
 	

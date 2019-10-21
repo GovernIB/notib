@@ -6,8 +6,10 @@ package es.caib.notib.war.controller;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -151,7 +153,8 @@ public class EnviamentController extends BaseUserController {
 		PaginaDto<NotificacioEnviamentDtoV2> enviaments = new PaginaDto<NotificacioEnviamentDtoV2>();
 		boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
 		boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
-		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+//		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+		Map<String, ProcedimentDto> uniqueProcediments = new HashMap<String, ProcedimentDto>();
 		List<ProcedimentGrupDto> grupsProcediment = new ArrayList<ProcedimentGrupDto>();
 		List<ProcedimentDto> procedimentsSenseGrups = new ArrayList<ProcedimentDto>();
 		List<ProcedimentDto> procedimentsPermisConsultaSenseGrups = new ArrayList<ProcedimentDto>();
@@ -167,13 +170,12 @@ public class EnviamentController extends BaseUserController {
 			if (RolHelper.isUsuariActualUsuari(request)) {
 				// Llistat de procediments amb grups
 				grupsProcediment = procedimentService.findAllGrups();
-				procediments = new ArrayList<ProcedimentDto>();
 				// Obté els procediments que tenen el mateix grup que el rol d'usuari
 				for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
 					for (String rol : rolsUsuariActual) {
 						if (rol.contains(grupProcediment.getGrup().getCodi())) {
 							if ((grupProcediment.getProcediment().getEntitat().getDir3Codi().equals(entitatActual.getDir3Codi()))) {
-								procediments.add(grupProcediment.getProcediment());
+								uniqueProcediments.put(grupProcediment.getProcediment().getCodi(), grupProcediment.getProcediment());
 							}
 						}
 					}
@@ -187,7 +189,7 @@ public class EnviamentController extends BaseUserController {
 									entitatActual);
 
 					for (ProcedimentDto procedimentSenseGrupAmbPermis : procedimentsPermisConsultaSenseGrups) {
-						procediments.add(procedimentSenseGrupAmbPermis);
+						uniqueProcediments.put(procedimentSenseGrupAmbPermis.getCodi(), procedimentSenseGrupAmbPermis);
 					}
 				}
 
@@ -198,7 +200,7 @@ public class EnviamentController extends BaseUserController {
 					isUsuari, 
 					isUsuariEntitat,
 					grupsProcediment, 
-					procediments,
+					uniqueProcediments,
 					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 

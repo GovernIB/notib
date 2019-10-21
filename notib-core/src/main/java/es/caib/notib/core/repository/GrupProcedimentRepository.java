@@ -2,6 +2,7 @@ package es.caib.notib.core.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import es.caib.notib.core.entity.GrupEntity;
@@ -18,5 +19,6 @@ public interface GrupProcedimentRepository extends JpaRepository<GrupProcediment
 
 	public GrupProcedimentEntity findByGrup(GrupEntity grup);
 	public List<GrupProcedimentEntity> findByProcediment(ProcedimentEntity procediment);
+	public List<GrupProcedimentEntity> findByProcediment(ProcedimentEntity procediment,Pageable paginacio);
 	public GrupProcedimentEntity findByGrupAndProcediment(GrupEntity grup, ProcedimentEntity procediment);
 }

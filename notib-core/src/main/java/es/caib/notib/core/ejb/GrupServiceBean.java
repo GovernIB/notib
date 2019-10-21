@@ -71,10 +71,12 @@ public class GrupServiceBean implements GrupService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public PaginaDto<ProcedimentGrupDto> findByProcediment(
 			Long entitatId, 
-			Long procedimentId) {
+			Long procedimentId,
+			PaginacioParamsDto paginacioParams) {
 		return delegate.findByProcediment(
 				entitatId, 
-				procedimentId);
+				procedimentId,
+				paginacioParams);
 	}
 
 	@Override

@@ -4,6 +4,7 @@
 package es.caib.notib.core.ejb;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -222,7 +223,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
 	public boolean hasGrupPermisConsultaProcediment(
-			List<ProcedimentDto> procediments,
+			Map<String, ProcedimentDto> procediments,
 			EntitatDto entitat) {
 		return delegate.hasGrupPermisConsultaProcediment(
 				procediments,
@@ -232,7 +233,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
 	public boolean hasGrupPermisNotificacioProcediment(
-			List<ProcedimentDto> procediments,
+			Map<String, ProcedimentDto> procediments,
 			EntitatDto entitat) {
 		return delegate.hasGrupPermisNotificacioProcediment(
 				procediments,

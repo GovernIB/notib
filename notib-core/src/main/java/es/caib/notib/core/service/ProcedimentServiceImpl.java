@@ -2,6 +2,7 @@ package es.caib.notib.core.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -677,7 +678,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	
 	@Override
 	public boolean hasGrupPermisConsultaProcediment(
-			List<ProcedimentDto> procediments,
+			Map<String, ProcedimentDto> procediments,
 			EntitatDto entitat) {
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
 		
@@ -693,7 +694,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	
 	@Override
 	public boolean hasGrupPermisNotificacioProcediment(
-			List<ProcedimentDto> procediments,
+			Map<String, ProcedimentDto> procediments,
 			EntitatDto entitat) {
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
 		

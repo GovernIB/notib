@@ -179,7 +179,8 @@ public class GrupServiceImpl implements GrupService{
 	@Override
 	public PaginaDto<ProcedimentGrupDto> findByProcediment(
 			Long entitatId, 
-			Long procedimentId) {
+			Long procedimentId,
+			PaginacioParamsDto paginacioParams) {
 		
 		if (entitatId != null)
 			entityComprovarHelper.comprovarEntitat(
@@ -189,7 +190,9 @@ public class GrupServiceImpl implements GrupService{
 					false);
 		
 		ProcedimentEntity procediment = procedimentRepositroy.findOne(procedimentId);
-		List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepositoy.findByProcediment(procediment); 
+		List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepositoy.findByProcediment(
+				procediment,
+				paginacioHelper.toSpringDataPageable(paginacioParams)); 
 		
 		return paginacioHelper.toPaginaDto(
 				grupsProcediment, 

@@ -101,7 +101,8 @@ public interface GrupService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public PaginaDto<ProcedimentGrupDto> findByProcediment(
 			Long entitatId,
-			Long procedimentId);
+			Long procedimentId,
+			PaginacioParamsDto paginacioParams);
 	
 	/**
 	 * Consulta un grup donat el seu codi.

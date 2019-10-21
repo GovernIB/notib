@@ -4,6 +4,7 @@
 package es.caib.notib.core.api.service;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.mail.MessagingException;
 
@@ -88,7 +89,7 @@ public interface NotificacioService {
 			boolean isUsuariEntitat,
 			boolean isSuperUsuari,
 			List<ProcedimentGrupDto> grupsProcediments,
-			List<ProcedimentDto> procediments,
+			Map<String, ProcedimentDto> procediments,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
 
@@ -103,7 +104,7 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaAndGrupsAndEntitat(
-			List<ProcedimentDto> procediments,
+			Map<String, ProcedimentDto> procediments,
 			EntitatDto entitat);
 	
 	/**
@@ -154,7 +155,8 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
-			List<ProcedimentDto> procediments,
+			Map<String, ProcedimentDto> procediments,
+//			List<ProcedimentDto> procediments,
 			EntitatDto entitat);
 	
 	/**

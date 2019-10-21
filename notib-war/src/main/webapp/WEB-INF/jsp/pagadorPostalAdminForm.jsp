@@ -31,17 +31,20 @@
 	<not:modalHead/>
 </head>
 <style>
+
+.datepicker table tr td.today, .datepicker table tr td.today:hover { 
+	color: #000000;
+	background: #a4a4a4 !important; 
+	background-color: #a4a4a4 !important;
+}
+
 .rmodal {
     max-height:400px; 
     overflow-y: auto;
 }
+
 </style>
 
-<script type="text/javascript">
-$(document).ready(function () {
-	$('#contracteDataVig').datepicker( "option", "dateFormat", "dd/mm/yy" );
-})
-</script>
 <body>
 	<c:set var="formAction"><not:modalUrl value="/pagadorPostal/newOrModify"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="pagadorPostalCommand" role="form">

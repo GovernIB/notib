@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -346,7 +347,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			boolean isUsuari,
 			boolean isUsuariEntitat,
 			List<ProcedimentGrupDto> grupsProcediments,
-			List<ProcedimentDto> procediments,
+			Map<String, ProcedimentDto> procediments,
 			NotificacioEnviamentFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws ParseException {
 		logger.debug("Consulta els enviaments de les notificacións que te una entitat");
@@ -387,11 +388,16 @@ public class EnviamentServiceImpl implements EnviamentService {
 						);
 				//Procediments amb permís de consulta no agurpables
 				List<ProcedimentDto> procedimentsNoAgrupables = new ArrayList<ProcedimentDto>();
-				for(ProcedimentDto procediment: procediments) {
-					if (!procediment.isAgrupar()) {
-						procedimentsNoAgrupables.add(procediment);
+				for (Map.Entry<String, ProcedimentDto> procediment : procediments.entrySet()) {
+					if (!procediment.getValue().isAgrupar()) {
+						procedimentsNoAgrupables.add(procediment.getValue());
 					}
 				}
+//				for(ProcedimentDto procediment: procediments) {
+//					if (!procediment.isAgrupar()) {
+//						procedimentsNoAgrupables.add(procediment);
+//					}
+//				}
 				procedimentsPermisConsulta = entityComprovarHelper.findByPermisProcedimentsUsuariActual(
 						procedimentsNoAgrupables, 
 						entitatActual,

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.mail.MessagingException;
 
@@ -368,7 +369,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			boolean isUsuariEntitat,
 			boolean isAdministrador,
 			List<ProcedimentGrupDto> grupsProcediments,
-			List<ProcedimentDto> procediments,
+			Map<String, ProcedimentDto> procediments,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		
@@ -404,11 +405,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 						);
 				//Procediments amb permís de consulta no agurpables
 				List<ProcedimentDto> procedimentsNoAgrupables = new ArrayList<ProcedimentDto>();
-				for(ProcedimentDto procediment: procediments) {
-					if (!procediment.isAgrupar()) {
-						procedimentsNoAgrupables.add(procediment);
+				for (Map.Entry<String, ProcedimentDto> procediment : procediments.entrySet()) {
+					if (!procediment.getValue().isAgrupar()) {
+						procedimentsNoAgrupables.add(procediment.getValue());
 					}
 				}
+//				for(ProcedimentDto procediment: procediments) {
+//					if (!procediment.isAgrupar()) {
+//						procedimentsNoAgrupables.add(procediment);
+//					}
+//				}
 				procedimentsPermisConsulta = entityComprovarHelper.findByPermisProcedimentsUsuariActual(
 						procedimentsNoAgrupables, 
 						entitatActual,
@@ -610,7 +616,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Override
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaAndGrupsAndEntitat(
-			List<ProcedimentDto> procediments,
+			Map<String, ProcedimentDto> procediments,
 			EntitatDto entitat) {
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
 		
@@ -655,7 +661,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Override
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
-			List<ProcedimentDto> procediments,
+			Map<String, ProcedimentDto> procediments,
+//			List<ProcedimentDto> procediments,
 			EntitatDto entitat) {
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
 

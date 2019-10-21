@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -163,12 +165,11 @@ public class NotificacioController extends BaseUserController {
 		List<ProcedimentDto> procedimentsPermisNotificacioAmbGrupsAndSenseGrups = new ArrayList<ProcedimentDto>();
 		List<ProcedimentDto> procedimentsPermisNotificacioSenseGrups = new ArrayList<ProcedimentDto>();
 		List<ProcedimentDto> procedimentsPermisNotificacio = new ArrayList<ProcedimentDto>();
-		List<ProcedimentDto> procedimentsAmbGrups = new ArrayList<ProcedimentDto>();
 		List<ProcedimentDto> procedimentsSenseGrups = new ArrayList<ProcedimentDto>();
 		List<ProcedimentGrupDto> grupsProcediment = new ArrayList<ProcedimentGrupDto>();
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
-
+		Map<String, ProcedimentDto> uniqueProcediments = new HashMap<String, ProcedimentDto>();
 		model.addAttribute("entitat", entitatActual);
 
 		if (RolHelper.isUsuariActualUsuari(request)) {
@@ -176,25 +177,25 @@ public class NotificacioController extends BaseUserController {
 			// Llistat de procediments amb grups
 			grupsProcediment = procedimentService.findAllGrups();
 
-			procedimentsAmbGrups = new ArrayList<ProcedimentDto>();
 			procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups(entitatActual);
 			// Obté els procediments que tenen el mateix grup que el rol d'usuari
 			for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
-
 				for (String rol : rolsUsuariActual) {
 					if (rol.contains(grupProcediment.getGrup().getCodi())) {
 						if ((grupProcediment.getProcediment().getEntitat().getDir3Codi().equals(entitatActual.getDir3Codi()))) {
-							procedimentsAmbGrups.add(grupProcediment.getProcediment());
+							uniqueProcediments.put(grupProcediment.getProcediment().getCodi(), grupProcediment.getProcediment());
+//							procedimentsAmbGrups.add(grupProcediment.getProcediment());
 						}
 					}
 				}
 			}
 		}
 
-		if (!procedimentsAmbGrups.isEmpty()) {
+		if (!uniqueProcediments.isEmpty()) {
 			// Procedimments amb i sense grups amb permís notificació
 			procedimentsPermisNotificacioAmbGrupsAndSenseGrups = notificacioService.findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
-					procedimentsAmbGrups,
+					uniqueProcediments,
+//					procedimentsAmbGrups,
 					entitatActual);
 
 			model.addAttribute("procediments", procedimentsPermisNotificacioAmbGrupsAndSenseGrups);
@@ -341,7 +342,8 @@ public class NotificacioController extends BaseUserController {
 		NotificacioFiltreDto filtre = (NotificacioFiltreDto) request.getSession().getAttribute(NOTIFICACIONS_FILTRE);
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		PaginaDto<NotificacioDto> notificacions = new PaginaDto<NotificacioDto>();
-		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+//		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+		Map<String, ProcedimentDto> uniqueProcediments = new HashMap<String, ProcedimentDto>();
 		List<ProcedimentGrupDto> grupsProcediment = new ArrayList<ProcedimentGrupDto>();
 		List<ProcedimentDto> procedimentsSenseGrups = new ArrayList<ProcedimentDto>();
 		List<ProcedimentDto> procedimentsPermisConsultaSenseGrups = new ArrayList<ProcedimentDto>();
@@ -361,14 +363,14 @@ public class NotificacioController extends BaseUserController {
 			if (RolHelper.isUsuariActualUsuari(request)) {
 				// Llistat de procediments amb grups
 				grupsProcediment = procedimentService.findAllGrups();
-				procediments = new ArrayList<ProcedimentDto>();
 				// Obté els procediments que tenen el mateix grup que el rol d'usuari
 				for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
 					for (String rol : rolsUsuariActual) {
 						if (rol.contains(grupProcediment.getGrup().getCodi())) {
 							//si el procediment es de l'entitat actual
 							if ((grupProcediment.getProcediment().getEntitat().getDir3Codi().equals(entitatActual.getDir3Codi()))) {
-								procediments.add(grupProcediment.getProcediment());
+								uniqueProcediments.put(grupProcediment.getProcediment().getCodi(), grupProcediment.getProcediment());
+//								procediments.add(grupProcediment.getProcediment());
 							}
 						}
 					}
@@ -382,7 +384,7 @@ public class NotificacioController extends BaseUserController {
 									entitatActual);
 	
 					for (ProcedimentDto procedimentSenseGrupAmbPermis : procedimentsPermisConsultaSenseGrups) {
-						procediments.add(procedimentSenseGrupAmbPermis);
+						uniqueProcediments.put(procedimentSenseGrupAmbPermis.getCodi(), procedimentSenseGrupAmbPermis);
 					}
 				}
 	
@@ -393,7 +395,7 @@ public class NotificacioController extends BaseUserController {
 					isUsuariEntitat,
 					isAdministrador, 
 					grupsProcediment, 
-					procediments, 
+					uniqueProcediments, 
 					filtre,
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 		}catch(SecurityException e) {

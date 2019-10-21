@@ -41,7 +41,7 @@
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="../../procediment/${procediment.id}/grup/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								<li><a href="../../procediment/${procediment.id}/grup/{{:id}}" data-height="300px" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								<li><a href="grup/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="procediment.grup.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
 						</div>
@@ -51,7 +51,7 @@
 		</thead>
 	</table>
 	<script id="tableButtonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a class="btn btn-default" href="../../procediment/${procediment.id}/grup/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="procediment.grup.boto.nou.grup"/></a></p>
+		<p style="text-align:right"><a class="btn btn-default" href="../../procediment/${procediment.id}/grup/new" data-height="300px" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="procediment.grup.boto.nou.grup"/></a></p>
 	</script>
 	<a href="<c:url value="/procediment?mantenirPaginacio=true"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
 	<div class="clearfix"></div>

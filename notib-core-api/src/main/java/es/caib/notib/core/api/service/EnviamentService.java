@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import es.caib.notib.core.api.dto.ColumnesDto;
 import es.caib.notib.core.api.dto.EntitatDto;
@@ -65,7 +67,7 @@ public interface EnviamentService {
 			boolean isUsuari,
 			boolean isUsuariEntitat,
 			List<ProcedimentGrupDto> grupsProcediments,
-			List<ProcedimentDto> procediments,
+			Map<String, ProcedimentDto> procediments,
 			NotificacioEnviamentFiltreDto filtre,
 			PaginacioParamsDto paginacio) throws ParseException;
 	

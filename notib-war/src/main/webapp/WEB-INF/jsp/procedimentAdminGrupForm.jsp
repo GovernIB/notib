@@ -18,9 +18,10 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<not:modalHead/>
 <style>
-	.permisosInput {margin-left: 45px}
+.permisosInput {
+	margin-left: 45px
+}
 </style>
-
 
 </head>
 <body>

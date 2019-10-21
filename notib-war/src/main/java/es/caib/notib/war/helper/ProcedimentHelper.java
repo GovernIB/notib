@@ -4,7 +4,9 @@
 package es.caib.notib.war.helper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -35,7 +37,8 @@ public class ProcedimentHelper {
 		LOGGER.debug("Cercant procediments amb grups i/o permís de consulta");
 		boolean sensePermis = false;
 		List<ProcedimentDto> procedimentsPermisConsulta = null;
-		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+		Map<String, ProcedimentDto> uniqueProcediments = new HashMap<String, ProcedimentDto>();
+//		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
 		List<ProcedimentGrupDto> procedimentsAmbGrups = new ArrayList<ProcedimentGrupDto>();
 		List<ProcedimentDto> procedimentsSenseGrups = new ArrayList<ProcedimentDto>();
 		List<ProcedimentDto> procedimentsPermisConsultaSenseGrups = new ArrayList<ProcedimentDto>();
@@ -46,21 +49,21 @@ public class ProcedimentHelper {
 			// Llistat de procediments amb grups
 			procedimentsAmbGrups = procedimentService.findAllGrups();
 			procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups(entitatActual);
-			procediments = new ArrayList<ProcedimentDto>();
 			// Obté els procediments que tenen el mateix grup que el rol d'usuari
 			for (ProcedimentGrupDto grupProcediment : procedimentsAmbGrups) {
 				for (String rol : rolsUsuariActual) {
 					if (rol.contains(grupProcediment.getGrup().getCodi())) {
 						if ((grupProcediment.getProcediment().getEntitat().getDir3Codi().equals(entitatActual.getDir3Codi()))) {
-							procediments.add(grupProcediment.getProcediment());
+							uniqueProcediments.put(grupProcediment.getProcediment().getCodi(), grupProcediment.getProcediment());
+//							procediments.add(grupProcediment.getProcediment());
 						}
 					}
 				}
 			}
 
-			if (!procediments.isEmpty()) {
+			if (!uniqueProcediments.isEmpty()) {
 				procedimentsPermisConsulta = notificacioService.findProcedimentsAmbPermisConsultaAndGrupsAndEntitat(
-						procediments,
+						uniqueProcediments,
 						entitatActual);
 			} else if (procedimentsAmbGrups.isEmpty()) {
 				procedimentsPermisConsulta = notificacioService.findProcedimentsEntitatAmbPermisConsulta(entitatActual);
