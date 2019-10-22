@@ -59,10 +59,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Temporal(TemporalType.DATE)
 	protected Date enviamentDataProgramada;
 	
-	@Column(name = "concepte", length = 50, nullable = false)
+	@Column(name = "concepte", length = 255, nullable = false)
 	protected String concepte;
 	
-	@Column(name = "descripcio", length = 100)
+	@Column(name = "descripcio", length = 1000)
 	protected String descripcio;
 	
 	@Column(name = "retard_postal")

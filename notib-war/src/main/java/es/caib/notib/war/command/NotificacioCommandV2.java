@@ -32,6 +32,7 @@ import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.ValidArxiuDocument;
 import es.caib.notib.war.validation.ValidConcepte;
 import es.caib.notib.war.validation.ValidCsvDocument;
+import es.caib.notib.war.validation.ValidDescripcio;
 import es.caib.notib.war.validation.ValidNotificacio;
 import es.caib.notib.war.validation.ValidUrlDocument;
 import es.caib.notib.war.validation.ValidUuidDocument;
@@ -63,6 +64,9 @@ import es.caib.notib.war.validation.ValidUuidDocument;
 @ValidConcepte (
 		fieldName = "concepte"
 )
+@ValidDescripcio (
+		fieldName = "descripcio"
+)
 @ValidNotificacio
 public class NotificacioCommandV2 {
 
@@ -72,7 +76,7 @@ public class NotificacioCommandV2 {
 	private String organGestor;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
-	@NotEmpty @Size(max=50)
+	@NotEmpty @Size(max=255)
 	private String concepte;
 	@Size(max=1000)
 	private String descripcio;
