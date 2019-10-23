@@ -400,7 +400,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		Integer retardPostal;
 		
 		try {
-			envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
+//			envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
+			if (notificacio.getProcediment().getOrganGestor() != null) 
+				envios.setCodigoOrganismoEmisor(notificacio.getProcediment().getOrganGestor());
+			else
+				envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
+			
 			switch (notificacio.getEnviamentTipus()) {
 			case COMUNICACIO:
 				envios.setTipoEnvio(new BigInteger("1"));
