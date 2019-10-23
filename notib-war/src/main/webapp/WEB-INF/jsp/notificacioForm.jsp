@@ -113,6 +113,10 @@
 	background: #a4a4a4 !important; 
 	background-color: #a4a4a4 !important;
 }
+
+.entregaPostalInfo {
+	display: none;
+}
 </style>
 <script type="text/javascript">
 
@@ -467,7 +471,7 @@ function addEnvio() {
     var num;
     var enviamentForm = $(".enviamentsForm").last().clone();
     var enviamentFormNou;
-
+	
     enviamentForm.find(':input').each(function() {
         number = this.name.substring(this.name.indexOf( '[' ) + 1, this.name.indexOf( ']' ));
         num = parseInt(number);
@@ -516,6 +520,9 @@ function addEnvio() {
 	$(enviamentForm).find('#entregaPostalAmagat').attr('value', 'false');
 	$(enviamentForm).find('.entregaPostal_'+number).hide();
     
+
+	$(enviamentForm).find('.entregaPostal_info_'+number).css('display','none');
+	
 	$('.newDestinatari_' + num).children('div').each(function (i) {
 
         var destinatariForm = $('.personaForm_' + number + '_' + 0 + ':last');
@@ -524,11 +531,13 @@ function addEnvio() {
         var enviamentForm = $('.enviamentForm_' + number + ':last');
         enviamentForm.removeClass('enviamentForm_' + number).addClass('enviamentForm_' + num);
 
-        //Aumentar index div entrega postal i deh
+        //Aumentar index div entrega postal, deh, alert-info
         var entregaPostal = $('.entregaPostal_'+number + ':last');
 		entregaPostal.removeClass('entregaPostal_'+number).addClass('entregaPostal_'+num);
 		var entregaDeh = $('.entregaDeh_'+number + ':last');
 		entregaDeh.removeClass('entregaDeh_'+number).addClass('entregaDeh_'+num);
+		var entregaDeh = $('.entregaPostal_info_'+number + ':last');
+		entregaDeh.removeClass('entregaPostal_info_'+number).addClass('entregaPostal_info_'+num);
 		
 		//Titol enviament
         if (num != null) {
@@ -587,9 +596,9 @@ function mostrarEntregaPostal(className) {
     
     var enviament_id_num = className.substring(className.lastIndexOf('[') + 1, className.lastIndexOf(']'));
     
-    if (concepteLength > 50) {
+    if ($(element).is(':checked') && concepteLength > 50) {
     	var longitidInfo = $('.entregaPostal_info_' + enviament_id_num);
-    	$(longitidInfo).toggle(2000);
+    	$(longitidInfo).slideDown(1000); 
     };
     
     if($('.entregaPostal_'+enviament_id_num).css('display') != 'none') {
@@ -902,12 +911,13 @@ function mostrarEntregaDeh(className) {
 									<hr/>
 								</div>
 								<div class="col-md-12">
-									<!--  
 									<div class="entregaPostal_info_${j} entregaPostalInfo alert alert-info" role="alert">
+										<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
 									  <strong><spring:message code="notificacio.form.camp.logitud.info"/></strong>
 									</div>
-									-->
-									<p class="comentari col-xs-offset-"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
+									<div>
+									<p class="comentari"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
+									</div>
 									<not:inputCheckbox name="enviaments[${j}].entregaPostalActiva" textKey="notificacio.form.camp.entregapostal.activa" labelSize="4" funcio="mostrarEntregaPostal(this.id)" />
 								</div>
 								<c:choose>
