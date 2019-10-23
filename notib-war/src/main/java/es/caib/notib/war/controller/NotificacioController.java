@@ -71,7 +71,6 @@ import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
 import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
 import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.core.service.NotificacioServiceImpl;
 import es.caib.notib.war.command.MarcarProcessatCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
 import es.caib.notib.war.command.NotificacioFiltreCommand;

@@ -599,10 +599,28 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			resposta.setErrorDescripcio("[CONCEPTE] El concepte de la notificació no pot ser null.");
 			return resposta;
 		}
-		if (notificacio.getConcepte().length() > 50) {
+		if (!validConcepteDescripcio(notificacio.getConcepte())) {
 			resposta.setError(true);
 			resposta.setEstat(NotificacioEstatEnum.PENDENT);
-			resposta.setErrorDescripcio("[CONCEPTE] El concepte de la notificació no pot contenir més de 50 caràcters.");
+			resposta.setErrorDescripcio("[CONCEPTE] El format del camp concepte no és correcte.");
+			return resposta;
+		}
+		if (notificacio.getConcepte().length() > 255) {
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[CONCEPTE] El concepte de la notificació no pot contenir més de 255 caràcters.");
+			return resposta;
+		}
+		if (notificacio.getDescripcio() != null && !validConcepteDescripcio(notificacio.getDescripcio())) {
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[DESCRIPCIO] El format del camp descripció no és correcte.");
+			return resposta;
+		}
+		if (notificacio.getDescripcio() != null && notificacio.getDescripcio().length() > 1000){
+			resposta.setError(true);
+			resposta.setEstat(NotificacioEstatEnum.PENDENT);
+			resposta.setErrorDescripcio("[DESCRIPCIO] La descripció de la notificació no pot contenir més de 1000 caràcters.");
 			return resposta;
 		}
 		if (notificacio.getEnviamentTipus() == null) {
@@ -1016,6 +1034,20 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		default:
 			return null;
 		}
+	}
+	
+	private boolean validConcepteDescripcio(String value) {
+		String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;";
+		char[] concepte_chars = value.toCharArray();
+		
+		boolean esCaracterValid = true;
+		for (int i = 0; esCaracterValid && i < concepte_chars.length; i++) {
+			esCaracterValid = !(CONTROL_CARACTERS.indexOf(concepte_chars[i]) < 0);
+			if (!esCaracterValid) {
+				break;
+			}
+	    }
+		return esCaracterValid;
 	}
 	
 	private static String isMultipleDestinataris() {

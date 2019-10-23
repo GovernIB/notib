@@ -16,6 +16,7 @@ public class CaducitatHelper {
 	public static Date sumarDiesLaborals(int diesCaducitat) {
 		Calendar diaActual = Calendar.getInstance();
 		diaActual.setTime(new Date());
+		diaActual.add(Calendar.DATE, 1);
 		
 		try {
 			for (int dia = 1; dia <= diesCaducitat; dia++) {

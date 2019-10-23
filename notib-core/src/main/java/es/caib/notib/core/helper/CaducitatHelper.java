@@ -18,6 +18,7 @@ public class CaducitatHelper {
 			int diesCaducitat) {
 		Calendar diaActual = Calendar.getInstance();
 		diaActual.setTime(dataCaducitat);
+		diaActual.add(Calendar.DATE, 1);
 		
 		try {
 			for (int dia = 1; dia <= diesCaducitat; dia++) {
