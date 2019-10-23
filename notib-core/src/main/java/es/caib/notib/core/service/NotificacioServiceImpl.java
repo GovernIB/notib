@@ -53,6 +53,7 @@ import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
@@ -67,6 +68,7 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EmailHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
@@ -83,6 +85,7 @@ import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
@@ -130,7 +133,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private GrupRepository grupRepository;
 	@Autowired
-	GrupProcedimentRepository grupProcedimentRepository;
+	private GrupProcedimentRepository grupProcedimentRepository;
+	@Autowired
+	private AplicacioService aplicacioService;
+	@Autowired
+	private UsuariRepository usuariRepository;
 	
 	@Transactional(rollbackFor=Exception.class)
 	@Override
@@ -378,7 +385,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 				false, 
 				isUsuariEntitat,
 				false);
-	
+		UsuariEntity usuariActual = usuariRepository.findByCodi(aplicacioService.getUsuariActual().getCodi());
+		
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId);
 		List<EntitatEntity> entitatsActiva = entitatRepository.findByActiva(true);
 		PaginaDto<NotificacioDto> resultatPagina = null;
@@ -416,7 +424,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 //					}
 //				}
 				procedimentsPermisConsulta = entityComprovarHelper.findByPermisProcedimentsUsuariActual(
-						procedimentsNoAgrupables, 
+						procedimentsNoAgrupables, 	
 						entitatActual,
 						new Permission[] {
 								ExtendedPermission.READ}
@@ -448,17 +456,19 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (isUsuari) {
 				//Només notificacions sense grups
 				if (!procedimentsCodisNotib.isEmpty()) {
-					notificacions = notificacioRepository.findByProcedimentCodiNotibAndEntitat(
+					notificacions = notificacioRepository.findByProcedimentCodiNotibAndEntitatAndCreatedBy(
 							procedimentsCodisNotib,
 							entitatActual,
+							//usuariActual,
 							paginacioHelper.toSpringDataPageable(paginacioParams));
 				}
 				//Notificacions específiques per un grup
 				if (!grupsProcedimentsCodis.isEmpty()) {
-					notificacions = notificacioRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
+					notificacions = notificacioRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitatAndCreatedBy(
 							procedimentsCodisNotib,
 							grupsProcedimentsCodis,
 							entitatActual,
+							//usuariActual,
 							paginacioHelper.toSpringDataPageable(paginacioParams));
 				}
 			//Consulta els notificacions de l'entitat acutal

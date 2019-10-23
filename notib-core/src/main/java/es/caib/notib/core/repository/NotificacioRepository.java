@@ -18,6 +18,7 @@ import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.UsuariEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -33,10 +34,12 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"from " +
 			"    NotificacioEntity ntf " +
 			"where (ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " + 
-			"and (ntf.entitat = :entitat)")
-	Page<NotificacioEntity> findByProcedimentCodiNotibAndEntitat(
+			"and (ntf.entitat = :entitat) " )
+			//"and (ntf.createdBy = :usuariActual)")
+	Page<NotificacioEntity> findByProcedimentCodiNotibAndEntitatAndCreatedBy(
 			@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
 			@Param("entitat") EntitatEntity entitat,
+			//@Param("usuariActual") UsuariEntity usuari,
 			Pageable paginacio);
 	
 	@Query(
@@ -44,11 +47,13 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"    NotificacioEntity ntf " +
 			"where (ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " + 
 			"and (ntf.grupCodi in (:grupsProcedimentCodisNotib)) or (ntf.grupCodi = null) " +
-			"and (ntf.entitat = :entitat)")
-	Page<NotificacioEntity> findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
+			"and (ntf.entitat = :entitat) " )
+			//"and (ntf.createdBy = :usuariActual)")
+	Page<NotificacioEntity> findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitatAndCreatedBy(
 			@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
 			@Param("grupsProcedimentCodisNotib") List<? extends String> grupsProcedimentCodisNotib,
 			@Param("entitat") EntitatEntity entitat,
+			//@Param("usuariActual") UsuariEntity usuari,
 			Pageable paginacio);
 
 	@Query(

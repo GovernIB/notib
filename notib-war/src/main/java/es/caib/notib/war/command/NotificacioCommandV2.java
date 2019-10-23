@@ -76,9 +76,8 @@ public class NotificacioCommandV2 {
 	private String organGestor;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
-	@NotEmpty @Size(max=255)
+	@NotEmpty 
 	private String concepte;
-	@Size(max=1000)
 	private String descripcio;
 	private Date enviamentDataProgramada;
 	private int retard;
@@ -136,6 +135,7 @@ public class NotificacioCommandV2 {
 	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
 		this.enviamentDataProgramada = enviamentDataProgramada;
 	}
+	@Size(max=255)
 	public String getConcepte() {
 		return concepte;
 	}
@@ -204,6 +204,7 @@ public class NotificacioCommandV2 {
 	public void setComunicacioTipus(NotificacioComunicacioTipusEnumDto comunicacioTipus) {
 		this.comunicacioTipus = comunicacioTipus;
 	}
+	@Size(max=1000)
 	public String getDescripcio() {
 		return descripcio;
 	}

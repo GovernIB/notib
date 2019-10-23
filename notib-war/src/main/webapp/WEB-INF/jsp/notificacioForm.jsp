@@ -374,6 +374,34 @@ $(document).ready(function() {
 	$('.interessat').trigger('change');
 	$('#tipusDocument').trigger('change');
 	$('.enviamentTipus').trigger('change');
+	
+	//Contador concepte
+	var fieldConcepte = $('#concepte');
+	if (fieldConcepte.val().length != 0) {
+		var size = $(fieldConcepte).val().length;
+		$('.inputCurrentLength').text(size);
+	} else {
+		$('.inputCurrentLength').text(0);
+	};
+	
+	$(fieldConcepte).bind("change paste keyup", function() {
+		var size = $(this).val().length;
+		$('.inputCurrentLength').text(size);
+	});
+	
+	//Contado descripció
+	var fieldDescripcio = $('#descripcio');
+	if (fieldDescripcio.val().length != 0) {
+		var size = $(fieldDescripcio).val().length;
+		$('.textAreaCurrentLength').text(size);
+	} else {
+		$('.textAreaCurrentLength').text(0);
+	};;
+	
+	$(fieldDescripcio).bind("change paste keyup", function() {
+		var size = $(this).val().length;
+		$('.textAreaCurrentLength').text(size);
+	});
 });
 
 function addDestinatari(enviament_id) {
@@ -555,8 +583,15 @@ function mostrarEntregaPostal(className) {
     var element = document.getElementById(className);
     var parent = $(element).closest(".enviamentsForm");
     var classParent = $(parent).attr('class');
-
+    var concepteLength = $('#concepte').val().length;
+    
     var enviament_id_num = className.substring(className.lastIndexOf('[') + 1, className.lastIndexOf(']'));
+    
+    if (concepteLength > 50) {
+    	var longitidInfo = $('.entregaPostal_info_' + enviament_id_num);
+    	$(longitidInfo).toggle(2000);
+    };
+    
     if($('.entregaPostal_'+enviament_id_num).css('display') != 'none') {
         $('#entregaPostalAmagat').attr('value', 'false');
         $('.entregaPostal_'+enviament_id_num).hide();
@@ -612,12 +647,12 @@ function mostrarEntregaDeh(className) {
 			<form:hidden path="emisorDir3Codi" value="${entitat.dir3Codi}" />
 			<div class="row">
 				<div class="col-md-12">
-					<not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="2" required="true" />
+					<not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="2" required="true" inputMaxLength="${concepteSize}"/>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<not:inputTextarea name="descripcio" textKey="notificacio.form.camp.descripcio" labelSize="2" />
+					<not:inputTextarea name="descripcio" textKey="notificacio.form.camp.descripcio" labelSize="2" inputMaxLength="${descripcioSize}"/>
 				</div>
 			</div>
 			<c:if test="${not empty grups}">
@@ -867,6 +902,11 @@ function mostrarEntregaDeh(className) {
 									<hr/>
 								</div>
 								<div class="col-md-12">
+									<!--  
+									<div class="entregaPostal_info_${j} entregaPostalInfo alert alert-info" role="alert">
+									  <strong><spring:message code="notificacio.form.camp.logitud.info"/></strong>
+									</div>
+									-->
 									<p class="comentari col-xs-offset-"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
 									<not:inputCheckbox name="enviaments[${j}].entregaPostalActiva" textKey="notificacio.form.camp.entregapostal.activa" labelSize="4" funcio="mostrarEntregaPostal(this.id)" />
 								</div>

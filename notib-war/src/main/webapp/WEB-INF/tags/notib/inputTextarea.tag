@@ -9,10 +9,19 @@
 <%@ attribute name="placeholderKey" required="false" rtexprvalue="true"%>
 <%@ attribute name="disabled" required="false" rtexprvalue="true"%>
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
+<%@ attribute name="inputLength" required="false" rtexprvalue="true"%>
+<%@ attribute name="inputMaxLength" required="false" rtexprvalue="true"%>
+
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
 <c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
 <c:set var="campInputSize">${12 - campLabelSize}</c:set>
+
+<style>
+.info-length {
+	font-size: x-small;
+}
+</style>
 <div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>">
 	<label class="control-label col-xs-${campLabelSize}" for="${campPath}">
 		<c:choose>
@@ -25,5 +34,14 @@
 	<div class="controls col-xs-${campInputSize}">
 		<form:textarea path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" rows="6"/>
 		<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
+		
+		<c:if test="${not empty inputMaxLength}">
+			<p class="info-length text-success">
+				<span class="glyphicon glyphicon-info-sign"></span>
+				<span class="textAreaCurrentLength">${inputLength}</span>
+					<spring:message code="notificacio.form.camp.logitud"/>
+				<span> ${inputMaxLength}</span>
+			</p>
+		</c:if>
 	</div>
 </div>

@@ -5,6 +5,7 @@
 package es.caib.notib.war.controller;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,8 +17,11 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -67,6 +71,7 @@ import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
 import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
 import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.service.NotificacioServiceImpl;
 import es.caib.notib.war.command.MarcarProcessatCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
@@ -694,7 +699,7 @@ public class NotificacioController extends BaseUserController {
 				null, 
 				isAdministrador(request), 
 				procedimentId);
-		NotificacioCommandV2 notificacio = new NotificacioCommandV2();		
+		NotificacioCommandV2 notificacio = new NotificacioCommandV2();	
 		List<String> tipusDocumentEnumDto = new ArrayList<String>();
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		List<TipusDocumentDto>  tipusDocuments =  entitatService.findTipusDocumentByEntitat(entitatActual.getId());
@@ -755,6 +760,19 @@ public class NotificacioController extends BaseUserController {
 				EnumHelper.getOptionsForEnum(
 						IdiomaEnumDto.class,
 						"es.caib.notib.core.api.dto.idiomaEnumDto."));
+		
+		try {
+			Method concepte = NotificacioCommandV2.class.getMethod("getConcepte");
+			int concepteSize = concepte.getAnnotation(Size.class).max();
+			
+			Method descripcio = NotificacioCommandV2.class.getMethod("getDescripcio");
+			int descripcioSize = descripcio.getAnnotation(Size.class).max();
+			model.addAttribute("concepteSize", concepteSize);
+			model.addAttribute("descripcioSize", descripcioSize);
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud del concepte: " + ex.getMessage());
+		}
+		
 	}
 	
 	@RequestMapping(value = "/paisos", method = RequestMethod.GET)
@@ -841,6 +859,18 @@ public class NotificacioController extends BaseUserController {
         model.addAttribute("errors", bindingResult.getAllErrors());
         if (notificacioCommand.getEnviaments().get(0).getDestinataris() != null)
         	model.addAttribute("isVisible", notificacioCommand.getEnviaments().get(0).getDestinataris().get(0).isVisible());
+	
+        try {
+			Method concepte = NotificacioCommandV2.class.getMethod("getConcepte");
+			int concepteSize = concepte.getAnnotation(Size.class).max();
+			
+			Method descripcio = NotificacioCommandV2.class.getMethod("getDescripcio");
+			int descripcioSize = descripcio.getAnnotation(Size.class).max();
+			model.addAttribute("concepteSize", concepteSize);
+			model.addAttribute("descripcioSize", descripcioSize);
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud del concepte: " + ex.getMessage());
+		}
 	}
 	private boolean isAdministrador(HttpServletRequest request) {
 		return RolHelper.isUsuariActualAdministrador(request);
@@ -855,4 +885,6 @@ public class NotificacioController extends BaseUserController {
 				Boolean.class, 
 				new CustomBooleanEditor("SI", "NO", false));
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(NotificacioController.class);
 }
