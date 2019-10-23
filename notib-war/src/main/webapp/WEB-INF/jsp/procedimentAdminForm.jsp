@@ -276,7 +276,7 @@ $(document).ready(function() {
 				<form:hidden path="organGestor"/>
 				<not:inputTextSearch name="organGestorNom" textKey="procediment.form.camp.organ" searchButton="searchOrgan" readonly="true" labelSize="2"/>
 				-->
-				<not:inputText name="organGestor" textKey="procediment.form.camp.organ" required="false" labelSize="2"/>
+				<not:inputText name="organGestor" textKey="procediment.form.camp.organ" required="true" labelSize="2"/>
 				<not:inputSelect name="pagadorPostalId" emptyOption="true" textKey="procediment.form.camp.postal" optionItems="${pagadorsPostal}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>
 				<not:inputSelect name="pagadorCieId" emptyOption="true" textKey="procediment.form.camp.cie" optionItems="${pagadorsCie}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>
 				<not:inputCheckbox name="agrupar" textKey="procediment.form.camp.agrupar" labelSize="2"/>

@@ -40,6 +40,7 @@ public class ProcedimentCommand {
 	private String oficinaNom;
 	private String llibre;
 	private String llibreNom;
+	@NotEmpty
 	private String organGestor;
 	private String organGestorNom;
 	private String tipusAssumpte;
