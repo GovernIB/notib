@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.GrupProcedimentEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.repository.GrupProcedimentRepository;
@@ -115,6 +116,30 @@ public class ProcedimentHelper {
 			List<DadesUsuari> usuarisGrup = pluginHelper.dadesUsuariConsultarAmbGrup(
 					permisGrup.getGrup().getCodi());
 				sb.append(" rol ").append(permisGrup.getGrup().getCodi()).append(" (");
+				if (usuarisGrup != null) {
+					for (DadesUsuari usuariGrup: usuarisGrup) {
+						usuaris.add(usuariGrup.getCodi());
+						sb.append(" ").append(usuariGrup.getCodi());
+					}
+				}
+				sb.append(")");
+			
+		}
+		logger.debug(sb.toString());
+		return usuaris;
+	}
+	
+	public Set<String> findUsuarisAmbPermisReadPerGrupNotificacio(
+			GrupEntity grup,
+			ProcedimentEntity procediment) {
+		StringBuilder sb = new StringBuilder("Preparant la llista d'usuaris per enviar l'email: ");
+		GrupProcedimentEntity grupProcediment = grupProcedimentRepository.findByGrupAndProcediment(grup, procediment);
+		
+		Set<String> usuaris = new HashSet<String>();
+		if (grupProcediment != null) {
+			List<DadesUsuari> usuarisGrup = pluginHelper.dadesUsuariConsultarAmbGrup(
+					grupProcediment.getGrup().getCodi());
+				sb.append(" rol ").append(grupProcediment.getGrup().getCodi()).append(" (");
 				if (usuarisGrup != null) {
 					for (DadesUsuari usuariGrup: usuarisGrup) {
 						usuaris.add(usuariGrup.getCodi());
