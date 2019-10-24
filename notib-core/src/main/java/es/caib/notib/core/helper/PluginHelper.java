@@ -1136,9 +1136,12 @@ public class PluginHelper {
 		if (persona.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
 			interessatDades.setDocumento(persona.getCodiEntitatDesti());
 			interessatDades.setTipoDocumentoIdentificacion("O");
-		} else {
+		} else if (persona.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
 			interessatDades.setDocumento(persona.getNif());
 			interessatDades.setTipoDocumentoIdentificacion("N");
+		} else if (persona.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA) {
+			interessatDades.setDocumento(persona.getNif());
+			interessatDades.setTipoDocumentoIdentificacion("C");
 		}
 		interessatDades.setRazonSocial(persona.getNom());
 		interessatDades.setNombre(persona.getNom());
@@ -1226,9 +1229,12 @@ public class PluginHelper {
 			if (titular.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
 				interessatDades.setDocumento(titular.getCodiEntitatDesti());
 				interessatDades.setTipoDocumentoIdentificacion("O");
-			} else {
+			}  else if (titular.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
 				interessatDades.setDocumento(titular.getNif());
 				interessatDades.setTipoDocumentoIdentificacion("N");
+			} else if (titular.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA) {
+				interessatDades.setDocumento(titular.getNif());
+				interessatDades.setTipoDocumentoIdentificacion("C");
 			}
 			interessatDades.setRazonSocial(titular.getNom());
 			interessatDades.setNombre(titular.getNom());
@@ -1249,9 +1255,12 @@ public class PluginHelper {
 			if (destinatari.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
 				representantDades.setDocumento(destinatari.getCodiEntitatDesti());
 				representantDades.setTipoDocumentoIdentificacion("O");
-			} else {
+			} else if (destinatari.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
 				representantDades.setDocumento(destinatari.getNif());
 				representantDades.setTipoDocumentoIdentificacion("N");
+			} else if (destinatari.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA) {
+				representantDades.setDocumento(destinatari.getNif());
+				representantDades.setTipoDocumentoIdentificacion("C");
 			}
 			representantDades.setRazonSocial(destinatari.getNom());
 			representantDades.setNombre(destinatari.getNom());

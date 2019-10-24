@@ -451,12 +451,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 				
 				//Quan no hi ha cap procediment amb grups
-				if (grupsProcedimentsCodis.isEmpty()) {
+				if (!procedimentsCodisNotib.isEmpty() && grupsProcedimentsCodis.isEmpty()) {
 					notificacions = notificacioRepository.findByProcedimentCodiNotibAndEntitat(
 							procedimentsCodisNotib,
 							entitatActual,
 							paginacioHelper.toSpringDataPageable(paginacioParams));
-				} else {
+				} else if (!procedimentsCodisNotib.isEmpty()) {
 					notificacions = notificacioRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
 							procedimentsCodisNotib, 
 							grupsProcedimentsCodis, 
@@ -515,7 +515,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					}
 				}
 				//Quan no hi ha cap procediment amb grups
-				if (grupsProcedimentsCodis.isEmpty()) {
+				if (!procedimentsCodisNotib.isEmpty() && grupsProcedimentsCodis.isEmpty()) {
 					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotib(
 							filtre.getEntitatId() == null,
 							filtre.getEntitatId(),
@@ -538,7 +538,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getTipusUsuari() == null,
 							filtre.getTipusUsuari(),
 							pageable);
-				} else {
+				} else if (!procedimentsCodisNotib.isEmpty()) {
 					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 							filtre.getEntitatId() == null,
 							filtre.getEntitatId(),
