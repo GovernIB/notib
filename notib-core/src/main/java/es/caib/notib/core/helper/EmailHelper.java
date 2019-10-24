@@ -4,6 +4,7 @@
 package es.caib.notib.core.helper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -19,9 +20,12 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.UsuariDto;
+import es.caib.notib.core.entity.GrupEntity;
+import es.caib.notib.core.entity.GrupProcedimentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.UsuariEntity;
+import es.caib.notib.core.repository.GrupProcedimentRepository;
+import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 
@@ -41,13 +45,17 @@ public class EmailHelper {
 	@Resource
 	private UsuariRepository usuariRepository;
 	@Resource
+	private GrupRepository grupRepository;
+	@Resource
+	private GrupProcedimentRepository grupProcedimentRepository;
+	@Resource
 	private JavaMailSender mailSender;
 	@Resource
 	private MessageHelper messageHelper;
 	
 	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws MessagingException {
 		logger.info("Desant emails del procediment (" + notificacio.getProcediment().getId() + ") per a l'enviament");
-		List<UsuariDto> destinataris = obtenirCodiDestinatarisPerProcediment(notificacio.getProcediment());
+		List<UsuariDto> destinataris = obtenirCodiDestinatarisPerProcediment(notificacio);
 		String resposta = null;
 		if (destinataris != null && !destinataris.isEmpty()) {
 			for (UsuariDto usuariDto : destinataris) {
@@ -221,14 +229,25 @@ public class EmailHelper {
 		mailSender.send(missatge);
 	}
 	
-	private List<UsuariDto> obtenirCodiDestinatarisPerProcediment(ProcedimentEntity procediment) {
+	private List<UsuariDto> obtenirCodiDestinatarisPerProcediment(NotificacioEntity notificacio) {
 		List<UsuariDto> destinataris = new ArrayList<UsuariDto>();
-		Set<String> usuaris;
-		if (procediment.isAgrupar()) {
-			usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrup(procediment);
+		Set<String> usuaris = new HashSet<String>();
+		GrupEntity grup;
+		
+		if (notificacio.getGrupCodi() != null) {
+			grup = grupRepository.findByCodi(notificacio.getGrupCodi());
+			if (grup != null)
+				usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrupNotificacio(grup, notificacio.getProcediment());
 		} else {
-			usuaris = procedimentHelper.findUsuarisAmbPermisReadPerProcediment(procediment);
+			List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepository.findByProcediment(notificacio.getProcediment());
+			
+			if (notificacio.getProcediment().isAgrupar() && !grupsProcediment.isEmpty()) {
+				usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrup(notificacio.getProcediment());
+			} else {
+				usuaris = procedimentHelper.findUsuarisAmbPermisReadPerProcediment(notificacio.getProcediment());
+			}
 		}
+		
 		for (String usuari: usuaris) {
 			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
 			if (dadesUsuari != null && dadesUsuari.getEmail() != null) {
