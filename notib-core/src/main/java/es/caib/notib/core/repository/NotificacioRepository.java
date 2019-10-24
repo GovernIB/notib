@@ -18,7 +18,6 @@ import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.UsuariEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -34,26 +33,23 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"from " +
 			"    NotificacioEntity ntf " +
 			"where (ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " + 
-			"and (ntf.entitat = :entitat) " )
-			//"and (ntf.createdBy = :usuariActual)")
-	Page<NotificacioEntity> findByProcedimentCodiNotibAndEntitatAndCreatedBy(
+			"and (ntf.entitat = :entitat) " +
+			"and (ntf.grupCodi = null) ")
+	Page<NotificacioEntity> findByProcedimentCodiNotibAndEntitat(
 			@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
 			@Param("entitat") EntitatEntity entitat,
-			//@Param("usuariActual") UsuariEntity usuari,
 			Pageable paginacio);
 	
 	@Query(
 			"from " +
 			"    NotificacioEntity ntf " +
 			"where (ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " + 
-			"and (ntf.grupCodi in (:grupsProcedimentCodisNotib)) or (ntf.grupCodi = null) " +
+			"and ntf.grupCodi = null or (ntf.grupCodi in (:grupsProcedimentCodisNotib)) " +
 			"and (ntf.entitat = :entitat) " )
-			//"and (ntf.createdBy = :usuariActual)")
-	Page<NotificacioEntity> findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitatAndCreatedBy(
+	Page<NotificacioEntity> findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
 			@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
 			@Param("grupsProcedimentCodisNotib") List<? extends String> grupsProcedimentCodisNotib,
 			@Param("entitat") EntitatEntity entitat,
-			//@Param("usuariActual") UsuariEntity usuari,
 			Pageable paginacio);
 
 	@Query(
@@ -164,7 +160,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
 			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
 			"    ) > 0) " + 
-			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari)")
+			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
+			"and (ntf.grupCodi = null) ")
 	public Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotib(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
@@ -193,7 +190,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"where " +
 			"    (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
 			"and (ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " +
-			"and (ntf.grupCodi in (:grupsProcedimentCodisNotib)) " +
+			"and ntf.grupCodi = null or (ntf.grupCodi in (:grupsProcedimentCodisNotib)) " +
 			"and (:entitat = ntf.entitat) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +

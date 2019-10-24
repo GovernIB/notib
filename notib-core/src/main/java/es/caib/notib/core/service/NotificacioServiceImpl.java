@@ -53,7 +53,6 @@ import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
@@ -68,7 +67,6 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EmailHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
@@ -85,7 +83,6 @@ import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
-import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
@@ -134,10 +131,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private GrupRepository grupRepository;
 	@Autowired
 	private GrupProcedimentRepository grupProcedimentRepository;
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private UsuariRepository usuariRepository;
 	
 	@Transactional(rollbackFor=Exception.class)
 	@Override
@@ -384,15 +377,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 				entitatId, 
 				false, 
 				isUsuariEntitat,
-				false);
-		UsuariEntity usuariActual = usuariRepository.findByCodi(aplicacioService.getUsuariActual().getCodi());
-		
+				false);		
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId);
 		List<EntitatEntity> entitatsActiva = entitatRepository.findByActiva(true);
 		PaginaDto<NotificacioDto> resultatPagina = null;
 		Page<NotificacioEntity> notificacions = null;
 		List<String> procedimentsCodisNotib = new ArrayList<String>();
-		List<String> grupsProcedimentsCodis = new ArrayList<String>();
+		List<String> grupsProcedimentsCodis = null;
 		List<ProcedimentDto> procedimentsPermisConsultaAndAgrupable = new ArrayList<ProcedimentDto>();
 		List<ProcedimentDto> procedimentsPermisConsulta = new ArrayList<ProcedimentDto>();
 		
@@ -442,35 +433,37 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			}
 		}
-		//Recuperar els grups dels procediment per poder filtrar les notificacions amb grups
-		for (String codiProcediment : procedimentsCodisNotib) {
-			ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(codiProcediment, entitatActual);
-			
-			List<GrupProcedimentEntity> grups = grupProcedimentRepository.findByProcediment(procediment);
-			for (GrupProcedimentEntity grup : grups) {
-				grupsProcedimentsCodis.add(grup.getGrup().getCodi());
-			}
-		}
+		
 		if (filtre == null) {
 			//Consulta les notificacions sobre les quals té permis l'usuari actual
 			if (isUsuari) {
-				//Només notificacions sense grups
-				if (!procedimentsCodisNotib.isEmpty()) {
-					notificacions = notificacioRepository.findByProcedimentCodiNotibAndEntitatAndCreatedBy(
+				//Notificacions sense grups i amb grups
+				grupsProcedimentsCodis = new ArrayList<String>();
+				for (String codiProcediment : procedimentsCodisNotib) {
+					ProcedimentEntity procedimentAgrupable = procedimentRepository.findByCodiAndEntitat(
+							codiProcediment,
+							entitatActual);
+
+					List<GrupProcedimentEntity> grups = grupProcedimentRepository.findByProcediment(procedimentAgrupable);
+					for (GrupProcedimentEntity grup : grups) {
+						grupsProcedimentsCodis.add(grup.getGrup().getCodi());
+					}
+				}
+				
+				//Quan no hi ha cap procediment amb grups
+				if (grupsProcedimentsCodis.isEmpty()) {
+					notificacions = notificacioRepository.findByProcedimentCodiNotibAndEntitat(
 							procedimentsCodisNotib,
 							entitatActual,
-							//usuariActual,
 							paginacioHelper.toSpringDataPageable(paginacioParams));
-				}
-				//Notificacions específiques per un grup
-				if (!grupsProcedimentsCodis.isEmpty()) {
-					notificacions = notificacioRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitatAndCreatedBy(
-							procedimentsCodisNotib,
-							grupsProcedimentsCodis,
+				} else {
+					notificacions = notificacioRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
+							procedimentsCodisNotib, 
+							grupsProcedimentsCodis, 
 							entitatActual,
-							//usuariActual,
 							paginacioHelper.toSpringDataPageable(paginacioParams));
 				}
+				
 			//Consulta els notificacions de l'entitat acutal
 			} else if (isUsuariEntitat) {
 				notificacions = notificacioRepository.findByEntitatActual(
@@ -509,7 +502,20 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
 			if (isUsuari) {
-				if (!procedimentsCodisNotib.isEmpty()) {
+				//Notificacions amb grups
+				grupsProcedimentsCodis = new ArrayList<String>();
+				for (String codiProcediment : procedimentsCodisNotib) {
+					ProcedimentEntity procedimentAgrupable = procedimentRepository.findByCodiAndEntitat(
+							codiProcediment,
+							entitatActual);
+
+					List<GrupProcedimentEntity> grups = grupProcedimentRepository.findByProcediment(procedimentAgrupable);
+					for (GrupProcedimentEntity grup : grups) {
+						grupsProcedimentsCodis.add(grup.getGrup().getCodi());
+					}
+				}
+				//Quan no hi ha cap procediment amb grups
+				if (grupsProcedimentsCodis.isEmpty()) {
 					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotib(
 							filtre.getEntitatId() == null,
 							filtre.getEntitatId(),
@@ -532,13 +538,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getTipusUsuari() == null,
 							filtre.getTipusUsuari(),
 							pageable);
-				}
-				if (!grupsProcedimentsCodis.isEmpty()) {
+				} else {
 					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 							filtre.getEntitatId() == null,
 							filtre.getEntitatId(),
-							procedimentsCodisNotib,
-							grupsProcedimentsCodis,
+							procedimentsCodisNotib, 
+							grupsProcedimentsCodis, 
 							filtre.getEnviamentTipus() == null,
 							filtre.getEnviamentTipus(),
 							filtre.getConcepte() == null,
@@ -558,6 +563,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getTipusUsuari(),
 							pageable);
 				}
+				
+				
 			} else if (isUsuariEntitat) {
 				notificacions = notificacioRepository.findAmbFiltre(
 						entitatId == null, 

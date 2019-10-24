@@ -46,7 +46,7 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 	private String username;
 	private String password;
 
-	private boolean serveiDesplegatDamuntJboss = true;
+	private boolean serveiDesplegatDamuntJbossCaib = true;
 
 	public NotificacioRestClient(
 			String baseUrl,
@@ -134,10 +134,10 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 	}
 
 	public boolean isServeiDesplegatDamuntJboss() {
-		return serveiDesplegatDamuntJboss;
+		return serveiDesplegatDamuntJbossCaib;
 	}
 	public void setServeiDesplegatDamuntJboss(boolean serveiDesplegatDamuntJboss) {
-		this.serveiDesplegatDamuntJboss = serveiDesplegatDamuntJboss;
+		this.serveiDesplegatDamuntJbossCaib = serveiDesplegatDamuntJboss;
 	}
 
 
@@ -172,7 +172,7 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 			String urlAmbMetode,
 			String username,
 			String password) throws InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
-		if (serveiDesplegatDamuntJboss) {
+		if (serveiDesplegatDamuntJbossCaib) {
 			logger.debug(
 					"Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (" +
 					"urlAmbMetode=" + urlAmbMetode + ", " +
