@@ -34,6 +34,8 @@ public class NotificacioDto extends AuditoriaDto {
 	private String csv_uuid;
 	private String documentContingutBase64;
 	private String documentSha1;
+	private String grupCodi;
+	private String grupNom;
 	private boolean documentNormalitzat;
 	private boolean documentGenerarCsv;
 	private NotificacioEstatEnumDto estat;
@@ -174,6 +176,18 @@ public class NotificacioDto extends AuditoriaDto {
 	}
 	public void setDocumentSha1(String documentSha1) {
 		this.documentSha1 = documentSha1;
+	}
+	public String getGrupCodi() {
+		return grupCodi;
+	}
+	public void setGrupCodi(String grupCodi) {
+		this.grupCodi = grupCodi;
+	}
+	public String getGrupNom() {
+		return grupNom;
+	}
+	public void setGrupNom(String grupNom) {
+		this.grupNom = grupNom;
 	}
 	public boolean isDocumentNormalitzat() {
 		return documentNormalitzat;

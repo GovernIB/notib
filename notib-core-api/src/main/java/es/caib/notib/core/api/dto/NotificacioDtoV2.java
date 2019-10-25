@@ -18,7 +18,6 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 
 	private Long id;
 	private String emisorDir3Codi;
-//	private String organGestor;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
 	private String concepte;
 	private String descripcio;
@@ -32,7 +31,6 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private String procedimentCodiNotib;
 	private GrupDto grup;
 	private String grupCodi;
-//	private ParametresRegistreDto parametresRegistre;
 	private NotificacioEstatEnumDto estat;
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
@@ -40,21 +38,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<NotificacioEnviamentDtoV2>();
 	private String usuariCodi;
 	private String motiu;
-	
-//	private String oficina;
-//	private String organ;
-//	private String llibre;
-//	private String registreNumero;
-//	private Date registreData;
-//	private String extracte;
-//	private RegistreDocumentacioFisicaEnumDto docFisica;
-//	private IdiomaEnumDto idioma;
-//	private String tipusAssumpte;
 	private String numExpedient;
-//	private String refExterna;
-//	private String codiAssumpte;
-//	private String observacions;
-//	
 	
 	
 	public Long getId() {

@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.LocalitatsDto;
@@ -661,6 +662,13 @@ public class NotificacioController extends BaseUserController {
 			String pipellaActiva, 
 			Model model) {
 		NotificacioDtoV2 notificacio = notificacioService.findAmbId(notificacioId);
+
+		if (notificacio.getGrupCodi() != null) {
+			GrupDto grup = grupService.findByCodi(
+					notificacio.getGrupCodi(), 
+					entitatActual.getId());
+			notificacio.setGrup(grup);
+		}
 		
 		model.addAttribute("pipellaActiva", pipellaActiva);
 		model.addAttribute("notificacio", notificacio);
@@ -824,7 +832,7 @@ public class NotificacioController extends BaseUserController {
 		}
 		
 		model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
-		
+		model.addAttribute("grups", grupService.findByProcedimentGrups(procedimentActual.getId()));
 		model.addAttribute("comunicacioTipus", 
 				EnumHelper.getOptionsForEnum(
 						NotificacioComunicacioTipusEnumDto.class,

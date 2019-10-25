@@ -160,6 +160,36 @@
 					</tbody>
 				</table>
 			</div>
+			<c:if test="${not empty notificacio.grup}">
+				<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								<strong><spring:message
+										code="notificacio.info.seccio.grup" /></strong>
+							</h3>
+						</div>
+						<table class="table table-bordered" style="width: 100%">
+							<tbody>
+								<tr>
+									<td width="30%">
+										<strong><spring:message	code="notificacio.info.grup.codi" /></strong>
+									</td>
+									<td>
+									${notificacio.grup.codi}
+									</td>
+								</tr>
+								<tr>
+									<td>
+									<strong><spring:message code="notificacio.info.grup.nom" /></strong>
+									</td>
+									<td>
+										${notificacio.grup.nom}
+									</td>
+								</tr>
+							</tbody>
+						</table>
+				</div>
+			</c:if>
 			<c:if test="${not empty notificacio.document}">
 				<div class="panel panel-default">
 						<div class="panel-heading">
