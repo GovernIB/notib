@@ -1,0 +1,2 @@
+-- #139
+ALTER TABLE NOT_PERSONA MODIFY NIF character varying(9 BYTE) NULL;
