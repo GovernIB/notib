@@ -143,7 +143,10 @@ public class ProcedimentHelper {
 			ProcedimentEntity procediment) {
 		StringBuilder sb = new StringBuilder("Preparant la llista d'usuaris per enviar l'email: ");
 		GrupProcedimentEntity grupProcediment = grupProcedimentRepository.findByGrupAndProcediment(grup, procediment);
-		
+		List<PermisDto> permisos = new ArrayList<PermisDto>();
+		permisos = permisosHelper.findPermisos(
+				procediment.getId(),
+				ProcedimentEntity.class);
 		Set<String> usuaris = new HashSet<String>();
 		if (grupProcediment != null) {
 			List<DadesUsuari> usuarisGrup = pluginHelper.dadesUsuariConsultarAmbGrup(
@@ -151,8 +154,12 @@ public class ProcedimentHelper {
 				sb.append(" rol ").append(grupProcediment.getGrup().getCodi()).append(" (");
 				if (usuarisGrup != null) {
 					for (DadesUsuari usuariGrup: usuarisGrup) {
-						usuaris.add(usuariGrup.getCodi());
-						sb.append(" ").append(usuariGrup.getCodi());
+						for (PermisDto permis : permisos) {
+							if (permis.getPrincipal().equals(usuariGrup.getCodi())) {
+								usuaris.add(usuariGrup.getCodi());
+								sb.append(" ").append(usuariGrup.getCodi());
+							}
+						}
 					}
 				}
 				sb.append(")");

@@ -56,6 +56,7 @@ public class EmailHelper {
 	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws MessagingException {
 		logger.info("Desant emails del procediment (" + notificacio.getProcediment().getId() + ") per a l'enviament");
 		List<UsuariDto> destinataris = obtenirCodiDestinatarisPerProcediment(notificacio);
+		
 		String resposta = null;
 		if (destinataris != null && !destinataris.isEmpty()) {
 			for (UsuariDto usuariDto : destinataris) {
@@ -229,13 +230,14 @@ public class EmailHelper {
 		mailSender.send(missatge);
 	}
 	
-	private List<UsuariDto> obtenirCodiDestinatarisPerProcediment(NotificacioEntity notificacio) {
+	private List<UsuariDto> obtenirCodiDestinatarisPerProcediment(
+			NotificacioEntity notificacio) {
 		List<UsuariDto> destinataris = new ArrayList<UsuariDto>();
 		Set<String> usuaris = new HashSet<String>();
 		GrupEntity grup;
 		
 		if (notificacio.getGrupCodi() != null) {
-			grup = grupRepository.findByCodi(notificacio.getGrupCodi());
+			grup = grupRepository.findByCodiAndEntitat(notificacio.getGrupCodi(), notificacio.getEntitat());
 			if (grup != null)
 				usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrupNotificacio(grup, notificacio.getProcediment());
 		} else {

@@ -127,8 +127,15 @@ public class GrupServiceImpl implements GrupService{
 	}
 	
 	@Override
-	public GrupDto findByCodi(String grupCodi) {
-		GrupEntity grupEntity = grupReposity.findByCodi(grupCodi);
+	public GrupDto findByCodi(
+			String grupCodi,
+			Long entitatId) {
+		EntitatEntity entitat = null;
+		
+		if(entitatId != null)
+			entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		
+		GrupEntity grupEntity = grupReposity.findByCodiAndEntitat(grupCodi, entitat);
 		
 		return conversioTipusHelper.convertir(
 				grupEntity, 

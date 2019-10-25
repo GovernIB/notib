@@ -86,7 +86,7 @@ public interface GrupService {
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
-	public GrupDto findByCodi(String grupCodi);
+	public GrupDto findByCodi(String grupCodi, Long entitatId);
 
 	
 	/**
