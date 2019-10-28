@@ -872,7 +872,7 @@ public class PluginHelper {
 		RegistreSortida registreSortida = new RegistreSortida();
 		DadesOficina dadesOficina = new DadesOficina();
 		Llibre llibreOrganisme = null;
-//		Oficina oficinaVirtual = null;
+		Oficina oficinaVirtual = null;
 		
 		if (notificacio.getProcediment().getOrganGestor() != null) {
 			llibreOrganisme = llistarLlibreOrganisme(
@@ -882,18 +882,16 @@ public class PluginHelper {
 		
 		if (notificacio.getProcediment().getOficina() != null) {
 			dadesOficina.setOficina(notificacio.getProcediment().getOficina());
-		} 
-//TODO Pendent aprovació Toni Trobat
-//		else {
-//			//oficina virtual
-//			oficinaVirtual = llistarOficinaVirtual(
-//					notificacio.getEmisorDir3Codi(), 
-//					TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
-//			
-//			if (oficinaVirtual != null) {
-//				dadesOficina.setOficina(oficinaVirtual.getCodi());
-//			}
-//		}
+		} else {
+			//oficina virtual
+			oficinaVirtual = llistarOficinaVirtual(
+					notificacio.getEmisorDir3Codi(), 
+					TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
+			
+			if (oficinaVirtual != null) {
+				dadesOficina.setOficina(oficinaVirtual.getCodi());
+			}
+		}
 		
 		if (notificacio.getProcediment().getLlibre() != null) {
 			dadesOficina.setLlibre(notificacio.getProcediment().getLlibre());
