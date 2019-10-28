@@ -55,14 +55,12 @@ public class CallbackHelper {
 	private NotificacioEventRepository notificacioEventRepository;
 	@Autowired
 	private NotificacioRepository notificacioRepository;
-//	@Autowired
-//	private PluginHelper pluginHelper;
 	@Autowired
 	private NotificaHelper notificaHelper;
 
 
 
-	@Transactional
+	@Transactional (rollbackFor = RuntimeException.class)
 	public boolean notifica(Long eventId) {
 		boolean ret = false;
 		// Recupera l'event
@@ -145,6 +143,7 @@ public class CallbackHelper {
 			event.getEnviament().getNotificacio().updateEventAfegir(callbackEvent);
 		else
 			event.getNotificacio().updateEventAfegir(callbackEvent);
+		notificacioEventRepository.save(callbackEvent);
 		return ret;
 	}
 
