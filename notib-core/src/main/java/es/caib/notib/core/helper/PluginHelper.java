@@ -874,12 +874,6 @@ public class PluginHelper {
 		Llibre llibreOrganisme = null;
 		Oficina oficinaVirtual = null;
 		
-		if (notificacio.getProcediment().getOrganGestor() != null) {
-			llibreOrganisme = llistarLlibreOrganisme(
-					notificacio.getEmisorDir3Codi(),
-					notificacio.getProcediment().getOrganGestor());
-		}
-		
 		if (notificacio.getProcediment().getOficina() != null) {
 			dadesOficina.setOficina(notificacio.getProcediment().getOficina());
 		} else {
@@ -895,9 +889,16 @@ public class PluginHelper {
 		
 		if (notificacio.getProcediment().getLlibre() != null) {
 			dadesOficina.setLlibre(notificacio.getProcediment().getLlibre());
-		} else if (llibreOrganisme != null) {
-			String llibreCodi = llibreOrganisme.getCodi();
-			dadesOficina.setLlibre(llibreCodi);
+		} else {
+			if (notificacio.getProcediment().getOrganGestor() != null) {
+				llibreOrganisme = llistarLlibreOrganisme(
+						notificacio.getEmisorDir3Codi(),
+						notificacio.getProcediment().getOrganGestor());
+			}
+			if (llibreOrganisme != null) {
+				String llibreCodi = llibreOrganisme.getCodi();
+				dadesOficina.setLlibre(llibreCodi);
+			}
 		}
 
 		registreSortida.setCodiEntitat(notificacio.getEmisorDir3Codi());
