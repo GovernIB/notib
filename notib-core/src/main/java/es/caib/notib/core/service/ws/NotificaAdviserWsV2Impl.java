@@ -147,6 +147,8 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.ENTREGADA_OP;
 						} else if ("expirada".equals(estado)) {
 							notificaEstat = NotificacioEnviamentEstatEnumDto.EXPIRADA;
+						} else if ("anulada".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.ANULADA;
 						}
 						//Update enviament
 						notificaHelper.enviamentUpdateDatat(

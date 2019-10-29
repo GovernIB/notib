@@ -45,6 +45,11 @@ import java.io.Serializable;
  *  			se dará este estado cuando después de los intentos de entrega estipulados por 
  *  			ley, no comparece el interesado. (sólo notificaciones)
  *  - Sin información.
+ *  - Finalitzada: El estado devuelto por Notific@ es un estado final
+ *  - Enviada: La notificación/comunicación ha sido enviada a Notific@
+ *  - Registrada: La notificación/comunicación ha sido enviada al Registro
+ *  - Processada: La notificación/comunicación se ha marcado como procesada por algun motivo.
+ *  - Anulada: Notificación incorrecta o errónea
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -74,5 +79,6 @@ public enum NotificacioEnviamentEstatEnumDto implements Serializable {
 	FINALITZADA,
 	ENVIADA,
 	REGISTRADA,
-	PROCESSADA
+	PROCESSADA,
+	ANULADA
 }

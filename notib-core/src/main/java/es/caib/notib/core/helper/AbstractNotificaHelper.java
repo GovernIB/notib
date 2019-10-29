@@ -147,7 +147,8 @@ public abstract class AbstractNotificaHelper {
 			"rehusada",
 			"expirada",
 			"envio_programado",
-			"sin_informacion"};
+			"sin_informacion",
+			"anulada"};
 	private static final NotificacioEnviamentEstatEnumDto[] estatsNotib = new NotificacioEnviamentEstatEnumDto[] {
 			NotificacioEnviamentEstatEnumDto.ABSENT,
 			NotificacioEnviamentEstatEnumDto.DESCONEGUT,
@@ -167,7 +168,8 @@ public abstract class AbstractNotificaHelper {
 			NotificacioEnviamentEstatEnumDto.REBUTJADA,
 			NotificacioEnviamentEstatEnumDto.EXPIRADA,
 			NotificacioEnviamentEstatEnumDto.ENVIAMENT_PROGRAMAT,
-			NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO};
+			NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO,
+			NotificacioEnviamentEstatEnumDto.ANULADA};
 	protected NotificacioEnviamentEstatEnumDto getEstatNotifica(
 			String estatCodi) {
 		for (int i = 0; i < estatsNotifica.length; i++) {
