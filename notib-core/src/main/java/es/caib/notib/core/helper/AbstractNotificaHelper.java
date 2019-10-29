@@ -163,6 +163,7 @@ public abstract class AbstractNotificaHelper {
 			NotificacioEnviamentEstatEnumDto.PENDENT_ENVIAMENT,
 			NotificacioEnviamentEstatEnumDto.PENDENT_CIE,
 			NotificacioEnviamentEstatEnumDto.PENDENT_DEH,
+			NotificacioEnviamentEstatEnumDto.PENDENT_SEU,
 			NotificacioEnviamentEstatEnumDto.REBUTJADA,
 			NotificacioEnviamentEstatEnumDto.EXPIRADA,
 			NotificacioEnviamentEstatEnumDto.ENVIAMENT_PROGRAMAT,
