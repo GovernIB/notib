@@ -756,11 +756,11 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 					organismeCodi));
 			
 		} catch (RegistrePluginException rex) {
-			logger.error("Error a plugin registre obtenció llibres i oficina", rex);
+			logger.error("Error a plugin registre obtenció llibres d'organisme", rex);
 		} catch (WsI18NException wse) {
-			logger.error("Error ws obtenció llibres i oficina", wse);
+			logger.error("Error ws obtenció llibres organisme", wse);
 		} catch (Exception ex) {
-			logger.error("Error a l'hora d'obtenir els llibres i oficina", ex);
+			logger.error("Error a l'hora d'obtenir els llibres d'organisme", ex);
 		}
 		return llibreOrganisme;
 	}
