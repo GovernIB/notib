@@ -269,16 +269,14 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			Holder<String> codigoRespuesta,
 			Holder<String> descripcionRespuesta,
 			NotificacioEnviamentEntity enviament) {
-//		NotificacioEnviamentEntity enviament = null;
 		NotificacioEventEntity.Builder eventBuilder = null;
 		NotificacioEventEntity event = null;
+		String gestioDocumentalId = null;
 		try {
 			if (acusePDF != null) {
 				EntitatEntity entitat = entitatRepository.findByDir3Codi(organismoEmisor);
 				if (entitat != null) {
-//					enviament = notificacioEnviamentRepository.findByNotificacioEntitatAndNotificaIdentificador(
-//							entitat,
-//							identificador.value);
+
 					//Problema hibernate
 					if (enviament != null && enviament.getNotificacio() == null) {
 						NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
@@ -292,12 +290,11 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 									PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
 						}
 						//certificacionOrganismo.getHashSha1(); // Hash document certificacio
-						String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
-								PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
-								new ByteArrayInputStream(
-										Base64.encode(
-												acusePDF.getContenido())));
-						
+						if (acusePDF.getContenido() != null) {
+							gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
+									PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
+									new ByteArrayInputStream(acusePDF.getContenido()));
+						}
 						enviament.updateNotificaCertificacio(
 								new Date(),
 								gestioDocumentalId,
