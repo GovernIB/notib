@@ -16,9 +16,10 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.codec.Base64;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.sun.jersey.core.util.Base64;
 
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
@@ -207,7 +208,8 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						modoNotificacion,
 						identificador,
 						codigoRespuesta,
-						descripcionRespuesta);
+						descripcionRespuesta,
+						enviament);
 			}
 		} catch (DatatypeConfigurationException ex) {
 			codigoRespuesta.value = "004";
@@ -265,17 +267,18 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			BigInteger modoNotificacion,
 			Holder<String> identificador,
 			Holder<String> codigoRespuesta,
-			Holder<String> descripcionRespuesta) {
-		NotificacioEnviamentEntity enviament = null;
+			Holder<String> descripcionRespuesta,
+			NotificacioEnviamentEntity enviament) {
+//		NotificacioEnviamentEntity enviament = null;
 		NotificacioEventEntity.Builder eventBuilder = null;
 		NotificacioEventEntity event = null;
 		try {
 			if (acusePDF != null) {
 				EntitatEntity entitat = entitatRepository.findByDir3Codi(organismoEmisor);
 				if (entitat != null) {
-					enviament = notificacioEnviamentRepository.findByNotificacioEntitatAndNotificaIdentificador(
-							entitat,
-							identificador.value);
+//					enviament = notificacioEnviamentRepository.findByNotificacioEntitatAndNotificaIdentificador(
+//							entitat,
+//							identificador.value);
 					//Problema hibernate
 					if (enviament != null && enviament.getNotificacio() == null) {
 						NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
@@ -294,6 +297,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 								new ByteArrayInputStream(
 										Base64.encode(
 												acusePDF.getContenido())));
+						
 						enviament.updateNotificaCertificacio(
 								new Date(),
 								gestioDocumentalId,
