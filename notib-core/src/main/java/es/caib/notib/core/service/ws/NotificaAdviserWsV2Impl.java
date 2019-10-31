@@ -95,7 +95,6 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					enviament = notificacioEnviamentRepository.findByNotificacioEntitatAndNotificaIdentificador(
 							entitat,
 							identificador.value);
-					//TODO: Revisar pq arriba la notificació sempre null
 					if (enviament != null && enviament.getNotificacio() == null) {
 						NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
 						enviament.setNotificacio(notificacio);
@@ -200,6 +199,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			}
 			//if datado + certificació
 			if (tipoEntrega.equals(BigInteger.valueOf(2L))) {
+				logger.info("guardant certificació...");
 				certificacionOrganismo(
 						acusePDF,
 						organismoEmisor,
@@ -274,25 +274,26 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			if (acusePDF != null) {
 				EntitatEntity entitat = entitatRepository.findByDir3Codi(organismoEmisor);
 				if (entitat != null) {
-
-					//Problema hibernate
-					if (enviament != null && enviament.getNotificacio() == null) {
-						NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
-						enviament.setNotificacio(notificacio);
-					}
 					if (enviament != null) {
 						//si hi ha una certificació
 						if (enviament.getNotificaCertificacioArxiuId() != null) {
+							logger.info("Esborrant certificació antiga...");
 							pluginHelper.gestioDocumentalDelete(
 									enviament.getNotificaCertificacioArxiuId(),
 									PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
 						}
-						//certificacionOrganismo.getHashSha1(); // Hash document certificacio
+						logger.info("Nou estat enviament: " + enviament.getNotificaEstatDescripcio());
+						
+						if (enviament.getNotificacio() != null)
+							logger.info("Nou estat notificació: " + enviament.getNotificacio().getEstat().name());
+						// Hash document certificacio
 						if (acusePDF.getContenido() != null) {
+							logger.info("Guardant certificació acusament de rebut...");
 							gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
 									PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
 									new ByteArrayInputStream(acusePDF.getContenido()));
 						}
+						logger.info("Actualitzant enviament amb la certificació. ID gestió documental: " + gestioDocumentalId);
 						enviament.updateNotificaCertificacio(
 								new Date(),
 								gestioDocumentalId,
@@ -305,6 +306,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 								NotificaCertificacioTipusEnumDto.ACUSE,
 								NotificaCertificacioArxiuTipusEnumDto.PDF,
 								null); // núm. seguiment
+						logger.info("Registrant event callbackcertificacio de l'Adviser...");
 						eventBuilder = NotificacioEventEntity.getBuilder(
 								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
 								enviament.getNotificacio()).
