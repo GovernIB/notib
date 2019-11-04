@@ -8,6 +8,7 @@ import java.math.BigInteger;
 import java.util.Date;
 
 import javax.jws.WebService;
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
@@ -18,6 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.sun.jersey.core.util.Base64;
 
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
@@ -293,7 +296,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 							logger.info("Guardant certificació acusament de rebut...");
 							gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
 									PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
-									new ByteArrayInputStream(acusePDF.getContenido()));
+									new ByteArrayInputStream(Base64.decode(acusePDF.getContenido())));
 						}
 						logger.info("Actualitzant enviament amb la certificació. ID gestió documental: " + gestioDocumentalId);
 						enviament.updateNotificaCertificacio(
