@@ -353,7 +353,9 @@ public class EnviamentController extends BaseUserController {
 			}
 			Integer notificacionsNoRegistrades = 0;
 			for(Long notificacioId: notificacioIds) {
-				NotificacioDtoV2 notificacio = notificacioService.findAmbId(notificacioId);
+				NotificacioDtoV2 notificacio = notificacioService.findAmbId(
+						notificacioId,
+						isAdministrador(request));
 				if(notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)) {
 					notificacioService.registrarNotificar(notificacioId);	
 				}else {
@@ -434,7 +436,9 @@ public class EnviamentController extends BaseUserController {
 				"enviament.controller.modificat.ok");
 	}
 	
-
+	private boolean isAdministrador(HttpServletRequest request) {
+		return RolHelper.isUsuariActualAdministrador(request);
+	}
 	
 	private NotificacioEnviamentFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {

@@ -207,7 +207,9 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						identificador,
 						codigoRespuesta,
 						descripcionRespuesta,
-						enviament);
+						enviament,
+						eventBuilder,
+						event);
 			}
 		} catch (DatatypeConfigurationException ex) {
 			codigoRespuesta.value = "004";
@@ -266,9 +268,9 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			Holder<String> identificador,
 			Holder<String> codigoRespuesta,
 			Holder<String> descripcionRespuesta,
-			NotificacioEnviamentEntity enviament) {
-		NotificacioEventEntity.Builder eventBuilder = null;
-		NotificacioEventEntity event = null;
+			NotificacioEnviamentEntity enviament,
+			NotificacioEventEntity.Builder eventBuilder,
+			NotificacioEventEntity event) {
 		String gestioDocumentalId = null;
 		try {
 			if (acusePDF != null) {

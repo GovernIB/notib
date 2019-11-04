@@ -577,7 +577,8 @@ public class NotificacioController extends BaseUserController {
 				notificacioId, 
 				enviamentId, 
 				"dades", 
-				model);
+				model,
+				request);
 		return "enviamentInfo";
 	}
 
@@ -611,7 +612,7 @@ public class NotificacioController extends BaseUserController {
 		} else {
 			MissatgesHelper.error(request, getMessage(request, "notificacio.controller.refrescar.estat.error"));
 		}
-		emplenarModelEnviamentInfo(notificacioId, enviamentId, "estatNotifica", model);
+		emplenarModelEnviamentInfo(notificacioId, enviamentId, "estatNotifica", model, request);
 		return "enviamentInfo";
 	}
 
@@ -661,7 +662,9 @@ public class NotificacioController extends BaseUserController {
 			HttpServletRequest request,
 			String pipellaActiva, 
 			Model model) {
-		NotificacioDtoV2 notificacio = notificacioService.findAmbId(notificacioId);
+		NotificacioDtoV2 notificacio = notificacioService.findAmbId(
+				notificacioId,
+				isAdministrador(request));
 
 		if (notificacio.getGrupCodi() != null) {
 			GrupDto grup = grupService.findByCodi(
@@ -688,8 +691,9 @@ public class NotificacioController extends BaseUserController {
 			Long notificacioId, 
 			Long enviamentId, 
 			String pipellaActiva, 
-			Model model) {
-		model.addAttribute("notificacio", notificacioService.findAmbId(notificacioId));
+			Model model,
+			HttpServletRequest request) {
+		model.addAttribute("notificacio", notificacioService.findAmbId(notificacioId, isAdministrador(request)));
 		model.addAttribute("pipellaActiva", pipellaActiva);
 		NotificacioEnviamentDto enviament = enviamentService.enviamentFindAmbId(enviamentId);
 		model.addAttribute("enviament", enviament);

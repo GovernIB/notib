@@ -346,9 +346,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public NotificacioDtoV2 findAmbId(Long id) {
+	public NotificacioDtoV2 findAmbId(
+			Long id,
+			boolean isAdministrador) {
 		logger.debug("Consulta de la notificacio amb id (id=" + id + ")");
-		NotificacioEntity dto = notificacioRepository.findById(id);
+		NotificacioEntity notificacio = notificacioRepository.findById(id);
 		
 		entityComprovarHelper.comprovarPermisos(
 				null,
@@ -356,8 +358,18 @@ public class NotificacioServiceImpl implements NotificacioService {
 				false,
 				false);
 		
+		if(notificacio != null) {
+			if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
+				notificacio.setPermisProcessar(
+						procedimentService.hasPermisProcessarProcediment(
+								notificacio.getProcediment().getCodi(),
+								notificacio.getProcediment().getId(),
+								isAdministrador));
+				}	
+		}
+		
 		return conversioTipusHelper.convertir(
-				dto,
+				notificacio,
 				NotificacioDtoV2.class);
 	}
 

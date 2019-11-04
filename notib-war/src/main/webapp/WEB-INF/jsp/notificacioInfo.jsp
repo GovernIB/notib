@@ -48,8 +48,20 @@
 						}
 					});
 				});
+				
+				$(document.body).on('hidden.bs.modal', function () {
+					$('.tab-content').load(location.href + " .tab-content");
+				});
 			});
 </script>
+<style type="text/css">
+.modal-backdrop {
+    visibility: hidden !important;
+}
+.modal.in {
+    background-color: rgba(0,0,0,0.5);
+}
+</style>
 </head>
 <body>
 	<c:if test="${notificacio.notificaError}">
@@ -106,8 +118,7 @@
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">
-						<strong><spring:message
-								code="notificacio.info.seccio.dades" /></strong>
+						<strong><spring:message code="notificacio.info.seccio.dades" /><c:if test="${notificacio.permisProcessar}"><a href="<c:url value="/notificacio/${notificacio.id}/processar"/>"  class="btn btn-info btn-xs pull-right"  data-toggle="modal" data-modal-id="modal-processar"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a></c:if></strong>
 					</h3>
 				</div>
 				<table class="table table-bordered" style="width: 100%">
@@ -309,6 +320,164 @@
 						</tbody>
 					</table>
 				</div>
+				</c:if>
+				<c:if test="${not empty notificacio.enviaments}">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">
+									<strong><spring:message code="notificacio.info.seccio.enviaments" /></strong>
+								</h3>
+							</div>
+							<table class="table teble-striped table-bordered">
+				    			<thead>
+				    			<tr>
+				    				<th>Nº</th>
+									<th><spring:message code="notificacio.list.enviament.list.titular"/></th>
+					    			<th><spring:message code="notificacio.list.enviament.list.destinataris"/></th>
+					    			<th><spring:message code="notificacio.list.enviament.list.estat"/></th>
+					    			<th><spring:message code="enviament.info.seccio.notifica.registre"/></th>
+					    			<th><spring:message code="enviament.info.seccio.notifica.certificacio"/></th>
+				    			</tr>
+								</thead>
+								<c:forEach items="${notificacio.enviaments}" var="enviament" varStatus="status">
+									<tbody>
+										<tr>
+											<td>
+												${status.index + 1}
+											</td>
+											<td>
+											${enviament.titular.nom}
+											${enviament.titular.llinatge1}
+											${enviament.titular.llinatge2}
+											</td>
+							    			<td>
+							    			<c:choose>
+							    			<c:when test="${not empty enviament.destinataris}">
+							    				<c:forEach items="${enviament.destinataris}" var="destinatari">
+													${destinatari.nom}
+													${destinatari.llinatge1}
+													${destinatari.llinatge2}
+							    				</c:forEach>
+							    			</c:when>
+							    			<c:otherwise>
+							    				<spring:message code="notificacio.list.enviament.list.sensedestinataris"/>
+							    			</c:otherwise>
+							    			</c:choose>
+							    			</td>
+							    			<td>
+							    			<spring:message code="es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.${enviament.notificaEstat}"/>
+							    			</td>
+							    			<c:choose>
+							    				<c:when test="${not empty enviament.registreNumeroFormatat}">
+													<td>
+													<table class="table table-striped" style="width:100%">
+														<tbody>
+															<tr>
+																<td><strong><spring:message code="enviament.info.seu.registre.num"/></strong></td>
+																<td>${enviament.registreNumeroFormatat}</td>
+															</tr>
+															<tr>
+																<td><strong><spring:message code="enviament.info.seu.registre.data"/></strong></td>
+																<td><fmt:formatDate value="${enviament.registreData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+															</tr>
+															<c:if test="${not empty enviament.registreEstat}">
+																<tr>
+																	<td><strong><spring:message code="enviament.info.seu.registre.estat"/></strong></td>
+																	<td>${enviament.registreEstat}</td>
+																</tr>
+															</c:if>
+															<c:if test="${enviament.registreEstat == 'DISTRIBUIT' || enviament.registreEstat == 'OFICI_EXTERN'  || enviament.registreEstat == 'OFICI_SIR' }">
+																<tr>
+																	<td><strong><spring:message code="enviament.info.seu.registre.justificant"/></strong></td>
+																	<td>
+																	<a href="<not:modalUrl value="/notificacio/${notificacio.id}/enviament/${enviament.id}/justificantDescarregar"/>" onerror="location.reload();" class="btn btn-default btn-sm pull-right">
+																		<span class="fa fa-download"></span>
+																		<spring:message code="enviament.info.accio.descarregar.justificant"/>
+																	</a>
+																	</td>
+																<tr>
+															</c:if>
+														</tbody>
+													</table>
+													</td>
+							    				</c:when>
+							    				<c:otherwise>
+							    					<td><spring:message code="notificacio.list.enviament.list.noregistrat"/></td>
+							    				</c:otherwise>
+							    			</c:choose>
+						    				<c:choose>
+						    				<c:when test="${not empty enviament.notificaCertificacioData}">
+							    				<td>
+							    					<table class="table table-striped" style="width:100%">
+														<tbody>
+															<tr>
+																<td><strong><spring:message code="enviament.info.notifica.certificacio.data"/></strong></td>
+																<td><fmt:formatDate value="${enviament.notificaCertificacioData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+															</tr>
+															<c:if test="${not empty enviament.notificaCertificacioMime}">
+																<tr>
+																	<td><strong><spring:message code="enviament.info.notifica.certificacio.mime"/></strong></td>
+																	<td>${enviament.notificaCertificacioMime}</td>
+																</tr>
+															</c:if>
+															<tr>
+																<td><strong><spring:message code="enviament.info.notifica.certificacio.origen"/></strong></td>
+																<td><spring:message code="enviament.datat.origen.enum.${enviament.notificaCertificacioOrigen}"/> (${enviament.notificaCertificacioOrigen})</td>
+															</tr>
+															<c:if test="${not empty enviament.notificaCertificacioMetadades}">
+																<tr>
+																	<td><strong><spring:message code="enviament.info.notifica.certificacio.metadades"/></strong></td>
+																	<td>${enviament.notificaCertificacioMetadades}</td>
+																</tr>
+															</c:if>
+															<c:if test="${not empty enviament.notificaCertificacioCsv}">
+																<tr>
+																	<td><strong><spring:message code="enviament.info.notifica.certificacio.csv"/></strong></td>
+																	<td>${enviament.notificaCertificacioCsv}</td>
+																</tr>
+															</c:if>
+															<c:if test="${not empty enviament.notificaCertificacioTipus}">
+																<tr>
+																	<td><strong><spring:message code="enviament.info.notifica.certificacio.tipus"/></strong></td>
+																	<td>${enviament.notificaCertificacioTipus}</td>
+																</tr>
+															</c:if>
+															<c:if test="${not empty enviament.notificaCertificacioArxiuTipus}">
+																<tr>
+																	<td><strong><spring:message code="enviament.info.notifica.certificacio.arxiu.tipus"/></strong></td>
+																	<td>${enviament.notificaCertificacioArxiuTipus}</td>
+																</tr>
+															</c:if>
+															<c:if test="${not empty enviament.notificaCertificacioNumSeguiment}">
+																<tr>
+																	<td><strong><spring:message code="enviament.info.notifica.certificacio.num.seguiment"/></strong></td>
+																	<td>${enviament.notificaCertificacioNumSeguiment}</td>
+																</tr>
+															</c:if>
+															<tr>
+																<td><strong><spring:message code="enviament.info.notifica.certificacio.document"/></strong></td>
+																<td>
+																<div></div>
+																	certificacio_${enviament.notificaIdentificador}.pdf
+																	
+																	<a href="<not:modalUrl value="/notificacio/${notificacio.id}/enviament/${enviament.id}/certificacioDescarregar"/>" class="btn btn-default btn-sm pull-right" title="<spring:message code="notificacio.info.document.descarregar"/>"><span class="fa fa-download"></span></a>
+																</td>
+															</tr>
+														</tbody>
+													</table>
+							    				</td>
+							    			</c:when>
+							    			<c:otherwise>
+							    				<td>
+							    				<spring:message code="notificacio.list.enviament.list.sensecertificacio"/>
+							    				</td>
+							    			</c:otherwise>
+						    				</c:choose>
+						    			</tr>
+									</tbody>
+								</c:forEach>
+							</table>
+						</div>
 				</c:if>
 		</div>
 		<div role="tabpanel"

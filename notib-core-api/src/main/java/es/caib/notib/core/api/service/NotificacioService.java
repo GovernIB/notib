@@ -71,7 +71,8 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public NotificacioDtoV2 findAmbId(
-			Long id);
+			Long id,
+			boolean isAdministrador);
 
 	/**
 	 * Consulta de les notificacions segons els paràmetres del filtre.

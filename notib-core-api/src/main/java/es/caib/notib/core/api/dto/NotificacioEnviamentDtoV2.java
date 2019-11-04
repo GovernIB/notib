@@ -25,11 +25,9 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private String titularNif;
 	private String usuari;
 	private String referencia;
-	private String notificaIdentificador;
 	private String numeroCertCorreus;
 	private String csv;
 	private String uuid;
-	private String notificaCertificacioNumSeguiment;
 	private String detalls;
 	private String codiNotibEnviament;
 	private String notificaDataCaducitat;
@@ -55,6 +53,28 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private String registreNumeroFormatat;
 	private NotificacioRegistreEstatEnumDto registreEstat;
+	
+	//Notific@
+	private Date notificaErrorData;
+	private String notificaErrorDescripcio;
+	private String notificaCertificacioArxiuNom;
+	private Date notificaCertificacioData;
+	private NotificacioEnviamentEstatEnumDto notificaEstat;
+	private Date notificaEstatData;
+	private String notificaDatatErrorDescripcio;
+	private String notificaDatatOrigen;
+	private String notificaDatatReceptorNif;
+	private String notificaDatatReceptorNom;
+	private String notificaDatatNumSeguiment;
+	private String notificaCertificacioMime;
+	private String notificaCertificacioOrigen;
+	private String notificaCertificacioMetadades;
+	private String notificaCertificacioCsv;
+	private String notificaReferencia;
+	private String notificaIdentificador;
+	private NotificaCertificacioTipusEnumDto notificaCertificacioTipus;
+	private NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus;
+	private String notificaCertificacioNumSeguiment;
 	
 	public Long getId() {
 		return id;
@@ -159,6 +179,12 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	public void setCodiNotibEnviament(String codiNotibEnviament) {
 		this.codiNotibEnviament = codiNotibEnviament;
 	}
+	public NotificacioEnviamentEstatEnumDto getNotificaEstat() {
+		return notificaEstat;
+	}
+	public void setNotificaEstat(NotificacioEnviamentEstatEnumDto notificaEstat) {
+		this.notificaEstat = notificaEstat;
+	}
 	public boolean isEntregaPostalActiva() {
 		return isEntregaPostalActiva;
 	}
@@ -248,6 +274,108 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	}
 	public void setComunicacioTipus(NotificacioComunicacioTipusEnumDto comunicacioTipus) {
 		this.comunicacioTipus = comunicacioTipus;
+	}
+	public Date getNotificaErrorData() {
+		return notificaErrorData;
+	}
+	public void setNotificaErrorData(Date notificaErrorData) {
+		this.notificaErrorData = notificaErrorData;
+	}
+	public String getNotificaErrorDescripcio() {
+		return notificaErrorDescripcio;
+	}
+	public void setNotificaErrorDescripcio(String notificaErrorDescripcio) {
+		this.notificaErrorDescripcio = notificaErrorDescripcio;
+	}
+	public String getNotificaCertificacioArxiuNom() {
+		return notificaCertificacioArxiuNom;
+	}
+	public void setNotificaCertificacioArxiuNom(String notificaCertificacioArxiuNom) {
+		this.notificaCertificacioArxiuNom = notificaCertificacioArxiuNom;
+	}
+	public Date getNotificaCertificacioData() {
+		return notificaCertificacioData;
+	}
+	public void setNotificaCertificacioData(Date notificaCertificacioData) {
+		this.notificaCertificacioData = notificaCertificacioData;
+	}
+	public Date getNotificaEstatData() {
+		return notificaEstatData;
+	}
+	public void setNotificaEstatData(Date notificaEstatData) {
+		this.notificaEstatData = notificaEstatData;
+	}
+	public String getNotificaDatatErrorDescripcio() {
+		return notificaDatatErrorDescripcio;
+	}
+	public void setNotificaDatatErrorDescripcio(String notificaDatatErrorDescripcio) {
+		this.notificaDatatErrorDescripcio = notificaDatatErrorDescripcio;
+	}
+	public String getNotificaDatatOrigen() {
+		return notificaDatatOrigen;
+	}
+	public void setNotificaDatatOrigen(String notificaDatatOrigen) {
+		this.notificaDatatOrigen = notificaDatatOrigen;
+	}
+	public String getNotificaDatatReceptorNif() {
+		return notificaDatatReceptorNif;
+	}
+	public void setNotificaDatatReceptorNif(String notificaDatatReceptorNif) {
+		this.notificaDatatReceptorNif = notificaDatatReceptorNif;
+	}
+	public String getNotificaDatatReceptorNom() {
+		return notificaDatatReceptorNom;
+	}
+	public void setNotificaDatatReceptorNom(String notificaDatatReceptorNom) {
+		this.notificaDatatReceptorNom = notificaDatatReceptorNom;
+	}
+	public String getNotificaDatatNumSeguiment() {
+		return notificaDatatNumSeguiment;
+	}
+	public void setNotificaDatatNumSeguiment(String notificaDatatNumSeguiment) {
+		this.notificaDatatNumSeguiment = notificaDatatNumSeguiment;
+	}
+	public String getNotificaCertificacioMime() {
+		return notificaCertificacioMime;
+	}
+	public void setNotificaCertificacioMime(String notificaCertificacioMime) {
+		this.notificaCertificacioMime = notificaCertificacioMime;
+	}
+	public String getNotificaCertificacioOrigen() {
+		return notificaCertificacioOrigen;
+	}
+	public void setNotificaCertificacioOrigen(String notificaCertificacioOrigen) {
+		this.notificaCertificacioOrigen = notificaCertificacioOrigen;
+	}
+	public String getNotificaCertificacioMetadades() {
+		return notificaCertificacioMetadades;
+	}
+	public void setNotificaCertificacioMetadades(String notificaCertificacioMetadades) {
+		this.notificaCertificacioMetadades = notificaCertificacioMetadades;
+	}
+	public String getNotificaCertificacioCsv() {
+		return notificaCertificacioCsv;
+	}
+	public void setNotificaCertificacioCsv(String notificaCertificacioCsv) {
+		this.notificaCertificacioCsv = notificaCertificacioCsv;
+	}
+	public String getNotificaReferencia() {
+		return notificaReferencia;
+	}
+	public void setNotificaReferencia(String notificaReferencia) {
+		this.notificaReferencia = notificaReferencia;
+	}
+	public NotificaCertificacioTipusEnumDto getNotificaCertificacioTipus() {
+		return notificaCertificacioTipus;
+	}
+	public void setNotificaCertificacioTipus(NotificaCertificacioTipusEnumDto notificaCertificacioTipus) {
+		this.notificaCertificacioTipus = notificaCertificacioTipus;
+	}
+	public NotificaCertificacioArxiuTipusEnumDto getNotificaCertificacioArxiuTipus() {
+		return notificaCertificacioArxiuTipus;
+	}
+	public void setNotificaCertificacioArxiuTipus(NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus) {
+		this.notificaCertificacioArxiuTipus = notificaCertificacioArxiuTipus;
 	}
 	//public String getCsvUuid() {
 	//	if(notificacio.getDocument().getUuid() != null) {
