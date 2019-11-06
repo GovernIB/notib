@@ -576,6 +576,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					titular.setEmail(enviament.getDestinataris().get(0).getEmail());
 					titular.setRazonSocial(enviament.getDestinataris().get(0).getRaoSocial());
 					titular.setCodigoDestino(enviament.getDestinataris().get(0).getCodiEntitatDesti());
+					enviament.getDestinataris().remove(0);
 				} else {
 					titular.setNif(enviament.getTitular().getNif());
 					titular.setNombre(enviament.getTitular().getNom());

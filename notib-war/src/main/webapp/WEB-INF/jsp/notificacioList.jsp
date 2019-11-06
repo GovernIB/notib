@@ -45,15 +45,98 @@
 .horaProcessat {
 	font-size: small;
 }
-.datepicker table tr td.today, .datepicker table tr td.today:hover { 
+.datepicker table tr td.today, .datepicker table tr td.today:hover {
 	color: #000000;
-	background: #a4a4a4 !important; 
+	background: #a4a4a4 !important;
 	background-color: #a4a4a4 !important;
 }
-
-
+.panel.panel-default.info-enviament {
+	margin-top: 6%;
+}
+.motiu_finalitzada {
+	background-color: #e0ead5;
+}
+.info_finalitzada_icon:hover {
+	cursor: pointer;
+}
+.info_finalitzada_div {
+	text-align: right;
+}
+.info_finalitzada_icon {
+	top: -16px;
+}
+.info_finalitzada_link:hover {
+	text-decoration: none !important;
+}
+.motiu_finalitzada > a {
+	display: none;
+}
 </style>
 <script type="text/javascript">
+
+
+var myHelpers = {format: returnEnviamentsStatusDiv};
+
+$.views.helpers(myHelpers);
+
+function returnEnviamentsStatusDiv(notificacioId, withClick) {
+	/*
+	"<div class='panel panel-default info-enviament'>" +
+	"<div class='panel-heading'><h3 class='panel-title'>" +
+	"<strong><spring:message code='notificacio.info.seccio.enviaments' /></strong></h3>" +
+	"</div>"
+	*/
+	var content;
+	var getUrl = "<c:url value="/notificacio/"/>" + notificacioId + "/enviament";
+
+	$.ajax({
+		type: 'GET',
+		url: getUrl,
+		async: false,
+		success: function(data) {
+			content = "<div><table class='table table-bordered' style='background-color: white; width: 100%'>";
+			content += "<thead>";
+			content +=  "<tr>" +
+						"<th>Nº</th>" +
+						"<th><spring:message code='notificacio.list.enviament.list.enviament'/></th>" +
+						"<th><spring:message code='notificacio.list.enviament.list.estat'/></th>" +
+						"</tr>";
+			content += "</thead>";
+
+			
+				for (i = 0; i < data.length; i++) {
+					var index = i + 1;
+					content += "<tbody>";
+					content += "<tr>";
+					content += "<td>" + index + "</td>";
+					content += "<td>" + data[i].id + "</td>";
+					content += "<td class='motiu_finalitzada'>" + data[i].notificaEstat + "</td>";
+					content += "<td style='display: none;'></td>";
+					content += "</tr>";
+					content += "</tbody>";
+					debugger
+				}
+				
+			content += "</table></div>"
+		},
+		error: function() {
+			alert("Error recuperant els enviaments de la notificació: " + notificacioId);
+		}
+	});
+	if (withClick) {
+		if (!$('#container_' + notificacioId).hasClass('displayed')) {
+			$('#container_' + notificacioId).append(content).show();
+			$('#container_' + notificacioId).addClass('displayed');
+		} else {
+			$('#container_' + notificacioId).empty().hide();
+			$('#container_' + notificacioId).removeClass('displayed');
+		}
+		 //$('.glyphicon').toggleClass("glyphicon-resize-small glyphicon-resize-full");
+	} else {
+		return content;
+	}
+}
+
 function formatDate(data) {
 	//Añadir ceros a los numeros de un dígito
 	Number.prototype.padLeft = function(base,chr){
@@ -62,7 +145,6 @@ function formatDate(data) {
 		}
 	if (data !== null) {
 		//dd/MM/yyyy HH:mm:SS
-		debugger
 		var procesDate = new Date(data),
 		procesDateFormat = [(procesDate.getMonth()+1).padLeft(),
 			procesDate.getDate().padLeft(),
@@ -126,7 +208,7 @@ $(document).ready(function() {
 					if (destinatari.llinatge2 != null) {
 						llinatge2Dest = destinatari.llinatge2;
 					}
-					destinataris += destinatari.nom + ' ' + llinatge1Dest + ' ' + llinatge2Dest + ' (' + destinatari.nif + '), ';	
+					destinataris += destinatari.nom + ' ' + llinatge1Dest + ' ' + llinatge2Dest + ' (' + destinatari.nif + '), ';
 				});
 				contingutTbody += '<tr>';
 				contingutTbody += '<td>' + data[i].titular.nom + ' ' + llinatge1 + ' ' + llinatge2 + '('+ data[i].titular.nif +') </td>';
@@ -154,7 +236,7 @@ $(document).ready(function() {
 				contingutTbody += '<td width="114px">';
 				if (data[i].notificaCertificacioData != null) {
 					contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/certificacioDescarregar"/>" class="btn btn-default btn-sm" title="<spring:message code="enviament.info.accio.descarregar.certificacio"/>"><span class="fa fa-download"></span></a>';
-				} else if (data[i].notificacio.estat == 'REGISTRADA' && 
+				} else if (data[i].notificacio.estat == 'REGISTRADA' &&
 						(data[i].registreEstat == 'DISTRIBUIT' || data[i].registreEstat == 'OFICI_EXTERN' || data[i].registreEstat == 'OFICI_SIR')) {
 					contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/justificantDescarregar"/>" class="btn btn-default btn-sm" title="<spring:message code="enviament.info.accio.descarregar.justificant"/>"><span class="fa fa-download"></span></a>';
 				}
@@ -274,13 +356,20 @@ $(document).ready(function() {
 							<span class="fa fa-file-o"></span>
 						{{else estat == 'PROCESSADA'}}
 							<span class="fa fa-check-circle"></span>
-							
 						{{/if}}
 						{{:~eval('notificacioEstats["' + estat + '"]')}}
+
 						{{if estat == 'PROCESSADA' && estatDate != ''}}
 							<br>
 							<p class="horaProcessat">{{:~eval('formatDate(' + estatDate+ ')')}}</p>
 						{{/if}}
+						{{if estat == 'FINALITZADA'}}
+							<div class="info_finalitzada_div">
+							<a class="info_finalitzada_link" title="<spring:message code="notificacio.list.enviament.list.informacio"/>" onclick="returnEnviamentsStatusDiv({{:id}}, true)"><span class="info_finalitzada_icon glyphicon glyphicon-menu-hamburger"/></a>
+							</div>
+							<div class="container_dialog displayed" id="container_{{:id}}">{{:~format(id, false)}}</div>
+						{{/if}}
+
 						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>errorNotificaDescripcio}}"></span>{{/if}}
 					</script>
 				</th>
@@ -292,7 +381,7 @@ $(document).ready(function() {
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="<c:url value="/notificacio/{{:id}}"/>" data-toggle="modal" data-height="700px"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="comu.boto.detalls"/></a></li>
-							{{if permisProcessar }}							
+							{{if permisProcessar }}
 								<li><a href="<c:url value="/notificacio/{{:id}}/processar"/>" data-toggle="modal"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a></li>
 							{{/if}}
 							</ul>

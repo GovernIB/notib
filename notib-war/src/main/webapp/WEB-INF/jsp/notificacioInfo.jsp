@@ -48,7 +48,7 @@
 						}
 					});
 				});
-				
+
 				$(document.body).on('hidden.bs.modal', function () {
 					$('.tab-content').load(location.href + " .tab-content");
 				});
@@ -215,11 +215,11 @@
 									<td width="30%">
 										<strong><spring:message	code="notificacio.info.document.arxiu.nom" /></strong>
 									</td>
-									<td>${notificacio.document.arxiuNom} 
+									<td>${notificacio.document.arxiuNom}
 										<a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar"/>"
 											class="btn btn-default btn-sm pull-right"
 											title="<spring:message code="notificacio.info.document.descarregar"/>">
-											<spring:message code="notificacio.info.document.descarregar"/> 
+											<spring:message code="notificacio.info.document.descarregar"/>
 												<span class="fa fa-download"></span>
 										</a>
 									</td>
@@ -353,11 +353,13 @@
 							    			<td>
 							    			<c:choose>
 							    			<c:when test="${not empty enviament.destinataris}">
+							    			<c:set var="destinataris" value=""/>
 							    				<c:forEach items="${enviament.destinataris}" var="destinatari">
-													${destinatari.nom}
-													${destinatari.llinatge1}
-													${destinatari.llinatge2}
+							    				<c:set var="destinataris" value="${destinataris} ${destinatari.nom} ${destinatari.llinatge1} ${destinatari.llinatge2} (${destinatari.nif}),"/>
 							    				</c:forEach>
+							    				<c:set var="destinatarisLength" value="${fn:length(destinataris)}"/>
+												<c:set var="destinatarisLengthLess" value="${fn:length(destinataris) - 1}"/>
+												${fn:substring(destinataris, 0, destinatarisLengthLess)}
 							    			</c:when>
 							    			<c:otherwise>
 							    				<spring:message code="notificacio.list.enviament.list.sensedestinataris"/>
@@ -459,7 +461,7 @@
 																<td>
 																<div></div>
 																	certificacio_${enviament.notificaIdentificador}.pdf
-																	
+
 																	<a href="<not:modalUrl value="/notificacio/${notificacio.id}/enviament/${enviament.id}/certificacioDescarregar"/>" class="btn btn-default btn-sm pull-right" title="<spring:message code="notificacio.info.document.descarregar"/>"><span class="fa fa-download"></span></a>
 																</td>
 															</tr>
@@ -557,7 +559,7 @@
 							</div>
 						</div>
 					</li>
-				</c:if>	
+				</c:if>
 			</ul>
 			<c:if test="${not algunaAccioDisponible}">
 				<div class="alert alert-info well-sm" role="alert">

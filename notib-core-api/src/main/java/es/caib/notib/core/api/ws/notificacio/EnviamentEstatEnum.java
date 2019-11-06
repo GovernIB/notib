@@ -36,5 +36,6 @@ public enum EnviamentEstatEnum implements Serializable {
 	FINALITZADA,
 	ENVIADA,
 	REGISTRADA,
-	PROCESSADA
+	PROCESSADA,
+	ANULADA
 }
