@@ -107,6 +107,9 @@ public abstract class AbstractNotificaHelper {
 		boolean estatsEnviamentsFinals = true;
 		Set<NotificacioEnviamentEntity> enviaments = enviament.getNotificacio().getEnviaments();
 		for (NotificacioEnviamentEntity env: enviaments) {
+			if (env.getId().equals(enviament.getId())) {
+				env = enviament;
+			}
 			if (!env.isNotificaEstatFinal()) {
 				estatsEnviamentsFinals = false;
 				break;
