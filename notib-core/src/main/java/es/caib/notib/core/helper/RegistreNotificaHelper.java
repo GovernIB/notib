@@ -214,19 +214,24 @@ public class RegistreNotificaHelper {
 		//Actualitza l'event per cada enviament
 		if (enviament != null) {
 			eventBulider.enviament(enviament);
+
+			notificacioEntity.updateNotificaError(
+					NotificacioErrorTipusEnumDto.ERROR_REGISTRE,
+					event);
+			notificacioEntity.updateEventAfegir(event);
+			notificacioEventRepository.saveAndFlush(event);
 		} else {
 			for (NotificacioEnviamentEntity enviamentEntity : enviaments) {
 				enviamentEntity.updateNotificaError(true, event);
 				eventBulider.enviament(enviamentEntity);
+				
+				notificacioEntity.updateNotificaError(
+						NotificacioErrorTipusEnumDto.ERROR_REGISTRE,
+						event);
+				notificacioEntity.updateEventAfegir(event);
+				notificacioEventRepository.saveAndFlush(event);
 			}
 		} 
-		
-		notificacioEntity.updateNotificaError(
-				NotificacioErrorTipusEnumDto.ERROR_REGISTRE,
-				event);
-		notificacioEntity.updateEventAfegir(event);
-		notificacioEventRepository.saveAndFlush(event);
-		
 	}
 	
 	private void updateEventWithoutError(
@@ -246,21 +251,11 @@ public class RegistreNotificaHelper {
 		
 		NotificacioEventEntity event = eventBulider.build();
 		
-		if (enviament != null) {
-			eventBulider.enviament(enviament);
-		} else {
-			for (NotificacioEnviamentEntity enviamentEntity : enviaments) {
-				eventBulider.enviament(enviamentEntity);
-			}
-		}
-		
 		if (arbResposta != null) {
 			notificacioEntity.updateRegistreNumero(Integer.parseInt(arbResposta.getRegistreNumero()));
 			notificacioEntity.updateRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
 			notificacioEntity.updateRegistreData(arbResposta.getRegistreData());
 			notificacioEntity.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
-			notificacioEntity.updateEventAfegir(event);
-			notificacioEventRepository.saveAndFlush(event);
 			
 			if (enviarNotificacio) {
 				notificaHelper.notificacioEnviar(notificacioEntity.getId());
@@ -269,11 +264,17 @@ public class RegistreNotificaHelper {
 				enviament.setRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
 				enviament.setRegistreData(arbResposta.getRegistreData());
 				enviament.setRegistreEstat(arbResposta.getEstat());
+				eventBulider.enviament(enviament);
+				notificacioEntity.updateEventAfegir(event);
+				notificacioEventRepository.saveAndFlush(event);
 			} else {
 				for(NotificacioEnviamentEntity enviamentEntity: enviaments) {
 					enviamentEntity.setRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
 					enviamentEntity.setRegistreData(arbResposta.getRegistreData());
 					enviamentEntity.setRegistreEstat(arbResposta.getEstat());
+					eventBulider.enviament(enviamentEntity);
+					notificacioEntity.updateEventAfegir(event);
+					notificacioEventRepository.saveAndFlush(event);
 				}
 			}
 		} else {
@@ -289,6 +290,9 @@ public class RegistreNotificaHelper {
 			for(NotificacioEnviamentEntity enviamentEntity: notificacioEntity.getEnviaments()) {
 				enviamentEntity.setRegistreNumeroFormatat(registreIdDto.getNumeroRegistreFormat());
 				enviamentEntity.setRegistreData(registreIdDto.getData());
+				eventBulider.enviament(enviamentEntity);
+				notificacioEntity.updateEventAfegir(event);
+				notificacioEventRepository.saveAndFlush(event);
 			}
 		}
 	}

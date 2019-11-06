@@ -43,7 +43,7 @@ import es.caib.notib.war.validation.ValidNifIfFisic;
         fieldName2 = "visible",
         fieldValue = "ADMINISTRACIO",
         fieldValue2 = "true",
-        dependFieldName = "dir3codi"
+        dependFieldName = "dir3Codi"
 )
 public class PersonaCommand {
 
@@ -59,7 +59,7 @@ public class PersonaCommand {
 	private String telefon;
 	@Size(max=255)
 	private String email;
-	private String dir3codi;
+	private String dir3Codi;
 	private boolean visible = true;
 	
 	
@@ -111,13 +111,12 @@ public class PersonaCommand {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public String getDir3codi() {
-		return dir3codi;
+	public String getDir3Codi() {
+		return dir3Codi;
 	}
-	public void setDir3codi(String dir3codi) {
-		this.dir3codi = dir3codi;
+	public void setDir3Codi(String dir3Codi) {
+		this.dir3Codi = dir3Codi;
 	}
-
 	public boolean isVisible() {
 		return visible;
 	}

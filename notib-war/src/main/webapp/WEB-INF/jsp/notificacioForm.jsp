@@ -350,7 +350,7 @@ $(document).ready(function() {
 		var llinatge1 = closest.find('.llinatge1');
 		var llinatge2 = closest.find('.llinatge2');
 		var nif = closest.find('.nif');
-		var dir3codi = closest.find('.dir3codi');
+		var dir3codi = closest.find('.dir3Codi');
 		
 		if ($(this).val() == 'ADMINISTRACIO') {
 			$(llinatge1).addClass('hidden');
@@ -818,8 +818,8 @@ function mostrarEntregaDeh(className) {
 										<div class="col-md-6">
 											<not:inputText name="enviaments[${j}].titular.telefon" textKey="notificacio.form.camp.titular.telefon" />
 										</div>
-										<div class="col-md-6 dir3codi hidden">
-											<not:inputText name="enviaments[${j}].titular.dir3codi" textKey="notificacio.form.camp.titular.dir3codi" required="true"/>
+										<div class="col-md-6 dir3Codi hidden">
+											<not:inputText name="enviaments[${j}].titular.dir3Codi" textKey="notificacio.form.camp.titular.dir3codi" required="true"/>
 										</div>
 										<c:if test="${isTitularAmbIncapacitat}">
 											<div class="col-md-12">
@@ -880,8 +880,8 @@ function mostrarEntregaDeh(className) {
 												<div class="col-md-4">
 													<not:inputText name="enviaments[${j}].destinataris[${i}].email" textKey="notificacio.form.camp.titular.email" labelSize="12" inputSize="12"/>
 												</div>
-												<div class="col-md-3 dir3codi hidden">
-													<not:inputText name="enviaments[${j}].destinataris[${i}].dir3codi" textKey="notificacio.form.camp.titular.dir3codi" labelSize="12" inputSize="12"/>
+												<div class="col-md-3 dir3Codi hidden">
+													<not:inputText name="enviaments[${j}].destinataris[${i}].dir3Codi" textKey="notificacio.form.camp.titular.dir3codi" labelSize="12" inputSize="12"/>
 												</div>
 												<div class="col-md-2 offset-col-md-2">
 													<div class="float-right">
