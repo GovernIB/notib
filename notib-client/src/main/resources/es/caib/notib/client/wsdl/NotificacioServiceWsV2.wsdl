@@ -299,18 +299,18 @@
 <xs:enumeration value="MORT" />
 <xs:enumeration value="LLEGIDA" />
 <xs:enumeration value="NOTIFICADA" />
+<xs:enumeration value="PENDENT" />
 <xs:enumeration value="PENDENT_ENVIAMENT" />
 <xs:enumeration value="PENDENT_SEU" />
 <xs:enumeration value="PENDENT_CIE" />
 <xs:enumeration value="PENDENT_DEH" />
 <xs:enumeration value="REBUTJADA" />
 <xs:enumeration value="SENSE_INFORMACIO" />
-<xs:enumeration value="ERROR_REGISTRE" />
-<xs:enumeration value="SIR_PENDENT" />
-<xs:enumeration value="SIR_COMUNICAT" />
-<xs:enumeration value="SIR_ERROR" />
-<xs:enumeration value="SIR_NO_DISPONIBLE" />
-<xs:enumeration value="SIR_NOTIFICAT" />
+<xs:enumeration value="FINALITZADA" />
+<xs:enumeration value="ENVIADA" />
+<xs:enumeration value="REGISTRADA" />
+<xs:enumeration value="PROCESSADA" />
+<xs:enumeration value="ANULADA" />
 </xs:restriction>
 </xs:simpleType>
 </xs:schema>
