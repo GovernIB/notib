@@ -86,38 +86,37 @@ function returnEnviamentsStatusDiv(notificacioId, withClick) {
 	$.ajax({
 		type: 'GET',
 		url: getUrl,
+		async: false,
 		success: function(data) {
-			localStorage.setItem('notificacio_' + notificacioId, JSON.stringify(data));
+			//localStorage.setItem('notificacio_' + notificacioId, JSON.stringify(data));
+			if (data != null) {
+				content = "<div><table class='table table-bordered' style='background-color: white; width: 100%'>";
+				content += "<thead>";
+				content +=  "<tr>" +
+							"<th>Nº</th>" +
+							"<th><spring:message code='notificacio.list.enviament.list.enviament'/></th>" +
+							"<th><spring:message code='notificacio.list.enviament.list.estat'/></th>" +
+							"</tr>";
+				content += "</thead>";
+				for (i = 0; i < data.length; i++) {
+					var index = i + 1;
+					content += "<tbody>";
+					content += "<tr>";
+					content += "<td>" + index + "</td>";
+					content += "<td>" + data[i].id + "</td>";
+					content += "<td class='motiu_finalitzada'>" + data[i].notificaEstat + "</td>";
+					content += "<td style='display: none;'></td>";
+					content += "</tr>";
+					content += "</tbody>";
+				}
+				content += "</table></div>"
+			}
 		},
 		error: function() {
 			alert("Error recuperant els enviaments de la notificació: " + notificacioId);
 		}
 	});
-	
-	var data = JSON.parse(localStorage.getItem('notificacio_' + notificacioId));
-	
-	if (data != null) {
-		content = "<div><table class='table table-bordered' style='background-color: white; width: 100%'>";
-		content += "<thead>";
-		content +=  "<tr>" +
-					"<th>Nº</th>" +
-					"<th><spring:message code='notificacio.list.enviament.list.enviament'/></th>" +
-					"<th><spring:message code='notificacio.list.enviament.list.estat'/></th>" +
-					"</tr>";
-		content += "</thead>";
-		for (i = 0; i < data.length; i++) {
-			var index = i + 1;
-			content += "<tbody>";
-			content += "<tr>";
-			content += "<td>" + index + "</td>";
-			content += "<td>" + data[i].id + "</td>";
-			content += "<td class='motiu_finalitzada'>" + data[i].notificaEstat + "</td>";
-			content += "<td style='display: none;'></td>";
-			content += "</tr>";
-			content += "</tbody>";
-		}
-		content += "</table></div>"
-	}
+	//var data = JSON.parse(localStorage.getItem('notificacio_' + notificacioId));
 	
 	if (withClick) {
 		if (!$('#container_' + notificacioId).hasClass('displayed')) {

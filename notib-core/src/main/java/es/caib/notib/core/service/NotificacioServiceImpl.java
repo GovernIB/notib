@@ -283,18 +283,23 @@ public class NotificacioServiceImpl implements NotificacioService {
 						).incapacitat(enviament.getTitular().isIncapacitat()).build());
 				
 				List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
-				for(Persona persona: enviament.getDestinataris()) {
-						PersonaEntity destinatari = personaRepository.saveAndFlush(PersonaEntity.getBuilderV2(
-							persona.getInteressatTipus(),
-							persona.getEmail(), 
-							persona.getLlinatge1(), 
-							persona.getLlinatge2(), 
-							persona.getNif(), 
-							persona.getNom(), 
-							persona.getTelefon(),
-							persona.getRaoSocial(),
-							persona.getDir3Codi()).incapacitat(false).build());
-					destinataris.add(destinatari);
+				if (enviament.getDestinataris() != null) {
+					for(Persona persona: enviament.getDestinataris()) {
+							if ((persona.getNif() != null && !persona.getNif().isEmpty()) || 
+									(persona.getDir3Codi() != null && !persona.getDir3Codi().isEmpty())) {
+								PersonaEntity destinatari = personaRepository.saveAndFlush(PersonaEntity.getBuilderV2(
+									persona.getInteressatTipus(),
+									persona.getEmail(), 
+									persona.getLlinatge1(), 
+									persona.getLlinatge2(), 
+									persona.getNif(), 
+									persona.getNom(), 
+									persona.getTelefon(),
+									persona.getRaoSocial(),
+									persona.getDir3Codi()).incapacitat(false).build());
+							destinataris.add(destinatari);
+						}
+					}
 				}
 				EntregaPostalViaTipusEnum viaTipus = null;
 				
