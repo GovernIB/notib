@@ -80,49 +80,45 @@ var myHelpers = {format: returnEnviamentsStatusDiv};
 $.views.helpers(myHelpers);
 
 function returnEnviamentsStatusDiv(notificacioId, withClick) {
-	/*
-	"<div class='panel panel-default info-enviament'>" +
-	"<div class='panel-heading'><h3 class='panel-title'>" +
-	"<strong><spring:message code='notificacio.info.seccio.enviaments' /></strong></h3>" +
-	"</div>"
-	*/
 	var content;
 	var getUrl = "<c:url value="/notificacio/"/>" + notificacioId + "/enviament";
 
 	$.ajax({
 		type: 'GET',
 		url: getUrl,
-		async: false,
 		success: function(data) {
-			content = "<div><table class='table table-bordered' style='background-color: white; width: 100%'>";
-			content += "<thead>";
-			content +=  "<tr>" +
-						"<th>Nº</th>" +
-						"<th><spring:message code='notificacio.list.enviament.list.enviament'/></th>" +
-						"<th><spring:message code='notificacio.list.enviament.list.estat'/></th>" +
-						"</tr>";
-			content += "</thead>";
-
-			
-				for (i = 0; i < data.length; i++) {
-					var index = i + 1;
-					content += "<tbody>";
-					content += "<tr>";
-					content += "<td>" + index + "</td>";
-					content += "<td>" + data[i].id + "</td>";
-					content += "<td class='motiu_finalitzada'>" + data[i].notificaEstat + "</td>";
-					content += "<td style='display: none;'></td>";
-					content += "</tr>";
-					content += "</tbody>";
-					debugger
-				}
-				
-			content += "</table></div>"
+			localStorage.setItem('notificacio_' + notificacioId, JSON.stringify(data));
 		},
 		error: function() {
 			alert("Error recuperant els enviaments de la notificació: " + notificacioId);
 		}
 	});
+	
+	var data = JSON.parse(localStorage.getItem('notificacio_' + notificacioId));
+	
+	if (data != null) {
+		content = "<div><table class='table table-bordered' style='background-color: white; width: 100%'>";
+		content += "<thead>";
+		content +=  "<tr>" +
+					"<th>Nº</th>" +
+					"<th><spring:message code='notificacio.list.enviament.list.enviament'/></th>" +
+					"<th><spring:message code='notificacio.list.enviament.list.estat'/></th>" +
+					"</tr>";
+		content += "</thead>";
+		for (i = 0; i < data.length; i++) {
+			var index = i + 1;
+			content += "<tbody>";
+			content += "<tr>";
+			content += "<td>" + index + "</td>";
+			content += "<td>" + data[i].id + "</td>";
+			content += "<td class='motiu_finalitzada'>" + data[i].notificaEstat + "</td>";
+			content += "<td style='display: none;'></td>";
+			content += "</tr>";
+			content += "</tbody>";
+		}
+		content += "</table></div>"
+	}
+	
 	if (withClick) {
 		if (!$('#container_' + notificacioId).hasClass('displayed')) {
 			$('#container_' + notificacioId).append(content).show();
@@ -131,9 +127,10 @@ function returnEnviamentsStatusDiv(notificacioId, withClick) {
 			$('#container_' + notificacioId).empty().hide();
 			$('#container_' + notificacioId).removeClass('displayed');
 		}
-		 //$('.glyphicon').toggleClass("glyphicon-resize-small glyphicon-resize-full");
+		localStorage.removeItem('notificacio_' + notificacioId);
 	} else {
 		return content;
+		localStorage.removeItem('notificacio_' + notificacioId);
 	}
 }
 
