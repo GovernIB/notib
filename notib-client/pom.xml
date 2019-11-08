@@ -4,9 +4,9 @@
 	<parent>
 		<groupId>es.caib.notib</groupId>
 		<artifactId>notib</artifactId>
-		<version>1.0</version>
+		<version>1.1</version>
 	</parent>
-	<version>${parent.version}.${version.revision}</version>
+	<version>${parent.version}</version>
 	<artifactId>notib-client</artifactId>
 	<dependencies>
 		<dependency>
