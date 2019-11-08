@@ -12,6 +12,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
 import es.caib.notib.core.api.dto.InteresadoWsDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
@@ -79,6 +82,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			Long tipusOperacio) {
 		RespostaConsultaRegistre rc = new RespostaConsultaRegistre();
 		try {
+			ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+			logger.info(ow.writeValueAsString(arb.getInteresados()));
+			
 			return toRespostaConsultaRegistre(getAsientoRegistralApi().crearAsientoRegistral(
 					codiDir3Entitat, 
 					toAsientoRegistralBean(arb), 
@@ -583,7 +589,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		if(interesadoWsDto.getInteresado() != null) {
 			DatosInteresadoWs interessatDades = new DatosInteresadoWs();
 			interessatDades.setTipoInteresado(interesadoWsDto.getInteresado().getTipoInteresado().longValue());
-			interessatDades.setTipoDocumentoIdentificacion("N");
+			interessatDades.setTipoDocumentoIdentificacion(interesadoWsDto.getInteresado().getTipoDocumentoIdentificacion());
 			interessatDades.setDocumento(interesadoWsDto.getInteresado().getDocumento());
 			interessatDades.setRazonSocial(interesadoWsDto.getInteresado().getRazonSocial());
 			interessatDades.setNombre(interesadoWsDto.getInteresado().getNombre());
@@ -606,7 +612,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		if(interesadoWsDto.getRepresentante() != null) {
 			DatosInteresadoWs representantDades = new DatosInteresadoWs();
 			representantDades.setTipoInteresado(interesadoWsDto.getRepresentante().getTipoInteresado().longValue());
-			representantDades.setTipoDocumentoIdentificacion("N");
+			representantDades.setTipoDocumentoIdentificacion(interesadoWsDto.getInteresado().getTipoDocumentoIdentificacion());
 			representantDades.setDocumento(interesadoWsDto.getRepresentante().getDocumento());
 			representantDades.setRazonSocial(interesadoWsDto.getRepresentante().getRazonSocial());
 			representantDades.setNombre(interesadoWsDto.getRepresentante().getNombre());
