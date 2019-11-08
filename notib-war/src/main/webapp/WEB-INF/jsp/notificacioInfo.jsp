@@ -299,7 +299,7 @@ $(document).ready(function() {
 						<tbody>
 							<c:if test="${not empty notificacio.procediment.pagadorcie.dir3codi}">
 								<tr>
-									<td><strong><spring:message
+									<td width="30%"><strong><spring:message
 												code="notificacio.info.pagador.cie.codi.dir3" /></strong></td>
 									<td>${notificacio.procediment.pagadorcie.dir3codi}</td>
 								</tr>
