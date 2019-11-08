@@ -24,35 +24,29 @@
 <script src="<c:url value="/js/webutil.common.js"/>"></script>
 <not:modalHead />
 <script type="text/javascript">
-	var eventTipus = [];
-	<c:forEach var="tipus" items="${eventTipus}">
-	eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
-	</c:forEach>
-	$(document).ready(
-			function() {
-				$('#events').on(
-						'rowinfo.dataTable',
-						function(e, td, rowData) {
-							$(td).empty();
-							$(td).append(
-									'<textarea style="width:100%" rows="10">'
-											+ rowData['errorDescripcio']
-											+ '</textarea>');
-						});
-				$('#events').on('draw.dt', function(e, settings) {
-					var api = new $.fn.dataTable.Api(settings);
-					api.rows().every(function(rowIdx, tableLoop, rowLoop) {
-						var data = this.data();
-						if (!data.error) {
-						$('td:last-child', this.node()).empty();
-						}
-					});
-				});
+var eventTipus = [];
+<c:forEach var="tipus" items="${eventTipus}">
+eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
+</c:forEach>
+$(document).ready(function() {
+	$('#events').on('rowinfo.dataTable', function(e, td, rowData) {
 
-				$(document.body).on('hidden.bs.modal', function () {
-					$('.tab-content').load(location.href + " .tab-content");
-				});
-			});
+			$(td).empty();
+			$(td).append('<textarea style="width:100%" rows="10">' + rowData['errorDescripcio'] + '</textarea>');
+	});
+	$('#events').on('draw.dt', function(e, settings) {
+		var api = new $.fn.dataTable.Api(settings);
+		api.rows().every(function(rowIdx, tableLoop, rowLoop) {
+			var data = this.data();
+			if (!data.error) {
+			$('td:last-child', this.node()).empty();
+			}
+		});
+	});
+	$(document.body).on('hidden.bs.modal', function () {
+		$('.tab-content').load(location.href + " .tab-content");
+	});
+});
 </script>
 <style type="text/css">
 .modal-backdrop {
@@ -118,7 +112,7 @@
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">
-						<strong><spring:message code="notificacio.info.seccio.dades" /><c:if test="${notificacio.permisProcessar}"><a href="<c:url value="/notificacio/${notificacio.id}/processar"/>"  class="btn btn-info btn-xs pull-right"  data-toggle="modal" data-modal-id="modal-processar"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a></c:if></strong>
+						<strong><spring:message code="notificacio.info.seccio.dades" /></strong>
 					</h3>
 				</div>
 				<table class="table table-bordered" style="width: 100%">

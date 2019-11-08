@@ -1133,7 +1133,7 @@ public class PluginHelper {
 		DatosInteresadoWsDto interessatDades = new DatosInteresadoWsDto();
 		interessatDades.setTipoInteresado(persona.getInteressatTipus().getLongVal());
 		if (persona.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-			interessatDades.setDocumento(persona.getCodiEntitatDesti());
+			interessatDades.setDocumento(persona.getDir3Codi());
 			interessatDades.setTipoDocumentoIdentificacion("O");
 		} else if (persona.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
 			interessatDades.setDocumento(persona.getNif());
@@ -1226,7 +1226,7 @@ public class PluginHelper {
 			if (titular.getInteressatTipus() != null)
 				interessatDades.setTipoInteresado(titular.getInteressatTipus().getLongVal());
 			if (titular.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-				interessatDades.setDocumento(titular.getCodiEntitatDesti());
+				interessatDades.setDocumento(titular.getDir3Codi());
 				interessatDades.setTipoDocumentoIdentificacion("O");
 			}  else if (titular.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
 				interessatDades.setDocumento(titular.getNif());
@@ -1252,7 +1252,7 @@ public class PluginHelper {
 			DatosInteresadoWsDto representantDades = new DatosInteresadoWsDto();
 			representantDades.setTipoInteresado(destinatari.getInteressatTipus().getLongVal());
 			if (destinatari.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-				representantDades.setDocumento(destinatari.getCodiEntitatDesti());
+				representantDades.setDocumento(destinatari.getDir3Codi());
 				representantDades.setTipoDocumentoIdentificacion("O");
 			} else if (destinatari.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
 				representantDades.setDocumento(destinatari.getNif());

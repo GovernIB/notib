@@ -575,7 +575,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					titular.setTelefono(enviament.getDestinataris().get(0).getTelefon());
 					titular.setEmail(enviament.getDestinataris().get(0).getEmail());
 					titular.setRazonSocial(enviament.getDestinataris().get(0).getRaoSocial());
-					titular.setCodigoDestino(enviament.getDestinataris().get(0).getCodiEntitatDesti());
+					titular.setCodigoDestino(enviament.getDestinataris().get(0).getDir3Codi());
 					enviament.getDestinataris().remove(0);
 				} else {
 					titular.setNif(enviament.getTitular().getNif());
@@ -587,7 +587,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					titular.setTelefono(enviament.getTitular().getTelefon());
 					titular.setEmail(enviament.getTitular().getEmail());
 					titular.setRazonSocial(enviament.getTitular().getRaoSocial());
-					titular.setCodigoDestino(enviament.getTitular().getCodiEntitatDesti());
+					titular.setCodigoDestino(enviament.getTitular().getDir3Codi());
 				}
 				
 				envio.setTitular(titular);
@@ -604,7 +604,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 							destinatario.setTelefono(destinatari.getTelefon());
 							destinatario.setEmail(destinatari.getEmail());
 							destinatario.setRazonSocial(destinatari.getRaoSocial());
-							destinatario.setCodigoDestino(destinatari.getCodiEntitatDesti());
+							destinatario.setCodigoDestino(destinatari.getDir3Codi());
 							destinatarios.getDestinatario().add(destinatario);
 						}
 					}

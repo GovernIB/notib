@@ -59,6 +59,7 @@ public class PersonaCommand {
 	private String telefon;
 	@Size(max=255)
 	private String email;
+	@Size(max=9)	
 	private String dir3Codi;
 	private boolean visible = true;
 	

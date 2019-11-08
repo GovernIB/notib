@@ -45,7 +45,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	@Column(name = "rao_social", length = 100)
 	private String raoSocial;
 	@Column(name = "cod_entitat_desti", length = 9)
-	private String codiEntitatDesti;
+	private String dir3Codi;
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_env_id")
 	private NotificacioEnviamentEntity enviament;
@@ -101,11 +101,11 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	public void setRaoSocial(String raoSocial) {
 		this.raoSocial = raoSocial;
 	}
-	public String getCodiEntitatDesti() {
-		return codiEntitatDesti;
+	public String getDir3Codi() {
+		return dir3Codi;
 	}
-	public void setCodiEntitatDesti(String codiEntitatDesti) {
-		this.codiEntitatDesti = codiEntitatDesti;
+	public void setDir3Codi(String dir3Codi) {
+		this.dir3Codi = dir3Codi;
 	}
 	public NotificacioEnviamentEntity getEnviament() {
 		return enviament;
@@ -192,7 +192,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 			built.incapacitat = false;
 			built.interessatTipus = interessatTipus;
 			built.email = email;
-			built.codiEntitatDesti = codiEntitatDesti;
+			built.dir3Codi = codiEntitatDesti;
 			built.llinatge1 = llinatge1;
 			built.llinatge2 = llinatge2;
 			built.nif = nif;

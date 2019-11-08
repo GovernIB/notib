@@ -125,6 +125,13 @@ body {
 		</c:if>		
 	</c:otherwise>
 </c:choose>
+
+.panel-heading.processarButton {
+	height: 65px;
+}
+.btn-processar {
+	margin-top: 10px;
+}
 </style>
 </head>
 <body>
@@ -293,15 +300,29 @@ body {
 	</div>
 	<div class="container container-main container-custom">
 		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h2>
-					<c:set var="metaTitleIconClass"><decorator:getProperty property="meta.title-icon-class"/></c:set>
-					<c:if test="${not empty metaTitleIconClass}"><span class="${metaTitleIconClass}"></span></c:if>
-					<decorator:title />
-					<small><decorator:getProperty property="meta.subtitle"/></small>
-					
-				</h2>
-			</div>
+				<c:choose>
+					<c:when test="${notificacio.permisProcessar}">
+						<div class="panel-heading processarButton">
+							<h2 class="col-md-8">
+								<c:set var="metaTitleIconClass"><decorator:getProperty property="meta.title-icon-class"/></c:set>
+								<c:if test="${not empty metaTitleIconClass}"><span class="${metaTitleIconClass}"></span></c:if>
+								<decorator:title />
+								<small><decorator:getProperty property="meta.subtitle"/></small>
+							</h2>
+							<a href="<c:url value="/notificacio/${notificacio.id}/processar"/>"  class="btn btn-info pull-right btn-processar"  data-toggle="modal" data-modal-id="modal-processar"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a>
+						</div>
+					</c:when>
+					<c:otherwise>
+						<div class="panel-heading">
+							<h2>
+								<c:set var="metaTitleIconClass"><decorator:getProperty property="meta.title-icon-class"/></c:set>
+								<c:if test="${not empty metaTitleIconClass}"><span class="${metaTitleIconClass}"></span></c:if>
+								<decorator:title />
+								<small><decorator:getProperty property="meta.subtitle"/></small>
+							</h2>
+						</div>
+					</c:otherwise>
+				</c:choose>
 			<div class="panel-body">
 				<div id="contingut-missatges"><not:missatges/></div>
     			<decorator:body />
