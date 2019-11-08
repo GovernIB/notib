@@ -55,6 +55,9 @@ $(document).ready(function() {
 .modal.in {
     background-color: rgba(0,0,0,0.5);
 }
+.btn-certificacio {
+	margin-top: 5%;
+}
 </style>
 </head>
 <body>
@@ -387,8 +390,8 @@ $(document).ready(function() {
 																	<td><strong><spring:message code="enviament.info.seu.registre.justificant"/></strong></td>
 																	<td>
 																	<a href="<not:modalUrl value="/notificacio/${notificacio.id}/enviament/${enviament.id}/justificantDescarregar"/>" onerror="location.reload();" class="btn btn-default btn-sm pull-right">
-																		<span class="fa fa-download"></span>
 																		<spring:message code="enviament.info.accio.descarregar.justificant"/>
+																		<span class="fa fa-download"></span>
 																	</a>
 																	</td>
 																<tr>
@@ -453,10 +456,12 @@ $(document).ready(function() {
 															<tr>
 																<td><strong><spring:message code="enviament.info.notifica.certificacio.document"/></strong></td>
 																<td>
-																<div></div>
 																	certificacio_${enviament.notificaIdentificador}.pdf
 
-																	<a href="<not:modalUrl value="/notificacio/${notificacio.id}/enviament/${enviament.id}/certificacioDescarregar"/>" class="btn btn-default btn-sm pull-right" title="<spring:message code="notificacio.info.document.descarregar"/>"><span class="fa fa-download"></span></a>
+																	<a href="<not:modalUrl value="/notificacio/${notificacio.id}/enviament/${enviament.id}/certificacioDescarregar"/>" class="btn btn-default btn-sm pull-right btn-certificacio" title="<spring:message code="enviament.info.notifica.certificacio.num.descarregar"/>">
+																		<spring:message code="enviament.info.notifica.certificacio.num.descarregar"/>
+																		<span class="fa fa-download"></span>
+																	</a>
 																</td>
 															</tr>
 														</tbody>
