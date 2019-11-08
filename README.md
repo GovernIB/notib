@@ -10,9 +10,9 @@ NOTIB ofereix una plataforma  per a realitzar i gestionar totes les comunicacion
 
 **Documentació**
 
->- [Manual d'instal·lació](https://github.com/GovernIB/notib/raw/notib-1.0/doc/pdf/NOTIB_instalacio.pdf)
->- [Manual d'integració](https://github.com/GovernIB/notib/raw/notib-1.0/doc/pdf/NOTIB_integracio.pdf)
->- [Manual de configuració](https://github.com/GovernIB/notib/raw/notib-1.0/doc/pdf/NOTIB_configuracio.pdf)
->- [Manual d'usuari](https://github.com/GovernIB/notib/raw/notib-1.0/doc/pdf/NOTIB_usuari.pdf)
->- [Manual de plugins](https://github.com/GovernIB/notib/raw/notib-1.0/doc/pdf/NOTIB_plugins.pdf)
->- [Model de dades](https://github.com/GovernIB/notib/raw/notib-1.0/doc/pdf/NOTIB_model_dades.pdf)
+>- [Manual d'usuari](https://github.com/GovernIB/notib/raw/notib-1.1/doc/pdf/NOTIB_usuari.pdf)
+>- [Manual d'instal·lació](https://github.com/GovernIB/notib/raw/notib-1.1/doc/pdf/NOTIB_instalacio.pdf)
+>- [Manual d'administració](https://github.com/GovernIB/notib/raw/notib-1.1/doc/pdf/NOTIB_administracio.pdf)
+>- [Manual d'integració](https://github.com/GovernIB/notib/raw/notib-1.1/doc/pdf/NOTIB_integracio.pdf)
+>- [Manual de plugins](https://github.com/GovernIB/notib/raw/notib-1.1/doc/pdf/NOTIB_plugins.pdf)
+>- [Model de dades](https://github.com/GovernIB/notib/raw/notib-1.1/doc/pdf/NOTIB_model_dades.pdf)
