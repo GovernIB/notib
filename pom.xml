@@ -15,7 +15,7 @@
 		<ehcache.version>2.10.1</ehcache.version>
 		<orika.version>1.4.6</orika.version>
 		<jackson.version>2.6.3</jackson.version>
-		<regweb.version>3.1.1</regweb.version>
+		<regweb.version>3.1.2</regweb.version>
 		<dir3caib.version>1.0.7</dir3caib.version>
 		<slf4j.version>1.6.6</slf4j.version>
 		<cxf.version>2.2.12</cxf.version>
@@ -24,7 +24,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<arxiu.api.version>1.0.4</arxiu.api.version>
 		<lombok.version>1.18.6</lombok.version>
-		<version.revision>0</version.revision>
+		<version.revision>1</version.revision>
 		<version.full>${project.version}.${version.revision}</version.full>
 	</properties>
 	<modules>
