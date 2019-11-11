@@ -82,13 +82,15 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			Long tipusOperacio) {
 		RespostaConsultaRegistre rc = new RespostaConsultaRegistre();
 		try {
-			ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-			logger.info(ow.writeValueAsString(arb.getInteresados()));
+//			ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+//			logger.info(ow.writeValueAsString(arb.getInteresados()));
 			
 			return toRespostaConsultaRegistre(getAsientoRegistralApi().crearAsientoRegistral(
+					null,
 					codiDir3Entitat, 
 					toAsientoRegistralBean(arb), 
 					tipusOperacio,
+					true,
 					false));
 		} catch (WsI18NException e) {
 			rc.setErrorCodi("0");
@@ -113,7 +115,10 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			long tipusRegistre){
 		RespostaJustificantRecepcio rj = new RespostaJustificantRecepcio();
 		try {
-			return toRespostaJustificantRecepcio(getAsientoRegistralApi().obtenerJustificante(codiDir3Entitat, numeroRegistreFormatat, tipusRegistre));
+			return toRespostaJustificantRecepcio(getAsientoRegistralApi().obtenerJustificante(
+					codiDir3Entitat, 
+					numeroRegistreFormatat, 
+					tipusRegistre));
 		} catch (WsI18NException e) {
 			rj.setErrorCodi("0");
 			rj.setErrorDescripcio("No s'ha pogut obtenir el justificant");
@@ -201,6 +206,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 					anexo.setValidezDocumento("0" + 1L); //Copia
 //					anexo.setOrigenCiudadanoAdmin(1); //Administaración
 //					anexo.setTipoDocumental("TD01");
+					anexo.setJustificante(false);
 					anexo.setOrigenCiudadanoAdmin(document.getOrigen());
 					anexo.setTipoDocumental(getTipusDocumental(document.getTipusDocumental()));
 					//Dettached
