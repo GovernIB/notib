@@ -16,6 +16,7 @@ import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
@@ -48,6 +49,12 @@ public class RegistreNotificaHelper {
 			NotificacioEntity notificacioEntity,
 			List<NotificacioEnviamentDtoV2> enviaments) {
 		if (isArxiuEmprarSir()) {
+			String dir3Codi;
+			if (notificacioEntity.getEntitat().getDir3CodiReg() != null)
+				dir3Codi = notificacioEntity.getEntitat().getDir3CodiReg();
+			else
+				dir3Codi = notificacioEntity.getEntitat().getDir3Codi();
+			
 			if(NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus())) {
 				//Regweb3 + SIR
 				boolean totsAdministracio = true;
@@ -64,7 +71,10 @@ public class RegistreNotificaHelper {
 									notificacioEntity, 
 									enviament);
 							notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
-							RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(notificacioEntity.getEntitat().getDir3Codi(), arb, 2L);
+							RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(
+									dir3Codi, 
+									arb, 
+									2L);
 							//Registrar event
 							if(arbResposta.getErrorDescripcio() != null) {
 								updateEventWithError(
@@ -80,7 +90,8 @@ public class RegistreNotificaHelper {
 										notificacioEntity,
 										enviament,
 										null,
-										false);
+										false,
+										totsAdministracio);
 							}
 						} catch (Exception ex) {
 							logger.error(
@@ -95,7 +106,10 @@ public class RegistreNotificaHelper {
 								notificacioEntity, 
 								notificacioEntity.getEnviaments());
 						notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
-						RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(notificacioEntity.getEntitat().getDir3Codi(), arb, 1L);
+						RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(
+								dir3Codi, 
+								arb, 
+								1L);
 						//Registrar event
 						if(arbResposta.getErrorCodi() != null) {
 							updateEventWithError(
@@ -111,7 +125,8 @@ public class RegistreNotificaHelper {
 									notificacioEntity,
 									null,
 									notificacioEntity.getEnviaments(),
-									true);
+									true,
+									false);
 						}
 					} catch (Exception ex) {
 						logger.error(
@@ -126,7 +141,10 @@ public class RegistreNotificaHelper {
 							notificacioEntity, 
 							notificacioEntity.getEnviaments());
 					notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
-					RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(notificacioEntity.getEntitat().getDir3Codi(), arb, 1L);
+					RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(
+							dir3Codi, 
+							arb, 
+							1L);
 					//Registrar event
 					if(arbResposta.getErrorCodi() != null) {
 						updateEventWithError(
@@ -142,7 +160,8 @@ public class RegistreNotificaHelper {
 								notificacioEntity,
 								null,
 								notificacioEntity.getEnviaments(),
-								true);
+								true,
+								false);
 					}
 				} catch (Exception ex) {
 					logger.error(
@@ -176,7 +195,8 @@ public class RegistreNotificaHelper {
 							notificacioEntity,
 							null,
 							notificacioEntity.getEnviaments(),
-							true);
+							true,
+							false);
 				}
 			} catch (Exception ex) {
 				logger.error(
@@ -240,7 +260,8 @@ public class RegistreNotificaHelper {
 			NotificacioEntity notificacioEntity,
 			NotificacioEnviamentEntity enviament,
 			Set<NotificacioEnviamentEntity> enviaments,
-			boolean enviarNotificacio) {
+			boolean enviarNotificacio,
+			boolean totsAdministracio) {
 		//Crea un nou event
 		NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
 				NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
@@ -260,10 +281,20 @@ public class RegistreNotificaHelper {
 			if (enviarNotificacio) {
 				notificaHelper.notificacioEnviar(notificacioEntity.getId());
 			}
+			//Comunicació + administració (SIR)
+			if (totsAdministracio) {
+				notificacioEntity.updateEstat(NotificacioEstatEnumDto.ENVIADA);
+			}
 			if (enviament != null) {
 				enviament.setRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
 				enviament.setRegistreData(arbResposta.getRegistreData());
 				enviament.setRegistreEstat(arbResposta.getEstat());
+				
+				//Comunicació + administració (SIR)
+				if (totsAdministracio) {
+					enviament.setNotificaEstat(NotificacioEnviamentEstatEnumDto.ENVIAT_SIR);
+				}
+				
 				eventBulider.enviament(enviament);
 				notificacioEntity.updateEventAfegir(event);
 				notificacioEventRepository.saveAndFlush(event);
@@ -272,6 +303,12 @@ public class RegistreNotificaHelper {
 					enviamentEntity.setRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
 					enviamentEntity.setRegistreData(arbResposta.getRegistreData());
 					enviamentEntity.setRegistreEstat(arbResposta.getEstat());
+					
+					//Comunicació + administració (SIR)
+					if (totsAdministracio) {
+						enviamentEntity.setNotificaEstat(NotificacioEnviamentEstatEnumDto.ENVIAT_SIR);
+					}
+					
 					eventBulider.enviament(enviamentEntity);
 					notificacioEntity.updateEventAfegir(event);
 					notificacioEventRepository.saveAndFlush(event);

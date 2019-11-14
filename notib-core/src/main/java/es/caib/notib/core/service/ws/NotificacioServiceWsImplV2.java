@@ -62,6 +62,7 @@ import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.helper.CaducitatHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.CreacioSemaforDto;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PluginHelper;
@@ -362,9 +363,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							enviamentsEntity, 
 							NotificacioEnviamentDtoV2.class);
 					
-					registreNotificaHelper.realitzarProcesRegistrarNotificar(
-							notificacioGuardada,
-							enviaments);
+					synchronized(CreacioSemaforDto.getCreacioSemafor()) {
+						registreNotificaHelper.realitzarProcesRegistrarNotificar(
+								notificacioGuardada,
+								enviaments);
+					}
+					
 				} else {
 					List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacioGuardada);
 					for (NotificacioEnviamentEntity enviament : enviamentsEntity) {

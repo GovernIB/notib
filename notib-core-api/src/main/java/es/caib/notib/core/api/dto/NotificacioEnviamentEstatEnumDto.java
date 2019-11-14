@@ -51,6 +51,7 @@ import java.io.Serializable;
  *  - Processada: La notificación/comunicación se ha marcado como procesada por algun motivo.
  *  - Anulada: Notificación incorrecta o errónea
  * 
+ *  - ENVIAT_SIR: Comunicació enviada a registre.
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum NotificacioEnviamentEstatEnumDto implements Serializable {
@@ -80,5 +81,6 @@ public enum NotificacioEnviamentEstatEnumDto implements Serializable {
 	ENVIADA,
 	REGISTRADA,
 	PROCESSADA,
-	ANULADA
+	ANULADA,
+	ENVIAT_SIR
 }

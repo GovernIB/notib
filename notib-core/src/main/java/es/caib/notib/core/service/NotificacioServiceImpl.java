@@ -68,6 +68,7 @@ import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.CreacioSemaforDto;
 import es.caib.notib.core.helper.EmailHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.NotificaHelper;
@@ -327,10 +328,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 			List<NotificacioEnviamentDtoV2> enviamentsDto = conversioTipusHelper.convertirList(
 					notificacio.getEnviaments(), 
 					NotificacioEnviamentDtoV2.class);
-			
-			registreNotificaHelper.realitzarProcesRegistrarNotificar(
-					notificacioEntity,
-					enviamentsDto);	
+			synchronized(CreacioSemaforDto.getCreacioSemafor()) {
+				registreNotificaHelper.realitzarProcesRegistrarNotificar(
+						notificacioEntity,
+						enviamentsDto);	
+			}
 		}
 
 		List<NotificacioEntity> notificacions = notificacioRepository.findByEntitatId(entitatId);
@@ -891,11 +893,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 		List<NotificacioEnviamentDtoV2> enviaments = conversioTipusHelper.convertirList(
 				enviamentsEntity, 
 				NotificacioEnviamentDtoV2.class);
-
-		registreNotificaHelper.realitzarProcesRegistrarNotificar(
-				notificacioEntity,
-				enviaments);
-
+		
+		synchronized(CreacioSemaforDto.getCreacioSemafor()) {
+			registreNotificaHelper.realitzarProcesRegistrarNotificar(
+					notificacioEntity,
+					enviaments);
+		}
+		
 		return registresIdDto;
 	}
 

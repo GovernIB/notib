@@ -484,6 +484,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public NotificacioEnviamentEstatEnumDto getNotificaEstat() {
 		return notificaEstat;
 	}
+	public void setNotificaEstat(NotificacioEnviamentEstatEnumDto notificaEstat) {
+		this.notificaEstat = notificaEstat;
+	}
 	public Date getNotificaEstatData() {
 		return notificaEstatData;
 	}
