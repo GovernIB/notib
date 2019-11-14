@@ -311,6 +311,7 @@
 <xs:enumeration value="REGISTRADA" />
 <xs:enumeration value="PROCESSADA" />
 <xs:enumeration value="ANULADA" />
+<xs:enumeration value="ENVIAT_SIR" />
 </xs:restriction>
 </xs:simpleType>
 </xs:schema>
