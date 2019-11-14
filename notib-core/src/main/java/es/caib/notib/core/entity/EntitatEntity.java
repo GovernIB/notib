@@ -36,6 +36,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	private EntitatTipusEnumDto tipus;
 	@Column(name = "dir3_codi", length = 9, nullable = false)
 	private String dir3Codi;
+	@Column(name = "dir3_codi_reg", length = 9)
+	private String dir3CodiReg;
 	@Column(name = "api_key", length = 64, nullable = false)
 	private String apiKey;
 	@Column(name = "amb_entrega_deh", nullable = false)
@@ -100,11 +102,15 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	public TipusDocumentEnumDto getTipusDocDefault() {
 		return tipusDocDefault;
 	}
+	public String getDir3CodiReg() {
+		return dir3CodiReg;
+	}
 	public void update(
 			String codi,
 			String nom,
 			EntitatTipusEnumDto tipus,
 			String dir3Codi,
+			String dir3CodiReg,
 			String apiKey,
 			boolean ambEntregaDeh,
 			String descripcio,
@@ -118,6 +124,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 		this.descripcio = descripcio;
 		this.tipus = tipus;
 		this.dir3Codi = dir3Codi;
+		this.dir3CodiReg = dir3CodiReg;
 		this.apiKey = apiKey;
 		this.ambEntregaDeh = ambEntregaDeh;
 		this.logoCapBytes = logoCapBytes;
@@ -137,6 +144,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			String nom,
 			EntitatTipusEnumDto tipus,
 			String dir3Codi,
+			String dir3CodiReg,
 			String apiKey,
 			boolean ambEntregaDeh,
 			byte[] logoCapBytes,
@@ -149,6 +157,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				nom,
 				tipus,
 				dir3Codi,
+				dir3CodiReg,
 				apiKey,
 				ambEntregaDeh,
 				logoCapBytes,
@@ -165,6 +174,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				String nom,
 				EntitatTipusEnumDto tipus,
 				String dir3Codi,
+				String dir3CodiReg,
 				String apiKey,
 				boolean ambEntregaDeh,
 				byte[] logoCapBytes,
@@ -177,6 +187,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			built.nom = nom;
 			built.tipus = tipus;
 			built.dir3Codi = dir3Codi;
+			built.dir3CodiReg = dir3CodiReg;
 			built.activa = true;
 			built.apiKey = apiKey;
 			built.ambEntregaDeh = ambEntregaDeh;

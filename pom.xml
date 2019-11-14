@@ -24,7 +24,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<arxiu.api.version>1.0.4</arxiu.api.version>
 		<lombok.version>1.18.6</lombok.version>
-		<version.revision>1</version.revision>
+		<version.error></version.error>
+		<version.revision>2</version.revision>
 		<version.full>${project.version}.${version.revision}</version.full>
 	</properties>
 	<modules>

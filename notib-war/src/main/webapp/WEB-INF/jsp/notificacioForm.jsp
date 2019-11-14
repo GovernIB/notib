@@ -58,11 +58,6 @@
 .select2-container--bootstrap {
 	width: 100% !important;
 }
-.comentari {
-	font-size: 12px;
-	color: #999;
-	margin-bottom: 0px;
-}
 .delete {
 	top: 27px;
 }

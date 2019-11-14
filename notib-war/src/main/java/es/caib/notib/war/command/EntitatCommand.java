@@ -38,10 +38,10 @@ public class EntitatCommand {
 	private EntitatTipusEnumDto tipus;
 	@NotEmpty
 	@Size(max=9)
-//	@DocumentIdentitat
 	private String dir3Codi;
 	@NotEmpty
 	private String apiKey;
+	private String dir3CodiReg;
 	private boolean ambEntregaDeh;
 	private String descripcio;
 	private MultipartFile logoCap;
@@ -89,6 +89,12 @@ public class EntitatCommand {
 	}
 	public void setApiKey(String apiKey) {
 		this.apiKey = apiKey;
+	}
+	public String getDir3CodiReg() {
+		return dir3CodiReg;
+	}
+	public void setDir3CodiReg(String dir3CodiReg) {
+		this.dir3CodiReg = dir3CodiReg;
 	}
 	public boolean isAmbEntregaDeh() {
 		return ambEntregaDeh;

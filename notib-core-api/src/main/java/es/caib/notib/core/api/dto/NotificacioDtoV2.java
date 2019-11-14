@@ -40,6 +40,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private String motiu;
 	private String numExpedient;
 	private boolean permisProcessar;
+	private EntitatDto entitat;
 	
 	public Long getId() {
 		return id;
@@ -175,6 +176,12 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	}
 	public void setPermisProcessar(boolean permisProcessar) {
 		this.permisProcessar = permisProcessar;
+	}
+	public EntitatDto getEntitat() {
+		return entitat;
+	}
+	public void setEntitat(EntitatDto entitat) {
+		this.entitat = entitat;
 	}
 	public String getUsuariCodi() {
 		return usuariCodi;

@@ -223,9 +223,11 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			for (DadesInteressat dadesInteressat : registreSortida.getDadesInteressat()) {
 				datosInteresado.setApellido1(dadesInteressat.getCognom1());
 				datosInteresado.setApellido2(dadesInteressat.getCognom2());
-				datosInteresado.setTipoDocumentoIdentificacion(RegistreInteressatDocumentTipusDtoEnum.NIF.name());
+				datosInteresado.setTipoDocumentoIdentificacion(dadesInteressat.getTipusDocumentIdentificacio().getValor());
 				datosInteresado.setDocumento(dadesInteressat.getNif());
 				datosInteresado.setNombre(dadesInteressat.getNom());
+				if (dadesInteressat.getTipusInteressat().equals(1L))
+					datosInteresado.setRazonSocial(dadesInteressat.getNom());
 				datosInteresado.setTipoInteresado(dadesInteressat.getTipusInteressat());
 				interesado.setInteresado(datosInteresado);
 			}
@@ -233,9 +235,11 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 				DadesRepresentat dadesRepresentat = registreSortida.getDadesRepresentat();
 				datosRepresentante.setApellido1(dadesRepresentat.getCognom1());
 				datosRepresentante.setApellido2(dadesRepresentat.getCognom2());
-				datosRepresentante.setTipoDocumentoIdentificacion(RegistreInteressatDocumentTipusDtoEnum.NIF.name());
+				datosRepresentante.setTipoDocumentoIdentificacion(dadesRepresentat.getTipusDocumentIdentificacio().getValor());
 				datosRepresentante.setDocumento(dadesRepresentat.getNif());
 				datosRepresentante.setNombre(dadesRepresentat.getNom());
+				if (dadesRepresentat.getTipusInteressat().equals(1L))
+					datosInteresado.setRazonSocial(dadesRepresentat.getNom());
 				datosRepresentante.setTipoInteresado(dadesRepresentat.getTipusInteressat());
 				interesado.setRepresentante(datosRepresentante);
 			}

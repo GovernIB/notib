@@ -40,6 +40,11 @@
 .info-length {
 	font-size: x-small;
 }
+.comentari {
+	font-size: 12px;
+	color: #999;
+	margin-bottom: 0px;
+}
 </style>
 <div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>"<c:if test="${multiple}"> data-toggle="multifield"</c:if>>
 <c:choose>

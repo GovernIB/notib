@@ -93,6 +93,7 @@ $(document).ready(function() {
 			<not:inputText name="nom" textKey="entitat.form.camp.nom" required="true"/>
 			<not:inputSelect name="tipus" textKey="entitat.form.camp.tipus" optionEnum="EntitatTipusEnumDto" required="true"/>
 			<not:inputText name="dir3Codi" textKey="entitat.form.camp.codidir3" required="true"/>
+			<not:inputText name="dir3CodiReg" textKey="entitat.form.camp.codidir3reg" info="true" messageInfo="entitat.form.camp.codidir3reg.info"/>
 			<not:inputText name="apiKey" textKey="entitat.form.camp.apiKey" required="true"/>
 			<not:inputCheckbox name="ambEntregaDeh" textKey="entitat.form.camp.entregadeh"/>
 			<not:inputTextarea name="descripcio" textKey="entitat.form.camp.descripcio"/>

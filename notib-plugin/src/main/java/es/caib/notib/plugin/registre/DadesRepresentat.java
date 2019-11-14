@@ -1,5 +1,7 @@
 package es.caib.notib.plugin.registre;
 
+import es.caib.notib.core.api.dto.RegistreInteressatDocumentTipusDtoEnum;
+
 /**
  * Informació sobre la persona representada en una anotació
  * de registre.
@@ -23,6 +25,8 @@ public class DadesRepresentat {
 	private String provinciaNom;
 	private String municipiCodi;
 	private String municipiNom;
+	private RegistreInteressatDocumentTipusDtoEnum tipusDocumentIdentificacio;
+	
 	public String getEntitatCodi() {
 		return entitatCodi;
 	}
@@ -106,6 +110,12 @@ public class DadesRepresentat {
 	}
 	public void setMunicipiNom(String municipiNom) {
 		this.municipiNom = municipiNom;
+	}
+	public RegistreInteressatDocumentTipusDtoEnum getTipusDocumentIdentificacio() {
+		return tipusDocumentIdentificacio;
+	}
+	public void setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum tipusDocumentIdentificacio) {
+		this.tipusDocumentIdentificacio = tipusDocumentIdentificacio;
 	}
 
 
