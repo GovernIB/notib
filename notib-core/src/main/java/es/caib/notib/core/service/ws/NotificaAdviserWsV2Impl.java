@@ -85,8 +85,8 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			Holder<String> codigoRespuesta,
 			Holder<String> descripcionRespuesta, 
 			Holder<Opciones> opcionesResultadoSincronizarEnvio) {
-		logger.info("--------------------------------------------------------------");
-		logger.info("Processar petició dins l'Adviser...");
+		logger.debug("--------------------------------------------------------------");
+		logger.debug("Processar petició dins l'Adviser...");
 		NotificacioEnviamentEntity enviament = null;
 		NotificacioEventEntity.Builder eventBuilder = null;
 		NotificacioEventEntity event = null;
@@ -162,7 +162,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 								null,
 								null,
 								enviament);
-						logger.info("Registrant event callbackdatat de l'Adviser...");
+						logger.debug("Registrant event callbackdatat de l'Adviser...");
 						//Crea un nou event builder
 						eventBuilder = NotificacioEventEntity.getBuilder(
 								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
@@ -176,6 +176,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						
 						codigoRespuesta.value = "000";
 						descripcionRespuesta.value = "OK";
+						logger.debug("Event callbackdatat registrat correctament: " + event.getTipus().name());
 					} else {
 						logger.error(
 								"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
@@ -202,7 +203,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			}
 			//if datado + certificació
 			if (tipoEntrega.equals(BigInteger.valueOf(2L))) {
-				logger.info("guardant certificació...");
+				logger.debug("Guardant certificació...");
 				certificacionOrganismo(
 						acusePDF,
 						organismoEmisor,
@@ -213,6 +214,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						enviament,
 						eventBuilder,
 						event);
+				logger.debug("Certificació guardada correctament.");
 			}
 		} catch (DatatypeConfigurationException ex) {
 			codigoRespuesta.value = "004";
@@ -224,6 +226,9 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					ex);
 			if (enviament != null) {
 				//Crea un nou event
+				logger.debug(
+						"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
+								"identificadorDestinatario=" + identificador + ")");
 				eventBuilder = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
 						enviament.getNotificacio()).
@@ -236,6 +241,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					eventBuilder.callbackInicialitza();
 				
 				event = eventBuilder.build();
+				logger.debug("Error event: " + event.getDescripcio());
 				enviament.updateNotificaError(
 						true,
 						event);
@@ -245,6 +251,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		}
 		if (enviament != null) {
 			if (event == null) {
+				logger.debug("L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null");
 				eventBuilder = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
 						enviament.getNotificacio()).
@@ -252,14 +259,16 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						descripcio(estado).
 						error(true).
 						errorDescripcio("Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value);
+				
 				event = eventBuilder.build();
+				logger.debug("Error event: " + event.getDescripcio());
 				enviament.updateNotificaError(
 						true,
 						event);
 			}
 			enviament.getNotificacio().updateEventAfegir(event);
 			notificacioEventRepository.save(event);
-			logger.info("Peticició processada correctament.");
+			logger.debug("Peticició processada correctament.");
 		}
 	}
 
@@ -282,15 +291,15 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					if (enviament != null) {
 						//si hi ha una certificació
 						if (enviament.getNotificaCertificacioArxiuId() != null) {
-							logger.info("Esborrant certificació antiga...");
+							logger.debug("Esborrant certificació antiga...");
 							pluginHelper.gestioDocumentalDelete(
 									enviament.getNotificaCertificacioArxiuId(),
 									PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
 						}
-						logger.info("Nou estat enviament: " + enviament.getNotificaEstatDescripcio());
+						logger.debug("Nou estat enviament: " + enviament.getNotificaEstatDescripcio());
 						
 						if (enviament.getNotificacio() != null)
-							logger.info("Nou estat notificació: " + enviament.getNotificacio().getEstat().name());
+							logger.debug("Nou estat notificació: " + enviament.getNotificacio().getEstat().name());
 						// Hash document certificacio
 						if (acusePDF.getContenido() != null) {
 							logger.info("Guardant certificació acusament de rebut...");
@@ -298,7 +307,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 									PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
 									new ByteArrayInputStream(Base64.decode(acusePDF.getContenido())));
 						}
-						logger.info("Actualitzant enviament amb la certificació. ID gestió documental: " + gestioDocumentalId);
+						logger.debug("Actualitzant enviament amb la certificació. ID gestió documental: " + gestioDocumentalId);
 						enviament.updateNotificaCertificacio(
 								new Date(),
 								gestioDocumentalId,
@@ -311,7 +320,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 								NotificaCertificacioTipusEnumDto.ACUSE,
 								NotificaCertificacioArxiuTipusEnumDto.PDF,
 								null); // núm. seguiment
-						logger.info("Registrant event callbackcertificacio de l'Adviser...");
+						logger.debug("Registrant event callbackcertificacio de l'Adviser...");
 						eventBuilder = NotificacioEventEntity.getBuilder(
 								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
 								enviament.getNotificacio()).
@@ -323,6 +332,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						
 						codigoRespuesta.value = "000";
 						descripcionRespuesta.value = "OK";
+						logger.debug("Event callbackcertificacio registrat correctament: " + event.getTipus().name());
 					} else {
 						logger.error(
 								"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
@@ -353,6 +363,9 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					"identificadorDestinatario=" + identificador + ")",
 					ex);
 			if (enviament != null) {
+				logger.debug(
+						"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
+						"identificadorDestinatario=" + identificador + ")");
 				eventBuilder = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
 						enviament.getNotificacio()).
@@ -361,6 +374,8 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						errorDescripcio(ExceptionUtils.getStackTrace(ex));
 				if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
 					eventBuilder.callbackInicialitza();
+				
+				logger.debug("Error event: " + event.getDescripcio());
 				event = eventBuilder.build();
 				enviament.updateNotificaError(
 						true,
@@ -371,6 +386,8 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		}
 		if (enviament != null) {
 			if (event == null) {
+				logger.debug("L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null (certificació).");
+
 				eventBuilder = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
 						enviament.getNotificacio()).
@@ -379,14 +396,15 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						errorDescripcio("Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value);
 				if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
 					eventBuilder.callbackInicialitza();
-			
 				event = eventBuilder.build();
+				logger.debug("Error event: " + event.getDescripcio());
 				enviament.updateNotificaError(
 						true,
 						event);
 			}
 			enviament.getNotificacio().updateEventAfegir(event);
 		}
+		logger.debug("Sortint de la certificació...");
 	}
 
 	private String getModoNotificacion(BigInteger modo) {

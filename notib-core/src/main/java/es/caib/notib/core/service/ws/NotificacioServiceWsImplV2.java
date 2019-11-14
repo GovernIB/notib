@@ -520,6 +520,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			String referencia) throws NotificacioServiceWsException {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findByNotificaReferencia(referencia);
 		RespostaConsultaEstatEnviament resposta = new RespostaConsultaEstatEnviament();
+		logger.debug("Consultant estat enviament amb referencia: " + referencia);
 		if (enviament == null) {
 			// Error de no trobat
 			throw new ValidationException(
@@ -534,12 +535,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					!enviament.getNotificaEstat().equals(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT)) {
 				notificaHelper.enviamentRefrescarEstat(enviament.getId());
 			}
+			logger.debug("Estat enviament amb referencia " + referencia + ":" + enviament.getNotificaEstatDescripcio());
 			resposta.setEstat(toEnviamentEstat(enviament.getNotificaEstat()));
 			resposta.setEstatData(enviament.getNotificaEstatData());
 			resposta.setEstatDescripcio(enviament.getNotificaEstatDescripcio());
 			resposta.setReceptorNif(enviament.getNotificaDatatReceptorNif());
 			resposta.setReceptorNom(enviament.getNotificaDatatReceptorNom());
 			if (enviament.getNotificaCertificacioData() != null) {
+				logger.debug("Guardant certificació enviament amb referencia: " + referencia);
 				Certificacio certificacio = new Certificacio();
 				certificacio.setData(enviament.getNotificaCertificacioData());
 				certificacio.setOrigen(enviament.getNotificaCertificacioOrigen());
@@ -556,12 +559,15 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				certificacio.setCsv(enviament.getNotificaCertificacioCsv());
 				certificacio.setTipusMime(enviament.getNotificaCertificacioMime());
 				resposta.setCertificacio(certificacio);
+				logger.debug("Certificació de l'enviament amb referencia: " + referencia + " s'ha guardat correctament.");
 			}
+			logger.debug("Notifica error de l'enviament amb referencia: " + referencia + ": " + enviament.isNotificaError());
 			if (enviament.isNotificaError()) {
 				resposta.setError(true);
 				NotificacioEventEntity errorEvent = enviament.getNotificaErrorEvent();
 				resposta.setErrorData(errorEvent.getData());
 				resposta.setErrorDescripcio(errorEvent.getErrorDescripcio());
+				logger.debug("Error consultar estat enviament amb referencia: " + referencia);
 			}
 		}
 		return resposta;

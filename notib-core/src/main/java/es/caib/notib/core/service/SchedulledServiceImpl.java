@@ -121,7 +121,32 @@ public class SchedulledServiceImpl implements SchedulledService {
 			logger.debug("L'actualització de l'estat dels enviaments amb l'estat de Notific@ està deshabilitada");
 		}
 	}
-	
+//	// 4. Actualització de l'estat dels enviaments amb l'estat de enviat_sir
+//		// PENDENT ELIMINAR DESPRÉS DE PROVAR ADVISER
+//		//////////////////////////////////////////////////////////////////
+//		@Override
+//		@Scheduled(
+//				fixedRateString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode}",
+//				initialDelayString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.registre.retard.inicial}")
+//		public void enviamentRefrescarEstatEnviatSir() {
+//			if (isTasquesActivesProperty() && isEnviamentActualitzacioEstatRegistreActiu()) {
+//				logger.info("Cercant enviaments pendents de refrescar l'estat enviat SIR");
+//				int maxPendents = getEnviamentActualitzacioEstatRegistreProcessarMaxProperty();
+//				List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByRegistreRefresc(
+//						new PageRequest(0, maxPendents));
+//				if (!pendents.isEmpty()) {
+//					logger.debug("Realitzant refresc de l'estat de enviat SIR per a " + pendents.size() + " enviaments (màxim=" + maxPendents + ")");
+//					for (NotificacioEnviamentEntity pendent: pendents) {
+//						logger.debug(">>> Consultat l'estat a registre de la notificació amb identificador " + pendent.getId() + ", i actualitzant les dades a Notib.");
+//						notificacioService.enviamentRefrescarEstat(pendent.getId());
+//					}
+//				} else {
+//					logger.debug("No hi ha enviaments pendents de refrescar l'estat enviats a SIR");
+//				}
+//			} else {
+//				logger.debug("L'actualització de l'estat dels enviaments amb l'estat de Notific@ està deshabilitada");
+//			}
+//		}
 	private boolean isNotificaEnviamentsActiu() {
 		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.notifica.enviaments.actiu");
 		if (actives != null) {
@@ -150,12 +175,24 @@ public class SchedulledServiceImpl implements SchedulledService {
 			return true;
 		}
 	}
+//	private boolean isEnviamentActualitzacioEstatRegistreActiu() {
+//		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.actiu");
+//		if (actives != null) {
+//			return new Boolean(actives).booleanValue();
+//		} else {
+//			return true;
+//		}
+//	}
 	private int getEnviamentActualitzacioEstatProcessarMaxProperty() {
 		return propertiesHelper.getAsInt(
 				"es.caib.notib.tasca.enviament.actualitzacio.estat.processar.max",
 				10);
 	}
-
+//	private int getEnviamentActualitzacioEstatRegistreProcessarMaxProperty() {
+//		return propertiesHelper.getAsInt(
+//				"es.caib.notib.tasca.enviament.actualitzacio.estat.registre.processar.max",
+//				10);
+//	}
 	private boolean isTasquesActivesProperty() {
 		String actives = propertiesHelper.getProperty("es.caib.notib.tasques.actives");
 		if (actives != null) {

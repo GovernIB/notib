@@ -28,5 +28,11 @@ public interface SchedulledService {
 	 * Notific@.
 	 */
 	public void enviamentRefrescarEstatPendents();
+	
+//	/**
+//	 * Mètode d'execució periòdica per a refrescar l'estat dels enviaments fets a
+//	 * Registre (comunicació SIR)
+//	 */
+//	public void enviamentRefrescarEstatEnviatSir();
 
 }
