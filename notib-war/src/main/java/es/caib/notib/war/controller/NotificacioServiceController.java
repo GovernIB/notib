@@ -22,7 +22,6 @@ import com.wordnik.swagger.annotations.ApiParam;
 
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.util.UtilitatsNotib;
-import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWs;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
 import es.caib.notib.core.api.ws.notificacio.PermisConsulta;
@@ -42,8 +41,6 @@ public class NotificacioServiceController extends BaseController {
 
 	@Autowired
 	private AplicacioService aplicacioService;
-	@Autowired
-	private NotificacioServiceWs notificacioServiceWsV1;
 	@Autowired
 	private NotificacioServiceWsV2 notificacioServiceWsV2;
 
@@ -80,6 +77,11 @@ public class NotificacioServiceController extends BaseController {
 						e, 
 						EJBAccessException.class));
 			}
+			if (resp.getErrorDescripcio() != null)
+				return resp;
+			else 
+				resp.setErrorDescripcio(e.getMessage());
+			
 			return resp;
 		}
 	}
@@ -102,7 +104,7 @@ public class NotificacioServiceController extends BaseController {
 			String identificador) {
 		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
 		try {
-			return notificacioServiceWsV1.consultaEstatNotificacio(identificador);
+			return notificacioServiceWsV2.consultaEstatNotificacio(identificador);
 		} catch (Exception e) {
 			RespostaConsultaEstatNotificacio resp = new RespostaConsultaEstatNotificacio();
 			resp.setError(true);
@@ -113,6 +115,11 @@ public class NotificacioServiceController extends BaseController {
 						e, 
 						EJBAccessException.class));
 			}
+			if (resp.getErrorDescripcio() != null)
+				return resp;
+			else 
+				resp.setErrorDescripcio(e.getMessage());
+			
 			return resp;
 		}
 	}
@@ -135,7 +142,7 @@ public class NotificacioServiceController extends BaseController {
 			String referencia) {
 		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
 		try {
-			return notificacioServiceWsV1.consultaEstatEnviament(referencia);
+			return notificacioServiceWsV2.consultaEstatEnviament(referencia);
 		} catch (Exception e) {
 			RespostaConsultaEstatEnviament resp = new RespostaConsultaEstatEnviament();
 			resp.setError(true);
@@ -146,6 +153,11 @@ public class NotificacioServiceController extends BaseController {
 						e, 
 						EJBAccessException.class));
 			}
+			if (resp.getErrorDescripcio() != null)
+				return resp;
+			else 
+				resp.setErrorDescripcio(e.getMessage());
+			
 			return resp;
 		}
 	}

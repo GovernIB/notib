@@ -980,6 +980,8 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 				} else if (enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR)) {
 					built.domiciliLinea1 = enviament.getEntregaPostal().getLinea1();
 					built.domiciliLinea2 = enviament.getEntregaPostal().getLinea2();
+					built.domiciliCodiPostal = enviament.getEntregaPostal().getCodiPostal();
+					built.domiciliPaisCodiIso = enviament.getEntregaPostal().getPaisCodi();
 				}
 			}
 			if (isAmbEntregaDeh && enviament.isEntregaDehActiva() && enviament.getEntregaDeh() != null) {
