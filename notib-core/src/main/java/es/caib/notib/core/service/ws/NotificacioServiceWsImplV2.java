@@ -579,7 +579,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							baos);
 					certificacio.setContingutBase64(
 							new String(Base64.encode(baos.toByteArray())));
-					certificacio.setTamany(enviament.getNotificaCertificacioTamany());
+					
+					if (enviament.getNotificaCertificacioTamany() != null)
+						certificacio.setTamany(enviament.getNotificaCertificacioTamany());
+					
 					certificacio.setHash(enviament.getNotificaCertificacioHash());
 					certificacio.setMetadades(enviament.getNotificaCertificacioMetadades());
 					certificacio.setCsv(enviament.getNotificaCertificacioCsv());
