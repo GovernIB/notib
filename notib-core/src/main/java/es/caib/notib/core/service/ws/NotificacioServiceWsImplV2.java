@@ -594,9 +594,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				}
 			}
 		} catch (Exception ex) {
-			throw new RuntimeException(
-					"[ENVIAMENT] Hi ha hagut un error consultant l'enviament: " + ex.getMessage(),
-					ex);
+			ex.printStackTrace();
 		}
 		return resposta;
 	}
