@@ -104,7 +104,40 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			return rc;
 		}
 	}
-
+	
+	@Override
+	public RespostaConsultaRegistre obtenerAsientoRegistral(
+			String codiDir3Entitat, 
+			String numeroRegistre,
+			Long tipusOperacio,
+			boolean ambAnnexos) {
+		RespostaConsultaRegistre rc = new RespostaConsultaRegistre();
+		try {
+//			ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+//			logger.info(ow.writeValueAsString(arb.getInteresados()));
+			AsientoRegistralWs asientoRegistralWs = getAsientoRegistralApi().obtenerAsientoRegistral(
+					codiDir3Entitat, 
+					numeroRegistre, 
+					tipusOperacio, 
+					ambAnnexos);
+			
+			return toRespostaConsultaRegistre(asientoRegistralWs);
+		} catch (WsI18NException e) {
+			rc.setErrorCodi("0");
+			rc.setErrorDescripcio(e.getMessage());
+			return rc;
+		} catch (WsValidationException e) {
+			rc.setErrorCodi("1");
+			rc.setErrorDescripcio(e.getMessage());
+			return rc;
+		} catch (Exception e) {
+			e.printStackTrace();
+			rc.setErrorCodi("2");
+			rc.setErrorDescripcio(e.getMessage());
+			return rc;
+		}
+	}
+	
 	@Override
 	public RespostaJustificantRecepcio obtenerJustificante(
 			String codiDir3Entitat, 
@@ -899,13 +932,6 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			throw new RegistrePluginException("Error conversió codis assumpte", ex);
 		}
 		return codisAssumpte;
-	}
-
-
-	@Override
-	public RespostaConsultaRegistre comunicarAsientoRegistral(String codiDir3Entitat, AsientoRegistralBeanDto arb,
-			Long tipusOperacio) {
-		return null;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(RegistrePluginRegweb3Impl.class);

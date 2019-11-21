@@ -21,24 +21,11 @@ public interface RegistrePlugin {
 			String aplicacion) throws RegistrePluginException;
 	
 	/**
-	 * Crea un registre de sortida
+	 * Crea un assentament registral
 	 * 
-	 * @param registreSortida	Objecte registreSortida amb les dades a enviar de l'anotació
-	 * @param aplicacion	Aplicació que realitza el registre de sortida
-	 * @return
-	 * 		Retorna un objecte amb la resposta del regweb (data, numero i numero formatejat)
-	 * @throws RegistrePluginException
-	 */
-	public RespostaConsultaRegistre comunicarAsientoRegistral(
-			String codiDir3Entitat, 
-			AsientoRegistralBeanDto arb, 
-			Long tipusOperacio);
-	
-	/**
-	 * Crea un registre de sortida
-	 * 
-	 * @param registreSortida	Objecte registreSortida amb les dades a enviar de l'anotació
-	 * @param aplicacion	Aplicació que realitza el registre de sortida
+	 * @param codiDir3Entitat	codi DIR3 de l'entitat
+	 * @param arb	Aplicació que realitza el registre de sortida
+	 * @param tipusOperacio	indicar si és un registre d'entrada o sortida
 	 * @return
 	 * 		Retorna un objecte amb la resposta del regweb (data, numero i numero formatejat)
 	 * @throws RegistrePluginException
@@ -49,10 +36,29 @@ public interface RegistrePlugin {
 			Long tipusOperacio);
 	
 	/**
-	 * Crea un registre de sortida
+	 * Recupera un registre de sortida
 	 * 
-	 * @param registreSortida	Objecte registreSortida amb les dades a enviar de l'anotació
-	 * @param aplicacion	Aplicació que realitza el registre de sortida
+	 * @param codiDir3Entitat	codi DIR3 de l'entitat
+	 * @param numeroRegistreFormatat	número de l'assentament que es vol recuperar
+	 * @param tipusOperacio	indicar si és un registre d'entrada o sortida
+	 * @param ambAnnexos	indicar si s'han de recuperar els annexos
+	 * @return
+	 * 		Retorna un objecte amb la resposta del regweb (data, numero i numero formatejat)
+	 * @throws RegistrePluginException
+	 */
+	public RespostaConsultaRegistre obtenerAsientoRegistral(
+			String codiDir3Entitat, 
+			String numeroRegistreFormatat,
+			Long tipusOperacio,
+			boolean ambAnnexos);
+	
+	
+	/**
+	 * Recupera el justificant
+	 * 
+	 * @param codiDir3Entitat	codi DIR3 de l'entitat
+	 * @param numeroRegistreFormatat	número de l'assentament que es vol recuperar
+	 * @param tipusRegistre	indicar si és un registre d'entrada o sortida
 	 * @return
 	 * 		Retorna un objecte amb la resposta del regweb (data, numero i numero formatejat)
 	 * @throws RegistrePluginException
@@ -63,10 +69,10 @@ public interface RegistrePlugin {
 			long tipusRegistre);
 	
 	/**
-	 * Crea un registre de sortida
+	 * Recupera l'ofici extern
 	 * 
-	 * @param registreSortida	Objecte registreSortida amb les dades a enviar de l'anotació
-	 * @param aplicacion	Aplicació que realitza el registre de sortida
+	 * @param codiDir3Entitat	codi DIR3 de l'entitat
+	 * @param numeroRegistreFormatat	número de l'assentament que es vol recuperar
 	 * @return
 	 * 		Retorna un objecte amb la resposta del regweb (data, numero i numero formatejat)
 	 * @throws RegistrePluginException

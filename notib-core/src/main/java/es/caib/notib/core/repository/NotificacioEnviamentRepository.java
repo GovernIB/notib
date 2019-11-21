@@ -327,14 +327,15 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	List<NotificacioEnviamentEntity> findByNotificaRefresc(
 			Pageable pageable);
 	
-//	@Query(	"  from	NotificacioEnviamentEntity " +
-//			" where	notificaEstatFinal = false " +
-//			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT " +
-//			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REGISTRADA " +
-//			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.FINALITZADA " +
-//			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.PROCESSADA " +
-//			" order by notificaEstatDataActualitzacio asc")
-//	List<NotificacioEnviamentEntity> findByRegistreRefresc(
-//			Pageable pageable);
+	@Query(	"  from	NotificacioEnviamentEntity " +
+			" where	registreEstatFinal = false " +
+			"   and registreEstat != es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT " +
+			"   and registreEstat != es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto.REBUTJAT " +
+			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REGISTRADA " +
+			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.FINALITZADA " +
+			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.PROCESSADA " +
+			" order by registreData asc")
+	List<NotificacioEnviamentEntity> findByRegistreRefresc(
+			Pageable pageable);
 
 }

@@ -271,4 +271,9 @@ public class NotificacioServiceBean implements NotificacioService {
 	public void enviamentRefrescarEstat(Long notificacioId) {
 		delegate.enviamentRefrescarEstat(notificacioId);
 	}
+
+	@Override
+	public void enviamentRefrescarEstatRegistre(Long notificacioId) {
+		delegate.enviamentRefrescarEstatRegistre(notificacioId);
+	}
 }
