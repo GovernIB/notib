@@ -407,6 +407,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					case FINALITZADA:
 						resposta.setEstat(NotificacioEstatEnum.FINALITZADA);
 						break;
+					case PROCESSADA:
+						resposta.setEstat(NotificacioEstatEnum.PROCESSADA);
+						break;
 					default:
 						break;
 					}
@@ -495,7 +498,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				resposta.setErrorDescripcio("No s'ha pogut desxifrar l'identificador de la notificació " + identificador);
 				return resposta;
 			}
-			NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
+			NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
 			
 			if (notificacio == null) {
 				resposta.setError(true);

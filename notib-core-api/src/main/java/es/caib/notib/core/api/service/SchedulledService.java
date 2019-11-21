@@ -29,10 +29,10 @@ public interface SchedulledService {
 	 */
 	public void enviamentRefrescarEstatPendents();
 	
-//	/**
-//	 * Mètode d'execució periòdica per a refrescar l'estat dels enviaments fets a
-//	 * Registre (comunicació SIR)
-//	 */
-//	public void enviamentRefrescarEstatEnviatSir();
+	/**
+	 * Mètode d'execució periòdica per a refrescar l'estat dels enviaments fets a
+	 * Registre (comunicació SIR)
+	 */
+	public void enviamentRefrescarEstatEnviatSir();
 
 }

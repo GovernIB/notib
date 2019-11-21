@@ -311,6 +311,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name="estat_registre")
 	private NotificacioRegistreEstatEnumDto registreEstat;
 	
+	@Column(name="registre_estat_final")
+	private boolean registreEstatFinal;
+	
 	@Transient
 	private String csvUuid;
 
@@ -581,6 +584,21 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
 		this.registreNumeroFormatat = registreNumeroFormatat;
+	}
+	public boolean isRegistreEstatFinal() {
+		return registreEstatFinal;
+	}
+
+	public void updateRegistreEstat(
+			NotificacioRegistreEstatEnumDto registreEstat,
+			Date registreEstatData,
+			String registreNumeroFormatat,
+			boolean registreEstatFinal) {
+		this.registreEstat = registreEstat;
+		this.registreData = registreEstatData;
+		this.registreNumeroFormatat = registreNumeroFormatat;
+		this.registreEstatFinal = registreEstatFinal;
+		
 	}
 	
 	public void updateNotificaEnviada(

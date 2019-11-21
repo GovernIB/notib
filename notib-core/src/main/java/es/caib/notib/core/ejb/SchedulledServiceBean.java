@@ -43,4 +43,10 @@ public class SchedulledServiceBean implements SchedulledService {
 		delegate.enviamentRefrescarEstatPendents();
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	public void enviamentRefrescarEstatEnviatSir() {
+		delegate.enviamentRefrescarEstatEnviatSir();
+	}
+
 }

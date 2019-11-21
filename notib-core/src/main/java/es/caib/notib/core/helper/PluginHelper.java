@@ -134,6 +134,19 @@ public class PluginHelper {
 				tipusOperacio);
 	}
 	
+	public RespostaConsultaRegistre obtenerAsientoRegistral(
+			String codiDir3Entitat, 
+			String numeroRegistreFormatat, 
+			Long tipusRegistre, 
+			boolean ambAnnexos) {
+		
+		return getRegistrePlugin().obtenerAsientoRegistral(
+				codiDir3Entitat, 
+				numeroRegistreFormatat, 
+				tipusRegistre, 
+				ambAnnexos);
+	}
+	
 	public RespostaJustificantRecepcio obtenirJustificant(
 			String codiDir3Entitat, 
 			String numeroRegistreFormatat) {

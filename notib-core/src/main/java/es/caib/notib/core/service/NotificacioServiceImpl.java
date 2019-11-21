@@ -74,6 +74,7 @@ import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PluginHelper;
+import es.caib.notib.core.helper.RegistreHelper;
 import es.caib.notib.core.helper.RegistreNotificaHelper;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.EntitatRepository;
@@ -132,6 +133,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private GrupRepository grupRepository;
 	@Autowired
 	private GrupProcedimentRepository grupProcedimentRepository;
+	@Autowired
+	private RegistreHelper registreHelper;
 	
 	@Transactional(rollbackFor=Exception.class)
 	@Override
@@ -1033,6 +1036,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public void enviamentRefrescarEstat(Long notificacioId) {
 		notificaHelper.enviamentRefrescarEstat(notificacioId);
+	}
+	
+	@Transactional
+	@Override
+	public void enviamentRefrescarEstatRegistre(Long notificacioId) {
+		registreHelper.enviamentRefrescarEstatRegistre(notificacioId);
 	}
 	
 	private void estatCalcularCampsAddicionals(
