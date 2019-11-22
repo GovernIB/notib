@@ -331,9 +331,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			" where	registreEstatFinal = false " +
 			"   and registreEstat != es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT " +
 			"   and registreEstat != es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto.REBUTJAT " +
-			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REGISTRADA " +
-			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.FINALITZADA " +
-			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.PROCESSADA " +
+			"   and notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIAT_SIR " +
 			" order by registreData asc")
 	List<NotificacioEnviamentEntity> findByRegistreRefresc(
 			Pageable pageable);

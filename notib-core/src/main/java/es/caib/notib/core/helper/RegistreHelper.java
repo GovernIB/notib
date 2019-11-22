@@ -48,6 +48,7 @@ public class RegistreHelper {
 		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
 		enviament.setNotificacio(notificacio);
 		NotificacioEventEntity.Builder eventBuilder  = null;
+		String descripcio;
 		
 		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb Registre (" +
 				"notificacioId=" + notificacio.getId() + ", " +
@@ -68,18 +69,23 @@ public class RegistreHelper {
 							resposta.getRegistreNumeroFormatat(), 
 							enviament);
 					
+					if (resposta.getEstat() != null)
+						descripcio = resposta.getEstat().name();
+					else
+						descripcio = resposta.getRegistreNumeroFormatat();
+					
 					//Crea un nou event
 					eventBuilder = NotificacioEventEntity.getBuilder(
 							NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,
 							enviament.getNotificacio()).
 							enviament(enviament).
-							descripcio(resposta.getEstat().name());
+							descripcio(descripcio);
 					
 					if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
 						eventBuilder.callbackInicialitza();
-					NotificacioEventEntity eventDatat = eventBuilder.build();
+					NotificacioEventEntity event = eventBuilder.build();
 					
-					notificacio.updateEventAfegir(eventDatat);
+					notificacio.updateEventAfegir(event);
 					enviament.updateNotificaError(false, null);
 					if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
 						emailHelper.prepararEnvioEmailNotificacio(notificacio);
