@@ -20,6 +20,8 @@ public class RespostaConsultaRegistre extends RespostaBase {
 	private String registreNumeroFormatat;
 	private String codiLlibre;
 	private NotificacioRegistreEstatEnumDto estat;
+	private String codiError;
+	private String descripcioError;
 	
 	public String getRegistreNumero() {
 		return registreNumero;
@@ -74,5 +76,17 @@ public class RespostaConsultaRegistre extends RespostaBase {
 	}
 	public void setCodiLlibre(String codiLlibre) {
 		this.codiLlibre = codiLlibre;
+	}
+	public String getCodiError() {
+		return codiError;
+	}
+	public void setCodiError(String codiError) {
+		this.codiError = codiError;
+	}
+	public String getDescripcioError() {
+		return descripcioError;
+	}
+	public void setDescripcioError(String descripcioError) {
+		this.descripcioError = descripcioError;
 	}
 }

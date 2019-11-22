@@ -497,6 +497,10 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		}
 		resposta.setEntitatCodi(ar.getEntidadCodigo());
 		resposta.setEntitatDenominacio(ar.getEntidadDenominacion());
+		if (ar.getCodigoError() != null && !ar.getCodigoError().isEmpty()) {
+			resposta.setCodiError(ar.getCodigoError());
+			resposta.setDescripcioError(ar.getDescripcionError());
+		}
 		return resposta;
 	}
 	

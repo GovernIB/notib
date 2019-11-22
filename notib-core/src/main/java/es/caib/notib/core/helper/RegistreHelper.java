@@ -57,38 +57,56 @@ public class RegistreHelper {
 		try {
 			if (enviament.getRegistreNumeroFormatat() != null) {
 				RespostaConsultaRegistre resposta = pluginHelper.obtenerAsientoRegistral(
-						notificacio.getEntitat().getCodi(), 
+						notificacio.getEntitat().getDir3Codi(),
 						enviament.getRegistreNumeroFormatat(), 
 						2L,  //registre sortida
 						false);
 				
 				if (resposta != null) {
-					enviamentUpdateDatat(
-							resposta.getEstat(),
-							resposta.getRegistreData(), 
-							resposta.getRegistreNumeroFormatat(), 
-							enviament);
 					
-					if (resposta.getEstat() != null)
-						descripcio = resposta.getEstat().name();
-					else
-						descripcio = resposta.getRegistreNumeroFormatat();
-					
-					//Crea un nou event
-					eventBuilder = NotificacioEventEntity.getBuilder(
-							NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,
-							enviament.getNotificacio()).
-							enviament(enviament).
-							descripcio(descripcio);
-					
-					if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-						eventBuilder.callbackInicialitza();
-					NotificacioEventEntity event = eventBuilder.build();
-					
-					notificacio.updateEventAfegir(event);
-					enviament.updateNotificaError(false, null);
-					if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
-						emailHelper.prepararEnvioEmailNotificacio(notificacio);
+					if (resposta.getCodiError() != null && !resposta.getCodiError().isEmpty()) {
+						//Crea un nou event
+						eventBuilder = NotificacioEventEntity.getBuilder(
+								NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,
+								enviament.getNotificacio()).
+								error(true).
+								errorDescripcio(resposta.getDescripcioError()).
+								enviament(enviament);
+						
+						if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+							eventBuilder.callbackInicialitza();
+						NotificacioEventEntity event = eventBuilder.build();
+						
+						notificacio.updateEventAfegir(event);
+						enviament.updateNotificaError(true, event);
+					} else {
+						enviamentUpdateDatat(
+								resposta.getEstat(),
+								resposta.getRegistreData(), 
+								resposta.getRegistreNumeroFormatat(), 
+								enviament);
+						
+						if (resposta.getEstat() != null)
+							descripcio = resposta.getEstat().name();
+						else
+							descripcio = resposta.getRegistreNumeroFormatat();
+						
+						//Crea un nou event
+						eventBuilder = NotificacioEventEntity.getBuilder(
+								NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,
+								enviament.getNotificacio()).
+								enviament(enviament).
+								descripcio(descripcio);
+						
+						if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+							eventBuilder.callbackInicialitza();
+						NotificacioEventEntity event = eventBuilder.build();
+						
+						notificacio.updateEventAfegir(event);
+						enviament.updateNotificaError(false, null);
+						if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
+							emailHelper.prepararEnvioEmailNotificacio(notificacio);
+						}
 					}
 				}
 				return true;
