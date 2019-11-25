@@ -10,6 +10,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
@@ -49,6 +50,7 @@ public class RegistreHelper {
 		enviament.setNotificacio(notificacio);
 		NotificacioEventEntity.Builder eventBuilder  = null;
 		String descripcio;
+		logger.debug("Comunicació SIR --> consular estat...");
 		
 		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb Registre (" +
 				"notificacioId=" + notificacio.getId() + ", " +
@@ -56,6 +58,9 @@ public class RegistreHelper {
 		
 		try {
 			if (enviament.getRegistreNumeroFormatat() != null) {
+				logger.debug("Comunicació SIR --> número registre formatat: " + enviament.getRegistreNumeroFormatat());
+				logger.debug("Comunicació SIR --> consulant estat...");
+				
 				RespostaConsultaRegistre resposta = pluginHelper.obtenerAsientoRegistral(
 						notificacio.getEntitat().getDir3Codi(),
 						enviament.getRegistreNumeroFormatat(), 
@@ -64,6 +69,7 @@ public class RegistreHelper {
 				
 				if (resposta != null) {
 					
+					logger.debug("Comunicació SIR --> creació event...");
 					if (resposta.getCodiError() != null && !resposta.getCodiError().isEmpty()) {
 						//Crea un nou event
 						eventBuilder = NotificacioEventEntity.getBuilder(
@@ -86,6 +92,7 @@ public class RegistreHelper {
 								resposta.getRegistreNumeroFormatat(), 
 								enviament);
 						
+						logger.debug("Comunicació SIR --> nou estat: " + resposta.getEstat().name());
 						if (resposta.getEstat() != null)
 							descripcio = resposta.getEstat().name();
 						else
@@ -104,6 +111,7 @@ public class RegistreHelper {
 						
 						notificacio.updateEventAfegir(event);
 						enviament.updateNotificaError(false, null);
+						logger.debug("Comunicació SIR --> enviar correu si és aplicació...");
 						if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
 							emailHelper.prepararEnvioEmailNotificacio(notificacio);
 						}
@@ -137,11 +145,12 @@ public class RegistreHelper {
 			Date registreEstatData,
 			String registreNumeroFormatat,
 			NotificacioEnviamentEntity enviament) {
-		
+		logger.debug("Actualitzant estat comunicació SIR...");
 		boolean estatFinal = 
-				NotificacioRegistreEstatEnumDto.ANULAT.equals(registreEstat) ||
+				NotificacioRegistreEstatEnumDto.REBUTJAT.equals(registreEstat) ||
 				NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT.equals(registreEstat);
 		
+		logger.debug("Estat actual: " + registreEstat.name());
 		enviament.updateRegistreEstat(
 				registreEstat,
 				registreEstatData,
@@ -159,6 +168,7 @@ public class RegistreHelper {
 				break;
 			}
 		}
+		logger.debug("Estat final: " + estatsEnviamentsFinals);
 		if (estatsEnviamentsFinals) {
 			enviament.getNotificacio().updateEstat(NotificacioEstatEnumDto.FINALITZADA);
 			enviament.getNotificacio().updateMotiu(registreEstat.name());
@@ -170,6 +180,7 @@ public class RegistreHelper {
 				enviament.getNotificacio().updateEstatDate(new Date());
 			}
 		}
+		logger.debug("L'estat de la comunicació SIR s'ha actualitzat correctament.");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(RegistreHelper.class);

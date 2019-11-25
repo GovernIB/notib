@@ -43,6 +43,8 @@ public class RegistreNotificaHelper {
 	@Autowired
 	NotificaHelper notificaHelper;
 	@Autowired
+	RegistreHelper registreHelper;
+	@Autowired
 	NotificacioEventRepository notificacioEventRepository;
 	
 	public void realitzarProcesRegistrarNotificar(
@@ -283,7 +285,13 @@ public class RegistreNotificaHelper {
 			}
 			//Comunicació + administració (SIR)
 			if (totsAdministracio) {
+				logger.debug("Comunicació SIR --> actualitzar estat...");
 				notificacioEntity.updateEstat(NotificacioEstatEnumDto.ENVIADA);
+				registreHelper.enviamentUpdateDatat(
+						arbResposta.getEstat(), 
+						arbResposta.getRegistreData(), 
+						arbResposta.getRegistreNumeroFormatat(), 
+						enviament);
 			}
 			if (enviament != null) {
 				enviament.setRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
