@@ -112,46 +112,35 @@
 .entregaPostalInfo {
 	display: none;
 }
+#loading {
+	background: rgba( 255, 255, 255, 0.8 );
+  	display: none;
+  	height: 100%;
+  	position: fixed;
+  	width: 100%;
+  	z-index: 9999;
+  	left: 0;
+  	top: 0;
+}
+#loading img {
+	left: 50%;
+  	margin-left: -32px;
+  	margin-top: -32px;
+  	position: absolute;
+  	top: 50%;
+  	width: 4%;
+}
+#loading p {
+	left: 50%;
+  	margin-left: -32px;
+  	margin-top: -32px;
+  	position: absolute;
+  	top: 56%;
+}
 </style>
 <script type="text/javascript">
 
 $(document).ready(function() {
-	var tipusDocumentDefault = $('#tipusDocumentDefault').val();
-	var tipusDocumentSelected = $('#tipusDocumentSelected').val();
-	$('.customSelect').webutilInputSelect2(null);
-
-	if (tipusDocumentSelected != '') {
-		$(".customSelect").val(tipusDocumentSelected).trigger("change");
-	} else if (tipusDocumentDefault != '') {
-		$(".customSelect").val(tipusDocumentDefault).trigger("change");
-	}
-	//Paisos
-	$.ajax({
-		type: 'GET',
-		url: "<c:url value="/notificacio/paisos/"/>",
-		success: function(data) {
-			var selPaisos = $('.paisos');
-			selPaisos.empty();
-			selPaisos.append("<option value=\"\"></option>");
-			if (data && data.length > 0) {
-				$.each(data, function(i, val) {
-					if (val.alfa2Pais == 'ES') {
-						selPaisos.append("<option value=\"" + val.alfa2Pais + "\" selected>" + val.descripcioPais + "</option>");
-					} else {
-						selPaisos.append("<option value=\"" + val.alfa2Pais + "\">" + val.descripcioPais + "</option>");
-					}
-					
-				});
-			}
-			var select2Options = {
-					theme: 'bootstrap',
-					width: 'auto'};
-			selPaisos.select2(select2Options);
-		},
-		error: function() {
-			console.log("error obtenint les provincies...");
-		}
-	});
 	
 	$(document).on('change','select.paisos', function() {
 		var provincia = $(this).closest("#entregaPostal").find("select[class*='provincies']");
@@ -161,13 +150,25 @@ $(document).ready(function() {
 			$(poblacioSelect).addClass('hidden');
 			$(poblacioText).removeClass('hidden');
 			$(provincia).prop('disabled', 'disabled');
+			$(provincia).parent().parent().addClass('hidden');
 		} else {
 			$(poblacioSelect).removeClass('hidden');
 			$(poblacioText).addClass('hidden');
 			$(provincia).removeAttr('disabled');
+			$(provincia).parent().parent().removeClass('hidden');
 		}
 	});
 	
+	var tipusDocumentDefault = $('#tipusDocumentDefault').val();
+	var tipusDocumentSelected = $('#tipusDocumentSelected').val();
+	$('.customSelect').webutilInputSelect2(null);
+
+	if (tipusDocumentSelected != '') {
+		$(".customSelect").val(tipusDocumentSelected).trigger("change");
+	} else if (tipusDocumentDefault != '') {
+		$(".customSelect").val(tipusDocumentDefault).trigger("change");
+	}
+
 	$(document).on('change','select.enviamentTipus', function() {
 		var dadesNormalitzat = $(this).closest("#entregaPostal").find("div[class*='normalitzat']");
 		var dadesSenseNormalitzar = $(this).closest("#entregaPostal").find("div[class*='senseNormalitzar']");
@@ -181,69 +182,8 @@ $(document).ready(function() {
 		}
 	});
 	
-	//Provincies
-	$.ajax({
-		type: 'GET',
-		url: "<c:url value="/notificacio/provincies/"/>",
-		success: function(data) {
-			var selProvincies = $('.provincies');
-			selProvincies.empty();
-			selProvincies.append("<option value=\"\"></option>");
-			if (data && data.length > 0) {
-				$.each(data, function(i, val) {
-					selProvincies.append("<option value=\"" + val.id + "\">" + val.descripcio + "</option>");
-				});
-			}
-			var select2Options = {
-					theme: 'bootstrap',
-					width: 'auto'};
-			selProvincies.select2(select2Options);
-		},
-		error: function() {
-			console.log("error obtenint les provincies...");
-		}
-	});
-
-	//Localitats
-	$(document).on('change','select.provincies', function() {
-		var provincia = $(this);
-		var selLocalitats = $(provincia).closest("#entregaPostal").find("select[class*='localitats']");
-		if ($(this).val() == '') {
-			$(selLocalitats).find('option').remove();
-		} else {
-			$.ajax({
-				type: 'GET',
-				url: "<c:url value="/notificacio/localitats/"/>" + $(provincia).val(),
-				success: function(data) {
-					selLocalitats.empty();
-					selLocalitats.append("<option value=\"\"></option>");
-					if (data && data.length > 0) {
-						$.each(data, function(i, val) {
-							selLocalitats.append("<option value=\"" + val.id + "\">" + val.descripcio + "</option>");
-						});
-					}
-					var select2Options = {
-							theme: 'bootstrap',
-							width: 'auto'};
-					selLocalitats.select2(select2Options);
-				},
-				error: function() {
-					console.log("error obtenint les provincies...");
-				}
-			});
-		}
-	});
-    //$('#concepte').on('input',function(e){
-    //	 $('#extracte').val($(this).val());
-    //});
 	var numPlus = 1;
-	//$('.envio\\[0\\]')[0].innerText = "Envio#" + numPlus;
-    //var destinatariForm = $('.destinatariForm');
-    //destinatariForm.find('input').each(function() {
-    //    if($(this).val().length > 0) {
-    //        $(destinatariForm).removeClass('hidden');
-    //    }
-    //});
+	
     $(".container-envios").find('.enviamentsForm').each(function() {
     	if($(this).find('.eliminar_enviament').attr('id') != 'enviamentDelete[0]') {
     		$(this).find('.eliminar_enviament').removeClass('hidden');
@@ -401,6 +341,11 @@ $(document).ready(function() {
 		var size = $(this).val().length;
 		$('.textAreaCurrentLength').text(size);
 	});
+	
+	//loading
+	$('#form').on("submit", function(){
+		$('#loading').fadeIn();
+	});
 });
 
 function addDestinatari(enviament_id) {
@@ -466,7 +411,6 @@ function addEnvio() {
     var num;
     var enviamentForm = $(".enviamentsForm").last().clone();
     var enviamentFormNou;
-	
     enviamentForm.find(':input').each(function() {
         number = this.name.substring(this.name.indexOf( '[' ) + 1, this.name.indexOf( ']' ));
         num = parseInt(number);
@@ -547,6 +491,8 @@ function addEnvio() {
             $(this).remove();
         }
     });
+
+	actualitzarEntrega(num);
     webutilModalAdjustHeight();
 }
 
@@ -636,9 +582,114 @@ function mostrarEntregaDeh(className) {
         $('.entregaDeh_'+enviament_id_num).show();
     }
 }
+
+function actualitzarEntrega(j) {
+	var selPaisos = document.getElementById("enviaments[" + j + "].entregaPostal.paisCodi");
+	var selProvincies = document.getElementById("enviaments[" + j + "].entregaPostal.provincia");
+	var selLocalitats = document.getElementById("enviaments[" + j + "].entregaPostal.municipiCodi");
+	var selPoblacio =  document.getElementById("enviaments[" + j + "].entregaPostal.poblacio");
+	
+	$.ajax({
+		type: 'GET',
+		url: "<c:url value="/notificacio/paisos/"/>",
+		success: function(data) {
+			$(selPaisos).empty();
+			$(selPaisos).append("<option value=\"\"></option>");
+			if (data && data.length > 0) {
+				$.each(data, function(i, val) {
+					if (val.alfa2Pais == 'ES') {
+						$(selPaisos).append("<option value=\"" + val.alfa2Pais + "\" selected>" + val.descripcioPais + "</option>");
+					} else {
+						$(selPaisos).append("<option value=\"" + val.alfa2Pais + "\">" + val.descripcioPais + "</option>");
+					}
+					
+				});
+									
+				var paisCodi = document.getElementsByClassName('enviaments[' + j + '].entregaPostal.paisCodi');
+				
+				if (paisCodi !== undefined && paisCodi[0] !== undefined) {
+					$(selPaisos).val(paisCodi[0].value).change();
+				}
+			}
+			var select2Options = {
+					theme: 'bootstrap',
+					width: 'auto'};
+			$(selPaisos).select2(select2Options);
+		},
+		error: function() {
+			console.log("error obtenint les provincies...");
+		}
+	});
+	//Provincies
+	$.ajax({
+		type: 'GET',
+		url: "<c:url value="/notificacio/provincies/"/>",
+		success: function(data) {
+			$(selProvincies).empty();
+			$(selProvincies).append("<option value=\"\"></option>");
+			if (data && data.length > 0) {
+				$.each(data, function(i, val) {
+					$(selProvincies).append("<option value=\"" + val.id + "\">" + val.descripcio + "</option>");
+				});
+				
+				var provinciaCodi = document.getElementsByClassName('enviaments[' + j + '].entregaPostal.provincia');
+				
+				if (provinciaCodi !== undefined && provinciaCodi[0] !== undefined) {
+					$(selProvincies).val(provinciaCodi[0].value).change();
+				}
+			}
+			var select2Options = {
+					theme: 'bootstrap',
+					width: 'auto'};
+			$(selProvincies).select2(select2Options);
+		},
+		error: function() {
+			console.log("error obtenint les provincies...");
+		}
+	});
+
+	//Localitats
+	$(selProvincies).on('change', function() {
+		var provincia = $(this);
+		if ($(this).val() == '') {
+			$(selLocalitats).find('option').remove();
+		} else {
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value="/notificacio/localitats/"/>" + $(provincia).val(),
+				success: function(data) {
+					$(selLocalitats).empty();
+					$(selLocalitats).append("<option value=\"\"></option>");
+					if (data && data.length > 0) {
+						$.each(data, function(i, val) {
+							$(selLocalitats).append("<option value=\"" + val.id + "\">" + val.descripcio + "</option>");
+						});
+						
+						var municipiCodi = document.getElementsByClassName('enviaments[' + j + '].entregaPostal.municipiCodi');
+						
+						if (municipiCodi !== undefined && municipiCodi[0] !== undefined) {
+							$(selLocalitats).val(municipiCodi[0].value).change();
+						}
+					}
+					var select2Options = {
+							theme: 'bootstrap',
+							width: 'auto'};
+					$(selLocalitats).select2(select2Options);
+				},
+				error: function() {
+					console.log("error obtenint les provincies...");
+				}
+			});
+		}
+	});	
+}
 </script>
 </head>
 <body>
+	<div id="loading">
+		<img src="<c:url value="/img/ajax-loader.gif"/>"/>
+		<p><spring:message code="notificacio.form.loading"/></p>
+	</div>
     <c:set var="formAction"><not:modalUrl value="/notificacio/newOrModify"/></c:set>
     <form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" commandName="notificacioCommandV2" enctype="multipart/form-data">
 		<div class="container-fluid">
@@ -880,7 +931,7 @@ function mostrarEntregaDeh(className) {
 												</div>
 												<div class="col-md-2 offset-col-md-2">
 													<div class="float-right">
-														<input type="button" class="btn btn-danger btn-group delete" name="destinatarisDelete[${j}][${i}]" onclick="destinatarisDelete(this.id)" id="destinatarisDelete[${j}][${i}]" value="<spring:message code="notificacio.form.boto.eliminar.destinatari"/>" required="true"/>
+														<input type="button" class="btn btn-danger btn-group delete" name="destinatarisDelete[${j}][${i}]" onclick="destinatarisDelete(this.id)" id="destinatarisDelete[${j}][${i}]" value="<spring:message code="notificacio.form.boto.eliminar.destinatari"/>"/>
 													</div>
 												</div>
 												<div class="col-md-12">
@@ -972,6 +1023,9 @@ function mostrarEntregaDeh(className) {
 											<div class="col-md-6 poblacioSelect">
 												<not:inputSelect name="enviaments[${j}].entregaPostal.municipiCodi" generalClass="localitats" emptyOption="true" textKey="notificacio.form.camp.entregapostal.municipi" labelClass="labelcss" inputClass="inputcss"/>
 											</div>
+											<script>
+											actualitzarEntrega(${j});
+											</script>
 <%-- 											
 											<div class="col-md-6 poblacioText hidden">
  												<not:inputText name="enviaments[${j}].entregaPostal.municipi" textKey="notificacio.form.camp.entregapostal.municipi" labelClass="labelcss" inputClass="inputcss" />
@@ -1024,6 +1078,9 @@ function mostrarEntregaDeh(className) {
 								</div>
 								<c:choose>
 									<c:when test="${not empty enviosGuardats}">
+										<input class="enviaments[${j}].entregaPostal.paisCodi hidden" value="${enviament.entregaPostal.paisCodi}"/>
+										<input class="enviaments[${j}].entregaPostal.provincia hidden" value="${enviament.entregaPostal.provincia}"/>
+										<input class="enviaments[${j}].entregaPostal.municipiCodi hidden" value="${enviament.entregaPostal.municipiCodi}"/>
 										<input id="entregaDehAmagat" name="enviaments[${j}].entregaDeh.visible" class="hidden" value="${enviament.entregaDehActiva}">
 										<c:set var="entregaDehActiva" value="${enviament.entregaDehActiva}"></c:set>
 									</c:when>
