@@ -58,6 +58,10 @@
 	es.caib.notib.tasca.callback.pendents.retard.inicial=60000
 	es.caib.notib.tasca.callback.pendents.notifica.events.intents.max=10
 
+	es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode=300000
+	es.caib.notib.tasca.enviament.actualitzacio.estat.registre.retard.inicial=10
+	es.caib.notib.tasca.enviament.actualitzacio.estat.registre.actiu=true
+	es.caib.notib.tasca.enviament.actualitzacio.estat.registre.processar.max=3
 
 	<!-- ### -->
 	<!-- ConnexiÃ³ amb Notific@ -->

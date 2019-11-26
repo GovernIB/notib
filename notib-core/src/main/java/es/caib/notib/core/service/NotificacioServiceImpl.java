@@ -828,7 +828,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					output);
 			return new ArxiuDto(
 					entity.getDocument().getArxiuNom() != null ? entity.getDocument().getArxiuNom() : nomDocumetnDefault,
-					"PDF",
+					null,
 					output.toByteArray(),
 					output.size());	
 		}else if(entity.getDocument().getUuid() != null){

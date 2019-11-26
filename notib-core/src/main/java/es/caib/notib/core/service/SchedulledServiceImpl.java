@@ -130,7 +130,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 				initialDelayString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.registre.retard.inicial}")
 		public void enviamentRefrescarEstatEnviatSir() {
 			if (isTasquesActivesProperty() && isEnviamentActualitzacioEstatRegistreActiu()) {
-				logger.info("Cercant enviaments pendents de refrescar l'estat enviat SIR");
+				logger.debug("Cercant enviaments pendents de refrescar l'estat enviat SIR");
 				int maxPendents = getEnviamentActualitzacioEstatRegistreProcessarMaxProperty();
 				List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByRegistreRefresc(
 						new PageRequest(0, maxPendents));

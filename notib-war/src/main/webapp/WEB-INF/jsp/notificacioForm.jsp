@@ -290,7 +290,6 @@ $(document).ready(function() {
 		if ($(this).val() == 'ADMINISTRACIO') {
 			$(llinatge1).addClass('hidden');
 			$(llinatge2).addClass('hidden');
-			$(nif).addClass('hidden');
 			$(dir3codi).removeClass('hidden');
 		} else if ($(this).val() == 'FISICA') {
 			$(llinatge1).removeClass('hidden');
@@ -847,7 +846,7 @@ function actualitzarEntrega(j) {
 											<not:inputSelect name="enviaments[${j}].titular.interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="4" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
 										</div>
 										<div class="col-md-6 nif">
-											<not:inputText name="enviaments[${j}].titular.nif" generalClass="titularNif" textKey="notificacio.form.camp.titular.nif" required="true" />
+											<not:inputText name="enviaments[${j}].titular.nif" generalClass="titularNif" textKey="notificacio.form.camp.titular.nif"/>
 										</div>
 										<div class="col-md-6">
 											<not:inputText name="enviaments[${j}].titular.nom" textKey="notificacio.form.camp.titular.nom" required="true" />
