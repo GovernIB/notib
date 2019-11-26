@@ -112,7 +112,7 @@
 .entregaPostalInfo {
 	display: none;
 }
-#loading {
+.loading {
 	background: rgba( 255, 255, 255, 0.8 );
   	display: none;
   	height: 100%;
@@ -122,7 +122,7 @@
   	left: 0;
   	top: 0;
 }
-#loading img {
+.loading-gif {
 	left: 50%;
   	margin-left: -32px;
   	margin-top: -32px;
@@ -130,12 +130,15 @@
   	top: 50%;
   	width: 4%;
 }
-#loading p {
-	left: 50%;
+.loading-gif img {
+	width: 45%;
+}
+.loading-text {
+	left: 47%;
   	margin-left: -32px;
   	margin-top: -32px;
   	position: absolute;
-  	top: 56%;
+  	top: 55%;
 }
 </style>
 <script type="text/javascript">
@@ -685,9 +688,13 @@ function actualitzarEntrega(j) {
 </script>
 </head>
 <body>
-	<div id="loading">
+	<div class="loading">
+		<div class="loading-gif">
 		<img src="<c:url value="/img/ajax-loader.gif"/>"/>
+		</div>
+		<div class="loading-text">
 		<p><spring:message code="notificacio.form.loading"/></p>
+		</div>
 	</div>
     <c:set var="formAction"><not:modalUrl value="/notificacio/newOrModify"/></c:set>
     <form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" commandName="notificacioCommandV2" enctype="multipart/form-data">
