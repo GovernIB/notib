@@ -53,6 +53,7 @@ import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
@@ -135,6 +136,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private GrupProcedimentRepository grupProcedimentRepository;
 	@Autowired
 	private RegistreHelper registreHelper;
+	@Autowired
+	private AplicacioService aplicacioService;
 	
 	@Transactional(rollbackFor=Exception.class)
 	@Override
@@ -466,7 +469,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 					List<GrupProcedimentEntity> grups = grupProcedimentRepository.findByProcediment(procedimentAgrupable);
 					for (GrupProcedimentEntity grup : grups) {
-						grupsProcedimentsCodis.add(grup.getGrup().getCodi());
+						List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(aplicacioService.getUsuariActual().getCodi());
+						
+						if (rolsUsuariActual.contains(grup.getGrup().getCodi())) {
+							grupsProcedimentsCodis.add(grup.getGrup().getCodi());
+						}
 					}
 				}
 				
@@ -531,7 +538,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 					List<GrupProcedimentEntity> grups = grupProcedimentRepository.findByProcediment(procedimentAgrupable);
 					for (GrupProcedimentEntity grup : grups) {
-						grupsProcedimentsCodis.add(grup.getGrup().getCodi());
+						List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(aplicacioService.getUsuariActual().getCodi());
+						
+						if (rolsUsuariActual.contains(grup.getGrup().getCodi())) {
+							grupsProcedimentsCodis.add(grup.getGrup().getCodi());
+						}
 					}
 				}
 				//Quan no hi ha cap procediment amb grups
