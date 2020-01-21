@@ -151,7 +151,7 @@ public class NotificacioServiceWsTest extends BaseServiceTest {
 		}
 	}
 
-	@Test
+	//@Test
 	public void notificacioAltaAmbConsulta() {
 		autenticarUsuari("admin");
 		EntitatDto entitatCreada = entitatService.create(entitat);

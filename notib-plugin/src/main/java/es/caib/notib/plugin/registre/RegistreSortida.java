@@ -14,7 +14,6 @@ public class RegistreSortida {
 	private String codiUsuari;
 	private DadesOficina dadesOficina;
 	private List<DadesInteressat> dadesInteressat = new ArrayList<DadesInteressat>();
-	private DadesRepresentat dadesRepresentat;
 	private DadesAnotacio dadesAnotacio;
 	private List<DocumentRegistre> documents;
 	private String versioNotib;
@@ -43,12 +42,6 @@ public class RegistreSortida {
 	}
 	public void setDadesInteressat(List<DadesInteressat> dadesInteressat) {
 		this.dadesInteressat = dadesInteressat;
-	}
-	public DadesRepresentat getDadesRepresentat() {
-		return dadesRepresentat;
-	}
-	public void setDadesRepresentat(DadesRepresentat dadesRepresentat) {
-		this.dadesRepresentat = dadesRepresentat;
 	}
 	public DadesAnotacio getDadesAnotacio() {
 		return dadesAnotacio;

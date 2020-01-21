@@ -3,6 +3,8 @@
  */
 package es.caib.notib.war.controller;
 
+import java.util.Date;
+
 import javax.ejb.EJBAccessException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -22,10 +24,12 @@ import com.wordnik.swagger.annotations.ApiParam;
 
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.util.UtilitatsNotib;
+import es.caib.notib.core.api.ws.notificacio.DadesConsulta;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
 import es.caib.notib.core.api.ws.notificacio.PermisConsulta;
 import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
+import es.caib.notib.core.api.ws.notificacio.RespostaConsultaDadesRegistre;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
 
@@ -161,6 +165,44 @@ public class NotificacioServiceController extends BaseController {
 			return resp;
 		}
 	}
+	
+	@RequestMapping(
+			value = {"/services/notificacioV2/consultaDadesRegistre"}, 
+			method = RequestMethod.POST,
+			produces="application/json")
+	@ApiOperation(
+			value = "Genera el justificant i consulta la informació del registre d'una notificació.",
+			notes = "Retorna la informació del registre i el justificant d'una notificació dins Notib.",
+			response = RespostaConsultaDadesRegistre.class)
+	@ResponseBody
+	public RespostaConsultaDadesRegistre consultaDadesRegistre(
+			@ApiParam(
+					name = "dadesConsulta",
+					value = "Objecte amb les dades necessàries per consultar les dades de registre d'una notificació o enviament",
+					required = false)
+			@RequestBody DadesConsulta dadesConsulta) {
+		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
+		try {
+			return notificacioServiceWsV2.consultaDadesRegistre(dadesConsulta);
+		} catch (Exception e) {
+			RespostaConsultaDadesRegistre resp = new RespostaConsultaDadesRegistre();
+			resp.setError(true);
+			if (UtilitatsNotib.isExceptionOrCauseInstanceOf(e, EJBAccessException.class)) {
+				resp.setErrorDescripcio("L'usuari " + usuariActualCodi + " no té els permisos necessaris: " + e.getMessage());
+			} else {
+				resp.setErrorDescripcio(UtilitatsNotib.getMessageExceptionOrCauseInstanceOf(
+						e, 
+						EJBAccessException.class));
+			}
+			if (resp.getErrorDescripcio() != null)
+				return resp;
+			else 
+				resp.setErrorDescripcio(e.getMessage());
+			
+			return resp;
+		}
+	}
+	
 	
 	@RequestMapping(
 			value = "/services/notificacioV2/permisConsulta", 

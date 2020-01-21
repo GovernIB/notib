@@ -58,5 +58,16 @@ public interface NotificacioServiceWsV2 {
 	 */
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(
 			@WebParam(name="referencia") @XmlElement(required = true) String referencia);
+	
+	/**
+	 * Consulta l'estat d'un enviament d'una notificació.
+	 * 
+	 * @param dadesConsulta
+	 *            Dades necessàries per realitzar la consulta.
+	 * @return la informació de la notificació amb l'enviament
+	 *            especificat.
+	 */
+	public RespostaConsultaDadesRegistre consultaDadesRegistre(
+			DadesConsulta dadesConsulta);
 
 }

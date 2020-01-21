@@ -14,12 +14,15 @@ import org.jboss.annotation.security.SecurityDomain;
 import org.jboss.wsf.spi.annotation.WebContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
+import es.caib.notib.core.api.ws.notificacio.DadesConsulta;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
 import es.caib.notib.core.api.ws.notificacio.PermisConsulta;
 import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
+import es.caib.notib.core.api.ws.notificacio.RespostaConsultaDadesRegistre;
 import es.caib.notib.core.helper.UsuariHelper;
 
 /**
@@ -85,6 +88,12 @@ public class NotificacioServiceWsBeanV2 implements NotificacioServiceWsV2 {
 				sessionContext,
 				true);
 		return delegate.donarPermisConsulta(permisConsulta);
+	}
+	
+	@Override
+	public RespostaConsultaDadesRegistre consultaDadesRegistre(
+			DadesConsulta dadesConsulta) {
+		return delegate.consultaDadesRegistre(dadesConsulta);
 	}
 
 }

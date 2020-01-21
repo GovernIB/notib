@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.channels.InterruptedByTimeoutException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -63,6 +64,7 @@ import es.caib.notib.plugin.registre.DadesInteressat;
 import es.caib.notib.plugin.registre.DadesOficina;
 import es.caib.notib.plugin.registre.DadesRepresentat;
 import es.caib.notib.plugin.registre.DocumentRegistre;
+import es.caib.notib.plugin.registre.Interessat;
 import es.caib.notib.plugin.registre.Llibre;
 import es.caib.notib.plugin.registre.LlibreOficina;
 import es.caib.notib.plugin.registre.Oficina;
@@ -943,13 +945,14 @@ public class PluginHelper {
 			if(enviament.getDestinataris() != null && enviament.getDestinataris().size() > 0) {
 				destinatari =  enviament.getDestinataris().get(0);
 			}
-			registreSortida.getDadesInteressat().add(personaToDadesInteressat(
-					notificacio, 
-					enviament.getTitular()));	
-			registreSortida.setDadesRepresentat(personaToDadesRepresentat(
+			registreSortida.getDadesInteressat().add(personaToDadesInteressatIRepresenat(
 					notificacio, 
 					enviament.getTitular(),
 					destinatari));	
+//			registreSortida.setDadesRepresentat(personaToDadesRepresentat(
+//					notificacio, 
+//					enviament.getTitular(),
+//					destinatari));	
 		}
 		
 		DadesAnotacio dadesAnotacio = new DadesAnotacio();
@@ -1189,17 +1192,19 @@ public class PluginHelper {
 		return interessat;
 	}
 	
-	public DadesInteressat personaToDadesInteressat (
+	public DadesInteressat personaToDadesInteressatIRepresenat (
 			NotificacioDtoV2 notificacio, 
-			PersonaDto titular) {
+			PersonaDto titular,
+			PersonaDto destinatari) {
 		String dir3Codi;
 
 		if (notificacio.getEntitat().getDir3CodiReg() != null)
 			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
 		else
 			dir3Codi = notificacio.getEmisorDir3Codi();
-		
-		DadesInteressat dadesInteressat = new DadesInteressat();
+		DadesInteressat interessatRepresentat = new DadesInteressat();
+		Interessat dadesRepresentat = null;
+		Interessat dadesInteressat = new Interessat();
 		if (titular != null && notificacio != null) {
 			dadesInteressat.setEntitatCodi(dir3Codi);
 			dadesInteressat.setAutenticat(false);
@@ -1227,7 +1232,39 @@ public class PluginHelper {
 			dadesInteressat.setMunicipiCodi(null);
 			dadesInteressat.setMunicipiNom(null);
 		}
-		return dadesInteressat;
+		interessatRepresentat.setInteressat(dadesInteressat);
+		
+		if (destinatari != null && titular.isIncapacitat()) {
+			dadesRepresentat = new Interessat();
+			dadesRepresentat.setEntitatCodi(dir3Codi);
+			dadesRepresentat.setAutenticat(false);
+			if (destinatari.getInteressatTipus() != null) {
+				dadesRepresentat.setTipusInteressat(destinatari.getInteressatTipus().getLongVal());
+			}
+			if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
+				dadesRepresentat.setNif(destinatari.getDir3Codi());
+				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
+			} else if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA){
+				dadesRepresentat.setNif(destinatari.getNif());
+				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CIF);
+			} else {
+				dadesRepresentat.setNif(destinatari.getNif());
+				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
+			}
+			dadesRepresentat.setNom(destinatari.getNom());
+			dadesRepresentat.setCognom1(destinatari.getLlinatge1());
+			dadesRepresentat.setCognom2(destinatari.getLlinatge2());
+			dadesRepresentat.setNomAmbCognoms(destinatari.getNom() + " " + destinatari.getLlinatges());
+			dadesRepresentat.setPaisCodi(null);
+			dadesRepresentat.setPaisNom(null);
+			dadesRepresentat.setProvinciaCodi(null);
+			dadesRepresentat.setProvinciaNom(null);
+			dadesRepresentat.setMunicipiCodi(null);
+			dadesRepresentat.setMunicipiNom(null);
+		}
+		interessatRepresentat.setRepresentat(dadesRepresentat);
+		
+		return interessatRepresentat;
 	}
 	
 	private DadesRepresentat personaToDadesRepresentat (

@@ -39,6 +39,7 @@ import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.ws.notificacio.Certificacio;
+import es.caib.notib.core.api.ws.notificacio.DadesConsulta;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.EnviamentEstatEnum;
@@ -53,6 +54,7 @@ import es.caib.notib.core.api.ws.notificacio.Persona;
 import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
+import es.caib.notib.core.api.ws.notificacio.RespostaConsultaDadesRegistre;
 import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
@@ -75,6 +77,7 @@ import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
 
 
 /**
@@ -601,6 +604,104 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
+		}
+		return resposta;
+	}
+	
+	@Override
+	public RespostaConsultaDadesRegistre consultaDadesRegistre(DadesConsulta dadesConsulta) {
+		RespostaConsultaDadesRegistre resposta = new RespostaConsultaDadesRegistre();
+		if (dadesConsulta.getIdentificador() != null) {
+			logger.debug("Consultant les dades de registre de la notificació amb identificador: " + dadesConsulta.getIdentificador());
+			int numeroRegistre = 0;
+			Long notificacioId;
+			try {
+				notificacioId = notificaHelper.desxifrarId(dadesConsulta.getIdentificador());
+			} catch (GeneralSecurityException ex) {
+				resposta.setError(true);
+				resposta.setErrorData(new Date());
+				resposta.setErrorDescripcio("No s'ha pogut desxifrar l'identificador de la notificació " + dadesConsulta.getIdentificador());
+				return resposta;
+			}
+			NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
+			
+			if (notificacio == null) {
+				resposta.setError(true);
+				resposta.setErrorData(new Date());
+				resposta.setErrorDescripcio("Error: No s'ha trobat cap notificació amb l'identificador " + dadesConsulta.getIdentificador());
+				return resposta;
+			} else {
+				//Dades registre i consutla justificant
+				if (notificacio.getRegistreNumero() != null)
+					numeroRegistre = notificacio.getRegistreNumero();
+				
+				String numeroRegistreFormatat = notificacio.getRegistreNumeroFormatat();
+				String codiDir3Entitat = notificacio.getEmisorDir3Codi();
+	
+				if (numeroRegistreFormatat == null) {
+					resposta.setError(true);
+					resposta.setErrorData(new Date());
+					resposta.setErrorDescripcio("Error: No s'ha trobat cap registre relacionat amb la notificació: " + notificacioId);
+					return resposta;
+				}
+	
+				resposta.setDataRegistre(notificacio.getRegistreData());
+				resposta.setNumRegistre(numeroRegistre);
+				resposta.setNumRegistreFormatat(numeroRegistreFormatat);
+				if (dadesConsulta.isAmbJustificant()) {
+					RespostaJustificantRecepcio justificant = pluginHelper.obtenirJustificant(
+							codiDir3Entitat, 
+							numeroRegistreFormatat);
+					if (justificant.getErrorCodi() == null) {
+						resposta.setJustificant(justificant.getJustificant());
+					} else {
+						resposta.setError(true);
+						resposta.setErrorData(new Date());
+						resposta.setErrorDescripcio(justificant.getErrorCodi() + ": " + justificant.getErrorDescripcio());
+						return  resposta;
+					}
+				}	
+			}
+		} else if (dadesConsulta.getReferencia() != null) {
+			logger.debug("Consultant les dades de registre de l'enviament amb referència: " + dadesConsulta.getReferencia());
+			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findByNotificaReferencia(dadesConsulta.getReferencia());
+			if (enviament == null) {
+				resposta.setError(true);
+				resposta.setErrorData(new Date());
+				resposta.setErrorDescripcio("Error: No s'ha trobat cap enviament amb la referència" + dadesConsulta.getReferencia());
+				return resposta;
+			} else {
+				//Dades registre i consutla justificant
+				String numeroRegistreFormatat = enviament.getRegistreNumeroFormatat();
+				if (enviament.getNotificacio() == null) {
+					NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
+					enviament.setNotificacio(notificacio);
+				}
+				String codiDir3Entitat = enviament.getNotificacio().getEmisorDir3Codi();
+				if (numeroRegistreFormatat == null) {
+					resposta.setError(true);
+					resposta.setErrorData(new Date());
+					resposta.setErrorDescripcio("Error: No s'ha trobat cap registre relacionat amb l'enviament: " + enviament.getId());
+					return resposta;
+				}
+	
+				resposta.setDataRegistre(enviament.getRegistreData());
+				resposta.setNumRegistre(0);
+				resposta.setNumRegistreFormatat(numeroRegistreFormatat);
+				if (dadesConsulta.isAmbJustificant()) {
+					RespostaJustificantRecepcio justificant = pluginHelper.obtenirJustificant(
+							codiDir3Entitat, 
+							numeroRegistreFormatat);
+					if (justificant.getErrorCodi() == null) {
+						resposta.setJustificant(justificant.getJustificant());
+					} else {
+						resposta.setError(true);
+						resposta.setErrorData(new Date());
+						resposta.setErrorDescripcio(justificant.getErrorCodi() + ": " + justificant.getErrorDescripcio());
+						return  resposta;
+					}
+				}	
+			}
 		}
 		return resposta;
 	}

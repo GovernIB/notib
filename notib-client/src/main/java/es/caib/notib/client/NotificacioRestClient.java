@@ -25,12 +25,14 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.representation.Form;
 
 import es.caib.loginModule.client.AuthenticationFailureException;
+import es.caib.notib.ws.notificacio.DadesConsulta;
 import es.caib.notib.ws.notificacio.NotificacioServiceV2;
 import es.caib.notib.ws.notificacio.NotificacioV2;
 import es.caib.notib.ws.notificacio.PermisConsulta;
 import es.caib.notib.ws.notificacio.RespostaAlta;
+import es.caib.notib.ws.notificacio.RespostaConsultaDadesRegistre;
 import es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament;
-import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
+import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;;
 
 /**
  * Client REST per al servei de notificacions de NOTIB.
@@ -46,7 +48,7 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 	private String username;
 	private String password;
 
-	private boolean serveiDesplegatDamuntJbossCaib = true;
+	private boolean serveiDesplegatDamuntJbossCaib = false;
 
 	public NotificacioRestClient(
 			String baseUrl,
@@ -228,5 +230,30 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioRestClient.class);
+
+	@Override
+	public RespostaConsultaDadesRegistre consultaDadesRegistre(DadesConsulta dadesConsulta) {
+		try {
+			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaDadesRegistre";
+			ObjectMapper mapper  = new ObjectMapper();
+			String body = mapper.writeValueAsString(dadesConsulta);
+			Client jerseyClient = generarClient();
+			if (username != null) {
+				autenticarClient(
+						jerseyClient,
+						urlAmbMetode,
+						username,
+						password);
+			}
+			String json = jerseyClient.
+					resource(urlAmbMetode).
+					type("application/json").
+					post(String.class, body);
+			logger.debug("Missatge REST rebut: " + json);
+			return mapper.readValue(json, RespostaConsultaDadesRegistre.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
 
 }

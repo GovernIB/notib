@@ -145,10 +145,13 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			long tipusRegistre){
 		RespostaJustificantRecepcio rj = new RespostaJustificantRecepcio();
 		try {
-			return toRespostaJustificantRecepcio(getAsientoRegistralApi().obtenerJustificante(
+//			return toRespostaJustificantRecepcio(getAsientoRegistralApi().obtenerJustificante(
+//					codiDir3Entitat, 
+//					numeroRegistreFormatat, 
+//					tipusRegistre));
+			return toRespostaJustificantRecepcio(getRegistroSalidaApi().obtenerJustificante(
 					codiDir3Entitat, 
-					numeroRegistreFormatat, 
-					tipusRegistre));
+					numeroRegistreFormatat));
 		} catch (WsI18NException e) {
 			rj.setErrorCodi("0");
 			rj.setErrorDescripcio("No s'ha pogut obtenir el justificant");
@@ -203,8 +206,6 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			RegistreSortida registreSortida,
 			String aplicacion) throws RegistrePluginException {
 		RegistroSalidaWs rsw = new RegistroSalidaWs();
-		DatosInteresadoWs datosInteresado = new DatosInteresadoWs();
-		DatosInteresadoWs datosRepresentante = new DatosInteresadoWs();
 		InteresadoWs interesado = new InteresadoWs();
 		AnexoWs anexo = null;
 		try {
@@ -250,31 +251,37 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			if (anexo != null) {
 				rsw.getAnexos().add(anexo);
 			}
+			List<InteresadoWs> interesadosWs = new ArrayList<InteresadoWs>();
 			for (DadesInteressat dadesInteressat : registreSortida.getDadesInteressat()) {
-				datosInteresado.setApellido1(dadesInteressat.getCognom1());
-				datosInteresado.setApellido2(dadesInteressat.getCognom2());
-				datosInteresado.setTipoDocumentoIdentificacion(dadesInteressat.getTipusDocumentIdentificacio().getValor());
-				datosInteresado.setDocumento(dadesInteressat.getNif());
-				datosInteresado.setNombre(dadesInteressat.getNom());
-				if (dadesInteressat.getTipusInteressat().equals(1L))
-					datosInteresado.setRazonSocial(dadesInteressat.getNom());
-				datosInteresado.setTipoInteresado(dadesInteressat.getTipusInteressat());
-				interesado.setInteresado(datosInteresado);
+				DatosInteresadoWs datosInteresado = new DatosInteresadoWs();
+				DatosInteresadoWs datosRepresentante = new DatosInteresadoWs();
+				InteresadoWs interesadoWs = new InteresadoWs();
+				datosInteresado.setApellido1(dadesInteressat.getInteressat().getCognom1());
+				datosInteresado.setApellido2(dadesInteressat.getInteressat().getCognom2());
+				datosInteresado.setTipoDocumentoIdentificacion(dadesInteressat.getInteressat().getTipusDocumentIdentificacio().getValor());
+				datosInteresado.setDocumento(dadesInteressat.getInteressat().getNif());
+				datosInteresado.setNombre(dadesInteressat.getInteressat().getNom());
+				if (dadesInteressat.getInteressat().getTipusInteressat().equals(1L))
+					datosInteresado.setRazonSocial(dadesInteressat.getInteressat().getNom());
+				datosInteresado.setTipoInteresado(dadesInteressat.getInteressat().getTipusInteressat());
+				interesadoWs.setInteresado(datosInteresado);
+				
+				if (dadesInteressat.getRepresentat() != null) {
+					Interessat dadesRepresentat = dadesInteressat.getRepresentat();
+					datosRepresentante.setApellido1(dadesRepresentat.getCognom1());
+					datosRepresentante.setApellido2(dadesRepresentat.getCognom2());
+					datosRepresentante.setTipoDocumentoIdentificacion(dadesRepresentat.getTipusDocumentIdentificacio().getValor());
+					datosRepresentante.setDocumento(dadesRepresentat.getNif());
+					datosRepresentante.setNombre(dadesRepresentat.getNom());
+					if (dadesRepresentat.getTipusInteressat().equals(1L))
+						datosInteresado.setRazonSocial(dadesRepresentat.getNom());
+					datosRepresentante.setTipoInteresado(dadesRepresentat.getTipusInteressat());
+					interesadoWs.setRepresentante(datosRepresentante);
+				}
+				interesadosWs.add(interesadoWs);
 			}
-			if (registreSortida.getDadesRepresentat() != null) {
-				DadesRepresentat dadesRepresentat = registreSortida.getDadesRepresentat();
-				datosRepresentante.setApellido1(dadesRepresentat.getCognom1());
-				datosRepresentante.setApellido2(dadesRepresentat.getCognom2());
-				datosRepresentante.setTipoDocumentoIdentificacion(dadesRepresentat.getTipusDocumentIdentificacio().getValor());
-				datosRepresentante.setDocumento(dadesRepresentat.getNif());
-				datosRepresentante.setNombre(dadesRepresentat.getNom());
-				if (dadesRepresentat.getTipusInteressat().equals(1L))
-					datosInteresado.setRazonSocial(dadesRepresentat.getNom());
-				datosRepresentante.setTipoInteresado(dadesRepresentat.getTipusInteressat());
-				interesado.setRepresentante(datosRepresentante);
-			}
-			rsw.getInteresados().add(interesado);
-			
+
+			rsw.getInteresados().addAll(interesadosWs);
 			rsw.setAplicacion(registreSortida.getAplicacio());
 			rsw.setVersion(registreSortida.getVersioNotib());
 			
