@@ -246,6 +246,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 						anexo.setNombreFirmaAnexada(document.getArxiuNom());
 						anexo.setFirmaAnexada(document.getArxiuContingut()); //doc.getFirmes().get(0).getContingut()
 					}
+					anexo.setCsv(document.getCsv());
 				}
 			}
 			if (anexo != null) {

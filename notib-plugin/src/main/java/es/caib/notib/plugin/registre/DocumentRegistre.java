@@ -20,7 +20,8 @@ public class DocumentRegistre {
 	private Integer origen;
 	private Integer modeFirma;
 	private String observacions;
-
+	private String csv;
+	
 	public String getNom() {
 		return nom;
 	}
@@ -85,6 +86,12 @@ public class DocumentRegistre {
 	public void setObservacions(
 			String observacions) {
 		this.observacions = observacions;
+	}
+	public String getCsv() {
+		return csv;
+	}
+	public void setCsv(String csv) {
+		this.csv = csv;
 	}
 
 }

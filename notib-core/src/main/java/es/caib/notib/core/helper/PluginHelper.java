@@ -608,6 +608,7 @@ public class PluginHelper {
 				document.setData(new Date());
 				document.setOrigen(RegistreOrigenEnum.ADMINISTRACIO.getValor());
 				document.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO.getValor());
+				document.setCsv(documentDto.getCsv());
 			}
 			try {
 				if (doc != null) {
