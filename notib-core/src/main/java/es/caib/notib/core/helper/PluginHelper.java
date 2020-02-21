@@ -599,6 +599,12 @@ public class PluginHelper {
 					document.setData(docDetall.getMetadades().getDataCaptura());
 					document.setOrigen(docDetall.getMetadades().getOrigen().ordinal());
 					document.setTipusDocumental(docDetall.getMetadades().getTipusDocumental().toString());
+					
+					//Recuperar csv
+					Map<String, Object> metadadesAddicionals = docDetall.getMetadades().getMetadadesAddicionals();
+					if (metadadesAddicionals != null && metadadesAddicionals.containsKey("csv")) {
+						document.setCsv((String)metadadesAddicionals.get("csv"));
+					}
 				}
 			} else if (documentDto.getCsv() != null) {
 				id = documentDto.getCsv();
