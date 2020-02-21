@@ -593,6 +593,7 @@ public class PluginHelper {
 			String id = "";
 			if(documentDto.getUuid() != null) {
 				id = documentDto.getUuid();
+				doc = arxiuGetImprimible(id, true);
 				document.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA.getValor());
 				Document docDetall = arxiuDocumentConsultar(id, null);
 				if (docDetall.getMetadades() != null) {
