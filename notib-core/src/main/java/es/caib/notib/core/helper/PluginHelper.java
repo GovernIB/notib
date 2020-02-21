@@ -599,6 +599,12 @@ public class PluginHelper {
 					document.setData(docDetall.getMetadades().getDataCaptura());
 					document.setOrigen(docDetall.getMetadades().getOrigen().ordinal());
 					document.setTipusDocumental(docDetall.getMetadades().getTipusDocumental().toString());
+					
+					//Recuperar csv
+					Map<String, Object> metadadesAddicionals = docDetall.getMetadades().getMetadadesAddicionals();
+					if (metadadesAddicionals != null && metadadesAddicionals.containsKey("csv")) {
+						document.setCsv((String)metadadesAddicionals.get("csv"));
+					}
 				}
 			} else if (documentDto.getCsv() != null) {
 				id = documentDto.getCsv();
@@ -733,6 +739,12 @@ public class PluginHelper {
 							annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumental().toString());
 							annex.setOrigenCiudadanoAdmin(docDetall.getMetadades().getOrigen().ordinal());
 							annex.setFechaCaptura(toXmlGregorianCalendar(docDetall.getMetadades().getDataCaptura()));
+							
+							//Recuperar csv
+							Map<String, Object> metadadesAddicionals = docDetall.getMetadades().getMetadadesAddicionals();
+							if (metadadesAddicionals != null && metadadesAddicionals.containsKey("csv")) {
+								document.setCsv((String)metadadesAddicionals.get("csv"));
+							}
 						}
 					}catch(ArxiuException ae) {
 						logger.error("Error Obtenint el document per l'uuid");
