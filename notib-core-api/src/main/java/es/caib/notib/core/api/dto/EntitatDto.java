@@ -22,6 +22,7 @@ public class EntitatDto extends AuditoriaDto {
 	private String dir3CodiReg;
 	private String apiKey;
 	private boolean ambEntregaDeh;
+	private boolean ambEntregaCie;
 	private String descripcio;
 	private boolean activa;
 	private byte[] logoCapBytes;
@@ -90,6 +91,12 @@ public class EntitatDto extends AuditoriaDto {
 	}
 	public void setAmbEntregaDeh(boolean ambEntregaDeh) {
 		this.ambEntregaDeh = ambEntregaDeh;
+	}
+	public boolean isAmbEntregaCie() {
+		return ambEntregaCie;
+	}
+	public void setAmbEntregaCie(boolean ambEntregaCie) {
+		this.ambEntregaCie = ambEntregaCie;
 	}
 	public boolean isActiva() {
 		return activa;

@@ -357,9 +357,9 @@ $(document).ready(function() {
 
 					<script id="cellEnviamentTipusTemplate" type="text/x-jsrender">
 						{{if enviamentTipus == 'NOTIFICACIO'}}
-							<div class="not-icon-o">N</div>
+							<div class="not-icon-o" title="<spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.NOTIFICACIO"/>">N</div>
 						{{else}}
-							<div class="com-icon-o">C</div>
+							<div class="com-icon-o" title="<spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.COMUNICACIO"/>">C</div>
 						{{/if}}
 					</script>
 				</th>

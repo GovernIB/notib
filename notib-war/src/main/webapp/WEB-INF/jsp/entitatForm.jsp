@@ -96,6 +96,7 @@ $(document).ready(function() {
 			<not:inputText name="dir3CodiReg" textKey="entitat.form.camp.codidir3reg" info="true" messageInfo="entitat.form.camp.codidir3reg.info"/>
 			<not:inputText name="apiKey" textKey="entitat.form.camp.apiKey" required="true"/>
 			<not:inputCheckbox name="ambEntregaDeh" textKey="entitat.form.camp.entregadeh"/>
+			<not:inputCheckbox name="ambEntregaCie" textKey="entitat.form.camp.entregacie"/>
 			<not:inputTextarea name="descripcio" textKey="entitat.form.camp.descripcio"/>
 		</div>
 		<div role="tabpanel" class="tab-pane " id="configuracioForm">

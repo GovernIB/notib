@@ -42,6 +42,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	private String apiKey;
 	@Column(name = "amb_entrega_deh", nullable = false)
 	private boolean ambEntregaDeh;
+	@Column(name = "amb_entrega_cie", nullable = false)
+	private boolean ambEntregaCie;
 	@Column(name = "descripcio", length = 1024)
 	private String descripcio;
 	@Column(name = "activa", nullable = false)
@@ -78,6 +80,9 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	public boolean isAmbEntregaDeh() {
 		return ambEntregaDeh;
 	}
+	public boolean isAmbEntregaCie() {
+		return ambEntregaCie;
+	}
 	public String getDescripcio() {
 		return descripcio;
 	}
@@ -113,6 +118,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			String dir3CodiReg,
 			String apiKey,
 			boolean ambEntregaDeh,
+			boolean ambEntregaCie,
 			String descripcio,
 			byte[] logoCapBytes,
 			byte[] logoPeuBytes,
@@ -127,6 +133,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 		this.dir3CodiReg = dir3CodiReg;
 		this.apiKey = apiKey;
 		this.ambEntregaDeh = ambEntregaDeh;
+		this.ambEntregaCie = ambEntregaCie;
 		this.logoCapBytes = logoCapBytes;
 		this.logoPeuBytes = logoPeuBytes;
 		this.colorFons = colorFons;
@@ -147,6 +154,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			String dir3CodiReg,
 			String apiKey,
 			boolean ambEntregaDeh,
+			boolean ambEntregaCie,
 			byte[] logoCapBytes,
 			byte[] logoPeuBytes,
 			String colorFons,
@@ -160,6 +168,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				dir3CodiReg,
 				apiKey,
 				ambEntregaDeh,
+				ambEntregaCie,
 				logoCapBytes,
 				logoPeuBytes,
 				colorFons,
@@ -177,6 +186,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				String dir3CodiReg,
 				String apiKey,
 				boolean ambEntregaDeh,
+				boolean ambEntregaCie,
 				byte[] logoCapBytes,
 				byte[] logoPeuBytes,
 				String colorFons,
@@ -191,6 +201,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			built.activa = true;
 			built.apiKey = apiKey;
 			built.ambEntregaDeh = ambEntregaDeh;
+			built.ambEntregaCie = ambEntregaCie;
 			built.logoCapBytes = logoCapBytes;
 			built.logoPeuBytes = logoPeuBytes;
 			built.colorFons = colorFons;
