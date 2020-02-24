@@ -86,11 +86,9 @@ public class PagadorPostalServiceImpl implements PagadorPostalService{
 	}
 
 	@Override
-	public PagadorPostalDto delete(Long id) throws NotFoundException {
+	public PagadorPostalDto delete(Long id) throws Exception {
 		
 		PagadorPostalEntity pagadorPostalEntity = entityComprovarHelper.comprovarPagadorPostal(id);
-		
-		
 		pagadorPostalReposity.delete(id);
 		return conversioTipusHelper.convertir(
 				pagadorPostalEntity, 

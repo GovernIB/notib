@@ -52,7 +52,7 @@ public interface PagadorCieService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public PagadorCieDto delete(
-			Long id) throws NotFoundException;
+			Long id) throws Exception;
 
 	/**
 	 * Consulta un pagador cie donat el seu codi.

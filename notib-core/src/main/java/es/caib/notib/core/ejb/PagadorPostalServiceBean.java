@@ -50,7 +50,7 @@ public class PagadorPostalServiceBean implements PagadorPostalService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
-	public PagadorPostalDto delete(Long id) throws NotFoundException {
+	public PagadorPostalDto delete(Long id) throws Exception {
 		return delegate.delete(id);
 	}
 

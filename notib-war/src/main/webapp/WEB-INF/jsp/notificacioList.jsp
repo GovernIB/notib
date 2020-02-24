@@ -95,6 +95,7 @@
 	color: black;
 	font-weight: bold;
 	font-size: 13px;
+	margin: 0 auto; 
 }
 #notificacio > tbody td:first-child {
 	vertical-align: middle;
@@ -340,7 +341,7 @@ $(document).ready(function() {
 		data-toggle="datatable"
 		data-url="<c:url value="/notificacio/datatable"/>"
 		data-search-enabled="false"
-		data-default-order="3"
+		data-default-order="4"
 		data-default-dir="desc"
 		class="table table-striped table-bordered"
 		style="width:100%"
@@ -352,7 +353,11 @@ $(document).ready(function() {
 				<th data-col-name="notificacio.notificaError" data-visible="false"></th>
 				<th data-col-name="notificacio.notificaErrorDescripcio" data-visible="false"></th>
 				
+<<<<<<< HEAD
+				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" class="enviamentTipusCol" width="5px">
+=======
 				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" class="enviamentTipusCol">
+>>>>>>> branch 'notib-1.1' of https://github.com/GovernIB/notib.git
 					<script id="cellEnviamentTipusTemplate" type="text/x-jsrender">
 						{{if enviamentTipus == 'NOTIFICACIO'}}
 							<div class="not-icon-o">N</div>

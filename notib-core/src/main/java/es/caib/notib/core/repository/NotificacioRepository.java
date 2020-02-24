@@ -190,7 +190,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"where " +
 			"    (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
 			"and (ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " +
-			"and ntf.grupCodi = null or (ntf.grupCodi in (:grupsProcedimentCodisNotib)) " +
+			"and (ntf.grupCodi = null or (ntf.grupCodi in (:grupsProcedimentCodisNotib))) " +
 			"and (:entitat = ntf.entitat) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +

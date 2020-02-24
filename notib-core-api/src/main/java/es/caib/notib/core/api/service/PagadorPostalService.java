@@ -52,7 +52,7 @@ public interface PagadorPostalService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public PagadorPostalDto delete(
-			Long id) throws NotFoundException;
+			Long id) throws Exception;
 
 	/**
 	 * Consulta un pagador postal donat el seu codi.

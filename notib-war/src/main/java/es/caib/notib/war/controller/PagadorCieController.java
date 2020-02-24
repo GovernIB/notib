@@ -8,6 +8,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -124,7 +125,7 @@ public class PagadorCieController extends BaseUserController{
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:pagadorsCie",
-					"procediment.controller.modificat.ok");
+					"pagadorCie.controller.modificat.ok");
 		//if it is new	
 		} else {
 			pagadorCieService.create(
@@ -133,7 +134,7 @@ public class PagadorCieController extends BaseUserController{
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:pagadorsCie",
-					"procediment.controller.creat.ok");
+					"pagadorCie.controller.creat.ok");
 		}
 	}
 	
@@ -164,10 +165,23 @@ public class PagadorCieController extends BaseUserController{
 	@RequestMapping(value = "/{pagadorCieId}/delete", method = RequestMethod.GET)
 	public String delete(
 			HttpServletRequest request,
-			@PathVariable Long pagadorCieId) {
-		//EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
-		pagadorCieService.delete(pagadorCieId);
+			@PathVariable Long pagadorCieId) {		
+		try {
+			pagadorCieService.delete(pagadorCieId);
+		} catch (Exception e) {
+			if (e instanceof DataIntegrityViolationException) {
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../pagadorCie",
+						"pagadorCie.controller.esborrat.ora.ko");
+			} else {
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../pagadorCie",
+						"pagadorCie.controller.esborrat.ko");
+			}
+			
+		}
 		
 		return getAjaxControllerReturnValueSuccess(
 				request,

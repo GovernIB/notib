@@ -46,7 +46,7 @@ public class PagadorCieServiceBean implements PagadorCieService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
-	public PagadorCieDto delete(Long id) throws NotFoundException {
+	public PagadorCieDto delete(Long id) throws Exception {
 		return delegate.delete(id);
 	}
 

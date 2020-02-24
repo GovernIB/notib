@@ -78,9 +78,9 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	}
 
 	@Override
-	public PagadorCieDto delete(Long id) throws NotFoundException {
-		PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(id);
+	public PagadorCieDto delete(Long id) throws Exception {
 		
+		PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(id);
 		pagadorCieReposity.delete(id);
 		return conversioTipusHelper.convertir(
 				pagadorCieEntity, 

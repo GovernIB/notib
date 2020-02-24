@@ -7,8 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -128,7 +128,7 @@ public class PagadorPostalController extends BaseUserController{
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:pagadorsPostals",
-					"procediment.controller.modificat.ok");
+					"pagadorPostal.controller.modificat.ok");
 		//if it is new	
 		} else {
 			pagadorPostalService.create(
@@ -137,7 +137,7 @@ public class PagadorPostalController extends BaseUserController{
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:pagadorsPostals",
-					"procediment.controller.creat.ok");
+					"pagadorPostal.controller.creat.ok");
 		}
 	}
 	
@@ -170,7 +170,22 @@ public class PagadorPostalController extends BaseUserController{
 			@PathVariable Long pagadorPostalId) {
 		//EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
-		pagadorPostalService.delete(pagadorPostalId);
+		try {
+			pagadorPostalService.delete(pagadorPostalId);
+		} catch (Exception e) {
+			if (e instanceof DataIntegrityViolationException) {
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../pagadorPostal",
+						"pagadorPostal.controller.esborrat.ora.ko");
+			} else {
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../pagadorPostal",
+						"pagadorPostal.controller.esborrat.ko");
+			}
+			
+		}
 		
 		return getAjaxControllerReturnValueSuccess(
 				request,
