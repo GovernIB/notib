@@ -169,18 +169,10 @@ public class PagadorCieController extends BaseUserController{
 		try {
 			pagadorCieService.delete(pagadorCieId);
 		} catch (Exception e) {
-			if (e instanceof DataIntegrityViolationException) {
-				return getAjaxControllerReturnValueError(
+			return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../pagadorCie",
 						"pagadorCie.controller.esborrat.ora.ko");
-			} else {
-				return getAjaxControllerReturnValueError(
-						request,
-						"redirect:../../pagadorCie",
-						"pagadorCie.controller.esborrat.ko");
-			}
-			
 		}
 		
 		return getAjaxControllerReturnValueSuccess(

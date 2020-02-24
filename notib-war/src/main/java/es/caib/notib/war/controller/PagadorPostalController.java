@@ -173,17 +173,10 @@ public class PagadorPostalController extends BaseUserController{
 		try {
 			pagadorPostalService.delete(pagadorPostalId);
 		} catch (Exception e) {
-			if (e instanceof DataIntegrityViolationException) {
 				return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../pagadorPostal",
 						"pagadorPostal.controller.esborrat.ora.ko");
-			} else {
-				return getAjaxControllerReturnValueError(
-						request,
-						"redirect:../../pagadorPostal",
-						"pagadorPostal.controller.esborrat.ko");
-			}
 			
 		}
 		
