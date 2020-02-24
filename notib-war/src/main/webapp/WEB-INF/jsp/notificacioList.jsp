@@ -74,6 +74,31 @@
 .panel-heading.processarButton {
 	background-color: red;
 }
+.not-icon-o {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 22px;
+	height: 22px;
+	background-color: #999999;
+	color: white;
+	font-weight: bold;
+	font-size: 13px;
+}
+.com-icon-o {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 27px;
+	height: 27px;
+	background-color: #dddddd;
+	color: black;
+	font-weight: bold;
+	font-size: 13px;
+}
+#notificacio > tbody td:first-child {
+	vertical-align: middle;
+}
 </style>
 <script type="text/javascript">
 var myHelpers = {recuperarEstatEnviament: returnEnviamentsStatusDiv};
@@ -270,7 +295,7 @@ $(document).ready(function() {
 <div id="msg-box"></div>
 	<form:form id="filtre" action="" method="post" cssClass="well" commandName="notificacioFiltreCommand">
 		<div class="row">
-			<c:if test="${isRolActualAdministrador}">
+			<c:if test="${isRolActualAdministrador && mostrarColumnaEntitat}">
 				<div class="col-md-3">
 					<not:inputSelect name="entitatId" optionItems="${entitat}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.entitat" inline="true"/>
 				</div>
@@ -326,16 +351,21 @@ $(document).ready(function() {
 				<th data-col-name="id" data-visible="false">#</th>
 				<th data-col-name="notificacio.notificaError" data-visible="false"></th>
 				<th data-col-name="notificacio.notificaErrorDescripcio" data-visible="false"></th>
-				<th data-col-name=createdDate data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>
-				<c:if test="${isRolActualAdministrador}">
-					<th data-col-name="entitat.nom" width="170px"><spring:message code="notificacio.list.columna.entitat"/></th>
-				</c:if>
-				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" width="60px">
-					<spring:message code="notificacio.list.columna.tipus.enviament"/>
+				
+				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" class="enviamentTipusCol">
 					<script id="cellEnviamentTipusTemplate" type="text/x-jsrender">
-						{{:~eval('enviamentTipus["' + enviamentTipus + '"]')}}
+						{{if enviamentTipus == 'NOTIFICACIO'}}
+							<div class="not-icon-o">N</div>
+						{{else}}
+							<div class="com-icon-o">C</div>
+						{{/if}}
 					</script>
 				</th>
+				
+				<th data-col-name=createdDate data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>
+				<c:if test="${isRolActualAdministrador && mostrarColumnaEntitat}">
+					<th data-col-name="entitat.nom" width="170px"><spring:message code="notificacio.list.columna.entitat"/></th>
+				</c:if>
 				<%--th data-col-name="comunicacioTipus" data-template="#cellComunicacioTipusTemplate">
 					<spring:message code="notificacio.list.columna.tipus.comunicacio"/>
 					<script id="cellComunicacioTipusTemplate" type="text/x-jsrender">
@@ -343,6 +373,9 @@ $(document).ready(function() {
 					</script>
 				</th--%>
 				<th data-col-name="procediment.nom"  width="200px"><spring:message code="notificacio.list.columna.procediment"/></th>
+				<c:if test="${mostrarColumnaNumExpedient}">
+					<th data-col-name="numExpedient" width="170px"><spring:message code="notificacio.list.columna.num.expedient"/></th>
+				</c:if>
 				<th data-col-name="concepte" width="${ampladaConcepte}" ><spring:message code="notificacio.list.columna.concepte"/></th>
 				<th data-col-name="estatDate" data-converter="datetime" data-visible="false"></th>
 				<th data-col-name="estat" data-template="#cellEstatTemplate"  width="120px">

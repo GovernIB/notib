@@ -150,6 +150,10 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("notificacioEnviamentTipus", 
 				EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class, 
 						"es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
+		model.addAttribute("mostrarColumnaEntitat", 
+				aplicacioService.propertyGet("es.caib.notib.columna.entitat"));
+		model.addAttribute("mostrarColumnaNumExpedient", 
+				aplicacioService.propertyGet("es.caib.notib.columna.num.expedient"));
 		return "notificacioList";
 	}
 

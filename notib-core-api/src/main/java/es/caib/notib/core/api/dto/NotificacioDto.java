@@ -53,7 +53,7 @@ public class NotificacioDto extends AuditoriaDto {
 	private String registreExtracte;
 	private String registreTipusAssumpte;
 	private String registreRefExterna;
-	private String registreNumExpedient;
+	private String numExpedient;
 	private PagadorPostalDto pagadorPostal;
 	private String usuariCodi;
 	private String registreObservacions;
@@ -315,11 +315,11 @@ public class NotificacioDto extends AuditoriaDto {
 	public void setRegistreRefExterna(String registreRefExterna) {
 		this.registreRefExterna = registreRefExterna;
 	}
-	public String getRegistreNumExpedient() {
-		return registreNumExpedient;
+	public String getNumExpedient() {
+		return numExpedient;
 	}
-	public void setRegistreNumExpedient(String registreNumExpedient) {
-		this.registreNumExpedient = registreNumExpedient;
+	public void setNumExpedient(String numExpedient) {
+		this.numExpedient = numExpedient;
 	}
 	public PagadorPostalDto getPagadorPostal() {
 		return pagadorPostal;

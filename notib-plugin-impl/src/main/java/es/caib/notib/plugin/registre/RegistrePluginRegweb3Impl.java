@@ -539,7 +539,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		registre.setCodigoAsuntoDenominacion(notificacio.getRegistreTipusAssumpte());
 		registre.setIdioma(1L);
 		registre.setReferenciaExterna(notificacio.getRegistreRefExterna());
-		registre.setNumeroExpediente(notificacio.getRegistreNumExpedient());
+		registre.setNumeroExpediente(notificacio.getNumExpedient());
 		/*
 		 * 
 		 * '01' : Servei de missatgers
