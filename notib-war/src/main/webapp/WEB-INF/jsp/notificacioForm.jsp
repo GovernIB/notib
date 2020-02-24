@@ -140,6 +140,17 @@
   	position: absolute;
   	top: 55%;
 }
+.avis-metodo-envio {
+	margin-top: 2%;
+	text-align: center;
+	color: #373737;
+	padding: 1% 0 0 0;
+}
+.avis-metodo-envio span:before {
+	color: #ff9f59;
+	font-size: 15px;
+	margin-right: 6px;
+}
 </style>
 <script type="text/javascript">
 
@@ -955,22 +966,36 @@ function actualitzarEntrega(j) {
 							
 							</div>
 							<div class="col-md-12 separacio"></div>
+							
 							<div class="metodeEntrega">
+								<c:choose>
+								<c:when test="${ambEntregaDeh || ambEntregaCie}">
 								<div class="col-md-12 title-envios">
 									<div class="title-container entrega">
 										<label> ${metodeEntrega} </label>
 									</div>
 									<hr/>
 								</div>
+								</c:when>
+								<c:otherwise>
+									<div class="avis-metodo-envio col-md-12">
+										<p class="comentari"><span class="fa fa-info-circle"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info.cap"/></span></p>
+									</div>
+								</c:otherwise>
+								</c:choose>
 								<div class="col-md-12">
 									<div class="entregaPostal_info_${j} entregaPostalInfo alert alert-info" role="alert">
 										<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
 									  <strong><spring:message code="notificacio.form.camp.logitud.info"/></strong>
 									</div>
+									<c:if test="${ambEntregaDeh || ambEntregaCie}">
 									<div>
 									<p class="comentari"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
 									</div>
-									<not:inputCheckbox name="enviaments[${j}].entregaPostalActiva" textKey="notificacio.form.camp.entregapostal.activa" labelSize="4" funcio="mostrarEntregaPostal(this.id)" />
+									</c:if>
+									<c:if test="${ambEntregaCie}">
+										<not:inputCheckbox name="enviaments[${j}].entregaPostalActiva" textKey="notificacio.form.camp.entregapostal.activa" labelSize="4" funcio="mostrarEntregaPostal(this.id)" />
+									</c:if>
 								</div>
 								<c:choose>
 									<c:when test="${not empty enviosGuardats}">

@@ -733,6 +733,7 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("isMultiplesDestinataris", aplicacioService.propertyGet("es.caib.notib.destinatari.multiple"));
 		model.addAttribute("notificacioCommandV2", notificacio);
 		model.addAttribute("ambEntregaDeh", entitatActual.isAmbEntregaDeh());
+		model.addAttribute("ambEntregaCie", entitatActual.isAmbEntregaCie());
 		model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
 		model.addAttribute("entitat", procedimentActual.getEntitat());
 		model.addAttribute("procediment", procedimentService.findById(
