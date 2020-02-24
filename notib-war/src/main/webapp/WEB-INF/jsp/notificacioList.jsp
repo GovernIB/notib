@@ -352,12 +352,8 @@ $(document).ready(function() {
 				<th data-col-name="id" data-visible="false">#</th>
 				<th data-col-name="notificacio.notificaError" data-visible="false"></th>
 				<th data-col-name="notificacio.notificaErrorDescripcio" data-visible="false"></th>
-				
-<<<<<<< HEAD
 				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" class="enviamentTipusCol" width="5px">
-=======
-				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" class="enviamentTipusCol">
->>>>>>> branch 'notib-1.1' of https://github.com/GovernIB/notib.git
+
 					<script id="cellEnviamentTipusTemplate" type="text/x-jsrender">
 						{{if enviamentTipus == 'NOTIFICACIO'}}
 							<div class="not-icon-o">N</div>
