@@ -113,28 +113,33 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		try {
 			ResultadoAltaRemesaEnvios resultadoAlta = enviaNotificacio(notificacio);
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
-				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
-					for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
-						if (enviament.getTitular().getNif().equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
-							enviament.updateNotificaEnviada(
-									resultadoEnvio.getIdentificador());
-						}
-					}
-				}
+				
 				//Crea un nou event
 				NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
 						notificacio);
 				if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
 					eventBulider.callbackInicialitza();
+				
 				NotificacioEventEntity event = eventBulider.build();
 				
-				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
-				notificacio.updateEventAfegir(event);
-				notificacio.updateNotificaError(
-						null,
-						null);
-				notificacioEventRepository.save(event);
+				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
+					for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+						if (enviament.getTitular().getNif().equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
+							enviament.updateNotificaEnviada(
+									resultadoEnvio.getIdentificador());
+							
+							//Registrar event per enviament
+							notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
+							eventBulider.enviament(enviament);
+							notificacio.updateEventAfegir(event);
+							notificacio.updateNotificaError(
+									null,
+									null);
+							notificacioEventRepository.save(event);
+						}
+					}
+				}
 			} else {
 				//Crea un nou event
 				NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
