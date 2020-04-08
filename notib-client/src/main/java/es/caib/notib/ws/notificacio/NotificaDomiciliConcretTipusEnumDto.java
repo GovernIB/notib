@@ -11,14 +11,14 @@ import javax.xml.bind.annotation.XmlType;
  * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
  * <p>
  * <pre>
- * &lt;simpleType name="notificaDomiciliConcretTipusEnumDto">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="NACIONAL"/>
- *     &lt;enumeration value="ESTRANGER"/>
- *     &lt;enumeration value="APARTAT_CORREUS"/>
- *     &lt;enumeration value="SENSE_NORMALITZAR"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="notificaDomiciliConcretTipusEnumDto"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="NACIONAL"/&gt;
+ *     &lt;enumeration value="ESTRANGER"/&gt;
+ *     &lt;enumeration value="APARTAT_CORREUS"/&gt;
+ *     &lt;enumeration value="SENSE_NORMALITZAR"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  * 
  */

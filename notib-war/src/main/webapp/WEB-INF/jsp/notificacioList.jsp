@@ -308,7 +308,7 @@ $(document).ready(function() {
 			<%--div class="col-md-2">
 				<not:inputSelect name="comunicacioTipus" optionItems="${notificacioComunicacioTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.comunicacio.tipus" inline="true"/>
 			</div--%>
-			<div class="col-md-3">
+			<div class="col-md-4">
 				<not:inputText name="concepte" inline="true"  placeholderKey="notificacio.list.filtre.camp.concepte"/>
 			</div>
 			<div class="col-md-2">
@@ -320,16 +320,17 @@ $(document).ready(function() {
 			<div class="col-md-2">
 				<not:inputDate name="dataFi" placeholderKey="notificacio.list.filtre.camp.datafi" inline="true" required="false" />
 			</div>
-			<div class="col-md-3">
+			<div class="col-md-2">
 				<not:inputText name="titular" inline="true" placeholderKey="notificacio.list.filtre.camp.titular"/>
 			</div>
-			<div class="col-md-3">
+			<div class="col-md-4">
 				<not:inputSelect name="procedimentId" optionItems="${procedimentsPermisLectura}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.procediment" inline="true"/>
 			</div>
-			<div class="col-md-3">
+			<div class="col-md-2">
 				<not:inputSelect name="tipusUsuari" optionItems="${tipusUsuari}" optionValueAttribute="value" optionTextKeyAttribute="text"  emptyOption="true"  placeholderKey="notificacio.list.filtre.camp.tipususuari" inline="true" />
 			</div>
-			<div class="col-md-3">
+			<div class="col-md-2">
+				<not:inputText name="numExpedient" inline="true" placeholderKey="notificacio.list.filtre.camp.numexpedient"/>
 			</div>
 			<div class="col-md-2 pull-right form-buttons">
 				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>

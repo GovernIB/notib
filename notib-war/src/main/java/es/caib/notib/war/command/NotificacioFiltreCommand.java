@@ -31,6 +31,7 @@ public class NotificacioFiltreCommand {
 	private String titular;
 	private Long procedimentId;
 	private TipusUsuariEnumDto tipusUsuari;
+	private String numExpedient;
 	
 	public Long getEntitatId() {
 		return entitatId;
@@ -91,6 +92,12 @@ public class NotificacioFiltreCommand {
 	}
 	public void setTipusUsuari(TipusUsuariEnumDto tipusUsuari) {
 		this.tipusUsuari = tipusUsuari;
+	}
+	public String getNumExpedient() {
+		return numExpedient;
+	}
+	public void setNumExpedient(String numExpedient) {
+		this.numExpedient = numExpedient;
 	}
 	public static NotificacioFiltreCommand asCommand(NotificacioFiltreDto dto) {
 		if (dto == null) {

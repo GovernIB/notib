@@ -100,7 +100,7 @@ public class CallbackHelper {
 					event.updateCallbackClient(CallbackEstatEnumDto.ERROR, ara, intents, "L'event id=" + event.getId() + " és del tipus " + event.getTipus() + " i no es pot notificar a l'aplicació client.");
 				}
 			} catch (Exception ex) {
-				logger.debug("Error notificant l'event " + eventId + " amb referencia de destinatari " + referencia, ex);
+				logger.debug("Error notificant l'event " + eventId + " amb referencia d'enviament: " + referencia, ex);
 				// Marca un error a l'event
 				Integer maxIntents = this.getEventsIntentsMaxProperty();
 				CallbackEstatEnumDto estatNou = maxIntents == null || intents < maxIntents ? 
@@ -115,7 +115,7 @@ public class CallbackHelper {
 			}
 		} else {
 			// No és un event que es pugui notificar, el marca com a error
-			event.updateCallbackClient(CallbackEstatEnumDto.ERROR, ara, intents, "L'event " + eventId + " no té referència de destinatari, no es pot fer un callback a l'aplicació client.");
+			event.updateCallbackClient(CallbackEstatEnumDto.ERROR, ara, intents, "L'event " + eventId + " no té referència d'enviament, no es pot fer un callback a l'aplicació client.");
 		}
 		
 		// Crea una nova entrada a la taula d'events per deixar constància de la notificació a l'aplicació client

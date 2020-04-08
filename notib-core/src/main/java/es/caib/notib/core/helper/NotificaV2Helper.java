@@ -230,7 +230,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						
 						Date dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
 						NotificacioEnviamentEstatEnumDto estat = getEstatNotifica(datatDarrer.getResultado());
-						
+						logger.info("Actualitzant informació enviament amb Datat...");
 						if (!dataDatat.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
 							CodigoDIR organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
 							CodigoDIR organismoEmisorRaiz = resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
@@ -245,7 +245,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 									(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getDescripcionCodigoDIR() : null,
 									(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getNifDIR() : null);
 							if (estat.name() != null)
-								logger.info(estat.name());
+								logger.info("Nou estat: " + estat.name());
+							
+							logger.info("Actualitzant Datat enviament...");
 							enviamentUpdateDatat(
 									estat,
 									toDate(datatDarrer.getFecha()),
@@ -256,24 +258,35 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 									null,
 									null,
 									enviament);
+							logger.info("Fi actualització Datat");
 							
+							logger.info("Creant nou event per Datat...");
 							//Crea un nou event
 							eventDatatBuilder = NotificacioEventEntity.getBuilder(
 									NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
 									enviament.getNotificacio()).
 									enviament(enviament).
 									descripcio(datatDarrer.getResultado());
+							logger.info("Event Datat creat");
 							
-							if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+							if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
+								logger.info("Inicialitzar nou event callback per usuari aplicació...");
 								eventDatatBuilder.callbackInicialitza();
+								logger.info("Event callback inicialitzat");
+							}
 							NotificacioEventEntity eventDatat = eventDatatBuilder.build();
 							
+							logger.info("Estat callback: " + eventDatat.getCallbackEstat());
+							logger.info("Afegint event Datat a l'enviament...");
 							notificacio.updateEventAfegir(eventDatat);
 							enviament.updateNotificaError(false, null);
+							
+							logger.info("Envio correu en cas d'usuaris no APLICACIÓ");
 							if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
 								emailHelper.prepararEnvioEmailNotificacio(notificacio);
 							}
 						}
+						logger.info("Enviament actualitzat");
 					} else {
 						throw new ValidationException(
 								enviament,
@@ -287,6 +300,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 							"La resposta rebuda de Notific@ no conté informació de datat");
 				}
 				if (resultadoInfoEnvio.getCertificacion() != null) {
+					logger.info("Actualitzant informació enviament amb certificació...");
 					Certificacion certificacio = resultadoInfoEnvio.getCertificacion();
 					
 					Date dataCertificacio = toDate(certificacio.getFechaCertificacion());
@@ -300,7 +314,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
 								PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
 								new ByteArrayInputStream(decodificat));
-						
+						logger.info("Actualitzant certificació enviament...");
 						enviament.updateNotificaCertificacio(
 								dataCertificacio,
 								gestioDocumentalId,
@@ -313,19 +327,31 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 								null,
 								null,
 								null);
+						logger.info("Fi actualització certificació");
+						
+						logger.info("Creant nou event per certificació...");
 						//Crea un nou event
 						eventCertBuilder = NotificacioEventEntity.getBuilder(
 								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
 								enviament.getNotificacio()).
 								enviament(enviament).
 								descripcio(datatDarrer.getResultado());
+						logger.info("Event Datat creat");
 						
-						if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+						if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
+							logger.info("Inicialitzar nou event callback per usuari aplicació...");
 							eventCertBuilder.callbackInicialitza();
+							logger.info("Event callback inicialitzat");
+						}
+						
 						NotificacioEventEntity eventCert = eventCertBuilder.build();
+
+						logger.info("Estat callback: " + eventCert.getCallbackEstat());
+						logger.info("Afegint event certificació a l'enviament...");
 						
 						notificacio.updateEventAfegir(eventCert);
 					}
+					logger.info("Enviament actualitzat");
 				}
 //				if (eventDatat != null) {
 //					eventDatat.callbackInicialitza();

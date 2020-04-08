@@ -568,6 +568,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							procediment,
 							filtre.getTipusUsuari() == null,
 							filtre.getTipusUsuari(),
+							filtre.getNumExpedient() == null,
+							filtre.getNumExpedient(),
 							pageable);
 				} else if (!procedimentsCodisNotib.isEmpty()) {
 					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
@@ -592,6 +594,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							procediment,
 							filtre.getTipusUsuari() == null,
 							filtre.getTipusUsuari(),
+							filtre.getNumExpedient() == null,
+							filtre.getNumExpedient(),
 							pageable);
 				}
 				
@@ -616,6 +620,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 						procediment,
 						filtre.getTipusUsuari() == null,
 						filtre.getTipusUsuari(),
+						filtre.getNumExpedient() == null,
+						filtre.getNumExpedient(),
 						pageable);
 			} else if (isAdministrador) {
 				notificacions = notificacioRepository.findAmbFiltre(
@@ -623,7 +629,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						filtre.getEntitatId(),
 						filtre.getEnviamentTipus() == null,
 						filtre.getEnviamentTipus(),
-						filtre.getConcepte() == null,
+						filtre.getConcepte() == null || filtre.getConcepte().isEmpty(),
 						filtre.getConcepte(),
 						filtre.getEstat() == null,
 						filtre.getEstat(),
@@ -637,6 +643,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 						procediment,
 						filtre.getTipusUsuari() == null,
 						filtre.getTipusUsuari(),
+						filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
+						filtre.getNumExpedient(),
 						pageable);
 			}
 		}

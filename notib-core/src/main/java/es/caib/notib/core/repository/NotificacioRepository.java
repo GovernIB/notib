@@ -161,7 +161,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
 			"    ) > 0) " + 
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
-			"and (ntf.grupCodi = null) ")
+			"and (ntf.grupCodi = null) " + 
+			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)")
 	public Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotib(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
@@ -183,6 +184,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("procediment") ProcedimentEntity procediment,
 			@Param("isTipusUsuariNull") boolean isTipusUsuariNull,
 			@Param("tipusUsuari") TipusUsuariEnumDto tipusUsuar,
+			@Param("isNumExpedientNull") boolean isNumExpedientNull,
+			@Param("numExpedient") String numExpedient,
 			Pageable paginacio);
 	
 	@Query(	"from " +
@@ -205,7 +208,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
 			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
 			"    ) > 0) " + 
-			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari)")
+			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " + 
+			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)")
 	public Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
@@ -228,6 +232,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("procediment") ProcedimentEntity procediment,
 			@Param("isTipusUsuariNull") boolean isTipusUsuariNull,
 			@Param("tipusUsuari") TipusUsuariEnumDto tipusUsuar,
+			@Param("isNumExpedientNull") boolean isNumExpedientNull,
+			@Param("numExpedient") String numExpedient,
 			Pageable paginacio);
 	
 	@Query(	"from " +
@@ -247,7 +253,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
 			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
 			"    ) > 0) " +
-			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari)")
+			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " + 
+			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)")
 	public Page<NotificacioEntity> findAmbFiltre(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
@@ -266,7 +273,9 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("isProcedimentNull") boolean isProcedimentNull,
 			@Param("procediment") ProcedimentEntity procediment,
 			@Param("isTipusUsuariNull") boolean isTipusUsuariNull,
-			@Param("tipusUsuari") TipusUsuariEnumDto tipusUsuar,
+			@Param("tipusUsuari") TipusUsuariEnumDto tipusUsuari,
+			@Param("isNumExpedientNull") boolean isNumExpedientNull,
+			@Param("numExpedient") String numExpedient,
 			Pageable paginacio);
 
 }

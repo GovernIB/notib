@@ -115,12 +115,14 @@ public abstract class AbstractNotificaHelper {
 				break;
 			}
 		}
+		logger.info("Estat final: " + estatsEnviamentsFinals);
 		if (estatsEnviamentsFinals) {
 			enviament.getNotificacio().updateEstat(NotificacioEstatEnumDto.FINALITZADA);
 			enviament.getNotificacio().updateMotiu(notificaEstat.name());
 
 			//Marcar com a processada si la notificació s'ha fet des de una aplicació
 			if (enviament.getNotificacio() != null && enviament.getNotificacio().getTipusUsuari() == TipusUsuariEnumDto.APLICACIO) {
+				logger.info("Marcant notificació com processada per ser usuari aplicació...");
 				enviament.getNotificacio().updateEstat(NotificacioEstatEnumDto.PROCESSADA);
 				enviament.getNotificacio().updateMotiu(notificaEstat.name());
 				enviament.getNotificacio().updateEstatDate(new Date());
