@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.mail.MessagingException;
 
 import org.slf4j.Logger;
@@ -68,6 +69,7 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.CreacioSemaforDto;
 import es.caib.notib.core.helper.EmailHelper;
@@ -138,6 +140,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private RegistreHelper registreHelper;
 	@Autowired
 	private AplicacioService aplicacioService;
+	@Resource
+	private CacheHelper cacheHelper;
 	
 	@Transactional(rollbackFor=Exception.class)
 	@Override
@@ -703,45 +707,30 @@ public class NotificacioServiceImpl implements NotificacioService {
 						ExtendedPermission.READ});	
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacio(
 			EntitatDto entitat) {
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
-
-		return entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
-				new Permission[] {
-						ExtendedPermission.NOTIFICACIO},
-				entitatActual
-				);	
+		return cacheHelper.findProcedimentsAmbPermisNotificacio(entitat.getId());
 	}
 	
+	@Transactional(readOnly = true)
 	@Override
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
 			Map<String, ProcedimentDto> procediments,
-//			List<ProcedimentDto> procediments,
 			EntitatDto entitat) {
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
-
-		return entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
-				procediments,
-				entitatActual,
-				new Permission[] {
-						ExtendedPermission.NOTIFICACIO}
-				);	
+		return cacheHelper.findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(procediments, entitat.getId());
 	}
 	
+	@Transactional(readOnly = true)
 	@Override
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(
 			List<ProcedimentDto> procediments,
 			EntitatDto entitat) {
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
 
-		return entityComprovarHelper.findByPermisProcedimentsUsuariActual(
+		return cacheHelper.findProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(
 				procediments,
-				entitatActual,
-				new Permission[] {
-						ExtendedPermission.NOTIFICACIO}
-				);	
+				entitat.getId());	
 	}
 	
 	@Override

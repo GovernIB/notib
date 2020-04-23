@@ -336,6 +336,19 @@ public class ProcedimentController extends BaseUserController{
 		return procedimentService.findLlibres(entitat, oficina);
 	}
 	
+	@RequestMapping(value = "/cache/refrescar", method = RequestMethod.GET)
+	private String refrescar(
+		HttpServletRequest request,
+		Model model) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		procedimentService.refrescarCache(entitat);
+		
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:../../procediment",
+				"procediment.controller.esborrat.cache.ok");
+	}
+	
 	private boolean isAdministrador(
 			HttpServletRequest request) {
 		return RolHelper.isUsuariActualAdministrador(request);

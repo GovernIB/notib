@@ -91,7 +91,10 @@
 	</table>
 	
 	<script id="botonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a id="procediment-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}procediment/new" data-toggle="modal" data-maximized="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="procediment.list.boto.nou.procediment"/></a></p>
+		<p style="text-align:right">
+			<a id="procediment-boto-nou" class="btn btn-warning" href="${unitatCodiUrlPrefix}procediment/cache/refrescar"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="procediment.list.boto.cache"/></a>
+			<a id="procediment-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}procediment/new" data-toggle="modal" data-maximized="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="procediment.list.boto.nou.procediment"/></a>
+		</p>
 	</script>
 	
 </body>

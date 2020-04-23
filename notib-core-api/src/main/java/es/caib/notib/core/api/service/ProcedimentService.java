@@ -367,6 +367,14 @@ public interface ProcedimentService {
 			Map<String, ProcedimentDto> procediments,
 			EntitatDto entitat);
 
-	
+	/**
+	 * buida els procediments en cache per entitat
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public void refrescarCache(
+			EntitatDto entitat);
 
 }

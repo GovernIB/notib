@@ -4,17 +4,22 @@
 package es.caib.notib.core.helper;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.Cache;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.EntitatRepository;
@@ -37,7 +42,8 @@ public class CacheHelper {
 	private EntitatRepository entitatRepository;
 	@Resource
 	private ProcedimentRepository procedimentRepository;
-	
+	@Resource
+	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
 	@Resource
@@ -46,8 +52,6 @@ public class CacheHelper {
 	private PluginHelper pluginHelper;
 	@Resource
 	private UsuariHelper usuariHelper;
-
-
 
 	@Cacheable(value = "entitatsUsuari", key="#usuariCodi")
 	public List<EntitatDto> findEntitatsAccessiblesUsuari(
@@ -114,56 +118,58 @@ public class CacheHelper {
 		return pluginHelper.consultarRolsAmbCodi(
 				usuariCodi);
 	}
-//	@Cacheable(value = "unitatsOrganitzatives", key="#entitatCodi")
-//	public ArbreDto<UnitatOrganitzativaDto> findUnitatsOrganitzativesPerEntitat(
-//			String entitatCodi) {
-//		EntitatEntity entitat = entitatRepository.findByCodi(entitatCodi);
-//		return pluginHelper.unitatsOrganitzativesFindArbreByPare(
-//				entitat.getUnitatArrel());
-//	}
-//	@CacheEvict(value = "unitatsOrganitzatives", key="#entitatCodi")
-//	public void evictUnitatsOrganitzativesPerEntitat(
-//			String entitatCodi) {
-//	}
-//
-//	@Cacheable(value = "unitatOrganitzativa", key="#organCodi")
-//	public UnitatOrganitzativaDto findUnitatOrganitzativaPerCodi(
-//			String organCodi) {
-//		UnitatOrganitzativaDto unitat = pluginHelper.unitatsOrganitzativesFindByCodi(organCodi);
-//		if (unitat != null) {
-//			unitat.setAdressa(
-//					getAdressa(
-//							unitat.getTipusVia(), 
-//							unitat.getNomVia(), 
-//							unitat.getNumVia()));
-//			if (unitat.getCodiPais() != null && !"".equals(unitat.getCodiPais()))
-//				unitat.setCodiPais(("000" + unitat.getCodiPais()).substring(unitat.getCodiPais().length()));
-//			if(unitat.getCodiComunitat() != null && !"".equals(unitat.getCodiComunitat()))
-//				unitat.setCodiComunitat(("00" + unitat.getCodiComunitat()).substring(unitat.getCodiComunitat().length()));
-//			
-//			if ((unitat.getCodiProvincia() == null || "".equals(unitat.getCodiProvincia())) && 
-//					unitat.getCodiComunitat() != null && !"".equals(unitat.getCodiComunitat())) {
-//				List<ProvinciaDto> provincies = findProvinciesPerComunitat(unitat.getCodiComunitat());
-//				if (provincies != null && provincies.size() == 1) {
-//					unitat.setCodiProvincia(provincies.get(0).getCodi());
-//				}		
-//			}
-//			if (unitat.getCodiProvincia() != null && !"".equals(unitat.getCodiProvincia())) {
-//				unitat.setCodiProvincia(("00" + unitat.getCodiProvincia()).substring(unitat.getCodiProvincia().length()));
-//				
-//				if (unitat.getLocalitat() == null && unitat.getNomLocalitat() != null) {
-//					MunicipiDto municipi = findMunicipiAmbNom(
-//							unitat.getCodiProvincia(), 
-//							unitat.getNomLocalitat());
-//					if (municipi != null)
-//						unitat.setLocalitat(municipi.getCodi());
-//					else
-//						logger.error("UNITAT ORGANITZATIVA. No s'ha trobat la localitat amb el nom: '" + unitat.getNomLocalitat() + "'");
-//				}
-//			}
-//		}
-//		return unitat;
-//	}
+	
+	@Cacheable(value = "procedimentsDisponibles", key="#entitatId")
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacio(
+			Long entitatId) {
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId);
+
+		return entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
+				new Permission[] {
+						ExtendedPermission.NOTIFICACIO},
+				entitatActual
+				);	
+	}
+	
+	@CacheEvict(value = "procedimentsDisponibles", key="#entitatId")
+	public void evictProcedimentsAmbPermisNotificacio(Long entitatId) {
+	}
+	
+	@Cacheable(value = "procedimentsDisponiblesAmbGrups", key="#entitatId")
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
+			Map<String, ProcedimentDto> procediments,
+			Long entitatId) {
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId);
+
+		return entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
+				procediments,
+				entitatActual,
+				new Permission[] {
+						ExtendedPermission.NOTIFICACIO}
+				);		
+	}
+	
+	@CacheEvict(value = "procedimentsDisponiblesAmbGrups", key="#entitatId")
+	public void evictProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(Long entitatId) {
+	}
+	
+	@Cacheable(value = "procedimentsDisponiblesSenseGrups", key="#entitatId")
+	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(
+			List<ProcedimentDto> procediments,
+			Long entitatId) {
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId);
+
+		return entityComprovarHelper.findByPermisProcedimentsUsuariActual(
+				procediments,
+				entitatActual,
+				new Permission[] {
+						ExtendedPermission.NOTIFICACIO}
+				);	
+	}
+
+	@CacheEvict(value = "procedimentsDisponiblesSenseGrups", key="#entitatId")
+	public void evictProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(Long entitatId) {
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(CacheHelper.class);
 

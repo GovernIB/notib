@@ -277,10 +277,14 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 							NotificacioEventEntity eventDatat = eventDatatBuilder.build();
 							
 							logger.info("Estat callback: " + eventDatat.getCallbackEstat());
-							logger.info("Afegint event Datat a l'enviament...");
+							logger.info("Afegint event Datat a la notificació...");
 							notificacio.updateEventAfegir(eventDatat);
+							
 							enviament.updateNotificaError(false, null);
 							
+							logger.info("Guardant event...");
+							notificacioEventRepository.save(eventDatat);
+							logger.info("L'event s'ha guardat correctament...");
 							logger.info("Envio correu en cas d'usuaris no APLICACIÓ");
 							if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
 								emailHelper.prepararEnvioEmailNotificacio(notificacio);
@@ -347,9 +351,13 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						NotificacioEventEntity eventCert = eventCertBuilder.build();
 
 						logger.info("Estat callback: " + eventCert.getCallbackEstat());
-						logger.info("Afegint event certificació a l'enviament...");
+						logger.info("Afegint event certificació a la notificació...");
 						
 						notificacio.updateEventAfegir(eventCert);
+						
+						logger.info("Guardant event...");
+						notificacioEventRepository.save(eventCert);
+						logger.info("L'event s'ha guardat correctament...");
 					}
 					logger.info("Enviament actualitzat");
 				}

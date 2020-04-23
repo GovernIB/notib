@@ -296,5 +296,11 @@ public class ProcedimentServiceBean implements ProcedimentService {
 		return delegate.findLlibres(entitat, oficina);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public void refrescarCache(EntitatDto entitat) {
+		delegate.refrescarCache(entitat);
+	}
+
 
 }

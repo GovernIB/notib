@@ -157,7 +157,6 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
 			Map<String, ProcedimentDto> procediments,
-//			List<ProcedimentDto> procediments,
 			EntitatDto entitat);
 	
 	/**

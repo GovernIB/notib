@@ -38,6 +38,7 @@ import es.caib.notib.core.entity.PagadorCieEntity;
 import es.caib.notib.core.entity.PagadorPostalEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.ProcedimentFormEntity;
+import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
@@ -90,6 +91,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private GrupProcedimentRepository grupProcedimentRepository;
 	@Resource
 	private PluginHelper pluginHelper;
+	@Resource
+	private CacheHelper cacheHelper;
 	
 	@Override
 	public ProcedimentDto create(
@@ -835,7 +838,16 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 		return llibres;
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public void refrescarCache(EntitatDto entitat) {
+		logger.debug("Preparant per buidar la informació en cache dels procediments...");
+		
+		cacheHelper.evictProcedimentsAmbPermisNotificacio(entitat.getId());
+		cacheHelper.evictProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(entitat.getId());
+		cacheHelper.evictProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(entitat.getId());
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
-
-
 }
