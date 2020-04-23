@@ -185,8 +185,6 @@ public class NotificacioController extends BaseUserController {
 
 			// Llistat de procediments amb grups
 			grupsProcediment = procedimentService.findAllGrups();
-			long start = System.currentTimeMillis();
-			
 			procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups(entitatActual);
 			// Obté els procediments que tenen el mateix grup que el rol d'usuari
 			for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
@@ -199,41 +197,25 @@ public class NotificacioController extends BaseUserController {
 					}
 				}
 			}
-			
-			long end = System.currentTimeMillis();
-			System.out.println("Els grups dels procediments s'han consultat en:" + (end - start) + "ms");
 		}
 
 		if (!uniqueProcediments.isEmpty()) {
-			long start = System.currentTimeMillis();
 			// Procedimments amb i sense grups amb permís notificació
 			procedimentsPermisNotificacioAmbGrupsAndSenseGrups = notificacioService.findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
 					uniqueProcediments,
-//					procedimentsAmbGrups,
-					entitatActual);
-
-			long end = System.currentTimeMillis();	
-			System.out.println("Els procediments amb i sense permís de notificació s'han consultat en:" + (end - start) + "ms");
-			
+					entitatActual);			
 			model.addAttribute("procediments", procedimentsPermisNotificacioAmbGrupsAndSenseGrups);
 		} else if (grupsProcediment.isEmpty()) {
-			long start = System.currentTimeMillis();
 			// Procediments sense grups amb permís notificació
 			procedimentsPermisNotificacio = notificacioService.findProcedimentsAmbPermisNotificacio(entitatActual);
 			model.addAttribute("procediments", procedimentsPermisNotificacio);
 			
-			long end = System.currentTimeMillis();	
-			System.out.println("Els procediments sense grups amb permís de notificació s'han consultat en:" + (end - start) + "ms");
 		}
-		long start = System.currentTimeMillis();
+		
 		procedimentsPermisNotificacioSenseGrups = notificacioService.findProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(
 				procedimentsSenseGrups,
 				entitatActual);
 		
-		long end = System.currentTimeMillis();
-		
-		System.out.println("Els procediments amb permís de notificació s'han consultat en:" + (end - start) + "ms");
-
 		if (procedimentsPermisNotificacioSenseGrups != null && !procedimentsPermisNotificacioSenseGrups.isEmpty()) {
 			for (ProcedimentDto procedimentSenseGrupAmbPermis : procedimentsPermisNotificacioSenseGrups) {
 				procedimentsPermisNotificacioAmbGrupsAndSenseGrups.add(procedimentSenseGrupAmbPermis);
