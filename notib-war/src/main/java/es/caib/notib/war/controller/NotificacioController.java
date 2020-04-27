@@ -218,7 +218,9 @@ public class NotificacioController extends BaseUserController {
 		
 		if (procedimentsPermisNotificacioSenseGrups != null && !procedimentsPermisNotificacioSenseGrups.isEmpty()) {
 			for (ProcedimentDto procedimentSenseGrupAmbPermis : procedimentsPermisNotificacioSenseGrups) {
-				procedimentsPermisNotificacioAmbGrupsAndSenseGrups.add(procedimentSenseGrupAmbPermis);
+				if (!procedimentsPermisNotificacioAmbGrupsAndSenseGrups.contains(procedimentSenseGrupAmbPermis)) {
+					procedimentsPermisNotificacioAmbGrupsAndSenseGrups.add(procedimentSenseGrupAmbPermis);
+				}
 			}
 			model.addAttribute("procediments", procedimentsPermisNotificacioAmbGrupsAndSenseGrups);
 		}

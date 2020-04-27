@@ -377,12 +377,12 @@ public class EnviamentServiceImpl implements EnviamentService {
 				procedimentsPermisConsultaAndAgrupable = entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
 					new Permission[] {
 							ExtendedPermission.READ},
-					entitatActual);
+					entitat.getId());
 			} else if (!procediments.isEmpty()) {
 				//Obté els procediments amb grup i permís de consulta
 				procedimentsPermisConsultaAndAgrupable = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
 						procediments, 
-						entitatActual,
+						entitat.getId(),
 						new Permission[] {
 								ExtendedPermission.READ}
 						);
@@ -400,7 +400,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 //				}
 				procedimentsPermisConsulta = entityComprovarHelper.findByPermisProcedimentsUsuariActual(
 						procedimentsNoAgrupables, 
-						entitatActual,
+						entitat.getId(),
 						new Permission[] {
 								ExtendedPermission.READ}
 						);

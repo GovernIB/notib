@@ -612,13 +612,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 	
 	@Override
-	public boolean hasPermisConsultaProcediment(EntitatDto entitat) {
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
-		
+	public boolean hasPermisConsultaProcediment(EntitatDto entitat) {		
 		List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
 				new Permission[] {
 						ExtendedPermission.READ},
-				entitatActual
+				entitat.getId()
 				);
 		
 		return (resposta.isEmpty()) ? false : true;
@@ -667,13 +665,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 	
 	@Override
-	public boolean hasPermisNotificacioProcediment(EntitatDto entitat) {
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
-		
+	public boolean hasPermisNotificacioProcediment(EntitatDto entitat) {		
 		List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
 				new Permission[] {
 					ExtendedPermission.NOTIFICACIO},
-				entitatActual
+				entitat.getId()
 				);
 		
 		return (resposta.isEmpty()) ? false : true;
@@ -682,12 +678,10 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Override
 	public boolean hasGrupPermisConsultaProcediment(
 			Map<String, ProcedimentDto> procediments,
-			EntitatDto entitat) {
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
-		
+			EntitatDto entitat) {		
 		List<ProcedimentDto> resposta = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
 				procediments,
-				entitatActual,
+				entitat.getId(),
 				new Permission[] {
 						ExtendedPermission.READ}
 				);
@@ -698,12 +692,10 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Override
 	public boolean hasGrupPermisNotificacioProcediment(
 			Map<String, ProcedimentDto> procediments,
-			EntitatDto entitat) {
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
-		
+			EntitatDto entitat) {		
 		List<ProcedimentDto> resposta = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
 				procediments,
-				entitatActual,
+				entitat.getId(),
 				new Permission[] {
 						ExtendedPermission.NOTIFICACIO}
 				);
@@ -844,9 +836,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	public void refrescarCache(EntitatDto entitat) {
 		logger.debug("Preparant per buidar la informació en cache dels procediments...");
 		
-		cacheHelper.evictProcedimentsAmbPermisNotificacio(entitat.getId());
-		cacheHelper.evictProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(entitat.getId());
-		cacheHelper.evictProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(entitat.getId());
+		cacheHelper.evictFindByGrupAndPermisProcedimentsUsuariActualAndEntitat(entitat.getId());
+		cacheHelper.evictFindByPermisProcedimentsUsuariActual(entitat.getId());
+		cacheHelper.evictFindPermisProcedimentsUsuariActualAndEntitat(entitat.getId());
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);

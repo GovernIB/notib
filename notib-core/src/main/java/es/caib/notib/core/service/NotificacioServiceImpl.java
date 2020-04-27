@@ -420,12 +420,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 				procedimentsPermisConsultaAndAgrupable = entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
 					new Permission[] {
 							ExtendedPermission.READ},
-					entitatActual);
+					entitatId);
 			} else if (!procediments.isEmpty()) {
 				//Obté els procediments amb grup i permís de consulta
 				procedimentsPermisConsultaAndAgrupable = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
 						procediments, 
-						entitatActual,
+						entitatId,
 						new Permission[] {
 								ExtendedPermission.READ}
 						);
@@ -443,7 +443,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 //				}
 				procedimentsPermisConsulta = entityComprovarHelper.findByPermisProcedimentsUsuariActual(
 						procedimentsNoAgrupables, 	
-						entitatActual,
+						entitatId,
 						new Permission[] {
 								ExtendedPermission.READ}
 						);
@@ -677,12 +677,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaAndGrupsAndEntitat(
 			Map<String, ProcedimentDto> procediments,
-			EntitatDto entitat) {
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
-		
+			EntitatDto entitat) {		
 		return entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
 				procediments,
-				entitatActual,
+				entitat.getId(),
 				new Permission[] {
 						ExtendedPermission.READ}
 				);	
@@ -690,13 +688,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Override
 	public List<ProcedimentDto> findProcedimentsEntitatAmbPermisConsulta(
-			EntitatDto entitat) {
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
-		
+			EntitatDto entitat) {		
 		return entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
 				new Permission[] {
 						ExtendedPermission.READ},
-				entitatActual
+				entitat.getId()
 				);	
 	}
 	
@@ -711,7 +707,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacio(
 			EntitatDto entitat) {
-		return cacheHelper.findProcedimentsAmbPermisNotificacio(entitat.getId());
+		return entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
+				new Permission[] {
+						ExtendedPermission.NOTIFICACIO},
+				entitat.getId()
+				);	
 	}
 	
 	@Transactional(readOnly = true)
@@ -719,7 +719,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
 			Map<String, ProcedimentDto> procediments,
 			EntitatDto entitat) {
-		return cacheHelper.findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(procediments, entitat.getId());
+		return entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
+				procediments,
+				entitat.getId(),
+				new Permission[] {
+						ExtendedPermission.NOTIFICACIO}
+				);	
 	}
 	
 	@Transactional(readOnly = true)
@@ -728,20 +733,21 @@ public class NotificacioServiceImpl implements NotificacioService {
 			List<ProcedimentDto> procediments,
 			EntitatDto entitat) {
 
-		return cacheHelper.findProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(
+		return entityComprovarHelper.findByPermisProcedimentsUsuariActual(
 				procediments,
-				entitat.getId());	
+				entitat.getId(),
+				new Permission[] {
+						ExtendedPermission.NOTIFICACIO}
+				);	
 	}
 	
 	@Override
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
 			List<ProcedimentDto> procediments,
 			EntitatDto entitat) {
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
-
 		return entityComprovarHelper.findByPermisProcedimentsUsuariActual(
 				procediments,
-				entitatActual,
+				entitat.getId(),
 				new Permission[] {
 						ExtendedPermission.READ}
 				);	

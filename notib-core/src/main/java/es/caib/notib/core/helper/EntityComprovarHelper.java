@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -578,9 +579,11 @@ public class EntityComprovarHelper {
 		return resposta;
 	}
 	
+	@Cacheable(value = "findPermisProcedimentsUsuariActualAndEntitat", key="#entitatId")
 	public List<ProcedimentDto> findPermisProcedimentsUsuariActualAndEntitat(
 			Permission[] permisos,
-			EntitatEntity entitatActual) {
+			Long entitatId) {
+		EntitatEntity entitatActual = comprovarEntitat(entitatId);
 		List<ProcedimentDto> resposta = null;
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<ProcedimentEntity> procediments = procedimentRepository.findByEntitat(entitatActual);
@@ -602,6 +605,7 @@ public class EntityComprovarHelper {
 		
 		return resposta;
 	}
+	
 	public List<ProcedimentDto> findPermisProcediments(
 			List<ProcedimentEntity> procediments,
 			Permission[] permisos) {
@@ -624,10 +628,12 @@ public class EntityComprovarHelper {
 		return resposta;
 	}
 	
+	@Cacheable(value = "findByGrupAndPermisProcedimentsUsuariActualAndEntitat", key="#entitatId")
 	public List<ProcedimentDto> findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
 			Map<String, ProcedimentDto> procediments,
-			EntitatEntity entitatActual,
+			Long entitatId,
 			Permission[] permisos) {
+		EntitatEntity entitatActual = comprovarEntitat(entitatId);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<ProcedimentEntity> procedimentsEntity = new ArrayList<ProcedimentEntity>();
 		List<ProcedimentDto> resposta;
@@ -701,10 +707,12 @@ public class EntityComprovarHelper {
 		return resposta;
 	}
 	
+	@Cacheable(value = "findByPermisProcedimentsUsuariActual", key="#entitatId")
 	public List<ProcedimentDto> findByPermisProcedimentsUsuariActual(
 			List<ProcedimentDto> procediments,
-			EntitatEntity entitatActual,
+			Long entitatId,
 			Permission[] permisos) {
+		EntitatEntity entitatActual = comprovarEntitat(entitatId);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<ProcedimentEntity> procedimentsEntity = new ArrayList<ProcedimentEntity>();
 		List<ProcedimentDto> resposta;
@@ -734,6 +742,7 @@ public class EntityComprovarHelper {
 		
 		return resposta;
 	}
+	
 	public List<EntitatDto> findPermisEntitat(
 			Permission[] permisos) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
