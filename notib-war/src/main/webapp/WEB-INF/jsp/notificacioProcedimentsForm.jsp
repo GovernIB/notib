@@ -15,9 +15,38 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<not:modalHead/>
+	
+<script>  
+$(document).ready(function(){ 
+	$('#search').keyup(function(){  
+		console.log("as");
+		search($(this).val());
+		
+	});
+});  
+
+function search(value) {
+	 $('#procediments tr').each(function(){  
+         var found = 'false';  
+         $(this).each(function(){  
+              if($(this).text().toLowerCase().indexOf(value.toLowerCase()) >= 0) {  
+                   found = 'true';  
+              }  
+         });  
+         if(found == 'true')  {  
+              $(this).show();  
+         } else {  
+              $(this).hide();  
+         }  
+    });  
+}
+</script>  
 </head>
+
 <body>
-	<table class="table table-hover">
+	<input type="text" name="search" id="search" class="form-control" placeholder="Cercar"/>
+	<br />
+	<table class="table table-hover" id="procediments">
 		<thead>
 			<tr>
 				<th scope="col"><spring:message code="notificacio.procediment.codi"/></th>
@@ -28,9 +57,9 @@
 		<tbody>
 			<c:forEach items="${procediments}" var="procediment">
 					<tr>
-						<td scope="row" name="codi">${procediment.codi}</td>
-						<td scope="row" name="nom">${procediment.nom}</td>
-						<td scope="row" name="id">
+						<td scope="row" name="codi" width="10%">${procediment.codi}</td>
+						<td scope="row" name="nom" width="80%">${procediment.nom}</td>
+						<td scope="row" name="id" width="10%">
 						<button onclick="window.top.location='/notib/notificacio/new/${procediment.id}';return false;" class="btn btn-default"><spring:message code="notificacio.form.titol.procediments.iniciar"/></button>
 						</td>
 					</tr>
