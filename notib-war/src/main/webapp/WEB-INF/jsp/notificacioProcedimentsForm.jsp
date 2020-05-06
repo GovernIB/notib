@@ -15,46 +15,78 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<not:modalHead/>
-	
+<style type="text/css">
+.search {
+	padding-left: 0;
+}
+.sort {
+	cursor: pointer;
+}
+</style>
 <script>  
 $(document).ready(function(){ 
 	$('#search').keyup(function(){  
 		console.log("as");
-		search($(this).val());
-		
+		 var value = $(this).val().toLowerCase();
+		$('#procediments tr').filter(function() {
+		      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+	    });	
 	});
-});  
-
-function search(value) {
-	 $('#procediments tr').each(function(){  
-         var found = 'false';  
-         $(this).each(function(){  
-              if($(this).text().toLowerCase().indexOf(value.toLowerCase()) >= 0) {  
-                   found = 'true';  
-              }  
-         });  
-         if(found == 'true')  {  
-              $(this).show();  
-         } else {  
-              $(this).hide();  
-         }  
-    });  
+	
+	var table = $('table');
+});    
+function sortTable(n) {
+	var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+	table = document.getElementById("procediments_table");
+	switching = true;
+	dir = "asc";
+	while (switching) {
+	  switching = false;
+	  rows = table.rows;
+	  for (i = 1; i < (rows.length - 1); i++) {
+	    shouldSwitch = false;
+	    x = rows[i].getElementsByTagName("TD")[n];
+	    y = rows[i + 1].getElementsByTagName("TD")[n];
+	    if (dir == "asc") {
+	      if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+	        shouldSwitch = true;
+	        break;
+	      }
+	    } else if (dir == "desc") {
+	      if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+	        shouldSwitch = true;
+	        break;
+	      }
+	    }
+	  }
+	  if (shouldSwitch) {
+	    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+	    switching = true;
+	    switchcount ++;
+	  } else {
+	    if (switchcount == 0 && dir == "asc") {
+	      dir = "desc";
+	      switching = true;
+	    }
+	  }
+	}
 }
 </script>  
 </head>
 
 <body>
-	<input type="text" name="search" id="search" class="form-control" placeholder="Cercar"/>
-	<br />
-	<table class="table table-hover" id="procediments">
+	<div class="col-xs-6 search">
+		<input type="text" name="search" id="search" class="form-control" placeholder="<spring:message code="notificacio.form.titol.procediments.cercar"/>"/>
+	</div>
+	<table class="table table-hover" id="procediments_table">
 		<thead>
 			<tr>
-				<th scope="col"><spring:message code="notificacio.procediment.codi"/></th>
-				<th scope="col"><spring:message code="notificacio.procediment.nom"/></th>
+				<th scope="col"><spring:message code="notificacio.procediment.codi"/>  <span class="fa fa-sort sort"  onclick="sortTable(0)"></span></th>
+				<th scope="col"><spring:message code="notificacio.procediment.nom"/>  <span class="fa fa-sort sort"  onclick="sortTable(1)"></span></th>
 				<th scope="col"></th>
 			</tr>
 		</thead>
-		<tbody>
+		<tbody id="procediments">
 			<c:forEach items="${procediments}" var="procediment">
 					<tr>
 						<td scope="row" name="codi" width="10%">${procediment.codi}</td>
