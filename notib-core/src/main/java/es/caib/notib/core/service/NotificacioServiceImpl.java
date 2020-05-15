@@ -901,10 +901,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional
 	@Override
 	public List<RegistreIdDto> registrarNotificar(Long notificacioId) {
-		logger.debug("Intentant registrar la notificació pendent (" +
-				"notificacioId=" + notificacioId + ")");
+		logger.info("Intentant registrar la notificació pendent (notificacioId=" + notificacioId + ")");
 		List<RegistreIdDto> registresIdDto = new ArrayList<RegistreIdDto>();
 		NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioId);
+		logger.info(" [REG] Inici registre notificació [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
 		List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacioEntity);
 		
 		List<NotificacioEnviamentDtoV2> enviaments = conversioTipusHelper.convertirList(
@@ -916,7 +916,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					notificacioEntity,
 					enviaments);
 		}
-		
+		logger.info(" [REG] Fi registre notificació [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
 		return registresIdDto;
 	}
 

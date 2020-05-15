@@ -125,6 +125,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	@Override
 	public RespostaAlta alta(
 			NotificacioV2 notificacio) throws NotificacioServiceWsException {
+		logger.debug("[ALTA] Alta de notificació: " + notificacio.toString());
 		RespostaAlta resposta = new RespostaAlta();
 		String emisorDir3Codi = notificacio.getEmisorDir3Codi();
 		EntitatEntity entitat = entitatRepository.findByDir3Codi(emisorDir3Codi);
@@ -368,6 +369,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 								enviamentsEntity, 
 								NotificacioEnviamentDtoV2.class);
 						
+						logger.info(" [ALTA] Enviament SINCRON notificació [Id: " + notificacioGuardada.getId() + ", Estat: " + notificacioGuardada.getEstat() + "]");
 						synchronized(CreacioSemaforDto.getCreacioSemafor()) {
 							registreNotificaHelper.realitzarProcesRegistrarNotificar(
 									notificacioGuardada,

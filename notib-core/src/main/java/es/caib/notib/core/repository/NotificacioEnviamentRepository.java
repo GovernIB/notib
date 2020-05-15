@@ -46,6 +46,9 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			EntitatEntity entitat,
 			String notificaIdentificador);
 	
+	NotificacioEnviamentEntity findByNotificaIdentificador(
+			String notificaIdentificador);
+	
 	
 	@Query(	"from" +
 			"    NotificacioEnviamentEntity n " +

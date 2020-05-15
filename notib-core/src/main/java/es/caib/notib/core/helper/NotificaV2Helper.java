@@ -103,7 +103,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	public boolean notificacioEnviar(
 			Long notificacioId) {
 		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
+		logger.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())) {
+			logger.error(" [NOT] la notificació no té l'estat REGISTRADA.");
 			throw new ValidationException(
 					notificacioId,
 					NotificacioEntity.class,
@@ -111,9 +113,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
 		try {
+			logger.info(" >>> Enviant notificació...");
 			ResultadoAltaRemesaEnvios resultadoAlta = enviaNotificacio(notificacio);
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
-				
+				logger.info(" >>> ... OK");
 				//Crea un nou event
 				NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
@@ -131,6 +134,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 							
 							//Registrar event per enviament
 							notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
+							logger.info(" >>> Canvi estat a ENVIADA ");
 							eventBulider.enviament(enviament);
 							notificacio.updateEventAfegir(event);
 							notificacio.updateNotificaError(
@@ -141,6 +145,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					}
 				}
 			} else {
+				logger.info(" >>> ... ERROR");
 				//Crea un nou event
 				NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
@@ -183,12 +188,14 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					NotificacioErrorTipusEnumDto.ERROR_XARXA,
 					event);
 		}
+		logger.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		return NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat());
 	}
 
 	public boolean enviamentRefrescarEstat(
 			Long enviamentId) throws SistemaExternException {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+		logger.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
 		enviament.setNotificacio(notificacio);
 //		NotificacioEnviamentEstatEnumDto estatActual = enviament.getNotificaEstat();
@@ -371,8 +378,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						notificacio).
 						enviament(enviament).build();
 				notificacio.updateEventAfegir(event);
+				logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 				return true;
 			} else {
+				logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 				return false;
 			}
 		} catch (Exception ex) {
@@ -391,6 +400,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			enviament.updateNotificaError(
 					true,
 					event);
+			logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 			return false;
 		}
 	}

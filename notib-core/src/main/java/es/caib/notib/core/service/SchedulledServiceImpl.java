@@ -51,21 +51,19 @@ public class SchedulledServiceImpl implements SchedulledService {
 			fixedRateString = "${config:es.caib.notib.tasca.registre.enviaments.periode}", 
 			initialDelayString = "${config:es.caib.notib.tasca.registre.enviaments.retard.inicial}")
 	public void registrarEnviamentsPendents() {
-		logger.debug("Cercant notificacions pendents de registrar");
+		logger.info("[REG] Cercant notificacions pendents de registrar");
 		int maxPendents = getRegistreEnviamentsProcessarMaxProperty();
 		List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatPendent(
 				pluginHelper.getRegistreReintentsMaxProperty(),
 				new PageRequest(0, maxPendents));
 		if (!pendents.isEmpty()) {
-			logger.debug("Realitzant registre per a " + pendents.size()
-					+ " notificacions pendents (màxim=" + maxPendents + ")");
+			logger.info("[REG] Realitzant registre per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
 			for (NotificacioEntity pendent : pendents) {
-				logger.debug(">>> Realitzant registre de la notificació amb identificador: "
-						+ pendent.getId());
+				logger.info("[REG] >>> Realitzant registre de la notificació: [Id: " + pendent.getId() + ", Estat: " + pendent.getEstat() + "]");
 				notificacioService.notificacioRegistrar(pendent.getId());
 			}
 		} else {
-			logger.debug("No hi ha notificacions pendents de registrar");
+			logger.info("[REG] No hi ha notificacions pendents de registrar");
 		}
 	}
 	
@@ -77,22 +75,22 @@ public class SchedulledServiceImpl implements SchedulledService {
 			initialDelayString = "${config:es.caib.notib.tasca.notifica.enviaments.retard.inicial}")
 	public void notificaEnviamentsRegistrats() {
 		if (isTasquesActivesProperty() && isNotificaEnviamentsActiu() && notificaHelper.isConnexioNotificaDisponible()) {
-			logger.debug("Cercant notificacions registrades pendents d'enviar a Notifica");
+			logger.info("[NOT] Cercant notificacions registrades pendents d'enviar a Notifica");
 			int maxPendents = getNotificaEnviamentsProcessarMaxProperty();
 			List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatRegistrada(
 					pluginHelper.getNotificaReintentsMaxProperty(), 
 					new PageRequest(0, maxPendents));
 			if (!pendents.isEmpty()) {
-				logger.debug("Realitzant enviaments a Notifica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
+				logger.info("[NOT] Realitzant enviaments a Notifica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
 				for (NotificacioEntity pendent: pendents) {
-					logger.debug(">>> Realitzant enviament a Notifica de la notificació amb identificador: " + pendent.getId());
+					logger.info("[NOT] >>> Realitzant enviament a Notifica de la notificació: [Id: " + pendent.getId() + ", Estat: " + pendent.getEstat() + "]");
 					notificacioService.notificacioEnviar(pendent.getId());
 				}
 			} else {
-				logger.debug("No hi ha notificacions pendents d'enviar a Notific@");
+				logger.info("[NOT] No hi ha notificacions pendents d'enviar a Notific@");
 			}
 		} else {
-			logger.debug("L'enviament de notificacions a Notific@ està deshabilitada");
+			logger.info("[NOT] L'enviament de notificacions a Notific@ està deshabilitada");
 		}
 	}
 	// 3. Actualització de l'estat dels enviaments amb l'estat de Notific@
@@ -104,49 +102,50 @@ public class SchedulledServiceImpl implements SchedulledService {
 			initialDelayString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.retard.inicial}")
 	public void enviamentRefrescarEstatPendents() {
 		if (!notificaHelper.isAdviserActiu() && isTasquesActivesProperty() && isEnviamentActualitzacioEstatActiu() && notificaHelper.isConnexioNotificaDisponible()) {
-			logger.info("Cercant enviaments pendents de refrescar l'estat de Notifica");
+			logger.info("[EST] Cercant enviaments pendents de refrescar l'estat de Notifica");
 			int maxPendents = getEnviamentActualitzacioEstatProcessarMaxProperty();
 			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByNotificaRefresc(
 					new PageRequest(0, maxPendents));
 			if (!pendents.isEmpty()) {
-				logger.debug("Realitzant refresc de l'estat de Notifica per a " + pendents.size() + " enviaments (màxim=" + maxPendents + ")");
+				logger.info("[EST] Realitzant refresc de l'estat de Notifica per a " + pendents.size() + " enviaments (màxim=" + maxPendents + ")");
 				for (NotificacioEnviamentEntity pendent: pendents) {
-					logger.debug(">>> Consultat l'estat a Notific@ de la notificació amb identificador " + pendent.getId() + ", i actualitzant les dades a Notib.");
+					logger.info("[EST] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + pendent.getId() + ", Estat: " + pendent.getNotificaEstat() + "]");
 					notificacioService.enviamentRefrescarEstat(pendent.getId());
 				}
 			} else {
-				logger.debug("No hi ha enviaments pendents de refrescar l'estat de Notifica");
+				logger.info("[EST] No hi ha enviaments pendents de refrescar l'estat de Notifica");
 			}
 		} else {
-			logger.debug("L'actualització de l'estat dels enviaments amb l'estat de Notific@ està deshabilitada");
+			logger.info("[EST] L'actualització de l'estat dels enviaments amb l'estat de Notific@ està deshabilitada");
 		}
 	}
 	// 4. Actualització de l'estat dels enviaments amb l'estat de enviat_sir
-		// PENDENT ELIMINAR DESPRÉS DE PROVAR ADVISER
-		//////////////////////////////////////////////////////////////////
-		@Override
-		@Scheduled(
-				fixedRateString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode}",
-				initialDelayString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.registre.retard.inicial}")
-		public void enviamentRefrescarEstatEnviatSir() {
-			if (isTasquesActivesProperty() && isEnviamentActualitzacioEstatRegistreActiu()) {
-				logger.debug("Cercant enviaments pendents de refrescar l'estat enviat SIR");
-				int maxPendents = getEnviamentActualitzacioEstatRegistreProcessarMaxProperty();
-				List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByRegistreRefresc(
-						new PageRequest(0, maxPendents));
-				if (!pendents.isEmpty()) {
-					logger.debug("Realitzant refresc de l'estat de enviat SIR per a " + pendents.size() + " enviaments (màxim=" + maxPendents + ")");
-					for (NotificacioEnviamentEntity pendent: pendents) {
-						logger.debug(">>> Consultat l'estat a registre de la notificació amb identificador " + pendent.getId() + ", i actualitzant les dades a Notib.");
-						notificacioService.enviamentRefrescarEstatRegistre(pendent.getId());
-					}
-				} else {
-					logger.debug("No hi ha enviaments pendents de refrescar l'estat enviats a SIR");
+	// PENDENT ELIMINAR DESPRÉS DE PROVAR ADVISER
+	//////////////////////////////////////////////////////////////////
+	@Override
+	@Scheduled(
+			fixedRateString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode}",
+			initialDelayString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.registre.retard.inicial}")
+	public void enviamentRefrescarEstatEnviatSir() {
+		if (isTasquesActivesProperty() && isEnviamentActualitzacioEstatRegistreActiu()) {
+			logger.info("[SIR] Cercant enviaments pendents de refrescar l'estat enviat SIR");
+			int maxPendents = getEnviamentActualitzacioEstatRegistreProcessarMaxProperty();
+			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByRegistreRefresc(
+					new PageRequest(0, maxPendents));
+			if (!pendents.isEmpty()) {
+				logger.info("[SIR] Realitzant refresc de l'estat de enviat SIR per a " + pendents.size() + " enviaments (màxim=" + maxPendents + ")");
+				for (NotificacioEnviamentEntity pendent: pendents) {
+					logger.info(">>> Consultat l'estat a registre de l'enviament: [Id: " + pendent.getId() + ", Estat: " + pendent.getNotificaEstat() + "]" + ", i actualitzant les dades a Notib.");
+					notificacioService.enviamentRefrescarEstatRegistre(pendent.getId());
 				}
 			} else {
-				logger.debug("L'actualització de l'estat dels enviaments amb l'estat de Notific@ està deshabilitada");
+				logger.info("[SIR] No hi ha enviaments pendents de refrescar l'estat enviats a SIR");
 			}
+		} else {
+			logger.info("[SIR] L'actualització de l'estat dels enviaments amb l'estat de Notific@ està deshabilitada");
 		}
+	}
+	
 	private boolean isNotificaEnviamentsActiu() {
 		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.notifica.enviaments.actiu");
 		if (actives != null) {

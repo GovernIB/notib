@@ -46,6 +46,7 @@ public class RegistreHelper {
 	
 	public boolean enviamentRefrescarEstatRegistre(Long enviamentId) {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+		logger.info(" [SIR] Inici actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
 		enviament.setNotificacio(notificacio);
 		NotificacioEventEntity.Builder eventBuilder  = null;
@@ -117,8 +118,10 @@ public class RegistreHelper {
 						}
 					}
 				}
+				logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 				return true;
 			} else {
+				logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 				return false;
 			}
 		} catch (Exception ex) {
@@ -137,6 +140,7 @@ public class RegistreHelper {
 			enviament.updateNotificaError(
 					true,
 					event);
+			logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 			return false;
 		}
 	}
