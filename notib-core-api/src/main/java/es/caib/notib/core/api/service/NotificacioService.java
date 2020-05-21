@@ -332,15 +332,16 @@ public interface NotificacioService {
 
 
 	// Mètodes per cridar des de l'schedulled
-	void notificacioRegistrar(Long notificacioId);
-	
-	void notificacioEnviar(Long notificacioId);
-	
-	void enviamentRefrescarEstat(Long notificacioId);
-
-	void enviamentRefrescarEstatRegistre(Long notificacioId);
+//	void notificacioRegistrar(Long notificacioId);
+//	void notificacioEnviar(Long notificacioId);
+//	void enviamentRefrescarEstat(Long notificacioId);
+//	void enviamentRefrescarEstatRegistre(Long notificacioId);
 
 
+	void registrarEnviamentsPendents();
+	void notificaEnviamentsRegistrats();
+	void enviamentRefrescarEstatPendents();
+	void enviamentRefrescarEstatEnviatSir();
 	
 
 }

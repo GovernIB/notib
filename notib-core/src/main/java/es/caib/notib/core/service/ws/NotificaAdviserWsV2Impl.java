@@ -52,7 +52,6 @@ import es.caib.notib.core.wsdl.adviser.Receptor;
 		portName = "AdviserWsV2PortType",
 		endpointInterface = "es.caib.notib.core.wsdl.adviser.AdviserWsV2PortType",
 		targetNamespace = "https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/")
-//@Interceptors({SOAPInterceptor.class})
 public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 
 	@Autowired
@@ -68,6 +67,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 
 
 	@Override
+	@Transactional
 	public void sincronizarEnvio(
 			String organismoEmisor, 
 			Holder<String> identificador, 
