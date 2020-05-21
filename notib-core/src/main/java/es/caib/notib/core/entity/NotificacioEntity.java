@@ -72,10 +72,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Temporal(TemporalType.DATE)
 	protected Date caducitat;
 	
-	@Column(name = "proc_codi_notib", length = 6, nullable = false)
+	@Column(name = "proc_codi_notib", length = 9, nullable = false)
 	protected String procedimentCodiNotib;
 	
-	@Column(name = "grup_codi", length = 6, nullable = false)
+	@Column(name = "grup_codi", length = 64, nullable = false)
 	protected String grupCodi;
 	
 	@Column(name = "estat", nullable = false)
