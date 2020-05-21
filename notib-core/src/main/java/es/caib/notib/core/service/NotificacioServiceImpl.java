@@ -962,162 +962,98 @@ public class NotificacioServiceImpl implements NotificacioService {
 		return resposta;
 	}
 	
-	
 	// SCHEDULLED METHODS
 	////////////////////////////////////////////////////////////////
 	
-	// 1. Enviament de notificacions pendents al registre y notific@
-	////////////////////////////////////////////////////////////////
+	@SuppressWarnings("rawtypes")
 	@Transactional
 	@Override
-	public void registrarEnviamentsPendents() {
-		logger.info("[REG] Cercant notificacions pendents de registrar");
+	public List getNotificacionsPendentsRegistrar() {
 		int maxPendents = getRegistreEnviamentsProcessarMaxProperty();
 		List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatPendent(
 				pluginHelper.getRegistreReintentsMaxProperty(),
 				new PageRequest(0, maxPendents));
-		if (!pendents.isEmpty()) {
-			logger.info("[REG] Realitzant registre per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
-			for (NotificacioEntity pendent : pendents) {
-				logger.info("[REG] >>> Realitzant registre de la notificació: [Id: " + pendent.getId() + ", Estat: " + pendent.getEstat() + "]");
-				registrarNotificar(pendent.getId());
-			}
-		} else {
-			logger.info("[REG] No hi ha notificacions pendents de registrar");
-		}
+		return pendents;
 	}
 	
-	// 2. Enviament de notificacions registrades a Notific@
-	///////////////////////////////////////////////////////
 	@Transactional
 	@Override
-	public void notificaEnviamentsRegistrats() {
-		if (isTasquesActivesProperty() && isNotificaEnviamentsActiu() && notificaHelper.isConnexioNotificaDisponible()) {
-			logger.info("[NOT] Cercant notificacions registrades pendents d'enviar a Notifica");
-			int maxPendents = getNotificaEnviamentsProcessarMaxProperty();
-			List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatRegistrada(
-					pluginHelper.getNotificaReintentsMaxProperty(), 
-					new PageRequest(0, maxPendents));
-			if (!pendents.isEmpty()) {
-				logger.info("[NOT] Realitzant enviaments a Notifica per a " + pendents.size() + " notificacions pendents (màxim=" + maxPendents + ")");
-				for (NotificacioEntity pendent: pendents) {
-					logger.info("[NOT] >>> Realitzant enviament a Notifica de la notificació: [Id: " + pendent.getId() + ", Estat: " + pendent.getEstat() + "]");
-					notificaHelper.notificacioEnviar(pendent.getId());
-				}
-			} else {
-				logger.info("[NOT] No hi ha notificacions pendents d'enviar a Notific@");
-			}
-		} else {
-			logger.info("[NOT] L'enviament de notificacions a Notific@ està deshabilitada");
-		}
+	public void notificacioRegistrar(Long notificacioId) {
+		registrarNotificar(notificacioId);
 	}
 	
-	// 3. Actualització de l'estat dels enviaments amb l'estat de Notific@
-	// PENDENT ELIMINAR DESPRÉS DE PROVAR ADVISER
-	//////////////////////////////////////////////////////////////////
+	@SuppressWarnings("rawtypes")
 	@Transactional
 	@Override
-	public void enviamentRefrescarEstatPendents() {
-		if (!notificaHelper.isAdviserActiu() && isTasquesActivesProperty() && isEnviamentActualitzacioEstatActiu() && notificaHelper.isConnexioNotificaDisponible()) {
-			logger.info("[EST] Cercant enviaments pendents de refrescar l'estat de Notifica");
-			int maxPendents = getEnviamentActualitzacioEstatProcessarMaxProperty();
-			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByNotificaRefresc(
-					new PageRequest(0, maxPendents));
-			if (!pendents.isEmpty()) {
-				logger.info("[EST] Realitzant refresc de l'estat de Notifica per a " + pendents.size() + " enviaments (màxim=" + maxPendents + ")");
-				for (NotificacioEnviamentEntity pendent: pendents) {
-					logger.info("[EST] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + pendent.getId() + ", Estat: " + pendent.getNotificaEstat() + "]");
-					notificaHelper.enviamentRefrescarEstat(pendent.getId());
-				}
-			} else {
-				logger.info("[EST] No hi ha enviaments pendents de refrescar l'estat de Notifica");
-			}
-		} else {
-			logger.info("[EST] L'actualització de l'estat dels enviaments amb l'estat de Notific@ està deshabilitada");
-		}
+	public List getNotificacionsPendentsEnviar() {
+		int maxPendents = getNotificaEnviamentsProcessarMaxProperty();
+		List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatRegistrada(
+				pluginHelper.getNotificaReintentsMaxProperty(), 
+				new PageRequest(0, maxPendents));
+		return pendents;
 	}
 	
-	// 4. Actualització de l'estat dels enviaments amb l'estat de enviat_sir
-	// PENDENT ELIMINAR DESPRÉS DE PROVAR ADVISER
-	//////////////////////////////////////////////////////////////////
 	@Transactional
 	@Override
-	public void enviamentRefrescarEstatEnviatSir() {
-		if (isTasquesActivesProperty() && isEnviamentActualitzacioEstatRegistreActiu()) {
-			logger.info("[SIR] Cercant enviaments pendents de refrescar l'estat enviat SIR");
-			int maxPendents = getEnviamentActualitzacioEstatRegistreProcessarMaxProperty();
-			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByRegistreRefresc(
-					new PageRequest(0, maxPendents));
-			if (!pendents.isEmpty()) {
-				logger.info("[SIR] Realitzant refresc de l'estat de enviat SIR per a " + pendents.size() + " enviaments (màxim=" + maxPendents + ")");
-				for (NotificacioEnviamentEntity pendent: pendents) {
-					logger.info(">>> Consultat l'estat a registre de l'enviament: [Id: " + pendent.getId() + ", Estat: " + pendent.getNotificaEstat() + "]" + ", i actualitzant les dades a Notib.");
-					registreHelper.enviamentRefrescarEstatRegistre(pendent.getId());
-				}
-			} else {
-				logger.info("[SIR] No hi ha enviaments pendents de refrescar l'estat enviats a SIR");
-			}
-		} else {
-			logger.info("[SIR] L'actualització de l'estat dels enviaments amb l'estat de Notific@ està deshabilitada");
-		}
+	public void notificacioEnviar(Long notificacioId) {
+		notificaHelper.notificacioEnviar(notificacioId);
 	}
 	
+	@SuppressWarnings("rawtypes")
+	@Transactional
+	@Override
+	public List getNotificacionsPendentsRefrescarEstat() {
+		int maxPendents = getEnviamentActualitzacioEstatProcessarMaxProperty();
+		List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByNotificaRefresc(
+				new PageRequest(0, maxPendents));
+		return pendents;
+	}
+	
+	@Transactional
+	@Override
+	public void enviamentRefrescarEstat(Long notificacioId) {
+		notificaHelper.enviamentRefrescarEstat(notificacioId);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@Transactional
+	@Override
+	public List getNotificacionsPendentsRefrescarEstatRegistre() {
+		int maxPendents = getEnviamentActualitzacioEstatRegistreProcessarMaxProperty();
+		List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByRegistreRefresc(
+				new PageRequest(0, maxPendents));
+		return pendents;
+	}
+	
+	@Transactional
+	@Override
+	public void enviamentRefrescarEstatRegistre(Long notificacioId) {
+		registreHelper.enviamentRefrescarEstatRegistre(notificacioId);
+	}
 	
 	private int getRegistreEnviamentsProcessarMaxProperty() {
 		return propertiesHelper.getAsInt(
 				"es.caib.notib.tasca.registre.enviaments.processar.max",
 				10);
 	}
-	
-	private boolean isTasquesActivesProperty() {
-		String actives = propertiesHelper.getProperty("es.caib.notib.tasques.actives");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
-	}
-	private boolean isNotificaEnviamentsActiu() {
-		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.notifica.enviaments.actiu");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
-	}
 	private int getNotificaEnviamentsProcessarMaxProperty() {
 		return propertiesHelper.getAsInt(
 				"es.caib.notib.tasca.notifica.enviaments.processar.max",
 				10);
-	}
-	
-	private boolean isEnviamentActualitzacioEstatActiu() {
-		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.enviament.actualitzacio.estat.actiu");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
 	}
 	private int getEnviamentActualitzacioEstatProcessarMaxProperty() {
 		return propertiesHelper.getAsInt(
 				"es.caib.notib.tasca.enviament.actualitzacio.estat.processar.max",
 				10);
 	}
-	
-	private boolean isEnviamentActualitzacioEstatRegistreActiu() {
-		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.actiu");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
-	}
 	private int getEnviamentActualitzacioEstatRegistreProcessarMaxProperty() {
 		return propertiesHelper.getAsInt(
 				"es.caib.notib.tasca.enviament.actualitzacio.estat.registre.processar.max",
 				10);
 	}
+	
+		
+	
 	
 	private void estatCalcularCampsAddicionals(
 			NotificacioEnviamentEntity enviament,
@@ -1138,6 +1074,49 @@ public class NotificacioServiceImpl implements NotificacioService {
 		return "certificacio_" + enviament.getNotificaIdentificador() + ".pdf";
 	}
 
+//	private boolean isNotificaEnviamentsActiu() {
+//		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.notifica.enviaments.actiu");
+//		if (actives != null) {
+//			return new Boolean(actives).booleanValue();
+//		} else {
+//			return true;
+//		}
+//	}
+//	private int getNotificaEnviamentsProcessarMaxProperty() {
+//		return propertiesHelper.getAsInt(
+//				"es.caib.notib.tasca.notifica.enviaments.processar.max",
+//				10);
+//	}
+//	
+//	private int getRegistreEnviamentsProcessarMaxProperty() {
+//		return propertiesHelper.getAsInt(
+//				"es.caib.notib.tasca.registre.enviaments.processar.max",
+//				10);
+//	}
+//
+//	private boolean isEnviamentActualitzacioEstatActiu() {
+//		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.enviament.actualitzacio.estat.actiu");
+//		if (actives != null) {
+//			return new Boolean(actives).booleanValue();
+//		} else {
+//			return true;
+//		}
+//	}
+//	private int getEnviamentActualitzacioEstatProcessarMaxProperty() {
+//		return propertiesHelper.getAsInt(
+//				"es.caib.notib.tasca.enviament.actualitzacio.estat.processar.max",
+//				10);
+//	}
+//
+//	private boolean isTasquesActivesProperty() {
+//		String actives = propertiesHelper.getProperty("es.caib.notib.tasques.actives");
+//		if (actives != null) {
+//			return new Boolean(actives).booleanValue();
+//		} else {
+//			return true;
+//		}
+//	}
+	
 	private byte[] downloadUsingStream(String urlStr, String file) throws IOException{
         URL url = new URL(urlStr);
         BufferedInputStream bis = new BufferedInputStream(url.openStream());
