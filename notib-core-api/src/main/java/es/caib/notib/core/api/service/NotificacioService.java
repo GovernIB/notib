@@ -333,14 +333,23 @@ public interface NotificacioService {
 
 	// Mètodes per cridar des de l'schedulled
 	void notificacioRegistrar(Long notificacioId);
-	
 	void notificacioEnviar(Long notificacioId);
-	
 	void enviamentRefrescarEstat(Long notificacioId);
-
 	void enviamentRefrescarEstatRegistre(Long notificacioId);
 
+	@SuppressWarnings("rawtypes")
+	List getNotificacionsPendentsRegistrar();
+	@SuppressWarnings("rawtypes")
+	List getNotificacionsPendentsEnviar();
+	@SuppressWarnings("rawtypes")
+	List getNotificacionsPendentsRefrescarEstat();
+	@SuppressWarnings("rawtypes")
+	List getNotificacionsPendentsRefrescarEstatRegistre();
 
+//	void registrarEnviamentsPendents();
+//	void notificaEnviamentsRegistrats();
+//	void enviamentRefrescarEstatPendents();
+//	void enviamentRefrescarEstatEnviatSir();
 	
 
 }

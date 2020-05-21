@@ -50,6 +50,7 @@ public class RegistreNotificaHelper {
 	public void realitzarProcesRegistrarNotificar(
 			NotificacioEntity notificacioEntity,
 			List<NotificacioEnviamentDtoV2> enviaments) {
+		logger.info(" [REG-NOT] Inici procés Registrar-Notificar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
 		if (isArxiuEmprarSir()) {
 			String dir3Codi;
 			if (notificacioEntity.getEntitat().getDir3CodiReg() != null)
@@ -66,9 +67,11 @@ public class RegistreNotificaHelper {
 					}
 				}
 				if(totsAdministracio) {
+					logger.info(" [REG-NOT] Assentament registral (SIR)");
 					for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
 						//Només crea assentament registral
 						try {
+							logger.info(" >>> Nou assentament registral...");
 							AsientoRegistralBeanDto arb = pluginHelper.notificacioToAsientoRegistralBean(
 									notificacioEntity, 
 									enviament);
@@ -79,6 +82,7 @@ public class RegistreNotificaHelper {
 									2L);
 							//Registrar event
 							if(arbResposta.getErrorDescripcio() != null) {
+								logger.info(" >>> ... ERROR");
 								updateEventWithError(
 										arbResposta,
 										null,
@@ -86,6 +90,7 @@ public class RegistreNotificaHelper {
 										enviament,
 										notificacioEntity.getEnviaments());
 							} else {
+								logger.info(" >>> ... OK");
 								updateEventWithoutError(
 										arbResposta,
 										null,
@@ -102,8 +107,10 @@ public class RegistreNotificaHelper {
 						}
 					}
 				} else {
+					logger.info(" [REG-NOT] Comunicació: Assentament registral + Notifica");
 					try {
 						//Crea assentament registral + Notific@
+						logger.info(" >>> Nou assentament registral...");
 						AsientoRegistralBeanDto arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(
 								notificacioEntity, 
 								notificacioEntity.getEnviaments());
@@ -114,6 +121,7 @@ public class RegistreNotificaHelper {
 								1L);
 						//Registrar event
 						if(arbResposta.getErrorCodi() != null) {
+							logger.info(" >>> ... ERROR");
 							updateEventWithError(
 									arbResposta,
 									null,
@@ -121,6 +129,7 @@ public class RegistreNotificaHelper {
 									null,
 									notificacioEntity.getEnviaments());
 						} else {
+							logger.info(" >>> ... OK");
 							updateEventWithoutError(
 									arbResposta,
 									null,
@@ -138,7 +147,9 @@ public class RegistreNotificaHelper {
 				}
 			} else {
 				//Crea assentament registral + Notific@
+				logger.info(" [REG-NOT] Notificació: Assentament registral + Notifica");
 				try {
+					logger.info(" >>> Nou assentament registral...");
 					AsientoRegistralBeanDto arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(
 							notificacioEntity, 
 							notificacioEntity.getEnviaments());
@@ -149,6 +160,7 @@ public class RegistreNotificaHelper {
 							1L);
 					//Registrar event
 					if(arbResposta.getErrorCodi() != null) {
+						logger.info(" >>> ... ERROR");
 						updateEventWithError(
 								arbResposta,
 								null,
@@ -156,6 +168,7 @@ public class RegistreNotificaHelper {
 								null,
 								notificacioEntity.getEnviaments());
 					} else {
+						logger.info(" >>> ... OK");
 						updateEventWithoutError(
 								arbResposta,
 								null,
@@ -173,8 +186,10 @@ public class RegistreNotificaHelper {
 			}
 		} else {
 			//Crea registre sortida + Notific@
+			logger.info(" [REG-NOT] Registre + Notifica");
 			RegistreIdDto registreIdDto = new RegistreIdDto();
 			try {
+				logger.info(" >>> Nou registre...");
 				notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
 				registreIdDto = pluginHelper.registreAnotacioSortida(
 						conversioTipusHelper.convertir(
@@ -184,6 +199,7 @@ public class RegistreNotificaHelper {
 						1L);
 				//Registrar event
 				if (registreIdDto.getDescripcioError() != null) {
+					logger.info(" >>> ... ERROR");
 					updateEventWithError(
 							null,
 							registreIdDto,
@@ -191,6 +207,7 @@ public class RegistreNotificaHelper {
 							null,
 							notificacioEntity.getEnviaments());				
 				} else {
+					logger.info(" >>> ... OK");
 					updateEventWithoutError(
 							null,
 							registreIdDto,
@@ -205,6 +222,7 @@ public class RegistreNotificaHelper {
 						ex.getMessage(),
 						ex);
 			}
+			logger.info(" [REG-NOT] Fi procés Registrar-Notificar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
 		}
 	}
 	
@@ -279,8 +297,9 @@ public class RegistreNotificaHelper {
 			notificacioEntity.updateRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
 			notificacioEntity.updateRegistreData(arbResposta.getRegistreData());
 			notificacioEntity.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
-			
+			logger.info(" >>> Canvi estat a REGISTRADA ");
 			if (enviarNotificacio) {
+				logger.info(" >>> Notificant...");
 				notificaHelper.notificacioEnviar(notificacioEntity.getId());
 			}
 			//Comunicació + administració (SIR)
@@ -327,9 +346,11 @@ public class RegistreNotificaHelper {
 			notificacioEntity.updateRegistreNumeroFormatat(registreIdDto.getNumeroRegistreFormat());
 			notificacioEntity.updateRegistreData(registreIdDto.getData());
 			notificacioEntity.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
+			logger.info(" >>> Canvi estat a REGISTRADA ");
 			notificacioEntity.updateEventAfegir(event);
 			notificacioEventRepository.saveAndFlush(event);
 			if (enviarNotificacio) {
+				logger.info(" >>> Notificant...");
 				notificaHelper.notificacioEnviar(notificacioEntity.getId());
 			}
 			for(NotificacioEnviamentEntity enviamentEntity: notificacioEntity.getEnviaments()) {

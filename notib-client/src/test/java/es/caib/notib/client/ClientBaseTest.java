@@ -22,6 +22,7 @@ import es.caib.notib.ws.notificacio.EntregaPostal;
 import es.caib.notib.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.ws.notificacio.Enviament;
 import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
+import es.caib.notib.ws.notificacio.InteressatTipusEnumDto;
 import es.caib.notib.ws.notificacio.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.ws.notificacio.NotificaServeiTipusEnumDto;
 import es.caib.notib.ws.notificacio.NotificacioV2;
@@ -41,9 +42,10 @@ public class ClientBaseTest {
 	protected static final String LLIBRE = "L99";
 	protected static final String OFICINA = "O00009390";
 	protected static final String UNITAT_ADMINISTRATIVA_SISTRA = "1";
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "846823";
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "123455";
 	protected static final String IDENTIFICADOR_PROCEDIMENT_SISTRA = "IN0026NSPI";
 	protected static final String IDIOMA = "ca";
+	protected static final String USUARI_CODI = "e18225486x";
 
 	protected NotificacioV2 generarNotificacioV2(
 			String notificacioId,
@@ -53,6 +55,7 @@ public class ClientBaseTest {
 		NotificacioV2 notificacio = new NotificacioV2();
 		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
 		notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
+		notificacio.setUsuariCodi(USUARI_CODI);
 //		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
 //		notificacio.setComunicacioTipus(ComunicacioTipusEnum.ASINCRON);
 		notificacio.setConcepte(
@@ -107,6 +110,7 @@ public class ClientBaseTest {
 			titular.setNif("00000000T");
 			titular.setTelefon("666010101");
 			titular.setEmail("sandreu@limit.es");
+			titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
 			enviament.setTitular(titular);
 			Persona destinatari = new Persona();
 			destinatari.setNom("melcior");
@@ -115,6 +119,7 @@ public class ClientBaseTest {
 			destinatari.setNif("18225486x");
 			destinatari.setTelefon("666020202");
 			destinatari.setEmail("sandreu@limit.es");
+			destinatari.setInteressatTipus(InteressatTipusEnumDto.FISICA);
 			enviament.getDestinataris().add(destinatari);
 			if (ambEnviamentPostal) {
 				EntregaPostal entregaPostal = new EntregaPostal();

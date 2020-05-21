@@ -257,23 +257,48 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.llistarPaisos();
 	}
 
+	@SuppressWarnings("rawtypes")
+	@Override
+	public List getNotificacionsPendentsRegistrar() {
+		return delegate.getNotificacionsPendentsRegistrar();
+	}
+
 	@Override
 	public void notificacioRegistrar(Long notificacioId) {
-		delegate.notificacioRegistrar(notificacioId);
+		delegate.notificacioRegistrar(notificacioId);		
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@Override
+	public List getNotificacionsPendentsEnviar() {
+		return delegate.getNotificacionsPendentsEnviar();
 	}
 
 	@Override
 	public void notificacioEnviar(Long notificacioId) {
-		delegate.notificacioEnviar(notificacioId);
+		delegate.notificacioEnviar(notificacioId);		
 	}
 
+	@SuppressWarnings("rawtypes")
+	@Override
+	public List getNotificacionsPendentsRefrescarEstat() {
+		return delegate.getNotificacionsPendentsRefrescarEstat();
+	}
+	
 	@Override
 	public void enviamentRefrescarEstat(Long notificacioId) {
-		delegate.enviamentRefrescarEstat(notificacioId);
+		delegate.enviamentRefrescarEstat(notificacioId);		
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public List getNotificacionsPendentsRefrescarEstatRegistre() {
+		return delegate.getNotificacionsPendentsRefrescarEstatRegistre();
 	}
 
 	@Override
 	public void enviamentRefrescarEstatRegistre(Long notificacioId) {
-		delegate.enviamentRefrescarEstatRegistre(notificacioId);
+		delegate.enviamentRefrescarEstatRegistre(notificacioId);		
 	}
+
 }
