@@ -175,14 +175,23 @@ public class EntregapostalCommand {
 	private String viaNom;
 	@Size(max=5)
 	private String numeroCasa;
+	@Size(max=3)
 	private String numeroQualificador;
+	@Size(max=5)
 	private String puntKm;
+	@Size(max=10)
 	private String apartatCorreus;
+	@Size(max=3)
 	private String portal;
+	@Size(max=3)
 	private String escala;
+	@Size(max=3)
 	private String planta;
+	@Size(max=3)
 	private String porta;
+	@Size(max=3)
 	private String bloc;
+	@Size(max=40)
 	private String complement;
 	@NotEmpty @Size(max=10)
 	private String codiPostal;
@@ -191,14 +200,19 @@ public class EntregapostalCommand {
 	
 	@Size(max=255)
 	private String poblacio;
-	private String municipiCodi; 
+	@Size(max=6)
+	private String municipiCodi;
+	@Size(max=2)
 	private String provincia;
+	@Size(max=2)
 	private String paisCodi;
 	@Size(max=50)
 	private String linea1;
 	@Size(max=50)
 	private String linea2;
+	@Size(max=10)
 	private String formatSobre;
+	@Size(max=10)
 	private String formatFulla;
 	private boolean visible = true;
 	

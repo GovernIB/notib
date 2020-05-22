@@ -319,7 +319,7 @@ $(document).ready(function() {
 			$(llinatge2).addClass('hidden');
 			$(nif).removeClass('hidden');
 			$(dir3codi).addClass('hidden');
-			$(nifLabel).text(nifLabelText);
+			$(nifLabel).text(nifLabelText + " *");
 		}
 	});
 	
