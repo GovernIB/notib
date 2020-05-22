@@ -5,6 +5,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -154,7 +156,7 @@ public class ProcedimentController extends BaseUserController{
 						isAdministrador(request));
 				
 			} catch(NotFoundException | ValidationException ev) {
-				System.out.print("Error");
+				logger.debug("Error al actualitzar el procediment", ev);
 			}
 			return getModalControllerReturnValueSuccess(
 					request,
@@ -354,5 +356,5 @@ public class ProcedimentController extends BaseUserController{
 		return RolHelper.isUsuariActualAdministrador(request);
 	}
 	
-	
+	private static final Logger logger = LoggerFactory.getLogger(ProcedimentController.class);
 }

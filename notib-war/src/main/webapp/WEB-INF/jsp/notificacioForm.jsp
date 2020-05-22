@@ -299,22 +299,27 @@ $(document).ready(function() {
 		var llinatge1 = closest.find('.llinatge1');
 		var llinatge2 = closest.find('.llinatge2');
 		var nif = closest.find('.nif');
+		var nifLabel = nif.find('label');
 		var dir3codi = closest.find('.dir3Codi');
+		var nifLabelText = "<spring:message code='notificacio.form.camp.titular.nif'/>";
 		
 		if ($(this).val() == 'ADMINISTRACIO') {
 			$(llinatge1).addClass('hidden');
 			$(llinatge2).addClass('hidden');
 			$(dir3codi).removeClass('hidden');
+			$(nifLabel).text(nifLabelText);
 		} else if ($(this).val() == 'FISICA') {
 			$(llinatge1).removeClass('hidden');
 			$(llinatge2).removeClass('hidden');
 			$(nif).removeClass('hidden');
+			$(nifLabel).text(nifLabelText + " *");
 			$(dir3codi).addClass('hidden');
 		} else {
 			$(llinatge1).addClass('hidden');
 			$(llinatge2).addClass('hidden');
 			$(nif).removeClass('hidden');
 			$(dir3codi).addClass('hidden');
+			$(nifLabel).text(nifLabelText);
 		}
 	});
 	
@@ -926,7 +931,7 @@ function actualitzarEntrega(j) {
 													<not:inputSelect name="enviaments[${j}].destinataris[${i}].interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="12" inputSize="12" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
 												</div>
 												<div class="col-md-3 nif">
-													<not:inputText name="enviaments[${j}].destinataris[${i}].nif" textKey="notificacio.form.camp.titular.nif" labelSize="12" inputSize="12" required="true" />
+													<not:inputText name="enviaments[${j}].destinataris[${i}].nif" textKey="notificacio.form.camp.titular.nif" labelSize="12" inputSize="12" />
 												</div>
 												<div class="col-md-3">
 													<not:inputText name="enviaments[${j}].destinataris[${i}].nom" textKey="notificacio.form.camp.titular.nom" labelSize="12" inputSize="12" required="true" />

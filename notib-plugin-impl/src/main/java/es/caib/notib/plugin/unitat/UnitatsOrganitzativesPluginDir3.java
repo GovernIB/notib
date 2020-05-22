@@ -12,6 +12,9 @@ import java.util.Map;
 
 import javax.xml.ws.BindingProvider;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -54,7 +57,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 					+ "&provincia="+ (provincia != null ? provincia : "-1")
 					+ "&localidad=" + (municipi != null ? municipi : "-1")
 					+ "&vigentes=true");
-			System.out.println("URL: " + url);
+			logger.debug("URL: " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
@@ -103,7 +106,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 					+ "&localidad=" + (municipi != null ? municipi : "-1")
 					+ "&oficinasSir=false"
 					+ "&vigentes=true");
-			System.out.println("URL: " + url);
+			logger.debug("URL: " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
@@ -134,7 +137,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 	public List<CodiValor> nivellsAdministracio() throws SistemaExternException {
 		try {
 			URL url = new URL(getServiceUrl() + SERVEI_CATALEG + "nivelesAdministracion");
-			System.out.println("URL: " + url);
+			logger.debug("URL: " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
@@ -180,7 +183,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 	public List<CodiValor> comunitatsAutonomes() throws SistemaExternException {
 		try {
 			URL url = new URL(getServiceUrl() + SERVEI_CATALEG + "comunidadesAutonomas");
-			System.out.println("URL: " + url);
+			logger.debug("URL: " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
@@ -205,7 +208,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 	public List<CodiValor> provincies() throws SistemaExternException {
 		try {
 			URL url = new URL(getServiceUrl() + SERVEI_CATALEG + "provincias");
-			System.out.println("URL: " + url);
+			logger.debug("URL: " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
@@ -232,7 +235,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 			URL url = new URL(getServiceUrl() + SERVEI_CATALEG 
 					+ "provincias/comunidadAutonoma?"
 					+ "id=" + codiCA);
-			System.out.println("URL: " + url);
+			logger.debug("URL: " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
@@ -261,7 +264,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 					+ "localidades/provincia/entidadGeografica?"
 					+ "codigoProvincia=" + codiProvincia
 					+ "&codigoEntidadGeografica=01");
-			System.out.println("URL: " + url);
+			logger.debug("URL: " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			httpConnection.setRequestMethod("GET");
 			httpConnection.setDoInput(true);
@@ -327,4 +330,5 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 		reqContext.put(BindingProvider.PASSWORD_PROPERTY, pwd);
 	}
 	
+	private static final Logger logger = LoggerFactory.getLogger(UnitatsOrganitzativesPluginDir3.class);
 }

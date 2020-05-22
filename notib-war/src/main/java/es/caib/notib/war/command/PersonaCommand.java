@@ -55,7 +55,9 @@ public class PersonaCommand {
 	private String llinatge1;
 	@Size(max=40)
 	private String llinatge2;
+	@Size(max=9)
 	private String nif;
+	@Size(max=16)
 	private String telefon;
 	@Size(max=255)
 	private String email;
