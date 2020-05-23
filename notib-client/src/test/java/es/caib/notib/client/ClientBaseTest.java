@@ -36,13 +36,13 @@ import es.caib.notib.ws.notificacio.Persona;
 public class ClientBaseTest {
 
 //	Entitat: A04013511 (DGTIC) ò A04003003 (Govern)
-	protected static final String ENTITAT_DIR3CODI = "A04013511";
+	protected static final String ENTITAT_DIR3CODI = "A04003003";
 //	protected static final String ORGAN_CODI = "A04013501";
-	protected static final String ORGAN_CODI = "A04013511";
+	protected static final String ORGAN_CODI = "A04003003";
 	protected static final String LLIBRE = "L99";
 	protected static final String OFICINA = "O00009390";
 	protected static final String UNITAT_ADMINISTRATIVA_SISTRA = "1";
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "123455";
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "234257";
 	protected static final String IDENTIFICADOR_PROCEDIMENT_SISTRA = "IN0026NSPI";
 	protected static final String IDIOMA = "ca";
 	protected static final String USUARI_CODI = "e18225486x";
@@ -56,51 +56,21 @@ public class ClientBaseTest {
 		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
 		notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
 		notificacio.setUsuariCodi(USUARI_CODI);
-//		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
 //		notificacio.setComunicacioTipus(ComunicacioTipusEnum.ASINCRON);
-		notificacio.setConcepte(
-				"concepte_" + notificacioId);
-		notificacio.setDescripcio(
-				"descripcio_" + notificacioId);
+		notificacio.setConcepte("concepte_" + notificacioId);
+		notificacio.setDescripcio("descripcio_" + notificacioId);
 		notificacio.setEnviamentDataProgramada(null);
 		notificacio.setRetard(5);
 		notificacio.setCaducitat(toXmlGregorianCalendar(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000)));
-//				toXmlGregorianCalendar(
-//						);
 		DocumentV2 document = new DocumentV2();
 		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
 		
 		String arxiuB64 = Base64.encodeBase64String(arxiuBytes);
-		
-//		System.out.println("Hash: " + new String(DigestUtils.sha256(arxiuBytes)));
-//		System.out.println("Hash: " + new String(DigestUtils.sha256(arxiuB64)));
-//		System.out.println("Hash: " + Base64.encodeBase64String(DigestUtils.sha256(arxiuBytes)));
-//		System.out.println("Hash: " + Base64.encodeBase64String(DigestUtils.sha256(arxiuB64)));
-		
 		document.setContingutBase64(arxiuB64);
-		//document.setHash(
-		//		Base64.encodeBase64String(
-		//				Hex.decodeHex(
-		//						DigestUtils.sha256Hex(arxiuBytes).toCharArray())));
 		document.setNormalitzat(false);
 //		document.setGenerarCsv(false);
 		notificacio.setDocument(document);
 		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
-//		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
-//		if (ambEnviamentPostal) {
-//			PagadorPostal pagadorPostal = new PagadorPostal();
-//			pagadorPostal.setDir3Codi("A04013511");
-//			pagadorPostal.setFacturacioClientCodi("ccFac_" + notificacioId);
-//			pagadorPostal.setContracteNum("pccNum_" + notificacioId);
-//			pagadorPostal.setContracteDataVigencia(new Date(0));
-////					toXmlGregorianCalendar();
-////			notificacio.setPagadorPostal(pagadorPostal);
-//			PagadorCie pagadorCie = new PagadorCie();
-//			pagadorCie.setDir3Codi("A04013511");
-//			pagadorCie.setContracteDataVigencia(new Date(0));
-////					toXmlGregorianCalendar();
-////			notificacio.setPagadorCie(pagadorCie);
-//		}
 		for (int i = 0; i < numDestinataris; i++) {
 			Enviament enviament = new Enviament();
 			Persona titular = new Persona();
@@ -144,6 +114,7 @@ public class ClientBaseTest {
 				entregaPostal.setLinea2("linea2_" + i);
 				entregaPostal.setCie(new Integer(0));
 				enviament.setEntregaPostal(entregaPostal);
+				enviament.setEntregaPostalActiva(true);
 			}
 			EntregaDeh entregaDeh = new EntregaDeh();
 			entregaDeh.setObligat(true);
