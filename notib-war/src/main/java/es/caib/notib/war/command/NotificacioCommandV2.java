@@ -71,13 +71,14 @@ import es.caib.notib.war.validation.ValidUuidDocument;
 public class NotificacioCommandV2 {
 
 	private Long id;
-	@NotEmpty @Size(max=64)
+	@NotEmpty @Size(max=9)
 	private String emisorDir3Codi;
 	private String organGestor;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
-	@NotEmpty 
+	@NotEmpty @Size(max=255)
 	private String concepte;
+	@Size(max=1000)
 	private String descripcio;
 	private Date enviamentDataProgramada;
 	private int retard;
@@ -88,6 +89,7 @@ public class NotificacioCommandV2 {
 	private String procedimentNom;
 	private String codiSia;
 	private Long grupId;
+	@Size(max=64)
 	private String usuariCodi;
 	private TipusDocumentEnumDto tipusDocument;
 	private String tipusDocumentSelected;
@@ -102,6 +104,7 @@ public class NotificacioCommandV2 {
 	private String docFisica;
 	private IdiomaEnumDto idioma;
 	private String tipusAssumpte;
+	@Size(max=256)
 	private String numExpedient;
 	private String refExterna;
 	private String codiAssumpte;
@@ -111,7 +114,7 @@ public class NotificacioCommandV2 {
 	private ServeiTipusEnumDto serveiTipus;
 	@Valid
 	private PersonaCommand titular;
-	private PersonaCommand destinatari = new PersonaCommand();
+//	private PersonaCommand destinatari = new PersonaCommand();
 	@Valid
 	private List<PersonaCommand> destinataris = new ArrayList<PersonaCommand>();
 	@Valid
@@ -265,12 +268,12 @@ public class NotificacioCommandV2 {
 	public void setTitular(PersonaCommand titular) {
 		this.titular = titular;
 	}
-	public PersonaCommand getDestinatari() {
-		return destinatari;
-	}
-	public void setDestinatari(PersonaCommand destinatari) {
-		this.destinatari = destinatari;
-	}
+//	public PersonaCommand getDestinatari() {
+//		return destinatari;
+//	}
+//	public void setDestinatari(PersonaCommand destinatari) {
+//		this.destinatari = destinatari;
+//	}
 	public List<PersonaCommand> getDestinataris() {
 		return destinataris;
 	}

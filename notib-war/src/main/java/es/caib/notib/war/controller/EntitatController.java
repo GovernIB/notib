@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -167,7 +169,7 @@ public class EntitatController extends BaseController {
 						entitatService.getCapLogo(), 
 						response);
 			} catch (Exception ex) {
-				System.out.println(ex.getMessage());
+				logger.debug("Error al obtenir el logo de la capçalera", ex);
 			}
 		}
 		return null;
@@ -191,7 +193,7 @@ public class EntitatController extends BaseController {
 						entitatService.getPeuLogo(), 
 						response);
 			} catch (Exception ex) {
-				System.out.println(ex.getMessage());
+				logger.debug("Error al obtenir el logo del peu", ex);
 			}
 		}
 		return null;
@@ -216,5 +218,5 @@ public class EntitatController extends BaseController {
 		return tipusDoc;
 	}
 
-
+	private static final Logger logger = LoggerFactory.getLogger(EntitatController.class);
 }

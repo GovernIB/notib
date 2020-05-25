@@ -3,8 +3,6 @@
  */
 package es.caib.notib.war.controller;
 
-import java.util.Date;
-
 import javax.ejb.EJBAccessException;
 import javax.servlet.http.HttpServletRequest;
 
