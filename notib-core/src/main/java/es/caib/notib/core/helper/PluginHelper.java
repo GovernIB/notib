@@ -1171,7 +1171,10 @@ public class PluginHelper {
 			interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
 		} else {
 			interessat.setDocumentNumero(persona.getNif());
-			interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.NIF);
+			if (isDocumentEstranger(persona.getNif()))
+				interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
+			else
+				interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.NIF);
 		}
 		return interessat;
 	}
@@ -1185,7 +1188,10 @@ public class PluginHelper {
 			interessatDades.setTipoDocumentoIdentificacion("O");
 		} else if (persona.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
 			interessatDades.setDocumento(persona.getNif());
-			interessatDades.setTipoDocumentoIdentificacion("N");
+			if (isDocumentEstranger(persona.getNif()))
+				interessatDades.setTipoDocumentoIdentificacion("E");
+			else
+				interessatDades.setTipoDocumentoIdentificacion("N");
 		} else if (persona.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA) {
 			interessatDades.setDocumento(persona.getNif());
 			interessatDades.setTipoDocumentoIdentificacion("C");
@@ -1232,7 +1238,10 @@ public class PluginHelper {
 				dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CIF);
 			} else {
 				dadesInteressat.setNif(titular.getNif());
-				dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
+				if (isDocumentEstranger(titular.getNif()))
+					dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
+				else
+					dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
 			}
 			dadesInteressat.setNom(titular.getNom());
 			dadesInteressat.setCognom1(titular.getLlinatge1());
@@ -1262,7 +1271,10 @@ public class PluginHelper {
 				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CIF);
 			} else {
 				dadesRepresentat.setNif(destinatari.getNif());
-				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
+				if (isDocumentEstranger(titular.getNif()))
+					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
+				else
+					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
 			}
 			dadesRepresentat.setNom(destinatari.getNom());
 			dadesRepresentat.setCognom1(destinatari.getLlinatge1());
@@ -1307,7 +1319,10 @@ public class PluginHelper {
 				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CIF);
 			} else {
 				dadesRepresentat.setNif(destinatari.getNif());
-				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
+				if (isDocumentEstranger(destinatari.getNif()))
+					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
+				else
+					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
 			}
 			dadesRepresentat.setNom(destinatari.getNom());
 			dadesRepresentat.setCognom1(destinatari.getLlinatge1());
@@ -1336,7 +1351,10 @@ public class PluginHelper {
 				interessatDades.setTipoDocumentoIdentificacion("O");
 			}  else if (titular.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
 				interessatDades.setDocumento(titular.getNif());
-				interessatDades.setTipoDocumentoIdentificacion("N");
+				if (isDocumentEstranger(destinatari.getNif()))
+					interessatDades.setTipoDocumentoIdentificacion("E");
+				else
+					interessatDades.setTipoDocumentoIdentificacion("N");
 			} else if (titular.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA) {
 				interessatDades.setDocumento(titular.getNif());
 				interessatDades.setTipoDocumentoIdentificacion("C");
@@ -1362,7 +1380,10 @@ public class PluginHelper {
 				representantDades.setTipoDocumentoIdentificacion("O");
 			} else if (destinatari.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
 				representantDades.setDocumento(destinatari.getNif());
-				representantDades.setTipoDocumentoIdentificacion("N");
+				if (isDocumentEstranger(destinatari.getNif()))
+					representantDades.setTipoDocumentoIdentificacion("E");
+				else
+					representantDades.setTipoDocumentoIdentificacion("N");
 			} else if (destinatari.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA) {
 				representantDades.setDocumento(destinatari.getNif());
 				representantDades.setTipoDocumentoIdentificacion("C");
@@ -1395,6 +1416,13 @@ public class PluginHelper {
     		throw new Exception(exc.getMessage());
     	}
 	}
+	
+	private static boolean isDocumentEstranger(String nie) {
+		boolean isNie = false;
+		if (nie != null && (nie.startsWith("X") || nie.startsWith("Y") || nie.startsWith("Z")))
+			isNie = true;
+		return isNie;
+    }
 	
 	private XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
 		if (date == null) {
