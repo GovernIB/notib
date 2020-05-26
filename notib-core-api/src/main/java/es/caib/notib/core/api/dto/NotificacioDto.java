@@ -68,7 +68,9 @@ public class NotificacioDto extends AuditoriaDto {
 	private boolean usuariActualProcessar;
 	private boolean usuariActualNotificacio;
 	private boolean usuariActualAdministration;
-
+	private boolean errorLastCallback;
+	private TipusUsuariEnumDto tipusUsuari;
+	
 	public Long getId() {
 		return id;
 	}
@@ -382,6 +384,18 @@ public class NotificacioDto extends AuditoriaDto {
 		this.registreLlibre = registreLlibre;
 	}
 	
+	public boolean isErrorLastCallback() {
+		return errorLastCallback;
+	}
+	public void setErrorLastCallback(boolean errorLastCallback) {
+		this.errorLastCallback = errorLastCallback;
+	}
+	public TipusUsuariEnumDto getTipusUsuari() {
+		return tipusUsuari;
+	}
+	public void setTipusUsuari(TipusUsuariEnumDto tipusUsuari) {
+		this.tipusUsuari = tipusUsuari;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

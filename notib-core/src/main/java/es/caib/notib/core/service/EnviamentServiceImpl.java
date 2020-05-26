@@ -51,6 +51,7 @@ import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.UsuariEntity;
+import es.caib.notib.core.helper.CallbackHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.MessageHelper;
@@ -94,6 +95,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private EntitatRepository entitatRepository;
 	@Autowired
 	private MessageHelper messageHelper;
+	@Autowired
+	private CallbackHelper callbackHelper;
 	
 	@Override
 	@Transactional(readOnly = true)
@@ -1144,9 +1147,13 @@ public class EnviamentServiceImpl implements EnviamentService {
 				notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacioId),
 				NotificacioEventDto.class);
 	}
-	
 
-
+	@Override
+	@Transactional
+	public boolean reintentarCallback(Long eventId) {
+		logger.info("Notificant canvi al client...");
+		return callbackHelper.notifica(eventId);
+	}
 
 	private List<NotificacioEnviamentDto> enviamentsToDto(
 			List<NotificacioEnviamentEntity> enviaments) {
@@ -1223,4 +1230,5 @@ public class EnviamentServiceImpl implements EnviamentService {
 			return pluginHelper.obtenirJustificant(enviament.getNotificacio().getEmisorDir3Codi(), enviament.getRegistreNumeroFormatat()).getJustificant();
 		}
 	}
+	
 }

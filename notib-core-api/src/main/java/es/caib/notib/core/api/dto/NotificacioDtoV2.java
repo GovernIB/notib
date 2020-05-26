@@ -41,6 +41,8 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private String numExpedient;
 	private boolean permisProcessar;
 	private EntitatDto entitat;
+	private boolean errorLastCallback;
+	private TipusUsuariEnumDto tipusUsuari;
 	
 	public Long getId() {
 		return id;
@@ -194,6 +196,18 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	}
 	public void setNotificaEnviamentIntent(int notificaEnviamentIntent) {
 		this.notificaEnviamentIntent = notificaEnviamentIntent;
+	}
+	public boolean isErrorLastCallback() {
+		return errorLastCallback;
+	}
+	public void setErrorLastCallback(boolean errorLastCallback) {
+		this.errorLastCallback = errorLastCallback;
+	}
+	public TipusUsuariEnumDto getTipusUsuari() {
+		return tipusUsuari;
+	}
+	public void setTipusUsuari(TipusUsuariEnumDto tipusUsuari) {
+		this.tipusUsuari = tipusUsuari;
 	}
 	@Override
 	public String toString() {

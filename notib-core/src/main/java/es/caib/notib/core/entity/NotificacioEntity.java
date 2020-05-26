@@ -165,6 +165,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 
 	@Transient
 	protected boolean permisProcessar;
+	@Transient
+	protected boolean errorLastCallback;
 	
 	public String getEmisorDir3Codi() {
 		return emisorDir3Codi;
@@ -293,6 +295,12 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		return tipusUsuari;
 	}
 	
+	public boolean isErrorLastCallback() {
+		return errorLastCallback;
+	}
+	public void setErrorLastCallback(boolean errorLastCallback) {
+		this.errorLastCallback = errorLastCallback;
+	}
 	public void updateNotificaNouEnviament(int reintentsPeriodeNotifica) {
 		this.notificaEnviamentIntent++;
 		Calendar cal = GregorianCalendar.getInstance();

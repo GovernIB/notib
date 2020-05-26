@@ -50,6 +50,7 @@ import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -659,6 +660,41 @@ public class NotificacioController extends BaseUserController {
 		String mimeType = ".pdf";
 		writeFileToResponse(arxiu.getNom() + mimeType, arxiu.getContingut(), response);
 	}
+	
+	@RequestMapping(value = "/{notificacioId}/refrescarEstatClient", method = RequestMethod.GET)
+	public String refrescarEstatClient(
+			HttpServletResponse response,
+			HttpServletRequest request, 
+			@PathVariable Long notificacioId) throws IOException {
+		List<NotificacioEventDto> events = enviamentService.eventFindAmbNotificacio(notificacioId);
+		boolean notificat = false;
+		if (events != null && events.size() > 0) {
+			NotificacioEventDto lastEvent = events.get(events.size() - 1);
+			
+			if(lastEvent.isError() && 
+					(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
+					lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
+					lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
+					lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
+					lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
+				logger.info("Preparant per notificar canvi del event : " + lastEvent.getId() + " de tipus " + lastEvent.getTipus().name());
+				notificat = enviamentService.reintentarCallback(lastEvent.getId());
+			}
+		}
+		
+		if (notificat) {
+			MissatgesHelper.success(request, 
+					getMessage(
+							request,
+							"notificacio.controller.notificar.client.ok"));
+		} else {
+			MissatgesHelper.error(request, 
+					getMessage(
+							request,
+							"notificacio.controller.notificar.client.error"));
+		}
+		return "notificacioInfo";
+	}
 
 	private void emplenarModelNotificacioInfo(
 			EntitatDto entitatActual,
@@ -690,6 +726,8 @@ public class NotificacioController extends BaseUserController {
 		}
 		model.addAttribute("permisAdmin", request.isUserInRole("NOT_ADMIN"));
 	}
+	
+	
 
 	private void emplenarModelEnviamentInfo(
 			Long notificacioId, 

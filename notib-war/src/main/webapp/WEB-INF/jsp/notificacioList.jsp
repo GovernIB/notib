@@ -343,7 +343,7 @@ $(document).ready(function() {
 		data-toggle="datatable"
 		data-url="<c:url value="/notificacio/datatable"/>"
 		data-search-enabled="false"
-		data-default-order="4"
+		data-default-order="6"
 		data-default-dir="desc"
 		class="table table-striped table-bordered"
 		style="width:100%"
@@ -352,6 +352,8 @@ $(document).ready(function() {
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false">#</th>
+				<th data-col-name="tipusUsuari" data-visible="false">#</th>
+				<th data-col-name="errorLastCallback" data-visible="false">#</th>
 				<th data-col-name="notificacio.notificaError" data-visible="false"></th>
 				<th data-col-name="notificacio.notificaErrorDescripcio" data-visible="false"></th>
 				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" class="enviamentTipusCol" width="5px">
@@ -396,7 +398,9 @@ $(document).ready(function() {
 							<span class="fa fa-check-circle"></span>
 						{{/if}}
 						{{:~eval('notificacioEstats["' + estat + '"]')}}
-
+						{{if estat == 'PROCESSADA' && tipusUsuari == 'APLICACIO' && errorLastCallback}}
+							<span class="fa fa-warning text-danger" title="<spring:message code="notificacio.list.client.error"/>"></span>
+						{{/if}}
 						{{if estat == 'PROCESSADA' && estatDate != ''}}
 							<br>
 							<p class="horaProcessat">{{:~eval('formatDate(' + estatDate+ ')')}}</p>

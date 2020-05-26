@@ -151,4 +151,10 @@ public class EnviamentServiceBean implements EnviamentService {
 	public byte[] getDocumentJustificant(Long enviamentId) {
 		return delegate.getDocumentJustificant(enviamentId);
 	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public boolean reintentarCallback(Long eventId) {
+		return delegate.reintentarCallback(eventId);
+	}
 }

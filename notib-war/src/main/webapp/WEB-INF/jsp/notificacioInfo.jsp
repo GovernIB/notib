@@ -136,12 +136,14 @@ $(document).ready(function() {
 										code="notificacio.info.dada.descripcio" /></strong></td>
 							<td>${notificacio.descripcio}</td>
 						</tr>
+						<c:if test="${notificacio.estat != null && notificacio.estat != ''}">
 						<tr>
 							<td><strong><spring:message
 										code="notificacio.info.dada.estat" /></strong></td>
 							<td><spring:message
 									code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.${notificacio.estat}" /></td>
 						</tr>
+						</c:if>
 						<tr>
 							<td><strong><spring:message
 										code="notificacio.info.dada.creacio.data" /></strong></td>
@@ -554,6 +556,23 @@ $(document).ready(function() {
 									href="<not:modalUrl value="/notificacio/${notificacio.id}/enviar"/>"
 									class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
 									<spring:message code="notificacio.info.accio.enviar.boto" />
+								</a>
+							</div>
+						</div>
+					</li>
+				</c:if>
+				<c:if test="${notificacio.tipusUsuari == 'APLICACIO' && notificacio.errorLastCallback}">
+					<c:set var="algunaAccioDisponible" value="${true}" />
+					<li class="list-group-item">
+						<div class="row">
+							<div class="col-sm-6" style="height: 100%">
+								<strong><spring:message code="notificacio.info.accio.reintent" /></strong>
+							</div>
+							<div class="col-sm-6 text-right">
+								<a
+									href="<not:modalUrl value="/notificacio/${notificacio.id}/refrescarEstatClient"/>"
+									class="btn btn-default btn-sm"> <span class="fa fa-undo"></span>
+									<spring:message code="notificacio.info.accio.reintent.boto" />
 								</a>
 							</div>
 						</div>
