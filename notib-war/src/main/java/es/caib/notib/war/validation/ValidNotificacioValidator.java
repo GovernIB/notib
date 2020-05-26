@@ -25,42 +25,116 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 	public void initialize(final ValidNotificacio constraintAnnotation) {
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
-	public boolean isValid(final NotificacioCommandV2 cmd, final ConstraintValidatorContext context) {
+	public boolean isValid(final NotificacioCommandV2 notificacio, final ConstraintValidatorContext context) {
 		boolean valid = true;
 		boolean comunicacioAmbAdministracio = false;
 		boolean comunicacioSenseAdministracio = false;
 		
 		try {
+			
+			// Validació del Concepte
+			if (notificacio.getConcepte() != null && !notificacio.getConcepte().isEmpty()) {
+				if (!validFormat(notificacio.getConcepte())) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(
+							MessageHelper.getInstance().getMessage("notificacio.form.valid.concepte"))
+					.addNode("concepte")
+					.addConstraintViolation();
+			    }
+			}
+			
+			// Validació de la Descripció
+			if (notificacio.getDescripcio() != null && !notificacio.getDescripcio().isEmpty()) {
+				if (!validFormat(notificacio.getDescripcio())) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(
+							MessageHelper.getInstance().getMessage("notificacio.form.valid.concepte"))
+					.addNode("descripcio")
+					.addConstraintViolation();
+			    }
+			}
+						
 			//Validar si és comunicació
-			if (cmd.getEnviaments() != null) {
-				for (EnviamentCommand enviament : cmd.getEnviaments()) {
-					if (cmd.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.COMUNICACIO) {
+			if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.COMUNICACIO) {
+				if (notificacio.getEnviaments() != null) {
+					for (EnviamentCommand enviament : notificacio.getEnviaments()) {
 						if (enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
 							comunicacioAmbAdministracio = true;
 						}
-						if ((enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.FISICA) || (enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.FISICA)) {
+						if ((enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.FISICA) || (enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.JURIDICA)) {
 							comunicacioSenseAdministracio = true;
 						}
 					}
 				}
 			}
-				
 			if (comunicacioAmbAdministracio && comunicacioSenseAdministracio) {
 				valid = false;
+				context.disableDefaultConstraintViolation();
+				context.buildConstraintViolationWithTemplate(
+						MessageHelper.getInstance().getMessage("notificacio.form.comunicacio")).addConstraintViolation();
 			} 
-
+			
+			// Validació de document
+			switch (notificacio.getTipusDocument()) {
+			case ARXIU:
+				if (notificacio.getContingutArxiu() == null || notificacio.getContingutArxiu().length == 0) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+					.addNode("arxiu")
+					.addConstraintViolation();
+				}
+				break;
+			case URL:
+				if (notificacio.getDocumentArxiuUrl() == null || notificacio.getDocumentArxiuUrl().isEmpty()) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+					.addNode("documentArxiuUrl")
+					.addConstraintViolation();
+				}
+				break;
+			case CSV:
+				if (notificacio.getDocumentArxiuCsv() == null || notificacio.getDocumentArxiuCsv().isEmpty()) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+					.addNode("documentArxiuCsv")
+					.addConstraintViolation();
+				}
+				break;
+			case UUID:
+				if (notificacio.getDocumentArxiuUuid() == null || notificacio.getDocumentArxiuUuid().isEmpty()) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+					.addNode("documentArxiuUuid")
+					.addConstraintViolation();
+				}
+				break;
+			}
+		
 		} catch (final Exception ex) {
-        	LOGGER.error("Una comunicació no pot estar dirigida a una administració i a una persona física/jurídica a la vegada.", ex);
+//        	LOGGER.error("Una comunicació no pot estar dirigida a una administració i a una persona física/jurídica a la vegada.", ex);
+			LOGGER.error("S'ha produït un error inesperat al validar la notificació. "
+					+ "Si l'error es continua donant en properes intents, posis en contacte amb els administradors de l'aplicació.", ex);
         	valid = false;
         }
 		
-		if (!valid)
-			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate(
-					MessageHelper.getInstance().getMessage("notificacio.form.comunicacio")).addConstraintViolation();
 		
 		return valid;
+	}
+	
+	private boolean validFormat(String value) {
+		String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;";
+		char[] chars = value.toCharArray();
+		
+		boolean esCaracterValid = true;
+		for (int i = 0; esCaracterValid && i < chars.length; i++) {
+			esCaracterValid = !(CONTROL_CARACTERS.indexOf(chars[i]) < 0);
+			if (!esCaracterValid) {
+				break;
+			}
+	    }
+		return esCaracterValid;
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ValidDocumentValidator.class);

@@ -16,12 +16,12 @@ import javax.validation.Payload;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Documented
-@Target({ElementType.TYPE})
+@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy=ValidNotificacioValidator.class)
 public @interface ValidNotificacio {
 	
-	String message() default "Una comunicació no pot estar dirigida a una administració i a una persona física/jurídica a la vegada.";
+	String message() default "Error en la validació de la notificació.";
 
 	Class<?>[] groups() default {};
 
