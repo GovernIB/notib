@@ -26,10 +26,10 @@
     <script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
     <script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
     <link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
-    <link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
+    <link href="<c:url value="/webjars/select2/4.0.5/dist/css/select2.min.css"/>" rel="stylesheet"/>
     <link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
-    <script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
-    <script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
+    <script src="<c:url value="/webjars/select2/4.0.5/dist/js/select2.min.js"/>"></script>
+    <script src="<c:url value="/webjars/select2/4.0.5/dist/js/i18n/${requestLocale}.js"/>"></script>
     <link href="<c:url value="/css/jasny-bootstrap.min.css"/>" rel="stylesheet">
     <script src="<c:url value="/js/jasny-bootstrap.min.js"/>"></script>
     <link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
@@ -154,6 +154,12 @@
 </style>
 <script type="text/javascript">
 
+var interessatsTipus = new Array();
+var interessatTipusOptions = "";
+<c:forEach items="${interessatTipus}" var="it" varStatus="status">
+   	interessatTipusOptions = interessatTipusOptions + "<option value=${it.value}" + (${status.index == 1} ? " selected='selected'" : "") + "><spring:message code='${it.text}'/></option>";
+</c:forEach>
+
 $(document).ready(function() {
 	
 	$(document).on('change','select.paisos', function() {
@@ -199,7 +205,7 @@ $(document).ready(function() {
 	var numPlus = 1;
 	
     $(".container-envios").find('.enviamentsForm').each(function() {
-    	if($(this).find('.eliminar_enviament').attr('id') != 'enviamentDelete[0]') {
+    	if($(this).find('.eliminar_enviament').attr('id') != 'enviamentDelete_0') {
     		$(this).find('.eliminar_enviament').removeClass('hidden');
     	}
     });
@@ -367,185 +373,280 @@ $(document).ready(function() {
 });
 
 function addDestinatari(enviament_id) {
-    var number;
-    var num;
-    var enviament_id_num = enviament_id.substring(enviament_id.indexOf( '[' ) + 1, enviament_id.indexOf( ']' ));
-    enviament_id_num = parseInt(enviament_id_num);
-    var isMultiple = ($("div[class*=' personaForm_" + enviament_id_num + "']").find('#isMultiple').val() == 'true');
+	var isMultiple = ${isMultiplesDestinataris};
+    var num_enviament = parseInt(enviament_id.substring(enviament_id.indexOf( '[' ) + 1, enviament_id.indexOf( ']' )));
+    var num_destinatari = $('div.destenv_' + num_enviament).size();
+    
+	var destinatari =' \
+    <div class="col-md-12 destinatariForm destenv_#num_enviament# personaForm_#num_enviament#_#num_destinatari#"> \
+		<div class="col-md-3"> \
+			<div class="form-group"> \
+				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].interessatTipus"><spring:message code="notificacio.form.camp.interessatTipus"/></label> \
+				<div class="controls col-xs-12"> \
+					<select id="enviaments[#num_enviament#].destinataris[#num_destinatari#].interessatTipus" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].interessatTipus" class="form-control interessat" style="width:100%"> \
+						' + interessatTipusOptions + ' \
+					</select> \
+				</div> \
+			</div> \
+		</div> \
+		<div class="col-md-3 nif"> \
+			<div class="form-group"> \
+				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].nif"><spring:message code="notificacio.form.camp.titular.nif"/></label> \
+				<div class="col-xs-12"> \
+					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].nif" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].nif" class="form-control " type="text" value=""> \
+				</div> \
+			</div> \
+		</div> \
+		<div class="col-md-3"> \
+			<div class="form-group"> \
+				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom"><spring:message code="notificacio.form.camp.titular.nom"/> *</label> \
+				<div class="col-xs-12"> \
+					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom" class="form-control " type="text" value=""> \
+				</div> \
+			</div> \
+		</div> \
+		<div class="col-md-3 llinatge1 hidden"> \
+			<div class="form-group"> \
+				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1"><spring:message code="notificacio.form.camp.titular.llinatge1"/> *</label> \
+				<div class="col-xs-12"> \
+					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1" class="form-control " type="text" value=""> \
+				</div> \
+			</div> \
+		</div> \
+		<div class="col-md-3 llinatge2 hidden"> \
+			<div class="form-group"> \
+				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2"><spring:message code="notificacio.form.camp.titular.llinatge2"/></label> \
+				<div class="col-xs-12"> \
+					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2" class="form-control " type="text" value=""> \
+				</div> \
+			</div> \
+		</div> \
+		<div class="col-md-3"> \
+			<div class="form-group"> \
+				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon"><spring:message code="notificacio.form.camp.titular.telefon"/></label> \
+				<div class="col-xs-12"> \
+					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon" class="form-control " type="text" value=""> \
+				</div> \
+			</div> \
+		</div> \
+		<div class="col-md-4"> \
+			<div class="form-group"> \
+				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].email"><spring:message code="notificacio.form.camp.titular.email"/></label> \
+				<div class="col-xs-12"> \
+					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].email" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].email" class="form-control " type="text" value=""> \
+				</div> \
+			</div> \
+		</div> \
+		<div class="col-md-3 dir3Codi"> \
+			<div class="form-group"> \
+				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].dir3Codi"><spring:message code="notificacio.form.camp.titular.dir3codi"/></label> \
+				<div class="col-xs-12"> \
+					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].dir3Codi" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].dir3Codi" class="form-control " type="text" value=""> \
+				</div> \
+			</div> \
+		</div> \
+		<div class="col-md-2 offset-col-md-2"> \
+			<div class="float-right"> \
+				<input type="button" class="btn btn-danger btn-group delete" name="destinatarisDelete[#num_enviament#][#num_destinatari#]" onclick="destinatarisDelete(this.id)" id="destinatarisDelete[#num_enviament#][#num_destinatari#]" value="<spring:message code="notificacio.form.boto.eliminar.destinatari"/>"> \
+			</div> \
+		</div> \
+		<div class="col-md-12"> \
+			<hr style="border-top: 1px dotted #BBB"> \
+		</div> \
+	</div>';
 
-    if ($("div[class*=' personaForm_" + enviament_id_num + "']").hasClass("hidden")) {
-        $("div[class*=' personaForm_" + enviament_id_num + "']").removeClass("hidden").show();
-        $('#isVisible').attr('value', 'true');
-        
-        if (!isMultiple) {
-        	$("div[class*=' personaForm_" + enviament_id_num + "']").closest('div.destinatari').find('.addDestinatari').addClass('hidden');
-        }
-    } else {
-        var destinatariForm = $("div[class*=' personaForm_" + enviament_id_num + "']").last().clone();
-        var enviamentsForm = $('.enviamentsForm');
-        
-        destinatariForm.find(':input').each(function() {
-            number = this.name.substring(this.name.lastIndexOf( '[' ) + 1, this.name.lastIndexOf( ']' ));
-            //Obtenir numero personaForm
-            num = parseInt(number);
-            ++num;
-            this.name= this.name.replace("is[" + number, "is[" + num);
-            this.id= this.id.replace("is[" + number, "is[" + num);
-         
-            destinatariForm.removeClass('personaForm_' + enviament_id_num + '_' + number).addClass('personaForm_' + enviament_id_num + '_' + num);
+	destinatari = replaceAll(destinatari, "#num_enviament#", num_enviament);
+	destinatari = replaceAll(destinatari, "#num_destinatari#", num_destinatari);
 
-            //id botó delete destinatari
-            if($(this).hasClass('delete')) {
-                this.name= this.name.replace("][" + number, "][" + num);
-                this.id= this.id.replace("][" + number, "][" + num);
-            }
-        });
-        //$('.newDestinatari_' + enviament_id_num).find('.destinatariForm').each(function() {
-		//	var $this = $(this);
-			
-        //    $this.find("span.select2").remove();
-            
-            //$(destinatariForm).find("select").select2();
-            //Cercar tots els selects i canviar valor
-        //    $this.find("select").webutilInputSelect2();
-        //    $this.find("select").attr('data-select2-eval', 'true');
-        //});
-       
-		$(destinatariForm).find("span.select2").remove();
-        $(destinatariForm).find("select").webutilInputSelect2();
-        //$(destinatariForm).find("select").select2();
-        $(destinatariForm).find("select").attr('data-select2-eval', 'true');
-       
-        $(destinatariForm).find('p').remove();
-        $(destinatariForm).find('div').removeClass('has-error');
-        $(destinatariForm).appendTo('.newDestinatari_'+ enviament_id_num).slideDown("slow").find("input[type='text']").val("");
-       
-        webutilModalAdjustHeight();
+	$('div.newDestinatari_' + num_enviament).append(destinatari);
+	$('#enviaments\\[' + num_enviament + '\\]\\.destinataris\\[' + num_destinatari + '\\]\\.interessatTipus').select2({theme: 'bootstrap', width: 'auto', minimumResultsForSearch: Infinity});
+
+	if (!isMultiple) {
+    	$("div[class*=' personaForm_" + num_enviament + "']").closest('div.destinatari').find('.addDestinatari').addClass('hidden');
     }
 }
 
+function replaceAll(string, search, replace) {
+	return string.split(search).join(replace);
+}
+	
 function addEnvio() {
     var number;
     var num;
+    var numPlus
     var enviamentForm = $(".enviamentsForm").last().clone();
-    var enviamentFormNou;
-    enviamentForm.find(':input').each(function() {
-        number = this.name.substring(this.name.indexOf( '[' ) + 1, this.name.indexOf( ']' ));
-        num = parseInt(number);
-        ++num;
-        this.name= this.name.replace(number,num);
-        this.id= this.id.replace(number,num);
-        this.value = this.value.replace(number,num);
-		$(this).attr('data-select2-id', num);
-		
-        if($(this).attr("id") == "envioTooltip") {
-            this.value= this.value.replace(number,num);
-            $(this).tooltip();
-        }
 
-        if($(this).hasClass('formEnviament')) {
-            this.name= this.name.replace("[" + number, "[" + num);
-            this.id= this.id.replace("[" + number, "[" + num);
+    var classList = enviamentForm.attr('class').split(/\s+/);
+    $.each(classList, function(index, classname) {
+        if (classname.startsWith('enviamentForm_')) {
+            number = classname.substring(14);
+            num = parseInt(number);
         }
     });
-    //select
-    $(enviamentForm).find("span.select2").remove();
-    
-    $(enviamentForm).find("select").webutilInputSelect2();
-    $(enviamentForm).find("select").attr('data-select2-eval', 'true');
-    
-    $(enviamentForm).find('p').remove();
-    $(enviamentForm).find('div').removeClass('has-error');
-	$(enviamentForm).appendTo(".newEnviament").slideDown("slow").find("input[type='text']").not(".procedimentcodi").val("");
 
-	//Remove last button addEnviament
-    if($(enviamentForm).find('.eliminar_enviament').attr('id') != 'enviamentDelete[0]') {
-		$(enviamentForm).find('.eliminar_enviament').removeClass('hidden');
-    }
-	//Increment destinatari envio id
-    var newDestinatariForm = $('.newDestinatari_' + number + ':last');
-	newDestinatariForm.removeClass('newDestinatari_'+number).addClass('newDestinatari_'+num);
-
-	//Show button addDestinatari
-	$(enviamentForm).find('.addDestinatari').removeClass('hidden');
-    //Inicialitzar chechbox incapacitat
-	$(enviamentForm).find('input:checkbox').removeAttr('checked');
-	//Inicialitzar deh
-	$(enviamentForm).find('#entregaDehAmagat').attr('value', 'false');
-	$(enviamentForm).find('.entregaDeh_'+number).hide();
-    //Inicialitzar entregapostal
-	$(enviamentForm).find('#entregaPostalAmagat').attr('value', 'false');
-	$(enviamentForm).find('.entregaPostal_'+number).hide();
-    
-
-	$(enviamentForm).find('.entregaPostal_info_'+number).css('display','none');
+  	//Titol enviament
+    if (num != null) {
+    	numPlus = num + 1;
+    	enviamentForm.removeClass('enviamentForm_' + num).addClass('enviamentForm_' + numPlus);
+    	var badge = enviamentForm.find('.envio\\['+numPlus+'\\]');
+    	badge.removeClass('envio[' + numPlus + ']').addClass('envio[' + (numPlus + 1) + ']');
+    	badge[0].innerText = "Enviament " + (numPlus + 1);
+    	var destinataris = enviamentForm.find('.newDestinatari_' + num);
+    	destinataris.removeClass('newDestinatari_' + num).addClass('newDestinatari_' + numPlus);
+    	destinataris.empty();
+	    enviamentForm.find(':input').each(function() {
+	        this.name= this.name.replace(number,numPlus);
+	        this.id= this.id.replace(number,numPlus);
+	        this.value = this.value.replace(number,numPlus);
+			$(this).attr('data-select2-id', numPlus);
+			
+	        if($(this).attr("id") == "envioTooltip") {
+	            this.value= this.value.replace(number,numPlus);
+	            $(this).tooltip();
+	        }
 	
-	$('.newDestinatari_' + num).children('div').each(function (i) {
-
-        var destinatariForm = $('.personaForm_' + number + '_' + 0 + ':last');
-        destinatariForm.removeClass('personaForm_'+number + '_' + 0).addClass('personaForm_' + num + '_' + 0);
-
-        var enviamentForm = $('.enviamentForm_' + number + ':last');
-        enviamentForm.removeClass('enviamentForm_' + number).addClass('enviamentForm_' + num);
-
-        //Aumentar index div entrega postal, deh, alert-info
-        var entregaPostal = $('.entregaPostal_'+number + ':last');
-		entregaPostal.removeClass('entregaPostal_'+number).addClass('entregaPostal_'+num);
-		var entregaDeh = $('.entregaDeh_'+number + ':last');
-		entregaDeh.removeClass('entregaDeh_'+number).addClass('entregaDeh_'+num);
-		var entregaDeh = $('.entregaPostal_info_'+number + ':last');
-		entregaDeh.removeClass('entregaPostal_info_'+number).addClass('entregaPostal_info_'+num);
+	        if($(this).hasClass('formEnviament')) {
+	            this.name= this.name.replace("[" + number, "[" + numPlus);
+	            this.id= this.id.replace("[" + number, "[" + numPlus);
+	        }
+	    });
+	    enviamentForm.find('#entregaPostal').removeClass('entregaPostal_' + num).addClass('entregaPostal_' + numPlus);
+	    //select
+	    $(enviamentForm).find("span.select2").remove();
+	    $(enviamentForm).find('p').remove();
+	    $(enviamentForm).find('div').removeClass('has-error');
+	    $(enviamentForm).find("select").select2({theme: 'bootstrap', width: 'auto'});
+	    $(enviamentForm).find("select").attr('data-select2-eval', 'true');
+		$(enviamentForm).appendTo(".newEnviament").slideDown("slow").find("input[type='text']").not(".procedimentcodi").val("");
 		
-		//Titol enviament
-        if (num != null) {
-        	var numPlus = num + 1;
-       		$('.envio\\['+num+'\\]:last').removeClass('envio[' + num + ']').addClass('envio[' + numPlus + ']');
-       		$('.envio\\['+numPlus+'\\]')[0].innerText = "Enviament " + numPlus;
-        }
-        
-        if (i === 0){
-            $(this).addClass('hidden');
-        } else {
-            $(this).remove();
-        }
-    });
+		//Remove last button addEnviament
+	    if($(enviamentForm).find('.eliminar_enviament').attr('id') != 'entregaPostal[0]') {
+			$(enviamentForm).find('.eliminar_enviament').removeClass('hidden');
+	    }
+		//Show button addDestinatari
+		$(enviamentForm).find('.addDestinatari').removeClass('hidden');
+	    //Inicialitzar chechbox incapacitat
+		$(enviamentForm).find('input:checkbox').removeAttr('checked');
+		//Inicialitzar deh
+		$(enviamentForm).find('.entregaDeh_'+numPlus).hide();
+	    //Inicialitzar entregapostal
+		$(enviamentForm).find('.entregaPostal_'+numPlus).hide();
+		$(enviamentForm).find('.entregaPostal_info_'+number).css('display','none');
+		
+		actualitzarEntrega(numPlus);
+	    webutilModalAdjustHeight();
+    }
 
-	actualitzarEntrega(num);
-    webutilModalAdjustHeight();
 }
 
 function destinatarisDelete(className) {
     var element = document.getElementById(className);
     var parent = $(element).closest(".destinatariForm");
     var classParent = $(parent).attr('class');
-    var destinatari_id_num = className.substring(className.lastIndexOf('[') + 1, className.lastIndexOf(']'));
-    var enviament_id_num = className.substring(className.indexOf('[') + 1, className.indexOf(']'));
+    var destinatari_id_num = parseInt(className.substring(className.lastIndexOf('[') + 1, className.lastIndexOf(']')));
+    var enviament_id_num = parseInt(className.substring(className.indexOf('[') + 1, className.indexOf(']')));
+    var destinatariRoot = $(element).closest(".dest");
+    var numDest = destinatariRoot.find(".destinatariForm").size();
+    
+	$(parent).remove();
 
-    //Si es el primer destinatari (0)
-    if (destinatari_id_num == 0) {
-    	var incapacitatCheck = $(parent).closest('.enviamentsForm').find("input[class*='incapacitat']");
-    	$(incapacitatCheck).prop('checked', false);
-    	
-        $(parent).addClass('hidden');
-        $('#isVisible').attr('value', 'false');
-        $(parent).find("input[type='text']").val("");
-        
-        $("div[class*=' personaForm_" + enviament_id_num + "']").closest('div.destinatari').find('.addDestinatari').removeClass('hidden')
-        
-    } else {
-        $(parent).remove();
-    }
+	// Reanomenar destinataris posteriors
+	if (numDest > (destinatari_id_num + 1)) {
+		for(var i = (destinatari_id_num + 1); i < numDest; i++) {
+			reanumeraDestinatari($(destinatariRoot).find('.destinatariForm:nth-child(' + i + ')'), i);
+		}
+	}
 }
 
-function enviamentDelete(className) {
-    var element = document.getElementById(className);
+function enviamentDelete(id) {
+    var element = document.getElementById(id);
     var parent = $(element).closest(".enviamentsForm");
     var classParent = $(parent).attr('class');
-    var enviament_id_num = className.substring(className.lastIndexOf('[') + 1, className.lastIndexOf(']'));
-
+    var enviament_id_num = parseInt(id.substring(16));
+	var enviamentRoot = $(element).closest(".newEnviament");
+	var numEnv = enviamentRoot.find(".enviamentsForm").size();
+	 
     $(parent).remove();
 
+    // Reenumerar enviaments posteriors
+    if (numEnv > (enviament_id_num + 1)) {
+		for(var i = (enviament_id_num + 1); i < numEnv; i++) {
+			reanumeraEnviament($(enviamentRoot).find('.enviamentsForm:nth-child(' + i + ')'), i);
+		}
+	}
 }
+
+function reanumeraDestinatari(destinatari, index) {
+	var nouIndex = index - 1;
+
+	var classList = destinatari.attr('class').split(/\s+/);
+    $.each(classList, function(index, classname) {
+        if (classname.startsWith('personaForm_')) {
+        	destinatari.removeClass(classname).addClass(classname.substring(0, classname.lastIndexOf('_') + 1) + nouIndex);
+        }
+    });
+    
+	destinatari.find(':input').each(function() {
+        this.name= this.name.replace('destinataris[' + index,'destinataris[' +nouIndex);
+        this.id= this.id.replace('destinataris[' + index,'destinataris[' + nouIndex);
+		
+        if($(this).hasClass('formEnviament')) {
+            this.name= this.name.replace("[" + index, "[" + nouIndex);
+            this.id= this.id.replace("[" + index, "[" + nouIndex);
+        }
+        if($(this).hasClass('delete')) {
+            this.name= this.name.substring(0, this.name.lastIndexOf('[') + 1) + nouIndex + ']';
+            this.id= this.id.substring(0, this.id.lastIndexOf('[') + 1) + nouIndex + ']';
+        }
+    });
+}
+
+function reanumeraEnviament(enviament, index) {
+   	var nouIndex = index - 1;
+   	enviament.removeClass('enviamentForm_' + index).addClass('enviamentForm_' + nouIndex);
+   	var badge = enviament.find('.envio\\[' + (index + 1) + '\\]');
+   	badge.removeClass('envio[' + (index + 1) + ']').addClass('envio[' + index + ']');
+   	badge[0].innerText = "Enviament " + index;
+   	var destinataris = enviament.find('.newDestinatari_' + index);
+   	destinataris.removeClass('newDestinatari_' + index).addClass('newDestinatari_' + nouIndex);
+   	destinataris.find('.destinatariForm').each(function(index) {
+		$(this).removeClass('destenv_' + index).addClass('destenv_' + nouIndex);
+		var classList = $(this).attr('class').split(/\s+/);
+	    $.each(classList, function(index, classname) {
+	        if (classname.startsWith('personaForm_')) {
+	            $(this).removeClass(classname).addClass('personaForm_' + nouIndex + classname.substring(classname.lastIndexOf('_'), classname.length));
+	        }
+	    });
+   	});
+    enviament.find('#entregaPostal').removeClass('entregaPostal_' + index).addClass('entregaPostal_' + nouIndex);
+   	enviament.find(':input').each(function() {
+        this.name= this.name.replace('enviaments[' + index,'enviaments[' +nouIndex);
+        this.id= this.id.replace('enviaments[' + index,'enviaments[' + nouIndex);
+		if ($(this).attr('data-select2-id') == index) {
+			$(this).attr('data-select2-id', nouIndex);
+		}
+		
+        if($(this).hasClass('formEnviament')) {
+            this.name= this.name.replace("[" + index, "[" + nouIndex);
+            this.id= this.id.replace("[" + index, "[" + nouIndex);
+        }
+        if($(this).hasClass('delete')) {
+            this.name= this.name.replace("destinatarisDelete[" + index, "destinatarisDelete[" + nouIndex);
+            this.id= this.id.replace("destinatarisDelete[" + index, "destinatarisDelete[" + nouIndex);
+        }
+        if($(this).hasClass('eliminar_enviament')) {
+            this.name= this.name.replace("enviamentDelete[" + index, "enviamentDelete[" + nouIndex);
+            this.id= this.id.replace("enviamentDelete_" + index, "enviamentDelete_" + nouIndex);
+        }
+    });
+	
+//     if($(enviament).find('.eliminar_enviament').attr('id') != 'entregaPostal[0]') {
+// 		$(enviament).find('.eliminar_enviament').removeClass('hidden');
+//     }
+// 	actualitzarEntrega(nouIndex);
+}
+
+
 
 function mostrarEntregaPostal(className) {
     var element = document.getElementById(className);
@@ -561,10 +662,8 @@ function mostrarEntregaPostal(className) {
     };
     
     if($('.entregaPostal_'+enviament_id_num).css('display') != 'none') {
-        $('#entregaPostalAmagat').attr('value', 'false');
         $('.entregaPostal_'+enviament_id_num).hide();
     } else {
-        $('#entregaPostalAmagat').attr('value', 'true');
         $('.entregaPostal_'+enviament_id_num).show();
     }
 }
@@ -592,11 +691,9 @@ function mostrarEntregaDeh(className) {
     var classParent = $(parent).attr('class');
 
     var enviament_id_num = className.substring(className.lastIndexOf('[') + 1, className.lastIndexOf(']'));
-    if($('.entregaDeh_'+enviament_id_num).css('display') != 'none') {
-        $('#entregaDehAmagat').attr('value', 'false');
+    if($('.entregaDeh_' + enviament_id_num).css('display') != 'none') {
         $('.entregaDeh_'+enviament_id_num).hide();
     } else {
-        $('#entregaDehAmagat').attr('value', 'true');
         $('.entregaDeh_'+enviament_id_num).show();
     }
 }
@@ -722,16 +819,22 @@ function actualitzarEntrega(j) {
 			</div>
 			<form:hidden path="procedimentId" value="${procediment.id}" />
 			<form:hidden path="emisorDir3Codi" value="${entitat.dir3Codi}" />
+			
+			<!-- CONCEPTE -->
 			<div class="row">
 				<div class="col-md-12">
 					<not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="2" required="true" inputMaxLength="${concepteSize}"/>
 				</div>
 			</div>
+			
+			<!-- DESCRIPCIÓ -->
 			<div class="row">
 				<div class="col-md-12">
 					<not:inputTextarea name="descripcio" textKey="notificacio.form.camp.descripcio" labelSize="2" inputMaxLength="${descripcioSize}"/>
 				</div>
 			</div>
+			
+			<!-- GRUP -->
 			<c:if test="${not empty grups}">
 				<div class="row">
 					<div class="col-md-12">
@@ -739,6 +842,8 @@ function actualitzarEntrega(j) {
 					</div>
 				</div>
 			</c:if>
+			
+			<!-- TIPUS D'ENVIAMENT -->
 			<div class="row">
 				<div class="col-md-6">
 					<div class="form-group">
@@ -756,33 +861,45 @@ function actualitzarEntrega(j) {
 					</div>
 				</div>
 			</div>
+			
+			<!-- DATA ENVIAMENT PROGRAMADA -->
 			<div class="row">
 				<div class="col-md-12">
 					<not:inputDate name="enviamentDataProgramada" textKey="notificacio.form.camp.dataProgramada" info="true" messageInfo="notificacio.form.camp.dataProgramada.info" labelSize="2" inputSize="6" />
 				</div>
 			</div>
+			
+			<!-- RETARD -->
 			<div class="row">
 				<div class="col-md-12">
 					<not:inputText name="retard" textKey="notificacio.form.camp.retard" info="true" messageInfo="notificacio.form.camp.retard.info" value="${procediment.retard}" labelSize="2" inputSize="6"/>
 				</div>
 			</div>
+			
+			<!-- CADUCITAT -->
 			<div class="row">
 				<div class="col-md-12">
 					<not:inputDate name="caducitat" textKey="notificacio.form.camp.caducitat" info="true" messageInfo="notificacio.form.camp.caducitat.info" orientacio="bottom" labelSize="2" inputSize="6" required="true" />
 				</div>
 			</div>
+			
+			<!-- NÚMERO D'EXPEDIENT -->
 			<div class="row">
 				<div class="col-md-12">
 					<not:inputText name="numExpedient" textKey="notificacio.form.camp.expedient" labelSize="2" inputSize="6" />
 				</div>
 			</div>
 		</div>
+		
+		<!-- DOCUMENT -->
 		<div class="container-fluid">
 			<div class="title">
 				<span class="fa fa-file"></span>
 				<label><spring:message code="notificacio.form.titol.document" /></label>
 				<hr/>
 			</div>
+			
+			<!-- TIPUS DE DOCUMENT -->
 			<div class="row">
 				<div class="col-md-6">
 					<div class="form-group">
@@ -798,39 +915,44 @@ function actualitzarEntrega(j) {
 						</div>
 					</div>
 				</div>
+				
+				<!-- CSV -->
 				<div id="input-origen-csv" class="col-md-6">
 					<not:inputText name="documentArxiuCsv" textKey="notificacio.form.camp.csvuuid" labelSize="3" />
 				</div>
+				
+				<!-- UUID -->
 				<div id="input-origen-uuid" class="col-md-6 hidden">
 					<not:inputText name="documentArxiuUuid" textKey="notificacio.form.camp.csvuuid" labelSize="3" />
 				</div>
+				
+				<!-- URL -->
 				<div id="input-origen-url" class="col-md-6 hidden">
 					<not:inputText name="documentArxiuUrl" textKey="notificacio.form.camp.csvuuid" labelSize="3" />
 				</div>
+				
+				<!-- FITXER -->
 				<div id="input-origen-arxiu" class="col-md-6 hidden">
 					<not:inputFile name="arxiu" textKey="notificacio.form.camp.arxiu" labelSize="3" />
 				</div>
 			</div>
+			
+			<!--  DOCUMENT NOTMALITZAT -->
 			<div class="row">
 				<div class="col-md-12">
 					<not:inputCheckbox name="document.normalitzat" textKey="notificacio.form.camp.normalitzat" info="true" messageInfo="notificacio.form.camp.normalitzat.info" labelSize="2" />
 				</div>
 			</div>
 		</div>
+		
+		<!-- ENVIAMENT -->
 		<div class="container-fluid">
 			<div class="title">
 				<span class="fa fa-vcard"></span>
 				<label><spring:message code="notificacio.form.titol.enviaments" /></label>
 				<hr/>
 			</div>
-			<c:choose>
-				<c:when test="${not empty enviosGuardats}">
-					<c:set value="${enviosGuardats}" var="envios"></c:set>
-				</c:when>
-				<c:otherwise>
-					<c:set value="enviaments" var="envios"></c:set>
-				</c:otherwise>
-			</c:choose>
+			<c:set var="envios" value="${notificacioCommandV2.enviaments}"/>
 			<div class="container-envios">
 				<div class="newEnviament">
 				<c:forEach items="${envios}" var="enviament" varStatus="status">
@@ -841,6 +963,8 @@ function actualitzarEntrega(j) {
 								<label class="envio[${k}] badge badge-light">Enviament ${k}</label>
 							</div>
 							<div>
+							
+							<!-- TIPUS DE SERVEI -->
 							<div class="col-md-6">
 								<div class="form-group">
 									<label class="control-label col-xs-4" for="enviaments[${j}].serveiTipus"><spring:message code="notificacio.form.camp.serveitipus" /></label>
@@ -856,6 +980,8 @@ function actualitzarEntrega(j) {
 									</div>
 								</div>
 							</div>
+							
+							<!-- TITULAR -->
 							<div class="titular">
 								<div class="col-md-12 title-envios">
 									<div class="title-container">
@@ -865,30 +991,47 @@ function actualitzarEntrega(j) {
 								</div>
 								<div class="personaForm">
 									<div>
+										<!--  TIPUS INTERESSAT -->
 										<div class="col-md-6">
 											<not:inputSelect name="enviaments[${j}].titular.interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="4" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
 										</div>
+										
+										<!-- NIF -->
 										<div class="col-md-6 nif">
 											<not:inputText name="enviaments[${j}].titular.nif" generalClass="titularNif" textKey="notificacio.form.camp.titular.nif"/>
 										</div>
+										
+										<!-- NOM / RAÓ SOCIAL -->
 										<div class="col-md-6">
 											<not:inputText name="enviaments[${j}].titular.nom" textKey="notificacio.form.camp.titular.nom" required="true" />
 										</div>
+										
+										<!-- PRIMER LLINATGE -->										
 										<div class="col-md-6 llinatge1">
 											<not:inputText name="enviaments[${j}].titular.llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" />
 										</div>
+										
+										<!-- SEGON LLINATGE -->
 										<div class="col-md-6 llinatge2">
 											<not:inputText name="enviaments[${j}].titular.llinatge2" textKey="notificacio.form.camp.titular.llinatge2" />
 										</div>
+										
+										<!-- EMAIL -->
 										<div class="col-md-6">
 											<not:inputText name="enviaments[${j}].titular.email" textKey="notificacio.form.camp.titular.email" />
 										</div>
+										
+										<!-- TELÈFON -->
 										<div class="col-md-6">
 											<not:inputText name="enviaments[${j}].titular.telefon" textKey="notificacio.form.camp.titular.telefon" />
 										</div>
+										
+										<!-- CODI DIR3 -->
 										<div class="col-md-6 dir3Codi hidden">
 											<not:inputText name="enviaments[${j}].titular.dir3Codi" textKey="notificacio.form.camp.titular.dir3codi" required="true"/>
 										</div>
+										
+										<!-- INCAPACITAT -->
 										<c:if test="${isTitularAmbIncapacitat}">
 											<div class="col-md-12">
 												<not:inputCheckbox name="enviaments[${j}].titular.incapacitat" generalClass="incapacitat" textKey="notificacio.form.camp.titular.incapacitat" funcio="mostrarDestinatari(this.id)"/>
@@ -897,6 +1040,8 @@ function actualitzarEntrega(j) {
 									</div>
 								</div>
 							</div>
+							
+							<!-- DESTINATARIS -->
 							<div class="destinatari">
 								<div class="col-md-12 title-envios">
 									<div class="title-container">
@@ -904,68 +1049,66 @@ function actualitzarEntrega(j) {
 									</div>
 									<hr/>
 								</div>
-								<c:choose>
-									<c:when test="${not empty enviosGuardats}">
-										<c:set value="${enviament.destinataris}" var="destinataris"></c:set>
-									</c:when>
-									<c:otherwise>
-										<c:set value="destinataris" var="destinataris"></c:set>
-									</c:otherwise>
-								</c:choose>
 								<div class="newDestinatari_${j} dest">
-									<c:forEach items="${destinataris}" var="destinatari"
-										varStatus="status">
-										<c:set var="i" value="${status.index}" />
-										<c:choose>
-											<c:when test="${isVisible == true}">
-												<c:set value="" var="visible"></c:set>
-											</c:when>
-											<c:otherwise>
-												<c:set value="hidden" var="visible"></c:set>
-											</c:otherwise>
-										</c:choose>
-										<div class="col-md-12 destinatariForm ${visible} personaForm_${j}_${i}">
-											<input id="isVisible" name="enviaments[${j}].destinataris[${i}].visible" class="hidden" value="false">
-											<input id="isMultiple" class="hidden" value="${isMultiplesDestinataris}">
-												<div class="col-md-3">
-													<not:inputSelect name="enviaments[${j}].destinataris[${i}].interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="12" inputSize="12" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-												</div>
-												<div class="col-md-3 nif">
-													<not:inputText name="enviaments[${j}].destinataris[${i}].nif" textKey="notificacio.form.camp.titular.nif" labelSize="12" inputSize="12" />
-												</div>
-												<div class="col-md-3">
-													<not:inputText name="enviaments[${j}].destinataris[${i}].nom" textKey="notificacio.form.camp.titular.nom" labelSize="12" inputSize="12" required="true" />
-												</div>
-												<div class="col-md-3 llinatge1">
-													<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge1" textKey="notificacio.form.camp.titular.llinatge1" labelSize="12" inputSize="12" required="true" />
-												</div>
-												<div class="col-md-3 llinatge2">
-													<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge2" textKey="notificacio.form.camp.titular.llinatge2" labelSize="12" inputSize="12"/>
-												</div>
-												<div class="col-md-3">
-													<not:inputText name="enviaments[${j}].destinataris[${i}].telefon" textKey="notificacio.form.camp.titular.telefon" labelSize="12" inputSize="12"/>
-												</div>
-												<div class="col-md-4">
-													<not:inputText name="enviaments[${j}].destinataris[${i}].email" textKey="notificacio.form.camp.titular.email" labelSize="12" inputSize="12"/>
-												</div>
-												<div class="col-md-3 dir3Codi hidden">
-													<not:inputText name="enviaments[${j}].destinataris[${i}].dir3Codi" textKey="notificacio.form.camp.titular.dir3codi" labelSize="12" inputSize="12"/>
-												</div>
-												<div class="col-md-2 offset-col-md-2">
-													<div class="float-right">
-														<input type="button" class="btn btn-danger btn-group delete" name="destinatarisDelete[${j}][${i}]" onclick="destinatarisDelete(this.id)" id="destinatarisDelete[${j}][${i}]" value="<spring:message code="notificacio.form.boto.eliminar.destinatari"/>"/>
+									<c:if test="${!empty enviament.destinataris}">
+										<c:set value="${enviament.destinataris}" var="destinataris"></c:set>
+										<c:forEach items="${destinataris}" var="destinatari" varStatus="status">
+											<c:set var="i" value="${status.index}" />
+											<div class="col-md-12 destinatariForm ${visible} destenv_${j} personaForm_${j}_${i}">
+												<input id="isVisible" name="enviaments[${j}].destinataris[${i}].visible" class="hidden" value="${isVisible[j]}">
+												<input id="isMultiple" class="hidden" value="${isMultiplesDestinataris}">
+												
+													<!-- TIPUS INTERESSAT -->
+													<div class="col-md-3">
+														<not:inputSelect name="enviaments[${j}].destinataris[${i}].interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="12" inputSize="12" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
 													</div>
-												</div>
-												<div class="col-md-12">
-													<hr style="border-top: 1px dotted #BBB">
-												</div>
-										</div>
-									</c:forEach>
+													<!-- NIF -->
+													<div class="col-md-3 nif">
+														<not:inputText name="enviaments[${j}].destinataris[${i}].nif" textKey="notificacio.form.camp.titular.nif" labelSize="12" inputSize="12" />
+													</div>
+													<!-- NOM / RAÓ SOCIAL -->
+													<div class="col-md-3">
+														<not:inputText name="enviaments[${j}].destinataris[${i}].nom" textKey="notificacio.form.camp.titular.nom" labelSize="12" inputSize="12" required="true" />
+													</div>
+													<!-- PRIMER LLINATGE -->
+													<div class="col-md-3 llinatge1">
+														<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge1" textKey="notificacio.form.camp.titular.llinatge1" labelSize="12" inputSize="12" required="true" />
+													</div>
+													<!-- SEGON LLINATGE -->
+													<div class="col-md-3 llinatge2">
+														<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge2" textKey="notificacio.form.camp.titular.llinatge2" labelSize="12" inputSize="12"/>
+													</div>
+													<!-- TELÈFON -->
+													<div class="col-md-3">
+														<not:inputText name="enviaments[${j}].destinataris[${i}].telefon" textKey="notificacio.form.camp.titular.telefon" labelSize="12" inputSize="12"/>
+													</div>
+													<!-- EMAIL -->
+													<div class="col-md-4">
+														<not:inputText name="enviaments[${j}].destinataris[${i}].email" textKey="notificacio.form.camp.titular.email" labelSize="12" inputSize="12"/>
+													</div>
+													<!-- CODI DIR3 -->
+													<div class="col-md-3 dir3Codi hidden">
+														<not:inputText name="enviaments[${j}].destinataris[${i}].dir3Codi" textKey="notificacio.form.camp.titular.dir3codi" labelSize="12" inputSize="12"/>
+													</div>
+													<!-- ELIMINAR DESTINATARI -->
+													<div class="col-md-2 offset-col-md-2">
+														<div class="float-right">
+															<input type="button" class="btn btn-danger btn-group delete" name="destinatarisDelete[${j}][${i}]" onclick="destinatarisDelete(this.id)" id="destinatarisDelete[${j}][${i}]" value="<spring:message code="notificacio.form.boto.eliminar.destinatari"/>"/>
+														</div>
+													</div>
+													<div class="col-md-12">
+														<hr style="border-top: 1px dotted #BBB">
+													</div>
+											</div>
+										</c:forEach>
+									</c:if>
 								</div>
 									
+								<c:set var="addHidden" value="${isMultiplesDestinataris || empty enviament.destinataris}"/>
+								<!-- AFEGIR NOU DESTINATARI -->
 								<div class="col-md-12">
 									<div class="text-left">	
-										<input type="button" class="btn btn-default addDestinatari" name="enviaments[${j}]" id="enviaments[${j}]" onclick="addDestinatari(this.id)" value="<spring:message code="notificacio.form.boto.nou.destinatari"/>" />
+										<input type="button" class="btn btn-default addDestinatari<c:if test="addHidden"> hidden</c:if>" name="enviaments[${j}]" id="enviaments[${j}]" onclick="addDestinatari(this.id)" value="<spring:message code="notificacio.form.boto.nou.destinatari"/>" />
 									</div>
 								</div>
 							
@@ -974,43 +1117,36 @@ function actualitzarEntrega(j) {
 							
 							<div class="metodeEntrega">
 								<c:choose>
-								<c:when test="${ambEntregaDeh || ambEntregaCie}">
-								<div class="col-md-12 title-envios">
-									<div class="title-container entrega">
-										<label> ${metodeEntrega} </label>
-									</div>
-									<hr/>
-								</div>
-								</c:when>
-								<c:otherwise>
-									<div class="avis-metodo-envio col-md-12">
-										<p class="comentari"><span class="fa fa-info-circle"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info.cap"/></span></p>
-									</div>
-								</c:otherwise>
+									<c:when test="${ambEntregaDeh || ambEntregaCie}">
+										<div class="col-md-12 title-envios">
+											<div class="title-container entrega">
+												<label> ${metodeEntrega} </label>
+											</div>
+											<hr/>
+										</div>
+									</c:when>
+									<c:otherwise>
+										<div class="avis-metodo-envio col-md-12">
+											<p class="comentari"><span class="fa fa-info-circle"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info.cap"/></span></p>
+										</div>
+									</c:otherwise>
 								</c:choose>
 								<div class="col-md-12">
 									<div class="entregaPostal_info_${j} entregaPostalInfo alert alert-info" role="alert">
 										<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-									  <strong><spring:message code="notificacio.form.camp.logitud.info"/></strong>
+									  	<strong><spring:message code="notificacio.form.camp.logitud.info"/></strong>
 									</div>
 									<c:if test="${ambEntregaDeh || ambEntregaCie}">
-									<div>
-									<p class="comentari"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
-									</div>
+										<div>
+											<p class="comentari"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
+										</div>
 									</c:if>
 									<c:if test="${ambEntregaCie}">
 										<not:inputCheckbox name="enviaments[${j}].entregaPostalActiva" textKey="notificacio.form.camp.entregapostal.activa" labelSize="4" funcio="mostrarEntregaPostal(this.id)" />
 									</c:if>
 								</div>
-								<c:choose>
-									<c:when test="${not empty enviosGuardats}">
-										<input id="entregaPostalAmagat" name="enviaments[${j}].entregaPostal.visible" class="hidden" value="${enviament.entregaPostalActiva}">
-										<c:set var="entregaPostalActiva" value="${enviament.entregaPostalActiva}"></c:set>
-									</c:when>
-									<c:otherwise>
-										<input id="entregaPostalAmagat" name="enviaments[${j}].entregaPostal.visible" class="hidden" value="false">
-									</c:otherwise>
-								</c:choose>
+								<c:set var="entregaPostalActiva" value="${enviament.entregaPostalActiva}"></c:set>
+								<!-- ENTREGA POSTAL -->
 								<div id="entregaPostal" class="entregaPostal_${j}" <c:if test="${!entregaPostalActiva}">style="display:none"</c:if>>
 									<div class="col-md-12">
 										<div class="col-md-12">
@@ -1018,7 +1154,7 @@ function actualitzarEntrega(j) {
 										</div>	
 										<div class="normalitzat">
 											<div class="col-md-4">
-												<not:inputSelect name="enviaments[${j}].entregaPostal.tipusVia" textKey="notificacio.form.camp.entregapostal.tipusvia" labelClass="labelcss" inputClass="inputcss" required="true" />
+												<not:inputSelect name="enviaments[${j}].entregaPostal.tipusVia" generalClass="tipusVia" textKey="notificacio.form.camp.entregapostal.tipusvia" labelClass="labelcss" inputClass="inputcss" required="true" />
 											</div>
 											<div class="col-md-8">
 												<not:inputText name="enviaments[${j}].entregaPostal.viaNom" textKey="notificacio.form.camp.entregapostal.vianom" labelClass="labelcss" inputClass="inputcss" required="true" />
@@ -1060,13 +1196,8 @@ function actualitzarEntrega(j) {
 												<not:inputSelect name="enviaments[${j}].entregaPostal.municipiCodi" generalClass="localitats" emptyOption="true" textKey="notificacio.form.camp.entregapostal.municipi" labelClass="labelcss" inputClass="inputcss"/>
 											</div>
 											<script>
-											actualitzarEntrega(${j});
+												actualitzarEntrega('${j}');
 											</script>
-<%-- 											
-											<div class="col-md-6 poblacioText hidden">
- 												<not:inputText name="enviaments[${j}].entregaPostal.municipi" textKey="notificacio.form.camp.entregapostal.municipi" labelClass="labelcss" inputClass="inputcss" />
- 											</div> 
---%>
 											<div class="col-md-6">
 												<not:inputText name="enviaments[${j}].entregaPostal.poblacio" textKey="notificacio.form.camp.entregapostal.poblacio" labelClass="labelcss" inputClass="inputcss"/>
 											</div>
@@ -1112,22 +1243,15 @@ function actualitzarEntrega(j) {
 										</div>
 									</div>
 								</div>
-								<c:choose>
-									<c:when test="${not empty enviosGuardats}">
-										<input class="enviaments[${j}].entregaPostal.paisCodi hidden" value="${enviament.entregaPostal.paisCodi}"/>
-										<input class="enviaments[${j}].entregaPostal.provincia hidden" value="${enviament.entregaPostal.provincia}"/>
-										<input class="enviaments[${j}].entregaPostal.municipiCodi hidden" value="${enviament.entregaPostal.municipiCodi}"/>
-										<input id="entregaDehAmagat" name="enviaments[${j}].entregaDeh.visible" class="hidden" value="${enviament.entregaDehActiva}">
-										<c:set var="entregaDehActiva" value="${enviament.entregaDehActiva}"></c:set>
-									</c:when>
-									<c:otherwise>
-										<input id="entregaDehAmagat" name="enviaments[${j}].entregaDeh.visible" class="hidden" value="false">
-									</c:otherwise>
-								</c:choose>
+								<input class="enviaments[${j}].entregaPostal.paisCodi hidden" value="${enviament.entregaPostal.paisCodi}"/>
+								<input class="enviaments[${j}].entregaPostal.provincia hidden" value="${enviament.entregaPostal.provincia}"/>
+								<input class="enviaments[${j}].entregaPostal.municipiCodi hidden" value="${enviament.entregaPostal.municipiCodi}"/>
 								<c:if test="${ambEntregaDeh}">
-								<div class="col-md-12">
-									<not:inputCheckbox name="enviaments[${j}].entregaDehActiva" textKey="notificacio.form.camp.entregadeh.activa" labelSize="4" funcio="mostrarEntregaDeh(this.id)" />
-								</div>
+									<c:set var="entregaDehActiva" value="${enviament.entregaDehActiva}"></c:set>
+									<div class="col-md-12">
+										<not:inputCheckbox name="enviaments[${j}].entregaDehActiva" textKey="notificacio.form.camp.entregadeh.activa" labelSize="4" funcio="mostrarEntregaDeh(this.id)" />
+									</div>
+									<!-- ENTREGA DEH -->
 									<div id="entregaDeh" class="entregaDeh_${j}" <c:if test="${!entregaDehActiva}">style="display:none"</c:if>>
 										<div class="col-md-12">
 											<div class="col-md-4">
@@ -1143,9 +1267,8 @@ function actualitzarEntrega(j) {
 									</div>
 								</c:if>
 								<div class="col-md-12 text-right">
-									<input name="enviamentDelete[${j}]" id="enviamentDelete[${j}]" class="id_enviament hidden">
 									<div class="btn-group">
-										<input type="button" class="btn btn-default formEnviament eliminar_enviament hidden" name="enviamentDelete[${j}]" onclick="enviamentDelete(this.id)" id="enviamentDelete[${j}]" value="<spring:message code="notificacio.form.boto.eliminar.enviament"/>" />
+										<input type="button" class="btn btn-default formEnviament eliminar_enviament hidden" name="enviamentDelete[${j}]" onclick="enviamentDelete(this.id)" id="enviamentDelete_${j}" value="<spring:message code="notificacio.form.boto.eliminar.enviament"/>" />
 									</div>
 								</div>
 							</div>

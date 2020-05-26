@@ -126,7 +126,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "dom_complem", length = 250)
 	protected String domiciliComplement;
 	
-	@Column(name = "dom_poblacio", length = 30)
+	@Column(name = "dom_poblacio", length = 255)
 	protected String domiciliPoblacio;
 	
 	@Column(name = "dom_mun_codine", length = 6)
