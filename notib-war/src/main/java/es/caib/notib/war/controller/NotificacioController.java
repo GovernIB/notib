@@ -665,15 +665,25 @@ public class NotificacioController extends BaseUserController {
 	public String refrescarEstatClient(
 			HttpServletResponse response,
 			HttpServletRequest request, 
+			Model model,
 			@PathVariable Long notificacioId) throws IOException {
 		List<NotificacioEventDto> events = enviamentService.eventFindAmbNotificacio(notificacioId);
 		boolean notificat = false;
+		
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		
+		emplenarModelNotificacioInfo(
+				entitatActual,
+				notificacioId, 
+				request,
+				"dades", 
+				model);
+		
 		if (events != null && events.size() > 0) {
 			NotificacioEventDto lastEvent = events.get(events.size() - 1);
 			
 			if(lastEvent.isError() && 
-					(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
-					lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
+					(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
 					lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
 					lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
 					lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {

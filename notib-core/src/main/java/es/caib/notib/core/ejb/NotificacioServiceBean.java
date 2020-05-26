@@ -301,4 +301,10 @@ public class NotificacioServiceBean implements NotificacioService {
 		delegate.enviamentRefrescarEstatRegistre(notificacioId);		
 	}
 
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public PaginaDto<NotificacioDto> findWithCallbackError(PaginacioParamsDto paginacioParams) {
+		return delegate.findWithCallbackError(paginacioParams);
+	}
+
 }

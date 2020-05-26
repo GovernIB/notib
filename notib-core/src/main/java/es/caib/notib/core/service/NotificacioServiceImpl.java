@@ -393,8 +393,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				NotificacioEventEntity lastEvent = events.get(events.size() - 1);
 				
 				if(lastEvent.isError() && 
-							(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
-							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
+							(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
 							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
 							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
 							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
@@ -692,8 +691,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						NotificacioEventEntity lastEvent = events.get(events.size() - 1);
 						
 						if(lastEvent.isError() && 
-									(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
-									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
+									(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
 									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
 									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
 									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
@@ -709,6 +707,41 @@ public class NotificacioServiceImpl implements NotificacioService {
 		
 		}
 		return resultatPagina;
+	}
+	
+	@Override
+	public PaginaDto<NotificacioDto> findWithCallbackError(
+			PaginacioParamsDto paginacioParams) {
+		List<NotificacioEntity> notificacions = notificacioRepository.findAll();
+
+		List<Long> docIds = new ArrayList<Long>();
+		if(notificacions != null) {
+			for (NotificacioEntity notificacio : notificacions) {
+				logger.info("Consultant events notificació...");
+				List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
+				
+				if (events != null && events.size() > 0) {
+					NotificacioEventEntity lastEvent = events.get(events.size() - 1);
+					
+					if(lastEvent.isError() && 
+								(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
+								lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
+								lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
+								lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
+						logger.info("El darrer event de la notificació " + notificacio.getId()  + " conté un error de tipus: " + lastEvent.getTipus().name());
+						docIds.add(notificacio.getId());
+					}
+				}
+			}
+		}
+		if (!docIds.isEmpty()) {
+			return paginacioHelper.toPaginaDto(
+					notificacioRepository.findNotificacioMassiuByIdsPaginat(
+							docIds,
+							paginacioHelper.toSpringDataPageable(paginacioParams)),
+					NotificacioDto.class);
+		}
+		return paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
 	}
 	
 	@Override

@@ -17,6 +17,7 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 
 /**
@@ -277,5 +278,15 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("isNumExpedientNull") boolean isNumExpedientNull,
 			@Param("numExpedient") String numExpedient,
 			Pageable paginacio);
+	
+	@Query(	"select " +
+			"    c " +
+			"from " +
+			"    NotificacioEntity c " +
+			"where " +
+			"    c.id in (:ids)")
+	public Page<NotificacioEntity> findNotificacioMassiuByIdsPaginat(
+			@Param("ids") List<Long> ids,
+			Pageable pageable);
 
 }

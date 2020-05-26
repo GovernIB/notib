@@ -248,6 +248,9 @@ body {
 									<li><a href="<c:url value="/aplicacio"/>"><spring:message code="decorator.menu.aplicacions"/></a></li>		
 								</ul>
 							</div>
+							<div class="btn-group">
+								<a href="<c:url value="/massiu/notificacions"/>" class="btn btn-primary"><spring:message code="decorator.menu.callback"/></a>							
+							</div>
 							</c:if>
 							<c:if test="${isRolActualUsuari}">
 							

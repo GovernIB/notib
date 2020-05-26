@@ -312,6 +312,10 @@ public interface NotificacioService {
 			Long notificacioId,
 			String motiu) throws MessagingException;
 	
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	PaginaDto<NotificacioDto> findWithCallbackError(PaginacioParamsDto paginacioParams);
+	
 //	/**
 //	 * Mètode d'execució periòdica per a fer els enviaments pendents
 //	 * a Notific@.
@@ -345,6 +349,7 @@ public interface NotificacioService {
 	List getNotificacionsPendentsRefrescarEstat();
 	@SuppressWarnings("rawtypes")
 	List getNotificacionsPendentsRefrescarEstatRegistre();
+
 
 //	void registrarEnviamentsPendents();
 //	void notificaEnviamentsRegistrats();

@@ -5,9 +5,11 @@ package es.caib.notib.core.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import es.caib.notib.core.entity.NotificacioEventEntity;
 
@@ -31,5 +33,6 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 	       " where ne.callbackEstat = es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
 	       " order by ne.callbackData asc nulls first, data asc")
 	List<Long> findEventsPendentsIds(Pageable page);
+
 
 }

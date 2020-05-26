@@ -48,7 +48,7 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 	private String username;
 	private String password;
 
-	private boolean serveiDesplegatDamuntJbossCaib = true;
+	private boolean serveiDesplegatDamuntJbossCaib = false;
 
 	public NotificacioRestClient(
 			String baseUrl,
