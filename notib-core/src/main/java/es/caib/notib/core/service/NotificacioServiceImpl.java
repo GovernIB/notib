@@ -393,7 +393,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 				NotificacioEventEntity lastEvent = events.get(events.size() - 1);
 				
 				if(lastEvent.isError() && 
-							(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
+							(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
+							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
 							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
 							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
 							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
@@ -684,19 +685,22 @@ public class NotificacioServiceImpl implements NotificacioService {
 										notificacio.getProcediment().getId(),
 										isAdministrador));
 						}
-					logger.info("Consultant events notificació...");
-					List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
-					
-					if (events != null && events.size() > 0) {
-						NotificacioEventEntity lastEvent = events.get(events.size() - 1);
+					if (notificacio.getTipusUsuari() != null && notificacio.getTipusUsuari().equals(TipusUsuariEnumDto.APLICACIO) && notificacio.getId() != null) {
+						logger.info("Consultant events notificació...");
+						List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
 						
-						if(lastEvent.isError() && 
-									(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
-									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
-									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
-									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
-							logger.info("El darrer event de la notificació " + notificacio.getId()  + " conté un error de tipus: " + lastEvent.getTipus().name());
-							notificacio.setErrorLastCallback(true);
+						if (events != null && events.size() > 0) {
+							NotificacioEventEntity lastEvent = events.get(events.size() - 1);
+							
+							if(lastEvent.isError() && 
+										(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
+										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
+										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
+										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
+										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
+								logger.info("El darrer event de la notificació " + notificacio.getId()  + " conté un error de tipus: " + lastEvent.getTipus().name());
+								notificacio.setErrorLastCallback(true);
+							}
 						}
 					}
 				}	
@@ -712,24 +716,28 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public PaginaDto<NotificacioDto> findWithCallbackError(
 			PaginacioParamsDto paginacioParams) {
-		List<NotificacioEntity> notificacions = notificacioRepository.findAll();
+		List<NotificacioEntity> notificacions = notificacioRepository.findByTipusUsuari(TipusUsuariEnumDto.APLICACIO);
 
 		List<Long> docIds = new ArrayList<Long>();
 		if(notificacions != null) {
 			for (NotificacioEntity notificacio : notificacions) {
-				logger.info("Consultant events notificació...");
-				List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
 				
-				if (events != null && events.size() > 0) {
-					NotificacioEventEntity lastEvent = events.get(events.size() - 1);
+				if (notificacio.getId() != null) {
+					logger.info("Consultant events notificació...");
+					List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
 					
-					if(lastEvent.isError() && 
-								(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
-								lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
-								lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
-								lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
-						logger.info("El darrer event de la notificació " + notificacio.getId()  + " conté un error de tipus: " + lastEvent.getTipus().name());
-						docIds.add(notificacio.getId());
+					if (events != null && events.size() > 0) {
+						NotificacioEventEntity lastEvent = events.get(events.size() - 1);
+						
+						if(lastEvent.isError() && 
+									(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
+									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
+									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
+									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
+									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
+							logger.info("El darrer event de la notificació " + notificacio.getId()  + " conté un error de tipus: " + lastEvent.getTipus().name());
+							docIds.add(notificacio.getId());
+						}
 					}
 				}
 			}

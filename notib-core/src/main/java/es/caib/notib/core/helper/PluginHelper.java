@@ -1017,6 +1017,8 @@ public class PluginHelper {
 		AsientoRegistralBeanDto registre = new AsientoRegistralBeanDto();
 		registre.setEntidadCodigo(notificacio.getEntitat().getCodi());
 		registre.setEntidadDenominacion(notificacio.getEntitat().getNom());
+		
+		
 		registre.setEntidadRegistralInicioCodigo(notificacio.getProcediment().getOficina());
 		registre.setEntidadRegistralInicioDenominacion(notificacio.getProcediment().getOficina());
 		registre.setEntidadRegistralOrigenCodigo(notificacio.getProcediment().getOficina());
@@ -1027,6 +1029,7 @@ public class PluginHelper {
 		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getProcediment().getOrganGestor());
 		registre.setUnidadTramitacionDestinoCodigo(notificacio.getProcediment().getOficina());
 		registre.setUnidadTramitacionDestinoDenominacion(notificacio.getProcediment().getOficina());
+		
 		registre.setTipoRegistro(2L);
 		registre.setLibroCodigo(notificacio.getProcediment().getLlibre());
 		registre.setResumen(notificacio.getConcepte());

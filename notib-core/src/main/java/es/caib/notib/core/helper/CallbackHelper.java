@@ -82,7 +82,8 @@ public class CallbackHelper {
 						|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT
 						|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO
 						|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE
-						|| event.getTipus() == NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT) {
+						|| event.getTipus() == NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT
+						|| (event.isError() && event.getTipus() == NotificacioEventTipusEnumDto.CALLBACK_CLIENT)) {
 					// Avisa al client que hi ha hagut una modificació a l'enviament
 					notificaCanvi(event.getEnviament());
 //					// Invoca el mètode de notificació de l'aplicació client segons és estat o certificat:

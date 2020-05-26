@@ -17,7 +17,6 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 
 /**
@@ -29,6 +28,8 @@ import es.caib.notib.core.entity.ProcedimentEntity;
 public interface NotificacioRepository extends JpaRepository<NotificacioEntity, Long> {
 
 	NotificacioEntity findById(Long id);
+	
+	List<NotificacioEntity> findByTipusUsuari(TipusUsuariEnumDto tipusUsuari);
 	
 	@Query(
 			"from " +

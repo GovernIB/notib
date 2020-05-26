@@ -398,7 +398,7 @@ $(document).ready(function() {
 							<span class="fa fa-check-circle"></span>
 						{{/if}}
 						{{:~eval('notificacioEstats["' + estat + '"]')}}
-						{{if estat == 'PROCESSADA' && tipusUsuari == 'APLICACIO' && errorLastCallback}}
+						{{if tipusUsuari == 'APLICACIO' && errorLastCallback}}
 							<span class="fa fa-warning text-danger" title="<spring:message code="notificacio.list.client.error"/>"></span>
 						{{/if}}
 						{{if estat == 'PROCESSADA' && estatDate != ''}}
