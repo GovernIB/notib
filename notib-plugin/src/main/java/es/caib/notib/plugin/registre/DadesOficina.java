@@ -8,8 +8,10 @@ package es.caib.notib.plugin.registre;
 public class DadesOficina {
 
 	private String organ;
-	private String oficina;
-	private String llibre;
+	private String oficinaCodi;
+	private String oficinaNom;
+	private String llibreCodi;
+	private String llibreNom;
 	private String oficinaFisica;
 
 	public String getOrgan() {
@@ -18,17 +20,29 @@ public class DadesOficina {
 	public void setOrgan(String organ) {
 		this.organ = organ;
 	}
-	public String getOficina() {
-		return oficina;
+	public String getOficinaCodi() {
+		return oficinaCodi;
 	}
-	public void setOficina(String oficina) {
-		this.oficina = oficina;
+	public void setOficinaCodi(String oficinaCodi) {
+		this.oficinaCodi = oficinaCodi;
 	}
-	public String getLlibre() {
-		return llibre;
+	public String getOficinaNom() {
+		return oficinaNom;
 	}
-	public void setLlibre(String llibre) {
-		this.llibre = llibre;
+	public void setOficinaNom(String oficinaNom) {
+		this.oficinaNom = oficinaNom;
+	}
+	public String getLlibreCodi() {
+		return llibreCodi;
+	}
+	public void setLlibreCodi(String llibreCodi) {
+		this.llibreCodi = llibreCodi;
+	}
+	public String getLlibreNom() {
+		return llibreNom;
+	}
+	public void setLlibreNom(String llibreNom) {
+		this.llibreNom = llibreNom;
 	}
 	public String getOficinaFisica() {
 		return oficinaFisica;
