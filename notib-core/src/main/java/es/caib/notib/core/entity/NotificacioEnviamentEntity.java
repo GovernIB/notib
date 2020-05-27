@@ -166,7 +166,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "deh_nif", length = 9)
 	protected String dehNif;
 	
-	@Column(name = "deh_proc_codi", length = 6)
+	@Column(name = "deh_proc_codi", length = 64)
 	protected String dehProcedimentCodi;
 	
 	/* Altres */

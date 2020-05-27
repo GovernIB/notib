@@ -18,10 +18,10 @@ import javax.validation.Payload;
 @Documented
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy=ValidNotificacioValidator.class)
-public @interface ValidNotificacio {
+@Constraint(validatedBy=ValidEntregaPostalValidator.class)
+public @interface ValidEntregaPostal {
 	
-	String message() default "Error en la validació de la notificació.";
+	String message() default "Error en la validació de la entrega postal.";
 
 	Class<?>[] groups() default {};
 
