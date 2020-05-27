@@ -73,6 +73,8 @@ import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
 import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
 import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.war.command.EntregapostalCommand;
+import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.MarcarProcessatCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
@@ -323,6 +325,7 @@ public class NotificacioController extends BaseUserController {
 								"es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
 			}
 		} catch (Exception ex) {
+			logger.error("Error creant una notificació", ex);
 			MissatgesHelper.error(request, ex.getMessage());
 			ompliModelFormulari(
 					procedimentActual, 
@@ -763,7 +766,15 @@ public class NotificacioController extends BaseUserController {
 				null, 
 				isAdministrador(request), 
 				procedimentId);
-		NotificacioCommandV2 notificacio = new NotificacioCommandV2();	
+		NotificacioCommandV2 notificacio = new NotificacioCommandV2();
+		List<EnviamentCommand> enviaments = new ArrayList<EnviamentCommand>();
+		EnviamentCommand enviament = new EnviamentCommand();
+		EntregapostalCommand entregaPostal = new EntregapostalCommand();
+		entregaPostal.setPaisCodi("ES");
+//		entregaPostal.setProvincia("7");
+		enviament.setEntregaPostal(entregaPostal);
+		enviaments.add(enviament);
+		notificacio.setEnviaments(enviaments);
 		List<String> tipusDocumentEnumDto = new ArrayList<String>();
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		List<TipusDocumentDto>  tipusDocuments =  entitatService.findTipusDocumentByEntitat(entitatActual.getId());
@@ -889,6 +900,10 @@ public class NotificacioController extends BaseUserController {
 			}
 		}
 		
+		model.addAttribute("isTitularAmbIncapacitat", aplicacioService.propertyGet("es.caib.notib.titular.incapacitat"));
+		model.addAttribute("isMultiplesDestinataris", aplicacioService.propertyGet("es.caib.notib.destinatari.multiple"));
+		model.addAttribute("ambEntregaDeh", entitatActual.isAmbEntregaDeh());
+		model.addAttribute("ambEntregaCie", entitatActual.isAmbEntregaCie());
 		model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
 		model.addAttribute("grups", grupService.findByProcedimentGrups(procedimentActual.getId()));
 		model.addAttribute("comunicacioTipus", 
@@ -922,8 +937,6 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("enviosGuardats", notificacioCommand.getEnviaments());
 		model.addAttribute("tipusDocument", notificacioCommand.getTipusDocument());
         model.addAttribute("errors", bindingResult.getAllErrors());
-        if (notificacioCommand.getEnviaments().get(0).getDestinataris() != null)
-        	model.addAttribute("isVisible", notificacioCommand.getEnviaments().get(0).getDestinataris().get(0).isVisible());
 	
         try {
 			Method concepte = NotificacioCommandV2.class.getMethod("getConcepte");

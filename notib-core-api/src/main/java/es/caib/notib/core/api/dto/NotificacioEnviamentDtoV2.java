@@ -5,11 +5,15 @@ package es.caib.notib.core.api.dto;
 import java.util.Date;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Informació d'un destinatari d'una anotació.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 
 	private Long id;
@@ -34,8 +38,8 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 //	private Date caducitat;
 	
 	//Info notificació
-	private boolean isEntregaPostalActiva;
-	private boolean isEntregaDehActiva;
+	private boolean entregaPostalActiva;
+	private boolean entregaDehActiva;
 	private Date enviamentDataProgramada;
 	private String procedimentCodiNotib;
 	private String grupCodi;
@@ -76,87 +80,6 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus;
 	private String notificaCertificacioNumSeguiment;
 	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	//public NotificacioDtoV2 getNotificacio() {
-	//	return notificacio;
-	//}
-	//public void setNotificacio(NotificacioDtoV2 notificacio) {
-	//	this.notificacio = notificacio;
-	//}
-	public List<PersonaDto> getDestinataris() {
-		return destinataris;
-	}
-	public void setDestinataris(List<PersonaDto> destinataris) {
-		this.destinataris = destinataris;
-	}
-	public EntregaPostalDto getEntregaPostal() {
-		return entregaPostal;
-	}
-	public void setEntregaPostal(EntregaPostalDto entregaPostal) {
-		this.entregaPostal = entregaPostal;
-	}
-	public boolean isEntregaDehActiva() {
-		return isEntregaDehActiva;
-	}
-	public void setEntregaDehActiva(boolean isEntregaDehActiva) {
-		this.isEntregaDehActiva = isEntregaDehActiva;
-	}
-	public EntregaDehDto getEntregaDeh() {
-		return entregaDeh;
-	}
-	public void setEntregaDeh(EntregaDehDto entregaDeh) {
-		this.entregaDeh = entregaDeh;
-	}
-	public ServeiTipusEnumDto getServeiTipus() {
-		return serveiTipus;
-	}
-	public void setServeiTipus(ServeiTipusEnumDto serveiTipus) {
-		this.serveiTipus = serveiTipus;
-	}
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-	public void setTitular(PersonaDto titular) {
-		this.titular = titular;
-	}
-	public void setTitularNomLlinatge(String titularNomLlinatge) {
-		this.titularNomLlinatge = titularNomLlinatge;
-	}
-	public String getUsuari() {
-		return usuari;
-	}
-	public void setUsuari(String usuari) {
-		this.usuari = usuari;
-	}
-	public String getReferencia() {
-		return referencia;
-	}
-	public String getNotificaIdentificador() {
-		return notificaIdentificador;
-	}
-	public void setNotificaIdentificador(String notificaCodi) {
-		this.notificaIdentificador = notificaCodi;
-	}
-	public void setReferencia(String referencia) {
-		this.referencia = referencia;
-	}
-	public String getTitularEmail() {
-		return titularEmail;
-	}
-	public void setTitularEmail(String titularEmail) {
-		this.titularEmail = titularEmail;
-	}
-	public String getTitularNif() {
-		return titularNif;
-	}
-	public void setTitularNif(String titularNif) {
-		this.titularNif = titularNif;
-	}
 	public String getDestinatarisNomLlinatges() {
 		destinatarisNomLlinatges = "";
 		for(PersonaDto destinatari: destinataris) {
@@ -164,231 +87,7 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 		}
 		return destinatarisNomLlinatges;
 	}
-	public void setDestinatarisNomLlinatges(String destinatarisNomLlinatge) {
-		this.destinatarisNomLlinatges = destinatarisNomLlinatge;
-	}
-	public String getNumeroCertCorreus() {
-		return numeroCertCorreus;
-	}
-	public void setNumeroCertCorreus(String numeroCertCorreus) {
-		this.numeroCertCorreus = numeroCertCorreus;
-	}
-	public String getCodiNotibEnviament() {
-		return codiNotibEnviament;
-	}
-	public void setCodiNotibEnviament(String codiNotibEnviament) {
-		this.codiNotibEnviament = codiNotibEnviament;
-	}
-	public NotificacioEnviamentEstatEnumDto getNotificaEstat() {
-		return notificaEstat;
-	}
-	public void setNotificaEstat(NotificacioEnviamentEstatEnumDto notificaEstat) {
-		this.notificaEstat = notificaEstat;
-	}
-	public boolean isEntregaPostalActiva() {
-		return isEntregaPostalActiva;
-	}
-	public void setEntregaPostalActiva(boolean isEntregaPostalActiva) {
-		this.isEntregaPostalActiva = isEntregaPostalActiva;
-	}
-	public Date getEnviamentDataProgramada() {
-		return enviamentDataProgramada;
-	}
-	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
-		this.enviamentDataProgramada = enviamentDataProgramada;
-	}
-	public String getProcedimentCodiNotib() {
-		return procedimentCodiNotib;
-	}
-	public void setProcedimentCodiNotib(String procedimentCodiNotib) {
-		this.procedimentCodiNotib = procedimentCodiNotib;
-	}
-	public String getGrupCodi() {
-		return grupCodi;
-	}
-	public void setGrupCodi(String grupCodi) {
-		this.grupCodi = grupCodi;
-	}
-	public String getEmisorDir3Codi() {
-		return emisorDir3Codi;
-	}
-	public void setEmisorDir3Codi(String emisorDir3Codi) {
-		this.emisorDir3Codi = emisorDir3Codi;
-	}
-	public String getUsuariCodi() {
-		return usuariCodi;
-	}
-	public void setUsuariCodi(String usuariCodi) {
-		this.usuariCodi = usuariCodi;
-	}
-	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
-		return enviamentTipus;
-	}
-	public void setEnviamentTipus(NotificaEnviamentTipusEnumDto enviamentTipus) {
-		this.enviamentTipus = enviamentTipus;
-	}
-	public String getConcepte() {
-		return concepte;
-	}
-	public void setConcepte(String concepte) {
-		this.concepte = concepte;
-	}
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
-	}
-	public String getLlibre() {
-		return llibre;
-	}
-	public void setLlibre(String llibre) {
-		this.llibre = llibre;
-	}
-	public int getRegistreNumero() {
-		return registreNumero;
-	}
-	public void setRegistreNumero(int registreNumero) {
-		this.registreNumero = registreNumero;
-	}
-	public Date getRegistreData() {
-		return registreData;
-	}
-	public void setRegistreData(Date registreData) {
-		this.registreData = registreData;
-	}
-	public NotificacioEstatEnumDto getEstat() {
-		return estat;
-	}
-	public void setEstat(NotificacioEstatEnumDto estat) {
-		this.estat = estat;
-	}
-	public String getCsvUuid() {
-		return csvUuid;
-	}
-	public void setCsvUuid(String csvUuid) {
-		this.csvUuid = csvUuid;
-	}
-	public NotificacioComunicacioTipusEnumDto getComunicacioTipus() {
-		return comunicacioTipus;
-	}
-	public void setComunicacioTipus(NotificacioComunicacioTipusEnumDto comunicacioTipus) {
-		this.comunicacioTipus = comunicacioTipus;
-	}
-	public Date getNotificaErrorData() {
-		return notificaErrorData;
-	}
-	public void setNotificaErrorData(Date notificaErrorData) {
-		this.notificaErrorData = notificaErrorData;
-	}
-	public String getNotificaErrorDescripcio() {
-		return notificaErrorDescripcio;
-	}
-	public void setNotificaErrorDescripcio(String notificaErrorDescripcio) {
-		this.notificaErrorDescripcio = notificaErrorDescripcio;
-	}
-	public String getNotificaCertificacioArxiuNom() {
-		return notificaCertificacioArxiuNom;
-	}
-	public void setNotificaCertificacioArxiuNom(String notificaCertificacioArxiuNom) {
-		this.notificaCertificacioArxiuNom = notificaCertificacioArxiuNom;
-	}
-	public Date getNotificaCertificacioData() {
-		return notificaCertificacioData;
-	}
-	public void setNotificaCertificacioData(Date notificaCertificacioData) {
-		this.notificaCertificacioData = notificaCertificacioData;
-	}
-	public Date getNotificaEstatData() {
-		return notificaEstatData;
-	}
-	public void setNotificaEstatData(Date notificaEstatData) {
-		this.notificaEstatData = notificaEstatData;
-	}
-	public String getNotificaDatatErrorDescripcio() {
-		return notificaDatatErrorDescripcio;
-	}
-	public void setNotificaDatatErrorDescripcio(String notificaDatatErrorDescripcio) {
-		this.notificaDatatErrorDescripcio = notificaDatatErrorDescripcio;
-	}
-	public String getNotificaDatatOrigen() {
-		return notificaDatatOrigen;
-	}
-	public void setNotificaDatatOrigen(String notificaDatatOrigen) {
-		this.notificaDatatOrigen = notificaDatatOrigen;
-	}
-	public String getNotificaDatatReceptorNif() {
-		return notificaDatatReceptorNif;
-	}
-	public void setNotificaDatatReceptorNif(String notificaDatatReceptorNif) {
-		this.notificaDatatReceptorNif = notificaDatatReceptorNif;
-	}
-	public String getNotificaDatatReceptorNom() {
-		return notificaDatatReceptorNom;
-	}
-	public void setNotificaDatatReceptorNom(String notificaDatatReceptorNom) {
-		this.notificaDatatReceptorNom = notificaDatatReceptorNom;
-	}
-	public String getNotificaDatatNumSeguiment() {
-		return notificaDatatNumSeguiment;
-	}
-	public void setNotificaDatatNumSeguiment(String notificaDatatNumSeguiment) {
-		this.notificaDatatNumSeguiment = notificaDatatNumSeguiment;
-	}
-	public String getNotificaCertificacioMime() {
-		return notificaCertificacioMime;
-	}
-	public void setNotificaCertificacioMime(String notificaCertificacioMime) {
-		this.notificaCertificacioMime = notificaCertificacioMime;
-	}
-	public String getNotificaCertificacioOrigen() {
-		return notificaCertificacioOrigen;
-	}
-	public void setNotificaCertificacioOrigen(String notificaCertificacioOrigen) {
-		this.notificaCertificacioOrigen = notificaCertificacioOrigen;
-	}
-	public String getNotificaCertificacioMetadades() {
-		return notificaCertificacioMetadades;
-	}
-	public void setNotificaCertificacioMetadades(String notificaCertificacioMetadades) {
-		this.notificaCertificacioMetadades = notificaCertificacioMetadades;
-	}
-	public String getNotificaCertificacioCsv() {
-		return notificaCertificacioCsv;
-	}
-	public void setNotificaCertificacioCsv(String notificaCertificacioCsv) {
-		this.notificaCertificacioCsv = notificaCertificacioCsv;
-	}
-	public String getNotificaReferencia() {
-		return notificaReferencia;
-	}
-	public void setNotificaReferencia(String notificaReferencia) {
-		this.notificaReferencia = notificaReferencia;
-	}
-	public NotificaCertificacioTipusEnumDto getNotificaCertificacioTipus() {
-		return notificaCertificacioTipus;
-	}
-	public void setNotificaCertificacioTipus(NotificaCertificacioTipusEnumDto notificaCertificacioTipus) {
-		this.notificaCertificacioTipus = notificaCertificacioTipus;
-	}
-	public NotificaCertificacioArxiuTipusEnumDto getNotificaCertificacioArxiuTipus() {
-		return notificaCertificacioArxiuTipus;
-	}
-	public void setNotificaCertificacioArxiuTipus(NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus) {
-		this.notificaCertificacioArxiuTipus = notificaCertificacioArxiuTipus;
-	}
-	//public String getCsvUuid() {
-	//	if(notificacio.getDocument().getUuid() != null) {
-	//		this.setCsvUuid(notificacio.getDocument().getUuid());
-	//	}
-	//	if(notificacio.getDocument().getCsv() != null) {
-	//		this.setCsvUuid(notificacio.getDocument().getCsv());
-	//	}
-	//	return this.csvUuid;
-	//}
-	//public void setCsvUuid(String csvUuid) {
-	//	this.csvUuid = csvUuid;
-	//}
+
 	public String getTitularNomLlinatge() {
 		if(this.titularNomLlinatge != null) {
 			return this.titularNomLlinatge;
@@ -416,20 +115,6 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 				destinatari.getLlinatge2());
 	}
 	
-//	public String getTitular() {
-//		StringBuilder sb = new StringBuilder();
-//		sb.append(titular.getNom());
-//		String llinatges = getTitularLlinatges();
-//		if (llinatges != null && !llinatges.isEmpty()) {
-//			sb.append(" ");
-//			sb.append(llinatges);
-//		}
-//		sb.append(" (");
-//		sb.append(titular.getNif());
-//		sb.append(")");
-//		return sb.toString();
-//	}
-	
 	private String concatenarLlinatges(
 			String llinatge1,
 			String llinatge2) {
@@ -445,9 +130,6 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 		return sb.toString();
 	}
 	
-	public PersonaDto getTitular() {
-		return titular;
-	}
 	private String concatenarNomLlinatges(
 			String llinatges,
 			String nom,
@@ -478,56 +160,6 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 			sb.append("]");
 		}
 		return sb.toString();
-	}
-
-	public String getCsv() {
-		return csv;
-	}
-	public void setCsv(String csv) {
-		this.csv = csv;
-	}
-	public String getUuid() {
-		return uuid;
-	}
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-	public String getNotificaCertificacioNumSeguiment() {
-		return notificaCertificacioNumSeguiment;
-	}
-	public void setNotificaCertificacioNumSeguiment(String notificaCertificacioNumSeguiment) {
-		this.notificaCertificacioNumSeguiment = notificaCertificacioNumSeguiment;
-	}
-	public String getDetalls() {
-		return detalls;
-	}
-	public void setDetalls(String detalls) {
-		this.detalls = detalls;
-	}
-
-	public Long getNotificacioId() {
-		return notificacioId;
-	}
-	public void setNotificacioId(Long notificacioId) {
-		this.notificacioId = notificacioId;
-	}
-	public String getNotificaDataCaducitat() {
-		return notificaDataCaducitat;
-	}
-	public void setNotificaDataCaducitat(String notificaDataCaducitat) {
-		this.notificaDataCaducitat = notificaDataCaducitat;
-	}
-	public String getRegistreNumeroFormatat() {
-		return registreNumeroFormatat;
-	}
-	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
-		this.registreNumeroFormatat = registreNumeroFormatat;
-	}
-	public NotificacioRegistreEstatEnumDto getRegistreEstat() {
-		return registreEstat;
-	}
-	public void setRegistreEstat(NotificacioRegistreEstatEnumDto registreEstat) {
-		this.registreEstat = registreEstat;
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;

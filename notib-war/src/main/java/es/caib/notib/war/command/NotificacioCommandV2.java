@@ -29,44 +29,16 @@ import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
-import es.caib.notib.war.validation.ValidArxiuDocument;
-import es.caib.notib.war.validation.ValidConcepte;
-import es.caib.notib.war.validation.ValidCsvDocument;
-import es.caib.notib.war.validation.ValidDescripcio;
 import es.caib.notib.war.validation.ValidNotificacio;
-import es.caib.notib.war.validation.ValidUrlDocument;
-import es.caib.notib.war.validation.ValidUuidDocument;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Command per al manteniment de notificacions manuals (V2).
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */	
-@ValidCsvDocument (
-		fieldName 	= "tipusDocument",
-		dependFieldName = "documentArxiuCsv"
-)
-
-@ValidUuidDocument (
-		fieldName 	= "tipusDocument",
-		dependFieldName = "documentArxiuUuid"
-)
-
-@ValidUrlDocument (
-		fieldName 	= "tipusDocument",
-		dependFieldName = "documentArxiuUrl"
-)
-
-@ValidArxiuDocument (
-		fieldName 	= "tipusDocument",
-		dependFieldName = "contingutArxiu"
-)
-@ValidConcepte (
-		fieldName = "concepte"
-)
-@ValidDescripcio (
-		fieldName = "descripcio"
-)
+@Getter @Setter
 @ValidNotificacio
 public class NotificacioCommandV2 {
 
@@ -112,75 +84,10 @@ public class NotificacioCommandV2 {
 	private boolean eliminarLogoPeu;
 	private boolean eliminarLogoCap;
 	private ServeiTipusEnumDto serveiTipus;
-	@Valid
-	private PersonaCommand titular;
-//	private PersonaCommand destinatari = new PersonaCommand();
-	@Valid
-	private List<PersonaCommand> destinataris = new ArrayList<PersonaCommand>();
-	@Valid
+	@Valid @NotEmpty
 	private List<EnviamentCommand> enviaments = new ArrayList<EnviamentCommand>();
 	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
-		return enviamentTipus;
-	}
-	public void setEnviamentTipus(NotificaEnviamentTipusEnumDto enviamentTipus) {
-		this.enviamentTipus = enviamentTipus;
-	}
-	public Date getEnviamentDataProgramada() {
-		return enviamentDataProgramada;
-	}
-	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
-		this.enviamentDataProgramada = enviamentDataProgramada;
-	}
-	@Size(max=255)
-	public String getConcepte() {
-		return concepte;
-	}
-	public TipusDocumentEnumDto getTipusDocument() {
-		return tipusDocument;
-	}
-	public void setTipusDocument(TipusDocumentEnumDto tipusDocument) {
-		this.tipusDocument = tipusDocument;
-	}
-	public String getTipusDocumentDefault() {
-		return tipusDocumentDefault;
-	}
-	public void setTipusDocumentDefault(String tipusDocumentDefault) {
-		this.tipusDocumentDefault = tipusDocumentDefault;
-	}
-	public void setConcepte(String concepte) {
-		this.concepte = concepte;
-	}
-	public String getDocumentArxiuCsv() {
-		return documentArxiuCsv;
-	}
-	public void setDocumentArxiuCsv(String documentArxiuCsv) {
-		this.documentArxiuCsv = documentArxiuCsv;
-	}
-	public String getDocumentArxiuUuid() {
-		return documentArxiuUuid;
-	}
-	public void setDocumentArxiuUuid(String documentArxiuUuid) {
-		this.documentArxiuUuid = documentArxiuUuid;
-	}
-	public String getDocumentArxiuUrl() {
-		return documentArxiuUrl;
-	}
-	public void setDocumentArxiuUrl(String documentArxiuUrl) {
-		this.documentArxiuUrl = documentArxiuUrl;
-	}
-	public MultipartFile getArxiu() {
-		return arxiu;
-	}
-	public void setArxiu(MultipartFile arxiu) {
-		this.arxiu = arxiu;
-	}
+
 	public byte[]  getContingutArxiu() {
 		try {
 			return arxiu.getBytes();
@@ -189,187 +96,7 @@ public class NotificacioCommandV2 {
 		}
 		return null;
 	}
-	public String getEmisorDir3Codi() {
-		return emisorDir3Codi;
-	}
-	public void setEmisorDir3Codi(String emisorDir3Codi) {
-		this.emisorDir3Codi = emisorDir3Codi;
-	}
-	public String getOrganGestor() {
-		return organGestor;
-	}
-	public void setOrganGestor(String organGestor) {
-		this.organGestor = organGestor;
-	}
-	public NotificacioComunicacioTipusEnumDto getComunicacioTipus() {
-		return comunicacioTipus;
-	}
-	public void setComunicacioTipus(NotificacioComunicacioTipusEnumDto comunicacioTipus) {
-		this.comunicacioTipus = comunicacioTipus;
-	}
-	@Size(max=1000)
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
-	}
-	public int getRetard() {
-		return retard;
-	}
-	public void setRetard(int retard) {
-		this.retard = retard;
-	}
-	public Date getCaducitat() {
-		return caducitat;
-	}
-	public void setCaducitat(Date caducitat) {
-		this.caducitat = caducitat;
-	}
-	public Long getProcedimentId() {
-		return procedimentId;
-	}
-	public void setProcedimentId(Long procedimentId) {
-		this.procedimentId = procedimentId;
-	}
-	public String getProcedimentNom() {
-		return procedimentNom;
-	}
-	public void setProcedimentNom(String procedimentNom) {
-		this.procedimentNom = procedimentNom;
-	}
-	public String getCodiSia() {
-		return codiSia;
-	}
-	public void setCodiSia(String codiSia) {
-		this.codiSia = codiSia;
-	}
-	public Long getGrupId() {
-		return grupId;
-	}
-	public void setGrupId(Long grupId) {
-		this.grupId = grupId;
-	}
-	public String getUsuariCodi() {
-		return usuariCodi;
-	}
-	public void setUsuariCodi(String usuariCodi) {
-		this.usuariCodi = usuariCodi;
-	}
-	public ServeiTipusEnumDto getServeiTipus() {
-		return serveiTipus;
-	}
-	public void setServeiTipus(ServeiTipusEnumDto serveiTipus) {
-		this.serveiTipus = serveiTipus;
-	}
-	public PersonaCommand getTitular() {
-		return titular;
-	}
-	public void setTitular(PersonaCommand titular) {
-		this.titular = titular;
-	}
-//	public PersonaCommand getDestinatari() {
-//		return destinatari;
-//	}
-//	public void setDestinatari(PersonaCommand destinatari) {
-//		this.destinatari = destinatari;
-//	}
-	public List<PersonaCommand> getDestinataris() {
-		return destinataris;
-	}
-	public void setDestinataris(List<PersonaCommand> destinataris) {
-		this.destinataris = destinataris;
-	}
-	public List<EnviamentCommand> getEnviaments() {
-		return enviaments;
-	}
-	public void setEnviaments(List<EnviamentCommand> enviaments) {
-		this.enviaments = enviaments;
-	}
-	public DocumentCommand getDocument() {
-		return document;
-	}
-	public void setDocument(DocumentCommand document) {
-		this.document = document;
-	}
-	public String getOficina() {
-		return oficina;
-	}
-	public String getLlibre() {
-		return llibre;
-	}
-	public void setOficina(String oficina) {
-		this.oficina = oficina;
-	}
-	public void setLlibre(String llibre) {
-		this.llibre = llibre;
-	}
-	public String getExtracte() {
-		return extracte;
-	}
-	public String getDocFisica() {
-		return docFisica;
-	}
-	public IdiomaEnumDto getIdioma() {
-		return idioma;
-	}
-	public String getTipusAssumpte() {
-		return tipusAssumpte;
-	}
-	public String getNumExpedient() {
-		return numExpedient;
-	}
-	public String getRefExterna() {
-		return refExterna;
-	}
-	public String getCodiAssumpte() {
-		return codiAssumpte;
-	}
-	public String getObservacions() {
-		return observacions;
-	}
-	public boolean isEliminarLogoPeu() {
-		return eliminarLogoPeu;
-	}
-	public void setEliminarLogoPeu(boolean eliminarLogoPeu) {
-		this.eliminarLogoPeu = eliminarLogoPeu;
-	}
-	public boolean isEliminarLogoCap() {
-		return eliminarLogoCap;
-	}
-	public void setEliminarLogoCap(boolean eliminarLogoCap) {
-		this.eliminarLogoCap = eliminarLogoCap;
-	}
-	public void setExtracte(String extracte) {
-		this.extracte = extracte;
-	}
-	public void setDocFisica(String docFisica) {
-		this.docFisica = docFisica;
-	}
-	public void setIdioma(IdiomaEnumDto idioma) {
-		this.idioma = idioma;
-	}
-	public void setTipusAssumpte(String tipusAssumpte) {
-		this.tipusAssumpte = tipusAssumpte;
-	}
-	public void setNumExpedient(String numeroExpedient) {
-		this.numExpedient = numeroExpedient;
-	}
-	public void setRefExterna(String refExterna) {
-		this.refExterna = refExterna;
-	}
-	public void setCodiAssumpte(String codiAssumpte) {
-		this.codiAssumpte = codiAssumpte;
-	}
-	public void setObservacions(String observacions) {
-		this.observacions = observacions;
-	}
-	public String getTipusDocumentSelected() {
-		return tipusDocumentSelected;
-	}
-	public void setTipusDocumentSelected(String tipusDocumentSelected) {
-		this.tipusDocumentSelected = tipusDocumentSelected;
-	}
+
 	public static NotificacioCommandV2 asCommand(NotificacioDtoV2 dto) {
 		if (dto == null) {
 			return null;
@@ -394,7 +121,6 @@ public class NotificacioCommandV2 {
 		GrupDto grupDto = new GrupDto();
 		grupDto.setId(command.getGrupId());
 		dto.setGrup(grupDto);
-		
 
 		DocumentDto document = new DocumentDto();
 		document.setArxiuGestdocId(dto.getDocument().getArxiuGestdocId());
