@@ -219,10 +219,10 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			rsw.setExtracto(registreSortida.getDadesAnotacio().getExtracte());
 			rsw.setFecha(new Timestamp((new Date()).getTime()));
 			rsw.setIdioma(registreSortida.getDadesAnotacio().getIdiomaCodi().toLowerCase());
-			rsw.setLibro(registreSortida.getDadesOficina().getLlibre());
+			rsw.setLibro(registreSortida.getDadesOficina().getLlibreCodi());
 			rsw.setNumExpediente(registreSortida.getDadesAnotacio().getNumExpedient());
 			rsw.setObservaciones(registreSortida.getDadesAnotacio().getObservacions());
-			rsw.setOficina(registreSortida.getDadesOficina().getOficina());
+			rsw.setOficina(registreSortida.getDadesOficina().getOficinaCodi());
 			rsw.setOrigen(registreSortida.getDadesOficina().getOrgan());
 			rsw.setRefExterna(registreSortida.getDadesAnotacio().getRefExterna());
 			

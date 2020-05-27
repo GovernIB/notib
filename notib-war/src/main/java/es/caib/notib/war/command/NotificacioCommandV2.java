@@ -4,6 +4,8 @@
 package es.caib.notib.war.command;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -161,6 +163,28 @@ public class NotificacioCommandV2 {
 			}
 		}
 		return dto;
+	}
+	
+	public int getConcepteDefaultSize() {
+		int concepteSize = 0;
+		try {
+			Field concepte = this.getClass().getDeclaredField("concepte");
+			concepteSize = concepte.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud del concepte: " + ex.getMessage());
+		}
+		return concepteSize;
+	}
+	
+	public int getDescripcioDefaultSize() {
+		int descripcioSize = 0;
+		try {
+			Field descripcio = this.getClass().getDeclaredField("descripcio");
+			descripcioSize = descripcio.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud de descripció: " + ex.getMessage());
+		}
+		return descripcioSize;
 	}
 
 	@Override

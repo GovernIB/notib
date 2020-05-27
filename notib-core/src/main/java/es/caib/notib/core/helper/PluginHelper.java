@@ -922,7 +922,7 @@ public class PluginHelper {
 		}
 		
 		if (notificacio.getProcediment().getOficina() != null) {
-			dadesOficina.setOficina(notificacio.getProcediment().getOficina());
+			dadesOficina.setOficinaCodi(notificacio.getProcediment().getOficina());
 		} else {
 			//oficina virtual
 			oficinaVirtual = llistarOficinaVirtual(
@@ -930,12 +930,12 @@ public class PluginHelper {
 					TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
 			
 			if (oficinaVirtual != null) {
-				dadesOficina.setOficina(oficinaVirtual.getCodi());
+				dadesOficina.setOficinaCodi(oficinaVirtual.getCodi());
 			}
 		}
 		
 		if (notificacio.getProcediment().getLlibre() != null) {
-			dadesOficina.setLlibre(notificacio.getProcediment().getLlibre());
+			dadesOficina.setLlibreCodi(notificacio.getProcediment().getLlibre());
 		} else {
 			if (notificacio.getProcediment().getOrganGestor() != null) {
 				llibreOrganisme = llistarLlibreOrganisme(
@@ -944,7 +944,7 @@ public class PluginHelper {
 			}
 			if (llibreOrganisme != null) {
 				String llibreCodi = llibreOrganisme.getCodi();
-				dadesOficina.setLlibre(llibreCodi);
+				dadesOficina.setLlibreCodi(llibreCodi);
 			}
 		}
 		
@@ -1013,25 +1013,62 @@ public class PluginHelper {
 
 	public AsientoRegistralBeanDto notificacioEnviamentsToAsientoRegistralBean(
 			NotificacioEntity notificacio, 
-			Set<NotificacioEnviamentEntity> enviaments) {
+			Set<NotificacioEnviamentEntity> enviaments) throws RegistrePluginException {
 		AsientoRegistralBeanDto registre = new AsientoRegistralBeanDto();
 		registre.setEntidadCodigo(notificacio.getEntitat().getCodi());
 		registre.setEntidadDenominacion(notificacio.getEntitat().getNom());
+		DadesOficina dadesOficina = new DadesOficina();
+		String dir3Codi;
+		String organisme = null;
 		
+		if (notificacio.getEntitat().getDir3CodiReg() != null) {
+			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
+			organisme = notificacio.getEntitat().getDir3CodiReg();
+		} else {
+			dir3Codi = notificacio.getEmisorDir3Codi();
+			organisme = notificacio.getProcediment().getOrganGestor();
+		}
+
+		try {
+			logger.debug("[OFC_VIRTUAL] Recuperant informació de l'oficina i registre...");
+			setOficina(
+					notificacio,
+					dadesOficina,
+					dir3Codi);
+			setLlibre(
+					notificacio, 
+					dadesOficina, 
+					dir3Codi);
+		} catch (RegistrePluginException ex) {
+			throw new RegistrePluginException("[OFC_VIRTUAL] No s'han pogut recuperar les dedes de l'oficina o llibre", ex);
+		}
 		
-		registre.setEntidadRegistralInicioCodigo(notificacio.getProcediment().getOficina());
-		registre.setEntidadRegistralInicioDenominacion(notificacio.getProcediment().getOficina());
-		registre.setEntidadRegistralOrigenCodigo(notificacio.getProcediment().getOficina());
-		registre.setEntidadRegistralOrigenDenominacion(notificacio.getProcediment().getOficina());
-		registre.setEntidadRegistralDestinoCodigo(notificacio.getProcediment().getOficina());
-		registre.setEntidadRegistralDestinoDenominacion(notificacio.getProcediment().getOficina());
-		registre.setUnidadTramitacionOrigenCodigo(notificacio.getProcediment().getOrganGestor());
-		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getProcediment().getOrganGestor());
-		registre.setUnidadTramitacionDestinoCodigo(notificacio.getProcediment().getOficina());
-		registre.setUnidadTramitacionDestinoDenominacion(notificacio.getProcediment().getOficina());
+		if (dadesOficina.getOficinaCodi() != null) {
+			//Codi Dir3 de l’oficina inicial
+			registre.setEntidadRegistralInicioCodigo(dadesOficina.getOficinaCodi());
+			registre.setEntidadRegistralInicioDenominacion(dadesOficina.getOficinaNom());
+			//Codi Dir3 de l’oficina origen (obligatori)
+			registre.setEntidadRegistralOrigenCodigo(dadesOficina.getOficinaCodi());
+			registre.setEntidadRegistralOrigenDenominacion(dadesOficina.getOficinaNom());
+			//Codi Dir3 de l’oficina destí
+			registre.setEntidadRegistralDestinoCodigo(dadesOficina.getOficinaCodi());
+			registre.setEntidadRegistralDestinoDenominacion(dadesOficina.getOficinaNom());
+		}
+		if (dadesOficina.getLlibreCodi() != null) {
+			registre.setLibroCodigo(dadesOficina.getLlibreCodi());
+		}
+		if (organisme != null) {
+			//Codi Dir3 de l’organisme origen
+			registre.setUnidadTramitacionOrigenCodigo(organisme);
+			registre.setUnidadTramitacionOrigenDenominacion(organisme);
+			//Codi Dir3 de l’organisme destí
+			registre.setUnidadTramitacionDestinoCodigo(organisme);
+			registre.setUnidadTramitacionDestinoDenominacion(organisme);
+		}
 		
+		//Salida
 		registre.setTipoRegistro(2L);
-		registre.setLibroCodigo(notificacio.getProcediment().getLlibre());
+		
 		registre.setResumen(notificacio.getConcepte());
 		/* 1 = Documentació adjunta en suport Paper
 		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper
@@ -1405,6 +1442,48 @@ public class PluginHelper {
 			interessat.setRepresentante(representantDades);	
 		}
 		return interessat;
+	}
+	
+	private void setOficina(
+			NotificacioEntity notificacio,
+			DadesOficina dadesOficina,
+			String dir3Codi) throws RegistrePluginException {
+		Oficina oficinaVirtual;
+		if (notificacio.getProcediment().getOficina() != null) {
+			dadesOficina.setOficinaCodi(notificacio.getProcediment().getOficina());
+			dadesOficina.setOficinaNom(notificacio.getProcediment().getOficina());
+		} else {
+			//oficina virtual
+			oficinaVirtual = llistarOficinaVirtual(
+					dir3Codi, 
+					TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
+			
+			if (oficinaVirtual != null) {
+				dadesOficina.setOficinaCodi(oficinaVirtual.getCodi());
+				dadesOficina.setOficinaNom(oficinaVirtual.getNom());
+			}
+		}
+	}
+	
+	private void setLlibre(
+			NotificacioEntity notificacio,
+			DadesOficina dadesOficina,
+			String dir3Codi) throws RegistrePluginException {
+		Llibre llibreOrganisme = null;
+		if (notificacio.getProcediment().getLlibre() != null) {
+			dadesOficina.setLlibreCodi(notificacio.getProcediment().getLlibre());
+			dadesOficina.setLlibreNom(notificacio.getProcediment().getLlibre());
+		} else {
+			if (notificacio.getProcediment().getOrganGestor() != null) {
+				llibreOrganisme = llistarLlibreOrganisme(
+						dir3Codi,
+						notificacio.getProcediment().getOrganGestor());
+			}
+			if (llibreOrganisme != null) {
+				dadesOficina.setLlibreCodi(llibreOrganisme.getCodi());
+				dadesOficina.setLlibreNom(llibreOrganisme.getNomCurt());
+			}
+		}
 	}
 	
 	public static DocumentBuilder getDocumentBuilder() throws Exception {
