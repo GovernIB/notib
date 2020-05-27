@@ -9,6 +9,9 @@ public class NifHelper {
 	private static final String LLETRA_CIF = "KPQRSNW";
 	
 	public static boolean isvalid(String nif) {
+		if (nif == null || nif.length() < 8)
+			return false;
+		
         nif = nif.toUpperCase();
         String primerCaracter = nif.substring(0, 1);
 

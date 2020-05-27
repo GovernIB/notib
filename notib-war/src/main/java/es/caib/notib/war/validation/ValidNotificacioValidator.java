@@ -12,6 +12,7 @@ import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
+import es.caib.notib.war.command.PersonaCommand;
 import es.caib.notib.war.helper.MessageHelper;
 
 /**
@@ -112,6 +113,64 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 				break;
 			}
 		
+			// ENVIAMENTS
+			if (notificacio.getEnviaments() != null) {
+				int envCount = 0;
+				for (EnviamentCommand enviament: notificacio.getEnviaments()) {
+					
+					// Incapacitat -> Destinataris no null
+					if (enviament.getTitular() != null && enviament.getTitular().isIncapacitat()) {
+						if (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty()) {
+							valid = false;
+							context.buildConstraintViolationWithTemplate(
+									MessageHelper.getInstance().getMessage("notificacio.form.valid.titular.incapacitat", new Object[] {envCount + 1}))
+							.addConstraintViolation();
+							context.buildConstraintViolationWithTemplate(
+									MessageHelper.getInstance().getMessage("notificacio.form.valid.titular.incapacitat", new Object[] {envCount + 1}))
+									.addNode("enviaments["+envCount+"].titular.incapacitat")
+							.addConstraintViolation();
+						}
+					}
+					if (NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
+						boolean senseNif = true;
+						if (enviament.getTitular() != null && enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
+							senseNif = false;
+						}
+						if (senseNif && enviament.getDestinataris() != null) {
+							for (PersonaCommand destinatari: enviament.getDestinataris()) {
+								if (destinatari.getNif() != null && !destinatari.getNif().isEmpty()) {
+									senseNif = false;
+								}
+							}
+						}
+						if (senseNif) {
+							valid = false;
+							context.buildConstraintViolationWithTemplate(
+									MessageHelper.getInstance().getMessage("notificacio.form.valid.notificacio.sensenif", new Object[] {envCount + 1}))
+							.addConstraintViolation();
+						}
+					}
+					
+//					if (enviament.isEntregaPostalActiva()) {
+//						
+//					}
+					if (enviament.getEntregaDeh() != null && enviament.getEntregaDeh().isActiva()) {
+						if (enviament.getTitular() == null || enviament.getTitular().getNif() == null || enviament.getTitular().getNif().isEmpty()) {
+							valid = false;
+							context.buildConstraintViolationWithTemplate(
+									MessageHelper.getInstance().getMessage("entregadeh.form.valid.sensenif"))
+							.addNode("enviaments["+envCount+"].titular.nif")
+							.addConstraintViolation();
+//							context.buildConstraintViolationWithTemplate(
+//									MessageHelper.getInstance().getMessage("entregadeh.form.valid.sensenif"))
+//							.addNode("enviaments["+envCount+"].entregaDeh.emisorNif")
+//							.addConstraintViolation();
+						}
+					}
+					
+					envCount++;
+				}
+			}
 		} catch (final Exception ex) {
 //        	LOGGER.error("Una comunicació no pot estar dirigida a una administració i a una persona física/jurídica a la vegada.", ex);
 			LOGGER.error("S'ha produït un error inesperat al validar la notificació. "

@@ -7,10 +7,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
-import es.caib.notib.war.validation.ValidDir3CodiIfAdm;
-import es.caib.notib.war.validation.ValidIfVisible;
-import es.caib.notib.war.validation.ValidLlinatgeIfFisic;
-import es.caib.notib.war.validation.ValidNifIfFisic;
+import es.caib.notib.war.validation.ValidPersona;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Command per al manteniment de persones (Titulars | Destinataris).
@@ -18,33 +17,8 @@ import es.caib.notib.war.validation.ValidNifIfFisic;
  * @author Limit Tecnologies <limit@limit.es>
  */
 
-@ValidIfVisible.List({
-	@ValidIfVisible(
-        fieldName = "visible",
-        fieldValue = "true",
-        dependFieldName = "nom")
-})
-@ValidLlinatgeIfFisic(
-        fieldName = "interessatTipus",
-        fieldName2 = "visible",
-        fieldValue = "FISICA",
-        fieldValue2 = "true",
-        dependFieldName = "llinatge1"
-)
-@ValidNifIfFisic(
-        fieldName = "interessatTipus",
-        fieldName2 = "visible",
-        fieldValue = "FISICA",
-        fieldValue2 = "true",
-        dependFieldName = "nif"
-)
-@ValidDir3CodiIfAdm(
-        fieldName = "interessatTipus",
-        fieldName2 = "visible",
-        fieldValue = "ADMINISTRACIO",
-        fieldValue2 = "true",
-        dependFieldName = "dir3Codi"
-)
+@Getter @Setter
+@ValidPersona
 public class PersonaCommand {
 
 	private boolean incapacitat;
@@ -63,69 +37,8 @@ public class PersonaCommand {
 	private String email;
 	@Size(max=9)	
 	private String dir3Codi;
-	private boolean visible = true;
 	
 	
-	public boolean isIncapacitat() {
-		return incapacitat;
-	}
-	public void setIncapacitat(boolean incapacitat) {
-		this.incapacitat = incapacitat;
-	}
-	public InteressatTipusEnumDto getInteressatTipus() {
-		return interessatTipus;
-	}
-	public void setInteressatTipus(InteressatTipusEnumDto interessatTipus) {
-		this.interessatTipus = interessatTipus;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-	public String getLlinatge1() {
-		return llinatge1;
-	}
-	public void setLlinatge1(String llinatge1) {
-		this.llinatge1 = llinatge1;
-	}
-	public String getLlinatge2() {
-		return llinatge2;
-	}
-	public void setLlinatge2(String llinatge2) {
-		this.llinatge2 = llinatge2;
-	}
-	public String getNif() {
-		return nif;
-	}
-	public void setNif(String nif) {
-		this.nif = nif;
-	}
-	public String getTelefon() {
-		return telefon;
-	}
-	public void setTelefon(String telefon) {
-		this.telefon = telefon;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	public String getDir3Codi() {
-		return dir3Codi;
-	}
-	public void setDir3Codi(String dir3Codi) {
-		this.dir3Codi = dir3Codi;
-	}
-	public boolean isVisible() {
-		return visible;
-	}
-	public void setVisible(boolean visible) {
-		this.visible = visible;
-	}
 	public static PersonaCommand asCommand(PersonaDto dto) {
 		if (dto == null) {
 			return null;

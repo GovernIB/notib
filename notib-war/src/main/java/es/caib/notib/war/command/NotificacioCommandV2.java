@@ -84,7 +84,7 @@ public class NotificacioCommandV2 {
 	private boolean eliminarLogoPeu;
 	private boolean eliminarLogoCap;
 	private ServeiTipusEnumDto serveiTipus;
-	@Valid
+	@Valid @NotEmpty
 	private List<EnviamentCommand> enviaments = new ArrayList<EnviamentCommand>();
 	
 

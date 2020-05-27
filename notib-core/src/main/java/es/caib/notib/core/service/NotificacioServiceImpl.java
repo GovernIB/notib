@@ -258,7 +258,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
 				NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
-				if (enviament.getEntregaPostal() != null && !enviament.getEntregaPostal().getViaNom().isEmpty()) {
+				if (enviament.isEntregaPostalActiva() && enviament.getEntregaPostal() != null) {
 					if (enviament.getEntregaPostal().getTipus() != null) {
 						switch (enviament.getEntregaPostal().getTipus()) {
 						case APARTAT_CORREUS:
@@ -339,13 +339,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 		notificacioEntity = notificacioRepository.saveAndFlush(notificacioEntity);
 		// Comprovar on s'ha d'enviar ara
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
-			List<NotificacioEnviamentDtoV2> enviamentsDto = conversioTipusHelper.convertirList(
-					notificacio.getEnviaments(), 
-					NotificacioEnviamentDtoV2.class);
+//			List<NotificacioEnviamentDtoV2> enviamentsDto = conversioTipusHelper.convertirList(
+//					notificacio.getEnviaments(), 
+//					NotificacioEnviamentDtoV2.class);
 			synchronized(CreacioSemaforDto.getCreacioSemafor()) {
 				registreNotificaHelper.realitzarProcesRegistrarNotificar(
 						notificacioEntity,
-						enviamentsDto);	
+						notificacio.getEnviaments());
+//						enviamentsDto);	
 			}
 		}
 

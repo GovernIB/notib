@@ -72,6 +72,7 @@ import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
 import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
 import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.war.command.EntregapostalCommand;
 import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.MarcarProcessatCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
@@ -323,6 +324,7 @@ public class NotificacioController extends BaseUserController {
 								"es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
 			}
 		} catch (Exception ex) {
+			logger.error("Error creant una notificació", ex);
 			MissatgesHelper.error(request, ex.getMessage());
 			ompliModelFormulari(
 					procedimentActual, 
@@ -717,7 +719,12 @@ public class NotificacioController extends BaseUserController {
 				procedimentId);
 		NotificacioCommandV2 notificacio = new NotificacioCommandV2();
 		List<EnviamentCommand> enviaments = new ArrayList<EnviamentCommand>();
-		enviaments.add(new EnviamentCommand());
+		EnviamentCommand enviament = new EnviamentCommand();
+		EntregapostalCommand entregaPostal = new EntregapostalCommand();
+		entregaPostal.setPaisCodi("ES");
+//		entregaPostal.setProvincia("7");
+		enviament.setEntregaPostal(entregaPostal);
+		enviaments.add(enviament);
 		notificacio.setEnviaments(enviaments);
 		List<String> tipusDocumentEnumDto = new ArrayList<String>();
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
@@ -881,18 +888,6 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("enviosGuardats", notificacioCommand.getEnviaments());
 		model.addAttribute("tipusDocument", notificacioCommand.getTipusDocument());
         model.addAttribute("errors", bindingResult.getAllErrors());
-        if (notificacioCommand.getEnviaments() != null && !notificacioCommand.getEnviaments().isEmpty()) {
-        	boolean isVisible[] = new boolean[notificacioCommand.getEnviaments().size()];
-        	int i = 0;
-        	for(EnviamentCommand enviament: notificacioCommand.getEnviaments()) {
-        		 if (enviament.getDestinataris() != null)
-        			 isVisible[i] = enviament.getDestinataris().get(0).isVisible();
-        		 i++;
-        	}
-        	model.addAttribute("isVisible", isVisible);
-        }
-//        if (notificacioCommand.getEnviaments().get(0).getDestinataris() != null)
-//        	model.addAttribute("isVisible", notificacioCommand.getEnviaments().get(0).getDestinataris().get(0).isVisible());
 	
         try {
 			Method concepte = NotificacioCommandV2.class.getMethod("getConcepte");

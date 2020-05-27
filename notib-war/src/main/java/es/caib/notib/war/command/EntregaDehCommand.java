@@ -4,9 +4,12 @@ import javax.validation.constraints.Size;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
+
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.EntregaDehDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Command per al manteniment de entregues direcció electrònica.
@@ -14,38 +17,14 @@ import es.caib.notib.war.helper.ConversioTipusHelper;
  * @author Limit Tecnologies <limit@limit.es>
  *
  */
+@Getter @Setter
 public class EntregaDehCommand {
 
 	private String emisorNif;
-	@NotEmpty @Size(max=50)
 	private boolean obligat;
+	@NotEmpty @Size(max=64)
 	private String procedimentCodi;
-	private boolean visible = true;
-	
-	public String getEmisorNif() {
-		return emisorNif;
-	}
-	public void setEmisorNif(String emisorNif) {
-		this.emisorNif = emisorNif;
-	}
-	public boolean isObligat() {
-		return obligat;
-	}
-	public void setObligat(boolean obligat) {
-		this.obligat = obligat;
-	}
-	public String getProcedimentCodi() {
-		return procedimentCodi;
-	}
-	public void setProcedimentCodi(String procedimentCodi) {
-		this.procedimentCodi = procedimentCodi;
-	}
-	public boolean isVisible() {
-		return visible;
-	}
-	public void setVisible(boolean visible) {
-		this.visible = visible;
-	}
+	private boolean activa;
 	
 	public static EntregaDehCommand asCommand(DocumentDto dto) {
 		if (dto == null) {

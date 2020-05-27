@@ -244,7 +244,7 @@ CREATE TABLE NOT_NOTIFICACIO_ENV
   DOM_CIE              		BIGSERIAL(10),
   DEH_OBLIGAT          		BIGSERIAL(1),
   DEH_NIF              		character varying(9),
-  DEH_PROC_CODI        		character varying(6), 
+  DEH_PROC_CODI        		character varying(64), 
   SERVEI_TIPUS         		BIGSERIAL(10),
   FORMAT_SOBRE         		character varying(10),
   FORMAT_FULLA         		character varying(10),

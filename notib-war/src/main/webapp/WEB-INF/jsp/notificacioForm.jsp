@@ -44,7 +44,7 @@
 	font-size: x-small;
 }
 #entregaPostal .help-block {
-	font-size: 8px;
+/* 	font-size: 8px; */
 }
 .inputcss {
 	width: calc(100% - 175px);
@@ -157,7 +157,7 @@
 var interessatsTipus = new Array();
 var interessatTipusOptions = "";
 <c:forEach items="${interessatTipus}" var="it" varStatus="status">
-   	interessatTipusOptions = interessatTipusOptions + "<option value=${it.value}" + (${status.index == 1} ? " selected='selected'" : "") + "><spring:message code='${it.text}'/></option>";
+   	interessatTipusOptions = interessatTipusOptions + "<option value=${it.value}" + (${status.index == 0} ? " selected='selected'" : "") + "><spring:message code='${it.text}'/></option>";
 </c:forEach>
 
 $(document).ready(function() {
@@ -673,11 +673,11 @@ function mostrarDestinatari(enviament_id) {
     var num;
     var enviament_id_num = enviament_id.substring(enviament_id.indexOf( '[' ) + 1, enviament_id.indexOf( ']' ));
     enviament_id_num = parseInt(enviament_id_num);
-    var isMultiple = ($("div[class*=' personaForm_" + enviament_id_num + "']").find('#isMultiple').val() == 'true');
+//     var isMultiple = ($("div[class*=' personaForm_" + enviament_id_num + "']").find('#isMultiple').val() == 'true');
+    var isMultiple = ${isMultiplesDestinataris};
     
     if ($("div[class*=' personaForm_" + enviament_id_num + "']").hasClass("hidden")) {
         $("div[class*=' personaForm_" + enviament_id_num + "']").removeClass("hidden").show();
-        $('#isVisible').attr('value', 'true');
         
         if (!isMultiple) {
         	$("div[class*=' personaForm_" + enviament_id_num + "']").closest('div.destinatari').find('.addDestinatari').addClass('hidden');
@@ -719,7 +719,6 @@ function actualitzarEntrega(j) {
 					}
 					
 				});
-									
 				var paisCodi = document.getElementsByClassName('enviaments[' + j + '].entregaPostal.paisCodi');
 				
 				if (paisCodi !== undefined && paisCodi[0] !== undefined) {
@@ -1054,9 +1053,8 @@ function actualitzarEntrega(j) {
 										<c:set value="${enviament.destinataris}" var="destinataris"></c:set>
 										<c:forEach items="${destinataris}" var="destinatari" varStatus="status">
 											<c:set var="i" value="${status.index}" />
-											<div class="col-md-12 destinatariForm ${visible} destenv_${j} personaForm_${j}_${i}">
-												<input id="isVisible" name="enviaments[${j}].destinataris[${i}].visible" class="hidden" value="${isVisible[j]}">
-												<input id="isMultiple" class="hidden" value="${isMultiplesDestinataris}">
+											<div class="col-md-12 destinatariForm destenv_${j} personaForm_${j}_${i}">
+<%-- 												<input id="isMultiple" class="hidden" value="${isMultiplesDestinataris}"> --%>
 												
 													<!-- TIPUS INTERESSAT -->
 													<div class="col-md-3">
@@ -1142,10 +1140,10 @@ function actualitzarEntrega(j) {
 										</div>
 									</c:if>
 									<c:if test="${ambEntregaCie}">
-										<not:inputCheckbox name="enviaments[${j}].entregaPostalActiva" textKey="notificacio.form.camp.entregapostal.activa" labelSize="4" funcio="mostrarEntregaPostal(this.id)" />
+										<not:inputCheckbox name="enviaments[${j}].entregaPostal.activa" textKey="notificacio.form.camp.entregapostal.activa" labelSize="4" funcio="mostrarEntregaPostal(this.id)" />
 									</c:if>
 								</div>
-								<c:set var="entregaPostalActiva" value="${enviament.entregaPostalActiva}"></c:set>
+								<c:set var="entregaPostalActiva" value="${enviament.entregaPostal.activa}"></c:set>
 								<!-- ENTREGA POSTAL -->
 								<div id="entregaPostal" class="entregaPostal_${j}" <c:if test="${!entregaPostalActiva}">style="display:none"</c:if>>
 									<div class="col-md-12">
@@ -1247,9 +1245,9 @@ function actualitzarEntrega(j) {
 								<input class="enviaments[${j}].entregaPostal.provincia hidden" value="${enviament.entregaPostal.provincia}"/>
 								<input class="enviaments[${j}].entregaPostal.municipiCodi hidden" value="${enviament.entregaPostal.municipiCodi}"/>
 								<c:if test="${ambEntregaDeh}">
-									<c:set var="entregaDehActiva" value="${enviament.entregaDehActiva}"></c:set>
+									<c:set var="entregaDehActiva" value="${enviament.entregaDeh.activa}"></c:set>
 									<div class="col-md-12">
-										<not:inputCheckbox name="enviaments[${j}].entregaDehActiva" textKey="notificacio.form.camp.entregadeh.activa" labelSize="4" funcio="mostrarEntregaDeh(this.id)" />
+										<not:inputCheckbox name="enviaments[${j}].entregaDeh.activa" textKey="notificacio.form.camp.entregadeh.activa" labelSize="4" funcio="mostrarEntregaDeh(this.id)" />
 									</div>
 									<!-- ENTREGA DEH -->
 									<div id="entregaDeh" class="entregaDeh_${j}" <c:if test="${!entregaDehActiva}">style="display:none"</c:if>>
