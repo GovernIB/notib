@@ -40,7 +40,9 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
-
+	<script src="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.min.js"/>"></script>
+	<link href="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.css"/>" rel="stylesheet"></link>
+	<script src="<c:url value="/js/jquery.fileDownload.js"/>"></script>
 <style type="text/css">
 .horaProcessat {
 	font-size: small;
@@ -104,6 +106,17 @@
 </style>
 <script type="text/javascript">
 var myHelpers = {recuperarEstatEnviament: returnEnviamentsStatusDiv};
+
+$(function() {
+    $(document).on("click", "a.fileDownloadSimpleRichExperience", function() {
+        $.fileDownload($(this).attr('href'), {
+            preparingMessageHtml: "Estam preparant la descàrrega, per favor esperi...",
+            failMessageHtml: "<strong style='color:red'>Ho sentim.<br/>S'ha produït un error intentant descarregar el document.</strong>"
+        });
+        return false; //this is critical to stop the click event which will trigger a normal file download!
+    });
+});
+
 
 $.views.helpers(myHelpers);
 
@@ -264,10 +277,10 @@ $(document).ready(function() {
 				contingutTbody += '</td>';
 				contingutTbody += '<td width="114px">';
 				if (data[i].notificaCertificacioData != null) {
-					contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/certificacioDescarregar"/>" class="btn btn-default btn-sm" title="<spring:message code="enviament.info.accio.descarregar.certificacio"/>"><span class="fa fa-download"></span></a>';
+					contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/certificacioDescarregar"/>" class="btn btn-default btn-sm fileDownloadSimpleRichExperience" title="<spring:message code="enviament.info.accio.descarregar.certificacio"/>"><span class="fa fa-download"></span></a>';
 				} else if (data[i].notificacio.estat == 'REGISTRADA' &&
 						(data[i].registreEstat == 'DISTRIBUIT' || data[i].registreEstat == 'OFICI_EXTERN' || data[i].registreEstat == 'OFICI_SIR')) {
-					contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/justificantDescarregar"/>" class="btn btn-default btn-sm" title="<spring:message code="enviament.info.accio.descarregar.justificant"/>"><span class="fa fa-download"></span></a>';
+					contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/justificantDescarregar"/>" class="btn btn-default btn-sm fileDownloadSimpleRichExperience" title="<spring:message code="enviament.info.accio.descarregar.justificant"/>"><span class="fa fa-download"></span></a>';
 				}
 				contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" data-toggle="modal" class="btn btn-default btn-sm"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>';
 				contingutTbody += '</td>';

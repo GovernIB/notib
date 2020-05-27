@@ -22,8 +22,21 @@
 <script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 <script src="<c:url value="/js/webutil.modal.js"/>"></script>
 <script src="<c:url value="/js/webutil.common.js"/>"></script>
+<script src="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.min.js"/>"></script>
+<link href="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.css"/>" rel="stylesheet"></link>
+<script src="<c:url value="/js/jquery.fileDownload.js"/>"></script>
 <not:modalHead />
 <script type="text/javascript">
+$(function() {
+    $(document).on("click", "a.fileDownloadSimpleRichExperience", function() {
+        $.fileDownload($(this).attr('href'), {
+            preparingMessageHtml: "Estam preparant la descàrrega, per favor esperi...",
+            failMessageHtml: "<strong style='color:red'>Ho sentim.<br/>S'ha produït un error intentant descarregar el document.</strong>"
+        });
+        return false; //this is critical to stop the click event which will trigger a normal file download!
+    });
+});
+
 var eventTipus = [];
 <c:forEach var="tipus" items="${eventTipus}">
 eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
@@ -216,7 +229,7 @@ $(document).ready(function() {
 									</td>
 									<td>${notificacio.document.arxiuNom}
 										<a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar"/>"
-											class="btn btn-default btn-sm pull-right"
+											class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience"
 											title="<spring:message code="notificacio.info.document.descarregar"/>">
 											<spring:message code="notificacio.info.document.descarregar"/>
 												<span class="fa fa-download"></span>
@@ -391,7 +404,7 @@ $(document).ready(function() {
 																<tr>
 																	<td><strong><spring:message code="enviament.info.seu.registre.justificant"/></strong></td>
 																	<td>
-																	<a href="<not:modalUrl value="/notificacio/${notificacio.id}/enviament/${enviament.id}/justificantDescarregar"/>" onerror="location.reload();" class="btn btn-default btn-sm pull-right">
+																	<a href="<not:modalUrl value="/notificacio/${notificacio.id}/enviament/${enviament.id}/justificantDescarregar"/>" onerror="location.reload();" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience">
 																		<spring:message code="enviament.info.accio.descarregar.justificant"/>
 																		<span class="fa fa-download"></span>
 																	</a>

@@ -4,12 +4,16 @@
 package es.caib.notib.war.controller;
 
 import java.io.IOException;
+
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.web.servlet.support.RequestContext;
+
+import es.caib.notib.core.api.exception.PluginException;
 import es.caib.notib.war.helper.AjaxHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.ModalHelper;
@@ -153,6 +157,9 @@ public class BaseController implements MessageSourceAware {
 			String fileName,
 			byte[] fileContent,
 			HttpServletResponse response) throws IOException {
+		if (fileContent == null) {
+			throw new PluginException("No s'ha pogut descarregar el fitxer");
+		}
 		response.setHeader("Pragma", "");
 		response.setHeader("Expires", "");
 		response.setHeader("Cache-Control", "");

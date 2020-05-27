@@ -15,8 +15,46 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	<script src="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.min.js"/>"></script>
+	<link href="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.css"/>" rel="stylesheet"></link>
+	<script src="<c:url value="/js/jquery.fileDownload.js"/>"></script>
 	<not:modalHead/>
 <script type="text/javascript">
+
+// function descarrega(ruta) {
+// 	fetch(ruta)
+// 	  .then(resp => resp.blob())
+// 	  .then(blob => {
+// 	    const url = window.URL.createObjectURL(blob);
+// 	    const a = document.createElement('a');
+// 	    a.style.display = 'none';
+// 	    a.href = url;
+// 	    // the filename you want
+// 	    a.download = 'justificant.pdf';
+// 	    document.body.appendChild(a);
+// 	    a.click();
+// 	    window.URL.revokeObjectURL(url);
+// 	    webutilRefreshMissatges();
+// 	  })
+// 	  .catch(() => webutilRefreshMissatges());
+// }
+
+$(function() {
+    $(document).on("click", "a.fileDownloadSimpleRichExperience", function() {
+        $.fileDownload($(this).attr('href'), {
+            preparingMessageHtml: "Estam preparant la descàrrega, per favor esperi...",
+            failMessageHtml: "<strong style='color:red'>Ho sentim.<br/>S'ha produït un error intentant descarregar el document.</strong>"//,
+//             failCallback: function(responseHtml, url) {
+//             	webutilRefreshMissatges();
+//             },
+//             successCallback: function(url) {
+//             	webutilRefreshMissatges();
+//             }
+        });
+        return false; //this is critical to stop the click event which will trigger a normal file download!
+    });
+});
+
 var eventTipus = [];
 <c:forEach var="tipus" items="${eventTipus}">
 eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
@@ -515,10 +553,16 @@ $(document).ready(function() {
 				</div>
 				<c:if test="${enviament.notificacio.estat == 'REGISTRADA'}">
 					<c:if test="${enviament.registreEstat == 'DISTRIBUIT' || enviament.registreEstat == 'OFICI_EXTERN'  || enviament.registreEstat == 'OFICI_SIR' }">
-						<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/justificantDescarregar"/>" onerror="location.reload();" class="btn btn-default btn-sm pull-right">
+					
+					fileDownloadSimpleRichExperience
+						<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/justificantDescarregar"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience">
 							<span class="fa fa-download"></span>
 							<spring:message code="enviament.info.accio.descarregar.justificant"/>
 						</a>
+<%-- 						<button onclick='descarrega("<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/justificantDescarregar"/>")' class="btn btn-default btn-sm pull-right"> --%>
+<!-- 							<span class="fa fa-download"></span> -->
+<%-- 							<spring:message code="enviament.info.accio.descarregar.justificant"/> --%>
+<!-- 						</button> -->
 					</c:if>
 				</c:if>
 			</c:if>

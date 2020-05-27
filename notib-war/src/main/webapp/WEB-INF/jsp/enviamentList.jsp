@@ -88,9 +88,8 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 }
 </style>
 <script>
+
 $(document).ready(function() {
-
-
 	
 	$('#notificacio').select2({
 		width: '100%',

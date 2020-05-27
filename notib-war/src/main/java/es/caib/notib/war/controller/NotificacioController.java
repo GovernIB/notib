@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
+import javax.servlet.http.Cookie;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -635,6 +636,7 @@ public class NotificacioController extends BaseUserController {
 			mimeType = ".pdf";
 		}
 		writeFileToResponse(arxiu.getNom() + mimeType, arxiu.getContingut(), response);
+		addFileDownloadCookie(response);
 	}
 
 	@RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/certificacioDescarregar", method = RequestMethod.GET)
@@ -648,6 +650,7 @@ public class NotificacioController extends BaseUserController {
 				arxiu.getNom(), 
 				arxiu.getContingut(), 
 				response);
+		addFileDownloadCookie(response);
 	}
 	
 	@RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/justificantDescarregar", method = RequestMethod.GET)
@@ -662,6 +665,14 @@ public class NotificacioController extends BaseUserController {
 		arxiu.setNom("justificant");
 		String mimeType = ".pdf";
 		writeFileToResponse(arxiu.getNom() + mimeType, arxiu.getContingut(), response);
+		addFileDownloadCookie(response);
+	}
+	
+	private void addFileDownloadCookie(HttpServletResponse response) {
+		Cookie cookie = new Cookie("fileDownload", "true");
+		cookie.setPath("/");
+		cookie.setMaxAge(60);
+		response.addCookie(cookie);
 	}
 	
 	@RequestMapping(value = "/{notificacioId}/refrescarEstatClient", method = RequestMethod.GET)
