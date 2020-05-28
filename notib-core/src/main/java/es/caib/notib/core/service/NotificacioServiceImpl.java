@@ -970,6 +970,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				output.size());
 	}
 
+	@Transactional
 	@Override
 	public boolean enviar(Long notificacioId) {
 		logger.debug("Intentant enviament de la notificació pendent (" +

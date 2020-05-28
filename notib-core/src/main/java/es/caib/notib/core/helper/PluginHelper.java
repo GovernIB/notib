@@ -1332,6 +1332,7 @@ public class PluginHelper {
 		return interessatRepresentat;
 	}
 	
+	@SuppressWarnings("unused")
 	private DadesRepresentat personaToDadesRepresentat (
 			NotificacioDtoV2 notificacio,
 			PersonaDto titular,
