@@ -8,7 +8,6 @@ import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
@@ -30,13 +29,11 @@ public class NotificaHelper {
 	private NotificaV2Helper notificaV2Helper;
 
 
-	@Transactional
 	public boolean notificacioEnviar(
 			Long notificacioId) {
 		return getNotificaHelper().notificacioEnviar(notificacioId);
 	}
 
-	@Transactional
 	public boolean enviamentRefrescarEstat(
 			Long enviamentId) throws SistemaExternException {
 		return getNotificaHelper().enviamentRefrescarEstat(enviamentId);

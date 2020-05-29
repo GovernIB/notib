@@ -72,10 +72,10 @@ public class RegistreNotificaHelper {
 						//Només crea assentament registral
 						try {
 							logger.info(" >>> Nou assentament registral...");
+							notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
 							AsientoRegistralBeanDto arb = pluginHelper.notificacioToAsientoRegistralBean(
 									notificacioEntity, 
 									enviament);
-							notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
 							RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(
 									dir3Codi, 
 									arb, 
@@ -111,10 +111,10 @@ public class RegistreNotificaHelper {
 					try {
 						//Crea assentament registral + Notific@
 						logger.info(" >>> Nou assentament registral...");
+						notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
 						AsientoRegistralBeanDto arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(
 								notificacioEntity, 
 								notificacioEntity.getEnviaments());
-						notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
 						RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(
 								dir3Codi, 
 								arb, 
@@ -150,10 +150,10 @@ public class RegistreNotificaHelper {
 				logger.info(" [REG-NOT] Notificació: Assentament registral + Notifica");
 				try {
 					logger.info(" >>> Nou assentament registral...");
+					notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
 					AsientoRegistralBeanDto arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(
 							notificacioEntity, 
 							notificacioEntity.getEnviaments());
-					notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
 					RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(
 							dir3Codi, 
 							arb, 
