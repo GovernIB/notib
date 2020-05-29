@@ -95,7 +95,7 @@ public class NotificacioEnviamentHelper {
 				
 				EntregaPostalDto entregaPostalDto = new EntregaPostalDto();
 				entregaPostalDto.setTipus(enviament.getDomiciliConcretTipus());
-				entregaPostalDto.setTipusVia(enviament.getDomiciliViaTipus());
+				entregaPostalDto.setViaTipus(enviament.getDomiciliViaTipus());
 				entregaPostalDto.setViaNom(enviament.getDomiciliViaNom());
 				entregaPostalDto.setNumeroCasa(enviament.getDomiciliNumeracioNumero());
 				entregaPostalDto.setNumeroQualificador(enviament.getDomiciliNumeracioQualificador());
@@ -170,7 +170,7 @@ public class NotificacioEnviamentHelper {
 				
 				EntregaPostalDto entregaPostalDto = new EntregaPostalDto();
 				entregaPostalDto.setTipus(enviament.getDomiciliConcretTipus());
-				entregaPostalDto.setTipusVia(enviament.getDomiciliViaTipus());
+				entregaPostalDto.setViaTipus(enviament.getDomiciliViaTipus());
 				entregaPostalDto.setViaNom(enviament.getDomiciliViaNom());
 				entregaPostalDto.setNumeroCasa(enviament.getDomiciliNumeracioNumero());
 				entregaPostalDto.setNumeroQualificador(enviament.getDomiciliNumeracioQualificador());

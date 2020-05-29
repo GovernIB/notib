@@ -594,7 +594,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							procediment,
 							filtre.getTipusUsuari() == null,
 							filtre.getTipusUsuari(),
-							filtre.getNumExpedient() == null,
+							filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
 							filtre.getNumExpedient(),
 							pageable);
 				} else if (!procedimentsCodisNotib.isEmpty()) {
@@ -620,7 +620,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							procediment,
 							filtre.getTipusUsuari() == null,
 							filtre.getTipusUsuari(),
-							filtre.getNumExpedient() == null,
+							filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
 							filtre.getNumExpedient(),
 							pageable);
 				}
@@ -646,7 +646,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						procediment,
 						filtre.getTipusUsuari() == null,
 						filtre.getTipusUsuari(),
-						filtre.getNumExpedient() == null,
+						filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
 						filtre.getNumExpedient(),
 						pageable);
 			} else if (isAdministrador) {
@@ -1103,7 +1103,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional
 	@Override
 	public void enviamentRefrescarEstatRegistre(Long notificacioId) {
-		registreHelper.enviamentRefrescarEstatRegistre(notificacioId);
+		registreHelper.enviamentRefrescarEstatRegistre(
+				notificacioId);
 	}
 	
 	private int getRegistreEnviamentsProcessarMaxProperty() {

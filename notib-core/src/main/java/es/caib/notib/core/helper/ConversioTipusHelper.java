@@ -183,15 +183,15 @@ public class ConversioTipusHelper {
 			byDefault().
 			register();
 		
-		mapperFactory.classMap(EntregaPostalDto.class, EntregaPostal.class).
-			field("tipusVia", "viaTipus").
-			byDefault().
-			register();
-		
-		mapperFactory.classMap(EntregaPostal.class, EntregaPostalDto.class).
-			field("viaTipus", "tipusVia").
-			byDefault().
-			register();
+//		mapperFactory.classMap(EntregaPostalDto.class, EntregaPostal.class).
+//			field("tipusVia", "viaTipus").
+//			byDefault().
+//			register();
+//		
+//		mapperFactory.classMap(EntregaPostal.class, EntregaPostalDto.class).
+//			field("viaTipus", "tipusVia").
+//			byDefault().
+//			register();
 		
 	}
 

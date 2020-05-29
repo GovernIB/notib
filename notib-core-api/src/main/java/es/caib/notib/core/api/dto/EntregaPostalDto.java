@@ -11,7 +11,7 @@ import lombok.Setter;
 public class EntregaPostalDto implements Serializable{
 
 	private NotificaDomiciliConcretTipusEnumDto tipus;
-	private NotificaDomiciliViaTipusEnumDto tipusVia;
+	private NotificaDomiciliViaTipusEnumDto viaTipus;
 	private String viaNom;
 	private String numeroCasa;
 	private String numeroQualificador;

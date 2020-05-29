@@ -34,7 +34,8 @@ public class ConversioTipusHelper {
 	private static MapperFactory mapperFactory;
 
 	public ConversioTipusHelper() {
-		mapperFactory = new DefaultMapperFactory.Builder().build();
+//		mapperFactory = new DefaultMapperFactory.Builder().build();
+		mapperFactory = new DefaultMapperFactory.Builder().compilerStrategy(new CustomJavassistCompilerStrategy()).build();
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<DateTime, Date>() {
 					public Date convert(
