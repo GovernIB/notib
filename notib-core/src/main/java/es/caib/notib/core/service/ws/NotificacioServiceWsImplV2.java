@@ -994,8 +994,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				}
 			//   - Persona jurídica
 			} else if(enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.JURIDICA)) {
-				if(enviament.getTitular().getRaoSocial() == null || enviament.getTitular().getRaoSocial().isEmpty()) {
-					return setRespostaError("[1140] El camp 'raoSocial' de la persona jurídica titular d'un enviament no pot ser null.");
+				if((enviament.getTitular().getRaoSocial() == null || enviament.getTitular().getRaoSocial().isEmpty()) && (enviament.getTitular().getNom() == null || enviament.getTitular().getNom().isEmpty())) {
+					return setRespostaError("[1140] El camp 'raoSocial/nom' de la persona jurídica titular d'un enviament no pot ser null.");
 				}
 				if(enviament.getTitular().getNif() == null || enviament.getTitular().getNif().isEmpty()) {
 					return setRespostaError("[1141] El camp 'nif' de la persona jurídica titular d'un enviament no pot ser null.");
@@ -1071,8 +1071,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							return setRespostaError("[1192] El camp 'nif' de la persona física destinatària d'un enviament no pot ser null.");
 						}
 					} else if(destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.JURIDICA)) {
-						if(destinatari.getRaoSocial() == null || destinatari.getRaoSocial().isEmpty()) {
-							return setRespostaError("[1200] El camp 'raoSocial' de la persona jurídica destinatària d'un enviament no pot ser null.");
+						if((destinatari.getRaoSocial() == null || destinatari.getRaoSocial().isEmpty()) && (destinatari.getNom() == null || destinatari.getNom().isEmpty())) {
+							return setRespostaError("[1200] El camp 'raoSocial/nom' de la persona jurídica destinatària d'un enviament no pot ser null.");
 						}
 						if(destinatari.getNif() == null) {
 							return setRespostaError("[1201] El camp 'nif' de la persona jurídica destinatària d'un enviament no pot ser null.");

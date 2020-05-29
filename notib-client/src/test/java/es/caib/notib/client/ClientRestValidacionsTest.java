@@ -317,6 +317,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
 		notificacio.getEnviaments().get(0).getTitular().setRaoSocial(null);
+		notificacio.getEnviaments().get(0).getTitular().setNom(null);
 		enviaNotificacioError(notificacio, "1140");
 	}
 	

@@ -197,7 +197,10 @@ public class PersonaEntity extends NotibAuditable<Long> {
 			built.llinatge2 = llinatge2;
 			built.nif = nif;
 			built.nom = nom;
-			built.raoSocial = raoSocial;
+			if (interessatTipus != null && interessatTipus.equals(InteressatTipusEnumDto.JURIDICA) && (raoSocial == null || raoSocial.isEmpty()))
+				built.raoSocial = nom;
+			else
+				built.raoSocial = raoSocial;
 			built.telefon = telefon;
 		}
 		public BuilderV2 incapacitat(boolean incapacitat) {
