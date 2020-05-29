@@ -10,7 +10,6 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
@@ -53,6 +52,8 @@ public class RegistreHelper {
 		String descripcio;
 		logger.debug("Comunicació SIR --> consular estat...");
 		
+		enviament.updateSirNovaConsulta(pluginHelper.getConsultaSirReintentsPeriodeProperty());
+		
 		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb Registre (" +
 				"notificacioId=" + notificacio.getId() + ", " +
 				"registreNumeroFormatat=" + enviament.getRegistreNumeroFormatat() + ")";
@@ -87,13 +88,14 @@ public class RegistreHelper {
 						notificacio.updateEventAfegir(event);
 						enviament.updateNotificaError(true, event);
 					} else {
+						enviament.refreshSirConsulta();
 						enviamentUpdateDatat(
 								resposta.getEstat(),
 								resposta.getRegistreData(), 
 								resposta.getRegistreNumeroFormatat(), 
 								enviament);
 						
-						logger.debug("Comunicació SIR --> nou estat: " + resposta.getEstat().name());
+						logger.debug("Comunicació SIR --> nou estat: " + resposta.getEstat() != null ? resposta.getEstat().name() : "");
 						if (resposta.getEstat() != null)
 							descripcio = resposta.getEstat().name();
 						else

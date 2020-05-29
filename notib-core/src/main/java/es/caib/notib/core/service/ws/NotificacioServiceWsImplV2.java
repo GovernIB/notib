@@ -589,7 +589,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				logger.debug("Notifica error de l'enviament amb referencia: " + referencia + ": " + enviament.isNotificaError());
 				if (enviament.isNotificaError()) {
 					resposta.setError(true);
-					NotificacioEventEntity errorEvent = enviament.getNotificaErrorEvent();
+					NotificacioEventEntity errorEvent = enviament.getNotificacioErrorEvent();
 					resposta.setErrorData(errorEvent.getData());
 					resposta.setErrorDescripcio(errorEvent.getErrorDescripcio());
 					logger.debug("Error consultar estat enviament amb referencia: " + referencia);

@@ -3,6 +3,8 @@
  */
 package es.caib.notib.client;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
@@ -41,7 +43,6 @@ import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;;
  */
 public class NotificacioRestClient implements NotificacioServiceV2 {
 
-	//private static final String NOTIFICACIO_SERVICE_PATH = "/api/services/notificacio";
 	private static final String NOTIFICACIOV2_SERVICE_PATH = "/api/services/notificacioV2";
 	
 	private String baseUrl;
@@ -91,7 +92,8 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
 			String identificador) {
 		try {
-			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
+			String identificadorEncoded = URLEncoder.encode(identificador, StandardCharsets.UTF_8.toString());
+			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatNotificacio/" + identificadorEncoded;
 			Client jerseyClient = generarClient();
 			if (username != null) {
 				autenticarClient(
@@ -115,7 +117,8 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(
 			String referencia) {
 		try {
-			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
+			String referenciaEncoded = URLEncoder.encode(referencia, StandardCharsets.UTF_8.toString());
+			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatEnviament/" + referenciaEncoded;
 			Client jerseyClient = generarClient();
 			if (username != null) {
 				autenticarClient(
@@ -225,9 +228,9 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 		}
 	}
 
-	private boolean isExecucioDinsJBoss() {
-		return System.getProperty("jboss.server.name") != null;
-	}
+//	private boolean isExecucioDinsJBoss() {
+//		return System.getProperty("jboss.server.name") != null;
+//	}
 
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioRestClient.class);
 

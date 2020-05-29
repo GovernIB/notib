@@ -3,6 +3,10 @@
  */
 package es.caib.notib.war.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 import javax.ejb.EJBAccessException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -103,8 +107,9 @@ public class NotificacioServiceController extends BaseController {
 					value = "Identificador de la notificació a consultar",
 					required = true)
 			@PathVariable("identificador")
-			String identificador) {
+			String identificador) throws UnsupportedEncodingException {
 		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
+		identificador = URLDecoder.decode(identificador, StandardCharsets.UTF_8.toString());
 		try {
 			return notificacioServiceWsV2.consultaEstatNotificacio(identificador);
 		} catch (Exception e) {

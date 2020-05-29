@@ -362,12 +362,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 			 dataRegistreFi = null,
 			 dataCaducitatInici = null,
 			 dataCaducitatFi = null;
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitat.getId());
 		List<String> procedimentsCodisNotib = new ArrayList<String>();
 		List<ProcedimentDto> procedimentsPermisConsultaAndAgrupable = new ArrayList<ProcedimentDto>();
 		List<ProcedimentDto> procedimentsPermisConsulta = new ArrayList<ProcedimentDto>();
 		
-		EntitatEntity entitatEntity = entitatRepository.findOne(entitat.getId());
 		entityComprovarHelper.comprovarPermisos(
 				null,
 				true,
@@ -1196,7 +1195,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			NotificacioEnviamentEntity enviament,
 			NotificacioEnviamentDto enviamentDto) {
 		if (enviament.isNotificaError()) {
-			NotificacioEventEntity event = enviament.getNotificaErrorEvent();
+			NotificacioEventEntity event = enviament.getNotificacioErrorEvent();
 			if (event != null) {
 				enviamentDto.setNotificaErrorData(event.getData());
 				enviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());

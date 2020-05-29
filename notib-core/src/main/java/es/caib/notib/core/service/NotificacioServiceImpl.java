@@ -1081,6 +1081,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public List getNotificacionsPendentsRefrescarEstat() {
 		int maxPendents = getEnviamentActualitzacioEstatProcessarMaxProperty();
 		List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByNotificaRefresc(
+				pluginHelper.getConsultaReintentsMaxProperty(),
 				new PageRequest(0, maxPendents));
 		return pendents;
 	}
@@ -1097,6 +1098,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public List getNotificacionsPendentsRefrescarEstatRegistre() {
 		int maxPendents = getEnviamentActualitzacioEstatRegistreProcessarMaxProperty();
 		List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByRegistreRefresc(
+				pluginHelper.getConsultaSirReintentsMaxProperty(),
 				new PageRequest(0, maxPendents));
 		return pendents;
 	}
@@ -1135,7 +1137,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotificacioEnviamentEntity enviament,
 			NotificacioEnviamenEstatDto estatDto) {
 		if (enviament.isNotificaError()) {
-			NotificacioEventEntity event = enviament.getNotificaErrorEvent();
+			NotificacioEventEntity event = enviament.getNotificacioErrorEvent();
 			if (event != null) {
 				estatDto.setNotificaErrorData(event.getData());
 				estatDto.setNotificaErrorDescripcio(event.getErrorDescripcio());

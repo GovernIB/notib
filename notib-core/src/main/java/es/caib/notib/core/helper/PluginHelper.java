@@ -1723,22 +1723,42 @@ public class PluginHelper {
 	private String getPropertyPluginArxiu() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.arxiu.class");
 	}
+	
+	
+	public int getRegistreReintentsPeriodeProperty() {
+		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.registre.enviaments.periode");
+	}
+	public int getNotificaReintentsPeriodeProperty() {
+		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.notifica.enviaments.periode");
+	}
+	public int getConsultaReintentsPeriodeProperty() {
+		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.periode");
+	}
+	public int getConsultaSirReintentsPeriodeProperty() {
+		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode");
+	}
+	
 	public int getRegistreReintentsMaxProperty() {
 		return PropertiesHelper.getProperties().getAsInt(
 				"es.caib.notib.tasca.registre.enviaments.reintents.maxim",
 				3);
-	}
-	public int getRegistreReintentsPeriodeProperty() {
-		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.registre.enviaments.periode");
 	}
 	public int getNotificaReintentsMaxProperty() {
 		return PropertiesHelper.getProperties().getAsInt(
 				"es.caib.notib.tasca.notifica.enviaments.reintents.maxim",
 				3);
 	}
-	public int getNotificaReintentsPeriodeProperty() {
-		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.notifica.enviaments.periode");
+	public int getConsultaReintentsMaxProperty() {
+		return PropertiesHelper.getProperties().getAsInt(
+				"es.caib.notib.tasca.enviament.actualitzacio.estat.reintents.maxim",
+				3);
 	}
+	public int getConsultaSirReintentsMaxProperty() {
+		return PropertiesHelper.getProperties().getAsInt(
+				"es.caib.notib.tasca.enviament.actualitzacio.estat.registre.reintents.maxim",
+				3);
+	}
+
 	
 	public NotificacioComunicacioTipusEnumDto getNotibTipusComunicacioDefecte() {
 		NotificacioComunicacioTipusEnumDto tipus = NotificacioComunicacioTipusEnumDto.SINCRON;
