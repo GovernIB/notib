@@ -116,7 +116,7 @@ public class PluginHelper {
 			String codiDir3Entitat, 
 			NotificacioEntity notificacio, 
 			NotificacioEnviamentEntity enviament, 
-			Long tipusOperacio) {
+			Long tipusOperacio) throws RegistrePluginException {
 		return getRegistrePlugin().salidaAsientoRegistral(
 				codiDir3Entitat, 
 				notificacioToAsientoRegistralBean(
@@ -1126,22 +1126,62 @@ public class PluginHelper {
 	
 	public AsientoRegistralBeanDto notificacioToAsientoRegistralBean(
 			NotificacioEntity notificacio, 
-			NotificacioEnviamentEntity enviament) {
+			NotificacioEnviamentEntity enviament) throws RegistrePluginException {
 		AsientoRegistralBeanDto registre = new AsientoRegistralBeanDto();
 		registre.setEntidadCodigo(notificacio.getEntitat().getCodi());
 		registre.setEntidadDenominacion(notificacio.getEntitat().getNom());
-		registre.setEntidadRegistralInicioCodigo(notificacio.getProcediment().getOficina());
-		registre.setEntidadRegistralInicioDenominacion(notificacio.getProcediment().getOficina());
-		registre.setEntidadRegistralOrigenCodigo(notificacio.getProcediment().getOficina());
-		registre.setEntidadRegistralOrigenDenominacion(notificacio.getProcediment().getOficina());
-		registre.setEntidadRegistralDestinoCodigo(notificacio.getProcediment().getOficina());
-		registre.setEntidadRegistralDestinoDenominacion(notificacio.getProcediment().getOficina());
-		registre.setUnidadTramitacionOrigenCodigo(notificacio.getProcediment().getOrganGestor());
-		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getProcediment().getOrganGestor());
-		registre.setUnidadTramitacionDestinoCodigo(notificacio.getProcediment().getOficina());
-		registre.setUnidadTramitacionDestinoDenominacion(notificacio.getProcediment().getOficina());
+		
+		DadesOficina dadesOficina = new DadesOficina();
+		String dir3Codi;
+		String organisme = null;
+		
+		if (notificacio.getEntitat().getDir3CodiReg() != null) {
+			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
+			organisme = notificacio.getEntitat().getDir3CodiReg();
+		} else {
+			dir3Codi = notificacio.getEmisorDir3Codi();
+			organisme = notificacio.getProcediment().getOrganGestor();
+		}
+
+		try {
+			logger.debug("[OFC_VIRTUAL] Recuperant informació de l'oficina i registre...");
+			setOficina(
+					notificacio,
+					dadesOficina,
+					dir3Codi);
+			setLlibre(
+					notificacio, 
+					dadesOficina, 
+					dir3Codi);
+		} catch (RegistrePluginException ex) {
+			throw new RegistrePluginException("[OFC_VIRTUAL] No s'han pogut recuperar les dedes de l'oficina o llibre", ex);
+		}
+		
+		if (dadesOficina.getOficinaCodi() != null) {
+			//Codi Dir3 de l’oficina inicial
+			registre.setEntidadRegistralInicioCodigo(dadesOficina.getOficinaCodi());
+			registre.setEntidadRegistralInicioDenominacion(dadesOficina.getOficinaNom());
+			//Codi Dir3 de l’oficina origen (obligatori)
+			registre.setEntidadRegistralOrigenCodigo(dadesOficina.getOficinaCodi());
+			registre.setEntidadRegistralOrigenDenominacion(dadesOficina.getOficinaNom());
+			//Codi Dir3 de l’oficina destí
+			registre.setEntidadRegistralDestinoCodigo(dadesOficina.getOficinaCodi());
+			registre.setEntidadRegistralDestinoDenominacion(dadesOficina.getOficinaNom());
+		}
+		if (dadesOficina.getLlibreCodi() != null) {
+			registre.setLibroCodigo(dadesOficina.getLlibreCodi());
+		}
+		if (organisme != null) {
+			//Codi Dir3 de l’organisme origen
+			registre.setUnidadTramitacionOrigenCodigo(organisme);
+			registre.setUnidadTramitacionOrigenDenominacion(organisme);
+			//Codi Dir3 de l’organisme destí
+			registre.setUnidadTramitacionDestinoCodigo(organisme);
+			registre.setUnidadTramitacionDestinoDenominacion(organisme);
+		}
+		
 		registre.setTipoRegistro(2L);
-		registre.setLibroCodigo(notificacio.getProcediment().getLlibre());
+
 		registre.setResumen(notificacio.getConcepte());
 		/* 1 = Documentació adjunta en suport Paper
 		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper
@@ -1727,6 +1767,11 @@ public class PluginHelper {
 				"es.caib.notib.tasca.registre.enviaments.reintents.maxim",
 				3);
 	}
+//	public int getRegistreReintentsMaxProperty() {
+//		return PropertiesHelper.getProperties().getAsInt(
+//				"es.caib.notib.tasca.registre.enviaments.reintents.maxim",
+//				3);
+//	}
 	public int getRegistreReintentsPeriodeProperty() {
 		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.registre.enviaments.periode");
 	}
