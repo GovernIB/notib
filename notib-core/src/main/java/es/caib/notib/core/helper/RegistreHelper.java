@@ -86,6 +86,7 @@ public class RegistreHelper {
 						
 						notificacio.updateEventAfegir(event);
 						enviament.updateNotificaError(true, event);
+						notificacioEventRepository.save(event);
 					} else {
 						enviamentUpdateDatat(
 								resposta.getEstat(),
@@ -112,6 +113,7 @@ public class RegistreHelper {
 						
 						notificacio.updateEventAfegir(event);
 						enviament.updateNotificaError(false, null);
+						notificacioEventRepository.save(event);
 						logger.debug("Comunicació SIR --> enviar correu si és aplicació...");
 						if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
 							emailHelper.prepararEnvioEmailNotificacio(notificacio);

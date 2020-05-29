@@ -66,7 +66,23 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 			String numeroRegistreFormatat,
 			Long tipusOperacio,
 			boolean ambAnnexos) {
-		return null;
+		boolean respostaAmbError = false;
+		RespostaConsultaRegistre respostaConsultaRegistre = new RespostaConsultaRegistre();
+		Date data = new Date();
+		Integer[] registre = readRegistreFile(data, true);
+		respostaConsultaRegistre.setRegistreNumeroFormatat(registre[1] + "/" + registre[0]);
+		respostaConsultaRegistre.setRegistreNumero(String.valueOf(registre[1]));
+		respostaConsultaRegistre.setRegistreData(data);
+		respostaConsultaRegistre.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
+		
+		respostaConsultaRegistre.setEntitatCodi("A04003003");
+		respostaConsultaRegistre.setEntitatDenominacio("CAIB");
+		if (respostaAmbError) {
+			respostaConsultaRegistre.setCodiError("500");
+			respostaConsultaRegistre.setDescripcioError("Simular error");
+		}
+		
+		return respostaConsultaRegistre;
 	}
 	
 	@Override
@@ -125,7 +141,10 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	public Oficina llistarOficinaVirtual(
 			String entitatCodi, 
 			Long autoritzacioValor) throws RegistrePluginException {
-		return null;
+		Oficina oficina = new Oficina();
+		oficina.setCodi("O00009390");
+		oficina.setNom(("DGTIC"));
+		return oficina;
 	}
 	
 	@Override
@@ -247,7 +266,10 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	public Llibre llistarLlibreOrganisme(
 			String entitatCodi, 
 			String organismeCodi) throws RegistrePluginException {
-		return null;
+		Llibre llibre = new Llibre();
+		llibre.setCodi("L99");
+		llibre.setNomCurt("Llibre prova");
+		return llibre;
 	}
 	
 	@Override
