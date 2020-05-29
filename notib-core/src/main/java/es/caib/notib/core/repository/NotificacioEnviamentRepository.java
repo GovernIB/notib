@@ -326,8 +326,10 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REGISTRADA " +
 			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.FINALITZADA " +
 			"   and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.PROCESSADA " +
-			" order by notificaEstatDataActualitzacio asc")
+			"   and notificaIntentNum < :maxReintents " +
+			" order by notificaEstatDataActualitzacio asc nulls first")
 	List<NotificacioEnviamentEntity> findByNotificaRefresc(
+			@Param("maxReintents")Integer maxReintents,
 			Pageable pageable);
 	
 	@Query(	"  from	NotificacioEnviamentEntity " +
@@ -335,8 +337,10 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"   and registreEstat != es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT " +
 			"   and registreEstat != es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto.REBUTJAT " +
 			"   and notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIAT_SIR " +
-			" order by registreData asc")
+			"   and sirConsultaIntent < :maxReintents " +
+			" order by sirConsultaData asc nulls first")
 	List<NotificacioEnviamentEntity> findByRegistreRefresc(
+			@Param("maxReintents")Integer maxReintents,
 			Pageable pageable);
 
 }

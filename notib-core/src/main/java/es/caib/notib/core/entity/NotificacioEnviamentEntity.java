@@ -41,6 +41,7 @@ import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.audit.NotibAuditable;
+import lombok.Getter;
 
 /**
  * Classe del model de dades que representa els enviaments d'una
@@ -48,6 +49,7 @@ import es.caib.notib.core.audit.NotibAuditable;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
 @Entity
 @Table(name="not_notificacio_env")
 @SecondaryTable(name="not_notificacio")
@@ -299,8 +301,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "notifica_intent_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date notificaIntentData;
-	@Column(name = "intent_num")
-	protected int intentNum;
+	
+	@Column(name = "notifica_intent_num")
+	protected int notificaIntentNum;
 
 	@Column(name="registre_numero_formatat", length = 50)
 	private String registreNumeroFormatat;
@@ -314,259 +317,34 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name="registre_estat_final")
 	private boolean registreEstatFinal;
 	
+	@Column(name = "sir_con_data")
+	@Temporal(TemporalType.TIMESTAMP)
+	protected Date sirConsultaData;
+	
+	@Column(name = "sir_con_intent")
+	protected int sirConsultaIntent;
+	
 	@Transient
 	private String csvUuid;
 
 	
-	public NotificacioRegistreEstatEnumDto getRegistreEstat() {
-		return registreEstat;
-	}
-
 	public void setRegistreEstat(NotificacioRegistreEstatEnumDto registreEstat) {
 		this.registreEstat = registreEstat;
-	}
-	public NotificacioEventEntity getNotificacioErrorEvent() {
-		return notificacioErrorEvent;
-	}
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-	public Date getRegistreData() {
-		return registreData;
 	}
 	public void setRegistreData(Date registreData) {
 		this.registreData = registreData;
 	}
-	public String getCsvUuid() {
-		return csvUuid;
-	}
 	public void setCsvUuid(String csvUuid) {
 		this.csvUuid = csvUuid;
-	}
-	public NotificaDomiciliTipusEnumDto getDomiciliTipus() {
-		return domiciliTipus;
-	}
-	public List<PersonaEntity> getDestinataris() {
-		return destinataris;
-	}
-	public int getIntentNum() {
-		return intentNum;
-	}
-	public PersonaEntity getTitular() {
-		return titular;
 	}
 	public void setTitular(PersonaEntity titular) {
 		this.titular = titular;
 	}
-	public NotificaDomiciliConcretTipusEnumDto getDomiciliConcretTipus() {
-		return domiciliConcretTipus;
-	}
-	public NotificaDomiciliViaTipusEnumDto getDomiciliViaTipus() {
-		return domiciliViaTipus;
-	}
-	public String getDomiciliViaNom() {
-		return domiciliViaNom;
-	}
-	public NotificaDomiciliNumeracioTipusEnumDto getDomiciliNumeracioTipus() {
-		return domiciliNumeracioTipus;
-	}
-	public String getDomiciliNumeracioNumero() {
-		return domiciliNumeracioNumero;
-	}
-	public String getDomiciliNumeracioQualificador() {
-		return domiciliNumeracioQualificador;
-	}
-	public String getDomiciliNumeracioPuntKm() {
-		return domiciliNumeracioPuntKm;
-	}
-	public String getDomiciliApartatCorreus() {
-		return domiciliApartatCorreus;
-	}
-	public String getDomiciliBloc() {
-		return domiciliBloc;
-	}
-	public String getDomiciliPortal() {
-		return domiciliPortal;
-	}
-	public String getDomiciliEscala() {
-		return domiciliEscala;
-	}
-	public String getDomiciliPlanta() {
-		return domiciliPlanta;
-	}
-	public String getDomiciliPorta() {
-		return domiciliPorta;
-	}
-	public String getDomiciliComplement() {
-		return domiciliComplement;
-	}
-	public String getDomiciliPoblacio() {
-		return domiciliPoblacio;
-	}
-	public String getFormatSobre() {
-		return formatSobre;
-	}
-	public String getFormatFulla() {
-		return formatFulla;
-	}
-	public String getDomiciliMunicipiCodiIne() {
-		return domiciliMunicipiCodiIne;
-	}
-	public String getDomiciliMunicipiNom() {
-		return domiciliMunicipiNom;
-	}
-	public String getDomiciliCodiPostal() {
-		return domiciliCodiPostal;
-	}
-	public String getDomiciliProvinciaCodi() {
-		return domiciliProvinciaCodi;
-	}
-	public String getDomiciliProvinciaNom() {
-		return domiciliProvinciaNom;
-	}
-	public String getDomiciliPaisCodiIso() {
-		return domiciliPaisCodiIso;
-	}
-	public String getDomiciliPaisNom() {
-		return domiciliPaisNom;
-	}
-	public String getDomiciliLinea1() {
-		return domiciliLinea1;
-	}
-	public String getDomiciliLinea2() {
-		return domiciliLinea2;
-	}
-	public Integer getDomiciliCie() {
-		return domiciliCie;
-	}
-	public Boolean getDehObligat() {
-		return dehObligat;
-	}
-	public String getDehNif() {
-		return dehNif;
-	}
-	public String getDehProcedimentCodi() {
-		return dehProcedimentCodi;
-	}
-	public ServeiTipusEnumDto getServeiTipus() {
-		return serveiTipus;
-	}
-	public String getNotificaReferencia() {
-		return notificaReferencia;
-	}
-	public String getNotificaIdentificador() {
-		return notificaIdentificador;
-	}
-	public Date getNotificaDataCreacio() {
-		return notificaDataCreacio;
-	}
-	public Date getNotificaDataDisposicio() {
-		return notificaDataDisposicio;
-	}
-	public Date getNotificaDataCaducitat() {
-		return notificaDataCaducitat;
-	}
-	public String getNotificaEmisorDir3() {
-		return notificaEmisorDir3;
-	}
-	public String getNotificaEmisorDescripcio() {
-		return notificaEmisorDescripcio;
-	}
-	public String getNotificaEmisorNif() {
-		return notificaEmisorNif;
-	}
-	public String getNotificaArrelDir3() {
-		return notificaArrelDir3;
-	}
-	public String getNotificaArrelDescripcio() {
-		return notificaArrelDescripcio;
-	}
-	public String getNotificaArrelNif() {
-		return notificaArrelNif;
-	}
-	public NotificacioEnviamentEstatEnumDto getNotificaEstat() {
-		return notificaEstat;
-	}
 	public void setNotificaEstat(NotificacioEnviamentEstatEnumDto notificaEstat) {
 		this.notificaEstat = notificaEstat;
 	}
-	public Date getNotificaEstatData() {
-		return notificaEstatData;
-	}
-	public Date getNotificaEstatDataActualitzacio() {
-		return notificaEstatDataActualitzacio;
-	}
-	public boolean isNotificaEstatFinal() {
-		return notificaEstatFinal;
-	}
-	public String getNotificaEstatDescripcio() {
-		return notificaEstatDescripcio;
-	}
-	public String getNotificaDatatOrigen() {
-		return notificaDatatOrigen;
-	}
-	public String getNotificaDatatReceptorNif() {
-		return notificaDatatReceptorNif;
-	}
-	public String getNotificaDatatReceptorNom() {
-		return notificaDatatReceptorNom;
-	}
-	public String getNotificaDatatNumSeguiment() {
-		return notificaDatatNumSeguiment;
-	}
-	public String getNotificaDatatErrorDescripcio() {
-		return notificaDatatErrorDescripcio;
-	}
-	public Date getNotificaCertificacioData() {
-		return notificaCertificacioData;
-	}
-	public String getNotificaCertificacioArxiuId() {
-		return notificaCertificacioArxiuId;
-	}
-	public String getNotificaCertificacioHash() {
-		return notificaCertificacioHash;
-	}
-	public String getNotificaCertificacioOrigen() {
-		return notificaCertificacioOrigen;
-	}
-	public String getNotificaCertificacioMetadades() {
-		return notificaCertificacioMetadades;
-	}
-	public String getNotificaCertificacioCsv() {
-		return notificaCertificacioCsv;
-	}
-	public String getNotificaCertificacioMime() {
-		return notificaCertificacioMime;
-	}
-	public Integer getNotificaCertificacioTamany() {
-		return notificaCertificacioTamany;
-	}
-	public NotificaCertificacioTipusEnumDto getNotificaCertificacioTipus() {
-		return notificaCertificacioTipus;
-	}
-	public NotificaCertificacioArxiuTipusEnumDto getNotificaCertificacioArxiuTipus() {
-		return notificaCertificacioArxiuTipus;
-	}
-	public String getNotificaCertificacioNumSeguiment() {
-		return notificaCertificacioNumSeguiment;
-	}
-	public boolean isNotificaError() {
-		return notificaError;
-	}
-	public NotificacioEventEntity getNotificaErrorEvent() {
-		return notificacioErrorEvent;
-	}
-	public Date getNotificaIntentData() {
-		return notificaIntentData;
-	}
-	public NotificacioEntity getNotificacio() {
-		return notificacio;
-	}
 	public void setNotificacio(NotificacioEntity notificacio) {
 		this.notificacio = notificacio;
-	}
-	public Long getNotificacioId() {
-		return notificacioId;
 	}
 	public void updateNotificaReferencia(
 			String notificaReferencia) {
@@ -579,14 +357,8 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public void setDehObligat(Boolean dehObligat) {
 		this.dehObligat = dehObligat;
 	}
-	public String getRegistreNumeroFormatat() {
-		return registreNumeroFormatat;
-	}
 	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
 		this.registreNumeroFormatat = registreNumeroFormatat;
-	}
-	public boolean isRegistreEstatFinal() {
-		return registreEstatFinal;
 	}
 
 	public void updateRegistreEstat(
@@ -611,6 +383,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaIntentData = new Date();
 		this.notificaEstatDataActualitzacio = new Date();
 	}
+	
 	public void updateNotificaInformacio(
 			Date notificaDataCreacio,
 			Date notificaDataDisposicio,
@@ -631,6 +404,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaArrelDescripcio = notificaArrelDescripcio;
 		this.notificaArrelNif = notificaArrelNif;
 	}
+	
 	public void updateNotificaDatat(
 			NotificacioEnviamentEstatEnumDto notificaEstat,
 			Date notificaEstatData,
@@ -652,6 +426,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaDatatErrorDescripcio = notificaDatatErrorDescripcio;
 		this.notificaEstatDataActualitzacio = new Date();
 	}
+	
 	public void updateNotificaCertificacio(
 			Date notificaCertificacioData,
 			String notificaCertificacioArxiuId,
@@ -676,6 +451,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaCertificacioArxiuTipus = notificaCertificacioArxiuTipus;
 		this.notificaCertificacioNumSeguiment = notificaCertificacioNumSeguiment;
 	}
+	
 	public void updateNotificaError(
 			boolean notificaError,
 			NotificacioEventEntity notificaErrorEvent) {
@@ -683,23 +459,48 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificacioErrorEvent = notificaErrorEvent;
 	}
 	
-	public void updateNotificaFiOperacio() {
-		this.notificaIntentData = new Date();
-	}
-	public void updateNotificaFiOperacio(boolean isError, Integer reintentPeriode) {
-		if (isError) {
-			this.intentNum++;
-			Calendar cal = GregorianCalendar.getInstance();
-			cal.add(Calendar.MILLISECOND, reintentPeriode*(2^intentNum));
-			this.notificaIntentData = cal.getTime();
-		} else {
-			this.intentNum = 0;
-			this.notificaIntentData = new Date();
-		}
-	}
+//	public void updateNotificaFiOperacio() {
+//		this.notificaIntentData = new Date();
+//	}
+//	public void updateNotificaFiOperacio(boolean isError, Integer reintentPeriode) {
+//		if (isError) {
+//			this.intentNum++;
+//			Calendar cal = GregorianCalendar.getInstance();
+//			cal.add(Calendar.MILLISECOND, reintentPeriode*(2^intentNum));
+//			this.notificaIntentData = cal.getTime();
+//		} else {
+//			this.intentNum = 0;
+//			this.notificaIntentData = new Date();
+//		}
+//	}
 	public void updateNotificaDataRefrescEstat() {
 		this.notificaEstatDataActualitzacio = new Date();
 	}
+	
+	public void updateNotificaNovaConsulta(Integer reintentPeriode) {
+		this.notificaIntentNum++;
+		Calendar cal = GregorianCalendar.getInstance();
+		cal.add(Calendar.MILLISECOND, reintentPeriode*(2^notificaIntentNum));
+		this.notificaIntentData = cal.getTime();
+	}
+	
+	public void refreshNotificaConsulta() {
+		this.notificaIntentNum = 0;
+		this.notificaIntentData = new Date();
+	}
+	
+	public void updateSirNovaConsulta(Integer reintentPeriode) {
+		this.sirConsultaIntent++;
+		Calendar cal = GregorianCalendar.getInstance();
+		cal.add(Calendar.MILLISECOND, reintentPeriode*(2^sirConsultaIntent));
+		this.sirConsultaData = cal.getTime();
+	}
+	
+	public void refreshSirConsulta() {
+		this.sirConsultaIntent = 0;
+		this.sirConsultaData = new Date();
+	}
+	
 	
 	public static Builder getBuilder(
 			String titularNif,
@@ -763,7 +564,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built.serveiTipus = serveiTipus;
 			built.notificacio = notificacio;
 			built.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
-			built.intentNum = 0;
+			built.notificaIntentNum = 0;
 		}
 		public Builder domiciliTipus(NotificaDomiciliTipusEnumDto domiciliTipus) {
 			built.domiciliTipus = domiciliTipus;
@@ -903,7 +704,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built = new NotificacioEnviamentEntity();
 			built.serveiTipus = tipusServei;
 			built.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
-			built.intentNum = 0;
+			built.notificaIntentNum = 0;
 			built.notificacio = notificacioGuardada;
 			
 			built.domiciliTipus = NotificaDomiciliTipusEnumDto.CONCRETO;
@@ -967,7 +768,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built = new NotificacioEnviamentEntity();
 			built.serveiTipus = tipusServei;
 			built.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
-			built.intentNum = 0;
+			built.notificaIntentNum = 0;
 			built.notificacio = notificacioGuardada;
 			built.domiciliTipus = NotificaDomiciliTipusEnumDto.CONCRETO;
 			built.domiciliNumeracioTipus = numeracioTipus;
@@ -1010,17 +811,17 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			
 			built.titular = titular;
 			built.destinataris = destinataris;
+			
+			// Inicialitzam les dates per consulta d'estats
+			Date data = new Date();
+			built.notificaIntentData = data;
+			built.sirConsultaData = data;
 		}
 		
 		public BuilderV2 domiciliViaTipus(NotificaDomiciliViaTipusEnumDto domiciliViaTipus) {
 			built.domiciliViaTipus = domiciliViaTipus;
 			return this;
 		}
-		
-//		public BuilderV2 titular(PersonaEntity titular) {
-//			built.titular = titular;
-//			return this;
-//		}
 		
 		public BuilderV2 destinataris(List<PersonaEntity> destinataris) {
 			built.destinataris = destinataris;

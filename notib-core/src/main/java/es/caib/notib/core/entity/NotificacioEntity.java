@@ -33,6 +33,7 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.audit.NotibAuditable;
+import lombok.Getter;
 
 
 /**
@@ -40,6 +41,7 @@ import es.caib.notib.core.audit.NotibAuditable;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
 @Entity
 @Table(name="not_notificacio")
 @EntityListeners(AuditingEntityListener.class)
@@ -47,8 +49,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 
 	@Column(name = "usuari_codi", length = 64, nullable = false)
 	protected String usuariCodi;
+	
 	@Column(name = "emisor_dir3codi", length = 9, nullable = false)
 	protected String emisorDir3Codi;
+	
 	@Column(name = "com_tipus", nullable = false)
 	protected NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	
@@ -97,30 +101,29 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date notificaEnviamentData;
 	
-	@Column(name = "not_reenv_data")
-	@Temporal(TemporalType.TIMESTAMP)
-	protected Date notificaReEnviamentData;
-	
 	@Column(name = "not_env_intent")
 	protected int notificaEnviamentIntent;
 	
 	@Column(name = "registre_env_intent")
 	protected int registreEnviamentIntent;
 	
+	@Column(name = "registre_numero", length = 19)
+	protected Integer registreNumero;
+	
+	@Column(name = "registre_numero_formatat", length = 200)
+	protected String registreNumeroFormatat;
+	
+	@Column(name = "registre_data")
+	@Temporal(TemporalType.DATE)
+	protected Date registreData;
+	
+	@Column(name = "registre_num_expedient", length = 256, nullable = false)
+	protected String numExpedient;
+	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "not_error_event_id")
 	@ForeignKey(name = "not_noterrevent_notificacio_fk")
 	protected NotificacioEventEntity notificaErrorEvent;
-	
-	@OneToMany(
-			mappedBy = "notificacio",
-			fetch = FetchType.EAGER,
-			cascade=CascadeType.ALL)
-	protected Set<NotificacioEnviamentEntity> enviaments = new LinkedHashSet<NotificacioEnviamentEntity>();
-	@OneToMany(
-			mappedBy = "notificacio",
-			fetch = FetchType.LAZY)
-	protected Set<NotificacioEventEntity> events = new LinkedHashSet<NotificacioEventEntity>();
 	
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "entitat_id")
@@ -152,145 +155,58 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@JoinColumn(name = "document_id")
 	@ForeignKey(name = "not_document_notificacio_fk")
 	protected DocumentEntity document;
-
-	@Column(name = "registre_numero", length = 19)
-	protected Integer registreNumero;
-	@Column(name = "registre_numero_formatat", length = 200)
-	protected String registreNumeroFormatat;
-	@Column(name = "registre_data")
-	@Temporal(TemporalType.DATE)
-	protected Date registreData;
-	@Column(name = "registre_num_expedient", length = 256, nullable = false)
-	protected String numExpedient;
+	
+	@OneToMany(
+			mappedBy = "notificacio",
+			fetch = FetchType.EAGER,
+			cascade=CascadeType.ALL)
+	protected Set<NotificacioEnviamentEntity> enviaments = new LinkedHashSet<NotificacioEnviamentEntity>();
+	@OneToMany(
+			mappedBy = "notificacio",
+			fetch = FetchType.LAZY)
+	protected Set<NotificacioEventEntity> events = new LinkedHashSet<NotificacioEventEntity>();
+	
 
 	@Transient
 	protected boolean permisProcessar;
 	@Transient
 	protected boolean errorLastCallback;
 	
-	public String getEmisorDir3Codi() {
-		return emisorDir3Codi;
-	}
-	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
-		return enviamentTipus;
-	}
-	public String getConcepte() {
-		return concepte;
-	}
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public String getProcedimentCodiNotib() {
-		return procedimentCodiNotib;
-	}
-	public String getGrupCodi() {
-		return grupCodi;
-	}
-	public Date getCaducitat() {
-		return caducitat;
-	}
-	public NotificacioEstatEnumDto getEstat() {
-		return estat;
-	}
-	public Date getEstatDate() {
-		return estatDate;
-	}
-	public String getMotiu() {
-		return motiu;
-	}
-	public NotificacioErrorTipusEnumDto getNotificaErrorTipus() {
-		return notificaErrorTipus;
-	}
-	public Date getNotificaEnviamentData() {
-		return notificaEnviamentData;
-	}
-	public int getNotificaEnviamentIntent() {
-		return notificaEnviamentIntent;
-	}
-	public int getRegistreEnviamentIntent() {
-		return registreEnviamentIntent;
-	}
-	public NotificacioEventEntity getNotificaErrorEvent() {
-		return notificaErrorEvent;
-	}
-	public Set<NotificacioEnviamentEntity> getEnviaments() {
-		return enviaments;
-	}
-	public Set<NotificacioEventEntity> getEvents() {
-		return events;
-	}
-	public EntitatEntity getEntitat() {
-		return entitat;
-	}
-	public Date getEnviamentDataProgramada() {
-		return enviamentDataProgramada;
-	}
-	public Date getNotificaReEnviamentData() {
-		return notificaReEnviamentData;
-	}
-	public String getUsuariCodi() {
-		return usuariCodi;
-	}
-	public PagadorPostalEntity getPagadorPostal() {
-		return pagadorPostal;
-	}
-	public PagadorCieEntity getPagadorCie() {
-		return pagadorCie;
-	}
-	public DocumentEntity getDocument() {
-		return document;
-	}
+	
 	public void addEnviament(
 			NotificacioEnviamentEntity enviament) {
 		this.enviaments.add(enviament);
 	}
-	public Integer getRegistreNumero() {
-		return registreNumero;
-	}
-	public String getRegistreNumeroFormatat() {
-		return registreNumeroFormatat;
-	}
-	public Date getRegistreData() {
-		return registreData;
-	}
-	public ProcedimentEntity getProcediment() {
-		return procediment;
-	}
-	public Integer getRetard() {
-		return retard;
-	}
-	public String getNumExpedient() {
-		return numExpedient;
-	}
-	public boolean isPermisProcessar() {
-		return permisProcessar;
-	}
+	
 	public void setPermisProcessar(boolean permisProcessar) {
 		this.permisProcessar = permisProcessar;
 	}
-	public NotificacioComunicacioTipusEnumDto getComunicacioTipus() {
-		return comunicacioTipus;
-	}
+	
 	public void updateRegistreNumero(Integer registreNumero) {
 		this.registreNumero = registreNumero;
 	}
+	
 	public void updateRegistreNumeroFormatat(String registreNumeroFormatat) {
 		this.registreNumeroFormatat = registreNumeroFormatat;
 	}
+	
 	public void updateRegistreData(Date registreData) {
 		this.registreData = registreData;
 	}
-	public void updateEstat(
-			NotificacioEstatEnumDto estat) {
+	
+	public void updateEstat(NotificacioEstatEnumDto estat) {
 		this.estat = estat;
 	}
+	
 	public void updateEstatDate(
 			Date estatDate) {
 		this.estatDate = estatDate;
 	}
+	
 	public void updateMotiu(String motiu) {
 		this.motiu = motiu;
 	}
+	
 	public TipusUsuariEnumDto getTipusUsuari() {
 		return tipusUsuari;
 	}
@@ -298,9 +214,11 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public boolean isErrorLastCallback() {
 		return errorLastCallback;
 	}
+	
 	public void setErrorLastCallback(boolean errorLastCallback) {
 		this.errorLastCallback = errorLastCallback;
 	}
+	
 	public void updateNotificaNouEnviament(int reintentsPeriodeNotifica) {
 		this.notificaEnviamentIntent++;
 		Calendar cal = GregorianCalendar.getInstance();
@@ -567,44 +485,12 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.usuariCodi = usuariCodi;
 			return this;
 		}
-//		public Builder registreExtracte(String registreExtracte) {
-//			built.registreExtracte = registreExtracte;
-//			return this;
-//		}
-//		public Builder registreDocFisica(String registreDocFisica) {
-//			built.registreDocFisica = registreDocFisica;
-//			return this;
-//		}
-//		public Builder registreIdioma(String registreIdioma) {
-//			built.registreIdioma = registreIdioma;
-//			return this;
-//		}
-//		public Builder registreTipusAssumpte(String registreTipusAssumpte) {
-//			built.registreTipusAssumpte = registreTipusAssumpte;
-//			return this;
-//		}
-//		public Builder registreNumExpedient(String registreNumExpedient) {
-//			built.registreNumExpedient = registreNumExpedient;
-//			return this;
-//		}
-//		public Builder registreRefExterna(String registreRefExterna) {
-//			built.registreRefExterna = registreRefExterna;
-//			return this;
-//		}
-//		public Builder registreCodiAssumpte(String registreCodiAssumpte) {
-//			built.registreCodiAssumpte = registreCodiAssumpte;
-//			return this;
-//		}
-//		public Builder registreObservacions(String registreObservacions) {
-//			built.registreObservacions = registreObservacions;
-//			return this;
-//		}
 		
 		public BuilderV2 enviaments(Set<NotificacioEnviamentEntity> enviaments) {
 			built.enviaments = enviaments;
 			return this;
 		}
-//		
+		
 		public BuilderV2 descripcio(String descripcio) {
 			built.descripcio = descripcio;
 			return this;
@@ -617,10 +503,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.grupCodi = grupCodi;
 			return this;
 		}
-//		public Builder procedimentDescripcioSia(String procedimentDescripcioSia) {
-//			built.procedimentDescripcioSia = procedimentDescripcioSia;
-//			return this;
-//		}
 		public BuilderV2 retard(Integer retard) {
 			built.retard = retard;
 			return this;

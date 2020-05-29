@@ -80,7 +80,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
 	}
 	// 3. Actualització de l'estat dels enviaments amb l'estat de Notific@
-	// PENDENT ELIMINAR DESPRÉS DE PROVAR ADVISER
 	//////////////////////////////////////////////////////////////////
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
@@ -105,7 +104,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
 	}
 	// 4. Actualització de l'estat dels enviaments amb l'estat de enviat_sir
-	// PENDENT ELIMINAR DESPRÉS DE PROVAR ADVISER
 	//////////////////////////////////////////////////////////////////
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override

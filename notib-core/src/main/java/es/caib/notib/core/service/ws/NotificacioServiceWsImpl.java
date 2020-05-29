@@ -461,7 +461,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 			}
 			if (enviament.isNotificaError()) {
 				resposta.setError(true);
-				NotificacioEventEntity errorEvent = enviament.getNotificaErrorEvent();
+				NotificacioEventEntity errorEvent = enviament.getNotificacioErrorEvent();
 				resposta.setErrorData(errorEvent.getData());
 				resposta.setErrorDescripcio(errorEvent.getErrorDescripcio());
 			}

@@ -123,7 +123,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						notificacio);
 				if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
 					eventBulider.callbackInicialitza();
-				
+
+				// TODO: Revisar generació d'events amb múltiples enviaments
 				NotificacioEventEntity event = eventBulider.build();
 				
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
@@ -133,8 +134,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 									resultadoEnvio.getIdentificador());
 							
 							//Registrar event per enviament
-							notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
 							logger.info(" >>> Canvi estat a ENVIADA ");
+							notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
 							eventBulider.enviament(enviament);
 							notificacio.updateEventAfegir(event);
 							notificacio.updateNotificaError(
@@ -198,7 +199,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		logger.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
 		enviament.setNotificacio(notificacio);
-//		NotificacioEnviamentEstatEnumDto estatActual = enviament.getNotificaEstat();
 		Date dataUltimDatat = enviament.getNotificaDataCreacio();
 		Date dataUltimaCertificacio = enviament.getNotificaCertificacioData();
 
@@ -206,6 +206,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		NotificacioEventEntity.Builder eventCertBuilder  = null;
 		
 		enviament.updateNotificaDataRefrescEstat();
+		enviament.updateNotificaNovaConsulta(pluginHelper.getConsultaReintentsPeriodeProperty());
 		
 		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb NotificaV2 (" +
 				"notificacioId=" + notificacio.getId() + ", " +
@@ -217,6 +218,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
 				String apiKey = enviament.getNotificacio().getEntitat().getApiKey();
 				ResultadoInfoEnvioV2 resultadoInfoEnvio = getNotificaWs(apiKey).infoEnvioV2(infoEnvio);
+				enviament.refreshNotificaConsulta();
 				Datado datatDarrer = null;
 				if (resultadoInfoEnvio.getDatados() != null) {
 					for (Datado datado: resultadoInfoEnvio.getDatados().getDatado()) {
