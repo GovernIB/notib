@@ -309,6 +309,8 @@ public class RegistreNotificaHelper {
 				registreHelper.enviamentUpdateDatat(
 						arbResposta.getEstat(), 
 						arbResposta.getRegistreData(), 
+						arbResposta.getSirRecepecioData(),
+						arbResposta.getSirRegistreDestiData(),
 						arbResposta.getRegistreNumeroFormatat(), 
 						enviament);
 			}

@@ -400,6 +400,18 @@ $(document).ready(function() {
 																	<td>${enviament.registreEstat}</td>
 																</tr>
 															</c:if>
+															<c:if test="${not empty enviament.sirRecepcioData}">
+																<tr>
+																	<td><strong><spring:message code="enviament.info.seu.registre.data.sir.recepcio"/></strong></td>
+																	<td><fmt:formatDate value="${enviament.sirRecepcioData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+																</tr>
+															</c:if>
+															<c:if test="${not empty enviament.sirRegDestiData}">
+																<tr>
+																	<td><strong><spring:message code="enviament.info.seu.registre.data.sir.desti"/></strong></td>
+																	<td><fmt:formatDate value="${enviament.sirRegDestiData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+																</tr>
+															</c:if>
 															<c:if test="${enviament.registreEstat == 'DISTRIBUIT' || enviament.registreEstat == 'OFICI_EXTERN'  || enviament.registreEstat == 'OFICI_SIR' }">
 																<tr>
 																	<td><strong><spring:message code="enviament.info.seu.registre.justificant"/></strong></td>

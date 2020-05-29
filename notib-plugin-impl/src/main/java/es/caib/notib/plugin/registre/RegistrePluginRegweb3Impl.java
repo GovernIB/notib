@@ -462,6 +462,8 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		resposta.setRegistreNumeroFormatat(ar.getNumeroRegistroFormateado());
 		resposta.setRegistreNumero(Integer.toString(ar.getNumeroRegistro()));
 		resposta.setRegistreData(ar.getFechaRegistro());
+		resposta.setSirRecepecioData(ar.getFechaRecepcion());
+		resposta.setSirRegistreDestiData(ar.getFechaRegistroDestino());
 		switch(ar.getEstado().intValue()) {
 		case 1:
 			resposta.setEstat(NotificacioRegistreEstatEnumDto.VALID);

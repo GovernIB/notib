@@ -56,6 +56,11 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
         resposta.setRegistreNumero(String.valueOf(registre[1]));
         resposta.setRegistreNumeroFormatat(registre[1] + "/" + registre[0]);
         resposta.setEstat(NotificacioRegistreEstatEnumDto.VALID);
+        
+        if (resposta.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_SIR))
+        	resposta.setSirRecepecioData(data);
+        if (resposta.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT))
+        	resposta.setSirRegistreDestiData(data);
 //        resposta.setErrorCodi("OK");
         return resposta;
 	}
@@ -66,7 +71,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 			String numeroRegistreFormatat,
 			Long tipusOperacio,
 			boolean ambAnnexos) {
-		boolean respostaAmbError = false;
+		boolean respostaAmbError = true;
 		RespostaConsultaRegistre respostaConsultaRegistre = new RespostaConsultaRegistre();
 		Date data = new Date();
 		Integer[] registre = readRegistreFile(data, true);
@@ -75,6 +80,11 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		respostaConsultaRegistre.setRegistreData(data);
 		respostaConsultaRegistre.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
 		
+		 if (respostaConsultaRegistre.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_SIR))
+			 respostaConsultaRegistre.setSirRecepecioData(data);
+		 if (respostaConsultaRegistre.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT))
+			 respostaConsultaRegistre.setSirRegistreDestiData(data);
+	        
 		respostaConsultaRegistre.setEntitatCodi("A04003003");
 		respostaConsultaRegistre.setEntitatDenominacio("CAIB");
 		if (respostaAmbError) {

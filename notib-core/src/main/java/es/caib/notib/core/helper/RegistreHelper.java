@@ -93,6 +93,8 @@ public class RegistreHelper {
 						enviamentUpdateDatat(
 								resposta.getEstat(),
 								resposta.getRegistreData(), 
+								resposta.getSirRecepecioData(),
+								resposta.getSirRegistreDestiData(),
 								resposta.getRegistreNumeroFormatat(), 
 								enviament);
 						
@@ -151,6 +153,8 @@ public class RegistreHelper {
 	public void enviamentUpdateDatat(
 			NotificacioRegistreEstatEnumDto registreEstat,
 			Date registreEstatData,
+			Date sirRecepcioData,
+			Date sirRegistreDestiData,
 			String registreNumeroFormatat,
 			NotificacioEnviamentEntity enviament) {
 		logger.debug("Actualitzant estat comunicació SIR...");
@@ -162,6 +166,8 @@ public class RegistreHelper {
 		enviament.updateRegistreEstat(
 				registreEstat,
 				registreEstatData,
+				sirRecepcioData,
+				sirRegistreDestiData,
 				registreNumeroFormatat,
 				estatFinal);
 		
