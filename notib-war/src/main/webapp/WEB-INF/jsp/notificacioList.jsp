@@ -367,8 +367,8 @@ $(document).ready(function() {
 				<th data-col-name="id" data-visible="false">#</th>
 				<th data-col-name="tipusUsuari" data-visible="false">#</th>
 				<th data-col-name="errorLastCallback" data-visible="false">#</th>
-				<th data-col-name="notificacio.notificaError" data-visible="false"></th>
-				<th data-col-name="notificacio.notificaErrorDescripcio" data-visible="false"></th>
+				<th data-col-name="notificaError" data-visible="false"></th>
+				<th data-col-name="notificaErrorDescripcio" data-visible="false"></th>
 				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" class="enviamentTipusCol" width="5px">
 
 					<script id="cellEnviamentTipusTemplate" type="text/x-jsrender">
@@ -411,8 +411,9 @@ $(document).ready(function() {
 							<span class="fa fa-check-circle"></span>
 						{{/if}}
 						{{:~eval('notificacioEstats["' + estat + '"]')}}
+						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>notificaErrorDescripcio}}"></span>{{/if}}
 						{{if tipusUsuari == 'APLICACIO' && errorLastCallback}}
-							<span class="fa fa-warning text-danger" title="<spring:message code="notificacio.list.client.error"/>"></span>
+							<span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>
 						{{/if}}
 						{{if estat == 'PROCESSADA' && estatDate != ''}}
 							<br>
@@ -423,7 +424,6 @@ $(document).ready(function() {
 							<p class="estat_{{:id}}"  style="display:inline"></p>
 						{{/if}}
 
-						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>errorNotificaDescripcio}}"></span>{{/if}}
 					</script>
 				</th>
 				<th data-col-name=createdBy.codi data-converter="String" width="80px"><spring:message code="notificacio.list.columna.enviament.creada"/></th>

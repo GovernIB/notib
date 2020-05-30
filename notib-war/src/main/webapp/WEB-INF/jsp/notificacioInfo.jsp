@@ -105,19 +105,22 @@ $(document).ready(function() {
 		</div>
 	</c:if>
 	<ul class="nav nav-tabs" role="tablist">
-		<li role="presentation" class="active"><a href="#dades"
-			aria-controls="dades" role="tab" data-toggle="tab"> <spring:message
-					code="notificacio.info.tab.dades" />
-		</a></li>
-		<li role="presentation"><a href="#events" aria-controls="events"
-			role="tab" data-toggle="tab"> <spring:message
-					code="notificacio.info.tab.events" />
-		</a></li>
+		<li role="presentation" class="active">
+			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"> 
+				<spring:message code="notificacio.info.tab.dades" />
+			</a>
+		</li>
+		<li role="presentation">
+			<a href="#events" aria-controls="events" role="tab" data-toggle="tab"> 
+				<spring:message code="notificacio.info.tab.events" />
+			</a>
+		</li>
 		<c:if test="${permisGestio == null || permisGestio}">
-			<li role="presentation"><a href="#accions"
-				aria-controls="accions" role="tab" data-toggle="tab"> <spring:message
-						code="notificacio.info.tab.accions" />
-			</a></li>
+			<li role="presentation">
+				<a href="#accions" aria-controls="accions" role="tab" data-toggle="tab"> 
+					<spring:message code="notificacio.info.tab.accions" />
+				</a>
+			</li>
 		</c:if>
 	</ul>
 	<br />
@@ -569,6 +572,40 @@ $(document).ready(function() {
 									href="<not:modalUrl value="/notificacio/${notificacio.id}/enviar"/>"
 									class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
 									<spring:message code="notificacio.info.accio.enviar.boto" />
+								</a>
+							</div>
+						</div>
+					</li>
+				</c:if>
+				<!-- Acció reprendre consulta d'estat  - Estat == ENVIADA && notificaErrorTipus == ERROR_REINTENTS_CONSULTA -->
+				<c:if test="${notificacio.estat == 'ENVIADA' && notificacio.notificaErrorTipus == 'ERROR_REINTENTS_CONSULTA'}">
+					<c:set var="algunaAccioDisponible" value="${true}" />
+					<li class="list-group-item">
+						<div class="row">
+							<div class="col-sm-6" style="height: 100%">
+								<strong><spring:message code="notificacio.info.accio.reactivar.consulta" /></strong>
+							</div>
+							<div class="col-sm-6 text-right">
+								<a href="<not:modalUrl value="/notificacio/${notificacio.id}/reactivarconsulta"/>"
+									class="btn btn-default btn-sm"> <span class="fa fa-play"></span>
+									<spring:message code="notificacio.info.accio.reactivar.boto" />
+								</a>
+							</div>
+						</div>
+					</li>
+				</c:if>
+				<!-- Acció reprendre consulta d'estat SIR  - Estat == ENVIADA && notificaErrorTipus == ERROR_REINTENTS_SIR -->
+				<c:if test="${notificacio.estat == 'ENVIADA' && notificacio.notificaErrorTipus == 'ERROR_REINTENTS_SIR'}">
+					<c:set var="algunaAccioDisponible" value="${true}" />
+					<li class="list-group-item">
+						<div class="row">
+							<div class="col-sm-6" style="height: 100%">
+								<strong><spring:message code="notificacio.info.accio.reactivar.consulta.sir" /></strong>
+							</div>
+							<div class="col-sm-6 text-right">
+								<a href="<not:modalUrl value="/notificacio/${notificacio.id}/reactivarsir"/>"
+									class="btn btn-default btn-sm"> <span class="fa fa-play"></span>
+									<spring:message code="notificacio.info.accio.reactivar.boto" />
 								</a>
 							</div>
 						</div>

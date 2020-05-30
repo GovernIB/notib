@@ -195,6 +195,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 	public boolean enviamentRefrescarEstat(
 			Long enviamentId) throws SistemaExternException {
+		
+		boolean resposta = true;
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		logger.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
@@ -218,7 +220,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
 				String apiKey = enviament.getNotificacio().getEntitat().getApiKey();
 				ResultadoInfoEnvioV2 resultadoInfoEnvio = getNotificaWs(apiKey).infoEnvioV2(infoEnvio);
-				enviament.refreshNotificaConsulta();
 				Datado datatDarrer = null;
 				if (resultadoInfoEnvio.getDatados() != null) {
 					for (Datado datado: resultadoInfoEnvio.getDatados().getDatado()) {
@@ -380,11 +381,14 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						notificacio).
 						enviament(enviament).build();
 				notificacio.updateEventAfegir(event);
+				enviament.refreshNotificaConsulta();
 				logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-				return true;
 			} else {
 				logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-				return false;
+				throw new ValidationException(
+						enviament,
+						NotificacioEnviamentEntity.class,
+						"L'enviament no té identificador de Notific@");
 			}
 		} catch (Exception ex) {
 			logger.error(
@@ -403,8 +407,25 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					true,
 					event);
 			logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-			return false;
+			if (enviament.getNotificaIntentNum() >= pluginHelper.getConsultaReintentsMaxProperty()) {
+				NotificacioEventEntity eventReintents = NotificacioEventEntity.getBuilder(
+						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR,
+						notificacio).
+						enviament(enviament).
+						error(true).
+						errorDescripcio("S'han esgotat els reintents de consulta de canvi d'estat a Notific@").
+						callbackInicialitza().
+						build();
+				notificacio.updateEventAfegir(eventReintents);
+				notificacioEventRepository.save(eventReintents);
+				notificacio.updateNotificaError(
+						NotificacioErrorTipusEnumDto.ERROR_REINTENTS_CONSULTA,
+						eventReintents);
+			}
+			resposta = false;
 		}
+		
+		return resposta;
 	}
 
 	

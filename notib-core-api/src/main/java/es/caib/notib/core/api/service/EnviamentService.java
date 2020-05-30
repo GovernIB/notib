@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import es.caib.notib.core.api.dto.ColumnesDto;
@@ -198,4 +199,21 @@ public interface EnviamentService {
 	public byte[] getDocumentJustificant(
 			Long enviamentId);
 
+	/**
+	 * Reactiva les consultes d'estat a Notific@
+	 * 
+	 * @param enviaments
+	 *            Llistat de atributs id dels enviaments
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	public void reactivaConsultes(Set<Long> enviaments);
+	
+	/**
+	 * Reactiva les consultes d'estat a SIR
+	 * 
+	 * @param enviaments
+	 *            Llistat de atributs id dels enviaments
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	public void reactivaSir(Set<Long> enviaments);
 }

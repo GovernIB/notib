@@ -565,6 +565,52 @@ public class NotificacioController extends BaseUserController {
 //					"notificacio.controller.registrar.error");
 //		}
 	}
+	
+	@RequestMapping(value = "/{notificacioId}/reactivarconsulta", method = RequestMethod.GET)
+	public String reactivarconsulta(
+			HttpServletRequest request, 
+			@PathVariable Long notificacioId, 
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+		boolean reactivat = notificacioService.reactivarConsulta(notificacioId);
+		emplenarModelNotificacioInfo(
+				entitatActual,
+				notificacioId, 
+				request,
+				"accions", 
+				model);
+		if (reactivat) {
+			return getAjaxControllerReturnValueSuccess(request, "notificacioInfo",
+					"notificacio.controller.reactivar.consulta.ok");
+		} else {
+			return getAjaxControllerReturnValueError(request, "notificacioInfo",
+					"notificacio.controller.reactivar.consulta.error");
+		}
+	}
+	
+	@RequestMapping(value = "/{notificacioId}/reactivarsir", method = RequestMethod.GET)
+	public String reactivarsir(
+			HttpServletRequest request, 
+			@PathVariable Long notificacioId, 
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+		boolean reactivat = notificacioService.reactivarSir(notificacioId);
+		emplenarModelNotificacioInfo(
+				entitatActual,
+				notificacioId, 
+				request,
+				"accions", 
+				model);
+		if (reactivat) {
+			return getAjaxControllerReturnValueSuccess(request, "notificacioInfo",
+					"notificacio.controller.reactivar.sir.ok");
+		} else {
+			return getAjaxControllerReturnValueError(request, "notificacioInfo",
+					"notificacio.controller.reactivar.sir.error");
+		}
+	}
 
 	@RequestMapping(value = "/{notificacioId}/enviament", method = RequestMethod.GET)
 	@ResponseBody

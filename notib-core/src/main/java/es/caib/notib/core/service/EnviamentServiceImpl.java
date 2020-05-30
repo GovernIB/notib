@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -1152,6 +1153,27 @@ public class EnviamentServiceImpl implements EnviamentService {
 	public boolean reintentarCallback(Long eventId) {
 		logger.info("Notificant canvi al client...");
 		return callbackHelper.notifica(eventId);
+	}
+	
+	@Override
+	@Transactional
+	public void reactivaConsultes(Set<Long> enviaments) {
+		for (Long enviamentId: enviaments) {
+			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
+			enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
+			enviament.refreshNotificaConsulta();
+		}
+	}
+
+
+	@Override
+	@Transactional
+	public void reactivaSir(Set<Long> enviaments) {
+		for (Long enviamentId: enviaments) {
+			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
+			enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
+			enviament.refreshSirConsulta();
+		}
 	}
 
 	private List<NotificacioEnviamentDto> enviamentsToDto(

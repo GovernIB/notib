@@ -392,6 +392,80 @@ public class EnviamentController extends BaseUserController {
 		return resposta;
 	}
 	
+	@RequestMapping(value = "/reactivar/consulta", method = RequestMethod.GET)
+	@ResponseBody
+	public String reactivarConsulta(
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		String resposta = "";
+		if (seleccio == null || seleccio.isEmpty()) {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"enviament.controller.reactivar.seleccio.buida"));
+			resposta = "error";
+		} else {
+			try {
+				enviamentService.reactivaConsultes(seleccio);
+				MissatgesHelper.info(
+						request, 
+						getMessage(
+								request, 
+								"enviament.controller.reactivar.consultes.OK"));
+				resposta = "ok";
+			} catch (Exception e) {
+				MissatgesHelper.error(
+						request, 
+						getMessage(
+								request, 
+								"enviament.controller.reactivar.consultes.KO"));
+			}
+		}
+		return resposta;
+	}
+	
+	@RequestMapping(value = "/reactivar/sir", method = RequestMethod.GET)
+	@ResponseBody
+	public String reactivarSir(
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		String resposta = "";
+		if (seleccio == null || seleccio.isEmpty()) {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"enviament.controller.reactivar.seleccio.buida"));
+			resposta = "error";
+		} else {
+			try {
+				enviamentService.reactivaSir(seleccio);
+				MissatgesHelper.info(
+						request, 
+						getMessage(
+								request, 
+								"enviament.controller.reactivar.sir.OK"));
+				resposta = "ok";
+			} catch (Exception e) {
+				MissatgesHelper.error(
+						request, 
+						getMessage(
+								request, 
+								"enviament.controller.reactivar.sir.KO"));
+			}
+		}
+		return resposta;
+	}
+	
 	@RequestMapping(value = "/visualitzar", method = RequestMethod.GET)
 	public String visualitzar(
 			HttpServletRequest request,

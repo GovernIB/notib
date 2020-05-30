@@ -316,24 +316,27 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	PaginaDto<NotificacioDto> findWithCallbackError(PaginacioParamsDto paginacioParams);
 	
-//	/**
-//	 * Mètode d'execució periòdica per a fer els enviaments pendents
-//	 * a Notific@.
-//	 */
-//	public void notificaEnviamentsRegistrats();
-//	
-//	/**
-//	 * Mètode d'execució periòdica per a fer els enviaments pendents
-//	 * al registre.
-//	 */
-//	public void registrarEnviamentsPendents();
-//
-//	/**
-//	 * Mètode d'execució periòdica per a refrescar l'estat dels enviaments fets a
-//	 * Notific@.
-//	 */
-//	public void enviamentRefrescarEstatPendents();
-
+	/**
+	 * Reactiva les consultes d'estat a Notifica.
+	 * 
+	 * @param notificacioId
+	 *            Atribut id de la notificació.
+	 * @return true si les consultes d'estat a notifica s'ha pogut reactivar o false en cas contrari.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	public boolean reactivarConsulta(Long notificacioId);
+	
+	/**
+	 * Reactiva les consultes d'estat a SIR.
+	 * 
+	 * @param notificacioId
+	 *            Atribut id de la notificació.
+	 * @return true si les consultes d'estat a SIR s'ha pogut reactivar o false en cas contrari.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	public boolean reactivarSir(Long notificacioId);
+	
+	
 
 	// Mètodes per cridar des de l'schedulled
 	void notificacioRegistrar(Long notificacioId);

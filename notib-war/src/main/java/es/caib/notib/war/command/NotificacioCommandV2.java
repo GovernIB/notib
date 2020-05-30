@@ -5,7 +5,6 @@ package es.caib.notib.war.command;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +26,7 @@ import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
@@ -86,6 +86,7 @@ public class NotificacioCommandV2 {
 	private boolean eliminarLogoPeu;
 	private boolean eliminarLogoCap;
 	private ServeiTipusEnumDto serveiTipus;
+	protected NotificacioErrorTipusEnumDto notificaErrorTipus;
 	@Valid @NotEmpty
 	private List<EnviamentCommand> enviaments = new ArrayList<EnviamentCommand>();
 	

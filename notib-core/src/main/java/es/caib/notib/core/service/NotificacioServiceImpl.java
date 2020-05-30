@@ -398,7 +398,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
 							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
 							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
-							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
+							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT) || 
+							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT) || 
+							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR) || 
+							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR))) {
 					logger.info("El darrer event de la notificació " + notificacio.getId()  + " conté un error de tipus: " + lastEvent.getTipus().name());
 					notificacio.setErrorLastCallback(true);
 				}
@@ -1038,6 +1041,47 @@ public class NotificacioServiceImpl implements NotificacioService {
 		return resposta;
 	}
 	
+	
+	@Transactional
+	@Override
+	public boolean reactivarConsulta(Long notificacioId) {
+		logger.debug("Reactivant consultes d'estat de la notificació (notificacioId=" + notificacioId + ")");
+		try {
+			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(
+					null,
+					notificacioId);
+//			List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacio);
+			for(NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+				enviament.refreshNotificaConsulta();
+			}
+			notificacio.cleanNotificaError();
+			notificacioRepository.saveAndFlush(notificacio);
+		} catch (Exception e) {
+			logger.debug("Error reactivant consultes d'estat de la notificació (notificacioId=" + notificacioId + ")", e);
+			return false;
+		}
+		return true;
+	}
+
+	@Transactional
+	@Override
+	public boolean reactivarSir(Long notificacioId) {
+		logger.debug("Reactivant consultes d'estat de SIR (notificacioId=" + notificacioId + ")");
+		try {
+			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(
+					null,
+					notificacioId);
+			for(NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+				enviament.refreshSirConsulta();
+			}
+			notificacio.cleanNotificaError();
+			notificacioRepository.saveAndFlush(notificacio);
+		} catch (Exception e) {
+			logger.debug("Error reactivant consultes a SIR de la notificació (notificacioId=" + notificacioId + ")", e);
+			return false;
+		}
+		return true;
+	}
 	// SCHEDULLED METHODS
 	////////////////////////////////////////////////////////////////
 	

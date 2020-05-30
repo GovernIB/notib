@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -156,5 +157,17 @@ public class EnviamentServiceBean implements EnviamentService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public boolean reintentarCallback(Long eventId) {
 		return delegate.reintentarCallback(eventId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public void reactivaConsultes(Set<Long> enviaments) {
+		delegate.reactivaConsultes(enviaments);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public void reactivaSir(Set<Long> enviaments) {
+		delegate.reactivaSir(enviaments);
 	}
 }

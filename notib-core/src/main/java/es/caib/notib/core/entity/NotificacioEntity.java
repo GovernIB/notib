@@ -239,6 +239,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		this.notificaErrorTipus = errorTipus;
 		this.notificaErrorEvent = errorEvent;
 	}
+	public void cleanNotificaError() {
+		this.notificaErrorTipus = null;
+		this.notificaErrorEvent = null;
+	}
 	public void updateEventAfegir(
 			NotificacioEventEntity event) {
 		events.add(event);

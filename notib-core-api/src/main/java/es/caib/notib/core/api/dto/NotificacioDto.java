@@ -8,12 +8,16 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import lombok.Getter;
+import lombok.Setter;
+
 
 /**
  * Informació d'una anotació.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 public class NotificacioDto extends AuditoriaDto {
 
 	private Long id;
@@ -41,6 +45,7 @@ public class NotificacioDto extends AuditoriaDto {
 	private NotificacioEstatEnumDto estat;
 	private Date estatDate;
 	private Date notificaErrorData;
+	private NotificacioErrorTipusEnumDto notificaErrorTipus;
 	private String notificaErrorDescripcio;
 	private EntitatDto entitat;
 	private ProcedimentDto procediment;
@@ -71,331 +76,10 @@ public class NotificacioDto extends AuditoriaDto {
 	private boolean errorLastCallback;
 	private TipusUsuariEnumDto tipusUsuari;
 	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getCifEntitat() {
-		return cifEntitat;
-	}
-	public void setCifEntitat(String cifEntitat) {
-		this.cifEntitat = cifEntitat;
-	}
-	public NotificacioComunicacioTipusEnumDto getComunicacioTipus() {
-		return comunicacioTipus;
-	}
-	public void setComunicacioTipus(NotificacioComunicacioTipusEnumDto comunicacioTipus) {
-		this.comunicacioTipus = comunicacioTipus;
-	}
-	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
-		return enviamentTipus;
-	}
-	public void setEnviamentTipus(NotificaEnviamentTipusEnumDto enviamentTipus) {
-		this.enviamentTipus = enviamentTipus;
-	}
-	public Date getEnviamentDataProgramada() {
-		return enviamentDataProgramada;
-	}
-	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
-		this.enviamentDataProgramada = enviamentDataProgramada;
-	}
-	public String getConcepte() {
-		return concepte;
-	}
-	public void setConcepte(String concepte) {
-		this.concepte = concepte;
-	}
-	public String getPagadorCorreusCodiDir3() {
-		return pagadorCorreusCodiDir3;
-	}
-	public void setPagadorCorreusCodiDir3(String pagadorCorreusCodiDir3) {
-		this.pagadorCorreusCodiDir3 = pagadorCorreusCodiDir3;
-	}
-	public String getPagadorCorreusContracteNum() {
-		return pagadorCorreusContracteNum;
-	}
-	public void setPagadorCorreusContracteNum(String pagadorCorreusContracteNum) {
-		this.pagadorCorreusContracteNum = pagadorCorreusContracteNum;
-	}
-	public String getPagadorCorreusCodiClientFacturacio() {
-		return pagadorCorreusCodiClientFacturacio;
-	}
-	public void setPagadorCorreusCodiClientFacturacio(String pagadorCorreusCodiClientFacturacio) {
-		this.pagadorCorreusCodiClientFacturacio = pagadorCorreusCodiClientFacturacio;
-	}
-	public Date getPagadorCorreusDataVigencia() {
-		return pagadorCorreusDataVigencia;
-	}
-	public void setPagadorCorreusDataVigencia(Date pagadorCorreusDataVigencia) {
-		this.pagadorCorreusDataVigencia = pagadorCorreusDataVigencia;
-	}
-	public String getPagadorCieCodiDir3() {
-		return pagadorCieCodiDir3;
-	}
-	public void setPagadorCieCodiDir3(String pagadorCieCodiDir3) {
-		this.pagadorCieCodiDir3 = pagadorCieCodiDir3;
-	}
-	public Date getPagadorCieDataVigencia() {
-		return pagadorCieDataVigencia;
-	}
-	public void setPagadorCieDataVigencia(Date pagadorCieDataVigencia) {
-		this.pagadorCieDataVigencia = pagadorCieDataVigencia;
-	}
-	public String getProcedimentDescripcioSia() {
-		return procedimentDescripcioSia;
-	}
-	public void setProcedimentDescripcioSia(String procedimentDescripcioSia) {
-		this.procedimentDescripcioSia = procedimentDescripcioSia;
-	}
-	public String getDocumentArxiuNom() {
-		return documentArxiuNom;
-	}
-	public void setDocumentArxiuNom(String documentArxiuNom) {
-		this.documentArxiuNom = documentArxiuNom;
-	}
-	public String getDocumentArxiuId() {
-		return documentArxiuId;
-	}
-	public void setDocumentArxiuId(String documentArxiuId) {
-		this.documentArxiuId = documentArxiuId;
-	}
-	public String getCsv_uuid() {
-		return csv_uuid;
-	}
-	public void setCsv_uuid(String csv_uuid) {
-		this.csv_uuid = csv_uuid;
-	}
-	public String getDocumentContingutBase64() {
-		return documentContingutBase64;
-	}
-	public void setDocumentContingutBase64(String documentContingutBase64) {
-		this.documentContingutBase64 = documentContingutBase64;
-	}
-	public String getDocumentSha1() {
-		return documentSha1;
-	}
-	public void setDocumentSha1(String documentSha1) {
-		this.documentSha1 = documentSha1;
-	}
-	public String getGrupCodi() {
-		return grupCodi;
-	}
-	public void setGrupCodi(String grupCodi) {
-		this.grupCodi = grupCodi;
-	}
-	public String getGrupNom() {
-		return grupNom;
-	}
-	public void setGrupNom(String grupNom) {
-		this.grupNom = grupNom;
-	}
-	public boolean isDocumentNormalitzat() {
-		return documentNormalitzat;
-	}
-	public void setDocumentNormalitzat(boolean documentNormalitzat) {
-		this.documentNormalitzat = documentNormalitzat;
-	}
-	public boolean isDocumentGenerarCsv() {
-		return documentGenerarCsv;
-	}
-	public void setDocumentGenerarCsv(boolean documentGenerarCsv) {
-		this.documentGenerarCsv = documentGenerarCsv;
-	}
-	public NotificacioEstatEnumDto getEstat() {
-		return estat;
-	}
-	public void setEstat(NotificacioEstatEnumDto estat) {
-		this.estat = estat;
-	}
-	public Date getEstatDate() {
-		return estatDate;
-	}
-	public void setEstatDate(Date estatDate) {
-		this.estatDate = estatDate;
-	}
-	public Date getNotificaErrorData() {
-		return notificaErrorData;
-	}
-	public void setNotificaErrorData(Date notificaErrorData) {
-		this.notificaErrorData = notificaErrorData;
-	}
-	public String getNotificaErrorDescripcio() {
-		return notificaErrorDescripcio;
-	}
-	public void setNotificaErrorDescripcio(String notificaErrorDescripcio) {
-		this.notificaErrorDescripcio = notificaErrorDescripcio;
-	}
-	public EntitatDto getEntitat() {
-		return entitat;
-	}
-	public void setEntitat(EntitatDto entitat) {
-		this.entitat = entitat;
-	}
 	public boolean isNotificaError() {
 		return notificaErrorData != null;
 	}
-	public List<PermisDto> getPermisos() {
-		return permisos;
-	}
-	public boolean isUsuariActualRead() {
-		return usuariActualRead;
-	}
-	public boolean isUsuariActualProcessar() {
-		return usuariActualProcessar;
-	}
-	public boolean isUsuariActualNotificacio() {
-		return usuariActualNotificacio;
-	}
-	public boolean isUsuariActualAdministration() {
-		return usuariActualAdministration;
-	}
-	public void setPermisos(List<PermisDto> permisos) {
-		this.permisos = permisos;
-	}
-	public void setUsuariActualRead(boolean usuariActualRead) {
-		this.usuariActualRead = usuariActualRead;
-	}
-	public void setUsuariActualProcessar(boolean usuariActualProcessar) {
-		this.usuariActualProcessar = usuariActualProcessar;
-	}
-	public void setUsuariActualNotificacio(boolean usuariActualNotificacio) {
-		this.usuariActualNotificacio = usuariActualNotificacio;
-	}
-	public void setUsuariActualAdministration(boolean usuariActualAdministration) {
-		this.usuariActualAdministration = usuariActualAdministration;
-	}
-	public String getReferenciaExterna() {
-		return referenciaExterna;
-	}
-	public void setReferenciaExterna(String referenciaExterna) {
-		this.referenciaExterna = referenciaExterna;
-	}
-	public String getNotificacio() {
-		return notificacio;
-	}
-	public void setNotificacio(String notificacio) {
-		this.notificacio = notificacio;
-	}
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-	public boolean isPermisProcessar() {
-		return permisProcessar;
-	}
-	public void setPermisProcessar(boolean permisProcessar) {
-		this.permisProcessar = permisProcessar;
-	}
-	public ProcedimentDto getProcediment() {
-		return procediment;
-	}
-	public void setProcediment(ProcedimentDto procediment) {
-		this.procediment = procediment;
-	}
-	public String getRegistreOrgan() {
-		return registreOrgan;
-	}
-	public void setRegistreOrgan(String registreOrgan) {
-		this.registreOrgan = registreOrgan;
-	}
-	public String getRegistreExtracte() {
-		return registreExtracte;
-	}
-	public void setRegistreExtracte(String registreExtracte) {
-		this.registreExtracte = registreExtracte;
-	}
-	public String getRegistreTipusAssumpte() {
-		return registreTipusAssumpte;
-	}
-	public void setRegistreTipusAssumpte(String registreTipusAssumpte) {
-		this.registreTipusAssumpte = registreTipusAssumpte;
-	}
-	public String getRegistreRefExterna() {
-		return registreRefExterna;
-	}
-	public void setRegistreRefExterna(String registreRefExterna) {
-		this.registreRefExterna = registreRefExterna;
-	}
-	public String getNumExpedient() {
-		return numExpedient;
-	}
-	public void setNumExpedient(String numExpedient) {
-		this.numExpedient = numExpedient;
-	}
-	public PagadorPostalDto getPagadorPostal() {
-		return pagadorPostal;
-	}
-	public void setPagadorPostal(PagadorPostalDto pagadorPostal) {
-		this.pagadorPostal = pagadorPostal;
-	}
-	public String getUsuariCodi() {
-		return usuariCodi;
-	}
-	public void setUsuariCodi(String usuariCodi) {
-		this.usuariCodi = usuariCodi;
-	}
-	public String getRegistreObservacions() {
-		return registreObservacions;
-	}
-	public void setRegistreObservacions(String registreObservacions) {
-		this.registreObservacions = registreObservacions;
-	}
-	public Date getRegistreData() {
-		return registreData;
-	}
-	public void setRegistreData(Date registreData) {
-		this.registreData = registreData;
-	}
-	public Integer getRegistreNumero() {
-		return registreNumero;
-	}
-	public void setRegistreNumero(Integer registreNumero) {
-		this.registreNumero = registreNumero;
-	}
-	public DocumentDto getDocument() {
-		return document;
-	}
-	public void setDocument(DocumentDto document) {
-		this.document = document;
-	}
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
-	}
-	public List<EnviamentDto> getEnviaments() {
-		return enviaments;
-	}
-	public void setEnviaments(List<EnviamentDto> enviaments) {
-		this.enviaments = enviaments;
-	}
-	public String getRegistreOficina() {
-		return registreOficina;
-	}
-	public void setRegistreOficina(String registreOficina) {
-		this.registreOficina = registreOficina;
-	}
-	public String getRegistreLlibre() {
-		return registreLlibre;
-	}
-	public void setRegistreLlibre(String registreLlibre) {
-		this.registreLlibre = registreLlibre;
-	}
-	
-	public boolean isErrorLastCallback() {
-		return errorLastCallback;
-	}
-	public void setErrorLastCallback(boolean errorLastCallback) {
-		this.errorLastCallback = errorLastCallback;
-	}
-	public TipusUsuariEnumDto getTipusUsuari() {
-		return tipusUsuari;
-	}
-	public void setTipusUsuari(TipusUsuariEnumDto tipusUsuari) {
-		this.tipusUsuari = tipusUsuari;
-	}
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

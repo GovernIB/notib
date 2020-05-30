@@ -307,4 +307,16 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.findWithCallbackError(paginacioParams);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public boolean reactivarConsulta(Long notificacioId) {
+		return delegate.reactivarConsulta(notificacioId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	public boolean reactivarSir(Long notificacioId) {
+		return delegate.reactivarSir(notificacioId);
+	}
+
 }

@@ -177,6 +177,30 @@ $(document).ready(function() {
 			}
 			return false;
 		});
+
+		$('#reactivarConsulta').on('click', function() {
+			if(confirm("<spring:message code="enviament.list.user.reactivar.consulta.misatge.avis"/>")){
+				$.get(
+					"enviament/reactivar/consulta",
+					function(data) {
+						location.reload();
+					}
+				);
+			}
+			return false;
+		});
+
+		$('#reactivarSir').on('click', function() {
+			if(confirm("<spring:message code="enviament.list.user.reactivar.sir.misatge.avis"/>")){
+				$.get(
+					"enviament/reactivar/sir",
+					function(data) {
+						location.reload();
+					}
+				);
+			}
+			return false;
+		});
 	});
 	
 	$("#enviament th").last().empty();
@@ -227,6 +251,8 @@ function getCookie(cname) {
 					<ul class="dropdown-menu">
 						<li><a href="<c:url value="enviament/export/ODS"/>"><spring:message code="enviament.list.user.exportar"/> a <spring:message code="enviament.list.user.exportar.EXCEL"/></a></li> 
 						<li><a style="cursor: pointer;" id="reintentarNotificacio"><spring:message code="enviament.list.user.reintentar"/> <spring:message code="enviament.list.user.reintentar.notificacio"/></a></li>
+						<li><a style="cursor: pointer;" id="reactivarConsulta"><spring:message code="enviament.list.user.reactivar.consulta"/></a></li>
+						<li><a style="cursor: pointer;" id="reactivarSir"><spring:message code="enviament.list.user.reactivar.sir"/></a></li>
 					</ul>
 				</div>
 			</div>

@@ -21,5 +21,7 @@ import java.io.Serializable;
 public enum NotificacioErrorTipusEnumDto implements Serializable {
 	ERROR_XARXA,
 	ERROR_REMOT,
-	ERROR_REGISTRE
+	ERROR_REGISTRE,
+	ERROR_REINTENTS_CONSULTA,
+	ERROR_REINTENTS_SIR
 }
