@@ -902,8 +902,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			return setRespostaError("[1071] El camp 'usuariCodi' no pot pot tenir una longitud superior a 64 caràcters.");
 		}
 		// Número d'expedient
-		if (notificacio.getNumExpedient() != null && notificacio.getNumExpedient().length() > 256) {
-			return setRespostaError("[1080] El camp 'numExpedient' no pot pot tenir una longitud superior a 256 caràcters.");
+		if (notificacio.getNumExpedient() != null && notificacio.getNumExpedient().length() > 80) {
+			return setRespostaError("[1080] El camp 'numExpedient' no pot pot tenir una longitud superior a 80 caràcters.");
 		}
 		// GrupCodi
 		if (notificacio.getGrupCodi() != null && notificacio.getGrupCodi().length() > 64) {
