@@ -50,7 +50,7 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 	private String username;
 	private String password;
 
-	private boolean serveiDesplegatDamuntJbossCaib = true;
+	private boolean autenticacioBasic = false;
 
 	public NotificacioRestClient(
 			String baseUrl,
@@ -66,12 +66,12 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 			String baseUrl,
 			String username,
 			String password,
-			boolean serveiDesplegatDamuntJbossCaib) {
+			boolean autenticacioBasic) {
 		super();
 		this.baseUrl = baseUrl;
 		this.username = username;
 		this.password = password;
-		this.serveiDesplegatDamuntJbossCaib = serveiDesplegatDamuntJbossCaib;
+		this.autenticacioBasic = autenticacioBasic;
 	}
 
 	@Override
@@ -161,14 +161,13 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 		}
 	}
 
-	public boolean isServeiDesplegatDamuntJboss() {
-		return serveiDesplegatDamuntJbossCaib;
-	}
-	public void setServeiDesplegatDamuntJboss(boolean serveiDesplegatDamuntJboss) {
-		this.serveiDesplegatDamuntJbossCaib = serveiDesplegatDamuntJboss;
+	public boolean isAutenticacioBasic() {
+		return autenticacioBasic;
 	}
 
-
+	public void setAutenticacioBasic(boolean autenticacioBasic) {
+		this.autenticacioBasic = autenticacioBasic;
+	}
 
 	private Client generarClient() {
 		Client jerseyClient = Client.create();
@@ -200,7 +199,7 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 			String urlAmbMetode,
 			String username,
 			String password) throws InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
-		if (serveiDesplegatDamuntJbossCaib) {
+		if (!autenticacioBasic) {
 			logger.debug(
 					"Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (" +
 					"urlAmbMetode=" + urlAmbMetode + ", " +
