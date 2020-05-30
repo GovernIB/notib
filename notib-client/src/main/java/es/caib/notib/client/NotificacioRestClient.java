@@ -13,7 +13,6 @@ import javax.management.InstanceNotFoundException;
 import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
 
-import org.jboss.mx.util.MBeanProxyCreationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +26,6 @@ import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.representation.Form;
 
-import es.caib.loginModule.client.AuthenticationFailureException;
 import es.caib.notib.ws.notificacio.DadesConsulta;
 import es.caib.notib.ws.notificacio.NotificacioServiceV2;
 import es.caib.notib.ws.notificacio.NotificacioV2;
@@ -52,6 +50,7 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 
 	private boolean autenticacioBasic = false;
 
+	public NotificacioRestClient() {}
 	public NotificacioRestClient(
 			String baseUrl,
 			String username,
@@ -198,7 +197,7 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 			Client jerseyClient,
 			String urlAmbMetode,
 			String username,
-			String password) throws InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
+			String password) throws InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
 		if (!autenticacioBasic) {
 			logger.debug(
 					"Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (" +
