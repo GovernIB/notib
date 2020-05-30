@@ -69,55 +69,58 @@ public class CallbackHelper {
 			throw new NotFoundException(
 					"eventId:" + eventId,
 					NotificacioEventEntity.class);
-		// Recupera la referència
-		String referencia = null;
-		if (event.getEnviament() != null)
-			referencia = event.getEnviament().getNotificaReferencia();
+//		// Recupera la referència
+//		String referencia = null;
+//		if (event.getEnviament() != null)
+//			referencia = event.getEnviament().getNotificaReferencia();
 		int intents = event.getCallbackIntents() + 1;
 		Date ara = new Date();
-		if (referencia != null) {
+//		if (referencia != null) {
 			// Notifica al client
-			try {
-				if (event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT
-						|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT
-						|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO
-						|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE
-						|| event.getTipus() == NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT
-						|| (event.isError() && event.getTipus() == NotificacioEventTipusEnumDto.CALLBACK_CLIENT)) {
-					// Avisa al client que hi ha hagut una modificació a l'enviament
-					notificaCanvi(event.getEnviament());
+		try {
+			if (event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT
+					|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT
+					|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO
+					|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE
+					|| event.getTipus() == NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT
+					|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR
+					|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR
+					|| (event.isError() && event.getTipus() == NotificacioEventTipusEnumDto.CALLBACK_CLIENT)) {
+				// Avisa al client que hi ha hagut una modificació a l'enviament
+				notificaCanvi(event.getEnviament());
 //					// Invoca el mètode de notificació de l'aplicació client segons és estat o certificat:
 //					if (event.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT))
 //						notificaEstat(event.getEnviament());
 //					else if (event.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO))
 //						notificaCertificat(event.getEnviament());					
-					// Marca l'event com a notificat
-					event.setNotificacio(event.getEnviament().getNotificacio());
-					event.updateCallbackClient(CallbackEstatEnumDto.NOTIFICAT, ara, intents, null);
-					ret = true;
-				} else {
-					// És un event pendent de notificar que no és del tipus esperat
-					event.setNotificacio(event.getEnviament().getNotificacio());
-					event.updateCallbackClient(CallbackEstatEnumDto.ERROR, ara, intents, "L'event id=" + event.getId() + " és del tipus " + event.getTipus() + " i no es pot notificar a l'aplicació client.");
-				}
-			} catch (Exception ex) {
-				logger.debug("Error notificant l'event " + eventId + " amb referencia d'enviament: " + referencia, ex);
-				// Marca un error a l'event
-				Integer maxIntents = this.getEventsIntentsMaxProperty();
-				CallbackEstatEnumDto estatNou = maxIntents == null || intents < maxIntents ? 
-													CallbackEstatEnumDto.PENDENT
-													: CallbackEstatEnumDto.ERROR;
+				// Marca l'event com a notificat
 				event.setNotificacio(event.getEnviament().getNotificacio());
-				event.updateCallbackClient(
-						estatNou,
-						ara,
-						intents,
-						"Error notificant l'event al client: " + ex.getMessage());
+				event.updateCallbackClient(CallbackEstatEnumDto.NOTIFICAT, ara, intents, null);
+				ret = true;
+			} else {
+				// És un event pendent de notificar que no és del tipus esperat
+				event.setNotificacio(event.getEnviament().getNotificacio());
+				event.updateCallbackClient(CallbackEstatEnumDto.ERROR, ara, intents, "L'event id=" + event.getId() + " és del tipus " + event.getTipus() + " i no es pot notificar a l'aplicació client.");
 			}
-		} else {
-			// No és un event que es pugui notificar, el marca com a error
-			event.updateCallbackClient(CallbackEstatEnumDto.ERROR, ara, intents, "L'event " + eventId + " no té referència d'enviament, no es pot fer un callback a l'aplicació client.");
+		} catch (Exception ex) {
+			logger.debug("Error notificant l'event " + eventId, ex);
+			// Marca un error a l'event
+			Integer maxIntents = this.getEventsIntentsMaxProperty();
+			CallbackEstatEnumDto estatNou = maxIntents == null || intents < maxIntents ? 
+												CallbackEstatEnumDto.PENDENT
+												: CallbackEstatEnumDto.ERROR;
+			event.setNotificacio(event.getEnviament().getNotificacio());
+			event.updateCallbackClient(
+					estatNou,
+					ara,
+					intents,
+					"Error notificant l'event al client: " + ex.getMessage());
 		}
+//		} else {
+//			// No és un event que es pugui notificar, el marca com a error
+//			event.setNotificacio(event.getEnviament().getNotificacio());
+//			event.updateCallbackClient(CallbackEstatEnumDto.ERROR, ara, intents, "L'event " + eventId + " no té referència d'enviament, no es pot fer un callback a l'aplicació client.");
+//		}
 		
 		// Crea una nova entrada a la taula d'events per deixar constància de la notificació a l'aplicació client
 		Builder eventBuilder = null;
