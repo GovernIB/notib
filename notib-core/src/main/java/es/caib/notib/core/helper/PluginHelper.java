@@ -1432,7 +1432,7 @@ public class PluginHelper {
 				interessatDades.setTipoDocumentoIdentificacion("O");
 			}  else if (titular.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
 				interessatDades.setDocumento(titular.getNif());
-				if (isDocumentEstranger(destinatari.getNif()))
+				if (isDocumentEstranger(titular.getNif()))
 					interessatDades.setTipoDocumentoIdentificacion("E");
 				else
 					interessatDades.setTipoDocumentoIdentificacion("N");

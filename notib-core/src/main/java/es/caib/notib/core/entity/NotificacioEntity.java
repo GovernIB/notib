@@ -117,7 +117,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Temporal(TemporalType.DATE)
 	protected Date registreData;
 	
-	@Column(name = "registre_num_expedient", length = 256, nullable = false)
+	@Column(name = "registre_num_expedient", length = 80, nullable = false)
 	protected String numExpedient;
 	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)

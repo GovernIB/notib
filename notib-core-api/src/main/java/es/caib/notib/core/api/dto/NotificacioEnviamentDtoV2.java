@@ -49,14 +49,18 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private String concepte;
 	private String descripcio;
 	private String llibre;
-	private int registreNumero;
-	private Date registreData;
 	private NotificacioEstatEnumDto estat;
 	private Long notificacioId;
 	private String csvUuid;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
+	
+	//Registre
 	private String registreNumeroFormatat;
 	private NotificacioRegistreEstatEnumDto registreEstat;
+	private Date sirRecepcioData;
+	private Date sirRegDestiData;
+	private int registreNumero;
+	private Date registreData;
 	
 	//Notific@
 	private Date notificaErrorData;

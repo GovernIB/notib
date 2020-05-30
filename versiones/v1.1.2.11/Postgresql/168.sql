@@ -1,0 +1,2 @@
+ALTER TABLE NOT_NOTIFICACIO_ENV ADD SIR_REC_DATA timestamp without time zone;
+ALTER TABLE NOT_NOTIFICACIO_ENV ADD SIR_REG_DESTI_DATA timestamp without time zone;

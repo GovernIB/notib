@@ -13,7 +13,6 @@ import javax.management.InstanceNotFoundException;
 import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
 
-import org.jboss.mx.util.MBeanProxyCreationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,11 +21,11 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.representation.Form;
 
-import es.caib.loginModule.client.AuthenticationFailureException;
 import es.caib.notib.ws.notificacio.DadesConsulta;
 import es.caib.notib.ws.notificacio.NotificacioServiceV2;
 import es.caib.notib.ws.notificacio.NotificacioV2;
@@ -49,8 +48,9 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 	private String username;
 	private String password;
 
-	private boolean serveiDesplegatDamuntJbossCaib = false;
+	private boolean autenticacioBasic = false;
 
+	public NotificacioRestClient() {}
 	public NotificacioRestClient(
 			String baseUrl,
 			String username,
@@ -59,6 +59,18 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 		this.baseUrl = baseUrl;
 		this.username = username;
 		this.password = password;
+	}
+	
+	public NotificacioRestClient(
+			String baseUrl,
+			String username,
+			String password,
+			boolean autenticacioBasic) {
+		super();
+		this.baseUrl = baseUrl;
+		this.username = username;
+		this.password = password;
+		this.autenticacioBasic = autenticacioBasic;
 	}
 
 	@Override
@@ -83,6 +95,16 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 					post(String.class, body);
 			logger.debug("Missatge REST rebut: " + json);
 			return mapper.readValue(json, RespostaAlta.class);
+		} catch (UniformInterfaceException ue) {
+			RespostaAlta respostaAlta = new RespostaAlta();
+			ClientResponse response = ue.getResponse();
+			
+			if (response != null && response.getStatus() == 401) {
+				respostaAlta.setError(true);
+				respostaAlta.setErrorDescripcio("[CLIENT] Hi ha hagut un problema d'autenticació: "  + ue.getMessage());
+				return respostaAlta;
+			}
+			throw new RuntimeException(ue);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -138,14 +160,9 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 		}
 	}
 
-	public boolean isServeiDesplegatDamuntJboss() {
-		return serveiDesplegatDamuntJbossCaib;
+	public boolean isAutenticacioBasic() {
+		return autenticacioBasic;
 	}
-	public void setServeiDesplegatDamuntJboss(boolean serveiDesplegatDamuntJboss) {
-		this.serveiDesplegatDamuntJbossCaib = serveiDesplegatDamuntJboss;
-	}
-
-
 
 	private Client generarClient() {
 		Client jerseyClient = Client.create();
@@ -176,8 +193,8 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 			Client jerseyClient,
 			String urlAmbMetode,
 			String username,
-			String password) throws InstanceNotFoundException, MalformedObjectNameException, MBeanProxyCreationException, RemoteException, NamingException, CreateException, AuthenticationFailureException {
-		if (serveiDesplegatDamuntJbossCaib) {
+			String password) throws InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
+		if (!autenticacioBasic) {
 			logger.debug(
 					"Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (" +
 					"urlAmbMetode=" + urlAmbMetode + ", " +

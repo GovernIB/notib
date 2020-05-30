@@ -78,7 +78,7 @@ public class NotificacioCommandV2 {
 	private String docFisica;
 	private IdiomaEnumDto idioma;
 	private String tipusAssumpte;
-	@Size(max=256)
+	@Size(max=80)
 	private String numExpedient;
 	private String refExterna;
 	private String codiAssumpte;

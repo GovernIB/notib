@@ -21,6 +21,18 @@ public class NotificacioRestClientFactory {
 				password);
 	}
 	
+	public static NotificacioRestClient getRestClient(
+			String baseUrl,
+			String username,
+			String password,
+			boolean serveiDesplegatDamuntJbossCaib) {
+		return new NotificacioRestClient(
+				baseUrl,
+				username,
+				password,
+				serveiDesplegatDamuntJbossCaib);
+	}
+	
 	public static NotificacioRestClient getRestClientV2(
 			String baseUrl,
 			String username,

@@ -91,14 +91,26 @@ public class RegistreHelper {
 					enviament.updateNotificaError(true, event);
 					notificacioEventRepository.save(event);
 					if (enviament.getSirConsultaIntent() >= pluginHelper.getConsultaSirReintentsMaxProperty()) {
+						NotificacioEventEntity eventReintents = NotificacioEventEntity.getBuilder(
+								NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR,
+								notificacio).
+								enviament(enviament).
+								error(true).
+								errorDescripcio("S'han esgotat els reintents de consulta de canvi d'estat a SIR").
+								callbackInicialitza().
+								build();
+						notificacio.updateEventAfegir(eventReintents);
+						notificacioEventRepository.save(eventReintents);
 						notificacio.updateNotificaError(
 								NotificacioErrorTipusEnumDto.ERROR_REINTENTS_SIR,
-								event);
+								eventReintents);
 					}
 				} else {
 					enviamentUpdateDatat(
 							resposta.getEstat(),
 							resposta.getRegistreData(), 
+							resposta.getSirRecepecioData(),
+							resposta.getSirRegistreDestiData(),
 							resposta.getRegistreNumeroFormatat(), 
 							enviament);
 					
@@ -177,6 +189,8 @@ public class RegistreHelper {
 	public void enviamentUpdateDatat(
 			NotificacioRegistreEstatEnumDto registreEstat,
 			Date registreEstatData,
+			Date sirRecepcioData,
+			Date sirRegistreDestiData,
 			String registreNumeroFormatat,
 			NotificacioEnviamentEntity enviament) {
 		logger.debug("Actualitzant estat comunicació SIR...");
@@ -188,6 +202,8 @@ public class RegistreHelper {
 		enviament.updateRegistreEstat(
 				registreEstat,
 				registreEstatData,
+				sirRecepcioData,
+				sirRegistreDestiData,
 				registreNumeroFormatat,
 				estatFinal);
 		

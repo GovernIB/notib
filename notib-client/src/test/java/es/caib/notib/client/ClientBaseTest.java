@@ -81,6 +81,8 @@ public class ClientBaseTest {
 			titular.setTelefon("666010101");
 			titular.setEmail("sandreu@limit.es");
 			titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+			if (titular.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO))
+				titular.setDir3Codi(ENTITAT_DIR3CODI);
 			enviament.setTitular(titular);
 			Persona destinatari = new Persona();
 			destinatari.setNom("melcior");
@@ -90,6 +92,8 @@ public class ClientBaseTest {
 			destinatari.setTelefon("666020202");
 			destinatari.setEmail("sandreu@limit.es");
 			destinatari.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+			if (destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO))
+				destinatari.setDir3Codi(ENTITAT_DIR3CODI);
 			enviament.getDestinataris().add(destinatari);
 			if (ambEnviamentPostal) {
 				EntregaPostal entregaPostal = new EntregaPostal();

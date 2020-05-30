@@ -324,6 +324,14 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "sir_con_intent")
 	protected int sirConsultaIntent;
 	
+	@Column(name = "sir_rec_data")
+	@Temporal(TemporalType.TIMESTAMP)
+	protected Date sirRecepcioData;
+	
+	@Column(name = "sir_reg_desti_data")
+	@Temporal(TemporalType.TIMESTAMP)
+	protected Date sirRegDestiData;
+	
 	@Transient
 	private String csvUuid;
 
@@ -364,10 +372,14 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public void updateRegistreEstat(
 			NotificacioRegistreEstatEnumDto registreEstat,
 			Date registreEstatData,
+			Date sirConsultaData,
+			Date sirRegDestiData,
 			String registreNumeroFormatat,
 			boolean registreEstatFinal) {
 		this.registreEstat = registreEstat;
 		this.registreData = registreEstatData;
+		this.sirRecepcioData = sirConsultaData;
+		this.sirRegDestiData = sirRegDestiData;
 		this.registreNumeroFormatat = registreNumeroFormatat;
 		this.registreEstatFinal = registreEstatFinal;
 		

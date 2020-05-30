@@ -361,7 +361,14 @@ $(document).ready(function() {
 												${status.index + 1}
 											</td>
 											<td>
-											${enviament.titular.nom}
+											<c:choose>
+												<c:when test="${not empty enviament.titular.nom}">
+												enviament.titular.nom
+												</c:when>
+												<c:otherwise>
+												enviament.titular.raoSocial
+												</c:otherwise>
+											</c:choose>
 											${enviament.titular.llinatge1}
 											${enviament.titular.llinatge2}
 											</td>
@@ -401,6 +408,18 @@ $(document).ready(function() {
 																<tr>
 																	<td><strong><spring:message code="enviament.info.seu.registre.estat"/></strong></td>
 																	<td>${enviament.registreEstat}</td>
+																</tr>
+															</c:if>
+															<c:if test="${not empty enviament.sirRecepcioData}">
+																<tr>
+																	<td><strong><spring:message code="enviament.info.seu.registre.data.sir.recepcio"/></strong></td>
+																	<td><fmt:formatDate value="${enviament.sirRecepcioData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+																</tr>
+															</c:if>
+															<c:if test="${not empty enviament.sirRegDestiData}">
+																<tr>
+																	<td><strong><spring:message code="enviament.info.seu.registre.data.sir.desti"/></strong></td>
+																	<td><fmt:formatDate value="${enviament.sirRegDestiData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 																</tr>
 															</c:if>
 															<c:if test="${enviament.registreEstat == 'DISTRIBUIT' || enviament.registreEstat == 'OFICI_EXTERN'  || enviament.registreEstat == 'OFICI_SIR' }">
