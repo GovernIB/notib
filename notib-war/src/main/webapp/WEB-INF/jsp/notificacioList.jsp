@@ -224,7 +224,13 @@ $(document).ready(function() {
 					'</thead><tbody></tbody></table>');
 	    	contingutTbody = '';
 			for (i = 0; i < data.length; i++) {
-				var llinatge1 = '', llinatge2 = '', destinataris = '', nif = '';
+				var nomTitular = '', llinatge1 = '', llinatge2 = '', destinataris = '', nif = '';
+				
+				if (data[i].titular.nom != null) {
+					nomTitular = data[i].titular.nom;
+				} else if (data[i].titular.raoSocial != null){
+					nomTitular = data[i].titular.raoSocial;
+				}
 				if (data[i].titular.llinatge1 != null) {
 					llinatge1 = data[i].titular.llinatge1;
 				}
@@ -233,7 +239,12 @@ $(document).ready(function() {
 				}
 				
 				$.each(data[i].destinataris, function (index, destinatari) {
-					var llinatge1Dest = '', llinatge2Dest = '';
+					var nomDest = '', llinatge1Dest = '', llinatge2Dest = '';
+					if (destinatari.nom != null) {
+						nomDest = destinatari.nom;
+					} else if (destinatari.raoSocial != null){
+						nomDest = destinatari.raoSocial;
+					}
 					if (destinatari.llinatge1 != null) {
 						llinatge1Dest = destinatari.llinatge1;
 					}
@@ -245,7 +256,7 @@ $(document).ready(function() {
 					} else {
 						nif = destinatari.dir3Codi;
 					}
-					destinataris += destinatari.nom + ' ' + llinatge1Dest + ' ' + llinatge2Dest + ' (' + nif + '), ';
+					destinataris += nomDest + ' ' + llinatge1Dest + ' ' + llinatge2Dest + ' (' + nif + '), ';
 				});
 				if (data[i].titular.nif != null) {
 					nif = data[i].titular.nif;
@@ -253,7 +264,7 @@ $(document).ready(function() {
 					nif = data[i].titular.dir3Codi;
 				}
 				contingutTbody += '<tr>';
-				contingutTbody += '<td>' + data[i].titular.nom + ' ' + llinatge1 + ' ' + llinatge2 + '('+ nif +') </td>';
+				contingutTbody += '<td>' + nomTitular + ' ' + llinatge1 + ' ' + llinatge2 + '('+ nif +') </td>';
 				if (destinataris != ''){
 					//Remove last white space
 					destinataris = destinataris.substr(0, destinataris.length-1);

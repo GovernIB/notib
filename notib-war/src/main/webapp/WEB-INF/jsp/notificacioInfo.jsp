@@ -358,7 +358,14 @@ $(document).ready(function() {
 												${status.index + 1}
 											</td>
 											<td>
-											${enviament.titular.nom}
+											<c:choose>
+												<c:when test="${not empty enviament.titular.nom}">
+												enviament.titular.nom
+												</c:when>
+												<c:otherwise>
+												enviament.titular.raoSocial
+												</c:otherwise>
+											</c:choose>
 											${enviament.titular.llinatge1}
 											${enviament.titular.llinatge2}
 											</td>

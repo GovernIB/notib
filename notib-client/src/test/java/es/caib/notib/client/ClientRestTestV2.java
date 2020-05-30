@@ -32,11 +32,11 @@ public class ClientRestTestV2 extends ClientBaseTest {
 	public ExpectedException expectedException = ExpectedException.none();
 	*/
 
-	private NotificacioRestClient clientV2;
+	private NotificacioRestClient client;
 
 	@Before
 	public void setUp() throws IOException, DecoderException {
-		clientV2 = NotificacioRestClientFactory.getRestClientV2(
+		client = NotificacioRestClientFactory.getRestClient(
 				URL,
 				USERNAME,
 				PASSWORD);
@@ -67,7 +67,7 @@ public class ClientRestTestV2 extends ClientBaseTest {
 //				NotificacioEstatEnum.ENVIADA,
 //				respostaAlta.getEstat());
 		
-		clientV2.consultaEstatNotificacio("dsad");
+		client.consultaEstatNotificacio("dsad");
 		// asserts
 		
 //		for (EnviamentReferencia referencia: respostaAlta.getReferencies()) {

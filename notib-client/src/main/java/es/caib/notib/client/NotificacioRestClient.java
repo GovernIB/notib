@@ -22,6 +22,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.representation.Form;
@@ -49,7 +50,7 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 	private String username;
 	private String password;
 
-	private boolean serveiDesplegatDamuntJbossCaib = false;
+	private boolean serveiDesplegatDamuntJbossCaib = true;
 
 	public NotificacioRestClient(
 			String baseUrl,
@@ -59,6 +60,18 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 		this.baseUrl = baseUrl;
 		this.username = username;
 		this.password = password;
+	}
+	
+	public NotificacioRestClient(
+			String baseUrl,
+			String username,
+			String password,
+			boolean serveiDesplegatDamuntJbossCaib) {
+		super();
+		this.baseUrl = baseUrl;
+		this.username = username;
+		this.password = password;
+		this.serveiDesplegatDamuntJbossCaib = serveiDesplegatDamuntJbossCaib;
 	}
 
 	@Override
@@ -83,6 +96,16 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 					post(String.class, body);
 			logger.debug("Missatge REST rebut: " + json);
 			return mapper.readValue(json, RespostaAlta.class);
+		} catch (UniformInterfaceException ue) {
+			RespostaAlta respostaAlta = new RespostaAlta();
+			ClientResponse response = ue.getResponse();
+			
+			if (response != null && response.getStatus() == 401) {
+				respostaAlta.setError(true);
+				respostaAlta.setErrorDescripcio("[CLIENT] Hi ha hagut un problema d'autenticació: "  + ue.getMessage());
+				return respostaAlta;
+			}
+			throw new RuntimeException(ue);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}

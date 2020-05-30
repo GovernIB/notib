@@ -49,7 +49,8 @@ public class ClientRestTest extends ClientBaseTest {
 		client = NotificacioRestClientFactory.getRestClient(
 				URL,
 				USERNAME,
-				PASSWORD);
+				PASSWORD,
+				false);
 		// client.setServeiDesplegatDamuntJboss(false);
 	}
 
