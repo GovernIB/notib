@@ -164,10 +164,6 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 		return autenticacioBasic;
 	}
 
-	public void setAutenticacioBasic(boolean autenticacioBasic) {
-		this.autenticacioBasic = autenticacioBasic;
-	}
-
 	private Client generarClient() {
 		Client jerseyClient = Client.create();
 		//jerseyClient.addFilter(new LoggingFilter(System.out));
