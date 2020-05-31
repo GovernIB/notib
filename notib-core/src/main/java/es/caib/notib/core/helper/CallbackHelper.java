@@ -109,7 +109,11 @@ public class CallbackHelper {
 			CallbackEstatEnumDto estatNou = maxIntents == null || intents < maxIntents ? 
 												CallbackEstatEnumDto.PENDENT
 												: CallbackEstatEnumDto.ERROR;
-			event.setNotificacio(event.getEnviament().getNotificacio());
+
+			// TODO: solució temporal.
+			//event.setNotificacio(event.getEnviament().getNotificacio());   <===  Revisar perquè falla quan recupera la notificació d'un event.
+			NotificacioEntity notificacio = notificacioRepository.findById(event.getNotificacioId());
+			event.setNotificacio(notificacio);
 			event.updateCallbackClient(
 					estatNou,
 					ara,
