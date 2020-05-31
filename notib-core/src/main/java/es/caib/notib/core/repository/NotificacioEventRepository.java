@@ -24,6 +24,9 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 	List<NotificacioEventEntity> findByNotificacioIdOrEnviamentIdOrderByDataAsc(
 			Long notificacioId,
 			Long enviamentId);
+	
+	List<NotificacioEventEntity> findByEnviamentIdOrderByIdAsc(
+			Long enviamentId);
 
 	/** Recupera la llista de notificacions pendents */
 	@Query("select ne.id " + 

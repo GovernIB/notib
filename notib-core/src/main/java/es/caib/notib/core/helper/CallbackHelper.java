@@ -164,19 +164,10 @@ public class CallbackHelper {
 		if (aplicacio.getCallbackUrl() == null)
 			throw new Exception("La aplicació " + aplicacio.getUsuariCodi() + " no té cap url de callback configurada");
 				
-//		// Omple l'objecte amb la informació cap a l'aplicació client
-//		NotificacioEstatClient notificacioEstat = new NotificacioEstatClient(
-//					calcularEstat(enviament),
-//					enviament.getNotificaEstatData(),
-//					enviament.getDestinatariNom(),
-//					enviament.getDestinatariNif(),
-//					enviament.getNotificaDatatOrigen(),
-//					enviament.getNotificaDatatNumSeguiment(),
-//					enviament.getNotificaReferencia() 
-//				);
 		NotificacioCanviClient notificacioCanvi = new NotificacioCanviClient(
 				notificaHelper.xifrarId(enviament.getNotificacio().getId()), 
-				enviament.getNotificaReferencia());
+				notificaHelper.xifrarId(enviament.getId()));
+//				enviament.getNotificaReferencia());
 
 		// Passa l'objecte a JSON
 		ObjectMapper mapper  = new ObjectMapper();

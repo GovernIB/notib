@@ -146,8 +146,9 @@ public class NotificacioServiceController extends BaseController {
 					value = "Referència de la notificació a consultar",
 					required = true)
 			@PathVariable("referencia")
-			String referencia) {
+			String referencia) throws UnsupportedEncodingException {
 		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
+		referencia = URLDecoder.decode(referencia, StandardCharsets.UTF_8.toString());
 		try {
 			return notificacioServiceWsV2.consultaEstatEnviament(referencia);
 		} catch (Exception e) {

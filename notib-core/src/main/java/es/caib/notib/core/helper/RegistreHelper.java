@@ -91,14 +91,17 @@ public class RegistreHelper {
 					enviament.updateNotificaError(true, event);
 					notificacioEventRepository.save(event);
 					if (enviament.getSirConsultaIntent() >= pluginHelper.getConsultaSirReintentsMaxProperty()) {
-						NotificacioEventEntity eventReintents = NotificacioEventEntity.getBuilder(
+						NotificacioEventEntity.Builder eventReintentsBuilder  = NotificacioEventEntity.getBuilder(
 								NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR,
 								notificacio).
 								enviament(enviament).
 								error(true).
-								errorDescripcio("S'han esgotat els reintents de consulta de canvi d'estat a SIR").
-								callbackInicialitza().
-								build();
+								errorDescripcio("S'han esgotat els reintents de consulta de canvi d'estat a SIR");
+						if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+							eventReintentsBuilder.callbackInicialitza();
+							
+						NotificacioEventEntity eventReintents = eventReintentsBuilder.build();
+						
 						notificacio.updateEventAfegir(eventReintents);
 						notificacioEventRepository.save(eventReintents);
 						notificacio.updateNotificaError(
@@ -168,14 +171,18 @@ public class RegistreHelper {
 					true,
 					event);
 			if (enviament.getSirConsultaIntent() >= pluginHelper.getConsultaSirReintentsMaxProperty()) {
-				NotificacioEventEntity eventReintents = NotificacioEventEntity.getBuilder(
+				NotificacioEventEntity.Builder eventReintentsBuilder  = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR,
 						notificacio).
 						enviament(enviament).
 						error(true).
-						errorDescripcio("S'han esgotat els reintents de consulta de canvi d'estat a SIR").
-						callbackInicialitza().
-						build();
+						errorDescripcio("S'han esgotat els reintents de consulta de canvi d'estat a SIR");
+				
+				if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+					eventReintentsBuilder.callbackInicialitza();
+					
+				NotificacioEventEntity eventReintents = eventReintentsBuilder.build();
+				
 				notificacio.updateEventAfegir(eventReintents);
 				notificacioEventRepository.save(eventReintents);
 				notificacio.updateNotificaError(

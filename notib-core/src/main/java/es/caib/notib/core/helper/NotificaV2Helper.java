@@ -40,8 +40,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.core.api.dto.NotificaRespostaDatatDto.NotificaRespostaDatatEventDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaRespostaDatatDto.NotificaRespostaDatatEventDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
@@ -177,12 +177,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			} else {
 				errorDescripcio = ExceptionUtils.getStackTrace(ex);
 			}
-			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+			NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
 					NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
 					notificacio).
 					error(true).
-					errorDescripcio(errorDescripcio).
-					build();
+					errorDescripcio(errorDescripcio);
+			if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+				eventBulider.callbackInicialitza();
+			NotificacioEventEntity event = eventBulider.build();
+			
 			notificacio.updateEventAfegir(event);
 			notificacioEventRepository.save(event);
 			notificacio.updateNotificaError(
@@ -371,11 +374,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					}
 					logger.info("Enviament actualitzat");
 				}
-//				if (eventDatat != null) {
-//					eventDatat.callbackInicialitza();
-//				} else if (eventCert != null) {
-//					eventCert.callbackInicialitza();
-//				}
 				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
 						notificacio).
@@ -408,14 +406,17 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					event);
 			logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 			if (enviament.getNotificaIntentNum() >= pluginHelper.getConsultaReintentsMaxProperty()) {
-				NotificacioEventEntity eventReintents = NotificacioEventEntity.getBuilder(
+				NotificacioEventEntity.Builder eventReintentsBuilder  = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR,
 						notificacio).
 						enviament(enviament).
 						error(true).
-						errorDescripcio("S'han esgotat els reintents de consulta de canvi d'estat a Notific@").
-						callbackInicialitza().
-						build();
+						errorDescripcio("S'han esgotat els reintents de consulta de canvi d'estat a Notific@");
+				if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+					eventReintentsBuilder.callbackInicialitza();
+					
+				NotificacioEventEntity eventReintents = eventReintentsBuilder.build();
+				
 				notificacio.updateEventAfegir(eventReintents);
 				notificacioEventRepository.save(eventReintents);
 				notificacio.updateNotificaError(

@@ -6,6 +6,9 @@ package es.caib.notib.core.helper;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.ws.soap.SOAPFaultException;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,9 +104,8 @@ public class RegistreNotificaHelper {
 										totsAdministracio);
 							}
 						} catch (Exception ex) {
-							logger.error(
-									ex.getMessage(),
-									ex);
+							logger.error(ex.getMessage(), ex);
+							updateEventWithError(ex, notificacioEntity, enviament, null);
 						}
 					}
 				} else {
@@ -140,9 +142,8 @@ public class RegistreNotificaHelper {
 									false);
 						}
 					} catch (Exception ex) {
-						logger.error(
-								ex.getMessage(),
-								ex);
+						logger.error(ex.getMessage(), ex);
+						updateEventWithError(ex, notificacioEntity, null, notificacioEntity.getEnviaments());
 					}
 				}
 			} else {
@@ -179,9 +180,8 @@ public class RegistreNotificaHelper {
 								false);
 					}
 				} catch (Exception ex) {
-					logger.error(
-							ex.getMessage(),
-							ex);
+					logger.error(ex.getMessage(), ex);
+					updateEventWithError(ex, notificacioEntity, null, notificacioEntity.getEnviaments());
 				}
 			}
 		} else {
@@ -218,9 +218,8 @@ public class RegistreNotificaHelper {
 							false);
 				}
 			} catch (Exception ex) {
-				logger.error(
-						ex.getMessage(),
-						ex);
+				logger.error(ex.getMessage(), ex);
+				updateEventWithError(ex, notificacioEntity, null, notificacioEntity.getEnviaments());
 			}
 			logger.info(" [REG-NOT] Fi procés Registrar-Notificar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
 		}
@@ -232,11 +231,34 @@ public class RegistreNotificaHelper {
 			NotificacioEntity notificacioEntity,
 			NotificacioEnviamentEntity enviament,
 			Set<NotificacioEnviamentEntity> enviaments) {
+		updateEventWithError(arbResposta, registreIdDto, null, notificacioEntity, enviament, enviaments);
+	}
+	
+	private void updateEventWithError(
+			Throwable error,
+			NotificacioEntity notificacioEntity,
+			NotificacioEnviamentEntity enviament,
+			Set<NotificacioEnviamentEntity> enviaments) {
 		String errorDescripcio;
+		if (error instanceof SOAPFaultException) {
+			errorDescripcio = error.getMessage();
+		} else {
+			errorDescripcio = ExceptionUtils.getStackTrace(error);
+		}
+		updateEventWithError(null, null, errorDescripcio, notificacioEntity, enviament, enviaments);
+	}
+	
+	private void updateEventWithError(
+			RespostaConsultaRegistre arbResposta,
+			RegistreIdDto registreIdDto,
+			String errorDescripcio,
+			NotificacioEntity notificacioEntity,
+			NotificacioEnviamentEntity enviament,
+			Set<NotificacioEnviamentEntity> enviaments) {
 		
 		if (arbResposta != null) {
 			errorDescripcio = arbResposta.getErrorDescripcio();
-		} else {
+		} else if (registreIdDto != null) {
 			errorDescripcio = registreIdDto.getDescripcioError();
 		}
 		

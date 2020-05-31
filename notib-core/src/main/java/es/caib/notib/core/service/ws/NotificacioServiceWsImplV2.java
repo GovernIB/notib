@@ -479,7 +479,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
 			String identificador) {
 		Long notificacioId;
@@ -522,10 +522,25 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			}
 			if (notificacio.getNotificaErrorEvent() != null) {
 				resposta.setError(true);
-				resposta.setErrorData(
-						notificacio.getNotificaErrorEvent().getData());
-				resposta.setErrorDescripcio(
-						notificacio.getNotificaErrorEvent().getErrorDescripcio());
+				NotificacioEventEntity errorEvent = notificacio.getNotificaErrorEvent();
+				resposta.setErrorData(errorEvent.getData());
+				resposta.setErrorDescripcio(errorEvent.getErrorDescripcio());
+//				// Si l'error és de reintents de consulta o SIR, hem d'obtenir el missatge d'error de l'event que ha provocat la fallada
+//				if (errorEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR) ||
+//						errorEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR)) {
+//					List<NotificacioEventEntity> events = new ArrayList<NotificacioEventEntity>(notificacio.getEvents());
+//					Collections.sort(events, new Comparator<NotificacioEventEntity>() {
+//						@Override
+//						public int compare(NotificacioEventEntity o1, NotificacioEventEntity o2) {
+//							return o1.getId().compareTo(o2.getId());
+//						}
+//					});
+//					int index = events.indexOf(errorEvent);
+//					if (index > 0) {
+//						NotificacioEventEntity eventErrada = events.get(index - 1);
+//						resposta.setErrorDescripcio(StringUtils.abbreviate(resposta.getErrorDescripcio() + " - " + eventErrada.getErrorDescripcio(), 2048));
+//					}
+//				}
 			}
 		} catch (Exception ex) {
 			throw new RuntimeException(
@@ -536,10 +551,18 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(
 			String referencia) throws NotificacioServiceWsException {
-		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findByNotificaReferencia(referencia);
+		
+		NotificacioEnviamentEntity enviament = null;
+		try {
+			Long enviamentId = notificaHelper.desxifrarId(referencia);
+			enviament = notificacioEnviamentRepository.findById(enviamentId);
+		} catch (Exception e) {}
+		if (enviament == null)
+			enviament = notificacioEnviamentRepository.findByNotificaReferencia(referencia);
+		
 		RespostaConsultaEstatEnviament resposta = new RespostaConsultaEstatEnviament();
 		logger.debug("Consultant estat enviament amb referencia: " + referencia);
 		try {
@@ -587,7 +610,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					logger.debug("Certificació de l'enviament amb referencia: " + referencia + " s'ha guardat correctament.");
 				}
 				logger.debug("Notifica error de l'enviament amb referencia: " + referencia + ": " + enviament.isNotificaError());
-				if (enviament.isNotificaError()) {
+				
+				if (enviament.getNotificacioErrorEvent() != null) {
 					resposta.setError(true);
 					NotificacioEventEntity errorEvent = enviament.getNotificacioErrorEvent();
 					resposta.setErrorData(errorEvent.getData());
