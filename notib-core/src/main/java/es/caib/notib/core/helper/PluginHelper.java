@@ -1305,6 +1305,7 @@ public class PluginHelper {
 		Interessat dadesRepresentat = null;
 		Interessat dadesInteressat = new Interessat();
 		if (titular != null && notificacio != null) {
+			dadesInteressat.setNom(titular.getNom());
 			dadesInteressat.setEntitatCodi(dir3Codi);
 			dadesInteressat.setAutenticat(false);
 			if (titular.getInteressatTipus() != null) {
@@ -1314,6 +1315,7 @@ public class PluginHelper {
 				dadesInteressat.setNif(titular.getDir3Codi());
 				dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
 			} else if (titular.getInteressatTipus() != null && titular.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA){
+				dadesInteressat.setNom(titular.getRaoSocial());
 				dadesInteressat.setNif(titular.getNif());
 				dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CIF);
 			} else {
@@ -1323,7 +1325,6 @@ public class PluginHelper {
 				else
 					dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
 			}
-			dadesInteressat.setNom(titular.getNom());
 			dadesInteressat.setCognom1(titular.getLlinatge1());
 			dadesInteressat.setCognom2(titular.getLlinatge2());
 			dadesInteressat.setNomAmbCognoms(titular.getNom() + " " + titular.getLlinatges());
