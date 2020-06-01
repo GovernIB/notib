@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaRespostaDatatDto.NotificaRespostaDatatEventDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
@@ -625,7 +626,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 									enviament.getDestinataris().get(0).getLlinatge2()));
 					titular.setTelefono(enviament.getDestinataris().get(0).getTelefon());
 					titular.setEmail(enviament.getDestinataris().get(0).getEmail());
-					if (enviament.getDestinataris().get(0).getRaoSocial() != null && !enviament.getDestinataris().get(0).getRaoSocial().isEmpty())
+					if (enviament.getDestinataris().get(0).getInteressatTipus().equals(InteressatTipusEnumDto.JURIDICA))
 						titular.setRazonSocial(enviament.getDestinataris().get(0).getRaoSocial());
 					else
 						titular.setNombre(enviament.getDestinataris().get(0).getNom());
@@ -640,7 +641,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 									enviament.getTitular().getLlinatge2()));
 					titular.setTelefono(enviament.getTitular().getTelefon());
 					titular.setEmail(enviament.getTitular().getEmail());
-					if (enviament.getTitular().getRaoSocial() != null && !enviament.getTitular().getRaoSocial().isEmpty())
+					if (enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.JURIDICA))
 						titular.setRazonSocial(enviament.getTitular().getRaoSocial());
 					else
 						titular.setNombre(enviament.getTitular().getNom());
@@ -660,7 +661,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 											destinatari.getLlinatge2()));
 							destinatario.setTelefono(destinatari.getTelefon());
 							destinatario.setEmail(destinatari.getEmail());
-							if (destinatari.getRaoSocial() != null && !destinatari.getRaoSocial().isEmpty())
+							if (destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.JURIDICA))
 								destinatario.setRazonSocial(destinatari.getRaoSocial());
 							else
 								destinatario.setNombre(destinatari.getNom());
