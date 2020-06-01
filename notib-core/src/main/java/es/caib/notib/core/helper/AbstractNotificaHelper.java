@@ -4,6 +4,7 @@
 package es.caib.notib.core.helper;
 
 import java.security.GeneralSecurityException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
@@ -313,7 +314,9 @@ public abstract class AbstractNotificaHelper {
 		if (date == null) {
 			return null;
 		}
+		SimpleDateFormat sdfCaducitat = new SimpleDateFormat("yyyy-MM-dd");
 		GregorianCalendar gc = new GregorianCalendar();
+		sdfCaducitat.setCalendar(gc);
 		gc.setTime(date);
 		return DatatypeFactory.newInstance().newXMLGregorianCalendar(gc);
 	}
