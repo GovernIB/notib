@@ -320,7 +320,7 @@ public abstract class AbstractNotificaHelper {
 		GregorianCalendar gc = new GregorianCalendar();
 		sdfCaducitat.setCalendar(gc);
 		gc.setTime(date);
-		return DatatypeFactory.newInstance().newXMLGregorianCalendarDate(gc.get(Calendar.YEAR),Calendar.MONTH,Calendar.DAY_OF_MONTH,DatatypeConstants.FIELD_UNDEFINED);
+		return DatatypeFactory.newInstance().newXMLGregorianCalendarDate(gc.get(Calendar.YEAR),gc.get(Calendar.MONTH) + 1,gc.get(Calendar.DAY_OF_MONTH),DatatypeConstants.FIELD_UNDEFINED);
 	}
 	protected Date toDate(XMLGregorianCalendar calendar) throws DatatypeConfigurationException {
 		if (calendar == null) {
