@@ -619,26 +619,32 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				Persona titular = new Persona();
 				if (enviament.getTitular().isIncapacitat() && enviament.getDestinataris() != null) {
 					titular.setNif(enviament.getDestinataris().get(0).getNif());
-					titular.setNombre(enviament.getDestinataris().get(0).getNom());
 					titular.setApellidos(
 							concatenarLlinatges(
 									enviament.getDestinataris().get(0).getLlinatge1(),
 									enviament.getDestinataris().get(0).getLlinatge2()));
 					titular.setTelefono(enviament.getDestinataris().get(0).getTelefon());
 					titular.setEmail(enviament.getDestinataris().get(0).getEmail());
-					titular.setRazonSocial(enviament.getDestinataris().get(0).getRaoSocial());
+					if (enviament.getDestinataris().get(0).getRaoSocial() != null && !enviament.getDestinataris().get(0).getRaoSocial().isEmpty())
+						titular.setRazonSocial(enviament.getDestinataris().get(0).getRaoSocial());
+					else
+						titular.setNombre(enviament.getDestinataris().get(0).getNom());
+					
 					titular.setCodigoDestino(enviament.getDestinataris().get(0).getDir3Codi());
 					enviament.getDestinataris().remove(0);
 				} else {
 					titular.setNif(enviament.getTitular().getNif());
-					titular.setNombre(enviament.getTitular().getNom());
 					titular.setApellidos(
 							concatenarLlinatges(
 									enviament.getTitular().getLlinatge1(),
 									enviament.getTitular().getLlinatge2()));
 					titular.setTelefono(enviament.getTitular().getTelefon());
 					titular.setEmail(enviament.getTitular().getEmail());
-					titular.setRazonSocial(enviament.getTitular().getRaoSocial());
+					if (enviament.getTitular().getRaoSocial() != null && !enviament.getTitular().getRaoSocial().isEmpty())
+						titular.setRazonSocial(enviament.getTitular().getRaoSocial());
+					else
+						titular.setNombre(enviament.getTitular().getNom());
+					
 					titular.setCodigoDestino(enviament.getTitular().getDir3Codi());
 				}
 				
@@ -648,14 +654,16 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						if (destinatari.getNif() != null) {
 							Persona destinatario = new Persona();
 							destinatario.setNif(destinatari.getNif());
-							destinatario.setNombre(destinatari.getNom());
 							destinatario.setApellidos(
 									concatenarLlinatges(
 											destinatari.getLlinatge1(),
 											destinatari.getLlinatge2()));
 							destinatario.setTelefono(destinatari.getTelefon());
 							destinatario.setEmail(destinatari.getEmail());
-							destinatario.setRazonSocial(destinatari.getRaoSocial());
+							if (destinatari.getRaoSocial() != null && !destinatari.getRaoSocial().isEmpty())
+								destinatario.setRazonSocial(destinatari.getRaoSocial());
+							else
+								destinatario.setNombre(destinatari.getNom());
 							destinatario.setCodigoDestino(destinatari.getDir3Codi());
 							destinatarios.getDestinatario().add(destinatario);
 						}
