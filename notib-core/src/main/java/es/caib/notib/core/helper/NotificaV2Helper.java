@@ -148,24 +148,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			} else {
 				logger.info(" >>> ... ERROR");
 				//Crea un nou event
-				NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
-						notificacio).
-						error(true).
-						errorDescripcio("[" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta());
-				
-				if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-					eventBulider.callbackInicialitza();
-				NotificacioEventEntity event = eventBulider.build();
-				
-				notificacio.updateNotificaError(
+				String errorDescripcio = "[" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
+				updateEventWithEnviament(
+						notificacio, 
+						errorDescripcio, 
 						NotificacioErrorTipusEnumDto.ERROR_REMOT,
-						event);
-				notificacio.updateEventAfegir(event);
-				notificacioEventRepository.save(event);
-				for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
-					enviament.updateNotificaError(true, event);
-				}
+						true);
 			}
 		} catch (Exception ex) {
 			logger.error(
@@ -177,20 +165,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			} else {
 				errorDescripcio = ExceptionUtils.getStackTrace(ex);
 			}
-			NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
-					NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
-					notificacio).
-					error(true).
-					errorDescripcio(errorDescripcio);
-			if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-				eventBulider.callbackInicialitza();
-			NotificacioEventEntity event = eventBulider.build();
-			
-			notificacio.updateEventAfegir(event);
-			notificacioEventRepository.save(event);
-			notificacio.updateNotificaError(
+			updateEventWithEnviament(
+					notificacio, 
+					errorDescripcio, 
 					NotificacioErrorTipusEnumDto.ERROR_XARXA,
-					event);
+					false);
 		}
 		logger.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		return NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat());
@@ -640,26 +619,32 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				Persona titular = new Persona();
 				if (enviament.getTitular().isIncapacitat() && enviament.getDestinataris() != null) {
 					titular.setNif(enviament.getDestinataris().get(0).getNif());
-					titular.setNombre(enviament.getDestinataris().get(0).getNom());
 					titular.setApellidos(
 							concatenarLlinatges(
 									enviament.getDestinataris().get(0).getLlinatge1(),
 									enviament.getDestinataris().get(0).getLlinatge2()));
 					titular.setTelefono(enviament.getDestinataris().get(0).getTelefon());
 					titular.setEmail(enviament.getDestinataris().get(0).getEmail());
-					titular.setRazonSocial(enviament.getDestinataris().get(0).getRaoSocial());
+					if (enviament.getDestinataris().get(0).getRaoSocial() != null && !enviament.getDestinataris().get(0).getRaoSocial().isEmpty())
+						titular.setRazonSocial(enviament.getDestinataris().get(0).getRaoSocial());
+					else
+						titular.setNombre(enviament.getDestinataris().get(0).getNom());
+					
 					titular.setCodigoDestino(enviament.getDestinataris().get(0).getDir3Codi());
 					enviament.getDestinataris().remove(0);
 				} else {
 					titular.setNif(enviament.getTitular().getNif());
-					titular.setNombre(enviament.getTitular().getNom());
 					titular.setApellidos(
 							concatenarLlinatges(
 									enviament.getTitular().getLlinatge1(),
 									enviament.getTitular().getLlinatge2()));
 					titular.setTelefono(enviament.getTitular().getTelefon());
 					titular.setEmail(enviament.getTitular().getEmail());
-					titular.setRazonSocial(enviament.getTitular().getRaoSocial());
+					if (enviament.getTitular().getRaoSocial() != null && !enviament.getTitular().getRaoSocial().isEmpty())
+						titular.setRazonSocial(enviament.getTitular().getRaoSocial());
+					else
+						titular.setNombre(enviament.getTitular().getNom());
+					
 					titular.setCodigoDestino(enviament.getTitular().getDir3Codi());
 				}
 				
@@ -669,14 +654,16 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						if (destinatari.getNif() != null) {
 							Persona destinatario = new Persona();
 							destinatario.setNif(destinatari.getNif());
-							destinatario.setNombre(destinatari.getNom());
 							destinatario.setApellidos(
 									concatenarLlinatges(
 											destinatari.getLlinatge1(),
 											destinatari.getLlinatge2()));
 							destinatario.setTelefono(destinatari.getTelefon());
 							destinatario.setEmail(destinatari.getEmail());
-							destinatario.setRazonSocial(destinatari.getRaoSocial());
+							if (destinatari.getRaoSocial() != null && !destinatari.getRaoSocial().isEmpty())
+								destinatario.setRazonSocial(destinatari.getRaoSocial());
+							else
+								destinatario.setNombre(destinatari.getNom());
 							destinatario.setCodigoDestino(destinatari.getDir3Codi());
 							destinatarios.getDestinatario().add(destinatario);
 						}
@@ -773,7 +760,35 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 		return envios;
 	}
-
+	
+	private void updateEventWithEnviament(
+			NotificacioEntity notificacio,
+			String errorDescripcio,
+			NotificacioErrorTipusEnumDto notificacioErrorTipus,
+			boolean notificaError) {
+		NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
+				NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
+				notificacio).
+				error(true).
+				errorDescripcio(errorDescripcio);
+		if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+			eventBulider.callbackInicialitza();
+		NotificacioEventEntity event = eventBulider.build();
+		
+		for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+			eventBulider.enviament(enviament);
+			enviament.updateNotificaError(
+					notificaError, 
+					event);
+		}
+		
+		notificacio.updateNotificaError(
+				notificacioErrorTipus,
+				event);
+		notificacio.updateEventAfegir(event);
+		notificacioEventRepository.save(event);
+	}
+	
 	private NotificaWsV2PortType getNotificaWs(String apiKey) throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
 		NotificaWsV2PortType port = new WsClientHelper<NotificaWsV2PortType>().generarClientWs(
 				getClass().getResource("/es/caib/notib/core/wsdl/NotificaWsV21.wsdl"),

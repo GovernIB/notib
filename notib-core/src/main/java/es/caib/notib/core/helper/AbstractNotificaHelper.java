@@ -4,6 +4,8 @@
 package es.caib.notib.core.helper;
 
 import java.security.GeneralSecurityException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
@@ -12,6 +14,7 @@ import java.util.TreeSet;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
@@ -313,9 +316,11 @@ public abstract class AbstractNotificaHelper {
 		if (date == null) {
 			return null;
 		}
+		SimpleDateFormat sdfCaducitat = new SimpleDateFormat("yyyy-MM-dd");
 		GregorianCalendar gc = new GregorianCalendar();
+		sdfCaducitat.setCalendar(gc);
 		gc.setTime(date);
-		return DatatypeFactory.newInstance().newXMLGregorianCalendar(gc);
+		return DatatypeFactory.newInstance().newXMLGregorianCalendarDate(gc.get(Calendar.YEAR),gc.get(Calendar.MONTH) + 1,gc.get(Calendar.DAY_OF_MONTH),DatatypeConstants.FIELD_UNDEFINED);
 	}
 	protected Date toDate(XMLGregorianCalendar calendar) throws DatatypeConfigurationException {
 		if (calendar == null) {
