@@ -818,7 +818,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			if (isAmbEntregaDeh && enviament.isEntregaDehActiva() && enviament.getEntregaDeh() != null) {
 				built.dehNif = enviament.getTitular().getNif();
 				built.dehObligat = enviament.getEntregaDeh().isObligat();
-				built.dehProcedimentCodi = enviament.getEntregaDeh().getProcedimentCodi();
+				built.dehProcedimentCodi = notificacioGuardada.getProcedimentCodiNotib();
 			}
 			
 			built.titular = titular;
