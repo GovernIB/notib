@@ -17,7 +17,10 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 
 import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.ws.callback.NotificacioCanviClient;
 import es.caib.notib.core.entity.AplicacioEntity;
@@ -191,12 +194,33 @@ public class CallbackHelper {
 				post(ClientResponse.class, body);
 		
 		// Comprova que la resposta sigui 200 OK
-		if ( ClientResponse.Status.OK.getStatusCode() != response.getStatusInfo().getStatusCode())
+		if ( ClientResponse.Status.OK.getStatusCode() != response.getStatusInfo().getStatusCode()) {
 			throw new Exception("La resposta del client és: " + response.getStatusInfo().getStatusCode() + " - " + response.getStatusInfo().getReasonPhrase());
+		} else {
+			//Marcar com a processada si la notificació s'ha fet des de una aplicació
+			if (enviament.getNotificacio() != null && enviament.getNotificacio().getTipusUsuari() == TipusUsuariEnumDto.APLICACIO && isAllEnviamentsEstatFinal(enviament.getNotificacio())) {
+				logger.info("Marcant notificació com processada per ser usuari aplicació...");
+				enviament.getNotificacio().updateEstat(NotificacioEstatEnumDto.PROCESSADA);
+				enviament.getNotificacio().updateMotiu("Notificació processada de forma automàtica. Estat final: " + enviament.getNotificaEstat());
+				enviament.getNotificacio().updateEstatDate(new Date());
+			}
+		}
 
 		return response.getEntity(String.class);
 	}
 	
+	private boolean isAllEnviamentsEstatFinal(NotificacioEntity notificacio) {
+		boolean estatsEnviamentsFinals = true;
+		if (notificacio != null) {
+			for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+				if (!enviament.isNotificaEstatFinal()) {
+					estatsEnviamentsFinals = false;
+					break;
+				}
+			}
+		}
+		return estatsEnviamentsFinals;
+	}
 //	private String notificaEstat(NotificacioEnviamentEntity enviament) throws Exception {
 //		if (enviament == null)
 //			throw new Exception("El destinatari no pot ser nul.");
