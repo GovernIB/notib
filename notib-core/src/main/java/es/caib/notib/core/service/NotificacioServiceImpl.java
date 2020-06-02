@@ -718,45 +718,54 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public PaginaDto<NotificacioDto> findWithCallbackError(
 			PaginacioParamsDto paginacioParams) {
-		List<NotificacioEntity> notificacions = notificacioRepository.findByTipusUsuari(TipusUsuariEnumDto.APLICACIO);
+		
+//		List<NotificacioEntity> notificacions = notificacioRepository.findByTipusUsuari(TipusUsuariEnumDto.APLICACIO);
+//
+//		List<Long> docIds = new ArrayList<Long>();
+//		if(notificacions != null) {
+//			for (NotificacioEntity notificacio : notificacions) {
+//				
+//				if (notificacio.getId() != null) {
+//					logger.info("Consultant events notificació...");
+//					List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
+//					
+//					if (events != null && events.size() > 0) {
+//						NotificacioEventEntity lastEvent = events.get(events.size() - 1);
+//						
+//						if(lastEvent.isError() && 
+//									(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
+//									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
+//									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
+//									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
+//									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
+//							logger.info("El darrer event de la notificació " + notificacio.getId()  + " conté un error de tipus: " + lastEvent.getTipus().name());
+//							docIds.add(notificacio.getId());
+//						}
+//					}
+//				}
+//			}
+//		}
+//
+//		if (!docIds.isEmpty()) {
+//			return paginacioHelper.toPaginaDto(
+//					notificacioRepository.findNotificacioMassiuByIdsPaginat(
+//							docIds,
+//							paginacioHelper.toSpringDataPageable(paginacioParams)),
+//					NotificacioDto.class);
+//		}
 
-		List<Long> docIds = new ArrayList<Long>();
-		if(notificacions != null) {
-			for (NotificacioEntity notificacio : notificacions) {
-				
-				if (notificacio.getId() != null) {
-					logger.info("Consultant events notificació...");
-					List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
-					
-					if (events != null && events.size() > 0) {
-						NotificacioEventEntity lastEvent = events.get(events.size() - 1);
-						
-						if(lastEvent.isError() && 
-									(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
-									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
-									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
-									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
-									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
-							logger.info("El darrer event de la notificació " + notificacio.getId()  + " conté un error de tipus: " + lastEvent.getTipus().name());
-							docIds.add(notificacio.getId());
-						}
-					}
-				}
-			}
-		}
-		if (!docIds.isEmpty()) {
-			return paginacioHelper.toPaginaDto(
-					notificacioRepository.findNotificacioMassiuByIdsPaginat(
-							docIds,
-							paginacioHelper.toSpringDataPageable(paginacioParams)),
-					NotificacioDto.class);
+		Page<NotificacioEntity> page = notificacioRepository.findNotificacioLastEventAmbError(paginacioHelper.toSpringDataPageable(paginacioParams));
+		if (page != null && page.getContent() != null && page.getContent().size() > 0) {
+			return paginacioHelper.toPaginaDto(page, NotificacioDto.class);
 		}
 		return paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaAndGrupsAndEntitat(
 			Map<String, ProcedimentDto> procediments,
 			EntitatDto entitat) {		
@@ -769,6 +778,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public List<ProcedimentDto> findProcedimentsEntitatAmbPermisConsulta(
 			EntitatDto entitat) {		
 		return entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
@@ -779,6 +789,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsulta() {		
 		return entityComprovarHelper.findPermisProcediments(
 				new Permission[] {
@@ -824,6 +835,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
 			List<ProcedimentDto> procediments,
 			EntitatDto entitat) {
@@ -836,6 +848,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public List<ProvinciesDto> llistarProvincies() {
 		List<CodiValor> codiValor = new ArrayList<CodiValor>();
 		try {
@@ -848,6 +861,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<LocalitatsDto> llistarLocalitats(String codiProvincia) {
 		List<CodiValor> codiValor = new ArrayList<CodiValor>();
 		try {
@@ -860,6 +874,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public List<PaisosDto> llistarPaisos() {
 		List<CodiValorPais> codiValorPais = new ArrayList<CodiValorPais>();
 		try {

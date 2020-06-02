@@ -4,8 +4,6 @@
 package es.caib.notib.war.controller;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 
 import javax.ejb.EJBAccessException;
 import javax.servlet.http.HttpServletRequest;
@@ -13,12 +11,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.HandlerMapping;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -93,23 +92,23 @@ public class NotificacioServiceController extends BaseController {
 	}
 
 	@RequestMapping(
-			value = {"/services/notificacioV2/consultaEstatNotificacio/{identificador}"}, 
+			value = {"/services/notificacioV2/consultaEstatNotificacio/**"}, 
 			method = RequestMethod.GET,
 			produces="application/json")
 	@ApiOperation(
 			value = "Consulta de la informació d'una notificació",
 			notes = "Retorna la informació sobre l'estat de l'enviament dins Notib o Notific@",
 			response = RespostaConsultaEstatNotificacio.class)
+	@ApiParam(
+			name = "identificador",
+			value = "Identificador de la notificació a consultar",
+			required = true)
 	@ResponseBody
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
-			@ApiParam(
-					name = "identificador",
-					value = "Identificador de la notificació a consultar",
-					required = true)
-			@PathVariable("identificador")
-			String identificador) throws UnsupportedEncodingException {
+			HttpServletRequest request) throws UnsupportedEncodingException {
 		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
-		identificador = URLDecoder.decode(identificador, StandardCharsets.UTF_8.toString());
+//		identificador = URLDecoder.decode(identificador, StandardCharsets.UTF_8.toString());
+		String identificador = extractIdentificador(request);
 		try {
 			return notificacioServiceWsV2.consultaEstatNotificacio(identificador);
 		} catch (Exception e) {
@@ -132,23 +131,23 @@ public class NotificacioServiceController extends BaseController {
 	}
 
 	@RequestMapping(
-			value = {"/services/notificacioV2/consultaEstatEnviament/{referencia}"}, 
+			value = {"/services/notificacioV2/consultaEstatEnviament/**"}, 
 			method = RequestMethod.GET,
 			produces="application/json")
 	@ApiOperation(
 			value = "Consulta la informació de l'estat d'un enviament dins Notific@",
 			notes = "Retorna la informació sobre l'estat de l'enviament dins Notific@.",
 			response = RespostaConsultaEstatEnviament.class)
+	@ApiParam(
+			name = "referencia",
+			value = "Referència de la notificació a consultar",
+			required = true)
 	@ResponseBody
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(
-			@ApiParam(
-					name = "referencia",
-					value = "Referència de la notificació a consultar",
-					required = true)
-			@PathVariable("referencia")
-			String referencia) throws UnsupportedEncodingException {
+			HttpServletRequest request) throws UnsupportedEncodingException {
 		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
-		referencia = URLDecoder.decode(referencia, StandardCharsets.UTF_8.toString());
+//		referencia = URLDecoder.decode(referencia, StandardCharsets.UTF_8.toString());
+		String referencia = extractIdentificador(request);
 		try {
 			return notificacioServiceWsV2.consultaEstatEnviament(referencia);
 		} catch (Exception e) {
@@ -168,6 +167,13 @@ public class NotificacioServiceController extends BaseController {
 			
 			return resp;
 		}
+	}
+	
+	private String extractIdentificador(HttpServletRequest request) {
+		String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+		String bestMatchPattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+	 
+		return new AntPathMatcher().extractPathWithinPattern(bestMatchPattern, path);
 	}
 	
 	@RequestMapping(

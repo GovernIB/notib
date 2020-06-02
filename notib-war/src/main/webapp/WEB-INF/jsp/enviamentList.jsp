@@ -273,7 +273,7 @@ function getCookie(cname) {
 		data-toggle="datatable"
 		data-url="<c:url value="/enviament/datatable"/>"
 		class="table table-striped table-bordered nowrap" 
-		data-default-order="3"
+		data-default-order="0"
 		data-default-dir="desc"
 		data-individual-filter="true"
 		data-botons-template="#botonsTemplate"
@@ -287,6 +287,7 @@ function getCookie(cname) {
 		style="width:100%">
 		<thead>
 			<tr>
+				<th data-col-name="id" data-visible="false"></th>
 				<c:choose>
 					<c:when test = "${columnes.dataEnviament == true}"> 
 					  <c:set value="true" var="visible"></c:set>
@@ -623,7 +624,6 @@ function getCookie(cname) {
 						</div>
 					</script>
 				</th>
-				<th data-col-name="id" data-visible="false"></th>
 				<th data-col-name="notificacioId" data-visible="false"></th>
 				<th data-col-name="detalls" data-orderable="false" data-template="#cellAccionsTemplate" width="101">
 			 	 	<script id="cellAccionsTemplate" type="text/x-jsrender">

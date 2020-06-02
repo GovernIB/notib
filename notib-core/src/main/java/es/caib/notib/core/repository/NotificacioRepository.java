@@ -290,4 +290,37 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("ids") List<Long> ids,
 			Pageable pageable);
 
+	@Query("select n " + 
+			   "  from NotificacioEventEntity ne " +
+			   " left outer join ne.notificacio n " +
+		       " where n.tipusUsuari = es.caib.notib.core.api.dto.TipusUsuariEnumDto.APLICACIO " +
+			   "   and ne.error = true " +
+		       "   and ne.tipus in (" +
+		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_CLIENT," +
+		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT," +
+		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO," +
+		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE," +
+		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT) " +
+		       " and ne.id in (select max(ne1.id) from NotificacioEventEntity ne1 " +
+		       " 				left outer join ne1.notificacio n1 " +
+		       "				group by n1.id)")
+	Page<NotificacioEntity> findNotificacioLastEventAmbError(Pageable pageable);
+	
+	@Query("select n " + 
+			   "  from NotificacioEventEntity ne " +
+			   " left outer join ne.notificacio n " +
+		       " where n.tipusUsuari = es.caib.notib.core.api.dto.TipusUsuariEnumDto.APLICACIO " +
+			   "   and ne.error = true " +
+		       "   and ne.tipus in (" +
+		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_CLIENT," +
+		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT," +
+		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO," +
+		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE," +
+		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT) " +
+		       " and ne.id in (select max(ne1.id) from NotificacioEventEntity ne1 " +
+		       " 				left outer join ne1.notificacio n1 " +
+		       "				group by n1.id)" +
+		       " order by n.id")
+	List<NotificacioEntity> findNotificacioLastEventAmbError();
+	
 }

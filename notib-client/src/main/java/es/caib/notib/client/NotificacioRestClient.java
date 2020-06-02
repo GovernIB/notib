@@ -3,8 +3,6 @@
  */
 package es.caib.notib.client;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
@@ -114,8 +112,8 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
 			String identificador) {
 		try {
-			String identificadorEncoded = URLEncoder.encode(identificador, StandardCharsets.UTF_8.toString());
-			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatNotificacio/" + identificadorEncoded;
+//			String identificadorEncoded = URLEncoder.encode(identificador, StandardCharsets.UTF_8.toString());
+			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
 			Client jerseyClient = generarClient();
 			if (username != null) {
 				autenticarClient(
@@ -139,8 +137,8 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(
 			String referencia) {
 		try {
-			String referenciaEncoded = URLEncoder.encode(referencia, StandardCharsets.UTF_8.toString());
-			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatEnviament/" + referenciaEncoded;
+//			String referenciaEncoded = URLEncoder.encode(referencia, StandardCharsets.UTF_8.toString());
+			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
 			Client jerseyClient = generarClient();
 			if (username != null) {
 				autenticarClient(
