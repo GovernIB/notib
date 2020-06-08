@@ -57,7 +57,6 @@ import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
 import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.EntitatTipusDocEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
@@ -741,7 +740,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1050 | El tipus d'enviament de la notificació no pot ser null
 	// 1060 | El camp 'document' no pot ser null
 	// 1061 | El camp 'arxiuNom' del document no pot ser null
-	// 1062 | És necessari incloure un document a la notificació utilitzant un dels camps del document admesos per l'entitat
+	// 1062 | És necessari incloure un document a la notificació
 	// 1070 | El camp 'usuariCodi' no pot ser null (Requisit per fer el registre de sortida)
 	// 1071 | El camp 'usuariCodi' no pot pot tenir una longitud superior a 64 caràcters
 	// 1080 | El camp 'numExpedient' no pot pot tenir una longitud superior a 256 caràcters
@@ -887,36 +886,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		if (document.getArxiuNom() == null || document.getArxiuNom().isEmpty()) {
 			return setRespostaError("[1061] El camp 'arxiuNom' del document no pot ser null.");
 		}
-		List<EntitatTipusDocEntity> tipusDocsEntity = entitatTipusDocRepository.findByEntitat(entitat);
-		boolean hiHaDocument = false;
-		String tipusDocsPermesos = "[";
-		for (EntitatTipusDocEntity tipusDocEntity: tipusDocsEntity) {
-			switch(tipusDocEntity.getTipusDocEnum()) {
-			case ARXIU:
-				if ((document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()))
-					hiHaDocument = true;
-				tipusDocsPermesos += "'contingutBase64', ";
-				break;
-			case CSV:
-				if (document.getCsv() != null && !document.getCsv().isEmpty())
-					hiHaDocument = true;
-				tipusDocsPermesos += "'csv', ";
-				break;
-			case URL:
-				if (document.getUrl() != null && !document.getUrl().isEmpty())
-					hiHaDocument = true;
-				tipusDocsPermesos += "'url', ";
-				break;
-			case UUID:
-				if (document.getUuid() == null || document.getUuid().isEmpty())
-					hiHaDocument = true;
-				tipusDocsPermesos += "'uuid', ";
-				break;
-			}
-		}
-		tipusDocsPermesos = tipusDocsPermesos.substring(0, tipusDocsPermesos.length() - 2) + "]";
-		if (!hiHaDocument) {
-			return setRespostaError("[1062] És necessari incloure un document a la notificació utilitzant un dels camps del document admesos per l'entitat: " + tipusDocsPermesos);
+		if (	(document.getContingutBase64() == null || document.getContingutBase64().isEmpty()) &&
+				(document.getCsv() == null || document.getCsv().isEmpty()) &&
+				(document.getUrl() == null || document.getUrl().isEmpty()) &&
+				(document.getUuid() == null || document.getUuid().isEmpty())) {
+			return setRespostaError("[1062] És necessari incloure un document a la notificació.");
 		}
 		// Usuari
 		if (notificacio.getUsuariCodi() == null || notificacio.getUsuariCodi().isEmpty()) {
