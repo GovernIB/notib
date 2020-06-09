@@ -206,7 +206,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			RegistreSortida registreSortida,
 			String aplicacion) throws RegistrePluginException {
 		RegistroSalidaWs rsw = new RegistroSalidaWs();
-		InteresadoWs interesado = new InteresadoWs();
+//		InteresadoWs interesado = new InteresadoWs();
 		AnexoWs anexo = null;
 		try {
 			rsw.setCodigoUsuario(registreSortida.getDadesAnotacio().getCodiUsuari());
@@ -508,8 +508,8 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		resposta.setEntitatCodi(ar.getEntidadCodigo());
 		resposta.setEntitatDenominacio(ar.getEntidadDenominacion());
 		if (ar.getCodigoError() != null && !ar.getCodigoError().isEmpty()) {
-			resposta.setCodiError(ar.getCodigoError());
-			resposta.setDescripcioError(ar.getDescripcionError());
+			resposta.setErrorCodi(ar.getCodigoError());
+			resposta.setErrorDescripcio(ar.getDescripcionError());
 		}
 		return resposta;
 	}

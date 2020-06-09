@@ -29,13 +29,11 @@ public class NotificaHelper {
 	private NotificaV2Helper notificaV2Helper;
 
 
-	public boolean notificacioEnviar(
-			Long notificacioId) {
+	public boolean notificacioEnviar(Long notificacioId) {
 		return getNotificaHelper().notificacioEnviar(notificacioId);
 	}
 
-	public boolean enviamentRefrescarEstat(
-			Long enviamentId) throws SistemaExternException {
+	public boolean enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
 		return getNotificaHelper().enviamentRefrescarEstat(enviamentId);
 	}
 
@@ -75,8 +73,6 @@ public class NotificaHelper {
 				notificaDatatErrorDescripcio,
 				enviament);
 	}
-
-
 
 	private AbstractNotificaHelper getNotificaHelper() {
 		String versio = getNotificaVersioProperty();

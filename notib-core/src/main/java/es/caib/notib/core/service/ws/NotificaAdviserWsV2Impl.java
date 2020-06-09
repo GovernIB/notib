@@ -3,7 +3,6 @@
  */
 package es.caib.notib.core.service.ws;
 
-import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sun.jersey.core.util.Base64;
 
+import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
@@ -30,6 +32,7 @@ import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
@@ -64,6 +67,8 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private NotificaHelper notificaHelper;
+	@Autowired
+	private IntegracioHelper integracioHelper;
 
 
 	@Override
@@ -82,6 +87,9 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			Holder<String> codigoRespuesta,
 			Holder<String> descripcionRespuesta, 
 			Holder<Opciones> opcionesResultadoSincronizarEnvio) {
+
+		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm");
+		
 		logger.info("[ADV] Inici sincronització enviament Adviser [");
 		logger.info("        Id: " + (identificador != null ? identificador.value : ""));
 		logger.info("        OrganismoEmisor: " + organismoEmisor);
@@ -89,13 +97,30 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		logger.info("        ModoNotificacion: " + modoNotificacion);
 		logger.info("        Estat: " + estado);
 		if (fechaEstado != null) {
-			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm");
 			logger.info("        FechaEstado: " + sdf.format(fechaEstado.toGregorianCalendar().getTime()));
 		}
 		logger.info("        Receptor: " + (receptor != null ? receptor.getNifReceptor() : "") + "]");
 		
 		logger.debug("--------------------------------------------------------------");
 		logger.debug("Processar petició dins l'Adviser...");
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_NOTIFICA, 
+				"Recepció de canvi de notificació via Adviser", 
+				IntegracioAccioTipusEnumDto.RECEPCIO, 
+				new AccioParam("Organisme emisor", organismoEmisor),
+				new AccioParam("Identificador", (identificador != null ? identificador.value : "")),
+				new AccioParam("Tipus d'entrega", String.valueOf(tipoEntrega)),
+				new AccioParam("Mode de notificació", String.valueOf(modoNotificacion)),
+				new AccioParam("Estat", estado),
+				new AccioParam("Data de l'estat", fechaEstado != null ? sdf.format(fechaEstado.toGregorianCalendar().getTime()) : ""),
+				new AccioParam("Receptor", receptor != null ? 
+						receptor.getNombreReceptor() + " (" + receptor.getNifReceptor() + ")" + 
+						(receptor.getNifRepresentante() != null ? " - Representant: " + 
+								receptor.getNombreRepresentante() + " (" + receptor.getNifRepresentante() + ")" : "") : ""),
+				new AccioParam("Acús en PDF (Hash)", acusePDF != null ? acusePDF.getHash() : ""),
+				new AccioParam("Acús en XML (Hash)", acuseXML != null ? acuseXML.getHash() : ""));
+		
 		NotificacioEnviamentEntity enviament = null;
 		NotificacioEventEntity.Builder eventDatatBuilder = null;
 		NotificacioEventEntity eventDatat = null;
@@ -194,6 +219,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 							enviament);
 					logger.debug("Certificació guardada correctament.");
 				}
+				integracioHelper.addAccioOk(info);
 			} else {
 				logger.error(
 						"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
@@ -201,10 +227,12 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						"No s'ha trobat cap enviament amb l'identificador especificat (" + identificador + ").");
 				codigoRespuesta.value = "002";
 				descripcionRespuesta.value = "Identificador no encontrado";
+				integracioHelper.addAccioError(info, "No s'ha trobat cap enviament amb l'identificador especificat");
 			}
 		} catch (DatatypeConfigurationException ex) {
 			codigoRespuesta.value = "004";
 			descripcionRespuesta.value = "Fecha incorrecta";
+			integracioHelper.addAccioError(info, "La data de l'estat no té un format vàlid");
 		} catch (Exception ex) {
 			logger.error(
 					"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
@@ -234,6 +262,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			}
 			codigoRespuesta.value = "666";
 			descripcionRespuesta.value = "Error procesando peticion";
+			integracioHelper.addAccioError(info, "Error processant la petició", ex);
 		}
 		if (enviament != null) {
 			if (eventDatat == null) {
@@ -292,7 +321,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						logger.info("Guardant certificació acusament de rebut...");
 						gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
 								PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
-								new ByteArrayInputStream(Base64.decode(acusePDF.getContenido())));
+								Base64.decode(acusePDF.getContenido()));
 					} catch (Exception ex) {
 						logger.error("No s'ha pogut guardar la certificació a la gestió documental", ex);
 					}

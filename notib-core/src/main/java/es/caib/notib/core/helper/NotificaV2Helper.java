@@ -3,7 +3,6 @@
  */
 package es.caib.notib.core.helper;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
@@ -40,6 +39,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaRespostaDatatDto.NotificaRespostaDatatEventDto;
@@ -99,14 +101,26 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private EmailHelper emailHelper;
 	@Autowired 
 	ConversioTipusHelper conversioTipusHelper;
-	@Autowired ProcedimentRepository procedimentRepository;
+	@Autowired 
+	ProcedimentRepository procedimentRepository;
+	@Autowired
+	IntegracioHelper integracioHelper;
+	
 	
 	public boolean notificacioEnviar(
 			Long notificacioId) {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_NOTIFICA, 
+				"Enviament d'una notificació", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
+		
 		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
 		logger.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())) {
 			logger.error(" [NOT] la notificació no té l'estat REGISTRADA.");
+			integracioHelper.addAccioError(info, "La notificació no està registrada");
 			throw new ValidationException(
 					notificacioId,
 					NotificacioEntity.class,
@@ -146,6 +160,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						}
 					}
 				}
+				integracioHelper.addAccioOk(info);
 			} else {
 				logger.info(" >>> ... ERROR");
 				//Crea un nou event
@@ -155,6 +170,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						errorDescripcio, 
 						NotificacioErrorTipusEnumDto.ERROR_REMOT,
 						true);
+				integracioHelper.addAccioError(info, errorDescripcio);
 			}
 		} catch (Exception ex) {
 			logger.error(
@@ -171,6 +187,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					errorDescripcio, 
 					NotificacioErrorTipusEnumDto.ERROR_XARXA,
 					false);
+			integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
 		}
 		logger.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		return NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat());
@@ -178,6 +195,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 	public boolean enviamentRefrescarEstat(
 			Long enviamentId) throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_NOTIFICA, 
+				"Consultar estat d'un enviament", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				new AccioParam("Identificador de l'enviament", String.valueOf(enviamentId)));
 		
 		boolean resposta = true;
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
@@ -285,16 +308,20 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						}
 						logger.info("Enviament actualitzat");
 					} else {
+						String errorDescripcio = "No s'ha pogut trobar el darrer datat dins la resposta rebuda de Notifica"; 
+						integracioHelper.addAccioError(info, errorDescripcio);
 						throw new ValidationException(
 								enviament,
 								NotificacioEnviamentEntity.class,
-								"No s'ha pogut trobar el darrer datat dins la resposta rebuda de Notific@");
+								errorDescripcio);
 					}
 				} else {
+					String errorDescripcio = "La resposta rebuda de Notifica no conté informació de datat"; 
+					integracioHelper.addAccioError(info, errorDescripcio);
 					throw new ValidationException(
 							enviament,
 							NotificacioEnviamentEntity.class,
-							"La resposta rebuda de Notific@ no conté informació de datat");
+							errorDescripcio);
 				}
 				if (resultadoInfoEnvio.getCertificacion() != null) {
 					logger.info("Actualitzant informació enviament amb certificació...");
@@ -310,7 +337,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						}
 						String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
 								PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
-								new ByteArrayInputStream(decodificat));
+								decodificat);
 						logger.info("Actualitzant certificació enviament...");
 						enviament.updateNotificaCertificacio(
 								dataCertificacio,
@@ -359,14 +386,18 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						notificacio).
 						enviament(enviament).build();
 				notificacio.updateEventAfegir(event);
+				notificacioEventRepository.save(event);
 				enviament.refreshNotificaConsulta();
+				integracioHelper.addAccioOk(info);
 				logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 			} else {
 				logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
+				String errorDescripcio = "L'enviament no té identificador de Notifica";
+				integracioHelper.addAccioError(info, errorDescripcio);
 				throw new ValidationException(
 						enviament,
 						NotificacioEnviamentEntity.class,
-						"L'enviament no té identificador de Notific@");
+						errorDescripcio);
 			}
 		} catch (Exception ex) {
 			logger.error(
@@ -403,6 +434,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						NotificacioErrorTipusEnumDto.ERROR_REINTENTS_CONSULTA,
 						eventReintents);
 			}
+			integracioHelper.addAccioError(info, "Error consultat l'estat de l'enviament", ex);
 			resposta = false;
 		}
 		
@@ -410,23 +442,21 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	}
 
 	
-	public ResultadoInfoEnvioV2 infoEnviament(
-			NotificacioEnviamentEntity enviament) throws SistemaExternException {
-		try {
-			InfoEnvioV2 infoEnvio = new InfoEnvioV2();
-			infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
-			String apiKey = enviament.getNotificacio().getEntitat().getApiKey();
-			return getNotificaWs(apiKey).infoEnvioV2(infoEnvio);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return null;
-	}
-
-	
+//	public ResultadoInfoEnvioV2 infoEnviament(
+//			NotificacioEnviamentEntity enviament) throws SistemaExternException {
+//		try {
+//			InfoEnvioV2 infoEnvio = new InfoEnvioV2();
+//			infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
+//			String apiKey = enviament.getNotificacio().getEntitat().getApiKey();
+//			return getNotificaWs(apiKey).infoEnvioV2(infoEnvio);
+//		} catch (Exception ex) {
+//			ex.printStackTrace();
+//		}
+//		return null;
+//	}
 
 
-	public ResultadoAltaRemesaEnvios enviaNotificacio(
+	private ResultadoAltaRemesaEnvios enviaNotificacio(
 			NotificacioEntity notificacio) throws Exception {
 		ResultadoAltaRemesaEnvios resultat = null;
 		try {

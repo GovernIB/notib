@@ -29,6 +29,7 @@ import es.caib.notib.core.api.dto.ProcedimentFormDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -56,7 +57,6 @@ import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.Llibre;
 import es.caib.notib.plugin.registre.Oficina;
 import es.caib.notib.plugin.registre.Organisme;
-import es.caib.notib.plugin.registre.RegistrePluginException;
 import es.caib.notib.plugin.registre.TipusAssumpte;
 
 /**
@@ -718,7 +718,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					
 					tipusAssumpte.add(assumpte);
 				}
-		} catch (RegistrePluginException e) {
+		} catch (SistemaExternException e) {
 			String errorMessage = "No s'han pogut recuperar els codis d'assumpte de l'entitat: " + entitat.getDir3Codi();
 			logger.error(
 					errorMessage, 
@@ -747,7 +747,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					
 					codiAssumpte.add(assumpte);
 				}
-		} catch (RegistrePluginException e) {
+		} catch (SistemaExternException e) {
 			String errorMessage = "No s'han pogut recuperar els codis d'assumpte del tipus d'assumpte: " + codiTipusAssumpte;
 			logger.error(
 					errorMessage, 

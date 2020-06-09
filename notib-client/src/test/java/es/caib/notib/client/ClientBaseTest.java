@@ -39,11 +39,9 @@ public class ClientBaseTest {
 	protected static final String ENTITAT_DIR3CODI = "A04003003";
 //	protected static final String ORGAN_CODI = "A04013501";
 	protected static final String ORGAN_CODI = "A04003003";
-	protected static final String LLIBRE = "L99";
+	protected static final String LLIBRE = "L16";
 	protected static final String OFICINA = "O00009390";
-	protected static final String UNITAT_ADMINISTRATIVA_SISTRA = "1";
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "234257";
-	protected static final String IDENTIFICADOR_PROCEDIMENT_SISTRA = "IN0026NSPI";
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "847185";
 	protected static final String IDIOMA = "ca";
 	protected static final String USUARI_CODI = "e18225486x";
 
@@ -67,8 +65,10 @@ public class ClientBaseTest {
 		
 		String arxiuB64 = Base64.encodeBase64String(arxiuBytes);
 		document.setContingutBase64(arxiuB64);
+//		document.setUuid("8f3e508c-d304-4502-bd45-2061b47d3eda");
 		document.setNormalitzat(false);
 //		document.setGenerarCsv(false);
+		
 		notificacio.setDocument(document);
 		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 		for (int i = 0; i < numDestinataris; i++) {

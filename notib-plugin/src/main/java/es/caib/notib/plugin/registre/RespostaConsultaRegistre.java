@@ -25,7 +25,7 @@ public class RespostaConsultaRegistre extends RespostaBase {
 	private String registreNumeroFormatat;
 	private String codiLlibre;
 	private NotificacioRegistreEstatEnumDto estat;
-	private String codiError;
-	private String descripcioError;
+//	private String codiError;
+//	private String descripcioError;
 	
 }

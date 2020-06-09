@@ -74,13 +74,13 @@ public class RegistreHelper {
 //				if (resposta != null) {
 				
 				logger.debug("Comunicació SIR --> creació event...");
-				if (resposta.getCodiError() != null && !resposta.getCodiError().isEmpty()) {
+				if (resposta.getErrorCodi() != null && !resposta.getErrorCodi().isEmpty()) {
 					//Crea un nou event
 					eventBuilder = NotificacioEventEntity.getBuilder(
 							NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,
 							enviament.getNotificacio()).
 							error(true).
-							errorDescripcio(resposta.getDescripcioError()).
+							errorDescripcio(resposta.getErrorDescripcio()).
 							enviament(enviament);
 					
 					if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)

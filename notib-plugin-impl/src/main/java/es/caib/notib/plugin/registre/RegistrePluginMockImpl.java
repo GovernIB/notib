@@ -88,8 +88,8 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		respostaConsultaRegistre.setEntitatCodi("A04003003");
 		respostaConsultaRegistre.setEntitatDenominacio("CAIB");
 		if (respostaAmbError) {
-			respostaConsultaRegistre.setCodiError("500");
-			respostaConsultaRegistre.setDescripcioError("Simular error");
+			respostaConsultaRegistre.setErrorCodi("500");
+			respostaConsultaRegistre.setErrorDescripcio("Simular error");
 		}
 		
 		return respostaConsultaRegistre;
