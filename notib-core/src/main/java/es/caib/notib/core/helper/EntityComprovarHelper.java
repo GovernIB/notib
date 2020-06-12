@@ -586,7 +586,7 @@ public class EntityComprovarHelper {
 		EntitatEntity entitatActual = comprovarEntitat(entitatId);
 		List<ProcedimentDto> resposta = null;
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<ProcedimentEntity> procediments = procedimentRepository.findByEntitat(entitatActual);
+		List<ProcedimentEntity> procediments = procedimentRepository.findByEntitatOrderByNomAsc(entitatActual);
 		
 		permisosHelper.filterGrantedAny(
 				procediments,

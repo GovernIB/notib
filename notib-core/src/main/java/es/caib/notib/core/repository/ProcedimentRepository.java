@@ -67,6 +67,9 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 	List<ProcedimentEntity> findByEntitat(
 			EntitatEntity entitat);
 	
+	List<ProcedimentEntity> findByEntitatOrderByNomAsc(
+			EntitatEntity entitat);
+	
 	Page<ProcedimentEntity> findByEntitat(
 			EntitatEntity entitat,
 			Pageable paginacio);
