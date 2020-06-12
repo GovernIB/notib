@@ -16,8 +16,10 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 
+import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
@@ -49,8 +51,6 @@ import es.caib.notib.core.repository.NotificacioRepository;
 public class CallbackHelper {
 
 	private static final String NOTIFICACIO_CANVI = "notificaCanvi";
-//	private static final String NOTIFICACIO_ESTAT = "notificaEstat";
-//	private static final String NOTIFICACIO_CERTIFICACIO = "notificaCertificacio";
 
 	@Autowired
 	private AplicacioRepository aplicacioRepository;
@@ -60,26 +60,27 @@ public class CallbackHelper {
 	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private NotificaHelper notificaHelper;
+	@Autowired
+	private IntegracioHelper integracioHelper;
 
 
 
 	@Transactional (rollbackFor = RuntimeException.class)
 	public boolean notifica(Long eventId) {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_CLIENT, 
+				"Enviament d'avís de canvi d'estat", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				new AccioParam("Identificador de l'event", String.valueOf(eventId)));
+		
 		boolean ret = false;
 		// Recupera l'event
 		NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
 		if (event == null)
-			throw new NotFoundException(
-					"eventId:" + eventId,
-					NotificacioEventEntity.class);
-//		// Recupera la referència
-//		String referencia = null;
-//		if (event.getEnviament() != null)
-//			referencia = event.getEnviament().getNotificaReferencia();
+			throw new NotFoundException("eventId:" + eventId, NotificacioEventEntity.class);
 		int intents = event.getCallbackIntents() + 1;
 		Date ara = new Date();
-//		if (referencia != null) {
-			// Notifica al client
 		try {
 			if (event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT
 					|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT
@@ -91,19 +92,17 @@ public class CallbackHelper {
 					|| (event.isError() && event.getTipus() == NotificacioEventTipusEnumDto.CALLBACK_CLIENT)) {
 				// Avisa al client que hi ha hagut una modificació a l'enviament
 				notificaCanvi(event.getEnviament());
-//					// Invoca el mètode de notificació de l'aplicació client segons és estat o certificat:
-//					if (event.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT))
-//						notificaEstat(event.getEnviament());
-//					else if (event.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO))
-//						notificaCertificat(event.getEnviament());					
 				// Marca l'event com a notificat
 				event.setNotificacio(event.getEnviament().getNotificacio());
 				event.updateCallbackClient(CallbackEstatEnumDto.NOTIFICAT, ara, intents, null);
 				ret = true;
+				integracioHelper.addAccioOk(info);
 			} else {
 				// És un event pendent de notificar que no és del tipus esperat
+				String errorDescripcio = "L'event id=" + event.getId() + " és del tipus " + event.getTipus() + " i no es pot notificar a l'aplicació client.";
 				event.setNotificacio(event.getEnviament().getNotificacio());
-				event.updateCallbackClient(CallbackEstatEnumDto.ERROR, ara, intents, "L'event id=" + event.getId() + " és del tipus " + event.getTipus() + " i no es pot notificar a l'aplicació client.");
+				event.updateCallbackClient(CallbackEstatEnumDto.ERROR, ara, intents, errorDescripcio);
+				integracioHelper.addAccioError(info, "Error enviant l'avís de canvi d'estat: " + errorDescripcio);
 			}
 		} catch (Exception ex) {
 			logger.debug("Error notificant l'event " + eventId, ex);
@@ -122,12 +121,8 @@ public class CallbackHelper {
 					ara,
 					intents,
 					"Error notificant l'event al client: " + ex.getMessage());
+			integracioHelper.addAccioError(info, "Error enviant l'avís de canvi d'estat", ex);
 		}
-//		} else {
-//			// No és un event que es pugui notificar, el marca com a error
-//			event.setNotificacio(event.getEnviament().getNotificacio());
-//			event.updateCallbackClient(CallbackEstatEnumDto.ERROR, ara, intents, "L'event " + eventId + " no té referència d'enviament, no es pot fer un callback a l'aplicació client.");
-//		}
 		
 		// Crea una nova entrada a la taula d'events per deixar constància de la notificació a l'aplicació client
 		Builder eventBuilder = null;
@@ -174,7 +169,6 @@ public class CallbackHelper {
 		NotificacioCanviClient notificacioCanvi = new NotificacioCanviClient(
 				notificaHelper.xifrarId(enviament.getNotificacio().getId()), 
 				notificaHelper.xifrarId(enviament.getId()));
-//				enviament.getNotificaReferencia());
 
 		// Passa l'objecte a JSON
 		ObjectMapper mapper  = new ObjectMapper();
@@ -221,174 +215,6 @@ public class CallbackHelper {
 		}
 		return estatsEnviamentsFinals;
 	}
-//	private String notificaEstat(NotificacioEnviamentEntity enviament) throws Exception {
-//		if (enviament == null)
-//			throw new Exception("El destinatari no pot ser nul.");
-//		
-//		// Resol si hi ha una aplicació pel codi d'usuari que ha creat l'enviament
-//		UsuariEntity usuari = enviament.getCreatedBy();
-//		AplicacioEntity aplicacio = aplicacioRepository.findByUsuariCodi(usuari.getCodi());
-//		if (aplicacio == null)
-//			throw new NotFoundException("codi usuari: " + usuari.getCodi(), AplicacioEntity.class);
-//		if (aplicacio.getCallbackUrl() == null)
-//			throw new Exception("La aplicació " + aplicacio.getUsuariCodi() + " no té cap url de callback configurada");
-//				
-//		// Omple l'objecte amb la informació cap a l'aplicació client
-//		NotificacioEstatClient notificacioEstat = new NotificacioEstatClient(
-//					calcularEstat(enviament),
-//					enviament.getNotificaEstatData(),
-//					enviament.getDestinatariNom(),
-//					enviament.getDestinatariNif(),
-//					enviament.getNotificaDatatOrigen(),
-//					enviament.getNotificaDatatNumSeguiment(),
-//					enviament.getNotificaReferencia() 
-//				);
-//
-//		// Passa l'objecte a JSON
-//		ObjectMapper mapper  = new ObjectMapper();
-//		String body = mapper.writeValueAsString(notificacioEstat);
-//				
-//		// Prepara el client JSON per a la crida POST
-//		Client jerseyClient = this.getClient(aplicacio);
-//
-//		// Completa la URL al mètode
-//		String urlBase = aplicacio.getCallbackUrl();
-//		String urlAmbMetode = urlBase + (urlBase.endsWith("/") ? "" : "/") +  NOTIFICACIO_ESTAT;
-//		
-//		// Fa la crida POST passant les dades JSON
-//		ClientResponse response = jerseyClient.
-//				resource(urlAmbMetode).
-//				type("application/json").
-//				post(ClientResponse.class, body);
-//		
-//		// Comprova que la resposta sigui 200 OK
-//		if ( ClientResponse.Status.OK.getStatusCode() != response.getStatusInfo().getStatusCode())
-//			throw new Exception("La resposta del client és: " + response.getStatusInfo().getStatusCode() + " - " + response.getStatusInfo().getReasonPhrase());
-//
-//		return response.getEntity(String.class);
-//	}
-
-//	private String notificaCertificat(NotificacioEnviamentEntity enviament) throws Exception{
-//		if (enviament == null)
-//			throw new Exception("El destinatari no pot ser nul.");
-//		// Resol si hi ha una aplicació pel codi d'usuari que ha creat l'enviament
-//		UsuariEntity usuari = enviament.getCreatedBy();
-//		AplicacioEntity aplicacio = aplicacioRepository.findByUsuariCodi(usuari.getCodi());
-//		if (aplicacio == null)
-//			throw new NotFoundException("codi usuari: " + usuari.getCodi(), AplicacioEntity.class);
-//		if (aplicacio.getCallbackUrl() == null)
-//			throw new Exception("La aplicació " + aplicacio.getUsuariCodi() + " no té cap url de callback configurada");
-//		// Comprova que l'event tingui un fitxer associat
-//		if (enviament.getNotificaCertificacioArxiuId() == null)
-//			throw new Exception("L'event no té un fitxer associat.");
-//		if (aplicacio.getCallbackUrl() == null)
-//			throw new Exception("La aplicació " + aplicacio.getUsuariCodi() + " no té cap url de callback configurada");
-//		
-//
-//		// Omple l'objecte amb la informació cap a l'aplicació client
-//		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//		pluginHelper.gestioDocumentalGet(
-//				enviament.getNotificaCertificacioArxiuId(),
-//				PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
-//				baos);
-//		NotificacioCertificacioClient notificacioCertificacio = new NotificacioCertificacioClient(
-//				CertificacioTipusEnum.toCertificacioTipusEnum(enviament.getNotificaCertificacioTipus()),
-//				CertificacioArxiuTipusEnum.toCertificacioArxiuTipusEnum(enviament.getNotificaCertificacioArxiuTipus()), 
-//				new String(Base64.encode(baos.toByteArray())),
-//				enviament.getNotificaCertificacioNumSeguiment(),
-//				enviament.getNotificaCertificacioData() );
-//
-//		// Passa l'objecte a JSON
-//		ObjectMapper mapper  = new ObjectMapper();
-//		String body = mapper.writeValueAsString(notificacioCertificacio);
-//		
-//		// Prepara el client JSON per a la crida POST
-//		Client jerseyClient = this.getClient(aplicacio); 
-//
-//		// Completa la URL al mètode
-//		String urlBase = aplicacio.getCallbackUrl();
-//    	String urlAmbMetode = urlBase + (urlBase.endsWith("/") ? "" : "/") +  NOTIFICACIO_CERTIFICACIO;
-//
-//		// Fa la crida POST passant les dades JSON
-//		ClientResponse response = jerseyClient.
-//				resource(urlAmbMetode).
-//				type("application/json").
-//				post(ClientResponse.class, body);
-//		
-//		// Comprova que la resposta sigui 200 OK
-//		if ( ClientResponse.Status.OK.getStatusCode() != response.getStatusInfo().getStatusCode())
-//			throw new Exception("La resposta del client és: " + response.getStatusInfo().getStatusCode() + " - " + response.getStatusInfo().getReasonPhrase());
-//
-//		return response.getEntity(String.class);
-//	}
-
-//	private NotificacioDestinatariEstatEnum calcularEstat(
-//			NotificacioEnviamentEntity enviament) {
-//		NotificacioDestinatariEstatEnum estat = null;
-//		switch (enviament.getNotificaEstat()) {
-//		case ABSENT:
-//			estat = NotificacioDestinatariEstatEnum.ABSENT;
-//			break;
-//		case ADRESA_INCORRECTA:
-//			estat = NotificacioDestinatariEstatEnum.ADRESA_INCORRECTA;
-//			break;
-//		case DESCONEGUT:
-//			estat = NotificacioDestinatariEstatEnum.DESCONEGUT;
-//			break;
-//		case ENTREGADA_OP:
-//			estat = NotificacioDestinatariEstatEnum.ENTREGADA_OP;
-//			break;
-//		case ENVIADA_CI:
-//			estat = NotificacioDestinatariEstatEnum.ENVIADA_CI;
-//			break;
-//		case ENVIADA_DEH:
-//			estat = NotificacioDestinatariEstatEnum.ENVIADA_DEH;
-//			break;
-//		case ENVIAMENT_PROGRAMAT:
-//			estat = NotificacioDestinatariEstatEnum.ENVIAMENT_PROGRAMAT;
-//			break;
-//		case ERROR_ENTREGA:
-//			estat = NotificacioDestinatariEstatEnum.ERROR_ENTREGA;
-//			break;
-//		case EXPIRADA:
-//			estat = NotificacioDestinatariEstatEnum.EXPIRADA;
-//			break;
-//		case EXTRAVIADA:
-//			estat = NotificacioDestinatariEstatEnum.EXTRAVIADA;
-//			break;
-//		case LLEGIDA:
-//			estat = NotificacioDestinatariEstatEnum.LLEGIDA;
-//			break;
-//		case MORT:
-//			estat = NotificacioDestinatariEstatEnum.MORT;
-//			break;
-//		case NOTIFICADA:
-//			estat = NotificacioDestinatariEstatEnum.NOTIFICADA;
-//			break;
-//		case PENDENT_CIE:
-//			estat = NotificacioDestinatariEstatEnum.PENDENT_CIE;
-//			break;
-//		case PENDENT_DEH:
-//			estat = NotificacioDestinatariEstatEnum.PENDENT_DEH;
-//			break;
-//		case PENDENT_ENVIAMENT:
-//			estat = NotificacioDestinatariEstatEnum.PENDENT_ENVIAMENT;
-//			break;
-//		case REBUTJADA:
-//			estat = NotificacioDestinatariEstatEnum.REBUTJADA;
-//			break;
-//		case SENSE_INFORMACIO:
-//			estat = NotificacioDestinatariEstatEnum.SENSE_INFORMACIO;
-//			break;
-//		case NOTIB_ENVIADA:
-//			estat = NotificacioDestinatariEstatEnum.NOTIB_ENVIADA;
-//			break;
-//		case NOTIB_PENDENT:
-//			estat = NotificacioDestinatariEstatEnum.NOTIB_PENDENT;
-//			break;
-//		}
-//		return estat;
-//	}
 
 	/** Propietat que assenayala el màxim de reintents. Si la propietat és null llavors no hi ha un màxim. */
 	private Integer getEventsIntentsMaxProperty() {
@@ -401,23 +227,8 @@ public class CallbackHelper {
 
 	private Client getClient(AplicacioEntity aplicacio) {
 		Client jerseyClient =  new Client();
-		// Només per depurar la sortida, esborrar o comentar-ho: 
+		// Només per depurar la sortida, esborrar o comentar-ho:
 		jerseyClient.addFilter(new LoggingFilter(System.out));		
-//		String username = null;
-//		String password = null;
-//		switch (aplicacio.getTipusAutenticacio()) {
-//		case TOKEN_CAIB:
-//			username = "";
-//			password = "";
-//			jerseyClient.addFilter(new HTTPBasicAuthFilter(username, password));
-//			break;
-//		case TEXT_CLAR:
-//			jerseyClient.addFilter(new HTTPBasicAuthFilter(username, password));
-//			break;
-//		case CAP:
-//		default:
-//			break;
-//		}	
 		return jerseyClient;
 	}
 

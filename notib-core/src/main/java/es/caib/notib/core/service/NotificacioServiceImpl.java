@@ -4,7 +4,6 @@
 package es.caib.notib.core.service;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -169,8 +168,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		if(notificacio.getDocument().getContingutBase64() != null) {
 			documentGesdocId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-					new ByteArrayInputStream(
-							Base64.decode(notificacio.getDocument().getContingutBase64())));
+					Base64.decode(notificacio.getDocument().getContingutBase64()));
 		} else if (notificacio.getDocument().getUuid() != null) {
 			DocumentDto document = new DocumentDto();
 			String arxiuUuid = notificacio.getDocument().getUuid();

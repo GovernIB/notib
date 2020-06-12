@@ -112,7 +112,6 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
 			String identificador) {
 		try {
-//			String identificadorEncoded = URLEncoder.encode(identificador, StandardCharsets.UTF_8.toString());
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
 			Client jerseyClient = generarClient();
 			if (username != null) {
@@ -137,7 +136,6 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(
 			String referencia) {
 		try {
-//			String referenciaEncoded = URLEncoder.encode(referencia, StandardCharsets.UTF_8.toString());
 			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
 			Client jerseyClient = generarClient();
 			if (username != null) {
@@ -157,7 +155,60 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 			throw new RuntimeException(ex);
 		}
 	}
+	
+	@Override
+	public RespostaConsultaDadesRegistre consultaDadesRegistre(DadesConsulta dadesConsulta) {
+		try {
+			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaDadesRegistre";
+			ObjectMapper mapper  = new ObjectMapper();
+			String body = mapper.writeValueAsString(dadesConsulta);
+			Client jerseyClient = generarClient();
+			if (username != null) {
+				autenticarClient(
+						jerseyClient,
+						urlAmbMetode,
+						username,
+						password);
+			}
+			String json = jerseyClient.
+					resource(urlAmbMetode).
+					type("application/json").
+					post(String.class, body);
+			logger.debug("Missatge REST rebut: " + json);
+			return mapper.readValue(json, RespostaConsultaDadesRegistre.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
 
+	@Override
+	public boolean donarPermisConsulta(PermisConsulta permisConsulta) {
+		try {
+			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/permisConsulta";
+			ObjectMapper mapper  = new ObjectMapper();
+			String body = mapper.writeValueAsString(permisConsulta);
+			Client jerseyClient = generarClient();
+			if (username != null) {
+				autenticarClient(
+						jerseyClient,
+						urlAmbMetode,
+						username,
+						password);
+			}
+			logger.debug("Missatge REST enviat: " + body);
+			String json = jerseyClient.
+					resource(urlAmbMetode).
+					type("application/json").
+					post(String.class, body);
+			logger.debug("Missatge REST rebut: " + json);
+			return mapper.readValue(json, boolean.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+	
+	
+	
 	public boolean isAutenticacioBasic() {
 		return autenticacioBasic;
 	}
@@ -217,61 +268,6 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 		}
 	}
 
-	@Override
-	public boolean donarPermisConsulta(PermisConsulta permisConsulta) {
-		try {
-			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/permisConsulta";
-			ObjectMapper mapper  = new ObjectMapper();
-			String body = mapper.writeValueAsString(permisConsulta);
-			Client jerseyClient = generarClient();
-			if (username != null) {
-				autenticarClient(
-						jerseyClient,
-						urlAmbMetode,
-						username,
-						password);
-			}
-			logger.debug("Missatge REST enviat: " + body);
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					post(String.class, body);
-			logger.debug("Missatge REST rebut: " + json);
-			return mapper.readValue(json, boolean.class);
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
-	}
-
-//	private boolean isExecucioDinsJBoss() {
-//		return System.getProperty("jboss.server.name") != null;
-//	}
-
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioRestClient.class);
-
-	@Override
-	public RespostaConsultaDadesRegistre consultaDadesRegistre(DadesConsulta dadesConsulta) {
-		try {
-			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaDadesRegistre";
-			ObjectMapper mapper  = new ObjectMapper();
-			String body = mapper.writeValueAsString(dadesConsulta);
-			Client jerseyClient = generarClient();
-			if (username != null) {
-				autenticarClient(
-						jerseyClient,
-						urlAmbMetode,
-						username,
-						password);
-			}
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					post(String.class, body);
-			logger.debug("Missatge REST rebut: " + json);
-			return mapper.readValue(json, RespostaConsultaDadesRegistre.class);
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
-	}
 
 }

@@ -435,108 +435,6 @@ public class EntitatServiceImpl implements EntitatService {
 		return (resposta.isEmpty()) ? false : true;
 	}
 	
-	/*@Override
-	@Transactional
-	public Map<Long, List<PermisDto>> findPermisos(List<Long> entitatIds) {
-		logger.debug("Consulta com a administrador dels permisos de les entitats (" + entitatIds.toString() + ")");
-		for(Long id : entitatIds)
-			entityComprovarHelper.comprovarPermisos(
-					id,
-					true,
-					true );
-		
-		return permisosHelper.findPermisos(
-				entitatIds,
-				EntitatEntity.class);
-	}*/
-	
-	
-//	@Transactional
-//	@Override
-//	public List<PermisDto> findPermisAdmin1( Long id ) {
-//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//		logger.debug("Consulta com a administrador del permis de l'entitat (id=" + id + ")");
-//		entityComprovarHelper.comprovarEntitat(
-//				id,
-//				false,
-//				false,
-//				false);
-//		boolean esAdministradorEntitat = permisosHelper.isGrantedAll(
-//				id,
-//				EntitatEntity.class,
-//				new Permission[] {(Permission) ExtendedPermission.ADMINISTRATION},
-//				auth);
-//		if (!esAdministradorEntitat) {
-//			logger.error("Aquest usuari no té permisos d'administrador sobre l'entitat (id=" + id + ", usuari=" + auth.getName() + ")");
-//			throw new SecurityException("Sense permisos per administrar aquesta entitat");
-//		}
-//		return permisosHelper.findPermisos(
-//				id,
-//				EntitatEntity.class);
-//	}
-
-//	@Transactional
-//	@Override
-//	@CacheEvict(value = "entitatsUsuari", allEntries = true)
-//	public void updatePermisAdmin(
-//			Long id,
-//			PermisDto permis) {
-//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//		logger.debug("Modificació com a administrador del permis de l'entitat ("
-//				+ "id=" + id + ", "
-//				+ "permis=" + permis + ")");
-//		entityComprovarHelper.comprovarEntitat(
-//				id,
-//				false,
-//				false,
-//				false);
-//		boolean esAdministradorEntitat = permisosHelper.isGrantedAll(
-//				id,
-//				EntitatEntity.class,
-//				new Permission[] {ExtendedPermission.ADMINISTRATION},
-//				auth);
-//		if (!esAdministradorEntitat) {
-//			logger.error("Aquest usuari no té permisos d'administrador sobre l'entitat (id=" + id + ", usuari=" + auth.getName() + ")");
-//			throw new SecurityException("Sense permisos per administrar aquesta entitat");
-//		}
-//		permisosHelper.updatePermis(
-//				id,
-//				EntitatEntity.class,
-//				permis);
-//	}
-//	@Transactional
-//	@Override
-//	@CacheEvict(value = "entitatsUsuari", allEntries = true)
-//	public void deletePermisAdmin(
-//			Long id,
-//			Long permisId) {
-//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//		logger.debug("Eliminació com a administrador del permis de l'entitat ("
-//				+ "id=" + id + ", "
-//				+ "permisId=" + permisId + ")");
-//		entityComprovarHelper.comprovarEntitat(
-//				id,
-//				false,
-//				false,
-//				false);
-//		boolean esAdministradorEntitat = permisosHelper.isGrantedAll(
-//				id,
-//				EntitatEntity.class,
-//				new Permission[] {ExtendedPermission.ADMINISTRATION},
-//				auth);
-//		if (!esAdministradorEntitat) {
-//			logger.error("Aquest usuari no té permisos d'administrador sobre l'entitat (id=" + id + ", usuari=" + auth.getName() + ")");
-//			throw new SecurityException("Sense permisos per administrar aquesta entitat");
-//		}
-//		permisosHelper.deletePermis(
-//				id,
-//				EntitatEntity.class,
-//				permisId);
-//	}
-
-	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
-
-
 	@Transactional
 	@Override
 	public byte[] getCapLogo() throws NoSuchFileException, IOException{
@@ -558,5 +456,6 @@ public class EntitatServiceImpl implements EntitatService {
 	}
 
 
+	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
 
 }

@@ -82,7 +82,9 @@ public class RegistreNotificaHelper {
 							RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(
 									dir3Codi, 
 									arb, 
-									2L);
+									2L,
+									notificacioEntity.getId(),
+									String.valueOf(enviament.getId()));
 							//Registrar event
 							if(arbResposta.getErrorDescripcio() != null) {
 								logger.info(" >>> ... ERROR");
@@ -120,7 +122,9 @@ public class RegistreNotificaHelper {
 						RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(
 								dir3Codi, 
 								arb, 
-								1L);
+								1L,
+								notificacioEntity.getId(),
+								getEnviamentIds(notificacioEntity));
 						//Registrar event
 						if(arbResposta.getErrorCodi() != null) {
 							logger.info(" >>> ... ERROR");
@@ -158,7 +162,9 @@ public class RegistreNotificaHelper {
 					RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(
 							dir3Codi, 
 							arb, 
-							1L);
+							1L,
+							notificacioEntity.getId(),
+							getEnviamentIds(notificacioEntity));
 					//Registrar event
 					if(arbResposta.getErrorCodi() != null) {
 						logger.info(" >>> ... ERROR");
@@ -225,6 +231,15 @@ public class RegistreNotificaHelper {
 		}
 	}
 	
+	private String getEnviamentIds(NotificacioEntity notificacio) {
+		String enviamentIds = "";
+		for(NotificacioEnviamentEntity enviament : notificacio.getEnviaments()) {
+			enviamentIds += enviament.getId() + ", ";
+		}
+		if (!enviamentIds.isEmpty())
+			enviamentIds = enviamentIds.substring(0, enviamentIds.length() - 2);
+		return enviamentIds;
+	}
 	private void updateEventWithError(
 			RespostaConsultaRegistre arbResposta,
 			RegistreIdDto registreIdDto,

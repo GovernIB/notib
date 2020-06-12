@@ -28,10 +28,10 @@ import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
 public class ClientRestTestConsulta {
 
 	
-	private static final String URL = "http://localhost:8080/notib";
+	private static final String URL = "http://localhost:8280/notib";
 	private static final String USERNAME = "admin";
 	private static final String PASSWORD = "admin";
-	private static final boolean BASIC_AUTH = true;
+	private static final boolean BASIC_AUTH = false;
 	private static final String CLAU_XIFRAT = "XXXXXX";
 	
 //	private static final String URL = "http://dev.caib.es/notib";
@@ -53,7 +53,8 @@ public class ClientRestTestConsulta {
 	public void testConsulta() throws DatatypeConfigurationException, IOException, DecoderException, GeneralSecurityException {
 		
 		// Consulta notificacio
-		RespostaConsultaEstatNotificacio respostaNot = client.consultaEstatNotificacio(xifrarId(172662L));
+//		RespostaConsultaEstatNotificacio respostaNot = client.consultaEstatNotificacio(xifrarId(172662L));
+		RespostaConsultaEstatNotificacio respostaNot = client.consultaEstatNotificacio("8vzkicPP/sQ=");
 		assertNotNull(respostaNot);
 
 		// Consulta enviament

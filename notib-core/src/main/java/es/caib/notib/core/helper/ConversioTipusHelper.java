@@ -10,9 +10,7 @@ import java.util.Set;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.core.api.dto.EntregaPostalDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostal;
 import es.caib.notib.core.entity.NotificacioEntity;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;

@@ -3,7 +3,6 @@
  */
 package es.caib.notib.core.service.ws;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -148,8 +147,7 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 		if(notificacio.getDocument().getContingutBase64() != null) {
 			documentGesdocId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-					new ByteArrayInputStream(
-							Base64.decode(notificacio.getDocument().getContingutBase64())));
+					Base64.decode(notificacio.getDocument().getContingutBase64()));
 		}
 		NotificaEnviamentTipusEnumDto enviamentTipus = null;
 		if (notificacio.getEnviamentTipus() != null) {

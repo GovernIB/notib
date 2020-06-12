@@ -35,7 +35,6 @@ import org.springframework.stereotype.Component;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 
@@ -350,8 +349,8 @@ public abstract class AbstractNotificaHelper {
 
 		if (idXifrat.length() < 11) {
 			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_DADESEXT,
-					"La longitud mínima del identificar ha de ser 11 caràcters.");
+					IntegracioHelper.INTCODI_CLIENT,
+					"La longitud mínima del identificador xifrat ha de ser 11 caràcters.");
 		}
 		
 		byte[] desxifrat = cipher.doFinal(Base64.decodeBase64(idXifrat.getBytes()));

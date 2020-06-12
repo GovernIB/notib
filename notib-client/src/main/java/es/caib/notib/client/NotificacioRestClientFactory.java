@@ -25,12 +25,12 @@ public class NotificacioRestClientFactory {
 			String baseUrl,
 			String username,
 			String password,
-			boolean serveiDesplegatDamuntJbossCaib) {
+			boolean autenticacioBasic) {
 		return new NotificacioRestClient(
 				baseUrl,
 				username,
 				password,
-				serveiDesplegatDamuntJbossCaib);
+				autenticacioBasic);
 	}
 	
 	public static NotificacioRestClient getRestClientV2(
