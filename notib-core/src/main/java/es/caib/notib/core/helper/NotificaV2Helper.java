@@ -386,7 +386,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						notificacio).
 						enviament(enviament).build();
 				notificacio.updateEventAfegir(event);
-				notificacioEventRepository.save(event);
+				notificacioEventRepository.save(event); // #235 Faltava desar l'event
 				enviament.refreshNotificaConsulta();
 				integracioHelper.addAccioOk(info);
 				logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
