@@ -1,0 +1,2 @@
+-- #164
+ALTER TABLE NOT_ENTITAT ADD DIR3_CODI_REG character varying(9);

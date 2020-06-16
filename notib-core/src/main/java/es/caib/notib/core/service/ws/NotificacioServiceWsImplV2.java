@@ -963,8 +963,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		if (notificacio.getConcepte() == null || notificacio.getConcepte().isEmpty()) {
 			return setRespostaError("[1030] El concepte de la notificació no pot ser null.");
 		}
-		if (notificacio.getConcepte().length() > 255) {
-			return setRespostaError("[1031] El concepte de la notificació no pot tenir una longitud superior a 255 caràcters.");
+		if (notificacio.getConcepte().length() > 240) {
+			return setRespostaError("[1031] El concepte de la notificació no pot tenir una longitud superior a 240 caràcters.");
 		}
 		if (!validConcepteDescripcio(notificacio.getConcepte())) {
 			return setRespostaError("[1032] El format del camp concepte no és correcte. (Inclou caràcters no permesos)");
@@ -987,6 +987,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		DocumentV2 document = notificacio.getDocument();
 		if (document.getArxiuNom() == null || document.getArxiuNom().isEmpty()) {
 			return setRespostaError("[1061] El camp 'arxiuNom' del document no pot ser null.");
+		}
+		if (document.getArxiuNom() != null || document.getArxiuNom().length() > 200) {
+			return setRespostaError("[1072] El camp 'arxiuNom' no pot pot tenir una longitud superior a 200 caràcters.");
 		}
 		if (	(document.getContingutBase64() == null || document.getContingutBase64().isEmpty()) &&
 				(document.getCsv() == null || document.getCsv().isEmpty()) &&
@@ -1062,8 +1065,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				}
 			}
 			// - Email
-			if (enviament.getTitular().getEmail() != null && enviament.getTitular().getEmail().length() > 255) {
-				return setRespostaError("[1117] El camp 'email' del titular no pot ser major que 255 caràcters.");
+			if (enviament.getTitular().getEmail() != null && enviament.getTitular().getEmail().length() > 160) {
+				return setRespostaError("[1117] El camp 'email' del titular no pot ser major que 160 caràcters.");
 			}
 			// - Telèfon
 			if (enviament.getTitular().getTelefon() != null && enviament.getTitular().getTelefon().length() > 16) {

@@ -50,7 +50,7 @@ public class NotificacioCommandV2 {
 	private String organGestor;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
-	@NotEmpty @Size(max=255)
+	@NotEmpty @Size(max=240)
 	private String concepte;
 	@Size(max=1000)
 	private String descripcio;

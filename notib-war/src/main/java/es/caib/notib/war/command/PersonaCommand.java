@@ -33,7 +33,7 @@ public class PersonaCommand {
 	private String nif;
 	@Size(max=16)
 	private String telefon;
-	@Size(max=255)
+	@Size(max=160)
 	private String email;
 	@Size(max=9)	
 	private String dir3Codi;
