@@ -56,6 +56,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			String aplicacion) {
 		RespostaAnotacioRegistre resposta = new RespostaAnotacioRegistre();
 		try {
+			//TODO: substituir pel nou mètode crearAsientoRegistral
 			resposta = toRespostaAnotacioRegistre(getRegistroSalidaApi().nuevoRegistroSalida(
 					registreSortida.getCodiEntitat(),
 					toRegistroSalidaWs(
@@ -149,6 +150,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 //					codiDir3Entitat, 
 //					numeroRegistreFormatat, 
 //					tipusRegistre));
+			//TODO: substituir pel nou mètode
 			return toRespostaJustificantRecepcio(getRegistroSalidaApi().obtenerJustificante(
 					codiDir3Entitat, 
 					numeroRegistreFormatat));

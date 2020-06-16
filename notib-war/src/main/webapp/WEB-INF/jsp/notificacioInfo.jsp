@@ -422,7 +422,8 @@ $(document).ready(function() {
 																	<td><fmt:formatDate value="${enviament.sirRegDestiData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 																</tr>
 															</c:if>
-															<c:if test="${enviament.registreEstat == 'DISTRIBUIT' || enviament.registreEstat == 'OFICI_EXTERN'  || enviament.registreEstat == 'OFICI_SIR' }">
+															<%-- Assentament registral o Registre normal (versió anterior) --%>
+															<c:if test="${(not empty enviament.registreEstat && (enviament.registreEstat == 'DISTRIBUIT' || enviament.registreEstat == 'OFICI_EXTERN'  || enviament.registreEstat == 'OFICI_SIR')) || (empty enviament.registreEstat && not empty enviament.registreNumeroFormatat)}">
 																<tr>
 																	<td><strong><spring:message code="enviament.info.seu.registre.justificant"/></strong></td>
 																	<td>
