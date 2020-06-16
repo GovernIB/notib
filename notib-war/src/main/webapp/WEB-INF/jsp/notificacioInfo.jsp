@@ -491,17 +491,18 @@ $(document).ready(function() {
 																	<td>${enviament.notificaCertificacioNumSeguiment}</td>
 																</tr>
 															</c:if>
-															<tr>
-																<td><strong><spring:message code="enviament.info.notifica.certificacio.document"/></strong></td>
-																<td>
-																	certificacio_${enviament.notificaIdentificador}.pdf
-
-																	<a href="<not:modalUrl value="/notificacio/${notificacio.id}/enviament/${enviament.id}/certificacioDescarregar"/>" class="btn btn-default btn-sm pull-right btn-certificacio" title="<spring:message code="enviament.info.notifica.certificacio.num.descarregar"/>">
-																		<spring:message code="enviament.info.notifica.certificacio.num.descarregar"/>
-																		<span class="fa fa-download"></span>
-																	</a>
-																</td>
-															</tr>
+															<c:if test="${not empty enviament.notificaCertificacioArxiuId}">
+																<tr>
+																	<td><strong><spring:message code="enviament.info.notifica.certificacio.document"/></strong></td>
+																	<td>
+																		certificacio_${enviament.notificaIdentificador}.pdf
+																		<a href="<not:modalUrl value="/notificacio/${notificacio.id}/enviament/${enviament.id}/certificacioDescarregar"/>" class="btn btn-default btn-sm pull-right btn-certificacio" title="<spring:message code="enviament.info.notifica.certificacio.num.descarregar"/>">
+																			<spring:message code="enviament.info.notifica.certificacio.num.descarregar"/>
+																			<span class="fa fa-download"></span>
+																		</a>
+																	</td>
+																</tr>
+															</c:if>
 														</tbody>
 													</table>
 							    				</td>

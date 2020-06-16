@@ -77,6 +77,7 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private String notificaCertificacioMime;
 	private String notificaCertificacioOrigen;
 	private String notificaCertificacioMetadades;
+	private String notificaCertificacioArxiuId;
 	private String notificaCertificacioCsv;
 	private String notificaReferencia;
 	private String notificaIdentificador;
