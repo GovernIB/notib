@@ -362,12 +362,8 @@ $(document).ready(function() {
 											</td>
 											<td>
 											<c:choose>
-												<c:when test="${not empty enviament.titular.nom}">
-												enviament.titular.nom
-												</c:when>
-												<c:otherwise>
-												enviament.titular.raoSocial
-												</c:otherwise>
+												<c:when test="${not empty enviament.titular.nom}">${enviament.titular.nom}</c:when>
+												<c:otherwise>${enviament.titular.raoSocial}</c:otherwise>
 											</c:choose>
 											${enviament.titular.llinatge1}
 											${enviament.titular.llinatge2}
