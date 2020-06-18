@@ -14,6 +14,7 @@ import javax.jws.WebService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +59,7 @@ import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaDadesRegistre;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
+import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
@@ -75,6 +77,7 @@ import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.helper.RegistreNotificaHelper;
+import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.EntitatTipusDocRepository;
@@ -115,6 +118,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	@Autowired
 	EntitatTipusDocRepository entitatTipusDocRepository;
 	@Autowired
+	private AplicacioRepository aplicacioRepository;
+	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired 
 	private PermisosHelper permisosHelper;
@@ -152,10 +157,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		RespostaAlta resposta = new RespostaAlta();
 		String emisorDir3Codi = notificacio.getEmisorDir3Codi();
 		EntitatEntity entitat = entitatRepository.findByDir3Codi(emisorDir3Codi);
+		String usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+		AplicacioEntity aplicacio = null;
+		if (entitat != null && usuariCodi != null)
+			aplicacio = aplicacioRepository.findByEntitatIdAndUsuariCodi(entitat.getId(), usuariCodi);
+		
 		resposta = validarNotificacio(
 				notificacio,
 				emisorDir3Codi,
-				entitat);
+				entitat,
+				aplicacio);
 		
 		if (resposta.isError()) {
 			integracioHelper.addAccioError(info, resposta.getErrorDescripcio());
@@ -832,6 +843,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1001 | El camp 'emisorDir3Codi' no pot tenir una longitud superior a 9 caràcters
 	// 1010 | No s'ha trobat cap entitat configurada a Notib amb el codi Dir3 especificat
 	// 1011 | L'entitat especificada està desactivada per a l'enviament de notificacions
+	// 1012 | L'usuari d'aplicació no està assignat a l'entitat
 	// 1020 | El camp 'procedimentCodi' no pot ser null
 	// 1021 | El camp 'procedimentCodi' no pot tenir una longitud superior a 9 caràcters
 	// 1030 | El concepte de la notificació no pot ser null
@@ -933,7 +945,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	protected RespostaAlta validarNotificacio(
 			NotificacioV2 notificacio,
 			String emisorDir3Codi,
-			EntitatEntity entitat) {
+			EntitatEntity entitat,
+			AplicacioEntity aplicacio) {
 		RespostaAlta resposta = new RespostaAlta();
 		boolean comunicacioSenseAdministracio = false;
 		boolean comunicacioAmbAdministracio = false;
@@ -951,6 +964,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 		if (!entitat.isActiva()) {
 			return setRespostaError("[1011] L'entitat especificada està desactivada per a l'enviament de notificacions");
+		}
+		// Aplicacio
+		if (aplicacio == null) {
+			return setRespostaError("[1012] L'usuari d'aplicació no està assignat a l'entitat amb codi Dir3 " + emisorDir3Codi);
 		}
 		// Procediment
 		if (notificacio.getProcedimentCodi() == null) {

@@ -28,13 +28,13 @@
 </head>
 <body>
 	<div class="text-right" data-toggle="botons-titol">
-		<a class="btn btn-default" href="<c:url value="/aplicacio/new"/>" data-toggle="modal" data-datatable-id="taulaAplicacions"><span class="fa fa-plus"></span>&nbsp;<spring:message code="aplicacio.list.boto.nova.aplicacio"/></a>
+		<a class="btn btn-default" href="<c:url value="/entitat/${entitat.id}/aplicacio/new"/>" data-toggle="modal" data-datatable-id="taulaAplicacions"><span class="fa fa-plus"></span>&nbsp;<spring:message code="aplicacio.list.boto.nova.aplicacio"/></a>
 	</div>
 	<script id="botonsTemplate" type="text/x-jsrender"></script>
 	<table
 		id="taulaAplicacions"
 		data-toggle="datatable"
-		data-url="<c:url value="/aplicacio/datatable"/>"
+		data-url="<c:url value="/entitat/${entitat.id}/aplicacio/datatable"/>"
 		data-search-enabled="true"
 		data-selection-enabled="false"
 		data-default-order="0" 
@@ -61,4 +61,7 @@
 			</tr>
 		</thead>
 	</table>
+	<div class="text-right">
+		<a class="btn btn-default" href="<c:url value="/entitat"/>" data-datatable-id="taulaAplicacions"><span class="fa fa-reply"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
+	</div>
 </body>

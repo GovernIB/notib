@@ -6,11 +6,16 @@ package es.caib.notib.core.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.audit.NotibAuditable;
+import lombok.Getter;
 
 /**
  * Classe del model de dades que representa una aplicació amb
@@ -18,6 +23,7 @@ import es.caib.notib.core.audit.NotibAuditable;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
 @Entity
 @Table(name="not_aplicacio")
 @EntityListeners(AuditingEntityListener.class)
@@ -27,14 +33,12 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 	protected String usuariCodi;
 	@Column(name = "callback_url", length = 256)
 	private String callbackUrl;
-
-	public String getUsuariCodi() {
-		return usuariCodi;
-	}
-	public String getCallbackUrl() {
-		return callbackUrl;
-	}
 	
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "entitat_id", nullable = false)
+	@ForeignKey(name = "not_aplicacio_entitat_fk")
+	protected EntitatEntity entitat;
+
 	public void update(
 			String usuariCodi,
 			String callbackUrl) {
@@ -43,9 +47,11 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 	}
 	
 	public static Builder getBuilder(
+			EntitatEntity entitat,
 			String codi,
 			String urlCallback) {
 		return new Builder(
+				entitat,
 				codi,
 				urlCallback);
 	}
@@ -53,9 +59,11 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 	public static class Builder {
 		AplicacioEntity built;
 		Builder(
+				EntitatEntity entitat,
 				String usuariCodi,
 				String callbackUrl) {
 			built = new AplicacioEntity();
+			built.entitat = entitat;
 			built.usuariCodi = usuariCodi;
 			built.callbackUrl = callbackUrl;
 		}

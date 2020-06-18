@@ -46,8 +46,9 @@ public class UsuariAplicacioServiceBean implements UsuariAplicacioService {
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public AplicacioDto delete(
-			Long id) throws NotFoundException {
-		return delegate.delete(id);
+			Long id, 
+			Long entitatId) throws NotFoundException {
+		return delegate.delete(id, entitatId);
 	}
 
 	@Override
@@ -56,6 +57,12 @@ public class UsuariAplicacioServiceBean implements UsuariAplicacioService {
 			Long aplicacioId) {
 		return delegate.findById(aplicacioId);
 	}
+	
+	@Override
+	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN", "NOT_APL"})
+	public AplicacioDto findByEntitatAndId(Long entitatId, Long aplicacioId) {
+		return delegate.findByEntitatAndId(entitatId, aplicacioId);
+	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN", "NOT_APL"})
@@ -63,12 +70,26 @@ public class UsuariAplicacioServiceBean implements UsuariAplicacioService {
 			String usuariCodi) {
 		return delegate.findByUsuariCodi(usuariCodi);
 	}
+	
+	@Override
+	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN", "NOT_APL"})
+	public AplicacioDto findByEntitatAndUsuariCodi(
+			Long entitatId, 
+			String usuariCodi) {
+		return delegate.findByEntitatAndUsuariCodi(entitatId, usuariCodi);
+	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN"})
 	public PaginaDto<AplicacioDto> findPaginat(
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findPaginat(paginacioParams);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN"})
+	public PaginaDto<AplicacioDto> findPaginatByEntitat(Long entitatId, PaginacioParamsDto paginacioParams) {
+		return delegate.findPaginatByEntitat(entitatId, paginacioParams);
 	}
 
 }

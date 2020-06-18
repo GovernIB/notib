@@ -48,7 +48,9 @@ public interface UsuariAplicacioService {
 	 * 
 	 * @param id
 	 *            Atribut id de l'aplicació a esborrar.
-	 *            
+	 * @param entitatId
+	 * 			  Atribut id de la entitat a la que pertany l'apliació
+	 *             
 	 * @return L'aplicació esborrada.
 	 * 
 	 * @throws NotFoundException
@@ -56,7 +58,8 @@ public interface UsuariAplicacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public AplicacioDto delete(
-			Long id) throws NotFoundException;
+			Long id,
+			Long entitatId) throws NotFoundException;
 	
 	/**
 	 * Consulta una aplicació a partir d'un l'identificador.
@@ -70,6 +73,19 @@ public interface UsuariAplicacioService {
 	public AplicacioDto findById(Long aplicacioId);
 	
 	/**
+	 * Consulta una aplicació a partir d'un l'identificador.
+	 * 
+	 * @param aplicacioId
+	 *            Identificador de l'aplicació a consultar
+	 * @param entitatId
+	 * 			  Atribut id de la entitat a la que pertany l'apliació
+	 *            
+	 * @return L'aplicació amb l'identificador assenyalat.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public AplicacioDto findByEntitatAndId(Long entitatId, Long aplicacioId);
+	
+	/**
 	 * Consulta una aplicació a partir del codi.
 	 * 
 	 * @param aplicacioCodi
@@ -81,6 +97,19 @@ public interface UsuariAplicacioService {
 	public AplicacioDto findByUsuariCodi(String usuariCodi);
 	
 	/**
+	 * Consulta una aplicació a partir del codi.
+	 * 
+	 * @param aplicacioCodi
+	 *            Codi de l'aplicació a consultar
+	 * @param entitatId
+	 * 			  Atribut id de la entitat a la que pertany l'apliació
+	 *            
+	 * @return L'aplicació amb el codi assenyalat.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public AplicacioDto findByEntitatAndUsuariCodi(Long entitatId, String usuariCodi);
+	
+	/**
 	 * Llistat amb totes les aplicacions paginades.
 	 * 
 	 * @param paginacioParams
@@ -90,5 +119,16 @@ public interface UsuariAplicacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public PaginaDto<AplicacioDto> findPaginat(PaginacioParamsDto paginacioParams);
+	
+	/**
+	 * Llistat amb totes les aplicacions paginades.
+	 * 
+	 * @param paginacioParams
+	 *            Paràmetres per a dur a terme la paginació del resultats.
+	 *            
+	 * @return La pàgina d'aplicacions.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public PaginaDto<AplicacioDto> findPaginatByEntitat(Long entitatId, PaginacioParamsDto paginacioParams);
 	
 }

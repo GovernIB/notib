@@ -3,6 +3,8 @@
  */
 package es.caib.notib.core.helper;
 
+import java.io.InputStream;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -10,6 +12,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.soap.SOAPFaultException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -266,7 +269,16 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					
 					Date dataCertificacio = toDate(certificacio.getFechaCertificacion());
 					if (!dataCertificacio.equals(dataUltimaCertificacio)) {
-						String gestioDocumentalId = "1574780444718";
+//						String gestioDocumentalId = "1574780444718";
+						byte[] decodificat = certificacio.getContenidoCertificacion();
+						if (enviament.getNotificaCertificacioArxiuId() != null) {
+							pluginHelper.gestioDocumentalDelete(
+									enviament.getNotificaCertificacioArxiuId(),
+									PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
+						}
+						String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
+								PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
+								decodificat);
 						logger.info("Actualitzant certificació enviament...");
 						enviament.updateNotificaCertificacio(
 								dataCertificacio,
@@ -368,11 +380,25 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			certificacio.setHash("b081c7abf42d5a8e5a4050958f28046bdf86158c");
 			certificacio.setOrigen("electronico");
 			certificacio.setCsv("dasd-dsadad-asdasd-asda-sda-das");
+			
+			byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
+			certificacio.setContenidoCertificacion(arxiuBytes);
+			certificacio.setSize(String.valueOf(arxiuBytes.length));
 			resultat.setCertificacion(certificacio);
+			resultat.setFechaCreacion(date);
+			resultat.setFechaPuestaDisposicion(date);
+			GregorianCalendar cal = date.toGregorianCalendar();
+			cal.add(Calendar.DAY_OF_MONTH, 1);
+			XMLGregorianCalendar dataCaducitat = DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
+			resultat.setFechaCaducidad(dataCaducitat);
 		} catch (Exception e) {}		
 		return resultat;
 	}
 
+	private InputStream getContingutNotificacioAdjunt() {
+		return getClass().getResourceAsStream(
+				"/es/caib/notib/core/certificacio.pdf");
+	}
 	
 
 

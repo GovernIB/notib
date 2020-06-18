@@ -21,14 +21,15 @@
 	<script type="text/javascript"></script>
 </head>
 <body>
-	<c:set var="createAplication"><not:modalUrl value="/aplicacio"/></c:set>
+	<c:set var="createAplication"><not:modalUrl value="/entitat/${entitat.id}/aplicacio"/></c:set>
 	<form:form action="${createAplication}" method="post" cssClass="form-horizontal" commandName="aplicacioCommand" role="form">
 		<form:hidden path="id"/>
+		<input type="hidden" name="entitatId" value="${entitat.id}"/>
 		<not:inputText name="usuariCodi" textKey="aplicacio.form.camp.codi" required="true" readonly="${!empty aplicacioCommand.id}"/>
 		<not:inputText name="callbackUrl" textKey="aplicacio.form.camp.callback.url" required="true"/>
 		<div id="modal-botons">
 			<button id="btnSubmit" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
-			<a href="<c:url value="/aplicacions"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+			<a href="<c:url value="/entitat/${entitat.id}/aplicacio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
 </body>
