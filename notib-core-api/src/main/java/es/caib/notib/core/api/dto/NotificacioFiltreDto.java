@@ -30,6 +30,8 @@ public class NotificacioFiltreDto implements Serializable {
 	private Long procedimentId;
 	private TipusUsuariEnumDto tipusUsuari;
 	private String numExpedient;
+	private String creadaPer;
+	private String identificador;
 	
 	@Override
 	public String toString() {

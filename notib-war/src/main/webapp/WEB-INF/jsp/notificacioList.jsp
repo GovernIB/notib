@@ -344,6 +344,8 @@ $(document).ready(function() {
 			<div class="col-md-2">
 				<not:inputDate name="dataFi" placeholderKey="notificacio.list.filtre.camp.datafi" inline="true" required="false" />
 			</div>
+		</div>
+		<div class="row">
 			<div class="col-md-2">
 				<not:inputText name="titular" inline="true" placeholderKey="notificacio.list.filtre.camp.titular"/>
 			</div>
@@ -359,6 +361,25 @@ $(document).ready(function() {
 			<div class="col-md-2 pull-right form-buttons">
 				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 				<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-2">
+				<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
+				<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+				<not:inputSuggest 
+					name="creadaPer" 
+					urlConsultaInicial="${urlConsultaInicial}" 
+					urlConsultaLlistat="${urlConsultaLlistat}" 
+					textKey="notificacio.list.filtre.camp.numexpedient"
+					placeholderKey="notificacio.list.filtre.camp.creadaper"
+					suggestValue="codi"
+					suggestText="nom"
+					suggestTextAddicional="nif"
+					inline="true"/>
+			</div>
+			<div class="col-md-2">
+				<not:inputText name="identificador" inline="true" placeholderKey="notificacio.list.filtre.camp.identificador"/>
 			</div>
 		</div>
 	</form:form>

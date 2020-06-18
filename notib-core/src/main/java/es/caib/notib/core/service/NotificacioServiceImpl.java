@@ -597,6 +597,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getTipusUsuari(),
 							filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
 							filtre.getNumExpedient(),
+							filtre.getCreadaPer() == null || filtre.getCreadaPer().isEmpty(),
+							filtre.getCreadaPer(),
+							filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
+							filtre.getIdentificador(),
 							pageable);
 				} else if (!procedimentsCodisNotib.isEmpty()) {
 					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
@@ -623,6 +627,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getTipusUsuari(),
 							filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
 							filtre.getNumExpedient(),
+							filtre.getCreadaPer() == null || filtre.getCreadaPer().isEmpty(),
+							filtre.getCreadaPer(),
+							filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
+							filtre.getIdentificador(),
 							pageable);
 				}
 				
@@ -649,6 +657,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 						filtre.getTipusUsuari(),
 						filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
 						filtre.getNumExpedient(),
+						filtre.getCreadaPer() == null || filtre.getCreadaPer().isEmpty(),
+						filtre.getCreadaPer(),
+						filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
+						filtre.getIdentificador(),
 						pageable);
 			} else if (isAdministrador) {
 				notificacions = notificacioRepository.findAmbFiltre(
@@ -672,6 +684,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 						filtre.getTipusUsuari(),
 						filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
 						filtre.getNumExpedient(),
+						filtre.getCreadaPer() == null || filtre.getCreadaPer().isEmpty(),
+						filtre.getCreadaPer(),
+						filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
+						filtre.getIdentificador(),
 						pageable);
 			}
 		}

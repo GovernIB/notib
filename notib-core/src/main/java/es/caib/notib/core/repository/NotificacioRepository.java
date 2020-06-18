@@ -164,7 +164,12 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"    ) > 0) " + 
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
 			"and (ntf.grupCodi = null) " + 
-			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)")
+			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient) " +
+			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " + 
+			"and (:isIdentificadorNull = true or " + 
+			"		(ntf.id = (select notificacio.id" + 
+			"				from NotificacioEnviamentEntity env" + 
+			"				where env.notificaIdentificador = :identificador)))")
 	public Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotib(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
@@ -188,6 +193,10 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("tipusUsuari") TipusUsuariEnumDto tipusUsuar,
 			@Param("isNumExpedientNull") boolean isNumExpedientNull,
 			@Param("numExpedient") String numExpedient,
+			@Param("isCreadaPerNull") boolean isCreadaPerNull,
+			@Param("creadaPer") String creadaPer,
+			@Param("isIdentificadorNull") boolean isIdentificadorNull,
+			@Param("identificador") String identificador,
 			Pageable paginacio);
 	
 	@Query(	"from " +
@@ -211,7 +220,12 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
 			"    ) > 0) " + 
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " + 
-			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)")
+			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)" +
+			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
+			"and (:isIdentificadorNull = true or " +
+			"		(ntf.id = (select notificacio.id" +
+			"				from NotificacioEnviamentEntity env" +
+			"				where env.notificaIdentificador = :identificador)))")
 	public Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
@@ -236,6 +250,10 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("tipusUsuari") TipusUsuariEnumDto tipusUsuar,
 			@Param("isNumExpedientNull") boolean isNumExpedientNull,
 			@Param("numExpedient") String numExpedient,
+			@Param("isCreadaPerNull") boolean isCreadaPerNull,
+			@Param("creadaPer") String creadaPer,
+			@Param("isIdentificadorNull") boolean isIdentificadorNull,
+			@Param("identificador") String identificador,
 			Pageable paginacio);
 	
 	@Query(	"from " +
@@ -256,7 +274,12 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
 			"    ) > 0) " +
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " + 
-			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)")
+			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)" +
+			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
+			"and (:isIdentificadorNull = true or " +
+			"		(ntf.id = (select notificacio.id"
+			+ "				from NotificacioEnviamentEntity env"
+			+ "				where env.notificaIdentificador = :identificador)))")
 	public Page<NotificacioEntity> findAmbFiltre(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
@@ -278,6 +301,10 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("tipusUsuari") TipusUsuariEnumDto tipusUsuari,
 			@Param("isNumExpedientNull") boolean isNumExpedientNull,
 			@Param("numExpedient") String numExpedient,
+			@Param("isCreadaPerNull") boolean isCreadaPerNull,
+			@Param("creadaPer") String creadaPer,
+			@Param("isIdentificadorNull") boolean isIdentificadorNull,
+			@Param("identificador") String identificador,
 			Pageable paginacio);
 	
 	@Query(	"select " +
