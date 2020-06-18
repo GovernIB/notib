@@ -173,13 +173,13 @@ function formatDate(data) {
 	//Añadir ceros a los numeros de un dígito
 	Number.prototype.padLeft = function(base,chr){
 		var  len = (String(base || 10).length - String(this).length)+1;
-			return len > 0? new Array(len).join(chr || '0')+this : this;
-		}
+		return len > 0? new Array(len).join(chr || '0')+this : this;
+	}
 	if (data !== null) {
 		//dd/MM/yyyy HH:mm:SS
 		var procesDate = new Date(data),
-		procesDateFormat = [(procesDate.getMonth()+1).padLeft(),
-			procesDate.getDate().padLeft(),
+		procesDateFormat = [procesDate.getDate().padLeft(),
+			(procesDate.getMonth()+1).padLeft(),
 			procesDate.getFullYear()].join('/') +' ' +
            [procesDate.getHours().padLeft(),
         	   procesDate.getMinutes().padLeft(),
