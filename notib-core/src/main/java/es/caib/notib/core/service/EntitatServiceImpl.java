@@ -38,6 +38,7 @@ import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.helper.UsuariHelper;
+import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.EntitatTipusDocRepository;
 import es.caib.notib.core.security.ExtendedPermission;
@@ -52,6 +53,10 @@ public class EntitatServiceImpl implements EntitatService {
 
 	@Resource
 	private EntitatRepository entitatRepository;
+	@Resource
+	private EntitatTipusDocRepository entitatTipusDocRepository;
+	@Resource
+	private AplicacioRepository aplicacioRepository;
 
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
@@ -63,8 +68,6 @@ public class EntitatServiceImpl implements EntitatService {
 	private CacheHelper cacheHelper;
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
-	@Resource
-	private EntitatTipusDocRepository entitatTipusDocRepository;
 	
 	@Resource
 	private UsuariHelper usuariHelper;
@@ -333,10 +336,14 @@ public class EntitatServiceImpl implements EntitatService {
 							paginacioHelper.toSpringDataPageable(paginacioParams)),
 					EntitatDto.class);
 		for (EntitatDto entitat: resposta.getContingut()) {
+			// Permisos
 			List<PermisDto> permisos = permisosHelper.findPermisos(
 					entitat.getId(),
 					EntitatEntity.class);
 			entitat.setPermisos(permisos);
+			
+			// Aplicacions
+			entitat.setNumAplicacions(aplicacioRepository.countByEntitatId(entitat.getId()));
 		}
 		return resposta;
 	}

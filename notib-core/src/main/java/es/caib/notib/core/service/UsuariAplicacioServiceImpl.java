@@ -17,6 +17,7 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.UsuariAplicacioService;
 import es.caib.notib.core.entity.AplicacioEntity;
+import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
@@ -32,6 +33,7 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 	
 	@Resource
 	private AplicacioRepository aplicacioRepository;
+
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
@@ -49,8 +51,9 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 				true,
 				false,
 				false);
-		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(aplicacio.getEntitatId());
 		AplicacioEntity entity = AplicacioEntity.getBuilder(
+				entitat,
 				aplicacio.getUsuariCodi(),
 				aplicacio.getCallbackUrl()).build();
 		
@@ -85,7 +88,7 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 	
 	@Override
 	@Transactional
-	public AplicacioDto delete(Long id) throws NotFoundException {
+	public AplicacioDto delete(Long id, Long entitatId) throws NotFoundException {
 		
 		logger.debug("Esborrant aplicacio (id=" + id +  ")");
 		entityComprovarHelper.comprovarPermisos(
@@ -93,7 +96,7 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 				true,
 				false,
 				false);
-		AplicacioEntity entity = aplicacioRepository.findOne( id );
+		AplicacioEntity entity = aplicacioRepository.findByEntitatIdAndId(entitatId, id );
 		
 		aplicacioRepository.delete(entity);
 		
@@ -124,6 +127,25 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 	
 	@Override
 	@Transactional(readOnly = true)
+	public AplicacioDto findByEntitatAndId(Long entitatId, Long aplicacioId) {
+		
+		logger.debug("Consulta una aplicació amb entitatId= " + entitatId + " i id = " + aplicacioId.toString());
+		entityComprovarHelper.comprovarPermisos(
+				null,
+				true,
+				false,
+				false);
+		
+		AplicacioEntity entity = aplicacioRepository.findByEntitatIdAndId(entitatId, aplicacioId);
+		
+		return conversioTipusHelper.convertir(
+				entity,
+				AplicacioDto.class);
+		
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
 	public AplicacioDto findByUsuariCodi(String usuariCodi) {
 
 		logger.debug("Consulta una aplicació amb codi = " + usuariCodi);
@@ -134,6 +156,25 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 				false);
 		
 		AplicacioEntity entity = aplicacioRepository.findByUsuariCodi(usuariCodi);
+		
+		return conversioTipusHelper.convertir(
+				entity,
+				AplicacioDto.class);
+		
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public AplicacioDto findByEntitatAndUsuariCodi(Long entitatId, String usuariCodi) {
+
+		logger.debug("Consulta una aplicació amb entitatId= " + entitatId + " i codi = " + usuariCodi);
+		entityComprovarHelper.comprovarPermisos(
+				null,
+				true,
+				false,
+				false);
+		
+		AplicacioEntity entity = aplicacioRepository.findByEntitatIdAndUsuariCodi(entitatId, usuariCodi);
 		
 		return conversioTipusHelper.convertir(
 				entity,
@@ -161,6 +202,28 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 				aplicacions,
 				AplicacioDto.class);
 		
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public PaginaDto<AplicacioDto> findPaginatByEntitat(Long entitatId, PaginacioParamsDto paginacioParams) {
+		logger.debug("Consulta de un llistat paginat de totes les aplicacions de l'entitat amb Id: " + entitatId);
+		
+		entityComprovarHelper.comprovarPermisos(
+				null,
+				true,
+				false,
+				false);
+		
+		Page<AplicacioEntity> aplicacions = aplicacioRepository.findByEntitatIdFiltrat(
+				entitatId,
+				paginacioParams.getFiltre(),
+				paginacioHelper.toSpringDataPageable(paginacioParams)
+				);
+		
+		return paginacioHelper.toPaginaDto(
+				aplicacions,
+				AplicacioDto.class);
 	}
 	
 	

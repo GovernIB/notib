@@ -48,10 +48,16 @@
 				<th data-col-name="id" data-visible="false" width="4%">#</th>
 				<th data-col-name="codi"><spring:message code="entitat.list.columna.codi"/></th>
 				<th data-col-name="nom"><spring:message code="entitat.list.columna.nom"/></th>
+				<th data-col-name="dir3Codi"><spring:message code="entitat.list.columna.dir3Codi"/></th>
 				<th data-col-name="activa" data-template="#cellActivaTemplate">
 					<spring:message code="entitat.list.columna.activa"/>
 					<script id="cellActivaTemplate" type="text/x-jsrender">
 						{{if activa}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="numAplicacions" data-orderable="false" data-template="#cellAplicacionsTemplate" width="10%">
+					<script id="cellAplicacionsTemplate" type="text/x-jsrender">
+						<a href="<c:url value="/entitat/{{:id}}/aplicacio"/>" class="btn btn-default"><span class="fa fa-puzzle-piece"></span>&nbsp;<spring:message code="entitat.list.boto.aplicacions"/>&nbsp;<span class="badge">{{:numAplicacions}}</span></a>
 					</script>
 				</th>
 				<th data-col-name="permisosCount" data-orderable="false" data-template="#cellPermisosTemplate" width="10%">

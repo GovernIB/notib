@@ -107,7 +107,6 @@ public class NotificacioServiceController extends BaseController {
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
 			HttpServletRequest request) throws UnsupportedEncodingException {
 		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
-//		identificador = URLDecoder.decode(identificador, StandardCharsets.UTF_8.toString());
 		String identificador = extractIdentificador(request);
 		try {
 			return notificacioServiceWsV2.consultaEstatNotificacio(identificador);
@@ -146,7 +145,6 @@ public class NotificacioServiceController extends BaseController {
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(
 			HttpServletRequest request) throws UnsupportedEncodingException {
 		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
-//		referencia = URLDecoder.decode(referencia, StandardCharsets.UTF_8.toString());
 		String referencia = extractIdentificador(request);
 		try {
 			return notificacioServiceWsV2.consultaEstatEnviament(referencia);

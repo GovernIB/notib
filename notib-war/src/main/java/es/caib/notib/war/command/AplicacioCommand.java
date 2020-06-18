@@ -11,12 +11,15 @@ import org.hibernate.validator.constraints.NotEmpty;
 import es.caib.notib.core.api.dto.AplicacioDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.CodiAplicacioNoRepetit;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Command per al manteniment d'aplicacions.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 @CodiAplicacioNoRepetit
 public class AplicacioCommand {
 
@@ -25,26 +28,8 @@ public class AplicacioCommand {
 	private String usuariCodi;
 	@NotEmpty @Size(max=256) 
 	private String callbackUrl;
+	private Long entitatId;
 
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getUsuariCodi() {
-		return usuariCodi;
-	}
-	public void setUsuariCodi(String usuariCodi) {
-		this.usuariCodi = usuariCodi;
-	}
-	public String getCallbackUrl() {
-		return callbackUrl;
-	}
-	public void setCallbackUrl(String callbackUrl) {
-		this.callbackUrl = callbackUrl;
-	}
-	
 	
 	public static AplicacioCommand asCommand(AplicacioDto dto) {
 		return ConversioTipusHelper.convertir(

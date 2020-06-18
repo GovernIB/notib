@@ -25,7 +25,7 @@ import es.caib.notib.war.helper.MissatgesHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class CodiAplicacioNoRepetitValidator implements ConstraintValidator<CodiAplicacioNoRepetit, Object> {
+public class CodiAplicacioNoRepetitValidator implements ConstraintValidator<CodiAplicacioNoRepetit, AplicacioCommand> {
 
 	private HttpServletRequest request;
 
@@ -42,18 +42,19 @@ public class CodiAplicacioNoRepetitValidator implements ConstraintValidator<Codi
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isValid(
-			final Object value, 
+			final AplicacioCommand command, 
 			final ConstraintValidatorContext context) {
 		try {
-			final AplicacioCommand command = (AplicacioCommand) value;
 			
 			final Long id = command.getId();
 			final String usuariCodi = command.getUsuariCodi();
+			final Long entitatId = command.getEntitatId();
 			
 			boolean valid = true;
 			
 			// Comprovar codi no repetit
-			AplicacioDto aplicacio = usuariAplicacioService.findByUsuariCodi(usuariCodi);
+//			AplicacioDto aplicacio = usuariAplicacioService.findByUsuariCodi(usuariCodi);
+			AplicacioDto aplicacio = usuariAplicacioService.findByEntitatAndUsuariCodi(entitatId, usuariCodi);
 			if (aplicacio != null) {
 				if (id == null) {
 					valid = false;
