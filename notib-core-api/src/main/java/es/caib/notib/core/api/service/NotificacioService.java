@@ -16,6 +16,7 @@ import es.caib.notib.core.api.dto.LocalitatsDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
+import es.caib.notib.core.api.dto.NotificacioErrorCallbackFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -314,7 +315,9 @@ public interface NotificacioService {
 	
 
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	PaginaDto<NotificacioDto> findWithCallbackError(PaginacioParamsDto paginacioParams);
+	PaginaDto<NotificacioDto> findWithCallbackError(
+			NotificacioErrorCallbackFiltreDto filtre,
+			PaginacioParamsDto paginacioParams);
 	
 	/**
 	 * Reactiva les consultes d'estat a Notifica.

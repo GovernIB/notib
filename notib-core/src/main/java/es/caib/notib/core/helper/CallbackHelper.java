@@ -79,6 +79,7 @@ public class CallbackHelper {
 		NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
 		if (event == null)
 			throw new NotFoundException("eventId:" + eventId, NotificacioEventEntity.class);
+		NotificacioEntity notificacio = notificacioRepository.findById(event.getNotificacioId());
 		int intents = event.getCallbackIntents() + 1;
 		Date ara = new Date();
 		try {
@@ -93,15 +94,17 @@ public class CallbackHelper {
 				// Avisa al client que hi ha hagut una modificació a l'enviament
 				notificaCanvi(event.getEnviament());
 				// Marca l'event com a notificat
-				event.setNotificacio(event.getEnviament().getNotificacio());
+				event.setNotificacio(notificacio); //event.getEnviament().getNotificacio());
 				event.updateCallbackClient(CallbackEstatEnumDto.NOTIFICAT, ara, intents, null);
+				notificacio.updateLastCallbackError(false);
 				ret = true;
 				integracioHelper.addAccioOk(info);
 			} else {
 				// És un event pendent de notificar que no és del tipus esperat
 				String errorDescripcio = "L'event id=" + event.getId() + " és del tipus " + event.getTipus() + " i no es pot notificar a l'aplicació client.";
-				event.setNotificacio(event.getEnviament().getNotificacio());
+				event.setNotificacio(notificacio); //event.getEnviament().getNotificacio());
 				event.updateCallbackClient(CallbackEstatEnumDto.ERROR, ara, intents, errorDescripcio);
+				notificacio.updateLastCallbackError(true);
 				integracioHelper.addAccioError(info, "Error enviant l'avís de canvi d'estat: " + errorDescripcio);
 			}
 		} catch (Exception ex) {
@@ -114,31 +117,31 @@ public class CallbackHelper {
 
 			// TODO: solució temporal.
 			//event.setNotificacio(event.getEnviament().getNotificacio());   <===  Revisar perquè falla quan recupera la notificació d'un event.
-			NotificacioEntity notificacio = notificacioRepository.findById(event.getNotificacioId());
 			event.setNotificacio(notificacio);
 			event.updateCallbackClient(
 					estatNou,
 					ara,
 					intents,
 					"Error notificant l'event al client: " + ex.getMessage());
+			notificacio.updateLastCallbackError(true);
 			integracioHelper.addAccioError(info, "Error enviant l'avís de canvi d'estat", ex);
 		}
+		notificacioRepository.save(notificacio);
 		
 		// Crea una nova entrada a la taula d'events per deixar constància de la notificació a l'aplicació client
 		Builder eventBuilder = null;
 		if (event.getEnviament() != null) {
 		eventBuilder = NotificacioEventEntity.getBuilder(
 				NotificacioEventTipusEnumDto.CALLBACK_CLIENT,
-				event.getEnviament().getNotificacio()).
+				notificacio). //event.getEnviament().getNotificacio()).
 				enviament(event.getEnviament()).
 				descripcio("Callback " + event.getTipus());
 		} else {
-			NotificacioEntity notificacio = notificacioRepository.findById(event.getNotificacioId());
 			event.setNotificacio(notificacio);
 			
 			eventBuilder = NotificacioEventEntity.getBuilder(
 					NotificacioEventTipusEnumDto.CALLBACK_CLIENT,
-					event.getNotificacio()).
+					notificacio). // event.getNotificacio()).
 					descripcio("Callback " + event.getTipus());
 		}
 		if (!ret && eventBuilder != null) {

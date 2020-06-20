@@ -1,5 +1,7 @@
 package es.caib.notib.war.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -7,25 +9,29 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomBooleanEditor;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioErrorCallbackFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.war.command.NotificacioErrorCallbackFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
-import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
 
 /**
@@ -43,26 +49,31 @@ public class ReintentMassiuController extends BaseUserController {
 	private EnviamentService enviamentService;
 	@Autowired
 	private NotificacioService notificacioService;
+	@Autowired
+	private ProcedimentService procedimentService;
+	
+	private final static String MASSIU_CALLBACK_FILTRE = "massiu_callback_filtre";
 	
 	@RequestMapping(value = "/notificacions", method = RequestMethod.GET)
 	public String getNotificacions(
 			HttpServletRequest request,
 			Model model) {
+		model.addAttribute(new NotificacioErrorCallbackFiltreCommand());
+		model.addAttribute("procediments", procedimentService.findAll());
 		model.addAttribute("notificacioEstats", 
 				EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
-		model.addAttribute("tipusUsuari", 
-				EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
-						"es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
 		model.addAttribute("notificacioEnviamentEstats",
 				EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
-		model.addAttribute("notificacioComunicacioTipus",
-				EnumHelper.getOptionsForEnum(NotificacioComunicacioTipusEnumDto.class,
-						"es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto."));
-		model.addAttribute("notificacioEnviamentTipus", 
-				EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class, 
-						"es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
+		return "contingutMassiuList";
+	}
+	
+	@RequestMapping(value = "/notificacions", method = RequestMethod.POST)
+	public String post(
+			HttpServletRequest request, 
+			NotificacioErrorCallbackFiltreCommand notificacioErrorCallbackFiltreCommand) {
+		request.getSession().setAttribute(MASSIU_CALLBACK_FILTRE, NotificacioErrorCallbackFiltreCommand.asDto(notificacioErrorCallbackFiltreCommand));
 		return "contingutMassiuList";
 	}
 	
@@ -70,10 +81,13 @@ public class ReintentMassiuController extends BaseUserController {
 	@ResponseBody
 	public DatatablesResponse datatable(
 			HttpServletRequest request) {
+		NotificacioErrorCallbackFiltreDto filtre = (NotificacioErrorCallbackFiltreDto) request.getSession().getAttribute(MASSIU_CALLBACK_FILTRE);
+		request.getSession().removeAttribute(MASSIU_CALLBACK_FILTRE);
 		return DatatablesHelper.getDatatableResponse(
 				request,
 				notificacioService.findWithCallbackError(
-							DatatablesHelper.getPaginacioDtoFromRequest(request)),
+						filtre,
+						DatatablesHelper.getPaginacioDtoFromRequest(request)),
 				 "id",
 				 SESSION_ATTRIBUTE_SELECCIO);
 		
@@ -169,5 +183,15 @@ public class ReintentMassiuController extends BaseUserController {
 			seleccio.clear();
 		}
 		return seleccio.size();
+	}
+	
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+		binder.registerCustomEditor(
+				Date.class, 
+				new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
+		binder.registerCustomEditor(
+				Boolean.class, 
+				new CustomBooleanEditor("SI", "NO", false));
 	}
 }

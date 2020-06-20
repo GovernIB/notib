@@ -19,6 +19,7 @@ import es.caib.notib.core.api.dto.LocalitatsDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
+import es.caib.notib.core.api.dto.NotificacioErrorCallbackFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -303,8 +304,10 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
-	public PaginaDto<NotificacioDto> findWithCallbackError(PaginacioParamsDto paginacioParams) {
-		return delegate.findWithCallbackError(paginacioParams);
+	public PaginaDto<NotificacioDto> findWithCallbackError(
+			NotificacioErrorCallbackFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findWithCallbackError(filtre, paginacioParams);
 	}
 
 	@Override

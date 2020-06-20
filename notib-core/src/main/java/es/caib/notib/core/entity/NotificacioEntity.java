@@ -120,6 +120,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "registre_num_expedient", length = 80, nullable = false)
 	protected String numExpedient;
 	
+	@Column(name = "callback_error")
+	protected boolean errorLastCallback;
+	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "not_error_event_id")
 	@ForeignKey(name = "not_noterrevent_notificacio_fk")
@@ -169,8 +172,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 
 	@Transient
 	protected boolean permisProcessar;
-	@Transient
-	protected boolean errorLastCallback;
 	
 	
 	public void addEnviament(
@@ -207,16 +208,12 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		this.motiu = motiu;
 	}
 	
+	public void updateLastCallbackError(boolean error) {
+		this.errorLastCallback = error;
+	}
+	
 	public TipusUsuariEnumDto getTipusUsuari() {
 		return tipusUsuari;
-	}
-	
-	public boolean isErrorLastCallback() {
-		return errorLastCallback;
-	}
-	
-	public void setErrorLastCallback(boolean errorLastCallback) {
-		this.errorLastCallback = errorLastCallback;
 	}
 	
 	public void updateNotificaNouEnviament(int reintentsPeriodeNotifica) {

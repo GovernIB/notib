@@ -41,9 +41,9 @@ import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificacioErrorCallbackFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
-import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
@@ -385,25 +385,25 @@ public class NotificacioServiceImpl implements NotificacioService {
 								notificacio.getProcediment().getId(),
 								isAdministrador));
 				}	
-			logger.info("Consultant events notificació...");
-			List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
-			
-			if (events != null && events.size() > 0) {
-				NotificacioEventEntity lastEvent = events.get(events.size() - 1);
-				
-				if(lastEvent.isError() && 
-							(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
-							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
-							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
-							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
-							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT) || 
-							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT) || 
-							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR) || 
-							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR))) {
-					logger.info("El darrer event de la notificació " + notificacio.getId()  + " conté un error de tipus: " + lastEvent.getTipus().name());
-					notificacio.setErrorLastCallback(true);
-				}
-			}
+//			logger.info("Consultant events notificació...");
+//			List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
+//			
+//			if (events != null && events.size() > 0) {
+//				NotificacioEventEntity lastEvent = events.get(events.size() - 1);
+//				
+//				if(lastEvent.isError() && 
+//							(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
+//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
+//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
+//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
+//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT) || 
+//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT) || 
+//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR) || 
+//							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR))) {
+//					logger.info("El darrer event de la notificació " + notificacio.getId()  + " conté un error de tipus: " + lastEvent.getTipus().name());
+//					notificacio.setErrorLastCallback(true);
+//				}
+//			}
 		}
 		
 		return conversioTipusHelper.convertir(
@@ -687,24 +687,24 @@ public class NotificacioServiceImpl implements NotificacioService {
 										notificacio.getProcediment().getId(),
 										isAdministrador));
 						}
-					if (notificacio.getTipusUsuari() != null && notificacio.getTipusUsuari().equals(TipusUsuariEnumDto.APLICACIO) && notificacio.getId() != null) {
-						logger.info("Consultant events notificació...");
-						List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
-						
-						if (events != null && events.size() > 0) {
-							NotificacioEventEntity lastEvent = events.get(events.size() - 1);
-							
-							if(lastEvent.isError() && 
-										(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
-										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
-										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
-										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
-										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
-								logger.info("El darrer event de la notificació " + notificacio.getId()  + " conté un error de tipus: " + lastEvent.getTipus().name());
-								notificacio.setErrorLastCallback(true);
-							}
-						}
-					}
+//					if (notificacio.getTipusUsuari() != null && notificacio.getTipusUsuari().equals(TipusUsuariEnumDto.APLICACIO) && notificacio.getId() != null) {
+//						logger.info("Consultant events notificació...");
+//						List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
+//						
+//						if (events != null && events.size() > 0) {
+//							NotificacioEventEntity lastEvent = events.get(events.size() - 1);
+//							
+//							if(lastEvent.isError() && 
+//										(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
+//										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
+//										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
+//										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
+//										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
+//								logger.info("El darrer event de la notificació " + notificacio.getId()  + " conté un error de tipus: " + lastEvent.getTipus().name());
+//								notificacio.setErrorLastCallback(true);
+//							}
+//						}
+//					}
 				}	
 			}
 			resultatPagina = paginacioHelper.toPaginaDto(
@@ -718,44 +718,55 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	@Transactional(readOnly = true)
 	public PaginaDto<NotificacioDto> findWithCallbackError(
+			NotificacioErrorCallbackFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
+		Page<NotificacioEntity> page = null;
 		
-//		List<NotificacioEntity> notificacions = notificacioRepository.findByTipusUsuari(TipusUsuariEnumDto.APLICACIO);
-//
-//		List<Long> docIds = new ArrayList<Long>();
-//		if(notificacions != null) {
-//			for (NotificacioEntity notificacio : notificacions) {
-//				
-//				if (notificacio.getId() != null) {
-//					logger.info("Consultant events notificació...");
-//					List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
-//					
-//					if (events != null && events.size() > 0) {
-//						NotificacioEventEntity lastEvent = events.get(events.size() - 1);
-//						
-//						if(lastEvent.isError() && 
-//									(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
-//									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
-//									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
-//									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
-//									lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
-//							logger.info("El darrer event de la notificació " + notificacio.getId()  + " conté un error de tipus: " + lastEvent.getTipus().name());
-//							docIds.add(notificacio.getId());
-//						}
-//					}
-//				}
-//			}
-//		}
-//
-//		if (!docIds.isEmpty()) {
-//			return paginacioHelper.toPaginaDto(
-//					notificacioRepository.findNotificacioMassiuByIdsPaginat(
-//							docIds,
-//							paginacioHelper.toSpringDataPageable(paginacioParams)),
-//					NotificacioDto.class);
-//		}
-
-		Page<NotificacioEntity> page = notificacioRepository.findNotificacioLastEventAmbError(paginacioHelper.toSpringDataPageable(paginacioParams));
+		if (filtre == null || filtre.isEmpty()) {
+			page = notificacioRepository.findNotificacioLastEventAmbError(paginacioHelper.toSpringDataPageable(paginacioParams));
+		} else {
+			Date dataInici = filtre.getDataInici();
+			if (dataInici != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataInici);
+				cal.set(Calendar.HOUR, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataInici = cal.getTime();
+			}
+			Date dataFi = filtre.getDataFi();
+			if (dataFi != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dataFi);
+				cal.set(Calendar.HOUR, 0);
+				cal.set(Calendar.MINUTE, 0);
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				dataFi = cal.getTime();
+			}
+			ProcedimentEntity procediment = null;
+			if (filtre.getProcedimentId() != null) {
+				procediment = procedimentRepository.findById(filtre.getProcedimentId());
+			}
+			page = notificacioRepository.findNotificacioLastEventAmbErrorAmbFiltre(
+//					filtre.getEntitatId() == null,
+//					filtre.getEntitatId(),
+					procediment == null,
+					procediment,
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi,
+					filtre.getConcepte() == null || filtre.getConcepte().trim().isEmpty(),
+					filtre.getConcepte() == null ? "" : filtre.getConcepte(),
+					filtre.getEstat() == null,
+					filtre.getEstat(),
+					filtre.getUsuari() == null || filtre.getUsuari().trim().isEmpty(),
+					filtre.getUsuari() == null ? "" : filtre.getUsuari(),
+					paginacioHelper.toSpringDataPageable(paginacioParams));
+		}
+			
 		if (page != null && page.getContent() != null && page.getContent().size() > 0) {
 			return paginacioHelper.toPaginaDto(page, NotificacioDto.class);
 		}

@@ -290,37 +290,88 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("ids") List<Long> ids,
 			Pageable pageable);
 
-	@Query("select n " + 
-			   "  from NotificacioEventEntity ne " +
-			   " left outer join ne.notificacio n " +
+//	@Query("select n " + 
+//			   "  from NotificacioEventEntity ne " +
+//			   " left outer join ne.notificacio n " +
+//		       " where n.tipusUsuari = es.caib.notib.core.api.dto.TipusUsuariEnumDto.APLICACIO " +
+//			   "   and ne.error = true " +
+//		       "   and ne.tipus in (" +
+//		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_CLIENT," +
+//		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT," +
+//		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO," +
+//		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE," +
+//		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT) " +
+//		       " and ne.id in (select max(ne1.id) from NotificacioEventEntity ne1 " +
+//		       " 				left outer join ne1.notificacio n1 " +
+//		       "				group by n1.id)")
+	@Query(    "  from NotificacioEntity n " +
 		       " where n.tipusUsuari = es.caib.notib.core.api.dto.TipusUsuariEnumDto.APLICACIO " +
-			   "   and ne.error = true " +
-		       "   and ne.tipus in (" +
-		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_CLIENT," +
-		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT," +
-		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO," +
-		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE," +
-		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT) " +
-		       " and ne.id in (select max(ne1.id) from NotificacioEventEntity ne1 " +
-		       " 				left outer join ne1.notificacio n1 " +
-		       "				group by n1.id)")
+			   "   and n.errorLastCallback = true")
 	Page<NotificacioEntity> findNotificacioLastEventAmbError(Pageable pageable);
 	
-	@Query("select n " + 
-			   "  from NotificacioEventEntity ne " +
-			   " left outer join ne.notificacio n " +
+//	@Query("select n " + 
+//			   "  from NotificacioEventEntity ne " +
+//			   " left outer join ne.notificacio n " +
+//		       " where n.tipusUsuari = es.caib.notib.core.api.dto.TipusUsuariEnumDto.APLICACIO " +
+//			   "   and ne.error = true " +
+//		       "   and ne.tipus in (" +
+//		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_CLIENT," +
+//		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT," +
+//		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO," +
+//		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE," +
+//		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT) " +
+//		       " and ne.id in (select max(ne1.id) from NotificacioEventEntity ne1 " +
+//		       " 				left outer join ne1.notificacio n1 " +
+//		       "				group by n1.id)" +
+//		       " order by n.id")
+	@Query(    "  from NotificacioEntity n " +
 		       " where n.tipusUsuari = es.caib.notib.core.api.dto.TipusUsuariEnumDto.APLICACIO " +
-			   "   and ne.error = true " +
-		       "   and ne.tipus in (" +
-		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_CLIENT," +
-		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT," +
-		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO," +
-		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE," +
-		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT) " +
-		       " and ne.id in (select max(ne1.id) from NotificacioEventEntity ne1 " +
-		       " 				left outer join ne1.notificacio n1 " +
-		       "				group by n1.id)" +
+			   "   and n.errorLastCallback = true " +
 		       " order by n.id")
 	List<NotificacioEntity> findNotificacioLastEventAmbError();
+
+//	@Query("select n " + 
+//			   "  from NotificacioEventEntity ne " +
+//			   " left outer	join ne.notificacio n " +
+//		       " where n.tipusUsuari = es.caib.notib.core.api.dto.TipusUsuariEnumDto.APLICACIO " +
+//		       " and (:isProcedimentNull = true or n.procediment = :procediment) " +
+//		       " and (:isDataIniciNull = true or n.createdDate >= :dataInici) " +
+//		       " and (:isDataFiNull = true or n.createdDate <= :dataFi) " +
+//		       " and (:isConcepteNull = true or lower(n.concepte) like concat('%', lower(:concepte), '%')) " +
+//		       " and (:isEstatNull = true or n.estat = :estat) " +
+//			   " and (:isUsuariNull = true or n.createdBy.codi = :usuariCodi) " +
+//			   "   and ne.error = true " +
+//		       "   and ne.tipus in (" +
+//		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_CLIENT," +
+//		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT," +
+//		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO," +
+//		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE," +
+//		       "		es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT) " +
+//		       " and ne.id in (select max(ne1.id) from NotificacioEventEntity ne1 " +
+//		       " 				left outer join ne1.notificacio n1 " +
+//		       "				group by n1.id) ")
+	@Query(    "  from NotificacioEntity n " +
+		       " where n.tipusUsuari = es.caib.notib.core.api.dto.TipusUsuariEnumDto.APLICACIO " +
+			   "   and n.errorLastCallback = true " +
+			   "   and (:isProcedimentNull = true or n.procediment = :procediment) " +
+		       "   and (:isDataIniciNull = true or n.createdDate >= :dataInici) " +
+		       "   and (:isDataFiNull = true or n.createdDate <= :dataFi) " +
+		       "   and (:isConcepteNull = true or lower(n.concepte) like concat('%', lower(:concepte), '%')) " +
+		       "   and (:isEstatNull = true or n.estat = :estat) " +
+			   "   and (:isUsuariNull = true or n.createdBy.codi = :usuariCodi)")
+	Page<NotificacioEntity> findNotificacioLastEventAmbErrorAmbFiltre(
+			@Param("isProcedimentNull") boolean isProcedimentNull,
+			@Param("procediment") ProcedimentEntity procediment, 
+			@Param("isDataIniciNull") boolean isDataIniciNull, 
+			@Param("dataInici") Date dataInici, 
+			@Param("isDataFiNull") boolean isDataFiNull, 
+			@Param("dataFi") Date dataFi, 
+			@Param("isConcepteNull") boolean isConcepteNull, 
+			@Param("concepte") String concepte,
+			@Param("isEstatNull") boolean isEstatNull, 
+			@Param("estat") NotificacioEstatEnumDto estat, 
+			@Param("isUsuariNull") boolean isUsuariNull, 
+			@Param("usuariCodi") String usuariCodi, 
+			Pageable springDataPageable);
 	
 }

@@ -107,17 +107,6 @@
 <script type="text/javascript">
 var myHelpers = {recuperarEstatEnviament: returnEnviamentsStatusDiv};
 
-$(function() {
-    $(document).on("click", "a.fileDownloadSimpleRichExperience", function() {
-        $.fileDownload($(this).attr('href'), {
-            preparingMessageHtml: "Estam preparant la descàrrega, per favor esperi...",
-            failMessageHtml: "<strong style='color:red'>Ho sentim.<br/>S'ha produït un error intentant descarregar el document.</strong>"
-        });
-        return false; //this is critical to stop the click event which will trigger a normal file download!
-    });
-});
-
-
 $.views.helpers(myHelpers);
 
 function returnEnviamentsStatusDiv(notificacioId) {
@@ -138,6 +127,16 @@ function returnEnviamentsStatusDiv(notificacioId) {
 		error: console.log("No s'han pogut recuperar els enviaments de la notificació: " + notificacioId)
 	})
 }
+
+$(function() {
+    $(document).on("click", "a.fileDownloadSimpleRichExperience", function() {
+        $.fileDownload($(this).attr('href'), {
+            preparingMessageHtml: "Estam preparant la descàrrega, per favor esperi...",
+            failMessageHtml: "<strong style='color:red'>Ho sentim.<br/>S'ha produït un error intentant descarregar el document.</strong>"
+        });
+        return false; //this is critical to stop the click event which will trigger a normal file download!
+    });
+});
 
 //function returnProcessarUrl(permisProcessar, notificacioId) {
 //	var url;
@@ -356,7 +355,7 @@ $(document).ready(function() {
 			<div class="col-md-2">
 				<not:inputText name="numExpedient" inline="true" placeholderKey="notificacio.list.filtre.camp.numexpedient"/>
 			</div>
-			<div class="col-md-2 pull-right form-buttons">
+			<div class="col-md-2 pull-right form-buttons"  style="text-align: right;">
 				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 				<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 			</div>
