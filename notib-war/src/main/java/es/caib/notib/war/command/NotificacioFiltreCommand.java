@@ -35,6 +35,8 @@ public class NotificacioFiltreCommand {
 	private Long procedimentId;
 	private TipusUsuariEnumDto tipusUsuari;
 	private String numExpedient;
+	private String creadaPer;
+	private String identificador;
 	
 	public static NotificacioFiltreCommand asCommand(NotificacioFiltreDto dto) {
 		if (dto == null) {

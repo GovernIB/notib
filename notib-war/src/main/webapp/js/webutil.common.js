@@ -146,13 +146,13 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 	$.fn.webutilNetejarInputs = function(options) {
 		$(this).find('input:text, input:password, input:file, select, textarea').val('');
 		$(this).find('input:radio, input:checkbox').removeAttr('checked').removeAttr('selected');
-//		$(this).find('select.select2-hidden-accessible').select2({theme: "bootstrap"}).trigger("change");
 		$(this).find('select.select2-hidden-accessible').each(function( index ) {
-			if ($(this).data("toggle") == "suggest") {
-				$(this).val(null).trigger("change");
-			} else {
-				$(this).select2({theme: "bootstrap"}).trigger("change");
-			}
+			if ($(this).data("netejar") == undefined || $(this).data("netejar"))
+				if ($(this).data("toggle") == "suggest") {
+					$(this).val(null).trigger("change");
+				} else {
+					$(this).select2({theme: "bootstrap"}).trigger("change");
+				}
 		});
 	}
 
@@ -413,32 +413,87 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 	}
 	
 	$.fn.webutilInputSuggest = function() {
+
+		var urlActual = $(this).data('urlInicial');
 		var value = $(this).data('currentValue');
-		var urlInicial = $(this).data('urlInicial') + "/" + value;
+		var urlInicial = urlActual + "/" + value;
 		var suggestValue = $(this).data('suggestValue');
 		var suggestText = $(this).data('suggestText');
+		var suggestTextAddicional = $(this).data('suggestTextAddicional');
 		var suggest = $(this);
-
-		// Preselected value
-		if (value) {
-			$.ajax({
-				url: urlInicial,
-				async: false,
-				success: function(resposta) {
-					suggest.append(
-								$('<option>', {
-									value: resposta[suggestValue],
-									text: resposta[suggestText],
-									selected: value == resposta[suggestValue]
-								}));
+		if (value != null && value.includes(",")) {
+			var valueArr = value.split(',');
+			valueArr.forEach(function(value) {
+				urlInicial = urlActual + "/" + value;
+				// Preselected value
+				if (value) {
+					$.ajax({
+						url: urlInicial,
+						async: false,
+						global: false,
+						success: function(resposta) {
+							suggest.append(
+										$('<option>', {
+											value: resposta[suggestValue],
+											text: (suggestTextAddicional != undefined && resposta[suggestTextAddicional] != null) ? resposta[suggestText] + " (" + resposta[suggestTextAddicional] + ")" : resposta[suggestText],
+											selected: value == resposta[suggestValue] != false ? value == resposta[suggestValue] : (value == resposta["codi"] != false ? value == resposta["codi"] : value == resposta["nif"])
+										}));
+						},
+						error: function () {
+							suggest.append(
+									$('<option>', {
+										value: value,
+										text: value,
+										selected: true
+									}));
+						}
+					});
+				} else {
+					$(this).empty();
 				}
-			});
+			})
+		} else {
+			// Preselected value
+			if (value) {
+				$.ajax({
+					url: urlInicial,
+					async: false,
+					global: false,
+					success: function(resposta) {
+						if (value == resposta[suggestValue] != false) {
+							suggest.append(
+									$('<option>', {
+										value: resposta[suggestValue],
+										text: (suggestTextAddicional != undefined && resposta[suggestTextAddicional] != null) ? resposta[suggestText] + " (" + resposta[suggestTextAddicional] + ")" : resposta[suggestText],
+										selected: value == resposta[suggestValue]
+									}));
+						} else {
+							//específic pel suggest de responsables portafib
+							suggest.append(
+									$('<option>', {
+										value: resposta[suggestValue],
+										text: (suggestTextAddicional != undefined && resposta[suggestTextAddicional] != null) ? resposta[suggestText] + " (" + resposta[suggestTextAddicional] + ")" : resposta[suggestText],
+										selected: value == resposta["nif"] ? value == resposta["nif"] : value == resposta["codi"]
+									}));
+						}
+					},
+					error: function () {
+						suggest.append(
+								$('<option>', {
+									value: value,
+									text: value,
+									selected: true
+								}));
+					}
+				});
+			} else {
+				$(this).empty();
+			}
 		}
-		
 		$(this).select2({
 		    placeholder: $(this).data('placeholder'),
 		    theme: "bootstrap",
-		    allowClear: true,
+		    allowClear: $(this).data('placeholder') ? true : false,
 		    minimumInputLength: $(this).data('minimumInputLength'),
 		    ajax: {
 		    	delay: 500,
@@ -451,7 +506,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 						var item = data[i];
 						results.push({
 							id: item[suggestValue],
-							text: item[suggestText]
+							text: (suggestTextAddicional != undefined && item[suggestTextAddicional] != null) ? item[suggestText] + " (" + item[suggestTextAddicional] + ")" : item[suggestText]
 						});
 					}
 					
