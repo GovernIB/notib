@@ -917,22 +917,22 @@ function actualitzarEntrega(j) {
 				
 				<!-- CSV -->
 				<div id="input-origen-csv" class="col-md-6">
-					<not:inputText name="documentArxiuCsv" textKey="notificacio.form.camp.csvuuid" labelSize="3" />
+					<not:inputText name="documentArxiuCsv" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
 				</div>
 				
 				<!-- UUID -->
 				<div id="input-origen-uuid" class="col-md-6 hidden">
-					<not:inputText name="documentArxiuUuid" textKey="notificacio.form.camp.csvuuid" labelSize="3" />
+					<not:inputText name="documentArxiuUuid" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
 				</div>
 				
 				<!-- URL -->
 				<div id="input-origen-url" class="col-md-6 hidden">
-					<not:inputText name="documentArxiuUrl" textKey="notificacio.form.camp.csvuuid" labelSize="3" />
+					<not:inputText name="documentArxiuUrl" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
 				</div>
 				
 				<!-- FITXER -->
 				<div id="input-origen-arxiu" class="col-md-6 hidden">
-					<not:inputFile name="arxiu" textKey="notificacio.form.camp.arxiu" labelSize="3" />
+					<not:inputFile name="arxiu" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
 				</div>
 			</div>
 			
