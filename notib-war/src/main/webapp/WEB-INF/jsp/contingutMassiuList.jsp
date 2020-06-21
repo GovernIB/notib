@@ -155,6 +155,20 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 				return false;
 			});
 		});
+		$('#btnNetejar').click(function() {
+			$(':input', $('#filtre')).each (function() {
+				var type = this.type, tag = this.tagName.toLowerCase();
+				if (type == 'text' || type == 'password' || tag == 'textarea') {
+					this.value = '';
+				} else if (type == 'checkbox' || type == 'radio') {
+					this.checked = false;
+				} else if (tag == 'select') {
+// 					this.selectedIndex = 0;
+					$(this).val(null).trigger('change');
+				}
+			});
+			$('#form-filtre').submit();
+		});
 	});
 </script>
 
@@ -187,7 +201,7 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 				<not:inputSelect name="estat" optionItems="${notificacioEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"/>
 			</div>
 			<div class="col-md-4">
-				<not:inputSuggest name="usuari" inline="true" placeholderKey="notificacio.list.filtre.camp.usuari" urlConsultaInicial="../usuari/usuari" urlConsultaLlistat="../usuari/usuaris" suggestValue="codi" suggestText="nom" minimumInputLength="2" />
+				<not:inputSuggest name="usuari" inline="true" placeholderKey="notificacio.list.filtre.camp.usuari" urlConsultaInicial="../userajax/usuariDades" urlConsultaLlistat="../userajax/usuarisDades" suggestValue="codi" suggestText="nom" minimumInputLength="2" />
 			</div>
 
 			<div class="col-md-2 pull-right form-buttons" style="text-align: right;">
@@ -222,7 +236,8 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 						{{/if}}
 					</script>
 				</th>
-				<th data-col-name=createdDate data-converter="datetime" width="10%"><spring:message code="notificacio.list.columna.enviament.data"/></th>
+				<th data-col-name="createdDate" data-converter="datetime" width="10%"><spring:message code="notificacio.list.columna.enviament.data"/></th>
+				<th data-col-name="createdBy.nom" width="10%"><spring:message code="notificacio.list.filtre.camp.usuari"/></th>
 				<th data-col-name="procediment.nom"  width="150px"><spring:message code="notificacio.list.columna.procediment"/></th>
 				<th data-col-name="concepte" width="15%" ><spring:message code="notificacio.list.columna.concepte"/></th>
 				<th data-col-name="estatDate" data-converter="datetime" data-visible="false"></th>

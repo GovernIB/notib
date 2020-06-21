@@ -72,8 +72,16 @@ public class ReintentMassiuController extends BaseUserController {
 	@RequestMapping(value = "/notificacions", method = RequestMethod.POST)
 	public String post(
 			HttpServletRequest request, 
-			NotificacioErrorCallbackFiltreCommand notificacioErrorCallbackFiltreCommand) {
+			NotificacioErrorCallbackFiltreCommand notificacioErrorCallbackFiltreCommand,
+			Model model) {
 		request.getSession().setAttribute(MASSIU_CALLBACK_FILTRE, NotificacioErrorCallbackFiltreCommand.asDto(notificacioErrorCallbackFiltreCommand));
+		model.addAttribute("procediments", procedimentService.findAll());
+		model.addAttribute("notificacioEstats", 
+				EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
+						"es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
+		model.addAttribute("notificacioEnviamentEstats",
+				EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
+						"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
 		return "contingutMassiuList";
 	}
 	
@@ -82,7 +90,6 @@ public class ReintentMassiuController extends BaseUserController {
 	public DatatablesResponse datatable(
 			HttpServletRequest request) {
 		NotificacioErrorCallbackFiltreDto filtre = (NotificacioErrorCallbackFiltreDto) request.getSession().getAttribute(MASSIU_CALLBACK_FILTRE);
-		request.getSession().removeAttribute(MASSIU_CALLBACK_FILTRE);
 		return DatatablesHelper.getDatatableResponse(
 				request,
 				notificacioService.findWithCallbackError(

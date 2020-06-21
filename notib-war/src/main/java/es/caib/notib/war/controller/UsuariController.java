@@ -3,8 +3,6 @@
  */
 package es.caib.notib.war.controller;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -12,10 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
@@ -68,25 +64,4 @@ public class UsuariController extends BaseController {
 					"usuari.controller.modificat.ok");
 	}
 	
-	
-	@RequestMapping(value = "/usuaris/{nom}", method = RequestMethod.GET)
-	@ResponseBody
-	public List<UsuariDto> getUsuaris(
-			HttpServletRequest request,
-			@PathVariable String nom,
-			Model model) {
-		List<UsuariDto> usuaris = aplicacioService.findUsuariAmbText(nom);
-		return usuaris;
-	}
-	
-	@RequestMapping(value = "/usuari/{codi}", method = RequestMethod.GET)
-	@ResponseBody
-	public UsuariDto getUsuari(
-			HttpServletRequest request,
-			@PathVariable String codi,
-			Model model) {
-		UsuariDto usuari = aplicacioService.findUsuariAmbCodi(codi);
-		return usuari;
-	}
-
 }
