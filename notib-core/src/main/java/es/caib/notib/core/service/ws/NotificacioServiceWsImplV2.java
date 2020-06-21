@@ -1006,7 +1006,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		if (document.getArxiuNom() == null || document.getArxiuNom().isEmpty()) {
 			return setRespostaError("[1061] El camp 'arxiuNom' del document no pot ser null.");
 		}
-		if (document.getArxiuNom() != null || document.getArxiuNom().length() > 200) {
+		if (document.getArxiuNom() != null && document.getArxiuNom().length() > 200) {
 			return setRespostaError("[1072] El camp 'arxiuNom' no pot pot tenir una longitud superior a 200 caràcters.");
 		}
 		if (	(document.getContingutBase64() == null || document.getContingutBase64().isEmpty()) &&
