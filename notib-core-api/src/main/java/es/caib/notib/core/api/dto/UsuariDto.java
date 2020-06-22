@@ -5,11 +5,15 @@ package es.caib.notib.core.api.dto;
 
 import java.io.Serializable;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Informació d'un usuari.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 public class UsuariDto implements Serializable {
 
 	private String codi;
@@ -19,49 +23,6 @@ public class UsuariDto implements Serializable {
 	private String idioma;
 	private String[] rols;
 	private Boolean rebreEmailsNotificacio;
-
-	public String getCodi() {
-		return codi;
-	}
-	public void setCodi(String codi) {
-		this.codi = codi;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-	public String getNif() {
-		return nif;
-	}
-	public void setNif(String nif) {
-		this.nif = nif;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	public String getIdioma() {
-		return idioma;
-	}
-	public void setIdioma(String idioma) {
-		this.idioma = idioma;
-	}
-	public String[] getRols() {
-		return rols;
-	}
-	public void setRols(String[] rols) {
-		this.rols = rols;
-	}
-	public Boolean getRebreEmailsNotificacio() {
-		return rebreEmailsNotificacio;
-	}
-	public void setRebreEmailsNotificacio(Boolean rebreEmailsNotificacio) {
-		this.rebreEmailsNotificacio = rebreEmailsNotificacio;
-	}
 
 	private static final long serialVersionUID = -139254994389509932L;
 
