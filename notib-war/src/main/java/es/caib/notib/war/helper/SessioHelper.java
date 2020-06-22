@@ -39,7 +39,8 @@ public class SessioHelper {
 						new Boolean(true));
 			}
 		}
-		String idioma_usuari = aplicacioService.getUsuariActual().getIdioma();
+		UsuariDto usuari = aplicacioService.getUsuariActual();
+		String idioma_usuari = usuari.getIdioma();
 		LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
         
 		request.getSession().setAttribute(
@@ -58,6 +59,9 @@ public class SessioHelper {
 		request.getSession().setAttribute(
 				SESSION_ATTRIBUTE_IDIOMA_USUARI, 
 				idioma_usuari);
+		request.getSession().setAttribute(
+				"dadesUsuariActual", 
+				usuari);
 		
         localeResolver.setLocale(
         		request, 

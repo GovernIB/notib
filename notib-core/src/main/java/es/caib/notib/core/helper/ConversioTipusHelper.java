@@ -12,11 +12,15 @@ import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.AplicacioDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
+import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.UsuariEntity;
 import ma.glasnost.orika.CustomConverter;
+import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
 
@@ -51,6 +55,11 @@ public class ConversioTipusHelper {
 			field("entitat.id", "entitatId").
 			byDefault().
 			register();
+		
+		mapperFactory.classMap(UsuariEntity.class, UsuariDto.class).
+			customize(new UsuariEntitytoMapper()).
+			byDefault().
+			register();
 	}
 
 	public <T> T convertir(Object source, Class<T> targetType) {
@@ -69,7 +78,19 @@ public class ConversioTipusHelper {
 		return getMapperFacade().mapAsSet(items, targetType);
 	}
 
-
+	public class UsuariEntitytoMapper extends CustomMapper<UsuariEntity, UsuariDto> {
+		@Override
+		public void mapAtoB(
+				UsuariEntity usuariEntity, 
+				UsuariDto usuariDto, 
+				MappingContext context) {
+			if (usuariEntity.getNomSencer() != null && !usuariEntity.getNomSencer().isEmpty() && usuariEntity.getNomSencer().trim().length() > 0) {
+				usuariDto.setNom(usuariEntity.getNomSencer());
+			} else if (usuariEntity.getLlinatges() != null && !usuariEntity.getLlinatges().isEmpty() && usuariEntity.getLlinatges().trim().length() > 0) {
+				usuariDto.setNom(usuariEntity.getNom() + " " + usuariEntity.getLlinatges());
+			}
+		}
+	}
 
 	private MapperFacade getMapperFacade() {
 		return mapperFactory.getMapperFacade();
