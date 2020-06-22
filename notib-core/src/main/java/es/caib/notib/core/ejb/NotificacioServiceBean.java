@@ -64,6 +64,13 @@ public class NotificacioServiceBean implements NotificacioService {
 				entitatId,
 				notificacioId);
 	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})	
+	public NotificacioEventDto findUltimEventCallbackByNotificacio(
+			Long notificacioId) {
+		return delegate.findUltimEventCallbackByNotificacio(notificacioId);
+	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})

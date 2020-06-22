@@ -228,6 +228,16 @@ public interface NotificacioService {
 	public List<NotificacioEventDto> eventFindAmbNotificacio(
 			Long entitatId,
 			Long notificacioId);
+	
+	/**
+	 * Consulta l'últim event de callback d'una d'una notificació.
+	 * 
+	 * @param notificacioId
+	 *            Atribut id de la notificació.
+	 * @return últim event de la notificació.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	public NotificacioEventDto findUltimEventCallbackByNotificacio(Long notificacioId);
 
 	/**
 	 * Consulta dels events del destinatari d'una notificació.

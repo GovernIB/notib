@@ -172,6 +172,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 
 	@Transient
 	protected boolean permisProcessar;
+	@Transient
+	protected boolean errorLastEvent;
 	
 	
 	public void addEnviament(
@@ -181,6 +183,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	public void setPermisProcessar(boolean permisProcessar) {
 		this.permisProcessar = permisProcessar;
+	}
+	
+	public void setErrorLastEvent(boolean errorLastEvent) {
+		this.errorLastEvent = errorLastEvent;
 	}
 	
 	public void updateRegistreNumero(Integer registreNumero) {

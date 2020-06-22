@@ -443,7 +443,7 @@ $(document).ready(function() {
 						{{/if}}
 						{{:~eval('notificacioEstats["' + estat + '"]')}}
 						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>notificaErrorDescripcio}}"></span>{{/if}}
-						{{if tipusUsuari == 'APLICACIO' && errorLastCallback}}
+						{{if tipusUsuari == 'APLICACIO' && errorLastEvent}}
 							<span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>
 						{{/if}}
 						{{if estat == 'PROCESSADA' && estatDate != ''}}

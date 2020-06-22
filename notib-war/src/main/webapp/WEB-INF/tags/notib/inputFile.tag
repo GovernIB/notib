@@ -13,14 +13,26 @@
 <%@ attribute name="inputSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="logoMenu" required="false" rtexprvalue="true"%>
 <%@ attribute name="fileEntitat" required="false" rtexprvalue="true"%>
+<%@ attribute name="messageInfo" required="false" rtexprvalue="true"%>
+<%@ attribute name="info" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
 <c:set var="campLabelText"><c:choose><c:when test="${not empty textKey}"><spring:message code="${textKey}"/></c:when><c:when test="${not empty text}">${text}</c:when><c:otherwise>${campPath}</c:otherwise></c:choose><c:if test="${required}">*</c:if></c:set>
 <c:set var="campPlaceholder"><c:choose><c:when test="${not empty placeholderKey}"><spring:message code="${placeholderKey}"/></c:when><c:otherwise>${placeholder}</c:otherwise></c:choose></c:set>
+<c:set var="campInfoText"><c:choose><c:when test="${not empty messageInfo}"><spring:message code="${messageInfo}"/></c:when><c:otherwise>${campPath}</c:otherwise></c:choose><c:if test="${required}"> *</c:if></c:set>
 <c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
 <c:set var="campInputSize"><c:choose><c:when test="${not empty inputSize}">${inputSize}</c:when><c:otherwise>${12 - campLabelSize}</c:otherwise></c:choose></c:set>
 <c:set var="campInputSizeDiv">${campInputSize / 2}</c:set>
-
+<style>
+.info-length {
+	font-size: x-small;
+}
+.comentari {
+	font-size: 12px;
+	color: #999;
+	margin-bottom: 0px;
+}
+</style>
 <c:choose>
 	<c:when test="${not inline}">
 		<div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>">
@@ -32,6 +44,9 @@
 					<a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Netejar</a>
 				</div>
 				<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
+				<c:if test="${info == true}">
+					<p class="comentari col-xs-12 col-xs-offset-">${campInfoText}</p>
+				</c:if>
 			</div>
 			<c:if test="${fileEntitat}">
 				<label class="control-label col-xs-${campLabelSize}" for="${campPath}"></label>
@@ -70,6 +85,10 @@
 				<span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Seleccionar</span><span class="fileinput-exists">Canviar</span><input type="file" id="${campPath}" name="${campPath}"></span>
 				<a href="#" class="input-group-addon btn btn-default fileinput-exists" style="width:auto" data-dismiss="fileinput">Netejar</a>
 			</div>
+			<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
+			<c:if test="${info == true}">
+				<p class="comentari col-xs-12 col-xs-offset-">${campInfoText}</p>
+			</c:if>
   		</div>
 	</c:otherwise>
 </c:choose>

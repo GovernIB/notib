@@ -268,6 +268,11 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>errorNotificaDescripcio}}"></span>{{/if}}
 					</script>
 				</th>
+				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="40px">
+					<script id="cellAccionsTemplate" type="text/x-jsrender">
+						<a href="<c:url value="/massiu/detallErrorCallback/{{:id}}"/>" class="btn btn-default" data-toggle="modal" data-height="450px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="comu.boto.detalls"/></a>
+					</script>
+				</th>
 			</tr>
 		</thead>
 	</table>

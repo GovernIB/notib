@@ -49,6 +49,8 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private boolean errorLastCallback;
 	private TipusUsuariEnumDto tipusUsuari;
 	
+	private boolean errorLastEvent;
+	
 	
 	public boolean isNotificaError() {
 		return notificaErrorData != null;

@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import es.caib.notib.core.entity.NotificacioEventEntity;
 
@@ -34,5 +35,16 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 	       " where ne.callbackEstat = es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
 	       " order by ne.callbackData asc nulls first, data asc")
 	List<Long> findEventsPendentsIds(Pageable page);
-	
+
+	@Query("select ne " + 
+			   "  from NotificacioEventEntity ne " +
+		       " where ne.id = ( " +
+			   "		select max(e.id) " +
+			   "		from NotificacioEventEntity e " +
+			   "			left outer join e.notificacio n " +
+			   "		where n.id = :notificacioId " +
+			   "		  and e.tipus = es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_CLIENT" +
+		       "	   )" +
+		       " order by ne.callbackData asc nulls first, data asc")
+	NotificacioEventEntity findUltimEventByNotificacioId(@Param("notificacioId")Long notificacioId);
 }

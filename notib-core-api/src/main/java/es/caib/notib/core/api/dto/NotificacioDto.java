@@ -74,6 +74,7 @@ public class NotificacioDto extends AuditoriaDto {
 	private boolean usuariActualNotificacio;
 	private boolean usuariActualAdministration;
 	private boolean errorLastCallback;
+	private boolean errorLastEvent;
 	private TipusUsuariEnumDto tipusUsuari;
 	
 	public boolean isNotificaError() {
