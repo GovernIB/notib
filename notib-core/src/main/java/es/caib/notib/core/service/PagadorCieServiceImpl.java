@@ -10,6 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.codahale.metrics.Timer;
 
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorCieFiltreDto;
@@ -21,6 +24,7 @@ import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.PagadorCieEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
+import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.repository.PagadorCieRepository;
 
@@ -40,109 +44,152 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	private PaginacioHelper paginacioHelper;
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
+	@Resource
+	private MetricsHelper metricsHelper;
 	
 	@Override
+	@Transactional
 	public PagadorCieDto create(
 			Long entitatId,
 			PagadorCieDto cie) {
-		logger.debug("Creant un nou pagador cie ("
-				+ "pagador=" + cie + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-		PagadorCieEntity pagadorCieEntity = null;
-		
-		pagadorCieEntity = pagadorCieReposity.save(
-				PagadorCieEntity.getBuilder(
-						cie.getDir3codi(),
-						cie.getContracteDataVig(),
-						entitat).build());
-		
-		return conversioTipusHelper.convertir(
-				pagadorCieEntity, 
-				PagadorCieDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Creant un nou pagador cie ("
+					+ "pagador=" + cie + ")");
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			PagadorCieEntity pagadorCieEntity = null;
+			
+			pagadorCieEntity = pagadorCieReposity.save(
+					PagadorCieEntity.getBuilder(
+							cie.getDir3codi(),
+							cie.getContracteDataVig(),
+							entitat).build());
+			
+			return conversioTipusHelper.convertir(
+					pagadorCieEntity, 
+					PagadorCieDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
+	@Transactional
 	public PagadorCieDto update(PagadorCieDto cie) throws NotFoundException {
-		logger.debug("Actualitzant pagador cie ("
-				+ "pagador=" + cie + ")");	
-		PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(cie.getId());
-		pagadorCieEntity.update(
-						cie.getDir3codi(),
-						cie.getContracteDataVig());
-		
-		pagadorCieReposity.save(pagadorCieEntity);
-		
-		return conversioTipusHelper.convertir(
-				pagadorCieEntity, 
-				PagadorCieDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Actualitzant pagador cie ("
+					+ "pagador=" + cie + ")");	
+			PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(cie.getId());
+			pagadorCieEntity.update(
+							cie.getDir3codi(),
+							cie.getContracteDataVig());
+			
+			pagadorCieReposity.save(pagadorCieEntity);
+			
+			return conversioTipusHelper.convertir(
+					pagadorCieEntity, 
+					PagadorCieDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
+	@Transactional
 	public PagadorCieDto delete(Long id) throws Exception {
-		
-		PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(id);
-		pagadorCieReposity.delete(id);
-		return conversioTipusHelper.convertir(
-				pagadorCieEntity, 
-				PagadorCieDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(id);
+			pagadorCieReposity.delete(id);
+			return conversioTipusHelper.convertir(
+					pagadorCieEntity, 
+					PagadorCieDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public PagadorCieDto findById(Long id) {
-		PagadorCieEntity pagadorCieEntity = pagadorCieReposity.findOne(id);
-		
-		return conversioTipusHelper.convertir(
-				pagadorCieEntity, 
-				PagadorCieDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			PagadorCieEntity pagadorCieEntity = pagadorCieReposity.findOne(id);
+			
+			return conversioTipusHelper.convertir(
+					pagadorCieEntity, 
+					PagadorCieDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public PaginaDto<PagadorCieDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			PagadorCieFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				true,
-				false);
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-		Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
-		Page<PagadorCieEntity> pagadorCie = null;
-
-		pagadorCie = pagadorCieReposity.findByCodiDir3NotNullFiltrePaginatAndEntitat(
-				filtre.getDir3codi() == null || filtre.getDir3codi().isEmpty(),
-				filtre.getDir3codi(),
-				entitat,
-				paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio));
-		
-		return paginacioHelper.toPaginaDto(
-				pagadorCie,
-				PagadorCieDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					true,
+					false);
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
+			Page<PagadorCieEntity> pagadorCie = null;
+	
+			pagadorCie = pagadorCieReposity.findByCodiDir3NotNullFiltrePaginatAndEntitat(
+					filtre.getDir3codi() == null || filtre.getDir3codi().isEmpty(),
+					filtre.getDir3codi(),
+					entitat,
+					paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio));
+			
+			return paginacioHelper.toPaginaDto(
+					pagadorCie,
+					PagadorCieDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<PagadorCieDto> findAll() {
-		logger.debug("Consulta de tots els pagadors cie");
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				true,
-				false);
-		return conversioTipusHelper.convertirList(
-					pagadorCieReposity.findAll(),
-					PagadorCieDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta de tots els pagadors cie");
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					true,
+					false);
+			return conversioTipusHelper.convertirList(
+						pagadorCieReposity.findAll(),
+						PagadorCieDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public List<PagadorCieDto> findByEntitat(Long entitatId) {
-		logger.debug("Consulta els pagadors postal de l'entitat: " + entitatId);
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-		List<PagadorCieEntity> pagadorsCie = pagadorCieReposity.findByEntitat(entitat);
-		
-		return conversioTipusHelper.convertirList(
-				pagadorsCie,
-				PagadorCieDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta els pagadors postal de l'entitat: " + entitatId);
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			List<PagadorCieEntity> pagadorsCie = pagadorCieReposity.findByEntitat(entitat);
+			
+			return conversioTipusHelper.convertirList(
+					pagadorsCie,
+					PagadorCieDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override

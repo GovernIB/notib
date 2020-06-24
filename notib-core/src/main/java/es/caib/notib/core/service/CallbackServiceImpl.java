@@ -10,8 +10,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.codahale.metrics.Timer;
+
 import es.caib.notib.core.api.service.CallbackService;
 import es.caib.notib.core.helper.CallbackHelper;
+import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 
@@ -30,30 +33,37 @@ public class CallbackServiceImpl implements CallbackService {
 	private CallbackHelper callbackHelper;
     @Autowired
 	private PropertiesHelper propertiesHelper;
-
+    @Autowired
+    private MetricsHelper metricsHelper;
+    
 	@Override
 	@Scheduled(
 			fixedRateString = "${config:es.caib.notib.tasca.callback.pendents.periode}",
 			initialDelayString = "${config:es.caib.notib.tasca.callback.pendents.retard.inicial}")
 	public void processarPendents() {
-		if (isTasquesActivesProperty() && isCallbackPendentsActiu()) {
-			logger.debug("Cercant notificacions pendents d'enviar al client");
-			int maxPendents = getEventsProcessarMaxProperty(); 
-			Pageable page = new PageRequest(
-					0,
-					maxPendents);
-			List<Long> pendentsIds = notificacioEventRepository.findEventsPendentsIds(page);
-			if (pendentsIds.size() > 0) {
-				logger.debug("Inici de les notificacions pendents cap a les aplicacions.");
-				int errors = 0;
-				for (Long pendentsId: pendentsIds) {
-					logger.debug(">>> Enviant avís a aplicació client de canvi d'estat de la notificació amb identificador: " + pendentsId);
-					if (!callbackHelper.notifica(pendentsId)) {
-						errors++;
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			if (isTasquesActivesProperty() && isCallbackPendentsActiu()) {
+				logger.debug("Cercant notificacions pendents d'enviar al client");
+				int maxPendents = getEventsProcessarMaxProperty(); 
+				Pageable page = new PageRequest(
+						0,
+						maxPendents);
+				List<Long> pendentsIds = notificacioEventRepository.findEventsPendentsIds(page);
+				if (pendentsIds.size() > 0) {
+					logger.debug("Inici de les notificacions pendents cap a les aplicacions.");
+					int errors = 0;
+					for (Long pendentsId: pendentsIds) {
+						logger.debug(">>> Enviant avís a aplicació client de canvi d'estat de la notificació amb identificador: " + pendentsId);
+						if (!callbackHelper.notifica(pendentsId)) {
+							errors++;
+						}
 					}
+					logger.debug("Fi de les notificacions pendents cap a les aplicacions: " + pendentsIds.size() + ", " + errors + " errors");
 				}
-				logger.debug("Fi de les notificacions pendents cap a les aplicacions: " + pendentsIds.size() + ", " + errors + " errors");
 			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
 		}
 	}
 

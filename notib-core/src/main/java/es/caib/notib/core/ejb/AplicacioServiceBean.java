@@ -122,5 +122,11 @@ public class AplicacioServiceBean implements AplicacioService {
 		return delegate.updateUsuariActual(usuariDto);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public String getMetrics() {
+		return delegate.getMetrics();
+	}
+
 
 }

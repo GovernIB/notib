@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.codahale.metrics.Timer;
+import com.codahale.metrics.json.MetricsModule;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
 import es.caib.notib.core.api.dto.IntegracioAccioDto;
@@ -28,6 +33,7 @@ import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.ExcepcioLogHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
+import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.repository.AclSidRepository;
@@ -59,7 +65,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private ExcepcioLogHelper excepcioLogHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
-
+	@Autowired
+	private MetricsHelper metricsHelper;
 
 	@Override
 	public String getVersioActual() {
@@ -76,147 +83,239 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Transactional
 	@Override
 	public void processarAutenticacioUsuari() {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		logger.debug("Processant autenticació (usuariCodi=" + auth.getName() + ")");
-		UsuariEntity usuari = usuariRepository.findOne(auth.getName());
-		if (usuari == null) {
-			logger.debug("Consultant plugin de dades d'usuari (" +
-					"usuariCodi=" + auth.getName() + ")");
-			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
-			String idioma = PropertiesHelper.getProperties().getProperty("es.caib.notib.default.user.language");
-			if (dadesUsuari != null) {
-				usuari = usuariRepository.save(
-						UsuariEntity.getBuilder(
-								dadesUsuari.getCodi(),
-								dadesUsuari.getEmail(),
-								idioma).
-						nom(dadesUsuari.getNom()).
-						llinatges(dadesUsuari.getLlinatges()).
-						nomSencer(dadesUsuari.getNomSencer()).
-						build());
-			} else {
-				throw new NotFoundException(
-						auth.getName(),
-						DadesUsuari.class);
-			}
-		} else {
-			logger.debug("Consultant plugin de dades d'usuari (" + "usuariCodi=" + auth.getName() + ")");
-			//DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
-			DadesUsuari dadesUsuari = pluginHelper.dadesUsuariConsultarAmbCodi(auth.getName());
-			if (dadesUsuari != null) {
-				if (dadesUsuari.getNomSencer() != null) {
-					usuari.update(
-							dadesUsuari.getNomSencer(),
-							dadesUsuari.getEmail());
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			logger.debug("Processant autenticació (usuariCodi=" + auth.getName() + ")");
+			UsuariEntity usuari = usuariRepository.findOne(auth.getName());
+			if (usuari == null) {
+				logger.debug("Consultant plugin de dades d'usuari (" +
+						"usuariCodi=" + auth.getName() + ")");
+				DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+				String idioma = PropertiesHelper.getProperties().getProperty("es.caib.notib.default.user.language");
+				if (dadesUsuari != null) {
+					usuari = usuariRepository.save(
+							UsuariEntity.getBuilder(
+									dadesUsuari.getCodi(),
+									dadesUsuari.getEmail(),
+									idioma).
+							nom(dadesUsuari.getNom()).
+							llinatges(dadesUsuari.getLlinatges()).
+							nomSencer(dadesUsuari.getNomSencer()).
+							build());
 				} else {
-					usuari.update(
-							dadesUsuari.getNom(),
-							dadesUsuari.getLlinatges(),
-							dadesUsuari.getEmail());
+					throw new NotFoundException(
+							auth.getName(),
+							DadesUsuari.class);
 				}
 			} else {
-				throw new NotFoundException(
-						auth.getName(),
-						DadesUsuari.class);
+				logger.debug("Consultant plugin de dades d'usuari (" + "usuariCodi=" + auth.getName() + ")");
+				//DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+				DadesUsuari dadesUsuari = pluginHelper.dadesUsuariConsultarAmbCodi(auth.getName());
+				if (dadesUsuari != null) {
+					if (dadesUsuari.getNomSencer() != null) {
+						usuari.update(
+								dadesUsuari.getNomSencer(),
+								dadesUsuari.getEmail());
+					} else {
+						usuari.update(
+								dadesUsuari.getNom(),
+								dadesUsuari.getLlinatges(),
+								dadesUsuari.getEmail());
+					}
+				} else {
+					throw new NotFoundException(
+							auth.getName(),
+							DadesUsuari.class);
+				}
 			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
 		}
 	}
 
 	@Transactional
 	@Override
 	public UsuariDto updateUsuariActual(UsuariDto dto) {
-		logger.debug("Actualitzant configuració de usuari actual");
-		UsuariEntity usuari = usuariRepository.findOne(dto.getCodi());
-		usuari.update(
-				dto.getRebreEmailsNotificacio(),
-				dto.getIdioma());
-		
-		return toUsuariDtoAmbRols(usuari);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Actualitzant configuració de usuari actual");
+			UsuariEntity usuari = usuariRepository.findOne(dto.getCodi());
+			usuari.update(
+					dto.getRebreEmailsNotificacio(),
+					dto.getIdioma());
+			
+			return toUsuariDtoAmbRols(usuari);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	@Transactional(readOnly = true)
 	@Override
 	public UsuariDto getUsuariActual() {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		logger.debug("Obtenint usuari actual");
-		return toUsuariDtoAmbRols(usuariRepository.findOne(auth.getName()));
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			logger.debug("Obtenint usuari actual");
+			return toUsuariDtoAmbRols(usuariRepository.findOne(auth.getName()));
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public List<String> findRolsUsuariAmbCodi(String codi) {
-		logger.debug("Obtenint els rols de l'usuari amb codi (codi=" + codi + ")");
-		return pluginHelper.consultarRolsAmbCodi(codi);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Obtenint els rols de l'usuari amb codi (codi=" + codi + ")");
+			return pluginHelper.consultarRolsAmbCodi(codi);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	@Transactional(readOnly = true)
 	@Override
 	public UsuariDto findUsuariAmbCodi(String codi) {
-		logger.debug("Obtenint usuari amb codi (codi=" + codi + ")");
-		return conversioTipusHelper.convertir(
-				usuariRepository.findOne(codi),
-				UsuariDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Obtenint usuari amb codi (codi=" + codi + ")");
+			return conversioTipusHelper.convertir(
+					usuariRepository.findOne(codi),
+					UsuariDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public List<UsuariDto> findUsuariAmbText(String text) {
-		logger.debug("Consultant usuaris amb text (text=" + text + ")");
-		return conversioTipusHelper.convertirList(
-				usuariRepository.findByText(text),
-				UsuariDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consultant usuaris amb text (text=" + text + ")");
+			return conversioTipusHelper.convertirList(
+					usuariRepository.findByText(text),
+					UsuariDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
 	public List<IntegracioDto> integracioFindAll() {
-		logger.debug("Consultant les integracions");
-		return integracioHelper.findAll();
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consultant les integracions");
+			return integracioHelper.findAll();
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
 	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi) {
-		logger.debug("Consultant les darreres accions per a la integració (" +
-				"codi=" + codi + ")");
-		return integracioHelper.findAccionsByIntegracioCodi(codi);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consultant les darreres accions per a la integració (" +
+					"codi=" + codi + ")");
+			return integracioHelper.findAccionsByIntegracioCodi(codi);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
 	public void excepcioSave(Throwable exception) {
-		logger.debug("Emmagatzemant excepció (" +
-				"exception=" + exception + ")");
-		excepcioLogHelper.addExcepcio(exception);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Emmagatzemant excepció (" +
+					"exception=" + exception + ")");
+			excepcioLogHelper.addExcepcio(exception);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
 	public ExcepcioLogDto excepcioFindOne(Long index) {
-		logger.debug("Consulta d'una excepció (index=" + index + ")");
-		return excepcioLogHelper.findAll().get(index.intValue());
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta d'una excepció (index=" + index + ")");
+			return excepcioLogHelper.findAll().get(index.intValue());
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
 	public List<ExcepcioLogDto> excepcioFindAll() {
-		logger.debug("Consulta de les excepcions disponibles");
-		return excepcioLogHelper.findAll();
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta de les excepcions disponibles");
+			return excepcioLogHelper.findAll();
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
 	public List<String> permisosFindRolsDistinctAll() {
-		logger.debug("Consulta dels rols definits a les ACLs");
-		return aclSidRepository.findSidByPrincipalFalse();
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta dels rols definits a les ACLs");
+			return aclSidRepository.findSidByPrincipalFalse();
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
 	public String propertyGet(String property) {
-		logger.debug("Consulta del valor de la property (" +
-				"property=" + property + ")");
-		return PropertiesHelper.getProperties().getProperty(property);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta del valor de la property (" +
+					"property=" + property + ")");
+			return PropertiesHelper.getProperties().getProperty(property);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
 	public Map<String, String> propertyFindByPrefix(String prefix) {
-		logger.debug("Consulta del valor dels properties amb prefix (" +
-				"prefix=" + prefix + ")");
-		return PropertiesHelper.getProperties().findByPrefix(prefix);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta del valor dels properties amb prefix (" +
+					"prefix=" + prefix + ")");
+			return PropertiesHelper.getProperties().findByPrefix(prefix);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Override
+	public String getMetrics() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consultant les mètriques de l'aplicació");
+			try {
+				ObjectMapper mapper = new ObjectMapper();
+				mapper.registerModule(
+						new MetricsModule(
+								TimeUnit.SECONDS,
+								TimeUnit.MILLISECONDS,
+								false));
+				return mapper.writeValueAsString(metricsHelper.getMetricRegistry());
+			} catch (Exception ex) {
+				logger.error("Error al generar les mètriques de l'aplicació", ex);
+				return "ERR";
+			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	private Properties getVersionProperties() throws IOException {
