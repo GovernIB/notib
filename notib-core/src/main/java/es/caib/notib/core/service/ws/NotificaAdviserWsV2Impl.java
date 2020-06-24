@@ -12,14 +12,13 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.sun.jersey.core.util.Base64;
 
 import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
@@ -303,7 +302,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		NotificacioEventEntity eventCert = null;
 		String gestioDocumentalId = null;
 		try {
-			if (acusePDF != null) {
+			if (acusePDF != null && acusePDF.getContenido() != null && acusePDF.getContenido().length > 0) {
 				//si hi ha una certificació
 				if (enviament.getNotificaCertificacioArxiuId() != null) {
 					logger.debug("Esborrant certificació antiga...");
@@ -316,16 +315,16 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 				if (enviament.getNotificacio() != null)
 					logger.debug("Nou estat notificació: " + enviament.getNotificacio().getEstat().name());
 				// Hash document certificacio
-				if (acusePDF.getContenido() != null) {
-					try {
-						logger.info("Guardant certificació acusament de rebut...");
-						gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
-								PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
-								Base64.decode(acusePDF.getContenido()));
-					} catch (Exception ex) {
-						logger.error("No s'ha pogut guardar la certificació a la gestió documental", ex);
-					}
+//				if (acusePDF.getContenido() != null && acusePDF.getContenido().length > 0) {
+				try {
+					logger.info("Guardant certificació acusament de rebut...");
+					gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
+							PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
+							Base64.decodeBase64(acusePDF.getContenido()));
+				} catch (Exception ex) {
+					logger.error("No s'ha pogut guardar la certificació a la gestió documental", ex);
 				}
+//				}
 				logger.debug("Actualitzant enviament amb la certificació. ID gestió documental: " + gestioDocumentalId);
 				enviament.updateNotificaCertificacio(
 						new Date(),

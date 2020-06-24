@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.jws.WebService;
 
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.jersey.core.util.Base64;
 
 import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.GrupDto;
@@ -208,7 +208,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				if(notificacio.getDocument().getContingutBase64() != null) {
 					documentGesdocId = pluginHelper.gestioDocumentalCreate(
 							PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-							Base64.decode(notificacio.getDocument().getContingutBase64()));
+							Base64.decodeBase64(notificacio.getDocument().getContingutBase64()));
 				}
 				
 				NotificaEnviamentTipusEnumDto enviamentTipus = null;
@@ -674,8 +674,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							enviament.getNotificaCertificacioArxiuId(),
 							PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
 							baos);
-					certificacio.setContingutBase64(
-							new String(Base64.encode(baos.toByteArray())));
+					certificacio.setContingutBase64(Base64.encodeBase64String(baos.toByteArray()));
 					
 					if (enviament.getNotificaCertificacioTamany() != null)
 						certificacio.setTamany(enviament.getNotificaCertificacioTamany());

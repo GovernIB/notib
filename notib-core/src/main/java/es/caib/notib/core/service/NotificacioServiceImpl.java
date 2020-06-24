@@ -17,6 +17,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
 
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.sun.jersey.core.util.Base64;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.DocumentDto;
@@ -169,7 +168,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		if(notificacio.getDocument().getContingutBase64() != null) {
 			documentGesdocId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-					Base64.decode(notificacio.getDocument().getContingutBase64()));
+					Base64.decodeBase64(notificacio.getDocument().getContingutBase64()));
 		} else if (notificacio.getDocument().getUuid() != null) {
 			DocumentDto document = new DocumentDto();
 			String arxiuUuid = notificacio.getDocument().getUuid();
