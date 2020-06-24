@@ -758,6 +758,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 							entregaPostal.setCodigoPostal(enviament.getDomiciliCodiPostal());
 							entregaPostal.setPais(enviament.getDomiciliPaisCodiIso());
 						}
+						if (entregaPostal.getPais() == null) {
+							entregaPostal.setPais("ES");
+						}
 						Opciones opcionesCie = new Opciones();
 						if (enviament.getDomiciliCie() != null) {
 							Opcion opcionCie = new Opcion();
