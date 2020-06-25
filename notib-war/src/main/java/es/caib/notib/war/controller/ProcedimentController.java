@@ -67,9 +67,11 @@ public class ProcedimentController extends BaseUserController{
 	public String get(
 			HttpServletRequest request,
 			Model model) {
-		model.addAttribute(new ProcedimentFiltreCommand());
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+//		model.addAttribute(new ProcedimentFiltreCommand());
 		ProcedimentFiltreCommand procedimentFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("procedimentFiltreCommand", procedimentFiltreCommand);
+		model.addAttribute("organsGestors", procedimentService.findOrgansGestorsByEntitat(entitat.getId()));
 		return "procedimentAdminList";
 	}
 	
@@ -242,6 +244,9 @@ public class ProcedimentController extends BaseUserController{
 					entitat.getId(),
 					isAdministrador(request),
 					procedimentId);
+			if (procediment != null && procediment.getOrganGestor() != null && !procediment.getOrganGestor().trim().isEmpty()) {
+				procediment.setOrganGestorNom(procediment.getOrganGestor() + " - " + procedimentService.findDenominacioOrganisme(procediment.getOrganGestor()));
+			}
 			model.addAttribute(procediment);
 //			List<TipusAssumpteDto> tipusAssumpte = procedimentService.findTipusAssumpte(procediment.getEntitat());
 //			model.addAttribute("tipusAssumpte", tipusAssumpte);

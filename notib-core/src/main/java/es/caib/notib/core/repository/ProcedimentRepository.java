@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 
 /**
@@ -95,5 +96,12 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			@Param("isNomNull") boolean isNomNull,
 			@Param("nom") String nom,
 			Pageable paginacio);
+
+	@Query(	"select distinct pro.organGestor " +
+			"  from ProcedimentEntity pro " +
+			" where pro.entitat = :entitat")
+	public List<String> findOrgansGestorsCodisByEntitat(@Param("entitat") EntitatEntity entitat);
+	
+	List<ProcedimentEntity> findByOrganGestor(OrganGestorEntity organGestor);
 	
 }

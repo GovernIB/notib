@@ -8,13 +8,15 @@
 		</layout>
 	</appender>
 
-	<!--logger name="org.springframework.web">
+<!--
+	<logger name="org.springframework.web">
 		<level value="DEBUG" />
 	</logger>
 	<logger name="org.springframework.security">
 		<level value="DEBUG" />
-	</logger-->
-
+	</logger>
+-->	
+	
 	<root>
 		<level value="INFO"/>
 		<appender-ref ref="consoleAppender"/>

@@ -6,9 +6,12 @@ import java.util.Map;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.core.api.dto.CodiAssumpteDto;
+import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
+import es.caib.notib.core.api.dto.OrganGestorFiltreDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
@@ -184,6 +187,14 @@ public interface ProcedimentService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public List<OrganismeDto> findOrganismes(EntitatDto entitat);
+	
+	/**
+	 * Recupera la denominació d'un organime.
+	 * 
+	 * @return La denominació de l'organisme.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public String findDenominacioOrganisme(String codiDir3);
 	
 	/**
 	 * Recupera les oficines d'una entitat.
@@ -377,4 +388,48 @@ public interface ProcedimentService {
 	public void refrescarCache(
 			EntitatDto entitat);
 
+	
+	// ORGANS GESTORS
+	/////////////////////////////////////////////////////////////
+	
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public List<CodiValorDto> findOrgansGestorsByEntitat(Long entitatId);
+	
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(
+			Long entitatId, 
+			OrganGestorFiltreDto filtre, 
+			PaginacioParamsDto paginacioParams);
+	
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public void updateOrganGestorNom(
+			Long entitatId, 
+			String organGestorCodi);
+	
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public void updateOrgansGestorsNom(
+			Long entitatId);
+
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public OrganGestorDto findOrganGestorById(
+			Long entitatId,
+			Long id);
+	
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	public List<PermisDto> permisOrganGestorFind(
+			Long entitatId,
+			Long id) throws NotFoundException;
+	
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public void permisOrganGestorUpdate(
+			Long entitatId,
+			Long id,
+			PermisDto permis) throws NotFoundException;
+	
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public void permisOrganGestorDelete(
+			Long entitatId,
+			Long id,
+			Long permisId) throws NotFoundException;
+	
 }
