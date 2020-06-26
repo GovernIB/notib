@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.mail.MessagingException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
-import javax.servlet.http.Cookie;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;

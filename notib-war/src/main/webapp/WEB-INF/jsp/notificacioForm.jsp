@@ -157,7 +157,8 @@
 var interessatsTipus = new Array();
 var interessatTipusOptions = "";
 <c:forEach items="${interessatTipus}" var="it" varStatus="status">
-   	interessatTipusOptions = interessatTipusOptions + "<option value=${it.value}" + (${status.index == 0} ? " selected='selected'" : "") + "><spring:message code='${it.text}'/></option>";
+	console.log(${status.index == 1})
+   	interessatTipusOptions = interessatTipusOptions + "<option value=${it.value}" + (${status.index == 1} ? " selected='selected'" : "") + "><spring:message code='${it.text}'/></option>";
 </c:forEach>
 
 $(document).ready(function() {
@@ -308,24 +309,28 @@ $(document).ready(function() {
 		var nifLabel = nif.find('label');
 		var dir3codi = closest.find('.dir3Codi');
 		var nifLabelText = "<spring:message code='notificacio.form.camp.titular.nif'/>";
+		var incapacitat = closest.find('.incapacitat');
 		
 		if ($(this).val() == 'ADMINISTRACIO') {
 			$(llinatge1).addClass('hidden');
 			$(llinatge2).addClass('hidden');
 			$(dir3codi).removeClass('hidden');
 			$(nifLabel).text(nifLabelText);
+			$(incapacitat).addClass('hidden');
 		} else if ($(this).val() == 'FISICA') {
 			$(llinatge1).removeClass('hidden');
 			$(llinatge2).removeClass('hidden');
 			$(nif).removeClass('hidden');
 			$(nifLabel).text(nifLabelText + " *");
 			$(dir3codi).addClass('hidden');
+			$(incapacitat).removeClass('hidden');
 		} else {
 			$(llinatge1).addClass('hidden');
 			$(llinatge2).addClass('hidden');
 			$(nif).removeClass('hidden');
 			$(dir3codi).addClass('hidden');
 			$(nifLabel).text(nifLabelText + " *");
+			$(incapacitat).removeClass('hidden');
 		}
 	});
 	
@@ -1032,8 +1037,8 @@ function actualitzarEntrega(j) {
 										
 										<!-- INCAPACITAT -->
 										<c:if test="${isTitularAmbIncapacitat}">
-											<div class="col-md-12">
-												<not:inputCheckbox name="enviaments[${j}].titular.incapacitat" generalClass="incapacitat" textKey="notificacio.form.camp.titular.incapacitat" funcio="mostrarDestinatari(this.id)"/>
+											<div class="col-md-12 incapacitat">
+												<not:inputCheckbox name="enviaments[${j}].titular.incapacitat" textKey="notificacio.form.camp.titular.incapacitat" funcio="mostrarDestinatari(this.id)"/>
 											</div>
 										</c:if>
 									</div>

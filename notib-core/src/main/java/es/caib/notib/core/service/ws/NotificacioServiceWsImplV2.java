@@ -856,6 +856,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1060 | El camp 'document' no pot ser null
 	// 1061 | El camp 'arxiuNom' del document no pot ser null
 	// 1062 | És necessari incloure un document a la notificació
+	// 1063 | La longitud del document supera el màxim definit
 	// 1070 | El camp 'usuariCodi' no pot ser null (Requisit per fer el registre de sortida)
 	// 1071 | El camp 'usuariCodi' no pot pot tenir una longitud superior a 64 caràcters
 	// 1072 | El camp 'arxiuNom' no pot pot tenir una longitud superior a 200 caràcters."
@@ -1017,6 +1018,15 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				(document.getUrl() == null || document.getUrl().isEmpty()) &&
 				(document.getUuid() == null || document.getUuid().isEmpty())) {
 			return setRespostaError("[1062] És necessari incloure un document a la notificació.");
+		}
+		if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
+			Long fileMaxSize = 10635049L; //10MB
+			byte[] base64Decoded = Base64.decode(notificacio.getDocument().getContingutBase64());
+			if (getMaxSizeFile() != null)
+				fileMaxSize = getMaxSizeFile();
+			if (base64Decoded.length > getMaxSizeFile()) {
+				return setRespostaError("[1063] La longitud del document supera el màxim definit (" + fileMaxSize + ").");
+			}
 		}
 		// Usuari
 		if (notificacio.getUsuariCodi() == null || notificacio.getUsuariCodi().isEmpty()) {
@@ -1461,6 +1471,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		logger.debug("Consulta del valor de la property (" +
 				"property=" + property + ")");
 		return PropertiesHelper.getProperties().getProperty(property);
+	}
+	
+	private static Long getMaxSizeFile() {
+		String property = "es.caib.notib.notificacio.document.size";
+		logger.debug("Consulta del valor de la property (" +
+				"property=" + property + ")");
+		if (PropertiesHelper.getProperties().getProperty(property) != null)
+			return Long.valueOf(PropertiesHelper.getProperties().getProperty(property));
+		else
+			return null;
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceWsImplV2.class);

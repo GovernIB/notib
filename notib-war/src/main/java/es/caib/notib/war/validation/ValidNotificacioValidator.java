@@ -2,15 +2,20 @@ package es.caib.notib.war.validation;
 
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import javax.mail.internet.InternetAddress;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
 import es.caib.notib.war.command.PersonaCommand;
@@ -23,6 +28,9 @@ import es.caib.notib.war.helper.MessageHelper;
  */
 public class ValidNotificacioValidator implements ConstraintValidator<ValidNotificacio, NotificacioCommandV2> {
 
+	@Autowired
+	private AplicacioService aplicacioService;
+	
 	@Override
 	public void initialize(final ValidNotificacio constraintAnnotation) {
 	}
@@ -33,15 +41,14 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 		boolean valid = true;
 		boolean comunicacioAmbAdministracio = false;
 		boolean comunicacioSenseAdministracio = false;
-		
 		try {
 			
 			// Validació del Concepte
 			if (notificacio.getConcepte() != null && !notificacio.getConcepte().isEmpty()) {
-				if (!validFormat(notificacio.getConcepte())) {
+				if (!validFormat(notificacio.getConcepte()).isEmpty()) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
-							MessageHelper.getInstance().getMessage("notificacio.form.valid.concepte"))
+							MessageHelper.getInstance().getMessage("notificacio.form.valid.concepte", new Object[] {validFormat(notificacio.getConcepte()).toString()}))
 					.addNode("concepte")
 					.addConstraintViolation();
 			    }
@@ -49,10 +56,10 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			
 			// Validació de la Descripció
 			if (notificacio.getDescripcio() != null && !notificacio.getDescripcio().isEmpty()) {
-				if (!validFormat(notificacio.getDescripcio())) {
+				if (!validFormat(notificacio.getDescripcio()).isEmpty()) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
-							MessageHelper.getInstance().getMessage("notificacio.form.valid.concepte"))
+							MessageHelper.getInstance().getMessage("notificacio.form.valid.descripcio", new Object[] {validFormat(notificacio.getDescripcio()).toString()}))
 					.addNode("descripcio")
 					.addConstraintViolation();
 			    }
@@ -81,9 +88,26 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			// Validació de document
 			switch (notificacio.getTipusDocument()) {
 			case ARXIU:
+				Long fileMaxSize = 10635049L; //10MB
+				String [] formatsDisponibles = {"application/pdf", "application/zip", "application/x-zip-compressed"};
+				if (aplicacioService.propertyGet("es.caib.notib.notificacio.document.size") != null)
+					fileMaxSize = Long.valueOf(aplicacioService.propertyGet("es.caib.notib.notificacio.document.size"));
+				
 				if (notificacio.getContingutArxiu() == null || notificacio.getContingutArxiu().length == 0) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+					.addNode("arxiu")
+					.addConstraintViolation();
+				}
+				if ((notificacio.getContingutArxiu() != null && notificacio.getContingutArxiu().length != 0) && !Arrays.asList(formatsDisponibles).contains(notificacio.getArxiu().getContentType())) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.format"))
+					.addNode("arxiu")
+					.addConstraintViolation();
+				}
+				if ((notificacio.getContingutArxiu() != null && notificacio.getContingutArxiu().length != 0) && notificacio.getArxiu().getSize() > fileMaxSize) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.size"))
 					.addNode("arxiu")
 					.addConstraintViolation();
 				}
@@ -203,18 +227,19 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 		return valid;
 	}
 	
-	private boolean validFormat(String value) {
+	private ArrayList<Character> validFormat(String value) {
 		String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;";
-		char[] chars = value.toCharArray();
+		ArrayList<Character> charsNoValids = new ArrayList<Character>();
+		char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
 		
 		boolean esCaracterValid = true;
 		for (int i = 0; esCaracterValid && i < chars.length; i++) {
 			esCaracterValid = !(CONTROL_CARACTERS.indexOf(chars[i]) < 0);
 			if (!esCaracterValid) {
-				break;
+				charsNoValids.add(chars[i]);
 			}
 	    }
-		return esCaracterValid;
+		return charsNoValids;
 	}
 
 	private boolean isEmailValid(String email) {
