@@ -49,7 +49,6 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
@@ -64,7 +63,6 @@ import es.caib.notib.core.api.ws.notificacio.Persona;
 import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.GrupEntity;
-import es.caib.notib.core.entity.GrupProcedimentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
@@ -83,7 +81,6 @@ import es.caib.notib.core.helper.RegistreHelper;
 import es.caib.notib.core.helper.RegistreNotificaHelper;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
@@ -136,8 +133,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private RegistreNotificaHelper registreNotificaHelper;
 	@Autowired
 	private GrupRepository grupRepository;
-	@Autowired
-	private GrupProcedimentRepository grupProcedimentRepository;
 	@Autowired
 	private RegistreHelper registreHelper;
 	@Autowired
@@ -418,8 +413,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			boolean isUsuari,
 			boolean isUsuariEntitat,
 			boolean isAdministrador,
-			List<ProcedimentGrupDto> grupsProcediments,
-			Map<String, ProcedimentDto> procediments,
+			List<String> procedimentsCodisNotib,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		
@@ -432,92 +426,17 @@ public class NotificacioServiceImpl implements NotificacioService {
 		List<EntitatEntity> entitatsActiva = entitatRepository.findByActiva(true);
 		PaginaDto<NotificacioDto> resultatPagina = null;
 		Page<NotificacioEntity> notificacions = null;
-		List<String> procedimentsCodisNotib = new ArrayList<String>();
-		List<String> grupsProcedimentsCodis = null;
-		List<ProcedimentDto> procedimentsPermisConsultaAndAgrupable = new ArrayList<ProcedimentDto>();
-		List<ProcedimentDto> procedimentsPermisConsulta = new ArrayList<ProcedimentDto>();
-		
-		if (isUsuari) {
-			if (grupsProcediments.isEmpty()) {
-				//Obté tots els procediments amb permís de consutla d'una entitat
-				procedimentsPermisConsultaAndAgrupable = entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
-					new Permission[] {
-							ExtendedPermission.READ},
-					entitatId);
-			} else if (!procediments.isEmpty()) {
-				//Obté els procediments amb grup i permís de consulta
-				procedimentsPermisConsultaAndAgrupable = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
-						procediments, 
-						entitatId,
-						new Permission[] {
-								ExtendedPermission.READ}
-						);
-				//Procediments amb permís de consulta no agurpables
-				List<ProcedimentDto> procedimentsNoAgrupables = new ArrayList<ProcedimentDto>();
-				for (Map.Entry<String, ProcedimentDto> procediment : procediments.entrySet()) {
-					if (!procediment.getValue().isAgrupar()) {
-						procedimentsNoAgrupables.add(procediment.getValue());
-					}
-				}
-//				for(ProcedimentDto procediment: procediments) {
-//					if (!procediment.isAgrupar()) {
-//						procedimentsNoAgrupables.add(procediment);
-//					}
-//				}
-				procedimentsPermisConsulta = entityComprovarHelper.findByPermisProcedimentsUsuariActual(
-						procedimentsNoAgrupables, 	
-						entitatId,
-						new Permission[] {
-								ExtendedPermission.READ}
-						);
-				
-			}
-			if (!procedimentsPermisConsultaAndAgrupable.isEmpty()) {
-					for (ProcedimentDto procedimentDto : procedimentsPermisConsultaAndAgrupable) {
-						procedimentsCodisNotib.add(procedimentDto.getCodi());
-					}
-			}
-			if (!procedimentsPermisConsulta.isEmpty()) {
-				for (ProcedimentDto procedimentDto : procedimentsPermisConsulta) {
-					procedimentsCodisNotib.add(procedimentDto.getCodi());
-				}
-			}
-		}
 		
 		if (filtre == null) {
 			//Consulta les notificacions sobre les quals té permis l'usuari actual
 			if (isUsuari) {
-				//Notificacions sense grups i amb grups
-				grupsProcedimentsCodis = new ArrayList<String>();
-				for (String codiProcediment : procedimentsCodisNotib) {
-					ProcedimentEntity procedimentAgrupable = procedimentRepository.findByCodiAndEntitat(
-							codiProcediment,
-							entitatActual);
-
-					List<GrupProcedimentEntity> grups = grupProcedimentRepository.findByProcediment(procedimentAgrupable);
-					for (GrupProcedimentEntity grup : grups) {
-						List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(aplicacioService.getUsuariActual().getCodi());
-						
-						if (rolsUsuariActual.contains(grup.getGrup().getCodi())) {
-							grupsProcedimentsCodis.add(grup.getGrup().getCodi());
-						}
-					}
-				}
-				
-				//Quan no hi ha cap procediment amb grups
-				if (!procedimentsCodisNotib.isEmpty() && grupsProcedimentsCodis.isEmpty()) {
-					notificacions = notificacioRepository.findByProcedimentCodiNotibAndEntitat(
-							procedimentsCodisNotib,
-							entitatActual,
-							paginacioHelper.toSpringDataPageable(paginacioParams));
-				} else if (!procedimentsCodisNotib.isEmpty()) {
+				if (!procedimentsCodisNotib.isEmpty()) {
 					notificacions = notificacioRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
 							procedimentsCodisNotib, 
-							grupsProcedimentsCodis, 
+							aplicacioService.findRolsUsuariActual(), 
 							entitatActual,
 							paginacioHelper.toSpringDataPageable(paginacioParams));
 				}
-				
 			//Consulta els notificacions de l'entitat acutal
 			} else if (isUsuariEntitat) {
 				notificacions = notificacioRepository.findByEntitatActual(
@@ -556,58 +475,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
 			if (isUsuari) {
-				//Notificacions amb grups
-				grupsProcedimentsCodis = new ArrayList<String>();
-				for (String codiProcediment : procedimentsCodisNotib) {
-					ProcedimentEntity procedimentAgrupable = procedimentRepository.findByCodiAndEntitat(
-							codiProcediment,
-							entitatActual);
-
-					List<GrupProcedimentEntity> grups = grupProcedimentRepository.findByProcediment(procedimentAgrupable);
-					for (GrupProcedimentEntity grup : grups) {
-						List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(aplicacioService.getUsuariActual().getCodi());
-						
-						if (rolsUsuariActual.contains(grup.getGrup().getCodi())) {
-							grupsProcedimentsCodis.add(grup.getGrup().getCodi());
-						}
-					}
-				}
-				//Quan no hi ha cap procediment amb grups
-				if (!procedimentsCodisNotib.isEmpty() && grupsProcedimentsCodis.isEmpty()) {
-					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotib(
-							filtre.getEntitatId() == null,
-							filtre.getEntitatId(),
-							procedimentsCodisNotib,
-							filtre.getEnviamentTipus() == null,
-							filtre.getEnviamentTipus(),
-							filtre.getConcepte() == null,
-							filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
-							filtre.getEstat() == null,
-							filtre.getEstat(), 
-							dataInici == null,
-							dataInici,
-							dataFi == null,
-							dataFi,
-							filtre.getTitular() == null || filtre.getTitular().isEmpty(),
-							filtre.getTitular() == null ? "" : filtre.getTitular(),
-							entitatActual, 
-							procediment == null,
-							procediment,
-							filtre.getTipusUsuari() == null,
-							filtre.getTipusUsuari(),
-							filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
-							filtre.getNumExpedient(),
-							filtre.getCreadaPer() == null || filtre.getCreadaPer().isEmpty(),
-							filtre.getCreadaPer(),
-							filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
-							filtre.getIdentificador(),
-							pageable);
-				} else if (!procedimentsCodisNotib.isEmpty()) {
+				if (!procedimentsCodisNotib.isEmpty()) {
 					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 							filtre.getEntitatId() == null,
 							filtre.getEntitatId(),
 							procedimentsCodisNotib, 
-							grupsProcedimentsCodis, 
+							aplicacioService.findRolsUsuariActual(), 
 							filtre.getEnviamentTipus() == null,
 							filtre.getEnviamentTipus(),
 							filtre.getConcepte() == null,
@@ -633,7 +506,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getIdentificador(),
 							pageable);
 				}
-				
 				
 			} else if (isUsuariEntitat) {
 				notificacions = notificacioRepository.findAmbFiltre(

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
 import es.caib.notib.core.api.dto.ProcedimentFormDto;
@@ -49,6 +51,7 @@ import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PermisosHelper;
+import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.ProcedimentHelper;
 import es.caib.notib.core.repository.EntitatRepository;
@@ -436,6 +439,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public List<ProcedimentDto> findAll() {
 		logger.debug("Consulta de tots els procediments");
 		
@@ -450,6 +454,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<ProcedimentGrupDto> findAllGrups() {
 		logger.debug("Consulta de tots els procediments");
 		
@@ -466,30 +471,138 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 	
 	@Override
-	public List<ProcedimentDto> findProcedimentsSenseGrups(EntitatDto entitatActual) {
+	@Transactional(readOnly = true)
+	public List<ProcedimentGrupDto> findGrupsByEntitat(Long entitatId) {
+		logger.debug("Consulta de tots els procediments d'una entitat");
 		
-		entityComprovarHelper.comprovarPermisos(
-				null,
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
 				true,
-				true,
+				false,
 				false);
-		List<GrupProcedimentEntity> grupsProcediments = grupProcedimentRepository.findAll();
-		List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActual.getId());
 		
-		for (GrupProcedimentEntity grupProcedimentEntity : grupsProcediments) {
-			procediments.add(procedimentRepository.findOne(grupProcedimentEntity.getProcediment().getId()));
-		}
-		List<ProcedimentEntity> procedimentsSenseGrups = new ArrayList<ProcedimentEntity>();
-		if(procediments.size() > 0) {
-			procedimentsSenseGrups = procedimentRepository.findProcedimentsSenseGrups(procediments);	
-		}
-		if (procediments.isEmpty() && procedimentsSenseGrups.isEmpty()) {
-			procedimentsSenseGrups = procedimentRepository.findByEntitat(entitat);
-		}
+		List<GrupProcedimentEntity> grupsProcediments = grupProcedimentRepository.findByProcedimentEntitat(entitat);
 		return conversioTipusHelper.convertirList(
-				procedimentsSenseGrups,
+					grupsProcediments,
+					ProcedimentGrupDto.class);
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<ProcedimentDto> findProcedimentsSenseGrups(Long entitatId) {
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		return conversioTipusHelper.convertirList(
+				procedimentRepository.findProcedimentsSenseGrupsByEntitat(entitat),
 				ProcedimentDto.class);
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<ProcedimentDto> findProcedimentsSenseGrupsWithPermis(Long entitatId, PermisEnum permis) {
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		List<ProcedimentEntity> procediments = procedimentRepository.findProcedimentsSenseGrupsByEntitat(entitat);
+		return entityComprovarHelper.findPermisProcediments(
+						procediments, 
+						getPermissionFromName(permis));
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<ProcedimentDto> findProcedimentsAmbGrups(Long entitatId, List<String> grups) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		return conversioTipusHelper.convertirList(
+				procedimentRepository.findProcedimentsAmbGrupsByEntitatAndGrup(entitat, grups),
+				ProcedimentDto.class);
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<ProcedimentDto> findProcedimentsAmbGrupsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		List<ProcedimentEntity> procediments = procedimentRepository.findProcedimentsAmbGrupsByEntitatAndGrup(entitat, grups);
+		return entityComprovarHelper.findPermisProcediments(
+						procediments, 
+						getPermissionFromName(permis));
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<ProcedimentDto> findProcediments(Long entitatId, List<String> grups) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		return conversioTipusHelper.convertirList(
+				procedimentRepository.findProcedimentsByEntitatAndGrup(entitat, grups),
+				ProcedimentDto.class);
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<ProcedimentDto> findProcedimentsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		List<ProcedimentEntity> procediments = procedimentRepository.findProcedimentsByEntitatAndGrup(entitat, grups);
+		return entityComprovarHelper.findPermisProcediments(
+						procediments, 
+						getPermissionFromName(permis));
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public boolean hasAnyProcedimentsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false);
+		List<ProcedimentEntity> procediments = procedimentRepository.findProcedimentsByEntitatAndGrup(entitat, grups);
+		if (procediments == null || procediments.isEmpty())
+			return false;
+		
+		permisosHelper.filterGrantedAny(
+				procediments,
+				new ObjectIdentifierExtractor<ProcedimentEntity>() {
+					public Long getObjectIdentifier(ProcedimentEntity procediment) {
+						return procediment.getId();
+					}
+				},
+				ProcedimentEntity.class,
+				getPermissionFromName(permis),
+				SecurityContextHolder.getContext().getAuthentication());
+		return !procediments.isEmpty();
+	}
+	
+	private Permission[] getPermissionFromName(PermisEnum permis) {
+		switch (permis) {
+		case CONSULTA: return new Permission[] {ExtendedPermission.READ};
+		case PROCESSAR: return new Permission[] {ExtendedPermission.PROCESSAR};
+		case NOTIFICACIO: return new Permission[] {ExtendedPermission.NOTIFICACIO};
+		case GESTIO: return new Permission[] {ExtendedPermission.ADMINISTRATION};
+		default: return null;
+		}
 	}
 	
 	@Transactional

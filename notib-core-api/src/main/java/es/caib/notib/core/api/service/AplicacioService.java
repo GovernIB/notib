@@ -66,6 +66,9 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<String> findRolsUsuariAmbCodi(String usuariCodi);
 	
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public List<String> findRolsUsuariActual();
+	
 	/**
 	 * Consulta els usuaris donat un text.
 	 * 

@@ -151,6 +151,14 @@ public class AplicacioServiceImpl implements AplicacioService {
 	
 	@Transactional(readOnly = true)
 	@Override
+	public List<String> findRolsUsuariActual() {
+		logger.debug("Obtenint els rols de l'usuari actual");
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		return pluginHelper.consultarRolsAmbCodi(auth.getName());
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
 	public UsuariDto findUsuariAmbCodi(String codi) {
 		logger.debug("Obtenint usuari amb codi (codi=" + codi + ")");
 		return conversioTipusHelper.convertir(

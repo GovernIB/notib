@@ -57,6 +57,12 @@ public class AplicacioServiceBean implements AplicacioService {
 	public List<String> findRolsUsuariAmbCodi(String usuariCodi) {
 		return delegate.findRolsUsuariAmbCodi(usuariCodi);
 	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	public List<String> findRolsUsuariActual() {
+		return delegate.findRolsUsuariActual();
+	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})

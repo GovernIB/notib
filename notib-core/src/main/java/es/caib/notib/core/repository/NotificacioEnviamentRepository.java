@@ -73,10 +73,6 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:esNomTitularNull = true or lower(concat('[', n.titular.llinatge1, ' ', n.titular.llinatge2, ', ', n.titular.nom,']')) like lower('%'||:nomTitular||'%')) " +
 			"and (:esEmailTitularNull = true or n.titular.email = :emailTitular) " +
 			"and (:esDir3CodiNull = true or lower(n.notificacio.emisorDir3Codi) like lower('%'||:dir3Codi||'%')) " +
-			//"and   (:isDestinatarisNull = true or lower(c.destinatariNom) like lower('%'||:destinataris||'%'))" +
-			//"and  	or lower(c.destinatariLlinatge1) like lower('%'||:destinataris||'%'))" +
-			//"and 	or lower(c.destinatariLlinatge2) like lower('%'||:destinataris||'%'))" +
-			//"and   (:isCodiNotibNull = true or n.titularEmail = :codiNotib) " +
 			"and (:isNumeroCertCorreusNull = true or n.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
 			"and (:isUsuariNull = true or n.notificacio.usuariCodi like lower('%'||:usuari||'%')) "+
 			"and (:isNumeroRegistreNull = true or n.notificacio.registreNumero like lower('%'||:numeroRegistre||'%')) "+
@@ -158,16 +154,13 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:esNomTitularNull = true or lower(concat('[', n.titular.llinatge1, ' ', n.titular.llinatge2, ', ', n.titular.nom,']')) like lower('%'||:nomTitular||'%')) " +
 			"and (:esEmailTitularNull = true or n.titular.email = :emailTitular) " +
 			"and (:esDir3CodiNull = true or lower(n.notificacio.emisorDir3Codi) like lower('%'||:dir3Codi||'%')) " +
-			//"and   (:isDestinatarisNull = true or lower(c.destinatariNom) like lower('%'||:destinataris||'%'))" +
-			//"and  	or lower(c.destinatariLlinatge1) like lower('%'||:destinataris||'%'))" +
-			//"and 	or lower(c.destinatariLlinatge2) like lower('%'||:destinataris||'%'))" +
-			//"and   (:isCodiNotibNull = true or n.titularEmail = :codiNotib) " +
 			"and (:isNumeroCertCorreusNull = true or n.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
 			"and (:isUsuariNull = true or n.notificacio.usuariCodi like lower('%'||:usuari||'%')) "+
 			"and (:isNumeroRegistreNull = true or n.notificacio.registreNumero like lower('%'||:numeroRegistre||'%')) "+
 			"and (:esDataRegistreIniciNull = true or n.notificacio.registreData >= :dataRegistreInici) " +
 			"and (:esDataRegistreFiNull = true or n.notificacio.registreData <= :dataRegistreFi) " +
-			"and (:esProcedimentsCodisNotibNull = true or n.notificacio.procedimentCodiNotib in (:procedimentsCodisNotib))")
+			"and (:esProcedimentsCodisNotibNull = true or n.notificacio.procedimentCodiNotib in (:procedimentsCodisNotib)) " +
+			"and (n.notificacio.grupCodi = null or (n.notificacio.grupCodi in (:grupsProcedimentCodisNotib))) ")
 	Page<NotificacioEnviamentEntity> findByNotificacio(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
 			@Param("codiProcediment") String codiProcediment,
@@ -220,6 +213,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("dataRegistreFi") Date dataRegistreFi,
 			@Param("esProcedimentsCodisNotibNull") boolean esProcedimentsCodisNotibNull,
 			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
+			@Param("grupsProcedimentCodisNotib") List<String> grupsProcedimentCodisNotib,
 			Pageable pageable);
 	
 	@Query(	"from" +
@@ -245,10 +239,6 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:esNomTitularNull = true or lower(concat('[', n.titular.llinatge1, ' ', n.titular.llinatge2, ', ', n.titular.nom,']')) like lower('%'||:nomTitular||'%')) " +
 			"and (:esEmailTitularNull = true or n.titular.email = :emailTitular) " +
 			"and (:esDir3CodiNull = true or lower(n.notificacio.emisorDir3Codi) like lower('%'||:dir3Codi||'%')) " +
-			//"and   (:isDestinatarisNull = true or lower(c.destinatariNom) like lower('%'||:destinataris||'%'))" +
-			//"and  	or lower(c.destinatariLlinatge1) like lower('%'||:destinataris||'%'))" +
-			//"and 	or lower(c.destinatariLlinatge2) like lower('%'||:destinataris||'%'))" +
-			//"and   (:isCodiNotibNull = true or n.titularEmail = :codiNotib) " +
 			"and (:isNumeroCertCorreusNull = true or n.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
 			"and (:isUsuariNull = true or n.notificacio.usuariCodi like lower('%'||:usuari||'%')) "+
 			"and (:isNumeroRegistreNull = true or n.notificacio.registreNumero like lower('%'||:numeroRegistre||'%')) "+

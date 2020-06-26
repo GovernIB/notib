@@ -21,11 +21,41 @@ import es.caib.notib.core.entity.ProcedimentEntity;
 public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, Long> {
 
 	@Query(
-			"from " + 
-			"	ProcedimentEntity pro " +
-			"where pro not in (:procediments)")
-	public List<ProcedimentEntity> findProcedimentsSenseGrups(
-			@Param("procediments") List<ProcedimentEntity> procediments);
+			"from ProcedimentEntity pro " +
+			"where pro.entitat = :entitat " +
+			"  and pro.agrupar = false ")
+//			"  and pro.id not in (select distinct p.id " +
+//			"		from GrupProcedimentEntity gp " +
+//			"		left outer join gp.procediment p " +
+//			"		where p.entitat = :entitat) ")
+	public List<ProcedimentEntity> findProcedimentsSenseGrupsByEntitat(@Param("entitat") EntitatEntity entitat);
+	
+	@Query(
+			"from ProcedimentEntity pro " +
+			"where pro.entitat = :entitat " +
+			"  and pro.agrupar = true " +
+			"  and pro in (select distinct gp.procediment " +
+			"		from GrupProcedimentEntity gp " +
+			"		left outer join gp.grup g " +
+			"		where g.entitat = :entitat " +
+			"		  and g.codi in (:grups)) ")
+	public List<ProcedimentEntity> findProcedimentsAmbGrupsByEntitatAndGrup(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("grups") List<String> grups);
+	
+	@Query(
+			"from ProcedimentEntity pro " +
+			"where pro.entitat = :entitat " +
+			"  and (pro.agrupar = false " +
+			"  	or (pro.agrupar = true " +
+			"  and pro in (select distinct gp.procediment " +
+			"		from GrupProcedimentEntity gp " +
+			"		left outer join gp.grup g " +
+			"		where g.entitat = :entitat " +
+			"		  and g.codi in (:grups))) )")
+	public List<ProcedimentEntity> findProcedimentsByEntitatAndGrup(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("grups") List<String> grups);
 	
 	List<ProcedimentEntity> findByEntitatActiva(boolean activa);
 	

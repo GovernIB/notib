@@ -244,23 +244,10 @@ public class ProcedimentController extends BaseUserController{
 					entitat.getId(),
 					isAdministrador(request),
 					procedimentId);
-			if (procediment != null && procediment.getOrganGestor() != null && !procediment.getOrganGestor().trim().isEmpty()) {
-				procediment.setOrganGestorNom(procediment.getOrganGestor() + " - " + procedimentService.findDenominacioOrganisme(procediment.getOrganGestor()));
+			if (procediment != null && procediment.getOrganGestor() != null) {
+				procediment.setOrganGestorNom(procediment.getOrganGestor() + " - " + procediment.getOrganGestorNom());
 			}
 			model.addAttribute(procediment);
-//			List<TipusAssumpteDto> tipusAssumpte = procedimentService.findTipusAssumpte(procediment.getEntitat());
-//			model.addAttribute("tipusAssumpte", tipusAssumpte);
-//			if (procediment.getTipusAssumpte() != null) {
-//				model.addAttribute("codiAssumpte", procedimentService.findCodisAssumpte(procediment.getEntitat(), procediment.getTipusAssumpte()));
-//			}else if(tipusAssumpte.get(0) != null && tipusAssumpte.get(0).getCodi() != null){
-//				model.addAttribute("codiAssumpte", procedimentService.findCodisAssumpte(procediment.getEntitat(), tipusAssumpte.get(0).getCodi()));
-//			}
-		} else {
-//			List<TipusAssumpteDto> tipusAssumpte = procedimentService.findTipusAssumpte(entitat);
-//			model.addAttribute("tipusAssumpte", tipusAssumpte);
-//			if(! tipusAssumpte.isEmpty() && tipusAssumpte.get(0) != null && tipusAssumpte.get(0).getCodi() != null){
-//				model.addAttribute("codiAssumpte", procedimentService.findCodisAssumpte(entitat, tipusAssumpte.get(0).getCodi()));
-//			}
 		}
 		model.addAttribute("pagadorsPostal", pagadorPostalService.findByEntitat(entitat.getId()));
 		model.addAttribute("pagadorsCie", pagadorCieService.findByEntitat(entitat.getId()));

@@ -24,6 +24,7 @@ import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
 import es.caib.notib.core.api.dto.ProcedimentFormDto;
@@ -130,13 +131,55 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	public List<ProcedimentGrupDto> findAllGrups() {
 		return delegate.findAllGrups();
 	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	public List<ProcedimentGrupDto> findGrupsByEntitat(Long entitatId) {
+		return delegate.findGrupsByEntitat(entitatId);
+	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
-	public List<ProcedimentDto> findProcedimentsSenseGrups(EntitatDto entitatActual) {
-		return delegate.findProcedimentsSenseGrups(entitatActual);
+	public List<ProcedimentDto> findProcedimentsSenseGrups(Long entitatId) {
+		return delegate.findProcedimentsSenseGrups(entitatId);
 	}
-
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	public List<ProcedimentDto> findProcedimentsSenseGrupsWithPermis(Long entitatId, PermisEnum permis) {
+		return delegate.findProcedimentsSenseGrupsWithPermis(entitatId, permis);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	public List<ProcedimentDto> findProcedimentsAmbGrups(Long entitatId, List<String> grups) {
+		return delegate.findProcedimentsAmbGrups(entitatId, grups);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	public List<ProcedimentDto> findProcedimentsAmbGrupsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
+		return delegate.findProcedimentsAmbGrupsWithPermis(entitatId, grups, permis);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	public List<ProcedimentDto> findProcediments(Long entitatId, List<String> grups) {
+		return delegate.findProcediments(entitatId, grups);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	public List<ProcedimentDto> findProcedimentsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
+		return delegate.findProcedimentsWithPermis(entitatId, grups, permis);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	public boolean hasAnyProcedimentsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
+		return delegate.hasAnyProcedimentsWithPermis(entitatId, grups, permis);
+	}
+	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
 	public List<PermisDto> permisFind(
@@ -357,4 +400,5 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	public void permisOrganGestorDelete(Long entitatId, Long id, Long permisId) throws NotFoundException {
 		delegate.permisOrganGestorDelete(entitatId, id, permisId);
 	}
+
 }

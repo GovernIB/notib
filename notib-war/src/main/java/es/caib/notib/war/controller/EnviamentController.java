@@ -6,10 +6,8 @@ package es.caib.notib.war.controller;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,8 +31,8 @@ import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.AplicacioService;
@@ -153,13 +151,12 @@ public class EnviamentController extends BaseUserController {
 		PaginaDto<NotificacioEnviamentDtoV2> enviaments = new PaginaDto<NotificacioEnviamentDtoV2>();
 		boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
 		boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
-//		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
-		Map<String, ProcedimentDto> uniqueProcediments = new HashMap<String, ProcedimentDto>();
-		List<ProcedimentGrupDto> grupsProcediment = new ArrayList<ProcedimentGrupDto>();
-		List<ProcedimentDto> procedimentsSenseGrups = new ArrayList<ProcedimentDto>();
-		List<ProcedimentDto> procedimentsPermisConsultaSenseGrups = new ArrayList<ProcedimentDto>();
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
+		
+		List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
+		List<String> codisProcedimentsDisponibles = new ArrayList<String>();
+		
 		try {
 			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
 				filtreEnviaments.setEstat(null);
@@ -168,39 +165,17 @@ public class EnviamentController extends BaseUserController {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			
 			if (RolHelper.isUsuariActualUsuari(request)) {
-				// Llistat de procediments amb grups
-				grupsProcediment = procedimentService.findAllGrups();
-				// Obté els procediments que tenen el mateix grup que el rol d'usuari
-				for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
-					for (String rol : rolsUsuariActual) {
-						if (rol.contains(grupProcediment.getGrup().getCodi())) {
-							if ((grupProcediment.getProcediment().getEntitat().getDir3Codi().equals(entitatActual.getDir3Codi()))) {
-								uniqueProcediments.put(grupProcediment.getProcediment().getCodi(), grupProcediment.getProcediment());
-							}
-						}
-					}
+				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.CONSULTA);
+				for(ProcedimentDto procediment: procedimentsDisponibles) {
+					codisProcedimentsDisponibles.add(procediment.getCodi());
 				}
-				// Procediments sense grups però amb perís consulta
-				procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups(entitatActual);
-
-				if (!procedimentsSenseGrups.isEmpty()) {
-					procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
-									procedimentsSenseGrups,
-									entitatActual);
-
-					for (ProcedimentDto procedimentSenseGrupAmbPermis : procedimentsPermisConsultaSenseGrups) {
-						uniqueProcediments.put(procedimentSenseGrupAmbPermis.getCodi(), procedimentSenseGrupAmbPermis);
-					}
-				}
-
 			}
 			
 			enviaments = enviamentService.enviamentFindByEntityAndFiltre(
 					entitatActual, 
 					isUsuari, 
 					isUsuariEntitat,
-					grupsProcediment, 
-					uniqueProcediments,
+					codisProcedimentsDisponibles, 
 					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 

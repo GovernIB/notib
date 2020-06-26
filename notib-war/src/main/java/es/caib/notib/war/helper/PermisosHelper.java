@@ -4,15 +4,13 @@
 package es.caib.notib.war.helper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
@@ -34,45 +32,20 @@ public class PermisosHelper {
 			AplicacioService aplicacioService) { 
 		
 		if (RolHelper.isUsuariActualUsuari(request)) {
+			
 			UsuariDto usuariActual = aplicacioService.getUsuariActual();
-			EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 			List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
-			List<ProcedimentDto> procedimentsPermisConsultaSenseGrups = new ArrayList<ProcedimentDto>();
-			List<ProcedimentDto> procedimentsSenseGrups = new ArrayList<ProcedimentDto>();
-			List<ProcedimentGrupDto> grupsProcediment = procedimentService.findAllGrups();
-//			List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
-			Map<String, ProcedimentDto> uniqueProcediments = new HashMap<String, ProcedimentDto>();
-			//Obté els procediments que tenen el mateix grup que el rol d'usuari
-			for (ProcedimentGrupDto grupProcediment : grupsProcediment) {
-				
-				for (String rol : rolsUsuariActual) {
-					if(rol.contains((grupProcediment.getGrup().getCodi()))) {
-						if ((grupProcediment.getProcediment().getEntitat().getDir3Codi().equals(entitatActual.getDir3Codi()))) {
-							uniqueProcediments.put(grupProcediment.getProcediment().getCodi(), grupProcediment.getProcediment());
-						}
-					}
-				}
-			}
-			//Comprova quins permisos té aquest usuari sobre els procediments amb grups
-			if(!uniqueProcediments.isEmpty()) {
-				request.setAttribute(
-						"permisNotificacio", 
-						procedimentService.hasGrupPermisNotificacioProcediment(
-								uniqueProcediments,
-								entitatActual));
-			}
-			// Procediments sense grups però amb perís consulta
-			procedimentsSenseGrups = procedimentService.findProcedimentsSenseGrups(entitatActual);
+			EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 
-			if (!procedimentsSenseGrups.isEmpty()) {
-				procedimentsPermisConsultaSenseGrups = notificacioService.findProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(
-								procedimentsSenseGrups,
-								entitatActual);
-				if (!procedimentsPermisConsultaSenseGrups.isEmpty()) {
-					request.setAttribute(
-							"permisNotificacio", 
-							procedimentService.hasPermisNotificacioProcediment(entitatActual));
-				}
+			List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
+			
+			if (RolHelper.isUsuariActualUsuari(request)) {
+				
+				procedimentsDisponibles = procedimentService.findProcedimentsSenseGrupsWithPermis(entitatActual.getId(), PermisEnum.NOTIFICACIO);
+				if (procedimentsDisponibles.isEmpty())
+					procedimentsDisponibles = procedimentService.findProcedimentsAmbGrupsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.NOTIFICACIO);
+				request.setAttribute("permisNotificacio", !procedimentsDisponibles.isEmpty());
+				
 			}
 		}
 	}

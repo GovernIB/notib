@@ -46,7 +46,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"from " +
 			"    NotificacioEntity ntf " +
 			"where (ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " + 
-			"and ntf.grupCodi = null or (ntf.grupCodi in (:grupsProcedimentCodisNotib)) " +
+			"and (ntf.grupCodi = null or (ntf.grupCodi in (:grupsProcedimentCodisNotib))) " +
 			"and (ntf.entitat = :entitat) " )
 	Page<NotificacioEntity> findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
 			@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
