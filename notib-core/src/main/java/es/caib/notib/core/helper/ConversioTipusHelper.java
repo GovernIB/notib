@@ -13,10 +13,12 @@ import org.springframework.stereotype.Component;
 import es.caib.notib.core.api.dto.AplicacioDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
+import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.CustomMapper;
@@ -66,6 +68,12 @@ public class ConversioTipusHelper {
 		mapperFactory.classMap(OrganGestorEntity.class, OrganGestorDto.class).
 			field("entitat.id", "entitatId").
 			field("entitat.nom", "entitatNom").
+			byDefault().
+			register();
+		
+		mapperFactory.classMap(ProcedimentEntity.class, ProcedimentDto.class).
+			field("organGestor.codi", "organGestor").
+			field("organGestor.nom", "organGestorNom").
 			byDefault().
 			register();
 	}

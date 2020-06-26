@@ -143,18 +143,6 @@ public class OrganGestorController extends BaseUserController{
 					"organgestor.controller.update.nom.tots.error");
 		}
 	}
-//	@RequestMapping(value = "/cache/refrescar", method = RequestMethod.GET)
-//	private String refrescar(
-//		HttpServletRequest request,
-//		Model model) {
-//		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-//		procedimentService.refrescarCache(entitat);
-//		
-//		return getAjaxControllerReturnValueSuccess(
-//				request,
-//				"redirect:../../procediment",
-//				"procediment.controller.esborrat.cache.ok");
-//	}
 	
 	private OrganGestorFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
@@ -172,5 +160,6 @@ public class OrganGestorController extends BaseUserController{
 		return organGestorFiltreCommand;
 	}
 	
+	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(OrganGestorController.class);
 }

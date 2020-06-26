@@ -52,6 +52,7 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaisosDto;
 import es.caib.notib.core.api.dto.PermisEnum;
@@ -84,7 +85,6 @@ import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EntitatHelper;
 import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
-import es.caib.notib.war.helper.ProcedimentHelper;
 import es.caib.notib.war.helper.RolHelper;
 
 /**
@@ -121,22 +121,7 @@ public class NotificacioController extends BaseUserController {
 			Model model) {
 		
 		model.addAttribute(new NotificacioFiltreCommand());
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		if (RolHelper.isUsuariActualUsuari(request)) {
-			if (ProcedimentHelper.sensePermisos(
-					request, 
-					entitatActual, 
-					aplicacioService, 
-					notificacioService, 
-					procedimentService)) {
-				MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.lectura"));
-			}
-		}
-		model.addAttribute("procedimentsPermisLectura", notificacioService.findProcedimentsEntitatAmbPermisConsulta(entitatActual));
-		if (RolHelper.isUsuariActualAdministrador(request)) {
-			model.addAttribute("entitat", entitatService.findAll());
-			model.addAttribute("procedimentsPermisLectura", notificacioService.findProcedimentsAmbPermisConsulta());
-		}
+		ompleProcediments(request, model);
 		model.addAttribute("notificacioEstats", 
 				EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
@@ -157,6 +142,51 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("mostrarColumnaNumExpedient", 
 				aplicacioService.propertyGet("es.caib.notib.columna.num.expedient"));
 		return "notificacioList";
+	}
+	
+	@RequestMapping(method = RequestMethod.POST)
+	public String post(
+			HttpServletRequest request, 
+			NotificacioFiltreCommand command, 
+			Model model) {
+		request.getSession().setAttribute(NOTIFICACIONS_FILTRE, NotificacioFiltreCommand.asDto(command));
+		ompleProcediments(request, model);
+		return "notificacioList";
+	}
+	
+	private void ompleProcediments(
+			HttpServletRequest request, 
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
+		List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
+		if (RolHelper.isUsuariActualAdministrador(request)) {
+			procedimentsDisponibles = procedimentService.findAll();
+			organsGestorsDisponibles = procedimentService.findOrgansGestorsAll();
+			model.addAttribute("entitat", entitatService.findAll());
+		} else if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
+			procedimentsDisponibles = procedimentService.findByEntitat(entitatActual.getId());
+			organsGestorsDisponibles = procedimentService.findOrgansGestorsByEntitat(entitatActual.getId());
+		} else if (RolHelper.isUsuariActualUsuari(request)) {
+			procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), aplicacioService.findRolsUsuariActual(), PermisEnum.CONSULTA);
+			if (procedimentsDisponibles.isEmpty()) {
+				MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.lectura"));
+			} else {
+				List<Long> procedimentsDisponiblesIds = new ArrayList<Long>();
+				for (ProcedimentDto pro: procedimentsDisponibles)
+					procedimentsDisponiblesIds.add(pro.getId());
+				organsGestorsDisponibles = procedimentService.findOrganGestorByProcedimentIds(procedimentsDisponiblesIds);
+			}
+		}
+		for (OrganGestorDto organGestor: organsGestorsDisponibles) {
+			String nom = organGestor.getCodi();
+			if (organGestor.getNom() != null && !organGestor.getNom().isEmpty()) {
+				nom += " - " + organGestor.getNom();
+			}
+			organGestor.setNom(nom);
+		}
+		model.addAttribute("procedimentsPermisLectura", procedimentsDisponibles);
+		model.addAttribute("organsGestorsPermisLectura", organsGestorsDisponibles);
 	}
 
 	@RequestMapping(value = "/new/{procedimentId}")
@@ -181,8 +211,6 @@ public class NotificacioController extends BaseUserController {
 		List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
 		
 		if (RolHelper.isUsuariActualUsuari(request)) {
-//			procedimentsDisponibles = procedimentService.findProcedimentsAmbGrupsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.NOTIFICACIO);
-//			procedimentsDisponibles.addAll(procedimentService.findProcedimentsSenseGrupsWithPermis(entitatActual.getId(), PermisEnum.NOTIFICACIO));
 			procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.NOTIFICACIO);
 			model.addAttribute("procediments", procedimentsDisponibles);
 		}
@@ -190,6 +218,46 @@ public class NotificacioController extends BaseUserController {
 		return "notificacioProcedimentsForm";
 	}
 
+	@RequestMapping(value = "/procedimentsOrgan", method = RequestMethod.GET)
+	@ResponseBody
+	public List<ProcedimentDto> getProcediments(
+			HttpServletRequest request, 
+			Model model) {
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+		
+		if (RolHelper.isUsuariActualAdministrador(request)) {
+			procediments = procedimentService.findAll();
+			model.addAttribute("entitat", entitatService.findAll());
+		} else if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
+			procediments = procedimentService.findByEntitat(entitatActual.getId());
+		} else if (RolHelper.isUsuariActualUsuari(request)) {
+			procediments = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), aplicacioService.findRolsUsuariActual(), PermisEnum.CONSULTA);
+		}
+		return procediments;
+	}
+	
+	@RequestMapping(value = "/procedimentsOrgan/{organGestor}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<ProcedimentDto> getProcedimentByOrganGestor(
+			HttpServletRequest request, 
+			@PathVariable String organGestor,
+			Model model) {
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+		
+		if (RolHelper.isUsuariActualUsuari(request)) {
+			procediments = procedimentService.findProcedimentsByOrganGestorWithPermis(
+					entitatActual.getId(),
+					organGestor, 
+					aplicacioService.findRolsUsuariActual(), 
+					PermisEnum.CONSULTA);
+		} else {
+			procediments = procedimentService.findProcedimentsByOrganGestor(organGestor);
+		}
+		return procediments;
+	}
+	
 	@RequestMapping(value = "/new/destinatari", method = RequestMethod.GET)
 	public PersonaCommand altaDestinatari(
 			HttpServletRequest request, 
@@ -298,15 +366,6 @@ public class NotificacioController extends BaseUserController {
 		}
 		
 		return "redirect:../notificacio";
-	}
-
-	@RequestMapping(method = RequestMethod.POST)
-	public String post(
-			HttpServletRequest request, 
-			NotificacioFiltreCommand command, 
-			Model model) {
-		request.getSession().setAttribute(NOTIFICACIONS_FILTRE, NotificacioFiltreCommand.asDto(command));
-		return "notificacioList";
 	}
 
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)

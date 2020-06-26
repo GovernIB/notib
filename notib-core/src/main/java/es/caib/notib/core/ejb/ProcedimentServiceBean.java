@@ -355,9 +355,47 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	public List<ProcedimentDto> findProcedimentsByOrganGestor(String organGestorCodi) {
+		return delegate.findProcedimentsByOrganGestor(organGestorCodi);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_USER"})
+	public List<ProcedimentDto> findProcedimentsByOrganGestorWithPermis(
+			Long entitatId,
+			String organGestorCodi, 
+			List<String> grups,
+			PermisEnum permis) {
+		return delegate.findProcedimentsByOrganGestorWithPermis(
+				entitatId, 
+				organGestorCodi, 
+				grups, 
+				permis);
+	}
+	
+	@Override
 	@RolesAllowed({"NOT_ADMIN"})
-	public List<CodiValorDto> findOrgansGestorsByEntitat(Long entitatId) {
+	public List<OrganGestorDto> findOrgansGestorsAll() {
+		return delegate.findOrgansGestorsAll();
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public List<OrganGestorDto> findOrgansGestorsByEntitat(Long entitatId) {
 		return delegate.findOrgansGestorsByEntitat(entitatId);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public List<CodiValorDto> findOrgansGestorsCodiByEntitat(Long entitatId) {
+		return delegate.findOrgansGestorsCodiByEntitat(entitatId);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	public List<OrganGestorDto> findOrganGestorByProcedimentIds(List<Long> procedimentIds) {
+		return delegate.findOrganGestorByProcedimentIds(procedimentIds);
 	}
 	
 	@Override

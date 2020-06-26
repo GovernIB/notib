@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -22,6 +23,29 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	public List<OrganGestorEntity> findByEntitat(EntitatEntity entitat);
 	public Page<OrganGestorEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);
 	public OrganGestorEntity findByCodi(String codi);
+	
+	@Query(	"select distinct og " +
+			"from " +
+			"    ProcedimentEntity p " +
+			"    left outer join p.organGestor og " +
+			"where p.id in (:procedimentIds)")
+	public List<OrganGestorEntity> findByProcedimentIds(@Param("procedimentIds") List<Long> procedimentIds);
+	
+	@Query( "select distinct og " +
+			"from ProcedimentEntity pro " +
+			"	  left outer join pro.organGestor og " +
+			"where pro.entitat = :entitat " +
+			"  and (pro.agrupar = false " +
+			"  	or (pro.agrupar = true " +
+			"  and pro in (select distinct gp.procediment " +
+			"		from GrupProcedimentEntity gp " +
+			"		left outer join gp.grup g " +
+			"		where g.entitat = :entitat " +
+			"		  and g.codi in (:grups))) ) " +
+			"order by pro.nom asc")
+	public List<ProcedimentEntity> findByEntitatAndGrup(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("grups") List<String> grups);
 	
 	@Query(	"from " +
 			"    OrganGestorEntity og " +

@@ -405,11 +405,31 @@ public interface ProcedimentService {
 			EntitatDto entitat);
 
 	
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
+	public List<ProcedimentDto> findProcedimentsByOrganGestor(String organGestorCodi);
+	
+	@PreAuthorize("hasRole('NOT_USER')")
+	public List<ProcedimentDto> findProcedimentsByOrganGestorWithPermis(
+			Long entitatId,
+			String organGestorCodi, 
+			List<String> grups, 
+			PermisEnum permis);
+	
+	
 	// ORGANS GESTORS
 	/////////////////////////////////////////////////////////////
 	
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	public List<OrganGestorDto> findOrgansGestorsAll();
+	
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public List<CodiValorDto> findOrgansGestorsByEntitat(Long entitatId);
+	public List<OrganGestorDto> findOrgansGestorsByEntitat(Long entitatId);
+	
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public List<CodiValorDto> findOrgansGestorsCodiByEntitat(Long entitatId);
+	
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	public List<OrganGestorDto> findOrganGestorByProcedimentIds(List<Long> procedimentIds);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(

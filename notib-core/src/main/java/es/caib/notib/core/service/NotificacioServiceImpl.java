@@ -66,6 +66,7 @@ import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.helper.CacheHelper;
@@ -85,6 +86,7 @@ import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
@@ -127,6 +129,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private PersonaRepository personaRepository;
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
+	@Autowired
+	private OrganGestorRepository organGestorRepository;
 	@Autowired
 	private EmailHelper emailHelper;
 	@Autowired
@@ -469,6 +473,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 				cal.set(Calendar.MILLISECOND, 0);
 				dataFi = cal.getTime();
 			}
+			OrganGestorEntity organGestor = null;
+			if (filtre.getOrganGestor() != null) {
+				organGestor = organGestorRepository.findByCodi(filtre.getOrganGestor());
+			}
 			ProcedimentEntity procediment = null;
 			if (filtre.getProcedimentId() != null) {
 				procediment = procedimentRepository.findById(filtre.getProcedimentId());
@@ -493,7 +501,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 							dataFi,
 							filtre.getTitular() == null || filtre.getTitular().isEmpty(),
 							filtre.getTitular() == null ? "" : filtre.getTitular(),
-							entitatActual, 
+							entitatActual,
+							organGestor == null,
+							organGestor,
 							procediment == null,
 							procediment,
 							filtre.getTipusUsuari() == null,
@@ -523,6 +533,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 						dataFi,
 						filtre.getTitular() == null || filtre.getTitular().isEmpty(),
 						filtre.getTitular(),
+						organGestor == null,
+						organGestor,
 						procediment == null,
 						procediment,
 						filtre.getTipusUsuari() == null,
@@ -550,6 +562,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 						dataFi,
 						filtre.getTitular() == null || filtre.getTitular().isEmpty(),
 						filtre.getTitular(),
+						organGestor == null,
+						organGestor,
 						procediment == null,
 						procediment,
 						filtre.getTipusUsuari() == null,

@@ -22,7 +22,6 @@ import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.PermisCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.notib.war.helper.RolHelper;
 
 /**
  * Controlador per el mantinemnt de permisos de organs gestors.
@@ -153,9 +152,9 @@ public class OrganGestorPermisController extends BaseUserController{
 				"procediment.controller.permis.esborrat.ok");
 	}
 	
-	private boolean isAdministrador(
-			HttpServletRequest request) {
-		return RolHelper.isUsuariActualAdministrador(request);
-	}
+//	private boolean isAdministrador(
+//			HttpServletRequest request) {
+//		return RolHelper.isUsuariActualAdministrador(request);
+//	}
 	
 }

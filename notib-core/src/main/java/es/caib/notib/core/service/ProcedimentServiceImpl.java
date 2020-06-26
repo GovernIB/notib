@@ -235,7 +235,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		
 		// Si canviam l'organ gestor, i aquest no s'utilitza en cap altre procediment, l'eliminarem (2)
 		if (organGestorAntic != null) {
-			List<ProcedimentEntity> procedimentsOrganGestorAntic = procedimentRepository.findByOrganGestor(organGestorAntic);
+			List<ProcedimentEntity> procedimentsOrganGestorAntic = procedimentRepository.findByOrganGestorId(organGestorAntic.getId());
 			if (procedimentsOrganGestorAntic == null || procedimentsOrganGestorAntic.isEmpty()) {
 				organGestorRepository.delete(organGestorAntic);
 			}
@@ -266,7 +266,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		procedimentRepository.delete(procedimentEntity);
 		
 		if (organGestor != null) {
-			List<ProcedimentEntity> procedimentsOrganGestorAntic = procedimentRepository.findByOrganGestor(organGestor);
+			List<ProcedimentEntity> procedimentsOrganGestorAntic = procedimentRepository.findByOrganGestorId(organGestor.getId());
 			if (procedimentsOrganGestorAntic == null || procedimentsOrganGestorAntic.isEmpty()) {
 				organGestorRepository.delete(organGestor);
 			}
@@ -999,12 +999,65 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		return llibres;
 	}
 	
+	@Override
+	@Transactional(readOnly = true)
+	public List<ProcedimentDto> findProcedimentsByOrganGestor(String organGestorCodi) {
+		OrganGestorEntity organGestor = organGestorRepository.findByCodi(organGestorCodi);
+		if (organGestor == null) {
+			throw new NotFoundException(
+					organGestorCodi,
+					OrganGestorEntity.class);
+		}
+		return conversioTipusHelper.convertirList(
+				procedimentRepository.findByOrganGestorId(organGestor.getId()),
+				ProcedimentDto.class);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<ProcedimentDto> findProcedimentsByOrganGestorWithPermis(
+			Long entitatId,
+			String organGestorCodi, 
+			List<String> grups,
+			PermisEnum permis) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId, 
+				true, 
+				false, 
+				false);
+		OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, organGestorCodi);
+		List<ProcedimentEntity> procediments = procedimentRepository.findProcedimentsByOrganGestorAndGrup(entitat, organGestor.getId(), grups);
+		return entityComprovarHelper.findPermisProcediments(
+						procediments, 
+						getPermissionFromName(permis));
+	}
+	
+	
 	// ORGANS GESTORS
 	///////////////////////////////////////////////////////////////////////////////////////
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<CodiValorDto> findOrgansGestorsByEntitat(Long entitatId) {
+	public List<OrganGestorDto> findOrgansGestorsAll() {
+		List<OrganGestorEntity> organs = organGestorRepository.findAll();
+		return conversioTipusHelper.convertirList(
+				organs, 
+				OrganGestorDto.class);
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<OrganGestorDto> findOrgansGestorsByEntitat(Long entitatId) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		List<OrganGestorEntity> organs = organGestorRepository.findByEntitat(entitat);
+		return conversioTipusHelper.convertirList(
+				organs, 
+				OrganGestorDto.class);
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<CodiValorDto> findOrgansGestorsCodiByEntitat(Long entitatId) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 		List<CodiValorDto> organsGestors = new ArrayList<CodiValorDto>();
 		List<OrganGestorEntity> organs = organGestorRepository.findByEntitat(entitat);
@@ -1012,6 +1065,14 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			organsGestors.add(new CodiValorDto(organ.getCodi(), organ.getCodi() + " - " + organ.getNom()));
 		}
 		return organsGestors;
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<OrganGestorDto> findOrganGestorByProcedimentIds(List<Long> procedimentIds) {
+		return conversioTipusHelper.convertirList(
+				organGestorRepository.findByProcedimentIds(procedimentIds), 
+				OrganGestorDto.class);
 	}
 	
 	@Override

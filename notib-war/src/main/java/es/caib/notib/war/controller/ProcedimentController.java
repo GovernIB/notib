@@ -71,7 +71,7 @@ public class ProcedimentController extends BaseUserController{
 //		model.addAttribute(new ProcedimentFiltreCommand());
 		ProcedimentFiltreCommand procedimentFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("procedimentFiltreCommand", procedimentFiltreCommand);
-		model.addAttribute("organsGestors", procedimentService.findOrgansGestorsByEntitat(entitat.getId()));
+		model.addAttribute("organsGestors", procedimentService.findOrgansGestorsCodiByEntitat(entitat.getId()));
 		return "procedimentAdminList";
 	}
 	

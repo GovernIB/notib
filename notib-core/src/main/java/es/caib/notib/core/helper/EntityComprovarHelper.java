@@ -359,6 +359,26 @@ public class EntityComprovarHelper {
 		
 		return organGestor;
 	}
+	public OrganGestorEntity comprovarOrganGestor(
+			EntitatEntity entitat,
+			String codi) {
+		
+		OrganGestorEntity organGestor = organGestorRepository.findByCodi(codi);
+		if (organGestor == null) {
+			throw new NotFoundException(
+					codi,
+					OrganGestorEntity.class);
+		}
+		
+		if (entitat != null && !entitat.equals(organGestor.getEntitat())) {
+			throw new ValidationException(
+					codi,
+					OrganGestorEntity.class,
+					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat de l'organ gestor");
+		}
+		
+		return organGestor;
+	}
 	public NotificacioEntity comprovarNotificacio(
 			EntitatEntity entitat,
 			Long id,

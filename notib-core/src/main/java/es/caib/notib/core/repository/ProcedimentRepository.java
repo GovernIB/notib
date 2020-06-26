@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 
 /**
@@ -52,9 +51,28 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			"		from GrupProcedimentEntity gp " +
 			"		left outer join gp.grup g " +
 			"		where g.entitat = :entitat " +
-			"		  and g.codi in (:grups))) )")
+			"		  and g.codi in (:grups))) ) " +
+			"order by pro.nom asc")
 	public List<ProcedimentEntity> findProcedimentsByEntitatAndGrup(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("grups") List<String> grups);
+	
+	@Query( "select distinct pro " +
+			"from ProcedimentEntity pro " +
+			"     left outer join pro.organGestor og " +
+			"where pro.entitat = :entitat " + 
+			"  and og.id = :organGestorId " +
+			"  and (pro.agrupar = false " +
+			"  	or (pro.agrupar = true " +
+			"  and pro in (select distinct gp.procediment " +
+			"		from GrupProcedimentEntity gp " +
+			"		left outer join gp.grup g " +
+			"		where g.entitat = :entitat " +
+			"		  and g.codi in (:grups))) ) " +
+			"order by pro.nom asc")
+	public List<ProcedimentEntity> findProcedimentsByOrganGestorAndGrup(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("organGestorId") Long organGestorId,
 			@Param("grups") List<String> grups);
 	
 	List<ProcedimentEntity> findByEntitatActiva(boolean activa);
@@ -132,6 +150,6 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			" where pro.entitat = :entitat")
 	public List<String> findOrgansGestorsCodisByEntitat(@Param("entitat") EntitatEntity entitat);
 	
-	List<ProcedimentEntity> findByOrganGestor(OrganGestorEntity organGestor);
+	List<ProcedimentEntity> findByOrganGestorId(Long organGestorId);
 	
 }
