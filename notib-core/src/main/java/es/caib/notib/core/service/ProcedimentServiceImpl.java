@@ -14,6 +14,8 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.codahale.metrics.Timer;
+
 import es.caib.notib.core.api.dto.CodiAssumpteDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
@@ -42,6 +44,7 @@ import es.caib.notib.core.entity.ProcedimentFormEntity;
 import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
+import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PluginHelper;
@@ -93,35 +96,111 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private PluginHelper pluginHelper;
 	@Resource
 	private CacheHelper cacheHelper;
+	@Resource
+	private MetricsHelper metricsHelper;
 	
 	@Override
+	@Transactional
 	public ProcedimentDto create(
 			Long entitatId,
 			ProcedimentDto procediment) {
-		logger.debug("Creant un nou procediment ("
-				+ "procediment=" + procediment + ")");
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-		PagadorPostalEntity pagadorPostal = null;
-		PagadorCieEntity pagadorCie = null;
-		if (procediment.getPagadorpostal() != null) {
-			pagadorPostal = entityComprovarHelper.comprovarPagadorPostal(
-					procediment.getPagadorpostal().getId());
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Creant un nou procediment ("
+					+ "procediment=" + procediment + ")");
+			
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			PagadorPostalEntity pagadorPostal = null;
+			PagadorCieEntity pagadorCie = null;
+			if (procediment.getPagadorpostal() != null) {
+				pagadorPostal = entityComprovarHelper.comprovarPagadorPostal(
+						procediment.getPagadorpostal().getId());
+			}
+			if (procediment.getPagadorcie() != null) {
+				pagadorCie = entityComprovarHelper.comprovarPagadorCie(
+						procediment.getPagadorcie().getId());
+			}
+			
+			ProcedimentEntity procedimentEntity = procedimentRepository.save(
+					ProcedimentEntity.getBuilder(
+							procediment.getCodi(),
+							procediment.getNom(),
+							procediment.getRetard(),
+							procediment.getCaducitat(),
+							entitat,
+							pagadorPostal,
+							pagadorCie,
+							procediment.isAgrupar(),
+							procediment.getLlibre(),
+							procediment.getLlibreNom(),
+							procediment.getOficina(),
+							procediment.getOficinaNom(),
+							procediment.getOrganGestor(),
+							procediment.getOrganGestorNom(),
+							procediment.getTipusAssumpte(),
+							procediment.getTipusAssumpteNom(),
+							procediment.getCodiAssumpte(),
+							procediment.getCodiAssumpteNom()).build());
+			
+			return conversioTipusHelper.convertir(
+					procedimentEntity, 
+					ProcedimentDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
 		}
-		if (procediment.getPagadorcie() != null) {
-			pagadorCie = entityComprovarHelper.comprovarPagadorCie(
-					procediment.getPagadorcie().getId());
-		}
-		
-		ProcedimentEntity procedimentEntity = procedimentRepository.save(
-				ProcedimentEntity.getBuilder(
+	}
+
+	@Override
+	@Transactional
+	public ProcedimentDto update(
+			Long entitatId,
+			ProcedimentDto procediment,
+			boolean isAdmin) throws NotFoundException {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Actualitzant procediment ("
+					+ "procediment=" + procediment + ")");
+			
+			
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId,
+					false,
+					false,
+					false);
+			ProcedimentEntity procedimentEntity = null;
+			PagadorPostalEntity pagadorPostal = null;
+			PagadorCieEntity pagadorCie = null;
+			if(!isAdmin) {
+				procedimentEntity = entityComprovarHelper.comprovarProcediment(
+						entitat,
+						procediment.getId());
+			} else {
+				procedimentEntity = procedimentRepository.findOne(procediment.getId());
+			}
+			
+			if (procediment.getPagadorpostal() != null) {
+				pagadorPostal = entityComprovarHelper.comprovarPagadorPostal(
+						procediment.getPagadorpostal().getId());
+			}
+			if (procediment.getPagadorcie() != null) {
+				pagadorCie = entityComprovarHelper.comprovarPagadorCie(
+						procediment.getPagadorcie().getId());
+			}
+			
+			List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepository.findByProcediment(procedimentEntity);
+			
+			if (!procediment.isAgrupar()) {
+				grupProcedimentRepository.delete(grupsProcediment);
+			}
+			
+			procedimentEntity.update(
 						procediment.getCodi(),
 						procediment.getNom(),
-						procediment.getRetard(),
-						procediment.getCaducitat(),
 						entitat,
 						pagadorPostal,
 						pagadorCie,
+						procediment.getRetard(),
+						procediment.getCaducitat(),
 						procediment.isAgrupar(),
 						procediment.getLlibre(),
 						procediment.getLlibreNom(),
@@ -132,101 +211,44 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						procediment.getTipusAssumpte(),
 						procediment.getTipusAssumpteNom(),
 						procediment.getCodiAssumpte(),
-						procediment.getCodiAssumpteNom()).build());
-		
-		return conversioTipusHelper.convertir(
-				procedimentEntity, 
-				ProcedimentDto.class);
-	}
-
-	@Override
-	public ProcedimentDto update(
-			Long entitatId,
-			ProcedimentDto procediment,
-			boolean isAdmin) throws NotFoundException {
-		logger.debug("Actualitzant procediment ("
-				+ "procediment=" + procediment + ")");
-		
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false);
-		ProcedimentEntity procedimentEntity = null;
-		PagadorPostalEntity pagadorPostal = null;
-		PagadorCieEntity pagadorCie = null;
-		if(!isAdmin) {
-			procedimentEntity = entityComprovarHelper.comprovarProcediment(
-					entitat,
-					procediment.getId());
-		} else {
-			procedimentEntity = procedimentRepository.findOne(procediment.getId());
-		}
-		
-		if (procediment.getPagadorpostal() != null) {
-			pagadorPostal = entityComprovarHelper.comprovarPagadorPostal(
-					procediment.getPagadorpostal().getId());
-		}
-		if (procediment.getPagadorcie() != null) {
-			pagadorCie = entityComprovarHelper.comprovarPagadorCie(
-					procediment.getPagadorcie().getId());
-		}
-		
-		List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepository.findByProcediment(procedimentEntity);
-		
-		if (!procediment.isAgrupar()) {
-			grupProcedimentRepository.delete(grupsProcediment);
-		}
-		
-		procedimentEntity.update(
-					procediment.getCodi(),
-					procediment.getNom(),
-					entitat,
-					pagadorPostal,
-					pagadorCie,
-					procediment.getRetard(),
-					procediment.getCaducitat(),
-					procediment.isAgrupar(),
-					procediment.getLlibre(),
-					procediment.getLlibreNom(),
-					procediment.getOficina(),
-					procediment.getOficinaNom(),
-					procediment.getOrganGestor(),
-					procediment.getOrganGestorNom(),
-					procediment.getTipusAssumpte(),
-					procediment.getTipusAssumpteNom(),
-					procediment.getCodiAssumpte(),
-					procediment.getCodiAssumpteNom());
-		
-		procedimentRepository.save(procedimentEntity);
+						procediment.getCodiAssumpteNom());
 			
-		return conversioTipusHelper.convertir(
-				procedimentEntity, 
-				ProcedimentDto.class);
+			procedimentRepository.save(procedimentEntity);
+				
+			return conversioTipusHelper.convertir(
+					procedimentEntity, 
+					ProcedimentDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
+	@Transactional
 	public ProcedimentDto delete(
 			Long entitatId,
 			Long id) throws NotFoundException {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId,
+					false,
+					false,
+					false);
+			
+			ProcedimentEntity procedimentEntity = entityComprovarHelper.comprovarProcediment(
+					entitat, 
+					id);
 		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false);
-		
-		ProcedimentEntity procedimentEntity = entityComprovarHelper.comprovarProcediment(
-				entitat, 
-				id);
-	
-		//Eliminar procediment
-		procedimentRepository.delete(procedimentEntity);
-		
-		return conversioTipusHelper.convertir(
-				procedimentEntity, 
-				ProcedimentDto.class);
+			//Eliminar procediment
+			procedimentRepository.delete(procedimentEntity);
+			
+			return conversioTipusHelper.convertir(
+					procedimentEntity, 
+					ProcedimentDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Transactional(readOnly = true)
@@ -235,34 +257,39 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			Long entitatId,
 			boolean isAdministrador,
 			Long id) {
-		logger.debug("Consulta del procediment ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ")");
-		EntitatEntity entitat = null;
-			
-		if (entitatId != null && !isAdministrador)
-			entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId, 
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta del procediment ("
+					+ "entitatId=" + entitatId + ", "
+					+ "id=" + id + ")");
+			EntitatEntity entitat = null;
+				
+			if (entitatId != null && !isAdministrador)
+				entitat = entityComprovarHelper.comprovarEntitat(
+						entitatId, 
+						false, 
+						false, 
+						false);
+	
+			ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
+					entitat, 
+					id, 
 					false, 
 					false, 
+					false,
 					false);
-
-		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
-				entitat, 
-				id, 
-				false, 
-				false, 
-				false,
-				false);
-		ProcedimentDto resposta = conversioTipusHelper.convertir(
-				procediment,
-				ProcedimentDto.class);
-		
-		if (resposta != null) {
-			procedimentHelper.omplirPermisosPerMetaNode(resposta, false);
+			ProcedimentDto resposta = conversioTipusHelper.convertir(
+					procediment,
+					ProcedimentDto.class);
+			
+			if (resposta != null) {
+				procedimentHelper.omplirPermisosPerMetaNode(resposta, false);
+			}
+			
+			return resposta;
+		} finally {
+			metricsHelper.fiMetrica(timer);
 		}
-		
-		return resposta;
 	}
 	
 	@Transactional(readOnly = true)
@@ -270,37 +297,46 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	public ProcedimentDto findByCodi(
 			Long entitatId,
 			String codiProcediment) throws NotFoundException {
-		logger.debug("Consulta del procediment ("
-				+ "entitatId=" + entitatId + ", "
-				+ "codi=" + codiProcediment + ")");
-		EntitatEntity entitat = null;
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta del procediment ("
+					+ "entitatId=" + entitatId + ", "
+					+ "codi=" + codiProcediment + ")");
+			EntitatEntity entitat = null;
+				
+			if (entitatId != null)
+				entitat = entityComprovarHelper.comprovarEntitat(
+						entitatId, 
+						false, 
+						false, 
+						false);
 			
-		if (entitatId != null)
-			entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId, 
-					false, 
-					false, 
-					false);
-		
-		ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(codiProcediment, entitat);
-		
-		return conversioTipusHelper.convertir(
-				procediment, 
-				ProcedimentDto.class);
+			ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(codiProcediment, entitat);
+			
+			return conversioTipusHelper.convertir(
+					procediment, 
+					ProcedimentDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<ProcedimentDto> findByEntitat(Long entitatId) {
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-		
-		List<ProcedimentEntity> procediment = procedimentRepository.findByEntitat(entitat);
-		
-		return conversioTipusHelper.convertirList(
-				procediment,
-				ProcedimentDto.class);
-		
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			
+			List<ProcedimentEntity> procediment = procedimentRepository.findByEntitat(entitat);
+			
+			return conversioTipusHelper.convertirList(
+					procediment,
+					ProcedimentDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	@Override
@@ -312,135 +348,156 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			boolean isAdministrador,
 			ProcedimentFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
-		
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false);
-		
-		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId);
-		List<EntitatEntity> entitatsActiva = entitatRepository.findByActiva(true);
-		List<Long> entitatsActivaId = new ArrayList<Long>();
-		
-		for (EntitatEntity entitatActiva : entitatsActiva) {
-			entitatsActivaId.add(entitatActiva.getId());
-		}
-		Page<ProcedimentFormEntity> procediments = null;
-		PaginaDto<ProcedimentFormDto> procedimentsPage = null;
-		
-		if (filtre == null) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			entityComprovarHelper.comprovarEntitat(
+					entitatId,
+					false,
+					false,
+					false);
 			
-			if (isUsuariEntitat) {
-				procediments = procedimentFormRepository.findAmbEntitatActual(
-						entitatActual.getId(),
-						paginacioHelper.toSpringDataPageable(paginacioParams));
-				procedimentsPage =  paginacioHelper.toPaginaDto(
-						procediments,
-						ProcedimentFormDto.class);
-			} else if (isAdministrador) {
-				procediments = procedimentFormRepository.findAmbEntitatActiva(
-						entitatsActivaId,
-						paginacioHelper.toSpringDataPageable(paginacioParams));
-				procedimentsPage =  paginacioHelper.toPaginaDto(
-						procediments,
-						ProcedimentFormDto.class);
-			}
-		} else {
-			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
+			EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId);
+			List<EntitatEntity> entitatsActiva = entitatRepository.findByActiva(true);
+			List<Long> entitatsActivaId = new ArrayList<Long>();
 			
-			if (isUsuariEntitat) {
-				procediments = procedimentFormRepository.findAmbEntitatAndFiltre(
-						entitatActual.getId(),
-						filtre.getCodi() == null || filtre.getCodi().isEmpty(), 
-						filtre.getCodi() == null ? "" : filtre.getCodi(),
-						filtre.getNom() == null || filtre.getNom().isEmpty(),
-						filtre.getNom() == null ? "" : filtre.getNom(),
-						pageable);
-				
-				procedimentsPage = paginacioHelper.toPaginaDto(
-						procediments, 
-						ProcedimentFormDto.class);
-				
-			} else if (isAdministrador) {
-				procediments = procedimentFormRepository.findAmbFiltre(
-						filtre.getCodi() == null || filtre.getCodi().isEmpty(), 
-						filtre.getCodi() == null ? "" : filtre.getCodi(),
-						filtre.getNom() == null || filtre.getNom().isEmpty(),
-						filtre.getNom() == null ? "" : filtre.getNom(),
-						pageable);
-				
-				procedimentsPage =  paginacioHelper.toPaginaDto(
-						procediments,
-						ProcedimentFormDto.class);
+			for (EntitatEntity entitatActiva : entitatsActiva) {
+				entitatsActivaId.add(entitatActiva.getId());
 			}
+			Page<ProcedimentFormEntity> procediments = null;
+			PaginaDto<ProcedimentFormDto> procedimentsPage = null;
+			
+			if (filtre == null) {
+				
+				if (isUsuariEntitat) {
+					procediments = procedimentFormRepository.findAmbEntitatActual(
+							entitatActual.getId(),
+							paginacioHelper.toSpringDataPageable(paginacioParams));
+					procedimentsPage =  paginacioHelper.toPaginaDto(
+							procediments,
+							ProcedimentFormDto.class);
+				} else if (isAdministrador) {
+					procediments = procedimentFormRepository.findAmbEntitatActiva(
+							entitatsActivaId,
+							paginacioHelper.toSpringDataPageable(paginacioParams));
+					procedimentsPage =  paginacioHelper.toPaginaDto(
+							procediments,
+							ProcedimentFormDto.class);
+				}
+			} else {
+				Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
+				
+				if (isUsuariEntitat) {
+					procediments = procedimentFormRepository.findAmbEntitatAndFiltre(
+							entitatActual.getId(),
+							filtre.getCodi() == null || filtre.getCodi().isEmpty(), 
+							filtre.getCodi() == null ? "" : filtre.getCodi(),
+							filtre.getNom() == null || filtre.getNom().isEmpty(),
+							filtre.getNom() == null ? "" : filtre.getNom(),
+							pageable);
+					
+					procedimentsPage = paginacioHelper.toPaginaDto(
+							procediments, 
+							ProcedimentFormDto.class);
+					
+				} else if (isAdministrador) {
+					procediments = procedimentFormRepository.findAmbFiltre(
+							filtre.getCodi() == null || filtre.getCodi().isEmpty(), 
+							filtre.getCodi() == null ? "" : filtre.getCodi(),
+							filtre.getNom() == null || filtre.getNom().isEmpty(),
+							filtre.getNom() == null ? "" : filtre.getNom(),
+							pageable);
+					
+					procedimentsPage =  paginacioHelper.toPaginaDto(
+							procediments,
+							ProcedimentFormDto.class);
+				}
+			}
+			for (ProcedimentFormDto procediment: procedimentsPage.getContingut()) {
+				List<PermisDto> permisos = permisosHelper.findPermisos(
+						procediment.getId(),
+						ProcedimentEntity.class);
+				List<GrupDto> grups = grupService.findGrupsByProcediment(procediment.getId());
+				procediment.setGrups(grups);
+				procediment.setPermisos(permisos);
+			}
+			return procedimentsPage;
+		} finally {
+			metricsHelper.fiMetrica(timer);
 		}
-		for (ProcedimentFormDto procediment: procedimentsPage.getContingut()) {
-			List<PermisDto> permisos = permisosHelper.findPermisos(
-					procediment.getId(),
-					ProcedimentEntity.class);
-			List<GrupDto> grups = grupService.findGrupsByProcediment(procediment.getId());
-			procediment.setGrups(grups);
-			procediment.setPermisos(permisos);
-		}
-		return procedimentsPage;
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public List<ProcedimentDto> findAll() {
-		logger.debug("Consulta de tots els procediments");
-		
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				true,
-				false);
-		return conversioTipusHelper.convertirList(
-					procedimentRepository.findAll(),
-					ProcedimentDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta de tots els procediments");
+			
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					true,
+					false);
+			return conversioTipusHelper.convertirList(
+						procedimentRepository.findAll(),
+						ProcedimentDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<ProcedimentGrupDto> findAllGrups() {
-		logger.debug("Consulta de tots els procediments");
-		
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				true,
-				false);
-		
-		List<GrupProcedimentEntity> grupsProcediments = grupProcedimentRepository.findAll();
-		return conversioTipusHelper.convertirList(
-					grupsProcediments,
-					ProcedimentGrupDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta de tots els procediments");
+			
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					true,
+					false);
+			
+			List<GrupProcedimentEntity> grupsProcediments = grupProcedimentRepository.findAll();
+			return conversioTipusHelper.convertirList(
+						grupsProcediments,
+						ProcedimentGrupDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public List<ProcedimentDto> findProcedimentsSenseGrups(EntitatDto entitatActual) {
-		
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				true,
-				false);
-		List<GrupProcedimentEntity> grupsProcediments = grupProcedimentRepository.findAll();
-		List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActual.getId());
-		
-		for (GrupProcedimentEntity grupProcedimentEntity : grupsProcediments) {
-			procediments.add(procedimentRepository.findOne(grupProcedimentEntity.getProcediment().getId()));
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					true,
+					false);
+			List<GrupProcedimentEntity> grupsProcediments = grupProcedimentRepository.findAll();
+			List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatActual.getId());
+			
+			for (GrupProcedimentEntity grupProcedimentEntity : grupsProcediments) {
+				procediments.add(procedimentRepository.findOne(grupProcedimentEntity.getProcediment().getId()));
+			}
+			List<ProcedimentEntity> procedimentsSenseGrups = new ArrayList<ProcedimentEntity>();
+			if(procediments.size() > 0) {
+				procedimentsSenseGrups = procedimentRepository.findProcedimentsSenseGrups(procediments);	
+			}
+			if (procediments.isEmpty() && procedimentsSenseGrups.isEmpty()) {
+				procedimentsSenseGrups = procedimentRepository.findByEntitat(entitat);
+			}
+			return conversioTipusHelper.convertirList(
+					procedimentsSenseGrups,
+					ProcedimentDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
 		}
-		List<ProcedimentEntity> procedimentsSenseGrups = new ArrayList<ProcedimentEntity>();
-		if(procediments.size() > 0) {
-			procedimentsSenseGrups = procedimentRepository.findProcedimentsSenseGrups(procediments);	
-		}
-		if (procediments.isEmpty() && procedimentsSenseGrups.isEmpty()) {
-			procedimentsSenseGrups = procedimentRepository.findByEntitat(entitat);
-		}
-		return conversioTipusHelper.convertirList(
-				procedimentsSenseGrups,
-				ProcedimentDto.class);
 	}
 	
 	@Transactional
@@ -449,396 +506,494 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			Long entitatId,
 			boolean isAdministrador,
 			Long id) {
-		logger.debug("Consulta dels permisos del meta-expedient ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + id +  ")"); 
-		EntitatEntity entitat = null;
-		
-		if (entitatId != null && !isAdministrador)
-			entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId,
-					false,
-					true,
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta dels permisos del meta-expedient ("
+					+ "entitatId=" + entitatId +  ", "
+					+ "id=" + id +  ")"); 
+			EntitatEntity entitat = null;
+			
+			if (entitatId != null && !isAdministrador)
+				entitat = entityComprovarHelper.comprovarEntitat(
+						entitatId,
+						false,
+						true,
+						false);
+			
+			entityComprovarHelper.comprovarProcediment(
+					entitat, 
+					id, 
+					false, 
+					false, 
+					false, 
 					false);
-		
-		entityComprovarHelper.comprovarProcediment(
-				entitat, 
-				id, 
-				false, 
-				false, 
-				false, 
-				false);
-		
-		return permisosHelper.findPermisos(
-				id,
-				ProcedimentEntity.class);
+			
+			return permisosHelper.findPermisos(
+					id,
+					ProcedimentEntity.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
-	
-	@Transactional
+
+	@Transactional(readOnly = true)
 	@Override
 	public void permisUpdate(
 			Long entitatId,
 			Long id,
 			PermisDto permis,
 			boolean isAdministrador) {
-		logger.debug("Modificació del permis del procediment ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + id + ", "
-				+ "permis=" + permis + ")");
-		
-		if (entitatId != null && !isAdministrador)
-			entityComprovarHelper.comprovarEntitat(
-					entitatId,
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Modificació del permis del procediment ("
+					+ "entitatId=" + entitatId +  ", "
+					+ "id=" + id + ", "
+					+ "permis=" + permis + ")");
+			
+			if (entitatId != null && !isAdministrador)
+				entityComprovarHelper.comprovarEntitat(
+						entitatId,
+						false,
+						true,
+						false);
+			entityComprovarHelper.comprovarProcediment(
+					null,
+					id,
 					false,
-					true,
+					false,
+					false,
 					false);
-		entityComprovarHelper.comprovarProcediment(
-				null,
-				id,
-				false,
-				false,
-				false,
-				false);
-		permisosHelper.updatePermis(
-				id,
-				ProcedimentEntity.class,
-				permis);
+			permisosHelper.updatePermis(
+					id,
+					ProcedimentEntity.class,
+					permis);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
-	
-	@Transactional
+
+	@Transactional(readOnly = true)
 	@Override
 	public void grupCreate(
 			Long entitatId, 
 			Long id, 
 			ProcedimentGrupDto procedimentGrup) throws NotFoundException {
-		logger.debug("Modificació del grup del procediment ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + id + ", "
-				+ "permis=" + procedimentGrup + ")");
-		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
-				null,
-				id,
-				false,
-				false,
-				false,
-				false);
-		GrupEntity grup = entityComprovarHelper.comprovarGrup(procedimentGrup.getGrup().getId());
-		
-		GrupProcedimentEntity grupProcedimentEntity = GrupProcedimentEntity.getBuilder(
-				procediment, 
-				grup).build();
-		
-		grupProcedimentRepository.saveAndFlush(grupProcedimentEntity);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Modificació del grup del procediment ("
+					+ "entitatId=" + entitatId +  ", "
+					+ "id=" + id + ", "
+					+ "permis=" + procedimentGrup + ")");
+			ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
+					null,
+					id,
+					false,
+					false,
+					false,
+					false);
+			GrupEntity grup = entityComprovarHelper.comprovarGrup(procedimentGrup.getGrup().getId());
+			
+			GrupProcedimentEntity grupProcedimentEntity = GrupProcedimentEntity.getBuilder(
+					procediment, 
+					grup).build();
+			
+			grupProcedimentRepository.saveAndFlush(grupProcedimentEntity);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
-	
-	@Transactional
+
+	@Transactional(readOnly = true)
 	@Override
 	public void grupUpdate(
 			Long entitatId, 
 			Long id, 
 			ProcedimentGrupDto procedimentGrup) throws NotFoundException {
-		logger.debug("Modificació del grup del procediment ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + id + ", "
-				+ "permis=" + procedimentGrup + ")");
-		ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
-				null,
-				id,
-				false,
-				false,
-				false,
-				false);
-		GrupEntity grup = entityComprovarHelper.comprovarGrup(procedimentGrup.getGrup().getId());
-		
-		GrupProcedimentEntity grupProcedimentEntity = entityComprovarHelper.comprovarGrupProcediment(
-				procedimentGrup.getId());
-		
-		grupProcedimentEntity.update(procediment, grup);
-		
-		grupProcedimentRepository.saveAndFlush(grupProcedimentEntity);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Modificació del grup del procediment ("
+					+ "entitatId=" + entitatId +  ", "
+					+ "id=" + id + ", "
+					+ "permis=" + procedimentGrup + ")");
+			ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
+					null,
+					id,
+					false,
+					false,
+					false,
+					false);
+			GrupEntity grup = entityComprovarHelper.comprovarGrup(procedimentGrup.getGrup().getId());
+			
+			GrupProcedimentEntity grupProcedimentEntity = entityComprovarHelper.comprovarGrupProcediment(
+					procedimentGrup.getId());
+			
+			grupProcedimentEntity.update(procediment, grup);
+			
+			grupProcedimentRepository.saveAndFlush(grupProcedimentEntity);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	@Override
 	public void grupDelete(
 			Long entitatId, 
 			Long procedimentGrupId) throws NotFoundException {
-		logger.debug("Modificació del grup del procediment ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "procedimentGrupID=" + procedimentGrupId + ")");
-		
-		entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false);
-		
-		GrupProcedimentEntity grupProcedimentEntity = grupProcedimentRepository.findOne(procedimentGrupId);
-		
-		grupProcedimentRepository.delete(grupProcedimentEntity);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Modificació del grup del procediment ("
+					+ "entitatId=" + entitatId +  ", "
+					+ "procedimentGrupID=" + procedimentGrupId + ")");
+			
+			entityComprovarHelper.comprovarEntitat(
+					entitatId,
+					false,
+					false,
+					false);
+			
+			GrupProcedimentEntity grupProcedimentEntity = grupProcedimentRepository.findOne(procedimentGrupId);
+			
+			grupProcedimentRepository.delete(grupProcedimentEntity);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	
 	@Override
+	@Transactional(readOnly = true)
 	public void permisDelete(
 			Long entitatId,
 			Long id,
 			Long permisId,
 			boolean isAdministrador) {
-		logger.debug("Eliminació del permis del meta-expedient ("
-				+ "entitatId=" + entitatId +  ", "
-				+ "id=" + id + ", "
-				+ "permisId=" + permisId + ")");
-		EntitatEntity entitat = null;
-		
-		if (entitatId != null && !isAdministrador)
-			entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId,
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Eliminació del permis del meta-expedient ("
+					+ "entitatId=" + entitatId +  ", "
+					+ "id=" + id + ", "
+					+ "permisId=" + permisId + ")");
+			EntitatEntity entitat = null;
+			
+			if (entitatId != null && !isAdministrador)
+				entitat = entityComprovarHelper.comprovarEntitat(
+						entitatId,
+						false,
+						true,
+						false);
+			
+			entityComprovarHelper.comprovarProcediment(
+					entitat,
+					id,
 					false,
-					true,
+					false,
+					false,
 					false);
-		
-		entityComprovarHelper.comprovarProcediment(
-				entitat,
-				id,
-				false,
-				false,
-				false,
-				false);
-		permisosHelper.deletePermis(
-				id,
-				ProcedimentEntity.class,
-				permisId);
+			permisosHelper.deletePermis(
+					id,
+					ProcedimentEntity.class,
+					permisId);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public boolean hasPermisConsultaProcediment(EntitatDto entitat) {		
-		List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
-				new Permission[] {
-						ExtendedPermission.READ},
-				entitat.getId()
-				);
-		
-		return (resposta.isEmpty()) ? false : true;
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
+					new Permission[] {
+							ExtendedPermission.READ},
+					entitat.getId()
+					);
+			
+			return (resposta.isEmpty()) ? false : true;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public boolean hasPermisGestioProcediment(
 			Long procedimentId) {
-		List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
-		ProcedimentEntity procediment = procedimentRepository.findById(procedimentId);
-		
-		procediments.add(procediment);
-		
-		List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcediments(
-				procediments,
-				new Permission[] {
-						ExtendedPermission.ADMINISTRATION}
-				);
-		
-		return (resposta.isEmpty()) ? false : true;
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
+			ProcedimentEntity procediment = procedimentRepository.findById(procedimentId);
+			
+			procediments.add(procediment);
+			
+			List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcediments(
+					procediments,
+					new Permission[] {
+							ExtendedPermission.ADMINISTRATION}
+					);
+			
+			return (resposta.isEmpty()) ? false : true;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public boolean hasPermisProcessarProcediment(
 			String procedimentCodi,
 			Long procedimentId,
 			boolean isAdministrador) {
-		List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
-		ProcedimentEntity procediment;
-		
-		if (!isAdministrador) {
-				procediment = procedimentRepository.findById(procedimentId);
-		} else {
-			procediment = procedimentRepository.findOne(procedimentId);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
+			ProcedimentEntity procediment;
+			
+			if (!isAdministrador) {
+					procediment = procedimentRepository.findById(procedimentId);
+			} else {
+				procediment = procedimentRepository.findOne(procedimentId);
+			}
+			if (procediment != null)
+				procediments.add(procediment);
+			
+			List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcediments(
+					procediments,
+					new Permission[] {
+							ExtendedPermission.PROCESSAR}
+					);
+			
+			return (resposta.isEmpty()) ? false : true;
+		} finally {
+			metricsHelper.fiMetrica(timer);
 		}
-		if (procediment != null)
-			procediments.add(procediment);
-		
-		List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcediments(
-				procediments,
-				new Permission[] {
-						ExtendedPermission.PROCESSAR}
-				);
-		
-		return (resposta.isEmpty()) ? false : true;
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public boolean hasPermisNotificacioProcediment(EntitatDto entitat) {		
-		List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
-				new Permission[] {
-					ExtendedPermission.NOTIFICACIO},
-				entitat.getId()
-				);
-		
-		return (resposta.isEmpty()) ? false : true;
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
+					new Permission[] {
+						ExtendedPermission.NOTIFICACIO},
+					entitat.getId()
+					);
+			
+			return (resposta.isEmpty()) ? false : true;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public boolean hasGrupPermisConsultaProcediment(
 			Map<String, ProcedimentDto> procediments,
 			EntitatDto entitat) {		
-		List<ProcedimentDto> resposta = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
-				procediments,
-				entitat.getId(),
-				new Permission[] {
-						ExtendedPermission.READ}
-				);
-		
-		return (resposta.isEmpty()) ? false : true;
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<ProcedimentDto> resposta = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
+					procediments,
+					entitat.getId(),
+					new Permission[] {
+							ExtendedPermission.READ}
+					);
+			
+			return (resposta.isEmpty()) ? false : true;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public boolean hasGrupPermisNotificacioProcediment(
 			Map<String, ProcedimentDto> procediments,
 			EntitatDto entitat) {		
-		List<ProcedimentDto> resposta = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
-				procediments,
-				entitat.getId(),
-				new Permission[] {
-						ExtendedPermission.NOTIFICACIO}
-				);
-		
-		return (resposta.isEmpty()) ? false : true;
-	}
-
-	@Override
-	public List<TipusAssumpteDto> findTipusAssumpte(EntitatDto entitat) {
-		List<TipusAssumpteDto> tipusAssumpte = new ArrayList<TipusAssumpteDto>();
-	
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			List<TipusAssumpte> tipusAssumpteRegistre = pluginHelper.llistarTipusAssumpte(entitat.getDir3Codi());
+			List<ProcedimentDto> resposta = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
+					procediments,
+					entitat.getId(),
+					new Permission[] {
+							ExtendedPermission.NOTIFICACIO}
+					);
 			
-			if (tipusAssumpteRegistre != null)
-				for (TipusAssumpte assumpteRegistre : tipusAssumpteRegistre) {
-					TipusAssumpteDto assumpte = new TipusAssumpteDto();
-					assumpte.setCodi(assumpteRegistre.getCodi());
-					assumpte.setNom(assumpteRegistre.getNom());
-					
-					tipusAssumpte.add(assumpte);
-				}
-		} catch (SistemaExternException e) {
-			String errorMessage = "No s'han pogut recuperar els codis d'assumpte de l'entitat: " + entitat.getDir3Codi();
-			logger.error(
-					errorMessage, 
-					e.getMessage());
+			return (resposta.isEmpty()) ? false : true;
+		} finally {
+			metricsHelper.fiMetrica(timer);
 		}
-		return tipusAssumpte;
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	public List<TipusAssumpteDto> findTipusAssumpte(EntitatDto entitat) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<TipusAssumpteDto> tipusAssumpte = new ArrayList<TipusAssumpteDto>();
+		
+			try {
+				List<TipusAssumpte> tipusAssumpteRegistre = pluginHelper.llistarTipusAssumpte(entitat.getDir3Codi());
+				
+				if (tipusAssumpteRegistre != null)
+					for (TipusAssumpte assumpteRegistre : tipusAssumpteRegistre) {
+						TipusAssumpteDto assumpte = new TipusAssumpteDto();
+						assumpte.setCodi(assumpteRegistre.getCodi());
+						assumpte.setNom(assumpteRegistre.getNom());
+						
+						tipusAssumpte.add(assumpte);
+					}
+			} catch (SistemaExternException e) {
+				String errorMessage = "No s'han pogut recuperar els codis d'assumpte de l'entitat: " + entitat.getDir3Codi();
+				logger.error(
+						errorMessage, 
+						e.getMessage());
+			}
+			return tipusAssumpte;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public List<CodiAssumpteDto> findCodisAssumpte(
 			EntitatDto entitat,
 			String codiTipusAssumpte) {
-		List<CodiAssumpteDto> codiAssumpte = new ArrayList<CodiAssumpteDto>();
-		
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			List<CodiAssumpte> tipusAssumpteRegistre = pluginHelper.llistarCodisAssumpte(
-					entitat.getDir3Codi(),
-					codiTipusAssumpte);
-			
-			if (tipusAssumpteRegistre != null)
-				for (CodiAssumpte assumpteRegistre : tipusAssumpteRegistre) {
-					CodiAssumpteDto assumpte = new CodiAssumpteDto();
-					assumpte.setCodi(assumpteRegistre.getCodi());
-					assumpte.setNom(assumpteRegistre.getNom());
-					assumpte.setTipusAssumpte(assumpteRegistre.getTipusAssumpte());
-					
-					codiAssumpte.add(assumpte);
-				}
-		} catch (SistemaExternException e) {
-			String errorMessage = "No s'han pogut recuperar els codis d'assumpte del tipus d'assumpte: " + codiTipusAssumpte;
-			logger.error(
-					errorMessage, 
-					e.getMessage());
+			List<CodiAssumpteDto> codiAssumpte = new ArrayList<CodiAssumpteDto>();
+			try {
+				List<CodiAssumpte> tipusAssumpteRegistre = pluginHelper.llistarCodisAssumpte(
+						entitat.getDir3Codi(),
+						codiTipusAssumpte);
+				
+				if (tipusAssumpteRegistre != null)
+					for (CodiAssumpte assumpteRegistre : tipusAssumpteRegistre) {
+						CodiAssumpteDto assumpte = new CodiAssumpteDto();
+						assumpte.setCodi(assumpteRegistre.getCodi());
+						assumpte.setNom(assumpteRegistre.getNom());
+						assumpte.setTipusAssumpte(assumpteRegistre.getTipusAssumpte());
+						
+						codiAssumpte.add(assumpte);
+					}
+			} catch (SistemaExternException e) {
+				String errorMessage = "No s'han pogut recuperar els codis d'assumpte del tipus d'assumpte: " + codiTipusAssumpte;
+				logger.error(
+						errorMessage, 
+						e.getMessage());
+			}
+			return codiAssumpte;
+		} finally {
+			metricsHelper.fiMetrica(timer);
 		}
-		return codiAssumpte;
 	}
 	
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<OrganismeDto> findOrganismes(EntitatDto entitat) {
-		List<OrganismeDto> organismes = new ArrayList<OrganismeDto>();
-		
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			List<Organisme> organismesRegistre = pluginHelper.llistarOrganismes(entitat.getDir3Codi());
-			if (organismes != null) {
-				for (Organisme organismeRegistre : organismesRegistre) {
-					OrganismeDto organisme = new OrganismeDto();
-					organisme.setCodi(organismeRegistre.getCodi());
-					organisme.setNom(organismeRegistre.getNom());
-					organismes.add(organisme);
+			List<OrganismeDto> organismes = new ArrayList<OrganismeDto>();
+			try {
+				List<Organisme> organismesRegistre = pluginHelper.llistarOrganismes(entitat.getDir3Codi());
+				if (organismes != null) {
+					for (Organisme organismeRegistre : organismesRegistre) {
+						OrganismeDto organisme = new OrganismeDto();
+						organisme.setCodi(organismeRegistre.getCodi());
+						organisme.setNom(organismeRegistre.getNom());
+						organismes.add(organisme);
+					}
 				}
+			} catch (Exception e) {
+				String errorMessage = "No s'han pogut recuperar els organismes de l'entitat: " + entitat.getDir3Codi();
+				logger.error(
+						errorMessage, 
+						e.getMessage());
 			}
-		} catch (Exception e) {
-			String errorMessage = "No s'han pogut recuperar els organismes de l'entitat: " + entitat.getDir3Codi();
-			logger.error(
-					errorMessage, 
-					e.getMessage());
+			return organismes;
+		} finally {
+			metricsHelper.fiMetrica(timer);
 		}
-		return organismes;
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<OficinaDto> findOficines(EntitatDto entitat) {
-		List<OficinaDto> oficines = new ArrayList<OficinaDto>();
-		
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			List<Oficina> oficinesRegistre = pluginHelper.llistarOficines(
-					entitat.getDir3Codi(), 
-					AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
-			for (Oficina oficinaRegistre : oficinesRegistre) {
-				OficinaDto oficina = new OficinaDto();
-				oficina.setCodi(oficinaRegistre.getCodi());
-				oficina.setNom(oficinaRegistre.getNom());
-				oficines.add(oficina);
+			List<OficinaDto> oficines = new ArrayList<OficinaDto>();
+			try {
+				List<Oficina> oficinesRegistre = pluginHelper.llistarOficines(
+						entitat.getDir3Codi(), 
+						AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
+				for (Oficina oficinaRegistre : oficinesRegistre) {
+					OficinaDto oficina = new OficinaDto();
+					oficina.setCodi(oficinaRegistre.getCodi());
+					oficina.setNom(oficinaRegistre.getNom());
+					oficines.add(oficina);
+				}
+			} catch (Exception e) {
+				String errorMessage = "No s'han pogut recuperar les oficines de l'entitat: " + entitat.getDir3Codi();
+				logger.error(
+						errorMessage, 
+						e.getMessage());
 			}
-		} catch (Exception e) {
-			String errorMessage = "No s'han pogut recuperar les oficines de l'entitat: " + entitat.getDir3Codi();
-			logger.error(
-					errorMessage, 
-					e.getMessage());
+			return oficines;	
+		} finally {
+			metricsHelper.fiMetrica(timer);
 		}
-		return oficines;
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<LlibreDto> findLlibres(
 			EntitatDto entitat, 
 			String oficina) {
-		List<LlibreDto> llibres = new ArrayList<LlibreDto>();
-		
+		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			List<Llibre> llibresRegistre = pluginHelper.llistarLlibres(
-					entitat.getDir3Codi(), 
-					oficina, 
-					AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
-			for (Llibre llibreRegistre : llibresRegistre) {
-				LlibreDto llibre = new LlibreDto();
-				llibre.setCodi(llibreRegistre.getCodi());
-				llibre.setNomCurt(llibreRegistre.getNomCurt());
-				llibre.setNomLlarg(llibreRegistre.getNomLlarg());
-				llibre.setOrganismeCodi(llibreRegistre.getOrganisme());
-				llibres.add(llibre);
+			List<LlibreDto> llibres = new ArrayList<LlibreDto>();
+			try {
+				List<Llibre> llibresRegistre = pluginHelper.llistarLlibres(
+						entitat.getDir3Codi(), 
+						oficina, 
+						AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
+				for (Llibre llibreRegistre : llibresRegistre) {
+					LlibreDto llibre = new LlibreDto();
+					llibre.setCodi(llibreRegistre.getCodi());
+					llibre.setNomCurt(llibreRegistre.getNomCurt());
+					llibre.setNomLlarg(llibreRegistre.getNomLlarg());
+					llibre.setOrganismeCodi(llibreRegistre.getOrganisme());
+					llibres.add(llibre);
+				}
+	 		} catch (Exception e) {
+	 			String errorMessage = "No s'han pogut recuperar els llibres de l'entitat: " + entitat.getDir3Codi();
+				logger.error(
+						errorMessage, 
+						e.getMessage());
 			}
- 		} catch (Exception e) {
- 			String errorMessage = "No s'han pogut recuperar els llibres de l'entitat: " + entitat.getDir3Codi();
-			logger.error(
-					errorMessage, 
-					e.getMessage());
+			return llibres;
+		} finally {
+			metricsHelper.fiMetrica(timer);
 		}
-		return llibres;
 	}
 	
 	@Transactional(readOnly = true)
 	@Override
 	public void refrescarCache(EntitatDto entitat) {
-		logger.debug("Preparant per buidar la informació en cache dels procediments...");
-		
-		cacheHelper.evictFindByGrupAndPermisProcedimentsUsuariActualAndEntitat(entitat.getId());
-		cacheHelper.evictFindByPermisProcedimentsUsuariActual(entitat.getId());
-		cacheHelper.evictFindPermisProcedimentsUsuariActualAndEntitat(entitat.getId());
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Preparant per buidar la informació en cache dels procediments...");
+			
+			cacheHelper.evictFindByGrupAndPermisProcedimentsUsuariActualAndEntitat(entitat.getId());
+			cacheHelper.evictFindByPermisProcedimentsUsuariActual(entitat.getId());
+			cacheHelper.evictFindPermisProcedimentsUsuariActualAndEntitat(entitat.getId());
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);

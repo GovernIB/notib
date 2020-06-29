@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.jws.WebService;
+import javax.mail.internet.InternetAddress;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -869,10 +870,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1115 | El camp 'nif' del titular d'un enviament no pot tenir una longitud superior a 9 caràcters
 	// 1116 | El 'nif' del titular no és vàlid
 	// 1117 | El camp 'email' del titular no pot ser major que 160 caràcters
-	// 1118 | El camp 'telefon' del titular no pot ser major que 16 caràcters
-	// 1119 | El camp 'raoSocial' del titular no pot ser major que 255 caràcters
-	// 1120 | El camp 'dir3Codi' del titular no pot ser major que 9 caràcters
-	// 1121 | En cas de titular amb incapacitat es obligatori indicar un destinatari
+	// 1118 | El format del camp 'email' del titular no és correcte
+	// 1119 | El camp 'telefon' del titular no pot ser major que 16 caràcters
+	// 1120 | El camp 'raoSocial' del titular no pot ser major que 255 caràcters
+	// 1121 | El camp 'dir3Codi' del titular no pot ser major que 9 caràcters
+	// 1122 | En cas de titular amb incapacitat es obligatori indicar un destinatari
 	// 1130 | El camp 'nom' de la persona física titular no pot ser null
 	// 1131 | El camp 'llinatge1' de la persona física titular d'un enviament no pot ser null en el cas de persones físiques
 	// 1132 | El camp 'nif' de la persona física titular d'un enviament no pot ser null
@@ -888,9 +890,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1174 | El camp 'nif' del destinatari d'un enviament no pot tenir una longitud superior a 9 caràcters
 	// 1175 | El 'nif' del titular no és vàlid
 	// 1176 | El camp 'email' del destinatari no pot ser major que 255 caràcters
-	// 1177 | El camp 'telefon' del destinatari no pot ser major que 16 caràcters
-	// 1178 | El camp 'raoSocial' del destinatari no pot ser major que 255 caràcters
-	// 1179 | El camp 'dir3Codi' del destinatari no pot ser major que 9 caràcters
+	// 1177 | El format del camp 'email' del destinatari no és correcte
+	// 1178 | El camp 'telefon' del destinatari no pot ser major que 16 caràcters
+	// 1179 | El camp 'raoSocial' del destinatari no pot ser major que 255 caràcters
+	// 1180 | El camp 'dir3Codi' del destinatari no pot ser major que 9 caràcters
 	// 1190 | El camp 'nom' de la persona física destinatària d'un enviament no pot ser null
 	// 1191 | El camp 'llinatge1' del destinatari d'un enviament no pot ser null en el cas de persones físiques
 	// 1192 | El camp 'nif' de la persona física destinatària d'un enviament no pot ser null
@@ -1085,21 +1088,24 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			if (enviament.getTitular().getEmail() != null && enviament.getTitular().getEmail().length() > 160) {
 				return setRespostaError("[1117] El camp 'email' del titular no pot ser major que 160 caràcters.");
 			}
+			if (enviament.getTitular().getEmail() != null && !isEmailValid(enviament.getTitular().getEmail())) {
+				return setRespostaError("[1118] El format del camp 'email' del titular no és correcte");
+			}
 			// - Telèfon
 			if (enviament.getTitular().getTelefon() != null && enviament.getTitular().getTelefon().length() > 16) {
-				return setRespostaError("[1118] El camp 'email' del titular no pot ser major que 16 caràcters.");
+				return setRespostaError("[1119] El camp 'email' del titular no pot ser major que 16 caràcters.");
 			}
 			// - Raó social
 			if (enviament.getTitular().getRaoSocial() != null && enviament.getTitular().getRaoSocial().length() > 255) {
-				return setRespostaError("[1119] El camp 'raoSocial' del titular no pot ser major que 255 caràcters.");
+				return setRespostaError("[1120] El camp 'raoSocial' del titular no pot ser major que 255 caràcters.");
 			}
 			// - Codi Dir3
 			if (enviament.getTitular().getDir3Codi() != null && enviament.getTitular().getDir3Codi().length() > 9) {
-				return setRespostaError("[1120] El camp 'dir3Codi' del titular no pot ser major que 9 caràcters.");
+				return setRespostaError("[1121] El camp 'dir3Codi' del titular no pot ser major que 9 caràcters.");
 			}
 			// - Incapacitat
 			if (enviament.getTitular().isIncapacitat() && (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty())) {
-				return setRespostaError("[1121] En cas de titular amb incapacitat es obligatori indicar un destinatari.");
+				return setRespostaError("[1122] En cas de titular amb incapacitat es obligatori indicar un destinatari.");
 			}
 			//   - Persona física
 			if(enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.FISICA)) {
@@ -1167,17 +1173,20 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					if (destinatari.getEmail() != null && destinatari.getEmail().length() > 160) {
 						return setRespostaError("[1176] El camp 'email' del destinatari no pot ser major que 160 caràcters.");
 					}
+					if (destinatari.getEmail() != null && !isEmailValid(destinatari.getEmail())) {
+						return setRespostaError("[1177] El format del camp 'email' del destinatari no és correcte");
+					}
 					// - Telèfon
 					if (destinatari.getTelefon() != null && destinatari.getTelefon().length() > 16) {
-						return setRespostaError("[1177] El camp 'telefon' del destinatari no pot ser major que 16 caràcters.");
+						return setRespostaError("[1178] El camp 'telefon' del destinatari no pot ser major que 16 caràcters.");
 					}
 					// - Raó social
 					if (destinatari.getRaoSocial() != null && destinatari.getRaoSocial().length() > 255) {
-						return setRespostaError("[1178] El camp 'raoSocial' del destinatari no pot ser major que 255 caràcters.");
+						return setRespostaError("[1179] El camp 'raoSocial' del destinatari no pot ser major que 255 caràcters.");
 					}
 					// - Codi Dir3
 					if (destinatari.getDir3Codi() != null && destinatari.getDir3Codi().length() > 9) {
-						return setRespostaError("[1179] El camp 'dir3Codi' del destinatari no pot ser major que 9 caràcters.");
+						return setRespostaError("[1180] El camp 'dir3Codi' del destinatari no pot ser major que 9 caràcters.");
 					}
 					
 					if(destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.FISICA)) {
@@ -1433,6 +1442,17 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			}
 	    }
 		return esCaracterValid;
+	}
+	
+	private boolean isEmailValid(String email) {
+		boolean valid = true;
+		try {
+			InternetAddress emailAddr = new InternetAddress(email);
+			emailAddr.validate();
+		} catch (Exception e) {
+			valid = false; //no vàlid
+		}
+		return valid;
 	}
 	
 	private static String isMultipleDestinataris() {

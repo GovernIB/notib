@@ -2,6 +2,7 @@ package es.caib.notib.war.validation;
 
 
 
+import javax.mail.internet.InternetAddress;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
@@ -168,6 +169,26 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 						}
 					}
 					
+					if (enviament.getTitular() != null && enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty() && !isEmailValid(enviament.getTitular().getEmail())) {
+						valid = false;
+						context.buildConstraintViolationWithTemplate(
+								MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email"))
+						.addNode("enviaments["+envCount+"].titular.email")
+						.addConstraintViolation();
+					}
+					if (enviament.getDestinataris() != null) {
+						int destCount = 0;
+						for (PersonaCommand destinatari: enviament.getDestinataris()) {
+							if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty() && !isEmailValid(destinatari.getEmail())) {
+								valid = false;
+								context.buildConstraintViolationWithTemplate(
+										MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email"))
+								.addNode("enviaments["+envCount+"].destinataris[" + destCount +"].email")
+								.addConstraintViolation();
+							}
+							destCount++;
+						}
+					}
 					envCount++;
 				}
 			}
@@ -196,6 +217,17 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 		return esCaracterValid;
 	}
 
+	private boolean isEmailValid(String email) {
+		boolean valid = true;
+		try {
+			InternetAddress emailAddr = new InternetAddress(email);
+			emailAddr.validate();
+		} catch (Exception e) {
+			valid = false; //no vàlid
+		}
+		return valid;
+	}
+	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ValidDocumentValidator.class);
 
 }

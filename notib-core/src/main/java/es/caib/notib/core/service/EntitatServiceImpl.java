@@ -22,6 +22,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.codahale.metrics.Timer;
+
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
@@ -34,6 +36,7 @@ import es.caib.notib.core.entity.EntitatTipusDocEntity;
 import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
+import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
@@ -57,7 +60,6 @@ public class EntitatServiceImpl implements EntitatService {
 	private EntitatTipusDocRepository entitatTipusDocRepository;
 	@Resource
 	private AplicacioRepository aplicacioRepository;
-
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
 	@Resource
@@ -68,149 +70,168 @@ public class EntitatServiceImpl implements EntitatService {
 	private CacheHelper cacheHelper;
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
-	
 	@Resource
 	private UsuariHelper usuariHelper;
-
+	@Resource
+	private MetricsHelper metricsHelper;
 
 
 	@Transactional
 	@Override
 	@CacheEvict(value = "entitatsUsuari", allEntries = true)
 	public EntitatDto create(EntitatDto entitat) {
-		logger.debug("Creant una nova entitat (entitat=" + entitat + ")");
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				false,
-				false );
-		
-		EntitatEntity entity = EntitatEntity.getBuilder(
-				entitat.getCodi(),
-				entitat.getNom(),
-				entitat.getTipus(),
-				entitat.getDir3Codi(),
-				entitat.getDir3CodiReg(),
-				entitat.getApiKey(),
-				entitat.isAmbEntregaDeh(),
-				entitat.isAmbEntregaCie(),
-				entitat.getLogoCapBytes(),
-				entitat.getLogoPeuBytes(),
-				entitat.getColorFons(),
-				entitat.getColorLletra(),
-				entitat.getTipusDocDefault().getTipusDocEnum()).
-				descripcio(entitat.getDescripcio()).
-				build();
-		
-		EntitatEntity entitatSaved = entitatRepository.save(entity);
-		
-		if (entitat.getTipusDoc() != null) {
-			for (TipusDocumentDto tipusDocument : entitat.getTipusDoc()) {
-				EntitatTipusDocEntity tipusDocEntity = EntitatTipusDocEntity.getBuilder(
-						entitatSaved, 
-						tipusDocument.getTipusDocEnum()).build();
-				entitatTipusDocRepository.save(tipusDocEntity);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Creant una nova entitat (entitat=" + entitat + ")");
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					false,
+					false );
+			
+			EntitatEntity entity = EntitatEntity.getBuilder(
+					entitat.getCodi(),
+					entitat.getNom(),
+					entitat.getTipus(),
+					entitat.getDir3Codi(),
+					entitat.getDir3CodiReg(),
+					entitat.getApiKey(),
+					entitat.isAmbEntregaDeh(),
+					entitat.isAmbEntregaCie(),
+					entitat.getLogoCapBytes(),
+					entitat.getLogoPeuBytes(),
+					entitat.getColorFons(),
+					entitat.getColorLletra(),
+					entitat.getTipusDocDefault().getTipusDocEnum()).
+					descripcio(entitat.getDescripcio()).
+					build();
+			
+			EntitatEntity entitatSaved = entitatRepository.save(entity);
+			
+			if (entitat.getTipusDoc() != null) {
+				for (TipusDocumentDto tipusDocument : entitat.getTipusDoc()) {
+					EntitatTipusDocEntity tipusDocEntity = EntitatTipusDocEntity.getBuilder(
+							entitatSaved, 
+							tipusDocument.getTipusDocEnum()).build();
+					entitatTipusDocRepository.save(tipusDocEntity);
+				}
 			}
+			
+			return conversioTipusHelper.convertir(
+					entitatSaved,
+					EntitatDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
 		}
-		
-		return conversioTipusHelper.convertir(
-				entitatSaved,
-				EntitatDto.class);
 	}
 
 	@Transactional
 	@Override
 	public EntitatDto update(EntitatDto entitat) {
-		logger.debug("Actualitzant entitat existent (entitat=" + entitat + ")");
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				false,
-				false );
-		byte[] logoCapActual = null;
-		byte[] logoPeuActual = null;
-		EntitatEntity entity = entitatRepository.findOne(entitat.getId());
-		List<EntitatTipusDocEntity> tipusDocsEntity = entitatTipusDocRepository.findByEntitat(entity);
-		
-		if (tipusDocsEntity != null && !tipusDocsEntity.isEmpty()) {
-			for (TipusDocumentDto tipusDocDto : entitat.getTipusDoc()) {
-				 entitatTipusDocRepository.deleteNotInList(
-						entitat.getId(),
-						tipusDocDto.getTipusDocEnum());
-			}
-		}
-		if (entitat.getTipusDoc().isEmpty()) {
-			entitatTipusDocRepository.delete(tipusDocsEntity);
-		}
-		
-		if ((entitat.getTipusDoc() != null && entitat.getTipusDoc().size() > 1) || tipusDocsEntity.isEmpty()) {
-			for (TipusDocumentDto tipusDocument : entitat.getTipusDoc()) {
-				EntitatTipusDocEntity tipusDocumentActual = entitatTipusDocRepository.findByEntitatAndTipus(entity.getId(), tipusDocument.getTipusDocEnum());
-				if (tipusDocumentActual == null) {
-					EntitatTipusDocEntity tipusDocEntity = EntitatTipusDocEntity.getBuilder(
-							entity, 
-							tipusDocument.getTipusDocEnum()).build();
-					entitatTipusDocRepository.save(tipusDocEntity);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Actualitzant entitat existent (entitat=" + entitat + ")");
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					false,
+					false );
+			byte[] logoCapActual = null;
+			byte[] logoPeuActual = null;
+			EntitatEntity entity = entitatRepository.findOne(entitat.getId());
+			List<EntitatTipusDocEntity> tipusDocsEntity = entitatTipusDocRepository.findByEntitat(entity);
+			
+			if (tipusDocsEntity != null && !tipusDocsEntity.isEmpty()) {
+				for (TipusDocumentDto tipusDocDto : entitat.getTipusDoc()) {
+					 entitatTipusDocRepository.deleteNotInList(
+							entitat.getId(),
+							tipusDocDto.getTipusDocEnum());
 				}
 			}
-		}
-		if (!entitat.isEliminarLogoCap()) {
-			if (entitat.getLogoCapBytes() != null && entitat.getLogoCapBytes().length != 0) {
-				logoCapActual = entitat.getLogoCapBytes();
-			} else {
-				logoCapActual = entity.getLogoCapBytes();
+			if (entitat.getTipusDoc().isEmpty()) {
+				entitatTipusDocRepository.delete(tipusDocsEntity);
 			}
-		}
-		
-		if (!entitat.isEliminarLogoPeu()) {
-			if (entitat.getLogoPeuBytes() != null && entitat.getLogoPeuBytes().length != 0) {
-				logoPeuActual = entitat.getLogoPeuBytes();
-			} else {
-				logoPeuActual = entity.getLogoPeuBytes();
+			
+			if ((entitat.getTipusDoc() != null && entitat.getTipusDoc().size() > 1) || tipusDocsEntity.isEmpty()) {
+				for (TipusDocumentDto tipusDocument : entitat.getTipusDoc()) {
+					EntitatTipusDocEntity tipusDocumentActual = entitatTipusDocRepository.findByEntitatAndTipus(entity.getId(), tipusDocument.getTipusDocEnum());
+					if (tipusDocumentActual == null) {
+						EntitatTipusDocEntity tipusDocEntity = EntitatTipusDocEntity.getBuilder(
+								entity, 
+								tipusDocument.getTipusDocEnum()).build();
+						entitatTipusDocRepository.save(tipusDocEntity);
+					}
+				}
 			}
+			if (!entitat.isEliminarLogoCap()) {
+				if (entitat.getLogoCapBytes() != null && entitat.getLogoCapBytes().length != 0) {
+					logoCapActual = entitat.getLogoCapBytes();
+				} else {
+					logoCapActual = entity.getLogoCapBytes();
+				}
+			}
+			
+			if (!entitat.isEliminarLogoPeu()) {
+				if (entitat.getLogoPeuBytes() != null && entitat.getLogoPeuBytes().length != 0) {
+					logoPeuActual = entitat.getLogoPeuBytes();
+				} else {
+					logoPeuActual = entity.getLogoPeuBytes();
+				}
+			}
+			
+			entity.update(
+					entitat.getCodi(),
+					entitat.getNom(),
+					entitat.getTipus(),
+					entitat.getDir3Codi(),
+					entitat.getDir3CodiReg(),
+					entitat.getApiKey(),
+					entitat.isAmbEntregaDeh(),
+					entitat.isAmbEntregaCie(),
+					entitat.getDescripcio(),
+					logoCapActual,
+					logoPeuActual,
+					entitat.getColorFons(),
+					entitat.getColorLletra(),
+					entitat.getTipusDocDefault().getTipusDocEnum());
+			return conversioTipusHelper.convertir(
+					entity,
+					EntitatDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
 		}
-		
-		entity.update(
-				entitat.getCodi(),
-				entitat.getNom(),
-				entitat.getTipus(),
-				entitat.getDir3Codi(),
-				entitat.getDir3CodiReg(),
-				entitat.getApiKey(),
-				entitat.isAmbEntregaDeh(),
-				entitat.isAmbEntregaCie(),
-				entitat.getDescripcio(),
-				logoCapActual,
-				logoPeuActual,
-				entitat.getColorFons(),
-				entitat.getColorLletra(),
-				entitat.getTipusDocDefault().getTipusDocEnum());
-		return conversioTipusHelper.convertir(
-				entity,
-				EntitatDto.class);
 	}
 	
 	@Override
 	public List<TipusDocumentDto> findTipusDocumentByEntitat(Long entitatId) {
-		List<TipusDocumentDto> tipusDocumentsDto = new ArrayList<TipusDocumentDto>();
-		
-		EntitatEntity entitat = entitatRepository.findOne(entitatId);
-		
-		List<EntitatTipusDocEntity> tipusDocsEntity = entitatTipusDocRepository.findByEntitat(entitat);
-		
-		for (EntitatTipusDocEntity entitatTipusDocEntity : tipusDocsEntity) {
-			TipusDocumentDto tipusDocumentDto = new TipusDocumentDto();
-			tipusDocumentDto.setTipusDocEnum(entitatTipusDocEntity.getTipusDocEnum());
-			tipusDocumentsDto.add(tipusDocumentDto);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<TipusDocumentDto> tipusDocumentsDto = new ArrayList<TipusDocumentDto>();
+			
+			EntitatEntity entitat = entitatRepository.findOne(entitatId);
+			
+			List<EntitatTipusDocEntity> tipusDocsEntity = entitatTipusDocRepository.findByEntitat(entitat);
+			
+			for (EntitatTipusDocEntity entitatTipusDocEntity : tipusDocsEntity) {
+				TipusDocumentDto tipusDocumentDto = new TipusDocumentDto();
+				tipusDocumentDto.setTipusDocEnum(entitatTipusDocEntity.getTipusDocEnum());
+				tipusDocumentsDto.add(tipusDocumentDto);
+			}
+			return tipusDocumentsDto;
+		} finally {
+			metricsHelper.fiMetrica(timer);
 		}
-		return tipusDocumentsDto;
 	}
 	
 	@Override
 	public TipusDocumentEnumDto findTipusDocumentDefaultByEntitat(Long entitatId) {
-		EntitatEntity entitat = entitatRepository.findOne(entitatId);
-		
-		return entitat.getTipusDocDefault();
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			EntitatEntity entitat = entitatRepository.findOne(entitatId);
+			return entitat.getTipusDocDefault();
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 
@@ -219,19 +240,24 @@ public class EntitatServiceImpl implements EntitatService {
 	public EntitatDto updateActiva(
 			Long id,
 			boolean activa) {
-		logger.debug("Actualitzant propietat activa d'una entitat existent ("
-				+ "id=" + id + ", "
-				+ "activa=" + activa + ")");
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				false,
-				false );
-		EntitatEntity entitat = entitatRepository.findOne(id);
-		entitat.updateActiva(activa);
-		return conversioTipusHelper.convertir(
-				entitat,
-				EntitatDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Actualitzant propietat activa d'una entitat existent ("
+					+ "id=" + id + ", "
+					+ "activa=" + activa + ")");
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					false,
+					false );
+			EntitatEntity entitat = entitatRepository.findOne(id);
+			entitat.updateActiva(activa);
+			return conversioTipusHelper.convertir(
+					entitat,
+					EntitatDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Transactional
@@ -239,136 +265,176 @@ public class EntitatServiceImpl implements EntitatService {
 	@CacheEvict(value = "entitatsUsuari", allEntries = true)
 	public EntitatDto delete(
 			Long id) {
-		logger.debug("Esborrant entitat (id=" + id +  ")");
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				false,
-				false );
-		EntitatEntity entitat = entitatRepository.findOne( id );
-		List<EntitatTipusDocEntity> tipusDocsEntity = entitatTipusDocRepository.findByEntitat(entitat);
-		if (!tipusDocsEntity.isEmpty()) {
-			entitatTipusDocRepository.delete(tipusDocsEntity);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Esborrant entitat (id=" + id +  ")");
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					false,
+					false );
+			EntitatEntity entitat = entitatRepository.findOne( id );
+			List<EntitatTipusDocEntity> tipusDocsEntity = entitatTipusDocRepository.findByEntitat(entitat);
+			if (!tipusDocsEntity.isEmpty()) {
+				entitatTipusDocRepository.delete(tipusDocsEntity);
+			}
+			entitatRepository.delete(entitat);
+			permisosHelper.deleteAcl(
+					entitat.getId(),
+					EntitatEntity.class);
+			return conversioTipusHelper.convertir(
+					entitat,
+					EntitatDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
 		}
-		entitatRepository.delete(entitat);
-		permisosHelper.deleteAcl(
-				entitat.getId(),
-				EntitatEntity.class);
-		return conversioTipusHelper.convertir(
-				entitat,
-				EntitatDto.class);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public EntitatDto findById(
 			Long id) {
-		logger.debug("Consulta de l'entitat (id=" + id + ")");
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				true,
-				true );
-		TipusDocumentDto tipusDocumentDto = new TipusDocumentDto();
-		EntitatEntity entitat = entitatRepository.findOne(id);
-		EntitatDto entitatDto = conversioTipusHelper.convertir(
-				entitatRepository.findOne(id),
-				EntitatDto.class);
-		tipusDocumentDto.setEntitat(entitat.getId());
-		tipusDocumentDto.setTipusDocEnum(entitat.getTipusDocDefault());
-		entitatDto.setTipusDocDefault(tipusDocumentDto);
-		return entitatDto;
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta de l'entitat (id=" + id + ")");
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					true,
+					true );
+			TipusDocumentDto tipusDocumentDto = new TipusDocumentDto();
+			EntitatEntity entitat = entitatRepository.findOne(id);
+			EntitatDto entitatDto = conversioTipusHelper.convertir(
+					entitatRepository.findOne(id),
+					EntitatDto.class);
+			tipusDocumentDto.setEntitat(entitat.getId());
+			tipusDocumentDto.setTipusDocEnum(entitat.getTipusDocDefault());
+			entitatDto.setTipusDocDefault(tipusDocumentDto);
+			return entitatDto;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public EntitatDto findByCodi(String codi) {
-		logger.debug("Consulta de l'entitat amb codi (codi=" + codi + ")");
-		EntitatEntity entitat = entitatRepository.findByCodi(codi);
-		if (entitat == null) return null;
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				true,
-				true );
-		return conversioTipusHelper.convertir(
-				entitat,
-				EntitatDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta de l'entitat amb codi (codi=" + codi + ")");
+			EntitatEntity entitat = entitatRepository.findByCodi(codi);
+			if (entitat == null) return null;
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					true,
+					true );
+			return conversioTipusHelper.convertir(
+					entitat,
+					EntitatDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public EntitatDto findByDir3codi(
 			String dir3codi) {
-		logger.debug("Consulta de l'entitat amb codi DIR3 (dir3codi=" + dir3codi + ")");
-		EntitatDto dto = conversioTipusHelper.convertir(
-				entitatRepository.findByDir3Codi(dir3codi),
-				EntitatDto.class);
-		return dto;
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta de l'entitat amb codi DIR3 (dir3codi=" + dir3codi + ")");
+			EntitatDto dto = conversioTipusHelper.convertir(
+					entitatRepository.findByDir3Codi(dir3codi),
+					EntitatDto.class);
+			return dto;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public List<EntitatDto> findAll() {
-		logger.debug("Consulta de totes les entitats");
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				false,
-				false );
-		return conversioTipusHelper.convertirList(
-					entitatRepository.findAll(),
-					EntitatDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta de totes les entitats");
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					false,
+					false );
+			return conversioTipusHelper.convertirList(
+						entitatRepository.findAll(),
+						EntitatDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<EntitatDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
-		logger.debug("Consulta de totes les entitats paginades (paginacioParams=" + paginacioParams + ")");
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				false,
-				false );
-		PaginaDto<EntitatDto> resposta = paginacioHelper.toPaginaDto(
-					entitatRepository.findByFiltre(
-							paginacioParams.getFiltre(), 
-							paginacioHelper.toSpringDataPageable(paginacioParams)),
-					EntitatDto.class);
-		for (EntitatDto entitat: resposta.getContingut()) {
-			// Permisos
-			List<PermisDto> permisos = permisosHelper.findPermisos(
-					entitat.getId(),
-					EntitatEntity.class);
-			entitat.setPermisos(permisos);
-			
-			// Aplicacions
-			entitat.setNumAplicacions(aplicacioRepository.countByEntitatId(entitat.getId()));
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta de totes les entitats paginades (paginacioParams=" + paginacioParams + ")");
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					false,
+					false );
+			PaginaDto<EntitatDto> resposta = paginacioHelper.toPaginaDto(
+						entitatRepository.findByFiltre(
+								paginacioParams.getFiltre(), 
+								paginacioHelper.toSpringDataPageable(paginacioParams)),
+						EntitatDto.class);
+			for (EntitatDto entitat: resposta.getContingut()) {
+				// Permisos
+				List<PermisDto> permisos = permisosHelper.findPermisos(
+						entitat.getId(),
+						EntitatEntity.class);
+				entitat.setPermisos(permisos);
+				
+				// Aplicacions
+				entitat.setNumAplicacions(aplicacioRepository.countByEntitatId(entitat.getId()));
+			}
+			return resposta;
+		} finally {
+			metricsHelper.fiMetrica(timer);
 		}
-		return resposta;
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public List<EntitatDto> findAccessiblesUsuariActual(String rolActual) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		logger.debug("Consulta les entitats accessibles per l'usuari actual (usuari=" + auth.getName() + ")");
-		return permisosHelper.findEntitatsAccessiblesUsuari(auth.getName(), rolActual);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			logger.debug("Consulta les entitats accessibles per l'usuari actual (usuari=" + auth.getName() + ")");
+			return permisosHelper.findEntitatsAccessiblesUsuari(auth.getName(), rolActual);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	@Transactional
 	@Override
 	public List<PermisDto> permisFindByEntitatId(
 			Long entitatId) {
-		logger.debug("Consulta dels permisos de l'entitat (entitatId=" + entitatId + ")");
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				true,
-				true );
-		return permisosHelper.findPermisos(
-				entitatId,
-				EntitatEntity.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta dels permisos de l'entitat (entitatId=" + entitatId + ")");
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					true,
+					true );
+			return permisosHelper.findPermisos(
+					entitatId,
+					EntitatEntity.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Transactional
@@ -377,18 +443,23 @@ public class EntitatServiceImpl implements EntitatService {
 	public void permisUpdate(
 			Long entitatId,
 			PermisDto permis) {
-		logger.debug("Modificació com a superusuari del permis de l'entitat (" +
-				"entitatId=" + entitatId + ", " +
-				"permis=" + permis + ")");
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				false,
-				false );
-		permisosHelper.updatePermis(
-				entitatId,
-				EntitatEntity.class,
-				permis);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Modificació com a superusuari del permis de l'entitat (" +
+					"entitatId=" + entitatId + ", " +
+					"permis=" + permis + ")");
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					false,
+					false );
+			permisosHelper.updatePermis(
+					entitatId,
+					EntitatEntity.class,
+					permis);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Transactional
@@ -397,69 +468,97 @@ public class EntitatServiceImpl implements EntitatService {
 	public void permisDelete(
 			Long entitatId,
 			Long permisId) {
-		logger.debug("Eliminació com a superusuari del permis de l'entitat (" +
-				"entitatId=" + entitatId + ", " +
-				"permisId=" + permisId + ")");
-		entityComprovarHelper.comprovarPermisos(
-				null,
-				true,
-				true,
-				false );
-		permisosHelper.deletePermis(
-				entitatId,
-				EntitatEntity.class,
-				permisId);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Eliminació com a superusuari del permis de l'entitat (" +
+					"entitatId=" + entitatId + ", " +
+					"permisId=" + permisId + ")");
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					true,
+					false );
+			permisosHelper.deletePermis(
+					entitatId,
+					EntitatEntity.class,
+					permisId);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 
 	@Override
 	public boolean hasPermisUsuariEntitat() {
-		List<EntitatDto> resposta = entityComprovarHelper.findPermisEntitat(
-				new Permission[] {
-						ExtendedPermission.USUARI}
-				);
-		
-		return (resposta.isEmpty()) ? false : true;
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<EntitatDto> resposta = entityComprovarHelper.findPermisEntitat(
+					new Permission[] {
+							ExtendedPermission.USUARI}
+					);
+			
+			return (resposta.isEmpty()) ? false : true;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
 	public boolean hasPermisAdminEntitat() {		
-		List<EntitatDto> resposta = entityComprovarHelper.findPermisEntitat(
-				new Permission[] {
-						ExtendedPermission.ADMINISTRADORENTITAT}
-				);
-		
-		return (resposta.isEmpty()) ? false : true;
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<EntitatDto> resposta = entityComprovarHelper.findPermisEntitat(
+					new Permission[] {
+							ExtendedPermission.ADMINISTRADORENTITAT}
+					);
+			
+			return (resposta.isEmpty()) ? false : true;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
 	public boolean hasPermisAplicacioEntitat() {		
-		List<EntitatDto> resposta = entityComprovarHelper.findPermisEntitat(
-				new Permission[] {
-						ExtendedPermission.APLICACIO}
-				);
-		
-		return (resposta.isEmpty()) ? false : true;
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<EntitatDto> resposta = entityComprovarHelper.findPermisEntitat(
+					new Permission[] {
+							ExtendedPermission.APLICACIO}
+					);
+			
+			return (resposta.isEmpty()) ? false : true;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	@Transactional
 	@Override
 	public byte[] getCapLogo() throws NoSuchFileException, IOException{
-
-		String filePath = PropertiesHelper.getProperties().getProperty("es.caib.notib.capsalera.logo");
-		Path path = Paths.get(filePath);
-		
-		return Files.readAllBytes(path);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			String filePath = PropertiesHelper.getProperties().getProperty("es.caib.notib.capsalera.logo");
+			Path path = Paths.get(filePath);
+			
+			return Files.readAllBytes(path);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	@Transactional
 	@Override
 	public byte[] getPeuLogo() throws NoSuchFileException, IOException{
-
-		String filePath = PropertiesHelper.getProperties().getProperty("es.caib.notib.peu.logo");
-		Path path = Paths.get(filePath);
-		
-		return Files.readAllBytes(path);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			String filePath = PropertiesHelper.getProperties().getProperty("es.caib.notib.peu.logo");
+			Path path = Paths.get(filePath);
+			
+			return Files.readAllBytes(path);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 

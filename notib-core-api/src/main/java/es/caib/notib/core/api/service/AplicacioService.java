@@ -159,5 +159,12 @@ public interface AplicacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('tothom')")
 	public UsuariDto updateUsuariActual(UsuariDto asDto);
+	
+	/**
+	 * Recupera les mètriques de l'aplicació.
+	 * 
+	 * @return El registre de les mètriques.
+	 */
+	public String getMetrics();
 
 }

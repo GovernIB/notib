@@ -8,6 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.codahale.metrics.Timer;
 
 import es.caib.notib.core.api.dto.PagadorCieFormatFullaDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -18,6 +21,7 @@ import es.caib.notib.core.entity.PagadorCieEntity;
 import es.caib.notib.core.entity.PagadorCieFormatFullaEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
+import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.repository.PagadorCieFormatFullaRepository;
 import es.caib.notib.core.repository.PagadorCieRepository;
@@ -40,90 +44,133 @@ public class PagadorCieFormatFullaServiceImpl implements PagadorCieFormatFullaSe
 	private PaginacioHelper paginacioHelper;
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
-
+	@Resource
+	private MetricsHelper metricsHelper;
 	
 	@Override
+	@Transactional
 	public PagadorCieFormatFullaDto create(
 			Long pagadorCieId, 
 			PagadorCieFormatFullaDto formatFulla) {
-		logger.debug("Creant un format de fulla per el pagador cie ("
-				+ "pagador=" + pagadorCieId + ")");
-		PagadorCieEntity pagadorCieEntity = pagadorCieReposity.findOne(pagadorCieId);
-		
-		PagadorCieFormatFullaEntity pagadorCieFormatFullaEntity = pagadorCieFormatFullaRepository.save(
-				PagadorCieFormatFullaEntity.getBuilder(
-						formatFulla.getCodi(),
-						pagadorCieEntity).build());
-		
-		return conversioTipusHelper.convertir(
-				pagadorCieFormatFullaEntity, 
-				PagadorCieFormatFullaDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Creant un format de fulla per el pagador cie ("
+					+ "pagador=" + pagadorCieId + ")");
+			PagadorCieEntity pagadorCieEntity = pagadorCieReposity.findOne(pagadorCieId);
+			
+			PagadorCieFormatFullaEntity pagadorCieFormatFullaEntity = pagadorCieFormatFullaRepository.save(
+					PagadorCieFormatFullaEntity.getBuilder(
+							formatFulla.getCodi(),
+							pagadorCieEntity).build());
+			
+			return conversioTipusHelper.convertir(
+					pagadorCieFormatFullaEntity, 
+					PagadorCieFormatFullaDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
+	@Transactional
 	public PagadorCieFormatFullaDto update(PagadorCieFormatFullaDto formatFulla) throws NotFoundException {
-		PagadorCieFormatFullaEntity pagadorCieFormatFullaEntity = entityComprovarHelper.comprovarPagadorCieFormatFulla(formatFulla.getId());
-		pagadorCieFormatFullaEntity.update(formatFulla.getCodi());
-		
-		pagadorCieFormatFullaRepository.save(pagadorCieFormatFullaEntity);
-		
-		return conversioTipusHelper.convertir(
-				pagadorCieFormatFullaEntity, 
-				PagadorCieFormatFullaDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			PagadorCieFormatFullaEntity pagadorCieFormatFullaEntity = entityComprovarHelper.comprovarPagadorCieFormatFulla(formatFulla.getId());
+			pagadorCieFormatFullaEntity.update(formatFulla.getCodi());
+			
+			pagadorCieFormatFullaRepository.save(pagadorCieFormatFullaEntity);
+			
+			return conversioTipusHelper.convertir(
+					pagadorCieFormatFullaEntity, 
+					PagadorCieFormatFullaDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
+	@Transactional
 	public PagadorCieFormatFullaDto delete(Long id) throws NotFoundException {
-		PagadorCieFormatFullaEntity pagadorCieFormatFullaEntity = entityComprovarHelper.comprovarPagadorCieFormatFulla(id);
-		pagadorCieFormatFullaRepository.delete(pagadorCieFormatFullaEntity.getId());
-		
-		return conversioTipusHelper.convertir(
-				pagadorCieFormatFullaEntity, 
-				PagadorCieFormatFullaDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			PagadorCieFormatFullaEntity pagadorCieFormatFullaEntity = entityComprovarHelper.comprovarPagadorCieFormatFulla(id);
+			pagadorCieFormatFullaRepository.delete(pagadorCieFormatFullaEntity.getId());
+			
+			return conversioTipusHelper.convertir(
+					pagadorCieFormatFullaEntity, 
+					PagadorCieFormatFullaDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public PagadorCieFormatFullaDto findById(Long id) {
-		PagadorCieFormatFullaEntity pagadorCieFormatFullaEntity = entityComprovarHelper.comprovarPagadorCieFormatFulla(id);
-		
-		return conversioTipusHelper.convertir(
-				pagadorCieFormatFullaEntity, 
-				PagadorCieFormatFullaDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			PagadorCieFormatFullaEntity pagadorCieFormatFullaEntity = entityComprovarHelper.comprovarPagadorCieFormatFulla(id);
+			
+			return conversioTipusHelper.convertir(
+					pagadorCieFormatFullaEntity, 
+					PagadorCieFormatFullaDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<PagadorCieFormatFullaDto> findAll() {
-		logger.debug("Consulta de tots els formats del pagador cie");
-		List<PagadorCieFormatFullaEntity> pagadorCieFormatFullaEntity = pagadorCieFormatFullaRepository.findAll();
-		
-		return conversioTipusHelper.convertirList(
-				pagadorCieFormatFullaEntity,
-				PagadorCieFormatFullaDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta de tots els formats del pagador cie");
+			List<PagadorCieFormatFullaEntity> pagadorCieFormatFullaEntity = pagadorCieFormatFullaRepository.findAll();
+			
+			return conversioTipusHelper.convertirList(
+					pagadorCieFormatFullaEntity,
+					PagadorCieFormatFullaDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public List<PagadorCieFormatFullaDto> findFormatFullaByPagadorCie(Long pagadorCieId) {
-		logger.debug("Consulta de tots els formats del pagador cie");
-		PagadorCieEntity pagadorCie = entityComprovarHelper.comprovarPagadorCie(pagadorCieId);
-		List<PagadorCieFormatFullaEntity> pagadorCieFormatFullaEntity = pagadorCieFormatFullaRepository.findByPagadorCie(pagadorCie);
-		
-		return conversioTipusHelper.convertirList(
-				pagadorCieFormatFullaEntity,
-				PagadorCieFormatFullaDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta de tots els formats del pagador cie");
+			PagadorCieEntity pagadorCie = entityComprovarHelper.comprovarPagadorCie(pagadorCieId);
+			List<PagadorCieFormatFullaEntity> pagadorCieFormatFullaEntity = pagadorCieFormatFullaRepository.findByPagadorCie(pagadorCie);
+			
+			return conversioTipusHelper.convertirList(
+					pagadorCieFormatFullaEntity,
+					PagadorCieFormatFullaDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public PaginaDto<PagadorCieFormatFullaDto> findAllPaginat(
 			Long pagadorCieId,
 			PaginacioParamsDto paginacioParams) {
-		PagadorCieEntity pagadorCie = entityComprovarHelper.comprovarPagadorCie(pagadorCieId);
-		Page<PagadorCieFormatFullaEntity> pagadorCieFormatsFulla = pagadorCieFormatFullaRepository.findByPagadorCie(
-				pagadorCie,
-				paginacioHelper.toSpringDataPageable(paginacioParams));
-	
-		return paginacioHelper.toPaginaDto(
-				pagadorCieFormatsFulla,
-				PagadorCieFormatFullaDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			PagadorCieEntity pagadorCie = entityComprovarHelper.comprovarPagadorCie(pagadorCieId);
+			Page<PagadorCieFormatFullaEntity> pagadorCieFormatsFulla = pagadorCieFormatFullaRepository.findByPagadorCie(
+					pagadorCie,
+					paginacioHelper.toSpringDataPageable(paginacioParams));
+		
+			return paginacioHelper.toPaginaDto(
+					pagadorCieFormatsFulla,
+					PagadorCieFormatFullaDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(PagadorCieFormatFullaServiceImpl.class);

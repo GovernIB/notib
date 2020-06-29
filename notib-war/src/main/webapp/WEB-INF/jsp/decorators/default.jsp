@@ -246,6 +246,7 @@ body {
 										<li><a href="<c:url value="/massiu/notificacions"/>"><spring:message code="decorator.menu.callback"/></a></li>							
 										<li><a href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
 										<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>
+										<li><a href="<c:url value="/metrics/list"/>"><spring:message code="decorator.menu.metriques"/></a></li>
 									</ul>
 								</div>
 							<div class="btn-group">
