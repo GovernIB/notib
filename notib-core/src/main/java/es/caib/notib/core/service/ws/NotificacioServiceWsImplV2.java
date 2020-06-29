@@ -1045,7 +1045,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 		if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
 			Long fileMaxSize = 10635049L; //10MB
-			byte[] base64Decoded = Base64.decode(notificacio.getDocument().getContingutBase64());
+			byte[] base64Decoded = Base64.decodeBase64(notificacio.getDocument().getContingutBase64());
 			if (getMaxSizeFile() != null)
 				fileMaxSize = getMaxSizeFile();
 			if (base64Decoded.length > getMaxSizeFile()) {

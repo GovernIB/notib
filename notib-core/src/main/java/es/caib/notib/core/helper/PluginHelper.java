@@ -1762,7 +1762,7 @@ public class PluginHelper {
 				interessatDades.setDocumento(titular.getNif());
 				interessatDades.setTipoDocumentoIdentificacion("C");
 			}
-			interessatDades.setRazonSocial(titular.getNom());
+			interessatDades.setRazonSocial(titular.getRaoSocial());
 			interessatDades.setNombre(titular.getNom());
 			interessatDades.setApellido1(titular.getLlinatge1());
 			interessatDades.setApellido2(titular.getLlinatge2());
