@@ -1012,12 +1012,17 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	@Transactional(readOnly = true)
 	public NotificacioEventDto findUltimEventCallbackByNotificacio(Long notificacioId) {
-		NotificacioEventEntity event = notificacioEventRepository.findUltimEventByNotificacioId(notificacioId);
-		if (event == null)
-			return null;
-		return conversioTipusHelper.convertir(
-				event, 
-				NotificacioEventDto.class);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			NotificacioEventEntity event = notificacioEventRepository.findUltimEventByNotificacioId(notificacioId);
+			if (event == null)
+				return null;
+			return conversioTipusHelper.convertir(
+					event, 
+					NotificacioEventDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 
 	@Override
