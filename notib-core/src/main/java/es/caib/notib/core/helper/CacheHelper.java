@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.helper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -17,11 +18,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
+import es.caib.notib.plugin.unitat.ObjetoDirectorio;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 
 /**
@@ -76,32 +79,8 @@ public class CacheHelper {
 		for(EntitatDto dto : resposta) dto.setUsuariActualAdministradorEntitat(true);
 		
 		return resposta;
-		
-//		usuarisEntitatHelper.omplirUsuarisPerEntitats(
-//				resposta,
-//				false);
-		
-		//////////////////////////////////////////////////////////////////
-		
-//		List<EntitatDto> entitats = conversioTipusHelper.convertirList(
-//				entitatRepository.findAll(),
-//				EntitatDto.class );
-//		
-//		List<EntitatDto> result = new ArrayList<>();
-//		for(EntitatDto e : entitats) {
-//			List<PermisDto> permisos = permisosHelper.findPermisos(
-//					e.getId(),
-//					EntitatEntity.class);
-//			for(PermisDto p : permisos) {
-//				if(p.getNom().equals(usuariCodi)) {
-//					e.setUsuariActualRepresentant(p.isRepresentant());
-//					result.add(e);
-//				}
-//			}
-//		}
-//		
-//		return result;
 	}
+	
 	@Cacheable(value = "usuariAmbCodi", key="#usuariCodi")
 	public DadesUsuari findUsuariAmbCodi(
 			String usuariCodi) {
@@ -116,6 +95,28 @@ public class CacheHelper {
 				usuariCodi);
 	}
 	
+	@Cacheable(value = "organismes", key="#entitatcodi")
+	public List<OrganismeDto> findOrganismesByEntitat(
+			String entitatcodi) {
+		List<OrganismeDto> organismes = new ArrayList<OrganismeDto>();
+		List<ObjetoDirectorio> organismesDir3 = pluginHelper.llistarOrganismesPerEntitat(entitatcodi);
+		if (organismesDir3 != null) {
+			for (ObjetoDirectorio organismeRegistre : organismesDir3) {
+				OrganismeDto organisme = new OrganismeDto();
+				organisme.setCodi(organismeRegistre.getCodi());
+				organisme.setNom(organismeRegistre.getDenominacio());
+				organismes.add(organisme);
+			}
+		}
+		return organismes;
+	}
+	
+	@Cacheable(value = "denominacioOrganisme", key="#codiDir3")
+	public String findDenominacioOrganisme(
+			String codiDir3) {
+		return pluginHelper.getDenominacio(codiDir3);
+	}
+	
 	@CacheEvict(value = "findPermisProcedimentsUsuariActualAndEntitat", key="#entitatId")
 	public void evictFindPermisProcedimentsUsuariActualAndEntitat(Long entitatId) {
 	}
@@ -128,7 +129,10 @@ public class CacheHelper {
 	public void evictFindByPermisProcedimentsUsuariActual(Long entitatId) {
 	}
 	
-
+	@CacheEvict(value = "organismes", key="#entitatcodi")
+	public void evictFindOrganismesByEntitat(String entitatcodi) {
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(CacheHelper.class);
 
 }

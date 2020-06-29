@@ -28,6 +28,7 @@ import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.GrupProcedimentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PagadorCieEntity;
 import es.caib.notib.core.entity.PagadorCieFormatFullaEntity;
 import es.caib.notib.core.entity.PagadorCieFormatSobreEntity;
@@ -39,6 +40,7 @@ import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.PagadorCieFormatFullaRepository;
 import es.caib.notib.core.repository.PagadorCieFormatSobreRepository;
 import es.caib.notib.core.repository.PagadorCieRepository;
@@ -70,6 +72,8 @@ public class EntityComprovarHelper {
 	private PagadorCieFormatSobreRepository pagadorCieFormatSobreRepository;
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
+	@Autowired
+	private OrganGestorRepository organGestorRepository;
 	@Resource
 	private GrupRepository grupRepository;
 	@Autowired
@@ -334,6 +338,46 @@ public class EntityComprovarHelper {
 		}
 		
 		return procediment;
+	}
+	public OrganGestorEntity comprovarOrganGestor(
+			EntitatEntity entitat,
+			Long id) {
+		
+		OrganGestorEntity organGestor = organGestorRepository.findOne(id);
+		if (organGestor == null) {
+			throw new NotFoundException(
+					id,
+					OrganGestorEntity.class);
+		}
+		
+		if (entitat != null && !entitat.equals(organGestor.getEntitat())) {
+			throw new ValidationException(
+					id,
+					OrganGestorEntity.class,
+					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat de l'organ gestor");
+		}
+		
+		return organGestor;
+	}
+	public OrganGestorEntity comprovarOrganGestor(
+			EntitatEntity entitat,
+			String codi) {
+		
+		OrganGestorEntity organGestor = organGestorRepository.findByCodi(codi);
+		if (organGestor == null) {
+			throw new NotFoundException(
+					codi,
+					OrganGestorEntity.class);
+		}
+		
+		if (entitat != null && !entitat.equals(organGestor.getEntitat())) {
+			throw new ValidationException(
+					codi,
+					OrganGestorEntity.class,
+					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat de l'organ gestor");
+		}
+		
+		return organGestor;
 	}
 	public NotificacioEntity comprovarNotificacio(
 			EntitatEntity entitat,

@@ -84,6 +84,7 @@ import es.caib.notib.plugin.registre.TipusAssumpte;
 import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
+import es.caib.notib.plugin.unitat.ObjetoDirectorio;
 import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
@@ -717,7 +718,7 @@ public class PluginHelper {
 			String errorDescripcio = "No s'ha pogut recuperar el document amb el uuid/csv proporcionat";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_REGISTRE,
+					IntegracioHelper.INTCODI_ARXIU,
 					errorDescripcio,
 					ex);
 		}
@@ -842,6 +843,55 @@ public class PluginHelper {
 	// UNITATS ORGANITZATIVES
 	// /////////////////////////////////////////////////////////////////////////////////////
 	
+	
+	public List<ObjetoDirectorio> llistarOrganismesPerEntitat(String entitatcodi) throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenir llista d'organismes per entitat", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				new AccioParam("Codi Dir3 de l'entitat", entitatcodi));
+		
+		List<ObjetoDirectorio> organismes = null;
+		try {
+			organismes = getUnitatsOrganitzativesPlugin().unitatsPerEntitat(entitatcodi, true);
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistar organismes per entitat";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+	
+		return organismes;
+	}
+	
+	public String getDenominacio(String codiDir3) {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenir denominació d'organisme", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				new AccioParam("Codi Dir3 de l'organisme", codiDir3));
+		
+		String denominacio = null;
+		try {
+			denominacio = getUnitatsOrganitzativesPlugin().unitatDenominacio(codiDir3);
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al obtenir denominació de organisme";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+		return denominacio;
+		
+	}
+
 	public List<CodiValorPais> llistarPaisos() throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(
@@ -857,7 +907,7 @@ public class PluginHelper {
 			String errorDescripcio = "Error al llistar països";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_GESDOC,
+					IntegracioHelper.INTCODI_UNITATS,
 					errorDescripcio,
 					ex);
 		}
@@ -880,7 +930,7 @@ public class PluginHelper {
 			String errorDescripcio = "Error al llistat províncies";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_GESDOC,
+					IntegracioHelper.INTCODI_UNITATS,
 					errorDescripcio,
 					ex);
 		}
@@ -904,7 +954,7 @@ public class PluginHelper {
 			String errorDescripcio = "Error al llistat els municipis d'una província";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_GESDOC,
+					IntegracioHelper.INTCODI_UNITATS,
 					errorDescripcio,
 					ex);
 		}
@@ -913,6 +963,7 @@ public class PluginHelper {
 	}
 	
 	
+	//////////////////////////////////////////////
 	
 	private DocumentRegistre documentToDocumentRegistreDto (DocumentDto documentDto) throws SistemaExternException {
 		DocumentRegistre document = new DocumentRegistre();
@@ -1296,7 +1347,7 @@ public class PluginHelper {
 			organisme = notificacio.getEntitat().getDir3CodiReg();
 		} else {
 			dir3Codi = notificacio.getEmisorDir3Codi();
-			organisme = notificacio.getProcediment().getOrganGestor();
+			organisme = notificacio.getProcediment().getOrganGestor() != null ? notificacio.getProcediment().getOrganGestor().getCodi() : null;
 		}
 
 		try {
@@ -1410,7 +1461,7 @@ public class PluginHelper {
 			organisme = notificacio.getEntitat().getDir3CodiReg();
 		} else {
 			dir3Codi = notificacio.getEmisorDir3Codi();
-			organisme = notificacio.getProcediment().getOrganGestor();
+			organisme = notificacio.getProcediment().getOrganGestor() != null ? notificacio.getProcediment().getOrganGestor().getCodi() : null;
 		}
 
 		try {
@@ -1490,8 +1541,8 @@ public class PluginHelper {
 		registre.setSolicita("");
 		registre.setPresencial(false);
 		registre.setEstado(notificacio.getEstat().getLongVal());
-		registre.setUnidadTramitacionOrigenCodigo(notificacio.getProcediment().getOrganGestor());
-		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getProcediment().getOrganGestor());
+//		registre.setUnidadTramitacionOrigenCodigo(notificacio.getProcediment().getOrganGestor().getCodi());
+//		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getProcediment().getOrganGestor().getCodi());
 		registre.setMotivo(notificacio.getDescripcio());
 		registre.setInteresados(new ArrayList<InteresadoWsDto>());
 		registre.setAnexos(new ArrayList<AnexoWsDto>());
@@ -1789,7 +1840,7 @@ public class PluginHelper {
 			if (notificacio.getProcediment().getOrganGestor() != null) {
 				llibreOrganisme = llistarLlibreOrganisme(
 						dir3Codi,
-						notificacio.getProcediment().getOrganGestor());
+						notificacio.getProcediment().getOrganGestor().getCodi());
 			}
 			if (llibreOrganisme != null) {
 				dadesOficina.setLlibreCodi(llibreOrganisme.getCodi());

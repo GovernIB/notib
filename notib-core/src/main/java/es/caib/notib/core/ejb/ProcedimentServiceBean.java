@@ -14,13 +14,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.notib.core.api.dto.CodiAssumpteDto;
+import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
+import es.caib.notib.core.api.dto.OrganGestorFiltreDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
 import es.caib.notib.core.api.dto.ProcedimentFormDto;
@@ -127,13 +131,55 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	public List<ProcedimentGrupDto> findAllGrups() {
 		return delegate.findAllGrups();
 	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	public List<ProcedimentGrupDto> findGrupsByEntitat(Long entitatId) {
+		return delegate.findGrupsByEntitat(entitatId);
+	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
-	public List<ProcedimentDto> findProcedimentsSenseGrups(EntitatDto entitatActual) {
-		return delegate.findProcedimentsSenseGrups(entitatActual);
+	public List<ProcedimentDto> findProcedimentsSenseGrups(Long entitatId) {
+		return delegate.findProcedimentsSenseGrups(entitatId);
 	}
-
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	public List<ProcedimentDto> findProcedimentsSenseGrupsWithPermis(Long entitatId, PermisEnum permis) {
+		return delegate.findProcedimentsSenseGrupsWithPermis(entitatId, permis);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	public List<ProcedimentDto> findProcedimentsAmbGrups(Long entitatId, List<String> grups) {
+		return delegate.findProcedimentsAmbGrups(entitatId, grups);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	public List<ProcedimentDto> findProcedimentsAmbGrupsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
+		return delegate.findProcedimentsAmbGrupsWithPermis(entitatId, grups, permis);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	public List<ProcedimentDto> findProcediments(Long entitatId, List<String> grups) {
+		return delegate.findProcediments(entitatId, grups);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	public List<ProcedimentDto> findProcedimentsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
+		return delegate.findProcedimentsWithPermis(entitatId, grups, permis);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	public boolean hasAnyProcedimentsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
+		return delegate.hasAnyProcedimentsWithPermis(entitatId, grups, permis);
+	}
+	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
 	public List<PermisDto> permisFind(
@@ -283,6 +329,12 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	public String findDenominacioOrganisme(String codiDir3) {
+		return delegate.findDenominacioOrganisme(codiDir3);
+	}
+	
+	@Override
 	@RolesAllowed({"NOT_ADMIN"})
 	public List<OficinaDto> findOficines(EntitatDto entitat) {
 		return delegate.findOficines(entitat);
@@ -302,5 +354,89 @@ public class ProcedimentServiceBean implements ProcedimentService {
 		delegate.refrescarCache(entitat);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	public List<ProcedimentDto> findProcedimentsByOrganGestor(String organGestorCodi) {
+		return delegate.findProcedimentsByOrganGestor(organGestorCodi);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_USER"})
+	public List<ProcedimentDto> findProcedimentsByOrganGestorWithPermis(
+			Long entitatId,
+			String organGestorCodi, 
+			List<String> grups,
+			PermisEnum permis) {
+		return delegate.findProcedimentsByOrganGestorWithPermis(
+				entitatId, 
+				organGestorCodi, 
+				grups, 
+				permis);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public List<OrganGestorDto> findOrgansGestorsAll() {
+		return delegate.findOrgansGestorsAll();
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public List<OrganGestorDto> findOrgansGestorsByEntitat(Long entitatId) {
+		return delegate.findOrgansGestorsByEntitat(entitatId);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public List<CodiValorDto> findOrgansGestorsCodiByEntitat(Long entitatId) {
+		return delegate.findOrgansGestorsCodiByEntitat(entitatId);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	public List<OrganGestorDto> findOrganGestorByProcedimentIds(List<Long> procedimentIds) {
+		return delegate.findOrganGestorByProcedimentIds(procedimentIds);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(
+			Long entitatId, 
+			OrganGestorFiltreDto filtre, 
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findOrgansGestorsAmbFiltrePaginat(entitatId, filtre, paginacioParams);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public void updateOrganGestorNom(Long entitatId, String organGestorCodi) {
+		delegate.updateOrganGestorNom(entitatId, organGestorCodi);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public void updateOrgansGestorsNom(Long entitatId) {
+		delegate.updateOrgansGestorsNom(entitatId);
+	}
+
+	@Override
+	public OrganGestorDto findOrganGestorById(Long entitatId, Long id) {
+		return delegate.findOrganGestorById(entitatId, id);
+	}
+
+	@Override
+	public List<PermisDto> permisOrganGestorFind(Long entitatId, Long id) throws NotFoundException {
+		return delegate.permisOrganGestorFind(entitatId, id);
+	}
+
+	@Override
+	public void permisOrganGestorUpdate(Long entitatId, Long id, PermisDto permis) throws NotFoundException {
+		delegate.permisOrganGestorUpdate(entitatId, id, permis);
+	}
+
+	@Override
+	public void permisOrganGestorDelete(Long entitatId, Long id, Long permisId) throws NotFoundException {
+		delegate.permisOrganGestorDelete(entitatId, id, permisId);
+	}
 
 }

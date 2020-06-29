@@ -17,12 +17,12 @@ public class ExtendedPermission extends BasePermission {
 
 	public static final Permission USUARI = new ExtendedPermission(1 << 5, 'U'); // 32
 	public static final Permission ADMINISTRADOR = new ExtendedPermission(1 << 6, 'M'); // 64
-	public static final Permission ADMINISTRADORENTITAT = new ExtendedPermission(1 << 7, 'E'); // 64
-	public static final Permission APLICACIO = new ExtendedPermission(1 << 8, 'L'); // 64
+	public static final Permission ADMINISTRADORENTITAT = new ExtendedPermission(1 << 7, 'E'); // 128
+	public static final Permission APLICACIO = new ExtendedPermission(1 << 8, 'L'); // 256
 
 
-	public static final Permission PROCESSAR = new ExtendedPermission(1 << 9, 'P'); // 64
-	public static final Permission NOTIFICACIO = new ExtendedPermission(1 << 10, 'N'); // 32
+	public static final Permission PROCESSAR = new ExtendedPermission(1 << 9, 'P'); // 512
+	public static final Permission NOTIFICACIO = new ExtendedPermission(1 << 10, 'N'); // 1024
 	
 	protected ExtendedPermission(int mask) {
 		super(mask);

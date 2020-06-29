@@ -313,6 +313,34 @@ $(document).ready(function() {
 		});
 		$('#form-filtre').submit();
 	});
+
+	$('#organGestor').on('change', function () {
+		//Procediments
+		var organGestor = $(this);
+		var selProcediments = $("#procedimentId");
+		
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value="/notificacio/procedimentsOrgan/"/>" + $(organGestor).val(),
+			success: function(data) {
+				$(selProcediments).empty();
+				$(selProcediments).append("<option value=\"\"></option>");
+				if (data && data.length > 0) {
+					$.each(data, function(i, val) {
+						$(selProcediments).append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
+					});
+				}
+				var select2Options = {
+						theme: 'bootstrap',
+						width: 'auto'};
+				$(selProcediments).select2(select2Options);
+			},
+			error: function() {
+				console.log("error obtenint els procediments!");
+			}
+		});
+	});
+		
 });
 </script>
 </head>
@@ -349,21 +377,17 @@ $(document).ready(function() {
 				<not:inputText name="titular" inline="true" placeholderKey="notificacio.list.filtre.camp.titular"/>
 			</div>
 			<div class="col-md-4">
+				<not:inputSelect name="organGestor" optionItems="${organsGestorsPermisLectura}" optionValueAttribute="codi" optionTextAttribute="nom" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
+			</div>
+			<div class="col-md-6">
 				<not:inputSelect name="procedimentId" optionItems="${procedimentsPermisLectura}" optionValueAttribute="id" optionTextAttribute="nom" placeholderKey="notificacio.list.filtre.camp.procediment" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
-			</div>
-			<div class="col-md-2">
-				<not:inputSelect name="tipusUsuari" optionItems="${tipusUsuari}" optionValueAttribute="value" optionTextKeyAttribute="text"  emptyOption="true"  placeholderKey="notificacio.list.filtre.camp.tipususuari" inline="true" />
-			</div>
-			<div class="col-md-2">
-				<not:inputText name="numExpedient" inline="true" placeholderKey="notificacio.list.filtre.camp.numexpedient"/>
-			</div>
-			<div class="col-md-2 pull-right form-buttons"  style="text-align: right;">
-				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
-				<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-2">
+				<not:inputSelect name="tipusUsuari" optionItems="${tipusUsuari}" optionValueAttribute="value" optionTextKeyAttribute="text"  emptyOption="true"  placeholderKey="notificacio.list.filtre.camp.tipususuari" inline="true" />
+			</div>
+			<div class="col-md-4">
 				<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
 				<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
 				<not:inputSuggest 
@@ -378,7 +402,14 @@ $(document).ready(function() {
 					inline="true"/>
 			</div>
 			<div class="col-md-2">
+				<not:inputText name="numExpedient" inline="true" placeholderKey="notificacio.list.filtre.camp.numexpedient"/>
+			</div>
+			<div class="col-md-2">
 				<not:inputText name="identificador" inline="true" placeholderKey="notificacio.list.filtre.camp.identificador"/>
+			</div>
+			<div class="col-md-2 pull-right form-buttons"  style="text-align: right;">
+				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+				<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 			</div>
 		</div>
 	</form:form>
@@ -421,6 +452,7 @@ $(document).ready(function() {
 						{{:~eval('comunicacioTipus["' + comunicacioTipus + '"]')}}
 					</script>
 				</th--%>
+				<th data-col-name="procediment.organGestor"  width="100px"><spring:message code="notificacio.form.camp.organGestor"/></th>
 				<th data-col-name="procediment.nom"  width="200px"><spring:message code="notificacio.list.columna.procediment"/></th>
 				<c:if test="${mostrarColumnaNumExpedient}">
 					<th data-col-name="numExpedient" width="170px"><spring:message code="notificacio.list.columna.num.expedient"/></th>

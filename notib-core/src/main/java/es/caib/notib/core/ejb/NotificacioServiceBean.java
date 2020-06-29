@@ -13,6 +13,7 @@ import javax.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.LocalitatsDto;
@@ -26,7 +27,6 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -169,8 +169,7 @@ public class NotificacioServiceBean implements NotificacioService {
 			boolean isUsuari,
 			boolean isUsuariEntitat,
 			boolean isSuperUsuari,
-			List<ProcedimentGrupDto> grupsProcediments,
-			Map<String, ProcedimentDto> procediments,
+			List<String> codisProcedimentsDisponibles,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findAmbFiltrePaginat(
@@ -178,8 +177,7 @@ public class NotificacioServiceBean implements NotificacioService {
 				isUsuari,
 				isUsuariEntitat,
 				isSuperUsuari,
-				grupsProcediments,
-				procediments,
+				codisProcedimentsDisponibles,
 				filtre,
 				paginacioParams);
 	}

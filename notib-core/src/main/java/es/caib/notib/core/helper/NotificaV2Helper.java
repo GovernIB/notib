@@ -485,7 +485,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		try {
 //			envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
 			if (notificacio.getProcediment().getOrganGestor() != null) 
-				envios.setCodigoOrganismoEmisor(notificacio.getProcediment().getOrganGestor());
+				envios.setCodigoOrganismoEmisor(notificacio.getProcediment().getOrganGestor().getCodi());
 			else
 				envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
 			
@@ -757,6 +757,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 							entregaPostal.setLinea2(enviament.getDomiciliLinea2());
 							entregaPostal.setCodigoPostal(enviament.getDomiciliCodiPostal());
 							entregaPostal.setPais(enviament.getDomiciliPaisCodiIso());
+						}
+						if (entregaPostal.getPais() == null) {
+							entregaPostal.setPais("ES");
 						}
 						Opciones opcionesCie = new Opciones();
 						if (enviament.getDomiciliCie() != null) {

@@ -11,5 +11,6 @@
 	<cache name="findPermisProcedimentsUsuariActualAndEntitat" maxElementsInMemory="300" eternal="false" timeToLiveSeconds="28800" overflowToDisk="false" />
 	<cache name="findByGrupAndPermisProcedimentsUsuariActualAndEntitat" maxElementsInMemory="300" eternal="false" timeToLiveSeconds="28800" overflowToDisk="false" />
 	<cache name="findByPermisProcedimentsUsuariActual" maxElementsInMemory="300" eternal="false" timeToLiveSeconds="28800" overflowToDisk="false" />
-	
+	<cache name="organismes" maxElementsInMemory="10" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />
+	<cache name="denominacioOrganisme" maxElementsInMemory="300" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />
 </ehcache>

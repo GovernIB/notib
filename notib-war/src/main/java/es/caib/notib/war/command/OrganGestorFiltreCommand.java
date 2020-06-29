@@ -2,7 +2,7 @@ package es.caib.notib.war.command;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
+import es.caib.notib.core.api.dto.OrganGestorFiltreDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,29 +13,27 @@ import lombok.Setter;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter
-public class ProcedimentFiltreCommand {
+public class OrganGestorFiltreCommand {
 	
 	private String codi;
 	private String nom;
-	private String organGestor;
-	private Long entitatId;
 	
-	public static ProcedimentFiltreCommand asCommand(ProcedimentFiltreDto dto) {
+	public static OrganGestorFiltreCommand asCommand(OrganGestorFiltreDto dto) {
 		if (dto == null) {
 			return null;
 		}
-		ProcedimentFiltreCommand command = ConversioTipusHelper.convertir(
+		OrganGestorFiltreCommand command = ConversioTipusHelper.convertir(
 				dto,
-				ProcedimentFiltreCommand.class );
+				OrganGestorFiltreCommand.class );
 		return command;
 	}
-	public static ProcedimentFiltreDto asDto(ProcedimentFiltreCommand command) {
+	public static OrganGestorFiltreDto asDto(OrganGestorFiltreCommand command) {
 		if (command == null) {
 			return null;
 		}
-		ProcedimentFiltreDto dto = ConversioTipusHelper.convertir(
+		OrganGestorFiltreDto dto = ConversioTipusHelper.convertir(
 				command,
-				ProcedimentFiltreDto.class);
+				OrganGestorFiltreDto.class);
 		return dto;
 	}
 
