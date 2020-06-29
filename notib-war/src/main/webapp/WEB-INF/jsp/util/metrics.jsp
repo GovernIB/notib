@@ -77,7 +77,7 @@
 	height: 340px;
 }
 .chart-container {
-	width: 500px;
+	width: 30%;
 	margin-left: 40px;
 	margin-right: 40px;
 }
@@ -182,7 +182,7 @@ $(document).ready(function() {
   		<div role="tabpanel" class="tab-pane fade in active" id="timers-tab">
   			<div id="llegenda">
   				<div class='counterTitle'><spring:message code="metriques.timers.llegenda"/></div>
-				<canvas class='llegendaChart collapse' width='100' height='30'></canvas>
+				<canvas class='llegendaChart collapse' width='100' height='100'></canvas>
 			</div>
       		<div id="timers" class="panel-body">
 				<h4 class="ocult"><spring:message code="metriques.timers.generics"/></h4>
