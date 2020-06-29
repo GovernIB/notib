@@ -15,7 +15,32 @@ import es.caib.notib.plugin.SistemaExternException;
  */
 public interface UnitatsOrganitzativesPlugin {
 	
+	/**
+	 * Retorna la llista d'unitats organitzatives filles donat un codi d'entitat.
+	 * 
+	 * @param codi
+	 *            Codi dir3 de la unitat pare.
+	 * @param inclourePare
+	 * 			  Indica si el llistat ha d'incloure l'entitat pare
+	 *            
+	 * @return La llista d'unitats organitzatives.
+	 * @throws SistemaExternException
+	 *            Si es produeix un error al consultar les unitats organitzatives.
+	 */
+	public List<ObjetoDirectorio> unitatsPerEntitat(String codiEntitat, boolean inclourePare) throws SistemaExternException;
 
+	/**
+	 * Retorna la denominació  d'una unitats organitzativa.
+	 * 
+	 * @param codi
+	 *            Codi dir3 de la unitat organitzativa.
+	 *            
+	 * @return La denominació de la unitat organitzativa.
+	 * @throws SistemaExternException
+	 *            Si es produeix un error al consultar la denominació de la unitat organitzativa.
+	 */
+	public String unitatDenominacio(String codiDir3) throws SistemaExternException;
+	
 	/**
 	 * Retorna la llista d'unitats organitzatives filles donat un filtre.
 	 * 

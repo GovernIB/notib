@@ -38,24 +38,30 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 			"    ProcedimentFormEntity pro " +
 			"where (pro.entitat_id = :entitatId)" +
 			" and (:isCodiNull = true or lower(pro.codi) like lower('%'||:codi||'%'))" +
-			" and (:isNomNull = true or lower(pro.nom) like lower('%'||:nom||'%'))")
+			" and (:isNomNull = true or lower(pro.nom) like lower('%'||:nom||'%'))" +
+			" and (:isOrganGestorNull = true or pro.organGestor like :organ)")
 	public Page<ProcedimentFormEntity> findAmbEntitatAndFiltre(
 			@Param("entitatId") Long entitatId,
 			@Param("isCodiNull") boolean isCodiNull,
 			@Param("codi") String codi,
 			@Param("isNomNull") boolean isNomNull,
 			@Param("nom") String nom,
+			@Param("isOrganGestorNull") boolean isOrganGestorNull,
+			@Param("organ") String organGestor,
 			Pageable paginacio);
 	
 	@Query(	"from " +
 			"    ProcedimentFormEntity pro " +
 			"where ((:isCodiNull = true) or (lower(pro.codi) like lower('%'||:codi||'%')))" + 
-			" and ((:isNomNull = true) or (lower(pro.nom) like lower('%'||:nom||'%')))")
+			" and ((:isNomNull = true) or (lower(pro.nom) like lower('%'||:nom||'%')))" +
+			" and (:isOrganGestorNull = true or pro.organGestor like :organ)")
 	public Page<ProcedimentFormEntity> findAmbFiltre(
 			@Param("isCodiNull") boolean isCodiNull,
 			@Param("codi") String codi,
 			@Param("isNomNull") boolean isNomNull,
 			@Param("nom") String nom,
+			@Param("isOrganGestorNull") boolean isOrganGestorNull,
+			@Param("organ") String organGestor,
 			Pageable paginacio);
 	
 }

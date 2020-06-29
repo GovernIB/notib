@@ -12,12 +12,14 @@ import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.audit.NotibAuditable;
+import lombok.Getter;
 
 /**
  * Classe de model de dades que conté la informació dels procediments.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
 @Entity
 @Table(name = "not_procediment")
 @EntityListeners(AuditingEntityListener.class)
@@ -41,12 +43,6 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	@Column(name = "oficina")
 	protected String oficina;
 	
-	@Column(name = "organ_gestor")
-	protected String organGestor;
-	
-	@Column(name = "organ_gestor_nom")
-	protected String organGestorNom;
-	
 	@Column(name = "tipusassumpte", length = 255)
 	protected String tipusAssumpte;
 	
@@ -58,6 +54,9 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "codiassumpte_nom", length = 255)
 	protected String codiAssumpteNom;
+	
+	@Column(name = "agrupar", length = 64, nullable = false)
+	protected boolean agrupar;
 	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "entitat")
@@ -74,119 +73,11 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	@ForeignKey(name = "not_pagador_cie_fk")
 	protected PagadorCieEntity pagadorcie;
 	
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "organ_gestor", referencedColumnName = "codi")
+	@ForeignKey(name = "not_proc_organ_fk")
+	protected OrganGestorEntity organGestor;
 	
-	
-	public void setCodi(String codi) {
-		this.codi = codi;
-	}
-
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-	
-	public void setRetard(Integer retard) {
-		this.retard = retard;
-	}
-
-	public Integer getCaducitat() {
-		return caducitat;
-	}
-
-	public void setLlibre(String llibre) {
-		this.llibre = llibre;
-	}
-
-	public void setOficina(String oficina) {
-		this.oficina = oficina;
-	}
-	
-	public String getOrganGestor() {
-		return organGestor;
-	}
-
-	public void setTipusAssumpte(String tipusAssumpte) {
-		this.tipusAssumpte = tipusAssumpte;
-	}
-
-	public void setCodiAssumpte(String codiAssumpte) {
-		this.codiAssumpte = codiAssumpte;
-	}
-
-	public void setEntitat(EntitatEntity entitat) {
-		this.entitat = entitat;
-	}
-
-	public void setPagadorpostal(PagadorPostalEntity pagadorpostal) {
-		this.pagadorpostal = pagadorpostal;
-	}
-
-	public void setPagadorcie(PagadorCieEntity pagadorcie) {
-		this.pagadorcie = pagadorcie;
-	}
-
-	public void setAgrupar(boolean agrupar) {
-		this.agrupar = agrupar;
-	}
-
-	public String getOrganGestorNom() {
-		return organGestorNom;
-	}
-
-	public String getTipusAssumpteNom() {
-		return tipusAssumpteNom;
-	}
-
-	public String getCodiAssumpteNom() {
-		return codiAssumpteNom;
-	}
-
-	@Column(name = "agrupar", length = 64, nullable = false)
-	protected boolean agrupar;
-
-	public String getCodi() {
-		return codi;
-	}
-
-	public String getNom() {
-		return nom;
-	}
-
-	public EntitatEntity getEntitat() {
-		return entitat;
-	}
-
-	public PagadorPostalEntity getPagadorpostal() {
-		return pagadorpostal;
-	}
-
-	public PagadorCieEntity getPagadorcie() {
-		return pagadorcie;
-	}
-
-	public boolean isAgrupar() {
-		return agrupar;
-	}
-
-	public Integer getRetard() {
-		return retard;
-	}
-
-	public String getLlibre() {
-		return llibre;
-	}
-
-	public String getOficina() {
-		return oficina;
-	}
-
-	public String getTipusAssumpte() {
-		return tipusAssumpte;
-	}
-
-	public String getCodiAssumpte() {
-		return codiAssumpte;
-	}
-
 	public void update(
 			String codi,
 			String nom,
@@ -200,8 +91,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			String llibreNom,
 			String oficina,
 			String oficinaNom,
-			String organGestor,
-			String organGestorNom,
+			OrganGestorEntity organGestor,
 			String tipusAssumpte,
 			String tipusAssumpteNom,
 			String codiAssumpte,
@@ -215,7 +105,6 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 		this.llibre = llibre;
 		this.oficina = oficina;
 		this.organGestor = organGestor;
-		this.organGestorNom = organGestorNom;
 		this.retard = retard;
 		this.caducitat = caducitat;
 		this.tipusAssumpte = tipusAssumpte;
@@ -237,8 +126,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			String llibreNom,
 			String oficina,
 			String oficinaNom,
-			String organGestor,
-			String organGestorNom,
+			OrganGestorEntity organGestor,
 			String tipusAssumpte,
 			String tipusAssumpteNom,
 			String codiAssumpte,
@@ -257,7 +145,6 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 				oficina,
 				oficinaNom,
 				organGestor,
-				organGestorNom,
 				tipusAssumpte,
 				tipusAssumpteNom,
 				codiAssumpte,
@@ -279,8 +166,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 				String llibreNom,
 				String oficina,
 				String oficinaNom,
-				String organGestor,
-				String organGestorNom,
+				OrganGestorEntity organGestor,
 				String tipusAssumpte,
 				String tipusAssumpteNom,
 				String codiAssumpte,
@@ -297,7 +183,6 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			built.llibre = llibre;
 			built.oficina = oficina;
 			built.organGestor = organGestor;
-			built.organGestorNom = organGestorNom;
 			built.tipusAssumpte = tipusAssumpte;
 			built.tipusAssumpteNom = tipusAssumpteNom;
 			built.codiAssumpte = codiAssumpte;

@@ -37,7 +37,7 @@ public class ClientBaseTest {
 
 //	Entitat: A04013511 (DGTIC) ò A04003003 (Govern)
 	protected static final String ENTITAT_DIR3CODI = "A04003003";
-//	protected static final String ORGAN_CODI = "A04013501";
+//	protected static final String ENTITAT_DIR3CODI = "A04013511";
 	protected static final String ORGAN_CODI = "A04003003";
 	protected static final String LLIBRE = "L16";
 	protected static final String OFICINA = "O00009390";

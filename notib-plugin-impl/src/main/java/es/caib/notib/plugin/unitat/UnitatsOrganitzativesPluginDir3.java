@@ -5,6 +5,7 @@ package es.caib.notib.plugin.unitat;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 import javax.xml.ws.BindingProvider;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +36,63 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 	
 	private static final String SERVEI_CERCA = "/rest/busqueda/";
 	private static final String SERVEI_CATALEG = "/rest/catalogo/";
+	private static final String SERVEI_UNITAT = "/rest/unidad/";
 	private static final String WS_CATALEG = "ws/Dir3CaibObtenerCatalogos";
+	
+	public List<ObjetoDirectorio> unitatsPerEntitat(String codiEntitat, boolean inclourePare) throws SistemaExternException {
+		List<ObjetoDirectorio> unitats = new ArrayList<ObjetoDirectorio>();
+		try {
+			URL url = new URL(getServiceUrl() + SERVEI_UNITAT + "arbolUnidades?codigo=" + codiEntitat);
+			logger.debug("URL: " + url);
+			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
+			httpConnection.setRequestMethod("GET");
+			httpConnection.setDoInput(true);
+			httpConnection.setDoOutput(true);
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			byte[] response = IOUtils.toByteArray(httpConnection.getInputStream());
+			if (response != null && response.length > 0) {
+				unitats = mapper.readValue(
+					response, 
+					TypeFactory.defaultInstance().constructCollectionType(
+							List.class,  
+							ObjetoDirectorio.class));
+			}
+			if (inclourePare) {
+				ObjetoDirectorio pare = new ObjetoDirectorio();
+				pare.setCodi(codiEntitat);
+				pare.setDenominacio(unitatDenominacio(codiEntitat));
+				unitats.add(pare);
+			}
+			Collections.sort(unitats);
+			return unitats;
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'han pogut consultar les unitats organitzatives via REST (" +
+					"codiEntitat=" + codiEntitat + ")",
+					ex);
+		}
+	}
+	
+	public String unitatDenominacio(String codiDir3) throws SistemaExternException {
+		try {
+			URL url = new URL(getServiceUrl() + SERVEI_UNITAT + "denominacion?codigo=" + codiDir3);
+			logger.debug("URL: " + url);
+			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
+			httpConnection.setRequestMethod("GET");
+			httpConnection.setDoInput(true);
+			httpConnection.setDoOutput(true);
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			String denominacio = IOUtils.toString(httpConnection.getInputStream(), StandardCharsets.UTF_8.name());
+			return denominacio;
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'han pogut consultar la denominació de la unitat organitzativ via REST (" +
+					"codiDir3=" + codiDir3 + ")",
+					ex);
+		}
+	}
 	
 	public List<NodeDir3> cercaUnitats(
 			String codi, 

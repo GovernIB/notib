@@ -37,7 +37,7 @@ public class ProcedimentHelper {
 	@Autowired
 	private GrupProcedimentRepository grupProcedimentRepository;
 	
-	public void omplirPermisosPerMetaNode(
+	public void omplirPermisos(
 			ProcedimentDto procediment,
 			boolean ambLlistaPermisos) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();

@@ -7,10 +7,10 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+
 import es.caib.notib.core.api.dto.ColumnesDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
@@ -20,8 +20,6 @@ import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 
@@ -67,8 +65,7 @@ public interface EnviamentService {
 			EntitatDto entitat,
 			boolean isUsuari,
 			boolean isUsuariEntitat,
-			List<ProcedimentGrupDto> grupsProcediments,
-			Map<String, ProcedimentDto> procediments,
+			List<String> codisProcedimentsDisponibles,
 			NotificacioEnviamentFiltreDto filtre,
 			PaginacioParamsDto paginacio) throws ParseException;
 	

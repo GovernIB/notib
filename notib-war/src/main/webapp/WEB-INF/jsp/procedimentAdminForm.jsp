@@ -63,15 +63,16 @@ $(document).ready(function() {
 						$.each(data, function(i, val) {
 							items.push({
 								"id": val.codi,
-								"text": val.nom
+								"text": val.codi + " - " + val.nom
 							});
-							selOrganismes.append("<option value=\"" + val.codi + "\">" + val.nom + "</option>");
+							selOrganismes.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
 						});
 				}
 				var select2Options = {
 						theme: 'bootstrap',
 						width: 'auto'};
 				selOrganismes.select2(select2Options);
+				$(".loading-screen").hide();
 			},
 			error: function() {
 				console.log("error obtenint els organismes...");
@@ -272,11 +273,9 @@ $(document).ready(function() {
 				<not:inputText name="retard" textKey="procediment.form.camp.retard" labelSize="2"/>
 				<not:inputText name="caducitat" textKey="procediment.form.camp.caducitat" labelSize="2"/>
 				<form:hidden path="entitatId" value="${entitat.id}"/>
-				<!--
 				<form:hidden path="organGestor"/>
-				<not:inputTextSearch name="organGestorNom" textKey="procediment.form.camp.organ" searchButton="searchOrgan" readonly="true" labelSize="2"/>
-				-->
-				<not:inputText name="organGestor" textKey="procediment.form.camp.organ" required="true" labelSize="2"/>
+				<not:inputTextSearch name="organGestorNom" textKey="procediment.form.camp.organ" searchButton="searchOrgan" required="true" readonly="true" labelSize="2"/>
+<%-- 				<not:inputText name="organGestor" textKey="procediment.form.camp.organ" required="true" labelSize="2"/> --%>
 				<not:inputSelect name="pagadorPostalId" emptyOption="true" textKey="procediment.form.camp.postal" optionItems="${pagadorsPostal}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>
 				<not:inputSelect name="pagadorCieId" emptyOption="true" textKey="procediment.form.camp.cie" optionItems="${pagadorsCie}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>
 				<not:inputCheckbox name="agrupar" textKey="procediment.form.camp.agrupar" labelSize="2"/>
@@ -308,6 +307,11 @@ $(document).ready(function() {
 				</div>
 				<div class="modal-body body">
 					<select id="selOrganismes"></select> 
+					<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
+						<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
+							<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>
+						</div>
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button id="addOrganismeButton" type="button" class="btn btn-info" data-dismiss="modal"><span class="fa fa-plus"></span> <spring:message code="comu.boto.afegir"/></button>

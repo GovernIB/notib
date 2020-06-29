@@ -178,6 +178,19 @@ public class AplicacioServiceImpl implements AplicacioService {
 	
 	@Transactional(readOnly = true)
 	@Override
+	public List<String> findRolsUsuariActual() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Obtenint els rols de l'usuari actual");
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			return pluginHelper.consultarRolsAmbCodi(auth.getName());
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
 	public UsuariDto findUsuariAmbCodi(String codi) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {

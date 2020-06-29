@@ -485,7 +485,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		try {
 //			envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
 			if (notificacio.getProcediment().getOrganGestor() != null) 
-				envios.setCodigoOrganismoEmisor(notificacio.getProcediment().getOrganGestor());
+				envios.setCodigoOrganismoEmisor(notificacio.getProcediment().getOrganGestor().getCodi());
 			else
 				envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
 			

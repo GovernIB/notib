@@ -7,16 +7,22 @@ import javax.persistence.Id;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Subselect;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Classe de model de dades que conté la informació dels procediments i pagadors.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 @Entity
 @Subselect("select 	pro.id as id,"
 		+ "			pro.codi as codi, "
 		+ "			pro.nom as nom, "
 		+ "			ent.nom as entitatNom, "
+		+ "			pro.organ_gestor as organGestor, "
+		+ "			og.nom as organGestorNom, "	
 		+ "			pro.codiassumpte as codiassumpte, "
 		+ " 		pro.tipusassumpte as tipusassumpte, "		
 		+ "			pro.llibre as llibre, "
@@ -29,7 +35,8 @@ import org.hibernate.annotations.Subselect;
 		+ " from	not_procediment pro "
 		+ " left outer join not_pagador_cie cie on cie.id = pro.pagadorcie "
 		+ " left outer join not_entitat ent on ent.id = pro.entitat "
-		+ " left outer join not_pagador_postal postal on postal.id = pro.pagadorpostal")
+		+ " left outer join not_pagador_postal postal on postal.id = pro.pagadorpostal "
+		+ " left outer join not_organ_gestor og on pro.organ_gestor = og.codi ")
 @Immutable
 public class ProcedimentFormEntity {
 	
@@ -48,6 +55,12 @@ public class ProcedimentFormEntity {
 	
 	@Column(name = "codiassumpte")
 	protected String codiAssumpte;
+	
+	@Column(name = "organGestor")
+	protected String organGestor;
+
+	@Column(name = "organGestorNom")
+	protected String organGestorNom;
 	
 	@Column(name = "tipusassumpte")
 	protected String tipusAssumpte;
@@ -72,109 +85,5 @@ public class ProcedimentFormEntity {
 	
 	@Column(name = "entitat_id")
 	protected Long entitat_id;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getCodi() {
-		return codi;
-	}
-
-	public void setCodi(String codi) {
-		this.codi = codi;
-	}
-
-	public String getNom() {
-		return nom;
-	}
-
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-
-	public String getEntitatNom() {
-		return entitatNom;
-	}
-
-	public void setEntitatNom(String entitatNom) {
-		this.entitatNom = entitatNom;
-	}
-
-	public boolean isAgrupar() {
-		return agrupar;
-	}
-
-	public void setAgrupar(boolean agrupar) {
-		this.agrupar = agrupar;
-	}
-
-	public String getCodiAssumpte() {
-		return codiAssumpte;
-	}
-
-	public void setCodiAssumpte(String codiAssumpte) {
-		this.codiAssumpte = codiAssumpte;
-	}
-
-	public String getTipusAssumpte() {
-		return tipusAssumpte;
-	}
-
-	public void setTipusAssumpte(String tipusAssumpte) {
-		this.tipusAssumpte = tipusAssumpte;
-	}
-
-	public String getLlibre() {
-		return llibre;
-	}
-
-	public void setLlibre(String llibre) {
-		this.llibre = llibre;
-	}
-
-	public String getOficina() {
-		return oficina;
-	}
-
-	public void setOficina(String oficina) {
-		this.oficina = oficina;
-	}
-	
-	public String getPagadorcie() {
-		return pagadorcie;
-	}
-
-	public void setPagadorcie(String pagadorcie) {
-		this.pagadorcie = pagadorcie;
-	}
-
-	public String getPagadorpostal() {
-		return pagadorpostal;
-	}
-
-	public void setPagadorpostal(String pagadorpostal) {
-		this.pagadorpostal = pagadorpostal;
-	}
-
-	public Integer getRetard() {
-		return retard;
-	}
-
-	public void setRetard(Integer retard) {
-		this.retard = retard;
-	}
-
-	public Long getEntitat_id() {
-		return entitat_id;
-	}
-
-	public void setEntitat_id(Long entitat_id) {
-		this.entitat_id = entitat_id;
-	}
 
 }

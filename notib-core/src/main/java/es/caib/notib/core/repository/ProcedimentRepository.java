@@ -20,11 +20,60 @@ import es.caib.notib.core.entity.ProcedimentEntity;
 public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, Long> {
 
 	@Query(
-			"from " + 
-			"	ProcedimentEntity pro " +
-			"where pro not in (:procediments)")
-	public List<ProcedimentEntity> findProcedimentsSenseGrups(
-			@Param("procediments") List<ProcedimentEntity> procediments);
+			"from ProcedimentEntity pro " +
+			"where pro.entitat = :entitat " +
+			"  and pro.agrupar = false ")
+//			"  and pro.id not in (select distinct p.id " +
+//			"		from GrupProcedimentEntity gp " +
+//			"		left outer join gp.procediment p " +
+//			"		where p.entitat = :entitat) ")
+	public List<ProcedimentEntity> findProcedimentsSenseGrupsByEntitat(@Param("entitat") EntitatEntity entitat);
+	
+	@Query(
+			"from ProcedimentEntity pro " +
+			"where pro.entitat = :entitat " +
+			"  and pro.agrupar = true " +
+			"  and pro in (select distinct gp.procediment " +
+			"		from GrupProcedimentEntity gp " +
+			"		left outer join gp.grup g " +
+			"		where g.entitat = :entitat " +
+			"		  and g.codi in (:grups)) ")
+	public List<ProcedimentEntity> findProcedimentsAmbGrupsByEntitatAndGrup(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("grups") List<String> grups);
+	
+	@Query(
+			"from ProcedimentEntity pro " +
+			"where pro.entitat = :entitat " +
+			"  and (pro.agrupar = false " +
+			"  	or (pro.agrupar = true " +
+			"  and pro in (select distinct gp.procediment " +
+			"		from GrupProcedimentEntity gp " +
+			"		left outer join gp.grup g " +
+			"		where g.entitat = :entitat " +
+			"		  and g.codi in (:grups))) ) " +
+			"order by pro.nom asc")
+	public List<ProcedimentEntity> findProcedimentsByEntitatAndGrup(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("grups") List<String> grups);
+	
+	@Query( "select distinct pro " +
+			"from ProcedimentEntity pro " +
+			"     left outer join pro.organGestor og " +
+			"where pro.entitat = :entitat " + 
+			"  and og.id = :organGestorId " +
+			"  and (pro.agrupar = false " +
+			"  	or (pro.agrupar = true " +
+			"  and pro in (select distinct gp.procediment " +
+			"		from GrupProcedimentEntity gp " +
+			"		left outer join gp.grup g " +
+			"		where g.entitat = :entitat " +
+			"		  and g.codi in (:grups))) ) " +
+			"order by pro.nom asc")
+	public List<ProcedimentEntity> findProcedimentsByOrganGestorAndGrup(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("organGestorId") Long organGestorId,
+			@Param("grups") List<String> grups);
 	
 	List<ProcedimentEntity> findByEntitatActiva(boolean activa);
 	
@@ -95,5 +144,12 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			@Param("isNomNull") boolean isNomNull,
 			@Param("nom") String nom,
 			Pageable paginacio);
+
+	@Query(	"select distinct pro.organGestor " +
+			"  from ProcedimentEntity pro " +
+			" where pro.entitat = :entitat")
+	public List<String> findOrgansGestorsCodisByEntitat(@Param("entitat") EntitatEntity entitat);
+	
+	List<ProcedimentEntity> findByOrganGestorId(Long organGestorId);
 	
 }

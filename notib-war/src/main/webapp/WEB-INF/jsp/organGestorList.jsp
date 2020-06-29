@@ -6,7 +6,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <html>
 <head>
-	<title><spring:message code="procediment.list.titol"/></title>
+	<title><spring:message code="organgestor.list.titol"/></title>
 	<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -40,16 +40,13 @@
 	</script>
 </head>
 <body>
-	<form:form id="filtre" action="" method="post" cssClass="well" commandName="procedimentFiltreCommand">
+	<form:form id="filtre" action="" method="post" cssClass="well" commandName="organGestorFiltreCommand">
 		<div class="row">
 			<div class="col-md-2">
-				<not:inputText name="codi" inline="true" placeholderKey="procediment.list.columna.codi"/>
+				<not:inputText name="codi" inline="true" placeholderKey="organgestor.list.columna.codi"/>
 			</div>
 			<div class="col-md-3">
-				<not:inputText name="nom" inline="true" placeholderKey="procediment.list.columna.nom"/>
-			</div>
-			<div class="col-md-5">
-				<not:inputSelect name="organGestor" optionItems="${organsGestors}" optionValueAttribute="codi" optionTextAttribute="valor" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
+				<not:inputText name="nom" inline="true" placeholderKey="organgestor.list.columna.nom"/>
 			</div>
 			<div class="col-md-2 pull-right">
 				<div class="pull-right">
@@ -61,15 +58,15 @@
 	</form:form>
 
 	<table
-		id="procediment"
+		id="organGestor"
 		data-toggle="datatable"
-		data-url="<c:url value="/procediment/datatable"/>"
+		data-url="<c:url value="/organgestor/datatable"/>"
 		data-search-enabled="false"
-		data-default-order="3"
+		data-default-order="1"
 		data-default-dir="desc"
 		class="table table-striped table-bordered"
-		data-botons-template="#botonsTemplate"
 		style="width:100%"
+		data-botons-template="#botonsTemplate"
 		data-filter="#filtre">
 		<thead>
 			<tr>
@@ -77,23 +74,9 @@
 				<th data-col-name="codi"><spring:message code="procediment.list.columna.codi"/></th>
 				<th data-col-name="nom"><spring:message code="procediment.list.columna.nom"/></th>
 				<th data-col-name="entitatNom"><spring:message code="procediment.list.columna.entitat"/></th>
-				<th data-col-name="organGestorDesc"><spring:message code="procediment.list.columna.organGestor"/></th>
-				<th data-col-name="pagadorpostal"><spring:message code="procediment.list.columna.pagadorpostal"/></th>
-				<th data-col-name="pagadorcie"><spring:message code="procediment.list.columna.pagadorcie"/></th>
-				<th data-col-name="agrupar" data-visible="false" id="agrupable"></th>
-			
-				<th data-col-name="grupsCount" data-template="#cellGrupsTemplate" data-orderable="false" width="10%">
-					<script id="cellGrupsTemplate" type="text/x-jsrender">
-					{{if agrupar != true}}
-						<button class="btn btn-default" disabled><span class="fa fa-users"></span>&nbsp;<spring:message code="procediment.list.boto.grups"/>&nbsp;</a>
-					{{else}}
-						<a href="${unitatCodiUrlPrefix}procediment/{{:id}}/grup" class="btn btn-default"><span class="fa fa-users"></span>&nbsp;<spring:message code="procediment.list.boto.grups"/>&nbsp;<span class="badge">{{:grupsCount}}</span></button>
-					{{/if}}
-					</script>
-				</th>	
 				<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="10%">
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
-						<a href="${unitatCodiUrlPrefix}procediment/{{:id}}/permis" class="btn btn-default"><span class="fa fa-key"></span>&nbsp;<spring:message code="procediment.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
+						<a href="organgestor/{{:id}}/permis" class="btn btn-default"><span class="fa fa-key"></span>&nbsp;<spring:message code="organgestor.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
 					</script>
 				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
@@ -101,8 +84,7 @@
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}" data-toggle="modal" data-maximized="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="pagadorpostal.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								<li><a href="organgestor/{{:codi}}/update" data-toggle="ajax"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="organgestor.list.boto.actualitzar"/></a></li>
 							</ul>
 						</div>
 					</script>
@@ -113,8 +95,7 @@
 	
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right">
-			<a id="procediment-boto-nou" class="btn btn-warning" href="${unitatCodiUrlPrefix}procediment/cache/refrescar"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="procediment.list.boto.cache"/></a>
-			<a id="procediment-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}procediment/new" data-toggle="modal" data-maximized="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="procediment.list.boto.nou.procediment"/></a>
+			<a id="organgestor-boto-nou" class="btn btn-warning" href="organgestor/update"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.tots"/></a>
 		</p>
 	</script>
 	

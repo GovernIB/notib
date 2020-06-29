@@ -12,7 +12,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.swing.table.DefaultTableModel;
@@ -25,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,11 +40,10 @@ import es.caib.notib.core.api.dto.NotificacioTipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.entity.ColumnesEntity;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -67,7 +64,6 @@ import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.UsuariRepository;
-import es.caib.notib.core.security.ExtendedPermission;
 
 /**
  * Implementació del servei de gestió de enviaments.
@@ -101,6 +97,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private MessageHelper messageHelper;
 	@Autowired
 	private CallbackHelper callbackHelper;
+	@Autowired
+	private AplicacioService aplicacioService;
 	@Autowired
 	private MetricsHelper metricsHelper;
 	
@@ -375,8 +373,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			EntitatDto entitat,
 			boolean isUsuari,
 			boolean isUsuariEntitat,
-			List<ProcedimentGrupDto> grupsProcediments,
-			Map<String, ProcedimentDto> procediments,
+			List<String> procedimentsCodisNotib,
 			NotificacioEnviamentFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws ParseException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
@@ -391,62 +388,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 				 dataCaducitatInici = null,
 				 dataCaducitatFi = null;
 			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitat.getId());
-			List<String> procedimentsCodisNotib = new ArrayList<String>();
-			List<ProcedimentDto> procedimentsPermisConsultaAndAgrupable = new ArrayList<ProcedimentDto>();
-			List<ProcedimentDto> procedimentsPermisConsulta = new ArrayList<ProcedimentDto>();
-			
 			entityComprovarHelper.comprovarPermisos(
 					null,
 					true,
 					true,
 					false);
-			
-			if (isUsuari) {
-				if (grupsProcediments.isEmpty()) {
-					//Obté tots els procediments amb permís de consutla d'una entitat
-					procedimentsPermisConsultaAndAgrupable = entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
-						new Permission[] {
-								ExtendedPermission.READ},
-						entitat.getId());
-				} else if (!procediments.isEmpty()) {
-					//Obté els procediments amb grup i permís de consulta
-					procedimentsPermisConsultaAndAgrupable = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
-							procediments, 
-							entitat.getId(),
-							new Permission[] {
-									ExtendedPermission.READ}
-							);
-					//Procediments amb permís de consulta no agurpables
-					List<ProcedimentDto> procedimentsNoAgrupables = new ArrayList<ProcedimentDto>();
-					for (Map.Entry<String, ProcedimentDto> procediment : procediments.entrySet()) {
-						if (!procediment.getValue().isAgrupar()) {
-							procedimentsNoAgrupables.add(procediment.getValue());
-						}
-					}
-	//				for(ProcedimentDto procediment: procediments) {
-	//					if (!procediment.isAgrupar()) {
-	//						procedimentsNoAgrupables.add(procediment);
-	//					}
-	//				}
-					procedimentsPermisConsulta = entityComprovarHelper.findByPermisProcedimentsUsuariActual(
-							procedimentsNoAgrupables, 
-							entitat.getId(),
-							new Permission[] {
-									ExtendedPermission.READ}
-							);
-					
-				}
-				if (!procedimentsPermisConsultaAndAgrupable.isEmpty()) {
-						for (ProcedimentDto procedimentDto : procedimentsPermisConsultaAndAgrupable) {
-							procedimentsCodisNotib.add(procedimentDto.getCodi());
-						}
-				}
-				if (!procedimentsPermisConsulta.isEmpty()) {
-					for (ProcedimentDto procedimentDto : procedimentsPermisConsulta) {
-						procedimentsCodisNotib.add(procedimentDto.getCodi());
-					}
-				}
-			}
 			
 			if (filtre.getDataEnviamentInici() != null && filtre.getDataEnviamentInici() != "") {
 				dataEnviamentInici = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentInici());
@@ -621,6 +567,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						dataRegistreFi,
 						(procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty()),
 						procedimentsCodisNotib,
+						aplicacioService.findRolsUsuariActual(),
 						pageable);
 			} else if (isUsuariEntitat) {
 				enviament = notificacioEnviamentRepository.findByNotificacio(
