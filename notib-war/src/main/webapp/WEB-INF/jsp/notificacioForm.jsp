@@ -158,7 +158,7 @@ var interessatsTipus = new Array();
 var interessatTipusOptions = "";
 <c:forEach items="${interessatTipus}" var="it" varStatus="status">
 	console.log(${status.index == 1})
-   	interessatTipusOptions = interessatTipusOptions + "<option value=${it.value}" + (${status.index == 1} ? " selected='selected'" : "") + "><spring:message code='${it.text}'/></option>";
+   	interessatTipusOptions = interessatTipusOptions + "<option value=${it.value}" + (${status.index == 0} ? " selected='selected'" : "") + "><spring:message code='${it.text}'/></option>";
 </c:forEach>
 
 $(document).ready(function() {

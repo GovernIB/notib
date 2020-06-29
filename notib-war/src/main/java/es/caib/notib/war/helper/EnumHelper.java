@@ -54,6 +54,22 @@ public class EnumHelper {
 		return resposta;
 	}
 	
+	public static List<HtmlOption> getOrderedOptionsForEnum(
+			Class<?> enumeracio,
+			String textKeyPrefix,
+			Enum<?>[] ordre) {
+		List<HtmlOption> resposta = new ArrayList<HtmlOption>();
+		if (enumeracio.isEnum()) {
+			for (Object e: ordre) {
+				resposta.add(new HtmlOption(
+						((Enum<?>)e).name(),
+						(textKeyPrefix != null) ? textKeyPrefix + ((Enum<?>)e).name() : ((Enum<?>)e).name()));
+				
+			}
+		}
+		return resposta;
+	}
+	
 	public static HtmlOption getOneOptionForEnum(
 			Class<?> enumeracio,
 			String textKeyPrefix) {

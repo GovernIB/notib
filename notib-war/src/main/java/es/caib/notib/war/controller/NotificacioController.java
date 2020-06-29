@@ -881,9 +881,10 @@ public class NotificacioController extends BaseUserController {
 						ServeiTipusEnumDto.class,
 						"es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto."));
 		model.addAttribute("interessatTipus", 
-				EnumHelper.getOptionsForEnum(
+				EnumHelper.getOrderedOptionsForEnum(
 						InteressatTipusEnumDto.class,
-						"es.caib.notib.core.api.dto.interessatTipusEnumDto."));
+						"es.caib.notib.core.api.dto.interessatTipusEnumDto.",
+						new Enum<?>[] {InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.ADMINISTRACIO, InteressatTipusEnumDto.JURIDICA}));
 		model.addAttribute("entregaPostalTipus", 
 				EnumHelper.getOptionsForEnum(
 						NotificaDomiciliConcretTipusEnumDto.class,
