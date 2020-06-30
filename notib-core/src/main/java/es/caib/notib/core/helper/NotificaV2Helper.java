@@ -497,8 +497,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				envios.setTipoEnvio(new BigInteger("2"));
 				break;
 			}
-		
-			envios.setFechaEnvioProgramado(toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+			Date today = new Date();
+			Date todayWithZeroTime = formatter.parse(formatter.format(today));
+			
+			if (notificacio.getEnviamentDataProgramada()!= null && notificacio.getEnviamentDataProgramada().after(todayWithZeroTime))
+				envios.setFechaEnvioProgramado(toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
 			
 			envios.setConcepto(notificacio.getConcepte());
 			envios.setDescripcion(notificacio.getDescripcio());
