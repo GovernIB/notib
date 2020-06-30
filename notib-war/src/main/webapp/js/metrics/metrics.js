@@ -115,6 +115,7 @@ function drawTimersGraph(metricsData, missatges) {
 				"<div class='panel panel-default timers' data-id='" + timer.name + "' data-class='" + classTimer + "' data-nom='" + metricNameTimer + "' data-max-target='" + timer.count + "' data-max-timer='" + timer.max + "'>" +
 				"	<div class='panel-body timer-body'>" +
 				"		<div class='counterTitle'>" + timer.name + " (" + timer.count + " execucions)</div>" +
+				//"		<div style='width: 100%; margin-left: 8px;'><div style='width:"+pctPes+"%; background-color:red; height: 1px;'></div></div>"+
 				"		<canvas class='timerChart collapse' width='100' height='30'></canvas>"+
 				"	</div>" +
 				"	<div style='clear:both;'></div>"+

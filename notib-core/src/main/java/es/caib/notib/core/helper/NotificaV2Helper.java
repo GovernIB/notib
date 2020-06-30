@@ -503,9 +503,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			
 			if (notificacio.getEnviamentDataProgramada()!= null && notificacio.getEnviamentDataProgramada().after(todayWithZeroTime))
 				envios.setFechaEnvioProgramado(toXmlGregorianCalendar(notificacio.getEnviamentDataProgramada()));
+
+			envios.setConcepto(notificacio.getConcepte().replace('·', '.'));
+			if (notificacio.getDescripcio() != null)
+				envios.setDescripcion(notificacio.getDescripcio().replace('·', '.'));
 			
-			envios.setConcepto(notificacio.getConcepte());
-			envios.setDescripcion(notificacio.getDescripcio());
 			envios.setProcedimiento(notificacio.getProcedimentCodiNotib());
 			Documento  documento = new Documento();
 			if(notificacio.getDocument() != null && notificacio.getDocument().getArxiuGestdocId() != null) {

@@ -48,7 +48,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 				if (!validFormat(notificacio.getConcepte()).isEmpty()) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
-							MessageHelper.getInstance().getMessage("notificacio.form.valid.concepte", new Object[] {validFormat(notificacio.getConcepte()).toString()}))
+							MessageHelper.getInstance().getMessage("notificacio.form.valid.concepte", new Object[] {listToString(validFormat(notificacio.getConcepte()))}))
 					.addNode("concepte")
 					.addConstraintViolation();
 			    }
@@ -59,7 +59,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 				if (!validFormat(notificacio.getDescripcio()).isEmpty()) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
-							MessageHelper.getInstance().getMessage("notificacio.form.valid.descripcio", new Object[] {validFormat(notificacio.getDescripcio()).toString()}))
+							MessageHelper.getInstance().getMessage("notificacio.form.valid.descripcio", new Object[] {listToString(validFormat(notificacio.getDescripcio()))}))
 					.addNode("descripcio")
 					.addConstraintViolation();
 			    }
@@ -228,12 +228,12 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 	}
 	
 	private ArrayList<Character> validFormat(String value) {
-		String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;";
+		String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;·";
 		ArrayList<Character> charsNoValids = new ArrayList<Character>();
 		char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
 		
 		boolean esCaracterValid = true;
-		for (int i = 0; esCaracterValid && i < chars.length; i++) {
+		for (int i = 0; i < chars.length; i++) {
 			esCaracterValid = !(CONTROL_CARACTERS.indexOf(chars[i]) < 0);
 			if (!esCaracterValid) {
 				charsNoValids.add(chars[i]);
@@ -242,6 +242,14 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 		return charsNoValids;
 	}
 
+	private StringBuilder listToString(ArrayList<?> list) {
+	    StringBuilder str = new StringBuilder();
+	    for (int i = 0; i < list.size(); i++) {
+	    	str.append(list.get(i));
+	    }
+	    return str;
+	}
+	
 	private boolean isEmailValid(String email) {
 		boolean valid = true;
 		try {
