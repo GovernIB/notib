@@ -6,7 +6,7 @@ function drawLlegendaGraph(missatges) {
 	    data: {
 		    labels: ['4','2','5'],
 	        datasets: [{
-		            data: ['4','2','5'],  //Recupera les dades del json
+		            data: ['5','2','4'],  //Recupera les dades del json
 		            backgroundColor: [
 		                'rgba(114, 147, 203, 0.6)',
 		                'rgba(132, 186, 91, 0.6)',
@@ -45,13 +45,13 @@ function drawLlegendaGraph(missatges) {
 	                // and if you need to format how the value is displayed...
 	                formatter: function(value) {
 	                	switch (value) {
-	    				case '4':
+	    				case '5':
 	    					value = missatges[0];
 	    					break;
 	    				case '2':
 	    					value = missatges[1];
 	    					break;
-	    				case '5':
+	    				case '4':
 	    					value = missatges[2];
 	    					break;
 	    				}
@@ -162,7 +162,8 @@ function drawTimersGraph(metricsData, missatges) {
 		            xAxes: [{
 		            	ticks: {
 		            		display: false,
-		            		beginAtZero: true
+		            		beginAtZero: true,
+		            		suggestedMax: maxMax
 	                	}
 	            	}]
 		        }
