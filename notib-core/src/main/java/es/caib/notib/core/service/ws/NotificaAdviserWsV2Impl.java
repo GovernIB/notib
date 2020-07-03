@@ -327,7 +327,6 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 //				if (acusePDF.getContenido() != null && acusePDF.getContenido().length > 0) {
 				try {
 					logger.info("Guardant certificació acusament de rebut...");
-					
 					gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
 							PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
 							acusePDF.getContenido());
