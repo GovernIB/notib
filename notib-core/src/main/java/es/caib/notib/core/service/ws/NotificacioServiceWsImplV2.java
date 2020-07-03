@@ -163,17 +163,22 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			
 			RespostaAlta resposta = new RespostaAlta();
 			String emisorDir3Codi = notificacio.getEmisorDir3Codi();
+			logger.debug(">> [ALTA] emisorDir3Codi: " + emisorDir3Codi);
 			EntitatEntity entitat = entitatRepository.findByDir3Codi(emisorDir3Codi);
+			logger.debug(">> [ALTA] entitat: " + (entitat == null ? "null": (entitat.getCodi() + " - " + entitat.getNom())));
 			String usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+			logger.debug(">> [ALTA] usuariCodi: " + usuariCodi);
 			AplicacioEntity aplicacio = null;
 			if (entitat != null && usuariCodi != null)
 				aplicacio = aplicacioRepository.findByEntitatIdAndUsuariCodi(entitat.getId(), usuariCodi);
+			logger.debug(">> [ALTA] aplicacio: " + aplicacio == null ? "null" : aplicacio.getUsuariCodi());
 			
 			resposta = validarNotificacio(
 					notificacio,
 					emisorDir3Codi,
 					entitat,
 					aplicacio);
+			logger.debug(">> [ALTA] validacio: [error=" + resposta.isError() + ", estat=" + resposta.getEstat() + ", descripcio=" + resposta.getErrorDescripcio() + "]");
 			
 			if (resposta.isError()) {
 				integracioHelper.addAccioError(info, resposta.getErrorDescripcio());
@@ -186,18 +191,19 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						entitat);
 	
 				if(procediment != null) {
+					logger.debug(">> [ALTA] procediment: " + procediment.getNom());
 					if (procediment.isAgrupar() && notificacio.getGrupCodi() != null && !notificacio.getGrupCodi().isEmpty()) {
+						logger.debug(">> [ALTA] procediment amb grups");
 						// Llistat de procediments amb grups
 						List<GrupDto> grupsProcediment = grupService.findByProcedimentGrups(procediment.getId());
 						GrupDto grupNotificacio = grupService.findByCodi(
 								notificacio.getGrupCodi(),
 								entitat.getId());
 						if (grupNotificacio == null) {
-							if (!grupsProcediment.contains(grupNotificacio)) {
-								String errorDescripcio = "[1320] El grup indicat " + notificacio.getGrupCodi() + " no està definit dins NOTIB.";
-								integracioHelper.addAccioError(info, errorDescripcio);
-								return setRespostaError(errorDescripcio);
-							}
+							logger.debug(">> [ALTA] procediment grup: Sense grup");
+							String errorDescripcio = "[1320] El grup indicat " + notificacio.getGrupCodi() + " no està definit dins NOTIB.";
+							integracioHelper.addAccioError(info, errorDescripcio);
+							return setRespostaError(errorDescripcio);
 						}
 						if (grupsProcediment == null || grupsProcediment.isEmpty()) {
 							String errorDescripcio = "[1321] S'ha indicat un grup per les notificacions però el procediment " + notificacio.getProcedimentCodi() + " no té cap grup assignat.";
@@ -213,9 +219,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					}
 					String documentGesdocId = null;
 					if(notificacio.getDocument().getContingutBase64() != null) {
+						logger.debug(">> [ALTA] document contingut Base64");
 						documentGesdocId = pluginHelper.gestioDocumentalCreate(
 								PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 								Base64.decodeBase64(notificacio.getDocument().getContingutBase64()));
+						logger.debug(">> [ALTA] documentId: " + documentGesdocId);
 					}
 					
 					NotificaEnviamentTipusEnumDto enviamentTipus = null;
@@ -228,6 +236,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							enviamentTipus = NotificaEnviamentTipusEnumDto.NOTIFICACIO;
 							break;
 						}
+						logger.debug(">> [ALTA] enviament tipus: " + enviamentTipus);
 					}
 					
 					DocumentEntity documentEntity = null;
@@ -245,6 +254,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 								notificacio.getDocument().isNormalitzat(),  
 								notificacio.getDocument().getUuid(),
 								notificacio.getDocument().getCsv()).build());
+						logger.debug(">> [ALTA] document creat");
 					}		
 					//Comprovar si no hi ha una caducitat posar una per defecte (dia acutal + dies caducitat procediment)
 					if (notificacio.getCaducitat() != null) {
@@ -256,6 +266,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 								new Date(),
 								procediment.getCaducitat()));
 					}
+					
 					NotificacioEntity.BuilderV2 notificacioBuilder = NotificacioEntity.
 						getBuilderV2(
 							entitat,
@@ -276,11 +287,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						).document(documentEntity);
 						
 						NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioBuilder.build());
+						logger.debug(">> [ALTA] notificacio guardada");
+						
 						List<EnviamentReferencia> referencies = new ArrayList<EnviamentReferencia>();
 						for (Enviament enviament: notificacio.getEnviaments()) {
 							if (enviament.getTitular() == null) {
 								String errorDescripcio = "[1110] El camp 'titular' no pot ser null.";
 								integracioHelper.addAccioError(info, errorDescripcio);
+								logger.debug(">> [ALTA] Titular null");
 								return setRespostaError(errorDescripcio);
 							}
 							ServeiTipusEnumDto serveiTipus = null;
@@ -298,6 +312,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
 							NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
 							if (enviament.isEntregaPostalActiva() && enviament.getEntregaPostal() != null) {
+								logger.debug(">> [ALTA] Entrega postal");
 								if (enviament.getEntregaPostal().getTipus() != null) {
 									switch (enviament.getEntregaPostal().getTipus()) {
 									case APARTAT_CORREUS:
@@ -379,11 +394,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 											titular, 
 											destinataris)
 									.domiciliViaTipus(toEnviamentViaTipusEnum(viaTipus)).build());
+							logger.debug(">> [ALTA] enviament creat");
 							
 							String referencia;
 							try {
 								referencia = notificaHelper.xifrarId(enviamentSaved.getId());
+								logger.debug(">> [ALTA] referencia creada");
 							} catch (GeneralSecurityException ex) {
+								logger.debug(">> [ALTA] Error creant referència");
 								throw new RuntimeException(
 										"No s'ha pogut crear la referencia per al destinatari",
 										ex);
@@ -398,9 +416,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							referencies.add(enviamentReferencia);
 							notificacioGuardada.addEnviament(enviamentSaved);
 						}
+						logger.debug(">> [ALTA] enviaments creats");
 						
 						notificacioRepository.saveAndFlush(notificacioGuardada);
 						if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
+							logger.debug(">> [ALTA] notificació síncrona");
 							List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacioGuardada);
 							
 							List<NotificacioEnviamentDtoV2> enviaments = conversioTipusHelper.convertirList(
@@ -415,6 +435,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							}
 							
 						} else {
+							logger.debug(">> [ALTA] notificació assíncrona");
 							List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacioGuardada);
 							for (NotificacioEnviamentEntity enviament : enviamentsEntity) {
 								NotificacioEventEntity eventDatat = NotificacioEventEntity.getBuilder(
@@ -426,13 +447,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 								notificacioGuardada.updateEventAfegir(eventDatat);
 								notificacioEventRepository.saveAndFlush(eventDatat);
 							}
+							logger.debug(">> [ALTA] callbacks de client inicialitzats");
 							
 						}
 			
 						try {
 							resposta.setIdentificador(
 									notificaHelper.xifrarId(notificacioGuardada.getId()));
+							logger.debug(">> [ALTA] identificador creat");
 						} catch (GeneralSecurityException ex) {
+							logger.debug(">> [ALTA] Error creant identificador");
 							throw new RuntimeException(
 									"No s'ha pogut crear l'identificador de la notificació",
 									ex);
@@ -457,19 +481,23 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							break;
 						}
 						if (notificacioGuardada.getNotificaErrorEvent() != null) {
+							logger.debug(">> [ALTA] Event d'error de Notifica!: " + notificacioGuardada.getNotificaErrorEvent().getDescripcio() + " - " + notificacioGuardada.getNotificaErrorEvent().getErrorDescripcio());
 							resposta.setError(true);
 							resposta.setErrorDescripcio(
 									notificacioGuardada.getNotificaErrorEvent().getErrorDescripcio());
 						}
 						resposta.setReferencies(referencies);
+						logger.debug(">> [ALTA] afegides referències");
 						integracioHelper.addAccioOk(info);
 						return resposta;
 				} else {
+					logger.debug(">> [ALTA] Sense procediment");
 					String errorDescripcio = "[1330] No s'ha trobat cap procediment amb el codi indicat.";
 					integracioHelper.addAccioError(info, errorDescripcio);
 					return setRespostaError(errorDescripcio);
 				}
 			} catch (Exception ex) {
+				logger.error("Error creant notificació", ex);
 				integracioHelper.addAccioError(info, "Error creant la notificació", ex);
 				throw new RuntimeException(
 						"[NOTIFICACIO/COMUNICACIO] Hi ha hagut un error creant la " + notificacio.getEnviamentTipus().name() + ": " + ex.getMessage(),
@@ -1044,12 +1072,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			return setRespostaError("[1062] És necessari incloure un document a la notificació.");
 		}
 		if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
-			Long fileMaxSize = 10635049L; //10MB
 			byte[] base64Decoded = Base64.decodeBase64(notificacio.getDocument().getContingutBase64());
-			if (getMaxSizeFile() != null)
-				fileMaxSize = getMaxSizeFile();
 			if (base64Decoded.length > getMaxSizeFile()) {
-				return setRespostaError("[1063] La longitud del document supera el màxim definit (" + fileMaxSize + ").");
+				return setRespostaError("[1063] La longitud del document supera el màxim definit (" + getMaxSizeFile() / (1024*1024) + "Mb).");
 			}
 		}
 		// Usuari
@@ -1499,12 +1524,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	
 	private static Long getMaxSizeFile() {
 		String property = "es.caib.notib.notificacio.document.size";
-		logger.debug("Consulta del valor de la property (" +
-				"property=" + property + ")");
-		if (PropertiesHelper.getProperties().getProperty(property) != null)
-			return Long.valueOf(PropertiesHelper.getProperties().getProperty(property));
-		else
-			return null;
+		logger.debug("Consulta del valor de la property (property=" + property + ")");
+		return Long.valueOf(PropertiesHelper.getProperties().getProperty(property, "10485760"));
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceWsImplV2.class);
