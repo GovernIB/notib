@@ -36,6 +36,7 @@ import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioTipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
@@ -1265,12 +1266,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
 		enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
 		
-		switch (enviament.getRegistreEstat()) {
-		case OFICI_EXTERN:
+		if (enviament.getRegistreEstat() != null && enviament.getRegistreEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_EXTERN))
 			return pluginHelper.obtenirOficiExtern(enviament.getNotificacio().getEmisorDir3Codi(), enviament.getRegistreNumeroFormatat()).getJustificant();	
-		default:
+		else
 			return pluginHelper.obtenirJustificant(enviament.getNotificacio().getEmisorDir3Codi(), enviament.getRegistreNumeroFormatat()).getJustificant();
-		}
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(EnviamentServiceImpl.class);
