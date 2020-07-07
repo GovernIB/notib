@@ -1040,15 +1040,15 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		if (notificacio.getConcepte().length() > 240) {
 			return setRespostaError("[1031] El concepte de la notificació no pot tenir una longitud superior a 240 caràcters.");
 		}
-		if (!validConcepteDescripcio(notificacio.getConcepte())) {
-			return setRespostaError("[1032] El format del camp concepte no és correcte. (Inclou caràcters no permesos)");
+		if (!validFormat(notificacio.getConcepte()).isEmpty()) {
+			return setRespostaError("[1032] El format del camp concepte no és correcte. Inclou els caràcters ("+ listToString(validFormat(notificacio.getConcepte())) +") que no són correctes");
 		}
 		// Descripcio
 		if (notificacio.getDescripcio() != null && notificacio.getDescripcio().length() > 1000){
 			return setRespostaError("[1040] La descripció de la notificació no pot contenir més de 1000 caràcters.");
 		}
-		if (notificacio.getDescripcio() != null && !validConcepteDescripcio(notificacio.getDescripcio())) {
-			return setRespostaError("[1041] El format del camp descripció no és correcte.");
+		if (notificacio.getDescripcio() != null && !validFormat(notificacio.getDescripcio()).isEmpty()) {
+			return setRespostaError("[1041] El format del camp descripció no és correcte. Inclou els caràcters ("+ listToString(validFormat(notificacio.getDescripcio())) +") que no són correctes");
 		}
 		// Tipus d'enviament
 		if (notificacio.getEnviamentTipus() == null) {
@@ -1490,18 +1490,27 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 	}
 	
-	private boolean validConcepteDescripcio(String value) {
-		String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;";
-		char[] concepte_chars = value.toCharArray();
+	private ArrayList<Character> validFormat(String value) {
+		String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;·";
+		ArrayList<Character> charsNoValids = new ArrayList<Character>();
+		char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
 		
 		boolean esCaracterValid = true;
-		for (int i = 0; esCaracterValid && i < concepte_chars.length; i++) {
-			esCaracterValid = !(CONTROL_CARACTERS.indexOf(concepte_chars[i]) < 0);
+		for (int i = 0; i < chars.length; i++) {
+			esCaracterValid = !(CONTROL_CARACTERS.indexOf(chars[i]) < 0);
 			if (!esCaracterValid) {
-				break;
+				charsNoValids.add(chars[i]);
 			}
 	    }
-		return esCaracterValid;
+		return charsNoValids;
+	}
+
+	private StringBuilder listToString(ArrayList<?> list) {
+	    StringBuilder str = new StringBuilder();
+	    for (int i = 0; i < list.size(); i++) {
+	    	str.append(list.get(i));
+	    }
+	    return str;
 	}
 	
 	private boolean isEmailValid(String email) {
