@@ -110,6 +110,19 @@ public interface UsuariAplicacioService {
 	public AplicacioDto findByEntitatAndUsuariCodi(Long entitatId, String usuariCodi);
 	
 	/**
+	 * Consulta una aplicació a partir d'un text
+	 * 
+	 * @param text
+	 *            Text a cercar
+	 * @param entitatId
+	 * 			  Atribut id de la entitat a la que pertany l'apliació
+	 *            
+	 * @return L'aplicació que coincideix  amb el text introduït.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_SUPER')")
+	public AplicacioDto findByEntitatAndText(Long entitatId, String text);
+	
+	/**
 	 * Llistat amb totes les aplicacions paginades.
 	 * 
 	 * @param paginacioParams

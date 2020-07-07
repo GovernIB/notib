@@ -92,4 +92,10 @@ public class UsuariAplicacioServiceBean implements UsuariAplicacioService {
 		return delegate.findPaginatByEntitat(entitatId, paginacioParams);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN"})
+	public AplicacioDto findByEntitatAndText(Long entitatId, String text) {
+		return delegate.findByEntitatAndText(entitatId, text);
+	}
+
 }

@@ -261,6 +261,20 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 	
 	
 	private static final Logger logger = LoggerFactory.getLogger(UsuariAplicacioServiceImpl.class);
+
+	@Override
+	@Transactional(readOnly = true)
+	public AplicacioDto findByEntitatAndText(Long entitatId, String text) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consultant usuaris aplicació amb text (text=" + text + ")");
+			return conversioTipusHelper.convertir(
+					aplicacioRepository.findByText(text),
+					AplicacioDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
 	
 	
 }

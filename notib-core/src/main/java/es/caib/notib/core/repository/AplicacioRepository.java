@@ -3,6 +3,8 @@
  */
 package es.caib.notib.core.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.caib.notib.core.entity.AplicacioEntity;
+import es.caib.notib.core.entity.UsuariEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -43,5 +46,10 @@ public interface AplicacioRepository extends JpaRepository<AplicacioEntity, Long
 	
 	@Query("SELECT count(a) FROM AplicacioEntity a WHERE a.entitat.id = :entitatId")
 	public Long countByEntitatId(@Param("entitatId") Long entitatId);
+	
+	@Query(  "FROM AplicacioEntity a "
+			+ "WHERE lower(a.usuariCodi) like concat('%', lower(:text), '%') "
+			+ "ORDER BY a.usuariCodi desc")
+	public AplicacioEntity findByText(@Param("text") String text);
 
 }
