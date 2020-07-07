@@ -12,7 +12,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -330,7 +329,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					logger.info("Guardant certificació acusament de rebut...");
 					gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
 							PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
-							Base64.decodeBase64(acusePDF.getContenido()));
+							acusePDF.getContenido());
 				} catch (Exception ex) {
 					logger.error("No s'ha pogut guardar la certificació a la gestió documental", ex);
 				}

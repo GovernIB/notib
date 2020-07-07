@@ -88,7 +88,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			// Validació de document
 			switch (notificacio.getTipusDocument()) {
 			case ARXIU:
-				Long fileMaxSize = 10635049L; //10MB
+				Long fileMaxSize = 10485760L; //10MB
 				String [] formatsDisponibles = {"application/pdf", "application/zip", "application/x-zip-compressed"};
 				if (aplicacioService.propertyGet("es.caib.notib.notificacio.document.size") != null)
 					fileMaxSize = Long.valueOf(aplicacioService.propertyGet("es.caib.notib.notificacio.document.size"));

@@ -5,6 +5,8 @@ package es.caib.notib.core.api.ws.notificacio;
 
 import java.util.List;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
@@ -76,4 +78,8 @@ public class Enviament {
 		this.serveiTipus = serveiTipus;
 	}
 
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
+	}
 }
