@@ -337,37 +337,32 @@ $(document).ready(function() {
 				</div>
 				</c:if>
 				<c:if test="${not empty notificacio.enviaments}">
+				
+					<c:forEach items="${notificacio.enviaments}" var="enviament" varStatus="status">
 						<div class="panel panel-default">
 							<div class="panel-heading">
 								<h3 class="panel-title">
-									<strong><spring:message code="notificacio.info.seccio.enviaments" /></strong>
+									<strong><spring:message code="notificacio.info.seccio.enviaments" /> ${status.index + 1}</strong>
 								</h3>
 							</div>
 							<table class="table teble-striped table-bordered">
-				    			<thead>
-				    			<tr>
-				    				<th>Nº</th>
-									<th><spring:message code="notificacio.list.enviament.list.titular"/></th>
-					    			<th><spring:message code="notificacio.list.enviament.list.destinataris"/></th>
-					    			<th><spring:message code="notificacio.list.enviament.list.estat"/></th>
-					    			<th><spring:message code="enviament.info.seccio.notifica.registre"/></th>
-					    			<th><spring:message code="enviament.info.seccio.notifica.certificacio"/></th>
-				    			</tr>
-								</thead>
-								<c:forEach items="${notificacio.enviaments}" var="enviament" varStatus="status">
 									<tbody>
 										<tr>
+											<th><spring:message code="notificacio.list.enviament.list.titular"/></th>
 											<td>
-												${status.index + 1}
+												<c:choose>
+													<c:when test="${not empty enviament.titular.nom}">${enviament.titular.nom}</c:when>
+													<c:otherwise>${enviament.titular.raoSocial}</c:otherwise>
+												</c:choose>
+												${enviament.titular.llinatge1}
+												${enviament.titular.llinatge2}
+												<c:if test="${not empty enviament.titular.nif}">
+													 (${enviament.titular.nif})
+												</c:if>
 											</td>
-											<td>
-											<c:choose>
-												<c:when test="${not empty enviament.titular.nom}">${enviament.titular.nom}</c:when>
-												<c:otherwise>${enviament.titular.raoSocial}</c:otherwise>
-											</c:choose>
-											${enviament.titular.llinatge1}
-											${enviament.titular.llinatge2}
-											</td>
+										</tr>
+						    			<tr>
+							    			<th><spring:message code="notificacio.list.enviament.list.destinataris"/></th>
 							    			<td>
 							    			<c:choose>
 							    			<c:when test="${not empty enviament.destinataris}">
@@ -384,9 +379,12 @@ $(document).ready(function() {
 							    			</c:otherwise>
 							    			</c:choose>
 							    			</td>
-							    			<td>
+							    		</tr>
+						    			<tr>
+							    			<th><spring:message code="enviament.info.seccio.notifica.registre"/></th>
+							    			<%--<td>
 							    			<spring:message code="es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.${enviament.notificaEstat}"/>
-							    			</td>
+							    			</td>--%>
 							    			<c:choose>
 							    				<c:when test="${not empty enviament.registreNumeroFormatat}">
 													<td>
@@ -438,6 +436,9 @@ $(document).ready(function() {
 							    					<td><spring:message code="notificacio.list.enviament.list.noregistrat"/></td>
 							    				</c:otherwise>
 							    			</c:choose>
+							    		</tr>
+						    			<tr>
+							    			<th><spring:message code="enviament.info.seccio.notifica.certificacio"/></th>
 						    				<c:choose>
 						    				<c:when test="${not empty enviament.notificaCertificacioData}">
 							    				<td>
@@ -501,19 +502,19 @@ $(document).ready(function() {
 															</c:if>
 														</tbody>
 													</table>
-							    				</td>
-							    			</c:when>
-							    			<c:otherwise>
-							    				<td>
-							    				<spring:message code="notificacio.list.enviament.list.sensecertificacio"/>
-							    				</td>
-							    			</c:otherwise>
-						    				</c:choose>
+								    			</td>
+								    		</c:when>
+								    		<c:otherwise>
+								    			<td>
+								    				<spring:message code="notificacio.list.enviament.list.sensecertificacio"/>
+								    			</td>
+								    		</c:otherwise>
+							    			</c:choose>
 						    			</tr>
 									</tbody>
-								</c:forEach>
 							</table>
 						</div>
+					</c:forEach>
 				</c:if>
 		</div>
 		<div role="tabpanel"

@@ -829,7 +829,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 	}
 
-	@Transactional(readOnly = true)
+	@Transactional
 	@Override
 	public void grupDelete(
 			Long entitatId, 
@@ -856,7 +856,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 
 	
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional
 	public void permisDelete(
 			Long entitatId,
 			Long id,
