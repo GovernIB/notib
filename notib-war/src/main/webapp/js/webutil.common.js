@@ -151,7 +151,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 				if ($(this).data("toggle") == "suggest") {
 					$(this).val(null).trigger("change");
 				} else {
-					$(this).select2({theme: "bootstrap"}).trigger("change");
+					$(this).webutilInputSelect2().trigger("change");
 				}
 		});
 	}
