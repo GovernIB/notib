@@ -171,7 +171,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			AplicacioEntity aplicacio = null;
 			if (entitat != null && usuariCodi != null)
 				aplicacio = aplicacioRepository.findByEntitatIdAndUsuariCodi(entitat.getId(), usuariCodi);
-			logger.debug(">> [ALTA] aplicacio: " + aplicacio == null ? "null" : aplicacio.getUsuariCodi());
+			logger.debug(">> [ALTA] aplicacio: " + (aplicacio == null ? "null" : aplicacio.getUsuariCodi()));
 			
 			resposta = validarNotificacio(
 					notificacio,
