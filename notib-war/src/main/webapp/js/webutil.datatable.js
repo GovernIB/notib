@@ -110,7 +110,6 @@
 						$('span', $cell).click(function() {
 							$(this).parent().trigger('click');
 						});
-						console.log($cell);
 					}
 					if (plugin.settings.dragEnabled) {
 						var $cell;
