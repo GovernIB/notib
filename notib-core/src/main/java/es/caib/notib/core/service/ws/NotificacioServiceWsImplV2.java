@@ -217,14 +217,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							}
 						}
 					}
-					String documentGesdocId = null;
-					if(notificacio.getDocument().getContingutBase64() != null) {
-						logger.debug(">> [ALTA] document contingut Base64");
-						documentGesdocId = pluginHelper.gestioDocumentalCreate(
-								PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-								Base64.decodeBase64(notificacio.getDocument().getContingutBase64()));
-						logger.debug(">> [ALTA] documentId: " + documentGesdocId);
-					}
 					
 					NotificaEnviamentTipusEnumDto enviamentTipus = null;
 					if (notificacio.getEnviamentTipus() != null) {
@@ -238,7 +230,35 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						}
 						logger.debug(">> [ALTA] enviament tipus: " + enviamentTipus);
 					}
-					
+
+					// DOCUMENT: Comprovam si el document és vàlid
+					String documentGesdocId = null;
+					try {
+						if(notificacio.getDocument().getContingutBase64() != null) {
+							logger.debug(">> [ALTA] document contingut Base64");
+							documentGesdocId = pluginHelper.gestioDocumentalCreate(
+									PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
+									Base64.decodeBase64(notificacio.getDocument().getContingutBase64()));
+							logger.debug(">> [ALTA] documentId: " + documentGesdocId);
+						} else if (notificacio.getDocument().getUuid() != null) {
+							String arxiuUuid = notificacio.getDocument().getUuid();
+							logger.debug(">> [ALTA] documentUuid: " + arxiuUuid);
+							pluginHelper.arxiuGetImprimible(arxiuUuid, true);
+						} else if (notificacio.getDocument().getCsv() != null) {
+							String arxiuCsv = notificacio.getDocument().getCsv();
+							logger.debug(">> [ALTA] documentCsv: " + arxiuCsv);
+							pluginHelper.arxiuGetImprimible(arxiuCsv, false);
+						} else if (notificacio.getDocument().getUrl() != null) {
+							String arxiuUrl = notificacio.getDocument().getUrl();
+							logger.debug(">> [ALTA] documentUrl: " + arxiuUrl);
+							pluginHelper.getUrlDocumentContent(arxiuUrl);
+						}
+					} catch (Exception e) {
+						logger.error("Error al obtenir el document", e);
+						String errorDescripcio = "[1064] No s'ha pogut obtenir el document a notificar: " + e.getMessage();
+						integracioHelper.addAccioError(info, errorDescripcio);
+						return setRespostaError(errorDescripcio);
+					}
 					DocumentEntity documentEntity = null;
 					if(notificacio.getDocument().getCsv() != null || 
 					   notificacio.getDocument().getUuid() != null || 
@@ -909,6 +929,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1061 | El camp 'arxiuNom' del document no pot ser null
 	// 1062 | És necessari incloure un document a la notificació
 	// 1063 | La longitud del document supera el màxim definit
+	// 1064 | No s'ha pogut obtenir el document a notificar
 	// 1070 | El camp 'usuariCodi' no pot ser null (Requisit per fer el registre de sortida)
 	// 1071 | El camp 'usuariCodi' no pot pot tenir una longitud superior a 64 caràcters
 	// 1072 | El camp 'arxiuNom' no pot pot tenir una longitud superior a 200 caràcters."

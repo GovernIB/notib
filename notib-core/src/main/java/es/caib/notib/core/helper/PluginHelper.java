@@ -1016,7 +1016,8 @@ public class PluginHelper {
 				&& (documentDto.getCsv() == null || documentDto.getCsv().isEmpty()) 
 				&& (documentDto.getContingutBase64() == null || documentDto.getContingutBase64().isEmpty())) {
 			document.setNom(documentDto.getUrl());
-			document.setArxiuNom(documentDto.getUrl());
+			document.setArxiuNom(documentDto.getArxiuNom());
+			document.setArxiuContingut(getUrlDocumentContent(documentDto.getUrl()));
 			document.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
 			document.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO.getValor());
 			document.setOrigen(RegistreOrigenEnum.ADMINISTRACIO.getValor());
@@ -1081,7 +1082,8 @@ public class PluginHelper {
 			}
 		} else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
 			annex.setNom(document.getUrl());
-			annex.setArxiuNom(document.getUrl());
+			annex.setArxiuNom(document.getArxiuNom());
+			annex.setArxiuContingut(getUrlDocumentContent(document.getUrl()));
 			annex.setTipusDocument(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI);
 			annex.setTipusDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO);
 			annex.setOrigen(RegistreOrigenDtoEnum.ADMINISTRACIO);
@@ -1155,32 +1157,7 @@ public class PluginHelper {
 				path = new File(document.getArxiuNom()).toPath(); 
 			}else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
 				annex = new AnexoWsDto();
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				InputStream is = null;
-				try {
-					URL url = new URL(document.getUrl());
-	
-					is = url.openStream();
-					byte[] byteChunk = new byte[4096]; // Or whatever size you want to read in at a time.
-					int n;
-	
-					while ((n = is.read(byteChunk)) > 0) {
-						baos.write(byteChunk, 0, n);
-					}
-				} catch (IOException e) {
-					System.err.printf("Failed while reading bytes from %s: %s", document.getUrl(), e.getMessage());
-					e.printStackTrace();
-					// Perform any other exception handling that's appropriate.
-				} finally {
-					if (is != null) {
-						try {
-							is.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-				annex.setFicheroAnexado(baos.toByteArray());
+				annex.setFicheroAnexado(getUrlDocumentContent(document.getUrl()));
 				annex.setNombreFicheroAnexado(FilenameUtils.getName(document.getUrl()));
 				
 				//Metadades
@@ -1222,6 +1199,34 @@ public class PluginHelper {
 			e1.printStackTrace();
 		}
 		return null;
+	}
+	
+	public byte[] getUrlDocumentContent(String urlPath) throws SistemaExternException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		InputStream is = null;
+		try {
+			URL url = new URL(urlPath);
+
+			is = url.openStream();
+			byte[] byteChunk = new byte[4096]; // Or whatever size you want to read in at a time.
+			int n;
+
+			while ((n = is.read(byteChunk)) > 0) {
+				baos.write(byteChunk, 0, n);
+			}
+			return baos.toByteArray();
+		} catch (Exception e) {
+			logger.error("Error al obtenir document de la URL: " + urlPath, e);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, "Error al obtenir document de la URL: " + urlPath);
+		} finally {
+			if (is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 	
 	private RegistreSortida toRegistreSortida(
