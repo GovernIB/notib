@@ -157,7 +157,6 @@
 var interessatsTipus = new Array();
 var interessatTipusOptions = "";
 <c:forEach items="${interessatTipus}" var="it" varStatus="status">
-	console.log(${status.index == 1})
    	interessatTipusOptions = interessatTipusOptions + "<option value=${it.value}" + (${status.index == 0} ? " selected='selected'" : "") + "><spring:message code='${it.text}'/></option>";
 </c:forEach>
 
@@ -469,6 +468,7 @@ function addDestinatari(enviament_id) {
 	if (!isMultiple) {
     	$("div[class*=' personaForm_" + num_enviament + "']").closest('div.destinatari').find('.addDestinatari').addClass('hidden');
     }
+	$('.interessat').trigger('change');
 }
 
 function replaceAll(string, search, replace) {

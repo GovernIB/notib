@@ -151,7 +151,12 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 				if ($(this).data("toggle") == "suggest") {
 					$(this).val(null).trigger("change");
 				} else {
-					$(this).select2({theme: "bootstrap"}).trigger("change");
+					$(this).select2({
+					    placeholder: $(this).data('placeholder'),
+					    theme: "bootstrap",
+					    allowClear: $(this).data('placeholder') ? true : false,
+					    minimumResultsForSearch: $(this).data('minimumresults')
+					});
 				}
 		});
 	}

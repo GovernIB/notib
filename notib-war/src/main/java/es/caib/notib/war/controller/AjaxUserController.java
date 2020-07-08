@@ -17,8 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.caib.notib.core.api.dto.AplicacioDto;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.UsuariAplicacioService;
 import es.caib.notib.war.helper.EnumHelper.HtmlOption;
 
 /**
@@ -32,6 +35,8 @@ public class AjaxUserController extends BaseUserController {
 
 	@Autowired
 	private AplicacioService aplicacioService;
+	@Autowired
+	private UsuariAplicacioService usuariAplicacioService;
 	
 	@RequestMapping(value = "/usuariDades/{codi}", method = RequestMethod.GET)
 	@ResponseBody
@@ -53,8 +58,20 @@ public class AjaxUserController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable String text,
 			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		List<UsuariDto> usuaris = new ArrayList<UsuariDto>();
 		try {
-			return aplicacioService.findUsuariAmbText(text);
+			List<UsuariDto> usuarisWeb = aplicacioService.findUsuariAmbText(text);
+			usuaris.addAll(usuarisWeb);
+			
+			AplicacioDto aplicacio = usuariAplicacioService.findByEntitatAndText(entitatActual.getId(), text);
+			if (aplicacio != null) {
+				UsuariDto usuariAplciacio = new UsuariDto();
+				usuariAplciacio.setCodi(aplicacio.getUsuariCodi());
+				usuariAplciacio.setNom(aplicacio.getUsuariCodi());
+				usuaris.add(usuariAplciacio);
+			}
+			return usuaris;
 		} catch (Exception ex) {
 			logger.error("Error al consultar la informació dels usuaris amb el filtre \"" + text + "\"", ex);
 			return new ArrayList<UsuariDto>();
