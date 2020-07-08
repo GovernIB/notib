@@ -928,8 +928,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1060 | El camp 'document' no pot ser null
 	// 1061 | El camp 'arxiuNom' del document no pot ser null
 	// 1062 | És necessari incloure un document a la notificació
-	// 1063 | La longitud del document supera el màxim definit
+	// 1063 | El format del document no és vàlid. Els formats vàlids són PDF i ZIP.
 	// 1064 | No s'ha pogut obtenir el document a notificar
+	// 1065 | La longitud del document supera el màxim definit
 	// 1070 | El camp 'usuariCodi' no pot ser null (Requisit per fer el registre de sortida)
 	// 1071 | El camp 'usuariCodi' no pot pot tenir una longitud superior a 64 caràcters
 	// 1072 | El camp 'arxiuNom' no pot pot tenir una longitud superior a 200 caràcters."
@@ -1094,8 +1095,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 		if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
 			byte[] base64Decoded = Base64.decodeBase64(notificacio.getDocument().getContingutBase64());
+			if (!isFormatValid(document.getContingutBase64()))
+				return setRespostaError("[1063] El format del document no és vàlid. Els formats vàlids són PDF i ZIP.");
 			if (base64Decoded.length > getMaxSizeFile()) {
-				return setRespostaError("[1063] La longitud del document supera el màxim definit (" + getMaxSizeFile() / (1024*1024) + "Mb).");
+				return setRespostaError("[1065] La longitud del document supera el màxim definit (" + getMaxSizeFile() / (1024*1024) + "Mb).");
 			}
 		}
 		// Usuari
@@ -1542,6 +1545,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		} catch (Exception e) {
 			valid = false; //no vàlid
 		}
+		return valid;
+	}
+	
+	private boolean isFormatValid(String docBase64) {
+		boolean valid = true;
+		String[] formatsValids = {"JVBERi0","UEsDBBQAAAAIA"}; //PDF / ZIP
+		
+		if (!(docBase64.startsWith(formatsValids[0]) || docBase64.startsWith(formatsValids[1])))
+			valid = false;
+		
 		return valid;
 	}
 	
