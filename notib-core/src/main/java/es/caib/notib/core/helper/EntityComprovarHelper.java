@@ -4,6 +4,7 @@
 package es.caib.notib.core.helper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.PermissionDeniedException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -785,6 +787,51 @@ public class EntityComprovarHelper {
 				ProcedimentDto.class);
 		
 		return resposta;
+	}
+	
+	@Cacheable(value = "getPermisosEntitatsUsuariActual", key="#auth.name")
+	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual(Authentication auth) {
+//		System.out.println("Obtenim i posam en cache els permisos de " + auth.getName());
+		List<EntitatEntity> entitatsEntity = entitatRepository.findAll();
+		Map<RolEnumDto, Boolean> hasPermisos = new HashMap<RolEnumDto, Boolean>();
+		
+		Boolean hasPermisUsuariEntitat = permisosHelper.isGrantedAny(
+				entitatsEntity, 
+				new ObjectIdentifierExtractor<EntitatEntity>() {
+					public Long getObjectIdentifier(EntitatEntity entitatEntity) {
+						return entitatEntity.getId();
+					}
+				}, 
+				EntitatEntity.class, 
+				new Permission[] {ExtendedPermission.USUARI}, 
+				auth);
+		Boolean hasPermisAdminEntitat = permisosHelper.isGrantedAny(
+				entitatsEntity, 
+				new ObjectIdentifierExtractor<EntitatEntity>() {
+					public Long getObjectIdentifier(EntitatEntity entitatEntity) {
+						return entitatEntity.getId();
+					}
+				}, 
+				EntitatEntity.class, 
+				new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT}, 
+				auth);		
+		Boolean hasPermisAplicacioEntitat = permisosHelper.isGrantedAny(
+				entitatsEntity, 
+				new ObjectIdentifierExtractor<EntitatEntity>() {
+					public Long getObjectIdentifier(EntitatEntity entitatEntity) {
+						return entitatEntity.getId();
+					}
+				}, 
+				EntitatEntity.class, 
+				new Permission[] {ExtendedPermission.APLICACIO}, 
+				auth);		
+		
+		hasPermisos.put(RolEnumDto.NOT_USER, hasPermisUsuariEntitat);
+		hasPermisos.put(RolEnumDto.NOT_ADMIN, hasPermisAdminEntitat);
+		hasPermisos.put(RolEnumDto.NOT_APL, hasPermisAplicacioEntitat);
+		
+		return hasPermisos;
+		
 	}
 	
 	public List<EntitatDto> findPermisEntitat(

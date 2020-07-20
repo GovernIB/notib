@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
 
 /**
  * Utilitat per a gestionar el canvi de rol de l'usuari actual.
@@ -19,10 +20,10 @@ import es.caib.notib.core.api.dto.EntitatDto;
  */
 public class RolHelper {
 
-	private static final String ROLE_SUPER = "NOT_SUPER";
-	private static final String ROLE_ADMIN_ENTITAT = "NOT_ADMIN";
-	private static final String ROLE_USUARI = "NOT_USER";
-	private static final String ROLE_APLICACIO = "NOT_APL";
+	private static final String ROLE_SUPER = RolEnumDto.NOT_SUPER.name(); 			// "NOT_SUPER";
+	private static final String ROLE_ADMIN_ENTITAT = RolEnumDto.NOT_ADMIN.name(); 	// "NOT_ADMIN";
+	private static final String ROLE_USUARI = RolEnumDto.NOT_USER.name(); 			// "NOT_USER";
+	private static final String ROLE_APLICACIO = RolEnumDto.NOT_APL.name(); 		// "NOT_APL";
 
 	private static final String REQUEST_PARAMETER_CANVI_ROL = "canviRol";
 	private static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";

@@ -129,6 +129,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 							DadesUsuari.class);
 				}
 			}
+			cacheHelper.evictGetPermisosEntitatsUsuariActual(auth);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -292,6 +293,20 @@ public class AplicacioServiceImpl implements AplicacioService {
 			logger.debug("Consulta del valor de la property (" +
 					"property=" + property + ")");
 			return PropertiesHelper.getProperties().getProperty(property);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	public String propertyGet(String property, String defaultValue) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta del valor de la property (property=" + property + ", default=" + defaultValue + ")");
+			String propertyValue = PropertiesHelper.getProperties().getProperty(property);
+			if (propertyValue == null || propertyValue.trim().isEmpty())
+				return defaultValue;
+			return propertyValue;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

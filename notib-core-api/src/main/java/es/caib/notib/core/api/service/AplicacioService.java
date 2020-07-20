@@ -143,6 +143,18 @@ public interface AplicacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public String propertyGet(String property);
+	
+	/**
+	 * Retorna el valor d'un paràmetre de configuració de l'aplicació.
+	 * 
+	 * @param property
+	 *             El codi del paràmetre
+	 * @param defaultValue
+	 *             El valor per defecte en cas que el paràmetre no s'hagi definit
+	 * @return el valor del paràmetre
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public String propertyGet(String property, String defaultValue);
 
 	/**
 	 * Retorna el valor d'un paràmetre de configuració de l'aplicació.

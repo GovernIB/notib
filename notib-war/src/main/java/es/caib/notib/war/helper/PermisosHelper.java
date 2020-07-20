@@ -5,12 +5,14 @@ package es.caib.notib.war.helper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
@@ -54,15 +56,19 @@ public class PermisosHelper {
 			HttpServletRequest request,
 			EntitatService entitatService) {
 		//Comprovar si té permisos sobre alguna entitat
+		Map<RolEnumDto, Boolean> permisos = entitatService.getPermisosEntitatsUsuariActual();
 		request.setAttribute(
-				"permisUsuariEntitat", 
-				entitatService.hasPermisUsuariEntitat());
+				"permisUsuariEntitat",
+				permisos.get(RolEnumDto.NOT_USER));
+//				entitatService.hasPermisUsuariEntitat());
 		request.setAttribute(
-				"permisAdminEntitat", 
-				entitatService.hasPermisAdminEntitat());
+				"permisAdminEntitat",
+				permisos.get(RolEnumDto.NOT_ADMIN));
+//				entitatService.hasPermisAdminEntitat());
 		request.setAttribute(
-				"permisAplicacioEntitat", 
-				entitatService.hasPermisAplicacioEntitat());
+				"permisAplicacioEntitat",
+				permisos.get(RolEnumDto.NOT_APL));
+//				entitatService.hasPermisAplicacioEntitat());
 
 	}
 }

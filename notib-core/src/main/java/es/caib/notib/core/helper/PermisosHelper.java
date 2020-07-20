@@ -182,6 +182,25 @@ public class PermisosHelper {
 				it.remove();
 		}
 	}
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public boolean isGrantedAny(
+			Collection<?> objects,
+			ObjectIdentifierExtractor objectIdentifierExtractor,
+			Class<?> clazz,
+			Permission[] permissions,
+			Authentication auth) {
+		Iterator<?> it = objects.iterator();
+		while (it.hasNext()) {
+			Long objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
+			if (isGrantedAny(
+					objectIdentifier,
+					clazz,
+					permissions,
+					auth))
+				return true;
+		}
+		return false;
+	}
 	public boolean isGrantedAny(
 			Long objectIdentifier,
 			Class<?> clazz,

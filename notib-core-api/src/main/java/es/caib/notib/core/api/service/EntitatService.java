@@ -6,6 +6,7 @@ package es.caib.notib.core.api.service;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -13,6 +14,7 @@ import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -177,6 +179,13 @@ public interface EntitatService {
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public boolean hasPermisAplicacioEntitat();
 	
+	/**
+	 * Comprova si l'usuari acutal té permisos a l'entitat actual
+	 * 
+	 * @return El un booleà per a cada rol: Usuari, Administrador d'entitats i Aplicació.
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual();
 	/**
 	 * Consulta els permisos de l'entitat.
 	 * 

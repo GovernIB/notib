@@ -115,6 +115,12 @@ public class AplicacioServiceBean implements AplicacioService {
 	public String propertyGet(String property) {
 		return delegate.propertyGet(property);
 	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	public String propertyGet(String property, String defaultValue) {
+		return delegate.propertyGet(property, defaultValue);
+	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})

@@ -604,11 +604,11 @@ public class PluginHelper {
 		
 		try {
 			List<String> rols = getDadesUsuariPlugin().consultarRolsAmbCodi(usuariCodi);
-			integracioHelper.addAccioOk(info);
+			integracioHelper.addAccioOk(info, false);
 			return rols;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
-			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			integracioHelper.addAccioError(info, errorDescripcio, ex, false);
 			throw new SistemaExternException(
 					IntegracioHelper.INTCODI_USUARIS,
 					errorDescripcio,
@@ -627,11 +627,11 @@ public class PluginHelper {
 		
 		try {
 			DadesUsuari dadesUsuari = getDadesUsuariPlugin().consultarAmbCodi(usuariCodi);
-			integracioHelper.addAccioOk(info);
+			integracioHelper.addAccioOk(info, false);
 			return dadesUsuari;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
-			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			integracioHelper.addAccioError(info, errorDescripcio, ex, false);
 			throw new SistemaExternException(
 					IntegracioHelper.INTCODI_USUARIS,
 					errorDescripcio,
@@ -651,11 +651,11 @@ public class PluginHelper {
 		try {
 			List<DadesUsuari> dadesUsuari = getDadesUsuariPlugin().consultarAmbGrup(
 					grupCodi);
-			integracioHelper.addAccioOk(info);
+			integracioHelper.addAccioOk(info, false);
 			return dadesUsuari;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
-			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			integracioHelper.addAccioError(info, errorDescripcio, ex, false);
 			throw new SistemaExternException(
 					IntegracioHelper.INTCODI_USUARIS,
 					errorDescripcio,

@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -28,6 +29,7 @@ import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.service.EntitatService;
@@ -528,6 +530,18 @@ public class EntitatServiceImpl implements EntitatService {
 					);
 			
 			return (resposta.isEmpty()) ? false : true;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//			System.out.println("Obtenim els permisos de " + auth.getName());
+			return entityComprovarHelper.getPermisosEntitatsUsuariActual(auth);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

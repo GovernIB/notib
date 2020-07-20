@@ -88,6 +88,11 @@ public class IntegracioHelper {
 	}
 
 	public void addAccioOk(IntegracioInfo info) {
+		addAccioOk(info, true);
+	}
+	public void addAccioOk(
+			IntegracioInfo info,
+			boolean obtenirUsuari) {
 		IntegracioAccioDto accio = new IntegracioAccioDto();
 		accio.setIntegracio(novaIntegracio(info.getCodi()));
 		accio.setData(new Date());
@@ -98,7 +103,8 @@ public class IntegracioHelper {
 		accio.setEstat(IntegracioAccioEstatEnumDto.OK);
 		addAccio(
 				info.getCodi(),
-				accio);
+				accio,
+				obtenirUsuari);
 	}
 	public void addAccioError(
 			IntegracioInfo info,
@@ -106,12 +112,34 @@ public class IntegracioHelper {
 		addAccioError(
 				info,
 				errorDescripcio,
-				null);
+				null,
+				true);
+	}
+	public void addAccioError(
+			IntegracioInfo info,
+			String errorDescripcio,
+			boolean obtenirUsuari) {
+		addAccioError(
+				info,
+				errorDescripcio,
+				null,
+				obtenirUsuari);
 	}
 	public void addAccioError(
 			IntegracioInfo info,
 			String errorDescripcio,
 			Throwable throwable) {
+		addAccioError(
+				info,
+				errorDescripcio,
+				throwable,
+				true);
+	}
+	public void addAccioError(
+			IntegracioInfo info,
+			String errorDescripcio,
+			Throwable throwable,
+			boolean obtenirUsuari) {
 		IntegracioAccioDto accio = new IntegracioAccioDto();
 		accio.setIntegracio(novaIntegracio(info.getCodi()));
 		accio.setData(new Date());
@@ -129,7 +157,8 @@ public class IntegracioHelper {
 		}
 		addAccio(
 				info.getCodi(),
-				accio);
+				accio,
+				obtenirUsuari);
 		logger.debug("Error d'integracio " + info.getDescripcio() + ": " + errorDescripcio + "("
 				+ "integracioCodi=" + info.getCodi() + ", "
 				+ "parametres=" + info.getParams() + ", "
@@ -170,8 +199,9 @@ public class IntegracioHelper {
 
 	private void addAccio(
 			String integracioCodi,
-			IntegracioAccioDto accio) {
-		afegirParametreUsuari(accio);
+			IntegracioAccioDto accio,
+			boolean obtenirUsuari) {
+		afegirParametreUsuari(accio, obtenirUsuari);
 		LinkedList<IntegracioAccioDto> accions = getLlistaAccions(integracioCodi);
 		int max = getMaxAccions(integracioCodi);
 		while (accions.size() >= max) {
@@ -183,15 +213,20 @@ public class IntegracioHelper {
 	}
 	
 	private void afegirParametreUsuari(
-			IntegracioAccioDto accio) {
+			IntegracioAccioDto accio,
+			boolean obtenirUsuari) {
 		String usuariNomCodi = "";
-		UsuariEntity usuari = null;
-		try {
-			usuari = usuariHelper.getUsuariAutenticat();
-		} catch (Exception e) {}
-		if (usuari != null) {
-			usuariNomCodi = usuari.getNom() + " (" + usuari.getCodi() + ")";
-		} else {
+		if (obtenirUsuari) {
+			UsuariEntity usuari = null;
+			try {
+				usuari = usuariHelper.getUsuariAutenticat();
+			} catch (Exception e) {}
+			if (usuari != null) {
+				usuariNomCodi = usuari.getNom() + " (" + usuari.getCodi() + ")";
+			}
+		}
+		
+		if (usuariNomCodi.isEmpty()) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			if (auth != null)
 				usuariNomCodi = auth.getName();

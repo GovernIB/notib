@@ -6,6 +6,7 @@ package es.caib.notib.core.ejb;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -18,6 +19,7 @@ import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -156,5 +158,10 @@ public class EntitatServiceBean implements EntitatService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public TipusDocumentEnumDto findTipusDocumentDefaultByEntitat(Long entitatId) {
 		return delegate.findTipusDocumentDefaultByEntitat(entitatId);
+	}
+
+	@Override
+	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual() {
+		return delegate.getPermisosEntitatsUsuariActual();
 	}
 }

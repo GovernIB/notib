@@ -133,6 +133,12 @@ public class CacheHelper {
 	public void evictFindOrganismesByEntitat(String entitatcodi) {
 	}
 	
+	@CacheEvict(value = "getPermisosEntitatsUsuariActual", key="#auth.name")
+	public void evictGetPermisosEntitatsUsuariActual(Authentication auth) {
+//		System.out.println("Esborram cache permisos de " + auth.getName());
+	}
+	
+	
 	private static final Logger logger = LoggerFactory.getLogger(CacheHelper.class);
 
 }
