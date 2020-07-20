@@ -643,12 +643,14 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		InteresadoWs interessat = new InteresadoWs();
 		
 		if(interesadoWsDto.getInteresado() != null) {
+			String nom = interesadoWsDto.getInteresado().getNombre();
+			String raoSocial = interesadoWsDto.getInteresado().getRazonSocial();
 			DatosInteresadoWs interessatDades = new DatosInteresadoWs();
 			interessatDades.setTipoInteresado(interesadoWsDto.getInteresado().getTipoInteresado().longValue());
 			interessatDades.setTipoDocumentoIdentificacion(interesadoWsDto.getInteresado().getTipoDocumentoIdentificacion());
 			interessatDades.setDocumento(interesadoWsDto.getInteresado().getDocumento());
-			interessatDades.setRazonSocial(interesadoWsDto.getInteresado().getRazonSocial());
-			interessatDades.setNombre(interesadoWsDto.getInteresado().getNombre());
+			interessatDades.setNombre(nom);
+			interessatDades.setRazonSocial(raoSocial != null ? raoSocial : nom);
 			interessatDades.setApellido1(interesadoWsDto.getInteresado().getApellido1());
 			interessatDades.setApellido2(interesadoWsDto.getInteresado().getApellido2());
 			interessatDades.setDireccion(interesadoWsDto.getInteresado().getDireccion());
@@ -666,12 +668,14 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		}
 
 		if(interesadoWsDto.getRepresentante() != null) {
+			String nom = interesadoWsDto.getRepresentante().getNombre();
+			String raoSocial = interesadoWsDto.getRepresentante().getRazonSocial();
 			DatosInteresadoWs representantDades = new DatosInteresadoWs();
 			representantDades.setTipoInteresado(interesadoWsDto.getRepresentante().getTipoInteresado().longValue());
 			representantDades.setTipoDocumentoIdentificacion(interesadoWsDto.getInteresado().getTipoDocumentoIdentificacion());
 			representantDades.setDocumento(interesadoWsDto.getRepresentante().getDocumento());
-			representantDades.setRazonSocial(interesadoWsDto.getRepresentante().getRazonSocial());
-			representantDades.setNombre(interesadoWsDto.getRepresentante().getNombre());
+			representantDades.setRazonSocial(raoSocial != null ? raoSocial : nom);
+			representantDades.setNombre(nom);
 			representantDades.setApellido1(interesadoWsDto.getRepresentante().getApellido1());
 			representantDades.setApellido2(interesadoWsDto.getRepresentante().getApellido2());
 			representantDades.setDireccion(interesadoWsDto.getRepresentante().getDireccion());
