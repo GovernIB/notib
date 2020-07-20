@@ -553,6 +553,7 @@ function destinatarisDelete(className) {
     var destinatariRoot = $(element).closest(".dest");
     var numDest = destinatariRoot.find(".destinatariForm").size();
     
+	$(parent).closest(".destinatari").find('.addDestinatari').removeClass('hidden');
 	$(parent).remove();
 
 	// Reanomenar destinataris posteriors
