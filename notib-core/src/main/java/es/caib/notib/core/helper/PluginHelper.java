@@ -1796,7 +1796,7 @@ public class PluginHelper {
 				representantDades.setDocumento(destinatari.getNif());
 				representantDades.setTipoDocumentoIdentificacion("C");
 			}
-			representantDades.setRazonSocial(destinatari.getNom());
+			representantDades.setRazonSocial(destinatari.getRaoSocial());
 			representantDades.setNombre(destinatari.getNom());
 			representantDades.setApellido1(destinatari.getLlinatge1());
 			representantDades.setApellido2(destinatari.getLlinatge2());
