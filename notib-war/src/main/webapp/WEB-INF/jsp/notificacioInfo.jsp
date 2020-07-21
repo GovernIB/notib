@@ -137,50 +137,40 @@ $(document).ready(function() {
 				<table class="table table-bordered" style="width: 100%">
 					<tbody>
 						<tr>
-							<td width="30%"><strong><spring:message
-										code="notificacio.info.dada.entitat" /></strong></td>
-							<td>${notificacio.procediment.entitat.nom}<br>
-							<small>${notificacio.procediment.entitat.dir3Codi}</small></td>
+							<td width="30%"><strong><spring:message code="notificacio.info.dada.entitat" /></strong></td>
+							<td>${notificacio.procediment.organGestorNom}<br>
+							<small>${notificacio.procediment.organGestor}</small></td>
 						</tr>
 						<tr>
-							<td><strong><spring:message
-										code="notificacio.info.dada.concepte" /></strong></td>
+							<td><strong><spring:message code="notificacio.info.dada.concepte" /></strong></td>
 							<td>${notificacio.concepte}</td>
 						</tr>
 						<tr>
-							<td><strong><spring:message
-										code="notificacio.info.dada.descripcio" /></strong></td>
+							<td><strong><spring:message code="notificacio.info.dada.descripcio" /></strong></td>
 							<td>${notificacio.descripcio}</td>
 						</tr>
 						<c:if test="${notificacio.estat != null && notificacio.estat != ''}">
 						<tr>
-							<td><strong><spring:message
-										code="notificacio.info.dada.estat" /></strong></td>
-							<td><spring:message
-									code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.${notificacio.estat}" /></td>
+							<td><strong><spring:message code="notificacio.info.dada.estat" /></strong></td>
+							<td><spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.${notificacio.estat}" /></td>
 						</tr>
 						</c:if>
 						<tr>
 							<td><strong><spring:message
 										code="notificacio.info.dada.creacio.data" /></strong></td>
-							<td><fmt:formatDate value="${notificacio.createdDate}"
-									pattern="dd/MM/yyyy HH:mm:ss" /></td>
+							<td><fmt:formatDate value="${notificacio.createdDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
 						</tr>
 						<tr>
-							<td><strong><spring:message
-										code="notificacio.info.dada.creacio.usuari" /></strong></td>
+							<td><strong><spring:message code="notificacio.info.dada.creacio.usuari" /></strong></td>
 							<td>${notificacio.createdBy.nom}
 								(${notificacio.createdBy.codi})</td>
 						</tr>
 						<tr>
-							<td><strong><spring:message
-										code="notificacio.info.dada.tipus" /></strong></td>
-							<td><spring:message
-									code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.${notificacio.enviamentTipus}" /></td>
+							<td><strong><spring:message code="notificacio.info.dada.tipus" /></strong></td>
+							<td><spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.${notificacio.enviamentTipus}" /></td>
 						</tr>
 						<tr>
-							<td><strong><spring:message
-										code="notificacio.info.dada.procediment.codi" /></strong></td>
+							<td><strong><spring:message code="notificacio.info.dada.procediment.codi" /></strong></td>
 							<td>${notificacio.procediment.nom}<br>${notificacio.procediment.codi}</td>
 						</tr>
 					</tbody>
@@ -220,8 +210,7 @@ $(document).ready(function() {
 				<div class="panel panel-default">
 						<div class="panel-heading">
 							<h3 class="panel-title">
-								<strong><spring:message
-										code="notificacio.info.seccio.document" /></strong>
+								<strong><spring:message code="notificacio.info.seccio.document" /></strong>
 							</h3>
 						</div>
 						<table class="table table-bordered" style="width: 100%">
@@ -240,8 +229,7 @@ $(document).ready(function() {
 									</td>
 								</tr>
 								<tr>
-									<td><strong><spring:message
-												code="notificacio.info.document.normalitzat" /></strong></td>
+									<td><strong><spring:message code="notificacio.info.document.normalitzat" /></strong></td>
 									<td>
 									<c:choose>
 									    <c:when test="${notificacio.document.normalitzat}">
@@ -254,8 +242,7 @@ $(document).ready(function() {
 									</td>
 								</tr>
 								<tr>
-									<td><strong><spring:message
-												code="notificacio.info.document.generar.csv" /></strong></td>
+									<td><strong><spring:message code="notificacio.info.document.generar.csv" /></strong></td>
 									<td>
 									<c:choose>
 									    <c:when test="${notificacio.document.generarCsv}">
