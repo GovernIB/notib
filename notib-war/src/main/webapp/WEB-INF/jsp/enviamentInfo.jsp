@@ -21,37 +21,13 @@
 	<not:modalHead/>
 <script type="text/javascript">
 
-// function descarrega(ruta) {
-// 	fetch(ruta)
-// 	  .then(resp => resp.blob())
-// 	  .then(blob => {
-// 	    const url = window.URL.createObjectURL(blob);
-// 	    const a = document.createElement('a');
-// 	    a.style.display = 'none';
-// 	    a.href = url;
-// 	    // the filename you want
-// 	    a.download = 'justificant.pdf';
-// 	    document.body.appendChild(a);
-// 	    a.click();
-// 	    window.URL.revokeObjectURL(url);
-// 	    webutilRefreshMissatges();
-// 	  })
-// 	  .catch(() => webutilRefreshMissatges());
-// }
-
 $(function() {
     $(document).on("click", "a.fileDownloadSimpleRichExperience", function() {
         $.fileDownload($(this).attr('href'), {
             preparingMessageHtml: "Estam preparant la descàrrega, per favor esperi...",
             failMessageHtml: "<strong style='color:red'>Ho sentim.<br/>S'ha produït un error intentant descarregar el document.</strong>"//,
-//             failCallback: function(responseHtml, url) {
-//             	webutilRefreshMissatges();
-//             },
-//             successCallback: function(url) {
-//             	webutilRefreshMissatges();
-//             }
         });
-        return false; //this is critical to stop the click event which will trigger a normal file download!
+        return false;
     });
 });
 
@@ -217,7 +193,7 @@ $(document).ready(function() {
 				</div>
 				<c:forEach var="destinatari" items="${enviament.destinataris}" varStatus="loop">
 					<c:if test="${not empty destinatari.nif}">
-						<div class="col-sm-6">
+						<div class="col-sm-12">
 							<div class="panel panel-default">
 								<div class="panel-heading">
 									<h3 class="panel-title">
@@ -488,7 +464,7 @@ $(document).ready(function() {
 										<td>
 										<div></div>
 											${enviament.notificaCertificacioArxiuNom}
-											<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/certificacioDescarregar"/>" class="btn btn-default btn-sm pull-right" title="<spring:message code="notificacio.info.document.descarregar"/>"><span class="fa fa-download"></span></a>
+											<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/certificacioDescarregar"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience" title="<spring:message code="notificacio.info.document.descarregar"/>"><span class="fa fa-download"></span></a>
 										</td>
 									</tr>
 								</tbody>
@@ -553,8 +529,6 @@ $(document).ready(function() {
 				</div>
 				<c:if test="${enviament.notificacio.estat == 'REGISTRADA'}">
 					<c:if test="${enviament.registreEstat == 'DISTRIBUIT' || enviament.registreEstat == 'OFICI_EXTERN'  || enviament.registreEstat == 'OFICI_SIR' }">
-					
-					fileDownloadSimpleRichExperience
 						<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/justificantDescarregar"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience">
 							<span class="fa fa-download"></span>
 							<spring:message code="enviament.info.accio.descarregar.justificant"/>

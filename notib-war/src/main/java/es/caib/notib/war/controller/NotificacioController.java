@@ -12,7 +12,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.mail.MessagingException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -671,8 +670,8 @@ public class NotificacioController extends BaseUserController {
 		if(arxiu.getContentType() == "application_pdf" || arxiu.getContentType() == "application/pdf" || arxiu.getContentType() == "PDF" && !arxiu.getNom().contains(".pdf")) {
 			mimeType = ".pdf";
 		}
+		response.setHeader("Set-cookie", "fileDownload=true; path=/");
 		writeFileToResponse(arxiu.getNom() + mimeType, arxiu.getContingut(), response);
-		addFileDownloadCookie(response);
 	}
 
 	@RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/certificacioDescarregar", method = RequestMethod.GET)
@@ -682,33 +681,26 @@ public class NotificacioController extends BaseUserController {
 			@PathVariable Long notificacioId,
 			@PathVariable Long enviamentId) throws IOException {
 		ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
+		response.setHeader("Set-cookie", "fileDownload=true; path=/");
 		writeFileToResponse(
 				arxiu.getNom(), 
 				arxiu.getContingut(), 
 				response);
-		addFileDownloadCookie(response);
 	}
 	
 	@RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/justificantDescarregar", method = RequestMethod.GET)
 	@ResponseBody
 	public void justificantDescarregar(
-			HttpServletResponse response,
 			HttpServletRequest request, 
+			HttpServletResponse response,
 			@PathVariable Long notificacioId,
 			@PathVariable Long enviamentId) throws IOException {
 		ArxiuDto arxiu = new ArxiuDto();
 		arxiu.setContingut(enviamentService.getDocumentJustificant(enviamentId));
 		arxiu.setNom("justificant");
 		String mimeType = ".pdf";
+		response.setHeader("Set-cookie", "fileDownload=true; path=/");
 		writeFileToResponse(arxiu.getNom() + mimeType, arxiu.getContingut(), response);
-		addFileDownloadCookie(response);
-	}
-	
-	private void addFileDownloadCookie(HttpServletResponse response) {
-		Cookie cookie = new Cookie("fileDownload", "true");
-		cookie.setPath("/");
-		cookie.setMaxAge(60);
-		response.addCookie(cookie);
 	}
 	
 	@RequestMapping(value = "/{notificacioId}/refrescarEstatClient", method = RequestMethod.GET)

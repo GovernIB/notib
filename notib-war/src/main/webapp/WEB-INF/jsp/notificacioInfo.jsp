@@ -10,20 +10,17 @@
 <html>
 <head>
 <title><spring:message code="notificacio.info.titol" /></title>
-<script
-	src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
-<script
-	src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
-<link
-	href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>"
-	rel="stylesheet"></link>
-<script
-	src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
+<script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
+<script src="<c:url value="/webjars/datatables.net/1.10.11/js/jquery.dataTables.min.js"/>"></script>
+<script src="<c:url value="/webjars/datatables.net-bs/1.10.11/js/dataTables.bootstrap.min.js"/>"></script>
+<link href="<c:url value="/webjars/datatables.net-bs/1.10.11/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
 <script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 <script src="<c:url value="/js/webutil.modal.js"/>"></script>
 <script src="<c:url value="/js/webutil.common.js"/>"></script>
 <script src="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.min.js"/>"></script>
 <link href="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.css"/>" rel="stylesheet"></link>
+<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 <script src="<c:url value="/js/jquery.fileDownload.js"/>"></script>
 <not:modalHead />
 <script type="text/javascript">
@@ -220,11 +217,9 @@ $(document).ready(function() {
 										<strong><spring:message	code="notificacio.info.document.arxiu.nom" /></strong>
 									</td>
 									<td>${notificacio.document.arxiuNom}
-										<a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar"/>"
-											class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience"
-											title="<spring:message code="notificacio.info.document.descarregar"/>">
+										<a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience" title="<spring:message code="notificacio.info.document.descarregar"/>">
 											<spring:message code="notificacio.info.document.descarregar"/>
-												<span class="fa fa-download"></span>
+											<span class="fa fa-download"></span>
 										</a>
 									</td>
 								</tr>
@@ -480,7 +475,7 @@ $(document).ready(function() {
 																	<td><strong><spring:message code="enviament.info.notifica.certificacio.document"/></strong></td>
 																	<td>
 																		certificacio_${enviament.notificaIdentificador}.pdf
-																		<a href="<not:modalUrl value="/notificacio/${notificacio.id}/enviament/${enviament.id}/certificacioDescarregar"/>" class="btn btn-default btn-sm pull-right btn-certificacio" title="<spring:message code="enviament.info.notifica.certificacio.num.descarregar"/>">
+																		<a href="<not:modalUrl value="/notificacio/${notificacio.id}/enviament/${enviament.id}/certificacioDescarregar"/>" class="btn btn-default btn-sm pull-right btn-certificacio fileDownloadSimpleRichExperience" title="<spring:message code="enviament.info.notifica.certificacio.num.descarregar"/>">
 																			<spring:message code="enviament.info.notifica.certificacio.num.descarregar"/>
 																			<span class="fa fa-download"></span>
 																		</a>

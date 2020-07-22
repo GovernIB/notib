@@ -134,7 +134,7 @@ $(function() {
             preparingMessageHtml: "Estam preparant la descàrrega, per favor esperi...",
             failMessageHtml: "<strong style='color:red'>Ho sentim.<br/>S'ha produït un error intentant descarregar el document.</strong>"
         });
-        return false; //this is critical to stop the click event which will trigger a normal file download!
+        return false;
     });
 });
 
