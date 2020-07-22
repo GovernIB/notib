@@ -92,7 +92,11 @@ public class CallbackHelper {
 					|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR
 					|| (event.isError() && event.getTipus() == NotificacioEventTipusEnumDto.CALLBACK_CLIENT)) {
 				// Avisa al client que hi ha hagut una modificació a l'enviament
-				notificaCanvi(event.getEnviament());
+				String resposta = notificaCanvi(event.getEnviament());
+				if ("INACTIVA".equals(resposta)) {
+					// No s'ha de fer res. El callback està inactiu
+					return true;
+				}
 				// Marca l'event com a notificat
 				event.setNotificacio(notificacio); //event.getEnviament().getNotificacio());
 				event.updateCallbackClient(CallbackEstatEnumDto.NOTIFICAT, ara, intents, null);
@@ -168,6 +172,8 @@ public class CallbackHelper {
 			throw new NotFoundException("codi usuari: " + usuari.getCodi(), AplicacioEntity.class);
 		if (aplicacio.getCallbackUrl() == null)
 			throw new Exception("La aplicació " + aplicacio.getUsuariCodi() + " no té cap url de callback configurada");
+		if (!aplicacio.isActiva())
+			return "INACTIVA";
 				
 		NotificacioCanviClient notificacioCanvi = new NotificacioCanviClient(
 				notificaHelper.xifrarId(enviament.getNotificacio().getId()), 

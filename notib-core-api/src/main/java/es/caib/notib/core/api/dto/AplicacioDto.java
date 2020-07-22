@@ -19,6 +19,7 @@ public class AplicacioDto extends AuditoriaDto {
 	private Long id;
 	private String usuariCodi;
 	private String callbackUrl;
+	private boolean activa;
 	private Long entitatId;
 
 

@@ -47,12 +47,23 @@
 			<tr>
 				<th data-col-name="usuariCodi" width="20%"><spring:message code="aplicacio.list.columna.codi"/></th>
 				<th data-col-name="callbackUrl" width="50%"><spring:message code="aplicacio.list.columna.callback.url"/></th>
+				<th data-col-name="activa" data-template="#cellActivaTemplate">
+					<spring:message code="aplicacio.list.columna.activa"/>
+					<script id="cellActivaTemplate" type="text/x-jsrender">
+						{{if activa}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="aplicacio/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								{{if !activa}}
+								<li><a href="aplicacio/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
+								{{else}}
+								<li><a href="aplicacio/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
+								{{/if}}
 								<li><a href="aplicacio/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="aplicacio.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
 						</div>

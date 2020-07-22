@@ -276,5 +276,29 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 		}
 	}
 	
+	@Transactional
+	@Override
+	public AplicacioDto updateActiva(
+			Long id,
+			boolean activa) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Actualitzant propietat activa d'una aplicació existent ("
+					+ "id=" + id + ", "
+					+ "activa=" + activa + ")");
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					false,
+					false );
+			AplicacioEntity aplicacio = aplicacioRepository.findOne(id);
+			aplicacio.updateActiva(activa);
+			return conversioTipusHelper.convertir(
+					aplicacio,
+					AplicacioDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
 	
 }

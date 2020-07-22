@@ -144,4 +144,18 @@ public interface UsuariAplicacioService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public PaginaDto<AplicacioDto> findPaginatByEntitat(Long entitatId, PaginacioParamsDto paginacioParams);
 	
+	/**
+	 * Marca l'aplicació amb l'id especificat com a activa/inactiva.
+	 * 
+	 * @param id
+	 *            Atribut id de l'aplicació a modificar.
+	 * @param activa
+	 *            true si es vol activar o false en cas contrari.
+	 * @return L'aplicació modificada.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	public AplicacioDto updateActiva(Long id, boolean activa);
+	
 }

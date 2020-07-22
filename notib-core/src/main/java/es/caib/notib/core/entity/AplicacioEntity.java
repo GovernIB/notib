@@ -33,6 +33,8 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 	protected String usuariCodi;
 	@Column(name = "callback_url", length = 256)
 	private String callbackUrl;
+	@Column(name = "activa", nullable = false)
+	private boolean activa;
 	
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "entitat_id", nullable = false)
@@ -44,6 +46,11 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 			String callbackUrl) {
 		this.usuariCodi = usuariCodi;
 		this.callbackUrl = callbackUrl;
+	}
+	
+	public void updateActiva(
+			boolean activa) {
+		this.activa = activa;
 	}
 	
 	public static Builder getBuilder(

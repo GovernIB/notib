@@ -130,5 +130,26 @@ public class AplicacioController extends BaseController {
 				"redirect:aplicacio",
 				"aplicacio.controller.esborrada.ok");
 	}
+	
+	@RequestMapping(value = "/{aplicacioId}/enable", method = RequestMethod.GET)
+	public String enable(
+			HttpServletRequest request,
+			@PathVariable Long aplicacioId) {
+		usuariAplicacioService.updateActiva(aplicacioId, true);
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:../../entitat",
+				"aplicacio.controller.activada.ok");
+	}
+	@RequestMapping(value = "/{aplicacioId}/disable", method = RequestMethod.GET)
+	public String disable(
+			HttpServletRequest request,
+			@PathVariable Long aplicacioId) {
+		usuariAplicacioService.updateActiva(aplicacioId, false);
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:../../entitat",
+				"aplicacio.controller.desactivada.ok");
+	}
 
 }

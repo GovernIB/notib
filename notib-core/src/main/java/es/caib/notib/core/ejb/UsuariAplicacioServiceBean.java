@@ -98,4 +98,9 @@ public class UsuariAplicacioServiceBean implements UsuariAplicacioService {
 		return delegate.findByEntitatAndText(entitatId, text);
 	}
 
+	@Override
+	public AplicacioDto updateActiva(Long id, boolean activa) {
+		return delegate.updateActiva(id, activa);
+	}
+
 }
