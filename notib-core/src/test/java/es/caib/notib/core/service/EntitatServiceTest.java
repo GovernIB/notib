@@ -28,7 +28,6 @@ import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.service.EntitatService;
-import es.caib.notib.core.helper.PropertiesHelper;
 
 /**
  * Tests per al servei d'entitats.
@@ -45,11 +44,11 @@ public class EntitatServiceTest extends BaseServiceTest {
 
 	private EntitatDto entitatCreate;
 	private EntitatDto entitatUpdate;
-	private PermisDto permisUserRepresentant;
+	private PermisDto permisUser;
+	private PermisDto permisAdmin;
 
 	@Before
 	public void setUp() {
-		PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
 		entitatCreate = new EntitatDto();
 		entitatCreate.setCodi("LIMIT");
 		entitatCreate.setNom("Limit Tecnologies");
@@ -64,9 +63,14 @@ public class EntitatServiceTest extends BaseServiceTest {
 		entitatCreate.setDescripcio("Descripció de Limit Tecnologies 2");
 		entitatUpdate.setDir3Codi("23599771E");
 		entitatCreate.setActiva(true);
-		permisUserRepresentant = new PermisDto();
-		permisUserRepresentant.setTipus(TipusEnumDto.USUARI);
-		permisUserRepresentant.setPrincipal("user");
+		permisUser = new PermisDto();
+		permisUser.setRead(true);
+		permisUser.setTipus(TipusEnumDto.USUARI);
+		permisUser.setPrincipal("user");
+		permisAdmin = new PermisDto();
+		permisAdmin.setAdministration(true);
+		permisAdmin.setTipus(TipusEnumDto.USUARI);
+		permisAdmin.setPrincipal("admin");
 	}
 
 	@Test

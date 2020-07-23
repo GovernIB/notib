@@ -423,6 +423,11 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	public OrganGestorDto findOrganGestorById(Long entitatId, Long id) {
 		return delegate.findOrganGestorById(entitatId, id);
 	}
+	
+	@Override
+	public OrganGestorDto findOrganGestorByCodi(Long entitatId, String codi) {
+		return delegate.findOrganGestorByCodi(entitatId, codi);
+	}
 
 	@Override
 	public List<PermisDto> permisOrganGestorFind(Long entitatId, Long id) throws NotFoundException {

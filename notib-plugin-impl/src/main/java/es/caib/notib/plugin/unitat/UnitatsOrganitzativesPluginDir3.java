@@ -338,7 +338,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 			return localitats;
 		} catch (Exception ex) {
 			throw new SistemaExternException(
-					"No s'han pogut consultar les comunitats autònomes via REST",
+					"No s'han pogut consultar les localitats via REST",
 					ex);
 		}
 	}

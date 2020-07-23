@@ -451,6 +451,11 @@ public interface ProcedimentService {
 			Long entitatId,
 			Long id);
 	
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public OrganGestorDto findOrganGestorByCodi(
+			Long entitatId,
+			String codi);
+	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public List<PermisDto> permisOrganGestorFind(
 			Long entitatId,

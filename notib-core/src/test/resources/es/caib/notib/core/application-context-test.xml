@@ -28,14 +28,27 @@
 	</bean>
 
 	<jdbc:embedded-database id="dataSource" type="HSQL">
-		<jdbc:script location="classpath:/es/caib/notib/core/hsql_schema.sql"/>
+		<jdbc:script location="classpath:/es/caib/notib/core/hsql_acl_schema.sql"/>
 	</jdbc:embedded-database>
 
+	<bean id="testSmtpServer" class="com.dumbster.smtp.SimpleSmtpServer" destroy-method="stop" factory-method="start">
+		<constructor-arg index="0" value="2525"/>
+	</bean>
+	<bean id="mailSession" class="javax.mail.Session" factory-method="getInstance">
+		<constructor-arg>
+			<props>
+				<prop key="mail.smtp.host">localhost</prop>
+				<prop key="mail.smtp.port">2525</prop>
+			</props>
+		</constructor-arg>
+	</bean>
+	
 	<sec:authentication-manager alias="authenticationManager">
         <sec:authentication-provider>
             <sec:user-service>
+            	<sec:user name="super" password="super" authorities="NOT_SUPER,tothom" />
                 <sec:user name="admin" password="admin" authorities="NOT_ADMIN,tothom" />
-                <sec:user name="rep" password="rep" authorities="NOT_REP,tothom" />
+                <sec:user name="user" password="user" authorities="NOT_USER,tothom" />
                 <sec:user name="apl" password="apl" authorities="NOT_APL, tothom" />
             </sec:user-service>
         </sec:authentication-provider>
@@ -45,8 +58,6 @@
 		<constructor-arg ref="dataSource" />
 		<constructor-arg ref="lookupStrategy" />
 		<constructor-arg ref="aclCache" />
-		<property name="classIdentityQuery" value="call identity()"/>
-		<property name="sidIdentityQuery" value="call identity()"/>
 	</bean>
 	<bean id="lookupStrategy" class="es.caib.notib.core.security.BasicLookupStrategy">
 		<constructor-arg ref="dataSource" />

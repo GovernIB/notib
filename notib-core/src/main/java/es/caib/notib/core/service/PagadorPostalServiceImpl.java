@@ -102,7 +102,7 @@ public class PagadorPostalServiceImpl implements PagadorPostalService{
 
 	@Override
 	@Transactional
-	public PagadorPostalDto delete(Long id) throws Exception {
+	public PagadorPostalDto delete(Long id) throws NotFoundException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			PagadorPostalEntity pagadorPostalEntity = entityComprovarHelper.comprovarPagadorPostal(id);
