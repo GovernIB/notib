@@ -5,10 +5,14 @@ package es.caib.notib.core.service;
 
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -17,6 +21,8 @@ import org.apache.commons.io.IOUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +35,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.loginModule.util.Base64.InputStream;
 import es.caib.notib.core.api.dto.AplicacioDto;
+import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorCieFormatFullaDto;
@@ -53,7 +61,18 @@ import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
+import es.caib.notib.plugin.registre.CodiAssumpte;
+import es.caib.notib.plugin.registre.Llibre;
+import es.caib.notib.plugin.registre.LlibreOficina;
+import es.caib.notib.plugin.registre.Oficina;
+import es.caib.notib.plugin.registre.Organisme;
 import es.caib.notib.plugin.registre.RegistrePlugin;
+import es.caib.notib.plugin.registre.RegistrePluginException;
+import es.caib.notib.plugin.registre.RegistreSortida;
+import es.caib.notib.plugin.registre.RespostaAnotacioRegistre;
+import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
+import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
+import es.caib.notib.plugin.registre.TipusAssumpte;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
@@ -337,19 +356,142 @@ public class BaseServiceTest {
 	}
 	
 	//	GestioDocumentalPlugin
-	protected void configureMockGestioDocumentalPlugin() throws SistemaExternException {
+	protected void configureMockGestioDocumentalPlugin() throws SistemaExternException, IOException {
 		gestioDocumentalPluginMock = Mockito.mock(GestioDocumentalPlugin.class);
-		
 		Mockito.when(gestioDocumentalPluginMock.create(Mockito.anyString(), Mockito.any(InputStream.class))).thenReturn(Integer.toString(ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE)));
-//		Mockito.when(gestioDocumentalPluginMock.update(Mockito.anyString(), Mockito.anyString(), Mockito.any(InputStream.class)));
-//		Mockito.when(gestioDocumentalPluginMock.delete(Mockito.anyString(), Mockito.anyString()));
-//		Mockito.when(gestioDocumentalPluginMock.get(Mockito.anyString(), Mockito.anyString(), Mockito.any(OutputStream.class)));
+		Mockito.doNothing().when(gestioDocumentalPluginMock).update(Mockito.anyString(), Mockito.anyString(), Mockito.any(InputStream.class));
+		Mockito.doNothing().when(gestioDocumentalPluginMock).delete(Mockito.anyString(), Mockito.anyString());
+		Mockito.doAnswer(new Answer<Void>() {
+			public Void answer(InvocationOnMock invocation) throws IOException {
+				Object[] args = invocation.getArguments();
+				FitxerDto fitxer = getFitxerPdfDeTest();
+				byte[] contingut = fitxer.getContingut();
+				IOUtils.copy(new ByteArrayInputStream(contingut), (OutputStream)args[2]);
+				return null;
+			}
+		}).when(gestioDocumentalPluginMock).get(Mockito.anyString(), Mockito.anyString(), Mockito.any(OutputStream.class));
 		pluginHelper.setGestioDocumentalPlugin(gestioDocumentalPluginMock);
 	}
 	
 	//	RegistrePlugin
-	protected void configureMockRegistrePlugin() {
+	protected void configureMockRegistrePlugin() throws RegistrePluginException, IOException {
 		registrePluginMock = Mockito.mock(RegistrePlugin.class);
+		FitxerDto fitxer = getFitxerPdfDeTest();
+		
+		// registrarSalida
+		Mockito.doAnswer(new Answer<RespostaAnotacioRegistre>() {
+			public RespostaAnotacioRegistre answer(InvocationOnMock invocation) {
+				RespostaAnotacioRegistre resposta = new RespostaAnotacioRegistre();
+				Date data = new Date();
+				Calendar calendar = new GregorianCalendar();
+				calendar.setTime(data);
+				String num = Integer.toString(ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE));
+				resposta.setData(data);
+				resposta.setNumero(num);
+				resposta.setNumeroRegistroFormateado(num + "/" + calendar.get(Calendar.YEAR));
+				return resposta;
+			}
+		}).when(registrePluginMock).registrarSalida(Mockito.any(RegistreSortida.class), Mockito.anyString());
+
+		// salidaAsientoRegistral
+		Mockito.doAnswer(new Answer<RespostaConsultaRegistre>() {
+			public RespostaConsultaRegistre answer(InvocationOnMock invocation) {
+				RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
+				Date data = new Date();
+				Calendar calendar = new GregorianCalendar();
+				calendar.setTime(data);
+				String num = Integer.toString(ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE));
+				resposta.setRegistreData(data);
+				resposta.setRegistreNumero(num);
+				resposta.setRegistreNumeroFormatat(num + "/" + calendar.get(Calendar.YEAR));
+				resposta.setEstat(NotificacioRegistreEstatEnumDto.VALID);
+				return resposta;
+			}
+		}).when(registrePluginMock).salidaAsientoRegistral(Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.anyLong());
+		
+		// obtenerAsientoRegistral
+		Mockito.doAnswer(new Answer<RespostaConsultaRegistre>() {
+			public RespostaConsultaRegistre answer(InvocationOnMock invocation) {
+				RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
+				Date data = new Date();
+				Calendar calendar = new GregorianCalendar();
+				calendar.setTime(data);
+				String num = Integer.toString(ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE));
+				resposta.setRegistreData(data);
+				resposta.setRegistreNumero(num);
+				resposta.setRegistreNumeroFormatat(num + "/" + calendar.get(Calendar.YEAR));
+				resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
+				resposta.setSirRegistreDestiData(data);
+				resposta.setEntitatCodi("A04003003");
+				resposta.setEntitatDenominacio("CAIB");
+				return resposta;
+			}
+		}).when(registrePluginMock).obtenerAsientoRegistral(Mockito.anyString(), Mockito.anyString(), Mockito.anyLong(), Mockito.anyBoolean());
+
+		// obtenerJustificante
+		RespostaJustificantRecepcio respostaJustificantRecepcio = new RespostaJustificantRecepcio();
+		respostaJustificantRecepcio.setJustificant(fitxer.getContingut());
+		respostaJustificantRecepcio.setErrorCodi("OK");
+		Mockito.when(registrePluginMock.obtenerJustificante(Mockito.anyString(), Mockito.anyString(), Mockito.anyLong())).thenReturn(respostaJustificantRecepcio);
+		
+		// obtenerOficioExterno
+		Mockito.when(registrePluginMock.obtenerOficioExterno(Mockito.anyString(), Mockito.anyString())).thenReturn(respostaJustificantRecepcio);
+		
+		// llistarTipusAssumpte
+		List<TipusAssumpte> tipusAssumptes = new ArrayList<TipusAssumpte>();
+		TipusAssumpte tipusAssumpte1 = new TipusAssumpte();
+		tipusAssumpte1.setCodi("TA01");
+		tipusAssumpte1.setNom("Tipus Assumpte 01");
+		tipusAssumptes.add(tipusAssumpte1);
+		Mockito.when(registrePluginMock.llistarTipusAssumpte(Mockito.anyString())).thenReturn(tipusAssumptes);
+		
+		// llistarCodisAssumpte
+		List<CodiAssumpte> codiAssumptes = new ArrayList<CodiAssumpte>();
+		CodiAssumpte codiAssumpte1 = new CodiAssumpte();
+		codiAssumpte1.setCodi("CA01");
+		codiAssumpte1.setNom("Codi Assumpte 01");
+		codiAssumpte1.setTipusAssumpte("TA01");
+		codiAssumptes.add(codiAssumpte1);
+		Mockito.when(registrePluginMock.llistarCodisAssumpte(Mockito.anyString(), Mockito.anyString())).thenReturn(codiAssumptes);
+
+		// llistarOficinaVirtual
+		Oficina oficina = new Oficina();
+		oficina.setCodi("O00009390");
+		oficina.setNom(("DGTIC"));
+		Mockito.when(registrePluginMock.llistarOficinaVirtual(Mockito.anyString(), Mockito.anyLong())).thenReturn(oficina);
+																																																																																				
+		// llistarOficines
+		List<Oficina> oficines = new ArrayList<Oficina>();
+		oficines.add(oficina);
+		Mockito.when(registrePluginMock.llistarOficines(Mockito.anyString(), Mockito.anyLong())).thenReturn(oficines);
+
+		// llistarLlibres
+		List<Llibre> llibres = new ArrayList<Llibre>();
+		Llibre llibre = new Llibre();
+		llibre.setCodi("L99");
+		llibre.setNomCurt("Llibre prova");
+		llibres.add(llibre);
+		Mockito.when(registrePluginMock.llistarLlibres(Mockito.anyString(), Mockito.anyString(), Mockito.anyLong())).thenReturn(llibres);
+
+		// llistarLlibreOrganisme
+		Mockito.when(registrePluginMock.llistarLlibreOrganisme(Mockito.anyString(), Mockito.anyString())).thenReturn(llibre);
+
+		// llistarLlibresOficines
+		List<LlibreOficina> llibresOficina = new ArrayList<LlibreOficina>();
+		LlibreOficina llibreOficina = new LlibreOficina();
+		llibreOficina.setLlibre(llibre);
+		llibreOficina.setOficina(oficina);
+		llibresOficina.add(llibreOficina);
+		Mockito.when(registrePluginMock.llistarLlibresOficines(Mockito.anyString(), Mockito.anyString(), Mockito.anyLong())).thenReturn(llibresOficina);
+			
+		// llistarOrganismes
+		List<Organisme> organismes = new ArrayList<Organisme>();
+		Organisme organisme = new Organisme();
+		organisme.setCodi("A04003003");
+		organisme.setNom("Govern de les Illes Balears");
+		organismes.add(organisme);
+		Mockito.when(registrePluginMock.llistarOrganismes(Mockito.anyString())).thenReturn(organismes);
+
 		
 		pluginHelper.setRegistrePlugin(registrePluginMock);
 	}
