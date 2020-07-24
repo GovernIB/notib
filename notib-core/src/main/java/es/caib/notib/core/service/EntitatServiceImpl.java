@@ -32,6 +32,7 @@ import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
+import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.EntitatTipusDocEntity;
@@ -150,20 +151,21 @@ public class EntitatServiceImpl implements EntitatService {
 							tipusDocDto.getTipusDocEnum());
 				}
 			}
-			if (entitat.getTipusDoc().isEmpty()) {
+			if (entitat.getTipusDoc() == null || entitat.getTipusDoc().isEmpty()) {
 				entitatTipusDocRepository.delete(tipusDocsEntity);
 			}
 			
 			if ((entitat.getTipusDoc() != null && entitat.getTipusDoc().size() > 1) || tipusDocsEntity.isEmpty()) {
-				for (TipusDocumentDto tipusDocument : entitat.getTipusDoc()) {
-					EntitatTipusDocEntity tipusDocumentActual = entitatTipusDocRepository.findByEntitatAndTipus(entity.getId(), tipusDocument.getTipusDocEnum());
-					if (tipusDocumentActual == null) {
-						EntitatTipusDocEntity tipusDocEntity = EntitatTipusDocEntity.getBuilder(
-								entity, 
-								tipusDocument.getTipusDocEnum()).build();
-						entitatTipusDocRepository.save(tipusDocEntity);
+				if (entitat.getTipusDoc() != null)
+					for (TipusDocumentDto tipusDocument : entitat.getTipusDoc()) {
+						EntitatTipusDocEntity tipusDocumentActual = entitatTipusDocRepository.findByEntitatAndTipus(entity.getId(), tipusDocument.getTipusDocEnum());
+						if (tipusDocumentActual == null) {
+							EntitatTipusDocEntity tipusDocEntity = EntitatTipusDocEntity.getBuilder(
+									entity, 
+									tipusDocument.getTipusDocEnum()).build();
+							entitatTipusDocRepository.save(tipusDocEntity);
+						}
 					}
-				}
 			}
 			if (!entitat.isEliminarLogoCap()) {
 				if (entitat.getLogoCapBytes() != null && entitat.getLogoCapBytes().length != 0) {
@@ -304,14 +306,16 @@ public class EntitatServiceImpl implements EntitatService {
 					true,
 					true,
 					true );
-			TipusDocumentDto tipusDocumentDto = new TipusDocumentDto();
 			EntitatEntity entitat = entitatRepository.findOne(id);
+			if (entitat == null)
+				throw new NotFoundException(id, EntitatEntity.class);
 			EntitatDto entitatDto = conversioTipusHelper.convertir(
 					entitatRepository.findOne(id),
 					EntitatDto.class);
-			tipusDocumentDto.setEntitat(entitat.getId());
-			tipusDocumentDto.setTipusDocEnum(entitat.getTipusDocDefault());
-			entitatDto.setTipusDocDefault(tipusDocumentDto);
+//			TipusDocumentDto tipusDocumentDto = new TipusDocumentDto();
+//			tipusDocumentDto.setEntitat(entitat.getId());
+//			tipusDocumentDto.setTipusDocEnum(entitat.getTipusDocDefault());
+//			entitatDto.setTipusDocDefault(tipusDocumentDto);
 			return entitatDto;
 		} finally {
 			metricsHelper.fiMetrica(timer);

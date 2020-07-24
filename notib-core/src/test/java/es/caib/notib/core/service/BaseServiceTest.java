@@ -97,7 +97,7 @@ public class BaseServiceTest {
 	@Autowired
 	private UsuariAplicacioService usuariAplicacioService;
 	@Autowired
-	private EntitatService entitatService;
+	protected EntitatService entitatService;
 	@Autowired
 	private ProcedimentService procedimentService;
 	@Autowired

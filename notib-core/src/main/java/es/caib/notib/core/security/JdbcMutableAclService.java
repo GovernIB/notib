@@ -42,6 +42,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
+import es.caib.notib.core.helper.PropertiesHelper;
+
 
 /**
  * Provides a base JDBC implementation of {@link MutableAclService}.
@@ -59,6 +61,14 @@ import org.springframework.util.Assert;
  * @author Johannes Zlattinger
  */
 public class JdbcMutableAclService extends JdbcAclService implements MutableAclService {
+	
+	private static final String CLASS_IDENTITY_ORACLE = "SELECT " + TableNames.SEQUENCE_CLASS + ".CURRVAL FROM DUAL";
+	private static final String SID_IDENTITY_ORACLE = "SELECT " + TableNames.SEQUENCE_SID + ".CURRVAL FROM DUAL";
+	private static final String CLASS_IDENTITY_POSTGRES = "select currval(pg_get_serial_sequence('" + TableNames.TABLE_CLASS + "', 'id'))";
+	private static final String SID_IDENTITY_POSTGRES = "select currval(pg_get_serial_sequence('" + TableNames.TABLE_SID + "', 'id'))";
+	private static final String CLASS_IDENTITY_HSQL = "call identity()";
+	private static final String SID_IDENTITY_HSQL = "call identity()";
+	
     //~ Instance fields ================================================================================================
 
     private boolean foreignKeysInDatabase = true;
@@ -69,8 +79,8 @@ public class JdbcMutableAclService extends JdbcAclService implements MutableAclS
     //private String classIdentityQuery = "call identity()";
     //private String sidIdentityQuery = "call identity()";
     // Oracle
-    private String classIdentityQuery = "SELECT " + TableNames.SEQUENCE_CLASS + ".CURRVAL FROM DUAL";
-    private String sidIdentityQuery = "SELECT " + TableNames.SEQUENCE_SID + ".CURRVAL FROM DUAL";
+    //private String classIdentityQuery = "SELECT " + TableNames.SEQUENCE_CLASS + ".CURRVAL FROM DUAL";
+    //private String sidIdentityQuery = "SELECT " + TableNames.SEQUENCE_SID + ".CURRVAL FROM DUAL";
     // PostgreSQL
     //private String classIdentityQuery = "select currval(pg_get_serial_sequence('acl_class', 'id'))";
     //private String sidIdentityQuery = "select currval(pg_get_serial_sequence('acl_sid', 'id'))";
@@ -182,7 +192,7 @@ public class JdbcMutableAclService extends JdbcAclService implements MutableAclS
             jdbcTemplate.update(insertClass, type);
             Assert.isTrue(TransactionSynchronizationManager.isSynchronizationActive(),
                     "Transaction must be running");
-            return new Long(jdbcTemplate.queryForObject(classIdentityQuery, Long.class));
+            return new Long(jdbcTemplate.queryForObject(getClassIdentityQuery(), Long.class));
         }
 
         return null;
@@ -224,7 +234,7 @@ public class JdbcMutableAclService extends JdbcAclService implements MutableAclS
         if (allowCreate) {
             jdbcTemplate.update(insertSid, Boolean.valueOf(sidIsPrincipal), sidName);
             Assert.isTrue(TransactionSynchronizationManager.isSynchronizationActive(), "Transaction must be running");
-            return new Long(jdbcTemplate.queryForObject(sidIdentityQuery, Long.class));
+            return new Long(jdbcTemplate.queryForObject(getSidIdentityQuery(), Long.class));
         }
 
         return null;
@@ -384,10 +394,10 @@ public class JdbcMutableAclService extends JdbcAclService implements MutableAclS
      *
      * @param classIdentityQuery the query, which should return the identifier. Defaults to <tt>call identity()</tt>
      */
-    public void setClassIdentityQuery(String classIdentityQuery) {
-        Assert.hasText(classIdentityQuery, "New classIdentityQuery query is required");
-        this.classIdentityQuery = classIdentityQuery;
-    }
+//    public void setClassIdentityQuery(String classIdentityQuery) {
+//        Assert.hasText(classIdentityQuery, "New classIdentityQuery query is required");
+//        this.classIdentityQuery = classIdentityQuery;
+//    }
 
     /**
      * Sets the query that will be used to retrieve the identity of a newly created row in the <tt>acl_sid</tt>
@@ -395,10 +405,10 @@ public class JdbcMutableAclService extends JdbcAclService implements MutableAclS
      *
      * @param sidIdentityQuery the query, which should return the identifier. Defaults to <tt>call identity()</tt>
      */
-    public void setSidIdentityQuery(String sidIdentityQuery) {
-        Assert.hasText(sidIdentityQuery, "New sidIdentityQuery query is required");
-        this.sidIdentityQuery = sidIdentityQuery;
-    }
+//    public void setSidIdentityQuery(String sidIdentityQuery) {
+//        Assert.hasText(sidIdentityQuery, "New sidIdentityQuery query is required");
+//        this.sidIdentityQuery = sidIdentityQuery;
+//    }
 
     public void setDeleteEntryByObjectIdentityForeignKeySql(String deleteEntryByObjectIdentityForeignKey) {
         this.deleteEntryByObjectIdentityForeignKey = deleteEntryByObjectIdentityForeignKey;
@@ -447,4 +457,34 @@ public class JdbcMutableAclService extends JdbcAclService implements MutableAclS
     public void setForeignKeysInDatabase(boolean foreignKeysInDatabase) {
         this.foreignKeysInDatabase = foreignKeysInDatabase;
     }
+    
+    private String getClassIdentityQuery() {
+		String dialect = getHibernateDialect().toLowerCase();
+		if (dialect.contains("oracle")) {
+			return CLASS_IDENTITY_ORACLE;
+		} else if (dialect.contains("postgres")) {
+			return CLASS_IDENTITY_POSTGRES;
+		} else if (dialect.contains("hsql")) {
+			return CLASS_IDENTITY_HSQL;
+		} else {
+			throw new RuntimeException("Dialecte Hibernate no suportat pel mòdul ACL");
+		}
+	}
+
+	private String getSidIdentityQuery() {
+		String dialect = getHibernateDialect().toLowerCase();
+		if (dialect.contains("oracle")) {
+			return SID_IDENTITY_ORACLE;
+		} else if (dialect.contains("postgres")) {
+			return SID_IDENTITY_POSTGRES;
+		} else if (dialect.contains("hsql")) {
+			return SID_IDENTITY_HSQL;
+		} else {
+			throw new RuntimeException("Dialecte Hibernate no suportat pel mòdul ACL");
+		}
+	}
+
+	private String getHibernateDialect() {
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.hibernate.dialect");
+	}
 }
