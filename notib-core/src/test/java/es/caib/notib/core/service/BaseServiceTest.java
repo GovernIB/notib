@@ -95,21 +95,21 @@ public class BaseServiceTest {
 	private UserDetailsService userDetailsService;
 	
 	@Autowired
-	private UsuariAplicacioService usuariAplicacioService;
+	protected UsuariAplicacioService usuariAplicacioService;
 	@Autowired
 	protected EntitatService entitatService;
 	@Autowired
-	private ProcedimentService procedimentService;
+	protected ProcedimentService procedimentService;
 	@Autowired
-	private GrupService grupService;
+	protected GrupService grupService;
 	@Autowired
-	private PagadorPostalService pagadorPostalService;
+	protected PagadorPostalService pagadorPostalService;
 	@Autowired
-	private PagadorCieService pagadorCieService;
+	protected PagadorCieService pagadorCieService;
 	@Autowired
-	private PagadorCieFormatFullaService pagadorCieFormatFullaService;
+	protected PagadorCieFormatFullaService pagadorCieFormatFullaService;
 	@Autowired
-	private PagadorCieFormatSobreService pagadorCieFormatSobreService;
+	protected PagadorCieFormatSobreService pagadorCieFormatSobreService;
 	
 	@Autowired
 	private  UsuariRepository usuariRepository;
