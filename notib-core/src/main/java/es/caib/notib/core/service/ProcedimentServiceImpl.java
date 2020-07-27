@@ -1,6 +1,7 @@
 package es.caib.notib.core.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,9 +35,11 @@ import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
 import es.caib.notib.core.api.dto.ProcedimentFormDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.SistemaExternException;
+import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -50,13 +53,14 @@ import es.caib.notib.core.entity.ProcedimentFormEntity;
 import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
-import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
+import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.ProcedimentHelper;
+import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.GrupRepository;
@@ -107,7 +111,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Resource
 	private CacheHelper cacheHelper;
 	@Resource
+	PropertiesHelper propertiesHelper;
+	@Resource
 	private MetricsHelper metricsHelper;
+	
+	public static Map<Long, ProgresActualitzacioDto> progresActualitzacio = new HashMap<Long, ProgresActualitzacioDto>();
 	
 	@Override
 	@Transactional
@@ -262,6 +270,161 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+	}
+	
+	@Override
+	@Transactional
+	public void actualitzaProcediments(EntitatDto entitatDto) {
+		Long t1 = System.currentTimeMillis();
+		System.out.println(">>>> Inici actualitzar procediments");
+		System.out.println(">>>> ==========================================================================");
+		System.out.println(">>>> Obtenir procediments de Rolsac de l'entitat...");
+		
+		List<ProcedimentDto> procedimentsGda = getProcedimentsGdaByEntitat(entitatDto.getDir3Codi());
+		
+		Long t2 = System.currentTimeMillis();
+		System.out.println("   " + procedimentsGda.size() + " procediments (" + (t2 - t1) + "ms)");
+		List<OrganGestorEntity> organsGestorsModificats = new ArrayList<OrganGestorEntity>();
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatDto.getId(),
+				false,
+				false,
+				false);
+		
+		System.out.println("");
+		int i = 1;
+		for (ProcedimentDto procedimentGda: procedimentsGda) {
+			t1 = System.currentTimeMillis();
+			System.out.println(">>>> " + i++ + ". Processant procediment: " + procedimentGda.getCodi() + " - " + procedimentGda.getNom());
+			System.out.println(">>>> ........................................................................");
+			System.out.println(">>>> Organ gestor " + procedimentGda.getOrganGestor() +  "...");
+			// Organ gestor
+			OrganGestorEntity organGestor = organGestorRepository.findByCodi(procedimentGda.getOrganGestor());
+			System.out.println(">>>> " + organGestor == null ? "NOU" : "EXISTENT");
+			
+			if (organGestor == null) {
+				organGestor = OrganGestorEntity.getBuilder(
+						procedimentGda.getOrganGestor(),
+						procedimentGda.getOrganGestorNom(),
+						entitat).build();
+				organGestorRepository.save(organGestor);
+			}
+
+			ProcedimentEntity procediment = procedimentRepository.findByCodi(procedimentGda.getCodi());
+			
+			if (procediment == null) {
+				System.out.print(">>>> Procediment NOU ...");
+				// CREATE
+//				ProcedimentEntity procedimentEntity = 
+				procedimentRepository.save(
+						ProcedimentEntity.getBuilder(
+								procedimentGda.getCodi(),
+								procedimentGda.getNom(),
+								Integer.parseInt(propertiesHelper.getProperty("es.caib.notib.procediment.alta.auto.retard", "0")),
+								Integer.parseInt(propertiesHelper.getProperty("es.caib.notib.procediment.alta.auto.caducitat", "10")),
+								entitat,
+								null,
+								null,
+								false,
+								null,
+								null,
+								null,
+								null,
+								organGestor,
+								null,
+								null,
+								null,
+								null).build());
+			} else {
+				System.out.println(">>>> Procediment EXISTENT ...");
+				if (!entitat.equals(procediment.getEntitat())) {
+					throw new ValidationException(
+							procedimentGda.getId(),
+							ProcedimentEntity.class,
+							"El procediment '" + procediment.getNom() + "'  no pertany a la entitat actual (id=" + entitat.getId() + ") ");
+				}
+				// UPDATE
+				if (!procediment.getOrganGestor().getCodi().equals(procedimentGda.getOrganGestor()) ||
+					!procediment.getNom().equals(procedimentGda.getNom())) {
+					// Si canviam l'organ gestor, i aquest no s'utilitza en cap altre procediment, l'eliminarem (1)
+					if (!procediment.getOrganGestor().getCodi().equals(procedimentGda.getOrganGestor())) {
+						organsGestorsModificats.add(procediment.getOrganGestor());
+					}
+					procediment.update(
+							procedimentGda.getNom(),
+							organGestor);
+					t2 = System.currentTimeMillis();
+					System.out.println(">>>>    Modificat (" + (t2 - t1) + "ms)");
+				} else {
+					System.out.println(">>>>    NO es modifica.");
+				}
+			}
+		}
+		
+		i = 1;
+		System.out.println(">>>> Processant organs gestors modificats (" + organsGestorsModificats.size() + ")");
+		System.out.println(">>>> ........................................................................");
+		for (OrganGestorEntity organGestorAntic: organsGestorsModificats) {
+			System.out.println(">>>> Organ gestor " + organGestorAntic.getCodi() + "...   ");
+			// Si canviam l'organ gestor, i aquest no s'utilitza en cap altre procediment, l'eliminarem (2)
+			List<ProcedimentEntity> procedimentsOrganGestorAntic = procedimentRepository.findByOrganGestorId(organGestorAntic.getId());
+			if (procedimentsOrganGestorAntic == null || procedimentsOrganGestorAntic.isEmpty()) {
+				organGestorRepository.delete(organGestorAntic);
+				System.out.println(">>>>    ELIMINADA");
+			} else {
+				System.out.println(">>>>    ES MANTÉ");
+			}
+		}
+		
+	}
+	
+	private List<ProcedimentDto> getProcedimentsGdaByEntitat(String codiDir3) {
+		Long t1 = System.currentTimeMillis();
+		System.out.println(">>>>>>> Obtenir tots els procediments de Rolsac...");
+		List<ProcedimentDto> procedimentsGda = pluginHelper.getProcedimentsGda();
+		Long t2 = System.currentTimeMillis();
+		System.out.println(">>>>>>>   " + procedimentsGda.size() + " procediments (" + (t2 - t1) + "ms)");
+		
+		System.out.println(">>>>>>> Obtenir totes els organs gestors de l'entitat...");
+		List<String> unitatsEntitat = getUnitatsSuccessores(codiDir3);
+		t1 = System.currentTimeMillis();
+		System.out.println(">>>>>>>   " + unitatsEntitat.size() + " organs (" + (t1 - t2) + "ms)");
+		
+		List<ProcedimentDto> procedimentsEntitat = new ArrayList<ProcedimentDto>();
+		
+		System.out.println(">>>>>>> Filtrar procediments per entitat...");
+		for (ProcedimentDto procediment: procedimentsGda) {
+			System.out.println(">>>>>>>>>> Organ procediment: " + procediment.getOrganGestor());
+			if (unitatsEntitat.contains(procediment.getOrganGestor()))
+				procedimentsEntitat.add(procediment);
+		}
+		t2 = System.currentTimeMillis();
+		System.out.println(">>>>>>>   " + procedimentsEntitat.size() + " procediments (" + (t2 - t1) + "ms)");
+		
+		return procedimentsEntitat;
+	}
+	
+	private List<String> getUnitatsSuccessores(String codiDir3) {
+		Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(codiDir3);
+		
+		List<String> unitatsEntitat = new ArrayList<String>();
+		unitatsEntitat.addAll(getUnitatsFilles(organigramaEntitat, codiDir3));
+		return unitatsEntitat;
+	}
+
+	private List<String> getUnitatsFilles(
+			Map<String, OrganismeDto> organigrama,
+			String codiDir3) {
+		List<String> unitats = new ArrayList<String>();
+		unitats.add(codiDir3);
+		OrganismeDto organisme = organigrama.get(codiDir3);
+		if (organisme.getFills() != null && !organisme.getFills().isEmpty()) {
+			for (String fill: organisme.getFills()) {
+				unitats.addAll(getUnitatsFilles(organigrama, fill));
+			}
+		}
+		return unitats;
 	}
 
 	@Override

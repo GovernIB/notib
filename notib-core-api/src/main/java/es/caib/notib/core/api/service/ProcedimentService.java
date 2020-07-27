@@ -467,5 +467,8 @@ public interface ProcedimentService {
 			Long entitatId,
 			Long id,
 			Long permisId) throws NotFoundException;
+
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public void actualitzaProcediments(EntitatDto entitat);
 	
 }

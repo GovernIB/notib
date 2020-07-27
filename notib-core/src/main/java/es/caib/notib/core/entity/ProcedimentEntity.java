@@ -113,6 +113,13 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 		this.codiAssumpteNom = codiAssumpteNom;
 	}
 	
+	public void update(
+			String nom,
+			OrganGestorEntity organGestor) {
+		this.nom = nom;
+		this.organGestor = organGestor;
+	}
+	
 	public static Builder getBuilder(
 			String codi,
 			String nom,

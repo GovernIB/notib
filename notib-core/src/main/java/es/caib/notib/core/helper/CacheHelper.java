@@ -4,7 +4,9 @@
 package es.caib.notib.core.helper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -24,6 +26,7 @@ import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
+import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 
@@ -111,6 +114,35 @@ public class CacheHelper {
 		return organismes;
 	}
 	
+	@Cacheable(value = "organigrama", key="#entitatcodi")
+	public Map<String, OrganismeDto> findOrganigramaByEntitat(String entitatcodi) {
+		Map<String, OrganismeDto> organigrama = new HashMap<String, OrganismeDto>();
+		Map<String, NodeDir3> organigramaDir3 = pluginHelper.getOrganigramaPerEntitat(entitatcodi);
+		if (organigramaDir3 != null) {
+			for (String organ : organigramaDir3.keySet()) {
+				organigrama.put(organ, nodeDir3ToOrganisme(organigramaDir3.get(organ)));
+			}
+		}
+		return organigrama;
+	}
+	
+	private OrganismeDto nodeDir3ToOrganisme(NodeDir3 node) {
+		OrganismeDto organisme = new OrganismeDto();
+		organisme.setCodi(node.getCodi());
+		organisme.setNom(node.getDenominacio());
+		organisme.setPare(node.getSuperior());
+		List<String> fills = null;
+		if (node.getFills() != null && !node.getFills().isEmpty()) {
+			fills = new ArrayList<String>();
+			for (NodeDir3 fill: node.getFills()) {
+				fills.add(fill.getCodi());
+			}
+		}
+		organisme.setFills(fills);
+		
+		return organisme;
+	}
+	
 	@Cacheable(value = "denominacioOrganisme", key="#codiDir3")
 	public String findDenominacioOrganisme(
 			String codiDir3) {
@@ -131,6 +163,10 @@ public class CacheHelper {
 	
 	@CacheEvict(value = "organismes", key="#entitatcodi")
 	public void evictFindOrganismesByEntitat(String entitatcodi) {
+	}
+	
+	@CacheEvict(value = "organigrama", key="#entitatcodi")
+	public void evictFindOrganigramaByEntitat(String entitatcodi) {
 	}
 	
 	@CacheEvict(value = "getPermisosEntitatsUsuariActual", key="#auth.name")

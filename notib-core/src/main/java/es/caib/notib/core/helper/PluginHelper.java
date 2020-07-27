@@ -42,6 +42,7 @@ import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.PersonaDto;
+import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.RegistreAnnexDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.RegistreInteressatDocumentTipusDtoEnum;
@@ -57,6 +58,8 @@ import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.PersonaEntity;
+import es.caib.notib.plugin.gesconadm.GdaProcediment;
+import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.registre.CodiAssumpte;
@@ -84,6 +87,7 @@ import es.caib.notib.plugin.registre.TipusAssumpte;
 import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
+import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
 import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
@@ -109,6 +113,7 @@ public class PluginHelper {
 	private RegistrePlugin registrePlugin;
 	private IArxiuPlugin arxiuPlugin;
 	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin;
+	private GestorContingutsAdministratiuPlugin gestorDocumentalAdministratiuPlugin;
 
 	@Autowired
 	private IntegracioHelper integracioHelper;
@@ -840,10 +845,73 @@ public class PluginHelper {
 		}
 	}
 	
+	// GESTOR DOCUMENTAL ADMINISTRATIU (ROLSAC)
+	// /////////////////////////////////////////////////////////////////////////////////////
+	
+	public List<ProcedimentDto> getProcedimentsGda() {
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_GESDOCADM, 
+				"Obtenir organigrama per entitat", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT);
+		
+		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+		try {
+			System.out.println(">>>>>> Consultant procediments via plugin de Gestor Documental Administratiu");
+			List<GdaProcediment> procs = getGestorDocumentalAdministratiuPlugin().getAllProcediments();
+			System.out.println(">>>>>> Obtinguts " + procs.size() + " procediments");
+			if (procs != null)
+				for (GdaProcediment proc: procs) {
+					ProcedimentDto dto = new ProcedimentDto();
+					dto.setCodi(proc.getCodiSIA());
+					dto.setNom(proc.getNom());
+					if (proc.getUnidadAdministrativa() != null) {
+						dto.setOrganGestor(proc.getUnidadAdministrativa().getCodiDir3());
+						dto.setOrganGestorNom(proc.getUnidadAdministrativa().getNom());
+					}
+					procediments.add(dto);
+				}
+			System.out.println(">>>>>> Procediments convertits");
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al obtenir els procediments del gestor documental administratiu";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_GESDOCADM,
+					errorDescripcio,
+					ex);
+		}
+		
+		return procediments;
+	}
+	
 	// UNITATS ORGANITZATIVES
 	// /////////////////////////////////////////////////////////////////////////////////////
 	
 	
+	public Map<String, NodeDir3> getOrganigramaPerEntitat(String entitatcodi) throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenir organigrama per entitat", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				new AccioParam("Codi Dir3 de l'entitat", entitatcodi));
+		
+		Map<String, NodeDir3> organigrama = null;
+		try {
+			organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(entitatcodi);
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al obtenir l'organigrama per entitat";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+	
+		return organigrama;
+	}
+
 	public List<ObjetoDirectorio> llistarOrganismesPerEntitat(String entitatcodi) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(
@@ -2074,6 +2142,29 @@ public class PluginHelper {
 		
 		return unitatsOrganitzativesPlugin;
 	}
+	
+	private GestorContingutsAdministratiuPlugin getGestorDocumentalAdministratiuPlugin() {
+		if (gestorDocumentalAdministratiuPlugin == null) {
+			String pluginClass = getPropertyPluginGestorDocumentalAdministratu();
+			if (pluginClass != null && pluginClass.length() > 0) {
+				try {
+					Class<?> clazz = Class.forName(pluginClass);
+					gestorDocumentalAdministratiuPlugin = (GestorContingutsAdministratiuPlugin)clazz.newInstance();
+				} catch (Exception ex) {
+					throw new SistemaExternException(
+							IntegracioHelper.INTCODI_GESDOCADM,
+							"Error al crear la instància del plugin de gestor documental administratiu",
+							ex);
+				}
+			} else {
+				throw new SistemaExternException(
+						IntegracioHelper.INTCODI_GESDOCADM,
+						"La classe del plugin del gestor documental administratiu no està configurada");
+			}
+		}
+		
+		return gestorDocumentalAdministratiuPlugin;
+	}
 
 	private String getPropertyPluginUnitats() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.unitats.class");
@@ -2089,6 +2180,9 @@ public class PluginHelper {
 	}
 	private String getPropertyPluginArxiu() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.arxiu.class");
+	}
+	private String getPropertyPluginGestorDocumentalAdministratu() {
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesconadm.class");
 	}
 	
 	

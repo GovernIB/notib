@@ -32,7 +32,7 @@ import es.caib.notib.plugin.utils.PropertiesHelper;
 import lombok.Getter;
 import lombok.Setter;
 
-public class GestorDocumentalAdministratiuPluginRolsac implements GestorDocumentalAdministratiuPlugin {
+public class GestorContingutsAdministratiuPluginRolsac implements GestorContingutsAdministratiuPlugin {
 	
 	private static final String ROLSAC_SERVICE_PATH = "api/rest/v1/";
 	private static Map<String, Unitat> unitatsAdministratives = new HashMap<String, Unitat>();
@@ -49,11 +49,12 @@ public class GestorDocumentalAdministratiuPluginRolsac implements GestorDocument
 					jerseyClient,
 					urlAmbMetode);
 			
+			System.out.println("Consulta de procediments via API REST de Rolsac");
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
 					post(String.class);
-			logger.debug("Missatge REST rebut: " + json);
+			System.out.println("Missatge REST rebut: " + json);
 			
 			ObjectMapper mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -93,14 +94,14 @@ public class GestorDocumentalAdministratiuPluginRolsac implements GestorDocument
 			
 			String json = jerseyClient.
 					resource(urlAmbMetode).
-					type("application/json").
+//					type("application/json").
 					post(String.class);
-			logger.debug("Missatge REST rebut: " + json);
+			System.out.println("Missatge REST rebut: " + json);
 			
 			ObjectMapper mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-			UnitatAdministrativa unitat = mapper.readValue(json, UnitatAdministrativa.class);
-			return unitat;
+			RespostaUnitatAdministrativa resposta = mapper.readValue(json, RespostaUnitatAdministrativa.class);
+			return resposta.getResultado().get(0);
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'han pogut consultar els procediments via REST",
@@ -155,7 +156,7 @@ public class GestorDocumentalAdministratiuPluginRolsac implements GestorDocument
 		GdaUnitatAdministrativa dto = new GdaUnitatAdministrativa();
 		dto.setCodiDir3(unitat.getCodigoDIR3());
 		dto.setNom(unitat.getNombre());
-		return null;
+		return dto;
 	}
 	
 	private Client generarClient() {
@@ -271,6 +272,6 @@ public class GestorDocumentalAdministratiuPluginRolsac implements GestorDocument
 		private String codiPare;
 	}
 	
-	private static final Logger logger = LoggerFactory.getLogger(GestorDocumentalAdministratiuPluginRolsac.class);
+	private static final Logger logger = LoggerFactory.getLogger(GestorContingutsAdministratiuPluginRolsac.class);
 	
 }

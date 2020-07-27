@@ -8,6 +8,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +38,42 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 	private static final String SERVEI_CERCA = "/rest/busqueda/";
 	private static final String SERVEI_CATALEG = "/rest/catalogo/";
 	private static final String SERVEI_UNITAT = "/rest/unidad/";
+	private static final String SERVEI_ORGANIGRAMA = "/rest/organigrama/";
 	private static final String WS_CATALEG = "ws/Dir3CaibObtenerCatalogos";
+	
+	public Map<String, NodeDir3> organigramaPerEntitat(String codiEntitat) throws SistemaExternException {
+		Map<String, NodeDir3> organigrama = new HashMap<String, NodeDir3>();
+		try {
+			URL url = new URL(getServiceUrl() + SERVEI_ORGANIGRAMA + "?codigo=" + codiEntitat);
+			logger.debug("URL: " + url);
+			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
+			httpConnection.setRequestMethod("GET");
+			httpConnection.setDoInput(true);
+			httpConnection.setDoOutput(true);
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			byte[] response = IOUtils.toByteArray(httpConnection.getInputStream());
+			if (response != null && response.length > 0) {
+				NodeDir3 arrel = mapper.readValue(
+					response, 
+					NodeDir3.class);
+				nodeToOrganigrama(arrel, organigrama);
+			}
+			return organigrama;
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'ha pogut consultar l'organigrama de unitats organitzatives via REST (" +
+					"codiEntitat=" + codiEntitat + ")",
+					ex);
+		}
+	}
+	
+	private void nodeToOrganigrama(NodeDir3 unitat, Map<String, NodeDir3> organigrama) {
+		organigrama.put(unitat.getCodi(), unitat);
+		if (unitat.getFills() != null)
+			for (NodeDir3 fill: unitat.getFills())
+				nodeToOrganigrama(fill, organigrama);
+	}
 	
 	public List<ObjetoDirectorio> unitatsPerEntitat(String codiEntitat, boolean inclourePare) throws SistemaExternException {
 		List<ObjetoDirectorio> unitats = new ArrayList<ObjetoDirectorio>();

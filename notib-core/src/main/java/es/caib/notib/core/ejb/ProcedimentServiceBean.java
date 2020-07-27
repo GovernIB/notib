@@ -439,4 +439,10 @@ public class ProcedimentServiceBean implements ProcedimentService {
 		delegate.permisOrganGestorDelete(entitatId, id, permisId);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public void actualitzaProcediments(EntitatDto entitat) {
+		delegate.actualitzaProcediments(entitat);
+	}
+
 }

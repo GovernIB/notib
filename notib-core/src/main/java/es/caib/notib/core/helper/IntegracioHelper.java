@@ -47,6 +47,7 @@ public class IntegracioHelper {
 	public static final String INTCODI_CLIENT = "CALLBACK";
 	public static final String INTCODI_GESDOC = "GESDOC";
 	public static final String INTCODI_UNITATS = "UNITATS";
+	public static final String INTCODI_GESDOCADM = "GESDOCADM";
 
 	private Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = new HashMap<String, LinkedList<IntegracioAccioDto>>();
 	private Map<String, Integer> maxAccionsIntegracio = new HashMap<String, Integer>();
@@ -79,6 +80,9 @@ public class IntegracioHelper {
 		integracions.add(
 				novaIntegracio(
 						INTCODI_UNITATS));
+		integracions.add(
+				novaIntegracio(
+						INTCODI_GESDOCADM));
 		return integracions;
 	}
 
@@ -256,6 +260,8 @@ public class IntegracioHelper {
 			integracio.setNom("Gestor documental");
 		} else if (INTCODI_UNITATS.equals(codi)) {
 			integracio.setNom("Unitats organitzatives");
+		} else if (INTCODI_GESDOCADM.equals(codi)) {
+			integracio.setNom("Rolsac");
 		}
 		return integracio;
 	}

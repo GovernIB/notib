@@ -13,7 +13,7 @@ import es.caib.notib.plugin.SistemaExternException;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface GestorDocumentalAdministratiuPlugin {
+public interface GestorContingutsAdministratiuPlugin {
 	
 	/**
 	 * Retorna la llista de tots els procediments definits al Gestor documental administratiu.

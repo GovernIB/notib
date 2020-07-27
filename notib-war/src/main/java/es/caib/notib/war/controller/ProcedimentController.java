@@ -216,6 +216,42 @@ public class ProcedimentController extends BaseUserController{
 				"procediment.controller.esborrat.ok");
 	}
 	
+	@RequestMapping(value = "/update/auto", method = RequestMethod.GET)
+	public String actualitzacioAutomaticaGet(
+			HttpServletRequest request,
+			Model model) {
+				
+		return "procedimentsActualitzacioForm";
+	}
+	
+	@RequestMapping(value = "/update/auto", method = RequestMethod.POST)
+	public String actualitzacioAutomaticaPost(
+			HttpServletRequest request,
+			Model model) {
+				
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		try {
+			procedimentService.actualitzaProcediments(entitat);
+		} catch (Exception e) {
+			logger.error("Error inesperat al actualitzar els procediments", e);
+			model.addAttribute("errors", e.getMessage());
+			return "procedimentsActualitzacioForm";
+		}
+		
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:procediments",
+				"procediment.controller.update.auto.ok");
+	}
+	
+//	@RequestMapping(value = "/update/auto/progres", method = RequestMethod.GET)
+//	@ResponseBody
+//	public String getProgresActualitzacio(HttpServletRequest request) {
+//		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+//		return procedimentService.getProgresActualitzacio(entitat);
+//	}
+			
+	
 	private ProcedimentFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
 		ProcedimentFiltreCommand procedimentFiltreCommand = (
