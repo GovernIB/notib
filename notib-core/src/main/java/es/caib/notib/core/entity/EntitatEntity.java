@@ -9,6 +9,7 @@ import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -23,7 +24,12 @@ import es.caib.notib.core.audit.NotibAuditable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
-@Table(name="not_entitat")
+@Table(name="not_entitat", 
+	uniqueConstraints = {
+			@UniqueConstraint(columnNames = "codi"),
+			@UniqueConstraint(columnNames = "dir3_codi")
+	}
+)
 @EntityListeners(AuditingEntityListener.class)
 public class EntitatEntity extends NotibAuditable<Long> {
 
@@ -34,7 +40,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	@Column(name = "tipus", length = 32, nullable = false)
 	@Enumerated(EnumType.STRING)
 	private EntitatTipusEnumDto tipus;
-	@Column(name = "dir3_codi", length = 9, nullable = false)
+	@Column(name = "dir3_codi", length = 9, nullable = false, unique = true)
 	private String dir3Codi;
 	@Column(name = "dir3_codi_reg", length = 9)
 	private String dir3CodiReg;
@@ -217,14 +223,15 @@ public class EntitatEntity extends NotibAuditable<Long> {
 		}
 	}
 
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((codi == null) ? 0 : codi.hashCode());
+		result = prime * result + ((dir3Codi == null) ? 0 : dir3Codi.hashCode());
 		return result;
 	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -239,8 +246,14 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				return false;
 		} else if (!codi.equals(other.codi))
 			return false;
+		if (dir3Codi == null) {
+			if (other.dir3Codi != null)
+				return false;
+		} else if (!dir3Codi.equals(other.dir3Codi))
+			return false;
 		return true;
 	}
+
 
 	private static final long serialVersionUID = -2299453443943600172L;
 

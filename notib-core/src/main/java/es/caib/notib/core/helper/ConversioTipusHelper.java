@@ -11,11 +11,14 @@ import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.AplicacioDto;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.entity.AplicacioEntity;
+import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
@@ -48,6 +51,12 @@ public class ConversioTipusHelper {
 						return source.toDate();
 					}
 				});
+		
+		mapperFactory.classMap(EntitatEntity.class, EntitatDto.class).
+			customize(new EntitatEntitytoMapper()).
+			byDefault().
+			register();
+		
 		mapperFactory.classMap(NotificacioEntity.class, NotificacioDto.class).
 			field("notificaErrorEvent.data", "notificaErrorData").
 			field("notificaErrorEvent.errorDescripcio", "notificaErrorDescripcio").
@@ -107,7 +116,22 @@ public class ConversioTipusHelper {
 			}
 		}
 	}
-
+	
+	public class EntitatEntitytoMapper extends CustomMapper<EntitatEntity, EntitatDto> {
+		@Override
+		public void mapAtoB(
+				EntitatEntity entitatEntity, 
+				EntitatDto entitatDto, 
+				MappingContext context) {
+			if (entitatEntity.getTipusDocDefault() != null) {
+				TipusDocumentDto tipusDocumentDto = new TipusDocumentDto();
+				tipusDocumentDto.setEntitat(entitatEntity.getId());
+				tipusDocumentDto.setTipusDocEnum(entitatEntity.getTipusDocDefault());
+				entitatDto.setTipusDocDefault(tipusDocumentDto);
+			}
+		}
+	}
+	
 	private MapperFacade getMapperFacade() {
 		return mapperFactory.getMapperFacade();
 	}

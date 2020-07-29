@@ -51,8 +51,7 @@ public interface PagadorPostalService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public PagadorPostalDto delete(
-			Long id) throws Exception;
+	public PagadorPostalDto delete(Long id) throws NotFoundException;
 
 	/**
 	 * Consulta un pagador postal donat el seu codi.

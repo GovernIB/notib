@@ -44,7 +44,9 @@ public class ClientBaseTest {
 	protected static final String IDENTIFICADOR_PROCEDIMENT = "847185";
 	protected static final String IDIOMA = "ca";
 	protected static final String USUARI_CODI = "e18225486x";
-
+//	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
+	
 	protected NotificacioV2 generarNotificacioV2(
 			String notificacioId,
 			int numDestinataris,
@@ -66,6 +68,9 @@ public class ClientBaseTest {
 		String arxiuB64 = Base64.encodeBase64String(arxiuBytes);
 		document.setContingutBase64(arxiuB64);
 //		document.setUuid("8f3e508c-d304-4502-bd45-2061b47d3eda");
+//		document.setUuid("fb341a96-2cbf-4ec8-b7dd-08a1817c4b32");
+//		document.setCsv("asdfa");
+//		document.setUrl("asdfas");
 		document.setNormalitzat(false);
 //		document.setGenerarCsv(false);
 		
@@ -97,25 +102,29 @@ public class ClientBaseTest {
 			enviament.getDestinataris().add(destinatari);
 			if (ambEnviamentPostal) {
 				EntregaPostal entregaPostal = new EntregaPostal();
-				entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.NACIONAL);
-				entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLE);
-				entregaPostal.setViaNom("Bas");
-				entregaPostal.setNumeroCasa("25");
-				entregaPostal.setNumeroQualificador("bis");
-				//entregaPostal.setApartatCorreus("0228");
-				entregaPostal.setPortal("pt" + i);
-				entregaPostal.setEscala("es" + i);
-				entregaPostal.setPlanta("pl" + i);
-				entregaPostal.setPorta("pr" + i);
-				entregaPostal.setBloc("bl" + i);
-				entregaPostal.setComplement("complement" + i);
-				entregaPostal.setCodiPostal("07500");
-				entregaPostal.setPoblacio("poblacio" + i);
-				entregaPostal.setMunicipiCodi("070337");
-				entregaPostal.setProvincia("07");
-				entregaPostal.setPaisCodi("ES");
-				entregaPostal.setLinea1("linea1_" + i);
-				entregaPostal.setLinea2("linea2_" + i);
+				if (NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR.equals(TIPUS_ENTREGA_POSTAL)) {
+					entregaPostal.setTipus(TIPUS_ENTREGA_POSTAL);
+					entregaPostal.setLinea1("linea1_" + i);
+					entregaPostal.setLinea2("linea2_" + i);
+				} else {
+					entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.NACIONAL);
+					entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLE);
+					entregaPostal.setViaNom("Bas");
+					entregaPostal.setNumeroCasa("25");
+					entregaPostal.setNumeroQualificador("bis");
+					//entregaPostal.setApartatCorreus("0228");
+					entregaPostal.setPortal("pt" + i);
+					entregaPostal.setEscala("es" + i);
+					entregaPostal.setPlanta("pl" + i);
+					entregaPostal.setPorta("pr" + i);
+					entregaPostal.setBloc("bl" + i);
+					entregaPostal.setComplement("complement" + i);
+					entregaPostal.setCodiPostal("07500");
+					entregaPostal.setPoblacio("poblacio" + i);
+					entregaPostal.setMunicipiCodi("070337");
+					entregaPostal.setProvincia("07");
+					entregaPostal.setPaisCodi("ES");
+				}
 				entregaPostal.setCie(new Integer(0));
 				enviament.setEntregaPostal(entregaPostal);
 				enviament.setEntregaPostalActiva(true);

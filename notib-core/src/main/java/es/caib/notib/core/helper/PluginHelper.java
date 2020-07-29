@@ -2234,6 +2234,26 @@ public class PluginHelper {
 				
 		return tipus;
 	}
+	
+	public void setDadesUsuariPlugin(DadesUsuariPlugin dadesUsuariPlugin) {
+		this.dadesUsuariPlugin = dadesUsuariPlugin;
+	}
+	
+	public void setGestioDocumentalPlugin(GestioDocumentalPlugin gestioDocumentalPlugin) {
+		this.gestioDocumentalPlugin = gestioDocumentalPlugin;
+	}
+	
+	public void setRegistrePlugin(RegistrePlugin registrePlugin) {
+		this.registrePlugin = registrePlugin;
+	}
+	
+	public void setArxiuPlugin(IArxiuPlugin arxiuPlugin) {
+		this.arxiuPlugin = arxiuPlugin;
+	}
+	
+	public void setUnitatsOrganitzativesPlugin(UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin) {
+		this.unitatsOrganitzativesPlugin = unitatsOrganitzativesPlugin;
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(PluginHelper.class);
 

@@ -1571,6 +1571,38 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 	}
 	
+	@Transactional(readOnly = true)
+	@Override
+	public OrganGestorDto findOrganGestorByCodi(
+			Long entitatId,
+			String codi) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta de l'organ gestor ("
+					+ "entitatId=" + entitatId + ", "
+					+ "codi=" + codi + ")");
+			EntitatEntity entitat = null;
+				
+			if (entitatId != null)
+				entitat = entityComprovarHelper.comprovarEntitat(
+						entitatId, 
+						false, 
+						true, 
+						false);
+	
+			OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(
+					entitat, 
+					codi);
+			OrganGestorDto resposta = conversioTipusHelper.convertir(
+					organGestor,
+					OrganGestorDto.class);
+			
+			return resposta;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
 	@Transactional
 	@Override
 	public List<PermisDto> permisOrganGestorFind(
