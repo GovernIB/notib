@@ -486,10 +486,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 				if (dataFi != null) {
 					Calendar cal = Calendar.getInstance();
 					cal.setTime(dataFi);
-					cal.set(Calendar.HOUR, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
+					cal.set(Calendar.HOUR, 23);
+					cal.set(Calendar.MINUTE, 59);
+					cal.set(Calendar.SECOND, 59);
+					cal.set(Calendar.MILLISECOND, 999);
 					dataFi = cal.getTime();
 				}
 				OrganGestorEntity organGestor = null;
