@@ -58,7 +58,7 @@ import es.caib.notib.core.service.BaseServiceTest;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+//@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
 @Transactional
 public class NotificacioServiceWsTest extends BaseServiceTest {
@@ -85,7 +85,7 @@ public class NotificacioServiceWsTest extends BaseServiceTest {
 
 
 
-	@Before
+//	@Before
 	public void setUp() throws IOException, DecoderException {
 		es.caib.notib.core.helper.PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
 		es.caib.notib.plugin.utils.PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");

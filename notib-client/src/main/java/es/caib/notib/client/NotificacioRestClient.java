@@ -10,12 +10,15 @@ import javax.ejb.CreateException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
@@ -232,6 +235,23 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 							cookies.addAll(response.getCookies());
 						}
 						return response;
+					}
+				}
+		);
+		jerseyClient.addFilter(
+				new ClientFilter() {
+					@Override
+					public ClientResponse handle(ClientRequest request) throws ClientHandlerException {
+						ClientHandler ch = getNext();
+				        ClientResponse resp = ch.handle(request);
+
+				        if (resp.getStatusInfo().getFamily() != Response.Status.Family.REDIRECTION) {
+				            return resp;
+				        } else {
+				            String redirectTarget = resp.getHeaders().getFirst("Location");
+				            request.setURI(UriBuilder.fromUri(redirectTarget).build());
+				            return ch.handle(request);
+				        }
 					}
 				}
 		);

@@ -161,7 +161,7 @@ public class NotificaAdviserWsTest {
 	private static final String CERIFICACIO_SHA1 = "b081c7abf42d5a8e5a4050958f28046bdf86158c";
 	
 	
-	@Test
+//	@Test
 	public void a_datadoOrganismoTest() throws Exception {
 		AdviserWsV2PortType ws = this.getWS();
 		Holder<String> codigoRespuesta = new Holder<String>();

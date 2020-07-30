@@ -3,6 +3,15 @@
  */
 package es.caib.notib.core.service.ws;
 
+import java.util.Date;
+
+import org.junit.Test;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import es.caib.notib.core.api.ws.callback.NotificacioCanviClient;
+
 //import static org.hamcrest.CoreMatchers.is;
 //import static org.junit.Assert.assertNotNull;
 //import static org.junit.Assert.assertThat;
@@ -63,6 +72,19 @@ package es.caib.notib.core.service.ws;
 //@Transactional
 //@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class NotificaWsTestIntegracio {
+	
+//	@Test
+	public void callbackjson() throws JsonProcessingException {
+		NotificacioCanviClient notificacioCanvi = new NotificacioCanviClient(
+				"aaaa", 
+				"bbbb");
+		notificacioCanvi.setData(new Date());
+
+		// Passa l'objecte a JSON
+		ObjectMapper mapper  = new ObjectMapper();
+		String body = mapper.writeValueAsString(notificacioCanvi);
+		System.out.println(body);
+	}
 /*
 	private static final String ENTITAT_DIR3CODI = "A04013511";
 
