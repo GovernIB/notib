@@ -155,8 +155,15 @@ public class GrupController extends BaseUserController{
 	public String delete(
 			HttpServletRequest request,
 			@PathVariable Long grupId) {
-		//EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
+		// Comprova que el grup no s'utilitzi
+		if (grupService.existProcedimentGrupByGrupId(entitatActual.getId(), grupId)) {
+			return getAjaxControllerReturnValueError(
+					request, 
+					"redirect:../../grup", 
+					"grup.controller.esborrat.ko.enus");
+		};
 		grupService.delete(grupId);
 		
 		return getAjaxControllerReturnValueSuccess(

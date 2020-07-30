@@ -94,6 +94,14 @@ public class GrupServiceBean implements GrupService {
 				entitatId, 
 				procedimentGrupId);
 	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	public Boolean existProcedimentGrupByGrupId(
+			Long entitatId, 
+			Long grupId) {
+		return delegate.existProcedimentGrupByGrupId(entitatId, grupId);
+	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
