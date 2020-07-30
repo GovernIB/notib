@@ -4,6 +4,8 @@
 package es.caib.notib.core.helper;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +29,6 @@ import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.unitat.NodeDir3;
-import es.caib.notib.plugin.unitat.ObjetoDirectorio;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 
 /**
@@ -102,15 +103,20 @@ public class CacheHelper {
 	public List<OrganismeDto> findOrganismesByEntitat(
 			String entitatcodi) {
 		List<OrganismeDto> organismes = new ArrayList<OrganismeDto>();
-		List<ObjetoDirectorio> organismesDir3 = pluginHelper.llistarOrganismesPerEntitat(entitatcodi);
-		if (organismesDir3 != null) {
-			for (ObjetoDirectorio organismeRegistre : organismesDir3) {
-				OrganismeDto organisme = new OrganismeDto();
-				organisme.setCodi(organismeRegistre.getCodi());
-				organisme.setNom(organismeRegistre.getDenominacio());
-				organismes.add(organisme);
-			}
+		Map<String, NodeDir3> organigramaDir3 = pluginHelper.getOrganigramaPerEntitat(entitatcodi);
+		for (String codi: organigramaDir3.keySet()) {
+			OrganismeDto organisme = new OrganismeDto();
+			NodeDir3 node = organigramaDir3.get(codi);
+			organisme.setCodi(node.getCodi());
+			organisme.setNom(node.getDenominacio());
+			organismes.add(organisme);
 		}
+		Collections.sort(organismes, new Comparator<OrganismeDto>() {
+			@Override
+			public int compare(OrganismeDto o1, OrganismeDto o2) {
+				return o1.getCodi().compareTo(o1.getCodi());
+			}
+		});
 		return organismes;
 	}
 	

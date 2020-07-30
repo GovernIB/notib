@@ -143,8 +143,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private RegistreHelper registreHelper;
 	@Autowired
-	private PropertiesHelper propertiesHelper;
-	@Autowired
 	private AplicacioService aplicacioService;
 	@Resource
 	private CacheHelper cacheHelper;
@@ -1260,22 +1258,22 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	private int getRegistreEnviamentsProcessarMaxProperty() {
-		return propertiesHelper.getAsInt(
+		return PropertiesHelper.getProperties().getAsInt(
 				"es.caib.notib.tasca.registre.enviaments.processar.max",
 				10);
 	}
 	private int getNotificaEnviamentsProcessarMaxProperty() {
-		return propertiesHelper.getAsInt(
+		return PropertiesHelper.getProperties().getAsInt(
 				"es.caib.notib.tasca.notifica.enviaments.processar.max",
 				10);
 	}
 	private int getEnviamentActualitzacioEstatProcessarMaxProperty() {
-		return propertiesHelper.getAsInt(
+		return PropertiesHelper.getProperties().getAsInt(
 				"es.caib.notib.tasca.enviament.actualitzacio.estat.processar.max",
 				10);
 	}
 	private int getEnviamentActualitzacioEstatRegistreProcessarMaxProperty() {
-		return propertiesHelper.getAsInt(
+		return PropertiesHelper.getProperties().getAsInt(
 				"es.caib.notib.tasca.enviament.actualitzacio.estat.registre.processar.max",
 				10);
 	}

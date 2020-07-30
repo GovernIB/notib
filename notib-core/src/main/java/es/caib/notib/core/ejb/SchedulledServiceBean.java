@@ -49,4 +49,10 @@ public class SchedulledServiceBean implements SchedulledService {
 		delegate.enviamentRefrescarEstatEnviatSir();
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	public void actualitzarProcediments() {
+		delegate.actualitzarProcediments();
+	}
+
 }

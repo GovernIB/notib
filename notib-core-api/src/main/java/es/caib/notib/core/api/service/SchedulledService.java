@@ -34,5 +34,10 @@ public interface SchedulledService {
 	 * Registre (comunicació SIR)
 	 */
 	public void enviamentRefrescarEstatEnviatSir();
+	
+	/**
+	 * Mètode d'execució periòdica per a actualitzar els procediments a partir de les dades de Rolsac
+	 */
+	public void actualitzarProcediments();
 
 }

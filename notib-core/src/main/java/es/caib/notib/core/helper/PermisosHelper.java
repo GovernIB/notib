@@ -287,6 +287,21 @@ public class PermisosHelper {
 		return findPermisosPerAcl(acl);
 	}
 	
+	public boolean hasAnyPermis(
+			Long objectIdentifier,
+			Class<?> objectClass) {
+		Acl acl = null;
+		try {
+			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
+			acl = aclService.readAclById(oid);
+		} catch (NotFoundException nfex) {
+			return false;
+		}
+		return (acl.getEntries() != null && !acl.getEntries().isEmpty());
+		
+	}
+	
+	
 	public Map<Long, List<PermisDto>> findPermisos(
 			List<Long> objectIdentifiers,
 			Class<?> objectClass) {

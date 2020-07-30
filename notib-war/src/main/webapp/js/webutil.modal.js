@@ -192,7 +192,7 @@
 			}
 			$('.modal-body iframe *', modalobj).remove();
 			$('.modal-footer *', modalobj).remove();
-			modalobj.modal('show');
+			modalobj.modal({show:true, backdrop:'static'});
 		});
 	};
 

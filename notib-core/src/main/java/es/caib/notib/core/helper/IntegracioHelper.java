@@ -40,14 +40,14 @@ public class IntegracioHelper {
 	public static final int DEFAULT_MAX_ACCIONS = 20;
 
 	public static final String INTCODI_USUARIS = "USUARIS";
-//	public static final String INTCODI_WEB = "WEB";
 	public static final String INTCODI_REGISTRE = "REGISTRE";
 	public static final String INTCODI_NOTIFICA = "NOTIFICA";
 	public static final String INTCODI_ARXIU = "ARXIU";
 	public static final String INTCODI_CLIENT = "CALLBACK";
 	public static final String INTCODI_GESDOC = "GESDOC";
 	public static final String INTCODI_UNITATS = "UNITATS";
-	public static final String INTCODI_GESDOCADM = "GESDOCADM";
+	public static final String INTCODI_GESCONADM = "GESCONADM";
+	public static final String INTCODI_PROCEDIMENT = "PROCEDIMENTS";
 
 	private Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = new HashMap<String, LinkedList<IntegracioAccioDto>>();
 	private Map<String, Integer> maxAccionsIntegracio = new HashMap<String, Integer>();
@@ -59,9 +59,6 @@ public class IntegracioHelper {
 		integracions.add(
 				novaIntegracio(
 						INTCODI_USUARIS));
-//		integracions.add(
-//				novaIntegracio(
-//						INTCODI_WEB));
 		integracions.add(
 				novaIntegracio(
 						INTCODI_REGISTRE));
@@ -82,7 +79,10 @@ public class IntegracioHelper {
 						INTCODI_UNITATS));
 		integracions.add(
 				novaIntegracio(
-						INTCODI_GESDOCADM));
+						INTCODI_GESCONADM));
+		integracions.add(
+				novaIntegracio(
+						INTCODI_PROCEDIMENT));
 		return integracions;
 	}
 
@@ -246,8 +246,6 @@ public class IntegracioHelper {
 		integracio.setCodi(codi);
 		if (INTCODI_USUARIS.equals(codi)) {
 			integracio.setNom("Usuaris");
-//		} else if (INTCODI_WEB.equals(codi)) {
-//			integracio.setNom("Accions web");
 		} else if (INTCODI_REGISTRE.equals(codi)) {
 			integracio.setNom("Registre");
 		} else if (INTCODI_NOTIFICA.equals(codi)) {
@@ -260,9 +258,11 @@ public class IntegracioHelper {
 			integracio.setNom("Gestor documental");
 		} else if (INTCODI_UNITATS.equals(codi)) {
 			integracio.setNom("Unitats organitzatives");
-		} else if (INTCODI_GESDOCADM.equals(codi)) {
+		} else if (INTCODI_GESCONADM.equals(codi)) {
 			integracio.setNom("Rolsac");
-		}
+		} else if (INTCODI_PROCEDIMENT.equals(codi)) {
+				integracio.setNom("Procediments");
+			}
 		return integracio;
 	}
 	

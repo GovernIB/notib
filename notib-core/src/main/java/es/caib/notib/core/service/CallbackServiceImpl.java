@@ -32,8 +32,6 @@ public class CallbackServiceImpl implements CallbackService {
     @Autowired
 	private CallbackHelper callbackHelper;
     @Autowired
-	private PropertiesHelper propertiesHelper;
-    @Autowired
     private MetricsHelper metricsHelper;
     
 	@Override
@@ -70,7 +68,7 @@ public class CallbackServiceImpl implements CallbackService {
 
 
 	private boolean isTasquesActivesProperty() {
-		String actives = propertiesHelper.getProperty("es.caib.notib.tasques.actives");
+		String actives = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasques.actives");
 		if (actives != null) {
 			return new Boolean(actives).booleanValue();
 		} else {
@@ -78,7 +76,7 @@ public class CallbackServiceImpl implements CallbackService {
 		}
 	}
 	private boolean isCallbackPendentsActiu() {
-		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.callback.pendents.actiu");
+		String actives = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasca.callback.pendents.actiu");
 		if (actives != null) {
 			return new Boolean(actives).booleanValue();
 		} else {

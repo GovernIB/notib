@@ -24,7 +24,7 @@ public class ProcedimentCommand {
 	private Long id;
 	@NotEmpty @Size(max=9)
 	private String codi;
-	@NotEmpty @Size(max=100)
+	@NotEmpty @Size(max=256)
 	private String nom;
 	private Long entitatId;
 	private String entitatNom;

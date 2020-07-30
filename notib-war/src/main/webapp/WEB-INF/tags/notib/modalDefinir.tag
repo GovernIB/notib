@@ -4,9 +4,10 @@
 <%@ attribute name="refrescarTaula" required="false"%>
 <%@ attribute name="refrescarTaulaId" required="false"%>
 <%@ attribute name="refrescarPagina" required="false"%>
+<%@ attribute name="disableBackdrop" required="false"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<div class="modal fade" id="modal-${modalId}" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="modal-${modalId}" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true" data-backdrop="static">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -103,7 +104,8 @@
 					"src",
 					modalUrl);
 		});
-		modalobj.modal({show:true});
+		debugger;
+		modalobj.modal({show:true, backdrop:'static'});
 		return false;
 	});
 </c:if>

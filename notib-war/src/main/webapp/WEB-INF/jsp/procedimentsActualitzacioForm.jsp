@@ -7,70 +7,213 @@
 <html>
 <head>
 	<title><spring:message code="procediment.actualitzacio.auto"/></title>
-<%-- 	<link href="<c:url value="/webjars/select2/4.0.5/dist/css/select2.min.css"/>" rel="stylesheet"/> --%>
-<%-- 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/> --%>
-<%-- 	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/select2.min.js"/>"></script> --%>
-<%-- 	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/i18n/${requestLocale}.js"/>"></script> --%>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<not:modalHead/>
 	<script>
+		var itervalProgres;
+		var writtenLines = 0;
+		
 		$(document).ready(function() {
-			//loading
-			$('#form').on("submit", function(){
+			$('#formUpdateAuto').on("submit", function(){
+				console.log("submitting...");
 				$('.loading').fadeIn();
+				$('#actualitzacioInfo').fadeIn();
+				$('.confirmacio').fadeOut();
+				$('#autobtn', parent.document).prop('disabled', true);
+				$('.close', parent.document).prop('disabled', true);
+				$('.modal-footer', parent.document).hide();
+				refreshProgres();
 			});
 		});
 
 		function refreshProgres() {
-			var idIterval = setInterval(function(){
-				  
-				  progreso +=10;
-				  $('#bar').css('width', progress + '%');
-				  $('#bar').attr('aria-valuenow', progress);
-					
-				  if(progreso == 100){
-				    clearInterval(idIterval);
-				  }
-			},200);
+			console.log("refreshProgres");
+			itervalProgres = setInterval(getProgres, 250);
 		}
+
+		function getProgres() {
+			console.log("getProgres");
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value='/procediment/update/auto/progres'/>",
+				success: function(data) {
+					if (data) {
+						console.log("Progres:", data);
+						writeInfo(data);
+						if (data.progres == 100) {
+							clearInterval(itervalProgres);
+							$('.modal-footer', parent.document).show();
+							$('.close', parent.document).prop('disabled', false);
+							$('.loading').hide();
+						} else {
+							if (data.progres > 0) {
+								$('.loading').hide();
+								$('.progress').show();
+								$('#bar').css('width', data.progres + '%');
+								$('#bar').attr('aria-valuenow', data.progres);
+								$('#bar').html(data.progres + '%');
+							}
+						}
+					}
+				},
+				error: function() {
+					console.log("error obtenint progrés...");
+					$('.loading').hide();
+					$('.modal-footer', parent.document).show();
+					$('.close', parent.document).prop('disabled', false);
+				}
+			});
+		}
+
+		function writeInfo(data) {
+			let info = data.info;
+			let index;
+			let scroll = writtenLines < info.length;
+			console.log("Scrol?: ", writtenLines, info.length, scroll);
+			for (index = writtenLines; index < info.length; index++) {
+				$("#bcursor").before("<p class='info-" + info[index].tipus + "'>" + info[index].text + "</p>");
+			}
+			writtenLines = index;
+			if (data.error) {
+				$("#bcursor").before("<p class='info-ERROR'>" + data.errorMsg + "</p>");
+			}
+			//scroll to the bottom of "#actualitzacioInfo"
+			if (scroll) {
+				var infoDiv = document.getElementById("actualitzacioInfo");
+				infoDiv.scrollTop = infoDiv.scrollHeight;
+			}
+		}
+
 	</script>
 	<style type="text/css">
+		.info-TITOL {
+			font-size: 13px;
+			font-weight: bold;
+			border-bottom: solid 2px #CCC;
+			margin-bottom: 8px;
+		}
+		.info-SUBTITOL {
+			font-size: 12px;
+			font-weight: bold;
+			border-bottom: solid 1px #CCC;
+			margin-bottom: 6px;
+			padding-left: 5px;
+		}
+		.info-INFO {
+			font-size: 10px;
+			padding-left: 10px;
+		}
+		.info-SUBINFO {
+			font-size: 9px;
+			padding-left: 15px;
+		}
+		.info-TEMPS {
+			font-size: 8px;
+			padding-right: 20px;
+			text-align: right;
+			color: #888;
+		}
+		.info-SEPARADOR {
+			padding-bottom: 10px;
+			border-top: dotted 1px #DDD;
+		}
+		.info-ERROR {
+			font-size: 11px;
+			padding-left: 10px;
+			color: red;
+		}
 		.loading {
-			background: rgba( 255, 255, 255, 0.8 );
 		  	display: none;
-		  	height: 100%;
-		  	position: fixed;
+		  	height: 20px;
 		  	width: 100%;
-		  	z-index: 9999;
-		  	left: 0;
-		  	top: 0;
 		}
 		.loading-gif {
 			left: 50%;
 		  	margin-left: -32px;
 		  	margin-top: -32px;
 		  	position: absolute;
-		  	top: 50%;
-		  	width: 4%;
+		  	top: 46px;
+		  	width: 40px;
 		}
 		.loading-gif img {
 			width: 45%;
-		}
-		.loading-text {
-			left: 47%;
-		  	margin-left: -32px;
-		  	margin-top: -32px;
-		  	position: absolute;
-		  	top: 55%;
 		}
 		body {
 			min-height: 400px;
 		}
 		.progress {
 			display: none;
+			margin-bottom: 0px !important;
 		}
 		.confirmacio {
 			text-align: center;
+		}
+		.info {
+			display: none;
+			overflow: auto;
+			width: 100%;
+			height: 340px;
+			background-color: #EEE;
+			position: relative;
+			top: 15px;
+			padding: 10px;
+		}
+		.info > p {
+			margin: 0 0 4px;
+		}
+		.blinking-cursor {
+ 			font-weight: 100;
+  			font-size: 16px;
+  			color: #222;
+  			-webkit-animation: 1s blink step-end infinite;
+  			-moz-animation: 1s blink step-end infinite;
+  			-ms-animation: 1s blink step-end infinite;
+  			-o-animation: 1s blink step-end infinite;
+  			animation: 1s blink step-end infinite;
+		}
+		@keyframes "blink" {
+		  from, to {
+		    color: transparent;
+		  }
+		  50% {
+		    color: black;
+		  }
+		}
+		
+		@-moz-keyframes blink {
+		  from, to {
+		    color: transparent;
+		  }
+		  50% {
+		    color: black;
+		  }
+		}
+		
+		@-webkit-keyframes "blink" {
+		  from, to {
+		    color: transparent;
+		  }
+		  50% {
+		    color: black;
+		  }
+		}
+		
+		@-ms-keyframes "blink" {
+		  from, to {
+		    color: transparent;
+		  }
+		  50% {
+		    color: black;
+		  }
+		}
+		
+		@-o-keyframes "blink" {
+		  from, to {
+		    color: transparent;
+		  }
+		  50% {
+		    color: black;
+		  }
 		}
 	</style>
 </head>
@@ -79,23 +222,23 @@
 	<div class="confirmacio"> 
 		<h4><spring:message code="procediemnt.actualitzacio.confirmacio"/></h4>
 	</div>
-	<div class="loading">
-		<div class="loading-gif">
-			<img src="<c:url value="/img/ajax-loader.gif"/>"/>
-		</div>
-		<div class="loading-text">
-			<p><spring:message code="procediemnt.actualitzacio.loading"/></p>
-		</div>
-	</div>
 	
 	<c:set var="formAction"><not:modalUrl value="/procediment/update/auto"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
+	<form:form id="formUpdateAuto" action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
+		<div class="loading">
+			<div class="loading-gif">
+				<img src="<c:url value="/img/ajax-loader.gif"/>"/>
+			</div>
+		</div>
 		<div class="progress">
   			<div id="bar" class="progress-bar" role="progressbar progress-bar-striped active" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">0%</div>
 		</div>
+		<div id="actualitzacioInfo" class="info">
+			<span id="bcursor" class="blinking-cursor">|</span>
+		</div>
 		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.actualitzar"/></button>
-			<a href="#" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+			<button id="autobtn" type="submit" class="btn btn-success"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.actualitzar"/></button>
+			<a id="cancelbtn" href="#" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
 </body>

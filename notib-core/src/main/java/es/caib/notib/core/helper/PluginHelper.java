@@ -850,15 +850,13 @@ public class PluginHelper {
 	
 	public List<ProcedimentDto> getProcedimentsGda() {
 		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_GESDOCADM, 
+				IntegracioHelper.INTCODI_GESCONADM, 
 				"Obtenir organigrama per entitat", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT);
 		
 		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
 		try {
-			System.out.println(">>>>>> Consultant procediments via plugin de Gestor Documental Administratiu");
 			List<GdaProcediment> procs = getGestorDocumentalAdministratiuPlugin().getAllProcediments();
-			System.out.println(">>>>>> Obtinguts " + procs.size() + " procediments");
 			if (procs != null)
 				for (GdaProcediment proc: procs) {
 					ProcedimentDto dto = new ProcedimentDto();
@@ -866,17 +864,15 @@ public class PluginHelper {
 					dto.setNom(proc.getNom());
 					if (proc.getUnitatAdministrativacodi() != null) {
 						dto.setOrganGestor(proc.getUnitatAdministrativacodi());
-//						dto.setOrganGestorNom(proc.getUnidadAdministrativa().getNom());
 					}
 					procediments.add(dto);
 				}
-			System.out.println(">>>>>> Procediments convertits");
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al obtenir els procediments del gestor documental administratiu";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_GESDOCADM,
+					IntegracioHelper.INTCODI_GESCONADM,
 					errorDescripcio,
 					ex);
 		}
@@ -2152,13 +2148,13 @@ public class PluginHelper {
 					gestorDocumentalAdministratiuPlugin = (GestorContingutsAdministratiuPlugin)clazz.newInstance();
 				} catch (Exception ex) {
 					throw new SistemaExternException(
-							IntegracioHelper.INTCODI_GESDOCADM,
+							IntegracioHelper.INTCODI_GESCONADM,
 							"Error al crear la instància del plugin de gestor documental administratiu",
 							ex);
 				}
 			} else {
 				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_GESDOCADM,
+						IntegracioHelper.INTCODI_GESCONADM,
 						"La classe del plugin del gestor documental administratiu no està configurada");
 			}
 		}

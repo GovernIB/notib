@@ -35,7 +35,7 @@ import lombok.Setter;
 public class GestorContingutsAdministratiuPluginRolsac implements GestorContingutsAdministratiuPlugin {
 	
 	private static final String ROLSAC_SERVICE_PATH = "api/rest/v1/";
-	private static Map<String, UnitatAdministrativa> unitatsAdministratives = new HashMap<String, UnitatAdministrativa>();
+	private static Map<String, String> unitatsAdministratives = new HashMap<String, String>();
 	private String baseUrl;
 	
 	@Override
@@ -49,12 +49,10 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 					jerseyClient,
 					urlAmbMetode);
 			
-			System.out.println("Consulta de procediments via API REST de Rolsac");
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
 					post(String.class);
-			System.out.println("Missatge REST rebut: " + json);
 			
 			ObjectMapper mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -72,7 +70,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	@Override
 	public String getUnitatAdministrativa(String codi) throws SistemaExternException {
 		if (unitatsAdministratives.containsKey(codi))
-			return unitatsAdministratives.get(codi).getCodigoDIR3(); //.getUnitatAdministrativa();
+			return unitatsAdministratives.get(codi);
 		
 		try {
 			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "unidades_administrativas/" + codi;
@@ -85,17 +83,21 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					post(String.class);
-			System.out.println("Missatge REST rebut: " + json);
 			
 			ObjectMapper mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			RespostaUnitatAdministrativa resposta = mapper.readValue(json, RespostaUnitatAdministrativa.class);
-			UnitatAdministrativa unitat = null;
+			String unitatCodi = null;
 			if (resposta.getResultado() != null && !resposta.getResultado().isEmpty()) {
-				unitat = resposta.getResultado().get(0);
-				unitatsAdministratives.put(codi, unitat);
+				UnitatAdministrativa unitat = resposta.getResultado().get(0);
+				if (unitat.getCodigoDIR3() != null && !unitat.getCodigoDIR3().isEmpty()) {
+					unitatCodi = unitat.getCodigoDIR3();
+				} else if (unitat.getPadre() != null && unitat.getPadre().getCodigo() != null && !unitat.getPadre().getCodigo().isEmpty()){
+					unitatCodi = getUnitatAdministrativa(unitat.getPadre().getCodigo());
+				}
 			}
-			return unitat.getCodigoDIR3();
+			unitatsAdministratives.put(codi, unitatCodi);
+			return unitatCodi;
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'han pogut consultar els procediments via REST",

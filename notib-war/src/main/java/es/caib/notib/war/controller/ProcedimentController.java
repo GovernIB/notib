@@ -1,5 +1,7 @@
 package es.caib.notib.war.controller;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +26,7 @@ import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentFormDto;
+import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -235,6 +238,10 @@ public class ProcedimentController extends BaseUserController{
 		} catch (Exception e) {
 			logger.error("Error inesperat al actualitzar els procediments", e);
 			model.addAttribute("errors", e.getMessage());
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			MissatgesHelper.error(request, "Error: \n" + sw.toString());
 			return "procedimentsActualitzacioForm";
 		}
 		
@@ -244,12 +251,12 @@ public class ProcedimentController extends BaseUserController{
 				"procediment.controller.update.auto.ok");
 	}
 	
-//	@RequestMapping(value = "/update/auto/progres", method = RequestMethod.GET)
-//	@ResponseBody
-//	public String getProgresActualitzacio(HttpServletRequest request) {
-//		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-//		return procedimentService.getProgresActualitzacio(entitat);
-//	}
+	@RequestMapping(value = "/update/auto/progres", method = RequestMethod.GET)
+	@ResponseBody
+	public ProgresActualitzacioDto getProgresActualitzacio(HttpServletRequest request) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		return procedimentService.getProgresActualitzacio(entitat.getDir3Codi());
+	}
 			
 	
 	private ProcedimentFiltreCommand getFiltreCommand(

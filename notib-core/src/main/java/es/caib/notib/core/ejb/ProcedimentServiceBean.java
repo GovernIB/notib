@@ -29,6 +29,7 @@ import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
 import es.caib.notib.core.api.dto.ProcedimentFormDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.ProcedimentService;
@@ -448,6 +449,11 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	@RolesAllowed({"NOT_ADMIN"})
 	public void actualitzaProcediments(EntitatDto entitat) {
 		delegate.actualitzaProcediments(entitat);
+	}
+
+	@Override
+	public ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi) {
+		return delegate.getProgresActualitzacio(dir3Codi);
 	}
 
 }

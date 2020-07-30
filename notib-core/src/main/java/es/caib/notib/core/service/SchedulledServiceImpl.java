@@ -3,17 +3,27 @@
  */
 package es.caib.notib.core.service;
 
+import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.codahale.metrics.Timer;
 
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.SchedulledService;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -34,7 +44,9 @@ public class SchedulledServiceImpl implements SchedulledService {
 	@Autowired
 	private NotificacioService notificacioService;
 	@Autowired
-	private PropertiesHelper propertiesHelper;
+	private ProcedimentService procedimentService;
+	@Autowired
+	private EntitatService entitatService;
 	@Autowired
 	private MetricsHelper metricsHelper;
 
@@ -152,8 +164,56 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}	
 	}
 	
+	
+	// 5. Actualització dels procediments a partir de la informació de Rolsac
+	/////////////////////////////////////////////////////////////////////////
+	@Override
+	@Scheduled(cron = "${config:es.caib.notib.actualitzacio.procediments.cron}")
+	public void actualitzarProcediments() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			if (isActualitzacioProcedimentsActiuProperty()) {
+				addAdminAuthentication();
+				logger.info("[PRO] Cercant entitats per a actualitzar els procediments");
+				List<EntitatDto> entitats = entitatService.findAll();
+				if (entitats != null && !entitats.isEmpty()) {
+					logger.info("[PRO] Realitzant actualització de procediments per a " + entitats.size() + " entitats");
+					for (EntitatDto entitat: entitats) {
+						logger.info(">>> Actualitzant procedimetns de la entitat: " + entitat.getNom());
+						procedimentService.actualitzaProcediments(entitat);
+					}
+				} else {
+					logger.info("[PRO] No hi ha entitats per actualitzar");
+				}
+			} else {
+				logger.info("[PRO] L'actualització de procedimetns està deshabilitada");
+			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}	
+	}
+	
+	private void addAdminAuthentication() {
+		Principal principal = new Principal() {
+			public String getName() {
+				return "SCHEDULLER";
+			}
+		};
+		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+		authorities.add(new SimpleGrantedAuthority("NOT_SUPER"));
+		authorities.add(new SimpleGrantedAuthority("NOT_ADMIN"));
+		
+		Authentication auth = new UsernamePasswordAuthenticationToken(
+				principal ,
+				"N/A",
+				authorities);
+		
+		SecurityContextHolder.getContext().setAuthentication(auth);
+	}
+		
+	
 	private boolean isNotificaEnviamentsActiu() {
-		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.notifica.enviaments.actiu");
+		String actives = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasca.notifica.enviaments.actiu");
 		if (actives != null) {
 			return new Boolean(actives).booleanValue();
 		} else {
@@ -161,7 +221,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
 	}
 	private boolean isEnviamentActualitzacioEstatActiu() {
-		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.enviament.actualitzacio.estat.actiu");
+		String actives = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasca.enviament.actualitzacio.estat.actiu");
 		if (actives != null) {
 			return new Boolean(actives).booleanValue();
 		} else {
@@ -169,7 +229,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
 	}
 	private boolean isEnviamentActualitzacioEstatRegistreActiu() {
-		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.actiu");
+		String actives = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.actiu");
 		if (actives != null) {
 			return new Boolean(actives).booleanValue();
 		} else {
@@ -177,11 +237,19 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
 	}
 	private boolean isTasquesActivesProperty() {
-		String actives = propertiesHelper.getProperty("es.caib.notib.tasques.actives");
+		String actives = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasques.actives");
 		if (actives != null) {
 			return new Boolean(actives).booleanValue();
 		} else {
 			return true;
+		}
+	}
+	private boolean isActualitzacioProcedimentsActiuProperty() {
+		String actiu = PropertiesHelper.getProperties().getProperty("es.caib.notib.actualitzacio.procediments.actiu");
+		if (actiu != null) {
+			return new Boolean(actiu).booleanValue();
+		} else {
+			return false;
 		}
 	}
 	

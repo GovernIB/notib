@@ -42,13 +42,14 @@ public class IntegracioController extends BaseUserController {
 
 	enum IntegracioEnumDto {
 		USUARIS,
-//		WEB,
 		REGISTRE,
 		NOTIFICA,
 		ARXIU,
 		CALLBACK,
 		GESDOC,
-		UNITATS
+		UNITATS,
+		GESCONADM,
+		PROCEDIMENTS
 	}
 
 	@RequestMapping(method = RequestMethod.GET)

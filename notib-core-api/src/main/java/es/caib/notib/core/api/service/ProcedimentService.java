@@ -21,6 +21,7 @@ import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
 import es.caib.notib.core.api.dto.ProcedimentFormDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 
@@ -475,5 +476,8 @@ public interface ProcedimentService {
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public void actualitzaProcediments(EntitatDto entitat);
+
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi);
 	
 }
