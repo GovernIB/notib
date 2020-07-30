@@ -864,9 +864,9 @@ public class PluginHelper {
 					ProcedimentDto dto = new ProcedimentDto();
 					dto.setCodi(proc.getCodiSIA());
 					dto.setNom(proc.getNom());
-					if (proc.getUnidadAdministrativa() != null) {
-						dto.setOrganGestor(proc.getUnidadAdministrativa().getCodiDir3());
-						dto.setOrganGestorNom(proc.getUnidadAdministrativa().getNom());
+					if (proc.getUnitatAdministrativacodi() != null) {
+						dto.setOrganGestor(proc.getUnitatAdministrativacodi());
+//						dto.setOrganGestorNom(proc.getUnidadAdministrativa().getNom());
 					}
 					procediments.add(dto);
 				}

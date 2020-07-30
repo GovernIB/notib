@@ -306,7 +306,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			if (organGestor == null) {
 				organGestor = OrganGestorEntity.getBuilder(
 						procedimentGda.getOrganGestor(),
-						procedimentGda.getOrganGestorNom(),
+						cacheHelper.findDenominacioOrganisme(procedimentGda.getOrganGestor()),
 						entitat).build();
 				organGestorRepository.save(organGestor);
 			}
@@ -316,7 +316,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			if (procediment == null) {
 				System.out.print(">>>> Procediment NOU ...");
 				// CREATE
-//				ProcedimentEntity procedimentEntity = 
 				procedimentRepository.save(
 						ProcedimentEntity.getBuilder(
 								procedimentGda.getCodi(),

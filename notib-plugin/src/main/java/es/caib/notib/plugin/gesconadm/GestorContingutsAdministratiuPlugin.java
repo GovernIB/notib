@@ -31,6 +31,6 @@ public interface GestorContingutsAdministratiuPlugin {
 	 * @throws SistemaExternException
 	 *            Si es produeix un error al consultar la unitat administrativa.
 	 */
-	public GdaUnitatAdministrativa getUnitatAdministrativa(String codi) throws SistemaExternException;
+	public String getUnitatAdministrativa(String codi) throws SistemaExternException;
 
 }

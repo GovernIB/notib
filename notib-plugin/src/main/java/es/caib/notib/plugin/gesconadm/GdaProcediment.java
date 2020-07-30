@@ -12,7 +12,8 @@ public class GdaProcediment {
 	
 	private String codiSIA;
     private String nom;
-    private GdaUnitatAdministrativa unidadAdministrativa;
-    private GdaUnitatAdministrativa unitatAdministrativaPare;
+    private String unitatAdministrativacodi;
+//    private GdaUnitatAdministrativa unidadAdministrativa;
+//    private GdaUnitatAdministrativa unitatAdministrativaPare;
 
 }

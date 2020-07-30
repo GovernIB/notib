@@ -35,7 +35,7 @@ import lombok.Setter;
 public class GestorContingutsAdministratiuPluginRolsac implements GestorContingutsAdministratiuPlugin {
 	
 	private static final String ROLSAC_SERVICE_PATH = "api/rest/v1/";
-	private static Map<String, Unitat> unitatsAdministratives = new HashMap<String, Unitat>();
+	private static Map<String, UnitatAdministrativa> unitatsAdministratives = new HashMap<String, UnitatAdministrativa>();
 	private String baseUrl;
 	
 	@Override
@@ -70,20 +70,10 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	}
 	
 	@Override
-	public GdaUnitatAdministrativa getUnitatAdministrativa(String codi) throws SistemaExternException {
+	public String getUnitatAdministrativa(String codi) throws SistemaExternException {
 		if (unitatsAdministratives.containsKey(codi))
-			return unitatsAdministratives.get(codi).getUnitatAdministrativa();
+			return unitatsAdministratives.get(codi).getCodigoDIR3(); //.getUnitatAdministrativa();
 		
-		UnitatAdministrativa unitat = getUnitatAdministrativaRolsac(codi);
-		GdaUnitatAdministrativa dto = toDto(unitat);
-		String codiPare = null;
-		if (unitat.getPadre() != null) 
-			codiPare = unitat.getPadre().getCodigo();
-		addUnitat(codi, dto, codiPare);
-		return dto;
-	}
-	
-	private UnitatAdministrativa getUnitatAdministrativaRolsac(String codi) throws SistemaExternException {
 		try {
 			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "unidades_administrativas/" + codi;
 			
@@ -94,45 +84,87 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			
 			String json = jerseyClient.
 					resource(urlAmbMetode).
-//					type("application/json").
 					post(String.class);
 			System.out.println("Missatge REST rebut: " + json);
 			
 			ObjectMapper mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			RespostaUnitatAdministrativa resposta = mapper.readValue(json, RespostaUnitatAdministrativa.class);
-			return resposta.getResultado().get(0);
+			UnitatAdministrativa unitat = null;
+			if (resposta.getResultado() != null && !resposta.getResultado().isEmpty()) {
+				unitat = resposta.getResultado().get(0);
+				unitatsAdministratives.put(codi, unitat);
+			}
+			return unitat.getCodigoDIR3();
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'han pogut consultar els procediments via REST",
 					ex);
 		}
+		
+//		UnitatAdministrativa unitat = getUnitatAdministrativaRolsac(codi);
+//		GdaUnitatAdministrativa dto = toDto(unitat);
+//		String codiPare = null;
+//		if (unitat.getPadre() != null) 
+//			codiPare = unitat.getPadre().getCodigo();
+//		addUnitat(codi, dto, codiPare);
+//		return unitat.getCodigoDIR3();
 	}
 	
-	private GdaUnitatAdministrativa getUnitatAdministrativaArrel(String codi) throws SistemaExternException {
-		GdaUnitatAdministrativa unitatAdministrativa = null;
-		if (unitatsAdministratives.containsKey(codi)) {
-			Unitat u = unitatsAdministratives.get(codi);
-			if (u.getCodiPare() == null) {
-				unitatAdministrativa = u.getUnitatAdministrativa();
-			} else if (u.getCodiPare() != null) {
-				unitatAdministrativa = getUnitatAdministrativaArrel(u.getCodiPare());
-			}
-		} else {
-			UnitatAdministrativa unitat = getUnitatAdministrativaRolsac(codi);
-			GdaUnitatAdministrativa dto = toDto(unitat);
-			String codiPare = null;
-			if (unitat.getPadre() != null) 
-				codiPare = unitat.getPadre().getCodigo();
-			addUnitat(codi, dto, codiPare);
-			if (codiPare == null) {
-				unitatAdministrativa = dto;
-			} else {
-				unitatAdministrativa = getUnitatAdministrativaArrel(codiPare);
-			}
-		}
-		return unitatAdministrativa;
-	}
+//	private UnitatAdministrativa getUnitatAdministrativaRolsac(String codi) throws SistemaExternException {
+//		try {
+//			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "unidades_administrativas/" + codi;
+//			
+//			Client jerseyClient = generarClient();
+//			autenticarClient(
+//					jerseyClient,
+//					urlAmbMetode);
+//			
+//			String json = jerseyClient.
+//					resource(urlAmbMetode).
+//					post(String.class);
+//			System.out.println("Missatge REST rebut: " + json);
+//			
+//			ObjectMapper mapper  = new ObjectMapper();
+//			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+//			RespostaUnitatAdministrativa resposta = mapper.readValue(json, RespostaUnitatAdministrativa.class);
+//			UnitatAdministrativa unitat = null;
+//			if (resposta.getResultado() != null && !resposta.getResultado().isEmpty()) {
+//				unitat = resposta.getResultado().get(0);
+//				unitatsAdministratives.put(codi, unitat);
+//			}
+//			return unitat;
+//		} catch (Exception ex) {
+//			throw new SistemaExternException(
+//					"No s'han pogut consultar els procediments via REST",
+//					ex);
+//		}
+//	}
+	
+//	private GdaUnitatAdministrativa getUnitatAdministrativaArrel(String codi) throws SistemaExternException {
+//		GdaUnitatAdministrativa unitatAdministrativa = null;
+//		if (unitatsAdministratives.containsKey(codi)) {
+//			Unitat u = unitatsAdministratives.get(codi);
+//			if (u.getCodiPare() == null) {
+//				unitatAdministrativa = u.getUnitatAdministrativa();
+//			} else if (u.getCodiPare() != null) {
+//				unitatAdministrativa = getUnitatAdministrativaArrel(u.getCodiPare());
+//			}
+//		} else {
+//			UnitatAdministrativa unitat = getUnitatAdministrativaRolsac(codi);
+//			GdaUnitatAdministrativa dto = toDto(unitat);
+//			String codiPare = null;
+//			if (unitat.getPadre() != null) 
+//				codiPare = unitat.getPadre().getCodigo();
+//			addUnitat(codi, dto, codiPare);
+//			if (codiPare == null) {
+//				unitatAdministrativa = dto;
+//			} else {
+//				unitatAdministrativa = getUnitatAdministrativaArrel(codiPare);
+//			}
+//		}
+//		return unitatAdministrativa;
+//	}
 	
 	
 	private List<GdaProcediment> toDto(List<Procediment> procediments) throws SistemaExternException {
@@ -147,17 +179,18 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		GdaProcediment dto = new GdaProcediment();
 		dto.setCodiSIA(procediment.getCodigoSIA());
 		dto.setNom(procediment.getNombre());
-		dto.setUnidadAdministrativa(getUnitatAdministrativa(procediment.getUnidadAdministrativa().getCodigo()));
-		dto.setUnitatAdministrativaPare(getUnitatAdministrativaArrel(procediment.getUnidadAdministrativa().getCodigo()));
+		dto.setUnitatAdministrativacodi(getUnitatAdministrativa(procediment.getUnidadAdministrativa().getCodigo()));
+//		dto.setUnidadAdministrativa(getUnitatAdministrativa(procediment.getUnidadAdministrativa().getCodigo()));
+//		dto.setUnitatAdministrativaPare(getUnitatAdministrativaArrel(procediment.getUnidadAdministrativa().getCodigo()));
 		return dto;
 	}
 
-	private GdaUnitatAdministrativa toDto(UnitatAdministrativa unitat) {
-		GdaUnitatAdministrativa dto = new GdaUnitatAdministrativa();
-		dto.setCodiDir3(unitat.getCodigoDIR3());
-		dto.setNom(unitat.getNombre());
-		return dto;
-	}
+//	private GdaUnitatAdministrativa toDto(UnitatAdministrativa unitat) {
+//		GdaUnitatAdministrativa dto = new GdaUnitatAdministrativa();
+//		dto.setCodiDir3(unitat.getCodigoDIR3());
+//		dto.setNom(unitat.getNombre());
+//		return dto;
+//	}
 	
 	private Client generarClient() {
 		Client jerseyClient = Client.create();
@@ -257,14 +290,14 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		}
 	}
 	
-	private static void addUnitat(String codi, GdaUnitatAdministrativa unitat, String codiPare) {
-		if (!unitatsAdministratives.containsKey(codi)) {
-			Unitat unitatAdministrativa = new Unitat();
-			unitatAdministrativa.setUnitatAdministrativa(unitat);
-			unitatAdministrativa.setCodiPare(codiPare);
-			unitatsAdministratives.put(codi, unitatAdministrativa);
-		}
-	}
+//	private static void addUnitat(String codi, GdaUnitatAdministrativa unitat, String codiPare) {
+//		if (!unitatsAdministratives.containsKey(codi)) {
+//			Unitat unitatAdministrativa = new Unitat();
+//			unitatAdministrativa.setUnitatAdministrativa(unitat);
+//			unitatAdministrativa.setCodiPare(codiPare);
+//			unitatsAdministratives.put(codi, unitatAdministrativa);
+//		}
+//	}
 	
 	@Getter @Setter
 	private static class Unitat {
