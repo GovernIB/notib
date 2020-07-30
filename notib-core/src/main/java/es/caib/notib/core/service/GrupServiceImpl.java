@@ -274,7 +274,7 @@ public class GrupServiceImpl implements GrupService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			GrupEntity grup = entityComprovarHelper.comprovarGrup(grupId);
-			if (grup.getEntitat().getId() != entitatId) {
+			if (!grup.getEntitat().getId().equals(entitatId)) {
 				throw new ValidationException("El grup que s'intenta eliminar no pertany a la entitat actual");
 			}
 			List<GrupProcedimentEntity> procedimentGrups = grupProcedimentRepositoy.findByGrup(grup);

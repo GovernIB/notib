@@ -112,7 +112,7 @@ public class GrupController extends BaseUserController{
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:grupAdminList",
-					"procediment.controller.modificat.ok");
+					"grup.controller.modificat.ok");
 		//if it is new	
 		} else {
 			grupService.create(
@@ -121,7 +121,7 @@ public class GrupController extends BaseUserController{
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:grupAdminList",
-					"procediment.controller.creat.ok");
+					"grup.controller.creat.ok");
 		}
 	}
 	

@@ -49,8 +49,8 @@
 		data-filter="#filtre">
 		<thead>
 			<tr>
-				<th data-col-name="codi"><spring:message code="grup.list.columna.codi"/></th>
 				<th data-col-name="nom"><spring:message code="grup.list.columna.nom"/></th>
+				<th data-col-name="codi"><spring:message code="grup.list.columna.codi"/></th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
