@@ -12,15 +12,19 @@ import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.AplicacioDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
+import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.entity.PagadorCieEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import ma.glasnost.orika.CustomConverter;
@@ -83,6 +87,19 @@ public class ConversioTipusHelper {
 		mapperFactory.classMap(ProcedimentEntity.class, ProcedimentDto.class).
 			field("organGestor.codi", "organGestor").
 			field("organGestor.nom", "organGestorNom").
+			byDefault().
+			register();
+		
+		
+		
+		mapperFactory.classMap(PagadorCieEntity.class, PagadorCieDto.class).
+		field("entitat.id", "entitatId").
+		byDefault().
+		register();
+		
+		
+		mapperFactory.classMap(GrupEntity.class, GrupDto.class).
+			field("entitat.id", "entitatId").
 			byDefault().
 			register();
 	}

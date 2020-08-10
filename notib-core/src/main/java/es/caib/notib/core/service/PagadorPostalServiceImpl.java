@@ -62,9 +62,7 @@ public class PagadorPostalServiceImpl implements PagadorPostalService{
 			pagadorPostalEntity = pagadorPostalReposity.save(
 					PagadorPostalEntity.getBuilder(
 							postal.getDir3codi(),
-							postal.getContracteNum(),
 							postal.getContracteDataVig(),
-							postal.getFacturacioClientCodi(),
 							entitat).build());
 			
 			return conversioTipusHelper.convertir(

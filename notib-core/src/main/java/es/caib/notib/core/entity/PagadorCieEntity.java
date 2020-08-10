@@ -38,6 +38,7 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 	@JoinColumn(name = "entitat")
 	@ForeignKey(name = "not_pagador_cie_entitat_fk")
 	private EntitatEntity entitat;
+	
 
 	public String getDir3codi() {
 		return dir3codi;

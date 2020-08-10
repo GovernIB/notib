@@ -7,6 +7,7 @@ public class GrupDto extends AuditoriaDto implements Serializable {
 	private Long id;
 	private String codi;
 	private String nom;
+	private Long entitatId;
 	
 	
 	public Long getId() {
@@ -28,6 +29,12 @@ public class GrupDto extends AuditoriaDto implements Serializable {
 		this.nom = nom;
 	}
 
+	public Long getEntitatId() {
+		return entitatId;
+	}
+	public void setEntitatId(Long entitatId) {
+		this.entitatId = entitatId;
+	}
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

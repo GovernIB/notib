@@ -15,7 +15,7 @@ import es.caib.notib.core.api.exception.NotFoundException;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface PagadorPostalService {
+public interface PagadorPostalService { 
 
 	/**
 	 * Crea un nou pagador postal.

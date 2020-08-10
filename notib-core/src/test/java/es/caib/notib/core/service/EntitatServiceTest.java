@@ -98,6 +98,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 				@Override
 				public void executar(List<Object> elementsCreats) throws Exception {
 					EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+					
 					assertNotNull(entitatCreada);
 					assertNotNull(entitatCreada.getId());
 					comprovarEntitatCoincideix(
@@ -108,6 +109,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 			}, 
 			"Alta de ENTITAT", 
 			entitatCreate);
+		
 	}
 	
 	@Test
@@ -115,7 +117,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 		testCreantElements(
 			new TestAmbElementsCreats() {
 				@Override
-				public void executar(List<Object> elementsCreats) {
+				public void executar(List<Object> elementsCreats) throws NotFoundException{
 					autenticarUsuari("super");
 					EntitatDto creada = (EntitatDto)elementsCreats.get(0);
 					entitatUpdate.setId(creada.getId());

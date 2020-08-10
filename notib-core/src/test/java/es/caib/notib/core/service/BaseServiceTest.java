@@ -563,7 +563,7 @@ public class BaseServiceTest {
 		localitats.add(new CodiValor("276", "Inca"));
 		
 		Mockito.when(unitatsOrganitzativesPluginMock.unitatsPerEntitat(Mockito.anyString(), Mockito.anyBoolean())).thenReturn(unitats);
-		Mockito.when(unitatsOrganitzativesPluginMock.unitatsPerEntitat(null, Mockito.anyBoolean())).thenThrow(NullPointerException.class);
+		Mockito.when(unitatsOrganitzativesPluginMock.unitatsPerEntitat(Mockito.eq((String)null), Mockito.anyBoolean())).thenThrow(NullPointerException.class);
 		Mockito.when(unitatsOrganitzativesPluginMock.unitatDenominacio(Mockito.anyString())).thenReturn("Gobierno de las Islas Baleares");
 		Mockito.when(unitatsOrganitzativesPluginMock.unitatDenominacio(null)).thenThrow(NullPointerException.class);
 		Mockito.when(unitatsOrganitzativesPluginMock.paisos()).thenReturn(paisos);
