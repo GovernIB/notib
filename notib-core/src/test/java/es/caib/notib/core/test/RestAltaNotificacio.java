@@ -46,7 +46,8 @@ public class RestAltaNotificacio {
 			ex.printStackTrace();
 		}
 	}
-	@Test
+	
+//	@Test
 	private void testAlta() throws JsonProcessingException, IOException, DecoderException {
 		Client jerseyClient = new Client();
 		ObjectMapper mapper  = new ObjectMapper();
@@ -70,7 +71,7 @@ public class RestAltaNotificacio {
 		System.out.println(
 				">>> Resposta HTTP JSON: " + response.getEntity(String.class));
 	}
-	@Test
+//	@Test
 	private void testAltaV2() throws JsonProcessingException, IOException, DecoderException {
 		Client jerseyClient = new Client();
 		ObjectMapper mapper  = new ObjectMapper();
