@@ -97,7 +97,7 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 
 	@Override
 	@Transactional
-	public PagadorCieDto delete(Long id) throws NotFoundException {
+	public PagadorCieDto delete(Long id) throws Exception {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(id);

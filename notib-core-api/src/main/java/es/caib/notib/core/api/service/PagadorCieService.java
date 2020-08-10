@@ -49,10 +49,11 @@ public interface PagadorCieService {
 	 * @return El pagador cie esborrat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws Exception 
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public PagadorCieDto delete(
-			Long id) throws NotFoundException;
+			Long id) throws NotFoundException, Exception;
 
 	/**
 	 * Consulta un pagador cie donat el seu codi.

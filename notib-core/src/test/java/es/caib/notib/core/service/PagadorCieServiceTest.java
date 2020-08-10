@@ -6,6 +6,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -107,7 +108,7 @@ public class PagadorCieServiceTest extends BaseServiceTest{
 		
 		createPagadorCie=new PagadorCieDto();
 		createPagadorCie.setDir3codi("07002");
-		createPagadorCie.setContracteDataVig(null);
+		createPagadorCie.setContracteDataVig(new Date());
 		
 		
 		
@@ -154,8 +155,7 @@ public class PagadorCieServiceTest extends BaseServiceTest{
 	
 	
 	/*
-	 * 
-	 */
+	 
 	@Test
 	public void update() {
 		testCreantElements(

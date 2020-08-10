@@ -41,7 +41,7 @@ public class ProcedimentServiceTest extends BaseServiceTest{
 	PermisosHelper permisosHelper;
 	@Autowired
 	private EntityManager entityManager;
-	
+	 
 	
 	private PermisDto permisUser;
 	private PermisDto permisAdmin;
