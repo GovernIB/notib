@@ -7,9 +7,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -37,7 +39,9 @@ import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 
 
@@ -55,6 +59,8 @@ public class PermisosHelper {
 	private MutableAclService aclService;
 	@Resource
 	private EntitatRepository entitatRepository;
+	@Resource
+	private OrganGestorRepository organGestorRepository;
 	@Resource
 	private PermisosHelper permisosHelper;
 	@Resource
@@ -577,32 +583,84 @@ public class PermisosHelper {
 		logger.debug("Consulta entitats accessibles (usuariCodi=" + usuariCodi + ")");
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<EntitatEntity> entitats = entitatRepository.findByActiva(true);
-		Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT};
 		
-		if (rolActual != null && rolActual.equals("NOT_USER")) {
-			permisos = new Permission[] {ExtendedPermission.USUARI};
+		if (rolActual != null && rolActual.equals("NOT_ADMIN_ORGAN")) {
+			
+			List<OrganGestorEntity> organsGestors = organGestorRepository.findAll();
+			Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADOR};
+			
+			permisosHelper.filterGrantedAny(
+					organsGestors,
+					new ObjectIdentifierExtractor<OrganGestorEntity>() {
+						public Long getObjectIdentifier(OrganGestorEntity organGestor) {
+							return organGestor.getId();
+						}
+					},
+					//revisar
+					OrganGestorEntity.class,
+					permisos,
+					auth);
+			Set<EntitatEntity> entitats = new HashSet<EntitatEntity>();
+			if (organsGestors != null) {
+				for (OrganGestorEntity organGestor: organsGestors) {
+					entitats.add(organGestor.getEntitat());
+				}
+			}
+			List<EntitatDto> resposta = conversioTipusHelper.convertirList(
+					new ArrayList<EntitatEntity>(entitats),
+					EntitatDto.class);
+			
+			for(EntitatDto dto : resposta) {
+				dto.setUsuariActualAdministradorOrgan(true);
+				dto.setUsuariActualAdministradorEntitat(true);
+			}
+			
+			return resposta;
+		} else {
+			List<EntitatEntity> entitats = entitatRepository.findByActiva(true);
+			
+			Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT};
+			
+			if (rolActual != null && rolActual.equals("NOT_USER")) {
+				permisos = new Permission[] {ExtendedPermission.USUARI};
+			}
+			
+			permisosHelper.filterGrantedAny(
+					entitats,
+					new ObjectIdentifierExtractor<EntitatEntity>() {
+						public Long getObjectIdentifier(EntitatEntity entitat) {
+							return entitat.getId();
+						}
+					},
+					//revisar
+					EntitatEntity.class,
+					permisos,
+					auth);
+			
+			List<EntitatDto> resposta = conversioTipusHelper.convertirList(
+					entitats,
+					EntitatDto.class);
+			
+			permisos = new Permission[] {ExtendedPermission.ADMINISTRADOR};
+			for(EntitatDto dto : resposta) {
+				dto.setUsuariActualAdministradorEntitat(true);
+				List<OrganGestorEntity> organsGestors = organGestorRepository.findByEntitatId(dto.getId());
+				dto.setUsuariActualAdministradorOrgan(
+						permisosHelper.isGrantedAny(
+								organsGestors,
+								new ObjectIdentifierExtractor<OrganGestorEntity>() {
+									public Long getObjectIdentifier(OrganGestorEntity organGestor) {
+										return organGestor.getId();
+									}
+								},
+								OrganGestorEntity.class,
+								permisos,
+								auth));
+				
+			}
+			
+			return resposta;
 		}
-		
-		permisosHelper.filterGrantedAny(
-				entitats,
-				new ObjectIdentifierExtractor<EntitatEntity>() {
-					public Long getObjectIdentifier(EntitatEntity entitat) {
-						return entitat.getId();
-					}
-				},
-				//revisar
-				EntitatEntity.class,
-				permisos,
-				auth);
-		
-		List<EntitatDto> resposta = conversioTipusHelper.convertirList(
-				entitats,
-				EntitatDto.class);
-		
-		for(EntitatDto dto : resposta) dto.setUsuariActualAdministradorEntitat(true);
-		
-		return resposta;
 		
 //		usuarisEntitatHelper.omplirUsuarisPerEntitats(
 //				resposta,

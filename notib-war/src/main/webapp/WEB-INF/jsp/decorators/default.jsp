@@ -31,11 +31,11 @@
 			"isRolActualUsuari",
 			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuari(request));
 	pageContext.setAttribute(
+			"isRolActualAdministradorOrgan",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
+	pageContext.setAttribute(
 			"requestParameterCanviRol",
 			es.caib.notib.war.helper.RolHelper.getRequestParameterCanviRol());
-	//pageContext.setAttribute(
-	//		"permisConsulta",
-	//		request.getAttribute("permisConsulta"));
 	pageContext.setAttribute(
 			"permisNotificacio",
 			request.getAttribute("permisNotificacio"));
@@ -165,7 +165,7 @@ body {
 				<div class="nav navbar-nav navbar-right">
 					<ul class="list-inline pull-right">
 					
-						<c:if test="${hiHaEntitats && isRolActualAdministradorEntitat || isRolActualUsuari}">
+						<c:if test="${hiHaEntitats && isRolActualAdministradorEntitat || isRolActualUsuari || isRolActualAdministradorOrgan}">
 							<li class="dropdown">
 								<c:if test="${hiHaMesEntitats}"><a href="#" data-toggle="dropdown"></c:if>
 		         				<span class="fa fa-home"></span> ${entitatActual.nom} <c:if test="${hiHaMesEntitats}"><b class="caret caret-white"></b></c:if>
@@ -291,18 +291,26 @@ body {
 								</ul>
 							</div>
 							</c:if>
-						</div>
-						<%-- <c:choose> --%>
-							<%-- <c:when test="${isRolActualAdministrador}"> --%>
-							<%-- <div class="btn-group">
-								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.monitoritzar"/>&nbsp;<span class="caret caret-white"></span></button>
+							<c:if test="${isRolActualAdministradorOrgan}">
+							<div class="btn-group">
+								<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
+							</div>
+							<div class="btn-group">
+								<a href="<c:url value="/enviament"/>" class="btn btn-primary"><spring:message code="decorator.menu.enviaments"/></a>
+							</div>
+							<div class="btn-group">
+								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>								
 								<ul class="dropdown-menu">
-									<li><a href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
-									<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>
+									<li><a href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/></a></li>
+									<li><a href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organGestor"/></a></li>
+									<li class="divider"></li>
+									<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
+									<li><a href="<c:url value="/pagadorPostal"/>"><spring:message code="decorator.menu.pagadorpostal"/></a></li>
+									<li><a href="<c:url value="/pagadorCie"/>"><spring:message code="decorator.menu.pagadorcie"/></a></li>
 								</ul>
-							</div> --%>
-							<%-- </c:when> --%>
-						<%-- </c:choose> --%>
+							</div>
+							</c:if>
+						</div>
 					</div>
 				</div>
 			</div>

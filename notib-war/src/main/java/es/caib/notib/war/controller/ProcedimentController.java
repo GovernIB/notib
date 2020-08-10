@@ -32,6 +32,7 @@ import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieService;
 import es.caib.notib.core.api.service.PagadorPostalService;
 import es.caib.notib.core.api.service.ProcedimentService;
@@ -58,6 +59,8 @@ public class ProcedimentController extends BaseUserController{
 	@Autowired
 	ProcedimentService procedimentService;
 	@Autowired
+	OrganGestorService organGestorService;
+	@Autowired
 	EntitatService entitatService;
 	@Autowired
 	PagadorPostalService pagadorPostalService;
@@ -74,7 +77,7 @@ public class ProcedimentController extends BaseUserController{
 //		model.addAttribute(new ProcedimentFiltreCommand());
 		ProcedimentFiltreCommand procedimentFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("procedimentFiltreCommand", procedimentFiltreCommand);
-		model.addAttribute("organsGestors", procedimentService.findOrgansGestorsCodiByEntitat(entitat.getId()));
+		model.addAttribute("organsGestors", organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId()));
 		return "procedimentAdminList";
 	}
 	
@@ -349,7 +352,7 @@ public class ProcedimentController extends BaseUserController{
 		Model model,
 		@PathVariable Long entitatId) {
 		EntitatDto entitat = entitatService.findById(entitatId);
-		return procedimentService.findOrganismes(entitat);
+		return organGestorService.findOrganismes(entitat);
 	}
 	
 	@RequestMapping(value = "/oficines/{entitatId}", method = RequestMethod.GET)

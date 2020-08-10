@@ -11,9 +11,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import es.caib.notib.core.api.service.AplicacioService;
-import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.war.helper.AplicacioHelper;
-import es.caib.notib.war.helper.PermisosHelper;
 
 /**
  * Interceptor per a les accions de context d'aplicació.
@@ -24,8 +22,8 @@ public class AplicacioInterceptor extends HandlerInterceptorAdapter {
 
 	@Autowired
 	private AplicacioService aplicacioService;
-	@Autowired
-	private EntitatService entitatService;
+//	@Autowired
+//	private EntitatService entitatService;
 
 
 	@Override
@@ -37,9 +35,9 @@ public class AplicacioInterceptor extends HandlerInterceptorAdapter {
 		request.setAttribute(
 				"requestLocale",
 				RequestContextUtils.getLocale(request).getLanguage());
-		PermisosHelper.comprovarPermisosEntitatsUsuariActual(
-				request,
-				entitatService);
+//		PermisosHelper.comprovarPermisosEntitatsUsuariActual(
+//				request,
+//				entitatService);
 		return true;
 	}
 

@@ -793,6 +793,7 @@ public class EntityComprovarHelper {
 	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual(Authentication auth) {
 //		System.out.println("Obtenim i posam en cache els permisos de " + auth.getName());
 		List<EntitatEntity> entitatsEntity = entitatRepository.findAll();
+		List<OrganGestorEntity> organsGestorsEntity = organGestorRepository.findAll();
 		Map<RolEnumDto, Boolean> hasPermisos = new HashMap<RolEnumDto, Boolean>();
 		
 		Boolean hasPermisUsuariEntitat = permisosHelper.isGrantedAny(
@@ -824,11 +825,22 @@ public class EntityComprovarHelper {
 				}, 
 				EntitatEntity.class, 
 				new Permission[] {ExtendedPermission.APLICACIO}, 
-				auth);		
+				auth);
+		Boolean hasPermisAdminOrgan = permisosHelper.isGrantedAny(
+				organsGestorsEntity, 
+				new ObjectIdentifierExtractor<OrganGestorEntity>() {
+					public Long getObjectIdentifier(OrganGestorEntity organGestorEntity) {
+						return organGestorEntity.getId();
+					}
+				}, 
+				OrganGestorEntity.class, 
+				new Permission[] {ExtendedPermission.ADMINISTRADOR}, 
+				auth);
 		
 		hasPermisos.put(RolEnumDto.NOT_USER, hasPermisUsuariEntitat);
 		hasPermisos.put(RolEnumDto.NOT_ADMIN, hasPermisAdminEntitat);
 		hasPermisos.put(RolEnumDto.NOT_APL, hasPermisAplicacioEntitat);
+		hasPermisos.put(RolEnumDto.NOT_ADMIN_ORGAN, hasPermisAdminOrgan);
 		
 		return hasPermisos;
 		

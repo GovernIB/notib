@@ -60,15 +60,15 @@ public class PermisosHelper {
 		request.setAttribute(
 				"permisUsuariEntitat",
 				permisos.get(RolEnumDto.NOT_USER));
-//				entitatService.hasPermisUsuariEntitat());
 		request.setAttribute(
 				"permisAdminEntitat",
 				permisos.get(RolEnumDto.NOT_ADMIN));
-//				entitatService.hasPermisAdminEntitat());
 		request.setAttribute(
 				"permisAplicacioEntitat",
 				permisos.get(RolEnumDto.NOT_APL));
-//				entitatService.hasPermisAplicacioEntitat());
+		request.setAttribute(
+				"permisAdminOrgan",
+				permisos.get(RolEnumDto.NOT_ADMIN_ORGAN));
 
 	}
 }

@@ -6,13 +6,9 @@ import java.util.Map;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.core.api.dto.CodiAssumpteDto;
-import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.OrganGestorFiltreDto;
-import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
@@ -196,22 +192,6 @@ public interface ProcedimentService {
 	public List<CodiAssumpteDto> findCodisAssumpte(
 			EntitatDto entitat,
 			String codiTipusAssumpte);
-	
-	/**
-	 * Recupera els organimes d'una entitat.
-	 * 
-	 * @return La llista dels tipus d'assumpte.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public List<OrganismeDto> findOrganismes(EntitatDto entitat);
-	
-	/**
-	 * Recupera la denominació d'un organime.
-	 * 
-	 * @return La denominació de l'organisme.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
-	public String findDenominacioOrganisme(String codiDir3);
 	
 	/**
 	 * Recupera les oficines d'una entitat.
@@ -417,67 +397,10 @@ public interface ProcedimentService {
 			PermisEnum permis);
 	
 	
-	// ORGANS GESTORS
-	/////////////////////////////////////////////////////////////
-	
-	@PreAuthorize("hasRole('NOT_SUPER')")
-	public List<OrganGestorDto> findOrgansGestorsAll();
-	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public List<OrganGestorDto> findOrgansGestorsByEntitat(Long entitatId);
-	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public List<CodiValorDto> findOrgansGestorsCodiByEntitat(Long entitatId);
-	
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public List<OrganGestorDto> findOrganGestorByProcedimentIds(List<Long> procedimentIds);
-	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public PaginaDto<OrganGestorDto> findOrgansGestorsAmbFiltrePaginat(
-			Long entitatId, 
-			OrganGestorFiltreDto filtre, 
-			PaginacioParamsDto paginacioParams);
-	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public void updateOrganGestorNom(
-			Long entitatId, 
-			String organGestorCodi);
-	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public void updateOrgansGestorsNom(
-			Long entitatId);
-
-	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public OrganGestorDto findOrganGestorById(
-			Long entitatId,
-			Long id);
-	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public OrganGestorDto findOrganGestorByCodi(
-			Long entitatId,
-			String codi);
-	
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public List<PermisDto> permisOrganGestorFind(
-			Long entitatId,
-			Long id) throws NotFoundException;
-	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public void permisOrganGestorUpdate(
-			Long entitatId,
-			Long id,
-			PermisDto permis) throws NotFoundException;
-	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public void permisOrganGestorDelete(
-			Long entitatId,
-			Long id,
-			Long permisId) throws NotFoundException;
-
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public void actualitzaProcediments(EntitatDto entitat);
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi);
-	
+
 }

@@ -1,12 +1,14 @@
 package es.caib.notib.war.controller;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,9 +19,10 @@ import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieService;
 import es.caib.notib.core.api.service.PagadorPostalService;
-import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.war.command.OrganGestorCommand;
 import es.caib.notib.war.command.OrganGestorFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
@@ -39,7 +42,7 @@ public class OrganGestorController extends BaseUserController{
 	private final static String ORGANS_FILTRE = "organs_filtre";
 	
 	@Autowired
-	ProcedimentService procedimentService;
+	OrganGestorService organGestorService;
 	@Autowired
 	EntitatService entitatService;
 	@Autowired
@@ -69,7 +72,7 @@ public class OrganGestorController extends BaseUserController{
 		try {
 			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 
-			organs = procedimentService.findOrgansGestorsAmbFiltrePaginat(
+			organs = organGestorService.findAmbFiltrePaginat(
 					entitat.getId(),
 					OrganGestorFiltreCommand.asDto(organGestorFiltreCommand),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
@@ -100,15 +103,46 @@ public class OrganGestorController extends BaseUserController{
 		return "organGestorList";
 	}
 	
+	@RequestMapping(value = "/new", method = RequestMethod.GET)
+	public String newGet(
+			HttpServletRequest request,
+			Model model) {
+		OrganGestorCommand organGestorCommand = new OrganGestorCommand();
+		model.addAttribute(organGestorCommand);
+		model.addAttribute("entitat", getEntitatActualComprovantPermisos(request));
+		return "organGestorForm";
+	}
+	
+	@RequestMapping(value = "/new", method = RequestMethod.POST)
+	public String save(
+			HttpServletRequest request,
+			@Valid OrganGestorCommand organGestorCommand,
+			BindingResult bindingResult,
+			Model model) {		
+		
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("entitat", getEntitatActualComprovantPermisos(request));
+//			model.addAttribute("errors", bindingResult.getAllErrors());
+			return "organGestorForm";
+		}
+		
+		organGestorService.create(OrganGestorCommand.asDto(organGestorCommand));
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:organgestor",
+				"organgestor.controller.creat.ok");
+	}
+	
+	
 	@RequestMapping(value = "/{organGestorCodi}/update", method = RequestMethod.GET)
-	public String delete(
+	public String update(
 			HttpServletRequest request,
 			@PathVariable String organGestorCodi) {		
 		
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		
 		try {
-			procedimentService.updateOrganGestorNom(
+			organGestorService.updateNom(
 					entitat.getId(),
 					organGestorCodi);
 			return getAjaxControllerReturnValueSuccess(
@@ -124,13 +158,13 @@ public class OrganGestorController extends BaseUserController{
 	}
 	
 	@RequestMapping(value = "/update", method = RequestMethod.GET)
-	public String delete(
+	public String update(
 			HttpServletRequest request) {		
 		
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		
 		try {
-			procedimentService.updateOrgansGestorsNom(
+			organGestorService.updateNoms(
 					entitat.getId());
 			return getAjaxControllerReturnValueSuccess(
 					request,
@@ -141,6 +175,38 @@ public class OrganGestorController extends BaseUserController{
 					request,
 					"redirect:../organgestor",
 					"organgestor.controller.update.nom.tots.error");
+		}
+	}
+	
+	@RequestMapping(value = "/{organGestorCodi}/delete", method = RequestMethod.GET)
+	public String delete(
+			HttpServletRequest request,
+			@PathVariable String organGestorCodi) {		
+		
+		try {
+			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+			OrganGestorDto organ = organGestorService.findByCodi(entitat.getId(), organGestorCodi);
+			
+			if (organGestorService.organGestorEnUs(organ.getId())) {
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../procediment",
+						"organgestor.controller.esborrat.us");
+			} else {
+				organGestorService.delete(
+						entitat.getId(),
+						organ.getId());
+				return getAjaxControllerReturnValueSuccess(
+						request,
+						"redirect:../../procediment",
+						"organgestor.controller.esborrat.ok");
+			}
+		} catch (Exception e) {
+			return getAjaxControllerReturnValueError(
+					request,
+					"redirect:../../procediment",
+					"organgestor.controller.esborrat.ko",
+					e);
 		}
 	}
 	
