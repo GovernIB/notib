@@ -4,6 +4,7 @@
 package es.caib.notib.plugin.unitat;
 
 import java.util.List;
+import java.util.Map;
 
 import es.caib.notib.plugin.SistemaExternException;
 
@@ -14,6 +15,20 @@ import es.caib.notib.plugin.SistemaExternException;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface UnitatsOrganitzativesPlugin {
+	
+	/**
+	 * Retorna la llista d'unitats organitzatives filles donat un codi d'entitat.
+	 * 
+	 * @param codi
+	 *            Codi dir3 de la unitat pare.
+	 * @param inclourePare
+	 * 			  Indica si el llistat ha d'incloure l'entitat pare
+	 *            
+	 * @return La llista d'unitats organitzatives.
+	 * @throws SistemaExternException
+	 *            Si es produeix un error al consultar les unitats organitzatives.
+	 */
+	public Map<String, NodeDir3> organigramaPerEntitat(String codiEntitat) throws SistemaExternException;
 	
 	/**
 	 * Retorna la llista d'unitats organitzatives filles donat un codi d'entitat.

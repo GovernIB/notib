@@ -21,6 +21,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.GrupEntity;
@@ -261,6 +262,24 @@ public class GrupServiceImpl implements GrupService{
 			return conversioTipusHelper.convertir(
 					procedimentGrup, 
 					ProcedimentGrupDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public Boolean existProcedimentGrupByGrupId(
+			Long entitatId, 
+			Long grupId) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			GrupEntity grup = entityComprovarHelper.comprovarGrup(grupId);
+			if (!grup.getEntitat().getId().equals(entitatId)) {
+				throw new ValidationException("El grup que s'intenta eliminar no pertany a la entitat actual");
+			}
+			List<GrupProcedimentEntity> procedimentGrups = grupProcedimentRepositoy.findByGrup(grup);
+			return (procedimentGrups != null && !procedimentGrups.isEmpty());
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

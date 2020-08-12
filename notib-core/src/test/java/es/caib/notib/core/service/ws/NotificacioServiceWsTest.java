@@ -19,7 +19,6 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -33,7 +32,6 @@ import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.service.EntitatService;
-import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.SchedulledService;
 import es.caib.notib.core.api.ws.notificacio.Document;
 import es.caib.notib.core.api.ws.notificacio.EntregaDeh;
@@ -69,8 +67,8 @@ public class NotificacioServiceWsTest extends BaseServiceTest {
 
 	@Autowired
 	private EntitatService entitatService;
-	@Autowired
-	private NotificacioService notificacioService;
+//	@Autowired
+//	private NotificacioService notificacioService;
 	@Autowired
 	private SchedulledService schedulledService;
 	@Autowired

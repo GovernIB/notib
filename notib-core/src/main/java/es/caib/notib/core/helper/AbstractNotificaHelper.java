@@ -421,10 +421,10 @@ public abstract class AbstractNotificaHelper {
 		return PropertiesHelper.getProperties().getProperty(
 				"es.caib.notib.notifica.url");
 	}
-	protected String getSedeUrlProperty() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.notifica.sede.url");
-	}
+//	protected String getSedeUrlProperty() {
+//		return PropertiesHelper.getProperties().getProperty(
+//				"es.caib.notib.notifica.sede.url");
+//	}
 	protected String getUsernameProperty() {
 		return PropertiesHelper.getProperties().getProperty(
 				"es.caib.notib.notifica.username");

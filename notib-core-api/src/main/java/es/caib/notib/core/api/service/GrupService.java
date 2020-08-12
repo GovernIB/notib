@@ -137,6 +137,19 @@ public interface GrupService {
 	public ProcedimentGrupDto findProcedimentGrupById(
 			Long entitatId,
 			Long procedimentGrupId);
+	
+	/**
+	 * Consulta un grup donat el seu codi.
+	 * 
+	 * @param id
+	 *            id del grup a trobar.
+	 * @return El grup amb l'id especificat o null si no s'ha trobat.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public Boolean existProcedimentGrupByGrupId(
+			Long entitatId,
+			Long grupId);
+	
 	/**
 	 * Consulta els grups que pertanyen a una entitat
 	 * 

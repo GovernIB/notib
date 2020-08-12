@@ -20,9 +20,9 @@ import es.caib.notib.core.entity.ProcedimentEntity;
  */
 public interface GrupProcedimentRepository extends JpaRepository<GrupProcedimentEntity, Long> {
 
-	public GrupProcedimentEntity findByGrup(GrupEntity grup);
+	public List<GrupProcedimentEntity> findByGrup(GrupEntity grup);
 	public List<GrupProcedimentEntity> findByProcediment(ProcedimentEntity procediment);
-	public List<GrupProcedimentEntity> findByProcediment(ProcedimentEntity procediment,Pageable paginacio);
+	public List<GrupProcedimentEntity> findByProcediment(ProcedimentEntity procediment, Pageable paginacio);
 	public GrupProcedimentEntity findByGrupAndProcediment(GrupEntity grup, ProcedimentEntity procediment);
 	public List<GrupProcedimentEntity> findByProcedimentEntitat(EntitatEntity entitat);
 	

@@ -23,6 +23,7 @@ public class EntitatHelper {
 	private static final String REQUEST_PARAMETER_CANVI_ENTITAT = "canviEntitat";
 	private static final String REQUEST_ATTRIBUTE_ENTITATS = "EntitatHelper.entitats";
 	private static final String SESSION_ATTRIBUTE_ENTITAT_ACTUAL = "EntitatHelper.entitatActual";
+	private static final String REQUEST_PARAMETER_CANVI_ROL = "canviRol";
 
 
 
@@ -52,6 +53,7 @@ public class EntitatHelper {
 			HttpServletRequest request,
 			EntitatService entitatService) {
 		String canviEntitat = request.getParameter(REQUEST_PARAMETER_CANVI_ENTITAT);
+		String canviRol = request.getParameter(REQUEST_PARAMETER_CANVI_ROL);
 		if (canviEntitat != null && canviEntitat.length() > 0) {
 			LOGGER.debug("Processant canvi entitat (id=" + canviEntitat + ")");
 			try {
@@ -63,6 +65,12 @@ public class EntitatHelper {
 					}
 				}
 			} catch (NumberFormatException ignored) {
+			}
+		} else if (canviRol != null && canviRol.length() > 0) {
+			List<EntitatDto> entitats = findEntitatsAccessibles(request, entitatService);
+			EntitatDto entitatActual = getEntitatActual(request);
+			if (!entitats.contains(entitatActual)) {
+				canviEntitatActual(request, entitats.get(0));
 			}
 		}
 	}

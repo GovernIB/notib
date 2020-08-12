@@ -13,7 +13,7 @@ import es.caib.notib.plugin.SistemaExternException;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface GestorDocumentalAdministratiuPlugin {
+public interface GestorContingutsAdministratiuPlugin {
 	
 	/**
 	 * Retorna la llista de tots els procediments definits al Gestor documental administratiu.
@@ -31,6 +31,6 @@ public interface GestorDocumentalAdministratiuPlugin {
 	 * @throws SistemaExternException
 	 *            Si es produeix un error al consultar la unitat administrativa.
 	 */
-	public GdaUnitatAdministrativa getUnitatAdministrativa(String codi) throws SistemaExternException;
+	public String getUnitatAdministrativa(String codi) throws SistemaExternException;
 
 }

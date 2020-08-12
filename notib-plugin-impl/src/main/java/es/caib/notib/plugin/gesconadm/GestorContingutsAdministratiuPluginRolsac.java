@@ -32,10 +32,10 @@ import es.caib.notib.plugin.utils.PropertiesHelper;
 import lombok.Getter;
 import lombok.Setter;
 
-public class GestorDocumentalAdministratiuPluginRolsac implements GestorDocumentalAdministratiuPlugin {
+public class GestorContingutsAdministratiuPluginRolsac implements GestorContingutsAdministratiuPlugin {
 	
 	private static final String ROLSAC_SERVICE_PATH = "api/rest/v1/";
-	private static Map<String, Unitat> unitatsAdministratives = new HashMap<String, Unitat>();
+	private static Map<String, String> unitatsAdministratives = new HashMap<String, String>();
 	private String baseUrl;
 	
 	@Override
@@ -53,7 +53,6 @@ public class GestorDocumentalAdministratiuPluginRolsac implements GestorDocument
 					resource(urlAmbMetode).
 					type("application/json").
 					post(String.class);
-			logger.debug("Missatge REST rebut: " + json);
 			
 			ObjectMapper mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -69,20 +68,10 @@ public class GestorDocumentalAdministratiuPluginRolsac implements GestorDocument
 	}
 	
 	@Override
-	public GdaUnitatAdministrativa getUnitatAdministrativa(String codi) throws SistemaExternException {
+	public String getUnitatAdministrativa(String codi) throws SistemaExternException {
 		if (unitatsAdministratives.containsKey(codi))
-			return unitatsAdministratives.get(codi).getUnitatAdministrativa();
+			return unitatsAdministratives.get(codi);
 		
-		UnitatAdministrativa unitat = getUnitatAdministrativaRolsac(codi);
-		GdaUnitatAdministrativa dto = toDto(unitat);
-		String codiPare = null;
-		if (unitat.getPadre() != null) 
-			codiPare = unitat.getPadre().getCodigo();
-		addUnitat(codi, dto, codiPare);
-		return dto;
-	}
-	
-	private UnitatAdministrativa getUnitatAdministrativaRolsac(String codi) throws SistemaExternException {
 		try {
 			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "unidades_administrativas/" + codi;
 			
@@ -93,45 +82,91 @@ public class GestorDocumentalAdministratiuPluginRolsac implements GestorDocument
 			
 			String json = jerseyClient.
 					resource(urlAmbMetode).
-					type("application/json").
 					post(String.class);
-			logger.debug("Missatge REST rebut: " + json);
 			
 			ObjectMapper mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-			UnitatAdministrativa unitat = mapper.readValue(json, UnitatAdministrativa.class);
-			return unitat;
+			RespostaUnitatAdministrativa resposta = mapper.readValue(json, RespostaUnitatAdministrativa.class);
+			String unitatCodi = null;
+			if (resposta.getResultado() != null && !resposta.getResultado().isEmpty()) {
+				UnitatAdministrativa unitat = resposta.getResultado().get(0);
+				if (unitat.getCodigoDIR3() != null && !unitat.getCodigoDIR3().isEmpty()) {
+					unitatCodi = unitat.getCodigoDIR3();
+				} else if (unitat.getPadre() != null && unitat.getPadre().getCodigo() != null && !unitat.getPadre().getCodigo().isEmpty()){
+					unitatCodi = getUnitatAdministrativa(unitat.getPadre().getCodigo());
+				}
+			}
+			unitatsAdministratives.put(codi, unitatCodi);
+			return unitatCodi;
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'han pogut consultar els procediments via REST",
 					ex);
 		}
+		
+//		UnitatAdministrativa unitat = getUnitatAdministrativaRolsac(codi);
+//		GdaUnitatAdministrativa dto = toDto(unitat);
+//		String codiPare = null;
+//		if (unitat.getPadre() != null) 
+//			codiPare = unitat.getPadre().getCodigo();
+//		addUnitat(codi, dto, codiPare);
+//		return unitat.getCodigoDIR3();
 	}
 	
-	private GdaUnitatAdministrativa getUnitatAdministrativaArrel(String codi) throws SistemaExternException {
-		GdaUnitatAdministrativa unitatAdministrativa = null;
-		if (unitatsAdministratives.containsKey(codi)) {
-			Unitat u = unitatsAdministratives.get(codi);
-			if (u.getCodiPare() == null) {
-				unitatAdministrativa = u.getUnitatAdministrativa();
-			} else if (u.getCodiPare() != null) {
-				unitatAdministrativa = getUnitatAdministrativaArrel(u.getCodiPare());
-			}
-		} else {
-			UnitatAdministrativa unitat = getUnitatAdministrativaRolsac(codi);
-			GdaUnitatAdministrativa dto = toDto(unitat);
-			String codiPare = null;
-			if (unitat.getPadre() != null) 
-				codiPare = unitat.getPadre().getCodigo();
-			addUnitat(codi, dto, codiPare);
-			if (codiPare == null) {
-				unitatAdministrativa = dto;
-			} else {
-				unitatAdministrativa = getUnitatAdministrativaArrel(codiPare);
-			}
-		}
-		return unitatAdministrativa;
-	}
+//	private UnitatAdministrativa getUnitatAdministrativaRolsac(String codi) throws SistemaExternException {
+//		try {
+//			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "unidades_administrativas/" + codi;
+//			
+//			Client jerseyClient = generarClient();
+//			autenticarClient(
+//					jerseyClient,
+//					urlAmbMetode);
+//			
+//			String json = jerseyClient.
+//					resource(urlAmbMetode).
+//					post(String.class);
+//			System.out.println("Missatge REST rebut: " + json);
+//			
+//			ObjectMapper mapper  = new ObjectMapper();
+//			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+//			RespostaUnitatAdministrativa resposta = mapper.readValue(json, RespostaUnitatAdministrativa.class);
+//			UnitatAdministrativa unitat = null;
+//			if (resposta.getResultado() != null && !resposta.getResultado().isEmpty()) {
+//				unitat = resposta.getResultado().get(0);
+//				unitatsAdministratives.put(codi, unitat);
+//			}
+//			return unitat;
+//		} catch (Exception ex) {
+//			throw new SistemaExternException(
+//					"No s'han pogut consultar els procediments via REST",
+//					ex);
+//		}
+//	}
+	
+//	private GdaUnitatAdministrativa getUnitatAdministrativaArrel(String codi) throws SistemaExternException {
+//		GdaUnitatAdministrativa unitatAdministrativa = null;
+//		if (unitatsAdministratives.containsKey(codi)) {
+//			Unitat u = unitatsAdministratives.get(codi);
+//			if (u.getCodiPare() == null) {
+//				unitatAdministrativa = u.getUnitatAdministrativa();
+//			} else if (u.getCodiPare() != null) {
+//				unitatAdministrativa = getUnitatAdministrativaArrel(u.getCodiPare());
+//			}
+//		} else {
+//			UnitatAdministrativa unitat = getUnitatAdministrativaRolsac(codi);
+//			GdaUnitatAdministrativa dto = toDto(unitat);
+//			String codiPare = null;
+//			if (unitat.getPadre() != null) 
+//				codiPare = unitat.getPadre().getCodigo();
+//			addUnitat(codi, dto, codiPare);
+//			if (codiPare == null) {
+//				unitatAdministrativa = dto;
+//			} else {
+//				unitatAdministrativa = getUnitatAdministrativaArrel(codiPare);
+//			}
+//		}
+//		return unitatAdministrativa;
+//	}
 	
 	
 	private List<GdaProcediment> toDto(List<Procediment> procediments) throws SistemaExternException {
@@ -146,17 +181,18 @@ public class GestorDocumentalAdministratiuPluginRolsac implements GestorDocument
 		GdaProcediment dto = new GdaProcediment();
 		dto.setCodiSIA(procediment.getCodigoSIA());
 		dto.setNom(procediment.getNombre());
-		dto.setUnidadAdministrativa(getUnitatAdministrativa(procediment.getUnidadAdministrativa().getCodigo()));
-		dto.setUnitatAdministrativaPare(getUnitatAdministrativaArrel(procediment.getUnidadAdministrativa().getCodigo()));
+		dto.setUnitatAdministrativacodi(getUnitatAdministrativa(procediment.getUnidadAdministrativa().getCodigo()));
+//		dto.setUnidadAdministrativa(getUnitatAdministrativa(procediment.getUnidadAdministrativa().getCodigo()));
+//		dto.setUnitatAdministrativaPare(getUnitatAdministrativaArrel(procediment.getUnidadAdministrativa().getCodigo()));
 		return dto;
 	}
 
-	private GdaUnitatAdministrativa toDto(UnitatAdministrativa unitat) {
-		GdaUnitatAdministrativa dto = new GdaUnitatAdministrativa();
-		dto.setCodiDir3(unitat.getCodigoDIR3());
-		dto.setNom(unitat.getNombre());
-		return null;
-	}
+//	private GdaUnitatAdministrativa toDto(UnitatAdministrativa unitat) {
+//		GdaUnitatAdministrativa dto = new GdaUnitatAdministrativa();
+//		dto.setCodiDir3(unitat.getCodigoDIR3());
+//		dto.setNom(unitat.getNombre());
+//		return dto;
+//	}
 	
 	private Client generarClient() {
 		Client jerseyClient = Client.create();
@@ -256,14 +292,14 @@ public class GestorDocumentalAdministratiuPluginRolsac implements GestorDocument
 		}
 	}
 	
-	private static void addUnitat(String codi, GdaUnitatAdministrativa unitat, String codiPare) {
-		if (!unitatsAdministratives.containsKey(codi)) {
-			Unitat unitatAdministrativa = new Unitat();
-			unitatAdministrativa.setUnitatAdministrativa(unitat);
-			unitatAdministrativa.setCodiPare(codiPare);
-			unitatsAdministratives.put(codi, unitatAdministrativa);
-		}
-	}
+//	private static void addUnitat(String codi, GdaUnitatAdministrativa unitat, String codiPare) {
+//		if (!unitatsAdministratives.containsKey(codi)) {
+//			Unitat unitatAdministrativa = new Unitat();
+//			unitatAdministrativa.setUnitatAdministrativa(unitat);
+//			unitatAdministrativa.setCodiPare(codiPare);
+//			unitatsAdministratives.put(codi, unitatAdministrativa);
+//		}
+//	}
 	
 	@Getter @Setter
 	private static class Unitat {
@@ -271,6 +307,6 @@ public class GestorDocumentalAdministratiuPluginRolsac implements GestorDocument
 		private String codiPare;
 	}
 	
-	private static final Logger logger = LoggerFactory.getLogger(GestorDocumentalAdministratiuPluginRolsac.class);
+	private static final Logger logger = LoggerFactory.getLogger(GestorContingutsAdministratiuPluginRolsac.class);
 	
 }

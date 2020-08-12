@@ -1,5 +1,7 @@
 package es.caib.notib.war.controller;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,11 +26,13 @@ import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentFormDto;
+import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieService;
 import es.caib.notib.core.api.service.PagadorPostalService;
 import es.caib.notib.core.api.service.ProcedimentService;
@@ -55,6 +59,8 @@ public class ProcedimentController extends BaseUserController{
 	@Autowired
 	ProcedimentService procedimentService;
 	@Autowired
+	OrganGestorService organGestorService;
+	@Autowired
 	EntitatService entitatService;
 	@Autowired
 	PagadorPostalService pagadorPostalService;
@@ -71,7 +77,7 @@ public class ProcedimentController extends BaseUserController{
 //		model.addAttribute(new ProcedimentFiltreCommand());
 		ProcedimentFiltreCommand procedimentFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("procedimentFiltreCommand", procedimentFiltreCommand);
-		model.addAttribute("organsGestors", procedimentService.findOrgansGestorsCodiByEntitat(entitat.getId()));
+		model.addAttribute("organsGestors", organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId()));
 		return "procedimentAdminList";
 	}
 	
@@ -216,6 +222,46 @@ public class ProcedimentController extends BaseUserController{
 				"procediment.controller.esborrat.ok");
 	}
 	
+	@RequestMapping(value = "/update/auto", method = RequestMethod.GET)
+	public String actualitzacioAutomaticaGet(
+			HttpServletRequest request,
+			Model model) {
+				
+		return "procedimentsActualitzacioForm";
+	}
+	
+	@RequestMapping(value = "/update/auto", method = RequestMethod.POST)
+	public String actualitzacioAutomaticaPost(
+			HttpServletRequest request,
+			Model model) {
+				
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		try {
+			procedimentService.actualitzaProcediments(entitat);
+		} catch (Exception e) {
+			logger.error("Error inesperat al actualitzar els procediments", e);
+			model.addAttribute("errors", e.getMessage());
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			MissatgesHelper.error(request, "Error: \n" + sw.toString());
+			return "procedimentsActualitzacioForm";
+		}
+		
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:procediments",
+				"procediment.controller.update.auto.ok");
+	}
+	
+	@RequestMapping(value = "/update/auto/progres", method = RequestMethod.GET)
+	@ResponseBody
+	public ProgresActualitzacioDto getProgresActualitzacio(HttpServletRequest request) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		return procedimentService.getProgresActualitzacio(entitat.getDir3Codi());
+	}
+			
+	
 	private ProcedimentFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
 		ProcedimentFiltreCommand procedimentFiltreCommand = (
@@ -306,7 +352,7 @@ public class ProcedimentController extends BaseUserController{
 		Model model,
 		@PathVariable Long entitatId) {
 		EntitatDto entitat = entitatService.findById(entitatId);
-		return procedimentService.findOrganismes(entitat);
+		return organGestorService.findOrganismes(entitat);
 	}
 	
 	@RequestMapping(value = "/oficines/{entitatId}", method = RequestMethod.GET)

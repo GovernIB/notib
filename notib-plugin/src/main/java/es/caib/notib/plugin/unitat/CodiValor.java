@@ -31,23 +31,6 @@ public class CodiValor implements Serializable, Comparable<CodiValor> {
 	@JsonProperty("descripcion")
 	private String descripcio;
 	
-	
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getDescripcio() {
-		return descripcio;
-	}
-
-	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
-	}
-
 	@Override
 	public int compareTo(CodiValor o) {
 		return descripcio.compareToIgnoreCase(o.getDescripcio());

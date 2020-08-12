@@ -143,8 +143,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private RegistreHelper registreHelper;
 	@Autowired
-	private PropertiesHelper propertiesHelper;
-	@Autowired
 	private AplicacioService aplicacioService;
 	@Resource
 	private CacheHelper cacheHelper;
@@ -486,10 +484,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 				if (dataFi != null) {
 					Calendar cal = Calendar.getInstance();
 					cal.setTime(dataFi);
-					cal.set(Calendar.HOUR, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
+					cal.set(Calendar.HOUR, 23);
+					cal.set(Calendar.MINUTE, 59);
+					cal.set(Calendar.SECOND, 59);
+					cal.set(Calendar.MILLISECOND, 999);
 					dataFi = cal.getTime();
 				}
 				OrganGestorEntity organGestor = null;
@@ -1260,22 +1258,22 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	private int getRegistreEnviamentsProcessarMaxProperty() {
-		return propertiesHelper.getAsInt(
+		return PropertiesHelper.getProperties().getAsInt(
 				"es.caib.notib.tasca.registre.enviaments.processar.max",
 				10);
 	}
 	private int getNotificaEnviamentsProcessarMaxProperty() {
-		return propertiesHelper.getAsInt(
+		return PropertiesHelper.getProperties().getAsInt(
 				"es.caib.notib.tasca.notifica.enviaments.processar.max",
 				10);
 	}
 	private int getEnviamentActualitzacioEstatProcessarMaxProperty() {
-		return propertiesHelper.getAsInt(
+		return PropertiesHelper.getProperties().getAsInt(
 				"es.caib.notib.tasca.enviament.actualitzacio.estat.processar.max",
 				10);
 	}
 	private int getEnviamentActualitzacioEstatRegistreProcessarMaxProperty() {
-		return propertiesHelper.getAsInt(
+		return PropertiesHelper.getProperties().getAsInt(
 				"es.caib.notib.tasca.enviament.actualitzacio.estat.registre.processar.max",
 				10);
 	}

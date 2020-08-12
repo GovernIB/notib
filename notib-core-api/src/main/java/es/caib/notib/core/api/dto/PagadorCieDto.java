@@ -13,8 +13,6 @@ public class PagadorCieDto extends AuditoriaDto implements Serializable{
 	private Date contracteDataVig;
 	private Long entitatId;
 	
-	
-
 	private static final long serialVersionUID = 1305599728317046741L;
 
 }

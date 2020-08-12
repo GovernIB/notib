@@ -28,7 +28,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	@Column(name = "codi", length = 64, nullable = false)
 	protected String codi;
 	
-	@Column(name = "nom", length = 100, nullable = false)
+	@Column(name = "nom", length = 256, nullable = false)
 	protected String nom;
 	
 	@Column(name = "retard")
@@ -111,6 +111,13 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 		this.tipusAssumpteNom = tipusAssumpteNom;
 		this.codiAssumpte = codiAssumpte;
 		this.codiAssumpteNom = codiAssumpteNom;
+	}
+	
+	public void update(
+			String nom,
+			OrganGestorEntity organGestor) {
+		this.nom = nom;
+		this.organGestor = organGestor;
 	}
 	
 	public static Builder getBuilder(

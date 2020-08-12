@@ -16,12 +16,14 @@ import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.audit.NotibAuditable;
+import lombok.Getter;
 
 /**
  * Classe de model de dades que conté la informació dels pagadors CIE.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
 @Entity
 @Table(name = "not_pagador_cie")
 @EntityListeners(AuditingEntityListener.class)
@@ -48,14 +50,6 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 		this.entitat = entitat;
 	}
 
-	public String getDir3codi() {
-		return dir3codi;
-	}
-
-	public Date getContracteDataVig() {
-		return contracteDataVig;
-	}
-	
 	public void update(
 			String dir3codi,
 			Date contracteDataVig) {
@@ -106,8 +100,6 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 		return true;
 	}
 	
-	
-	
 	public void setDir3codi(String dir3codi) {
 		this.dir3codi = dir3codi;
 	}
@@ -115,8 +107,6 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 	public void setContracteDataVig(Date contracteDataVig) {
 		this.contracteDataVig = contracteDataVig;
 	}
-
-
 
 	private static final long serialVersionUID = 8596990469127710436L;
 	

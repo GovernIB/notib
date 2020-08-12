@@ -26,10 +26,10 @@
 		<form:hidden path="id"/>
 		<div class="row">
 			<div class="col-md-2">
-				<not:inputText name="codi" textKey="grup.list.columna.codi" required="true"/>
+				<not:inputText name="nom" textKey="grup.list.columna.nom" required="true"/>
 			</div>
 			<div class="col-md-2">
-				<not:inputText name="nom" textKey="grup.list.columna.nom" required="true"/>
+				<not:inputText name="codi" textKey="grup.list.columna.codi" required="true"/>
 			</div>
 			<div id="modal-botons">
 				<button id="addGrupButton" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
