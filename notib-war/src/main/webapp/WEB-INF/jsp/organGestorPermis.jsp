@@ -21,6 +21,12 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	
+	<style type="text/css">
+		td.organ-admin {
+			background-color: #feeec5;
+		}
+	</style>
 </head>
 <body>
 	<table 
@@ -36,33 +42,39 @@
 		style="width:100%">
 		<thead>
 			<tr>
-				<th data-col-name="tipus" data-renderer="enum(TipusEnumDto)"><spring:message code="procediment.permis.columna.tipus"/></th>
+				<th data-col-name="tipus" data-renderer="enum(TipusEnumDto)" width="120px"><spring:message code="procediment.permis.columna.tipus" /></th>
 				<th data-col-name="principal"><spring:message code="procediment.permis.columna.principal"/></th>
-				<th data-col-name="read" data-template="#cellPermisReadTemplate">
+				<th data-col-name="read" data-template="#cellPermisReadTemplate" width="120px">
 					<spring:message code="procediment.permis.columna.consulta"/>
 					<script id="cellPermisReadTemplate" type="text/x-jsrender">
 						{{if read}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="processar" data-template="#cellPermisProcessarTemplate">
+				<th data-col-name="processar" data-template="#cellPermisProcessarTemplate" width="120px">
 					<spring:message code="procediment.permis.columna.processar"/>
 					<script id="cellPermisProcessarTemplate" type="text/x-jsrender">
 						{{if processar}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="notificacio" data-template="#cellPermisNotificacioTemplate">
+				<th data-col-name="notificacio" data-template="#cellPermisNotificacioTemplate" width="120px">
 					<spring:message code="procediment.permis.columna.notificacio"/>
 					<script id="cellPermisNotificacioTemplate" type="text/x-jsrender">
 						{{if notificacio}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="administration" data-template="#cellPermisGestioTemplate">
+				<th data-col-name="administration" data-template="#cellPermisGestioTemplate" width="120px">
 					<spring:message code="procediment.permis.columna.gestio"/>
 					<script id="cellPermisGestioTemplate" type="text/x-jsrender">
 						{{if administration}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+				<th data-col-name="administrador" data-template="#cellPermisAdministradorTemplate" data-class="organ-admin" width="120px">
+					<spring:message code="procediment.permis.columna.administrador"/>
+					<script id="cellPermisAdministradorTemplate" type="text/x-jsrender">
+						{{if administrador}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="100px">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>

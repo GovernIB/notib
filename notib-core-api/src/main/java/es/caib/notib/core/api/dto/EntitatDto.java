@@ -39,6 +39,7 @@ public class EntitatDto extends AuditoriaDto {
 	private TipusDocumentDto tipusDocDefault;
 	private List<PermisDto> permisos;
 	private boolean usuariActualAdministradorEntitat;
+	private boolean usuariActualAdministradorOrgan;
 	private Long numAplicacions;
 
 

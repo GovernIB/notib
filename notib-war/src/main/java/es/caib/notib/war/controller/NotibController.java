@@ -52,6 +52,8 @@ public class NotibController {
 				throw new SecurityException("No te cap entitat assignada");
 			if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
 				return "redirect:notificacio";
+			} else if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
+				return "redirect:notificacio";
 			} else {
 				return "index";
 			}

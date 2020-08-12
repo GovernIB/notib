@@ -20,10 +20,11 @@ import es.caib.notib.core.api.dto.RolEnumDto;
  */
 public class RolHelper {
 
-	private static final String ROLE_SUPER = RolEnumDto.NOT_SUPER.name(); 			// "NOT_SUPER";
-	private static final String ROLE_ADMIN_ENTITAT = RolEnumDto.NOT_ADMIN.name(); 	// "NOT_ADMIN";
-	private static final String ROLE_USUARI = RolEnumDto.NOT_USER.name(); 			// "NOT_USER";
-	private static final String ROLE_APLICACIO = RolEnumDto.NOT_APL.name(); 		// "NOT_APL";
+	private static final String ROLE_SUPER = RolEnumDto.NOT_SUPER.name(); 				// "NOT_SUPER";
+	private static final String ROLE_ADMIN_ENTITAT = RolEnumDto.NOT_ADMIN.name(); 		// "NOT_ADMIN";
+	private static final String ROLE_USUARI = RolEnumDto.NOT_USER.name(); 				// "NOT_USER";
+	private static final String ROLE_APLICACIO = RolEnumDto.NOT_APL.name(); 			// "NOT_APL";
+	private static final String ROLE_ADMIN_ORGAN = RolEnumDto.NOT_ADMIN_ORGAN.name(); 	// "NOT_ADMIN_ORGAN";
 
 	private static final String REQUEST_PARAMETER_CANVI_ROL = "canviRol";
 	private static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
@@ -51,6 +52,12 @@ public class RolHelper {
 				request.getSession().setAttribute(
 						SESSION_ATTRIBUTE_ROL_ACTUAL,
 						canviRol);
+			} else if(RolEnumDto.NOT_ADMIN_ORGAN.name().equals(canviRol) && 
+					request.isUserInRole(RolEnumDto.NOT_USER.name()) &&
+					(boolean)request.getAttribute("permisAdminOrgan")) {
+				request.getSession().setAttribute(
+						SESSION_ATTRIBUTE_ROL_ACTUAL,
+						canviRol);
 			}
 		}
 	}
@@ -60,13 +67,13 @@ public class RolHelper {
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		List<String> rolsDisponibles = getRolsUsuariActual(request);
 		if (rolActual == null || !rolsDisponibles.contains(rolActual)) {
-			if (request.isUserInRole(ROLE_SUPER) && rolsDisponibles.contains(ROLE_SUPER)) {
-				rolActual = ROLE_SUPER;
-			}else if (request.isUserInRole(ROLE_ADMIN_ENTITAT) && rolsDisponibles.contains(ROLE_ADMIN_ENTITAT)) {
-				rolActual = ROLE_ADMIN_ENTITAT;
-			}else if (request.isUserInRole(ROLE_USUARI) && rolsDisponibles.contains(ROLE_USUARI)) {
+			if (request.isUserInRole(ROLE_USUARI) && rolsDisponibles.contains(ROLE_USUARI)) {
 				rolActual = ROLE_USUARI;
-			}else if (request.isUserInRole(ROLE_APLICACIO) && rolsDisponibles.contains(ROLE_APLICACIO)) {
+			} else if (request.isUserInRole(ROLE_ADMIN_ENTITAT) && rolsDisponibles.contains(ROLE_ADMIN_ENTITAT)) {
+				rolActual = ROLE_ADMIN_ENTITAT;
+			} else if (request.isUserInRole(ROLE_SUPER) && rolsDisponibles.contains(ROLE_SUPER)) {
+				rolActual = ROLE_SUPER; 
+			} else if (request.isUserInRole(ROLE_APLICACIO) && rolsDisponibles.contains(ROLE_APLICACIO)) {
 				rolActual = ROLE_APLICACIO;
 			}
 			if (rolActual != null)
@@ -87,8 +94,11 @@ public class RolHelper {
 	public static boolean isUsuariActualUsuari(HttpServletRequest request) {
 		return ROLE_USUARI.equals(getRolActual(request));
 	}
-	public static boolean isUsuariActualAplicacio( HttpServletRequest request ) {
+	public static boolean isUsuariActualAplicacio(HttpServletRequest request) {
 		return ROLE_APLICACIO.equals(getRolActual(request));
+	}
+	public static boolean isUsuariActualUsuariAdministradorOrgan(HttpServletRequest request) {
+		return ROLE_ADMIN_ORGAN.equals(getRolActual(request));
 	}
 
 	public static List<String> getRolsUsuariActual(HttpServletRequest request) {
@@ -97,6 +107,7 @@ public class RolHelper {
 		boolean permisUsuariSobreEntitat = request.isUserInRole(ROLE_USUARI);
 		boolean permisAdminSobreEntitat = request.isUserInRole(ROLE_ADMIN_ENTITAT);
 		boolean permisAplicacioSobreEntitat = request.isUserInRole(ROLE_APLICACIO);
+		boolean permisAdminSobreOrgan = false;
 		
 		if (request.getAttribute("permisUsuariEntitat") != null) 
 			permisUsuariSobreEntitat = (boolean) request.getAttribute("permisUsuariEntitat");
@@ -104,6 +115,9 @@ public class RolHelper {
 			permisAdminSobreEntitat = (boolean) request.getAttribute("permisAdminEntitat");
 		if (request.getAttribute("permisAplicacioEntitat") != null)
 			permisAplicacioSobreEntitat = (boolean) request.getAttribute("permisAplicacioEntitat");
+		if (request.getAttribute("permisAdminOrgan") != null) {
+			permisAdminSobreOrgan = (boolean) request.getAttribute("permisAdminOrgan");
+		}
 		
 		if (request.isUserInRole(ROLE_SUPER)) {
 			rols.add(ROLE_SUPER);
@@ -113,6 +127,9 @@ public class RolHelper {
 		}
 		if (request.isUserInRole(ROLE_APLICACIO) && permisAplicacioSobreEntitat) {
 			rols.add(ROLE_APLICACIO);
+		}
+		if (request.isUserInRole(ROLE_USUARI) && permisAdminSobreOrgan) {
+			rols.add(ROLE_ADMIN_ORGAN);
 		}
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		if (entitatActual != null) {
