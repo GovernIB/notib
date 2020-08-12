@@ -2,6 +2,10 @@ package es.caib.notib.core.api.dto;
 
 import java.io.Serializable;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter @Setter
 public class GrupDto extends AuditoriaDto implements Serializable {
 
 	private Long id;
@@ -9,32 +13,6 @@ public class GrupDto extends AuditoriaDto implements Serializable {
 	private String nom;
 	private Long entitatId;
 	
-	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getCodi() {
-		return codi;
-	}
-	public void setCodi(String codi) {
-		this.codi = codi;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-
-	public Long getEntitatId() {
-		return entitatId;
-	}
-	public void setEntitatId(Long entitatId) {
-		this.entitatId = entitatId;
-	}
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

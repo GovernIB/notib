@@ -40,6 +40,14 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 	private EntitatEntity entitat;
 	
 
+	public EntitatEntity getEntitat() {
+		return entitat;
+	}
+
+	public void setEntitat(EntitatEntity entitat) {
+		this.entitat = entitat;
+	}
+
 	public String getDir3codi() {
 		return dir3codi;
 	}

@@ -1,7 +1,8 @@
 package es.caib.notib.core.service;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +27,6 @@ import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.plugin.SistemaExternException;
 
@@ -161,23 +161,23 @@ public class ProcedimentServiceTest extends BaseServiceTest{
 					
 					
 					updateProcediment.setId(procedimentoCreado.getId());
-					ProcedimentDto ProcedimientoModificado=procedimentService.update(
+					ProcedimentDto procedimientoModificado=procedimentService.update(
 							entitatCreada.getId(), updateProcediment, true);
 					
 					
 					
-					assertNotNull(ProcedimientoModificado);
-					assertNotNull(ProcedimientoModificado.getId());
+					assertNotNull(procedimientoModificado);
+					assertNotNull(procedimientoModificado.getId());
 					
 					assertEquals(
 							procedimentoCreado.getId(),
-							ProcedimientoModificado.getId());
+							procedimientoModificado.getId());
 					
 					comprovarProcedimentCoincideix(
 							procedimentoCreado,
-							ProcedimientoModificado);
+							procedimientoModificado);
 					
-					assertEquals(entitatCreada.getId(), ProcedimientoModificado.getEntitat().getId());
+					assertEquals(entitatCreada.getId(), procedimientoModificado.getEntitat().getId());
 
 				}
 			},
@@ -197,7 +197,8 @@ public class ProcedimentServiceTest extends BaseServiceTest{
 					 EntitatDto entitatCreada=(EntitatDto)elementsCreats.get(0);
 					 ProcedimentDto procedimentCreat1=(ProcedimentDto)elementsCreats.get(1);
 					 
-					autenticarUsuari("admin");							
+					autenticarUsuari("admin");
+					
 					ProcedimentDto borrado = procedimentService.delete(
 							entitatCreada.getId(), 
 							procedimentCreat1.getId());
@@ -320,7 +321,7 @@ public class ProcedimentServiceTest extends BaseServiceTest{
 				public void executar(List<Object> elementsCreats) {
 					EntitatDto creada = (EntitatDto)elementsCreats.get(0);
 					autenticarUsuari("user");
-					List<EntitatDto> entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_ADMIN");
+					List<EntitatDto> entitatsAccessibles = procedimentService.findAccessiblesUsuariActual("NOT_ADMIN");
 					assertThat(
 							entitatsAccessibles.size(),
 							is(0));
@@ -407,6 +408,9 @@ public class ProcedimentServiceTest extends BaseServiceTest{
 			entitatCreate);
 	}
 	
+	
+	*/
+	
 	@Test
 	public void findTipusDocument() {
 		// TODO
@@ -436,11 +440,11 @@ public class ProcedimentServiceTest extends BaseServiceTest{
 			entitatCreate);
 	}
 	
-	*/
+	
 	
 	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAdminCreate() {
-		autenticarUsuari("admin");
+	public void errorSiAccesSuperCreate() {
+		autenticarUsuari("super");
 		procedimentService.create(entitatCreate.getId(),createProcediment);
 	}
 
@@ -457,40 +461,59 @@ public class ProcedimentServiceTest extends BaseServiceTest{
 	}
 	
 	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAdminUpdate() {
-		autenticarUsuari("admin");
-		procedimentService.create(entitatCreate.getId(),createProcediment);
-	}
-	
-	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesUserUpdate() {
 		autenticarUsuari("user");
-		procedimentService.update(entitatCreate.getId(),updateProcediment,false);
+		procedimentService.update(entitatCreate.getId(),createProcediment,false);
 	}
-	
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplUpdate() {
 		autenticarUsuari("apl");
-		procedimentService.update(entitatCreate.getId(), updateProcediment, false);
+		procedimentService.update(entitatCreate.getId(),createProcediment,false);
 	}
-
+	
 	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAdminDelete() {
-		autenticarUsuari("admin");
-		procedimentService.update(entitatCreate.getId(),updateProcediment,  true);
+	public void errorSiAccesSuperUpdate() {
+		autenticarUsuari("super");
+		procedimentService.update(entitatCreate.getId(),createProcediment,false);
 	}
-
+	
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesUserDelete() {
 		autenticarUsuari("user");
-		procedimentService.delete(entitatCreate.getId(), createProcediment.getId());
+		procedimentService.delete(entitatCreate.getId(),createProcediment.getId());
 	}
-
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplDelete() {
 		autenticarUsuari("apl");
-		procedimentService.delete(entitatCreate.getId(), createProcediment.getId());
+		procedimentService.delete(entitatCreate.getId(),createProcediment.getId());
 	}
+	@Test(expected = AccessDeniedException.class)
+	public void errorSiAccesSuperDelete() {
+		autenticarUsuari("super");
+		procedimentService.delete(entitatCreate.getId(),createProcediment.getId());
+	}
+	
+	@Test(expected = AccessDeniedException.class)
+	public void errorSiAccesUserFinById() {
+		autenticarUsuari("user");
+		procedimentService.findById(entitatCreate.getId(), false, createProcediment.getId());
+	}
+	@Test(expected = AccessDeniedException.class)
+	public void errorSiAccesSuperFinById() {
+		autenticarUsuari("super");
+		procedimentService.findById(entitatCreate.getId(), false, createProcediment.getId());
+	}
+	
+	@Test(expected = AccessDeniedException.class)
+	public void errorSiAccesAplFinById() {
+		autenticarUsuari("apl");
+		procedimentService.findById(entitatCreate.getId(), false, createProcediment.getId());
+	}
+	
+	
+	
+	
+	
 	
 	
 
@@ -514,31 +537,7 @@ public class ProcedimentServiceTest extends BaseServiceTest{
 				perComprovar.getPagadorpostal());
 	}
 	
-	private void comprovarPermisCoincideix(
-			PermisDto original,
-			PermisDto perComprovar) {
-		assertEquals(
-				original.getPrincipal(),
-				perComprovar.getPrincipal());
-		assertEquals(
-				original.getTipus(),
-				perComprovar.getTipus());
-		assertEquals(
-				original.isRead(),
-				perComprovar.isRead());
-		assertEquals(
-				original.isWrite(),
-				perComprovar.isWrite());
-		assertEquals(
-				original.isCreate(),
-				perComprovar.isCreate());
-		assertEquals(
-				original.isDelete(),
-				perComprovar.isDelete());
-		assertEquals(
-				original.isAdministration(),
-				perComprovar.isAdministration());
-	}
+	
 	
 }
 

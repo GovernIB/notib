@@ -2,19 +2,16 @@ package es.caib.notib.core.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.EntityManager;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +24,6 @@ import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.helper.PermisosHelper;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -37,8 +33,8 @@ public class GrupServiceTest extends BaseServiceTest{
 	
 	@Autowired
 	PermisosHelper permisosHelper;
-	@Autowired
-	private EntityManager entityManager;
+//	@Autowired
+//	private EntityManager entityManager;
 
 	
 	private EntitatDto entitatCreate;
@@ -125,14 +121,13 @@ public class GrupServiceTest extends BaseServiceTest{
 							grupCreat);
 					assertEquals(entitatCreada.getId(), grupCreat.getEntitatId());
 				}
+				
 			}, 
-			"Alta de ENTITAT", 
+			"Alta de GRUP", 
 			entitatCreate);
 			//grupCreate);
 		
 	}
-	
-	
 	
 	@Test
 	public void update() {
@@ -159,11 +154,10 @@ public class GrupServiceTest extends BaseServiceTest{
 					assertEquals(entitatCreada.getId(), grupModificat.getEntitatId());
 				}
 			},
-			"Modificación de ENTITAT",
+			"Modificación de GRUP",
 			entitatCreate,	// elementsCreats.get(0)
 			grupCreate);	// elementsCreats.get(1)
 	}
-	
 	
 	@Test
 	public void delete() {
@@ -190,12 +184,11 @@ public class GrupServiceTest extends BaseServiceTest{
 					
 				}
 			},
-		"Delete  ENTITAT",
+		"Delete  GRUP",
 		entitatCreate,
 		grupCreate);
 	}
 			
-	
 	
 	@Test
 	public void findById() {
@@ -231,7 +224,7 @@ public class GrupServiceTest extends BaseServiceTest{
 							
 				}
 			},
-			"FindById  ENTITAT",
+			"FindById GRUP",
 			entitatCreate,
 			grupCreate);
 	
@@ -272,136 +265,35 @@ public class GrupServiceTest extends BaseServiceTest{
 				}
 					
 			},
-			
+			"findByCodi GRUP",
 			entitatCreate,
 			grupCreate);
 	}
 	
 	
-	
-	@Test
-	public void managePermisAdmin() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats) {
-					EntitatDto creada = (EntitatDto)elementsCreats.get(0);
-					autenticarUsuari("user");
-					List<EntitatDto> entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
-					assertThat(
-							entitatsAccessibles.size(),
-							is(0));
-					autenticarUsuari("super");
-					List<PermisDto> permisos = permisosHelper.findPermisos(creada.getId(), EntitatEntity.class);
-					assertThat(
-							permisos.size(),
-							is(0));
-					entitatService.permisUpdate(
-							creada.getId(),
-							permisUser);
-					permisos = permisosHelper.findPermisos(creada.getId(), EntitatEntity.class);
-					assertThat(
-							permisos.size(),
-							is(1));
-					comprovarPermisCoincideix(
-							permisUser,
-							permisos.get(0));
-					autenticarUsuari("user");
-					entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
-					assertThat(
-							entitatsAccessibles.size(),
-							is(1));
-					assertThat(
-							entitatsAccessibles.get(0).getId(),
-							is(creada.getId()));
-					autenticarUsuari("super");
-					entitatService.permisUpdate(
-							creada.getId(),
-							permisAdmin);
-					permisos = permisosHelper.findPermisos(creada.getId(), EntitatEntity.class);
-					PermisDto permisPerUser = null;
-					for (PermisDto permis: permisos) {
-						if ("user".equals(permis.getPrincipal())) {
-							permisPerUser = permis;
-							break;
-						}
-					}
-					assertNotNull(permisUser);
-					assertThat(
-							permisos.size(),
-							is(2));
-					comprovarPermisCoincideix(
-							permisUser,
-							permisPerUser);
-					autenticarUsuari("user");
-					entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
-					assertThat(
-							entitatsAccessibles.size(),
-							is(1));
-					assertThat(
-							entitatsAccessibles.get(0).getId(),
-							is(creada.getId()));
-					autenticarUsuari("super");
-					entitatService.permisDelete(
-							creada.getId(),
-							permisPerUser.getId());
-					permisos = permisosHelper.findPermisos(creada.getId(), EntitatEntity.class);
-					assertThat(
-							permisos.size(),
-							is(1));
-					autenticarUsuari("user");
-					entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
-					assertThat(
-							entitatsAccessibles.size(),
-							is(0));
-					autenticarUsuari("super");
-					entitatService.permisDelete(
-							creada.getId(),
-							permisos.get(0).getId());
-					permisos = permisosHelper.findPermisos(creada.getId(), EntitatEntity.class);
-					assertThat(
-							permisos.size(),
-							is(0));
-					autenticarUsuari("user");
-					entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
-					assertThat(
-							entitatsAccessibles.size(),
-							is(0));
-				}
-			},
-			entitatCreate);
-	}
-
-	
-	
 	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAdminCreate() {
-		autenticarUsuari("admin");
+	public void errorSiAccesUserCreate() {
+		autenticarUsuari("user");
 		grupService.create(entitatCreate.getId(), grupCreate);
 	}
 
 	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserCreate() {
-		autenticarUsuari("user");
-		grupService.create(entitatCreate.getId(),grupCreate);
-	}
-	
-	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplCreate() {
-		autenticarUsuari("apl");
+		autenticarUsuari("Apl");
 		grupService.create(entitatCreate.getId(),grupCreate);
 	}
 	
 	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAdminUpdate() {
-		autenticarUsuari("admin");
+	public void errorSiAccesSuperCreate() {
+		autenticarUsuari("super");
 		grupService.create(entitatCreate.getId(),grupCreate);
 	}
+	
 	
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesUserUpdate() {
 		autenticarUsuari("user");
-		grupService.update(grupUpdate); 
+		grupService.update(grupCreate);
 	}
 	
 	@Test(expected = AccessDeniedException.class)
@@ -409,54 +301,38 @@ public class GrupServiceTest extends BaseServiceTest{
 		autenticarUsuari("apl");
 		grupService.update(grupUpdate);
 	}
-
+	
 	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAdminDelete() {
-		autenticarUsuari("admin");
-		grupService.update(grupUpdate);
+	public void errorSiAccesSuserUpdate() {
+		autenticarUsuari("super");
+		grupService.update(grupUpdate); 
 	}
-
+	
 	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserDelete() {
-		autenticarUsuari("user");
-		grupService.delete(grupCreate.getId());
+	public void errorSiAccesSuperDelete() {
+		autenticarUsuari("super");
+		grupService.delete(grupCreate.getId()); 
 	}
-
+	
+	
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplDelete() {
 		autenticarUsuari("apl");
-		grupService.delete(grupCreate.getId());
+		grupService.delete(grupCreate.getId()); 
 	}
 	
-	
-	
-	private void comprovarPermisCoincideix(
-			PermisDto original,
-			PermisDto perComprovar) {
-		assertEquals(
-				original.getPrincipal(),
-				perComprovar.getPrincipal());
-		assertEquals(
-				original.getTipus(),
-				perComprovar.getTipus());
-		assertEquals(
-				original.isRead(),
-				perComprovar.isRead());
-		assertEquals(
-				original.isWrite(),
-				perComprovar.isWrite());
-		assertEquals(
-				original.isCreate(),
-				perComprovar.isCreate());
-		assertEquals(
-				original.isDelete(),
-				perComprovar.isDelete());
-		assertEquals(
-				original.isAdministration(),
-				perComprovar.isAdministration());
+	@Test(expected = AccessDeniedException.class)
+	public void errorSiAccesUserDelete() {
+		autenticarUsuari("user");
+		grupService.delete(grupCreate.getId()); 
 	}
 	
-
+	@Test(expected = AccessDeniedException.class)
+	public void errorSiAccesSuperFindById() {
+		autenticarUsuari("super");
+		grupService.findById(entitatCreate.getId(), grupCreate.getId()); 
+	}
+	
 	
 	
 	private void comprobarGroup(
@@ -472,3 +348,5 @@ public class GrupServiceTest extends BaseServiceTest{
 	
 
 }
+
+

@@ -1,38 +1,38 @@
 package es.caib.notib.core.service;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
-import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorCieFormatFullaDto;
-import es.caib.notib.core.api.dto.PagadorPostalDto;
 import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
-import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.helper.PermisosHelper;
-import es.caib.notib.core.service.BaseServiceTest.TestAmbElementsCreats;
 
 
 
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
+@Transactional
 
 public class PagadorCieFormatFullaServiceTest extends BaseServiceTest{
 
@@ -51,9 +51,6 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTest{
 
 	@Autowired
 	PermisosHelper permisosHelper;
-	@Autowired
-	private EntityManager entityManager;
-	
 	@Before
 	public void setUp() {
 		entitatCreate = new EntitatDto();
@@ -100,13 +97,12 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTest{
 		
 		createPagadorCieFormatFulla=new PagadorCieFormatFullaDto();
 		createPagadorCieFormatFulla.setCodi("122");
-		createPagadorCieFormatFulla.setPagadorCieId(createPagadorCieFormatFulla.getId());
 		
-		
+	
 		
 		updatePagadorCieFormatFulla=new PagadorCieFormatFullaDto();
-		updatePagadorCieFormatFulla.setCodi("122");
-		updatePagadorCieFormatFulla.setPagadorCieId(createPagadorCieFormatFulla.getId());
+		updatePagadorCieFormatFulla.setCodi("12333");
+		
 		
 		
 
@@ -120,7 +116,6 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTest{
 			new TestAmbElementsCreats() {
 				@Override
 				public void executar(List<Object> elementsCreats) throws Exception {
-					EntitatDto entitatCreate = (EntitatDto)elementsCreats.get(0);
 					PagadorCieDto createPagadorCie = (PagadorCieDto)elementsCreats.get(1);
 					PagadorCieFormatFullaDto createPagadorFormatFulla = (PagadorCieFormatFullaDto)elementsCreats.get(2);
 					
@@ -129,7 +124,7 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTest{
 //					PagadorCieFormatFullaDto PagadorCieCreat= pagadorCieFormatFullaService.create(
 //							createPagadorCieFormatFulla.getId(), createPagador);
 					
-				
+					createPagadorCieFormatFulla.setId(createPagadorFormatFulla.getId());
 					
 					assertNotNull(createPagadorFormatFulla);
 					assertNotNull(createPagadorFormatFulla.getId());
@@ -159,7 +154,6 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTest{
 				public void executar(List<Object> elementsCreats) throws NotFoundException{
 					
 					
-					EntitatDto entitatCreate = (EntitatDto)elementsCreats.get(0);
 					PagadorCieDto updatePagadorCie = (PagadorCieDto)elementsCreats.get(1);
 					PagadorCieFormatFullaDto updatePagadorFormatFulla = (PagadorCieFormatFullaDto)elementsCreats.get(2);
 					
@@ -200,7 +194,6 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTest{
 				@Override
 				public void executar(List<Object> elementsCreats) throws NotFoundException{
 					
-					EntitatDto entitatCreata=(EntitatDto)elementsCreats.get(0);
 					PagadorCieDto deletePagadorCie = (PagadorCieDto)elementsCreats.get(1);
 					PagadorCieFormatFullaDto deletePagadorFormatFulla = (PagadorCieFormatFullaDto)elementsCreats.get(2);
 					 
@@ -251,7 +244,6 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTest{
 				@Override
 				public void executar(List<Object> elementsCreats)throws NotFoundException{
 					
-					EntitatDto entitatCreata=(EntitatDto)elementsCreats.get(0);
 					PagadorCieDto createPagadorCie = (PagadorCieDto)elementsCreats.get(1);
 					PagadorCieFormatFullaDto deletePagadorFormatFulla = (PagadorCieFormatFullaDto)elementsCreats.get(2);
 							
@@ -281,143 +273,19 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTest{
 	
 	}
 	
-	
-	@Test
-	public void managePermisAdmin() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats) {
-					EntitatDto creada = (EntitatDto)elementsCreats.get(0);
-					autenticarUsuari("user");
-					List<EntitatDto> entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
-					assertThat(
-							entitatsAccessibles.size(),
-							is(0));
-					autenticarUsuari("super");
-					List<PermisDto> permisos = permisosHelper.findPermisos(creada.getId(), EntitatEntity.class);
-					assertThat(
-							permisos.size(),
-							is(0));
-					pagadorCieFormatFullaService.permisUpdate(
-							creada.getId(), 
-							createPagador.getId(), 
-							permisUser, false);
-							
-					permisos = permisosHelper.findPermisos(creada.getId(), EntitatEntity.class);
-					assertThat(
-							permisos.size(),
-							is(1));
-					comprovarPermisCoincideix(
-							permisUser,
-							permisos.get(0));
-					autenticarUsuari("user");
-					entitatsAccessibles = pagadorCieFormatFullaService.findAll()("NOT_USER");
-					assertThat(
-							entitatsAccessibles.size(),
-							is(1));
-					assertThat(
-							entitatsAccessibles.get(0).getId(),
-							is(creada.getId()));
-					autenticarUsuari("super");
-					entitatService.permisUpdate(
-							creada.getId(),
-							permisAdmin);
-					permisos = permisosHelper.findPermisos(creada.getId(), EntitatEntity.class);
-					PermisDto permisPerUser = null;
-					for (PermisDto permis: permisos) {
-						if ("user".equals(permis.getPrincipal())) {
-							permisPerUser = permis;
-							break;
-						}
-					}
-					assertNotNull(permisUser);
-					assertThat(
-							permisos.size(),
-							is(2));
-					comprovarPermisCoincideix(
-							permisUser,
-							permisPerUser);
-					autenticarUsuari("user");
-					entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
-					assertThat(
-							entitatsAccessibles.size(),
-							is(1));
-					assertThat(
-							entitatsAccessibles.get(0).getId(),
-							is(creada.getId()));
-					autenticarUsuari("super");
-					entitatService.permisDelete(
-							creada.getId(),
-							permisPerUser.getId());
-					permisos = permisosHelper.findPermisos(creada.getId(), EntitatEntity.class);
-					assertThat(
-							permisos.size(),
-							is(1));
-					autenticarUsuari("user");
-					entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
-					assertThat(
-							entitatsAccessibles.size(),
-							is(0));
-					autenticarUsuari("super");
-					entitatService.permisDelete(
-							creada.getId(),
-							permisos.get(0).getId());
-					permisos = permisosHelper.findPermisos(creada.getId(), EntitatEntity.class);
-					assertThat(
-							permisos.size(),
-							is(0));
-					autenticarUsuari("user");
-					entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
-					assertThat(
-							entitatsAccessibles.size(),
-							is(0));
-				}
-			},
-			entitatCreate);
-	}
-	
+		
+
+
 	private void comprobarPagadorCieFormatFulla(
 			PagadorCieFormatFullaDto original,
 			PagadorCieFormatFullaDto perComprovar) {
-		assertEquals(
-				original.getId(),
-				perComprovar.getId());
+
 		assertEquals(
 				original.getCodi(),
 				perComprovar.getCodi());
-		assertEquals(
-				original.getPagadorCieId(),
-				perComprovar.getPagadorCieId());
+	
 		
 	}
 
-	
-	
-	private void comprovarPermisCoincideix(
-			PermisDto original,
-			PermisDto perComprovar) {
-		assertEquals(
-				original.getPrincipal(),
-				perComprovar.getPrincipal());
-		assertEquals(
-				original.getTipus(),
-				perComprovar.getTipus());
-		assertEquals(
-				original.isRead(),
-				perComprovar.isRead());
-		assertEquals(
-				original.isWrite(),
-				perComprovar.isWrite());
-		assertEquals(
-				original.isCreate(),
-				perComprovar.isCreate());
-		assertEquals(
-				original.isDelete(),
-				perComprovar.isDelete());
-		assertEquals(
-				original.isAdministration(),
-				perComprovar.isAdministration());
-	}
 }
 

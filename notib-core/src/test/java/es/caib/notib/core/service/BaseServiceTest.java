@@ -304,7 +304,12 @@ public class BaseServiceTest {
 					pagadorPostalService.delete(((PagadorPostalDto)element).getId());
 				} else if(element instanceof PagadorCieDto) {
 					autenticarUsuari("admin");
-					pagadorCieService.delete(((PagadorCieDto)element).getId());
+					try {
+						pagadorCieService.delete(((PagadorCieDto)element).getId());
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				} else if(element instanceof PagadorCieFormatFullaDto) {
 					autenticarUsuari("admin");
 					pagadorCieFormatFullaService.delete(((PagadorCieFormatFullaDto)element).getId());

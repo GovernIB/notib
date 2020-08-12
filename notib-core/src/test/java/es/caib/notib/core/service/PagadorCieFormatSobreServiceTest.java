@@ -15,7 +15,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +28,6 @@ import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
 import es.caib.notib.core.helper.PermisosHelper;
 
 
@@ -112,8 +110,8 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTest{
 		
 		
 		updatePagadorCieFormatSobre= new PagadorCieFormatSobreDto();
-		updatePagadorCieFormatSobre.setCodi("12345");
-		updatePagadorCieFormatSobre.setPagadorCieId(createPagadorCieFormatSobre.getId());
+		updatePagadorCieFormatSobre.setCodi("23456");
+		//updatePagadorCieFormatSobre.setPagadorCieId(createPagadorCieFormatSobre.getId());
 		
 		
 
@@ -169,6 +167,7 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTest{
 					
 					autenticarUsuari("admin");
 					
+					createPagadorCieFormatSobre.setCodi(pagadorCieFormatSobreServiceUpdate.getCodi());
 //					PagadorCieFormatSobreDto pagadorCieFormatSobreCreat = pagadorCieFormatSobreService.create(
 //							createPagadorCieFormatSobre.getId(), createPagadorCieFormatSobre);
 					
@@ -177,18 +176,13 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTest{
 //					PagadorCieFormatSobreDto PagadorCieFormatSobre=pagadorCieFormatSobreService.update(pagadorCieFormatSobreServiceCreado);
 
 					
-					assertNotNull(pagadorCieUpdtate);
-					assertNotNull(pagadorCieUpdtate.getId());
-					
-					
-					
-					
-					assertEquals(createPagadorCie.getId(), pagadorCieUpdtate.getId());
-					
+					assertNotNull(pagadorCieFormatSobreServiceUpdate);
+					assertNotNull(pagadorCieFormatSobreServiceUpdate.getId());
 					
 					comprobarPagadorCieFormatSobre(
 							createPagadorCieFormatSobre,
 							pagadorCieFormatSobreServiceUpdate);
+					
 					assertEquals( pagadorCieUpdtate.getId(), pagadorCieFormatSobreServiceUpdate.getPagadorCieId());
 				
 					
@@ -197,7 +191,7 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTest{
 			},
 			entitatCreate,
 			createPagadorCie,
-			createPagadorCieFormatSobre);
+			updatePagadorCieFormatSobre);
  }
 
 
@@ -208,7 +202,7 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTest{
 				@Override
 				public void executar(List<Object> elementsCreats) throws NotFoundException{
 					 EntitatDto entitatCreada=(EntitatDto)elementsCreats.get(0);
-					 PagadorCieDto pagadorCieSobreBorrar=(PagadorCieDto)elementsCreats.get(1);
+					 PagadorCieDto deletePagadorCie=(PagadorCieDto)elementsCreats.get(1);
 					 PagadorCieFormatSobreDto pagadorCieFormatSobreBorrar=(PagadorCieFormatSobreDto)elementsCreats.get(2);
 					 
 					autenticarUsuari("admin");
@@ -217,19 +211,19 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTest{
 					
 							
 					createPagadorCieFormatSobre.setId(pagadorCieFormatSobreBorrar.getId());
-							
+					
 					assertNotNull(pagadorCieFormatSobreBorrar);
 					assertNotNull(pagadorCieFormatSobreBorrar.getId());
 					
-					assertEquals( pagadorCieFormatSobreBorrar.getId(), pagadorCieFormatSobreBorrar.getId());
-				
+					assertEquals( deletePagadorCie.getId(), pagadorCieFormatSobreBorrar.getId());
+					
 					comprobarPagadorCieFormatSobre(
 							createPagadorCieFormatSobre,
 							pagadorCieFormatSobreBorrar);
 					
 					try {						
 						pagadorCieFormatSobreService.findById(
-								pagadorCieSobreBorrar.getId());
+								pagadorCieFormatSobreBorrar.getId());
 						
 						fail("El PagadorCieSobre esborrat no s `hauria d'haver trobat");												
 						}catch(NotFoundException expected) {
@@ -288,199 +282,19 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTest{
 	}
 	
 	
-	@Test
-	public void managePermisAdmin() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats) {
-					EntitatDto creada = (EntitatDto)elementsCreats.get(0);
-					autenticarUsuari("user");
-					List<EntitatDto> entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
-					assertThat(
-							entitatsAccessibles.size(),
-							is(0));
-					autenticarUsuari("super");
-					List<PermisDto> permisos = permisosHelper.findPermisos(creada.getId(), EntitatEntity.class);
-					assertThat(
-							permisos.size(),
-							is(0));
-					pagadorCieFormatFullaService.permisUpdate(
-							creada.getId(), 
-							createPagador.getId(), 
-							permisUser, false);
-							
-					permisos = permisosHelper.findPermisos(creada.getId(), EntitatEntity.class);
-					assertThat(
-							permisos.size(),
-							is(1));
-					comprovarPermisCoincideix(
-							permisUser,
-							permisos.get(0));
-					autenticarUsuari("user");
-					entitatsAccessibles = pagadorCieFormatFullaService.findAll()("NOT_USER");
-					assertThat(
-							entitatsAccessibles.size(),
-							is(1));
-					assertThat(
-							entitatsAccessibles.get(0).getId(),
-							is(creada.getId()));
-					autenticarUsuari("super");
-					entitatService.permisUpdate(
-							creada.getId(),
-							permisAdmin);
-					permisos = permisosHelper.findPermisos(creada.getId(), EntitatEntity.class);
-					PermisDto permisPerUser = null;
-					for (PermisDto permis: permisos) {
-						if ("user".equals(permis.getPrincipal())) {
-							permisPerUser = permis;
-							break;
-						}
-					}
-					assertNotNull(permisUser);
-					assertThat(
-							permisos.size(),
-							is(2));
-					comprovarPermisCoincideix(
-							permisUser,
-							permisPerUser);
-					autenticarUsuari("user");
-					entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
-					assertThat(
-							entitatsAccessibles.size(),
-							is(1));
-					assertThat(
-							entitatsAccessibles.get(0).getId(),
-							is(creada.getId()));
-					autenticarUsuari("super");
-					entitatService.permisDelete(
-							creada.getId(),
-							permisPerUser.getId());
-					permisos = permisosHelper.findPermisos(creada.getId(), EntitatEntity.class);
-					assertThat(
-							permisos.size(),
-							is(1));
-					autenticarUsuari("user");
-					entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
-					assertThat(
-							entitatsAccessibles.size(),
-							is(0));
-					autenticarUsuari("super");
-					entitatService.permisDelete(
-							creada.getId(),
-							permisos.get(0).getId());
-					permisos = permisosHelper.findPermisos(creada.getId(), EntitatEntity.class);
-					assertThat(
-							permisos.size(),
-							is(0));
-					autenticarUsuari("user");
-					entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
-					assertThat(
-							entitatsAccessibles.size(),
-							is(0));
-				}
-			},
-			entitatCreate);
-	}
-	
-	*/
 	
 	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAdminCreate() {
-		autenticarUsuari("admin");
-		pagadorCieFormatSobreService.create(createPagadorCie.getId(),createPagadorCieFormatSobre);
-	}
-
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserCreate() {
-		autenticarUsuari("user");
-		pagadorCieFormatSobreService.create(createPagadorCie.getId(),createPagadorCieFormatSobre);
-	}
 	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAplCreate() {
-		autenticarUsuari("apl");
-		pagadorCieFormatSobreService.create(createPagadorCie.getId(),createPagadorCieFormatSobre);
-	}
-	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAdminUpdate() {
-		autenticarUsuari("admin");
-		pagadorCieFormatSobreService.create(createPagadorCie.getId(),createPagadorCieFormatSobre);
-	}
-	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserUpdate() {
-		autenticarUsuari("user");
-		pagadorCieFormatSobreService.update(updatePagadorCieFormatSobre);
-	}
-	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAplUpdate() {
-		autenticarUsuari("apl");
-		pagadorCieFormatSobreService.update(updatePagadorCieFormatSobre);
-	}
-
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAdminDelete() {
-		autenticarUsuari("admin");
-		pagadorCieFormatSobreService.update(updatePagadorCieFormatSobre);
-	}
-
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserDelete() {
-		autenticarUsuari("user");
-		pagadorCieFormatSobreService.delete(updatePagadorCieFormatSobre.getId());
-	}
-
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAplDelete() {
-		autenticarUsuari("apl");
-		pagadorCieFormatSobreService.delete(updatePagadorCieFormatSobre.getId());
-	}
 	
 	private void comprobarPagadorCieFormatSobre(
 			PagadorCieFormatSobreDto original,
 			PagadorCieFormatSobreDto perComprovar) {
 		assertEquals(
-				original.getId(),
-				perComprovar.getId());
-		assertEquals(
 				original.getCodi(),
 				perComprovar.getCodi());
-		assertEquals(
-				original.getPagadorCieId(),
-				perComprovar.getPagadorCieId());
-		
 	}
 
 	
-	
-	private void comprovarPermisCoincideix(
-			PermisDto original,
-			PermisDto perComprovar) {
-		assertEquals(
-				original.getPrincipal(),
-				perComprovar.getPrincipal());
-		assertEquals(
-				original.getTipus(),
-				perComprovar.getTipus());
-		assertEquals(
-				original.isRead(),
-				perComprovar.isRead());
-		assertEquals(
-				original.isWrite(),
-				perComprovar.isWrite());
-		assertEquals(
-				original.isCreate(),
-				perComprovar.isCreate());
-		assertEquals(
-				original.isDelete(),
-				perComprovar.isDelete());
-		assertEquals(
-				original.isAdministration(),
-				perComprovar.isAdministration());
-	}
 }
+	
 
