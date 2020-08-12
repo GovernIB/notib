@@ -55,8 +55,11 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	@Column(name = "codiassumpte_nom", length = 255)
 	protected String codiAssumpteNom;
 	
-	@Column(name = "agrupar", length = 64, nullable = false)
+	@Column(name = "agrupar")
 	protected boolean agrupar;
+	
+	@Column(name = "comu")
+	protected boolean comu;
 	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "entitat")
