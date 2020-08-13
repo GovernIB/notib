@@ -3,7 +3,6 @@ package es.caib.notib.core.service;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -16,14 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
-import es.caib.notib.core.api.dto.PagadorCieDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.service.BaseServiceTest.TestAmbElementsCreats;
 
 
 
@@ -38,7 +35,7 @@ public class OrganosGestoresServiceTest extends BaseServiceTest{
 	private PermisDto permisUser;
 	private PermisDto permisAdmin;
 	private OrganGestorDto organoGestorCreate;
-	private OrganGestorDto organoGestorUpdate;
+	
 	
 	@Before
 	public void setUp() {
@@ -86,13 +83,11 @@ public class OrganosGestoresServiceTest extends BaseServiceTest{
 		organoGestorCreate= new OrganGestorDto();
 		organoGestorCreate.setCodi("123456789");
 		organoGestorCreate.setNom("Procedimiento 1");
-		organoGestorCreate.setOrganGestor("A00000000");
 		
 		
-		organoGestorUpdate= new OrganGestorDto();
-		organoGestorUpdate.setCodi("234567890");
-		organoGestorUpdate.setNom("Procedimiento 2");
-		organoGestorUpdate.setOrganGestor("A00000000");
+		
+		
+		
 	}
 	
 	
@@ -103,108 +98,69 @@ public class OrganosGestoresServiceTest extends BaseServiceTest{
 		testCreantElements(
 			new TestAmbElementsCreats() {
 				@Override
-				public void executar(List<Object> elementsCreats) throws Exception {
+				public void executar(List<Object> elementsCreats){
 					EntitatDto entitatCreate = (EntitatDto)elementsCreats.get(0);
+					OrganGestorDto organoGestorCreate=(OrganGestorDto)elementsCreats.get(1);
 					
 			
 					autenticarUsuari("admin");
-					OrganoGestorDto organoGestorCreate1 = organoGestorService.create(
-							entitatCreate.getId(), 
+					
+					assertNotNull(organoGestorCreate);
+					assertNotNull(organoGestorCreate.getId());
+					
+					OrganGestorDto organoGestorCreate1 = organGestorService.create(
 							organoGestorCreate);
 		
-					
-					
 					assertNotNull(organoGestorCreate1);
 					assertNotNull(organoGestorCreate1.getId());
+					
 					
 					comprovarOrganoGestor(
 							organoGestorCreate,
 							organoGestorCreate1
-						);
-					assertEquals(entitatCreate.getId(), organoGestorCreado.getEntitat().getId());
+				
+							);
+
+					assertEquals(entitatCreate.getId(), organoGestorCreate.getEntitatId());
 				}
 
 			
 			}, 
 			"Entitat Create", 
-			entitatCreate);
-	}
-	
-	
-	
-	@Test
-	public void update() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats) throws NotFoundException{
-					
-					EntitatDto entitatCreada=(EntitatDto)elementsCreats.get(0);	
-					OrganoGestorDto organoGestorCreado=(OrganoGestorDto)elementsCreats.get(1);
-					
-					
-					autenticarUsuari("admin");
-//					ProcedimentDto procedimentoCreado = procedimentService.create(
-//							entitatCreada.getId(), createProcediment);
-					
-					
-					organoGestorService.setId(organoGestorCreado.getId());
-					OrganoGestorDto organoGestorUpdate1=organoGestorService.update(
-							entitatCreada.getId(), organoGestorCreado, true);
-					
-					
-					
-					assertNotNull(organoGestorUpdate1);
-					assertNotNull(organoGestorUpdate1.getId());
-					
-					assertEquals(
-							organoGestorUpdate1.getId(),
-							organoGestorUpdate1.getId());
-					
-					comprovarOrganoGestor(
-							
-							
-							organoGestorUpdate1,
-							organoGestorUpdate
-							
-							);
-					
-					assertEquals(entitatCreada.getId(), organoGestorUpdate1.getEntitat().getId());
-
-				}
-			},
-			
 			entitatCreate,
-			organoGestorUpdate);
+			organoGestorCreate
+			);
 	}
 	
-	
+
 	
 	@Test
 	public void delete() {
 		testCreantElements(
 			new TestAmbElementsCreats() {
 				@Override
-				public void executar(List<Object> elementsCreats) throws NotFoundException{
+				public void executar(List<Object> elementsCreats){
 					 EntitatDto entitatCreada=(EntitatDto)elementsCreats.get(0);
-					 OrganoGestorDto organoGestorCreat=(OrganoGestorDto)elementsCreats.get(1);
+					 OrganGestorDto organoGestorCreat=(OrganGestorDto)elementsCreats.get(1);
 					 
 					autenticarUsuari("admin");
 					
-					OrganoGestorDto organoGestorDelete = organoGestorService.delete(
+					OrganGestorDto organoGestorDelete = organGestorService.delete(
 							entitatCreada.getId(), 
 							organoGestorCreat.getId());
 					
 							comprovarOrganoGestor(
 							
 							
-							organoGestorUpdate1,
-							organoGestorUpdate
+							organoGestorCreat,
+						organoGestorDelete
 							
 							);
 					
 					try {						
-						organoGestorService.findById();
+						organGestorService.findById(
+								entitatCreada.getId(),
+								organoGestorCreat.getId());
 								
 						
 						fail("El procediment esborrat no s `hauria d'haver trobat");												
@@ -233,24 +189,26 @@ public class OrganosGestoresServiceTest extends BaseServiceTest{
 				public void executar(List<Object> elementsCreats)throws NotFoundException{
 					
 					EntitatDto entitatCreada=(EntitatDto)elementsCreats.get(0);
-					OrganoGestorDto  encontrarOrganoGestorPorId=(OrganoGestorDto)elementsCreats.get(1);
+					OrganGestorDto  encontrarOrganoGestor=(OrganGestorDto)elementsCreats.get(1);
 							
 					autenticarUsuari("admin");
 					
-					organoGestorCreate.setId(encontrarPorId.getId());
-					OrganoGestorDto encontrarOrganoGestorPorId= organoGestorService.findById();
+					
+					OrganGestorDto encontrarOrganoGestorPorId= organGestorService.findById(
+							entitatCreada.getId(),
+							encontrarOrganoGestor.getId());
 						
 							
 						comprovarOrganoGestor(
 							
 							
-							organoGestorUpdate1,
-							organoGestorUpdate
+								encontrarOrganoGestor,
+								encontrarOrganoGestorPorId
 							
 							);
 					
-					assertNotNull(encontrado);
-					assertNotNull(encontrado.getId());
+					assertNotNull(encontrarOrganoGestorPorId);
+					assertNotNull(encontrarOrganoGestorPorId.getId());
 					
 					
 					
@@ -275,17 +233,17 @@ public class OrganosGestoresServiceTest extends BaseServiceTest{
 					
 					EntitatDto entitatCreada=(EntitatDto)elementsCreats.get(0);
 					
-					OrganoGestorDto  encontrarOrganoGestorPorCodi=(OrganoGestorDto)elementsCreats.get(1);
+					OrganGestorDto  encontrarOrganoGestor=(OrganGestorDto)elementsCreats.get(1);
 					
 					
 				
 					autenticarUsuari("super");
-//					ProcedimentDto encontratPorCodi = procedimentService.create(entitatCreada.getId(), createProcediment);
+
 							
-					createProcediment.setId(encontrarPorCodi.getId());	
+					OrganGestorDto  encontrarOrganoGestorPorCodi=organGestorService.findByCodi(
+							entitatCreada.getId(), encontrarOrganoGestor.getCodi());
 					
 					
-					ProcedimentDto organoGestorEncontadoCode= organoGestorService.findByCodi();
 					
 					
 					assertNotNull(encontrarOrganoGestorPorCodi);
@@ -294,8 +252,8 @@ public class OrganosGestoresServiceTest extends BaseServiceTest{
 					comprovarOrganoGestor(
 							
 							
-							encontrarOrganoGestorPorCodi,
-							organoGestorCreate
+							encontrarOrganoGestor,
+							encontrarOrganoGestorPorCodi
 							
 							);
 
@@ -312,89 +270,80 @@ public class OrganosGestoresServiceTest extends BaseServiceTest{
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesSuperCreate() {
 		autenticarUsuari("super");
-		organoGestorService.create();
+		organGestorService.create(organoGestorCreate);
 	}
 
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesUserCreate() {
 		autenticarUsuari("user");
-		organoGestorService.create();
+		organGestorService.create(organoGestorCreate);
 	}
 	
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplCreate() {
 		autenticarUsuari("apl");
-		organoGestorService.create();
-	}
-	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserUpdate() {
-		autenticarUsuari("user");
-		organoGestorService.update();
-	}
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAplUpdate() {
-		autenticarUsuari("apl");
-		organoGestorService.update();
-	}
-	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesSuperUpdate() {
-		autenticarUsuari("super");
-		organoGestorService.update();
+		organGestorService.create(organoGestorCreate);
 	}
 	
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesUserDelete() {
 		autenticarUsuari("user");
-		organoGestorService.delete();
+		organGestorService.delete(
+				entitatCreate.getId(), 
+				organoGestorCreate.getId());
 	}
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplDelete() {
 		autenticarUsuari("apl");
-		organoGestorService.delete();
+		organGestorService.delete(
+				entitatCreate.getId(), 
+				organoGestorCreate.getId());
 	}
+	
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesSuperDelete() {
 		autenticarUsuari("super");
-		organoGestorService.delete();
+		organGestorService.delete(
+				entitatCreate.getId(), 
+				organoGestorCreate.getId());
 	}
+	
+	
 	
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesUserFinById() {
 		autenticarUsuari("user");
-		organoGestorService.findById();
+		organGestorService.findById(entitatCreate.getId(),
+				organoGestorCreate.getId());
 	}
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesSuperFinById() {
 		autenticarUsuari("super");
-		organoGestorService.findById();
+		organGestorService.findById(entitatCreate.getId(),
+				organoGestorCreate.getId());
 	}
 	
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplFinById() {
 		autenticarUsuari("apl");
-		organoGestorService.findById();
+		organGestorService.findById(entitatCreate.getId(),
+				organoGestorCreate.getId());
 	}
 	
+	
+	
+	
 	private void comprovarOrganoGestor(
-			OrganoGestorDto original,
-			OrganoGestorDto perComprovar) {
+			OrganGestorDto original,
+			OrganGestorDto perComprovar) {
 		assertEquals(
 				original.getCodi(),
 				perComprovar.getCodi());
 		assertEquals(
 				original.getNom(),
 				perComprovar.getNom());
-		assertEquals(
-				original.getOrganGestor(),
-				perComprovar.getOrganGestor());
-		assertEquals(
-				original.getCaducitat(),
-				perComprovar.getCaducitat());
-		assertEquals(
-				original.getPagadorpostal(),
-				perComprovar.getPagadorpostal());
+		
+		
 	}
 	
 	

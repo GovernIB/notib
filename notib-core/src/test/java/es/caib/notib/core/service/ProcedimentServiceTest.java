@@ -205,7 +205,7 @@ public class ProcedimentServiceTest extends BaseServiceTest{
 					
 					comprovarProcedimentCoincideix(
 							
-							createProcediment,
+							procedimentCreat1,
 							borrado);
 					
 					try {						
@@ -493,22 +493,8 @@ public class ProcedimentServiceTest extends BaseServiceTest{
 		procedimentService.delete(entitatCreate.getId(),createProcediment.getId());
 	}
 	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserFinById() {
-		autenticarUsuari("user");
-		procedimentService.findById(entitatCreate.getId(), false, createProcediment.getId());
-	}
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesSuperFinById() {
-		autenticarUsuari("super");
-		procedimentService.findById(entitatCreate.getId(), false, createProcediment.getId());
-	}
+
 	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAplFinById() {
-		autenticarUsuari("apl");
-		procedimentService.findById(entitatCreate.getId(), false, createProcediment.getId());
-	}
 	
 	
 	

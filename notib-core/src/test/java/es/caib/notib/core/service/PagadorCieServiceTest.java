@@ -133,9 +133,9 @@ public class PagadorCieServiceTest extends BaseServiceTest{
 					assertNotNull(pagadorCreateCie);
 					assertNotNull(pagadorCreateCie.getId());
 					
-					comprobarPagadorCieService(
-							pagadorCreateCie,
-							createPagadorCie);
+
+					
+					assertEquals(entitatCreate.getId(), pagadorCreateCie.getEntitatId());
 					
 				}
 
@@ -200,18 +200,19 @@ public class PagadorCieServiceTest extends BaseServiceTest{
 				@Override
 				public void executar(List<Object> elementsCreats) throws NotFoundException{
 					
-					EntitatDto entitatCreada=(EntitatDto)elementsCreats.get(0);
-					PagadorCieDto pagadorCieDelete=(PagadorCieDto)elementsCreats.get(1);
+					
+					PagadorCieDto pagadorCieDelete=(PagadorCieDto)elementsCreats.get(2);
+					
 					 
 					autenticarUsuari("admin");
+					
 							
-								3.
 					PagadorCieDto pagadorCieDeleteSeborra = pagadorCieService.delete(
 							pagadorCieDelete.getId());
 					
 					comprobarPagadorCieService(
 							
-							createPagadorCie,
+							pagadorCieDelete,
 							pagadorCieDeleteSeborra);
 
 										
@@ -240,12 +241,11 @@ public class PagadorCieServiceTest extends BaseServiceTest{
 				@Override
 				public void executar(List<Object> elementsCreats)throws NotFoundException{
 					
-					EntitatDto entitatCreada=(EntitatDto)elementsCreats.get(0);
+					
 					PagadorCieDto pagadorCieEncontrado=(PagadorCieDto)elementsCreats.get(1);
 							
 					autenticarUsuari("admin");
 					
-					createPagadorCie.setId(pagadorCieEncontrado.getId());
 					
 					PagadorCieDto encontradoCie= pagadorCieService.findById(
 							pagadorCieEncontrado.getId());

@@ -49,6 +49,7 @@ import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
 import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
 import es.caib.notib.core.api.service.PagadorCieService;
@@ -100,6 +101,8 @@ public class BaseServiceTest {
 	protected EntitatService entitatService;
 	@Autowired
 	protected ProcedimentService procedimentService;
+	@Autowired
+	protected OrganGestorService organGestorService;
 	@Autowired
 	protected GrupService grupService;
 	@Autowired
@@ -220,11 +223,11 @@ public class BaseServiceTest {
 					id = entitatCreada.getId();
 				} else if(element instanceof OrganGestorDto) {
 					if (((OrganGestorDto)element).getPermisos() != null) {
-						OrganGestorDto organGestor = procedimentService.findOrganGestorByCodi(
+						OrganGestorDto organGestor = organGestorService.findByCodi(
 								entitatId, 
 								((OrganGestorDto)element).getCodi());
 						for (PermisDto permis: ((OrganGestorDto)element).getPermisos()) {
-							procedimentService.permisOrganGestorUpdate(
+							organGestorService.permisUpdate(
 									entitatId, 
 									organGestor.getId(), 
 									permis);
@@ -259,7 +262,14 @@ public class BaseServiceTest {
 							(PagadorCieFormatFullaDto)element);
 					elementsCreats.add(entitatCreada);
 					id = entitatCreada.getId();
-				} else if(element instanceof PagadorCieFormatSobreDto) {
+				}else if(element instanceof OrganGestorDto) {
+					autenticarUsuari("admin");
+					OrganGestorDto entitatCreada = organGestorService.create(
+							(OrganGestorDto)element);
+						elementsCreats.add(entitatCreada);
+						id=entitatCreada.getId();
+					
+				}else if(element instanceof PagadorCieFormatSobreDto) {
 					autenticarUsuari("admin");
 					PagadorCieFormatSobreDto entitatCreada = pagadorCieFormatSobreService.create(
 							pagadorCieId,
@@ -316,7 +326,13 @@ public class BaseServiceTest {
 				} else if(element instanceof PagadorCieFormatSobreDto) {
 					autenticarUsuari("admin");
 					pagadorCieFormatSobreService.delete(((PagadorCieFormatSobreDto)element).getId());
+				}else if(element instanceof OrganGestorDto) {
+					autenticarUsuari("admin");
+					organGestorService.delete(entitatId,
+					((OrganGestorDto)element).getId());
+					 
 				}
+				
 				logger.debug("...objecte de tipus " + element.getClass().getSimpleName() + " esborrat correctament.");
 			}
 			logger.info("-------------------------------------------------------------------");

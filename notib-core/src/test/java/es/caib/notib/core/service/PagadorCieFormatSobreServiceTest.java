@@ -125,29 +125,31 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTest{
 			new TestAmbElementsCreats() {
 				@Override
 				public void executar(List<Object> elementsCreats){
-					EntitatDto entitatCreate = (EntitatDto)elementsCreats.get(0);
-					PagadorCieDto pagadorCieCreate = (PagadorCieDto)elementsCreats.get(1);
-					PagadorCieFormatSobreDto pagadorCieFormatSobreCreat = (PagadorCieFormatSobreDto)elementsCreats.get(2);
-					
+					EntitatDto entitatCreat1 = (EntitatDto)elementsCreats.get(0);
+					PagadorCieDto pagadorCieCreate=(PagadorCieDto)elementsCreats.get(1);
+					PagadorCieFormatSobreDto pagadorCieFormatSobre=(PagadorCieFormatSobreDto)elementsCreats.get(2);
+				
 					autenticarUsuari("admin");
-//					PagadorCieFormatSobreDto PagadorCieFormatSobreCreat= pagadorCieFormatSobreService.create(
-//					pagadorCieCreate.getId(),
-//					createPagadorCieFormatSobre);
 					
-					createPagadorCieFormatSobre.setId(pagadorCieFormatSobreCreat.getId());
+					 pagadorCieFormatSobreService.create(
+							pagadorCieCreate.getId(), createPagadorCieFormatSobre);
+ 					
 					
-					assertNotNull(pagadorCieFormatSobreCreat);
-					assertNotNull(pagadorCieFormatSobreCreat.getId());
 					
-					comprobarPagadorCieFormatSobre(
-							createPagadorCieFormatSobre,
-							pagadorCieFormatSobreCreat);
-					assertEquals(pagadorCieCreate.getId(), pagadorCieFormatSobreCreat.getPagadorCieId());
+					
+					assertNotNull(pagadorCieFormatSobre);
+					assertNotNull(pagadorCieFormatSobre.getId());
+					
+					comprovarEntitatCoincideix(
+							entitatCreate,
+							entitatCreat1);
+					assertEquals(entitatCreat1.getId(), pagadorCieCreate.getEntitatId());
 				}
 
 			
 			}, 
 			"createPagadorCieFormatSobre Create", 
+			
 			entitatCreate,
 			createPagadorCie,
 			createPagadorCieFormatSobre);
@@ -161,29 +163,29 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTest{
 				@Override
 				public void executar(List<Object> elementsCreats) throws NotFoundException{
 					
-					EntitatDto entitatCreada=(EntitatDto)elementsCreats.get(0);
-					PagadorCieDto pagadorCieUpdtate = (PagadorCieDto)elementsCreats.get(1);
+					EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 					PagadorCieFormatSobreDto pagadorCieFormatSobreServiceUpdate=(PagadorCieFormatSobreDto)elementsCreats.get(2);
 					
 					autenticarUsuari("admin");
 					
-					createPagadorCieFormatSobre.setCodi(pagadorCieFormatSobreServiceUpdate.getCodi());
-//					PagadorCieFormatSobreDto pagadorCieFormatSobreCreat = pagadorCieFormatSobreService.create(
-//							createPagadorCieFormatSobre.getId(), createPagadorCieFormatSobre);
 					
 					
-//					updatePagadorCieFormatSobre.setId(pagadorCieFormatSobreServiceCreado.getId());
-//					PagadorCieFormatSobreDto PagadorCieFormatSobre=pagadorCieFormatSobreService.update(pagadorCieFormatSobreServiceCreado);
-
+					
+					PagadorCieFormatSobreDto pagadorCieFormatSobreServiceUpdate1=pagadorCieFormatSobreService.update(
+							pagadorCieFormatSobreServiceUpdate);
+							
+					
+					pagadorCieFormatSobreServiceUpdate=pagadorCieFormatSobreService.update(
+					pagadorCieFormatSobreServiceUpdate);
 					
 					assertNotNull(pagadorCieFormatSobreServiceUpdate);
 					assertNotNull(pagadorCieFormatSobreServiceUpdate.getId());
 					
 					comprobarPagadorCieFormatSobre(
-							createPagadorCieFormatSobre,
-							pagadorCieFormatSobreServiceUpdate);
+							pagadorCieFormatSobreServiceUpdate,
+							pagadorCieFormatSobreServiceUpdate1);
 					
-					assertEquals( pagadorCieUpdtate.getId(), pagadorCieFormatSobreServiceUpdate.getPagadorCieId());
+					assertEquals( entitatCreada.getId(), pagadorCieFormatSobreServiceUpdate.getPagadorCieId());
 				
 					
 
@@ -201,34 +203,26 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTest{
 			new TestAmbElementsCreats() {
 				@Override
 				public void executar(List<Object> elementsCreats) throws NotFoundException{
-					 EntitatDto entitatCreada=(EntitatDto)elementsCreats.get(0);
-					 PagadorCieDto deletePagadorCie=(PagadorCieDto)elementsCreats.get(1);
+					
+					
 					 PagadorCieFormatSobreDto pagadorCieFormatSobreBorrar=(PagadorCieFormatSobreDto)elementsCreats.get(2);
 					 
 					autenticarUsuari("admin");
-//					PagadorCieFormatSobreDto deletePagadorCieFormatSobre1 = 
-//							pagadorCieFormatSobreService.create(deletePagadorCieFormatSobre.getId(),deletePagadorCieFormatSobre);
-					
-							
-					createPagadorCieFormatSobre.setId(pagadorCieFormatSobreBorrar.getId());
-					
 					assertNotNull(pagadorCieFormatSobreBorrar);
 					assertNotNull(pagadorCieFormatSobreBorrar.getId());
-					
-					assertEquals( deletePagadorCie.getId(), pagadorCieFormatSobreBorrar.getId());
-					
+					PagadorCieFormatSobreDto deletePagadorCieFormatSobre = pagadorCieFormatSobreService.delete(
+							pagadorCieFormatSobreBorrar.getId());
+							
 					comprobarPagadorCieFormatSobre(
-							createPagadorCieFormatSobre,
+							deletePagadorCieFormatSobre,
 							pagadorCieFormatSobreBorrar);
 					
 					try {						
-						pagadorCieFormatSobreService.findById(
-								pagadorCieFormatSobreBorrar.getId());
+						pagadorCieFormatSobreService.findById(pagadorCieFormatSobreBorrar.getId());
+						fail("El PagadorCieSobre esborrat no s'hauria d'haver trobat");												
+					}catch(NotFoundException expected) {
 						
-						fail("El PagadorCieSobre esborrat no s `hauria d'haver trobat");												
-						}catch(NotFoundException expected) {
-						
-						}
+					}
 					
 					elementsCreats.remove(pagadorCieFormatSobreBorrar);
 					
@@ -251,24 +245,20 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTest{
 				@Override
 				public void executar(List<Object> elementsCreats)throws NotFoundException{
 							
-					 EntitatDto entitatCreada=(EntitatDto)elementsCreats.get(0);
-					 PagadorCieDto pagadorCieSobreFindById=(PagadorCieDto)elementsCreats.get(1);
-					 PagadorCieFormatSobreDto pagadorCieFormatSobreFinById=(PagadorCieFormatSobreDto)elementsCreats.get(2);
+					 
+					PagadorCieFormatSobreDto pagadorCieFormatSobreFinById=(PagadorCieFormatSobreDto)elementsCreats.get(2);
 					 
 					autenticarUsuari("admin");
 					
-//					PagadorCieFormatSobreDto  encontrarCieFormatPorId= pagadorCieFormatSobreService.create(findByIdPagadorCieFormatSobre.getId(),findByIdPagadorCieFormatSobre);
+					PagadorCieFormatSobreDto pagadorCieFormatSobreFinById1=pagadorCieFormatSobreService.findById(
+							pagadorCieFormatSobreFinById.getId());
 					
-					createPagadorCieFormatSobre.setId(pagadorCieFormatSobreFinById.getId());
+					assertNotNull(pagadorCieFormatSobreFinById1);
+					assertNotNull(pagadorCieFormatSobreFinById1.getId());
 					
-//					PagadorCieFormatFullaDto encontradoPagadorCie= pagadorCieFormatFullaService.findById(encontrarCieFormatPorId.getId());
+		
 					
-					
-					
-					assertNotNull(pagadorCieFormatSobreFinById);
-					assertNotNull(pagadorCieFormatSobreFinById.getId());
-					
-					assertEquals(pagadorCieSobreFindById.getId(), pagadorCieFormatSobreFinById.getId());
+					assertEquals(pagadorCieFormatSobreFinById.getId(), pagadorCieFormatSobreFinById1.getId());
 				}
 			},
 			
@@ -294,6 +284,35 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTest{
 				perComprovar.getCodi());
 	}
 
+	
+	private void comprovarEntitatCoincideix(
+			EntitatDto original,
+			EntitatDto perComprovar) {
+		assertEquals(
+				original.getCodi(),
+				perComprovar.getCodi());
+		assertEquals(
+				original.getNom(),
+				perComprovar.getNom());
+		assertEquals(
+				original.getDescripcio(),
+				perComprovar.getDescripcio());
+		assertEquals(
+				original.getTipus(),
+				perComprovar.getTipus());
+		assertEquals(
+				original.getDir3Codi(),
+				perComprovar.getDir3Codi());
+		assertEquals(
+				original.getApiKey(),
+				perComprovar.getApiKey());
+		assertEquals(
+				original.isAmbEntregaDeh(),
+				perComprovar.isAmbEntregaDeh());
+		assertEquals(
+				original.isAmbEntregaCie(),
+				perComprovar.isAmbEntregaCie());
+	}
 	
 }
 	
