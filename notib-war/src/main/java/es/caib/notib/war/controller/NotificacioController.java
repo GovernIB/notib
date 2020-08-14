@@ -69,6 +69,7 @@ import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
 import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
 import es.caib.notib.core.api.service.ProcedimentService;
@@ -105,6 +106,8 @@ public class NotificacioController extends BaseUserController {
 	private EntitatService entitatService;
 	@Autowired
 	private ProcedimentService procedimentService;
+	@Autowired
+	private OrganGestorService organGestorService;
 	@Autowired
 	private EnviamentService enviamentService;
 	@Autowired
@@ -161,11 +164,11 @@ public class NotificacioController extends BaseUserController {
 		List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
 		if (RolHelper.isUsuariActualAdministrador(request)) {
 			procedimentsDisponibles = procedimentService.findAll();
-			organsGestorsDisponibles = procedimentService.findOrgansGestorsAll();
+			organsGestorsDisponibles = organGestorService.findAll();
 			model.addAttribute("entitat", entitatService.findAll());
 		} else if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
 			procedimentsDisponibles = procedimentService.findByEntitat(entitatActual.getId());
-			organsGestorsDisponibles = procedimentService.findOrgansGestorsByEntitat(entitatActual.getId());
+			organsGestorsDisponibles = organGestorService.findByEntitat(entitatActual.getId());
 		} else if (RolHelper.isUsuariActualUsuari(request)) {
 			procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), aplicacioService.findRolsUsuariActual(), PermisEnum.CONSULTA);
 			if (procedimentsDisponibles.isEmpty()) {
@@ -174,7 +177,7 @@ public class NotificacioController extends BaseUserController {
 				List<Long> procedimentsDisponiblesIds = new ArrayList<Long>();
 				for (ProcedimentDto pro: procedimentsDisponibles)
 					procedimentsDisponiblesIds.add(pro.getId());
-				organsGestorsDisponibles = procedimentService.findOrganGestorByProcedimentIds(procedimentsDisponiblesIds);
+				organsGestorsDisponibles = organGestorService.findByProcedimentIds(procedimentsDisponiblesIds);
 			}
 		}
 		for (OrganGestorDto organGestor: organsGestorsDisponibles) {

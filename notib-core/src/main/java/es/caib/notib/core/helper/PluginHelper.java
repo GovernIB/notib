@@ -58,7 +58,7 @@ import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.PersonaEntity;
-import es.caib.notib.plugin.gesconadm.GdaProcediment;
+import es.caib.notib.plugin.gesconadm.GcaProcediment;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
@@ -845,7 +845,7 @@ public class PluginHelper {
 		}
 	}
 	
-	// GESTOR DOCUMENTAL ADMINISTRATIU (ROLSAC)
+	// GESTOR CONTINGUTS ADMINISTRATIU (ROLSAC)
 	// /////////////////////////////////////////////////////////////////////////////////////
 	
 	public List<ProcedimentDto> getProcedimentsGda() {
@@ -856,12 +856,13 @@ public class PluginHelper {
 		
 		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
 		try {
-			List<GdaProcediment> procs = getGestorDocumentalAdministratiuPlugin().getAllProcediments();
+			List<GcaProcediment> procs = getGestorDocumentalAdministratiuPlugin().getAllProcediments();
 			if (procs != null)
-				for (GdaProcediment proc: procs) {
+				for (GcaProcediment proc: procs) {
 					ProcedimentDto dto = new ProcedimentDto();
 					dto.setCodi(proc.getCodiSIA());
 					dto.setNom(proc.getNom());
+					dto.setComu(proc.isComu());
 					if (proc.getUnitatAdministrativacodi() != null) {
 						dto.setOrganGestor(proc.getUnitatAdministrativacodi());
 					}

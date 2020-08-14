@@ -1,0 +1,1 @@
+ALTER TABLE not_procediment ADD comu NUMBER(1) DEFAULT 0 NOT NULL;

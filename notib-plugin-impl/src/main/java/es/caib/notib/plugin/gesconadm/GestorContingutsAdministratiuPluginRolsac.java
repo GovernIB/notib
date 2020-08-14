@@ -39,7 +39,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	private String baseUrl;
 	
 	@Override
-	public List<GdaProcediment> getAllProcediments() throws SistemaExternException {
+	public List<GcaProcediment> getAllProcediments() throws SistemaExternException {
 		List<Procediment> procediments = new ArrayList<Procediment>();
 		try {
 			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "procedimientos";
@@ -169,19 +169,24 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 //	}
 	
 	
-	private List<GdaProcediment> toDto(List<Procediment> procediments) throws SistemaExternException {
-		List<GdaProcediment> procedimentsDto = new ArrayList<GdaProcediment>();
+	private List<GcaProcediment> toDto(List<Procediment> procediments) throws SistemaExternException {
+		List<GcaProcediment> procedimentsDto = new ArrayList<GcaProcediment>();
 		for (Procediment procediment: procediments) {
 			procedimentsDto.add(toDto(procediment));
 		}
 		return procedimentsDto;
 	}
 	
-	private GdaProcediment toDto(Procediment procediment) throws SistemaExternException {
-		GdaProcediment dto = new GdaProcediment();
+	private GcaProcediment toDto(Procediment procediment) throws SistemaExternException {
+		GcaProcediment dto = new GcaProcediment();
 		dto.setCodiSIA(procediment.getCodigoSIA());
 		dto.setNom(procediment.getNombre());
 		dto.setUnitatAdministrativacodi(getUnitatAdministrativa(procediment.getUnidadAdministrativa().getCodigo()));
+		//Com que Procediment ens ve amb Boolean i al nostre sistema ho tenim amb boolean primitiu, si es null ho tractam com false:
+		if (procediment.getComun()!=null) 
+			dto.setComu(procediment.getComun().booleanValue());	
+		else 
+			dto.setComu(false);
 //		dto.setUnidadAdministrativa(getUnitatAdministrativa(procediment.getUnidadAdministrativa().getCodigo()));
 //		dto.setUnitatAdministrativaPare(getUnitatAdministrativaArrel(procediment.getUnidadAdministrativa().getCodigo()));
 		return dto;

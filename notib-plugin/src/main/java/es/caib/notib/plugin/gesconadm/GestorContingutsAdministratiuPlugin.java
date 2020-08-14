@@ -22,7 +22,7 @@ public interface GestorContingutsAdministratiuPlugin {
 	 * @throws SistemaExternException
 	 *            Si es produeix un error al consultar els procediments.
 	 */
-	public List<GdaProcediment> getAllProcediments() throws SistemaExternException;
+	public List<GcaProcediment> getAllProcediments() throws SistemaExternException;
 	
 	/**
 	 * Retorna una unitat administrativa donat el seu codi.

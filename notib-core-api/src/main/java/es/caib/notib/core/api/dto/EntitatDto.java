@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,13 +16,15 @@ import lombok.Setter;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter @Setter
+@Getter @Setter @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class EntitatDto extends AuditoriaDto {
 
 	private Long id;
+	@EqualsAndHashCode.Include
 	private String codi;
 	private String nom;
 	private EntitatTipusEnumDto tipus;
+	@EqualsAndHashCode.Include
 	private String dir3Codi;
 	private String dir3CodiReg;
 	private String apiKey;
@@ -39,6 +42,7 @@ public class EntitatDto extends AuditoriaDto {
 	private TipusDocumentDto tipusDocDefault;
 	private List<PermisDto> permisos;
 	private boolean usuariActualAdministradorEntitat;
+	private boolean usuariActualAdministradorOrgan;
 	private Long numAplicacions;
 
 

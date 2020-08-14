@@ -1,5 +1,7 @@
 package es.caib.notib.war.controller;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,9 +18,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDireccioDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.service.EntitatService;
-import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.war.command.PermisCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
@@ -34,7 +39,7 @@ import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 public class OrganGestorPermisController extends BaseUserController{
 	
 	@Autowired
-	ProcedimentService procedimentService;
+	OrganGestorService organGestorService;
 	@Autowired
 	EntitatService entitatService;
 	
@@ -45,7 +50,7 @@ public class OrganGestorPermisController extends BaseUserController{
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
-		OrganGestorDto organGestor = procedimentService.findOrganGestorById(
+		OrganGestorDto organGestor = organGestorService.findById(
 				entitatActual.getId(),
 				organGestorId);
 					
@@ -63,11 +68,38 @@ public class OrganGestorPermisController extends BaseUserController{
 			@PathVariable Long organGestorId, 
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		return DatatablesHelper.getDatatableResponse(request,
-				procedimentService.permisOrganGestorFind(
-						entitatActual.getId(), 
-						organGestorId), 
-						"id");
+		
+		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		List<PermisDto> permisos = organGestorService.permisFind(
+				entitatActual.getId(), 
+				organGestorId);
+		if (paginacio.getOrdres() != null && !paginacio.getOrdres().isEmpty()) {
+			// Només ordenarem per un camp
+			OrdreDto ordre = paginacio.getOrdres().get(0);
+			boolean desc = ordre.getDireccio().equals(OrdreDireccioDto.DESCENDENT);
+			Comparator<PermisDto> comp = null;
+			
+			switch (ordre.getCamp()) {
+			case "read":
+				comp = desc ? PermisDto.decending(PermisDto.sortByRead()) : PermisDto.sortByRead();
+				break;
+			case "processar":
+				comp = desc ? PermisDto.decending(PermisDto.sortByProcessar()) : PermisDto.sortByProcessar();
+				break;
+			case "notificacio":
+				comp = desc ? PermisDto.decending(PermisDto.sortByNotificacio()) : PermisDto.sortByNotificacio();
+				break;
+			case "administration":
+				comp = desc ? PermisDto.decending(PermisDto.sortByAdministration()) : PermisDto.sortByAdministration();
+				break;
+			case "administrador":
+				comp = desc ? PermisDto.decending(PermisDto.sortByAdministrador()) : PermisDto.sortByAdministrador();
+				break;
+			}
+			if (comp != null)
+				Collections.sort(permisos, comp);
+		}
+		return DatatablesHelper.getDatatableResponse(request, permisos, "id");
 	}
 	
 	@RequestMapping(value = "/{organGestorId}/permis/new", method = RequestMethod.GET)
@@ -87,12 +119,12 @@ public class OrganGestorPermisController extends BaseUserController{
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		model.addAttribute(
 				"organGestor",
-				procedimentService.findOrganGestorById(
+				organGestorService.findById(
 						entitatActual.getId(),
 						organGestorId));
 		PermisDto permis = null;
 		if (permisId != null) {
-			List<PermisDto> permisos = procedimentService.permisOrganGestorFind(
+			List<PermisDto> permisos = organGestorService.permisFind(
 					entitatActual.getId(),
 					organGestorId);
 			for (PermisDto p: permisos) {
@@ -120,12 +152,12 @@ public class OrganGestorPermisController extends BaseUserController{
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
 					"organGestor",
-					procedimentService.findOrganGestorById(
+					organGestorService.findById(
 							entitatActual.getId(),
 							organGestorId));
 			return "organGestorPermisForm";
 		}
-		procedimentService.permisOrganGestorUpdate(
+		organGestorService.permisUpdate(
 				entitatActual.getId(),
 				organGestorId,
 				PermisCommand.asDto(command));
@@ -142,7 +174,7 @@ public class OrganGestorPermisController extends BaseUserController{
 			@PathVariable Long permisId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		procedimentService.permisOrganGestorDelete(
+		organGestorService.permisDelete(
 				entitatActual.getId(),
 				organGestorId,
 				permisId);

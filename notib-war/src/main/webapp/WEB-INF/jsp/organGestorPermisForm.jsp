@@ -63,6 +63,7 @@
 			<not:inputCheckbox name="notificacio" textKey="procediment.permis.form.camp.notificacio"/>
 			<not:inputCheckbox name="administration" textKey="procediment.permis.form.camp.gestio"/>
 		</div>
+		<not:inputCheckbox name="administrador" textKey="procediment.permis.form.camp.administrador"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/organgestor/${organGestor.id}/permis"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
