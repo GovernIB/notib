@@ -12,20 +12,19 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
-import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.unitat.NodeDir3;
@@ -47,6 +46,8 @@ public class CacheHelper {
 	@Resource
 	private ProcedimentRepository procedimentRepository;
 	@Resource
+	private OrganGestorRepository organGestorRepository;
+	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
@@ -57,32 +58,32 @@ public class CacheHelper {
 	@Resource
 	private UsuariHelper usuariHelper;
 
-	@Cacheable(value = "entitatsUsuari", key="#usuariCodi")
+	@Cacheable(value = "entitatsUsuari", key="#usuariCodi.concat('-').concat(#rolActual)")
 	public List<EntitatDto> findEntitatsAccessiblesUsuari(
-			String usuariCodi) {
-		logger.debug("Consulta entitats accessibles (usuariCodi=" + usuariCodi + ")");
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<EntitatEntity> entitats = entitatRepository.findByActiva(true);
+			String usuariCodi,
+			String rolActual) {
+		return permisosHelper.findEntitatsAccessiblesUsuari(usuariCodi, rolActual);
+	}
+	
+	@Cacheable(value = "organsGestorsUsuari", key="#auth.name")
+	public List<OrganGestorDto> findOrgansGestorsAccessiblesUsuari(Authentication auth) {
+		List<OrganGestorEntity> organsGestors = organGestorRepository.findAll();
+		Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADOR};
+		
 		permisosHelper.filterGrantedAny(
-				entitats,
-				new ObjectIdentifierExtractor<EntitatEntity>() {
-					public Long getObjectIdentifier(EntitatEntity entitat) {
-						return entitat.getId();
+				organsGestors,
+				new ObjectIdentifierExtractor<OrganGestorEntity>() {
+					public Long getObjectIdentifier(OrganGestorEntity organGestor) {
+						return organGestor.getId();
 					}
 				},
-				//revisar
-				EntitatEntity.class,
-				new Permission[] {
-					ExtendedPermission.ADMINISTRADORENTITAT},
+				OrganGestorEntity.class,
+				permisos,
 				auth);
 		
-		List<EntitatDto> resposta = conversioTipusHelper.convertirList(
-				entitats,
-				EntitatDto.class);
-		
-		for(EntitatDto dto : resposta) dto.setUsuariActualAdministradorEntitat(true);
-		
-		return resposta;
+		return conversioTipusHelper.convertirList(
+				organsGestors, 
+				OrganGestorDto.class);
 	}
 	
 	@Cacheable(value = "usuariAmbCodi", key="#usuariCodi")
@@ -175,12 +176,20 @@ public class CacheHelper {
 	public void evictFindOrganigramaByEntitat(String entitatcodi) {
 	}
 	
+	@CacheEvict(value = "organsGestorsUsuari", allEntries = true)
+	public void evictFindOrgansGestorsAccessiblesUsuari() {
+	}
+	
+	@CacheEvict(value = "entitatsUsuari", allEntries = true)
+	public void evictFindEntitatsAccessiblesUsuari() {
+	}
+	
 	@CacheEvict(value = "getPermisosEntitatsUsuariActual", key="#auth.name")
 	public void evictGetPermisosEntitatsUsuariActual(Authentication auth) {
 //		System.out.println("Esborram cache permisos de " + auth.getName());
 	}
 	
 	
-	private static final Logger logger = LoggerFactory.getLogger(CacheHelper.class);
+//	private static final Logger logger = LoggerFactory.getLogger(CacheHelper.class);
 
 }

@@ -84,6 +84,8 @@ public interface OrganGestorService {
 			Long id,
 			Long permisId) throws NotFoundException;
 	
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	public List<OrganGestorDto> findAccessiblesByUsuariActual();
 	
 	/**
 	 * Recupera els organimes d'una entitat.

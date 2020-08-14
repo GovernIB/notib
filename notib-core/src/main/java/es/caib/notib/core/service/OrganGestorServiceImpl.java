@@ -8,6 +8,8 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -332,6 +334,31 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		}
 	}
 	
+	@Override
+	public List<OrganGestorDto> findAccessiblesByUsuariActual() {
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		return cacheHelper.findOrgansGestorsAccessiblesUsuari(auth);
+
+//		List<OrganGestorEntity> organsGestors = organGestorRepository.findAll();
+//		Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADOR};
+//		
+//		permisosHelper.filterGrantedAny(
+//				organsGestors,
+//				new ObjectIdentifierExtractor<OrganGestorEntity>() {
+//					public Long getObjectIdentifier(OrganGestorEntity organGestor) {
+//						return organGestor.getId();
+//					}
+//				},
+//				OrganGestorEntity.class,
+//				permisos,
+//				auth);
+//		
+//		return conversioTipusHelper.convertirList(
+//				organsGestors, 
+//				OrganGestorDto.class);
+	}
+	
 	@Transactional
 	@Override
 	public List<PermisDto> permisFind(
@@ -388,6 +415,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					id,
 					OrganGestorEntity.class,
 					permis);
+			cacheHelper.evictFindOrgansGestorsAccessiblesUsuari();
+			cacheHelper.evictFindEntitatsAccessiblesUsuari();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -418,6 +447,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					id,
 					OrganGestorEntity.class,
 					permisId);
+			cacheHelper.evictFindOrgansGestorsAccessiblesUsuari();
+			cacheHelper.evictFindEntitatsAccessiblesUsuari();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
