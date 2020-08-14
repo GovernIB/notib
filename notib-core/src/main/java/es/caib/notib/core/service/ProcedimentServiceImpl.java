@@ -174,7 +174,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							procediment.getTipusAssumpte(),
 							procediment.getTipusAssumpteNom(),
 							procediment.getCodiAssumpte(),
-							procediment.getCodiAssumpteNom()).build());
+							procediment.getCodiAssumpteNom(),
+							procediment.isComu()).build());
 			
 			return conversioTipusHelper.convertir(
 					procedimentEntity, 
@@ -259,7 +260,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						procediment.getTipusAssumpte(),
 						procediment.getTipusAssumpteNom(),
 						procediment.getCodiAssumpte(),
-						procediment.getCodiAssumpteNom());
+						procediment.getCodiAssumpteNom(),
+						procediment.isComu());
 		
 			procedimentRepository.save(procedimentEntity);
 			
@@ -420,7 +422,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 										null,
 										null,
 										null,
-										null).build());
+										null,
+										procedimentGda.isComu()).build());
 						
 	//					logger.debug(">>>> >> Creat.");
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.creat"));
@@ -446,7 +449,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							
 							// UPDATE
 							if (!procediment.getOrganGestor().getCodi().equals(procedimentGda.getOrganGestor()) ||
-								!procediment.getNom().equals(procedimentGda.getNom())) {
+								!procediment.getNom().equals(procedimentGda.getNom()) || 
+								procediment.isComu() != procedimentGda.isComu()) {
 								// Si canviam l'organ gestor, i aquest no s'utilitza en cap altre procediment, l'eliminarem (1)
 								if (!procediment.getOrganGestor().getCodi().equals(procedimentGda.getOrganGestor())) {
 									progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.update.organ"));
@@ -460,7 +464,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 								
 								procediment.update(
 										procedimentGda.getNom(),
-										organGestor);
+										organGestor,
+										procedimentGda.isComu());
 								
 								t2 = System.currentTimeMillis();
 	//							logger.debug(">>>> >> Modificat (" + (t2 - t1) + "ms)");
@@ -1603,6 +1608,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			cacheHelper.evictFindByPermisProcedimentsUsuariActual(entitat.getId());
 			cacheHelper.evictFindPermisProcedimentsUsuariActualAndEntitat(entitat.getId());
 			cacheHelper.evictFindOrganismesByEntitat(entitat.getDir3Codi());
+			cacheHelper.evictFindOrganigramaByEntitat(entitat.getDir3Codi());
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

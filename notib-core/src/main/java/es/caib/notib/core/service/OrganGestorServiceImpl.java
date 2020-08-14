@@ -231,6 +231,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		}
 	}
 	
+	//List<String> obtenirCodisDir3Fills(organGestor)
+	
 	@Transactional
 	@Override
 	public void updateNom(Long entitatId, String organGestorCodi) {

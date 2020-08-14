@@ -8,11 +8,12 @@ import lombok.Setter;
  *
  */
 @Getter @Setter
-public class GdaProcediment {
+public class GcaProcediment {
 	
 	private String codiSIA;
     private String nom;
     private String unitatAdministrativacodi;
+    private boolean comu;
 //    private GdaUnitatAdministrativa unidadAdministrativa;
 //    private GdaUnitatAdministrativa unitatAdministrativaPare;
 

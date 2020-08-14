@@ -27,6 +27,7 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 	private String tipusAssumpteNom;
 	private String codiAssumpte;
 	private String codiAssumpteNom;
+	private boolean comu;
 	
 	private List<PermisDto> permisos;
 	private boolean usuariActualRead;

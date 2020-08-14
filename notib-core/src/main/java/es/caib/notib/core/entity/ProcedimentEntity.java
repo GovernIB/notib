@@ -55,8 +55,11 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	@Column(name = "codiassumpte_nom", length = 255)
 	protected String codiAssumpteNom;
 	
-	@Column(name = "agrupar", length = 64, nullable = false)
+	@Column(name = "agrupar")
 	protected boolean agrupar;
+	
+	@Column(name = "comu")
+	protected boolean comu;
 	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "entitat")
@@ -95,7 +98,8 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			String tipusAssumpte,
 			String tipusAssumpteNom,
 			String codiAssumpte,
-			String codiAssumpteNom) {
+			String codiAssumpteNom,
+			boolean comu) {
 		this.codi = codi;
 		this.nom = nom;
 		this.entitat = entitat;
@@ -111,13 +115,16 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 		this.tipusAssumpteNom = tipusAssumpteNom;
 		this.codiAssumpte = codiAssumpte;
 		this.codiAssumpteNom = codiAssumpteNom;
+		this.comu=comu;
 	}
 	
 	public void update(
 			String nom,
-			OrganGestorEntity organGestor) {
+			OrganGestorEntity organGestor,
+			boolean comu) {
 		this.nom = nom;
 		this.organGestor = organGestor;
+		this.comu= comu;
 	}
 	
 	public static Builder getBuilder(
@@ -137,7 +144,8 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			String tipusAssumpte,
 			String tipusAssumpteNom,
 			String codiAssumpte,
-			String codiAssumpteNom) {
+			String codiAssumpteNom,
+			boolean comu) {
 		return new Builder(
 				codi,
 				nom,
@@ -155,7 +163,8 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 				tipusAssumpte,
 				tipusAssumpteNom,
 				codiAssumpte,
-				codiAssumpteNom);
+				codiAssumpteNom,
+				comu);
 	}
 	
 	public static class Builder {
@@ -177,7 +186,8 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 				String tipusAssumpte,
 				String tipusAssumpteNom,
 				String codiAssumpte,
-				String codiAssumpteNom) {
+				String codiAssumpteNom,
+				boolean comu) {
 			built = new ProcedimentEntity();
 			built.codi = codi;
 			built.nom = nom;
@@ -194,6 +204,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			built.tipusAssumpteNom = tipusAssumpteNom;
 			built.codiAssumpte = codiAssumpte;
 			built.codiAssumpteNom = codiAssumpteNom;
+			built.comu=comu;
 		}
 		public ProcedimentEntity build() {
 			return built;

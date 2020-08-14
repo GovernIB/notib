@@ -48,6 +48,7 @@ public class ProcedimentCommand {
 	private String codiAssumpte;
 	private String codiAssumpteNom;
 	private int caducitat;
+	private boolean comu;
 	
 	public Long getId() {
 		return id;
@@ -192,6 +193,13 @@ public class ProcedimentCommand {
 	}
 	public void setCaducitat(int caducitat) {
 		this.caducitat = caducitat;
+	}
+	
+	public boolean isComu() {
+		return comu;
+	}
+	public void setComu(boolean comu) {
+		this.comu = comu;
 	}
 	public static ProcedimentCommand asCommand(ProcedimentDto dto) {
 		if (dto == null) {
