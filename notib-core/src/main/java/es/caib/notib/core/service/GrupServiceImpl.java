@@ -140,7 +140,7 @@ public class GrupServiceImpl implements GrupService{
 		try {
 			entityComprovarHelper.comprovarEntitat(entitatId);
 			
-			GrupEntity grupEntity = grupReposity.findOne(id);
+			GrupEntity grupEntity = entityComprovarHelper.comprovarGrup(id);
 			return conversioTipusHelper.convertir(
 					grupEntity, 
 					GrupDto.class);

@@ -120,7 +120,7 @@ public class PagadorPostalServiceImpl implements PagadorPostalService{
 	public PagadorPostalDto findById(Long id) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			PagadorPostalEntity pagadorPostalEntity = pagadorPostalReposity.findOne(id);
+			PagadorPostalEntity pagadorPostalEntity = entityComprovarHelper.comprovarPagadorPostal(id);
 			
 			return conversioTipusHelper.convertir(
 					pagadorPostalEntity, 

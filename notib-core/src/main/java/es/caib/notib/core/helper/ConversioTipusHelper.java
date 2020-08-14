@@ -12,17 +12,25 @@ import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.AplicacioDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PagadorCieDto;
+import es.caib.notib.core.api.dto.PagadorCieFormatFullaDto;
+import es.caib.notib.core.api.dto.PagadorCieFormatSobreDto;
+import es.caib.notib.core.api.dto.PagadorPostalDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PagadorCieEntity;
+import es.caib.notib.core.entity.PagadorCieFormatFullaEntity;
+import es.caib.notib.core.entity.PagadorCieFormatSobreEntity;
+import es.caib.notib.core.entity.PagadorPostalEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import ma.glasnost.orika.CustomConverter;
@@ -88,10 +96,31 @@ public class ConversioTipusHelper {
 			byDefault().
 			register();
 		
+		mapperFactory.classMap(GrupEntity.class, GrupDto.class).
+			field("entitat.id", "entitatId").
+			byDefault().
+			register();
+
 		mapperFactory.classMap(PagadorCieEntity.class, PagadorCieDto.class).
 			field("entitat.id", "entitatId").
 			byDefault().
 			register();
+		
+		mapperFactory.classMap(PagadorPostalEntity.class, PagadorPostalDto.class).
+			field("entitat.id", "entitatId").
+			byDefault().
+			register();
+		
+		mapperFactory.classMap(PagadorCieFormatFullaEntity.class, PagadorCieFormatFullaDto.class).
+			field("pagadorCie.id", "pagadorCieId").
+			byDefault().
+			register();
+		
+		mapperFactory.classMap(PagadorCieFormatSobreEntity.class, PagadorCieFormatSobreDto.class).
+			field("pagadorCie.id", "pagadorCieId").
+			byDefault().
+			register();
+	
 	}
 
 	public <T> T convertir(Object source, Class<T> targetType) {

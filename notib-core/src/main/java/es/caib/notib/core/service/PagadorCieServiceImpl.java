@@ -115,7 +115,7 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	public PagadorCieDto findById(Long id) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			PagadorCieEntity pagadorCieEntity = pagadorCieReposity.findOne(id);
+			PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(id);
 			
 			return conversioTipusHelper.convertir(
 					pagadorCieEntity, 

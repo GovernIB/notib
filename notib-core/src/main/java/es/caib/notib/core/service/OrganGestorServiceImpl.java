@@ -70,7 +70,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					Long.parseLong(dto.getEntitatId()), 
+					dto.getEntitatId(), 
 					false, 
 					true, 
 					false);
