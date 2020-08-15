@@ -1038,9 +1038,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 					NotificacioEnviamentDtoV2.class);
 			
 			synchronized(CreacioSemaforDto.getCreacioSemafor()) {
-				registreNotificaHelper.realitzarProcesRegistrarNotificar(
-						notificacioEntity,
-						enviaments);
+				logger.info("Comprovant estat actual notificació (id: " + notificacioEntity.getId() + ")...");
+				NotificacioEstatEnumDto estatActual = notificacioRepository.getEstatNotificacio(notificacioEntity.getId());
+				logger.info("Estat notificació [Id:" + notificacioEntity.getId() + ", Estat: "+ estatActual + "]");
+				
+				if (estatActual.equals(NotificacioEstatEnumDto.PENDENT)) {
+					registreNotificaHelper.realitzarProcesRegistrarNotificar(
+							notificacioEntity,
+							enviaments);
+				}
 			}
 			logger.info(" [REG] Fi registre notificació [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
 			return registresIdDto;
