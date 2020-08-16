@@ -195,7 +195,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					if (procediment.isAgrupar() && notificacio.getGrupCodi() != null && !notificacio.getGrupCodi().isEmpty()) {
 						logger.debug(">> [ALTA] procediment amb grups");
 						// Llistat de procediments amb grups
-						List<GrupDto> grupsProcediment = grupService.findByProcedimentGrups(procediment.getId());
+						List<GrupDto> grupsProcediment = grupService.findByProcedimentAndUsuariGrups(procediment.getId());
 						GrupDto grupNotificacio = grupService.findByCodi(
 								notificacio.getGrupCodi(),
 								entitat.getId());

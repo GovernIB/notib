@@ -12,6 +12,8 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorCieFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -86,5 +88,10 @@ public class PagadorCieServiceBean implements PagadorCieService {
 		return delegate.findByEntitat(entitatId);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	public Object findByEntitatAndOrganGestor(EntitatDto entitat, OrganGestorDto organGestor) {
+		return delegate.findByEntitatAndOrganGestor(entitat, organGestor);
+	}
 
 }

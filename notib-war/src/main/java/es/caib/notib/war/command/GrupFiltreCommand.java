@@ -4,36 +4,28 @@ import javax.validation.constraints.Size;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
-import es.caib.notib.core.api.dto.GrupDto;
+
 import es.caib.notib.core.api.dto.GrupFiltreDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Command per al manteniment del filtre de grups.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 public class GrupFiltreCommand {
 	
 	@NotEmpty @Size(max=64)
 	private String codi;
 	@NotEmpty @Size(max=64)
 	private String nom;
+	private Long organGestorId;
 	
-	public String getCodi() {
-		return codi;
-	}
-	public void setCodi(String codi) {
-		this.codi = codi;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
 	
-	public static GrupFiltreCommand asCommand(GrupDto dto) {
+	public static GrupFiltreCommand asCommand(GrupFiltreDto dto) {
 		if (dto == null) {
 			return null;
 		}

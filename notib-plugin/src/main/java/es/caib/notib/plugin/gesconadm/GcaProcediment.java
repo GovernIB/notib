@@ -1,5 +1,7 @@
 package es.caib.notib.plugin.gesconadm;
 
+import java.util.Date;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +16,7 @@ public class GcaProcediment {
     private String nom;
     private String unitatAdministrativacodi;
     private boolean comu;
+    private Date dataActualitzacio;
 //    private GdaUnitatAdministrativa unidadAdministrativa;
 //    private GdaUnitatAdministrativa unitatAdministrativaPare;
 

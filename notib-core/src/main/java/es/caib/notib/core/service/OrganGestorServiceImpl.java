@@ -33,6 +33,7 @@ import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.repository.OrganGestorRepository;
@@ -60,6 +61,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	private PermisosHelper permisosHelper;
 	@Resource
 	private CacheHelper cacheHelper;
+	@Resource
+	private OrganigramaHelper organigramaHelper;
 	@Resource
 	private MetricsHelper metricsHelper;
 	
@@ -466,6 +469,26 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				organismes = cacheHelper.findOrganismesByEntitat(entitat.getDir3Codi());
 			} catch (Exception e) {
 				String errorMessage = "No s'han pogut recuperar els organismes de l'entitat: " + entitat.getDir3Codi();
+				logger.error(
+						errorMessage, 
+						e.getMessage());
+			}
+			return organismes;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<OrganismeDto> findOrganismes(EntitatDto entitat, OrganGestorDto organGestor) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<OrganismeDto> organismes = new ArrayList<OrganismeDto>();
+			try {
+				organismes = organigramaHelper.getOrganismesFillsByOrgan(entitat.getDir3Codi(), organGestor.getCodi());
+			} catch (Exception e) {
+				String errorMessage = "No s'han pogut recuperar els organismes de l'entitat: " + entitat.getDir3Codi() + " i òrgan gestor: " + organGestor.getCodi();
 				logger.error(
 						errorMessage, 
 						e.getMessage());

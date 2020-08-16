@@ -95,6 +95,9 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public List<OrganismeDto> findOrganismes(EntitatDto entitat);
 	
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	public List<OrganismeDto> findOrganismes(EntitatDto entitat, OrganGestorDto organGestor);
+	
 	/**
 	 * Recupera la denominació d'un organime.
 	 * 

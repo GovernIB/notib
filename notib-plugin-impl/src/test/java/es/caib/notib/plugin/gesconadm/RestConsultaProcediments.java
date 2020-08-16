@@ -9,6 +9,7 @@ import javax.ejb.CreateException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -29,8 +30,8 @@ public class RestConsultaProcediments {
 
 	private static final String ROLSAC_URL = "https://dev.caib.es/rolsac/";
 	private static final String ROLSAC_SERVICE_PATH = "api/rest/v1/";
-	private static final String ROLSAC_USERNAME = "$distribucio_rolsac";
-	private static final String ROLSAC_PASSWORD = "distribucio_rolsac";
+	private static final String ROLSAC_USERNAME = "$notib_rolsac";
+	private static final String ROLSAC_PASSWORD = "notib_rolsac";
 	private static final Boolean ROLSAC_BASICAUTH = true;
 	
 	
@@ -43,10 +44,16 @@ public class RestConsultaProcediments {
 				jerseyClient,
 				urlAmbMetode);
 		
+		Form form = new Form();
+		form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"10000\"}");
+		form.add("filtro", "{\"activo\":\"1\"}");
+		form.add("filtro", "{\"codigoUADir3\":\"A04003003\", \"buscarEnDescendientesUA\":\"1\", \"activo\":\"1\", \"estadoUA\":\"1\"}");
+	    
 		String json = jerseyClient.
 				resource(urlAmbMetode).
-				type("application/json").
-				post(String.class);
+				type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
+				accept(MediaType.APPLICATION_JSON_TYPE).
+				post(String.class, form);
 		assertNotNull(json);
 		System.out.println("Missatge REST rebut: ");
 		System.out.println(json);

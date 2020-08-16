@@ -1,5 +1,7 @@
 package es.caib.notib.war.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GrupService;
@@ -119,10 +123,18 @@ public class ProcedimentGrupController extends BaseUserController{
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ProcedimentGrupDto procedimentGrups = null;
-		
+		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		List<GrupDto> grups;
+		if (organGestorActual == null) {
+			grups = grupService.findByEntitat(entitatActual.getId());
+		} else {
+			grups = grupService.findByEntitatAndOrganGestor(
+					entitatActual,
+					organGestorActual);
+		}
 		model.addAttribute(
 				"grups", 
-				grupService.findByEntitat(entitatActual.getId()));
+				grups);
 
 		model.addAttribute(
 				"procediment",

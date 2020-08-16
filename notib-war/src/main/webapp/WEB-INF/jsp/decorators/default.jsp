@@ -208,7 +208,7 @@ body {
 										<c:forEach var="organ" items="${sessionOrgans}" varStatus="status">
 											<c:if test="${organ.id != organActual.id}">
 											
-												<c:url var="urlCanviOrgan" value="/index">
+												<c:url var="urlCanviOrgan" value="">
 													<c:param name="${requestParameterCanviOrgan}" value="${organ.id}"/>
 												</c:url>
 												<li><a href="${urlCanviOrgan}">${organ.nom}</a></li>

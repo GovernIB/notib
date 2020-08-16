@@ -130,9 +130,15 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public List<OrganismeDto> findOrganismes(EntitatDto entitat) {
 		return delegate.findOrganismes(entitat);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	public List<OrganismeDto> findOrganismes(EntitatDto entitat, OrganGestorDto organGestor) {
+		return delegate.findOrganismes(entitat, organGestor);
 	}
 
 	@Override

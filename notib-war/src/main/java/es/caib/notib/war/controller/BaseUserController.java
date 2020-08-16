@@ -6,7 +6,9 @@ package es.caib.notib.war.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.war.helper.EntitatHelper;
+import es.caib.notib.war.helper.OrganGestorHelper;
 import es.caib.notib.war.helper.RolHelper;
 
 
@@ -36,6 +38,15 @@ public class BaseUserController extends BaseController {
 			throw new SecurityException("No te permisos per accedir a aquesta entitat com a usuari entitat");
 		}
 		return entitat;
+	}
+	
+	public OrganGestorDto getOrganGestorActual(HttpServletRequest request) {
+		OrganGestorDto organGestor = null;
+		boolean administradorOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+		if (administradorOrgan) {
+			organGestor = OrganGestorHelper.getOrganGestorUsuariActual(request);
+		}
+		return organGestor;
 	}
 
 }

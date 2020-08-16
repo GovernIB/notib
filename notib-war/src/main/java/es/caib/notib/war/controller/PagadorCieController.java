@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.service.EntitatService;
@@ -30,7 +31,6 @@ import es.caib.notib.war.command.PagadorCieFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.RequestSessionHelper;
-import es.caib.notib.war.helper.RolHelper;
 
 /**
  * Controlador per el mantinemnt de pagadors cie.
@@ -70,9 +70,13 @@ public class PagadorCieController extends BaseUserController{
 		PagadorCieFiltreCommand pagadorCieFiltreCommand = getFiltreCommand(request);
 		PaginaDto<PagadorCieDto> pagadorsCie = null;
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
-			//procedimentFiltreCommand.setEntitatId(entitat.getId());
+		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		if (organGestorActual != null) {
+			pagadorCieFiltreCommand.setOrganGestorId(organGestorActual.getId());
+		} else {
+			pagadorCieFiltreCommand.setOrganGestorId(null);
 		}
+			
 		pagadorsCie = pagadorCieService.findAmbFiltrePaginat(
 							entitat.getId(),
 							PagadorCieFiltreCommand.asDto(pagadorCieFiltreCommand),
@@ -127,9 +131,14 @@ public class PagadorCieController extends BaseUserController{
 					"pagadorCie.controller.modificat.ok");
 		//if it is new	
 		} else {
+			PagadorCieDto dto = PagadorCieCommand.asDto(pagadorCieCommand);
+			OrganGestorDto organGestorActual = getOrganGestorActual(request);
+			if (organGestorActual != null)
+				dto.setOrganGestorId(organGestorActual.getId());
+			
 			pagadorCieService.create(
 					entitatActual.getId(),
-					PagadorCieCommand.asDto(pagadorCieCommand));
+					dto);
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:pagadorsCie",

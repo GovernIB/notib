@@ -10,6 +10,7 @@ import javax.ejb.CreateException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -49,10 +50,49 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 					jerseyClient,
 					urlAmbMetode);
 			
+			Form form = new Form();
+			form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"100000\"}");
+			form.add("filtro", "{\"activo\":\"1\"}");
+		    
 			String json = jerseyClient.
 					resource(urlAmbMetode).
-					type("application/json").
-					post(String.class);
+					type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
+					accept(MediaType.APPLICATION_JSON_TYPE).
+					post(String.class, form);
+			
+			ObjectMapper mapper  = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			RespostaProcediments resposta = mapper.readValue(json, RespostaProcediments.class);
+			if (resposta != null)
+				procediments = resposta.getResultado();
+			return toDto(procediments);
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'han pogut consultar els procediments via REST",
+					ex);
+		}
+	}
+	
+	@Override
+	public List<GcaProcediment> getProcedimentsByUnitat(String codi) throws SistemaExternException {
+		List<Procediment> procediments = new ArrayList<Procediment>();
+		try {
+			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "procedimientos";
+			
+			Client jerseyClient = generarClient();
+			autenticarClient(
+					jerseyClient,
+					urlAmbMetode);
+			
+			Form form = new Form();
+			form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"100000\"}");
+			form.add("filtro", "{\"codigoUADir3\":\"" + codi + "\", \"buscarEnDescendientesUA\":\"1\", \"activo\":\"1\", \"estadoUA\":\"1\"}");
+		    
+			String json = jerseyClient.
+					resource(urlAmbMetode).
+					type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
+					accept(MediaType.APPLICATION_JSON_TYPE).
+					post(String.class, form);
 			
 			ObjectMapper mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -182,6 +222,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		dto.setCodiSIA(procediment.getCodigoSIA());
 		dto.setNom(procediment.getNombre());
 		dto.setUnitatAdministrativacodi(getUnitatAdministrativa(procediment.getUnidadAdministrativa().getCodigo()));
+		dto.setDataActualitzacio(procediment.getFechaActualizacion());
 		//Com que Procediment ens ve amb Boolean i al nostre sistema ho tenim amb boolean primitiu, si es null ho tractam com false:
 		if (procediment.getComun()!=null) 
 			dto.setComu(procediment.getComun().booleanValue());	
@@ -313,5 +354,5 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(GestorContingutsAdministratiuPluginRolsac.class);
-	
+
 }

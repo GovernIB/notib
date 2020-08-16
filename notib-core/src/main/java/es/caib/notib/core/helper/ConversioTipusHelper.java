@@ -98,16 +98,22 @@ public class ConversioTipusHelper {
 		
 		mapperFactory.classMap(GrupEntity.class, GrupDto.class).
 			field("entitat.id", "entitatId").
+			field("organGestor.id", "organGestorId").
+			field("organGestor.codi", "organGestorCodi").
 			byDefault().
 			register();
 
 		mapperFactory.classMap(PagadorCieEntity.class, PagadorCieDto.class).
 			field("entitat.id", "entitatId").
+			field("organGestor.id", "organGestorId").
+			field("organGestor.codi", "organGestorCodi").
 			byDefault().
 			register();
 		
 		mapperFactory.classMap(PagadorPostalEntity.class, PagadorPostalDto.class).
 			field("entitat.id", "entitatId").
+			field("organGestor.id", "organGestorId").
+			field("organGestor.codi", "organGestorCodi").
 			byDefault().
 			register();
 		
