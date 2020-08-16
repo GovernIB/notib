@@ -79,10 +79,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			AsientoRegistralBeanDto arb, 
 			Long tipusOperacio) {
 		RespostaConsultaRegistre rc = new RespostaConsultaRegistre();
-		try {
-//			ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-//			logger.info(ow.writeValueAsString(arb.getInteresados()));
-			
+		try {			
 			return toRespostaConsultaRegistre(getAsientoRegistralApi().crearAsientoRegistral(
 					null,
 					codiDir3Entitat, 
