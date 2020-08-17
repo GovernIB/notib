@@ -64,6 +64,7 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
 			Long entitatId, 
+			String organCodiDir3,
 			OrganGestorFiltreDto filtre, 
 			PaginacioParamsDto paginacioParams);
 

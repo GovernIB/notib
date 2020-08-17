@@ -31,6 +31,7 @@ import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.repository.OrganGestorRepository;
@@ -60,6 +61,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	private CacheHelper cacheHelper;
 	@Resource
 	private MetricsHelper metricsHelper;
+	@Resource
+	private OrganigramaHelper organigramaHelper;
 	
 
 	@Override
@@ -188,6 +191,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Transactional(readOnly = true)
 	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
 			Long entitatId, 
+			String organCodiDir3,
 			OrganGestorFiltreDto filtre, 
 			PaginacioParamsDto paginacioParams) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
@@ -199,18 +203,34 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					false);
 			
 			Page<OrganGestorEntity> organs = null;
-			if (filtre == null) {
-				organs = organGestorRepository.findByEntitat(
-						entitat,
-						paginacioHelper.toSpringDataPageable(paginacioParams));
-			} else {
-				organs = organGestorRepository.findByEntitatAndFiltre(
-						entitat,
-						filtre.getCodi() == null || filtre.getCodi().isEmpty(), 
-						filtre.getCodi() == null ? "" : filtre.getCodi(),
-						filtre.getNom() == null || filtre.getNom().isEmpty(),
-						filtre.getNom() == null ? "" : filtre.getNom(),
-						paginacioHelper.toSpringDataPageable(paginacioParams));
+			
+			//Cas d'Administrador d'Entitat
+			//	Tots els organs fills de l'Entitat
+			if (organCodiDir3 == null) {
+			
+				if (filtre == null) {
+					organs = organGestorRepository.findByEntitat(
+							entitat,
+							paginacioHelper.toSpringDataPageable(paginacioParams));
+				} else {
+					organs = organGestorRepository.findByEntitatAndFiltre(
+							entitat,
+							filtre.getCodi() == null || filtre.getCodi().isEmpty(), 
+							filtre.getCodi() == null ? "" : filtre.getCodi(),
+							filtre.getNom() == null || filtre.getNom().isEmpty(),
+							filtre.getNom() == null ? "" : filtre.getNom(),
+							paginacioHelper.toSpringDataPageable(paginacioParams));
+				}
+			//Cas d'Administrador d'Organ
+			//	Només el l'Organ de l'administrador, i els seus fills (tant de primer nivell com següents)
+			}else {
+				//TODO
+				//OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(entitat,organActualId);
+				List<String> organGestorsListCodisDir3 = organigramaHelper.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organCodiDir3);
+				if (filtre == null) {
+					organs = organGestorRepository.findByEntitatAndOrganGestor(
+							organGestorsListCodisDir3, paginacioHelper.toSpringDataPageable(paginacioParams));
+				}
 			}
 			
 			PaginaDto<OrganGestorDto> paginaOrgans = paginacioHelper.toPaginaDto(

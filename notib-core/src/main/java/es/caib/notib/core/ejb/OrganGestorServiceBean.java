@@ -104,9 +104,10 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	@RolesAllowed({"NOT_ADMIN"})
 	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
 			Long entitatId, 
+			String organCodiDir3,
 			OrganGestorFiltreDto filtre, 
 			PaginacioParamsDto paginacioParams) {
-		return delegate.findAmbFiltrePaginat(entitatId, filtre, paginacioParams);
+		return delegate.findAmbFiltrePaginat(entitatId, organCodiDir3,filtre, paginacioParams);
 	}
 
 	@Override

@@ -60,6 +60,7 @@ import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
@@ -121,6 +122,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private IntegracioHelper integracioHelper;
 	@Resource
 	private MetricsHelper metricsHelper;
+	@Resource
+	private OrganigramaHelper organigramaHelper;
 	
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
 	
@@ -586,7 +589,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 //		logger.debug(">>>> >> Obtenir totes els organs gestors de l'entitat...");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.consulta.organs"));
 		
-		List<String> unitatsEntitat = getUnitatsSuccessores(codiDir3);
+		List<String> unitatsEntitat = organigramaHelper.getCodisOrgansGestorsFillsByEntitat(codiDir3);
 		
 		t1 = System.currentTimeMillis();
 //		logger.debug(">>>> >> obtinguts" + unitatsEntitat.size() + " organs (" + (t1 - t2) + "ms)");
@@ -614,28 +617,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.filtre.procediments.result", new Object[] {procedimentsEntitat.size()}));
 		progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(t2 - t1)}));
 		return procedimentsEntitat;
-	}
-	
-	private List<String> getUnitatsSuccessores(String codiDir3) {
-		Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(codiDir3);
-		
-		List<String> unitatsEntitat = new ArrayList<String>();
-		unitatsEntitat.addAll(getUnitatsFilles(organigramaEntitat, codiDir3));
-		return unitatsEntitat;
-	}
-
-	private List<String> getUnitatsFilles(
-			Map<String, OrganismeDto> organigrama,
-			String codiDir3) {
-		List<String> unitats = new ArrayList<String>();
-		unitats.add(codiDir3);
-		OrganismeDto organisme = organigrama.get(codiDir3);
-		if (organisme != null && organisme.getFills() != null && !organisme.getFills().isEmpty()) {
-			for (String fill: organisme.getFills()) {
-				unitats.addAll(getUnitatsFilles(organigrama, fill));
-			}
-		}
-		return unitats;
 	}
 	
 	private boolean isActualitzacioProcedimentsModificarProperty() {

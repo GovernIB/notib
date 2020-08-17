@@ -72,8 +72,14 @@ public class OrganGestorController extends BaseUserController{
 		try {
 			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 
+			//TODO 
+			//OrganGestorDto organActual = getEntitatActualComprovantPermisos(request);
+			OrganGestorDto organActual = new OrganGestorDto();
+			organActual.setCodi("EA0004519");
+			
 			organs = organGestorService.findAmbFiltrePaginat(
 					entitat.getId(),
+					organActual.getCodi(),
 					OrganGestorFiltreCommand.asDto(organGestorFiltreCommand),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 		}catch(SecurityException e) {

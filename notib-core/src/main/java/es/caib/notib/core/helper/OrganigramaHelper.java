@@ -32,6 +32,7 @@ public class OrganigramaHelper {
 		String codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
 		
 		List<String> unitatsEntitat = new ArrayList<String>();
+		
 		unitatsEntitat.addAll(getCodisOrgansGestorsFills(organigramaEntitat, codiDir3));
 		return unitatsEntitat;
 	}
