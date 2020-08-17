@@ -22,6 +22,7 @@ import es.caib.notib.core.api.dto.CodiAssumpteDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
@@ -90,6 +91,7 @@ public class ProcedimentController extends BaseUserController{
 		boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
 		boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
 		boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
+		OrganGestorDto organGestorActual = getOrganGestorActual(request);
 		
 		ProcedimentFiltreCommand procedimentFiltreCommand = getFiltreCommand(request);
 		PaginaDto<ProcedimentFormDto> procediments = new PaginaDto<ProcedimentFormDto>();
@@ -102,6 +104,7 @@ public class ProcedimentController extends BaseUserController{
 					isUsuari,
 					isUsuariEntitat,
 					isAdministrador,
+					organGestorActual,
 					ProcedimentFiltreCommand.asDto(procedimentFiltreCommand),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 		}catch(SecurityException e) {
@@ -295,8 +298,15 @@ public class ProcedimentController extends BaseUserController{
 			}
 			model.addAttribute(procediment);
 		}
-		model.addAttribute("pagadorsPostal", pagadorPostalService.findByEntitat(entitat.getId()));
-		model.addAttribute("pagadorsCie", pagadorCieService.findByEntitat(entitat.getId()));
+		
+		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		if (organGestorActual != null) {
+			model.addAttribute("pagadorsPostal", pagadorPostalService.findByEntitatAndOrganGestor(entitat, organGestorActual));
+			model.addAttribute("pagadorsCie", pagadorCieService.findByEntitatAndOrganGestor(entitat, organGestorActual));
+		} else {
+			model.addAttribute("pagadorsPostal", pagadorPostalService.findByEntitat(entitat.getId()));
+			model.addAttribute("pagadorsCie", pagadorCieService.findByEntitat(entitat.getId()));
+		}
 		
 		if (procediment != null) {
 			model.addAttribute("entitatId", procediment.getEntitat().getId());
@@ -352,7 +362,14 @@ public class ProcedimentController extends BaseUserController{
 		Model model,
 		@PathVariable Long entitatId) {
 		EntitatDto entitat = entitatService.findById(entitatId);
-		return organGestorService.findOrganismes(entitat);
+		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		List<OrganismeDto> organismes;
+		if (organGestorActual != null) {
+			organismes = organGestorService.findOrganismes(entitat, organGestorActual);
+		} else {
+			organismes = organGestorService.findOrganismes(entitat);
+		}
+		return organismes;
 	}
 	
 	@RequestMapping(value = "/oficines/{entitatId}", method = RequestMethod.GET)

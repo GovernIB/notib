@@ -3,26 +3,16 @@ package es.caib.notib.core.api.dto;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter @Setter
 public class PagadorCieFiltreDto implements Serializable{
 
 	private String dir3codi;
 	private Date contracteDataVig;
+	private Long organGestorId;
 	
-	
-	public String getDir3codi() {
-		return dir3codi;
-	}
-	public void setDir3codi(String dir3codi) {
-		this.dir3codi = dir3codi;
-	}
-	public Date getContracteDataVig() {
-		return contracteDataVig;
-	}
-	public void setContracteDataVig(Date contracteDataVig) {
-		this.contracteDataVig = contracteDataVig;
-	}
-
-
 	/**
 	 * 
 	 */

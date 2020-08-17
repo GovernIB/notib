@@ -847,7 +847,7 @@ public class NotificacioController extends BaseUserController {
 				procedimentId));
 		model.addAttribute("amagat", Boolean.FALSE);
 		
-		model.addAttribute("grups", grupService.findByProcedimentGrups(procedimentId));
+		model.addAttribute("grups", grupService.findByProcedimentAndUsuariGrups(procedimentId));
 		if (procedimentActual.getPagadorcie() != null) {
 			model.addAttribute("formatsFulla", pagadorCieFormatFullaService.findFormatFullaByPagadorCie(procedimentActual.getPagadorcie().getId()));
 			model.addAttribute("formatsSobre", pagadorCieFormatSobreService.findFormatSobreByPagadorCie(procedimentActual.getPagadorcie().getId()));
@@ -946,7 +946,7 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("ambEntregaDeh", entitatActual.isAmbEntregaDeh());
 		model.addAttribute("ambEntregaCie", entitatActual.isAmbEntregaCie());
 		model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
-		model.addAttribute("grups", grupService.findByProcedimentGrups(procedimentActual.getId()));
+		model.addAttribute("grups", grupService.findByProcedimentAndUsuariGrups(procedimentActual.getId()));
 		model.addAttribute("comunicacioTipus", 
 				EnumHelper.getOptionsForEnum(
 						NotificacioComunicacioTipusEnumDto.class,

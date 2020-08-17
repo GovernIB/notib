@@ -851,7 +851,7 @@ public class PluginHelper {
 	public List<ProcedimentDto> getProcedimentsGda() {
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_GESCONADM, 
-				"Obtenir organigrama per entitat", 
+				"Obtenir tots els procediments", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT);
 		
 		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
@@ -863,6 +863,40 @@ public class PluginHelper {
 					dto.setCodi(proc.getCodiSIA());
 					dto.setNom(proc.getNom());
 					dto.setComu(proc.isComu());
+					if (proc.getUnitatAdministrativacodi() != null) {
+						dto.setOrganGestor(proc.getUnitatAdministrativacodi());
+					}
+					procediments.add(dto);
+				}
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al obtenir els procediments del gestor documental administratiu";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_GESCONADM,
+					errorDescripcio,
+					ex);
+		}
+		
+		return procediments;
+	}
+	
+	public List<ProcedimentDto> getProcedimentsGdaByEntitat(String codiDir3) {
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_GESCONADM, 
+				"Obtenir procediments per entitat", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT);
+		
+		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+		try {
+			List<GcaProcediment> procs = getGestorDocumentalAdministratiuPlugin().getProcedimentsByUnitat(codiDir3);
+			if (procs != null)
+				for (GcaProcediment proc: procs) {
+					ProcedimentDto dto = new ProcedimentDto();
+					dto.setCodi(proc.getCodiSIA());
+					dto.setNom(proc.getNom());
+					dto.setComu(proc.isComu());
+					dto.setUltimaActualitzacio(proc.getDataActualitzacio());
 					if (proc.getUnitatAdministrativacodi() != null) {
 						dto.setOrganGestor(proc.getUnitatAdministrativacodi());
 					}

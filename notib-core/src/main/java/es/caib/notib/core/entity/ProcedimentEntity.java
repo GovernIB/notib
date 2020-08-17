@@ -1,5 +1,7 @@
 package es.caib.notib.core.entity;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -7,6 +9,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -60,6 +64,10 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "comu")
 	protected boolean comu;
+	
+	@Column(name = "ultima_act")
+	@Temporal(TemporalType.DATE)
+	protected Date ultimaActualitzacio;
 	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "entitat")
@@ -125,6 +133,10 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 		this.nom = nom;
 		this.organGestor = organGestor;
 		this.comu= comu;
+	}
+	
+	public void updateDataActualitzacio(Date dataActualitzacio) {
+		this.ultimaActualitzacio = dataActualitzacio;
 	}
 	
 	public static Builder getBuilder(

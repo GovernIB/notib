@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PagadorPostalDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.service.EntitatService;
@@ -31,7 +32,6 @@ import es.caib.notib.war.command.PagadorPostalFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.RequestSessionHelper;
-import es.caib.notib.war.helper.RolHelper;
 
 /**
  * Controlador per el mantinemnt de pagadors postals.
@@ -73,9 +73,13 @@ public class PagadorPostalController extends BaseUserController{
 		PagadorPostalFiltreCommand pagadorPostalFiltreCommand = getFiltreCommand(request);
 		PaginaDto<PagadorPostalDto> pagadorsPostals = null;
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
-			//procedimentFiltreCommand.setEntitatId(entitat.getId());
+		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		if (organGestorActual != null) {
+			pagadorPostalFiltreCommand.setOrganGestorId(organGestorActual.getId());
+		} else {
+			pagadorPostalFiltreCommand.setOrganGestorId(null);
 		}
+		
 		pagadorsPostals = pagadorPostalService.findAmbFiltrePaginat(
 							entitat.getId(),
 							PagadorPostalFiltreCommand.asDto(pagadorPostalFiltreCommand),
@@ -130,9 +134,14 @@ public class PagadorPostalController extends BaseUserController{
 					"pagadorPostal.controller.modificat.ok");
 		//if it is new	
 		} else {
+			PagadorPostalDto dto = PagadorPostalCommand.asDto(pagadorPostalCommand);
+			OrganGestorDto organGestorActual = getOrganGestorActual(request);
+			if (organGestorActual != null)
+				dto.setOrganGestorId(organGestorActual.getId());
+			
 			pagadorPostalService.create(
 					entitatActual.getId(),
-					PagadorPostalCommand.asDto(pagadorPostalCommand));
+					dto);
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:pagadorsPostals",

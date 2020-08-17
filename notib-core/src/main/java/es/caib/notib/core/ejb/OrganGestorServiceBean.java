@@ -111,6 +111,11 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 
 	@Override
+	public List<OrganGestorDto> findAccessiblesByUsuariActual() {
+		return delegate.findAccessiblesByUsuariActual();
+	}
+	
+	@Override
 	public List<PermisDto> permisFind(Long entitatId, Long id) throws NotFoundException {
 		return delegate.permisFind(entitatId, id);
 	}
@@ -126,9 +131,15 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public List<OrganismeDto> findOrganismes(EntitatDto entitat) {
 		return delegate.findOrganismes(entitat);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	public List<OrganismeDto> findOrganismes(EntitatDto entitat, OrganGestorDto organGestor) {
+		return delegate.findOrganismes(entitat, organGestor);
 	}
 
 	@Override

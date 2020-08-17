@@ -1,25 +1,23 @@
 package es.caib.notib.war.command;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+
 import es.caib.notib.core.api.dto.PagadorCieFiltreDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Command per al manteniment del filtre de pagadors cie.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 public class PagadorCieFiltreCommand {
 	
 	private String dir3codi;
+	private Long organGestorId;
 	
-	
-	public String getDir3codi() {
-		return dir3codi;
-	}
-	public void setDir3codi(String dir3codi) {
-		this.dir3codi = dir3codi;
-	}
 	
 	public static PagadorCieFiltreCommand asCommand(PagadorCieFiltreDto dto) {
 		if (dto == null) {

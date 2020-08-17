@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GrupService;
@@ -22,7 +23,6 @@ import es.caib.notib.war.command.GrupFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.RequestSessionHelper;
-import es.caib.notib.war.helper.RolHelper;
 
 /**
  * Controlador per el mantinemnt de grups
@@ -59,9 +59,13 @@ public class GrupController extends BaseUserController{
 		GrupFiltreCommand grupFiltreCommand = getFiltreCommand(request);
 		PaginaDto<GrupDto> grup = null;
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
-			//procedimentFiltreCommand.setEntitatId(entitat.getId());
+		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		if (organGestorActual != null) {
+			grupFiltreCommand.setOrganGestorId(organGestorActual.getId());
+		} else {
+			grupFiltreCommand.setOrganGestorId(null);
 		}
+		
 		grup = grupService.findAmbFiltrePaginat(
 							entitat.getId(),
 							GrupFiltreCommand.asDto(grupFiltreCommand),
@@ -104,6 +108,7 @@ public class GrupController extends BaseUserController{
 		if (bindingResult.hasErrors()) {
 			return "grupAdminForm";
 		}
+
 		// if it is modified
 		if (grupCommand.getId() != null) {
 			grupService.update(
@@ -115,9 +120,14 @@ public class GrupController extends BaseUserController{
 					"grup.controller.modificat.ok");
 		//if it is new	
 		} else {
+			GrupDto dto = GrupCommand.asDto(grupCommand);
+			OrganGestorDto organGestorActual = getOrganGestorActual(request);
+			if (organGestorActual != null)
+				dto.setOrganGestorId(organGestorActual.getId());
+			
 			grupService.create(
 					entitatActual.getId(),
-					GrupCommand.asDto(grupCommand));
+					dto);
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:grupAdminList",

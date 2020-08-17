@@ -16,17 +16,21 @@ import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.audit.NotibAuditable;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 /**
  * Classe de model de dades que conté la informació dels pagadors postals.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "not_pagador_postal")
 @EntityListeners(AuditingEntityListener.class)
 public class PagadorPostalEntity extends NotibAuditable<Long> {
 	
+	@EqualsAndHashCode.Include
 	@Column(name = "dir3_codi", length = 9)
 	private String dir3codi;
 	
@@ -40,32 +44,16 @@ public class PagadorPostalEntity extends NotibAuditable<Long> {
 	@Column(name = "facturacio_codi_client", length = 20)
 	private String facturacioClientCodi;
 	
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "entitat")
 	@ForeignKey(name = "not_pagador_postal_entitat_fk")
 	private EntitatEntity entitat;
-
 	
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "organ_gestor")
+	@ForeignKey(name = "not_pagpostal_organ_fk")
+	protected OrganGestorEntity organGestor;
 
-	public String getDir3codi() {
-		return dir3codi;
-	}
-	
-	public String getContracteNum() {
-		return contracteNum;
-	}
-
-	public Date getContracteDataVig() {
-		return contracteDataVig;
-	}
-
-	public String getFacturacioClientCodi() {
-		return facturacioClientCodi;
-	}
-	
-	public EntitatEntity getEntitat() {
-		return entitat;
-	}
 
 	public void update(
 			String dir3codi,
@@ -89,7 +77,24 @@ public class PagadorPostalEntity extends NotibAuditable<Long> {
 				contracteNum,
 				contracteDataVig,
 				facturacioClientCodi,
-				entitat);
+				entitat,
+				null);
+	}
+	
+	public static Builder getBuilder(
+			String dir3codi,
+			String contracteNum,
+			Date contracteDataVig,
+			String facturacioClientCodi,
+			EntitatEntity entitat,
+			OrganGestorEntity organGestor) {
+		return new Builder(
+				dir3codi,
+				contracteNum,
+				contracteDataVig,
+				facturacioClientCodi,
+				entitat,
+				organGestor);
 	}
 	
 	public static class Builder {
@@ -99,53 +104,21 @@ public class PagadorPostalEntity extends NotibAuditable<Long> {
 				String contracteNum,
 				Date contracteDataVig,
 				String facturacioClientCodi,
-				EntitatEntity entitat) {
+				EntitatEntity entitat,
+				OrganGestorEntity organGestor) {
 			built = new PagadorPostalEntity();
 			built.dir3codi = dir3codi;
 			built.contracteNum = contracteNum;
 			built.contracteDataVig = contracteDataVig;
 			built.facturacioClientCodi = facturacioClientCodi;
 			built.entitat = entitat;
+			built.organGestor = organGestor;
 		}
 		public PagadorPostalEntity build() {
 			return built;
 		}
 	}
 	
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		PagadorPostalEntity other = (PagadorPostalEntity) obj;
-		if (dir3codi == null) {
-			if (other.dir3codi != null)
-				return false;
-		} else if (!dir3codi.equals(other.dir3codi))
-			return false;
-		return true;
-	}
-	
-	
-	public void setDir3codi(String dir3codi) {
-		this.dir3codi = dir3codi;
-	}
-
-	public void setContracteNum(String contracteNum) {
-		this.contracteNum = contracteNum;
-	}
-
-	public void setContracteDataVig(Date contracteDataVig) {
-		this.contracteDataVig = contracteDataVig;
-	}
-
-	public void setFacturacioClientCodi(String facturacioClientCodi) {
-		this.facturacioClientCodi = facturacioClientCodi;
-	}
-
 
 	private static final long serialVersionUID = 4863376704844981591L;
 

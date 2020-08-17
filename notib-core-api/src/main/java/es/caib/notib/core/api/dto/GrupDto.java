@@ -2,49 +2,25 @@ package es.caib.notib.core.api.dto;
 
 import java.io.Serializable;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter @Setter @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 public class GrupDto extends AuditoriaDto implements Serializable {
 
 	private Long id;
+	@EqualsAndHashCode.Include
 	private String codi;
 	private String nom;
+	private Long entitatId;
+	private Long organGestorId;
+	private String organGestorCodi;
 	
+	public String getNomIRol() {
+		return nom + " (" + codi + ")";
+	}
 	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getCodi() {
-		return codi;
-	}
-	public void setCodi(String codi) {
-		this.codi = codi;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (getClass() != obj.getClass())
-			return false;
-		GrupDto other = (GrupDto) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id)) {
-			return false;
-	 	} else if (id.equals(other.id))
-			return true;
-		return true;
-	}
-
 	private static final long serialVersionUID = 7999677809220395478L;
 
 }

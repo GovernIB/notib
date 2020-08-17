@@ -1,31 +1,24 @@
 package es.caib.notib.war.command;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+
 import es.caib.notib.core.api.dto.PagadorPostalFiltreDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Command per al manteniment del filtre de pagadors postals.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 public class PagadorPostalFiltreCommand {
 	
 	private String dir3codi;
 	private String contracteNum;
+	private Long organGestorId;
 	
-	public String getDir3codi() {
-		return dir3codi;
-	}
-	public void setDir3codi(String dir3codi) {
-		this.dir3codi = dir3codi;
-	}
-	public String getContracteNum() {
-		return contracteNum;
-	}
-	public void setContracteNum(String contracteNum) {
-		this.contracteNum = contracteNum;
-	}
 	
 	public static PagadorPostalFiltreCommand asCommand(PagadorPostalFiltreDto dto) {
 		if (dto == null) {

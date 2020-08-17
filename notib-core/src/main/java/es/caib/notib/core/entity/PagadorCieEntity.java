@@ -16,6 +16,7 @@ import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.audit.NotibAuditable;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
@@ -23,12 +24,13 @@ import lombok.Getter;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter
+@Getter @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "not_pagador_cie")
 @EntityListeners(AuditingEntityListener.class)
 public class PagadorCieEntity extends NotibAuditable<Long> {
 
+	@EqualsAndHashCode.Include
 	@Column(name = "dir3_codi", length = 9)
 	private String dir3codi;
 	
@@ -36,10 +38,15 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 	@Temporal(TemporalType.DATE)
 	private Date contracteDataVig;
 	
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "entitat")
 	@ForeignKey(name = "not_pagador_cie_entitat_fk")
 	private EntitatEntity entitat;
+	
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "organ_gestor")
+	@ForeignKey(name = "not_pagcie_organ_fk")
+	protected OrganGestorEntity organGestor;
 
 	public void update(
 			String dir3codi,
@@ -55,7 +62,20 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 		return new Builder(
 				dir3codi,
 				contracteDataVig,
-				entitat);
+				entitat,
+				null);
+	}
+	
+	public static Builder getBuilder(
+			String dir3codi,
+			Date contracteDataVig,
+			EntitatEntity entitat,
+			OrganGestorEntity organGestor) {
+		return new Builder(
+				dir3codi,
+				contracteDataVig,
+				entitat,
+				organGestor);
 	}
 	
 	public static class Builder {
@@ -63,42 +83,19 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 		Builder(
 				String dir3codi,
 				Date contracteDataVig,
-				EntitatEntity entitat) {
+				EntitatEntity entitat,
+				OrganGestorEntity organGestor) {
 			built = new PagadorCieEntity();
 			built.dir3codi = dir3codi;
 			built.contracteDataVig = contracteDataVig;
 			built.entitat = entitat;
+			built.organGestor = organGestor;
 		}
 		public PagadorCieEntity build() {
 			return built;
 		}
 	}
 	
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		PagadorCieEntity other = (PagadorCieEntity) obj;
-		if (dir3codi == null) {
-			if (other.dir3codi != null)
-				return false;
-		} else if (!dir3codi.equals(other.dir3codi))
-			return false;
-		return true;
-	}
-	
-	public void setDir3codi(String dir3codi) {
-		this.dir3codi = dir3codi;
-	}
-
-	public void setContracteDataVig(Date contracteDataVig) {
-		this.contracteDataVig = contracteDataVig;
-	}
-
 	private static final long serialVersionUID = 8596990469127710436L;
 	
 }

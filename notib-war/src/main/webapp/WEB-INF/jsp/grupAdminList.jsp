@@ -4,6 +4,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<% 
+pageContext.setAttribute(
+			"isRolActualAdministradorEntitat",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
+%>
 <html>
 <head>
 	<title><spring:message code="grup.list.titol"/></title>
@@ -51,6 +56,7 @@
 			<tr>
 				<th data-col-name="nom"><spring:message code="grup.list.columna.nom"/></th>
 				<th data-col-name="codi"><spring:message code="grup.list.columna.codi"/></th>
+				<th data-col-name="organGestorCodi"><spring:message code="grup.list.columna.organgestor"/></th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">

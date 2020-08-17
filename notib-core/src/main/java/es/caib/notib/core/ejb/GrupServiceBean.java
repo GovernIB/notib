@@ -12,8 +12,10 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.GrupFiltreDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
@@ -81,8 +83,8 @@ public class GrupServiceBean implements GrupService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
-	public List<GrupDto> findByProcedimentGrups(Long procedimentId) {
-		return delegate.findByProcedimentGrups(procedimentId);
+	public List<GrupDto> findByProcedimentAndUsuariGrups(Long procedimentId) {
+		return delegate.findByProcedimentAndUsuariGrups(procedimentId);
 	}
 
 	@Override
@@ -107,6 +109,14 @@ public class GrupServiceBean implements GrupService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public List<GrupDto> findByEntitat(Long entitatId) {
 		return delegate.findByEntitat(entitatId);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	public List<GrupDto> findByEntitatAndOrganGestor(
+			EntitatDto entitat, 
+			OrganGestorDto organGestor) {
+		return delegate.findByEntitatAndOrganGestor(entitat, organGestor);
 	}
 
 	@Override
