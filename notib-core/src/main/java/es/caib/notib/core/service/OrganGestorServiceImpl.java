@@ -193,22 +193,23 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Transactional(readOnly = true)
 	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
 			Long entitatId, 
-			String organCodiDir3,
+			String organActualCodiDir3,
 			OrganGestorFiltreDto filtre, 
 			PaginacioParamsDto paginacioParams) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId, 
-					false, 
-					true, 
-					false);
+			
 			
 			Page<OrganGestorEntity> organs = null;
 			
 			//Cas d'Administrador d'Entitat
 			//	Tots els organs fills de l'Entitat
-			if (organCodiDir3 == null) {
+			if (organActualCodiDir3 == null) {
+				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+						entitatId, 
+						false, 
+						true, 
+						false);
 			
 				if (filtre == null) {
 					organs = organGestorRepository.findByEntitat(
@@ -225,13 +226,31 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				}
 			//Cas d'Administrador d'Organ
 			//	Només el l'Organ de l'administrador, i els seus fills (tant de primer nivell com següents)
-			}else {
-				//TODO
+			}else{
+				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+						entitatId, 
+						true, 
+						false, 
+						false);
+				
+				//Comprovació permisos organ
+				entityComprovarHelper.comprovarOrganGestor(organActualCodiDir3);
 				//OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(entitat,organActualId);
-				List<String> organGestorsListCodisDir3 = organigramaHelper.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organCodiDir3);
+				List<String> organGestorsListCodisDir3 = organigramaHelper.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organActualCodiDir3);
 				if (filtre == null) {
 					organs = organGestorRepository.findByEntitatAndOrganGestor(
-							organGestorsListCodisDir3, paginacioHelper.toSpringDataPageable(paginacioParams));
+							entitat,
+							organGestorsListCodisDir3,
+							paginacioHelper.toSpringDataPageable(paginacioParams));
+				} else {
+					organs = organGestorRepository.findByEntitatAndOrganGestorAndFiltre(
+							entitat,
+							organGestorsListCodisDir3,
+							filtre.getCodi() == null || filtre.getCodi().isEmpty(), 
+							filtre.getCodi() == null ? "" : filtre.getCodi(),
+							filtre.getNom() == null || filtre.getNom().isEmpty(),
+							filtre.getNom() == null ? "" : filtre.getNom(),
+							paginacioHelper.toSpringDataPageable(paginacioParams));
 				}
 			}
 			

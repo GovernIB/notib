@@ -142,6 +142,22 @@ public class EntityComprovarHelper {
 		return entitat;
 	}
 	
+	public void comprovarOrganGestor(String organCodiDir3) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		OrganGestorEntity organGestorEntity = organGestorRepository.findByCodi(organCodiDir3);
+		Boolean hasPermisAdminOrgan = permisosHelper.isGrantedAny(
+				organGestorEntity.getId(), 
+				OrganGestorEntity.class, 
+				new Permission[] {ExtendedPermission.ADMINISTRADOR}, 
+				auth);
+		if (!hasPermisAdminOrgan)
+			throw new PermissionDeniedException(
+					organGestorEntity.getId(),
+					OrganGestorEntity.class,
+					auth.getName(),
+					"ADMINISTRADOR");
+	}
+	
 	public void comprovarPermisos(
 			Long entitatId,
 			boolean comprovarSuper,

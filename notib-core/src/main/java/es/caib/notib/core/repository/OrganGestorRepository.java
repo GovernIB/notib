@@ -48,13 +48,6 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("entitat") EntitatEntity entitat,
 			@Param("grups") List<String> grups);
 	
-	@Query( "select distinct og " +
-			"from OrganGestorEntity og " +
-			"where og.codi in (:organsIds)")
-	public Page<OrganGestorEntity> findByEntitatAndOrganGestor(
-			@Param("organsIds") List<String> organs,
-			Pageable paginacio);
-	
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
 			"where (og.entitat = :entitat)" +
@@ -62,6 +55,30 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			" and (:isNomNull = true or lower(og.nom) like lower('%'||:nom||'%'))")
 	public Page<OrganGestorEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("isCodiNull") boolean isCodiNull,
+			@Param("codi") String codi,
+			@Param("isNomNull") boolean isNomNull,
+			@Param("nom") String nom,
+			Pageable paginacio);
+	
+	@Query( "select distinct og " +
+			"from OrganGestorEntity og " +
+			"where (og.entitat = :entitat)" +
+			"and og.codi in (:organsIds)")
+	public Page<OrganGestorEntity> findByEntitatAndOrganGestor(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("organsIds") List<String> organs,
+			Pageable paginacio);
+	
+	@Query(	"from " +
+			"    OrganGestorEntity og " +
+			"where (og.entitat = :entitat)" + 
+			"and og.codi in (:organsIds)" +
+			" and (:isCodiNull = true or lower(og.codi) like lower('%'||:codi||'%'))" +
+			" and (:isNomNull = true or lower(og.nom) like lower('%'||:nom||'%'))")
+	public Page<OrganGestorEntity> findByEntitatAndOrganGestorAndFiltre(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("organsIds") List<String> organs,
 			@Param("isCodiNull") boolean isCodiNull,
 			@Param("codi") String codi,
 			@Param("isNomNull") boolean isNomNull,

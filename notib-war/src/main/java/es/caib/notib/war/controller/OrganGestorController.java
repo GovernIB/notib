@@ -72,14 +72,13 @@ public class OrganGestorController extends BaseUserController{
 		try {
 			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 
-			//TODO 
-			//OrganGestorDto organActual = getEntitatActualComprovantPermisos(request);
-			OrganGestorDto organActual = new OrganGestorDto();
-			organActual.setCodi("EA0004519");
+			OrganGestorDto organGestorActual = getOrganGestorActual(request);
+			String organActualCodiDir3=null;
+			if (organGestorActual!=null) organActualCodiDir3 = organGestorActual.getCodi();
 			
 			organs = organGestorService.findAmbFiltrePaginat(
 					entitat.getId(),
-					organActual.getCodi(),
+					organActualCodiDir3,
 					OrganGestorFiltreCommand.asDto(organGestorFiltreCommand),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 		}catch(SecurityException e) {
