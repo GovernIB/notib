@@ -417,7 +417,7 @@ public class EntitatServiceImpl implements EntitatService {
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			logger.debug("Consulta les entitats accessibles per l'usuari actual (usuari=" + auth.getName() + ")");
-			return permisosHelper.findEntitatsAccessiblesUsuari(auth.getName(), rolActual);
+			return cacheHelper.findEntitatsAccessiblesUsuari(auth.getName(), rolActual);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

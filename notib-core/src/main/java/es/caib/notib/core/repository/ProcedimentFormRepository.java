@@ -34,6 +34,16 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 			@Param("entitatsActivesId") List<Long> entitatActiveId,
 			Pageable paginacio);
 	
+	@Query(
+			"from " +
+			"    ProcedimentFormEntity pro " + 
+			"where (pro.entitat_id = :entitatId) " +
+			" and (pro.organGestor in (:organsGestors))")
+	Page<ProcedimentFormEntity> findAmbOrganGestorActual(
+			@Param("entitatId") Long entitatId,
+			@Param("organsGestors") List<String> organsGestors,
+			Pageable paginacio);
+	
 	@Query(	"from " +
 			"    ProcedimentFormEntity pro " +
 			"where (pro.entitat_id = :entitatId)" +
@@ -63,5 +73,20 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 			@Param("isOrganGestorNull") boolean isOrganGestorNull,
 			@Param("organ") String organGestor,
 			Pageable paginacio);
-	
+
+	@Query(	"from " +
+			"    ProcedimentFormEntity pro " +
+			"where (pro.entitat_id = :entitatId)" +
+			" and (:isCodiNull = true or lower(pro.codi) like lower('%'||:codi||'%'))" +
+			" and (:isNomNull = true or lower(pro.nom) like lower('%'||:nom||'%'))" +
+			" and (pro.organGestor in (:organsGestors))")
+	Page<ProcedimentFormEntity> findAmbOrganGestorAndFiltre(
+			@Param("entitatId") Long entitatId,
+			@Param("isCodiNull") boolean isCodiNull,
+			@Param("codi") String codi,
+			@Param("isNomNull") boolean isNomNull,
+			@Param("nom") String nom,
+			@Param("organsGestors") List<String> organsGestors,
+			Pageable paginacio);
+
 }

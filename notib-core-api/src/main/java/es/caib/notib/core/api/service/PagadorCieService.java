@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorCieFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -49,10 +51,10 @@ public interface PagadorCieService {
 	 * @return El pagador cie esborrat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws NotFoundException 
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	public PagadorCieDto delete(
-			Long id) throws NotFoundException;
+	public PagadorCieDto delete(Long id) throws NotFoundException;
 
 	/**
 	 * Consulta un pagador cie donat el seu codi.
@@ -97,6 +99,9 @@ public interface PagadorCieService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<PagadorCieDto> findByEntitat(Long entitatId);
 
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	public Object findByEntitatAndOrganGestor(EntitatDto entitat, OrganGestorDto organGestor);
+
 	/**
 	 * Llistat amb tots els pagadros cie paginats.
 	 * 
@@ -107,5 +112,4 @@ public interface PagadorCieService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public PaginaDto<PagadorCieDto> findAllPaginat(PaginacioParamsDto paginacioParams);
 
-	
 }

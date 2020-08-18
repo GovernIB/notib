@@ -15,8 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.codahale.metrics.Timer;
 
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.GrupFiltreDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
@@ -26,11 +28,13 @@ import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.GrupProcedimentEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.GrupHelper;
 import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.GrupProcedimentRepository;
@@ -55,6 +59,8 @@ public class GrupServiceImpl implements GrupService{
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
+	private OrganigramaHelper organigramaHelper;
+	@Resource
 	private GrupRepository grupReposity;
 	@Resource
 	private GrupProcedimentRepository grupProcedimentRepositoy;
@@ -76,15 +82,19 @@ public class GrupServiceImpl implements GrupService{
 					+ "grup=" + grup + ")");
 			
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			OrganGestorEntity organGestor = null;
+			if (grup.getOrganGestorId() != null) {
+				organGestor = entityComprovarHelper.comprovarOrganGestor(
+						entitat, 
+						grup.getOrganGestorId());
+			}
 			
-			GrupEntity grupEntity = null;
-			
-			grupEntity = grupReposity.save(
+			GrupEntity grupEntity = grupReposity.save(
 					GrupEntity.getBuilder(
 							grup.getCodi(),
 							grup.getNom(),
-							entitat).build());
-			
+							entitat,
+							organGestor).build());
 			
 			return conversioTipusHelper.convertir(
 					grupEntity, 
@@ -140,7 +150,7 @@ public class GrupServiceImpl implements GrupService{
 		try {
 			entityComprovarHelper.comprovarEntitat(entitatId);
 			
-			GrupEntity grupEntity = grupReposity.findOne(id);
+			GrupEntity grupEntity = entityComprovarHelper.comprovarGrup(id);
 			return conversioTipusHelper.convertir(
 					grupEntity, 
 					GrupDto.class);
@@ -173,7 +183,7 @@ public class GrupServiceImpl implements GrupService{
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<GrupDto> findByProcedimentGrups(Long procedimentId) {
+	public List<GrupDto> findByProcedimentAndUsuariGrups(Long procedimentId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			List<GrupDto> grups = new ArrayList<GrupDto>();
@@ -307,16 +317,34 @@ public class GrupServiceImpl implements GrupService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-	
-			List<GrupEntity> grups = grupReposity.findByEntitat(entitat);
 			
 			return conversioTipusHelper.convertirList(
-					grups,
+					grupReposity.findByEntitat(entitat),
 					GrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<GrupDto> findByEntitatAndOrganGestor(
+			EntitatDto entitat, 
+			OrganGestorDto organGestor) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+					entitat.getDir3Codi(), 
+					organGestor.getCodi());
+			
+			return conversioTipusHelper.convertirList(
+					grupReposity.findByEntitatIdAndOrganGestorCodiIn(entitat.getId(), organsFills),
+					GrupDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
 	
 	@Override
 	@Transactional(readOnly = true)
@@ -335,9 +363,22 @@ public class GrupServiceImpl implements GrupService{
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			Page<GrupEntity> grup = null;
 	
+			List<String> organsFills = null;
+			if (filtre.getOrganGestorId() != null) {
+				OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(
+						entitat, 
+						filtre.getOrganGestorId());
+				organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+						entitat.getDir3Codi(), 
+						organGestor.getCodi());	
+			}
+			
 			grup = grupReposity.findByCodiNotNullFiltrePaginat(
 					filtre.getCodi() == null || filtre.getCodi().isEmpty(),
 					filtre.getCodi(),
+					filtre.getOrganGestorId() == null,
+					//filtre.getOrganGestorId(),
+					organsFills,
 					entitat,
 					paginacioHelper.toSpringDataPageable(paginacioParams));
 			
@@ -362,6 +403,5 @@ public class GrupServiceImpl implements GrupService{
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
-
 
 }

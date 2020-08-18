@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.codahale.metrics.Timer;
 
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorCieFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -21,10 +23,12 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.PagadorCieService;
 import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PagadorCieEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.repository.PagadorCieRepository;
 
@@ -45,6 +49,8 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
+	private OrganigramaHelper organigramaHelper;
+	@Resource
 	private MetricsHelper metricsHelper;
 	
 	@Override
@@ -57,13 +63,19 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 			logger.debug("Creant un nou pagador cie ("
 					+ "pagador=" + cie + ")");
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			PagadorCieEntity pagadorCieEntity = null;
+			OrganGestorEntity organGestor = null;
+			if (cie.getOrganGestorId() != null) {
+				organGestor = entityComprovarHelper.comprovarOrganGestor(
+						entitat, 
+						cie.getOrganGestorId());
+			}
 			
-			pagadorCieEntity = pagadorCieReposity.save(
+			PagadorCieEntity pagadorCieEntity = pagadorCieReposity.save(
 					PagadorCieEntity.getBuilder(
 							cie.getDir3codi(),
 							cie.getContracteDataVig(),
-							entitat).build());
+							entitat,
+							organGestor).build());
 			
 			return conversioTipusHelper.convertir(
 					pagadorCieEntity, 
@@ -115,7 +127,7 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	public PagadorCieDto findById(Long id) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			PagadorCieEntity pagadorCieEntity = pagadorCieReposity.findOne(id);
+			PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(id);
 			
 			return conversioTipusHelper.convertir(
 					pagadorCieEntity, 
@@ -142,9 +154,22 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			Page<PagadorCieEntity> pagadorCie = null;
 	
+			List<String> organsFills = null;
+			if (filtre.getOrganGestorId() != null) {
+				OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(
+						entitat, 
+						filtre.getOrganGestorId());
+				organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+						entitat.getDir3Codi(), 
+						organGestor.getCodi());	
+			}
+			
 			pagadorCie = pagadorCieReposity.findByCodiDir3NotNullFiltrePaginatAndEntitat(
 					filtre.getDir3codi() == null || filtre.getDir3codi().isEmpty(),
 					filtre.getDir3codi(),
+					filtre.getOrganGestorId() == null,
+//					filtre.getOrganGestorId(),
+					organsFills,
 					entitat,
 					paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio));
 			
@@ -183,6 +208,25 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 			logger.debug("Consulta els pagadors postal de l'entitat: " + entitatId);
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			List<PagadorCieEntity> pagadorsCie = pagadorCieReposity.findByEntitat(entitat);
+			
+			return conversioTipusHelper.convertirList(
+					pagadorsCie,
+					PagadorCieDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Object findByEntitatAndOrganGestor(EntitatDto entitat, OrganGestorDto organGestor) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta els pagadors postal de l'entitat: " + entitat.getId() + " i òrgan gestor: " + organGestor.getCodi());
+			List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+					entitat.getDir3Codi(), 
+					organGestor.getCodi());
+			List<PagadorCieEntity> pagadorsCie = pagadorCieReposity.findByEntitatIdAndOrganGestorCodiIn(entitat.getId(), organsFills);
 			
 			return conversioTipusHelper.convertirList(
 					pagadorsCie,

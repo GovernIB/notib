@@ -4,6 +4,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<% 
+pageContext.setAttribute(
+			"isRolActualAdministradorEntitat",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
+%>
 <html>
 <head>
 	<title><spring:message code="procediment.list.titol"/></title>
@@ -113,8 +118,10 @@
 	
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right">
-			<a id="procediment-boto-cache" class="btn btn-warning" href="${unitatCodiUrlPrefix}procediment/cache/refrescar"><span class="fa fa-trash"></span>&nbsp;<spring:message code="procediment.list.boto.cache"/></a>
-			<a id="procediment-boto-update" class="btn btn-default" href="${unitatCodiUrlPrefix}procediment/update/auto" data-toggle="modal" data-maximized="false"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="procediment.list.boto.procediment.auto"/></a>
+			<c:if test="${isRolActualAdministradorEntitat}">
+				<a id="procediment-boto-cache" class="btn btn-warning" href="${unitatCodiUrlPrefix}procediment/cache/refrescar"><span class="fa fa-trash"></span>&nbsp;<spring:message code="procediment.list.boto.cache"/></a>
+				<a id="procediment-boto-update" class="btn btn-default" href="${unitatCodiUrlPrefix}procediment/update/auto" data-toggle="modal" data-maximized="false"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="procediment.list.boto.procediment.auto"/></a>
+			</c:if>
 			<a id="procediment-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}procediment/new" data-toggle="modal" data-maximized="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="procediment.list.boto.nou.procediment"/></a>
 		</p>
 	</script>

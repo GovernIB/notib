@@ -4,8 +4,10 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.GrupFiltreDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
@@ -112,7 +114,7 @@ public interface GrupService {
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
-	public List<GrupDto> findByProcedimentGrups(
+	public List<GrupDto> findByProcedimentAndUsuariGrups(
 			Long procedimentId);
 	
 	/**
@@ -160,6 +162,11 @@ public interface GrupService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<GrupDto> findByEntitat(Long entitatId);
 
+	
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	public List<GrupDto> findByEntitatAndOrganGestor(
+			EntitatDto entitat, 
+			OrganGestorDto organGestor);
 	
 	/**
 	 * Consulta dels grups segons els paràmetres del filtre.

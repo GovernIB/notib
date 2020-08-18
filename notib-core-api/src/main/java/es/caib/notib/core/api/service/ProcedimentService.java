@@ -9,6 +9,7 @@ import es.caib.notib.core.api.dto.CodiAssumpteDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
@@ -133,6 +134,7 @@ public interface ProcedimentService {
 			boolean isUsuari,
 			boolean isUsuariEntitat,
 			boolean isAdministrador,
+			OrganGestorDto organGestorActual,
 			ProcedimentFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
 	

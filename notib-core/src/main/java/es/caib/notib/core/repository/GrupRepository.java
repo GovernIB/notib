@@ -20,7 +20,7 @@ import es.caib.notib.core.entity.GrupEntity;
 public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 
 	public List<GrupEntity> findByEntitat(EntitatEntity entitat);
-	
+	public List<GrupEntity> findByEntitatIdAndOrganGestorCodiIn(Long entitatId, List<String> organsGestorsCodis);
 	public GrupEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
 	
 	public Page<GrupEntity> findByEntitat(
@@ -30,10 +30,14 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 	@Query(	"from " +
 			"    GrupEntity b " +
 			"where (:esNullFiltreCodi = true or b.codi = :codi) " + 
+			"and (:esNullFiltreOrganGestor = true or b.organGestor.codi in (:organsGestors)) " +
 			"and b.entitat = :entitat")
 	public Page<GrupEntity> findByCodiNotNullFiltrePaginat(
 			@Param("esNullFiltreCodi") boolean esNullFiltrecodi,
 			@Param("codi") String codi, 
+			@Param("esNullFiltreOrganGestor") boolean esNullOrganGestor,
+//			@Param("organGestorId") Long organGestorId,
+			@Param("organsGestors") List<String> organsGestors,
 			@Param("entitat") EntitatEntity entitat,
 			Pageable paginacio);
 }

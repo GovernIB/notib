@@ -26,15 +26,21 @@ public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEnti
 			"where " +
 			"(:esNullFiltreCodi = true or b.dir3codi = :dir3codi) " +
 			"and (:esNullFiltreNumContracte = true or b.contracteNum = :numContracte) " + 
+			"and (:esNullFiltreOrganGestor = true or b.organGestor.codi in (:organsGestors)) " +
 			"and b.entitat = :entitat")
 	Page<PagadorPostalEntity> findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitat(
 			@Param("esNullFiltreCodi") boolean esNullFiltreDir3codi,
 			@Param("dir3codi") String dir3codi, 
 			@Param("esNullFiltreNumContracte") boolean esNullFiltreNumContracte,
-			@Param("numContracte") String filtreNumContracte,	
+			@Param("numContracte") String filtreNumContracte,
+			@Param("esNullFiltreOrganGestor") boolean esNullOrganGestor,
+//			@Param("organGestorId") Long organGestorId,
+			@Param("organsGestors") List<String> organsGestors,
 			@Param("entitat") EntitatEntity entitat,
 			Pageable paginacio);
 	
 	List<PagadorPostalEntity> findByEntitat(EntitatEntity entitat);
+
+	List<PagadorPostalEntity> findByEntitatIdAndOrganGestorCodiIn(Long entitatId, List<String> organsFills);
 	
 }

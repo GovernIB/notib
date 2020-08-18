@@ -417,4 +417,11 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("usuariCodi") String usuariCodi, 
 			Pageable springDataPageable);
 	
+	@Query(	"select " +
+			"    c.estat " +
+			"from " +
+			"    NotificacioEntity c " +
+			"where " +
+			"    c.id = :id")
+	NotificacioEstatEnumDto getEstatNotificacio(@Param("id") Long id);
 }

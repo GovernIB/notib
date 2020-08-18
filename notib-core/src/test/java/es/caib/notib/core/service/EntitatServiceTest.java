@@ -115,7 +115,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 		testCreantElements(
 			new TestAmbElementsCreats() {
 				@Override
-				public void executar(List<Object> elementsCreats) {
+				public void executar(List<Object> elementsCreats) throws NotFoundException{
 					autenticarUsuari("super");
 					EntitatDto creada = (EntitatDto)elementsCreats.get(0);
 					entitatUpdate.setId(creada.getId());
@@ -131,6 +131,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 					assertEquals(true, modificada.isActiva());
 				}
 			},
+			"Modificació de ENTITAT",
 			entitatCreate);
 	}
 	
@@ -154,6 +155,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 					elementsCreats.remove(creada);
 				}
 			},
+			"Eliminació de ENTITAT",
 			entitatCreate);
 	}
 
@@ -179,6 +181,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 							activada.isActiva());
 				}
 			},
+			"Canvi de activa de ENTITAT",
 			entitatCreate);
 	}
 	
@@ -198,6 +201,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 							trobada);
 				}
 			},
+			"FindById de ENTITAT",
 			entitatCreate);
 	}
 	
@@ -217,6 +221,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 							trobada);
 				}
 			},
+			"FindByCodi de ENTITAT",
 			entitatCreate);
 	}
 	
@@ -236,6 +241,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 							trobada);
 				}
 			},
+			"FindByCodiDir3 de ENTITAT",
 			entitatCreate);
 	}
 	
@@ -329,6 +335,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 							is(0));
 				}
 			},
+			"Permisos de ENTITAT",
 			entitatCreate);
 	}
 	
@@ -358,6 +365,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 					}
 				}
 			},
+			"Error duplicat de ENTITAT",
 			entitatCreate);
 	}
 	
@@ -379,6 +387,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 					}
 				}
 			},
+			"Error codiDir3 duplicat de ENTITAT",
 			entitatCreate);
 	}
 	

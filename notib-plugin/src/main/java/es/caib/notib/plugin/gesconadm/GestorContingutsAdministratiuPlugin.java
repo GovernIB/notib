@@ -25,8 +25,19 @@ public interface GestorContingutsAdministratiuPlugin {
 	public List<GcaProcediment> getAllProcediments() throws SistemaExternException;
 	
 	/**
+	 * Retorna la llista de tots els procediments definits al Gestor documental administratiu per a una unitat administrativa.
+	 * 
+	 * @param codi CodiDir3 de la unitat administrativa
+	 * @return La llista de procediments.
+	 * @throws SistemaExternException
+	 *            Si es produeix un error al consultar els procediments.
+	 */
+	public List<GcaProcediment> getProcedimentsByUnitat(String codi) throws SistemaExternException;
+	
+	/**
 	 * Retorna una unitat administrativa donat el seu codi.
 	 * 
+	 * @param codi CodiDir3 de la unitat administrativa
 	 * @return La unitat administrativa.
 	 * @throws SistemaExternException
 	 *            Si es produeix un error al consultar la unitat administrativa.

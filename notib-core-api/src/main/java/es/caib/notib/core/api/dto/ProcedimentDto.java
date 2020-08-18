@@ -1,6 +1,7 @@
 package es.caib.notib.core.api.dto;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import lombok.Getter;
@@ -28,6 +29,7 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 	private String codiAssumpte;
 	private String codiAssumpteNom;
 	private boolean comu;
+	private Date ultimaActualitzacio;
 	
 	private List<PermisDto> permisos;
 	private boolean usuariActualRead;

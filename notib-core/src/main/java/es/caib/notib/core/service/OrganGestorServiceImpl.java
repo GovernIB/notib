@@ -8,6 +8,8 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,7 @@ import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.repository.OrganGestorRepository;
@@ -59,6 +62,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Resource
 	private CacheHelper cacheHelper;
 	@Resource
+	private OrganigramaHelper organigramaHelper;
+	@Resource
 	private MetricsHelper metricsHelper;
 	
 
@@ -68,7 +73,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					Long.parseLong(dto.getEntitatId()), 
+					dto.getEntitatId(), 
 					false, 
 					true, 
 					false);
@@ -334,6 +339,31 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		}
 	}
 	
+	@Override
+	public List<OrganGestorDto> findAccessiblesByUsuariActual() {
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		return cacheHelper.findOrgansGestorsAccessiblesUsuari(auth);
+
+//		List<OrganGestorEntity> organsGestors = organGestorRepository.findAll();
+//		Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADOR};
+//		
+//		permisosHelper.filterGrantedAny(
+//				organsGestors,
+//				new ObjectIdentifierExtractor<OrganGestorEntity>() {
+//					public Long getObjectIdentifier(OrganGestorEntity organGestor) {
+//						return organGestor.getId();
+//					}
+//				},
+//				OrganGestorEntity.class,
+//				permisos,
+//				auth);
+//		
+//		return conversioTipusHelper.convertirList(
+//				organsGestors, 
+//				OrganGestorDto.class);
+	}
+	
 	@Transactional
 	@Override
 	public List<PermisDto> permisFind(
@@ -390,6 +420,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					id,
 					OrganGestorEntity.class,
 					permis);
+			cacheHelper.evictFindOrgansGestorsAccessiblesUsuari();
+			cacheHelper.evictFindEntitatsAccessiblesUsuari();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -420,6 +452,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					id,
 					OrganGestorEntity.class,
 					permisId);
+			cacheHelper.evictFindOrgansGestorsAccessiblesUsuari();
+			cacheHelper.evictFindEntitatsAccessiblesUsuari();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -435,6 +469,26 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				organismes = cacheHelper.findOrganismesByEntitat(entitat.getDir3Codi());
 			} catch (Exception e) {
 				String errorMessage = "No s'han pogut recuperar els organismes de l'entitat: " + entitat.getDir3Codi();
+				logger.error(
+						errorMessage, 
+						e.getMessage());
+			}
+			return organismes;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<OrganismeDto> findOrganismes(EntitatDto entitat, OrganGestorDto organGestor) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<OrganismeDto> organismes = new ArrayList<OrganismeDto>();
+			try {
+				organismes = organigramaHelper.getOrganismesFillsByOrgan(entitat.getDir3Codi(), organGestor.getCodi());
+			} catch (Exception e) {
+				String errorMessage = "No s'han pogut recuperar els organismes de l'entitat: " + entitat.getDir3Codi() + " i òrgan gestor: " + organGestor.getCodi();
 				logger.error(
 						errorMessage, 
 						e.getMessage());

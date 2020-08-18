@@ -5,7 +5,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <html>
 <head>
-	<title><spring:message code="procediment.permis.titol"/></title>
+	<title><spring:message code="procediment.grup.titol"/></title>
 	<meta name="subtitle" content="${procediment.nom}"/>
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
@@ -29,19 +29,21 @@
 		style="width:100%">
 		<thead>
 			<tr>
-				<th data-col-name="id" data-template="#cellTipusTemplate" ><spring:message code="procediment.grup.columna.tipus"/>
+<%-- 				<th data-col-name="id" data-template="#cellTipusTemplate" ><spring:message code="procediment.grup.columna.tipus"/>
 					<script id="cellTipusTemplate" type="text/x-jsrender">
 						<td><spring:message code="procediment.grup.columna.tipus.grup"/></td>
 					</script>
 				</th>
-				<th data-col-name="grup.nom"><spring:message code="procediment.permis.columna.principal"/></th>
+--%>
+				<th data-col-name="grup.nom"><spring:message code="procediment.grup.columna.tipus.grup"/></th>
+				<th data-col-name="grup.codi"><spring:message code="grup.list.columna.codi"/></th>
 				
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="../../procediment/${procediment.id}/grup/{{:id}}" data-height="300px" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								<%--<li><a href="../../procediment/${procediment.id}/grup/{{:id}}" data-height="300px" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>--%>
 								<li><a href="grup/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="procediment.grup.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
 						</div>

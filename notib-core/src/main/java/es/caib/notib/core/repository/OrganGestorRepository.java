@@ -60,4 +60,10 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("isNomNull") boolean isNomNull,
 			@Param("nom") String nom,
 			Pageable paginacio);
+	
+	@Query(	"select distinct og.codi " +
+			"from OrganGestorEntity og " +
+			"     left outer join og.entitat e " + 
+			"where e.dir3Codi = :entitatCodiDir3")
+	public List<String> findCodisByEntitatDir3(@Param("entitatCodiDir3") String entitatCodiDir3);
 }

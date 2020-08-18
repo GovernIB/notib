@@ -28,8 +28,8 @@
 	<c:set var="formAction"><not:modalUrl value="/procediment/${procediment.id}/grup"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="procedimentGrupCommand">
 		<form:hidden path="id"/>
-		<not:inputSelect name="tipus" textKey="procediment.grup.form.camp.tipus" optionItems="${TipusGrupEnum}"  optionValueAttribute="value" optionTextKeyAttribute="text"/>
-		<not:inputSelect name="grupId" textKey="procediment.grup.form.camp.principal" optionItems="${grups}" optionValueAttribute="id" optionTextAttribute="nom" required="true"/>
+<%-- 		<not:inputSelect name="tipus" textKey="procediment.grup.form.camp.tipus" optionItems="${TipusGrupEnum}"  optionValueAttribute="value" optionTextKeyAttribute="text"/> --%>
+		<not:inputSelect name="grupId" textKey="procediment.grup.columna.tipus.grup" optionItems="${grups}" optionValueAttribute="id" optionTextAttribute="nomIRol" required="true"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/procediment/${procediment.id}/grup"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

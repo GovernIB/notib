@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PagadorPostalDto;
 import es.caib.notib.core.api.dto.PagadorPostalFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -96,6 +98,9 @@ public interface PagadorPostalService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<PagadorPostalDto> findByEntitat(Long entitatId);
 
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	public Object findByEntitatAndOrganGestor(EntitatDto entitat, OrganGestorDto organGestor);
+
 	/**
 	 * Llistat amb tots els pagadros postals paginats.
 	 * 
@@ -106,5 +111,4 @@ public interface PagadorPostalService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public PaginaDto<PagadorPostalDto> findAllPaginat(PaginacioParamsDto paginacioParams);
 
-	
 }
