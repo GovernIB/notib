@@ -191,6 +191,23 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	
 	@Override
 	@Transactional(readOnly = true)
+	public List<OrganGestorDto> findDescencentsByCodi(
+			Long entitatId, 
+			String organCodi) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organCodi);
+			return conversioTipusHelper.convertirList(
+					organGestorRepository.findByCodiIn(organs),
+					OrganGestorDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
 	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			OrganGestorFiltreDto filtre, 

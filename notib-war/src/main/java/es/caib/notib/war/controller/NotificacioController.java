@@ -179,6 +179,10 @@ public class NotificacioController extends BaseUserController {
 					procedimentsDisponiblesIds.add(pro.getId());
 				organsGestorsDisponibles = organGestorService.findByProcedimentIds(procedimentsDisponiblesIds);
 			}
+		} else if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
+			OrganGestorDto organGestorActual = getOrganGestorActual(request);
+			procedimentsDisponibles = procedimentService.findByOrganGestorIDescendents(entitatActual.getId(), organGestorActual);
+			organsGestorsDisponibles = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
 		}
 		for (OrganGestorDto organGestor: organsGestorsDisponibles) {
 			String nom = organGestor.getCodi();
@@ -381,17 +385,25 @@ public class NotificacioController extends BaseUserController {
 		boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
 		boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
 		boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
+		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 
 		List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
 		List<String> codisProcedimentsDisponibles = new ArrayList<String>();
 		try {
-			if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
+			if (isUsuariEntitat) {
 				if (filtre != null) {
 					filtre.setEntitatId(entitatActual.getId());
 				}
 			}
-			if (RolHelper.isUsuariActualUsuari(request)) {
+			if (isUsuari) {
 				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.CONSULTA);
+				for(ProcedimentDto procediment: procedimentsDisponibles) {
+					codisProcedimentsDisponibles.add(procediment.getCodi());
+				}
+			}
+			if (isAdminOrgan) {
+				OrganGestorDto organGestorActual = getOrganGestorActual(request);
+				procedimentsDisponibles = procedimentService.findByOrganGestorIDescendents(entitatActual.getId(), organGestorActual);
 				for(ProcedimentDto procediment: procedimentsDisponibles) {
 					codisProcedimentsDisponibles.add(procediment.getCodi());
 				}
@@ -400,7 +412,8 @@ public class NotificacioController extends BaseUserController {
 					entitatActual.getId(), 
 					isUsuari, 
 					isUsuariEntitat,
-					isAdministrador, 
+					isAdministrador,
+					isAdminOrgan,
 					codisProcedimentsDisponibles,
 					filtre,
 					DatatablesHelper.getPaginacioDtoFromRequest(request));

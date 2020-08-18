@@ -761,6 +761,20 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
+	public List<ProcedimentDto> findByOrganGestorIDescendents(
+			Long entitatId, 
+			OrganGestorDto organGestor) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+				entitat.getDir3Codi(), 
+				organGestor.getCodi());
+		return conversioTipusHelper.convertirList(
+				procedimentRepository.findByOrganGestorCodiIn(organsFills),
+				ProcedimentDto.class);
+	}
+	
+	@Override
 	@Transactional
 	public PaginaDto<ProcedimentFormDto> findAmbFiltrePaginat(
 			Long entitatId,
@@ -1339,18 +1353,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Transactional(readOnly = true)
 	public boolean hasPermisProcessarProcediment(
 			String procedimentCodi,
-			Long procedimentId,
-			boolean isAdministrador) {
+			Long procedimentId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
-			ProcedimentEntity procediment;
-			
-			if (!isAdministrador) {
-					procediment = procedimentRepository.findById(procedimentId);
-			} else {
-				procediment = procedimentRepository.findOne(procedimentId);
-			}
+			ProcedimentEntity procediment = procedimentRepository.findById(procedimentId);
 			if (procediment != null)
 				procediments.add(procediment);
 			

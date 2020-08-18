@@ -112,6 +112,20 @@ public interface ProcedimentService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public List<ProcedimentDto> findByEntitat(Long entitatId);
 	
+	/**
+	 * Consulta els procediments d'un organ gestor i els seus organs gestors descendents.
+	 * 
+	 * @param entitatId
+	 *            Identificador de la entitat en la que s'està cercant
+	 * @param organGestor
+	 * 			  Òrgna gestor del que volem obtenir els procediments
+	 * @return Els procediments associats a l'òrgan gestor, o a algund els seus descendents.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	public List<ProcedimentDto> findByOrganGestorIDescendents(
+			Long entitatId, 
+			OrganGestorDto organGestor);
+	
 	
 	/**
 	 * Consulta de les notificacions segons els paràmetres del filtre i permís actual.
@@ -354,8 +368,7 @@ public interface ProcedimentService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public boolean hasPermisProcessarProcediment(
 			String procedimentCodi,
-			Long procedimentId,
-			boolean isAdministrador);
+			Long procedimentId);
 	
 	/**
 	 * Comprova si l'usuari actual té permisos de consulta i pertany al grup d'un procediment

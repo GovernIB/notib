@@ -151,5 +151,7 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 	public List<String> findOrgansGestorsCodisByEntitat(@Param("entitat") EntitatEntity entitat);
 	
 	List<ProcedimentEntity> findByOrganGestorId(Long organGestorId);
+
+	public List<ProcedimentEntity> findByOrganGestorCodiIn(List<String> organsGestors);
 	
 }

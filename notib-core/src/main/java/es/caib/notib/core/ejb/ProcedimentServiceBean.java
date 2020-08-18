@@ -99,6 +99,14 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	public List<ProcedimentDto> findByEntitat(Long entitatId) {
 		return delegate.findByEntitat(entitatId);
 	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	public List<ProcedimentDto> findByOrganGestorIDescendents(
+			Long entitatId, 
+			OrganGestorDto organGestor) {
+		return delegate.findByOrganGestorIDescendents(entitatId, organGestor);
+	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
@@ -298,12 +306,10 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
 	public boolean hasPermisProcessarProcediment(
 			String procedimentCodi,
-			Long procedimentId,
-			boolean isAdministrador) {
+			Long procedimentId) {
 		return delegate.hasPermisProcessarProcediment(
 				procedimentCodi,
-				procedimentId,
-				isAdministrador);
+				procedimentId);
 	}
 
 	@Override

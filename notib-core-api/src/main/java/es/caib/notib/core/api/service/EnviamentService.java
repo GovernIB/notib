@@ -65,6 +65,7 @@ public interface EnviamentService {
 			EntitatDto entitat,
 			boolean isUsuari,
 			boolean isUsuariEntitat,
+			boolean isAdminOrgan,
 			List<String> codisProcedimentsDisponibles,
 			NotificacioEnviamentFiltreDto filtre,
 			PaginacioParamsDto paginacio) throws ParseException;

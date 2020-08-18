@@ -169,6 +169,7 @@ public class NotificacioServiceBean implements NotificacioService {
 			boolean isUsuari,
 			boolean isUsuariEntitat,
 			boolean isSuperUsuari,
+			boolean isAdministradorOrgan,
 			List<String> codisProcedimentsDisponibles,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
@@ -177,11 +178,12 @@ public class NotificacioServiceBean implements NotificacioService {
 				isUsuari,
 				isUsuariEntitat,
 				isSuperUsuari,
+				isAdministradorOrgan,
 				codisProcedimentsDisponibles,
 				filtre,
 				paginacioParams);
 	}
-
+	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaAndGrupsAndEntitat(

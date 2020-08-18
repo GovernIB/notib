@@ -89,9 +89,37 @@ public interface NotificacioService {
 			boolean isUsuari,
 			boolean isUsuariEntitat,
 			boolean isSuperUsuari,
+			boolean isAdministradorOrgan,
 			List<String> codisProcedimentsDisponibles,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
+	
+	
+//	@PreAuthorize("hasRole('NOT_SUPER')")
+//	public PaginaDto<NotificacioDto> findAmbFiltrePaginatForSuperAdministrador(
+//			Long entitatId,
+//			NotificacioFiltreDto filtre,
+//			PaginacioParamsDto paginacioParams);
+//	
+//	@PreAuthorize("hasRole('NOT_ADMIN')")
+//	public PaginaDto<NotificacioDto> findAmbFiltrePaginatForAdministradorEntitat(
+//			Long entitatId,
+//			NotificacioFiltreDto filtre,
+//			PaginacioParamsDto paginacioParams);
+//	
+//	@PreAuthorize("hasRole('NOT_USER')")
+//	public PaginaDto<NotificacioDto> findAmbFiltrePaginatForAdministradorOrgan(
+//			Long entitatId,
+//			List<String> codisProcedimentsDisponibles,
+//			NotificacioFiltreDto filtre,
+//			PaginacioParamsDto paginacioParams);
+//
+//	@PreAuthorize("hasRole('NOT_USER')")
+//	public PaginaDto<NotificacioDto> findAmbFiltrePaginatForUsuari(
+//			Long entitatId,
+//			List<String> codisProcedimentsDisponibles,
+//			NotificacioFiltreDto filtre,
+//			PaginacioParamsDto paginacioParams);
 
 	/**
 	 * Consulta de les notificacions segons els paràmetres del filtre.
