@@ -373,6 +373,7 @@ public class NotificacioController extends BaseUserController {
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request) {
+		getEntitatActualComprovantPermisos(request);
 		NotificacioFiltreDto filtre = (NotificacioFiltreDto) request.getSession().getAttribute(NOTIFICACIONS_FILTRE);
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		PaginaDto<NotificacioDto> notificacions = new PaginaDto<NotificacioDto>();
@@ -390,14 +391,14 @@ public class NotificacioController extends BaseUserController {
 					filtre.setEntitatId(entitatActual.getId());
 				}
 			}
-			if (RolHelper.isUsuariActualUsuari(request)) {
+			if (RolHelper.isUsuariActualUsuari(request) && entitatActual!=null) {
 				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.CONSULTA);
 				for(ProcedimentDto procediment: procedimentsDisponibles) {
 					codisProcedimentsDisponibles.add(procediment.getCodi());
 				}
 			}
 			notificacions = notificacioService.findAmbFiltrePaginat(
-					entitatActual.getId(), 
+					entitatActual!=null?entitatActual.getId():null, 
 					isUsuari, 
 					isUsuariEntitat,
 					isAdministrador, 

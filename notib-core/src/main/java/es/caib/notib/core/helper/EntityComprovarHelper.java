@@ -90,6 +90,11 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisUsuari,
 			boolean comprovarPermisAdminEntitat,
 			boolean comprovarPermisAplicacio) throws NotFoundException {
+		if (entitatId == null) {
+			throw new NotFoundException(
+					entitatId,
+					EntitatEntity.class);
+		}
 		EntitatEntity entitat = entitatRepository.findOne(entitatId);
 		if (entitat == null) {
 			throw new NotFoundException(
