@@ -277,7 +277,7 @@ public class NotificacioController extends BaseUserController {
 		List<String> tipusDocumentEnumDto = new ArrayList<String>();
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		ProcedimentDto procedimentActual = procedimentService.findById(
-				null, 
+				entitatActual.getId(), 
 				isAdministrador(request), 
 				notificacioCommand.getProcedimentId());
 		notificacioCommand.setUsuariCodi(aplicacioService.getUsuariActual().getCodi());
@@ -806,9 +806,9 @@ public class NotificacioController extends BaseUserController {
 			HttpServletRequest request, 
 			@PathVariable Long procedimentId, 
 			Model model) {
-		
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		ProcedimentDto procedimentActual = procedimentService.findById(
-				null, 
+				entitatActual.getId(), 
 				isAdministrador(request), 
 				procedimentId);
 		NotificacioCommandV2 notificacio = new NotificacioCommandV2();
@@ -821,7 +821,7 @@ public class NotificacioController extends BaseUserController {
 		enviaments.add(enviament);
 		notificacio.setEnviaments(enviaments);
 		List<String> tipusDocumentEnumDto = new ArrayList<String>();
-		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		
 		List<TipusDocumentDto>  tipusDocuments =  entitatService.findTipusDocumentByEntitat(entitatActual.getId());
 		TipusDocumentEnumDto tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
 		notificacio.setCaducitat(CaducitatHelper.sumarDiesLaborals(procedimentActual.getCaducitat()));
@@ -842,7 +842,7 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
 		model.addAttribute("entitat", procedimentActual.getEntitat());
 		model.addAttribute("procediment", procedimentService.findById(
-				null, 
+				entitatActual.getId(), 
 				isAdministrador(request), 
 				procedimentId));
 		model.addAttribute("amagat", Boolean.FALSE);

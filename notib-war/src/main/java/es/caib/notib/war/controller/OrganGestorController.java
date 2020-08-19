@@ -169,8 +169,12 @@ public class OrganGestorController extends BaseUserController{
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		
 		try {
+			OrganGestorDto organGestorActual = getOrganGestorActual(request);
+			String codiDir3OrganActual=null;
+			if (organGestorActual!=null) codiDir3OrganActual = organGestorActual.getCodi();
+			
 			organGestorService.updateNoms(
-					entitat.getId());
+					entitat.getId(), codiDir3OrganActual);
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../organgestor",

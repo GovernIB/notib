@@ -82,6 +82,9 @@ public class GrupServiceImpl implements GrupService{
 					+ "grup=" + grup + ")");
 			
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			
+			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que indica Organ al grup i que es administrador de l'organ indicat 
+			
 			OrganGestorEntity organGestor = null;
 			if (grup.getOrganGestorId() != null) {
 				organGestor = entityComprovarHelper.comprovarOrganGestor(
@@ -111,7 +114,9 @@ public class GrupServiceImpl implements GrupService{
 		try {
 			logger.debug("Actualitzant grup ("
 					+ "grup=" + grup + ")");
-				
+			
+			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que indica Organ al grup i que es administrador de l'organ indicat
+			
 			GrupEntity grupEntity = entityComprovarHelper.comprovarGrup(grup.getId());
 			grupEntity.update(
 							grup.getCodi(),
@@ -131,6 +136,8 @@ public class GrupServiceImpl implements GrupService{
 	public GrupDto delete(Long id) throws NotFoundException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			
+			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que es administrador de l'organ del grup que vol eliminar 
 			GrupEntity grupEntity = entityComprovarHelper.comprovarGrup(id);
 			grupReposity.delete(grupEntity);
 			return conversioTipusHelper.convertir(
@@ -301,6 +308,7 @@ public class GrupServiceImpl implements GrupService{
 			List<GrupDto> grups) throws NotFoundException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que es administrador de l'organ del grup que vol eliminar
 			List<GrupEntity> grupsEntity = entityComprovarHelper.comprovarGrups(grups);
 			
 			grupReposity.delete(grupsEntity);
@@ -371,16 +379,25 @@ public class GrupServiceImpl implements GrupService{
 				organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
 						entitat.getDir3Codi(), 
 						organGestor.getCodi());	
+				
+				grup = grupReposity.findByCodiNotNullFiltrePaginatWithOrgan(
+						filtre.getCodi() == null || filtre.getCodi().isEmpty(),
+						filtre.getCodi(),
+						organsFills,
+						entitat,
+						paginacioHelper.toSpringDataPageable(paginacioParams));
+				
+			}else{
+				grup = grupReposity.findByCodiNotNullFiltrePaginat(
+						filtre.getCodi() == null || filtre.getCodi().isEmpty(),
+						filtre.getCodi(),
+						entitat,
+						paginacioHelper.toSpringDataPageable(paginacioParams));
 			}
 			
-			grup = grupReposity.findByCodiNotNullFiltrePaginat(
-					filtre.getCodi() == null || filtre.getCodi().isEmpty(),
-					filtre.getCodi(),
-					filtre.getOrganGestorId() == null,
-					//filtre.getOrganGestorId(),
-					organsFills,
-					entitat,
-					paginacioHelper.toSpringDataPageable(paginacioParams));
+			
+			
+			
 			
 			return paginacioHelper.toPaginaDto(
 					grup,

@@ -29,7 +29,7 @@ public class PagadorCieFormatSobreServiceBean implements PagadorCieFormatSobreSe
 	PagadorCieFormatSobreService delegate;
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public PagadorCieFormatSobreDto create(Long entitatId, PagadorCieFormatSobreDto formatSobre) {
 		return delegate.create(
 				entitatId, 
@@ -37,13 +37,13 @@ public class PagadorCieFormatSobreServiceBean implements PagadorCieFormatSobreSe
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public PagadorCieFormatSobreDto update(PagadorCieFormatSobreDto formatSobre) throws NotFoundException {
 		return delegate.update(formatSobre);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public PagadorCieFormatSobreDto delete(Long id) throws NotFoundException {
 		return delegate.delete(id);
 	}

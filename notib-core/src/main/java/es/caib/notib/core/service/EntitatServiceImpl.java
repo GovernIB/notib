@@ -303,8 +303,8 @@ public class EntitatServiceImpl implements EntitatService {
 			logger.debug("Consulta de l'entitat (id=" + id + ")");
 			entityComprovarHelper.comprovarPermisos(
 					null,
-					true,
-					true,
+					false,
+					false,
 					true );
 			EntitatEntity entitat = entitatRepository.findOne(id);
 			if (entitat == null)

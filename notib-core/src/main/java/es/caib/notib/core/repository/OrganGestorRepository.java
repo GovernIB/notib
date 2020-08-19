@@ -70,6 +70,14 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("organsIds") List<String> organs,
 			Pageable paginacio);
 	
+	@Query( "select distinct og " +
+			"from OrganGestorEntity og " +
+			"where (og.entitat = :entitat)" +
+			"and og.codi in (:organsIds)")
+	public List<OrganGestorEntity> findByEntitatAndOrgansGestors(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("organsIds") List<String> organs);
+	
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
 			"where (og.entitat = :entitat)" + 

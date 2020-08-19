@@ -193,35 +193,35 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public void permisUpdate(
-			Long entitatId, 
+			Long entitatId,
+			Long organGestorId,
 			Long id, 
-			PermisDto permis,
-			boolean isAdministrador) throws NotFoundException {
+			PermisDto permis) throws NotFoundException {
 		delegate.permisUpdate(
-				entitatId, 
+				entitatId,
+				organGestorId,
 				id, 
-				permis,
-				isAdministrador);
+				permis);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public void permisDelete(
 			Long entitatId,
+			Long organGestorId,
 			Long id,
-			Long permisId,
-			boolean isAdministrador) throws NotFoundException {
+			Long permisId) throws NotFoundException {
 		delegate.permisDelete(
-				entitatId, 
+				entitatId,
+				organGestorId,
 				id, 
-				permisId,
-				isAdministrador);
+				permisId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public void grupCreate(
 			Long entitatId,
 			Long id,
@@ -233,7 +233,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public void grupUpdate(
 			Long entitatId, 
 			Long id, 
@@ -245,7 +245,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public void grupDelete(
 			Long entitatId, 
 			Long GrupId) throws NotFoundException {

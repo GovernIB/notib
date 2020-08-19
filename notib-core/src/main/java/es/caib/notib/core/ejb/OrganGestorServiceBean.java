@@ -37,31 +37,31 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	OrganGestorService delegate;
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public OrganGestorDto create(OrganGestorDto dto) {
 		return delegate.create(dto);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public OrganGestorDto delete(Long entitatId, Long organId) {
 		return delegate.delete(entitatId, organId);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public void updateNom(Long entitatId, String organGestorCodi) {
 		delegate.updateNom(entitatId, organGestorCodi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
-	public void updateNoms(Long entitatId) {
-		delegate.updateNoms(entitatId);
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	public void updateNoms(Long entitatId, String organActualCodiDir3) {
+		delegate.updateNoms(entitatId,organActualCodiDir3);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public boolean organGestorEnUs(Long organId) {
 		return delegate.organGestorEnUs(organId);
 	}
@@ -73,6 +73,7 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 	
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public OrganGestorDto findById(Long entitatId, Long id) {
 		return delegate.findById(entitatId, id);
 	}
@@ -89,7 +90,7 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public List<CodiValorDto> findOrgansGestorsCodiByEntitat(Long entitatId) {
 		return delegate.findOrgansGestorsCodiByEntitat(entitatId);
 	}
@@ -101,7 +102,7 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			String organCodiDir3,

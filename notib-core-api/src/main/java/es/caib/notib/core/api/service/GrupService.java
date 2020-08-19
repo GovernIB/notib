@@ -29,7 +29,7 @@ public interface GrupService {
 	 * 				Informació del grup a crear
 	 * @return El grup creat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public GrupDto create(
 			Long entitatId,
 			GrupDto grup);
@@ -42,7 +42,7 @@ public interface GrupService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb el codi especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public GrupDto update(GrupDto grup) throws NotFoundException;
 
 	/**
@@ -53,7 +53,7 @@ public interface GrupService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public GrupDto delete(
 			Long id) throws NotFoundException;
 	
