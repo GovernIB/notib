@@ -324,11 +324,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				boolean modificar = isActualitzacioProcedimentsModificarProperty();
 				boolean eliminarOrgans = isActualitzacioProcedimentsEliminarOrgansProperty();
 				Long ti = System.currentTimeMillis();
-	//			logger.debug(">>>> Inici actualitzar procediments");
-	//			logger.debug(">>>> ==========================================================================");
+//				logger.debug(">>>> Inici actualitzar procediments");
+//				logger.debug(">>>> ==========================================================================");
 				if (progres != null && progres.getProgres() < 100 && !progres.isError()) {
-	//				logger.debug(">>>> Ja existeix un altre procés que està executant l'actualització");
-	//				logger.debug(">>>> ==========================================================================");
+//					logger.debug(">>>> Ja existeix un altre procés que està executant l'actualització");
+//					logger.debug(">>>> ==========================================================================");
 					
 					return;	// Ja existeix un altre procés que està executant l'actualització.
 				} else {
@@ -338,14 +338,14 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				progres.addInfo(TipusInfo.TITOL, messageHelper.getMessage("procediment.actualitzacio.auto.inici", new Object[] {entitatDto.getNom()}));
 			
 				Long t1 = System.currentTimeMillis();
-	//			logger.debug(">>>> Obtenir procediments de Rolsac de l'entitat...");
+//				logger.debug(">>>> Obtenir procediments de Rolsac de l'entitat...");
 				progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments"));
 			
 				Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(entitatDto.getDir3Codi());
 				List<ProcedimentDto> procedimentsGda = getProcedimentsGdaByEntitat(entitatDto.getDir3Codi());
 				
 				Long t2 = System.currentTimeMillis();
-	//			logger.debug(">>>> obtinguts " + procedimentsGda.size() + " procediments (" + (t2 - t1) + "ms)");
+//				logger.debug(">>>> obtinguts " + procedimentsGda.size() + " procediments (" + (t2 - t1) + "ms)");
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments.result", new Object[] {procedimentsGda.size()}));
 				progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(t2 - t1)}));
 				progres.setNumProcediments(procedimentsGda.size());
@@ -358,22 +358,22 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						false,
 						false);
 				
-	//			logger.debug(">>>> ==========================================================================");
-	//			logger.debug(">>>> Processar procediments");
-	//			logger.debug(">>>> ==========================================================================");
+//				logger.debug(">>>> ==========================================================================");
+//				logger.debug(">>>> Processar procediments");
+//				logger.debug(">>>> ==========================================================================");
 				progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediments"));
 				
 				int i = 1;
 				for (ProcedimentDto procedimentGda: procedimentsGda) {
 					t1 = System.currentTimeMillis();
-	//				logger.debug(">>>> " + i + ". Processant procediment: " + procedimentGda.getNom());
-	//				logger.debug(">>>> ..........................................................................");
+//					logger.debug(">>>> " + i + ". Processant procediment: " + procedimentGda.getNom());
+//					logger.debug(">>>> ..........................................................................");
 					progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment", new Object[] {i++, procedimentGda.getNom()}));
 					
 					if (procedimentGda.getCodi() == null || procedimentGda.getCodi().isEmpty()) {
-	//					logger.debug(">>>> Procediment DESCARTAT: No disposa de Codi SIA");
-	//					logger.debug(">>>> ..........................................................................");
-	//					logger.debug(">>>> ..........................................................................");
+//						logger.debug(">>>> Procediment DESCARTAT: No disposa de Codi SIA");
+//						logger.debug(">>>> ..........................................................................");
+//						logger.debug(">>>> ..........................................................................");
 						progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat"));
 						progres.addSeparador();
 						progres.incrementProcedimentsActualitzats();
@@ -386,18 +386,29 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						if (procediment.getUltimaActualitzacio() != null && procedimentGda.getUltimaActualitzacio() != null && 
 								!procediment.getUltimaActualitzacio().before(procedimentGda.getUltimaActualitzacio())) {
 							progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat.data"));
+//							logger.debug(">>>> Procediment DESCARTAT: No s'ha modificat des de la última actualització.");
 							progres.addSeparador();
 							progres.incrementProcedimentsActualitzats();
 							continue;
 						}
 					}
+					
+					if (organigramaEntitat.get(procedimentGda.getOrganGestor())==null) {
+						// Si l'Organ gestor del procediment no existeix dins el nostre organigrama, no es guarda el procediment
+						progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat.noOrganDinsOrganigrama", new Object[] {procedimentGda.getOrganGestor()}));
+//						logger.debug(">>>> Procediment DESCARTAT: No s'ha trobat l'organ del procediment dins l'organigrama de l'entitat. Organ: "+ procedimentGda.getOrganGestor());
+						progres.addSeparador();
+						progres.incrementProcedimentsActualitzats();
+						continue;
+					}
+						
 
 					// Organ gestor
-					//				logger.debug(">>>> >> Comprovant Organ gestor. Codi: " + procedimentGda.getOrganGestor() +  "...");
+//					logger.debug(">>>> >> Comprovant Organ gestor. Codi: " + procedimentGda.getOrganGestor() +  "...");
 					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ", new Object[] {procedimentGda.getOrganGestor()}));
 					
 					OrganGestorEntity organGestor = organGestorRepository.findByCodi(procedimentGda.getOrganGestor());
-					//				logger.debug(">>>> >> organ gestor " + (organGestor == null ? "NOU" : "EXISTENT"));
+									logger.debug(">>>> >> organ gestor " + (organGestor == null ? "NOU" : "EXISTENT"));
 					
 					if (organGestor == null) {
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ.result.no"));
@@ -414,12 +425,12 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ.result.si"));
 					}
 		
-	//				logger.debug(">>>> >> Comprovant Procediment. Codi SIA: " + procedimentGda.getCodi() +  "...");
+//					logger.debug(">>>> >> Comprovant Procediment. Codi SIA: " + procedimentGda.getCodi() +  "...");
 					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment", new Object[] {procedimentGda.getCodi()}));
 					
 					
 					if (procediment == null) {
-	//					logger.debug(">>>> >> procediment NOU ...");
+//						logger.debug(">>>> >> procediment NOU ...");
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.result.no"));
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.crear", new Object[] {procedimentGda.getCodi()}));
 						
@@ -446,11 +457,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						procediment.updateDataActualitzacio(new Date());
 						procedimentRepository.save(procediment);
 						
-	//					logger.debug(">>>> >> Creat.");
+//						logger.debug(">>>> >> Creat.");
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.creat"));
 						
 					} else { 
-	//					logger.debug(">>>> >> Procediment EXISTENT ...");
+//						logger.debug(">>>> >> Procediment EXISTENT ...");
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.result.si"));
 						
 						if (modificar) {
@@ -491,11 +502,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 								procedimentRepository.save(procediment);
 								
 								t2 = System.currentTimeMillis();
-	//							logger.debug(">>>> >> Modificat (" + (t2 - t1) + "ms)");
+//								logger.debug(">>>> >> Modificat (" + (t2 - t1) + "ms)");
 								progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.updated"));
 								
 							} else {
-	//							logger.debug(">>>> >> NO es necessari realitzar cap modificació.");
+//								logger.debug(">>>> >> NO es necessari realitzar cap modificació.");
 								progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.update.result.no"));
 							}
 						} else {
@@ -503,8 +514,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						}
 					}
 					t2 = System.currentTimeMillis();
-	//				logger.debug(">>>> ..........................................................................");
-	//				logger.debug(">>>> ..........................................................................");
+//					logger.debug(">>>> ..........................................................................");
+//					logger.debug(">>>> ..........................................................................");
 					progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.result", new Object[] {procedimentGda.getNom()}));
 					progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(t2 - t1)}));
 					progres.addSeparador();
@@ -513,19 +524,19 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				
 				if (eliminarOrgans) {
 					i = 1;
-	//				logger.debug(">>>> Processant organs gestors modificats (" + organsGestorsModificats.size() + ")");
-	//				logger.debug(">>>> ==========================================================================");
+//					logger.debug(">>>> Processant organs gestors modificats (" + organsGestorsModificats.size() + ")");
+//					logger.debug(">>>> ==========================================================================");
 					progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organs"));
 					progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organs.check"));
 					if (organsGestorsModificats.isEmpty()) {
-		//				logger.debug(">>>> No hi ha organs gestors a modificar");
+//						logger.debug(">>>> No hi ha organs gestors a modificar");
 						progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organs.result.no"));
 					} else {
 						progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organs.result.si", new Object[] {organsGestorsModificats.size()}));
 					}
 					
 					for (OrganGestorEntity organGestorAntic: organsGestorsModificats) {
-	//					logger.debug(">>>> Processant organ gestor " + organGestorAntic.getCodi() + "...   ");
+//						logger.debug(">>>> Processant organ gestor " + organGestorAntic.getCodi() + "...   ");
 						progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ", new Object[] {organGestorAntic.getCodi()}));
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.us"));
 
@@ -537,7 +548,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.borrar", new Object[] {organGestorAntic.getCodi()}));
 							organGestorRepository.delete(organGestorAntic);
 							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.borrat"));
-							//logger.debug(">>>> ELIMINAT: No té cap procediment ni permís assignat.");
+//							logger.debug(">>>> ELIMINAT: No té cap procediment ni permís assignat.");
 						}else{
 							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.permis.result.si"));
 							progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.result.permis"));
@@ -545,16 +556,16 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.us.result.si"));
 							progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.result.procediments"));
 						}
-	//					logger.debug(">>>> ..........................................................................");
+//						logger.debug(">>>> ..........................................................................");
 						progres.addSeparador();
 					}
 				} else {
 					progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organs.inactiu"));
 				}
 				
-	//			logger.debug(">>>> ==========================================================================");
-	//			logger.debug(">>>> Fi actualitzar procediments");
-	//			logger.debug(">>>> ==========================================================================");
+//				logger.debug(">>>> ==========================================================================");
+//				logger.debug(">>>> Fi actualitzar procediments");
+//				logger.debug(">>>> ==========================================================================");
 				Long tf = System.currentTimeMillis();
 				progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
 				
@@ -586,14 +597,14 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private List<ProcedimentDto> getProcedimentsGdaByEntitat(String codiDir3) {
 		ProgresActualitzacioDto progres = progresActualitzacio.get(codiDir3);
 		
-//		logger.debug(">>>> >> Obtenir tots els procediments de Rolsac...");
+		logger.debug(">>>> >> Obtenir tots els procediments de Rolsac...");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.consulta.gesconadm"));
 		Long t1 = System.currentTimeMillis();
 		
 		List<ProcedimentDto> procedimentsEntitat = pluginHelper.getProcedimentsGdaByEntitat(codiDir3);
 		
 		Long t2 = System.currentTimeMillis();
-//		logger.debug(">>>> >> obtinguts" + procedimentsGda.size() + " procediments (" + (t2 - t1) + "ms)");
+		logger.debug(">>>> >> obtinguts" + procedimentsEntitat.size() + " procediments (" + (t2 - t1) + "ms)");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.consulta.gesconadm.result", new Object[] {procedimentsEntitat.size()}));
 		progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(t2 - t1)}));
 		

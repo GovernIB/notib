@@ -253,7 +253,7 @@ public class ProcedimentController extends BaseUserController{
 		
 		return getModalControllerReturnValueSuccess(
 				request,
-				"redirect:procediments",
+				"redirect:../../procediment",
 				"procediment.controller.update.auto.ok");
 	}
 	
