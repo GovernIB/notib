@@ -47,6 +47,7 @@ import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.GrupEntity;
@@ -126,6 +127,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private IntegracioHelper integracioHelper;
 	@Resource
 	private MetricsHelper metricsHelper;
+	@Resource
+	private OrganGestorService organGestorService;
 	
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
 	
@@ -376,12 +379,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						progres.incrementProcedimentsActualitzats();
 						continue;
 					}
-					// Organ gestor
-	//				logger.debug(">>>> >> Comprovant Organ gestor. Codi: " + procedimentGda.getOrganGestor() +  "...");
-					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ", new Object[] {procedimentGda.getOrganGestor()}));
-					
-					OrganGestorEntity organGestor = organGestorRepository.findByCodi(procedimentGda.getOrganGestor());
-	//				logger.debug(">>>> >> organ gestor " + (organGestor == null ? "NOU" : "EXISTENT"));
 					
 					ProcedimentEntity procediment = procedimentRepository.findByCodi(procedimentGda.getCodi());
 					if (procediment != null) {
@@ -394,6 +391,14 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							continue;
 						}
 					}
+
+					// Organ gestor
+					//				logger.debug(">>>> >> Comprovant Organ gestor. Codi: " + procedimentGda.getOrganGestor() +  "...");
+					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ", new Object[] {procedimentGda.getOrganGestor()}));
+					
+					OrganGestorEntity organGestor = organGestorRepository.findByCodi(procedimentGda.getOrganGestor());
+					//				logger.debug(">>>> >> organ gestor " + (organGestor == null ? "NOU" : "EXISTENT"));
+					
 					if (organGestor == null) {
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ.result.no"));
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ.crear", new Object[] {procedimentGda.getOrganGestor()}));
@@ -523,29 +528,20 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	//					logger.debug(">>>> Processant organ gestor " + organGestorAntic.getCodi() + "...   ");
 						progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ", new Object[] {organGestorAntic.getCodi()}));
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.us"));
+
 						// Si canviam l'organ gestor, i aquest no s'utilitza en cap altre procediment, l'eliminarem (2)
-						List<ProcedimentEntity> procedimentsOrganGestorAntic = procedimentRepository.findByOrganGestorId(organGestorAntic.getId());
-						if (procedimentsOrganGestorAntic == null || procedimentsOrganGestorAntic.isEmpty()) {
+						if (!organGestorService.organGestorEnUs(organGestorAntic.getId())) {
 							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.us.result.no"));
-							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.permis"));
-							 if (!permisosHelper.hasAnyPermis(
-									 organGestorAntic.getId(),
-									 OrganGestorEntity.class)) {
-								 progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.permis.result.no"));
-								 progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.result.borrar"));
-								 progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.borrar", new Object[] {organGestorAntic.getCodi()}));
-								 
-								 organGestorRepository.delete(organGestorAntic);
-								 
-								 progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.borrat"));
-	//							 logger.debug(">>>> ELIMINAT: No té cap procediment ni permís assignat.");
-							 } else {
-								 progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.permis.result.si"));
-								 progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.result.permis"));
-	//							 logger.debug(">>>> NO ELIMINAT: Té permisos configurats.");
-							 }
-						} else {
-	//						logger.debug(">>>> NO ELIMINAT: Té altres procediments assignats.");
+							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.permis.result.no"));
+							progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.result.borrar"));
+							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.borrar", new Object[] {organGestorAntic.getCodi()}));
+							organGestorRepository.delete(organGestorAntic);
+							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.borrat"));
+							//logger.debug(">>>> ELIMINAT: No té cap procediment ni permís assignat.");
+						}else{
+							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.permis.result.si"));
+							progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.result.permis"));
+//							logger.debug(">>>> NO ELIMINAT: Té permisos configurats.");
 							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.us.result.si"));
 							progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.result.procediments"));
 						}
@@ -618,7 +614,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		if (eliminar != null) {
 			return new Boolean(eliminar).booleanValue();
 		} else {
-			return true;
+			return false;
 		}
 	}
 
@@ -652,17 +648,19 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			ProcedimentEntity procedimentEntity = entityComprovarHelper.comprovarProcediment(
 					entitat, 
 					id);
-			OrganGestorEntity organGestor = procedimentEntity.getOrganGestor();
-		
 			//Eliminar procediment
 			procedimentRepository.delete(procedimentEntity);
-			
-			if (organGestor != null) {
-				List<ProcedimentEntity> procedimentsOrganGestorAntic = procedimentRepository.findByOrganGestorId(organGestor.getId());
-				if (procedimentsOrganGestorAntic == null || procedimentsOrganGestorAntic.isEmpty()) {
-					organGestorRepository.delete(organGestor);
-				}
-			}
+
+			//TODO: Decidir si mantenir l'Organ Gestor encara que no hi hagi procediments o no
+			//		Recordar que ara l'Organ té més coses assignades: Administrador, grups, pagadors ...
+			//		Es pot mirar si esta en ús amb la funció organGestorService.organGestorEnUs(organId);
+//			OrganGestorEntity organGestor = procedimentEntity.getOrganGestor();
+//			if (organGestor != null) {
+//				List<ProcedimentEntity> procedimentsOrganGestorAntic = procedimentRepository.findByOrganGestorId(organGestor.getId());
+//				if (procedimentsOrganGestorAntic == null || procedimentsOrganGestorAntic.isEmpty()) {
+//					organGestorRepository.delete(organGestor);
+//				}
+//			}
 
 			return conversioTipusHelper.convertir(
 					procedimentEntity, 
@@ -1113,7 +1111,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				entitat = entityComprovarHelper.comprovarEntitat(
 						entitatId,
 						false,
-						true,
+						false,
 						false);
 			
 			entityComprovarHelper.comprovarProcediment(
@@ -1136,9 +1134,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Override
 	public void permisUpdate(
 			Long entitatId,
+			Long organGestorId,
 			Long id,
-			PermisDto permis,
-			boolean isAdministrador) {
+			PermisDto permis) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Modificació del permis del procediment ("
@@ -1146,23 +1144,41 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					+ "id=" + id + ", "
 					+ "permis=" + permis + ")");
 			
-			if (entitatId != null && !isAdministrador)
-				entityComprovarHelper.comprovarEntitat(
-						entitatId,
-						false,
-						true,
-						false);
-			entityComprovarHelper.comprovarProcediment(
-					null,
-					id,
-					false,
-					false,
-					false,
-					false);
+			entityComprovarHelper.comprovarPermisAdminEntitatOAdminOrgan(entitatId,organGestorId);
+			 
+			entityComprovarHelper.comprovarProcediment(entitatId,id);
+			
 			permisosHelper.updatePermis(
 					id,
 					ProcedimentEntity.class,
 					permis);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional
+	public void permisDelete(
+			Long entitatId,
+			Long organGestorId,
+			Long id,
+			Long permisId) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Eliminació del permis del meta-expedient ("
+					+ "entitatId=" + entitatId +  ", "
+					+ "id=" + id + ", "
+					+ "permisId=" + permisId + ")");
+			
+			entityComprovarHelper.comprovarPermisAdminEntitatOAdminOrgan(entitatId,organGestorId);
+			
+			entityComprovarHelper.comprovarProcediment(entitatId,id);
+			
+			permisosHelper.deletePermis(
+					id,
+					ProcedimentEntity.class,
+					permisId);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1180,8 +1196,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					+ "entitatId=" + entitatId +  ", "
 					+ "id=" + id + ", "
 					+ "permis=" + procedimentGrup + ")");
+			
+			//TODO: en cas de NOT_USER, comprovar que sigui administrador d'Organ i que tant el grup com el procediment son de l'Organ.
+			
 			ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
-					null,
+					entitatId,
 					id,
 					false,
 					false,
@@ -1211,8 +1230,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					+ "entitatId=" + entitatId +  ", "
 					+ "id=" + id + ", "
 					+ "permis=" + procedimentGrup + ")");
+			
+			//TODO: en cas de NOT_USER, comprovar que sigui administrador d'Organ i que tant el grup com el procediment son de l'Organ.
+			
 			ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
-					null,
+					entitatId,
 					id,
 					false,
 					false,
@@ -1242,6 +1264,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					+ "entitatId=" + entitatId +  ", "
 					+ "procedimentGrupID=" + procedimentGrupId + ")");
 			
+			//TODO: en cas de NOT_USER, comprovar que sigui administrador d'Organ i que tant el grup com el procediment son de l'Organ.
 			entityComprovarHelper.comprovarEntitat(
 					entitatId,
 					false,
@@ -1256,44 +1279,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 	}
 
-	
-	@Override
-	@Transactional
-	public void permisDelete(
-			Long entitatId,
-			Long id,
-			Long permisId,
-			boolean isAdministrador) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			logger.debug("Eliminació del permis del meta-expedient ("
-					+ "entitatId=" + entitatId +  ", "
-					+ "id=" + id + ", "
-					+ "permisId=" + permisId + ")");
-			EntitatEntity entitat = null;
-			
-			if (entitatId != null && !isAdministrador)
-				entitat = entityComprovarHelper.comprovarEntitat(
-						entitatId,
-						false,
-						true,
-						false);
-			
-			entityComprovarHelper.comprovarProcediment(
-					entitat,
-					id,
-					false,
-					false,
-					false,
-					false);
-			permisosHelper.deletePermis(
-					id,
-					ProcedimentEntity.class,
-					permisId);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
 	
 	@Override
 	@Transactional(readOnly = true)

@@ -62,6 +62,9 @@ public class PagadorPostalServiceImpl implements PagadorPostalService{
 		try {
 			logger.debug("Creant un nou pagador postal ("
 					+ "pagador=" + postal + ")");
+			
+			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que indica Organ al pagadorPostal i que es administrador de l'organ indicat
+			
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			OrganGestorEntity organGestor = null;
 			if (postal.getOrganGestorId() != null) {
@@ -95,6 +98,8 @@ public class PagadorPostalServiceImpl implements PagadorPostalService{
 			logger.debug("Actualitzant pagador postal ("
 					+ "pagador=" + postal + ")");
 					
+			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que indica Organ al pagadorPostal i que es administrador de l'organ indicat
+
 			PagadorPostalEntity pagadorPostalEntity = entityComprovarHelper.comprovarPagadorPostal(postal.getId());
 			pagadorPostalEntity.update(
 							postal.getDir3codi(),
@@ -117,6 +122,9 @@ public class PagadorPostalServiceImpl implements PagadorPostalService{
 	public PagadorPostalDto delete(Long id) throws NotFoundException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+
+			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que l'usuari es administrador de l'Organ associat al pagadorPostal a eliminar.
+
 			PagadorPostalEntity pagadorPostalEntity = entityComprovarHelper.comprovarPagadorPostal(id);
 			pagadorPostalReposity.delete(id);
 			return conversioTipusHelper.convertir(
@@ -164,19 +172,25 @@ public class PagadorPostalServiceImpl implements PagadorPostalService{
 						filtre.getOrganGestorId());
 				organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
 						entitat.getDir3Codi(), 
-						organGestor.getCodi());	
+						organGestor.getCodi());
+				
+				pagadorPostal = pagadorPostalReposity.findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitatWithOrgan(
+						filtre.getDir3codi() == null || filtre.getDir3codi().isEmpty(),
+						filtre.getDir3codi(),
+						filtre.getContracteNum() == null || filtre.getContracteNum().isEmpty(),
+						filtre.getContracteNum(),
+						organsFills,
+						entitat,
+						paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio));
+			}else {
+				pagadorPostal = pagadorPostalReposity.findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitat(
+						filtre.getDir3codi() == null || filtre.getDir3codi().isEmpty(),
+						filtre.getDir3codi(),
+						filtre.getContracteNum() == null || filtre.getContracteNum().isEmpty(),
+						filtre.getContracteNum(),
+						entitat,
+						paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio));
 			}
-			
-			pagadorPostal = pagadorPostalReposity.findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitat(
-					filtre.getDir3codi() == null || filtre.getDir3codi().isEmpty(),
-					filtre.getDir3codi(),
-					filtre.getContracteNum() == null || filtre.getContracteNum().isEmpty(),
-					filtre.getContracteNum(),
-					filtre.getOrganGestorId() == null,
-//					filtre.getOrganGestorId(),
-					organsFills,
-					entitat,
-					paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio));
 			
 			return paginacioHelper.toPaginaDto(
 					pagadorPostal,

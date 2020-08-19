@@ -38,7 +38,10 @@ public class EntitatHelper {
 		List<EntitatDto> entitats = (List<EntitatDto>)request.getAttribute(
 				REQUEST_ATTRIBUTE_ENTITATS);
 		if (entitats == null && entitatService != null) {
-			entitats = entitatService.findAccessiblesUsuariActual(RolHelper.getRolActual(request));
+			String rolActual = RolHelper.getRolActual(request);
+			if (rolActual == null)
+				rolActual = "";
+			entitats = entitatService.findAccessiblesUsuariActual(rolActual);
 			request.setAttribute(REQUEST_ATTRIBUTE_ENTITATS, entitats);
 		}
 		//Si només hi ha una entitat

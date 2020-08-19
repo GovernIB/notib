@@ -84,7 +84,7 @@ public class EntityComprovarHelper {
 	private PermisosHelper permisosHelper;
 	@Autowired
 	private GrupProcedimentRepository grupProcedimentRepository;
-
+	
 	public EntitatEntity comprovarEntitat(
 			Long entitatId,
 			boolean comprovarPermisUsuari,
@@ -329,6 +329,12 @@ public class EntityComprovarHelper {
 	public ProcedimentEntity comprovarProcediment(
 			EntitatEntity entitat,
 			Long id) {
+		return comprovarProcediment(entitat.getId(), id);
+	}
+	
+	public ProcedimentEntity comprovarProcediment(
+			Long entitatId,
+			Long id) {
 		
 		ProcedimentEntity procediment = procedimentRepository.findOne(id);
 		if (procediment == null) {
@@ -337,15 +343,67 @@ public class EntityComprovarHelper {
 					ProcedimentEntity.class);
 		}
 		
-		if (entitat != null && !entitat.equals(procediment.getEntitat())) {
+		if (entitatId != null && !entitatId.equals(procediment.getEntitat().getId())) {
 			throw new ValidationException(
 					id,
 					ProcedimentEntity.class,
-					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat del procediment");
+					"L'entitat especificada (id=" + entitatId + ") no coincideix amb l'entitat del procediment");
 		}
 		
 		return procediment;
 	}
+	
+	public void comprovarPermisAdminEntitatOAdminOrgan(
+			Long entitatId,
+			Long organGestorId) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		
+		if (organGestorId != null) {
+			boolean hasPermisAdmin = permisosHelper.isGrantedAll(
+					organGestorId, 
+					OrganGestorEntity.class, 
+					new Permission[] {ExtendedPermission.ADMINISTRADOR}, 
+					auth);
+			if (!hasPermisAdmin) {
+				throw new PermissionDeniedException(
+						organGestorId,
+						OrganGestorEntity.class,
+						auth.getName(),
+						"ADMINISTRADOR");
+			}
+		} else {
+			boolean hasPermisAdmin = permisosHelper.isGrantedAll(
+					entitatId,
+					EntitatEntity.class,
+					new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT},
+					auth);
+			if (!hasPermisAdmin) {
+				throw new PermissionDeniedException(
+						entitatId,
+						EntitatEntity.class,
+						auth.getName(),
+						"ADMINISTRADORENTITAT");
+			}
+		}
+		
+	}
+	
+	public void comprovarPermisosOrganGestor(String organCodiDir3) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		OrganGestorEntity organGestorEntity = organGestorRepository.findByCodi(organCodiDir3);
+		Boolean hasPermisAdminOrgan = permisosHelper.isGrantedAny(
+				organGestorEntity.getId(), 
+				OrganGestorEntity.class, 
+				new Permission[] {ExtendedPermission.ADMINISTRADOR}, 
+				auth);
+		if (!hasPermisAdminOrgan)
+			throw new PermissionDeniedException(
+					organGestorEntity.getId(),
+					OrganGestorEntity.class,
+					auth.getName(),
+					"ADMINISTRADOR");
+	}
+	
 	public OrganGestorEntity comprovarOrganGestor(
 			EntitatEntity entitat,
 			Long id) {
@@ -426,6 +484,25 @@ public class EntityComprovarHelper {
 		}
 		
 		return notificacio;
+	}
+	
+	public ProcedimentEntity comprovarProcediment(
+			Long entitatId,
+			Long id,
+			boolean comprovarPermisConsulta,
+			boolean comprovarPermisProcessar,
+			boolean comprovarPermisNotificacio,
+			boolean comprovarPermisGestio) {
+		
+		EntitatEntity entitatEntity = comprovarEntitat(entitatId);
+		
+		return comprovarProcediment(
+				entitatEntity,
+				id,
+				comprovarPermisConsulta,
+				comprovarPermisProcessar,
+				comprovarPermisNotificacio,
+				comprovarPermisGestio);
 	}
 	
 	public ProcedimentEntity comprovarProcediment(

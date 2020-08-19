@@ -35,7 +35,7 @@ public class PagadorPostalServiceBean implements PagadorPostalService {
 	PagadorPostalService delegate;
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PagadorPostalDto create(
 			Long entitatId, 
 			PagadorPostalDto postal) {
@@ -45,13 +45,13 @@ public class PagadorPostalServiceBean implements PagadorPostalService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PagadorPostalDto update(PagadorPostalDto postal) throws NotFoundException {
 		return delegate.update(postal);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PagadorPostalDto delete(Long id) throws NotFoundException {
 		return delegate.delete(id);
 	}
