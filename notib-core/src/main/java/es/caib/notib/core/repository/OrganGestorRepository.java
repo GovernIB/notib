@@ -61,6 +61,38 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("nom") String nom,
 			Pageable paginacio);
 	
+	@Query( "select distinct og " +
+			"from OrganGestorEntity og " +
+			"where (og.entitat = :entitat)" +
+			"and og.codi in (:organsIds)")
+	public Page<OrganGestorEntity> findByEntitatAndOrganGestor(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("organsIds") List<String> organs,
+			Pageable paginacio);
+	
+	@Query( "select distinct og " +
+			"from OrganGestorEntity og " +
+			"where (og.entitat = :entitat)" +
+			"and og.codi in (:organsIds)")
+	public List<OrganGestorEntity> findByEntitatAndOrgansGestors(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("organsIds") List<String> organs);
+	
+	@Query(	"from " +
+			"    OrganGestorEntity og " +
+			"where (og.entitat = :entitat)" + 
+			"and og.codi in (:organsIds)" +
+			" and (:isCodiNull = true or lower(og.codi) like lower('%'||:codi||'%'))" +
+			" and (:isNomNull = true or lower(og.nom) like lower('%'||:nom||'%'))")
+	public Page<OrganGestorEntity> findByEntitatAndOrganGestorAndFiltre(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("organsIds") List<String> organs,
+			@Param("isCodiNull") boolean isCodiNull,
+			@Param("codi") String codi,
+			@Param("isNomNull") boolean isNomNull,
+			@Param("nom") String nom,
+			Pageable paginacio);
+	
 	@Query(	"select distinct og.codi " +
 			"from OrganGestorEntity og " +
 			"     left outer join og.entitat e " + 

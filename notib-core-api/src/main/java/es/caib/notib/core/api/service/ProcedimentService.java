@@ -36,7 +36,7 @@ public interface ProcedimentService {
 	 *            Informació del procediment a crear.
 	 * @return El procediment creat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public ProcedimentDto create(
 			Long entitatId,
 			ProcedimentDto procediment);
@@ -50,7 +50,7 @@ public interface ProcedimentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public ProcedimentDto update(
 			Long entitatId,
 			ProcedimentDto procediment,
@@ -65,7 +65,7 @@ public interface ProcedimentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public ProcedimentDto delete(
 			Long entitatId,
 			Long id) throws NotFoundException;
@@ -258,12 +258,12 @@ public interface ProcedimentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public void permisUpdate(
 			Long entitatId,
+			Long organGestorId,
 			Long id,
-			PermisDto permis,
-			boolean isAdministrador) throws NotFoundException;
+			PermisDto permis) throws NotFoundException;
 	
 	/**
 	 * Esborra els permisos d'un usuari o d'un rol per a un procediment.
@@ -277,12 +277,12 @@ public interface ProcedimentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public void permisDelete(
 			Long entitatId,
+			Long organGestorId,
 			Long id,
-			Long permisId,
-			boolean isAdministrador) throws NotFoundException;
+			Long permisId) throws NotFoundException;
 	
 	/**
 	 * Assigna un grup a un procediment.
@@ -296,7 +296,7 @@ public interface ProcedimentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public void grupCreate(
 			Long entitatId,
 			Long id,
@@ -314,7 +314,7 @@ public interface ProcedimentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public void grupUpdate(
 			Long entitatId,
 			Long id,
@@ -330,7 +330,7 @@ public interface ProcedimentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public void grupDelete(
 			Long entitatId,
 			Long GrupId) throws NotFoundException;

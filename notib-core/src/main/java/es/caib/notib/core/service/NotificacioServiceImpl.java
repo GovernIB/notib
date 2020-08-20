@@ -161,7 +161,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			GrupEntity grupNotificacio = null;
 			String documentGesdocId = null;
 			ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
-						null,
+						entitat,
 					 	notificacio.getProcediment().getId(),
 					 	false,
 					 	false,

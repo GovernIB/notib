@@ -139,11 +139,12 @@ public class ProcedimentPermisController extends BaseUserController{
 							procedimentId));
 			return "procedimentAdminPermisForm";
 		}
+		Long organGestorActualId = getOrganGestorActual(request).getId();
 		procedimentService.permisUpdate(
 				entitatActual.getId(),
+				organGestorActualId,
 				procedimentId,
-				PermisCommand.asDto(command),
-				isAdministrador(request));
+				PermisCommand.asDto(command));
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../procediment/" + procedimentId + "/permis",
@@ -157,11 +158,12 @@ public class ProcedimentPermisController extends BaseUserController{
 			@PathVariable Long permisId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		Long organGestorActualId = getOrganGestorActual(request).getId();
 		procedimentService.permisDelete(
 				entitatActual.getId(),
+				organGestorActualId,
 				procedimentId,
-				permisId,
-				isAdministrador(request));
+				permisId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../../../procediment/" + procedimentId + "/permis",

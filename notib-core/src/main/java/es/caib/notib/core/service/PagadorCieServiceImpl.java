@@ -62,6 +62,9 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 		try {
 			logger.debug("Creant un nou pagador cie ("
 					+ "pagador=" + cie + ")");
+			
+			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que indica Organ al pagadorCIE i que es administrador de l'organ indicat
+			
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			OrganGestorEntity organGestor = null;
 			if (cie.getOrganGestorId() != null) {
@@ -91,7 +94,10 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Actualitzant pagador cie ("
-					+ "pagador=" + cie + ")");	
+					+ "pagador=" + cie + ")");
+			
+			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que indica Organ al pagadorCIE i que es administrador de l'organ indicat
+			
 			PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(cie.getId());
 			pagadorCieEntity.update(
 							cie.getDir3codi(),
@@ -112,6 +118,9 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	public PagadorCieDto delete(Long id) throws NotFoundException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			
+			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que l'usuari es administrador de l'Organ associat al pagadorCIE a eliminar.
+			
 			PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(id);
 			pagadorCieReposity.delete(id);
 			return conversioTipusHelper.convertir(
@@ -161,17 +170,23 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 						filtre.getOrganGestorId());
 				organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
 						entitat.getDir3Codi(), 
-						organGestor.getCodi());	
+						organGestor.getCodi());
+				
+				pagadorCie = pagadorCieReposity.findByCodiDir3NotNullFiltrePaginatAndEntitatWithOrgan(
+						filtre.getDir3codi() == null || filtre.getDir3codi().isEmpty(),
+						filtre.getDir3codi(),
+						organsFills,
+						entitat,
+						paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio));
+			}else{
+				pagadorCie = pagadorCieReposity.findByCodiDir3NotNullFiltrePaginatAndEntitat(
+						filtre.getDir3codi() == null || filtre.getDir3codi().isEmpty(),
+						filtre.getDir3codi(),
+						entitat,
+						paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio));
 			}
 			
-			pagadorCie = pagadorCieReposity.findByCodiDir3NotNullFiltrePaginatAndEntitat(
-					filtre.getDir3codi() == null || filtre.getDir3codi().isEmpty(),
-					filtre.getDir3codi(),
-					filtre.getOrganGestorId() == null,
-//					filtre.getOrganGestorId(),
-					organsFills,
-					entitat,
-					paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio));
+			
 			
 			return paginacioHelper.toPaginaDto(
 					pagadorCie,

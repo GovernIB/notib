@@ -21,33 +21,33 @@ import es.caib.notib.core.api.exception.NotFoundException;
  */
 public interface OrganGestorService {
 
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public OrganGestorDto create(OrganGestorDto dto);
 	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public OrganGestorDto delete(Long entitatId, Long organId);
 	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public void updateNom(
 			Long entitatId, 
 			String organGestorCodi);
 	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public void updateNoms(
-			Long entitatId);
+			Long entitatId, String organActualCodiDir3);
 
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public boolean organGestorEnUs(Long organId);
 	
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	public List<OrganGestorDto> findAll();
 	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public OrganGestorDto findById(
 			Long entitatId,
 			Long id);
 	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public OrganGestorDto findByCodi(
 			Long entitatId,
 			String codi);
@@ -55,7 +55,7 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public List<OrganGestorDto> findByEntitat(Long entitatId);
 	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public List<CodiValorDto> findOrgansGestorsCodiByEntitat(Long entitatId);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
@@ -69,6 +69,7 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
 			Long entitatId, 
+			String organCodiDir3,
 			OrganGestorFiltreDto filtre, 
 			PaginacioParamsDto paginacioParams);
 
@@ -77,13 +78,13 @@ public interface OrganGestorService {
 			Long entitatId,
 			Long id) throws NotFoundException;
 	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public void permisUpdate(
 			Long entitatId,
 			Long id,
 			PermisDto permis) throws NotFoundException;
 	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public void permisDelete(
 			Long entitatId,
 			Long id,

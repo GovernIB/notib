@@ -24,7 +24,7 @@ public interface PagadorCieFormatSobreService {
 	 * 				Informació del pagador cie a crear
 	 * @return	El pagador cie creat
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public PagadorCieFormatSobreDto create(
 			Long pagadorCieId,
 			PagadorCieFormatSobreDto formatSobre);
@@ -37,7 +37,7 @@ public interface PagadorCieFormatSobreService {
 	 * @return
 	 * @throws NotFoundException
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public PagadorCieFormatSobreDto update(PagadorCieFormatSobreDto formatSobre) throws NotFoundException;
 
 	/**
@@ -49,7 +49,7 @@ public interface PagadorCieFormatSobreService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public PagadorCieFormatSobreDto delete(
 			Long id) throws NotFoundException;
 

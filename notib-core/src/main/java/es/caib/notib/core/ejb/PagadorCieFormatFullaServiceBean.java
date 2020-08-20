@@ -29,7 +29,7 @@ public class PagadorCieFormatFullaServiceBean implements PagadorCieFormatFullaSe
 	PagadorCieFormatFullaService delegate;
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER",})
 	public PagadorCieFormatFullaDto create(Long pagadorCieId, PagadorCieFormatFullaDto formatSobre) {
 		return delegate.create(
 				pagadorCieId, 
@@ -37,13 +37,13 @@ public class PagadorCieFormatFullaServiceBean implements PagadorCieFormatFullaSe
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER",})
 	public PagadorCieFormatFullaDto update(PagadorCieFormatFullaDto formatSobre) throws NotFoundException {
 		return delegate.update(formatSobre);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER",})
 	public PagadorCieFormatFullaDto delete(Long id) throws NotFoundException {
 		return delegate.delete(id);
 	}
