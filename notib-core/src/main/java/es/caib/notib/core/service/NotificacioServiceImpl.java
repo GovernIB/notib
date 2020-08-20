@@ -1188,7 +1188,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			int maxPendents = getNotificaEnviamentsProcessarMaxProperty();
-			List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatRegistrada(
+			List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatRegistradaAmbReintentsDisponibles(
 					pluginHelper.getNotificaReintentsMaxProperty(), 
 					new PageRequest(0, maxPendents));
 			return pendents;

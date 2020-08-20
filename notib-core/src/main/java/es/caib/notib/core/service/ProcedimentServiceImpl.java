@@ -52,6 +52,7 @@ import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.GrupProcedimentEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PagadorCieEntity;
 import es.caib.notib.core.entity.PagadorPostalEntity;
@@ -73,6 +74,7 @@ import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.GrupRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentFormRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
@@ -129,6 +131,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private MetricsHelper metricsHelper;
 	@Resource
 	private OrganGestorService organGestorService;
+	@Resource
+	private NotificacioRepository notificacioRepository;
 	
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
 	
@@ -234,6 +238,18 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			
 			if (!procediment.isAgrupar()) {
 				grupProcedimentRepository.delete(grupsProcediment);
+			}
+			
+			//#271 Check canvi codi SIA, si es modifica s'han de modificar tots els enviaments pendents
+			if (!procediment.getCodi().equals(procedimentEntity.getCodi())) {
+				//Obtenir notificacions pendents.
+				List<NotificacioEntity> notificacionsPendentsNotificar = notificacioRepository.findNotificacionsPendentsDeNotificarByProcediment(procedimentEntity);
+				for (NotificacioEntity notificacioEntity : notificacionsPendentsNotificar) {
+					//modificar el codi SIA i activar per tal que scheduled ho torni a agafar
+					notificacioEntity.updateCodiSia(procediment.getCodi());
+					notificacioEntity.resetIntentsNotificacio();
+					notificacioRepository.save(notificacioEntity);
+				}
 			}
 			
 			// Organ gestor
