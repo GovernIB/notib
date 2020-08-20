@@ -372,25 +372,23 @@ public class ProcedimentController extends BaseUserController{
 		return organismes;
 	}
 	
-	@RequestMapping(value = "/oficines/{entitatId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/oficines/{organGestor}", method = RequestMethod.GET)
 	@ResponseBody
 	private List<OficinaDto> getOficines(
 		HttpServletRequest request,
 		Model model,
-		@PathVariable Long entitatId) {
-		EntitatDto entitat = entitatService.findById(entitatId);
-		return procedimentService.findOficines(entitat);
+		@PathVariable String organGestor) {
+		return procedimentService.findOficines(organGestor);
 	}
 	
-	@RequestMapping(value = "/llibres/{entitatId}/{oficina}", method = RequestMethod.GET)
+	@RequestMapping(value = "/llibres/{organGestor}/{oficina}", method = RequestMethod.GET)
 	@ResponseBody
 	private List<LlibreDto> getLlibres(
 		HttpServletRequest request,
 		Model model,
-		@PathVariable Long entitatId,
+		@PathVariable String organGestor,
 		@PathVariable String oficina) {
-		EntitatDto entitat = entitatService.findById(entitatId);
-		return procedimentService.findLlibres(entitat, oficina);
+		return procedimentService.findLlibres(organGestor, oficina);
 	}
 	
 	@RequestMapping(value = "/cache/refrescar", method = RequestMethod.GET)

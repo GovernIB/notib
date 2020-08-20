@@ -324,16 +324,16 @@ public class ProcedimentServiceBean implements ProcedimentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
-	public List<OficinaDto> findOficines(EntitatDto entitat) {
-		return delegate.findOficines(entitat);
+	public List<OficinaDto> findOficines(String organGestorDir3Codi) {
+		return delegate.findOficines(organGestorDir3Codi);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
 	public List<LlibreDto> findLlibres(
-			EntitatDto entitat, 
+			String organGestorDir3Codi, 
 			String oficina) {
-		return delegate.findLlibres(entitat, oficina);
+		return delegate.findLlibres(organGestorDir3Codi, oficina);
 	}
 
 	@Override
