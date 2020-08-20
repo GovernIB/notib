@@ -393,7 +393,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						}
 					}
 					
-					if (organigramaEntitat.get(procedimentGda.getOrganGestor())==null) {
+					if (!organigramaEntitat.containsKey(procedimentGda.getOrganGestor())) {
+					//if (organigramaEntitat.get(procedimentGda.getOrganGestor())==null) {
 						// Si l'Organ gestor del procediment no existeix dins el nostre organigrama, no es guarda el procediment
 						progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat.noOrganDinsOrganigrama", new Object[] {procedimentGda.getOrganGestor()}));
 //						logger.debug(">>>> Procediment DESCARTAT: No s'ha trobat l'organ del procediment dins l'organigrama de l'entitat. Organ: "+ procedimentGda.getOrganGestor());
