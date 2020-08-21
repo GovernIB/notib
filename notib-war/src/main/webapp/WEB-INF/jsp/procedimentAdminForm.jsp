@@ -4,7 +4,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-
+<% 
+pageContext.setAttribute(
+			"isRolActualAdministradorEntitat",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
+%>
 <c:choose>
 	<c:when test="${empty procedimentCommand.codi}"><c:set var="titol"><spring:message code="procediment.form.titol.crear"/> ${entitat.nom} <c:out value=" (${entitat.dir3Codi})"></c:out></c:set></c:when>
 	<c:otherwise><c:set var="titol"><spring:message code="procediment.form.titol.modificar"/> ${entitat.nom} <c:out value=" (${entitat.dir3Codi})"></c:out></c:set></c:otherwise>
@@ -46,38 +50,78 @@
 }
 </style>
 <script type="text/javascript">
+var entitatDir3 = "${entitat.dir3Codi}";
+
 $(document).ready(function() {
 	//Organismes
-	$("#searchOrgan").click(function(){
-		$("#organismesModal").modal();
-		var entitatId = $('#entitatId').val();
-		$.ajax({
-			type: 'GET',
-			url: "<c:url value="/procediment/organismes/"/>" + entitatId,
-			success: function(data) {
-				var selOrganismes = $('#selOrganismes');
-				selOrganismes.empty();
-				selOrganismes.append("<option value=\"\"></option>");
-				if (data && data.length > 0) {
-						var items = [];
-						$.each(data, function(i, val) {
-							items.push({
-								"id": val.codi,
-								"text": val.codi + " - " + val.nom
+	function loadOrganismes(){
+			var entitatId = $('#entitatId').val();
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value="/procediment/organismes/"/>" + entitatId,
+				success: function(data) {
+					var selOrganismes = $('#selOrganismes');
+					selOrganismes.empty();
+					selOrganismes.append("<option value=\"\"></option>");
+					if (data && data.length > 0) {
+							var items = [];
+							$.each(data, function(i, val) {
+								items.push({
+									"id": val.codi,
+									"text": val.codi + " - " + val.nom
+								});
+								selOrganismes.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
 							});
-							selOrganismes.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
-						});
+					}
+					var select2Options = {
+							theme: 'bootstrap',
+							width: 'auto'};
+					selOrganismes.select2(select2Options);
+					$(".loading-screen").hide();
+				},
+				error: function() {
+					console.log("error obtenint els organismes...");
 				}
-				var select2Options = {
-						theme: 'bootstrap',
-						width: 'auto'};
-				selOrganismes.select2(select2Options);
-				$(".loading-screen").hide();
-			},
-			error: function() {
-				console.log("error obtenint els organismes...");
-			}
-		});
+			});
+	};
+	loadOrganismes();
+	$("#searchOrgan").click(function(){
+		var comu = document.getElementById('comu');
+		debugger
+		if(comu == null || (comu!= null && !comu.checked)){
+			$("#organismesModal").modal();
+			var entitatId = $('#entitatId').val();
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value="/procediment/organismes/"/>" + entitatId,
+				success: function(data) {
+					var selOrganismes = $('#selOrganismes');
+					selOrganismes.empty();
+					selOrganismes.append("<option value=\"\"></option>");
+					if (data && data.length > 0) {
+							var items = [];
+							$.each(data, function(i, val) {
+								items.push({
+									"id": val.codi,
+									"text": val.codi + " - " + val.nom
+								});
+								selOrganismes.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
+							});
+					}
+					var select2Options = {
+							theme: 'bootstrap',
+							width: 'auto'};
+					selOrganismes.select2(select2Options);
+					$(".loading-screen").hide();
+				},
+				error: function() {
+					console.log("error obtenint els organismes...");
+				}
+			});
+			
+		}
+		
+		
 	});
 	$('#addOrganismeButton').on('click', function(){
 		var organSelect = document.getElementById('selOrganismes');
@@ -246,6 +290,31 @@ $(document).ready(function() {
 		$('#codiAssumpte').val(codiAssumpteSeleccionatValue);
 		$('#codiAssumpteNom').val(codiAssumpteSeleccionatText);
 	});
+	$('#comu').on('click', function(event){
+// 		var organSelect = document.getElementById('selOrganismes');
+		
+		if ($(this).is(':checked')) {
+			debugger
+			$('#organGestorNom').removeClass('habilitat');
+			$('#organGestor').val(entitatDir3);
+			var organText = '';
+			$("#selOrganismes option").each(function(){
+				if ($(this).val() == entitatDir3){        
+					organText = $(this).text();
+			    }
+		     });
+			$('#organGestorNom').val(organText);
+		}else{
+			$('#organGestorNom').addClass('habilitat');
+			$('#organGestor').val(null);
+			$('#organGestorNom').val(null);
+		}	
+	});
+	
+		
+	
+
+	
 });
 </script>
 </head>
@@ -272,14 +341,19 @@ $(document).ready(function() {
 				<not:inputText name="nom" textKey="procediment.form.camp.nom" required="true" labelSize="2"/>
 				<not:inputText name="retard" textKey="procediment.form.camp.retard" labelSize="2"/>
 				<not:inputText name="caducitat" textKey="procediment.form.camp.caducitat" labelSize="2"/>
+				<c:if test="${isRolActualAdministradorEntitat}">
+					<not:inputCheckbox name="comu" textKey="procediment.form.camp.comu" labelSize="2"/>
+					
+				</c:if>
+				<not:inputTextSearch  name="organGestorNom" textKey="procediment.form.camp.organ" searchButton="searchOrgan" required="true" readonly="true" labelSize="2"/>
 				<form:hidden path="entitatId" value="${entitat.id}"/>
 				<form:hidden path="organGestor"/>
-				<not:inputTextSearch name="organGestorNom" textKey="procediment.form.camp.organ" searchButton="searchOrgan" required="true" readonly="true" labelSize="2"/>
+				
 <%-- 				<not:inputText name="organGestor" textKey="procediment.form.camp.organ" required="true" labelSize="2"/> --%>
 				<not:inputSelect name="pagadorPostalId" emptyOption="true" textKey="procediment.form.camp.postal" optionItems="${pagadorsPostal}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>
 				<not:inputSelect name="pagadorCieId" emptyOption="true" textKey="procediment.form.camp.cie" optionItems="${pagadorsCie}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>
 				<not:inputCheckbox name="agrupar" textKey="procediment.form.camp.agrupar" labelSize="2"/>
-				<not:inputCheckbox name="comu" textKey="procediment.form.camp.comu" labelSize="2"/>
+
 			</div>
 			<div role="tabpanel" class="tab-pane <c:if test='${not empty errorRegistre}'>active</c:if>" id="registreForm">
 				<div class="alert alert-warning" role="alert">
