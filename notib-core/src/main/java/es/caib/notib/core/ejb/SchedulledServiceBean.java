@@ -10,6 +10,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.SchedulledService;
 
 /**
@@ -33,7 +34,7 @@ public class SchedulledServiceBean implements SchedulledService {
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
-	public void registrarEnviamentsPendents() {
+	public void registrarEnviamentsPendents() throws RegistreNotificaException {
 		delegate.registrarEnviamentsPendents();
 	}
 

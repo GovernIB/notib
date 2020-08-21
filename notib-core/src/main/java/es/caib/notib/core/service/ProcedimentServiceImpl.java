@@ -263,7 +263,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			}
 			// Si canviam l'organ gestor, i aquest no s'utilitza en cap altre procediment, l'eliminarem (1)
 			OrganGestorEntity organGestorAntic = null;
-			if (!procedimentEntity.getOrganGestor().getCodi().equals(procediment.getOrganGestor())) {
+			if (procedimentEntity.getOrganGestor() != null && !procedimentEntity.getOrganGestor().getCodi().equals(procediment.getOrganGestor())) {
 				organGestorAntic = procedimentEntity.getOrganGestor();
 			}
 			
@@ -1503,13 +1503,13 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<OficinaDto> findOficines(EntitatDto entitat) {
+	public List<OficinaDto> findOficines(String organGestorDir3Codi) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			List<OficinaDto> oficines = new ArrayList<OficinaDto>();
 			try {
 				List<Oficina> oficinesRegistre = pluginHelper.llistarOficines(
-						entitat.getDir3Codi(), 
+						organGestorDir3Codi, 
 						AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
 				for (Oficina oficinaRegistre : oficinesRegistre) {
 					OficinaDto oficina = new OficinaDto();
@@ -1518,7 +1518,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					oficines.add(oficina);
 				}
 			} catch (Exception e) {
-				String errorMessage = "No s'han pogut recuperar les oficines de l'entitat: " + entitat.getDir3Codi();
+				String errorMessage = "No s'han pogut recuperar les oficines de l'òrgan gestor: " + organGestorDir3Codi;
 				logger.error(
 						errorMessage, 
 						e.getMessage());
@@ -1532,14 +1532,14 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Override
 	@Transactional(readOnly = true)
 	public List<LlibreDto> findLlibres(
-			EntitatDto entitat, 
+			String organGestorDir3Codi, 
 			String oficina) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			List<LlibreDto> llibres = new ArrayList<LlibreDto>();
 			try {
 				List<Llibre> llibresRegistre = pluginHelper.llistarLlibres(
-						entitat.getDir3Codi(), 
+						organGestorDir3Codi, 
 						oficina, 
 						AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
 				for (Llibre llibreRegistre : llibresRegistre) {
@@ -1551,7 +1551,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					llibres.add(llibre);
 				}
 	 		} catch (Exception e) {
-	 			String errorMessage = "No s'han pogut recuperar els llibres de l'entitat: " + entitat.getDir3Codi();
+	 			String errorMessage = "No s'han pogut recuperar els llibres de l'òrgan gestor: " + organGestorDir3Codi;
 				logger.error(
 						errorMessage, 
 						e.getMessage());

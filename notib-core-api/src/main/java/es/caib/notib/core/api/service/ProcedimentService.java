@@ -201,7 +201,7 @@ public interface ProcedimentService {
 	 * @return La llista dels tipus d'assumpte.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public List<OficinaDto> findOficines(EntitatDto entitat);
+	public List<OficinaDto> findOficines(String organGestorDir3Codi);
 	
 	/**
 	 * Recupera els llibres d'una entitat i d'una oficina.
@@ -210,7 +210,7 @@ public interface ProcedimentService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public List<LlibreDto> findLlibres(
-			EntitatDto entitat,
+			String organGestorDir3Codi,
 			String oficina);
 	
 	/**

@@ -701,22 +701,18 @@ public class PluginHelper {
 	
 	public DocumentContingut arxiuGetImprimible(
 			String id,
-			boolean uuidCsv) {
+			boolean isUuid) {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_ARXIU, 
 				"Obtenir versió imprimible d'un document", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Identificador del document", id),
-				new AccioParam("Tipus d'identificador", uuidCsv ? "uuid" : "csv"));
+				new AccioParam("Tipus d'identificador", isUuid ? "uuid" : "csv"));
 		
 		DocumentContingut documentContingut = null;
 		try {
-			if(uuidCsv) {
-				id = "uuid:" + id;
-			} else {
-				id = "csv:" + id;
-			}
+			id = isUuid ? "uuid:" + id : "csv:" + id;
 			documentContingut = getArxiuPlugin().documentImprimible(id);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
@@ -1214,40 +1210,32 @@ public class PluginHelper {
 				Document docDetall = null;
 				if(document.getUuid() != null) {
 					id = document.getUuid();
-					try {
-						doc = arxiuGetImprimible(id, true);
-						annex.setFicheroAnexado(doc.getContingut());
-						annex.setNombreFicheroAnexado(doc.getArxiuNom());
-						docDetall = arxiuDocumentConsultar(id, null);
-						
-						if (docDetall != null) {
-							annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumental().toString());
-							annex.setOrigenCiudadanoAdmin(docDetall.getMetadades().getOrigen().ordinal());
-							annex.setFechaCaptura(toXmlGregorianCalendar(docDetall.getMetadades().getDataCaptura()));
-							
-							//Recuperar csv
-							Map<String, Object> metadadesAddicionals = docDetall.getMetadades().getMetadadesAddicionals();
-							if (metadadesAddicionals != null && metadadesAddicionals.containsKey("csv")) {
-								document.setCsv((String)metadadesAddicionals.get("csv"));
-							}
+					doc = arxiuGetImprimible(id, true);
+					annex.setFicheroAnexado(doc.getContingut());
+					annex.setNombreFicheroAnexado(doc.getArxiuNom());
+					docDetall = arxiuDocumentConsultar(id, null);
+
+					if (docDetall != null) {
+						annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumental().toString());
+						annex.setOrigenCiudadanoAdmin(docDetall.getMetadades().getOrigen().ordinal());
+						annex.setFechaCaptura(toXmlGregorianCalendar(docDetall.getMetadades().getDataCaptura()));
+
+						// Recuperar csv
+						Map<String, Object> metadadesAddicionals = docDetall.getMetadades().getMetadadesAddicionals();
+						if (metadadesAddicionals != null && metadadesAddicionals.containsKey("csv")) {
+							document.setCsv((String) metadadesAddicionals.get("csv"));
 						}
-					}catch(ArxiuException ae) {
-						logger.error("Error Obtenint el document per l'uuid");
 					}
 				} else if (document.getCsv() != null){
 					id = document.getCsv();
-					try {
-						doc = arxiuGetImprimible(id, false);
-						annex.setFicheroAnexado(doc.getContingut());
-						annex.setNombreFicheroAnexado(doc.getArxiuNom());
-						annex.setCsv(document.getCsv());
-						
-						annex.setTipoDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO.getValor());
-						annex.setOrigenCiudadanoAdmin(0);	
-						annex.setFechaCaptura(toXmlGregorianCalendar(new Date()));
-					}catch(ArxiuException ae) {
-						logger.error("Error Obtenint el document per el csv");
-					}
+					doc = arxiuGetImprimible(id, false);
+					annex.setFicheroAnexado(doc.getContingut());
+					annex.setNombreFicheroAnexado(doc.getArxiuNom());
+					annex.setCsv(document.getCsv());
+
+					annex.setTipoDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO.getValor());
+					annex.setOrigenCiudadanoAdmin(0);
+					annex.setFechaCaptura(toXmlGregorianCalendar(new Date()));
 				}
 				
 				annex.setTipoDocumento(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
@@ -1292,12 +1280,13 @@ public class PluginHelper {
 			}
 			annex.setTitulo("Annex 1");
 			annex.setModoFirma(0);
-			/*Llogica de recerca de document*/
 			return annex;
-		} catch (Exception e1) {
-			e1.printStackTrace();
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_REGISTRE, 
+					ex.getMessage(),
+					ex.getCause());
 		}
-		return null;
 	}
 	
 	public byte[] getUrlDocumentContent(String urlPath) throws SistemaExternException {
