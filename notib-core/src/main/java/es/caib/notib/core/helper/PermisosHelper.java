@@ -687,6 +687,16 @@ public class PermisosHelper {
 //		
 //		return result;
 	}
+	
+	public void revocarPermisosEntity(
+			Long objectIdentifier,
+			Class<?> clazz) {
+		List<PermisDto> permisosActuals = findPermisos(objectIdentifier, clazz);
+		for (PermisDto permisDto : permisosActuals) {
+			permisDto.revocaPermisos();
+			updatePermis(objectIdentifier, clazz, permisDto);
+		}
+	}
 
 	public interface ObjectIdentifierExtractor<T> {
 		public Long getObjectIdentifier(T object);

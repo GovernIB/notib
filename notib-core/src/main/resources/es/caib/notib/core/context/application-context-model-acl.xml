@@ -65,6 +65,15 @@
 				<bean class="org.springframework.security.core.authority.SimpleGrantedAuthority">
 					<constructor-arg value="NOT_ADMIN" />
 				</bean>
+				<bean class="org.springframework.security.core.authority.SimpleGrantedAuthority">
+					<constructor-arg value="NOT_USER" />
+				</bean>
+				<bean class="org.springframework.security.core.authority.SimpleGrantedAuthority">
+					<constructor-arg value="NOT_USER" />
+				</bean>
+				<bean class="org.springframework.security.core.authority.SimpleGrantedAuthority">
+					<constructor-arg value="NOT_USER" />
+				</bean>
 			</list>
 		</constructor-arg>
 	</bean>
