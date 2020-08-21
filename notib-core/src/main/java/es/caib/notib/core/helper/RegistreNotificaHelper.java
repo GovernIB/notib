@@ -23,6 +23,7 @@ import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
@@ -50,7 +51,7 @@ public class RegistreNotificaHelper {
 	
 	public void realitzarProcesRegistrarNotificar(
 			NotificacioEntity notificacioEntity,
-			List<NotificacioEnviamentDtoV2> enviaments) {
+			List<NotificacioEnviamentDtoV2> enviaments) throws RegistreNotificaException {
 		logger.info(" [REG-NOT] Inici procés Registrar-Notificar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
 		String dir3Codi;
 		if (notificacioEntity.getEntitat().getDir3CodiReg() != null) {
@@ -105,11 +106,14 @@ public class RegistreNotificaHelper {
 							}
 						} catch (Exception ex) {
 							logger.error(ex.getMessage(), ex);
-							updateEventWithError(
-									ex, 
-									notificacioEntity, 
-									enviament, 
-									null);
+//							updateEventWithError(
+//									ex, 
+//									notificacioEntity, 
+//									enviament, 
+//									null);
+							throw new RegistreNotificaException(
+									ex.getMessage(),
+									ex);
 						}
 					}
 				} else {
@@ -148,11 +152,14 @@ public class RegistreNotificaHelper {
 						}
 					} catch (Exception ex) {
 						logger.error(ex.getMessage(), ex);
-						updateEventWithError(
-								ex, 
-								notificacioEntity, 
-								null, 
-								notificacioEntity.getEnviaments());
+//						updateEventWithError(
+//								ex, 
+//								notificacioEntity, 
+//								null, 
+//								notificacioEntity.getEnviaments());
+						throw new RegistreNotificaException(
+								ex.getMessage(),
+								ex);
 					}
 				}
 			} else {
@@ -191,11 +198,14 @@ public class RegistreNotificaHelper {
 					}
 				} catch (Exception ex) {
 					logger.error(ex.getMessage(), ex);
-					updateEventWithError(
-							ex, 
-							notificacioEntity, 
-							null, 
-							notificacioEntity.getEnviaments());
+//					updateEventWithError(
+//							ex, 
+//							notificacioEntity, 
+//							null, 
+//							notificacioEntity.getEnviaments());
+					throw new RegistreNotificaException(
+							ex.getMessage(),
+							ex);
 				}
 			}
 		} else {
@@ -241,11 +251,14 @@ public class RegistreNotificaHelper {
 				}
 			} catch (Exception ex) {
 				logger.error(ex.getMessage(), ex);
-				updateEventWithError(
-						ex, 
-						notificacioEntity, 
-						null, 
-						notificacioEntity.getEnviaments());
+//				updateEventWithError(
+//						ex, 
+//						notificacioEntity, 
+//						null, 
+//						notificacioEntity.getEnviaments());
+				throw new RegistreNotificaException(
+						ex.getMessage(),
+						ex);
 			}
 			logger.info(" [REG-NOT] Fi procés Registrar-Notificar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
 		}

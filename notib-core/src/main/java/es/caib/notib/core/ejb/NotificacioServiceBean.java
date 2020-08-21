@@ -30,6 +30,7 @@ import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.NotificacioService;
 
 /**
@@ -136,7 +137,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public List<NotificacioDto> create(
 			Long entitatId, 
-			NotificacioDtoV2 notificacio) {
+			NotificacioDtoV2 notificacio) throws RegistreNotificaException {
 		return delegate.create(entitatId, notificacio);
 	}
 	
@@ -234,7 +235,7 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
-	public List<RegistreIdDto> registrarNotificar(Long notificacioId) {
+	public List<RegistreIdDto> registrarNotificar(Long notificacioId) throws RegistreNotificaException {
 		return delegate.registrarNotificar(notificacioId);
 	}
 
@@ -270,7 +271,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-	public void notificacioRegistrar(Long notificacioId) {
+	public void notificacioRegistrar(Long notificacioId) throws RegistreNotificaException {
 		delegate.notificacioRegistrar(notificacioId);		
 	}
 	
