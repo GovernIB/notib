@@ -32,6 +32,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	
 	List<NotificacioEntity> findByTipusUsuari(TipusUsuariEnumDto tipusUsuari);
 	
+	List<NotificacioEntity> findByProcedimentId(Long id);
+	
 	@Query(
 			"from " +
 			"    NotificacioEntity ntf " +

@@ -139,7 +139,7 @@ public class ProcedimentPermisController extends BaseUserController{
 							procedimentId));
 			return "procedimentAdminPermisForm";
 		}
-		Long organGestorActualId = getOrganGestorActual(request).getId();
+		Long organGestorActualId = getOrganGestorActualId(request);
 		procedimentService.permisUpdate(
 				entitatActual.getId(),
 				organGestorActualId,
@@ -158,7 +158,7 @@ public class ProcedimentPermisController extends BaseUserController{
 			@PathVariable Long permisId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		Long organGestorActualId = getOrganGestorActual(request).getId();
+		Long organGestorActualId = getOrganGestorActualId(request);
 		procedimentService.permisDelete(
 				entitatActual.getId(),
 				organGestorActualId,

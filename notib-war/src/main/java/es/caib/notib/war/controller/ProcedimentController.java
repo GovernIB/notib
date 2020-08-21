@@ -213,16 +213,31 @@ public class ProcedimentController extends BaseUserController{
 			HttpServletRequest request,
 			@PathVariable Long procedimentId) {		
 		
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		
-		procedimentService.delete(
-				entitat.getId(),
-				procedimentId);
-		
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../procediment",
-				"procediment.controller.esborrat.ok");
+		try {
+			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+			
+			if (procedimentService.procedimentEnUs(procedimentId)) {
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../procediment",
+						"procediment.controller.esborrat.enUs");
+			} else {
+				procedimentService.delete(
+						entitat.getId(),
+						procedimentId);
+				
+				return getAjaxControllerReturnValueSuccess(
+						request,
+						"redirect:../../procediment",
+						"procediment.controller.esborrat.ok");
+			}
+		} catch (Exception e) {
+			return getAjaxControllerReturnValueError(
+					request,
+					"redirect:../../procediment",
+					"procediment.controller.esborrat.ko",
+					e);
+		}
 	}
 	
 	@RequestMapping(value = "/update/auto", method = RequestMethod.GET)
