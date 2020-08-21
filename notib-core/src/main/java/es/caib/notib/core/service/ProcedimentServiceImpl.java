@@ -305,6 +305,23 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 	}
 	
+	@Override
+	@Transactional(readOnly = true)
+	public boolean procedimentEnUs(Long procedimentId) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			//Compravacions en ús
+			boolean procedimentEnUs=false;
+				//1) Si té notificacions
+				List<NotificacioEntity> notificacionsByProcediment = notificacioRepository.findByProcedimentId(procedimentId);
+				procedimentEnUs=notificacionsByProcediment != null && !notificacionsByProcediment.isEmpty();
+			
+			return procedimentEnUs;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
 	private String findDenominacioOrganisme(String codiDir3) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -676,8 +693,14 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			ProcedimentEntity procedimentEntity = entityComprovarHelper.comprovarProcediment(
 					entitat, 
 					id);
+			//Eliminar grups del procediment
+			List<GrupProcedimentEntity> grupsDelProcediment = grupProcedimentRepository.findByProcediment(procedimentEntity);
+			for (GrupProcedimentEntity grupProcedimentEntity : grupsDelProcediment) {
+				grupProcedimentRepository.delete(grupProcedimentEntity);
+			}
 			//Eliminar procediment
 			procedimentRepository.delete(procedimentEntity);
+			permisosHelper.revocarPermisosEntity(id,ProcedimentEntity.class);
 
 			//TODO: Decidir si mantenir l'Organ Gestor encara que no hi hagi procediments o no
 			//		Recordar que ara l'Organ té més coses assignades: Administrador, grups, pagadors ...

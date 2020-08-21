@@ -145,6 +145,9 @@ public interface ProcedimentService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public List<ProcedimentDto> findAll();
+	
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	public boolean procedimentEnUs(Long procedimentId);
 
 	/**
 	 * Llistat amb tots els grups.
