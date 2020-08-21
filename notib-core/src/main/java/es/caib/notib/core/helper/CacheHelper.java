@@ -27,6 +27,9 @@ import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
+import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
+import es.caib.notib.plugin.registre.Llibre;
+import es.caib.notib.plugin.registre.Oficina;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 
@@ -154,6 +157,33 @@ public class CacheHelper {
 	public String findDenominacioOrganisme(
 			String codiDir3) {
 		return pluginHelper.getDenominacio(codiDir3);
+	}
+	
+	@Cacheable(value = "findOficinesEntitat", key="#codiDir3")
+	public List<Oficina> llistarOficinesEntitat(
+			String codiDir3) {
+		return pluginHelper.llistarOficines(
+				codiDir3, 
+				AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
+	}
+	
+	@Cacheable(value = "findLlibresOficina", key="#codiDir3Oficina")
+	public List<Llibre> llistarLlibresOficina(
+			String codiDir3Entitat,
+			String codiDir3Oficina) {
+		return pluginHelper.llistarLlibres(
+				codiDir3Entitat, 
+				codiDir3Oficina, 
+				AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
+	}
+	
+	@Cacheable(value = "findLlibreOrganisme", key="#codiDir3Organ")
+	public Llibre getLlibreOrganGestor(
+			String codiDir3Entitat,
+			String codiDir3Organ) {
+		return pluginHelper.llistarLlibreOrganisme(
+				codiDir3Entitat,
+				codiDir3Organ);
 	}
 	
 	@CacheEvict(value = "findPermisProcedimentsUsuariActualAndEntitat", key="#entitatId")

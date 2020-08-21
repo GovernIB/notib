@@ -79,7 +79,6 @@ import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentFormRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
-import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.Llibre;
 import es.caib.notib.plugin.registre.Oficina;
@@ -300,6 +299,23 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			return conversioTipusHelper.convertir(
 					procedimentEntity, 
 					ProcedimentDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public boolean procedimentEnUs(Long procedimentId) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			//Compravacions en ús
+			boolean procedimentEnUs=false;
+				//1) Si té notificacions
+				List<NotificacioEntity> notificacionsByProcediment = notificacioRepository.findByProcedimentId(procedimentId);
+				procedimentEnUs=notificacionsByProcediment != null && !notificacionsByProcediment.isEmpty();
+			
+			return procedimentEnUs;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -676,8 +692,14 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			ProcedimentEntity procedimentEntity = entityComprovarHelper.comprovarProcediment(
 					entitat, 
 					id);
+			//Eliminar grups del procediment
+			List<GrupProcedimentEntity> grupsDelProcediment = grupProcedimentRepository.findByProcediment(procedimentEntity);
+			for (GrupProcedimentEntity grupProcedimentEntity : grupsDelProcediment) {
+				grupProcedimentRepository.delete(grupProcedimentEntity);
+			}
 			//Eliminar procediment
 			procedimentRepository.delete(procedimentEntity);
+			permisosHelper.revocarPermisosEntity(id,ProcedimentEntity.class);
 
 			//TODO: Decidir si mantenir l'Organ Gestor encara que no hi hagi procediments o no
 			//		Recordar que ara l'Organ té més coses assignades: Administrador, grups, pagadors ...
@@ -1503,14 +1525,18 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<OficinaDto> findOficines(String organGestorDir3Codi) {
+	public List<OficinaDto> findOficines(Long entitatId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId, 
+					true, 
+					false, 
+					false);
 			List<OficinaDto> oficines = new ArrayList<OficinaDto>();
 			try {
-				List<Oficina> oficinesRegistre = pluginHelper.llistarOficines(
-						organGestorDir3Codi, 
-						AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
+				//Recupera les oficines d'una entitat
+				List<Oficina> oficinesRegistre = cacheHelper.llistarOficinesEntitat(entitat.getDir3Codi());
 				for (Oficina oficinaRegistre : oficinesRegistre) {
 					OficinaDto oficina = new OficinaDto();
 					oficina.setCodi(oficinaRegistre.getCodi());
@@ -1518,7 +1544,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					oficines.add(oficina);
 				}
 			} catch (Exception e) {
-				String errorMessage = "No s'han pogut recuperar les oficines de l'òrgan gestor: " + organGestorDir3Codi;
+				String errorMessage = "No s'han pogut recuperar les oficines de l'entitat amb codi: " + entitat.getDir3Codi();
 				logger.error(
 						errorMessage, 
 						e.getMessage());
@@ -1532,16 +1558,21 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Override
 	@Transactional(readOnly = true)
 	public List<LlibreDto> findLlibres(
-			String organGestorDir3Codi, 
-			String oficina) {
+			Long entitatId, 
+			String oficinaDir3Codi) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId, 
+					true, 
+					false, 
+					false);
 			List<LlibreDto> llibres = new ArrayList<LlibreDto>();
 			try {
-				List<Llibre> llibresRegistre = pluginHelper.llistarLlibres(
-						organGestorDir3Codi, 
-						oficina, 
-						AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
+				//Recupera els llibres d'una oficina i entitat
+				List<Llibre> llibresRegistre = cacheHelper.llistarLlibresOficina(
+						entitat.getDir3Codi(), 
+						oficinaDir3Codi);
 				for (Llibre llibreRegistre : llibresRegistre) {
 					LlibreDto llibre = new LlibreDto();
 					llibre.setCodi(llibreRegistre.getCodi());
@@ -1551,12 +1582,49 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					llibres.add(llibre);
 				}
 	 		} catch (Exception e) {
-	 			String errorMessage = "No s'han pogut recuperar els llibres de l'òrgan gestor: " + organGestorDir3Codi;
+	 			String errorMessage = "No s'han pogut recuperar els llibres de l'entitat [Entitat: " + entitat.getDir3Codi() + ", Oficina: " + oficinaDir3Codi + "]";
 				logger.error(
 						errorMessage, 
 						e.getMessage());
 			}
 			return llibres;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public LlibreDto getLlibreOranisme(
+			Long entitatId,
+			String organGestorDir3Codi) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId, 
+					true, 
+					false, 
+					false);
+			LlibreDto llibre = null;
+			try {
+				//Recupera el llibre de l'òrgan gestor especificat (organisme)
+				Llibre llibreRegistre = cacheHelper.getLlibreOrganGestor(
+						entitat.getDir3Codi(),
+						organGestorDir3Codi);
+				if (llibreRegistre != null) {
+					llibre = new LlibreDto();
+					llibre.setCodi(llibreRegistre.getCodi());
+					llibre.setNomCurt(llibreRegistre.getNomCurt());
+					llibre.setNomLlarg(llibreRegistre.getNomLlarg());
+					llibre.setOrganismeCodi(llibreRegistre.getOrganisme());
+				}
+	 		} catch (Exception e) {
+	 			String errorMessage = "No s'ha pogut recuperar el llibre de l'òrgan gestor: " + organGestorDir3Codi;
+				logger.error(
+						errorMessage, 
+						e.getMessage());
+			}
+			return llibre;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

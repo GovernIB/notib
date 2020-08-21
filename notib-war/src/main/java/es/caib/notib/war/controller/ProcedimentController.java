@@ -213,16 +213,31 @@ public class ProcedimentController extends BaseUserController{
 			HttpServletRequest request,
 			@PathVariable Long procedimentId) {		
 		
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		
-		procedimentService.delete(
-				entitat.getId(),
-				procedimentId);
-		
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../procediment",
-				"procediment.controller.esborrat.ok");
+		try {
+			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+			
+			if (procedimentService.procedimentEnUs(procedimentId)) {
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../procediment",
+						"procediment.controller.esborrat.enUs");
+			} else {
+				procedimentService.delete(
+						entitat.getId(),
+						procedimentId);
+				
+				return getAjaxControllerReturnValueSuccess(
+						request,
+						"redirect:../../procediment",
+						"procediment.controller.esborrat.ok");
+			}
+		} catch (Exception e) {
+			return getAjaxControllerReturnValueError(
+					request,
+					"redirect:../../procediment",
+					"procediment.controller.esborrat.ko",
+					e);
+		}
 	}
 	
 	@RequestMapping(value = "/update/auto", method = RequestMethod.GET)
@@ -372,13 +387,25 @@ public class ProcedimentController extends BaseUserController{
 		return organismes;
 	}
 	
-	@RequestMapping(value = "/oficines/{organGestor}", method = RequestMethod.GET)
+	@RequestMapping(value = "/oficines", method = RequestMethod.GET)
 	@ResponseBody
 	private List<OficinaDto> getOficines(
 		HttpServletRequest request,
+		Model model) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		return procedimentService.findOficines(entitat.getId());
+	}
+	
+	@RequestMapping(value = "/llibre/{organGestorDir3Codi}", method = RequestMethod.GET)
+	@ResponseBody
+	private LlibreDto getLlibreOrgan(
+		HttpServletRequest request,
 		Model model,
-		@PathVariable String organGestor) {
-		return procedimentService.findOficines(organGestor);
+		@PathVariable String organGestorDir3Codi) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		return procedimentService.getLlibreOranisme(
+				entitat.getId(),
+				organGestorDir3Codi);
 	}
 	
 	@RequestMapping(value = "/llibres/{organGestor}/{oficina}", method = RequestMethod.GET)
@@ -386,9 +413,11 @@ public class ProcedimentController extends BaseUserController{
 	private List<LlibreDto> getLlibres(
 		HttpServletRequest request,
 		Model model,
-		@PathVariable String organGestor,
 		@PathVariable String oficina) {
-		return procedimentService.findLlibres(organGestor, oficina);
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		return procedimentService.findLlibres(
+				entitat.getId(),
+				oficina);
 	}
 	
 	@RequestMapping(value = "/cache/refrescar", method = RequestMethod.GET)

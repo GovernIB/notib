@@ -509,7 +509,7 @@ public class PluginHelper {
 		return llibresOficines;
 	}
 	
-	private Llibre llistarLlibreOrganisme(
+	public Llibre llistarLlibreOrganisme(
 			String entitatCodi,
 			String organismeCodi) throws SistemaExternException{
 		

@@ -88,39 +88,34 @@ $(document).ready(function() {
 	});
 	//Oficines
 	$("#searchOficina").click(function(){
-		var organGestor = $('#organGestor').val();
-		if (organGestor !== undefined && organGestor !== '') {
-			$("#oficinesModal").modal();
-			$.ajax({
-				type: 'GET',
-				url: "<c:url value="/procediment/oficines/"/>" + organGestor,
-				success: function(data) {
-					var selOficines = $('#selOficines');
-					selOficines.empty();
-					selOficines.append("<option value=\"\"></option>");
-					if (data && data.length > 0) {
-							var items = [];
-							$.each(data, function(i, val) {
-								items.push({
-									"id": val.codi,
-									"text": val.codi + " - " + val.nom
-								});
-								selOficines.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
+		$("#oficinesModal").modal();
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value="/procediment/oficines"/>",
+			success: function(data) {
+				var selOficines = $('#selOficines');
+				selOficines.empty();
+				selOficines.append("<option value=\"\"></option>");
+				if (data && data.length > 0) {
+						var items = [];
+						$.each(data, function(i, val) {
+							items.push({
+								"id": val.codi,
+								"text": val.codi + " - " + val.nom
 							});
-						}
-					var select2Options = {
-							theme: 'bootstrap',
-							width: 'auto'};
-					selOficines.select2(select2Options);
-					$(".loading-screen").hide();
-				},
-				error: function() {
-					console.log("error obtenint les oficines...");
-				}
-			});
-		} else {
-			alert('<spring:message code="procediment.form.avis.oficines"/>');
-		}
+							selOficines.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
+						});
+					}
+				var select2Options = {
+						theme: 'bootstrap',
+						width: 'auto'};
+				selOficines.select2(select2Options);
+				$(".loading-screen").hide();
+			},
+			error: function() {
+				console.log("error obtenint les oficines...");
+			}
+		});
 	});
 	$('#addOficinaButton').on('click', function(){
 		var oficinaSelect = document.getElementById('selOficines');
@@ -132,27 +127,23 @@ $(document).ready(function() {
 	//Llibres
 	$("#searchLlibre").click(function(){
 		var organGestor = $('#organGestor').val();
-		var oficina = $('#oficina').val();
-		console.log(oficina);
-		if (oficina !== undefined && oficina !== '') {
+		if (organGestor !== undefined && organGestor !== '') {
 			$("#llibresModal").modal();
 			$.ajax({
 				type: 'GET',
-				url: "<c:url value="/procediment/llibres/"/>" + organGestor + "/" + oficina,
+				url: "<c:url value="/procediment/llibre/"/>" + organGestor,
 				success: function(data) {
 					var selLlibres = $('#selLlibres');
 					selLlibres.empty();
 					selLlibres.append("<option value=\"\"></option>");
-					if (data && data.length > 0) {
-							var items = [];
-							$.each(data, function(i, val) {
-								items.push({
-									"id": val.codi,
-									"text": val.codi + " - " + val.nomLlarg
-								});
-								selLlibres.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nomLlarg + "</option>");
-							});
-						}
+					if (data) {
+						var items = [];
+						items.push({
+							"id": data.codi,
+							"text": data.codi + " - " + data.nomLlarg
+						});
+						selLlibres.append("<option value=\"" + data.codi + "\">" + data.codi + " - " + data.nomLlarg + "</option>");
+					}
 					var select2Options = {
 							theme: 'bootstrap',
 							width: 'auto'};
