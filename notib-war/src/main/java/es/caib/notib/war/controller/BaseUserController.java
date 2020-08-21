@@ -48,5 +48,11 @@ public class BaseUserController extends BaseController {
 		}
 		return organGestor;
 	}
+	
+	public Long getOrganGestorActualId(HttpServletRequest request) {
+		OrganGestorDto organGestor = getOrganGestorActual(request); 
+		if (organGestor!=null) return organGestor.getId();
+		else return null;
+	}
 
 }

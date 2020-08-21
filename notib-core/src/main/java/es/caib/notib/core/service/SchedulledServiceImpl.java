@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import com.codahale.metrics.Timer;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
@@ -57,7 +58,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 	@Scheduled(
 			fixedRateString = "${config:es.caib.notib.tasca.registre.enviaments.periode}", 
 			initialDelayString = "${config:es.caib.notib.tasca.registre.enviaments.retard.inicial}")
-	public void registrarEnviamentsPendents() {
+	public void registrarEnviamentsPendents() throws RegistreNotificaException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.info("[REG] Cercant notificacions pendents de registrar");

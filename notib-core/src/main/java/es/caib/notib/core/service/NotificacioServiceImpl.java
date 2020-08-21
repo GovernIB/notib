@@ -56,6 +56,7 @@ import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
@@ -153,7 +154,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public List<NotificacioDto> create(
 			Long entitatId, 
-			NotificacioDtoV2 notificacio) {
+			NotificacioDtoV2 notificacio) throws RegistreNotificaException {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -1024,7 +1025,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Transactional
 	@Override
-	public List<RegistreIdDto> registrarNotificar(Long notificacioId) {
+	public List<RegistreIdDto> registrarNotificar(Long notificacioId) throws RegistreNotificaException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.info("Intentant registrar la notificació pendent (notificacioId=" + notificacioId + ")");
@@ -1172,7 +1173,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Transactional
 	@Override
-	public void notificacioRegistrar(Long notificacioId) {
+	public void notificacioRegistrar(Long notificacioId) throws RegistreNotificaException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			registrarNotificar(notificacioId);
@@ -1188,7 +1189,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			int maxPendents = getNotificaEnviamentsProcessarMaxProperty();
-			List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatRegistrada(
+			List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatRegistradaAmbReintentsDisponibles(
 					pluginHelper.getNotificaReintentsMaxProperty(), 
 					new PageRequest(0, maxPendents));
 			return pendents;
