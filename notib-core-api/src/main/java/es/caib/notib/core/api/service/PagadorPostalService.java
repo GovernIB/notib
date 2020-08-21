@@ -27,7 +27,7 @@ public interface PagadorPostalService {
 	 * 				Informació del pagador postal a crear
 	 * @return	El pagador postal creat
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public PagadorPostalDto create(
 			Long entitatId,
 			PagadorPostalDto postal);
@@ -40,7 +40,7 @@ public interface PagadorPostalService {
 	 * @return
 	 * @throws NotFoundException
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public PagadorPostalDto update(PagadorPostalDto postal) throws NotFoundException;
 
 	/**
@@ -52,7 +52,7 @@ public interface PagadorPostalService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
 	public PagadorPostalDto delete(Long id) throws NotFoundException;
 
 	/**

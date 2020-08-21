@@ -45,7 +45,7 @@ public class RestConsultaProcediments {
 				urlAmbMetode);
 		
 		Form form = new Form();
-		form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"10000\"}");
+		form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"100\"}");
 		form.add("filtro", "{\"activo\":\"1\"}");
 		form.add("filtro", "{\"codigoUADir3\":\"A04003003\", \"buscarEnDescendientesUA\":\"1\", \"activo\":\"1\", \"estadoUA\":\"1\"}");
 	    

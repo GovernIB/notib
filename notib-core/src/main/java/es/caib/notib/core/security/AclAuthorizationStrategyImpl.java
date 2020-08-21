@@ -40,6 +40,9 @@ public class AclAuthorizationStrategyImpl implements AclAuthorizationStrategy {
    private final GrantedAuthority procedimentGaGeneralChanges;
    private final GrantedAuthority procedimentGaModifyAuditing;
    private final GrantedAuthority procedimentGaTakeOwnership;
+   private final GrantedAuthority organGaGeneralChanges;
+   private final GrantedAuthority organGaModifyAuditing;
+   private final GrantedAuthority organGaTakeOwnership;
    private SidRetrievalStrategy sidRetrievalStrategy = new SidRetrievalStrategyImpl();
 
    //~ Constructors ===================================================================================================
@@ -56,18 +59,22 @@ public class AclAuthorizationStrategyImpl implements AclAuthorizationStrategy {
     * Alternatively, a single value can be supplied for all three permissions.
     */
    public AclAuthorizationStrategyImpl(GrantedAuthority... auths) {
-       Assert.isTrue(auths != null && (auths.length == 6 || auths.length == 2),
+       Assert.isTrue(auths != null && (auths.length == 9 || auths.length == 3),
                "Two or six GrantedAuthority instances required");
-       if (auths.length == 6) {
+       if (auths.length == 9) {
     	   entitatGaTakeOwnership = auths[0];
     	   entitatGaModifyAuditing = auths[1];
            entitatGaGeneralChanges = auths[2];
            procedimentGaTakeOwnership = auths[3];
            procedimentGaModifyAuditing = auths[4];
            procedimentGaGeneralChanges = auths[5];
+           organGaTakeOwnership = auths[6];
+           organGaModifyAuditing = auths[7];
+           organGaGeneralChanges = auths[8];
        } else {
     	   entitatGaTakeOwnership = entitatGaModifyAuditing = entitatGaGeneralChanges = auths[0];
     	   procedimentGaTakeOwnership = procedimentGaModifyAuditing = procedimentGaGeneralChanges = auths[1];
+    	   organGaTakeOwnership = organGaModifyAuditing = organGaGeneralChanges = auths[2];
        }
    }
 
@@ -92,16 +99,21 @@ public class AclAuthorizationStrategyImpl implements AclAuthorizationStrategy {
 
        // Not authorized by ACL ownership; try via adminstrative permissions
        GrantedAuthority requiredAuthority;
+       GrantedAuthority requiredAuthorityOrgan = null;
 
        String tipus = acl.getObjectIdentity().getType();
        
-       if ("es.caib.notib.core.entity.ProcedimentEntity".equals(tipus)) {
+       if ("es.caib.notib.core.entity.ProcedimentEntity".equals(tipus) ||
+    	   "es.caib.notib.core.entity.OrganGestorEntity".equals(tipus)) {
     	   if (changeType == CHANGE_AUDITING) {
 	           requiredAuthority = this.procedimentGaModifyAuditing;
+	           requiredAuthorityOrgan = this.organGaModifyAuditing;
 	       } else if (changeType == CHANGE_GENERAL) {
 	           requiredAuthority = this.procedimentGaGeneralChanges;
+	           requiredAuthorityOrgan = this.organGaGeneralChanges;
 	       } else if (changeType == CHANGE_OWNERSHIP) {
 	           requiredAuthority = this.procedimentGaTakeOwnership;
+	           requiredAuthorityOrgan = this.organGaTakeOwnership;
 	       } else {
 	           throw new IllegalArgumentException("Unknown change type");
 	       }
@@ -120,6 +132,9 @@ public class AclAuthorizationStrategyImpl implements AclAuthorizationStrategy {
        // Iterate this principal's authorities to determine right
        if (authentication.getAuthorities().contains(requiredAuthority)) {
            return;
+       } else if (requiredAuthorityOrgan != null && 
+    		   authentication.getAuthorities().contains(requiredAuthorityOrgan)) {
+    	   return;
        }
 
        // Try to get permission via ACEs within the ACL

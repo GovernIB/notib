@@ -48,6 +48,9 @@
 	pageContext.setAttribute(
 			"requestParameterCanviOrgan",
 			es.caib.notib.war.helper.OrganGestorHelper.getRequestParameterCanviOrgan());
+	pageContext.setAttribute(
+			"versioMajorActual",
+			es.caib.notib.war.helper.AplicacioHelper.getVersioMajorActual(request));
 		
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
@@ -246,6 +249,8 @@ body {
 								</c:otherwise>
 							</c:choose>
 						</li>
+					
+						
 						
 						<li class="dropdown">
 							<a href="#" data-toggle="dropdown">
@@ -264,7 +269,7 @@ body {
 								</li>
 							</ul>
 						</li>
-						
+				
 					</ul>
 					<div class="clearfix"></div>
 					<div class="btn-group navbar-btn navbar-right">
@@ -290,6 +295,7 @@ body {
 <%-- 									<li><a href="<c:url value="/aplicacio"/>"><spring:message code="decorator.menu.aplicacions"/></a></li>	--%>
 								</ul>
 							</div>
+							
 							</c:if>
 							<c:if test="${isRolActualUsuari}">
 							
@@ -343,8 +349,16 @@ body {
 								</ul>
 							</div>
 							</c:if>
+							<div class="btn-group">
+									<a class="btn btn-primary" href="https://github.com/GovernIB/notib/raw/notib-${versioMajorActual}/doc/pdf/NOTIB_usuari.pdf" } download/><spring:message code="decorator.menu.manual.usuari"/></a>
+<!-- 									Per a diferents rol, ara sol esta el manual d'usuari -->
+<%-- 									<a class="btn btn-primary" href="https://github.com/GovernIB/notib/raw/notib-${versioMajorActual}/doc/pdf/NOTIB_${rolActual}.pdf" } download/><spring:message code="decorator.menu.manual.usuari"/></a> --%>
+							</div>
 						</div>
+							
 					</div>
+					
+					
 				</div>
 			</div>
 		</div>
@@ -398,5 +412,7 @@ body {
         	</p>
         </div>
     </div>
+     <div class="divider"></div>	
+
 </body>
 </html>

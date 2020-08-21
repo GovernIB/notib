@@ -35,19 +35,19 @@ public class PagadorCieServiceBean implements PagadorCieService {
 	PagadorCieService delegate;
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PagadorCieDto create(Long entitatId, PagadorCieDto cie) {
 		return delegate.create(entitatId, cie);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PagadorCieDto update(PagadorCieDto cie) throws NotFoundException {
 		return delegate.update(cie);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PagadorCieDto delete(Long id) throws NotFoundException {
 		return delegate.delete(id);
 	}

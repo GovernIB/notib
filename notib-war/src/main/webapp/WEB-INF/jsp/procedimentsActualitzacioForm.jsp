@@ -58,6 +58,7 @@
 				},
 				error: function() {
 					console.log("error obtenint progrés...");
+					clearInterval(itervalProgres);
 					$('.loading').hide();
 					$('.modal-footer', parent.document).show();
 					$('.close', parent.document).prop('disabled', false);

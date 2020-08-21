@@ -72,8 +72,13 @@ public class OrganGestorController extends BaseUserController{
 		try {
 			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 
+			OrganGestorDto organGestorActual = getOrganGestorActual(request);
+			String organActualCodiDir3=null;
+			if (organGestorActual!=null) organActualCodiDir3 = organGestorActual.getCodi();
+			
 			organs = organGestorService.findAmbFiltrePaginat(
 					entitat.getId(),
+					organActualCodiDir3,
 					OrganGestorFiltreCommand.asDto(organGestorFiltreCommand),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 		}catch(SecurityException e) {
@@ -164,8 +169,12 @@ public class OrganGestorController extends BaseUserController{
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		
 		try {
+			OrganGestorDto organGestorActual = getOrganGestorActual(request);
+			String codiDir3OrganActual=null;
+			if (organGestorActual!=null) codiDir3OrganActual = organGestorActual.getCodi();
+			
 			organGestorService.updateNoms(
-					entitat.getId());
+					entitat.getId(), codiDir3OrganActual);
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../organgestor",
