@@ -125,6 +125,12 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	public List<ProcedimentDto> findAll() {
 		return delegate.findAll();
 	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	public boolean procedimentEnUs(Long procedimentId) {
+		return delegate.procedimentEnUs(procedimentId);
+	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
