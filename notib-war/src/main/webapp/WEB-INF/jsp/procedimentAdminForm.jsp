@@ -103,9 +103,9 @@ $(document).ready(function() {
 							$.each(data, function(i, val) {
 								items.push({
 									"id": val.codi,
-									"text": val.nom
+									"text": val.codi + " - " + val.nom
 								});
-								selOficines.append("<option value=\"" + val.codi + "\">" + val.nom + "</option>");
+								selOficines.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
 							});
 						}
 					var select2Options = {
@@ -133,6 +133,7 @@ $(document).ready(function() {
 	$("#searchLlibre").click(function(){
 		var organGestor = $('#organGestor').val();
 		var oficina = $('#oficina').val();
+		console.log(oficina);
 		if (oficina !== undefined && oficina !== '') {
 			$("#llibresModal").modal();
 			$.ajax({
@@ -147,9 +148,9 @@ $(document).ready(function() {
 							$.each(data, function(i, val) {
 								items.push({
 									"id": val.codi,
-									"text": val.nomLlarg
+									"text": val.codi + " - " + val.nomLlarg
 								});
-								selLlibres.append("<option value=\"" + val.codi + "\">" + val.nomLlarg + "</option>");
+								selLlibres.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nomLlarg + "</option>");
 							});
 						}
 					var select2Options = {

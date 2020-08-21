@@ -47,6 +47,12 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	@Column(name = "oficina")
 	protected String oficina;
 	
+	@Column(name = "llibre_nom")
+	protected String llibreNom;
+	
+	@Column(name = "oficina_nom")
+	protected String oficinaNom;
+	
 	@Column(name = "tipusassumpte", length = 255)
 	protected String tipusAssumpte;
 	
@@ -115,7 +121,9 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 		this.pagadorcie = pagadorcie;
 		this.agrupar = agrupar;
 		this.llibre = llibre;
+		this.llibreNom = llibreNom;
 		this.oficina = oficina;
+		this.oficinaNom = oficinaNom;
 		this.organGestor = organGestor;
 		this.retard = retard;
 		this.caducitat = caducitat;
@@ -210,7 +218,9 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			built.pagadorcie = pagadorcie;
 			built.agrupar = agrupar;
 			built.llibre = llibre;
+			built.llibreNom = llibreNom;
 			built.oficina = oficina;
+			built.oficinaNom = oficinaNom;
 			built.organGestor = organGestor;
 			built.tipusAssumpte = tipusAssumpte;
 			built.tipusAssumpteNom = tipusAssumpteNom;

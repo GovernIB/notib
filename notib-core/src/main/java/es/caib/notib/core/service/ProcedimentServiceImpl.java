@@ -244,7 +244,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			}
 			// Si canviam l'organ gestor, i aquest no s'utilitza en cap altre procediment, l'eliminarem (1)
 			OrganGestorEntity organGestorAntic = null;
-			if (!procedimentEntity.getOrganGestor().getCodi().equals(procediment.getOrganGestor())) {
+			if (procedimentEntity.getOrganGestor() != null && !procedimentEntity.getOrganGestor().getCodi().equals(procediment.getOrganGestor())) {
 				organGestorAntic = procedimentEntity.getOrganGestor();
 			}
 			
