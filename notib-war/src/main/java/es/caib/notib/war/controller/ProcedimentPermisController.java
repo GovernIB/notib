@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,7 +13,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.service.EntitatService;
@@ -22,8 +25,8 @@ import es.caib.notib.core.api.service.PagadorPostalService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.PermisCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
-import es.caib.notib.war.helper.RolHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.notib.war.helper.RolHelper;
 
 /**
  * Controlador per el mantinemnt de permisos de procediments.
@@ -139,7 +142,10 @@ public class ProcedimentPermisController extends BaseUserController{
 							procedimentId));
 			return "procedimentAdminPermisForm";
 		}
-		Long organGestorActualId = getOrganGestorActual(request).getId();
+		Long organGestorActualId = null;
+		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		if (organGestorActual != null)
+			organGestorActualId = organGestorActual.getId();
 		procedimentService.permisUpdate(
 				entitatActual.getId(),
 				organGestorActualId,
@@ -158,7 +164,10 @@ public class ProcedimentPermisController extends BaseUserController{
 			@PathVariable Long permisId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		Long organGestorActualId = getOrganGestorActual(request).getId();
+		Long organGestorActualId = null;
+		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		if (organGestorActual != null)
+			organGestorActualId = organGestorActual.getId();
 		procedimentService.permisDelete(
 				entitatActual.getId(),
 				organGestorActualId,

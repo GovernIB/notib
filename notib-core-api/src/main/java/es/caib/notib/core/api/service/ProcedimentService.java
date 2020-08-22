@@ -1,7 +1,6 @@
 package es.caib.notib.core.api.service;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -177,17 +176,19 @@ public interface ProcedimentService {
 	 * @return La llista dels procediments.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public List<ProcedimentDto> findProcedimentsSenseGrups(Long entitatId);
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public List<ProcedimentDto> findProcedimentsSenseGrupsWithPermis(Long entitatId, PermisEnum permis);
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public List<ProcedimentDto> findProcedimentsAmbGrups(Long entitatId, List<String> grups);
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public List<ProcedimentDto> findProcedimentsAmbGrupsWithPermis(Long entitatId, List<String> grups, PermisEnum permis);
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public List<ProcedimentDto> findProcediments(Long entitatId, List<String> grups);
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public List<ProcedimentDto> findProcedimentsWithPermis(Long entitatId, List<String> grups, PermisEnum permis);
+	public List<ProcedimentDto> findProcedimentsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+//	public List<ProcedimentDto> findProcedimentsWithPermis(Long entitatId, List<String> grups, PermisEnum permis);
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	public List<ProcedimentDto> findProcedimentsSenseGrups(Long entitatId);
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+//	public List<ProcedimentDto> findProcedimentsSenseGrupsWithPermis(Long entitatId, PermisEnum permis);
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	public List<ProcedimentDto> findProcedimentsAmbGrups(Long entitatId, List<String> grups);
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+//	public List<ProcedimentDto> findProcedimentsAmbGrupsWithPermis(Long entitatId, List<String> grups, PermisEnum permis);
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public boolean hasAnyProcedimentsWithPermis(Long entitatId, List<String> grups, PermisEnum permis);
 	
@@ -335,21 +336,21 @@ public interface ProcedimentService {
 			Long entitatId,
 			Long GrupId) throws NotFoundException;
 
-	/**
-	 * Comprova si l'usuari actual té permisos de consulta sobre algun procediment
-	 * 
-	 * @return true / false
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public boolean hasPermisConsultaProcediment(EntitatDto entitat);
-
-	/**
-	 * Comprova si l'usuari actual té permisos de notificació sobre algun procediment
-	 * 
-	 * @return true / false
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public boolean hasPermisNotificacioProcediment(EntitatDto entitat);
+//	/**
+//	 * Comprova si l'usuari actual té permisos de consulta sobre algun procediment
+//	 * 
+//	 * @return true / false
+//	 */
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+//	public boolean hasPermisConsultaProcediment(EntitatDto entitat);
+//
+//	/**
+//	 * Comprova si l'usuari actual té permisos de notificació sobre algun procediment
+//	 * 
+//	 * @return true / false
+//	 */
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+//	public boolean hasPermisNotificacioProcediment(EntitatDto entitat);
 	
 	/**
 	 * Comprova si l'usuari actual té permisos de notificació sobre algun procediment
@@ -357,39 +358,10 @@ public interface ProcedimentService {
 	 * @return true / false
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public boolean hasPermisGestioProcediment(
-			Long procedimentId);
+	public boolean hasPermisProcediment(
+			Long procedimentId,
+			PermisEnum permis);
 	
-	/**
-	 * Comprova si l'usuari actual té permisos de notificació sobre algun procediment
-	 * 
-	 * @return true / false
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public boolean hasPermisProcessarProcediment(
-			String procedimentCodi,
-			Long procedimentId);
-	
-	/**
-	 * Comprova si l'usuari actual té permisos de consulta i pertany al grup d'un procediment
-	 * 
-	 * @return true / false
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public boolean hasGrupPermisConsultaProcediment(
-			Map<String, ProcedimentDto> procediments,
-			EntitatDto entitat);
-
-	/**
-	 * Comprova si l'usuari actual té permisos de notificació i pertany al grup d'un procediment
-	 * 
-	 * @return true / false
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public boolean hasGrupPermisNotificacioProcediment(
-			Map<String, ProcedimentDto> procediments,
-			EntitatDto entitat);
-
 	/**
 	 * buida els procediments en cache per entitat
 	 * 

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.OrganismeDto;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.repository.OrganGestorRepository;
 
 /**
@@ -91,6 +92,46 @@ public class OrganigramaHelper {
 			}
 		}
 		return organismes;
+	}
+
+	public List<String> getCodisOrgansGestorsParesExistentsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
+		Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(codiDir3Entitat);
+		
+		String codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
+		
+		List<String> unitatsEntitat = new ArrayList<String>();
+		unitatsEntitat.addAll(getCodisOrgansGestorsPare(organigramaEntitat, codiDir3, codiDir3Entitat));
+		
+		List<String> unitatsExistents = organGestorRepository.findCodisByEntitatDir3(codiDir3Entitat);
+		unitatsEntitat.retainAll(unitatsExistents);
+		return unitatsEntitat;
+	}
+	
+	public List<OrganGestorEntity> getOrgansGestorsParesExistentsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
+		Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(codiDir3Entitat);
+		
+		String codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
+		
+		List<String> unitatsEntitat = new ArrayList<String>();
+		unitatsEntitat.addAll(getCodisOrgansGestorsPare(organigramaEntitat, codiDir3, codiDir3Entitat));
+		
+		List<String> unitatsExistents = organGestorRepository.findCodisByEntitatDir3(codiDir3Entitat);
+		unitatsEntitat.retainAll(unitatsExistents);
+		
+		return organGestorRepository.findByCodiIn(unitatsEntitat);
+	}
+
+	private List<String> getCodisOrgansGestorsPare(
+			Map<String, OrganismeDto> organigrama,
+			String codiDir3,
+			String codiDir3Entitat) {
+		List<String> unitats = new ArrayList<String>();
+		unitats.add(codiDir3);
+		OrganismeDto organisme = organigrama.get(codiDir3);
+		if (organisme != null && organisme.getPare() != null && organisme.getPare() != codiDir3Entitat) {
+			unitats.addAll(getCodisOrgansGestorsPare(organigrama, organisme.getPare(), codiDir3Entitat));
+		}
+		return unitats;
 	}
 	
 //	private static final Logger logger = LoggerFactory.getLogger(OrganigramaHelper.class);

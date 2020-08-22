@@ -35,19 +35,17 @@ public class PermisosHelper {
 		
 		if (RolHelper.isUsuariActualUsuari(request)) {
 			
-			UsuariDto usuariActual = aplicacioService.getUsuariActual();
-			List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 			EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+			UsuariDto usuariActual = aplicacioService.getUsuariActual();
+//			List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 
 			List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
-			
 			if (RolHelper.isUsuariActualUsuari(request)) {
-				
-				procedimentsDisponibles = procedimentService.findProcedimentsSenseGrupsWithPermis(entitatActual.getId(), PermisEnum.NOTIFICACIO);
-				if (procedimentsDisponibles.isEmpty())
-					procedimentsDisponibles = procedimentService.findProcedimentsAmbGrupsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.NOTIFICACIO);
+				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
+//				procedimentsDisponibles = procedimentService.findProcedimentsSenseGrupsWithPermis(entitatActual.getId(), PermisEnum.NOTIFICACIO);
+//				if (procedimentsDisponibles.isEmpty())
+//					procedimentsDisponibles = procedimentService.findProcedimentsAmbGrupsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.NOTIFICACIO);
 				request.setAttribute("permisNotificacio", !procedimentsDisponibles.isEmpty());
-				
 			}
 		}
 	}

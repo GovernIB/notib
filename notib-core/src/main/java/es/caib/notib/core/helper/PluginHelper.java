@@ -27,6 +27,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.AccioParam;
@@ -918,7 +919,7 @@ public class PluginHelper {
 	// UNITATS ORGANITZATIVES
 	// /////////////////////////////////////////////////////////////////////////////////////
 	
-	
+	@Cacheable(value = "organigramaPlugin", key="#entitatcodi")
 	public Map<String, NodeDir3> getOrganigramaPerEntitat(String entitatcodi) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(

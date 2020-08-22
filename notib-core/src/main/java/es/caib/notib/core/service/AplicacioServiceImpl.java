@@ -34,7 +34,6 @@ import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.ExcepcioLogHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.repository.AclSidRepository;
 import es.caib.notib.core.repository.UsuariRepository;
@@ -63,8 +62,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private ExcepcioLogHelper excepcioLogHelper;
-	@Autowired
-	private PluginHelper pluginHelper;
 	@Autowired
 	private MetricsHelper metricsHelper;
 
@@ -110,8 +107,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 				}
 			} else {
 				logger.debug("Consultant plugin de dades d'usuari (" + "usuariCodi=" + auth.getName() + ")");
-				//DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
-				DadesUsuari dadesUsuari = pluginHelper.dadesUsuariConsultarAmbCodi(auth.getName());
+				DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 				if (dadesUsuari != null) {
 					if (dadesUsuari.getNomSencer() != null) {
 						usuari.update(
@@ -171,7 +167,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Obtenint els rols de l'usuari amb codi (codi=" + codi + ")");
-			return pluginHelper.consultarRolsAmbCodi(codi);
+			return cacheHelper.findRolsUsuariAmbCodi(codi);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -184,7 +180,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		try {
 			logger.debug("Obtenint els rols de l'usuari actual");
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			return pluginHelper.consultarRolsAmbCodi(auth.getName());
+			return cacheHelper.findRolsUsuariAmbCodi(auth.getName());
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

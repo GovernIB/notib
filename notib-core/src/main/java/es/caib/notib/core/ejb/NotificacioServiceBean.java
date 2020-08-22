@@ -4,7 +4,6 @@
 package es.caib.notib.core.ejb;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.LocalitatsDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
@@ -26,7 +24,6 @@ import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -152,18 +149,6 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public List<ProcedimentDto> findProcedimentsEntitatAmbPermisConsulta(EntitatDto entitat) {
-		return delegate.findProcedimentsEntitatAmbPermisConsulta(entitat);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacio(EntitatDto entitat) {
-		return delegate.findProcedimentsAmbPermisNotificacio(entitat);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
 			Long entitatId,
 			boolean isUsuari,
@@ -186,46 +171,6 @@ public class NotificacioServiceBean implements NotificacioService {
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaAndGrupsAndEntitat(
-			Map<String, ProcedimentDto> procediments,
-			EntitatDto entitat) {
-		return delegate.findProcedimentsAmbPermisConsultaAndGrupsAndEntitat(
-				procediments,
-				entitat);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
-			Map<String, ProcedimentDto> procediments,
-			EntitatDto entitat) {
-		return delegate.findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
-				procediments,
-				entitat);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(
-			List<ProcedimentDto> procediments,
-			EntitatDto entitat) {
-		return delegate.findProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(
-				procediments,
-				entitat);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
-			List<ProcedimentDto> procediments,
-			EntitatDto entitat) {
-		return delegate.findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
-				procediments,
-				entitat);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public String marcarComProcessada(
 			Long enviamentId,
 			String motiu) throws MessagingException {
@@ -238,13 +183,6 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public List<RegistreIdDto> registrarNotificar(Long notificacioId) {
 		return delegate.registrarNotificar(notificacioId);
-	}
-
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
-	public List<ProcedimentDto> findProcedimentsAmbPermisConsulta() {
-		return delegate.findProcedimentsAmbPermisConsulta();
 	}
 
 	@Override

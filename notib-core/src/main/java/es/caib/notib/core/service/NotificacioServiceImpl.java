@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
@@ -24,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +30,6 @@ import com.codahale.metrics.Timer;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.DocumentDto;
-import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.LocalitatsDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
@@ -50,7 +47,7 @@ import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
@@ -58,7 +55,6 @@ import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
-import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.Persona;
@@ -92,7 +88,6 @@ import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
-import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
@@ -126,8 +121,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private EntitatRepository entitatRepository;
 	@Autowired
 	private DocumentRepository documentRepository;
-	@Autowired
-	private ProcedimentService procedimentService;
 	@Autowired
 	private PersonaRepository personaRepository;
 	@Autowired
@@ -390,9 +383,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if(notificacio != null) {
 				if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
 					notificacio.setPermisProcessar(
-							procedimentService.hasPermisProcessarProcediment(
-									notificacio.getProcediment().getCodi(),
-									notificacio.getProcediment().getId()));
+							entityComprovarHelper.hasPermisProcediment(
+									notificacio.getProcediment().getId(),
+									PermisEnum.PROCESSAR));
 					}	
 				logger.info("Consultant events notificació...");
 				List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
@@ -655,9 +648,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 				for (NotificacioEntity notificacio : notificacions) {
 					if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
 						notificacio.setPermisProcessar(
-								procedimentService.hasPermisProcessarProcediment(
-										notificacio.getProcediment().getCodi(),
-										notificacio.getProcediment().getId()));
+								entityComprovarHelper.hasPermisProcediment(
+										notificacio.getProcediment().getId(),
+										PermisEnum.PROCESSAR));
 						}
 					if (notificacio.getTipusUsuari() != null && notificacio.getTipusUsuari().equals(TipusUsuariEnumDto.APLICACIO) && notificacio.getId() != null) {
 						logger.info("Consultant events notificació...");
@@ -748,123 +741,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				return paginacioHelper.toPaginaDto(page, NotificacioDto.class);
 			}
 			return paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Override
-	@Transactional(readOnly = true)
-	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaAndGrupsAndEntitat(
-			Map<String, ProcedimentDto> procediments,
-			EntitatDto entitat) {		
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			return entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
-					procediments,
-					entitat.getId(),
-					new Permission[] {
-							ExtendedPermission.READ}
-					);	
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Override
-	@Transactional(readOnly = true)
-	public List<ProcedimentDto> findProcedimentsEntitatAmbPermisConsulta(
-			EntitatDto entitat) {		
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			return entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
-					new Permission[] {
-							ExtendedPermission.READ},
-					entitat.getId()
-					);	
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Override
-	@Transactional(readOnly = true)
-	public List<ProcedimentDto> findProcedimentsAmbPermisConsulta() {		
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			return entityComprovarHelper.findPermisProcediments(
-					new Permission[] {
-							ExtendedPermission.READ});	
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacio(
-			EntitatDto entitat) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			return entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
-					new Permission[] {
-							ExtendedPermission.NOTIFICACIO},
-					entitat.getId()
-					);	
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Transactional(readOnly = true)
-	@Override
-	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
-			Map<String, ProcedimentDto> procediments,
-			EntitatDto entitat) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			return entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
-					procediments,
-					entitat.getId(),
-					new Permission[] {
-							ExtendedPermission.NOTIFICACIO}
-					);	
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Transactional(readOnly = true)
-	@Override
-	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(
-			List<ProcedimentDto> procediments,
-			EntitatDto entitat) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			return entityComprovarHelper.findByPermisProcedimentsUsuariActual(
-					procediments,
-					entitat.getId(),
-					new Permission[] {
-							ExtendedPermission.NOTIFICACIO}
-					);	
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Override
-	@Transactional(readOnly = true)
-	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
-			List<ProcedimentDto> procediments,
-			EntitatDto entitat) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			return entityComprovarHelper.findByPermisProcedimentsUsuariActual(
-					procediments,
-					entitat.getId(),
-					new Permission[] {
-							ExtendedPermission.READ}
-					);	
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

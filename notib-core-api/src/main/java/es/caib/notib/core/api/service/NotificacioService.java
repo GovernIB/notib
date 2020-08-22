@@ -4,14 +4,12 @@
 package es.caib.notib.core.api.service;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.mail.MessagingException;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.LocalitatsDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
@@ -22,7 +20,6 @@ import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -93,127 +90,6 @@ public interface NotificacioService {
 			List<String> codisProcedimentsDisponibles,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
-	
-	
-//	@PreAuthorize("hasRole('NOT_SUPER')")
-//	public PaginaDto<NotificacioDto> findAmbFiltrePaginatForSuperAdministrador(
-//			Long entitatId,
-//			NotificacioFiltreDto filtre,
-//			PaginacioParamsDto paginacioParams);
-//	
-//	@PreAuthorize("hasRole('NOT_ADMIN')")
-//	public PaginaDto<NotificacioDto> findAmbFiltrePaginatForAdministradorEntitat(
-//			Long entitatId,
-//			NotificacioFiltreDto filtre,
-//			PaginacioParamsDto paginacioParams);
-//	
-//	@PreAuthorize("hasRole('NOT_USER')")
-//	public PaginaDto<NotificacioDto> findAmbFiltrePaginatForAdministradorOrgan(
-//			Long entitatId,
-//			List<String> codisProcedimentsDisponibles,
-//			NotificacioFiltreDto filtre,
-//			PaginacioParamsDto paginacioParams);
-//
-//	@PreAuthorize("hasRole('NOT_USER')")
-//	public PaginaDto<NotificacioDto> findAmbFiltrePaginatForUsuari(
-//			Long entitatId,
-//			List<String> codisProcedimentsDisponibles,
-//			NotificacioFiltreDto filtre,
-//			PaginacioParamsDto paginacioParams);
-
-	/**
-	 * Consulta de les notificacions segons els paràmetres del filtre.
-	 * 
-	 * @param filtre
-	 *            Paràmetres per a filtrar els resultats.
-	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
-	 * @return La pàgina amb les notificacions.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
-	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaAndGrupsAndEntitat(
-			Map<String, ProcedimentDto> procediments,
-			EntitatDto entitat);
-	
-	/**
-	 * Consulta de les notificacions segons els paràmetres del filtre.
-	 * 
-	 * @param filtre
-	 *            Paràmetres per a filtrar els resultats.
-	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
-	 * @return La pàgina amb les notificacions.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
-	public List<ProcedimentDto> findProcedimentsEntitatAmbPermisConsulta(EntitatDto entitat);
-	
-	/**
-	 * Consulta de les notificacions segons els paràmetres del filtre.
-	 * 
-	 * @param filtre
-	 *            Paràmetres per a filtrar els resultats.
-	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
-	 * @return La pàgina amb les notificacions.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
-	public List<ProcedimentDto> findProcedimentsAmbPermisConsulta();
-	
-	/**
-	 * Consulta de les notificacions segons els paràmetres del filtre.
-	 * 
-	 * @param filtre
-	 *            Paràmetres per a filtrar els resultats.
-	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
-	 * @return La pàgina amb les notificacions.
-	 */
-	
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
-	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacio(EntitatDto entitat);
-	
-	/**
-	 * Consulta de les notificacions segons els paràmetres del filtre.
-	 * 
-	 * @param filtre
-	 *            Paràmetres per a filtrar els resultats.
-	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
-	 * @return La pàgina amb les notificacions.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
-	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioAndGrupsAndEntitat(
-			Map<String, ProcedimentDto> procediments,
-			EntitatDto entitat);
-	
-	/**
-	 * Consulta de les notificacions segons els paràmetres del filtre.
-	 * 
-	 * @param filtre
-	 *            Paràmetres per a filtrar els resultats.
-	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
-	 * @return La pàgina amb les notificacions.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
-	public List<ProcedimentDto> findProcedimentsAmbPermisNotificacioSenseGrupsAndEntitat(
-			List<ProcedimentDto> procediments,
-			EntitatDto entitat);
-	
-	
-	/**
-	 * Consulta de les notificacions segons els paràmetres del filtre.
-	 * 
-	 * @param filtre
-	 *            Paràmetres per a filtrar els resultats.
-	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
-	 * @return La pàgina amb les notificacions.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
-	public List<ProcedimentDto> findProcedimentsAmbPermisConsultaSenseGrupsAndEntitat(
-			List<ProcedimentDto> procediments,
-			EntitatDto entitat);
 	
 	/**
 	 * Consulta les provincies.

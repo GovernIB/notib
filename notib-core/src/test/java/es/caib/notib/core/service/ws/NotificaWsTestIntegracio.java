@@ -5,8 +5,6 @@ package es.caib.notib.core.service.ws;
 
 import java.util.Date;
 
-import org.junit.Test;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

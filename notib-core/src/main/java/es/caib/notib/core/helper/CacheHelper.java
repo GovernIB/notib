@@ -57,6 +57,8 @@ public class CacheHelper {
 	private PluginHelper pluginHelper;
 	@Resource
 	private UsuariHelper usuariHelper;
+	@Resource
+	private OrganigramaHelper organigramaHelper;
 
 	@Cacheable(value = "entitatsUsuari", key="#usuariCodi.concat('-').concat(#rolActual)")
 	public List<EntitatDto> findEntitatsAccessiblesUsuari(
@@ -93,7 +95,7 @@ public class CacheHelper {
 				usuariCodi);
 	}
 
-	@Cacheable(value = "RolsAmbCodi", key="#rolsCodi")
+	@Cacheable(value = "rolsAmbCodi", key="#usuariCodi")
 	public List<String> findRolsUsuariAmbCodi(
 			String usuariCodi) {
 		return pluginHelper.consultarRolsAmbCodi(
@@ -176,6 +178,14 @@ public class CacheHelper {
 	public void evictFindOrganigramaByEntitat(String entitatcodi) {
 	}
 	
+	@CacheEvict(value = "organigramaPlugin", key="#entitatcodi")
+	public void evictFindOrganigramaPlugin(String entitatCodi) {
+	}
+			
+	@CacheEvict(value = "procedimentsPermis", allEntries = true)
+	public void evictFindProcedimentsWithPermis() {
+	}
+	
 	@CacheEvict(value = "organsGestorsUsuari", allEntries = true)
 	public void evictFindOrgansGestorsAccessiblesUsuari() {
 	}
@@ -186,9 +196,7 @@ public class CacheHelper {
 	
 	@CacheEvict(value = "getPermisosEntitatsUsuariActual", key="#auth.name")
 	public void evictGetPermisosEntitatsUsuariActual(Authentication auth) {
-//		System.out.println("Esborram cache permisos de " + auth.getName());
 	}
-	
 	
 //	private static final Logger logger = LoggerFactory.getLogger(CacheHelper.class);
 

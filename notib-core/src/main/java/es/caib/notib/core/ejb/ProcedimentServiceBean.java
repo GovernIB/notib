@@ -4,7 +4,6 @@
 package es.caib.notib.core.ejb;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -148,15 +147,27 @@ public class ProcedimentServiceBean implements ProcedimentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
-	public List<ProcedimentDto> findProcedimentsSenseGrups(Long entitatId) {
-		return delegate.findProcedimentsSenseGrups(entitatId);
+	public List<ProcedimentDto> findProcediments(Long entitatId, List<String> grups) {
+		return delegate.findProcediments(entitatId, grups);
 	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
-	public List<ProcedimentDto> findProcedimentsSenseGrupsWithPermis(Long entitatId, PermisEnum permis) {
-		return delegate.findProcedimentsSenseGrupsWithPermis(entitatId, permis);
+	public List<ProcedimentDto> findProcedimentsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+		return delegate.findProcedimentsWithPermis(entitatId, usuariCodi, permis);
 	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	public List<ProcedimentDto> findProcedimentsSenseGrups(Long entitatId) {
+		return delegate.findProcedimentsSenseGrups(entitatId);
+	}
+	
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+//	public List<ProcedimentDto> findProcedimentsSenseGrupsWithPermis(Long entitatId, PermisEnum permis) {
+//		return delegate.findProcedimentsSenseGrupsWithPermis(entitatId, permis);
+//	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
@@ -164,23 +175,11 @@ public class ProcedimentServiceBean implements ProcedimentService {
 		return delegate.findProcedimentsAmbGrups(entitatId, grups);
 	}
 	
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
-	public List<ProcedimentDto> findProcedimentsAmbGrupsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
-		return delegate.findProcedimentsAmbGrupsWithPermis(entitatId, grups, permis);
-	}
-	
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
-	public List<ProcedimentDto> findProcediments(Long entitatId, List<String> grups) {
-		return delegate.findProcediments(entitatId, grups);
-	}
-	
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
-	public List<ProcedimentDto> findProcedimentsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
-		return delegate.findProcedimentsWithPermis(entitatId, grups, permis);
-	}
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+//	public List<ProcedimentDto> findProcedimentsAmbGrupsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
+//		return delegate.findProcedimentsAmbGrupsWithPermis(entitatId, grups, permis);
+//	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
@@ -264,52 +263,12 @@ public class ProcedimentServiceBean implements ProcedimentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
-	public boolean hasPermisConsultaProcediment(EntitatDto entitat) {
-		return delegate.hasPermisConsultaProcediment(entitat);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
-	public boolean hasPermisNotificacioProcediment(EntitatDto entitat) {
-		return delegate.hasPermisNotificacioProcediment(entitat);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
-	public boolean hasGrupPermisConsultaProcediment(
-			Map<String, ProcedimentDto> procediments,
-			EntitatDto entitat) {
-		return delegate.hasGrupPermisConsultaProcediment(
-				procediments,
-				entitat);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
-	public boolean hasGrupPermisNotificacioProcediment(
-			Map<String, ProcedimentDto> procediments,
-			EntitatDto entitat) {
-		return delegate.hasGrupPermisNotificacioProcediment(
-				procediments,
-				entitat);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
-	public boolean hasPermisGestioProcediment(
-			Long procedimentId) {
-		return delegate.hasPermisGestioProcediment(
-				procedimentId);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
-	public boolean hasPermisProcessarProcediment(
-			String procedimentCodi,
-			Long procedimentId) {
-		return delegate.hasPermisProcessarProcediment(
-				procedimentCodi,
-				procedimentId);
+	public boolean hasPermisProcediment(
+			Long procedimentId,
+			PermisEnum permis) {
+		return delegate.hasPermisProcediment(
+				procedimentId,
+				permis);
 	}
 
 	@Override

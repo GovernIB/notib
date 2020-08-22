@@ -182,7 +182,7 @@ body {
 						<c:if test="${hiHaEntitats && isRolActualAdministradorEntitat || isRolActualUsuari || isRolActualAdministradorOrgan}">
 							<li class="dropdown">
 								<c:if test="${hiHaMesEntitats}"><a href="#" data-toggle="dropdown"></c:if>
-		         				<span class="fa fa-home"></span> ${entitatActual.nom} <c:if test="${hiHaMesEntitats}"><b class="caret caret-white"></b></c:if>
+		         				<span class="fa fa-home"></span> <span class="truncate" title="${entitatActual.nom}">${entitatActual.nom}</span> <c:if test="${hiHaMesEntitats}"><b class="caret caret-white"></b></c:if>
 								<c:if test="${hiHaMesEntitats}"></a></c:if>
 								<c:if test="${hiHaMesEntitats}">
 									<ul class="dropdown-menu">
@@ -204,7 +204,7 @@ body {
 						<c:if test="${hiHaOrgans && isRolActualAdministradorOrgan}">
 							<li class="dropdown">
 								<c:if test="${hiHaMesOrgans}"><a href="#" data-toggle="dropdown"></c:if>
-		         				<span class="fa fa-cubes"></span> ${organActual.nom} <c:if test="${hiHaMesOrgans}"><b class="caret caret-white"></b></c:if>
+		         				<span class="fa fa-cubes"></span> <span class="truncate" title="${organActual.nom}">${organActual.nom}</span> <c:if test="${hiHaMesOrgans}"><b class="caret caret-white"></b></c:if></span>
 								<c:if test="${hiHaMesOrgans}"></a></c:if>
 								<c:if test="${hiHaMesOrgans}">
 									<ul class="dropdown-menu">
@@ -272,7 +272,12 @@ body {
 				
 					</ul>
 					<div class="clearfix"></div>
-					<div class="btn-group navbar-btn navbar-right">
+					<div class="btn-toolbar navbar-btn navbar-right">
+						<c:if test="${isRolActualUsuari and permisNotificacio}">
+							<div class="btn-group">
+								<a data-toggle="modal" class="btn btn-primary" href="<c:url value="/notificacio/procediments"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.altanotificacio"/></a>
+							</div>
+						</c:if>
 						<div class="btn-group">
 							<c:if test="${isRolActualAdministrador}">
 							<div class="btn-group">
@@ -299,11 +304,11 @@ body {
 							</c:if>
 							<c:if test="${isRolActualUsuari}">
 							
-								<c:if test="${permisNotificacio}">
-									<div class="btn-group">
-										<a data-toggle="modal" class="btn btn-primary" href="<c:url value="/notificacio/procediments"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.altanotificacio"/></a>
-									</div>
-								</c:if>
+<%-- 								<c:if test="${permisNotificacio}"> --%>
+<!-- 									<div class="btn-group"> -->
+<%-- 										<a data-toggle="modal" class="btn btn-primary" href="<c:url value="/notificacio/procediments"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.altanotificacio"/></a> --%>
+<!-- 									</div> -->
+<%-- 								</c:if> --%>
 									<div class="btn-group">
 										<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
 									</div>
@@ -349,11 +354,11 @@ body {
 								</ul>
 							</div>
 							</c:if>
-							<div class="btn-group">
-									<a class="btn btn-primary" href="https://github.com/GovernIB/notib/raw/notib-${versioMajorActual}/doc/pdf/NOTIB_usuari.pdf" } download/><spring:message code="decorator.menu.manual.usuari"/></a>
+						</div>
+						<div class="btn-group">
+							<a class="btn btn-success" href="https://github.com/GovernIB/notib/raw/notib-${versioMajorActual}/doc/pdf/NOTIB_usuari.pdf" rel="noopener noreferrer" target="_blank"><span class="fa fa-download"></span> <spring:message code="decorator.menu.manual.usuari"/></a>
 <!-- 									Per a diferents rol, ara sol esta el manual d'usuari -->
 <%-- 									<a class="btn btn-primary" href="https://github.com/GovernIB/notib/raw/notib-${versioMajorActual}/doc/pdf/NOTIB_${rolActual}.pdf" } download/><spring:message code="decorator.menu.manual.usuari"/></a> --%>
-							</div>
 						</div>
 							
 					</div>

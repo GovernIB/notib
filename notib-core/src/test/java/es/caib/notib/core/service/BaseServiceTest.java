@@ -169,6 +169,7 @@ public class BaseServiceTest {
 		logger.info("-------------------------------------------------------------------");
 		List<Object> elementsCreats = new ArrayList<Object>();
 		Long entitatId = null;
+		Long organGestorId = null;
 		Long pagadorCieId = null;
 		try {
 			
@@ -209,6 +210,7 @@ public class BaseServiceTest {
 					autenticarUsuari("admin");
 					((OrganGestorDto)element).setEntitatId(entitatId);
 					OrganGestorDto entitatCreada = organGestorService.create((OrganGestorDto)element);
+					organGestorId = entitatCreada.getId();
 					elementsCreats.add(entitatCreada);
 					if (((OrganGestorDto)element).getPermisos() != null) {
 						for (PermisDto permis: ((OrganGestorDto)element).getPermisos()) {
@@ -229,9 +231,9 @@ public class BaseServiceTest {
 						for (PermisDto permis: ((ProcedimentDto)element).getPermisos()) {
 							procedimentService.permisUpdate(
 									entitatId,
+									organGestorId,
 									entitatCreada.getId(),
-									permis,
-									false);
+									permis);
 						}
 					}
 					id = entitatCreada.getId();

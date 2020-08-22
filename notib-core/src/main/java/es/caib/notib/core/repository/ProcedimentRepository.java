@@ -152,6 +152,20 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 	
 	List<ProcedimentEntity> findByOrganGestorId(Long organGestorId);
 
-	public List<ProcedimentEntity> findByOrganGestorCodiIn(List<String> organsGestors);
+	@Query(
+			"from ProcedimentEntity pro " +
+			"where pro.organGestor.codi in (:organsCodis) " +
+			"  and (pro.agrupar = false " +
+			"  	or (pro.agrupar = true " +
+			"  and pro in (select distinct gp.procediment " +
+			"		from GrupProcedimentEntity gp " +
+			"		left outer join gp.grup g " +
+			"		where g.codi in (:grups))) ) " +
+			"order by pro.nom asc")
+	public List<ProcedimentEntity> findByOrganGestorCodiInAndGrup(
+			@Param("organsCodis") List<String> organsCodis,
+			@Param("grups") List<String> grups);
+
+	public List<?> findByOrganGestorCodiIn(List<String> organsFills);
 	
 }
