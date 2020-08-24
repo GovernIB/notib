@@ -23,6 +23,7 @@ import es.caib.notib.core.api.dto.PaisosDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.exception.RegistreNotificaException;
 /**
  * Declaració dels mètodes per a la consulta de notificacions i dels
  * destinataris i events associats.
@@ -37,11 +38,12 @@ public interface NotificacioService {
 	 * @param notificacio
 	 *            Informació de la notificació a crear
 	 * @return La notificació amb l'id especificat.
+	 * @throws RegistreNotificaException 
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public List<NotificacioDto> create(
 			Long entitatId,
-			NotificacioDtoV2 notificacio);
+			NotificacioDtoV2 notificacio) throws RegistreNotificaException;
 	
 
 	/**
@@ -194,9 +196,10 @@ public interface NotificacioService {
 	 * @param notificacioId
 	 *            Atribut id de la notificació.
 	 * @return true si la notificació s'ha pogut enviar o false en cas contrari.
+	 * @throws RegistreNotificaException 
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
-	public List<RegistreIdDto> registrarNotificar(Long notificacioId);
+	public List<RegistreIdDto> registrarNotificar(Long notificacioId) throws RegistreNotificaException;
 
 	/**
 	 * Refresca l'estat d'un enviament (datat i certificació).
@@ -254,7 +257,7 @@ public interface NotificacioService {
 	
 
 	// Mètodes per cridar des de l'schedulled
-	void notificacioRegistrar(Long notificacioId);
+	void notificacioRegistrar(Long notificacioId) throws RegistreNotificaException;
 	void notificacioEnviar(Long notificacioId);
 	void enviamentRefrescarEstat(Long notificacioId);
 	void enviamentRefrescarEstatRegistre(Long notificacioId);

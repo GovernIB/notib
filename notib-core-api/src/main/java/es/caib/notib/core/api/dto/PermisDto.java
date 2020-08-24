@@ -36,6 +36,23 @@ public class PermisDto implements Serializable {
 	private boolean processar;
 	private boolean notificacio;
 
+	public void revocaPermisos() {
+		this.read = false;
+		this.read= false;
+		this.write= false;
+		this.create= false;
+		this.delete= false;
+		this.administration= false;
+		
+		this.usuari= false;
+		this.administrador= false;
+		this.administradorEntitat= false;
+		this.aplicacio= false;
+		
+		this.processar= false;
+		this.notificacio= false;
+	}
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

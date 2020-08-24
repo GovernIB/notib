@@ -65,6 +65,7 @@ import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
+import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.EnviamentService;
@@ -538,7 +539,7 @@ public class NotificacioController extends BaseUserController {
 	public String registrar(
 			HttpServletRequest request, 
 			@PathVariable Long notificacioId, 
-			Model model) {
+			Model model) throws RegistreNotificaException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
 		List<RegistreIdDto> registresIdDto = notificacioService.registrarNotificar(notificacioId);

@@ -19,4 +19,7 @@
 	<cache name="denominacioOrganisme" maxElementsInMemory="300" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />
 	<cache name="organsGestorsUsuari" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
 	<cache name="procedimentsPermis" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
+	<cache name="findOficinesEntitat" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
+	<cache name="findLlibresOficina" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
+	<cache name="findLlibreOrganisme" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
 </ehcache>

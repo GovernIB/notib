@@ -222,6 +222,14 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		return tipusUsuari;
 	}
 	
+	public void updateCodiSia(String codiSia) {
+		this.procedimentCodiNotib=codiSia;
+	}
+	
+	public void resetIntentsNotificacio() {
+		this.notificaEnviamentIntent = 0;
+	}
+	
 	public void updateNotificaNouEnviament(int reintentsPeriodeNotifica) {
 		this.notificaEnviamentIntent++;
 		Calendar cal = GregorianCalendar.getInstance();

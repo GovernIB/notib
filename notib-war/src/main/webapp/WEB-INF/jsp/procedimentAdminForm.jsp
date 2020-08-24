@@ -4,7 +4,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-
+<% 
+pageContext.setAttribute(
+			"isRolActualAdministradorEntitat",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
+%>
 <c:choose>
 	<c:when test="${empty procedimentCommand.codi}"><c:set var="titol"><spring:message code="procediment.form.titol.crear"/> ${entitat.nom} <c:out value=" (${entitat.dir3Codi})"></c:out></c:set></c:when>
 	<c:otherwise><c:set var="titol"><spring:message code="procediment.form.titol.modificar"/> ${entitat.nom} <c:out value=" (${entitat.dir3Codi})"></c:out></c:set></c:otherwise>
@@ -46,38 +50,78 @@
 }
 </style>
 <script type="text/javascript">
+var entitatDir3 = "${entitat.dir3Codi}";
+
 $(document).ready(function() {
 	//Organismes
-	$("#searchOrgan").click(function(){
-		$("#organismesModal").modal();
-		var entitatId = $('#entitatId').val();
-		$.ajax({
-			type: 'GET',
-			url: "<c:url value="/procediment/organismes/"/>" + entitatId,
-			success: function(data) {
-				var selOrganismes = $('#selOrganismes');
-				selOrganismes.empty();
-				selOrganismes.append("<option value=\"\"></option>");
-				if (data && data.length > 0) {
-						var items = [];
-						$.each(data, function(i, val) {
-							items.push({
-								"id": val.codi,
-								"text": val.codi + " - " + val.nom
+	function loadOrganismes(){
+			var entitatId = $('#entitatId').val();
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value="/procediment/organismes/"/>" + entitatId,
+				success: function(data) {
+					var selOrganismes = $('#selOrganismes');
+					selOrganismes.empty();
+					selOrganismes.append("<option value=\"\"></option>");
+					if (data && data.length > 0) {
+							var items = [];
+							$.each(data, function(i, val) {
+								items.push({
+									"id": val.codi,
+									"text": val.codi + " - " + val.nom
+								});
+								selOrganismes.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
 							});
-							selOrganismes.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
-						});
+					}
+					var select2Options = {
+							theme: 'bootstrap',
+							width: 'auto'};
+					selOrganismes.select2(select2Options);
+					$(".loading-screen").hide();
+				},
+				error: function() {
+					console.log("error obtenint els organismes...");
 				}
-				var select2Options = {
-						theme: 'bootstrap',
-						width: 'auto'};
-				selOrganismes.select2(select2Options);
-				$(".loading-screen").hide();
-			},
-			error: function() {
-				console.log("error obtenint els organismes...");
-			}
-		});
+			});
+	};
+	loadOrganismes();
+	$("#searchOrgan").click(function(){
+		var comu = document.getElementById('comu');
+		debugger
+		if(comu == null || (comu!= null && !comu.checked)){
+			$("#organismesModal").modal();
+			var entitatId = $('#entitatId').val();
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value="/procediment/organismes/"/>" + entitatId,
+				success: function(data) {
+					var selOrganismes = $('#selOrganismes');
+					selOrganismes.empty();
+					selOrganismes.append("<option value=\"\"></option>");
+					if (data && data.length > 0) {
+							var items = [];
+							$.each(data, function(i, val) {
+								items.push({
+									"id": val.codi,
+									"text": val.codi + " - " + val.nom
+								});
+								selOrganismes.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
+							});
+					}
+					var select2Options = {
+							theme: 'bootstrap',
+							width: 'auto'};
+					selOrganismes.select2(select2Options);
+					$(".loading-screen").hide();
+				},
+				error: function() {
+					console.log("error obtenint els organismes...");
+				}
+			});
+			
+		}
+		
+		
 	});
 	$('#addOrganismeButton').on('click', function(){
 		var organSelect = document.getElementById('selOrganismes');
@@ -89,10 +133,9 @@ $(document).ready(function() {
 	//Oficines
 	$("#searchOficina").click(function(){
 		$("#oficinesModal").modal();
-		var entitatId = $('#entitatId').val();
 		$.ajax({
 			type: 'GET',
-			url: "<c:url value="/procediment/oficines/"/>" + entitatId,
+			url: "<c:url value="/procediment/oficines"/>",
 			success: function(data) {
 				var selOficines = $('#selOficines');
 				selOficines.empty();
@@ -102,15 +145,16 @@ $(document).ready(function() {
 						$.each(data, function(i, val) {
 							items.push({
 								"id": val.codi,
-								"text": val.nom
+								"text": val.codi + " - " + val.nom
 							});
-							selOficines.append("<option value=\"" + val.codi + "\">" + val.nom + "</option>");
+							selOficines.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
 						});
 					}
 				var select2Options = {
 						theme: 'bootstrap',
 						width: 'auto'};
 				selOficines.select2(select2Options);
+				$(".loading-screen").hide();
 			},
 			error: function() {
 				console.log("error obtenint les oficines...");
@@ -126,38 +170,37 @@ $(document).ready(function() {
 	});
 	//Llibres
 	$("#searchLlibre").click(function(){
-		$("#llibresModal").modal();
-		var entitatId = $('#entitatId').val();
-		var oficina = $('#oficina').val();
-		if (oficina == '') {
-			oficina = '0';
-		}
-		$.ajax({
-			type: 'GET',
-			url: "<c:url value="/procediment/llibres/"/>" + entitatId + "/" + oficina,
-			success: function(data) {
-				var selLlibres = $('#selLlibres');
-				selLlibres.empty();
-				selLlibres.append("<option value=\"\"></option>");
-				if (data && data.length > 0) {
+		var organGestor = $('#organGestor').val();
+		if (organGestor !== undefined && organGestor !== '') {
+			$("#llibresModal").modal();
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value="/procediment/llibre/"/>" + organGestor,
+				success: function(data) {
+					var selLlibres = $('#selLlibres');
+					selLlibres.empty();
+					selLlibres.append("<option value=\"\"></option>");
+					if (data) {
 						var items = [];
-						$.each(data, function(i, val) {
-							items.push({
-								"id": val.codi,
-								"text": val.nom
-							});
-							selLlibres.append("<option value=\"" + val.codi + "\">" + val.nom + "</option>");
+						items.push({
+							"id": data.codi,
+							"text": data.codi + " - " + data.nomLlarg
 						});
+						selLlibres.append("<option value=\"" + data.codi + "\">" + data.codi + " - " + data.nomLlarg + "</option>");
 					}
-				var select2Options = {
-						theme: 'bootstrap',
-						width: 'auto'};
-				selLlibres.select2(select2Options);
-			},
-			error: function() {
-				console.log("error obtenint els llibres...");
-			}
-		});
+					var select2Options = {
+							theme: 'bootstrap',
+							width: 'auto'};
+					selLlibres.select2(select2Options);
+					$(".loading-screen").hide();
+				},
+				error: function() {
+					console.log("error obtenint els llibres...");
+				}
+			});
+		} else {
+			alert('<spring:message code="procediment.form.avis.llibres"/>');
+		}
 	});
 	$('#addLlibreButton').on('click', function(){
 		var llibreSelect = document.getElementById('selLlibres');
@@ -191,6 +234,7 @@ $(document).ready(function() {
 						theme: 'bootstrap',
 						width: 'auto'};
 				selTipusAssumpte.select2(select2Options);
+				$(".loading-screen").hide();
 			},
 			error: function() {
 				console.log("error obtenint els tipus d'assumpte...");
@@ -233,6 +277,7 @@ $(document).ready(function() {
 						theme: 'bootstrap',
 						width: 'auto'};
 				selCodisAssumpte.select2(select2Options);
+				$(".loading-screen").hide();
 			},
 			error: function() {
 				console.log("error obtenint els codis d'assumpte...");
@@ -246,6 +291,31 @@ $(document).ready(function() {
 		$('#codiAssumpte').val(codiAssumpteSeleccionatValue);
 		$('#codiAssumpteNom').val(codiAssumpteSeleccionatText);
 	});
+	$('#comu').on('click', function(event){
+// 		var organSelect = document.getElementById('selOrganismes');
+		
+		if ($(this).is(':checked')) {
+			debugger
+			$('#organGestorNom').removeClass('habilitat');
+			$('#organGestor').val(entitatDir3);
+			var organText = '';
+			$("#selOrganismes option").each(function(){
+				if ($(this).val() == entitatDir3){        
+					organText = $(this).text();
+			    }
+		     });
+			$('#organGestorNom').val(organText);
+		}else{
+			$('#organGestorNom').addClass('habilitat');
+			$('#organGestor').val(null);
+			$('#organGestorNom').val(null);
+		}	
+	});
+	
+		
+	
+
+	
 });
 </script>
 </head>
@@ -272,21 +342,30 @@ $(document).ready(function() {
 				<not:inputText name="nom" textKey="procediment.form.camp.nom" required="true" labelSize="2"/>
 				<not:inputText name="retard" textKey="procediment.form.camp.retard" labelSize="2"/>
 				<not:inputText name="caducitat" textKey="procediment.form.camp.caducitat" labelSize="2"/>
+				<c:if test="${isRolActualAdministradorEntitat}">
+					<not:inputCheckbox name="comu" textKey="procediment.form.camp.comu" labelSize="2"/>
+					
+				</c:if>
+				<not:inputTextSearch  name="organGestorNom" textKey="procediment.form.camp.organ" searchButton="searchOrgan" required="true" readonly="true" labelSize="2"/>
 				<form:hidden path="entitatId" value="${entitat.id}"/>
 				<form:hidden path="organGestor"/>
-				<not:inputTextSearch name="organGestorNom" textKey="procediment.form.camp.organ" searchButton="searchOrgan" required="true" readonly="true" labelSize="2"/>
+				
 <%-- 				<not:inputText name="organGestor" textKey="procediment.form.camp.organ" required="true" labelSize="2"/> --%>
 				<not:inputSelect name="pagadorPostalId" emptyOption="true" textKey="procediment.form.camp.postal" optionItems="${pagadorsPostal}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>
 				<not:inputSelect name="pagadorCieId" emptyOption="true" textKey="procediment.form.camp.cie" optionItems="${pagadorsCie}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>
 				<not:inputCheckbox name="agrupar" textKey="procediment.form.camp.agrupar" labelSize="2"/>
-				<not:inputCheckbox name="comu" textKey="procediment.form.camp.comu" labelSize="2"/>
+
 			</div>
 			<div role="tabpanel" class="tab-pane <c:if test='${not empty errorRegistre}'>active</c:if>" id="registreForm">
 				<div class="alert alert-warning" role="alert">
 				 	<spring:message code="procediment.form.warning"></spring:message>
 				</div>
-				<not:inputText name="oficina" textKey="procediment.form.camp.oficina" labelSize="2"/>
-				<not:inputText name="llibre" textKey="procediment.form.camp.llibre" labelSize="2"/>
+				<!--not:inputText name="oficina" textKey="procediment.form.camp.oficina" labelSize="2"/-->
+				<form:hidden path="oficina"/>
+				<not:inputTextSearch name="oficinaNom" textKey="procediment.form.camp.oficina" searchButton="searchOficina" required="true" readonly="true" labelSize="2"/>
+				<!-- not:inputText name="llibre" textKey="procediment.form.camp.llibre" labelSize="2"/-->
+				<form:hidden path="llibre"/>
+				<not:inputTextSearch name="llibreNom" textKey="procediment.form.camp.llibre" searchButton="searchLlibre" required="true" readonly="true" labelSize="2"/>
 				<form:hidden path="tipusAssumpte"/>
 				<not:inputTextSearch name="tipusAssumpteNom" textKey="procediment.form.camp.tipusassumpte" searchButton="searchTipusAssumpte" labelSize="2" readonly="true"/>
 				<form:hidden path="codiAssumpte"/>
@@ -330,7 +409,12 @@ $(document).ready(function() {
 					<h4 class="modal-title"><spring:message code="procediment.form.titol.oficines"/></h4>
 				</div>
 				<div class="modal-body body">
-					<select id="selOficines"></select> 
+					<select id="selOficines"></select>
+					<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
+						<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
+							<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>
+						</div>
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button id="addOficinaButton" type="button" class="btn btn-info" data-dismiss="modal"><span class="fa fa-plus"></span> <spring:message code="comu.boto.afegir"/></button>
@@ -348,7 +432,12 @@ $(document).ready(function() {
 					<h4 class="modal-title"><spring:message code="procediment.form.titol.llibres"/></h4>
 				</div>
 				<div class="modal-body body">
-					<select id="selLlibres"></select> 
+					<select id="selLlibres"></select>
+					<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
+						<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
+							<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>
+						</div>
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button id="addLlibreButton" type="button" class="btn btn-info" data-dismiss="modal"><span class="fa fa-plus"></span> <spring:message code="comu.boto.afegir"/></button>
@@ -366,7 +455,12 @@ $(document).ready(function() {
 					<h4 class="modal-title"><spring:message code="procediment.form.titol.tipusAssumpte"/></h4>
 				</div>
 				<div class="modal-body body">
-					<select id="selTipusAssumpte"></select> 
+					<select id="selTipusAssumpte"></select>
+					<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
+						<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
+							<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>
+						</div>
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button id="addTipusAssumpteButton" type="button" class="btn btn-info" data-dismiss="modal"><span class="fa fa-plus"></span> <spring:message code="comu.boto.afegir"/></button>
@@ -384,7 +478,12 @@ $(document).ready(function() {
 					<h4 class="modal-title"><spring:message code="procediment.form.titol.codiAssumpte"/></h4>
 				</div>
 				<div class="modal-body body">
-					<select id="selCodiAssumpte"></select> 
+					<select id="selCodiAssumpte"></select>
+					<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
+						<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
+							<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>
+						</div>
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button id="addCodiAssumpteButton" type="button" class="btn btn-info" data-dismiss="modal"><span class="fa fa-plus"></span> <spring:message code="comu.boto.afegir"/></button>

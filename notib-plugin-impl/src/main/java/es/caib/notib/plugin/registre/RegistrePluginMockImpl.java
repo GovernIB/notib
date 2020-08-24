@@ -164,70 +164,70 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		
 		List<Oficina> oficines = new ArrayList<Oficina>();
 		
-//		Oficina oficina1 = new Oficina();
-//		oficina1.setCodi("O00001496");
-//		oficina1.setNom("Fogaiba Servicios Centrales");
-//		oficines.add(oficina1);
-//		
-//		Oficina oficina2 = new Oficina();
-//		oficina2.setCodi("O00001497");
-//		oficina2.setNom("Fogaiba Palma");
-//		oficines.add(oficina2);
-//		
-//		Oficina oficina3 = new Oficina();
-//		oficina3.setCodi("O00001502");
-//		oficina3.setNom("Fogaiba SA Pobla");
-//		oficines.add(oficina3);
-//		
-//		Oficina oficina4 = new Oficina();
-//		oficina4.setCodi("O00001500");
-//		oficina4.setNom("Fogaiba Inca");
-//		oficines.add(oficina4);
-//		
-//		Oficina oficina5 = new Oficina();
-//		oficina5.setCodi("O00001501");
-//		oficina5.setNom("Fogaiba Manacor");
-//		oficines.add(oficina5);
-//		
-//		Oficina oficina6 = new Oficina();
-//		oficina6.setCodi("O00009385");
-//		oficina6.setNom("Fogaiba Maó");
-//		oficines.add(oficina6);
-//		
-//		Oficina oficina7 = new Oficina();
-//		oficina7.setCodi("O00009386");
-//		oficina7.setNom("Fogaiba Ciutadella");
-//		oficines.add(oficina7);
-//		
-//		Oficina oficina8 = new Oficina();
-//		oficina8.setCodi("O00001498");
-//		oficina8.setNom("Fogaiba Campos");
-//		oficines.add(oficina8);
-//		
-//		Oficina oficina9 = new Oficina();
-//		oficina9.setCodi("O00009384");
-//		oficina9.setNom("Fogaiba Eivissa");
-//		oficines.add(oficina9);
-//		
-//		Oficina oficina10 = new Oficina();
-//		oficina10.setCodi("O00001499");
-//		oficina10.setNom("Fogaiba Felanitx");
-//		oficines.add(oficina10);
-//		
-//		Oficina oficina11 = new Oficina();
-//		oficina11.setCodi("O00009436");
-//		oficina11.setNom("Oficina Conveni Consell D'Eivissa");
-//		oficines.add(oficina11);
-//		
-//		Oficina oficina12 = new Oficina();
-//		oficina12.setCodi("O00009437");
-//		oficina12.setNom("Oficina Conveni Consell de Menorca");
-//		oficines.add(oficina12);
-//		
-//		Oficina oficina13 = new Oficina();
-//		oficina13.setCodi("O00010444");
-//		oficina13.setNom("Oficina Conveni Consell D'Eivissa");
-//		oficines.add(oficina13);
+		Oficina oficina1 = new Oficina();
+		oficina1.setCodi("O00001496");
+		oficina1.setNom("Fogaiba Servicios Centrales");
+		oficines.add(oficina1);
+		
+		Oficina oficina2 = new Oficina();
+		oficina2.setCodi("O00001497");
+		oficina2.setNom("Fogaiba Palma");
+		oficines.add(oficina2);
+		
+		Oficina oficina3 = new Oficina();
+		oficina3.setCodi("O00001502");
+		oficina3.setNom("Fogaiba SA Pobla");
+		oficines.add(oficina3);
+		
+		Oficina oficina4 = new Oficina();
+		oficina4.setCodi("O00001500");
+		oficina4.setNom("Fogaiba Inca");
+		oficines.add(oficina4);
+		
+		Oficina oficina5 = new Oficina();
+		oficina5.setCodi("O00001501");
+		oficina5.setNom("Fogaiba Manacor");
+		oficines.add(oficina5);
+		
+		Oficina oficina6 = new Oficina();
+		oficina6.setCodi("O00009385");
+		oficina6.setNom("Fogaiba Maó");
+		oficines.add(oficina6);
+		
+		Oficina oficina7 = new Oficina();
+		oficina7.setCodi("O00009386");
+		oficina7.setNom("Fogaiba Ciutadella");
+		oficines.add(oficina7);
+		
+		Oficina oficina8 = new Oficina();
+		oficina8.setCodi("O00001498");
+		oficina8.setNom("Fogaiba Campos");
+		oficines.add(oficina8);
+		
+		Oficina oficina9 = new Oficina();
+		oficina9.setCodi("O00009384");
+		oficina9.setNom("Fogaiba Eivissa");
+		oficines.add(oficina9);
+		
+		Oficina oficina10 = new Oficina();
+		oficina10.setCodi("O00001499");
+		oficina10.setNom("Fogaiba Felanitx");
+		oficines.add(oficina10);
+		
+		Oficina oficina11 = new Oficina();
+		oficina11.setCodi("O00009436");
+		oficina11.setNom("Oficina Conveni Consell D'Eivissa");
+		oficines.add(oficina11);
+		
+		Oficina oficina12 = new Oficina();
+		oficina12.setCodi("O00009437");
+		oficina12.setNom("Oficina Conveni Consell de Menorca");
+		oficines.add(oficina12);
+		
+		Oficina oficina13 = new Oficina();
+		oficina13.setCodi("O00010444");
+		oficina13.setNom("Oficina Conveni Consell D'Eivissa");
+		oficines.add(oficina13);
 		
 		return oficines;
 	}
@@ -240,26 +240,26 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		
 		List<Llibre> llibres = new ArrayList<Llibre>();
 	
-//		Llibre llibre1 = new Llibre();
-//		llibre1.setCodi("L95");
-//		llibre1.setOrganisme("A04003003");
-//		llibre1.setNomCurt("L95");
-//		llibre1.setNomLlarg("FOGAIBA");
-//		llibres.add(llibre1);
-//		
-//		Llibre llibre2 = new Llibre();
-//		llibre2.setCodi("L2");
-//		llibre2.setOrganisme("A04003003");
-//		llibre2.setNomCurt("L2");
-//		llibre2.setNomLlarg("OF. CONVENI CONSELL MENORCA");
-//		llibres.add(llibre2);
-//		
-//		Llibre llibre3 = new Llibre();
-//		llibre3.setCodi("L3");
-//		llibre3.setOrganisme("A04003003");
-//		llibre3.setNomCurt("L3");
-//		llibre3.setNomLlarg("OF. CONVENI CONSELL EIVISSA");
-//		llibres.add(llibre3);
+		Llibre llibre1 = new Llibre();
+		llibre1.setCodi("L95");
+		llibre1.setOrganisme("A04003003");
+		llibre1.setNomCurt("L95");
+		llibre1.setNomLlarg("FOGAIBA");
+		llibres.add(llibre1);
+		
+		Llibre llibre2 = new Llibre();
+		llibre2.setCodi("L2");
+		llibre2.setOrganisme("A04003003");
+		llibre2.setNomCurt("L2");
+		llibre2.setNomLlarg("OF. CONVENI CONSELL MENORCA");
+		llibres.add(llibre2);
+		
+		Llibre llibre3 = new Llibre();
+		llibre3.setCodi("L3");
+		llibre3.setOrganisme("A04003003");
+		llibre3.setNomCurt("L3");
+		llibre3.setNomLlarg("OF. CONVENI CONSELL EIVISSA");
+		llibres.add(llibre3);
 		
 		return llibres;
 	}

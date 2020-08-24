@@ -132,6 +132,12 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	public List<ProcedimentDto> findAll() {
 		return delegate.findAll();
 	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	public boolean procedimentEnUs(Long procedimentId) {
+		return delegate.procedimentEnUs(procedimentId);
+	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
@@ -289,20 +295,6 @@ public class ProcedimentServiceBean implements ProcedimentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
-	public List<OficinaDto> findOficines(EntitatDto entitat) {
-		return delegate.findOficines(entitat);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN"})
-	public List<LlibreDto> findLlibres(
-			EntitatDto entitat, 
-			String oficina) {
-		return delegate.findLlibres(entitat, oficina);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN"})
 	public void refrescarCache(EntitatDto entitat) {
 		delegate.refrescarCache(entitat);
 	}
@@ -336,6 +328,24 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	@Override
 	public ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi) {
 		return delegate.getProgresActualitzacio(dir3Codi);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	public List<OficinaDto> findOficines(Long entitatId) {
+		return delegate.findOficines(entitatId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	public List<LlibreDto> findLlibres(Long entitatId, String oficina) {
+		return delegate.findLlibres(entitatId, oficina);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	public LlibreDto getLlibreOrganisme(Long entitatId, String organGestorDir3Codi) {
+		return delegate.getLlibreOrganisme(entitatId, organGestorDir3Codi);
 	}
 
 }

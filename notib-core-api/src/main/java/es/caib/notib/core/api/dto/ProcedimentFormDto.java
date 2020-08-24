@@ -36,7 +36,7 @@ public class ProcedimentFormDto extends AuditoriaDto implements Serializable{
 	}
 	
 	public String getOrganGestorDesc() {
-		return organGestor + " - " + organGestorNom;
+		return organGestor + " - " + organGestorNom!=null?organGestorNom:"";
 	}
 
 

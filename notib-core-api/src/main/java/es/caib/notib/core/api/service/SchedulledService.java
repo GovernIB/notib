@@ -3,6 +3,8 @@
  */
 package es.caib.notib.core.api.service;
 
+import es.caib.notib.core.api.exception.RegistreNotificaException;
+
 /**
  * Declaració dels mètodes per a la consulta de notificacions i dels
  * destinataris i events associats.
@@ -20,8 +22,9 @@ public interface SchedulledService {
 	/**
 	 * Mètode d'execució periòdica per a fer els enviaments pendents
 	 * al registre.
+	 * @throws RegistreNotificaException 
 	 */
-	public void registrarEnviamentsPendents();
+	public void registrarEnviamentsPendents() throws RegistreNotificaException;
 
 	/**
 	 * Mètode d'execució periòdica per a refrescar l'estat dels enviaments fets a

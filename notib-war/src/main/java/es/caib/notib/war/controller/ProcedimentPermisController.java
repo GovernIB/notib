@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.service.EntitatService;
@@ -142,10 +141,7 @@ public class ProcedimentPermisController extends BaseUserController{
 							procedimentId));
 			return "procedimentAdminPermisForm";
 		}
-		Long organGestorActualId = null;
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
-		if (organGestorActual != null)
-			organGestorActualId = organGestorActual.getId();
+		Long organGestorActualId = getOrganGestorActualId(request);
 		procedimentService.permisUpdate(
 				entitatActual.getId(),
 				organGestorActualId,
@@ -164,10 +160,7 @@ public class ProcedimentPermisController extends BaseUserController{
 			@PathVariable Long permisId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		Long organGestorActualId = null;
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
-		if (organGestorActual != null)
-			organGestorActualId = organGestorActual.getId();
+		Long organGestorActualId = getOrganGestorActualId(request);
 		procedimentService.permisDelete(
 				entitatActual.getId(),
 				organGestorActualId,

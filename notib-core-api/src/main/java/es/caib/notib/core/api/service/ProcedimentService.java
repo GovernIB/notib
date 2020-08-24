@@ -158,6 +158,9 @@ public interface ProcedimentService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public List<ProcedimentDto> findAll();
+	
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	public boolean procedimentEnUs(Long procedimentId);
 
 	/**
 	 * Llistat amb tots els grups.
@@ -216,7 +219,7 @@ public interface ProcedimentService {
 	 * @return La llista dels tipus d'assumpte.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public List<OficinaDto> findOficines(EntitatDto entitat);
+	public List<OficinaDto> findOficines(Long entitatId);
 	
 	/**
 	 * Recupera els llibres d'una entitat i d'una oficina.
@@ -225,8 +228,18 @@ public interface ProcedimentService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	public List<LlibreDto> findLlibres(
-			EntitatDto entitat,
+			Long entitatId,
 			String oficina);
+	
+	/**
+	 * Recupera el llibre d'un òrgan gestor (anomenat organisme dins Regweb)
+	 * 
+	 * @return La llista dels codis d'assumpte.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	public LlibreDto getLlibreOrganisme(
+			Long entitatId,
+			String organGestorDir3Codi);
 	
 	/**
 	 * Consulta els permisos d'un procediment.
