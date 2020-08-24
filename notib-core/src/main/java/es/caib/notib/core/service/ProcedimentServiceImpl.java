@@ -83,7 +83,9 @@ import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.Llibre;
 import es.caib.notib.plugin.registre.Oficina;
+import es.caib.notib.plugin.registre.Organisme;
 import es.caib.notib.plugin.registre.TipusAssumpte;
+import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
 
 /**
  * Implementació del servei de gestió de procediments.
@@ -396,6 +398,12 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 //				logger.debug(">>>> ==========================================================================");
 				progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediments"));
 				
+				//TODO: optimitzar el tema de la oficina virtual, podria estar en cache
+				// per tal que no la cerqui cada vegada dins el for
+				Oficina oficinaVirtual = pluginHelper.llistarOficinaVirtual(
+						entitatDto.getDir3Codi(), 
+						TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
+				
 				int i = 1;
 				for (ProcedimentDto procedimentGda: procedimentsGda) {
 					t1 = System.currentTimeMillis();
@@ -467,6 +475,21 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 //						logger.debug(">>>> >> procediment NOU ...");
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.result.no"));
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.crear", new Object[] {procedimentGda.getCodi()}));
+
+						//#260 Capturar Llibre i oficina del regweb3
+						String llibre = null;
+						String llibreNom = null;
+						String oficina = null; 
+						String oficinaNom = null;
+						
+						Llibre llibreEntitatiOrgan = pluginHelper.llistarLlibreOrganisme(entitatDto.getDir3Codi(), organGestor.getCodi());
+						
+						if (llibreEntitatiOrgan!=null) {
+							llibre = llibreEntitatiOrgan.getCodi();
+							llibreNom = llibreEntitatiOrgan.getNomCurt();
+							oficina = oficinaVirtual.getCodi(); 
+							oficinaNom = oficinaVirtual.getNom();
+						}
 						
 						// CREATE
 						procediment = ProcedimentEntity.getBuilder(
@@ -478,16 +501,17 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 								null,
 								null,
 								false,
-								null,
-								null,
-								null,
-								null,
+								llibre,
+								llibreNom,
+								oficina,
+								oficinaNom,
 								organGestor,
 								null,
 								null,
 								null,
 								null,
 								procedimentGda.isComu()).build();
+						
 						procediment.updateDataActualitzacio(new Date());
 						procedimentRepository.save(procediment);
 						
