@@ -421,6 +421,7 @@ public class PluginHelper {
 	
 	public Oficina llistarOficinaVirtual(
 			String entitatcodi,
+			String nomOficinaVirtual,
 			TipusRegistreRegweb3Enum autoritzacio) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(
@@ -434,6 +435,7 @@ public class PluginHelper {
 		try {
 			oficina = getRegistrePlugin().llistarOficinaVirtual(
 					entitatcodi, 
+					nomOficinaVirtual,
 					autoritzacio.getValor());
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
@@ -1342,6 +1344,7 @@ public class PluginHelper {
 			//oficina virtual
 			oficinaVirtual = llistarOficinaVirtual(
 					dir3Codi, 
+					notificacio.getEntitat().getNomOficinaVirtual(),
 					TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
 			
 			if (oficinaVirtual != null) {
@@ -1912,7 +1915,8 @@ public class PluginHelper {
 		} else {
 			//oficina virtual
 			oficinaVirtual = llistarOficinaVirtual(
-					dir3Codi, 
+					dir3Codi,
+					notificacio.getEntitat().getNomOficinaVirtual(),
 					TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
 			
 			if (oficinaVirtual != null) {

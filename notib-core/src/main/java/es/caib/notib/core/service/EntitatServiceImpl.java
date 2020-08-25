@@ -105,7 +105,8 @@ public class EntitatServiceImpl implements EntitatService {
 					entitat.getLogoPeuBytes(),
 					entitat.getColorFons(),
 					entitat.getColorLletra(),
-					entitat.getTipusDocDefault().getTipusDocEnum()).
+					entitat.getTipusDocDefault().getTipusDocEnum(),
+					entitat.getNomOficinaVirtual()).
 					descripcio(entitat.getDescripcio()).
 					build();
 			
@@ -197,7 +198,8 @@ public class EntitatServiceImpl implements EntitatService {
 					logoPeuActual,
 					entitat.getColorFons(),
 					entitat.getColorLletra(),
-					entitat.getTipusDocDefault().getTipusDocEnum());
+					entitat.getTipusDocDefault().getTipusDocEnum(),
+					entitat.getNomOficinaVirtual());
 			return conversioTipusHelper.convertir(
 					entity,
 					EntitatDto.class);

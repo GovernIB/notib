@@ -44,7 +44,7 @@ public class EntitatDto extends AuditoriaDto {
 	private boolean usuariActualAdministradorEntitat;
 	private boolean usuariActualAdministradorOrgan;
 	private Long numAplicacions;
-
+	private String nomOficinaVirtual;
 
 	public int getPermisosCount() {
 		if  (permisos == null)

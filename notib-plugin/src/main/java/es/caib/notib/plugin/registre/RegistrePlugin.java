@@ -108,6 +108,7 @@ public interface RegistrePlugin {
 	 * Retorn l'oficina virtual d'una entitat
 	 * 
 	 * @param entitatCodi	Codi de l'entitat de la qual es volen llistar les oficines
+	 * @param nomOficinaVirtual	Nom de l'oficina virtual a recuperar
 	 * @param autoritzacioValor	Tipus de registre del que es volen llistar les oficines	
 	 * @return
 	 * 		Retorna una llista amb les oficines de l'entitat
@@ -115,6 +116,7 @@ public interface RegistrePlugin {
 	 */
 	public Oficina llistarOficinaVirtual(
 			String entitatCodi, 
+			String nomOficinaVirtual,
 			Long autoritzacioValor) throws RegistrePluginException;
 	
 	/** Llista les oficines d'una entitat depenent dels permisos

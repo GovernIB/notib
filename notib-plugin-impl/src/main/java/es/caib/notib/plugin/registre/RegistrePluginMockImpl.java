@@ -150,6 +150,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	@Override
 	public Oficina llistarOficinaVirtual(
 			String entitatCodi, 
+			String nomOficinaVirtualEntitat,
 			Long autoritzacioValor) throws RegistrePluginException {
 		Oficina oficina = new Oficina();
 		oficina.setCodi("O00009390");

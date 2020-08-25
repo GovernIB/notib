@@ -48,7 +48,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
 	
-	private static final String OFICINA_VIRTUAL = "Oficina Virtual";
+	private static final String OFICINA_VIRTUAL_DEFAULT = "Oficina Virtual";
 
 	@Override
 	public RespostaAnotacioRegistre registrarSalida(
@@ -728,16 +728,20 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	}
 
 	@Override
-	public Oficina llistarOficinaVirtual(String entitatCodi, Long autoritzacioValor) throws RegistrePluginException {
+	public Oficina llistarOficinaVirtual(
+			String entitatCodi, 
+			String nomOficinaVirtualEntitat,
+			Long autoritzacioValor) throws RegistrePluginException {
 		List<Oficina> oficines = new ArrayList<Oficina>();
 		Oficina oficinaVirtual = new Oficina();
+		String nomOficinaVirtual = nomOficinaVirtualEntitat != null ? nomOficinaVirtualEntitat : OFICINA_VIRTUAL_DEFAULT;
 		try {
 			oficines = toOficines(getInfoApi().listarOficinas(
 					entitatCodi,
 					autoritzacioValor));
 			if (oficines != null) {
 				for (Oficina oficina : oficines) {
-					if (oficina.getNom().equalsIgnoreCase(OFICINA_VIRTUAL)) {
+					if (oficina.getNom().equalsIgnoreCase(nomOficinaVirtual)) {
 						oficinaVirtual = oficina;
 					}
 				}

@@ -405,6 +405,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				// per tal que no la cerqui cada vegada dins el for
 				Oficina oficinaVirtual = pluginHelper.llistarOficinaVirtual(
 						entitatDto.getDir3Codi(), 
+						entitatDto.getNomOficinaVirtual(),
 						TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
 				
 				int i = 1;

@@ -471,7 +471,7 @@ public class BaseServiceTest {
 		Oficina oficina = new Oficina();
 		oficina.setCodi("O00009390");
 		oficina.setNom(("DGTIC"));
-		Mockito.when(registrePluginMock.llistarOficinaVirtual(Mockito.anyString(), Mockito.anyLong())).thenReturn(oficina);
+		Mockito.when(registrePluginMock.llistarOficinaVirtual(Mockito.anyString(), Mockito.anyString(), Mockito.anyLong())).thenReturn(oficina);
 																																																																																				
 		// llistarOficines
 		List<Oficina> oficines = new ArrayList<Oficina>();
