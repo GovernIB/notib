@@ -8,27 +8,57 @@
 <head>
 	<title><spring:message code="procediment.actualitzacio.auto"/></title>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
 	<not:modalHead/>
 	<script>
 		var itervalProgres;
 		var writtenLines = 0;
-		
+		var title="<spring:message code="procediment.actualitzacio.auto"/>";
+		var content="<spring:message code="procediemnt.actualitzacio.cancelarActu"/>";
+		var acceptar="<spring:message code="procediemnt.actualitzacio.acceptar"/>";
+		var cancelar="<spring:message code="procediemnt.actualitzacio.cancelar"/>";
 		$(document).ready(function() {
 			$('#formUpdateAuto').on("submit", function(){
 				console.log("submitting...");
+				debugger
 				$('.loading').fadeIn();
 				$('#actualitzacioInfo').fadeIn();
 				$('.confirmacio').fadeOut();
 				$('#autobtn', parent.document).prop('disabled', true);
+				$('#cancelbtn', parent.document).toggle(true);
 				$('.close', parent.document).prop('disabled', true);
-				$('.modal-footer', parent.document).hide();
+// 				$('.modal-footer', parent.document).hide();
 				refreshProgres();
 			});
+			$('.close', parent.document).on('click',function(){
+				debugger
+				$.alert('fuck');
+				$.confirm({
+					title: title,
+				    content: content,
+				    buttons: {
+				    	confirm: {
+				            text: acceptar,
+				            action: function () {
+				            	window.top.location.reload();
+				            }
+				        },
+				        cancel: {
+				            text: cancelar,
+				            action: function () {
+				            }
+				        }
+				    }
+				});
+		    });
 		});
 
 		function refreshProgres() {
 			console.log("refreshProgres");
-			itervalProgres = setInterval(getProgres, 250);
+			itervalProgres =  setInterval(function(){ getProgres(); }, 250);
+// 			itervalProgres = setInterval(getProgres, 250);
+			debugger
 		}
 
 		function getProgres() {
@@ -40,9 +70,12 @@
 					if (data) {
 						console.log("Progres:", data);
 						writeInfo(data);
+						$('#cancelbtn', parent.document).toggle(true);
+						debugger
 						if (data.progres == 100) {
 							clearInterval(itervalProgres);
-							$('.modal-footer', parent.document).show();
+						
+// 							$('.modal-footer', parent.document).show();
 							$('.close', parent.document).prop('disabled', false);
 							$('.loading').hide();
 						} else {
@@ -52,6 +85,9 @@
 								$('#bar').css('width', data.progres + '%');
 								$('#bar').attr('aria-valuenow', data.progres);
 								$('#bar').html(data.progres + '%');
+							}else if(data.progres == 0 && data.numProcedimentsActualitzats == 0 ){
+								$('.close', parent.document).prop('disabled', false);
+								$('.loading').hide();
 							}
 						}
 					}
@@ -60,7 +96,7 @@
 					console.log("error obtenint progrés...");
 					clearInterval(itervalProgres);
 					$('.loading').hide();
-					$('.modal-footer', parent.document).show();
+// 					$('.modal-footer', parent.document).show();
 					$('.close', parent.document).prop('disabled', false);
 				}
 			});
@@ -83,6 +119,26 @@
 				var infoDiv = document.getElementById("actualitzacioInfo");
 				infoDiv.scrollTop = infoDiv.scrollHeight;
 			}
+		}
+		function myFunction() {
+			debugger
+			$.confirm({
+				title: title,
+			    content: content,
+			    buttons: {
+			    	confirm: {
+			            text: acceptar,
+			            action: function () {
+			            	window.top.location.reload();
+			            }
+			        },
+			        cancel: {
+			            text: cancelar,
+			            action: function () {
+			            }
+			        }
+			    }
+			});
 		}
 
 	</script>
@@ -239,7 +295,7 @@
 		</div>
 		<div id="modal-botons" class="well">
 			<button id="autobtn" type="submit" class="btn btn-success"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.actualitzar"/></button>
-			<a id="cancelbtn" href="#" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+			<a id="cancelbtn" href="#" style="display: none !important;" class="btn btn-default" data-modal-cancel="false" onclick="myFunction()" ><spring:message code="comu.boto.tancar"/></a>
 		</div>
 	</form:form>
 </body>

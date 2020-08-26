@@ -266,9 +266,9 @@ public class ProcedimentController extends BaseUserController{
 			return "procedimentsActualitzacioForm";
 		}
 		
-		return getModalControllerReturnValueSuccess(
+		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:../../procediment",
+				"/procedimentsActualitzacioForm",
 				"procediment.controller.update.auto.ok");
 	}
 	
