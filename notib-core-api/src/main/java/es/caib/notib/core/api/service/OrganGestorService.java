@@ -62,6 +62,11 @@ public interface OrganGestorService {
 	public List<OrganGestorDto> findByProcedimentIds(List<Long> procedimentIds);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	public List<OrganGestorDto> findDescencentsByCodi(
+			Long entitatId,
+			String organCodi);
+	
+	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			String organCodiDir3,

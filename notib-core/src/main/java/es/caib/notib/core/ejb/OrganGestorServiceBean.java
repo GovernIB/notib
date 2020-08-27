@@ -103,6 +103,12 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	public List<OrganGestorDto> findDescencentsByCodi(Long entitatId, String organCodi) {
+		return delegate.findDescencentsByCodi(entitatId, organCodi);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
 	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			String organCodiDir3,

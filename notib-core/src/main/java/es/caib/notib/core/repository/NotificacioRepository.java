@@ -38,8 +38,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"from " +
 			"    NotificacioEntity ntf " +
 			"where (ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " + 
-			"and (ntf.entitat = :entitat) " +
-			"and (ntf.grupCodi = null) ")
+			"and (ntf.entitat = :entitat) ")
+//			"and (ntf.grupCodi = null) ")
 	Page<NotificacioEntity> findByProcedimentCodiNotibAndEntitat(
 			@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
 			@Param("entitat") EntitatEntity entitat,
@@ -179,15 +179,14 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"    where " +
 			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
 			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
-			"    ) > 0) " + 
-			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
-			"and (ntf.grupCodi = null) " + 
-			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient) " +
-			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " + 
-			"and (:isIdentificadorNull = true or " + 
-			"		(ntf.id = (select notificacio.id" + 
-			"				from NotificacioEnviamentEntity env" + 
-			"				where env.notificaIdentificador = :identificador)))")
+			"    ) > 0) " +
+			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " + 
+			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)" +
+			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
+			"and (:isIdentificadorNull = true or " +
+			"		(ntf.id = (select notificacio.id"
+			+ "				from NotificacioEnviamentEntity env"
+			+ "				where env.notificaIdentificador = :identificador)))")
 	public Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotib(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,

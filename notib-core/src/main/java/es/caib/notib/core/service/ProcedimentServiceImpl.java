@@ -3,18 +3,24 @@ package es.caib.notib.core.service;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,12 +84,9 @@ import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentFormRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
-import es.caib.notib.core.security.ExtendedPermission;
-import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.Llibre;
 import es.caib.notib.plugin.registre.Oficina;
-import es.caib.notib.plugin.registre.Organisme;
 import es.caib.notib.plugin.registre.TipusAssumpte;
 import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
 
@@ -402,6 +405,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				// per tal que no la cerqui cada vegada dins el for
 				Oficina oficinaVirtual = pluginHelper.llistarOficinaVirtual(
 						entitatDto.getDir3Codi(), 
+						entitatDto.getNomOficinaVirtual(),
 						TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
 				
 				int i = 1;
@@ -631,6 +635,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					if (inf.getText() != null)
 						info.getParams().add(new AccioParam("Msg. procés:", inf.getText()));
 				}
+				progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.fi", new Object[] {entitatDto.getNom()}));
 				integracioHelper.addAccioOk(info);
 			} catch (Exception e) {
 				StringWriter sw = new StringWriter();
@@ -750,12 +755,12 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	public ProcedimentDto findById(
 			Long entitatId,
 			boolean isAdministrador,
-			Long id) {
+			Long procedimentId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta del procediment ("
 					+ "entitatId=" + entitatId + ", "
-					+ "id=" + id + ")");
+					+ "procedimentId=" + procedimentId + ")");
 			EntitatEntity entitat = null;
 				
 			if (entitatId != null && !isAdministrador)
@@ -767,11 +772,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	
 			ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
 					entitat, 
-					id, 
-					false, 
-					false, 
-					false,
-					false);
+					procedimentId);
 			ProcedimentDto resposta = conversioTipusHelper.convertir(
 					procediment,
 					ProcedimentDto.class);
@@ -831,6 +832,20 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<ProcedimentDto> findByOrganGestorIDescendents(
+			Long entitatId, 
+			OrganGestorDto organGestor) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+				entitat.getDir3Codi(), 
+				organGestor.getCodi());
+		return conversioTipusHelper.convertirList(
+				procedimentRepository.findByOrganGestorCodiIn(organsFills),
+				ProcedimentDto.class);
 	}
 	
 	@Override
@@ -1020,36 +1035,17 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<ProcedimentDto> findProcedimentsSenseGrups(Long entitatId) {
+	public List<ProcedimentDto> findProcediments(Long entitatId, List<String> grups) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
+		try {	
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 					entitatId,
 					true,
 					false,
 					false);
 			return conversioTipusHelper.convertirList(
-					procedimentRepository.findProcedimentsSenseGrupsByEntitat(entitat),
+					procedimentRepository.findProcedimentsByEntitatAndGrup(entitat, grups),
 					ProcedimentDto.class);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Override
-	@Transactional(readOnly = true)
-	public List<ProcedimentDto> findProcedimentsSenseGrupsWithPermis(Long entitatId, PermisEnum permis) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId,
-					true,
-					false,
-					false);
-			List<ProcedimentEntity> procediments = procedimentRepository.findProcedimentsSenseGrupsByEntitat(entitat);
-			return entityComprovarHelper.findPermisProcediments(
-							procediments, 
-							getPermissionFromName(permis));
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1075,7 +1071,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<ProcedimentDto> findProcedimentsAmbGrupsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
+	public List<ProcedimentDto> findProcedimentsSenseGrups(Long entitatId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
@@ -1083,27 +1079,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					true,
 					false,
 					false);
-			List<ProcedimentEntity> procediments = procedimentRepository.findProcedimentsAmbGrupsByEntitatAndGrup(entitat, grups);
-			return entityComprovarHelper.findPermisProcediments(
-							procediments, 
-							getPermissionFromName(permis));
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Override
-	@Transactional(readOnly = true)
-	public List<ProcedimentDto> findProcediments(Long entitatId, List<String> grups) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {	
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId,
-					true,
-					false,
-					false);
 			return conversioTipusHelper.convertirList(
-					procedimentRepository.findProcedimentsByEntitatAndGrup(entitat, grups),
+					procedimentRepository.findProcedimentsSenseGrupsByEntitat(entitat),
 					ProcedimentDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1112,18 +1089,157 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<ProcedimentDto> findProcedimentsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
+	@Cacheable(value = "procedimentsPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
+	public List<ProcedimentDto> findProcedimentsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 					entitatId,
 					true,
 					false,
 					false);
+			
+			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
+
+			// 1. Obtenim els procediments amb permisos per procediment
+			List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
 			List<ProcedimentEntity> procediments = procedimentRepository.findProcedimentsByEntitatAndGrup(entitat, grups);
-			return entityComprovarHelper.findPermisProcediments(
-							procediments, 
-							getPermissionFromName(permis));
+			List<ProcedimentEntity> procedimentsAmbPermis = new ArrayList<ProcedimentEntity>(procediments);
+			permisosHelper.filterGrantedAny(
+					procedimentsAmbPermis,
+					new ObjectIdentifierExtractor<ProcedimentEntity>() {
+						public Long getObjectIdentifier(ProcedimentEntity procediment) {
+							return procediment.getId();
+						}
+					},
+					ProcedimentEntity.class,
+					permisos,
+					auth);
+			
+			// 2. Obtenim els òrgans gestors amb permisos
+			List<OrganGestorEntity> organsGestors = organGestorRepository.findByEntitat(entitat);
+			List<OrganGestorEntity> organsGestorsAmbPermis = new ArrayList<OrganGestorEntity>(organsGestors);
+			
+			permisosHelper.filterGrantedAny(
+					organsGestorsAmbPermis,
+					new ObjectIdentifierExtractor<OrganGestorEntity>() {
+						public Long getObjectIdentifier(OrganGestorEntity organGestor) {
+							return organGestor.getId();
+						}
+					},
+					OrganGestorEntity.class,
+					permisos,
+					auth);
+			
+			// 3. Obtenim els òrgans gestors fills dels organs gestors amb permisos
+			List<String> organsGestorsCodisAmbPermis = new ArrayList<String>();
+			if (!organsGestorsAmbPermis.isEmpty()) {
+				Set<String> codisOrgansAmbDescendents = new HashSet<String>();
+				for (OrganGestorEntity organGestorEntity : organsGestorsAmbPermis) {
+					codisOrgansAmbDescendents.addAll(
+							organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+									entitat.getDir3Codi(), 
+									organGestorEntity.getCodi()));
+				}
+				organsGestorsCodisAmbPermis = new ArrayList<String>(codisOrgansAmbDescendents);
+			}
+			
+			// 4. Obtenim els procediments amb permisos per òrgan gestor
+			List<ProcedimentEntity> procedimentsAmbPermisOrgan = new ArrayList<ProcedimentEntity>();
+			if (!organsGestorsCodisAmbPermis.isEmpty()) {
+				procedimentsAmbPermisOrgan = procedimentRepository.findByOrganGestorCodiInAndGrup(organsGestorsCodisAmbPermis, grups);
+			}
+			
+			// 5. Juntam els procediments amb permís per òrgan gestor amb els procediments amb permís per procediment
+			Set<ProcedimentEntity> setProcediments = new HashSet<ProcedimentEntity>(procedimentsAmbPermis);
+			setProcediments.addAll(procedimentsAmbPermisOrgan);
+			procediments = new ArrayList<ProcedimentEntity>(setProcediments);
+			
+			// 6. Ordenam els procediments
+			Collections.sort(procediments, new Comparator<ProcedimentEntity>() {
+				@Override
+				public int compare(ProcedimentEntity p1, ProcedimentEntity p2) {
+					return p1.getNom().compareTo(p2.getNom());
+				}
+			});
+			
+			// 7. Convertim els procediments a dto
+			return conversioTipusHelper.convertirList(
+					procediments,
+					ProcedimentDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<ProcedimentDto> findProcedimentsByOrganGestor(String organGestorCodi) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			OrganGestorEntity organGestor = organGestorRepository.findByCodi(organGestorCodi);
+			if (organGestor == null) {
+				throw new NotFoundException(
+						organGestorCodi,
+						OrganGestorEntity.class);
+			}
+			return conversioTipusHelper.convertirList(
+					procedimentRepository.findByOrganGestorId(organGestor.getId()),
+					ProcedimentDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<ProcedimentDto> findProcedimentsByOrganGestorWithPermis(
+			Long entitatId,
+			String organGestorCodi, 
+			List<String> grups,
+			PermisEnum permis) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId, 
+					true, 
+					false, 
+					false);
+			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
+			OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, organGestorCodi);
+			// 1. Obtenim tots els procediments de l'òrgan gestor
+			List<ProcedimentEntity> procediments = procedimentRepository.findProcedimentsByOrganGestorAndGrup(entitat, organGestor.getId(), grups);
+			
+			// 2. Si tenim permis a sobre de l'òrgan o un dels pares, llavors tenim permís a sobre tots els procediments de l'òrgan
+			List<OrganGestorEntity> organsGestors = organigramaHelper.getOrgansGestorsParesExistentsByOrgan(entitat.getDir3Codi(), organGestorCodi);
+			permisosHelper.filterGrantedAny(
+					organsGestors,
+					new ObjectIdentifierExtractor<OrganGestorEntity>() {
+						public Long getObjectIdentifier(OrganGestorEntity organGestor) {
+							return organGestor.getId();
+						}
+					},
+					OrganGestorEntity.class,
+					permisos,
+					auth);
+			if (organsGestors.isEmpty()) {
+				// 3. Si no tenim permis sobre òrgan, llavors miram els permisos sobre el procediment
+				permisosHelper.filterGrantedAny(
+						procediments,
+						new ObjectIdentifierExtractor<ProcedimentEntity>() {
+							public Long getObjectIdentifier(ProcedimentEntity procediment) {
+								return procediment.getId();
+							}
+						},
+						ProcedimentEntity.class,
+						permisos,
+						auth);
+			}
+			return conversioTipusHelper.convertirList(
+					procediments,
+					ProcedimentDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1151,7 +1267,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						}
 					},
 					ProcedimentEntity.class,
-					getPermissionFromName(permis),
+					entityComprovarHelper.getPermissionsFromName(permis),
 					SecurityContextHolder.getContext().getAuthentication());
 			return !procediments.isEmpty();
 		} finally {
@@ -1159,27 +1275,87 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 	}
 	
-	private Permission[] getPermissionFromName(PermisEnum permis) {
-		switch (permis) {
-		case CONSULTA: return new Permission[] {ExtendedPermission.READ};
-		case PROCESSAR: return new Permission[] {ExtendedPermission.PROCESSAR};
-		case NOTIFICACIO: return new Permission[] {ExtendedPermission.NOTIFICACIO};
-		case GESTIO: return new Permission[] {ExtendedPermission.ADMINISTRATION};
-		default: return null;
+	@Override
+	@Transactional(readOnly = true)
+	public boolean hasPermisProcediment(
+			Long procedimentId,
+			PermisEnum permis) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+//			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//			List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
+//			ProcedimentEntity procediment = procedimentRepository.findById(procedimentId);
+//			procediments.add(procediment);
+//			EntitatEntity entitat = procediment.getEntitat();
+//			
+//			// 1. Comprovam si el procediment té assignat el permís d'administration
+//			Permission[] permisos = getPermissionsFromName(permis);
+//			permisosHelper.filterGrantedAny(
+//					procediments,
+//					new ObjectIdentifierExtractor<ProcedimentEntity>() {
+//						public Long getObjectIdentifier(ProcedimentEntity procediment) {
+//							return procediment.getId();
+//						}
+//					},
+//					ProcedimentEntity.class,
+//					permisos,
+//					auth);
+//			if (!procediments.isEmpty())
+//				return true;
+//			
+//			// 2. Comprovam si algun organ pare del procediment té permis d'administration
+//			List<OrganGestorEntity> organsGestors = organigramaHelper.getOrgansGestorsParesExistentsByOrgan(
+//					entitat.getDir3Codi(), 
+//					procediment.getOrganGestor().getCodi());
+//			permisosHelper.filterGrantedAny(
+//					organsGestors,
+//					new ObjectIdentifierExtractor<OrganGestorEntity>() {
+//						public Long getObjectIdentifier(OrganGestorEntity organGestor) {
+//							return organGestor.getId();
+//						}
+//					},
+//					OrganGestorEntity.class,
+//					permisos,
+//					auth);
+//			if (!organsGestors.isEmpty())
+//				return true;
+//			
+//			return false;
+			return entityComprovarHelper.hasPermisProcediment(procedimentId, permis);
+		} finally {
+			metricsHelper.fiMetrica(timer);
 		}
 	}
+	
+//	private Permission[] getPermissionsFromName(PermisEnum permis) {
+//		Permission perm = getPermissionFromName(permis);
+//		if (perm == null)
+//			return null;
+//		else
+//			return new Permission[] {perm};
+//	}
+//	
+//	private Permission getPermissionFromName(PermisEnum permis) {
+//		switch (permis) {
+//		case CONSULTA: return ExtendedPermission.READ;
+//		case PROCESSAR: return ExtendedPermission.PROCESSAR;
+//		case NOTIFICACIO: return ExtendedPermission.NOTIFICACIO;
+//		case GESTIO: return ExtendedPermission.ADMINISTRATION;
+//		default: return null;
+//		}
+//	}
 	
 	@Transactional
 	@Override
 	public List<PermisDto> permisFind(
 			Long entitatId,
 			boolean isAdministrador,
-			Long id) {
+			Long procedimentId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta dels permisos del meta-expedient ("
+			logger.debug("Consulta dels permisos del procediment ("
 					+ "entitatId=" + entitatId +  ", "
-					+ "id=" + id +  ")"); 
+					+ "procedimentId=" + procedimentId +  ")"); 
 			EntitatEntity entitat = null;
 			
 			if (entitatId != null && !isAdministrador)
@@ -1191,14 +1367,10 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			
 			entityComprovarHelper.comprovarProcediment(
 					entitat, 
-					id, 
-					false, 
-					false, 
-					false, 
-					false);
+					procedimentId);
 			
 			return permisosHelper.findPermisos(
-					id,
+					procedimentId,
 					ProcedimentEntity.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1227,6 +1399,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					id,
 					ProcedimentEntity.class,
 					permis);
+			cacheHelper.evictFindProcedimentsWithPermis();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1254,6 +1427,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					id,
 					ProcedimentEntity.class,
 					permisId);
+			cacheHelper.evictFindProcedimentsWithPermis();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1354,135 +1528,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 	}
 
-	
-	@Override
-	@Transactional(readOnly = true)
-	public boolean hasPermisConsultaProcediment(EntitatDto entitat) {		
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
-					new Permission[] {
-							ExtendedPermission.READ},
-					entitat.getId()
-					);
-			
-			return (resposta.isEmpty()) ? false : true;
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Override
-	@Transactional(readOnly = true)
-	public boolean hasPermisGestioProcediment(
-			Long procedimentId) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
-			ProcedimentEntity procediment = procedimentRepository.findById(procedimentId);
-			
-			procediments.add(procediment);
-			
-			List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcediments(
-					procediments,
-					new Permission[] {
-							ExtendedPermission.ADMINISTRATION}
-					);
-			
-			return (resposta.isEmpty()) ? false : true;
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Override
-	@Transactional(readOnly = true)
-	public boolean hasPermisProcessarProcediment(
-			String procedimentCodi,
-			Long procedimentId,
-			boolean isAdministrador) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
-			ProcedimentEntity procediment;
-			
-			if (!isAdministrador) {
-					procediment = procedimentRepository.findById(procedimentId);
-			} else {
-				procediment = procedimentRepository.findOne(procedimentId);
-			}
-			if (procediment != null)
-				procediments.add(procediment);
-			
-			List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcediments(
-					procediments,
-					new Permission[] {
-							ExtendedPermission.PROCESSAR}
-					);
-			
-			return (resposta.isEmpty()) ? false : true;
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Override
-	@Transactional(readOnly = true)
-	public boolean hasPermisNotificacioProcediment(EntitatDto entitat) {		
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			List<ProcedimentDto> resposta = entityComprovarHelper.findPermisProcedimentsUsuariActualAndEntitat(
-					new Permission[] {
-						ExtendedPermission.NOTIFICACIO},
-					entitat.getId()
-					);
-			
-			return (resposta.isEmpty()) ? false : true;
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Override
-	@Transactional(readOnly = true)
-	public boolean hasGrupPermisConsultaProcediment(
-			Map<String, ProcedimentDto> procediments,
-			EntitatDto entitat) {		
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			List<ProcedimentDto> resposta = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
-					procediments,
-					entitat.getId(),
-					new Permission[] {
-							ExtendedPermission.READ}
-					);
-			
-			return (resposta.isEmpty()) ? false : true;
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Override
-	@Transactional(readOnly = true)
-	public boolean hasGrupPermisNotificacioProcediment(
-			Map<String, ProcedimentDto> procediments,
-			EntitatDto entitat) {		
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			List<ProcedimentDto> resposta = entityComprovarHelper.findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
-					procediments,
-					entitat.getId(),
-					new Permission[] {
-							ExtendedPermission.NOTIFICACIO}
-					);
-			
-			return (resposta.isEmpty()) ? false : true;
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-
 	@Override
 	@Transactional(readOnly = true)
 	public List<TipusAssumpteDto> findTipusAssumpte(EntitatDto entitat) {
@@ -1550,14 +1595,18 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<OficinaDto> findOficines(String organGestorDir3Codi) {
+	public List<OficinaDto> findOficines(Long entitatId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId, 
+					true, 
+					false, 
+					false);
 			List<OficinaDto> oficines = new ArrayList<OficinaDto>();
 			try {
-				List<Oficina> oficinesRegistre = pluginHelper.llistarOficines(
-						organGestorDir3Codi, 
-						AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
+				//Recupera les oficines d'una entitat
+				List<Oficina> oficinesRegistre = cacheHelper.llistarOficinesEntitat(entitat.getDir3Codi());
 				for (Oficina oficinaRegistre : oficinesRegistre) {
 					OficinaDto oficina = new OficinaDto();
 					oficina.setCodi(oficinaRegistre.getCodi());
@@ -1565,7 +1614,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					oficines.add(oficina);
 				}
 			} catch (Exception e) {
-				String errorMessage = "No s'han pogut recuperar les oficines de l'òrgan gestor: " + organGestorDir3Codi;
+				String errorMessage = "No s'han pogut recuperar les oficines de l'entitat amb codi: " + entitat.getDir3Codi();
 				logger.error(
 						errorMessage, 
 						e.getMessage());
@@ -1579,16 +1628,21 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Override
 	@Transactional(readOnly = true)
 	public List<LlibreDto> findLlibres(
-			String organGestorDir3Codi, 
-			String oficina) {
+			Long entitatId, 
+			String oficinaDir3Codi) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId, 
+					true, 
+					false, 
+					false);
 			List<LlibreDto> llibres = new ArrayList<LlibreDto>();
 			try {
-				List<Llibre> llibresRegistre = pluginHelper.llistarLlibres(
-						organGestorDir3Codi, 
-						oficina, 
-						AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
+				//Recupera els llibres d'una oficina i entitat
+				List<Llibre> llibresRegistre = cacheHelper.llistarLlibresOficina(
+						entitat.getDir3Codi(), 
+						oficinaDir3Codi);
 				for (Llibre llibreRegistre : llibresRegistre) {
 					LlibreDto llibre = new LlibreDto();
 					llibre.setCodi(llibreRegistre.getCodi());
@@ -1598,7 +1652,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					llibres.add(llibre);
 				}
 	 		} catch (Exception e) {
-	 			String errorMessage = "No s'han pogut recuperar els llibres de l'òrgan gestor: " + organGestorDir3Codi;
+	 			String errorMessage = "No s'han pogut recuperar els llibres de l'entitat [Entitat: " + entitat.getDir3Codi() + ", Oficina: " + oficinaDir3Codi + "]";
 				logger.error(
 						errorMessage, 
 						e.getMessage());
@@ -1611,30 +1665,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<ProcedimentDto> findProcedimentsByOrganGestor(String organGestorCodi) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			OrganGestorEntity organGestor = organGestorRepository.findByCodi(organGestorCodi);
-			if (organGestor == null) {
-				throw new NotFoundException(
-						organGestorCodi,
-						OrganGestorEntity.class);
-			}
-			return conversioTipusHelper.convertirList(
-					procedimentRepository.findByOrganGestorId(organGestor.getId()),
-					ProcedimentDto.class);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public List<ProcedimentDto> findProcedimentsByOrganGestorWithPermis(
+	public LlibreDto getLlibreOrganisme(
 			Long entitatId,
-			String organGestorCodi, 
-			List<String> grups,
-			PermisEnum permis) {
+			String organGestorDir3Codi) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
@@ -1642,16 +1675,30 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					true, 
 					false, 
 					false);
-			OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, organGestorCodi);
-			List<ProcedimentEntity> procediments = procedimentRepository.findProcedimentsByOrganGestorAndGrup(entitat, organGestor.getId(), grups);
-			return entityComprovarHelper.findPermisProcediments(
-							procediments, 
-							getPermissionFromName(permis));
+			LlibreDto llibre = null;
+			try {
+				//Recupera el llibre de l'òrgan gestor especificat (organisme)
+				Llibre llibreRegistre = cacheHelper.getLlibreOrganGestor(
+						entitat.getDir3Codi(),
+						organGestorDir3Codi);
+				if (llibreRegistre != null) {
+					llibre = new LlibreDto();
+					llibre.setCodi(llibreRegistre.getCodi());
+					llibre.setNomCurt(llibreRegistre.getNomCurt());
+					llibre.setNomLlarg(llibreRegistre.getNomLlarg());
+					llibre.setOrganismeCodi(llibreRegistre.getOrganisme());
+				}
+	 		} catch (Exception e) {
+	 			String errorMessage = "No s'ha pogut recuperar el llibre de l'òrgan gestor: " + organGestorDir3Codi;
+				logger.error(
+						errorMessage, 
+						e.getMessage());
+			}
+			return llibre;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -1665,6 +1712,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			cacheHelper.evictFindPermisProcedimentsUsuariActualAndEntitat(entitat.getId());
 			cacheHelper.evictFindOrganismesByEntitat(entitat.getDir3Codi());
 			cacheHelper.evictFindOrganigramaByEntitat(entitat.getDir3Codi());
+			cacheHelper.evictFindProcedimentsWithPermis();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

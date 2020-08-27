@@ -8,12 +8,18 @@
 	<cache name="aclCache" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="600" overflowToDisk="false" />
 	<cache name="entitatsUsuari" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
 	<cache name="usuariAmbCodi" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
+	<cache name="rolsAmbCodi" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
 	<cache name="findPermisProcedimentsUsuariActualAndEntitat" maxElementsInMemory="300" eternal="false" timeToLiveSeconds="28800" overflowToDisk="false" />
 	<cache name="findByGrupAndPermisProcedimentsUsuariActualAndEntitat" maxElementsInMemory="300" eternal="false" timeToLiveSeconds="28800" overflowToDisk="false" />
 	<cache name="findByPermisProcedimentsUsuariActual" maxElementsInMemory="300" eternal="false" timeToLiveSeconds="28800" overflowToDisk="false" />
 	<cache name="getPermisosEntitatsUsuariActual" maxElementsInMemory="300" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />
-	<cache name="organismes" maxElementsInMemory="20" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />
-	<cache name="organigrama" maxElementsInMemory="20" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />
+	<cache name="organismes" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />
+	<cache name="organigrama" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />
+	<cache name="organigramaPlugin" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />
 	<cache name="denominacioOrganisme" maxElementsInMemory="300" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />
 	<cache name="organsGestorsUsuari" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
+	<cache name="procedimentsPermis" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
+	<cache name="findOficinesEntitat" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
+	<cache name="findLlibresOficina" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
+	<cache name="findLlibreOrganisme" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
 </ehcache>

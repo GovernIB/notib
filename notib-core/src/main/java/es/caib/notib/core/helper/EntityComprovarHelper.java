@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -78,6 +79,8 @@ public class EntityComprovarHelper {
 	private OrganGestorRepository organGestorRepository;
 	@Resource
 	private GrupRepository grupRepository;
+	@Resource
+	private OrganigramaHelper organigramaHelper;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -444,26 +447,6 @@ public class EntityComprovarHelper {
 		
 		return organGestor;
 	}
-	public NotificacioEntity comprovarNotificacio(
-			EntitatEntity entitat,
-			Long id,
-			boolean comprovarPermisConsulta,
-			boolean comprovarPermisProcessar,
-			boolean comprovarPermisNotificacio,
-			boolean comprovarPermisGestio) {
-		
-		NotificacioEntity notificacio = comprovarNotificacio(entitat, id);
-		
-		comprovarPermisosNotificacio(
-				notificacio,
-				id,
-				comprovarPermisConsulta,
-				comprovarPermisProcessar,
-				comprovarPermisNotificacio,
-				comprovarPermisGestio);
-		
-		return notificacio;
-	}
 
 	public NotificacioEntity comprovarNotificacio(
 			EntitatEntity entitat,
@@ -507,25 +490,120 @@ public class EntityComprovarHelper {
 	
 	public ProcedimentEntity comprovarProcediment(
 			EntitatEntity entitat,
-			Long id,
+			Long procedimentId,
 			boolean comprovarPermisConsulta,
 			boolean comprovarPermisProcessar,
 			boolean comprovarPermisNotificacio,
 			boolean comprovarPermisGestio) {
 		
-		ProcedimentEntity procediment = comprovarProcediment(entitat, id);
+		ProcedimentEntity procediment = comprovarProcediment(entitat, procedimentId);
 		
-		comprovarPermisosProcediment(
-				procediment,
-				id,
-				comprovarPermisConsulta,
-				comprovarPermisProcessar,
-				comprovarPermisNotificacio,
-				comprovarPermisGestio);
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (comprovarPermisConsulta) {
+			boolean granted = hasPermisProcediment(procedimentId, PermisEnum.CONSULTA);
+			if (!granted) {
+				throw new PermissionDeniedException(
+						procedimentId,
+						ProcedimentEntity.class,
+						auth.getName(),
+						"READ");
+			}
+		}
+		if (comprovarPermisProcessar) {
+			boolean granted = hasPermisProcediment(procedimentId, PermisEnum.PROCESSAR); 
+			if (!granted) {
+				throw new PermissionDeniedException(
+						procedimentId,
+						ProcedimentEntity.class,
+						auth.getName(),
+						"PROCESSAR");
+			}
+		}
+		if (comprovarPermisNotificacio) {
+			boolean granted = hasPermisProcediment(procedimentId, PermisEnum.NOTIFICACIO); 
+			if (!granted) {
+				throw new PermissionDeniedException(
+						procedimentId,
+						ProcedimentEntity.class,
+						auth.getName(),
+						"NOTIFICACIO");
+			}
+		}
+		if (comprovarPermisGestio) {
+			boolean granted = hasPermisProcediment(procedimentId, PermisEnum.GESTIO); 
+			if (!granted) {
+				throw new PermissionDeniedException(
+						procedimentId,
+						ProcedimentEntity.class,
+						auth.getName(),
+						"ADMINISTRATION");
+			}
+		}
 		
 		return procediment;
 	}
 	
+	public boolean hasPermisProcediment(
+			Long procedimentId,
+			PermisEnum permis) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
+		ProcedimentEntity procediment = procedimentRepository.findById(procedimentId);
+		procediments.add(procediment);
+		EntitatEntity entitat = procediment.getEntitat();
+		
+		// 1. Comprovam si el procediment té assignat el permís d'administration
+		Permission[] permisos = getPermissionsFromName(permis);
+		permisosHelper.filterGrantedAny(
+				procediments,
+				new ObjectIdentifierExtractor<ProcedimentEntity>() {
+					public Long getObjectIdentifier(ProcedimentEntity procediment) {
+						return procediment.getId();
+					}
+				},
+				ProcedimentEntity.class,
+				permisos,
+				auth);
+		if (!procediments.isEmpty())
+			return true;
+		
+		// 2. Comprovam si algun organ pare del procediment té permis d'administration
+		List<OrganGestorEntity> organsGestors = organigramaHelper.getOrgansGestorsParesExistentsByOrgan(
+				entitat.getDir3Codi(), 
+				procediment.getOrganGestor().getCodi());
+		permisosHelper.filterGrantedAny(
+				organsGestors,
+				new ObjectIdentifierExtractor<OrganGestorEntity>() {
+					public Long getObjectIdentifier(OrganGestorEntity organGestor) {
+						return organGestor.getId();
+					}
+				},
+				OrganGestorEntity.class,
+				permisos,
+				auth);
+		if (!organsGestors.isEmpty())
+			return true;
+		
+		return false;
+	}
+	
+	public Permission[] getPermissionsFromName(PermisEnum permis) {
+		Permission perm = getPermissionFromName(permis);
+		if (perm == null)
+			return null;
+		else
+			return new Permission[] {perm};
+	}
+	
+	public Permission getPermissionFromName(PermisEnum permis) {
+		switch (permis) {
+		case CONSULTA: return ExtendedPermission.READ;
+		case PROCESSAR: return ExtendedPermission.PROCESSAR;
+		case NOTIFICACIO: return ExtendedPermission.NOTIFICACIO;
+		case GESTIO: return ExtendedPermission.ADMINISTRATION;
+		default: return null;
+		}
+	}
 	
 	public GrupEntity comprovarGrup(
 			Long grupId) {
@@ -558,322 +636,8 @@ public class EntityComprovarHelper {
 		return grupsEntity;
 	}
 	
-	public void comprovarPermisosProcediment(
-			ProcedimentEntity procediment,
-			Long procedimentId,
-			boolean comprovarPermisConsulta,
-			boolean comprovarPermisProcessar,
-			boolean comprovarPermisNotificacio,
-			boolean comprovarPermisGestio) {
-		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (comprovarPermisConsulta) {
-			boolean granted = permisosHelper.isGrantedAll(
-					procediment.getId(),
-					ProcedimentEntity.class,
-					new Permission[] {ExtendedPermission.READ},
-					auth);
-			if (!granted) {
-				throw new PermissionDeniedException(
-						procedimentId,
-						ProcedimentEntity.class,
-						auth.getName(),
-						"READ");
-			}
-		}
-		if (comprovarPermisProcessar) {
-			boolean granted = permisosHelper.isGrantedAll(
-					procediment.getId(),
-					ProcedimentEntity.class,
-					new Permission[] {ExtendedPermission.PROCESSAR},
-					auth);
-			if (!granted) {
-				throw new PermissionDeniedException(
-						procedimentId,
-						ProcedimentEntity.class,
-						auth.getName(),
-						"PROCESSAR");
-			}
-		}
-		if (comprovarPermisNotificacio) {
-			boolean granted = permisosHelper.isGrantedAll(
-					procediment.getId(),
-					ProcedimentEntity.class,
-					new Permission[] {ExtendedPermission.NOTIFICACIO},
-					auth);
-			if (!granted) {
-				throw new PermissionDeniedException(
-						procedimentId,
-						ProcedimentEntity.class,
-						auth.getName(),
-						"NOTIFICACIO");
-			}
-		}
-		if (comprovarPermisGestio) {
-			boolean granted = permisosHelper.isGrantedAll(
-					procediment.getId(),
-					ProcedimentEntity.class,
-					new Permission[] {ExtendedPermission.ADMINISTRATION},
-					auth);
-			if (!granted) {
-				throw new PermissionDeniedException(
-						procedimentId,
-						ProcedimentEntity.class,
-						auth.getName(),
-						"ADMINISTRATION");
-			}
-		}
-	}
-	public void comprovarPermisosNotificacio(
-			NotificacioEntity notificacio,
-			Long notificacioId,
-			boolean comprovarPermisConsulta,
-			boolean comprovarPermisProcessar,
-			boolean comprovarPermisNotificacio,
-			boolean comprovarPermisGestio) {
-		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (comprovarPermisConsulta) {
-			boolean granted = permisosHelper.isGrantedAll(
-					notificacio.getId(),
-					NotificacioEntity.class,
-					new Permission[] {ExtendedPermission.READ},
-					auth);
-			if (!granted) {
-				throw new SecurityException("Sense permisos per accedir a la notificació ("
-						+ "id=" + notificacioId + ", "
-						+ "usuari=" + auth.getName() + ")");
-			}
-		}
-		if (comprovarPermisProcessar) {
-			boolean granted = permisosHelper.isGrantedAll(
-					notificacio.getId(),
-					NotificacioEntity.class,
-					new Permission[] {ExtendedPermission.PROCESSAR},
-					auth);
-			if (!granted) {
-				throw new SecurityException("Sense permisos per processar la notificació ("
-						+ "id=" + notificacioId + ", "
-						+ "usuari=" + auth.getName() + ")");
-			}
-		}
-		if (comprovarPermisNotificacio) {
-			boolean granted = permisosHelper.isGrantedAll(
-					notificacio.getId(),
-					NotificacioEntity.class,
-					new Permission[] {ExtendedPermission.NOTIFICACIO},
-					auth);
-			if (!granted) {
-				throw new SecurityException("Sense permisos per crear una notificació ("
-						+ "id=" + notificacioId + ", "
-						+ "usuari=" + auth.getName() + ")");
-			}
-		}
-		if (comprovarPermisGestio) {
-			boolean granted = permisosHelper.isGrantedAll(
-					notificacio.getId(),
-					NotificacioEntity.class,
-					new Permission[] {ExtendedPermission.ADMINISTRATION},
-					auth);
-			if (!granted) {
-				throw new SecurityException("Sense permisos per gestionar la notificació ("
-						+ "id=" + notificacioId + ", "
-						+ "usuari=" + auth.getName() + ")");
-			}
-		}
-	}
-	
-	public List<ProcedimentDto> findPermisProcediments(
-			Permission[] permisos) {
-		List<ProcedimentDto> resposta = null;
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<ProcedimentEntity> procediments = procedimentRepository.findAll();
-		
-		permisosHelper.filterGrantedAny(
-				procediments,
-				new ObjectIdentifierExtractor<ProcedimentEntity>() {
-					public Long getObjectIdentifier(ProcedimentEntity procediment) {
-						return procediment.getId();
-					}
-				},
-				ProcedimentEntity.class,
-				permisos,
-				auth);
-		
-		resposta = conversioTipusHelper.convertirList(
-				procediments,
-				ProcedimentDto.class);
-		
-		return resposta;
-	}
-	
-	@Cacheable(value = "findPermisProcedimentsUsuariActualAndEntitat", key="#entitatId")
-	public List<ProcedimentDto> findPermisProcedimentsUsuariActualAndEntitat(
-			Permission[] permisos,
-			Long entitatId) {
-		EntitatEntity entitatActual = comprovarEntitat(entitatId);
-		List<ProcedimentDto> resposta = null;
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<ProcedimentEntity> procediments = procedimentRepository.findByEntitatOrderByNomAsc(entitatActual);
-		
-		permisosHelper.filterGrantedAny(
-				procediments,
-				new ObjectIdentifierExtractor<ProcedimentEntity>() {
-					public Long getObjectIdentifier(ProcedimentEntity procediment) {
-						return procediment.getId();
-					}
-				},
-				ProcedimentEntity.class,
-				permisos,
-				auth);
-		
-		resposta = conversioTipusHelper.convertirList(
-				procediments,
-				ProcedimentDto.class);
-		
-		return resposta;
-	}
-	
-	public List<ProcedimentDto> findPermisProcediments(
-			List<ProcedimentEntity> procediments,
-			Permission[] permisos) {
-		List<ProcedimentDto> resposta = null;
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		permisosHelper.filterGrantedAny(
-				procediments,
-				new ObjectIdentifierExtractor<ProcedimentEntity>() {
-					public Long getObjectIdentifier(ProcedimentEntity procediment) {
-						return procediment.getId();
-					}
-				},
-				ProcedimentEntity.class,
-				permisos,
-				auth);
-	
-		resposta = conversioTipusHelper.convertirList(
-				procediments,
-				ProcedimentDto.class);
-		return resposta;
-	}
-	
-	@Cacheable(value = "findByGrupAndPermisProcedimentsUsuariActualAndEntitat", key="#entitatId")
-	public List<ProcedimentDto> findByGrupAndPermisProcedimentsUsuariActualAndEntitat(
-			Map<String, ProcedimentDto> procediments,
-			Long entitatId,
-			Permission[] permisos) {
-		EntitatEntity entitatActual = comprovarEntitat(entitatId);
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<ProcedimentEntity> procedimentsEntity = new ArrayList<ProcedimentEntity>();
-		List<ProcedimentDto> resposta;
-		
-		if (procediments != null) {
-			for (Map.Entry<String, ProcedimentDto> procediment : procediments.entrySet()) { 
-				ProcedimentEntity procedimentEntity = procedimentRepository.findByIdAndEntitat(
-						procediment.getValue().getId(),
-						entitatActual);
-				if (procedimentEntity != null && procedimentEntity.isAgrupar()) {
-						procedimentsEntity.add(procedimentEntity);
-				}
-			}
-		} 
-		
-//		//Conversió de dto a entity per comprovar permisos
-//		for (ProcedimentDto procedimentDto : procedimentsDto) {
-//			ProcedimentEntity procedimentEntity = procedimentRepository.findByIdAndEntitat(
-//					procedimentDto.getId(),
-//					entitatActual);
-//			if (procedimentEntity != null && procedimentEntity.isAgrupar()) {
-//					procedimentsEntity.add(procedimentEntity);
-//			}
-//		}
-		
-		permisosHelper.filterGrantedAny(
-				procedimentsEntity,
-				new ObjectIdentifierExtractor<ProcedimentEntity>() {
-					public Long getObjectIdentifier(ProcedimentEntity procedimentsEntity) {
-						return procedimentsEntity.getId();
-					}
-				},
-				ProcedimentEntity.class,
-				permisos,
-				auth);
-		
-		resposta = conversioTipusHelper.convertirList(
-				procedimentsEntity,
-				ProcedimentDto.class);
-		
-		return resposta;
-	}
-	
-	public List<ProcedimentDto> findByPermisConsultaProcedimentsUsuariActual(
-			List<ProcedimentDto> procediments,
-			Permission[] permisos) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<ProcedimentEntity> procedimentsEntity = new ArrayList<ProcedimentEntity>();
-		List<ProcedimentDto> resposta;
-		
-		//Conversió de dto a entity per comprovar permisos
-		for (ProcedimentDto procedimentDto : procediments) {
-			ProcedimentEntity procedimentEntity = procedimentRepository.findOne(procedimentDto.getId());
-			procedimentsEntity.add(procedimentEntity);
-		}
-		permisosHelper.filterGrantedAny(
-				procedimentsEntity,
-				new ObjectIdentifierExtractor<ProcedimentEntity>() {
-					public Long getObjectIdentifier(ProcedimentEntity procedimentsEntity) {
-						return procedimentsEntity.getId();
-					}
-				},
-				ProcedimentEntity.class,
-				permisos,
-				auth);
-		
-		resposta = conversioTipusHelper.convertirList(
-				procedimentsEntity,
-				ProcedimentDto.class);
-		
-		return resposta;
-	}
-	
-	@Cacheable(value = "findByPermisProcedimentsUsuariActual", key="#entitatId")
-	public List<ProcedimentDto> findByPermisProcedimentsUsuariActual(
-			List<ProcedimentDto> procediments,
-			Long entitatId,
-			Permission[] permisos) {
-		EntitatEntity entitatActual = comprovarEntitat(entitatId);
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<ProcedimentEntity> procedimentsEntity = new ArrayList<ProcedimentEntity>();
-		List<ProcedimentDto> resposta;
-		
-		//Conversió de dto a entity per comprovar permisos
-		for (ProcedimentDto procedimentDto : procediments) {
-			ProcedimentEntity procedimentEntity = procedimentRepository.findByIdAndEntitat(
-					procedimentDto.getId(),
-					entitatActual);
-			if (procedimentEntity != null)
-				procedimentsEntity.add(procedimentEntity);
-		}
-		permisosHelper.filterGrantedAny(
-				procedimentsEntity,
-				new ObjectIdentifierExtractor<ProcedimentEntity>() {
-					public Long getObjectIdentifier(ProcedimentEntity procedimentsEntity) {
-						return procedimentsEntity.getId();
-					}
-				},
-				ProcedimentEntity.class,
-				permisos,
-				auth);
-		
-		resposta = conversioTipusHelper.convertirList(
-				procedimentsEntity,
-				ProcedimentDto.class);
-		
-		return resposta;
-	}
-	
 	@Cacheable(value = "getPermisosEntitatsUsuariActual", key="#auth.name")
 	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual(Authentication auth) {
-//		System.out.println("Obtenim i posam en cache els permisos de " + auth.getName());
 		List<EntitatEntity> entitatsEntity = entitatRepository.findAll();
 		List<OrganGestorEntity> organsGestorsEntity = organGestorRepository.findAll();
 		Map<RolEnumDto, Boolean> hasPermisos = new HashMap<RolEnumDto, Boolean>();

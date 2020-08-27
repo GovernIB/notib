@@ -30,6 +30,7 @@ import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProcedimentDto;
@@ -152,8 +153,9 @@ public class EnviamentController extends BaseUserController {
 		PaginaDto<NotificacioEnviamentDtoV2> enviaments = new PaginaDto<NotificacioEnviamentDtoV2>();
 		boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
 		boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
+		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
-		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
+//		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 		
 		List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
 		List<String> codisProcedimentsDisponibles = new ArrayList<String>();
@@ -165,8 +167,16 @@ public class EnviamentController extends BaseUserController {
 			
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			
-			if (RolHelper.isUsuariActualUsuari(request)) {
-				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.CONSULTA);
+			if (isUsuari) {
+//				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.CONSULTA);
+				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
+				for(ProcedimentDto procediment: procedimentsDisponibles) {
+					codisProcedimentsDisponibles.add(procediment.getCodi());
+				}
+			}
+			if (isAdminOrgan) {
+				OrganGestorDto organGestorActual = getOrganGestorActual(request);
+				procedimentsDisponibles = procedimentService.findByOrganGestorIDescendents(entitatActual.getId(), organGestorActual);
 				for(ProcedimentDto procediment: procedimentsDisponibles) {
 					codisProcedimentsDisponibles.add(procediment.getCodi());
 				}
@@ -176,6 +186,7 @@ public class EnviamentController extends BaseUserController {
 					entitatActual, 
 					isUsuari, 
 					isUsuariEntitat,
+					isAdminOrgan,
 					codisProcedimentsDisponibles, 
 					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));

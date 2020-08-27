@@ -55,6 +55,8 @@ public class EntitatCommand {
 	private String[] tipusDocName;
 	private String tipusDocDefault;
 	private String tipusDocDefaultSelected;
+	private String nomOficinaVirtual;
+	
 	public Long getId() {
 		return id;
 	}
@@ -169,6 +171,12 @@ public class EntitatCommand {
 	public void setTipusDocDefaultSelected(String tipusDocDefaultSelected) {
 		this.tipusDocDefaultSelected = tipusDocDefaultSelected;
 	}
+	public String getNomOficinaVirtual() {
+		return nomOficinaVirtual;
+	}
+	public void setNomOficinaVirtual(String nomOficinaVirtual) {
+		this.nomOficinaVirtual = nomOficinaVirtual;
+	}
 	public static List<EntitatCommand> toEntitatCommands(
 			List<EntitatDto> dtos) {
 		List<EntitatCommand> commands = new ArrayList<EntitatCommand>();
@@ -185,8 +193,9 @@ public class EntitatCommand {
 		EntitatCommand entitat = ConversioTipusHelper.convertir(
 				dto,
 				EntitatCommand.class);
-		if (dto.getTipusDocDefault().getTipusDocEnum() != null)
+		if (dto.getTipusDocDefault() != null && dto.getTipusDocDefault().getTipusDocEnum() != null) {
 			entitat.setTipusDocDefault(dto.getTipusDocDefault().getTipusDocEnum().name());
+		}
 		return entitat;
 	}
 	public static EntitatDto asDto(EntitatCommand command) throws IOException {

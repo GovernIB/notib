@@ -64,6 +64,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	private String colorLletra;
 	@Column(name = "tipus_doc_default")
 	private TipusDocumentEnumDto tipusDocDefault;
+	@Column(name = "nom_oficina_virtual", length = 255)
+	private String nomOficinaVirtual;
 	
 	@Version
 	private long version = 0;
@@ -116,6 +118,9 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	public String getDir3CodiReg() {
 		return dir3CodiReg;
 	}
+	public String getNomOficinaVirtual() {
+		return nomOficinaVirtual;
+	}
 	public void update(
 			String codi,
 			String nom,
@@ -130,7 +135,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			byte[] logoPeuBytes,
 			String colorFons,
 			String colorLletra,
-			TipusDocumentEnumDto tipusDocDefault) {
+			TipusDocumentEnumDto tipusDocDefault,
+			String nomOficinaVirtual) {
 		this.codi = codi;
 		this.nom = nom;
 		this.descripcio = descripcio;
@@ -145,6 +151,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 		this.colorFons = colorFons;
 		this.colorLletra = colorLletra;
 		this.tipusDocDefault = tipusDocDefault;
+		this.nomOficinaVirtual = nomOficinaVirtual;
 	}
 
 	public void updateActiva(
@@ -165,7 +172,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			byte[] logoPeuBytes,
 			String colorFons,
 			String colorLletra,
-			TipusDocumentEnumDto tipusDocDefault) {
+			TipusDocumentEnumDto tipusDocDefault,
+			String nomOficinaVirtual) {
 		return new Builder(
 				codi,
 				nom,
@@ -179,7 +187,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				logoPeuBytes,
 				colorFons,
 				colorLletra,
-				tipusDocDefault);
+				tipusDocDefault,
+				nomOficinaVirtual);
 	}
 
 	public static class Builder {
@@ -197,7 +206,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				byte[] logoPeuBytes,
 				String colorFons,
 				String colorLletra,
-				TipusDocumentEnumDto tipusDocDefault) {
+				TipusDocumentEnumDto tipusDocDefault,
+				String nomOficinaVirtual) {
 			built = new EntitatEntity();
 			built.codi = codi;
 			built.nom = nom;
@@ -213,6 +223,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			built.colorFons = colorFons;
 			built.colorLletra = colorLletra;
 			built.tipusDocDefault = tipusDocDefault;
+			built.nomOficinaVirtual = nomOficinaVirtual;
 		}
 		public Builder descripcio(String descripcio) {
 			built.descripcio = descripcio;

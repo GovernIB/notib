@@ -374,6 +374,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			EntitatDto entitat,
 			boolean isUsuari,
 			boolean isUsuariEntitat,
+			boolean isAdminOrgan,
 			List<String> procedimentsCodisNotib,
 			NotificacioEnviamentFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws ParseException {
@@ -396,100 +397,28 @@ public class EnviamentServiceImpl implements EnviamentService {
 					false);
 			
 			if (filtre.getDataEnviamentInici() != null && filtre.getDataEnviamentInici() != "") {
-				dataEnviamentInici = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentInici());
-				if (dataEnviamentInici != null) {
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(dataEnviamentInici);
-					cal.set(Calendar.HOUR_OF_DAY, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-					dataEnviamentInici = cal.getTime();
-				}
+				dataEnviamentInici = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentInici()));
 			}
 			if (filtre.getDataEnviamentFi() != null && filtre.getDataEnviamentFi() != "") {
-				dataEnviamentFi = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentFi());
-				if (dataEnviamentFi != null) {
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(dataEnviamentFi);
-					cal.set(Calendar.HOUR_OF_DAY, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-					dataEnviamentFi = cal.getTime();
-				}
+				dataEnviamentFi = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentFi()));
 			}
 			if (filtre.getDataProgramadaDisposicioInici() != null && filtre.getDataProgramadaDisposicioInici() != "") {
-				dataProgramadaDisposicioInici = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataProgramadaDisposicioInici());
-				if (dataProgramadaDisposicioInici != null) {
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(dataProgramadaDisposicioInici);
-					cal.set(Calendar.HOUR_OF_DAY, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-					dataProgramadaDisposicioInici = cal.getTime();
-				}
+				dataProgramadaDisposicioInici = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataProgramadaDisposicioInici()));
 			}
 			if (filtre.getDataProgramadaDisposicioFi() != null && filtre.getDataProgramadaDisposicioFi() != "") {
-				dataProgramadaDisposicioFi = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataProgramadaDisposicioFi());
-				if (dataProgramadaDisposicioFi != null) {
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(dataProgramadaDisposicioFi);
-					cal.set(Calendar.HOUR_OF_DAY, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-					dataProgramadaDisposicioFi = cal.getTime();
-				}
+				dataProgramadaDisposicioFi = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataProgramadaDisposicioFi()));
 			}
 			if (filtre.getDataRegistreInici() != null && filtre.getDataRegistreInici() != "") {
-				dataRegistreInici = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataRegistreInici());
-				if (dataRegistreInici != null) {
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(dataRegistreInici);
-					cal.set(Calendar.HOUR_OF_DAY, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-					dataRegistreInici = cal.getTime();
-				}
+				dataRegistreInici = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataRegistreInici()));
 			}
 			if (filtre.getDataRegistreFi() != null && filtre.getDataRegistreFi() != "") {
-				dataRegistreFi = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataRegistreFi());
-				if (dataRegistreFi != null) {
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(dataRegistreFi);
-					cal.set(Calendar.HOUR_OF_DAY, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-					dataRegistreFi = cal.getTime();
-				}
+				dataRegistreFi = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataRegistreFi()));
 			}
 			if (filtre.getDataCaducitatInici() != null && filtre.getDataCaducitatInici() != "") {
-				dataCaducitatInici = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataCaducitatInici());
-				if (dataCaducitatInici != null) {
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(dataCaducitatInici);
-					cal.set(Calendar.HOUR_OF_DAY, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-					dataCaducitatInici = cal.getTime();
-				}
+				dataCaducitatInici = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataCaducitatInici()));
 			}
 			if (filtre.getDataCaducitatFi() != null && filtre.getDataCaducitatFi() != "") {
-				dataCaducitatFi = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataCaducitatFi());
-				if (dataCaducitatFi != null) {
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(dataCaducitatFi);
-					cal.set(Calendar.HOUR_OF_DAY, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
-					dataCaducitatFi = cal.getTime();
-				}
+				dataCaducitatFi = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataCaducitatFi()));
 			}
 			//Filtres camps procediment
 			Integer estat = null;
@@ -569,6 +498,60 @@ public class EnviamentServiceImpl implements EnviamentService {
 						(procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty()),
 						procedimentsCodisNotib,
 						aplicacioService.findRolsUsuariActual(),
+						pageable);
+			} else if (isAdminOrgan && !procedimentsCodisNotib.isEmpty()) {
+				enviament = notificacioEnviamentRepository.findByNotificacio(
+						filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
+						filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
+						filtre.getGrup() == null || filtre.getGrup().isEmpty(),
+						filtre.getGrup() == null ? "" : filtre.getGrup(),
+						filtre.getConcepte() == null || filtre.getConcepte().isEmpty(),
+						filtre.getConcepte() == null ? "" : filtre.getConcepte(),
+						filtre.getDescripcio() == null || filtre.getDescripcio().isEmpty(),
+						filtre.getDescripcio() == null ? "" : filtre.getDescripcio(),
+						(dataProgramadaDisposicioInici == null),
+						dataProgramadaDisposicioInici,
+						(dataProgramadaDisposicioFi == null),
+						dataProgramadaDisposicioFi,
+						(dataCaducitatInici == null),
+						dataCaducitatInici,
+						(dataCaducitatFi == null),
+						dataCaducitatFi,
+						(filtre.getEnviamentTipus() == null),
+						(tipusEnviament),
+						(filtre.getCsvUuid() == null || filtre.getCsvUuid().isEmpty()),
+						filtre.getCsvUuid(),
+						(filtre.getEstat() == null),
+						(estat),
+						entitatEntity,
+						(dataEnviamentInici == null),
+						dataEnviamentInici,
+						(dataEnviamentFi == null),
+						dataEnviamentFi,
+						(filtre.getCodiNotifica() == null || filtre.getCodiNotifica().isEmpty()),
+						filtre.getCodiNotifica() == null ? "" : filtre.getCodiNotifica(),
+						(filtre.getCreatedBy() == null || filtre.getCreatedBy().getCodi().isEmpty()),
+						conversioTipusHelper.convertir(filtre.getCreatedBy(), UsuariEntity.class),
+						(filtre.getNifTitular() == null || filtre.getNifTitular().isEmpty()),
+						filtre.getNifTitular() == null ? "" : filtre.getNifTitular(),
+						(filtre.getTitularNomLlinatge() == null || filtre.getTitularNomLlinatge().isEmpty()),
+						filtre.getTitularNomLlinatge() == null ? "" : filtre.getTitularNomLlinatge(),
+						(filtre.getEmailTitular() == null || filtre.getEmailTitular().isEmpty()),
+						filtre.getEmailTitular() == null ? "" : filtre.getEmailTitular(),
+						(filtre.getDir3Codi() == null || filtre.getDir3Codi().isEmpty()),
+						filtre.getDir3Codi() == null ? "" : filtre.getDir3Codi(),
+						(filtre.getNumeroCertCorreus() == null || filtre.getNumeroCertCorreus().isEmpty()),
+						filtre.getNumeroCertCorreus() == null ? "" : filtre.getNumeroCertCorreus(),
+						(filtre.getUsuari() == null || filtre.getUsuari().isEmpty()),
+						filtre.getUsuari() == null ? "" : filtre.getUsuari(),
+						(filtre.getRegistreNumero() == null || filtre.getRegistreNumero().isEmpty()),
+						filtre.getRegistreNumero() == null ? "" : filtre.getRegistreNumero(),
+						(dataRegistreInici == null),
+						dataRegistreInici,
+						(dataRegistreFi == null),
+						dataRegistreFi,
+						(procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty()),
+						procedimentsCodisNotib,
 						pageable);
 			} else if (isUsuariEntitat) {
 				enviament = notificacioEnviamentRepository.findByNotificacio(
@@ -670,6 +653,19 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 	}
 
+	private Date toIniciDia(Date data) {
+		if (data != null) {
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(data);
+			cal.set(Calendar.HOUR, 0);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
+			data = cal.getTime();
+		}
+		return data;
+	}
+	
 	private void campsOrdre(PaginacioParamsDto paginacioParams) {
 		PaginacioParamsDto paginacioParamsNou = paginacioParams;
 		

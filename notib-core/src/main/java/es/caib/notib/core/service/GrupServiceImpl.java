@@ -30,13 +30,13 @@ import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.GrupProcedimentEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.GrupHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
-import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
@@ -67,7 +67,7 @@ public class GrupServiceImpl implements GrupService{
 	@Resource
 	private ProcedimentRepository procedimentRepositroy;
 	@Resource
-	private PluginHelper pluginHelper;
+	private CacheHelper cacheHelper;
 	@Resource
 	private MetricsHelper metricsHelper;
 	
@@ -199,9 +199,9 @@ public class GrupServiceImpl implements GrupService{
 			List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepositoy.findByProcediment(procediment); 
 			
 			for (GrupProcedimentEntity grupProcediment : grupsProcediment) {
-				DadesUsuari usuariGrup = pluginHelper.dadesUsuariConsultarAmbCodi(auth.getName());
+				DadesUsuari usuariGrup = cacheHelper.findUsuariAmbCodi(auth.getName());
 				if (usuariGrup != null) {
-					List<String> rols = pluginHelper.consultarRolsAmbCodi(usuariGrup.getCodi());
+					List<String> rols = cacheHelper.findRolsUsuariAmbCodi(usuariGrup.getCodi());
 					if (rols.contains(grupProcediment.getGrup().getCodi())) {
 						grups.add(conversioTipusHelper.convertir(
 								grupReposity.findOne(grupProcediment.getGrup().getId()), 

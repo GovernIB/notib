@@ -157,19 +157,21 @@ public class EntitatController extends BaseController {
 			HttpServletResponse response) throws IOException {
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		
-		if (entitatActual.getLogoCapBytes() != null) {
-			writeFileToResponse(
-					"Logo_cap.png",
-					entitatActual.getLogoCapBytes(),
-					response);
-		} else {
-			try {
+		if (entitatActual != null) {
+			if (entitatActual.getLogoCapBytes() != null) {
 				writeFileToResponse(
-						"Logo_cap.png", 
-						entitatService.getCapLogo(), 
+						"Logo_cap.png",
+						entitatActual.getLogoCapBytes(),
 						response);
-			} catch (Exception ex) {
-				logger.debug("Error al obtenir el logo de la capçalera", ex);
+			} else {
+				try {
+					writeFileToResponse(
+							"Logo_cap.png", 
+							entitatService.getCapLogo(), 
+							response);
+				} catch (Exception ex) {
+					logger.debug("Error al obtenir el logo de la capçalera", ex);
+				}
 			}
 		}
 		return null;
@@ -181,19 +183,21 @@ public class EntitatController extends BaseController {
 			HttpServletResponse response) throws IOException {
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		
-		if (entitatActual.getLogoPeuBytes() != null) {
-			writeFileToResponse(
-					"Logo_peu.png",
-					entitatActual.getLogoPeuBytes(),
-					response);
-		} else {
-			try {
+		if (entitatActual != null) {
+			if (entitatActual.getLogoPeuBytes() != null) {
 				writeFileToResponse(
-						"Logo_peu.png", 
-						entitatService.getPeuLogo(), 
+						"Logo_peu.png",
+						entitatActual.getLogoPeuBytes(),
 						response);
-			} catch (Exception ex) {
-				logger.debug("Error al obtenir el logo del peu", ex);
+			} else {
+				try {
+					writeFileToResponse(
+							"Logo_peu.png", 
+							entitatService.getPeuLogo(), 
+							response);
+				} catch (Exception ex) {
+					logger.debug("Error al obtenir el logo del peu", ex);
+				}
 			}
 		}
 		return null;

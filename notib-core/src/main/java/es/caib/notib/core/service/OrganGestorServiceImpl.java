@@ -236,6 +236,23 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	
 	@Override
 	@Transactional(readOnly = true)
+	public List<OrganGestorDto> findDescencentsByCodi(
+			Long entitatId, 
+			String organCodi) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organCodi);
+			return conversioTipusHelper.convertirList(
+					organGestorRepository.findByCodiIn(organs),
+					OrganGestorDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
 	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			String organActualCodiDir3,
@@ -513,6 +530,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					permis);
 			cacheHelper.evictFindOrgansGestorsAccessiblesUsuari();
 			cacheHelper.evictFindEntitatsAccessiblesUsuari();
+			cacheHelper.evictFindProcedimentsWithPermis();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -545,6 +563,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					permisId);
 			cacheHelper.evictFindOrgansGestorsAccessiblesUsuari();
 			cacheHelper.evictFindEntitatsAccessiblesUsuari();
+			cacheHelper.evictFindProcedimentsWithPermis();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
