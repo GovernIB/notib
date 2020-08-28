@@ -434,28 +434,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					}
 					
 					for (OrganGestorEntity organGestorAntic: organsGestorsModificats) {
-//						logger.debug(">>>> Processant organ gestor " + organGestorAntic.getCodi() + "...   ");
-						progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ", new Object[] {organGestorAntic.getCodi()}));
-						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.us"));
-
-						// Si canviam l'organ gestor, i aquest no s'utilitza en cap altre procediment, l'eliminarem (2)
-						if (!organGestorService.organGestorEnUs(organGestorAntic.getId())) {
-							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.us.result.no"));
-							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.permis.result.no"));
-							progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.result.borrar"));
-							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.borrar", new Object[] {organGestorAntic.getCodi()}));
-							organGestorRepository.delete(organGestorAntic);
-							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.borrat"));
-//							logger.debug(">>>> ELIMINAT: No té cap procediment ni permís assignat.");
-						}else{
-							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.permis.result.si"));
-							progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.result.permis"));
-//							logger.debug(">>>> NO ELIMINAT: Té permisos configurats.");
-							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.us.result.si"));
-							progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.result.procediments"));
-						}
-//						logger.debug(">>>> ..........................................................................");
-						progres.addSeparador();
+						//#260 Modificació passar la funcionalitat del for dins un procediment, ja que pel temps de transacció fallava
+						procedimentHelper.eliminarOrganSiNoEstaEnUs(progres,organGestorAntic);
 					}
 				} else {
 					progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organs.inactiu"));
@@ -492,8 +472,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
-	
 	
 	private List<ProcedimentDto> getProcedimentsGdaByEntitat(String codiDir3) {
 		ProgresActualitzacioDto progres = progresActualitzacio.get(codiDir3);

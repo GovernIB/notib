@@ -26,6 +26,7 @@ import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
 import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.GrupProcedimentEntity;
@@ -57,6 +58,8 @@ public class ProcedimentHelper {
 	private ProcedimentRepository procedimentRepository;
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
+	@Resource
+	private OrganGestorService organGestorService;
 	@Resource
 	MessageHelper messageHelper;
 	
@@ -370,6 +373,32 @@ public class ProcedimentHelper {
 		progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(t2 - t1)}));
 		progres.addSeparador();
 		progres.incrementProcedimentsActualitzats();
+	}
+	
+	@Transactional(timeout = 300, propagation = Propagation.REQUIRES_NEW)
+	public void eliminarOrganSiNoEstaEnUs(ProgresActualitzacioDto progres, OrganGestorEntity organGestorAntic) {
+		logger.debug(">>>> Processant organ gestor " + organGestorAntic.getCodi() + "...   ");
+		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ", new Object[] {organGestorAntic.getCodi()}));
+		progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.us"));
+
+		// Si canviam l'organ gestor, i aquest no s'utilitza en cap altre procediment, l'eliminarem (2)
+		if (!organGestorService.organGestorEnUs(organGestorAntic.getId())) {
+			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.us.result.no"));
+			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.permis.result.no"));
+			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.result.borrar"));
+			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.borrar", new Object[] {organGestorAntic.getCodi()}));
+			organGestorRepository.delete(organGestorAntic);
+			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.borrat"));
+//			logger.debug(">>>> ELIMINAT: No té cap procediment ni permís assignat.");
+		}else{
+			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.permis.result.si"));
+			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.result.permis"));
+//			logger.debug(">>>> NO ELIMINAT: Té permisos configurats.");
+			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.us.result.si"));
+			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organ.result.procediments"));
+		}
+//		logger.debug(">>>> ..........................................................................");
+		progres.addSeparador();
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ProcedimentHelper.class);
