@@ -36,7 +36,7 @@ public class GrupServiceBean implements GrupService {
 	GrupService delegate;
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public GrupDto create(
 			Long entitatId, 
 			GrupDto grup) {
@@ -46,13 +46,13 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public GrupDto update(GrupDto grup) throws NotFoundException {
 		return delegate.update(grup);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
 	public GrupDto delete(Long id) throws NotFoundException {
 		return delegate.delete(id);
 	}

@@ -46,7 +46,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	private String raoSocial;
 	@Column(name = "cod_entitat_desti", length = 9)
 	private String dir3Codi;
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_env_id")
 	private NotificacioEnviamentEntity enviament;
 	
