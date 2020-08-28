@@ -277,14 +277,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						logger.debug(">> [ALTA] document creat");
 					}		
 					//Comprovar si no hi ha una caducitat posar una per defecte (dia acutal + dies caducitat procediment)
-					if (notificacio.getCaducitat() != null) {
-						notificacio.setCaducitat(CaducitatHelper.sumarDiesLaborals(
-								notificacio.getCaducitat(),
-								procediment.getCaducitat()));
-					} else {
-						notificacio.setCaducitat(CaducitatHelper.sumarDiesLaborals(
-								new Date(),
-								procediment.getCaducitat()));
+					if (notificacio.getCaducitat() == null) {
+						notificacio.setCaducitat(
+								CaducitatHelper.sumarDiesLaborals(
+										new Date(),
+										procediment.getCaducitat()));
 					}
 					
 					NotificacioEntity.BuilderV2 notificacioBuilder = NotificacioEntity.
