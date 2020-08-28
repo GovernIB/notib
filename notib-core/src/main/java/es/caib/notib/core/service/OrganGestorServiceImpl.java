@@ -89,10 +89,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			//		que l'Organ que crea es fill d'almenys un dels Organs que administra 
 			
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					dto.getEntitatId(), 
-					true, 
-					false, 
-					false);
+					dto.getEntitatId()); 
+//					true, 
+//					false, 
+//					false);
 			
 			OrganGestorEntity organGestor = OrganGestorEntity.getBuilder(
 					dto.getCodi(),
@@ -118,10 +118,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			//		verificar que almenys un dels organs que administra es pare del que vol eliminar.
 			
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId,
-					true,
-					false,
-					false);
+					entitatId);
+//					true,
+//					false,
+//					false);
 			
 			OrganGestorEntity organGestorEntity = entityComprovarHelper.comprovarOrganGestor(
 					entitat, 
@@ -268,10 +268,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			//	Tots els organs fills de l'Entitat
 			if (organActualCodiDir3 == null) {
 				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-						entitatId, 
-						false, 
-						true, 
-						false);
+						entitatId); 
+//						false, 
+//						true, 
+//						false);
 			
 				if (filtre == null) {
 					organs = organGestorRepository.findByEntitat(
@@ -290,10 +290,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			//	Només el l'Organ de l'administrador, i els seus fills (tant de primer nivell com següents)
 			}else{
 				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-						entitatId, 
-						true, 
-						false, 
-						false);
+						entitatId); 
+//						true, 
+//						false, 
+//						false);
 				
 				//Comprovació permisos organ
 				entityComprovarHelper.comprovarPermisosOrganGestor(organActualCodiDir3);
@@ -359,10 +359,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		try {
 			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ 
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId, 
-					true, 
-					false, 
-					false);
+					entitatId); 
+//					true, 
+//					false, 
+//					false);
 			List<OrganGestorEntity> organsGestors;
 			if (organActualCodiDir3==null)
 				organsGestors = organGestorRepository.findByEntitat(entitat);
@@ -394,7 +394,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					+ "entitatId=" + entitatId + ", "
 					+ "id=" + id + ")");
 			EntitatEntity entitat = null;
-				
+			
+			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ
 			if (entitatId != null)
 				entitat = entityComprovarHelper.comprovarEntitat(
 						entitatId);
@@ -427,12 +428,13 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					+ "codi=" + codi + ")");
 			EntitatEntity entitat = null;
 				
+			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ
 			if (entitatId != null)
 				entitat = entityComprovarHelper.comprovarEntitat(
-						entitatId, 
-						true, 
-						false, 
-						false);
+						entitatId); 
+//						true, 
+//						false, 
+//						false);
 	
 			OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(
 					entitat, 
@@ -484,12 +486,13 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					+ "id=" + id +  ")"); 
 			EntitatEntity entitat = null;
 			
+			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ
 			if (entitatId != null)
 				entitat = entityComprovarHelper.comprovarEntitat(
-						entitatId,
-						true,
-						false,
-						false);
+						entitatId);
+//						true,
+//						false,
+//						false);
 			
 			entityComprovarHelper.comprovarOrganGestor(
 					entitat, 
@@ -517,12 +520,13 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					+ "permis=" + permis + ")");
 			EntitatEntity entitat = null;
 			
+			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ
 			if (entitatId != null)
 				entitat = entityComprovarHelper.comprovarEntitat(
-						entitatId,
-						true,
-						false,
-						false);
+						entitatId);
+//						true,
+//						false,
+//						false);
 			entityComprovarHelper.comprovarOrganGestor(entitat, id);
 			permisosHelper.updatePermis(
 					id,
@@ -549,12 +553,13 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					+ "permisId=" + permisId + ")");
 			EntitatEntity entitat = null;
 			
+			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ
 			if (entitatId != null)
 				entitat = entityComprovarHelper.comprovarEntitat(
-						entitatId,
-						true,
-						false,
-						false);
+						entitatId);
+//						true,
+//						false,
+//						false);
 			
 			entityComprovarHelper.comprovarOrganGestor(entitat, id);
 			permisosHelper.deletePermis(
