@@ -44,7 +44,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	ProcedimentService delegate;
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public ProcedimentDto create(
 			Long entitatId, 
 			ProcedimentDto procediment) {
@@ -54,7 +54,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public ProcedimentDto update(
 			Long entitatId, 
 			ProcedimentDto procediment,
@@ -66,7 +66,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
 	public ProcedimentDto delete(
 			Long entitatId, 
 			Long id) throws NotFoundException {
