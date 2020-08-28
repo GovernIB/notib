@@ -397,10 +397,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				
 			if (entitatId != null)
 				entitat = entityComprovarHelper.comprovarEntitat(
-						entitatId, 
-						true, 
-						false, 
-						false);
+						entitatId);
+//						true, 
+//						false, 
+//						false);
 	
 			OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(
 					entitat, 

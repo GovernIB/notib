@@ -94,9 +94,6 @@
 --------------------------------------------------------
 --  Ref Constraints for Table NOT_NOTIFICACIO
 --------------------------------------------------------
-
-  ALTER TABLE "NOT_NOTIFICACIO" ADD CONSTRAINT "NOT_NOTIFICACIO_ENV_FK" FOREIGN KEY ("ID")
-	  REFERENCES "NOT_NOTIFICACIO_ENV" ("ID") ENABLE;
  
   ALTER TABLE "NOT_NOTIFICACIO" ADD CONSTRAINT "NOT_NOTIFICACIO_USRCREATE_FK" FOREIGN KEY ("CREATEDBY_CODI")
 	  REFERENCES "NOT_USUARI" ("CODI") ENABLE;

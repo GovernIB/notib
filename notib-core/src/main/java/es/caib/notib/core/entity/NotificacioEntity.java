@@ -79,7 +79,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "proc_codi_notib", length = 9, nullable = false)
 	protected String procedimentCodiNotib;
 	
-	@Column(name = "grup_codi", length = 64, nullable = false)
+	@Column(name = "grup_codi", length = 64)
 	protected String grupCodi;
 	
 	@Column(name = "estat", nullable = false)
@@ -117,7 +117,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Temporal(TemporalType.DATE)
 	protected Date registreData;
 	
-	@Column(name = "registre_num_expedient", length = 80, nullable = false)
+	@Column(name = "registre_num_expedient", length = 80)
 	protected String numExpedient;
 	
 	@Column(name = "callback_error")
@@ -135,14 +135,14 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	
 	/*pagador a Postal*/
-	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "pagador_postal_id")
 	@ForeignKey(name = "not_pagador_postal_not_fk")
 	protected PagadorPostalEntity pagadorPostal;
 	
 	
 	/*pagador CIE*/
-	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "pagador_cie_id")
 	@ForeignKey(name = "not_pagador_cie_not_fk")
 	protected PagadorCieEntity pagadorCie;
