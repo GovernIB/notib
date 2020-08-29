@@ -51,12 +51,12 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Creant una nova aplicació (aplicació=" + aplicacio.toString() + ")");
-			entityComprovarHelper.comprovarPermisos(
-					null,
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+					aplicacio.getEntitatId(),
+					true,
 					true,
 					false,
 					false);
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(aplicacio.getEntitatId());
 			AplicacioEntity entity = AplicacioEntity.getBuilder(
 					entitat,
 					aplicacio.getUsuariCodi(),
@@ -76,8 +76,9 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Actualitzant l'aplicació existent (aplicacio=" + aplicacio.toString() + ")");
-			entityComprovarHelper.comprovarPermisos(
-					null,
+			entityComprovarHelper.comprovarEntitat(
+					aplicacio.getEntitatId(),
+					true,
 					true,
 					false,
 					false);
@@ -103,8 +104,9 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Esborrant aplicacio (id=" + id +  ")");
-			entityComprovarHelper.comprovarPermisos(
-					null,
+			entityComprovarHelper.comprovarEntitat(
+					entitatId,
+					true,
 					true,
 					false,
 					false);
@@ -126,11 +128,11 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta una aplicació amb id = " + aplicacioId.toString());
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					false,
-					false);
+//			entityComprovarHelper.comprovarPermisos(
+//					null,
+//					true,
+//					false,
+//					false);
 			
 			AplicacioEntity entity = aplicacioRepository.findOne(aplicacioId);
 			
@@ -148,11 +150,11 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta una aplicació amb entitatId= " + entitatId + " i id = " + aplicacioId.toString());
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					false,
-					false);
+//			entityComprovarHelper.comprovarPermisos(
+//					null,
+//					true,
+//					false,
+//					false);
 			
 			AplicacioEntity entity = aplicacioRepository.findByEntitatIdAndId(entitatId, aplicacioId);
 			
@@ -170,11 +172,11 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta una aplicació amb codi = " + usuariCodi);
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					false,
-					false);
+//			entityComprovarHelper.comprovarPermisos(
+//					null,
+//					true,
+//					false,
+//					false);
 			
 			AplicacioEntity entity = aplicacioRepository.findByUsuariCodi(usuariCodi);
 			
@@ -192,11 +194,11 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta una aplicació amb entitatId= " + entitatId + " i codi = " + usuariCodi);
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					false,
-					false);
+//			entityComprovarHelper.comprovarPermisos(
+//					null,
+//					true,
+//					false,
+//					false);
 			
 			AplicacioEntity entity = aplicacioRepository.findByEntitatIdAndUsuariCodi(entitatId, usuariCodi);
 			
@@ -286,12 +288,13 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 			logger.debug("Actualitzant propietat activa d'una aplicació existent ("
 					+ "id=" + id + ", "
 					+ "activa=" + activa + ")");
-			entityComprovarHelper.comprovarPermisos(
-					null,
+			AplicacioEntity aplicacio = aplicacioRepository.findOne(id);
+			entityComprovarHelper.comprovarEntitat(
+					aplicacio.getEntitat().getId(),
+					true,
 					true,
 					false,
-					false );
-			AplicacioEntity aplicacio = aplicacioRepository.findOne(id);
+					false);
 			aplicacio.updateActiva(activa);
 			return conversioTipusHelper.convertir(
 					aplicacio,

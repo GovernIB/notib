@@ -9,9 +9,12 @@
 	<c:when test="${empty entitatCommand.id}"><c:set var="titol"><spring:message code="entitat.form.titol.crear"/></c:set></c:when>
 	<c:otherwise><c:set var="titol"><spring:message code="entitat.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
-
-<%    pageContext.setAttribute("tipusDocumentEnumDto", TipusDocumentEnumDto.values()); %>
-
+<%
+	pageContext.setAttribute("tipusDocumentEnumDto", TipusDocumentEnumDto.values()); 
+	pageContext.setAttribute(
+			"isRolActualAdministrador",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
+%>
 <html>
 <head>
 	<title>${titol}</title>
@@ -133,7 +136,9 @@ $(document).ready(function() {
 		</div>
 		<div id="modal-botons" class="col-xs-12 text-right">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<c:if test="${isRolActualAdministrador}">
 			<a href="<c:url value="/entitat"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+			</c:if>
 		</div>
 	</form:form>
 </body>

@@ -135,11 +135,17 @@ public class EntitatServiceImpl implements EntitatService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Actualitzant entitat existent (entitat=" + entitat + ")");
-			entityComprovarHelper.comprovarPermisos(
-					null,
+//			entityComprovarHelper.comprovarPermisos(
+//					null,
+//					true,
+//					false,
+//					false );
+			entityComprovarHelper.comprovarEntitat(
+					entitat.getId(),
+					true,
 					true,
 					false,
-					false );
+					false);
 			byte[] logoCapActual = null;
 			byte[] logoPeuActual = null;
 			EntitatEntity entity = entitatRepository.findOne(entitat.getId());
@@ -456,11 +462,17 @@ public class EntitatServiceImpl implements EntitatService {
 			logger.debug("Modificació com a superusuari del permis de l'entitat (" +
 					"entitatId=" + entitatId + ", " +
 					"permis=" + permis + ")");
-			entityComprovarHelper.comprovarPermisos(
-					null,
+			entityComprovarHelper.comprovarEntitat(
+					entitatId,
+					true,
 					true,
 					false,
-					false );
+					false);
+//			entityComprovarHelper.comprovarPermisos(
+//					null,
+//					true,
+//					false,
+//					false );
 			permisosHelper.updatePermis(
 					entitatId,
 					EntitatEntity.class,
@@ -481,11 +493,17 @@ public class EntitatServiceImpl implements EntitatService {
 			logger.debug("Eliminació com a superusuari del permis de l'entitat (" +
 					"entitatId=" + entitatId + ", " +
 					"permisId=" + permisId + ")");
-			entityComprovarHelper.comprovarPermisos(
-					null,
+			entityComprovarHelper.comprovarEntitat(
+					entitatId,
 					true,
 					true,
-					false );
+					false,
+					false);
+//			entityComprovarHelper.comprovarPermisos(
+//					null,
+//					true,
+//					true,
+//					false );
 			permisosHelper.deletePermis(
 					entitatId,
 					EntitatEntity.class,

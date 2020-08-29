@@ -25,7 +25,7 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return L'aplicació creada.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public AplicacioDto create(AplicacioDto aplicacio);
 
 	/**
@@ -40,7 +40,7 @@ public interface UsuariAplicacioService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public AplicacioDto update(AplicacioDto aplicacio) throws NotFoundException;
 
 	/**
@@ -56,7 +56,7 @@ public interface UsuariAplicacioService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public AplicacioDto delete(
 			Long id,
 			Long entitatId) throws NotFoundException;
@@ -130,7 +130,7 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return La pàgina d'aplicacions.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public PaginaDto<AplicacioDto> findPaginat(PaginacioParamsDto paginacioParams);
 	
 	/**
@@ -141,7 +141,7 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return La pàgina d'aplicacions.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public PaginaDto<AplicacioDto> findPaginatByEntitat(Long entitatId, PaginacioParamsDto paginacioParams);
 	
 	/**
@@ -155,7 +155,7 @@ public interface UsuariAplicacioService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
 	public AplicacioDto updateActiva(Long id, boolean activa);
 	
 }

@@ -93,6 +93,14 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisUsuari,
 			boolean comprovarPermisAdminEntitat,
 			boolean comprovarPermisAplicacio) throws NotFoundException {
+		return comprovarEntitat(entitatId, comprovarPermisUsuari, comprovarPermisAdminEntitat, comprovarPermisAplicacio, false);
+	}
+	public EntitatEntity comprovarEntitat(
+			Long entitatId,
+			boolean comprovarPermisSuper,
+			boolean comprovarPermisAdminEntitat,
+			boolean comprovarPermisUsuari,
+			boolean comprovarPermisAplicacio) throws NotFoundException {
 		if (entitatId == null) {
 			throw new NotFoundException(
 					entitatId,
@@ -105,49 +113,50 @@ public class EntityComprovarHelper {
 					EntitatEntity.class);
 		}
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		
+		boolean tePermis = !(comprovarPermisUsuari || comprovarPermisAdminEntitat || comprovarPermisAplicacio);
+		
+		if (comprovarPermisSuper) {
+			for (GrantedAuthority ga: auth.getAuthorities()) {
+				if (ga.toString().equals("NOT_SUPER")) {
+					tePermis = true;
+					break;
+				}
+			}
+		}
 		if (comprovarPermisUsuari) {
-			boolean esLectorEntitat = permisosHelper.isGrantedAll(
+			if (permisosHelper.isGrantedAll(
 					entitatId,
 					EntitatEntity.class,
 					new Permission[] {ExtendedPermission.USUARI},
-					auth);
-			if (!esLectorEntitat) {
-				throw new PermissionDeniedException(
-						entitatId,
-						EntitatEntity.class,
-						auth.getName(),
-						"USUARI");
-			}
+					auth))
+				tePermis = true;
 		}	
 		if (comprovarPermisAdminEntitat) {
-			boolean esAdministradorEntitat = permisosHelper.isGrantedAll(
+			if (permisosHelper.isGrantedAll(
 					entitatId,
 					EntitatEntity.class,
 					new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT},
-					auth);
-			if (!esAdministradorEntitat) {
-				throw new PermissionDeniedException(
-						entitatId,
-						EntitatEntity.class,
-						auth.getName(),
-						"ADMINISTRADORENTITAT");
-			}
+					auth))
+				tePermis = true;
 		}
 		if (comprovarPermisAplicacio) {
-			boolean esUsuariAplicacio = permisosHelper.isGrantedAny(
+			if (permisosHelper.isGrantedAny(
 					entitatId,
 					EntitatEntity.class,
 					new Permission[] {ExtendedPermission.APLICACIO},
-					auth);
-			if (!esUsuariAplicacio) {
-				throw new PermissionDeniedException(
-						entitatId,
-						EntitatEntity.class,
-						auth.getName(),
-						"APLICACIO");
-			}
+					auth))
+				tePermis = true;
 		}
-		return entitat;
+		if (tePermis) {
+			return entitat;
+		} else {
+			throw new PermissionDeniedException(
+					entitatId,
+					EntitatEntity.class,
+					auth.getName(),
+					comprovarPermisUsuari ? "USUARI" : comprovarPermisAplicacio ? "APLICACIO" : "ADMINISTRADORENTITAT");
+		}
 	}
 	
 	public void comprovarPermisos(
@@ -156,13 +165,11 @@ public class EntityComprovarHelper {
 			boolean comprovarAdmin,
 			boolean comprovarUser) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		boolean esAdministradorEntitat = false;
-		boolean esSuperAdministrador = false;
-		boolean esUsuari = false;
+		boolean tePermis = !(comprovarSuper || comprovarAdmin || comprovarUser);
 		if (comprovarSuper) {
 			for (GrantedAuthority ga: auth.getAuthorities()) {
 				if (ga.toString().equals("NOT_SUPER")) {
-					esSuperAdministrador = true;
+					tePermis = true;
 					break;
 				}
 			}
@@ -170,7 +177,7 @@ public class EntityComprovarHelper {
 		if (comprovarAdmin) {
 			for (GrantedAuthority ga: auth.getAuthorities()) {
 				if (ga.toString().equals("NOT_ADMIN")) {
-					esAdministradorEntitat = true;
+					tePermis = true;
 					break;
 				}
 			}
@@ -178,38 +185,23 @@ public class EntityComprovarHelper {
 		if (comprovarUser) {
 			for (GrantedAuthority ga: auth.getAuthorities()) {
 				if (ga.toString().equals("NOT_USER")) {
-					esUsuari = true;
+					tePermis = true;
 					break;
 				}
 			}
 		}
-		if (comprovarAdmin && !esAdministradorEntitat) {
-			if (esSuperAdministrador && !esSuperAdministrador) {
-				throw new PermissionDeniedException(
-						entitatId,
-						EntitatEntity.class,
-						auth.getName(),
-						"ADMINISTRATION");
-				}
-		} else if (comprovarAdmin && esAdministradorEntitat) {
+		
+		// Comprovarem que es compleixi algun dels permisos demanats
+		if (tePermis) {
 			return;
-		}
-		if (esUsuari && !esAdministradorEntitat) {
-			if (comprovarSuper && !esSuperAdministrador) {
-				throw new PermissionDeniedException(
-						entitatId,
-						EntitatEntity.class,
-						auth.getName(),
-						"USUARI");
-			}
-		}
-		if (esUsuari && esAdministradorEntitat && !esSuperAdministrador) {
+		} else {
 			throw new PermissionDeniedException(
 					entitatId,
 					EntitatEntity.class,
 					auth.getName(),
-					"SUPERUSUARI");
+					comprovarUser ? "USUARI" : comprovarAdmin ? "ADMINISTRATION" : "SUPERUSUARI");
 		}
+		
 	}
 
 	public EntitatEntity comprovarEntitat(

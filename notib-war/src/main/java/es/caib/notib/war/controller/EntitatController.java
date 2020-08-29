@@ -106,9 +106,10 @@ public class EntitatController extends BaseController {
 		}
 		if (command.getId() != null) {
 			entitatService.update(EntitatCommand.asDto(command));
+			boolean isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
 			return getModalControllerReturnValueSuccess(
 					request,
-					"redirect:entitat",
+					"redirect:entitat" + (isAdminEntitat ? "/" + command.getId() : ""),
 					"entitat.controller.modificada.ok");
 		} else {
 			entitatService.create(EntitatCommand.asDto(command));

@@ -4,6 +4,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%
+	pageContext.setAttribute(
+			"isRolActualAdministrador",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
+%>
 <html>
 <head>
 	<title><spring:message code="aplicacio.list.titol"/></title>
@@ -72,7 +77,9 @@
 			</tr>
 		</thead>
 	</table>
-	<div class="text-right">
-		<a class="btn btn-default" href="<c:url value="/entitat"/>" data-datatable-id="taulaAplicacions"><span class="fa fa-reply"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
-	</div>
+	<c:if test="${isRolActualAdministrador}">
+		<div class="text-right">
+			<a class="btn btn-default" href="<c:url value="/entitat"/>" data-datatable-id="taulaAplicacions"><span class="fa fa-reply"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
+		</div>
+	</c:if>
 </body>

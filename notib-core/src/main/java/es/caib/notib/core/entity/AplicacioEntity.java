@@ -73,6 +73,7 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 			built.entitat = entitat;
 			built.usuariCodi = usuariCodi;
 			built.callbackUrl = callbackUrl;
+			built.activa = true;
 		}
 		public AplicacioEntity build() {
 			return built;

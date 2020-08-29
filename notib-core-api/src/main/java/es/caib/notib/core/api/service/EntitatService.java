@@ -46,7 +46,7 @@ public interface EntitatService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
 	public EntitatDto update(EntitatDto entitat) throws NotFoundException;
 
 	/**
@@ -195,7 +195,7 @@ public interface EntitatService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
 	public List<PermisDto> permisFindByEntitatId(
 			Long entitatId) throws NotFoundException;
 
@@ -210,7 +210,7 @@ public interface EntitatService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
 	public void permisUpdate(
 			Long entitatId,
 			PermisDto permis) throws NotFoundException;
@@ -226,16 +226,16 @@ public interface EntitatService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
 	public void permisDelete(
 			Long entitatId,
 			Long permisId) throws NotFoundException;
 	
 	
-	@PreAuthorize("hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	byte[] getCapLogo() throws NoSuchFileException, IOException;
 	
-	@PreAuthorize("hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	byte[] getPeuLogo() throws NoSuchFileException, IOException;
 
 }
