@@ -274,6 +274,7 @@ public class RegistreNotificaHelper {
 		return enviamentIds;
 	}
 	
+	@SuppressWarnings("unused")
 	private void updateEventWithError(
 			Throwable error,
 			NotificacioEntity notificacioEntity,

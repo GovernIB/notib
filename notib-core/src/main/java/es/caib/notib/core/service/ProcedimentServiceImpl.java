@@ -1520,11 +1520,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		try {
 			logger.debug("Preparant per buidar la informació en cache dels procediments...");
 			
-			cacheHelper.evictFindByGrupAndPermisProcedimentsUsuariActualAndEntitat(entitat.getId());
-			cacheHelper.evictFindByPermisProcedimentsUsuariActual(entitat.getId());
-			cacheHelper.evictFindPermisProcedimentsUsuariActualAndEntitat(entitat.getId());
-			cacheHelper.evictFindOrganismesByEntitat(entitat.getDir3Codi());
-			cacheHelper.evictFindOrganigramaByEntitat(entitat.getDir3Codi());
+//			cacheHelper.evictFindByGrupAndPermisProcedimentsUsuariActualAndEntitat(entitat.getId());
+//			cacheHelper.evictFindByPermisProcedimentsUsuariActual(entitat.getId());
+//			cacheHelper.evictFindPermisProcedimentsUsuariActualAndEntitat(entitat.getId());
+//			cacheHelper.evictFindOrganismesByEntitat(entitat.getDir3Codi());
+//			cacheHelper.evictFindOrganigramaByEntitat(entitat.getDir3Codi());
 			cacheHelper.evictFindProcedimentsWithPermis();
 		} finally {
 			metricsHelper.fiMetrica(timer);

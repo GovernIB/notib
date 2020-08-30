@@ -4,6 +4,8 @@
 package es.caib.notib.core.helper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -12,6 +14,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
@@ -62,6 +66,8 @@ public class CacheHelper {
 	private UsuariHelper usuariHelper;
 	@Resource
 	private OrganigramaHelper organigramaHelper;
+	@Resource
+	private CacheManager cacheManager;
 
 	@Cacheable(value = "entitatsUsuari", key="#usuariCodi.concat('-').concat(#rolActual)")
 	public List<EntitatDto> findEntitatsAccessiblesUsuari(
@@ -188,17 +194,21 @@ public class CacheHelper {
 				codiDir3Organ);
 	}
 	
-	@CacheEvict(value = "findPermisProcedimentsUsuariActualAndEntitat", key="#entitatId")
-	public void evictFindPermisProcedimentsUsuariActualAndEntitat(Long entitatId) {
+	public Collection<String> getAllCaches() {
+		return cacheManager.getCacheNames(); 
 	}
 	
-	@CacheEvict(value = "findByGrupAndPermisProcedimentsUsuariActualAndEntitat", key="#entitatId")
-	public void evictFindByGrupAndPermisProcedimentsUsuariActualAndEntitat(Long entitatId) {
-	}
-	
-	@CacheEvict(value = "findByPermisProcedimentsUsuariActual", key="#entitatId")
-	public void evictFindByPermisProcedimentsUsuariActual(Long entitatId) {
-	}
+//	@CacheEvict(value = "findPermisProcedimentsUsuariActualAndEntitat", key="#entitatId")
+//	public void evictFindPermisProcedimentsUsuariActualAndEntitat(Long entitatId) {
+//	}
+//	
+//	@CacheEvict(value = "findByGrupAndPermisProcedimentsUsuariActualAndEntitat", key="#entitatId")
+//	public void evictFindByGrupAndPermisProcedimentsUsuariActualAndEntitat(Long entitatId) {
+//	}
+//	
+//	@CacheEvict(value = "findByPermisProcedimentsUsuariActual", key="#entitatId")
+//	public void evictFindByPermisProcedimentsUsuariActual(Long entitatId) {
+//	}
 	
 	@CacheEvict(value = "organismes", key="#entitatcodi")
 	public void evictFindOrganismesByEntitat(String entitatcodi) {
@@ -226,6 +236,10 @@ public class CacheHelper {
 	
 	@CacheEvict(value = "getPermisosEntitatsUsuariActual", key="#auth.name")
 	public void evictGetPermisosEntitatsUsuariActual(Authentication auth) {
+	}
+	
+	public void clearCache(String value) {
+		cacheManager.getCache(value).clear();
 	}
 	
 //	private static final Logger logger = LoggerFactory.getLogger(CacheHelper.class);
