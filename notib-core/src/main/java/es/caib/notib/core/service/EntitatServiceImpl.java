@@ -32,7 +32,6 @@ import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
-import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.EntitatTipusDocEntity;
@@ -305,26 +304,23 @@ public class EntitatServiceImpl implements EntitatService {
 	@Transactional(readOnly = true)
 	@Override
 	public EntitatDto findById(
-			Long id) {
+			Long entitatId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta de l'entitat (id=" + id + ")");
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					false,
-					false,
-					true );
-			EntitatEntity entitat = entitatRepository.findOne(id);
-			if (entitat == null)
-				throw new NotFoundException(id, EntitatEntity.class);
-			EntitatDto entitatDto = conversioTipusHelper.convertir(
-					entitatRepository.findOne(id),
+			logger.debug("Consulta de l'entitat (id=" + entitatId + ")");
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			return conversioTipusHelper.convertir(
+					entitat,
 					EntitatDto.class);
+//			entityComprovarHelper.comprovarPermisos(
+//					null,
+//					false,
+//					false,
+//					true );
 //			TipusDocumentDto tipusDocumentDto = new TipusDocumentDto();
 //			tipusDocumentDto.setEntitat(entitat.getId());
 //			tipusDocumentDto.setTipusDocEnum(entitat.getTipusDocDefault());
 //			entitatDto.setTipusDocDefault(tipusDocumentDto);
-			return entitatDto;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
