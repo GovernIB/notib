@@ -426,12 +426,12 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			logger.debug("Consulta de l'organ gestor ("
 					+ "entitatId=" + entitatId + ", "
 					+ "codi=" + codi + ")");
-			EntitatEntity entitat = null;
+//			EntitatEntity entitat = null;
 				
 			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ
-			if (entitatId != null)
-				entitat = entityComprovarHelper.comprovarEntitat(
-						entitatId); 
+//			if (entitatId != null)
+//				entitat = entityComprovarHelper.comprovarEntitat(
+//						entitatId); 
 //						true, 
 //						false, 
 //						false);
