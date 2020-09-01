@@ -196,10 +196,18 @@ public class ProcedimentHelper {
 	}
 	
 	@Transactional(timeout = 300, propagation = Propagation.REQUIRES_NEW)
-	public void actualitzarProcedimentFromGda(ProgresActualitzacioDto progres, Long t1, Long t2, 
-			ProcedimentDto procedimentGda, EntitatDto entitatDto, EntitatEntity entitat,
-			Oficina oficinaVirtual, Map<String, OrganismeDto> organigramaEntitat, boolean modificar,
-			List<OrganGestorEntity> organsGestorsModificats, int i) {
+	public void actualitzarProcedimentFromGda(
+			ProgresActualitzacioDto progres, 
+			Long t1, 
+			Long t2, 
+			ProcedimentDto procedimentGda, 
+			EntitatDto entitatDto, 
+			EntitatEntity entitat,
+			Oficina oficinaVirtual, 
+			Map<String, OrganismeDto> organigramaEntitat, 
+			boolean modificar,
+			List<OrganGestorEntity> organsGestorsModificats, 
+			int i) {
 		
 		t1 = System.currentTimeMillis();
 //		logger.debug(">>>> " + i + ". Processant procediment: " + procedimentGda.getNom());

@@ -385,7 +385,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				// per tal que no la cerqui cada vegada dins el for
 				Oficina oficinaVirtual = pluginHelper.llistarOficinaVirtual(
 						entitatDto.getDir3Codi(), 
-						entitatDto.getNomOficinaVirtual(),
+						entitat.getNomOficinaVirtual(),
 						TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
 
 //				logger.debug(">>>> Obtenir de 30 en 30 els procediments de Rolsac de l'entitat...");
@@ -434,10 +434,18 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					for (ProcedimentDto procedimentGda: procedimentsGda) {
 						//#260 Modificació passar la funcionalitat del for dins un procediment, ja que pel temps de transacció fallava, 
 						//i també d'aquesta forma els que s'han carregat ja es guardan.
-						procedimentHelper.actualitzarProcedimentFromGda(progres, t1, t2, 
-								procedimentGda, entitatDto, entitat,
-								 oficinaVirtual,  organigramaEntitat,  modificar,
-								 organsGestorsModificats,  i);
+						procedimentHelper.actualitzarProcedimentFromGda(
+								progres, 
+								t1, 
+								t2, 
+								procedimentGda, 
+								entitatDto, 
+								entitat,
+								oficinaVirtual,  
+								organigramaEntitat,  
+								modificar,
+								organsGestorsModificats,  
+								i);
 						i++;
 					}
 					
