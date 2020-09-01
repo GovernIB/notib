@@ -9,6 +9,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -561,7 +562,16 @@ public class EntitatServiceImpl implements EntitatService {
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 //			System.out.println("Obtenim els permisos de " + auth.getName());
-			return entityComprovarHelper.getPermisosEntitatsUsuariActual(auth);
+			if (auth != null) {
+				return entityComprovarHelper.getPermisosEntitatsUsuariActual(auth);
+			} else {
+				Map<RolEnumDto, Boolean> hasPermisos = new HashMap<RolEnumDto, Boolean>();
+				hasPermisos.put(RolEnumDto.NOT_USER, false);
+				hasPermisos.put(RolEnumDto.NOT_ADMIN, false);
+				hasPermisos.put(RolEnumDto.NOT_APL, false);
+				hasPermisos.put(RolEnumDto.NOT_ADMIN_ORGAN, false);
+				return hasPermisos;
+			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
