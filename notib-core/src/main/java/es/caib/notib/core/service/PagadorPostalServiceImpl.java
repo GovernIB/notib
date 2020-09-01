@@ -160,7 +160,7 @@ public class PagadorPostalServiceImpl implements PagadorPostalService{
 					null,
 					true,
 					true,
-					false);
+					true);
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			Page<PagadorPostalEntity> pagadorPostal = null;

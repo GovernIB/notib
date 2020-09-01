@@ -430,12 +430,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}
 			Page<NotificacioEnviamentEntity> enviament = null;
 			
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					true,
-					false);
-			
 			campsOrdre(paginacioParams);
 			
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
