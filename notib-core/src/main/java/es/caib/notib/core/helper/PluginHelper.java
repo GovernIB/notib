@@ -880,7 +880,30 @@ public class PluginHelper {
 		return procediments;
 	}
 	
-	public List<ProcedimentDto> getProcedimentsGdaByEntitat(String codiDir3) {
+	public int getTotalProcediments(String codiDir3) {
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_GESCONADM, 
+				"Recuperant el total de procediments", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT);
+		int totalElements = 0;
+		try {
+			totalElements = getGestorDocumentalAdministratiuPlugin().getTotalProcediments(codiDir3);
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al obtenir el número total d'elemetns";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_GESCONADM,
+					errorDescripcio,
+					ex);
+		}
+		
+		return totalElements;
+	}
+	
+	public List<ProcedimentDto> getProcedimentsGdaByEntitat(
+			String codiDir3,
+			int numPagina) {
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_GESCONADM, 
 				"Obtenir procediments per entitat", 
@@ -888,7 +911,9 @@ public class PluginHelper {
 		
 		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
 		try {
-			List<GcaProcediment> procs = getGestorDocumentalAdministratiuPlugin().getProcedimentsByUnitat(codiDir3);
+			List<GcaProcediment> procs = getGestorDocumentalAdministratiuPlugin().getProcedimentsByUnitat(
+					codiDir3,
+					numPagina);
 			if (procs != null)
 				for (GcaProcediment proc: procs) {
 					ProcedimentDto dto = new ProcedimentDto();
