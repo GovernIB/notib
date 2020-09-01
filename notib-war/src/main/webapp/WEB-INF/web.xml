@@ -78,6 +78,9 @@
 	<security-role>
 		<role-name>NOT_APL</role-name>
 	</security-role>
+	<security-role>
+		<role-name>tothom</role-name>
+	</security-role>
 
 	<security-constraint>
 		<web-resource-collection>

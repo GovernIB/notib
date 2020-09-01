@@ -103,19 +103,19 @@ public class EntitatServiceBean implements EntitatService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public List<PermisDto> permisFindByEntitatId(Long id) throws NotFoundException {
 		return delegate.permisFindByEntitatId(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public void permisUpdate(Long entitatId, PermisDto permis) throws NotFoundException {
 		delegate.permisUpdate(entitatId, permis);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public void permisDelete(Long entitatId, Long permisId) throws NotFoundException {
 		delegate.permisDelete(entitatId, permisId);
 	}

@@ -693,7 +693,7 @@ public class PluginHelper {
 			integracioHelper.addAccioOk(info);
 			return documentDetalls;
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin d'arxiu digital";
+			String errorDescripcio = "Error al plugin d'arxiu digital: no s'ha pogut obtenir el codument amb UUID " + arxiuUuid;
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			throw new SistemaExternException(
 					IntegracioHelper.INTCODI_ARXIU,
@@ -719,7 +719,7 @@ public class PluginHelper {
 			documentContingut = getArxiuPlugin().documentImprimible(id);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
-			String errorDescripcio = "No s'ha pogut recuperar el document amb el uuid/csv proporcionat";
+			String errorDescripcio = "No s'ha pogut recuperar el document amb " + id;
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			throw new SistemaExternException(
 					IntegracioHelper.INTCODI_ARXIU,

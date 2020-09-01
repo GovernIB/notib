@@ -122,6 +122,7 @@ public class AclAuthorizationStrategyImpl implements AclAuthorizationStrategy {
 	           requiredAuthority = this.entitatGaModifyAuditing;
 	       } else if (changeType == CHANGE_GENERAL) {
 	           requiredAuthority = this.entitatGaGeneralChanges;
+	           requiredAuthorityOrgan = this.procedimentGaGeneralChanges; // Per entitat també pot ser administrador d'entitat
 	       } else if (changeType == CHANGE_OWNERSHIP) {
 	           requiredAuthority = this.entitatGaTakeOwnership;
 	       } else {

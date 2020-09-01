@@ -244,7 +244,7 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 			entityComprovarHelper.comprovarPermisos(
 					null,
 					true,
-					false,
+					true,
 					false);
 			
 			Page<AplicacioEntity> aplicacions = aplicacioRepository.findByEntitatIdFiltrat(

@@ -850,7 +850,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					destinatari.getNotificacioId(),
 					true,
 					true,
-					false);
+					true);
 			return conversioTipusHelper.convertirList(
 					notificacioEventRepository.findByNotificacioIdOrEnviamentIdOrderByDataAsc(
 							notificacioId,

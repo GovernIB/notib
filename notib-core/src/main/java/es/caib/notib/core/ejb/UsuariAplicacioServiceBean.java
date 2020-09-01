@@ -30,21 +30,21 @@ public class UsuariAplicacioServiceBean implements UsuariAplicacioService {
 	UsuariAplicacioService delegate;
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"NOT_SUPER", "NOT_ADMIN"})
 	public AplicacioDto create(
 			AplicacioDto aplicacio) {
 		return delegate.create(aplicacio);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"NOT_SUPER", "NOT_ADMIN"})
 	public AplicacioDto update(
 			AplicacioDto aplicacio) throws NotFoundException {
 		return delegate.update(aplicacio);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"NOT_SUPER", "NOT_ADMIN"})
 	public AplicacioDto delete(
 			Long id, 
 			Long entitatId) throws NotFoundException {
