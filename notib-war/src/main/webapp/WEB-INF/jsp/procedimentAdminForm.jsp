@@ -199,7 +199,7 @@ $(document).ready(function() {
 				}
 			});
 		} else {
-			alert('<spring:message code="procediment.form.avis.llibres"/>');
+			alert('<spring:message code="procediment.form.avis.oficines"/>');
 		}
 	});
 	$('#addLlibreButton').on('click', function(){
