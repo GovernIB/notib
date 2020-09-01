@@ -412,7 +412,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					} catch (Exception e) {
 						errorConsultantLlista = true;
 						procedimentsGda = new ArrayList<ProcedimentDto>();
-						progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments.error"));
+						progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments.error"));
 						numPagina++;
 						reintents++;
 						continue;
