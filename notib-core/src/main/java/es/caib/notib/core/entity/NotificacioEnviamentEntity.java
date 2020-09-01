@@ -849,7 +849,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + ((notificacio == null) ? 0 : notificacio.hashCode());
-		result = prime * result + ((titular.getNif() == null) ? 0 : titular.getNif().hashCode());
+		result = prime * result + ((titular == null || titular.getNif() == null) ? 0 : titular.getNif().hashCode());
 		return result;
 	}
 

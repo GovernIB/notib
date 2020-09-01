@@ -814,7 +814,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					null,
 					true,
 					true,
-					false);
+					true);
 			return conversioTipusHelper.convertirList(
 					notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacioId),
 					NotificacioEventDto.class);

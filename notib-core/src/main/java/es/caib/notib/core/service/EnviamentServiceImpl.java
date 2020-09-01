@@ -115,7 +115,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					null,
 					true,
 					true,
-					false);
+					true);
 			NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
 			List<NotificacioEnviamentEntity> enviaments = notificacioEnviamentRepository.findByNotificacio(notificacio);
 			return enviamentsToDto(enviaments);
@@ -167,7 +167,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					null,
 					true,
 					true,
-					false);
+					true);
 			
 			if (filtre.getDataEnviamentInici() != null && filtre.getDataEnviamentInici() != "") {
 				dataEnviamentInici = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentInici());
@@ -284,7 +284,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					null,
 					true,
 					true,
-					false);
+					true);
 				
 				enviament = notificacioEnviamentRepository.findByNotificacio(
 						filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
@@ -394,7 +394,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					null,
 					true,
 					true,
-					false);
+					true);
 			
 			if (filtre.getDataEnviamentInici() != null && filtre.getDataEnviamentInici() != "") {
 				dataEnviamentInici = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentInici()));
@@ -439,7 +439,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					null,
 					true,
 					true,
-					false);
+					true);
 			
 			campsOrdre(paginacioParams);
 			
@@ -749,7 +749,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					null,
 					true,
 					true,
-					false);
+					true);
 			
 			if (filtre.getDataEnviamentInici() != null && filtre.getDataEnviamentInici() != "") {
 				dataEnviamentInici = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentInici());
@@ -866,7 +866,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					null,
 					true,
 					true,
-					false);
+					true);
 				
 			enviaments = notificacioEnviamentRepository.findByNotificacio(
 					filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
@@ -1138,7 +1138,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					null,
 					true,
 					true,
-					false);
+					true);
 			return conversioTipusHelper.convertirList(
 					notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacioId),
 					NotificacioEventDto.class);

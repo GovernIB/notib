@@ -366,7 +366,7 @@ public class GrupServiceImpl implements GrupService{
 					null,
 					true,
 					true,
-					false );
+					true );
 			
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			Page<GrupEntity> grup = null;

@@ -36,7 +36,7 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 	<table
 		id="events"
 		data-toggle="datatable"
-		data-url="<c:url value="/notificacio/${notificacioId}/enviament/${enviamentId}/event"/>"
+		data-url="/notificacio/${notificacioId}/enviament/${enviamentId}/event"
 		data-search-enabled="false"
 		data-paging="false"
 		data-info="false"
