@@ -56,8 +56,8 @@ public class EnviamentServiceBean implements EnviamentService {
 	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByEntityAndFiltre(
 			EntitatDto entitat, 
 			boolean isUsuari,
-			boolean isAdminOrgan,
-			boolean isUsuariEntitat, 
+			boolean isUsuariEntitat,
+			boolean isAdminOrgan, 
 			List<String> codisProcedimentsDisponibles,
 			NotificacioEnviamentFiltreDto filtre, 
 			PaginacioParamsDto paginacio)

@@ -171,7 +171,7 @@ public class ProcedimentController extends BaseUserController{
 			}
 			return getModalControllerReturnValueSuccess(
 					request,
-					"redirect:procediments",
+					"redirect:../procediment",
 					"procediment.controller.modificat.ok");
 		} else {
 			procedimentService.create(
@@ -179,7 +179,7 @@ public class ProcedimentController extends BaseUserController{
 					ProcedimentCommand.asDto(procedimentCommand));
 			return getModalControllerReturnValueSuccess(
 					request,
-					"redirect:procediments",
+					"redirect:../procediment",
 					"procediment.controller.creat.ok");
 		}
 	}

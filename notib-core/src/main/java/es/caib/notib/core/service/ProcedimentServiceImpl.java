@@ -738,20 +738,23 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			}
 			Page<ProcedimentFormEntity> procediments = null;
 			PaginaDto<ProcedimentFormDto> procedimentsPage = null;
-			
+			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
+			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organGestorNom"}); //{"organGestor", "organGestorNom"});
+			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
+
 			if (filtre == null) {
 				
 				if (isUsuariEntitat) {
 					procediments = procedimentFormRepository.findAmbEntitatActual(
 							entitatActual.getId(),
-							paginacioHelper.toSpringDataPageable(paginacioParams));
+							pageable);
 					procedimentsPage =  paginacioHelper.toPaginaDto(
 							procediments,
 							ProcedimentFormDto.class);
 				} else if (isAdministrador) {
 					procediments = procedimentFormRepository.findAmbEntitatActiva(
 							entitatsActivaId,
-							paginacioHelper.toSpringDataPageable(paginacioParams));
+							pageable);
 					procedimentsPage =  paginacioHelper.toPaginaDto(
 							procediments,
 							ProcedimentFormDto.class);
@@ -762,13 +765,12 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					procediments = procedimentFormRepository.findAmbOrganGestorActual(
 							entitatActual.getId(),
 							organsFills,
-							paginacioHelper.toSpringDataPageable(paginacioParams));
+							pageable);
 					procedimentsPage =  paginacioHelper.toPaginaDto(
 							procediments,
 							ProcedimentFormDto.class);
 				}
 			} else {
-				Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
 			
 				if (isUsuariEntitat) {
 					procediments = procedimentFormRepository.findAmbEntitatAndFiltre(
