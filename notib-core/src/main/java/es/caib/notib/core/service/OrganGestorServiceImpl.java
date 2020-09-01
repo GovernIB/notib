@@ -436,14 +436,19 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 //						false, 
 //						false);
 	
-			OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(
-					entitat, 
-					codi);
-			OrganGestorDto resposta = conversioTipusHelper.convertir(
+//			OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(
+//					entitat, 
+//					codi);
+			
+			OrganGestorEntity organGestor = organGestorRepository.findByCodi(codi);
+			
+			if (organGestor!=null) {
+					OrganGestorDto resposta = conversioTipusHelper.convertir(
 					organGestor,
 					OrganGestorDto.class);
-			
-			return resposta;
+					return resposta;
+			}else
+				return null;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
