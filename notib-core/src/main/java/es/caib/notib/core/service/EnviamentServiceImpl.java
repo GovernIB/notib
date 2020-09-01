@@ -390,11 +390,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 				 dataCaducitatInici = null,
 				 dataCaducitatFi = null;
 			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitat.getId());
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					true,
-					false);
 			
 			if (filtre.getDataEnviamentInici() != null && filtre.getDataEnviamentInici() != "") {
 				dataEnviamentInici = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentInici()));
