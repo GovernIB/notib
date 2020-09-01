@@ -45,7 +45,7 @@ public class EntitatServiceBean implements EntitatService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"NOT_SUPER", "NOT_ADMIN"})
 	public EntitatDto update(
 			EntitatDto entitat) {
 		return delegate.update(entitat);

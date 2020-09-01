@@ -376,7 +376,7 @@ public class ProcedimentController extends BaseUserController{
 		HttpServletRequest request,
 		Model model,
 		@PathVariable Long entitatId) {
-		EntitatDto entitat = entitatService.findById(entitatId);
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
 		List<OrganismeDto> organismes;
 		if (organGestorActual != null) {
