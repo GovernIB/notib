@@ -810,11 +810,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			logger.debug("Consulta dels events de la notificació (" +
 					"notificacioId=" + notificacioId + ")");
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					true,
-					true);
 			return conversioTipusHelper.convertirList(
 					notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacioId),
 					NotificacioEventDto.class);
