@@ -195,20 +195,26 @@ public class OrganGestorController extends BaseUserController{
 		try {
 			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 			OrganGestorDto organ = organGestorService.findByCodi(entitat.getId(), organGestorCodi);
-			
-			if (organGestorService.organGestorEnUs(organ.getId())) {
+			if (organ!=null) {
+				if (organGestorService.organGestorEnUs(organ.getId())) {
+					return getAjaxControllerReturnValueError(
+							request,
+							"redirect:../../procediment",
+							"organgestor.controller.esborrat.us");
+				} else {
+					organGestorService.delete(
+							entitat.getId(),
+							organ.getId());
+					return getAjaxControllerReturnValueSuccess(
+							request,
+							"redirect:../../procediment",
+							"organgestor.controller.esborrat.ok");
+				}
+			}else{
 				return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../procediment",
-						"organgestor.controller.esborrat.us");
-			} else {
-				organGestorService.delete(
-						entitat.getId(),
-						organ.getId());
-				return getAjaxControllerReturnValueSuccess(
-						request,
-						"redirect:../../procediment",
-						"organgestor.controller.esborrat.ok");
+						"organgestor.controller.esborrat.ko");
 			}
 		} catch (Exception e) {
 			return getAjaxControllerReturnValueError(
