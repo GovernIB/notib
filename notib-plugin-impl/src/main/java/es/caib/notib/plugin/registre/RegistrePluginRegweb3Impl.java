@@ -143,14 +143,13 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			long tipusRegistre){
 		RespostaJustificantRecepcio rj = new RespostaJustificantRecepcio();
 		try {
-//			return toRespostaJustificantRecepcio(getAsientoRegistralApi().obtenerJustificante(
-//					codiDir3Entitat, 
-//					numeroRegistreFormatat, 
-//					tipusRegistre));
-			//TODO: substituir pel nou mètode
-			return toRespostaJustificantRecepcio(getRegistroSalidaApi().obtenerJustificante(
+			return toRespostaJustificantRecepcio(getAsientoRegistralApi().obtenerJustificante(
 					codiDir3Entitat, 
-					numeroRegistreFormatat));
+					numeroRegistreFormatat, 
+					tipusRegistre));
+//			return toRespostaJustificantRecepcio(getRegistroSalidaApi().obtenerJustificante(
+//					codiDir3Entitat, 
+//					numeroRegistreFormatat));
 		} catch (WsI18NException e) {
 			rj.setErrorCodi("0");
 			rj.setErrorDescripcio("No s'ha pogut obtenir el justificant");
