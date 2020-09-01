@@ -373,31 +373,13 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				}
 				progres.addInfo(TipusInfo.TITOL, messageHelper.getMessage("procediment.actualitzacio.auto.inici", new Object[] {entitatDto.getNom()}));
 			
-				Long t1 = System.currentTimeMillis();
-//				logger.debug(">>>> Obtenir procediments de Rolsac de l'entitat...");
-				progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments"));
-			
-				Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(entitatDto.getDir3Codi());
-				List<ProcedimentDto> procedimentsGda = getProcedimentsGdaByEntitat(entitatDto.getDir3Codi());
-				
-				Long t2 = System.currentTimeMillis();
-//				logger.debug(">>>> obtinguts " + procedimentsGda.size() + " procediments (" + (t2 - t1) + "ms)");
-				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments.result", new Object[] {procedimentsGda.size()}));
-				progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(t2 - t1)}));
-				progres.setNumProcediments(procedimentsGda.size());
-				
 				List<OrganGestorEntity> organsGestorsModificats = new ArrayList<OrganGestorEntity>();
-				
 				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 						entitatDto.getId(),
 						false,
 						false,
 						false);
-				
-//				logger.debug(">>>> ==========================================================================");
-//				logger.debug(">>>> Processar procediments");
-//				logger.debug(">>>> ==========================================================================");
-				progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediments"));
+				Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(entitatDto.getDir3Codi());
 				
 				//TODO: optimitzar el tema de la oficina virtual, podria estar en cache
 				// per tal que no la cerqui cada vegada dins el for
@@ -405,20 +387,65 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						entitatDto.getDir3Codi(), 
 						entitatDto.getNomOficinaVirtual(),
 						TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
-				
+
+//				logger.debug(">>>> Obtenir de 30 en 30 els procediments de Rolsac de l'entitat...");
+				progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments"));
+				List<ProcedimentDto> procedimentsGda  = new ArrayList<ProcedimentDto>();
+//				List<ProcedimentDto> totalProcedimentsGda  = new ArrayList<ProcedimentDto>();
+				int totalElements = getTotalProcediments(entitatDto.getDir3Codi());
+				Long t1 = System.currentTimeMillis();
+				int numPagina = 1;
+				int reintents = 0;
 				int i = 1;
-				for (ProcedimentDto procedimentGda: procedimentsGda) {
-					//#260 Modificació passar la funcionalitat del for dins un procediment, ja que pel temps de transacció fallava, 
-					//i també d'aquesta forma els que s'han carregat ja es guardan.
-					procedimentHelper.actualitzarProcedimentFromGda(progres, t1, t2, 
-							procedimentGda, entitatDto, entitat,
-							 oficinaVirtual,  organigramaEntitat,  modificar,
-							 organsGestorsModificats,  i);
-					i++;
-				}
+				boolean errorConsultantLlista = false;
+				boolean darreraLlista = false;
+				do {
+					try {
+						procedimentsGda = getProcedimentsGdaByEntitat(
+								entitatDto.getDir3Codi(),
+								numPagina);
+						
+						if (procedimentsGda.size() < 30) 
+							darreraLlista = true;
+						errorConsultantLlista = false;
+						reintents = 0;
+					} catch (Exception e) {
+						errorConsultantLlista = true;
+						procedimentsGda = new ArrayList<ProcedimentDto>();
+						progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments.error"));
+						numPagina++;
+						reintents++;
+						continue;
+					}
+					
+					Long t2 = System.currentTimeMillis();
+//					logger.debug(">>>> obtinguts " + procedimentsGda.size() + " procediments (" + (t2 - t1) + "ms)");
+					progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments.result", new Object[] {procedimentsGda.size()}));
+					progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(t2 - t1)}));
+					progres.setNumProcediments(totalElements);
+
+//					logger.debug(">>>> ==========================================================================");
+//					logger.debug(">>>> Processar procediments");
+//					logger.debug(">>>> ==========================================================================");
+					progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediments", new Object[] {procedimentsGda.size()}));
+					
+					for (ProcedimentDto procedimentGda: procedimentsGda) {
+						//#260 Modificació passar la funcionalitat del for dins un procediment, ja que pel temps de transacció fallava, 
+						//i també d'aquesta forma els que s'han carregat ja es guardan.
+						procedimentHelper.actualitzarProcedimentFromGda(progres, t1, t2, 
+								procedimentGda, entitatDto, entitat,
+								 oficinaVirtual,  organigramaEntitat,  modificar,
+								 organsGestorsModificats,  i);
+						i++;
+					}
+					
+//					totalProcedimentsGda.addAll(procedimentsGda);
+					numPagina++;
+				} while (!darreraLlista || (errorConsultantLlista && reintents < 3));
+
 				
 				if (eliminarOrgans) {
-					i = 1;
+//					int i = 1;
 //					logger.debug(">>>> Processant organs gestors modificats (" + organsGestorsModificats.size() + ")");
 //					logger.debug(">>>> ==========================================================================");
 					progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organs"));
@@ -470,14 +497,27 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 	}
 	
-	private List<ProcedimentDto> getProcedimentsGdaByEntitat(String codiDir3) {
+	private int getTotalProcediments(String codiDir3) {		
+		logger.debug(">>>> >> Obtenir total procediments Rolsac...");
+		Long t1 = System.currentTimeMillis();
+		int totalElements = pluginHelper.getTotalProcediments(codiDir3);
+		Long t2 = System.currentTimeMillis();
+		logger.debug(">>>> >> resultat"  + totalElements + " procediments (" + (t2 - t1) + "ms)");		
+		return totalElements;
+	}
+	
+	private List<ProcedimentDto> getProcedimentsGdaByEntitat(
+			String codiDir3,
+			int numPagina) {
 		ProgresActualitzacioDto progres = progresActualitzacio.get(codiDir3);
 		
 		logger.debug(">>>> >> Obtenir tots els procediments de Rolsac...");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.consulta.gesconadm"));
 		Long t1 = System.currentTimeMillis();
 		
-		List<ProcedimentDto> procedimentsEntitat = pluginHelper.getProcedimentsGdaByEntitat(codiDir3);
+		List<ProcedimentDto> procedimentsEntitat = pluginHelper.getProcedimentsGdaByEntitat(
+				codiDir3,
+				numPagina);
 		
 		Long t2 = System.currentTimeMillis();
 		logger.debug(">>>> >> obtinguts" + procedimentsEntitat.size() + " procediments (" + (t2 - t1) + "ms)");

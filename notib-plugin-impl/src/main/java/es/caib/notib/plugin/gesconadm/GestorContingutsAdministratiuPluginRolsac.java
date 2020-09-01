@@ -74,7 +74,9 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	}
 	
 	@Override
-	public List<GcaProcediment> getProcedimentsByUnitat(String codi) throws SistemaExternException {
+	public List<GcaProcediment> getProcedimentsByUnitat(
+			String codi,
+			int numPagina) throws SistemaExternException {
 		List<Procediment> procediments = new ArrayList<Procediment>();
 		try {
 			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "procedimientos";
@@ -85,7 +87,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 					urlAmbMetode);
 			
 			Form form = new Form();
-			form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"100000\"}");
+			form.add("filtroPaginacion", "{\"page\":\"" + numPagina + "\", \"size\":\"30\"}");
 			form.add("filtro", "{\"codigoUADir3\":\"" + codi + "\", \"buscarEnDescendientesUA\":\"1\", \"activo\":\"1\", \"estadoUA\":\"1\"}");
 		    
 			String json = jerseyClient.
@@ -151,6 +153,40 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 //			codiPare = unitat.getPadre().getCodigo();
 //		addUnitat(codi, dto, codiPare);
 //		return unitat.getCodigoDIR3();
+	}
+	
+	@Override
+	public int getTotalProcediments(String codi) throws SistemaExternException {
+		int numeroElements = 0;
+		try {
+			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "procedimientos";
+			
+			Client jerseyClient = generarClient();
+			autenticarClient(
+					jerseyClient,
+					urlAmbMetode);
+			
+			Form form = new Form();
+			form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"1\"}");
+			form.add("filtro", "{\"codigoUADir3\":\"" + codi + "\", \"buscarEnDescendientesUA\":\"1\", \"activo\":\"1\", \"estadoUA\":\"1\"}");
+		    
+			String json = jerseyClient.
+					resource(urlAmbMetode).
+					type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
+					accept(MediaType.APPLICATION_JSON_TYPE).
+					post(String.class, form);
+			
+			ObjectMapper mapper  = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			RespostaProcediments resposta = mapper.readValue(json, RespostaProcediments.class);
+			if (resposta != null) 
+				numeroElements = resposta.getNumeroElementos();
+			return numeroElements;
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'ha pogut consultar els total de procediments via REST",
+					ex);
+		}
 	}
 	
 //	private UnitatAdministrativa getUnitatAdministrativaRolsac(String codi) throws SistemaExternException {

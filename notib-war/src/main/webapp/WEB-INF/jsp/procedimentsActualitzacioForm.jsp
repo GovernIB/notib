@@ -21,7 +21,6 @@
 		$(document).ready(function() {
 			$('#formUpdateAuto').on("submit", function(){
 				console.log("submitting...");
-				debugger
 				$('.loading').fadeIn();
 				$('#actualitzacioInfo').fadeIn();
 				$('.confirmacio').fadeOut();
@@ -32,7 +31,6 @@
 				refreshProgres();
 			});
 			$('.close', parent.document).on('click',function(){
-				debugger
 				$.alert('fuck');
 				$.confirm({
 					title: title,
@@ -58,7 +56,6 @@
 			console.log("refreshProgres");
 			itervalProgres =  setInterval(function(){ getProgres(); }, 250);
 // 			itervalProgres = setInterval(getProgres, 250);
-			debugger
 		}
 
 		function getProgres() {
@@ -71,7 +68,6 @@
 						console.log("Progres:", data);
 						writeInfo(data);
 						$('#cancelbtn', parent.document).toggle(true);
-						debugger
 						if (data.progres == 100) {
 							clearInterval(itervalProgres);
 						
@@ -121,7 +117,6 @@
 			}
 		}
 		function myFunction() {
-			debugger
 			$.confirm({
 				title: title,
 			    content: content,
