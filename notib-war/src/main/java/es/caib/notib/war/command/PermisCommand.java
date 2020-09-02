@@ -6,6 +6,8 @@ package es.caib.notib.war.command;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.validator.constraints.NotEmpty;
+
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
@@ -18,6 +20,7 @@ import es.caib.notib.war.helper.ConversioTipusHelper;
 public class PermisCommand {
 
 	private Long id;
+	@NotEmpty
 	private String principal;
 	private TipusEnumDto tipus;
 	private boolean read;
