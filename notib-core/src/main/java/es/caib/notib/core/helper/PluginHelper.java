@@ -283,6 +283,10 @@ public class PluginHelper {
 				errorDescripcio += " :" + ex.getCause().getMessage();
 			}
 			resposta.setErrorDescripcio(errorDescripcio);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_REGISTRE,
+					errorDescripcio,
+					ex);
 		}
 		
 		return resposta;
@@ -319,6 +323,10 @@ public class PluginHelper {
 				errorDescripcio += " :" + ex.getCause().getMessage();
 			}
 			resposta.setErrorDescripcio(errorDescripcio);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_REGISTRE,
+					errorDescripcio,
+					ex);
 		}
 		
 		return resposta;
