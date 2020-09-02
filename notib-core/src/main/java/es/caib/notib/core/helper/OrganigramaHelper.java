@@ -128,7 +128,7 @@ public class OrganigramaHelper {
 		List<String> unitats = new ArrayList<String>();
 		unitats.add(codiDir3);
 		OrganismeDto organisme = organigrama.get(codiDir3);
-		if (organisme != null && organisme.getPare() != null && organisme.getPare() != codiDir3Entitat) {
+		if (organisme != null && organisme.getPare() != null && !organisme.getPare().equals(codiDir3Entitat)) {
 			unitats.addAll(getCodisOrgansGestorsPare(organigrama, organisme.getPare(), codiDir3Entitat));
 		}
 		return unitats;

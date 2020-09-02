@@ -146,7 +146,13 @@ public class CacheHelper {
 		OrganismeDto organisme = new OrganismeDto();
 		organisme.setCodi(node.getCodi());
 		organisme.setNom(node.getDenominacio());
-		organisme.setPare(node.getSuperior());
+		String pare = node.getSuperior();
+		if (pare != null && !pare.isEmpty()) {
+			int size = pare.indexOf(" - ");
+			if (size > 0)
+			pare = pare.substring(0, pare.indexOf(" - "));
+		}
+		organisme.setPare(pare);
 		List<String> fills = null;
 		if (node.getFills() != null && !node.getFills().isEmpty()) {
 			fills = new ArrayList<String>();

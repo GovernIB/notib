@@ -90,6 +90,7 @@ public interface NotificacioService {
 			boolean isSuperUsuari,
 			boolean isAdministradorOrgan,
 			List<String> codisProcedimentsDisponibles,
+			List<String> codisProcedimentsProcessables,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
 	

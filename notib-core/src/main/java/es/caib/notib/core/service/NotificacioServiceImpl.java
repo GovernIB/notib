@@ -427,6 +427,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			boolean isAdministrador,
 			boolean isAdministradorOrgan,
 			List<String> procedimentsCodisNotib,
+			List<String> codisProcedimentsProcessables,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		
@@ -608,7 +609,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					}
 				}
 			}
-			return complementaNotificacions(notificacions);
+			return complementaNotificacions(notificacions, codisProcedimentsProcessables);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -640,7 +641,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 		return data;
 	}
 	
-	private PaginaDto<NotificacioDto> complementaNotificacions(Page<NotificacioEntity> notificacions) {
+	private PaginaDto<NotificacioDto> complementaNotificacions(
+			Page<NotificacioEntity> notificacions,
+			List<String> codisProcedimentsProcessables) {
 		PaginaDto<NotificacioDto> resultatPagina = null;
 		if (notificacions == null) {
 			resultatPagina = paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
@@ -649,9 +652,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 				for (NotificacioEntity notificacio : notificacions) {
 					if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
 						notificacio.setPermisProcessar(
-								entityComprovarHelper.hasPermisProcediment(
-										notificacio.getProcediment().getId(),
-										PermisEnum.PROCESSAR));
+								codisProcedimentsProcessables.contains(notificacio.getProcediment().getCodi()));
+//								entityComprovarHelper.hasPermisProcediment(
+//										notificacio.getProcediment().getId(),
+//										PermisEnum.PROCESSAR));
 						}
 					if (notificacio.getTipusUsuari() != null && notificacio.getTipusUsuari().equals(TipusUsuariEnumDto.APLICACIO) && notificacio.getId() != null) {
 						logger.info("Consultant events notificació...");

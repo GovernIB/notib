@@ -387,7 +387,6 @@ public class NotificacioController extends BaseUserController {
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		PaginaDto<NotificacioDto> notificacions = new PaginaDto<NotificacioDto>();
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
-//		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 		boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
 		boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
 		boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
@@ -395,14 +394,19 @@ public class NotificacioController extends BaseUserController {
 
 		List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
 		List<String> codisProcedimentsDisponibles = new ArrayList<String>();
+		List<String> codisProcedimentsProcessables = new ArrayList<String>();
 		try {
+			List<ProcedimentDto> procedimentsProcessables = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.PROCESSAR);
+			if (procedimentsProcessables != null)
+				for(ProcedimentDto procediment: procedimentsProcessables) {
+					codisProcedimentsProcessables.add(procediment.getCodi());
+				}
 			if (isUsuariEntitat) {
 				if (filtre != null) {
 					filtre.setEntitatId(entitatActual.getId());
 				}
 			}
 			if (isUsuari && entitatActual!=null) {
-//				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.CONSULTA);
 				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
 				for(ProcedimentDto procediment: procedimentsDisponibles) {
 					codisProcedimentsDisponibles.add(procediment.getCodi());
@@ -422,6 +426,7 @@ public class NotificacioController extends BaseUserController {
 					isAdministrador,
 					isAdminOrgan,
 					codisProcedimentsDisponibles,
+					codisProcedimentsProcessables,
 					filtre,
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 		}catch(SecurityException e) {
