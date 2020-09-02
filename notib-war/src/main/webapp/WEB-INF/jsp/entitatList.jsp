@@ -32,8 +32,16 @@
 			<a class="btn btn-default" href="<c:url value="/entitat/new"/>" data-toggle="modal" data-datatable-id="entitats"><span class="fa fa-plus"></span>&nbsp;<spring:message code="entitat.list.boto.nova.entitat"/></a>
 		</div>
 	</c:if>
-	<script id="botonsTemplate" type="text/x-jsrender"></script>
+	<script id="botonsTemplate" type="text/x-jsrender">
+<%--
+		<c:if test="${isRolActualAdministrador}">
+			<p style="text-align:right"><a id="grup-entitat-nou" class="btn btn-default" href="entitat/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="entitat.list.boto.nova.entitat"/></a></p>
+		</c:if>
+--%>
+	</script>
+
 	<table
+		id="entitats"
 		data-toggle="datatable"
 		data-url="<c:url value="/entitat/datatable"/>"
 		data-search-enabled="true"
