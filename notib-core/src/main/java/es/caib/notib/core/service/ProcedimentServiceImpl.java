@@ -415,8 +415,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments.error"));
 						numPagina++;
 						reintents++;
-//						Restam aquesta llista del total
-						totalElements -= 30;
+//						Elements no actualitzats
+						totalElements -= ((totalElements - progres.getNumProcedimentsActualitzats()) < 30) ? ((totalElements - progres.getNumProcedimentsActualitzats())) : (30);
 						continue;
 					}
 					

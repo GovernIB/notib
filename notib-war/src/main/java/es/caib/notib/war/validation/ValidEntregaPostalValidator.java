@@ -32,7 +32,7 @@ public class ValidEntregaPostalValidator implements ConstraintValidator<ValidEnt
 				// Validacions per tipus de entrega postal
 				switch (entregaPostal.getTipus()) {
 				case NACIONAL:
-					if (entregaPostal.getTipusVia() == null) {
+					if (entregaPostal.getViaTipus() == null) {
 						valid = false;
 						context.buildConstraintViolationWithTemplate(
 								MessageHelper.getInstance().getMessage("entregapostal.form.valid.nacional.notempty"))

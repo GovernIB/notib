@@ -482,7 +482,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 				if (filtre.getProcedimentId() != null) {
 					procediment = procedimentRepository.findById(filtre.getProcedimentId());
 				}
-				Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
+				Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
+				mapeigPropietatsOrdenacio.put("procediment.organGestor", new String[] {"pro.organGestor.codi"});
+				mapeigPropietatsOrdenacio.put("procediment.nom", new String[] {"pro.nom"});
+				Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 				if (isUsuari) {
 					if (!procedimentsCodisNotib.isEmpty()) {
 						notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(

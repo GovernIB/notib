@@ -19,7 +19,7 @@ import lombok.Setter;
 public class EntregapostalCommand {
 
 	private NotificaDomiciliConcretTipusEnumDto tipus;
-	private NotificaDomiciliViaTipusEnumDto tipusVia;
+	private NotificaDomiciliViaTipusEnumDto viaTipus;
 	@Size(max=50)
 	private String viaNom;
 	@Size(max=5)

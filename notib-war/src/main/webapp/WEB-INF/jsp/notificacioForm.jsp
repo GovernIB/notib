@@ -1158,7 +1158,7 @@ function actualitzarEntrega(j) {
 										</div>	
 										<div class="normalitzat">
 											<div class="col-md-4">
-												<not:inputSelect name="enviaments[${j}].entregaPostal.tipusVia" generalClass="tipusVia" textKey="notificacio.form.camp.entregapostal.tipusvia" labelClass="labelcss" inputClass="inputcss" required="true" />
+												<not:inputSelect name="enviaments[${j}].entregaPostal.viaTipus" generalClass="tipusVia" textKey="notificacio.form.camp.entregapostal.tipusvia" labelClass="labelcss" inputClass="inputcss" required="true" />
 											</div>
 											<div class="col-md-8">
 												<not:inputText name="enviaments[${j}].entregaPostal.viaNom" textKey="notificacio.form.camp.entregapostal.vianom" labelClass="labelcss" inputClass="inputcss" required="true" />
