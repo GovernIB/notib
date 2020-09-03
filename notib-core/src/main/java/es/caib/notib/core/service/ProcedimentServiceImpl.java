@@ -624,17 +624,16 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			logger.debug("Consulta del procediment ("
 					+ "entitatId=" + entitatId + ", "
 					+ "procedimentId=" + procedimentId + ")");
-			EntitatEntity entitat = null;
 				
 			if (entitatId != null && !isAdministrador)
-				entitat = entityComprovarHelper.comprovarEntitat(
+				entityComprovarHelper.comprovarEntitat(
 						entitatId, 
 						false, 
 						false, 
 						false);
 	
 			ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
-					entitat, 
+					entitatId, 
 					procedimentId);
 			ProcedimentDto resposta = conversioTipusHelper.convertir(
 					procediment,

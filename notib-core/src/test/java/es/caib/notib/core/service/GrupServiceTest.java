@@ -218,12 +218,6 @@ public class GrupServiceTest extends BaseServiceTest{
 	
 	
 	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserCreate() {
-		autenticarUsuari("user");
-		grupService.create(entitatCreate.getId(), grupCreate);
-	}
-
-	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplCreate() {
 		autenticarUsuari("Apl");
 		grupService.create(entitatCreate.getId(),grupCreate);
@@ -233,13 +227,6 @@ public class GrupServiceTest extends BaseServiceTest{
 	public void errorSiAccesSuperCreate() {
 		autenticarUsuari("super");
 		grupService.create(entitatCreate.getId(),grupCreate);
-	}
-	
-	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserUpdate() {
-		autenticarUsuari("user");
-		grupService.update(grupCreate);
 	}
 	
 	@Test(expected = AccessDeniedException.class)
@@ -264,12 +251,6 @@ public class GrupServiceTest extends BaseServiceTest{
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplDelete() {
 		autenticarUsuari("apl");
-		grupService.delete(grupCreate.getId()); 
-	}
-	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserDelete() {
-		autenticarUsuari("user");
 		grupService.delete(grupCreate.getId()); 
 	}
 	

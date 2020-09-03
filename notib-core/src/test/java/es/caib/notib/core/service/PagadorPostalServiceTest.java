@@ -118,7 +118,7 @@ public class PagadorPostalServiceTest extends BaseServiceTest{
 					comprobarPagadorPostal(
 							updatePagadorPostal,
 							pagadorModificat);
-					assertEquals(entitatCreada.getId(), pagadorModificat.getId());
+					assertEquals(entitatCreada.getId(), pagadorModificat.getEntitatId());
 				}
 			},
 			"Update PAGADOR POSTAL",
@@ -178,34 +178,15 @@ public class PagadorPostalServiceTest extends BaseServiceTest{
 	}
 
 	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserCreate() {
-		autenticarUsuari("user");
-		pagadorPostalService.create(entitatCreate.getId(),crearPagadorPostal);
-	}
-	
-	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplCreate() {
 		autenticarUsuari("apl");
 		pagadorPostalService.create(entitatCreate.getId(),crearPagadorPostal);
 	}
 	
 	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserUpdate() {
-		autenticarUsuari("user");
-		pagadorPostalService.update(crearPagadorPostal);
-	}
-	
-	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplUpdate() {
 		autenticarUsuari("apl");
 		pagadorPostalService.update(crearPagadorPostal);
-	}
-	
-
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserDelete() {
-		autenticarUsuari("user");
-		pagadorPostalService.delete(crearPagadorPostal.getId());
 	}
 
 	@Test(expected = AccessDeniedException.class)

@@ -91,7 +91,7 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTest{
 					comprobarPagadorCieFormatSobre(
 							createPagadorCieFormatSobre,
 							formatSobreCreada);
-					assertEquals(pagadorCieCreada.getEntitatId(), formatSobreCreada.getPagadorCieId());
+					assertEquals(pagadorCieCreada.getId(), formatSobreCreada.getPagadorCieId());
 				}
 			}, 
 			"Create FORMAT SOBRE",

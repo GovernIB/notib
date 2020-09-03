@@ -191,23 +191,9 @@ public class OrganGestorServiceTest extends BaseServiceTest{
 	}
 
 	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserCreate() {
-		autenticarUsuari("user");
-		organGestorService.create(organoGestorCreate);
-	}
-	
-	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplCreate() {
 		autenticarUsuari("apl");
 		organGestorService.create(organoGestorCreate);
-	}
-	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserDelete() {
-		autenticarUsuari("user");
-		organGestorService.delete(
-				entitatCreate.getId(), 
-				organoGestorCreate.getId());
 	}
 	
 	@Test(expected = AccessDeniedException.class)
@@ -223,13 +209,6 @@ public class OrganGestorServiceTest extends BaseServiceTest{
 		autenticarUsuari("super");
 		organGestorService.delete(
 				entitatCreate.getId(), 
-				organoGestorCreate.getId());
-	}
-	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserFinById() {
-		autenticarUsuari("user");
-		organGestorService.findById(entitatCreate.getId(),
 				organoGestorCreate.getId());
 	}
 	

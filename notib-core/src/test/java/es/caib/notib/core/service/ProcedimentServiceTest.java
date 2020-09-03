@@ -162,6 +162,8 @@ public class ProcedimentServiceTest extends BaseServiceTest{
 								procedimentCreat.getId());
 						fail("El procediment esborrat no s'hauria d'haver trobat");												
 					}catch(NotFoundException expected) {
+					}catch (Exception ex) {
+						ex.printStackTrace();
 					}
 					elementsCreats.remove(procedimentCreat);
 				}
@@ -356,22 +358,11 @@ public class ProcedimentServiceTest extends BaseServiceTest{
 	}
 
 	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserCreate() {
-		autenticarUsuari("user");
-		procedimentService.create(entitatCreate.getId(),createProcediment);
-	}
-	
-	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplCreate() {
 		autenticarUsuari("apl");
 		procedimentService.create(entitatCreate.getId(),createProcediment);
 	}
 	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserUpdate() {
-		autenticarUsuari("user");
-		procedimentService.update(entitatCreate.getId(),createProcediment,false);
-	}
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplUpdate() {
 		autenticarUsuari("apl");
@@ -385,15 +376,11 @@ public class ProcedimentServiceTest extends BaseServiceTest{
 	}
 	
 	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesUserDelete() {
-		autenticarUsuari("user");
-		procedimentService.delete(entitatCreate.getId(),createProcediment.getId());
-	}
-	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplDelete() {
 		autenticarUsuari("apl");
 		procedimentService.delete(entitatCreate.getId(),createProcediment.getId());
 	}
+	
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesSuperDelete() {
 		autenticarUsuari("super");
