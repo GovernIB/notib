@@ -117,8 +117,10 @@ public class OrganigramaHelper {
 		
 		List<String> unitatsExistents = organGestorRepository.findCodisByEntitatDir3(codiDir3Entitat);
 		unitatsEntitat.retainAll(unitatsExistents);
-		
-		return organGestorRepository.findByCodiIn(unitatsEntitat);
+		if (!unitatsEntitat.isEmpty())
+			return organGestorRepository.findByCodiIn(unitatsEntitat);
+		else
+			return new ArrayList<OrganGestorEntity>();
 	}
 
 	private List<String> getCodisOrgansGestorsPare(

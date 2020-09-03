@@ -481,13 +481,12 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 //				logger.debug(">>>> ==========================================================================");
 				Long tf = System.currentTimeMillis();
 				progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
-				
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.fi.resultat", new Object[] {progres.getNumProcedimentsActualitzats(), totalElementsCons}));
+				progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.fi", new Object[] {entitatDto.getNom()}));
 				for (ActualitzacioInfo inf: progres.getInfo()) {
 					if (inf.getText() != null)
 						info.getParams().add(new AccioParam("Msg. procés:", inf.getText()));
 				}
-				progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.fi", new Object[] {entitatDto.getNom()}));
-				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.fi.resultat", new Object[] {progres.getNumProcedimentsActualitzats(), totalElementsCons}));
 				integracioHelper.addAccioOk(info);
 			} catch (Exception e) {
 				StringWriter sw = new StringWriter();
@@ -626,17 +625,16 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			logger.debug("Consulta del procediment ("
 					+ "entitatId=" + entitatId + ", "
 					+ "procedimentId=" + procedimentId + ")");
-			EntitatEntity entitat = null;
 				
 			if (entitatId != null && !isAdministrador)
-				entitat = entityComprovarHelper.comprovarEntitat(
+				entityComprovarHelper.comprovarEntitat(
 						entitatId, 
 						false, 
 						false, 
 						false);
 	
 			ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
-					entitat, 
+					entitatId, 
 					procedimentId);
 			ProcedimentDto resposta = conversioTipusHelper.convertir(
 					procediment,

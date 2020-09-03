@@ -410,12 +410,6 @@ public class EntitatServiceTest extends BaseServiceTest {
 	}
 	
 	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAdminUpdate() {
-		autenticarUsuari("admin");
-		entitatService.update(entitatCreate);
-	}
-	
-	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesUserUpdate() {
 		autenticarUsuari("user");
 		entitatService.update(entitatCreate);
