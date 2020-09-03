@@ -393,6 +393,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				List<ProcedimentDto> procedimentsGda  = new ArrayList<ProcedimentDto>();
 //				List<ProcedimentDto> totalProcedimentsGda  = new ArrayList<ProcedimentDto>();
 				int totalElements = getTotalProcediments(entitatDto.getDir3Codi());
+				int totalElementsCons = totalElements;
 				Long t1 = System.currentTimeMillis();
 				int numPagina = 1;
 				int reintents = 0;
@@ -486,6 +487,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						info.getParams().add(new AccioParam("Msg. procés:", inf.getText()));
 				}
 				progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.fi", new Object[] {entitatDto.getNom()}));
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.fi.resultat", new Object[] {progres.getNumProcedimentsActualitzats(), totalElementsCons}));
 				integracioHelper.addAccioOk(info);
 			} catch (Exception e) {
 				StringWriter sw = new StringWriter();
