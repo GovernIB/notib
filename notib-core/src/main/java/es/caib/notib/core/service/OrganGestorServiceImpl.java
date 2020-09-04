@@ -17,6 +17,7 @@ import com.codahale.metrics.Timer;
 
 import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.OrganGestorFiltreDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
@@ -97,7 +98,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			OrganGestorEntity organGestor = OrganGestorEntity.getBuilder(
 					dto.getCodi(),
 					dto.getNom(),
-					entitat).build();
+					entitat,
+					dto.getLlibre(),
+					dto.getLlibreNom()).build();
 			return conversioTipusHelper.convertir(
 					organGestorRepository.save(organGestor),
 					OrganGestorDto.class);
@@ -633,6 +636,36 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 						e.getMessage());
 			}
 			return denominacio;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public LlibreDto getLlibreOrganisme(
+			Long entitatId,
+			String organGestorDir3Codi) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId, 
+					true, 
+					false, 
+					false);
+			LlibreDto llibre = new LlibreDto();
+			try {
+				//Recupera el llibre de l'òrgan gestor especificat (organisme)
+				llibre = cacheHelper.getLlibreOrganGestor(
+						entitat.getDir3Codi(),
+						organGestorDir3Codi);
+	 		} catch (Exception e) {
+	 			String errorMessage = "No s'ha pogut recuperar el llibre de l'òrgan gestor: " + organGestorDir3Codi;
+				logger.error(
+						errorMessage, 
+						e.getMessage());
+			}
+			return llibre;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

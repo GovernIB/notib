@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.LlibreDto;
+import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
@@ -36,8 +38,6 @@ import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
-import es.caib.notib.plugin.registre.Llibre;
-import es.caib.notib.plugin.registre.Oficina;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 
 /**
@@ -203,7 +203,7 @@ public class ProcedimentHelper {
 			ProcedimentDto procedimentGda, 
 			EntitatDto entitatDto, 
 			EntitatEntity entitat,
-			Oficina oficinaVirtual, 
+			OficinaDto oficinaVirtual, 
 			Map<String, OrganismeDto> organigramaEntitat, 
 			boolean modificar,
 			List<OrganGestorEntity> organsGestorsModificats, 
@@ -259,10 +259,17 @@ public class ProcedimentHelper {
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ.result.no"));
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ.crear", new Object[] {procedimentGda.getOrganGestor()}));
 
+			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ.result.no"));
+			LlibreDto llibreOrgan = pluginHelper.llistarLlibreOrganisme(
+					entitat.getCodi(),
+					organigramaEntitat.get(procedimentGda.getOrganGestor()).getCodi());
+			
 			organGestor = OrganGestorEntity.getBuilder(
 					procedimentGda.getOrganGestor(),
 					organigramaEntitat.get(procedimentGda.getOrganGestor()).getNom(),
-					entitat).build();
+					entitat,
+					llibreOrgan.getCodi(),
+					llibreOrgan.getNomLlarg()).build();
 			organGestorRepository.save(organGestor);
 			
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ.creat"));
@@ -278,21 +285,6 @@ public class ProcedimentHelper {
 //			logger.debug(">>>> >> procediment NOU ...");
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.result.no"));
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.crear", new Object[] {procedimentGda.getCodi()}));
-
-			//#260 Capturar Llibre i oficina del regweb3
-			String llibre = null;
-			String llibreNom = null;
-			String oficina = null; 
-			String oficinaNom = null;
-			
-			Llibre llibreEntitatiOrgan = pluginHelper.llistarLlibreOrganisme(entitatDto.getDir3Codi(), organGestor.getCodi());
-			
-			if (llibreEntitatiOrgan!=null) {
-				llibre = llibreEntitatiOrgan.getCodi();
-				llibreNom = llibreEntitatiOrgan.getNomCurt();
-				oficina = oficinaVirtual.getCodi(); 
-				oficinaNom = oficinaVirtual.getNom();
-			}
 			
 			// CREATE
 			procediment = ProcedimentEntity.getBuilder(
@@ -304,10 +296,6 @@ public class ProcedimentHelper {
 					null,
 					null,
 					false,
-					llibre,
-					llibreNom,
-					oficina,
-					oficinaNom,
 					organGestor,
 					null,
 					null,

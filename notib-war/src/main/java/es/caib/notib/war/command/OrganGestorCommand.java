@@ -29,6 +29,9 @@ public class OrganGestorCommand {
 	private String nom;
 	private Long entitatId;
 	private String entitatNom;
+	@NotEmpty
+	private String llibre;
+	private String llibreNom;
 	
 	public static OrganGestorCommand asCommand(OrganGestorDto dto) {
 		if (dto == null) {

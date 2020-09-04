@@ -83,8 +83,6 @@ import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentFormRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.plugin.registre.CodiAssumpte;
-import es.caib.notib.plugin.registre.Llibre;
-import es.caib.notib.plugin.registre.Oficina;
 import es.caib.notib.plugin.registre.TipusAssumpte;
 import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
 
@@ -164,10 +162,15 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			// Organ gestor
 			OrganGestorEntity organGestor = organGestorRepository.findByCodi(procediment.getOrganGestor()); 
 			if (organGestor == null) {
+				LlibreDto llibre = pluginHelper.llistarLlibreOrganisme(
+						entitat.getCodi(),
+						procediment.getOrganGestor());
 				organGestor = OrganGestorEntity.getBuilder(
 						procediment.getOrganGestor(),
 						findDenominacioOrganisme(procediment.getOrganGestor()),
-						entitat).build();
+						entitat,
+						llibre.getCodi(),
+						llibre.getNomLlarg()).build();
 				organGestorRepository.save(organGestor);
 			}
 			
@@ -181,10 +184,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							pagadorPostal,
 							pagadorCie,
 							procediment.isAgrupar(),
-							procediment.getLlibre(),
-							procediment.getLlibreNom(),
-							procediment.getOficina(),
-							procediment.getOficinaNom(),
 							organGestor,
 							procediment.getTipusAssumpte(),
 							procediment.getTipusAssumpteNom(),
@@ -258,10 +257,15 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			// Organ gestor
 			OrganGestorEntity organGestor = organGestorRepository.findByCodi(procediment.getOrganGestor()); 
 			if (organGestor == null) {
+				LlibreDto llibre = pluginHelper.llistarLlibreOrganisme(
+						entitat.getCodi(),
+						procediment.getOrganGestor());
 				organGestor = OrganGestorEntity.getBuilder(
 						procediment.getOrganGestor(),
 						findDenominacioOrganisme(procediment.getOrganGestor()),
-						entitat).build();
+						entitat,
+						llibre.getCodi(),
+						llibre.getNomLlarg()).build();
 				organGestorRepository.save(organGestor);
 			}
 			// Si canviam l'organ gestor, i aquest no s'utilitza en cap altre procediment, l'eliminarem (1)
@@ -279,10 +283,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						procediment.getRetard(),
 						procediment.getCaducitat(),
 						procediment.isAgrupar(),
-						procediment.getLlibre(),
-						procediment.getLlibreNom(),
-						procediment.getOficina(),
-						procediment.getOficinaNom(),
 						organGestor,
 						procediment.getTipusAssumpte(),
 						procediment.getTipusAssumpteNom(),
@@ -383,7 +383,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				
 				//TODO: optimitzar el tema de la oficina virtual, podria estar en cache
 				// per tal que no la cerqui cada vegada dins el for
-				Oficina oficinaVirtual = pluginHelper.llistarOficinaVirtual(
+				OficinaDto oficinaVirtual = pluginHelper.llistarOficinaVirtual(
 						entitatDto.getDir3Codi(), 
 						entitat.getNomOficinaVirtual(),
 						TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
@@ -1452,114 +1452,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						e.getMessage());
 			}
 			return codiAssumpte;
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-
-	@Override
-	@Transactional(readOnly = true)
-	public List<OficinaDto> findOficines(Long entitatId) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId, 
-					true, 
-					false, 
-					false);
-			List<OficinaDto> oficines = new ArrayList<OficinaDto>();
-			try {
-				//Recupera les oficines d'una entitat
-				List<Oficina> oficinesRegistre = cacheHelper.llistarOficinesEntitat(entitat.getDir3Codi());
-				for (Oficina oficinaRegistre : oficinesRegistre) {
-					OficinaDto oficina = new OficinaDto();
-					oficina.setCodi(oficinaRegistre.getCodi());
-					oficina.setNom(oficinaRegistre.getNom());
-					oficines.add(oficina);
-				}
-			} catch (Exception e) {
-				String errorMessage = "No s'han pogut recuperar les oficines de l'entitat amb codi: " + entitat.getDir3Codi();
-				logger.error(
-						errorMessage, 
-						e.getMessage());
-			}
-			return oficines;	
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public List<LlibreDto> findLlibres(
-			Long entitatId, 
-			String oficinaDir3Codi) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId, 
-					true, 
-					false, 
-					false);
-			List<LlibreDto> llibres = new ArrayList<LlibreDto>();
-			try {
-				//Recupera els llibres d'una oficina i entitat
-				List<Llibre> llibresRegistre = cacheHelper.llistarLlibresOficina(
-						entitat.getDir3Codi(), 
-						oficinaDir3Codi);
-				for (Llibre llibreRegistre : llibresRegistre) {
-					LlibreDto llibre = new LlibreDto();
-					llibre.setCodi(llibreRegistre.getCodi());
-					llibre.setNomCurt(llibreRegistre.getNomCurt());
-					llibre.setNomLlarg(llibreRegistre.getNomLlarg());
-					llibre.setOrganismeCodi(llibreRegistre.getOrganisme());
-					llibres.add(llibre);
-				}
-	 		} catch (Exception e) {
-	 			String errorMessage = "No s'han pogut recuperar els llibres de l'entitat [Entitat: " + entitat.getDir3Codi() + ", Oficina: " + oficinaDir3Codi + "]";
-				logger.error(
-						errorMessage, 
-						e.getMessage());
-			}
-			return llibres;
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Override
-	@Transactional(readOnly = true)
-	public LlibreDto getLlibreOrganisme(
-			Long entitatId,
-			String organGestorDir3Codi) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId, 
-					true, 
-					false, 
-					false);
-			LlibreDto llibre = null;
-			try {
-				//Recupera el llibre de l'òrgan gestor especificat (organisme)
-				Llibre llibreRegistre = cacheHelper.getLlibreOrganGestor(
-						entitat.getDir3Codi(),
-						organGestorDir3Codi);
-				if (llibreRegistre != null) {
-					llibre = new LlibreDto();
-					llibre.setCodi(llibreRegistre.getCodi());
-					llibre.setNomCurt(llibreRegistre.getNomCurt());
-					llibre.setNomLlarg(llibreRegistre.getNomLlarg());
-					llibre.setOrganismeCodi(llibreRegistre.getOrganisme());
-				}
-	 		} catch (Exception e) {
-	 			String errorMessage = "No s'ha pogut recuperar el llibre de l'òrgan gestor: " + organGestorDir3Codi;
-				logger.error(
-						errorMessage, 
-						e.getMessage());
-			}
-			return llibre;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

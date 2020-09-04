@@ -17,12 +17,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
+import lombok.Getter;
 
 /**
  * Classe del model de dades que representa una entitat.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
 @Entity
 @Table(name="not_entitat", 
 	uniqueConstraints = {
@@ -66,61 +68,12 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	private TipusDocumentEnumDto tipusDocDefault;
 	@Column(name = "nom_oficina_virtual", length = 255)
 	private String nomOficinaVirtual;
+	@Column(name = "oficina", length = 255)
+	private String oficina;
 	
 	@Version
 	private long version = 0;
 
-	public String getCodi() {
-		return codi;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public EntitatTipusEnumDto getTipus() {
-		return tipus;
-	}
-	public String getDir3Codi() {
-		return dir3Codi;
-	}
-	public String getApiKey() {
-		return apiKey;
-	}
-	public boolean isAmbEntregaDeh() {
-		return ambEntregaDeh;
-	}
-	public boolean isAmbEntregaCie() {
-		return ambEntregaCie;
-	}
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public boolean isActiva() {
-		return activa;
-	}
-	public byte[] getLogoCapBytes() {
-		return logoCapBytes;
-	}
-	public byte[] getLogoPeuBytes() {
-		return logoPeuBytes;
-	}
-	public String getColorFons() {
-		return colorFons;
-	}
-	public String getColorLletra() {
-		return colorLletra;
-	}
-	public long getVersion() {
-		return version;
-	}
-	public TipusDocumentEnumDto getTipusDocDefault() {
-		return tipusDocDefault;
-	}
-	public String getDir3CodiReg() {
-		return dir3CodiReg;
-	}
-	public String getNomOficinaVirtual() {
-		return nomOficinaVirtual;
-	}
 	public void update(
 			String codi,
 			String nom,
@@ -136,6 +89,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			String colorFons,
 			String colorLletra,
 			TipusDocumentEnumDto tipusDocDefault,
+			String oficina,
 			String nomOficinaVirtual) {
 		this.codi = codi;
 		this.nom = nom;
@@ -151,6 +105,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 		this.colorFons = colorFons;
 		this.colorLletra = colorLletra;
 		this.tipusDocDefault = tipusDocDefault;
+		this.oficina = oficina;
 		this.nomOficinaVirtual = nomOficinaVirtual;
 	}
 
@@ -173,6 +128,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			String colorFons,
 			String colorLletra,
 			TipusDocumentEnumDto tipusDocDefault,
+			String oficina,
 			String nomOficinaVirtual) {
 		return new Builder(
 				codi,
@@ -188,6 +144,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				colorFons,
 				colorLletra,
 				tipusDocDefault,
+				oficina,
 				nomOficinaVirtual);
 	}
 
@@ -207,6 +164,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				String colorFons,
 				String colorLletra,
 				TipusDocumentEnumDto tipusDocDefault,
+				String oficina,
 				String nomOficinaVirtual) {
 			built = new EntitatEntity();
 			built.codi = codi;
@@ -223,6 +181,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			built.colorFons = colorFons;
 			built.colorLletra = colorLletra;
 			built.tipusDocDefault = tipusDocDefault;
+			built.oficina = oficina;
 			built.nomOficinaVirtual = nomOficinaVirtual;
 		}
 		public Builder descripcio(String descripcio) {

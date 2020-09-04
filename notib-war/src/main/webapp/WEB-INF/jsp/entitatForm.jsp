@@ -54,7 +54,7 @@
 }
 </style>
 <script type="text/javascript">
-$(document).ready(function() { 
+$(document).ready(function() {
 	var entitatId = document.getElementById('id').value;
 	if (entitatId != '') {
 		var getUrl = "<c:url value="/entitat/"/>" + entitatId + "/tipusDocument";
@@ -73,6 +73,39 @@ $(document).ready(function() {
 	});
 	
 	$('#colorFons, #colorLletra').colorpicker();
+	var oficinaActual = '${oficinaSelected}';
+	$('#dir3Codi').on("change blur", function() {
+		let dir3codi = $(this).val();
+		if (dir3codi !== undefined && dir3codi !== '') {
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value="/entitat/oficines/"/>" + dir3codi,
+				success: function(data) {
+					var selOficines = $('#oficina');
+					selOficines.empty();
+					selOficines.append("<option value=\"\"></option>");
+					if (data && data.length > 0) {
+							var items = [];
+							$.each(data, function(i, val) {
+								items.push({
+									"id": val.codi,
+									"text": val.codi + " - " + val.nom
+								});
+								console.log(oficinaActual);
+								selOficines.append("<option value=\"" + val.codi + "\"" + (oficinaActual == val.codi ? "selected" :  "") + ">" + val.codi + " - " + val.nom + "</option>");									
+							});
+						}
+					$(".loading-screen").hide();
+				},
+				error: function() {
+					console.log("error obtenint les oficines...");
+				}
+			});
+		} else {
+			console.log('<spring:message code="procediment.form.avis.llibres"/>');
+		}
+	});
+	$('#dir3Codi').trigger("blur");
 });	
 </script>
 </head>
@@ -100,6 +133,7 @@ $(document).ready(function() {
 			<not:inputText name="apiKey" textKey="entitat.form.camp.apiKey" required="true"/>
 			<not:inputCheckbox name="ambEntregaDeh" textKey="entitat.form.camp.entregadeh"/>
 			<not:inputCheckbox name="ambEntregaCie" textKey="entitat.form.camp.entregacie"/>
+			<not:inputSelect name="oficina" textKey="entitat.form.camp.oficina"/>
 			<not:inputText name="nomOficinaVirtual" textKey="entitat.form.camp.oficinavirtual"/>
 			<not:inputTextarea name="descripcio" textKey="entitat.form.camp.descripcio"/>
 		</div>

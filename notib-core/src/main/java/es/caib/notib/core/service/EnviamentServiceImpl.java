@@ -625,7 +625,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				if (enviament.getContent().get(i).getNotificacio().getDescripcio() != null)
 					notificacioEnviamentDtoV2.setDescripcio(enviament.getContent().get(i).getNotificacio().getDescripcio());
 				if (enviament.getContent().get(i).getNotificacio().getProcediment() != null)
-					notificacioEnviamentDtoV2.setLlibre(enviament.getContent().get(i).getNotificacio().getProcediment().getLlibre());
+					notificacioEnviamentDtoV2.setLlibre(enviament.getContent().get(i).getNotificacio().getProcediment().getOrganGestor().getLlibre());
 				if (enviament.getContent().get(i).getNotificacio().getRegistreNumero() != null)
 					notificacioEnviamentDtoV2.setRegistreNumero(enviament.getContent().get(i).getNotificacio().getRegistreNumero());
 				if (enviament.getContent().get(i).getNotificacio().getRegistreData() != null)
@@ -968,7 +968,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					fila[12] = enviament.getTitular().getEmail();
 					fila[13] = (enviament.getDestinataris().size() > 0) ? enviament.getDestinataris().get(0).getNif() : null;
 					if (enviament.getNotificacio().getProcediment() != null)
-						fila[14] = enviament.getNotificacio().getProcediment().getLlibre();
+						fila[14] = enviament.getNotificacio().getProcediment().getOrganGestor().getLlibre();
 					fila[15] = String.valueOf(enviament.getNotificacio().getRegistreNumero());
 					fila[16] = (enviament.getNotificacio().getRegistreData() != null)? enviament.getNotificacio().getRegistreData().toString() : "";
 					fila[17] = enviament.getNotificacio().getCaducitat() != null ? sdf.format(enviament.getNotificacio().getCaducitat()) : "";

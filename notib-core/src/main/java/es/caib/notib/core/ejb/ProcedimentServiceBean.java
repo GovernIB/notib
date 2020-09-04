@@ -14,8 +14,6 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.notib.core.api.dto.CodiAssumpteDto;
 import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
@@ -329,23 +327,4 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	public ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi) {
 		return delegate.getProgresActualitzacio(dir3Codi);
 	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
-	public List<OficinaDto> findOficines(Long entitatId) {
-		return delegate.findOficines(entitatId);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
-	public List<LlibreDto> findLlibres(Long entitatId, String oficina) {
-		return delegate.findLlibres(entitatId, oficina);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
-	public LlibreDto getLlibreOrganisme(Long entitatId, String organGestorDir3Codi) {
-		return delegate.getLlibreOrganisme(entitatId, organGestorDir3Codi);
-	}
-
 }

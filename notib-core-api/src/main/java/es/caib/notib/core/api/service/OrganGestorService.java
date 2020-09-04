@@ -6,6 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.OrganGestorFiltreDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
@@ -112,4 +113,13 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
 	public String findDenominacioOrganisme(String codiDir3);
 
+	/**
+	 * Recupera el llibre d'un òrgan gestor (anomenat organisme dins Regweb)
+	 * 
+	 * @return La llista dels codis d'assumpte.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public LlibreDto getLlibreOrganisme(
+			Long entitatId,
+			String organGestorDir3Codi);
 }

@@ -21,6 +21,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.LlibreDto;
+import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.entity.OrganGestorEntity;
@@ -30,8 +32,6 @@ import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
-import es.caib.notib.plugin.registre.Llibre;
-import es.caib.notib.plugin.registre.Oficina;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 
@@ -172,7 +172,7 @@ public class CacheHelper {
 	}
 	
 	@Cacheable(value = "findOficinesEntitat", key="#codiDir3")
-	public List<Oficina> llistarOficinesEntitat(
+	public List<OficinaDto> llistarOficinesEntitat(
 			String codiDir3) {
 		return pluginHelper.llistarOficines(
 				codiDir3, 
@@ -180,7 +180,7 @@ public class CacheHelper {
 	}
 	
 	@Cacheable(value = "findLlibresOficina", key="#codiDir3Oficina")
-	public List<Llibre> llistarLlibresOficina(
+	public List<LlibreDto> llistarLlibresOficina(
 			String codiDir3Entitat,
 			String codiDir3Oficina) {
 		return pluginHelper.llistarLlibres(
@@ -190,7 +190,7 @@ public class CacheHelper {
 	}
 	
 	@Cacheable(value = "findLlibreOrganisme", key="#codiDir3Organ")
-	public Llibre getLlibreOrganGestor(
+	public LlibreDto getLlibreOrganGestor(
 			String codiDir3Entitat,
 			String codiDir3Organ) {
 		return pluginHelper.llistarLlibreOrganisme(

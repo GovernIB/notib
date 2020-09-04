@@ -6,8 +6,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.core.api.dto.CodiAssumpteDto;
 import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
@@ -212,34 +210,6 @@ public interface ProcedimentService {
 	public List<CodiAssumpteDto> findCodisAssumpte(
 			EntitatDto entitat,
 			String codiTipusAssumpte);
-	
-	/**
-	 * Recupera les oficines d'una entitat.
-	 * 
-	 * @return La llista dels tipus d'assumpte.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public List<OficinaDto> findOficines(Long entitatId);
-	
-	/**
-	 * Recupera els llibres d'una entitat i d'una oficina.
-	 * 
-	 * @return La llista dels codis d'assumpte.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public List<LlibreDto> findLlibres(
-			Long entitatId,
-			String oficina);
-	
-	/**
-	 * Recupera el llibre d'un òrgan gestor (anomenat organisme dins Regweb)
-	 * 
-	 * @return La llista dels codis d'assumpte.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
-	public LlibreDto getLlibreOrganisme(
-			Long entitatId,
-			String organGestorDir3Codi);
 	
 	/**
 	 * Consulta els permisos d'un procediment.

@@ -45,6 +45,12 @@ body {
 $(document).ready(function() {
 	//Organismes
 	var entitatId = $('#entitatId').val();
+	var select2 = $('select');
+	var select2Options = {
+			theme: 'bootstrap',
+			width: 'auto'};
+	select2.select2(select2Options);
+	
 	$.ajax({
 		type: 'GET',
 		url: "<c:url value="/procediment/organismes/"/>" + entitatId,
@@ -62,10 +68,6 @@ $(document).ready(function() {
 					selOrganismes.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
 				});
 			}
-			var select2Options = {
-					theme: 'bootstrap',
-					width: 'auto'};
-			selOrganismes.select2(select2Options);
 			$(".loading-screen").hide();
 		},
 		error: function() {
@@ -78,6 +80,40 @@ $(document).ready(function() {
 		var organSeleccionatText = organSelect.options[organSelect.selectedIndex].text;
 		$('#codi').val(organSeleccionatValue);
 		$('#nom').val(organSeleccionatText.substring(organSeleccionatValue.length + 3));
+		
+		if (organSeleccionatValue !== undefined && organSeleccionatValue !== '') {
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value="/organgestor/llibre/"/>" + organSeleccionatValue,
+				success: function(data) {
+					var selLlibres = $('#selLlibres');
+					selLlibres.empty();
+					selLlibres.append("<option value=\"\"></option>");
+					if (data) {
+						var items = [];
+						items.push({
+							"id": data.codi,
+							"text": data.codi + " - " + data.nomLlarg
+						});
+						selLlibres.append("<option value=\"" + data.codi + "\">" + data.codi + " - " + data.nomLlarg + "</option>");
+					}
+					$(".loading-screen").hide();
+				},
+				error: function() {
+					console.log("error obtenint els llibres...");
+				}
+			});
+		} else {
+			alert('<spring:message code="procediment.form.avis.llibres"/>');
+		}
+		
+		$('#selLlibres').on('change', function(){
+			var llibreSelect = document.getElementById('selLlibres');
+			var llibreSeleccionatValue = llibreSelect.options[llibreSelect.selectedIndex].value;
+			var llibreSeleccionatText = llibreSelect.options[llibreSelect.selectedIndex].text;
+			$('#llibre').val(llibreSeleccionatValue);
+			$('#llibreNom').val(llibreSeleccionatText);
+		});
 	});
 });
 </script>
@@ -89,7 +125,11 @@ $(document).ready(function() {
 		<div role="tabpanel" class="tab-pane active" id="dadesgeneralsForm">
 			<form:hidden path="codi"/>
 			<form:hidden path="nom"/>
-			<select id="selOrganismes"></select> 
+			<select id="selOrganismes" data-placeholder="<spring:message code="organgestor.form.camp.organisme"/>"></select> 
+			<br/>
+			<form:hidden path="llibre"/>
+			<form:hidden path="llibreNom"/>
+			<select id="selLlibres" data-placeholder="<spring:message code="organgestor.form.camp.llibre"/>"></select>
 			<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
 				<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
 					<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>
