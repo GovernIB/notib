@@ -33,7 +33,6 @@ import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -84,7 +83,6 @@ import es.caib.notib.core.repository.ProcedimentFormRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.TipusAssumpte;
-import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
 
 /**
  * Implementació del servei de gestió de procediments.
@@ -362,7 +360,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				Long ti = System.currentTimeMillis();
 //				logger.debug(">>>> Inici actualitzar procediments");
 //				logger.debug(">>>> ==========================================================================");
-				if (progres != null && progres.getProgres() < 100 && !progres.isError()) {
+				if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
 //					logger.debug(">>>> Ja existeix un altre procés que està executant l'actualització");
 //					logger.debug(">>>> ==========================================================================");
 					
@@ -380,13 +378,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						false,
 						false);
 				Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(entitatDto.getDir3Codi());
-				
-				//TODO: optimitzar el tema de la oficina virtual, podria estar en cache
-				// per tal que no la cerqui cada vegada dins el for
-				OficinaDto oficinaVirtual = pluginHelper.llistarOficinaVirtual(
-						entitatDto.getDir3Codi(), 
-						entitat.getNomOficinaVirtual(),
-						TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
+
+//				OficinaDto oficinaVirtual = pluginHelper.llistarOficinaVirtual(
+//						entitatDto.getDir3Codi(), 
+//						entitat.getNomOficinaVirtual(),
+//						TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
 
 //				logger.debug(">>>> Obtenir de 30 en 30 els procediments de Rolsac de l'entitat...");
 				progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments"));
@@ -442,7 +438,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 								procedimentGda, 
 								entitatDto, 
 								entitat,
-								oficinaVirtual,  
+								null, //oficinaVirtual  
 								organigramaEntitat,  
 								modificar,
 								organsGestorsModificats,  
@@ -561,7 +557,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			ProgresActualitzacioDto progres = progresActualitzacio.get(dir3Codi);
-			if (progres.getProgres() != null &&  progres.getProgres() >= 100) {
+			if (progres != null && progres.getProgres() != null &&  progres.getProgres() >= 100) {
 				progresActualitzacio.remove(dir3Codi);
 			}
 			return progres;
