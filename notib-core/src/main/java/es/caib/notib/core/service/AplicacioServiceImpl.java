@@ -3,10 +3,8 @@
  */
 package es.caib.notib.core.service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -47,7 +45,6 @@ import es.caib.notib.plugin.usuari.DadesUsuari;
 @Service
 public class AplicacioServiceImpl implements AplicacioService {
 
-	private Properties versionProperties;
 	
 	@Autowired
 	private UsuariRepository usuariRepository;
@@ -64,18 +61,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private ExcepcioLogHelper excepcioLogHelper;
 	@Autowired
 	private MetricsHelper metricsHelper;
-
-	@Override
-	public String getVersioActual() {
-		logger.debug("Obtenint versió actual de l'aplicació");
-		try {
-			return getVersionProperties().getProperty("app.version");
-		} catch (IOException ex) {
-			logger.error("No s'ha pogut llegir el fitxer version.properties", ex);
-			return "???";
-		}
-	}
-	
 
 	@Transactional
 	@Override
@@ -340,16 +325,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
-	}
-
-	private Properties getVersionProperties() throws IOException {
-		if (versionProperties == null) {
-			versionProperties = new Properties();
-			versionProperties.load(
-					getClass().getResourceAsStream(
-							"/es/caib/notib/core/version/version.properties"));
-		}
-		return versionProperties;
 	}
 
 	private UsuariDto toUsuariDtoAmbRols(

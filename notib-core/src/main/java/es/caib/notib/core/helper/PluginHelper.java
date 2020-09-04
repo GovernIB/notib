@@ -1457,7 +1457,7 @@ public class PluginHelper {
 			registreSortida.setDocuments(documents);
 		}
 		registreSortida.setAplicacio("NOTIB");
-		registreSortida.setVersioNotib(aplicacioService.getVersioActual());
+//		registreSortida.setVersioNotib(aplicacioService.getVersioActual());
 		
 		return registreSortida;
 	}
@@ -2278,6 +2278,10 @@ public class PluginHelper {
 				3);
 	}
 
+	public int getVersioActual() {
+		return PropertiesHelper.getProperties().getAsInt(
+				"es.caib.notib.versio.actual");
+	}
 	
 	public NotificacioComunicacioTipusEnumDto getNotibTipusComunicacioDefecte() {
 		NotificacioComunicacioTipusEnumDto tipus = NotificacioComunicacioTipusEnumDto.SINCRON;

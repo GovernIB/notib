@@ -48,9 +48,10 @@
 	pageContext.setAttribute(
 			"requestParameterCanviOrgan",
 			es.caib.notib.war.helper.OrganGestorHelper.getRequestParameterCanviOrgan());
-	pageContext.setAttribute(
-			"versioMajorActual",
-			es.caib.notib.war.helper.AplicacioHelper.getVersioMajorActual(request));
+	
+//	pageContext.setAttribute(
+//			"versioMajorActual",
+//			es.caib.notib.war.helper.AplicacioHelper.getVersioMajorActual(request));
 		
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
@@ -361,7 +362,7 @@ body {
 							</c:if>
 						</div>
 						<div class="btn-group">
-							<a class="btn btn-success" href="https://github.com/GovernIB/notib/raw/notib-${versioMajorActual}/doc/pdf/NOTIB_usuari.pdf" rel="noopener noreferrer" target="_blank"><span class="fa fa-download"></span> <spring:message code="decorator.menu.manual.usuari"/></a>
+							<a class="btn btn-success" href="https://github.com/GovernIB/notib/raw/${manifestAtributes['Implementation-SCM-Branch']}/doc/pdf/NOTIB_usuari.pdf" rel="noopener noreferrer" target="_blank"><span class="fa fa-download"></span> <spring:message code="decorator.menu.manual.usuari"/></a>
 <!-- 									Per a diferents rol, ara sol esta el manual d'usuari -->
 <%-- 									<a class="btn btn-primary" href="https://github.com/GovernIB/notib/raw/notib-${versioMajorActual}/doc/pdf/NOTIB_${rolActual}.pdf" } download/><spring:message code="decorator.menu.manual.usuari"/></a> --%>
 						</div>

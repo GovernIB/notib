@@ -21,13 +21,6 @@ import es.caib.notib.core.api.exception.NotFoundException;
  */
 public interface AplicacioService {
 
-	/**
-	 * Obté la versió actual de l'aplicació.
-	 * 
-	 * @return La versió actual.
-	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
-	public String getVersioActual();
 
 	/**
 	 * Processa l'autenticació d'un usuari.
