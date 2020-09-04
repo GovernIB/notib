@@ -14,6 +14,7 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.OrganGestorFiltreDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
@@ -153,6 +154,12 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
 	public String findDenominacioOrganisme(String codiDir3) {
 		return delegate.findDenominacioOrganisme(codiDir3);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public LlibreDto getLlibreOrganisme(Long entitatId, String organGestorDir3Codi) {
+		return delegate.getLlibreOrganisme(entitatId, organGestorDir3Codi);
 	}
 
 }
