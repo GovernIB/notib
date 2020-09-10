@@ -58,6 +58,7 @@ public class EntitatCommand {
 	private String[] tipusDocName;
 	private String tipusDocDefault;
 	private String tipusDocDefaultSelected;
+	@NotEmpty
 	private String oficina;
 	private String nomOficinaVirtual;
 	

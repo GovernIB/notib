@@ -22,9 +22,27 @@
 .sort {
 	cursor: pointer;
 }
+.search_btn {
+	margin-top: 1%;
+}
+.filtre {
+	min-height: 120px;
+	padding: 19px;
+	margin-bottom: 20px;
+	background-color: #f5f5f5;
+	border: 1px solid #e3e3e3;
+	box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+}
 </style>
 <script>  
-$(document).ready(function(){ 
+$(document).ready(function() {
+	var select2 = $('#organGestorSelect');
+	var select2Options = {
+			theme: 'bootstrap',
+			width: 'auto',
+			allowClear: true};
+	select2.select2(select2Options);
+	
 	$('#search').keyup(function(){  
 		console.log("as");
 		 var value = $(this).val().toLowerCase();
@@ -106,30 +124,29 @@ function sortTable(n) {
 </head>
 
 <body>
-	<div class="col-xs-6 search">
-		<input type="text" name="search" id="search" class="form-control" placeholder="<spring:message code="notificacio.form.titol.procediments.cercar"/>"/>
+	<div class="filtre">
+		<div class="col-xs-12 row">
+			<div class="col-xs-6 search">
+				<input type="text" name="search" id="search" class="form-control" placeholder="<spring:message code="notificacio.form.titol.procediments.cercar"/>"/>
+			</div>
+			<div class="col-xs-6 search">
+				<select class="form-control" id='organGestorSelect' data-placeholder="<spring:message code="organgestor.form.camp.organisme"/>">
+					  	<option></option>
+					    <c:forEach items="${organsGestors}" var="organ">
+				            <option value="${organ.codi}">${organ.nom}</option>
+				    </c:forEach>
+				</select>
+			</div>
+		</div>
+		<div class="col-xs-12 row search_btn">
+			<div class="col-xs-10 search">
+				 <label class="control-label" for="comuBtn"><spring:message code="procediment.form.camp.comu"/>:</label>  <input type="checkbox" id="comuBtn" >
+			</div>
+			<div class="pull-right form-buttons">
+				 <input type="button" name="netejar" id="netejar" value="<spring:message code="comu.boto.netejar"/>" class="btn btn-default"/>
+			</div>
+		</div>
 	</div>
-	<br></br>
-	<div class="col-xs-6 search">
-		<select class="form-control" id='organGestorSelect'>
-		<option disabled selected value><spring:message code="notificacio.procediment.seleccio"/></option>
-		    <c:forEach items="${organsGestors}" var="organ">
-		            <option value="${organ.codi}">${organ.nom}</option>
-		    </c:forEach>
-		</select>
-	</div>
-	<br></br>
-	<div class="col-xs-7 search">
-		 <label class="control-label col-xs-2" for="comuBtn"><spring:message code="procediment.form.camp.comu"/>:</label><input type="checkbox" id="comuBtn" >
-	</div>
-	<div class="pull-right">
-		 <button type="button" name="netejar" id="netejar" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
-	</div>
-	
-	
-	
-	
-	
 	<table class="table table-hover" id="procediments_table">
 		<thead>
 			<tr>
