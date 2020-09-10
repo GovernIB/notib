@@ -121,7 +121,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			String denominacio = IOUtils.toString(httpConnection.getInputStream(), StandardCharsets.ISO_8859_1.name());
-			System.out.println("Denominacio: " + denominacio);
+			//System.out.println("Denominacio: " + denominacio);
 			return denominacio;
 		} catch (Exception ex) {
 			throw new SistemaExternException(

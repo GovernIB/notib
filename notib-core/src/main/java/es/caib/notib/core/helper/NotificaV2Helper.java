@@ -707,7 +707,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 							destinatarios.getDestinatario().add(destinatario);
 						}
 					}
-					envio.setDestinatarios(destinatarios);
+					if (!destinatarios.getDestinatario().isEmpty())
+						envio.setDestinatarios(destinatarios);
+					
 					if (enviament.getDomiciliConcretTipus() != null) {
 						EntregaPostal entregaPostal = new EntregaPostal();
 						if (notificacio.getProcediment().getPagadorpostal() != null) {
