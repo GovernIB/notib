@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.codahale.metrics.Timer;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
@@ -106,6 +107,7 @@ public class EntitatServiceImpl implements EntitatService {
 					entitat.getColorFons(),
 					entitat.getColorLletra(),
 					entitat.getTipusDocDefault().getTipusDocEnum(),
+					entitat.getOficina(),
 					entitat.getNomOficinaVirtual()).
 					descripcio(entitat.getDescripcio()).
 					build();
@@ -205,6 +207,7 @@ public class EntitatServiceImpl implements EntitatService {
 					entitat.getColorFons(),
 					entitat.getColorLletra(),
 					entitat.getTipusDocDefault().getTipusDocEnum(),
+					entitat.getOficina(),
 					entitat.getNomOficinaVirtual());
 			return conversioTipusHelper.convertir(
 					entity,
@@ -572,6 +575,27 @@ public class EntitatServiceImpl implements EntitatService {
 				hasPermisos.put(RolEnumDto.NOT_ADMIN_ORGAN, false);
 				return hasPermisos;
 			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<OficinaDto> findOficinesEntitat(String dir3codi) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<OficinaDto> oficines = new ArrayList<OficinaDto>();
+			try {
+				//Recupera les oficines d'una entitat
+				oficines = cacheHelper.llistarOficinesEntitat(dir3codi);
+			} catch (Exception e) {
+				String errorMessage = "No s'han pogut recuperar les oficines de l'entitat amb codi: " + dir3codi;
+				logger.error(
+						errorMessage, 
+						e.getMessage());
+			}
+			return oficines;	
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

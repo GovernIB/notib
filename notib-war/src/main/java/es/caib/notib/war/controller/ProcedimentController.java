@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.CodiAssumpteDto;
 import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -385,39 +383,6 @@ public class ProcedimentController extends BaseUserController{
 			organismes = organGestorService.findOrganismes(entitat);
 		}
 		return organismes;
-	}
-	
-	@RequestMapping(value = "/oficines", method = RequestMethod.GET)
-	@ResponseBody
-	private List<OficinaDto> getOficines(
-		HttpServletRequest request,
-		Model model) {
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		return procedimentService.findOficines(entitat.getId());
-	}
-	
-	@RequestMapping(value = "/llibre/{organGestorDir3Codi}", method = RequestMethod.GET)
-	@ResponseBody
-	private LlibreDto getLlibreOrgan(
-		HttpServletRequest request,
-		Model model,
-		@PathVariable String organGestorDir3Codi) {
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		return procedimentService.getLlibreOrganisme(
-				entitat.getId(),
-				organGestorDir3Codi);
-	}
-	
-	@RequestMapping(value = "/llibres/{organGestor}/{oficina}", method = RequestMethod.GET)
-	@ResponseBody
-	private List<LlibreDto> getLlibres(
-		HttpServletRequest request,
-		Model model,
-		@PathVariable String oficina) {
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		return procedimentService.findLlibres(
-				entitat.getId(),
-				oficina);
 	}
 	
 	@RequestMapping(value = "/cache/refrescar", method = RequestMethod.GET)

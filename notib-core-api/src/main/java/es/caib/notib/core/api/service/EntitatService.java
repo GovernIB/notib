@@ -11,6 +11,7 @@ import java.util.Map;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
@@ -231,6 +232,16 @@ public interface EntitatService {
 			Long entitatId,
 			Long permisId) throws NotFoundException;
 	
+	/**
+	 * Recupera les oficines d'una entitat a partir del codi DIR3
+	 * 
+	 * @param dir3codi
+	 *            Codi dir3 de l'entitat de la qual volem recuperar les oficines.
+	 * @return La llista de les oficines
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
+	public List<OficinaDto> findOficinesEntitat(
+			String dir3codi);
 	
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
 	byte[] getCapLogo() throws NoSuchFileException, IOException;

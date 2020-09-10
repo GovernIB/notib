@@ -20,12 +20,15 @@ import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.EntitatValorsNoRepetits;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Command per al manteniment d'entitats.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 @EntitatValorsNoRepetits
 public class EntitatCommand {
 
@@ -55,128 +58,9 @@ public class EntitatCommand {
 	private String[] tipusDocName;
 	private String tipusDocDefault;
 	private String tipusDocDefaultSelected;
+	private String oficina;
 	private String nomOficinaVirtual;
 	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getCodi() {
-		return codi;
-	}
-	public void setCodi(String codi) {
-		this.codi = codi;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-	public EntitatTipusEnumDto getTipus() {
-		return tipus;
-	}
-	public void setTipus(EntitatTipusEnumDto tipus) {
-		this.tipus = tipus;
-	}
-	public String getDir3Codi() {
-		return dir3Codi;
-	}
-	public void setDir3Codi(String dir3Codi) {
-		this.dir3Codi = dir3Codi;
-	}
-	public String getApiKey() {
-		return apiKey;
-	}
-	public void setApiKey(String apiKey) {
-		this.apiKey = apiKey;
-	}
-	public String getDir3CodiReg() {
-		return dir3CodiReg;
-	}
-	public void setDir3CodiReg(String dir3CodiReg) {
-		this.dir3CodiReg = dir3CodiReg;
-	}
-	public boolean isAmbEntregaDeh() {
-		return ambEntregaDeh;
-	}
-	public void setAmbEntregaDeh(boolean ambEntregaDeh) {
-		this.ambEntregaDeh = ambEntregaDeh;
-	}
-	public boolean isAmbEntregaCie() {
-		return ambEntregaCie;
-	}
-	public void setAmbEntregaCie(boolean ambEntregaCie) {
-		this.ambEntregaCie = ambEntregaCie;
-	}
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
-	}
-	public MultipartFile getLogoCap() {
-		return logoCap;
-	}
-	public void setLogoCap(MultipartFile logoCap) {
-		this.logoCap = logoCap;
-	}
-	public MultipartFile getLogoPeu() {
-		return logoPeu;
-	}
-	public void setLogoPeu(MultipartFile logoPeu) {
-		this.logoPeu = logoPeu;
-	}
-	public boolean isEliminarLogoCap() {
-		return eliminarLogoCap;
-	}
-	public void setEliminarLogoCap(boolean eliminarLogoCap) {
-		this.eliminarLogoCap = eliminarLogoCap;
-	}
-	public boolean isEliminarLogoPeu() {
-		return eliminarLogoPeu;
-	}
-	public void setEliminarLogoPeu(boolean eliminarLogoPeu) {
-		this.eliminarLogoPeu = eliminarLogoPeu;
-	}
-	public String getColorFons() {
-		return colorFons;
-	}
-	public void setColorFons(String colorFons) {
-		this.colorFons = colorFons;
-	}
-	public String getColorLletra() {
-		return colorLletra;
-	}
-	public void setColorLletra(String colorLletra) {
-		this.colorLletra = colorLletra;
-	}
-	public String[] getTipusDocName() {
-		return tipusDocName;
-	}
-	public void setTipusDocName(String[] tipusDocName) {
-		this.tipusDocName = tipusDocName;
-	}
-	public String getTipusDocDefault() {
-		return tipusDocDefault;
-	}
-	public void setTipusDocDefault(String tipusDocDefault) {
-		this.tipusDocDefault = tipusDocDefault;
-	}
-	public String getTipusDocDefaultSelected() {
-		return tipusDocDefaultSelected;
-	}
-	public void setTipusDocDefaultSelected(String tipusDocDefaultSelected) {
-		this.tipusDocDefaultSelected = tipusDocDefaultSelected;
-	}
-	public String getNomOficinaVirtual() {
-		return nomOficinaVirtual;
-	}
-	public void setNomOficinaVirtual(String nomOficinaVirtual) {
-		this.nomOficinaVirtual = nomOficinaVirtual;
-	}
 	public static List<EntitatCommand> toEntitatCommands(
 			List<EntitatDto> dtos) {
 		List<EntitatCommand> commands = new ArrayList<EntitatCommand>();

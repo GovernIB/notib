@@ -53,6 +53,11 @@ pageContext.setAttribute(
 var entitatDir3 = "${entitat.dir3Codi}";
 
 $(document).ready(function() {
+	var select2 = $('select');
+	var select2Options = {
+			theme: 'bootstrap',
+			width: 'auto'};
+	select2.select2(select2Options);
 	//Organismes
 	function loadOrganismes(){
 			var entitatId = $('#entitatId').val();
@@ -73,10 +78,6 @@ $(document).ready(function() {
 								selOrganismes.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
 							});
 					}
-					var select2Options = {
-							theme: 'bootstrap',
-							width: 'auto'};
-					selOrganismes.select2(select2Options);
 					$(".loading-screen").hide();
 				},
 				error: function() {
@@ -89,35 +90,8 @@ $(document).ready(function() {
 		var comu = document.getElementById('comu');
 		if(comu == null || (comu!= null && !comu.checked)){
 			$("#organismesModal").modal();
-			 loadOrganismes();
-// 			var entitatId = $('#entitatId').val();
-// 			$.ajax({
-// 				type: 'GET',
-// 				url: "<c:url value="/procediment/organismes/"/>" + entitatId,
-// 				success: function(data) {
-// 					var selOrganismes = $('#selOrganismes');
-// 					selOrganismes.empty();
-// 					selOrganismes.append("<option value=\"\"></option>");
-// 					if (data && data.length > 0) {
-// 							var items = [];
-// 							$.each(data, function(i, val) {
-// 								items.push({
-// 									"id": val.codi,
-// 									"text": val.codi + " - " + val.nom
-// 								});
-// 								selOrganismes.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
-// 							});
-// 					}
-// 					var select2Options = {
-// 							theme: 'bootstrap',
-// 							width: 'auto'};
-// 					selOrganismes.select2(select2Options);
-// 					$(".loading-screen").hide();
-// 				},
-// 				error: function() {
-// 					console.log("error obtenint els organismes...");
-// 				}
-// 			});
+			var entitatId = $('#entitatId').val();
+			loadOrganismes();
 			
 		}
 		
@@ -129,85 +103,6 @@ $(document).ready(function() {
 		var organSeleccionatText = organSelect.options[organSelect.selectedIndex].text;
 		$('#organGestor').val(organSeleccionatValue);
 		$('#organGestorNom').val(organSeleccionatText);
-	});
-	//Oficines
-	$("#searchOficina").click(function(){
-		$("#oficinesModal").modal();
-		$.ajax({
-			type: 'GET',
-			url: "<c:url value="/procediment/oficines"/>",
-			success: function(data) {
-				var selOficines = $('#selOficines');
-				selOficines.empty();
-				selOficines.append("<option value=\"\"></option>");
-				if (data && data.length > 0) {
-						var items = [];
-						$.each(data, function(i, val) {
-							items.push({
-								"id": val.codi,
-								"text": val.codi + " - " + val.nom
-							});
-							selOficines.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
-						});
-					}
-				var select2Options = {
-						theme: 'bootstrap',
-						width: 'auto'};
-				selOficines.select2(select2Options);
-				$(".loading-screen").hide();
-			},
-			error: function() {
-				console.log("error obtenint les oficines...");
-			}
-		});
-	});
-	$('#addOficinaButton').on('click', function(){
-		var oficinaSelect = document.getElementById('selOficines');
-		var oficinaSeleccionatValue = oficinaSelect.options[oficinaSelect.selectedIndex].value;
-		var oficinaSeleccionatText = oficinaSelect.options[oficinaSelect.selectedIndex].text;
-		$('#oficina').val(oficinaSeleccionatValue);
-		$('#oficinaNom').val(oficinaSeleccionatText);
-	});
-	//Llibres
-	$("#searchLlibre").click(function(){
-		var organGestor = $('#organGestor').val();
-		if (organGestor !== undefined && organGestor !== '') {
-			$("#llibresModal").modal();
-			$.ajax({
-				type: 'GET',
-				url: "<c:url value="/procediment/llibre/"/>" + organGestor,
-				success: function(data) {
-					var selLlibres = $('#selLlibres');
-					selLlibres.empty();
-					selLlibres.append("<option value=\"\"></option>");
-					if (data) {
-						var items = [];
-						items.push({
-							"id": data.codi,
-							"text": data.codi + " - " + data.nomLlarg
-						});
-						selLlibres.append("<option value=\"" + data.codi + "\">" + data.codi + " - " + data.nomLlarg + "</option>");
-					}
-					var select2Options = {
-							theme: 'bootstrap',
-							width: 'auto'};
-					selLlibres.select2(select2Options);
-					$(".loading-screen").hide();
-				},
-				error: function() {
-					console.log("error obtenint els llibres...");
-				}
-			});
-		} else {
-			alert('<spring:message code="procediment.form.avis.llibres"/>');
-		}
-	});
-	$('#addLlibreButton').on('click', function(){
-		var llibreSelect = document.getElementById('selLlibres');
-		var llibreSeleccionatValue = llibreSelect.options[llibreSelect.selectedIndex].value;
-		var llibreSeleccionatText = llibreSelect.options[llibreSelect.selectedIndex].text;
-		$('#llibre').val(llibreSeleccionatValue);
-		$('#llibreNom').val(llibreSeleccionatText);
 	});
 	//TipusAssumpte
 	$("#searchTipusAssumpte").click(function(){
@@ -230,10 +125,6 @@ $(document).ready(function() {
 							selTipusAssumpte.append("<option value=\"" + val.codi + "\">" + val.nom + "</option>");
 						});
 					}
-				var select2Options = {
-						theme: 'bootstrap',
-						width: 'auto'};
-				selTipusAssumpte.select2(select2Options);
 				$(".loading-screen").hide();
 			},
 			error: function() {
@@ -273,10 +164,6 @@ $(document).ready(function() {
 							selCodisAssumpte.append("<option value=\"" + val.codi + "\">" + val.nom + "</option>");
 						});
 					}
-				var select2Options = {
-						theme: 'bootstrap',
-						width: 'auto'};
-				selCodisAssumpte.select2(select2Options);
 				$(".loading-screen").hide();
 			},
 			error: function() {
@@ -292,8 +179,6 @@ $(document).ready(function() {
 		$('#codiAssumpteNom').val(codiAssumpteSeleccionatText);
 	});
 	$('#comu').on('click', function(event){
-// 		var organSelect = document.getElementById('selOrganismes');
-		
 		if ($(this).is(':checked')) {
 			debugger
 			$('#organGestorNom').removeClass('habilitat');
@@ -360,12 +245,12 @@ $(document).ready(function() {
 				<div class="alert alert-warning" role="alert">
 				 	<spring:message code="procediment.form.warning"></spring:message>
 				</div>
-				<!--not:inputText name="oficina" textKey="procediment.form.camp.oficina" labelSize="2"/-->
+				<%--
 				<form:hidden path="oficina"/>
 				<not:inputTextSearch name="oficinaNom" textKey="procediment.form.camp.oficina" searchButton="searchOficina" required="true" readonly="true" labelSize="2"/>
-				<!-- not:inputText name="llibre" textKey="procediment.form.camp.llibre" labelSize="2"/-->
 				<form:hidden path="llibre"/>
 				<not:inputTextSearch name="llibreNom" textKey="procediment.form.camp.llibre" searchButton="searchLlibre" required="true" readonly="true" labelSize="2"/>
+				--%>
 				<form:hidden path="tipusAssumpte"/>
 				<not:inputTextSearch name="tipusAssumpteNom" textKey="procediment.form.camp.tipusassumpte" searchButton="searchTipusAssumpte" labelSize="2" readonly="true"/>
 				<form:hidden path="codiAssumpte"/>
@@ -386,7 +271,7 @@ $(document).ready(function() {
 					<h4 class="modal-title"><spring:message code="procediment.form.titol.organismes"/></h4>
 				</div>
 				<div class="modal-body body">
-					<select id="selOrganismes"></select> 
+					<select id="selOrganismes" data-placeholder="<spring:message code="procediment.form.camp.organ"/>"></select> 
 					<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
 						<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
 							<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>
@@ -455,7 +340,7 @@ $(document).ready(function() {
 					<h4 class="modal-title"><spring:message code="procediment.form.titol.tipusAssumpte"/></h4>
 				</div>
 				<div class="modal-body body">
-					<select id="selTipusAssumpte"></select>
+					<select id="selTipusAssumpte"  data-placeholder="<spring:message code="procediment.form.camp.tipusassumpte"/>"></select>
 					<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
 						<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
 							<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>
@@ -478,7 +363,7 @@ $(document).ready(function() {
 					<h4 class="modal-title"><spring:message code="procediment.form.titol.codiAssumpte"/></h4>
 				</div>
 				<div class="modal-body body">
-					<select id="selCodiAssumpte"></select>
+					<select id="selCodiAssumpte"  data-placeholder="<spring:message code="procediment.form.camp.codiassumpte"/>"></select>
 					<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
 						<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
 							<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>

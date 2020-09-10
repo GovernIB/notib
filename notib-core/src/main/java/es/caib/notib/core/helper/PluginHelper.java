@@ -39,9 +39,11 @@ import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.InteresadoWsDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.RegistreAnnexDto;
@@ -54,7 +56,6 @@ import es.caib.notib.core.api.dto.RegistreTipusDocumentDtoEnum;
 import es.caib.notib.core.api.dto.RegistreTipusDocumentalDtoEnum;
 import es.caib.notib.core.api.dto.RegistreValidezDocumentDtoEnum;
 import es.caib.notib.core.api.exception.SistemaExternException;
-import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -118,9 +119,6 @@ public class PluginHelper {
 
 	@Autowired
 	private IntegracioHelper integracioHelper;
-	@Autowired
-	private AplicacioService aplicacioService;
-	
 	
 	// REGISTRE
 	// /////////////////////////////////////////////////////////////////////////////////////
@@ -427,7 +425,7 @@ public class PluginHelper {
 		return assumptes;
 	}
 	
-	public Oficina llistarOficinaVirtual(
+	public OficinaDto llistarOficinaVirtual(
 			String entitatcodi,
 			String nomOficinaVirtual,
 			TipusRegistreRegweb3Enum autoritzacio) throws SistemaExternException {
@@ -438,13 +436,16 @@ public class PluginHelper {
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Codi Dir3 de l'entitat", entitatcodi),
 				new AccioParam("Tipud de registre", autoritzacio.name()));
-		
-		Oficina oficina = null;
+		OficinaDto oficinaDto = new OficinaDto();
 		try {
-			oficina = getRegistrePlugin().llistarOficinaVirtual(
+			Oficina oficina = getRegistrePlugin().llistarOficinaVirtual(
 					entitatcodi, 
 					nomOficinaVirtual,
 					autoritzacio.getValor());
+			if (oficina != null) {
+				oficinaDto.setCodi(oficina.getCodi());
+				oficinaDto.setNom(oficina.getNom());
+			}
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al obtenir la oficina virtual";
@@ -455,10 +456,10 @@ public class PluginHelper {
 					ex);
 		}
 
-		return oficina;
+		return oficinaDto;
 	}
 	
-	public List<Oficina> llistarOficines(
+	public List<OficinaDto> llistarOficines(
 			String entitatcodi,
 			AutoritzacioRegiWeb3Enum autoritzacio) throws SistemaExternException {
 		
@@ -469,11 +470,19 @@ public class PluginHelper {
 				new AccioParam("Codi Dir3 de l'entitat", entitatcodi),
 				new AccioParam("Tipud de registre", autoritzacio.name()));
 		
-		List<Oficina> oficines = null;
+		List<OficinaDto> oficinesDto = new ArrayList<OficinaDto>();
 		try {
-			oficines = getRegistrePlugin().llistarOficines(
+			List<Oficina> oficines = getRegistrePlugin().llistarOficines(
 					entitatcodi, 
 					autoritzacio.getValor());
+			if (oficines != null) {
+				for (Oficina oficina : oficines) {
+					OficinaDto oficinaDto = new OficinaDto();
+					oficinaDto.setCodi(oficina.getCodi());
+					oficinaDto.setNom(oficina.getNom());
+					oficinesDto.add(oficinaDto);
+				}
+			}
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar les oficines";
@@ -484,7 +493,7 @@ public class PluginHelper {
 					ex);
 		}
 	
-		return oficines;
+		return oficinesDto;
 	}
 	
 	public List<LlibreOficina> llistarLlibresOficines(
@@ -520,7 +529,7 @@ public class PluginHelper {
 		return llibresOficines;
 	}
 	
-	public Llibre llistarLlibreOrganisme(
+	public LlibreDto llistarLlibreOrganisme(
 			String entitatCodi,
 			String organismeCodi) throws SistemaExternException{
 		
@@ -530,12 +539,17 @@ public class PluginHelper {
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Codi Dir3 de l'entitat", entitatCodi),
 				new AccioParam("Codi de l'organisme", organismeCodi));
-		
-		Llibre llibre = null;
+		LlibreDto llibreDto = new LlibreDto();
 		try {
-			llibre = getRegistrePlugin().llistarLlibreOrganisme(
+			Llibre llibre = getRegistrePlugin().llistarLlibreOrganisme(
 					entitatCodi, 
 					organismeCodi);
+			if (llibre != null) {
+				llibreDto.setCodi(llibre.getCodi());
+				llibreDto.setNomCurt(llibre.getNomCurt());
+				llibreDto.setNomLlarg(llibre.getNomLlarg());
+				llibreDto.setOrganismeCodi(llibre.getOrganisme());
+			}
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar els llibres d'un organisme";
@@ -546,11 +560,11 @@ public class PluginHelper {
 					ex);
 		}
 		
-		return llibre;
+		return llibreDto;
 
 	}
 	
-	public List<Llibre> llistarLlibres(
+	public List<LlibreDto> llistarLlibres(
 			String entitatcodi,
 			String oficina,
 			AutoritzacioRegiWeb3Enum autoritzacio) throws SistemaExternException {
@@ -562,12 +576,22 @@ public class PluginHelper {
 				new AccioParam("Codi Dir3 de l'entitat", entitatcodi),
 				new AccioParam("Oficina", oficina));
 		
-		List<Llibre> llibres = null;
+		List<LlibreDto> llibresDto = new ArrayList<LlibreDto>();
 		try {
-			llibres = getRegistrePlugin().llistarLlibres(
+			List<Llibre> llibres = getRegistrePlugin().llistarLlibres(
 					entitatcodi, 
 					oficina, 
 					autoritzacio.getValor());
+			if (llibres != null) {
+				for (Llibre llibre : llibres) {
+					LlibreDto llibreDto = new LlibreDto();
+					llibreDto.setCodi(llibre.getCodi());
+					llibreDto.setNomCurt(llibre.getNomCurt());
+					llibreDto.setNomLlarg(llibre.getNomLlarg());
+					llibreDto.setOrganismeCodi(llibre.getOrganisme());
+					llibresDto.add(llibreDto);
+				}
+			}
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar els llibres d'una oficina";
@@ -578,7 +602,7 @@ public class PluginHelper {
 					ex);
 		}
 
-		return llibres;
+		return llibresDto;
 	}
 	
 	public List<Organisme> llistarOrganismes(String entitatcodi) throws SistemaExternException {
@@ -1358,8 +1382,8 @@ public class PluginHelper {
 			List<NotificacioEnviamentDtoV2> enviaments) throws RegistrePluginException {
 		RegistreSortida registreSortida = new RegistreSortida();
 		DadesOficina dadesOficina = new DadesOficina();
-		Llibre llibreOrganisme = null;
-		Oficina oficinaVirtual = null;
+		LlibreDto llibreOrganisme = null;
+		OficinaDto oficinaVirtual = null;
 		String dir3Codi;
 		String organisme;
 		
@@ -1941,13 +1965,11 @@ public class PluginHelper {
 			NotificacioEntity notificacio,
 			DadesOficina dadesOficina,
 			String dir3Codi) throws RegistrePluginException {
-		Oficina oficinaVirtual;
-		if (notificacio.getProcediment().getOficina() != null) {
-			dadesOficina.setOficinaCodi(notificacio.getProcediment().getOficina());
-			dadesOficina.setOficinaNom(notificacio.getProcediment().getOficina());
+		if (notificacio.getEntitat().getOficina() != null) {
+			dadesOficina.setOficinaCodi(notificacio.getEntitat().getOficina());
+			dadesOficina.setOficinaNom(notificacio.getEntitat().getOficina());
 		} else {
-			//oficina virtual
-			oficinaVirtual = llistarOficinaVirtual(
+			OficinaDto oficinaVirtual = llistarOficinaVirtual(
 					dir3Codi,
 					notificacio.getEntitat().getNomOficinaVirtual(),
 					TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
@@ -1963,11 +1985,11 @@ public class PluginHelper {
 			NotificacioEntity notificacio,
 			DadesOficina dadesOficina,
 			String dir3Codi) throws RegistrePluginException {
-		Llibre llibreOrganisme = null;
-		if (notificacio.getProcediment().getLlibre() != null) {
-			dadesOficina.setLlibreCodi(notificacio.getProcediment().getLlibre());
-			dadesOficina.setLlibreNom(notificacio.getProcediment().getLlibre());
+		if (notificacio.getProcediment().getOrganGestor().getLlibre() != null) {
+			dadesOficina.setLlibreCodi(notificacio.getProcediment().getOrganGestor().getLlibre());
+			dadesOficina.setLlibreNom(notificacio.getProcediment().getOrganGestor().getLlibreNom());
 		} else {
+			LlibreDto llibreOrganisme = null;
 			if (notificacio.getProcediment().getOrganGestor() != null) {
 				llibreOrganisme = llistarLlibreOrganisme(
 						dir3Codi,

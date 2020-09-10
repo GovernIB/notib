@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -87,6 +88,7 @@ public class EntitatController extends BaseController {
 		if (entitat != null) {
 			EntitatCommand command = EntitatCommand.asCommand( entitat );
 			model.addAttribute("tipusDocumentDefault", command.getTipusDocDefault());
+			model.addAttribute("oficinaSelected", command.getOficina());
 			model.addAttribute( command );
 		} else {
 			model.addAttribute(new EntitatCommand());
@@ -221,6 +223,15 @@ public class EntitatController extends BaseController {
 			}
 		}
 		return tipusDoc;
+	}
+	
+	@RequestMapping(value = "/oficines/{dir3codi}", method = RequestMethod.GET)
+	@ResponseBody
+	private List<OficinaDto> getOficines(
+		HttpServletRequest request,
+		Model model,
+		@PathVariable String dir3codi) {
+		return entitatService.findOficinesEntitat(dir3codi);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(EntitatController.class);

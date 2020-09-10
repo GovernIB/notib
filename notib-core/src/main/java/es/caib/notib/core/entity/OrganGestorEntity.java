@@ -38,6 +38,12 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 	@ForeignKey(name = "not_organ_entitat_fk")
 	protected EntitatEntity entitat;
 	
+	@Column(name = "llibre")
+	protected String llibre;
+	
+	@Column(name = "llibre_nom")
+	protected String llibreNom;
+	
 	public void update(
 			String nom) {
 		this.nom = nom;
@@ -46,11 +52,15 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 	public static Builder getBuilder(
 			String codi,
 			String nom,
-			EntitatEntity entitat) {
+			EntitatEntity entitat,
+			String llibre,
+			String llibreNom) {
 		return new Builder(
 				codi,
 				nom,
-				entitat);
+				entitat,
+				llibre,
+				llibreNom);
 	}
 	
 	public static class Builder {
@@ -58,11 +68,15 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 		Builder(
 				String codi,
 				String nom,
-				EntitatEntity entitat) {
+				EntitatEntity entitat,
+				String llibre,
+				String llibreNom) {
 			built = new OrganGestorEntity();
 			built.codi = codi;
 			built.nom = nom;
 			built.entitat = entitat;
+			built.llibre = llibre;
+			built.llibreNom = llibreNom;
 		}
 		public OrganGestorEntity build() {
 			return built;

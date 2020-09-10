@@ -61,9 +61,12 @@ public class EmailHelper {
 		if (destinataris != null && !destinataris.isEmpty()) {
 			for (UsuariDto usuariDto : destinataris) {
 				try {
-					sendEmailBustiaPendentContingut(
-							usuariDto.getEmail(),
-							notificacio);
+					if (usuariDto.getEmail() != null && !usuariDto.getEmail().isEmpty()) {
+						String email = usuariDto.getEmail().replaceAll("\\s+","");
+						sendEmailBustiaPendentContingut(
+								email,
+								notificacio);
+					}
 				} catch (Exception ex) {
 					String errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
 					logger.error(errorDescripció);

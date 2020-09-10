@@ -27,6 +27,7 @@ import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
+import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
@@ -159,6 +160,15 @@ public class NotificacioCommandV2 {
 							logger.error("Error al donar format a la provincia: '" + enviament.getEntregaPostal().getProvincia() + 
 									"' i al municipi '" + enviament.getEntregaPostal().getMunicipiCodi() + "'");
 						}
+					}
+				}
+				if (enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty())
+					enviament.getTitular().setEmail(enviament.getTitular().getEmail().replaceAll("\\s+",""));
+				
+				if (enviament.getDestinataris() != null) {
+					for (PersonaDto destinatari : enviament.getDestinataris()) {
+						if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty())
+							destinatari.setEmail(destinatari.getEmail().replaceAll("\\s+",""));
 					}
 				}
 			}

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.service.EntitatService;
@@ -223,6 +224,18 @@ public class OrganGestorController extends BaseUserController{
 					"organgestor.controller.esborrat.ko",
 					e);
 		}
+	}
+	
+	@RequestMapping(value = "/llibre/{organGestorDir3Codi}", method = RequestMethod.GET)
+	@ResponseBody
+	private LlibreDto getLlibreOrgan(
+		HttpServletRequest request,
+		Model model,
+		@PathVariable String organGestorDir3Codi) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		return organGestorService.getLlibreOrganisme(
+				entitat.getId(),
+				organGestorDir3Codi);
 	}
 	
 	private OrganGestorFiltreCommand getFiltreCommand(

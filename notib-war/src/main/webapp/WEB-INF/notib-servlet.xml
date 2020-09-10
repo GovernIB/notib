@@ -177,6 +177,23 @@
 			<mvc:exclude-mapping path="/error"/>
 			<bean class="es.caib.notib.war.interceptor.PermisosInterceptor"/>
 		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/grup**"/>
+			<mvc:mapping path="/grup/**"/>
+			<bean class="es.caib.notib.war.interceptor.AccesGrupsInterceptor"/>
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/pagadorCie**"/>
+			<mvc:mapping path="/pagadorCie/**"/>
+			<mvc:mapping path="/pagadorPostal**"/>
+			<mvc:mapping path="/pagadorPostal/**"/>
+			<bean class="es.caib.notib.war.interceptor.AccesPagadorsInterceptor"/>
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/organgestor**"/>
+			<mvc:mapping path="/organgestor/**"/>
+			<bean class="es.caib.notib.war.interceptor.AccesOrgansInterceptor"/>
+		</mvc:interceptor>
 	</mvc:interceptors>
 
 	<bean id="defaultViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
