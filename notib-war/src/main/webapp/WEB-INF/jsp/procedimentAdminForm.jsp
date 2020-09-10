@@ -87,37 +87,37 @@ $(document).ready(function() {
 	loadOrganismes();
 	$("#searchOrgan").click(function(){
 		var comu = document.getElementById('comu');
-		debugger
 		if(comu == null || (comu!= null && !comu.checked)){
 			$("#organismesModal").modal();
-			var entitatId = $('#entitatId').val();
-			$.ajax({
-				type: 'GET',
-				url: "<c:url value="/procediment/organismes/"/>" + entitatId,
-				success: function(data) {
-					var selOrganismes = $('#selOrganismes');
-					selOrganismes.empty();
-					selOrganismes.append("<option value=\"\"></option>");
-					if (data && data.length > 0) {
-							var items = [];
-							$.each(data, function(i, val) {
-								items.push({
-									"id": val.codi,
-									"text": val.codi + " - " + val.nom
-								});
-								selOrganismes.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
-							});
-					}
-					var select2Options = {
-							theme: 'bootstrap',
-							width: 'auto'};
-					selOrganismes.select2(select2Options);
-					$(".loading-screen").hide();
-				},
-				error: function() {
-					console.log("error obtenint els organismes...");
-				}
-			});
+			 loadOrganismes();
+// 			var entitatId = $('#entitatId').val();
+// 			$.ajax({
+// 				type: 'GET',
+// 				url: "<c:url value="/procediment/organismes/"/>" + entitatId,
+// 				success: function(data) {
+// 					var selOrganismes = $('#selOrganismes');
+// 					selOrganismes.empty();
+// 					selOrganismes.append("<option value=\"\"></option>");
+// 					if (data && data.length > 0) {
+// 							var items = [];
+// 							$.each(data, function(i, val) {
+// 								items.push({
+// 									"id": val.codi,
+// 									"text": val.codi + " - " + val.nom
+// 								});
+// 								selOrganismes.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
+// 							});
+// 					}
+// 					var select2Options = {
+// 							theme: 'bootstrap',
+// 							width: 'auto'};
+// 					selOrganismes.select2(select2Options);
+// 					$(".loading-screen").hide();
+// 				},
+// 				error: function() {
+// 					console.log("error obtenint els organismes...");
+// 				}
+// 			});
 			
 		}
 		

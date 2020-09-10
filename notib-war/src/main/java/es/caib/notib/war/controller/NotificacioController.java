@@ -218,11 +218,18 @@ public class NotificacioController extends BaseUserController {
 //		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 
 		List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
+		List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
 		
 		if (RolHelper.isUsuariActualUsuari(request)) {
 //			procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.NOTIFICACIO);
+			
 			procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
 			model.addAttribute("procediments", procedimentsDisponibles);
+			List<Long> procedimentsDisponiblesIds = new ArrayList<Long>();
+			for (ProcedimentDto pro: procedimentsDisponibles)
+				procedimentsDisponiblesIds.add(pro.getId());
+			organsGestorsDisponibles = organGestorService.findByProcedimentIds(procedimentsDisponiblesIds);
+			model.addAttribute("organsGestors", organsGestorsDisponibles);
 		}
 
 		return "notificacioProcedimentsForm";

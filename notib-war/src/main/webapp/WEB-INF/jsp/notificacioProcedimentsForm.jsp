@@ -33,6 +33,37 @@ $(document).ready(function(){
 	    });	
 	});
 	
+	
+	$( "#organGestorSelect" ).change(function() {
+		var value = $(this).find('option:selected').val();
+		$('#procediments tr').filter(function() {
+				$(this).toggle($(this).find("td:eq(3)").text() == value);  
+		    });
+	});
+	$( "#netejar" ).click(function() {
+		$('#procediments tr').filter(function() {
+			$(this).toggle($(this).find("td:eq(3)").text() != null);  
+			$("#comuBtn").prop("checked", false);
+			$('#search').val('');
+	    });
+	});
+	
+	
+	$('#comuBtn').on('click', function(event){
+		
+		var checked = $(this).is(':checked');
+		
+		$('#procediments tr').filter(function() {
+			if(checked){
+				$(this).toggle($(this).find("td:eq(2)").text() == "true");
+			}else{
+				$(this).toggle($(this).find("td:eq(2)").text() != null);
+			}
+		      
+	    });
+	});
+
+	
 	var table = $('table');
 });    
 function sortTable(n) {
@@ -41,7 +72,7 @@ function sortTable(n) {
 	switching = true;
 	dir = "asc";
 	while (switching) {
-	  switching = false;
+	  switching = false; 
 	  rows = table.rows;
 	  for (i = 1; i < (rows.length - 1); i++) {
 	    shouldSwitch = false;
@@ -78,6 +109,27 @@ function sortTable(n) {
 	<div class="col-xs-6 search">
 		<input type="text" name="search" id="search" class="form-control" placeholder="<spring:message code="notificacio.form.titol.procediments.cercar"/>"/>
 	</div>
+	<br></br>
+	<div class="col-xs-6 search">
+		<select class="form-control" id='organGestorSelect'>
+		<option disabled selected value><spring:message code="notificacio.procediment.seleccio"/></option>
+		    <c:forEach items="${organsGestors}" var="organ">
+		            <option value="${organ.codi}">${organ.nom}</option>
+		    </c:forEach>
+		</select>
+	</div>
+	<br></br>
+	<div class="col-xs-7 search">
+		 <label class="control-label col-xs-2" for="comuBtn"><spring:message code="procediment.form.camp.comu"/>:</label><input type="checkbox" id="comuBtn" >
+	</div>
+	<div class="pull-right">
+		 <button type="button" name="netejar" id="netejar" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+	</div>
+	
+	
+	
+	
+	
 	<table class="table table-hover" id="procediments_table">
 		<thead>
 			<tr>
@@ -89,8 +141,10 @@ function sortTable(n) {
 		<tbody id="procediments">
 			<c:forEach items="${procediments}" var="procediment">
 					<tr>
-						<td scope="row" name="codi" width="10%">${procediment.codi}</td>
-						<td scope="row" name="nom" width="80%">${procediment.nom}</td>
+						<td scope="row" id="codi" name="codi" width="10%">${procediment.codi}</td>
+						<td scope="row" id="nom" name="nom" width="80%">${procediment.nom}</td>
+						<td style="display:none;" scope="row" name="comu" >${procediment.comu}</td>
+						<td style="display:none;" scope="row" name="organGestor" >${procediment.organGestor}</td>
 						<td scope="row" name="id" width="10%">
 						<button onclick="window.top.location='/notib/notificacio/new/${procediment.id}';return false;" class="btn btn-default"><spring:message code="notificacio.form.titol.procediments.iniciar"/></button>
 						</td>
