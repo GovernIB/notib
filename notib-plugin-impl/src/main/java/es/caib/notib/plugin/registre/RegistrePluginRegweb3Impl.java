@@ -439,8 +439,10 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		}
 		//Interessat + representant
 		if (dto.getInteresados() != null) {
-			InteresadoWs interessat = interesadoWsDtoToInteresadoWs(dto.getInteresados().get(0));
-			ar.getInteresados().add(interessat);
+			for (InteresadoWsDto interessatWsDto : dto.getInteresados()) {
+				InteresadoWs interessat = interesadoWsDtoToInteresadoWs(interessatWsDto);
+				ar.getInteresados().add(interessat);
+			}
 		}
 		ar.setVersion(dto.getVersion());
 		return ar;

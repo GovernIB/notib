@@ -1503,20 +1503,15 @@ public class PluginHelper {
 			dir3Codi = notificacio.getEmisorDir3Codi();
 			organisme = notificacio.getProcediment().getOrganGestor() != null ? notificacio.getProcediment().getOrganGestor().getCodi() : null;
 		}
-
-		try {
-			logger.debug("[OFC_VIRTUAL] Recuperant informació de l'oficina i registre...");
-			setOficina(
-					notificacio,
-					dadesOficina,
-					dir3Codi);
-			setLlibre(
-					notificacio, 
-					dadesOficina, 
-					dir3Codi);
-		} catch (RegistrePluginException ex) {
-			throw new RegistrePluginException("[OFC_VIRTUAL] No s'han pogut recuperar les dedes de l'oficina o llibre", ex);
-		}
+		
+		setOficina(
+				notificacio,
+				dadesOficina,
+				dir3Codi);
+		setLlibre(
+				notificacio, 
+				dadesOficina, 
+				dir3Codi);
 		
 		if (dadesOficina.getOficinaCodi() != null) {
 			//Codi Dir3 de l’oficina inicial
@@ -1617,20 +1612,16 @@ public class PluginHelper {
 			dir3Codi = notificacio.getEmisorDir3Codi();
 			organisme = notificacio.getProcediment().getOrganGestor() != null ? notificacio.getProcediment().getOrganGestor().getCodi() : null;
 		}
-
-		try {
-			logger.debug("[OFC_VIRTUAL] Recuperant informació de l'oficina i registre...");
-			setOficina(
-					notificacio,
-					dadesOficina,
-					dir3Codi);
-			setLlibre(
-					notificacio, 
-					dadesOficina, 
-					dir3Codi);
-		} catch (RegistrePluginException ex) {
-			throw new RegistrePluginException("[OFC_VIRTUAL] No s'han pogut recuperar les dedes de l'oficina o llibre", ex);
-		}
+		
+		logger.debug("Recuperant informació de l'oficina i registre...");
+		setOficina(
+				notificacio,
+				dadesOficina,
+				dir3Codi);
+		setLlibre(
+				notificacio, 
+				dadesOficina, 
+				dir3Codi);
 		
 		if (dadesOficina.getOficinaCodi() != null) {
 			//Codi Dir3 de l’oficina inicial
@@ -1979,6 +1970,9 @@ public class PluginHelper {
 				dadesOficina.setOficinaNom(oficinaVirtual.getNom());
 			}
 		}
+		if (dadesOficina.getOficinaCodi() == null) {
+			throw new RegistrePluginException("No hi ha definida cap oficina per realitzar el registre");
+		}
 	}
 	
 	private void setLlibre(
@@ -1999,6 +1993,9 @@ public class PluginHelper {
 				dadesOficina.setLlibreCodi(llibreOrganisme.getCodi());
 				dadesOficina.setLlibreNom(llibreOrganisme.getNomCurt());
 			}
+		}
+		if (dadesOficina.getLlibreCodi() == null) {
+			throw new RegistrePluginException("No hi ha definit cap llibre per realitzar el registre");
 		}
 	}
 	
