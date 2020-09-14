@@ -60,7 +60,8 @@ $(document).ready(function() {
 	});
 	$( "#netejar" ).click(function() {
 		$('#procediments tr').filter(function() {
-			$(this).toggle($(this).find("td:eq(3)").text() != null);  
+			$(this).toggle($(this).find("td:eq(3)").text() != null); 
+			$('#organGestorSelect').prop('disabled', false);
 			$("#comuBtn").prop("checked", false);
 			$('#search').val('');
 	    });
@@ -73,8 +74,10 @@ $(document).ready(function() {
 		
 		$('#procediments tr').filter(function() {
 			if(checked){
+				$('#organGestorSelect').prop('disabled', true);
 				$(this).toggle($(this).find("td:eq(2)").text() == "true");
 			}else{
+				$('#organGestorSelect').prop('disabled', false);
 				$(this).toggle($(this).find("td:eq(2)").text() != null);
 			}
 		      

@@ -133,7 +133,7 @@ $(document).ready(function() {
 			<not:inputText name="apiKey" textKey="entitat.form.camp.apiKey" required="true"/>
 			<not:inputCheckbox name="ambEntregaDeh" textKey="entitat.form.camp.entregadeh"/>
 			<not:inputCheckbox name="ambEntregaCie" textKey="entitat.form.camp.entregacie"/>
-			<not:inputSelect name="oficina" textKey="entitat.form.camp.oficina" required="true"/>
+			<not:inputSelect name="oficina" textKey="entitat.form.camp.oficina" required="true" optionMinimumResultsForSearch="0"/>
 			<%-- <not:inputText name="nomOficinaVirtual" textKey="entitat.form.camp.oficinavirtual"/> --%>
 			<not:inputTextarea name="descripcio" textKey="entitat.form.camp.descripcio"/>
 		</div>

@@ -74,6 +74,7 @@
 				<th data-col-name="codi"><spring:message code="procediment.list.columna.codi"/></th>
 				<th data-col-name="nom"><spring:message code="procediment.list.columna.nom"/></th>
 				<th data-col-name="entitatNom"><spring:message code="procediment.list.columna.entitat"/></th>
+				<th data-col-name="llibreCodiNom"><spring:message code="procediment.list.columna.llibre"/></th>
 				<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="100px">
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
 						<a href="organgestor/{{:id}}/permis" class="btn btn-default"><span class="fa fa-key"></span>&nbsp;<spring:message code="organgestor.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>

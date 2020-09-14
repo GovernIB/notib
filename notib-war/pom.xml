@@ -429,6 +429,7 @@
 							<Implementation-SCM-Branch>${git.branch}</Implementation-SCM-Branch>
 							<Implementation-SCM-Revision>${git.commit.id}</Implementation-SCM-Revision>
 							<Implementation-SCM-Version>${git.closest.tag.name}</Implementation-SCM-Version>
+							<Release-Date>${version.date}</Release-Date>
 	                    </manifestEntries>
 	                </archive>
 				</configuration>

@@ -40,6 +40,11 @@ body {
 	background-color: white !important;
 	cursor: pointer;
 }
+.comentari {
+	font-size: 12px;
+	color: #999;
+	margin-bottom: 0px;
+}
 </style>
 <script type="text/javascript">
 $(document).ready(function() {
@@ -130,7 +135,7 @@ $(document).ready(function() {
 			<form:hidden path="llibre"/>
 			<form:hidden path="llibreNom"/>
 			<select id="selLlibres" data-placeholder="<spring:message code="organgestor.form.camp.llibre"/>"></select>
-			<p class="comentari"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
+			<p class="comentari"><spring:message code="organgestor.form.camp.llibre.info"/></p>
 			<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
 				<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
 					<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>
