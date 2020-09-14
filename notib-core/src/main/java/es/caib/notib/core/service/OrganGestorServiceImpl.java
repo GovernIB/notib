@@ -342,6 +342,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	public void updateNom(Long entitatId, String organGestorCodi) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId); 
 			OrganGestorEntity organGestor = organGestorRepository.findByCodi(organGestorCodi);
 			String denominacio = findDenominacioOrganisme(organGestorCodi);
 			if (denominacio != null && !denominacio.isEmpty())
@@ -350,12 +351,21 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				throw new SistemaExternException(
 						IntegracioHelper.INTCODI_UNITATS, 
 						"No s'ha pogut obtenir la denominació de l'organ gestor");
+			LlibreDto llibreOrgan = cacheHelper.getLlibreOrganGestor(
+					entitat.getCodi(),
+					organGestor.getCodi());
+			if (llibreOrgan != null)
+				organGestor.update(llibreOrgan.getCodi(), llibreOrgan.getNomLlarg());
+			else 
+				throw new SistemaExternException(
+						IntegracioHelper.INTCODI_REGISTRE, 
+						"No s'ha pogut obtenir el llibre de l'organ gestor");
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
 
-	@Transactional
+	@Transactional(timeout = 1200)
 	@Override
 	public void updateNoms(Long entitatId, String organActualCodiDir3) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
@@ -380,6 +390,11 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				String denominacio = findDenominacioOrganisme(organGestor.getCodi());
 				if (denominacio != null && !denominacio.isEmpty())
 					organGestor.update(denominacio);
+				LlibreDto llibreOrgan = cacheHelper.getLlibreOrganGestor(
+						entitat.getCodi(),
+						organGestor.getCodi());
+				if (llibreOrgan != null)
+					organGestor.update(llibreOrgan.getCodi(), llibreOrgan.getNomLlarg());
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);

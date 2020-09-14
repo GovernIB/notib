@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
@@ -277,9 +278,12 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	public Llibre llistarLlibreOrganisme(
 			String entitatCodi, 
 			String organismeCodi) throws RegistrePluginException {
+		Random rand = new Random();
+		Integer num = rand.nextInt(100);
 		Llibre llibre = new Llibre();
-		llibre.setCodi("L99");
-		llibre.setNomCurt("Llibre prova");
+		llibre.setCodi("L" + num);
+		llibre.setNomCurt("Llibre " + num + " de prova");
+		llibre.setNomLlarg("Llibre " + num + " de prova llarg");
 		return llibre;
 	}
 	

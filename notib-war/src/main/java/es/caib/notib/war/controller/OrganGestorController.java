@@ -119,6 +119,26 @@ public class OrganGestorController extends BaseUserController{
 		return "organGestorForm";
 	}
 	
+//	@RequestMapping(value = "/{organGestorId}", method = RequestMethod.GET)
+//	public String get(
+//			HttpServletRequest request,
+//			@PathVariable Long organGestorId,
+//			Model model) {
+//		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+//		OrganGestorDto organ = null;
+//		if (organGestorId != null) {
+//			organ = organGestorService.findById(entitat.getId(), organGestorId);
+//		}
+//		if (organ != null) {
+//			OrganGestorCommand command = OrganGestorCommand.asCommand(organ);
+//			model.addAttribute( command );
+//		} else {
+//			model.addAttribute(new OrganGestorCommand());
+//		}
+//		model.addAttribute("entitat", entitat);
+//		return "organGestorForm";
+//	}
+	
 	@RequestMapping(value = "/new", method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,

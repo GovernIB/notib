@@ -40,6 +40,12 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 	private int retard;
 	private int caducitat;
 	
+	public String getOrganGestorDesc() {
+		if (organGestorNom != null && !organGestorNom.isEmpty())
+			return organGestor + " - " + organGestorNom;
+		return organGestor;
+	}
+	
 	private static final long serialVersionUID = 6058789232924135932L;
 
 }

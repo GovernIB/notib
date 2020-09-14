@@ -49,6 +49,13 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 		this.nom = nom;
 	}
 	
+	public void update(
+			String llibre,
+			String llibreNom) {
+		this.llibre = llibre;
+		this.llibreNom = llibreNom;
+	}
+	
 	public static Builder getBuilder(
 			String codi,
 			String nom,

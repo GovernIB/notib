@@ -452,7 +452,7 @@ $(document).ready(function() {
 						{{:~eval('comunicacioTipus["' + comunicacioTipus + '"]')}}
 					</script>
 				</th--%>
-				<th data-col-name="procediment.organGestor"  width="100px"><spring:message code="notificacio.form.camp.organGestor"/></th>
+				<th data-col-name="procediment.organGestorDesc"  width="200px"><spring:message code="notificacio.form.camp.organGestor"/></th>
 				<th data-col-name="procediment.nom"  width="200px"><spring:message code="notificacio.list.columna.procediment"/></th>
 				<c:if test="${mostrarColumnaNumExpedient}">
 					<th data-col-name="numExpedient" width="170px"><spring:message code="notificacio.list.columna.num.expedient"/></th>
