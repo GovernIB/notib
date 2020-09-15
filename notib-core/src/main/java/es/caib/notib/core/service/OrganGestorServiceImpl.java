@@ -352,7 +352,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 						IntegracioHelper.INTCODI_UNITATS, 
 						"No s'ha pogut obtenir la denominació de l'organ gestor");
 			LlibreDto llibreOrgan = cacheHelper.getLlibreOrganGestor(
-					entitat.getCodi(),
+					entitat.getDir3Codi(),
 					organGestor.getCodi());
 			if (llibreOrgan != null)
 				organGestor.update(llibreOrgan.getCodi(), llibreOrgan.getNomLlarg());
@@ -391,7 +391,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				if (denominacio != null && !denominacio.isEmpty())
 					organGestor.update(denominacio);
 				LlibreDto llibreOrgan = cacheHelper.getLlibreOrganGestor(
-						entitat.getCodi(),
+						entitat.getDir3Codi(),
 						organGestor.getCodi());
 				if (llibreOrgan != null)
 					organGestor.update(llibreOrgan.getCodi(), llibreOrgan.getNomLlarg());

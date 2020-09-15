@@ -7,7 +7,7 @@
   <packaging>pom</packaging>
   <properties>
 		<revision>1.1.4</revision>
-		<version.date>2020.09.14 20:00h</version.date>
+		<version.date>2020.09.15 09:30h</version.date>
 		<github.global.server>github</github.global.server>
 		<spring.version>3.2.16.RELEASE</spring.version>
 		<spring-security.version>3.2.9.RELEASE</spring-security.version>
