@@ -24,7 +24,7 @@ public interface PagadorCieFormatFullaService {
 	 * 				Informació del pagador cie a crear
 	 * @return	El pagador cie creat
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	public PagadorCieFormatFullaDto create(
 			Long pagadorCieId,
 			PagadorCieFormatFullaDto formatSobre);
@@ -37,7 +37,7 @@ public interface PagadorCieFormatFullaService {
 	 * @return
 	 * @throws NotFoundException
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')  or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')  or hasRole('tothom')")
 	public PagadorCieFormatFullaDto update(PagadorCieFormatFullaDto formatSobre) throws NotFoundException;
 
 	/**
@@ -49,7 +49,7 @@ public interface PagadorCieFormatFullaService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')  or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')  or hasRole('tothom')")
 	public PagadorCieFormatFullaDto delete(
 			Long id) throws NotFoundException;
 
@@ -60,7 +60,7 @@ public interface PagadorCieFormatFullaService {
 	 *            Codi del procediment a trobar.
 	 * @return El pagador cie amb el codi especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
 	public PagadorCieFormatFullaDto findById(Long id);
 
 	
@@ -69,7 +69,7 @@ public interface PagadorCieFormatFullaService {
 	 * 
 	 * @return La llista dels pagadors cie.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
 	public List<PagadorCieFormatFullaDto> findAll();
 	
 	/**
@@ -77,7 +77,7 @@ public interface PagadorCieFormatFullaService {
 	 * 
 	 * @return La llista dels pagadors cie.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
 	public List<PagadorCieFormatFullaDto> findFormatFullaByPagadorCie(Long pagadorCieId);
 
 	/**
@@ -87,7 +87,7 @@ public interface PagadorCieFormatFullaService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina de pagadors cie.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	public PaginaDto<PagadorCieFormatFullaDto> findAllPaginat(
 			Long pagadorCieId,
 			PaginacioParamsDto paginacioParams);

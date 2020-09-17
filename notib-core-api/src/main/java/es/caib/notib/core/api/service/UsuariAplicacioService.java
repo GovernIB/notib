@@ -69,7 +69,7 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return L'aplicació amb l'identificador assenyalat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public AplicacioDto findById(Long aplicacioId);
 	
 	/**
@@ -82,7 +82,7 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return L'aplicació amb l'identificador assenyalat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public AplicacioDto findByEntitatAndId(Long entitatId, Long aplicacioId);
 	
 	/**
@@ -93,7 +93,7 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return L'aplicació amb el codi assenyalat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public AplicacioDto findByUsuariCodi(String usuariCodi);
 	
 	/**
@@ -106,7 +106,7 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return L'aplicació amb el codi assenyalat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public AplicacioDto findByEntitatAndUsuariCodi(Long entitatId, String usuariCodi);
 	
 	/**
@@ -119,7 +119,7 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return L'aplicació que coincideix  amb el text introduït.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_SUPER')")
 	public AplicacioDto findByEntitatAndText(Long entitatId, String text);
 	
 	/**
@@ -130,7 +130,7 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return La pàgina d'aplicacions.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public PaginaDto<AplicacioDto> findPaginat(PaginacioParamsDto paginacioParams);
 	
 	/**
@@ -141,7 +141,7 @@ public interface UsuariAplicacioService {
 	 *            
 	 * @return La pàgina d'aplicacions.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public PaginaDto<AplicacioDto> findPaginatByEntitat(Long entitatId, PaginacioParamsDto paginacioParams);
 	
 	/**

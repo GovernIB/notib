@@ -569,7 +569,7 @@ public class EntitatServiceImpl implements EntitatService {
 				return entityComprovarHelper.getPermisosEntitatsUsuariActual(auth);
 			} else {
 				Map<RolEnumDto, Boolean> hasPermisos = new HashMap<RolEnumDto, Boolean>();
-				hasPermisos.put(RolEnumDto.NOT_USER, false);
+				hasPermisos.put(RolEnumDto.tothom, false);
 				hasPermisos.put(RolEnumDto.NOT_ADMIN, false);
 				hasPermisos.put(RolEnumDto.NOT_APL, false);
 				hasPermisos.put(RolEnumDto.NOT_ADMIN_ORGAN, false);

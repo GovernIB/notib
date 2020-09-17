@@ -353,7 +353,7 @@ public class BaseServiceTest {
 	protected void configureMockDadesUsuariPlugin() throws SistemaExternException {
 		dadesUsuariPluginMock = Mockito.mock(DadesUsuariPlugin.class);
 		List<String> rols = new ArrayList<String>();
-		rols.add("NOT_USER");
+		rols.add("tothom");
 		DadesUsuari usuari = new DadesUsuari();
 		usuari.setCodi("user");
 		usuari.setNom("User");

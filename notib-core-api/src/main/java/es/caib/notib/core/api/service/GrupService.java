@@ -29,7 +29,7 @@ public interface GrupService {
 	 * 				Informació del grup a crear
 	 * @return El grup creat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public GrupDto create(
 			Long entitatId,
 			GrupDto grup);
@@ -42,7 +42,7 @@ public interface GrupService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb el codi especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public GrupDto update(GrupDto grup) throws NotFoundException;
 
 	/**
@@ -53,7 +53,7 @@ public interface GrupService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public GrupDto delete(
 			Long id) throws NotFoundException;
 	
@@ -64,7 +64,7 @@ public interface GrupService {
 	 *          	Llista dels grups que es volen esborrar
 	 * @throws NotFoundException
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public List<GrupDto> deleteGrupsProcediment(
 			List<GrupDto> grups) throws NotFoundException;
 
@@ -75,7 +75,7 @@ public interface GrupService {
 	 *            id del grup a trobar.
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public GrupDto findById(
 			Long entitatId,
 			Long id);
@@ -87,7 +87,7 @@ public interface GrupService {
 	 *            id del grup a trobar.
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public GrupDto findByCodi(String grupCodi, Long entitatId);
 
 	
@@ -100,7 +100,7 @@ public interface GrupService {
 	 *            id del procediment a trobar.
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public PaginaDto<ProcedimentGrupDto> findByProcediment(
 			Long entitatId,
 			Long procedimentId,
@@ -113,7 +113,7 @@ public interface GrupService {
 	 *            id del grup a trobar.
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public List<GrupDto> findByProcedimentAndUsuariGrups(
 			Long procedimentId);
 	
@@ -124,7 +124,7 @@ public interface GrupService {
 	 *            id del grup a trobar.
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public List<GrupDto> findGrupsByProcediment(
 			Long procedimentId);
 	
@@ -135,7 +135,7 @@ public interface GrupService {
 	 *            id del grup a trobar.
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public ProcedimentGrupDto findProcedimentGrupById(
 			Long entitatId,
 			Long procedimentGrupId);
@@ -147,7 +147,7 @@ public interface GrupService {
 	 *            id del grup a trobar.
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public Boolean existProcedimentGrupByGrupId(
 			Long entitatId,
 			Long grupId);
@@ -159,11 +159,11 @@ public interface GrupService {
 	 *            id del grup a trobar.
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public List<GrupDto> findByEntitat(Long entitatId);
 
 	
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public List<GrupDto> findByEntitatAndOrganGestor(
 			EntitatDto entitat, 
 			OrganGestorDto organGestor);
@@ -179,7 +179,7 @@ public interface GrupService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina amb els grups.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public PaginaDto<GrupDto> findAmbFiltrePaginat(
 			Long entitatId,
 			GrupFiltreDto filtre,
@@ -190,7 +190,7 @@ public interface GrupService {
 	 * 
 	 * @return La llista dels grups.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public List<GrupDto> findAll();
 
 	/**
@@ -200,6 +200,6 @@ public interface GrupService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina de grups.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public PaginaDto<GrupDto> findAllPaginat(PaginacioParamsDto paginacioParams);
 }

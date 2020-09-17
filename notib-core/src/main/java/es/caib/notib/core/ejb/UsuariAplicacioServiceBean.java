@@ -52,27 +52,27 @@ public class UsuariAplicacioServiceBean implements UsuariAplicacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN", "NOT_APL"})
+	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN", "NOT_APL"})
 	public AplicacioDto findById(
 			Long aplicacioId) {
 		return delegate.findById(aplicacioId);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN", "NOT_APL"})
+	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN", "NOT_APL"})
 	public AplicacioDto findByEntitatAndId(Long entitatId, Long aplicacioId) {
 		return delegate.findByEntitatAndId(entitatId, aplicacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN", "NOT_APL"})
+	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN", "NOT_APL"})
 	public AplicacioDto findByUsuariCodi(
 			String usuariCodi) {
 		return delegate.findByUsuariCodi(usuariCodi);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN", "NOT_APL"})
+	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN", "NOT_APL"})
 	public AplicacioDto findByEntitatAndUsuariCodi(
 			Long entitatId, 
 			String usuariCodi) {
@@ -80,20 +80,20 @@ public class UsuariAplicacioServiceBean implements UsuariAplicacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN"})
+	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN"})
 	public PaginaDto<AplicacioDto> findPaginat(
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findPaginat(paginacioParams);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN"})
+	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN"})
 	public PaginaDto<AplicacioDto> findPaginatByEntitat(Long entitatId, PaginacioParamsDto paginacioParams) {
 		return delegate.findPaginatByEntitat(entitatId, paginacioParams);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN"})
+	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN"})
 	public AplicacioDto findByEntitatAndText(Long entitatId, String text) {
 		return delegate.findByEntitatAndText(entitatId, text);
 	}

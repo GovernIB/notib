@@ -83,7 +83,7 @@ public class GrupServiceImpl implements GrupService{
 			
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			
-			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que indica Organ al grup i que es administrador de l'organ indicat 
+			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al grup i que es administrador de l'organ indicat 
 			
 			OrganGestorEntity organGestor = null;
 			if (grup.getOrganGestorId() != null) {
@@ -115,7 +115,7 @@ public class GrupServiceImpl implements GrupService{
 			logger.debug("Actualitzant grup ("
 					+ "grup=" + grup + ")");
 			
-			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que indica Organ al grup i que es administrador de l'organ indicat
+			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al grup i que es administrador de l'organ indicat
 			
 			GrupEntity grupEntity = entityComprovarHelper.comprovarGrup(grup.getId());
 			grupEntity.update(
@@ -137,7 +137,7 @@ public class GrupServiceImpl implements GrupService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			
-			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que es administrador de l'organ del grup que vol eliminar 
+			//TODO: Si es tothom comprovar que és administrador d'Organ i que es administrador de l'organ del grup que vol eliminar 
 			GrupEntity grupEntity = entityComprovarHelper.comprovarGrup(id);
 			grupReposity.delete(grupEntity);
 			return conversioTipusHelper.convertir(
@@ -308,7 +308,7 @@ public class GrupServiceImpl implements GrupService{
 			List<GrupDto> grups) throws NotFoundException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que es administrador de l'organ del grup que vol eliminar
+			//TODO: Si es tothom comprovar que és administrador d'Organ i que es administrador de l'organ del grup que vol eliminar
 			List<GrupEntity> grupsEntity = entityComprovarHelper.comprovarGrups(grups);
 			
 			grupReposity.delete(grupsEntity);

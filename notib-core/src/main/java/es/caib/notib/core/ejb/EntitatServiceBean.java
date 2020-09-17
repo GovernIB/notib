@@ -68,37 +68,37 @@ public class EntitatServiceBean implements EntitatService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public EntitatDto findById(Long id) {
 		return delegate.findById(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public EntitatDto findByCodi(String codi) {
 		return delegate.findByCodi(codi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public EntitatDto findByDir3codi(String dir3Codi) {
 		return delegate.findByDir3codi(dir3Codi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN", "NOT_APL"})
+	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN", "NOT_APL"})
 	public List<EntitatDto> findAll() {
 		return delegate.findAll();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER", "NOT_USER", "NOT_ADMIN"})
+	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN"})
 	public PaginaDto<EntitatDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		return delegate.findAllPaginat(paginacioParams);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<EntitatDto> findAccessiblesUsuariActual(String rolActual) {
 		return delegate.findAccessiblesUsuariActual(rolActual);
 	}
@@ -122,19 +122,19 @@ public class EntitatServiceBean implements EntitatService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public boolean hasPermisUsuariEntitat() {
 		return delegate.hasPermisUsuariEntitat();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public boolean hasPermisAdminEntitat() {
 		return delegate.hasPermisAdminEntitat();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public boolean hasPermisAplicacioEntitat() {
 		return delegate.hasPermisAplicacioEntitat();
 	}
@@ -150,19 +150,19 @@ public class EntitatServiceBean implements EntitatService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public List<TipusDocumentDto> findTipusDocumentByEntitat(Long entitatId) {
 		return delegate.findTipusDocumentByEntitat(entitatId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public TipusDocumentEnumDto findTipusDocumentDefaultByEntitat(Long entitatId) {
 		return delegate.findTipusDocumentDefaultByEntitat(entitatId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual() {
 		return delegate.getPermisosEntitatsUsuariActual();
 	}

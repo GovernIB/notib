@@ -621,7 +621,7 @@ public class PermisosHelper {
 			
 			Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT};
 			
-			if (rolActual != null && rolActual.equals("NOT_USER")) {
+			if (rolActual != null && rolActual.equals("tothom")) {
 				permisos = new Permission[] {ExtendedPermission.USUARI};
 			}
 			

@@ -29,7 +29,7 @@ public class PagadorCieFormatFullaServiceBean implements PagadorCieFormatFullaSe
 	PagadorCieFormatFullaService delegate;
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER",})
+	@RolesAllowed({"NOT_ADMIN", "tothom",})
 	public PagadorCieFormatFullaDto create(Long pagadorCieId, PagadorCieFormatFullaDto formatSobre) {
 		return delegate.create(
 				pagadorCieId, 
@@ -37,31 +37,31 @@ public class PagadorCieFormatFullaServiceBean implements PagadorCieFormatFullaSe
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER",})
+	@RolesAllowed({"NOT_ADMIN", "tothom",})
 	public PagadorCieFormatFullaDto update(PagadorCieFormatFullaDto formatSobre) throws NotFoundException {
 		return delegate.update(formatSobre);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER",})
+	@RolesAllowed({"NOT_ADMIN", "tothom",})
 	public PagadorCieFormatFullaDto delete(Long id) throws NotFoundException {
 		return delegate.delete(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public PagadorCieFormatFullaDto findById(Long id) {
 		return delegate.findById(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<PagadorCieFormatFullaDto> findAll() {
 		return delegate.findAll();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public PaginaDto<PagadorCieFormatFullaDto> findAllPaginat(
 			Long pagadorCieId,
 			PaginacioParamsDto paginacioParams) {
@@ -71,7 +71,7 @@ public class PagadorCieFormatFullaServiceBean implements PagadorCieFormatFullaSe
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<PagadorCieFormatFullaDto> findFormatFullaByPagadorCie(Long pagadorCieId) {
 		return delegate.findFormatFullaByPagadorCie(pagadorCieId);
 	}

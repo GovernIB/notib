@@ -29,7 +29,7 @@ public class PagadorCieFormatSobreServiceBean implements PagadorCieFormatSobreSe
 	PagadorCieFormatSobreService delegate;
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public PagadorCieFormatSobreDto create(Long entitatId, PagadorCieFormatSobreDto formatSobre) {
 		return delegate.create(
 				entitatId, 
@@ -37,37 +37,37 @@ public class PagadorCieFormatSobreServiceBean implements PagadorCieFormatSobreSe
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public PagadorCieFormatSobreDto update(PagadorCieFormatSobreDto formatSobre) throws NotFoundException {
 		return delegate.update(formatSobre);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public PagadorCieFormatSobreDto delete(Long id) throws NotFoundException {
 		return delegate.delete(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public PagadorCieFormatSobreDto findById(Long id) {
 		return delegate.findById(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<PagadorCieFormatSobreDto> findAll() {
 		return delegate.findAll();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<PagadorCieFormatSobreDto> findFormatSobreByPagadorCie(Long pagadorCieId) {
 		return delegate.findFormatSobreByPagadorCie(pagadorCieId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public PaginaDto<PagadorCieFormatSobreDto> findAllPaginat(
 			Long pagadorCieId, 
 			PaginacioParamsDto paginacioParams) {

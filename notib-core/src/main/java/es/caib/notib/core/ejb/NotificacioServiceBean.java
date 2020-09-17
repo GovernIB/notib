@@ -44,7 +44,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	NotificacioService delegate;
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public NotificacioDtoV2 findAmbId(
 			Long id,
 			boolean isAdministrador) {
@@ -54,7 +54,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public List<NotificacioEventDto> eventFindAmbNotificacio(
 			Long entitatId,
 			Long notificacioId) {
@@ -71,7 +71,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<NotificacioEventDto> eventFindAmbEnviament(
 			Long entitatId,
 			Long notificacioId,
@@ -83,27 +83,27 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public ArxiuDto getDocumentArxiu(
 			Long notificacioId) {
 		return delegate.getDocumentArxiu(notificacioId);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public ArxiuDto enviamentGetCertificacioArxiu(
 			Long enviamentId) {
 		return delegate.enviamentGetCertificacioArxiu(enviamentId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public boolean enviar(Long notificacioId) {
 		return delegate.enviar(notificacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(
 			Long entitatId,
 			Long enviamentId) {
@@ -113,25 +113,25 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 //	@Override
-//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 //	public void notificaEnviamentsRegistrats() {
 //		delegate.notificaEnviamentsRegistrats();
 //	}
 //	
 //	@Override
-//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 //	public void enviamentRefrescarEstatPendents() {
 //		delegate.enviamentRefrescarEstatPendents();
 //	}
 //
 //	@Override
-//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 //	public void registrarEnviamentsPendents() {
 //		delegate.registrarEnviamentsPendents();
 //	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<NotificacioDto> create(
 			Long entitatId, 
 			NotificacioDtoV2 notificacio) throws RegistreNotificaException {
@@ -139,7 +139,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public NotificacioDtoV2 update(
 			Long entitatId,
 			NotificacioDtoV2 notificacio) throws NotFoundException {
@@ -149,7 +149,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
 			Long entitatId,
 			boolean isUsuari,
@@ -173,7 +173,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public String marcarComProcessada(
 			Long enviamentId,
 			String motiu) throws MessagingException {
@@ -183,25 +183,25 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<RegistreIdDto> registrarNotificar(Long notificacioId) throws RegistreNotificaException {
 		return delegate.registrarNotificar(notificacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_USER"})
+	@RolesAllowed({"tothom"})
 	public List<ProvinciesDto> llistarProvincies() {
 		return delegate.llistarProvincies();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_USER"})
+	@RolesAllowed({"tothom"})
 	public List<LocalitatsDto> llistarLocalitats(String codiProvincia) {
 		return delegate.llistarLocalitats(codiProvincia);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_USER"})
+	@RolesAllowed({"tothom"})
 	public List<PaisosDto> llistarPaisos() {
 		return delegate.llistarPaisos();
 	}
@@ -259,13 +259,13 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public boolean reactivarConsulta(Long notificacioId) {
 		return delegate.reactivarConsulta(notificacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public boolean reactivarSir(Long notificacioId) {
 		return delegate.reactivarSir(notificacioId);
 	}

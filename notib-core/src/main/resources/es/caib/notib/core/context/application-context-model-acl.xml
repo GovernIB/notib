@@ -66,13 +66,13 @@
 					<constructor-arg value="NOT_ADMIN" />
 				</bean>
 				<bean class="org.springframework.security.core.authority.SimpleGrantedAuthority">
-					<constructor-arg value="NOT_USER" />
+					<constructor-arg value="tothom" />
 				</bean>
 				<bean class="org.springframework.security.core.authority.SimpleGrantedAuthority">
-					<constructor-arg value="NOT_USER" />
+					<constructor-arg value="tothom" />
 				</bean>
 				<bean class="org.springframework.security.core.authority.SimpleGrantedAuthority">
-					<constructor-arg value="NOT_USER" />
+					<constructor-arg value="tothom" />
 				</bean>
 			</list>
 		</constructor-arg>

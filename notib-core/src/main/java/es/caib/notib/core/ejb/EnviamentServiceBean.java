@@ -44,7 +44,7 @@ public class EnviamentServiceBean implements EnviamentService {
 
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public List<Long> findIdsAmbFiltre(
 			Long entitatId, 
 			NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException {
@@ -52,7 +52,7 @@ public class EnviamentServiceBean implements EnviamentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByEntityAndFiltre(
 			EntitatDto entitat, 
 			boolean isUsuari,
@@ -74,25 +74,25 @@ public class EnviamentServiceBean implements EnviamentService {
 
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public List<NotificacioEnviamentDto> enviamentFindAmbNotificacio(Long notificacioId) {
 		return delegate.enviamentFindAmbNotificacio(notificacioId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public NotificacioEnviamentDto enviamentFindAmbId(Long enviamentId) {
 		return delegate.enviamentFindAmbId(enviamentId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public List<NotificacioEventDto> eventFindAmbNotificacio(Long notificacioId) {
 		return delegate.eventFindAmbNotificacio(notificacioId);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public void columnesCreate(
 			UsuariDto usuaris, 
 			Long entitatId, 
@@ -104,7 +104,7 @@ public class EnviamentServiceBean implements EnviamentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public void columnesUpdate(
 			Long entitatId, 
 			ColumnesDto columnes) {
@@ -114,7 +114,7 @@ public class EnviamentServiceBean implements EnviamentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public ColumnesDto getColumnesUsuari(
 			Long entitatId, 
 			UsuariDto usuari) {
@@ -124,7 +124,7 @@ public class EnviamentServiceBean implements EnviamentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public FitxerDto exportacio(
 			Long entitatId, 
 			Collection<Long> enviamentIds, 
@@ -139,31 +139,31 @@ public class EnviamentServiceBean implements EnviamentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public NotificacioEnviamentDtoV2 getOne(Long entitatId) {
 		return delegate.getOne(entitatId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public byte[] getDocumentJustificant(Long enviamentId) {
 		return delegate.getDocumentJustificant(enviamentId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public boolean reintentarCallback(Long eventId) {
 		return delegate.reintentarCallback(eventId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public void reactivaConsultes(Set<Long> enviaments) {
 		delegate.reactivaConsultes(enviaments);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public void reactivaSir(Set<Long> enviaments) {
 		delegate.reactivaSir(enviaments);
 	}

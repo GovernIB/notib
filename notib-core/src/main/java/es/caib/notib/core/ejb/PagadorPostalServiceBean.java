@@ -35,7 +35,7 @@ public class PagadorPostalServiceBean implements PagadorPostalService {
 	PagadorPostalService delegate;
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PagadorPostalDto create(
 			Long entitatId, 
 			PagadorPostalDto postal) {
@@ -45,25 +45,25 @@ public class PagadorPostalServiceBean implements PagadorPostalService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PagadorPostalDto update(PagadorPostalDto postal) throws NotFoundException {
 		return delegate.update(postal);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PagadorPostalDto delete(Long id) throws NotFoundException {
 		return delegate.delete(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public PagadorPostalDto findById(Long id) {
 		return delegate.findById(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PaginaDto<PagadorPostalDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			PagadorPostalFiltreDto filtre,
@@ -75,25 +75,25 @@ public class PagadorPostalServiceBean implements PagadorPostalService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<PagadorPostalDto> findAll() {
 		return delegate.findAll();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PaginaDto<PagadorPostalDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		return delegate.findAllPaginat(paginacioParams);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public List<PagadorPostalDto> findByEntitat(Long entitatId) {
 		return delegate.findByEntitat(entitatId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public Object findByEntitatAndOrganGestor(EntitatDto entitat, OrganGestorDto organGestor) {
 		return delegate.findByEntitatAndOrganGestor(entitat, organGestor);
 	}

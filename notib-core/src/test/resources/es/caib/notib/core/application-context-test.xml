@@ -46,10 +46,10 @@
 	<sec:authentication-manager alias="authenticationManager">
         <sec:authentication-provider>
             <sec:user-service>
-            	<sec:user name="super" password="super" authorities="NOT_SUPER,tothom" />
-                <sec:user name="admin" password="admin" authorities="NOT_ADMIN,tothom" />
-                <sec:user name="user" password="user" authorities="NOT_USER,tothom" />
-                <sec:user name="apl" password="apl" authorities="NOT_APL, tothom" />
+            	<sec:user name="super" password="super" authorities="NOT_SUPER" />
+                <sec:user name="admin" password="admin" authorities="NOT_ADMIN" />
+                <sec:user name="user" password="user" authorities="tothom" />
+                <sec:user name="apl" password="apl" authorities="NOT_APL" />
             </sec:user-service>
         </sec:authentication-provider>
     </sec:authentication-manager>

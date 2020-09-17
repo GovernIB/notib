@@ -57,8 +57,8 @@ public class UsuariHelper {
 				authorities.add(new SimpleGrantedAuthority("NOT_ADMIN"));
 			if (sessionContext.isCallerInRole("NOT_SUPER"))
 				authorities.add(new SimpleGrantedAuthority("NOT_SUPER"));
-			if (sessionContext.isCallerInRole("NOT_USER"))
-				authorities.add(new SimpleGrantedAuthority("NOT_USER"));
+			if (sessionContext.isCallerInRole("tothom"))
+				authorities.add(new SimpleGrantedAuthority("tothom"));
 			if (authorities.isEmpty())
 				authorities = null;
 			return generarUsuariAutenticat(

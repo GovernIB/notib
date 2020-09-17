@@ -253,7 +253,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 				public void executar(List<Object> elementsCreats) {
 					EntitatDto creada = (EntitatDto)elementsCreats.get(0);
 					autenticarUsuari("user");
-					List<EntitatDto> entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
+					List<EntitatDto> entitatsAccessibles = entitatService.findAccessiblesUsuariActual("tothom");
 					assertThat(
 							entitatsAccessibles.size(),
 							is(0));
@@ -273,7 +273,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 							permisUser,
 							permisos.get(0));
 					autenticarUsuari("user");
-					entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
+					entitatsAccessibles = entitatService.findAccessiblesUsuariActual("tothom");
 					assertThat(
 							entitatsAccessibles.size(),
 							is(1));
@@ -300,7 +300,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 							permisUser,
 							permisPerUser);
 					autenticarUsuari("user");
-					entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
+					entitatsAccessibles = entitatService.findAccessiblesUsuariActual("tothom");
 					assertThat(
 							entitatsAccessibles.size(),
 							is(1));
@@ -316,7 +316,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 							permisos.size(),
 							is(1));
 					autenticarUsuari("user");
-					entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
+					entitatsAccessibles = entitatService.findAccessiblesUsuariActual("tothom");
 					assertThat(
 							entitatsAccessibles.size(),
 							is(0));
@@ -329,7 +329,7 @@ public class EntitatServiceTest extends BaseServiceTest {
 							permisos.size(),
 							is(0));
 					autenticarUsuari("user");
-					entitatsAccessibles = entitatService.findAccessiblesUsuariActual("NOT_USER");
+					entitatsAccessibles = entitatService.findAccessiblesUsuariActual("tothom");
 					assertThat(
 							entitatsAccessibles.size(),
 							is(0));

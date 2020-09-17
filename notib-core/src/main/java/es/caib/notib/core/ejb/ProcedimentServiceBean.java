@@ -42,7 +42,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	ProcedimentService delegate;
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public ProcedimentDto create(
 			Long entitatId, 
 			ProcedimentDto procediment) {
@@ -52,7 +52,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public ProcedimentDto update(
 			Long entitatId, 
 			ProcedimentDto procediment,
@@ -64,7 +64,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public ProcedimentDto delete(
 			Long entitatId, 
 			Long id) throws NotFoundException {
@@ -74,7 +74,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
 	public ProcedimentDto findById(
 			Long entitatId, 
 			boolean isAdministrador,
@@ -86,19 +86,19 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
 	public ProcedimentDto findByCodi(Long entitatId, String codiProcediment) throws NotFoundException {
 		return delegate.findByCodi(entitatId, codiProcediment);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
 	public List<ProcedimentDto> findByEntitat(Long entitatId) {
 		return delegate.findByEntitat(entitatId);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public List<ProcedimentDto> findByOrganGestorIDescendents(
 			Long entitatId, 
 			OrganGestorDto organGestor) {
@@ -106,7 +106,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public PaginaDto<ProcedimentFormDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			boolean isUsuari, 
@@ -126,73 +126,73 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
 	public List<ProcedimentDto> findAll() {
 		return delegate.findAll();
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public boolean procedimentEnUs(Long procedimentId) {
 		return delegate.procedimentEnUs(procedimentId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
 	public List<ProcedimentGrupDto> findAllGrups() {
 		return delegate.findAllGrups();
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
 	public List<ProcedimentGrupDto> findGrupsByEntitat(Long entitatId) {
 		return delegate.findGrupsByEntitat(entitatId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
 	public List<ProcedimentDto> findProcediments(Long entitatId, List<String> grups) {
 		return delegate.findProcediments(entitatId, grups);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
 	public List<ProcedimentDto> findProcedimentsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 		return delegate.findProcedimentsWithPermis(entitatId, usuariCodi, permis);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
 	public List<ProcedimentDto> findProcedimentsSenseGrups(Long entitatId) {
 		return delegate.findProcedimentsSenseGrups(entitatId);
 	}
 	
 //	@Override
-//	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+//	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
 //	public List<ProcedimentDto> findProcedimentsSenseGrupsWithPermis(Long entitatId, PermisEnum permis) {
 //		return delegate.findProcedimentsSenseGrupsWithPermis(entitatId, permis);
 //	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
 	public List<ProcedimentDto> findProcedimentsAmbGrups(Long entitatId, List<String> grups) {
 		return delegate.findProcedimentsAmbGrups(entitatId, grups);
 	}
 	
 //	@Override
-//	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+//	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
 //	public List<ProcedimentDto> findProcedimentsAmbGrupsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
 //		return delegate.findProcedimentsAmbGrupsWithPermis(entitatId, grups, permis);
 //	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public boolean hasAnyProcedimentsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
 		return delegate.hasAnyProcedimentsWithPermis(entitatId, grups, permis);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
 	public List<PermisDto> permisFind(
 			Long entitatId, 
 			boolean isAdministrador, 
@@ -204,7 +204,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public void permisUpdate(
 			Long entitatId,
 			Long organGestorId,
@@ -218,7 +218,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public void permisDelete(
 			Long entitatId,
 			Long organGestorId,
@@ -232,7 +232,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public void grupCreate(
 			Long entitatId,
 			Long id,
@@ -244,7 +244,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public void grupUpdate(
 			Long entitatId, 
 			Long id, 
@@ -256,7 +256,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public void grupDelete(
 			Long entitatId, 
 			Long GrupId) throws NotFoundException {
@@ -266,7 +266,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
 	public boolean hasPermisProcediment(
 			Long procedimentId,
 			PermisEnum permis) {
@@ -304,7 +304,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_USER"})
+	@RolesAllowed({"tothom"})
 	public List<ProcedimentDto> findProcedimentsByOrganGestorWithPermis(
 			Long entitatId,
 			String organGestorCodi, 

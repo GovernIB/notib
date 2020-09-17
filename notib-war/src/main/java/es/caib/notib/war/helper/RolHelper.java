@@ -22,7 +22,7 @@ public class RolHelper {
 
 	private static final String ROLE_SUPER = RolEnumDto.NOT_SUPER.name(); 				// "NOT_SUPER";
 	private static final String ROLE_ADMIN_ENTITAT = RolEnumDto.NOT_ADMIN.name(); 		// "NOT_ADMIN";
-	private static final String ROLE_USUARI = RolEnumDto.NOT_USER.name(); 				// "NOT_USER";
+	private static final String ROLE_USUARI = RolEnumDto.tothom.name(); 				// "tothom";
 	private static final String ROLE_APLICACIO = RolEnumDto.NOT_APL.name(); 			// "NOT_APL";
 	private static final String ROLE_ADMIN_ORGAN = RolEnumDto.NOT_ADMIN_ORGAN.name(); 	// "NOT_ADMIN_ORGAN";
 
@@ -53,7 +53,7 @@ public class RolHelper {
 						SESSION_ATTRIBUTE_ROL_ACTUAL,
 						canviRol);
 			} else if(RolEnumDto.NOT_ADMIN_ORGAN.name().equals(canviRol) && 
-					request.isUserInRole(RolEnumDto.NOT_USER.name()) &&
+					request.isUserInRole(RolEnumDto.tothom.name()) &&
 					(boolean)request.getAttribute("permisAdminOrgan")) {
 				request.getSession().setAttribute(
 						SESSION_ATTRIBUTE_ROL_ACTUAL,

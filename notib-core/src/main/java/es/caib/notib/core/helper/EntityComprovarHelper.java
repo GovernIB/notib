@@ -184,7 +184,7 @@ public class EntityComprovarHelper {
 		}
 		if (comprovarUser) {
 			for (GrantedAuthority ga: auth.getAuthorities()) {
-				if (ga.toString().equals("NOT_USER")) {
+				if (ga.toString().equals("tothom")) {
 					tePermis = true;
 					break;
 				}
@@ -675,7 +675,7 @@ public class EntityComprovarHelper {
 				new Permission[] {ExtendedPermission.ADMINISTRADOR}, 
 				auth);
 		
-		hasPermisos.put(RolEnumDto.NOT_USER, hasPermisUsuariEntitat);
+		hasPermisos.put(RolEnumDto.tothom, hasPermisUsuariEntitat);
 		hasPermisos.put(RolEnumDto.NOT_ADMIN, hasPermisAdminEntitat);
 		hasPermisos.put(RolEnumDto.NOT_APL, hasPermisAplicacioEntitat);
 		hasPermisos.put(RolEnumDto.NOT_ADMIN_ORGAN, hasPermisAdminOrgan);

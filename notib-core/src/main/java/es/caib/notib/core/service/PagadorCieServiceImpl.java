@@ -63,7 +63,7 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 			logger.debug("Creant un nou pagador cie ("
 					+ "pagador=" + cie + ")");
 			
-			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que indica Organ al pagadorCIE i que es administrador de l'organ indicat
+			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al pagadorCIE i que es administrador de l'organ indicat
 			
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			OrganGestorEntity organGestor = null;
@@ -96,7 +96,7 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 			logger.debug("Actualitzant pagador cie ("
 					+ "pagador=" + cie + ")");
 			
-			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que indica Organ al pagadorCIE i que es administrador de l'organ indicat
+			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al pagadorCIE i que es administrador de l'organ indicat
 			
 			PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(cie.getId());
 			pagadorCieEntity.update(
@@ -119,7 +119,7 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			
-			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que l'usuari es administrador de l'Organ associat al pagadorCIE a eliminar.
+			//TODO: Si es tothom comprovar que és administrador d'Organ i que l'usuari es administrador de l'Organ associat al pagadorCIE a eliminar.
 			
 			PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(id);
 			pagadorCieReposity.delete(id);

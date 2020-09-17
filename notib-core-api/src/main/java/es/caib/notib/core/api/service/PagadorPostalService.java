@@ -27,7 +27,7 @@ public interface PagadorPostalService {
 	 * 				Informació del pagador postal a crear
 	 * @return	El pagador postal creat
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	public PagadorPostalDto create(
 			Long entitatId,
 			PagadorPostalDto postal);
@@ -40,7 +40,7 @@ public interface PagadorPostalService {
 	 * @return
 	 * @throws NotFoundException
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	public PagadorPostalDto update(PagadorPostalDto postal) throws NotFoundException;
 
 	/**
@@ -52,7 +52,7 @@ public interface PagadorPostalService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	public PagadorPostalDto delete(Long id) throws NotFoundException;
 
 	/**
@@ -62,7 +62,7 @@ public interface PagadorPostalService {
 	 *            Codi del procediment a trobar.
 	 * @return El pagador postal amb el codi especificat o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
 	public PagadorPostalDto findById(Long id);
 
 	/**
@@ -76,7 +76,7 @@ public interface PagadorPostalService {
 	 *            	Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina amb els pagadors postals.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	public PaginaDto<PagadorPostalDto> findAmbFiltrePaginat(
 			Long entitatId,
 			PagadorPostalFiltreDto filtre,
@@ -87,7 +87,7 @@ public interface PagadorPostalService {
 	 * 
 	 * @return La llista dels pagadors postals.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
 	public List<PagadorPostalDto> findAll();
 	
 	/**
@@ -95,10 +95,10 @@ public interface PagadorPostalService {
 	 * 
 	 * @return La llista dels pagadors postals.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
 	public List<PagadorPostalDto> findByEntitat(Long entitatId);
 
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public Object findByEntitatAndOrganGestor(EntitatDto entitat, OrganGestorDto organGestor);
 
 	/**
@@ -108,7 +108,7 @@ public interface PagadorPostalService {
 	 *            Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina de pagadors postals.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	public PaginaDto<PagadorPostalDto> findAllPaginat(PaginacioParamsDto paginacioParams);
 
 }

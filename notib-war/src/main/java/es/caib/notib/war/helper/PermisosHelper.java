@@ -57,7 +57,7 @@ public class PermisosHelper {
 		Map<RolEnumDto, Boolean> permisos = entitatService.getPermisosEntitatsUsuariActual();
 		request.setAttribute(
 				"permisUsuariEntitat",
-				permisos.get(RolEnumDto.NOT_USER));
+				permisos.get(RolEnumDto.tothom));
 		request.setAttribute(
 				"permisAdminEntitat",
 				permisos.get(RolEnumDto.NOT_ADMIN));

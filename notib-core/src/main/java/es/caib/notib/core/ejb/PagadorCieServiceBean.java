@@ -35,31 +35,31 @@ public class PagadorCieServiceBean implements PagadorCieService {
 	PagadorCieService delegate;
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PagadorCieDto create(Long entitatId, PagadorCieDto cie) {
 		return delegate.create(entitatId, cie);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PagadorCieDto update(PagadorCieDto cie) throws NotFoundException {
 		return delegate.update(cie);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PagadorCieDto delete(Long id) throws NotFoundException {
 		return delegate.delete(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public PagadorCieDto findById(Long id) {
 		return delegate.findById(id);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PaginaDto<PagadorCieDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			PagadorCieFiltreDto filtre,
@@ -71,25 +71,25 @@ public class PagadorCieServiceBean implements PagadorCieService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<PagadorCieDto> findAll() {
 		return delegate.findAll();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PaginaDto<PagadorCieDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		return delegate.findAllPaginat(paginacioParams);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public List<PagadorCieDto> findByEntitat(Long entitatId) {
 		return delegate.findByEntitat(entitatId);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public Object findByEntitatAndOrganGestor(EntitatDto entitat, OrganGestorDto organGestor) {
 		return delegate.findByEntitatAndOrganGestor(entitat, organGestor);
 	}

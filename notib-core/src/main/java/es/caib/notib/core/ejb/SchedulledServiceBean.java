@@ -27,25 +27,25 @@ public class SchedulledServiceBean implements SchedulledService {
 	SchedulledService delegate;
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public void notificaEnviamentsRegistrats() {
 		delegate.notificaEnviamentsRegistrats();
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public void registrarEnviamentsPendents() throws RegistreNotificaException {
 		delegate.registrarEnviamentsPendents();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public void enviamentRefrescarEstatPendents() {
 		delegate.enviamentRefrescarEstatPendents();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public void enviamentRefrescarEstatEnviatSir() {
 		delegate.enviamentRefrescarEstatEnviatSir();
 	}

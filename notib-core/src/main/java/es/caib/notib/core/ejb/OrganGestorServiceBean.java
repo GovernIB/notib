@@ -38,31 +38,31 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	OrganGestorService delegate;
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public OrganGestorDto create(OrganGestorDto dto) {
 		return delegate.create(dto);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public OrganGestorDto delete(Long entitatId, Long organId) {
 		return delegate.delete(entitatId, organId);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public void updateNom(Long entitatId, String organGestorCodi) {
 		delegate.updateNom(entitatId, organGestorCodi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public void updateNoms(Long entitatId, String organActualCodiDir3) {
 		delegate.updateNoms(entitatId,organActualCodiDir3);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public boolean organGestorEnUs(Long organId) {
 		return delegate.organGestorEnUs(organId);
 	}
@@ -74,7 +74,7 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public OrganGestorDto findById(Long entitatId, Long id) {
 		return delegate.findById(entitatId, id);
 	}
@@ -91,25 +91,25 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public List<CodiValorDto> findOrgansGestorsCodiByEntitat(Long entitatId) {
 		return delegate.findOrgansGestorsCodiByEntitat(entitatId);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public List<OrganGestorDto> findByProcedimentIds(List<Long> procedimentIds) {
 		return delegate.findByProcedimentIds(procedimentIds);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public List<OrganGestorDto> findDescencentsByCodi(Long entitatId, String organCodi) {
 		return delegate.findDescencentsByCodi(entitatId, organCodi);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			String organCodiDir3,
@@ -139,19 +139,19 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public List<OrganismeDto> findOrganismes(EntitatDto entitat) {
 		return delegate.findOrganismes(entitat);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_USER"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public List<OrganismeDto> findOrganismes(EntitatDto entitat, OrganGestorDto organGestor) {
 		return delegate.findOrganismes(entitat, organGestor);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "NOT_USER", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public String findDenominacioOrganisme(String codiDir3) {
 		return delegate.findDenominacioOrganisme(codiDir3);
 	}

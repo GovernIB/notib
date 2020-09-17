@@ -14,6 +14,6 @@ public interface RegistreService {
 	 *            Informació del procediment a crear.
 	 * @return El procediment creat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('NOT_USER') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
 	public void registrarSortida(RegistreAnotacioDto registreAnotacio);
 }

@@ -86,7 +86,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			
-			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i
+			//TODO: Si es tothom comprovar que és administrador d'Organ i
 			//		que l'Organ que crea es fill d'almenys un dels Organs que administra 
 			
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
@@ -117,7 +117,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			
-			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i
+			//TODO: Si es tothom comprovar que és administrador d'Organ i
 			//		verificar que almenys un dels organs que administra es pare del que vol eliminar.
 			
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(

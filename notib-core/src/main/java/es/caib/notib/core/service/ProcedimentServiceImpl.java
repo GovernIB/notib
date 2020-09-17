@@ -1307,7 +1307,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					+ "id=" + id + ", "
 					+ "permis=" + procedimentGrup + ")");
 			
-			//TODO: en cas de NOT_USER, comprovar que sigui administrador d'Organ i que tant el grup com el procediment son de l'Organ.
+			//TODO: en cas de tothom, comprovar que sigui administrador d'Organ i que tant el grup com el procediment son de l'Organ.
 			
 			ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
 					entitatId,
@@ -1341,7 +1341,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					+ "id=" + id + ", "
 					+ "permis=" + procedimentGrup + ")");
 			
-			//TODO: en cas de NOT_USER, comprovar que sigui administrador d'Organ i que tant el grup com el procediment son de l'Organ.
+			//TODO: en cas de tothom, comprovar que sigui administrador d'Organ i que tant el grup com el procediment son de l'Organ.
 			
 			ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
 					entitatId,
@@ -1374,7 +1374,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					+ "entitatId=" + entitatId +  ", "
 					+ "procedimentGrupID=" + procedimentGrupId + ")");
 			
-			//TODO: en cas de NOT_USER, comprovar que sigui administrador d'Organ i que tant el grup com el procediment son de l'Organ.
+			//TODO: en cas de tothom, comprovar que sigui administrador d'Organ i que tant el grup com el procediment son de l'Organ.
 			entityComprovarHelper.comprovarEntitat(
 					entitatId,
 					false,

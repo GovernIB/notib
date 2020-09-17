@@ -63,7 +63,7 @@ public class PagadorPostalServiceImpl implements PagadorPostalService{
 			logger.debug("Creant un nou pagador postal ("
 					+ "pagador=" + postal + ")");
 			
-			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que indica Organ al pagadorPostal i que es administrador de l'organ indicat
+			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al pagadorPostal i que es administrador de l'organ indicat
 			
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			OrganGestorEntity organGestor = null;
@@ -98,7 +98,7 @@ public class PagadorPostalServiceImpl implements PagadorPostalService{
 			logger.debug("Actualitzant pagador postal ("
 					+ "pagador=" + postal + ")");
 					
-			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que indica Organ al pagadorPostal i que es administrador de l'organ indicat
+			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al pagadorPostal i que es administrador de l'organ indicat
 
 			PagadorPostalEntity pagadorPostalEntity = entityComprovarHelper.comprovarPagadorPostal(postal.getId());
 			pagadorPostalEntity.update(
@@ -123,7 +123,7 @@ public class PagadorPostalServiceImpl implements PagadorPostalService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 
-			//TODO: Si es NOT_USER comprovar que és administrador d'Organ i que l'usuari es administrador de l'Organ associat al pagadorPostal a eliminar.
+			//TODO: Si es tothom comprovar que és administrador d'Organ i que l'usuari es administrador de l'Organ associat al pagadorPostal a eliminar.
 
 			PagadorPostalEntity pagadorPostalEntity = entityComprovarHelper.comprovarPagadorPostal(id);
 			pagadorPostalReposity.delete(id);
