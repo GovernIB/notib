@@ -30,7 +30,8 @@ public class AccesOrgansInterceptor extends HandlerInterceptorAdapter {
 			HttpServletResponse response,
 			Object handler) throws Exception {
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
-		if (!RolHelper.isUsuariActualAdministradorEntitat(request))
+		if (!RolHelper.isUsuariActualAdministradorEntitat(request) &&
+				!RolHelper.isUsuariActualUsuariAdministradorOrgan(request))
 			throw new SecurityException("L'usuari actual " + usuariActual.getCodi() + " no pot accedir a la gestió d'òrgans gestors", null);
 		
 		return true;

@@ -157,7 +157,7 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN"})
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public LlibreDto getLlibreOrganisme(Long entitatId, String organGestorDir3Codi) {
 		return delegate.getLlibreOrganisme(entitatId, organGestorDir3Codi);
 	}

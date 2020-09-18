@@ -118,7 +118,7 @@ public interface OrganGestorService {
 	 * 
 	 * @return La llista dels codis d'assumpte.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public LlibreDto getLlibreOrganisme(
 			Long entitatId,
 			String organGestorDir3Codi);
