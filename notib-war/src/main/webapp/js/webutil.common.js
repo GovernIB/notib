@@ -18,15 +18,16 @@ function addDefault(option) {
 	if (option && option.length > 0) {
 			var items = [];
 			$.each(option, function(i, val) {
-				items.push({
-					"id": val,
-					"text": val
-				});
+//				items.push({
+//					"id": val.valor,
+//					"text": val.desc
+//				});
+				debugger
 				var selected = $('#tipusDocDefaultSelected').val();
-				if (val == selected) {
-					selOrganismes.append("<option value=\"" + val + "\" selected='true'>" + val + "</option>");
+				if (val.valor == selected) {
+					selOrganismes.append("<option value=\"" + val.valor + "\" selected='true'>" + val.desc + "</option>");
 				} else {
-					selOrganismes.append("<option value=\"" + val + "\">" + val + "</option>");
+					selOrganismes.append("<option value=\"" + val.valor + "\">" + val.desc + "</option>");
 				}
 			});
 	}
@@ -386,17 +387,19 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		    minimumResultsForSearch: $(this).data('minimumresults')
 		});
 		
+		// Unicament per tipus de document de l'entitat!!!
 		if (selectValue !== undefined) {
 			addDefault(selectValue);
 			var vals = selectValue;
-
+			var values = [];
 			if(!!vals) {
-				vals.forEach(function(e){
-					if(!s2.find('option:contains(' + e + ')').length) 
-					  s2.append($('<option>').text(e));
-					});
+				vals.forEach(function(v){
+					values.push(v.valor);
+					if(!s2.find('option:contains(' + v.desc + ')').length) 
+					  s2.append($('<option value="' + v.valor + '">').text(v.desc));
+				});
 			}
-			s2.val(vals).trigger("change"); 
+			s2.val(values).trigger("change"); 
 		}
 		$(this).on('select2:open', function() {
 			webutilModalAdjustHeight();

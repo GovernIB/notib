@@ -6,6 +6,7 @@ package es.caib.notib.war.controller;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,7 +22,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
+import es.caib.notib.core.api.dto.CodiValorDescDto;
+import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
@@ -32,6 +37,8 @@ import es.caib.notib.war.command.EntitatCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EntitatHelper;
+import es.caib.notib.war.helper.MessageHelper;
+import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RolHelper;
 
 /**
@@ -86,6 +93,7 @@ public class EntitatController extends BaseController {
 			entitat = entitatService.findById(entitatId);
 		}
 		if (entitat != null) {
+		
 			EntitatCommand command = EntitatCommand.asCommand( entitat );
 			model.addAttribute("tipusDocumentDefault", command.getTipusDocDefault());
 			model.addAttribute("oficinaSelected", command.getOficina());
@@ -208,18 +216,16 @@ public class EntitatController extends BaseController {
 	
 	@RequestMapping(value = "/{entitatId}/tipusDocument", method = RequestMethod.GET)
 	@ResponseBody
-	public String[] getTipusDocument(
+	public CodiValorDescDto[] getTipusDocument(
 			@PathVariable Long entitatId,
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
-		String[] tipusDoc = null;
+		CodiValorDescDto[] tipusDoc = null;
 		List<TipusDocumentDto> tipusDocuments = entitatService.findTipusDocumentByEntitat(entitatId);
-		
 		if (tipusDocuments != null && !tipusDocuments.isEmpty()) {
-			tipusDoc = new String[tipusDocuments.size()];
+			tipusDoc = new CodiValorDescDto[tipusDocuments.size()];
 			for (int i = 0; i < tipusDocuments.size(); i++) {
-				tipusDoc[i] = tipusDocuments.get(i).getTipusDocEnum().name();
-				
+				tipusDoc[i] = new CodiValorDescDto(String.valueOf(i),tipusDocuments.get(i).getTipusDocEnum().name(),MessageHelper.getInstance().getMessage("tipus.document.enum." + tipusDocuments.get(i).getTipusDocEnum().name(),null,getLocale(request)));
 			}
 		}
 		return tipusDoc;
@@ -232,6 +238,21 @@ public class EntitatController extends BaseController {
 		Model model,
 		@PathVariable String dir3codi) {
 		return entitatService.findOficinesEntitat(dir3codi);
+	}
+	
+	@RequestMapping(value = "/localerequest", method = RequestMethod.GET)
+	@ResponseBody
+	private Locale getLocale(
+		HttpServletRequest request) {
+		LocaleResolver localeResolver = RequestContextUtils
+				.getLocaleResolver(request);
+		Locale locale;
+		if (localeResolver != null) {
+			locale = localeResolver.resolveLocale(request);
+		} else {
+			locale = request.getLocale();
+		}
+		return locale;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(EntitatController.class);
