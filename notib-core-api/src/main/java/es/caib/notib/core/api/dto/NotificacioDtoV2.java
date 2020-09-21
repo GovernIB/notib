@@ -25,6 +25,8 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
 	private String concepte;
 	private String descripcio;
+	private String organGestor;
+	private String organGestorNom;
 	private Date enviamentDataProgramada;
 	private Integer retard;
 	protected int notificaEnviamentIntent;
@@ -54,6 +56,12 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	
 	public boolean isNotificaError() {
 		return notificaErrorData != null;
+	}
+	
+	public String getOrganGestorDesc() {
+		if (organGestorNom != null && !organGestorNom.isEmpty())
+			return organGestor + " - " + organGestorNom;
+		return organGestor;
 	}
 
 	@Override

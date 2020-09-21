@@ -16,7 +16,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import lombok.Getter;
 
 /**
- * Classe de model de dades que conté la informació dels procediments.
+ * Classe de model de dades que conté la informació dels òrgans gestors.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */

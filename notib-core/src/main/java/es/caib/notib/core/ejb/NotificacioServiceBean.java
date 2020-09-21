@@ -158,6 +158,8 @@ public class NotificacioServiceBean implements NotificacioService {
 			boolean isAdministradorOrgan,
 			List<String> codisProcedimentsDisponibles,
 			List<String> codisProcedimentsProcessables,
+			String organGestorCodi,
+			String usuariCodi,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findAmbFiltrePaginat(
@@ -168,6 +170,8 @@ public class NotificacioServiceBean implements NotificacioService {
 				isAdministradorOrgan,
 				codisProcedimentsDisponibles,
 				codisProcedimentsProcessables,
+				organGestorCodi,
+				usuariCodi,
 				filtre,
 				paginacioParams);
 	}

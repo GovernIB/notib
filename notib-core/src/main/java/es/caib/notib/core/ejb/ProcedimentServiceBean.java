@@ -138,6 +138,12 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public boolean procedimentAmbGrups(Long procedimentId) {
+		return delegate.procedimentAmbGrups(procedimentId);
+	}
+	
+	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
 	public List<ProcedimentGrupDto> findAllGrups() {
 		return delegate.findAllGrups();

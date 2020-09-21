@@ -323,6 +323,19 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 	}
 	
+	@Override
+	@Transactional(readOnly = true)
+	public boolean procedimentAmbGrups(Long procedimentId) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			//Compravar si agrupar
+			ProcedimentEntity procediment = procedimentRepository.findById(procedimentId);
+			return procediment.isAgrupar();
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
 	private String findDenominacioOrganisme(String codiDir3) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -1323,6 +1336,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					grup).build();
 			
 			grupProcedimentRepository.saveAndFlush(grupProcedimentEntity);
+			cacheHelper.evictFindProcedimentsWithPermis();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1358,6 +1372,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			grupProcedimentEntity.update(procediment, grup);
 			
 			grupProcedimentRepository.saveAndFlush(grupProcedimentEntity);
+			cacheHelper.evictFindProcedimentsWithPermis();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1384,6 +1399,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			GrupProcedimentEntity grupProcedimentEntity = grupProcedimentRepository.findOne(procedimentGrupId);
 			
 			grupProcedimentRepository.delete(grupProcedimentEntity);
+			cacheHelper.evictFindProcedimentsWithPermis();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

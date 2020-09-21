@@ -160,6 +160,8 @@ public interface ProcedimentService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public boolean procedimentEnUs(Long procedimentId);
 
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	public boolean procedimentAmbGrups(Long procedimentId);
 	/**
 	 * Llistat amb tots els grups.
 	 * 

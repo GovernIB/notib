@@ -13,6 +13,7 @@ public class NotFoundException extends RuntimeException {
 
 	private Object objectId;
 	private Class<?> objectClass;
+	private String message;
 	
 	public NotFoundException(
 			Object objectId,
@@ -20,6 +21,16 @@ public class NotFoundException extends RuntimeException {
 		super(getExceptionMessage(objectId, objectClass));
 		this.objectId = objectId;
 		this.objectClass = objectClass;
+	}
+	
+	public NotFoundException(
+			Object objectId,
+			Class<?> objectClass,
+			String message) {
+		super(getExceptionMessage(objectId, objectClass, message));
+		this.objectId = objectId;
+		this.objectClass = objectClass;
+		this.message = message;
 	}
 
 	public Object getObjectId() {
@@ -30,10 +41,26 @@ public class NotFoundException extends RuntimeException {
 		return objectClass;
 	}
 
+	public String getMessage() {
+		return message;
+	}
+	
 	public static String getExceptionMessage(
 			Object objectId,
 			Class<?> objectClass) {
+		return getExceptionMessage(
+				objectId, 
+				objectClass, 
+				null);
+	}
+	
+	public static String getExceptionMessage(
+			Object objectId,
+			Class<?> objectClass,
+			String message) {
 		StringBuilder sb = new StringBuilder();
+		if (message != null)
+			sb.append(message + ". ");
 		if (objectClass != null)
 			sb.append(objectClass.getName());
 		else

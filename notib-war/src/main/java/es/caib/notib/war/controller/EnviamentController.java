@@ -155,6 +155,7 @@ public class EnviamentController extends BaseUserController {
 		boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
 		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		String organGestorCodi = null;
 //		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 		
 		List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
@@ -176,6 +177,7 @@ public class EnviamentController extends BaseUserController {
 			}
 			if (isAdminOrgan) {
 				OrganGestorDto organGestorActual = getOrganGestorActual(request);
+				organGestorCodi = organGestorActual.getCodi();
 				procedimentsDisponibles = procedimentService.findByOrganGestorIDescendents(entitatActual.getId(), organGestorActual);
 				for(ProcedimentDto procediment: procedimentsDisponibles) {
 					codisProcedimentsDisponibles.add(procediment.getCodi());
@@ -187,7 +189,9 @@ public class EnviamentController extends BaseUserController {
 					isUsuari, 
 					isUsuariEntitat,
 					isAdminOrgan,
-					codisProcedimentsDisponibles, 
+					codisProcedimentsDisponibles,
+					organGestorCodi,
+					usuariActual.getCodi(),
 					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 

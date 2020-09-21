@@ -1392,10 +1392,13 @@ public class PluginHelper {
 			organisme = notificacio.getEntitat().getDir3CodiReg();
 		} else {
 			dir3Codi = notificacio.getEmisorDir3Codi();
-			organisme = notificacio.getProcediment().getOrganGestor();
+			if (notificacio.getProcediment() != null)
+				organisme = notificacio.getProcediment().getOrganGestor();
+			else 
+				organisme = notificacio.getOrganGestor();
 		}
 		
-		if (notificacio.getProcediment().getOficina() != null) {
+		if (notificacio.getProcediment() != null && notificacio.getProcediment().getOficina() != null) {
 			dadesOficina.setOficinaCodi(notificacio.getProcediment().getOficina());
 		} else {
 			//oficina virtual
@@ -1409,17 +1412,23 @@ public class PluginHelper {
 			}
 		}
 		
-		if (notificacio.getProcediment().getLlibre() != null) {
+		if (notificacio.getProcediment() != null && notificacio.getProcediment().getLlibre() != null) {
 			dadesOficina.setLlibreCodi(notificacio.getProcediment().getLlibre());
 		} else {
-			if (notificacio.getProcediment().getOrganGestor() != null) {
+			String organGestor = null;
+			if (notificacio.getProcediment() != null) {
+				organGestor = notificacio.getProcediment().getOrganGestor();
+			} else {
+				organGestor = notificacio.getOrganGestor();
+			}
+			if (organGestor != null) {
 				llibreOrganisme = llistarLlibreOrganisme(
 						dir3Codi,
-						notificacio.getProcediment().getOrganGestor());
-			}
-			if (llibreOrganisme != null) {
-				String llibreCodi = llibreOrganisme.getCodi();
-				dadesOficina.setLlibreCodi(llibreCodi);
+						organGestor);
+				if (llibreOrganisme != null) {
+					String llibreCodi = llibreOrganisme.getCodi();
+					dadesOficina.setLlibreCodi(llibreCodi);
+				}
 			}
 		}
 		
@@ -1448,14 +1457,14 @@ public class PluginHelper {
 		
 		List<TipusAssumpte> tipusAssumpte = llistarTipusAssumpte(dir3Codi);
 		
-		if(notificacio.getProcediment().getTipusAssumpte() != null) {
+		if(notificacio.getProcediment() != null && notificacio.getProcediment().getTipusAssumpte() != null) {
 			dadesAnotacio.setTipusAssumpte(notificacio.getProcediment().getTipusAssumpte());
 		} else if (tipusAssumpte != null && ! tipusAssumpte.isEmpty()) {
 			String tipusAssumpteCodi = tipusAssumpte.get(0).getCodi();
 			dadesAnotacio.setTipusAssumpte(tipusAssumpteCodi);
 		}
 		
-		if(notificacio.getProcediment().getCodiAssumpte() != null) {
+		if(notificacio.getProcediment() != null && notificacio.getProcediment().getCodiAssumpte() != null) {
 			dadesAnotacio.setCodiAssumpte(notificacio.getProcediment().getCodiAssumpte());
 		} else if (tipusAssumpte != null && ! tipusAssumpte.isEmpty()) {
 			List<CodiAssumpte> codisAssumpte = llistarCodisAssumpte(
@@ -1501,7 +1510,10 @@ public class PluginHelper {
 			organisme = notificacio.getEntitat().getDir3CodiReg();
 		} else {
 			dir3Codi = notificacio.getEmisorDir3Codi();
-			organisme = notificacio.getProcediment().getOrganGestor() != null ? notificacio.getProcediment().getOrganGestor().getCodi() : null;
+			if (notificacio.getProcediment() != null)
+				organisme = notificacio.getProcediment().getOrganGestor() != null ? notificacio.getProcediment().getOrganGestor().getCodi() : null;
+			else
+				organisme = notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null;
 		}
 		
 		setOficina(
@@ -1544,10 +1556,12 @@ public class PluginHelper {
 		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper
 		 * 3 = Documentació adjunta digitalitzada */
 		registre.setTipoDocumentacionFisicaCodigo(3L);
-		registre.setTipoAsunto(notificacio.getProcediment().getTipusAssumpte());
-		registre.setTipoAsuntoDenominacion(notificacio.getProcediment().getTipusAssumpte());
-		registre.setCodigoAsunto(notificacio.getProcediment().getCodiAssumpte());
-		registre.setCodigoAsuntoDenominacion(notificacio.getProcediment().getCodiAssumpte());
+		if (notificacio.getProcediment() != null) {
+			registre.setTipoAsunto(notificacio.getProcediment().getTipusAssumpte());
+			registre.setTipoAsuntoDenominacion(notificacio.getProcediment().getTipusAssumpte());
+			registre.setCodigoAsunto(notificacio.getProcediment().getCodiAssumpte());
+			registre.setCodigoAsuntoDenominacion(notificacio.getProcediment().getCodiAssumpte());
+		}
 		registre.setIdioma(1L);
 //		registre.setReferenciaExterna(notificacio.getRefExterna());
 		registre.setNumeroExpediente(notificacio.getNumExpedient());
@@ -1567,7 +1581,8 @@ public class PluginHelper {
 		}else {
 			registre.setTipoTransporte("07");
 		}
-		registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
+		if (notificacio.getProcediment() != null)
+			registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
 		registre.setCodigoUsuario(notificacio.getUsuariCodi());
 		registre.setAplicacionTelematica("NOTIB");
 		registre.setAplicacion("RWE");
@@ -1610,7 +1625,10 @@ public class PluginHelper {
 			organisme = notificacio.getEntitat().getDir3CodiReg();
 		} else {
 			dir3Codi = notificacio.getEmisorDir3Codi();
-			organisme = notificacio.getProcediment().getOrganGestor() != null ? notificacio.getProcediment().getOrganGestor().getCodi() : null;
+			if (notificacio.getProcediment() != null)
+				organisme = notificacio.getProcediment().getOrganGestor() != null ? notificacio.getProcediment().getOrganGestor().getCodi() : null;
+			else
+				organisme = notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null;
 		}
 		
 		logger.debug("Recuperant informació de l'oficina i registre...");
@@ -1653,10 +1671,12 @@ public class PluginHelper {
 		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper
 		 * 3 = Documentació adjunta digitalitzada */
 		registre.setTipoDocumentacionFisicaCodigo(3L);
-		registre.setTipoAsunto(notificacio.getProcediment().getTipusAssumpte());
-		registre.setTipoAsuntoDenominacion(notificacio.getProcediment().getTipusAssumpte());
-		registre.setCodigoAsunto(notificacio.getProcediment().getCodiAssumpte());
-		registre.setCodigoAsuntoDenominacion(notificacio.getProcediment().getCodiAssumpte());
+		if (notificacio.getProcediment() != null) {
+			registre.setTipoAsunto(notificacio.getProcediment().getTipusAssumpte());
+			registre.setTipoAsuntoDenominacion(notificacio.getProcediment().getTipusAssumpte());
+			registre.setCodigoAsunto(notificacio.getProcediment().getCodiAssumpte());
+			registre.setCodigoAsuntoDenominacion(notificacio.getProcediment().getCodiAssumpte());
+		}
 		registre.setIdioma(1L);
 //		registre.setReferenciaExterna(notificacio.getRefExterna());
 		registre.setNumeroExpediente(notificacio.getNumExpedient());
@@ -1676,7 +1696,8 @@ public class PluginHelper {
 		}else {
 			registre.setTipoTransporte("07");
 		}
-		registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
+		if (notificacio.getProcediment() != null)
+			registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
 		registre.setCodigoUsuario(notificacio.getUsuariCodi());
 		registre.setAplicacionTelematica("NOTIB");
 		registre.setAplicacion("RWE");
@@ -1979,19 +2000,25 @@ public class PluginHelper {
 			NotificacioEntity notificacio,
 			DadesOficina dadesOficina,
 			String dir3Codi) throws RegistrePluginException {
-		if (notificacio.getProcediment().getOrganGestor().getLlibre() != null) {
+		if (notificacio.getProcediment() != null && notificacio.getProcediment().getOrganGestor().getLlibre() != null) {
 			dadesOficina.setLlibreCodi(notificacio.getProcediment().getOrganGestor().getLlibre());
 			dadesOficina.setLlibreNom(notificacio.getProcediment().getOrganGestor().getLlibreNom());
 		} else {
 			LlibreDto llibreOrganisme = null;
-			if (notificacio.getProcediment().getOrganGestor() != null) {
+			String organGestor = null;
+			if (notificacio.getProcediment() != null) {
+				organGestor = notificacio.getProcediment().getOrganGestor().getCodi();
+			} else if (notificacio.getOrganGestor() != null) {
+				organGestor = notificacio.getOrganGestor().getCodi();
+			}
+			if (organGestor != null) {
 				llibreOrganisme = llistarLlibreOrganisme(
 						dir3Codi,
-						notificacio.getProcediment().getOrganGestor().getCodi());
-			}
-			if (llibreOrganisme != null) {
-				dadesOficina.setLlibreCodi(llibreOrganisme.getCodi());
-				dadesOficina.setLlibreNom(llibreOrganisme.getNomCurt());
+						organGestor);
+				if (llibreOrganisme != null) {
+					dadesOficina.setLlibreCodi(llibreOrganisme.getCodi());
+					dadesOficina.setLlibreNom(llibreOrganisme.getNomCurt());
+				}
 			}
 		}
 		if (dadesOficina.getLlibreCodi() == null) {

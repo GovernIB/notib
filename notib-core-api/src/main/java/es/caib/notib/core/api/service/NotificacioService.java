@@ -91,6 +91,8 @@ public interface NotificacioService {
 			boolean isAdministradorOrgan,
 			List<String> codisProcedimentsDisponibles,
 			List<String> codisProcedimentsProcessables,
+			String organGestorCodi,
+			String usuariCodi,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
 	

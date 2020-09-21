@@ -59,6 +59,8 @@ public class EnviamentServiceBean implements EnviamentService {
 			boolean isUsuariEntitat,
 			boolean isAdminOrgan, 
 			List<String> codisProcedimentsDisponibles,
+			String organGestorCodi,
+			String usuariCodi,
 			NotificacioEnviamentFiltreDto filtre, 
 			PaginacioParamsDto paginacio)
 			throws ParseException {
@@ -68,6 +70,8 @@ public class EnviamentServiceBean implements EnviamentService {
 				isUsuariEntitat, 
 				isAdminOrgan,
 				codisProcedimentsDisponibles,
+				organGestorCodi,
+				usuariCodi,
 				filtre, 
 				paginacio);
 	}
