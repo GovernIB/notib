@@ -46,6 +46,9 @@ public class ProcedimentDto extends AuditoriaDto implements Serializable{
 		return organGestor;
 	}
 	
+	public String getDescripcio() {
+		return codi + " - " + nom;
+	}
 	private static final long serialVersionUID = 6058789232924135932L;
 
 }

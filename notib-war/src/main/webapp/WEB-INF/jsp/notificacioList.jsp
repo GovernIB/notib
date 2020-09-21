@@ -380,7 +380,7 @@ $(document).ready(function() {
 				<not:inputSelect name="organGestor" optionItems="${organsGestorsPermisLectura}" optionValueAttribute="codi" optionTextAttribute="nom" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 			<div class="col-md-6">
-				<not:inputSelect name="procedimentId" optionItems="${procedimentsPermisLectura}" optionValueAttribute="id" optionTextAttribute="nom" placeholderKey="notificacio.list.filtre.camp.procediment" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
+				<not:inputSelect name="procedimentId" optionItems="${procedimentsPermisLectura}" optionValueAttribute="id" optionTextAttribute="descripcio" placeholderKey="notificacio.list.filtre.camp.procediment" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 		</div>
 		<div class="row">
