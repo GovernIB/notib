@@ -55,21 +55,38 @@
 </style>
 <script type="text/javascript">
 $(document).ready(function() {
+
 	var entitatId = document.getElementById('id').value;
 	if (entitatId != '') {
+		
+		
 		var getUrl = "<c:url value="/entitat/"/>" + entitatId + "/tipusDocument";
 		 $.get(getUrl).done(function(data) {
-			$('.customSelect').webutilInputSelect2(data);
+			 var dataMod =[]
+			 
+		 	$("#tipusDocName").webutilInputSelect2(data);
 		 });
 	} else {
-		$('.customSelect').webutilInputSelect2(null);
+		$("#tipusDocName").webutilInputSelect2(null);
 	}
+	
+	$("#tipusDocName").webutilInputSelect2();
 	
 	var data = new Array();
 	
 	$('.customSelect').on("select2:select select2:unselect select2-loaded", function (e) {
-	    var items = $(this).val();
-	    addDefault(items);
+		var data = [];
+		$.each($("#tipusDocName :selected"), function(index, option) {
+			data[index] = {
+				    'valor': option.value,
+				    'desc': option.text,
+				};
+			
+				    	      
+		});
+	    addDefault(data);
+
+	  
 	});
 	
 	$('#colorFons, #colorLletra').colorpicker();
@@ -155,9 +172,13 @@ $(document).ready(function() {
 				<div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>">
 					<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/> *</label>
 					<div class="controls col-xs-8">
-						<select name="tipusDocName" class="customSelect" multiple>
+						<select name="tipusDocName" id="tipusDocName" class="customSelect" multiple>
 						<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
-							<option value="${enumValue}" selected>${enumValue}</option>
+<%-- 							<c:set var="documentVar"> --%>
+<%-- 						      <spring:message code="tipus.document.enum.${enumValue}" /> --%>
+<%-- 						  	</c:set>   --%>
+							<option value="${enumValue}" selected><spring:message code="tipus.document.enum.${enumValue}" /></option>
+<%-- 							<option value="${enumValue}" selected>${enumValue}</option> --%>
 						</c:forEach>
 						</select>
 						<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="tipusDocName"/></p></c:if>
@@ -169,7 +190,7 @@ $(document).ready(function() {
 		</div>
 		</div>
 		<div id="modal-botons" class="col-xs-12 text-right">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<button type="submit" id="submitBtn" class="btn btn-success" ><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<c:if test="${isRolActualAdministrador}">
 			<a href="<c:url value="/entitat"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 			</c:if>
