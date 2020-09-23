@@ -3,6 +3,8 @@
  */
 package es.caib.notib.war.controller;
 
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -12,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
@@ -62,6 +65,11 @@ public class UsuariController extends BaseController {
 					request,
 					"redirect:/",
 					"usuari.controller.modificat.ok");
+	}
+	@RequestMapping(value = "/configuracio/idioma", method = RequestMethod.GET)
+	@ResponseBody
+	public String getIdioma() {
+		return new Locale(SessioHelper.getIdioma(aplicacioService), Locale.getDefault().getCountry()).toLanguageTag();
 	}
 	
 }

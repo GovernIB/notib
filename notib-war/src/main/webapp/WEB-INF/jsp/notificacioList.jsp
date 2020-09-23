@@ -104,7 +104,8 @@
 	vertical-align: middle;
 }
 </style>
-<script type="text/javascript">
+<script type="text/javascript"> 
+
 var myHelpers = {recuperarEstatEnviament: returnEnviamentsStatusDiv};
 
 $.views.helpers(myHelpers);

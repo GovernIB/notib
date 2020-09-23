@@ -77,5 +77,10 @@ public class SessioHelper {
 	public static void setUsuariActual(HttpServletRequest request, UsuariDto usuari) {
 		request.getSession().setAttribute(SESSION_ATTRIBUTE_USUARI_ACTUAL, usuari);
 	}
+	
+	public static String getIdioma(
+			AplicacioService aplicacioService) {
+		return aplicacioService.getUsuariActual().getIdioma();
+	}
 
 }

@@ -83,7 +83,7 @@
 			var language = window.navigator.userLanguage || window.navigator.language;
 			var dataTableOptions = {
 				language: {
-					url: webutilContextPath() + '/js/datatables/i18n/datatables.' + language + '.json'
+					url: webutilContextPath() + '/js/datatables/i18n/datatables.' + userLanguage + '.json'
 				},
 				info: plugin.settings.infoEnabled,
 				serverSide: true,
