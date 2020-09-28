@@ -34,9 +34,10 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	
 	List<NotificacioEntity> findByProcedimentId(Long id);
 	
-	@Query(
+	@Query( "select ntf " +
 			"from " +
 			"    NotificacioEntity ntf " +
+			"     left outer join ntf.procediment pro " +
 			"where (ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " + 
 			"and (ntf.entitat = :entitat) ")
 //			"and (ntf.grupCodi = null) ")
@@ -45,9 +46,10 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("entitat") EntitatEntity entitat,
 			Pageable paginacio);
 	
-	@Query(
+	@Query( "select ntf " +
 			"from " +
 			"    NotificacioEntity ntf " +
+			"     left outer join ntf.procediment pro " +
 			"where (ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " + 
 			"and (ntf.grupCodi = null or (ntf.grupCodi in (:grupsProcedimentCodisNotib))) " +
 			"and (ntf.entitat = :entitat) " )
@@ -57,9 +59,10 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("entitat") EntitatEntity entitat,
 			Pageable paginacio);
 
-	@Query(
+	@Query( "select ntf " +
 			"from " +
 			"    NotificacioEntity ntf " +
+			"     left outer join ntf.procediment pro " +
 			"where ntf.entitat = (:entitatActual)")
 	Page<NotificacioEntity> findByEntitatActual(
 			@Param("entitatActual") EntitatEntity entitatActiva,

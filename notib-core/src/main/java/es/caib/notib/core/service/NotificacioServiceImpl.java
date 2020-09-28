@@ -442,6 +442,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 					false);
 			Page<NotificacioEntity> notificacions = null;
 			
+			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
+			mapeigPropietatsOrdenacio.put("procediment.organGestor", new String[] {"pro.organGestor.codi"});
+			mapeigPropietatsOrdenacio.put("procediment.organGestorDesc", new String[] {"pro.organGestor.codi"});
+			mapeigPropietatsOrdenacio.put("procediment.nom", new String[] {"pro.nom"});
+			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
+			
 			if (filtre == null) {
 				//Consulta les notificacions sobre les quals té permis l'usuari actual
 				if (isUsuari) {
@@ -450,25 +456,25 @@ public class NotificacioServiceImpl implements NotificacioService {
 								procedimentsCodisNotib, 
 								aplicacioService.findRolsUsuariActual(), 
 								entitatActual,
-								paginacioHelper.toSpringDataPageable(paginacioParams));
+								pageable);
 					}
 				//Consulta els notificacions de l'entitat acutal
 				} else if (isUsuariEntitat) {
 					notificacions = notificacioRepository.findByEntitatActual(
 							entitatActual,
-							paginacioHelper.toSpringDataPageable(paginacioParams));
+							pageable);
 				//Consulta totes les notificacions de les entitats actives
 				} else if (isAdministrador) {
 					List<EntitatEntity> entitatsActiva = entitatRepository.findByActiva(true);
 					notificacions = notificacioRepository.findByEntitatActiva(
 							entitatsActiva,
-							paginacioHelper.toSpringDataPageable(paginacioParams));
+							pageable);
 				} else if (isAdministradorOrgan) {
 					if (!procedimentsCodisNotib.isEmpty()) {
 						notificacions = notificacioRepository.findByProcedimentCodiNotibAndEntitat(
 								procedimentsCodisNotib, 
 								entitatActual,
-								paginacioHelper.toSpringDataPageable(paginacioParams));
+								pageable);
 					}
 				}
 			} else {
@@ -482,10 +488,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				if (filtre.getProcedimentId() != null) {
 					procediment = procedimentRepository.findById(filtre.getProcedimentId());
 				}
-				Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
-				mapeigPropietatsOrdenacio.put("procediment.organGestor", new String[] {"pro.organGestor.codi"});
-				mapeigPropietatsOrdenacio.put("procediment.nom", new String[] {"pro.nom"});
-				Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 				if (isUsuari) {
 					if (!procedimentsCodisNotib.isEmpty()) {
 						notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(

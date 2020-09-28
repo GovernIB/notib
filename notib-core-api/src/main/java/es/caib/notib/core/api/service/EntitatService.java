@@ -185,7 +185,7 @@ public interface EntitatService {
 	 * 
 	 * @return El un booleà per a cada rol: Usuari, Administrador d'entitats i Aplicació.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+//	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual();
 	/**
 	 * Consulta els permisos de l'entitat.

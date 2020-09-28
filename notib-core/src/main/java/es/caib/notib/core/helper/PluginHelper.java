@@ -1283,7 +1283,7 @@ public class PluginHelper {
 						// Recuperar csv
 						Map<String, Object> metadadesAddicionals = docDetall.getMetadades().getMetadadesAddicionals();
 						if (metadadesAddicionals != null && metadadesAddicionals.containsKey("csv")) {
-							document.setCsv((String) metadadesAddicionals.get("csv"));
+							annex.setCsv((String) metadadesAddicionals.get("csv"));
 						}
 					}
 				} else if (document.getCsv() != null){

@@ -162,7 +162,7 @@ public class EntitatServiceBean implements EntitatService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual() {
 		return delegate.getPermisosEntitatsUsuariActual();
 	}
