@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
 import es.caib.notib.war.command.PersonaCommand;
@@ -30,6 +31,8 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 
 	@Autowired
 	private AplicacioService aplicacioService;
+	@Autowired
+	private ProcedimentService procedimentService;
 	
 	@Override
 	public void initialize(final ValidNotificacio constraintAnnotation) {
@@ -83,7 +86,28 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 				context.disableDefaultConstraintViolation();
 				context.buildConstraintViolationWithTemplate(
 						MessageHelper.getInstance().getMessage("notificacio.form.comunicacio")).addConstraintViolation();
-			} 
+			}
+			
+			// Procediment
+			if (!comunicacioAmbAdministracio) {
+				if (notificacio.getProcedimentId() == null) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(
+							MessageHelper.getInstance().getMessage("notificacio.form.valid.procediment"))
+					.addNode("procedimentId")
+					.addConstraintViolation();
+				}
+			}
+			if (notificacio.getProcedimentId() != null) {
+				boolean procedimentAmbGrups = procedimentService.procedimentAmbGrups(notificacio.getProcedimentId());
+				if (procedimentAmbGrups && notificacio.getGrupId() == null) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(
+							MessageHelper.getInstance().getMessage("notificacio.form.valid.grup"))
+					.addNode("grupId")
+					.addConstraintViolation();
+				}
+			}
 			
 			// Validació de document
 			switch (notificacio.getTipusDocument()) {

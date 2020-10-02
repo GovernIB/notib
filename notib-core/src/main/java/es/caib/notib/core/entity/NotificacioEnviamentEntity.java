@@ -34,12 +34,10 @@ import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
-import es.caib.notib.core.api.ws.notificacio.Notificacio;
 import es.caib.notib.core.audit.NotibAuditable;
 import lombok.Getter;
 
@@ -525,7 +523,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 	
 	public static BuilderV1 getBuilderV1(
-			Enviament enviament, Notificacio notificacio, 
+			Enviament enviament, 
 			NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
 			NotificaDomiciliConcretTipusEnumDto tipusConcret,
 			ServeiTipusEnumDto tipusServei,
@@ -534,7 +532,6 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			List<PersonaEntity> destinataris) {
 		return new BuilderV1(
 				enviament,
-				notificacio,
 				numeracioTipus,
 				tipusConcret,
 				tipusServei,
@@ -547,7 +544,6 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public static BuilderV2 getBuilderV2(
 			Enviament enviament, 
 			boolean isAmbEntregaDeh,
-			NotificacioDtoV2 notificacio, 
 			NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
 			NotificaDomiciliConcretTipusEnumDto tipusConcret,
 			ServeiTipusEnumDto tipusServei,
@@ -557,7 +553,6 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		return new BuilderV2(
 				enviament,
 				isAmbEntregaDeh,
-				notificacio,
 				numeracioTipus,
 				tipusConcret,
 				tipusServei,
@@ -706,7 +701,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public static class BuilderV1 {
 		NotificacioEnviamentEntity built;
 		BuilderV1(
-				Enviament enviament, Notificacio notificacio, 
+				Enviament enviament, 
 				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
 				NotificaDomiciliConcretTipusEnumDto tipusConcret,
 				ServeiTipusEnumDto tipusServei,
@@ -770,7 +765,6 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		BuilderV2(
 				Enviament enviament, 
 				boolean isAmbEntregaDeh,
-				NotificacioDtoV2 notificacio, 
 				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
 				NotificaDomiciliConcretTipusEnumDto tipusConcret,
 				ServeiTipusEnumDto tipusServei,

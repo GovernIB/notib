@@ -288,11 +288,6 @@ body {
 					</ul>
 					<div class="clearfix"></div>
 					<div class="btn-toolbar navbar-btn navbar-right">
-						<c:if test="${isRolActualUsuari and permisNotificacio}">
-							<div class="btn-group">
-								<a data-toggle="modal" class="btn btn-primary" href="<c:url value="/notificacio/procediments"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.altanotificacio"/></a>
-							</div>
-						</c:if>
 						<div class="btn-group">
 							<c:if test="${isRolActualAdministrador}">
 <%-- 
@@ -319,6 +314,12 @@ body {
 							
 							</c:if>
 							<c:if test="${isRolActualUsuari}">
+<%-- 								<c:if test="${isRolActualUsuari and permisNotificacio}"> --%>
+									<div class="btn-group">
+<%-- 										<a data-toggle="modal" class="btn btn-primary" href="<c:url value="/notificacio/procediments"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.altanotificacio"/></a> --%>
+										<a class="btn btn-primary" href="<c:url value="/notificacio/new"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.altanotificacio"/></a>
+									</div>
+<%-- 								</c:if> --%>
 							
 <%-- 								<c:if test="${permisNotificacio}"> --%>
 <!-- 									<div class="btn-group"> -->

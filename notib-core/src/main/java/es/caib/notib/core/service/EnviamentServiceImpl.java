@@ -57,6 +57,7 @@ import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.ColumnesRepository;
@@ -98,6 +99,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private MessageHelper messageHelper;
 	@Autowired
 	private CallbackHelper callbackHelper;
+	@Autowired
+	private OrganigramaHelper organigramaHelper;
 	@Autowired
 	private AplicacioService aplicacioService;
 	@Autowired
@@ -376,6 +379,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 			boolean isUsuariEntitat,
 			boolean isAdminOrgan,
 			List<String> procedimentsCodisNotib,
+			String organGestorCodi,
+			String usuariCodi,
 			NotificacioEnviamentFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws ParseException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
@@ -433,7 +438,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			campsOrdre(paginacioParams);
 			
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
-			if (isUsuari && !procedimentsCodisNotib.isEmpty()) {
+			if (isUsuari) { // && !procedimentsCodisNotib.isEmpty()) {
 				enviament = notificacioEnviamentRepository.findByNotificacio(
 						filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 						filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
@@ -487,8 +492,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 						(procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty()),
 						procedimentsCodisNotib,
 						aplicacioService.findRolsUsuariActual(),
+						usuariCodi,
 						pageable);
-			} else if (isAdminOrgan && !procedimentsCodisNotib.isEmpty()) {
+			} else if (isAdminOrgan) { // && !procedimentsCodisNotib.isEmpty()) {
+				List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatEntity.getDir3Codi(), organGestorCodi);
 				enviament = notificacioEnviamentRepository.findByNotificacio(
 						filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 						filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
@@ -541,6 +548,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						dataRegistreFi,
 						(procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty()),
 						procedimentsCodisNotib,
+						organs,
 						pageable);
 			} else if (isUsuariEntitat) {
 				enviament = notificacioEnviamentRepository.findByNotificacio(

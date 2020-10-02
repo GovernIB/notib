@@ -54,7 +54,6 @@ public class EmailHelper {
 	private MessageHelper messageHelper;
 	
 	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws MessagingException {
-		logger.info("Desant emails del procediment (" + notificacio.getProcediment().getId() + ") per a l'enviament");
 		List<UsuariDto> destinataris = obtenirCodiDestinatarisPerProcediment(notificacio);
 		
 		String resposta = null;
@@ -184,7 +183,7 @@ public class EmailHelper {
 					"		</tr>"+	
 					"		<tr>"+
 					"			<th>"+ messageHelper.getMessage("notificacio.email.procediment") +"</th>"+
-					"			<td>"+ notificacio.getProcediment().getNom() + "</td>"+
+					"			<td>"+ notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : "----" + "</td>"+
 					"		</tr>"+	
 					"		<tr>"+
 					"			<th>"+ messageHelper.getMessage("notificacio.email.entitat") +"</th>"+
@@ -218,7 +217,7 @@ public class EmailHelper {
 				"\t"+messageHelper.getMessage("notificacio.email.notificacio.concepte") + 
 				"\t\t\t\t"+ Objects.toString(notificacio.getConcepte(), "") +"\n"+
 				"\t"+messageHelper.getMessage("notificacio.email.procediment")+
-				"\t\t\t\t"+ Objects.toString(notificacio.getProcediment().getNom(), "")+"\n"+
+				"\t\t\t\t"+ Objects.toString(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : "----", "")+"\n"+
 				"\t"+messageHelper.getMessage("notificacio.email.entitat")+
 				"\t\t\t\t"+ Objects.toString(notificacio.getEmisorDir3Codi(), "")+"\n"+
 				"\t"+messageHelper.getMessage("notificacio.email.estat.nou") + 
@@ -239,29 +238,31 @@ public class EmailHelper {
 		Set<String> usuaris = new HashSet<String>();
 		GrupEntity grup;
 		
-		if (notificacio.getGrupCodi() != null) {
-			grup = grupRepository.findByCodiAndEntitat(notificacio.getGrupCodi(), notificacio.getEntitat());
-			if (grup != null)
-				usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrupNotificacio(grup, notificacio.getProcediment());
-		} else {
-			List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepository.findByProcediment(notificacio.getProcediment());
-			
-			if (notificacio.getProcediment().isAgrupar() && !grupsProcediment.isEmpty()) {
-				usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrup(notificacio.getProcediment());
+		if (notificacio.getProcediment() != null) {
+			if (notificacio.getGrupCodi() != null) {
+				grup = grupRepository.findByCodiAndEntitat(notificacio.getGrupCodi(), notificacio.getEntitat());
+				if (grup != null)
+					usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrupNotificacio(grup, notificacio.getProcediment());
 			} else {
-				usuaris = procedimentHelper.findUsuarisAmbPermisReadPerProcediment(notificacio.getProcediment());
+				List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepository.findByProcediment(notificacio.getProcediment());
+				
+				if (notificacio.getProcediment().isAgrupar() && !grupsProcediment.isEmpty()) {
+					usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrup(notificacio.getProcediment());
+				} else {
+					usuaris = procedimentHelper.findUsuarisAmbPermisReadPerProcediment(notificacio.getProcediment());
+				}
 			}
-		}
-		
-		for (String usuari: usuaris) {
-			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
-			if (dadesUsuari != null && dadesUsuari.getEmail() != null) {
-				UsuariEntity user = usuariRepository.findOne(usuari);
-				if (user == null || user.isRebreEmailsNotificacio()) {
-					UsuariDto u = new UsuariDto();
-					u.setCodi(usuari);
-					u.setEmail(dadesUsuari.getEmail());
-					destinataris.add(u);
+			
+			for (String usuari: usuaris) {
+				DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
+				if (dadesUsuari != null && dadesUsuari.getEmail() != null) {
+					UsuariEntity user = usuariRepository.findOne(usuari);
+					if (user == null || user.isRebreEmailsNotificacio()) {
+						UsuariDto u = new UsuariDto();
+						u.setCodi(usuari);
+						u.setEmail(dadesUsuari.getEmail());
+						destinataris.add(u);
+					}
 				}
 			}
 		}

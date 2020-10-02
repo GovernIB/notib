@@ -38,25 +38,33 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"from " +
 			"    NotificacioEntity ntf " +
 			"     left outer join ntf.procediment pro " +
-			"where (ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " + 
-			"and (ntf.entitat = :entitat) ")
-//			"and (ntf.grupCodi = null) ")
-	Page<NotificacioEntity> findByProcedimentCodiNotibAndEntitat(
+			"where " +
+			"   ((:isProcNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib))" +
+			"   or (ntf.procedimentCodiNotib is null and ntf.usuariCodi = :usuariCodi)) " + 
+			"and (ntf.grupCodi = null or (ntf.grupCodi in (:grupsProcedimentCodisNotib))) " +
+			"and (ntf.entitat = :entitat) " )
+	Page<NotificacioEntity> findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
+			@Param("isProcNull") boolean isProcNull,
 			@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
+			@Param("grupsProcedimentCodisNotib") List<? extends String> grupsProcedimentCodisNotib,
 			@Param("entitat") EntitatEntity entitat,
+			@Param("usuariCodi") String usuariCodi,
 			Pageable paginacio);
 	
 	@Query( "select ntf " +
 			"from " +
 			"    NotificacioEntity ntf " +
 			"     left outer join ntf.procediment pro " +
-			"where (ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " + 
-			"and (ntf.grupCodi = null or (ntf.grupCodi in (:grupsProcedimentCodisNotib))) " +
-			"and (ntf.entitat = :entitat) " )
-	Page<NotificacioEntity> findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
+			"where " +
+			"   ((:isProcNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib))" +
+			"   or (ntf.procedimentCodiNotib is null and ntf.organGestor is not null and ntf.organGestor in (:organs))) " + 
+			"and (ntf.entitat = :entitat) ")
+//			"and (ntf.grupCodi = null) ")
+	Page<NotificacioEntity> findByProcedimentCodiNotibAndEntitat(
+			@Param("isProcNull") boolean isProcNull,
 			@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
-			@Param("grupsProcedimentCodisNotib") List<? extends String> grupsProcedimentCodisNotib,
 			@Param("entitat") EntitatEntity entitat,
+			@Param("organs") List<String> organs,
 			Pageable paginacio);
 
 	@Query( "select ntf " +
@@ -161,20 +169,22 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	List<NotificacioEntity> findNotificacionsPendentsDeNotificarByProcediment(
 			@Param("procediment") ProcedimentEntity procediment);
 
+	// TODO: Provar: Afegir notificacions sense procediment realitzades a un organ disponible per l'administrador d'òrgan actual
 	@Query(	"select ntf " +
 			"from " +
 			"     NotificacioEntity ntf " +
 			"     left outer join ntf.procediment pro " +
 			"where " +
 			"    (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
-			"and (ntf.procedimentCodiNotib in (:procedimentsCodisNotib))" +
+			"and ((:isProcNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib))" +
+			"   or (ntf.procedimentCodiNotib is null and ntf.organGestor is not null and ntf.organGestor in (:organs))) " + 
 			"and (:entitat = ntf.entitat) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
 			"and (:isEstatNull = true or ntf.estat = :estat) " +
 			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
 			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) "+
-			"and (:isOrganGestorNull = true or pro.organGestor = :organGestor) " +
+			"and (:isOrganGestorNull = true or ntf.organGestor = :organGestor) " +
 			"and (:isProcedimentNull = true or ntf.procediment = :procediment) " +
 			"and (:isTitularNull = true or (" +
 			"    select count(env.id) " +
@@ -193,6 +203,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	public Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotib(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
+			@Param("isProcNull") boolean isProcNull,
 			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
 			@Param("isEnviamentTipusNull") boolean isEnviamentTipusNull,
 			@Param("enviamentTipus") NotificaEnviamentTipusEnumDto enviamentTipus,
@@ -219,15 +230,18 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("creadaPer") String creadaPer,
 			@Param("isIdentificadorNull") boolean isIdentificadorNull,
 			@Param("identificador") String identificador,
+			@Param("organs") List<String> organs,
 			Pageable paginacio);
 	
+	// TODO: Afegir notificacions sense procediment realitzades per l'usuari actual
 	@Query(	"select ntf " +
 			"from " +
 			"     NotificacioEntity ntf " +
 			"     left outer join ntf.procediment pro " +
 			"where " +
 			"    (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
-			"and (ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " +
+			"and ((:isProcNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib))" +
+			"   or (ntf.procedimentCodiNotib is null and ntf.usuariCodi = :usuariCodi)) " + 
 			"and (ntf.grupCodi = null or (ntf.grupCodi in (:grupsProcedimentCodisNotib))) " +
 			"and (:entitat = ntf.entitat) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
@@ -235,7 +249,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:isEstatNull = true or ntf.estat = :estat) " +
 			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
 			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) "+
-			"and (:isOrganGestorNull = true or pro.organGestor = :organGestor) " +
+			"and (:isOrganGestorNull = true or ntf.organGestor = :organGestor) " +
 			"and (:isProcedimentNull = true or ntf.procediment = :procediment) " +
 			"and (:isTitularNull = true or (" +
 			"    select count(env.id) " +
@@ -254,6 +268,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	public Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
+			@Param("isProcNull") boolean isProcNull,
 			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
 			@Param("grupsProcedimentCodisNotib") List<String> grupsProcedimentCodisNotib,
 			@Param("isEnviamentTipusNull") boolean isEnviamentTipusNull,
@@ -281,6 +296,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("creadaPer") String creadaPer,
 			@Param("isIdentificadorNull") boolean isIdentificadorNull,
 			@Param("identificador") String identificador,
+			@Param("usuariCodi") String usuariCodi,
 			Pageable paginacio);
 	
 	@Query(	"select ntf " +
@@ -294,7 +310,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:isEstatNull = true or ntf.estat = :estat) " +
 			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
 			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) "+
-			"and (:isOrganGestorNull = true or pro.organGestor = :organGestor) " +
+			"and (:isOrganGestorNull = true or ntf.organGestor = :organGestor) " +
 			"and (:isProcedimentNull = true or ntf.procediment = :procediment) " +
 			"and (:isTitularNull = true or (" +
 			"    select count(env.id) " +

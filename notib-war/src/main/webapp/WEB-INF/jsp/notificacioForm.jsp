@@ -209,7 +209,11 @@ $(document).ready(function() {
     		$(this).find('.eliminar_enviament').removeClass('hidden');
     	}
     });
-    
+
+    $( "#form" ).submit(function( event ) {
+      $("#organGestor").prop("disabled", false);
+      return true;
+    });
     $('#tipusDocument').on('change', function() {
         if ($(this).val() == 'CSV') {
             $('#metadades').removeClass('hidden');
@@ -252,10 +256,81 @@ $(document).ready(function() {
     var procedimentId = $("#procedimentId").children(":selected").attr("value");
 
     $('#procedimentId').on('change', function() {
-        var agrupable = $(this).children(":selected").attr("class");
-        var procedimentId = $(this).children(":selected").attr("value");
-        comprovarGrups(agrupable, procedimentId)
-        webutilModalAdjustHeight();
+//         var agrupable = $(this).children(":selected").attr("class");
+//         var procedimentId = $(this).children(":selected").attr("value");
+//         comprovarGrups(agrupable, procedimentId)
+//         webutilModalAdjustHeight();
+		var procediment = $(this).val();
+		if (procediment == '') {
+			$("#organGestor").prop("disabled", false);
+		} else {
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value="/notificacio/procediment/"/>" + procediment + "/dades",
+				success: function(data) {
+					var select2Options = {
+							theme: 'bootstrap',
+							width: 'auto'};
+					// Òrgan gestor
+					$("#organGestor").val(data.organCodi).trigger("change");
+					$("#organGestor").prop("disabled", true);
+					// Caducitat
+					$("#caducitat").val(data.caducitat);
+					// Grups
+					var grups = data.grups;
+					var selGrups = $("#grupId");
+					selGrups.empty();
+					selGrups.append("<option value=\"\"></option>");
+					if (data.agrupable && grups && grups.length > 0) {
+						$.each(grups, function(i, val) {
+							selGrups.append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
+						});
+						selGrups.select2(select2Options);
+						$("#grups").removeClass("hidden");
+					} else {
+						$("#grups").addClass("hidden");
+					}
+					// TODO: Afegir formats de fulla i sobre
+					// Format fulla
+// 					var selFormatFulla = $("#grupId");
+// 					selFormatFulla.empty();
+// 					selFormatFulla.append("<option value=\"\"></option>");
+// 					var formatsFulla = data.formatsFulla;
+// 					if (grups && grups.ength > 0) {
+// 						$.each(grups, function(i, val) {
+// 							selGrups.append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
+// 						});
+// 					}
+// 					selGrups.select2(select2Options);
+<%--
+					// Format sobre
+					<div class="col-md-3 formatFulla">
+						<c:choose>
+							<c:when test="${not empty formatsFulla}">
+								<not:inputSelect name="enviaments[${j}].entregaPostal.formatFulla" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatfulla" optionItems="${formatsFulla}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>
+							</c:when>
+							<c:otherwise>
+								<not:inputText name="enviaments[${j}].entregaPostal.formatFulla" textKey="notificacio.form.camp.entregapostal.formatfulla" labelClass="labelcss" inputClass="inputcss"/>
+							</c:otherwise>
+						</c:choose>
+						</div>
+						<div class="col-md-3 formatSobre">
+						<c:choose>
+							<c:when test="${not empty formatsSobre}">
+								<not:inputSelect name="enviaments[${j}].entregaPostal.formatSobre" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatsobre" optionItems="${formatsSobre}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>
+							</c:when>
+							<c:otherwise>
+								<not:inputText name="enviaments[${j}].entregaPostal.formatSobre" textKey="notificacio.form.camp.entregapostal.formatsobre" labelClass="labelcss" inputClass="inputcss"/>
+							</c:otherwise>
+						</c:choose>	
+					</div>					
+--%>
+				},
+				error: function() {
+					console.log("error obtenint la informació del procediment...");
+				}
+			});
+		}	
     });
 
     //Add metadata
@@ -822,8 +897,41 @@ function actualitzarEntrega(j) {
 				<label><spring:message code="notificacio.form.titol.dadesgenerals" /></label>
 				<hr/>
 			</div>
-			<form:hidden path="procedimentId" value="${procediment.id}" />
+<%-- 			<form:hidden path="procedimentId" value="${procediment.id}" /> --%>
 			<form:hidden path="emisorDir3Codi" value="${entitat.dir3Codi}" />
+			
+			<!-- PROCEDIMENT -->
+			<div class="row">
+				<div class="col-md-12">
+					<not:inputSelect 
+						name="procedimentId" 
+						textKey="notificacio.form.camp.procediment" 
+						required="false" 
+						optionItems="${procediments}" 
+						optionValueAttribute="id" 
+						optionTextAttribute="nom" 
+						labelSize="2"
+						emptyOption="true"
+						optionMinimumResultsForSearch="2"
+						emptyOptionTextKey="notificacio.form.camp.procediment.select"/>
+				</div>
+			</div>
+			<!-- ORGAN -->
+			<div class="row">
+				<div class="col-md-12">
+					<not:inputSelect 
+						name="organGestor" 
+						textKey="notificacio.form.camp.organGestor" 
+						required="true" 
+						optionItems="${organsGestors}" 
+						optionValueAttribute="codi" 
+						optionTextAttribute="nom"
+						labelSize="2" 
+						emptyOption="true"
+						optionMinimumResultsForSearch="2"
+						emptyOptionTextKey="notificacio.form.camp.organ.select"/>
+				</div>
+			</div>
 			
 			<!-- CONCEPTE -->
 			<div class="row">
@@ -840,13 +948,12 @@ function actualitzarEntrega(j) {
 			</div>
 			
 			<!-- GRUP -->
-			<c:if test="${not empty grups}">
-				<div class="row">
-					<div class="col-md-12">
-						<not:inputSelect name="grupId" textKey="notificacio.form.camp.grup" optionItems="${grups}" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2" />
-					</div>
+			<div id="grups" class="row <c:if test='${empty grups}'>hidden</c:if>">
+				<div class="col-md-12">
+					<not:inputSelect name="grupId" textKey="notificacio.form.camp.grup" optionItems="${grups}" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2" />
 				</div>
-			</c:if>
+			</div>
+			
 			
 			<!-- TIPUS D'ENVIAMENT -->
 			<div class="row">
@@ -1208,30 +1315,26 @@ function actualitzarEntrega(j) {
 											<div class="col-md-12">
 												<not:inputText name="enviaments[${j}].entregaPostal.complement" textKey="notificacio.form.camp.entregapostal.complement" labelClass="labelcss" inputClass="inputcss" />
 											</div>
+											<div class="col-md-3 formatFulla">
 											<c:choose>
 												<c:when test="${not empty formatsFulla}">
-												<div class="col-md-3">
 													<not:inputSelect name="enviaments[${j}].entregaPostal.formatFulla" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatfulla" optionItems="${formatsFulla}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>
-												</div>
 												</c:when>
 												<c:otherwise>
-												<div class="col-md-3">
 													<not:inputText name="enviaments[${j}].entregaPostal.formatFulla" textKey="notificacio.form.camp.entregapostal.formatfulla" labelClass="labelcss" inputClass="inputcss"/>
-												</div>
 												</c:otherwise>
 											</c:choose>
+											</div>
+											<div class="col-md-3 formatSobre">
 											<c:choose>
 												<c:when test="${not empty formatsSobre}">
-												<div class="col-md-3">
 													<not:inputSelect name="enviaments[${j}].entregaPostal.formatSobre" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatsobre" optionItems="${formatsSobre}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>
-												</div>
 												</c:when>
 												<c:otherwise>
-												<div class="col-md-3">
 													<not:inputText name="enviaments[${j}].entregaPostal.formatSobre" textKey="notificacio.form.camp.entregapostal.formatsobre" labelClass="labelcss" inputClass="inputcss"/>
-												</div>
 												</c:otherwise>
 											</c:choose>	
+											</div>
 										</div>	
 										<div class="senseNormalitzar hidden">
 											<div class="col-md-6">
