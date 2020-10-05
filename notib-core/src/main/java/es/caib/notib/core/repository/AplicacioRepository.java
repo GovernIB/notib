@@ -20,6 +20,7 @@ import es.caib.notib.core.entity.AplicacioEntity;
 public interface AplicacioRepository extends JpaRepository<AplicacioEntity, Long> {
 	
 	AplicacioEntity findByUsuariCodi(String usuariCodi);
+	AplicacioEntity findByUsuariCodiAndEntitatId(String usuariCodi,Long entitatId);
 	AplicacioEntity findByEntitatIdAndId(Long entitatId, Long id);
 	AplicacioEntity findByEntitatIdAndUsuariCodi(Long entitatId, String usuariCodi);
 	
