@@ -25,7 +25,7 @@ import es.caib.notib.war.helper.MissatgesHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<EntitatValorsNoRepetits, Object> {
+public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<EntitatValorsNoRepetits, EntitatCommand> {
 
 	private HttpServletRequest request;
 
@@ -43,10 +43,9 @@ public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<Ent
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isValid(
-			final Object value, 
+			final EntitatCommand entitatCommand, 
 			final ConstraintValidatorContext context) {
 		try {
-			final EntitatCommand entitatCommand = (EntitatCommand)value;
 			final Long id = entitatCommand.getId();
 			final String codi = entitatCommand.getCodi();
 			final String dir3 = entitatCommand.getDir3Codi();

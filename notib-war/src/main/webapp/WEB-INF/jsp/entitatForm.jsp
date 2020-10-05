@@ -54,6 +54,11 @@
 }
 </style>
 <script type="text/javascript">
+
+var oficinaActual = '${oficinaSelected}';
+var codiDir3Actual =  '${entitatCommand.dir3Codi}';
+var codiDir3RegActual = '${entitatCommand.dir3CodiReg}';
+
 $(document).ready(function() {
 
 	var entitatId = document.getElementById('id').value;
@@ -90,40 +95,85 @@ $(document).ready(function() {
 	});
 	
 	$('#colorFons, #colorLletra').colorpicker();
-	var oficinaActual = '${oficinaSelected}';
-	$('#dir3Codi').on("change blur", function() {
+	
+	$('#dir3Codi').on("change", function() {
 		let dir3codi = $(this).val();
+		let dir3codiReg = $("#dir3CodiReg").val();
+		
 		if (dir3codi !== undefined && dir3codi !== '') {
-			$.ajax({
-				type: 'GET',
-				url: "<c:url value="/entitat/oficines/"/>" + dir3codi,
-				success: function(data) {
-					var selOficines = $('#oficina');
-					selOficines.empty();
-					selOficines.append("<option value=\"\"></option>");
-					if (data && data.length > 0) {
-							var items = [];
-							$.each(data, function(i, val) {
-								items.push({
-									"id": val.codi,
-									"text": val.codi + " - " + val.nom
-								});
-								console.log(oficinaActual);
-								selOficines.append("<option value=\"" + val.codi + "\"" + (oficinaActual == val.codi ? "selected" :  "") + ">" + val.codi + " - " + val.nom + "</option>");									
-							});
-						}
-					$(".loading-screen").hide();
-				},
-				error: function() {
-					console.log("error obtenint les oficines...");
-				}
-			});
+			if (dir3codiReg == undefined || dir3codiReg == '') {
+				updateOficines(dir3codi);
+				updateLlibre(dir3codi);
+			}
 		} else {
-			console.log('<spring:message code="procediment.form.avis.llibres"/>');
+			console.log('<spring:message code="procediment.form.avis.oficines"/>');
 		}
 	});
-	$('#dir3Codi').trigger("blur");
+	$('#dir3CodiReg').on("change", function() {
+		let dir3codiReg = $(this).val();
+		let dir3codi = $("#dir3Codi").val();
+		
+		if (dir3codiReg !== undefined && dir3codiReg !== '') {
+			updateOficines(dir3codiReg);
+			updateLlibre(dir3codiReg);
+		} else if (dir3codi !== undefined && dir3codi !== ''){
+			updateOficines(dir3codi);
+			updateLlibre(dir3codi);
+		} else {
+			console.log('<spring:message code="procediment.form.avis.oficines"/>');
+		}
+	});
+	$('#oficina').on("change", function(){
+		oficinaActual = $(this).val();
+	});
+	$('#dir3CodiReg').trigger("change");
 });	
+
+function updateOficines(dir3codi) {
+	$.ajax({
+		type: 'GET',
+		url: "<c:url value="/entitat/oficines/"/>" + dir3codi,
+		success: function(data) {
+			var selOficines = $('#oficina');
+			selOficines.empty();
+			selOficines.append("<option value=\"\"></option>");
+			if (data && data.length > 0) {
+					var items = [];
+					$.each(data, function(i, val) {
+						items.push({
+							"id": val.codi,
+							"text": val.codi + " - " + val.nom
+						});
+						console.log(oficinaActual);
+						selOficines.append("<option value=\"" + val.codi + "\"" + (oficinaActual == val.codi ? "selected" :  "") + ">" + val.codi + " - " + val.nom + "</option>");									
+					});
+				}
+			$(".loading-screen").hide();
+		},
+		error: function() {
+			console.log("error obtenint les oficines...");
+		}
+	});
+}
+function updateLlibre(dir3codi) {
+	<c:if test="${setLlibre}">
+	$.ajax({
+		type: 'GET',
+		url: "<c:url value="/entitat/llibre/"/>" + dir3codi,
+		success: function(data) {
+			if (data) {
+				$('#llibreCodiNom').val(data.codi + " - " + data.nomLlarg);
+			} else {
+				$('#llibreCodiNom').val("");
+			}
+// 			$(".loading-screen").hide();
+		},
+		error: function() {
+			console.log("error obtenint el llibre de l'entitat!");
+		}
+	});
+	</c:if>
+}
 </script>
 </head>
 <body>
@@ -150,6 +200,9 @@ $(document).ready(function() {
 			<not:inputText name="apiKey" textKey="entitat.form.camp.apiKey" required="true"/>
 			<not:inputCheckbox name="ambEntregaDeh" textKey="entitat.form.camp.entregadeh"/>
 			<not:inputCheckbox name="ambEntregaCie" textKey="entitat.form.camp.entregacie"/>
+			<c:if test="${setLlibre}">
+				<not:inputText name="llibreCodiNom" textKey="entitat.form.camp.llibre" required="true" readonly="true"/>
+			</c:if>
 			<not:inputSelect name="oficina" textKey="entitat.form.camp.oficina" required="true" optionMinimumResultsForSearch="0"/>
 			<%-- <not:inputText name="nomOficinaVirtual" textKey="entitat.form.camp.oficinavirtual"/> --%>
 			<not:inputTextarea name="descripcio" textKey="entitat.form.camp.descripcio"/>
