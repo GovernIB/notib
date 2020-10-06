@@ -25,7 +25,6 @@ import org.springframework.security.acls.jdbc.LookupStrategy;
 import org.springframework.security.acls.model.AccessControlEntry;
 import org.springframework.security.acls.model.Acl;
 import org.springframework.security.acls.model.MutableAcl;
-import org.springframework.security.acls.model.MutableAclService;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.acls.model.Permission;
@@ -43,6 +42,7 @@ import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.security.ExtendedPermission;
+import es.caib.notib.core.security.NotibMutableAclService;
 
 
 /**
@@ -56,7 +56,7 @@ public class PermisosHelper {
 	@Resource
 	private LookupStrategy lookupStrategy;
 	@Resource
-	private MutableAclService aclService;
+	private NotibMutableAclService aclService;
 	@Resource
 	private EntitatRepository entitatRepository;
 	@Resource
@@ -359,17 +359,25 @@ public class PermisosHelper {
 			Long permisId) {
 		try {
 			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
-			Acl acl = aclService.readAclById(oid);
+			MutableAcl acl = (MutableAcl)aclService.readAclById(oid);
+			Sid sid = null;
 			for (AccessControlEntry ace: acl.getEntries()) {
 				if (permisId.equals(ace.getId())) {
+					sid = ace.getSid(); 
 					assignarPermisos(
 							ace.getSid(),
 							objectClass,
 							objectIdentifier,
 							new Permission[] {},
 							true);
+					break;
 				}
 			}
+			// asseguram que s'eliminin de BBDD!!
+			if (sid != null)
+				aclService.deleteEntries( 
+						oid, 
+						sid);
 		} catch (NotFoundException nfex) {
 		}
 	}

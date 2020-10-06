@@ -480,6 +480,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public List<OrganGestorDto> findAccessiblesByUsuariActual() {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -571,6 +572,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	}
 	
 	@Override
+	@Transactional
 	public void permisDelete(
 			Long entitatId,
 			Long id,

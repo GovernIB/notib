@@ -60,7 +60,7 @@ import es.caib.notib.core.helper.PropertiesHelper;
  * @author Ben Alex
  * @author Johannes Zlattinger
  */
-public class JdbcMutableAclService extends JdbcAclService implements MutableAclService {
+public class JdbcMutableAclService extends JdbcAclService implements NotibMutableAclService {
 	
 	private static final String CLASS_IDENTITY_ORACLE = "SELECT " + TableNames.SEQUENCE_CLASS + ".CURRVAL FROM DUAL";
 	private static final String SID_IDENTITY_ORACLE = "SELECT " + TableNames.SEQUENCE_SID + ".CURRVAL FROM DUAL";
@@ -74,6 +74,7 @@ public class JdbcMutableAclService extends JdbcAclService implements MutableAclS
     private boolean foreignKeysInDatabase = true;
     private final AclCache aclCache;
     private String deleteEntryByObjectIdentityForeignKey = "delete from " + TableNames.TABLE_ENTRY + " where acl_object_identity=?";
+    private String deleteEntryByObjectIdentityAndSid = "delete from " + TableNames.TABLE_ENTRY + " where acl_object_identity=? and sid=?";
     private String deleteObjectIdentityByPrimaryKey = "delete from " + TableNames.TABLE_OBJECT_IDENTITY + " where id=?";
     // Original
     //private String classIdentityQuery = "call identity()";
@@ -284,6 +285,11 @@ public class JdbcMutableAclService extends JdbcAclService implements MutableAclS
         jdbcTemplate.update(deleteEntryByObjectIdentityForeignKey, oidPrimaryKey);
     }
 
+    public void deleteEntries(ObjectIdentity oid, Sid sid) {
+    	Long oidPrimaryKey = retrieveObjectIdentityPrimaryKey(oid);
+    	Long sidId = createOrRetrieveSidPrimaryKey(sid, true);
+    	jdbcTemplate.update(deleteEntryByObjectIdentityAndSid, oidPrimaryKey, sidId);
+    }
     /**
      * Deletes a single row from acl_object_identity that is associated with the presented ObjectIdentity primary key.
      * <p>
