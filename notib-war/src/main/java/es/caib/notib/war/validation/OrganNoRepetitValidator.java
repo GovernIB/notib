@@ -19,6 +19,7 @@ import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.war.command.OrganGestorCommand;
 import es.caib.notib.war.helper.MessageHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
+import es.caib.notib.war.helper.PropertiesHelper;
 
 /**
  * Constraint de validació que controla que no es repeteixi
@@ -61,6 +62,15 @@ public class OrganNoRepetitValidator implements ConstraintValidator<OrganNoRepet
 				valid = false;
 				context.disableDefaultConstraintViolation();
 				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("organgestor.validation.codi.repetit")).addConstraintViolation();
+			}
+			
+			// Si el llibre es desa a l'òrgan, llavors comprovar que s'ha informat
+			if ("ORGAN".equalsIgnoreCase(PropertiesHelper.getProperties().getProperty("es.caib.notib.lloc.libre", "ENTITAT"))) {
+				if (command.getLlibre() == null || command.getLlibre().isEmpty()) {
+					valid = false;
+					context.disableDefaultConstraintViolation();
+					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("organgestor.validation.llibre.buit")).addConstraintViolation();
+				}
 			}
 			
         } catch (final Exception ex) {

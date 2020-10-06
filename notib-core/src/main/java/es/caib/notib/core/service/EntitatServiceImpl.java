@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.codahale.metrics.Timer;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
@@ -108,7 +109,9 @@ public class EntitatServiceImpl implements EntitatService {
 					entitat.getColorLletra(),
 					entitat.getTipusDocDefault().getTipusDocEnum(),
 					entitat.getOficina(),
-					entitat.getNomOficinaVirtual()).
+					entitat.getNomOficinaVirtual(),
+					entitat.getLlibre(),
+					entitat.getLlibreNom()).
 					descripcio(entitat.getDescripcio()).
 					build();
 			
@@ -208,7 +211,9 @@ public class EntitatServiceImpl implements EntitatService {
 					entitat.getColorLletra(),
 					entitat.getTipusDocDefault().getTipusDocEnum(),
 					entitat.getOficina(),
-					entitat.getNomOficinaVirtual());
+					entitat.getNomOficinaVirtual(),
+					entitat.getLlibre(),
+					entitat.getLlibreNom());
 			return conversioTipusHelper.convertir(
 					entity,
 					EntitatDto.class);
@@ -624,6 +629,29 @@ public class EntitatServiceImpl implements EntitatService {
 			Path path = Paths.get(filePath);
 			
 			return Files.readAllBytes(path);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public LlibreDto getLlibreEntitat(
+			String dir3Codi) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			LlibreDto llibre = new LlibreDto();
+			try {
+				llibre = cacheHelper.getLlibreOrganGestor(
+						dir3Codi,
+						dir3Codi);
+	 		} catch (Exception e) {
+	 			String errorMessage = "No s'ha pogut recuperar el llibre de l'entitat amb codi Dir3: " + dir3Codi;
+				logger.error(
+						errorMessage, 
+						e.getMessage());
+			}
+			return llibre;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

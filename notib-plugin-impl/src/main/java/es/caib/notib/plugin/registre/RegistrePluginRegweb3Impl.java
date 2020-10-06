@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
 import es.caib.notib.core.api.dto.InteresadoWsDto;
-import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.RegistreInteressatDocumentTipusDtoEnum;
@@ -514,94 +513,65 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		return resposta;
 	}
 	
-	public AsientoRegistralWs notificacioToAsientoRegistralBean(NotificacioDto notificacio, AnexoWs anexe) {
-		AsientoRegistralWs registre = new AsientoRegistralWs();
-		registre.setEntidadCodigo(notificacio.getEntitat().getCodi());
-		registre.setEntidadDenominacion(notificacio.getEntitat().getNom());
-		registre.setEntidadRegistralInicioCodigo(notificacio.getProcediment().getOficina());
-		registre.setEntidadRegistralInicioDenominacion(notificacio.getProcediment().getOficina());
-		registre.setEntidadRegistralOrigenCodigo(notificacio.getProcediment().getOficina());
-		registre.setEntidadRegistralOrigenDenominacion(notificacio.getProcediment().getOficina());
-		registre.setEntidadRegistralDestinoCodigo(notificacio.getProcediment().getOficina());
-		registre.setEntidadRegistralDestinoDenominacion(notificacio.getProcediment().getOficina());
-		registre.setUnidadTramitacionOrigenCodigo(notificacio.getRegistreOrgan());
-		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getRegistreOrgan());
-		registre.setUnidadTramitacionDestinoCodigo(notificacio.getProcediment().getOficina());
-		registre.setUnidadTramitacionDestinoDenominacion(notificacio.getProcediment().getOficina());
-		registre.setTipoRegistro(2L);
-		registre.setLibroCodigo(notificacio.getProcediment().getLlibre());
-		registre.setResumen(notificacio.getRegistreExtracte());
-		/* 1 = Documentació adjunta en suport Paper
-		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper
-		 * 3 = Documentació adjunta digitalitzada */
-		registre.setTipoDocumentacionFisicaCodigo(3L);
-		//registre.setTipoAsunto(notificacio.getRegistreTipusAssumpte());
-		//registre.setTipoAsuntoDenominacion(notificacio.getRegistreTipusAssumpte());
-		registre.setCodigoAsunto(notificacio.getRegistreTipusAssumpte());
-		registre.setCodigoAsuntoDenominacion(notificacio.getRegistreTipusAssumpte());
-		registre.setIdioma(1L);
-		registre.setReferenciaExterna(notificacio.getRegistreRefExterna());
-		registre.setNumeroExpediente(notificacio.getNumExpedient());
-		/*
-		 * 
-		 * '01' : Servei de missatgers
-		 * '02' : Correu postal
-		 * '03' : Correu postal certificat
-		 * '04' : Burofax
-		 * '05' : En ma
-		 * '06' : Fax
-		 * '07' : Altres
-		 * 
-		 * */
-		if(notificacio.getPagadorPostal() != null) {
-			registre.setTipoTransporte("02");
-		}else {
-			registre.setTipoTransporte("07");
-		}
-//		registre.setNumeroTransporte();
-		registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
-		registre.setCodigoUsuario(notificacio.getUsuariCodi());
-		registre.setAplicacionTelematica("SISTRA");
-		registre.setAplicacion("RWE");
-		registre.setVersion("3.1");
-		registre.setObservaciones(notificacio.getRegistreObservacions());
-		registre.setExpone("");
-		registre.setSolicita("");
-		registre.setPresencial(false);
-//		registre.setTipoEnvioDocumentacion();
-		registre.setEstado(notificacio.getEstat().getLongVal());
-		registre.setUnidadTramitacionOrigenCodigo(notificacio.getRegistreOrgan());
-		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getRegistreOrgan());
-//		registre.setIdentificadorIntercambio();
-//		registre.setFechaRecepcion();
-//		registre.setCodigoError();
-//		registre.setNumeroRegistroDestino();
-//		registre.setFechaRegistroDestino();
-		registre.setMotivo(notificacio.getDescripcio());
-		registre.getInteresados().add(personaToInteresadoWs(notificacio.getEnviaments().iterator().next().getTitular()));
-		if(notificacio.getDocument() != null) {
-			registre.getAnexos().add(anexe);	
-		}
-		return registre;
-	}
-	/*------------------*/
-	
-//	public RegistreAnotacioDto notificacioToRegistreAnotacioV2(NotificacioEntity notificacio) {
-//		RegistreAnotacioDto registre = new RegistreAnotacioDto();
-//		registre.setAssumpteCodi(notificacio.getRegistreCodiAssumpte());
-//		registre.setAssumpteExtracte(notificacio.getConcepte());
-//		registre.setAssumpteIdiomaCodi(notificacio.getRegistreIdioma());
-//		registre.setAssumpteTipus(notificacio.getRegistreTipusAssumpte());
-//		registre.setEntitatCodi(notificacio.getEntitat().getCodi());
-//		registre.setExpedientNumero(notificacio.getRegistreNumExpedient());
-//		registre.setObservacions(notificacio.getRegistreObservacions());
-//		registre.setLlibre(notificacio.getProcediment().getLlibre());
-//		registre.setOficina(notificacio.getProcediment().getOficina());
-//		registre.setAnnexos(new ArrayList<RegistreAnnexDto>());
-//		registre.getAnnexos().add(documentToRegistreAnnexDto(notificacio.getDocument()));
-//		List<RegistreInteressatDto> interessats = new ArrayList<RegistreInteressatDto>();
-//		interessats.add(personaToRegistreInteresatDto(notificacio.getEnviaments().iterator().next().getTitular()));
-//		registre.setInteressats(interessats);
+//	public AsientoRegistralWs notificacioToAsientoRegistralBean(NotificacioDto notificacio, AnexoWs anexe) {
+//		AsientoRegistralWs registre = new AsientoRegistralWs();
+//		registre.setEntidadCodigo(notificacio.getEntitat().getCodi());
+//		registre.setEntidadDenominacion(notificacio.getEntitat().getNom());
+//		registre.setEntidadRegistralInicioCodigo(notificacio.getProcediment().getOficina());
+//		registre.setEntidadRegistralInicioDenominacion(notificacio.getProcediment().getOficina());
+//		registre.setEntidadRegistralOrigenCodigo(notificacio.getProcediment().getOficina());
+//		registre.setEntidadRegistralOrigenDenominacion(notificacio.getProcediment().getOficina());
+//		registre.setEntidadRegistralDestinoCodigo(notificacio.getProcediment().getOficina());
+//		registre.setEntidadRegistralDestinoDenominacion(notificacio.getProcediment().getOficina());
+//		registre.setUnidadTramitacionOrigenCodigo(notificacio.getRegistreOrgan());
+//		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getRegistreOrgan());
+//		registre.setUnidadTramitacionDestinoCodigo(notificacio.getProcediment().getOficina());
+//		registre.setUnidadTramitacionDestinoDenominacion(notificacio.getProcediment().getOficina());
+//		registre.setTipoRegistro(2L);
+//		registre.setLibroCodigo(notificacio.getProcediment().getLlibre());
+//		registre.setResumen(notificacio.getRegistreExtracte());
+//		/* 1 = Documentació adjunta en suport Paper
+//		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper
+//		 * 3 = Documentació adjunta digitalitzada */
+//		registre.setTipoDocumentacionFisicaCodigo(3L);
+//		registre.setCodigoAsunto(notificacio.getRegistreTipusAssumpte());
+//		registre.setCodigoAsuntoDenominacion(notificacio.getRegistreTipusAssumpte());
+//		registre.setIdioma(1L);
+//		registre.setReferenciaExterna(notificacio.getRegistreRefExterna());
+//		registre.setNumeroExpediente(notificacio.getNumExpedient());
+//		/*
+//		 * 
+//		 * '01' : Servei de missatgers
+//		 * '02' : Correu postal
+//		 * '03' : Correu postal certificat
+//		 * '04' : Burofax
+//		 * '05' : En ma
+//		 * '06' : Fax
+//		 * '07' : Altres
+//		 * 
+//		 * */
+//		if(notificacio.getPagadorPostal() != null) {
+//			registre.setTipoTransporte("02");
+//		}else {
+//			registre.setTipoTransporte("07");
+//		}
+//		registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
+//		registre.setCodigoUsuario(notificacio.getUsuariCodi());
+//		registre.setAplicacionTelematica("SISTRA");
+//		registre.setAplicacion("RWE");
+//		registre.setVersion("3.1");
+//		registre.setObservaciones(notificacio.getRegistreObservacions());
+//		registre.setExpone("");
+//		registre.setSolicita("");
+//		registre.setPresencial(false);
+//		registre.setEstado(notificacio.getEstat().getLongVal());
+//		registre.setUnidadTramitacionOrigenCodigo(notificacio.getRegistreOrgan());
+//		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getRegistreOrgan());
+//		registre.setMotivo(notificacio.getDescripcio());
+//		registre.getInteresados().add(personaToInteresadoWs(notificacio.getEnviaments().iterator().next().getTitular()));
+//		if(notificacio.getDocument() != null) {
+//			registre.getAnexos().add(anexe);	
+//		}
 //		return registre;
 //	}
 	

@@ -61,6 +61,23 @@ public class EntitatCommand {
 	@NotEmpty
 	private String oficina;
 	private String nomOficinaVirtual;
+	private String llibre;
+	private String llibreNom;
+	
+	public String getLlibreCodiNom() {
+		if (llibre != null)
+			return llibre + " - " + (llibreNom != null ? llibreNom : "");
+		return "";
+	}
+	public void setLlibreCodiNom(String llibreCodiNom) {
+		if (llibreCodiNom != null) {
+			int div = llibreCodiNom.indexOf(" - ");
+			if (div > 0) {
+				this.llibre = llibreCodiNom.substring(0, div);
+				this.llibreNom = llibreCodiNom.substring(div + 3);
+			}
+		}
+	}
 	
 	public static List<EntitatCommand> toEntitatCommands(
 			List<EntitatDto> dtos) {

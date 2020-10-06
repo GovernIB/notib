@@ -28,6 +28,7 @@ import es.caib.notib.war.command.OrganGestorFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.MissatgesHelper;
+import es.caib.notib.war.helper.PropertiesHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
 
 /**
@@ -58,6 +59,7 @@ public class OrganGestorController extends BaseUserController{
 			HttpServletRequest request,
 			Model model) {
 		model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
+		model.addAttribute("setLlibre", "ORGAN".equalsIgnoreCase(PropertiesHelper.getProperties().getProperty("es.caib.notib.lloc.libre", "ENTITAT")));
 		return "organGestorList";
 	}
 	
@@ -116,6 +118,7 @@ public class OrganGestorController extends BaseUserController{
 		OrganGestorCommand organGestorCommand = new OrganGestorCommand();
 		model.addAttribute(organGestorCommand);
 		model.addAttribute("entitat", getEntitatActualComprovantPermisos(request));
+		model.addAttribute("setLlibre", "ORGAN".equalsIgnoreCase(PropertiesHelper.getProperties().getProperty("es.caib.notib.lloc.libre", "ENTITAT")));
 		return "organGestorForm";
 	}
 	
@@ -148,7 +151,7 @@ public class OrganGestorController extends BaseUserController{
 		
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("entitat", getEntitatActualComprovantPermisos(request));
-//			model.addAttribute("errors", bindingResult.getAllErrors());
+			model.addAttribute("setLlibre", "ORGAN".equalsIgnoreCase(PropertiesHelper.getProperties().getProperty("es.caib.notib.lloc.libre", "ENTITAT")));
 			return "organGestorForm";
 		}
 		

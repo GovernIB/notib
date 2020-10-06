@@ -46,7 +46,15 @@ public class EntitatDto extends AuditoriaDto {
 	private Long numAplicacions;
 	private String oficina;
 	private String nomOficinaVirtual;
+	private String llibre;
+	private String llibreNom;
 
+	public String getLlibreCodiNom() {
+		if (llibre != null)
+			return llibre + " - " + (llibreNom != null ? llibreNom : "");
+		return "";
+	}
+	
 	public int getPermisosCount() {
 		if  (permisos == null)
 			return 0;

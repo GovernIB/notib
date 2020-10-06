@@ -60,6 +60,7 @@ import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PluginHelper;
+import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.repository.ColumnesRepository;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
@@ -615,6 +616,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					enviament,
 					NotificacioEnviamentDtoV2.class);
 			int i = 0;
+			boolean llibreOrgan = "ORGAN".equalsIgnoreCase(PropertiesHelper.getProperties().getProperty("es.caib.notib.lloc.libre", "ENTITAT"));
 			for (NotificacioEnviamentDtoV2 notificacioEnviamentDtoV2 : paginaDto.getContingut()) {
 				if (enviament.getContent().get(i).getNotificacio().getProcedimentCodiNotib() != null)
 					notificacioEnviamentDtoV2.setProcedimentCodiNotib(enviament.getContent().get(i).getNotificacio().getProcedimentCodiNotib());
@@ -632,8 +634,13 @@ public class EnviamentServiceImpl implements EnviamentService {
 					notificacioEnviamentDtoV2.setConcepte(enviament.getContent().get(i).getNotificacio().getConcepte());
 				if (enviament.getContent().get(i).getNotificacio().getDescripcio() != null)
 					notificacioEnviamentDtoV2.setDescripcio(enviament.getContent().get(i).getNotificacio().getDescripcio());
-				if (enviament.getContent().get(i).getNotificacio().getProcediment() != null)
-					notificacioEnviamentDtoV2.setLlibre(enviament.getContent().get(i).getNotificacio().getProcediment().getOrganGestor().getLlibre());
+				// Llibre
+				if (llibreOrgan) {
+					if (enviament.getContent().get(i).getNotificacio().getProcediment() != null)
+						notificacioEnviamentDtoV2.setLlibre(enviament.getContent().get(i).getNotificacio().getProcediment().getOrganGestor().getLlibre());
+				} else {
+					notificacioEnviamentDtoV2.setLlibre(entitatEntity.getLlibre());
+				}
 				if (enviament.getContent().get(i).getNotificacio().getRegistreNumero() != null)
 					notificacioEnviamentDtoV2.setRegistreNumero(enviament.getContent().get(i).getNotificacio().getRegistreNumero());
 				if (enviament.getContent().get(i).getNotificacio().getRegistreData() != null)
@@ -948,6 +955,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			
 			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 			List<String[]> files = new ArrayList<String[]>();
+			boolean llibreOrgan = "ORGAN".equalsIgnoreCase(PropertiesHelper.getProperties().getProperty("es.caib.notib.lloc.libre", "ENTITAT"));
 			
 			for (NotificacioEnviamentEntity enviament : enviaments) {
 				String[] fila = new String[numColumnes];
@@ -975,8 +983,12 @@ public class EnviamentServiceImpl implements EnviamentService {
 					fila[11] = enviament.getTitular().getNom();
 					fila[12] = enviament.getTitular().getEmail();
 					fila[13] = (enviament.getDestinataris().size() > 0) ? enviament.getDestinataris().get(0).getNif() : null;
-					if (enviament.getNotificacio().getProcediment() != null)
-						fila[14] = enviament.getNotificacio().getProcediment().getOrganGestor().getLlibre();
+					if (llibreOrgan) {
+						if (enviament.getNotificacio().getProcediment() != null)
+							fila[14] = enviament.getNotificacio().getProcediment().getOrganGestor().getLlibre();
+					} else {
+						fila[14] = entitatEntity.getLlibre();
+					}
 					fila[15] = String.valueOf(enviament.getNotificacio().getRegistreNumero());
 					fila[16] = (enviament.getNotificacio().getRegistreData() != null)? enviament.getNotificacio().getRegistreData().toString() : "";
 					fila[17] = enviament.getNotificacio().getCaducitat() != null ? sdf.format(enviament.getNotificacio().getCaducitat()) : "";

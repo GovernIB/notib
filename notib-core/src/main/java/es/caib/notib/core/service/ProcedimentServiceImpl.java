@@ -1288,7 +1288,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			Long permisId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Eliminació del permis del meta-expedient ("
+			logger.debug("Eliminació del permis del procediment ("
 					+ "entitatId=" + entitatId +  ", "
 					+ "id=" + id + ", "
 					+ "permisId=" + permisId + ")");
