@@ -52,6 +52,16 @@
 .icon {
 	float: left;
 }
+.addBoto {
+	float:left;
+	width: calc(100% - 40px);
+}
+.botoAdded {
+	float: left;
+	margin-left: 5px;
+	padding: 9px 10px;
+	line-height: 10px;
+}
 </style>
 <script type="text/javascript">
 
@@ -86,8 +96,6 @@ $(document).ready(function() {
 				    'valor': option.value,
 				    'desc': option.text,
 				};
-			
-				    	      
 		});
 	    addDefault(data);
 
@@ -126,9 +134,34 @@ $(document).ready(function() {
 	$('#oficina').on("change", function(){
 		oficinaActual = $(this).val();
 	});
-	$('#dir3CodiReg').trigger("change");
+	$('#refreshLlibre').on("click", function() {
+		let dir3codiReg = $("#dir3CodiReg").val();
+		let dir3codi = $("#dir3Codi").val();
+		
+		if (dir3codiReg !== undefined && dir3codiReg !== '') {
+			updateLlibre(dir3codiReg);
+		} else if (dir3codi !== undefined && dir3codi !== ''){
+			updateLlibre(dir3codi);
+		} else {
+			$('#llibreCodiNom').val("");
+		}
+	});
+// 	$('#dir3CodiReg').trigger("change");
+	loadOficines();
 });	
 
+function loadOficines() {
+	let dir3codiReg = $("#dir3CodiReg").val();
+	let dir3codi = $("#dir3Codi").val();
+	
+	if (dir3codiReg !== undefined && dir3codiReg !== '') {
+		updateOficines(dir3codiReg);
+	} else if (dir3codi !== undefined && dir3codi !== ''){
+		updateOficines(dir3codi);
+	} else {
+		console.log('<spring:message code="procediment.form.avis.oficines"/>');
+	}
+}
 function updateOficines(dir3codi) {
 	$.ajax({
 		type: 'GET',
@@ -201,7 +234,14 @@ function updateLlibre(dir3codi) {
 			<not:inputCheckbox name="ambEntregaDeh" textKey="entitat.form.camp.entregadeh"/>
 			<not:inputCheckbox name="ambEntregaCie" textKey="entitat.form.camp.entregacie"/>
 			<c:if test="${setLlibre}">
-				<not:inputText name="llibreCodiNom" textKey="entitat.form.camp.llibre" required="true" readonly="true"/>
+<%-- 				<not:inputText name="llibreCodiNom" textKey="entitat.form.camp.llibre" required="true" readonly="true" inputClass="addBoto"/> --%>
+				<div class="form-group">
+					<label class="control-label col-xs-4 " for="llibreCodiNom"><spring:message code="entitat.form.camp.llibre" /> *</label>
+					<div class="col-xs-8">
+						<input id="llibreCodiNom" name="llibreCodiNom" class="form-control addBoto" readonly="readonly" type="text" value="${entitatCommand.llibreCodiNom}">
+						<button id="refreshLlibre" type="button" class="btn btn-default botoAdded"><span class="fa fa-refresh"></span></button>
+					</div>
+				</div>
 			</c:if>
 			<not:inputSelect name="oficina" textKey="entitat.form.camp.oficina" required="true" optionMinimumResultsForSearch="0"/>
 			<%-- <not:inputText name="nomOficinaVirtual" textKey="entitat.form.camp.oficinavirtual"/> --%>
