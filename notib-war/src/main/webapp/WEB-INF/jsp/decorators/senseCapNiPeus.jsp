@@ -24,6 +24,20 @@
 	<script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/css/bootstrap-colorpicker.min.css"/>" rel="stylesheet">
 	<script src="<c:url value="/js/bootstrap-colorpicker.min.js"/>"></script>
+	<script type="text/javascript">
+		var userLanguage;
+		var setIdioma = function() {
+			$.ajax({
+				type: "GET",
+				async: false,
+			    url: '/notib/usuari/configuracio/idioma',  
+			    success: function(data) {
+			    	userLanguage =  data; 
+			    }
+			  });
+	    }
+		setIdioma();
+	</script>
 	<decorator:head />
 </head>
 <body>
