@@ -50,6 +50,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	private static final String OFICINA_VIRTUAL_DEFAULT = "Oficina Virtual";
 
 	@Override
+	@Deprecated
 	public RespostaAnotacioRegistre registrarSalida(
 			RegistreSortida registreSortida,
 			String aplicacion) {

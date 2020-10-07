@@ -247,6 +247,12 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		this.registreData = cal.getTime();
 	}
 	
+	public void refreshRegistre() {
+		this.registreEnviamentIntent = 0;	
+		Calendar cal = GregorianCalendar.getInstance();
+		this.registreData = cal.getTime();
+	}
+	
 	public void updateNotificaError(
 			NotificacioErrorTipusEnumDto errorTipus,
 			NotificacioEventEntity errorEvent) {
@@ -581,4 +587,5 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	}
 
 	private static final long serialVersionUID = 7206301266966284277L;
+
 }

@@ -47,6 +47,7 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreErrorFiltreDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
@@ -891,6 +892,22 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public NotificacioEventDto findUltimEventRegistreByNotificacio(Long notificacioId) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			NotificacioEventEntity event = notificacioEventRepository.findUltimEventRegistreByNotificacioId(notificacioId);
+			if (event == null)
+				return null;
+			return conversioTipusHelper.convertir(
+					event, 
+					NotificacioEventDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
 
 	@Override
 	@Transactional(readOnly = true)
@@ -1246,6 +1263,147 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 	
+	@Transactional(readOnly = true)
+	@Override
+	public PaginaDto<NotificacioDto> findNotificacionsAmbErrorRegistre(
+			Long entitatId,
+			NotificacioRegistreErrorFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) {
+		Page<NotificacioEntity> page = null;
+		
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			if (filtre == null || filtre.isEmpty()) {
+				page = notificacioRepository.findByNotificaEstatPendentSenseReintentsDisponibles(
+						entitatId,
+						pluginHelper.getRegistreReintentsMaxProperty(),
+						paginacioHelper.toSpringDataPageable(paginacioParams));
+			} else {
+				Date dataInici = filtre.getDataInici();
+				if (dataInici != null) {
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(dataInici);
+					cal.set(Calendar.HOUR, 0);
+					cal.set(Calendar.MINUTE, 0);
+					cal.set(Calendar.SECOND, 0);
+					cal.set(Calendar.MILLISECOND, 0);
+					dataInici = cal.getTime();
+				}
+				Date dataFi = filtre.getDataFi();
+				if (dataFi != null) {
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(dataFi);
+					cal.set(Calendar.HOUR, 0);
+					cal.set(Calendar.MINUTE, 0);
+					cal.set(Calendar.SECOND, 0);
+					cal.set(Calendar.MILLISECOND, 0);
+					dataFi = cal.getTime();
+				}
+				ProcedimentEntity procediment = null;
+				if (filtre.getProcedimentId() != null) {
+					procediment = procedimentRepository.findById(filtre.getProcedimentId());
+				}
+				page = notificacioRepository.findByNotificaEstatPendentSenseReintentsDisponiblesAmbFiltre(
+						entitatId,
+						procediment == null,
+						procediment,
+						dataInici == null,
+						dataInici,
+						dataFi == null,
+						dataFi,
+						filtre.getConcepte() == null || filtre.getConcepte().trim().isEmpty(),
+						filtre.getConcepte() == null ? "" : filtre.getConcepte(),
+						filtre.getUsuari() == null || filtre.getUsuari().trim().isEmpty(),
+						filtre.getUsuari() == null ? "" : filtre.getUsuari(),
+						pluginHelper.getRegistreReintentsMaxProperty(),
+						paginacioHelper.toSpringDataPageable(paginacioParams));
+			}
+				
+			if (page != null && page.getContent() != null && page.getContent().size() > 0) {
+				return paginacioHelper.toPaginaDto(page, NotificacioDto.class);
+			}
+			return paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	public List<Long> findNotificacionsIdAmbErrorRegistre(
+			Long entitatId, 
+			NotificacioRegistreErrorFiltreDto filtre) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		List<Long> ids = null;
+		try {
+			if (filtre == null || filtre.isEmpty()) {
+				ids = notificacioRepository.findIdsByNotificaEstatPendentSenseReintentsDisponibles(
+						entitatId,
+						pluginHelper.getRegistreReintentsMaxProperty());
+			} else {
+				Date dataInici = filtre.getDataInici();
+				if (dataInici != null) {
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(dataInici);
+					cal.set(Calendar.HOUR, 0);
+					cal.set(Calendar.MINUTE, 0);
+					cal.set(Calendar.SECOND, 0);
+					cal.set(Calendar.MILLISECOND, 0);
+					dataInici = cal.getTime();
+				}
+				Date dataFi = filtre.getDataFi();
+				if (dataFi != null) {
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(dataFi);
+					cal.set(Calendar.HOUR, 0);
+					cal.set(Calendar.MINUTE, 0);
+					cal.set(Calendar.SECOND, 0);
+					cal.set(Calendar.MILLISECOND, 0);
+					dataFi = cal.getTime();
+				}
+				ProcedimentEntity procediment = null;
+				if (filtre.getProcedimentId() != null) {
+					procediment = procedimentRepository.findById(filtre.getProcedimentId());
+				}
+				ids = notificacioRepository.findIdsByNotificaEstatPendentSenseReintentsDisponiblesAmbFiltre(
+						entitatId,
+						procediment == null,
+						procediment,
+						dataInici == null,
+						dataInici,
+						dataFi == null,
+						dataFi,
+						filtre.getConcepte() == null || filtre.getConcepte().trim().isEmpty(),
+						filtre.getConcepte() == null ? "" : filtre.getConcepte(),
+						filtre.getUsuari() == null || filtre.getUsuari().trim().isEmpty(),
+						filtre.getUsuari() == null ? "" : filtre.getUsuari(),
+						pluginHelper.getRegistreReintentsMaxProperty());
+			}
+				
+			return ids;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Transactional
+	@Override
+	public void reactivarRegistre(Long notificacioId) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Reactivant registre de la notificació (notificacioId=" + notificacioId + ")");
+			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(
+					null,
+					notificacioId);
+			notificacio.refreshRegistre();
+			notificacio.cleanNotificaError();
+			notificacioRepository.saveAndFlush(notificacio);
+		} catch (Exception e) {
+			logger.debug("Error reactivant consultes d'estat de la notificació (notificacioId=" + notificacioId + ")", e);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}		
+	}
+	
 	private int getRegistreEnviamentsProcessarMaxProperty() {
 		return PropertiesHelper.getProperties().getAsInt(
 				"es.caib.notib.tasca.registre.enviaments.processar.max",
@@ -1356,6 +1514,5 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceImpl.class);
-
 
 }

@@ -26,6 +26,7 @@ import es.caib.notib.plugin.utils.PropertiesHelper;
 public class RegistrePluginMockImpl implements RegistrePlugin{
 	
 	@Override
+	@Deprecated
 	public RespostaAnotacioRegistre registrarSalida(
 			RegistreSortida registreSortida,
 			String aplicacion) throws RegistrePluginException {
@@ -47,23 +48,27 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 			String codiDir3Entitat, 
 			AsientoRegistralBeanDto arb, 
 			Long tipusOperacio) {
-		
 		RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
-		
-		Date data = new Date();
-		Integer[] registre = readRegistreFile(data, true);
-		
-        resposta.setRegistreData(data);
-        resposta.setRegistreNumero(String.valueOf(registre[1]));
-        resposta.setRegistreNumeroFormatat(registre[1] + "/" + registre[0]);
-        resposta.setEstat(NotificacioRegistreEstatEnumDto.VALID);
-        
-        if (resposta.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_SIR))
-        	resposta.setSirRecepecioData(data);
-        if (resposta.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT))
-        	resposta.setSirRegistreDestiData(data);
-//        resposta.setErrorCodi("OK");
-        return resposta;
+		if (arb.getResumen().startsWith("Error")) {
+			resposta.setErrorCodi("3");
+			resposta.setErrorDescripcio("Error de registre MOCK (" + System.currentTimeMillis() + ")");
+			return resposta;
+		} else {
+			Date data = new Date();
+			Integer[] registre = readRegistreFile(data, true);
+			
+	        resposta.setRegistreData(data);
+	        resposta.setRegistreNumero(String.valueOf(registre[1]));
+	        resposta.setRegistreNumeroFormatat(registre[1] + "/" + registre[0]);
+	        resposta.setEstat(NotificacioRegistreEstatEnumDto.VALID);
+	        
+	        if (resposta.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_SIR))
+	        	resposta.setSirRecepecioData(data);
+	        if (resposta.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT))
+	        	resposta.setSirRegistreDestiData(data);
+	//        resposta.setErrorCodi("OK");
+	        return resposta;
+		}
 	}
 	
 	@Override

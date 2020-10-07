@@ -144,7 +144,7 @@ $(document).ready(function() {
 					"enviament/select",
 					function(data) {
 						$(".seleccioCount").html(data);
-						$('#taulaDades').webutilDatatable('refresh');
+						$('#enviament').webutilDatatable('refresh');
 					}
 			);
 			return false;
@@ -250,7 +250,7 @@ function getCookie(cname) {
 					</button>
 					<ul class="dropdown-menu">
 						<li><a href="<c:url value="enviament/export/ODS"/>"><spring:message code="enviament.list.user.exportar"/> a <spring:message code="enviament.list.user.exportar.EXCEL"/></a></li> 
-						<li><a style="cursor: pointer;" id="reintentarNotificacio"><spring:message code="enviament.list.user.reintentar"/> <spring:message code="enviament.list.user.reintentar.notificacio"/></a></li>
+						<li><a style="cursor: pointer;" id="reintentarNotificacio"><spring:message code="enviament.list.user.reintentar.notificacio"/></a></li>
 						<li><a style="cursor: pointer;" id="reactivarConsulta"><spring:message code="enviament.list.user.reactivar.consulta"/></a></li>
 						<li><a style="cursor: pointer;" id="reactivarSir"><spring:message code="enviament.list.user.reactivar.sir"/></a></li>
 					</ul>

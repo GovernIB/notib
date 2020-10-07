@@ -21,6 +21,7 @@ import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioErrorCallbackFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreErrorFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
@@ -273,5 +274,40 @@ public class NotificacioServiceBean implements NotificacioService {
 	public boolean reactivarSir(Long notificacioId) {
 		return delegate.reactivarSir(notificacioId);
 	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public PaginaDto<NotificacioDto> findNotificacionsAmbErrorRegistre(
+			Long entitatId,
+			NotificacioRegistreErrorFiltreDto filtre,
+			PaginacioParamsDto paginacioDtoFromRequest) {
+		return delegate.findNotificacionsAmbErrorRegistre(
+				entitatId,
+				filtre, 
+				paginacioDtoFromRequest);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public List<Long> findNotificacionsIdAmbErrorRegistre(
+			Long entitatId, 
+			NotificacioRegistreErrorFiltreDto filtre) {
+		return delegate.findNotificacionsIdAmbErrorRegistre(
+				entitatId,
+				filtre);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public void reactivarRegistre(Long notificacioId) {
+		delegate.reactivarRegistre(notificacioId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	public NotificacioEventDto findUltimEventRegistreByNotificacio(Long notificacioId) {
+		return delegate.findUltimEventRegistreByNotificacio(notificacioId);
+	}
+
 
 }

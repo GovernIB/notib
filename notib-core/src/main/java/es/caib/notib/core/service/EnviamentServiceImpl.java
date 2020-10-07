@@ -140,7 +140,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					+ "filtre=" + filtre + ")");
 			entityComprovarHelper.comprovarPermisos(
 					entitatId,
-					true,
+					false,
 					false,
 					false);
 			return findIdsAmbFiltrePaginat(

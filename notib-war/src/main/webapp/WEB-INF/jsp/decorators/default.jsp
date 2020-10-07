@@ -278,9 +278,8 @@ body {
 							</a>
 							<ul class="dropdown-menu">
 								<li>
-									<a href="<c:url value="/usuari/configuracio"/>" data-toggle="modal" data-maximized="true">
-										<spring:message code="decorator.menu.configuracio.user"/>
-									</a>
+									<a href="<c:url value="/usuari/configuracio"/>" data-toggle="modal" data-maximized="true"><spring:message code="decorator.menu.configuracio.user"/></a>
+									<a href="https://github.com/GovernIB/notib/raw/${manifestAtributes['Implementation-SCM-Branch']}/doc/pdf/NOTIB_usuari.pdf" rel="noopener noreferrer" target="_blank"><span class="fa fa-download"></span> <spring:message code="decorator.menu.manual.usuari"/></a>
 								</li>
 							</ul>
 						</li>
@@ -341,6 +340,13 @@ body {
 								<a href="<c:url value="/enviament"/>" class="btn btn-primary"><spring:message code="decorator.menu.enviaments"/></a>
 							</div>
 							<div class="btn-group">
+								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.gestio"/>&nbsp;<span class="caret caret-white"></span></button>								
+								<ul class="dropdown-menu">
+									<li><a href="<c:url value="/massiu/registre/notificacionsError"/>"><spring:message code="decorator.menu.massiu.registre"/></a></li>
+								</ul>
+							</div>
+								
+							<div class="btn-group">
 								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>								
 								<ul class="dropdown-menu">
 									<li><a href="<c:url value="/entitat/${entitatActual.id}"/>"><spring:message code="decorator.menu.entitat"/></a></li>
@@ -376,11 +382,13 @@ body {
 							</div>
 							</c:if>
 						</div>
+<%--
 						<div class="btn-group">
 							<a class="btn btn-success" href="https://github.com/GovernIB/notib/raw/${manifestAtributes['Implementation-SCM-Branch']}/doc/pdf/NOTIB_usuari.pdf" rel="noopener noreferrer" target="_blank"><span class="fa fa-download"></span> <spring:message code="decorator.menu.manual.usuari"/></a>
 <!-- 									Per a diferents rol, ara sol esta el manual d'usuari -->
-<%-- 									<a class="btn btn-primary" href="https://github.com/GovernIB/notib/raw/notib-${versioMajorActual}/doc/pdf/NOTIB_${rolActual}.pdf" } download/><spring:message code="decorator.menu.manual.usuari"/></a> --%>
+<!-- 									<a class="btn btn-primary" href="https://github.com/GovernIB/notib/raw/notib-${versioMajorActual}/doc/pdf/NOTIB_${rolActual}.pdf" } download/><spring:message code="decorator.menu.manual.usuari"/></a> -->
 						</div>
+--%>
 							
 					</div>
 					
