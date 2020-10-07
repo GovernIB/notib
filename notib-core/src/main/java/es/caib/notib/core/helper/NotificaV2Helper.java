@@ -484,9 +484,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		
 		try {
 //			envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
-			if (notificacio.getProcediment() != null && notificacio.getProcediment().getOrganGestor() != null) { 
+			if (!isCodiDir3Entitat() && notificacio.getProcediment() != null && notificacio.getProcediment().getOrganGestor() != null) { 
 				envios.setCodigoOrganismoEmisor(notificacio.getProcediment().getOrganGestor().getCodi());
-			} else if(notificacio.getOrganGestor() != null) {
+			} else if(!isCodiDir3Entitat() && notificacio.getOrganGestor() != null) {
 				envios.setCodigoOrganismoEmisor(notificacio.getOrganGestor().getCodi());
 			} else {
 				envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
@@ -908,6 +908,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 	}
 
+	private boolean isCodiDir3Entitat() {
+		return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.plugin.codi.dir3.entitat");
+	}
 	private static final Logger logger = LoggerFactory.getLogger(NotificaV2Helper.class);
 
 }

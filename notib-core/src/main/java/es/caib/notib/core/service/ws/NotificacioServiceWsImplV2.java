@@ -1321,7 +1321,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			}
 			// - Telèfon
 			if (enviament.getTitular().getTelefon() != null && enviament.getTitular().getTelefon().length() > 16) {
-				return setRespostaError("[1119] El camp 'email' del titular no pot ser major que 16 caràcters.");
+				return setRespostaError("[1119] El camp 'telefon' del titular no pot ser major que 16 caràcters.");
 			}
 			// - Raó social
 			if (enviament.getTitular().getRaoSocial() != null && enviament.getTitular().getRaoSocial().length() > 255) {
