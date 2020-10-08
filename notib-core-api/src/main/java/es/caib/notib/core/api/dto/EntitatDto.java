@@ -46,6 +46,7 @@ public class EntitatDto extends AuditoriaDto {
 	private Long numAplicacions;
 	private String oficina;
 	private String nomOficinaVirtual;
+	private boolean llibreEntitat;
 	private String llibre;
 	private String llibreNom;
 

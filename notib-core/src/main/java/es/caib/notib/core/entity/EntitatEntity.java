@@ -70,6 +70,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	private String nomOficinaVirtual;
 	@Column(name = "oficina", length = 255)
 	private String oficina;
+	@Column(name = "llibre_entitat")
+	private boolean llibreEntitat;
 	@Column(name = "llibre")
 	protected String llibre;
 	@Column(name = "llibre_nom")
@@ -95,6 +97,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			TipusDocumentEnumDto tipusDocDefault,
 			String oficina,
 			String nomOficinaVirtual,
+			boolean llibreEntitat,
 			String llibre,
 			String llibreNom) {
 		this.codi = codi;
@@ -113,6 +116,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 		this.tipusDocDefault = tipusDocDefault;
 		this.oficina = oficina;
 		this.nomOficinaVirtual = nomOficinaVirtual;
+		this.llibreEntitat = llibreEntitat;
 		this.llibre = llibre;
 		this.llibreNom = llibreNom;
 	}
@@ -138,6 +142,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			TipusDocumentEnumDto tipusDocDefault,
 			String oficina,
 			String nomOficinaVirtual,
+			boolean llibreEntitat,
 			String llibre,
 			String llibreNom) {
 		return new Builder(
@@ -156,6 +161,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				tipusDocDefault,
 				oficina,
 				nomOficinaVirtual,
+				llibreEntitat,
 				llibre,
 				llibreNom);
 	}
@@ -178,6 +184,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				TipusDocumentEnumDto tipusDocDefault,
 				String oficina,
 				String nomOficinaVirtual,
+				boolean llibreEntitat,
 				String llibre,
 				String llibreNom) {
 			built = new EntitatEntity();
@@ -197,6 +204,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			built.tipusDocDefault = tipusDocDefault;
 			built.oficina = oficina;
 			built.nomOficinaVirtual = nomOficinaVirtual;
+			built.llibreEntitat = llibreEntitat;
 			built.llibre = llibre;
 			built.llibreNom = llibreNom;
 		}

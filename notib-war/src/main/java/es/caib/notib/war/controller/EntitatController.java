@@ -38,7 +38,6 @@ import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EntitatHelper;
 import es.caib.notib.war.helper.MessageHelper;
-import es.caib.notib.war.helper.PropertiesHelper;
 import es.caib.notib.war.helper.RolHelper;
 
 /**
@@ -57,7 +56,6 @@ public class EntitatController extends BaseController {
 	public String get( 
 			HttpServletRequest request,
 			Model model) {
-//		model.addAttribute("setLlibre", "ENTITAT".equalsIgnoreCase(PropertiesHelper.getProperties().getProperty("es.caib.notib.lloc.libre", "ENTITAT")));
 		return "entitatList";
 	}
 
@@ -101,7 +99,6 @@ public class EntitatController extends BaseController {
 			model.addAttribute("tipusDocumentDefault", command.getTipusDocDefault());
 			model.addAttribute("oficinaSelected", command.getOficina());
 			model.addAttribute( command );
-			model.addAttribute("setLlibre", "ENTITAT".equalsIgnoreCase(PropertiesHelper.getProperties().getProperty("es.caib.notib.lloc.libre", "ENTITAT")));
 		} else {
 			model.addAttribute(new EntitatCommand());
 		}
@@ -116,7 +113,6 @@ public class EntitatController extends BaseController {
 			Model model) throws NotFoundException, IOException {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("errors", bindingResult.getAllErrors());
-			model.addAttribute("setLlibre", "ENTITAT".equalsIgnoreCase(PropertiesHelper.getProperties().getProperty("es.caib.notib.lloc.libre", "ENTITAT")));
 			return "entitatForm";
 		}
 		if (command.getId() != null) {

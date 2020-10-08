@@ -61,6 +61,8 @@ public class EntitatCommand {
 	@NotEmpty
 	private String oficina;
 	private String nomOficinaVirtual;
+	
+	private boolean llibreEntitat;
 	private String llibre;
 	private String llibreNom;
 	
@@ -123,6 +125,11 @@ public class EntitatCommand {
 		}
 		entitat.setTipusDocDefault(tipusDocumentDefault);
 		entitat.setTipusDoc(tipusDocuments);
+		
+		if (!command.isLlibreEntitat()) {
+			entitat.setLlibre(null);
+			entitat.setLlibreNom(null);
+		}
 		return entitat;
 	}
 
