@@ -1401,7 +1401,7 @@ public class PluginHelper {
 //			}
 //		}
 //		
-//		if ("ORGAN".equalsIgnoreCase(PropertiesHelper.getProperties().getProperty("es.caib.notib.lloc.libre", "ENTITAT"))) {
+//		if (!notificacio.getEntitat().isLlibreEntitat()) {
 //			if (notificacio.getProcediment() != null && notificacio.getProcediment().getLlibre() != null) {
 //				dadesOficina.setLlibreCodi(notificacio.getProcediment().getLlibre());
 //			} else {
@@ -1998,7 +1998,7 @@ public class PluginHelper {
 			String dir3Codi) throws RegistrePluginException {
 		
 		LlibreDto llibreOrganisme = null;
-		if ("ORGAN".equalsIgnoreCase(PropertiesHelper.getProperties().getProperty("es.caib.notib.lloc.libre", "ENTITAT"))) {
+		if (!notificacio.getEntitat().isLlibreEntitat()) {
 			if (notificacio.getProcediment() != null && notificacio.getProcediment().getOrganGestor().getLlibre() != null) {
 				dadesOficina.setLlibreCodi(notificacio.getProcediment().getOrganGestor().getLlibre());
 				dadesOficina.setLlibreNom(notificacio.getProcediment().getOrganGestor().getLlibreNom());

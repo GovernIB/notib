@@ -111,24 +111,29 @@ $(document).ready(function() {
 		if (dir3codi !== undefined && dir3codi !== '') {
 			if (dir3codiReg == undefined || dir3codiReg == '') {
 				updateOficines(dir3codi);
-				updateLlibre(dir3codi);
+				if($("#llibreEntitat").is(':checked'))
+					updateLlibre(dir3codi);
 			}
 		} else {
 			console.log('<spring:message code="procediment.form.avis.oficines"/>');
 		}
 	});
 	$('#dir3CodiReg').on("change", function() {
+		let codi = '';
 		let dir3codiReg = $(this).val();
 		let dir3codi = $("#dir3Codi").val();
 		
 		if (dir3codiReg !== undefined && dir3codiReg !== '') {
-			updateOficines(dir3codiReg);
-			updateLlibre(dir3codiReg);
+			codi = dir3codiReg
 		} else if (dir3codi !== undefined && dir3codi !== ''){
-			updateOficines(dir3codi);
-			updateLlibre(dir3codi);
+			codi = dir3codi;
 		} else {
 			console.log('<spring:message code="procediment.form.avis.oficines"/>');
+		}
+		if (codi != '') {
+			updateOficines(codi);
+			if($("#llibreEntitat").is(':checked'))
+				updateLlibre(codi);
 		}
 	});
 	$('#oficina').on("change", function(){
@@ -146,7 +151,16 @@ $(document).ready(function() {
 			$('#llibreCodiNom').val("");
 		}
 	});
-// 	$('#dir3CodiReg').trigger("change");
+
+	$('#llibreEntitat').change(function() {
+		if (this.checked) {
+			$('#llibre-entitat').show();
+			$('#refreshLlibre').trigger("click");
+		} else {
+			$('#llibre-entitat').hide();
+		}
+	});
+	$('#llibreEntitat').trigger("change");
 	loadOficines();
 });	
 
@@ -189,7 +203,6 @@ function updateOficines(dir3codi) {
 	});
 }
 function updateLlibre(dir3codi) {
-	<c:if test="${setLlibre}">
 	$.ajax({
 		type: 'GET',
 		url: "<c:url value="/entitat/llibre/"/>" + dir3codi,
@@ -205,7 +218,6 @@ function updateLlibre(dir3codi) {
 			console.log("error obtenint el llibre de l'entitat!");
 		}
 	});
-	</c:if>
 }
 </script>
 </head>
@@ -233,8 +245,8 @@ function updateLlibre(dir3codi) {
 			<not:inputText name="apiKey" textKey="entitat.form.camp.apiKey" required="true"/>
 			<not:inputCheckbox name="ambEntregaDeh" textKey="entitat.form.camp.entregadeh"/>
 			<not:inputCheckbox name="ambEntregaCie" textKey="entitat.form.camp.entregacie"/>
-			<c:if test="${setLlibre}">
-<%-- 				<not:inputText name="llibreCodiNom" textKey="entitat.form.camp.llibre" required="true" readonly="true" inputClass="addBoto"/> --%>
+			<not:inputCheckbox name="llibreEntitat" textKey="entitat.form.camp.llibreEntitat"/>
+			<div id="llibre-entitat">
 				<div class="form-group">
 					<label class="control-label col-xs-4 " for="llibreCodiNom"><spring:message code="entitat.form.camp.llibre" /> *</label>
 					<div class="col-xs-8">
@@ -242,9 +254,8 @@ function updateLlibre(dir3codi) {
 						<button id="refreshLlibre" type="button" class="btn btn-default botoAdded"><span class="fa fa-refresh"></span></button>
 					</div>
 				</div>
-			</c:if>
+			</div>
 			<not:inputSelect name="oficina" textKey="entitat.form.camp.oficina" required="true" optionMinimumResultsForSearch="0"/>
-			<%-- <not:inputText name="nomOficinaVirtual" textKey="entitat.form.camp.oficinavirtual"/> --%>
 			<not:inputTextarea name="descripcio" textKey="entitat.form.camp.descripcio"/>
 		</div>
 		<div role="tabpanel" class="tab-pane " id="configuracioForm">

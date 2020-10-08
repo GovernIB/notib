@@ -60,7 +60,6 @@ import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PluginHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.repository.ColumnesRepository;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
@@ -616,7 +615,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 					enviament,
 					NotificacioEnviamentDtoV2.class);
 			int i = 0;
-			boolean llibreOrgan = "ORGAN".equalsIgnoreCase(PropertiesHelper.getProperties().getProperty("es.caib.notib.lloc.libre", "ENTITAT"));
+			boolean llibreOrgan = !entitat.isLlibreEntitat();
+			
 			for (NotificacioEnviamentDtoV2 notificacioEnviamentDtoV2 : paginaDto.getContingut()) {
 				if (enviament.getContent().get(i).getNotificacio().getProcedimentCodiNotib() != null)
 					notificacioEnviamentDtoV2.setProcedimentCodiNotib(enviament.getContent().get(i).getNotificacio().getProcedimentCodiNotib());
@@ -955,7 +955,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			
 			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 			List<String[]> files = new ArrayList<String[]>();
-			boolean llibreOrgan = "ORGAN".equalsIgnoreCase(PropertiesHelper.getProperties().getProperty("es.caib.notib.lloc.libre", "ENTITAT"));
+			boolean llibreOrgan = !entitatEntity.isLlibreEntitat();
 			
 			for (NotificacioEnviamentEntity enviament : enviaments) {
 				String[] fila = new String[numColumnes];

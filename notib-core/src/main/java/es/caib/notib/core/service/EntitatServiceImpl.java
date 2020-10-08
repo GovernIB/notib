@@ -110,6 +110,7 @@ public class EntitatServiceImpl implements EntitatService {
 					entitat.getTipusDocDefault().getTipusDocEnum(),
 					entitat.getOficina(),
 					entitat.getNomOficinaVirtual(),
+					entitat.isLlibreEntitat(),
 					entitat.getLlibre(),
 					entitat.getLlibreNom()).
 					descripcio(entitat.getDescripcio()).
@@ -212,6 +213,7 @@ public class EntitatServiceImpl implements EntitatService {
 					entitat.getTipusDocDefault().getTipusDocEnum(),
 					entitat.getOficina(),
 					entitat.getNomOficinaVirtual(),
+					entitat.isLlibreEntitat(),
 					entitat.getLlibre(),
 					entitat.getLlibreNom());
 			return conversioTipusHelper.convertir(
