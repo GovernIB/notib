@@ -145,6 +145,9 @@
 								'data-href',
 								$(plugin.settings.rowhrefTemplate).render(data));
 					}
+					if (data['DT_RowSelected']) {
+						$taula.dataTable().api().row(row).select();
+					}
 				},
 				preDrawCallback: function(settings_) {
 					
@@ -465,6 +468,21 @@
 						}, 50, "webutilDataTable#" + $taula.attr('id'));
 					});
 				}
+				if(plugin.settings.saveState){
+					dataTableOptions = $.extend({
+						stateSave: true,
+						stateSaveCallback: function(settings, data) {
+							sessionStorage.setItem( 'DataTables_' + settings.sInstance, JSON.stringify(data) )
+						}
+					}, dataTableOptions);
+					if(plugin.settings.mantenirPaginacio){
+						dataTableOptions = $.extend({
+							stateLoadCallback: function(settings) {
+								return JSON.parse( sessionStorage.getItem( 'DataTables_' + settings.sInstance ) )
+							}
+						}, dataTableOptions);
+					}
+				}
 			} else {
 				dataTableOptions = $.extend({
 					paging: false,
@@ -535,6 +553,8 @@
 						triggerSelectionChangeFunction('deselect', indexes);
 					}
 				});
+				
+				
 			}
 			// Configuració del filtre
 			if (plugin.settings.filtre) {

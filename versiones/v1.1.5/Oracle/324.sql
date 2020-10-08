@@ -1,3 +1,6 @@
+-- descomentar en cas de no existir la columna organ_gestor
+-- ALTER TABLE NOT_NOTIFICACIO ADD organ_gestor VARCHAR2(64 CHAR);
+
 UPDATE  NOT_NOTIFICACIO n
 SET     n.organ_gestor = (
         SELECT  p.organ_gestor

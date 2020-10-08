@@ -77,6 +77,12 @@ public class EnviamentController extends BaseUserController {
 	public String get(
 			HttpServletRequest request,
 			Model model) {
+		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
+		if (mantenirPaginacio) {
+			model.addAttribute("mantenirPaginacio", true);
+		} else {
+			model.addAttribute("mantenirPaginacio", false);
+		}
 		UsuariDto usuariAcutal = aplicacioService.getUsuariActual();
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		ColumnesDto columnes = null;

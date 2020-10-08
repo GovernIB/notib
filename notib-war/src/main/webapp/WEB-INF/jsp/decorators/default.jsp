@@ -297,7 +297,7 @@ body {
 							<div class="btn-group">
 									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.monitoritzar"/>&nbsp;<span class="caret caret-white"></span></button>
 									<ul class="dropdown-menu">
-										<li><a href="<c:url value="/massiu/notificacions"/>"><spring:message code="decorator.menu.callback"/></a></li>							
+										<li><a href="<c:url value="/massiu/notificacions"> <c:param name="mantenirPaginacio" value="true"/></c:url>"><spring:message code="decorator.menu.callback"/></a></li>							
 										<li><a href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
 										<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>
 										<li><a href="<c:url value="/metrics/list"/>"><spring:message code="decorator.menu.metriques"/></a></li>
@@ -329,7 +329,7 @@ body {
 										<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
 									</div>
 									<div class="btn-group">
-										<a href="<c:url value="/enviament"/>" class="btn btn-primary"><spring:message code="decorator.menu.enviaments"/></a>
+										<a href="<c:url value="/enviament"><c:param name="mantenirPaginacio" value="false"/></c:url>" class="btn btn-primary"><spring:message code="decorator.menu.enviaments"/></a>
 									</div>
 							</c:if>
 							<c:if test="${isRolActualAdministradorEntitat}">
