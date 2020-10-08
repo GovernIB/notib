@@ -66,6 +66,12 @@ public class ReintentMassiuController extends BaseUserController {
 	public String getNotificacions(
 			HttpServletRequest request,
 			Model model) {
+		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
+		if (mantenirPaginacio) {
+			model.addAttribute("mantenirPaginacio", true);
+		} else {
+			model.addAttribute("mantenirPaginacio", false);
+		}
 		model.addAttribute(new NotificacioErrorCallbackFiltreCommand());
 		model.addAttribute("procediments", procedimentService.findAll());
 		model.addAttribute("notificacioEstats", 

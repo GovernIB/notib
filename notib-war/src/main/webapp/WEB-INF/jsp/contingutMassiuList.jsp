@@ -220,6 +220,8 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-selection-enabled="true"
+		data-save-state="true"
+		data-mantenir-paginacio="${mantenirPaginacio}"
 		style="width:100%">
 		<thead>
 			<tr>
