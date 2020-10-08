@@ -1,3 +1,6 @@
+-- #316
+UPDATE NOT_ENTITAT SET LLIBRE_ENTITAT = 0;
+
 -- #324
 UPDATE  NOT_NOTIFICACIO n
 SET     n.organ_gestor = (

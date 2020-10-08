@@ -80,7 +80,7 @@ public class ProcedimentController extends BaseUserController{
 		ProcedimentFiltreCommand procedimentFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("procedimentFiltreCommand", procedimentFiltreCommand);
 		model.addAttribute("organsGestors", organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId()));
-		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGet("es.caib.notib.plugin.codi.dir3.entitat")));
+		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGet("es.caib.notib.plugin.codi.dir3.entitat", "false")));
 		
 		return "procedimentAdminList";
 	}
