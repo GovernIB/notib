@@ -207,10 +207,12 @@ function updateLlibre(dir3codi) {
 		type: 'GET',
 		url: "<c:url value="/entitat/llibre/"/>" + dir3codi,
 		success: function(data) {
-			if (data) {
+			if (data && data.codi) {
 				$('#llibreCodiNom').val(data.codi + " - " + data.nomLlarg);
+				$('#llibre-error').hide();
 			} else {
 				$('#llibreCodiNom').val("");
+				$('#llibre-error').show();
 			}
 // 			$(".loading-screen").hide();
 		},
@@ -252,6 +254,7 @@ function updateLlibre(dir3codi) {
 					<div class="col-xs-8">
 						<input id="llibreCodiNom" name="llibreCodiNom" class="form-control addBoto" readonly="readonly" type="text" value="${entitatCommand.llibreCodiNom}">
 						<button id="refreshLlibre" type="button" class="btn btn-default botoAdded"><span class="fa fa-refresh"></span></button>
+						<p id="llibre-error" class="comentari col-xs-12 col-xs-offset-"><spring:message code="entitat.form.camp.llibre.error"/></p>
 					</div>
 				</div>
 			</div>

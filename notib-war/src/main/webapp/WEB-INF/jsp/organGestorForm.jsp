@@ -80,7 +80,6 @@ $(document).ready(function() {
 		}
 	});
 
-	<c:if test="${setLlibre}">
 	$('#selOrganismes').on('change', function(){
 		var organSelect = document.getElementById('selOrganismes');
 		var organSeleccionatValue = organSelect.options[organSelect.selectedIndex].value;
@@ -88,6 +87,7 @@ $(document).ready(function() {
 		$('#codi').val(organSeleccionatValue);
 		$('#nom').val(organSeleccionatText.substring(organSeleccionatValue.length + 3));
 		
+		<c:if test="${setLlibre}">
 		if (organSeleccionatValue !== undefined && organSeleccionatValue !== '') {
 			$.ajax({
 				type: 'GET',
@@ -121,8 +121,8 @@ $(document).ready(function() {
 			$('#llibre').val(llibreSeleccionatValue);
 			$('#llibreNom').val(llibreSeleccionatText);
 		});
+		</c:if>
 	});
-	</c:if>
 });
 </script>
 </head>

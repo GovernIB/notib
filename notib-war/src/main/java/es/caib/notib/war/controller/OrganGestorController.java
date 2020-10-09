@@ -57,7 +57,7 @@ public class OrganGestorController extends BaseUserController{
 	public String get(
 			HttpServletRequest request,
 			Model model) {
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
 		model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
 		model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 		return "organGestorList";
@@ -116,7 +116,7 @@ public class OrganGestorController extends BaseUserController{
 			HttpServletRequest request,
 			Model model) {
 		OrganGestorCommand organGestorCommand = new OrganGestorCommand();
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
 		model.addAttribute(organGestorCommand);
 		model.addAttribute("entitat", getEntitatActualComprovantPermisos(request));
 		model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
@@ -131,9 +131,8 @@ public class OrganGestorController extends BaseUserController{
 			Model model) {		
 		
 		if (bindingResult.hasErrors()) {
-			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-			
-			model.addAttribute("entitat", getEntitatActualComprovantPermisos(request));
+			EntitatDto entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
+			model.addAttribute("entitat", entitat);
 			model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 			return "organGestorForm";
 		}
