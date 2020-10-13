@@ -210,10 +210,10 @@ $(document).ready(function() {
     	}
     });
 
-    $( "#form" ).submit(function( event ) {
-      $("#organGestor").prop("disabled", false);
-      return true;
-    });
+//     $( "#form" ).submit(function( event ) {
+//       $("#organGestor").prop("disabled", false);
+//       return true;
+//     });
     $('#tipusDocument').on('change', function() {
         if ($(this).val() == 'CSV') {
             $('#metadades').removeClass('hidden');
@@ -255,6 +255,35 @@ $(document).ready(function() {
     var agrupable = $("#procedimentId").children(":selected").attr("class");
     var procedimentId = $("#procedimentId").children(":selected").attr("value");
 
+    $('#organGestor').on('change', function(){
+    	var organ = $(this).val();
+    	$.ajax({
+			type: 'GET',
+			url: "<c:url value="/notificacio/organ/"/>" + organ + "/procediments",
+			success: function(data) {
+				var select2Options = {
+						theme: 'bootstrap',
+						width: 'auto'};
+				// Procediments
+				debugger
+				var procediments = data;
+				var selProcediments = $("#procedimentId");
+				selProcediments.empty();
+				if (procediments && procediments.length > 0) {
+					selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.select'/></option>");
+					$.each(data, function(i, val) {
+						selProcediments.append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
+					});
+				} else {
+					selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
+				}
+				selProcediments.select2(select2Options);
+			},
+			error: function() {
+				console.log("error obtenint els procediments de l'òrgan gestor...");
+			}
+		});
+    });
     $('#procedimentId').on('change', function() {
 //         var agrupable = $(this).children(":selected").attr("class");
 //         var procedimentId = $(this).children(":selected").attr("value");
@@ -272,8 +301,9 @@ $(document).ready(function() {
 							theme: 'bootstrap',
 							width: 'auto'};
 					// Òrgan gestor
-					$("#organGestor").val(data.organCodi).trigger("change");
-					$("#organGestor").prop("disabled", true);
+					debugger
+					$("#organGestor").val(data.organCodi).trigger("change.select2");
+// 					$("#organGestor").prop("disabled", true);
 					// Caducitat
 					$("#caducitat").val(data.caducitat);
 					// Grups
@@ -900,22 +930,20 @@ function actualitzarEntrega(j) {
 <%-- 			<form:hidden path="procedimentId" value="${procediment.id}" /> --%>
 			<form:hidden path="emisorDir3Codi" value="${entitat.dir3Codi}" />
 			
-			<!-- PROCEDIMENT -->
+			<!-- CONCEPTE -->
 			<div class="row">
 				<div class="col-md-12">
-					<not:inputSelect 
-						name="procedimentId" 
-						textKey="notificacio.form.camp.procediment" 
-						required="false" 
-						optionItems="${procediments}" 
-						optionValueAttribute="id" 
-						optionTextAttribute="nom" 
-						labelSize="2"
-						emptyOption="true"
-						optionMinimumResultsForSearch="2"
-						emptyOptionTextKey="notificacio.form.camp.procediment.select"/>
+					<not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="2" required="true" inputMaxLength="${concepteSize}"/>
 				</div>
 			</div>
+			
+			<!-- DESCRIPCIÓ -->
+			<div class="row">
+				<div class="col-md-12">
+					<not:inputTextarea name="descripcio" textKey="notificacio.form.camp.descripcio" labelSize="2" inputMaxLength="${descripcioSize}"/>
+				</div>
+			</div>
+			
 			<!-- ORGAN -->
 			<div class="row">
 				<div class="col-md-12">
@@ -932,18 +960,20 @@ function actualitzarEntrega(j) {
 						emptyOptionTextKey="notificacio.form.camp.organ.select"/>
 				</div>
 			</div>
-			
-			<!-- CONCEPTE -->
+			<!-- PROCEDIMENT -->
 			<div class="row">
 				<div class="col-md-12">
-					<not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="2" required="true" inputMaxLength="${concepteSize}"/>
-				</div>
-			</div>
-			
-			<!-- DESCRIPCIÓ -->
-			<div class="row">
-				<div class="col-md-12">
-					<not:inputTextarea name="descripcio" textKey="notificacio.form.camp.descripcio" labelSize="2" inputMaxLength="${descripcioSize}"/>
+					<not:inputSelect 
+						name="procedimentId" 
+						textKey="notificacio.form.camp.procediment" 
+						required="false" 
+						optionItems="${procediments}" 
+						optionValueAttribute="id" 
+						optionTextAttribute="nom" 
+						labelSize="2"
+						emptyOption="true"
+						optionMinimumResultsForSearch="2"
+						emptyOptionTextKey="notificacio.form.camp.procediment.select"/>
 				</div>
 			</div>
 			

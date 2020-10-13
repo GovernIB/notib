@@ -830,6 +830,28 @@ public class NotificacioController extends BaseUserController {
 		return dadesProcediment;
 	}
 	
+	@RequestMapping(value = "/organ/{organId}/procediments", method = RequestMethod.GET)
+	@ResponseBody
+	public List<ProcedimentDto> getProcedimentsOrgan(
+			HttpServletRequest request, 
+			@PathVariable String organId) {
+
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		List<ProcedimentDto> procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
+
+		List<ProcedimentDto> procedimentsOrgan = new ArrayList<ProcedimentDto>();
+		if (procedimentsDisponibles != null) {
+			for (ProcedimentDto proc: procedimentsDisponibles) {
+				if (proc.isComu() || organId.equalsIgnoreCase(proc.getOrganGestor())) {
+					procedimentsOrgan.add(proc);
+				}
+			}
+		}
+		return procedimentsOrgan;
+	}
+	
+	
 	@RequestMapping(value = "/paisos", method = RequestMethod.GET)
 	@ResponseBody
 	private List<PaisosDto> getPaisos(
