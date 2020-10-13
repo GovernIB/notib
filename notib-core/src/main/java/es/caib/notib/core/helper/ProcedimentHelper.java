@@ -290,8 +290,8 @@ public class ProcedimentHelper {
 			procediment = ProcedimentEntity.getBuilder(
 					procedimentGda.getCodi(),
 					procedimentGda.getNom(),
-					Integer.parseInt(PropertiesHelper.getProperties().getProperty("es.caib.notib.procediment.alta.auto.retard", "0")),
-					Integer.parseInt(PropertiesHelper.getProperties().getProperty("es.caib.notib.procediment.alta.auto.caducitat", "10")),
+					Integer.parseInt(PropertiesHelper.getProperties().getProperty("es.caib.notib.procediment.alta.auto.retard", "10")),
+					Integer.parseInt(PropertiesHelper.getProperties().getProperty("es.caib.notib.procediment.alta.auto.caducitat", "15")),
 					entitat,
 					null,
 					null,

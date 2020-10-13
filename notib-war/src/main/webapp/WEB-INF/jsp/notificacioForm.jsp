@@ -257,6 +257,9 @@ $(document).ready(function() {
 
     $('#organGestor').on('change', function(){
     	var organ = $(this).val();
+    	if (organ == undefined || organ == "") {
+			organ = "-";
+        }
     	$.ajax({
 			type: 'GET',
 			url: "<c:url value="/notificacio/organ/"/>" + organ + "/procediments",
@@ -265,7 +268,6 @@ $(document).ready(function() {
 						theme: 'bootstrap',
 						width: 'auto'};
 				// Procediments
-				debugger
 				var procediments = data;
 				var selProcediments = $("#procedimentId");
 				selProcediments.empty();
@@ -301,11 +303,12 @@ $(document).ready(function() {
 							theme: 'bootstrap',
 							width: 'auto'};
 					// Òrgan gestor
-					debugger
 					$("#organGestor").val(data.organCodi).trigger("change.select2");
 // 					$("#organGestor").prop("disabled", true);
 					// Caducitat
 					$("#caducitat").val(data.caducitat);
+					// Retard
+					$("#retard").val(data.retard);
 					// Grups
 					var grups = data.grups;
 					var selGrups = $("#grupId");
@@ -1014,7 +1017,7 @@ function actualitzarEntrega(j) {
 			<!-- RETARD -->
 			<div class="row">
 				<div class="col-md-12">
-					<not:inputText name="retard" textKey="notificacio.form.camp.retard" info="true" messageInfo="notificacio.form.camp.retard.info" value="${procediment.retard}" labelSize="2" inputSize="6"/>
+					<not:inputText name="retard" textKey="notificacio.form.camp.retard" info="true" messageInfo="notificacio.form.camp.retard.info" value="10" labelSize="2" inputSize="6"/>
 				</div>
 			</div>
 			

@@ -819,6 +819,7 @@ public class NotificacioController extends BaseUserController {
 		DadesProcediment dadesProcediment = new DadesProcediment();
 		dadesProcediment.setOrganCodi(procedimentActual.getOrganGestor());
 		dadesProcediment.setCaducitat(CaducitatHelper.sumarDiesLaborals(procedimentActual.getCaducitat()));
+		dadesProcediment.setRetard(procedimentActual.getRetard());
 		dadesProcediment.setAgrupable(procedimentActual.isAgrupar());
 		if (procedimentActual.isAgrupar()) {
 			dadesProcediment.setGrups(grupService.findByProcedimentAndUsuariGrups(procedimentId));
@@ -843,7 +844,8 @@ public class NotificacioController extends BaseUserController {
 		List<ProcedimentDto> procedimentsOrgan = new ArrayList<ProcedimentDto>();
 		if (procedimentsDisponibles != null) {
 			for (ProcedimentDto proc: procedimentsDisponibles) {
-				if (proc.isComu() || organId.equalsIgnoreCase(proc.getOrganGestor())) {
+				// Si no s'ha seleccionat cap òrgan enviaran '-'
+				if (proc.isComu() || organId.equals("-") || organId.equalsIgnoreCase(proc.getOrganGestor())) {
 					procedimentsOrgan.add(proc);
 				}
 			}
@@ -1107,6 +1109,7 @@ public class NotificacioController extends BaseUserController {
 	@Data
 	public class DadesProcediment {
 		private String caducitat;
+		private Integer retard;
 		private String organCodi;
 		private boolean agrupable = false;
 		private List<GrupDto> grups = new ArrayList<GrupDto>();
