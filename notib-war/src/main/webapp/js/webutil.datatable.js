@@ -4,7 +4,7 @@
 	$.webutilDatatable = function(element, options) {
 		var defaults = {
 			pageLength: 10,
-			lengthMenu: [10, 20, 50],
+			lengthMenu: [10, 20, 50, 100],
 			infoEnabled: true,
 			infoType: 'botons', // 'botons', 'search'
 			searchEnabled: true,
@@ -92,6 +92,17 @@
 				ajax: {
 					url: getBaseUrl() + '/datatable',
 					data: function(data) {
+						
+						// Reduir crida - INICI
+						for (var i = 0, len = data.columns.length; i < len; i++) {
+							if (! data.columns[i].search.value) delete data.columns[i].search;
+							if (data.columns[i].searchable === true) delete data.columns[i].searchable;
+							if (data.columns[i].orderable === true) delete data.columns[i].orderable;
+							if (data.columns[i].data === data.columns[i].name) delete data.columns[i].name;
+						}
+						delete data.search.regex;
+						// Reduir crida - FI
+						
 						for (var key in plugin.serverParams) {
 							data[key] = plugin.serverParams[key];
 						}
@@ -133,6 +144,9 @@
 						$(row).attr(
 								'data-href',
 								$(plugin.settings.rowhrefTemplate).render(data));
+					}
+					if (data['DT_RowSelected']) {
+						$taula.dataTable().api().row(row).select();
 					}
 				},
 				preDrawCallback: function(settings_) {
@@ -454,6 +468,21 @@
 						}, 50, "webutilDataTable#" + $taula.attr('id'));
 					});
 				}
+				if(plugin.settings.saveState){
+					dataTableOptions = $.extend({
+						stateSave: true,
+						stateSaveCallback: function(settings, data) {
+							sessionStorage.setItem( 'DataTables_' + settings.sInstance, JSON.stringify(data) )
+						}
+					}, dataTableOptions);
+					if(plugin.settings.mantenirPaginacio){
+						dataTableOptions = $.extend({
+							stateLoadCallback: function(settings) {
+								return JSON.parse( sessionStorage.getItem( 'DataTables_' + settings.sInstance ) )
+							}
+						}, dataTableOptions);
+					}
+				}
 			} else {
 				dataTableOptions = $.extend({
 					paging: false,
@@ -524,6 +553,8 @@
 						triggerSelectionChangeFunction('deselect', indexes);
 					}
 				});
+				
+				
 			}
 			// Configuració del filtre
 			if (plugin.settings.filtre) {

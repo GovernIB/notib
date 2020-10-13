@@ -144,7 +144,7 @@ $(document).ready(function() {
 					"enviament/select",
 					function(data) {
 						$(".seleccioCount").html(data);
-						$('#taulaDades').webutilDatatable('refresh');
+						$('#enviament').webutilDatatable('refresh');
 					}
 			);
 			return false;
@@ -213,6 +213,41 @@ $(document).ready(function() {
 	    }
 	});
 });
+
+function guardarFilesSeleccionades(table) {
+	var idsSelectedRows = sessionStorage.getItem('rowIdsStore');
+	if (!(idsSelectedRows))
+		return;
+	
+	var rowids = JSON.parse(idsSelectedRows);
+	for (var id in rowids) {
+		var selectedRowId = document.getElementById(id);
+		var $cell = $('td:first', $(selectedRowId));
+		$(selectedRowId).addClass('selected');
+		$cell.empty().append('<span class="fa fa-check-square-o"></span>');
+	}
+}
+
+function seleccionarFila(id) {
+	var isSelected = $(document.getElementById(id)).hasClass('selected')
+	var idsSelectedRows = sessionStorage.getItem('rowIdsStore');
+	if (!(idsSelectedRows)) {
+		clearSeleccio();
+	}
+	var rowKeys = JSON.parse(idsSelectedRows);
+	if (isSelected === false && rowKeys.hasOwnProperty(id)) {
+		delete rowKeys[id];
+	} else if (isSelected) {
+		rowKeys[id] = true;
+	}
+	sessionStorage.setItem('rowIdsStore', JSON.stringify(rowKeys));
+}
+
+
+function clearSeleccio() {
+	sessionStorage.setItem('rowIdsStore', "{}");
+}
+
 function setCookie(cname,cvalue) {
 	var exdays = 30;
     var d = new Date();
@@ -250,7 +285,7 @@ function getCookie(cname) {
 					</button>
 					<ul class="dropdown-menu">
 						<li><a href="<c:url value="enviament/export/ODS"/>"><spring:message code="enviament.list.user.exportar"/> a <spring:message code="enviament.list.user.exportar.EXCEL"/></a></li> 
-						<li><a style="cursor: pointer;" id="reintentarNotificacio"><spring:message code="enviament.list.user.reintentar"/> <spring:message code="enviament.list.user.reintentar.notificacio"/></a></li>
+						<li><a style="cursor: pointer;" id="reintentarNotificacio"><spring:message code="enviament.list.user.reintentar.notificacio"/></a></li>
 						<li><a style="cursor: pointer;" id="reactivarConsulta"><spring:message code="enviament.list.user.reactivar.consulta"/></a></li>
 						<li><a style="cursor: pointer;" id="reactivarSir"><spring:message code="enviament.list.user.reactivar.sir"/></a></li>
 					</ul>
@@ -281,9 +316,9 @@ function getCookie(cname) {
 		data-cell-template="#cellFilterTemplate"
 		data-paging-style-x="true"
 		data-scroll-overflow="adaptMax"
-		data-mantenir-paginacio="${mantenirPaginacio}"
 		data-selection-enabled="true"
 		data-save-state="true"
+		data-mantenir-paginacio="${mantenirPaginacio}"
 		style="width:100%">
 		<thead>
 			<tr>

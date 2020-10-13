@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
@@ -162,7 +163,7 @@ public class EntitatServiceBean implements EntitatService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual() {
 		return delegate.getPermisosEntitatsUsuariActual();
 	}
@@ -171,5 +172,11 @@ public class EntitatServiceBean implements EntitatService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public List<OficinaDto> findOficinesEntitat(String dir3codi) {
 		return delegate.findOficinesEntitat(dir3codi);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public LlibreDto getLlibreEntitat(String dir3Codi) {
+		return delegate.getLlibreEntitat(dir3Codi);
 	}
 }

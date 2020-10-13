@@ -52,8 +52,23 @@
 .icon {
 	float: left;
 }
+.addBoto {
+	float:left;
+	width: calc(100% - 40px);
+}
+.botoAdded {
+	float: left;
+	margin-left: 5px;
+	padding: 9px 10px;
+	line-height: 10px;
+}
 </style>
 <script type="text/javascript">
+
+var oficinaActual = '${oficinaSelected}';
+var codiDir3Actual =  '${entitatCommand.dir3Codi}';
+var codiDir3RegActual = '${entitatCommand.dir3CodiReg}';
+
 $(document).ready(function() {
 
 	var entitatId = document.getElementById('id').value;
@@ -81,8 +96,6 @@ $(document).ready(function() {
 				    'valor': option.value,
 				    'desc': option.text,
 				};
-			
-				    	      
 		});
 	    addDefault(data);
 
@@ -90,40 +103,124 @@ $(document).ready(function() {
 	});
 	
 	$('#colorFons, #colorLletra').colorpicker();
-	var oficinaActual = '${oficinaSelected}';
-	$('#dir3Codi').on("change blur", function() {
+	
+	$('#dir3Codi').on("change", function() {
 		let dir3codi = $(this).val();
+		let dir3codiReg = $("#dir3CodiReg").val();
+		
 		if (dir3codi !== undefined && dir3codi !== '') {
-			$.ajax({
-				type: 'GET',
-				url: "<c:url value="/entitat/oficines/"/>" + dir3codi,
-				success: function(data) {
-					var selOficines = $('#oficina');
-					selOficines.empty();
-					selOficines.append("<option value=\"\"></option>");
-					if (data && data.length > 0) {
-							var items = [];
-							$.each(data, function(i, val) {
-								items.push({
-									"id": val.codi,
-									"text": val.codi + " - " + val.nom
-								});
-								console.log(oficinaActual);
-								selOficines.append("<option value=\"" + val.codi + "\"" + (oficinaActual == val.codi ? "selected" :  "") + ">" + val.codi + " - " + val.nom + "</option>");									
-							});
-						}
-					$(".loading-screen").hide();
-				},
-				error: function() {
-					console.log("error obtenint les oficines...");
-				}
-			});
+			if (dir3codiReg == undefined || dir3codiReg == '') {
+				updateOficines(dir3codi);
+				if($("#llibreEntitat").is(':checked'))
+					updateLlibre(dir3codi);
+			}
 		} else {
-			console.log('<spring:message code="procediment.form.avis.llibres"/>');
+			console.log('<spring:message code="procediment.form.avis.oficines"/>');
 		}
 	});
-	$('#dir3Codi').trigger("blur");
+	$('#dir3CodiReg').on("change", function() {
+		let codi = '';
+		let dir3codiReg = $(this).val();
+		let dir3codi = $("#dir3Codi").val();
+		
+		if (dir3codiReg !== undefined && dir3codiReg !== '') {
+			codi = dir3codiReg
+		} else if (dir3codi !== undefined && dir3codi !== ''){
+			codi = dir3codi;
+		} else {
+			console.log('<spring:message code="procediment.form.avis.oficines"/>');
+		}
+		if (codi != '') {
+			updateOficines(codi);
+			if($("#llibreEntitat").is(':checked'))
+				updateLlibre(codi);
+		}
+	});
+	$('#oficina').on("change", function(){
+		oficinaActual = $(this).val();
+	});
+	$('#refreshLlibre').on("click", function() {
+		let dir3codiReg = $("#dir3CodiReg").val();
+		let dir3codi = $("#dir3Codi").val();
+		
+		if (dir3codiReg !== undefined && dir3codiReg !== '') {
+			updateLlibre(dir3codiReg);
+		} else if (dir3codi !== undefined && dir3codi !== ''){
+			updateLlibre(dir3codi);
+		} else {
+			$('#llibreCodiNom').val("");
+		}
+	});
+
+	$('#llibreEntitat').change(function() {
+		if (this.checked) {
+			$('#llibre-entitat').show();
+			$('#refreshLlibre').trigger("click");
+		} else {
+			$('#llibre-entitat').hide();
+		}
+	});
+	$('#llibreEntitat').trigger("change");
+	loadOficines();
 });	
+
+function loadOficines() {
+	let dir3codiReg = $("#dir3CodiReg").val();
+	let dir3codi = $("#dir3Codi").val();
+	
+	if (dir3codiReg !== undefined && dir3codiReg !== '') {
+		updateOficines(dir3codiReg);
+	} else if (dir3codi !== undefined && dir3codi !== ''){
+		updateOficines(dir3codi);
+	} else {
+		console.log('<spring:message code="procediment.form.avis.oficines"/>');
+	}
+}
+function updateOficines(dir3codi) {
+	$.ajax({
+		type: 'GET',
+		url: "<c:url value="/entitat/oficines/"/>" + dir3codi,
+		success: function(data) {
+			var selOficines = $('#oficina');
+			selOficines.empty();
+			selOficines.append("<option value=\"\"></option>");
+			if (data && data.length > 0) {
+					var items = [];
+					$.each(data, function(i, val) {
+						items.push({
+							"id": val.codi,
+							"text": val.codi + " - " + val.nom
+						});
+						console.log(oficinaActual);
+						selOficines.append("<option value=\"" + val.codi + "\"" + (oficinaActual == val.codi ? "selected" :  "") + ">" + val.codi + " - " + val.nom + "</option>");									
+					});
+				}
+			$(".loading-screen").hide();
+		},
+		error: function() {
+			console.log("error obtenint les oficines...");
+		}
+	});
+}
+function updateLlibre(dir3codi) {
+	$.ajax({
+		type: 'GET',
+		url: "<c:url value="/entitat/llibre/"/>" + dir3codi,
+		success: function(data) {
+			if (data && data.codi) {
+				$('#llibreCodiNom').val(data.codi + " - " + data.nomLlarg);
+				$('#llibre-error').hide();
+			} else {
+				$('#llibreCodiNom').val("");
+				$('#llibre-error').show();
+			}
+// 			$(".loading-screen").hide();
+		},
+		error: function() {
+			console.log("error obtenint el llibre de l'entitat!");
+		}
+	});
+}
 </script>
 </head>
 <body>
@@ -150,8 +247,18 @@ $(document).ready(function() {
 			<not:inputText name="apiKey" textKey="entitat.form.camp.apiKey" required="true"/>
 			<not:inputCheckbox name="ambEntregaDeh" textKey="entitat.form.camp.entregadeh"/>
 			<not:inputCheckbox name="ambEntregaCie" textKey="entitat.form.camp.entregacie"/>
+			<not:inputCheckbox name="llibreEntitat" textKey="entitat.form.camp.llibreEntitat"/>
+			<div id="llibre-entitat">
+				<div class="form-group">
+					<label class="control-label col-xs-4 " for="llibreCodiNom"><spring:message code="entitat.form.camp.llibre" /> *</label>
+					<div class="col-xs-8">
+						<input id="llibreCodiNom" name="llibreCodiNom" class="form-control addBoto" readonly="readonly" type="text" value="${entitatCommand.llibreCodiNom}">
+						<button id="refreshLlibre" type="button" class="btn btn-default botoAdded"><span class="fa fa-refresh"></span></button>
+						<p id="llibre-error" class="comentari col-xs-12 col-xs-offset-"><spring:message code="entitat.form.camp.llibre.error"/></p>
+					</div>
+				</div>
+			</div>
 			<not:inputSelect name="oficina" textKey="entitat.form.camp.oficina" required="true" optionMinimumResultsForSearch="0"/>
-			<%-- <not:inputText name="nomOficinaVirtual" textKey="entitat.form.camp.oficinavirtual"/> --%>
 			<not:inputTextarea name="descripcio" textKey="entitat.form.camp.descripcio"/>
 		</div>
 		<div role="tabpanel" class="tab-pane " id="configuracioForm">

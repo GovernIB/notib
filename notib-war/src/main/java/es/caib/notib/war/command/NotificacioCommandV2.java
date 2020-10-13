@@ -48,6 +48,7 @@ public class NotificacioCommandV2 {
 	private Long id;
 	@NotEmpty @Size(max=9)
 	private String emisorDir3Codi;
+	@NotEmpty
 	private String organGestor;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;

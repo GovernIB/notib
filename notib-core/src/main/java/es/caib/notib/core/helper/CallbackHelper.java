@@ -167,7 +167,8 @@ public class CallbackHelper {
 		
 		// Resol si hi ha una aplicació pel codi d'usuari que ha creat l'enviament
 		UsuariEntity usuari = enviament.getCreatedBy();
-		AplicacioEntity aplicacio = aplicacioRepository.findByUsuariCodi(usuari.getCodi());
+		
+		AplicacioEntity aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuari.getCodi(), enviament.getNotificacio().getEntitat().getId());
 		if (aplicacio == null)
 			throw new NotFoundException("codi usuari: " + usuari.getCodi(), AplicacioEntity.class);
 		if (aplicacio.getCallbackUrl() == null)

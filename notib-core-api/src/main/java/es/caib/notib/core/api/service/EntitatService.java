@@ -11,6 +11,7 @@ import java.util.Map;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
@@ -185,7 +186,7 @@ public interface EntitatService {
 	 * 
 	 * @return El un booleà per a cada rol: Usuari, Administrador d'entitats i Aplicació.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+//	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual();
 	/**
 	 * Consulta els permisos de l'entitat.
@@ -248,5 +249,8 @@ public interface EntitatService {
 	
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom')")
 	byte[] getPeuLogo() throws NoSuchFileException, IOException;
+	
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	public LlibreDto getLlibreEntitat(String dir3Codi);
 
 }

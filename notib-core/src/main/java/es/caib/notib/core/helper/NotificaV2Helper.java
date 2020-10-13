@@ -480,14 +480,17 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private AltaRemesaEnvios generarAltaRemesaEnvios(
 			NotificacioEntity notificacio) throws GeneralSecurityException, DatatypeConfigurationException, DecoderException {
 		AltaRemesaEnvios envios = new AltaRemesaEnvios();
-		Integer retardPostal;
+		Integer retardPostal = null;
 		
 		try {
 //			envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
-			if (notificacio.getProcediment().getOrganGestor() != null) 
+			if (!isCodiDir3Entitat() && notificacio.getProcediment() != null && notificacio.getProcediment().getOrganGestor() != null) { 
 				envios.setCodigoOrganismoEmisor(notificacio.getProcediment().getOrganGestor().getCodi());
-			else
+			} else if(!isCodiDir3Entitat() && notificacio.getOrganGestor() != null) {
+				envios.setCodigoOrganismoEmisor(notificacio.getOrganGestor().getCodi());
+			} else {
 				envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
+			}
 			
 			switch (notificacio.getEnviamentTipus()) {
 			case COMUNICACIO:
@@ -621,7 +624,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 			if(notificacio.getRetard() != null) {
 				retardPostal = notificacio.getRetard();
-			} else {
+			} else if (notificacio.getProcediment() != null) {
 				retardPostal = procedimentRepository.findOne(notificacio.getProcediment().getId()).getRetard();
 			}
 			
@@ -712,7 +715,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					
 					if (enviament.getDomiciliConcretTipus() != null) {
 						EntregaPostal entregaPostal = new EntregaPostal();
-						if (notificacio.getProcediment().getPagadorpostal() != null) {
+						if (notificacio.getProcediment() != null && notificacio.getProcediment().getPagadorpostal() != null) {
 							OrganismoPagadorPostal pagadorPostal = new OrganismoPagadorPostal();
 							pagadorPostal.setCodigoDIR3Postal(notificacio.getProcediment().getPagadorpostal().getDir3codi());
 							pagadorPostal.setCodClienteFacturacionPostal(notificacio.getProcediment().getPagadorpostal().getFacturacioClientCodi());
@@ -721,7 +724,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 								toXmlGregorianCalendar(notificacio.getProcediment().getPagadorpostal().getContracteDataVig()));
 							entregaPostal.setOrganismoPagadorPostal(pagadorPostal);
 						}
-						if (notificacio.getProcediment().getPagadorcie() != null) {
+						if (notificacio.getProcediment() != null && notificacio.getProcediment().getPagadorcie() != null) {
 							OrganismoPagadorCIE pagadorCie = new OrganismoPagadorCIE();
 							pagadorCie.setCodigoDIR3CIE(notificacio.getProcediment().getPagadorcie().getDir3codi());
 							pagadorCie.setFechaVigenciaCIE(
@@ -905,6 +908,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 	}
 
+	private boolean isCodiDir3Entitat() {
+		return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.plugin.codi.dir3.entitat", false);
+	}
 	private static final Logger logger = LoggerFactory.getLogger(NotificaV2Helper.class);
 
 }

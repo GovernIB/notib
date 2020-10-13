@@ -285,8 +285,14 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 				}			
 				NotificacioEnviamentEntity enviamentSaved = notificacioEnviamentRepository.saveAndFlush(
 						NotificacioEnviamentEntity.getBuilderV1(
-								enviament, notificacio, numeracioTipus, tipusConcret, serveiTipus, notificacioGuardada, titular, destinataris)
-								.domiciliViaTipus(toEnviamentViaTipusEnum(enviament.getEntregaPostal().getViaTipus())).build());
+								enviament, 
+								numeracioTipus, 
+								tipusConcret, 
+								serveiTipus, 
+								notificacioGuardada, 
+								titular, 
+								destinataris)
+						.domiciliViaTipus(toEnviamentViaTipusEnum(enviament.getEntregaPostal().getViaTipus())).build());
 				
 				String referencia;
 				try {

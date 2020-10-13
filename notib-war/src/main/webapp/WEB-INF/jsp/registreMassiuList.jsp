@@ -7,7 +7,7 @@
 <c:set var="idioma"><%=org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage()%></c:set>
 <html>
 <head>
-	<title><spring:message code="accio.massiva.reintentar.titol"/></title>
+	<title><spring:message code="accio.massiva.registre.titol"/></title>
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -125,7 +125,7 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 // </c:forEach>
 	$(document).ready(function() {
 		
-		$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
+		$('#taulaDadesRegistre').on('selectionchange.dataTable', function (e, accio, ids) {
 			$.get(
 					accio,
 					{ids: ids},
@@ -134,13 +134,13 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 					}
 			);
 		});
-		$('#taulaDades').on('draw.dt', function () {
+		$('#taulaDadesRegistre').on('draw.dt', function () {
 			$('#seleccioAll').on('click', function() {
 				$.get(
 						"select",
 						function(data) {
 							$("#seleccioCount").html(data);
-							$('#taulaDades').webutilDatatable('refresh');
+							$('#taulaDadesRegistre').webutilDatatable('refresh');
 						}
 				);
 				return false;
@@ -150,8 +150,8 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 						"deselect",
 						function(data) {
 							$("#seleccioCount").html(data);
-							$('#taulaDades').webutilDatatable('select-none');
-							$('#taulaDades').webutilDatatable('refresh');
+							$('#taulaDadesRegistre').webutilDatatable('select-none');
+							$('#taulaDadesRegistre').webutilDatatable('refresh');
 						}
 				);
 				return false;
@@ -179,13 +179,22 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 	
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<div class="btn-group pull-right">
-			<a type="button" class="btn btn-default" href="./notificacions/reintentar" data-refresh-pagina="false">
-				<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="accio.massiva.reintentar.boto"/>
-			</a>
+			<div class="btn-group">
+				<button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots" />" class="btn btn-default" ><span class="fa fa-check-square-o"></span></button>
+				<button id="seleccioNone" title="<spring:message code="enviament.list.user.seleccio.cap" />" class="btn btn-default" ><span class="fa fa-square-o"></span></button>
+				<div class="btn-group">
+					<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  						<span id="seleccioCount" class="badge seleccioCount">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.accions.massives"/> <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a href="./notificacionsError/reintentar"><spring:message code="accio.massiva.registre.boto"/></a></li>
+					</ul>
+				</div>
+			</div>
 		</div>
 	</script>
 		
-	<form:form id="filtre" action="" method="post" cssClass="well" commandName="notificacioErrorCallbackFiltreCommand" >
+	<form:form id="filtre" action="" method="post" cssClass="well" commandName="notificacioRegistreErrorFiltreCommand" >
 		<div class="row">
 			<div class="col-md-4">
 				<not:inputSelect name="procedimentId" optionItems="${procediments}" optionValueAttribute="id" optionTextAttribute="nom" placeholderKey="notificacio.list.filtre.camp.procediment" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
@@ -200,9 +209,6 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 				<not:inputDate name="dataFi" placeholderKey="notificacio.list.filtre.camp.datafi" inline="true" required="false" />
 			</div>
 			<div class="col-md-4">
-				<not:inputSelect name="estat" optionItems="${notificacioEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"/>
-			</div>
-			<div class="col-md-4">
 				<not:inputSuggest name="usuari" inline="true" placeholderKey="notificacio.list.filtre.camp.usuari" urlConsultaInicial="../userajax/usuariDades" urlConsultaLlistat="../userajax/usuarisDades" suggestValue="codi" suggestText="nom" minimumInputLength="2" />
 			</div>
 
@@ -213,21 +219,18 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 		</div>
 	</form:form>
 	
-	<table id="taulaDades" 
+	<table id="taulaDadesRegistre" 
 		data-toggle="datatable" 
-		data-url="<c:url value="/massiu/datatable"/>"
+		data-url="<c:url value="/massiu/registre/datatable"/>"
 		class="table table-bordered table-striped" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-selection-enabled="true"
-		data-save-state="true"
-		data-mantenir-paginacio="${mantenirPaginacio}"
 		style="width:100%">
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false">#</th>
 				<th data-col-name="tipusUsuari" data-visible="false">#</th>
-				<th data-col-name="errorLastCallback" data-visible="false">#</th>
 				<th data-col-name="notificacio.notificaError" data-visible="false"></th>
 				<th data-col-name="notificacio.notificaErrorDescripcio" data-visible="false"></th>
 				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" class="enviamentTipusCol" width="3%">
@@ -241,40 +244,12 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 					</script>
 				</th>
 				<th data-col-name="createdDate" data-converter="datetime" width="10%"><spring:message code="notificacio.list.columna.enviament.data"/></th>
-				<th data-col-name="createdBy.nom" width="10%"><spring:message code="notificacio.list.filtre.camp.usuari"/></th>
-				<th data-col-name="procediment.nom"  width="150px"><spring:message code="notificacio.list.columna.procediment"/></th>
-				<th data-col-name="concepte" width="15%" ><spring:message code="notificacio.list.columna.concepte"/></th>
-				<th data-col-name="estatDate" data-converter="datetime" data-visible="false"></th>
-				<th data-col-name="estat" data-template="#cellEstatTemplate"  width="120px">
-					<spring:message code="notificacio.list.columna.estat"/>
-					<script id="cellEstatTemplate" type="text/x-jsrender">
-						{{if estat == 'PENDENT'}}
-							<span class="fa fa-clock-o"></span>
-						{{else estat == 'ENVIADA'}}
-							<span class="fa fa-send-o"></span>
-						{{else estat == 'FINALITZADA'}}
-							<span class="fa fa-check"></span>
-						{{else estat == 'REGISTRADA'}}
-							<span class="fa fa-file-o"></span>
-						{{else estat == 'PROCESSADA'}}
-							<span class="fa fa-check-circle"></span>
-						{{/if}}
-						{{:~eval('notificacioEstats["' + estat + '"]')}}
-						{{if estat == 'PROCESSADA' && estatDate != ''}}
-							<br>
-							<p class="horaProcessat">{{:~eval('formatDate(' + estatDate+ ')')}}</p>
-						{{/if}}
-						{{if estat == 'FINALITZADA'}}
-							{{:~recuperarEstatEnviament(id)}}
-							<p class="estat_{{:id}}"  style="display:inline"></p>
-						{{/if}}
-
-						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>errorNotificaDescripcio}}"></span>{{/if}}
-					</script>
-				</th>
+				<th data-col-name="createdBy.nom" width="15%"><spring:message code="notificacio.info.dada.creacio.usuari"/></th>
+				<th data-col-name="procediment.nom"  width="30%"><spring:message code="notificacio.list.columna.procediment"/></th>
+				<th data-col-name="concepte"><spring:message code="notificacio.list.columna.concepte"/></th>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="40px">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<a href="<c:url value="/massiu/detallErrorCallback/{{:id}}"/>" class="btn btn-default" data-toggle="modal" data-height="450px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="comu.boto.detalls"/></a>
+						<a href="<c:url value="/massiu/registre/detallError/{{:id}}"/>" class="btn btn-default" data-toggle="modal" data-height="450px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="comu.boto.detalls"/></a>
 					</script>
 				</th>
 			</tr>

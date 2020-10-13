@@ -157,7 +157,8 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:isNumeroRegistreNull = true or n.notificacio.registreNumero like lower('%'||:numeroRegistre||'%')) "+
 			"and (:esDataRegistreIniciNull = true or n.notificacio.registreData >= :dataRegistreInici) " +
 			"and (:esDataRegistreFiNull = true or n.notificacio.registreData <= :dataRegistreFi) " +
-			"and (:esProcedimentsCodisNotibNull = true or n.notificacio.procedimentCodiNotib in (:procedimentsCodisNotib)) " +
+			"and ((:esProcedimentsCodisNotibNull = false and n.notificacio.procedimentCodiNotib is not null and n.notificacio.procedimentCodiNotib in (:procedimentsCodisNotib))" +
+			"   or (n.notificacio.procedimentCodiNotib is null and n.notificacio.usuariCodi = :usuariCodi)) " +
 			"and (n.notificacio.grupCodi = null or (n.notificacio.grupCodi in (:grupsProcedimentCodisNotib))) ")
 	Page<NotificacioEnviamentEntity> findByNotificacio(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
@@ -212,6 +213,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("esProcedimentsCodisNotibNull") boolean esProcedimentsCodisNotibNull,
 			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
 			@Param("grupsProcedimentCodisNotib") List<String> grupsProcedimentCodisNotib,
+			@Param("usuariCodi") String usuariCodi,
 			Pageable pageable);
 	
 	@Query(	"from" +
@@ -242,7 +244,8 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:isNumeroRegistreNull = true or n.notificacio.registreNumero like lower('%'||:numeroRegistre||'%')) "+
 			"and (:esDataRegistreIniciNull = true or n.notificacio.registreData >= :dataRegistreInici) " +
 			"and (:esDataRegistreFiNull = true or n.notificacio.registreData <= :dataRegistreFi) " +
-			"and (:esProcedimentsCodisNotibNull = true or n.notificacio.procedimentCodiNotib in (:procedimentsCodisNotib)) ")
+			"and ((:esProcedimentsCodisNotibNull = false and n.notificacio.procedimentCodiNotib is not null and n.notificacio.procedimentCodiNotib in (:procedimentsCodisNotib)) " +
+			"   or (n.notificacio.procedimentCodiNotib is null and n.notificacio.organGestor is not null and n.notificacio.organGestor in (:organs))) ")
 	Page<NotificacioEnviamentEntity> findByNotificacio(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
 			@Param("codiProcediment") String codiProcediment,
@@ -295,6 +298,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("dataRegistreFi") Date dataRegistreFi,
 			@Param("esProcedimentsCodisNotibNull") boolean esProcedimentsCodisNotibNull,
 			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
+			@Param("organs") List<String> organs,
 			Pageable pageable);
 	
 	@Query(	"from" +

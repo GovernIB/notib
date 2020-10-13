@@ -3,7 +3,6 @@ package es.caib.notib.war.command;
 import javax.validation.constraints.Size;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.EntregaDehDto;
@@ -22,7 +21,7 @@ public class EntregaDehCommand {
 
 	private String emisorNif;
 	private boolean obligat;
-	@NotEmpty @Size(max=64)
+	@Size(max=64)
 	private String procedimentCodi;
 	private boolean activa;
 	

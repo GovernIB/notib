@@ -57,6 +57,7 @@ import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.ColumnesRepository;
@@ -99,6 +100,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Autowired
 	private CallbackHelper callbackHelper;
 	@Autowired
+	private OrganigramaHelper organigramaHelper;
+	@Autowired
 	private AplicacioService aplicacioService;
 	@Autowired
 	private MetricsHelper metricsHelper;
@@ -136,7 +139,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					+ "filtre=" + filtre + ")");
 			entityComprovarHelper.comprovarPermisos(
 					entitatId,
-					true,
+					false,
 					false,
 					false);
 			return findIdsAmbFiltrePaginat(
@@ -376,6 +379,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 			boolean isUsuariEntitat,
 			boolean isAdminOrgan,
 			List<String> procedimentsCodisNotib,
+			String organGestorCodi,
+			String usuariCodi,
 			NotificacioEnviamentFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws ParseException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
@@ -433,7 +438,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			campsOrdre(paginacioParams);
 			
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
-			if (isUsuari && !procedimentsCodisNotib.isEmpty()) {
+			if (isUsuari) { // && !procedimentsCodisNotib.isEmpty()) {
 				enviament = notificacioEnviamentRepository.findByNotificacio(
 						filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 						filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
@@ -487,8 +492,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 						(procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty()),
 						procedimentsCodisNotib,
 						aplicacioService.findRolsUsuariActual(),
+						usuariCodi,
 						pageable);
-			} else if (isAdminOrgan && !procedimentsCodisNotib.isEmpty()) {
+			} else if (isAdminOrgan) { // && !procedimentsCodisNotib.isEmpty()) {
+				List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatEntity.getDir3Codi(), organGestorCodi);
 				enviament = notificacioEnviamentRepository.findByNotificacio(
 						filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 						filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
@@ -541,6 +548,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						dataRegistreFi,
 						(procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty()),
 						procedimentsCodisNotib,
+						organs,
 						pageable);
 			} else if (isUsuariEntitat) {
 				enviament = notificacioEnviamentRepository.findByNotificacio(
@@ -607,6 +615,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 					enviament,
 					NotificacioEnviamentDtoV2.class);
 			int i = 0;
+			boolean llibreOrgan = !entitat.isLlibreEntitat();
+			
 			for (NotificacioEnviamentDtoV2 notificacioEnviamentDtoV2 : paginaDto.getContingut()) {
 				if (enviament.getContent().get(i).getNotificacio().getProcedimentCodiNotib() != null)
 					notificacioEnviamentDtoV2.setProcedimentCodiNotib(enviament.getContent().get(i).getNotificacio().getProcedimentCodiNotib());
@@ -624,8 +634,13 @@ public class EnviamentServiceImpl implements EnviamentService {
 					notificacioEnviamentDtoV2.setConcepte(enviament.getContent().get(i).getNotificacio().getConcepte());
 				if (enviament.getContent().get(i).getNotificacio().getDescripcio() != null)
 					notificacioEnviamentDtoV2.setDescripcio(enviament.getContent().get(i).getNotificacio().getDescripcio());
-				if (enviament.getContent().get(i).getNotificacio().getProcediment() != null)
-					notificacioEnviamentDtoV2.setLlibre(enviament.getContent().get(i).getNotificacio().getProcediment().getOrganGestor().getLlibre());
+				// Llibre
+				if (llibreOrgan) {
+					if (enviament.getContent().get(i).getNotificacio().getProcediment() != null)
+						notificacioEnviamentDtoV2.setLlibre(enviament.getContent().get(i).getNotificacio().getProcediment().getOrganGestor().getLlibre());
+				} else {
+					notificacioEnviamentDtoV2.setLlibre(entitatEntity.getLlibre());
+				}
 				if (enviament.getContent().get(i).getNotificacio().getRegistreNumero() != null)
 					notificacioEnviamentDtoV2.setRegistreNumero(enviament.getContent().get(i).getNotificacio().getRegistreNumero());
 				if (enviament.getContent().get(i).getNotificacio().getRegistreData() != null)
@@ -940,6 +955,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			
 			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 			List<String[]> files = new ArrayList<String[]>();
+			boolean llibreOrgan = !entitatEntity.isLlibreEntitat();
 			
 			for (NotificacioEnviamentEntity enviament : enviaments) {
 				String[] fila = new String[numColumnes];
@@ -967,8 +983,12 @@ public class EnviamentServiceImpl implements EnviamentService {
 					fila[11] = enviament.getTitular().getNom();
 					fila[12] = enviament.getTitular().getEmail();
 					fila[13] = (enviament.getDestinataris().size() > 0) ? enviament.getDestinataris().get(0).getNif() : null;
-					if (enviament.getNotificacio().getProcediment() != null)
-						fila[14] = enviament.getNotificacio().getProcediment().getOrganGestor().getLlibre();
+					if (llibreOrgan) {
+						if (enviament.getNotificacio().getProcediment() != null)
+							fila[14] = enviament.getNotificacio().getProcediment().getOrganGestor().getLlibre();
+					} else {
+						fila[14] = entitatEntity.getLlibre();
+					}
 					fila[15] = String.valueOf(enviament.getNotificacio().getRegistreNumero());
 					fila[16] = (enviament.getNotificacio().getRegistreData() != null)? enviament.getNotificacio().getRegistreData().toString() : "";
 					fila[17] = enviament.getNotificacio().getCaducitat() != null ? sdf.format(enviament.getNotificacio().getCaducitat()) : "";

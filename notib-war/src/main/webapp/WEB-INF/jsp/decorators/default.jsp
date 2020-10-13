@@ -278,9 +278,8 @@ body {
 							</a>
 							<ul class="dropdown-menu">
 								<li>
-									<a href="<c:url value="/usuari/configuracio"/>" data-toggle="modal" data-maximized="true">
-										<spring:message code="decorator.menu.configuracio.user"/>
-									</a>
+									<a href="<c:url value="/usuari/configuracio"/>" data-toggle="modal" data-maximized="true"><spring:message code="decorator.menu.configuracio.user"/></a>
+									<a href="https://github.com/GovernIB/notib/raw/${manifestAtributes['Implementation-SCM-Branch']}/doc/pdf/NOTIB_usuari.pdf" rel="noopener noreferrer" target="_blank"><span class="fa fa-download"></span> <spring:message code="decorator.menu.manual.usuari"/></a>
 								</li>
 							</ul>
 						</li>
@@ -288,11 +287,6 @@ body {
 					</ul>
 					<div class="clearfix"></div>
 					<div class="btn-toolbar navbar-btn navbar-right">
-						<c:if test="${isRolActualUsuari and permisNotificacio}">
-							<div class="btn-group">
-								<a data-toggle="modal" class="btn btn-primary" href="<c:url value="/notificacio/procediments"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.altanotificacio"/></a>
-							</div>
-						</c:if>
 						<div class="btn-group">
 							<c:if test="${isRolActualAdministrador}">
 <%-- 
@@ -303,7 +297,7 @@ body {
 							<div class="btn-group">
 									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.monitoritzar"/>&nbsp;<span class="caret caret-white"></span></button>
 									<ul class="dropdown-menu">
-										<li><a href="<c:url value="/massiu/notificacions"/>"><spring:message code="decorator.menu.callback"/></a></li>							
+										<li><a href="<c:url value="/massiu/notificacions"> <c:param name="mantenirPaginacio" value="true"/></c:url>"><spring:message code="decorator.menu.callback"/></a></li>							
 										<li><a href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
 										<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>
 										<li><a href="<c:url value="/metrics/list"/>"><spring:message code="decorator.menu.metriques"/></a></li>
@@ -319,6 +313,12 @@ body {
 							
 							</c:if>
 							<c:if test="${isRolActualUsuari}">
+<%-- 								<c:if test="${isRolActualUsuari and permisNotificacio}"> --%>
+									<div class="btn-group">
+<%-- 										<a data-toggle="modal" class="btn btn-primary" href="<c:url value="/notificacio/procediments"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.altanotificacio"/></a> --%>
+										<a class="btn btn-primary" href="<c:url value="/notificacio/new"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.altanotificacio"/></a>
+									</div>
+<%-- 								</c:if> --%>
 							
 <%-- 								<c:if test="${permisNotificacio}"> --%>
 <!-- 									<div class="btn-group"> -->
@@ -329,7 +329,7 @@ body {
 										<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
 									</div>
 									<div class="btn-group">
-										<a href="<c:url value="/enviament"/>" class="btn btn-primary"><spring:message code="decorator.menu.enviaments"/></a>
+										<a href="<c:url value="/enviament"><c:param name="mantenirPaginacio" value="false"/></c:url>" class="btn btn-primary"><spring:message code="decorator.menu.enviaments"/></a>
 									</div>
 							</c:if>
 							<c:if test="${isRolActualAdministradorEntitat}">
@@ -339,6 +339,13 @@ body {
 							<div class="btn-group">
 								<a href="<c:url value="/enviament"/>" class="btn btn-primary"><spring:message code="decorator.menu.enviaments"/></a>
 							</div>
+							<div class="btn-group">
+								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.gestio"/>&nbsp;<span class="caret caret-white"></span></button>								
+								<ul class="dropdown-menu">
+									<li><a href="<c:url value="/massiu/registre/notificacionsError"/>"><spring:message code="decorator.menu.massiu.registre"/></a></li>
+								</ul>
+							</div>
+								
 							<div class="btn-group">
 								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>								
 								<ul class="dropdown-menu">
@@ -375,11 +382,13 @@ body {
 							</div>
 							</c:if>
 						</div>
+<%--
 						<div class="btn-group">
 							<a class="btn btn-success" href="https://github.com/GovernIB/notib/raw/${manifestAtributes['Implementation-SCM-Branch']}/doc/pdf/NOTIB_usuari.pdf" rel="noopener noreferrer" target="_blank"><span class="fa fa-download"></span> <spring:message code="decorator.menu.manual.usuari"/></a>
 <!-- 									Per a diferents rol, ara sol esta el manual d'usuari -->
-<%-- 									<a class="btn btn-primary" href="https://github.com/GovernIB/notib/raw/notib-${versioMajorActual}/doc/pdf/NOTIB_${rolActual}.pdf" } download/><spring:message code="decorator.menu.manual.usuari"/></a> --%>
+<!-- 									<a class="btn btn-primary" href="https://github.com/GovernIB/notib/raw/notib-${versioMajorActual}/doc/pdf/NOTIB_${rolActual}.pdf" } download/><spring:message code="decorator.menu.manual.usuari"/></a> -->
 						</div>
+--%>
 							
 					</div>
 					

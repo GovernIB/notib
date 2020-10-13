@@ -22,7 +22,6 @@ function addDefault(option) {
 //					"id": val.valor,
 //					"text": val.desc
 //				});
-				debugger
 				var selected = $('#tipusDocDefaultSelected').val();
 				if (val.valor == selected) {
 					selOrganismes.append("<option value=\"" + val.valor + "\" selected='true'>" + val.desc + "</option>");

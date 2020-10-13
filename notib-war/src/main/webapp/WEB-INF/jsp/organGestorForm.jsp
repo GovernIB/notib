@@ -79,6 +79,7 @@ $(document).ready(function() {
 			console.log("error obtenint els organismes...");
 		}
 	});
+
 	$('#selOrganismes').on('change', function(){
 		var organSelect = document.getElementById('selOrganismes');
 		var organSeleccionatValue = organSelect.options[organSelect.selectedIndex].value;
@@ -86,6 +87,7 @@ $(document).ready(function() {
 		$('#codi').val(organSeleccionatValue);
 		$('#nom').val(organSeleccionatText.substring(organSeleccionatValue.length + 3));
 		
+		<c:if test="${setLlibre}">
 		if (organSeleccionatValue !== undefined && organSeleccionatValue !== '') {
 			$.ajax({
 				type: 'GET',
@@ -119,6 +121,7 @@ $(document).ready(function() {
 			$('#llibre').val(llibreSeleccionatValue);
 			$('#llibreNom').val(llibreSeleccionatText);
 		});
+		</c:if>
 	});
 });
 </script>
@@ -131,11 +134,13 @@ $(document).ready(function() {
 			<form:hidden path="codi"/>
 			<form:hidden path="nom"/>
 			<select id="selOrganismes" data-placeholder="<spring:message code="organgestor.form.camp.organisme"/>"></select> 
-			<br/>
-			<form:hidden path="llibre"/>
-			<form:hidden path="llibreNom"/>
-			<select id="selLlibres" data-placeholder="<spring:message code="organgestor.form.camp.llibre"/>"></select>
-			<p class="comentari"><spring:message code="organgestor.form.camp.llibre.info"/></p>
+			<c:if test="${setLlibre}">
+				<br/>
+				<form:hidden path="llibre"/>
+				<form:hidden path="llibreNom"/>
+				<select id="selLlibres" data-placeholder="<spring:message code="organgestor.form.camp.llibre"/>"></select>
+				<p class="comentari"><spring:message code="organgestor.form.camp.llibre.info"/></p>
+			</c:if>
 			<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
 				<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
 					<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>

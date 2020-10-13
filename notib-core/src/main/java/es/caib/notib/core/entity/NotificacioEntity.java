@@ -76,7 +76,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Temporal(TemporalType.DATE)
 	protected Date caducitat;
 	
-	@Column(name = "proc_codi_notib", length = 9, nullable = false)
+	@Column(name = "proc_codi_notib", length = 9)
 	protected String procedimentCodiNotib;
 	
 	@Column(name = "grup_codi", length = 64)
@@ -123,45 +123,48 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "callback_error")
 	protected boolean errorLastCallback;
 	
-	@ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "not_error_event_id")
 	@ForeignKey(name = "not_noterrevent_notificacio_fk")
 	protected NotificacioEventEntity notificaErrorEvent;
 	
-	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "entitat_id")
 	@ForeignKey(name = "not_entitat_notificacio_fk")
 	protected EntitatEntity entitat;
 	
-	
 	/*pagador a Postal*/
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "pagador_postal_id")
 	@ForeignKey(name = "not_pagador_postal_not_fk")
 	protected PagadorPostalEntity pagadorPostal;
 	
-	
 	/*pagador CIE*/
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "pagador_cie_id")
 	@ForeignKey(name = "not_pagador_cie_not_fk")
 	protected PagadorCieEntity pagadorCie;
 	
 	/*Procediment*/
-	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "procediment_id")
 	@ForeignKey(name = "not_procediment_not_fk")
 	protected ProcedimentEntity procediment;
 	
 	/*document*/
-	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "document_id")
 	@ForeignKey(name = "not_document_notificacio_fk")
 	protected DocumentEntity document;
 	
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "organ_gestor", referencedColumnName = "codi")
+	@ForeignKey(name = "not_not_organ_fk")
+	protected OrganGestorEntity organGestor;
+	
 	@OneToMany(
 			mappedBy = "notificacio",
-			fetch = FetchType.EAGER,
+			fetch = FetchType.LAZY,
 			cascade=CascadeType.ALL)
 	protected Set<NotificacioEnviamentEntity> enviaments = new LinkedHashSet<NotificacioEnviamentEntity>();
 	@OneToMany(
@@ -244,6 +247,12 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		this.registreData = cal.getTime();
 	}
 	
+	public void refreshRegistre() {
+		this.registreEnviamentIntent = 0;	
+		Calendar cal = GregorianCalendar.getInstance();
+		this.registreData = cal.getTime();
+	}
+	
 	public void updateNotificaError(
 			NotificacioErrorTipusEnumDto errorTipus,
 			NotificacioEventEntity errorEvent) {
@@ -317,6 +326,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public static BuilderV2 getBuilderV2(
 			EntitatEntity entitat,
 			String emisorDir3Codi,
+			OrganGestorEntity organGestor,
 			NotificacioComunicacioTipusEnumDto comunicacioTipus,
 			NotificaEnviamentTipusEnumDto enviamentTipus,
 			String concepte,
@@ -333,6 +343,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		return new BuilderV2(
 				entitat,
 				emisorDir3Codi,
+				organGestor,
 				comunicacioTipus,
 				enviamentTipus,
 				concepte,
@@ -462,6 +473,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		BuilderV2(
 				EntitatEntity entitat,
 				String emisorDir3Codi,
+				OrganGestorEntity organGestor,
 				NotificacioComunicacioTipusEnumDto comunicacioTipus,
 				NotificaEnviamentTipusEnumDto enviamentTipus,
 				String concepte,
@@ -478,6 +490,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built = new NotificacioEntity();
 			built.entitat = entitat;
 			built.emisorDir3Codi = emisorDir3Codi;
+			built.organGestor = organGestor;
 			built.comunicacioTipus = comunicacioTipus;
 			built.enviamentTipus = enviamentTipus;
 			built.concepte = concepte;
@@ -574,4 +587,5 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	}
 
 	private static final long serialVersionUID = 7206301266966284277L;
+
 }

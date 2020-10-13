@@ -70,7 +70,13 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	private String nomOficinaVirtual;
 	@Column(name = "oficina", length = 255)
 	private String oficina;
-	
+	@Column(name = "llibre_entitat")
+	private boolean llibreEntitat;
+	@Column(name = "llibre")
+	protected String llibre;
+	@Column(name = "llibre_nom")
+	protected String llibreNom;
+
 	@Version
 	private long version = 0;
 
@@ -90,7 +96,10 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			String colorLletra,
 			TipusDocumentEnumDto tipusDocDefault,
 			String oficina,
-			String nomOficinaVirtual) {
+			String nomOficinaVirtual,
+			boolean llibreEntitat,
+			String llibre,
+			String llibreNom) {
 		this.codi = codi;
 		this.nom = nom;
 		this.descripcio = descripcio;
@@ -107,6 +116,9 @@ public class EntitatEntity extends NotibAuditable<Long> {
 		this.tipusDocDefault = tipusDocDefault;
 		this.oficina = oficina;
 		this.nomOficinaVirtual = nomOficinaVirtual;
+		this.llibreEntitat = llibreEntitat;
+		this.llibre = llibre;
+		this.llibreNom = llibreNom;
 	}
 
 	public void updateActiva(
@@ -129,7 +141,10 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			String colorLletra,
 			TipusDocumentEnumDto tipusDocDefault,
 			String oficina,
-			String nomOficinaVirtual) {
+			String nomOficinaVirtual,
+			boolean llibreEntitat,
+			String llibre,
+			String llibreNom) {
 		return new Builder(
 				codi,
 				nom,
@@ -145,7 +160,10 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				colorLletra,
 				tipusDocDefault,
 				oficina,
-				nomOficinaVirtual);
+				nomOficinaVirtual,
+				llibreEntitat,
+				llibre,
+				llibreNom);
 	}
 
 	public static class Builder {
@@ -165,7 +183,10 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				String colorLletra,
 				TipusDocumentEnumDto tipusDocDefault,
 				String oficina,
-				String nomOficinaVirtual) {
+				String nomOficinaVirtual,
+				boolean llibreEntitat,
+				String llibre,
+				String llibreNom) {
 			built = new EntitatEntity();
 			built.codi = codi;
 			built.nom = nom;
@@ -183,6 +204,9 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			built.tipusDocDefault = tipusDocDefault;
 			built.oficina = oficina;
 			built.nomOficinaVirtual = nomOficinaVirtual;
+			built.llibreEntitat = llibreEntitat;
+			built.llibre = llibre;
+			built.llibreNom = llibreNom;
 		}
 		public Builder descripcio(String descripcio) {
 			built.descripcio = descripcio;

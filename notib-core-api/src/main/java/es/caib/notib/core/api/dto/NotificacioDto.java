@@ -66,6 +66,8 @@ public class NotificacioDto extends AuditoriaDto {
 	private Integer registreNumero;
 	private DocumentDto document;
 	private String descripcio;
+	private String organGestor;
+	private String organGestorNom;
 	private List<EnviamentDto> enviaments;
 	
 	private List<PermisDto> permisos;
@@ -79,6 +81,12 @@ public class NotificacioDto extends AuditoriaDto {
 	
 	public boolean isNotificaError() {
 		return notificaErrorData != null;
+	}
+	
+	public String getOrganGestorDesc() {
+		if (organGestorNom != null && !organGestorNom.isEmpty())
+			return organGestor + " - " + organGestorNom;
+		return organGestor;
 	}
 
 	@Override

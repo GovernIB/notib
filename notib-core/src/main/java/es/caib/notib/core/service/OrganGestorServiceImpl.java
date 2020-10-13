@@ -1,13 +1,16 @@
 package es.caib.notib.core.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -264,8 +267,12 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			
+			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
+			mapeigPropietatsOrdenacio.put("llibreCodiNom", new String[] {"llibre"});
+			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 			
 			Page<OrganGestorEntity> organs = null;
+			
 			
 			//Cas d'Administrador d'Entitat
 			//	Tots els organs fills de l'Entitat
@@ -279,7 +286,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				if (filtre == null) {
 					organs = organGestorRepository.findByEntitat(
 							entitat,
-							paginacioHelper.toSpringDataPageable(paginacioParams));
+							pageable);
 				} else {
 					organs = organGestorRepository.findByEntitatAndFiltre(
 							entitat,
@@ -287,7 +294,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 							filtre.getCodi() == null ? "" : filtre.getCodi(),
 							filtre.getNom() == null || filtre.getNom().isEmpty(),
 							filtre.getNom() == null ? "" : filtre.getNom(),
-							paginacioHelper.toSpringDataPageable(paginacioParams));
+							pageable);
 				}
 			//Cas d'Administrador d'Organ
 			//	Només el l'Organ de l'administrador, i els seus fills (tant de primer nivell com següents)
@@ -306,7 +313,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					organs = organGestorRepository.findByEntitatAndOrganGestor(
 							entitat,
 							organGestorsListCodisDir3,
-							paginacioHelper.toSpringDataPageable(paginacioParams));
+							pageable);
 				} else {
 					organs = organGestorRepository.findByEntitatAndOrganGestorAndFiltre(
 							entitat,
@@ -315,7 +322,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 							filtre.getCodi() == null ? "" : filtre.getCodi(),
 							filtre.getNom() == null || filtre.getNom().isEmpty(),
 							filtre.getNom() == null ? "" : filtre.getNom(),
-							paginacioHelper.toSpringDataPageable(paginacioParams));
+							pageable);
 				}
 			}
 			
@@ -473,6 +480,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public List<OrganGestorDto> findAccessiblesByUsuariActual() {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -564,6 +572,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	}
 	
 	@Override
+	@Transactional
 	public void permisDelete(
 			Long entitatId,
 			Long id,

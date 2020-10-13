@@ -29,6 +29,7 @@ import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.OrganGestorService;
@@ -67,6 +68,8 @@ public class ProcedimentController extends BaseUserController{
 	PagadorCieService pagadorCieService;
 	@Autowired
 	GrupService grupsService;
+	@Autowired
+	AplicacioService aplicacioService;
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -77,6 +80,8 @@ public class ProcedimentController extends BaseUserController{
 		ProcedimentFiltreCommand procedimentFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("procedimentFiltreCommand", procedimentFiltreCommand);
 		model.addAttribute("organsGestors", organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId()));
+		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGet("es.caib.notib.plugin.codi.dir3.entitat", "false")));
+		
 		return "procedimentAdminList";
 	}
 	

@@ -15,6 +15,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.war.command.OrganGestorCommand;
 import es.caib.notib.war.helper.MessageHelper;
@@ -32,6 +33,8 @@ public class OrganNoRepetitValidator implements ConstraintValidator<OrganNoRepet
 
 	@Autowired
 	private OrganGestorService organGestorService;
+	@Autowired
+	private EntitatService entitatService;
 	
 	
 	@Override
@@ -61,6 +64,15 @@ public class OrganNoRepetitValidator implements ConstraintValidator<OrganNoRepet
 				valid = false;
 				context.disableDefaultConstraintViolation();
 				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("organgestor.validation.codi.repetit")).addConstraintViolation();
+			}
+			
+			// Si el llibre es desa a l'òrgan, llavors comprovar que s'ha informat
+			if (!entitatService.findById(command.getEntitatId()).isLlibreEntitat()) {
+				if (command.getLlibre() == null || command.getLlibre().isEmpty()) {
+					valid = false;
+					context.disableDefaultConstraintViolation();
+					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("organgestor.validation.llibre.buit")).addConstraintViolation();
+				}
 			}
 			
         } catch (final Exception ex) {

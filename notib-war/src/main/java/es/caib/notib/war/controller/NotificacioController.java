@@ -53,6 +53,8 @@ import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
+import es.caib.notib.core.api.dto.PagadorCieFormatFullaDto;
+import es.caib.notib.core.api.dto.PagadorCieFormatSobreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaisosDto;
 import es.caib.notib.core.api.dto.PermisEnum;
@@ -88,6 +90,7 @@ import es.caib.notib.war.helper.EntitatHelper;
 import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RolHelper;
+import lombok.Data;
 
 /**
  * Controlador per a la consulta i gestió de notificacions.
@@ -198,12 +201,20 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("organsGestorsPermisLectura", organsGestorsDisponibles);
 	}
 
-	@RequestMapping(value = "/new/{procedimentId}")
+//	@RequestMapping(value = "/new/{procedimentId}")
+//	public String altaForm(
+//			HttpServletRequest request, 
+//			@PathVariable Long procedimentId, 
+//			Model model) {
+//		emplenarModelNotificacio(request, procedimentId, model);
+//		return "notificacioForm";
+//	}
+	
+	@RequestMapping(value = "/new")
 	public String altaForm(
 			HttpServletRequest request, 
-			@PathVariable Long procedimentId, 
 			Model model) {
-		emplenarModelNotificacio(request, procedimentId, model);
+		emplenarModelNotificacio(request, model);
 		return "notificacioForm";
 	}
 
@@ -292,10 +303,12 @@ public class NotificacioController extends BaseUserController {
 			Model model) throws IOException {
 		List<String> tipusDocumentEnumDto = new ArrayList<String>();
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-		ProcedimentDto procedimentActual = procedimentService.findById(
-				entitatActual.getId(), 
-				isAdministrador(request), 
-				notificacioCommand.getProcedimentId());
+		ProcedimentDto procedimentActual = null;
+		if (notificacioCommand.getProcedimentId() != null)
+			procedimentActual = procedimentService.findById(
+					entitatActual.getId(), 
+					isAdministrador(request), 
+					notificacioCommand.getProcedimentId());
 		notificacioCommand.setUsuariCodi(aplicacioService.getUsuariActual().getCodi());
 		if (bindingResult.hasErrors()) {
 			ompliModelFormulari(
@@ -351,7 +364,7 @@ public class NotificacioController extends BaseUserController {
 					NotificacioCommandV2.asDto(notificacioCommand));
 			} else {
 				notificacioService.create(
-						procedimentActual.getEntitat().getId(), 
+						entitatActual.getId(), 
 						NotificacioCommandV2.asDto(notificacioCommand));
 				
 				model.addAttribute("notificacioEstats", 
@@ -371,6 +384,7 @@ public class NotificacioController extends BaseUserController {
 								"es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
 			}
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			logger.error("Error creant una notificació", ex);
 			MissatgesHelper.error(request, ex.getMessage());
 			ompliModelFormulari(
@@ -398,6 +412,7 @@ public class NotificacioController extends BaseUserController {
 		boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
 		boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
 		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+		String organGestorCodi = null;
 
 		List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
 		List<String> codisProcedimentsDisponibles = new ArrayList<String>();
@@ -421,6 +436,7 @@ public class NotificacioController extends BaseUserController {
 			}
 			if (isAdminOrgan) {
 				OrganGestorDto organGestorActual = getOrganGestorActual(request);
+				organGestorCodi = organGestorActual.getCodi();
 				procedimentsDisponibles = procedimentService.findByOrganGestorIDescendents(entitatActual.getId(), organGestorActual);
 				for(ProcedimentDto procediment: procedimentsDisponibles) {
 					codisProcedimentsDisponibles.add(procediment.getCodi());
@@ -434,6 +450,8 @@ public class NotificacioController extends BaseUserController {
 					isAdminOrgan,
 					codisProcedimentsDisponibles,
 					codisProcedimentsProcessables,
+					organGestorCodi,
+					usuariActual.getCodi(),
 					filtre,
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 		}catch(SecurityException e) {
@@ -787,6 +805,80 @@ public class NotificacioController extends BaseUserController {
 		return "notificacioInfo";
 	}
 
+	@RequestMapping(value = "/procediment/{procedimentId}/dades", method = RequestMethod.GET)
+	@ResponseBody
+	public DadesProcediment getDataCaducitat(
+			HttpServletRequest request, 
+			@PathVariable Long procedimentId) {
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		ProcedimentDto procedimentActual = procedimentService.findById(
+				entitatActual.getId(), 
+				false, 
+				procedimentId);
+		
+		DadesProcediment dadesProcediment = new DadesProcediment();
+		dadesProcediment.setOrganCodi(procedimentActual.getOrganGestor());
+		dadesProcediment.setCaducitat(CaducitatHelper.sumarDiesLaborals(procedimentActual.getCaducitat()));
+		dadesProcediment.setRetard(procedimentActual.getRetard());
+		dadesProcediment.setAgrupable(procedimentActual.isAgrupar());
+		if (procedimentActual.isAgrupar()) {
+			dadesProcediment.setGrups(grupService.findByProcedimentAndUsuariGrups(procedimentId));
+		}
+		if (procedimentActual.getPagadorcie() != null) {
+			dadesProcediment.setFormatsSobre(pagadorCieFormatSobreService.findFormatSobreByPagadorCie(procedimentActual.getPagadorcie().getId()));
+			dadesProcediment.setFormatsFulla(pagadorCieFormatFullaService.findFormatFullaByPagadorCie(procedimentActual.getPagadorcie().getId()));
+		}
+		return dadesProcediment;
+	}
+	
+	@RequestMapping(value = "/organ/{organId}/procediments", method = RequestMethod.GET)
+	@ResponseBody
+	public List<ProcedimentDto> getProcedimentsOrgan(
+			HttpServletRequest request, 
+			@PathVariable String organId) {
+
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		List<ProcedimentDto> procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
+
+		List<ProcedimentDto> procedimentsOrgan = new ArrayList<ProcedimentDto>();
+		if (procedimentsDisponibles != null) {
+			for (ProcedimentDto proc: procedimentsDisponibles) {
+				// Si no s'ha seleccionat cap òrgan enviaran '-'
+				if (proc.isComu() || organId.equals("-") || organId.equalsIgnoreCase(proc.getOrganGestor())) {
+					procedimentsOrgan.add(proc);
+				}
+			}
+		}
+		return procedimentsOrgan;
+	}
+	
+	
+	@RequestMapping(value = "/paisos", method = RequestMethod.GET)
+	@ResponseBody
+	private List<PaisosDto> getPaisos(
+		HttpServletRequest request,
+		Model model) {		
+		return notificacioService.llistarPaisos();
+	}
+	
+	@RequestMapping(value = "/provincies", method = RequestMethod.GET)
+	@ResponseBody
+	private List<ProvinciesDto> getProvincies(
+		HttpServletRequest request,
+		Model model) {		
+		return notificacioService.llistarProvincies();
+	}
+	
+	@RequestMapping(value = "/localitats/{provinciaId}", method = RequestMethod.GET)
+	@ResponseBody
+	private List<LocalitatsDto> getLocalitats(
+		HttpServletRequest request,
+		Model model,
+		@PathVariable String provinciaId) {
+		return notificacioService.llistarLocalitats(provinciaId);
+	}
+	
 	private void emplenarModelNotificacioInfo(
 			EntitatDto entitatActual,
 			Long notificacioId, 
@@ -837,28 +929,23 @@ public class NotificacioController extends BaseUserController {
 
 	private void emplenarModelNotificacio(
 			HttpServletRequest request, 
-			@PathVariable Long procedimentId, 
 			Model model) {
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-		ProcedimentDto procedimentActual = procedimentService.findById(
-				entitatActual.getId(), 
-				isAdministrador(request), 
-				procedimentId);
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		
 		NotificacioCommandV2 notificacio = new NotificacioCommandV2();
 		List<EnviamentCommand> enviaments = new ArrayList<EnviamentCommand>();
 		EnviamentCommand enviament = new EnviamentCommand();
 		EntregapostalCommand entregaPostal = new EntregapostalCommand();
 		entregaPostal.setPaisCodi("ES");
-//		entregaPostal.setProvincia("7");
 		enviament.setEntregaPostal(entregaPostal);
 		enviaments.add(enviament);
 		notificacio.setEnviaments(enviaments);
+		notificacio.setCaducitat(CaducitatHelper.sumarDiesLaborals(10));
 		List<String> tipusDocumentEnumDto = new ArrayList<String>();
 		
-		List<TipusDocumentDto>  tipusDocuments =  entitatService.findTipusDocumentByEntitat(entitatActual.getId());
 		TipusDocumentEnumDto tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
-		notificacio.setCaducitat(CaducitatHelper.sumarDiesLaborals(procedimentActual.getCaducitat()));
-
+		List<TipusDocumentDto>  tipusDocuments =  entitatService.findTipusDocumentByEntitat(entitatActual.getId());
 		if (tipusDocuments != null) {
 			for (TipusDocumentDto tipusDocument: tipusDocuments) {
 				tipusDocumentEnumDto.add(tipusDocument.getTipusDocEnum().name());
@@ -873,18 +960,16 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("ambEntregaDeh", entitatActual.isAmbEntregaDeh());
 		model.addAttribute("ambEntregaCie", entitatActual.isAmbEntregaCie());
 		model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
-		model.addAttribute("entitat", procedimentActual.getEntitat());
-		model.addAttribute("procediment", procedimentService.findById(
-				entitatActual.getId(), 
-				isAdministrador(request), 
-				procedimentId));
-		model.addAttribute("amagat", Boolean.FALSE);
+		model.addAttribute("entitat", entitatActual);
 		
-		model.addAttribute("grups", grupService.findByProcedimentAndUsuariGrups(procedimentId));
-		if (procedimentActual.getPagadorcie() != null) {
-			model.addAttribute("formatsFulla", pagadorCieFormatFullaService.findFormatFullaByPagadorCie(procedimentActual.getPagadorcie().getId()));
-			model.addAttribute("formatsSobre", pagadorCieFormatSobreService.findFormatSobreByPagadorCie(procedimentActual.getPagadorcie().getId()));
+		List<ProcedimentDto> procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO); 
+		model.addAttribute("procediments", procedimentsDisponibles);
+		if (procedimentsDisponibles.isEmpty()) {
+			MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
 		}
+	
+		model.addAttribute("organsGestors", organGestorService.findOrganismes(entitatActual));
+		model.addAttribute("amagat", Boolean.FALSE);
 		
 		model.addAttribute("comunicacioTipus", 
 				EnumHelper.getOptionsForEnum(
@@ -924,31 +1009,6 @@ public class NotificacioController extends BaseUserController {
 		}
 		
 	}
-	
-	@RequestMapping(value = "/paisos", method = RequestMethod.GET)
-	@ResponseBody
-	private List<PaisosDto> getPaisos(
-		HttpServletRequest request,
-		Model model) {		
-		return notificacioService.llistarPaisos();
-	}
-	
-	@RequestMapping(value = "/provincies", method = RequestMethod.GET)
-	@ResponseBody
-	private List<ProvinciesDto> getProvincies(
-		HttpServletRequest request,
-		Model model) {		
-		return notificacioService.llistarProvincies();
-	}
-	
-	@RequestMapping(value = "/localitats/{provinciaId}", method = RequestMethod.GET)
-	@ResponseBody
-	private List<LocalitatsDto> getLocalitats(
-		HttpServletRequest request,
-		Model model,
-		@PathVariable String provinciaId) {
-		return notificacioService.llistarLocalitats(provinciaId);
-	}
 
 	private void ompliModelFormulari(
 			ProcedimentDto procedimentActual,
@@ -957,10 +1017,13 @@ public class NotificacioController extends BaseUserController {
 			BindingResult bindingResult,
 			List<String> tipusDocumentEnumDto,
 			Model model) {
-		if (procedimentActual.getPagadorcie() != null) {
-			model.addAttribute("formatsFulla", pagadorCieFormatFullaService.findFormatFullaByPagadorCie(procedimentActual.getPagadorcie().getId()));
-			model.addAttribute("formatsSobre", pagadorCieFormatSobreService.findFormatSobreByPagadorCie(procedimentActual.getPagadorcie().getId()));
-		}
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		
+		// TODO: Afegir formats de sobre i fulla
+//		if (procedimentActual != null && procedimentActual.getPagadorcie() != null) {
+//			model.addAttribute("formatsFulla", pagadorCieFormatFullaService.findFormatFullaByPagadorCie(procedimentActual.getPagadorcie().getId()));
+//			model.addAttribute("formatsSobre", pagadorCieFormatSobreService.findFormatSobreByPagadorCie(procedimentActual.getPagadorcie().getId()));
+//		}
 		
 		List<TipusDocumentDto>  tipusDocuments =  entitatService.findTipusDocumentByEntitat(entitatActual.getId());
 		TipusDocumentEnumDto tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
@@ -979,7 +1042,11 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("ambEntregaDeh", entitatActual.isAmbEntregaDeh());
 		model.addAttribute("ambEntregaCie", entitatActual.isAmbEntregaCie());
 		model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
-		model.addAttribute("grups", grupService.findByProcedimentAndUsuariGrups(procedimentActual.getId()));
+		model.addAttribute("procediments", procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO));
+	
+		model.addAttribute("organsGestors", organGestorService.findOrganismes(entitatActual));
+		if (procedimentActual != null)
+			model.addAttribute("grups", grupService.findByProcedimentAndUsuariGrups(procedimentActual.getId()));
 		model.addAttribute("comunicacioTipus", 
 				EnumHelper.getOptionsForEnum(
 						NotificacioComunicacioTipusEnumDto.class,
@@ -1037,6 +1104,23 @@ public class NotificacioController extends BaseUserController {
 		binder.registerCustomEditor(
 				Boolean.class, 
 				new CustomBooleanEditor("SI", "NO", false));
+	}
+	
+	@Data
+	public class DadesProcediment {
+		private String caducitat;
+		private Integer retard;
+		private String organCodi;
+		private boolean agrupable = false;
+		private List<GrupDto> grups = new ArrayList<GrupDto>();
+		private List<PagadorCieFormatSobreDto> formatsSobre = new ArrayList<PagadorCieFormatSobreDto>();
+		private List<PagadorCieFormatFullaDto> formatsFulla = new ArrayList<PagadorCieFormatFullaDto>();
+		
+		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+		
+		public void setCaducitat(Date data) {
+			this.caducitat = format.format(data); 
+		}
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioController.class);

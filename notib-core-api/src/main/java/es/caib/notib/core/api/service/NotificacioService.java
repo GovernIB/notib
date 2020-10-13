@@ -17,6 +17,7 @@ import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioErrorCallbackFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreErrorFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
@@ -91,6 +92,8 @@ public interface NotificacioService {
 			boolean isAdministradorOrgan,
 			List<String> codisProcedimentsDisponibles,
 			List<String> codisProcedimentsProcessables,
+			String organGestorCodi,
+			String usuariCodi,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
 	
@@ -144,6 +147,9 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public NotificacioEventDto findUltimEventCallbackByNotificacio(Long notificacioId);
 
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	public NotificacioEventDto findUltimEventRegistreByNotificacio(Long notificacioId);
+	
 	/**
 	 * Consulta dels events del destinatari d'una notificació.
 	 * 
@@ -271,6 +277,20 @@ public interface NotificacioService {
 	List getNotificacionsPendentsRefrescarEstat();
 	@SuppressWarnings("rawtypes")
 	List getNotificacionsPendentsRefrescarEstatRegistre();
+
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public PaginaDto<NotificacioDto> findNotificacionsAmbErrorRegistre(
+			Long entitatId,
+			NotificacioRegistreErrorFiltreDto filtre,
+			PaginacioParamsDto paginacioDtoFromRequest);
+	
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public List<Long> findNotificacionsIdAmbErrorRegistre(
+			Long entitatId,
+			NotificacioRegistreErrorFiltreDto filtre);
+
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public void reactivarRegistre(Long notificacioId);
 
 
 //	void registrarEnviamentsPendents();

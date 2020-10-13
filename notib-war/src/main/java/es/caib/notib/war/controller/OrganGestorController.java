@@ -57,7 +57,9 @@ public class OrganGestorController extends BaseUserController{
 	public String get(
 			HttpServletRequest request,
 			Model model) {
+		EntitatDto entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
 		model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
+		model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 		return "organGestorList";
 	}
 	
@@ -114,30 +116,12 @@ public class OrganGestorController extends BaseUserController{
 			HttpServletRequest request,
 			Model model) {
 		OrganGestorCommand organGestorCommand = new OrganGestorCommand();
+		EntitatDto entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
 		model.addAttribute(organGestorCommand);
 		model.addAttribute("entitat", getEntitatActualComprovantPermisos(request));
+		model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 		return "organGestorForm";
 	}
-	
-//	@RequestMapping(value = "/{organGestorId}", method = RequestMethod.GET)
-//	public String get(
-//			HttpServletRequest request,
-//			@PathVariable Long organGestorId,
-//			Model model) {
-//		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-//		OrganGestorDto organ = null;
-//		if (organGestorId != null) {
-//			organ = organGestorService.findById(entitat.getId(), organGestorId);
-//		}
-//		if (organ != null) {
-//			OrganGestorCommand command = OrganGestorCommand.asCommand(organ);
-//			model.addAttribute( command );
-//		} else {
-//			model.addAttribute(new OrganGestorCommand());
-//		}
-//		model.addAttribute("entitat", entitat);
-//		return "organGestorForm";
-//	}
 	
 	@RequestMapping(value = "/new", method = RequestMethod.POST)
 	public String save(
@@ -147,8 +131,9 @@ public class OrganGestorController extends BaseUserController{
 			Model model) {		
 		
 		if (bindingResult.hasErrors()) {
-			model.addAttribute("entitat", getEntitatActualComprovantPermisos(request));
-//			model.addAttribute("errors", bindingResult.getAllErrors());
+			EntitatDto entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
+			model.addAttribute("entitat", entitat);
+			model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 			return "organGestorForm";
 		}
 		
