@@ -263,7 +263,7 @@ $(document).ready(function() {
 				} else {
 					nif = data[i].titular.dir3Codi;
 				}
-				contingutTbody += '<tr>';
+				contingutTbody += '<tr data-toggle="modal" data-href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" style="cursor: pointer;">';
 				contingutTbody += '<td>' + nomTitular + ' ' + llinatge1 + ' ' + llinatge2 + '('+ nif +') </td>';
 				if (destinataris != ''){
 					//Remove last white space
@@ -414,6 +414,7 @@ $(document).ready(function() {
 			</div>
 		</div>
 	</form:form>
+	<script id="rowhrefTemplate" type="text/x-jsrender">modal/notificacio/{{:id}}</script>
 	<table
 		id="notificacio"
 		data-toggle="datatable"
@@ -424,7 +425,9 @@ $(document).ready(function() {
 		class="table table-striped table-bordered"
 		style="width:100%"
 		data-row-info="true"
-		data-filter="#filtre">
+		data-filter="#filtre"
+		data-rowhref-template="#rowhrefTemplate"
+		data-rowhref-toggle="modal">
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false">#</th>
