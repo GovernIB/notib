@@ -1277,6 +1277,50 @@ public class EnviamentServiceImpl implements EnviamentService {
 			return pluginHelper.obtenirJustificant(enviament.getNotificacio().getEmisorDir3Codi(), enviament.getRegistreNumeroFormatat()).getJustificant();
 	}
 	
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<NotificacioEnviamentDto> findComunicacionsByNif(String dniTitular) {
+		List<NotificacioEnviamentEntity> comunicacions = notificacioEnviamentRepository.findComunicacionsByNif(dniTitular.toUpperCase());
+		return conversioTipusHelper.convertirList(comunicacions, NotificacioEnviamentDto.class);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<NotificacioEnviamentDto> findNotificacionsByNif(String dniTitular) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<NotificacioEnviamentDto> findComunicacionsPendentsByNif(String dniTitular) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<NotificacioEnviamentDto> findNotificacionsPendentsByNif(String dniTitular) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<NotificacioEnviamentDto> findComunicacionsLlegidesByNif(String dniTitular) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<NotificacioEnviamentDto> findNotificacionsLlegidesByNif(String dniTitular) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(EnviamentServiceImpl.class);
 
 }

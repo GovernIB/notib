@@ -171,4 +171,35 @@ public class EnviamentServiceBean implements EnviamentService {
 	public void reactivaSir(Set<Long> enviaments) {
 		delegate.reactivaSir(enviaments);
 	}
+	
+	
+	@Override
+	public List<NotificacioEnviamentDto> findComunicacionsByNif(String dniTitular) {
+		return delegate.findComunicacionsByNif(dniTitular);
+	}
+
+	@Override
+	public List<NotificacioEnviamentDto> findNotificacionsByNif(String dniTitular) {
+		return delegate.findNotificacionsByNif(dniTitular);
+	}
+
+	@Override
+	public List<NotificacioEnviamentDto> findComunicacionsPendentsByNif(String dniTitular) {
+		return delegate.findComunicacionsPendentsByNif(dniTitular);
+	}
+
+	@Override
+	public List<NotificacioEnviamentDto> findNotificacionsPendentsByNif(String dniTitular) {
+		return delegate.findNotificacionsPendentsByNif(dniTitular);
+	}
+
+	@Override
+	public List<NotificacioEnviamentDto> findComunicacionsLlegidesByNif(String dniTitular) {
+		return delegate.findComunicacionsLlegidesByNif(dniTitular);
+	}
+
+	@Override
+	public List<NotificacioEnviamentDto> findNotificacionsLlegidesByNif(String dniTitular) {
+		return delegate.findNotificacionsLlegidesByNif(dniTitular);
+	}
 }

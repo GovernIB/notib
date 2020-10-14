@@ -418,4 +418,12 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("maxReintents")Integer maxReintents,
 			Pageable pageable);
 
+	@Query( " select ne " +
+			" from NotificacioEnviamentEntity ne " +
+			" left outer join ne.destinataris d " +
+		    " where ne.notificacio.enviamentTipus = es.caib.notib.core.api.dto.COMUNICACIO " +
+		    "   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :nif) " +
+		    "   or (upper(d.nif) = :nif)) ")
+	List<NotificacioEnviamentEntity> findComunicacionsByNif(@Param("nif") String dniTitular);
+
 }

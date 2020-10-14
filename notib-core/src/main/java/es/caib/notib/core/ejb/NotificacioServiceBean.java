@@ -309,5 +309,4 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.findUltimEventRegistreByNotificacio(notificacioId);
 	}
 
-
 }

@@ -6,7 +6,7 @@ import lombok.Data;
 public class Document {
 
 	private String nom;
-	private Integer mida;
+//	private Integer mida;
 	private String url;
 	
 }

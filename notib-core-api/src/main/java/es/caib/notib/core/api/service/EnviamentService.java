@@ -216,4 +216,12 @@ public interface EnviamentService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	public void reactivaSir(Set<Long> enviaments);
+	
+	
+	public List<NotificacioEnviamentDto> findComunicacionsByNif(String dniTitular);
+	public List<NotificacioEnviamentDto> findNotificacionsByNif(String dniTitular);
+	public List<NotificacioEnviamentDto> findComunicacionsPendentsByNif(String dniTitular);
+	public List<NotificacioEnviamentDto> findNotificacionsPendentsByNif(String dniTitular);
+	public List<NotificacioEnviamentDto> findComunicacionsLlegidesByNif(String dniTitular);
+	public List<NotificacioEnviamentDto> findNotificacionsLlegidesByNif(String dniTitular);
 }
