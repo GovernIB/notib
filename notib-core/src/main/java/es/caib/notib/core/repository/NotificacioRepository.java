@@ -264,7 +264,11 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:isIdentificadorNull = true or " +
 			"		(ntf.id = (select notificacio.id" +
 			"				from NotificacioEnviamentEntity env" +
-			"				where env.notificaIdentificador = :identificador)))")
+			"				where env.notificaIdentificador = :identificador))) " + 
+			"and (:nomesAmbErrors = false or " + 
+			"		(ntf.id in (select notificacio.id" +
+			"				from NotificacioEnviamentEntity env" + 
+			"				where env.notificaError = true)))")
 	public Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
@@ -297,6 +301,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("isIdentificadorNull") boolean isIdentificadorNull,
 			@Param("identificador") String identificador,
 			@Param("usuariCodi") String usuariCodi,
+			@Param("nomesAmbErrors") boolean nomesAmbErrors,
 			Pageable paginacio);
 	
 	@Query(	"select ntf " +
@@ -323,9 +328,13 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)" +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
 			"and (:isIdentificadorNull = true or " +
-			"		(ntf.id = (select notificacio.id"
-			+ "				from NotificacioEnviamentEntity env"
-			+ "				where env.notificaIdentificador = :identificador)))")
+			"		(ntf.id = (select notificacio.id" + 
+			"				from NotificacioEnviamentEntity env" +
+			"				where env.notificaIdentificador = :identificador)))" +
+			"and (:nomesAmbErrors = false or " + 
+			"		(ntf.id in (select notificacio.id" +
+			"				from NotificacioEnviamentEntity env" + 
+			"				where env.notificaError = true)))")
 	public Page<NotificacioEntity> findAmbFiltre(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
@@ -353,6 +362,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("creadaPer") String creadaPer,
 			@Param("isIdentificadorNull") boolean isIdentificadorNull,
 			@Param("identificador") String identificador,
+			@Param("nomesAmbErrors") boolean nomesAmbErrors,
 			Pageable paginacio);
 	
 	@Query(	"select " +
