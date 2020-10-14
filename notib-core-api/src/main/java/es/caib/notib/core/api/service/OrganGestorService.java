@@ -13,6 +13,7 @@ import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.exception.NotFoundException;
 
 /**
@@ -122,4 +123,17 @@ public interface OrganGestorService {
 	public LlibreDto getLlibreOrganisme(
 			Long entitatId,
 			String organGestorDir3Codi);
+	
+	/**
+	 * Recupera els òrgans sobre els quals té permís l'usuari actual
+	 * 
+	 * @param entitatId
+	 * @param permis
+	 * 
+	 * @return
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public List<OrganGestorDto> findOrgansGestorsWithPermis(
+			Long entitatId, 
+			PermisEnum permis);
 }

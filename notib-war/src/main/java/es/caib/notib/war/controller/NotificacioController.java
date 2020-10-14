@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -828,6 +830,7 @@ public class NotificacioController extends BaseUserController {
 			dadesProcediment.setFormatsSobre(pagadorCieFormatSobreService.findFormatSobreByPagadorCie(procedimentActual.getPagadorcie().getId()));
 			dadesProcediment.setFormatsFulla(pagadorCieFormatFullaService.findFormatFullaByPagadorCie(procedimentActual.getPagadorcie().getId()));
 		}
+		dadesProcediment.setComu(procedimentActual.isComu());
 		return dadesProcediment;
 	}
 	
@@ -962,13 +965,19 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
 		model.addAttribute("entitat", entitatActual);
 		
-		List<ProcedimentDto> procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO); 
+		List<ProcedimentDto> procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(
+				entitatActual.getId(), 
+				usuariActual.getCodi(), 
+				PermisEnum.NOTIFICACIO);
 		model.addAttribute("procediments", procedimentsDisponibles);
 		if (procedimentsDisponibles.isEmpty()) {
 			MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
 		}
-	
-		model.addAttribute("organsGestors", organGestorService.findOrganismes(entitatActual));
+		List<OrganGestorDto> organsGestors = recuperarOrgansPerProcedimentAmbPermis(
+				entitatActual,
+				procedimentsDisponibles);			
+		model.addAttribute("organsGestors", organsGestors);
+		
 		model.addAttribute("amagat", Boolean.FALSE);
 		
 		model.addAttribute("comunicacioTipus", 
@@ -1008,6 +1017,31 @@ public class NotificacioController extends BaseUserController {
 			logger.error("No s'ha pogut recuperar la longitud del concepte: " + ex.getMessage());
 		}
 		
+	}
+
+	private List<OrganGestorDto> recuperarOrgansPerProcedimentAmbPermis(
+			EntitatDto entitatActual,
+			List<ProcedimentDto> procedimentsDisponibles) {
+		List<Long> procedimentsDisponiblesIds = new ArrayList<Long>();
+		for (ProcedimentDto pro: procedimentsDisponibles)
+			procedimentsDisponiblesIds.add(pro.getId());
+		
+		// 1-recuperam els òrgans dels procediments disponibles (amb permís)
+		List<OrganGestorDto> organsGestorsProcediments = organGestorService.findByProcedimentIds(procedimentsDisponiblesIds);
+		// 2-recuperam els òrgans amb permís de notificació
+		List<OrganGestorDto> organsGestorsAmbPermis = organGestorService.findOrgansGestorsWithPermis(
+				entitatActual.getId(), 
+				PermisEnum.NOTIFICACIO);
+		// 3-juntam tots els òrgans i ordenam per nom
+		List<OrganGestorDto> organsGestors = new ArrayList<OrganGestorDto>(organsGestorsProcediments);
+		organsGestors.addAll(organsGestorsAmbPermis);
+		Collections.sort(organsGestors, new Comparator<OrganGestorDto>() {
+			@Override
+			public int compare(OrganGestorDto p1, OrganGestorDto p2) {
+				return p1.getNom().compareTo(p2.getNom());
+			}
+		});
+		return organsGestors;
 	}
 
 	private void ompliModelFormulari(
@@ -1115,6 +1149,7 @@ public class NotificacioController extends BaseUserController {
 		private List<GrupDto> grups = new ArrayList<GrupDto>();
 		private List<PagadorCieFormatSobreDto> formatsSobre = new ArrayList<PagadorCieFormatSobreDto>();
 		private List<PagadorCieFormatFullaDto> formatsFulla = new ArrayList<PagadorCieFormatFullaDto>();
+		private boolean comu;
 		
 		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 		

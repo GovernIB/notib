@@ -151,6 +151,12 @@
 	font-size: 15px;
 	margin-right: 6px;
 }
+[id^="select2-procedimentId-result-"] {
+	padding: 6px 20px;
+}
+.select2-results__group {
+	font-size: 14px !important;
+}
 </style>
 <script type="text/javascript">
 
@@ -273,9 +279,29 @@ $(document).ready(function() {
 				selProcediments.empty();
 				if (procediments && procediments.length > 0) {
 					selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.select'/></option>");
+					var procedimentsComuns = [];
+					var procedimentsOrgan = [];
 					$.each(data, function(i, val) {
-						selProcediments.append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
+						if(val.comu) {
+							procedimentsComuns.push(val);
+						} else {
+							procedimentsOrgan.push(val);
+						}
 					});
+					if (procedimentsComuns.length > 0) {
+						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
+							$.each(procedimentsComuns, function(index, val) {
+								selProcediments.append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
+							});
+						selProcediments.append("</optgroup>");
+					}
+					if (procedimentsOrgan.length > 0) {
+						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
+							$.each(procedimentsOrgan, function(index, val) {
+								selProcediments.append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
+							});
+						selProcediments.append("</optgroup>");
+					}
 				} else {
 					selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
 				}
@@ -303,7 +329,9 @@ $(document).ready(function() {
 							theme: 'bootstrap',
 							width: 'auto'};
 					// Òrgan gestor
-					$("#organGestor").val(data.organCodi).trigger("change.select2");
+					if (!data.comu) {
+						$("#organGestor").val(data.organCodi).trigger("change.select2");
+					}
 // 					$("#organGestor").prop("disabled", true);
 					// Caducitat
 					$("#caducitat").val(data.caducitat);
@@ -365,7 +393,7 @@ $(document).ready(function() {
 			});
 		}	
     });
-
+	$("#organGestor").trigger('change');
     //Add metadata
     var count = 0;
     $('#add').on('click', function () {

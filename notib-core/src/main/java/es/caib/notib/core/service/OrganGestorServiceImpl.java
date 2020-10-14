@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -43,6 +45,7 @@ import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PermisosHelper;
+import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.PagadorCieRepository;
@@ -690,6 +693,41 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 						e.getMessage());
 			}
 			return llibre;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<OrganGestorDto> findOrgansGestorsWithPermis(Long entitatId, PermisEnum permis) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId, 
+					true,
+					false, 
+					false);
+			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
+			List<OrganGestorEntity> organsDisponibles = organGestorRepository.findByEntitat(entitat);
+			
+			permisosHelper.filterGrantedAny(
+					organsDisponibles,
+					new ObjectIdentifierExtractor<OrganGestorEntity>() {
+						public Long getObjectIdentifier(OrganGestorEntity organGestor) {
+							return organGestor.getId();
+						}
+					},
+					OrganGestorEntity.class,
+					permisos,
+					auth);
+			
+			List<OrganGestorDto> organsGestorsDto = conversioTipusHelper.convertirList(
+					organsDisponibles, 
+					OrganGestorDto.class); 
+			return organsGestorsDto;
+	
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

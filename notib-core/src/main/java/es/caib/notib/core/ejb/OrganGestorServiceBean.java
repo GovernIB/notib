@@ -21,6 +21,7 @@ import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.OrganGestorService;
 
@@ -160,6 +161,12 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public LlibreDto getLlibreOrganisme(Long entitatId, String organGestorDir3Codi) {
 		return delegate.getLlibreOrganisme(entitatId, organGestorDir3Codi);
+	}
+
+	@Override
+	@RolesAllowed({"tothom"})
+	public List<OrganGestorDto> findOrgansGestorsWithPermis(Long entitatId, PermisEnum permis) {
+		return delegate.findOrgansGestorsWithPermis(entitatId, permis);
 	}
 
 }
