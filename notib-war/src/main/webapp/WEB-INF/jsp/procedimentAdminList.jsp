@@ -83,6 +83,12 @@ pageContext.setAttribute(
 				<th data-col-name="nom"><spring:message code="procediment.list.columna.nom"/></th>
 				<th data-col-name="entitatNom"><spring:message code="procediment.list.columna.entitat"/></th>
 				<th data-col-name="organGestorDesc"><spring:message code="procediment.list.columna.organGestor"/></th>
+				<th data-col-name="comu" data-template="#cellComuTemplate">
+					<spring:message code="procediment.list.columna.comu"/>
+					<script id="cellComuTemplate" type="text/x-jsrender">
+						{{if comu}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
 				<th data-col-name="pagadorpostal"><spring:message code="procediment.list.columna.pagadorpostal"/></th>
 				<th data-col-name="pagadorcie"><spring:message code="procediment.list.columna.pagadorcie"/></th>
 				<th data-col-name="agrupar" data-visible="false" id="agrupable"></th>
