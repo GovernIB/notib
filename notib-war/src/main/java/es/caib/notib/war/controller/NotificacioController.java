@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -1033,8 +1035,12 @@ public class NotificacioController extends BaseUserController {
 				entitatActual.getId(), 
 				PermisEnum.NOTIFICACIO);
 		// 3-juntam tots els òrgans i ordenam per nom
-		List<OrganGestorDto> organsGestors = new ArrayList<OrganGestorDto>(organsGestorsProcediments);
-		organsGestors.addAll(organsGestorsAmbPermis);
+		List<OrganGestorDto> organsGestors;
+		Set<OrganGestorDto> setOrgansGestors = new HashSet<OrganGestorDto>(organsGestorsProcediments);
+		setOrgansGestors.addAll(organsGestorsAmbPermis);
+				
+		organsGestors = new ArrayList<OrganGestorDto>(setOrgansGestors);
+		
 		Collections.sort(organsGestors, new Comparator<OrganGestorDto>() {
 			@Override
 			public int compare(OrganGestorDto p1, OrganGestorDto p2) {

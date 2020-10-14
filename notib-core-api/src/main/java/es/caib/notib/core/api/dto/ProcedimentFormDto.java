@@ -21,7 +21,6 @@ public class ProcedimentFormDto extends AuditoriaDto implements Serializable{
 	private Integer retard;
 	private List<PermisDto> permisos;
 	private List<GrupDto> grups;
-	private boolean comu;
 	
 	public int getPermisosCount() {
 		if  (permisos == null)
