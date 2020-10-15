@@ -4,7 +4,10 @@
 package es.caib.notib.war.controller;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -59,19 +62,19 @@ public class AjaxUserController extends BaseUserController {
 			@PathVariable String text,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		List<UsuariDto> usuaris = new ArrayList<UsuariDto>();
+		Set<UsuariDto> setUsuaris = new HashSet<UsuariDto>();
 		try {
 			List<UsuariDto> usuarisWeb = aplicacioService.findUsuariAmbText(text);
-			usuaris.addAll(usuarisWeb);
+			setUsuaris.addAll(usuarisWeb);
 			
 			AplicacioDto aplicacio = usuariAplicacioService.findByEntitatAndText(entitatActual.getId(), text);
 			if (aplicacio != null) {
 				UsuariDto usuariAplciacio = new UsuariDto();
 				usuariAplciacio.setCodi(aplicacio.getUsuariCodi());
 				usuariAplciacio.setNom(aplicacio.getUsuariCodi());
-				usuaris.add(usuariAplciacio);
+				setUsuaris.add(usuariAplciacio);
 			}
-			return usuaris;
+			return new ArrayList<UsuariDto>(setUsuaris);
 		} catch (Exception ex) {
 			logger.error("Error al consultar la informació dels usuaris amb el filtre \"" + text + "\"", ex);
 			return new ArrayList<UsuariDto>();

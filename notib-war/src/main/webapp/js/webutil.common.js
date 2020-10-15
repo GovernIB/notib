@@ -442,7 +442,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 							suggest.append(
 										$('<option>', {
 											value: resposta[suggestValue],
-											text: (suggestTextAddicional != undefined && resposta[suggestTextAddicional] != null) ? resposta[suggestText] + " (" + resposta[suggestTextAddicional] + ")" : resposta[suggestText],
+											text: (suggestTextAddicional != undefined && resposta[suggestTextAddicional] != null) ? resposta[suggestText] + " (" + resposta[suggestTextAddicional] + ")" : resposta[suggestText] + " (" + resposta["codi"] + ")",
 											selected: value == resposta[suggestValue] != false ? value == resposta[suggestValue] : (value == resposta["codi"] != false ? value == resposta["codi"] : value == resposta["nif"])
 										}));
 						},
@@ -513,7 +513,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 						var item = data[i];
 						results.push({
 							id: item[suggestValue],
-							text: (suggestTextAddicional != undefined && item[suggestTextAddicional] != null) ? item[suggestText] + " (" + item[suggestTextAddicional] + ")" : item[suggestText]
+							text: (suggestTextAddicional != undefined && item[suggestTextAddicional] != null) ? item[suggestText] + " (" + item[suggestTextAddicional] + ")" : item[suggestText] + " (" + item["codi"] + ")"
 						});
 					}
 					
