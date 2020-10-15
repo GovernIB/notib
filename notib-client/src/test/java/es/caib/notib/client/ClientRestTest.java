@@ -29,13 +29,13 @@ import es.caib.notib.ws.notificacio.RespostaAlta;
 public class ClientRestTest extends ClientBaseTest {
 
 	
-//	private static final String URL = "http://localhost:8280/notib";
-//	private static final String USERNAME = "admin";
-//	private static final String PASSWORD = "admin";
+	private static final String URL = "http://localhost:8080/notib";
+	private static final String USERNAME = "admin";
+	private static final String PASSWORD = "admin";
 	
-	private static final String URL = "https://dev.caib.es/notib";
-	private static final String USERNAME = "$ripea_notib";
-	private static final String PASSWORD = "ripea_notib";
+//	private static final String URL = "https://dev.caib.es/notib";
+//	private static final String USERNAME = "$ripea_notib";
+//	private static final String PASSWORD = "ripea_notib";
 
 	/*
 	@Rule
@@ -50,7 +50,7 @@ public class ClientRestTest extends ClientBaseTest {
 				URL,
 				USERNAME,
 				PASSWORD,
-				false);
+				true);
 	}
 
 	@Test

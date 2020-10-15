@@ -41,7 +41,7 @@ public class ClientBaseTest {
 	protected static final String ORGAN_CODI = "A04003003";
 	protected static final String LLIBRE = "L16";
 	protected static final String OFICINA = "O00009390";
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "847185";
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "2095292";
 	protected static final String IDIOMA = "ca";
 	protected static final String USUARI_CODI = "e18225486x";
 //	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
@@ -54,9 +54,10 @@ public class ClientBaseTest {
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 		NotificacioV2 notificacio = new NotificacioV2();
 		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
+		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
 		notificacio.setUsuariCodi(USUARI_CODI);
 //		notificacio.setComunicacioTipus(ComunicacioTipusEnum.ASINCRON);
+//		notificacio.setOrganGestor(ORGAN_CODI);
 		notificacio.setConcepte("concepte_" + notificacioId);
 		notificacio.setDescripcio("descripcio_" + notificacioId);
 		notificacio.setEnviamentDataProgramada(null);
@@ -75,7 +76,7 @@ public class ClientBaseTest {
 //		document.setGenerarCsv(false);
 		
 		notificacio.setDocument(document);
-		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
+//		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 		for (int i = 0; i < numDestinataris; i++) {
 			Enviament enviament = new Enviament();
 			Persona titular = new Persona();
@@ -85,7 +86,7 @@ public class ClientBaseTest {
 			titular.setNif("00000000T");
 			titular.setTelefon("666010101");
 			titular.setEmail("sandreu@limit.es");
-			titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+			titular.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
 			if (titular.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO))
 				titular.setDir3Codi(ENTITAT_DIR3CODI);
 			enviament.setTitular(titular);
@@ -96,7 +97,7 @@ public class ClientBaseTest {
 			destinatari.setNif("18225486x");
 			destinatari.setTelefon("666020202");
 			destinatari.setEmail("sandreu@limit.es");
-			destinatari.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+			destinatari.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
 			if (destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO))
 				destinatari.setDir3Codi(ENTITAT_DIR3CODI);
 			enviament.getDestinataris().add(destinatari);
