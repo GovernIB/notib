@@ -505,7 +505,7 @@ $(document).ready(function() {
 
 					</script>
 				</th>
-				<th data-col-name=createdBy.codi data-converter="String" width="80px"><spring:message code="notificacio.list.columna.enviament.creada"/></th>
+				<th data-col-name="createdByComplet" data-converter="String" width="150px"><spring:message code="notificacio.list.columna.enviament.creada"/></th>
 				<th data-col-name="permisProcessar" data-visible="false">
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="60px">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
