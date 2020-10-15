@@ -565,6 +565,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 								filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
 								filtre.getIdentificador(),
 								usuariCodi,
+								filtre.isNomesAmbErrors(),
 								pageable);
 					}
 					
@@ -596,6 +597,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getCreadaPer(),
 							filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
 							filtre.getIdentificador(),
+							filtre.isNomesAmbErrors(),
 							pageable);
 				} else if (isAdministrador) {
 					notificacions = notificacioRepository.findAmbFiltre(
@@ -625,6 +627,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getCreadaPer(),
 							filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
 							filtre.getIdentificador(),
+							filtre.isNomesAmbErrors(),
 							pageable);
 				} else if (isAdministradorOrgan) {
 					List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
