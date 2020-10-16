@@ -160,7 +160,10 @@ $(document).ready(function() {
 			$('#llibre-entitat').hide();
 		}
 	});
-	$('#llibreEntitat').trigger("change");
+	if (!$('#llibreEntitat').checked) {
+		$('#llibre-entitat').hide();
+	}
+// 	$('#llibreEntitat').trigger("change");
 	loadOficines();
 });	
 

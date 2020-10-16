@@ -2,6 +2,7 @@ package es.caib.notib.plugin.registre;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -11,6 +12,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
 import es.caib.notib.core.api.dto.InteresadoWsDto;
@@ -80,10 +85,27 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			Long tipusOperacio) {
 		RespostaConsultaRegistre rc = new RespostaConsultaRegistre();
 		try {			
+			AsientoRegistralWs asiento = toAsientoRegistralBean(arb);
+//			logger.debug("[SalidaAsientoRegistral - INICI]");
+//			logger.debug("   Entitat: " + codiDir3Entitat);
+//			logger.debug("   Tipus operacio: " + tipusOperacio);
+//			ObjectMapper objectMapper = new ObjectMapper();
+//			objectMapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector(){
+//			    @Override
+//			    public boolean hasIgnoreMarker(final AnnotatedMember m) {
+//
+//			    List<String> exclusions = Arrays.asList("anexos");
+//			    return exclusions.contains(m.getName())|| super.hasIgnoreMarker(m);
+//			    }
+//			});
+//			String asientoJson = objectMapper.writeValueAsString(asiento); 
+//			logger.debug("   Asiento: " + asientoJson);
+//			logger.debug("[SalidaAsientoRegistral - FI]");
+
 			return toRespostaConsultaRegistre(getAsientoRegistralApi().crearAsientoRegistral(
 					null,
 					codiDir3Entitat, 
-					toAsientoRegistralBean(arb), 
+					asiento, 
 					tipusOperacio,
 					true,
 					false));
