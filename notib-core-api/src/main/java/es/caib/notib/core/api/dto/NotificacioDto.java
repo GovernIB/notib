@@ -88,6 +88,19 @@ public class NotificacioDto extends AuditoriaDto {
 			return organGestor + " - " + organGestorNom;
 		return organGestor;
 	}
+	
+	public String getCreatedByComplet() {
+		String nomComplet = "";
+		if (getCreatedBy() != null) {
+			String nomUsuari = getCreatedBy().getNom();
+			String codiUsuari = getCreatedBy().getCodi();
+			if (nomUsuari != null && !nomUsuari.isEmpty())
+				nomComplet += nomUsuari + " ";
+			if (codiUsuari != null && !codiUsuari.isEmpty())
+				nomComplet += "(" + codiUsuari + ")";
+		}
+		return nomComplet;
+	}
 
 	@Override
 	public String toString() {

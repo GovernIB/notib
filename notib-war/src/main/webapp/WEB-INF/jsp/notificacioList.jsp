@@ -103,6 +103,10 @@
 #notificacio > tbody td:first-child {
 	vertical-align: middle;
 }
+
+#nomesAmbErrorsBtn {
+	margin-right: 10%;
+}
 </style>
 <script type="text/javascript"> 
 
@@ -263,7 +267,7 @@ $(document).ready(function() {
 				} else {
 					nif = data[i].titular.dir3Codi;
 				}
-				contingutTbody += '<tr>';
+				contingutTbody += '<tr data-toggle="modal" data-href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" style="cursor: pointer;">';
 				contingutTbody += '<td>' + nomTitular + ' ' + llinatge1 + ' ' + llinatge2 + '('+ nif +') </td>';
 				if (destinataris != ''){
 					//Remove last white space
@@ -312,9 +316,15 @@ $(document).ready(function() {
 				this.selectedIndex = 0;
 			}
 		});
+		$('#nomesAmbErrorsBtn').removeClass('active');
+		$('#nomesAmbErrors').val(false);
 		$('#form-filtre').submit();
 	});
-
+	$('#nomesAmbErrorsBtn').click(function() {
+		debugger
+		nomesAmbErrors = !$(this).hasClass('active');
+		$('#nomesAmbErrors').val(nomesAmbErrors);
+	})
 	$('#organGestor').on('change', function () {
 		//Procediments
 		var organGestor = $(this);
@@ -409,11 +419,14 @@ $(document).ready(function() {
 				<not:inputText name="identificador" inline="true" placeholderKey="notificacio.list.filtre.camp.identificador"/>
 			</div>
 			<div class="col-md-2 pull-right form-buttons"  style="text-align: right;">
+				<button id="nomesAmbErrorsBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbErrors"/>" class="btn btn-default <c:if test="${nomesAmbErrors}">active</c:if>" data-toggle="button"><span class="fa fa-warning"></span></button>
+				<not:inputHidden name="nomesAmbErrors"/>
 				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 				<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 			</div>
 		</div>
 	</form:form>
+	<script id="rowhrefTemplate" type="text/x-jsrender">modal/notificacio/{{:id}}</script>
 	<table
 		id="notificacio"
 		data-toggle="datatable"
@@ -424,7 +437,9 @@ $(document).ready(function() {
 		class="table table-striped table-bordered"
 		style="width:100%"
 		data-row-info="true"
-		data-filter="#filtre">
+		data-filter="#filtre"
+		data-rowhref-template="#rowhrefTemplate"
+		data-rowhref-toggle="modal">
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false">#</th>
@@ -454,7 +469,7 @@ $(document).ready(function() {
 					</script>
 				</th--%>
 				<th data-col-name="organGestorDesc"  width="200px"><spring:message code="notificacio.form.camp.organGestor"/></th>
-				<th data-col-name="procediment.nom"  width="200px"><spring:message code="notificacio.list.columna.procediment"/></th>
+				<th data-col-name="procediment.descripcio"  width="200px"><spring:message code="notificacio.list.columna.procediment"/></th>
 				<c:if test="${mostrarColumnaNumExpedient}">
 					<th data-col-name="numExpedient" width="170px"><spring:message code="notificacio.list.columna.num.expedient"/></th>
 				</c:if>
@@ -490,7 +505,7 @@ $(document).ready(function() {
 
 					</script>
 				</th>
-				<th data-col-name=createdBy.codi data-converter="String" width="80px"><spring:message code="notificacio.list.columna.enviament.creada"/></th>
+				<th data-col-name="createdByComplet" data-converter="String" width="150px"><spring:message code="notificacio.list.columna.enviament.creada"/></th>
 				<th data-col-name="permisProcessar" data-visible="false">
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="60px">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">

@@ -162,6 +162,9 @@ public class NotificacioController extends BaseUserController {
 			Model model) {
 		request.getSession().setAttribute(NOTIFICACIONS_FILTRE, NotificacioFiltreCommand.asDto(command));
 		ompleProcediments(request, model);
+		model.addAttribute(
+				"nomesAmbErrors",
+				command.isNomesAmbErrors());
 		return "notificacioList";
 	}
 	
