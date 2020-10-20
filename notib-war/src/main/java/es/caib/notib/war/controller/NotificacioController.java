@@ -332,6 +332,8 @@ public class NotificacioController extends BaseUserController {
 					notificacioCommand.getDocument().setNormalitzat(notificacioCommand.getDocument().isNormalitzat());
 					String contingutBase64 = Base64.encodeBase64String(notificacioCommand.getArxiu().getBytes());
 					notificacioCommand.getDocument().setContingutBase64(contingutBase64);
+					notificacioCommand.getDocument().setMediaType(notificacioCommand.getArxiu().getContentType());
+					notificacioCommand.getDocument().setMida(notificacioCommand.getArxiu().getSize());
 					notificacioCommand.getDocument().setMetadadesKeys(notificacioCommand.getDocument().getMetadadesKeys());
 					notificacioCommand.getDocument().setMetadadesValues(notificacioCommand.getDocument().getMetadadesValues());
 				}

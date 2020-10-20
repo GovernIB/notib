@@ -21,30 +21,32 @@ import lombok.Data;
 public class Comunicacio {
 
 	// Notificació
-	private Long id;	// Identificador de la comunicació
-	private String emisor;	// Codi dir3 de l'entitat emisora
-	private String organGestor;	// Codi dir3 de l'òrgan gestor
-	private String procediment;	// Codi SIA del procediment
-	private String numExpedient;
-	private String concepte;	// Concepte de la comunicació
-	private String descripcio;	// Descripció de la comunicació
-	private Date dataEnviament;	// Data d'enviament de la comunicació
-	private Estat estat;		// Estat de l'enviament
-	private Date dataEstat;		// Data en que s'ha realitzat l'enviament
-	private Document document;	// Document comunicat
+	private Long id;					// Identificador de la comunicació
+	private String emisor;				// Codi dir3 de l'entitat emisora
+	private String organGestor;			// Codi dir3 de l'òrgan gestor
+	private String procediment;			// Codi SIA del procediment
+	private String numExpedient;		// Número de l’expedient al que està associada la comunicació
+	private String concepte;			// Concepte de la comunicació
+	private String descripcio;			// Descripció de la comunicació
+	private Date dataEnviament;			// Data d'enviament de la comunicació
+	private Estat estat;				// Estat de l'enviament
+	private Date dataEstat;				// Data en que s'ha realitzat l'enviament
+	private Document document;			// Document comunicat
 	
 	// Enviament
-	private Persona titular;	// Persona titular de l'enviament
+	private Persona titular;			// Persona titular de l'enviament
 	private List<Persona> destinataris;	// Persones representans, destinatàries de l'enviament
-	private SubEstat subestat;	// Subestat de l'enviament
-	private Date dataSubestat;	// Data en que s'ha canviat al subestat actual
-	// private Document certificacio;	// Certificació generada per a la notificació --> Notificació
+	private SubEstat subestat;			// Subestat de l'enviament
+	private Date dataSubestat;			// Data en que s'ha canviat al subestat actual
 
 	// Error
-	private boolean error;	// Informa si s'ha produït algun error en la comunicació
-	private Date errorData;	// Data de l'error
-	private String errorDescripcio;	// Descripció de l'error
+	private boolean error;				// Informa si s'ha produït algun error en la comunicació
+	private Date errorData;				// Data de l'error
+	private String errorDescripcio;		// Descripció de l'error
+	
+	private Document justificant;		// Justificant de registre
 
+	
 	public static Comunicacio toComunicacio(NotificacioEnviamentDto enviament, String basePath) {
 		Comunicacio comunicacio = new Comunicacio();
 		comunicacio.setId(enviament.getId());
@@ -58,11 +60,11 @@ public class Comunicacio {
 		comunicacio.setDataEnviament(enviament.getNotificacio().getEnviamentDataProgramada());
 		comunicacio.setEstat(Estat.valueOf(enviament.getNotificacio().getEstat().name()));
 		comunicacio.setDataEstat(enviament.getNotificacio().getEstatDate());
-		Document document = new Document();
-		document.setNom(enviament.getNotificacio().getDocument().getArxiuNom());
-		// TODO: afegir mida del document
-//		document.setMida(mida);
-		document.setUrl(basePath + "/document/" + enviament.getNotificacio().getId());
+		Document document = Document.builder()
+				.nom(enviament.getNotificacio().getDocument().getArxiuNom())
+				.mediaType(enviament.getNotificacio().getDocument().getMediaType())
+				.mida(enviament.getNotificacio().getDocument().getMida())
+				.url(basePath + "/document/" + enviament.getNotificacio().getId()).build();
 		comunicacio.setDocument(document);
 		comunicacio.setTitular(toPersona(enviament.getTitular()));
 		List<Persona> destinataris = new ArrayList<Persona>();
@@ -84,12 +86,15 @@ public class Comunicacio {
 	
 	protected static Persona toPersona(PersonaDto dto) {
 		Persona persona= new Persona();
-		persona.setTipus(PersonaTipus.valueOf(dto.getInteressatTipus().name()));
-		if (!InteressatTipusEnumDto.FISICA.equals(dto.getInteressatTipus())) {
-			if (dto.getRaoSocial() != null && !dto.getRaoSocial().isEmpty()) {
-				persona.setNom(dto.getRaoSocial());
-			} else {
-				persona.setNom(dto.getNom());
+		persona.setNom(dto.getNom());
+		if (dto.getInteressatTipus() != null) {
+			persona.setTipus(PersonaTipus.valueOf(dto.getInteressatTipus().name()));
+			if (!InteressatTipusEnumDto.FISICA.equals(dto.getInteressatTipus())) {
+				if (dto.getRaoSocial() != null && !dto.getRaoSocial().isEmpty()) {
+					persona.setNom(dto.getRaoSocial());
+				} else {
+					persona.setNom(dto.getNom());
+				}
 			}
 		}
 		persona.setLlinatge1(dto.getLlinatge1());

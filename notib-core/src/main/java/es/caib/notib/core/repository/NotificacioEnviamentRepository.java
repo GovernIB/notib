@@ -421,9 +421,53 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	@Query( " select ne " +
 			" from NotificacioEnviamentEntity ne " +
 			" left outer join ne.destinataris d " +
-		    " where ne.notificacio.enviamentTipus = es.caib.notib.core.api.dto.COMUNICACIO " +
+		    " where ne.notificacio.enviamentTipus = es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.COMUNICACIO " +
 		    "   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :nif) " +
 		    "   or (upper(d.nif) = :nif)) ")
 	List<NotificacioEnviamentEntity> findComunicacionsByNif(@Param("nif") String dniTitular);
+
+	@Query( " select ne " +
+			" from NotificacioEnviamentEntity ne " +
+			" left outer join ne.destinataris d " +
+		    " where ne.notificacio.enviamentTipus = es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.NOTIFICACIO " +
+		    "   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :nif) " +
+		    "   or (upper(d.nif) = :nif)) ")
+	List<NotificacioEnviamentEntity> findNotificacionsByNif(@Param("nif") String dniTitular);
+	
+	@Query( " select ne " +
+			" from NotificacioEnviamentEntity ne " +
+			" left outer join ne.destinataris d " +
+		    " where ne.notificacio.enviamentTipus = es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.COMUNICACIO " +
+			"   and ne.notificaEstatFinal = false " +
+		    "   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :nif) " +
+		    "   or (upper(d.nif) = :nif)) ")
+	List<NotificacioEnviamentEntity> findComunicacionsPendentsByNif(@Param("nif") String dniTitular);
+
+	@Query( " select ne " +
+			" from NotificacioEnviamentEntity ne " +
+			" left outer join ne.destinataris d " +
+		    " where ne.notificacio.enviamentTipus = es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.NOTIFICACIO " +
+		    "   and ne.notificaEstatFinal = false " +
+		    "   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :nif) " +
+		    "   or (upper(d.nif) = :nif)) ")
+	List<NotificacioEnviamentEntity> findNotificacionsPendentsByNif(@Param("nif") String dniTitular);
+	
+	@Query( " select ne " +
+			" from NotificacioEnviamentEntity ne " +
+			" left outer join ne.destinataris d " +
+		    " where ne.notificacio.enviamentTipus = es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.COMUNICACIO " +
+			"   and ne.notificaEstatFinal = true " +
+		    "   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :nif) " +
+		    "   or (upper(d.nif) = :nif)) ")
+	List<NotificacioEnviamentEntity> findComunicacionsLlegidesByNif(@Param("nif") String dniTitular);
+
+	@Query( " select ne " +
+			" from NotificacioEnviamentEntity ne " +
+			" left outer join ne.destinataris d " +
+		    " where ne.notificacio.enviamentTipus = es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.NOTIFICACIO " +
+		    "   and ne.notificaEstatFinal = true " +
+		    "   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :nif) " +
+		    "   or (upper(d.nif) = :nif)) ")
+	List<NotificacioEnviamentEntity> findNotificacionsLlegidesByNif(@Param("nif") String dniTitular);
 
 }

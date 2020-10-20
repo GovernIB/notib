@@ -1289,36 +1289,36 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<NotificacioEnviamentDto> findNotificacionsByNif(String dniTitular) {
-		// TODO Auto-generated method stub
-		return null;
+		List<NotificacioEnviamentEntity> notificacions = notificacioEnviamentRepository.findNotificacionsByNif(dniTitular.toUpperCase());
+		return conversioTipusHelper.convertirList(notificacions, NotificacioEnviamentDto.class);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public List<NotificacioEnviamentDto> findComunicacionsPendentsByNif(String dniTitular) {
-		// TODO Auto-generated method stub
-		return null;
+		List<NotificacioEnviamentEntity> comunicacions = notificacioEnviamentRepository.findComunicacionsPendentsByNif(dniTitular.toUpperCase());
+		return conversioTipusHelper.convertirList(comunicacions, NotificacioEnviamentDto.class);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public List<NotificacioEnviamentDto> findNotificacionsPendentsByNif(String dniTitular) {
-		// TODO Auto-generated method stub
-		return null;
+		List<NotificacioEnviamentEntity> notificacions = notificacioEnviamentRepository.findNotificacionsPendentsByNif(dniTitular.toUpperCase());
+		return conversioTipusHelper.convertirList(notificacions, NotificacioEnviamentDto.class);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public List<NotificacioEnviamentDto> findComunicacionsLlegidesByNif(String dniTitular) {
-		// TODO Auto-generated method stub
-		return null;
+		List<NotificacioEnviamentEntity> comunicacions = notificacioEnviamentRepository.findComunicacionsLlegidesByNif(dniTitular.toUpperCase());
+		return conversioTipusHelper.convertirList(comunicacions, NotificacioEnviamentDto.class);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public List<NotificacioEnviamentDto> findNotificacionsLlegidesByNif(String dniTitular) {
-		// TODO Auto-generated method stub
-		return null;
+		List<NotificacioEnviamentEntity> notificacions = notificacioEnviamentRepository.findNotificacionsLlegidesByNif(dniTitular.toUpperCase());
+		return conversioTipusHelper.convertirList(notificacions, NotificacioEnviamentDto.class);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(EnviamentServiceImpl.class);

@@ -192,7 +192,9 @@ public class NotificacioServiceWsImpl implements NotificacioServiceWs {
 					notificacio.getDocument().getUrl(),  
 					notificacio.getDocument().getMetadades(),  
 					notificacio.getDocument().isNormalitzat(),  
-					notificacio.getDocument().isGenerarCsv()).build());
+					notificacio.getDocument().isGenerarCsv(),
+					null,
+					null).build());
 			
 			NotificacioEntity.BuilderV1 notificacioBuilder = NotificacioEntity.getBuilderV1(
 					entitat,

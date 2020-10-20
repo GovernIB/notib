@@ -22,7 +22,7 @@ public class Notificacio extends Comunicacio{
 
 	private Document certificacio;	// Certificació generada per a la notificació --> Notificació
 
-	public static Comunicacio toNotificacio(NotificacioEnviamentDto enviament, String basePath) {
+	public static Notificacio toNotificacio(NotificacioEnviamentDto enviament, String basePath) {
 		Notificacio notificacio = new Notificacio();
 		notificacio.setId(enviament.getId());
 		notificacio.setEmisor(enviament.getNotificacio().getEntitat().getCodi());
@@ -35,11 +35,11 @@ public class Notificacio extends Comunicacio{
 		notificacio.setDataEnviament(enviament.getNotificacio().getEnviamentDataProgramada());
 		notificacio.setEstat(Estat.valueOf(enviament.getNotificacio().getEstat().name()));
 		notificacio.setDataEstat(enviament.getNotificacio().getEstatDate());
-		Document document = new Document();
-		document.setNom(enviament.getNotificacio().getDocument().getArxiuNom());
-		// TODO: afegir mida del document
-//		document.setMida(mida);
-		document.setUrl(basePath + "/document/" + enviament.getNotificacio().getId());
+		Document document = Document.builder()
+				.nom(enviament.getNotificacio().getDocument().getArxiuNom())
+				.mediaType(enviament.getNotificacio().getDocument().getMediaType())
+				.mida(enviament.getNotificacio().getDocument().getMida())
+				.url(basePath + "/document/" + enviament.getNotificacio().getId()).build();
 		notificacio.setDocument(document);
 		notificacio.setTitular(toPersona(enviament.getTitular()));
 		List<Persona> destinataris = new ArrayList<Persona>();
@@ -58,9 +58,10 @@ public class Notificacio extends Comunicacio{
 		
 		// Certificació
 		if (enviament.getNotificaCertificacioData() != null) {
-			Document certificacio = new Document();
-			certificacio.setNom(enviament.getNotificaCertificacioArxiuNom());
-			certificacio.setUrl(basePath + "/certificacio/" + enviament.getId());
+			Document certificacio = Document.builder()
+					.nom(enviament.getNotificaCertificacioArxiuNom())
+					.url(basePath + "/certificacio/" + enviament.getId()).build();
+			notificacio.setCertificacio(certificacio);
 		}
 		
 		return notificacio;
