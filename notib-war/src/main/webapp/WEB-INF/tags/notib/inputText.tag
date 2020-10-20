@@ -1,6 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
 <%@ attribute name="name" required="true" rtexprvalue="true"%>
 <%@ attribute name="value" required="false" rtexprvalue="true"%>
 <%@ attribute name="required" required="false" rtexprvalue="true"%>
@@ -46,6 +47,13 @@
 	margin-bottom: 0px;
 }
 </style>
+<script>
+$('input').change(function() {
+	if(this.type != "file"){
+		this.value = this.value.trim();
+	}
+});
+</script>
 <div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>"<c:if test="${multiple}"> data-toggle="multifield"</c:if>>
 <c:choose>
 	<c:when test="${not inline}">
@@ -54,7 +62,7 @@
 		<c:choose>
 			<c:when test="${picker}">
 				<div id="${campPath}" class="input-group colorpicker-component">
-					<form:input value="${campValue}" path="${campPath}" cssClass="form-control ${generalClass}" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}"/>
+					<form:input value="${campValue}" path="${campPath}" cssClass="form-control ${generalClass}" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}" />
 					<span class="input-group-addon"><i></i></span>
 					<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 					<c:if test="${info == true}">
