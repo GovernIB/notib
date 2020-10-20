@@ -15,6 +15,14 @@
 <%@ attribute name="multiple" required="false" rtexprvalue="true"%>
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="readonly" required="false" rtexprvalue="true"%>
+<script>
+$('input').change(function() {
+	if(this.type != "file"){
+		this.value = this.value.trim();
+	}
+	
+});
+</script>
 <c:set var="campValue" value="${value}"/>
 <c:set var="campId" value="${id}"/>
 <c:set var="campClass" value="${classe}"/>
