@@ -1090,14 +1090,17 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			logger.debug("Refrescant l'estat de la notificació a PROCESSAT (" +
 					"notificacioId=" + notificacioId + ")");		
-			String resposta;
+			String resposta = null;
 			NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(
 					null,
 					notificacioId);
 			notificacioEntity.updateEstat(NotificacioEstatEnumDto.PROCESSADA);
 			notificacioEntity.updateEstatDate(new Date());
 			notificacioEntity.updateMotiu(motiu);
-			resposta = emailHelper.prepararEnvioEmailNotificacio(notificacioEntity);
+			if(notificacioEntity.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
+				resposta = emailHelper.prepararEnvioEmailNotificacio(notificacioEntity);
+			}
+			
 			notificacioRepository.saveAndFlush(notificacioEntity);
 			
 			return resposta;

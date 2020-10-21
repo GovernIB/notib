@@ -55,7 +55,6 @@ public class EmailHelper {
 	
 	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws MessagingException {
 		List<UsuariDto> destinataris = obtenirCodiDestinatarisPerProcediment(notificacio);
-		
 		String resposta = null;
 		if (destinataris != null && !destinataris.isEmpty()) {
 			for (UsuariDto usuariDto : destinataris) {
@@ -183,7 +182,7 @@ public class EmailHelper {
 					"		</tr>"+	
 					"		<tr>"+
 					"			<th>"+ messageHelper.getMessage("notificacio.email.procediment") +"</th>"+
-					"			<td>"+ notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : "----" + "</td>"+
+					"			<td>"+ (notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : "----") + "</td>"+
 					"		</tr>"+	
 					"		<tr>"+
 					"			<th>"+ messageHelper.getMessage("notificacio.email.entitat") +"</th>"+
