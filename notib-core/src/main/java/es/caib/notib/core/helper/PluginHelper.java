@@ -1495,7 +1495,7 @@ public class PluginHelper {
 			NotificacioEntity notificacio, 
 			Set<NotificacioEnviamentEntity> enviaments) throws RegistrePluginException {
 		AsientoRegistralBeanDto registre = new AsientoRegistralBeanDto();
-		registre.setEntidadCodigo(notificacio.getEntitat().getCodi());
+		registre.setEntidadCodigo(notificacio.getEntitat().getDir3Codi());
 		registre.setEntidadDenominacion(notificacio.getEntitat().getNom());
 		DadesOficina dadesOficina = new DadesOficina();
 		String dir3Codi;
@@ -1522,15 +1522,15 @@ public class PluginHelper {
 				dir3Codi);
 		
 		if (dadesOficina.getOficinaCodi() != null) {
-			//Codi Dir3 de l’oficina inicial
-			registre.setEntidadRegistralInicioCodigo(dadesOficina.getOficinaCodi());
-			registre.setEntidadRegistralInicioDenominacion(dadesOficina.getOficinaNom());
 			//Codi Dir3 de l’oficina origen (obligatori)
 			registre.setEntidadRegistralOrigenCodigo(dadesOficina.getOficinaCodi());
 			registre.setEntidadRegistralOrigenDenominacion(dadesOficina.getOficinaNom());
+			//Codi Dir3 de l’oficina inicial
+			//registre.setEntidadRegistralInicioCodigo(dadesOficina.getOficinaCodi());
+			//registre.setEntidadRegistralInicioDenominacion(dadesOficina.getOficinaNom());
 			//Codi Dir3 de l’oficina destí
-			registre.setEntidadRegistralDestinoCodigo(dadesOficina.getOficinaCodi());
-			registre.setEntidadRegistralDestinoDenominacion(dadesOficina.getOficinaNom());
+			//registre.setEntidadRegistralDestinoCodigo(dadesOficina.getOficinaCodi());
+			//registre.setEntidadRegistralDestinoDenominacion(dadesOficina.getOficinaNom());
 		}
 		if (dadesOficina.getLlibreCodi() != null) {
 			registre.setLibroCodigo(dadesOficina.getLlibreCodi());
