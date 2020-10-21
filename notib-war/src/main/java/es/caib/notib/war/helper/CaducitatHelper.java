@@ -20,10 +20,11 @@ public class CaducitatHelper {
 			int diesSumats = 0;
 			while (diesSumats < diesCaducitat) {
 				diaActual.add(Calendar.DAY_OF_YEAR, 1);
-		        if ((diaActual.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) &&
-		        		diaActual.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
-		            ++diesSumats;
-		        }
+				++diesSumats;
+//		        if ((diaActual.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) &&
+//		        		diaActual.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+//		            ++diesSumats;
+//		        }
 		    }
 		} catch (Exception ex) {
 			String errorMessage = "Error sumant dies a la data de caducitat: ";
