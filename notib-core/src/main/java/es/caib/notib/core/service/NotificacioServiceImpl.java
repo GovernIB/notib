@@ -73,6 +73,7 @@ import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.CreacioSemaforDto;
@@ -86,6 +87,7 @@ import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.helper.RegistreHelper;
 import es.caib.notib.core.helper.RegistreNotificaHelper;
+import es.caib.notib.core.helper.UsuariHelper;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.GrupRepository;
@@ -136,6 +138,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private OrganGestorRepository organGestorRepository;
 	@Autowired
 	private EmailHelper emailHelper;
+	@Autowired
+	private UsuariHelper usuariHelper;
 	@Autowired
 	private RegistreNotificaHelper registreNotificaHelper;
 	@Autowired
@@ -1097,8 +1101,18 @@ public class NotificacioServiceImpl implements NotificacioService {
 			notificacioEntity.updateEstat(NotificacioEstatEnumDto.PROCESSADA);
 			notificacioEntity.updateEstatDate(new Date());
 			notificacioEntity.updateMotiu(motiu);
+			UsuariEntity usuari = usuariHelper.getUsuariAutenticat();
 			if(notificacioEntity.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
-				resposta = emailHelper.prepararEnvioEmailNotificacio(notificacioEntity);
+				
+				if(usuari.isRebreEmailsNotificacioCreats()) {
+					if(usuari.getCodi() == notificacioEntity.getCreatedBy().getCodi()) {
+						resposta = emailHelper.prepararEnvioEmailNotificacio(notificacioEntity);
+					}else {
+						resposta = null;
+					}	
+				}else {
+					resposta = emailHelper.prepararEnvioEmailNotificacio(notificacioEntity);
+				}
 			}
 			
 			notificacioRepository.saveAndFlush(notificacioEntity);

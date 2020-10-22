@@ -26,6 +26,7 @@ public class UsuariDto implements Serializable {
 	private String idioma;
 	private String[] rols;
 	private Boolean rebreEmailsNotificacio;
+	private Boolean rebreEmailsNotificacioCreats;
 
 	private static final long serialVersionUID = -139254994389509932L;
 

@@ -24,6 +24,7 @@ public class UsuariCommand implements Serializable {
 	private String idioma;
 	private String[] rols;
 	private Boolean rebreEmailsNotificacio;
+	private Boolean rebreEmailsNotificacioCreats;
 
 	public String getCodi() {
 		return codi;
@@ -66,6 +67,13 @@ public class UsuariCommand implements Serializable {
 	}
 	public void setRebreEmailsNotificacio(Boolean rebreEmailsNotificacio) {
 		this.rebreEmailsNotificacio = rebreEmailsNotificacio;
+	}
+	
+	public Boolean getRebreEmailsNotificacioCreats() {
+		return rebreEmailsNotificacioCreats;
+	}
+	public void setRebreEmailsNotificacioCreats(Boolean rebreEmailsNotificacioCreats) {
+		this.rebreEmailsNotificacioCreats = rebreEmailsNotificacioCreats;
 	}
 	
 	public static UsuariCommand asCommand(UsuariDto dto) {
