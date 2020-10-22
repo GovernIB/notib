@@ -34,6 +34,8 @@ public class UsuariEntity implements Serializable {
 	private String email;
 	@Column(name = "rebre_emails")
 	private boolean rebreEmailsNotificacio = true;
+	@Column(name = "rebre_emails_creats")
+	private boolean rebreEmailsNotificacioCreats = false;
 	@Column(name="idioma", length = 2)
 	private String idioma;
 	
@@ -61,6 +63,11 @@ public class UsuariEntity implements Serializable {
 	public String getIdioma() {
 		return idioma;
 	}
+	
+	public boolean isRebreEmailsNotificacioCreats() {
+		return rebreEmailsNotificacioCreats;
+	}
+
 	public void update(
 			String nom,
 			String llinatges,
@@ -78,8 +85,10 @@ public class UsuariEntity implements Serializable {
 	
 	public void update(
 			boolean rebreEmailsNotificacio,
+			boolean rebreEmailsNotificacioCreats,
 			String idioma) {
 		this.rebreEmailsNotificacio = rebreEmailsNotificacio;
+		this.rebreEmailsNotificacioCreats = rebreEmailsNotificacioCreats;
 		this.idioma = idioma;
 	}
 
