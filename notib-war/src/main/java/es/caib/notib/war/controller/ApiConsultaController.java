@@ -1,7 +1,6 @@
 package es.caib.notib.war.controller;
 
 import java.net.URI;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -20,7 +20,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.rest.consulta.Arxiu;
 import es.caib.notib.core.api.rest.consulta.Resposta;
 import es.caib.notib.core.api.service.EnviamentService;
@@ -46,14 +46,15 @@ public class ApiConsultaController {
 			position = 0,
 			response = Resposta.class,
 			tags = "Comunicacions")
-	@ApiParam(
-			name = "dniTitular",
-			value = "DNI del titular de les comunicacions a consultar",
-			required = true)
 	@ResponseBody
-	public Resposta comunicacionsByTitular(HttpServletRequest request, @PathVariable String dniTitular) {
-		
-		List<NotificacioEnviamentDto> enviaments = enviamentService.findComunicacionsByNif(dniTitular);
+	public Resposta comunicacionsByTitular(
+			HttpServletRequest request, 
+			@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
+			@PathVariable String dniTitular,
+			@ApiParam(name = "pagina", value = "Número de pàgina a mostrar en la paginació", required = true)
+			@RequestParam(value = "pagina", required = false) Integer pagina,
+			@ApiParam(name = "mida", value = "Mida de la pàgina a mostrar en la paginació", required = true)
+			@RequestParam(value = "mida", required = false) Integer mida) {
 		
 		URI location = ServletUriComponentsBuilder
 				.fromServletMapping(request)
@@ -61,10 +62,13 @@ public class ApiConsultaController {
 				.buildAndExpand().toUri();
 		String basePath = location.toString();
 		
-		Resposta resposta = new Resposta();
-		resposta.setNumeroElements(enviaments.size());
-		resposta.setResultat(enviaments, basePath);
-		return resposta;
+		return enviamentService.findEnviamentsByNif(
+				dniTitular,
+				NotificaEnviamentTipusEnumDto.COMUNICACIO,
+				null,
+				basePath, 
+				pagina, 
+				mida);
 	}
 	
 	@RequestMapping(
@@ -82,20 +86,28 @@ public class ApiConsultaController {
 			value = "DNI del titular de les notificacions a consultar",
 			required = true)
 	@ResponseBody
-	public Resposta notificacionsByTitular(HttpServletRequest request, @PathVariable String dniTitular) {
-
-		List<NotificacioEnviamentDto> enviaments = enviamentService.findNotificacionsByNif(dniTitular);
+	public Resposta notificacionsByTitular(
+			HttpServletRequest request, 
+			@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
+			@PathVariable String dniTitular,
+			@ApiParam(name = "pagina", value = "Número de pàgina a mostrar en la paginació", required = true)
+			@RequestParam(value = "pagina", required = false) Integer pagina,
+			@ApiParam(name = "mida", value = "Mida de la pàgina a mostrar en la paginació", required = true)
+			@RequestParam(value = "mida", required = false) Integer mida) {
 		
 		URI location = ServletUriComponentsBuilder
 				.fromServletMapping(request)
 				.path("/api/consulta/v1")
 				.buildAndExpand().toUri();
 		String basePath = location.toString();
-		
-		Resposta resposta = new Resposta();
-		resposta.setNumeroElements(enviaments.size());
-		resposta.setResultat(enviaments, basePath);
-		return resposta;
+
+		return enviamentService.findEnviamentsByNif(
+				dniTitular,
+				NotificaEnviamentTipusEnumDto.NOTIFICACIO,
+				null,
+				basePath, 
+				pagina, 
+				mida);
 	}
 	
 	@RequestMapping(
@@ -113,9 +125,14 @@ public class ApiConsultaController {
 			value = "DNI del titular de les comunicacions a consultar",
 			required = true)
 	@ResponseBody
-	public Resposta comunicacionsPendentsByTitular(HttpServletRequest request, @PathVariable String dniTitular) {
-		
-		List<NotificacioEnviamentDto> enviaments = enviamentService.findComunicacionsPendentsByNif(dniTitular);
+	public Resposta comunicacionsPendentsByTitular(
+			HttpServletRequest request, 
+			@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
+			@PathVariable String dniTitular,
+			@ApiParam(name = "pagina", value = "Número de pàgina a mostrar en la paginació", required = true)
+			@RequestParam(value = "pagina", required = false) Integer pagina,
+			@ApiParam(name = "mida", value = "Mida de la pàgina a mostrar en la paginació", required = true)
+			@RequestParam(value = "mida", required = false) Integer mida) {
 		
 		URI location = ServletUriComponentsBuilder
 				.fromServletMapping(request)
@@ -123,10 +140,13 @@ public class ApiConsultaController {
 				.buildAndExpand().toUri();
 		String basePath = location.toString();
 		
-		Resposta resposta = new Resposta();
-		resposta.setNumeroElements(enviaments.size());
-		resposta.setResultat(enviaments, basePath);
-		return resposta;
+		return enviamentService.findEnviamentsByNif(
+				dniTitular,
+				NotificaEnviamentTipusEnumDto.COMUNICACIO,
+				false,
+				basePath, 
+				pagina, 
+				mida);
 	}
 	
 	@RequestMapping(
@@ -144,20 +164,28 @@ public class ApiConsultaController {
 			value = "DNI del titular de les notificacions a consultar",
 			required = true)
 	@ResponseBody
-	public Resposta notificacionsPendentsByTitular(HttpServletRequest request, @PathVariable String dniTitular) {
+	public Resposta notificacionsPendentsByTitular(
+			HttpServletRequest request, 
+			@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
+			@PathVariable String dniTitular,
+			@ApiParam(name = "pagina", value = "Número de pàgina a mostrar en la paginació", required = true)
+			@RequestParam(value = "pagina", required = false) Integer pagina,
+			@ApiParam(name = "mida", value = "Mida de la pàgina a mostrar en la paginació", required = true)
+			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		List<NotificacioEnviamentDto> enviaments = enviamentService.findNotificacionsPendentsByNif(dniTitular);
-		
 		URI location = ServletUriComponentsBuilder
 				.fromServletMapping(request)
 				.path("/api/consulta/v1")
 				.buildAndExpand().toUri();
 		String basePath = location.toString();
 		
-		Resposta resposta = new Resposta();
-		resposta.setNumeroElements(enviaments.size());
-		resposta.setResultat(enviaments, basePath);
-		return resposta;
+		return enviamentService.findEnviamentsByNif(
+				dniTitular,
+				NotificaEnviamentTipusEnumDto.NOTIFICACIO,
+				false,
+				basePath, 
+				pagina, 
+				mida);
 	}
 	
 	@RequestMapping(
@@ -175,20 +203,28 @@ public class ApiConsultaController {
 			value = "DNI del titular de les comunicacions a consultar",
 			required = true)
 	@ResponseBody
-	public Resposta comunicacionsLlegidesByTitular(HttpServletRequest request, @PathVariable String dniTitular) {
+	public Resposta comunicacionsLlegidesByTitular(
+			HttpServletRequest request,			 
+			@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
+			@PathVariable String dniTitular,
+			@ApiParam(name = "pagina", value = "Número de pàgina a mostrar en la paginació", required = true)
+			@RequestParam(value = "pagina", required = false) Integer pagina,
+			@ApiParam(name = "mida", value = "Mida de la pàgina a mostrar en la paginació", required = true)
+			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		List<NotificacioEnviamentDto> enviaments = enviamentService.findComunicacionsLlegidesByNif(dniTitular);
-		
 		URI location = ServletUriComponentsBuilder
 				.fromServletMapping(request)
 				.path("/api/consulta/v1")
 				.buildAndExpand().toUri();
 		String basePath = location.toString();
 		
-		Resposta resposta = new Resposta();
-		resposta.setNumeroElements(enviaments.size());
-		resposta.setResultat(enviaments, basePath);
-		return resposta;
+		return enviamentService.findEnviamentsByNif(
+				dniTitular,
+				NotificaEnviamentTipusEnumDto.COMUNICACIO,
+				true,
+				basePath, 
+				pagina, 
+				mida);
 	}
 	
 	@RequestMapping(
@@ -206,20 +242,28 @@ public class ApiConsultaController {
 			value = "DNI del titular de les notificacions a consultar",
 			required = true)
 	@ResponseBody
-	public Resposta notificacionsLlegidesByTitular(HttpServletRequest request, @PathVariable String dniTitular) {
+	public Resposta notificacionsLlegidesByTitular(
+			HttpServletRequest request, 
+			@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
+			@PathVariable String dniTitular,
+			@ApiParam(name = "pagina", value = "Número de pàgina a mostrar en la paginació", required = true)
+			@RequestParam(value = "pagina", required = false) Integer pagina,
+			@ApiParam(name = "mida", value = "Mida de la pàgina a mostrar en la paginació", required = true)
+			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		List<NotificacioEnviamentDto> enviaments = enviamentService.findNotificacionsLlegidesByNif(dniTitular);
-		
 		URI location = ServletUriComponentsBuilder
 				.fromServletMapping(request)
 				.path("/api/consulta/v1")
 				.buildAndExpand().toUri();
 		String basePath = location.toString();
 		
-		Resposta resposta = new Resposta();
-		resposta.setNumeroElements(enviaments.size());
-		resposta.setResultat(enviaments, basePath);
-		return resposta;
+		return enviamentService.findEnviamentsByNif(
+				dniTitular,
+				NotificaEnviamentTipusEnumDto.NOTIFICACIO,
+				true,
+				basePath, 
+				pagina, 
+				mida);
 	}
 	
 	@RequestMapping(

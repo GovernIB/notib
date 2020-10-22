@@ -40,6 +40,7 @@
 			<mvc:exclude-mapping path="/api/apidoc**"/>
 			<mvc:exclude-mapping path="/api-docs/**"/>
 			<mvc:exclude-mapping path="/**/api-docs/"/>
+			<mvc:exclude-mapping path="/api/consulta/**"/>
 			<bean class="es.caib.notib.war.interceptor.AplicacioInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -52,6 +53,7 @@
 			<mvc:exclude-mapping path="/extensions/**"/>
 			<mvc:exclude-mapping path="/webjars/**"/>
 			<mvc:exclude-mapping path="/error"/>
+			<mvc:exclude-mapping path="/api/consulta/**"/>
 			<bean class="es.caib.notib.war.interceptor.PermisosEntitatInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -69,6 +71,7 @@
 			<mvc:exclude-mapping path="/api/apidoc**"/>
 			<mvc:exclude-mapping path="/api-docs/**"/>
 			<mvc:exclude-mapping path="/**/api-docs/"/>
+			<mvc:exclude-mapping path="/api/consulta/**"/>
 			<mvc:exclude-mapping path="/error"/>
 			<bean class="es.caib.notib.war.interceptor.SessioInterceptor"/>
 		</mvc:interceptor>
@@ -87,6 +90,7 @@
 			<mvc:exclude-mapping path="/api/apidoc**"/>
 			<mvc:exclude-mapping path="/api-docs/**"/>
 			<mvc:exclude-mapping path="/**/api-docs/"/>
+			<mvc:exclude-mapping path="/api/consulta/**"/>
 			<mvc:exclude-mapping path="/error"/>
 			<bean class="es.caib.notib.war.interceptor.LlistaRolsInterceptor"/>
 		</mvc:interceptor>
@@ -105,6 +109,7 @@
 			<mvc:exclude-mapping path="/api/apidoc**"/>
 			<mvc:exclude-mapping path="/api-docs/**"/>
 			<mvc:exclude-mapping path="/**/api-docs/"/>
+			<mvc:exclude-mapping path="/api/consulta/**"/>
 			<mvc:exclude-mapping path="/error"/>
 			<bean class="es.caib.notib.war.interceptor.LlistaEntitatsInterceptor"/>
 		</mvc:interceptor>
@@ -123,6 +128,7 @@
 			<mvc:exclude-mapping path="/api/apidoc**"/>
 			<mvc:exclude-mapping path="/api-docs/**"/>
 			<mvc:exclude-mapping path="/**/api-docs/"/>
+			<mvc:exclude-mapping path="/api/consulta/**"/>
 			<bean class="es.caib.notib.war.interceptor.ModalInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -140,6 +146,7 @@
 			<mvc:exclude-mapping path="/api/apidoc**"/>
 			<mvc:exclude-mapping path="/api-docs/**"/>
 			<mvc:exclude-mapping path="/**/api-docs/"/>
+			<mvc:exclude-mapping path="/api/consulta/**"/>
 			<bean class="es.caib.notib.war.interceptor.NodecoInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -157,6 +164,7 @@
 			<mvc:exclude-mapping path="/api/apidoc**"/>
 			<mvc:exclude-mapping path="/api-docs/**"/>
 			<mvc:exclude-mapping path="/**/api-docs/"/>
+			<mvc:exclude-mapping path="/api/consulta/**"/>
 			<bean class="es.caib.notib.war.interceptor.AjaxInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -174,6 +182,7 @@
 			<mvc:exclude-mapping path="/api/apidoc**"/>
 			<mvc:exclude-mapping path="/api-docs/**"/>
 			<mvc:exclude-mapping path="/**/api-docs/"/>
+			<mvc:exclude-mapping path="/api/consulta/**"/>
 			<mvc:exclude-mapping path="/error"/>
 			<bean class="es.caib.notib.war.interceptor.PermisosInterceptor"/>
 		</mvc:interceptor>
