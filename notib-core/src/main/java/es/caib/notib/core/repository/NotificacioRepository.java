@@ -539,4 +539,5 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("isUsuariNull") boolean isUsuariNull, 
 			@Param("usuariCodi") String usuariCodi, 
 			@Param("maxReintents")Integer maxReintents);
+
 }

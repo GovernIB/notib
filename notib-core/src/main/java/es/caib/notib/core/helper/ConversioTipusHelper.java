@@ -15,6 +15,7 @@ import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorCieFormatFullaDto;
@@ -27,6 +28,8 @@ import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PagadorCieEntity;
 import es.caib.notib.core.entity.PagadorCieFormatFullaEntity;
@@ -80,6 +83,11 @@ public class ConversioTipusHelper {
 		mapperFactory.classMap(NotificacioEntity.class, NotificacioDtoV2.class).
 			field("organGestor.codi", "organGestor").
 			field("organGestor.nom", "organGestorNom").
+			byDefault().
+			register();
+		
+		mapperFactory.classMap(NotificacioEnviamentEntity.class, NotificacioEnviamentDto.class).
+			customize(new NotificacioEnviamentEntitytoMapper()).
 			byDefault().
 			register();
 		
@@ -182,6 +190,23 @@ public class ConversioTipusHelper {
 			}
 		}
 	}
+	
+	public class NotificacioEnviamentEntitytoMapper extends CustomMapper<NotificacioEnviamentEntity, NotificacioEnviamentDto> {
+		@Override
+		public void mapAtoB(
+				NotificacioEnviamentEntity notificacioEnviamentEntity, 
+				NotificacioEnviamentDto notificacioEnviamentDto, 
+				MappingContext context) {
+			if (notificacioEnviamentEntity.isNotificaError()) {
+				NotificacioEventEntity event = notificacioEnviamentEntity.getNotificacioErrorEvent();
+				if (event != null) {
+					notificacioEnviamentDto.setNotificaErrorData(event.getData());
+					notificacioEnviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
+				}
+			}
+		}
+	}
+	
 	
 	private MapperFacade getMapperFacade() {
 		return mapperFactory.getMapperFacade();

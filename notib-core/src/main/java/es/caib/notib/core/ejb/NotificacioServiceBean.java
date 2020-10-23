@@ -84,14 +84,14 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_CARPETA"})
 	public ArxiuDto getDocumentArxiu(
 			Long notificacioId) {
 		return delegate.getDocumentArxiu(notificacioId);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_CARPETA"})
 	public ArxiuDto enviamentGetCertificacioArxiu(
 			Long enviamentId) {
 		return delegate.enviamentGetCertificacioArxiu(enviamentId);
@@ -308,6 +308,5 @@ public class NotificacioServiceBean implements NotificacioService {
 	public NotificacioEventDto findUltimEventRegistreByNotificacio(Long notificacioId) {
 		return delegate.findUltimEventRegistreByNotificacio(notificacioId);
 	}
-
 
 }

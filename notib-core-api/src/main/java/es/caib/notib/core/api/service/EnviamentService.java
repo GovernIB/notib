@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import es.caib.notib.core.api.dto.ColumnesDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
@@ -22,6 +23,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.rest.consulta.Resposta;
 
 /**
  * Declaració dels mètodes per a la consulta de notificacions i dels
@@ -195,7 +197,7 @@ public interface EnviamentService {
 	 *            id de l'enviament registrat.
 	 * @return document justificant descarregat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_CARPETA')")
 	public byte[] getDocumentJustificant(
 			Long enviamentId);
 
@@ -216,4 +218,14 @@ public interface EnviamentService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	public void reactivaSir(Set<Long> enviaments);
+	
+	@PreAuthorize("hasRole('NOT_CARPETA') or hasRole('NOT_SUPER')")
+	public Resposta findEnviamentsByNif(
+			String dniTitular,
+			NotificaEnviamentTipusEnumDto tipus,
+			Boolean estatFinal,
+			String basePath, 
+			Integer pagina, 
+			Integer mida);
+	
 }

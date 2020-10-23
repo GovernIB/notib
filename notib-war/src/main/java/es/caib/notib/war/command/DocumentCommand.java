@@ -10,16 +10,21 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Command per al manteniment de documents.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 public class DocumentCommand {
 
 	private String arxiuNom;
 	private String contingutBase64;
+	private String mediaType;
+	private Long mida;
 	private String hash;
 	private String url;
 	private List<String> metadadesKeys = new ArrayList<String>();
@@ -28,67 +33,6 @@ public class DocumentCommand {
 	private boolean generarCsv;
 	private String csv;
 	private String uuid;
-	
-	public String getArxiuNom() {
-		return arxiuNom;
-	}
-	public void setArxiuNom(String arxiuNom) {
-		this.arxiuNom = arxiuNom;
-	}
-	public String getContingutBase64() {
-		return contingutBase64;
-	}
-	public void setContingutBase64(String contingutBase64) {
-		this.contingutBase64 = contingutBase64;
-	}
-	public String getHash() {
-		return hash;
-	}
-	public void setHash(String hash) {
-		this.hash = hash;
-	}
-	public String getUrl() {
-		return url;
-	}
-	public void setUrl(String url) {
-		this.url = url;
-	}
-	public List<String> getMetadadesKeys() {
-		return metadadesKeys;
-	}
-	public void setMetadadesKeys(List<String> metadadesKeys) {
-		this.metadadesKeys = metadadesKeys;
-	}
-	public List<String> getMetadadesValues() {
-		return metadadesValues;
-	}
-	public void setMetadadesValues(List<String> metadadesValues) {
-		this.metadadesValues = metadadesValues;
-	}
-	public boolean isNormalitzat() {
-		return normalitzat;
-	}
-	public void setNormalitzat(boolean normalitzat) {
-		this.normalitzat = normalitzat;
-	}
-	public boolean isGenerarCsv() {
-		return generarCsv;
-	}
-	public void setGenerarCsv(boolean generarCsv) {
-		this.generarCsv = generarCsv;
-	}
-	public String getCsv() {
-		return csv;
-	}
-	public void setCsv(String csv) {
-		this.csv = csv;
-	}
-	public String getUuid() {
-		return uuid;
-	}
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
 	
 	public static DocumentCommand asCommand(DocumentDto dto) {
 		if (dto == null) {
