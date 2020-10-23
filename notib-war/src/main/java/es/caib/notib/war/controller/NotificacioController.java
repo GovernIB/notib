@@ -1042,12 +1042,14 @@ public class NotificacioController extends BaseUserController {
 	private List<OrganGestorDto> recuperarOrgansPerProcedimentAmbPermis(
 			EntitatDto entitatActual,
 			List<ProcedimentDto> procedimentsDisponibles) {
+		List<OrganGestorDto> organsGestorsProcediments = new ArrayList<OrganGestorDto>();
 		List<Long> procedimentsDisponiblesIds = new ArrayList<Long>();
 		for (ProcedimentDto pro: procedimentsDisponibles)
 			procedimentsDisponiblesIds.add(pro.getId());
 		
 		// 1-recuperam els òrgans dels procediments disponibles (amb permís)
-		List<OrganGestorDto> organsGestorsProcediments = organGestorService.findByProcedimentIds(procedimentsDisponiblesIds);
+		if (!procedimentsDisponiblesIds.isEmpty())
+			organsGestorsProcediments = organGestorService.findByProcedimentIds(procedimentsDisponiblesIds);
 		// 2-recuperam els òrgans amb permís de notificació
 		List<OrganGestorDto> organsGestorsAmbPermis = organGestorService.findOrgansGestorsWithPermis(
 				entitatActual.getId(), 
