@@ -261,7 +261,13 @@ $(document).ready(function() {
     var agrupable = $("#procedimentId").children(":selected").attr("class");
     var procedimentId = $("#procedimentId").children(":selected").attr("value");
 
-    $('#organGestor').on('change', function(){
+    $('#organGestor').on('change', function() {
+    	//### seleccionat per defecte si només hi ha un (empty + òrgan)
+    	if ($('#organGestor').children('option').length == 2) {
+    		$('#organGestor option:eq(1)').attr('selected', 'selected');
+    		$('#organGestor').trigger('change.select2');
+    	}
+    	
     	var organ = $(this).val();
     	if (organ == undefined || organ == "") {
 			organ = "-";
