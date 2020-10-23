@@ -76,6 +76,7 @@
 <xs:element minOccurs="0" name="descripcio" type="xs:string" />
 <xs:element minOccurs="0" name="document" type="tns:documentV2" />
 <xs:element minOccurs="0" name="emisorDir3Codi" type="xs:string" />
+<xs:element minOccurs="0" name="organGestor" type="xs:string" />
 <xs:element minOccurs="0" name="enviamentDataProgramada" type="xs:dateTime" />
 <xs:element minOccurs="0" name="enviamentTipus" type="tns:enviamentTipusEnum" />
 <xs:element maxOccurs="unbounded" minOccurs="0" name="enviaments" nillable="true" type="tns:enviament" />
