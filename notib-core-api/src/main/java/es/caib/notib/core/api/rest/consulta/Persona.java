@@ -1,8 +1,10 @@
 package es.caib.notib.core.api.rest.consulta;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class Persona {
 
 	private PersonaTipus tipus;
@@ -11,6 +13,5 @@ public class Persona {
 	private String llinatge2;
 	private String nif;
 	private String email;
-//	private String dir3Codi;
 	
 }

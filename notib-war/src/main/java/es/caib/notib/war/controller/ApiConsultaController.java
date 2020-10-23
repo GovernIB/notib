@@ -51,9 +51,9 @@ public class ApiConsultaController {
 			HttpServletRequest request, 
 			@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
 			@PathVariable String dniTitular,
-			@ApiParam(name = "pagina", value = "Número de pàgina a mostrar en la paginació", required = true)
+			@ApiParam(name = "pagina", value = "Número de pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "pagina", required = false) Integer pagina,
-			@ApiParam(name = "mida", value = "Mida de la pàgina a mostrar en la paginació", required = true)
+			@ApiParam(name = "mida", value = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 		
 		URI location = ServletUriComponentsBuilder
@@ -90,9 +90,9 @@ public class ApiConsultaController {
 			HttpServletRequest request, 
 			@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
 			@PathVariable String dniTitular,
-			@ApiParam(name = "pagina", value = "Número de pàgina a mostrar en la paginació", required = true)
+			@ApiParam(name = "pagina", value = "Número de pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "pagina", required = false) Integer pagina,
-			@ApiParam(name = "mida", value = "Mida de la pàgina a mostrar en la paginació", required = true)
+			@ApiParam(name = "mida", value = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 		
 		URI location = ServletUriComponentsBuilder
@@ -129,9 +129,9 @@ public class ApiConsultaController {
 			HttpServletRequest request, 
 			@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
 			@PathVariable String dniTitular,
-			@ApiParam(name = "pagina", value = "Número de pàgina a mostrar en la paginació", required = true)
+			@ApiParam(name = "pagina", value = "Número de pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "pagina", required = false) Integer pagina,
-			@ApiParam(name = "mida", value = "Mida de la pàgina a mostrar en la paginació", required = true)
+			@ApiParam(name = "mida", value = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 		
 		URI location = ServletUriComponentsBuilder
@@ -168,9 +168,9 @@ public class ApiConsultaController {
 			HttpServletRequest request, 
 			@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
 			@PathVariable String dniTitular,
-			@ApiParam(name = "pagina", value = "Número de pàgina a mostrar en la paginació", required = true)
+			@ApiParam(name = "pagina", value = "Número de pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "pagina", required = false) Integer pagina,
-			@ApiParam(name = "mida", value = "Mida de la pàgina a mostrar en la paginació", required = true)
+			@ApiParam(name = "mida", value = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
 		URI location = ServletUriComponentsBuilder
@@ -207,9 +207,9 @@ public class ApiConsultaController {
 			HttpServletRequest request,			 
 			@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
 			@PathVariable String dniTitular,
-			@ApiParam(name = "pagina", value = "Número de pàgina a mostrar en la paginació", required = true)
+			@ApiParam(name = "pagina", value = "Número de pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "pagina", required = false) Integer pagina,
-			@ApiParam(name = "mida", value = "Mida de la pàgina a mostrar en la paginació", required = true)
+			@ApiParam(name = "mida", value = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
 		URI location = ServletUriComponentsBuilder
@@ -246,9 +246,9 @@ public class ApiConsultaController {
 			HttpServletRequest request, 
 			@ApiParam(name = "dniTitular", value = "DNI del titular de les comunicacions a consultar", required = true)
 			@PathVariable String dniTitular,
-			@ApiParam(name = "pagina", value = "Número de pàgina a mostrar en la paginació", required = true)
+			@ApiParam(name = "pagina", value = "Número de pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "pagina", required = false) Integer pagina,
-			@ApiParam(name = "mida", value = "Mida de la pàgina a mostrar en la paginació", required = true)
+			@ApiParam(name = "mida", value = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
 		URI location = ServletUriComponentsBuilder
