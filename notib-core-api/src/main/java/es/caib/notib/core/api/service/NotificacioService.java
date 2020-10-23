@@ -92,6 +92,7 @@ public interface NotificacioService {
 			boolean isAdministradorOrgan,
 			List<String> codisProcedimentsDisponibles,
 			List<String> codisProcedimentsProcessables,
+			List<String> codisOrgansGestorsDisponibles,
 			String organGestorCodi,
 			String usuariCodi,
 			NotificacioFiltreDto filtre,

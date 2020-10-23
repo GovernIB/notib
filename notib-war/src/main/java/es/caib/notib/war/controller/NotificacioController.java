@@ -184,13 +184,20 @@ public class NotificacioController extends BaseUserController {
 		} else if (RolHelper.isUsuariActualUsuari(request)) {
 //			procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), aplicacioService.findRolsUsuariActual(), PermisEnum.CONSULTA);
 			procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), SecurityContextHolder.getContext().getAuthentication().getName(), PermisEnum.CONSULTA);
-			if (procedimentsDisponibles.isEmpty()) {
+			organsGestorsDisponibles = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), PermisEnum.CONSULTA);
+			if (procedimentsDisponibles.isEmpty() && organsGestorsDisponibles.isEmpty()) {
+				//### Usuari sense permís sobre cap òrgan ni procediment
 				MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.lectura"));
-			} else {
+			} else if (!procedimentsDisponibles.isEmpty()) {
+				//### Òrgans gestors que són de procediments sobre els quals té permís l'usuari actual
 				List<Long> procedimentsDisponiblesIds = new ArrayList<Long>();
 				for (ProcedimentDto pro: procedimentsDisponibles)
 					procedimentsDisponiblesIds.add(pro.getId());
-				organsGestorsDisponibles = organGestorService.findByProcedimentIds(procedimentsDisponiblesIds);
+				
+				Set<OrganGestorDto> setOrgansGestors = new HashSet<OrganGestorDto>(organsGestorsDisponibles);
+				setOrgansGestors.addAll(organGestorService.findByProcedimentIds(procedimentsDisponiblesIds));
+				
+				organsGestorsDisponibles = new ArrayList<OrganGestorDto>(setOrgansGestors);
 			}
 		} else if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
 			OrganGestorDto organGestorActual = getOrganGestorActual(request);
@@ -422,9 +429,10 @@ public class NotificacioController extends BaseUserController {
 		boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
 		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		String organGestorCodi = null;
-
+		List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
 		List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
 		List<String> codisProcedimentsDisponibles = new ArrayList<String>();
+		List<String> codisOrgansGestorsDisponibles = new ArrayList<String>();
 		List<String> codisProcedimentsProcessables = new ArrayList<String>();
 		try {
 			List<ProcedimentDto> procedimentsProcessables = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.PROCESSAR);
@@ -439,8 +447,12 @@ public class NotificacioController extends BaseUserController {
 			}
 			if (isUsuari && entitatActual!=null) {
 				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
+				organsGestorsDisponibles = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), PermisEnum.CONSULTA);
 				for(ProcedimentDto procediment: procedimentsDisponibles) {
 					codisProcedimentsDisponibles.add(procediment.getCodi());
+				}
+				for (OrganGestorDto organGestorDto : organsGestorsDisponibles) {
+					codisOrgansGestorsDisponibles.add(organGestorDto.getCodi());
 				}
 			}
 			if (isAdminOrgan) {
@@ -459,6 +471,7 @@ public class NotificacioController extends BaseUserController {
 					isAdminOrgan,
 					codisProcedimentsDisponibles,
 					codisProcedimentsProcessables,
+					codisOrgansGestorsDisponibles,
 					organGestorCodi,
 					usuariActual.getCodi(),
 					filtre,
