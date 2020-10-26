@@ -4,8 +4,10 @@
 package es.caib.notib.plugin.unitat;
 
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,6 +27,9 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import es.caib.dir3caib.ws.api.catalogo.CatPais;
 import es.caib.dir3caib.ws.api.catalogo.Dir3CaibObtenerCatalogosWs;
 import es.caib.dir3caib.ws.api.catalogo.Dir3CaibObtenerCatalogosWsService;
+import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWs;
+import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWsService;
+import es.caib.dir3caib.ws.api.unidad.UnidadTF;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.PropertiesHelper;
 
@@ -40,6 +45,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 	private static final String SERVEI_UNITAT = "/rest/unidad/";
 	private static final String SERVEI_ORGANIGRAMA = "/rest/organigrama/";
 	private static final String WS_CATALEG = "ws/Dir3CaibObtenerCatalogos";
+	private static final String WS_UNITATS = "ws/Dir3CaibObtenerUnidades";
 	
 	public Map<String, NodeDir3> organigramaPerEntitat(String codiEntitat) throws SistemaExternException {
 		Map<String, NodeDir3> organigrama = new HashMap<String, NodeDir3>();
@@ -69,12 +75,64 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 	}
 	
 	private void nodeToOrganigrama(NodeDir3 unitat, Map<String, NodeDir3> organigrama) {
-		organigrama.put(unitat.getCodi(), unitat);
-		if (unitat.getFills() != null)
-			for (NodeDir3 fill: unitat.getFills())
-				nodeToOrganigrama(fill, organigrama);
+		if (unitat.getEstat().startsWith("V") || unitat.getEstat().startsWith("T")) {	// Unitats Vigents o Transitòries 
+			organigrama.put(unitat.getCodi(), unitat);
+			if (unitat.getFills() != null)
+				for (NodeDir3 fill: unitat.getFills())
+					nodeToOrganigrama(fill, organigrama);
+		}
 	}
 	
+	public Map<String, NodeDir3> organigramaPerEntitatWs(
+			String pareCodi,
+			Timestamp fechaActualizacion,
+			Timestamp fechaSincronizacion) throws SistemaExternException {
+		Map<String, NodeDir3> organigrama = new HashMap<String, NodeDir3>();
+		try {
+			List<UnidadTF> arbol = getObtenerUnidadesService().obtenerArbolUnidades(
+					pareCodi,
+					fechaActualizacion,
+					fechaSincronizacion);
+
+			for(UnidadTF unidadTF: arbol){
+				if ("V".equals(unidadTF.getCodigoEstadoEntidad()) || "T".equals(unidadTF.getCodigoEstadoEntidad())) {	// Unitats Vigents o Transitòries 
+					NodeDir3 node = toNodeDir3(unidadTF);
+					NodeDir3 pare = organigrama.get(node.getSuperior());
+					if (node.getCodi().equalsIgnoreCase(pareCodi) || pare != null) {
+						organigrama.put(node.getCodi(), node);
+						if (pare != null) {
+							List<NodeDir3> fills = pare.getFills();
+							if (fills == null) {
+								fills = new ArrayList<NodeDir3>();
+								pare.setFills(fills);
+							}
+							fills.add(node);
+						}
+					}
+				}
+			}
+			return organigrama;
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'han pogut consultar les unitats organitzatives via WS (" +
+					"pareCodi=" + pareCodi + ")",
+					ex);
+		}
+	}
+	
+	private NodeDir3 toNodeDir3(UnidadTF unidadTF) {
+		NodeDir3 node = new NodeDir3(
+				unidadTF.getCodigo(), 				// codi
+				unidadTF.getDenominacion(), 		// denominacio 
+				unidadTF.getCodigoEstadoEntidad(),	// estat
+				unidadTF.getCodUnidadRaiz(), 		// arrel 
+				unidadTF.getCodUnidadSuperior(),	// superior 
+				unidadTF.getDescripcionLocalidad(),	// localitat 
+				unidadTF.getCodUnidadSuperior(),	// idPare 
+				null );								// fills
+		return node;
+	}
+
 	public List<ObjetoDirectorio> unitatsPerEntitat(String codiEntitat, boolean inclourePare) throws SistemaExternException {
 		List<ObjetoDirectorio> unitats = new ArrayList<ObjetoDirectorio>();
 		try {
@@ -378,6 +436,19 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 					"No s'han pogut consultar les localitats via REST",
 					ex);
 		}
+	}
+	
+	private Dir3CaibObtenerUnidadesWs getObtenerUnidadesService() throws MalformedURLException {
+	
+		final String endpoint = getServiceUrl() + WS_UNITATS;
+		final URL wsdl = new URL(endpoint + "?wsdl");
+
+		Dir3CaibObtenerUnidadesWsService service = new Dir3CaibObtenerUnidadesWsService(wsdl);
+		Dir3CaibObtenerUnidadesWs api = service.getDir3CaibObtenerUnidadesWs();
+
+		configAddressUserPassword(getUsernameServiceUrl(), getPasswordServiceUrl(), endpoint, api);
+
+		return api;
 	}
 	
 	public Dir3CaibObtenerCatalogosWs getCatalogosWsWithSecurityApi() throws Exception {
