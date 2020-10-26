@@ -92,6 +92,7 @@ public interface NotificacioService {
 			boolean isAdministradorOrgan,
 			List<String> codisProcedimentsDisponibles,
 			List<String> codisProcedimentsProcessables,
+			List<String> codisOrgansGestorsDisponibles,
 			String organGestorCodi,
 			String usuariCodi,
 			NotificacioFiltreDto filtre,
@@ -172,7 +173,7 @@ public interface NotificacioService {
 	 *            Atribut id de la notificació.
 	 * @return el fitxer associat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_CARPETA')")
 	public ArxiuDto getDocumentArxiu(
 			Long notificacioId);
 	
@@ -183,7 +184,7 @@ public interface NotificacioService {
 	 *            Atribut id de l'enviament.
 	 * @return el fitxer de certificació associat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_CARPETA')")
 	public ArxiuDto enviamentGetCertificacioArxiu(
 			Long enviamentId);
 

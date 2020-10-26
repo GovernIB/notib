@@ -9,12 +9,14 @@ import javax.persistence.Transient;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.audit.NotibAuditable;
+import lombok.Getter;
 
 /**
  * Classe del model de dades que representa un document.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
 @Entity
 @Table(name = "not_document")
 @EntityListeners(AuditingEntityListener.class)
@@ -52,6 +54,12 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 	@Column(name = "csv", length = 256)
 	protected String csv;
 	
+	@Column(name = "media", length = 256)
+	private String mediaType;
+	
+	@Column(name = "mida")
+	private Long mida;
+	
 	public static Builder getBuilder(
 			String arxiuId,
 			String arxiuGestdocId,
@@ -60,7 +68,9 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			String url,
 			String metadades,
 			Boolean normalitzat,
-			Boolean generarCsv
+			Boolean generarCsv,
+			String media,
+			Long mida
 			) {
 		return new Builder(
 				arxiuId,
@@ -70,7 +80,9 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 				url,
 				metadades,
 				normalitzat,
-				generarCsv
+				generarCsv,
+				media,
+				mida
 				);
 	}
 	
@@ -84,7 +96,9 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 				String url,
 				String metadades,
 				Boolean normalitzat,
-				Boolean generarCsv
+				Boolean generarCsv,
+				String media,
+				Long mida
 				) {
 			built = new DocumentEntity();
 			built.arxiuGestdocId = arxiuGestdocId;
@@ -92,6 +106,8 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			built.hash = hash;
 			built.normalitzat = normalitzat;
 			built.url = url;
+			built.mediaType = media;
+			built.mida = mida;
 			
 		}
 		public DocumentEntity build() {
@@ -107,7 +123,9 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			String url,
 			Boolean normalitzat,
 			String uuid,
-			String csv
+			String csv,
+			String media,
+			Long mida
 			) {
 		return new BuilderV2(
 				arxiuId,
@@ -116,12 +134,13 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 				url,
 				normalitzat,
 				uuid,
-				csv);
+				csv,
+				media,
+				mida);
 	}
 	
 	public static class BuilderV2{
 		DocumentEntity built;
-//		@SuppressWarnings("rawtypes")
 		BuilderV2(
 				String arxiuId,
 				String arxiuGestdocId,
@@ -129,7 +148,9 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 				String url,
 				Boolean normalitzat,
 				String uuid,
-				String csv
+				String csv,
+				String media,
+				Long mida
 				) {
 			built = new DocumentEntity();
 			built.arxiuGestdocId = arxiuGestdocId;
@@ -145,77 +166,14 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			built.normalitzat = normalitzat;
 			built.url = url;
 			built.uuid = uuid;
+			built.mediaType = media;
+			built.mida = mida;
 		}
 		public DocumentEntity build() {
 			return built;
 		}
 	}
 	
-
-	public String getArxiuNom() {
-		return arxiuNom;
-	}
-
-	public void setArxiuNom(String arxiuNom) {
-		this.arxiuNom = arxiuNom;
-	}
-
-	public String getContingutBase64() {
-		return contingutBase64;
-	}
-
-	public void setContingutBase64(String contingutBase64) {
-		this.contingutBase64 = contingutBase64;
-	}
-
-	public String getHash() {
-		return hash;
-	}
-
-	public void setHash(String hash) {
-		this.hash = hash;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	public Boolean getNormalitzat() {
-		return normalitzat;
-	}
-
-	public void setNormalitzat(Boolean normalitzat) {
-		this.normalitzat = normalitzat;
-	}
-
-	public String getUuid() {
-		return uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
-	public String getCsv() {
-		return csv;
-	}
-
-	public void setCsv(String csv) {
-		this.csv = csv;
-	}
-
-	public String getArxiuGestdocId() {
-		return arxiuGestdocId;
-	}
-
-	public void setArxiuGestdocId(String arxiuGestdocId) {
-		this.arxiuGestdocId = arxiuGestdocId;
-	}
-
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}

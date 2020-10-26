@@ -215,13 +215,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 				DocumentDto document = new DocumentDto();
 				String arxiuUuid = notificacio.getDocument().getUuid();
 				if (pluginHelper.isArxiuPluginDisponible()) {
-					Document documentArxiu = pluginHelper.arxiuDocumentConsultar(
-							arxiuUuid, 
-							null);
+					Document documentArxiu = pluginHelper.arxiuDocumentConsultar(arxiuUuid, null);
 					document.setArxiuNom(documentArxiu.getNom());
 					document.setNormalitzat(notificacio.getDocument().isNormalitzat());
 					document.setGenerarCsv(notificacio.getDocument().isGenerarCsv());
 					document.setUuid(arxiuUuid);
+					document.setMediaType(documentArxiu.getContingut().getTipusMime());
+					document.setMida(documentArxiu.getContingut().getTamany());
 					notificacio.setDocument(document);
 				}
 			} else if (notificacio.getDocument().getCsv() != null) {
@@ -232,8 +232,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 					document.setArxiuNom(documentArxiu.getArxiuNom());
 					document.setNormalitzat(notificacio.getDocument().isNormalitzat());
 					document.setGenerarCsv(notificacio.getDocument().isGenerarCsv());
+					document.setMediaType(documentArxiu.getTipusMime());
+					document.setMida(documentArxiu.getTamany());
 					document.setCsv(arxiuCsv);
-					notificacio.setDocument(document);
 					notificacio.setDocument(document);
 				}
 			}
@@ -252,7 +253,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 						notificacio.getDocument().getUrl(),  
 						notificacio.getDocument().isNormalitzat(),  
 						notificacio.getDocument().getUuid(),
-						notificacio.getDocument().getCsv()).build());
+						notificacio.getDocument().getCsv(),
+						notificacio.getDocument().getMediaType(),
+						notificacio.getDocument().getMida()).build());
 			}
 			// Dades generals de la notificació
 			NotificacioEntity.BuilderV2 notificacioBuilder = NotificacioEntity.
@@ -471,6 +474,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			boolean isAdministradorOrgan,
 			List<String> procedimentsCodisNotib,
 			List<String> codisProcedimentsProcessables,
+			List<String> codisOrgansGestorsDisponibles,
 			String organGestorCodi,
 			String usuariCodi,
 			NotificacioFiltreDto filtre,
@@ -493,15 +497,23 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (filtre == null) {
 				//Consulta les notificacions sobre les quals té permis l'usuari actual
 				if (isUsuari) {
-//					if (!procedimentsCodisNotib.isEmpty()) {
+					if (!procedimentsCodisNotib.isEmpty() && !codisOrgansGestorsDisponibles.isEmpty()) {
+						//TODO consulta: en cas de notificacions sense procediment consultar per òrgan en lloc de per usuari
 						notificacions = notificacioRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
-								procedimentsCodisNotib.isEmpty(),
 								procedimentsCodisNotib, 
 								aplicacioService.findRolsUsuariActual(), 
+								codisOrgansGestorsDisponibles,
 								entitatActual,
 								usuariCodi,
 								pageable);
-//					}
+					} else if (!codisOrgansGestorsDisponibles.isEmpty()) {
+						//### notificacions d'òrgans gestors sense procediment
+						notificacions = notificacioRepository.findByOrganGestorCodiWithoutProcedimentAndEntitat(
+								codisOrgansGestorsDisponibles, 
+								entitatActual, 
+								usuariCodi, 
+								pageable);
+					}
 				//Consulta els notificacions de l'entitat acutal
 				} else if (isUsuariEntitat) {
 					notificacions = notificacioRepository.findByEntitatActual(
@@ -515,14 +527,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 							pageable);
 				} else if (isAdministradorOrgan) {
 					List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
-//					if (!procedimentsCodisNotib.isEmpty()) {
+					if (!procedimentsCodisNotib.isEmpty()) {
 						notificacions = notificacioRepository.findByProcedimentCodiNotibAndEntitat(
-								procedimentsCodisNotib.isEmpty(),
 								procedimentsCodisNotib, 
 								entitatActual,
 								organs,
 								pageable);
-//					}
+					}
 				}
 			} else {
 				Date dataInici = toIniciDia(filtre.getDataInici());
@@ -536,13 +547,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 					procediment = procedimentRepository.findById(filtre.getProcedimentId());
 				}
 				if (isUsuari) {
-					if (!procedimentsCodisNotib.isEmpty()) {
+					if (!procedimentsCodisNotib.isEmpty() && !codisOrgansGestorsDisponibles.isEmpty()) {
 						notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 								filtre.getEntitatId() == null,
 								filtre.getEntitatId(),
 								procedimentsCodisNotib.isEmpty(),
 								procedimentsCodisNotib, 
-								aplicacioService.findRolsUsuariActual(), 
+								aplicacioService.findRolsUsuariActual(),
+								codisOrgansGestorsDisponibles,
 								filtre.getEnviamentTipus() == null,
 								filtre.getEnviamentTipus(),
 								filtre.getConcepte() == null,
@@ -560,6 +572,37 @@ public class NotificacioServiceImpl implements NotificacioService {
 								organGestor,
 								procediment == null,
 								procediment,
+								filtre.getTipusUsuari() == null,
+								filtre.getTipusUsuari(),
+								filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
+								filtre.getNumExpedient(),
+								filtre.getCreadaPer() == null || filtre.getCreadaPer().isEmpty(),
+								filtre.getCreadaPer(),
+								filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
+								filtre.getIdentificador(),
+								usuariCodi,
+								filtre.isNomesAmbErrors(),
+								pageable);
+					} else if (!codisOrgansGestorsDisponibles.isEmpty()){
+						notificacions = notificacioRepository.findByOrganGestorCodiWithoutProcedimentAndUsuariAndEntitat(
+								codisOrgansGestorsDisponibles,
+								filtre.getEntitatId() == null,
+								filtre.getEntitatId(),
+								filtre.getEnviamentTipus() == null,
+								filtre.getEnviamentTipus(),
+								filtre.getConcepte() == null,
+								filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
+								filtre.getEstat() == null,
+								filtre.getEstat(), 
+								dataInici == null,
+								dataInici,
+								dataFi == null,
+								dataFi,
+								filtre.getTitular() == null || filtre.getTitular().isEmpty(),
+								filtre.getTitular() == null ? "" : filtre.getTitular(),
+								entitatActual,
+								organGestor == null,
+								organGestor,
 								filtre.getTipusUsuari() == null,
 								filtre.getTipusUsuari(),
 								filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
