@@ -971,10 +971,16 @@ public class PluginHelper {
 				"Obtenir organigrama per entitat", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Codi Dir3 de l'entitat", entitatcodi));
+
+		String protocol = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.unitats.dir3.protocol", "REST");
 		
 		Map<String, NodeDir3> organigrama = null;
 		try {
-			organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(entitatcodi);
+			if ("SOAP".equalsIgnoreCase(protocol)) {
+				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitatWs(entitatcodi, null, null);
+			} else {
+				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(entitatcodi);
+			}
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al obtenir l'organigrama per entitat";
@@ -984,10 +990,9 @@ public class PluginHelper {
 					errorDescripcio,
 					ex);
 		}
-	
 		return organigrama;
 	}
-
+	
 	public List<ObjetoDirectorio> llistarOrganismesPerEntitat(String entitatcodi) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(

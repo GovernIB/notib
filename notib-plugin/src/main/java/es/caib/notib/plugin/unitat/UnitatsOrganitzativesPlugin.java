@@ -3,6 +3,7 @@
  */
 package es.caib.notib.plugin.unitat;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,10 @@ public interface UnitatsOrganitzativesPlugin {
 	 */
 	public Map<String, NodeDir3> organigramaPerEntitat(String codiEntitat) throws SistemaExternException;
 	
+	public Map<String, NodeDir3> organigramaPerEntitatWs(
+			String pareCodi,
+			Timestamp fechaActualizacion,
+			Timestamp fechaSincronizacion) throws SistemaExternException;
 	/**
 	 * Retorna la llista d'unitats organitzatives filles donat un codi d'entitat.
 	 * 
