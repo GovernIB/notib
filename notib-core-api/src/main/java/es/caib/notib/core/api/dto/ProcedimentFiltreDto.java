@@ -19,6 +19,7 @@ public class ProcedimentFiltreDto extends AuditoriaDto implements Serializable {
 	private String nom;
 	private String organGestor;
 	private Long entitatId;
+	private Boolean comu;
 	
 	private static final long serialVersionUID = -2393511650074099319L;
 }

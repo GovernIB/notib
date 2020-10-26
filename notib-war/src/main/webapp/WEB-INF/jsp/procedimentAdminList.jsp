@@ -28,6 +28,7 @@ pageContext.setAttribute(
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<script type="text/javascript">
 	$(document).ready(function() {
+		$('#nomesAmbErrors').val(false);
 		$('#btnNetejar').click(function() {
 			$(':input', $('#filtre')).each (function() {
 				var type = this.type, tag = this.tagName.toLowerCase();
@@ -41,6 +42,7 @@ pageContext.setAttribute(
 			});
 			$('#form-filtre').submit();
 		});
+		
 	});
 	</script>
 </head>
@@ -53,8 +55,11 @@ pageContext.setAttribute(
 			<div class="col-md-3">
 				<not:inputText name="nom" inline="true" placeholderKey="procediment.list.columna.nom"/>
 			</div>
-			<div class="col-md-5">
+			<div class="col-md-4">
 				<not:inputSelect name="organGestor" optionItems="${organsGestors}" optionValueAttribute="codi" optionTextAttribute="valor" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
+			</div>
+			<div class="col-md-5">
+				 <label  for="comuBtn"><spring:message code="procediment.form.camp.comu"/>:</label>  <input type="checkbox" name="comu" id="comuBtn" >
 			</div>
 			<div class="col-md-2 pull-right">
 				<div class="pull-right">
@@ -81,10 +86,17 @@ pageContext.setAttribute(
 				<th data-col-name="id" data-visible="false" width="4%">#</th>
 				<th data-col-name="codi"><spring:message code="procediment.list.columna.codi"/></th>
 				<th data-col-name="nom"><spring:message code="procediment.list.columna.nom"/></th>
-				<th data-col-name="entitatNom"><spring:message code="procediment.list.columna.entitat"/></th>
+<%-- 				<th data-col-name="entitatNom"><spring:message code="procediment.list.columna.entitat"/></th> --%>
 				<th data-col-name="organGestorDesc"><spring:message code="procediment.list.columna.organGestor"/></th>
 				<th data-col-name="pagadorpostal"><spring:message code="procediment.list.columna.pagadorpostal"/></th>
 				<th data-col-name="pagadorcie"><spring:message code="procediment.list.columna.pagadorcie"/></th>
+				<th data-col-name="comu" data-template="#cellActivaTemplate">
+					<spring:message code="procediment.list.columna.comu"/>
+					<script id="cellActivaTemplate" type="text/x-jsrender">
+						{{if comu}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				
 				<th data-col-name="agrupar" data-visible="false" id="agrupable"></th>
 			
 				<th data-col-name="grupsCount" data-template="#cellGrupsTemplate" data-orderable="false" width="10%">

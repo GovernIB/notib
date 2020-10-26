@@ -19,6 +19,8 @@ public class ProcedimentFiltreCommand {
 	private String nom;
 	private String organGestor;
 	private Long entitatId;
+	private Boolean comu;
+	
 	
 	public static ProcedimentFiltreCommand asCommand(ProcedimentFiltreDto dto) {
 		if (dto == null) {
