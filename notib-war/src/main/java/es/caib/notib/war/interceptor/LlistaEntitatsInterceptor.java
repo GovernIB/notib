@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.war.helper.ContingutEstaticHelper;
 import es.caib.notib.war.helper.EntitatHelper;
@@ -21,6 +22,8 @@ import es.caib.notib.war.helper.EntitatHelper;
 public class LlistaEntitatsInterceptor extends HandlerInterceptorAdapter {
 
 	@Autowired
+	private AplicacioService aplicacioService;
+	@Autowired
 	private EntitatService entitatService;
 
 
@@ -32,9 +35,11 @@ public class LlistaEntitatsInterceptor extends HandlerInterceptorAdapter {
 		if (!ContingutEstaticHelper.isContingutEstatic(request)) {
 			EntitatHelper.findEntitatsAccessibles(
 					request,
+					aplicacioService,
 					entitatService);
 			EntitatHelper.processarCanviEntitats(
 					request,
+					aplicacioService,
 					entitatService);
 		}
 		return true;

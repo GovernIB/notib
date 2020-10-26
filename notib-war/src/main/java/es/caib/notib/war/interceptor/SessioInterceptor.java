@@ -21,7 +21,7 @@ import es.caib.notib.war.helper.SessioHelper;
 public class SessioInterceptor extends HandlerInterceptorAdapter {
 
 	@Autowired
-	private AplicacioService aplicacioService;
+	AplicacioService aplicacioService;
 	@Autowired
 	EntitatService entitatService;
 
@@ -33,7 +33,8 @@ public class SessioInterceptor extends HandlerInterceptorAdapter {
 		SessioHelper.processarAutenticacio(
 				request, 
 				response,
-				aplicacioService);
+				aplicacioService,
+				entitatService);
 		return true;
 	}
 

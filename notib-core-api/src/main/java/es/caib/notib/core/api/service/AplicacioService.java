@@ -168,6 +168,11 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('tothom') or hasRole('NOT_CARPETA')")
 	public UsuariDto updateUsuariActual(UsuariDto asDto);
 	
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('tothom') or hasRole('NOT_CARPETA')")
+	public void updateRolUsuariActual(String rol);
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('tothom') or hasRole('NOT_CARPETA')")
+	public void updateEntitatUsuariActual(Long entitat);
+	
 	/**
 	 * Recupera les mètriques de l'aplicació.
 	 * 

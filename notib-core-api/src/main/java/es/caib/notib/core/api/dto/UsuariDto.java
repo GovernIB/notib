@@ -25,6 +25,8 @@ public class UsuariDto implements Serializable {
 	private String email;
 	private String idioma;
 	private String[] rols;
+	private String ultimRol;
+	private Long ultimaEntitat;
 	private Boolean rebreEmailsNotificacio;
 	private Boolean rebreEmailsNotificacioCreats;
 
