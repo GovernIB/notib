@@ -127,10 +127,21 @@ public class AplicacioServiceBean implements AplicacioService {
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	public void updateRolUsuariActual(String rol) {
+		delegate.updateRolUsuariActual(rol);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	public void updateEntitatUsuariActual(Long entitat) {
+		delegate.updateEntitatUsuariActual(entitat);
+	}
+	
+	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public String getMetrics() {
 		return delegate.getMetrics();
 	}
-
 
 }

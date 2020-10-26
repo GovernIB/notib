@@ -12,6 +12,7 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.EntitatService;
 
 /**
  * Utilitat per a gestionar accions de context de sessió.
@@ -28,7 +29,8 @@ public class SessioHelper {
 	public static void processarAutenticacio(
 			HttpServletRequest request,
 			HttpServletResponse response,
-			AplicacioService aplicacioService) {
+			AplicacioService aplicacioService,
+			EntitatService entitatService) {
 		if (request.getUserPrincipal() != null) {
 			Boolean autenticacioProcessada = (Boolean)request.getSession().getAttribute(
 					SESSION_ATTRIBUTE_AUTH_PROCESSADA);
@@ -62,6 +64,9 @@ public class SessioHelper {
 		request.getSession().setAttribute(
 				"dadesUsuariActual", 
 				usuari);
+		// Assegurem que l'entitat i rol actual s'hagin carregat correctament
+		EntitatHelper.getEntitatActual(request, aplicacioService, entitatService);
+		RolHelper.getRolActual(request, aplicacioService);
 		
         localeResolver.setLocale(
         		request, 
