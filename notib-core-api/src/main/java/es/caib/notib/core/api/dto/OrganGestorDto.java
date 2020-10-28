@@ -37,5 +37,11 @@ public class OrganGestorDto extends AuditoriaDto implements Serializable {
 			return permisos.size();
 	}
 	
+	public String getOrganGestorDesc() {
+		if (nom != null && !nom.isEmpty())
+			return codi + " - " + nom;
+		return codi;
+	}
+	
 	private static final long serialVersionUID = -2393511650074099319L;
 }
