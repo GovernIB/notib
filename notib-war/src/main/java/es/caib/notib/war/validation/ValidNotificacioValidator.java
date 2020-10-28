@@ -89,7 +89,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			}
 			
 			// Procediment
-			if (!comunicacioAmbAdministracio) {
+			if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO) {
 				if (notificacio.getProcedimentId() == null) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(

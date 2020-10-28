@@ -1620,7 +1620,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 		
 		// Procediment
-		if (!comunicacioAmbAdministracio) {
+		// if (!comunicacioAmbAdministracio) {
+		if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.NOTIFICACIO) {
 			if (notificacio.getProcedimentCodi() == null) {
 				return setRespostaError("[1020] El camp 'procedimentCodi' no pot ser null.");
 			}

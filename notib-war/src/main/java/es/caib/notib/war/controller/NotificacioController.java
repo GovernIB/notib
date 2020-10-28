@@ -31,6 +31,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -324,6 +325,7 @@ public class NotificacioController extends BaseUserController {
 					isAdministrador(request), 
 					notificacioCommand.getProcedimentId());
 		notificacioCommand.setUsuariCodi(aplicacioService.getUsuariActual().getCodi());
+		
 		if (bindingResult.hasErrors()) {
 			ompliModelFormulari(
 					request,
