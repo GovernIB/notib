@@ -262,7 +262,7 @@ $(document).ready(function() {
     var procedimentId = $("#procedimentId").children(":selected").attr("value");
 
     $('#organGestor').on('change', function() {
-    	debugger
+    	
     	//### seleccionat per defecte si només hi ha un (empty + òrgan)
     	if ($('#organGestor').children('option').length == 2) {
     		$('#organGestor option:eq(1)').attr('selected', 'selected');
@@ -324,7 +324,6 @@ $(document).ready(function() {
 //         var procedimentId = $(this).children(":selected").attr("value");
 //         comprovarGrups(agrupable, procedimentId)
 //         webutilModalAdjustHeight();
-debugger
 		var procediment = $(this).val();
 		if (procediment == '') {
 			$("#organGestor").prop("disabled", false);

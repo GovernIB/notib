@@ -104,7 +104,6 @@
 					"src",
 					modalUrl);
 		});
-		debugger;
 		modalobj.modal({show:true, backdrop:'static'});
 		return false;
 	});
