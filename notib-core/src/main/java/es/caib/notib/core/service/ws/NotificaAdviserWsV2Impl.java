@@ -136,95 +136,111 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					enviament.setNotificacio(notificacio);
 				}
 				if (enviament != null) {
-					String receptorNombre = null;
-					String receptorNif = null;
-					if (receptor != null) {
-						receptorNombre = receptor.getNombreReceptor();
-						receptorNif = receptor.getNifReceptor();
-					}
-					NotificacioEnviamentEstatEnumDto notificaEstat = null;
-					if ("pendiente_envio".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_ENVIAMENT;
-					} else if ("enviado_ci".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIADA_CI;
-					} else if ("notificada".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIFICADA;
-					} else if ("extraviada".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.EXTRAVIADA;
-					} else if ("rehusada".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.REBUTJADA;
-					} else if ("desconocido".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.DESCONEGUT;
-					} else if ("fallecido".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.MORT;
-					} else if ("ausente".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.ABSENT;
-					} else if ("direccion_incorrecta".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA;
-					} else if ("sin_informacion".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO;
-					} else if ("error".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.ERROR_ENTREGA;
-					} else if ("pendiente_sede".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_SEU;
-					} else if ("enviado_deh".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIADA_DEH;
-					} else if ("leida".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.LLEGIDA;
-					} else if ("envio_programado".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIAMENT_PROGRAMAT;
-					} else if ("pendiente_cie".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_CIE;
-					} else if ("pendiente_deh".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_DEH;
-					} else if ("entregado_op".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.ENTREGADA_OP;
-					} else if ("expirada".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.EXPIRADA;
-					} else if ("anulada".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.ANULADA;
-					}
-					//Update enviament
-					notificaHelper.enviamentUpdateDatat(
-							notificaEstat,
-							toDate(fechaEstado),
-							estado,
-							getModoNotificacion(modoNotificacion),
-							receptorNif,
-							receptorNombre,
-							null,
-							null,
-							enviament);
-					logger.debug("Registrant event callbackdatat de l'Adviser...");
-					//Crea un nou event builder
-					eventDatatBuilder = NotificacioEventEntity.getBuilder(
-							NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-							enviament.getNotificacio()).
-							enviament(enviament).
-							descripcio(estado);
 					
-					if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-						eventDatatBuilder.callbackInicialitza();
-					eventDatat = eventDatatBuilder.build();
-					
-					codigoRespuesta.value = "000";
-					descripcionRespuesta.value = "OK";
-					logger.debug("Event callbackdatat registrat correctament: " + eventDatat.getTipus().name());
-	
-					//if datado + certificació
-					if (tipoEntrega.equals(BigInteger.valueOf(2L))) {
-						logger.debug("Guardant certificació...");
-						certificacionOrganismo(
-								acusePDF,
-								organismoEmisor,
-								modoNotificacion,
-								identificador,
-								codigoRespuesta,
-								descripcionRespuesta,
+					if (enviament.isNotificaEstatFinal()) {
+						logger.error(
+								"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
+								"L'enviament amb l'identificador especificat (" + identificador + ") ja es troba en un estat final.");
+						//Crea un nou event builder
+						eventDatat = NotificacioEventEntity.getBuilder(
+								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
+								enviament.getNotificacio()).
+								enviament(enviament).
+								descripcio(estado).build();
+						codigoRespuesta.value = "000";
+						descripcionRespuesta.value = "OK";
+						integracioHelper.addAccioError(info, "L'enviament ja es troba en un estat final");
+					} else {
+						String receptorNombre = null;
+						String receptorNif = null;
+						if (receptor != null) {
+							receptorNombre = receptor.getNombreReceptor();
+							receptorNif = receptor.getNifReceptor();
+						}
+						NotificacioEnviamentEstatEnumDto notificaEstat = null;
+						if ("pendiente_envio".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_ENVIAMENT;
+						} else if ("enviado_ci".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIADA_CI;
+						} else if ("notificada".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIFICADA;
+						} else if ("extraviada".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.EXTRAVIADA;
+						} else if ("rehusada".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.REBUTJADA;
+						} else if ("desconocido".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.DESCONEGUT;
+						} else if ("fallecido".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.MORT;
+						} else if ("ausente".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.ABSENT;
+						} else if ("direccion_incorrecta".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA;
+						} else if ("sin_informacion".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO;
+						} else if ("error".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.ERROR_ENTREGA;
+						} else if ("pendiente_sede".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_SEU;
+						} else if ("enviado_deh".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIADA_DEH;
+						} else if ("leida".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.LLEGIDA;
+						} else if ("envio_programado".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIAMENT_PROGRAMAT;
+						} else if ("pendiente_cie".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_CIE;
+						} else if ("pendiente_deh".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_DEH;
+						} else if ("entregado_op".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.ENTREGADA_OP;
+						} else if ("expirada".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.EXPIRADA;
+						} else if ("anulada".equals(estado)) {
+							notificaEstat = NotificacioEnviamentEstatEnumDto.ANULADA;
+						}
+						//Update enviament
+						notificaHelper.enviamentUpdateDatat(
+								notificaEstat,
+								toDate(fechaEstado),
+								estado,
+								getModoNotificacion(modoNotificacion),
+								receptorNif,
+								receptorNombre,
+								null,
+								null,
 								enviament);
-						logger.debug("Certificació guardada correctament.");
+						logger.debug("Registrant event callbackdatat de l'Adviser...");
+						//Crea un nou event builder
+						eventDatatBuilder = NotificacioEventEntity.getBuilder(
+								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
+								enviament.getNotificacio()).
+								enviament(enviament).
+								descripcio(estado);
+						
+						if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+							eventDatatBuilder.callbackInicialitza();
+						eventDatat = eventDatatBuilder.build();
+						
+						codigoRespuesta.value = "000";
+						descripcionRespuesta.value = "OK";
+						logger.debug("Event callbackdatat registrat correctament: " + eventDatat.getTipus().name());
+						
+						//if datado + certificació
+						if (tipoEntrega.equals(BigInteger.valueOf(2L))) {
+							logger.debug("Guardant certificació...");
+							certificacionOrganismo(
+									acusePDF,
+									organismoEmisor,
+									modoNotificacion,
+									identificador,
+									codigoRespuesta,
+									descripcionRespuesta,
+									enviament);
+							logger.debug("Certificació guardada correctament.");
+						}
+						integracioHelper.addAccioOk(info);
 					}
-					integracioHelper.addAccioOk(info);
 				} else {
 					logger.error(
 							"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
