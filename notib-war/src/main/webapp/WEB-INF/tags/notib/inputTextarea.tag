@@ -24,7 +24,6 @@
 </style>
 <script>
 $('textarea').change(function() {
-	debugger
 	if(this.type != "file"){
 		this.value = this.value.trim();
 	}

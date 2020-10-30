@@ -180,7 +180,6 @@ $(document).ready(function() {
 	});
 	$('#comu').on('click', function(event){
 		if ($(this).is(':checked')) {
-			debugger
 			$('#organGestorNom').removeClass('habilitat');
 			$('#organGestor').val(entitatDir3);
 			var organText = '';
