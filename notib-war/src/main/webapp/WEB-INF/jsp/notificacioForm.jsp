@@ -309,6 +309,10 @@ $(document).ready(function() {
 							});
 						selProcediments.append("</optgroup>");
 					}
+					if (selProcediments.children('option').length == 2) {
+			    		$('#procedimentId option:eq(1)').attr('selected', 'selected');
+			    		selProcediments.trigger('change.select2');
+			    	}
 				} else {
 					selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
 				}
@@ -324,6 +328,9 @@ $(document).ready(function() {
 //         var procedimentId = $(this).children(":selected").attr("value");
 //         comprovarGrups(agrupable, procedimentId)
 //         webutilModalAdjustHeight();
+
+		
+
 		var procediment = $(this).val();
 		if (procediment == '') {
 			$("#organGestor").prop("disabled", false);
