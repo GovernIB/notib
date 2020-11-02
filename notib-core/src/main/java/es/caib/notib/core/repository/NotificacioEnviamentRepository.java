@@ -158,8 +158,9 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:isNumeroRegistreNull = true or n.notificacio.registreNumero like lower('%'||:numeroRegistre||'%')) "+
 			"and (:esDataRegistreIniciNull = true or n.notificacio.registreData >= :dataRegistreInici) " +
 			"and (:esDataRegistreFiNull = true or n.notificacio.registreData <= :dataRegistreFi) " +
-			"and ((:esProcedimentsCodisNotibNull = false and n.notificacio.procedimentCodiNotib is not null and n.notificacio.procedimentCodiNotib in (:procedimentsCodisNotib))" +
-			"   or (n.notificacio.procedimentCodiNotib is null and n.notificacio.usuariCodi = :usuariCodi)) " +
+			"and ((:esProcedimentsCodisNotibNull = false and n.notificacio.procedimentCodiNotib is not null and n.notificacio.procedimentCodiNotib in (:procedimentsCodisNotib))" +	// Té permís sobre el procediment
+			"	or (:esOrgansGestorsCodisNotib = false and n.notificacio.organGestor.codi is not null and n.notificacio.organGestor.codi in (:organsGestorsCodisNotib)) " +						// Té permís sobre l'òrgan
+			"   or ((n.notificacio.procedimentCodiNotib is null or n.notificacio.procediment.comu = true) and n.notificacio.usuariCodi = :usuariCodi)) " +							// És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
 			"and (n.notificacio.grupCodi = null or (n.notificacio.grupCodi in (:grupsProcedimentCodisNotib))) ")
 	Page<NotificacioEnviamentEntity> findByNotificacio(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
@@ -213,6 +214,8 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("dataRegistreFi") Date dataRegistreFi,
 			@Param("esProcedimentsCodisNotibNull") boolean esProcedimentsCodisNotibNull,
 			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
+			@Param("esOrgansGestorsCodisNotib") boolean esOrgansGestorsCodisNotib,
+			@Param("organsGestorsCodisNotib") List<String> organsGestorsCodisNotib,
 			@Param("grupsProcedimentCodisNotib") List<String> grupsProcedimentCodisNotib,
 			@Param("usuariCodi") String usuariCodi,
 			Pageable pageable);

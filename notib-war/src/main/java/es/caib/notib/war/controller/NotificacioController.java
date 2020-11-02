@@ -184,7 +184,7 @@ public class NotificacioController extends BaseUserController {
 		} else if (RolHelper.isUsuariActualUsuari(request)) {
 //			procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), aplicacioService.findRolsUsuariActual(), PermisEnum.CONSULTA);
 			procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), SecurityContextHolder.getContext().getAuthentication().getName(), PermisEnum.CONSULTA);
-			organsGestorsDisponibles = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), PermisEnum.CONSULTA);
+			organsGestorsDisponibles = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), SecurityContextHolder.getContext().getAuthentication().getName(), PermisEnum.CONSULTA);
 			if (procedimentsDisponibles.isEmpty() && organsGestorsDisponibles.isEmpty()) {
 				//### Usuari sense permís sobre cap òrgan ni procediment
 				MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.lectura"));
@@ -447,7 +447,7 @@ public class NotificacioController extends BaseUserController {
 			}
 			if (isUsuari && entitatActual!=null) {
 				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
-				organsGestorsDisponibles = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), PermisEnum.CONSULTA);
+				organsGestorsDisponibles = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
 				for(ProcedimentDto procediment: procedimentsDisponibles) {
 					codisProcedimentsDisponibles.add(procediment.getCodi());
 				}
@@ -1053,6 +1053,7 @@ public class NotificacioController extends BaseUserController {
 		// 2-recuperam els òrgans amb permís de notificació
 		List<OrganGestorDto> organsGestorsAmbPermis = organGestorService.findOrgansGestorsWithPermis(
 				entitatActual.getId(), 
+				SecurityContextHolder.getContext().getAuthentication().getName(), 
 				PermisEnum.NOTIFICACIO);
 		// 3-juntam tots els òrgans i ordenam per nom
 		List<OrganGestorDto> organsGestors;

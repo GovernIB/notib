@@ -494,26 +494,21 @@ public class NotificacioServiceImpl implements NotificacioService {
 			mapeigPropietatsOrdenacio.put("procediment.nom", new String[] {"pro.nom"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 			
+			boolean esProcedimentsCodisNotibNull = (procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty());
+			boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
+			
 			if (filtre == null) {
 				//Consulta les notificacions sobre les quals té permis l'usuari actual
 				if (isUsuari) {
-					if (!procedimentsCodisNotib.isEmpty() && !codisOrgansGestorsDisponibles.isEmpty()) {
-						//TODO consulta: en cas de notificacions sense procediment consultar per òrgan en lloc de per usuari
-						notificacions = notificacioRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
-								procedimentsCodisNotib, 
-								aplicacioService.findRolsUsuariActual(), 
-								codisOrgansGestorsDisponibles,
-								entitatActual,
-								usuariCodi,
-								pageable);
-					} else if (!codisOrgansGestorsDisponibles.isEmpty()) {
-						//### notificacions d'òrgans gestors sense procediment
-						notificacions = notificacioRepository.findByOrganGestorCodiWithoutProcedimentAndEntitat(
-								codisOrgansGestorsDisponibles, 
-								entitatActual, 
-								usuariCodi, 
-								pageable);
-					}
+					notificacions = notificacioRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
+							esProcedimentsCodisNotibNull,
+							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib, 
+							aplicacioService.findRolsUsuariActual(), 
+							esOrgansGestorsCodisNotibNull,
+							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+							entitatActual,
+							usuariCodi,
+							pageable);
 				//Consulta els notificacions de l'entitat acutal
 				} else if (isUsuariEntitat) {
 					notificacions = notificacioRepository.findByEntitatActual(
@@ -547,75 +542,42 @@ public class NotificacioServiceImpl implements NotificacioService {
 					procediment = procedimentRepository.findById(filtre.getProcedimentId());
 				}
 				if (isUsuari) {
-					if (!procedimentsCodisNotib.isEmpty() && !codisOrgansGestorsDisponibles.isEmpty()) {
-						notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
-								filtre.getEntitatId() == null,
-								filtre.getEntitatId(),
-								procedimentsCodisNotib.isEmpty(),
-								procedimentsCodisNotib, 
-								aplicacioService.findRolsUsuariActual(),
-								codisOrgansGestorsDisponibles,
-								filtre.getEnviamentTipus() == null,
-								filtre.getEnviamentTipus(),
-								filtre.getConcepte() == null,
-								filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
-								filtre.getEstat() == null,
-								filtre.getEstat(), 
-								dataInici == null,
-								dataInici,
-								dataFi == null,
-								dataFi,
-								filtre.getTitular() == null || filtre.getTitular().isEmpty(),
-								filtre.getTitular() == null ? "" : filtre.getTitular(),
-								entitatActual,
-								organGestor == null,
-								organGestor,
-								procediment == null,
-								procediment,
-								filtre.getTipusUsuari() == null,
-								filtre.getTipusUsuari(),
-								filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
-								filtre.getNumExpedient(),
-								filtre.getCreadaPer() == null || filtre.getCreadaPer().isEmpty(),
-								filtre.getCreadaPer(),
-								filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
-								filtre.getIdentificador(),
-								usuariCodi,
-								filtre.isNomesAmbErrors(),
-								pageable);
-					} else if (!codisOrgansGestorsDisponibles.isEmpty()){
-						notificacions = notificacioRepository.findByOrganGestorCodiWithoutProcedimentAndUsuariAndEntitat(
-								codisOrgansGestorsDisponibles,
-								filtre.getEntitatId() == null,
-								filtre.getEntitatId(),
-								filtre.getEnviamentTipus() == null,
-								filtre.getEnviamentTipus(),
-								filtre.getConcepte() == null,
-								filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
-								filtre.getEstat() == null,
-								filtre.getEstat(), 
-								dataInici == null,
-								dataInici,
-								dataFi == null,
-								dataFi,
-								filtre.getTitular() == null || filtre.getTitular().isEmpty(),
-								filtre.getTitular() == null ? "" : filtre.getTitular(),
-								entitatActual,
-								organGestor == null,
-								organGestor,
-								filtre.getTipusUsuari() == null,
-								filtre.getTipusUsuari(),
-								filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
-								filtre.getNumExpedient(),
-								filtre.getCreadaPer() == null || filtre.getCreadaPer().isEmpty(),
-								filtre.getCreadaPer(),
-								filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
-								filtre.getIdentificador(),
-								usuariCodi,
-								filtre.isNomesAmbErrors(),
-								pageable);
-					}
-					
+					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
+							filtre.getEntitatId() == null,
+							filtre.getEntitatId(),
+							esProcedimentsCodisNotibNull,
+							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib, 
+							aplicacioService.findRolsUsuariActual(),
+							esOrgansGestorsCodisNotibNull,
+							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+							filtre.getEnviamentTipus() == null,
+							filtre.getEnviamentTipus(),
+							filtre.getConcepte() == null,
+							filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
+							filtre.getEstat() == null,
+							filtre.getEstat(), 
+							dataInici == null,
+							dataInici,
+							dataFi == null,
+							dataFi,
+							filtre.getTitular() == null || filtre.getTitular().isEmpty(),
+							filtre.getTitular() == null ? "" : filtre.getTitular(),
+							entitatActual,
+							organGestor == null,
+							organGestor,
+							procediment == null,
+							procediment,
+							filtre.getTipusUsuari() == null,
+							filtre.getTipusUsuari(),
+							filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
+							filtre.getNumExpedient(),
+							filtre.getCreadaPer() == null || filtre.getCreadaPer().isEmpty(),
+							filtre.getCreadaPer(),
+							filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
+							filtre.getIdentificador(),
+							usuariCodi,
+							filtre.isNomesAmbErrors(),
+							pageable);
 				} else if (isUsuariEntitat) {
 					notificacions = notificacioRepository.findAmbFiltre(
 							entitatId == null, 
@@ -682,8 +644,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 						notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotib(
 								filtre.getEntitatId() == null,
 								filtre.getEntitatId(),
-								procedimentsCodisNotib.isEmpty(),
-								procedimentsCodisNotib, 
+								esProcedimentsCodisNotibNull,
+								esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib, 
 								filtre.getEnviamentTipus() == null,
 								filtre.getEnviamentTipus(),
 								filtre.getConcepte() == null,

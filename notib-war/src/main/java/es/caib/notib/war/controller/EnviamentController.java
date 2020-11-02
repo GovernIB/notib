@@ -40,6 +40,7 @@ import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.ColumnesCommand;
 import es.caib.notib.war.command.NotificacioEnviamentCommand;
@@ -72,6 +73,8 @@ public class EnviamentController extends BaseUserController {
 	private NotificacioService notificacioService;
 	@Autowired
 	private ProcedimentService procedimentService;
+	@Autowired
+	private OrganGestorService organGestorService;
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -162,10 +165,11 @@ public class EnviamentController extends BaseUserController {
 		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		String organGestorCodi = null;
-//		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 		
 		List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
+		List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
 		List<String> codisProcedimentsDisponibles = new ArrayList<String>();
+		List<String> codisOrgansGestorsDisponibles = new ArrayList<String>();
 		
 		try {
 			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
@@ -175,10 +179,13 @@ public class EnviamentController extends BaseUserController {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			
 			if (isUsuari) {
-//				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.CONSULTA);
 				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
+				organsGestorsDisponibles = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
 				for(ProcedimentDto procediment: procedimentsDisponibles) {
 					codisProcedimentsDisponibles.add(procediment.getCodi());
+				}
+				for (OrganGestorDto organGestorDto : organsGestorsDisponibles) {
+					codisOrgansGestorsDisponibles.add(organGestorDto.getCodi());
 				}
 			}
 			if (isAdminOrgan) {
@@ -196,6 +203,7 @@ public class EnviamentController extends BaseUserController {
 					isUsuariEntitat,
 					isAdminOrgan,
 					codisProcedimentsDisponibles,
+					codisOrgansGestorsDisponibles,
 					organGestorCodi,
 					usuariActual.getCodi(),
 					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),

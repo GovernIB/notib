@@ -165,8 +165,14 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed({"tothom"})
-	public List<OrganGestorDto> findOrgansGestorsWithPermis(Long entitatId, PermisEnum permis) {
-		return delegate.findOrgansGestorsWithPermis(entitatId, permis);
+	public List<OrganGestorDto> findOrgansGestorsWithPermis(
+			Long entitatId, 
+			String usuariCodi,
+			PermisEnum permis) {
+		return delegate.findOrgansGestorsWithPermis(
+				entitatId, 
+				usuariCodi,
+				permis);
 	}
 
 }

@@ -230,6 +230,10 @@ public class CacheHelper {
 	public void evictFindProcedimentsWithPermis() {
 	}
 	
+	@CacheEvict(value = "organsPermis", allEntries = true)
+	public void evictFindOrgansGestorWithPermis() {
+	}
+	
 	@CacheEvict(value = "organsGestorsUsuari", allEntries = true)
 	public void evictFindOrgansGestorsAccessiblesUsuari() {
 	}

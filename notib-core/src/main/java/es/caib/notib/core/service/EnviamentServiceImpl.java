@@ -391,6 +391,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			boolean isUsuariEntitat,
 			boolean isAdminOrgan,
 			List<String> procedimentsCodisNotib,
+			List<String> codisOrgansGestorsDisponibles,
 			String organGestorCodi,
 			String usuariCodi,
 			NotificacioEnviamentFiltreDto filtre,
@@ -398,6 +399,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta els enviaments de les notificacións que te una entitat");
+			
+			boolean esProcedimentsCodisNotibNull = (procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty());
+			boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
+			
 			Date dataEnviamentInici = null,
 				 dataEnviamentFi = null,
 				 dataProgramadaDisposicioInici = null,
@@ -501,8 +506,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 						dataRegistreInici,
 						(dataRegistreFi == null),
 						dataRegistreFi,
-						(procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty()),
-						procedimentsCodisNotib,
+						esProcedimentsCodisNotibNull,
+						esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib,
+						esOrgansGestorsCodisNotibNull,
+						esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
 						aplicacioService.findRolsUsuariActual(),
 						usuariCodi,
 						pageable);
@@ -558,8 +565,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 						dataRegistreInici,
 						(dataRegistreFi == null),
 						dataRegistreFi,
-						(procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty()),
-						procedimentsCodisNotib,
+						esProcedimentsCodisNotibNull,
+						esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib,
 						organs,
 						pageable);
 			} else if (isUsuariEntitat) {
