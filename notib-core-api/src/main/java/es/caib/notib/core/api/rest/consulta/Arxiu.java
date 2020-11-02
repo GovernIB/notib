@@ -14,4 +14,7 @@ public class Arxiu {
 	String mediaType;
 	String contingut;
 	
+	boolean error;
+	String missatgeError;
+	
 }

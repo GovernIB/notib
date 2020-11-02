@@ -6,7 +6,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,8 +27,10 @@ import es.caib.notib.core.api.rest.consulta.Arxiu;
 import es.caib.notib.core.api.rest.consulta.Resposta;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.api.service.NotificacioService;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
+@Slf4j
 @RequestMapping("/api/consulta/v1")
 @Api(value = "/rest/consulta", description = "API de consulta de comunicacions i notificacions")
 public class ApiConsultaController {
@@ -281,9 +285,15 @@ public class ApiConsultaController {
 			value = "Identificador de la notificació de la que es vol obtenir el document",
 			required = true)
 	@ResponseBody
-	public Arxiu getDocument(HttpServletRequest request, @PathVariable Long notificacioId) {
+	public ResponseEntity<Arxiu> getDocument(HttpServletRequest request, @PathVariable Long notificacioId) {
 		Arxiu document = null;
-		ArxiuDto arxiu = notificacioService.getDocumentArxiu(notificacioId);
+		ArxiuDto arxiu = null;
+		HttpStatus status = HttpStatus.OK;
+		try {
+			arxiu = notificacioService.getDocumentArxiu(notificacioId);
+		} catch (Exception e) {
+			log.debug("No s'ha trobat el document per a la notificació amb identificador " + notificacioId);
+		}
 		if (arxiu != null && arxiu.getContingut() != null) {
 			if (arxiu.getContentType() == null) {
 				if (arxiu.getNom() != null) {
@@ -299,8 +309,13 @@ public class ApiConsultaController {
 					.nom(arxiu.getNom())
 					.mediaType(arxiu.getContentType())
 					.contingut(contingutDocumentBasse64).build();
+		} else {
+			document = Arxiu.builder()
+					.error(true)
+					.missatgeError("No s'ha trobat el document.").build();
+			status = HttpStatus.BAD_REQUEST;
 		}
-		return document;
+		return new ResponseEntity<Arxiu>(document, status);
 	}
 	
 	@RequestMapping(
@@ -318,17 +333,28 @@ public class ApiConsultaController {
 			value = "Identificador de l'enviament de la que es vol obtenir la certificació",
 			required = true)
 	@ResponseBody
-	public Arxiu getCertificacio(HttpServletRequest request, @PathVariable Long enviamentId) {
+	public ResponseEntity<Arxiu> getCertificacio(HttpServletRequest request, @PathVariable Long enviamentId) {
 		Arxiu certificacio = null;
-		ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
+		ArxiuDto arxiu = null;
+		HttpStatus status = HttpStatus.OK;
+		try {
+			arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
+		} catch (Exception e) {
+			log.debug("No s'ha trobat la certificació per a l'enviament amb identificador " + enviamentId);
+		}
 		if (arxiu != null && arxiu.getContingut() != null) {
 			String contingutCertificacioBasse64 = Base64.encodeBase64String(arxiu.getContingut());
 			certificacio = Arxiu.builder()
 					.nom(arxiu.getNom())
 					.mediaType(arxiu.getContentType())
 					.contingut(contingutCertificacioBasse64).build();
+		} else {
+			certificacio = Arxiu.builder()
+					.error(true)
+					.missatgeError("No s'ha trobat la certificació.").build();
+			status = HttpStatus.BAD_REQUEST;
 		}
-		return certificacio;
+		return new ResponseEntity<Arxiu>(certificacio, status);
 	}
 	
 	@RequestMapping(
@@ -346,17 +372,28 @@ public class ApiConsultaController {
 			value = "Identificador de l'enviament de la que es vol obtenir el justificant",
 			required = true)
 	@ResponseBody
-	public Arxiu getJustificant(HttpServletRequest request, @PathVariable Long enviamentId) {
+	public ResponseEntity<Arxiu> getJustificant(HttpServletRequest request, @PathVariable Long enviamentId) {
 		Arxiu justificant = null;
-		byte[] contingutJustificant = enviamentService.getDocumentJustificant(enviamentId);
+		byte[] contingutJustificant = null;
+		HttpStatus status = HttpStatus.OK;
+		try {
+			contingutJustificant = enviamentService.getDocumentJustificant(enviamentId);
+		} catch (Exception e) {
+			log.debug("No s'ha trobat el justificant per a l'enviament amb identificador " + enviamentId);
+		}
 		if (contingutJustificant != null) {
 			String contingutJustificantBasse64 = Base64.encodeBase64String(contingutJustificant); 
 			justificant = Arxiu.builder()
 					.nom("Justificant")
 					.mediaType(com.google.common.net.MediaType.PDF.toString())
 					.contingut(contingutJustificantBasse64).build();
+		} else {
+			justificant = Arxiu.builder()
+					.error(true)
+					.missatgeError("No s'ha trobat el justificant.").build();
+			status = HttpStatus.BAD_REQUEST;
 		}
-		return justificant;
+		return new ResponseEntity<Arxiu>(justificant, status);
 	}
 	
 }
