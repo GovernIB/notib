@@ -31,6 +31,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -324,8 +325,10 @@ public class NotificacioController extends BaseUserController {
 					isAdministrador(request), 
 					notificacioCommand.getProcedimentId());
 		notificacioCommand.setUsuariCodi(aplicacioService.getUsuariActual().getCodi());
+		
 		if (bindingResult.hasErrors()) {
 			ompliModelFormulari(
+					request,
 					procedimentActual, 
 					entitatActual,
 					notificacioCommand,
@@ -404,6 +407,7 @@ public class NotificacioController extends BaseUserController {
 			logger.error("Error creant una notificació", ex);
 			MissatgesHelper.error(request, ex.getMessage());
 			ompliModelFormulari(
+					request,
 					procedimentActual, 
 					entitatActual,
 					notificacioCommand,
@@ -1072,6 +1076,7 @@ public class NotificacioController extends BaseUserController {
 	}
 
 	private void ompliModelFormulari(
+			HttpServletRequest request,
 			ProcedimentDto procedimentActual,
 			EntitatDto entitatActual,
 			NotificacioCommandV2 notificacioCommand,
@@ -1103,9 +1108,21 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("ambEntregaDeh", entitatActual.isAmbEntregaDeh());
 		model.addAttribute("ambEntregaCie", entitatActual.isAmbEntregaCie());
 		model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
-		model.addAttribute("procediments", procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO));
-	
-		model.addAttribute("organsGestors", organGestorService.findOrganismes(entitatActual));
+		//model.addAttribute("procediments", procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO));
+		//model.addAttribute("organsGestors", organGestorService.findOrganismes(entitatActual));
+		List<ProcedimentDto> procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(
+				entitatActual.getId(), 
+				usuariActual.getCodi(), 
+				PermisEnum.NOTIFICACIO);
+		model.addAttribute("procediments", procedimentsDisponibles);
+		if (procedimentsDisponibles.isEmpty()) {
+			MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
+		}
+		List<OrganGestorDto> organsGestors = recuperarOrgansPerProcedimentAmbPermis(
+				entitatActual,
+				procedimentsDisponibles);			
+		model.addAttribute("organsGestors", organsGestors);
+		
 		if (procedimentActual != null)
 			model.addAttribute("grups", grupService.findByProcedimentAndUsuariGrups(procedimentActual.getId()));
 		model.addAttribute("comunicacioTipus", 

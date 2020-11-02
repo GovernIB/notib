@@ -17,6 +17,7 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
@@ -43,6 +44,7 @@ import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.core.security.NotibMutableAclService;
+import es.caib.notib.plugin.usuari.DadesUsuari;
 
 
 /**
@@ -65,6 +67,8 @@ public class PermisosHelper {
 	private PermisosHelper permisosHelper;
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
+	@Autowired
+	private PluginHelper pluginHelper;
 
 
 	public void assignarPermisUsuari(
@@ -406,7 +410,7 @@ public class PermisosHelper {
 					if (permis == null) {
 						permis = new PermisDto();
 						permis.setId((Long)ace.getId());
-						permis.setPrincipal(principal);
+						permis.setPrincipal(pluginHelper.dadesUsuariConsultarAmbCodi(principal).getNomSencerAmbCodi());
 						permis.setTipus(TipusEnumDto.USUARI);
 						permisosUsuari.put(principal, permis);
 					}

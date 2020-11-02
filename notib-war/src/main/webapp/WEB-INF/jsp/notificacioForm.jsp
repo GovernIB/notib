@@ -262,6 +262,7 @@ $(document).ready(function() {
     var procedimentId = $("#procedimentId").children(":selected").attr("value");
 
     $('#organGestor').on('change', function() {
+    	
     	//### seleccionat per defecte si només hi ha un (empty + òrgan)
     	if ($('#organGestor').children('option').length == 2) {
     		$('#organGestor option:eq(1)').attr('selected', 'selected');
@@ -297,17 +298,21 @@ $(document).ready(function() {
 					if (procedimentsComuns.length > 0) {
 						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
 							$.each(procedimentsComuns, function(index, val) {
-								selProcediments.append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
+								selProcediments.append("<option value=\"" + val.id + "\">" + val.codi +' - '+ val.nom + "</option>");
 							});
 						selProcediments.append("</optgroup>");
 					}
 					if (procedimentsOrgan.length > 0) {
 						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
 							$.each(procedimentsOrgan, function(index, val) {
-								selProcediments.append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
+								selProcediments.append("<option value=\"" + val.id + "\">" + val.codi +' - '+ val.nom + "</option>");
 							});
 						selProcediments.append("</optgroup>");
 					}
+					if (selProcediments.children('option').length == 2) {
+			    		$('#procedimentId option:eq(1)').attr('selected', 'selected');
+			    		selProcediments.trigger('change.select2');
+			    	}
 				} else {
 					selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
 				}
@@ -323,6 +328,9 @@ $(document).ready(function() {
 //         var procedimentId = $(this).children(":selected").attr("value");
 //         comprovarGrups(agrupable, procedimentId)
 //         webutilModalAdjustHeight();
+
+		
+
 		var procediment = $(this).val();
 		if (procediment == '') {
 			$("#organGestor").prop("disabled", false);
@@ -990,7 +998,7 @@ function actualitzarEntrega(j) {
 						required="true" 
 						optionItems="${organsGestors}" 
 						optionValueAttribute="codi" 
-						optionTextAttribute="nom"
+						optionTextAttribute="organGestorDesc"
 						labelSize="2" 
 						emptyOption="true"
 						optionMinimumResultsForSearch="2"
@@ -1006,7 +1014,7 @@ function actualitzarEntrega(j) {
 						required="false" 
 						optionItems="${procediments}" 
 						optionValueAttribute="id" 
-						optionTextAttribute="nom" 
+						optionTextAttribute="id" 
 						labelSize="2"
 						emptyOption="true"
 						optionMinimumResultsForSearch="2"

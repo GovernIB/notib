@@ -37,6 +37,14 @@ public class DadesUsuari implements Serializable {
 			return null;
 		}
 	}
+	
+	public String getNomSencerAmbCodi() {
+		if(getNomSencer() != null) {
+			return getNomSencer() + "("+codi+")"; 
+		}
+		return codi;
+	}
+	
 	public void setNomSencer(String nomSencer) {
 		this.nomSencer = nomSencer;
 	}

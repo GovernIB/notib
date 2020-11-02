@@ -321,7 +321,6 @@ $(document).ready(function() {
 		$('#form-filtre').submit();
 	});
 	$('#nomesAmbErrorsBtn').click(function() {
-		debugger
 		nomesAmbErrors = !$(this).hasClass('active');
 		$('#nomesAmbErrors').val(nomesAmbErrors);
 	})
