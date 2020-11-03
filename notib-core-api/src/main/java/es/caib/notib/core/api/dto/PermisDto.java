@@ -21,6 +21,7 @@ public class PermisDto implements Serializable {
 
 	private Long id;
 	private String principal;
+	private String nomSencerAmbCodi;
 	private TipusEnumDto tipus;
 	private boolean read;
 	private boolean write;
