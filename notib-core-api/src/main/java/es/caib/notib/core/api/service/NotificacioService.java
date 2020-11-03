@@ -10,6 +10,7 @@ import javax.mail.MessagingException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.LocalitatsDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
@@ -292,6 +293,9 @@ public interface NotificacioService {
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public void reactivarRegistre(Long notificacioId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public FitxerDto recuperarJustificant(Long notificacioId);
 
 
 //	void registrarEnviamentsPendents();

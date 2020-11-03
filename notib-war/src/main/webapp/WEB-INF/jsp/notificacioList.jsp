@@ -516,6 +516,7 @@ $(document).ready(function() {
 							{{if permisProcessar }}
 								<li><a href="<c:url value="/notificacio/{{:id}}/processar"/>" data-toggle="modal"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a></li>
 							{{/if}}
+								<li><a href="<c:url value="/notificacio/{{:id}}/justificantDescarregar"/>"><span class="fa fa-info-circle"></span>&nbsp; Justificant</a></li>
 							</ul>
 						</div>
 					</script>

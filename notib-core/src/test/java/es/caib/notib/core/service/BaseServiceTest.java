@@ -39,6 +39,8 @@ import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.NotificacioDto;
+import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PagadorCieDto;
@@ -49,6 +51,7 @@ import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
 import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
@@ -113,6 +116,8 @@ public class BaseServiceTest {
 	protected PagadorCieFormatFullaService pagadorCieFormatFullaService;
 	@Autowired
 	protected PagadorCieFormatSobreService pagadorCieFormatSobreService;
+	@Autowired
+	protected NotificacioService notificacioService;
 	
 	@Autowired
 	private  UsuariRepository usuariRepository;
@@ -273,6 +278,13 @@ public class BaseServiceTest {
 							(PagadorCieFormatSobreDto)element);
 					elementsCreats.add(entitatCreada);
 					id = entitatCreada.getId();
+				} else if(element instanceof NotificacioDtoV2) {
+					autenticarUsuari("admin");
+					List<NotificacioDto> entitatCreada = notificacioService.create(
+							entitatId,
+							(NotificacioDtoV2)element);
+					elementsCreats.add(entitatCreada.get(0));
+					id = entitatCreada.get(0).getId();
 				} else {
 					fail("No s'ha trobat cap entitat per associar l'objecte de tipus " + element.getClass().getSimpleName());
 				}

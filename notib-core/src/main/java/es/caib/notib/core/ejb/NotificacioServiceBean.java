@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.LocalitatsDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
@@ -309,6 +310,12 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public NotificacioEventDto findUltimEventRegistreByNotificacio(Long notificacioId) {
 		return delegate.findUltimEventRegistreByNotificacio(notificacioId);
+	}
+
+	@Override
+	@RolesAllowed({"tothom"})
+	public FitxerDto recuperarJustificant(Long notificacioId) {
+		return delegate.recuperarJustificant(notificacioId);
 	}
 
 }

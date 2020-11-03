@@ -33,6 +33,7 @@ import com.codahale.metrics.Timer;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.DocumentDto;
+import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.LocalitatsDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
@@ -80,6 +81,7 @@ import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.CreacioSemaforDto;
 import es.caib.notib.core.helper.EmailHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
+import es.caib.notib.core.helper.JustificantHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.OrganigramaHelper;
@@ -98,6 +100,7 @@ import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
@@ -155,6 +158,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private CacheHelper cacheHelper;
 	@Resource
 	private MetricsHelper metricsHelper;
+	@Autowired
+	private JustificantHelper justificantHelper;
 	
 	@Transactional(rollbackFor=Exception.class)
 	@Override
@@ -1424,6 +1429,47 @@ public class NotificacioServiceImpl implements NotificacioService {
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}		
+	}
+	
+	@Transactional
+	@Override
+	public FitxerDto recuperarJustificant(Long notificacioId) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Recuperant el justificant de la notificacio (notificacioId=" + notificacioId + ")");
+			NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
+			byte[] contingut = justificantHelper.generarJustificant(
+					conversioTipusHelper.convertir(
+							notificacio, 
+							NotificacioDtoV2.class));
+			FitxerDto justificantOriginal = new FitxerDto();
+			justificantOriginal.setNom("justificant.docx");
+			justificantOriginal.setContentType("application/msword");
+			justificantOriginal.setContingut(contingut);
+			
+			//## CONVERSIÓ PDF
+			FitxerDto justificantPdf = pluginHelper.conversioConvertirPdf(
+					justificantOriginal,
+					null);
+			
+			//## FIRMA SERVIDOR
+//			byte[] contingutFirmat = pluginHelper.firmaServidorFirmar(
+//					notificacio, 
+//					justificantPdf, 
+//					TipusFirma.PADES, 
+//					"prova firma servidor", 
+//					"ca");
+//			
+//			FitxerDto justificantFirmat = new FitxerDto();
+//			justificantFirmat.setContentType("application/pdf");
+//			justificantFirmat.setContingut(contingutFirmat);
+//			justificantFirmat.setNom("justificant_signed.pdf");
+//			justificantFirmat.setTamany(contingutFirmat.length);
+			
+			return justificantPdf;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	private int getRegistreEnviamentsProcessarMaxProperty() {

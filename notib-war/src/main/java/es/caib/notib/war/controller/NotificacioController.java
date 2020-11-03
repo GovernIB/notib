@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
@@ -778,6 +779,18 @@ public class NotificacioController extends BaseUserController {
 		String mimeType = ".pdf";
 		response.setHeader("Set-cookie", "fileDownload=true; path=/");
 		writeFileToResponse(arxiu.getNom() + mimeType, arxiu.getContingut(), response);
+	}
+	
+	@RequestMapping(value = "/{notificacioId}/justificantDescarregar", method = RequestMethod.GET)
+	@ResponseBody
+	public void justificantDescarregar(
+			HttpServletRequest request, 
+			HttpServletResponse response,
+			@PathVariable Long notificacioId) throws IOException {
+		FitxerDto justificant = notificacioService.recuperarJustificant(notificacioId);
+		String mimeType = ".docx";
+		response.setHeader("Set-cookie", "fileDownload=true; path=/");
+		writeFileToResponse(justificant.getNom(), justificant.getContingut(), response);
 	}
 	
 	@RequestMapping(value = "/{notificacioId}/refrescarEstatClient", method = RequestMethod.GET)
