@@ -30,7 +30,7 @@ public class CarpetaRestTest {
 
 	private CarpetaRestClient client;
 
-	@Before
+//	@Before
 	public void setUp() throws IOException, DecoderException {
 		client = new CarpetaRestClient(
 				URL,
@@ -39,7 +39,7 @@ public class CarpetaRestTest {
 				true);
 	}
 
-	@Test
+//	@Test
 	public void testConsulta() throws DatatypeConfigurationException, IOException, DecoderException {
 		String nif = "18225486x";
 		int pagina = 0;
@@ -59,7 +59,7 @@ public class CarpetaRestTest {
 		}
 	}
 	
-	@Test
+//	@Test
 	public void testDocument() throws DatatypeConfigurationException, IOException, DecoderException {
 		Long notificacioId = 173875L;
 		
