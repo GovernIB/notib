@@ -68,7 +68,7 @@ public class PermisosHelper {
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
-	private PluginHelper pluginHelper;
+	private CacheHelper cacheHelper;
 
 
 	public void assignarPermisUsuari(
@@ -410,7 +410,14 @@ public class PermisosHelper {
 					if (permis == null) {
 						permis = new PermisDto();
 						permis.setId((Long)ace.getId());
-						permis.setPrincipal(pluginHelper.dadesUsuariConsultarAmbCodi(principal).getNomSencerAmbCodi());
+						permis.setPrincipal(principal);
+						DadesUsuari usuari = cacheHelper.findUsuariAmbCodi(principal);
+						if(usuari != null) {
+							permis.setNomSencerAmbCodi(usuari.getNomSencerAmbCodi()!=null?usuari.getNomSencerAmbCodi():principal);
+						}else {
+							permis.setNomSencerAmbCodi(principal);
+						}
+						
 						permis.setTipus(TipusEnumDto.USUARI);
 						permisosUsuari.put(principal, permis);
 					}
