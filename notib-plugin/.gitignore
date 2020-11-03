@@ -4,3 +4,4 @@
 /.settings/
 /bin/
 /.flattened-pom.xml
+/.attach_pid*
