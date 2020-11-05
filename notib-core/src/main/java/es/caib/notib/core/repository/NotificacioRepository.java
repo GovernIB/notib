@@ -77,7 +77,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"     left outer join ntf.procediment pro " +
 			"where " +
 			"   ((ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib))" +
-			"   or (ntf.procedimentCodiNotib is null and ntf.organGestor is not null and ntf.organGestor in (:organs))) " + 
+			"   or (ntf.procedimentCodiNotib is null and ntf.organGestor is not null and ntf.organGestor.codi in (:organs))) " + 
 			"and (ntf.entitat = :entitat) ")
 //			"and (ntf.grupCodi = null) ")
 	Page<NotificacioEntity> findByProcedimentCodiNotibAndEntitat(
@@ -196,7 +196,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"where " +
 			"    (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
 			"and ((:isProcNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib))" +
-			"   or (ntf.procedimentCodiNotib is null and ntf.organGestor is not null and ntf.organGestor in (:organs))) " + 
+			"   or (ntf.procedimentCodiNotib is null and ntf.organGestor is not null and ntf.organGestor.codi in (:organs))) " + 
 			"and (:entitat = ntf.entitat) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +

@@ -24,6 +24,7 @@ import es.caib.notib.ws.notificacio.NotificacioServiceV2;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Deprecated
 public class NotificacioWsClientFactory {
 
 	public static NotificacioServiceV2 getWsClientV2(
