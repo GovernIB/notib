@@ -311,7 +311,7 @@ $(document).ready(function() {
 					}
 					if (selProcediments.children('option').length == 2) {
 			    		$('#procedimentId option:eq(1)').attr('selected', 'selected');
-			    		selProcediments.trigger('change.select2');
+			    		selProcediments.trigger('change');
 			    	}
 				} else {
 					selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
