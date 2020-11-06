@@ -417,25 +417,25 @@ public class EnviamentServiceImpl implements EnviamentService {
 				dataEnviamentInici = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentInici()));
 			}
 			if (filtre.getDataEnviamentFi() != null && filtre.getDataEnviamentFi() != "") {
-				dataEnviamentFi = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentFi()));
+				dataEnviamentFi = toFiDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentFi()));
 			}
 			if (filtre.getDataProgramadaDisposicioInici() != null && filtre.getDataProgramadaDisposicioInici() != "") {
 				dataProgramadaDisposicioInici = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataProgramadaDisposicioInici()));
 			}
 			if (filtre.getDataProgramadaDisposicioFi() != null && filtre.getDataProgramadaDisposicioFi() != "") {
-				dataProgramadaDisposicioFi = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataProgramadaDisposicioFi()));
+				dataProgramadaDisposicioFi = toFiDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataProgramadaDisposicioFi()));
 			}
 			if (filtre.getDataRegistreInici() != null && filtre.getDataRegistreInici() != "") {
 				dataRegistreInici = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataRegistreInici()));
 			}
 			if (filtre.getDataRegistreFi() != null && filtre.getDataRegistreFi() != "") {
-				dataRegistreFi = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataRegistreFi()));
+				dataRegistreFi = toFiDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataRegistreFi()));
 			}
 			if (filtre.getDataCaducitatInici() != null && filtre.getDataCaducitatInici() != "") {
 				dataCaducitatInici = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataCaducitatInici()));
 			}
 			if (filtre.getDataCaducitatFi() != null && filtre.getDataCaducitatFi() != "") {
-				dataCaducitatFi = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataCaducitatFi()));
+				dataCaducitatFi = toFiDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataCaducitatFi()));
 			}
 			//Filtres camps procediment
 			Integer estat = null;
@@ -684,6 +684,19 @@ public class EnviamentServiceImpl implements EnviamentService {
 			cal.set(Calendar.MINUTE, 0);
 			cal.set(Calendar.SECOND, 0);
 			cal.set(Calendar.MILLISECOND, 0);
+			data = cal.getTime();
+		}
+		return data;
+	}
+	
+	private Date toFiDia(Date data) {
+		if (data != null) {
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(data);
+			cal.set(Calendar.HOUR, 23);
+			cal.set(Calendar.MINUTE, 59);
+			cal.set(Calendar.SECOND, 59);
+			cal.set(Calendar.MILLISECOND, 999);
 			data = cal.getTime();
 		}
 		return data;

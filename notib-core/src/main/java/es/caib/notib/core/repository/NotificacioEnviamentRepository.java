@@ -249,7 +249,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:esDataRegistreIniciNull = true or n.notificacio.registreData >= :dataRegistreInici) " +
 			"and (:esDataRegistreFiNull = true or n.notificacio.registreData <= :dataRegistreFi) " +
 			"and ((:esProcedimentsCodisNotibNull = false and n.notificacio.procedimentCodiNotib is not null and n.notificacio.procedimentCodiNotib in (:procedimentsCodisNotib)) " +
-			"   or (n.notificacio.procedimentCodiNotib is null and n.notificacio.organGestor is not null and n.notificacio.organGestor in (:organs))) ")
+			"   or (n.notificacio.procedimentCodiNotib is null and n.notificacio.organGestor is not null and n.notificacio.organGestor.codi in (:organs))) ")
 	Page<NotificacioEnviamentEntity> findByNotificacio(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
 			@Param("codiProcediment") String codiProcediment,
