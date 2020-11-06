@@ -351,7 +351,6 @@ $(document).ready(function() {
 			}
 		});
 	});
-		
 });
 </script>
 </head>
@@ -445,6 +444,7 @@ $(document).ready(function() {
 				<th data-col-name="id" data-visible="false">#</th>
 				<th data-col-name="tipusUsuari" data-visible="false">#</th>
 				<th data-col-name="errorLastCallback" data-visible="false">#</th>
+				<th data-col-name="hasEnviamentsPendents" data-visible="false">#</th>
 				<th data-col-name="notificaError" data-visible="false"></th>
 				<th data-col-name="notificaErrorDescripcio" data-visible="false"></th>
 				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" class="enviamentTipusCol" width="5px">
@@ -516,7 +516,9 @@ $(document).ready(function() {
 							{{if permisProcessar }}
 								<li><a href="<c:url value="/notificacio/{{:id}}/processar"/>" data-toggle="modal"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a></li>
 							{{/if}}
-								<li><a href="<c:url value="/notificacio/{{:id}}/justificantDescarregar"/>"><span class="fa fa-info-circle"></span>&nbsp; Justificant</a></li>
+							{{if !hasEnviamentsPendents }}
+								<li><a href="<c:url value="/notificacio/{{:id}}/justificant"/>" data-toggle="modal" data-height="250px"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.justificant"/></a></li>
+							{{/if}}							
 							</ul>
 						</div>
 					</script>

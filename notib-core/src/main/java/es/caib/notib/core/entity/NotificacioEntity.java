@@ -177,7 +177,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	protected boolean permisProcessar;
 	@Transient
 	protected boolean errorLastEvent;
-	
+	@Transient
+	protected boolean hasEnviamentsPendents;
 	
 	public void addEnviament(
 			NotificacioEnviamentEntity enviament) {
@@ -190,6 +191,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	public void setErrorLastEvent(boolean errorLastEvent) {
 		this.errorLastEvent = errorLastEvent;
+	}
+	
+	public void setHasEnviamentsPendents(boolean hasEnviamentsPendents) {
+		this.hasEnviamentsPendents = hasEnviamentsPendents;
 	}
 	
 	public void updateRegistreNumero(Integer registreNumero) {

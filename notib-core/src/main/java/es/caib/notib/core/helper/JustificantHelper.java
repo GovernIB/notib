@@ -1,45 +1,39 @@
 package es.caib.notib.core.helper;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigInteger;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-import org.apache.poi.util.Units;
-import org.apache.poi.xwpf.model.XWPFHeaderFooterPolicy;
-import org.apache.poi.xwpf.usermodel.BreakClear;
-import org.apache.poi.xwpf.usermodel.BreakType;
-import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
-import org.apache.poi.xwpf.usermodel.TextAlignment;
-import org.apache.poi.xwpf.usermodel.UnderlinePatterns;
-import org.apache.poi.xwpf.usermodel.XWPFAbstractNum;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFFooter;
-import org.apache.poi.xwpf.usermodel.XWPFHeader;
-import org.apache.poi.xwpf.usermodel.XWPFNumbering;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.apache.poi.xwpf.usermodel.XWPFStyles;
-import org.apache.poi.xwpf.usermodel.XWPFTable;
-import org.apache.poi.xwpf.usermodel.XWPFTableCell;
-import org.apache.poi.xwpf.usermodel.XWPFTableCell.XWPFVertAlign;
-import org.apache.poi.xwpf.usermodel.XWPFTableRow;
-import org.apache.xmlbeans.XmlCursor;
-import org.apache.xmlbeans.XmlException;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTAbstractNum;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTNumbering;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageMar;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTStyles;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTblWidth;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.List;
+import com.itextpdf.text.ListItem;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfPageEventHelper;
+import com.itextpdf.text.pdf.PdfWriter;
+
+import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.PersonaDto;
+import es.caib.notib.core.api.dto.ProgresDescarregaDto;
+import es.caib.notib.core.api.dto.ProgresDescarregaDto.TipusInfo;
+import es.caib.notib.core.api.exception.JustificantException;
 
 /**
  * Helper per generar el justificant de la notificació electrònica
@@ -51,691 +45,492 @@ import es.caib.notib.core.api.dto.PersonaDto;
 @Component
 public class JustificantHelper {
 
+	private Font frutiger8 = FontFactory.getFont("Frutiger", 8, new BaseColor(127, 127, 127, 1)); // #7F7F7F
+	private Font frutiger9 = FontFactory.getFont("Frutiger", 8, new BaseColor(127, 127, 127, 1)); // #7F7F7F
+	private Font frutigerTitolBold = FontFactory.getFont("Frutiger", 11, Font.BOLD);
+	private Font calibri10 = FontFactory.getFont("Calibri", 10);
+	private Font calibri10Bold = FontFactory.getFont("Calibri", 10, Font.BOLD); 
+	private Font calibriWhiteBold = FontFactory.getFont("Calibri", 10, Font.BOLD, new BaseColor(255, 255, 255)); // #FFFFFF
+	
 	@Autowired
 	MessageHelper messageHelper;
 
-	public byte[] generarJustificant(NotificacioDtoV2 notificacio) {
+	public byte[] generarJustificant(
+			NotificacioDtoV2 notificacio, 
+			ProgresDescarregaDto progres) throws JustificantException {
+		logger.debug("Generant el justificant d'enviament de la notificacio [notificacioId=" + notificacio.getId() + "]");
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
+			Document justificant = inicialitzaDocument(out, progres);
 
-			XWPFDocument justificant = getDocumentFormatted();
+			progres.setProgres(30);
+			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant.titol"));
+			crearTitolAndIntroduccio(
+					justificant, 
+					notificacio, 
+					progres);
 
-			if (justificant != null) {
-
-				createCapsaleraPagina(justificant);
-
-				createTitle(justificant);
-
-				createIntroduction(justificant, notificacio);
-
-				int numEnviament = 1;
-				for (NotificacioEnviamentDtoV2 enviament: notificacio.getEnviaments()) {
-					createTableEnviaments(
-							justificant, 
-							notificacio, 
-							enviament, 
-							numEnviament);
-					numEnviament++;
-				}
-
-				createPeuPagina(justificant);
-				
-				justificant.write(out);
-				out.close();
+			progres.setProgres(40);
+			int numEnviament = 1;
+			for (NotificacioEnviamentDtoV2 enviament : notificacio.getEnviaments()) {
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant.taula.enviament", new Object[] {numEnviament}));
+				crearTaulaEnviaments(
+						justificant, 
+						notificacio, 
+						enviament, 
+						numEnviament,
+						progres);
+				numEnviament++;
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (XmlException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			justificant.close();
+		} catch (DocumentException ex) {
+			String errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.generant.error", new Object[] {ex.getMessage()});
+			progres.setProgres(100);
+			progres.addInfo(TipusInfo.ERROR, errorMessage);
+			logger.error(
+					errorMessage, 
+					ex);
 		}
 		return out.toByteArray();
 	}
 
-	private void createCapsaleraPagina(XWPFDocument justificant) {
-		try {
-			int twipsPerInch = 1440;
-//			Capsalera per defecte
-			XWPFHeaderFooterPolicy headerFooterPolicy = justificant.getHeaderFooterPolicy();
-			XWPFHeader header = headerFooterPolicy.createHeader(XWPFHeaderFooterPolicy.DEFAULT);
-//			## [CAPSALERA] ##
-//			XWPFParagraph paragraph = header.createParagraph();
-//			XmlCursor cursor = paragraph.getCTP().newCursor();
-//			XWPFTable tableCapsalera = header.insertNewTbl(cursor);
-			XWPFTable tableCapsalera = header.createTable(1, 2);
-			tableCapsalera.setStyleID("Tablaconcuadrcula");
-			tableCapsalera.getCTTbl().addNewTblGrid().addNewGridCol().setW(BigInteger.valueOf((long) (3.84 * twipsPerInch)));
-			tableCapsalera.getCTTbl().getTblGrid().addNewGridCol().setW(BigInteger.valueOf((long) (3.35 * twipsPerInch)));
-//			## [NEW_ROW] ## crea la primera fila d'una taula
-//			XWPFTableRow firstRow = createFirstTableRow(tableCapsalera);
-//			## [LOGO COL] ## first column
-			addInfoToHeader(tableCapsalera, 0);
-//			## [DIRECCIÓ COL] ## second column
-			addInfoToHeader(tableCapsalera, 1);
-			
-			removeTableBorder(tableCapsalera);
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-	}
-
-	private void createPeuPagina(XWPFDocument justificant) {
-		try {
-			int twipsPerInch = 1725;
-//			Peu per defecte
-			XWPFHeaderFooterPolicy headerFooterPolicy = justificant.getHeaderFooterPolicy();
-			XWPFFooter footer = headerFooterPolicy.createFooter(XWPFHeaderFooterPolicy.DEFAULT);
-//			## [CAPSALERA] ##
-//			XWPFParagraph paragraph = footer.createParagraph();
-//			XmlCursor cursor = paragraph.getCTP().newCursor();
-//			XWPFTable tableFooter = footer.insertNewTbl(cursor);
-			XWPFTable tableFooter = footer.createTable(1, 2);
-			tableFooter.getCTTbl().addNewTblGrid().addNewGridCol().setW(BigInteger.valueOf(6 * twipsPerInch));
-//			## [NEW_ROW] ## crea la primera fila d'una taula
-//			XWPFTableRow firstRow = createFirstTableRow(tableFooter);
-//			## [TÍTOL COL] ## first column
-			addInfoToFooter(tableFooter, 0);
-//			## [LOGO COL] ## second column
-			addInfoToFooter(tableFooter, 1);
-
-			removeTableBorder(tableFooter);
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-	}
-
-	private XWPFTableRow createFirstTableRow(XWPFTable table) {
-		int twipsPerInch = 1725;
-		XWPFTableRow row = table.getRow(0);
-		if (row == null)
-			row = table.createRow();
-		table.getCTTbl().addNewTblGrid().addNewGridCol().setW(BigInteger.valueOf(6 * twipsPerInch));
-		return row;
-	}
-
-	private void addInfoToHeader(XWPFTable table, int numCell) {
-		try {
-			XWPFTableCell cell = table.getRow(0).getCell(numCell);
-			//## a vegades la columna no té format(width i tipus) i dona error
-			//checkAndFormatCell(cell, 3.53);
-
-			if (numCell == 0) {
-				XWPFParagraph paragraph = cell.getParagraphs().get(0);
-//				## [LOGO]
-				paragraph.setSpacingBefore(100);
-				paragraph.setSpacingAfter(100);
-				XWPFRun runLogo = paragraph.createRun();
-				if (getCapsaleraLogo() != null) {
-					FileInputStream pictureInputStream = new FileInputStream(getCapsaleraLogo());
-					int indexOfLastBar = getCapsaleraLogo().lastIndexOf("/") != -1 ? getCapsaleraLogo().lastIndexOf("/")
-							: getCapsaleraLogo().lastIndexOf("\\");
-					String logoName = getCapsaleraLogo().substring(indexOfLastBar + 1, getCapsaleraLogo().length());
-					runLogo.addPicture(pictureInputStream, XWPFDocument.PICTURE_TYPE_GIF, logoName, Units.toEMU(180),
-							Units.toEMU(60));
-					pictureInputStream.close();
-				}
-			} else if (numCell == 1) {
-				cell.setVerticalAlignment(XWPFVertAlign.CENTER);
-//				## [DIRECCIO - NIF]
-				XWPFParagraph paragraphNif = cell.getParagraphs().get(0);
-				XWPFRun direccioNifRun = paragraphNif.createRun();
-				direccioNifRun.setText(getNifDireccio());
-//				## [DIRECCIO - CODIDIR3]
-				XWPFParagraph paragraphDir = cell.addParagraph();
-				XWPFRun direccioCodiRun = paragraphDir.createRun();
-				direccioCodiRun.setText(getCodiDireccio());
-//				## [DIRECCIO - CARRER]
-				XWPFParagraph paragraphCarrer = cell.addParagraph();
-				XWPFRun direccioRun = paragraphCarrer.createRun();
-				direccioRun.setText(getDireccio());
-//				## [DIRECCIO - EMAIL]
-				XWPFParagraph paragraphEmail = cell.addParagraph();
-				XWPFRun direccioEmailRun = paragraphEmail.createRun();
-				direccioEmailRun.setText(getEmailDireccio());
-				direccioEmailRun.setUnderline(UnderlinePatterns.SINGLE);
-				
-				for (XWPFParagraph paragraph : cell.getParagraphs()) {
-					paragraph.getRuns().get(0).setFontSize(8);
-					paragraph.getRuns().get(0).setFontFamily("Frutiger");
-					paragraph.getRuns().get(0).setBold(false);
-					paragraph.getRuns().get(0).setColor("7f7f7f");
-					paragraph.setStyle("Encabezado");
-					paragraph.setAlignment(ParagraphAlignment.RIGHT);
-				}
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private void addInfoToFooter(XWPFTable table, int numCell) {
-		try {
-//			int twipsPerInch = 1750;
-			XWPFTableCell cell = table.getRow(0).getCell(numCell);
-			
-			//## a vegades la columna no té format(width i tipus) i dona error
-			checkAndFormatCell(cell, 3.53);
-			
-			XWPFParagraph paragraph = cell.getParagraphs().get(0);
-
-			if (numCell == 0) {
-				paragraph.setAlignment(ParagraphAlignment.LEFT);
-//				## [DIRECCIO - FOOTER-TITLE]
-				XWPFRun titolFooterRun = paragraph.createRun();
-				if (getPeuTitol() != null) {
-					titolFooterRun.addBreak();
-					titolFooterRun.setText(getPeuTitol());
-				}
-				titolFooterRun.setFontSize(9);
-				titolFooterRun.setFontFamily("Frutiger");
-				titolFooterRun.setColor("7f7f7f");
-			} else {
-//				## [LOGO]
-				paragraph.setAlignment(ParagraphAlignment.RIGHT);
-				paragraph.setSpacingBefore(2);
-				XWPFRun runLogo = paragraph.createRun();
-				if (getPeuLogo() != null) {
-					FileInputStream pictureInputStream = new FileInputStream(getPeuLogo());
-					int indexOfLastBar = getCapsaleraLogo().lastIndexOf("/") != -1 ? getPeuLogo().lastIndexOf("/")
-							: getCapsaleraLogo().lastIndexOf("\\");
-					String logoName = getPeuLogo().substring(indexOfLastBar + 1, getPeuLogo().length());
-					runLogo.addPicture(pictureInputStream, XWPFDocument.PICTURE_TYPE_JPEG, logoName, Units.toEMU(100),
-							Units.toEMU(60));
-//					pictureInputStream.close();
-				}
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void createTitle(XWPFDocument justificant) {
-		XWPFParagraph paragraph = null;
-		if (justificant.getParagraphs().get(0) != null && !justificant.getParagraphs().isEmpty())
-			paragraph = justificant.createParagraph();
-		else
-			paragraph = justificant.createParagraph();
-
-		paragraph.setAlignment(ParagraphAlignment.CENTER);
-		// ## style
-		XWPFRun run = paragraph.createRun();
-		run.setText(messageHelper.getMessage("es.caib.notib.justificant.titol"));
-		run.setFontSize(11);
-		run.setFontFamily("Frutiger");
-		run.setBold(true);
-		run.addCarriageReturn();
-		run.addBreak();
-	}
-
-	private void createIntroduction(XWPFDocument justificant, NotificacioDtoV2 notificacio) {
-		XWPFParagraph paragraph = justificant.createParagraph();
-		// ## introducció 1
-		XWPFRun runIntro = paragraph.createRun();
-		runIntro.setText(messageHelper.getMessage("es.caib.notib.justificant.introduccio", new Object[] {
-				notificacio.getEnviamentTipus().name(), notificacio.getConcepte(), notificacio.getCreatedDate().toString() }));
-		runIntro.setFontSize(10);
-		runIntro.setFontFamily("Calibri");
-		runIntro.addBreak();
-		// ## introducció 2
-		XWPFRun runIntroEnviaments = paragraph.createRun();
-		runIntroEnviaments.setText(messageHelper.getMessage("es.caib.notib.justificant.enviaments.titol",
-				new Object[] { notificacio.getEnviaments().size() }));
-		runIntroEnviaments.setFontSize(10);
-		runIntroEnviaments.setFontFamily("Calibri");
-		runIntroEnviaments.addBreak();
-	}
-
-	private void createTableEnviaments(
-			XWPFDocument justificant, 
+	private void crearTitolAndIntroduccio(
+			Document justificant, 
 			NotificacioDtoV2 notificacio, 
-			NotificacioEnviamentDtoV2 enviament,
-			int numEnviament) {
-		XWPFTable taulaEnviaments = crearTaulaEnviaments(justificant);
-
-		configurarTitolTaulaEnviaments(
-				taulaEnviaments, 
-				notificacio, 
-				numEnviament);
-
-		crearContingutTaulaEnviaments(
-				justificant, 
-				taulaEnviaments, 
-				notificacio, 
-				enviament, 
-				numEnviament);
+			ProgresDescarregaDto progres) throws JustificantException {
+		logger.debug("Creant el títol i la introducció del justificant d'enviament de la notificacio [notificacioId=" + notificacio.getId() + "]");
+		try {
+			//## [TAULA QUE CONTÉ TÍTOL I INTRODUCCIÓ]
+			PdfPTable titolIntroduccioTable = new PdfPTable(1);
+			titolIntroduccioTable.setWidthPercentage(100);
+			PdfPCell titolIntroduccioCell = new PdfPCell();
+			titolIntroduccioCell.setBorder(Rectangle.NO_BORDER);
+			
+			//## [TITOL JUSTIFICANT]
+			String titolMessage = messageHelper.getMessage("es.caib.notib.justificant.titol");
+			Paragraph justificantTitol = new Paragraph(titolMessage, frutigerTitolBold);
+			justificantTitol.setAlignment(Element.ALIGN_CENTER);
+			justificantTitol.add(Chunk.NEWLINE);
+			justificantTitol.add(Chunk.NEWLINE);
+			
+			//## [INTRODUCCIÓ JUSTIFICANT]
+			String introduccio = messageHelper.getMessage(
+					"es.caib.notib.justificant.introduccio", 
+					new Object[] {
+							messageHelper.getMessage("es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto." + notificacio.getEnviamentTipus().name()),
+							notificacio.getConcepte(),
+							getDateTimeFormatted(notificacio.getEnviaments().get(0).getNotificaEstatData())});
+			Paragraph justificantIntroduccio = new Paragraph();
+			setParametersBold(justificantIntroduccio, introduccio);
+			justificantIntroduccio.add(Chunk.NEWLINE);
+			
+			//## [INTRODUCCIÓ ENVIAMENTS JUSTIFICANT]
+			String introduccioEnviaments = messageHelper.getMessage("es.caib.notib.justificant.enviaments.titol", new Object[] {notificacio.getEnviaments().size()});
+			Paragraph justificantIntroduccioEnviaments = new Paragraph();
+			setParametersBold(justificantIntroduccioEnviaments, introduccioEnviaments);
+			justificantIntroduccioEnviaments.setSpacingBefore(10f);
+			
+			titolIntroduccioCell.addElement(justificantTitol);
+			titolIntroduccioCell.addElement(justificantIntroduccio);
+			titolIntroduccioCell.addElement(justificantIntroduccioEnviaments);
+			
+			titolIntroduccioTable.addCell(titolIntroduccioCell);
+			titolIntroduccioTable.setSpacingAfter(10f);
+			justificant.add(titolIntroduccioTable);
+		} catch (DocumentException ex) {
+			String errorMessage = "Hi ha hagut un error generant la introducció del justificant";
+			progres.setProgres(100);
+			progres.addInfo(TipusInfo.INFO, errorMessage);
+			logger.debug(errorMessage, ex);
+		}
 	}
 
-	private void configurarTitolTaulaEnviaments(XWPFTable taulaEnviaments, NotificacioDtoV2 notificacio,
-			int numEnviament) {
-		int twipsPerInch = 1440;
-//		## títol taula enviaments
-		XWPFTableRow tableTitleRow = taulaEnviaments.getRow(0);
-//		tableTitleRow.setHeight((int) (twipsPerInch * 3 / 10));
-		XWPFTableCell tableTitleCell = tableTitleRow.getCell(0);
-		tableTitleCell.setColor("a6a6a6");
-//		tableTitleCell.setVerticalAlignment(XWPFVertAlign.CENTER);
-
-//		## paràgraf cella
-		XWPFParagraph tableTitleCellParagraph = tableTitleCell.getParagraphs().get(0);
-		tableTitleCellParagraph.setAlignment(ParagraphAlignment.CENTER);
-//		tableTitleCellParagraph.setVerticalAlignment(TextAlignment.CENTER);
-
-//		## contingut cella
-		XWPFRun tableTitleRun = tableTitleCellParagraph.createRun();
-		tableTitleRun.setText(messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.titol",
-				new Object[] { numEnviament, notificacio.getEnviaments().size() }));
-		tableTitleRun.setFontSize(10);
-		tableTitleRun.setFontFamily("Calibri");
-		tableTitleRun.setBold(true);
-		tableTitleRun.setColor("ffffff");
-	}
-
-	private void crearContingutTaulaEnviaments(
-			XWPFDocument justificant,
-			XWPFTable taulaEnviaments,
+	private void crearTaulaEnviaments(
+			Document justificant, 
 			NotificacioDtoV2 notificacio,
-			NotificacioEnviamentDtoV2 enviament,
-			int numEnviament) {
+			NotificacioEnviamentDtoV2 enviament, 
+			int numEnviament,
+			ProgresDescarregaDto progres) throws JustificantException {
+		logger.debug("Generant la taula d'enviament del justificant d'enviament de l'enviament [enviamentId=" + enviament.getId() + "]");
 		try {
-			BigInteger styleNormalMarginId = createNewListStyle(justificant, false, false);
-			BigInteger styleDoubleMarginId = createNewListStyle(justificant, false, true);
-			BigInteger styleCustomTabId = createNewListStyle(justificant, true, false);
+			PdfPTable taulaEnviaments = new PdfPTable(1);
+			taulaEnviaments.setWidthPercentage(99f);
 			
-	//		## contignut taula enviaments
-			XWPFTableRow tableContentRow = taulaEnviaments.getRow(1);
-			XWPFTableCell tableContentCell = tableContentRow.getCell(0);
-	
-	//		## dades registre
-			XWPFParagraph tableDadesRegistreParagraph = tableContentCell.getParagraphs().get(0);
-			XWPFRun tableDadesRegistreRun = tableDadesRegistreParagraph.createRun();
-			tableDadesRegistreRun.setText(messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.registre"));
-			tableDadesRegistreRun.setFontSize(10);
-			tableDadesRegistreRun.setFontFamily("Calibri");
-			tableDadesRegistreRun.setBold(true);
+			//## [TÍTOL]
+			PdfPCell titolCell = getTitolEnviament(numEnviament, notificacio);
 			
-	//		## dades registre - número
-			XWPFParagraph tableDadesRegistreNumParagraph = tableContentCell.addParagraph();
-			tableDadesRegistreNumParagraph.setNumID(styleNormalMarginId);
-
-			XWPFRun tableDadesRegistreNumRun = tableDadesRegistreNumParagraph.createRun();
-			tableDadesRegistreNumRun.setText(
-					messageHelper.getMessage(
-							"es.caib.notib.justificant.enviaments.taula.dades.registre.numero",
-							new Object[] { enviament.getRegistreNumero() }));
-			tableDadesRegistreNumRun.setFontSize(10);
-			tableDadesRegistreNumRun.setFontFamily("Calibri");
+			//## [CONTINGUT]
+			PdfPCell contingut = getContingutEnviament(enviament);
 			
-	//		## dades registre - data
-			XWPFParagraph tableDadesRegistreDataParagraph = tableContentCell.addParagraph();
-			tableDadesRegistreDataParagraph.setNumID(styleNormalMarginId);
-			
-			XWPFRun tableDadesRegistreDataRun = tableDadesRegistreDataParagraph.createRun();
-			tableDadesRegistreDataRun.setText(
-					messageHelper.getMessage(
-							"es.caib.notib.justificant.enviaments.taula.dades.registre.data",
-							new Object[] { enviament.getRegistreData().toString() }));
-			tableDadesRegistreDataRun.setFontSize(10);
-			tableDadesRegistreDataRun.setFontFamily("Calibri");
-			tableDadesRegistreDataRun.addBreak();
-			
-	//		## dades notific@
-			XWPFParagraph tableDadesNotificaParagraph = tableContentCell.addParagraph();
-			XWPFRun tableDadesNotificaRun = tableDadesNotificaParagraph.createRun();
-			tableDadesNotificaRun.setText(messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.notifica"));
-			tableDadesNotificaRun.setFontSize(10);
-			tableDadesNotificaRun.setFontFamily("Calibri");
-			tableDadesNotificaRun.setBold(true);
-			tableDadesNotificaRun.addBreak();
-			
-//			## dades notific@ - identificador
-			XWPFParagraph tableDadesNotificaIdentParagraph = tableContentCell.addParagraph();
-			tableDadesNotificaIdentParagraph.setNumID(styleNormalMarginId);
-			
-			XWPFRun tableDadesNotificaIdentRun = tableDadesNotificaIdentParagraph.createRun();
-			tableDadesNotificaIdentRun.setText(
-					messageHelper.getMessage(
-							"es.caib.notib.justificant.enviaments.taula.dades.notifica.identificador",
-							new Object[] { enviament.getNotificaIdentificador() }));
-			tableDadesNotificaIdentRun.setFontSize(10);
-			tableDadesNotificaIdentRun.setFontFamily("Calibri");
-			
-//			## dades notific@ - estat
-			XWPFParagraph tableDadesNotificaEstatParagraph = tableContentCell.addParagraph();
-			tableDadesNotificaEstatParagraph.setNumID(styleNormalMarginId);
-			
-			XWPFRun tableDadesNotificaEstatRun = tableDadesNotificaEstatParagraph.createRun();
-			tableDadesNotificaEstatRun.setText(
-					messageHelper.getMessage(
-							"es.caib.notib.justificant.enviaments.taula.dades.notifica.estat",
-							new Object[] { notificacio.getEstat().name() }));
-			tableDadesNotificaEstatRun.setFontSize(10);
-			tableDadesNotificaEstatRun.setFontFamily("Calibri");
-			
-//			## dades notific@ - data
-			XWPFParagraph tableDadesNotificaDataParagraph = tableContentCell.addParagraph();
-			tableDadesNotificaDataParagraph.setNumID(styleNormalMarginId);
-			
-			XWPFRun tableDadesNotificaDataRun = tableDadesNotificaDataParagraph.createRun();
-			tableDadesNotificaDataRun.setText(
-					messageHelper.getMessage(
-							"es.caib.notib.justificant.enviaments.taula.dades.notifica.data",
-							new Object[] { enviament.getNotificaEstatData().toString() }));
-			tableDadesNotificaDataRun.setFontSize(10);
-			tableDadesNotificaDataRun.setFontFamily("Calibri");
-			tableDadesNotificaDataRun.addBreak();
-			
-	//		## interessats
-			XWPFParagraph tableDadesInteressatsParagraph = tableContentCell.addParagraph();
-			XWPFRun tableDadesInteressatsRun = tableDadesInteressatsParagraph.createRun();
-			tableDadesInteressatsRun.setText(messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessats"));
-			tableDadesInteressatsRun.setFontSize(10);
-			tableDadesInteressatsRun.setFontFamily("Calibri");
-			tableDadesInteressatsRun.setBold(true);
-			tableDadesInteressatsRun.addBreak();
-			
-	//		## interessats - titular
-			XWPFParagraph tableDadesTitularParagraph = tableContentCell.addParagraph();
-			tableDadesTitularParagraph.setNumID(styleCustomTabId);
-			
-			XWPFRun tableDadesTitularRun = tableDadesTitularParagraph.createRun();
-			tableDadesTitularRun.addTab();
-			tableDadesTitularRun.setText(messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.titular"));
-			tableDadesTitularRun.setFontSize(10);
-			tableDadesTitularRun.setFontFamily("Calibri");
-			tableDadesTitularRun.addBreak();
-			
-//			## interessats - titular - nom
-			XWPFParagraph tableDadesTitularNomParagraph = tableContentCell.addParagraph();
-			tableDadesTitularNomParagraph.setNumID(styleDoubleMarginId);
-			
-			XWPFRun tableDadesTitularNomRun = tableDadesTitularNomParagraph.createRun();
-			tableDadesTitularNomRun.setText(
-					messageHelper.getMessage(
-							"es.caib.notib.justificant.enviaments.taula.interessat.titular.nom",
-							new Object[] { enviament.getTitular().getNom() != null ? enviament.getTitular().getNom() : enviament.getTitular().getRaoSocial() }));
-			tableDadesTitularNomRun.setFontSize(10);
-			tableDadesTitularNomRun.setFontFamily("Calibri");
-			
-//			## interessats - titular - llinatges
-			XWPFParagraph tableDadesTitularLlintgParagraph = tableContentCell.addParagraph();
-			tableDadesTitularLlintgParagraph.setNumID(styleDoubleMarginId);
-			
-			XWPFRun tableDadesTitularLlintgRun = tableDadesTitularLlintgParagraph.createRun();
-			tableDadesTitularLlintgRun.setText(
-					messageHelper.getMessage(
-							"es.caib.notib.justificant.enviaments.taula.interessat.titular.llinatges",
-							new Object[] { enviament.getTitular().getLlinatges() }));
-			tableDadesTitularLlintgRun.setFontSize(10);
-			tableDadesTitularLlintgRun.setFontFamily("Calibri");
-			
-//			## interessats - titular - nif
-			XWPFParagraph tableDadesTitularNifParagraph = tableContentCell.addParagraph();
-			tableDadesTitularNifParagraph.setNumID(styleDoubleMarginId);
-			
-			XWPFRun tableDadesTitularNifRun = tableDadesTitularNifParagraph.createRun();
-			tableDadesTitularNifRun.setText(
-					messageHelper.getMessage(
-							"es.caib.notib.justificant.enviaments.taula.interessat.titular.nif",
-							new Object[] { enviament.getTitular().getNif() }));
-			tableDadesTitularNifRun.setFontSize(10);
-			tableDadesTitularNifRun.setFontFamily("Calibri");
-			
-//			## interessats - titular - dir3
-			XWPFParagraph tableDadesTitularDirParagraph = tableContentCell.addParagraph();
-			tableDadesTitularDirParagraph.setNumID(styleDoubleMarginId);
-			
-			XWPFRun tableDadesTitularDirRun = tableDadesTitularDirParagraph.createRun();
-			tableDadesTitularDirRun.setText(
-					messageHelper.getMessage(
-							"es.caib.notib.justificant.enviaments.taula.interessat.titular.dir3",
-							new Object[] { enviament.getTitular().getDir3Codi() }));
-			tableDadesTitularDirRun.setFontSize(10);
-			tableDadesTitularDirRun.setFontFamily("Calibri");
-			tableDadesTitularDirRun.addBreak();
-			
-	//		## interessats - destinataris
-			int destinatariNum = 1;
-			for (PersonaDto destinatari : enviament.getDestinataris()) {
-				//		## interessats - destinatari
-				XWPFParagraph tableDadesDestinatariParagraph = tableContentCell.addParagraph();
-				tableDadesDestinatariParagraph.setNumID(styleCustomTabId);
-				
-				XWPFRun tableDadesDestinatariRun = tableDadesDestinatariParagraph.createRun();
-				tableDadesDestinatariRun.addTab();
-				tableDadesDestinatariRun.setText(
-						messageHelper.getMessage(
-								"es.caib.notib.justificant.enviaments.taula.interessat.destinatari",
-								new Object[] {destinatariNum}));
-				tableDadesDestinatariRun.setFontSize(10);
-				tableDadesDestinatariRun.setFontFamily("Calibri");
-				
-//				## interessats - destinatari - nom
-				XWPFParagraph tableDadesDestinatariNomParagraph = tableContentCell.addParagraph();
-				tableDadesDestinatariNomParagraph.setNumID(styleDoubleMarginId);
-				
-				XWPFRun tableDadesDestinatariNomRun = tableDadesDestinatariNomParagraph.createRun();
-				tableDadesDestinatariNomRun.setText(
-						messageHelper.getMessage(
-								"es.caib.notib.justificant.enviaments.taula.interessat.destinatari.nom",
-								new Object[] { destinatari.getNom() != null ? destinatari.getNom() : destinatari.getRaoSocial() }));
-				tableDadesDestinatariNomRun.setFontSize(10);
-				tableDadesDestinatariNomRun.setFontFamily("Calibri");
-				
-//				## interessats - destinatari - llinatges
-				XWPFParagraph tableDadesDestinatariLlintgParagraph = tableContentCell.addParagraph();
-				tableDadesDestinatariLlintgParagraph.setNumID(styleDoubleMarginId);
-				
-				XWPFRun tableDadesDestinatariLlintgRun = tableDadesDestinatariLlintgParagraph.createRun();
-				tableDadesDestinatariLlintgRun.setText(
-						messageHelper.getMessage(
-								"es.caib.notib.justificant.enviaments.taula.interessat.destinatari.llinatges",
-								new Object[] { destinatari.getLlinatges() }));
-				tableDadesDestinatariLlintgRun.setFontSize(10);
-				tableDadesDestinatariLlintgRun.setFontFamily("Calibri");
-				
-//				## interessats - destinatari - nif
-				XWPFParagraph tableDadesDestinatariNifParagraph = tableContentCell.addParagraph();
-				tableDadesDestinatariNifParagraph.setNumID(styleDoubleMarginId);
-				
-				XWPFRun tableDadesDestinatariNifRun = tableDadesDestinatariNifParagraph.createRun();
-				tableDadesDestinatariNifRun.setText(
-						messageHelper.getMessage(
-								"es.caib.notib.justificant.enviaments.taula.interessat.destinatari.nif",
-								new Object[] { destinatari.getNif() }));
-				tableDadesDestinatariNifRun.setFontSize(10);
-				tableDadesDestinatariNifRun.setFontFamily("Calibri");
-				
-//				## interessats - destinatari - dir3
-				XWPFParagraph tableDadesDestinatariDirParagraph = tableContentCell.addParagraph();
-				tableDadesDestinatariDirParagraph.setNumID(styleDoubleMarginId);
-				
-				XWPFRun tableDadesDestinatariDirRun = tableDadesDestinatariDirParagraph.createRun();
-				tableDadesDestinatariDirRun.setText(
-						messageHelper.getMessage(
-								"es.caib.notib.justificant.enviaments.taula.interessat.destinatari.dir3",
-								new Object[] { destinatari.getDir3Codi() }));
-				tableDadesDestinatariDirRun.setFontSize(10);
-				tableDadesDestinatariDirRun.setFontFamily("Calibri");
-				tableDadesDestinatariRun.addBreak();
-				destinatariNum++;
-			}
-			
-		} catch (Exception e) {
-			// TODO: handle exception
+			taulaEnviaments.addCell(titolCell);
+			taulaEnviaments.addCell(contingut);
+			justificant.add(taulaEnviaments);
+			justificant.add(Chunk.NEXTPAGE);
+		} catch (Exception ex) {
+			String errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.generant.taula.enviament.error");
+			progres.setProgres(100);
+			progres.addInfo(TipusInfo.INFO, errorMessage);
+			logger.debug(errorMessage, ex);
 		}
 	}
 	
-	private BigInteger createNewListStyle(
-			XWPFDocument doc,
-			boolean isTab,
-			boolean doubleTab) {
-        try {
-        	String listStyle = null;
-        	if (isTab) {
-        		listStyle = getListCustomTab();
-        	} else if(!isTab && !doubleTab) {
-        		listStyle = getNormalListStyle('-');
-        	} else if(!isTab && doubleTab) {
-        		listStyle = getDoubleListStyle('-');
-        	}
-        	
-        	CTNumbering cTNumbering = CTNumbering.Factory.parse(listStyle);
-        	CTAbstractNum cTAbstractNum = cTNumbering.getAbstractNumArray(0);
-        	XWPFAbstractNum abstractNum1 = new XWPFAbstractNum(cTAbstractNum);
-        	  
-        	XWPFNumbering numbering = doc.createNumbering();
-        	
-        	BigInteger abstractNumID1 = numbering.addAbstractNum(abstractNum1);
-        	BigInteger numID = numbering.addNum(abstractNumID1);
-            return numID;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-	
-	private static String getNormalListStyle(char simbol) {
-		String style = "<w:abstractNum xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" w:abstractNumId=\"0\">\r\n" + 
-				"		<w:nsid w:val=\"732069B6\"/>\r\n" + 
-				"		<w:multiLevelType w:val=\"singleLevel\"/>\r\n" + 
-				"		<w:tmpl w:val=\"033EE1DA\"/>\r\n" + 
-				"		<w:lvl w:ilvl=\"0\" w:tplc=\"F7342CAA\">\r\n" + 
-				"			<w:numFmt w:val=\"bullet\"/>\r\n" + 
-				"			<w:lvlText w:val=\"" + simbol + "\"/>\r\n" + 
-				"			<w:lvlJc w:val=\"left\"/>\r\n" + 
-				"			<w:pPr>\r\n" + 
-				"				<w:ind w:left=\"720\" w:hanging=\"360\"/>\r\n" + 
-				"			</w:pPr>\r\n" + 
-				"			<w:rPr>\r\n" + 
-				"				<w:rFonts w:ascii=\"Calibri\" w:eastAsiaTheme=\"minorHAnsi\" w:hAnsi=\"Calibri\" w:cs=\"Calibri\" w:hint=\"default\"/>\r\n" + 
-				"			</w:rPr>\r\n" + 
-				"		</w:lvl>\r\n" + 
-				"	</w:abstractNum>";
-		return style;
+	private PdfPCell getTitolEnviament(int numEnviament, NotificacioDtoV2 notificacio) {
+		logger.debug("Generant el títol de la taula d'enviament del justificant d'enviament de la notificació [notificacioId=" + notificacio.getId() + "]");
+		PdfPCell titolCell = new PdfPCell();
+		String titolEnviamentMessage = messageHelper.getMessage(
+				"es.caib.notib.justificant.enviaments.taula.titol", 
+				new Object[] {
+						numEnviament, 
+						notificacio.getEnviaments().size()});
+		Paragraph titolParagraph = new Paragraph(titolEnviamentMessage, calibriWhiteBold);
+		titolParagraph.setAlignment(Element.ALIGN_CENTER);
+		titolCell.addElement(titolParagraph);
+		titolCell.setPaddingBottom(6f);
+		titolCell.setBackgroundColor(new BaseColor(166, 166, 166));
+		titolCell.setBorderWidth((float) 0.5);
+		titolCell.setBorderColor(new BaseColor(166, 166, 166));
+		return titolCell;
 	}
 	
-	private static String getDoubleListStyle(char simbol) {
-		String style = "<w:abstractNum xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" w:abstractNumId=\"1\">\r\n" + 
-				"		<w:nsid w:val=\"732069B6\"/>\r\n" + 
-				"		<w:multiLevelType w:val=\"singleLevel\"/>\r\n" + 
-				"		<w:tmpl w:val=\"033EE1DA\"/>\r\n" + 
-				"		<w:lvl w:ilvl=\"0\" w:tplc=\"F7342CAA\">\r\n" + 
-				"			<w:numFmt w:val=\"bullet\"/>\r\n" + 
-				"			<w:lvlText w:val=\"" + simbol + "\"/>\r\n" + 
-				"			<w:lvlJc w:val=\"left\"/>\r\n" + 
-				"			<w:pPr>\r\n" + 
-				"				<w:ind w:left=\"1100\" w:hanging=\"360\"/>\r\n" + 
-				"			</w:pPr>\r\n" + 
-				"			<w:rPr>\r\n" + 
-				"				<w:rFonts w:ascii=\"Calibri\" w:eastAsiaTheme=\"minorHAnsi\" w:hAnsi=\"Calibri\" w:cs=\"Calibri\" w:hint=\"default\"/>\r\n" + 
-				"			</w:rPr>\r\n" + 
-				"		</w:lvl>\r\n" + 
-				"	</w:abstractNum>";
-		return style;
-	}
-	
-	private static String getListCustomTab() {
-		String style = "<w:abstractNum xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" w:abstractNumId=\"2\">\r\n" + 
-				"		<w:nsid w:val=\"732069B6\"/>\r\n" + 
-				"		<w:multiLevelType w:val=\"singleLevel\"/>\r\n" + 
-				"		<w:tmpl w:val=\"033EE1DA\"/>\r\n" + 
-				"		<w:lvl w:ilvl=\"0\" w:tplc=\"F7342CAA\">\r\n" + 
-				"			<w:numFmt w:val=\"bullet\"/>\r\n" + 
-				"			<w:lvlJc w:val=\"left\"/>\r\n" + 
-				"			<w:lvlText w:val=\"\"/>\r\n" + 
-				"			<w:pPr>\r\n" + 
-				"				<w:ind w:left=\"310\" w:hanging=\"360\"/>\r\n" + 
-				"			</w:pPr>\r\n" + 
-				"			<w:rPr>\r\n" + 
-				"				<w:rFonts w:ascii=\"Calibri\" w:eastAsiaTheme=\"minorHAnsi\" w:hAnsi=\"Calibri\" w:cs=\"Calibri\" w:hint=\"default\"/>\r\n" + 
-				"			</w:rPr>\r\n" + 
-				"		</w:lvl>\r\n" + 
-				"	</w:abstractNum>";
-		return style;
-	}
+	private PdfPCell getContingutEnviament(NotificacioEnviamentDtoV2 enviament) {
+		logger.debug("Generant el contingut de la taula d'enviament del justificant d'enviament de l'enviament [enviamentId=" + enviament.getId() + "]");
+		PdfPCell contingutCell = new PdfPCell();
+		// ## [DADES REGISTRE - TÍTOL]
+		Paragraph dadesRegistreTitol = new Paragraph(messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.registre"), calibri10Bold);
+		dadesRegistreTitol.setAlignment(Element.ALIGN_LEFT);
 
-	private XWPFDocument getDocumentFormatted() throws XmlException {
-		XWPFDocument justificant = null;
-		try {
-			justificant = recuperarPlantilla();
-			double twipsPerInch = 1440;
-			CTSectPr sectPr = justificant.getDocument().getBody().getSectPr();
-			CTPageMar pageMargin = sectPr.getPgMar();
-
-			pageMargin.setHeader(BigInteger.valueOf((long) (0.472441 * twipsPerInch))); // 1.00cm
-			pageMargin.setLeft(BigInteger.valueOf((long) (0.590551 * twipsPerInch))); // 1.50cm
-			pageMargin.setRight(BigInteger.valueOf((long) (0.393701 * twipsPerInch))); // 1.00cm
-			pageMargin.setFooter(BigInteger.valueOf((long) (0.1732283 * twipsPerInch))); // 0.44cm
-
-			CTStyles ctStyle = CTStyles.Factory.parse(recuperarEstils());
-		    XWPFStyles styles = justificant.createStyles();
-		    styles.setStyles(ctStyle);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		// ## [DADES REGISTRE - CONTINGUT]
+		Paragraph dadesRegistre = new Paragraph();
+		List listRegistre = new List(List.UNORDERED);
+		// ## [DADES REGISTRE - NÚMERO]
+		String numRegistreMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.registre.numero", new Object[] {enviament.getRegistreNumeroFormatat()});
+		Chunk dadesRegistreNumeroChunk = new Chunk(numRegistreMessage, calibri10);
+		// ## [DADES REGISTRE - DATA]
+		String dataRegistreMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.registre.data", new Object[] {getDateTimeFormatted(enviament.getRegistreData())});
+		Chunk dadesRegistreDataChunk = new Chunk(dataRegistreMessage, calibri10);
+		
+		//## [CREACIÓ LLISTA REGISTRE] ####
+		listRegistre.add(new ListItem(dadesRegistreNumeroChunk));
+		listRegistre.add(new ListItem(dadesRegistreDataChunk));
+		listRegistre.setIndentationLeft(16f);
+		dadesRegistre.setSpacingBefore(10f);
+		dadesRegistre.setSpacingAfter(10f);
+        dadesRegistre.add(listRegistre);
+        
+        // ## [DADES NOTIFICA]
+        String dadesNotificaMessage = messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.notifica");
+     	Paragraph dadesNotificaTitol = new Paragraph(dadesNotificaMessage, calibri10Bold);
+     	dadesNotificaTitol.setAlignment(Element.ALIGN_LEFT);
+     	
+     	// ## [DADES NOTIFICA - CONTINGUT]
+     	Paragraph dadesNotifica = new Paragraph();
+     	List listNotifica = new List(List.UNORDERED);
+     	// ## [DADES NOTIFICA - IDENTIFICADOR]
+     	String dadesNotificaIdentificador = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.notifica.identificador", new Object[] {enviament.getNotificaIdentificador()});
+     	Chunk dadesNotificaIdentChunk = new Chunk(dadesNotificaIdentificador, calibri10);
+     	// ## [DADES NOTIFICA - ESTAT]
+     	String dadesNotificaEstat = "   " + messageHelper.getMessage(
+     			"es.caib.notib.justificant.enviaments.taula.dades.notifica.estat", 
+     			new Object[] {
+     					messageHelper.getMessage("es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto." + enviament.getNotificaEstat().name())});
+     	Chunk dadesNotificaEstatChunk = new Chunk(dadesNotificaEstat, calibri10);
+     	// ## [DADES NOTIFICA - DATA]
+     	String dadesNotificaData = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.notifica.data", new Object[] {getDateTimeFormatted(enviament.getNotificaEstatData())});
+     	Chunk dadesNotificaDataChunk = new Chunk(dadesNotificaData, calibri10);
+     	
+     	//## [CREACIÓ LLISTA NOTIFIC@] ####
+     	listNotifica.add(new ListItem(dadesNotificaIdentChunk));
+     	listNotifica.add(new ListItem(dadesNotificaEstatChunk));
+     	listNotifica.add(new ListItem(dadesNotificaDataChunk));
+     	listNotifica.setIndentationLeft(16f);
+     	dadesNotifica.setSpacingBefore(10f);
+     	dadesNotifica.setSpacingAfter(10f);
+        dadesNotifica.add(listNotifica);
+            
+        // ## [DADES INTERESSATS]
+     	Paragraph dadesInteressatsTitol = new Paragraph(messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessats"), calibri10Bold);
+     	dadesInteressatsTitol.setAlignment(Element.ALIGN_LEFT);
+     	
+     	// ## [DADES INTERESSATS - TITULAR]
+     	Paragraph dadesInteressatsTitularTitol = new Paragraph(messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.titular"), calibri10);
+     	dadesInteressatsTitularTitol.setAlignment(Element.ALIGN_LEFT);
+     	dadesInteressatsTitularTitol.setIndentationLeft(16f);
+     	dadesInteressatsTitularTitol.setSpacingBefore(10f);
+     	PersonaDto titular = enviament.getTitular();
+     	
+     	Paragraph dadesTitular = new Paragraph();
+     	List listTitular = new List(List.UNORDERED);
+     	String titularNomMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.titular.nom", new Object[] {getNomInteressat(titular)});
+     	Chunk dadesTitularNomChunk = new Chunk(titularNomMessage, calibri10);
+     	String titularLlintgMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.titular.llinatges", new Object[] {titular.getLlinatges()});
+     	Chunk dadesTitularLlintgChunk = new Chunk(titularLlintgMessage, calibri10);
+     	String titularNifMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.titular.nif", new Object[] {titular.getNif()});
+     	Chunk dadesTitularNifChunk = new Chunk(titularNifMessage, calibri10);
+     	String titularDir3Message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.titular.dir3", new Object[] {titular.getDir3Codi()});
+     	Chunk dadesTitularDir3Chunk = new Chunk(titularDir3Message, calibri10);
+     	
+     	//## [CREACIÓ LLISTA TITULAR] ####
+     	listTitular.add(new ListItem(dadesTitularNomChunk));
+     	if (titular.getInteressatTipus().equals(InteressatTipusEnumDto.FISICA))
+     		listTitular.add(new ListItem(dadesTitularLlintgChunk));
+     	listTitular.add(new ListItem(dadesTitularNifChunk));
+     	if (titular.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO))
+     		listTitular.add(new ListItem(dadesTitularDir3Chunk));
+     	listTitular.setIndentationLeft(35f);
+     	dadesTitular.setSpacingBefore(10f);
+     	dadesTitular.add(listTitular);
+        
+     	contingutCell.addElement(dadesRegistreTitol);
+     	contingutCell.addElement(dadesRegistre);
+     	contingutCell.addElement(dadesNotificaTitol);
+     	contingutCell.addElement(dadesNotifica);
+     	contingutCell.addElement(dadesInteressatsTitol);
+     	contingutCell.addElement(dadesInteressatsTitularTitol);
+     	contingutCell.addElement(dadesTitular);
+     	
+        //## [DADES INTERESSATS - DESTINATARIS]
+        int numDestinatari = 1;
+        for (PersonaDto destinatari : enviament.getDestinataris()) {
+     		// ## [DADES INTERESSATS - DESTINATARI]
+        	String dadesInteressatsDestinatariMessage = messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.destinatari", new Object[] {numDestinatari});
+         	Paragraph dadesInteressatsDestinatariTitol = new Paragraph(dadesInteressatsDestinatariMessage, calibri10);
+         	dadesInteressatsDestinatariTitol.setAlignment(Element.ALIGN_LEFT);
+         	dadesInteressatsDestinatariTitol.setIndentationLeft(16f);
+         	dadesInteressatsDestinatariTitol.setSpacingBefore(10f);
+         	
+         	Paragraph dadesDestinatari = new Paragraph();
+         	List listDestinatari = new List(List.UNORDERED);
+         	String destinatariNomMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.destinatari.nom", new Object[] {getNomInteressat(destinatari)});
+         	Chunk dadesDestinatariNomChunk = new Chunk(destinatariNomMessage, calibri10);
+         	String destinatariLlintgMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.destinatari.llinatges", new Object[] {destinatari.getLlinatges()});
+         	Chunk dadesDestinatariLlintgChunk = new Chunk(destinatariLlintgMessage, calibri10);
+         	String destinatariNifMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.destinatari.nif", new Object[] {destinatari.getNif()});
+         	Chunk dadesDestinatariNifChunk = new Chunk(destinatariNifMessage, calibri10);
+         	String destinatariDir3Message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.destinatari.dir3", new Object[] {destinatari.getDir3Codi()});
+         	Chunk dadesDestinatariDir3Chunk = new Chunk(destinatariDir3Message, calibri10);
+         	
+         	//## [CREACIÓ LLISTA DESTINATARI] ####
+         	listDestinatari.add(new ListItem(dadesDestinatariNomChunk));
+         	if (destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.FISICA))
+         		listDestinatari.add(new ListItem(dadesDestinatariLlintgChunk));
+         	listDestinatari.add(new ListItem(dadesDestinatariNifChunk));
+         	if (destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO))
+         		listDestinatari.add(new ListItem(dadesDestinatariDir3Chunk));
+         	listDestinatari.setIndentationLeft(35f);
+         	dadesDestinatari.setSpacingBefore(10f);
+         	dadesDestinatari.add(listDestinatari);
+         	
+         	contingutCell.addElement(dadesInteressatsDestinatariTitol);
+         	contingutCell.addElement(dadesDestinatari);
+         	numDestinatari++;
 		}
+
+        //## [CONFIGURACIÓ CELLA CONTINGUT]
+     	contingutCell.setPaddingLeft(7f);
+     	contingutCell.setPaddingBottom(15f);
+        contingutCell.setBorderWidth((float) 0.5);
+        contingutCell.setBorderColor(new BaseColor(166, 166, 166));
+		return contingutCell;
+	}
+
+	private Document inicialitzaDocument(
+			ByteArrayOutputStream out,
+			ProgresDescarregaDto progres) throws DocumentException, JustificantException {
+		logger.debug("Inicialitzant el document per la generació del justificant d'enviament");
+		//## [Event per crear el header]
+		HeaderPageEvent headerEvent = new HeaderPageEvent(progres);
+		//## [Event per crear el footer]
+		FooterPageEvent footerEvent = new FooterPageEvent(progres);
+		
+	    Document justificant = new Document(PageSize.A4, 36, 36, 35 + headerEvent.getTableHeight(), 36);
+		PdfWriter writer = PdfWriter.getInstance(justificant, out);
+		writer.setViewerPreferences(PdfWriter.ALLOW_PRINTING);
+		
+		writer.setPageEvent(headerEvent);
+		writer.setPageEvent(footerEvent);
+		
+		justificant.open();
+		justificant.addAuthor("Notib");
+		justificant.addCreationDate();
+		justificant.addCreator("iText library");
+
 		return justificant;
 	}
+	
+	private class HeaderPageEvent extends PdfPageEventHelper {
+		private PdfPTable header;
+		private float tableHeight;
+	    
+		
+	    public float getTableHeight() {
+			return tableHeight;
+		}
 
-	private static XWPFTable crearTaulaEnviaments(XWPFDocument justificant) {
-		// ## configuració inicial taula
-		int twipsPerInch = 1440;
-		double inches = 7.08661; // 18.00cm
-		XWPFTable tableEnviaments = justificant.createTable(2, 1);
-		tableEnviaments.getCTTbl().addNewTblGrid().addNewGridCol().setW(BigInteger.valueOf((long) (inches * twipsPerInch)));
-		tableEnviaments.setCellMargins(110, 110, 110, 110);
-		setTableBorderColor(tableEnviaments, "a6a6a6");
-		return tableEnviaments;
-	}
+		public void onEndPage(PdfWriter writer, Document justificant) {
+			header.writeSelectedRows(
+					0, 
+					-1,
+					justificant.left(),
+					750 + ((justificant.topMargin() + tableHeight) / 2),
+                    writer.getDirectContent());
+	    }
+	    
+		private HeaderPageEvent(ProgresDescarregaDto progres) throws JustificantException {
+			String accioDescripcio = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.header");
+			logger.debug(accioDescripcio);
+			progres.setProgres(15);
+			progres.addInfo(TipusInfo.INFO, accioDescripcio);
+			try {
+				PdfPCell cellDireccio = new PdfPCell();
+				header = new PdfPTable(2);
+				header.setTotalWidth(523);
+				header.setLockedWidth(true);
+				
+				if (getCapsaleraLogo() != null) {
+	 				// ## [LOGO ENTITAT]
+					Image logoEntitat = Image.getInstance(getCapsaleraLogo());
+	//				logoEntitat.setScaleToFitHeight(true);
+	//				logoEntitat.scaleToFit(200, 80);
+					PdfPCell cellLogo = new PdfPCell(logoEntitat);
+					cellLogo.setHorizontalAlignment(Element.ALIGN_LEFT);
+					cellLogo.setBorder(Rectangle.NO_BORDER);
+					header.addCell(cellLogo);
+				}
+				if (getNifDireccio() != null) {
+					// ## [DIRECCIO - NIF]
+					Paragraph direccioNif = new Paragraph(getNifDireccio(), frutiger8);
+					direccioNif.setAlignment(Element.ALIGN_RIGHT);
+					direccioNif.setLeading(0, (float) 1.25);
+					cellDireccio.addElement(direccioNif);
+				}
+				if (getCodiDireccio() != null) {
+					// ## [DIRECCIO - CODIDIR3]
+					Paragraph direccioCodi = new Paragraph(getCodiDireccio(), frutiger8);
+					direccioCodi.setAlignment(Element.ALIGN_RIGHT);
+					direccioCodi.setLeading(0, (float) 1.25);
+					cellDireccio.addElement(direccioCodi);
+				}
+				if (getDireccio() != null) {
+					// ## [DIRECCIO - CARRER]
+					Paragraph direccio = new Paragraph(getDireccio(), frutiger8);
+					direccio.setAlignment(Element.ALIGN_RIGHT);
+					direccio.setLeading(0, (float) 1.25);
+					cellDireccio.addElement(direccio);
+				}
+				if (getEmailDireccio() != null) {
+					// ## [DIRECCIO - EMAIL]
+					Chunk direccioEmailChunk = new Chunk(getEmailDireccio(), frutiger8);
+					direccioEmailChunk.setUnderline(1.5f, -1);
+					Paragraph direccioEmail = new Paragraph(direccioEmailChunk);
+					direccioEmail.setAlignment(Element.ALIGN_RIGHT);
+					direccioEmail.setLeading(0, (float) 1.25);
+					cellDireccio.addElement(direccioEmail);
+				}
 
-	private static void setTableBorderColor(XWPFTable table, String color) {
-
-		table.getCTTbl().getTblPr().getTblBorders().getBottom().setColor(color);
-		table.getCTTbl().getTblPr().getTblBorders().getTop().setColor(color);
-		table.getCTTbl().getTblPr().getTblBorders().getLeft().setColor(color);
-		table.getCTTbl().getTblPr().getTblBorders().getRight().setColor(color);
-		table.getCTTbl().getTblPr().getTblBorders().getInsideH().setColor(color);
-		table.getCTTbl().getTblPr().getTblBorders().getInsideV().setColor(color);
-
-		table.getCTTbl().getTblPr().getTblBorders().getRight().setSz(BigInteger.valueOf(6));
-		table.getCTTbl().getTblPr().getTblBorders().getTop().setSz(BigInteger.valueOf(6));
-		table.getCTTbl().getTblPr().getTblBorders().getLeft().setSz(BigInteger.valueOf(6));
-		table.getCTTbl().getTblPr().getTblBorders().getBottom().setSz(BigInteger.valueOf(6));
-		table.getCTTbl().getTblPr().getTblBorders().getInsideH().setSz(BigInteger.valueOf(6));
-		table.getCTTbl().getTblPr().getTblBorders().getInsideV().setSz(BigInteger.valueOf(6));
+				cellDireccio.setHorizontalAlignment(Element.ALIGN_RIGHT);
+				cellDireccio.setVerticalAlignment(Element.ALIGN_MIDDLE);
+				cellDireccio.setBorder(Rectangle.NO_BORDER);
+				header.addCell(cellDireccio);
+				tableHeight = header.getTotalHeight();
+			} catch (Exception ex) {
+				String errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.header.error");
+				progres.setProgres(100);
+				progres.addInfo(TipusInfo.ERROR, errorMessage);
+				logger.error(errorMessage, ex);
+			}
+		}
 	}
 	
-	private static void removeTableBorder(XWPFTable table) {
-		table.getCTTbl().getTblPr().getTblBorders().getRight().setSz(BigInteger.valueOf(0));
-		table.getCTTbl().getTblPr().getTblBorders().getTop().setSz(BigInteger.valueOf(0));
-		table.getCTTbl().getTblPr().getTblBorders().getLeft().setSz(BigInteger.valueOf(0));
-		table.getCTTbl().getTblPr().getTblBorders().getBottom().setSz(BigInteger.valueOf(0));
-		table.getCTTbl().getTblPr().getTblBorders().getInsideH().setSz(BigInteger.valueOf(0));
-		table.getCTTbl().getTblPr().getTblBorders().getInsideV().setSz(BigInteger.valueOf(0));
+	private class FooterPageEvent extends PdfPageEventHelper {
+		private PdfPTable footer;
+
+		public void onEndPage(PdfWriter writer, Document justificant) {
+			footer.writeSelectedRows(
+					0, 
+					-1, 
+					36, 
+					80, 
+					writer.getDirectContent());
+	    }
+	    
+		private FooterPageEvent(ProgresDescarregaDto progres) throws JustificantException {
+			String accioDescripcio = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.footer");
+			logger.debug(accioDescripcio);
+			progres.setProgres(20);
+			progres.addInfo(TipusInfo.INFO, accioDescripcio);
+			try {
+				footer = new PdfPTable(2);
+				footer.setTotalWidth(523);
+				footer.setLockedWidth(true);
+
+				if (getPeuTitol() != null) {
+					// ## [PEU - TÍTOL]
+					Paragraph direccioNif = new Paragraph(getPeuTitol(), frutiger9);
+					direccioNif.setAlignment(Element.ALIGN_LEFT);
+	
+					PdfPCell cellDireccio = new PdfPCell();
+					cellDireccio.addElement(direccioNif);
+					cellDireccio.setVerticalAlignment(Element.ALIGN_MIDDLE);
+					cellDireccio.setBorder(Rectangle.NO_BORDER);
+					footer.addCell(cellDireccio);
+				}
+				if (getPeuLogo() != null) {
+					// ## [PEU - LOGO]
+					Image logoPeu = Image.getInstance(getPeuLogo());
+					logoPeu.setScaleToFitHeight(true);
+					logoPeu.scaleToFit(100, 80);
+					PdfPCell cellLogo = new PdfPCell(logoPeu);
+					cellLogo.setHorizontalAlignment(Element.ALIGN_RIGHT);
+					cellLogo.setBorder(Rectangle.NO_BORDER);
+					footer.addCell(cellLogo);
+				}
+			} catch (Exception ex) {
+				String errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.footer.error");
+				progres.setProgres(100);
+				progres.addInfo(TipusInfo.ERROR, errorMessage);
+				logger.error(errorMessage, ex);
+			}
+		}
 	}
 	
-	private void checkAndFormatCell(XWPFTableCell cell, double d) {
-		int twipsPerInch = 1440;
-		if (cell.getCTTc().getTcPr() == null)
-			cell.getCTTc().addNewTcPr();
-		if (cell.getCTTc().getTcPr().getTcW() == null)
-			cell.getCTTc().getTcPr().addNewTcW();
-		cell.getCTTc().getTcPr().getTcW().setType(STTblWidth.DXA);
-		cell.getCTTc().getTcPr().getTcW().setW(BigInteger.valueOf((long) (d * twipsPerInch)));
+	//TODO millorar
+	private void setParametersBold(Paragraph paragraph, String content) {
+		Chunk cacacter = new Chunk();
+		for (int i = 0; i < content.length(); i++) {
+			if (content.charAt(i) == '[') {
+				while (content.charAt(i + 1) != ']') {
+					cacacter = new Chunk(String.valueOf(content.charAt(i + 1)), calibri10Bold);
+					paragraph.add(cacacter);
+					i++;
+					continue;
+				}
+			} else {
+				if (content.charAt(i) != '[' && content.charAt(i) != ']') {
+					cacacter = new Chunk(String.valueOf(content.charAt(i)), calibri10);
+					paragraph.add(cacacter);
+				}
+			}
+		}
 	}
 	
-	private InputStream recuperarEstils() throws IOException {
-		return getClass().getResourceAsStream("/es/caib/notib/core/plantilles/styles.xml");
+	private String getNomInteressat(PersonaDto persona)  {
+		switch (persona.getInteressatTipus()) {
+		case FISICA:
+			return persona.getNom();
+		case ADMINISTRACIO:
+			return persona.getNom();
+		case JURIDICA:
+			return persona.getRaoSocial() != null ? persona.getRaoSocial() : persona.getNom();
+		default:
+			return persona.getRaoSocial();
+		}
 	}
 	
-	private XWPFDocument recuperarPlantilla() throws IOException {
-		return new XWPFDocument(
-				getClass().getResourceAsStream("/es/caib/notib/core/plantilles/plantilla_justificante.docx"));
+	private String getDateTimeFormatted(Date date)  {
+		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		long now = date.getTime();
+		return formatter.format(now);
 	}
 
 	private String getDireccio() {
@@ -765,4 +560,6 @@ public class JustificantHelper {
 	private String getPeuTitol() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.peu.titol");
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(JustificantHelper.class);
 }

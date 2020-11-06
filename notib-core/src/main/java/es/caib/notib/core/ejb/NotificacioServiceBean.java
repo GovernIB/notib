@@ -26,8 +26,10 @@ import es.caib.notib.core.api.dto.NotificacioRegistreErrorFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
+import es.caib.notib.core.api.dto.ProgresDescarregaDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
+import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.NotificacioService;
@@ -314,8 +316,14 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"tothom"})
-	public FitxerDto recuperarJustificant(Long notificacioId) {
-		return delegate.recuperarJustificant(notificacioId);
+	public FitxerDto recuperarJustificant(Long notificacioId, Long entitatId) throws JustificantException {
+		return delegate.recuperarJustificant(notificacioId, entitatId);
+	}
+
+	@Override
+	@RolesAllowed({"tothom"})
+	public ProgresDescarregaDto justificantEstat() throws JustificantException {
+		return delegate.justificantEstat();
 	}
 
 }

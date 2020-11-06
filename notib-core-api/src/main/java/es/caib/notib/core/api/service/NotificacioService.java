@@ -22,8 +22,10 @@ import es.caib.notib.core.api.dto.NotificacioRegistreErrorFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
+import es.caib.notib.core.api.dto.ProgresDescarregaDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
+import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 /**
@@ -294,9 +296,25 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public void reactivarRegistre(Long notificacioId);
 
+	/**
+	 * Genera un justificant d'enviament
+	 * 
+	 * @param notificacioId
+	 *            Atribut id de la notificació.
+	 * @return el justificant firmat
+	 * @throws JustificantException
+	 */
 	@PreAuthorize("hasRole('tothom')")
-	public FitxerDto recuperarJustificant(Long notificacioId);
+	public FitxerDto recuperarJustificant(Long notificacioId, Long entitatId) throws JustificantException;
 
+	/**
+	 * Recuperar l'estat de la generació del justificant
+	 * 
+	 * @return el justificant firmat
+	 * @throws JustificantException
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public ProgresDescarregaDto justificantEstat() throws JustificantException;
 
 //	void registrarEnviamentsPendents();
 //	void notificaEnviamentsRegistrats();

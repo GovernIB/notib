@@ -26,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,12 +57,16 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
 import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.ProgresDescarregaDto;
+import es.caib.notib.core.api.dto.ProgresDescarregaDto.TipusInfo;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
+import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
@@ -82,6 +88,7 @@ import es.caib.notib.core.helper.CreacioSemaforDto;
 import es.caib.notib.core.helper.EmailHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.JustificantHelper;
+import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.OrganigramaHelper;
@@ -160,6 +167,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private MetricsHelper metricsHelper;
 	@Autowired
 	private JustificantHelper justificantHelper;
+	@Autowired
+	private MessageHelper messageHelper;
+	
+	public static Map<String, ProgresDescarregaDto> progresDescarrega = new HashMap<String, ProgresDescarregaDto>();
 	
 	@Transactional(rollbackFor=Exception.class)
 	@Override
@@ -746,6 +757,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 								notificacio.setErrorLastEvent(true);
 							}
 						}
+					}
+					
+					List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacio(notificacio);
+					if (enviamentsPendents != null && ! enviamentsPendents.isEmpty()) {
+						notificacio.setHasEnviamentsPendents(true);
 					}
 				}	
 			}
@@ -1433,40 +1449,91 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Transactional
 	@Override
-	public FitxerDto recuperarJustificant(Long notificacioId) {
+	public FitxerDto recuperarJustificant(
+			Long notificacioId,
+			Long entitatId) throws JustificantException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Recuperant el justificant de la notificacio (notificacioId=" + notificacioId + ")");
 			NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
-			byte[] contingut = justificantHelper.generarJustificant(
-					conversioTipusHelper.convertir(
+			List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacio(notificacio);
+			
+			if (enviamentsPendents != null && !enviamentsPendents.isEmpty()) 
+				throw new ValidationException("No es pot generar el justificant d'una notificació amb enviaments pendents.");
+			
+			entityComprovarHelper.comprovarEntitat(
+					entitatId, 
+					false,
+					true, 
+					true, 
+					false);
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			ProgresDescarregaDto progres = progresDescarrega.get(auth.getName());
+			
+			if (progres != null && progres.getProgres() != 0) {
+				logger.error("Ja existeix un altre procés iniciat"); 
+				progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant"));
+				return null;
+			} else {
+				//## Únic procés per usuari per evitar sobrecàrrega
+				progres = new ProgresDescarregaDto();
+				progresDescarrega.put(auth.getName(), progres);
+				
+				//## GENERAR JUSTIFICANT
+				logger.debug("Recuperant el justificant de la notificacio (notificacioId=" + notificacioId + ")");
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant"));
+				byte[] contingut = justificantHelper.generarJustificant(
+						conversioTipusHelper.convertir(
+								notificacio, 
+								NotificacioDtoV2.class),
+						progres);
+				FitxerDto justificantOriginal = new FitxerDto();
+				justificantOriginal.setNom("justificant_notificació_" + notificacio.getId() + ".pdf");
+				justificantOriginal.setContentType("application/pdf");
+				justificantOriginal.setContingut(contingut);
+				
+				//## FIRMA EN SERVIDOR
+				progres.setProgres(80);
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.aplicant.firma"));
+				byte[] contingutFirmat = null;
+				try {
+					contingutFirmat = pluginHelper.firmaServidorFirmar(
 							notificacio, 
-							NotificacioDtoV2.class));
-			FitxerDto justificantOriginal = new FitxerDto();
-			justificantOriginal.setNom("justificant.docx");
-			justificantOriginal.setContentType("application/msword");
-			justificantOriginal.setContingut(contingut);
-			
-			//## CONVERSIÓ PDF
-			FitxerDto justificantPdf = pluginHelper.conversioConvertirPdf(
-					justificantOriginal,
-					null);
-			
-			//## FIRMA SERVIDOR
-//			byte[] contingutFirmat = pluginHelper.firmaServidorFirmar(
-//					notificacio, 
-//					justificantPdf, 
-//					TipusFirma.PADES, 
-//					"prova firma servidor", 
-//					"ca");
-//			
-//			FitxerDto justificantFirmat = new FitxerDto();
-//			justificantFirmat.setContentType("application/pdf");
-//			justificantFirmat.setContingut(contingutFirmat);
-//			justificantFirmat.setNom("justificant_signed.pdf");
-//			justificantFirmat.setTamany(contingutFirmat.length);
-			
-			return justificantPdf;
+							justificantOriginal, 
+							TipusFirma.PADES, 
+							"justificant enviament Notib", 
+							"ca");
+					progres.setProgres(100);
+				} catch (Exception ex) {
+					progres.setProgres(100);
+					String errorDescripcio = messageHelper.getMessage("es.caib.notib.justificant.proces.aplicant.firma.error");
+					progres.addInfo(TipusInfo.ERROR, errorDescripcio);
+					logger.error(errorDescripcio, ex);
+					progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.finalitzat"));
+					return justificantOriginal;
+				}
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.finalitzat.firma"));
+				FitxerDto justificantFirmat = new FitxerDto();
+				justificantFirmat.setContentType("application/pdf");
+				justificantFirmat.setContingut(contingutFirmat);
+				justificantFirmat.setNom("justificant_notificació_" + notificacio.getId() + "_firmat.pdf");
+				justificantFirmat.setTamany(contingutFirmat.length);
+				return justificantFirmat;
+			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	public ProgresDescarregaDto justificantEstat() throws JustificantException {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			ProgresDescarregaDto progres = progresDescarrega.get(auth.getName());
+			if (progres != null && progres.getProgres() != null &&  progres.getProgres() >= 100) {
+				progresDescarrega.remove(auth.getName());
+			}
+			return progres;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

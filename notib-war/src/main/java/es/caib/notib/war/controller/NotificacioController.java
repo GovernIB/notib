@@ -64,6 +64,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaisosDto;
 import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.ProgresDescarregaDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
@@ -73,6 +74,7 @@ import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
+import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.EnviamentService;
@@ -781,16 +783,39 @@ public class NotificacioController extends BaseUserController {
 		writeFileToResponse(arxiu.getNom() + mimeType, arxiu.getContingut(), response);
 	}
 	
-	@RequestMapping(value = "/{notificacioId}/justificantDescarregar", method = RequestMethod.GET)
+	@RequestMapping(value = "/{notificacioId}/justificant", method = RequestMethod.GET)
+	public String justificantDescarregar(
+			HttpServletRequest request,
+			Model model,
+			@PathVariable Long notificacioId) throws IOException {
+		model.addAttribute("notificacioId", notificacioId);
+		return "justificantDownloadForm";
+	}
+	
+	@RequestMapping(value = "/{notificacioId}/justificant", method = RequestMethod.POST)
 	@ResponseBody
 	public void justificantDescarregar(
 			HttpServletRequest request, 
 			HttpServletResponse response,
 			@PathVariable Long notificacioId) throws IOException {
-		FitxerDto justificant = notificacioService.recuperarJustificant(notificacioId);
-		String mimeType = ".docx";
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		FitxerDto justificant = notificacioService.recuperarJustificant(
+				notificacioId, 
+				entitatActual.getId());
+		if (justificant == null) {
+			throw new ValidationException("Existeix un altre procés iniciat. Esperau que finalitzi la descàrrega del document.");
+		}
 		response.setHeader("Set-cookie", "fileDownload=true; path=/");
 		writeFileToResponse(justificant.getNom(), justificant.getContingut(), response);
+	}
+	
+	@RequestMapping(value = "/{notificacioId}/justificant/estat", method = RequestMethod.GET)
+	@ResponseBody
+	public ProgresDescarregaDto justificantEstat(
+			HttpServletRequest request, 
+			HttpServletResponse response,
+			@PathVariable Long notificacioId) throws IOException {
+		return notificacioService.justificantEstat();
 	}
 	
 	@RequestMapping(value = "/{notificacioId}/refrescarEstatClient", method = RequestMethod.GET)
