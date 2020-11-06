@@ -131,6 +131,7 @@ public class NotificacioController extends BaseUserController {
 			HttpServletRequest request, 
 			Model model) {
 		
+		request.getSession().removeAttribute(NOTIFICACIONS_FILTRE);
 		model.addAttribute(new NotificacioFiltreCommand());
 		ompleProcediments(request, model);
 		model.addAttribute("notificacioEstats", 

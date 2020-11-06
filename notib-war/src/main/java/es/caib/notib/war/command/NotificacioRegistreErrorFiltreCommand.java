@@ -7,7 +7,7 @@ import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import es.caib.notib.core.api.dto.NotificacioErrorCallbackFiltreDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreErrorFiltreDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +27,7 @@ public class NotificacioRegistreErrorFiltreCommand {
 	private String concepte;
 	private String usuari;
 
-	public static NotificacioRegistreErrorFiltreCommand asCommand(NotificacioErrorCallbackFiltreDto dto) {
+	public static NotificacioRegistreErrorFiltreCommand asCommand(NotificacioRegistreErrorFiltreDto dto) {
 		if (dto == null) {
 			return null;
 		}
@@ -36,13 +36,13 @@ public class NotificacioRegistreErrorFiltreCommand {
 				NotificacioRegistreErrorFiltreCommand.class );
 		return command;
 	}
-	public static NotificacioErrorCallbackFiltreDto asDto(NotificacioRegistreErrorFiltreCommand command) {
+	public static NotificacioRegistreErrorFiltreDto asDto(NotificacioRegistreErrorFiltreCommand command) {
 		if (command == null) {
 			return null;
 		}
-		NotificacioErrorCallbackFiltreDto dto = ConversioTipusHelper.convertir(
+		NotificacioRegistreErrorFiltreDto dto = ConversioTipusHelper.convertir(
 				command,
-				NotificacioErrorCallbackFiltreDto.class);
+				NotificacioRegistreErrorFiltreDto.class);
 		return dto;
 	}
 

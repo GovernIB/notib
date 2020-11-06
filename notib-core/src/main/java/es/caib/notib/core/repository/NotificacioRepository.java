@@ -287,10 +287,10 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"		(ntf.id = (select notificacio.id" +
 			"				from NotificacioEnviamentEntity env" +
 			"				where env.notificaIdentificador = :identificador))) " + 
-			"and (:nomesAmbErrors = false or " + 
-			"		(ntf.id in (select notificacio.id" +
-			"				from NotificacioEnviamentEntity env" + 
-			"				where env.notificaError = true)))")
+			"and (:nomesAmbErrors = false or ntf.notificaErrorEvent is not null)") 
+//			"		(ntf.id in (select notificacio.id" +
+//			"				from NotificacioEnviamentEntity env" + 
+//			"				where env.notificaError = true)))")
 	public Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
@@ -418,10 +418,10 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"		(ntf.id = (select notificacio.id" + 
 			"				from NotificacioEnviamentEntity env" +
 			"				where env.notificaIdentificador = :identificador)))" +
-			"and (:nomesAmbErrors = false or " + 
-			"		(ntf.id in (select notificacio.id" +
-			"				from NotificacioEnviamentEntity env" + 
-			"				where env.notificaError = true)))")
+			"and (:nomesAmbErrors = false or ntf.notificaErrorEvent is not null)")
+//			"		(ntf.id in (select notificacio.id" +
+//			"				from NotificacioEnviamentEntity env" + 
+//			"				where env.notificaError = true)))")
 	public Page<NotificacioEntity> findAmbFiltre(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
