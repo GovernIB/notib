@@ -428,6 +428,7 @@ public class PermisosHelper {
 						permis = new PermisDto();
 						permis.setId((Long)ace.getId());
 						permis.setPrincipal(grantedAuthority);
+						permis.setNomSencerAmbCodi(grantedAuthority);
 						permis.setTipus(TipusEnumDto.ROL);
 						permisosRol.put(grantedAuthority, permis);
 					}
