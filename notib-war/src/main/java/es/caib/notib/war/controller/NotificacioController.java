@@ -738,6 +738,23 @@ public class NotificacioController extends BaseUserController {
 		emplenarModelEnviamentInfo(notificacioId, enviamentId, "estatNotifica", model, request);
 		return "enviamentInfo";
 	}
+	
+	@RequestMapping(value = "/refrescarEstatNotifica", method = RequestMethod.GET)
+	public String refrescarEstatNotifica(HttpServletRequest request, Model model) {
+		try {
+			notificacioService.enviamentsRefrescarEstat();
+		} catch (Exception ex) {
+			logger.error("S'ha produit un error consultant els enviaments", ex);
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../entitat",
+					"notificacio.controller.refrescar.estat.error");
+		}
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../entitat",
+				"notificacio.controller.refrescar.estat.expirades.ok");
+	}
 
 	@RequestMapping(value = "/{notificacioId}/documentDescarregar", method = RequestMethod.GET)
 	@ResponseBody

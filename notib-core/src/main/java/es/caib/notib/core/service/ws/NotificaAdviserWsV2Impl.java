@@ -240,6 +240,11 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 							logger.debug("Certificació guardada correctament.");
 						}
 						integracioHelper.addAccioOk(info);
+						
+						if ("expirada".equals(estado) && acusePDF == null && enviament.getNotificaCertificacioData() == null) {
+							logger.debug("Consultant la certificació de l'enviament expirat...");
+							notificaHelper.enviamentRefrescarEstat(enviament.getId());
+						}
 					}
 				} else {
 					logger.error(

@@ -42,6 +42,7 @@ import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorCallbackFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
@@ -1427,6 +1428,27 @@ public class NotificacioServiceImpl implements NotificacioService {
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}		
+	}
+	
+	@Override
+	@Transactional
+	public void enviamentsRefrescarEstat() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<NotificacioEnviamentEntity> enviaments = notificacioEnviamentRepository.findExpiradesAndNotificaCertificacioDataNull();
+			
+			for (NotificacioEnviamentEntity enviament : enviaments) {
+				logger.debug("Refrescant l'estat de la notificació de Notific@ (enviamentId=" + enviament.getId() + ")");
+				try {
+					notificaHelper.enviamentRefrescarEstat(enviament.getId());
+				
+				} catch (Exception e) {
+					logger.error("No s'ha pogut refrescar l'estat de l'enviament (enviamentId=" + enviament.getId() + ")");
+				}
+			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	private int getRegistreEnviamentsProcessarMaxProperty() {
