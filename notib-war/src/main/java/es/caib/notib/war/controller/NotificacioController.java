@@ -81,6 +81,7 @@ import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
 import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
 import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.war.command.EntregapostalCommand;
 import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.MarcarProcessatCommand;
@@ -1014,10 +1015,14 @@ public class NotificacioController extends BaseUserController {
 		if (procedimentsDisponibles.isEmpty()) {
 			MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
 		}
+		
 		List<OrganGestorDto> organsGestors = recuperarOrgansPerProcedimentAmbPermis(
 				entitatActual,
 				procedimentsDisponibles);			
 		model.addAttribute("organsGestors", organsGestors);
+		if (organsGestors == null || organsGestors.isEmpty()) {
+			MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.organs"));
+		}
 		
 		model.addAttribute("amagat", Boolean.FALSE);
 		
@@ -1080,8 +1085,10 @@ public class NotificacioController extends BaseUserController {
 		List<OrganGestorDto> organsGestors;
 		Set<OrganGestorDto> setOrgansGestors = new HashSet<OrganGestorDto>(organsGestorsProcediments);
 		setOrgansGestors.addAll(organsGestorsAmbPermis);
-				
 		organsGestors = new ArrayList<OrganGestorDto>(setOrgansGestors);
+		if(!PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes", false)) {
+			organsGestors.remove(organGestorService.findByCodi(entitatActual.getId(), entitatActual.getDir3Codi()));
+		}
 		
 		Collections.sort(organsGestors, new Comparator<OrganGestorDto>() {
 			@Override
