@@ -484,10 +484,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		
 		try {
 //			envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
-			if (!isCodiDir3Entitat() && notificacio.getProcediment() != null && notificacio.getProcediment().getOrganGestor() != null) { 
-				envios.setCodigoOrganismoEmisor(notificacio.getProcediment().getOrganGestor().getCodi());
-			} else if(!isCodiDir3Entitat() && notificacio.getOrganGestor() != null) {
+			if (!isCodiDir3Entitat() && notificacio.getOrganGestor() != null) { 
 				envios.setCodigoOrganismoEmisor(notificacio.getOrganGestor().getCodi());
+			} else if(!isCodiDir3Entitat() && notificacio.getProcediment() != null && notificacio.getProcediment().getOrganGestor() != null) {
+				envios.setCodigoOrganismoEmisor(notificacio.getProcediment().getOrganGestor().getCodi());
 			} else {
 				envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
 			}

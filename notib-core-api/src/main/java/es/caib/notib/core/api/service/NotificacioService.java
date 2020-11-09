@@ -292,8 +292,9 @@ public interface NotificacioService {
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public void reactivarRegistre(Long notificacioId);
-
-
+	
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	void enviamentsRefrescarEstat();
 //	void registrarEnviamentsPendents();
 //	void notificaEnviamentsRegistrats();
 //	void enviamentRefrescarEstatPendents();
