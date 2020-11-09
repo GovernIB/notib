@@ -81,7 +81,6 @@ import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
 import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
 import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.war.command.EntregapostalCommand;
 import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.MarcarProcessatCommand;
@@ -94,6 +93,7 @@ import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EntitatHelper;
 import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
+import es.caib.notib.war.helper.PropertiesHelper;
 import es.caib.notib.war.helper.RolHelper;
 import lombok.Data;
 
@@ -213,6 +213,9 @@ public class NotificacioController extends BaseUserController {
 			}
 			organGestor.setNom(nom);
 		}
+//		// Eliminam l'òrgan gestor entitat  --> Per ara el mantenim, ja que hi ha notificacions realitzades a l'entitat
+//		OrganGestorDto organEntitat = organGestorService.findByCodi(entitatActual.getId(), entitatActual.getDir3Codi());
+//		organsGestorsDisponibles.remove(organEntitat);
 		model.addAttribute("procedimentsPermisLectura", procedimentsDisponibles);
 		model.addAttribute("organsGestorsPermisLectura", organsGestorsDisponibles);
 	}

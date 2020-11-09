@@ -2,6 +2,7 @@ package es.caib.notib.war.controller;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.CodiAssumpteDto;
+import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
@@ -76,10 +78,20 @@ public class ProcedimentController extends BaseUserController{
 			HttpServletRequest request,
 			Model model) {
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-//		model.addAttribute(new ProcedimentFiltreCommand());
+		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+
+		List<CodiValorDto> organsGestors = new ArrayList<CodiValorDto>();
+		if (organGestorActual == null) {
+			organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
+		} else {
+			List<OrganGestorDto> organsDto = organGestorService.findDescencentsByCodi(entitat.getId(), organGestorActual.getCodi());
+			for (OrganGestorDto organ: organsDto) {
+				organsGestors.add(new CodiValorDto(organ.getCodi(), organ.getCodi() + " - " + organ.getNom()));
+			}
+		}
 		ProcedimentFiltreCommand procedimentFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("procedimentFiltreCommand", procedimentFiltreCommand);
-		model.addAttribute("organsGestors", organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId()));
+		model.addAttribute("organsGestors", organsGestors);
 		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGet("es.caib.notib.plugin.codi.dir3.entitat", "false")));
 		
 		return "procedimentAdminList";

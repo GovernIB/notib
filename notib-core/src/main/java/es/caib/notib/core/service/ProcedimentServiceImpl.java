@@ -1118,6 +1118,22 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						permisos,
 						auth);
 			}
+			
+			// 4. Procediments comuns
+			List<ProcedimentEntity> procedimentsComuns = procedimentRepository.findByComuTrue();
+			permisosHelper.filterGrantedAny(
+					procedimentsComuns,
+					new ObjectIdentifierExtractor<ProcedimentEntity>() {
+						public Long getObjectIdentifier(ProcedimentEntity procediment) {
+							return procediment.getId();
+						}
+					},
+					ProcedimentEntity.class,
+					permisos,
+					auth);
+			procedimentsComuns.removeAll(procediments);
+			procediments.addAll(procedimentsComuns);
+			
 			return conversioTipusHelper.convertirList(
 					procediments,
 					ProcedimentDto.class);
