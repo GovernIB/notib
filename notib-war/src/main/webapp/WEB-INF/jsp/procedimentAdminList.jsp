@@ -59,7 +59,7 @@ pageContext.setAttribute(
 				<not:inputSelect name="organGestor" optionItems="${organsGestors}" optionValueAttribute="codi" optionTextAttribute="valor" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 			<div class="col-md-5">
-				 <label  for="comuBtn"><spring:message code="procediment.form.camp.comu"/>:</label>  <input type="checkbox" name="comu" id="comuBtn" >
+				 <label  for="comuBtn"><spring:message code="procediment.filter.form.camp.comu"/>:</label>  <input type="checkbox" name="comu" id="comuBtn" >
 			</div>
 			<div class="col-md-2 pull-right">
 				<div class="pull-right">

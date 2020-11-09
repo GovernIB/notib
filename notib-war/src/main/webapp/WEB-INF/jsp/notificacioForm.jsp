@@ -20,6 +20,8 @@
 <c:set var="entregaPostal"><spring:message code="notificacio.form.titol.entregapostal"/></c:set>
 <c:set var="entregaPostalDades"><spring:message code="notificacio.form.titol.entregapostal.dades"/></c:set>
 <c:set var="entregaDireccio"><spring:message code="notificacio.form.titol.entregadireccio"/></c:set>
+<c:set var="entitatDir3Codi">${entitat.dir3Codi}</c:set>
+
 <html>
 <head>
     <title>${titol}</title>
@@ -267,6 +269,12 @@ $(document).ready(function() {
     	if ($('#organGestor').children('option').length == 2) {
     		$('#organGestor option:eq(1)').attr('selected', 'selected');
     		$('#organGestor').trigger('change.select2');
+    	}else if($('#organGestor').children('option').length == 3){
+    		$('#organGestor > option').each(function() {
+    			if(this.value == $('#entitatDir3Codi').val())
+    				$('#organGestor option:eq(1)').attr('selected', 'selected');
+        			$('#organGestor').trigger('change.select2');
+    		});
     	}
     	
     	var organ = $(this).val();
@@ -973,7 +981,7 @@ function actualitzarEntrega(j) {
 				<hr/>
 			</div>
 <%-- 			<form:hidden path="procedimentId" value="${procediment.id}" /> --%>
-			<form:hidden path="emisorDir3Codi" value="${entitat.dir3Codi}" />
+			<form:hidden path="emisorDir3Codi" id="emisorDir3Codi" value="${entitat.dir3Codi}" />
 			
 			<!-- CONCEPTE -->
 			<div class="row">
