@@ -315,9 +315,11 @@ $(document).ready(function() {
 			} else if (tag == 'select') {
 				this.selectedIndex = 0;
 			}
+			
 		});
 		$('#nomesAmbErrorsBtn').removeClass('active');
 		$('#nomesAmbErrors').val(false);
+		omplirProcediments();
 		$('#form-filtre').submit();
 	});
 	$('#nomesAmbErrorsBtn').click(function() {
@@ -326,31 +328,81 @@ $(document).ready(function() {
 	})
 	$('#organGestor').on('change', function () {
 		//Procediments
-		var organGestor = $(this);
+		omplirProcediments();
+// 		var organGestor = $(this);
+// 		var selProcediments = $("#procedimentId");
+// 		$.ajax({
+// 			type: 'GET',
+// 			url: "<c:url value="/notificacio/procedimentsOrgan/"/>" + $(organGestor).val(),
+// 			success: function(data) {
+// 				$(selProcediments).empty();
+// 				$(selProcediments).append("<option value=\"\"></option>");
+// 				if (data && data.length > 0) {
+// 					$.each(data, function(i, val) {
+// 						$(selProcediments).append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
+// 					});
+// 				}
+// 				var select2Options = {
+// 						theme: 'bootstrap',
+// 						width: 'auto'};
+// 				$(selProcediments).select2(select2Options);
+// 			},
+// 			error: function() {
+// 				console.log("error obtenint els procediments!");
+// 			}
+// 		});
+	});
+	function omplirProcediments() {
+		var organGestor = $("#organGestor");
 		var selProcediments = $("#procedimentId");
-		
 		$.ajax({
 			type: 'GET',
 			url: "<c:url value="/notificacio/procedimentsOrgan/"/>" + $(organGestor).val(),
 			success: function(data) {
-				$(selProcediments).empty();
-				$(selProcediments).append("<option value=\"\"></option>");
-				if (data && data.length > 0) {
-					$.each(data, function(i, val) {
-						$(selProcediments).append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
-					});
-				}
 				var select2Options = {
 						theme: 'bootstrap',
 						width: 'auto'};
-				$(selProcediments).select2(select2Options);
+				// Procediments
+				var procediments = data;
+				var selProcediments = $("#procedimentId");
+				selProcediments.empty();
+				if (procediments && procediments.length > 0) {
+					selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.select'/></option>");
+					var procedimentsComuns = [];
+					var procedimentsOrgan = [];
+					$.each(data, function(i, val) {
+						if(val.comu) {
+							procedimentsComuns.push(val);
+						} else {
+							procedimentsOrgan.push(val);
+						}
+					});
+					if (procedimentsComuns.length > 0) {
+						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
+							$.each(procedimentsComuns, function(index, val) {
+								selProcediments.append("<option value=\"" + val.id + "\">" + val.codi +' - '+ val.nom + "</option>");
+							});
+						selProcediments.append("</optgroup>");
+					}
+					if (procedimentsOrgan.length > 0) {
+						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
+							$.each(procedimentsOrgan, function(index, val) {
+								selProcediments.append("<option value=\"" + val.id + "\">" + val.codi +' - '+ val.nom + "</option>");
+							});
+						selProcediments.append("</optgroup>");
+					}
+				
+				} else {
+					selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
+				}
+				selProcediments.select2(select2Options);
 			},
 			error: function() {
-				console.log("error obtenint els procediments!");
+				console.log("error obtenint els procediments de l'òrgan gestor...");
 			}
 		});
-	});
-		
+	}
+		omplirProcediments();
 });
 </script>
 </head>
