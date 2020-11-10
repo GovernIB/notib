@@ -40,7 +40,7 @@ public class DadesUsuari implements Serializable {
 	
 	public String getNomSencerAmbCodi() {
 		if(getNomSencer() != null) {
-			return getNomSencer() + "("+codi+")"; 
+			return getNomSencer() + " ("+codi+")"; 
 		}
 		return codi;
 	}

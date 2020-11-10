@@ -1014,7 +1014,6 @@ public class NotificacioController extends BaseUserController {
 				entitatActual.getId(), 
 				usuariActual.getCodi(), 
 				PermisEnum.NOTIFICACIO);
-		model.addAttribute("procediments", procedimentsDisponibles);
 		if (procedimentsDisponibles.isEmpty()) {
 			MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
 		}
@@ -1025,6 +1024,8 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("organsGestors", organsGestors);
 		if (organsGestors == null || organsGestors.isEmpty()) {
 			MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.organs"));
+		} else {
+			model.addAttribute("procediments", procedimentsDisponibles);
 		}
 		
 		model.addAttribute("amagat", Boolean.FALSE);
