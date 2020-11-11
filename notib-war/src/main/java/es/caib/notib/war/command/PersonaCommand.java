@@ -23,7 +23,7 @@ public class PersonaCommand {
 
 	private boolean incapacitat;
 	private InteressatTipusEnumDto interessatTipus;
-	@Size(max=255)
+	@Size(max=80)
 	private String nom;
 	@Size(max=40)	
 	private String llinatge1;
