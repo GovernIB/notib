@@ -144,9 +144,9 @@ public class NotificacioServiceBean implements NotificacioService {
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public NotificacioDtoV2 update(
+	public List<NotificacioDto> update(
 			Long entitatId,
-			NotificacioDtoV2 notificacio) throws NotFoundException {
+			NotificacioDtoV2 notificacio) throws NotFoundException, RegistreNotificaException {
 		return delegate.update(
 				entitatId, 
 				notificacio);

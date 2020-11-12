@@ -425,13 +425,13 @@ $(document).ready(function() {
 			</div>
 		</div>
 	</form:form>
-	<script id="rowhrefTemplate" type="text/x-jsrender">modal/notificacio/{{:id}}</script>
+	<script id="rowhrefTemplate" type="text/x-jsrender">modal/notificacio/{{:id}}/info</script>
 	<table
 		id="notificacio"
 		data-toggle="datatable"
 		data-url="<c:url value="/notificacio/datatable"/>"
 		data-search-enabled="false"
-		data-default-order="6"
+		data-default-order="8"
 		data-default-dir="desc"
 		class="table table-striped table-bordered"
 		style="width:100%"
@@ -445,6 +445,7 @@ $(document).ready(function() {
 				<th data-col-name="tipusUsuari" data-visible="false">#</th>
 				<th data-col-name="errorLastCallback" data-visible="false">#</th>
 				<th data-col-name="hasEnviamentsPendents" data-visible="false">#</th>
+				<th data-col-name="hasEnviamentsPendentsRegistre" data-visible="false">#</th>
 				<th data-col-name="notificaError" data-visible="false"></th>
 				<th data-col-name="notificaErrorDescripcio" data-visible="false"></th>
 				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" class="enviamentTipusCol" width="5px">
@@ -457,8 +458,8 @@ $(document).ready(function() {
 						{{/if}}
 					</script>
 				</th>
-				
-				<th data-col-name=createdDate data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>
+				<%-- <th data-col-name="notificaEnviamentData" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>--%>
+				<th data-col-name="createdDate" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.creadael"/></th>
 				<c:if test="${isRolActualAdministrador && mostrarColumnaEntitat}">
 					<th data-col-name="entitat.nom" width="170px"><spring:message code="notificacio.list.columna.entitat"/></th>
 				</c:if>
@@ -512,12 +513,15 @@ $(document).ready(function() {
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="<c:url value="/notificacio/{{:id}}"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="comu.boto.detalls"/></a></li>
+								<li><a href="<c:url value="/notificacio/{{:id}}/info"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="comu.boto.detalls"/></a></li>
 							{{if permisProcessar }}
 								<li><a href="<c:url value="/notificacio/{{:id}}/processar"/>" data-toggle="modal"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a></li>
 							{{/if}}
 							{{if !hasEnviamentsPendents }}
 								<li><a href="<c:url value="/notificacio/{{:id}}/justificant"/>" data-toggle="modal" data-height="250px"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.justificant"/></a></li>
+							{{/if}}
+							{{if hasEnviamentsPendentsRegistre }}
+								<li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;Editar</a></li>
 							{{/if}}							
 							</ul>
 						</div>

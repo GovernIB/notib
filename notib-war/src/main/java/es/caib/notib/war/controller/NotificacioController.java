@@ -231,7 +231,7 @@ public class NotificacioController extends BaseUserController {
 	public String altaForm(
 			HttpServletRequest request, 
 			Model model) {
-		emplenarModelNotificacio(request, model);
+		emplenarModelNotificacio(request, model, null);
 		return "notificacioForm";
 	}
 
@@ -379,9 +379,9 @@ public class NotificacioController extends BaseUserController {
 		
 		try {
 			if (notificacioCommand.getId() != null) {
-			notificacioService.update(
-					notificacioCommand.getProcedimentId(),
-					NotificacioCommandV2.asDto(notificacioCommand));
+				notificacioService.update(
+						entitatActual.getId(),
+						NotificacioCommandV2.asDto(notificacioCommand));
 			} else {
 				notificacioService.create(
 						entitatActual.getId(), 
@@ -492,7 +492,16 @@ public class NotificacioController extends BaseUserController {
 		return DatatablesHelper.getDatatableResponse(request, notificacions);
 	}
 
-	@RequestMapping(value = "/{notificacioId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{notificacioId}/edit", method = RequestMethod.GET)
+	public String editar(
+			HttpServletRequest request, 
+			Model model,
+			@PathVariable Long notificacioId) {
+		emplenarModelNotificacio(request, model, notificacioId);
+		return "notificacioForm";
+	}
+	
+	@RequestMapping(value = "/{notificacioId}/info", method = RequestMethod.GET)
 	public String info(
 			HttpServletRequest request, 
 			Model model,
@@ -992,29 +1001,54 @@ public class NotificacioController extends BaseUserController {
 
 	private void emplenarModelNotificacio(
 			HttpServletRequest request, 
-			Model model) {
+			Model model,
+			Long notificacioId) {
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		
-		NotificacioCommandV2 notificacio = new NotificacioCommandV2();
-		List<EnviamentCommand> enviaments = new ArrayList<EnviamentCommand>();
-		EnviamentCommand enviament = new EnviamentCommand();
-		EntregapostalCommand entregaPostal = new EntregapostalCommand();
-		entregaPostal.setPaisCodi("ES");
-		enviament.setEntregaPostal(entregaPostal);
-		enviaments.add(enviament);
-		notificacio.setEnviaments(enviaments);
-		notificacio.setCaducitat(CaducitatHelper.sumarDiesLaborals(10));
+		NotificacioCommandV2 notificacio = null;
 		List<String> tipusDocumentEnumDto = new ArrayList<String>();
-		
-		TipusDocumentEnumDto tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
+		if (notificacioId != null) {
+			NotificacioDtoV2 notificacioDto = notificacioService.findAmbId(notificacioId, false);
+			notificacio = NotificacioCommandV2.asCommand(notificacioDto);
+			
+			if (notificacio.getDocument().getArxiuNom() != null) {
+				model.addAttribute("nomDocument", notificacio.getDocument().getArxiuNom());
+				notificacio.setTipusDocumentDefault(TipusDocumentEnumDto.ARXIU.name());
+			}
+			if (notificacio.getDocument().getUuid() != null) {
+				model.addAttribute("nomDocument", notificacio.getDocument().getUuid());
+				notificacio.setTipusDocumentDefault(TipusDocumentEnumDto.UUID.name());
+			}
+			if (notificacio.getDocument().getCsv() != null) {
+				model.addAttribute("nomDocument", notificacio.getDocument().getCsv());
+				notificacio.setTipusDocumentDefault(TipusDocumentEnumDto.CSV.name());
+			}
+			if (notificacio.getDocument().getUrl() != null) {
+				model.addAttribute("nomDocument", notificacio.getDocument().getUrl());
+				notificacio.setTipusDocumentDefault(TipusDocumentEnumDto.URL.name());
+			}
+			
+		} else {
+			notificacio = new NotificacioCommandV2();
+			List<EnviamentCommand> enviaments = new ArrayList<EnviamentCommand>();
+			EnviamentCommand enviament = new EnviamentCommand();
+			EntregapostalCommand entregaPostal = new EntregapostalCommand();
+			entregaPostal.setPaisCodi("ES");
+			enviament.setEntregaPostal(entregaPostal);
+			enviaments.add(enviament);
+			notificacio.setEnviaments(enviaments);
+			notificacio.setCaducitat(CaducitatHelper.sumarDiesLaborals(10));
+			
+			TipusDocumentEnumDto tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
+			if (tipusDocumentDefault != null) {
+				notificacio.setTipusDocumentDefault(tipusDocumentDefault.name());
+			}
+		}
 		List<TipusDocumentDto>  tipusDocuments =  entitatService.findTipusDocumentByEntitat(entitatActual.getId());
 		if (tipusDocuments != null) {
 			for (TipusDocumentDto tipusDocument: tipusDocuments) {
 				tipusDocumentEnumDto.add(tipusDocument.getTipusDocEnum().name());
-			}
-			if (tipusDocumentDefault != null) {
-				notificacio.setTipusDocumentDefault(tipusDocumentDefault.name());
 			}
 		}
 		model.addAttribute("isTitularAmbIncapacitat", aplicacioService.propertyGet("es.caib.notib.titular.incapacitat"));

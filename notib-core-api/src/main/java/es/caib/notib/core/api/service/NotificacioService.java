@@ -59,11 +59,12 @@ public interface NotificacioService {
 	 * @return El procediment modificat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws RegistreNotificaException 
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
-	public NotificacioDtoV2 update(
+	public List<NotificacioDto> update(
 			Long entitatId,
-			NotificacioDtoV2 notificacio) throws NotFoundException;
+			NotificacioDtoV2 notificacio) throws NotFoundException, RegistreNotificaException;
 	
 	/**
 	 * Consulta una notificació donat el seu id.

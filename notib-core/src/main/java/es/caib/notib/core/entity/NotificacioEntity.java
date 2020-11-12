@@ -179,6 +179,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	protected boolean errorLastEvent;
 	@Transient
 	protected boolean hasEnviamentsPendents;
+	@Transient
+	protected boolean hasEnviamentsPendentsRegistre;
 	
 	public void addEnviament(
 			NotificacioEnviamentEntity enviament) {
@@ -195,6 +197,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	public void setHasEnviamentsPendents(boolean hasEnviamentsPendents) {
 		this.hasEnviamentsPendents = hasEnviamentsPendents;
+	}
+
+	public void setHasEnviamentsPendentsRegistre(boolean hasEnviamentsPendentsRegistre) {
+		this.hasEnviamentsPendentsRegistre = hasEnviamentsPendentsRegistre;
 	}
 	
 	public void updateRegistreNumero(Integer registreNumero) {
@@ -273,6 +279,45 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		events.add(event);
 	}
 	
+	public void update (
+			EntitatEntity entitat,
+			String emisorDir3Codi,
+			OrganGestorEntity organGestor,
+			NotificacioComunicacioTipusEnumDto comunicacioTipus,
+			NotificaEnviamentTipusEnumDto enviamentTipus,
+			String concepte,
+			String descripcio,
+			Date enviamentDataProgramada,
+			Integer retard,
+			Date caducitat,
+			String usuariCodi,
+			String procedimentCodi,
+			ProcedimentEntity procediment,
+			String grup,
+			String numExpedient,
+			TipusUsuariEnumDto tipusUsuari,
+			DocumentEntity document) {
+		this.entitat = entitat;
+		this.emisorDir3Codi = emisorDir3Codi;
+		this.organGestor = organGestor;
+		this.comunicacioTipus = comunicacioTipus;
+		this.enviamentTipus = enviamentTipus;
+		this.concepte = concepte;
+		this.descripcio = descripcio;
+		this.enviamentDataProgramada = enviamentDataProgramada;
+		this.retard = retard;
+		this.caducitat = caducitat;
+		this.usuariCodi = usuariCodi;
+		this.procedimentCodiNotib = procedimentCodi;
+		this.procediment = procediment;
+		this.grupCodi = grup;
+		this.numExpedient = numExpedient;
+		this.tipusUsuari = tipusUsuari;
+		this.document = document;
+		
+		this.registreEnviamentIntent = 0;
+		this.notificaEnviamentIntent = 0;
+	}
 	public static Builder getBuilder(
 			EntitatEntity entitat,
 			String emisorDir3Codi,

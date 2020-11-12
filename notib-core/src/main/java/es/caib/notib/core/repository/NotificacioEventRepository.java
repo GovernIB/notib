@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 
 /**
@@ -28,6 +29,8 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 	
 	List<NotificacioEventEntity> findByEnviamentIdOrderByIdAsc(
 			Long enviamentId);
+	
+	void deleteByEnviament(NotificacioEnviamentEntity enviament);
 
 	/** Recupera la llista de notificacions pendents */
 	@Query("select ne.id " + 
