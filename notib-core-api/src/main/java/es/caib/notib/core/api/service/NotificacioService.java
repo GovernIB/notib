@@ -49,17 +49,37 @@ public interface NotificacioService {
 			Long entitatId,
 			NotificacioDtoV2 notificacio) throws RegistreNotificaException;
 	
-
+	/**
+	 * Esborra la notificació indicada per paràmetre
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat actual
+	 * @param notificacioId
+	 *            Id de la notificació a eliminar
+	 *            
+	 * @return La llista de notificacions actualitzada
+	 * @throws NotFoundException
+	 *              Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	public void delete(
+			Long entitatId,
+			Long notificacioId) throws NotFoundException;
+	
 	/**
 	 * Actualitza la informació de la notificacio que tengui el mateix
 	 * id que l'especificat per paràmetre.
 	 * 
-	 * @param procediment
-	 *            Informació del procediment a modificar.
-	 * @return El procediment modificat.
+	 * @param entitatId
+	 *            Id de l'entitat actual
+	 * @param notificacio
+	 *            Informació de la notificació a modificar
+	 *            
+	 * @return La llista de notificacions actualitzada
 	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 * @throws RegistreNotificaException 
+	 *              Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws RegistreNotificaException
+	 * 				Si hi ha hagut un error en el procés de registra/notificar
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public List<NotificacioDto> update(

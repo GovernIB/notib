@@ -151,6 +151,12 @@ public class NotificacioServiceBean implements NotificacioService {
 				entitatId, 
 				notificacio);
 	}
+	
+	@Override
+	@RolesAllowed({"tothom"})
+	public void delete(Long entitatId, Long notificacioId) throws NotFoundException {
+		delegate.delete(entitatId, notificacioId);
+	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})

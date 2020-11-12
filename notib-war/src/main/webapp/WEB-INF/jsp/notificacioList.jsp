@@ -511,7 +511,7 @@ $(document).ready(function() {
 					</script>
 				</th>
 				<%-- <th data-col-name="notificaEnviamentData" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>--%>
-				<th data-col-name="createdDate" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.creadael"/></th>
+				<th data-col-name="createdDate" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>
 				<c:if test="${isRolActualAdministrador && mostrarColumnaEntitat}">
 					<th data-col-name="entitat.nom" width="170px"><spring:message code="notificacio.list.columna.entitat"/></th>
 				</c:if>
@@ -573,7 +573,8 @@ $(document).ready(function() {
 								<li><a href="<c:url value="/notificacio/{{:id}}/justificant"/>" data-toggle="modal" data-height="250px"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.justificant"/></a></li>
 							{{/if}}
 							{{if hasEnviamentsPendentsRegistre }}
-								<li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;Editar</a></li>
+								<li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
+								<li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							{{/if}}							
 							</ul>
 						</div>

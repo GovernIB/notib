@@ -522,6 +522,32 @@ public class NotificacioController extends BaseUserController {
 				model);
 		return "notificacioInfo";
 	}
+	
+	@RequestMapping(value = "/{notificacioId}/delete", method = RequestMethod.GET)
+	public String eliminar(
+			HttpServletRequest request, 
+			Model model,
+			@PathVariable Long notificacioId) {
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		
+		try {
+			notificacioService.delete(
+					entitatActual.getId(), 
+					notificacioId);
+
+		} catch (Exception ex) {
+			logger.error("Hi ha hagut un error esborrant la notificació", ex);
+			return getModalControllerReturnValueError(
+					request, 
+					"redirect:../../notificacio",
+					"notificacio.controller.esborrar.ko",
+					new Object[] {ex.getMessage()});
+		}
+		return getModalControllerReturnValueSuccess(
+				request, 
+				"redirect:../../notificacio",
+				"notificacio.controller.esborrar.ok");
+	}
 
 	@RequestMapping(value = "/{notificacioId}/processar", method = RequestMethod.GET)
 	public String processarGet(

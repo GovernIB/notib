@@ -47,7 +47,6 @@ import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorCallbackFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
@@ -419,6 +418,47 @@ public class NotificacioServiceImpl implements NotificacioService {
 			return conversioTipusHelper.convertirList(
 				notificacions,
 				NotificacioDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Transactional
+	@Override
+	public void delete(
+			Long entitatId, 
+			Long notificacioId) throws NotFoundException {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			entityComprovarHelper.comprovarEntitat(
+					entitatId, 
+					false, 
+					true, 
+					true, 
+					false);
+			
+			logger.debug("Esborrant la notificació (notificacioId=" + notificacioId + ")");
+			NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
+			
+			if (notificacio == null)
+				throw new NotFoundException(
+						notificacioId, 
+						NotificacioEntity.class,
+						"No s'ha trobat cap notificació amb l'id especificat");
+
+//			### Esborrar els enviaments i els events
+			notificacioEnviamentRepository.delete(notificacio.getEnviaments());
+			notificacioEventRepository.delete(notificacio.getEvents());
+			
+//			### Esborrar la notificació
+			notificacioRepository.delete(notificacio);
+			
+//			### Esborrar el titular i els destinataris de cada enviament
+			for (NotificacioEnviamentEntity enviament : notificacio.getEnviaments()) {
+				personaRepository.delete(enviament.getTitular());
+				personaRepository.delete(enviament.getDestinataris());
+			}
+			logger.debug("La notificació s'ha esborrat correctament (notificacioId=" + notificacioId + ")");
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
