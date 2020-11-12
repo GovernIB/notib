@@ -403,7 +403,6 @@ $(document).ready(function() {
 		});
 	}
 		omplirProcediments();
-	});
 });
 </script>
 </head>

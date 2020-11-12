@@ -1348,7 +1348,11 @@ public class PluginHelper {
 					docDetall = arxiuDocumentConsultar(id, null);
 
 					if (docDetall != null) {
-						annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumental().toString());
+						if (docDetall.getMetadades().getTipusDocumental() != null) {
+							annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumental().toString());
+						} else if (docDetall.getMetadades().getTipusDocumentalAddicional() != null) {
+							annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumentalAddicional());
+						}
 						annex.setOrigenCiudadanoAdmin(docDetall.getMetadades().getOrigen().ordinal());
 						annex.setFechaCaptura(toXmlGregorianCalendar(docDetall.getMetadades().getDataCaptura()));
 
