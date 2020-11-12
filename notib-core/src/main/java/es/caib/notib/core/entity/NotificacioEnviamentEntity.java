@@ -511,6 +511,66 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.sirConsultaData = new Date();
 	}
 	
+	public void update(
+			Enviament enviament, 
+			boolean isAmbEntregaDeh,
+			NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
+			NotificaDomiciliConcretTipusEnumDto tipusConcret,
+			ServeiTipusEnumDto tipusServei,
+			NotificacioEntity notificacioGuardada,
+			PersonaEntity titular,
+			NotificaDomiciliViaTipusEnumDto domiciliViaTipus) {
+		this.serveiTipus = tipusServei;
+		this.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
+		this.notificaIntentNum = 0;
+		this.notificacio = notificacioGuardada;
+		this.domiciliTipus = NotificaDomiciliTipusEnumDto.CONCRETO;
+		this.domiciliNumeracioTipus = numeracioTipus;
+		this.domiciliConcretTipus = tipusConcret;
+		this.domiciliViaTipus = domiciliViaTipus;
+		if (enviament.getEntregaPostal() != null) {
+			if(! enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR)) {
+				this.domiciliViaNom = enviament.getEntregaPostal().getViaNom();
+				this.domiciliNumeracioNumero = enviament.getEntregaPostal().getNumeroCasa();
+				this.domiciliNumeracioQualificador = enviament.getEntregaPostal().getNumeroQualificador();
+				this.domiciliNumeracioPuntKm = enviament.getEntregaPostal().getPuntKm();
+				this.domiciliApartatCorreus = enviament.getEntregaPostal().getApartatCorreus();
+				this.domiciliPortal = enviament.getEntregaPostal().getPortal();
+				this.domiciliEscala = enviament.getEntregaPostal().getEscala();
+				this.domiciliPlanta = enviament.getEntregaPostal().getPlanta();
+				this.domiciliPorta = enviament.getEntregaPostal().getPorta();
+				this.domiciliBloc = enviament.getEntregaPostal().getBloc();
+				this.domiciliComplement = enviament.getEntregaPostal().getComplement();
+				this.domiciliCodiPostal = enviament.getEntregaPostal().getCodiPostal();
+				this.domiciliPoblacio = enviament.getEntregaPostal().getPoblacio();
+				this.domiciliMunicipiCodiIne = enviament.getEntregaPostal().getMunicipiCodi();
+				this.domiciliProvinciaCodi = enviament.getEntregaPostal().getProvincia();
+				this.domiciliPaisCodiIso = enviament.getEntregaPostal().getPaisCodi();
+				this.domiciliLinea1 = enviament.getEntregaPostal().getLinea1();
+				this.domiciliLinea2 = enviament.getEntregaPostal().getLinea2();
+				this.domiciliCie = enviament.getEntregaPostal().getCie();
+				this.formatSobre = enviament.getEntregaPostal().getFormatSobre();
+				this.formatFulla = enviament.getEntregaPostal().getFormatFulla();
+			} else if (enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR)) {
+				this.domiciliLinea1 = enviament.getEntregaPostal().getLinea1();
+				this.domiciliLinea2 = enviament.getEntregaPostal().getLinea2();
+				this.domiciliCodiPostal = enviament.getEntregaPostal().getCodiPostal();
+				this.domiciliPaisCodiIso = enviament.getEntregaPostal().getPaisCodi();
+			}
+		}
+		if (isAmbEntregaDeh && enviament.isEntregaDehActiva() && enviament.getEntregaDeh() != null) {
+			this.dehNif = enviament.getTitular().getNif();
+			this.dehObligat = enviament.getEntregaDeh().isObligat();
+			this.dehProcedimentCodi = notificacioGuardada.getProcedimentCodiNotib();
+		}
+		
+		this.titular = titular;
+		
+		// Inicialitzam les dates per consulta d'estats
+		Date data = new Date();
+		this.notificaIntentData = data;
+		this.sirConsultaData = data;
+	}
 	
 	public static Builder getBuilder(
 			String titularNif,

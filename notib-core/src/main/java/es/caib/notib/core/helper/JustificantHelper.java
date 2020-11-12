@@ -120,7 +120,7 @@ public class JustificantHelper {
 					new Object[] {
 							messageHelper.getMessage("es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto." + notificacio.getEnviamentTipus().name()),
 							notificacio.getConcepte(),
-							getDateTimeFormatted(notificacio.getEnviaments().get(0).getNotificaEstatData())});
+							getDateTimeFormatted(notificacio.getNotificaEnviamentData())});
 			Paragraph justificantIntroduccio = new Paragraph();
 			setParametersBold(justificantIntroduccio, introduccio);
 			justificantIntroduccio.add(Chunk.NEWLINE);
