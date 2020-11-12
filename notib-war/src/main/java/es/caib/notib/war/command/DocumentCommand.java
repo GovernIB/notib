@@ -21,6 +21,7 @@ import lombok.Setter;
 @Getter @Setter
 public class DocumentCommand {
 
+	private String id;
 	private String arxiuNom;
 	private String contingutBase64;
 	private String mediaType;
@@ -33,6 +34,7 @@ public class DocumentCommand {
 	private boolean generarCsv;
 	private String csv;
 	private String uuid;
+	private String arxiuGestdocId;
 	
 	public static DocumentCommand asCommand(DocumentDto dto) {
 		if (dto == null) {

@@ -60,6 +60,25 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 	@Column(name = "mida")
 	private Long mida;
 	
+	public void update (
+			String arxiuGestdocId,
+			String arxiuNom,
+			String url,
+			Boolean normalitzat,
+			String uuid,
+			String csv,
+			String media,
+			Long mida) {
+		this.arxiuGestdocId = arxiuGestdocId;
+		this.arxiuNom = arxiuNom;
+		this.url = url;
+		this.normalitzat = normalitzat;
+		this.uuid = uuid;
+		this.csv = csv;
+		this.mediaType = media;
+		this.mida = mida;
+	}
+	
 	public static Builder getBuilder(
 			String arxiuId,
 			String arxiuGestdocId,

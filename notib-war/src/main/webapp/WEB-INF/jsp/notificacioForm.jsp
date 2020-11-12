@@ -195,6 +195,14 @@ $(document).ready(function() {
 		$(".customSelect").val(tipusDocumentSelected).trigger("change");
 	} else if (tipusDocumentDefault != '') {
 		$(".customSelect").val(tipusDocumentDefault).trigger("change");
+		
+		if (tipusDocumentDefault == 'CSV') {
+			$('#documentArxiuCsv').val("${nomDocument}");
+		} else if (tipusDocumentDefault == 'UUID') {
+			$('#documentArxiuUuid').val("${nomDocument}");
+		} else if (tipusDocumentDefault == 'URL') {
+			$('#documentArxiuUrl').val("${nomDocument}");
+		}
 	}
 
 	$(document).on('change','select.enviamentTipus', function() {
@@ -264,7 +272,6 @@ $(document).ready(function() {
     var procedimentId = $("#procedimentId").children(":selected").attr("value");
 
     $('#organGestor').on('change', function() {
-    	
     	//### seleccionat per defecte si només hi ha un (empty + òrgan)
     	if ($('#organGestor').children('option').length == 2) {
     		$('#organGestor option:eq(1)').attr('selected', 'selected');
@@ -340,9 +347,6 @@ $(document).ready(function() {
 //         var procedimentId = $(this).children(":selected").attr("value");
 //         comprovarGrups(agrupable, procedimentId)
 //         webutilModalAdjustHeight();
-
-		
-
 		var procediment = $(this).val();
 		if (procediment == '') {
 			$("#organGestor").prop("disabled", false);
@@ -419,7 +423,8 @@ $(document).ready(function() {
 			});
 		}	
     });
-	$("#organGestor").trigger('change');
+    
+    $('#organGestor').trigger('change');
     //Add metadata
     var count = 0;
     $('#add').on('click', function () {
@@ -675,6 +680,13 @@ function addEnvio() {
 	        if($(this).hasClass('formEnviament')) {
 	            this.name= this.name.replace("[" + number, "[" + numPlus);
 	            this.id= this.id.replace("[" + number, "[" + numPlus);
+	        }
+	        
+	        if ($(this).attr('type') == 'hidden') {
+	        	var hiddenId = parseInt($(this).val());
+	        	if (typeof hiddenId == 'number') {
+	        		$(this).val(''); //remove hidden id (new)
+	        	}
 	        }
 	    });
 	    enviamentForm.find('#entregaPostal').removeClass('entregaPostal_' + num).addClass('entregaPostal_' + numPlus);
@@ -978,6 +990,7 @@ function actualitzarEntrega(j) {
 	</div>
     <c:set var="formAction"><not:modalUrl value="/notificacio/newOrModify"/></c:set>
     <form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" commandName="notificacioCommandV2" enctype="multipart/form-data">
+    	<input type="hidden" name="id" value="${notificacioCommandV2.id}">
 		<div class="container-fluid">
 			<div class="title">
 				<span class="fa fa-address-book"></span>
@@ -1114,7 +1127,9 @@ function actualitzarEntrega(j) {
 						</div>
 					</div>
 				</div>
-				
+				<input type="hidden" name="document.id" value="${notificacioCommandV2.document.id}">
+				<input type="hidden" name="document.arxiuGestdocId" value="${notificacioCommandV2.document.arxiuGestdocId}">
+				<input type="hidden" name="document.arxiuNom" value="${notificacioCommandV2.document.arxiuNom}">
 				<!-- CSV -->
 				<div id="input-origen-csv" class="col-md-6">
 					<not:inputText name="documentArxiuCsv" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
@@ -1132,7 +1147,14 @@ function actualitzarEntrega(j) {
 				
 				<!-- FITXER -->
 				<div id="input-origen-arxiu" class="col-md-6 hidden">
-					<not:inputFile name="arxiu" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+					<c:choose>
+						<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
+							<not:inputFile name="arxiu" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument}"/>
+						</c:when>
+						<c:otherwise>
+							<not:inputFile name="arxiu" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis"/>
+						</c:otherwise>
+					</c:choose>
 				</div>
 			</div>
 			
@@ -1162,7 +1184,7 @@ function actualitzarEntrega(j) {
 								<label class="envio[${k}] badge badge-light">Enviament ${k}</label>
 							</div>
 							<div>
-							
+							<input type="hidden" name="enviaments[${j}].id" value="${enviament.id}"/>
 							<!-- TIPUS DE SERVEI -->
 							<div class="col-md-6">
 								<div class="form-group">
@@ -1190,6 +1212,7 @@ function actualitzarEntrega(j) {
 								</div>
 								<div class="personaForm">
 									<div>
+										<input type="hidden" name="enviaments[${j}].titular.id" value="${enviament.titular.id}"/>
 										<!--  TIPUS INTERESSAT -->
 										<div class="col-md-6">
 											<not:inputSelect name="enviaments[${j}].titular.interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="4" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
@@ -1255,7 +1278,7 @@ function actualitzarEntrega(j) {
 											<c:set var="i" value="${status.index}" />
 											<div class="col-md-12 destinatariForm destenv_${j} personaForm_${j}_${i}">
 <%-- 												<input id="isMultiple" class="hidden" value="${isMultiplesDestinataris}"> --%>
-												
+													<input type="hidden" name="enviaments[${j}].destinataris[${i}].id" value="${destinatari.id}"/>
 													<!-- TIPUS INTERESSAT -->
 													<div class="col-md-3">
 														<not:inputSelect name="enviaments[${j}].destinataris[${i}].interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="12" inputSize="12" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />

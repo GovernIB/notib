@@ -23,6 +23,7 @@ import lombok.Setter;
 @Getter @Setter
 public class EnviamentCommand {
 
+	private Long id;
 	private ServeiTipusEnumDto serveiTipus;
 	private Date caducitat;
 	@Valid @NotNull

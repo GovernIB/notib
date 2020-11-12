@@ -48,7 +48,9 @@ public class IntegracioHelper {
 	public static final String INTCODI_UNITATS = "UNITATS";
 	public static final String INTCODI_GESCONADM = "GESCONADM";
 	public static final String INTCODI_PROCEDIMENT = "PROCEDIMENTS";
-
+	public static final String INTCODI_CONVERT = "CONVERT";
+	public static final String INTCODI_FIRMASERV = "FIRMASERV";
+	
 	private Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = new HashMap<String, LinkedList<IntegracioAccioDto>>();
 	private Map<String, Integer> maxAccionsIntegracio = new HashMap<String, Integer>();
 

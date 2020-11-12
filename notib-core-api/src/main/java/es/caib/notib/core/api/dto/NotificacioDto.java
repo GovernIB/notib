@@ -69,6 +69,7 @@ public class NotificacioDto extends AuditoriaDto {
 	private String organGestor;
 	private String organGestorNom;
 	private List<EnviamentDto> enviaments;
+	private Date notificaEnviamentData;
 	
 	private List<PermisDto> permisos;
 	private boolean usuariActualRead;
@@ -77,6 +78,9 @@ public class NotificacioDto extends AuditoriaDto {
 	private boolean usuariActualAdministration;
 	private boolean errorLastCallback;
 	private boolean errorLastEvent;
+	private boolean hasEnviamentsPendents;
+	private boolean hasEnviamentsPendentsRegistre;
+	
 	private TipusUsuariEnumDto tipusUsuari;
 	
 	public boolean isNotificaError() {

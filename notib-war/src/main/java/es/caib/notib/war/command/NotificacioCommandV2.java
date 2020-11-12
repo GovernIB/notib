@@ -106,9 +106,11 @@ public class NotificacioCommandV2 {
 		if (dto == null) {
 			return null;
 		}
-		NotificacioCommandV2 command = ConversioTipusHelper.convertir(
-				dto,
-				NotificacioCommandV2.class );
+		NotificacioCommandV2 command = ConversioTipusHelper.convertir(dto, NotificacioCommandV2.class);
+		
+		if (dto.getProcediment() != null) {
+			command.setProcedimentId(dto.getProcediment().getId());
+		}
 		return command;
 	}
 	public static NotificacioDtoV2 asDto(NotificacioCommandV2 command) {

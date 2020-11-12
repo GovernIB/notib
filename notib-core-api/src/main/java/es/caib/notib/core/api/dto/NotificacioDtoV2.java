@@ -50,6 +50,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private EntitatDto entitat;
 	private boolean errorLastCallback;
 	private TipusUsuariEnumDto tipusUsuari;
+	private Date notificaEnviamentData;
 	
 	private boolean errorLastEvent;
 	

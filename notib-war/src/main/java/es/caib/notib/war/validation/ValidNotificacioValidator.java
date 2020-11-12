@@ -117,7 +117,8 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 				if (aplicacioService.propertyGet("es.caib.notib.notificacio.document.size") != null)
 					fileMaxSize = Long.valueOf(aplicacioService.propertyGet("es.caib.notib.notificacio.document.size"));
 				
-				if (notificacio.getContingutArxiu() == null || notificacio.getContingutArxiu().length == 0) {
+				if ((notificacio.getContingutArxiu() == null || notificacio.getContingutArxiu().length == 0 || notificacio.getDocument().getArxiuGestdocId() == null)
+						&& (notificacio.getDocument().getArxiuGestdocId() == null)) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
 					.addNode("arxiu")
