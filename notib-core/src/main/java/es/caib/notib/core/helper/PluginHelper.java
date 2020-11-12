@@ -1348,11 +1348,13 @@ public class PluginHelper {
 					docDetall = arxiuDocumentConsultar(id, null);
 
 					if (docDetall != null) {
+//						### START #381
 						if (docDetall.getMetadades().getTipusDocumental() != null) {
 							annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumental().toString());
 						} else if (docDetall.getMetadades().getTipusDocumentalAddicional() != null) {
 							annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumentalAddicional());
 						}
+//						### END #381
 						annex.setOrigenCiudadanoAdmin(docDetall.getMetadades().getOrigen().ordinal());
 						annex.setFechaCaptura(toXmlGregorianCalendar(docDetall.getMetadades().getDataCaptura()));
 
