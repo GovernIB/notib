@@ -380,7 +380,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			certificacio.setHash("b081c7abf42d5a8e5a4050958f28046bdf86158c");
 			certificacio.setOrigen("electronico");
 			certificacio.setCsv("dasd-dsadad-asdasd-asda-sda-das");
-			
+			certificacio.setMime("application/pdf");
 			byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 			certificacio.setContenidoCertificacion(arxiuBytes);
 			certificacio.setSize(String.valueOf(arxiuBytes.length));

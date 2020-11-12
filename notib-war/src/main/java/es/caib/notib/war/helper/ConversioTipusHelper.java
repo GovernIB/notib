@@ -58,6 +58,18 @@ public class ConversioTipusHelper {
         })
 		.register();
 		
+		mapperFactory.classMap(PersonaDto.class, PersonaCommand.class)
+		.byDefault()
+		.customize(new CustomMapper<PersonaDto, PersonaCommand>() {
+            @Override
+            public void mapAtoB(PersonaDto personaDto, PersonaCommand personaCommand, MappingContext context) {
+                if (InteressatTipusEnumDto.JURIDICA.equals(personaDto.getInteressatTipus())) {
+                	personaCommand.setNom(personaDto.getRaoSocial() != null ? personaDto.getRaoSocial() : personaDto.getNom());
+                }
+            }                   
+        })
+		.register();
+		
 		mapperFactory.classMap(EnviamentCommand.class, NotificacioEnviamentDtoV2.class)
 		.field("entregaPostal.activa", "entregaPostalActiva")
 		.field("entregaDeh.activa", "entregaDehActiva")

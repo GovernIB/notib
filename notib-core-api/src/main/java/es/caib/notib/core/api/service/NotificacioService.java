@@ -10,6 +10,7 @@ import javax.mail.MessagingException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.LocalitatsDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
@@ -21,8 +22,10 @@ import es.caib.notib.core.api.dto.NotificacioRegistreErrorFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
+import es.caib.notib.core.api.dto.ProgresDescarregaDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
+import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 /**
@@ -56,11 +59,12 @@ public interface NotificacioService {
 	 * @return El procediment modificat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws RegistreNotificaException 
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
-	public NotificacioDtoV2 update(
+	public List<NotificacioDto> update(
 			Long entitatId,
-			NotificacioDtoV2 notificacio) throws NotFoundException;
+			NotificacioDtoV2 notificacio) throws NotFoundException, RegistreNotificaException;
 	
 	/**
 	 * Consulta una notificació donat el seu id.
@@ -295,6 +299,27 @@ public interface NotificacioService {
 	
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	void enviamentsRefrescarEstat();
+
+	/**
+	 * Genera un justificant d'enviament
+	 * 
+	 * @param notificacioId
+	 *            Atribut id de la notificació.
+	 * @return el justificant firmat
+	 * @throws JustificantException
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public FitxerDto recuperarJustificant(Long notificacioId, Long entitatId) throws JustificantException;
+
+	/**
+	 * Recuperar l'estat de la generació del justificant
+	 * 
+	 * @return el justificant firmat
+	 * @throws JustificantException
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public ProgresDescarregaDto justificantEstat() throws JustificantException;
+
 //	void registrarEnviamentsPendents();
 //	void notificaEnviamentsRegistrats();
 //	void enviamentRefrescarEstatPendents();
