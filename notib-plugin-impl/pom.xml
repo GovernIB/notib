@@ -80,32 +80,6 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jaxws-maven-plugin</artifactId>
-				<version>2.4.1</version>
-				<executions>
-					<execution>
-						<id>generate-reports-ws-code</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>wsimport</goal>
-						</goals>
-						<configuration>
-							<sourceDestDir>${basedir}/src/main/java</sourceDestDir>
-							<wsdlUrls>
-								<wsdlUrl>${basedir}/src/main/resources/es/caib/notib/plugin/wsdl/sistra/zonaper/BackofficeFacade.wsdl</wsdlUrl>
-								<wsdlUrl>${basedir}/src/main/resources/es/caib/notib/plugin/wsdl/sistra/regtel/BackofficeFacade.wsdl</wsdlUrl>
-								<wsdlUrl>${basedir}/src/main/resources/es/caib/notib/plugin/wsdl/sistra/redose/BackofficeFacade.wsdl</wsdlUrl>
-							</wsdlUrls>
-							<vmArgs>
-								<vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
-							</vmArgs>
-							<verbose>true</verbose>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>

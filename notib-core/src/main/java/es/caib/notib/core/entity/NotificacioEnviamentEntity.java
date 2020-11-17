@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -17,7 +18,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.SecondaryTable;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -50,28 +50,28 @@ import lombok.Getter;
 @Getter
 @Entity
 @Table(name="not_notificacio_env")
-@SecondaryTable(name="not_notificacio")
+//@SecondaryTable(name="not_notificacio")
 @EntityListeners(AuditingEntityListener.class)
 public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_id")
 	@ForeignKey(name = "NOT_NOTIFICACIO_NOTENV_FK")
 	@NotFound(action = NotFoundAction.IGNORE)
 	protected NotificacioEntity notificacio;
 	
-	@Column(name="notificacio_id", insertable=false, updatable=false)
-	protected Long notificacioId;
+//	@Column(name="notificacio_id", insertable=false, updatable=false)
+//	protected Long notificacioId;
 	
 	/* Titular */
-	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "titular_id")
 	@ForeignKey(name = "not_persona_notificacio_env_fk")
 	protected PersonaEntity titular;
 	
 	/* Destinataris */
-	@OneToMany(fetch = FetchType.EAGER)
+	@OneToMany(fetch = FetchType.LAZY)
 	@ForeignKey(name = "not_persona_not_fk")
     @JoinColumn(name = "notificacio_env_id") // we need to duplicate the physical information
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -291,7 +291,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "notifica_error", nullable = false)
 	protected boolean notificaError;
 	
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinColumn(name = "notifica_error_event_id")
 	@ForeignKey(name = "not_noteve_noterr_notdest_fk")
 	protected NotificacioEventEntity notificacioErrorEvent;

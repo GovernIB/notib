@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.codahale.metrics.Timer;
 
 import es.caib.notib.core.api.service.CallbackService;
+import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.helper.CallbackHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
@@ -53,7 +54,9 @@ public class CallbackServiceImpl implements CallbackService {
 					int errors = 0;
 					for (Long pendentsId: pendentsIds) {
 						logger.debug(">>> Enviant avís a aplicació client de canvi d'estat de la notificació amb identificador: " + pendentsId);
-						if (!callbackHelper.notifica(pendentsId)) {
+						NotificacioEntity notificacioProcessada = callbackHelper.notifica(pendentsId);
+						if (notificacioProcessada != null && notificacioProcessada.isErrorLastCallback()) { 
+//						if (!callbackHelper.notifica(pendentsId)) {
 							errors++;
 						}
 					}

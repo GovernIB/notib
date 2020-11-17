@@ -42,7 +42,7 @@ public interface NotificacioService {
 	 * @throws RegistreNotificaException 
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
-	public List<NotificacioDto> create(
+	public NotificacioDtoV2 create(
 			Long entitatId,
 			NotificacioDtoV2 notificacio) throws RegistreNotificaException;
 	

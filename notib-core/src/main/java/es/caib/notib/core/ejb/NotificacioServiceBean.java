@@ -133,7 +133,7 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public List<NotificacioDto> create(
+	public NotificacioDtoV2 create(
 			Long entitatId, 
 			NotificacioDtoV2 notificacio) throws RegistreNotificaException {
 		return delegate.create(entitatId, notificacio);

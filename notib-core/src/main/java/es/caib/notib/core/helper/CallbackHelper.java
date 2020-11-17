@@ -62,11 +62,12 @@ public class CallbackHelper {
 	private NotificaHelper notificaHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
-
+	@Autowired
+	private AuditNotificacioHelper auditNotificacioHelper;
 
 
 	@Transactional (rollbackFor = RuntimeException.class)
-	public boolean notifica(Long eventId) {
+	public NotificacioEntity notifica(Long eventId) {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_CLIENT, 
@@ -79,7 +80,7 @@ public class CallbackHelper {
 		NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
 		if (event == null)
 			throw new NotFoundException("eventId:" + eventId, NotificacioEventEntity.class);
-		NotificacioEntity notificacio = notificacioRepository.findById(event.getNotificacioId());
+		NotificacioEntity notificacio = event.getNotificacio(); //notificacioRepository.findById(event.getNotificacioId());
 		int intents = event.getCallbackIntents() + 1;
 		Date ara = new Date();
 		try {
@@ -94,21 +95,21 @@ public class CallbackHelper {
 				// Avisa al client que hi ha hagut una modificació a l'enviament
 				String resposta = notificaCanvi(event.getEnviament());
 				if ("INACTIVA".equals(resposta)) {
-					// No s'ha de fer res. El callback està inactiu
-					return true;
+					// No s'ha d'enviar. El callback està inactiu
+					event.updateCallbackClient(CallbackEstatEnumDto.PROCESSAT, ara, intents, null);
+					auditNotificacioHelper.updateLastCallbackError(notificacio, false);
+					return notificacio;
 				}
 				// Marca l'event com a notificat
-				event.setNotificacio(notificacio); //event.getEnviament().getNotificacio());
 				event.updateCallbackClient(CallbackEstatEnumDto.NOTIFICAT, ara, intents, null);
-				notificacio.updateLastCallbackError(false);
+				auditNotificacioHelper.updateLastCallbackError(notificacio, false);
 				ret = true;
 				integracioHelper.addAccioOk(info);
 			} else {
 				// És un event pendent de notificar que no és del tipus esperat
 				String errorDescripcio = "L'event id=" + event.getId() + " és del tipus " + event.getTipus() + " i no es pot notificar a l'aplicació client.";
-				event.setNotificacio(notificacio); //event.getEnviament().getNotificacio());
 				event.updateCallbackClient(CallbackEstatEnumDto.ERROR, ara, intents, errorDescripcio);
-				notificacio.updateLastCallbackError(true);
+				auditNotificacioHelper.updateLastCallbackError(notificacio, true);
 				integracioHelper.addAccioError(info, "Error enviant l'avís de canvi d'estat: " + errorDescripcio);
 			}
 		} catch (Exception ex) {
@@ -118,16 +119,12 @@ public class CallbackHelper {
 			CallbackEstatEnumDto estatNou = maxIntents == null || intents < maxIntents ? 
 												CallbackEstatEnumDto.PENDENT
 												: CallbackEstatEnumDto.ERROR;
-
-			// TODO: solució temporal.
-			//event.setNotificacio(event.getEnviament().getNotificacio());   <===  Revisar perquè falla quan recupera la notificació d'un event.
-			event.setNotificacio(notificacio);
 			event.updateCallbackClient(
 					estatNou,
 					ara,
 					intents,
 					"Error notificant l'event al client: " + ex.getMessage());
-			notificacio.updateLastCallbackError(true);
+			auditNotificacioHelper.updateLastCallbackError(notificacio, true);
 			integracioHelper.addAccioError(info, "Error enviant l'avís de canvi d'estat", ex);
 		}
 		notificacioRepository.save(notificacio);
@@ -141,8 +138,6 @@ public class CallbackHelper {
 				enviament(event.getEnviament()).
 				descripcio("Callback " + event.getTipus());
 		} else {
-			event.setNotificacio(notificacio);
-			
 			eventBuilder = NotificacioEventEntity.getBuilder(
 					NotificacioEventTipusEnumDto.CALLBACK_CLIENT,
 					notificacio). // event.getNotificacio()).
@@ -158,7 +153,7 @@ public class CallbackHelper {
 		else
 			event.getNotificacio().updateEventAfegir(callbackEvent);
 		notificacioEventRepository.save(callbackEvent);
-		return ret;
+		return notificacio;
 	}
 
 	private String notificaCanvi(NotificacioEnviamentEntity enviament) throws Exception {

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
+import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 
 /**
@@ -24,16 +25,14 @@ public class NotificaHelper {
 	@Autowired
 	private NotificaV0Helper notificaV0Helper; // Mock
 	@Autowired
-	private NotificaV1Helper notificaV1Helper;
-	@Autowired
 	private NotificaV2Helper notificaV2Helper;
 
 
-	public boolean notificacioEnviar(Long notificacioId) {
+	public NotificacioEntity notificacioEnviar(Long notificacioId) {
 		return getNotificaHelper().notificacioEnviar(notificacioId);
 	}
 
-	public boolean enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
+	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
 		return getNotificaHelper().enviamentRefrescarEstat(enviamentId);
 	}
 
@@ -78,8 +77,6 @@ public class NotificaHelper {
 		String versio = getNotificaVersioProperty();
 		if ("0".equals(versio)) {
 			return notificaV0Helper;
-		} else if ("1".equals(versio)) {
-			return notificaV1Helper;
 		} else if ("2".equals(versio)) {
 			return notificaV2Helper;
 		} else {

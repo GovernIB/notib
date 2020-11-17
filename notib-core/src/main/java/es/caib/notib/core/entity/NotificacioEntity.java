@@ -169,7 +169,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	protected Set<NotificacioEnviamentEntity> enviaments = new LinkedHashSet<NotificacioEnviamentEntity>();
 	@OneToMany(
 			mappedBy = "notificacio",
-			fetch = FetchType.LAZY)
+			fetch = FetchType.LAZY,
+			cascade=CascadeType.ALL)
 	protected Set<NotificacioEventEntity> events = new LinkedHashSet<NotificacioEventEntity>();
 	
 

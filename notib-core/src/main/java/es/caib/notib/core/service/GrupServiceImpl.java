@@ -24,7 +24,11 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.service.AuditService.TipusEntitat;
+import es.caib.notib.core.api.service.AuditService.TipusObjecte;
+import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.aspect.Audita;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.GrupProcedimentEntity;
@@ -71,6 +75,7 @@ public class GrupServiceImpl implements GrupService{
 	@Resource
 	private MetricsHelper metricsHelper;
 	
+	@Audita(entityType = TipusEntitat.GRUP, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
 	@Override
 	@Transactional
 	public GrupDto create(
@@ -107,6 +112,7 @@ public class GrupServiceImpl implements GrupService{
 		}
 	}
 
+	@Audita(entityType = TipusEntitat.GRUP, operationType = TipusOperacio.UPDATE, returnType = TipusObjecte.DTO)
 	@Override
 	@Transactional
 	public GrupDto update(GrupDto grup) throws NotFoundException {
@@ -131,6 +137,7 @@ public class GrupServiceImpl implements GrupService{
 		}
 	}
 
+	@Audita(entityType = TipusEntitat.GRUP, operationType = TipusOperacio.DELETE, returnType = TipusObjecte.DTO)
 	@Override
 	@Transactional
 	public GrupDto delete(Long id) throws NotFoundException {
