@@ -557,6 +557,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
 							filtre.getEstat() == null,
 							filtre.getEstat(), 
+							NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
 							dataInici == null,
 							dataInici,
 							dataFi == null,
@@ -589,6 +590,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getConcepte(),
 							filtre.getEstat() == null,
 							filtre.getEstat(),
+							NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
 							dataInici == null,
 							dataInici,
 							dataFi == null,
@@ -619,6 +621,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getConcepte(),
 							filtre.getEstat() == null,
 							filtre.getEstat(),
+							NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
 							dataInici == null,
 							dataInici,
 							dataFi == null,
@@ -653,6 +656,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 								filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
 								filtre.getEstat() == null,
 								filtre.getEstat(), 
+								NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
 								dataInici == null,
 								dataInici,
 								dataFi == null,
@@ -717,6 +721,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			resultatPagina = paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
 		} else {
 			if(notificacions != null) {
+				
 				for (NotificacioEntity notificacio : notificacions) {
 					if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
 						notificacio.setPermisProcessar(
@@ -746,6 +751,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 							}
 						}
 					}
+					
+//					List<NotificacioEnviamentEntity> notificacioEnviaments = notificacioEnviamentRepository.findByNotificacioIdOrderByNotificaEstatDataAndOrderByNotificaEstatDataActualitzacioDesc(notificacio.getId());
+//					if(notificacioEnviaments != null && notificacioEnviaments.size() != 0) {
+//						notificacio.setNotificaEstat(notificacioEnviaments.get(0).getNotificaEstat());
+//					}
+				
 				}	
 			}
 			resultatPagina = paginacioHelper.toPaginaDto(
@@ -805,6 +816,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						filtre.getConcepte() == null ? "" : filtre.getConcepte(),
 						filtre.getEstat() == null,
 						filtre.getEstat(),
+						NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
 						filtre.getUsuari() == null || filtre.getUsuari().trim().isEmpty(),
 						filtre.getUsuari() == null ? "" : filtre.getUsuari(),
 						paginacioHelper.toSpringDataPageable(paginacioParams));

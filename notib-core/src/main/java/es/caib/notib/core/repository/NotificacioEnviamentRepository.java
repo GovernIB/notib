@@ -30,6 +30,10 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	List<NotificacioEnviamentEntity> findByNotificacioId(
 			Long notificacioId);
 	
+	@Query(value = "FROM NotificacioEnviamentEntity n WHERE n.notificacioId = :notificacioId ORDER BY n.notificaEstatData DESC, n.notificaEstatDataActualitzacio DESC")
+	List<NotificacioEnviamentEntity> findByNotificacioIdOrderByNotificaEstatDataAndOrderByNotificaEstatDataActualitzacioDesc(
+			@Param("notificacioId")  Long notificacioId);
+	
 	NotificacioEnviamentEntity findById(Long id);
 	
 	@Query(value = "FROM NotificacioEnviamentEntity n WHERE n.notificacio = :notificacio")
