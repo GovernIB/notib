@@ -558,6 +558,7 @@ $(document).ready(function() {
 
 					</script>
 				</th>
+<%-- 				<th data-col-name="notificaEstat"  width="200px"><spring:message code="notificacio.form.camp.organGestor"/></th> --%>
 				<th data-col-name="createdByComplet" data-converter="String" width="150px"><spring:message code="notificacio.list.columna.enviament.creada"/></th>
 				<th data-col-name="permisProcessar" data-visible="false">
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="60px">

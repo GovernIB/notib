@@ -28,6 +28,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
@@ -181,7 +182,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	protected boolean hasEnviamentsPendents;
 	@Transient
 	protected boolean hasEnviamentsPendentsRegistre;
-	
+//	@Transient
+//	protected NotificacioEnviamentEstatEnumDto notificaEstat;
+
 	public void addEnviament(
 			NotificacioEnviamentEntity enviament) {
 		this.enviaments.add(enviament);
@@ -202,6 +205,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public void setHasEnviamentsPendentsRegistre(boolean hasEnviamentsPendentsRegistre) {
 		this.hasEnviamentsPendentsRegistre = hasEnviamentsPendentsRegistre;
 	}
+
 	
 	public void updateRegistreNumero(Integer registreNumero) {
 		this.registreNumero = registreNumero;
@@ -635,6 +639,142 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			return false;
 		return true;
 	}
+
+	public void setUsuariCodi(String usuariCodi) {
+		this.usuariCodi = usuariCodi;
+	}
+
+	public void setEmisorDir3Codi(String emisorDir3Codi) {
+		this.emisorDir3Codi = emisorDir3Codi;
+	}
+
+	public void setComunicacioTipus(NotificacioComunicacioTipusEnumDto comunicacioTipus) {
+		this.comunicacioTipus = comunicacioTipus;
+	}
+
+	public void setEnviamentTipus(NotificaEnviamentTipusEnumDto enviamentTipus) {
+		this.enviamentTipus = enviamentTipus;
+	}
+
+	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
+		this.enviamentDataProgramada = enviamentDataProgramada;
+	}
+
+	public void setConcepte(String concepte) {
+		this.concepte = concepte;
+	}
+
+	public void setDescripcio(String descripcio) {
+		this.descripcio = descripcio;
+	}
+
+	public void setRetard(Integer retard) {
+		this.retard = retard;
+	}
+
+	public void setCaducitat(Date caducitat) {
+		this.caducitat = caducitat;
+	}
+
+	public void setProcedimentCodiNotib(String procedimentCodiNotib) {
+		this.procedimentCodiNotib = procedimentCodiNotib;
+	}
+
+	public void setGrupCodi(String grupCodi) {
+		this.grupCodi = grupCodi;
+	}
+
+	public void setEstat(NotificacioEstatEnumDto estat) {
+		this.estat = estat;
+	}
+
+	public void setEstatDate(Date estatDate) {
+		this.estatDate = estatDate;
+	}
+
+	public void setTipusUsuari(TipusUsuariEnumDto tipusUsuari) {
+		this.tipusUsuari = tipusUsuari;
+	}
+
+	public void setMotiu(String motiu) {
+		this.motiu = motiu;
+	}
+
+	public void setNotificaErrorTipus(NotificacioErrorTipusEnumDto notificaErrorTipus) {
+		this.notificaErrorTipus = notificaErrorTipus;
+	}
+
+	public void setNotificaEnviamentData(Date notificaEnviamentData) {
+		this.notificaEnviamentData = notificaEnviamentData;
+	}
+
+	public void setNotificaEnviamentIntent(int notificaEnviamentIntent) {
+		this.notificaEnviamentIntent = notificaEnviamentIntent;
+	}
+
+	public void setRegistreEnviamentIntent(int registreEnviamentIntent) {
+		this.registreEnviamentIntent = registreEnviamentIntent;
+	}
+
+	public void setRegistreNumero(Integer registreNumero) {
+		this.registreNumero = registreNumero;
+	}
+
+	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
+		this.registreNumeroFormatat = registreNumeroFormatat;
+	}
+
+	public void setRegistreData(Date registreData) {
+		this.registreData = registreData;
+	}
+
+	public void setNumExpedient(String numExpedient) {
+		this.numExpedient = numExpedient;
+	}
+
+	public void setErrorLastCallback(boolean errorLastCallback) {
+		this.errorLastCallback = errorLastCallback;
+	}
+
+	public void setNotificaErrorEvent(NotificacioEventEntity notificaErrorEvent) {
+		this.notificaErrorEvent = notificaErrorEvent;
+	}
+
+	public void setEntitat(EntitatEntity entitat) {
+		this.entitat = entitat;
+	}
+
+	public void setPagadorPostal(PagadorPostalEntity pagadorPostal) {
+		this.pagadorPostal = pagadorPostal;
+	}
+
+	public void setPagadorCie(PagadorCieEntity pagadorCie) {
+		this.pagadorCie = pagadorCie;
+	}
+
+	public void setProcediment(ProcedimentEntity procediment) {
+		this.procediment = procediment;
+	}
+
+	public void setDocument(DocumentEntity document) {
+		this.document = document;
+	}
+
+	public void setOrganGestor(OrganGestorEntity organGestor) {
+		this.organGestor = organGestor;
+	}
+
+	public void setEnviaments(Set<NotificacioEnviamentEntity> enviaments) {
+		this.enviaments = enviaments;
+	}
+
+	public void setEvents(Set<NotificacioEventEntity> events) {
+		this.events = events;
+	}
+
+//	public void setNotificaEstat(NotificacioEnviamentEstatEnumDto notificaEstat) {
+//		this.notificaEstat = notificaEstat;
+//	}
 
 	private static final long serialVersionUID = 7206301266966284277L;
 

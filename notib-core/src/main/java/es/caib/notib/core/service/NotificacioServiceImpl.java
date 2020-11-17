@@ -114,6 +114,7 @@ import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -950,6 +951,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
 							filtre.getEstat() == null,
 							filtre.getEstat(), 
+							NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
 							dataInici == null,
 							dataInici,
 							dataFi == null,
@@ -982,6 +984,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getConcepte(),
 							filtre.getEstat() == null,
 							filtre.getEstat(),
+							NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
 							dataInici == null,
 							dataInici,
 							dataFi == null,
@@ -1012,6 +1015,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getConcepte(),
 							filtre.getEstat() == null,
 							filtre.getEstat(),
+							NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
 							dataInici == null,
 							dataInici,
 							dataFi == null,
@@ -1046,6 +1050,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 								filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
 								filtre.getEstat() == null,
 								filtre.getEstat(), 
+								NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
 								dataInici == null,
 								dataInici,
 								dataFi == null,
@@ -1110,6 +1115,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			resultatPagina = paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
 		} else {
 			if(notificacions != null) {
+				
 				for (NotificacioEntity notificacio : notificacions) {
 					if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
 						notificacio.setPermisProcessar(
@@ -1149,6 +1155,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 					if (enviamentsPendents != null && ! enviamentsPendents.isEmpty()) {
 						notificacio.setHasEnviamentsPendentsRegistre(true);
 					}
+
+//					List<NotificacioEnviamentEntity> notificacioEnviaments = notificacioEnviamentRepository.findByNotificacioIdOrderByNotificaEstatDataAndOrderByNotificaEstatDataActualitzacioDesc(notificacio.getId());
+//					if(notificacioEnviaments != null && notificacioEnviaments.size() != 0) {
+//						notificacio.setNotificaEstat(notificacioEnviaments.get(0).getNotificaEstat());
+//					}
+				
+
 				}	
 			}
 			resultatPagina = paginacioHelper.toPaginaDto(
@@ -1208,6 +1221,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						filtre.getConcepte() == null ? "" : filtre.getConcepte(),
 						filtre.getEstat() == null,
 						filtre.getEstat(),
+						NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
 						filtre.getUsuari() == null || filtre.getUsuari().trim().isEmpty(),
 						filtre.getUsuari() == null ? "" : filtre.getUsuari(),
 						paginacioHelper.toSpringDataPageable(paginacioParams));

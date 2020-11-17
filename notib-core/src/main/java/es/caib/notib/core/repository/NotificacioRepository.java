@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -200,7 +201,11 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:entitat = ntf.entitat) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
-			"and (:isEstatNull = true or ntf.estat = :estat) " +
+			"and (:isEstatNull = true or ntf.estat = :estat or (" +
+			"    select count(env.id) " +
+			"    from ntf.enviaments env " +
+			"    where env.notificaEstat = :notificaEstat" +
+			"    ) > 0 ) " +
 			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
 			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) "+
 			"and (:isOrganGestorNull = true or ntf.organGestor = :organGestor) " +
@@ -230,6 +235,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") NotificacioEstatEnumDto estat,
+			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
 			@Param("isDataIniciNull") boolean isDataIniciNull,
 			@Param("dataInici") Date dataInici,
 			@Param("isDataFiNull") boolean isDataFiNull,
@@ -268,7 +274,11 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:entitat = ntf.entitat) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
-			"and (:isEstatNull = true or ntf.estat = :estat) " +
+			"and (:isEstatNull = true or ntf.estat = :estat or (" +
+			"    select count(env.id) " +
+			"    from ntf.enviaments env " +
+			"    where env.notificaEstat = :notificaEstat" +
+			"    ) > 0 ) " +
 			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
 			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) "+
 			"and (:isOrganGestorNull = true or ntf.organGestor = :organGestor) " +
@@ -305,6 +315,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") NotificacioEstatEnumDto estat,
+			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
 			@Param("isDataIniciNull") boolean isDataIniciNull,
 			@Param("dataInici") Date dataInici,
 			@Param("isDataFiNull") boolean isDataFiNull,
@@ -399,7 +410,11 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"    (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
-			"and (:isEstatNull = true or ntf.estat = :estat) " +
+			"and (:isEstatNull = true or ntf.estat = :estat  or (" +
+			"    select count(env.id) " +
+			"    from ntf.enviaments env " +
+			"    where env.notificaEstat = :notificaEstat" +
+			"    ) > 0 ) " +
 			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
 			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) "+
 			"and (:isOrganGestorNull = true or ntf.organGestor = :organGestor) " +
@@ -431,6 +446,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") NotificacioEstatEnumDto estat,
+			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
 			@Param("isDataIniciNull") boolean isDataIniciNull,
 			@Param("dataInici") Date dataInici,
 			@Param("isDataFiNull") boolean isDataFiNull,
@@ -529,7 +545,11 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 		       "   and (:isDataIniciNull = true or n.createdDate >= :dataInici) " +
 		       "   and (:isDataFiNull = true or n.createdDate <= :dataFi) " +
 		       "   and (:isConcepteNull = true or lower(n.concepte) like concat('%', lower(:concepte), '%')) " +
-		       "   and (:isEstatNull = true or n.estat = :estat) " +
+		       "   and (:isEstatNull = true or n.estat = :estat or (" +
+			   "    select count(env.id) " +
+			   "    from n.enviaments env " +
+			   "    where env.notificaEstat = :notificaEstat" +
+			   "    ) > 0 ) " +
 			   "   and (:isUsuariNull = true or n.createdBy.codi = :usuariCodi)")
 	Page<NotificacioEntity> findNotificacioLastEventAmbErrorAmbFiltre(
 			@Param("isProcedimentNull") boolean isProcedimentNull,
@@ -542,6 +562,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull, 
 			@Param("estat") NotificacioEstatEnumDto estat, 
+			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
 			@Param("isUsuariNull") boolean isUsuariNull, 
 			@Param("usuariCodi") String usuariCodi, 
 			Pageable springDataPageable);
