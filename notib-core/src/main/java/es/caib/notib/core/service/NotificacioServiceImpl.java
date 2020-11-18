@@ -34,9 +34,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.codahale.metrics.Timer;
 
+import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.LocalitatsDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
@@ -60,6 +63,8 @@ import es.caib.notib.core.api.dto.PaisosDto;
 import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProgresDescarregaDto;
 import es.caib.notib.core.api.dto.ProgresDescarregaDto.TipusInfo;
+import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
+import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
@@ -89,10 +94,12 @@ import es.caib.notib.core.helper.CreacioSemaforDto;
 import es.caib.notib.core.helper.EmailHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.HibernateHelper;
+import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.JustificantHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.NotificaHelper;
+import es.caib.notib.core.helper.NotificacioHelper;
 import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PluginHelper;
@@ -172,8 +179,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private JustificantHelper justificantHelper;
 	@Autowired
 	private MessageHelper messageHelper;
+	@Autowired
+	private NotificacioHelper notificacioHelper;
+	@Autowired
+	private IntegracioHelper integracioHelper;
 	
 	public static Map<String, ProgresDescarregaDto> progresDescarrega = new HashMap<String, ProgresDescarregaDto>();
+	public static Map<String, ProgresActualitzacioCertificacioDto> progresActulitzacioExpirades = new HashMap<String, ProgresActualitzacioCertificacioDto>();
 	
 	@Transactional(rollbackFor=Exception.class)
 	@Override
@@ -1860,25 +1872,64 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	@Override
-	@Transactional
 	public void enviamentsRefrescarEstat() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			List<NotificacioEnviamentEntity> enviaments = notificacioEnviamentRepository.findExpiradesAndNotificaCertificacioDataNull();
 			
-			for (NotificacioEnviamentEntity enviament : enviaments) {
-				logger.debug("Refrescant l'estat de la notificació de Notific@ (enviamentId=" + enviament.getId() + ")");
-				try {
-					notificaHelper.enviamentRefrescarEstat(enviament.getId());
-				
-				} catch (Exception e) {
-					logger.error("No s'ha pogut refrescar l'estat de l'enviament (enviamentId=" + enviament.getId() + ")");
+			logger.debug("S'ha iniciat els procés d'actualització dels enviaments expirats");
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			IntegracioInfo info = new IntegracioInfo(
+					IntegracioHelper.INTCODI_NOTIFICA, 
+					"Actualització d'enviaments expirats sense certificació", 
+					IntegracioAccioTipusEnumDto.PROCESSAR, 
+					new AccioParam("Usuari encarregat: ", auth.getName()));
+			
+			ProgresActualitzacioCertificacioDto progres = progresActulitzacioExpirades.get(auth.getName());
+			if (progres != null && progres.getProgres() != 0) {
+				progres.addInfo(TipusActInfo.ERROR, "Existeix un altre procés en progrés...");
+			} else {
+				progres = new ProgresActualitzacioCertificacioDto();
+				progresActulitzacioExpirades.put(auth.getName(), progres);
+				List<Long> enviamentsIds = notificacioEnviamentRepository.findIdExpiradesAndNotificaCertificacioDataNull();
+				if (enviamentsIds == null || enviamentsIds.isEmpty()) {
+					progres.setProgres(100);
+					String msgInfoEnviamentsEmpty = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.empty");
+					progres.addInfo(TipusActInfo.WARNING, msgInfoEnviamentsEmpty);
+					info.getParams().add(new AccioParam("Msg. Títol:", msgInfoEnviamentsEmpty));
+				} else {
+					String msgInfoInici = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.inici");
+					progres.setNumEnviamentsExpirats(enviamentsIds.size());
+					progres.addInfo(TipusActInfo.TITOL, msgInfoInici);
+					info.getParams().add(new AccioParam("Msg. Títol:", msgInfoInici));
+					for (Long enviamentId : enviamentsIds) {
+						notificacioHelper.enviamentRefrescarEstat(
+								enviamentId, 
+								progres, 
+								info);
+					}
 				}
+				integracioHelper.addAccioOk(info);
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+
+	@Override
+	public ProgresActualitzacioCertificacioDto actualitzacioEnviamentsEstat() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			ProgresActualitzacioCertificacioDto progres = progresActulitzacioExpirades.get(auth.getName());
+			if (progres != null && progres.getProgres() != null &&  progres.getProgres() >= 100) {
+				progresActulitzacioExpirades.remove(auth.getName());
+			}
+			return progres;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
 	
 	@Transactional
 	@Override

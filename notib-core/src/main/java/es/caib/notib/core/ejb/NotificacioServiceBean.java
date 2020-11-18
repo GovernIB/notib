@@ -27,6 +27,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
 import es.caib.notib.core.api.dto.ProgresDescarregaDto;
+import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.exception.JustificantException;
@@ -335,6 +336,12 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"tothom"})
 	public ProgresDescarregaDto justificantEstat() throws JustificantException {
 		return delegate.justificantEstat();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public ProgresActualitzacioCertificacioDto actualitzacioEnviamentsEstat() {
+		return delegate.actualitzacioEnviamentsEstat();
 	}
 
 }

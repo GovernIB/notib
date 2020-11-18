@@ -23,11 +23,13 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
 import es.caib.notib.core.api.dto.ProgresDescarregaDto;
+import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
+
 /**
  * Declaració dels mètodes per a la consulta de notificacions i dels
  * destinataris i events associats.
@@ -316,9 +318,6 @@ public interface NotificacioService {
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public void reactivarRegistre(Long notificacioId);
-	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
-	void enviamentsRefrescarEstat();
 
 	/**
 	 * Genera un justificant d'enviament
@@ -344,6 +343,21 @@ public interface NotificacioService {
 //	void notificaEnviamentsRegistrats();
 //	void enviamentRefrescarEstatPendents();
 //	void enviamentRefrescarEstatEnviatSir();
+
+	/**
+	 * Actualitza enviaments expirats sense certificació
+	 * 
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public void enviamentsRefrescarEstat();
+	
+	/**
+	 * Recupera l'estat actual del progrés
+	 * 
+	 * @return el progrés d'actualització
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public ProgresActualitzacioCertificacioDto actualitzacioEnviamentsEstat();
 	
 
 }

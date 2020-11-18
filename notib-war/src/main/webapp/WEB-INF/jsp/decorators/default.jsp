@@ -308,7 +308,7 @@ body {
 								<ul class="dropdown-menu">
 									<li><a href="<c:url value="/entitat"/>"><spring:message code="decorator.menu.entitats"/></a></li>
 									<li><a href="<c:url value="/cache"/>"><spring:message code="decorator.menu.caches"/></a></li>
-									<li><a href="<c:url value="/notificacio/refrescarEstatNotifica"/>" data-confirm="<spring:message code="decorator.menu.expirades.confirm"/>" title="<spring:message code="decorator.menu.expirades.ajuda"/>"><spring:message code="decorator.menu.expirades"/> </a></li>
+									<li><a href="<c:url value="/notificacio/refrescarEstatNotifica"/>" title="<spring:message code="decorator.menu.expirades.ajuda"/>" data-toggle="modal" data-height="350px"><spring:message code="decorator.menu.expirades"/> </a></li>
 								</ul>
 							</div>
 							
