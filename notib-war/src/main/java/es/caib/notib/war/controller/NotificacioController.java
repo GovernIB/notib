@@ -63,6 +63,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaisosDto;
 import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
@@ -742,23 +743,6 @@ public class NotificacioController extends BaseUserController {
 		emplenarModelEnviamentInfo(notificacioId, enviamentId, "estatNotifica", model, request);
 		return "enviamentInfo";
 	}
-	
-	@RequestMapping(value = "/refrescarEstatNotifica", method = RequestMethod.GET)
-	public String refrescarEstatNotifica(HttpServletRequest request, Model model) {
-		try {
-			notificacioService.enviamentsRefrescarEstat();
-		} catch (Exception ex) {
-			logger.error("S'ha produit un error consultant els enviaments", ex);
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:../entitat",
-					"notificacio.controller.refrescar.estat.error");
-		}
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:../entitat",
-				"notificacio.controller.refrescar.estat.expirades.ok");
-	}
 
 	@RequestMapping(value = "/{notificacioId}/documentDescarregar", method = RequestMethod.GET)
 	@ResponseBody
@@ -925,6 +909,27 @@ public class NotificacioController extends BaseUserController {
 		Model model,
 		@PathVariable String provinciaId) {
 		return notificacioService.llistarLocalitats(provinciaId);
+	}
+	
+	@RequestMapping(value = "/refrescarEstatNotifica", method = RequestMethod.GET)
+	public String refrescarEstatNotificaGet(HttpServletRequest request, Model model) {
+		return "enviamentsExpiratsActualitzacioForm";
+	}
+	
+	@RequestMapping(value = "/refrescarEstatNotifica", method = RequestMethod.POST)
+	@ResponseBody
+	public void refrescarEstatNotifica() {
+		try {
+			notificacioService.enviamentsRefrescarEstat();
+		} catch (Exception ex) {
+			logger.error("S'ha produit un error consultant els enviaments", ex);
+		}
+	}
+	
+	@RequestMapping(value = "/refrescarEstatNotifica/estat", method = RequestMethod.GET)
+	@ResponseBody
+	public ProgresActualitzacioCertificacioDto enviamentsRefrescarEstatProgres() throws IOException {
+		return notificacioService.actualitzacioEnviamentsEstat();
 	}
 	
 	private void emplenarModelNotificacioInfo(
