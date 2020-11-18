@@ -85,6 +85,9 @@ public class IntegracioHelper {
 		integracions.add(
 				novaIntegracio(
 						INTCODI_PROCEDIMENT));
+		integracions.add(
+				novaIntegracio(
+						INTCODI_FIRMASERV));
 		return integracions;
 	}
 
@@ -264,7 +267,9 @@ public class IntegracioHelper {
 			integracio.setNom("Rolsac");
 		} else if (INTCODI_PROCEDIMENT.equals(codi)) {
 				integracio.setNom("Procediments");
-			}
+		} else if (INTCODI_FIRMASERV.equals(codi)) {
+			integracio.setNom("Firma servidor");
+		}
 		return integracio;
 	}
 	

@@ -15,6 +15,7 @@ public class ProgresActualitzacioCertificacioDto {
 		TITOL,
 		INFO,
 		SUB_INFO,
+		WARNING,
 		ERROR
 	}
 

@@ -318,9 +318,6 @@ public interface NotificacioService {
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public void reactivarRegistre(Long notificacioId);
-	
-	@PreAuthorize("hasRole('NOT_ADMIN')")
-	void enviamentsRefrescarEstat();
 
 	/**
 	 * Genera un justificant d'enviament
@@ -347,8 +344,20 @@ public interface NotificacioService {
 //	void enviamentRefrescarEstatPendents();
 //	void enviamentRefrescarEstatEnviatSir();
 
+	/**
+	 * Actualitza enviaments expirats sense certificació
+	 * 
+	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	ProgresActualitzacioCertificacioDto actualitzacioEnviamentsEstat();
+	public void enviamentsRefrescarEstat();
+	
+	/**
+	 * Recupera l'estat actual del progrés
+	 * 
+	 * @return el progrés d'actualització
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public ProgresActualitzacioCertificacioDto actualitzacioEnviamentsEstat();
 	
 
 }

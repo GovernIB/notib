@@ -57,7 +57,7 @@ function submit() {
 function refreshProgres() {
 	itervalProgres =  setInterval(function(){
 			getProgres(); 
-		}, 10);
+		}, 100);
 }
 
 function getProgres() {
@@ -80,7 +80,7 @@ function getProgres() {
 					
 					$('.customProgressPercentage').css('width', data.progres + '%');
 					
-					if (info[index].tipus == 'ERROR' || info[index].tipus == 'TITOL' || info[index].tipus == 'SUB_INFO') {
+					if (info[index].tipus == 'ERROR' || info[index].tipus == 'TITOL' || info[index].tipus == 'SUB_INFO' || info[index].tipus == 'WARNING') {
 						$('#actualitzacioInfo').append("<div class='info-" + info[index].tipus + "'><div>" + info[index].text + "</div></div>");
 					} else {
 						$('#actualitzacioInfo').append("<div class='info-" + info[index].tipus + "'><div class='info'>" + info[index].text + "</div><div class='percentage'>[" + data.progres + "%]</div></div>");
@@ -117,6 +117,12 @@ function getProgres() {
 .info-ERROR {
 	font-size: 13px;
 	color: #ff0000;
+}
+
+.info-WARNING {
+	font-size: 13px;
+	font-weight: bold;
+	color: #e08a0a;
 }
 
 .detall {

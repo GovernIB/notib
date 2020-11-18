@@ -49,7 +49,8 @@ public class IntegracioController extends BaseUserController {
 		GESDOC,
 		UNITATS,
 		GESCONADM,
-		PROCEDIMENTS
+		PROCEDIMENTS,
+		FIRMASERV
 	}
 
 	@RequestMapping(method = RequestMethod.GET)

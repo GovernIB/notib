@@ -34,9 +34,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.codahale.metrics.Timer;
 
+import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.ArxiuDto;
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.LocalitatsDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
@@ -91,6 +94,7 @@ import es.caib.notib.core.helper.CreacioSemaforDto;
 import es.caib.notib.core.helper.EmailHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.HibernateHelper;
+import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.JustificantHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
@@ -177,6 +181,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private MessageHelper messageHelper;
 	@Autowired
 	private NotificacioHelper notificacioHelper;
+	@Autowired
+	private IntegracioHelper integracioHelper;
 	
 	public static Map<String, ProgresDescarregaDto> progresDescarrega = new HashMap<String, ProgresDescarregaDto>();
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActulitzacioExpirades = new HashMap<String, ProgresActualitzacioCertificacioDto>();
@@ -1869,10 +1875,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public void enviamentsRefrescarEstat() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			
 			logger.debug("S'ha iniciat els procés d'actualització dels enviaments expirats");
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			ProgresActualitzacioCertificacioDto progres = progresActulitzacioExpirades.get(auth.getName());
+			IntegracioInfo info = new IntegracioInfo(
+					IntegracioHelper.INTCODI_NOTIFICA, 
+					"Actualització d'enviaments expirats sense certificació", 
+					IntegracioAccioTipusEnumDto.PROCESSAR, 
+					new AccioParam("Usuari encarregat: ", auth.getName()));
 			
+			ProgresActualitzacioCertificacioDto progres = progresActulitzacioExpirades.get(auth.getName());
 			if (progres != null && progres.getProgres() != 0) {
 				progres.addInfo(TipusActInfo.ERROR, "Existeix un altre procés en progrés...");
 			} else {
@@ -1881,12 +1893,22 @@ public class NotificacioServiceImpl implements NotificacioService {
 				List<Long> enviamentsIds = notificacioEnviamentRepository.findIdExpiradesAndNotificaCertificacioDataNull();
 				if (enviamentsIds == null || enviamentsIds.isEmpty()) {
 					progres.setProgres(100);
+					String msgInfoEnviamentsEmpty = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.empty");
+					progres.addInfo(TipusActInfo.WARNING, msgInfoEnviamentsEmpty);
+					info.getParams().add(new AccioParam("Msg. Títol:", msgInfoEnviamentsEmpty));
+				} else {
+					String msgInfoInici = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.inici");
+					progres.setNumEnviamentsExpirats(enviamentsIds.size());
+					progres.addInfo(TipusActInfo.TITOL, msgInfoInici);
+					info.getParams().add(new AccioParam("Msg. Títol:", msgInfoInici));
+					for (Long enviamentId : enviamentsIds) {
+						notificacioHelper.enviamentRefrescarEstat(
+								enviamentId, 
+								progres, 
+								info);
+					}
 				}
-				progres.setNumEnviamentsExpirats(enviamentsIds.size());
-				progres.addInfo(TipusActInfo.TITOL, messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.inici"));
-				for (Long enviamentId : enviamentsIds) {
-					notificacioHelper.enviamentRefrescarEstat(enviamentId, progres);
-				}
+				integracioHelper.addAccioOk(info);
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
