@@ -458,7 +458,8 @@ public class NotificacioController extends BaseUserController {
 				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
 				organsGestorsDisponibles = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
 				for(ProcedimentDto procediment: procedimentsDisponibles) {
-					codisProcedimentsDisponibles.add(procediment.getCodi());
+					if (!procediment.isComu())
+						codisProcedimentsDisponibles.add(procediment.getCodi());
 				}
 				for (OrganGestorDto organGestorDto : organsGestorsDisponibles) {
 					codisOrgansGestorsDisponibles.add(organGestorDto.getCodi());

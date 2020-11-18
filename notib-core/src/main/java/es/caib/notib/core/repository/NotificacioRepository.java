@@ -34,6 +34,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	
 	List<NotificacioEntity> findByProcedimentId(Long id);
 	
+	// Consulta de notificacions per usuaris normals sense filtre
 	@Query( "select ntf " +
 			"from " +
 			"    NotificacioEntity ntf " +
@@ -57,20 +58,6 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("usuariCodi") String usuariCodi,
 			Pageable paginacio);
 	
-//	@Query( "select ntf " +
-//			"from " +
-//			"    NotificacioEntity ntf " +
-//			"     left outer join ntf.organGestor organ " +
-//			"where (organ.codi is not null and organ.codi in (:organsGestorsCodisNotib))" +
-//			"and (ntf.procedimentCodiNotib is null and ntf.usuariCodi = :usuariCodi) " + 
-//			"and (ntf.entitat = :entitat) " )
-//	Page<NotificacioEntity> findByOrganGestorCodiWithoutProcedimentAndEntitat(
-//			@Param("esOrgansGestorsCodisNotibNull") boolean esOrgansGestorsCodisNotibNull,
-//			@Param("organsGestorsCodisNotib") List<? extends String> organsGestorsCodisNotib,
-//			@Param("entitat") EntitatEntity entitat,
-//			@Param("usuariCodi") String usuariCodi,
-//			Pageable paginacio);
-	
 	@Query( "select ntf " +
 			"from " +
 			"    NotificacioEntity ntf " +
@@ -79,7 +66,6 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"   ((ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib))" +
 			"   or (ntf.procedimentCodiNotib is null and ntf.organGestor is not null and ntf.organGestor.codi in (:organs))) " + 
 			"and (ntf.entitat = :entitat) ")
-//			"and (ntf.grupCodi = null) ")
 	Page<NotificacioEntity> findByProcedimentCodiNotibAndEntitat(
 			@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
 			@Param("entitat") EntitatEntity entitat,
@@ -252,6 +238,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("organs") List<String> organs,
 			Pageable paginacio);
 	
+	// Consulta de notificacions per usuaris normals amb filtre
 	@Query(	"select ntf " +
 			"from " +
 			"     NotificacioEntity ntf " +

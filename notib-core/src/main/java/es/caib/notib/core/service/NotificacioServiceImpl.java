@@ -1455,6 +1455,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 				progres = new ProgresActualitzacioCertificacioDto();
 				progresActulitzacioExpirades.put(auth.getName(), progres);
 				List<Long> enviamentsIds = notificacioEnviamentRepository.findIdExpiradesAndNotificaCertificacioDataNull();
+				if (enviamentsIds == null || enviamentsIds.isEmpty()) {
+					progres.setProgres(100);
+				}
 				progres.setNumEnviamentsExpirats(enviamentsIds.size());
 				progres.addInfo(TipusActInfo.TITOL, messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.inici"));
 				for (Long enviamentId : enviamentsIds) {
