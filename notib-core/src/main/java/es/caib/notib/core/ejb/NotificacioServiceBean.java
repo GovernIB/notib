@@ -25,6 +25,7 @@ import es.caib.notib.core.api.dto.NotificacioRegistreErrorFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
+import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -315,6 +316,12 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"NOT_ADMIN"})
 	public void enviamentsRefrescarEstat() {
 		delegate.enviamentsRefrescarEstat();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public ProgresActualitzacioCertificacioDto actualitzacioEnviamentsEstat() {
+		return delegate.actualitzacioEnviamentsEstat();
 	}
 
 }

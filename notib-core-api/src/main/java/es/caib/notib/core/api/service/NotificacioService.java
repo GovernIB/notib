@@ -21,10 +21,12 @@ import es.caib.notib.core.api.dto.NotificacioRegistreErrorFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
+import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
+
 /**
  * Declaració dels mètodes per a la consulta de notificacions i dels
  * destinataris i events associats.
@@ -299,6 +301,9 @@ public interface NotificacioService {
 //	void notificaEnviamentsRegistrats();
 //	void enviamentRefrescarEstatPendents();
 //	void enviamentRefrescarEstatEnviatSir();
+
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	ProgresActualitzacioCertificacioDto actualitzacioEnviamentsEstat();
 	
 
 }
