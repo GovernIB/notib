@@ -21,6 +21,7 @@ public class ProcedimentFormDto extends AuditoriaDto implements Serializable{
 	private Integer retard;
 	private List<PermisDto> permisos;
 	private List<GrupDto> grups;
+	private boolean comu;
 	
 	public int getPermisosCount() {
 		if  (permisos == null)
@@ -36,8 +37,11 @@ public class ProcedimentFormDto extends AuditoriaDto implements Serializable{
 	}
 	
 	public String getOrganGestorDesc() {
-		return organGestor + " - " + organGestorNom!=null?organGestorNom:"";
+		if (organGestorNom != null && !organGestorNom.isEmpty())
+			return organGestor + " - " + organGestorNom;
+		return organGestor;
 	}
+
 
 
 	private static final long serialVersionUID = 6058789232924135932L;

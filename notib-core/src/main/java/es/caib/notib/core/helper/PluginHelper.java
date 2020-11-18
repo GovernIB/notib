@@ -971,10 +971,16 @@ public class PluginHelper {
 				"Obtenir organigrama per entitat", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Codi Dir3 de l'entitat", entitatcodi));
+
+		String protocol = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.unitats.dir3.protocol", "REST");
 		
 		Map<String, NodeDir3> organigrama = null;
 		try {
-			organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(entitatcodi);
+			if ("SOAP".equalsIgnoreCase(protocol)) {
+				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitatWs(entitatcodi, null, null);
+			} else {
+				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(entitatcodi);
+			}
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al obtenir l'organigrama per entitat";
@@ -984,10 +990,9 @@ public class PluginHelper {
 					errorDescripcio,
 					ex);
 		}
-	
 		return organigrama;
 	}
-
+	
 	public List<ObjetoDirectorio> llistarOrganismesPerEntitat(String entitatcodi) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(
@@ -1495,7 +1500,7 @@ public class PluginHelper {
 			NotificacioEntity notificacio, 
 			Set<NotificacioEnviamentEntity> enviaments) throws RegistrePluginException {
 		AsientoRegistralBeanDto registre = new AsientoRegistralBeanDto();
-		registre.setEntidadCodigo(notificacio.getEntitat().getCodi());
+		registre.setEntidadCodigo(notificacio.getEntitat().getDir3Codi());
 		registre.setEntidadDenominacion(notificacio.getEntitat().getNom());
 		DadesOficina dadesOficina = new DadesOficina();
 		String dir3Codi;
@@ -1522,15 +1527,15 @@ public class PluginHelper {
 				dir3Codi);
 		
 		if (dadesOficina.getOficinaCodi() != null) {
-			//Codi Dir3 de l’oficina inicial
-			registre.setEntidadRegistralInicioCodigo(dadesOficina.getOficinaCodi());
-			registre.setEntidadRegistralInicioDenominacion(dadesOficina.getOficinaNom());
 			//Codi Dir3 de l’oficina origen (obligatori)
 			registre.setEntidadRegistralOrigenCodigo(dadesOficina.getOficinaCodi());
 			registre.setEntidadRegistralOrigenDenominacion(dadesOficina.getOficinaNom());
+			//Codi Dir3 de l’oficina inicial
+			//registre.setEntidadRegistralInicioCodigo(dadesOficina.getOficinaCodi());
+			//registre.setEntidadRegistralInicioDenominacion(dadesOficina.getOficinaNom());
 			//Codi Dir3 de l’oficina destí
-			registre.setEntidadRegistralDestinoCodigo(dadesOficina.getOficinaCodi());
-			registre.setEntidadRegistralDestinoDenominacion(dadesOficina.getOficinaNom());
+			//registre.setEntidadRegistralDestinoCodigo(dadesOficina.getOficinaCodi());
+			//registre.setEntidadRegistralDestinoDenominacion(dadesOficina.getOficinaNom());
 		}
 		if (dadesOficina.getLlibreCodi() != null) {
 			registre.setLibroCodigo(dadesOficina.getLlibreCodi());
@@ -1609,7 +1614,7 @@ public class PluginHelper {
 			NotificacioEntity notificacio, 
 			NotificacioEnviamentEntity enviament) throws RegistrePluginException {
 		AsientoRegistralBeanDto registre = new AsientoRegistralBeanDto();
-		registre.setEntidadCodigo(notificacio.getEntitat().getCodi());
+		registre.setEntidadCodigo(notificacio.getEntitat().getDir3Codi());
 		registre.setEntidadDenominacion(notificacio.getEntitat().getNom());
 		
 		DadesOficina dadesOficina = new DadesOficina();
@@ -1638,15 +1643,15 @@ public class PluginHelper {
 				dir3Codi);
 		
 		if (dadesOficina.getOficinaCodi() != null) {
-			//Codi Dir3 de l’oficina inicial
-			registre.setEntidadRegistralInicioCodigo(dadesOficina.getOficinaCodi());
-			registre.setEntidadRegistralInicioDenominacion(dadesOficina.getOficinaNom());
 			//Codi Dir3 de l’oficina origen (obligatori)
 			registre.setEntidadRegistralOrigenCodigo(dadesOficina.getOficinaCodi());
 			registre.setEntidadRegistralOrigenDenominacion(dadesOficina.getOficinaNom());
+			//Codi Dir3 de l’oficina inicial
+			//registre.setEntidadRegistralInicioCodigo(dadesOficina.getOficinaCodi());
+			//registre.setEntidadRegistralInicioDenominacion(dadesOficina.getOficinaNom());
 			//Codi Dir3 de l’oficina destí
-			registre.setEntidadRegistralDestinoCodigo(dadesOficina.getOficinaCodi());
-			registre.setEntidadRegistralDestinoDenominacion(dadesOficina.getOficinaNom());
+			//registre.setEntidadRegistralDestinoCodigo(dadesOficina.getOficinaCodi());
+			//registre.setEntidadRegistralDestinoDenominacion(dadesOficina.getOficinaNom());
 		}
 		if (dadesOficina.getLlibreCodi() != null) {
 			registre.setLibroCodigo(dadesOficina.getLlibreCodi());

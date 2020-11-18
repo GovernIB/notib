@@ -75,6 +75,8 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			@Param("organGestorId") Long organGestorId,
 			@Param("grups") List<String> grups);
 	
+	public List<ProcedimentEntity> findByComuTrue();
+	
 	List<ProcedimentEntity> findByEntitatActiva(boolean activa);
 	
 	@Query(

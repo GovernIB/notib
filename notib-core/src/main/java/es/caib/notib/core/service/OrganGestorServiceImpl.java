@@ -1,14 +1,19 @@
 package es.caib.notib.core.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.acls.model.Permission;
@@ -569,6 +574,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			cacheHelper.evictFindOrgansGestorsAccessiblesUsuari();
 			cacheHelper.evictFindEntitatsAccessiblesUsuari();
 			cacheHelper.evictFindProcedimentsWithPermis();
+			cacheHelper.evictFindOrgansGestorWithPermis();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -604,6 +610,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			cacheHelper.evictFindOrgansGestorsAccessiblesUsuari();
 			cacheHelper.evictFindEntitatsAccessiblesUsuari();
 			cacheHelper.evictFindProcedimentsWithPermis();
+			cacheHelper.evictFindOrgansGestorWithPermis();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -700,7 +707,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<OrganGestorDto> findOrgansGestorsWithPermis(Long entitatId, PermisEnum permis) {
+	@Cacheable(value = "organsPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
+	public List<OrganGestorDto> findOrgansGestorsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -710,6 +718,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					false, 
 					false);
 			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
+
+			// 1. Obtenim els òrgans gestors amb permisos
 			List<OrganGestorEntity> organsDisponibles = organGestorRepository.findByEntitat(entitat);
 			
 			permisosHelper.filterGrantedAny(
@@ -726,6 +736,33 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			List<OrganGestorDto> organsGestorsDto = conversioTipusHelper.convertirList(
 					organsDisponibles, 
 					OrganGestorDto.class); 
+
+			if (organsGestorsDto != null && !organsGestorsDto.isEmpty()) {
+				Set<OrganGestorDto> organsGestorsAmbPermis = new HashSet<OrganGestorDto>(organsGestorsDto);
+				
+				// 2. Obtenim els òrgans gestors fills dels organs gestors amb permisos
+				if (!organsDisponibles.isEmpty()) {
+					for (OrganGestorEntity organGestorEntity : organsDisponibles) {
+						List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+										entitat.getDir3Codi(), 
+										organGestorEntity.getCodi());
+						if (organsFills != null)
+							for(String organCodi: organsFills) {
+								organsGestorsAmbPermis.add(findByCodi(entitatId, organCodi));
+							}
+										
+					}
+				}
+				
+				organsGestorsDto = new ArrayList<OrganGestorDto>(organsGestorsAmbPermis);
+				Collections.sort(organsGestorsDto, new Comparator<OrganGestorDto>() {
+					@Override
+					public int compare(OrganGestorDto o1, OrganGestorDto o2) {
+						return o1.getCodi().compareTo(o1.getCodi());
+					}
+				});
+			}
+			
 			return organsGestorsDto;
 	
 		} finally {

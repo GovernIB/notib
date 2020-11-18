@@ -8,12 +8,14 @@
 		</layout>
 	</appender>
 	
-	<!--logger name="org.springframework.web">
+	<!-- 
+	<logger name="org.springframework.web">
 		<level value="DEBUG" />
-	</logger-->
+	</logger>
 	<logger name="es.caib.notib.plugin.caib.arxiu.client">
 		<level value="DEBUG" />
 	</logger>
+	-->
 
 	<root>
 		<level value="INFO"/>

@@ -10,7 +10,10 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
+
+import lombok.Getter;
 
 /**
  * Classe de model de dades que conté la informació d'un usuari.
@@ -18,6 +21,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
+@Getter
 @Table(name = "not_usuari")
 public class UsuariEntity implements Serializable {
 
@@ -34,33 +38,18 @@ public class UsuariEntity implements Serializable {
 	private String email;
 	@Column(name = "rebre_emails")
 	private boolean rebreEmailsNotificacio = true;
+	@Column(name = "rebre_emails_creats")
+	private boolean rebreEmailsNotificacioCreats = false;
+	@Column(name = "ultim_rol", length = 40)
+	private String ultimRol;
+	@Column(name = "ultima_entitat")
+	private Long ultimaEntitat;
 	@Column(name="idioma", length = 2)
 	private String idioma;
 	
 	@Version
 	private long version = 0;
 
-	public String getCodi() {
-		return codi;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public String getLlinatges() {
-		return llinatges;
-	}
-	public String getNomSencer() {
-		return nomSencer;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public boolean isRebreEmailsNotificacio() {
-		return rebreEmailsNotificacio;
-	}
-	public String getIdioma() {
-		return idioma;
-	}
 	public void update(
 			String nom,
 			String llinatges,
@@ -78,11 +67,22 @@ public class UsuariEntity implements Serializable {
 	
 	public void update(
 			boolean rebreEmailsNotificacio,
+			boolean rebreEmailsNotificacioCreats,
 			String idioma) {
 		this.rebreEmailsNotificacio = rebreEmailsNotificacio;
+		this.rebreEmailsNotificacioCreats = rebreEmailsNotificacioCreats;
 		this.idioma = idioma;
 	}
+	
+	public void updateUltimRol(String ultimRol) {
+		this.ultimRol = ultimRol;
+	}
 
+	public void updateUltimaEntitat(Long ultimaEntitat) {
+		this.ultimaEntitat = ultimaEntitat;
+	}
+
+	
 	public static Builder getBuilder(
 			String codi,
 			String email,

@@ -28,7 +28,7 @@ public interface AplicacioService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'usuari amb el codi de l'usuari autenticat.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
 	public void processarAutenticacioUsuari() throws NotFoundException;
 
 	/**
@@ -36,7 +36,7 @@ public interface AplicacioService {
 	 * 
 	 * @return L'usuari actual.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
 	public UsuariDto getUsuariActual();
 
 	/**
@@ -46,7 +46,7 @@ public interface AplicacioService {
 	 *            Codi de l'usuari a cercar.
 	 * @return L'usuari obtingut o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
 	public UsuariDto findUsuariAmbCodi(String codi);
 
 	/**
@@ -56,10 +56,10 @@ public interface AplicacioService {
 	 *            Codi de l'usuari a cercar.
 	 * @return L'usuari obtingut o null si no s'ha trobat.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
 	public List<String> findRolsUsuariAmbCodi(String usuariCodi);
 	
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
 	public List<String> findRolsUsuariActual();
 	
 	/**
@@ -69,7 +69,7 @@ public interface AplicacioService {
 	 *            Text per a fer la consulta.
 	 * @return La llista d'usuaris.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
 	public List<UsuariDto> findUsuariAmbText(String text);
 
 	/**
@@ -134,7 +134,7 @@ public interface AplicacioService {
 	 *             El codi del paràmetre
 	 * @return el valor del paràmetre
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
 	public String propertyGet(String property);
 	
 	/**
@@ -146,7 +146,7 @@ public interface AplicacioService {
 	 *             El valor per defecte en cas que el paràmetre no s'hagi definit
 	 * @return el valor del paràmetre
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
 	public String propertyGet(String property, String defaultValue);
 
 	/**
@@ -156,7 +156,7 @@ public interface AplicacioService {
 	 *             El prefix dels paràmetres a consultar
 	 * @return un Map amb els paràmetres trobats.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
 	public Map<String, String> propertyFindByPrefix(String prefix);
 
 	
@@ -165,8 +165,13 @@ public interface AplicacioService {
 	 * 
 	 * @return L'usuari actual.
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('tothom')")
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('tothom') or hasRole('NOT_CARPETA')")
 	public UsuariDto updateUsuariActual(UsuariDto asDto);
+	
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('tothom') or hasRole('NOT_CARPETA')")
+	public void updateRolUsuariActual(String rol);
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('tothom') or hasRole('NOT_CARPETA')")
+	public void updateEntitatUsuariActual(Long entitat);
 	
 	/**
 	 * Recupera les mètriques de l'aplicació.

@@ -6,8 +6,11 @@ package es.caib.notib.war.command;
 import java.io.Serializable;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
+import lombok.Getter;
+import lombok.Setter;
 
 
 /**
@@ -15,6 +18,7 @@ import es.caib.notib.war.helper.ConversioTipusHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 public class UsuariCommand implements Serializable {
 
 	private String codi;
@@ -24,50 +28,8 @@ public class UsuariCommand implements Serializable {
 	private String idioma;
 	private String[] rols;
 	private Boolean rebreEmailsNotificacio;
+	private Boolean rebreEmailsNotificacioCreats;
 
-	public String getCodi() {
-		return codi;
-	}
-	public void setCodi(String codi) {
-		this.codi = codi;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-	public String getNif() {
-		return nif;
-	}
-	public void setNif(String nif) {
-		this.nif = nif;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	public String getIdioma() {
-		return idioma;
-	}
-	public void setIdioma(String idioma) {
-		this.idioma = idioma;
-	}
-	public String[] getRols() {
-		return rols;
-	}
-	public void setRols(String[] rols) {
-		this.rols = rols;
-	}
-	public Boolean getRebreEmailsNotificacio() {
-		return rebreEmailsNotificacio;
-	}
-	public void setRebreEmailsNotificacio(Boolean rebreEmailsNotificacio) {
-		this.rebreEmailsNotificacio = rebreEmailsNotificacio;
-	}
-	
 	public static UsuariCommand asCommand(UsuariDto dto) {
 		return ConversioTipusHelper.convertir(
 				dto,

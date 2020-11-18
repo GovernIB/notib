@@ -72,9 +72,9 @@
 	<security-role>
 		<role-name>NOT_ADMIN</role-name>
 	</security-role>
-<!-- 	<security-role> -->
-<!-- 		<role-name>NOT_USER</role-name> -->
-<!-- 	</security-role> -->
+	<security-role>
+		<role-name>NOT_CARPETA</role-name>
+	</security-role>
 	<security-role>
 		<role-name>NOT_APL</role-name>
 	</security-role>
@@ -90,7 +90,7 @@
 		<auth-constraint>
 			<role-name>NOT_SUPER</role-name>
 			<role-name>NOT_ADMIN</role-name>
-<!-- 			<role-name>NOT_USER</role-name> -->
+			<role-name>NOT_CARPETA</role-name>
 			<role-name>NOT_APL</role-name>
 			<role-name>tothom</role-name>
 		</auth-constraint>

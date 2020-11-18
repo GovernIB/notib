@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,18 +33,29 @@ import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.ColumnesDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
+import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioTipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDto;
+import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.rest.consulta.Document;
+import es.caib.notib.core.api.rest.consulta.Estat;
+import es.caib.notib.core.api.rest.consulta.Persona;
+import es.caib.notib.core.api.rest.consulta.PersonaTipus;
+import es.caib.notib.core.api.rest.consulta.Resposta;
+import es.caib.notib.core.api.rest.consulta.SubEstat;
+import es.caib.notib.core.api.rest.consulta.Transmissio;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.entity.ColumnesEntity;
@@ -379,6 +391,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			boolean isUsuariEntitat,
 			boolean isAdminOrgan,
 			List<String> procedimentsCodisNotib,
+			List<String> codisOrgansGestorsDisponibles,
 			String organGestorCodi,
 			String usuariCodi,
 			NotificacioEnviamentFiltreDto filtre,
@@ -386,6 +399,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta els enviaments de les notificacións que te una entitat");
+			
+			boolean esProcedimentsCodisNotibNull = (procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty());
+			boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
+			
 			Date dataEnviamentInici = null,
 				 dataEnviamentFi = null,
 				 dataProgramadaDisposicioInici = null,
@@ -400,25 +417,25 @@ public class EnviamentServiceImpl implements EnviamentService {
 				dataEnviamentInici = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentInici()));
 			}
 			if (filtre.getDataEnviamentFi() != null && filtre.getDataEnviamentFi() != "") {
-				dataEnviamentFi = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentFi()));
+				dataEnviamentFi = toFiDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentFi()));
 			}
 			if (filtre.getDataProgramadaDisposicioInici() != null && filtre.getDataProgramadaDisposicioInici() != "") {
 				dataProgramadaDisposicioInici = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataProgramadaDisposicioInici()));
 			}
 			if (filtre.getDataProgramadaDisposicioFi() != null && filtre.getDataProgramadaDisposicioFi() != "") {
-				dataProgramadaDisposicioFi = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataProgramadaDisposicioFi()));
+				dataProgramadaDisposicioFi = toFiDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataProgramadaDisposicioFi()));
 			}
 			if (filtre.getDataRegistreInici() != null && filtre.getDataRegistreInici() != "") {
 				dataRegistreInici = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataRegistreInici()));
 			}
 			if (filtre.getDataRegistreFi() != null && filtre.getDataRegistreFi() != "") {
-				dataRegistreFi = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataRegistreFi()));
+				dataRegistreFi = toFiDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataRegistreFi()));
 			}
 			if (filtre.getDataCaducitatInici() != null && filtre.getDataCaducitatInici() != "") {
 				dataCaducitatInici = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataCaducitatInici()));
 			}
 			if (filtre.getDataCaducitatFi() != null && filtre.getDataCaducitatFi() != "") {
-				dataCaducitatFi = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataCaducitatFi()));
+				dataCaducitatFi = toFiDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataCaducitatFi()));
 			}
 			//Filtres camps procediment
 			Integer estat = null;
@@ -489,8 +506,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 						dataRegistreInici,
 						(dataRegistreFi == null),
 						dataRegistreFi,
-						(procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty()),
-						procedimentsCodisNotib,
+						esProcedimentsCodisNotibNull,
+						esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib,
+						esOrgansGestorsCodisNotibNull,
+						esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
 						aplicacioService.findRolsUsuariActual(),
 						usuariCodi,
 						pageable);
@@ -546,8 +565,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 						dataRegistreInici,
 						(dataRegistreFi == null),
 						dataRegistreFi,
-						(procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty()),
-						procedimentsCodisNotib,
+						esProcedimentsCodisNotibNull,
+						esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib,
 						organs,
 						pageable);
 			} else if (isUsuariEntitat) {
@@ -665,6 +684,19 @@ public class EnviamentServiceImpl implements EnviamentService {
 			cal.set(Calendar.MINUTE, 0);
 			cal.set(Calendar.SECOND, 0);
 			cal.set(Calendar.MILLISECOND, 0);
+			data = cal.getTime();
+		}
+		return data;
+	}
+	
+	private Date toFiDia(Date data) {
+		if (data != null) {
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(data);
+			cal.set(Calendar.HOUR, 23);
+			cal.set(Calendar.MINUTE, 59);
+			cal.set(Calendar.SECOND, 59);
+			cal.set(Calendar.MILLISECOND, 999);
 			data = cal.getTime();
 		}
 		return data;
@@ -1275,6 +1307,127 @@ public class EnviamentServiceImpl implements EnviamentService {
 			return pluginHelper.obtenirOficiExtern(enviament.getNotificacio().getEmisorDir3Codi(), enviament.getRegistreNumeroFormatat()).getJustificant();	
 		else
 			return pluginHelper.obtenirJustificant(enviament.getNotificacio().getEmisorDir3Codi(), enviament.getRegistreNumeroFormatat()).getJustificant();
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public Resposta findEnviamentsByNif(
+			String dniTitular,
+			NotificaEnviamentTipusEnumDto tipus,
+			Boolean estatFinal,
+			String basePath, 
+			Integer pagina, 
+			Integer mida) {
+		Integer numEnviaments = notificacioEnviamentRepository.countEnviamentsByNif(
+				dniTitular.toUpperCase(),
+				tipus,
+				estatFinal == null,
+				estatFinal);
+		Page<NotificacioEnviamentEntity> comunicacions = notificacioEnviamentRepository.findEnviamentsByNif(
+				dniTitular.toUpperCase(),
+				tipus,
+				estatFinal == null,
+				estatFinal,
+				getPageable(pagina, mida));
+		Resposta resposta = new Resposta();
+		resposta.setNumeroElementsTotals(numEnviaments);
+		resposta.setNumeroElementsRetornats(comunicacions.getContent() != null ? comunicacions.getContent().size() : 0);
+		
+		List<NotificacioEnviamentDto> dtos = conversioTipusHelper.convertirList(comunicacions.getContent(), NotificacioEnviamentDto.class);
+		resposta.setResultat(dtosToTransmissions(dtos, basePath));
+		return resposta;
+	}
+	
+	private Pageable getPageable(Integer pagina, Integer mida) {
+		Pageable pageable = new PageRequest(0, 999999999);
+		if (pagina != null && mida != null)
+			pageable = new PageRequest(
+					pagina,
+					mida);
+		return pageable;
+	}
+	
+	
+	private List<Transmissio> dtosToTransmissions(List<NotificacioEnviamentDto> enviaments, String basePath) {
+		List<Transmissio> transmissions = new ArrayList<Transmissio>();
+		if (enviaments != null) {
+			for (NotificacioEnviamentDto enviament: enviaments) {
+				transmissions.add(toTransmissio(enviament, basePath));
+			}
+		}
+		return transmissions;
+	}
+	
+	private Transmissio toTransmissio(NotificacioEnviamentDto enviament, String basePath) {
+		Transmissio transmissio = new Transmissio();
+		transmissio.setId(enviament.getId());
+		transmissio.setEmisor(enviament.getNotificacio().getEntitat().getCodi());
+		transmissio.setOrganGestor(enviament.getNotificacio().getOrganGestor());
+		if (enviament.getNotificacio().getProcediment() != null)
+			transmissio.setProcediment(enviament.getNotificacio().getProcediment().getCodi());
+		transmissio.setNumExpedient(enviament.getNotificacio().getNumExpedient());
+		transmissio.setConcepte(enviament.getNotificacio().getConcepte());
+		transmissio.setDescripcio(enviament.getNotificacio().getDescripcio());
+		transmissio.setDataEnviament(enviament.getNotificacio().getEnviamentDataProgramada());
+		transmissio.setEstat(Estat.valueOf(enviament.getNotificacio().getEstat().name()));
+		transmissio.setDataEstat(enviament.getNotificacio().getEstatDate());
+		Document document = Document.builder()
+				.nom(enviament.getNotificacio().getDocument().getArxiuNom())
+				.mediaType(enviament.getNotificacio().getDocument().getMediaType())
+				.mida(enviament.getNotificacio().getDocument().getMida())
+				.url(basePath + "/document/" + enviament.getNotificacio().getId()).build();
+		transmissio.setDocument(document);
+		transmissio.setTitular(toPersona(enviament.getTitular()));
+		List<Persona> destinataris = new ArrayList<Persona>();
+		if (enviament.getDestinataris() != null && !enviament.getDestinataris().isEmpty()) {
+			for (PersonaDto destinatari: enviament.getDestinataris()) {
+				destinataris.add(toPersona(destinatari));
+			}
+		}
+		transmissio.setDestinataris(destinataris);
+		transmissio.setSubestat(SubEstat.valueOf(enviament.getNotificaEstat().name()));
+		transmissio.setDataSubestat(enviament.getNotificaEstatData());
+
+		transmissio.setError(enviament.isNotificaError());
+		transmissio.setErrorData(enviament.getNotificaErrorData());
+		transmissio.setErrorDescripcio(enviament.getNotificaErrorDescripcio());
+		
+		// Justificant de registre
+		if (NotificacioEstatEnumDto.REGISTRADA.equals(enviament.getNotificacio().getEstat()) &&
+			(enviament.getRegistreEstat() != null && 
+				(NotificacioRegistreEstatEnumDto.DISTRIBUIT.equals(enviament.getRegistreEstat()) || 
+				 NotificacioRegistreEstatEnumDto.OFICI_EXTERN.equals(enviament.getRegistreEstat()) ||
+				 NotificacioRegistreEstatEnumDto.OFICI_SIR.equals(enviament.getRegistreEstat()) ) ||
+				(enviament.getRegistreData() != null && enviament.getRegistreNumeroFormatat() != null && !enviament.getRegistreNumeroFormatat().isEmpty()))) {
+			transmissio.setJustificant(basePath + "/justificant/" + enviament.getId());
+		}
+		
+		// Certificació
+		if (enviament.getNotificaCertificacioData() != null) {
+			transmissio.setCertificacio(basePath + "/certificacio/" + enviament.getId());
+		}
+		
+		return transmissio;
+	}
+	
+	private Persona toPersona(PersonaDto dto) {
+		Persona persona= new Persona();
+		persona.setNom(dto.getNom());
+		if (dto.getInteressatTipus() != null) {
+			persona.setTipus(PersonaTipus.valueOf(dto.getInteressatTipus().name()));
+			if (!InteressatTipusEnumDto.FISICA.equals(dto.getInteressatTipus())) {
+				if (dto.getRaoSocial() != null && !dto.getRaoSocial().isEmpty()) {
+					persona.setNom(dto.getRaoSocial());
+				} else {
+					persona.setNom(dto.getNom());
+				}
+			}
+		}
+		persona.setLlinatge1(dto.getLlinatge1());
+		persona.setLlinatge2(dto.getLlinatge2());
+		persona.setNif(dto.getNif());
+		persona.setEmail(dto.getEmail());
+		return persona;
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(EnviamentServiceImpl.class);

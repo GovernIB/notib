@@ -4,6 +4,7 @@
 package es.caib.notib.war.controller;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 import javax.ejb.EJBAccessException;
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 
+import es.caib.notib.core.api.rest.consulta.AppInfo;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.util.UtilitatsNotib;
 import es.caib.notib.core.api.ws.notificacio.DadesConsulta;
@@ -33,6 +35,7 @@ import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaDadesRegistre;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
+import es.caib.notib.war.interceptor.AplicacioInterceptor;
 
 /**
  * Controlador del servei REST per a la gestio de notificacions.
@@ -52,6 +55,19 @@ public class NotificacioServiceController extends BaseController {
 	@RequestMapping(value = {"/apidoc", "/rest"}, method = RequestMethod.GET)
 	public String documentacio(HttpServletRequest request) {
 		return "apidoc";
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = {"/rest/appinfo"}, method = RequestMethod.GET)
+	@ResponseBody
+	public AppInfo getAppInfo(HttpServletRequest request) {
+		AppInfo appInfo = new AppInfo();
+		appInfo.setNom("Notib");
+		Map<String, Object> manifestAtributsMap = (Map<String, Object>)request.getAttribute(
+				AplicacioInterceptor.REQUEST_ATTRIBUTE_MANIFEST_ATRIBUTES);
+		appInfo.setVersio(manifestAtributsMap.get("Implementation-Version").toString());
+		appInfo.setData(manifestAtributsMap.get("Release-Date").toString());
+		return appInfo;
 	}
 
 	@RequestMapping(

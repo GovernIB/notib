@@ -38,6 +38,7 @@ public class NotificacioFiltreCommand {
 	private String numExpedient;
 	private String creadaPer;
 	private String identificador;
+	private boolean nomesAmbErrors;
 	
 	public static NotificacioFiltreCommand asCommand(NotificacioFiltreDto dto) {
 		if (dto == null) {

@@ -3,7 +3,12 @@
  */
 package es.caib.notib.core.service.ws;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLConnection;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,6 +30,7 @@ import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
@@ -95,6 +101,7 @@ import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
+import es.caib.plugins.arxiu.api.DocumentContingut;
 
 
 /**
@@ -262,9 +269,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				
 				// DOCUMENT
 				// Comprovam si el document és vàlid
-				String documentGesdocId = null;
+				DocumentDto document = null;
 				try {
-					documentGesdocId = comprovaDocument(notificacio, documentGesdocId);
+					document = comprovaDocument(notificacio);
 				} catch (Exception e) {
 					logger.error("Error al obtenir el document", e);
 					String errorDescripcio = "[1064] No s'ha pogut obtenir el document a notificar: " + e.getMessage();
@@ -272,7 +279,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					return setRespostaError(errorDescripcio);
 				}
 				// Obtenim el document
-				DocumentEntity documentEntity = getDocument(notificacio, documentGesdocId);
+				DocumentEntity documentEntity = getDocument(notificacio, document);
 	
 				NotificacioEntity.BuilderV2 notificacioBuilder = NotificacioEntity.
 						getBuilderV2(
@@ -569,7 +576,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		return serveiTipus;
 	}
 
-	private DocumentEntity getDocument(NotificacioV2 notificacio, String documentGesdocId) {
+	private DocumentEntity getDocument(NotificacioV2 notificacio, DocumentDto document) {
 		DocumentEntity documentEntity = null;
 		if(notificacio.getDocument().getCsv() != null || 
 		   notificacio.getDocument().getUuid() != null || 
@@ -579,12 +586,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 			documentEntity = documentRepository.saveAndFlush(DocumentEntity.getBuilderV2(
 					notificacio.getDocument().getArxiuId(), 
-					documentGesdocId, 
+					document.getArxiuGestdocId(), 
 					notificacio.getDocument().getArxiuNom(),  
 					notificacio.getDocument().getUrl(),  
 					notificacio.getDocument().isNormalitzat(),  
 					notificacio.getDocument().getUuid(),
-					notificacio.getDocument().getCsv()).build());
+					notificacio.getDocument().getCsv(),
+					document.getMediaType(),
+					document.getMida()).build());
 			logger.debug(">> [ALTA] document creat");
 		}
 		return documentEntity;
@@ -607,27 +616,51 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		return enviamentTipus;
 	}
 
-	private String comprovaDocument(NotificacioV2 notificacio, String documentGesdocId) {
+	private DocumentDto comprovaDocument(NotificacioV2 notificacio) {
+		DocumentDto document = new DocumentDto();
 		if(notificacio.getDocument().getContingutBase64() != null) {
 			logger.debug(">> [ALTA] document contingut Base64");
-			documentGesdocId = pluginHelper.gestioDocumentalCreate(
+			byte[] contingut = Base64.decodeBase64(notificacio.getDocument().getContingutBase64()); 
+			String documentGesdocId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-					Base64.decodeBase64(notificacio.getDocument().getContingutBase64()));
+					contingut);
+			document.setArxiuGestdocId(documentGesdocId);
+			document.setMida(Long.valueOf(contingut.length));
+			document.setMediaType(getMimeTypeFromContingut(contingut));
 			logger.debug(">> [ALTA] documentId: " + documentGesdocId);
 		} else if (notificacio.getDocument().getUuid() != null) {
 			String arxiuUuid = notificacio.getDocument().getUuid();
 			logger.debug(">> [ALTA] documentUuid: " + arxiuUuid);
-			pluginHelper.arxiuGetImprimible(arxiuUuid, true);
+			DocumentContingut contingut = pluginHelper.arxiuGetImprimible(arxiuUuid, true);
+			document.setMida(contingut.getTamany());
+			document.setMediaType(contingut.getTipusMime());
 		} else if (notificacio.getDocument().getCsv() != null) {
 			String arxiuCsv = notificacio.getDocument().getCsv();
 			logger.debug(">> [ALTA] documentCsv: " + arxiuCsv);
-			pluginHelper.arxiuGetImprimible(arxiuCsv, false);
+			DocumentContingut contingut = pluginHelper.arxiuGetImprimible(arxiuCsv, false);
+			document.setMida(contingut.getTamany());
+			document.setMediaType(contingut.getTipusMime());
 		} else if (notificacio.getDocument().getUrl() != null) {
 			String arxiuUrl = notificacio.getDocument().getUrl();
 			logger.debug(">> [ALTA] documentUrl: " + arxiuUrl);
-			pluginHelper.getUrlDocumentContent(arxiuUrl);
+			byte[] contingut = pluginHelper.getUrlDocumentContent(arxiuUrl);
+			document.setMida(Long.valueOf(contingut.length));
+			document.setMediaType(getMimeTypeFromContingut(contingut));
 		}
-		return documentGesdocId;
+		return document;
+	}
+	
+	private String getMimeTypeFromContingut(byte[] contingut) {
+		String mimeType = null;
+		
+		try {
+			InputStream is = new BufferedInputStream(new ByteArrayInputStream(contingut));
+			mimeType = URLConnection.guessContentTypeFromStream(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return mimeType;
 	}
 
 	private String getGrupNotificacio(NotificacioV2 notificacio, EntitatEntity entitat, ProcedimentEntity procediment) {
@@ -1587,7 +1620,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 		
 		// Procediment
-		if (!comunicacioAmbAdministracio) {
+		// if (!comunicacioAmbAdministracio) {
+		if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.NOTIFICACIO) {
 			if (notificacio.getProcedimentCodi() == null) {
 				return setRespostaError("[1020] El camp 'procedimentCodi' no pot ser null.");
 			}

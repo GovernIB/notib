@@ -748,7 +748,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			Page<ProcedimentFormEntity> procediments = null;
 			PaginaDto<ProcedimentFormDto> procedimentsPage = null;
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
-			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organGestorNom"}); //{"organGestor", "organGestorNom"});
+			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organGestor.codi"});
+//			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organGestorNom"}); //{"organGestor", "organGestorNom"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 
 			if (filtre == null) {
@@ -790,6 +791,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getNom() == null ? "" : filtre.getNom(),
 							filtre.getOrganGestor() == null || filtre.getOrganGestor().isEmpty(),
 							filtre.getOrganGestor() == null ? "" : filtre.getOrganGestor(),
+							filtre.getComu()== null,		
+							filtre.getComu()== null ? false : filtre.getComu(),
 							pageable);
 					
 					procedimentsPage = paginacioHelper.toPaginaDto(
@@ -804,6 +807,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getNom() == null ? "" : filtre.getNom(),
 							filtre.getOrganGestor() == null || filtre.getOrganGestor().isEmpty(),
 							filtre.getOrganGestor() == null ? "" : filtre.getOrganGestor(),
+							filtre.getComu()== null,
+							filtre.getComu()== null ? false : filtre.getComu(),
 							pageable);
 					
 					procedimentsPage =  paginacioHelper.toPaginaDto(
@@ -822,6 +827,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getNom() == null || filtre.getNom().isEmpty(),
 							filtre.getNom() == null ? "" : filtre.getNom(),
 							organsFills,
+							filtre.getComu()== null,
+							filtre.getComu()== null ? false : filtre.getComu(),
 							pageable);
 					
 					procedimentsPage =  paginacioHelper.toPaginaDto(
@@ -1111,6 +1118,22 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						permisos,
 						auth);
 			}
+			
+			// 4. Procediments comuns
+			List<ProcedimentEntity> procedimentsComuns = procedimentRepository.findByComuTrue();
+			permisosHelper.filterGrantedAny(
+					procedimentsComuns,
+					new ObjectIdentifierExtractor<ProcedimentEntity>() {
+						public Long getObjectIdentifier(ProcedimentEntity procediment) {
+							return procediment.getId();
+						}
+					},
+					ProcedimentEntity.class,
+					permisos,
+					auth);
+			procedimentsComuns.removeAll(procediments);
+			procediments.addAll(procedimentsComuns);
+			
 			return conversioTipusHelper.convertirList(
 					procediments,
 					ProcedimentDto.class);

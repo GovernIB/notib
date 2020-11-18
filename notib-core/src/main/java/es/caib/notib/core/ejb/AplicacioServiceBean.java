@@ -33,37 +33,37 @@ public class AplicacioServiceBean implements AplicacioService {
 	AplicacioService delegate;
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public void processarAutenticacioUsuari() {
 		delegate.processarAutenticacioUsuari();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public UsuariDto getUsuariActual() {
 		return delegate.getUsuariActual();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public List<String> findRolsUsuariAmbCodi(String usuariCodi) {
 		return delegate.findRolsUsuariAmbCodi(usuariCodi);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public List<String> findRolsUsuariActual() {
 		return delegate.findRolsUsuariActual();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public UsuariDto findUsuariAmbCodi(String codi) {
 		return delegate.findUsuariAmbCodi(codi);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public List<UsuariDto> findUsuariAmbText(String text) {
 		return delegate.findUsuariAmbText(text);
 	}
@@ -103,34 +103,45 @@ public class AplicacioServiceBean implements AplicacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public String propertyGet(String property) {
 		return delegate.propertyGet(property);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public String propertyGet(String property, String defaultValue) {
 		return delegate.propertyGet(property, defaultValue);
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public Map<String, String> propertyFindByPrefix(String prefix) {
 		return delegate.propertyFindByPrefix(prefix);
 	}
 	
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public UsuariDto updateUsuariActual(UsuariDto usuariDto) {
 		return delegate.updateUsuariActual(usuariDto);
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	public void updateRolUsuariActual(String rol) {
+		delegate.updateRolUsuariActual(rol);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	public void updateEntitatUsuariActual(Long entitat) {
+		delegate.updateEntitatUsuariActual(entitat);
+	}
+	
+	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public String getMetrics() {
 		return delegate.getMetrics();
 	}
-
 
 }

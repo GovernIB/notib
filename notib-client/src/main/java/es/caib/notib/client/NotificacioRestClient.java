@@ -50,6 +50,8 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 	private String password;
 
 	private boolean autenticacioBasic = false;
+	private int connecTimeout = 3000;
+	private int readTimeout = 10000;
 
 	public NotificacioRestClient() {}
 	public NotificacioRestClient(
@@ -66,12 +68,42 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 			String baseUrl,
 			String username,
 			String password,
+			int connecTimeout,
+			int readTimeout) {
+		super();
+		this.baseUrl = baseUrl;
+		this.username = username;
+		this.password = password;
+		this.connecTimeout = connecTimeout;
+		this.readTimeout = readTimeout;
+	}
+	
+	public NotificacioRestClient(
+			String baseUrl,
+			String username,
+			String password,
 			boolean autenticacioBasic) {
 		super();
 		this.baseUrl = baseUrl;
 		this.username = username;
 		this.password = password;
 		this.autenticacioBasic = autenticacioBasic;
+	}
+	
+	public NotificacioRestClient(
+			String baseUrl,
+			String username,
+			String password,
+			boolean autenticacioBasic,
+			int connecTimeout,
+			int readTimeout) {
+		super();
+		this.baseUrl = baseUrl;
+		this.username = username;
+		this.password = password;
+		this.autenticacioBasic = autenticacioBasic;
+		this.connecTimeout = connecTimeout;
+		this.readTimeout = readTimeout;
 	}
 
 	@Override
@@ -218,6 +250,8 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 
 	private Client generarClient() {
 		Client jerseyClient = Client.create();
+		jerseyClient.setConnectTimeout(connecTimeout);
+		jerseyClient.setReadTimeout(readTimeout);
 		//jerseyClient.addFilter(new LoggingFilter(System.out));
 		jerseyClient.addFilter(
 				new ClientFilter() {

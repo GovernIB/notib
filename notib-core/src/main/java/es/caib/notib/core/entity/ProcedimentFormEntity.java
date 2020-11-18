@@ -31,6 +31,7 @@ import lombok.Setter;
 		+ "			cie.dir3_codi as pagadorcie, "
 		+ "			postal.dir3_codi as pagadorpostal, "
 		+ "			pro.retard as retard, "
+		+ "			pro.comu as comu, "
 		+ "         pro.entitat as entitat_id"
 		+ " from	not_procediment pro "
 		+ " left outer join not_pagador_cie cie on cie.id = pro.pagadorcie "
@@ -85,5 +86,8 @@ public class ProcedimentFormEntity {
 	
 	@Column(name = "entitat_id")
 	protected Long entitat_id;
+	
+	@Column(name = "comu")
+	protected boolean comu;
 
 }

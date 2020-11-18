@@ -125,9 +125,40 @@ public class AplicacioServiceImpl implements AplicacioService {
 			UsuariEntity usuari = usuariRepository.findOne(dto.getCodi());
 			usuari.update(
 					dto.getRebreEmailsNotificacio(),
+					dto.getRebreEmailsNotificacioCreats(),
 					dto.getIdioma());
 			
 			return toUsuariDtoAmbRols(usuari);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Transactional
+	@Override
+	public void updateRolUsuariActual(String rol) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Actualitzant úlrim rol de usuari actual");
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			UsuariEntity usuari = usuariRepository.findOne(auth.getName());
+			usuari.updateUltimRol(rol);
+//			return toUsuariDtoAmbRols(usuari);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Transactional
+	@Override
+	public void updateEntitatUsuariActual(Long entitat) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Actualitzant úlrim rol de usuari actual");
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			UsuariEntity usuari = usuariRepository.findOne(auth.getName());
+			usuari.updateUltimaEntitat(entitat);
+//			return toUsuariDtoAmbRols(usuari);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

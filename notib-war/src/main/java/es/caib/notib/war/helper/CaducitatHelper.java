@@ -16,21 +16,16 @@ public class CaducitatHelper {
 	public static Date sumarDiesLaborals(int diesCaducitat) {
 		Calendar diaActual = Calendar.getInstance();
 		diaActual.setTime(new Date());
-		diaActual.add(Calendar.DATE, 1);
-		
 		try {
-			for (int dia = 1; dia <= diesCaducitat; dia++) {
-				Calendar diaSeguent = Calendar.getInstance();
-				diaSeguent.setTime(new Date());
-				diaSeguent.add(Calendar.DAY_OF_YEAR, dia);
-				
-				if ((diaSeguent.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY)) {
-					diaActual.add(Calendar.DAY_OF_YEAR, 1);
-				} else if (diaSeguent.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY){
-					dia = dia + 2;
-					diaActual.add(Calendar.DAY_OF_YEAR, 3);
-				}
-			}
+			int diesSumats = 0;
+			while (diesSumats < diesCaducitat) {
+				diaActual.add(Calendar.DAY_OF_YEAR, 1);
+				++diesSumats;
+//		        if ((diaActual.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) &&
+//		        		diaActual.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+//		            ++diesSumats;
+//		        }
+		    }
 		} catch (Exception ex) {
 			String errorMessage = "Error sumant dies a la data de caducitat: ";
 			LOGGER.error(errorMessage + ex.getMessage());

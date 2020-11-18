@@ -2,8 +2,6 @@
 /.classpath
 /.project
 /.settings/
-<<<<<<< HEAD
 /notib-plugin-impl/src/main/java/es/caib/regweb3/ws/v3/impl/
-=======
-/notib-plugin-impl/src/main/java/es/caib/regweb3/ws/v3/impl
->>>>>>> refs/remotes/origin/notib-1.0
+/.flattened-pom.xml
+/.attach_pid*

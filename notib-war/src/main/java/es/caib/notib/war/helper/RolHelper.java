@@ -10,8 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.RolEnumDto;
+import es.caib.notib.core.api.service.AplicacioService;
 
 /**
  * Utilitat per a gestionar el canvi de rol de l'usuari actual.
@@ -44,27 +46,46 @@ public class RolHelper {
 	}
 
 	public static void processarCanviRols(
-			HttpServletRequest request) {
+			HttpServletRequest request,
+			AplicacioService aplicacioService) {
 		String canviRol = request.getParameter(REQUEST_PARAMETER_CANVI_ROL);
 		if (canviRol != null && canviRol.length() > 0) {
 			LOGGER.debug("Processant canvi rol (rol=" + canviRol + ")");
-			if (request.isUserInRole(canviRol)) {
-				request.getSession().setAttribute(
-						SESSION_ATTRIBUTE_ROL_ACTUAL,
-						canviRol);
-			} else if(RolEnumDto.NOT_ADMIN_ORGAN.name().equals(canviRol) && 
+			if (request.isUserInRole(canviRol) || 
+				(RolEnumDto.NOT_ADMIN_ORGAN.name().equals(canviRol) && 
 					request.isUserInRole(RolEnumDto.tothom.name()) &&
-					(boolean)request.getAttribute("permisAdminOrgan")) {
-				request.getSession().setAttribute(
-						SESSION_ATTRIBUTE_ROL_ACTUAL,
-						canviRol);
+					(boolean)request.getAttribute("permisAdminOrgan"))) {
+				updateUltimRol(request, aplicacioService, canviRol);
 			}
 		}
 	}
+	
+	private static void updateUltimRol(
+			HttpServletRequest request,
+			AplicacioService aplicacioService,
+			String rol) {
+		request.getSession().setAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL,
+				rol);
+		if (aplicacioService != null)
+			aplicacioService.updateRolUsuariActual(rol);
+	}
 
 	public static String getRolActual(HttpServletRequest request) {
+		return getRolActual(request, null);
+	}
+	
+	public static String getRolActual(
+			HttpServletRequest request,
+			AplicacioService aplicacioService) {
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		if (rolActual == null && aplicacioService != null) {
+			rolActual = aplicacioService.getUsuariActual().getUltimRol();
+			request.getSession().setAttribute(
+					SESSION_ATTRIBUTE_ROL_ACTUAL,
+					rolActual);
+		}
 		List<String> rolsDisponibles = getRolsUsuariActual(request);
 		if (rolActual == null || !rolsDisponibles.contains(rolActual)) {
 			if (request.isUserInRole(ROLE_USUARI) && rolsDisponibles.contains(ROLE_USUARI)) {
@@ -77,9 +98,7 @@ public class RolHelper {
 				rolActual = ROLE_APLICACIO;
 			}
 			if (rolActual != null)
-				request.getSession().setAttribute(
-						SESSION_ATTRIBUTE_ROL_ACTUAL,
-						rolActual);
+				updateUltimRol(request, aplicacioService, rolActual);
 		}
 		LOGGER.debug("Obtenint rol actual (rol=" + rolActual + ")");
 		return rolActual;
@@ -135,18 +154,13 @@ public class RolHelper {
 		if (entitatActual != null) {
 			if (entitatActual.isUsuariActualAdministradorEntitat() && request.isUserInRole(ROLE_ADMIN_ENTITAT) && permisAdminSobreEntitat)
 				rols.add(ROLE_ADMIN_ENTITAT);
+		} else {
+			if (request.isUserInRole(ROLE_ADMIN_ENTITAT) && permisAdminSobreEntitat)
+				rols.add(ROLE_ADMIN_ENTITAT);
 		}
 		return rols;
 	}
 
-	public static List<String> getAllRolsUsuariActual(HttpServletRequest request) {
-		LOGGER.debug("Obtenint tots els rols per a l'usuari actual");
-		List<String> rols = new ArrayList<String>();
-		
-		
-		return rols;
-	}
-	
 	public static void esborrarRolActual(HttpServletRequest request) {
 		request.getSession().removeAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 	}

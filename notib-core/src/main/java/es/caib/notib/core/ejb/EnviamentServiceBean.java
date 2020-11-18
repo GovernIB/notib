@@ -19,6 +19,7 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.notib.core.api.dto.ColumnesDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
@@ -27,6 +28,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.rest.consulta.Resposta;
 import es.caib.notib.core.api.service.EnviamentService;
 
 /**
@@ -59,6 +61,7 @@ public class EnviamentServiceBean implements EnviamentService {
 			boolean isUsuariEntitat,
 			boolean isAdminOrgan, 
 			List<String> codisProcedimentsDisponibles,
+			List<String> codisOrgansGestorsDisponibles,
 			String organGestorCodi,
 			String usuariCodi,
 			NotificacioEnviamentFiltreDto filtre, 
@@ -70,6 +73,7 @@ public class EnviamentServiceBean implements EnviamentService {
 				isUsuariEntitat, 
 				isAdminOrgan,
 				codisProcedimentsDisponibles,
+				codisOrgansGestorsDisponibles,
 				organGestorCodi,
 				usuariCodi,
 				filtre, 
@@ -149,7 +153,7 @@ public class EnviamentServiceBean implements EnviamentService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_CARPETA"})
 	public byte[] getDocumentJustificant(Long enviamentId) {
 		return delegate.getDocumentJustificant(enviamentId);
 	}
@@ -170,5 +174,23 @@ public class EnviamentServiceBean implements EnviamentService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public void reactivaSir(Set<Long> enviaments) {
 		delegate.reactivaSir(enviaments);
+	}
+	
+	@Override
+	@RolesAllowed({"NOT_CARPETA", "NOT_SUPER"})
+	public Resposta findEnviamentsByNif(
+			String dniTitular,
+			NotificaEnviamentTipusEnumDto tipus,
+			Boolean estatFinal,
+			String basePath,
+			Integer pagina,
+			Integer mida) {
+		return delegate.findEnviamentsByNif(
+				dniTitular, 
+				tipus, 
+				estatFinal, 
+				basePath, 
+				pagina, 
+				mida);
 	}
 }

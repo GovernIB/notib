@@ -271,7 +271,7 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 		try {
 			logger.debug("Consultant usuaris aplicació amb text (text=" + text + ")");
 			return conversioTipusHelper.convertir(
-					aplicacioRepository.findByText(text),
+					aplicacioRepository.findByText(entitatId, text),
 					AplicacioDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

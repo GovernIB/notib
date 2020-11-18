@@ -123,9 +123,12 @@ $(document).ready(function() {
     	$('#estat').val("${filtreEnviaments.estat}").trigger('change');
     }
     
-	$('.data').datepicker({
+    $('.data').datepicker({
 		orientation: "bottom",
-		format: 'dd/mm/yyyy'
+		format: 'dd/mm/yyyy',
+		weekStart: 1,
+		todayHighlight: true,
+		language: "${requestLocale}"
 	});
 	
 	$('#enviament').on('selectionchange.dataTable', function (e, accio, ids) {

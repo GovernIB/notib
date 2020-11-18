@@ -15,6 +15,14 @@
 <%@ attribute name="inputSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="readonly" required="false" rtexprvalue="true"%>
 <%@ attribute name="searchButton" required="true" rtexprvalue="true"%>
+<script>
+$('input').change(function() {
+	if(this.type != "file"){
+		this.value = this.value.trim();
+	}
+	
+});
+</script>
 <c:set var="campValue" value="${value}"/>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>

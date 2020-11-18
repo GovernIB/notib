@@ -33,6 +33,7 @@ public class NotificacioFiltreDto implements Serializable {
 	private String numExpedient;
 	private String creadaPer;
 	private String identificador;
+	private boolean nomesAmbErrors;
 	
 	@Override
 	public String toString() {

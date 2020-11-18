@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.war.helper.ContingutEstaticHelper;
 import es.caib.notib.war.helper.OrganGestorHelper;
@@ -23,6 +24,8 @@ public class LlistaRolsInterceptor extends HandlerInterceptorAdapter {
 
 	@Autowired
 	private OrganGestorService organGestorService;
+	@Autowired
+	private AplicacioService aplicacioService;
 	
 	@Override
 	public boolean preHandle(
@@ -31,7 +34,8 @@ public class LlistaRolsInterceptor extends HandlerInterceptorAdapter {
 			Object handler) throws Exception {
 		if (!ContingutEstaticHelper.isContingutEstatic(request)) {
 			RolHelper.processarCanviRols(
-					request);
+					request,
+					aplicacioService);
 			OrganGestorHelper.getOrgansGestorsUsuariActual(
 					request, 
 					organGestorService);

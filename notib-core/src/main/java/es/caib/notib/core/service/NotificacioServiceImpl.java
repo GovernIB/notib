@@ -42,6 +42,7 @@ import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorCallbackFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
@@ -73,6 +74,7 @@ import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.CreacioSemaforDto;
@@ -86,6 +88,7 @@ import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.helper.RegistreHelper;
 import es.caib.notib.core.helper.RegistreNotificaHelper;
+import es.caib.notib.core.helper.UsuariHelper;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.GrupRepository;
@@ -136,6 +139,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private OrganGestorRepository organGestorRepository;
 	@Autowired
 	private EmailHelper emailHelper;
+	@Autowired
+	private UsuariHelper usuariHelper;
 	@Autowired
 	private RegistreNotificaHelper registreNotificaHelper;
 	@Autowired
@@ -211,13 +216,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 				DocumentDto document = new DocumentDto();
 				String arxiuUuid = notificacio.getDocument().getUuid();
 				if (pluginHelper.isArxiuPluginDisponible()) {
-					Document documentArxiu = pluginHelper.arxiuDocumentConsultar(
-							arxiuUuid, 
-							null);
+					Document documentArxiu = pluginHelper.arxiuDocumentConsultar(arxiuUuid, null);
 					document.setArxiuNom(documentArxiu.getNom());
 					document.setNormalitzat(notificacio.getDocument().isNormalitzat());
 					document.setGenerarCsv(notificacio.getDocument().isGenerarCsv());
 					document.setUuid(arxiuUuid);
+					document.setMediaType(documentArxiu.getContingut().getTipusMime());
+					document.setMida(documentArxiu.getContingut().getTamany());
 					notificacio.setDocument(document);
 				}
 			} else if (notificacio.getDocument().getCsv() != null) {
@@ -228,8 +233,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 					document.setArxiuNom(documentArxiu.getArxiuNom());
 					document.setNormalitzat(notificacio.getDocument().isNormalitzat());
 					document.setGenerarCsv(notificacio.getDocument().isGenerarCsv());
+					document.setMediaType(documentArxiu.getTipusMime());
+					document.setMida(documentArxiu.getTamany());
 					document.setCsv(arxiuCsv);
-					notificacio.setDocument(document);
 					notificacio.setDocument(document);
 				}
 			}
@@ -248,7 +254,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 						notificacio.getDocument().getUrl(),  
 						notificacio.getDocument().isNormalitzat(),  
 						notificacio.getDocument().getUuid(),
-						notificacio.getDocument().getCsv()).build());
+						notificacio.getDocument().getCsv(),
+						notificacio.getDocument().getMediaType(),
+						notificacio.getDocument().getMida()).build());
 			}
 			// Dades generals de la notificació
 			NotificacioEntity.BuilderV2 notificacioBuilder = NotificacioEntity.
@@ -467,6 +475,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			boolean isAdministradorOrgan,
 			List<String> procedimentsCodisNotib,
 			List<String> codisProcedimentsProcessables,
+			List<String> codisOrgansGestorsDisponibles,
 			String organGestorCodi,
 			String usuariCodi,
 			NotificacioFiltreDto filtre,
@@ -486,18 +495,21 @@ public class NotificacioServiceImpl implements NotificacioService {
 			mapeigPropietatsOrdenacio.put("procediment.nom", new String[] {"pro.nom"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 			
+			boolean esProcedimentsCodisNotibNull = (procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty());
+			boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
+			
 			if (filtre == null) {
 				//Consulta les notificacions sobre les quals té permis l'usuari actual
 				if (isUsuari) {
-//					if (!procedimentsCodisNotib.isEmpty()) {
-						notificacions = notificacioRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
-								procedimentsCodisNotib.isEmpty(),
-								procedimentsCodisNotib, 
-								aplicacioService.findRolsUsuariActual(), 
-								entitatActual,
-								usuariCodi,
-								pageable);
-//					}
+					notificacions = notificacioRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
+							esProcedimentsCodisNotibNull,
+							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib, 
+							aplicacioService.findRolsUsuariActual(), 
+							esOrgansGestorsCodisNotibNull,
+							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+							entitatActual,
+							usuariCodi,
+							pageable);
 				//Consulta els notificacions de l'entitat acutal
 				} else if (isUsuariEntitat) {
 					notificacions = notificacioRepository.findByEntitatActual(
@@ -511,14 +523,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 							pageable);
 				} else if (isAdministradorOrgan) {
 					List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
-//					if (!procedimentsCodisNotib.isEmpty()) {
+					if (!procedimentsCodisNotib.isEmpty()) {
 						notificacions = notificacioRepository.findByProcedimentCodiNotibAndEntitat(
-								procedimentsCodisNotib.isEmpty(),
 								procedimentsCodisNotib, 
 								entitatActual,
 								organs,
 								pageable);
-//					}
+					}
 				}
 			} else {
 				Date dataInici = toIniciDia(filtre.getDataInici());
@@ -532,42 +543,42 @@ public class NotificacioServiceImpl implements NotificacioService {
 					procediment = procedimentRepository.findById(filtre.getProcedimentId());
 				}
 				if (isUsuari) {
-					if (!procedimentsCodisNotib.isEmpty()) {
-						notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
-								filtre.getEntitatId() == null,
-								filtre.getEntitatId(),
-								procedimentsCodisNotib.isEmpty(),
-								procedimentsCodisNotib, 
-								aplicacioService.findRolsUsuariActual(), 
-								filtre.getEnviamentTipus() == null,
-								filtre.getEnviamentTipus(),
-								filtre.getConcepte() == null,
-								filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
-								filtre.getEstat() == null,
-								filtre.getEstat(), 
-								dataInici == null,
-								dataInici,
-								dataFi == null,
-								dataFi,
-								filtre.getTitular() == null || filtre.getTitular().isEmpty(),
-								filtre.getTitular() == null ? "" : filtre.getTitular(),
-								entitatActual,
-								organGestor == null,
-								organGestor,
-								procediment == null,
-								procediment,
-								filtre.getTipusUsuari() == null,
-								filtre.getTipusUsuari(),
-								filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
-								filtre.getNumExpedient(),
-								filtre.getCreadaPer() == null || filtre.getCreadaPer().isEmpty(),
-								filtre.getCreadaPer(),
-								filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
-								filtre.getIdentificador(),
-								usuariCodi,
-								pageable);
-					}
-					
+					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
+							filtre.getEntitatId() == null,
+							filtre.getEntitatId(),
+							esProcedimentsCodisNotibNull,
+							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib, 
+							aplicacioService.findRolsUsuariActual(),
+							esOrgansGestorsCodisNotibNull,
+							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+							filtre.getEnviamentTipus() == null,
+							filtre.getEnviamentTipus(),
+							filtre.getConcepte() == null,
+							filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
+							filtre.getEstat() == null,
+							filtre.getEstat(), 
+							dataInici == null,
+							dataInici,
+							dataFi == null,
+							dataFi,
+							filtre.getTitular() == null || filtre.getTitular().isEmpty(),
+							filtre.getTitular() == null ? "" : filtre.getTitular(),
+							entitatActual,
+							organGestor == null,
+							organGestor,
+							procediment == null,
+							procediment,
+							filtre.getTipusUsuari() == null,
+							filtre.getTipusUsuari(),
+							filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
+							filtre.getNumExpedient(),
+							filtre.getCreadaPer() == null || filtre.getCreadaPer().isEmpty(),
+							filtre.getCreadaPer(),
+							filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
+							filtre.getIdentificador(),
+							usuariCodi,
+							filtre.isNomesAmbErrors(),
+							pageable);
 				} else if (isUsuariEntitat) {
 					notificacions = notificacioRepository.findAmbFiltre(
 							entitatId == null, 
@@ -596,6 +607,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getCreadaPer(),
 							filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
 							filtre.getIdentificador(),
+							filtre.isNomesAmbErrors(),
 							pageable);
 				} else if (isAdministrador) {
 					notificacions = notificacioRepository.findAmbFiltre(
@@ -625,6 +637,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getCreadaPer(),
 							filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
 							filtre.getIdentificador(),
+							filtre.isNomesAmbErrors(),
 							pageable);
 				} else if (isAdministradorOrgan) {
 					List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
@@ -632,8 +645,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 						notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotib(
 								filtre.getEntitatId() == null,
 								filtre.getEntitatId(),
-								procedimentsCodisNotib.isEmpty(),
-								procedimentsCodisNotib, 
+								esProcedimentsCodisNotibNull,
+								esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib, 
 								filtre.getEnviamentTipus() == null,
 								filtre.getEnviamentTipus(),
 								filtre.getConcepte() == null,
@@ -769,10 +782,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 				if (dataFi != null) {
 					Calendar cal = Calendar.getInstance();
 					cal.setTime(dataFi);
-					cal.set(Calendar.HOUR, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
+					cal.set(Calendar.HOUR, 23);
+					cal.set(Calendar.MINUTE, 59);
+					cal.set(Calendar.SECOND, 59);
+					cal.set(Calendar.MILLISECOND, 999);
 					dataFi = cal.getTime();
 				}
 				ProcedimentEntity procediment = null;
@@ -1087,14 +1100,27 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			logger.debug("Refrescant l'estat de la notificació a PROCESSAT (" +
 					"notificacioId=" + notificacioId + ")");		
-			String resposta;
+			String resposta = null;
 			NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(
 					null,
 					notificacioId);
 			notificacioEntity.updateEstat(NotificacioEstatEnumDto.PROCESSADA);
 			notificacioEntity.updateEstatDate(new Date());
 			notificacioEntity.updateMotiu(motiu);
-			resposta = emailHelper.prepararEnvioEmailNotificacio(notificacioEntity);
+			UsuariEntity usuari = usuariHelper.getUsuariAutenticat();
+			if(notificacioEntity.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
+				
+				if(usuari.isRebreEmailsNotificacioCreats()) {
+					if(usuari.getCodi() == notificacioEntity.getCreatedBy().getCodi()) {
+						resposta = emailHelper.prepararEnvioEmailNotificacio(notificacioEntity);
+					}else {
+						resposta = null;
+					}	
+				}else {
+					resposta = emailHelper.prepararEnvioEmailNotificacio(notificacioEntity);
+				}
+			}
+			
 			notificacioRepository.saveAndFlush(notificacioEntity);
 			
 			return resposta;
@@ -1293,10 +1319,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 				if (dataFi != null) {
 					Calendar cal = Calendar.getInstance();
 					cal.setTime(dataFi);
-					cal.set(Calendar.HOUR, 0);
-					cal.set(Calendar.MINUTE, 0);
-					cal.set(Calendar.SECOND, 0);
-					cal.set(Calendar.MILLISECOND, 0);
+					cal.set(Calendar.HOUR, 23);
+					cal.set(Calendar.MINUTE, 59);
+					cal.set(Calendar.SECOND, 59);
+					cal.set(Calendar.MILLISECOND, 999);
 					dataFi = cal.getTime();
 				}
 				ProcedimentEntity procediment = null;
@@ -1402,6 +1428,27 @@ public class NotificacioServiceImpl implements NotificacioService {
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}		
+	}
+	
+	@Override
+	@Transactional
+	public void enviamentsRefrescarEstat() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<NotificacioEnviamentEntity> enviaments = notificacioEnviamentRepository.findExpiradesAndNotificaCertificacioDataNull();
+			
+			for (NotificacioEnviamentEntity enviament : enviaments) {
+				logger.debug("Refrescant l'estat de la notificació de Notific@ (enviamentId=" + enviament.getId() + ")");
+				try {
+					notificaHelper.enviamentRefrescarEstat(enviament.getId());
+				
+				} catch (Exception e) {
+					logger.error("No s'ha pogut refrescar l'estat de l'enviament (enviamentId=" + enviament.getId() + ")");
+				}
+			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	private int getRegistreEnviamentsProcessarMaxProperty() {

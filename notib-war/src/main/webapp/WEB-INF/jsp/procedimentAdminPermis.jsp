@@ -37,7 +37,7 @@
 		<thead>
 			<tr>
 				<th data-col-name="tipus" data-renderer="enum(TipusEnumDto)"><spring:message code="procediment.permis.columna.tipus"/></th>
-				<th data-col-name="principal"><spring:message code="procediment.permis.columna.principal"/></th>
+				<th data-col-name="nomSencerAmbCodi"><spring:message code="procediment.permis.columna.principal"/></th>
 				<th data-col-name="read" data-template="#cellPermisReadTemplate">
 					<spring:message code="procediment.permis.columna.consulta"/>
 					<script id="cellPermisReadTemplate" type="text/x-jsrender">

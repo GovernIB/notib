@@ -135,8 +135,8 @@ $(document).ready(function() {
 					<tbody>
 						<tr>
 							<td width="30%"><strong><spring:message code="notificacio.info.dada.entitat" /></strong></td>
-							<td>${notificacio.procediment.organGestorNom}<br>
-							<small>${notificacio.procediment.organGestor}</small></td>
+							<td>${notificacio.organGestorNom}<br>
+							<small>${notificacio.organGestor}</small></td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="notificacio.info.dada.concepte" /></strong></td>

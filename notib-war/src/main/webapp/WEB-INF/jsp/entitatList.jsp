@@ -31,6 +31,10 @@
 		<div class="text-right btn-novaentitat" data-toggle="botons-titol">
 			<a class="btn btn-default" href="<c:url value="/entitat/new"/>" data-toggle="modal" data-datatable-id="entitats"><span class="fa fa-plus"></span>&nbsp;<spring:message code="entitat.list.boto.nova.entitat"/></a>
 		</div>
+		
+		<div class="text-right btn-novaentitat" data-toggle="botons-titol">
+			<a class="btn btn-default" href="<c:url value="/entitat/new"/>" data-toggle="modal" data-datatable-id="entitats"><span class="fa fa-plus"></span>&nbsp;<spring:message code="entitat.list.boto.nova.entitat"/></a>
+		</div>
 	</c:if>
 	<script id="botonsTemplate" type="text/x-jsrender">
 <%--

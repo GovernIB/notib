@@ -4,3 +4,6 @@
 /.settings/
 /appserv_tomcat
 /appserv_jboss
+/.flattened-pom.xml
+/.attach_pid*
+/.tern-project

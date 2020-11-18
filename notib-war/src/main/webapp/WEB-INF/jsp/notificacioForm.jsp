@@ -20,6 +20,8 @@
 <c:set var="entregaPostal"><spring:message code="notificacio.form.titol.entregapostal"/></c:set>
 <c:set var="entregaPostalDades"><spring:message code="notificacio.form.titol.entregapostal.dades"/></c:set>
 <c:set var="entregaDireccio"><spring:message code="notificacio.form.titol.entregadireccio"/></c:set>
+<c:set var="entitatDir3Codi">${entitat.dir3Codi}</c:set>
+
 <html>
 <head>
     <title>${titol}</title>
@@ -261,62 +263,86 @@ $(document).ready(function() {
     var agrupable = $("#procedimentId").children(":selected").attr("class");
     var procedimentId = $("#procedimentId").children(":selected").attr("value");
 
-    $('#organGestor').on('change', function(){
+    $('#organGestor').on('change', function() {
+    	
+    	//### seleccionat per defecte si només hi ha un (empty + òrgan)
+    	if ($('#organGestor').children('option').length == 2) {
+    		$('#organGestor option:eq(1)').attr('selected', 'selected');
+    		$('#organGestor').trigger('change.select2');
+    	}else if($('#organGestor').children('option').length == 3){
+    		$('#organGestor > option').each(function() {
+    			if(this.value == $('#entitatDir3Codi').val())
+    				$('#organGestor option:eq(1)').attr('selected', 'selected');
+        			$('#organGestor').trigger('change.select2');
+    		});
+    	}
+    	
     	var organ = $(this).val();
     	if (organ == undefined || organ == "") {
 			organ = "-";
         }
-    	$.ajax({
-			type: 'GET',
-			url: "<c:url value="/notificacio/organ/"/>" + organ + "/procediments",
-			success: function(data) {
-				var select2Options = {
-						theme: 'bootstrap',
-						width: 'auto'};
-				// Procediments
-				var procediments = data;
-				var selProcediments = $("#procedimentId");
-				selProcediments.empty();
-				if (procediments && procediments.length > 0) {
-					selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.select'/></option>");
-					var procedimentsComuns = [];
-					var procedimentsOrgan = [];
-					$.each(data, function(i, val) {
-						if(val.comu) {
-							procedimentsComuns.push(val);
-						} else {
-							procedimentsOrgan.push(val);
-						}
-					});
-					if (procedimentsComuns.length > 0) {
-						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
-							$.each(procedimentsComuns, function(index, val) {
-								selProcediments.append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
-							});
-						selProcediments.append("</optgroup>");
-					}
-					if (procedimentsOrgan.length > 0) {
-						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
-							$.each(procedimentsOrgan, function(index, val) {
-								selProcediments.append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
-							});
-						selProcediments.append("</optgroup>");
-					}
-				} else {
-					selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
-				}
-				selProcediments.select2(select2Options);
-			},
-			error: function() {
-				console.log("error obtenint els procediments de l'òrgan gestor...");
-			}
-		});
+    	if ($('#organGestor').children('option').length > 1) {
+    		$.ajax({
+    			type: 'GET',
+    			url: "<c:url value="/notificacio/organ/"/>" + organ + "/procediments",
+    			success: function(data) {
+    				var select2Options = {
+    						theme: 'bootstrap',
+    						width: 'auto'};
+    				// Procediments
+    				var procediments = data;
+    				var selProcediments = $("#procedimentId");
+    				selProcediments.empty();
+    				if (procediments && procediments.length > 0) {
+    					selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.select'/></option>");
+    					var procedimentsComuns = [];
+    					var procedimentsOrgan = [];
+    					$.each(data, function(i, val) {
+    						if(val.comu) {
+    							procedimentsComuns.push(val);
+    						} else {
+    							procedimentsOrgan.push(val);
+    						}
+    					});
+    					if (procedimentsComuns.length > 0) {
+    						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
+    							$.each(procedimentsComuns, function(index, val) {
+    								selProcediments.append("<option value=\"" + val.id + "\">" + val.codi +' - '+ val.nom + "</option>");
+    							});
+    						selProcediments.append("</optgroup>");
+    					}
+    					if (procedimentsOrgan.length > 0) {
+    						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
+    							$.each(procedimentsOrgan, function(index, val) {
+    								selProcediments.append("<option value=\"" + val.id + "\">" + val.codi +' - '+ val.nom + "</option>");
+    							});
+    						selProcediments.append("</optgroup>");
+    					}
+    					if (selProcediments.children('option').length == 2) {
+    			    		$('#procedimentId option:eq(1)').attr('selected', 'selected');
+    			    		selProcediments.trigger('change');
+    			    	}
+    				} else {
+    					selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
+    				}
+    				selProcediments.select2(select2Options);
+    			},
+    			error: function() {
+    				console.log("error obtenint els procediments de l'òrgan gestor...");
+    			}
+    		});
+    		
+    	}
+    	
     });
     $('#procedimentId').on('change', function() {
 //         var agrupable = $(this).children(":selected").attr("class");
 //         var procedimentId = $(this).children(":selected").attr("value");
 //         comprovarGrups(agrupable, procedimentId)
 //         webutilModalAdjustHeight();
+
+		
+
 		var procediment = $(this).val();
 		if (procediment == '') {
 			$("#organGestor").prop("disabled", false);
@@ -959,7 +985,7 @@ function actualitzarEntrega(j) {
 				<hr/>
 			</div>
 <%-- 			<form:hidden path="procedimentId" value="${procediment.id}" /> --%>
-			<form:hidden path="emisorDir3Codi" value="${entitat.dir3Codi}" />
+			<form:hidden path="emisorDir3Codi" id="emisorDir3Codi" value="${entitat.dir3Codi}" />
 			
 			<!-- CONCEPTE -->
 			<div class="row">
@@ -984,7 +1010,7 @@ function actualitzarEntrega(j) {
 						required="true" 
 						optionItems="${organsGestors}" 
 						optionValueAttribute="codi" 
-						optionTextAttribute="nom"
+						optionTextAttribute="organGestorDesc"
 						labelSize="2" 
 						emptyOption="true"
 						optionMinimumResultsForSearch="2"
@@ -1000,7 +1026,7 @@ function actualitzarEntrega(j) {
 						required="false" 
 						optionItems="${procediments}" 
 						optionValueAttribute="id" 
-						optionTextAttribute="nom" 
+						optionTextAttribute="id" 
 						labelSize="2"
 						emptyOption="true"
 						optionMinimumResultsForSearch="2"
