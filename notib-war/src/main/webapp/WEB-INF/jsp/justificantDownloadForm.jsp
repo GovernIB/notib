@@ -60,7 +60,7 @@ function getProgres() {
 					if (info[index].tipus == 'ERROR') {
 						$('#actualitzacioInfo').append("<div class='info-" + info[index].tipus + "'><div>" + info[index].text + "</div></div>");
 					} else {
-						$('#actualitzacioInfo').append("<div class='info-" + info[index].tipus + "'><div class='info'>" + info[index].text + "</div><div class='percetage'>[" + data.progres + "%]</div></div>");
+						$('#actualitzacioInfo').append("<div class='info-" + info[index].tipus + "'><div class='info'>" + info[index].text + "</div><div class='percentage'>[" + data.progres + "%]</div></div>");
 					}
 				}
 				writtenLines = index;

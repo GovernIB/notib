@@ -74,6 +74,8 @@ import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
+import es.caib.notib.core.api.exception.JustificantException;
+import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
@@ -822,8 +824,14 @@ public class NotificacioController extends BaseUserController {
 		arxiu.setContingut(enviamentService.getDocumentJustificant(enviamentId));
 		arxiu.setNom("justificant");
 		String mimeType = ".pdf";
-		response.setHeader("Set-cookie", "fileDownload=true; path=/");
-		writeFileToResponse(arxiu.getNom() + mimeType, arxiu.getContingut(), response);
+		
+		if (arxiu.getContingut() != null) {
+			response.setHeader("Set-cookie", "fileDownload=true; path=/");
+			writeFileToResponse(arxiu.getNom() + mimeType, arxiu.getContingut(), response);
+		} else {
+			response.setHeader("Set-cookie", "fileDownload=false; path=/");
+			throw new RuntimeException("Hi ha hagut un error generant/descarregant el justificant");
+		}
 	}
 	
 	@RequestMapping(value = "/{notificacioId}/justificant", method = RequestMethod.GET)
