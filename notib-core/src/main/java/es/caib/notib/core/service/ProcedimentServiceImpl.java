@@ -271,7 +271,10 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			if (procedimentEntity.getOrganGestor() != null && !procedimentEntity.getOrganGestor().getCodi().equals(procediment.getOrganGestor())) {
 				organGestorAntic = procedimentEntity.getOrganGestor();
 			}
-			
+			// Si hi ha hagut qualque canvi a un d'aquests camps
+			if ((procediment.isComu() != procedimentEntity.isComu()) || (procediment.isAgrupar() != procedimentEntity.isAgrupar())) {
+				cacheHelper.evictFindProcedimentsWithPermis();
+			}
 			procedimentEntity.update(
 						procediment.getCodi(),
 						procediment.getNom(),
