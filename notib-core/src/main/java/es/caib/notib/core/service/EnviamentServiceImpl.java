@@ -37,6 +37,7 @@ import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
@@ -324,6 +325,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtre.getCsvUuid(),
 						(filtre.getEstat() == null),
 						(estat),
+						filtre.getEstat() != null ? NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()) : null,
 						entitatEntity,
 						(dataEnviamentInici == null),
 						dataEnviamentInici,
@@ -479,6 +481,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtre.getCsvUuid(),
 						(filtre.getEstat() == null),
 						(estat),
+						filtre.getEstat() != null ? NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()) : null,
 						entitatEntity,
 						(dataEnviamentInici == null),
 						dataEnviamentInici,
@@ -538,6 +541,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtre.getCsvUuid(),
 						(filtre.getEstat() == null),
 						(estat),
+						filtre.getEstat() != null ? NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()) : null,
 						entitatEntity,
 						(dataEnviamentInici == null),
 						dataEnviamentInici,
@@ -593,6 +597,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtre.getCsvUuid(),
 						(filtre.getEstat() == null),
 						(estat),
+						filtre.getEstat() != null ? NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()) : null,
 						entitatEntity,
 						(dataEnviamentInici == null),
 						dataEnviamentInici,
@@ -927,6 +932,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					filtre.getCsvUuid(),
 					(filtre.getEstat() == null),
 					(estat),
+					filtre.getEstat() != null ? NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()) : null,
 					entitatEntity,
 					(dataEnviamentInici == null),
 					dataEnviamentInici,

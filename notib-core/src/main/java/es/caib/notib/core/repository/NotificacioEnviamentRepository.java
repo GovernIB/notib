@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -93,7 +94,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:isDataCaducitatFiNull = true or n.notificacio.caducitat <= :dataCaducitatFi) " +
 			"and (:isTipusEnviamentNull = true or lower(n.notificacio.enviamentTipus) like lower('%'||:tipusEnviament||'%')) " +
 			"and (:isCsvNull = true or lower(concat(n.notificacio.document.uuid, n.notificacio.document.csv)) like lower('%'||:csv||'%')) " +
-			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%')) " +
+			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%') or n.notificaEstat like lower('%'||:notificaEstat||'%'))" +
 			"and (:entitat = n.notificacio.entitat) " +
 			"and (:esDataEnviamentFiNull = true or n.createdDate <= :dataEnviamentFi) " +
 			"and (:esCodiNotificaNull = true or lower(n.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
@@ -130,6 +131,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") int estat,
+			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esDataEnviamentIniciNull") boolean esDataEnviamentIniciNull,
 			@Param("dataEnviamentInici") Date dataEnviamentInici,
@@ -172,7 +174,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:isDataCaducitatFiNull = true or n.notificacio.caducitat <= :dataCaducitatFi) " +
 			"and (:isTipusEnviamentNull = true or lower(n.notificacio.enviamentTipus) like lower('%'||:tipusEnviament||'%')) " +
 			"and (:isCsvNull = true or lower(concat(n.notificacio.document.uuid, n.notificacio.document.csv)) like lower('%'||:csv||'%')) " +
-			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%')) " +
+			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%') or n.notificaEstat like lower('%'||:notificaEstat||'%'))" +
 			"and (:entitat = n.notificacio.entitat) " +
 			"and (:esDataEnviamentFiNull = true or n.createdDate <= :dataEnviamentFi) " +
 			"and (:esCodiNotificaNull = true or lower(n.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
@@ -213,6 +215,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") int estat,
+			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esDataEnviamentIniciNull") boolean esDataEnviamentIniciNull,
 			@Param("dataEnviamentInici") Date dataEnviamentInici,
@@ -262,7 +265,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:isDataCaducitatFiNull = true or n.notificacio.caducitat <= :dataCaducitatFi) " +
 			"and (:isTipusEnviamentNull = true or lower(n.notificacio.enviamentTipus) like lower('%'||:tipusEnviament||'%')) " +
 			"and (:isCsvNull = true or lower(concat(n.notificacio.document.uuid, n.notificacio.document.csv)) like lower('%'||:csv||'%')) " +
-			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%')) " +
+			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%') or n.notificaEstat like lower('%'||:notificaEstat||'%'))" +
 			"and (:entitat = n.notificacio.entitat) " +
 			"and (:esDataEnviamentFiNull = true or n.createdDate <= :dataEnviamentFi) " +
 			"and (:esCodiNotificaNull = true or lower(n.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
@@ -301,6 +304,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") int estat,
+			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esDataEnviamentIniciNull") boolean esDataEnviamentIniciNull,
 			@Param("dataEnviamentInici") Date dataEnviamentInici,
@@ -347,7 +351,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:isDataCaducitatFiNull = true or n.notificacio.caducitat <= :dataCaducitatFi) " +
 			"and (:isTipusEnviamentNull = true or lower(n.notificacio.enviamentTipus) like lower('%'||:tipusEnviament||'%')) " +
 			"and (:isCsvNull = true or lower(concat(n.notificacio.document.uuid, n.notificacio.document.csv)) like lower('%'||:csv||'%')) " +
-			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%')) " +
+			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%') or n.notificaEstat like lower('%'||:notificaEstat||'%'))" +
 			"and (:entitat = n.notificacio.entitat) " +
 			"and (:esDataEnviamentFiNull = true or n.createdDate <= :dataEnviamentFi) " +
 			"and (:esCodiNotificaNull = true or lower(n.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
@@ -384,6 +388,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") int estat,
+			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esDataEnviamentIniciNull") boolean esDataEnviamentIniciNull,
 			@Param("dataEnviamentInici") Date dataEnviamentInici,

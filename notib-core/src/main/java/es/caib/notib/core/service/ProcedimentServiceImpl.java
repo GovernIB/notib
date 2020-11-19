@@ -829,6 +829,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getCodi() == null ? "" : filtre.getCodi(),
 							filtre.getNom() == null || filtre.getNom().isEmpty(),
 							filtre.getNom() == null ? "" : filtre.getNom(),
+							filtre.getOrganGestor() == null || filtre.getOrganGestor().isEmpty(),
+							filtre.getOrganGestor() == null ? "" : filtre.getOrganGestor(),
 							organsFills,
 							filtre.getComu()== null,
 							filtre.getComu()== null ? false : filtre.getComu(),

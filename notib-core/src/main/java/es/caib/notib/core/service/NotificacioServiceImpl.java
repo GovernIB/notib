@@ -975,7 +975,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
 							filtre.getEstat() == null,
 							filtre.getEstat(), 
-							NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
+							filtre.getEstat() != null ? NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()) : null,
 							dataInici == null,
 							dataInici,
 							dataFi == null,
