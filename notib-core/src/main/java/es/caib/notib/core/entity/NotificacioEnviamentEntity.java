@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.entity;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -71,11 +72,11 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	protected PersonaEntity titular;
 	
 	/* Destinataris */
-	@OneToMany(fetch = FetchType.LAZY)
+	@OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
 	@ForeignKey(name = "not_persona_not_fk")
     @JoinColumn(name = "notificacio_env_id") // we need to duplicate the physical information
 	@NotFound(action = NotFoundAction.IGNORE)
-	protected List<PersonaEntity> destinataris;
+	protected List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
 	
 	/* Domicili */
 	@Column(name = "dom_tipus")

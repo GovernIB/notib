@@ -24,6 +24,8 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.ForeignKey;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
@@ -165,12 +167,15 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,
-			cascade=CascadeType.ALL)
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
 	protected Set<NotificacioEnviamentEntity> enviaments = new LinkedHashSet<NotificacioEnviamentEntity>();
+	
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,
-			cascade=CascadeType.ALL)
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
 	protected Set<NotificacioEventEntity> events = new LinkedHashSet<NotificacioEventEntity>();
 	
 
