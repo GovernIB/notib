@@ -283,7 +283,7 @@ public interface ProcedimentService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public void grupCreate(
+	public ProcedimentGrupDto grupCreate(
 			Long entitatId,
 			Long id,
 			ProcedimentGrupDto procedimentGrup) throws NotFoundException;
@@ -301,7 +301,7 @@ public interface ProcedimentService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public void grupUpdate(
+	public ProcedimentGrupDto grupUpdate(
 			Long entitatId,
 			Long id,
 			ProcedimentGrupDto procedimentGrup) throws NotFoundException;
@@ -317,7 +317,7 @@ public interface ProcedimentService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public void grupDelete(
+	public ProcedimentGrupDto grupDelete(
 			Long entitatId,
 			Long GrupId) throws NotFoundException;
 

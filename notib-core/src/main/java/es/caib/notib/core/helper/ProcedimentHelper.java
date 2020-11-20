@@ -1,7 +1,6 @@
 package es.caib.notib.core.helper;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +51,8 @@ public class ProcedimentHelper {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private PermisosHelper permisosHelper;
+	@Autowired
+	private ProcedimentUpdateHelper procedimentUpdateHelper;
 	@Autowired
 	private GrupProcedimentRepository grupProcedimentRepository;
 	@Autowired
@@ -228,7 +229,7 @@ public class ProcedimentHelper {
 		if (procediment != null) {
 			// Si no s'ha modificat des de la última actualització, no es fa res
 			if (procediment.getUltimaActualitzacio() != null && procedimentGda.getUltimaActualitzacio() != null && 
-					!procediment.getUltimaActualitzacio().before(procedimentGda.getUltimaActualitzacio())) {
+					!procediment.getUltimaActualitzacio().after(procedimentGda.getUltimaActualitzacio())) {
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat.data"));
 //				logger.debug(">>>> Procediment DESCARTAT: No s'ha modificat des de la última actualització.");
 				progres.addSeparador();
@@ -287,24 +288,7 @@ public class ProcedimentHelper {
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.crear", new Object[] {procedimentGda.getCodi()}));
 			
 			// CREATE
-			procediment = ProcedimentEntity.getBuilder(
-					procedimentGda.getCodi(),
-					procedimentGda.getNom(),
-					Integer.parseInt(PropertiesHelper.getProperties().getProperty("es.caib.notib.procediment.alta.auto.retard", "10")),
-					Integer.parseInt(PropertiesHelper.getProperties().getProperty("es.caib.notib.procediment.alta.auto.caducitat", "15")),
-					entitat,
-					null,
-					null,
-					false,
-					organGestor,
-					null,
-					null,
-					null,
-					null,
-					procedimentGda.isComu()).build();
-			
-			procediment.updateDataActualitzacio(new Date());
-			procedimentRepository.save(procediment);
+			procedimentUpdateHelper.nouProcediment(procedimentGda, entitat, organGestor);
 			
 //			logger.debug(">>>> >> Creat.");
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.creat"));
@@ -343,12 +327,7 @@ public class ProcedimentHelper {
 					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.update.result.si"));
 					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.updating", new Object[] {procedimentGda.getCodi()}));
 					
-					procediment.update(
-							procedimentGda.getNom(),
-							organGestor,
-							procedimentGda.isComu());
-					procediment.updateDataActualitzacio(new Date());
-					procedimentRepository.save(procediment);
+					procedimentUpdateHelper.updateProcediment(procedimentGda, procediment, organGestor);
 					
 					t2 = System.currentTimeMillis();
 //					logger.debug(">>>> >> Modificat (" + (t2 - t1) + "ms)");
@@ -370,7 +349,7 @@ public class ProcedimentHelper {
 		progres.addSeparador();
 		progres.incrementProcedimentsActualitzats();
 	}
-	
+
 	@Transactional(timeout = 300, propagation = Propagation.REQUIRES_NEW)
 	public void eliminarOrganSiNoEstaEnUs(ProgresActualitzacioDto progres, OrganGestorEntity organGestorAntic) {
 		logger.debug(">>>> Processant organ gestor " + organGestorAntic.getCodi() + "...   ");

@@ -17,7 +17,11 @@ import es.caib.notib.core.api.dto.AplicacioDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.service.AuditService.TipusEntitat;
+import es.caib.notib.core.api.service.AuditService.TipusObjecte;
+import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.api.service.UsuariAplicacioService;
+import es.caib.notib.core.aspect.Audita;
 import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
@@ -45,6 +49,7 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 	@Resource
 	private MetricsHelper metricsHelper;
 	
+	@Audita(entityType = TipusEntitat.APLICACIO, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
 	@Override
 	@Transactional
 	public AplicacioDto create(AplicacioDto aplicacio) {
@@ -70,6 +75,7 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 		}
 	}
 	
+	@Audita(entityType = TipusEntitat.APLICACIO, operationType = TipusOperacio.UPDATE, returnType = TipusObjecte.DTO)
 	@Override
 	@Transactional
 	public AplicacioDto update(AplicacioDto aplicacio) throws NotFoundException {
@@ -98,6 +104,7 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 		
 	}
 	
+	@Audita(entityType = TipusEntitat.APLICACIO, operationType = TipusOperacio.DELETE, returnType = TipusObjecte.DTO)
 	@Override
 	@Transactional
 	public AplicacioDto delete(Long id, Long entitatId) throws NotFoundException {
@@ -278,6 +285,7 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 		}
 	}
 	
+	@Audita(entityType = TipusEntitat.APLICACIO, operationType = TipusOperacio.UPDATE, returnType = TipusObjecte.DTO)
 	@Transactional
 	@Override
 	public AplicacioDto updateActiva(

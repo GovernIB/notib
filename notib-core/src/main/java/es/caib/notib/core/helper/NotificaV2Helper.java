@@ -52,6 +52,9 @@ import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.service.AuditService.TipusEntitat;
+import es.caib.notib.core.api.service.AuditService.TipusOperacio;
+import es.caib.notib.core.aspect.Audita;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
@@ -105,9 +108,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	ProcedimentRepository procedimentRepository;
 	@Autowired
 	IntegracioHelper integracioHelper;
+	@Autowired
+	private AuditEnviamentHelper auditEnviamentHelper;
 	
-	
-	public boolean notificacioEnviar(
+	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
+	public NotificacioEntity notificacioEnviar(
 			Long notificacioId) {
 		
 		IntegracioInfo info = new IntegracioInfo(
@@ -132,6 +137,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			ResultadoAltaRemesaEnvios resultadoAlta = enviaNotificacio(notificacio);
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
 				logger.info(" >>> ... OK");
+				
+				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
+				notificacio.updateNotificaError(
+						null,
+						null);
+
 				//Crea un nou event
 				NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
@@ -145,18 +156,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
 					for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
 						if (enviament.getTitular().getNif().equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
-							enviament.updateNotificaEnviada(
-									resultadoEnvio.getIdentificador());
-							
-							//Registrar event per enviament
-							logger.info(" >>> Canvi estat a ENVIADA ");
-							notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
-							eventBulider.enviament(enviament);
-							notificacio.updateEventAfegir(event);
-							notificacio.updateNotificaError(
-									null,
-									null);
-							notificacioEventRepository.save(event);
+							enviament = auditEnviamentHelper.updateEnviamentEnviat(notificacio, eventBulider, event, resultadoEnvio, enviament);
 						}
 					}
 				}
@@ -190,10 +190,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
 		}
 		logger.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
-		return NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat());
+//		return NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat());
+		return notificacio;
 	}
 
-	public boolean enviamentRefrescarEstat(
+	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
+	public NotificacioEnviamentEntity enviamentRefrescarEstat(
 			Long enviamentId) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(
@@ -202,11 +204,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Identificador de l'enviament", String.valueOf(enviamentId)));
 		
-		boolean resposta = true;
+//		boolean resposta = true;
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		logger.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
-		enviament.setNotificacio(notificacio);
+		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacio().getId());
+//		enviament.setNotificacio(notificacio);
 		Date dataUltimDatat = enviament.getNotificaDataCreacio();
 		Date dataUltimaCertificacio = enviament.getNotificaCertificacioData();
 
@@ -435,10 +437,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						eventReintents);
 			}
 			integracioHelper.addAccioError(info, "Error consultat l'estat de l'enviament", ex);
-			resposta = false;
+//			resposta = false;
 		}
 		
-		return resposta;
+		return enviament;
 	}
 
 	
@@ -808,7 +810,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return envios;
 	}
 	
-	private void updateEventWithEnviament(
+	public void updateEventWithEnviament(
 			NotificacioEntity notificacio,
 			String errorDescripcio,
 			NotificacioErrorTipusEnumDto notificacioErrorTipus,
@@ -824,9 +826,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		
 		for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
 			eventBulider.enviament(enviament);
-			enviament.updateNotificaError(
-					notificaError, 
-					event);
+			auditEnviamentHelper.actualizaErrorNotifica(enviament, notificaError, event);
+//			enviament.updateNotificaError(
+//					notificaError, 
+//					event);
 		}
 		
 		notificacio.updateNotificaError(

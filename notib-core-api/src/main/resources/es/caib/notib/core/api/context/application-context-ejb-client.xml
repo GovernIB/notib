@@ -80,4 +80,8 @@
 			id="cacheService"
 			jndi-name="notib/CacheServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.CacheService"/>
+	<jee:local-slsb
+			id="auditService"
+			jndi-name="notib/AuditServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.AuditService"/>
 </beans>

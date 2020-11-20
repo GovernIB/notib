@@ -239,11 +239,11 @@ public class ProcedimentServiceBean implements ProcedimentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public void grupCreate(
+	public ProcedimentGrupDto grupCreate(
 			Long entitatId,
 			Long id,
 			ProcedimentGrupDto procedimentGrup) throws NotFoundException {
-		delegate.grupCreate(
+		return delegate.grupCreate(
 				entitatId,
 				id,
 				procedimentGrup);
@@ -251,11 +251,11 @@ public class ProcedimentServiceBean implements ProcedimentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public void grupUpdate(
+	public ProcedimentGrupDto grupUpdate(
 			Long entitatId, 
 			Long id, 
 			ProcedimentGrupDto procedimentGrup) throws NotFoundException {
-		delegate.grupUpdate(
+		return delegate.grupUpdate(
 				entitatId, 
 				id, 
 				procedimentGrup);
@@ -263,10 +263,10 @@ public class ProcedimentServiceBean implements ProcedimentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public void grupDelete(
+	public ProcedimentGrupDto grupDelete(
 			Long entitatId, 
 			Long GrupId) throws NotFoundException {
-		delegate.grupDelete(
+		return delegate.grupDelete(
 				entitatId, 
 				GrupId);
 	}

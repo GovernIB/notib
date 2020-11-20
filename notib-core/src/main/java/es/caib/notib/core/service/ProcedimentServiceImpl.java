@@ -49,9 +49,13 @@ import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.SistemaExternException;
+import es.caib.notib.core.api.service.AuditService.TipusEntitat;
+import es.caib.notib.core.api.service.AuditService.TipusObjecte;
+import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.aspect.Audita;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.GrupProcedimentEntity;
@@ -135,6 +139,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
 	
+	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
 	@Override
 	@Transactional
 	public ProcedimentDto create(
@@ -197,6 +202,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 	}
 
+	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.UPDATE, returnType = TipusObjecte.DTO)
 	@Override
 	@Transactional
 	public ProcedimentDto update(
@@ -301,6 +307,51 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				}
 			}
 
+			return conversioTipusHelper.convertir(
+					procedimentEntity, 
+					ProcedimentDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.DELETE, returnType = TipusObjecte.DTO)
+	@Override
+	@Transactional
+	public ProcedimentDto delete(
+			Long entitatId,
+			Long id) throws NotFoundException {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId,
+					false,
+					false,
+					false);
+			
+			ProcedimentEntity procedimentEntity = entityComprovarHelper.comprovarProcediment(
+					entitat, 
+					id);
+			//Eliminar grups del procediment
+			List<GrupProcedimentEntity> grupsDelProcediment = grupProcedimentRepository.findByProcediment(procedimentEntity);
+			for (GrupProcedimentEntity grupProcedimentEntity : grupsDelProcediment) {
+				grupProcedimentRepository.delete(grupProcedimentEntity);
+			}
+			//Eliminar procediment
+			procedimentRepository.delete(procedimentEntity);
+			permisosHelper.revocarPermisosEntity(id,ProcedimentEntity.class);
+			
+			//TODO: Decidir si mantenir l'Organ Gestor encara que no hi hagi procediments o no
+			//		Recordar que ara l'Organ té més coses assignades: Administrador, grups, pagadors ...
+			//		Es pot mirar si esta en ús amb la funció organGestorService.organGestorEnUs(organId);
+//			OrganGestorEntity organGestor = procedimentEntity.getOrganGestor();
+//			if (organGestor != null) {
+//				List<ProcedimentEntity> procedimentsOrganGestorAntic = procedimentRepository.findByOrganGestorId(organGestor.getId());
+//				if (procedimentsOrganGestorAntic == null || procedimentsOrganGestorAntic.isEmpty()) {
+//					organGestorRepository.delete(organGestor);
+//				}
+//			}
+			
 			return conversioTipusHelper.convertir(
 					procedimentEntity, 
 					ProcedimentDto.class);
@@ -577,50 +628,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				progresActualitzacio.remove(dir3Codi);
 			}
 			return progres;
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Override
-	@Transactional
-	public ProcedimentDto delete(
-			Long entitatId,
-			Long id) throws NotFoundException {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId,
-					false,
-					false,
-					false);
-			
-			ProcedimentEntity procedimentEntity = entityComprovarHelper.comprovarProcediment(
-					entitat, 
-					id);
-			//Eliminar grups del procediment
-			List<GrupProcedimentEntity> grupsDelProcediment = grupProcedimentRepository.findByProcediment(procedimentEntity);
-			for (GrupProcedimentEntity grupProcedimentEntity : grupsDelProcediment) {
-				grupProcedimentRepository.delete(grupProcedimentEntity);
-			}
-			//Eliminar procediment
-			procedimentRepository.delete(procedimentEntity);
-			permisosHelper.revocarPermisosEntity(id,ProcedimentEntity.class);
-
-			//TODO: Decidir si mantenir l'Organ Gestor encara que no hi hagi procediments o no
-			//		Recordar que ara l'Organ té més coses assignades: Administrador, grups, pagadors ...
-			//		Es pot mirar si esta en ús amb la funció organGestorService.organGestorEnUs(organId);
-//			OrganGestorEntity organGestor = procedimentEntity.getOrganGestor();
-//			if (organGestor != null) {
-//				List<ProcedimentEntity> procedimentsOrganGestorAntic = procedimentRepository.findByOrganGestorId(organGestor.getId());
-//				if (procedimentsOrganGestorAntic == null || procedimentsOrganGestorAntic.isEmpty()) {
-//					organGestorRepository.delete(organGestor);
-//				}
-//			}
-
-			return conversioTipusHelper.convertir(
-					procedimentEntity, 
-					ProcedimentDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1335,9 +1342,13 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 	}
 
+	// PROCEDIMENT-GRUP
+	// ==========================================================
+	
+	@Audita(entityType = TipusEntitat.PROCEDIMENT_GRUP, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
 	@Transactional(readOnly = true)
 	@Override
-	public void grupCreate(
+	public ProcedimentGrupDto grupCreate(
 			Long entitatId, 
 			Long id, 
 			ProcedimentGrupDto procedimentGrup) throws NotFoundException {
@@ -1363,16 +1374,20 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					procediment, 
 					grup).build();
 			
-			grupProcedimentRepository.saveAndFlush(grupProcedimentEntity);
+			grupProcedimentEntity = grupProcedimentRepository.saveAndFlush(grupProcedimentEntity);
 			cacheHelper.evictFindProcedimentsWithPermis();
+			return conversioTipusHelper.convertir(
+					grupProcedimentEntity, 
+					ProcedimentGrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
 
+	@Audita(entityType = TipusEntitat.PROCEDIMENT_GRUP, operationType = TipusOperacio.UPDATE, returnType = TipusObjecte.DTO)
 	@Transactional(readOnly = true)
 	@Override
-	public void grupUpdate(
+	public ProcedimentGrupDto grupUpdate(
 			Long entitatId, 
 			Long id, 
 			ProcedimentGrupDto procedimentGrup) throws NotFoundException {
@@ -1399,16 +1414,20 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			
 			grupProcedimentEntity.update(procediment, grup);
 			
-			grupProcedimentRepository.saveAndFlush(grupProcedimentEntity);
+			grupProcedimentEntity = grupProcedimentRepository.saveAndFlush(grupProcedimentEntity);
 			cacheHelper.evictFindProcedimentsWithPermis();
+			return conversioTipusHelper.convertir(
+					grupProcedimentEntity, 
+					ProcedimentGrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
 
+	@Audita(entityType = TipusEntitat.PROCEDIMENT_GRUP, operationType = TipusOperacio.DELETE, returnType = TipusObjecte.DTO)
 	@Transactional
 	@Override
-	public void grupDelete(
+	public ProcedimentGrupDto grupDelete(
 			Long entitatId, 
 			Long procedimentGrupId) throws NotFoundException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
@@ -1428,6 +1447,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			
 			grupProcedimentRepository.delete(grupProcedimentEntity);
 			cacheHelper.evictFindProcedimentsWithPermis();
+			return conversioTipusHelper.convertir(
+					grupProcedimentEntity, 
+					ProcedimentGrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

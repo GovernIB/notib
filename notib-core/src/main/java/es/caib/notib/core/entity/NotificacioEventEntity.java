@@ -16,14 +16,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.ForeignKey;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
+import lombok.Getter;
 
 /**
  * Classe del model de dades que representa un event
@@ -31,6 +32,7 @@ import es.caib.notib.core.audit.NotibAuditable;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
 @Entity
 @Table(name="not_notificacio_event")
 @EntityListeners(AuditingEntityListener.class)
@@ -40,75 +42,46 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 
 	@Column(name = "tipus", nullable = false)
 	private NotificacioEventTipusEnumDto tipus;
+	
 	@Column(name = "data", nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date data;
+	
 	@Column(name = "descripcio", length = 256)
 	private String descripcio;
+	
 	@Column(name = "error", nullable = false)
 	private boolean error;
+	
 	@Column(name = "error_desc", length = ERROR_DESC_MAX_LENGTH)
 	private String errorDescripcio;
+	
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_id")
 	@ForeignKey(name = "not_notifi_noteve_fk")
-	@NotFound(action = NotFoundAction.IGNORE)
 	private NotificacioEntity notificacio;
-	@Column(name="notificacio_id", insertable=false, updatable=false)
-	private Long notificacioId;
+	
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_env_id")
 	@ForeignKey(name = "not_notenv_noteve_fk")
 	private NotificacioEnviamentEntity enviament;
+	
 	@Column(name = "callback_estat", length = 10, nullable = true)
 	@Enumerated(EnumType.STRING)
 	private CallbackEstatEnumDto callbackEstat;
+	
 	@Column(name = "callback_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date callbackData;
+
 	@Column(name = "callback_intents")
 	private Integer callbackIntents;
+	
 	@Column(name = "callback_error_desc", length = ERROR_DESC_MAX_LENGTH)
 	private String callbackError;
 
-	public NotificacioEventTipusEnumDto getTipus() {
-		return tipus;
-	}
-	public Date getData() {
-		return data;
-	}
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public boolean isError() {
-		return error;
-	}
-	public String getErrorDescripcio() {
-		return errorDescripcio;
-	}
-	public NotificacioEntity getNotificacio() {
-		return notificacio;
-	}
-	public NotificacioEnviamentEntity getEnviament() {
-		return enviament;
-	}
-	public CallbackEstatEnumDto getCallbackEstat() {
-		return callbackEstat;
-	}
-	public Date getCallbackData() {
-		return callbackData;
-	}
 	public int getCallbackIntents() {
 		return callbackIntents != null? callbackIntents : 0;
-	}
-	public String getCallbackError() {
-		return callbackError;
-	}
-	public Long getNotificacioId() {
-		return notificacioId;
-	}
-	public void setNotificacio(NotificacioEntity notificacio) {
-		this.notificacio = notificacio;
 	}
 	public void updateCallbackClient(
 			CallbackEstatEnumDto estat,
@@ -144,8 +117,6 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 			built.data = new Date();
 			built.error = false;
 			built.notificacio = notificacio;
-			if (notificacio != null)
-				built.notificacioId = notificacio.getId();
 		}
 		public Builder descripcio(String descripcio) {
 			built.descripcio = descripcio;
@@ -156,7 +127,7 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 			return this;
 		}
 		public Builder errorDescripcio(String errorDescripcio) {
-			built.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH);
+			built.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH/2);
 			return this;
 		}
 		public Builder enviament(NotificacioEnviamentEntity enviament) {

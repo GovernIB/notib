@@ -28,7 +28,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
@@ -170,7 +169,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	protected Set<NotificacioEnviamentEntity> enviaments = new LinkedHashSet<NotificacioEnviamentEntity>();
 	@OneToMany(
 			mappedBy = "notificacio",
-			fetch = FetchType.LAZY)
+			fetch = FetchType.LAZY,
+			cascade=CascadeType.ALL)
 	protected Set<NotificacioEventEntity> events = new LinkedHashSet<NotificacioEventEntity>();
 	
 

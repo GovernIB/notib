@@ -65,6 +65,7 @@ import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.UsuariEntity;
+import es.caib.notib.core.helper.AuditEnviamentHelper;
 import es.caib.notib.core.helper.CallbackHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
@@ -118,6 +119,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private MetricsHelper metricsHelper;
+	@Autowired
+	private AuditEnviamentHelper auditEnviamentHelper;
 	
 	@Override
 	@Transactional(readOnly = true)
@@ -357,7 +360,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			List<Long> enviamentIds = new ArrayList<Long>();
 			for(NotificacioEnviamentEntity nee: enviament) {
 				enviamentIds.add(nee.getId());
-				nee.setNotificacio(notificacioRepository.findById(nee.getNotificacioId()));
+//				nee.setNotificacio(notificacioRepository.findById(nee.getNotificacioId()));
 			}
 			return enviamentIds;
 		} finally {
@@ -631,9 +634,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 				enviament = new PageImpl<>(new ArrayList<NotificacioEnviamentEntity>());
 			}
 			
-			for(NotificacioEnviamentEntity nee: enviament.getContent()) {
-				nee.setNotificacio(notificacioRepository.findById(nee.getNotificacioId()));
-			}
+//			for(NotificacioEnviamentEntity nee: enviament.getContent()) {
+//				nee.setNotificacio(notificacioRepository.findById(nee.getNotificacioId()));
+//			}
 			
 			PaginaDto<NotificacioEnviamentDtoV2> paginaDto = paginacioHelper.toPaginaDto(
 					enviament,
@@ -961,9 +964,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 					(dataRegistreFi == null),
 					dataRegistreFi);
 			
-			for(NotificacioEnviamentEntity nee: enviaments) {
-				nee.setNotificacio(notificacioRepository.findById(nee.getNotificacioId()));
-			}
+//			for(NotificacioEnviamentEntity nee: enviaments) {
+//				nee.setNotificacio(notificacioRepository.findById(nee.getNotificacioId()));
+//			}
 			
 			//Genera les columnes
 			int numColumnes = 22;
@@ -1200,7 +1203,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.info("Notificant canvi al client...");
-			return callbackHelper.notifica(eventId);
+			NotificacioEntity notificacio = callbackHelper.notifica(eventId); 
+			return (notificacio != null && !notificacio.isErrorLastCallback());
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1212,31 +1216,26 @@ public class EnviamentServiceImpl implements EnviamentService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			for (Long enviamentId: enviaments) {
-				NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
-				enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
-				enviament.refreshNotificaConsulta();
+				auditEnviamentHelper.reiniciaConsultaNotifica(notificacioEnviamentRepository.findById(enviamentId));
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-
-
+	
 	@Override
 	@Transactional
 	public void reactivaSir(Set<Long> enviaments) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			for (Long enviamentId: enviaments) {
-				NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
-				enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
-				enviament.refreshSirConsulta();
+				auditEnviamentHelper.reiniciaConsultaSir(notificacioEnviamentRepository.findById(enviamentId));
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-
+	
 	private List<NotificacioEnviamentDto> enviamentsToDto(
 			List<NotificacioEnviamentEntity> enviaments) {
 		List<NotificacioEnviamentDto> destinatarisDto = new ArrayList<NotificacioEnviamentDto>();
@@ -1244,10 +1243,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 			destinatarisDto.add(conversioTipusHelper.convertir(enviament, NotificacioEnviamentDto.class));
 			
 		}
-		
-//		List<NotificacioEnviamentDto> destinatarisDto = conversioTipusHelper.convertirList(
-//				enviaments,
-//				NotificacioEnviamentDto.class);
 		
 		for (int i = 0; i < enviaments.size(); i++) {
 			NotificacioEnviamentEntity destinatariEntity = enviaments.get(i);
@@ -1262,7 +1257,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Transactional
 	private NotificacioEnviamentDto enviamentToDto(
 			NotificacioEnviamentEntity enviament) {
-		enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
+//		enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
 		NotificacioEnviamentDto enviamentDto = conversioTipusHelper.convertir(
 				enviament,
 				NotificacioEnviamentDto.class);
@@ -1307,7 +1302,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 	public byte[] getDocumentJustificant(Long enviamentId) {
 		
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
-		enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
+//		enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
 		
 		if (enviament.getRegistreEstat() != null && enviament.getRegistreEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_EXTERN))
 			return pluginHelper.obtenirOficiExtern(enviament.getNotificacio().getEmisorDir3Codi(), enviament.getRegistreNumeroFormatat()).getJustificant();	
