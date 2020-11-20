@@ -318,12 +318,14 @@ $(document).ready(function() {
     							});
     						selProcediments.append("</optgroup>");
     					}
+    					var isOnlyOneProcedimentOrgan = (procedimentsOrgan.length < 2);
     					if (procedimentsOrgan.length > 0) {
     						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
     							$.each(procedimentsOrgan, function(index, val) {
-    								selProcediments.append("<option value=\"" + val.id + "\">" + val.codi +' - '+ val.nom + "</option>");
+    								selProcediments.append("<option value=\"" + val.id + "\"" + (isOnlyOneProcedimentOrgan ? " selected" : "") + ">" + val.codi +' - '+ val.nom + "</option>");
     							});
     						selProcediments.append("</optgroup>");
+    						selProcediments.trigger('change.select2');
     					}
     					if (selProcediments.children('option').length == 2) {
     			    		$('#procedimentId option:eq(1)').attr('selected', 'selected');
