@@ -7,14 +7,21 @@ import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.aspect.Audita;
+import es.caib.notib.core.entity.DocumentEntity;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 
@@ -31,7 +38,69 @@ public class AuditNotificacioHelper {
 	private NotificacioRepository notificacioRepository;
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
+	@Resource
+	private PluginHelper pluginHelper;
 	
+	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.CREATE)
+	public NotificacioEntity desaNotificacio(NotificacioDtoV2 notificacio, EntitatEntity entitat,
+			GrupEntity grupNotificacio, OrganGestorEntity organGestor, ProcedimentEntity procediment,
+			DocumentEntity documentEntity) {
+		return notificacioRepository.saveAndFlush(NotificacioEntity.
+				getBuilderV2(
+						entitat,
+						notificacio.getEmisorDir3Codi(),
+						organGestor,
+						pluginHelper.getNotibTipusComunicacioDefecte(),
+						notificacio.getEnviamentTipus(), 
+						notificacio.getConcepte(),
+						notificacio.getDescripcio(),
+						notificacio.getEnviamentDataProgramada(),
+						notificacio.getRetard(),
+						notificacio.getCaducitat(),
+						notificacio.getUsuariCodi(),
+						procediment != null ? procediment.getCodi() : null,
+						procediment,
+						grupNotificacio != null ? grupNotificacio.getCodi() : null,
+						notificacio.getNumExpedient(),
+						TipusUsuariEnumDto.INTERFICIE_WEB
+						).document(documentEntity).build());
+	}
+	
+	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
+	public NotificacioEntity updateNotificacio(
+			NotificacioDtoV2 notificacio, 
+			EntitatEntity entitat,
+			NotificacioEntity notificacioEntity, 
+			GrupEntity grupNotificacio, 
+			OrganGestorEntity organGestor,
+			ProcedimentEntity procediment, 
+			DocumentEntity documentEntity) {
+		notificacioEntity.update(
+				entitat,
+				notificacio.getEmisorDir3Codi(),
+				organGestor,
+				pluginHelper.getNotibTipusComunicacioDefecte(),
+				notificacio.getEnviamentTipus(), 
+				notificacio.getConcepte(),
+				notificacio.getDescripcio(),
+				notificacio.getEnviamentDataProgramada(),
+				notificacio.getRetard(),
+				notificacio.getCaducitat(),
+				notificacio.getUsuariCodi(),
+				procediment != null ? procediment.getCodi() : null,
+				procediment,
+				grupNotificacio != null ? grupNotificacio.getCodi() : null,
+				notificacio.getNumExpedient(),
+				TipusUsuariEnumDto.INTERFICIE_WEB,
+				documentEntity);
+		return notificacioEntity;
+	}
+	
+	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.DELETE)
+	public NotificacioEntity deleteNotificacio(NotificacioEntity notificacioEntity) {
+		notificacioRepository.delete(notificacioEntity);
+		return notificacioEntity;
+	}
 	
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateEstatNotificacio(
