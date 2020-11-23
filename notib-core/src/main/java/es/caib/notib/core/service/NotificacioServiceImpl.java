@@ -1878,10 +1878,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 					progres.addInfo(TipusActInfo.TITOL, msgInfoInici);
 					info.getParams().add(new AccioParam("Msg. Títol:", msgInfoInici));
 					for (Long enviamentId : enviamentsIds) {
-						notificacioHelper.enviamentRefrescarEstat(
-								enviamentId, 
-								progres, 
-								info);
+						progres.incrementProcedimentsActualitzats();
+						try {
+							notificacioHelper.enviamentRefrescarEstat(
+									enviamentId, 
+									progres, 
+									info);	
+						} catch (Exception ex) {
+							progres.addInfo(TipusActInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant.ko", new Object[] {enviamentId}));
+							logger.error("No s'ha pogut refrescar l'estat de l'enviament (enviamentId=" + enviamentId + ")", ex);
+						}
 					}
 				}
 				integracioHelper.addAccioOk(info);

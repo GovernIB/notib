@@ -40,18 +40,7 @@ function submit() {
 		$('.progresContainerDetail').slideToggle("slow");
 	});
 	
-	$.ajax({
-		type: 'POST',
-		url: "<c:url value='/notificacio/refrescarEstatNotifica'/>",
-		success: function(data) {
-			if (data) {
-				console.log(data);
-			}
-		},
-		error: function() {
-			console.log("error obtenint progrés...");
-		}
-	});
+	$.post("<c:url value='/notificacio/refrescarEstatNotifica'/>");
 }
 
 function refreshProgres() {

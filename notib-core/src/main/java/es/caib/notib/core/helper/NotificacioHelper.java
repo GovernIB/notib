@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.notib.core.api.dto.AccioParam;
@@ -25,10 +26,8 @@ public class NotificacioHelper {
 	private MessageHelper messageHelper;
 	@Autowired
 	private NotificaHelper notificaHelper;
-	@Autowired
-	private IntegracioHelper integracioHelper;
-	
-	@Transactional
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void enviamentRefrescarEstat(
 			Long enviamentId, 
 			ProgresActualitzacioCertificacioDto progres,
@@ -44,10 +43,7 @@ public class NotificacioHelper {
 			progres.addInfo(TipusActInfo.SUB_INFO, msgInfoUpdated);
 			info.getParams().add(new AccioParam("Msg. procés:", msgInfoUpdated));
 		} catch (Exception ex) {
-			progres.addInfo(TipusActInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant.ko", new Object[] {enviamentId}));
-			logger.error("No s'ha pogut refrescar l'estat de l'enviament (enviamentId=" + enviamentId + ")", ex);
-
-			integracioHelper.addAccioError(info, "Error actualitzant enviaments expirats: ", ex);
+			throw new RuntimeException(ex); 
 		}
 	}
 	
