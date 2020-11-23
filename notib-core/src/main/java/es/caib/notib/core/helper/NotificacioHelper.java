@@ -6,8 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
 
@@ -23,20 +26,23 @@ public class NotificacioHelper {
 	private MessageHelper messageHelper;
 	@Autowired
 	private NotificaHelper notificaHelper;
-	
-	@Transactional
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void enviamentRefrescarEstat(
 			Long enviamentId, 
-			ProgresActualitzacioCertificacioDto progres) {
+			ProgresActualitzacioCertificacioDto progres,
+			IntegracioInfo info) throws RuntimeException {
 		logger.debug("Refrescant l'estat de la notificació de Notific@ (enviamentId=" + enviamentId + ")");
 		try {
-			progres.incrementProcedimentsActualitzats();
-			progres.addInfo(TipusActInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant", new Object[] {enviamentId}));
+			String msgInfoUpdating = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant", new Object[] {enviamentId});
+			progres.addInfo(TipusActInfo.INFO, msgInfoUpdating);
+			info.getParams().add(new AccioParam("Msg. procés:", msgInfoUpdating + " [" + progres.getProgres() + "%]"));
 			notificaHelper.enviamentRefrescarEstat(enviamentId);
-			progres.addInfo(TipusActInfo.SUB_INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant.ok", new Object[] {enviamentId}));
+			String msgInfoUpdated = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant.ok", new Object[] {enviamentId});
+			progres.addInfo(TipusActInfo.SUB_INFO, msgInfoUpdated);
+			info.getParams().add(new AccioParam("Msg. procés:", msgInfoUpdated));
 		} catch (Exception ex) {
-			progres.addInfo(TipusActInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant.ko", new Object[] {enviamentId}));
-			logger.error("No s'ha pogut refrescar l'estat de l'enviament (enviamentId=" + enviamentId + ")", ex);
+			throw new RuntimeException(ex); 
 		}
 	}
 	
