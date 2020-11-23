@@ -4,6 +4,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+
+<%
+pageContext.setAttribute(
+		"isRolActualAdministradorOrgan",
+		es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
+%>
 <c:choose>
 	<c:when test="${empty permisCommand.id}"><c:set var="titol"><spring:message code="organgestor.permis.form.titol.crear"/></c:set></c:when>
 	<c:otherwise><c:set var="titol"><spring:message code="procediment.permis.form.titol.modificar"/></c:set></c:otherwise>
@@ -63,7 +69,7 @@
 			<not:inputCheckbox name="notificacio" textKey="procediment.permis.form.camp.notificacio"/>
 			<not:inputCheckbox name="administration" textKey="procediment.permis.form.camp.gestio"/>
 		</div>
-		<not:inputCheckbox name="administrador" textKey="procediment.permis.form.camp.administrador"/>
+		<not:inputCheckbox name="administrador" textKey="procediment.permis.form.camp.administrador" disabled="${isRolActualAdministradorOrgan}"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/organgestor/${organGestor.id}/permis"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

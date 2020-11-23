@@ -2,6 +2,8 @@ package es.caib.notib.core.api.service;
 
 import java.util.List;
 
+import javax.xml.bind.ValidationException;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.core.api.dto.CodiValorDto;
@@ -84,7 +86,8 @@ public interface OrganGestorService {
 	public void permisUpdate(
 			Long entitatId,
 			Long id,
-			PermisDto permis) throws NotFoundException;
+			boolean isAdminOrgan,
+			PermisDto permis) throws NotFoundException, ValidationException;
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public void permisDelete(

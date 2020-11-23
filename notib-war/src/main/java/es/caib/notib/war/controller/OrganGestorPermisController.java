@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.xml.bind.ValidationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,10 +23,12 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDireccioDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDto;
 import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.war.command.PermisCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
+import es.caib.notib.war.helper.RolHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 
 /**
@@ -106,7 +109,7 @@ public class OrganGestorPermisController extends BaseUserController{
 	public String getNew(
 			HttpServletRequest request,
 			@PathVariable Long organGestorId,
-			Model model) {
+			Model model) throws ValidationException {
 		return get(request, organGestorId, null, model);
 	}
 	
@@ -115,7 +118,7 @@ public class OrganGestorPermisController extends BaseUserController{
 			HttpServletRequest request,
 			@PathVariable Long organGestorId,
 			@PathVariable Long permisId,
-			Model model) {
+			Model model) throws ValidationException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		model.addAttribute(
 				"organGestor",
@@ -123,6 +126,7 @@ public class OrganGestorPermisController extends BaseUserController{
 						entitatActual.getId(),
 						organGestorId));
 		PermisDto permis = null;
+		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		if (permisId != null) {
 			List<PermisDto> permisos = organGestorService.permisFind(
 					entitatActual.getId(),
@@ -134,6 +138,8 @@ public class OrganGestorPermisController extends BaseUserController{
 				}
 			}
 		}
+		if (isAdminOrgan && permis.isAdministrador())
+			throw new ValidationException("Un administrador d'òrgan no pot gestionar el permís d'admministrador d'òrgans gestors");
 		if (permis != null)
 			model.addAttribute(PermisCommand.asCommand(permis));
 		else
@@ -147,7 +153,7 @@ public class OrganGestorPermisController extends BaseUserController{
 			@PathVariable Long organGestorId,
 			@Valid PermisCommand command,
 			BindingResult bindingResult,
-			Model model) {
+			Model model) throws NotFoundException, ValidationException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
@@ -157,9 +163,11 @@ public class OrganGestorPermisController extends BaseUserController{
 							organGestorId));
 			return "organGestorPermisForm";
 		}
+		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		organGestorService.permisUpdate(
 				entitatActual.getId(),
 				organGestorId,
+				isAdminOrgan,
 				PermisCommand.asDto(command));
 		return getModalControllerReturnValueSuccess(
 				request,

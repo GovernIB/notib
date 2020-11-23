@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
+import javax.xml.bind.ValidationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -550,15 +551,15 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	public void permisUpdate(
 			Long entitatId,
 			Long id,
-			PermisDto permis) {
+			boolean isAdminOrgan,
+			PermisDto permisDto) throws ValidationException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Modificació del permis de l'organ gestor ("
 					+ "entitatId=" + entitatId +  ", "
 					+ "id=" + id + ", "
-					+ "permis=" + permis + ")");
+					+ "permis=" + permisDto + ")");
 			EntitatEntity entitat = null;
-			
 			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ
 			if (entitatId != null)
 				entitat = entityComprovarHelper.comprovarEntitat(
@@ -567,10 +568,20 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 //						false,
 //						false);
 			entityComprovarHelper.comprovarOrganGestor(entitat, id);
+			
+			PermisDto permis = permisosHelper.findPermis(
+					id,
+					OrganGestorEntity.class,
+					permisDto.getId());	
+			if (permis != null && isAdminOrgan && ((permis.getId() == null && permis.isAdministrador()) ||
+					(permis.getId() != null && (permis.isAdministrador() != permisDto.isAdministrador())))) {
+				throw new ValidationException("Un administrador d'òrgan no pot gestionar el permís d'admministrador d'òrgans gestors");
+			}
+			
 			permisosHelper.updatePermis(
 					id,
 					OrganGestorEntity.class,
-					permis);
+					permisDto);
 			cacheHelper.evictFindOrgansGestorsAccessiblesUsuari();
 			cacheHelper.evictFindEntitatsAccessiblesUsuari();
 			cacheHelper.evictFindProcedimentsWithPermis();
