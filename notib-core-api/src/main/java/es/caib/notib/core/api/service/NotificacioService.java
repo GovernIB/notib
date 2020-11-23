@@ -19,6 +19,7 @@ import es.caib.notib.core.api.dto.NotificacioErrorCallbackFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreErrorFiltreDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
@@ -339,6 +340,27 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public ProgresDescarregaDto justificantEstat() throws JustificantException;
+
+	/**
+	 * Consulta les administracions disponibles dins DIR3 a partir del codi.
+	 * 
+	 * @param text 
+	 * 				Text per la cerca
+	 * @return Una llista amb les administracions cercades.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	List<OrganGestorDto> unitatsPerCodi(String text);
+
+	/**
+	 * Consulta les administracions disponibles dins DIR3 a partir de la denominació.
+	 * 
+	 * @param text 
+	 * 				Text per la cerca
+	 * @return Una llista amb les administracions cercades.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	List<OrganGestorDto> unitatsPerDenominacio(String denominacio);
+	
 
 //	void registrarEnviamentsPendents();
 //	void notificaEnviamentsRegistrats();

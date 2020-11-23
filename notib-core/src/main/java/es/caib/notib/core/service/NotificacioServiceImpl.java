@@ -53,6 +53,7 @@ import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreErrorFiltreDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
@@ -1285,6 +1286,31 @@ public class NotificacioServiceImpl implements NotificacioService {
 						"Error recuperant els paisos de DIR3CAIB: " + ex);
 			}
 			return conversioTipusHelper.convertirList(codiValorPais, PaisosDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<OrganGestorDto> unitatsPerCodi(String codi) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			return pluginHelper.unitatsPerCodi(codi);
+			
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<OrganGestorDto> unitatsPerDenominacio(String denominacio) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			return pluginHelper.unitatsPerDenominacio(denominacio);
+			
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

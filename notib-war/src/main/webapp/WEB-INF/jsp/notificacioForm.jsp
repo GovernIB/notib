@@ -170,6 +170,7 @@ var interessatTipusOptions = "";
 
 $(document).ready(function() {
 	
+	
 	$(document).on('change','select.paisos', function() {
 		var provincia = $(this).closest("#entregaPostal").find("select[class*='provincies']");
 		var poblacioSelect = $(this).closest("#entregaPostal").find("div[class*='poblacioSelect']");
@@ -318,12 +319,14 @@ $(document).ready(function() {
     							});
     						selProcediments.append("</optgroup>");
     					}
+    					var isOnlyOneProcedimentOrgan = (procedimentsOrgan.length < 2);
     					if (procedimentsOrgan.length > 0) {
     						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
     							$.each(procedimentsOrgan, function(index, val) {
-    								selProcediments.append("<option value=\"" + val.id + "\">" + val.codi +' - '+ val.nom + "</option>");
+    								selProcediments.append("<option value=\"" + val.id + "\"" + (isOnlyOneProcedimentOrgan ? " selected" : "") + ">" + val.codi +' - '+ val.nom + "</option>");
     							});
     						selProcediments.append("</optgroup>");
+    						selProcediments.trigger('change.select2');
     					}
     					if (selProcediments.children('option').length == 2) {
     			    		$('#procedimentId option:eq(1)').attr('selected', 'selected');
@@ -476,6 +479,7 @@ $(document).ready(function() {
 		var dir3codi = closest.find('.dir3Codi');
 		var nifLabelText = "<spring:message code='notificacio.form.camp.titular.nif'/>";
 		var incapacitat = closest.find('.incapacitat');
+		var raoSocial = closest.find('.rao');
 		
 		if ($(this).val() == 'ADMINISTRACIO') {
 			$(llinatge1).addClass('hidden');
@@ -483,6 +487,7 @@ $(document).ready(function() {
 			$(dir3codi).removeClass('hidden');
 			$(nifLabel).text(nifLabelText);
 			$(incapacitat).addClass('hidden');
+			$(raoSocial).addClass('hidden');
 		} else if ($(this).val() == 'FISICA') {
 			$(llinatge1).removeClass('hidden');
 			$(llinatge2).removeClass('hidden');
@@ -490,6 +495,7 @@ $(document).ready(function() {
 			$(nifLabel).text(nifLabelText + " *");
 			$(dir3codi).addClass('hidden');
 			$(incapacitat).removeClass('hidden');
+			$(raoSocial).removeClass('hidden');
 		} else {
 			$(llinatge1).addClass('hidden');
 			$(llinatge2).addClass('hidden');
@@ -497,6 +503,7 @@ $(document).ready(function() {
 			$(dir3codi).addClass('hidden');
 			$(nifLabel).text(nifLabelText + " *");
 			$(incapacitat).removeClass('hidden');
+			$(raoSocial).removeClass('hidden');
 		}
 	});
 	
@@ -568,7 +575,7 @@ function addDestinatari(enviament_id) {
 				</div> \
 			</div> \
 		</div> \
-		<div class="col-md-3"> \
+		<div class="col-md-3 rao"> \
 			<div class="form-group"> \
 				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom"><spring:message code="notificacio.form.camp.titular.nom"/> *</label> \
 				<div class="col-xs-12"> \
@@ -609,6 +616,19 @@ function addDestinatari(enviament_id) {
 			</div> \
 		</div> \
 		<div class="col-md-3 dir3Codi"> \
+		<div class="form-group"> \
+			<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].dir3Codi"><spring:message code="notificacio.form.camp.titular.dir3codi"/></label> \
+			<div class="col-xs-12"> \
+				<div class="input-group" id="$searchOrgan#num_enviament#" onclick="obrirModalOrganismes(#num_enviament#)"> \
+					<input id="searchOrgan#num_enviament#" class="form-control " type="text" value=""> \
+					<span class="input-group-addon habilitat">  \
+						<a><span class="fa fa-search"></span></a> \
+					</span> \
+				</div> \
+			</div> \
+		</div> \
+	</div> \
+		<div class="col-md-3 hidden"> \
 			<div class="form-group"> \
 				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].dir3Codi"><spring:message code="notificacio.form.camp.titular.dir3codi"/></label> \
 				<div class="col-xs-12"> \
@@ -865,6 +885,128 @@ function mostrarDestinatari(enviament_id) {
     }
 }
 
+
+function obrirModalOrganismes(index){
+	$("#organismesModal").modal();
+	$("#indexTitular").val(index);
+	$("#titular").val(index);
+	var selOrganismes = $('#selOrganismes');
+	webutilModalAdjustHeight();
+	
+	selOrganismes.append("<option value=\"\"></option>");
+	$(".loading-screen").hide();
+	
+	netejarFiltre();
+	
+};
+
+function searchCodiChange(text){
+	var searchNom = $('#searchNom');
+	if(text.trim().length ==0){
+		searchNom.removeAttr('disabled');
+	}else{
+		searchNom.prop("disabled", true);
+	}
+	
+};
+
+function searchNomChange(text){
+	var searchCodi = $('#searchCodi');
+	if(text.trim().length ==0){
+		searchCodi.removeAttr('disabled');
+	}else{
+		searchCodi.prop("disabled", true);
+	}
+	
+};
+
+
+function seleccionar(){
+	var from = $('#titular').val().split('-')[0];
+	var index = $('#titular').val().split('-')[1] != undefined?$('#titular').val().split('-')[1]:from;
+	var dir3Codi;
+	var raoSocial;
+	var dir3CodiDesc;
+	var organSelect = document.getElementById('selOrganismes');
+	if(organSelect.selectedIndex != -1){
+		var organSeleccionatValue = organSelect.options[organSelect.selectedIndex].value;
+		var organSeleccionatText = organSelect.options[organSelect.selectedIndex].text;
+		if(from == 'Tit'){
+			dir3Codi = document.getElementById("enviaments[" + index + "].titular.nom");
+			raoSocial = document.getElementById("enviaments[" + index + "].titular.dir3Codi");
+			dir3CodiDesc =  document.getElementById("searchOrganTit" + index).getElementsByTagName('input')[0];
+		}else{
+			dir3Codi = document.getElementById("enviaments[" + index + "].destinataris[" + index + "].nom");
+			raoSocial = document.getElementById("enviaments[" + index + "].destinataris[" + index + "].nom");
+			dir3CodiDesc =  document.getElementById("searchOrgan" + index);
+		}
+		
+		dir3Codi.value = organSeleccionatValue;
+		raoSocial.value = organSeleccionatText.split("-")[1].trim();	
+		dir3CodiDesc.value = organSeleccionatText;		
+	}
+	
+	
+};
+
+function netejarFiltre(){
+	var searchCodi = $('#searchCodi');
+	var searchNom = $('#searchNom');
+	var selOrganismes = $('#selOrganismes');
+	
+	searchCodi.removeAttr('disabled');
+	searchCodi.val('');
+	searchNom.removeAttr('disabled');
+	searchNom.val('');
+	
+	selOrganismes.empty();
+	selOrganismes.append("<option value=\"\"></option>");
+
+};
+
+function cercarOrganismes(text){
+	var searchCodi = $('#searchCodi');
+	var searchNom = $('#searchNom');
+	var searchValue ='';
+	if(searchCodi.val()!=''){
+		searchValue = "codi/" + searchCodi.val();
+	}else if(searchNom.val()!=''){
+		searchValue = "denominacio/" +searchNom.val();
+	}
+	
+	
+	if(searchValue != '' && searchValue.length > 2){
+		$(".loading-screen").show();
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value="/notificacio/administracions/"/>" + searchValue,
+			success: function(data) {
+				var selOrganismes = $('#selOrganismes');
+				
+				
+				selOrganismes.empty();
+				selOrganismes.append("<option value=\"\"></option>");
+				if (data && data.length > 0) {
+						var items = [];
+						$.each(data, function(i, val) {
+							items.push({
+								"id": val.codi,
+								"text": val.codi + " - " + val.nom
+							});
+							selOrganismes.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
+						});
+				}
+				$(".loading-screen").hide();
+			},
+			error: function() {
+				console.log("error obtenint els organismes...");
+			}
+		});
+	}
+	
+	
+};
+
 function mostrarEntregaDeh(className) {
     var element = document.getElementById(className);
     var parent = $(element).closest(".enviamentsForm");
@@ -976,7 +1118,11 @@ function actualitzarEntrega(j) {
 			});
 		}
 	});	
+	
 }
+
+
+	
 </script>
 </head>
 <body>
@@ -1224,7 +1370,7 @@ function actualitzarEntrega(j) {
 										</div>
 										
 										<!-- NOM / RAÓ SOCIAL -->
-										<div class="col-md-6">
+										<div class="col-md-6 rao">
 											<not:inputText name="enviaments[${j}].titular.nom" textKey="notificacio.form.camp.titular.nom" required="true" />
 										</div>
 										
@@ -1250,8 +1396,15 @@ function actualitzarEntrega(j) {
 										
 										<!-- CODI DIR3 -->
 										<div class="col-md-6 dir3Codi hidden">
-											<not:inputText name="enviaments[${j}].titular.dir3Codi" textKey="notificacio.form.camp.titular.dir3codi" required="true"/>
+											<not:inputTextSearch  funcio="obrirModalOrganismes('Tit-${j}')" searchButton="searchOrganTit${j}" textKey="notificacio.form.camp.titular.dir3codi" required="true"/>
 										</div>
+										
+										<div class="col-md-6 hidden">
+											<not:inputTextSearch  funcio="obrirModalOrganismes(${j})" name="enviaments[${j}].titular.dir3Codi" searchButton="searchOrgan" textKey="notificacio.form.camp.titular.dir3codi" required="true"/>
+										</div>
+<!-- 										<div class="col-md-6"> -->
+<%-- 											<not:inputTextSearch  name="enviaments[${j}].titular.dir3Codi" textKey="procediment.form.camp.organ" searchButton="searchOrgan" required="true" readonly="true" labelSize="2"/> --%>
+<!-- 										</div> -->
 										
 										<!-- INCAPACITAT -->
 										<c:if test="${isTitularAmbIncapacitat}">
@@ -1515,5 +1668,56 @@ function actualitzarEntrega(j) {
 			</div>
 		</div>
 	</form:form>
+
+
+
+	<div class="modal fade" id="organismesModal" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title"><spring:message code="procediment.form.titol.organismes"/></h4>
+				</div>
+				<div class="modal-body body">
+					<div class="row">
+						<input type="hidden" id="titular" value="${indexTitular}">
+						<div class="col-md-3">
+							<input type="text"  name="searchCodi" id="searchCodi" onchange="searchCodiChange(this.value)" class="form-control" placeholder="<spring:message code="organgestor.list.columna.codi"/>"/>
+						</div>
+						<div class="col-md-3">
+							<input type="text"  id="searchNom" class="form-control" onchange="searchNomChange(this.value)" placeholder="<spring:message code="organgestor.list.columna.nom"/>"/>
+						<div class="col-md-3"> </div>
+						</div>
+						<div class="col-md-4 pull-right">
+							<div class="pull-right">
+								<button id="btnNetejar" onclick="netejarFiltre()" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+								<button type="submit" onclick="cercarOrganismes()" id="btnBuscar" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-8" style="margin-top: 10px;">
+							<select id="selOrganismes" class= "form-control"  data-placeholder="<spring:message code="procediment.form.camp.organ"/>"></select> 
+						</div>
+					</div>
+					
+					<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
+						<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
+							<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>
+						</div>
+					</div>
+				</div>
+				<h6 class="modal-footer"><spring:message code="notificacio.form.filtre.llegenda"/></h6>
+				<div class="modal-footer">
+					
+					<button id="addOrganismeButton" onclick="seleccionar()" type="button" class="btn btn-info" data-dismiss="modal"><span class="fa fa-plus"></span> <spring:message code="comu.boto.seleccionar"/></button>
+					<button type="button" class="btn btn-default" data-dismiss="modal"><spring:message code="comu.boto.cancelar" /></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	
 
 </body> 
