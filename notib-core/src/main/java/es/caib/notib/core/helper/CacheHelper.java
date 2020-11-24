@@ -124,7 +124,7 @@ public class CacheHelper {
 		Collections.sort(organismes, new Comparator<OrganismeDto>() {
 			@Override
 			public int compare(OrganismeDto o1, OrganismeDto o2) {
-				return o1.getCodi().compareTo(o1.getCodi());
+				return o1.getCodi().compareTo(o2.getCodi());
 			}
 		});
 		return organismes;
@@ -228,6 +228,10 @@ public class CacheHelper {
 			
 	@CacheEvict(value = "procedimentsPermis", allEntries = true)
 	public void evictFindProcedimentsWithPermis() {
+	}
+	
+	@CacheEvict(value = "procedimentsOrganPermis", allEntries = true)
+	public void evictFindProcedimentsOrganWithPermis() {
 	}
 	
 	@CacheEvict(value = "organsPermis", allEntries = true)

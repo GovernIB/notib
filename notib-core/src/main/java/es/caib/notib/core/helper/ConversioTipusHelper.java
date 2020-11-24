@@ -143,6 +143,12 @@ public class ConversioTipusHelper {
 			field("pagadorCie.id", "pagadorCieId").
 			byDefault().
 			register();
+		
+//		mapperFactory.classMap(ProcedimentOrganEntity.class, ProcedimentOrganDto.class).
+//			field("procediment.id", "procedimentId").
+//			field("organGestor.codi", "organGestor").
+//			byDefault().
+//			register();
 	
 	}
 

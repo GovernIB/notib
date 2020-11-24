@@ -49,6 +49,7 @@ import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorCallbackFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
@@ -60,10 +61,10 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
 import es.caib.notib.core.api.dto.PermisEnum;
-import es.caib.notib.core.api.dto.ProgresDescarregaDto;
-import es.caib.notib.core.api.dto.ProgresDescarregaDto.TipusInfo;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
+import es.caib.notib.core.api.dto.ProgresDescarregaDto;
+import es.caib.notib.core.api.dto.ProgresDescarregaDto.TipusInfo;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
@@ -86,6 +87,7 @@ import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.ProcedimentOrganEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.AuditEnviamentHelper;
 import es.caib.notib.core.helper.AuditNotificacioHelper;
@@ -116,13 +118,13 @@ import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.PersonaRepository;
+import es.caib.notib.core.repository.ProcedimentOrganRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -158,6 +160,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private ProcedimentRepository procedimentRepository;
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
+	@Autowired
+	private ProcedimentOrganRepository procedimentOrganRepository;
 	@Autowired
 	private EmailHelper emailHelper;
 	@Autowired
@@ -206,15 +210,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			OrganGestorEntity organGestor = null;
 			String documentGesdocId = null;
 			ProcedimentEntity procediment = null;
+			ProcedimentOrganEntity procedimentOrgan = null;
 			if (notificacio.getProcediment() != null && notificacio.getProcediment().getId() != null) {
-				procediment = entityComprovarHelper.comprovarProcediment(
-							entitat,
-						 	notificacio.getProcediment().getId(),
-						 	false,
-						 	false,
-						 	true,
-						 	false);
-				if (!procediment.isComu() || (procediment.isComu() && notificacio.getOrganGestor() == null)) {
+				procediment = entityComprovarHelper.comprovarProcediment(entitat, notificacio.getProcediment().getId());
+				if (procediment != null && !procediment.isComu()) { // || (procediment.isComu() && notificacio.getOrganGestor() == null)) { --> Tot procediment comú ha de informa un òrgan gestor
 					organGestor = procediment.getOrganGestor();
 				}
 			} 
@@ -241,6 +240,20 @@ public class NotificacioServiceImpl implements NotificacioService {
 							llibreOrgan.getNomLlarg()).build();
 					organGestorRepository.save(organGestor);
 				}
+			}
+			// Si tenim procediment --> Comprovam permisos
+			if (procediment != null) {
+				if (procediment.isComu() && organGestor != null) {
+					procedimentOrgan = procedimentOrganRepository.findByProcedimentIdAndOrganGestorId(procediment.getId(), organGestor.getId());
+				}
+				procediment = entityComprovarHelper.comprovarProcedimentOrgan(
+						entitat,
+					 	notificacio.getProcediment().getId(),
+					 	procedimentOrgan,
+					 	false,
+					 	false,
+					 	true,
+					 	false);
 			}
 			if (notificacio.getGrup() != null && notificacio.getGrup().getId() != null) {
 				grupNotificacio = grupRepository.findOne(notificacio.getGrup().getId());
@@ -302,7 +315,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 					grupNotificacio, 
 					organGestor,
 					procediment,
-					documentEntity);
+					documentEntity,
+					procedimentOrgan);
 	
 			List<Enviament> enviaments = new ArrayList<Enviament>();
 			List<NotificacioEnviamentEntity> enviamentsEntity = new ArrayList<NotificacioEnviamentEntity>();
@@ -488,19 +502,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 				OrganGestorEntity organGestor = null;
 				String documentGesdocId = null;
 				ProcedimentEntity procediment = null;
+				ProcedimentOrganEntity procedimentOrgan = null;
 	//			### Recuperar procediment notificació
 				if (notificacio.getProcediment() != null && notificacio.getProcediment().getId() != null) {
-					procediment = entityComprovarHelper.comprovarProcediment(
-								entitat,
-							 	notificacio.getProcediment().getId(),
-							 	false,
-							 	false,
-							 	true,
-							 	false);
-					if (!procediment.isComu() || (procediment.isComu() && notificacio.getOrganGestor() == null)) {
+					procediment = entityComprovarHelper.comprovarProcediment(entitat, notificacio.getProcediment().getId());
+					if (procediment != null && !procediment.isComu()) { // || (procediment.isComu() && notificacio.getOrganGestor() == null)) { --> Tot procediment comú ha de informa un òrgan gestor
 						organGestor = procediment.getOrganGestor();
 					}
-				} 
+				}
 	//			### Recuperar òrgan gestor notificació
 				if (organGestor == null && notificacio.getOrganGestor() != null ) {
 					organGestor = organGestorRepository.findByCodi(notificacio.getOrganGestor());
@@ -525,6 +534,20 @@ public class NotificacioServiceImpl implements NotificacioService {
 								llibreOrgan.getNomLlarg()).build();
 						organGestorRepository.save(organGestor);
 					}
+				}
+				// Si tenim procediment --> Comprovam permisos
+				if (procediment != null) {
+					if (procediment.isComu() && organGestor != null) {
+						procedimentOrgan = procedimentOrganRepository.findByProcedimentIdAndOrganGestorId(procediment.getId(), organGestor.getId());
+					}
+					procediment = entityComprovarHelper.comprovarProcedimentOrgan(
+							entitat,
+						 	notificacio.getProcediment().getId(),
+						 	procedimentOrgan,
+						 	false,
+						 	false,
+						 	true,
+						 	false);
 				}
 	//			### Recupera grup notificació a partir del codi
 				if (notificacio.getGrup() != null && notificacio.getGrup().getId() != null) {
@@ -601,7 +624,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 						grupNotificacio, 
 						organGestor, 
 						procediment,
-						documentEntity);
+						documentEntity,
+						procedimentOrgan);
 				
 				List<Enviament> enviaments = new ArrayList<Enviament>();
 				List<Long> enviamentsIds = new ArrayList<Long>();
@@ -871,6 +895,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			List<String> procedimentsCodisNotib,
 			List<String> codisProcedimentsProcessables,
 			List<String> codisOrgansGestorsDisponibles,
+			List<Long> codisProcedimentOrgansDisponibles,
 			String organGestorCodi,
 			String usuariCodi,
 			NotificacioFiltreDto filtre,
@@ -892,6 +917,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			
 			boolean esProcedimentsCodisNotibNull = (procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty());
 			boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
+			boolean esProcedimentsOrgansCodisNotibNull = (codisProcedimentOrgansDisponibles == null || codisProcedimentOrgansDisponibles.isEmpty());
 			
 			if (filtre == null) {
 				//Consulta les notificacions sobre les quals té permis l'usuari actual
@@ -902,6 +928,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							aplicacioService.findRolsUsuariActual(), 
 							esOrgansGestorsCodisNotibNull,
 							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+							esProcedimentsOrgansCodisNotibNull,
+							esProcedimentsOrgansCodisNotibNull ? null : codisProcedimentOrgansDisponibles,
 							entitatActual,
 							usuariCodi,
 							pageable);
@@ -946,6 +974,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							aplicacioService.findRolsUsuariActual(),
 							esOrgansGestorsCodisNotibNull,
 							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+							esProcedimentsOrgansCodisNotibNull,
+							esProcedimentsOrgansCodisNotibNull ? null : codisProcedimentOrgansDisponibles,
 							filtre.getEnviamentTipus() == null,
 							filtre.getEnviamentTipus(),
 							filtre.getConcepte() == null,

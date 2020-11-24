@@ -22,6 +22,7 @@ import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.ProcedimentOrganEntity;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 
@@ -42,9 +43,14 @@ public class AuditNotificacioHelper {
 	private PluginHelper pluginHelper;
 	
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.CREATE)
-	public NotificacioEntity desaNotificacio(NotificacioDtoV2 notificacio, EntitatEntity entitat,
-			GrupEntity grupNotificacio, OrganGestorEntity organGestor, ProcedimentEntity procediment,
-			DocumentEntity documentEntity) {
+	public NotificacioEntity desaNotificacio(
+			NotificacioDtoV2 notificacio, 
+			EntitatEntity entitat,
+			GrupEntity grupNotificacio, 
+			OrganGestorEntity organGestor, 
+			ProcedimentEntity procediment,
+			DocumentEntity documentEntity,
+			ProcedimentOrganEntity procedimentOrgan) {
 		return notificacioRepository.saveAndFlush(NotificacioEntity.
 				getBuilderV2(
 						entitat,
@@ -62,8 +68,8 @@ public class AuditNotificacioHelper {
 						procediment,
 						grupNotificacio != null ? grupNotificacio.getCodi() : null,
 						notificacio.getNumExpedient(),
-						TipusUsuariEnumDto.INTERFICIE_WEB
-						).document(documentEntity).build());
+						TipusUsuariEnumDto.INTERFICIE_WEB,
+						procedimentOrgan).document(documentEntity).build());
 	}
 	
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
@@ -74,7 +80,8 @@ public class AuditNotificacioHelper {
 			GrupEntity grupNotificacio, 
 			OrganGestorEntity organGestor,
 			ProcedimentEntity procediment, 
-			DocumentEntity documentEntity) {
+			DocumentEntity documentEntity,
+			ProcedimentOrganEntity procedimentOrgan) {
 		notificacioEntity.update(
 				entitat,
 				notificacio.getEmisorDir3Codi(),
@@ -92,7 +99,8 @@ public class AuditNotificacioHelper {
 				grupNotificacio != null ? grupNotificacio.getCodi() : null,
 				notificacio.getNumExpedient(),
 				TipusUsuariEnumDto.INTERFICIE_WEB,
-				documentEntity);
+				documentEntity,
+				procedimentOrgan);
 		return notificacioEntity;
 	}
 	
