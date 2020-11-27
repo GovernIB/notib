@@ -933,7 +933,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							entitatActual,
 							usuariCodi,
 							pageable);
-				//Consulta els notificacions de l'entitat acutal
+				//Consulta les notificacions de l'entitat acutal
 				} else if (isUsuariEntitat) {
 					notificacions = notificacioRepository.findByEntitatActual(
 							entitatActual,
@@ -946,13 +946,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 							pageable);
 				} else if (isAdministradorOrgan) {
 					List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
-					if (!procedimentsCodisNotib.isEmpty()) {
-						notificacions = notificacioRepository.findByProcedimentCodiNotibAndEntitat(
-								procedimentsCodisNotib, 
-								entitatActual,
-								organs,
-								pageable);
-					}
+					notificacions = notificacioRepository.findByProcedimentCodiNotibAndEntitat(
+							esProcedimentsCodisNotibNull,
+							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib, 
+							entitatActual,
+							organs,
+							pageable);
 				}
 			} else {
 				Date dataInici = toIniciDia(filtre.getDataInici());
@@ -1069,41 +1068,39 @@ public class NotificacioServiceImpl implements NotificacioService {
 							pageable);
 				} else if (isAdministradorOrgan) {
 					List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
-//					if (!procedimentsCodisNotib.isEmpty()) {
-						notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotib(
-								filtre.getEntitatId() == null,
-								filtre.getEntitatId(),
-								esProcedimentsCodisNotibNull,
-								esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib, 
-								filtre.getEnviamentTipus() == null,
-								filtre.getEnviamentTipus(),
-								filtre.getConcepte() == null,
-								filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
-								filtre.getEstat() == null,
-								filtre.getEstat(), 
-								NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
-								dataInici == null,
-								dataInici,
-								dataFi == null,
-								dataFi,
-								filtre.getTitular() == null || filtre.getTitular().isEmpty(),
-								filtre.getTitular() == null ? "" : filtre.getTitular(),
-								entitatActual,
-								organGestor == null,
-								organGestor,
-								procediment == null,
-								procediment,
-								filtre.getTipusUsuari() == null,
-								filtre.getTipusUsuari(),
-								filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
-								filtre.getNumExpedient(),
-								filtre.getCreadaPer() == null || filtre.getCreadaPer().isEmpty(),
-								filtre.getCreadaPer(),
-								filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
-								filtre.getIdentificador(),
-								organs,
-								pageable);
-//					}
+					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotib(
+							filtre.getEntitatId() == null,
+							filtre.getEntitatId(),
+							esProcedimentsCodisNotibNull,
+							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib, 
+							filtre.getEnviamentTipus() == null,
+							filtre.getEnviamentTipus(),
+							filtre.getConcepte() == null,
+							filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
+							filtre.getEstat() == null,
+							filtre.getEstat(), 
+							NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
+							dataInici == null,
+							dataInici,
+							dataFi == null,
+							dataFi,
+							filtre.getTitular() == null || filtre.getTitular().isEmpty(),
+							filtre.getTitular() == null ? "" : filtre.getTitular(),
+							entitatActual,
+							organGestor == null,
+							organGestor,
+							procediment == null,
+							procediment,
+							filtre.getTipusUsuari() == null,
+							filtre.getTipusUsuari(),
+							filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
+							filtre.getNumExpedient(),
+							filtre.getCreadaPer() == null || filtre.getCreadaPer().isEmpty(),
+							filtre.getCreadaPer(),
+							filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
+							filtre.getIdentificador(),
+							organs,
+							pageable);
 				}
 			}
 			return complementaNotificacions(notificacions, codisProcedimentsProcessables);
