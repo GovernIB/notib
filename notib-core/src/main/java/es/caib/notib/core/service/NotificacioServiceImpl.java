@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
-import javax.mail.MessagingException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -1543,7 +1542,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public String marcarComProcessada(
 			Long notificacioId,
-			String motiu) throws MessagingException {
+			String motiu) throws Exception {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Refrescant l'estat de la notificació a PROCESSAT (" +
@@ -1554,7 +1553,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					notificacioId); 
 			notificacioEntity = auditNotificacioHelper.updateNotificacioProcessada(notificacioEntity, motiu);
 			UsuariEntity usuari = usuariHelper.getUsuariAutenticat();
-			if(notificacioEntity.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
+			if(usuari != null && notificacioEntity.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
 				
 				if(usuari.isRebreEmailsNotificacioCreats()) {
 					if(usuari.getCodi() == notificacioEntity.getCreatedBy().getCodi()) {

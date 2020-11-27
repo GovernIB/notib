@@ -8,7 +8,6 @@ import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
-import javax.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
@@ -26,8 +25,8 @@ import es.caib.notib.core.api.dto.NotificacioRegistreErrorFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
-import es.caib.notib.core.api.dto.ProgresDescarregaDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
+import es.caib.notib.core.api.dto.ProgresDescarregaDto;
 import es.caib.notib.core.api.dto.ProvinciesDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.exception.JustificantException;
@@ -195,7 +194,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public String marcarComProcessada(
 			Long enviamentId,
-			String motiu) throws MessagingException {
+			String motiu) throws Exception {
 		return delegate.marcarComProcessada(
 				enviamentId,
 				motiu);

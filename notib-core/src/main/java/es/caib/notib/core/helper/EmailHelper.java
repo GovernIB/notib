@@ -53,25 +53,25 @@ public class EmailHelper {
 	@Resource
 	private MessageHelper messageHelper;
 	
-	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws MessagingException {
-		List<UsuariDto> destinataris = obtenirCodiDestinatarisPerProcediment(notificacio);
+	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws Exception {
 		String resposta = null;
-		if (destinataris != null && !destinataris.isEmpty()) {
-			for (UsuariDto usuariDto : destinataris) {
-				try {
+		try {
+			List<UsuariDto> destinataris = obtenirCodiDestinatarisPerProcediment(notificacio);
+			if (destinataris != null && !destinataris.isEmpty()) {
+				for (UsuariDto usuariDto : destinataris) {
 					if (usuariDto.getEmail() != null && !usuariDto.getEmail().isEmpty()) {
 						String email = usuariDto.getEmail().replaceAll("\\s+","");
 						sendEmailBustiaPendentContingut(
 								email,
 								notificacio);
 					}
-				} catch (Exception ex) {
-					String errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
-					logger.error(errorDescripció);
-					resposta = errorDescripció;
 				}
-			}
-		}	
+			}	
+		} catch (Exception ex) {
+			String errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
+			logger.error(errorDescripció);
+			resposta = errorDescripció;
+		}
 		return resposta;
 	}
 	

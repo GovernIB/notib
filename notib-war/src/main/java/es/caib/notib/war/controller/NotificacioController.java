@@ -569,11 +569,14 @@ public class NotificacioController extends BaseUserController {
 	@RequestMapping(value = "/{notificacioId}/processar", method = RequestMethod.POST)
 	public String processarPost(
 			HttpServletRequest request, 
-			Model model, 
-			@PathVariable 
-			Long notificacioId,
-			@Valid MarcarProcessatCommand command) throws MessagingException {
+			@PathVariable Long notificacioId,
+			@Valid MarcarProcessatCommand command,
+			BindingResult bindingResult,
+			Model model) throws MessagingException {
 		try {
+			if (bindingResult.hasErrors()) {
+				return "notificacioMarcarProcessat";
+			}
 			String resposta = notificacioService.marcarComProcessada(
 					notificacioId,
 					command.getMotiu());
@@ -585,8 +588,13 @@ public class NotificacioController extends BaseUserController {
 					request, 
 					"redirect:../../notificacio",
 					"notificacio.controller.refrescar.estat.ok");
-		} catch (Exception exception) {
-			return "notificacioMarcarProcessat";
+		} catch (Exception ex) {
+			logger.error("Hi ha hagut un error processant la notificació", ex);
+			return getModalControllerReturnValueError(
+					request, 
+					"redirect:../../notificacio",
+					"notificacio.controller.processar.ko",
+					new Object[] {ex.toString()}); //ex.getMessage()});
 		}
 
 	}
