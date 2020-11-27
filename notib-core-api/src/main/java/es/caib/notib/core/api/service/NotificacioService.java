@@ -119,6 +119,7 @@ public interface NotificacioService {
 			List<String> codisProcedimentsDisponibles,
 			List<String> codisProcedimentsProcessables,
 			List<String> codisOrgansGestorsDisponibles,
+			List<Long> codisProcedimentOrgansDisponibles,
 			String organGestorCodi,
 			String usuariCodi,
 			NotificacioFiltreDto filtre,

@@ -77,6 +77,7 @@ import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.ProcedimentOrganEntity;
 import es.caib.notib.core.helper.AuditEnviamentHelper;
 import es.caib.notib.core.helper.AuditNotificacioHelper;
 import es.caib.notib.core.helper.CacheHelper;
@@ -99,6 +100,7 @@ import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.PersonaRepository;
+import es.caib.notib.core.repository.ProcedimentOrganRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
 import es.caib.plugins.arxiu.api.DocumentContingut;
@@ -126,6 +128,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
+	@Autowired
+	private ProcedimentOrganRepository procedimentOrganRepository;
 	@Autowired
 	private PersonaRepository personaRepository;
 	@Autowired
@@ -172,7 +176,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			RespostaAlta resposta = new RespostaAlta();
 			ProcedimentEntity procediment = null;
 			OrganGestorEntity organGestor = null;
-
+			ProcedimentOrganEntity procedimentOrgan = null;
+			
 			// Generar informació per al monitor d'integracions
 			IntegracioInfo info = generateInfoAlta(notificacio);
 			
@@ -233,7 +238,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						}
 						
 						// Organ gestor
-						if (!procediment.isComu() || (procediment.isComu() && notificacio.getOrganGestor() == null)) {
+						if (!procediment.isComu()) { // || (procediment.isComu() && notificacio.getOrganGestor() == null)) { --> Tot procediment comú ha de informa un òrgan gestor
 							organGestor = procediment.getOrganGestor();
 						}
 					} else {
@@ -268,7 +273,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						organGestorRepository.save(organGestor);
 					}
 				}
-				
+				if (procediment != null && procediment.isComu() && organGestor != null) {
+					procedimentOrgan = procedimentOrganRepository.findByProcedimentIdAndOrganGestorId(procediment.getId(), organGestor.getId());
+				}
+
 				// Dades no depenents de procediment
 				
 				// DOCUMENT
@@ -302,7 +310,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 								procediment,
 								notificacio.getGrupCodi(),
 								notificacio.getNumExpedient(),
-								TipusUsuariEnumDto.APLICACIO)
+								TipusUsuariEnumDto.APLICACIO,
+								procedimentOrgan)
 						.document(documentEntity).build();
 				
 				NotificacioEntity notificacioGuardada = auditNotificacioHelper.desaNotificacio(notificacioEntity);

@@ -52,10 +52,19 @@
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
 		<form:hidden path="id"/>
 		<not:inputSelect name="tipus" textKey="procediment.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="TipusEnumDto"/>
-		<c:url value="/userajax/usuari" var="urlConsultaInicial"/>
-		<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
 		<not:inputText name="principal" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"/>
-		
+		<c:if test="${procediment.comu}">
+			<not:inputSelect 
+				name="organ" 
+				textKey="entitat.permis.form.camp.organ" 
+				disabled="${not empty permisCommand.id}" 
+				optionItems="${organs}"
+				optionTextAttribute="nomComplet"
+				optionValueAttribute="codi"
+				optionMinimumResultsForSearch="5"
+				emptyOption="false"/>
+		</c:if>
+
 		<not:inputCheckbox name="selectAll" textKey="procediment.permis.form.camp.all"/>
 		<div class="permisosInput">
 			<not:inputCheckbox name="read" textKey="procediment.permis.form.camp.consulta"/>

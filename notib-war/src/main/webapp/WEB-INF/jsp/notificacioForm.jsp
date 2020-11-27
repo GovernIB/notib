@@ -345,10 +345,6 @@ $(document).ready(function() {
     	
     });
     $('#procedimentId').on('change', function() {
-//         var agrupable = $(this).children(":selected").attr("class");
-//         var procedimentId = $(this).children(":selected").attr("value");
-//         comprovarGrups(agrupable, procedimentId)
-//         webutilModalAdjustHeight();
 		var procediment = $(this).val();
 		if (procediment == '') {
 			$("#organGestor").prop("disabled", false);
@@ -363,8 +359,11 @@ $(document).ready(function() {
 					// Òrgan gestor
 					if (!data.comu) {
 						$("#organGestor").val(data.organCodi).trigger("change.select2");
+					} else if (data.organsDisponibles.length) {
+						if (data.organsDisponibles.length == 1) {
+							$("#organGestor").val(data.organsDisponibles[0]).trigger("change.select2");
+						}
 					}
-// 					$("#organGestor").prop("disabled", true);
 					// Caducitat
 					$("#caducitat").val(data.caducitat);
 					// Retard

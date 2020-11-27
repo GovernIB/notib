@@ -15,6 +15,7 @@ import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
 import es.caib.notib.core.api.dto.ProcedimentFormDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.ProcedimentOrganDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -26,6 +27,7 @@ import es.caib.notib.core.api.exception.NotFoundException;
  */
 public interface ProcedimentService {
 
+	public enum TipusPermis { PROCEDIMENT, PROCEDIMENT_ORGAN }
 	/**
 	 * Crea un nou procediment.
 	 * 
@@ -182,19 +184,19 @@ public interface ProcedimentService {
 	public List<ProcedimentDto> findProcediments(Long entitatId, List<String> grups);
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public List<ProcedimentDto> findProcedimentsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
-//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-//	public List<ProcedimentDto> findProcedimentsWithPermis(Long entitatId, List<String> grups, PermisEnum permis);
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public List<ProcedimentDto> findProcedimentsSenseGrups(Long entitatId);
-//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-//	public List<ProcedimentDto> findProcedimentsSenseGrupsWithPermis(Long entitatId, PermisEnum permis);
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public List<ProcedimentDto> findProcedimentsAmbGrups(Long entitatId, List<String> grups);
-//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-//	public List<ProcedimentDto> findProcedimentsAmbGrupsWithPermis(Long entitatId, List<String> grups, PermisEnum permis);
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public boolean hasAnyProcedimentsWithPermis(Long entitatId, List<String> grups, PermisEnum permis);
 	
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	public List<ProcedimentOrganDto> findProcedimentsOrganWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	public List<ProcedimentOrganDto> findProcedimentsOrganWithPermisByOrgan(String organId, String entitatCodi, List<ProcedimentOrganDto> procedimentsOrgans);
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	public List<String> findProcedimentsOrganCodiWithPermisByProcediment(ProcedimentDto procediment, String entitatCodi, List<ProcedimentOrganDto> procedimentsOrgans);
 	/**
 	 * Recupera els tipus d'assumpte d'una entitat.
 	 * 
@@ -230,7 +232,10 @@ public interface ProcedimentService {
 	public List<PermisDto> permisFind(
 			Long entitatId,
 			boolean isAdministrador,
-			Long id) throws NotFoundException;
+			Long procedimentId,
+			String organ,
+			String organActual,
+			TipusPermis tipus) throws NotFoundException;
 	
 	/**
 	 * Modifica els permisos d'un usuari o d'un rol per a un procediment.
@@ -268,7 +273,9 @@ public interface ProcedimentService {
 			Long entitatId,
 			Long organGestorId,
 			Long id,
-			Long permisId) throws NotFoundException;
+			String organ,
+			Long permisId,
+			TipusPermis tipus) throws NotFoundException;
 	
 	/**
 	 * Assigna un grup a un procediment.

@@ -43,9 +43,10 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"     left outer join ntf.organGestor organ " +
 			"where " +
 			"   (" +
-			"		(:esProcedimentsCodisNotibNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib))" +	// Té permís sobre el procediment
+			"		(:esProcedimentsCodisNotibNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " +	// Té permís sobre el procediment
 			"	or	(:esOrgansGestorsCodisNotibNull = false and organ.codi is not null and organ.codi in (:organsGestorsCodisNotib)) " +							// Té permís sobre l'òrgan
-			"   or 	((ntf.procedimentCodiNotib is null or pro.comu = true) and ntf.usuariCodi = :usuariCodi) " +													// És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari 
+			"   or 	((ntf.procedimentCodiNotib is null or pro.comu = true) and ntf.usuariCodi = :usuariCodi) " +													// És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
+			"   or 	(:esProcedimentOrgansIdsNotibNull = false and ntf.procedimentOrgan is not null and ntf.procedimentOrgan.id in (:procedimentOrgansIdsNotib)) " +	// Procediment comú amb permís de procediment-òrgan
 			"	) " +
 			"and (ntf.grupCodi = null or (ntf.grupCodi in (:grupsProcedimentCodisNotib))) " +
 			"and (ntf.entitat = :entitat) " )
@@ -55,6 +56,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("grupsProcedimentCodisNotib") List<? extends String> grupsProcedimentCodisNotib,
 			@Param("esOrgansGestorsCodisNotibNull") boolean esOrgansGestorsCodisNotibNull,
 			@Param("organsGestorsCodisNotib") List<? extends String> organsGestorsCodisNotib,
+			@Param("esProcedimentOrgansIdsNotibNull") boolean esProcedimentOrgansIdsNotibNull,
+			@Param("procedimentOrgansIdsNotib") List<Long> procedimentOrgansIdsNotib,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("usuariCodi") String usuariCodi,
 			Pageable paginacio);
@@ -65,7 +68,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"     left outer join ntf.procediment pro " +
 			"where " +
 			"   ((ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib))" +
-			"   or (ntf.procedimentCodiNotib is null and ntf.organGestor is not null and ntf.organGestor.codi in (:organs))) " + 
+//			"   or (ntf.procedimentCodiNotib is null and ntf.organGestor is not null and ntf.organGestor.codi in (:organs))) " +
+			"   or (ntf.organGestor is not null and ntf.organGestor.codi in (:organs))) " +
 			"and (ntf.entitat = :entitat) ")
 	Page<NotificacioEntity> findByProcedimentCodiNotibAndEntitat(
 			@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
@@ -175,7 +179,6 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	List<NotificacioEntity> findNotificacionsPendentsDeNotificarByProcediment(
 			@Param("procediment") ProcedimentEntity procediment);
 
-	// TODO: Provar: Afegir notificacions sense procediment realitzades a un organ disponible per l'administrador d'òrgan actual
 	@Query(	"select ntf " +
 			"from " +
 			"     NotificacioEntity ntf " +
@@ -183,7 +186,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"where " +
 			"    (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
 			"and ((:isProcNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib))" +
-			"   or (ntf.procedimentCodiNotib is null and ntf.organGestor is not null and ntf.organGestor.codi in (:organs))) " + 
+//			"   or (ntf.procedimentCodiNotib is null and ntf.organGestor is not null and ntf.organGestor.codi in (:organs))) " +
+			"   or (ntf.organGestor is not null and ntf.organGestor.codi in (:organs))) " +
 			"and (:entitat = ntf.entitat) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
@@ -253,9 +257,10 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"where " +
 			"    (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
 			"and (" +
-			"		(:isProcNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " +	// Té permís sobre el procediment
-			"	or	(:isOrganNull = false and organ.codi is not null and organ.codi in (:organsGestorsCodisNotib)) " +								// Té permís sobre l'òrgan
-			"   or 	((ntf.procedimentCodiNotib is null or pro.comu = true) and ntf.usuariCodi = :usuariCodi) " +									// És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari 
+			"		(:isProcNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " +					// Té permís sobre el procediment
+			"	or	(:isOrganNull = false and organ.codi is not null and organ.codi in (:organsGestorsCodisNotib)) " +												// Té permís sobre l'òrgan
+			"   or 	((ntf.procedimentCodiNotib is null or pro.comu = true) and ntf.usuariCodi = :usuariCodi) " +													// És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari 
+			"   or 	(:esProcedimentOrgansIdsNotibNull = false and ntf.procedimentOrgan is not null and ntf.procedimentOrgan.id in (:procedimentOrgansIdsNotib)) " +	// Procediment comú amb permís de procediment-òrgan
 			"	) " +
 			"and (ntf.grupCodi = null or (ntf.grupCodi in (:grupsProcedimentCodisNotib))) " +
 			"and (:entitat = ntf.entitat) " +
@@ -285,9 +290,6 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"				from NotificacioEnviamentEntity env" +
 			"				where env.notificaIdentificador = :identificador))) " + 
 			"and (:nomesAmbErrors = false or ntf.notificaErrorEvent is not null)") 
-//			"		(ntf.id in (select notificacio.id" +
-//			"				from NotificacioEnviamentEntity env" + 
-//			"				where env.notificaError = true)))")
 	public Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
@@ -296,6 +298,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("grupsProcedimentCodisNotib") List<String> grupsProcedimentCodisNotib,
 			@Param("isOrganNull") boolean isOrganNull,
 			@Param("organsGestorsCodisNotib") List<? extends String> organsGestorsCodisNotib,
+			@Param("esProcedimentOrgansIdsNotibNull") boolean esProcedimentOrgansIdsNotibNull,
+			@Param("procedimentOrgansIdsNotib") List<Long> procedimentOrgansIdsNotib,
 			@Param("isEnviamentTipusNull") boolean isEnviamentTipusNull,
 			@Param("enviamentTipus") NotificaEnviamentTipusEnumDto enviamentTipus,
 			@Param("isConcepteNull") boolean isConcepteNull,

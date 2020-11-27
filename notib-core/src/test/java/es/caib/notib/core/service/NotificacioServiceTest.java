@@ -25,7 +25,6 @@ import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.OrganGestorDto;
@@ -140,7 +139,7 @@ public class NotificacioServiceTest extends BaseServiceTest {
 							NUM_DESTINATARIS,
 							false);
 					
-					 List<NotificacioDto> notificacioCreated = notificacioService.create(
+					 NotificacioDtoV2 notificacioCreated = notificacioService.create(
 							entitatCreate.getId(), 
 							notificacio);
 					

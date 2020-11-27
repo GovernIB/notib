@@ -7,7 +7,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -24,8 +23,6 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.ForeignKey;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
@@ -33,7 +30,6 @@ import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
-import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.audit.NotibAuditable;
 import lombok.Getter;
 
@@ -152,6 +148,12 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@JoinColumn(name = "procediment_id")
 	@ForeignKey(name = "not_procediment_not_fk")
 	protected ProcedimentEntity procediment;
+	
+	/*Procediment*/
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "procediment_organ_id")
+	@ForeignKey(name = "not_procorgan_not_fk")
+	protected ProcedimentOrganEntity procedimentOrgan;
 	
 	/*document*/
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -305,7 +307,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String grup,
 			String numExpedient,
 			TipusUsuariEnumDto tipusUsuari,
-			DocumentEntity document) {
+			DocumentEntity document,
+			ProcedimentOrganEntity procedimentOrgan) {
 		this.entitat = entitat;
 		this.emisorDir3Codi = emisorDir3Codi;
 		this.organGestor = organGestor;
@@ -323,64 +326,11 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		this.numExpedient = numExpedient;
 		this.tipusUsuari = tipusUsuari;
 		this.document = document;
+		this.procedimentOrgan = procedimentOrgan;
 		
 		this.registreEnviamentIntent = 0;
 		this.notificaEnviamentIntent = 0;
 	}
-	public static Builder getBuilder(
-			EntitatEntity entitat,
-			String emisorDir3Codi,
-			NotificaEnviamentTipusEnumDto enviamentTipus,
-			String concepte,
-			String documentArxiuNom,
-			String documentArxiuId,
-			String csv_uuid,
-			String documentHash,
-			boolean documentNormalitzat,
-			boolean documentGenerarCsv) {
-		return new Builder(
-				entitat,
-				emisorDir3Codi,
-				enviamentTipus,
-				concepte,
-				documentArxiuNom,
-				documentArxiuId,
-				csv_uuid,
-				documentHash,
-				documentNormalitzat,
-				documentGenerarCsv);
-	}
-	
-	public static BuilderV1 getBuilderV1(
-			EntitatEntity entitat,
-			String emisorDir3Codi,
-			NotificacioComunicacioTipusEnumDto comunicacioTipus,
-			NotificaEnviamentTipusEnumDto enviamentTipus,
-			String concepte,
-			String descripcio,
-			Date enviamentDataProgramada,
-			Integer retard,
-			Date caducitat,
-			DocumentEntity document,
-			PagadorPostalEntity pagadorPostal,
-			PagadorCieEntity pagadorCie,
-			List<Enviament>enviaments) {
-		return new BuilderV1(
-				entitat,
-				emisorDir3Codi,
-				comunicacioTipus,
-				enviamentTipus,
-				concepte,
-				descripcio,
-				enviamentDataProgramada,
-				retard,
-				caducitat,
-				document,
-				pagadorPostal,
-				pagadorCie,
-				enviaments);
-	}
-	
 	
 	public static BuilderV2 getBuilderV2(
 			EntitatEntity entitat,
@@ -398,7 +348,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			ProcedimentEntity procediment,
 			String grup,
 			String numExpedient,
-			TipusUsuariEnumDto tipusUsuari) {
+			TipusUsuariEnumDto tipusUsuari,
+			ProcedimentOrganEntity procedimentOrgan) {
 		return new BuilderV2(
 				entitat,
 				emisorDir3Codi,
@@ -415,118 +366,11 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				procediment,
 				grup,
 				numExpedient,
-				tipusUsuari);
+				tipusUsuari,
+				procedimentOrgan);
 	}
 	
 
-	public static class Builder {
-		NotificacioEntity built;
-		Builder(
-				EntitatEntity entitat,
-				String emisorDir3Codi,
-				NotificaEnviamentTipusEnumDto enviamentTipus,
-				String concepte,
-				String documentArxiuNom,
-				String documentArxiuId,
-				String csv_uuid,
-				String documentHash,
-				boolean documentNormalitzat,
-				boolean documentGenerarCsv) {
-			built = new NotificacioEntity();
-			built.entitat = entitat;
-			built.emisorDir3Codi = emisorDir3Codi;
-			built.enviamentTipus = enviamentTipus;
-			built.concepte = concepte;
-			built.estat = NotificacioEstatEnumDto.PENDENT;
-			built.notificaEnviamentIntent = 0;
-			built.registreEnviamentIntent = 0;
-			built.notificaEnviamentData = new Date();
-		}
-		public Builder numExpedient(String numExpedient) {
-			built.numExpedient = numExpedient;
-			return this;
-		}
-		public Builder descripcio(String descripcio) {
-			built.descripcio = descripcio;
-			return this;
-		}
-		public Builder procedimentCodiNotib(String procedimentCodiNotib) {
-			built.procedimentCodiNotib = procedimentCodiNotib;
-			return this;
-		}
-		public Builder grupCodi(String grupCodi) {
-			built.grupCodi = grupCodi;
-			return this;
-		}
-		public Builder retard(Integer retard) {
-			built.retard = retard;
-			return this;
-		}
-		public Builder caducitat(Date caducitat) {
-			built.caducitat = caducitat;
-			return this;
-		}
-		public NotificacioEntity build() {
-			return built;
-		}
-	}
-	
-	
-	public static class BuilderV1 {
-		NotificacioEntity built;
-		BuilderV1(
-				EntitatEntity entitat,
-				String emisorDir3Codi,
-				NotificacioComunicacioTipusEnumDto comunicacioTipus,
-				NotificaEnviamentTipusEnumDto enviamentTipus,
-				String concepte,
-				String descripcio,
-				Date enviamentDataProgramada,
-				Integer retard,
-				Date caducitat,
-				DocumentEntity document,
-				PagadorPostalEntity pagadorPostal,
-				PagadorCieEntity pagadorCie,
-				List<Enviament>enviaments) {
-			built = new NotificacioEntity();
-			built.entitat = entitat;
-			built.emisorDir3Codi = emisorDir3Codi;
-			built.comunicacioTipus = comunicacioTipus;
-			built.enviamentTipus = enviamentTipus;
-			built.concepte = concepte;
-			built.descripcio = descripcio;
-			built.enviamentDataProgramada = enviamentDataProgramada;
-			built.retard = retard;
-			built.caducitat = caducitat;
-			built.document = document;
-			built.pagadorPostal = pagadorPostal;
-			built.pagadorCie = pagadorCie;
-			
-			built.estat = NotificacioEstatEnumDto.PENDENT;
-			built.notificaEnviamentIntent = 0;
-			built.notificaEnviamentData = new Date();
-		}
-		public BuilderV1 descripcio(String descripcio) {
-			built.descripcio = descripcio;
-			return this;
-		}
-		public BuilderV1 caducitat(Date caducitat) {
-			built.caducitat = caducitat;
-			return this;
-		}
-		public BuilderV1 retardPostal(Integer retard) {
-			built.retard = retard;
-			return this;
-		}
-		public BuilderV1 usuariCodi(String usuariCodi) {
-			built.usuariCodi = usuariCodi;
-			return this;
-		}
-		public NotificacioEntity build() {
-			return built;
-		}
-	}
-	
 	public static class BuilderV2 {
 		NotificacioEntity built;
 		BuilderV2(
@@ -545,7 +389,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				ProcedimentEntity procediment,
 				String grup,
 				String numExpedient,
-				TipusUsuariEnumDto tipusUsuari) {
+				TipusUsuariEnumDto tipusUsuari,
+				ProcedimentOrganEntity procedimentOrgan) {
 			built = new NotificacioEntity();
 			built.entitat = entitat;
 			built.emisorDir3Codi = emisorDir3Codi;
@@ -567,6 +412,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.registreEnviamentIntent = 0;
 			built.notificaEnviamentData = new Date();
 			built.tipusUsuari = tipusUsuari;
+			built.procedimentOrgan = procedimentOrgan;
 		}
 		public BuilderV2 usuariCodi(String usuariCodi) {
 			built.usuariCodi = usuariCodi;
