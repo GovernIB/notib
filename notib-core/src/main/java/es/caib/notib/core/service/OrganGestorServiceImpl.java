@@ -586,6 +586,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			cacheHelper.evictFindEntitatsAccessiblesUsuari();
 			cacheHelper.evictFindProcedimentsWithPermis();
 			cacheHelper.evictFindOrgansGestorWithPermis();
+			cacheHelper.evictAllPermisosEntitatsUsuariActual();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -622,6 +623,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			cacheHelper.evictFindEntitatsAccessiblesUsuari();
 			cacheHelper.evictFindProcedimentsWithPermis();
 			cacheHelper.evictFindOrgansGestorWithPermis();
+			cacheHelper.evictAllPermisosEntitatsUsuariActual();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

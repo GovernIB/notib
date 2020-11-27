@@ -13,11 +13,13 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.EntitatDto;
@@ -43,6 +45,7 @@ import es.caib.notib.plugin.usuari.DadesUsuari;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Component
 public class CacheHelper { 
 
@@ -89,7 +92,18 @@ public class CacheHelper {
 				OrganGestorEntity.class,
 				permisos,
 				auth);
-		
+
+		if (entityComprovarHelper.getGenerarLogsPermisosOrgan()) {
+			log.info("### PERMISOS - Obtenir Òrgans gestors #####################################");
+			log.info("### -----------------------------------------------------------------------");
+			log.info("### Usuari: " + auth.getName());
+			log.info("### Òrgans: ");
+			if (organsGestors != null)
+				for (OrganGestorEntity organGestor : organsGestors) {
+					log.info("### # " + organGestor.getCodi() + " - " + organGestor.getNom());
+				}
+			log.info("### -----------------------------------------------------------------------");
+		}
 		return conversioTipusHelper.convertirList(
 				organsGestors, 
 				OrganGestorDto.class);
@@ -248,6 +262,10 @@ public class CacheHelper {
 	
 	@CacheEvict(value = "getPermisosEntitatsUsuariActual", key="#auth.name")
 	public void evictGetPermisosEntitatsUsuariActual(Authentication auth) {
+	}
+
+	@CacheEvict(value = "getPermisosEntitatsUsuariActual", allEntries = true)
+	public void evictAllPermisosEntitatsUsuariActual() {
 	}
 	
 	public void clearCache(String value) {

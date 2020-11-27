@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
@@ -58,6 +59,7 @@ import es.caib.notib.core.security.ExtendedPermission;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Component
 public class EntityComprovarHelper {
 
@@ -753,7 +755,23 @@ public class EntityComprovarHelper {
 		hasPermisos.put(RolEnumDto.NOT_ADMIN, hasPermisAdminEntitat);
 		hasPermisos.put(RolEnumDto.NOT_APL, hasPermisAplicacioEntitat);
 		hasPermisos.put(RolEnumDto.NOT_ADMIN_ORGAN, hasPermisAdminOrgan);
-		
+
+		if (getGenerarLogsPermisosOrgan()) {
+			log.info("### PERMISOS - Obtenir Permisos ###########################################");
+			log.info("### -----------------------------------------------------------------------");
+			log.info("### Usuari: " + auth.getName());
+			log.info("### Rols: ");
+			if (auth.getAuthorities() != null)
+				for (GrantedAuthority authority : auth.getAuthorities()) {
+					log.info("### # " + authority.getAuthority());
+				}
+			log.info("### Permís Usuari: " + hasPermisUsuariEntitat);
+			log.info("### Permís Adm entitat: " + hasPermisAdminEntitat);
+			log.info("### Permís Adm òrgan: " + hasPermisAdminOrgan);
+			log.info("### Permís Aplicació: " + hasPermisAplicacioEntitat);
+			log.info("### -----------------------------------------------------------------------");
+		}
+
 		return hasPermisos;
 		
 	}
@@ -783,6 +801,10 @@ public class EntityComprovarHelper {
 	public List<ProcedimentDto> findGrupProcedimentsUsuariActual() {
 		
 		return null;
+	}
+
+	public boolean getGenerarLogsPermisosOrgan() {
+		return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.permisos.organ.logs", false);
 	}
 	
 }

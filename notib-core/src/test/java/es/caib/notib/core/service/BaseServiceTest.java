@@ -220,7 +220,8 @@ public class BaseServiceTest {
 						for (PermisDto permis: ((OrganGestorDto)element).getPermisos()) {
 							organGestorService.permisUpdate(
 									entitatId, 
-									entitatCreada.getId(), 
+									entitatCreada.getId(),
+									false,
 									permis);
 						}
 					}
