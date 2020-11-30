@@ -125,6 +125,8 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			EntitatEntity entitat,
 			Pageable paginacio);
 	
+	List<ProcedimentEntity> findByIdIn(List<Long> ids);
+	
 	@Query(	"from " +
 			"    ProcedimentEntity pro " +
 			"where (:isCodiNull = true or lower(pro.codi) like lower('%'||:codi||'%'))" +

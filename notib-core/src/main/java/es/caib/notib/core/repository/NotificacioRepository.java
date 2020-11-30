@@ -530,5 +530,16 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("isUsuariNull") boolean isUsuariNull, 
 			@Param("usuariCodi") String usuariCodi, 
 			@Param("maxReintents")Integer maxReintents);
+	
+	@Query( " from " +
+			"	NotificacioEntity n " +
+		    " where " +
+		    "   	n.entitat.id = :entitatId " +
+		    "   and n.createdDate >= :dataInici " +
+		    "   and n.createdDate <= :dataFi ")
+	List<NotificacioEntity> findBetweenCreatedDate(
+			@Param("entitatId")Long entitatId, 
+			@Param("dataInici") Date dataInici, 
+			@Param("dataFi") Date dataFi);
 
 }
