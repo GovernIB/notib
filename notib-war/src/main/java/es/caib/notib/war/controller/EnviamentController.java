@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import es.caib.notib.core.api.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,17 +25,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.notib.core.api.dto.ColumnesDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PermisEnum;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.AplicacioService;
@@ -168,8 +158,10 @@ public class EnviamentController extends BaseUserController {
 		
 		List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
 		List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
+		List<ProcedimentOrganDto> procedimentOrgansDisponibles = new ArrayList<ProcedimentOrganDto>();
 		List<String> codisProcedimentsDisponibles = new ArrayList<String>();
 		List<String> codisOrgansGestorsDisponibles = new ArrayList<String>();
+		List<Long> codisProcedimentOrgansDisponibles = new ArrayList<Long>();
 		
 		try {
 			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
@@ -181,12 +173,16 @@ public class EnviamentController extends BaseUserController {
 			if (isUsuari) {
 				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
 				organsGestorsDisponibles = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
+				procedimentOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
 				for(ProcedimentDto procediment: procedimentsDisponibles) {
 					if (!procediment.isComu())
 						codisProcedimentsDisponibles.add(procediment.getCodi());
 				}
 				for (OrganGestorDto organGestorDto : organsGestorsDisponibles) {
 					codisOrgansGestorsDisponibles.add(organGestorDto.getCodi());
+				}
+				for (ProcedimentOrganDto procedimentOrganDto : procedimentOrgansDisponibles) {
+					codisProcedimentOrgansDisponibles.add(procedimentOrganDto.getId());
 				}
 			}
 			if (isAdminOrgan) {
@@ -205,6 +201,7 @@ public class EnviamentController extends BaseUserController {
 					isAdminOrgan,
 					codisProcedimentsDisponibles,
 					codisOrgansGestorsDisponibles,
+					codisProcedimentOrgansDisponibles,
 					organGestorCodi,
 					usuariActual.getCodi(),
 					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),

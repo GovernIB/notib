@@ -397,6 +397,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			boolean isAdminOrgan,
 			List<String> procedimentsCodisNotib,
 			List<String> codisOrgansGestorsDisponibles,
+			List<Long> codisProcedimentOrgansDisponibles,
 			String organGestorCodi,
 			String usuariCodi,
 			NotificacioEnviamentFiltreDto filtre,
@@ -407,7 +408,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 			
 			boolean esProcedimentsCodisNotibNull = (procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty());
 			boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
-			
+			boolean esProcedimentsOrgansCodisNotibNull = (codisProcedimentOrgansDisponibles == null || codisProcedimentOrgansDisponibles.isEmpty());
+
 			Date dataEnviamentInici = null,
 				 dataEnviamentFi = null,
 				 dataProgramadaDisposicioInici = null,
@@ -516,6 +518,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 						esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib,
 						esOrgansGestorsCodisNotibNull,
 						esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+						esProcedimentsOrgansCodisNotibNull,
+						esProcedimentsOrgansCodisNotibNull ? null : codisProcedimentOrgansDisponibles,
 						aplicacioService.findRolsUsuariActual(),
 						usuariCodi,
 						pageable);

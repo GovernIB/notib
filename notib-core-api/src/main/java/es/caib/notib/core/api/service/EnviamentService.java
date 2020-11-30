@@ -70,6 +70,7 @@ public interface EnviamentService {
 			boolean isAdminOrgan,
 			List<String> codisProcedimentsDisponibles,
 			List<String> codisOrgansGestorsDisponibles,
+			List<Long> codisProcedimentOrgansDisponibles,
 			String organGestorCodi,
 			String usuariCodi,
 			NotificacioEnviamentFiltreDto filtre,
