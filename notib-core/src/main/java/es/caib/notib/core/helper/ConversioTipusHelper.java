@@ -37,6 +37,8 @@ import es.caib.notib.core.entity.PagadorCieFormatSobreEntity;
 import es.caib.notib.core.entity.PagadorPostalEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.UsuariEntity;
+import es.caib.notib.plugin.unitat.NodeDir3;
+import es.caib.notib.plugin.unitat.ObjetoDirectorio;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFacade;
@@ -149,6 +151,17 @@ public class ConversioTipusHelper {
 //			field("organGestor.codi", "organGestor").
 //			byDefault().
 //			register();
+
+		mapperFactory.classMap(NodeDir3.class, OrganGestorDto.class).
+			field("denominacio", "nom").
+			byDefault().
+			register();
+		
+		mapperFactory.classMap(ObjetoDirectorio.class, OrganGestorDto.class).
+			field("denominacio", "nom").
+			byDefault().
+			register();
+
 	
 	}
 
