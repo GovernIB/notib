@@ -22,6 +22,7 @@ import es.caib.notib.core.api.dto.NotificacioErrorCallbackFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioEventDto;
 import es.caib.notib.core.api.dto.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreErrorFiltreDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaisosDto;
@@ -343,6 +344,19 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"NOT_ADMIN"})
 	public ProgresActualitzacioCertificacioDto actualitzacioEnviamentsEstat() {
 		return delegate.actualitzacioEnviamentsEstat();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public List<OrganGestorDto> unitatsPerCodi(String codi) {
+		return delegate.unitatsPerCodi(codi);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public List<OrganGestorDto> unitatsPerDenominacio(String denominacio) {
+		return delegate.unitatsPerDenominacio(denominacio);
+
 	}
 
 }

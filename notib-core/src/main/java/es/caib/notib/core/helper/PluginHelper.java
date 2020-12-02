@@ -43,6 +43,7 @@ import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.RegistreAnnexDto;
@@ -103,6 +104,7 @@ public class PluginHelper {
 
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
+	
 
 	private DadesUsuariPlugin dadesUsuariPlugin;
 	private GestioDocumentalPlugin gestioDocumentalPlugin;
@@ -115,6 +117,8 @@ public class PluginHelper {
 	
 	@Autowired
 	private IntegracioHelper integracioHelper;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
 	
 	// REGISTRE
 	// /////////////////////////////////////////////////////////////////////////////////////
@@ -1047,6 +1051,60 @@ public class PluginHelper {
 		return denominacio;
 		
 	}
+	
+	
+	public List<OrganGestorDto> unitatsPerCodi(String codi) throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenir llista de tots els organismes a partir d'un text", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				new AccioParam("Text de la cerca", codi));
+
+		List<NodeDir3> organismesNodeDir3 = null;
+		List<OrganGestorDto> organismes = null;
+		try {
+			organismesNodeDir3 = getUnitatsOrganitzativesPlugin().cercaUnitats(codi, null, null, null, null, null, null, null);
+			organismes = conversioTipusHelper.convertirList(organismesNodeDir3, OrganGestorDto.class);
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistar organismes  a partir d'un text";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+	
+		return organismes;
+	}
+	
+	public List<OrganGestorDto> unitatsPerDenominacio(String denominacio) throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenir llista de tots els organismes a partir d'un text", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				new AccioParam("Text de la cerca", denominacio));
+
+		List<ObjetoDirectorio> organismesDir3 = null;
+		List<OrganGestorDto> organismes = null;
+		try {
+			organismesDir3 = getUnitatsOrganitzativesPlugin().unitatsPerDenominacio(denominacio);
+			organismes = conversioTipusHelper.convertirList(organismesDir3, OrganGestorDto.class);
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistar organismes  a partir d'un text";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+	
+		return organismes;
+	}
+	
 
 	public List<CodiValorPais> llistarPaisos() throws SistemaExternException {
 		

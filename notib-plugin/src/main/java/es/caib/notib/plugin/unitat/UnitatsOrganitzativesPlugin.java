@@ -97,6 +97,19 @@ public interface UnitatsOrganitzativesPlugin {
 
 	
 	/**
+	 * Retorna la llista d'unitats organitzatives a partir d'un text comparant amb la denominació.
+	 * 
+	 * @param denominacio
+	 *            Text corresponent a la denominació
+	 *            
+	 * @return La llista d'unitats organitzatives.
+	 * @throws SistemaExternException
+	 *            Si es produeix un error al consultar les unitats organitzatives.
+	 */
+	public List<ObjetoDirectorio> unitatsPerDenominacio(String denominacio) throws SistemaExternException;
+	
+	
+	/**
 	 * Retorna la llista d'unitats organitzatives filles donat un filtre.
 	 * 
 	 * @param codi
