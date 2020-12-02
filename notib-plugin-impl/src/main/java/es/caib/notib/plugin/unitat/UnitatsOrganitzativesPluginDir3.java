@@ -227,7 +227,6 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'han pogut consultar les unitats organitzatives via REST (" +
-					"codi=" + codi + ", " +
 					"denominacio=" + denominacio + ", " +
 					"nivellAdministracio=" + nivellAdministracio + ", " +
 					"comunitatAutonoma=" + comunitatAutonoma + ", " +
@@ -235,6 +234,34 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 					"esUnitatArrel=" + esUnitatArrel + ", " +
 					"provincia=" + provincia + ", " +
 					"municipi=" + municipi + ")",
+					ex);
+		}
+	}
+	
+	public List<ObjetoDirectorio> unitatsPerDenominacio(String denominacio) throws SistemaExternException {
+		List<ObjetoDirectorio> unitats = new ArrayList<ObjetoDirectorio>();
+		try {
+			URL url = new URL(getServiceUrl() + SERVEI_UNITAT + "unidadesDenominacion?denominacion=" + denominacio);
+			logger.debug("URL: " + url);
+			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
+			httpConnection.setRequestMethod("GET");
+			httpConnection.setDoInput(true);
+			httpConnection.setDoOutput(true);
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			byte[] response = IOUtils.toByteArray(httpConnection.getInputStream());
+			if (response != null && response.length > 0) {
+				unitats = mapper.readValue(
+					response, 
+					TypeFactory.defaultInstance().constructCollectionType(
+							List.class,  
+							ObjetoDirectorio.class));
+			}
+			return unitats;
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'han pogut consultar les unitats organitzatives via REST (" +
+					"denominacio=" + denominacio + ")",
 					ex);
 		}
 	}

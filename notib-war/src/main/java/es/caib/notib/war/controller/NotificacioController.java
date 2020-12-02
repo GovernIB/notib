@@ -91,6 +91,7 @@ import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.MarcarProcessatCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
+import es.caib.notib.war.command.OrganGestorFiltreCommand;
 import es.caib.notib.war.command.PersonaCommand;
 import es.caib.notib.war.helper.CaducitatHelper;
 import es.caib.notib.war.helper.DatatablesHelper;
@@ -302,6 +303,26 @@ public class NotificacioController extends BaseUserController {
 		return procediments;
 	}
 	
+	@RequestMapping(value = "/administracions/codi/{codi}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<OrganGestorDto> getAdministracionsPerCodi(
+			HttpServletRequest request, 
+			@PathVariable String codi,
+			Model model) {
+		return notificacioService.unitatsPerCodi(codi);
+	
+	}
+	
+	@RequestMapping(value = "/administracions/denominacio/{denominacio}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<OrganGestorDto> getAdministracionsPerDenominacio(
+			HttpServletRequest request, 
+			@PathVariable String denominacio,
+			Model model) {
+		return notificacioService.unitatsPerDenominacio(denominacio);
+	
+	}
+	
 	@RequestMapping(value = "/new/destinatari", method = RequestMethod.GET)
 	public PersonaCommand altaDestinatari(
 			HttpServletRequest request, 
@@ -341,6 +362,7 @@ public class NotificacioController extends BaseUserController {
 			model.addAttribute("entitat", entitatService.findAll());
 		}
 		model.addAttribute(new NotificacioFiltreCommand());
+		model.addAttribute(new OrganGestorFiltreCommand());
 		if (notificacioCommand.getTipusDocument() != null) {
 			switch (notificacioCommand.getTipusDocument()) {
 			case ARXIU:

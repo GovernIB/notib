@@ -1,7 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-<%@ attribute name="name" required="true" rtexprvalue="true"%>
+<%@ attribute name="name" required="false" rtexprvalue="true"%>
 <%@ attribute name="value" required="false" rtexprvalue="true"%>
 <%@ attribute name="required" required="false" rtexprvalue="true"%>
 <%@ attribute name="text" required="false" rtexprvalue="true"%>
@@ -15,6 +15,7 @@
 <%@ attribute name="inputSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="readonly" required="false" rtexprvalue="true"%>
 <%@ attribute name="searchButton" required="true" rtexprvalue="true"%>
+<%@ attribute name="funcio" required="false" rtexprvalue="true"%>
 <script>
 $('input').change(function() {
 	if(this.type != "file"){
@@ -42,7 +43,7 @@ $('input').change(function() {
 	<c:when test="${not inline}">
 		<label class="control-label col-xs-${campLabelSize}" for="${campPath}">${campLabelText}</label>
 		<div class="col-xs-${campInputSize}">
-		<div class="input-group" id="${searchButton}">
+		<div class="input-group" id="${searchButton}" onclick="${funcio}">
 			<form:input value="${campValue}" path="${campPath}" cssClass="form-control habilitat" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}"/>
 			<span class="input-group-addon habilitat"> 
 			<a>
@@ -57,7 +58,7 @@ $('input').change(function() {
    		<label class="sr-only" for="${campPath}">${campLabelText}</label>
    		<form:input value="${campValue}" path="${campPath}" cssClass="form-control" id="${campPath}" placeholder="${campPlaceholder}" disabled="${disabled}" readonly="${myReadonly}"/>
 			<span class="input-group-addon"> 
-			<a id="${searchButton}">
+			<a id="${searchButton}" onclick="${funcio}">
 				<span class="fa fa-search"></span>
 			</a>
 			</span>
