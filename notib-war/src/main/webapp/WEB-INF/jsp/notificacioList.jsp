@@ -118,7 +118,6 @@ var myHelpers = {recuperarEstatEnviament: returnEnviamentsStatusDiv, hlpIsUsuari
 $.views.helpers(myHelpers);
 
 function isRolActualUsuari() {
-	debugger
 	return ${isRolActualUsuari};
 }
 
