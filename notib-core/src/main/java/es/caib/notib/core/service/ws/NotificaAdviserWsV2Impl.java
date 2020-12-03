@@ -169,18 +169,31 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			if (enviament != null) {
 				
 				if (enviament.isNotificaEstatFinal()) {
-					logger.error(
-							"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
-							"L'enviament amb l'identificador especificat (" + identificador + ") ja es troba en un estat final.");
-					//Crea un nou event builder
-					eventDatat = NotificacioEventEntity.getBuilder(
-							NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-							enviament.getNotificacio()).
-							enviament(enviament).
-							descripcio(estado).build();
-					codigoRespuesta.value = "000";
-					descripcionRespuesta.value = "OK";
-					integracioHelper.addAccioError(info, "L'enviament ja es troba en un estat final");
+					if (tipoEntrega.equals(BigInteger.valueOf(1L))) { //if datado (1L)
+						logger.error(
+								"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
+								"L'enviament amb l'identificador especificat (" + identificador + ") ja es troba en un estat final.");
+						//Crea un nou event builder
+						eventDatat = NotificacioEventEntity.getBuilder(
+								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
+								enviament.getNotificacio()).
+								enviament(enviament).
+								descripcio(estado).build();
+						codigoRespuesta.value = "000";
+						descripcionRespuesta.value = "OK";
+						integracioHelper.addAccioError(info, "L'enviament ja es troba en un estat final");
+					} else if (tipoEntrega.equals(BigInteger.valueOf(3L))) { //if certificació (3L)
+						logger.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
+						certificacionOrganismo(
+								acusePDF,
+								organismoEmisor,
+								modoNotificacion,
+								identificador,
+								codigoRespuesta,
+								descripcionRespuesta,
+								enviament);
+						logger.debug("Certificació guardada correctament.");
+					}
 				} else {
 					String receptorNombre = null;
 					String receptorNif = null;
@@ -259,7 +272,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					
 					//if datado + certificació
 					if (tipoEntrega.equals(BigInteger.valueOf(2L))) {
-						logger.debug("Guardant certificació...");
+						logger.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
 						certificacionOrganismo(
 								acusePDF,
 								organismoEmisor,
@@ -272,10 +285,10 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					}
 					integracioHelper.addAccioOk(info);
 					
-					if ("expirada".equals(estado) && acusePDF == null && enviament.getNotificaCertificacioData() == null) {
-						logger.debug("Consultant la certificació de l'enviament expirat...");
-						notificaHelper.enviamentRefrescarEstat(enviament.getId());
-					}
+//					if ("expirada".equals(estado) && acusePDF == null && enviament.getNotificaCertificacioData() == null) {
+//						logger.debug("Consultant la certificació de l'enviament expirat...");
+//						notificaHelper.enviamentRefrescarEstat(enviament.getId());
+//					}
 				}
 			} else {
 				logger.error(
