@@ -64,7 +64,7 @@ public interface NotificacioService {
 	 * @throws NotFoundException
 	 *              Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('tothom')")
 	public void delete(
 			Long entitatId,
 			Long notificacioId) throws NotFoundException;
@@ -84,7 +84,7 @@ public interface NotificacioService {
 	 * @throws RegistreNotificaException
 	 * 				Si hi ha hagut un error en el procés de registra/notificar
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	@PreAuthorize("hasRole('tothom')")
 	public List<NotificacioDto> update(
 			Long entitatId,
 			NotificacioDtoV2 notificacio) throws NotFoundException, RegistreNotificaException;

@@ -8,6 +8,9 @@
 	pageContext.setAttribute(
 			"isRolActualAdministrador",
 			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
+	pageContext.setAttribute(
+			"isRolActualUsuari",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuari(request));
 %>
 <c:set var="ampladaConcepte">
 	<c:choose>
@@ -110,9 +113,14 @@
 </style>
 <script type="text/javascript"> 
 
-var myHelpers = {recuperarEstatEnviament: returnEnviamentsStatusDiv};
+var myHelpers = {recuperarEstatEnviament: returnEnviamentsStatusDiv, hlpIsUsuari: isRolActualUsuari};
 
 $.views.helpers(myHelpers);
+
+function isRolActualUsuari() {
+	debugger
+	return ${isRolActualUsuari};
+}
 
 function returnEnviamentsStatusDiv(notificacioId) {
 	var content = "";
@@ -573,7 +581,7 @@ $(document).ready(function() {
 							{{if !hasEnviamentsPendents }}
 								<li><a href="<c:url value="/notificacio/{{:id}}/justificant"/>" data-toggle="modal" data-height="250px"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.justificant"/></a></li>
 							{{/if}}
-							{{if hasEnviamentsPendentsRegistre }}
+							{^{if ~hlpIsUsuari() && hasEnviamentsPendentsRegistre }}
 								<li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
 								<li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							{{/if}}							
