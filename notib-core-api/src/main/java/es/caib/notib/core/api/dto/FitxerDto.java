@@ -19,8 +19,15 @@ public class FitxerDto implements Serializable {
 	private byte[] contingut;
 	private long tamany;
 
-
-
+	public FitxerDto() { }
+	
+	public FitxerDto(String nom, String contentType, byte[] contingut) {
+		super();
+		this.nom = nom;
+		this.contentType = contentType;
+		this.setContingut(contingut);
+	}
+	
 	public String getNom() {
 		return nom;
 	}

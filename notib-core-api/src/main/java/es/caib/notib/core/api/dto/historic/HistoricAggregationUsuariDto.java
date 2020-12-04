@@ -38,5 +38,8 @@ public class HistoricAggregationUsuariDto extends HistoricAggregation {
 				numComOrigenWeb);
 		// TODO Auto-generated constructor stub
 	}
+	public HistoricAggregationUsuariDto(Date data) {
+		super(data);
+	}
 
 }

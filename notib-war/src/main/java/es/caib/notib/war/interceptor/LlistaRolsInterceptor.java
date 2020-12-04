@@ -36,9 +36,9 @@ public class LlistaRolsInterceptor extends HandlerInterceptorAdapter {
 			RolHelper.processarCanviRols(
 					request,
 					aplicacioService);
-			OrganGestorHelper.getOrgansGestorsUsuariActual(
-					request, 
-					organGestorService);
+//			OrganGestorHelper.getOrgansGestorsUsuariActual(
+//					request, 
+//					organGestorService);
 		}
 		return true;
 	}

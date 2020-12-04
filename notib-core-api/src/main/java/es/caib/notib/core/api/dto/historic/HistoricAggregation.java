@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class HistoricAggregation {
 
-	private Date data;
+	protected Date data;
 	
 	private Long numNotTotal;
 	private Long numComTotal;
@@ -95,4 +95,6 @@ public class HistoricAggregation {
 		this();
 		this.data = data;
 	}
+	
+	
 }

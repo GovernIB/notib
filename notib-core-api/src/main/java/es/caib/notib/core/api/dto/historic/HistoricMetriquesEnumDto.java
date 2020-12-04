@@ -16,6 +16,7 @@ public enum HistoricMetriquesEnumDto {
 	COMUNICACIONS_AMB_GRUP,
 	COMUNICACIONS_ORIGEN_API,
 	COMUNICACIONS_ORIGEN_WEB,
+	ENVIAMENTS,
 	PROCEDIMENTS, 
 	GRUPS, 
 	PERMISOS_CONSULTA, 
@@ -24,85 +25,107 @@ public enum HistoricMetriquesEnumDto {
 	PERMISOS_PROCESSAR, 
 	PERMISOS_ADMINISTRAR;
 	
-	public Long getValue(HistoricAggregationOrganDto historic) {
-		Long value = 0L;
+	public Long getValue(HistoricAggregation historic) {
 		switch (this) {
 		case NOTIFICACIONS_TOTAL:
-			value = historic.getNumNotTotal();
-			break;
+			return historic.getNumNotTotal();
 		case NOTIFICACIONS_CORRECTES:
-			value = historic.getNumNotCorrectes();
-			break;
+			return historic.getNumNotCorrectes();
 		case NOTIFICACIONS_AMB_ERROR:
-			value = historic.getNumNotAmbError();
-			break;
+			return historic.getNumNotAmbError();
 		case NOTIFICACIONS_PROCEDIMENT_COMU:
-			value = historic.getNumNotProcedimentComu();
-			break;
+			return historic.getNumNotProcedimentComu();
 		case NOTIFICACIONS_AMB_GRUP:
-			value = historic.getNumNotAmbGrup();
-			break;
+			return historic.getNumNotAmbGrup();
 		case NOTIFICACIONS_ORIGEN_API:
-			value = historic.getNumNotOrigenApi();
-			break;
+			return historic.getNumNotOrigenApi();
 		case NOTIFICACIONS_ORIGEN_WEB:
-			value = historic.getNumNotOrigenWeb();
-			break;	
+			return historic.getNumNotOrigenWeb();
 		case COMUNICACIONS_TOTAL:
-			value = historic.getNumComTotal();
-			break;
+			return historic.getNumComTotal();
 		case COMUNICACIONS_CORRECTES:
-			value = historic.getNumComCorrectes();
-			break;
+			return historic.getNumComCorrectes();
 		case COMUNICACIONS_AMB_ERROR:
-			value = historic.getNumComAmbError();
-			break;
+			return historic.getNumComAmbError();
 		case COMUNICACIONS_PROCEDIMENT_COMU:
-			value = historic.getNumComProcedimentComu();
-			break;
-
+			return historic.getNumComProcedimentComu();
 		case COMUNICACIONS_AMB_GRUP:
-			value = historic.getNumComAmbGrup();
-			break;
+			return historic.getNumComAmbGrup();
 		case COMUNICACIONS_ORIGEN_API:
-			value = historic.getNumComOrigenApi();
-			break;
+			return historic.getNumComOrigenApi();
 		case COMUNICACIONS_ORIGEN_WEB:
-			value = historic.getNumComOrigenWeb();
-			break;
-		default:
-			break;
+			return historic.getNumComOrigenWeb();
+		}
+		return null;		
+	}
+	
+	public Long getValue(HistoricAggregationOrganDto historic) {
+		Long value = getValue((HistoricAggregation) historic);
+		if (value != null ) {
+			return value;
+		}
+		switch (this) {
+		case ENVIAMENTS:
+			return historic.getNumEnviaments();
+		case PROCEDIMENTS:
+			return historic.getNumProcediments();
+		case GRUPS:
+			return historic.getNumGrups();
+		}
+		return value;		
+	}
+	public Long getValue(HistoricAggregationProcedimentDto historic) {
+		Long value = getValue((HistoricAggregation) historic);
+		if (value != null ) {
+			return value;
+		}
+		switch (this) {
+		case ENVIAMENTS:
+			return historic.getNumEnviaments();
+		case GRUPS:
+			return historic.getNumGrups();
 		}
 		return value;		
 	}
 	
 	public String toString() {
 		String value = "";
-//		switch (this) {
-//		case EXPEDIENTS_CREATS:
-//			value = "Nombre d'expedients creats";
-//			break;
-//		case EXPEDIENTS_CREATS_ACUM:
-//			value = "Nombre d'expedients creats acumulats";
-//			break;
-//		case EXPEDIENTS_TANCATS:
-//			value = "Nombre d'expedients tancats";
-//			break;
-//		case EXPEDIENTS_TANCATS_ACUM:
-//			value = "Nombre d'expedients tancats acumulats";
-//			break;
-//		case DOCUMENTS_SIGNATS:
-//			value = "Nombre de documents signats";
-//			break;
-//		case DOCUMENTS_NOTIFICATS:
-//			value = "Nombre de documents notificats";
-//			break;		
-//		case TASQUES_TRAMITADES:
-//			value = "Nombre de tasques tramitades";
-//			break;
-//		default:
-//			break;
-//		}
+		switch (this) {
+		case NOTIFICACIONS_TOTAL:
+			return "Nombre de notificacions total";
+		case NOTIFICACIONS_CORRECTES:
+			return "Nombre de notificacions correctes";
+		case NOTIFICACIONS_AMB_ERROR:
+			return "Nombre de notificacions amb error";
+		case NOTIFICACIONS_PROCEDIMENT_COMU:
+			return "Nombre de notificacions de procediment comú";
+		case NOTIFICACIONS_AMB_GRUP:
+			return "Nombre de notificacions amb grup";
+		case NOTIFICACIONS_ORIGEN_API:
+			return "Nombre de notificacions origen api";
+		case NOTIFICACIONS_ORIGEN_WEB:
+			return "Nombre de notificacions origen web";
+		case COMUNICACIONS_TOTAL:
+			return "Nombre de comunicacions total";
+		case COMUNICACIONS_CORRECTES:
+			return "Nombre de comunicacions correctes";
+		case COMUNICACIONS_AMB_ERROR:
+			return "Nombre de comunicacions amb error";
+		case COMUNICACIONS_PROCEDIMENT_COMU:
+			return "Nombre de comunicacions procediment comú";
+		case COMUNICACIONS_AMB_GRUP:
+			return "Nombre de comunicacions amb grup";
+		case COMUNICACIONS_ORIGEN_API:
+			return "Nombre de comunicacions origen api";
+		case COMUNICACIONS_ORIGEN_WEB:
+			return "Nombre de comunicacions origen web";
+		case ENVIAMENTS:
+			return "Nombre d'enviaments";
+		case PROCEDIMENTS:
+			return "Nombre de procediments";
+		case GRUPS:
+			return "Nombre de grups";
+		}
 		return value;		
 	}
 }

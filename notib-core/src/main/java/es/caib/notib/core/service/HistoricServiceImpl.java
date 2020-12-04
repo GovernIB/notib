@@ -1,5 +1,7 @@
 package es.caib.notib.core.service;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -77,7 +79,7 @@ public class HistoricServiceImpl implements HistoricService {
 					filtre.getTipusAgrupament(),
 					filtre.getDataInici(),
 					filtre.getDataFi());
-			historics = fillEmptyData(filtre, historics);
+			historics = fillEmptyData(filtre, historics, HistoricAggregationOrganDto.class);
 			response.put(conversioTipusHelper.convertir(organ, OrganGestorDto.class), historics);
 		}
 
@@ -99,7 +101,7 @@ public class HistoricServiceImpl implements HistoricService {
 					filtre.getTipusAgrupament(),
 					filtre.getDataInici(),
 					filtre.getDataFi());
-			historics = fillEmptyData(filtre, historics);
+			historics = fillEmptyData(filtre, historics, HistoricAggregationProcedimentDto.class);
 			response.put(conversioTipusHelper.convertir(procediment, ProcedimentDto.class), historics);
 		}
 
@@ -116,7 +118,7 @@ public class HistoricServiceImpl implements HistoricService {
 					filtre.getTipusAgrupament(),
 					filtre.getDataInici(),
 					filtre.getDataFi());
-			historics = fillEmptyData(filtre, historics);
+			historics = fillEmptyData(filtre, historics, HistoricAggregationEstatDto.class);
 			response.put(estat, historics);
 		}
 
@@ -144,7 +146,7 @@ public class HistoricServiceImpl implements HistoricService {
 					filtre.getTipusAgrupament(),
 					filtre.getDataInici(),
 					filtre.getDataFi());
-			historics = fillEmptyData(filtre, historics);
+			historics = fillEmptyData(filtre, historics, HistoricAggregationGrupDto.class);
 			response.put(grup, historics);
 		}
 
@@ -165,7 +167,7 @@ public class HistoricServiceImpl implements HistoricService {
 					filtre.getTipusAgrupament(),
 					filtre.getDataInici(),
 					filtre.getDataFi());
-			historics = fillEmptyData(filtre, historics);
+			historics = fillEmptyData(filtre, historics, HistoricAggregationUsuariDto.class);
 			response.put(usuari, historics);
 		}
 
@@ -210,32 +212,40 @@ public class HistoricServiceImpl implements HistoricService {
 	 *                  data
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	private <T extends HistoricAggregation> List<T> fillEmptyData(HistoricFiltreDto filtre, List<T> historics) {
+	private <T extends HistoricAggregation> List<T> fillEmptyData(HistoricFiltreDto filtre, List<T> historics, Class<T> cls) {
 		List<Date> dates = filtre.getQueriedDates();
 		Iterator<T> it = historics.iterator();
 		T currentHistoric = null;
 		if (it.hasNext())
 			currentHistoric = it.next();
 		else
-			currentHistoric = (T)new HistoricAggregation(dates.get(0));
-
+			currentHistoric = emptyInstance(dates.get(0), cls);
 		List<T> results = new ArrayList<T>();
 		for (Date data : dates) {
+			T dateHistoric = null;
 			if (data.compareTo(currentHistoric.getData()) < 0) { // anterior que l'actual
-				results.add((T)new HistoricAggregation(data));
+				dateHistoric = emptyInstance(data, cls);
 
 			} else if (data.compareTo(currentHistoric.getData()) == 0) { // igual que l'actual
-				results.add(currentHistoric);
+				dateHistoric = currentHistoric;
 				if (it.hasNext())
 					currentHistoric = it.next();
 
 			} else { // major que l'actual
-				results.add((T)new HistoricAggregation(data));
-
+				dateHistoric = emptyInstance(data, cls);
+				
 			}
+			results.add(dateHistoric);
 		}
 		return results;
 	}
 
+	private <T extends HistoricAggregation> T emptyInstance(Date date, Class<T> cls) {
+		try {
+			return cls.getConstructor(Date.class).newInstance(date);
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException |
+				InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			return null;
+		}
+	}
 }

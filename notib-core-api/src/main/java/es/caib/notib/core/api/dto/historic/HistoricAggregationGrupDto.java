@@ -3,7 +3,8 @@ package es.caib.notib.core.api.dto.historic;
 import java.util.Date;
 
 public class HistoricAggregationGrupDto extends HistoricAggregation {
-
+	private String grup;
+	
 	public HistoricAggregationGrupDto(
 			Date data,
 			Long numNotTotal,
@@ -37,6 +38,9 @@ public class HistoricAggregationGrupDto extends HistoricAggregation {
 				numNotOrigenWeb,
 				numComOrigenWeb);
 		// TODO Auto-generated constructor stub
+	}
+	public HistoricAggregationGrupDto(Date data) {
+		super(data);
 	}
 
 }

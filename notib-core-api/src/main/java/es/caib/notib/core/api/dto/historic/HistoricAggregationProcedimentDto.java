@@ -54,4 +54,12 @@ public class HistoricAggregationProcedimentDto extends HistoricAggregation {
 		this.codiSia = codiSia;
 		this.nom = nom;
 	}
+	
+	public HistoricAggregationProcedimentDto(Date data) {
+		super(data);
+		numEnviaments = 0L;
+		numGrups = 0L;
+		codiSia = "";
+		nom = "";
+	}
 }

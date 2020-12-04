@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
@@ -38,6 +40,7 @@ import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.HistoricFiltreCommand;
 import es.caib.notib.war.helper.RequestSessionHelper;
+import es.caib.notib.war.historic.ExportacioActionHistoric;
 
 @Controller
 @RequestMapping("/historic")
@@ -53,9 +56,9 @@ public class HistoricController extends BaseUserController {
 	@Autowired
 	private OrganGestorService organGestorService;
 
-//	@Autowired
-//	private ExportacioActionHistoric exportacioActionHistoric;
-
+	@Autowired
+	private ExportacioActionHistoric exportacioActionHistoric;
+	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
 		getEntitatActualComprovantPermisos(request);
@@ -249,6 +252,41 @@ public class HistoricController extends BaseUserController {
 				historicFiltreCommand.asDto());
 
 		return dades;
+	}
+	
+
+	@RequestMapping(value = "/exportar", method = RequestMethod.POST)
+	public String export(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam String format) throws Exception {
+		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
+
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		FitxerDto fitxer = null;
+		if (historicFiltreCommand.showingDadesOrganGestor()) {
+			fitxer = exportacioActionHistoric.exportarHistoricOrgansGestors(entitatActual.getId(), historicFiltreCommand.asDto(), format);
+			
+		} else if (historicFiltreCommand.showingDadesUsuari()) {
+			String[] usuaris = (String[])RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_USUARIS);
+			usuaris = usuaris == null ? new String[0] : usuaris;
+			fitxer = exportacioActionHistoric.exportarHistoricUsuaris(usuaris, historicFiltreCommand.asDto(), format);
+			
+		} else if (historicFiltreCommand.showingDadesProcediment()) {
+			fitxer = exportacioActionHistoric.exportarHistoricProcediments(historicFiltreCommand.asDto(), format);
+			
+		} else if (historicFiltreCommand.showingDadesEstat()) {
+			fitxer = exportacioActionHistoric.exportarHistoricEstats(historicFiltreCommand.asDto(), format);
+		
+		} else if (historicFiltreCommand.showingDadesGrups()) {
+			fitxer = exportacioActionHistoric.exportarHistoricGrups(entitatActual.getId(), historicFiltreCommand.asDto(), format);
+			
+		} else {
+			throw new Exception("No s'han seleccionat el tipus de dades a generar");
+		}
+
+		writeFileToResponse(fitxer.getNom(), fitxer.getContingut(), response);
+		return null;
 	}
 	
 	////

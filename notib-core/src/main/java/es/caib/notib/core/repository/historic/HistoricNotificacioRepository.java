@@ -80,13 +80,14 @@ public interface HistoricNotificacioRepository extends JpaRepository<HistoricNot
 			"	     sum(h.numComOrigenApi), " +
 			"        sum(h.numNotOrigenWeb), " +
 			"        sum(h.numComOrigenWeb), " +
-			"        ( 	select " +
-			"				sum(hEnv.numTotal) " +
-			"			from " +
-			"				HistoricEnviamentsEntity hEnv " +
-			"			where " +
-			"				hEnv.data = h.data and  hEnv.organGestor = :organGestor" +
-			"		 )," +
+			"        0L, " +
+//			"        ( 	select " +
+//			"				sum(hEnv.numTotal) " +
+//			"			from " +
+//			"				HistoricEnviamentsEntity hEnv " +
+//			"			where " +
+//			"				hEnv.data = h.data and  hEnv.organGestor = :organGestor" +
+//			"		 )," +
 			"        count(distinct h.procediment), " +
 			"        count(distinct h.grupCodi), " +
 			"		 h.organGestor.codi, " +
@@ -168,13 +169,14 @@ public interface HistoricNotificacioRepository extends JpaRepository<HistoricNot
 			"	    sum(h.numComOrigenApi), " +
 			"       sum(h.numNotOrigenWeb), " +
 			"       sum(h.numComOrigenWeb), " +
-			"		( 	select " +
-			"				sum(hEnv.numTotal) " +
-			"			from " +
-			"				HistoricEnviamentsEntity hEnv " +
-			"			where " +
-			"				hEnv.data = h.data and  hEnv.procediment = :procediment" +
-			"		)," +
+			"        0L, " +
+//			"		( 	select " +
+//			"				sum(hEnv.numTotal) " +
+//			"			from " +
+//			"				HistoricEnviamentsEntity hEnv " +
+//			"			where " +
+//			"				hEnv.data = h.data and  hEnv.procediment = :procediment" +
+//			"		)," +
 			"       count(distinct h.grupCodi), " +
 			"		h.procediment.codi, " +
 			"		h.procediment.nom " +

@@ -34,11 +34,11 @@ public class PermisosInterceptor extends HandlerInterceptorAdapter {
 			HttpServletResponse response,
 			Object handler) throws Exception {
 		
-		PermisosHelper.comprovarPermisosProcedimentsUsuariActual(
-				request,
-				procedimentService,
-				notificacioService,
-				aplicacioService);
+//		PermisosHelper.comprovarPermisosProcedimentsUsuariActual(
+//				request,
+//				procedimentService,
+//				notificacioService,
+//				aplicacioService);
 		return true;
 	}
 

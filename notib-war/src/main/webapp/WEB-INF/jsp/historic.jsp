@@ -484,7 +484,7 @@
 				if ( showingTables ) {
 					metriques.forEach(function(metric){
 						var title = '<h2>' + metricsDefinition[metric]["text"] + '</h2>'
-						var htmlTable = buildTableMetric(data, metric, "table-procediment-" + metric);
+						var htmlTable = buildTableMetric(data, metric, "table-dades-" + metric);
 						
 						$container.append(title + htmlTable);	
 						

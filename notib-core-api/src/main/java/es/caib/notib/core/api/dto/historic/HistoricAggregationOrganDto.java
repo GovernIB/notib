@@ -56,4 +56,22 @@ public class HistoricAggregationOrganDto extends HistoricAggregation {
 		this.codi = codi;
 		this.nom = nom;
 	}
+	
+	public HistoricAggregationOrganDto() {
+		super();
+		numEnviaments = 0L;
+		numProcediments = 0L;
+		numGrups = 0L;
+		codi = "";
+		nom = "";
+	}
+
+	public HistoricAggregationOrganDto(Date data) {
+		super(data);
+		numEnviaments = 0L;
+		numProcediments = 0L;
+		numGrups = 0L;
+		codi = "";
+		nom = "";
+	}
 }

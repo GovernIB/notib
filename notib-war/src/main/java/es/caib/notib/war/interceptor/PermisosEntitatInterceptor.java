@@ -28,9 +28,9 @@ public class PermisosEntitatInterceptor extends HandlerInterceptorAdapter {
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Object handler) throws Exception {
-		PermisosHelper.comprovarPermisosEntitatsUsuariActual(
-				request,
-				entitatService);
+//		PermisosHelper.comprovarPermisosEntitatsUsuariActual(
+//				request,
+//				entitatService);
 		return true;
 	}
 

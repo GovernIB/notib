@@ -76,5 +76,9 @@ public class HistoricAggregationEstatDto extends HistoricAggregation {
 				numComOrigenWeb);
 		this.estat = estat;
 	}
+	public HistoricAggregationEstatDto(Date data) {
+		super(data);
+		this.estat = null;
+	}
 
 }

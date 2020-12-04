@@ -47,7 +47,6 @@ public class HistoricFiltreDto {
 			cal.set(Calendar.MILLISECOND, 0);
 			Date data = cal.getTime();
 			
-	
 			List<Date> dates = new ArrayList<Date> ();
 			dates.add(data);
 			while(data.compareTo(dataFinal) < 0) {
