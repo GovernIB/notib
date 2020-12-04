@@ -335,7 +335,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			integracioHelper.addAccioError(info, "Error processant la petició", ex);
 		}
 		if (enviament != null) {
-			if (eventDatat == null) {
+			if (eventDatat == null && !tipoEntrega.equals(BigInteger.valueOf(3L))) {
 				logger.debug("L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null");
 				eventDatatBuilder = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
@@ -351,8 +351,10 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						true,
 						eventDatat);
 			}
-			enviament.getNotificacio().updateEventAfegir(eventDatat);
-			notificacioEventRepository.save(eventDatat);
+			if (eventDatat != null) {
+				enviament.getNotificacio().updateEventAfegir(eventDatat);
+				notificacioEventRepository.save(eventDatat);
+			}
 			logger.debug("Peticició processada correctament.");
 		}
 		
