@@ -321,7 +321,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			List<Enviament> enviaments = new ArrayList<Enviament>();
 			List<NotificacioEnviamentEntity> enviamentsEntity = new ArrayList<NotificacioEnviamentEntity>();
 			for(NotificacioEnviamentDtoV2 enviament: notificacio.getEnviaments()) {
-				if (enviament.getEntregaPostal().getCodiPostal() == null || enviament.getEntregaPostal().getCodiPostal().isEmpty())
+				if (enviament.getEntregaPostal() != null && (enviament.getEntregaPostal().getCodiPostal() == null || enviament.getEntregaPostal().getCodiPostal().isEmpty()))
 					enviament.getEntregaPostal().setCodiPostal(enviament.getEntregaPostal().getCodiPostalNorm());
 				enviaments.add(conversioTipusHelper.convertir(enviament, Enviament.class));
 			}

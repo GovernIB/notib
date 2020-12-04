@@ -198,6 +198,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 			Boolean esUnitatArrel,
 			Long provincia, 
 			String municipi) throws SistemaExternException {
+		List<NodeDir3> unitats = new ArrayList<NodeDir3>();
 		try {
 			URL url = new URL(getServiceUrl() + SERVEI_CERCA
 					+ "organismos?"
@@ -217,12 +218,15 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 			httpConnection.setDoOutput(true);
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-			List<NodeDir3> unitats = mapper.readValue(
-					httpConnection.getInputStream(), 
-					TypeFactory.defaultInstance().constructCollectionType(
-							List.class,  
-							NodeDir3.class));
-			Collections.sort(unitats);
+			byte[] response = IOUtils.toByteArray(httpConnection.getInputStream());
+			if (response != null && response.length > 0) {
+				unitats = mapper.readValue(
+						httpConnection.getInputStream(), 
+						TypeFactory.defaultInstance().constructCollectionType(
+								List.class,  
+								NodeDir3.class));
+				Collections.sort(unitats);
+			}
 			return unitats;
 		} catch (Exception ex) {
 			throw new SistemaExternException(

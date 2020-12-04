@@ -1683,7 +1683,7 @@ function actualitzarEntrega(j) {
 						<div class="col-md-3">
 							<input type="text"  name="searchCodi" id="searchCodi" onchange="searchCodiChange(this.value)" class="form-control" placeholder="<spring:message code="organgestor.list.columna.codi"/>"/>
 						</div>
-						<div class="col-md-3">
+						<div class="col-md-5">
 							<input type="text"  id="searchNom" class="form-control" onchange="searchNomChange(this.value)" placeholder="<spring:message code="organgestor.list.columna.nom"/>"/>
 						<div class="col-md-3"> </div>
 						</div>
@@ -1694,8 +1694,9 @@ function actualitzarEntrega(j) {
 							</div>
 						</div>
 					</div>
+					<h6 class="top"><spring:message code="notificacio.form.filtre.llegenda"/></h6>
 					<div class="row">
-						<div class="col-md-8" style="margin-top: 10px;">
+						<div class="col-md-12" style="margin-top: 10px;">
 							<select id="selOrganismes" class= "form-control"  data-placeholder="<spring:message code="procediment.form.camp.organ"/>"></select> 
 						</div>
 					</div>
@@ -1706,7 +1707,7 @@ function actualitzarEntrega(j) {
 						</div>
 					</div>
 				</div>
-				<h6 class="modal-footer"><spring:message code="notificacio.form.filtre.llegenda"/></h6>
+				
 				<div class="modal-footer">
 					
 					<button id="addOrganismeButton" onclick="seleccionar()" type="button" class="btn btn-info" data-dismiss="modal"><span class="fa fa-plus"></span> <spring:message code="comu.boto.seleccionar"/></button>

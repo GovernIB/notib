@@ -42,6 +42,7 @@ import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
+import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorCieFormatFullaDto;
 import es.caib.notib.core.api.dto.PagadorCieFormatSobreDto;
@@ -58,9 +59,11 @@ import es.caib.notib.core.api.service.PagadorCieService;
 import es.caib.notib.core.api.service.PagadorPostalService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.UsuariAplicacioService;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
+import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
@@ -302,8 +305,12 @@ public class BaseServiceTest {
 				logger.debug("Esborrant objecte de tipus " + element.getClass().getSimpleName() + "...");
 				if (element instanceof EntitatDto) {
 					autenticarUsuari("super");
-					entitatService.delete(
-							((EntitatDto)element).getId());
+					Long entitadId = ((EntitatDto)element).getId();
+					List<OrganGestorDto> organsGestors = organGestorService.findByEntitat(entitadId);
+					for(OrganGestorDto organGestorDto: organsGestors) {
+						organGestorService.delete(entitatId, organGestorDto.getId());
+					}
+					entitatService.delete(entitadId);
 					entitatId = null;
 				} else if(element instanceof AplicacioDto) {
 					autenticarUsuari("super");
