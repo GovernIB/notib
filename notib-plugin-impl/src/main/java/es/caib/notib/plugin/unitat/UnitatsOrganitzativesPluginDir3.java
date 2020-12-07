@@ -221,7 +221,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 			byte[] response = IOUtils.toByteArray(httpConnection.getInputStream());
 			if (response != null && response.length > 0) {
 				unitats = mapper.readValue(
-						httpConnection.getInputStream(), 
+						response,
 						TypeFactory.defaultInstance().constructCollectionType(
 								List.class,  
 								NodeDir3.class));

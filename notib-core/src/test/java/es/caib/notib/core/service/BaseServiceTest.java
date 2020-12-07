@@ -59,10 +59,12 @@ import es.caib.notib.core.api.service.PagadorCieService;
 import es.caib.notib.core.api.service.PagadorPostalService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.UsuariAplicacioService;
+import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
+import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.plugin.SistemaExternException;
@@ -123,6 +125,9 @@ public class BaseServiceTest {
 	
 	@Autowired
 	private  UsuariRepository usuariRepository;
+	
+	@Autowired
+	private  NotificacioRepository notificacioRepository;
 	
 	@Autowired
 	private  PluginHelper pluginHelper;
@@ -304,12 +309,13 @@ public class BaseServiceTest {
 			for (Object element: elementsCreats) {
 				logger.debug("Esborrant objecte de tipus " + element.getClass().getSimpleName() + "...");
 				if (element instanceof EntitatDto) {
-					autenticarUsuari("super");
+					autenticarUsuari("admin");
 					Long entitadId = ((EntitatDto)element).getId();
 					List<OrganGestorDto> organsGestors = organGestorService.findByEntitat(entitadId);
 					for(OrganGestorDto organGestorDto: organsGestors) {
 						organGestorService.delete(entitatId, organGestorDto.getId());
 					}
+					autenticarUsuari("super");
 					entitatService.delete(entitadId);
 					entitatId = null;
 				} else if(element instanceof AplicacioDto) {
@@ -323,7 +329,13 @@ public class BaseServiceTest {
 							entitatId,
 							((OrganGestorDto)element).getId());
 				} else if(element instanceof ProcedimentDto) {
+					
 					autenticarUsuari("admin");
+					Long procedimentId = ((ProcedimentDto)element).getId();
+					List<NotificacioEntity> notificacionsByProcediment = notificacioRepository.findByProcedimentId(procedimentId);
+					for(NotificacioEntity notificacioEntity: notificacionsByProcediment) {
+						notificacioRepository.delete(notificacioEntity.getId());
+					}
 					procedimentService.delete(
 							entitatId, 
 							((ProcedimentDto)element).getId());

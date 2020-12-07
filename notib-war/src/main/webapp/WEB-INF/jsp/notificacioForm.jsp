@@ -619,7 +619,7 @@ function addDestinatari(enviament_id) {
 			<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].dir3Codi"><spring:message code="notificacio.form.camp.titular.dir3codi"/></label> \
 			<div class="col-xs-12"> \
 				<div class="input-group" id="$searchOrgan#num_enviament#" onclick="obrirModalOrganismes(#num_enviament#)"> \
-					<input id="searchOrgan#num_enviament#" class="form-control " type="text" value=""> \
+					<input id="searchOrgan#num_enviament#" class="form-control " type="text" value="" readonly="true"> \
 					<span class="input-group-addon habilitat">  \
 						<a><span class="fa fa-search"></span></a> \
 					</span> \
@@ -1395,7 +1395,7 @@ function actualitzarEntrega(j) {
 										
 										<!-- CODI DIR3 -->
 										<div class="col-md-6 dir3Codi hidden">
-											<not:inputTextSearch  funcio="obrirModalOrganismes('Tit-${j}')" searchButton="searchOrganTit${j}" textKey="notificacio.form.camp.titular.dir3codi" required="true"/>
+											<not:inputTextSearch  funcio="obrirModalOrganismes('Tit-${j}')" searchButton="searchOrganTit${j}" textKey="notificacio.form.camp.titular.dir3codi" required="true" readonly="true"/>
 										</div>
 										
 										<div class="col-md-6 hidden">
