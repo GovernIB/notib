@@ -480,6 +480,9 @@ $(document).ready(function() {
 		var incapacitat = closest.find('.incapacitat');
 		var raoSocial = closest.find('.rao');
 		
+		
+	
+		
 		if ($(this).val() == 'ADMINISTRACIO') {
 			$(llinatge1).addClass('hidden');
 			$(llinatge2).addClass('hidden');
@@ -487,6 +490,9 @@ $(document).ready(function() {
 			$(nifLabel).text(nifLabelText);
 			$(incapacitat).addClass('hidden');
 			$(raoSocial).addClass('hidden');
+			$('#rowRetard').removeClass('hidden');
+			$('#rowDataProgramada').removeClass('hidden');
+			$('#rowCaducitat').removeClass('hidden');
 		} else if ($(this).val() == 'FISICA') {
 			$(llinatge1).removeClass('hidden');
 			$(llinatge2).removeClass('hidden');
@@ -495,6 +501,9 @@ $(document).ready(function() {
 			$(dir3codi).addClass('hidden');
 			$(incapacitat).removeClass('hidden');
 			$(raoSocial).removeClass('hidden');
+			$('#rowRetard').addClass('hidden');
+			$('#rowDataProgramada').addClass('hidden');
+			$('#rowCaducitat').addClass('hidden');
 		} else {
 			$(llinatge1).addClass('hidden');
 			$(llinatge2).addClass('hidden');
@@ -503,6 +512,9 @@ $(document).ready(function() {
 			$(nifLabel).text(nifLabelText + " *");
 			$(incapacitat).removeClass('hidden');
 			$(raoSocial).removeClass('hidden');
+			$('#rowRetard').addClass('hidden');
+			$('#rowDataProgramada').addClass('hidden');
+			$('#rowCaducitat').addClass('hidden');
 		}
 	});
 	
@@ -1220,21 +1232,21 @@ function actualitzarEntrega(j) {
 			</div>
 			
 			<!-- DATA ENVIAMENT PROGRAMADA -->
-			<div class="row">
+			<div class="row" id="rowDataProgramada">
 				<div class="col-md-12">
 					<not:inputDate name="enviamentDataProgramada" textKey="notificacio.form.camp.dataProgramada" info="true" messageInfo="notificacio.form.camp.dataProgramada.info" labelSize="2" inputSize="6" />
 				</div>
 			</div>
 			
 			<!-- RETARD -->
-			<div class="row">
+			<div class="row" id="rowRetard">
 				<div class="col-md-12">
 					<not:inputText name="retard" textKey="notificacio.form.camp.retard" info="true" messageInfo="notificacio.form.camp.retard.info" value="10" labelSize="2" inputSize="6"/>
 				</div>
 			</div>
 			
 			<!-- CADUCITAT -->
-			<div class="row">
+			<div class="row" id="rowCaducitat">
 				<div class="col-md-12">
 					<not:inputDate name="caducitat" textKey="notificacio.form.camp.caducitat" info="true" messageInfo="notificacio.form.camp.caducitat.info" orientacio="bottom" labelSize="2" inputSize="6" required="true" />
 				</div>
