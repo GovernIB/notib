@@ -479,10 +479,7 @@ $(document).ready(function() {
 		var nifLabelText = "<spring:message code='notificacio.form.camp.titular.nif'/>";
 		var incapacitat = closest.find('.incapacitat');
 		var raoSocial = closest.find('.rao');
-		
-		
 	
-		
 		if ($(this).val() == 'ADMINISTRACIO') {
 			$(llinatge1).addClass('hidden');
 			$(llinatge2).addClass('hidden');
@@ -500,10 +497,7 @@ $(document).ready(function() {
 			$(nifLabel).text(nifLabelText + " *");
 			$(dir3codi).addClass('hidden');
 			$(incapacitat).removeClass('hidden');
-			$(raoSocial).removeClass('hidden');
-			$('#rowRetard').addClass('hidden');
-			$('#rowDataProgramada').addClass('hidden');
-			$('#rowCaducitat').addClass('hidden');
+			$(raoSocial).removeClass('hidden');	
 		} else {
 			$(llinatge1).addClass('hidden');
 			$(llinatge2).addClass('hidden');
@@ -512,12 +506,29 @@ $(document).ready(function() {
 			$(nifLabel).text(nifLabelText + " *");
 			$(incapacitat).removeClass('hidden');
 			$(raoSocial).removeClass('hidden');
+		}
+		
+		comprovarTitularComuniacio();
+		
+	});
+	
+	$(document).on('change', 'input[type=radio][name=enviamentTipus]', function (event) {
+	      comprovarTitularComuniacio();
+	});
+	
+	
+	function comprovarTitularComuniacio() {
+		var tipusInteressatTitular = document.getElementById("enviaments[0].titular.interessatTipus").value;
+		if($('input[name=enviamentTipus]:checked').val() == 'COMUNICACIO' && (tipusInteressatTitular == 'JURIDICA' || tipusInteressatTitular == 'FISICA')){
 			$('#rowRetard').addClass('hidden');
 			$('#rowDataProgramada').addClass('hidden');
 			$('#rowCaducitat').addClass('hidden');
+		}else{
+			$('#rowRetard').removeClass('hidden');
+			$('#rowDataProgramada').removeClass('hidden');
+			$('#rowCaducitat').removeClass('hidden');
 		}
-	});
-	
+	}
 	
 	$(document).on('input', ".titularNif", function () {
 		$(this).closest('.enviamentsForm').find('.nifemisor').val($(this).val());
