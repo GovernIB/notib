@@ -960,6 +960,9 @@ function netejarFiltre(){
 	
 	selOrganismes.empty();
 	selOrganismes.append("<option value=\"\"></option>");
+	selOrganismes.select2({
+		theme: 'bootstrap',
+		width: 'auto'});
 
 };
 
@@ -995,6 +998,9 @@ function cercarOrganismes(text){
 							selOrganismes.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
 						});
 				}
+				selOrganismes.select2({
+					theme: 'bootstrap',
+					width: 'auto'});
 				$(".loading-screen").hide();
 			},
 			error: function() {
