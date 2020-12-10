@@ -10,6 +10,7 @@ import javax.mail.MessagingException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.LocalitatsDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
@@ -381,6 +382,11 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public ProgresActualitzacioCertificacioDto actualitzacioEnviamentsEstat();
+
+	@PreAuthorize("hasRole('tothom')")
+	public String guardarArxiuTemporal(String string);
+
+
 	
 
 }

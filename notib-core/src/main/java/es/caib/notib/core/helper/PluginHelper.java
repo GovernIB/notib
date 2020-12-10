@@ -104,6 +104,7 @@ public class PluginHelper {
 
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
+	public static final String GESDOC_AGRUPACIO_TEMPORALS = "tmp";
 	
 
 	private DadesUsuariPlugin dadesUsuariPlugin;

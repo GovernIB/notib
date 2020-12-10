@@ -340,6 +340,8 @@ public class NotificacioController extends BaseUserController {
 		List<String> tipusDocumentEnumDto = new ArrayList<String>();
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		ProcedimentDto procedimentActual = null;
+		String documentGesdocId = null;
+		String documentGesdocNom = null;
 		if (notificacioCommand.getProcedimentId() != null)
 			procedimentActual = procedimentService.findById(
 					entitatActual.getId(), 
@@ -348,6 +350,14 @@ public class NotificacioController extends BaseUserController {
 		notificacioCommand.setUsuariCodi(aplicacioService.getUsuariActual().getCodi());
 		
 		if (bindingResult.hasErrors()) {
+			if (notificacioCommand.getTipusDocument() != null) {
+				if (notificacioCommand.getTipusDocument() == TipusDocumentEnumDto.ARXIU) {
+					documentGesdocId = notificacioService.guardarArxiuTemporal(Base64.encodeBase64String(notificacioCommand.getArxiu().getBytes()));
+					documentGesdocNom = notificacioCommand.getArxiu().getName();
+					
+				}
+			}
+			
 			ompliModelFormulari(
 					request,
 					procedimentActual, 

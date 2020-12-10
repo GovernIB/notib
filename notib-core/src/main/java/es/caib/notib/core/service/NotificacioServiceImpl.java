@@ -2057,6 +2057,25 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 	
+	
+	@Override
+	@Transactional(readOnly = true)
+	public String guardarArxiuTemporal(String contigut) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		String documentGesdocId = null;
+		try {
+			if(contigut != null) {
+				documentGesdocId = pluginHelper.gestioDocumentalCreate(
+						PluginHelper.GESDOC_AGRUPACIO_TEMPORALS,
+						Base64.decodeBase64(contigut));
+			}
+			return documentGesdocId;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	
 	private int getRegistreEnviamentsProcessarMaxProperty() {
 		return PropertiesHelper.getProperties().getAsInt(
 				"es.caib.notib.tasca.registre.enviaments.processar.max",

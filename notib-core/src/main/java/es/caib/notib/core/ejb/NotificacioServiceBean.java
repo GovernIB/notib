@@ -359,4 +359,10 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	}
 
+	@Override
+	@RolesAllowed({"tothom"})
+	public String guardarArxiuTemporal(String contigut) {
+		return delegate.guardarArxiuTemporal(contigut);
+	}
+
 }
