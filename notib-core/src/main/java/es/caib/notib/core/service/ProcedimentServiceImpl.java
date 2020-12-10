@@ -854,6 +854,17 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				List<PermisDto> permisos = permisosHelper.findPermisos(
 						procediment.getId(),
 						ProcedimentEntity.class);
+
+				if (procediment.isComu()) {
+					String organActual = null;
+					if (organGestorActual != null) {
+						organActual = organGestorActual.getCodi();
+//					} else {
+//						organActual = entitatActual.getDir3Codi();
+					}
+					permisos.addAll(findPermisProcedimentOrganByProcediment(procediment.getId(), organActual));
+				}
+
 				List<GrupDto> grups = grupService.findGrupsByProcediment(procediment.getId());
 				procediment.setGrups(grups);
 				procediment.setPermisos(permisos);
@@ -1432,14 +1443,18 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				if (permisosProcOrgan != null && !permisosProcOrgan.isEmpty()) {
 					String organ = procedimentOrgan.getOrganGestor().getCodi();
 					boolean tePermis = true;
+
 					if (organGestor != null)
 						tePermis = organsAmbPermis.contains(organ);
-					for (PermisDto permis: permisosProcOrgan) {
-						permis.setOrgan(organ);
-						permis.setPermetEdicio(tePermis);
+
+					if (tePermis) {
+						for (PermisDto permis : permisosProcOrgan) {
+							permis.setOrgan(organ);
+							permis.setPermetEdicio(tePermis);
+						}
+						permisos.addAll(permisosProcOrgan);
 					}
 				}
-				permisos.addAll(permisosProcOrgan);
 			}
 		}
 		return permisos;
