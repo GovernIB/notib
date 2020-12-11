@@ -170,6 +170,10 @@ $(document).ready(function() {
 							<td><strong><spring:message code="notificacio.info.dada.procediment.codi" /></strong></td>
 							<td>${notificacio.procediment.nom}<br>${notificacio.procediment.codi}</td>
 						</tr>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.dada.procediment.justificant" /></strong></td>
+							<td><a href="<c:url value="/notificacio/${notificacio.id}/justificant"/>" data-toggle="modal" data-height="250px" data-refresh="true" class="btn btn-default btn-sm"><spring:message code="comu.boto.justificant"/>&nbsp;<span class="fa fa-download"></span></a></td>
+						</tr>
 					</tbody>
 				</table>
 			</div>
