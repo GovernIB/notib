@@ -23,7 +23,7 @@ public enum NotificacioEstatEnumDto implements Serializable {
 	FINALITZADA(3),
 	PROCESSADA(4),
 	EXPIRADA(10),
-	NOTIFICADA(1),
+	NOTIFICADA(14),
 	REBUTJADA(20);
 	
 	private Integer numVal;
