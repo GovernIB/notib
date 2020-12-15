@@ -1248,6 +1248,11 @@ public class NotificacioController extends BaseUserController {
         try {
             model.addAttribute("concepteSize", notificacio.getConcepteDefaultSize());
             model.addAttribute("descripcioSize", notificacio.getDescripcioDefaultSize());
+            model.addAttribute("nomSize", notificacio.getNomDefaultSize());
+            model.addAttribute("llinatge1Size", notificacio.getLlinatge1DefaultSize());
+            model.addAttribute("llinatge2Size", notificacio.getLlinatge2DefaultSize());
+            model.addAttribute("emailSize", notificacio.getEmailDefaultSize());
+            model.addAttribute("telefonSize", notificacio.getTelefonDefaultSize());
         } catch (Exception ex) {
             logger.error("No s'ha pogut recuperar la longitud del concepte: " + ex.getMessage());
         }

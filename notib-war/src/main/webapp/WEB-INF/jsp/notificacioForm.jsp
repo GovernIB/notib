@@ -515,20 +515,6 @@ $(document).ready(function() {
 	$('#tipusDocument').trigger('change');
 	$('.enviamentTipus').trigger('change');
 	
-	//Contador concepte
-	var fieldConcepte = $('#concepte');
-	if (fieldConcepte.val().length != 0) {
-		var size = $(fieldConcepte).val().length;
-		$('.inputCurrentLength').text(size);
-	} else {
-		$('.inputCurrentLength').text(0);
-	};
-	
-	$(fieldConcepte).bind("change paste keyup", function() {
-		var size = $(this).val().length;
-		$('.inputCurrentLength').text(size);
-	});
-	
 	//Contado descripció
 	var fieldDescripcio = $('#descripcio');
 	if (fieldDescripcio.val().length != 0) {
@@ -578,7 +564,13 @@ function addDestinatari(enviament_id) {
 			<div class="form-group"> \
 				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom"><spring:message code="notificacio.form.camp.titular.nom"/> *</label> \
 				<div class="col-xs-12"> \
-					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom" class="form-control " type="text" value=""> \
+					<input maxlength="${nomSize}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom" class="form-control " type="text" value=""> \
+					<p class="info-length text-success"> \
+						<span class="glyphicon glyphicon-info-sign"></span> \
+						<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].nom">0</span> \
+							<spring:message code="notificacio.form.camp.logitud"/> \
+						<span> ${nomSize}</span> \
+					</p> \
 				</div> \
 			</div> \
 		</div> \
@@ -586,7 +578,13 @@ function addDestinatari(enviament_id) {
 			<div class="form-group"> \
 				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1"><spring:message code="notificacio.form.camp.titular.llinatge1"/> *</label> \
 				<div class="col-xs-12"> \
-					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1" class="form-control " type="text" value=""> \
+					<input maxlength="${llinatge1Size}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1" class="form-control " type="text" value=""> \
+					<p class="info-length text-success"> \
+					<span class="glyphicon glyphicon-info-sign"></span> \
+					<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1">0</span> \
+						<spring:message code="notificacio.form.camp.logitud"/> \
+					<span> ${llinatge1Size}</span> \
+					</p> \
 				</div> \
 			</div> \
 		</div> \
@@ -594,7 +592,13 @@ function addDestinatari(enviament_id) {
 			<div class="form-group"> \
 				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2"><spring:message code="notificacio.form.camp.titular.llinatge2"/></label> \
 				<div class="col-xs-12"> \
-					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2" class="form-control " type="text" value=""> \
+					<input maxlength="${llinatge2Size}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2" class="form-control " type="text" value=""> \
+					<p class="info-length text-success"> \
+					<span class="glyphicon glyphicon-info-sign"></span> \
+					<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2">0</span> \
+						<spring:message code="notificacio.form.camp.logitud"/> \
+					<span> ${llinatge2Size}</span> \
+					</p> \
 				</div> \
 			</div> \
 		</div> \
@@ -602,7 +606,13 @@ function addDestinatari(enviament_id) {
 			<div class="form-group"> \
 				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon"><spring:message code="notificacio.form.camp.titular.telefon"/></label> \
 				<div class="col-xs-12"> \
-					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon" class="form-control " type="text" value=""> \
+					<input maxlength="${telefonSize}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon" class="form-control " type="text" value=""> \
+					<p class="info-length text-success"> \
+					<span class="glyphicon glyphicon-info-sign"></span> \
+					<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon">0</span> \
+						<spring:message code="notificacio.form.camp.logitud"/> \
+					<span> ${telefonSize}</span> \
+					</p> \
 				</div> \
 			</div> \
 		</div> \
@@ -610,7 +620,13 @@ function addDestinatari(enviament_id) {
 			<div class="form-group"> \
 				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].email"><spring:message code="notificacio.form.camp.titular.email"/></label> \
 				<div class="col-xs-12"> \
-					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].email" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].email" class="form-control " type="text" value=""> \
+					<input maxlength="${emailSize}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].email" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].email" class="form-control " type="text" value=""> \
+					<p class="info-length text-success"> \
+					<span class="glyphicon glyphicon-info-sign"></span> \
+					<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].email">0</span> \
+						<spring:message code="notificacio.form.camp.logitud"/> \
+					<span> ${emailSize}</span> \
+					</p> \
 				</div> \
 			</div> \
 		</div> \
@@ -655,6 +671,12 @@ function addDestinatari(enviament_id) {
     	$("div[class*=' personaForm_" + num_enviament + "']").closest('div.destinatari').find('.addDestinatari').addClass('hidden');
     }
 	$('.interessat').trigger('change');
+	
+	addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].nom');
+	addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].llinatge1');
+	addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].llinatge2');
+	addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].telefon');
+	addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].email');
 }
 
 function replaceAll(string, search, replace) {
@@ -733,8 +755,56 @@ function addEnvio() {
 		
 		actualitzarEntrega(numPlus);
 	    webutilModalAdjustHeight();
+	    
+	    addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.nom', '${nomSize}');
+	    addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.llinatge1', '${llinatge1Size}');
+	    addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.llinatge2', '${llinatge2Size}');
+	    addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.email', '${emailSize}');
+	    addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.telefon', '${telefonSize}');
     }
 
+}
+
+function addContadorAddicionalDestinatari(fieldId) {
+	//Contador
+	var fieldSize = 'inputCurrentLength_' + fieldId;
+	var fieldSizeClass = $(document.getElementsByClassName(fieldSize)[0]);
+	if (fieldSizeClass.val() != undefined && fieldSizeClass.val().length != 0) {
+		var size = $(fieldId).val().length;
+		$(fieldSizeClass).text(size);
+	} else {
+		$(fieldSizeClass).text(0);
+	};
+	
+	$(document.getElementById(fieldId)).bind("change paste keyup", function() {
+		var size = $(this).val().length;
+		$(fieldSizeClass).text(size);
+	});
+}
+
+function addContadorAddicionalEnviament(fieldId, inputMaxLength) {
+	var p = '<p class="info-length text-success"> \
+				<span class="glyphicon glyphicon-info-sign"></span> \
+				<span class="inputCurrentLength_' + fieldId + '">0</span> \
+					<spring:message code="notificacio.form.camp.logitud"/> \
+				<span> ' + inputMaxLength + '</span> \
+			</p>';
+	var inputField = $(document.getElementById(fieldId));
+	$(p).insertAfter(inputField);
+	//Contador
+	var fieldSize = 'inputCurrentLength_' + fieldId;
+	var fieldSizeClass = $(document.getElementsByClassName(fieldSize)[0]);
+	if (fieldSizeClass.val() != undefined && fieldSizeClass.val().length != 0) {
+		var size = $(fieldId).val().length;
+		$(fieldSizeClass).text(size);
+	} else {
+		$(fieldSizeClass).text(0);
+	};
+	
+	$(document.getElementById(fieldId)).bind("change paste keyup", function() {
+		var size = $(this).val().length;
+		$(fieldSizeClass).text(size);
+	});
 }
 
 function destinatarisDelete(className) {
@@ -1126,7 +1196,20 @@ function actualitzarEntrega(j) {
 	
 }
 
-
+function comptarCaracters(idCamp) {
+	var fieldConcepte = $('#' + idCamp);
+	if (fieldConcepte.val().length != 0) {
+		var size = $(fieldConcepte).val().length;
+		$('.inputCurrentLength').text(size);
+	} else {
+		$('.inputCurrentLength').text(0);
+	};
+	
+	//$(fieldConcepte).bind("change paste keyup", function() {
+	//	var size = $(this).val().length;
+	//	$('.inputCurrentLength').text(size);
+	//});
+}
 	
 </script>
 </head>
@@ -1154,7 +1237,7 @@ function actualitzarEntrega(j) {
 			<!-- CONCEPTE -->
 			<div class="row">
 				<div class="col-md-12">
-					<not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="2" required="true" inputMaxLength="${concepteSize}"/>
+					<not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="2" required="true" showsize="true" inputMaxLength="${concepteSize}"/>
 				</div>
 			</div>
 			
@@ -1376,27 +1459,27 @@ function actualitzarEntrega(j) {
 										
 										<!-- NOM / RAÓ SOCIAL -->
 										<div class="col-md-6 rao">
-											<not:inputText name="enviaments[${j}].titular.nom" textKey="notificacio.form.camp.titular.nom" required="true" />
+											<not:inputText name="enviaments[${j}].titular.nom" textKey="notificacio.form.camp.titular.nom" required="true" inputMaxLength="${nomSize}" showsize="true"/>
 										</div>
 										
 										<!-- PRIMER LLINATGE -->										
 										<div class="col-md-6 llinatge1">
-											<not:inputText name="enviaments[${j}].titular.llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" />
+											<not:inputText name="enviaments[${j}].titular.llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" inputMaxLength="${llinatge1Size}" showsize="true"/>
 										</div>
 										
 										<!-- SEGON LLINATGE -->
 										<div class="col-md-6 llinatge2">
-											<not:inputText name="enviaments[${j}].titular.llinatge2" textKey="notificacio.form.camp.titular.llinatge2" />
+											<not:inputText name="enviaments[${j}].titular.llinatge2" textKey="notificacio.form.camp.titular.llinatge2" inputMaxLength="${llinatge2Size}" showsize="true"/>
 										</div>
 										
 										<!-- EMAIL -->
 										<div class="col-md-6">
-											<not:inputText name="enviaments[${j}].titular.email" textKey="notificacio.form.camp.titular.email" />
+											<not:inputText name="enviaments[${j}].titular.email" textKey="notificacio.form.camp.titular.email" inputMaxLength="${emailSize}" showsize="true"/>
 										</div>
 										
 										<!-- TELÈFON -->
 										<div class="col-md-6">
-											<not:inputText name="enviaments[${j}].titular.telefon" textKey="notificacio.form.camp.titular.telefon" />
+											<not:inputText name="enviaments[${j}].titular.telefon" textKey="notificacio.form.camp.titular.telefon" inputMaxLength="${telefonSize}" showsize="true"/>
 										</div>
 										
 										<!-- CODI DIR3 -->
@@ -1447,23 +1530,23 @@ function actualitzarEntrega(j) {
 													</div>
 													<!-- NOM / RAÓ SOCIAL -->
 													<div class="col-md-3">
-														<not:inputText name="enviaments[${j}].destinataris[${i}].nom" textKey="notificacio.form.camp.titular.nom" labelSize="12" inputSize="12" required="true" />
+														<not:inputText name="enviaments[${j}].destinataris[${i}].nom" textKey="notificacio.form.camp.titular.nom" labelSize="12" inputSize="12" required="true" inputMaxLength="${concepteSize}" showsize="true"/>
 													</div>
 													<!-- PRIMER LLINATGE -->
 													<div class="col-md-3 llinatge1">
-														<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge1" textKey="notificacio.form.camp.titular.llinatge1" labelSize="12" inputSize="12" required="true" />
+														<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge1" textKey="notificacio.form.camp.titular.llinatge1" labelSize="12" inputSize="12" required="true"  inputMaxLength="${concepteSize}" showsize="true"/>
 													</div>
 													<!-- SEGON LLINATGE -->
 													<div class="col-md-3 llinatge2">
-														<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge2" textKey="notificacio.form.camp.titular.llinatge2" labelSize="12" inputSize="12"/>
+														<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge2" textKey="notificacio.form.camp.titular.llinatge2" labelSize="12" inputSize="12" inputMaxLength="${concepteSize}" showsize="true"/>
 													</div>
 													<!-- TELÈFON -->
 													<div class="col-md-3">
-														<not:inputText name="enviaments[${j}].destinataris[${i}].telefon" textKey="notificacio.form.camp.titular.telefon" labelSize="12" inputSize="12"/>
+														<not:inputText name="enviaments[${j}].destinataris[${i}].telefon" textKey="notificacio.form.camp.titular.telefon" labelSize="12" inputSize="12" inputMaxLength="${concepteSize}" showsize="true"/>
 													</div>
 													<!-- EMAIL -->
 													<div class="col-md-4">
-														<not:inputText name="enviaments[${j}].destinataris[${i}].email" textKey="notificacio.form.camp.titular.email" labelSize="12" inputSize="12"/>
+														<not:inputText name="enviaments[${j}].destinataris[${i}].email" textKey="notificacio.form.camp.titular.email" labelSize="12" inputSize="12" inputMaxLength="${concepteSize}" showsize="true"/>
 													</div>
 													<!-- CODI DIR3 -->
 													<div class="col-md-3 dir3Codi hidden">

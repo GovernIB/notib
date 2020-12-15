@@ -23,6 +23,7 @@
 <%@ attribute name="inputClass" required="false" rtexprvalue="true"%>
 <%@ attribute name="inputLength" required="false" rtexprvalue="true"%>
 <%@ attribute name="inputMaxLength" required="false" rtexprvalue="true"%>
+<%@ attribute name="showsize" required="false" rtexprvalue="true"%>
 <c:set var="campValue" value="${value}"/>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
@@ -48,6 +49,25 @@
 }
 </style>
 <script>
+$(document).ready(function() {
+	if ('${showsize}' && '${inputMaxLength}') {
+		//Contador
+		var field = '${name}';	
+		var fieldSize = 'inputCurrentLength_${name}';
+		var fieldSizeClass = $(document.getElementsByClassName(fieldSize)[0]);
+		if (fieldSizeClass.val() != undefined && fieldSizeClass.val().length != 0) {
+			var size = $(field).val().length;
+			$(fieldSizeClass).text(size);
+		} else {
+			$(fieldSizeClass).text(0);
+		};
+		
+		$(document.getElementById(field)).bind("change paste keyup", function() {
+			var size = $(this).val().length;
+			$(fieldSizeClass).text(size);
+		});
+	}
+});
 $('input').change(function() {
 	if(this.type != "file"){
 		this.value = this.value.trim();
@@ -62,7 +82,7 @@ $('input').change(function() {
 		<c:choose>
 			<c:when test="${picker}">
 				<div id="${campPath}" class="input-group colorpicker-component">
-					<form:input value="${campValue}" path="${campPath}" cssClass="form-control ${generalClass}" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}" />
+					<form:input maxlength="${inputMaxLength}" value="${campValue}" path="${campPath}" cssClass="form-control ${generalClass}" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}"/>
 					<span class="input-group-addon"><i></i></span>
 					<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 					<c:if test="${info == true}">
@@ -71,7 +91,7 @@ $('input').change(function() {
 					<c:if test="${not empty inputMaxLength}">
 					<p class="info-length text-success">
 						<span class="glyphicon glyphicon-info-sign"></span>
-						<span class="inputCurrentLength">${inputLength}</span>
+						<span class="inputCurrentLength_${name}">${inputLength}</span>
 							<spring:message code="notificacio.form.camp.logitud"/>
 						<span> ${inputMaxLength}</span>
 					</p>
@@ -79,7 +99,7 @@ $('input').change(function() {
 				</div>
 			</c:when>
 			<c:otherwise>
-				<form:input value="${campValue}" path="${campPath}" cssClass="form-control ${generalClass}" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}"/>
+				<form:input maxlength="${inputMaxLength}" value="${campValue}" path="${campPath}" cssClass="form-control ${generalClass}" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}"/>
 				<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 				<c:if test="${info == true}">
 					<p class="comentari col-xs-12 col-xs-offset-">${campInfoText}</p>
@@ -87,23 +107,22 @@ $('input').change(function() {
 				<c:if test="${not empty inputMaxLength}">
 					<p class="info-length text-success">
 						<span class="glyphicon glyphicon-info-sign"></span>
-						<span class="inputCurrentLength">${inputLength}</span>
+						<span class="inputCurrentLength_${name}">${inputLength}</span>
 							<spring:message code="notificacio.form.camp.logitud"/>
 						<span> ${inputMaxLength}</span>
 					</p>
 				</c:if>
 			</c:otherwise>
 		</c:choose>
-			
 		</div>
 	</c:when>
 	<c:otherwise>
    		<label class="sr-only" for="${campPath}">${campLabelText}</label>
-   		<form:input value="${campValue}" path="${campPath}" cssClass="form-control" id="${campPath}" placeholder="${campPlaceholder}" disabled="${disabled}" readonly="${myReadonly}"/>
+   		<form:input maxlength="${inputMaxLength}" value="${campValue}" path="${campPath}" cssClass="form-control" id="${campPath}" placeholder="${campPlaceholder}" disabled="${disabled}" readonly="${myReadonly}"/>
 		<c:if test="${not empty inputMaxLength}">
 			<p class="info-length text-success">
 				<span class="glyphicon glyphicon-info-sign"></span>
-				<span class="inputCurrentLength">${inputLength}</span>
+				<span class="inputCurrentLength_${name}">${inputLength}</span>
 					<spring:message code="notificacio.form.camp.logitud"/>
 				<span> ${inputMaxLength}</span>
 			</p>
