@@ -73,7 +73,7 @@ public class EntitatHelper {
 		} else if (canviRol != null && canviRol.length() > 0) {
 			List<EntitatDto> entitats = findEntitatsAccessibles(request, aplicacioService, entitatService);
 			EntitatDto entitatActual = getEntitatActual(request);
-			if (!entitats.contains(entitatActual)) {
+			if (!entitats.isEmpty() && !entitats.contains(entitatActual)) {
 				canviEntitatActual(request, aplicacioService, entitats.get(0));
 			}
 		}
