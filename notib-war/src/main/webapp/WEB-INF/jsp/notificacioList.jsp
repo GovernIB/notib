@@ -490,7 +490,7 @@ $(document).ready(function() {
 		data-toggle="datatable"
 		data-url="<c:url value="/notificacio/datatable"/>"
 		data-search-enabled="false"
-		data-default-order="8"
+		data-default-order="7"
 		data-default-dir="desc"
 		class="table table-striped table-bordered"
 		style="width:100%"
@@ -503,7 +503,6 @@ $(document).ready(function() {
 				<th data-col-name="id" data-visible="false">#</th>
 				<th data-col-name="tipusUsuari" data-visible="false">#</th>
 				<th data-col-name="errorLastCallback" data-visible="false">#</th>
-				<th data-col-name="hasEnviamentsPendents" data-visible="false">#</th>
 				<th data-col-name="hasEnviamentsPendentsRegistre" data-visible="false">#</th>
 				<th data-col-name="notificaError" data-visible="false"></th>
 				<th data-col-name="notificaErrorDescripcio" data-visible="false"></th>
@@ -576,9 +575,6 @@ $(document).ready(function() {
 								<li><a href="<c:url value="/notificacio/{{:id}}/info"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="comu.boto.detalls"/></a></li>
 							{{if permisProcessar }}
 								<li><a href="<c:url value="/notificacio/{{:id}}/processar"/>" data-toggle="modal"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a></li>
-							{{/if}}
-							{{if !hasEnviamentsPendents }}
-								<li><a href="<c:url value="/notificacio/{{:id}}/justificant"/>" data-toggle="modal" data-height="250px"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.justificant"/></a></li>
 							{{/if}}
 							{^{if ~hlpIsUsuari() && hasEnviamentsPendentsRegistre }}
 								<li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>

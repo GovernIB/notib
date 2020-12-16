@@ -331,14 +331,14 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 	
 	@RolesAllowed({"tothom"})
-	public FitxerDto recuperarJustificant(Long notificacioId, Long entitatId) throws JustificantException {
-		return delegate.recuperarJustificant(notificacioId, entitatId);
+	public FitxerDto recuperarJustificant(Long notificacioId, Long entitatId, String sequence) throws JustificantException {
+		return delegate.recuperarJustificant(notificacioId, entitatId, sequence);
 	}
 
 	@Override
 	@RolesAllowed({"tothom"})
-	public ProgresDescarregaDto justificantEstat() throws JustificantException {
-		return delegate.justificantEstat();
+	public ProgresDescarregaDto justificantEstat(String sequence) throws JustificantException {
+		return delegate.justificantEstat(sequence);
 	}
 
 	@Override

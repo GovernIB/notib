@@ -2048,7 +2048,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public FitxerDto recuperarJustificant(
 			Long notificacioId,
-			Long entitatId) throws JustificantException {
+			Long entitatId,
+			String sequence) throws JustificantException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
@@ -2064,7 +2065,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					true, 
 					false);
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			ProgresDescarregaDto progres = progresDescarrega.get(auth.getName());
+			ProgresDescarregaDto progres = progresDescarrega.get(auth.getName() + "_" + sequence);
 			
 			if (progres != null && progres.getProgres() != 0) {
 				logger.error("Ja existeix un altre procés iniciat"); 
@@ -2073,7 +2074,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			} else {
 				//## Únic procés per usuari per evitar sobrecàrrega
 				progres = new ProgresDescarregaDto();
-				progresDescarrega.put(auth.getName(), progres);
+				progresDescarrega.put(auth.getName() + "_" + sequence, progres);
 				
 				//## GENERAR JUSTIFICANT
 				logger.debug("Recuperant el justificant de la notificacio (notificacioId=" + notificacioId + ")");
@@ -2122,11 +2123,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	@Override
-	public ProgresDescarregaDto justificantEstat() throws JustificantException {
+	public ProgresDescarregaDto justificantEstat(String sequence) throws JustificantException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			ProgresDescarregaDto progres = progresDescarrega.get(auth.getName());
+			ProgresDescarregaDto progres = progresDescarrega.get(auth.getName() + "_" + sequence);
 			if (progres != null && progres.getProgres() != null &&  progres.getProgres() >= 100) {
 				progresDescarrega.remove(auth.getName());
 			}

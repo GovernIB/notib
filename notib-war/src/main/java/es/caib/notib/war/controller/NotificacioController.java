@@ -941,9 +941,11 @@ public class NotificacioController extends BaseUserController {
             HttpServletResponse response,
             @PathVariable Long notificacioId) throws IOException {
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        String sequence = request.getParameter("sequence");
         FitxerDto justificant = notificacioService.recuperarJustificant(
                 notificacioId,
-                entitatActual.getId());
+                entitatActual.getId(),
+                sequence);
         if (justificant == null) {
             throw new ValidationException("Existeix un altre procés iniciat. Esperau que finalitzi la descàrrega del document.");
         }
@@ -951,13 +953,14 @@ public class NotificacioController extends BaseUserController {
         writeFileToResponse(justificant.getNom(), justificant.getContingut(), response);
     }
 
-    @RequestMapping(value = "/{notificacioId}/justificant/estat", method = RequestMethod.GET)
+    @RequestMapping(value = "/{notificacioId}/justificant/estat/{sequence}", method = RequestMethod.GET)
     @ResponseBody
     public ProgresDescarregaDto justificantEstat(
             HttpServletRequest request,
             HttpServletResponse response,
-            @PathVariable Long notificacioId) throws IOException {
-        return notificacioService.justificantEstat();
+            @PathVariable Long notificacioId,
+            @PathVariable String sequence) throws IOException {
+        return notificacioService.justificantEstat(sequence);
     }
 
     @RequestMapping(value = "/{notificacioId}/refrescarEstatClient", method = RequestMethod.GET)

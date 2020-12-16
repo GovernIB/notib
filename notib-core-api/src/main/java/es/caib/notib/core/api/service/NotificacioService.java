@@ -360,7 +360,7 @@ public interface NotificacioService {
 	 * @throws JustificantException
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public FitxerDto recuperarJustificant(Long notificacioId, Long entitatId) throws JustificantException;
+	public FitxerDto recuperarJustificant(Long notificacioId, Long entitatId, String sequence) throws JustificantException;
 
 	/**
 	 * Recuperar l'estat de la generació del justificant
@@ -369,7 +369,7 @@ public interface NotificacioService {
 	 * @throws JustificantException
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public ProgresDescarregaDto justificantEstat() throws JustificantException;
+	public ProgresDescarregaDto justificantEstat(String sequence) throws JustificantException;
 
 	/**
 	 * Consulta les administracions disponibles dins DIR3 a partir del codi.
