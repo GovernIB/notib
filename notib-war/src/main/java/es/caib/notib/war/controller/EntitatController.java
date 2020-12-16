@@ -35,7 +35,6 @@ import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.EntitatService;
-import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.war.command.EntitatCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
@@ -54,8 +53,6 @@ public class EntitatController extends BaseController {
 		
 	@Autowired
 	private EntitatService entitatService;
-	@Autowired
-	private CacheHelper cacheHelper;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get( 
@@ -270,14 +267,14 @@ public class EntitatController extends BaseController {
 		return locale;
 	}
 	
-	@RequestMapping(value = "/organigrama/{entitatId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/organigrama/{entitatCodi}", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, OrganismeDto> getOrganigrama(
-			@PathVariable String entitatId,
+			@PathVariable String entitatCodi,
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		
-		return cacheHelper.findOrganigramaByEntitat(entitatId);
+		return entitatService.findOrganigramaByEntitat(entitatCodi);
 		
 	}
 	
