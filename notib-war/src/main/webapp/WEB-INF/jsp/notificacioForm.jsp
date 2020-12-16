@@ -339,7 +339,12 @@ $(document).ready(function() {
     					if (procedimentsOrgan.length > 0) {
     						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
     							$.each(procedimentsOrgan, function(index, val) {
-    								selProcediments.append("<option value=\"" + val.id + "\"" + (isOnlyOneProcedimentOrgan ? " selected" : "") + ">" + val.codi +' - '+ val.nom + "</option>");
+    								if (isOnlyOneProcedimentOrgan) {
+    									selProcediments.append("<option value='" + val.id + "' selected>" + val.codi +' - '+ val.nom + "</option>");
+    									$("#organGestor").val(val.organGestor).trigger("change.select2");
+    								} else {
+    									selProcediments.append("<option value='" + val.id + "'>" + val.codi +' - '+ val.nom + "</option>");
+    								}
     							});
     						selProcediments.append("</optgroup>");
     						selProcediments.trigger('change.select2');
