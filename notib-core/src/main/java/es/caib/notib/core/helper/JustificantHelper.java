@@ -122,7 +122,7 @@ public class JustificantHelper {
 					new Object[] {
 							messageHelper.getMessage("es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto." + notificacio.getEnviamentTipus().name()),
 							notificacio.getConcepte(),
-							getDateTimeFormatted(notificacio.getNotificaEnviamentData())});
+							getDateTimeFormatted(notificacio.getNotificaEnviamentNotificaData() != null ? notificacio.getNotificaEnviamentNotificaData() : notificacio.getNotificaEnviamentData())});
 			Paragraph justificantIntroduccio = new Paragraph();
 			setParametersBold(justificantIntroduccio, introduccio);
 			justificantIntroduccio.add(Chunk.NEWLINE);
@@ -593,7 +593,7 @@ public class JustificantHelper {
 	}
 	
 	private String getDateTimeFormatted(Date date)  {
-		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		long now = date.getTime();
 		return formatter.format(now);
 	}

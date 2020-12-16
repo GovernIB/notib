@@ -99,6 +99,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date notificaEnviamentData;
 	
+	@Column(name = "not_env_data_notifica")
+	@Temporal(TemporalType.TIMESTAMP)
+	protected Date notificaEnviamentNotificaData;
+	
 	@Column(name = "not_env_intent")
 	protected int notificaEnviamentIntent;
 	
@@ -260,6 +264,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		Calendar cal = GregorianCalendar.getInstance();
 		cal.add(Calendar.MILLISECOND, reintentsPeriodeNotifica*(2^notificaEnviamentIntent));
 		this.notificaEnviamentData = cal.getTime();
+	}
+	
+	public void updateNotificaEnviamentData() {
+		this.notificaEnviamentNotificaData = new Date();
 	}
 	
 	public void updateRegistreNouEnviament(int reintentsPeriodeRegistre) {
