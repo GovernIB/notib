@@ -1442,6 +1442,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						ProcedimentOrganEntity.class);
 				if (permisosProcOrgan != null && !permisosProcOrgan.isEmpty()) {
 					String organ = procedimentOrgan.getOrganGestor().getCodi();
+					String organNom = procedimentOrgan.getOrganGestor().getNom();
 					boolean tePermis = true;
 
 					if (organGestor != null)
@@ -1450,6 +1451,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					if (tePermis) {
 						for (PermisDto permis : permisosProcOrgan) {
 							permis.setOrgan(organ);
+							permis.setOrganNom(organNom);
 							permis.setPermetEdicio(tePermis);
 						}
 						permisos.addAll(permisosProcOrgan);
@@ -1470,6 +1472,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				ProcedimentOrganEntity.class);
 		for (PermisDto permis: permisos) {
 			permis.setOrgan(organ);
+			permis.setOrganNom(procedimentOrgan.getOrganGestor().getNom());
 		}
 		return permisos;
 	}
