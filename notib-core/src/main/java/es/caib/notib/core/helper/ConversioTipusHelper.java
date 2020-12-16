@@ -17,6 +17,7 @@ import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorCieFormatFullaDto;
@@ -169,7 +170,10 @@ public class ConversioTipusHelper {
 			field("descripcio", "valor").
 			byDefault().
 			register();
-
+		mapperFactory.classMap(NotificacioEnviamentEntity.class, NotificacioEnviamentDtoV2.class).
+		field("notificacio.id", "notificacioId").
+		byDefault().
+		register();
 	
 	}
 
