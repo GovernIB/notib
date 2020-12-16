@@ -209,7 +209,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 					+ "&conOficinas=" + (ambOficines != null && ambOficines ? "true" : "false")
 					+ "&unidadRaiz=" + (esUnitatArrel != null && esUnitatArrel ? "true" : "false")
 					+ "&provincia="+ (provincia != null ? provincia : "-1")
-					+ "&localidad=" + (municipi != null ? municipi : "-1")
+					+ "&localidad=" + ((municipi != null && !municipi.isEmpty() )  ? municipi : "-1")
 					+ "&vigentes=true");
 			logger.debug("URL: " + url);
 			HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();

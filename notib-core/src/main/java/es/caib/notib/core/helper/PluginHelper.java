@@ -1053,7 +1053,15 @@ public class PluginHelper {
 	}
 	
 	
-	public List<OrganGestorDto> unitatsPerCodi(String codi) throws SistemaExternException {
+	public List<OrganGestorDto> cercaUnitats(
+			String codi, 
+			String denominacio,
+			Long nivellAdministracio, 
+			Long comunitatAutonoma, 
+			Boolean ambOficines, 
+			Boolean esUnitatArrel,
+			Long provincia, 
+			String municipi) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_UNITATS, 
@@ -1064,7 +1072,7 @@ public class PluginHelper {
 		List<NodeDir3> organismesNodeDir3 = null;
 		List<OrganGestorDto> organismes = null;
 		try {
-			organismesNodeDir3 = getUnitatsOrganitzativesPlugin().cercaUnitats(codi, null, null, null, null, null, null, null);
+			organismesNodeDir3 = getUnitatsOrganitzativesPlugin().cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
 			organismes = conversioTipusHelper.convertirList(organismesNodeDir3, OrganGestorDto.class);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
@@ -1078,6 +1086,12 @@ public class PluginHelper {
 	
 		return organismes;
 	}
+	
+	
+	public List<OrganGestorDto> unitatsPerCodi(String codi) throws SistemaExternException {
+		return cercaUnitats(codi,null,null,null,null,null,null,null);
+	}
+	
 	
 	public List<OrganGestorDto> unitatsPerDenominacio(String denominacio) throws SistemaExternException {
 		
@@ -1104,6 +1118,54 @@ public class PluginHelper {
 	
 		return organismes;
 	}
+	
+	
+	public List<CodiValor> llistarNivellsAdministracions() throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenint llista dels nivells de les administracions", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT);
+		
+		List<CodiValor> nivellsAdministracio = null;
+		try {
+			nivellsAdministracio = getUnitatsOrganitzativesPlugin().nivellsAdministracio();
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistar els nivells de les administracions";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+		
+		return nivellsAdministracio;
+	}
+	
+	public List<CodiValor> llistarComunitatsAutonomes() throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenint llista les comunitats autònomes", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT);
+		
+		List<CodiValor> comunitatsAutonomes = null;
+		try {
+			comunitatsAutonomes = getUnitatsOrganitzativesPlugin().comunitatsAutonomes();
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistar les comunitats autònomes";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+		
+		return comunitatsAutonomes;
+	}
+
 	
 
 	public List<CodiValorPais> llistarPaisos() throws SistemaExternException {
@@ -1139,6 +1201,29 @@ public class PluginHelper {
 		List<CodiValor> provincies = null;
 		try {
 			provincies = getUnitatsOrganitzativesPlugin().provincies();
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistat províncies";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+		
+		return provincies;
+	}
+	
+	public List<CodiValor> llistarProvincies(String codiCA) throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenint llista de províncies", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT);
+		
+		List<CodiValor> provincies = null;
+		try {
+			provincies = getUnitatsOrganitzativesPlugin().provincies(codiCA);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistat províncies";

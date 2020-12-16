@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.LocalitatsDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
@@ -348,6 +349,14 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio,
+			Long comunitatAutonoma, Boolean ambOficines, Boolean esUnitatArrel, Long provincia, String municipi) {
+		return delegate.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
+	}
+	
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public List<OrganGestorDto> unitatsPerCodi(String codi) {
 		return delegate.unitatsPerCodi(codi);
 	}
@@ -358,5 +367,25 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.unitatsPerDenominacio(denominacio);
 
 	}
+
+	@Override
+	@RolesAllowed({"tothom"})
+	public List<CodiValorDto> llistarNivellsAdministracions() {
+		return delegate.llistarNivellsAdministracions();
+	}
+
+	@Override
+	@RolesAllowed({"tothom"})
+	public List<CodiValorDto> llistarComunitatsAutonomes() {
+		return delegate.llistarComunitatsAutonomes();
+	}
+
+	@Override
+	@RolesAllowed({"tothom"})
+	public List<ProvinciesDto> llistarProvincies(String codiCA) {
+		return delegate.llistarProvincies(codiCA);
+	}
+
+
 
 }

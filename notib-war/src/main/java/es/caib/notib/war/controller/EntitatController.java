@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,10 +30,12 @@ import es.caib.notib.core.api.dto.CodiValorDescDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.war.command.EntitatCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
@@ -51,6 +54,8 @@ public class EntitatController extends BaseController {
 		
 	@Autowired
 	private EntitatService entitatService;
+	@Autowired
+	private CacheHelper cacheHelper;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get( 
@@ -264,6 +269,18 @@ public class EntitatController extends BaseController {
 		}
 		return locale;
 	}
+	
+	@RequestMapping(value = "/organigrama/{entitatId}", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, OrganismeDto> getOrganigrama(
+			@PathVariable String entitatId,
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		
+		return cacheHelper.findOrganigramaByEntitat(entitatId);
+		
+	}
+	
 
 	private static final Logger logger = LoggerFactory.getLogger(EntitatController.class);
 }

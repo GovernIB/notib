@@ -36,9 +36,11 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.GrupDto;
@@ -302,6 +304,23 @@ public class NotificacioController extends BaseUserController {
 		}
 		return procediments;
 	}
+	
+	
+	@RequestMapping(value = "/cercaUnitats", method = RequestMethod.GET)
+	@ResponseBody
+	public List<OrganGestorDto> getAdministracions(
+			HttpServletRequest request, 
+			@RequestParam(value = "codi", required = false) String codi,
+			@RequestParam(value = "denominacio", required = false) String denominacio,
+			@RequestParam(value = "nivellAdministracio", required = false) Long nivellAdministracio,
+			@RequestParam(value = "comunitatAutonoma", required = false) Long comunitatAutonoma,
+			@RequestParam(value = "provincia", required = false) Long provincia,
+			@RequestParam(value = "municipi", required = false) String municipi,
+			Model model) {
+		return notificacioService.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, null, null, provincia, municipi);
+	
+	}
+	
 	
 	@RequestMapping(value = "/administracions/codi/{codi}", method = RequestMethod.GET)
 	@ResponseBody
@@ -1026,6 +1045,23 @@ public class NotificacioController extends BaseUserController {
 		return procedimentsOrgan;
 	}
 	
+	@RequestMapping(value = "/nivellsAdministracions", method = RequestMethod.GET)
+	@ResponseBody
+	private List<CodiValorDto> getNivellsAdministracions(
+		HttpServletRequest request,
+		Model model) {		
+		return notificacioService.llistarNivellsAdministracions();
+	}
+	
+	
+	@RequestMapping(value = "/comunitatsAutonomes", method = RequestMethod.GET)
+	@ResponseBody
+	private List<CodiValorDto> getComunitatsAutonomess(
+		HttpServletRequest request,
+		Model model) {		
+		return notificacioService.llistarComunitatsAutonomes();
+	}
+	
 	
 	@RequestMapping(value = "/paisos", method = RequestMethod.GET)
 	@ResponseBody
@@ -1041,6 +1077,15 @@ public class NotificacioController extends BaseUserController {
 		HttpServletRequest request,
 		Model model) {		
 		return notificacioService.llistarProvincies();
+	}
+	
+	@RequestMapping(value = "/provincies/{codiCA}", method = RequestMethod.GET)
+	@ResponseBody
+	private List<ProvinciesDto> getProvinciesPerCA(
+		HttpServletRequest request,
+		Model model,
+		@PathVariable String codiCA) {		
+		return notificacioService.llistarProvincies(codiCA);
 	}
 	
 	@RequestMapping(value = "/localitats/{provinciaId}", method = RequestMethod.GET)
@@ -1341,6 +1386,7 @@ public class NotificacioController extends BaseUserController {
 		model.addAttribute("ambEntregaDeh", entitatActual.isAmbEntregaDeh());
 		model.addAttribute("ambEntregaCie", entitatActual.isAmbEntregaCie());
 		model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
+		model.addAttribute("dir3Codi", entitatActual.getId());
 		//model.addAttribute("procediments", procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO));
 		//model.addAttribute("organsGestors", organGestorService.findOrganismes(entitatActual));
 		List<ProcedimentDto> procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(

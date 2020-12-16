@@ -35,6 +35,7 @@ import com.codahale.metrics.Timer;
 
 import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
@@ -1266,12 +1267,87 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Override
 	@Transactional(readOnly = true)
+	public List<CodiValorDto> llistarNivellsAdministracions() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<CodiValor> codiValor = new ArrayList<CodiValor>();
+			try {
+				codiValor = cacheHelper.llistarNivellsAdministracions();
+			} catch (Exception ex) {
+				logger.error(
+						"Error recuperant els nivells d'administració de DIR3CAIB: " + ex);
+			}
+			return conversioTipusHelper.convertirList(codiValor, CodiValorDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<CodiValorDto> llistarComunitatsAutonomes() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<CodiValor> codiValor = new ArrayList<CodiValor>();
+			try {
+				codiValor = cacheHelper.llistarComunitatsAutonomes();
+			} catch (Exception ex) {
+				logger.error(
+						"Error recuperant les comunitats autònomes de DIR3CAIB: " + ex);
+			}
+			return conversioTipusHelper.convertirList(codiValor, CodiValorDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	
+	
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<PaisosDto> llistarPaisos() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<CodiValorPais> codiValorPais = new ArrayList<CodiValorPais>();
+			try {
+				codiValorPais = pluginHelper.llistarPaisos();
+			} catch (Exception ex) {
+				logger.error(
+						"Error recuperant els paisos de DIR3CAIB: " + ex);
+			}
+			return conversioTipusHelper.convertirList(codiValorPais, PaisosDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
 	public List<ProvinciesDto> llistarProvincies() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			List<CodiValor> codiValor = new ArrayList<CodiValor>();
 			try {
 				codiValor = pluginHelper.llistarProvincies();
+			} catch (Exception ex) {
+				logger.error(
+						"Error recuperant les provincies de DIR3CAIB: " + ex);
+			}
+			return conversioTipusHelper.convertirList(codiValor, ProvinciesDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<ProvinciesDto> llistarProvincies(String codiCA) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<CodiValor> codiValor = new ArrayList<CodiValor>();
+			try {
+				codiValor = cacheHelper.llistarProvincies(codiCA);
 			} catch (Exception ex) {
 				logger.error(
 						"Error recuperant les provincies de DIR3CAIB: " + ex);
@@ -1289,7 +1365,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			List<CodiValor> codiValor = new ArrayList<CodiValor>();
 			try {
-				codiValor = pluginHelper.llistarLocalitats(codiProvincia);
+				codiValor = cacheHelper.llistarLocalitats(codiProvincia);
 			} catch (Exception ex) {
 				logger.error(
 						"Error recuperant les provincies de DIR3CAIB: " + ex);
@@ -1299,20 +1375,23 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<PaisosDto> llistarPaisos() {
+	public List<OrganGestorDto> cercaUnitats(
+			String codi, 
+			String denominacio,
+			Long nivellAdministracio, 
+			Long comunitatAutonoma, 
+			Boolean ambOficines, 
+			Boolean esUnitatArrel,
+			Long provincia, 
+			String municipi) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			List<CodiValorPais> codiValorPais = new ArrayList<CodiValorPais>();
-			try {
-				codiValorPais = pluginHelper.llistarPaisos();
-			} catch (Exception ex) {
-				logger.error(
-						"Error recuperant els paisos de DIR3CAIB: " + ex);
-			}
-			return conversioTipusHelper.convertirList(codiValorPais, PaisosDto.class);
+			return pluginHelper.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
+			
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
