@@ -44,6 +44,7 @@ pageContext.setAttribute(
 			<tr>
 				<th data-col-name="tipus" data-renderer="enum(TipusEnumDto)"><spring:message code="procediment.permis.columna.tipus"/></th>
 				<th data-col-name="nomSencerAmbCodi"><spring:message code="procediment.permis.columna.principal"/></th>
+				<th data-col-name="organ" data-visible="false">#</th>
 				<th data-col-name="organCodiNom"><spring:message code="procediment.permis.columna.organ"/></th>
 				<th data-col-name="read" data-template="#cellPermisReadTemplate">
 					<spring:message code="procediment.permis.columna.consulta"/>
@@ -81,7 +82,7 @@ pageContext.setAttribute(
 								<li><a href="../../procediment/${procediment.id}/organ/{{:organ}}/permis/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="procediment.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 								{{else}}
 								<li><a href="../../procediment/${procediment.id}/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								<li><a href="../../procediment/${procediment.id}/permis/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="procediment.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								<li><a href="../../procediment/${procediment.id}/permis/{{:id}}/{{:organ}}/delete" data-toggle="ajax" data-confirm="<spring:message code="procediment.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 								{{/if}}
 							</ul>
 						</div>
