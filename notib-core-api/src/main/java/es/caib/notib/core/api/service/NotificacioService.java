@@ -65,7 +65,7 @@ public interface NotificacioService {
 	 * @throws NotFoundException
 	 *              Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
 	public void delete(
 			Long entitatId,
 			Long notificacioId) throws NotFoundException;
@@ -85,10 +85,11 @@ public interface NotificacioService {
 	 * @throws RegistreNotificaException
 	 * 				Si hi ha hagut un error en el procés de registra/notificar
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
 	public List<NotificacioDto> update(
 			Long entitatId,
-			NotificacioDtoV2 notificacio) throws NotFoundException, RegistreNotificaException;
+			NotificacioDtoV2 notificacio,
+			boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException;
 	
 	/**
 	 * Consulta una notificació donat el seu id.
@@ -359,8 +360,8 @@ public interface NotificacioService {
 	 * @return el justificant firmat
 	 * @throws JustificantException
 	 */
-	@PreAuthorize("hasRole('tothom')")
-	public FitxerDto recuperarJustificant(Long notificacioId, Long entitatId) throws JustificantException;
+	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
+	public FitxerDto recuperarJustificant(Long notificacioId, Long entitatId, String sequence) throws JustificantException;
 
 	/**
 	 * Recuperar l'estat de la generació del justificant
@@ -368,8 +369,8 @@ public interface NotificacioService {
 	 * @return el justificant firmat
 	 * @throws JustificantException
 	 */
-	@PreAuthorize("hasRole('tothom')")
-	public ProgresDescarregaDto justificantEstat() throws JustificantException;
+	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
+	public ProgresDescarregaDto justificantEstat(String sequence) throws JustificantException;
 
 	/**
 	 * Consulta les administracions disponibles dins DIR3 a partir del codi.

@@ -22,6 +22,7 @@ public class PermisDto implements Serializable {
 	private Long id;
 	private String principal;
 	private String organ;
+	private String organNom;
 	private String nomSencerAmbCodi;
 	private TipusEnumDto tipus;
 	private boolean read;
@@ -41,6 +42,13 @@ public class PermisDto implements Serializable {
 	// Booleà per a indicar si en cas de procediment comú, 
 	// l'usuari administrador d'òrgan pot editar el permís
 	private boolean permetEdicio;
+	
+	public String getOrganCodiNom() {
+		if (organ != null && organNom != null)
+			return organ + " - " + organNom;
+
+		return organ;
+	}
 
 	public void revocaPermisos() {
 		this.read = false;

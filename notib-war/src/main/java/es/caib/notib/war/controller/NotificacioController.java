@@ -430,7 +430,8 @@ public class NotificacioController extends BaseUserController {
             if (notificacioCommand.getId() != null) {
                 notificacioService.update(
                         entitatActual.getId(),
-                        NotificacioCommandV2.asDto(notificacioCommand));
+                        NotificacioCommandV2.asDto(notificacioCommand),
+                        RolHelper.isUsuariActualAdministradorEntitat(request));
             } else {
                 notificacioService.create(
                         entitatActual.getId(),
@@ -941,9 +942,11 @@ public class NotificacioController extends BaseUserController {
             HttpServletResponse response,
             @PathVariable Long notificacioId) throws IOException {
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        String sequence = request.getParameter("sequence");
         FitxerDto justificant = notificacioService.recuperarJustificant(
                 notificacioId,
-                entitatActual.getId());
+                entitatActual.getId(),
+                sequence);
         if (justificant == null) {
             throw new ValidationException("Existeix un altre procés iniciat. Esperau que finalitzi la descàrrega del document.");
         }
@@ -951,13 +954,14 @@ public class NotificacioController extends BaseUserController {
         writeFileToResponse(justificant.getNom(), justificant.getContingut(), response);
     }
 
-    @RequestMapping(value = "/{notificacioId}/justificant/estat", method = RequestMethod.GET)
+    @RequestMapping(value = "/{notificacioId}/justificant/estat/{sequence}", method = RequestMethod.GET)
     @ResponseBody
     public ProgresDescarregaDto justificantEstat(
             HttpServletRequest request,
             HttpServletResponse response,
-            @PathVariable Long notificacioId) throws IOException {
-        return notificacioService.justificantEstat();
+            @PathVariable Long notificacioId,
+            @PathVariable String sequence) throws IOException {
+        return notificacioService.justificantEstat(sequence);
     }
 
     @RequestMapping(value = "/{notificacioId}/refrescarEstatClient", method = RequestMethod.GET)
@@ -1050,37 +1054,51 @@ public class NotificacioController extends BaseUserController {
             @PathVariable String organId) {
 
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        UsuariDto usuariActual = aplicacioService.getUsuariActual();
-        List<ProcedimentDto> procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-
+        List<ProcedimentOrganDto> procedimentsOrgansDisponibles = new ArrayList<ProcedimentOrganDto>(); 
         List<ProcedimentDto> procedimentsOrgan = new ArrayList<ProcedimentDto>();
-        if (procedimentsDisponibles != null) {
-            for (ProcedimentDto proc : procedimentsDisponibles) {
-                // Si no s'ha seleccionat cap òrgan enviaran '-'
-                if (proc.isComu() || organId.equals("-") || organId.equalsIgnoreCase(proc.getOrganGestor())) {
-                    procedimentsOrgan.add(proc);
-                }
-            }
-        }
-
-        // Procediments-Òrgan (Comuns)
-        List<ProcedimentOrganDto> procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-        if (!procedimentsOrgansDisponibles.isEmpty()) {
-            if (organId.equals("-")) {
-            } else {
-                procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermisByOrgan(organId, entitatActual.getDir3Codi(), procedimentsOrgansDisponibles);
-            }
-            for (ProcedimentOrganDto procedimentOrgan : procedimentsOrgansDisponibles) {
-                if (!procedimentsOrgan.contains(procedimentOrgan.getProcediment())) {
-                    procedimentsOrgan.add(procedimentOrgan.getProcediment());
-                }
-            }
-            Collections.sort(procedimentsOrgan, new Comparator<ProcedimentDto>() {
-                @Override
-                public int compare(ProcedimentDto p1, ProcedimentDto p2) {
-                    return p1.getNom().compareTo(p2.getNom());
-                }
-            });
+        if(!RolHelper.isUsuariActualAdministradorEntitat(request)) {
+        	UsuariDto usuariActual = aplicacioService.getUsuariActual();
+	        List<ProcedimentDto> procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
+	
+	        if (procedimentsDisponibles != null) {
+	            for (ProcedimentDto proc : procedimentsDisponibles) {
+	                // Si no s'ha seleccionat cap òrgan enviaran '-'
+	                if (proc.isComu() || organId.equals("-") || organId.equalsIgnoreCase(proc.getOrganGestor())) {
+	                    procedimentsOrgan.add(proc);
+	                }
+	            }
+	        }
+	
+	        // Procediments-Òrgan (Comuns)
+	        procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
+       
+	        if (!procedimentsOrgansDisponibles.isEmpty()) {
+	            if (organId.equals("-")) {
+	            } else {
+	                procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermisByOrgan(organId, entitatActual.getDir3Codi(), procedimentsOrgansDisponibles);
+	            }
+	            for (ProcedimentOrganDto procedimentOrgan : procedimentsOrgansDisponibles) {
+	                if (!procedimentsOrgan.contains(procedimentOrgan.getProcediment())) {
+	                    procedimentsOrgan.add(procedimentOrgan.getProcediment());
+	                }
+	            }
+	            Collections.sort(procedimentsOrgan, new Comparator<ProcedimentDto>() {
+	                @Override
+	                public int compare(ProcedimentDto p1, ProcedimentDto p2) {
+	                    return p1.getNom().compareTo(p2.getNom());
+	                }
+	            });
+	        }
+        } else {
+        	List<ProcedimentDto> procedimentsDisponibles = procedimentService.findByEntitat(entitatActual.getId());
+	        if (procedimentsDisponibles != null) {
+	            for (ProcedimentDto proc : procedimentsDisponibles) {
+	                // Si no s'ha seleccionat cap òrgan enviaran '-'
+	                if (proc.isComu() || organId.equals("-") || organId.equalsIgnoreCase(proc.getOrganGestor())) {
+	                    procedimentsOrgan.add(proc);
+	                }
+	            }
+	        }
         }
         return procedimentsOrgan;
     }
@@ -1239,26 +1257,33 @@ public class NotificacioController extends BaseUserController {
         model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
         model.addAttribute("entitat", entitatActual);
 
-        List<ProcedimentDto> procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(
-                entitatActual.getId(),
-                usuariActual.getCodi(),
-                PermisEnum.NOTIFICACIO);
-
-        List<ProcedimentOrganDto> procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(
-                entitatActual.getId(),
-                usuariActual.getCodi(),
-                PermisEnum.NOTIFICACIO);
-
-        procedimentsDisponibles = addProcedimentsOrgan(procedimentsDisponibles, procedimentsOrgansDisponibles);
-
-        if (procedimentsDisponibles.isEmpty()) {
-            MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
+        List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
+        List<OrganGestorDto> organsGestors = new ArrayList<OrganGestorDto>();
+        if (!RolHelper.isUsuariActualAdministradorEntitat(request)) {
+	        procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(
+	                entitatActual.getId(),
+	                usuariActual.getCodi(),
+	                PermisEnum.NOTIFICACIO);
+	
+	        List<ProcedimentOrganDto> procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(
+	                entitatActual.getId(),
+	                usuariActual.getCodi(),
+	                PermisEnum.NOTIFICACIO);
+	
+	        procedimentsDisponibles = addProcedimentsOrgan(procedimentsDisponibles, procedimentsOrgansDisponibles);
+	
+	        if (procedimentsDisponibles.isEmpty()) {
+	            MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
+	        }
+	
+	        organsGestors = recuperarOrgansPerProcedimentAmbPermis(
+	                entitatActual,
+	                procedimentsDisponibles,
+	                procedimentsOrgansDisponibles);
+        } else {
+        	procedimentsDisponibles = procedimentService.findByEntitat(entitatActual.getId());
+        	organsGestors = organGestorService.findByEntitat(entitatActual.getId());
         }
-
-        List<OrganGestorDto> organsGestors = recuperarOrgansPerProcedimentAmbPermis(
-                entitatActual,
-                procedimentsDisponibles,
-                procedimentsOrgansDisponibles);
         model.addAttribute("organsGestors", organsGestors);
         if (organsGestors == null || organsGestors.isEmpty()) {
             MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.organs"));
@@ -1407,26 +1432,33 @@ public class NotificacioController extends BaseUserController {
         model.addAttribute("dir3Codi", entitatActual.getId());
         //model.addAttribute("procediments", procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO));
         //model.addAttribute("organsGestors", organGestorService.findOrganismes(entitatActual));
-        List<ProcedimentDto> procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(
-                entitatActual.getId(),
-                usuariActual.getCodi(),
-                PermisEnum.NOTIFICACIO);
-        List<ProcedimentOrganDto> procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(
-                entitatActual.getId(),
-                usuariActual.getCodi(),
-                PermisEnum.NOTIFICACIO);
-        addProcedimentsOrgan(procedimentsDisponibles, procedimentsOrgansDisponibles);
-
+        List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
+        List<OrganGestorDto> organsGestors = new ArrayList<OrganGestorDto>();
+        if (!RolHelper.isUsuariActualAdministradorEntitat(request)) {
+	       	procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(
+	                entitatActual.getId(),
+	                usuariActual.getCodi(),
+	                PermisEnum.NOTIFICACIO);
+	        List<ProcedimentOrganDto> procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(
+	                entitatActual.getId(),
+	                usuariActual.getCodi(),
+	                PermisEnum.NOTIFICACIO);
+	        addProcedimentsOrgan(procedimentsDisponibles, procedimentsOrgansDisponibles);
+	
+	        organsGestors = recuperarOrgansPerProcedimentAmbPermis(
+	                entitatActual,
+	                procedimentsDisponibles,
+	                procedimentsOrgansDisponibles);
+        } else {
+        	procedimentsDisponibles = procedimentService.findByEntitat(entitatActual.getId());
+        	organsGestors = organGestorService.findByEntitat(entitatActual.getId());
+        }
         model.addAttribute("procediments", procedimentsDisponibles);
         if (procedimentsDisponibles.isEmpty()) {
             MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
         }
-        List<OrganGestorDto> organsGestors = recuperarOrgansPerProcedimentAmbPermis(
-                entitatActual,
-                procedimentsDisponibles,
-                procedimentsOrgansDisponibles);
         model.addAttribute("organsGestors", organsGestors);
-
+        
         if (procedimentActual != null)
             model.addAttribute("grups", grupService.findByProcedimentAndUsuariGrups(procedimentActual.getId()));
         model.addAttribute("comunicacioTipus",

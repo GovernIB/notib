@@ -486,13 +486,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public List<NotificacioDto> update(
 			Long entitatId,
-			NotificacioDtoV2 notificacio) throws NotFoundException, RegistreNotificaException {
+			NotificacioDtoV2 notificacio,
+			boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 					entitatId, 
 					false, 
-					false, 
+					true, 
 					true,
 					false);
 			NotificacioEntity notificacioEntity = notificacioRepository.findOne(notificacio.getId());
@@ -541,14 +542,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 					if (procediment.isComu() && organGestor != null) {
 						procedimentOrgan = procedimentOrganRepository.findByProcedimentIdAndOrganGestorId(procediment.getId(), organGestor.getId());
 					}
-					procediment = entityComprovarHelper.comprovarProcedimentOrgan(
-							entitat,
-						 	notificacio.getProcediment().getId(),
-						 	procedimentOrgan,
-						 	false,
-						 	false,
-						 	true,
-						 	false);
+					if (!isAdministradorEntitat) {
+						procediment = entityComprovarHelper.comprovarProcedimentOrgan(
+								entitat,
+							 	notificacio.getProcediment().getId(),
+							 	procedimentOrgan,
+							 	false,
+							 	false,
+							 	true,
+							 	false);
+					}
 				}
 	//			### Recupera grup notificació a partir del codi
 				if (notificacio.getGrup() != null && notificacio.getGrup().getId() != null) {
@@ -854,7 +857,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 							entityComprovarHelper.hasPermisProcediment(
 									notificacio.getProcediment().getId(),
 									PermisEnum.PROCESSAR));
-					}	
+					}
+				
+				List<NotificacioEnviamentEntity> enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
+				if (enviamentsPendentsNotifica != null && ! enviamentsPendentsNotifica.isEmpty()) {
+					notificacio.setHasEnviamentsPendents(true);
+				}
+				
 				logger.info("Consultant events notificació...");
 				List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
 				
@@ -1173,11 +1182,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 								notificacio.setErrorLastEvent(true);
 							}
 						}
-					}
-					
-					List<NotificacioEnviamentEntity> enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
-					if (enviamentsPendentsNotifica != null && ! enviamentsPendentsNotifica.isEmpty()) {
-						notificacio.setHasEnviamentsPendents(true);
 					}
 					
 					List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacio(notificacio);
@@ -2048,7 +2052,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public FitxerDto recuperarJustificant(
 			Long notificacioId,
-			Long entitatId) throws JustificantException {
+			Long entitatId,
+			String sequence) throws JustificantException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
@@ -2064,7 +2069,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					true, 
 					false);
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			ProgresDescarregaDto progres = progresDescarrega.get(auth.getName());
+			ProgresDescarregaDto progres = progresDescarrega.get(auth.getName() + "_" + sequence);
 			
 			if (progres != null && progres.getProgres() != 0) {
 				logger.error("Ja existeix un altre procés iniciat"); 
@@ -2073,7 +2078,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			} else {
 				//## Únic procés per usuari per evitar sobrecàrrega
 				progres = new ProgresDescarregaDto();
-				progresDescarrega.put(auth.getName(), progres);
+				progresDescarrega.put(auth.getName() + "_" + sequence, progres);
 				
 				//## GENERAR JUSTIFICANT
 				logger.debug("Recuperant el justificant de la notificacio (notificacioId=" + notificacioId + ")");
@@ -2122,11 +2127,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	@Override
-	public ProgresDescarregaDto justificantEstat() throws JustificantException {
+	public ProgresDescarregaDto justificantEstat(String sequence) throws JustificantException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			ProgresDescarregaDto progres = progresDescarrega.get(auth.getName());
+			ProgresDescarregaDto progres = progresDescarrega.get(auth.getName() + "_" + sequence);
 			if (progres != null && progres.getProgres() != null &&  progres.getProgres() >= 100) {
 				progresDescarrega.remove(auth.getName());
 			}

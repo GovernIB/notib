@@ -122,7 +122,7 @@ public class JustificantHelper {
 					new Object[] {
 							messageHelper.getMessage("es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto." + notificacio.getEnviamentTipus().name()),
 							notificacio.getConcepte(),
-							getDateTimeFormatted(notificacio.getNotificaEnviamentData())});
+							getDateTimeFormatted(notificacio.getNotificaEnviamentNotificaData() != null ? notificacio.getNotificaEnviamentNotificaData() : notificacio.getNotificaEnviamentData())});
 			Paragraph justificantIntroduccio = new Paragraph();
 			setParametersBold(justificantIntroduccio, introduccio);
 			justificantIntroduccio.add(Chunk.NEWLINE);
@@ -228,42 +228,46 @@ public class JustificantHelper {
 		dadesRegistre.setSpacingAfter(5f);
         dadesRegistre.add(dadesRegistreTable);
 //		######## FI DADES REGISTRE #########
+        Paragraph dadesNotificaTitol = null;
+        Paragraph dadesNotifica = null;
+        if (enviament.getNotificaIdentificador() != null) {
 //		######## INICI DADES NOTIFICA #########
-//      ## [DADES NOTIFICA]
-        String dadesNotificaMessage = messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.notifica");
-     	Paragraph dadesNotificaTitol = new Paragraph(dadesNotificaMessage, calibri10Bold);
-     	dadesNotificaTitol.setAlignment(Element.ALIGN_LEFT);
-     	
-//     	## [DADES NOTIFICA - CONTINGUT]
-     	Paragraph dadesNotifica = new Paragraph();
-     	PdfPTable dadesNotificaTable = new PdfPTable(2);
-     	dadesNotificaTable.setWidthPercentage(95f);
-     	dadesNotificaTable.setWidths(headingTablewidths);
-     	
-//     	## [DADES NOTIFICA - IDENTIFICADOR]
-     	String dadesNotificaIdentificador = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.notifica.identificador");
-     	Chunk dadesNotificaIdentTitleChunk = new Chunk(dadesNotificaIdentificador, calibri10);
-     	Chunk dadesNotificaIdentContentChunk = new Chunk(enviament.getNotificaIdentificador(), calibri10);
-		createNewTableContent(dadesNotificaTable, dadesNotificaIdentTitleChunk, dadesNotificaIdentContentChunk);
-     
-     	// ## [DADES NOTIFICA - EMISOR]
-     	String dadesNotificaEmisor = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.notifica.emisor");
-     	Chunk dadesNotificaEmisorTitleChunk = new Chunk(dadesNotificaEmisor, calibri10);
-     	Chunk dadesNotificaEmisorContentChunk = new Chunk("[" + notificacio.getOrganGestor() + "] " + notificacio.getOrganGestorNom(), calibri10);
-		createNewTableContent(dadesNotificaTable, dadesNotificaEmisorTitleChunk, dadesNotificaEmisorContentChunk);
-		
-     	// ## [DADES NOTIFICA - PROCEDIMENT]
-		if (notificacio.getProcediment() != null) {
-			String dadesNotificaProcediment = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.notifica.procediment");
-     		Chunk dadesNotificaProcedimentTitleChunk = new Chunk(dadesNotificaProcediment, calibri10);
-     		Chunk dadesNotificaProcedimentContentChunk = new Chunk("[" + notificacio.getProcediment().getCodi() + "] " + notificacio.getProcediment().getNom(), calibri10);
-     		createNewTableContent(dadesNotificaTable, dadesNotificaProcedimentTitleChunk, dadesNotificaProcedimentContentChunk);
-		}
-		
-     	dadesNotifica.setSpacingBefore(5f);
-     	dadesNotifica.setSpacingAfter(5f);
-        dadesNotifica.add(dadesNotificaTable);
+//      	## [DADES NOTIFICA]
+	        String dadesNotificaMessage = messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.notifica");
+	     	dadesNotificaTitol = new Paragraph(dadesNotificaMessage, calibri10Bold);
+	     	dadesNotificaTitol.setAlignment(Element.ALIGN_LEFT);
+	     	
+//	     	## [DADES NOTIFICA - CONTINGUT]
+	     	dadesNotifica = new Paragraph();
+	     	PdfPTable dadesNotificaTable = new PdfPTable(2);
+	     	dadesNotificaTable.setWidthPercentage(95f);
+	     	dadesNotificaTable.setWidths(headingTablewidths);
+	     	
+//	     	## [DADES NOTIFICA - IDENTIFICADOR]
+	     	String dadesNotificaIdentificador = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.notifica.identificador");
+	     	Chunk dadesNotificaIdentTitleChunk = new Chunk(dadesNotificaIdentificador, calibri10);
+	     	Chunk dadesNotificaIdentContentChunk = new Chunk(enviament.getNotificaIdentificador(), calibri10);
+			createNewTableContent(dadesNotificaTable, dadesNotificaIdentTitleChunk, dadesNotificaIdentContentChunk);
+	     
+//	     	## [DADES NOTIFICA - EMISOR]
+	     	String dadesNotificaEmisor = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.notifica.emisor");
+	     	Chunk dadesNotificaEmisorTitleChunk = new Chunk(dadesNotificaEmisor, calibri10);
+	     	Chunk dadesNotificaEmisorContentChunk = new Chunk("[" + notificacio.getOrganGestor() + "] " + notificacio.getOrganGestorNom(), calibri10);
+			createNewTableContent(dadesNotificaTable, dadesNotificaEmisorTitleChunk, dadesNotificaEmisorContentChunk);
+			
+//	     	## [DADES NOTIFICA - PROCEDIMENT]
+			if (notificacio.getProcediment() != null) {
+				String dadesNotificaProcediment = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.notifica.procediment");
+	     		Chunk dadesNotificaProcedimentTitleChunk = new Chunk(dadesNotificaProcediment, calibri10);
+	     		Chunk dadesNotificaProcedimentContentChunk = new Chunk("[" + notificacio.getProcediment().getCodi() + "] " + notificacio.getProcediment().getNom(), calibri10);
+	     		createNewTableContent(dadesNotificaTable, dadesNotificaProcedimentTitleChunk, dadesNotificaProcedimentContentChunk);
+			}
+			
+	     	dadesNotifica.setSpacingBefore(5f);
+	     	dadesNotifica.setSpacingAfter(5f);
+	        dadesNotifica.add(dadesNotificaTable);
 //		######## FI DADES NOTIFICA #########
+        }
 //		######## INICI DADES INTERESSATS #########
      	Paragraph dadesInteressatsTitol = new Paragraph(messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessats"), calibri10Bold);
      	dadesInteressatsTitol.setAlignment(Element.ALIGN_LEFT);
@@ -309,8 +313,10 @@ public class JustificantHelper {
         
      	contingutCell.addElement(dadesRegistreTitol);
      	contingutCell.addElement(dadesRegistre);
-     	contingutCell.addElement(dadesNotificaTitol);
-     	contingutCell.addElement(dadesNotifica);
+     	if (dadesNotificaTitol != null)
+     		contingutCell.addElement(dadesNotificaTitol);
+     	if (dadesNotifica != null)
+     		contingutCell.addElement(dadesNotifica);
      	contingutCell.addElement(dadesInteressatsTitol);
      	contingutCell.addElement(dadesInteressatsTitularTitol);
      	contingutCell.addElement(dadesTitular);
@@ -593,7 +599,7 @@ public class JustificantHelper {
 	}
 	
 	private String getDateTimeFormatted(Date date)  {
-		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		long now = date.getTime();
 		return formatter.format(now);
 	}
