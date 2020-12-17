@@ -54,7 +54,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private Date notificaEnviamentNotificaData;
 	
 	private boolean errorLastEvent;
-	
+	private boolean hasEnviamentsPendents;
 	
 	public boolean isNotificaError() {
 		return notificaErrorData != null;

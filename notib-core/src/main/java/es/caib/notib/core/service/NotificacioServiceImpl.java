@@ -854,7 +854,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 							entityComprovarHelper.hasPermisProcediment(
 									notificacio.getProcediment().getId(),
 									PermisEnum.PROCESSAR));
-					}	
+					}
+				
+				List<NotificacioEnviamentEntity> enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
+				if (enviamentsPendentsNotifica != null && ! enviamentsPendentsNotifica.isEmpty()) {
+					notificacio.setHasEnviamentsPendents(true);
+				}
+				
 				logger.info("Consultant events notificació...");
 				List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
 				
@@ -1173,11 +1179,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 								notificacio.setErrorLastEvent(true);
 							}
 						}
-					}
-					
-					List<NotificacioEnviamentEntity> enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
-					if (enviamentsPendentsNotifica != null && ! enviamentsPendentsNotifica.isEmpty()) {
-						notificacio.setHasEnviamentsPendents(true);
 					}
 					
 					List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacio(notificacio);
