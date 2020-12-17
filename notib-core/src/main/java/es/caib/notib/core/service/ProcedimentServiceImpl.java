@@ -1436,8 +1436,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		List<PermisDto> permisos = permisosHelper.findPermisos(
 				procediment.getId(),
 				ProcedimentEntity.class);
+		boolean isAdministradorOrganAndNoComuOrAdminEntitat = (adminOrgan && !procediment.isComu()) || !adminOrgan;
 		for (PermisDto permis: permisos)
-			permis.setPermetEdicio((adminOrgan && !procediment.isComu()) || !adminOrgan); //òrgan gestor i procediment no comú o NO òrgan gestor (administrador entitat)
+			permis.setPermetEdicio(isAdministradorOrganAndNoComuOrAdminEntitat);
 		return permisos;
 	}
 	
