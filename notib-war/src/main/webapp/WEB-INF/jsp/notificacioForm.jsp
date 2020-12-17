@@ -1353,12 +1353,13 @@ function loadOrgansGestors(){
 						var sir = $('#organigrama').val().indexOf(data[i].codi);
 						var clase = null;
 						var claseBoto = 'select btn btn-success';
-						var socSir = (sir!=-1?'<spring:message code="comu.si"/>':'<spring:message code="comu.no"/>');
+						var socSir = (sir!=-1?'<spring:message code="comu.no"/>':'<spring:message code="comu.si"/>');
 						
-						if(enviamentTipus == 'NOTIFICACIO' && sir!=-1 ){
-							clase = 'unselectable';
-							claseBoto = 'unselectable select btn btn-success';
-						}else if(enviamentTipus == 'COMUNICACIO' && sir==-1 ){
+// 						if(enviamentTipus == 'NOTIFICACIO' && sir!=-1 ){
+// 							clase = 'unselectable';
+// 							claseBoto = 'unselectable select btn btn-success';
+// 						}else if(enviamentTipus == 'COMUNICACIO' && sir==-1 ){
+						if(enviamentTipus == 'COMUNICACIO' && sir!=-1 ){
 							clase = 'unselectable';
 							claseBoto = 'unselectable select btn btn-success';
 						}else{
