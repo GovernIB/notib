@@ -297,11 +297,12 @@ public class JustificantHelper {
 	     	createNewTableContent(dadesTitularTable, dadesTitularLlintgTitleChunk, dadesTitularLlintgContentChunk);
      	}
      	
-     	String titularNifMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.titular.nif");
-     	Chunk dadesTitularNifTitleChunk = new Chunk(titularNifMessage, calibri10);
-     	Chunk dadesTitularNifContentChunk = new Chunk(titular.getNif(), calibri10);
-     	createNewTableContent(dadesTitularTable, dadesTitularNifTitleChunk, dadesTitularNifContentChunk);
-     	
+     	if (titular.getNif() != null) {
+	     	String titularNifMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.titular.nif");
+	     	Chunk dadesTitularNifTitleChunk = new Chunk(titularNifMessage, calibri10);
+	     	Chunk dadesTitularNifContentChunk = new Chunk(titular.getNif(), calibri10);
+	     	createNewTableContent(dadesTitularTable, dadesTitularNifTitleChunk, dadesTitularNifContentChunk);
+     	}
      	if (titular.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
 	     	String titularDir3Message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.titular.dir3");
 	     	Chunk dadesTitularDir3TitleChunk = new Chunk(titularDir3Message, calibri10);
@@ -348,11 +349,12 @@ public class JustificantHelper {
 	         	createNewTableContent(dadesDestinatariTable, dadesDestinatariLlintgTitleChunk, dadesDestinatariLlintgContentChunk);
          	}
          	
-         	String destinatariNifMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.destinatari.nif");
-         	Chunk dadesDestinatariNifTitleChunk = new Chunk(destinatariNifMessage, calibri10);
-         	Chunk dadesDestinatariNifContentChunk = new Chunk(destinatari.getNif(), calibri10);
-         	createNewTableContent(dadesDestinatariTable, dadesDestinatariNifTitleChunk, dadesDestinatariNifContentChunk);
-         	
+         	if (destinatari.getNif() != null) {
+	         	String destinatariNifMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.destinatari.nif");
+	         	Chunk dadesDestinatariNifTitleChunk = new Chunk(destinatariNifMessage, calibri10);
+	         	Chunk dadesDestinatariNifContentChunk = new Chunk(destinatari.getNif(), calibri10);
+	         	createNewTableContent(dadesDestinatariTable, dadesDestinatariNifTitleChunk, dadesDestinatariNifContentChunk);
+         	}
          	if (destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
 	         	String destinatariDir3Message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.destinatari.dir3");
 	         	Chunk dadesDestinatariDir3TitleChunk = new Chunk(destinatariDir3Message, calibri10);
