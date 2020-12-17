@@ -1394,16 +1394,16 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						false,
 						false,
 						false);
-			entityComprovarHelper.comprovarProcediment(
+			ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
 					entitat, 
 					procedimentId);
 			boolean adminOrgan = organActual != null;
 
 			if (tipus == null) {
-				permisos = findPermisProcediment(procedimentId, adminOrgan);
+				permisos = findPermisProcediment(procediment, adminOrgan);
 				permisos.addAll(findPermisProcedimentOrganByProcediment(procedimentId, organActual));
 			} else if (TipusPermis.PROCEDIMENT.equals(tipus)) {
-				permisos = findPermisProcediment(procedimentId, adminOrgan);
+				permisos = findPermisProcediment(procediment, adminOrgan);
 			} else {
 				if (organ == null)
 					permisos = findPermisProcedimentOrganByProcediment(procedimentId, organActual);
@@ -1431,13 +1431,13 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 
 	private List<PermisDto> findPermisProcediment(
-			Long procedimentId,
+			ProcedimentEntity procediment,
 			boolean adminOrgan) {
 		List<PermisDto> permisos = permisosHelper.findPermisos(
-				procedimentId,
+				procediment.getId(),
 				ProcedimentEntity.class);
 		for (PermisDto permis: permisos)
-			permis.setPermetEdicio(!adminOrgan);
+			permis.setPermetEdicio((adminOrgan && !procediment.isComu()) || !adminOrgan); //òrgan gestor i procediment no comú o NO òrgan gestor (administrador entitat)
 		return permisos;
 	}
 	
