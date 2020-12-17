@@ -119,6 +119,7 @@ public class ProcedimentServiceTest extends BaseServiceTest{
 					ProcedimentDto modificat = procedimentService.update(
 							entitatCreada.getId(), 
 							updateProcediment, 
+							true,
 							true);
 					
 					assertNotNull(modificat);
@@ -149,7 +150,8 @@ public class ProcedimentServiceTest extends BaseServiceTest{
 					 autenticarUsuari("admin");
 					 ProcedimentDto borrat = procedimentService.delete(
 							entitatCreada.getId(), 
-							procedimentCreat.getId());
+							procedimentCreat.getId(),
+							true);
 					
 					comprovarProcedimentCoincideix(
 							createProcediment,
@@ -366,25 +368,25 @@ public class ProcedimentServiceTest extends BaseServiceTest{
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplUpdate() {
 		autenticarUsuari("apl");
-		procedimentService.update(entitatCreate.getId(),createProcediment,false);
+		procedimentService.update(entitatCreate.getId(),createProcediment,false,false);
 	}
 	
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesSuperUpdate() {
 		autenticarUsuari("super");
-		procedimentService.update(entitatCreate.getId(),createProcediment,false);
+		procedimentService.update(entitatCreate.getId(),createProcediment,false,false);
 	}
 	
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplDelete() {
 		autenticarUsuari("apl");
-		procedimentService.delete(entitatCreate.getId(),createProcediment.getId());
+		procedimentService.delete(entitatCreate.getId(),createProcediment.getId(),false);
 	}
 	
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesSuperDelete() {
 		autenticarUsuari("super");
-		procedimentService.delete(entitatCreate.getId(),createProcediment.getId());
+		procedimentService.delete(entitatCreate.getId(),createProcediment.getId(),false);
 	}
 	
 	private void comprovarProcedimentCoincideix(

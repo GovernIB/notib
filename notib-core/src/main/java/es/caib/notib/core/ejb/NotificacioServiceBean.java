@@ -148,10 +148,12 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<NotificacioDto> update(
 			Long entitatId,
-			NotificacioDtoV2 notificacio) throws NotFoundException, RegistreNotificaException {
+			NotificacioDtoV2 notificacio,
+			boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
 		return delegate.update(
 				entitatId, 
-				notificacio);
+				notificacio,
+				isAdministradorEntitat);
 	}
 	
 	@Override
