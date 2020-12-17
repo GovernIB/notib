@@ -49,6 +49,7 @@ import es.caib.notib.core.api.dto.ProgresActualitzacioDto.ActualitzacioInfo;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.exception.PermissionDeniedException;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusObjecte;
@@ -219,12 +220,20 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	public ProcedimentDto update(
 			Long entitatId,
 			ProcedimentDto procediment,
-			boolean isAdmin) throws NotFoundException {
+			boolean isAdmin,
+			boolean isAdminEntitat) throws NotFoundException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Actualitzant procediment ("
 					+ "procediment=" + procediment + ")");
-			
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			if (!isAdminEntitat && procediment.isComu()) {
+				throw new PermissionDeniedException(
+						procediment.getId(),
+						ProcedimentEntity.class,
+						auth.getName(),
+						"ADMINISTRADORENTITAT");
+			}
 			
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 					entitatId,
@@ -323,9 +332,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Transactional
 	public ProcedimentDto delete(
 			Long entitatId,
-			Long id) throws NotFoundException {
+			Long id,
+			boolean isAdminEntitat) throws NotFoundException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 					entitatId,
 					false,
@@ -335,6 +346,13 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			ProcedimentEntity procedimentEntity = entityComprovarHelper.comprovarProcediment(
 					entitat, 
 					id);
+			if (!isAdminEntitat && procedimentEntity.isComu()) {
+				throw new PermissionDeniedException(
+						procedimentEntity.getId(),
+						ProcedimentEntity.class,
+						auth.getName(),
+						"ADMINISTRADORENTITAT");
+			}
 			//Eliminar grups del procediment
 			List<GrupProcedimentEntity> grupsDelProcediment = grupProcedimentRepository.findByProcediment(procedimentEntity);
 			for (GrupProcedimentEntity grupProcedimentEntity : grupsDelProcediment) {

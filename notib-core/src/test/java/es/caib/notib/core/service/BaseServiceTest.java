@@ -338,7 +338,8 @@ public class BaseServiceTest {
 					}
 					procedimentService.delete(
 							entitatId, 
-							((ProcedimentDto)element).getId());
+							((ProcedimentDto)element).getId(),
+							true);
 				} else if(element instanceof GrupDto) {
 					autenticarUsuari("admin");
 					grupService.delete(((GrupDto)element).getId());
