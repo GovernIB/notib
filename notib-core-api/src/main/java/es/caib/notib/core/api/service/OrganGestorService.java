@@ -135,7 +135,7 @@ public interface OrganGestorService {
 	 * 
 	 * @return
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
 	public List<OrganGestorDto> findOrgansGestorsWithPermis(
 			Long entitatId, 
 			String usuariCodi,

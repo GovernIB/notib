@@ -486,13 +486,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public List<NotificacioDto> update(
 			Long entitatId,
-			NotificacioDtoV2 notificacio) throws NotFoundException, RegistreNotificaException {
+			NotificacioDtoV2 notificacio,
+			boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 					entitatId, 
 					false, 
-					false, 
+					true, 
 					true,
 					false);
 			NotificacioEntity notificacioEntity = notificacioRepository.findOne(notificacio.getId());
@@ -541,14 +542,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 					if (procediment.isComu() && organGestor != null) {
 						procedimentOrgan = procedimentOrganRepository.findByProcedimentIdAndOrganGestorId(procediment.getId(), organGestor.getId());
 					}
-					procediment = entityComprovarHelper.comprovarProcedimentOrgan(
-							entitat,
-						 	notificacio.getProcediment().getId(),
-						 	procedimentOrgan,
-						 	false,
-						 	false,
-						 	true,
-						 	false);
+					if (!isAdministradorEntitat) {
+						procediment = entityComprovarHelper.comprovarProcedimentOrgan(
+								entitat,
+							 	notificacio.getProcediment().getId(),
+							 	procedimentOrgan,
+							 	false,
+							 	false,
+							 	true,
+							 	false);
+					}
 				}
 	//			### Recupera grup notificació a partir del codi
 				if (notificacio.getGrup() != null && notificacio.getGrup().getId() != null) {
