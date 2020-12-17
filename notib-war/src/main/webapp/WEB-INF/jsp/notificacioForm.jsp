@@ -601,8 +601,12 @@ $(document).ready(function() {
 		if(!$(this).hasClass('unselectable')){
 			seleccionar($(this)); 
 		}
-		
 	});
+		$("#rOrgans").on("click", ".select", function() {
+			if(!$(this).hasClass('unselectable')){
+				seleccionar($(this).closest("tr")); 
+			}
+		});
 	
 });
 
@@ -1324,7 +1328,7 @@ function loadOrgansGestors(){
 	var codiProvincia = $('#o_provincia').val()!=null?$('#o_provincia').val():'';
 	var codiLocalitat = $("#o_localitat").val()!=null?$('#o_localitat').val():'';
 
-
+	
 	if ((codi == null || codi == "") &&
 			(denominacio == null || denominacio == "") &&
 			(codiComunitat == null || codiComunitat == "")) {
@@ -1336,7 +1340,7 @@ function loadOrgansGestors(){
 			type: 'GET',
 			url: "<c:url value="/notificacio/cercaUnitats"/>" + 
 				'?codi='+codi.trim()+
-				'&denominacio='+denominacio.trim()+
+				'&denominacio='+denominacio+
 				'&nivellAdministracio='+nivellAdmin+
 				'&comunitatAutonoma='+codiComunitat+
 				'&provincia='+codiProvincia+
@@ -1345,11 +1349,37 @@ function loadOrgansGestors(){
 				var list_html = '';
 				if (data.length > 0) {
 					$.each(data, function(i, item) {
-						if($('#organigrama').val().indexOf(data[i].codi) != -1 ){
-							list_html += '<tr class="unselectable" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom + '</td><td>Si</td></tr>';
+						var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
+						var sir = $('#organigrama').val().indexOf(data[i].codi);
+						var clase = null;
+						var claseBoto = 'select btn btn-success';
+						var socSir = (sir!=-1?'<spring:message code="comu.si"/>':'<spring:message code="comu.no"/>');
+						
+						if(enviamentTipus == 'NOTIFICACIO' && sir!=-1 ){
+							clase = 'unselectable';
+							claseBoto = 'unselectable select btn btn-success';
+						}else if(enviamentTipus == 'COMUNICACIO' && sir==-1 ){
+							clase = 'unselectable';
+							claseBoto = 'unselectable select btn btn-success';
 						}else{
-							list_html += '<tr class="' + (i%2 == 0 ? 'even' : 'odd') + '" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom + '</td><td>No</td></tr>';
+							clase = (i%2 == 0 ? 'even' : 'odd');
 						}
+						
+						list_html += '<tr class="'+clase+'" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom + 
+						'</td><td>'+(socSir)+'</td><td><button type="button" class="'+claseBoto+'"> <spring:message code="comu.boto.seleccionar"/></button</td></tr>';
+						
+						
+// 						list_html += '<tr class="'+clase+'" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom + 
+// 						'</td><td>'+socSir+'</td><td><button type="button" class="'+clase+'" select btn btn-success"> <spring:message code="comu.boto.seleccionar"/></button</td></tr>';
+						
+						
+// 						if($('#organigrama').val().indexOf(data[i].codi) != -1 ){
+// 							list_html += '<tr class="'+clase+'" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom + 
+// 							'</td><td>'+sir!=-1?'Si':'No'+'</td><td><button type="button" class="select btn btn-success"> <spring:message code="comu.boto.seleccionar"/></button</td></tr>';
+// 						}else{
+// 							list_html += '<tr class="' + clase) + '" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom + 
+// 							'</td><td>No</td><td><button  type="button" class="select btn btn-success"> <spring:message code="comu.boto.seleccionar"/></button></td></tr>';
+// 						}
 						
 					});
 				}else{
@@ -1357,7 +1387,7 @@ function loadOrgansGestors(){
 				}
 				$("#rOrgans").html(list_html);
 				
-				$('.disabled').prop('disabled', true);
+// 				$('.disabled').prop('disabled', true);
 				mdesbloquejar();
 			},
 			error: function() {
@@ -2048,7 +2078,7 @@ function comptarCaracters(idCamp) {
 
 
 	<div class="modal fade" id="organismesModal" role="dialog">
-		<div class="modal-dialog">
+		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -2060,8 +2090,10 @@ function comptarCaracters(idCamp) {
 					<input type="hidden" id="titular" value="">
 					<input type="hidden" id="organigrama" value="">
 					 
+
+					 
 					<div class="row margebaix" style="margin-top:20px;">
-						<div class="col-md-12">
+						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.codi" /></label>
 								<div class="forminput">
@@ -2069,9 +2101,7 @@ function comptarCaracters(idCamp) {
 								</div>
 							</div>
 						</div>
-					</div>
-					<div class="row margebaix">
-						<div class="col-md-12">
+						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.denominacio" /></label>
 								<div class="forminput">
@@ -2081,7 +2111,7 @@ function comptarCaracters(idCamp) {
 						</div>
 					</div>
 					<div class="row margebaix">
-						<div class="col-md-12">
+						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.nivell.administracio" /></label>
 								<div class="forminput">
@@ -2091,9 +2121,7 @@ function comptarCaracters(idCamp) {
 								</div>
 							</div>
 						</div>
-					</div>
-					<div class="row margebaix">
-						<div class="col-md-12">
+						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.comunitat.autonoma" /></label>
 								<div class="forminput">
@@ -2105,7 +2133,7 @@ function comptarCaracters(idCamp) {
 						</div>
 					</div>
 					<div class="row margebaix">
-						<div class="col-md-12">
+						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.provincia" /></label>
 								<div class="forminput">
@@ -2115,9 +2143,7 @@ function comptarCaracters(idCamp) {
 								</div>
 							</div>
 						</div>
-					</div>
-					<div class="row margebaix">
-						<div class="col-md-12">
+						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.localitat" /></label>
 								<div class="forminput">
@@ -2137,6 +2163,7 @@ function comptarCaracters(idCamp) {
 								<tr class="capsalera" style="font-weight: bold;" >
 									<td width="85%"><spring:message code="notificacio.form.dir3.cercar.titol" /></td>
 									<td><spring:message code="notificacio.form.dir3.cercar.sir" /></td>
+									<td></td>
 								</tr>
 							</thead>
 							<tbody id="rOrgans">
