@@ -504,7 +504,6 @@ $(document).ready(function() {
 		var index = closest.find(".rowId input").val();
 		var raoSocialDesc = raoSocial.find('input').val();
 		var dir3Desc = closest.find('.codiDir3 input').val();
-	debugger
 		if ($(this).val() == 'ADMINISTRACIO') {
 			$(llinatge1).addClass('hidden');
 			$(llinatge2).addClass('hidden');
@@ -537,8 +536,7 @@ $(document).ready(function() {
 			$(raoSocial).removeClass('hidden');
 		}
 		
-		if(raoSocialDesc != null && dir3Desc != null){
-// 			document.getElementById("searchOrganTit0").value = document.getElementById("enviaments[" + index + "].titular.dir3Codi").value;
+		if((raoSocialDesc != null && raoSocialDesc != "") && (dir3Desc != null && dir3Desc != "")){
 			document.getElementById("searchOrganTit" + index).getElementsByTagName('input')[index].value = dir3Desc+'-'+raoSocialDesc;
 			$(dir3codi).find('.help-block').addClass('hidden')
 			$(dir3codi).find('.form-group').removeClass('has-error')
