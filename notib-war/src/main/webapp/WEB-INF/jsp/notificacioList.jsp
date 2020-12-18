@@ -14,6 +14,9 @@
 	pageContext.setAttribute(
 			"isRolActualAdministradorEntitat",
 			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
+	pageContext.setAttribute(
+			"isRolActualAdministradorOrgan",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
 %>
 <c:set var="ampladaConcepte">
 	<c:choose>
@@ -116,7 +119,11 @@
 </style>
 <script type="text/javascript"> 
 
-var myHelpers = {recuperarEstatEnviament: returnEnviamentsStatusDiv, hlpIsUsuari: isRolActualUsuari, hlpIsAdministradorEntitat: isRolActualAdministradorEntitat};
+var myHelpers = {
+		recuperarEstatEnviament: returnEnviamentsStatusDiv, 
+		hlpIsUsuari: isRolActualUsuari, 
+		hlpIsAdministradorEntitat: isRolActualAdministradorEntitat, 
+		hlpIsAdministradorOrgan: isRolActualAdministradorOrgan};
 
 $.views.helpers(myHelpers);
 
@@ -126,6 +133,10 @@ function isRolActualUsuari() {
 
 function isRolActualAdministradorEntitat() {
 	return ${isRolActualAdministradorEntitat};
+}
+
+function isRolActualAdministradorOrgan() {
+	return ${isRolActualAdministradorOrgan};
 }
 
 
@@ -584,7 +595,7 @@ $(document).ready(function() {
 							{{if permisProcessar }}
 								<li><a href="<c:url value="/notificacio/{{:id}}/processar"/>" data-toggle="modal"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a></li>
 							{{/if}}
-							{^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat()) && hasEnviamentsPendentsRegistre }}
+							{^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan()) && hasEnviamentsPendentsRegistre }}
 								<li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
 								<li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							{{/if}}							
