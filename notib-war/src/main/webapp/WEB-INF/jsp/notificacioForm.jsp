@@ -630,8 +630,6 @@ $(document).ready(function() {
 // 					$("#organigrama").val(data);
 					var t = buscarCodiEnOrganigrama(data);
 					$("#organigrama").val(buscarCodiEnOrganigrama(data));
-				}else{
-					alert("No s'han trobat resultats per aquesta entitat.");
 				}
 				
 				
@@ -1339,7 +1337,7 @@ function loadOrgansGestors(){
 	if ((codi == null || codi == "") &&
 			(denominacio == null || denominacio == "") &&
 			(codiComunitat == null || codiComunitat == "")) {
-		alert("És obligatori indicar com a mínimm el codi, la denominació o un lloc per a fer la cerca");
+		alert("<spring:message code='notificacio.form.dir3.cercar.noMinimOrgansFiltre'/>");
 		return false;
 	} else {
 		mbloquejar()
@@ -1391,7 +1389,7 @@ function loadOrgansGestors(){
 						
 					});
 				}else{
-					alert("No s'han trobat oficines segons els filtres seleccionats.");
+					alert("<spring:message code='notificacio.form.dir3.cercar.noOrgansFiltre'/>");
 				}
 				$("#rOrgans").html(list_html);
 				
