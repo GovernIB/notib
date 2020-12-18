@@ -1259,7 +1259,7 @@ public class NotificacioController extends BaseUserController {
 
         List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
         List<OrganGestorDto> organsGestors = new ArrayList<OrganGestorDto>();
-        if (!RolHelper.isUsuariActualAdministradorEntitat(request)) {
+        if (RolHelper.isUsuariActualUsuari(request)) {
 	        procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(
 	                entitatActual.getId(),
 	                usuariActual.getCodi(),
@@ -1280,9 +1280,13 @@ public class NotificacioController extends BaseUserController {
 	                entitatActual,
 	                procedimentsDisponibles,
 	                procedimentsOrgansDisponibles);
-        } else {
+        } else if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
         	procedimentsDisponibles = procedimentService.findByEntitat(entitatActual.getId());
         	organsGestors = organGestorService.findByEntitat(entitatActual.getId());
+        } else if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
+        	OrganGestorDto organGestorActual = getOrganGestorActual(request);
+            procedimentsDisponibles = procedimentService.findByOrganGestorIDescendents(entitatActual.getId(), organGestorActual);
+            organsGestors = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
         }
         model.addAttribute("organsGestors", organsGestors);
         if (organsGestors == null || organsGestors.isEmpty()) {

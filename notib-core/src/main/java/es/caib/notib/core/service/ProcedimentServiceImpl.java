@@ -1400,10 +1400,10 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			boolean adminOrgan = organActual != null;
 
 			if (tipus == null) {
-				permisos = findPermisProcediment(procediment, adminOrgan);
+				permisos = findPermisProcediment(procediment, adminOrgan, organActual);
 				permisos.addAll(findPermisProcedimentOrganByProcediment(procedimentId, organActual));
 			} else if (TipusPermis.PROCEDIMENT.equals(tipus)) {
-				permisos = findPermisProcediment(procediment, adminOrgan);
+				permisos = findPermisProcediment(procediment, adminOrgan, organActual);
 			} else {
 				if (organ == null)
 					permisos = findPermisProcedimentOrganByProcediment(procedimentId, organActual);
@@ -1432,11 +1432,14 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 
 	private List<PermisDto> findPermisProcediment(
 			ProcedimentEntity procediment,
-			boolean adminOrgan) {
+			boolean adminOrgan,
+			String organ) {
 		List<PermisDto> permisos = permisosHelper.findPermisos(
 				procediment.getId(),
 				ProcedimentEntity.class);
-		boolean isAdministradorOrganAndNoComuOrAdminEntitat = (adminOrgan && !procediment.isComu()) || !adminOrgan;
+		boolean isAdministradorOrganAndNoComuOrAdminEntitat = (adminOrgan && !procediment.isComu()) || //administrador òrgan i procediment no comú
+				(adminOrgan && procediment.isComu() && (procediment.getOrganGestor().getCodi().equals(organ))) ||  //administrador òrgan, procediment comú però del mateix òrgan
+				!adminOrgan; //administrador entitat
 		for (PermisDto permis: permisos)
 			permis.setPermetEdicio(isAdministradorOrganAndNoComuOrAdminEntitat);
 		return permisos;
