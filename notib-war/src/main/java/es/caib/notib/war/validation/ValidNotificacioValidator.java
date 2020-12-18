@@ -197,6 +197,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 							valid = false;
 							context.buildConstraintViolationWithTemplate(
 									MessageHelper.getInstance().getMessage("notificacio.form.valid.notificacio.sensenif", new Object[] {envCount + 1}))
+							.addNode("enviaments["+envCount+"].titular.nif")
 							.addConstraintViolation();
 						}
 					}

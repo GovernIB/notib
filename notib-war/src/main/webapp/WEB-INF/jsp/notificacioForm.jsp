@@ -501,7 +501,10 @@ $(document).ready(function() {
 		var nifLabelText = "<spring:message code='notificacio.form.camp.titular.nif'/>";
 		var incapacitat = closest.find('.incapacitat');
 		var raoSocial = closest.find('.rao');
-	
+		var index = closest.find(".rowId input").val();
+		var raoSocialDesc = raoSocial.find('input').val();
+		var dir3Desc = closest.find('.codiDir3 input').val();
+	debugger
 		if ($(this).val() == 'ADMINISTRACIO') {
 			$(llinatge1).addClass('hidden');
 			$(llinatge2).addClass('hidden');
@@ -534,7 +537,14 @@ $(document).ready(function() {
 			$(raoSocial).removeClass('hidden');
 		}
 		
+		if(raoSocialDesc != null && dir3Desc != null){
+// 			document.getElementById("searchOrganTit0").value = document.getElementById("enviaments[" + index + "].titular.dir3Codi").value;
+			document.getElementById("searchOrganTit" + index).getElementsByTagName('input')[index].value = dir3Desc+'-'+raoSocialDesc;
+			$(dir3codi).find('.help-block').addClass('hidden')
+			$(dir3codi).find('.form-group').removeClass('has-error')
+		}
 		comprovarTitularComuniacio();
+		
 		
 	});
 	
@@ -546,7 +556,6 @@ $(document).ready(function() {
 	
 	
 	function comprovarTitularComuniacio() {
-		var tipusInteressatTitular = document.getElementById("enviaments[0].titular.interessatTipus").value;
 		var closest = $(this).closest('.destinatariForm, .personaForm');
 		var nif = closest.find('.nif');
 		var nifLabel = nif.find('label');
@@ -1740,6 +1749,7 @@ function comptarCaracters(idCamp) {
 							</div>
 							<div>
 							<input type="hidden" name="enviaments[${j}].id" value="${enviament.id}"/>
+						
 							<!-- TIPUS DE SERVEI -->
 							<div class="col-md-6">
 								<div class="form-group">
@@ -1765,7 +1775,10 @@ function comptarCaracters(idCamp) {
 									</div>
 									<hr/>
 								</div>
+<%-- 								<input class="col-md-6 rowId hidden" type="input" id="rowId" value="${j}"/> --%>
+								
 								<div class="personaForm">
+									<div class='rowId'><input class='hidden' value="${j}"/></div>
 									<div>
 										<input type="hidden" name="enviaments[${j}].titular.id" value="${enviament.titular.id}"/>
 										<!--  TIPUS INTERESSAT -->
@@ -1805,10 +1818,11 @@ function comptarCaracters(idCamp) {
 										
 										<!-- CODI DIR3 -->
 										<div class="col-md-6 dir3Codi hidden">
-											<not:inputTextSearch  funcio="obrirModalOrganismes('Tit-${j}')" searchButton="searchOrganTit${j}" textKey="notificacio.form.camp.titular.dir3codi" required="true"/>
+											<not:inputTextSearch  funcio="obrirModalOrganismes('Tit-${j}')" searchButton="searchOrganTit${j}" textKey="notificacio.form.camp.titular.dir3codi" required="true" readonly="true" value=""/> 
+<%-- 											value="${fn:join(enviaments[j].titular.dir3Codi, enviaments[j].titular.nom)} "/> --%>
 										</div>
 										
-										<div class="col-md-6 hidden">
+										<div class="col-md-6 codiDir3 hidden">
 <%-- 											<not:inputTextSearch  funcio="obrirModalOrganismes(${j})" name="enviaments[${j}].titular.dir3Codi" searchButton="searchOrgan" textKey="notificacio.form.camp.titular.dir3codi" required="true"/> --%>
 											<not:inputText name="enviaments[${j}].titular.dir3Codi" textKey="notificacio.form.camp.titular.dir3codi" required="true"/>
 										</div>
