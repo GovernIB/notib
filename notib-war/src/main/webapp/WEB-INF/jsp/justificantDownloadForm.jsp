@@ -6,7 +6,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <html>
 <head>
-	<title><spring:message code="procediment.actualitzacio.auto"/></title>
+	<title><spring:message code="es.caib.notib.justificant.proces.justificant"/></title>
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -26,7 +26,11 @@
 <script type="text/javascript">
 var itervalProgres;
 writtenLines = 0;
+
+let sequence = generarAleatori();
+
 $(document).ready(function() {
+	$('#sequence').val(sequence);
 	$('#formUpdateAuto').submit();
 	refreshProgres();
 	
@@ -45,7 +49,7 @@ function getProgres() {
 	console.log("getProgres");
 	$.ajax({
 		type: 'GET',
-		url: "<c:url value='/notificacio/${notificacioId}/justificant/estat'/>",
+		url: "<c:url value='/notificacio/${notificacioId}/justificant/estat/'/>" + sequence,
 		success: function(data) {
 			if (data) {
 				let info = data.info;
@@ -73,6 +77,19 @@ function getProgres() {
 			console.log("error obtenint progrés...");
 		}
 	});
+}
+
+function generarAleatori() {
+	const n = 50;
+	const arr = new Array(n);
+	for (let i = 0; i < n; i++) {
+	    arr[i] = i + 1;
+	}
+
+	arr.sort(() => Math.random() > 0.5 ? 1 : -1);
+	const number = arr.slice(0, 5);
+
+	return number.toString().replaceAll(',', '_');
 }
 </script>
 
@@ -103,7 +120,7 @@ function getProgres() {
 }
 
 .info {
-	width: 50%;
+	width: 80%;
 	text-align: left;
 }
 
@@ -161,6 +178,7 @@ function getProgres() {
 <body>
 	<c:set var="formAction"><not:modalUrl value="/notificacio/${notificacioId}/justificant"/></c:set>
 	<form:form id="formUpdateAuto" action="${formAction}" method="post" cssClass="form-horizontal" role="form">
+		<input name="sequence" type="hidden" id="sequence">
 		<div role="tabpanel" class="tab-pane active">
 			<div class="progresContainer">
 				<div class="customProgressTitle"></div>

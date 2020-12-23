@@ -34,6 +34,7 @@ import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
+import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 
@@ -211,6 +212,29 @@ public class CacheHelper {
 				codiDir3Entitat,
 				codiDir3Organ);
 	}
+	
+	@Cacheable(value = "llistarNivellsAdministracions")
+	public List<CodiValor> llistarNivellsAdministracions() {
+		return pluginHelper.llistarNivellsAdministracions();
+	}
+	
+	
+	@Cacheable(value = "llistarComunitatsAutonomes")
+	public List<CodiValor> llistarComunitatsAutonomes() {
+		return pluginHelper.llistarComunitatsAutonomes();
+	}
+	
+	@Cacheable(value = "llistarProvincies", key="#codiCA")
+	public List<CodiValor> llistarProvincies(String codiCA) {
+		return pluginHelper.llistarProvincies(codiCA);
+	}
+	
+	@Cacheable(value = "llistarLocalitats", key="#codiProvincia")
+	public List<CodiValor> llistarLocalitats(String codiProvincia) {
+		return pluginHelper.llistarLocalitats(codiProvincia);
+	}
+	
+	
 	
 	public Collection<String> getAllCaches() {
 		return cacheManager.getCacheNames(); 

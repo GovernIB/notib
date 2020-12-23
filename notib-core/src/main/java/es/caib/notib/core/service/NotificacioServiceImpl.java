@@ -35,6 +35,7 @@ import com.codahale.metrics.Timer;
 
 import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
@@ -485,13 +486,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public List<NotificacioDto> update(
 			Long entitatId,
-			NotificacioDtoV2 notificacio) throws NotFoundException, RegistreNotificaException {
+			NotificacioDtoV2 notificacio,
+			boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 					entitatId, 
 					false, 
-					false, 
+					true, 
 					true,
 					false);
 			NotificacioEntity notificacioEntity = notificacioRepository.findOne(notificacio.getId());
@@ -540,14 +542,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 					if (procediment.isComu() && organGestor != null) {
 						procedimentOrgan = procedimentOrganRepository.findByProcedimentIdAndOrganGestorId(procediment.getId(), organGestor.getId());
 					}
-					procediment = entityComprovarHelper.comprovarProcedimentOrgan(
-							entitat,
-						 	notificacio.getProcediment().getId(),
-						 	procedimentOrgan,
-						 	false,
-						 	false,
-						 	true,
-						 	false);
+					if (!isAdministradorEntitat) {
+						procediment = entityComprovarHelper.comprovarProcedimentOrgan(
+								entitat,
+							 	notificacio.getProcediment().getId(),
+							 	procedimentOrgan,
+							 	false,
+							 	false,
+							 	true,
+							 	false);
+					}
 				}
 	//			### Recupera grup notificació a partir del codi
 				if (notificacio.getGrup() != null && notificacio.getGrup().getId() != null) {
@@ -853,7 +857,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 							entityComprovarHelper.hasPermisProcediment(
 									notificacio.getProcediment().getId(),
 									PermisEnum.PROCESSAR));
-					}	
+					}
+				
+				List<NotificacioEnviamentEntity> enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
+				if (enviamentsPendentsNotifica != null && ! enviamentsPendentsNotifica.isEmpty()) {
+					notificacio.setHasEnviamentsPendents(true);
+				}
+				
 				logger.info("Consultant events notificació...");
 				List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
 				
@@ -1014,7 +1024,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getConcepte(),
 							filtre.getEstat() == null,
 							filtre.getEstat(),
-							NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
+							filtre.getEstat() != null ? NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()) : null,
 							dataInici == null,
 							dataInici,
 							dataFi == null,
@@ -1045,7 +1055,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getConcepte(),
 							filtre.getEstat() == null,
 							filtre.getEstat(),
-							NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
+							filtre.getEstat() != null ? NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()) : null,
 							dataInici == null,
 							dataInici,
 							dataFi == null,
@@ -1078,8 +1088,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getConcepte() == null,
 							filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
 							filtre.getEstat() == null,
-							filtre.getEstat(), 
-							NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
+							filtre.getEstat(),
+							filtre.getEstat() != null ? NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()) : null,
 							dataInici == null,
 							dataInici,
 							dataFi == null,
@@ -1174,11 +1184,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 						}
 					}
 					
-					List<NotificacioEnviamentEntity> enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
-					if (enviamentsPendentsNotifica != null && ! enviamentsPendentsNotifica.isEmpty()) {
-						notificacio.setHasEnviamentsPendents(true);
-					}
-					
 					List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacio(notificacio);
 					if (enviamentsPendents != null && ! enviamentsPendents.isEmpty()) {
 						notificacio.setHasEnviamentsPendentsRegistre(true);
@@ -1266,12 +1271,87 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Override
 	@Transactional(readOnly = true)
+	public List<CodiValorDto> llistarNivellsAdministracions() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<CodiValor> codiValor = new ArrayList<CodiValor>();
+			try {
+				codiValor = cacheHelper.llistarNivellsAdministracions();
+			} catch (Exception ex) {
+				logger.error(
+						"Error recuperant els nivells d'administració de DIR3CAIB: " + ex);
+			}
+			return conversioTipusHelper.convertirList(codiValor, CodiValorDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<CodiValorDto> llistarComunitatsAutonomes() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<CodiValor> codiValor = new ArrayList<CodiValor>();
+			try {
+				codiValor = cacheHelper.llistarComunitatsAutonomes();
+			} catch (Exception ex) {
+				logger.error(
+						"Error recuperant les comunitats autònomes de DIR3CAIB: " + ex);
+			}
+			return conversioTipusHelper.convertirList(codiValor, CodiValorDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	
+	
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<PaisosDto> llistarPaisos() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<CodiValorPais> codiValorPais = new ArrayList<CodiValorPais>();
+			try {
+				codiValorPais = pluginHelper.llistarPaisos();
+			} catch (Exception ex) {
+				logger.error(
+						"Error recuperant els paisos de DIR3CAIB: " + ex);
+			}
+			return conversioTipusHelper.convertirList(codiValorPais, PaisosDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
 	public List<ProvinciesDto> llistarProvincies() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			List<CodiValor> codiValor = new ArrayList<CodiValor>();
 			try {
 				codiValor = pluginHelper.llistarProvincies();
+			} catch (Exception ex) {
+				logger.error(
+						"Error recuperant les provincies de DIR3CAIB: " + ex);
+			}
+			return conversioTipusHelper.convertirList(codiValor, ProvinciesDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<ProvinciesDto> llistarProvincies(String codiCA) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<CodiValor> codiValor = new ArrayList<CodiValor>();
+			try {
+				codiValor = cacheHelper.llistarProvincies(codiCA);
 			} catch (Exception ex) {
 				logger.error(
 						"Error recuperant les provincies de DIR3CAIB: " + ex);
@@ -1289,7 +1369,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			List<CodiValor> codiValor = new ArrayList<CodiValor>();
 			try {
-				codiValor = pluginHelper.llistarLocalitats(codiProvincia);
+				codiValor = cacheHelper.llistarLocalitats(codiProvincia);
 			} catch (Exception ex) {
 				logger.error(
 						"Error recuperant les provincies de DIR3CAIB: " + ex);
@@ -1299,20 +1379,23 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<PaisosDto> llistarPaisos() {
+	public List<OrganGestorDto> cercaUnitats(
+			String codi, 
+			String denominacio,
+			Long nivellAdministracio, 
+			Long comunitatAutonoma, 
+			Boolean ambOficines, 
+			Boolean esUnitatArrel,
+			Long provincia, 
+			String municipi) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			List<CodiValorPais> codiValorPais = new ArrayList<CodiValorPais>();
-			try {
-				codiValorPais = pluginHelper.llistarPaisos();
-			} catch (Exception ex) {
-				logger.error(
-						"Error recuperant els paisos de DIR3CAIB: " + ex);
-			}
-			return conversioTipusHelper.convertirList(codiValorPais, PaisosDto.class);
+			return pluginHelper.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
+			
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1969,7 +2052,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public FitxerDto recuperarJustificant(
 			Long notificacioId,
-			Long entitatId) throws JustificantException {
+			Long entitatId,
+			String sequence) throws JustificantException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
@@ -1985,7 +2069,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					true, 
 					false);
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			ProgresDescarregaDto progres = progresDescarrega.get(auth.getName());
+			ProgresDescarregaDto progres = progresDescarrega.get(auth.getName() + "_" + sequence);
 			
 			if (progres != null && progres.getProgres() != 0) {
 				logger.error("Ja existeix un altre procés iniciat"); 
@@ -1994,7 +2078,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			} else {
 				//## Únic procés per usuari per evitar sobrecàrrega
 				progres = new ProgresDescarregaDto();
-				progresDescarrega.put(auth.getName(), progres);
+				progresDescarrega.put(auth.getName() + "_" + sequence, progres);
 				
 				//## GENERAR JUSTIFICANT
 				logger.debug("Recuperant el justificant de la notificacio (notificacioId=" + notificacioId + ")");
@@ -2043,11 +2127,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	
 	@Override
-	public ProgresDescarregaDto justificantEstat() throws JustificantException {
+	public ProgresDescarregaDto justificantEstat(String sequence) throws JustificantException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			ProgresDescarregaDto progres = progresDescarrega.get(auth.getName());
+			ProgresDescarregaDto progres = progresDescarrega.get(auth.getName() + "_" + sequence);
 			if (progres != null && progres.getProgres() != null &&  progres.getProgres() >= 100) {
 				progresDescarrega.remove(auth.getName());
 			}
@@ -2056,25 +2140,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
-	
-	@Override
-	@Transactional(readOnly = true)
-	public String guardarArxiuTemporal(String contigut) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		String documentGesdocId = null;
-		try {
-			if(contigut != null) {
-				documentGesdocId = pluginHelper.gestioDocumentalCreate(
-						PluginHelper.GESDOC_AGRUPACIO_TEMPORALS,
-						Base64.decodeBase64(contigut));
-			}
-			return documentGesdocId;
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
 	
 	private int getRegistreEnviamentsProcessarMaxProperty() {
 		return PropertiesHelper.getProperties().getAsInt(
@@ -2118,6 +2183,47 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotificacioEnviamentEntity enviament) {
 		return "certificacio_" + enviament.getNotificaIdentificador() + ".pdf";
 	}
+	
+	
+	@Override
+	@Transactional(rollbackFor=Exception.class)
+	public String guardarArxiuTemporal(String contigut) {
+		String documentGesdocId = null;
+		try {
+			if(contigut != null) {
+				documentGesdocId = pluginHelper.gestioDocumentalCreate(
+						PluginHelper.GESDOC_AGRUPACIO_TEMPORALS,
+						Base64.decodeBase64(contigut));
+			}
+		} catch (Exception ex) {
+			logger.error(
+					"Error al guardar l'arxiu temporal " + ex);
+		} 
+		return documentGesdocId;
+	}
+	
+	@Override
+	@Transactional(rollbackFor=Exception.class)
+	public byte[] obtenirArxiuTemporal(String arxiuGestdocId) {
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		try {
+			if(arxiuGestdocId != null) {
+				
+				pluginHelper.gestioDocumentalGet(
+						arxiuGestdocId,
+						PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
+						output);
+			}
+		} catch (Exception ex) {
+			logger.error(
+					"Error al recuperar l'arxiu temporal " + ex);
+		} 
+		return output.toByteArray();
+	}
+	
+	
+	
+
 
 //	private boolean isNotificaEnviamentsActiu() {
 //		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.notifica.enviaments.actiu");

@@ -6,6 +6,8 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
 
+
+
 <c:choose>
     <c:when test="${empty notificacioCommand.id}"><c:set var="titol"><spring:message code="notificacio.form.titol.crear"/> <br> <small>  ${procediment.nom}</small></c:set></c:when>
     <c:otherwise><c:set var="titol"><spring:message code="notificacio.form.titol.modificar"/></c:set></c:otherwise>
@@ -21,6 +23,13 @@
 <c:set var="entregaPostalDades"><spring:message code="notificacio.form.titol.entregapostal.dades"/></c:set>
 <c:set var="entregaDireccio"><spring:message code="notificacio.form.titol.entregadireccio"/></c:set>
 <c:set var="entitatDir3Codi">${entitat.dir3Codi}</c:set>
+
+
+<c:url value="/notificacio/nivellsAdministracions" 	var="urlNivellAdministracions"/>
+<c:url value="/notificacio/comunitatsAutonomes" 	var="urlComunitatsAutonomes"/>
+<c:url value="/notificacio/provincies" 				var="urlProvincies"/>
+<c:url value="/notificacio/localitats" 				var="urlLocalitats"/>
+
 
 <html>
 <head>
@@ -159,8 +168,15 @@
 .select2-results__group {
 	font-size: 14px !important;
 }
+.unselectable {
+    background-color: #ddd;
+    cursor: not-allowed;
+}
+
 </style>
 <script type="text/javascript">
+
+
 
 var interessatsTipus = new Array();
 var interessatTipusOptions = "";
@@ -217,6 +233,19 @@ $(document).ready(function() {
 			$(dadesNormalitzat).removeClass('hidden');
 			$(dadesSenseNormalitzar).addClass('hidden');
 		}
+	});
+	
+	
+	$('input[name="arxiu"]').change(function(){
+		var arxiuGestdocId = $('input[name="document.arxiuGestdocId"]');
+		var arxiuNom = $('input[name="document.arxiuNom"]');
+		if($(this).val() == ''){
+			arxiuGestdocId.val("");
+			arxiuNom.val("");
+		}else if($(this).val() != '' && $(this).val() != arxiuNom){
+			arxiuGestdocId.val("");
+			arxiuNom.val("");
+		}	  
 	});
 	
 	var numPlus = 1;
@@ -323,7 +352,12 @@ $(document).ready(function() {
     					if (procedimentsOrgan.length > 0) {
     						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
     							$.each(procedimentsOrgan, function(index, val) {
-    								selProcediments.append("<option value=\"" + val.id + "\"" + (isOnlyOneProcedimentOrgan ? " selected" : "") + ">" + val.codi +' - '+ val.nom + "</option>");
+    								if (isOnlyOneProcedimentOrgan) {
+    									selProcediments.append("<option value='" + val.id + "' selected>" + val.codi +' - '+ val.nom + "</option>");
+    									$("#organGestor").val(val.organGestor).trigger("change.select2");
+    								} else {
+    									selProcediments.append("<option value='" + val.id + "'>" + val.codi +' - '+ val.nom + "</option>");
+    								}
     							});
     						selProcediments.append("</optgroup>");
     						selProcediments.trigger('change.select2');
@@ -336,6 +370,8 @@ $(document).ready(function() {
     					selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
     				}
     				selProcediments.select2(select2Options);
+    				selProcediments.val(selProcediments.attr('data-enum-value'));
+    				selProcediments.trigger('change');
     			},
     			error: function() {
     				console.log("error obtenint els procediments de l'òrgan gestor...");
@@ -431,6 +467,7 @@ $(document).ready(function() {
     var count = 0;
     $('#add').on('click', function () {
         //Input to add
+        debugger
         var metadataInput =
             "<div class='form-group'>" +
                 "<label class='control-label col-xs-2'></label>" +
@@ -473,23 +510,30 @@ $(document).ready(function() {
 		var closest = $(this).closest('.destinatariForm, .personaForm');
 		var llinatge1 = closest.find('.llinatge1');
 		var llinatge2 = closest.find('.llinatge2');
+		var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
 		var nif = closest.find('.nif');
 		var nifLabel = nif.find('label');
 		var dir3codi = closest.find('.dir3Codi');
 		var nifLabelText = "<spring:message code='notificacio.form.camp.titular.nif'/>";
 		var incapacitat = closest.find('.incapacitat');
 		var raoSocial = closest.find('.rao');
-	
+		var index = closest.find(".rowId input").val();
+		var raoSocialDesc = raoSocial.find('input').val();
+		var dir3Desc = closest.find('.codiDir3 input').val();
 		if ($(this).val() == 'ADMINISTRACIO') {
 			$(llinatge1).addClass('hidden');
 			$(llinatge2).addClass('hidden');
 			$(dir3codi).removeClass('hidden');
-			$(nifLabel).text(nifLabelText);
 			$(incapacitat).addClass('hidden');
 			$(raoSocial).addClass('hidden');
-			$('#rowRetard').removeClass('hidden');
-			$('#rowDataProgramada').removeClass('hidden');
-			$('#rowCaducitat').removeClass('hidden');
+			if(enviamentTipus == 'COMUNICACIO'){
+				$(nifLabel).text(nifLabelText);
+				$(nif).addClass('hidden');
+			}else{
+				$(nifLabel).text(nifLabelText + " *");
+				$(nif).removeClass('hidden');
+				
+			}
 		} else if ($(this).val() == 'FISICA') {
 			$(llinatge1).removeClass('hidden');
 			$(llinatge2).removeClass('hidden');
@@ -508,18 +552,30 @@ $(document).ready(function() {
 			$(raoSocial).removeClass('hidden');
 		}
 		
+		if((raoSocialDesc != null && raoSocialDesc != "") && (dir3Desc != null && dir3Desc != "")){
+			document.getElementById("searchOrganTit" + index).getElementsByTagName('input')[index].value = dir3Desc+'-'+raoSocialDesc;
+			$(dir3codi).find('.help-block').addClass('hidden')
+			$(dir3codi).find('.form-group').removeClass('has-error')
+		}
 		comprovarTitularComuniacio();
+		
 		
 	});
 	
 	$(document).on('change', 'input[type=radio][name=enviamentTipus]', function (event) {
-	      comprovarTitularComuniacio();
+	    comprovarTitularComuniacio();
+		$('.interessat').trigger('change');
+		
 	});
 	
 	
 	function comprovarTitularComuniacio() {
-		var tipusInteressatTitular = document.getElementById("enviaments[0].titular.interessatTipus").value;
-		if($('input[name=enviamentTipus]:checked').val() == 'COMUNICACIO' && (tipusInteressatTitular == 'JURIDICA' || tipusInteressatTitular == 'FISICA')){
+		var closest = $(this).closest('.destinatariForm, .personaForm');
+		var nif = closest.find('.nif');
+		var nifLabel = nif.find('label');
+		var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
+		var nifLabelText = "<spring:message code='notificacio.form.camp.titular.nif'/>";
+		if(enviamentTipus == 'COMUNICACIO' && (tipusInteressatTitular == 'JURIDICA' || tipusInteressatTitular == 'FISICA')){
 			$('#rowRetard').addClass('hidden');
 			$('#rowDataProgramada').addClass('hidden');
 			$('#rowCaducitat').addClass('hidden');
@@ -528,6 +584,8 @@ $(document).ready(function() {
 			$('#rowDataProgramada').removeClass('hidden');
 			$('#rowCaducitat').removeClass('hidden');
 		}
+		
+		
 	}
 	
 	$(document).on('input', ".titularNif", function () {
@@ -537,20 +595,6 @@ $(document).ready(function() {
 	$('.interessat').trigger('change');
 	$('#tipusDocument').trigger('change');
 	$('.enviamentTipus').trigger('change');
-	
-	//Contador concepte
-	var fieldConcepte = $('#concepte');
-	if (fieldConcepte.val().length != 0) {
-		var size = $(fieldConcepte).val().length;
-		$('.inputCurrentLength').text(size);
-	} else {
-		$('.inputCurrentLength').text(0);
-	};
-	
-	$(fieldConcepte).bind("change paste keyup", function() {
-		var size = $(this).val().length;
-		$('.inputCurrentLength').text(size);
-	});
 	
 	//Contado descripció
 	var fieldDescripcio = $('#descripcio');
@@ -570,7 +614,49 @@ $(document).ready(function() {
 	$('#form').on("submit", function(){
 		$('.loading').fadeIn();
 	});
+	
+	
+
+// 	var organigrama = loadOrganigrama();
+// // 	var organigrama =null;
+	
+	$("#rOrgans").on("dblclick", "tr", function() {
+		if(!$(this).hasClass('unselectable')){
+			seleccionar($(this)); 
+		}
+	});
+		$("#rOrgans").on("click", ".select", function() {
+			if(!$(this).hasClass('unselectable')){
+				seleccionar($(this).closest("tr")); 
+			}
+		});
+	
 });
+
+
+	function loadOrganigrama(){
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value="/entitat/organigrama/"/>" + document.getElementById('emisorDir3Codi').value,
+			success: function(data) {
+				if (Object.keys(data).length > 0) {
+// 	 				$.each(data, function(i, item) {
+// 	 					list_html += '<tr class="' + (i%2 == 0 ? 'even' : 'odd') + '" data-codi="' + data[i].codigo +'" data-denominacio="' + data[i].denominacion +'"><td>' + data[i].denominacion + '<span class="fa fa-sign-out select pull-right" style="font-size:14px; cursor:pointer; color:#222;"></span></td></tr>';
+// 	 				});
+// 					$("#organigrama").val(data);
+					var t = buscarCodiEnOrganigrama(data);
+					$("#organigrama").val(buscarCodiEnOrganigrama(data));
+				}
+				
+				
+				
+			
+			},
+			error: function() {
+				console.log("error obtenint l'organigrama...");
+			}
+		});
+	}
 
 function addDestinatari(enviament_id) {
 	var isMultiple = ${isMultiplesDestinataris};
@@ -601,7 +687,13 @@ function addDestinatari(enviament_id) {
 			<div class="form-group"> \
 				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom"><spring:message code="notificacio.form.camp.titular.nom"/> *</label> \
 				<div class="col-xs-12"> \
-					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom" class="form-control " type="text" value=""> \
+					<input maxlength="${nomSize}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom" class="form-control " type="text" value=""> \
+					<p class="info-length text-success"> \
+						<span class="glyphicon glyphicon-info-sign"></span> \
+						<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].nom">0</span> \
+							<spring:message code="notificacio.form.camp.logitud"/> \
+						<span> ${nomSize}</span> \
+					</p> \
 				</div> \
 			</div> \
 		</div> \
@@ -609,7 +701,13 @@ function addDestinatari(enviament_id) {
 			<div class="form-group"> \
 				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1"><spring:message code="notificacio.form.camp.titular.llinatge1"/> *</label> \
 				<div class="col-xs-12"> \
-					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1" class="form-control " type="text" value=""> \
+					<input maxlength="${llinatge1Size}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1" class="form-control " type="text" value=""> \
+					<p class="info-length text-success"> \
+					<span class="glyphicon glyphicon-info-sign"></span> \
+					<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1">0</span> \
+						<spring:message code="notificacio.form.camp.logitud"/> \
+					<span> ${llinatge1Size}</span> \
+					</p> \
 				</div> \
 			</div> \
 		</div> \
@@ -617,7 +715,13 @@ function addDestinatari(enviament_id) {
 			<div class="form-group"> \
 				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2"><spring:message code="notificacio.form.camp.titular.llinatge2"/></label> \
 				<div class="col-xs-12"> \
-					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2" class="form-control " type="text" value=""> \
+					<input maxlength="${llinatge2Size}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2" class="form-control " type="text" value=""> \
+					<p class="info-length text-success"> \
+					<span class="glyphicon glyphicon-info-sign"></span> \
+					<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2">0</span> \
+						<spring:message code="notificacio.form.camp.logitud"/> \
+					<span> ${llinatge2Size}</span> \
+					</p> \
 				</div> \
 			</div> \
 		</div> \
@@ -625,7 +729,13 @@ function addDestinatari(enviament_id) {
 			<div class="form-group"> \
 				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon"><spring:message code="notificacio.form.camp.titular.telefon"/></label> \
 				<div class="col-xs-12"> \
-					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon" class="form-control " type="text" value=""> \
+					<input maxlength="${telefonSize}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon" class="form-control " type="text" value=""> \
+					<p class="info-length text-success"> \
+					<span class="glyphicon glyphicon-info-sign"></span> \
+					<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon">0</span> \
+						<spring:message code="notificacio.form.camp.logitud"/> \
+					<span> ${telefonSize}</span> \
+					</p> \
 				</div> \
 			</div> \
 		</div> \
@@ -633,7 +743,13 @@ function addDestinatari(enviament_id) {
 			<div class="form-group"> \
 				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].email"><spring:message code="notificacio.form.camp.titular.email"/></label> \
 				<div class="col-xs-12"> \
-					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].email" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].email" class="form-control " type="text" value=""> \
+					<input maxlength="${emailSize}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].email" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].email" class="form-control " type="text" value=""> \
+					<p class="info-length text-success"> \
+					<span class="glyphicon glyphicon-info-sign"></span> \
+					<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].email">0</span> \
+						<spring:message code="notificacio.form.camp.logitud"/> \
+					<span> ${emailSize}</span> \
+					</p> \
 				</div> \
 			</div> \
 		</div> \
@@ -678,6 +794,12 @@ function addDestinatari(enviament_id) {
     	$("div[class*=' personaForm_" + num_enviament + "']").closest('div.destinatari').find('.addDestinatari').addClass('hidden');
     }
 	$('.interessat').trigger('change');
+	
+	addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].nom');
+	addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].llinatge1');
+	addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].llinatge2');
+	addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].telefon');
+	addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].email');
 }
 
 function replaceAll(string, search, replace) {
@@ -756,8 +878,56 @@ function addEnvio() {
 		
 		actualitzarEntrega(numPlus);
 	    webutilModalAdjustHeight();
+	    
+	    addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.nom', '${nomSize}');
+	    addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.llinatge1', '${llinatge1Size}');
+	    addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.llinatge2', '${llinatge2Size}');
+	    addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.email', '${emailSize}');
+	    addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.telefon', '${telefonSize}');
     }
 
+}
+
+function addContadorAddicionalDestinatari(fieldId) {
+	//Contador
+	var fieldSize = 'inputCurrentLength_' + fieldId;
+	var fieldSizeClass = $(document.getElementsByClassName(fieldSize)[0]);
+	if (fieldSizeClass.val() != undefined && fieldSizeClass.val().length != 0) {
+		var size = $(fieldId).val().length;
+		$(fieldSizeClass).text(size);
+	} else {
+		$(fieldSizeClass).text(0);
+	};
+	
+	$(document.getElementById(fieldId)).bind("change paste keyup", function() {
+		var size = $(this).val().length;
+		$(fieldSizeClass).text(size);
+	});
+}
+
+function addContadorAddicionalEnviament(fieldId, inputMaxLength) {
+	var p = '<p class="info-length text-success"> \
+				<span class="glyphicon glyphicon-info-sign"></span> \
+				<span class="inputCurrentLength_' + fieldId + '">0</span> \
+					<spring:message code="notificacio.form.camp.logitud"/> \
+				<span> ' + inputMaxLength + '</span> \
+			</p>';
+	var inputField = $(document.getElementById(fieldId));
+	$(p).insertAfter(inputField);
+	//Contador
+	var fieldSize = 'inputCurrentLength_' + fieldId;
+	var fieldSizeClass = $(document.getElementsByClassName(fieldSize)[0]);
+	if (fieldSizeClass.val() != undefined && fieldSizeClass.val().length != 0) {
+		var size = $(fieldId).val().length;
+		$(fieldSizeClass).text(size);
+	} else {
+		$(fieldSizeClass).text(0);
+	};
+	
+	$(document.getElementById(fieldId)).bind("change paste keyup", function() {
+		var size = $(this).val().length;
+		$(fieldSizeClass).text(size);
+	});
 }
 
 function destinatarisDelete(className) {
@@ -844,7 +1014,7 @@ function reanumeraEnviament(enviament, index) {
    	enviament.find(':input').each(function() {
         this.name= this.name.replace('enviaments[' + index,'enviaments[' +nouIndex);
         this.id= this.id.replace('enviaments[' + index,'enviaments[' + nouIndex);
-		if ($(this).attr('data-select2-id') == index) {
+		if ($(this).attr('data--id') == index) {
 			$(this).attr('data-select2-id', nouIndex);
 		}
 		
@@ -867,8 +1037,6 @@ function reanumeraEnviament(enviament, index) {
 //     }
 // 	actualitzarEntrega(nouIndex);
 }
-
-
 
 function mostrarEntregaPostal(className) {
     var element = document.getElementById(className);
@@ -910,49 +1078,220 @@ function mostrarDestinatari(enviament_id) {
 
 function obrirModalOrganismes(index){
 	$("#organismesModal").modal();
-	$("#indexTitular").val(index);
+// 	$("#indexTitular").val(index);
 	$("#titular").val(index);
-	var selOrganismes = $('#selOrganismes');
+// 	var selOrganismes = $('#selOrganismes');
 	webutilModalAdjustHeight();
+// 	selOrganismes.append("<option value=\"\"></option>");
 	
-	selOrganismes.append("<option value=\"\"></option>");
+	loadNivellsAdministracions();
+ 	loadComunitatsAutonomes();
+	
 	$(".loading-screen").hide();
-	
-	netejarFiltre();
+	loadOrganigrama();
+	netejar();
 	
 };
 
-function searchCodiChange(text){
-	var searchNom = $('#searchNom');
-	if(text.trim().length ==0){
-		searchNom.removeAttr('disabled');
-	}else{
-		searchNom.prop("disabled", true);
+// function searchCodiChange(text){
+// 	var searchNom = $('#searchNom');
+// 	if(text.trim().length ==0){
+// 		searchNom.removeAttr('disabled');
+// 	}else{
+// 		searchNom.prop("disabled", true);
+// 	}
+	
+// };
+
+// function searchNomChange(text){
+// 	var searchCodi = $('#searchCodi');
+// 	if(text.trim().length ==0){
+// 		searchCodi.removeAttr('disabled');
+// 	}else{
+// 		searchCodi.prop("disabled", true);
+// 	}
+	
+// };
+
+function loadNivellsAdministracions() {
+	$.ajax({
+		type: 'GET',
+		url: '${urlNivellAdministracions}',
+		dataType: 'json',
+		async: false,
+		data: {	}
+	}).done(function(data){
+		var list_html = '<option value=""></option>';
+		if (data.length > 0) {
+			$.each(data, function(i, item) {
+				list_html += '<option value=' + data[i].codi + '>' + data[i].valor + '</option>';
+			});
+		}
+		$("#o_nivellAdmin").html(list_html);
+// 		$("#o_nivellAdmin").select2({
+// 			enable : true,
+// 			allowClear : true,
+// 			dropdownParent: $("#dialeg_organs")
+// 		});
+		
+		$("#o_nivellAdmin").select2({
+			theme: 'bootstrap',
+			width: 'auto'
+		});
+		
+		
+		
+	}).fail(function(jqXHR, textStatus) {
+// 		refreshAlertes();
+	});
+}
+
+function loadComunitatsAutonomes() {
+	$.ajax({
+		type: 'GET',
+		url: '${urlComunitatsAutonomes}',
+		dataType: 'json',
+		async: false,
+		data: {	}
+	}).done(function(data){
+		var list_html = '<option value=""></option>';
+		if (data.length > 0) {
+			$.each(data, function(i, item) {
+				list_html += '<option value=' + data[i].codi + '>' + data[i].valor + '</option>';
+			});
+		}
+		$("#o_comunitat").html(list_html);
+		$("#o_comunitat").select2({
+			theme: 'bootstrap',
+			width: 'auto'
+		});
+	}).fail(function(jqXHR, textStatus) {
+// 		refreshAlertes();
+	});
+	
+}
+
+function loadProvincies(codiCA) {
+	if (codiCA != null && codiCA != '') {
+		mbloquejar();
+		$.ajax({
+			type: 'GET',
+			url: '${urlProvincies}/' + codiCA ,
+			dataType: 'json',
+			async: false		
+		}).done(function(data){
+			var list_html = '<option value=""></option>';
+			if (data.length > 0) {
+				$.each(data, function(i, item) {
+					list_html += '<option value=' + data[i].id + '>' + data[i].descripcio + '</option>';
+				});
+			}
+			$("#o_provincia").html(list_html);
+			$("#o_provincia").select2({
+				theme: 'bootstrap',
+				width: 'auto'
+			});
+		}).fail(function(jqXHR, textStatus) {
+// 			refreshAlertes();
+		});
+		mdesbloquejar();
+	} else {
+		var list_html = '<option value=""></option>';
+		$("#o_provincia").html(list_html);
+		$("#o_provincia").select2({
+			theme: 'bootstrap',
+			width: 'auto'
+		});
 	}
 	
-};
-
-function searchNomChange(text){
-	var searchCodi = $('#searchCodi');
-	if(text.trim().length ==0){
-		searchCodi.removeAttr('disabled');
-	}else{
-		searchCodi.prop("disabled", true);
-	}
 	
+}
+
+function comunitatAutonomaChange(value){
+	if(value.trim().length !=0){
+		loadProvincies(value);
+	}
 };
 
+function provinciesChange(value){
+	if(value.trim().length !=0){
+		loadLocalitats(value);
+	}
+};
 
-function seleccionar(){
+function loadLocalitats(codiProvincia) {
+	if (codiProvincia != null && codiProvincia != '') {
+		mbloquejar();
+		$.ajax({
+			type: 'GET',
+			url: '${urlLocalitats}/' + codiProvincia,
+			dataType: 'json',
+			async: false
+		}).done(function(data){
+			var list_html = '<option value=""></option>';
+			if (data.length > 0) {
+				$.each(data, function(i, item) {
+					list_html += '<option value=' + data[i].id + '>' + data[i].descripcio + '</option>';
+				});
+			}
+			$("#o_localitat").html(list_html);
+			$("#o_localitat").select2({
+				theme: 'bootstrap',
+				width: 'auto'
+			});
+		}).fail(function(jqXHR, textStatus) {
+// 			refreshAlertes();
+		});
+		mdesbloquejar();
+	} else {
+		var list_html = '<option value=""></option>';
+		$("#o_localitat").html(list_html);
+		$("#o_localitat").select2({
+			theme: 'bootstrap',
+			width: 'auto'
+		});
+	}
+}
+
+function mbloquejar() {
+// 	var height = $("#dialeg_organs").css('height');
+	var width = $("#dialeg_organs").css('width');
+	var top = $("#dialeg_organs").css('top');
+// 	$(".mloading-screen").css('height', height);
+	$(".mloading-screen").css('width', width);
+	$(".mloading-screen").css('top', top);
+	$(".mloading-screen").show();
+}
+
+function mdesbloquejar() {
+	$(".mloading-screen").hide();
+}
+
+function netejar() {
+	$("#o_provincia").val("");
+	$("#o_provincia").html("");
+	$("#o_localitat").val("");
+	$("#o_localitat").html("");
+	$("#o_codi").val("");
+	$("#o_denominacio").val("");
+	$("#rOrgans").html('');	
+}
+
+function seleccionar(fila){
 	var from = $('#titular').val().split('-')[0];
 	var index = $('#titular').val().split('-')[1] != undefined?$('#titular').val().split('-')[1]:from;
 	var dir3Codi;
 	var raoSocial;
 	var dir3CodiDesc;
-	var organSelect = document.getElementById('selOrganismes');
-	if(organSelect.selectedIndex != -1){
-		var organSeleccionatValue = organSelect.options[organSelect.selectedIndex].value;
-		var organSeleccionatText = organSelect.options[organSelect.selectedIndex].text;
+// 	var organSelect = document.getElementById('selOrganismes');
+	if(fila.size()>0){
+// 		var organSeleccionatValue = organSelect.options[organSelect.selectedIndex].value;
+// 		var organSeleccionatText = organSelect.options[organSelect.selectedIndex].text;
+		
+		let codi = fila.data('codi');
+		let denominacio = fila.data('denominacio');
+		let ocodi = codi + '-' + denominacio;
+		
 		if(from == 'Tit'){
 			dir3Codi = document.getElementById("enviaments[" + index + "].titular.dir3Codi");
 			raoSocial = document.getElementById("enviaments[" + index + "].titular.nom");
@@ -963,71 +1302,127 @@ function seleccionar(){
 			dir3CodiDesc =  document.getElementById("searchOrgan" + index);
 		}
 		
-		dir3Codi.value = organSeleccionatValue;
-		raoSocial.value = organSeleccionatText.split("-")[1].trim();	
-		dir3CodiDesc.value = organSeleccionatText;		
+		dir3Codi.value = codi;
+		raoSocial.value = denominacio;	
+		dir3CodiDesc.value = ocodi;	
+		$('#cerrarModal').click();
 	}
-	
-	
 };
 
-function netejarFiltre(){
-	var searchCodi = $('#searchCodi');
-	var searchNom = $('#searchNom');
-	var selOrganismes = $('#selOrganismes');
+// function netejarFiltre(){
+// 	var searchCodi = $('#searchCodi');
+// 	var searchNom = $('#searchNom');
+// 	var selOrganismes = $('#selOrganismes');
 	
-	searchCodi.removeAttr('disabled');
-	searchCodi.val('');
-	searchNom.removeAttr('disabled');
-	searchNom.val('');
+// 	searchCodi.removeAttr('disabled');
+// 	searchCodi.val('');
+// 	searchNom.removeAttr('disabled');
+// 	searchNom.val('');
 	
-	selOrganismes.empty();
-	selOrganismes.append("<option value=\"\"></option>");
+// 	selOrganismes.empty();
+// 	selOrganismes.append("<option value=\"\"></option>");
 
-};
+// };
 
-function cercarOrganismes(text){
-	var searchCodi = $('#searchCodi');
-	var searchNom = $('#searchNom');
-	var searchValue ='';
-	if(searchCodi.val()!=''){
-		searchValue = "codi/" + searchCodi.val();
-	}else if(searchNom.val()!=''){
-		searchValue = "denominacio/" +searchNom.val();
+
+function buscarCodiEnOrganigrama(fills){
+	var array = new Array();
+	if(fills != null && fills != undefined){
+		$.each(fills, function(key, obj) { 
+			array.push(key);
+			if(obj.fills != undefined && obj.fills != null){
+				$.each(obj.fills, function(key, obj) { 
+					buscarCodiEnOrganigrama(obj.fills);		
+				});	
+			}	
+		});
+		
 	}
+	return array; 
+}
+
+function loadOrgansGestors(){
+	var codi = $("#o_codi").val();
+	var denominacio = $("#o_denominacio").val();
+	var nivellAdmin = $("#o_nivellAdmin").val();
+	var codiComunitat = $('#o_comunitat').val();
+	var codiProvincia = $('#o_provincia').val()!=null?$('#o_provincia').val():'';
+	var codiLocalitat = $("#o_localitat").val()!=null?$('#o_localitat').val():'';
+
 	
-	
-	if(searchValue != '' && searchValue.length > 2){
-		$(".loading-screen").show();
+	if ((codi == null || codi == "") &&
+			(denominacio == null || denominacio == "") &&
+			(codiComunitat == null || codiComunitat == "")) {
+		alert("<spring:message code='notificacio.form.dir3.cercar.noMinimOrgansFiltre'/>");
+		return false;
+	} else {
+		mbloquejar()
 		$.ajax({
 			type: 'GET',
-			url: "<c:url value="/notificacio/administracions/"/>" + searchValue,
+			url: "<c:url value="/notificacio/cercaUnitats"/>" + 
+				'?codi='+codi.trim()+
+				'&denominacio='+denominacio+
+				'&nivellAdministracio='+nivellAdmin+
+				'&comunitatAutonoma='+codiComunitat+
+				'&provincia='+codiProvincia+
+				'&municipi='+codiLocalitat,
 			success: function(data) {
-				var selOrganismes = $('#selOrganismes');
-				
-				
-				selOrganismes.empty();
-				selOrganismes.append("<option value=\"\"></option>");
-				if (data && data.length > 0) {
-						var items = [];
-						$.each(data, function(i, val) {
-							items.push({
-								"id": val.codi,
-								"text": val.codi + " - " + val.nom
-							});
-							selOrganismes.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
-						});
+				var list_html = '';
+				if (data.length > 0) {
+					$.each(data, function(i, item) {
+						var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
+						var sir = $('#organigrama').val().indexOf(data[i].codi);
+						var clase = null;
+						var claseBoto = 'select btn btn-success';
+						var socSir = (sir!=-1?'<spring:message code="comu.no"/>':'<spring:message code="comu.si"/>');
+						
+// 						if(enviamentTipus == 'NOTIFICACIO' && sir!=-1 ){
+// 							clase = 'unselectable';
+// 							claseBoto = 'unselectable select btn btn-success';
+// 						}else if(enviamentTipus == 'COMUNICACIO' && sir==-1 ){
+						if(enviamentTipus == 'COMUNICACIO' && sir!=-1 ){
+							clase = 'unselectable';
+							claseBoto = 'unselectable select btn btn-success';
+						}else{
+							clase = (i%2 == 0 ? 'even' : 'odd');
+						}
+						
+						list_html += '<tr class="'+clase+'" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom + 
+						'</td><td>'+(socSir)+'</td><td><button type="button" class="'+claseBoto+'"> <spring:message code="comu.boto.seleccionar"/></button</td></tr>';
+						
+						
+// 						list_html += '<tr class="'+clase+'" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom + 
+// 						'</td><td>'+socSir+'</td><td><button type="button" class="'+clase+'" select btn btn-success"> <spring:message code="comu.boto.seleccionar"/></button</td></tr>';
+						
+						
+// 						if($('#organigrama').val().indexOf(data[i].codi) != -1 ){
+// 							list_html += '<tr class="'+clase+'" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom + 
+// 							'</td><td>'+sir!=-1?'Si':'No'+'</td><td><button type="button" class="select btn btn-success"> <spring:message code="comu.boto.seleccionar"/></button</td></tr>';
+// 						}else{
+// 							list_html += '<tr class="' + clase) + '" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom + 
+// 							'</td><td>No</td><td><button  type="button" class="select btn btn-success"> <spring:message code="comu.boto.seleccionar"/></button></td></tr>';
+// 						}
+						
+					});
+				}else{
+					alert("<spring:message code='notificacio.form.dir3.cercar.noOrgansFiltre'/>");
 				}
-				$(".loading-screen").hide();
+				$("#rOrgans").html(list_html);
+				
+// 				$('.disabled').prop('disabled', true);
+				mdesbloquejar();
 			},
 			error: function() {
-				console.log("error obtenint els organismes...");
+				console.log("error obtenint les administracions...");
+				mdesbloquejar();
 			}
 		});
 	}
 	
 	
 };
+
+
 
 function mostrarEntregaDeh(className) {
     var element = document.getElementById(className);
@@ -1143,7 +1538,20 @@ function actualitzarEntrega(j) {
 	
 }
 
-
+function comptarCaracters(idCamp) {
+	var fieldConcepte = $('#' + idCamp);
+	if (fieldConcepte.val().length != 0) {
+		var size = $(fieldConcepte).val().length;
+		$('.inputCurrentLength').text(size);
+	} else {
+		$('.inputCurrentLength').text(0);
+	};
+	
+	//$(fieldConcepte).bind("change paste keyup", function() {
+	//	var size = $(this).val().length;
+	//	$('.inputCurrentLength').text(size);
+	//});
+}
 	
 </script>
 </head>
@@ -1171,7 +1579,7 @@ function actualitzarEntrega(j) {
 			<!-- CONCEPTE -->
 			<div class="row">
 				<div class="col-md-12">
-					<not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="2" required="true" inputMaxLength="${concepteSize}"/>
+					<not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="2" required="true" showsize="true" inputMaxLength="${concepteSize}"/>
 				</div>
 			</div>
 			
@@ -1298,6 +1706,8 @@ function actualitzarEntrega(j) {
 				<input type="hidden" name="document.id" value="${notificacioCommandV2.document.id}">
 				<input type="hidden" name="document.arxiuGestdocId" value="${notificacioCommandV2.document.arxiuGestdocId}">
 				<input type="hidden" name="document.arxiuNom" value="${notificacioCommandV2.document.arxiuNom}">
+				<input type="hidden" name="document.mediaType" value="${notificacioCommandV2.document.mediaType}">
+				<input type="hidden" name="document.mida" value="${notificacioCommandV2.document.mida}">
 				<!-- CSV -->
 				<div id="input-origen-csv" class="col-md-6">
 					<not:inputText name="documentArxiuCsv" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
@@ -1353,6 +1763,7 @@ function actualitzarEntrega(j) {
 							</div>
 							<div>
 							<input type="hidden" name="enviaments[${j}].id" value="${enviament.id}"/>
+						
 							<!-- TIPUS DE SERVEI -->
 							<div class="col-md-6">
 								<div class="form-group">
@@ -1378,11 +1789,14 @@ function actualitzarEntrega(j) {
 									</div>
 									<hr/>
 								</div>
+<%-- 								<input class="col-md-6 rowId hidden" type="input" id="rowId" value="${j}"/> --%>
+								
 								<div class="personaForm">
+									<div class='rowId'><input class='hidden' value="${j}"/></div>
 									<div>
 										<input type="hidden" name="enviaments[${j}].titular.id" value="${enviament.titular.id}"/>
 										<!--  TIPUS INTERESSAT -->
-										<div class="col-md-6">
+										<div class="col-md-6 interessatTipus">
 											<not:inputSelect name="enviaments[${j}].titular.interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="4" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
 										</div>
 										
@@ -1393,40 +1807,39 @@ function actualitzarEntrega(j) {
 										
 										<!-- NOM / RAÓ SOCIAL -->
 										<div class="col-md-6 rao">
-											<not:inputText name="enviaments[${j}].titular.nom" textKey="notificacio.form.camp.titular.nom" required="true" />
+											<not:inputText name="enviaments[${j}].titular.nom" textKey="notificacio.form.camp.titular.nom" required="true" inputMaxLength="${nomSize}" showsize="true"/>
 										</div>
 										
 										<!-- PRIMER LLINATGE -->										
 										<div class="col-md-6 llinatge1">
-											<not:inputText name="enviaments[${j}].titular.llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" />
+											<not:inputText name="enviaments[${j}].titular.llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" inputMaxLength="${llinatge1Size}" showsize="true"/>
 										</div>
 										
 										<!-- SEGON LLINATGE -->
 										<div class="col-md-6 llinatge2">
-											<not:inputText name="enviaments[${j}].titular.llinatge2" textKey="notificacio.form.camp.titular.llinatge2" />
+											<not:inputText name="enviaments[${j}].titular.llinatge2" textKey="notificacio.form.camp.titular.llinatge2" inputMaxLength="${llinatge2Size}" showsize="true"/>
 										</div>
 										
 										<!-- EMAIL -->
 										<div class="col-md-6">
-											<not:inputText name="enviaments[${j}].titular.email" textKey="notificacio.form.camp.titular.email" />
+											<not:inputText name="enviaments[${j}].titular.email" textKey="notificacio.form.camp.titular.email" inputMaxLength="${emailSize}" showsize="true"/>
 										</div>
 										
 										<!-- TELÈFON -->
 										<div class="col-md-6">
-											<not:inputText name="enviaments[${j}].titular.telefon" textKey="notificacio.form.camp.titular.telefon" />
+											<not:inputText name="enviaments[${j}].titular.telefon" textKey="notificacio.form.camp.titular.telefon" inputMaxLength="${telefonSize}" showsize="true"/>
 										</div>
 										
 										<!-- CODI DIR3 -->
 										<div class="col-md-6 dir3Codi hidden">
-											<not:inputTextSearch  funcio="obrirModalOrganismes('Tit-${j}')" searchButton="searchOrganTit${j}" textKey="notificacio.form.camp.titular.dir3codi" required="true"/>
+											<not:inputTextSearch  funcio="obrirModalOrganismes('Tit-${j}')" searchButton="searchOrganTit${j}" textKey="notificacio.form.camp.titular.dir3codi" required="true" readonly="true" value=""/> 
+<%-- 											value="${fn:join(enviaments[j].titular.dir3Codi, enviaments[j].titular.nom)} "/> --%>
 										</div>
 										
-										<div class="col-md-6 hidden">
-											<not:inputTextSearch  funcio="obrirModalOrganismes(${j})" name="enviaments[${j}].titular.dir3Codi" searchButton="searchOrgan" textKey="notificacio.form.camp.titular.dir3codi" required="true"/>
+										<div class="col-md-6 codiDir3 hidden">
+<%-- 											<not:inputTextSearch  funcio="obrirModalOrganismes(${j})" name="enviaments[${j}].titular.dir3Codi" searchButton="searchOrgan" textKey="notificacio.form.camp.titular.dir3codi" required="true"/> --%>
+											<not:inputText name="enviaments[${j}].titular.dir3Codi" textKey="notificacio.form.camp.titular.dir3codi" required="true"/>
 										</div>
-<!-- 										<div class="col-md-6"> -->
-<%-- 											<not:inputTextSearch  name="enviaments[${j}].titular.dir3Codi" textKey="procediment.form.camp.organ" searchButton="searchOrgan" required="true" readonly="true" labelSize="2"/> --%>
-<!-- 										</div> -->
 										
 										<!-- INCAPACITAT -->
 										<c:if test="${isTitularAmbIncapacitat}">
@@ -1464,23 +1877,23 @@ function actualitzarEntrega(j) {
 													</div>
 													<!-- NOM / RAÓ SOCIAL -->
 													<div class="col-md-3">
-														<not:inputText name="enviaments[${j}].destinataris[${i}].nom" textKey="notificacio.form.camp.titular.nom" labelSize="12" inputSize="12" required="true" />
+														<not:inputText name="enviaments[${j}].destinataris[${i}].nom" textKey="notificacio.form.camp.titular.nom" labelSize="12" inputSize="12" required="true" inputMaxLength="${concepteSize}" showsize="true"/>
 													</div>
 													<!-- PRIMER LLINATGE -->
 													<div class="col-md-3 llinatge1">
-														<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge1" textKey="notificacio.form.camp.titular.llinatge1" labelSize="12" inputSize="12" required="true" />
+														<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge1" textKey="notificacio.form.camp.titular.llinatge1" labelSize="12" inputSize="12" required="true"  inputMaxLength="${concepteSize}" showsize="true"/>
 													</div>
 													<!-- SEGON LLINATGE -->
 													<div class="col-md-3 llinatge2">
-														<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge2" textKey="notificacio.form.camp.titular.llinatge2" labelSize="12" inputSize="12"/>
+														<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge2" textKey="notificacio.form.camp.titular.llinatge2" labelSize="12" inputSize="12" inputMaxLength="${concepteSize}" showsize="true"/>
 													</div>
 													<!-- TELÈFON -->
 													<div class="col-md-3">
-														<not:inputText name="enviaments[${j}].destinataris[${i}].telefon" textKey="notificacio.form.camp.titular.telefon" labelSize="12" inputSize="12"/>
+														<not:inputText name="enviaments[${j}].destinataris[${i}].telefon" textKey="notificacio.form.camp.titular.telefon" labelSize="12" inputSize="12" inputMaxLength="${concepteSize}" showsize="true"/>
 													</div>
 													<!-- EMAIL -->
 													<div class="col-md-4">
-														<not:inputText name="enviaments[${j}].destinataris[${i}].email" textKey="notificacio.form.camp.titular.email" labelSize="12" inputSize="12"/>
+														<not:inputText name="enviaments[${j}].destinataris[${i}].email" textKey="notificacio.form.camp.titular.email" labelSize="12" inputSize="12" inputMaxLength="${concepteSize}" showsize="true"/>
 													</div>
 													<!-- CODI DIR3 -->
 													<div class="col-md-3 dir3Codi hidden">
@@ -1694,47 +2107,106 @@ function actualitzarEntrega(j) {
 
 
 	<div class="modal fade" id="organismesModal" role="dialog">
-		<div class="modal-dialog">
+		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title"><spring:message code="procediment.form.titol.organismes"/></h4>
+					<h4 class="modal-title"><spring:message code="notificacio.form.dir3.cercar.organismes"/></h4>
 				</div>
 				<div class="modal-body body">
-					<div class="row">
-						<input type="hidden" id="titular" value="${indexTitular}">
-						<div class="col-md-3">
-							<input type="text"  name="searchCodi" id="searchCodi" onchange="searchCodiChange(this.value)" class="form-control" placeholder="<spring:message code="organgestor.list.columna.codi"/>"/>
+					
+				<div id='dialeg_organs' style='padding: 0px;'>
+					<input type="hidden" id="titular" value="">
+					<input type="hidden" id="organigrama" value="">
+					 
+
+					 
+					<div class="row margebaix" style="margin-top:20px;">
+						<div class="col-sm-6">
+							<div class="form-group">
+								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.codi" /></label>
+								<div class="forminput">
+									<input type="text" id="o_codi" class="form-control">
+								</div>
+							</div>
 						</div>
-						<div class="col-md-5">
-							<input type="text"  id="searchNom" class="form-control" onchange="searchNomChange(this.value)" placeholder="<spring:message code="organgestor.list.columna.nom"/>"/>
-						<div class="col-md-3"> </div>
-						</div>
-						<div class="col-md-4 pull-right">
-							<div class="pull-right">
-								<button id="btnNetejar" onclick="netejarFiltre()" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
-								<button type="submit" onclick="cercarOrganismes()" id="btnBuscar" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+						<div class="col-sm-6">
+							<div class="form-group">
+								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.denominacio" /></label>
+								<div class="forminput">
+									<input type="text" id="o_denominacio" class="form-control">
+								</div>
 							</div>
 						</div>
 					</div>
-					<h6 class="top"><spring:message code="notificacio.form.filtre.llegenda"/></h6>
-					<div class="row">
-						<div class="col-md-12" style="margin-top: 10px;">
-							<select id="selOrganismes" class= "form-control"  data-placeholder="<spring:message code="procediment.form.camp.organ"/>"></select> 
+					<div class="row margebaix">
+						<div class="col-sm-6">
+							<div class="form-group">
+								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.nivell.administracio" /></label>
+								<div class="forminput">
+									<select id="o_nivellAdmin" class="form-control">
+										<option value=""></option>
+				    				</select>
+								</div>
+							</div>
 						</div>
+						<div class="col-sm-6">
+							<div class="form-group">
+								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.comunitat.autonoma" /></label>
+								<div class="forminput">
+									<select id="o_comunitat" onchange="comunitatAutonomaChange(this.value)" class="form-control">
+										<option value=""></option>
+				    				</select>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row margebaix">
+						<div class="col-sm-6">
+							<div class="form-group">
+								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.provincia" /></label>
+								<div class="forminput">
+									<select id="o_provincia" onchange="provinciesChange(this.value)"class="form-control">
+										<option value=""></option>
+				    				</select>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							<div class="form-group">
+								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.localitat" /></label>
+								<div class="forminput">
+									<select id="o_localitat" class="form-control">
+										<option value=""></option>
+				    				</select>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="mloading-screen ocult">
+						<span class="fa fa-spin fa-circle-o-notch  fa-4x" style="color: burlywood;margin-top: 10px;"></span>
+					</div>
+					<div id="results" class="row" style="width: calc(100% - 30px); background-color: white; height: 240px; border: 1px solid #CCC; margin: 15px; overflow-y: scroll"" >
+						<table id="tOficines" class="table table-bordered dataTable dinamicTable">
+							<thead>
+								<tr class="capsalera" style="font-weight: bold;" >
+									<td width="85%"><spring:message code="notificacio.form.dir3.cercar.titol" /></td>
+									<td><spring:message code="notificacio.form.dir3.cercar.sir" /></td>
+									<td></td>
+								</tr>
+							</thead>
+							<tbody id="rOrgans">
+							</tbody>
+						</table>
 					</div>
 					
-					<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
-						<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
-							<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>
-						</div>
-					</div>
+				</div>
 				</div>
 				
 				<div class="modal-footer">
-					
-					<button id="addOrganismeButton" onclick="seleccionar()" type="button" class="btn btn-info" data-dismiss="modal"><span class="fa fa-plus"></span> <spring:message code="comu.boto.seleccionar"/></button>
-					<button type="button" class="btn btn-default" data-dismiss="modal"><spring:message code="comu.boto.cancelar" /></button>
+					<button id="btnNetejar" onclick="netejar()" type="submit" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+					<button id="loadOrgansGestors" onclick="loadOrgansGestors()" name="accio" value="filtrar" type="button" class="btn btn-info"> <spring:message code="comu.boto.filtrar"/></button>
+					<button id="cerrarModal" type="button" class="btn btn-default" data-dismiss="modal"><spring:message code="comu.boto.cancelar" /></button>
 				</div>
 			</div>
 		</div>

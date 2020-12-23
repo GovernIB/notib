@@ -57,21 +57,25 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	public ProcedimentDto update(
 			Long entitatId, 
 			ProcedimentDto procediment,
-			boolean isAdmin) throws NotFoundException {
+			boolean isAdmin,
+			boolean isAdminEntitat) throws NotFoundException {
 		return delegate.update(
 				entitatId, 
 				procediment,
-				isAdmin);
+				isAdmin,
+				isAdminEntitat);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public ProcedimentDto delete(
 			Long entitatId, 
-			Long id) throws NotFoundException {
+			Long id,
+			boolean isAdminEntitat) throws NotFoundException {
 		return delegate.delete(
 				entitatId, 
-				id);
+				id,
+				isAdminEntitat);
 	}
 
 	@Override

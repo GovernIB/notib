@@ -179,7 +179,8 @@ public class ProcedimentController extends BaseUserController{
 				procedimentService.update(
 						procedimentCommand.getEntitatId(),
 						ProcedimentCommand.asDto(procedimentCommand),
-						isAdministrador(request));
+						isAdministrador(request),
+						RolHelper.isUsuariActualAdministradorEntitat(request));
 				
 			} catch(NotFoundException | ValidationException ev) {
 				logger.debug("Error al actualitzar el procediment", ev);
@@ -239,7 +240,8 @@ public class ProcedimentController extends BaseUserController{
 			} else {
 				procedimentService.delete(
 						entitat.getId(),
-						procedimentId);
+						procedimentId,
+						RolHelper.isUsuariActualAdministradorEntitat(request));
 				
 				return getAjaxControllerReturnValueSuccess(
 						request,

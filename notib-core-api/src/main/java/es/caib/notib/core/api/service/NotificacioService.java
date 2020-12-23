@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.api.service;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import javax.mail.MessagingException;
@@ -10,7 +11,7 @@ import javax.mail.MessagingException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.DocumentDto;
+import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.LocalitatsDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
@@ -65,7 +66,7 @@ public interface NotificacioService {
 	 * @throws NotFoundException
 	 *              Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
 	public void delete(
 			Long entitatId,
 			Long notificacioId) throws NotFoundException;
@@ -85,10 +86,11 @@ public interface NotificacioService {
 	 * @throws RegistreNotificaException
 	 * 				Si hi ha hagut un error en el procés de registra/notificar
 	 */
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
 	public List<NotificacioDto> update(
 			Long entitatId,
-			NotificacioDtoV2 notificacio) throws NotFoundException, RegistreNotificaException;
+			NotificacioDtoV2 notificacio,
+			boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException;
 	
 	/**
 	 * Consulta una notificació donat el seu id.
@@ -127,6 +129,33 @@ public interface NotificacioService {
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
 	
+	
+	/**
+	 * Consulta els nivells d'administració disponibles dins DIR3.
+	 * 
+	 * @return Una llista amb el codi i el nom de la l'administració.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	public List<CodiValorDto> llistarNivellsAdministracions();
+	
+	
+	/**
+	 * Consulta les comunitats autònomes disponibles dins DIR3.
+	 * 
+	 * @return Una llista amb el codi i el nom de la comunitat autònoma.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	public List<CodiValorDto> llistarComunitatsAutonomes();
+	
+	/**
+	 * Consulta els paisos disponibles dins DIR3.
+	 * 
+	 * @return Una llista amb el codi i el nom de la localitat.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	public List<PaisosDto> llistarPaisos();
+	
+	
 	/**
 	 * Consulta les provincies.
 	 * 
@@ -134,6 +163,16 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
 	public List<ProvinciesDto> llistarProvincies();
+	
+	/**
+	 * Consulta les provincies.
+	 * 
+	 *  @param codiCA Codi de la comunitat autònoma.
+	 *  
+	 * @return Una llista amb el codi i el nom de la provincia.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	List<ProvinciesDto> llistarProvincies(String codiCA);
 	
 	/**
 	 * Consulta les localitats d'una provincia.
@@ -145,15 +184,7 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
 	public List<LocalitatsDto> llistarLocalitats(String codiProvincia);
 	
-	/**
-	 * Consulta els paisos disponibles dins DIR3.
-	 * 
-	 * @param codiProvincia 
-	 * 				Codi de la provincia de la que es vol recuperar les localitats
-	 * @return Una llista amb el codi i el nom de la localitat.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public List<PaisosDto> llistarPaisos();
+	
 	
 	/**
 	 * Consulta dels events d'una notificació.
@@ -330,8 +361,8 @@ public interface NotificacioService {
 	 * @return el justificant firmat
 	 * @throws JustificantException
 	 */
-	@PreAuthorize("hasRole('tothom')")
-	public FitxerDto recuperarJustificant(Long notificacioId, Long entitatId) throws JustificantException;
+	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
+	public FitxerDto recuperarJustificant(Long notificacioId, Long entitatId, String sequence) throws JustificantException;
 
 	/**
 	 * Recuperar l'estat de la generació del justificant
@@ -339,8 +370,8 @@ public interface NotificacioService {
 	 * @return el justificant firmat
 	 * @throws JustificantException
 	 */
-	@PreAuthorize("hasRole('tothom')")
-	public ProgresDescarregaDto justificantEstat() throws JustificantException;
+	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
+	public ProgresDescarregaDto justificantEstat(String sequence) throws JustificantException;
 
 	/**
 	 * Consulta les administracions disponibles dins DIR3 a partir del codi.
@@ -361,6 +392,17 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
 	List<OrganGestorDto> unitatsPerDenominacio(String denominacio);
+	
+	
+	/**
+	 * Consulta les administracions disponibles dins DIR3 a partir de tots els camps disponibles.
+	 * 
+	 * @return Una llista amb les administracions cercades.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	public List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma,
+			Boolean ambOficines, Boolean esUnitatArrel, Long provincia, String municipi);
+
 	
 
 //	void registrarEnviamentsPendents();
@@ -383,10 +425,18 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public ProgresActualitzacioCertificacioDto actualitzacioEnviamentsEstat();
 
+	
+	/**
+	 * Guarda un document a partir del string de bytes
+	 * 
+	 * @return el id
+	 */
 	@PreAuthorize("hasRole('tothom')")
 	public String guardarArxiuTemporal(String string);
 
-
+	@PreAuthorize("hasRole('tothom')")
+	public byte[] obtenirArxiuTemporal(String arxiuGestdocId);
+	
 	
 
 }

@@ -27,7 +27,7 @@ public class NotificacioHelper {
 	@Autowired
 	private NotificaHelper notificaHelper;
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public void enviamentRefrescarEstat(
 			Long enviamentId, 
 			ProgresActualitzacioCertificacioDto progres,

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +30,7 @@ import es.caib.notib.core.api.dto.CodiValorDescDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -264,6 +266,18 @@ public class EntitatController extends BaseController {
 		}
 		return locale;
 	}
+	
+	@RequestMapping(value = "/organigrama/{entitatCodi}", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, OrganismeDto> getOrganigrama(
+			@PathVariable String entitatCodi,
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		
+		return entitatService.findOrganigramaByEntitat(entitatCodi);
+		
+	}
+	
 
 	private static final Logger logger = LoggerFactory.getLogger(EntitatController.class);
 }

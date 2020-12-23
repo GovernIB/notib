@@ -11,6 +11,12 @@
 	pageContext.setAttribute(
 			"isRolActualUsuari",
 			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuari(request));
+	pageContext.setAttribute(
+			"isRolActualAdministradorEntitat",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
+	pageContext.setAttribute(
+			"isRolActualAdministradorOrgan",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
 %>
 <c:set var="ampladaConcepte">
 	<c:choose>
@@ -113,13 +119,26 @@
 </style>
 <script type="text/javascript"> 
 
-var myHelpers = {recuperarEstatEnviament: returnEnviamentsStatusDiv, hlpIsUsuari: isRolActualUsuari};
+var myHelpers = {
+		recuperarEstatEnviament: returnEnviamentsStatusDiv, 
+		hlpIsUsuari: isRolActualUsuari, 
+		hlpIsAdministradorEntitat: isRolActualAdministradorEntitat, 
+		hlpIsAdministradorOrgan: isRolActualAdministradorOrgan};
 
 $.views.helpers(myHelpers);
 
 function isRolActualUsuari() {
 	return ${isRolActualUsuari};
 }
+
+function isRolActualAdministradorEntitat() {
+	return ${isRolActualAdministradorEntitat};
+}
+
+function isRolActualAdministradorOrgan() {
+	return ${isRolActualAdministradorOrgan};
+}
+
 
 function returnEnviamentsStatusDiv(notificacioId) {
 	var content = "";
@@ -479,7 +498,7 @@ $(document).ready(function() {
 			<div class="col-md-2 pull-right form-buttons"  style="text-align: right;">
 				<button id="nomesAmbErrorsBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbErrors"/>" class="btn btn-default <c:if test="${nomesAmbErrors}">active</c:if>" data-toggle="button"><span class="fa fa-warning"></span></button>
 				<not:inputHidden name="nomesAmbErrors"/>
-				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+				<button id="btnNetejar" type="submit" name="netejar" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 				<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 			</div>
 		</div>
@@ -490,7 +509,7 @@ $(document).ready(function() {
 		data-toggle="datatable"
 		data-url="<c:url value="/notificacio/datatable"/>"
 		data-search-enabled="false"
-		data-default-order="8"
+		data-default-order="7"
 		data-default-dir="desc"
 		class="table table-striped table-bordered"
 		style="width:100%"
@@ -503,7 +522,6 @@ $(document).ready(function() {
 				<th data-col-name="id" data-visible="false">#</th>
 				<th data-col-name="tipusUsuari" data-visible="false">#</th>
 				<th data-col-name="errorLastCallback" data-visible="false">#</th>
-				<th data-col-name="hasEnviamentsPendents" data-visible="false">#</th>
 				<th data-col-name="hasEnviamentsPendentsRegistre" data-visible="false">#</th>
 				<th data-col-name="notificaError" data-visible="false"></th>
 				<th data-col-name="notificaErrorDescripcio" data-visible="false"></th>
@@ -577,10 +595,7 @@ $(document).ready(function() {
 							{{if permisProcessar }}
 								<li><a href="<c:url value="/notificacio/{{:id}}/processar"/>" data-toggle="modal"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a></li>
 							{{/if}}
-							{{if !hasEnviamentsPendents }}
-								<li><a href="<c:url value="/notificacio/{{:id}}/justificant"/>" data-toggle="modal" data-height="250px"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.justificant"/></a></li>
-							{{/if}}
-							{^{if ~hlpIsUsuari() && hasEnviamentsPendentsRegistre }}
+							{^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan()) && hasEnviamentsPendentsRegistre }}
 								<li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
 								<li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							{{/if}}							

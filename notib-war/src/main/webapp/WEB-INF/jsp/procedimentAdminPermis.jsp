@@ -44,7 +44,8 @@ pageContext.setAttribute(
 			<tr>
 				<th data-col-name="tipus" data-renderer="enum(TipusEnumDto)"><spring:message code="procediment.permis.columna.tipus"/></th>
 				<th data-col-name="nomSencerAmbCodi"><spring:message code="procediment.permis.columna.principal"/></th>
-				<th data-col-name="organ"><spring:message code="procediment.permis.columna.organ"/></th>
+				<th data-col-name="organ" data-visible="false">#</th>
+				<th data-col-name="organCodiNom"><spring:message code="procediment.permis.columna.organ"/></th>
 				<th data-col-name="read" data-template="#cellPermisReadTemplate">
 					<spring:message code="procediment.permis.columna.consulta"/>
 					<script id="cellPermisReadTemplate" type="text/x-jsrender">

@@ -53,7 +53,8 @@ public interface ProcedimentService {
 	public ProcedimentDto update(
 			Long entitatId,
 			ProcedimentDto procediment,
-			boolean isAdmin) throws NotFoundException;
+			boolean isAdmin,
+			boolean isAdminEntitat) throws NotFoundException;
 
 	/**
 	 * Esborra el procediment amb el mateix id que l'especificat.
@@ -67,7 +68,8 @@ public interface ProcedimentService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public ProcedimentDto delete(
 			Long entitatId,
-			Long id) throws NotFoundException;
+			Long id,
+			boolean isAdminEntitat) throws NotFoundException;
 
 	/**
 	 * Consulta un procediment donat el seu id.

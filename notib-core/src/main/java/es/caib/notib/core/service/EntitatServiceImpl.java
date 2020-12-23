@@ -29,6 +29,7 @@ import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
@@ -666,7 +667,17 @@ public class EntitatServiceImpl implements EntitatService {
 		}
 	}
 
-
+	@Transactional(readOnly = true)
+	@Override
+	public Map<String, OrganismeDto> findOrganigramaByEntitat(String entitatCodi) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			return cacheHelper.findOrganigramaByEntitat(entitatCodi);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
 
 }

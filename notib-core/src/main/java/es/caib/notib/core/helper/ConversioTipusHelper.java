@@ -11,11 +11,13 @@ import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.AplicacioDto;
+import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorCieFormatFullaDto;
@@ -37,6 +39,7 @@ import es.caib.notib.core.entity.PagadorCieFormatSobreEntity;
 import es.caib.notib.core.entity.PagadorPostalEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.UsuariEntity;
+import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
 import ma.glasnost.orika.CustomConverter;
@@ -161,7 +164,16 @@ public class ConversioTipusHelper {
 			field("denominacio", "nom").
 			byDefault().
 			register();
-
+		
+		mapperFactory.classMap(CodiValor.class, CodiValorDto.class).
+			field("id", "codi").
+			field("descripcio", "valor").
+			byDefault().
+			register();
+		mapperFactory.classMap(NotificacioEnviamentEntity.class, NotificacioEnviamentDtoV2.class).
+		field("notificacio.id", "notificacioId").
+		byDefault().
+		register();
 	
 	}
 

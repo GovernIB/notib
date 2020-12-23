@@ -170,6 +170,11 @@ $(document).ready(function() {
 							<td><strong><spring:message code="notificacio.info.dada.procediment.codi" /></strong></td>
 							<td>${notificacio.procediment.nom}<br>${notificacio.procediment.codi}</td>
 						</tr>
+						<c:if test="${!notificacio.hasEnviamentsPendents}">
+							<tr>
+								<td colspan="2"><a href="<c:url value="/notificacio/${notificacio.id}/justificant"/>" data-toggle="modal" data-height="250px" data-refresh="true" class="btn btn-default btn-sm pull-right"><spring:message code="comu.boto.justificant"/>&nbsp;<span class="fa fa-download"></span></a></td>
+							</tr>
+						</c:if>
 					</tbody>
 				</table>
 			</div>

@@ -49,6 +49,7 @@ import es.caib.notib.core.api.dto.ProgresActualitzacioDto.ActualitzacioInfo;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.exception.PermissionDeniedException;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusObjecte;
@@ -219,12 +220,20 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	public ProcedimentDto update(
 			Long entitatId,
 			ProcedimentDto procediment,
-			boolean isAdmin) throws NotFoundException {
+			boolean isAdmin,
+			boolean isAdminEntitat) throws NotFoundException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Actualitzant procediment ("
 					+ "procediment=" + procediment + ")");
-			
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			if (!isAdminEntitat && procediment.isComu()) {
+				throw new PermissionDeniedException(
+						procediment.getId(),
+						ProcedimentEntity.class,
+						auth.getName(),
+						"ADMINISTRADORENTITAT");
+			}
 			
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 					entitatId,
@@ -323,9 +332,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Transactional
 	public ProcedimentDto delete(
 			Long entitatId,
-			Long id) throws NotFoundException {
+			Long id,
+			boolean isAdminEntitat) throws NotFoundException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 					entitatId,
 					false,
@@ -335,6 +346,13 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			ProcedimentEntity procedimentEntity = entityComprovarHelper.comprovarProcediment(
 					entitat, 
 					id);
+			if (!isAdminEntitat && procedimentEntity.isComu()) {
+				throw new PermissionDeniedException(
+						procedimentEntity.getId(),
+						ProcedimentEntity.class,
+						auth.getName(),
+						"ADMINISTRADORENTITAT");
+			}
 			//Eliminar grups del procediment
 			List<GrupProcedimentEntity> grupsDelProcediment = grupProcedimentRepository.findByProcediment(procedimentEntity);
 			for (GrupProcedimentEntity grupProcedimentEntity : grupsDelProcediment) {
@@ -854,6 +872,17 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				List<PermisDto> permisos = permisosHelper.findPermisos(
 						procediment.getId(),
 						ProcedimentEntity.class);
+
+				if (procediment.isComu()) {
+					String organActual = null;
+					if (organGestorActual != null) {
+						organActual = organGestorActual.getCodi();
+//					} else {
+//						organActual = entitatActual.getDir3Codi();
+					}
+					permisos.addAll(findPermisProcedimentOrganByProcediment(procediment.getId(), organActual));
+				}
+
 				List<GrupDto> grups = grupService.findGrupsByProcediment(procediment.getId());
 				procediment.setGrups(grups);
 				procediment.setPermisos(permisos);
@@ -1365,16 +1394,16 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						false,
 						false,
 						false);
-			entityComprovarHelper.comprovarProcediment(
+			ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(
 					entitat, 
 					procedimentId);
 			boolean adminOrgan = organActual != null;
 
 			if (tipus == null) {
-				permisos = findPermisProcediment(procedimentId, adminOrgan);
+				permisos = findPermisProcediment(procediment, adminOrgan, organActual);
 				permisos.addAll(findPermisProcedimentOrganByProcediment(procedimentId, organActual));
 			} else if (TipusPermis.PROCEDIMENT.equals(tipus)) {
-				permisos = findPermisProcediment(procedimentId, adminOrgan);
+				permisos = findPermisProcediment(procediment, adminOrgan, organActual);
 			} else {
 				if (organ == null)
 					permisos = findPermisProcedimentOrganByProcediment(procedimentId, organActual);
@@ -1402,13 +1431,17 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 
 	private List<PermisDto> findPermisProcediment(
-			Long procedimentId,
-			boolean adminOrgan) {
+			ProcedimentEntity procediment,
+			boolean adminOrgan,
+			String organ) {
 		List<PermisDto> permisos = permisosHelper.findPermisos(
-				procedimentId,
+				procediment.getId(),
 				ProcedimentEntity.class);
+		boolean isAdministradorOrganAndNoComuOrAdminEntitat = (adminOrgan && !procediment.isComu()) || //administrador òrgan i procediment no comú
+				(adminOrgan && procediment.isComu() && (procediment.getOrganGestor().getCodi().equals(organ))) ||  //administrador òrgan, procediment comú però del mateix òrgan
+				!adminOrgan; //administrador entitat
 		for (PermisDto permis: permisos)
-			permis.setPermetEdicio(!adminOrgan);
+			permis.setPermetEdicio(isAdministradorOrganAndNoComuOrAdminEntitat);
 		return permisos;
 	}
 	
@@ -1431,15 +1464,21 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						ProcedimentOrganEntity.class);
 				if (permisosProcOrgan != null && !permisosProcOrgan.isEmpty()) {
 					String organ = procedimentOrgan.getOrganGestor().getCodi();
+					String organNom = procedimentOrgan.getOrganGestor().getNom();
 					boolean tePermis = true;
+
 					if (organGestor != null)
 						tePermis = organsAmbPermis.contains(organ);
-					for (PermisDto permis: permisosProcOrgan) {
-						permis.setOrgan(organ);
-						permis.setPermetEdicio(tePermis);
+
+					if (tePermis) {
+						for (PermisDto permis : permisosProcOrgan) {
+							permis.setOrgan(organ);
+							permis.setOrganNom(organNom);
+							permis.setPermetEdicio(tePermis);
+						}
+						permisos.addAll(permisosProcOrgan);
 					}
 				}
-				permisos.addAll(permisosProcOrgan);
 			}
 		}
 		return permisos;
@@ -1455,6 +1494,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				ProcedimentOrganEntity.class);
 		for (PermisDto permis: permisos) {
 			permis.setOrgan(organ);
+			permis.setOrganNom(procedimentOrgan.getOrganGestor().getNom());
 		}
 		return permisos;
 	}
