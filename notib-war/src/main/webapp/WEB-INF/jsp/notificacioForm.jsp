@@ -89,6 +89,13 @@
 .title > label {
 	color: #ff9523;
 }
+.subtitle {
+	margin-top: 2%;
+	font-size: larger;
+}
+.subtitle > label {
+	color: #0BB60B;
+}
 .title > hr {
 	margin-top: 0%;
 }
@@ -558,11 +565,19 @@ $(document).ready(function() {
 			$(dir3codi).find('.form-group').removeClass('has-error')
 		}
 		comprovarTitularComuniacio();
+		var dir3Codi = closest.find("input[name='enviaments[0].titular.dir3Codi']");
+		var sir = $('#organigrama').val().indexOf(dir3Codi.val());
+		if(sir != -1){
+			document.getElementById("searchOrganTit0").getElementsByTagName('input')[0].value = '';
+			$(dir3Codi).val("");
+			closest.find("input[name='enviaments[0].titular.nom']").val("");
+		}
 		
 		
 	});
 	
 	$(document).on('change', 'input[type=radio][name=enviamentTipus]', function (event) {
+		
 	    comprovarTitularComuniacio();
 		$('.interessat').trigger('change');
 		
@@ -570,11 +585,8 @@ $(document).ready(function() {
 	
 	
 	function comprovarTitularComuniacio() {
-		var closest = $(this).closest('.destinatariForm, .personaForm');
-		var nif = closest.find('.nif');
-		var nifLabel = nif.find('label');
 		var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
-		var nifLabelText = "<spring:message code='notificacio.form.camp.titular.nif'/>";
+		var tipusInteressatTitular = document.getElementById("enviaments[0].titular.interessatTipus").value;
 		if(enviamentTipus == 'COMUNICACIO' && (tipusInteressatTitular == 'JURIDICA' || tipusInteressatTitular == 'FISICA')){
 			$('#rowRetard').addClass('hidden');
 			$('#rowDataProgramada').addClass('hidden');
@@ -665,7 +677,7 @@ function addDestinatari(enviament_id) {
     
 	var destinatari =' \
     <div class="col-md-12 destinatariForm destenv_#num_enviament# personaForm_#num_enviament#_#num_destinatari#"> \
-		<div class="col-md-3"> \
+		<div class="col-md-3 interessat"> \
 			<div class="form-group"> \
 				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].interessatTipus"><spring:message code="notificacio.form.camp.interessatTipus"/></label> \
 				<div class="controls col-xs-12"> \
@@ -1077,19 +1089,34 @@ function mostrarDestinatari(enviament_id) {
 
 
 function obrirModalOrganismes(index){
+	var from = index.split('-')[0];
+
 	$("#organismesModal").modal();
 // 	$("#indexTitular").val(index);
 	$("#titular").val(index);
+	var j = $('#titular').val().split('-')[1] != undefined?$('#titular').val().split('-')[1]:from;
 // 	var selOrganismes = $('#selOrganismes');
 	webutilModalAdjustHeight();
 // 	selOrganismes.append("<option value=\"\"></option>");
 	
-	loadNivellsAdministracions();
- 	loadComunitatsAutonomes();
-	
+	loadNivellsAdministracions($("#o_nivellAdmin").val());
+ 	loadComunitatsAutonomes($("#o_comunitat").val());
+	debugger
+ 	if(from == 'Tit'){
+		dir3CodiDesc =  document.getElementById("searchOrganTit" + j ).getElementsByTagName('input')[0];
+	}else{
+		dir3CodiDesc =  document.getElementById("searchOrgan" + j );
+	}
+ 	
+ 	if(dir3CodiDesc.value == '' || dir3CodiDesc.value == null){
+ 		netejar(true);
+ 	}else{
+ 		netejar(false);
+ 	}
+ 	
 	$(".loading-screen").hide();
 	loadOrganigrama();
-	netejar();
+
 	
 };
 
@@ -1113,7 +1140,8 @@ function obrirModalOrganismes(index){
 	
 // };
 
-function loadNivellsAdministracions() {
+function loadNivellsAdministracions(value) {
+	var nivellAdmin = $("#o_nivellAdmin");
 	$.ajax({
 		type: 'GET',
 		url: '${urlNivellAdministracions}',
@@ -1127,14 +1155,17 @@ function loadNivellsAdministracions() {
 				list_html += '<option value=' + data[i].codi + '>' + data[i].valor + '</option>';
 			});
 		}
-		$("#o_nivellAdmin").html(list_html);
+		nivellAdmin.html(list_html);
+		if(value !=null && value != ''){
+			nivellAdmin.val(value).trigger('change');
+		}
 // 		$("#o_nivellAdmin").select2({
 // 			enable : true,
 // 			allowClear : true,
 // 			dropdownParent: $("#dialeg_organs")
 // 		});
 		
-		$("#o_nivellAdmin").select2({
+		nivellAdmin.select2({
 			theme: 'bootstrap',
 			width: 'auto'
 		});
@@ -1146,7 +1177,8 @@ function loadNivellsAdministracions() {
 	});
 }
 
-function loadComunitatsAutonomes() {
+function loadComunitatsAutonomes(value) {
+	var codiComunitat = $("#o_comunitat");
 	$.ajax({
 		type: 'GET',
 		url: '${urlComunitatsAutonomes}',
@@ -1160,8 +1192,11 @@ function loadComunitatsAutonomes() {
 				list_html += '<option value=' + data[i].codi + '>' + data[i].valor + '</option>';
 			});
 		}
-		$("#o_comunitat").html(list_html);
-		$("#o_comunitat").select2({
+		codiComunitat.html(list_html);
+		if(value !=null && value != ''){
+			codiComunitat.val(value).trigger('change');
+		}
+		codiComunitat.select2({
 			theme: 'bootstrap',
 			width: 'auto'
 		});
@@ -1171,9 +1206,10 @@ function loadComunitatsAutonomes() {
 	
 }
 
-function loadProvincies(codiCA) {
+function loadProvincies(codiCA, value) {
+	var provincia = $('#o_provincia');
 	if (codiCA != null && codiCA != '') {
-		mbloquejar();
+		$(".loading-screen").show();
 		$.ajax({
 			type: 'GET',
 			url: '${urlProvincies}/' + codiCA ,
@@ -1186,7 +1222,10 @@ function loadProvincies(codiCA) {
 					list_html += '<option value=' + data[i].id + '>' + data[i].descripcio + '</option>';
 				});
 			}
-			$("#o_provincia").html(list_html);
+			provincia.html(list_html);
+			if(value !=null && value != ''){
+				provincia.val(value).trigger('change');
+			}
 			$("#o_provincia").select2({
 				theme: 'bootstrap',
 				width: 'auto'
@@ -1194,7 +1233,7 @@ function loadProvincies(codiCA) {
 		}).fail(function(jqXHR, textStatus) {
 // 			refreshAlertes();
 		});
-		mdesbloquejar();
+		$(".loading-screen").hide();
 	} else {
 		var list_html = '<option value=""></option>';
 		$("#o_provincia").html(list_html);
@@ -1209,19 +1248,23 @@ function loadProvincies(codiCA) {
 
 function comunitatAutonomaChange(value){
 	if(value.trim().length !=0){
-		loadProvincies(value);
+		loadProvincies(value,$('#o_provincia').val()!=null?$('#o_provincia').val():'');
+	}else{
+		limpiarProvincia(true);
 	}
 };
 
 function provinciesChange(value){
 	if(value.trim().length !=0){
 		loadLocalitats(value);
+	}else{
+		limpiarLocalitat(true);
 	}
 };
 
 function loadLocalitats(codiProvincia) {
 	if (codiProvincia != null && codiProvincia != '') {
-		mbloquejar();
+		$(".loading-screen").show();
 		$.ajax({
 			type: 'GET',
 			url: '${urlLocalitats}/' + codiProvincia,
@@ -1242,7 +1285,7 @@ function loadLocalitats(codiProvincia) {
 		}).fail(function(jqXHR, textStatus) {
 // 			refreshAlertes();
 		});
-		mdesbloquejar();
+		$(".loading-screen").hide();
 	} else {
 		var list_html = '<option value=""></option>';
 		$("#o_localitat").html(list_html);
@@ -1253,29 +1296,55 @@ function loadLocalitats(codiProvincia) {
 	}
 }
 
-function mbloquejar() {
-// 	var height = $("#dialeg_organs").css('height');
-	var width = $("#dialeg_organs").css('width');
-	var top = $("#dialeg_organs").css('top');
-// 	$(".mloading-screen").css('height', height);
-	$(".mloading-screen").css('width', width);
-	$(".mloading-screen").css('top', top);
-	$(".mloading-screen").show();
+// function mbloquejar() {
+// // 	var height = $("#dialeg_organs").css('height');
+// 	var width = $("#dialeg_organs").css('width');
+// 	var top = $("#dialeg_organs").css('top');
+// // 	$(".mloading-screen").css('height', height);
+// 	$(".mloading-screen").css('width', width);
+// 	$(".mloading-screen").css('top', top);
+// 	$(".mloading-screen").show();
+// }
+
+// function mdesbloquejar() {
+// 	$(".mloading-screen").hide();
+// }
+
+function netejar(reload) { 
+	if(reload){
+		limpiarNivellAdmin();
+		limpiarComunitat();
+		limpiarProvincia(true);
+		limpiarLocalitat(true);
+		$("#o_codi").val("");
+		$("#o_denominacio").val("");
+		$("#rOrgans").html('');	
+		$("#resultatsTotal").addClass('hidden');	
+	}else{
+		loadOrgansGestors();
+	}
+	$(".loading-screen").hide();
 }
 
-function mdesbloquejar() {
-	$(".mloading-screen").hide();
+function limpiarNivellAdmin() { 
+	$('#o_nivellAdmin').val(null).trigger('change');
+}
+function limpiarComunitat() { 
+	$('#o_comunitat').val(null).trigger('change');
+}
+function limpiarProvincia(borrarLlistat) { 
+	$("#o_provincia").val("").trigger('change');
+	if(borrarLlistat){
+		$("#o_provincia").html("");
+	}	
+}
+function limpiarLocalitat(borrarLlistat) { 
+	$("#o_localitat").val("").trigger('change');
+	if(borrarLlistat){
+		$("#o_localitat").html("");
+	}
 }
 
-function netejar() {
-	$("#o_provincia").val("");
-	$("#o_provincia").html("");
-	$("#o_localitat").val("");
-	$("#o_localitat").html("");
-	$("#o_codi").val("");
-	$("#o_denominacio").val("");
-	$("#rOrgans").html('');	
-}
 
 function seleccionar(fila){
 	var from = $('#titular').val().split('-')[0];
@@ -1356,7 +1425,7 @@ function loadOrgansGestors(){
 		alert("<spring:message code='notificacio.form.dir3.cercar.noMinimOrgansFiltre'/>");
 		return false;
 	} else {
-		mbloquejar()
+		$(".loading-screen").show();
 		$.ajax({
 			type: 'GET',
 			url: "<c:url value="/notificacio/cercaUnitats"/>" + 
@@ -1368,6 +1437,7 @@ function loadOrgansGestors(){
 				'&municipi='+codiLocalitat,
 			success: function(data) {
 				var list_html = '';
+				$("#resultatsTotal").removeClass('hidden');
 				if (data.length > 0) {
 					$.each(data, function(i, item) {
 						var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
@@ -1381,13 +1451,13 @@ function loadOrgansGestors(){
 // 							claseBoto = 'unselectable select btn btn-success';
 // 						}else if(enviamentTipus == 'COMUNICACIO' && sir==-1 ){
 						if(enviamentTipus == 'COMUNICACIO' && sir!=-1 ){
-							clase = 'unselectable';
-							claseBoto = 'unselectable select btn btn-success';
+							clase =   (i%2 == 0 ? 'even' : 'odd') +' unselectable';
+							claseBoto = 'hidden select btn btn-success';
 						}else{
 							clase = (i%2 == 0 ? 'even' : 'odd');
 						}
 						
-						list_html += '<tr class="'+clase+'" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom + 
+						list_html += '<tr class="'+clase+'" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].codi + ' - '+ data[i].nom + 
 						'</td><td>'+(socSir)+'</td><td><button type="button" class="'+claseBoto+'"> <spring:message code="comu.boto.seleccionar"/></button</td></tr>';
 						
 						
@@ -1405,16 +1475,17 @@ function loadOrgansGestors(){
 						
 					});
 				}else{
-					alert("<spring:message code='notificacio.form.dir3.cercar.noOrgansFiltre'/>");
+					$("#total").text("0");
 				}
+
 				$("#rOrgans").html(list_html);
-				
-// 				$('.disabled').prop('disabled', true);
-				mdesbloquejar();
+				$("#total").text(data.length);
+// 				$("#rOrgans").append('<tfoot><tr><th id="total" colspan="2"><spring:message code="comu.resultats"/></th><td>'+data.length+'</td></tr></tfoot>');
+				$(".loading-screen").hide();
 			},
 			error: function() {
 				console.log("error obtenint les administracions...");
-				mdesbloquejar();
+				$(".loading-screen").hide();
 			}
 		});
 	}
@@ -1868,7 +1939,7 @@ function comptarCaracters(idCamp) {
 <%-- 												<input id="isMultiple" class="hidden" value="${isMultiplesDestinataris}"> --%>
 													<input type="hidden" name="enviaments[${j}].destinataris[${i}].id" value="${destinatari.id}"/>
 													<!-- TIPUS INTERESSAT -->
-													<div class="col-md-3">
+													<div class="col-md-3 interessat">
 														<not:inputSelect name="enviaments[${j}].destinataris[${i}].interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="12" inputSize="12" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
 													</div>
 													<!-- NIF -->
@@ -2122,7 +2193,7 @@ function comptarCaracters(idCamp) {
 
 					 
 					<div class="row margebaix" style="margin-top:20px;">
-						<div class="col-sm-6">
+						<div class="col-sm-5">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.codi" /></label>
 								<div class="forminput">
@@ -2130,7 +2201,7 @@ function comptarCaracters(idCamp) {
 								</div>
 							</div>
 						</div>
-						<div class="col-sm-6">
+						<div class="col-sm-5">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.denominacio" /></label>
 								<div class="forminput">
@@ -2138,9 +2209,10 @@ function comptarCaracters(idCamp) {
 								</div>
 							</div>
 						</div>
+					
 					</div>
 					<div class="row margebaix">
-						<div class="col-sm-6">
+						<div class="col-sm-5">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.nivell.administracio" /></label>
 								<div class="forminput">
@@ -2150,7 +2222,10 @@ function comptarCaracters(idCamp) {
 								</div>
 							</div>
 						</div>
-						<div class="col-sm-6">
+						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px">
+							<span onclick="limpiarNivellAdmin()" class="fa fa-trash"></span>
+						</div>
+						<div class="col-sm-5">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.comunitat.autonoma" /></label>
 								<div class="forminput">
@@ -2160,9 +2235,12 @@ function comptarCaracters(idCamp) {
 								</div>
 							</div>
 						</div>
+						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px">
+							<span onclick="limpiarComunitat()" class="fa fa-trash"></span>
+						</div>
 					</div>
 					<div class="row margebaix">
-						<div class="col-sm-6">
+						<div class="col-sm-5">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.provincia" /></label>
 								<div class="forminput">
@@ -2172,7 +2250,10 @@ function comptarCaracters(idCamp) {
 								</div>
 							</div>
 						</div>
-						<div class="col-sm-6">
+						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px">
+							<span onclick="limpiarProvincia(false)" class="fa fa-trash"></span>
+						</div>
+						<div class="col-sm-5">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.localitat" /></label>
 								<div class="forminput">
@@ -2182,11 +2263,17 @@ function comptarCaracters(idCamp) {
 								</div>
 							</div>
 						</div>
+						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px">
+							<span onclick="limpiarLocalitat(false)" class="fa fa-trash"></span>
+						</div>
 					</div>
-					<div class="mloading-screen ocult">
-						<span class="fa fa-spin fa-circle-o-notch  fa-4x" style="color: burlywood;margin-top: 10px;"></span>
-					</div>
+				
 					<div id="results" class="row" style="width: calc(100% - 30px); background-color: white; height: 240px; border: 1px solid #CCC; margin: 15px; overflow-y: scroll"" >
+						<div class="loading-screen" style="text-align: center; width:100%; height: 0%;;">
+								<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
+									<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>
+								</div>
+							</div>
 						<table id="tOficines" class="table table-bordered dataTable dinamicTable">
 							<thead>
 								<tr class="capsalera" style="font-weight: bold;" >
@@ -2197,16 +2284,20 @@ function comptarCaracters(idCamp) {
 							</thead>
 							<tbody id="rOrgans">
 							</tbody>
+						
 						</table>
 					</div>
-					
+					<div id="resultatsTotal"  class="hidden subtitle">
+						<label><spring:message code="comu.resultats" /></label><label id="total"></label>
+						
+					</div>
 				</div>
-				</div>
+			</div>
 				
 				<div class="modal-footer">
-					<button id="btnNetejar" onclick="netejar()" type="submit" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
-					<button id="loadOrgansGestors" onclick="loadOrgansGestors()" name="accio" value="filtrar" type="button" class="btn btn-info"> <spring:message code="comu.boto.filtrar"/></button>
+					<button id="btnNetejar" onclick="netejar(true)" type="submit" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 					<button id="cerrarModal" type="button" class="btn btn-default" data-dismiss="modal"><spring:message code="comu.boto.cancelar" /></button>
+					<button id="loadOrgansGestors" onclick="loadOrgansGestors()" name="accio" value="filtrar" type="button" class="btn btn-info"> <spring:message code="comu.boto.filtrar"/></button>
 				</div>
 			</div>
 		</div>
