@@ -45,7 +45,7 @@ import es.caib.notib.core.api.ws.notificacio.PagadorPostal;
 import es.caib.notib.core.api.ws.notificacio.Persona;
 import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
 import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
-import es.caib.notib.core.helper.NotificaV1Helper;
+import es.caib.notib.core.helper.NotificaV2Helper;
 import es.caib.notib.core.service.BaseServiceTest;
 
 /**
@@ -72,7 +72,7 @@ public class NotificacioServiceWsTest extends BaseServiceTest {
 	private NotificacioServiceWs notificacioServiceWs;
 
 	@Autowired
-	private NotificaV1Helper notificaHelper;
+	private NotificaV2Helper notificaHelper;
 
 	private EntitatDto entitat;
 	private Notificacio notificacio;

@@ -297,6 +297,20 @@ public class PermisosHelper {
 		return findPermisosPerAcl(acl);
 	}
 	
+	public PermisDto findPermis(
+			Long objectIdentifier,
+			Class<?> objectClass,
+			Long permisId) {
+		Acl acl = null;
+		try {
+			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
+			acl = aclService.readAclById(oid);
+		} catch (NotFoundException nfex) {
+			return new PermisDto();
+		}
+		return findPermisAclById(acl, permisId);
+	}
+	
 	public boolean hasAnyPermis(
 			Long objectIdentifier,
 			Class<?> objectClass) {
@@ -463,6 +477,60 @@ public class PermisosHelper {
 		}
 		return resposta;
 	}
+	
+	private PermisDto findPermisAclById(Acl acl, Long permisId) {
+		PermisDto permis = null;
+		if (acl != null && permisId != null) {
+			for (AccessControlEntry ace: acl.getEntries()) {
+				if (ace.getSid() instanceof PrincipalSid && permisId.equals((Long)ace.getId())) {
+					String principal = ((PrincipalSid)ace.getSid()).getPrincipal();
+					permis = new PermisDto();
+					permis.setId(permisId);
+					permis.setPrincipal(principal);
+					DadesUsuari usuari = cacheHelper.findUsuariAmbCodi(principal);
+					if(usuari != null) {
+						permis.setNomSencerAmbCodi(usuari.getNomSencerAmbCodi()!=null?usuari.getNomSencerAmbCodi():principal);
+					}else {
+						permis.setNomSencerAmbCodi(principal);
+					}
+						permis.setTipus(TipusEnumDto.USUARI);
+				} else if (ace.getSid() instanceof GrantedAuthoritySid && permisId.equals((Long)ace.getId())) {
+					String grantedAuthority = ((GrantedAuthoritySid)ace.getSid()).getGrantedAuthority();
+					permis = new PermisDto();
+					permis.setId((Long)ace.getId());
+					permis.setPrincipal(grantedAuthority);
+					permis.setNomSencerAmbCodi(grantedAuthority);
+					permis.setTipus(TipusEnumDto.ROL);
+				}
+				if (permis != null) {
+					if (ExtendedPermission.READ.equals(ace.getPermission()))
+						permis.setRead(true);
+					if (ExtendedPermission.WRITE.equals(ace.getPermission()))
+						permis.setWrite(true);
+					if (ExtendedPermission.CREATE.equals(ace.getPermission()))
+						permis.setCreate(true);
+					if (ExtendedPermission.DELETE.equals(ace.getPermission()))
+						permis.setDelete(true);
+					if (ExtendedPermission.ADMINISTRATION.equals(ace.getPermission()))
+						permis.setAdministration(true);
+					if (ExtendedPermission.USUARI.equals(ace.getPermission()))
+						permis.setUsuari(true);
+					if (ExtendedPermission.ADMINISTRADOR.equals(ace.getPermission()))
+						permis.setAdministrador(true);
+					if (ExtendedPermission.ADMINISTRADORENTITAT.equals(ace.getPermission()))
+						permis.setAdministradorEntitat(true);
+					if (ExtendedPermission.APLICACIO.equals(ace.getPermission()))
+						permis.setAplicacio(true);
+					if (ExtendedPermission.PROCESSAR.equals(ace.getPermission()))
+						permis.setProcessar(true);
+					if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission()))
+						permis.setNotificacio(true);
+				}
+			}
+		}
+		return permis;
+	}
+	
 	private void assignarPermisos(
 			Sid sid,
 			Class<?> objectClass,

@@ -114,6 +114,29 @@ public class PersonaEntity extends NotibAuditable<Long> {
 		this.enviament = enviament;
 	}
 	
+	public void update (
+			InteressatTipusEnumDto interessatTipus,
+			String email,
+			String llinatge1,
+			String llinatge2,
+			String nif,
+			String nom,
+			String telefon,
+			String raoSocial, 
+			String dir3Codi, 
+			boolean incapacitat) {
+		this.interessatTipus = interessatTipus;
+		this.email = email;
+		this.llinatge1 = llinatge1;
+		this.llinatge2 = llinatge2;
+		this.nif = nif;
+		this.nom = nom;
+		this.telefon = telefon;
+		this.raoSocial = raoSocial;
+		this.dir3Codi = dir3Codi;
+		this.incapacitat = incapacitat;
+	}
+	
 	public static Builder getBuilder(
 			String email,
 			String llinatge1,

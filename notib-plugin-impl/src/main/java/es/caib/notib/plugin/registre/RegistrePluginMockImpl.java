@@ -60,7 +60,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	        resposta.setRegistreData(data);
 	        resposta.setRegistreNumero(String.valueOf(registre[1]));
 	        resposta.setRegistreNumeroFormatat(registre[1] + "/" + registre[0]);
-	        resposta.setEstat(NotificacioRegistreEstatEnumDto.VALID);
+	        resposta.setEstat(NotificacioRegistreEstatEnumDto.DISTRIBUIT);
 	        
 	        if (resposta.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_SIR))
 	        	resposta.setSirRecepecioData(data);
@@ -111,7 +111,8 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		
 		resposta.setJustificant(getJustificant());
 		resposta.setErrorCodi("OK");
-		
+//		resposta.setJustificant(null);
+//		resposta.setErrorCodi("ERROR");
 		return resposta;
 		
 	}

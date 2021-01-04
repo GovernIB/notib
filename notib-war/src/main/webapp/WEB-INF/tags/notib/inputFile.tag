@@ -15,6 +15,7 @@
 <%@ attribute name="fileEntitat" required="false" rtexprvalue="true"%>
 <%@ attribute name="messageInfo" required="false" rtexprvalue="true"%>
 <%@ attribute name="info" required="false" rtexprvalue="true"%>
+<%@ attribute name="fileName" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
 <c:set var="campLabelText"><c:choose><c:when test="${not empty textKey}"><spring:message code="${textKey}"/></c:when><c:when test="${not empty text}">${text}</c:when><c:otherwise>${campPath}</c:otherwise></c:choose><c:if test="${required}">*</c:if></c:set>
@@ -92,3 +93,14 @@
   		</div>
 	</c:otherwise>
 </c:choose>
+<script>
+$(document).ready(function() {
+	let fileName = "${fileName}";
+	if (fileName) {
+		$fileinput = $('#${campPath}').closest('.fileinput');
+		$fileinput.removeClass('fileinput-new');
+		$fileinput.addClass('fileinput-exists');
+		$('.fileinput-filename', $fileinput).append(fileName);
+	}
+});
+</script>

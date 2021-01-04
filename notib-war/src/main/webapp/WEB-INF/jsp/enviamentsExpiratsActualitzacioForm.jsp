@@ -6,7 +6,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <html>
 <head>
-	<title><spring:message code="procediment.actualitzacio.auto"/></title>
+	<title><spring:message code="es.caib.notib.enviaments.proces.titol"/></title>
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -40,18 +40,7 @@ function submit() {
 		$('.progresContainerDetail').slideToggle("slow");
 	});
 	
-	$.ajax({
-		type: 'POST',
-		url: "<c:url value='/notificacio/refrescarEstatNotifica'/>",
-		success: function(data) {
-			if (data) {
-				console.log(data);
-			}
-		},
-		error: function() {
-			console.log("error obtenint progrés...");
-		}
-	});
+	$.post("<c:url value='/notificacio/refrescarEstatNotifica'/>");
 }
 
 function refreshProgres() {

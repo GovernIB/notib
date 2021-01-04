@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.core.api.dto.NotificaRespostaDatatDto.NotificaRespostaDatatEventDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
@@ -59,7 +58,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	@Autowired
 	private PluginHelper pluginHelper;
 	
-	public boolean notificacioEnviar(
+	public NotificacioEntity notificacioEnviar(
 			Long notificacioId) {
 		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
 		logger.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
@@ -74,6 +73,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		try {
 			logger.info(" >>> Enviant notificació...");
 			ResultadoAltaRemesaEnvios resultadoAlta = enviaNotificacio(notificacio);
+			notificacio.updateNotificaEnviamentData();
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
 				logger.info(" >>> ... OK");
 				//Crea un nou event
@@ -148,15 +148,16 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					event);
 		}
 		logger.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
-		return NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat());
+//		return NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat());
+		return notificacio;
 	}
 
-	public boolean enviamentRefrescarEstat(
+	public NotificacioEnviamentEntity enviamentRefrescarEstat(
 			Long enviamentId) throws SistemaExternException {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		logger.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
-		enviament.setNotificacio(notificacio);
+		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacio().getId());
+//		enviament.setNotificacio(notificacio);
 		Date dataUltimDatat = enviament.getNotificaDataCreacio();
 		Date dataUltimaCertificacio = enviament.getNotificaCertificacioData();
 
@@ -184,9 +185,9 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 								datatDarrer = datado;
 							}
 						}
-						NotificaRespostaDatatEventDto event = new NotificaRespostaDatatEventDto();
-						event.setData(datatData);
-						event.setEstat(datado.getResultado());
+//						NotificaRespostaDatatEventDto event = new NotificaRespostaDatatEventDto();
+//						event.setData(datatData);
+//						event.setEstat(datado.getResultado());
 					}
 					if (datatDarrer != null) {
 						
@@ -328,10 +329,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 						enviament(enviament).build();
 				notificacio.updateEventAfegir(event);
 				logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-				return true;
 			} else {
 				logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-				return false;
 			}
 		} catch (Exception ex) {
 			logger.error(
@@ -350,8 +349,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					true,
 					event);
 			logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-			return false;
 		}
+		return enviament;
 	}
 
 	
@@ -380,7 +379,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			certificacio.setHash("b081c7abf42d5a8e5a4050958f28046bdf86158c");
 			certificacio.setOrigen("electronico");
 			certificacio.setCsv("dasd-dsadad-asdasd-asda-sda-das");
-			
+			certificacio.setMime("application/pdf");
 			byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 			certificacio.setContenidoCertificacion(arxiuBytes);
 			certificacio.setSize(String.valueOf(arxiuBytes.length));

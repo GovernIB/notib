@@ -3,11 +3,17 @@
  */
 package es.caib.notib.core.entity;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
@@ -76,6 +82,13 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	protected String llibre;
 	@Column(name = "llibre_nom")
 	protected String llibreNom;
+	
+//	@OneToMany(
+//			mappedBy = "entitat",
+//			fetch = FetchType.LAZY,
+//			cascade = CascadeType.ALL,
+//			orphanRemoval = true)
+//	protected List<OrganGetorEntity> organsGestors  = new ArrayList<OrganGetorEntity>();
 
 	@Version
 	private long version = 0;

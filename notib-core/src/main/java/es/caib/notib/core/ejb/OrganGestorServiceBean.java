@@ -8,6 +8,7 @@ import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
+import javax.xml.bind.ValidationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
@@ -130,8 +131,8 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 
 	@Override
-	public void permisUpdate(Long entitatId, Long id, PermisDto permis) throws NotFoundException {
-		delegate.permisUpdate(entitatId, id, permis);
+	public void permisUpdate(Long entitatId, Long id, boolean isAdminOrgan, PermisDto permis) throws NotFoundException, ValidationException {
+		delegate.permisUpdate(entitatId, id, isAdminOrgan, permis);
 	}
 
 	@Override

@@ -58,6 +58,11 @@
 			<version>${slf4j.version}</version>
 			<scope>provided</scope>
 		</dependency>
+<!-- 		<dependency> -->
+<!--             <groupId>org.slf4j</groupId> -->
+<!--             <artifactId>slf4j-log4j12</artifactId> -->
+<!--             <version>${slf4j.version}</version> -->
+<!--         </dependency> -->
 		<dependency>
 			<groupId>javax.ejb</groupId>
 			<artifactId>ejb-api</artifactId>
@@ -238,6 +243,16 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itextpdf</artifactId>
+            <version>${itext.pdf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf.tool</groupId>
+            <artifactId>xmlworker</artifactId>
+            <version>1.1.1</version>
+        </dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -294,24 +309,6 @@
 							</bindingFiles>
 							<wsdlUrls>
 								<wsdlUrl>${basedir}/src/main/resources/es/caib/notib/core/wsdl/NotificaWsV21.wsdl</wsdlUrl>
-							</wsdlUrls>
-							<vmArgs>
-								<vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
-							</vmArgs>
-							<verbose>true</verbose>
-							<sourceDestDir>${basedir}/src/main/java</sourceDestDir>
-						</configuration>
-					</execution>
-					<execution>
-						<id>notifica1</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>wsimport</goal>
-						</goals>
-						<configuration>
-							<packageName>es.caib.notib.core.wsdl.notificaV1</packageName>
-							<wsdlUrls>
-								<wsdlUrl>${basedir}/src/main/resources/es/caib/notib/core/wsdl/NotificaWS.wsdl</wsdlUrl>
 							</wsdlUrls>
 							<vmArgs>
 								<vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>

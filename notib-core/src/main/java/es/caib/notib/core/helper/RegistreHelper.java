@@ -12,12 +12,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.service.AuditService.TipusEntitat;
+import es.caib.notib.core.api.service.AuditService.TipusOperacio;
+import es.caib.notib.core.aspect.Audita;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
@@ -44,12 +46,15 @@ public class RegistreHelper {
 	private PluginHelper pluginHelper;
 	@Autowired 
 	private EmailHelper emailHelper;
+	@Autowired
+	private AuditNotificacioHelper auditNotificacioHelper;
 	
-	public boolean enviamentRefrescarEstatRegistre(Long enviamentId) {
+	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
+	public NotificacioEnviamentEntity enviamentRefrescarEstatRegistre(Long enviamentId) {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		logger.info(" [SIR] Inici actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
-		enviament.setNotificacio(notificacio);
+		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacio().getId());
+//		enviament.setNotificacio(notificacio);
 		NotificacioEventEntity.Builder eventBuilder  = null;
 		String descripcio;
 		logger.debug("Comunicació SIR --> consular estat...");
@@ -104,9 +109,7 @@ public class RegistreHelper {
 						
 						notificacio.updateEventAfegir(eventReintents);
 						notificacioEventRepository.save(eventReintents);
-						notificacio.updateNotificaError(
-								NotificacioErrorTipusEnumDto.ERROR_REINTENTS_SIR,
-								eventReintents);
+						auditNotificacioHelper.updateNotificacioErrorSir(notificacio, eventReintents);
 					}
 				} else {
 					enviamentUpdateDatat(
@@ -145,7 +148,7 @@ public class RegistreHelper {
 				}
 //				}
 				logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-				return true;
+//				return true;
 			} else {
 				logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 				throw new ValidationException(
@@ -185,14 +188,14 @@ public class RegistreHelper {
 				
 				notificacio.updateEventAfegir(eventReintents);
 				notificacioEventRepository.save(eventReintents);
-				notificacio.updateNotificaError(
-						NotificacioErrorTipusEnumDto.ERROR_REINTENTS_SIR,
-						eventReintents);
+				auditNotificacioHelper.updateNotificacioErrorSir(notificacio, eventReintents);
 			}
 			logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-			return false;
+//			return false;
 		}
+		return enviament;
 	}
+	
 	public void enviamentUpdateDatat(
 			NotificacioRegistreEstatEnumDto registreEstat,
 			Date registreEstatData,

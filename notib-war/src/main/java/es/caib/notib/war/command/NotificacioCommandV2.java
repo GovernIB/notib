@@ -106,9 +106,11 @@ public class NotificacioCommandV2 {
 		if (dto == null) {
 			return null;
 		}
-		NotificacioCommandV2 command = ConversioTipusHelper.convertir(
-				dto,
-				NotificacioCommandV2.class );
+		NotificacioCommandV2 command = ConversioTipusHelper.convertir(dto, NotificacioCommandV2.class);
+		
+		if (dto.getProcediment() != null) {
+			command.setProcedimentId(dto.getProcediment().getId());
+		}
 		return command;
 	}
 	public static NotificacioDtoV2 asDto(NotificacioCommandV2 command) {
@@ -197,6 +199,61 @@ public class NotificacioCommandV2 {
 			logger.error("No s'ha pogut recuperar la longitud de descripció: " + ex.getMessage());
 		}
 		return descripcioSize;
+	}
+	
+	public int getNomDefaultSize() {
+		int concepteSize = 0;
+		try {
+			Field concepte = PersonaCommand.class.getDeclaredField("nom");
+			concepteSize = concepte.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud del nom: " + ex.getMessage());
+		}
+		return concepteSize;
+	}
+	
+	public int getLlinatge1DefaultSize() {
+		int concepteSize = 0;
+		try {
+			Field concepte = PersonaCommand.class.getDeclaredField("llinatge1");
+			concepteSize = concepte.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud del llinatge 1: " + ex.getMessage());
+		}
+		return concepteSize;
+	}
+	
+	public int getLlinatge2DefaultSize() {
+		int concepteSize = 0;
+		try {
+			Field concepte = PersonaCommand.class.getDeclaredField("llinatge2");
+			concepteSize = concepte.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud del llinatge 2: " + ex.getMessage());
+		}
+		return concepteSize;
+	}
+	
+	public int getEmailDefaultSize() {
+		int concepteSize = 0;
+		try {
+			Field concepte = PersonaCommand.class.getDeclaredField("email");
+			concepteSize = concepte.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud de l'email: " + ex.getMessage());
+		}
+		return concepteSize;
+	}
+	
+	public int getTelefonDefaultSize() {
+		int concepteSize = 0;
+		try {
+			Field concepte = PersonaCommand.class.getDeclaredField("telefon");
+			concepteSize = concepte.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud del telèfon: " + ex.getMessage());
+		}
+		return concepteSize;
 	}
 
 	@Override

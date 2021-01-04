@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -30,6 +31,10 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	List<NotificacioEnviamentEntity> findByNotificacioId(
 			Long notificacioId);
 	
+	@Query(value = "FROM NotificacioEnviamentEntity n WHERE n.id = :notificacioId ORDER BY n.notificaEstatData DESC, n.notificaEstatDataActualitzacio DESC")
+	List<NotificacioEnviamentEntity> findByNotificacioIdOrderByNotificaEstatDataAndOrderByNotificaEstatDataActualitzacioDesc(
+			@Param("notificacioId")  Long notificacioId);
+	
 	NotificacioEnviamentEntity findById(Long id);
 	
 	@Query(value = "FROM NotificacioEnviamentEntity n WHERE n.notificacio = :notificacio")
@@ -42,6 +47,35 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	NotificacioEnviamentEntity findByNotificacioAndNotificaReferencia(
 			NotificacioEntity notificacio,
 			String notificaReferencia);
+	
+//	@Query(	" from NotificacioEnviamentEntity " +
+//			" where	notificacio = :notificacio " + 
+//			"	and (notificaEstatFinal = false " + 
+//			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIADA" +
+//			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.NOTIB_ENVIADA" +
+//			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIAT_SIR)" +
+//			" order by notificaEstatDataActualitzacio asc nulls first")
+	@Query(	" from NotificacioEnviamentEntity " +
+			" where	notificacio = :notificacio " + 
+			"	and (notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT" +
+			"   		or notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REGISTRADA)" +
+			" order by notificaEstatDataActualitzacio asc nulls first")
+	List<NotificacioEnviamentEntity> findEnviamentsPendentsNotificaByNotificacio(@Param("notificacio") NotificacioEntity notificacio);
+	
+//	@Query(	" from NotificacioEnviamentEntity " +
+//			" where	notificacio = :notificacio " + 
+//			"	and (notificaEstatFinal = false " + 
+//			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REGISTRADA" +
+//			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIADA" +
+//			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.NOTIB_ENVIADA" +
+//			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIAT_SIR)" +
+//			" order by notificaEstatDataActualitzacio asc nulls first")
+	@Query(	" from NotificacioEnviamentEntity " +
+			" where	notificacio = :notificacio " + 
+			"	and (notificaEstatFinal = false " + 
+			"   		and notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT)" +
+			" order by notificaEstatDataActualitzacio asc nulls first")
+	List<NotificacioEnviamentEntity> findEnviamentsPendentsByNotificacio(@Param("notificacio") NotificacioEntity notificacio);
 
 	NotificacioEnviamentEntity findByNotificacioEntitatAndNotificaIdentificador(
 			EntitatEntity entitat,
@@ -70,7 +104,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:isDataCaducitatFiNull = true or n.notificacio.caducitat <= :dataCaducitatFi) " +
 			"and (:isTipusEnviamentNull = true or lower(n.notificacio.enviamentTipus) like lower('%'||:tipusEnviament||'%')) " +
 			"and (:isCsvNull = true or lower(concat(n.notificacio.document.uuid, n.notificacio.document.csv)) like lower('%'||:csv||'%')) " +
-			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%')) " +
+			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%') or n.notificaEstat like lower('%'||:notificaEstat||'%'))" +
 			"and (:entitat = n.notificacio.entitat) " +
 			"and (:esDataEnviamentFiNull = true or n.createdDate <= :dataEnviamentFi) " +
 			"and (:esCodiNotificaNull = true or lower(n.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
@@ -107,6 +141,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") int estat,
+			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esDataEnviamentIniciNull") boolean esDataEnviamentIniciNull,
 			@Param("dataEnviamentInici") Date dataEnviamentInici,
@@ -149,7 +184,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:isDataCaducitatFiNull = true or n.notificacio.caducitat <= :dataCaducitatFi) " +
 			"and (:isTipusEnviamentNull = true or lower(n.notificacio.enviamentTipus) like lower('%'||:tipusEnviament||'%')) " +
 			"and (:isCsvNull = true or lower(concat(n.notificacio.document.uuid, n.notificacio.document.csv)) like lower('%'||:csv||'%')) " +
-			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%')) " +
+			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%') or n.notificaEstat like lower('%'||:notificaEstat||'%'))" +
 			"and (:entitat = n.notificacio.entitat) " +
 			"and (:esDataEnviamentFiNull = true or n.createdDate <= :dataEnviamentFi) " +
 			"and (:esCodiNotificaNull = true or lower(n.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
@@ -165,7 +200,8 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:esDataRegistreFiNull = true or n.notificacio.registreData <= :dataRegistreFi) " +
 			"and ((:esProcedimentsCodisNotibNull = false and n.notificacio.procedimentCodiNotib is not null and n.notificacio.procedimentCodiNotib in (:procedimentsCodisNotib))" +	// Té permís sobre el procediment
 			"	or (:esOrgansGestorsCodisNotib = false and n.notificacio.organGestor.codi is not null and n.notificacio.organGestor.codi in (:organsGestorsCodisNotib)) " +						// Té permís sobre l'òrgan
-			"   or ((n.notificacio.procedimentCodiNotib is null or n.notificacio.procediment.comu = true) and n.notificacio.usuariCodi = :usuariCodi)) " +							// És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
+			"   or ((n.notificacio.procedimentCodiNotib is null or n.notificacio.procediment.comu = true) and n.notificacio.usuariCodi = :usuariCodi)" +
+			"   or (:esProcedimentOrgansIdsNotibNull = false and n.notificacio.procedimentOrgan is not null and n.notificacio.procedimentOrgan.id in (:procedimentOrgansIdsNotib))) " +							// És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
 			"and (n.notificacio.grupCodi = null or (n.notificacio.grupCodi in (:grupsProcedimentCodisNotib))) ")
 	Page<NotificacioEnviamentEntity> findByNotificacio(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
@@ -190,6 +226,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") int estat,
+			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esDataEnviamentIniciNull") boolean esDataEnviamentIniciNull,
 			@Param("dataEnviamentInici") Date dataEnviamentInici,
@@ -221,6 +258,8 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
 			@Param("esOrgansGestorsCodisNotib") boolean esOrgansGestorsCodisNotib,
 			@Param("organsGestorsCodisNotib") List<String> organsGestorsCodisNotib,
+			@Param("esProcedimentOrgansIdsNotibNull") boolean esProcedimentOrgansIdsNotibNull,
+			@Param("procedimentOrgansIdsNotib") List<Long> procedimentOrgansIdsNotib,
 			@Param("grupsProcedimentCodisNotib") List<String> grupsProcedimentCodisNotib,
 			@Param("usuariCodi") String usuariCodi,
 			Pageable pageable);
@@ -239,7 +278,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:isDataCaducitatFiNull = true or n.notificacio.caducitat <= :dataCaducitatFi) " +
 			"and (:isTipusEnviamentNull = true or lower(n.notificacio.enviamentTipus) like lower('%'||:tipusEnviament||'%')) " +
 			"and (:isCsvNull = true or lower(concat(n.notificacio.document.uuid, n.notificacio.document.csv)) like lower('%'||:csv||'%')) " +
-			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%')) " +
+			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%') or n.notificaEstat like lower('%'||:notificaEstat||'%'))" +
 			"and (:entitat = n.notificacio.entitat) " +
 			"and (:esDataEnviamentFiNull = true or n.createdDate <= :dataEnviamentFi) " +
 			"and (:esCodiNotificaNull = true or lower(n.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
@@ -278,6 +317,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") int estat,
+			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esDataEnviamentIniciNull") boolean esDataEnviamentIniciNull,
 			@Param("dataEnviamentInici") Date dataEnviamentInici,
@@ -324,7 +364,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:isDataCaducitatFiNull = true or n.notificacio.caducitat <= :dataCaducitatFi) " +
 			"and (:isTipusEnviamentNull = true or lower(n.notificacio.enviamentTipus) like lower('%'||:tipusEnviament||'%')) " +
 			"and (:isCsvNull = true or lower(concat(n.notificacio.document.uuid, n.notificacio.document.csv)) like lower('%'||:csv||'%')) " +
-			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%')) " +
+			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%') or n.notificaEstat like lower('%'||:notificaEstat||'%'))" +
 			"and (:entitat = n.notificacio.entitat) " +
 			"and (:esDataEnviamentFiNull = true or n.createdDate <= :dataEnviamentFi) " +
 			"and (:esCodiNotificaNull = true or lower(n.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
@@ -361,6 +401,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") int estat,
+			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esDataEnviamentIniciNull") boolean esDataEnviamentIniciNull,
 			@Param("dataEnviamentInici") Date dataEnviamentInici,

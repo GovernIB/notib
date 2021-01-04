@@ -3,6 +3,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+
+<%
+pageContext.setAttribute(
+		"isRolActualAdministradorOrgan",
+		es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
+%>
 <html>
 <head>
 	<title><spring:message code="procediment.permis.titol"/></title>
@@ -38,6 +44,8 @@
 			<tr>
 				<th data-col-name="tipus" data-renderer="enum(TipusEnumDto)"><spring:message code="procediment.permis.columna.tipus"/></th>
 				<th data-col-name="nomSencerAmbCodi"><spring:message code="procediment.permis.columna.principal"/></th>
+				<th data-col-name="organ" data-visible="false">#</th>
+				<th data-col-name="organCodiNom"><spring:message code="procediment.permis.columna.organ"/></th>
 				<th data-col-name="read" data-template="#cellPermisReadTemplate">
 					<spring:message code="procediment.permis.columna.consulta"/>
 					<script id="cellPermisReadTemplate" type="text/x-jsrender">
@@ -62,15 +70,23 @@
 						{{if administration}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
+				<th data-col-name="permetEdicio" data-visible="false">#</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
+						{{if permetEdicio}}
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
+								{{if organ}}
+								<li><a href="../../procediment/${procediment.id}/organ/{{:organ}}/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								<li><a href="../../procediment/${procediment.id}/organ/{{:organ}}/permis/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="procediment.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								{{else}}
 								<li><a href="../../procediment/${procediment.id}/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								<li><a href="../../procediment/${procediment.id}/permis/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="procediment.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								{{/if}}
 							</ul>
 						</div>
+						{{/if}}
 					</script>
 				</th>
 			</tr>

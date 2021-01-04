@@ -3,11 +3,13 @@
  */
 package es.caib.notib.core.entity;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -17,7 +19,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.SecondaryTable;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -50,32 +51,32 @@ import lombok.Getter;
 @Getter
 @Entity
 @Table(name="not_notificacio_env")
-@SecondaryTable(name="not_notificacio")
+//@SecondaryTable(name="not_notificacio")
 @EntityListeners(AuditingEntityListener.class)
 public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_id")
 	@ForeignKey(name = "NOT_NOTIFICACIO_NOTENV_FK")
 	@NotFound(action = NotFoundAction.IGNORE)
 	protected NotificacioEntity notificacio;
 	
-	@Column(name="notificacio_id", insertable=false, updatable=false)
-	protected Long notificacioId;
+//	@Column(name="notificacio_id", insertable=false, updatable=false)
+//	protected Long notificacioId;
 	
 	/* Titular */
-	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "titular_id")
 	@ForeignKey(name = "not_persona_notificacio_env_fk")
 	protected PersonaEntity titular;
 	
 	/* Destinataris */
-	@OneToMany(fetch = FetchType.EAGER)
+	@OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
 	@ForeignKey(name = "not_persona_not_fk")
     @JoinColumn(name = "notificacio_env_id") // we need to duplicate the physical information
 	@NotFound(action = NotFoundAction.IGNORE)
-	protected List<PersonaEntity> destinataris;
+	protected List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
 	
 	/* Domicili */
 	@Column(name = "dom_tipus")
@@ -291,7 +292,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "notifica_error", nullable = false)
 	protected boolean notificaError;
 	
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade=CascadeType.ALL)
 	@JoinColumn(name = "notifica_error_event_id")
 	@ForeignKey(name = "not_noteve_noterr_notdest_fk")
 	protected NotificacioEventEntity notificacioErrorEvent;
@@ -511,6 +512,66 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.sirConsultaData = new Date();
 	}
 	
+	public void update(
+			Enviament enviament, 
+			boolean isAmbEntregaDeh,
+			NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
+			NotificaDomiciliConcretTipusEnumDto tipusConcret,
+			ServeiTipusEnumDto tipusServei,
+			NotificacioEntity notificacioGuardada,
+			PersonaEntity titular,
+			NotificaDomiciliViaTipusEnumDto domiciliViaTipus) {
+		this.serveiTipus = tipusServei;
+		this.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
+		this.notificaIntentNum = 0;
+		this.notificacio = notificacioGuardada;
+		this.domiciliTipus = NotificaDomiciliTipusEnumDto.CONCRETO;
+		this.domiciliNumeracioTipus = numeracioTipus;
+		this.domiciliConcretTipus = tipusConcret;
+		this.domiciliViaTipus = domiciliViaTipus;
+		if (enviament.getEntregaPostal() != null) {
+			if(! enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR)) {
+				this.domiciliViaNom = enviament.getEntregaPostal().getViaNom();
+				this.domiciliNumeracioNumero = enviament.getEntregaPostal().getNumeroCasa();
+				this.domiciliNumeracioQualificador = enviament.getEntregaPostal().getNumeroQualificador();
+				this.domiciliNumeracioPuntKm = enviament.getEntregaPostal().getPuntKm();
+				this.domiciliApartatCorreus = enviament.getEntregaPostal().getApartatCorreus();
+				this.domiciliPortal = enviament.getEntregaPostal().getPortal();
+				this.domiciliEscala = enviament.getEntregaPostal().getEscala();
+				this.domiciliPlanta = enviament.getEntregaPostal().getPlanta();
+				this.domiciliPorta = enviament.getEntregaPostal().getPorta();
+				this.domiciliBloc = enviament.getEntregaPostal().getBloc();
+				this.domiciliComplement = enviament.getEntregaPostal().getComplement();
+				this.domiciliCodiPostal = enviament.getEntregaPostal().getCodiPostal();
+				this.domiciliPoblacio = enviament.getEntregaPostal().getPoblacio();
+				this.domiciliMunicipiCodiIne = enviament.getEntregaPostal().getMunicipiCodi();
+				this.domiciliProvinciaCodi = enviament.getEntregaPostal().getProvincia();
+				this.domiciliPaisCodiIso = enviament.getEntregaPostal().getPaisCodi();
+				this.domiciliLinea1 = enviament.getEntregaPostal().getLinea1();
+				this.domiciliLinea2 = enviament.getEntregaPostal().getLinea2();
+				this.domiciliCie = enviament.getEntregaPostal().getCie();
+				this.formatSobre = enviament.getEntregaPostal().getFormatSobre();
+				this.formatFulla = enviament.getEntregaPostal().getFormatFulla();
+			} else if (enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR)) {
+				this.domiciliLinea1 = enviament.getEntregaPostal().getLinea1();
+				this.domiciliLinea2 = enviament.getEntregaPostal().getLinea2();
+				this.domiciliCodiPostal = enviament.getEntregaPostal().getCodiPostal();
+				this.domiciliPaisCodiIso = enviament.getEntregaPostal().getPaisCodi();
+			}
+		}
+		if (isAmbEntregaDeh && enviament.isEntregaDehActiva() && enviament.getEntregaDeh() != null) {
+			this.dehNif = enviament.getTitular().getNif();
+			this.dehObligat = enviament.getEntregaDeh().isObligat();
+			this.dehProcedimentCodi = notificacioGuardada.getProcedimentCodiNotib();
+		}
+		
+		this.titular = titular;
+		
+		// Inicialitzam les dates per consulta d'estats
+		Date data = new Date();
+		this.notificaIntentData = data;
+		this.sirConsultaData = data;
+	}
 	
 	public static Builder getBuilder(
 			String titularNif,

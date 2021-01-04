@@ -30,12 +30,13 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
+import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 
 /**
@@ -45,13 +46,16 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
  */
 @Component
 public abstract class AbstractNotificaHelper {
+	
+	@Autowired
+	AuditNotificacioHelper auditNotificacioHelper;
 
 	private boolean modeTest;
 	
-	public abstract boolean notificacioEnviar(
+	public abstract NotificacioEntity notificacioEnviar(
 			Long notificacioId);
 
-	public abstract boolean enviamentRefrescarEstat(
+	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(
 			Long enviamentId) throws SistemaExternException;
 
 	public String generarReferencia(NotificacioEnviamentEntity notificacioDestinatari) throws GeneralSecurityException {
@@ -76,7 +80,7 @@ public abstract class AbstractNotificaHelper {
 		this.modeTest = modeTest;
 	}
 
-	public void enviamentUpdateDatat(
+	public NotificacioEnviamentEntity enviamentUpdateDatat(
 			NotificacioEnviamentEstatEnumDto notificaEstat,
 			Date notificaEstatData,
 			String notificaEstatDescripcio,
@@ -119,8 +123,7 @@ public abstract class AbstractNotificaHelper {
 		}
 		logger.info("Estat final: " + estatsEnviamentsFinals);
 		if (estatsEnviamentsFinals) {
-			enviament.getNotificacio().updateEstat(NotificacioEstatEnumDto.FINALITZADA);
-			enviament.getNotificacio().updateMotiu(notificaEstat.name());
+			auditNotificacioHelper.updateEstatNotificacio(notificaEstat, enviament.getNotificacio());
 
 //			//Marcar com a processada si la notificació s'ha fet des de una aplicació
 //			if (enviament.getNotificacio() != null && enviament.getNotificacio().getTipusUsuari() == TipusUsuariEnumDto.APLICACIO) {
@@ -130,10 +133,8 @@ public abstract class AbstractNotificaHelper {
 //				enviament.getNotificacio().updateEstatDate(new Date());
 //			}
 		}
-		
+		return enviament;
 	}
-
-
 
 	private static final String[] estatsNotifica = new String[] {
 			"ausente",

@@ -23,6 +23,7 @@ import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
 import es.caib.notib.core.api.dto.ProcedimentFormDto;
 import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.ProcedimentOrganDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -56,21 +57,25 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	public ProcedimentDto update(
 			Long entitatId, 
 			ProcedimentDto procediment,
-			boolean isAdmin) throws NotFoundException {
+			boolean isAdmin,
+			boolean isAdminEntitat) throws NotFoundException {
 		return delegate.update(
 				entitatId, 
 				procediment,
-				isAdmin);
+				isAdmin,
+				isAdminEntitat);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public ProcedimentDto delete(
 			Long entitatId, 
-			Long id) throws NotFoundException {
+			Long id,
+			boolean isAdminEntitat) throws NotFoundException {
 		return delegate.delete(
 				entitatId, 
-				id);
+				id,
+				isAdminEntitat);
 	}
 
 	@Override
@@ -202,11 +207,17 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	public List<PermisDto> permisFind(
 			Long entitatId, 
 			boolean isAdministrador, 
-			Long id) throws NotFoundException {
+			Long procedimentId,
+			String organ,
+			String organActual,
+			TipusPermis tipus) throws NotFoundException {
 		return delegate.permisFind(
 				entitatId, 
 				isAdministrador, 
-				id);
+				procedimentId,
+				organ,
+				organActual,
+				tipus);
 	}
 
 	@Override
@@ -228,22 +239,26 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	public void permisDelete(
 			Long entitatId,
 			Long organGestorId,
-			Long id,
-			Long permisId) throws NotFoundException {
+			Long procedimentId,
+			String organCodi,
+			Long permisId,
+			TipusPermis tipus) throws NotFoundException {
 		delegate.permisDelete(
 				entitatId,
 				organGestorId,
-				id, 
-				permisId);
+				procedimentId, 
+				organCodi,
+				permisId,
+				tipus);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public void grupCreate(
+	public ProcedimentGrupDto grupCreate(
 			Long entitatId,
 			Long id,
 			ProcedimentGrupDto procedimentGrup) throws NotFoundException {
-		delegate.grupCreate(
+		return delegate.grupCreate(
 				entitatId,
 				id,
 				procedimentGrup);
@@ -251,11 +266,11 @@ public class ProcedimentServiceBean implements ProcedimentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public void grupUpdate(
+	public ProcedimentGrupDto grupUpdate(
 			Long entitatId, 
 			Long id, 
 			ProcedimentGrupDto procedimentGrup) throws NotFoundException {
-		delegate.grupUpdate(
+		return delegate.grupUpdate(
 				entitatId, 
 				id, 
 				procedimentGrup);
@@ -263,10 +278,10 @@ public class ProcedimentServiceBean implements ProcedimentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public void grupDelete(
+	public ProcedimentGrupDto grupDelete(
 			Long entitatId, 
 			Long GrupId) throws NotFoundException {
-		delegate.grupDelete(
+		return delegate.grupDelete(
 				entitatId, 
 				GrupId);
 	}
@@ -332,5 +347,31 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	@Override
 	public ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi) {
 		return delegate.getProgresActualitzacio(dir3Codi);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public List<ProcedimentOrganDto> findProcedimentsOrganWithPermis(
+			Long entitatId,
+			String usuariCodi,
+			PermisEnum permis) {
+		return delegate.findProcedimentsOrganWithPermis(entitatId, usuariCodi, permis);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public List<ProcedimentOrganDto> findProcedimentsOrganWithPermisByOrgan(
+			String organId,
+			String entitatCodi,
+			List<ProcedimentOrganDto> procedimentsOrgans) {
+		return delegate.findProcedimentsOrganWithPermisByOrgan(organId, entitatCodi, procedimentsOrgans);
+	}
+
+	@Override
+	public List<String> findProcedimentsOrganCodiWithPermisByProcediment(
+			ProcedimentDto procediment,
+			String entitatCodi,
+			List<ProcedimentOrganDto> procedimentsOrgans) {
+		return delegate.findProcedimentsOrganCodiWithPermisByProcediment(procediment, entitatCodi, procedimentsOrgans);
 	}
 }

@@ -34,6 +34,7 @@ import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.AnexoWsDto;
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
 import es.caib.notib.core.api.dto.DatosInteresadoWsDto;
+import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.InteresadoWsDto;
@@ -42,6 +43,7 @@ import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.RegistreAnnexDto;
@@ -57,6 +59,10 @@ import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.PersonaEntity;
+import es.caib.notib.plugin.conversio.ConversioArxiu;
+import es.caib.notib.plugin.conversio.ConversioPlugin;
+import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
+import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.gesconadm.GcaProcediment;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
@@ -98,6 +104,7 @@ public class PluginHelper {
 
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
+	
 
 	private DadesUsuariPlugin dadesUsuariPlugin;
 	private GestioDocumentalPlugin gestioDocumentalPlugin;
@@ -105,9 +112,13 @@ public class PluginHelper {
 	private IArxiuPlugin arxiuPlugin;
 	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin;
 	private GestorContingutsAdministratiuPlugin gestorDocumentalAdministratiuPlugin;
-
+	private ConversioPlugin conversioPlugin;
+	private FirmaServidorPlugin firmaServidorPlugin;
+	
 	@Autowired
 	private IntegracioHelper integracioHelper;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
 	
 	// REGISTRE
 	// /////////////////////////////////////////////////////////////////////////////////////
@@ -1040,6 +1051,122 @@ public class PluginHelper {
 		return denominacio;
 		
 	}
+	
+	
+	public List<OrganGestorDto> cercaUnitats(
+			String codi, 
+			String denominacio,
+			Long nivellAdministracio, 
+			Long comunitatAutonoma, 
+			Boolean ambOficines, 
+			Boolean esUnitatArrel,
+			Long provincia, 
+			String municipi) throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenir llista de tots els organismes a partir d'un text", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				new AccioParam("Text de la cerca", codi));
+
+		List<NodeDir3> organismesNodeDir3 = null;
+		List<OrganGestorDto> organismes = null;
+		try {
+			organismesNodeDir3 = getUnitatsOrganitzativesPlugin().cercaUnitats(codi, denominacio.replaceAll(" ", "%20"), nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
+			organismes = conversioTipusHelper.convertirList(organismesNodeDir3, OrganGestorDto.class);
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistar organismes  a partir d'un text";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+	
+		return organismes;
+	}
+	
+	
+	public List<OrganGestorDto> unitatsPerCodi(String codi) throws SistemaExternException {
+		return cercaUnitats(codi,null,null,null,null,null,null,null);
+	}
+	
+	
+	public List<OrganGestorDto> unitatsPerDenominacio(String denominacio) throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenir llista de tots els organismes a partir d'un text", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				new AccioParam("Text de la cerca", denominacio));
+
+		List<ObjetoDirectorio> organismesDir3 = null;
+		List<OrganGestorDto> organismes = null;
+		try {
+			organismesDir3 = getUnitatsOrganitzativesPlugin().unitatsPerDenominacio(denominacio);
+			organismes = conversioTipusHelper.convertirList(organismesDir3, OrganGestorDto.class);
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistar organismes  a partir d'un text";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+	
+		return organismes;
+	}
+	
+	
+	public List<CodiValor> llistarNivellsAdministracions() throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenint llista dels nivells de les administracions", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT);
+		
+		List<CodiValor> nivellsAdministracio = null;
+		try {
+			nivellsAdministracio = getUnitatsOrganitzativesPlugin().nivellsAdministracio();
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistar els nivells de les administracions";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+		
+		return nivellsAdministracio;
+	}
+	
+	public List<CodiValor> llistarComunitatsAutonomes() throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenint llista les comunitats autònomes", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT);
+		
+		List<CodiValor> comunitatsAutonomes = null;
+		try {
+			comunitatsAutonomes = getUnitatsOrganitzativesPlugin().comunitatsAutonomes();
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistar les comunitats autònomes";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+		
+		return comunitatsAutonomes;
+	}
+
+	
 
 	public List<CodiValorPais> llistarPaisos() throws SistemaExternException {
 		
@@ -1087,6 +1214,29 @@ public class PluginHelper {
 		return provincies;
 	}
 	
+	public List<CodiValor> llistarProvincies(String codiCA) throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenint llista de províncies", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT);
+		
+		List<CodiValor> provincies = null;
+		try {
+			provincies = getUnitatsOrganitzativesPlugin().provincies(codiCA);
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistat províncies";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+		
+		return provincies;
+	}
+	
 	public List<CodiValor> llistarLocalitats(String codiProvincia) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(
@@ -1111,6 +1261,77 @@ public class PluginHelper {
 		return localitats;
 	}
 	
+	public FitxerDto conversioConvertirPdf(
+			FitxerDto original,
+			String urlPerEstampar) {
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_CONVERT, 
+				"Conversió de document a PDF", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				new AccioParam("arxiuOriginalNom", original.getNom()),
+				new AccioParam("arxiuOriginalTamany", new Integer(original.getContingut().length).toString()));
+		try {
+			ConversioArxiu convertit = getConversioPlugin().convertirPdfIEstamparUrl(
+					new ConversioArxiu(
+							original.getNom(),
+							original.getContingut()),
+					urlPerEstampar);
+			
+			info.getParams().add(new AccioParam("arxiuConvertitNom", convertit.getArxiuNom()));
+			info.getParams().add(new AccioParam("arxiuConvertitTamany", new Integer(convertit.getArxiuContingut().length).toString()));
+			integracioHelper.addAccioOk(info);
+			FitxerDto resposta = new FitxerDto();
+			resposta.setNom(
+					convertit.getArxiuNom());
+			resposta.setContingut(
+					convertit.getArxiuContingut());
+			return resposta;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de conversió de documents";
+			integracioHelper.addAccioError(
+					info,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_CONVERT,
+					errorDescripcio,
+					ex);
+		}
+	}
+	
+	public byte[] firmaServidorFirmar(
+			NotificacioEntity notificacio,
+			FitxerDto fitxer,
+			TipusFirma tipusFirma,
+			String motiu,
+			String idioma) {
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_FIRMASERV, 
+				"Firma en servidor d'un document", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				new AccioParam("notificacioId", notificacio.getId().toString()),
+				new AccioParam("títol", fitxer.getNom()));
+		try {
+			byte[] firmaContingut = getFirmaServidorPlugin().firmar(
+					fitxer.getNom(),
+					motiu,
+					fitxer.getContingut(),
+					tipusFirma,
+					idioma);
+			integracioHelper.addAccioOk(info);
+			return firmaContingut;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de firma en servidor: " + ex.getMessage();
+			integracioHelper.addAccioError(
+					info,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_FIRMASERV,
+					errorDescripcio,
+					ex);
+		}
+	}
 	
 	//////////////////////////////////////////////
 	
@@ -1270,7 +1491,13 @@ public class PluginHelper {
 					docDetall = arxiuDocumentConsultar(id, null);
 
 					if (docDetall != null) {
-						annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumental().toString());
+//						### START #381
+						if (docDetall.getMetadades().getTipusDocumental() != null) {
+							annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumental().toString());
+						} else if (docDetall.getMetadades().getTipusDocumentalAddicional() != null) {
+							annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumentalAddicional());
+						}
+//						### END #381
 						annex.setOrigenCiudadanoAdmin(docDetall.getMetadades().getOrigen().ordinal());
 						annex.setFechaCaptura(toXmlGregorianCalendar(docDetall.getMetadades().getDataCaptura()));
 
@@ -2287,7 +2514,48 @@ public class PluginHelper {
 		
 		return gestorDocumentalAdministratiuPlugin;
 	}
-
+	private ConversioPlugin getConversioPlugin() {
+		if (conversioPlugin == null) {
+			String pluginClass = getPropertyPluginConversio();
+			if (pluginClass != null && pluginClass.length() > 0) {
+				try {
+					Class<?> clazz = Class.forName(pluginClass);
+					conversioPlugin = (ConversioPlugin)clazz.newInstance();
+				} catch (Exception ex) {
+					throw new SistemaExternException(
+							IntegracioHelper.INTCODI_CONVERT,
+							"Error al crear la instància del plugin de conversió de documents",
+							ex);
+				}
+			} else {
+				throw new SistemaExternException(
+						IntegracioHelper.INTCODI_CONVERT,
+						"No està configurada la classe per al plugin de conversió de documents");
+			}
+		}
+		return conversioPlugin;
+	}
+	private FirmaServidorPlugin getFirmaServidorPlugin() {
+		if (firmaServidorPlugin == null) {
+			String pluginClass = getPropertyPluginFirmaServidor();
+			if (pluginClass != null && pluginClass.length() > 0) {
+				try {
+					Class<?> clazz = Class.forName(pluginClass);
+					firmaServidorPlugin = (FirmaServidorPlugin)clazz.newInstance();
+				} catch (Exception ex) {
+					throw new SistemaExternException(
+							IntegracioHelper.INTCODI_FIRMASERV,
+							"Error al crear la instància del plugin de firma en servidor",
+							ex);
+				}
+			} else {
+				throw new SistemaExternException(
+						IntegracioHelper.INTCODI_FIRMASERV,
+						"No està configurada la classe per al plugin de firma en servidor");
+			}
+		}
+		return firmaServidorPlugin;
+	}
 	private String getPropertyPluginUnitats() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.unitats.class");
 	}
@@ -2306,8 +2574,12 @@ public class PluginHelper {
 	private String getPropertyPluginGestorDocumentalAdministratu() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesconadm.class");
 	}
-	
-	
+	private String getPropertyPluginConversio() {
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.conversio.class");
+	}
+	private String getPropertyPluginFirmaServidor() {
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.firmaservidor.class");
+	}
 	public int getRegistreReintentsPeriodeProperty() {
 		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.registre.enviaments.periode");
 	}

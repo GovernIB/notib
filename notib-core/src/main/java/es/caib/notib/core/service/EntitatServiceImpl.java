@@ -29,13 +29,18 @@ import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
+import es.caib.notib.core.api.service.AuditService.TipusEntitat;
+import es.caib.notib.core.api.service.AuditService.TipusObjecte;
+import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.core.aspect.Audita;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.EntitatTipusDocEntity;
 import es.caib.notib.core.helper.CacheHelper;
@@ -81,6 +86,7 @@ public class EntitatServiceImpl implements EntitatService {
 	private MetricsHelper metricsHelper;
 
 
+	@Audita(entityType = TipusEntitat.ENTITAT, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
 	@Transactional
 	@Override
 	@CacheEvict(value = "entitatsUsuari", allEntries = true)
@@ -135,6 +141,7 @@ public class EntitatServiceImpl implements EntitatService {
 		}
 	}
 
+	@Audita(entityType = TipusEntitat.ENTITAT, operationType = TipusOperacio.UPDATE, returnType = TipusObjecte.DTO)
 	@Transactional
 	@Override
 	public EntitatDto update(EntitatDto entitat) {
@@ -224,6 +231,63 @@ public class EntitatServiceImpl implements EntitatService {
 		}
 	}
 	
+	@Audita(entityType = TipusEntitat.ENTITAT, operationType = TipusOperacio.UPDATE, returnType = TipusObjecte.DTO)
+	@Transactional
+	@Override
+	public EntitatDto updateActiva(
+			Long id,
+			boolean activa) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Actualitzant propietat activa d'una entitat existent ("
+					+ "id=" + id + ", "
+					+ "activa=" + activa + ")");
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					false,
+					false );
+			EntitatEntity entitat = entitatRepository.findOne(id);
+			entitat.updateActiva(activa);
+			return conversioTipusHelper.convertir(
+					entitat,
+					EntitatDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Audita(entityType = TipusEntitat.ENTITAT, operationType = TipusOperacio.DELETE, returnType = TipusObjecte.DTO)
+	@Transactional
+	@Override
+	@CacheEvict(value = "entitatsUsuari", allEntries = true)
+	public EntitatDto delete(
+			Long id) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Esborrant entitat (id=" + id +  ")");
+			entityComprovarHelper.comprovarPermisos(
+					null,
+					true,
+					false,
+					false );
+			EntitatEntity entitat = entitatRepository.findOne( id );
+			List<EntitatTipusDocEntity> tipusDocsEntity = entitatTipusDocRepository.findByEntitat(entitat);
+			if (!tipusDocsEntity.isEmpty()) {
+				entitatTipusDocRepository.delete(tipusDocsEntity);
+			}
+			entitatRepository.delete(entitat);
+			permisosHelper.deleteAcl(
+					entitat.getId(),
+					EntitatEntity.class);
+			return conversioTipusHelper.convertir(
+					entitat,
+					EntitatDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
 	@Override
 	public List<TipusDocumentDto> findTipusDocumentByEntitat(Long entitatId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
@@ -251,62 +315,6 @@ public class EntitatServiceImpl implements EntitatService {
 		try {
 			EntitatEntity entitat = entitatRepository.findOne(entitatId);
 			return entitat.getTipusDocDefault();
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-
-
-	@Transactional
-	@Override
-	public EntitatDto updateActiva(
-			Long id,
-			boolean activa) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			logger.debug("Actualitzant propietat activa d'una entitat existent ("
-					+ "id=" + id + ", "
-					+ "activa=" + activa + ")");
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					false,
-					false );
-			EntitatEntity entitat = entitatRepository.findOne(id);
-			entitat.updateActiva(activa);
-			return conversioTipusHelper.convertir(
-					entitat,
-					EntitatDto.class);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-
-	@Transactional
-	@Override
-	@CacheEvict(value = "entitatsUsuari", allEntries = true)
-	public EntitatDto delete(
-			Long id) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			logger.debug("Esborrant entitat (id=" + id +  ")");
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					false,
-					false );
-			EntitatEntity entitat = entitatRepository.findOne( id );
-			List<EntitatTipusDocEntity> tipusDocsEntity = entitatTipusDocRepository.findByEntitat(entitat);
-			if (!tipusDocsEntity.isEmpty()) {
-				entitatTipusDocRepository.delete(tipusDocsEntity);
-			}
-			entitatRepository.delete(entitat);
-			permisosHelper.deleteAcl(
-					entitat.getId(),
-					EntitatEntity.class);
-			return conversioTipusHelper.convertir(
-					entitat,
-					EntitatDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -659,7 +667,17 @@ public class EntitatServiceImpl implements EntitatService {
 		}
 	}
 
-
+	@Transactional(readOnly = true)
+	@Override
+	public Map<String, OrganismeDto> findOrganigramaByEntitat(String entitatCodi) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			return cacheHelper.findOrganigramaByEntitat(entitatCodi);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
 
 }

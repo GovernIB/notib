@@ -3,6 +3,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+
+<%
+pageContext.setAttribute(
+		"isRolActualAdministradorOrgan",
+		es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
+%>
 <html>
 <head>
 	<title><spring:message code="organgestor.permis.titol"/></title>
@@ -22,6 +28,15 @@
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	
+	<script type="text/javascript">
+		$.views.helpers({
+			hlpIsAdminOrgan: isAdminOrgan
+		});
+		
+		function isAdminOrgan() {
+			return ${isRolActualAdministradorOrgan};
+		}
+	</script>
 	<style type="text/css">
 		td.organ-admin {
 			background-color: #feeec5;
@@ -79,7 +94,11 @@
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="../../organgestor/${organGestor.id}/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								{^{if ~hlpIsAdminOrgan() && !administrador}}
+									<li><a href="../../organgestor/${organGestor.id}/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								{{else !~hlpIsAdminOrgan()}}		
+									<li><a href="../../organgestor/${organGestor.id}/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>				
+								{{/if}}								
 								<li><a href="../../organgestor/${organGestor.id}/permis/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="procediment.permis.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
 						</div>

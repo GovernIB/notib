@@ -28,6 +28,7 @@ import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.SchedulledService;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.helper.CreacioSemaforDto;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
@@ -87,7 +88,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 	public void notificaEnviamentsRegistrats() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			if (isTasquesActivesProperty() && isNotificaEnviamentsActiu() && notificaHelper.isConnexioNotificaDisponible()) {
+			if (!isSemaforInUse() && isTasquesActivesProperty() && isNotificaEnviamentsActiu() && notificaHelper.isConnexioNotificaDisponible()) {
 				logger.info("[NOT] Cercant notificacions registrades pendents d'enviar a Notifica");
 				List pendents = notificacioService.getNotificacionsPendentsEnviar();
 				if (pendents != null && !pendents.isEmpty()) {
@@ -252,6 +253,14 @@ public class SchedulledServiceImpl implements SchedulledService {
 		} else {
 			return false;
 		}
+	}
+	
+	private boolean isSemaforInUse() {
+		boolean inUse = true;
+		synchronized(CreacioSemaforDto.getCreacioSemafor()) {
+			inUse = false;
+		}
+		return inUse;
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(SchedulledServiceImpl.class);

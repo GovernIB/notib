@@ -48,7 +48,9 @@ public class IntegracioHelper {
 	public static final String INTCODI_UNITATS = "UNITATS";
 	public static final String INTCODI_GESCONADM = "GESCONADM";
 	public static final String INTCODI_PROCEDIMENT = "PROCEDIMENTS";
-
+	public static final String INTCODI_CONVERT = "CONVERT";
+	public static final String INTCODI_FIRMASERV = "FIRMASERV";
+	
 	private Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = new HashMap<String, LinkedList<IntegracioAccioDto>>();
 	private Map<String, Integer> maxAccionsIntegracio = new HashMap<String, Integer>();
 
@@ -83,6 +85,9 @@ public class IntegracioHelper {
 		integracions.add(
 				novaIntegracio(
 						INTCODI_PROCEDIMENT));
+		integracions.add(
+				novaIntegracio(
+						INTCODI_FIRMASERV));
 		return integracions;
 	}
 
@@ -262,7 +267,9 @@ public class IntegracioHelper {
 			integracio.setNom("Rolsac");
 		} else if (INTCODI_PROCEDIMENT.equals(codi)) {
 				integracio.setNom("Procediments");
-			}
+		} else if (INTCODI_FIRMASERV.equals(codi)) {
+			integracio.setNom("Firma servidor");
+		}
 		return integracio;
 	}
 	

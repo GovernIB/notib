@@ -8,6 +8,15 @@
 	pageContext.setAttribute(
 			"isRolActualAdministrador",
 			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
+	pageContext.setAttribute(
+			"isRolActualUsuari",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuari(request));
+	pageContext.setAttribute(
+			"isRolActualAdministradorEntitat",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
+	pageContext.setAttribute(
+			"isRolActualAdministradorOrgan",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
 %>
 <c:set var="ampladaConcepte">
 	<c:choose>
@@ -110,9 +119,26 @@
 </style>
 <script type="text/javascript"> 
 
-var myHelpers = {recuperarEstatEnviament: returnEnviamentsStatusDiv};
+var myHelpers = {
+		recuperarEstatEnviament: returnEnviamentsStatusDiv, 
+		hlpIsUsuari: isRolActualUsuari, 
+		hlpIsAdministradorEntitat: isRolActualAdministradorEntitat, 
+		hlpIsAdministradorOrgan: isRolActualAdministradorOrgan};
 
 $.views.helpers(myHelpers);
+
+function isRolActualUsuari() {
+	return ${isRolActualUsuari};
+}
+
+function isRolActualAdministradorEntitat() {
+	return ${isRolActualAdministradorEntitat};
+}
+
+function isRolActualAdministradorOrgan() {
+	return ${isRolActualAdministradorOrgan};
+}
+
 
 function returnEnviamentsStatusDiv(notificacioId) {
 	var content = "";
@@ -472,18 +498,18 @@ $(document).ready(function() {
 			<div class="col-md-2 pull-right form-buttons"  style="text-align: right;">
 				<button id="nomesAmbErrorsBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbErrors"/>" class="btn btn-default <c:if test="${nomesAmbErrors}">active</c:if>" data-toggle="button"><span class="fa fa-warning"></span></button>
 				<not:inputHidden name="nomesAmbErrors"/>
-				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+				<button id="btnNetejar" type="submit" name="netejar" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 				<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 			</div>
 		</div>
 	</form:form>
-	<script id="rowhrefTemplate" type="text/x-jsrender">modal/notificacio/{{:id}}</script>
+	<script id="rowhrefTemplate" type="text/x-jsrender">modal/notificacio/{{:id}}/info</script>
 	<table
 		id="notificacio"
 		data-toggle="datatable"
 		data-url="<c:url value="/notificacio/datatable"/>"
 		data-search-enabled="false"
-		data-default-order="6"
+		data-default-order="7"
 		data-default-dir="desc"
 		class="table table-striped table-bordered"
 		style="width:100%"
@@ -496,6 +522,7 @@ $(document).ready(function() {
 				<th data-col-name="id" data-visible="false">#</th>
 				<th data-col-name="tipusUsuari" data-visible="false">#</th>
 				<th data-col-name="errorLastCallback" data-visible="false">#</th>
+				<th data-col-name="hasEnviamentsPendentsRegistre" data-visible="false">#</th>
 				<th data-col-name="notificaError" data-visible="false"></th>
 				<th data-col-name="notificaErrorDescripcio" data-visible="false"></th>
 				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" class="enviamentTipusCol" width="5px">
@@ -508,8 +535,8 @@ $(document).ready(function() {
 						{{/if}}
 					</script>
 				</th>
-				
-				<th data-col-name=createdDate data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>
+				<%-- <th data-col-name="notificaEnviamentData" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>--%>
+				<th data-col-name="createdDate" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>
 				<c:if test="${isRolActualAdministrador && mostrarColumnaEntitat}">
 					<th data-col-name="entitat.nom" width="170px"><spring:message code="notificacio.list.columna.entitat"/></th>
 				</c:if>
@@ -556,6 +583,7 @@ $(document).ready(function() {
 
 					</script>
 				</th>
+<%-- 				<th data-col-name="notificaEstat"  width="200px"><spring:message code="notificacio.form.camp.organGestor"/></th> --%>
 				<th data-col-name="createdByComplet" data-converter="String" width="150px"><spring:message code="notificacio.list.columna.enviament.creada"/></th>
 				<th data-col-name="permisProcessar" data-visible="false">
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="60px">
@@ -563,10 +591,14 @@ $(document).ready(function() {
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="<c:url value="/notificacio/{{:id}}"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="comu.boto.detalls"/></a></li>
+								<li><a href="<c:url value="/notificacio/{{:id}}/info"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="comu.boto.detalls"/></a></li>
 							{{if permisProcessar }}
 								<li><a href="<c:url value="/notificacio/{{:id}}/processar"/>" data-toggle="modal"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a></li>
 							{{/if}}
+							{^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan()) && hasEnviamentsPendentsRegistre }}
+								<li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
+								<li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+							{{/if}}							
 							</ul>
 						</div>
 					</script>

@@ -27,13 +27,14 @@ public class NotificacioHelper {
 	@Autowired
 	private NotificaHelper notificaHelper;
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public void enviamentRefrescarEstat(
 			Long enviamentId, 
 			ProgresActualitzacioCertificacioDto progres,
-			IntegracioInfo info) throws RuntimeException {
+			IntegracioInfo info) {
 		logger.debug("Refrescant l'estat de la notificació de Notific@ (enviamentId=" + enviamentId + ")");
 		try {
+			progres.incrementProcedimentsActualitzats();
 			String msgInfoUpdating = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant", new Object[] {enviamentId});
 			progres.addInfo(TipusActInfo.INFO, msgInfoUpdating);
 			info.getParams().add(new AccioParam("Msg. procés:", msgInfoUpdating + " [" + progres.getProgres() + "%]"));

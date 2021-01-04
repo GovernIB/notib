@@ -31,8 +31,6 @@ public class NotificacioEnviamentHelper {
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
 	
-	
-	
 	public List<NotificacioEnviamentDtoV2> toNotificacioEnviamentDtoV2(
 			NotificacioEntity notificacio,
 			Page<NotificacioEnviamentEntity> enviamentsPage) {
@@ -201,4 +199,5 @@ public class NotificacioEnviamentHelper {
 		}
 		return enviaments;
 	}
+	
 }

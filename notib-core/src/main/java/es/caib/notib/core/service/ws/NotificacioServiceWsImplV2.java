@@ -38,7 +38,6 @@ import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
@@ -49,7 +48,6 @@ import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
-import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.ws.notificacio.Certificacio;
@@ -79,6 +77,9 @@ import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.ProcedimentOrganEntity;
+import es.caib.notib.core.helper.AuditEnviamentHelper;
+import es.caib.notib.core.helper.AuditNotificacioHelper;
 import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.CaducitatHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
@@ -99,6 +100,7 @@ import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.PersonaRepository;
+import es.caib.notib.core.repository.ProcedimentOrganRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
 import es.caib.plugins.arxiu.api.DocumentContingut;
@@ -126,6 +128,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
+	@Autowired
+	private ProcedimentOrganRepository procedimentOrganRepository;
 	@Autowired
 	private PersonaRepository personaRepository;
 	@Autowired
@@ -156,6 +160,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private CacheHelper cacheHelper;
 	@Autowired
 	private MetricsHelper metricsHelper;
+	@Autowired
+	private AuditNotificacioHelper auditNotificacioHelper;
+	@Autowired
+	private AuditEnviamentHelper auditEnviamentHelper;
 	
 	@Transactional
 	@Override
@@ -168,7 +176,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			RespostaAlta resposta = new RespostaAlta();
 			ProcedimentEntity procediment = null;
 			OrganGestorEntity organGestor = null;
-
+			ProcedimentOrganEntity procedimentOrgan = null;
+			
 			// Generar informació per al monitor d'integracions
 			IntegracioInfo info = generateInfoAlta(notificacio);
 			
@@ -229,7 +238,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						}
 						
 						// Organ gestor
-						if (!procediment.isComu() || (procediment.isComu() && notificacio.getOrganGestor() == null)) {
+						if (!procediment.isComu()) { // || (procediment.isComu() && notificacio.getOrganGestor() == null)) { --> Tot procediment comú ha de informa un òrgan gestor
 							organGestor = procediment.getOrganGestor();
 						}
 					} else {
@@ -264,7 +273,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						organGestorRepository.save(organGestor);
 					}
 				}
-				
+				if (procediment != null && procediment.isComu() && organGestor != null) {
+					procedimentOrgan = procedimentOrganRepository.findByProcedimentIdAndOrganGestorId(procediment.getId(), organGestor.getId());
+				}
+
 				// Dades no depenents de procediment
 				
 				// DOCUMENT
@@ -281,7 +293,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				// Obtenim el document
 				DocumentEntity documentEntity = getDocument(notificacio, document);
 	
-				NotificacioEntity.BuilderV2 notificacioBuilder = NotificacioEntity.
+				NotificacioEntity notificacioEntity = NotificacioEntity.
 						getBuilderV2(
 								entitat,
 								emisorDir3Codi,
@@ -298,10 +310,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 								procediment,
 								notificacio.getGrupCodi(),
 								notificacio.getNumExpedient(),
-								TipusUsuariEnumDto.APLICACIO)
-						.document(documentEntity);
+								TipusUsuariEnumDto.APLICACIO,
+								procedimentOrgan)
+						.document(documentEntity).build();
 				
-				NotificacioEntity notificacioGuardada = notificacioRepository.saveAndFlush(notificacioBuilder.build());
+				NotificacioEntity notificacioGuardada = auditNotificacioHelper.desaNotificacio(notificacioEntity);
 				logger.debug(">> [ALTA] notificacio guardada");
 				
 				// Enviaments
@@ -324,11 +337,25 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				}
 				logger.debug(">> [ALTA] enviaments creats");
 
-				notificacioRepository.saveAndFlush(notificacioGuardada);
+				notificacioGuardada = notificacioRepository.saveAndFlush(notificacioGuardada);
 
 				
 				if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
-					processaNotificacio(notificacioGuardada);
+					logger.debug(">> [ALTA] notificació síncrona");
+					List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacioGuardada);
+					List<NotificacioEnviamentDtoV2> enviaments = conversioTipusHelper.convertirList(
+							enviamentsEntity,
+							NotificacioEnviamentDtoV2.class);
+					
+					logger.info(" [ALTA] Enviament SINCRON notificació [Id: " + notificacioGuardada.getId() + ", Estat: " + notificacioGuardada.getEstat() + "]");
+					synchronized(CreacioSemaforDto.getCreacioSemafor()) {
+						boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(
+								notificacioGuardada,
+								enviaments);
+						if (notificar)
+							notificaHelper.notificacioEnviar(notificacioGuardada.getId());
+					}
+					
 				} else {
 					inicialitzaCallbacks(notificacioGuardada);
 				}
@@ -408,23 +435,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		logger.debug(">> [ALTA] callbacks de client inicialitzats");
 	}
 
-	private void processaNotificacio(NotificacioEntity notificacioGuardada) throws RegistreNotificaException {
-		logger.debug(">> [ALTA] notificació síncrona");
-		List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacioGuardada);
-		
-		List<NotificacioEnviamentDtoV2> enviaments = conversioTipusHelper.convertirList(
-				enviamentsEntity, 
-				NotificacioEnviamentDtoV2.class);
-		
-		logger.info(" [ALTA] Enviament SINCRON notificació [Id: " + notificacioGuardada.getId() + ", Estat: " + notificacioGuardada.getEstat() + "]");
-		synchronized(CreacioSemaforDto.getCreacioSemafor()) {
-			registreNotificaHelper.realitzarProcesRegistrarNotificar(
-					notificacioGuardada,
-					enviaments);
-		}
-	}
-
-	private EnviamentReferencia saveEnviament(
+	public EnviamentReferencia saveEnviament(
 			EntitatEntity entitat,
 			NotificacioEntity notificacioGuardada,
 			Enviament enviament) {
@@ -442,32 +453,18 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		List<PersonaEntity> destinataris = getDestinataris(enviament);
 		EntregaPostalViaTipusEnum viaTipus = getViaTipus(enviament);
 		
-		NotificacioEnviamentEntity enviamentSaved = notificacioEnviamentRepository.saveAndFlush(
-				NotificacioEnviamentEntity.getBuilderV2(
-						enviament, 
-						entitat.isAmbEntregaDeh(),
-						numeracioTipus, 
-						tipusConcret, 
-						serveiTipus, 
-						notificacioGuardada, 
-						titular, 
-						destinataris)
-				.domiciliViaTipus(toEnviamentViaTipusEnum(viaTipus)).build());
-		logger.debug(">> [ALTA] enviament creat");
-		
-		String referencia;
-		try {
-			referencia = notificaHelper.xifrarId(enviamentSaved.getId());
-			logger.debug(">> [ALTA] referencia creada");
-		} catch (GeneralSecurityException ex) {
-			logger.debug(">> [ALTA] Error creant referència");
-			throw new RuntimeException(
-					"No s'ha pogut crear la referencia per al destinatari",
-					ex);
-		}
-		enviamentSaved.updateNotificaReferencia(referencia);
+		NotificacioEnviamentEntity enviamentSaved = auditEnviamentHelper.desaEnviamentAmbReferencia(
+				entitat,
+				notificacioGuardada,
+				enviament,
+				serveiTipus,
+				numeracioTipus,
+				tipusConcret,
+				titular,
+				destinataris,
+				viaTipus);
 		EnviamentReferencia enviamentReferencia = new EnviamentReferencia();
-		enviamentReferencia.setReferencia(referencia);
+		enviamentReferencia.setReferencia(enviamentSaved.getNotificaReferencia());
 		if (titular.getInteressatTipus() != InteressatTipusEnumDto.ADMINISTRACIO)
 			enviamentReferencia.setTitularNif(titular.getNif().toUpperCase());
 		else
@@ -899,7 +896,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							!enviament.isNotificaEstatFinal() &&
 							!enviament.getNotificaEstat().equals(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT)) {
 						logger.debug("Consultat estat de l'enviament amb referencia " + referencia + " a Notifica.");
-						notificaHelper.enviamentRefrescarEstat(enviament.getId());
+						enviament = notificaHelper.enviamentRefrescarEstat(enviament.getId());
 					}
 					resposta.setEstat(toEnviamentEstat(enviament.getNotificaEstat()));
 					resposta.setEstatData(enviament.getNotificaEstatData());
@@ -947,7 +944,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	public RespostaConsultaDadesRegistre consultaDadesRegistre(DadesConsulta dadesConsulta) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
@@ -1043,10 +1040,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				} else {
 					//Dades registre i consutla justificant
 					String numeroRegistreFormatat = enviament.getRegistreNumeroFormatat();
-					if (enviament.getNotificacio() == null) {
-						NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
-						enviament.setNotificacio(notificacio);
-					}
+//					if (enviament.getNotificacio() == null) {
+//						NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacioId());
+//						enviament.setNotificacio(notificacio);
+//					}
 					String codiDir3Entitat = enviament.getNotificacio().getEmisorDir3Codi();
 					if (numeroRegistreFormatat == null) {
 						resposta.setError(true);
@@ -1637,14 +1634,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		resposta.setEstat(NotificacioEstatEnum.PENDENT);
 		resposta.setErrorDescripcio(descripcioError);
 		return resposta;
-	}
-	
-	private NotificaDomiciliViaTipusEnumDto toEnviamentViaTipusEnum(
-			EntregaPostalViaTipusEnum viaTipus) {
-		if (viaTipus == null) {
-			return null;
-		}
-		return NotificaDomiciliViaTipusEnumDto.valueOf(viaTipus.name());
 	}
 	
 	private EnviamentEstatEnum toEnviamentEstat(NotificacioEnviamentEstatEnumDto estat) {

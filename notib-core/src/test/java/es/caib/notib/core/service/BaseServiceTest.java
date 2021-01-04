@@ -39,8 +39,10 @@ import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
+import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorCieFormatFullaDto;
 import es.caib.notib.core.api.dto.PagadorCieFormatSobreDto;
@@ -49,6 +51,7 @@ import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
 import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
@@ -56,9 +59,13 @@ import es.caib.notib.core.api.service.PagadorCieService;
 import es.caib.notib.core.api.service.PagadorPostalService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.UsuariAplicacioService;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
+import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
@@ -113,9 +120,14 @@ public class BaseServiceTest {
 	protected PagadorCieFormatFullaService pagadorCieFormatFullaService;
 	@Autowired
 	protected PagadorCieFormatSobreService pagadorCieFormatSobreService;
+	@Autowired
+	protected NotificacioService notificacioService;
 	
 	@Autowired
 	private  UsuariRepository usuariRepository;
+	
+	@Autowired
+	private  NotificacioRepository notificacioRepository;
 	
 	@Autowired
 	private  PluginHelper pluginHelper;
@@ -216,7 +228,8 @@ public class BaseServiceTest {
 						for (PermisDto permis: ((OrganGestorDto)element).getPermisos()) {
 							organGestorService.permisUpdate(
 									entitatId, 
-									entitatCreada.getId(), 
+									entitatCreada.getId(),
+									false,
 									permis);
 						}
 					}
@@ -273,6 +286,13 @@ public class BaseServiceTest {
 							(PagadorCieFormatSobreDto)element);
 					elementsCreats.add(entitatCreada);
 					id = entitatCreada.getId();
+				} else if(element instanceof NotificacioDtoV2) {
+					autenticarUsuari("admin");
+					NotificacioDtoV2 entitatCreada = notificacioService.create(
+							entitatId,
+							(NotificacioDtoV2)element);
+					elementsCreats.add(entitatCreada);
+					id = entitatCreada.getId();
 				} else {
 					fail("No s'ha trobat cap entitat per associar l'objecte de tipus " + element.getClass().getSimpleName());
 				}
@@ -289,9 +309,14 @@ public class BaseServiceTest {
 			for (Object element: elementsCreats) {
 				logger.debug("Esborrant objecte de tipus " + element.getClass().getSimpleName() + "...");
 				if (element instanceof EntitatDto) {
+					autenticarUsuari("admin");
+					Long entitadId = ((EntitatDto)element).getId();
+					List<OrganGestorDto> organsGestors = organGestorService.findByEntitat(entitadId);
+					for(OrganGestorDto organGestorDto: organsGestors) {
+						organGestorService.delete(entitatId, organGestorDto.getId());
+					}
 					autenticarUsuari("super");
-					entitatService.delete(
-							((EntitatDto)element).getId());
+					entitatService.delete(entitadId);
 					entitatId = null;
 				} else if(element instanceof AplicacioDto) {
 					autenticarUsuari("super");
@@ -304,10 +329,17 @@ public class BaseServiceTest {
 							entitatId,
 							((OrganGestorDto)element).getId());
 				} else if(element instanceof ProcedimentDto) {
+					
 					autenticarUsuari("admin");
+					Long procedimentId = ((ProcedimentDto)element).getId();
+					List<NotificacioEntity> notificacionsByProcediment = notificacioRepository.findByProcedimentId(procedimentId);
+					for(NotificacioEntity notificacioEntity: notificacionsByProcediment) {
+						notificacioRepository.delete(notificacioEntity.getId());
+					}
 					procedimentService.delete(
 							entitatId, 
-							((ProcedimentDto)element).getId());
+							((ProcedimentDto)element).getId(),
+							true);
 				} else if(element instanceof GrupDto) {
 					autenticarUsuari("admin");
 					grupService.delete(((GrupDto)element).getId());
