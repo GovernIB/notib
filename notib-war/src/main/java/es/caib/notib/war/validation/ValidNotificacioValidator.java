@@ -9,6 +9,7 @@ import javax.mail.internet.InternetAddress;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,6 +106,17 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					context.buildConstraintViolationWithTemplate(
 							MessageHelper.getInstance().getMessage("notificacio.form.valid.grup"))
 					.addNode("grupId")
+					.addConstraintViolation();
+				}
+			}
+			
+			// Validació caducitat
+			if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO) {
+				if (notificacio.getCaducitat() != null && !notificacio.getCaducitat().after(LocalDateTime.now().toDate())) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(
+							MessageHelper.getInstance().getMessage("notificacio.form.valid.caducitat"))
+					.addNode("caducitat")
 					.addConstraintViolation();
 				}
 			}
