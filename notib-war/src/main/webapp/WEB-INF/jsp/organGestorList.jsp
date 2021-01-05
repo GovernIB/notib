@@ -48,6 +48,9 @@
 			<div class="col-md-3">
 				<not:inputText name="nom" inline="true" placeholderKey="organgestor.list.columna.nom"/>
 			</div>
+			<div class="col-md-3">
+				<not:inputText name="oficina" inline="true" placeholderKey="organgestor.list.columna.oficina"/>
+			</div>
 			<div class="col-md-2 pull-right">
 				<div class="pull-right">
 					<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -71,11 +74,12 @@
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false" width="4%">#</th>
-				<th data-col-name="codi"><spring:message code="procediment.list.columna.codi"/></th>
-				<th data-col-name="nom"><spring:message code="procediment.list.columna.nom"/></th>
+				<th data-col-name="codi"><spring:message code="organgestor.list.columna.codi"/></th>
+				<th data-col-name="nom"><spring:message code="organgestor.list.columna.nom"/></th>
 				<c:if test="${setLlibre}">
 				<th data-col-name="llibreCodiNom"><spring:message code="procediment.list.columna.llibre"/></th>
 				</c:if>
+				<th data-col-name="oficinaNom"><spring:message code="organgestor.list.columna.oficina"/></th>
 				<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="100px">
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
 						<a href="organgestor/{{:id}}/permis" class="btn btn-default"><span class="fa fa-key"></span>&nbsp;<spring:message code="organgestor.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>

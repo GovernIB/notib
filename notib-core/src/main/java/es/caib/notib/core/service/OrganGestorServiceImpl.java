@@ -278,6 +278,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			mapeigPropietatsOrdenacio.put("llibreCodiNom", new String[] {"llibre"});
+			mapeigPropietatsOrdenacio.put("oficinaNom", new String[] {"entitat.oficina"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 			
 			Page<OrganGestorEntity> organs = null;
@@ -303,6 +304,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 							filtre.getCodi() == null ? "" : filtre.getCodi(),
 							filtre.getNom() == null || filtre.getNom().isEmpty(),
 							filtre.getNom() == null ? "" : filtre.getNom(),
+							filtre.getOficina() == null || filtre.getOficina().isEmpty(),
+							filtre.getOficina() == null ? "" : filtre.getOficina(),
 							pageable);
 				}
 			//Cas d'Administrador d'Organ
@@ -331,6 +334,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 							filtre.getCodi() == null ? "" : filtre.getCodi(),
 							filtre.getNom() == null || filtre.getNom().isEmpty(),
 							filtre.getNom() == null ? "" : filtre.getNom(),
+							filtre.getOficina() == null || filtre.getOficina().isEmpty(),
+							filtre.getOficina() == null ? "" : filtre.getOficina(),
 							pageable);
 				}
 			}
