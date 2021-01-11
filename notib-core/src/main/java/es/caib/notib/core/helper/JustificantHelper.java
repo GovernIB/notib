@@ -607,23 +607,23 @@ public class JustificantHelper {
 	}
 
 	private String getDireccio() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.capsalera.direccio");
+		return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.capsalera.direccio"));
 	}
 
 	private String getNifDireccio() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.capsalera.nif");
+		return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.capsalera.nif"));
 	}
 
 	private String getCodiDireccio() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.capsalera.codi");
+		return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.capsalera.codi"));
 	}
 
 	private String getEmailDireccio() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.capsalera.email");
+		return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.capsalera.email"));
 	}
 
 	private String getCapsaleraLogo() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.capsalera.logo");
+		return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.capsalera.logo"));
 	}
 	
 	private InputStream getCapsaleraDefaultLogo() {
@@ -635,12 +635,18 @@ public class JustificantHelper {
 	}
 
 	private String getPeuLogo() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.peu.logo");
+		return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.peu.logo"));
 	}
 
 	private String getPeuTitol() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.peu.titol");
+		return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.peu.titol"));
 	}
-	
+
+	private String getNotBlankProperty(String property) {
+		if (property == null || property.trim().isEmpty())
+			return null;
+		return property.trim();
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(JustificantHelper.class);
 }
