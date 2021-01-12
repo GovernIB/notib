@@ -394,6 +394,11 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.guardarArxiuTemporal(nom);
 	}
 
+	@Override
+	@RolesAllowed({"tothom"})
+	public byte[] obtenirArxiuTemporal(String arxiuGestdocId) {
+		return delegate.obtenirArxiuTemporal(arxiuGestdocId);
+	}
 
 
 }
