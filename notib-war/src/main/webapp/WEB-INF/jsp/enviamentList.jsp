@@ -101,6 +101,23 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 .input-group-addon {
 	padding: 0;
 }
+#loading-screen {
+	width: 100%;
+	height: 100%;
+	top: 100px;
+	left: 0;
+	position: fixed;
+	display: none;
+	opacity: 0.7;
+	background-color: #fff;
+	z-index: 99;
+	text-align: center;
+	}
+#processing-icon {
+	position: relative;
+	top: 240px;
+	z-index: 100;
+}
 </style>
 <script>
 
@@ -186,6 +203,7 @@ $(document).ready(function() {
 
 		$('#reintentarNotificacio').on('click', function() {
 			if(confirm("<spring:message code="enviament.list.user.reintentar.notificacio.misatge.avis"/>")){
+				$("#loading-screen").show();
 				$.get(
 					"enviament/reintentar/notificacio",
 					function(data) {
@@ -295,6 +313,11 @@ function getCookie(cname) {
 </script>
 </head>
 <body>
+	<div id="loading-screen" class="loading-screen" >
+		<div id="processing-icon" class="processing-icon">
+			<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: dimgray;margin-top: 10px;"></span>
+		</div>
+	</div>
 	<form:form id="enviamentFiltreForm" action="" method="post" cssClass="well hidden" commandName="enviamentFiltreCommand"></form:form>
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<div class="text-right">
