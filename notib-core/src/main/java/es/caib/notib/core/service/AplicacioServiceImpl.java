@@ -360,6 +360,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	private UsuariDto toUsuariDtoAmbRols(
 			UsuariEntity usuari) {
+		if (usuari == null)
+			return null;
 		UsuariDto dto = conversioTipusHelper.convertir(
 				usuari,
 				UsuariDto.class);
