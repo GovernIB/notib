@@ -371,7 +371,7 @@ public class EnviamentController extends BaseUserController {
 							errorMessage = e.getMessage();
 						else if (e.getCause() != null && e.getCause().getMessage() != null && !e.getCause().getMessage().isEmpty())
 							errorMessage = e.getCause().getMessage();
-						if (e.getStackTrace() != null && e.getStackTrace().length > 0) {
+						if (e.getStackTrace() != null && e.getStackTrace().length > 2) {
 							errorMessage += "<br/>";
 							errorMessage += e.getStackTrace()[0] + "<br/>";
 							errorMessage += e.getStackTrace()[1] + "<br/>";
