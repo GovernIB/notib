@@ -7,6 +7,15 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 
+<%
+	pageContext.setAttribute(
+			"isRolActualAdministradorEntitat",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
+	pageContext.setAttribute(
+			"isRolActualAdministradorOrgan",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
+%>
+
 <html>
 <head>
 <title><spring:message code="notificacio.info.titol" /></title>
@@ -112,7 +121,7 @@ $(document).ready(function() {
 				<spring:message code="notificacio.info.tab.events" />
 			</a>
 		</li>
-		<c:if test="${permisGestio == null || permisGestio}">
+		<c:if test="${permisGestio == null || permisGestio || isRolActualAdministradorEntitat || isRolActualAdministradorOrgan}">
 			<li role="presentation">
 				<a href="#accions" aria-controls="accions" role="tab" data-toggle="tab"> 
 					<spring:message code="notificacio.info.tab.accions" />
