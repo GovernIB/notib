@@ -48,7 +48,7 @@ import es.caib.notib.plugin.usuari.DadesUsuari;
  */
 @Slf4j
 @Component
-public class CacheHelper { 
+public class CacheHelper {
 
 	@Resource
 	private EntitatRepository entitatRepository;
@@ -70,6 +70,8 @@ public class CacheHelper {
 	private OrganigramaHelper organigramaHelper;
 	@Resource
 	private CacheManager cacheManager;
+
+	public static String appVersion;
 
 	@Cacheable(value = "entitatsUsuari", key="#usuariCodi.concat('-').concat(#rolActual)")
 	public List<EntitatDto> findEntitatsAccessiblesUsuari(

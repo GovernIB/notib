@@ -54,30 +54,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	
 	private static final String OFICINA_VIRTUAL_DEFAULT = "Oficina Virtual";
 
-	@Override
-	@Deprecated
-	public RespostaAnotacioRegistre registrarSalida(
-			RegistreSortida registreSortida,
-			String aplicacion) {
-		RespostaAnotacioRegistre resposta = new RespostaAnotacioRegistre();
-		try {
-			//TODO: substituir pel nou mètode crearAsientoRegistral
-			resposta = toRespostaAnotacioRegistre(getRegistroSalidaApi().nuevoRegistroSalida(
-					registreSortida.getCodiEntitat(),
-					toRegistroSalidaWs(
-									registreSortida,
-									aplicacion)));
-					
-		} catch (Exception ex) {
-			resposta.setErrorDescripcio(ex.getMessage());
-			resposta.setData(new Date());
-			logger.error("Error a l'hora de registrar la sortida", ex);
-		}
-		return resposta;
-	}
-	
-	
-	
+
 	@Override
 	public RespostaConsultaRegistre salidaAsientoRegistral(
 			String codiDir3Entitat, 
@@ -98,7 +75,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 //			    return exclusions.contains(m.getName())|| super.hasIgnoreMarker(m);
 //			    }
 //			});
-//			String asientoJson = objectMapper.writeValueAsString(asiento); 
+//			String asientoJson = objectMapper.writeValueAsString(asiento);
 //			logger.debug("   Asiento: " + asientoJson);
 //			logger.debug("[SalidaAsientoRegistral - FI]");
 
@@ -392,7 +369,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		return ntiTipusDocumental;
 	}
 	
-	public AsientoRegistralWs toAsientoRegistralBean(AsientoRegistralBeanDto dto) {
+	private AsientoRegistralWs toAsientoRegistralBean(AsientoRegistralBeanDto dto) {
 		AsientoRegistralWs ar = new AsientoRegistralWs();
 		ar.setAplicacion(dto.getAplicacion());
 		ar.setAplicacionTelematica(dto.getAplicacionTelematica());

@@ -40,6 +40,7 @@ public class NotificacioV2 {
 	private String grupCodi;
 	private String numExpedient;
 	private List<Enviament> enviaments;
+	private String idioma = "ca";
 	
 	@Override
 	public String toString() {
