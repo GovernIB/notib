@@ -921,8 +921,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			Page<NotificacioEntity> notificacions = null;
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			mapeigPropietatsOrdenacio.put("procediment.organGestor", new String[] {"pro.organGestor.codi"});
-			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organGestor.codi"});
+			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {(isUsuari ? "organ.codi" : "organGestor.codi")});
 			mapeigPropietatsOrdenacio.put("procediment.nom", new String[] {"pro.nom"});
+			mapeigPropietatsOrdenacio.put("procediment.descripcio", new String[] {"pro.codi"});
+			mapeigPropietatsOrdenacio.put("createdByComplet", new String[] {"createdBy"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 			
 			boolean esProcedimentsCodisNotibNull = (procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty());

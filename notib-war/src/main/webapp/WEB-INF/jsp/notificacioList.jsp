@@ -169,36 +169,6 @@ $(function() {
     });
 });
 
-//function returnProcessarUrl(permisProcessar, notificacioId) {
-//	var url;
-//	if(permisProcessar) {
-//		url = '<a href="<c:url value="/notificacio/' + notificacioId + '/processar"/>" class="btn btn-info btn-xs pull-right"  data-toggle="modal" data-modal-id="modal-processar"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a>';
-//	}
-//	if (url !== undefined) {
-//		return  url.replace(/"/g, "'");
-//	} else {
-//		return  url;
-//	}
-//}
-//async function resolve(notificacioId) {
-//	var content;
-//	var getUrl = "<c:url value="/notificacio/"/>" + notificacioId + "/enviament";
-//	
-//	const reposResponse = await fetch(getUrl);
-//	const userRepos = await reposResponse.json();
-//	
-//	if (userRepos != null) {
-//		for (i = 0; i < userRepos.length; i++) {
-//			content = (userRepos[i].notificaEstat) ? notificacioEnviamentEstats[userRepos[i].notificaEstat] + ',' : '';
-//		}
-//	}
-//	if (content !== undefined) {
-//		content = "("+content.replace(/,\s*$/, "")+")";
-//	}
-//	//console.log(content);
-//	return content;
-//}
-
 function formatDate(data) {
 	//Añadir ceros a los numeros de un dígito
 	Number.prototype.padLeft = function(base,chr){
@@ -355,28 +325,6 @@ $(document).ready(function() {
 	$('#organGestor').on('change', function () {
 		//Procediments
 		omplirProcediments();
-// 		var organGestor = $(this);
-// 		var selProcediments = $("#procedimentId");
-// 		$.ajax({
-// 			type: 'GET',
-// 			url: "<c:url value="/notificacio/procedimentsOrgan/"/>" + $(organGestor).val(),
-// 			success: function(data) {
-// 				$(selProcediments).empty();
-// 				$(selProcediments).append("<option value=\"\"></option>");
-// 				if (data && data.length > 0) {
-// 					$.each(data, function(i, val) {
-// 						$(selProcediments).append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
-// 					});
-// 				}
-// 				var select2Options = {
-// 						theme: 'bootstrap',
-// 						width: 'auto'};
-// 				$(selProcediments).select2(select2Options);
-// 			},
-// 			error: function() {
-// 				console.log("error obtenint els procediments!");
-// 			}
-// 		});
 	});
 	function omplirProcediments() {
 		var organGestor = $("#organGestor");

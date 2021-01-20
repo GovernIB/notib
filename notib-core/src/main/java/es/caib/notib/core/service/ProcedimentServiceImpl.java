@@ -750,7 +750,18 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				procedimentRepository.findByOrganGestorCodiIn(organsFills),
 				ProcedimentDto.class);
 	}
-	
+
+	@Override
+	public List<ProcedimentDto> findByOrganGestorIDescendentsAndComu(Long entitatId, OrganGestorDto organGestor) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+				entitat.getDir3Codi(),
+				organGestor.getCodi());
+		return conversioTipusHelper.convertirList(
+				procedimentRepository.findByOrganGestorCodiInOrComu(organsFills, entitat),
+				ProcedimentDto.class);
+	}
+
 	@Override
 	@Transactional
 	public PaginaDto<ProcedimentFormDto> findAmbFiltrePaginat(

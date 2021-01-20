@@ -110,7 +110,15 @@ public class ProcedimentServiceBean implements ProcedimentService {
 		return delegate.findByOrganGestorIDescendents(entitatId, organGestor);
 	}
 
-	@Override
+    @Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+    public List<ProcedimentDto> findByOrganGestorIDescendentsAndComu(
+    		Long id,
+			OrganGestorDto organGestor) {
+        return delegate.findByOrganGestorIDescendentsAndComu(id, organGestor);
+    }
+
+    @Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public PaginaDto<ProcedimentFormDto> findAmbFiltrePaginat(
 			Long entitatId, 

@@ -126,6 +126,11 @@ public interface ProcedimentService {
 	public List<ProcedimentDto> findByOrganGestorIDescendents(
 			Long entitatId, 
 			OrganGestorDto organGestor);
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	public List<ProcedimentDto> findByOrganGestorIDescendentsAndComu(
+			Long entitatId,
+			OrganGestorDto organGestor);
 	
 	
 	/**

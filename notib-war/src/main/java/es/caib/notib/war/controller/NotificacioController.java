@@ -201,20 +201,31 @@ public class NotificacioController extends BaseUserController {
         } else if (RolHelper.isUsuariActualUsuari(request)) {
 //			procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), aplicacioService.findRolsUsuariActual(), PermisEnum.CONSULTA);
             procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), SecurityContextHolder.getContext().getAuthentication().getName(), PermisEnum.CONSULTA);
-            organsGestorsDisponibles = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), SecurityContextHolder.getContext().getAuthentication().getName(), PermisEnum.CONSULTA);
+            List<ProcedimentOrganDto> procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(
+                    entitatActual.getId(),
+                    SecurityContextHolder.getContext().getAuthentication().getName(),
+                    PermisEnum.CONSULTA);
+
+            procedimentsDisponibles = addProcedimentsOrgan(procedimentsDisponibles, procedimentsOrgansDisponibles);
+//            organsGestorsDisponibles = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), SecurityContextHolder.getContext().getAuthentication().getName(), PermisEnum.CONSULTA);
+            organsGestorsDisponibles = recuperarOrgansPerProcedimentAmbPermis(
+                    entitatActual,
+                    procedimentsDisponibles,
+                    procedimentsOrgansDisponibles,
+                    PermisEnum.CONSULTA);
             if (procedimentsDisponibles.isEmpty() && organsGestorsDisponibles.isEmpty()) {
                 //### Usuari sense permís sobre cap òrgan ni procediment
                 MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.lectura"));
-            } else if (!procedimentsDisponibles.isEmpty()) {
-                //### Òrgans gestors que són de procediments sobre els quals té permís l'usuari actual
-                List<Long> procedimentsDisponiblesIds = new ArrayList<Long>();
-                for (ProcedimentDto pro : procedimentsDisponibles)
-                    procedimentsDisponiblesIds.add(pro.getId());
-
-                Set<OrganGestorDto> setOrgansGestors = new HashSet<OrganGestorDto>(organsGestorsDisponibles);
-                setOrgansGestors.addAll(organGestorService.findByProcedimentIds(procedimentsDisponiblesIds));
-
-                organsGestorsDisponibles = new ArrayList<OrganGestorDto>(setOrgansGestors);
+//            } else if (!procedimentsDisponibles.isEmpty()) {
+//                //### Òrgans gestors que són de procediments sobre els quals té permís l'usuari actual
+//                List<Long> procedimentsDisponiblesIds = new ArrayList<Long>();
+//                for (ProcedimentDto pro : procedimentsDisponibles)
+//                    procedimentsDisponiblesIds.add(pro.getId());
+//
+//                Set<OrganGestorDto> setOrgansGestors = new HashSet<OrganGestorDto>(organsGestorsDisponibles);
+//                setOrgansGestors.addAll(organGestorService.findByProcedimentIds(procedimentsDisponiblesIds));
+//
+//                organsGestorsDisponibles = new ArrayList<OrganGestorDto>(setOrgansGestors);
             }
         } else if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
             OrganGestorDto organGestorActual = getOrganGestorActual(request);
@@ -285,9 +296,18 @@ public class NotificacioController extends BaseUserController {
         } else if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
             procediments = procedimentService.findByEntitat(entitatActual.getId());
         } else if (RolHelper.isUsuariActualUsuari(request)) {
-//			procediments = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), aplicacioService.findRolsUsuariActual(), PermisEnum.CONSULTA);
-			procediments = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), SecurityContextHolder.getContext().getAuthentication().getName(), PermisEnum.NOTIFICACIO);
-		}
+//			procediments = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), SecurityContextHolder.getContext().getAuthentication().getName(), PermisEnum.NOTIFICACIO);
+            procediments = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), SecurityContextHolder.getContext().getAuthentication().getName(), PermisEnum.CONSULTA);
+            List<ProcedimentOrganDto> procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(
+                    entitatActual.getId(),
+                    SecurityContextHolder.getContext().getAuthentication().getName(),
+                    PermisEnum.CONSULTA);
+            procediments = addProcedimentsOrgan(procediments, procedimentsOrgansDisponibles);
+		} else if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
+            procediments = procedimentService.findByOrganGestorIDescendentsAndComu(
+                    entitatActual.getId(),
+                    getOrganGestorActual(request));
+        }
 		return procediments;
 	}
 	
@@ -319,14 +339,56 @@ public class NotificacioController extends BaseUserController {
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
 
-        if (RolHelper.isUsuariActualUsuari(request)) {
-            procediments = procedimentService.findProcedimentsByOrganGestorWithPermis(
-                    entitatActual.getId(),
-                    organGestor,
-                    aplicacioService.findRolsUsuariActual(),
-                    PermisEnum.CONSULTA);
-        } else {
-            procediments = procedimentService.findProcedimentsByOrganGestor(organGestor);
+//        if (RolHelper.isUsuariActualUsuari(request)) {
+//            procediments = procedimentService.findProcedimentsByOrganGestorWithPermis(
+//                    entitatActual.getId(),
+//                    organGestor,
+//                    aplicacioService.findRolsUsuariActual(),
+//                    PermisEnum.CONSULTA);
+//        } else {
+//            procediments = procedimentService.findProcedimentsByOrganGestor(organGestor);
+//        }
+//        return procediments;
+
+        List<ProcedimentOrganDto> procedimentsOrgansDisponibles = new ArrayList<ProcedimentOrganDto>();
+        if(RolHelper.isUsuariActualUsuari(request)) {
+            UsuariDto usuariActual = aplicacioService.getUsuariActual();
+            List<ProcedimentDto> procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
+
+            if (procedimentsDisponibles != null) {
+                for (ProcedimentDto proc : procedimentsDisponibles) {
+                    if (proc.isComu() || organGestor.equalsIgnoreCase(proc.getOrganGestor())) {
+                        procediments.add(proc);
+                    }
+                }
+            }
+
+            // Procediments-Òrgan (Comuns)
+            procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
+
+            if (!procedimentsOrgansDisponibles.isEmpty()) {
+                procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermisByOrgan(organGestor, entitatActual.getDir3Codi(), procedimentsOrgansDisponibles);
+                for (ProcedimentOrganDto procedimentOrgan : procedimentsOrgansDisponibles) {
+                    if (!procediments.contains(procedimentOrgan.getProcediment())) {
+                        procediments.add(procedimentOrgan.getProcediment());
+                    }
+                }
+                Collections.sort(procediments, new Comparator<ProcedimentDto>() {
+                    @Override
+                    public int compare(ProcedimentDto p1, ProcedimentDto p2) {
+                        return p1.getNom().compareTo(p2.getNom());
+                    }
+                });
+            }
+        } else { //if(RolHelper.isUsuariActualAdministradorEntitat(request)) {
+            List<ProcedimentDto> procedimentsDisponibles = procedimentService.findByEntitat(entitatActual.getId());
+            if (procedimentsDisponibles != null) {
+                for (ProcedimentDto proc : procedimentsDisponibles) {
+                    if (proc.isComu() || organGestor.equalsIgnoreCase(proc.getOrganGestor())) {
+                        procediments.add(proc);
+                    }
+                }
+            }
         }
         return procediments;
     }
@@ -1286,7 +1348,8 @@ public class NotificacioController extends BaseUserController {
 	        organsGestors = recuperarOrgansPerProcedimentAmbPermis(
 	                entitatActual,
 	                procedimentsDisponibles,
-	                procedimentsOrgansDisponibles);
+	                procedimentsOrgansDisponibles,
+                    PermisEnum.NOTIFICACIO);
         } else if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
         	procedimentsDisponibles = procedimentService.findByEntitat(entitatActual.getId());
         	organsGestors = organGestorService.findByEntitat(entitatActual.getId());
@@ -1370,7 +1433,8 @@ public class NotificacioController extends BaseUserController {
     private List<OrganGestorDto> recuperarOrgansPerProcedimentAmbPermis(
             EntitatDto entitatActual,
             List<ProcedimentDto> procedimentsDisponibles,
-            List<ProcedimentOrganDto> procedimentsOrgansDisponibles) {
+            List<ProcedimentOrganDto> procedimentsOrgansDisponibles,
+            PermisEnum permis) {
         List<OrganGestorDto> organsGestorsProcediments = new ArrayList<OrganGestorDto>();
         List<Long> procedimentsDisponiblesIds = new ArrayList<Long>();
         for (ProcedimentDto pro : procedimentsDisponibles)
@@ -1383,7 +1447,7 @@ public class NotificacioController extends BaseUserController {
         List<OrganGestorDto> organsGestorsAmbPermis = organGestorService.findOrgansGestorsWithPermis(
                 entitatActual.getId(),
                 SecurityContextHolder.getContext().getAuthentication().getName(),
-                PermisEnum.NOTIFICACIO);
+                permis); //PermisEnum.NOTIFICACIO);
         // 3-juntam tots els òrgans i ordenam per nom
         List<OrganGestorDto> organsGestors;
         Set<OrganGestorDto> setOrgansGestors = new HashSet<OrganGestorDto>(organsGestorsProcediments);
@@ -1459,7 +1523,8 @@ public class NotificacioController extends BaseUserController {
 	        organsGestors = recuperarOrgansPerProcedimentAmbPermis(
 	                entitatActual,
 	                procedimentsDisponibles,
-	                procedimentsOrgansDisponibles);
+	                procedimentsOrgansDisponibles,
+                    PermisEnum.NOTIFICACIO);
         } else {
         	procedimentsDisponibles = procedimentService.findByEntitat(entitatActual.getId());
         	organsGestors = organGestorService.findByEntitat(entitatActual.getId());
