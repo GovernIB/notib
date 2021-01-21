@@ -354,14 +354,14 @@ $(document).ready(function() {
 					if (procedimentsComuns.length > 0) {
 						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
 							$.each(procedimentsComuns, function(index, val) {
-								selProcediments.append("<option value=\"" + val.id + "\">" + val.codi +' - '+ val.nom + "</option>");
+								selProcediments.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
 							});
 						selProcediments.append("</optgroup>");
 					}
 					if (procedimentsOrgan.length > 0) {
 						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
 							$.each(procedimentsOrgan, function(index, val) {
-								selProcediments.append("<option value=\"" + val.id + "\">" + val.codi +' - '+ val.nom + "</option>");
+								selProcediments.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
 							});
 						selProcediments.append("</optgroup>");
 					}
@@ -413,7 +413,7 @@ $(document).ready(function() {
 				<not:inputText name="titular" inline="true" placeholderKey="notificacio.list.filtre.camp.titular"/>
 			</div>
 			<div class="col-md-4">
-				<not:inputSelect name="organGestor" optionItems="${organsGestorsPermisLectura}" optionValueAttribute="codi" optionTextAttribute="nom" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
+				<not:inputSelect name="organGestor" optionItems="${organsGestorsPermisLectura}" optionValueAttribute="codi" optionTextAttribute="valor" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 			<div class="col-md-6">
 				<not:inputSelect name="procedimentId" optionItems="${procedimentsPermisLectura}" optionValueAttribute="id" optionTextAttribute="descripcio" placeholderKey="notificacio.list.filtre.camp.procediment" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>

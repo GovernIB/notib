@@ -2,22 +2,9 @@ package es.caib.notib.core.api.service;
 
 import java.util.List;
 
+import es.caib.notib.core.api.dto.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.notib.core.api.dto.CodiAssumpteDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.PermisEnum;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
-import es.caib.notib.core.api.dto.ProcedimentFormDto;
-import es.caib.notib.core.api.dto.ProcedimentGrupDto;
-import es.caib.notib.core.api.dto.ProcedimentOrganDto;
-import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
-import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 
 /**
@@ -374,15 +361,22 @@ public interface ProcedimentService {
 	
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
 	public List<ProcedimentDto> findProcedimentsByOrganGestor(String organGestorCodi);
-	
+
 	@PreAuthorize("hasRole('tothom')")
 	public List<ProcedimentDto> findProcedimentsByOrganGestorWithPermis(
 			Long entitatId,
-			String organGestorCodi, 
-			List<String> grups, 
+			String organGestorCodi,
+			List<String> grups,
 			PermisEnum permis);
-	
-	
+
+	@PreAuthorize("hasRole('tothom')")
+	List<CodiValorComuDto> getProcedimentsOrgan(
+			Long entitatId,
+			String organCodi,
+			Long organFiltre,
+			RolEnumDto rol,
+			PermisEnum permis);
+
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public void actualitzaProcediments(EntitatDto entitat);
 
