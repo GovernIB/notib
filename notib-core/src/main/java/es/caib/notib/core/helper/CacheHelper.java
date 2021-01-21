@@ -264,15 +264,15 @@ public class CacheHelper {
 	public void evictFindOrganigramaPlugin(String entitatCodi) {
 	}
 			
-	@CacheEvict(value = "procedimentsPermis", allEntries = true)
+	@CacheEvict(value = {"procedimentsPermis", "procedimentEntitiesPermis"}, allEntries = true)
 	public void evictFindProcedimentsWithPermis() {
 	}
 	
-	@CacheEvict(value = "procedimentsOrganPermis", allEntries = true)
+	@CacheEvict(value = {"procedimentsOrganPermis", "procedimentEntitiessOrganPermis"}, allEntries = true)
 	public void evictFindProcedimentsOrganWithPermis() {
 	}
 	
-	@CacheEvict(value = "organsPermis", allEntries = true)
+	@CacheEvict(value = {"organsPermis", "organsEntitiesPermis"}, allEntries = true)
 	public void evictFindOrgansGestorWithPermis() {
 	}
 	
