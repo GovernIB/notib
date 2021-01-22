@@ -1,23 +1,23 @@
 {
-	"sEmptyTable":	"Cap dada disponible en aquesta taula",
-	"sInfo":		"Mostrant _START_ a _END_ de _TOTAL_ resultats",
-	"sInfoEmpty":	"Mostrant 0 a 0 de 0 resultats",
-	"sInfoFiltered":	"(filtrat de _MAX_ resultats totals)",
-	"sInfoPostFix":	"",
-	"sInfoThousands":	".",
-	"sLengthMenu":	"Mostrar _MENU_ registres",
-	"sLoadingRecords":	"Carregant...",
-	"sProcessing":	"Processant...",
-	"sSearch":		"Filtre:",
-	"sZeroRecords":	"No s'ha trobat cap resultat",
-	"oPaginate": {
-		"sFirst":	"Primer",
-		"sLast":	"Darrer",
-		"sNext":	"Següent",
-		"sPrevious":"Anterior"
-	},
-	"oAria": {
-		"sSortAscending":	": Activar per a ordenar la columna amb ordre ascendent",
-		"sSortDescending":	": Activar per a ordenar la columna amb ordre descendent"
-	}
+    "sEmptyTable":     "Ningún dato disponible en esta tabla",
+    "sInfo":           "Mostrando registros del _START_ al _END_ de _TOTAL_ registros",
+    "sInfoEmpty":      "Mostrando registros del 0 al 0 de 0 registros",
+    "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+    "sInfoPostFix":    "",
+    "sInfoThousands":  ".",
+    "sLengthMenu":     "Mostrar _MENU_ registros",
+    "sLoadingRecords": "Cargando...",
+    "sProcessing":     "Procesando...",
+    "sSearch":         "Filtro:",
+    "sZeroRecords":    "No se encontraron resultados",
+    "oPaginate": {
+        "sFirst":    "Primero",
+        "sLast":     "Último",
+        "sNext":     "Siguiente",
+        "sPrevious": "Anterior"
+    },
+    "oAria": {
+        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+    }
 }
