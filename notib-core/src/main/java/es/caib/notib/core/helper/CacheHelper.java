@@ -268,7 +268,7 @@ public class CacheHelper {
 	public void evictFindProcedimentsWithPermis() {
 	}
 	
-	@CacheEvict(value = {"procedimentsOrganPermis", "procedimentEntitiessOrganPermis"}, allEntries = true)
+	@CacheEvict(value = {"procedimentsOrganPermis", "procedimentEntitiessOrganPermis", "procedimentsOrgan"}, allEntries = true)
 	public void evictFindProcedimentsOrganWithPermis() {
 	}
 	

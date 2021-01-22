@@ -457,7 +457,7 @@ public class NotificacioController extends BaseUserController {
         getEntitatActualComprovantPermisos(request);
         NotificacioFiltreDto filtre = (NotificacioFiltreDto) request.getSession().getAttribute(NOTIFICACIONS_FILTRE);
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        PaginaDto<NotificacioDto> notificacions = new PaginaDto<NotificacioDto>();
+        PaginaDto<NotificacioDatatableDto> notificacions = new PaginaDto<>();
         UsuariDto usuariActual = aplicacioService.getUsuariActual();
         boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
         boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
@@ -769,11 +769,11 @@ public class NotificacioController extends BaseUserController {
 
     @RequestMapping(value = "/{notificacioId}/enviament", method = RequestMethod.GET)
     @ResponseBody
-    public List<NotificacioEnviamentDto> enviamentList(
+    public List<NotificacioEnviamentDatatableDto> enviamentList(
             HttpServletRequest request,
             Model model,
             @PathVariable Long notificacioId) {
-        List<NotificacioEnviamentDto> destinataris = enviamentService.enviamentFindAmbNotificacio(notificacioId);
+        List<NotificacioEnviamentDatatableDto> destinataris = enviamentService.enviamentFindAmbNotificacio(notificacioId);
         return destinataris;
     }
 

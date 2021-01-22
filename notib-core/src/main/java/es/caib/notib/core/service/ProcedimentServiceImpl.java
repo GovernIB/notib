@@ -1125,6 +1125,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 
 	@Override
 	@Transactional(readOnly = true)
+	@Cacheable(value = "procedimentsOrgan", key="{#entitatId, #organCodi, #organFiltre, #rol.ordinal(), #permis.ordinal()}")
 	public List<CodiValorComuDto> getProcedimentsOrgan(
 			Long entitatId,
 			String organCodi,

@@ -9,28 +9,10 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 
+import es.caib.notib.core.api.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.CodiValorDto;
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.LocalitatsDto;
-import es.caib.notib.core.api.dto.NotificacioDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
-import es.caib.notib.core.api.dto.NotificacioErrorCallbackFiltreDto;
-import es.caib.notib.core.api.dto.NotificacioEventDto;
-import es.caib.notib.core.api.dto.NotificacioFiltreDto;
-import es.caib.notib.core.api.dto.NotificacioRegistreErrorFiltreDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PaisosDto;
-import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
-import es.caib.notib.core.api.dto.ProgresDescarregaDto;
-import es.caib.notib.core.api.dto.ProvinciesDto;
-import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
@@ -164,7 +146,7 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
+	public PaginaDto<NotificacioDatatableDto> findAmbFiltrePaginat(
 			Long entitatId,
 			boolean isUsuari,
 			boolean isUsuariEntitat,
