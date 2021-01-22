@@ -514,7 +514,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			}
 			envios.setConcepto(notificacio.getConcepte().replace('·', '.'));
 			if (notificacio.getDescripcio() != null)
-				envios.setDescripcion(notificacio.getDescripcio().replace('·', '.'));
+				envios.setDescripcion(notificacio.getDescripcio().replace('·', '.').replace("\r", ""));
 			
 			envios.setProcedimiento(notificacio.getProcedimentCodiNotib());
 			Documento  documento = new Documento();
