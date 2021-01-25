@@ -3,28 +3,7 @@
  */
 package es.caib.notib.core.entity;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
+import es.caib.notib.core.api.dto.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
@@ -32,6 +11,15 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 import lombok.Getter;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 
 /**
@@ -124,6 +112,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "callback_error")
 	protected boolean errorLastCallback;
+
+	@Column(name = "idioma")
+	protected IdiomaEnumDto idioma;
 	
 	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "not_error_event_id")
@@ -316,7 +307,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String numExpedient,
 			TipusUsuariEnumDto tipusUsuari,
 			DocumentEntity document,
-			ProcedimentOrganEntity procedimentOrgan) {
+			ProcedimentOrganEntity procedimentOrgan,
+			IdiomaEnumDto idioma) {
 		this.entitat = entitat;
 		this.emisorDir3Codi = emisorDir3Codi;
 		this.organGestor = organGestor;
@@ -335,6 +327,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		this.tipusUsuari = tipusUsuari;
 		this.document = document;
 		this.procedimentOrgan = procedimentOrgan;
+		this.idioma = idioma;
 		
 		this.registreEnviamentIntent = 0;
 		this.notificaEnviamentIntent = 0;
@@ -357,7 +350,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String grup,
 			String numExpedient,
 			TipusUsuariEnumDto tipusUsuari,
-			ProcedimentOrganEntity procedimentOrgan) {
+			ProcedimentOrganEntity procedimentOrgan,
+			IdiomaEnumDto idioma) {
 		return new BuilderV2(
 				entitat,
 				emisorDir3Codi,
@@ -375,7 +369,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				grup,
 				numExpedient,
 				tipusUsuari,
-				procedimentOrgan);
+				procedimentOrgan,
+				idioma);
 	}
 	
 
@@ -398,7 +393,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				String grup,
 				String numExpedient,
 				TipusUsuariEnumDto tipusUsuari,
-				ProcedimentOrganEntity procedimentOrgan) {
+				ProcedimentOrganEntity procedimentOrgan,
+				IdiomaEnumDto idioma) {
 			built = new NotificacioEntity();
 			built.entitat = entitat;
 			built.emisorDir3Codi = emisorDir3Codi;
@@ -421,6 +417,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.notificaEnviamentData = new Date();
 			built.tipusUsuari = tipusUsuari;
 			built.procedimentOrgan = procedimentOrgan;
+			built.idioma = idioma == null ? IdiomaEnumDto.CA : idioma;
 		}
 		public BuilderV2 usuariCodi(String usuariCodi) {
 			built.usuariCodi = usuariCodi;
