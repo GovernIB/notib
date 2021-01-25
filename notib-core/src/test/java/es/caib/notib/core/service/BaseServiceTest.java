@@ -424,19 +424,19 @@ public class BaseServiceTest {
 		FitxerDto fitxer = getFitxerPdfDeTest();
 		
 		// registrarSalida
-		Mockito.doAnswer(new Answer<RespostaAnotacioRegistre>() {
-			public RespostaAnotacioRegistre answer(InvocationOnMock invocation) {
-				RespostaAnotacioRegistre resposta = new RespostaAnotacioRegistre();
-				Date data = new Date();
-				Calendar calendar = new GregorianCalendar();
-				calendar.setTime(data);
-				String num = Integer.toString(ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE));
-				resposta.setData(data);
-				resposta.setNumero(num);
-				resposta.setNumeroRegistroFormateado(num + "/" + calendar.get(Calendar.YEAR));
-				return resposta;
-			}
-		}).when(registrePluginMock).registrarSalida(Mockito.any(RegistreSortida.class), Mockito.anyString());
+//		Mockito.doAnswer(new Answer<RespostaAnotacioRegistre>() {
+//			public RespostaAnotacioRegistre answer(InvocationOnMock invocation) {
+//				RespostaAnotacioRegistre resposta = new RespostaAnotacioRegistre();
+//				Date data = new Date();
+//				Calendar calendar = new GregorianCalendar();
+//				calendar.setTime(data);
+//				String num = Integer.toString(ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE));
+//				resposta.setData(data);
+//				resposta.setNumero(num);
+//				resposta.setNumeroRegistroFormateado(num + "/" + calendar.get(Calendar.YEAR));
+//				return resposta;
+//			}
+//		}).when(registrePluginMock).registrarSalida(Mockito.any(RegistreSortida.class), Mockito.anyString());
 
 		// salidaAsientoRegistral
 		Mockito.doAnswer(new Answer<RespostaConsultaRegistre>() {

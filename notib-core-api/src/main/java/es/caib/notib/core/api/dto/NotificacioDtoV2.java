@@ -3,14 +3,13 @@
  */
 package es.caib.notib.core.api.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Informació d'una anotació.
@@ -52,6 +51,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private TipusUsuariEnumDto tipusUsuari;
 	private Date notificaEnviamentData;
 	private Date notificaEnviamentNotificaData;
+	private IdiomaEnumDto idioma;
 	
 	private boolean errorLastEvent;
 	private boolean hasEnviamentsPendents;
