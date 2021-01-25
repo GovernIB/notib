@@ -5,3 +5,5 @@
 /notib-plugin-impl/src/main/java/es/caib/regweb3/ws/v3/impl/
 /.flattened-pom.xml
 /.attach_pid*
+/.idea
+/notib.iml
