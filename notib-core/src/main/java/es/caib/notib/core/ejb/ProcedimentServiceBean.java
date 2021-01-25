@@ -9,23 +9,10 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 
+import es.caib.notib.core.api.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.notib.core.api.dto.CodiAssumpteDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.PermisEnum;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
-import es.caib.notib.core.api.dto.ProcedimentFormDto;
-import es.caib.notib.core.api.dto.ProcedimentGrupDto;
-import es.caib.notib.core.api.dto.ProcedimentOrganDto;
-import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
-import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.ProcedimentService;
 
@@ -345,8 +332,24 @@ public class ProcedimentServiceBean implements ProcedimentService {
 				grups, 
 				permis);
 	}
-	
-	@Override
+
+    @Override
+	@RolesAllowed({"tothom"})
+    public List<CodiValorComuDto> getProcedimentsOrgan(
+			Long entitatId,
+			String organCodi,
+			Long organFiltre,
+			RolEnumDto rol,
+			PermisEnum permis) {
+        return delegate.getProcedimentsOrgan(
+        		entitatId,
+				organCodi,
+				organFiltre,
+				rol,
+				permis);
+    }
+
+    @Override
 	@RolesAllowed({"NOT_ADMIN"})
 	public void actualitzaProcediments(EntitatDto entitat) {
 		delegate.actualitzaProcediments(entitat);

@@ -17,6 +17,7 @@ import java.util.Set;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
+import es.caib.notib.core.api.dto.*;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,24 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.codahale.metrics.Timer;
 
-import es.caib.notib.core.api.dto.ColumnesDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEventDto;
-import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioTipusEnviamentEnumDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDto;
-import es.caib.notib.core.api.dto.PersonaDto;
-import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.rest.consulta.Document;
@@ -124,7 +108,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<NotificacioEnviamentDto> enviamentFindAmbNotificacio(
+	public List<NotificacioEnviamentDatatableDto> enviamentFindAmbNotificacio(
 			Long notificacioId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -137,7 +121,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					true);
 			NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
 			List<NotificacioEnviamentEntity> enviaments = notificacioEnviamentRepository.findByNotificacio(notificacio);
-			return enviamentsToDto(enviaments);
+			return conversioTipusHelper.convertirList(enviaments, NotificacioEnviamentDatatableDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1240,25 +1224,25 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 	}
 	
-	private List<NotificacioEnviamentDto> enviamentsToDto(
-			List<NotificacioEnviamentEntity> enviaments) {
-		List<NotificacioEnviamentDto> destinatarisDto = new ArrayList<NotificacioEnviamentDto>();
-		for(NotificacioEnviamentEntity enviament : enviaments) {
-			destinatarisDto.add(conversioTipusHelper.convertir(enviament, NotificacioEnviamentDto.class));
-			
-		}
-		
-		for (int i = 0; i < enviaments.size(); i++) {
-			NotificacioEnviamentEntity destinatariEntity = enviaments.get(i);
-			NotificacioEnviamentDto destinatariDto = destinatarisDto.get(i);
-			destinatariCalcularCampsAddicionals(
-					destinatariEntity,
-					destinatariDto);
-		}
-		return destinatarisDto;
-	}
+//	private List<NotificacioEnviamentDatatableDto> enviamentsToDto(
+//			List<NotificacioEnviamentEntity> enviaments) {
+//		List<NotificacioEnviamentDatatableDto> enviamentsDto = new ArrayList<>();
+//		for(NotificacioEnviamentEntity enviament : enviaments) {
+//			NotificacioEnviamentDatatableDto enviamentDto = conversioTipusHelper.convertir(
+//					enviament,
+//					NotificacioEnviamentDatatableDto.class);
+//			if (enviament.isNotificaError()) {
+//				NotificacioEventEntity event = enviament.getNotificacioErrorEvent();
+//				if (event != null) {
+//					enviamentDto.setNotificacioErrorData(event.getData());
+//					enviamentDto.setNotificacioErrorDescripcio(event.getErrorDescripcio());
+//				}
+//			}
+//			enviamentsDto.add(enviamentDto);
+//		}
+//		return enviamentsDto;
+//	}
 
-	@Transactional
 	private NotificacioEnviamentDto enviamentToDto(
 			NotificacioEnviamentEntity enviament) {
 //		enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));

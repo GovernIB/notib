@@ -9,19 +9,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import es.caib.notib.core.api.dto.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.notib.core.api.dto.ColumnesDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
-import es.caib.notib.core.api.dto.NotificacioEventDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.rest.consulta.Resposta;
 
@@ -84,7 +74,7 @@ public interface EnviamentService {
 	 * @return els destinataris trobats.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public List<NotificacioEnviamentDto> enviamentFindAmbNotificacio(
+	public List<NotificacioEnviamentDatatableDto> enviamentFindAmbNotificacio(
 			Long notificacioId);
 
 	/**

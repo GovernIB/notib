@@ -19,6 +19,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import es.caib.notib.core.api.dto.*;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,43 +34,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.codahale.metrics.Timer;
 
-import es.caib.notib.core.api.dto.AccioParam;
-import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.CodiValorDto;
-import es.caib.notib.core.api.dto.DocumentDto;
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.core.api.dto.IntegracioInfo;
-import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.LocalitatsDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioErrorCallbackFiltreDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEventDto;
-import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioFiltreDto;
-import es.caib.notib.core.api.dto.NotificacioRegistreErrorFiltreDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.OrganismeDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PaisosDto;
-import es.caib.notib.core.api.dto.PermisEnum;
-import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
-import es.caib.notib.core.api.dto.ProgresDescarregaDto;
 import es.caib.notib.core.api.dto.ProgresDescarregaDto.TipusInfo;
-import es.caib.notib.core.api.dto.ProvinciesDto;
-import es.caib.notib.core.api.dto.RegistreIdDto;
-import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
@@ -896,7 +862,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
+	public PaginaDto<NotificacioDatatableDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			boolean isUsuari,
 			boolean isUsuariEntitat,
@@ -923,7 +889,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			mapeigPropietatsOrdenacio.put("procediment.organGestor", new String[] {"pro.organGestor.codi"});
 			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {(isUsuari ? "organ.codi" : "organGestor.codi")});
 			mapeigPropietatsOrdenacio.put("procediment.nom", new String[] {"pro.nom"});
-			mapeigPropietatsOrdenacio.put("procediment.descripcio", new String[] {"pro.codi"});
+			mapeigPropietatsOrdenacio.put("procedimentDesc", new String[] {"pro.codi"});
 			mapeigPropietatsOrdenacio.put("createdByComplet", new String[] {"createdBy"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 			
@@ -931,7 +897,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
 			boolean esProcedimentsOrgansCodisNotibNull = (codisProcedimentOrgansDisponibles == null || codisProcedimentOrgansDisponibles.isEmpty());
 			
-			if (filtre == null) {
+			if (filtre == null || filtre.isEmpty()) {
 				//Consulta les notificacions sobre les quals té permis l'usuari actual
 				if (isUsuari) {
 					notificacions = notificacioRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
@@ -1147,12 +1113,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 		return data;
 	}
 	
-	private PaginaDto<NotificacioDto> complementaNotificacions(
+	private PaginaDto<NotificacioDatatableDto> complementaNotificacions(
 			Page<NotificacioEntity> notificacions,
 			List<String> codisProcedimentsProcessables) {
-		PaginaDto<NotificacioDto> resultatPagina = null;
+
+		PaginaDto<NotificacioDatatableDto> resultatPagina = null;
+
 		if (notificacions == null) {
-			resultatPagina = paginacioHelper.getPaginaDtoBuida(NotificacioDto.class);
+			resultatPagina = paginacioHelper.getPaginaDtoBuida(NotificacioDatatableDto.class);
 		} else {
 			if(notificacions != null) {
 				
@@ -1160,25 +1128,22 @@ public class NotificacioServiceImpl implements NotificacioService {
 					if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
 						notificacio.setPermisProcessar(
 								codisProcedimentsProcessables.contains(notificacio.getProcediment().getCodi()));
-//								entityComprovarHelper.hasPermisProcediment(
-//										notificacio.getProcediment().getId(),
-//										PermisEnum.PROCESSAR));
 						}
 					if (notificacio.getTipusUsuari() != null && notificacio.getTipusUsuari().equals(TipusUsuariEnumDto.APLICACIO) && notificacio.getId() != null) {
 						logger.info("Consultant events notificació...");
 						List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
-						
+
 						if (events != null && events.size() > 0) {
 							NotificacioEventEntity lastEvent = events.get(events.size() - 1);
-							
-							if(lastEvent.isError() && 
+
+							if(lastEvent.isError() &&
 										(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
 										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
 										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
-										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
-										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT) || 
-										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT) || 
-										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR) || 
+										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) ||
+										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT) ||
+										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT) ||
+										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR) ||
 										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR))) {
 								logger.info("El darrer event de la notificació " + notificacio.getId()  + " conté un error de tipus: " + lastEvent.getTipus().name());
 								notificacio.setErrorLastEvent(true);
@@ -1190,18 +1155,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 					if (enviamentsPendents != null && ! enviamentsPendents.isEmpty()) {
 						notificacio.setHasEnviamentsPendentsRegistre(true);
 					}
-
-//					List<NotificacioEnviamentEntity> notificacioEnviaments = notificacioEnviamentRepository.findByNotificacioIdOrderByNotificaEstatDataAndOrderByNotificaEstatDataActualitzacioDesc(notificacio.getId());
-//					if(notificacioEnviaments != null && notificacioEnviaments.size() != 0) {
-//						notificacio.setNotificaEstat(notificacioEnviaments.get(0).getNotificaEstat());
-//					}
-				
-
-				}	
+				}
 			}
 			resultatPagina = paginacioHelper.toPaginaDto(
-				notificacions,
-				NotificacioDto.class);
+					notificacions,
+					NotificacioDatatableDto.class);
 		
 		}
 		return resultatPagina;

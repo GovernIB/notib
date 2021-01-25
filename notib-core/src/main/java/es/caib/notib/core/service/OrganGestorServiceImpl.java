@@ -12,6 +12,11 @@ import java.util.Set;
 import javax.annotation.Resource;
 import javax.xml.bind.ValidationException;
 
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.exception.NoPermisosException;
+import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.entity.*;
+import es.caib.notib.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -25,32 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.codahale.metrics.Timer;
 
-import es.caib.notib.core.api.dto.CodiValorDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.OrganGestorFiltreDto;
-import es.caib.notib.core.api.dto.OrganismeDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.service.OrganGestorService;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.GrupEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.PagadorCieEntity;
-import es.caib.notib.core.entity.PagadorPostalEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.helper.CacheHelper;
-import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.EntityComprovarHelper;
-import es.caib.notib.core.helper.IntegracioHelper;
-import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.OrganigramaHelper;
-import es.caib.notib.core.helper.PaginacioHelper;
-import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
@@ -90,6 +71,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	private PagadorPostalRepository pagadorPostalReposity;
 	@Resource
 	private PagadorCieRepository pagadorCieReposity;
+	@Resource
+	private ProcedimentHelper procedimentHelper;
+	@Resource
+	private OrganGestorHelper organGestorHelper;
 	
 
 	@Override
@@ -787,7 +772,124 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
-	private static final Logger logger = LoggerFactory.getLogger(OrganGestorServiceImpl.class);
+
+    @Override
+	@Transactional(readOnly = true)
+    public List<CodiValorDto> getOrgansGestorsDisponiblesConsulta(
+    		Long entitatId,
+			String usuari,
+			RolEnumDto rol,
+			String organ) {
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<CodiValorDto> organsGestors = new ArrayList<>();
+			List<ProcedimentEntity> procedimentsDisponibles = new ArrayList<>();
+			List<OrganGestorEntity> organsGestorsDisponibles = new ArrayList<>();
+
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+
+			if (RolEnumDto.NOT_SUPER.equals(rol)) {
+				organsGestorsDisponibles = organGestorRepository.findAll();
+			} else if (RolEnumDto.NOT_ADMIN.equals(rol)) {
+				organsGestorsDisponibles = organGestorRepository.findByEntitat(entitat);
+			} else if (RolEnumDto.NOT_ADMIN_ORGAN.equals(rol)) {
+				List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organ);
+				organsGestorsDisponibles = organGestorRepository.findByCodiIn(organs);
+			} else if (RolEnumDto.tothom.equals(rol)) {
+				organsGestorsDisponibles = recuperarOrgansPerProcedimentAmbPermis(
+						usuari,
+						entitat,
+						PermisEnum.CONSULTA);
+			}
+			Collections.sort(organsGestorsDisponibles, new Comparator<OrganGestorEntity>() {
+				@Override
+				public int compare(OrganGestorEntity p1, OrganGestorEntity p2) {
+					return p1.getNom().compareTo(p2.getNom());
+				}
+			});
+
+			for (OrganGestorEntity organGestor : organsGestorsDisponibles) {
+				String nom = organGestor.getCodi();
+				if (organGestor.getNom() != null && !organGestor.getNom().isEmpty()) {
+					nom += " - " + organGestor.getNom();
+				}
+				organsGestors.add(new CodiValorDto(organGestor.getId().toString(), nom));
+			}
+//		// Eliminam l'òrgan gestor entitat  --> Per ara el mantenim, ja que hi ha notificacions realitzades a l'entitat
+//		OrganGestorDto organEntitat = organGestorService.findByCodi(entitatActual.getId(), entitatActual.getDir3Codi());
+//		organsGestorsDisponibles.remove(organEntitat);
+        	return organsGestors;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+    }
+
+	private List<ProcedimentEntity> addProcedimentsOrgan(
+			List<ProcedimentEntity> procedimentsDisponibles,
+			List<ProcedimentOrganEntity> procedimentsOrgansDisponibles) {
+		if (procedimentsOrgansDisponibles != null && !procedimentsOrgansDisponibles.isEmpty()) {
+			Set<ProcedimentEntity> setProcediments = new HashSet<>(procedimentsDisponibles);
+			for (ProcedimentOrganEntity procedimentOrgan : procedimentsOrgansDisponibles) {
+				setProcediments.add(procedimentOrgan.getProcediment());
+			}
+			procedimentsDisponibles = new ArrayList<ProcedimentEntity>(setProcediments);
+		}
+		return procedimentsDisponibles;
+	}
+
+	private List<OrganGestorEntity> recuperarOrgansPerProcedimentAmbPermis(
+			String usuari,
+			EntitatEntity entitat,
+			PermisEnum permis) {
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
+		List<ProcedimentEntity> procedimentsDisponibles = procedimentHelper.getProcedimentsWithPermis(
+				usuari,
+				auth,
+				entitat,
+				permisos);
+		List<ProcedimentOrganEntity> procedimentsOrgansDisponibles = procedimentHelper.getProcedimentOrganWithPermis(
+				usuari,
+				auth,
+				entitat,
+				permisos);
+
+		procedimentsDisponibles = addProcedimentsOrgan(procedimentsDisponibles, procedimentsOrgansDisponibles);
+
+		List<OrganGestorEntity> organsGestorsProcediments = new ArrayList<>();
+		List<Long> procedimentsDisponiblesIds = new ArrayList<>();
+		for (ProcedimentEntity pro : procedimentsDisponibles)
+			procedimentsDisponiblesIds.add(pro.getId());
+
+		// 1-recuperam els òrgans dels procediments disponibles (amb permís)
+		if (!procedimentsDisponiblesIds.isEmpty())
+			organsGestorsProcediments = organGestorRepository.findByProcedimentIds(procedimentsDisponiblesIds);
+		// 2-recuperam els òrgans amb permís
+		List<OrganGestorEntity> organsGestorsAmbPermis = organGestorHelper.getProcedimentsWithPermis(
+				usuari,
+				auth,
+				entitat,
+				permisos);
+		// 3-juntam tots els òrgans i ordenam per nom
+		List<OrganGestorEntity> organsGestors;
+		Set<OrganGestorEntity> setOrgansGestors = new HashSet<>(organsGestorsProcediments);
+		setOrgansGestors.addAll(organsGestorsAmbPermis);
+		if (procedimentsOrgansDisponibles != null) {
+			for (ProcedimentOrganEntity procedimentOrgan : procedimentsOrgansDisponibles) {
+				setOrgansGestors.add(procedimentOrgan.getOrganGestor());
+			}
+		}
+		organsGestors = new ArrayList<>(setOrgansGestors);
+		if (!PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes", false)) {
+			organsGestors.remove(organGestorRepository.findByCodi(entitat.getDir3Codi()));
+		}
+		if (procedimentsDisponibles.isEmpty() && organsGestors.isEmpty())
+			throw new NoPermisosException("Usuari sense permios assignats");
+		return organsGestors;
+	}
+
+    private static final Logger logger = LoggerFactory.getLogger(OrganGestorServiceImpl.class);
 
 }

@@ -275,21 +275,20 @@ $(document).ready(function() {
 				}
 				contingutTbody += '<td>' + destinataris + '</td>';
 				contingutTbody += '<td>';
-				//contingutTbody += (data[i].notificacio.estat) ? notificacioEnviamentEstats[data[i].notificacio.estat] : '';
 				contingutTbody += (data[i].notificaEstat) ? notificacioEnviamentEstats[data[i].notificaEstat] : '';
-				if (data[i].notificacio.notificaError) {
+				if (data[i].notificacioError) {
 					var errorTitle = '';
-					if (data[i].notificacio.notificaErrorDescripcio) {
-						errorTitle = data[i].notificacio.notificaErrorDescripcio;
+					if (data[i].notificacioErrorDescripcio) {
+						errorTitle = data[i].notificacioErrorDescripcio;
 					}
-					var escaped = data[i].notificacio.notificaErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+					var escaped = data[i].notificacioErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 					contingutTbody += ' <span class="fa fa-warning text-danger" title="' + escaped + '"></span>';
 				}
 				contingutTbody += '</td>';
 				contingutTbody += '<td width="114px">';
 				if (data[i].notificaCertificacioData != null) {
 					contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/certificacioDescarregar"/>" class="btn btn-default btn-sm fileDownloadSimpleRichExperience" title="<spring:message code="enviament.info.accio.descarregar.certificacio"/>"><span class="fa fa-download"></span></a>';
-				} else if (data[i].notificacio.estat == 'REGISTRADA' && 
+				} else if (data[i].notificacioEstat == 'REGISTRADA' &&
 						(data[i].registreEstat && (data[i].registreEstat == 'DISTRIBUIT' || data[i].registreEstat == 'OFICI_EXTERN'  || data[i].registreEstat == 'OFICI_SIR')) || (data[i].registreData && data[i].registreNumeroFormatat != '')){
 					contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/justificantDescarregar"/>" class="btn btn-default btn-sm fileDownloadSimpleRichExperience" title="<spring:message code="enviament.info.accio.descarregar.justificant"/>"><span class="fa fa-download"></span></a>';
 				}
@@ -354,14 +353,14 @@ $(document).ready(function() {
 					if (procedimentsComuns.length > 0) {
 						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
 							$.each(procedimentsComuns, function(index, val) {
-								selProcediments.append("<option value=\"" + val.id + "\">" + val.codi +' - '+ val.nom + "</option>");
+								selProcediments.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
 							});
 						selProcediments.append("</optgroup>");
 					}
 					if (procedimentsOrgan.length > 0) {
 						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
 							$.each(procedimentsOrgan, function(index, val) {
-								selProcediments.append("<option value=\"" + val.id + "\">" + val.codi +' - '+ val.nom + "</option>");
+								selProcediments.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
 							});
 						selProcediments.append("</optgroup>");
 					}
@@ -413,7 +412,7 @@ $(document).ready(function() {
 				<not:inputText name="titular" inline="true" placeholderKey="notificacio.list.filtre.camp.titular"/>
 			</div>
 			<div class="col-md-4">
-				<not:inputSelect name="organGestor" optionItems="${organsGestorsPermisLectura}" optionValueAttribute="codi" optionTextAttribute="nom" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
+				<not:inputSelect name="organGestor" optionItems="${organsGestorsPermisLectura}" optionValueAttribute="codi" optionTextAttribute="valor" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 			<div class="col-md-6">
 				<not:inputSelect name="procedimentId" optionItems="${procedimentsPermisLectura}" optionValueAttribute="id" optionTextAttribute="descripcio" placeholderKey="notificacio.list.filtre.camp.procediment" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
@@ -495,7 +494,7 @@ $(document).ready(function() {
 					</script>
 				</th--%>
 				<th data-col-name="organGestorDesc"  width="200px"><spring:message code="notificacio.form.camp.organGestor"/></th>
-				<th data-col-name="procediment.descripcio"  width="200px"><spring:message code="notificacio.list.columna.procediment"/></th>
+				<th data-col-name="procedimentDesc"  width="200px"><spring:message code="notificacio.list.columna.procediment"/></th>
 				<c:if test="${mostrarColumnaNumExpedient}">
 					<th data-col-name="numExpedient" width="170px"><spring:message code="notificacio.list.columna.num.expedient"/></th>
 				</c:if>
