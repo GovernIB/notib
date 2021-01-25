@@ -179,7 +179,15 @@
     background-color: #ddd;
     cursor: not-allowed;
 }
-
+#tooltip {
+    position: absolute;
+    border: 1px solid #ffeeba;
+    border-radius: 3px;
+    background: #fff3cd;
+    padding: 2px 10px;
+    color: #856404;
+    display: none;
+}
 </style>
 <script type="text/javascript">
 
@@ -474,7 +482,6 @@ $(document).ready(function() {
     var count = 0;
     $('#add').on('click', function () {
         //Input to add
-        debugger
         var metadataInput =
             "<div class='form-group'>" +
                 "<label class='control-label col-xs-2'></label>" +
@@ -642,8 +649,43 @@ $(document).ready(function() {
 				seleccionar($(this).closest("tr")); 
 			}
 		});
-	
+		
+	//### #432
+	$("#descripcio").on("keydown", function (e) {
+		if (e.keyCode != 13) return;
+		var warning = "<spring:message code='notificacio.form.camp.descripcio.write.validacio'/>";
+		makeTooltip(warning);
+		return false;
+	});
+	$("#descripcio").on("change paste", function (e) {
+		var warning = "<spring:message code='notificacio.form.camp.descripcio.paste.validacio'/>";
+		var e = $(this);
+        setTimeout(function(){
+        	while (/\r?\n|\r/.test($.trim(e.val()))) {
+        		makeTooltip(warning);
+        		e.val($.trim(e.val()).replace(/\r?\n|\r\r\n/, ' '));
+        	}
+        }, 0);
+	});
 });
+
+var t, makeTooltip = function(warning) {
+	var pos = $("#descripcio").position();
+	clearTimeout(t);
+	$('#tooltip').remove();
+	$('<p id="tooltip">' + warning + '</p>').insertBefore("#descripcio");
+	$('#tooltip').css({
+					top : pos.top - 30,
+		            left: pos.left
+		        }).fadeIn("fast");
+
+	t = setTimeout(function() {
+		$('#tooltip').fadeOut(300, function() {
+			$(this).remove();
+		});
+	}, 4000);
+};
+
 
 
 	function loadOrganigrama(){
