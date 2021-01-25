@@ -4,44 +4,48 @@
  */
 package es.caib.notib.war.controller;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
-
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.CodiValorComuDto;
+import es.caib.notib.core.api.dto.CodiValorDto;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.IdiomaEnumDto;
+import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.LocalitatsDto;
+import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioDatatableDto;
+import es.caib.notib.core.api.dto.NotificacioDtoV2;
+import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDatatableDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEventDto;
+import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioFiltreDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
+import es.caib.notib.core.api.dto.PagadorCieFormatFullaDto;
+import es.caib.notib.core.api.dto.PagadorCieFormatSobreDto;
+import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.PaisosDto;
+import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.ProcedimentOrganDto;
+import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
+import es.caib.notib.core.api.dto.ProgresDescarregaDto;
+import es.caib.notib.core.api.dto.ProvinciesDto;
+import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
+import es.caib.notib.core.api.dto.RegistreIdDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
+import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
+import es.caib.notib.core.api.dto.TipusDocumentDto;
+import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NoPermisosException;
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomBooleanEditor;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
@@ -69,6 +73,41 @@ import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.PropertiesHelper;
 import es.caib.notib.war.helper.RolHelper;
 import lombok.Data;
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomBooleanEditor;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Size;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Controlador per a la consulta i gestió de notificacions.
@@ -106,7 +145,15 @@ public class NotificacioController extends BaseUserController {
             Model model) {
 
         request.getSession().removeAttribute(NOTIFICACIONS_FILTRE);
-        model.addAttribute(new NotificacioFiltreCommand());
+        NotificacioFiltreCommand notificacioFiltreCommand = new NotificacioFiltreCommand();
+        if (getLast3months()) {
+            Calendar cal = new GregorianCalendar();
+            cal.add(Calendar.MONTH, -3);
+            notificacioFiltreCommand.setDataInici(cal.getTime());
+            notificacioFiltreCommand.setDataFi(new Date());
+            request.getSession().setAttribute(NOTIFICACIONS_FILTRE, NotificacioFiltreCommand.asDto(notificacioFiltreCommand));
+        }
+        model.addAttribute(notificacioFiltreCommand);
         ompleProcediments(request, model);
         model.addAttribute("notificacioEstats",
                 EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
@@ -128,6 +175,10 @@ public class NotificacioController extends BaseUserController {
         model.addAttribute("mostrarColumnaNumExpedient",
                 aplicacioService.propertyGet("es.caib.notib.columna.num.expedient"));
         return "notificacioList";
+    }
+
+    private boolean getLast3months() {
+        return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.filtre.remeses.last.3.month");
     }
 
     @RequestMapping(method = RequestMethod.POST, params = "netejar")
