@@ -3,6 +3,22 @@
  */
 package es.caib.notib.core.service.ws;
 
+import com.codahale.metrics.Timer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.jws.WebService;
+import javax.mail.internet.InternetAddress;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -14,20 +30,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import javax.jws.WebService;
-import javax.mail.internet.InternetAddress;
-
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.codahale.metrics.Timer;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.DocumentDto;
@@ -49,8 +51,6 @@ import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
-import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.ws.notificacio.Certificacio;
 import es.caib.notib.core.api.ws.notificacio.DadesConsulta;
 import es.caib.notib.core.api.ws.notificacio.DocumentV2;
@@ -103,10 +103,7 @@ import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.repository.ProcedimentOrganRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
-import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
 import es.caib.notib.plugin.unitat.NodeDir3;
-import es.caib.plugins.arxiu.api.DocumentContingut;
-
 
 /**
  * Implementació del servei per a l'enviament i consulta de notificacions V2 (Sense paràmetres SEU).
@@ -318,7 +315,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 								notificacio.getGrupCodi(),
 								notificacio.getNumExpedient(),
 								TipusUsuariEnumDto.APLICACIO,
-								procedimentOrgan)
+								procedimentOrgan,
+								notificacio.getIdioma())
 						.document(documentEntity).build();
 				
 				NotificacioEntity notificacioGuardada = auditNotificacioHelper.desaNotificacio(notificacioEntity);

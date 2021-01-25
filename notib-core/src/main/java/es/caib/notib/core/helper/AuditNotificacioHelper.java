@@ -1,12 +1,5 @@
 package es.caib.notib.core.helper;
 
-import java.util.Date;
-
-import javax.annotation.Resource;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
@@ -25,6 +18,11 @@ import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.ProcedimentOrganEntity;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.Date;
 
 
 /**
@@ -69,7 +67,8 @@ public class AuditNotificacioHelper {
 						grupNotificacio != null ? grupNotificacio.getCodi() : null,
 						notificacio.getNumExpedient(),
 						TipusUsuariEnumDto.INTERFICIE_WEB,
-						procedimentOrgan).document(documentEntity).build());
+						procedimentOrgan,
+						notificacio.getIdioma()).document(documentEntity).build());
 	}
 	
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
@@ -100,7 +99,8 @@ public class AuditNotificacioHelper {
 				notificacio.getNumExpedient(),
 				TipusUsuariEnumDto.INTERFICIE_WEB,
 				documentEntity,
-				procedimentOrgan);
+				procedimentOrgan,
+				notificacio.getIdioma());
 		return notificacioEntity;
 	}
 	

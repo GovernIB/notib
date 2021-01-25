@@ -1,5 +1,41 @@
 package es.caib.notib.core.helper;
 
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.exception.SistemaExternException;
+import es.caib.notib.core.entity.DocumentEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.PersonaEntity;
+import es.caib.notib.plugin.conversio.ConversioArxiu;
+import es.caib.notib.plugin.conversio.ConversioPlugin;
+import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
+import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
+import es.caib.notib.plugin.gesconadm.GcaProcediment;
+import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
+import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
+import es.caib.notib.plugin.unitat.CodiValor;
+import es.caib.notib.plugin.unitat.CodiValorPais;
+import es.caib.notib.plugin.unitat.NodeDir3;
+import es.caib.notib.plugin.unitat.ObjetoDirectorio;
+import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
+import es.caib.notib.plugin.usuari.DadesUsuari;
+import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
+import es.caib.plugins.arxiu.api.ArxiuException;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Component;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -17,18 +53,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.AnexoWsDto;
@@ -54,19 +78,7 @@ import es.caib.notib.core.api.dto.RegistreOrigenDtoEnum;
 import es.caib.notib.core.api.dto.RegistreTipusDocumentDtoEnum;
 import es.caib.notib.core.api.dto.RegistreTipusDocumentalDtoEnum;
 import es.caib.notib.core.api.dto.RegistreValidezDocumentDtoEnum;
-import es.caib.notib.core.api.exception.SistemaExternException;
-import es.caib.notib.core.entity.DocumentEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.PersonaEntity;
-import es.caib.notib.plugin.conversio.ConversioArxiu;
-import es.caib.notib.plugin.conversio.ConversioPlugin;
-import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
-import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
-import es.caib.notib.plugin.gesconadm.GcaProcediment;
-import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
-import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.DadesInteressat;
@@ -83,19 +95,7 @@ import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
 import es.caib.notib.plugin.registre.TipusAssumpte;
 import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
-import es.caib.notib.plugin.unitat.CodiValor;
-import es.caib.notib.plugin.unitat.CodiValorPais;
-import es.caib.notib.plugin.unitat.NodeDir3;
-import es.caib.notib.plugin.unitat.ObjetoDirectorio;
 import es.caib.notib.plugin.unitat.OficinaSIR;
-import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
-import es.caib.notib.plugin.usuari.DadesUsuari;
-import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
-import es.caib.plugins.arxiu.api.ArxiuException;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentContingut;
-import es.caib.plugins.arxiu.api.IArxiuPlugin;
-
 /**
  * Helper per a interactuar amb els plugins.
  * 
@@ -125,48 +125,6 @@ public class PluginHelper {
 	
 	// REGISTRE
 	// /////////////////////////////////////////////////////////////////////////////////////
-	
-	public RespostaConsultaRegistre registreSortidaAsientoRegistral(
-			String codiDir3Entitat, 
-			NotificacioEntity notificacio, 
-			NotificacioEnviamentEntity enviament, 
-			Long tipusOperacio) throws RegistrePluginException {
-		
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_REGISTRE, 
-				"Enviament notificació a registre (SIR activat)", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
-				new AccioParam("Id de la notificacio", String.valueOf(notificacio.getId())),
-				new AccioParam("Id de l'enviament", String.valueOf(enviament.getId())),
-				new AccioParam("Tipus d'operacio", String.valueOf(tipusOperacio)));
-		
-		RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
-		
-		try {
-			resposta = getRegistrePlugin().salidaAsientoRegistral(
-					codiDir3Entitat, 
-					notificacioToAsientoRegistralBean(
-							notificacio, 
-							enviament), 
-					tipusOperacio);
-			
-			if (resposta.getErrorCodi() == null) {
-				integracioHelper.addAccioOk(info);
-			} else {
-				integracioHelper.addAccioError(info, "Error creant assentament registral: " + resposta.getErrorDescripcio());
-			}
-		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de registre";
-			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			if (ex.getCause() != null) {
-				errorDescripcio += " :" + ex.getCause().getMessage();
-			}
-			resposta.setErrorDescripcio(errorDescripcio);
-		}
-		
-		return resposta;
-	}
 	
 	public RespostaConsultaRegistre crearAsientoRegistral(
 			String codiDir3Entitat, 
@@ -1813,8 +1771,9 @@ public class PluginHelper {
 		
 		//Salida
 		registre.setTipoRegistro(2L);
-		
-		registre.setResumen(notificacio.getConcepte());
+
+		String tipusEnv = NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus()) ? "Notificacio" : "Comunicacio";
+		registre.setResumen(tipusEnv + " - " + notificacio.getConcepte());
 		/* 1 = Documentació adjunta en suport Paper
 		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper
 		 * 3 = Documentació adjunta digitalitzada */
@@ -1825,7 +1784,7 @@ public class PluginHelper {
 			registre.setCodigoAsunto(notificacio.getProcediment().getCodiAssumpte());
 			registre.setCodigoAsuntoDenominacion(notificacio.getProcediment().getCodiAssumpte());
 		}
-		registre.setIdioma(1L);
+		registre.setIdioma(notificacio.getIdioma() != null ? (notificacio.getIdioma().ordinal() + 1) : 1L);
 //		registre.setReferenciaExterna(notificacio.getRefExterna());
 		registre.setNumeroExpediente(notificacio.getNumExpedient());
 		/*
@@ -1839,15 +1798,15 @@ public class PluginHelper {
 		 * '07' : Altres
 		 * 
 		 * */
-		if(notificacio.getPagadorPostal() != null) {
-			registre.setTipoTransporte("02");
-		}else {
-			registre.setTipoTransporte("07");
-		}
+//		if(notificacio.getPagadorPostal() != null) {
+//			registre.setTipoTransporte("02");
+//		}else {
+//			registre.setTipoTransporte("07");
+//		}
 		if (notificacio.getProcediment() != null)
 			registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
 		registre.setCodigoUsuario(notificacio.getUsuariCodi());
-		registre.setAplicacionTelematica("NOTIB");
+		registre.setAplicacionTelematica("NOTIB v." + CacheHelper.appVersion);
 		registre.setAplicacion("RWE");
 		registre.setVersion("3.1");
 		registre.setObservaciones("Notib: " + notificacio.getUsuariCodi());
@@ -1929,7 +1888,8 @@ public class PluginHelper {
 		
 		registre.setTipoRegistro(2L);
 
-		registre.setResumen(notificacio.getConcepte());
+		String tipusEnv = NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus()) ? "Notificacio" : "Comunicacio";
+		registre.setResumen(tipusEnv + " - " + notificacio.getConcepte());
 		/* 1 = Documentació adjunta en suport Paper
 		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper
 		 * 3 = Documentació adjunta digitalitzada */
@@ -1940,7 +1900,7 @@ public class PluginHelper {
 			registre.setCodigoAsunto(notificacio.getProcediment().getCodiAssumpte());
 			registre.setCodigoAsuntoDenominacion(notificacio.getProcediment().getCodiAssumpte());
 		}
-		registre.setIdioma(1L);
+		registre.setIdioma(notificacio.getIdioma() != null ? (notificacio.getIdioma().ordinal() + 1) : 1L);
 //		registre.setReferenciaExterna(notificacio.getRefExterna());
 		registre.setNumeroExpediente(notificacio.getNumExpedient());
 		/*
@@ -1954,15 +1914,15 @@ public class PluginHelper {
 		 * '07' : Altres
 		 * 
 		 * */
-		if(notificacio.getPagadorPostal() != null) {
-			registre.setTipoTransporte("02");
-		}else {
-			registre.setTipoTransporte("07");
-		}
+//		if(notificacio.getPagadorPostal() != null) {
+//			registre.setTipoTransporte("02");
+//		}else {
+//			registre.setTipoTransporte("07");
+//		}
 		if (notificacio.getProcediment() != null)
 			registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
 		registre.setCodigoUsuario(notificacio.getUsuariCodi());
-		registre.setAplicacionTelematica("NOTIB");
+		registre.setAplicacionTelematica("NOTIB v." + CacheHelper.appVersion);
 		registre.setAplicacion("RWE");
 		registre.setVersion("3.1");
 		registre.setObservaciones("Notib: " + notificacio.getUsuariCodi());

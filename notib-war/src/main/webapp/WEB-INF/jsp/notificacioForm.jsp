@@ -1790,6 +1790,25 @@ function comptarCaracters(idCamp) {
 					<not:inputText name="numExpedient" textKey="notificacio.form.camp.expedient" labelSize="2" inputSize="6" />
 				</div>
 			</div>
+
+			<!-- IDIOMA -->
+			<div class="row">
+				<div class="col-md-6">
+					<div class="form-group">
+						<label class="control-label col-xs-4" for="idioma"><spring:message code="notificacio.form.camp.idioma" /></label>
+						<div class="controls col-xs-8">
+							<div class="col-xs-6">
+								<form:radiobutton path="idioma" value="CA" checked="checked"/>
+								<spring:message code="es.caib.notib.core.api.dto.idiomaEnumDto.CA" />
+							</div>
+							<div class="col-xs-6">
+								<form:radiobutton path="idioma" value="ES" />
+								<spring:message code="es.caib.notib.core.api.dto.idiomaEnumDto.ES" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 		
 		<!-- DOCUMENT -->

@@ -144,4 +144,13 @@ public class AplicacioServiceBean implements AplicacioService {
 		return delegate.getMetrics();
 	}
 
+	@Override
+	public String getAppVersion() {
+		return delegate.getAppVersion();
+	}
+	@Override
+	public void setAppVersion(String appVersion) {
+		delegate.setAppVersion(appVersion);
+	}
+
 }
