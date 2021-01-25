@@ -567,7 +567,7 @@ $(document).ready(function() {
 		comprovarTitularComuniacio();
 		var dir3Codi = closest.find("input[name='enviaments[0].titular.dir3Codi']");
 		var sir = $('#organigrama').val().indexOf(dir3Codi.val());
-		if(sir != -1){
+		if($('#organigrama').val() != '' && dir3Codi != '' && sir != -1){
 			document.getElementById("searchOrganTit0").getElementsByTagName('input')[0].value = '';
 			$(dir3Codi).val("");
 			closest.find("input[name='enviaments[0].titular.nom']").val("");
