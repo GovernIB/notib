@@ -1,5 +1,42 @@
 package es.caib.notib.core.helper;
 
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.exception.SistemaExternException;
+import es.caib.notib.core.entity.DocumentEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.PersonaEntity;
+import es.caib.notib.plugin.conversio.ConversioArxiu;
+import es.caib.notib.plugin.conversio.ConversioPlugin;
+import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
+import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
+import es.caib.notib.plugin.gesconadm.GcaProcediment;
+import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
+import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
+import es.caib.notib.plugin.registre.*;
+import es.caib.notib.plugin.unitat.CodiValor;
+import es.caib.notib.plugin.unitat.CodiValorPais;
+import es.caib.notib.plugin.unitat.NodeDir3;
+import es.caib.notib.plugin.unitat.ObjetoDirectorio;
+import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
+import es.caib.notib.plugin.usuari.DadesUsuari;
+import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
+import es.caib.plugins.arxiu.api.ArxiuException;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Component;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -16,60 +53,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import es.caib.notib.core.api.dto.*;
-import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Component;
-
-import es.caib.notib.core.api.exception.SistemaExternException;
-import es.caib.notib.core.entity.DocumentEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.PersonaEntity;
-import es.caib.notib.plugin.conversio.ConversioArxiu;
-import es.caib.notib.plugin.conversio.ConversioPlugin;
-import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
-import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
-import es.caib.notib.plugin.gesconadm.GcaProcediment;
-import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
-import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
-import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
-import es.caib.notib.plugin.registre.CodiAssumpte;
-import es.caib.notib.plugin.registre.DadesInteressat;
-import es.caib.notib.plugin.registre.DadesOficina;
-import es.caib.notib.plugin.registre.DadesRepresentat;
-import es.caib.notib.plugin.registre.Interessat;
-import es.caib.notib.plugin.registre.Llibre;
-import es.caib.notib.plugin.registre.LlibreOficina;
-import es.caib.notib.plugin.registre.Oficina;
-import es.caib.notib.plugin.registre.Organisme;
-import es.caib.notib.plugin.registre.RegistrePlugin;
-import es.caib.notib.plugin.registre.RegistrePluginException;
-import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
-import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
-import es.caib.notib.plugin.registre.TipusAssumpte;
-import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
-import es.caib.notib.plugin.unitat.CodiValor;
-import es.caib.notib.plugin.unitat.CodiValorPais;
-import es.caib.notib.plugin.unitat.NodeDir3;
-import es.caib.notib.plugin.unitat.ObjetoDirectorio;
-import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
-import es.caib.notib.plugin.usuari.DadesUsuari;
-import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
-import es.caib.plugins.arxiu.api.ArxiuException;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentContingut;
-import es.caib.plugins.arxiu.api.IArxiuPlugin;
 
 /**
  * Helper per a interactuar amb els plugins.
@@ -1727,7 +1710,7 @@ public class PluginHelper {
 			registre.setCodigoAsunto(notificacio.getProcediment().getCodiAssumpte());
 			registre.setCodigoAsuntoDenominacion(notificacio.getProcediment().getCodiAssumpte());
 		}
-		registre.setIdioma(1L);
+		registre.setIdioma(notificacio.getIdioma() != null ? (notificacio.getIdioma().ordinal() + 1) : 1L);
 //		registre.setReferenciaExterna(notificacio.getRefExterna());
 		registre.setNumeroExpediente(notificacio.getNumExpedient());
 		/*
@@ -1843,7 +1826,7 @@ public class PluginHelper {
 			registre.setCodigoAsunto(notificacio.getProcediment().getCodiAssumpte());
 			registre.setCodigoAsuntoDenominacion(notificacio.getProcediment().getCodiAssumpte());
 		}
-		registre.setIdioma(1L);
+		registre.setIdioma(notificacio.getIdioma() != null ? (notificacio.getIdioma().ordinal() + 1) : 1L);
 //		registre.setReferenciaExterna(notificacio.getRefExterna());
 		registre.setNumeroExpediente(notificacio.getNumExpedient());
 		/*
