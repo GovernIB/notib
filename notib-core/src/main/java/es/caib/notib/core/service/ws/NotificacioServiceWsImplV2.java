@@ -1098,6 +1098,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1032 | El format del camp concepte no és correcte. (Inclou caràcters no permesos)
 	// 1040 | La descripció de la notificació no pot contenir més de 1000 caràcters
 	// 1041 | El format del camp descripció no és correcte
+	// 1042 | Els salts de línia no estan permesos al camp descripció
 	// 1050 | El tipus d'enviament de la notificació no pot ser null
 	// 1060 | El camp 'document' no pot ser null
 	// 1061 | El camp 'arxiuNom' del document no pot ser null
@@ -1245,6 +1246,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 		if (notificacio.getDescripcio() != null && !validFormat(notificacio.getDescripcio()).isEmpty()) {
 			return setRespostaError("[1041] El format del camp descripció no és correcte. Inclou els caràcters ("+ listToString(validFormat(notificacio.getDescripcio())) +") que no són correctes");
+		}
+		if (notificacio.getDescripcio() != null && hasSaltLinia(notificacio.getDescripcio())) {
+			return setRespostaError("[1042] Els salts de línia no estan permesos al camp descripció.");
 		}
 		// Tipus d'enviament
 		if (notificacio.getEnviamentTipus() == null) {
@@ -1703,6 +1707,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			}
 	    }
 		return charsNoValids;
+	}
+	
+	private boolean hasSaltLinia(String value) {
+		return value.contains("\r") || value.contains("\n") || value.contains("\r\n");
 	}
 
 	private StringBuilder listToString(ArrayList<?> list) {
