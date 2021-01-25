@@ -652,6 +652,14 @@ public class EntityComprovarHelper {
 		else
 			return new Permission[] {perm};
 	}
+
+	public Permission[] getPermissionsFromName(String permis) {
+		Permission perm = getPermissionFromName(permis);
+		if (perm == null)
+			return null;
+		else
+			return new Permission[] {perm};
+	}
 	
 	public Permission getPermissionFromName(PermisEnum permis) {
 		switch (permis) {
@@ -660,6 +668,16 @@ public class EntityComprovarHelper {
 		case NOTIFICACIO: return ExtendedPermission.NOTIFICACIO;
 		case GESTIO: return ExtendedPermission.ADMINISTRATION;
 		default: return null;
+		}
+	}
+
+	public Permission getPermissionFromName(String permis) {
+		switch (permis) {
+			case "CONSULTA": return ExtendedPermission.READ;
+			case "PROCESSAR": return ExtendedPermission.PROCESSAR;
+			case "NOTIFICACIO": return ExtendedPermission.NOTIFICACIO;
+			case "GESTIO": return ExtendedPermission.ADMINISTRATION;
+			default: return null;
 		}
 	}
 	
