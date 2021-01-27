@@ -44,16 +44,43 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 	@Column(name = "llibre_nom")
 	protected String llibreNom;
 	
+	@Column(name = "oficina")
+	protected String oficina;
+	
+	@Column(name = "oficina_nom")
+	protected String oficinaNom;
+	
+	public void update(
+			String codi,
+			String nom,
+			String llibre,
+			String llibreNom,
+			String oficina,
+			String oficinaNom) {
+		this.codi = codi;
+		this.nom = nom;
+		this.llibre = llibre;
+		this.llibreNom = llibreNom;
+		this.oficina = oficina;
+		this.oficinaNom = oficinaNom;
+	}
 	public void update(
 			String nom) {
 		this.nom = nom;
 	}
 	
-	public void update(
+	public void updateLlibre(
 			String llibre,
 			String llibreNom) {
 		this.llibre = llibre;
 		this.llibreNom = llibreNom;
+	}
+	
+	public void updateOficina(
+			String oficina,
+			String oficinaNom) {
+		this.oficina = oficina;
+		this.oficinaNom = oficinaNom;
 	}
 	
 	public static Builder getBuilder(
@@ -61,13 +88,17 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 			String nom,
 			EntitatEntity entitat,
 			String llibre,
-			String llibreNom) {
+			String llibreNom,
+			String oficina,
+			String oficinaNom) {
 		return new Builder(
 				codi,
 				nom,
 				entitat,
 				llibre,
-				llibreNom);
+				llibreNom,
+				oficina,
+				oficinaNom);
 	}
 	
 	public static class Builder {
@@ -77,13 +108,17 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 				String nom,
 				EntitatEntity entitat,
 				String llibre,
-				String llibreNom) {
+				String llibreNom,
+				String oficina,
+				String oficinaNom) {
 			built = new OrganGestorEntity();
 			built.codi = codi;
 			built.nom = nom;
 			built.entitat = entitat;
 			built.llibre = llibre;
 			built.llibreNom = llibreNom;
+			built.oficina = oficina;
+			built.oficinaNom = oficinaNom;
 		}
 		public OrganGestorEntity build() {
 			return built;

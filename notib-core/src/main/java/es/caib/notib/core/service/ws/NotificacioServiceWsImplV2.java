@@ -43,6 +43,7 @@ import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
@@ -103,6 +104,7 @@ import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.repository.ProcedimentOrganRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
+import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 
 
@@ -263,13 +265,18 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						LlibreDto llibreOrgan = pluginHelper.llistarLlibreOrganisme(
 								entitat.getCodi(),
 								notificacio.getOrganGestor());
-						
+						Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
+						List<OficinaDto> oficinesSIR = cacheHelper.getOficinesSIRUnitat(
+								arbreUnitats, 
+								notificacio.getOrganGestor());
 						organGestor = OrganGestorEntity.getBuilder(
 								notificacio.getOrganGestor(),
 								organigramaEntitat.get(notificacio.getOrganGestor()).getNom(),
 								entitat,
 								llibreOrgan.getCodi(),
-								llibreOrgan.getNomLlarg()).build();
+								llibreOrgan.getNomLlarg(),
+								(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getCodi() : null),
+								(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getNom() : null)).build();
 						organGestorRepository.save(organGestor);
 					}
 				}

@@ -58,13 +58,14 @@ public class EntitatCommand {
 	private String[] tipusDocName;
 	private String tipusDocDefault;
 	private String tipusDocDefaultSelected;
-	@NotEmpty
 	private String oficina;
 	private String nomOficinaVirtual;
 	
 	private boolean llibreEntitat;
 	private String llibre;
 	private String llibreNom;
+	
+	private boolean oficinaEntitat = true;
 	
 	public String getLlibreCodiNom() {
 		if (llibre != null)

@@ -77,9 +77,14 @@
 				<th data-col-name="codi"><spring:message code="organgestor.list.columna.codi"/></th>
 				<th data-col-name="nom"><spring:message code="organgestor.list.columna.nom"/></th>
 				<c:if test="${setLlibre}">
-				<th data-col-name="llibreCodiNom"><spring:message code="procediment.list.columna.llibre"/></th>
+					<th data-col-name="llibreCodiNom"><spring:message code="procediment.list.columna.llibre"/></th>
 				</c:if>
-				<th data-col-name="oficinaNom"><spring:message code="organgestor.list.columna.oficina"/></th>
+				<c:if test="${setOficina}"> 
+					<th data-col-name="oficinaCodiNom"><spring:message code="organgestor.list.columna.oficina.sir"/>
+				</c:if>
+				<c:if test="${!setOficina}"> 
+					<th data-col-name="oficinaNom"><spring:message code="organgestor.list.columna.oficina"/></th>
+				</c:if>
 				<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="100px">
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
 						<a href="organgestor/{{:id}}/permis" class="btn btn-default"><span class="fa fa-key"></span>&nbsp;<spring:message code="organgestor.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
@@ -90,7 +95,9 @@
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<%--<li><a href="organgestor/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>--%>
+								<c:if test="${setOficina}">
+									<li><a href="organgestor/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								</c:if>
 								<li><a href="organgestor/{{:codi}}/update" data-toggle="ajax"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="organgestor.list.boto.actualitzar"/></a></li>
 								<li><a href="organgestor/{{:codi}}/delete" data-toggle="ajax" data-confirm="<spring:message code="organgestor.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>

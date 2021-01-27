@@ -23,6 +23,9 @@ public interface OrganGestorService {
 	public OrganGestorDto delete(Long entitatId, Long organId);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	public OrganGestorDto updateOficina(OrganGestorDto dto);
+	
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public void updateNom(
 			Long entitatId, 
 			String organGestorCodi);
@@ -115,6 +118,16 @@ public interface OrganGestorService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public LlibreDto getLlibreOrganisme(
+			Long entitatId,
+			String organGestorDir3Codi);
+	
+	/**
+	 * Recupera les oficines SIR d'un òrgan gestor (anomenat organisme dins Regweb)
+	 * 
+	 * @return La llista dels codis d'assumpte.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	public List<OficinaDto> getOficinesOrganisme(
 			Long entitatId,
 			String organGestorDir3Codi);
 	

@@ -90,6 +90,7 @@ import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
+import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 
@@ -198,13 +199,18 @@ public class NotificacioServiceImpl implements NotificacioService {
 					LlibreDto llibreOrgan = pluginHelper.llistarLlibreOrganisme(
 							entitat.getCodi(),
 							notificacio.getOrganGestor());
-					
+					Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
+					List<OficinaDto> oficinesSIR = cacheHelper.getOficinesSIRUnitat(
+							arbreUnitats, 
+							notificacio.getOrganGestor());
 					organGestor = OrganGestorEntity.getBuilder(
 							notificacio.getOrganGestor(),
 							organigramaEntitat.get(notificacio.getOrganGestor()).getNom(),
 							entitat,
 							llibreOrgan.getCodi(),
-							llibreOrgan.getNomLlarg()).build();
+							llibreOrgan.getNomLlarg(),
+							(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getCodi() : null),
+							(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getNom() : null)).build();
 					organGestorRepository.save(organGestor);
 				}
 			}
@@ -492,14 +498,19 @@ public class NotificacioServiceImpl implements NotificacioService {
 						LlibreDto llibreOrgan = pluginHelper.llistarLlibreOrganisme(
 								entitat.getCodi(),
 								notificacio.getOrganGestor());
-						
+						Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
+						List<OficinaDto> oficinesSIR = cacheHelper.getOficinesSIRUnitat(
+								arbreUnitats, 
+								notificacio.getOrganGestor());
 	//					### Crear òrgan gestor si no existeix, si existeix no fer res
 						organGestor = OrganGestorEntity.getBuilder(
 								notificacio.getOrganGestor(),
 								organigramaEntitat.get(notificacio.getOrganGestor()).getNom(),
 								entitat,
 								llibreOrgan.getCodi(),
-								llibreOrgan.getNomLlarg()).build();
+								llibreOrgan.getNomLlarg(),
+								(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getCodi() : null),
+								(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getNom() : null)).build();
 						organGestorRepository.save(organGestor);
 					}
 				}

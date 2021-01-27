@@ -1,2 +1,7 @@
 -- #449 Mostrar columna Estat i desactivar Grup per defecte a la consulta d'enviament
 UPDATE NOTIB_JA.NOT_COLUMNES SET GRUP_CODI=0,  ESTAT=1;
+
+-- #424
+ALTER TABLE NOT_ORGAN_GESTOR ADD OFICINA character varying(256);
+ALTER TABLE NOT_ORGAN_GESTOR ADD OFICINA_NOM character varying(256);
+ALTER TABLE NOT_ENTITAT ADD OFICINA_ENTITAT BIGSERIAL(1) DEFAULT 1;

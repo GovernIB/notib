@@ -58,6 +58,7 @@ import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.plugin.conversio.ConversioArxiu;
 import es.caib.notib.plugin.conversio.ConversioPlugin;
@@ -86,6 +87,7 @@ import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
+import es.caib.notib.plugin.unitat.OficinaSIR;
 import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
@@ -495,6 +497,38 @@ public class PluginHelper {
 		}
 	
 		return oficinesDto;
+	}
+	
+	public List<OficinaDto> oficinesSIRUnitat(
+			String unitatCodi, 
+			Map<String, NodeDir3> arbreUnitats) throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenir llista de les oficines SIR d'una unitat organitzativa", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				new AccioParam("Text de la cerca", unitatCodi));
+
+		List<OficinaSIR> oficinesTF = null;
+		List<OficinaDto> oficinesSIR = null;
+		try {
+			oficinesTF = getUnitatsOrganitzativesPlugin().oficinesSIRUnitat(
+					unitatCodi,
+					arbreUnitats);
+			oficinesSIR = conversioTipusHelper.convertirList(
+					oficinesTF, 
+					OficinaDto.class);
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistar organismes  a partir d'un text";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+	
+		return oficinesSIR;
 	}
 	
 	public List<LlibreOficina> llistarLlibresOficines(
@@ -2206,9 +2240,13 @@ public class PluginHelper {
 			NotificacioEntity notificacio,
 			DadesOficina dadesOficina,
 			String dir3Codi) throws RegistrePluginException {
-		if (notificacio.getEntitat().getOficina() != null) {
+		if (notificacio.getEntitat().isOficinaEntitat() && notificacio.getEntitat().getOficina() != null) {
 			dadesOficina.setOficinaCodi(notificacio.getEntitat().getOficina());
 			dadesOficina.setOficinaNom(notificacio.getEntitat().getOficina());
+		} else if (!notificacio.getEntitat().isOficinaEntitat() && notificacio.getOrganGestor().getOficina() != null) {
+			OrganGestorEntity organGestor = notificacio.getOrganGestor();
+			dadesOficina.setOficinaCodi(organGestor.getOficina());
+			dadesOficina.setOficinaNom(organGestor.getOficinaNom());
 		} else {
 			OficinaDto oficinaVirtual = llistarOficinaVirtual(
 					dir3Codi,

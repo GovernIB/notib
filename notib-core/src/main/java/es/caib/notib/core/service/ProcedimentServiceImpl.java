@@ -70,6 +70,7 @@ import es.caib.notib.core.repository.ProcedimentOrganRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.TipusAssumpte;
+import es.caib.notib.plugin.unitat.NodeDir3;
 
 /**
  * Implementació del servei de gestió de procediments.
@@ -179,12 +180,18 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		LlibreDto llibre = pluginHelper.llistarLlibreOrganisme(
 				entitat.getCodi(),
 				organGestorCodi);
+		Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
+		List<OficinaDto> oficinesSIR = cacheHelper.getOficinesSIRUnitat(
+				arbreUnitats, 
+				organGestorCodi);
 		organGestor = OrganGestorEntity.getBuilder(
 				organGestorCodi,
 				findDenominacioOrganisme(organGestorCodi),
 				entitat,
 				llibre.getCodi(),
-				llibre.getNomLlarg()).build();
+				llibre.getNomLlarg(),
+				(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getCodi() : null),
+				(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getNom() : null)).build();
 		organGestorRepository.save(organGestor);
 		return organGestor;
 	}
