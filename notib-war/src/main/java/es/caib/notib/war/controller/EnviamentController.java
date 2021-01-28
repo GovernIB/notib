@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package es.caib.notib.war.controller;
 
@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import es.caib.notib.core.api.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,17 +25,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.notib.core.api.dto.ColumnesDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PermisEnum;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.AplicacioService;
@@ -54,7 +44,7 @@ import es.caib.notib.war.helper.RequestSessionHelper;
 import es.caib.notib.war.helper.RolHelper;
 /**
  * Controlador per el mantinement d'enviaments.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Controller
@@ -64,7 +54,7 @@ public class EnviamentController extends BaseUserController {
 	private static final String ENVIAMENTS_FILTRE = "enviaments_filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "EnviamentController.session.seleccio";
 	private static final String ENVIAMENT_ID = "EnviamentController.session.enviament.id";
-	
+
 	@Autowired
 	private AplicacioService aplicacioService;
 	@Autowired
@@ -75,7 +65,7 @@ public class EnviamentController extends BaseUserController {
 	private ProcedimentService procedimentService;
 	@Autowired
 	private OrganGestorService organGestorService;
-	
+
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -89,7 +79,7 @@ public class EnviamentController extends BaseUserController {
 		UsuariDto usuariAcutal = aplicacioService.getUsuariActual();
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		ColumnesDto columnes = null;
-		
+
 		model.addAttribute(
 				getFiltreCommand(request));
 		model.addAttribute(
@@ -99,10 +89,10 @@ public class EnviamentController extends BaseUserController {
 						SESSION_ATTRIBUTE_SELECCIO));
 		if(entitatActual != null) {
 			columnes = enviamentService.getColumnesUsuari(
-					entitatActual.getId(), 
+					entitatActual.getId(),
 					usuariAcutal);
-			
-			if (columnes == null) {			
+
+			if (columnes == null) {
 				enviamentService.columnesCreate(
 						usuariAcutal,
 						entitatActual.getId(),
@@ -110,9 +100,9 @@ public class EnviamentController extends BaseUserController {
 			}
 		}else {
 			MissatgesHelper.error(
-					request, 
+					request,
 					getMessage(
-							request, 
+							request,
 							"enviament.controller.entitat.cap.creada"));
 		}
 		NotificacioEnviamentFiltreCommand filtreEnviaments = getFiltreCommand(request);
@@ -120,10 +110,10 @@ public class EnviamentController extends BaseUserController {
 		model.addAttribute(new NotificacioEnviamentCommand());
 		model.addAttribute("columnes", ColumnesCommand.asCommand(columnes));
 		model.addAttribute("filtreEnviaments", filtreEnviaments);
-		
+
 		return "enviamentList";
 	}
-	
+
 	@RequestMapping(method = RequestMethod.POST)
 	public String post(
 			HttpServletRequest request,
@@ -131,12 +121,12 @@ public class EnviamentController extends BaseUserController {
 			BindingResult bindingResult,
 			Model model,
 			@RequestParam(value = "accio", required = false) String accio) {
-		
+
 		RequestSessionHelper.actualitzarObjecteSessio(
 				request,
 				ENVIAMENTS_FILTRE,
 				filtreCommand);
-		
+
 		Long enviamentId = (Long)RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				ENVIAMENT_ID);
@@ -152,7 +142,7 @@ public class EnviamentController extends BaseUserController {
 
 		return "redirect:enviament";
 	}
-	
+
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(
@@ -165,28 +155,34 @@ public class EnviamentController extends BaseUserController {
 		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		String organGestorCodi = null;
-		
+
 		List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
 		List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
+		List<ProcedimentOrganDto> procedimentOrgansDisponibles = new ArrayList<ProcedimentOrganDto>();
 		List<String> codisProcedimentsDisponibles = new ArrayList<String>();
 		List<String> codisOrgansGestorsDisponibles = new ArrayList<String>();
-		
+		List<Long> codisProcedimentOrgansDisponibles = new ArrayList<Long>();
+
 		try {
 			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
 				filtreEnviaments.setEstat(null);
 			}
-			
+
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-			
+
 			if (isUsuari) {
 				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
 				organsGestorsDisponibles = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
+				procedimentOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
 				for(ProcedimentDto procediment: procedimentsDisponibles) {
 					if (!procediment.isComu())
 						codisProcedimentsDisponibles.add(procediment.getCodi());
 				}
 				for (OrganGestorDto organGestorDto : organsGestorsDisponibles) {
 					codisOrgansGestorsDisponibles.add(organGestorDto.getCodi());
+				}
+				for (ProcedimentOrganDto procedimentOrganDto : procedimentOrgansDisponibles) {
+					codisProcedimentOrgansDisponibles.add(procedimentOrganDto.getId());
 				}
 			}
 			if (isAdminOrgan) {
@@ -197,14 +193,15 @@ public class EnviamentController extends BaseUserController {
 					codisProcedimentsDisponibles.add(procediment.getCodi());
 				}
 			}
-			
+
 			enviaments = enviamentService.enviamentFindByEntityAndFiltre(
-					entitatActual, 
-					isUsuari, 
+					entitatActual,
+					isUsuari,
 					isUsuariEntitat,
 					isAdminOrgan,
 					codisProcedimentsDisponibles,
 					codisOrgansGestorsDisponibles,
+					codisProcedimentOrgansDisponibles,
 					organGestorCodi,
 					usuariActual.getCodi(),
 					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
@@ -212,14 +209,14 @@ public class EnviamentController extends BaseUserController {
 
 		}catch(SecurityException e) {
 			MissatgesHelper.error(
-					request, 
+					request,
 					getMessage(
-							request, 
+							request,
 							"enviament.controller.entitat.cap.assignada"));
 		}
-		
+
 		return DatatablesHelper.getDatatableResponse(
-				request, 
+				request,
 				enviaments,
 				"id",
 				SESSION_ATTRIBUTE_SELECCIO);
@@ -244,17 +241,17 @@ public class EnviamentController extends BaseUserController {
 		if (ids != null) {
 			for (Long id: ids) {
 				if(!seleccio.contains(id)) {
-					seleccio.add(id);	
+					seleccio.add(id);
 				}
 			}
 		} else {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			NotificacioEnviamentFiltreCommand filtreCommand = getFiltreCommand(request);
 			try {
-				
+
 				for(Long id: enviamentService.findIdsAmbFiltre(entitatActual.getId(),NotificacioEnviamentFiltreCommand.asDto(filtreCommand))) {
 					if(!seleccio.contains(id)) {
-						seleccio.add(id);	
+						seleccio.add(id);
 					}
 				}
 			} catch (NotFoundException | ParseException e) {
@@ -263,7 +260,7 @@ public class EnviamentController extends BaseUserController {
 		}
 		return seleccio.size();
 	}
-	
+
 	@RequestMapping(value = "/deselect", method = RequestMethod.GET)
 	@ResponseBody
 	public int deselect(
@@ -289,7 +286,7 @@ public class EnviamentController extends BaseUserController {
 		}
 		return seleccio.size();
 	}
-	
+
 	@RequestMapping(value = "/export/{format}", method = RequestMethod.GET)
 	public String export(
 			HttpServletRequest request,
@@ -303,9 +300,9 @@ public class EnviamentController extends BaseUserController {
 		NotificacioEnviamentFiltreCommand command = getFiltreCommand(request);
 		if (seleccio == null || seleccio.isEmpty() || command == null) {
 			MissatgesHelper.error(
-					request, 
+					request,
 					getMessage(
-							request, 
+							request,
 							"enviament.controller.exportacio.seleccio.buida"));
 			return "redirect:../../enviament";
 		} else {
@@ -327,11 +324,11 @@ public class EnviamentController extends BaseUserController {
 			} catch (NotFoundException | ParseException e) {
 				e.printStackTrace();
 			}
-			
+
 			return null;
 		}
 	}
-	
+
 	@RequestMapping(value = "/reintentar/notificacio", method = RequestMethod.GET)
 	@ResponseBody
 	public String reintentarNotificacio(
@@ -344,13 +341,13 @@ public class EnviamentController extends BaseUserController {
 		String resposta = "";
 		if (seleccio == null || seleccio.isEmpty()) {
 			MissatgesHelper.error(
-					request, 
+					request,
 					getMessage(
-							request, 
+							request,
 							"enviament.controller.notificacio.seleccio.buida"));
 			resposta = "error";
 		} else {
-			List<Long> notificacioIds = new ArrayList<Long>();
+			Set<Long> notificacioIds = new HashSet<Long>();
 			for(Long id: seleccio) {
 				NotificacioEnviamentDtoV2 e = enviamentService.getOne(id);
 				if(!notificacioIds.contains(e.getNotificacioId())) {
@@ -358,46 +355,73 @@ public class EnviamentController extends BaseUserController {
 				}
 			}
 			Integer notificacionsNoRegistrades = 0;
+			Integer notificacionsError = 0;
+
 			for(Long notificacioId: notificacioIds) {
 				NotificacioDtoV2 notificacio = notificacioService.findAmbId(
 						notificacioId,
 						isAdministrador(request));
 				if(notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)) {
-					notificacioService.registrarNotificar(notificacioId);	
+					try {
+						notificacioService.registrarNotificar(notificacioId);
+					} catch (Exception e) {
+						notificacionsError++;
+						String errorMessage = "";
+						if (e.getMessage() != null && !e.getMessage().isEmpty())
+							errorMessage = e.getMessage();
+						else if (e.getCause() != null && e.getCause().getMessage() != null && !e.getCause().getMessage().isEmpty())
+							errorMessage = e.getCause().getMessage();
+						if (e.getStackTrace() != null && e.getStackTrace().length > 2) {
+							errorMessage += "<br/>";
+							errorMessage += e.getStackTrace()[0] + "<br/>";
+							errorMessage += e.getStackTrace()[1] + "<br/>";
+							errorMessage += e.getStackTrace()[2] + "<br/>...";
+						}
+						MissatgesHelper.error(
+								request,
+								getMessage(
+										request,
+										"enviament.controller.reintent.notificacio.pendents.error",
+										new String[] {
+												notificacioId.toString(),
+												notificacio.getCreatedDateAmbFormat(),
+												notificacio.getConcepte(),
+												errorMessage})
+						);
+					}
 				}else {
-					notificacionsNoRegistrades++;	
+					notificacionsNoRegistrades++;
 				}
 			}
-			if(notificacionsNoRegistrades.equals((Integer)notificacioIds.size()) && notificacionsNoRegistrades > 1) {
+
+			if(notificacionsNoRegistrades.equals((Integer)notificacioIds.size())) {
 				MissatgesHelper.error(
-						request, 
+						request,
 						getMessage(
-								request, 
-								"enviament.controller.reintent.notificacions.pendents.KO"));
-			} else if(notificacionsNoRegistrades.equals((Integer)notificacioIds.size()) && notificacionsNoRegistrades == 1){
+								request,
+								"enviament.controller.reintent." + (notificacionsNoRegistrades == 1 ? "notificacio" : "notificacions" )+ ".pendents.KO"));
+			} else if(notificacionsError.equals((Integer)notificacioIds.size())) {
 				MissatgesHelper.error(
-						request, 
+						request,
 						getMessage(
-								request, 
-								"enviament.controller.reintent.notificacio.pendents.KO"));
-			} else if(notificacioIds.size() > 1){
-				MissatgesHelper.info(
-						request, 
-						getMessage(
-								request, 
-								"enviament.controller.reintent.notificacions.pendents.OK"));
+								request,
+								"enviament.controller.reintent." + (notificacionsNoRegistrades == 1 ? "notificacio" : "notificacions" )+ ".pendents.error"));
+			} else if (notificacionsError > 0) {
+				MissatgesHelper.warning(
+						request,
+						notificacionsError + " " + getMessage(request, "enviament.controller.reintent.notificacions.pendents.error.alguna"));
 			} else {
 				MissatgesHelper.info(
-						request, 
+						request,
 						getMessage(
-								request, 
-								"enviament.controller.reintent.notificacio.pendents.OK"));
+								request,
+								"enviament.controller.reintent." + (notificacioIds.size() == 1 ? "notificacio" : "notificacions") + ".pendents.OK"));
 			}
 			resposta = "ok";
 		}
 		return resposta;
 	}
-	
+
 	@RequestMapping(value = "/reactivar/consulta", method = RequestMethod.GET)
 	@ResponseBody
 	public String reactivarConsulta(
@@ -410,31 +434,31 @@ public class EnviamentController extends BaseUserController {
 		String resposta = "";
 		if (seleccio == null || seleccio.isEmpty()) {
 			MissatgesHelper.error(
-					request, 
+					request,
 					getMessage(
-							request, 
+							request,
 							"enviament.controller.reactivar.seleccio.buida"));
 			resposta = "error";
 		} else {
 			try {
 				enviamentService.reactivaConsultes(seleccio);
 				MissatgesHelper.info(
-						request, 
+						request,
 						getMessage(
-								request, 
+								request,
 								"enviament.controller.reactivar.consultes.OK"));
 				resposta = "ok";
 			} catch (Exception e) {
 				MissatgesHelper.error(
-						request, 
+						request,
 						getMessage(
-								request, 
+								request,
 								"enviament.controller.reactivar.consultes.KO"));
 			}
 		}
 		return resposta;
 	}
-	
+
 	@RequestMapping(value = "/reactivar/sir", method = RequestMethod.GET)
 	@ResponseBody
 	public String reactivarSir(
@@ -447,52 +471,52 @@ public class EnviamentController extends BaseUserController {
 		String resposta = "";
 		if (seleccio == null || seleccio.isEmpty()) {
 			MissatgesHelper.error(
-					request, 
+					request,
 					getMessage(
-							request, 
+							request,
 							"enviament.controller.reactivar.seleccio.buida"));
 			resposta = "error";
 		} else {
 			try {
 				enviamentService.reactivaSir(seleccio);
 				MissatgesHelper.info(
-						request, 
+						request,
 						getMessage(
-								request, 
+								request,
 								"enviament.controller.reactivar.sir.OK"));
 				resposta = "ok";
 			} catch (Exception e) {
 				MissatgesHelper.error(
-						request, 
+						request,
 						getMessage(
-								request, 
+								request,
 								"enviament.controller.reactivar.sir.KO"));
 			}
 		}
 		return resposta;
 	}
-	
+
 	@RequestMapping(value = "/visualitzar", method = RequestMethod.GET)
 	public String visualitzar(
 			HttpServletRequest request,
 			Model model) {
 		UsuariDto usuari = aplicacioService.getUsuariActual();
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-		
+
 		ColumnesDto columnes = enviamentService.getColumnesUsuari(
 				entitat.getId(),
 				usuari);
-		
+
 		if (columnes != null) {
 			model.addAttribute(ColumnesCommand.asCommand(columnes));
 		} else {
 			model.addAttribute(new ColumnesCommand());
 		}
-		
-		
+
+
 		return "enviamentColumns";
 	}
-	
+
 	@RequestMapping(value = "/visualitzar/save", method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
@@ -500,26 +524,26 @@ public class EnviamentController extends BaseUserController {
 			BindingResult bindingResult,
 			Model model) throws IOException {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-		
+
 		if (bindingResult.hasErrors()) {
 			return "procedimentAdminForm";
 		}
-	
+
 		model.addAttribute(new NotificacioFiltreCommand());
 		enviamentService.columnesUpdate(
 					entitat.getId(),
 					ColumnesCommand.asDto(columnesCommand));
-		
+
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:enviament",
 				"enviament.controller.modificat.ok");
 	}
-	
+
 	private boolean isAdministrador(HttpServletRequest request) {
 		return RolHelper.isUsuariActualAdministrador(request);
 	}
-	
+
 	private NotificacioEnviamentFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
 		NotificacioEnviamentFiltreCommand filtreCommand = (NotificacioEnviamentFiltreCommand) RequestSessionHelper.obtenirObjecteSessio(

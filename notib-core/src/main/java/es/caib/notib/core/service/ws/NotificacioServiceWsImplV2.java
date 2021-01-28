@@ -3,6 +3,22 @@
  */
 package es.caib.notib.core.service.ws;
 
+import com.codahale.metrics.Timer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.jws.WebService;
+import javax.mail.internet.InternetAddress;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -14,20 +30,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import javax.jws.WebService;
-import javax.mail.internet.InternetAddress;
-
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.codahale.metrics.Timer;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.DocumentDto;
@@ -43,13 +45,12 @@ import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
-import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.ws.notificacio.Certificacio;
 import es.caib.notib.core.api.ws.notificacio.DadesConsulta;
 import es.caib.notib.core.api.ws.notificacio.DocumentV2;
@@ -102,9 +103,7 @@ import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.repository.ProcedimentOrganRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
-import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
-import es.caib.plugins.arxiu.api.DocumentContingut;
-
+import es.caib.notib.plugin.unitat.NodeDir3;
 
 /**
  * Implementació del servei per a l'enviament i consulta de notificacions V2 (Sense paràmetres SEU).
@@ -263,13 +262,18 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						LlibreDto llibreOrgan = pluginHelper.llistarLlibreOrganisme(
 								entitat.getCodi(),
 								notificacio.getOrganGestor());
-						
+						Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
+						List<OficinaDto> oficinesSIR = cacheHelper.getOficinesSIRUnitat(
+								arbreUnitats, 
+								notificacio.getOrganGestor());
 						organGestor = OrganGestorEntity.getBuilder(
 								notificacio.getOrganGestor(),
 								organigramaEntitat.get(notificacio.getOrganGestor()).getNom(),
 								entitat,
 								llibreOrgan.getCodi(),
-								llibreOrgan.getNomLlarg()).build();
+								llibreOrgan.getNomLlarg(),
+								(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getCodi() : null),
+								(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getNom() : null)).build();
 						organGestorRepository.save(organGestor);
 					}
 				}
@@ -311,7 +315,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 								notificacio.getGrupCodi(),
 								notificacio.getNumExpedient(),
 								TipusUsuariEnumDto.APLICACIO,
-								procedimentOrgan)
+								procedimentOrgan,
+								notificacio.getIdioma())
 						.document(documentEntity).build();
 				
 				NotificacioEntity notificacioGuardada = auditNotificacioHelper.desaNotificacio(notificacioEntity);
@@ -1098,6 +1103,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1032 | El format del camp concepte no és correcte. (Inclou caràcters no permesos)
 	// 1040 | La descripció de la notificació no pot contenir més de 1000 caràcters
 	// 1041 | El format del camp descripció no és correcte
+	// 1042 | Els salts de línia no estan permesos al camp descripció
 	// 1050 | El tipus d'enviament de la notificació no pot ser null
 	// 1060 | El camp 'document' no pot ser null
 	// 1061 | El camp 'arxiuNom' del document no pot ser null
@@ -1245,6 +1251,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 		if (notificacio.getDescripcio() != null && !validFormat(notificacio.getDescripcio()).isEmpty()) {
 			return setRespostaError("[1041] El format del camp descripció no és correcte. Inclou els caràcters ("+ listToString(validFormat(notificacio.getDescripcio())) +") que no són correctes");
+		}
+		if (notificacio.getDescripcio() != null && hasSaltLinia(notificacio.getDescripcio())) {
+			return setRespostaError("[1042] Els salts de línia no estan permesos al camp descripció.");
 		}
 		// Tipus d'enviament
 		if (notificacio.getEnviamentTipus() == null) {
@@ -1703,6 +1712,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			}
 	    }
 		return charsNoValids;
+	}
+	
+	private boolean hasSaltLinia(String value) {
+		return value.contains("\r") || value.contains("\n") || value.contains("\r\n");
 	}
 
 	private StringBuilder listToString(ArrayList<?> list) {

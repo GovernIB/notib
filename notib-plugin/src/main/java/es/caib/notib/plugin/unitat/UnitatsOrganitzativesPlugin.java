@@ -97,6 +97,19 @@ public interface UnitatsOrganitzativesPlugin {
 
 	
 	/**
+	 * Retorna la llista d'unitats organitzatives a partir d'un text comparant amb la denominació.
+	 * 
+	 * @param denominacio
+	 *            Text corresponent a la denominació
+	 *            
+	 * @return La llista d'unitats organitzatives.
+	 * @throws SistemaExternException
+	 *            Si es produeix un error al consultar les unitats organitzatives.
+	 */
+	public List<ObjetoDirectorio> unitatsPerDenominacio(String denominacio) throws SistemaExternException;
+	
+	
+	/**
 	 * Retorna la llista d'unitats organitzatives filles donat un filtre.
 	 * 
 	 * @param codi
@@ -179,4 +192,18 @@ public interface UnitatsOrganitzativesPlugin {
 	 */
 	public List<CodiValor> localitats(
 			String codiProvincia) throws SistemaExternException;
+	
+	/**
+	 * @return recupera el llistat de les oficines SIR d'una unitata organitzativa
+	 * 
+	 * @param unitat
+	 * 			Codi de la unitat
+	 * @param arbreUnitats 
+	 * 			Arbre unitat actual
+	 * @throws SistemaExternException
+	 *            Si es produeix un error al consultar les oficines SIR
+	 */
+	public List<OficinaSIR> oficinesSIRUnitat(
+			String unitat, 
+			Map<String, NodeDir3> arbreUnitats) throws SistemaExternException;
 }

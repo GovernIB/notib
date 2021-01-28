@@ -5,3 +5,4 @@
 /bin/
 /.flattened-pom.xml
 /.attach_pid*
+/notib-plugin-impl.iml

@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
+import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
@@ -199,6 +200,7 @@ public class NotificacioServiceTest extends BaseServiceTest {
 		for (int i = 0; i < numDestinataris; i++) {
 			NotificacioEnviamentDtoV2 enviament = new NotificacioEnviamentDtoV2();
 			PersonaDto titular = new PersonaDto();
+			titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
 			titular.setNom("titularNom" + i);
 			titular.setLlinatge1("titLlinatge1_" + i);
 			titular.setLlinatge2("titLlinatge2_" + i);
@@ -208,6 +210,7 @@ public class NotificacioServiceTest extends BaseServiceTest {
 			enviament.setTitular(titular);
 			List<PersonaDto> destinataris = new ArrayList<PersonaDto>();
 			PersonaDto destinatari = new PersonaDto();
+			destinatari.setInteressatTipus(InteressatTipusEnumDto.FISICA);
 			destinatari.setNom("destinatariNom" + i);
 			destinatari.setLlinatge1("destLlinatge1_" + i);
 			destinatari.setLlinatge2("destLlinatge2_" + i);

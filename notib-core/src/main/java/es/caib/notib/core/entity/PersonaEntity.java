@@ -132,7 +132,10 @@ public class PersonaEntity extends NotibAuditable<Long> {
 		this.nif = nif;
 		this.nom = nom;
 		this.telefon = telefon;
-		this.raoSocial = raoSocial;
+		if (interessatTipus != null && interessatTipus.equals(InteressatTipusEnumDto.JURIDICA) && (raoSocial == null || raoSocial.isEmpty()))
+			this.raoSocial = nom;
+		else
+			this.raoSocial = raoSocial;
 		this.dir3Codi = dir3Codi;
 		this.incapacitat = incapacitat;
 	}

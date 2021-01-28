@@ -9,26 +9,10 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 
+import es.caib.notib.core.api.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.LocalitatsDto;
-import es.caib.notib.core.api.dto.NotificacioDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
-import es.caib.notib.core.api.dto.NotificacioErrorCallbackFiltreDto;
-import es.caib.notib.core.api.dto.NotificacioEventDto;
-import es.caib.notib.core.api.dto.NotificacioFiltreDto;
-import es.caib.notib.core.api.dto.NotificacioRegistreErrorFiltreDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PaisosDto;
-import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
-import es.caib.notib.core.api.dto.ProgresDescarregaDto;
-import es.caib.notib.core.api.dto.ProvinciesDto;
-import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
@@ -146,10 +130,12 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<NotificacioDto> update(
 			Long entitatId,
-			NotificacioDtoV2 notificacio) throws NotFoundException, RegistreNotificaException {
+			NotificacioDtoV2 notificacio,
+			boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
 		return delegate.update(
 				entitatId, 
-				notificacio);
+				notificacio,
+				isAdministradorEntitat);
 	}
 	
 	@Override
@@ -160,7 +146,7 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
+	public PaginaDto<NotificacioDatatableDto> findAmbFiltrePaginat(
 			Long entitatId,
 			boolean isUsuari,
 			boolean isUsuariEntitat,
@@ -329,14 +315,14 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 	
 	@RolesAllowed({"tothom"})
-	public FitxerDto recuperarJustificant(Long notificacioId, Long entitatId) throws JustificantException {
-		return delegate.recuperarJustificant(notificacioId, entitatId);
+	public FitxerDto recuperarJustificant(Long notificacioId, Long entitatId, String sequence) throws JustificantException {
+		return delegate.recuperarJustificant(notificacioId, entitatId, sequence);
 	}
 
 	@Override
 	@RolesAllowed({"tothom"})
-	public ProgresDescarregaDto justificantEstat() throws JustificantException {
-		return delegate.justificantEstat();
+	public ProgresDescarregaDto justificantEstat(String sequence) throws JustificantException {
+		return delegate.justificantEstat(sequence);
 	}
 
 	@Override
@@ -344,5 +330,57 @@ public class NotificacioServiceBean implements NotificacioService {
 	public ProgresActualitzacioCertificacioDto actualitzacioEnviamentsEstat() {
 		return delegate.actualitzacioEnviamentsEstat();
 	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio,
+			Long comunitatAutonoma, Boolean ambOficines, Boolean esUnitatArrel, Long provincia, String municipi) {
+		return delegate.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
+	}
+	
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public List<OrganGestorDto> unitatsPerCodi(String codi) {
+		return delegate.unitatsPerCodi(codi);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public List<OrganGestorDto> unitatsPerDenominacio(String denominacio) {
+		return delegate.unitatsPerDenominacio(denominacio);
+
+	}
+
+	@Override
+	@RolesAllowed({"tothom"})
+	public List<CodiValorDto> llistarNivellsAdministracions() {
+		return delegate.llistarNivellsAdministracions();
+	}
+
+	@Override
+	@RolesAllowed({"tothom"})
+	public List<CodiValorDto> llistarComunitatsAutonomes() {
+		return delegate.llistarComunitatsAutonomes();
+	}
+
+	@Override
+	@RolesAllowed({"tothom"})
+	public List<ProvinciesDto> llistarProvincies(String codiCA) {
+		return delegate.llistarProvincies(codiCA);
+	}
+	
+	@Override
+	@RolesAllowed({"tothom"})
+	public String guardarArxiuTemporal(String nom){
+		return delegate.guardarArxiuTemporal(nom);
+	}
+
+	@Override
+	@RolesAllowed({"tothom"})
+	public byte[] obtenirArxiuTemporal(String arxiuGestdocId) {
+		return delegate.obtenirArxiuTemporal(arxiuGestdocId);
+	}
+
 
 }

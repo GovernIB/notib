@@ -76,6 +76,14 @@ public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<Ent
 					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entitat.validation.dir3.repetit")).addNode("dir3Codi").addConstraintViolation();
 				}
 			}
+			// validar si és oficina per entitat
+			if (entitatCommand.isOficinaEntitat() && (entitatCommand.getOficina() == null || entitatCommand.getOficina().isEmpty())) {
+				valid = false;
+				if (!valid) {
+					context.disableDefaultConstraintViolation();
+					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty")).addNode("oficina").addConstraintViolation();
+				}
+			}
 			return valid;
         } catch (Exception ex) {
         	LOGGER.error("Error al validar si el codi d'entitat és únic", ex);

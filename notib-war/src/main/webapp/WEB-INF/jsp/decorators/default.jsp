@@ -280,6 +280,7 @@ body {
 								<li>
 									<a href="<c:url value="/usuari/configuracio"/>" data-toggle="modal" data-maximized="true"><spring:message code="decorator.menu.configuracio.user"/></a>
 									<a href="https://github.com/GovernIB/notib/raw/${manifestAtributes['Implementation-SCM-Branch']}/doc/pdf/NOTIB_usuari.pdf" rel="noopener noreferrer" target="_blank"><span class="fa fa-download"></span> <spring:message code="decorator.menu.manual.usuari"/></a>
+									<a href="<c:url value="/usuari/${dadesUsuariActual.codi}/refrescarRols"/>"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="usuari.form.boto.refrescar.rols"/></a>
 								</li>
 							</ul>
 						</li>

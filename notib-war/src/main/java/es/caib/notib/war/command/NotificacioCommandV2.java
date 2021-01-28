@@ -200,6 +200,61 @@ public class NotificacioCommandV2 {
 		}
 		return descripcioSize;
 	}
+	
+	public int getNomDefaultSize() {
+		int concepteSize = 0;
+		try {
+			Field concepte = PersonaCommand.class.getDeclaredField("nom");
+			concepteSize = concepte.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud del nom: " + ex.getMessage());
+		}
+		return concepteSize;
+	}
+	
+	public int getLlinatge1DefaultSize() {
+		int concepteSize = 0;
+		try {
+			Field concepte = PersonaCommand.class.getDeclaredField("llinatge1");
+			concepteSize = concepte.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud del llinatge 1: " + ex.getMessage());
+		}
+		return concepteSize;
+	}
+	
+	public int getLlinatge2DefaultSize() {
+		int concepteSize = 0;
+		try {
+			Field concepte = PersonaCommand.class.getDeclaredField("llinatge2");
+			concepteSize = concepte.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud del llinatge 2: " + ex.getMessage());
+		}
+		return concepteSize;
+	}
+	
+	public int getEmailDefaultSize() {
+		int concepteSize = 0;
+		try {
+			Field concepte = PersonaCommand.class.getDeclaredField("email");
+			concepteSize = concepte.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud de l'email: " + ex.getMessage());
+		}
+		return concepteSize;
+	}
+	
+	public int getTelefonDefaultSize() {
+		int concepteSize = 0;
+		try {
+			Field concepte = PersonaCommand.class.getDeclaredField("telefon");
+			concepteSize = concepte.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud del telèfon: " + ex.getMessage());
+		}
+		return concepteSize;
+	}
 
 	@Override
 	public String toString() {

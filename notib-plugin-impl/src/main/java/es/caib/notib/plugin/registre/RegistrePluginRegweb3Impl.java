@@ -1,22 +1,5 @@
 package es.caib.notib.plugin.registre;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
-import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
-
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
 import es.caib.notib.core.api.dto.InteresadoWsDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
@@ -24,22 +7,17 @@ import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.RegistreInteressatDocumentTipusDtoEnum;
 import es.caib.notib.core.api.dto.RegistreInteressatDto;
 import es.caib.plugins.arxiu.api.ArxiuException;
-import es.caib.regweb3.ws.api.v3.AnexoWs;
-import es.caib.regweb3.ws.api.v3.AsientoRegistralWs;
-import es.caib.regweb3.ws.api.v3.CodigoAsuntoWs;
-import es.caib.regweb3.ws.api.v3.DatosInteresadoWs;
-import es.caib.regweb3.ws.api.v3.IdentificadorWs;
-import es.caib.regweb3.ws.api.v3.InteresadoWs;
-import es.caib.regweb3.ws.api.v3.JustificanteWs;
-import es.caib.regweb3.ws.api.v3.LibroOficinaWs;
-import es.caib.regweb3.ws.api.v3.LibroWs;
-import es.caib.regweb3.ws.api.v3.OficinaWs;
-import es.caib.regweb3.ws.api.v3.OficioWs;
-import es.caib.regweb3.ws.api.v3.OrganismoWs;
-import es.caib.regweb3.ws.api.v3.RegistroSalidaWs;
-import es.caib.regweb3.ws.api.v3.TipoAsuntoWs;
-import es.caib.regweb3.ws.api.v3.WsI18NException;
-import es.caib.regweb3.ws.api.v3.WsValidationException;
+import es.caib.regweb3.ws.api.v3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Implementació del plugin de registre per a la interficie de
@@ -54,30 +32,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	
 	private static final String OFICINA_VIRTUAL_DEFAULT = "Oficina Virtual";
 
-	@Override
-	@Deprecated
-	public RespostaAnotacioRegistre registrarSalida(
-			RegistreSortida registreSortida,
-			String aplicacion) {
-		RespostaAnotacioRegistre resposta = new RespostaAnotacioRegistre();
-		try {
-			//TODO: substituir pel nou mètode crearAsientoRegistral
-			resposta = toRespostaAnotacioRegistre(getRegistroSalidaApi().nuevoRegistroSalida(
-					registreSortida.getCodiEntitat(),
-					toRegistroSalidaWs(
-									registreSortida,
-									aplicacion)));
-					
-		} catch (Exception ex) {
-			resposta.setErrorDescripcio(ex.getMessage());
-			resposta.setData(new Date());
-			logger.error("Error a l'hora de registrar la sortida", ex);
-		}
-		return resposta;
-	}
-	
-	
-	
+
 	@Override
 	public RespostaConsultaRegistre salidaAsientoRegistral(
 			String codiDir3Entitat, 
@@ -98,7 +53,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 //			    return exclusions.contains(m.getName())|| super.hasIgnoreMarker(m);
 //			    }
 //			});
-//			String asientoJson = objectMapper.writeValueAsString(asiento); 
+//			String asientoJson = objectMapper.writeValueAsString(asiento);
 //			logger.debug("   Asiento: " + asientoJson);
 //			logger.debug("[SalidaAsientoRegistral - FI]");
 
@@ -392,7 +347,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		return ntiTipusDocumental;
 	}
 	
-	public AsientoRegistralWs toAsientoRegistralBean(AsientoRegistralBeanDto dto) {
+	private AsientoRegistralWs toAsientoRegistralBean(AsientoRegistralBeanDto dto) {
 		AsientoRegistralWs ar = new AsientoRegistralWs();
 		ar.setAplicacion(dto.getAplicacion());
 		ar.setAplicacionTelematica(dto.getAplicacionTelematica());
@@ -535,68 +490,6 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		}
 		return resposta;
 	}
-	
-//	public AsientoRegistralWs notificacioToAsientoRegistralBean(NotificacioDto notificacio, AnexoWs anexe) {
-//		AsientoRegistralWs registre = new AsientoRegistralWs();
-//		registre.setEntidadCodigo(notificacio.getEntitat().getCodi());
-//		registre.setEntidadDenominacion(notificacio.getEntitat().getNom());
-//		registre.setEntidadRegistralInicioCodigo(notificacio.getProcediment().getOficina());
-//		registre.setEntidadRegistralInicioDenominacion(notificacio.getProcediment().getOficina());
-//		registre.setEntidadRegistralOrigenCodigo(notificacio.getProcediment().getOficina());
-//		registre.setEntidadRegistralOrigenDenominacion(notificacio.getProcediment().getOficina());
-//		registre.setEntidadRegistralDestinoCodigo(notificacio.getProcediment().getOficina());
-//		registre.setEntidadRegistralDestinoDenominacion(notificacio.getProcediment().getOficina());
-//		registre.setUnidadTramitacionOrigenCodigo(notificacio.getRegistreOrgan());
-//		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getRegistreOrgan());
-//		registre.setUnidadTramitacionDestinoCodigo(notificacio.getProcediment().getOficina());
-//		registre.setUnidadTramitacionDestinoDenominacion(notificacio.getProcediment().getOficina());
-//		registre.setTipoRegistro(2L);
-//		registre.setLibroCodigo(notificacio.getProcediment().getLlibre());
-//		registre.setResumen(notificacio.getRegistreExtracte());
-//		/* 1 = Documentació adjunta en suport Paper
-//		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper
-//		 * 3 = Documentació adjunta digitalitzada */
-//		registre.setTipoDocumentacionFisicaCodigo(3L);
-//		registre.setCodigoAsunto(notificacio.getRegistreTipusAssumpte());
-//		registre.setCodigoAsuntoDenominacion(notificacio.getRegistreTipusAssumpte());
-//		registre.setIdioma(1L);
-//		registre.setReferenciaExterna(notificacio.getRegistreRefExterna());
-//		registre.setNumeroExpediente(notificacio.getNumExpedient());
-//		/*
-//		 * 
-//		 * '01' : Servei de missatgers
-//		 * '02' : Correu postal
-//		 * '03' : Correu postal certificat
-//		 * '04' : Burofax
-//		 * '05' : En ma
-//		 * '06' : Fax
-//		 * '07' : Altres
-//		 * 
-//		 * */
-//		if(notificacio.getPagadorPostal() != null) {
-//			registre.setTipoTransporte("02");
-//		}else {
-//			registre.setTipoTransporte("07");
-//		}
-//		registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
-//		registre.setCodigoUsuario(notificacio.getUsuariCodi());
-//		registre.setAplicacionTelematica("SISTRA");
-//		registre.setAplicacion("RWE");
-//		registre.setVersion("3.1");
-//		registre.setObservaciones(notificacio.getRegistreObservacions());
-//		registre.setExpone("");
-//		registre.setSolicita("");
-//		registre.setPresencial(false);
-//		registre.setEstado(notificacio.getEstat().getLongVal());
-//		registre.setUnidadTramitacionOrigenCodigo(notificacio.getRegistreOrgan());
-//		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getRegistreOrgan());
-//		registre.setMotivo(notificacio.getDescripcio());
-//		registre.getInteresados().add(personaToInteresadoWs(notificacio.getEnviaments().iterator().next().getTitular()));
-//		if(notificacio.getDocument() != null) {
-//			registre.getAnexos().add(anexe);	
-//		}
-//		return registre;
-//	}
 	
 	public RegistreInteressatDto personaToRegistreInteresatDto (PersonaDto persona) {
 		RegistreInteressatDto interessat = new RegistreInteressatDto();

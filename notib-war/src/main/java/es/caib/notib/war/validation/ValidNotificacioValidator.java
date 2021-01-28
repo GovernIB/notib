@@ -9,6 +9,7 @@ import javax.mail.internet.InternetAddress;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,6 +110,17 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 				}
 			}
 			
+			// Validació caducitat
+			if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO) {
+				if (notificacio.getCaducitat() != null && !notificacio.getCaducitat().after(LocalDateTime.now().toDate())) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(
+							MessageHelper.getInstance().getMessage("notificacio.form.valid.caducitat"))
+					.addNode("caducitat")
+					.addConstraintViolation();
+				}
+			}
+			
 			// Validació de document
 			switch (notificacio.getTipusDocument()) {
 			case ARXIU:
@@ -197,6 +209,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 							valid = false;
 							context.buildConstraintViolationWithTemplate(
 									MessageHelper.getInstance().getMessage("notificacio.form.valid.notificacio.sensenif", new Object[] {envCount + 1}))
+							.addNode("enviaments["+envCount+"].titular.nif")
 							.addConstraintViolation();
 						}
 					}

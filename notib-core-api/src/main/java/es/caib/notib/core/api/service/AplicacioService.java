@@ -180,4 +180,6 @@ public interface AplicacioService {
 	 */
 	public String getMetrics();
 
+	public String getAppVersion();
+	public void setAppVersion(String appVersion);
 }

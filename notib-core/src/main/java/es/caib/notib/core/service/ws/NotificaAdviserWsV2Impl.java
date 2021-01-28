@@ -169,18 +169,31 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			if (enviament != null) {
 				
 				if (enviament.isNotificaEstatFinal()) {
-					logger.error(
-							"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
-							"L'enviament amb l'identificador especificat (" + identificador + ") ja es troba en un estat final.");
-					//Crea un nou event builder
-					eventDatat = NotificacioEventEntity.getBuilder(
-							NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-							enviament.getNotificacio()).
-							enviament(enviament).
-							descripcio(estado).build();
-					codigoRespuesta.value = "000";
-					descripcionRespuesta.value = "OK";
-					integracioHelper.addAccioError(info, "L'enviament ja es troba en un estat final");
+					if (tipoEntrega.equals(BigInteger.valueOf(1L))) { //if datado (1L)
+						logger.error(
+								"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
+								"L'enviament amb l'identificador especificat (" + identificador + ") ja es troba en un estat final.");
+						//Crea un nou event builder
+						eventDatat = NotificacioEventEntity.getBuilder(
+								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
+								enviament.getNotificacio()).
+								enviament(enviament).
+								descripcio(estado).build();
+						codigoRespuesta.value = "000";
+						descripcionRespuesta.value = "OK";
+						integracioHelper.addAccioError(info, "L'enviament ja es troba en un estat final");
+					} else if (tipoEntrega.equals(BigInteger.valueOf(3L))) { //if certificació (3L)
+						logger.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
+						certificacionOrganismo(
+								acusePDF,
+								organismoEmisor,
+								modoNotificacion,
+								identificador,
+								codigoRespuesta,
+								descripcionRespuesta,
+								enviament);
+						logger.debug("Certificació guardada correctament.");
+					}
 				} else {
 					String receptorNombre = null;
 					String receptorNif = null;
@@ -259,7 +272,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					
 					//if datado + certificació
 					if (tipoEntrega.equals(BigInteger.valueOf(2L))) {
-						logger.debug("Guardant certificació...");
+						logger.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
 						certificacionOrganismo(
 								acusePDF,
 								organismoEmisor,
@@ -272,10 +285,10 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					}
 					integracioHelper.addAccioOk(info);
 					
-					if ("expirada".equals(estado) && acusePDF == null && enviament.getNotificaCertificacioData() == null) {
-						logger.debug("Consultant la certificació de l'enviament expirat...");
-						notificaHelper.enviamentRefrescarEstat(enviament.getId());
-					}
+//					if ("expirada".equals(estado) && acusePDF == null && enviament.getNotificaCertificacioData() == null) {
+//						logger.debug("Consultant la certificació de l'enviament expirat...");
+//						notificaHelper.enviamentRefrescarEstat(enviament.getId());
+//					}
 				}
 			} else {
 				logger.error(
@@ -322,7 +335,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			integracioHelper.addAccioError(info, "Error processant la petició", ex);
 		}
 		if (enviament != null) {
-			if (eventDatat == null) {
+			if (eventDatat == null && !tipoEntrega.equals(BigInteger.valueOf(3L))) {
 				logger.debug("L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null");
 				eventDatatBuilder = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
@@ -338,8 +351,10 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						true,
 						eventDatat);
 			}
-			enviament.getNotificacio().updateEventAfegir(eventDatat);
-			notificacioEventRepository.save(eventDatat);
+			if (eventDatat != null) {
+				enviament.getNotificacio().updateEventAfegir(eventDatat);
+				notificacioEventRepository.save(eventDatat);
+			}
 			logger.debug("Peticició processada correctament.");
 		}
 		

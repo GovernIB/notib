@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -32,6 +33,7 @@ import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
+import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 
@@ -43,8 +45,9 @@ import es.caib.notib.plugin.usuari.DadesUsuari;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Component
-public class CacheHelper { 
+public class CacheHelper {
 
 	@Resource
 	private EntitatRepository entitatRepository;
@@ -66,6 +69,8 @@ public class CacheHelper {
 	private OrganigramaHelper organigramaHelper;
 	@Resource
 	private CacheManager cacheManager;
+
+	public static String appVersion;
 
 	@Cacheable(value = "entitatsUsuari", key="#usuariCodi.concat('-').concat(#rolActual)")
 	public List<EntitatDto> findEntitatsAccessiblesUsuari(
@@ -89,7 +94,18 @@ public class CacheHelper {
 				OrganGestorEntity.class,
 				permisos,
 				auth);
-		
+
+		if (entityComprovarHelper.getGenerarLogsPermisosOrgan()) {
+			log.info("### PERMISOS - Obtenir Òrgans gestors #####################################");
+			log.info("### -----------------------------------------------------------------------");
+			log.info("### Usuari: " + auth.getName());
+			log.info("### Òrgans: ");
+			if (organsGestors != null)
+				for (OrganGestorEntity organGestor : organsGestors) {
+					log.info("### # " + organGestor.getCodi() + " - " + organGestor.getNom());
+				}
+			log.info("### -----------------------------------------------------------------------");
+		}
 		return conversioTipusHelper.convertirList(
 				organsGestors, 
 				OrganGestorDto.class);
@@ -198,6 +214,43 @@ public class CacheHelper {
 				codiDir3Organ);
 	}
 	
+	@Cacheable(value = "oficinesSIRUnitat", key="#codiDir3Organ")
+	public List<OficinaDto> getOficinesSIRUnitat(
+			Map<String, NodeDir3> arbreUnitats,
+			String codiDir3Organ) {
+		return pluginHelper.oficinesSIRUnitat(
+				codiDir3Organ,
+				arbreUnitats);
+	}
+	
+	@Cacheable(value = "organigramaOriginal", key="#entitatcodi")
+	public Map<String, NodeDir3> findOrganigramaNodeByEntitat(String entitatcodi) {
+		return  pluginHelper.getOrganigramaPerEntitat(entitatcodi);
+	}
+	
+	@Cacheable(value = "llistarNivellsAdministracions")
+	public List<CodiValor> llistarNivellsAdministracions() {
+		return pluginHelper.llistarNivellsAdministracions();
+	}
+	
+	
+	@Cacheable(value = "llistarComunitatsAutonomes")
+	public List<CodiValor> llistarComunitatsAutonomes() {
+		return pluginHelper.llistarComunitatsAutonomes();
+	}
+	
+	@Cacheable(value = "llistarProvincies", key="#codiCA")
+	public List<CodiValor> llistarProvincies(String codiCA) {
+		return pluginHelper.llistarProvincies(codiCA);
+	}
+	
+	@Cacheable(value = "llistarLocalitats", key="#codiProvincia")
+	public List<CodiValor> llistarLocalitats(String codiProvincia) {
+		return pluginHelper.llistarLocalitats(codiProvincia);
+	}
+	
+	
+	
 	public Collection<String> getAllCaches() {
 		return cacheManager.getCacheNames(); 
 	}
@@ -226,15 +279,15 @@ public class CacheHelper {
 	public void evictFindOrganigramaPlugin(String entitatCodi) {
 	}
 			
-	@CacheEvict(value = "procedimentsPermis", allEntries = true)
+	@CacheEvict(value = {"procedimentsPermis", "procedimentEntitiesPermis"}, allEntries = true)
 	public void evictFindProcedimentsWithPermis() {
 	}
 	
-	@CacheEvict(value = "procedimentsOrganPermis", allEntries = true)
+	@CacheEvict(value = {"procedimentsOrganPermis", "procedimentEntitiessOrganPermis", "procedimentsOrgan"}, allEntries = true)
 	public void evictFindProcedimentsOrganWithPermis() {
 	}
 	
-	@CacheEvict(value = "organsPermis", allEntries = true)
+	@CacheEvict(value = {"organsPermis", "organsEntitiesPermis"}, allEntries = true)
 	public void evictFindOrgansGestorWithPermis() {
 	}
 	
@@ -248,6 +301,10 @@ public class CacheHelper {
 	
 	@CacheEvict(value = "getPermisosEntitatsUsuariActual", key="#auth.name")
 	public void evictGetPermisosEntitatsUsuariActual(Authentication auth) {
+	}
+
+	@CacheEvict(value = "getPermisosEntitatsUsuariActual", allEntries = true)
+	public void evictAllPermisosEntitatsUsuariActual() {
 	}
 	
 	public void clearCache(String value) {

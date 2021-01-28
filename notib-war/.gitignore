@@ -3,7 +3,8 @@
 /.project
 /.settings/
 /appserv_tomcat
-/appserv_jboss
+/appserv_tomcat
 /.flattened-pom.xml
 /.attach_pid*
 /.tern-project
+/notib-war.iml

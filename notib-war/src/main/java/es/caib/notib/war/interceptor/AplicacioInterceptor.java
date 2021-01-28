@@ -13,6 +13,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import es.caib.notib.core.api.service.AplicacioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import org.springframework.web.servlet.support.RequestContextUtils;
@@ -25,10 +26,12 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 public class AplicacioInterceptor extends HandlerInterceptorAdapter {
 
 	public static final String REQUEST_ATTRIBUTE_MANIFEST_ATRIBUTES = "manifestAtributes";
+	private static Map<String, Object> manifestAtributsMap;
 
 	@Autowired
+	private AplicacioService aplicacioService;
+	@Autowired
 	private ServletContext servletContext;
-	private Map<String, Object> manifestAtributsMap;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
@@ -44,6 +47,7 @@ public class AplicacioInterceptor extends HandlerInterceptorAdapter {
 			for (Object key: new HashMap(manifestAtributs).keySet()) {
 				manifestAtributsMap.put(key.toString(), manifestAtributs.get(key));
 			}
+			aplicacioService.setAppVersion((String) manifestAtributsMap.get("Implementation-Version"));
 		}
 		request.setAttribute(
 				REQUEST_ATTRIBUTE_MANIFEST_ATRIBUTES,

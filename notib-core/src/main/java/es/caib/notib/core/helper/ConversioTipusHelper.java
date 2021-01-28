@@ -7,23 +7,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import es.caib.notib.core.api.dto.*;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.core.api.dto.AplicacioDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.NotificacioDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.PagadorCieDto;
-import es.caib.notib.core.api.dto.PagadorCieFormatFullaDto;
-import es.caib.notib.core.api.dto.PagadorCieFormatSobreDto;
-import es.caib.notib.core.api.dto.PagadorPostalDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.TipusDocumentDto;
-import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.GrupEntity;
@@ -37,6 +24,9 @@ import es.caib.notib.core.entity.PagadorCieFormatSobreEntity;
 import es.caib.notib.core.entity.PagadorPostalEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.UsuariEntity;
+import es.caib.notib.plugin.unitat.CodiValor;
+import es.caib.notib.plugin.unitat.NodeDir3;
+import es.caib.notib.plugin.unitat.ObjetoDirectorio;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFacade;
@@ -85,11 +75,31 @@ public class ConversioTipusHelper {
 			field("organGestor.nom", "organGestorNom").
 			byDefault().
 			register();
+
+		mapperFactory.classMap(NotificacioEntity.class, NotificacioDatatableDto.class).
+				field("notificaErrorEvent.data", "notificaErrorData").
+				field("notificaErrorEvent.errorDescripcio", "notificaErrorDescripcio").
+				field("organGestor.codi", "organGestor").
+				field("organGestor.nom", "organGestorNom").
+				field("entitat.id", "entitatId").
+				field("entitat.nom", "entitatNom").
+				field("procediment.codi", "procedimentCodi").
+				field("procediment.nom", "procedimentNom").
+				field("createdBy.nom", "createdByNom").
+				field("createdBy.codi", "createdByCodi").
+				byDefault().
+				register();
 		
 		mapperFactory.classMap(NotificacioEnviamentEntity.class, NotificacioEnviamentDto.class).
 			customize(new NotificacioEnviamentEntitytoMapper()).
 			byDefault().
 			register();
+
+		mapperFactory.classMap(NotificacioEnviamentEntity.class, NotificacioEnviamentDatatableDto.class).
+				field("notificacio.estat", "notificacioEstat").
+				customize(new NotificacioEnviamentEntitytoDatatableMapper()).
+				byDefault().
+				register();
 		
 		mapperFactory.classMap(AplicacioEntity.class, AplicacioDto.class).
 			field("entitat.id", "entitatId").
@@ -104,6 +114,9 @@ public class ConversioTipusHelper {
 		mapperFactory.classMap(OrganGestorEntity.class, OrganGestorDto.class).
 			field("entitat.id", "entitatId").
 			field("entitat.nom", "entitatNom").
+			field("entitat.oficina", "oficinaNom").
+			field("oficina", "oficina.codi").
+			field("oficinaNom", "oficina.nom").
 			byDefault().
 			register();
 		
@@ -149,6 +162,26 @@ public class ConversioTipusHelper {
 //			field("organGestor.codi", "organGestor").
 //			byDefault().
 //			register();
+
+		mapperFactory.classMap(NodeDir3.class, OrganGestorDto.class).
+			field("denominacio", "nom").
+			byDefault().
+			register();
+		
+		mapperFactory.classMap(ObjetoDirectorio.class, OrganGestorDto.class).
+			field("denominacio", "nom").
+			byDefault().
+			register();
+		
+		mapperFactory.classMap(CodiValor.class, CodiValorDto.class).
+			field("id", "codi").
+			field("descripcio", "valor").
+			byDefault().
+			register();
+		mapperFactory.classMap(NotificacioEnviamentEntity.class, NotificacioEnviamentDtoV2.class).
+		field("notificacio.id", "notificacioId").
+		byDefault().
+		register();
 	
 	}
 
@@ -208,6 +241,22 @@ public class ConversioTipusHelper {
 				if (event != null) {
 					notificacioEnviamentDto.setNotificaErrorData(event.getData());
 					notificacioEnviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
+				}
+			}
+		}
+	}
+
+	public class NotificacioEnviamentEntitytoDatatableMapper extends CustomMapper<NotificacioEnviamentEntity, NotificacioEnviamentDatatableDto> {
+		@Override
+		public void mapAtoB(
+				NotificacioEnviamentEntity notificacioEnviamentEntity,
+				NotificacioEnviamentDatatableDto notificacioEnviamentDto,
+				MappingContext context) {
+			if (notificacioEnviamentEntity.isNotificaError()) {
+				NotificacioEventEntity event = notificacioEnviamentEntity.getNotificacioErrorEvent();
+				if (event != null) {
+					notificacioEnviamentDto.setNotificacioErrorData(event.getData());
+					notificacioEnviamentDto.setNotificacioErrorDescripcio(event.getErrorDescripcio());
 				}
 			}
 		}

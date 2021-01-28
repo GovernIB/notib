@@ -135,6 +135,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		try {
 			logger.info(" >>> Enviant notificació...");
 			ResultadoAltaRemesaEnvios resultadoAlta = enviaNotificacio(notificacio);
+			notificacio.updateNotificaEnviamentData();
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
 				logger.info(" >>> ... OK");
 				

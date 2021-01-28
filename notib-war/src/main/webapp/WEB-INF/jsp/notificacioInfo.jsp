@@ -7,6 +7,15 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 
+<%
+	pageContext.setAttribute(
+			"isRolActualAdministradorEntitat",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
+	pageContext.setAttribute(
+			"isRolActualAdministradorOrgan",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
+%>
+
 <html>
 <head>
 <title><spring:message code="notificacio.info.titol" /></title>
@@ -112,7 +121,7 @@ $(document).ready(function() {
 				<spring:message code="notificacio.info.tab.events" />
 			</a>
 		</li>
-		<c:if test="${permisGestio == null || permisGestio}">
+		<c:if test="${permisGestio == null || permisGestio || isRolActualAdministradorEntitat || isRolActualAdministradorOrgan}">
 			<li role="presentation">
 				<a href="#accions" aria-controls="accions" role="tab" data-toggle="tab"> 
 					<spring:message code="notificacio.info.tab.accions" />
@@ -170,6 +179,11 @@ $(document).ready(function() {
 							<td><strong><spring:message code="notificacio.info.dada.procediment.codi" /></strong></td>
 							<td>${notificacio.procediment.nom}<br>${notificacio.procediment.codi}</td>
 						</tr>
+						<c:if test="${!notificacio.hasEnviamentsPendents}">
+							<tr>
+								<td colspan="2"><a href="<c:url value="/notificacio/${notificacio.id}/justificant"/>" data-toggle="modal" data-height="250px" data-refresh="true" class="btn btn-default btn-sm pull-right"><spring:message code="comu.boto.justificant"/>&nbsp;<span class="fa fa-download"></span></a></td>
+							</tr>
+						</c:if>
 					</tbody>
 				</table>
 			</div>

@@ -248,8 +248,10 @@ public class ProcedimentPermisController extends BaseUserController{
 			organismeActual.setNom("Global");
 		}
 		int index = organismes.indexOf(organismeActual);
-		organismes.remove(index);
-		organismes.add(0, organismeActual);
+		if (index != -1) {
+			organismes.remove(index);
+			organismes.add(0, organismeActual);
+		}
 		return organismes;
 	}
 	

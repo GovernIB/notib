@@ -1,5 +1,41 @@
 package es.caib.notib.core.helper;
 
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.exception.SistemaExternException;
+import es.caib.notib.core.entity.DocumentEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.PersonaEntity;
+import es.caib.notib.plugin.conversio.ConversioArxiu;
+import es.caib.notib.plugin.conversio.ConversioPlugin;
+import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
+import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
+import es.caib.notib.plugin.gesconadm.GcaProcediment;
+import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
+import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
+import es.caib.notib.plugin.unitat.CodiValor;
+import es.caib.notib.plugin.unitat.CodiValorPais;
+import es.caib.notib.plugin.unitat.NodeDir3;
+import es.caib.notib.plugin.unitat.ObjetoDirectorio;
+import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
+import es.caib.notib.plugin.usuari.DadesUsuari;
+import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
+import es.caib.plugins.arxiu.api.ArxiuException;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Component;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -17,18 +53,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.AnexoWsDto;
@@ -43,6 +67,7 @@ import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.RegistreAnnexDto;
@@ -53,18 +78,7 @@ import es.caib.notib.core.api.dto.RegistreOrigenDtoEnum;
 import es.caib.notib.core.api.dto.RegistreTipusDocumentDtoEnum;
 import es.caib.notib.core.api.dto.RegistreTipusDocumentalDtoEnum;
 import es.caib.notib.core.api.dto.RegistreValidezDocumentDtoEnum;
-import es.caib.notib.core.api.exception.SistemaExternException;
-import es.caib.notib.core.entity.DocumentEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.PersonaEntity;
-import es.caib.notib.plugin.conversio.ConversioArxiu;
-import es.caib.notib.plugin.conversio.ConversioPlugin;
-import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
-import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
-import es.caib.notib.plugin.gesconadm.GcaProcediment;
-import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
-import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.DadesInteressat;
@@ -81,18 +95,7 @@ import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
 import es.caib.notib.plugin.registre.TipusAssumpte;
 import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
-import es.caib.notib.plugin.unitat.CodiValor;
-import es.caib.notib.plugin.unitat.CodiValorPais;
-import es.caib.notib.plugin.unitat.NodeDir3;
-import es.caib.notib.plugin.unitat.ObjetoDirectorio;
-import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
-import es.caib.notib.plugin.usuari.DadesUsuari;
-import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
-import es.caib.plugins.arxiu.api.ArxiuException;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentContingut;
-import es.caib.plugins.arxiu.api.IArxiuPlugin;
-
+import es.caib.notib.plugin.unitat.OficinaSIR;
 /**
  * Helper per a interactuar amb els plugins.
  * 
@@ -103,6 +106,8 @@ public class PluginHelper {
 
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
+	public static final String GESDOC_AGRUPACIO_TEMPORALS = "tmp";
+	
 
 	private DadesUsuariPlugin dadesUsuariPlugin;
 	private GestioDocumentalPlugin gestioDocumentalPlugin;
@@ -115,51 +120,11 @@ public class PluginHelper {
 	
 	@Autowired
 	private IntegracioHelper integracioHelper;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
 	
 	// REGISTRE
 	// /////////////////////////////////////////////////////////////////////////////////////
-	
-	public RespostaConsultaRegistre registreSortidaAsientoRegistral(
-			String codiDir3Entitat, 
-			NotificacioEntity notificacio, 
-			NotificacioEnviamentEntity enviament, 
-			Long tipusOperacio) throws RegistrePluginException {
-		
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_REGISTRE, 
-				"Enviament notificació a registre (SIR activat)", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
-				new AccioParam("Id de la notificacio", String.valueOf(notificacio.getId())),
-				new AccioParam("Id de l'enviament", String.valueOf(enviament.getId())),
-				new AccioParam("Tipus d'operacio", String.valueOf(tipusOperacio)));
-		
-		RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
-		
-		try {
-			resposta = getRegistrePlugin().salidaAsientoRegistral(
-					codiDir3Entitat, 
-					notificacioToAsientoRegistralBean(
-							notificacio, 
-							enviament), 
-					tipusOperacio);
-			
-			if (resposta.getErrorCodi() == null) {
-				integracioHelper.addAccioOk(info);
-			} else {
-				integracioHelper.addAccioError(info, "Error creant assentament registral: " + resposta.getErrorDescripcio());
-			}
-		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de registre";
-			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			if (ex.getCause() != null) {
-				errorDescripcio += " :" + ex.getCause().getMessage();
-			}
-			resposta.setErrorDescripcio(errorDescripcio);
-		}
-		
-		return resposta;
-	}
 	
 	public RespostaConsultaRegistre crearAsientoRegistral(
 			String codiDir3Entitat, 
@@ -490,6 +455,38 @@ public class PluginHelper {
 		}
 	
 		return oficinesDto;
+	}
+	
+	public List<OficinaDto> oficinesSIRUnitat(
+			String unitatCodi, 
+			Map<String, NodeDir3> arbreUnitats) throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenir llista de les oficines SIR d'una unitat organitzativa", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				new AccioParam("Text de la cerca", unitatCodi));
+
+		List<OficinaSIR> oficinesTF = null;
+		List<OficinaDto> oficinesSIR = null;
+		try {
+			oficinesTF = getUnitatsOrganitzativesPlugin().oficinesSIRUnitat(
+					unitatCodi,
+					arbreUnitats);
+			oficinesSIR = conversioTipusHelper.convertirList(
+					oficinesTF, 
+					OficinaDto.class);
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistar organismes  a partir d'un text";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+	
+		return oficinesSIR;
 	}
 	
 	public List<LlibreOficina> llistarLlibresOficines(
@@ -1047,6 +1044,122 @@ public class PluginHelper {
 		return denominacio;
 		
 	}
+	
+	
+	public List<OrganGestorDto> cercaUnitats(
+			String codi, 
+			String denominacio,
+			Long nivellAdministracio, 
+			Long comunitatAutonoma, 
+			Boolean ambOficines, 
+			Boolean esUnitatArrel,
+			Long provincia, 
+			String municipi) throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenir llista de tots els organismes a partir d'un text", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				new AccioParam("Text de la cerca", codi));
+
+		List<NodeDir3> organismesNodeDir3 = null;
+		List<OrganGestorDto> organismes = null;
+		try {
+			organismesNodeDir3 = getUnitatsOrganitzativesPlugin().cercaUnitats(codi, denominacio.replaceAll(" ", "%20"), nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
+			organismes = conversioTipusHelper.convertirList(organismesNodeDir3, OrganGestorDto.class);
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistar organismes  a partir d'un text";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+	
+		return organismes;
+	}
+	
+	
+	public List<OrganGestorDto> unitatsPerCodi(String codi) throws SistemaExternException {
+		return cercaUnitats(codi,null,null,null,null,null,null,null);
+	}
+	
+	
+	public List<OrganGestorDto> unitatsPerDenominacio(String denominacio) throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenir llista de tots els organismes a partir d'un text", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				new AccioParam("Text de la cerca", denominacio));
+
+		List<ObjetoDirectorio> organismesDir3 = null;
+		List<OrganGestorDto> organismes = null;
+		try {
+			organismesDir3 = getUnitatsOrganitzativesPlugin().unitatsPerDenominacio(denominacio);
+			organismes = conversioTipusHelper.convertirList(organismesDir3, OrganGestorDto.class);
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistar organismes  a partir d'un text";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+	
+		return organismes;
+	}
+	
+	
+	public List<CodiValor> llistarNivellsAdministracions() throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenint llista dels nivells de les administracions", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT);
+		
+		List<CodiValor> nivellsAdministracio = null;
+		try {
+			nivellsAdministracio = getUnitatsOrganitzativesPlugin().nivellsAdministracio();
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistar els nivells de les administracions";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+		
+		return nivellsAdministracio;
+	}
+	
+	public List<CodiValor> llistarComunitatsAutonomes() throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenint llista les comunitats autònomes", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT);
+		
+		List<CodiValor> comunitatsAutonomes = null;
+		try {
+			comunitatsAutonomes = getUnitatsOrganitzativesPlugin().comunitatsAutonomes();
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistar les comunitats autònomes";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+		
+		return comunitatsAutonomes;
+	}
+
+	
 
 	public List<CodiValorPais> llistarPaisos() throws SistemaExternException {
 		
@@ -1081,6 +1194,29 @@ public class PluginHelper {
 		List<CodiValor> provincies = null;
 		try {
 			provincies = getUnitatsOrganitzativesPlugin().provincies();
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistat províncies";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+		
+		return provincies;
+	}
+	
+	public List<CodiValor> llistarProvincies(String codiCA) throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenint llista de províncies", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT);
+		
+		List<CodiValor> provincies = null;
+		try {
+			provincies = getUnitatsOrganitzativesPlugin().provincies(codiCA);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistat províncies";
@@ -1635,8 +1771,9 @@ public class PluginHelper {
 		
 		//Salida
 		registre.setTipoRegistro(2L);
-		
-		registre.setResumen(notificacio.getConcepte());
+
+		String tipusEnv = NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus()) ? "Notificacio" : "Comunicacio";
+		registre.setResumen(tipusEnv + " - " + notificacio.getConcepte());
 		/* 1 = Documentació adjunta en suport Paper
 		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper
 		 * 3 = Documentació adjunta digitalitzada */
@@ -1647,7 +1784,7 @@ public class PluginHelper {
 			registre.setCodigoAsunto(notificacio.getProcediment().getCodiAssumpte());
 			registre.setCodigoAsuntoDenominacion(notificacio.getProcediment().getCodiAssumpte());
 		}
-		registre.setIdioma(1L);
+		registre.setIdioma(notificacio.getIdioma() != null ? (notificacio.getIdioma().ordinal() + 1) : 1L);
 //		registre.setReferenciaExterna(notificacio.getRefExterna());
 		registre.setNumeroExpediente(notificacio.getNumExpedient());
 		/*
@@ -1661,15 +1798,15 @@ public class PluginHelper {
 		 * '07' : Altres
 		 * 
 		 * */
-		if(notificacio.getPagadorPostal() != null) {
-			registre.setTipoTransporte("02");
-		}else {
-			registre.setTipoTransporte("07");
-		}
+//		if(notificacio.getPagadorPostal() != null) {
+//			registre.setTipoTransporte("02");
+//		}else {
+//			registre.setTipoTransporte("07");
+//		}
 		if (notificacio.getProcediment() != null)
 			registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
 		registre.setCodigoUsuario(notificacio.getUsuariCodi());
-		registre.setAplicacionTelematica("NOTIB");
+		registre.setAplicacionTelematica("NOTIB v." + CacheHelper.appVersion);
 		registre.setAplicacion("RWE");
 		registre.setVersion("3.1");
 		registre.setObservaciones("Notib: " + notificacio.getUsuariCodi());
@@ -1751,7 +1888,8 @@ public class PluginHelper {
 		
 		registre.setTipoRegistro(2L);
 
-		registre.setResumen(notificacio.getConcepte());
+		String tipusEnv = NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus()) ? "Notificacio" : "Comunicacio";
+		registre.setResumen(tipusEnv + " - " + notificacio.getConcepte());
 		/* 1 = Documentació adjunta en suport Paper
 		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper
 		 * 3 = Documentació adjunta digitalitzada */
@@ -1762,7 +1900,7 @@ public class PluginHelper {
 			registre.setCodigoAsunto(notificacio.getProcediment().getCodiAssumpte());
 			registre.setCodigoAsuntoDenominacion(notificacio.getProcediment().getCodiAssumpte());
 		}
-		registre.setIdioma(1L);
+		registre.setIdioma(notificacio.getIdioma() != null ? (notificacio.getIdioma().ordinal() + 1) : 1L);
 //		registre.setReferenciaExterna(notificacio.getRefExterna());
 		registre.setNumeroExpediente(notificacio.getNumExpedient());
 		/*
@@ -1776,15 +1914,15 @@ public class PluginHelper {
 		 * '07' : Altres
 		 * 
 		 * */
-		if(notificacio.getPagadorPostal() != null) {
-			registre.setTipoTransporte("02");
-		}else {
-			registre.setTipoTransporte("07");
-		}
+//		if(notificacio.getPagadorPostal() != null) {
+//			registre.setTipoTransporte("02");
+//		}else {
+//			registre.setTipoTransporte("07");
+//		}
 		if (notificacio.getProcediment() != null)
 			registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
 		registre.setCodigoUsuario(notificacio.getUsuariCodi());
-		registre.setAplicacionTelematica("NOTIB");
+		registre.setAplicacionTelematica("NOTIB v." + CacheHelper.appVersion);
 		registre.setAplicacion("RWE");
 		registre.setVersion("3.1");
 		registre.setObservaciones("Notib: " + notificacio.getUsuariCodi());
@@ -2062,9 +2200,13 @@ public class PluginHelper {
 			NotificacioEntity notificacio,
 			DadesOficina dadesOficina,
 			String dir3Codi) throws RegistrePluginException {
-		if (notificacio.getEntitat().getOficina() != null) {
+		if (notificacio.getEntitat().isOficinaEntitat() && notificacio.getEntitat().getOficina() != null) {
 			dadesOficina.setOficinaCodi(notificacio.getEntitat().getOficina());
 			dadesOficina.setOficinaNom(notificacio.getEntitat().getOficina());
+		} else if (!notificacio.getEntitat().isOficinaEntitat() && notificacio.getOrganGestor().getOficina() != null) {
+			OrganGestorEntity organGestor = notificacio.getOrganGestor();
+			dadesOficina.setOficinaCodi(organGestor.getOficina());
+			dadesOficina.setOficinaNom(organGestor.getOficinaNom());
 		} else {
 			OficinaDto oficinaVirtual = llistarOficinaVirtual(
 					dir3Codi,

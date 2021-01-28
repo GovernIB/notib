@@ -76,6 +76,14 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	protected String llibre;
 	@Column(name = "llibre_nom")
 	protected String llibreNom;
+	@Column(name = "oficina_entitat")
+	private boolean oficinaEntitat;
+//	@OneToMany(
+//			mappedBy = "entitat",
+//			fetch = FetchType.LAZY,
+//			cascade = CascadeType.ALL,
+//			orphanRemoval = true)
+//	protected List<OrganGetorEntity> organsGestors  = new ArrayList<OrganGetorEntity>();
 
 	@Version
 	private long version = 0;
@@ -99,7 +107,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			String nomOficinaVirtual,
 			boolean llibreEntitat,
 			String llibre,
-			String llibreNom) {
+			String llibreNom,
+			boolean oficinaEntitat) {
 		this.codi = codi;
 		this.nom = nom;
 		this.descripcio = descripcio;
@@ -119,6 +128,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 		this.llibreEntitat = llibreEntitat;
 		this.llibre = llibre;
 		this.llibreNom = llibreNom;
+		this.oficinaEntitat = oficinaEntitat;
 	}
 
 	public void updateActiva(
@@ -144,7 +154,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			String nomOficinaVirtual,
 			boolean llibreEntitat,
 			String llibre,
-			String llibreNom) {
+			String llibreNom,
+			boolean oficinaEntitat) {
 		return new Builder(
 				codi,
 				nom,
@@ -163,7 +174,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				nomOficinaVirtual,
 				llibreEntitat,
 				llibre,
-				llibreNom);
+				llibreNom,
+				oficinaEntitat);
 	}
 
 	public static class Builder {
@@ -186,7 +198,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				String nomOficinaVirtual,
 				boolean llibreEntitat,
 				String llibre,
-				String llibreNom) {
+				String llibreNom,
+				boolean oficinaEntitat) {
 			built = new EntitatEntity();
 			built.codi = codi;
 			built.nom = nom;
@@ -207,6 +220,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			built.llibreEntitat = llibreEntitat;
 			built.llibre = llibre;
 			built.llibreNom = llibreNom;
+			built.oficinaEntitat = oficinaEntitat;
 		}
 		public Builder descripcio(String descripcio) {
 			built.descripcio = descripcio;

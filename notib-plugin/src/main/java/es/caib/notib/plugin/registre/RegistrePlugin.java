@@ -6,19 +6,19 @@ import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
 
 public interface RegistrePlugin {
 	
-	/**
-	 * Crea un registre de sortida
-	 * 
-	 * @param registreSortida	Objecte registreSortida amb les dades a enviar de l'anotació
-	 * @param aplicacion	Aplicació que realitza el registre de sortida
-	 * @return
-	 * 		Retorna un objecte amb la resposta del regweb (data, numero i numero formatejat)
-	 * 
-	 * @throws RegistrePluginException
-	 */
-	public RespostaAnotacioRegistre registrarSalida(
-			RegistreSortida registreSortida,
-			String aplicacion) throws RegistrePluginException;
+//	/**
+//	 * Crea un registre de sortida
+//	 *
+//	 * @param registreSortida	Objecte registreSortida amb les dades a enviar de l'anotació
+//	 * @param aplicacion	Aplicació que realitza el registre de sortida
+//	 * @return
+//	 * 		Retorna un objecte amb la resposta del regweb (data, numero i numero formatejat)
+//	 *
+//	 * @throws RegistrePluginException
+//	 */
+//	public RespostaAnotacioRegistre registrarSalida(
+//			RegistreSortida registreSortida,
+//			String aplicacion) throws RegistrePluginException;
 	
 	/**
 	 * Crea un assentament registral

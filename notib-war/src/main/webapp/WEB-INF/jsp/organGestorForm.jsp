@@ -70,7 +70,13 @@ $(document).ready(function() {
 						"id": val.codi,
 						"text": val.codi + " - " + val.nom
 					});
-					selOrganismes.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
+					if (val.codi == "${organGestorCommand.codi}") {
+						selOrganismes.append("<option value=\"" + val.codi + "\" selected>" + val.codi + " - " + val.nom + "</option>");
+
+						$('#selOrganismes').trigger('change');
+					} else {
+						selOrganismes.append("<option value=\"" + val.codi + "\">" + val.codi + " - " + val.nom + "</option>");
+					}
 				});
 			}
 			$(".loading-screen").hide();
@@ -79,15 +85,16 @@ $(document).ready(function() {
 			console.log("error obtenint els organismes...");
 		}
 	});
-
+	var organSeleccionatValue;
 	$('#selOrganismes').on('change', function(){
 		var organSelect = document.getElementById('selOrganismes');
-		var organSeleccionatValue = organSelect.options[organSelect.selectedIndex].value;
+		organSeleccionatValue = organSelect.options[organSelect.selectedIndex].value;
 		var organSeleccionatText = organSelect.options[organSelect.selectedIndex].text;
 		$('#codi').val(organSeleccionatValue);
 		$('#nom').val(organSeleccionatText.substring(organSeleccionatValue.length + 3));
 		
 		<c:if test="${setLlibre}">
+		$(".loading-screen").show();
 		if (organSeleccionatValue !== undefined && organSeleccionatValue !== '') {
 			$.ajax({
 				type: 'GET',
@@ -102,7 +109,11 @@ $(document).ready(function() {
 							"id": data.codi,
 							"text": data.codi + " - " + data.nomLlarg
 						});
-						selLlibres.append("<option value=\"" + data.codi + "\">" + data.codi + " - " + data.nomLlarg + "</option>");
+						if (data.codi == "${organGestorCommand.llibre}") {
+							selLlibres.append("<option value=\"" + data.codi + "\" selected>" + data.codi + " - " + data.nomLlarg + "</option>");
+						} else {
+							selLlibres.append("<option value=\"" + data.codi + "\">" + data.codi + " - " + data.nomLlarg + "</option>");
+						}
 					}
 					$(".loading-screen").hide();
 				},
@@ -122,8 +133,58 @@ $(document).ready(function() {
 			$('#llibreNom').val(llibreSeleccionatText);
 		});
 		</c:if>
+		getOficines(organSeleccionatValue);
 	});
+	getOficines(organSeleccionatValue);
 });
+			
+	function getOficines(organSeleccionatValue) {
+		<c:if test="${setOficina}">
+			if ((organSeleccionatValue !== undefined && organSeleccionatValue !== '') || ("${organGestorCommand.codi}" !== "")) {
+				$(".loading-screen").show();
+				var organ = organSeleccionatValue || "${organGestorCommand.codi}";
+				$.ajax({
+					type: 'GET',
+					url: "<c:url value="/organgestor/oficines/"/>" + organ,
+					success: function(data) {
+						var selOficines = $('#selOficines');
+						selOficines.empty();
+						selOficines.append("<option value=\"\"></option>");
+						if (data) {
+							data.forEach(function(oficina) {
+								var items = [];
+								items.push({
+									"id": oficina.codi,
+									"text": oficina.codi + " - " + oficina.nom
+								});
+								if (oficina.codi == "${organGestorCommand.oficina}") {
+									selOficines.append("<option value=\"" + oficina.codi + "\" selected>" + oficina.nom + "</option>");
+								} else {
+									selOficines.append("<option value=\"" + oficina.codi + "\">" + oficina.nom + "</option>");
+								}
+							})
+						}
+						$(".loading-screen").hide();
+					},
+					error: function() {
+						console.log("error obtenint les oficines...");
+					}
+				});
+			} else {
+				if ("${organGestorCommand.codi}" !== "") {
+					alert('<spring:message code="procediment.form.avis.oficines"/>');
+				}
+			}
+				
+			$('#selOficines').on('change', function(){
+				var oficinaSelect = document.getElementById('selOficines');
+				var oficinaSeleccionatValue = oficinaSelect.options[oficinaSelect.selectedIndex].value;
+				var oficinaSeleccionatText = oficinaSelect.options[oficinaSelect.selectedIndex].text;
+				$('#oficina').val(oficinaSeleccionatValue);
+				$('#oficinaNom').val(oficinaSeleccionatText);
+			});
+		</c:if>
+	}
 </script>
 </head>
 <body>
@@ -131,15 +192,24 @@ $(document).ready(function() {
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="organGestorCommand" role="form">
 		<form:hidden path="entitatId" value="${entitat.id}"/>
 		<div role="tabpanel" class="tab-pane active" id="dadesgeneralsForm">
+			<form:hidden path="id"/>
 			<form:hidden path="codi"/>
 			<form:hidden path="nom"/>
-			<select id="selOrganismes" data-placeholder="<spring:message code="organgestor.form.camp.organisme"/>"></select> 
-			<c:if test="${setLlibre}">
+			<c:if test="${!isModificacio}">
+				<select id="selOrganismes" data-placeholder="<spring:message code="organgestor.form.camp.organisme"/>"></select> 
+				<c:if test="${setLlibre}">
+					<br/>
+					<form:hidden path="llibre"/>
+					<form:hidden path="llibreNom"/>
+					<select id="selLlibres" data-placeholder="<spring:message code="organgestor.form.camp.llibre"/>"></select>
+					<p class="comentari"><spring:message code="organgestor.form.camp.llibre.info"/></p>
+				</c:if>
+			</c:if>
+			<c:if test="${setOficina}">
 				<br/>
-				<form:hidden path="llibre"/>
-				<form:hidden path="llibreNom"/>
-				<select id="selLlibres" data-placeholder="<spring:message code="organgestor.form.camp.llibre"/>"></select>
-				<p class="comentari"><spring:message code="organgestor.form.camp.llibre.info"/></p>
+				<form:hidden path="oficina"/>
+				<form:hidden path="oficinaNom"/>
+				<select id="selOficines" data-placeholder="<spring:message code="organgestor.form.camp.oficina"/>"></select>
 			</c:if>
 			<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
 				<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">

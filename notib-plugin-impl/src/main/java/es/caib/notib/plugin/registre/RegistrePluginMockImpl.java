@@ -26,24 +26,6 @@ import es.caib.notib.plugin.utils.PropertiesHelper;
 public class RegistrePluginMockImpl implements RegistrePlugin{
 	
 	@Override
-	@Deprecated
-	public RespostaAnotacioRegistre registrarSalida(
-			RegistreSortida registreSortida,
-			String aplicacion) throws RegistrePluginException {
-		
-		RespostaAnotacioRegistre resposta = new RespostaAnotacioRegistre();
-		
-		Date data = new Date();
-		Integer[] registre = readRegistreFile(data, true);
-		
-        resposta.setData(data);
-        resposta.setNumero(String.valueOf(registre[1]));
-        resposta.setNumeroRegistroFormateado(registre[1] + "/" + registre[0]);
-//        resposta.setErrorCodi("OK");
-        return resposta;
-	}
-	
-	@Override
 	public RespostaConsultaRegistre salidaAsientoRegistral(
 			String codiDir3Entitat, 
 			AsientoRegistralBeanDto arb, 

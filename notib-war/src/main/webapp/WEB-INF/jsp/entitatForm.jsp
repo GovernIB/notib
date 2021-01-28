@@ -163,7 +163,15 @@ $(document).ready(function() {
 	if (!$('#llibreEntitat').checked) {
 		$('#llibre-entitat').hide();
 	}
-// 	$('#llibreEntitat').trigger("change");
+	
+	$('#oficinaEntitat').change(function() {
+		if (this.checked) {
+			$('#oficina').closest('.form-group').show();
+		} else {
+			$('#oficina').closest('.form-group').hide();
+		}
+	});
+ 	$('#oficinaEntitat').trigger("change");
 	loadOficines();
 });	
 
@@ -194,7 +202,6 @@ function updateOficines(dir3codi) {
 							"id": val.codi,
 							"text": val.codi + " - " + val.nom
 						});
-						console.log(oficinaActual);
 						selOficines.append("<option value=\"" + val.codi + "\"" + (oficinaActual == val.codi ? "selected" :  "") + ">" + val.codi + " - " + val.nom + "</option>");									
 					});
 				}
@@ -253,7 +260,7 @@ function updateLlibre(dir3codi) {
 			<not:inputCheckbox name="llibreEntitat" textKey="entitat.form.camp.llibreEntitat"/>
 			<div id="llibre-entitat">
 				<div class="form-group">
-					<label class="control-label col-xs-4 " for="llibreCodiNom"><spring:message code="entitat.form.camp.llibre" /> *</label>
+					<label class="control-label col-xs-4 " for="llibreCodiNom"><spring:message code="entitat.form.camp.llibre" />*</label>
 					<div class="col-xs-8">
 						<input id="llibreCodiNom" name="llibreCodiNom" class="form-control addBoto" readonly="readonly" type="text" value="${entitatCommand.llibreCodiNom}">
 						<button id="refreshLlibre" type="button" class="btn btn-default botoAdded"><span class="fa fa-refresh"></span></button>
@@ -261,6 +268,7 @@ function updateLlibre(dir3codi) {
 					</div>
 				</div>
 			</div>
+			<not:inputCheckbox name="oficinaEntitat" textKey="entitat.form.camp.oficinaEntitat"/>
 			<not:inputSelect name="oficina" textKey="entitat.form.camp.oficina" required="true" optionMinimumResultsForSearch="0"/>
 			<not:inputTextarea name="descripcio" textKey="entitat.form.camp.descripcio"/>
 		</div>

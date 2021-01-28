@@ -5,10 +5,14 @@ package es.caib.notib.core.helper;
 
 import java.util.Locale;
 
+import es.caib.notib.core.api.dto.UsuariDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.stereotype.Component;
+
+import es.caib.notib.core.api.service.AplicacioService;
 
 /**
  * Helper per a mostrar missatges multiidioma.
@@ -20,6 +24,9 @@ public class MessageHelper implements MessageSourceAware {
 
 	private MessageSource messageSource;
 
+	@Autowired
+	private AplicacioService aplicacioService;
+	
 	public String getMessage(String[] keys, Object[] vars, Locale locale) {
 		String msg = "???" + (keys.length > 0 ? keys[keys.length-1] : "") + "???";
 		boolean found = false;
@@ -45,6 +52,13 @@ public class MessageHelper implements MessageSourceAware {
 	}
 	public String getMessage(String key, Object[] vars, Locale locale) {
 		try {
+			if (locale == null) {
+				String lang = "ca";
+				UsuariDto usuariActual = aplicacioService.getUsuariActual();
+				if (usuariActual != null && usuariActual.getIdioma() != null && !usuariActual.getIdioma().isEmpty())
+					lang = usuariActual.getIdioma();
+				locale = new Locale(lang);
+			}
 			return messageSource.getMessage(
 					key,
 					vars,

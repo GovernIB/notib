@@ -3,17 +3,15 @@
  */
 package es.caib.notib.core.api.ws.notificacio;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-
+import es.caib.notib.core.api.dto.IdiomaEnumDto;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.builder.ToStringBuilder;
+
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Informació d'una notificació per al seu enviament.
@@ -40,6 +38,7 @@ public class NotificacioV2 {
 	private String grupCodi;
 	private String numExpedient;
 	private List<Enviament> enviaments;
+	private IdiomaEnumDto idioma;
 	
 	@Override
 	public String toString() {

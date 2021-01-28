@@ -358,8 +358,19 @@ public class AplicacioServiceImpl implements AplicacioService {
 		}
 	}
 
+	@Override
+	public String getAppVersion() {
+		return CacheHelper.appVersion;
+	}
+	@Override
+	public void setAppVersion(String appVersion) {
+		CacheHelper.appVersion = appVersion;
+	}
+
 	private UsuariDto toUsuariDtoAmbRols(
 			UsuariEntity usuari) {
+		if (usuari == null)
+			return null;
 		UsuariDto dto = conversioTipusHelper.convertir(
 				usuari,
 				UsuariDto.class);

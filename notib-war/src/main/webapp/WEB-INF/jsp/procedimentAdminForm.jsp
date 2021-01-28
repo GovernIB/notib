@@ -226,10 +226,14 @@ $(document).ready(function() {
 				<not:inputText name="nom" textKey="procediment.form.camp.nom" required="true" labelSize="2" inputMaxLength="256"/>
 				<not:inputText name="retard" textKey="procediment.form.camp.retard" labelSize="2"/>
 				<not:inputText name="caducitat" textKey="procediment.form.camp.caducitat" labelSize="2"/>
-				<c:if test="${isRolActualAdministradorEntitat}">
-					<not:inputCheckbox name="comu" textKey="procediment.form.camp.comu" labelSize="2"/>
-					
-				</c:if>
+				<c:choose>
+					<c:when test="${isRolActualAdministradorEntitat}">
+						<not:inputCheckbox name="comu" textKey="procediment.form.camp.comu" labelSize="2"/>
+					</c:when>
+					<c:otherwise>
+						<form:hidden path="comu"/>
+					</c:otherwise>
+				</c:choose>
 				<not:inputTextSearch  name="organGestorNom" textKey="procediment.form.camp.organ" searchButton="searchOrgan" required="true" readonly="true" labelSize="2"/>
 				<form:hidden path="entitatId" value="${entitat.id}"/>
 				<form:hidden path="organGestor"/>

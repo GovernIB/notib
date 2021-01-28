@@ -5,6 +5,7 @@ import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.OrganNoRepetit;
@@ -31,22 +32,33 @@ public class OrganGestorCommand {
 	private String entitatNom;
 	private String llibre;
 	private String llibreNom;
-	
+	private String oficina;
+	private String oficinaNom;
 	public static OrganGestorCommand asCommand(OrganGestorDto dto) {
 		if (dto == null) {
 			return null;
 		}
-		return ConversioTipusHelper.convertir(
+		OrganGestorCommand command = ConversioTipusHelper.convertir(
 				dto,
-				OrganGestorCommand.class );
+				OrganGestorCommand.class);
+		if (dto.getOficina() != null) {
+			command.setOficina(dto.getOficina().getCodi());
+			command.setOficinaNom(dto.getOficina().getNom());
+		}
+		return command;
 	}
 	public static OrganGestorDto asDto(OrganGestorCommand command) {
 		if (command == null) {
 			return null;
 		}
-		return ConversioTipusHelper.convertir(
+		OrganGestorDto organGestorDto = ConversioTipusHelper.convertir(
 				command,
 				OrganGestorDto.class);
+		OficinaDto oficina = new OficinaDto();
+		oficina.setCodi(command.getOficina());
+		oficina.setNom(command.getOficinaNom());
+		organGestorDto.setOficina(oficina);
+		return organGestorDto;
 	}
 
 	@Override

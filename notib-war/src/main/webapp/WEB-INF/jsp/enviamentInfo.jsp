@@ -464,7 +464,7 @@ $(document).ready(function() {
 										<td>
 										<div></div>
 											${enviament.notificaCertificacioArxiuNom}
-											<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/certificacioDescarregar"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience" title="<spring:message code="notificacio.info.document.descarregar"/>"><span class="fa fa-download"></span></a>
+											<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/certificacioDescarregar"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience" title="<spring:message code="enviament.info.notifica.certificacio.num.descarregar"/>"><span class="fa fa-download"></span></a>
 										</td>
 									</tr>
 								</tbody>

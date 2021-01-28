@@ -48,22 +48,32 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			NotificacioEntity notificacio,
 			String notificaReferencia);
 	
+//	@Query(	" from NotificacioEnviamentEntity " +
+//			" where	notificacio = :notificacio " + 
+//			"	and (notificaEstatFinal = false " + 
+//			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIADA" +
+//			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.NOTIB_ENVIADA" +
+//			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIAT_SIR)" +
+//			" order by notificaEstatDataActualitzacio asc nulls first")
 	@Query(	" from NotificacioEnviamentEntity " +
 			" where	notificacio = :notificacio " + 
-			"	and (notificaEstatFinal = false " + 
-			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIADA" +
-			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.NOTIB_ENVIADA" +
-			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIAT_SIR)" +
+			"	and (notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT" +
+			"   		or notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REGISTRADA)" +
 			" order by notificaEstatDataActualitzacio asc nulls first")
 	List<NotificacioEnviamentEntity> findEnviamentsPendentsNotificaByNotificacio(@Param("notificacio") NotificacioEntity notificacio);
 	
+//	@Query(	" from NotificacioEnviamentEntity " +
+//			" where	notificacio = :notificacio " + 
+//			"	and (notificaEstatFinal = false " + 
+//			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REGISTRADA" +
+//			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIADA" +
+//			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.NOTIB_ENVIADA" +
+//			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIAT_SIR)" +
+//			" order by notificaEstatDataActualitzacio asc nulls first")
 	@Query(	" from NotificacioEnviamentEntity " +
 			" where	notificacio = :notificacio " + 
 			"	and (notificaEstatFinal = false " + 
-			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REGISTRADA" +
-			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIADA" +
-			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.NOTIB_ENVIADA" +
-			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIAT_SIR)" +
+			"   		and notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT)" +
 			" order by notificaEstatDataActualitzacio asc nulls first")
 	List<NotificacioEnviamentEntity> findEnviamentsPendentsByNotificacio(@Param("notificacio") NotificacioEntity notificacio);
 
@@ -190,7 +200,8 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:esDataRegistreFiNull = true or n.notificacio.registreData <= :dataRegistreFi) " +
 			"and ((:esProcedimentsCodisNotibNull = false and n.notificacio.procedimentCodiNotib is not null and n.notificacio.procedimentCodiNotib in (:procedimentsCodisNotib))" +	// Té permís sobre el procediment
 			"	or (:esOrgansGestorsCodisNotib = false and n.notificacio.organGestor.codi is not null and n.notificacio.organGestor.codi in (:organsGestorsCodisNotib)) " +						// Té permís sobre l'òrgan
-			"   or ((n.notificacio.procedimentCodiNotib is null or n.notificacio.procediment.comu = true) and n.notificacio.usuariCodi = :usuariCodi)) " +							// És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
+			"   or ((n.notificacio.procedimentCodiNotib is null or n.notificacio.procediment.comu = true) and n.notificacio.usuariCodi = :usuariCodi)" +
+			"   or (:esProcedimentOrgansIdsNotibNull = false and n.notificacio.procedimentOrgan is not null and n.notificacio.procedimentOrgan.id in (:procedimentOrgansIdsNotib))) " +							// És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
 			"and (n.notificacio.grupCodi = null or (n.notificacio.grupCodi in (:grupsProcedimentCodisNotib))) ")
 	Page<NotificacioEnviamentEntity> findByNotificacio(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
@@ -247,6 +258,8 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
 			@Param("esOrgansGestorsCodisNotib") boolean esOrgansGestorsCodisNotib,
 			@Param("organsGestorsCodisNotib") List<String> organsGestorsCodisNotib,
+			@Param("esProcedimentOrgansIdsNotibNull") boolean esProcedimentOrgansIdsNotibNull,
+			@Param("procedimentOrgansIdsNotib") List<Long> procedimentOrgansIdsNotib,
 			@Param("grupsProcedimentCodisNotib") List<String> grupsProcedimentCodisNotib,
 			@Param("usuariCodi") String usuariCodi,
 			Pageable pageable);

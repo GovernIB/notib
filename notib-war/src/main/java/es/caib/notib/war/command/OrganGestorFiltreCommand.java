@@ -17,6 +17,7 @@ public class OrganGestorFiltreCommand {
 	
 	private String codi;
 	private String nom;
+	private String oficina;
 	
 	public static OrganGestorFiltreCommand asCommand(OrganGestorFiltreDto dto) {
 		if (dto == null) {

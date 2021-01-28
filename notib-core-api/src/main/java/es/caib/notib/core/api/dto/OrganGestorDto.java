@@ -23,11 +23,18 @@ public class OrganGestorDto extends AuditoriaDto implements Serializable {
 	private String entitatNom;
 	private String llibre;
 	private String llibreNom;
+	private String oficinaNom;
 	private List<PermisDto> permisos;
+	private OficinaDto oficina;
 	
 	public String getLlibreCodiNom() {
 		if (llibre != null)
 			return llibre + " " + (llibreNom != null ? llibreNom : "");
+		return "";
+	}
+	public String getOficinaCodiNom() {
+		if (oficina != null)
+			return oficina.getCodi() + " " + (oficina.getNom() != null ? oficina.getNom() : "");
 		return "";
 	}
 	public int getPermisosCount() {

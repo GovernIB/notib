@@ -53,6 +53,7 @@ public class OrganNoRepetitValidator implements ConstraintValidator<OrganNoRepet
 		try {
 			
 			final String codi = command.getCodi();
+			final Long id = command.getId();
 			
 			// Comprovar codi no repetit
 			OrganGestorDto organGestor = null;
@@ -60,14 +61,14 @@ public class OrganNoRepetitValidator implements ConstraintValidator<OrganNoRepet
 				organGestor = organGestorService.findByCodi(command.getEntitatId(), codi);
 			} catch (NotFoundException e) {	}
 			
-			if (organGestor != null) {
+			if (organGestor != null && id == null) {
 				valid = false;
 				context.disableDefaultConstraintViolation();
 				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("organgestor.validation.codi.repetit")).addConstraintViolation();
 			}
 			
 			// Si el llibre es desa a l'òrgan, llavors comprovar que s'ha informat
-			if (!entitatService.findById(command.getEntitatId()).isLlibreEntitat()) {
+			if (!entitatService.findById(command.getEntitatId()).isLlibreEntitat() && id == null) {
 				if (command.getLlibre() == null || command.getLlibre().isEmpty()) {
 					valid = false;
 					context.disableDefaultConstraintViolation();

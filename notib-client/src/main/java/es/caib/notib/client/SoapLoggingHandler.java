@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Deprecated
 public class SoapLoggingHandler implements SOAPHandler<SOAPMessageContext> {
 
 	private Logger logger;

@@ -27,6 +27,15 @@ pageContext.setAttribute(
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<script type="text/javascript">
+	
+	var myHelpers = {hlpIsAdministradorEntitat: isRolActualAdministradorEntitat};
+
+	$.views.helpers(myHelpers);
+
+	function isRolActualAdministradorEntitat() {
+		return ${isRolActualAdministradorEntitat};
+	}
+	
 	$(document).ready(function() {
 		$('#nomesAmbErrors').val(false);
 		$('#btnNetejar').click(function() {
@@ -115,6 +124,7 @@ pageContext.setAttribute(
 				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
+					{^{if (~hlpIsAdministradorEntitat()) || (!~hlpIsAdministradorEntitat() && !comu) }}
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
@@ -122,6 +132,7 @@ pageContext.setAttribute(
 								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="procediment.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
 						</div>
+					{{/if}}
 					</script>
 				</th>
 			</tr>
