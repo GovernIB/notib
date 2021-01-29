@@ -59,6 +59,12 @@ public class NotificacioFiltreCommand {
 		return dto;
 	}
 
+	public NotificacioFiltreDto asDto() {
+		return ConversioTipusHelper.convertir(
+				this,
+				NotificacioFiltreDto.class);
+	}
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

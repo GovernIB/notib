@@ -462,6 +462,8 @@ $(document).ready(function() {
 		style="width:100%"
 		data-row-info="true"
 		data-filter="#filtre"
+		data-save-state="true"
+		data-mantenir-paginacio="true"
 		data-rowhref-template="#rowhrefTemplate"
 		data-rowhref-toggle="modal">
 		<thead>

@@ -64,14 +64,8 @@ import es.caib.notib.war.command.NotificacioCommandV2;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
 import es.caib.notib.war.command.OrganGestorFiltreCommand;
 import es.caib.notib.war.command.PersonaCommand;
-import es.caib.notib.war.helper.CaducitatHelper;
-import es.caib.notib.war.helper.DatatablesHelper;
+import es.caib.notib.war.helper.*;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.notib.war.helper.EntitatHelper;
-import es.caib.notib.war.helper.EnumHelper;
-import es.caib.notib.war.helper.MissatgesHelper;
-import es.caib.notib.war.helper.PropertiesHelper;
-import es.caib.notib.war.helper.RolHelper;
 import lombok.Data;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -144,15 +138,8 @@ public class NotificacioController extends BaseUserController {
             HttpServletRequest request,
             Model model) {
 
-        request.getSession().removeAttribute(NOTIFICACIONS_FILTRE);
-        NotificacioFiltreCommand notificacioFiltreCommand = new NotificacioFiltreCommand();
-        if (getLast3months()) {
-            Calendar cal = new GregorianCalendar();
-            cal.add(Calendar.MONTH, -3);
-            notificacioFiltreCommand.setDataInici(cal.getTime());
-            notificacioFiltreCommand.setDataFi(new Date());
-            request.getSession().setAttribute(NOTIFICACIONS_FILTRE, NotificacioFiltreCommand.asDto(notificacioFiltreCommand));
-        }
+        NotificacioFiltreCommand notificacioFiltreCommand = getFiltreCommand(request);
+
         model.addAttribute(notificacioFiltreCommand);
         ompleProcediments(request, model);
         model.addAttribute("notificacioEstats",
@@ -177,10 +164,6 @@ public class NotificacioController extends BaseUserController {
         return "notificacioList";
     }
 
-    private boolean getLast3months() {
-        return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.filtre.remeses.last.3.month");
-    }
-
     @RequestMapping(method = RequestMethod.POST, params = "netejar")
     public String postNeteja(
             HttpServletRequest request,
@@ -193,7 +176,10 @@ public class NotificacioController extends BaseUserController {
             HttpServletRequest request,
             NotificacioFiltreCommand command,
             Model model) {
-        request.getSession().setAttribute(NOTIFICACIONS_FILTRE, NotificacioFiltreCommand.asDto(command));
+        RequestSessionHelper.actualitzarObjecteSessio(
+                request,
+                NOTIFICACIONS_FILTRE,
+                command);
         ompleProcediments(request, model);
         model.addAttribute("notificacioFiltreCommand", command);
         model.addAttribute("nomesAmbErrors", command.isNomesAmbErrors());
@@ -506,7 +492,7 @@ public class NotificacioController extends BaseUserController {
     @ResponseBody
     public DatatablesResponse datatable(HttpServletRequest request) {
         getEntitatActualComprovantPermisos(request);
-        NotificacioFiltreDto filtre = (NotificacioFiltreDto) request.getSession().getAttribute(NOTIFICACIONS_FILTRE);
+        NotificacioFiltreDto filtre = getFiltreCommand(request).asDto();
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         PaginaDto<NotificacioDatatableDto> notificacions = new PaginaDto<>();
         UsuariDto usuariActual = aplicacioService.getUsuariActual();
@@ -1179,6 +1165,31 @@ public class NotificacioController extends BaseUserController {
     @ResponseBody
     public ProgresActualitzacioCertificacioDto enviamentsRefrescarEstatProgres() throws IOException {
         return notificacioService.actualitzacioEnviamentsEstat();
+    }
+
+    private boolean getLast3months() {
+        return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.filtre.remeses.last.3.month");
+    }
+
+    private NotificacioFiltreCommand getFiltreCommand(
+            HttpServletRequest request) {
+        NotificacioFiltreCommand notificacioFiltreCommand = (NotificacioFiltreCommand) request.getSession()
+                .getAttribute(NOTIFICACIONS_FILTRE);
+
+        if (notificacioFiltreCommand == null) {
+            notificacioFiltreCommand = new NotificacioFiltreCommand();
+            if (getLast3months()) {
+                Calendar cal = new GregorianCalendar();
+                cal.add(Calendar.MONTH, -3);
+                notificacioFiltreCommand.setDataInici(cal.getTime());
+                notificacioFiltreCommand.setDataFi(new Date());
+            }
+            RequestSessionHelper.actualitzarObjecteSessio(
+                    request,
+                    NOTIFICACIONS_FILTRE,
+                    notificacioFiltreCommand);
+        }
+        return notificacioFiltreCommand;
     }
 
     private void emplenarModelNotificacioInfo(
