@@ -325,7 +325,7 @@ function getCookie(cname) {
 				</div>
 			</div>
 			<div class="btn-group">
-				<a href="<c:url value="/enviament/visualitzar"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-eye-slash"></span> <spring:message code="enviament.list.show"/></a>		
+				<a href="<c:url value="/enviament/visualitzar"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default"><span class="fa fa-eye-slash"></span> <spring:message code="enviament.list.show"/></a>
 			</div>
 		</div>
 	</script>
