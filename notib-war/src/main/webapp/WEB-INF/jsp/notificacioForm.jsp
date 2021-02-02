@@ -359,7 +359,7 @@ $(document).ready(function() {
     					if (procedimentsComuns.length > 0) {
     						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
     							$.each(procedimentsComuns, function(index, val) {
-    								selProcediments.append("<option value=\"" + val.id + "\">" + val.codi +' - '+ val.nom + "</option>");
+    								selProcediments.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
     							});
     						selProcediments.append("</optgroup>");
     					}
@@ -368,10 +368,10 @@ $(document).ready(function() {
     						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
     							$.each(procedimentsOrgan, function(index, val) {
     								if (isOnlyOneProcedimentOrgan) {
-    									selProcediments.append("<option value='" + val.id + "' selected>" + val.codi +' - '+ val.nom + "</option>");
+    									selProcediments.append("<option value='" + val.codi + "' selected>" + val.valor + "</option>");
     									$("#organGestor").val(val.organGestor).trigger("change.select2");
     								} else {
-    									selProcediments.append("<option value='" + val.id + "'>" + val.codi +' - '+ val.nom + "</option>");
+    									selProcediments.append("<option value='" + val.codi + "'>" + val.valor + "</option>");
     								}
     							});
     						selProcediments.append("</optgroup>");

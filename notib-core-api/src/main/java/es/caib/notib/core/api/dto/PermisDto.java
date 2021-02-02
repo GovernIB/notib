@@ -38,6 +38,8 @@ public class PermisDto implements Serializable {
 	
 	private boolean processar;
 	private boolean notificacio;
+
+	private boolean comuns;
 	
 	// Booleà per a indicar si en cas de procediment comú, 
 	// l'usuari administrador d'òrgan pot editar el permís
@@ -52,7 +54,6 @@ public class PermisDto implements Serializable {
 
 	public void revocaPermisos() {
 		this.read = false;
-		this.read= false;
 		this.write= false;
 		this.create= false;
 		this.delete= false;

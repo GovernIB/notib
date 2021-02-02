@@ -61,15 +61,21 @@ pageContext.setAttribute(
 		<c:url value="/userajax/usuari" var="urlConsultaInicial"/>
 		<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
 		<not:inputText name="principal" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"/>
-		
-		<not:inputCheckbox name="selectAll" textKey="procediment.permis.form.camp.all"/>
-		<div class="permisosInput">
-			<not:inputCheckbox name="read" textKey="procediment.permis.form.camp.consulta"/>
-			<not:inputCheckbox name="processar" textKey="procediment.permis.form.camp.processar"/>
-			<not:inputCheckbox name="notificacio" textKey="procediment.permis.form.camp.notificacio"/>
-			<not:inputCheckbox name="administration" textKey="procediment.permis.form.camp.gestio"/>
+		<div class="row">
+			<div class="col-xs-6">
+				<not:inputCheckbox name="selectAll" labelSize="8" textKey="procediment.permis.form.camp.all"/>
+				<div class="permisosInput">
+					<not:inputCheckbox name="read" labelSize="8" textKey="procediment.permis.form.camp.consulta"/>
+					<not:inputCheckbox name="processar" labelSize="8" textKey="procediment.permis.form.camp.processar"/>
+					<not:inputCheckbox name="notificacio" labelSize="8" textKey="procediment.permis.form.camp.notificacio"/>
+					<not:inputCheckbox name="administration" labelSize="8" textKey="procediment.permis.form.camp.gestio"/>
+				</div>
+				<not:inputCheckbox name="administrador" labelSize="8" textKey="procediment.permis.form.camp.administrador" disabled="${isRolActualAdministradorOrgan}"/>
+			</div>
+			<div class="col-xs-6">
+				<not:inputCheckbox name="comuns" textKey="organgestor.permis.form.camp.comuns"/>
+			</div>
 		</div>
-		<not:inputCheckbox name="administrador" textKey="procediment.permis.form.camp.administrador" disabled="${isRolActualAdministradorOrgan}"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/organgestor/${organGestor.id}/permis"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

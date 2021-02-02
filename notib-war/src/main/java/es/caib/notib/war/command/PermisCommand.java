@@ -41,7 +41,9 @@ public class PermisCommand {
 	
 	private boolean processar;
 	private boolean notificacio;
-	
+
+	private boolean comuns;
+
 	private boolean selectAll;
 
 	public static List<PermisCommand> toPermisCommands(

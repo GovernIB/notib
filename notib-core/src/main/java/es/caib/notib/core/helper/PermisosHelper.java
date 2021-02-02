@@ -4,14 +4,7 @@
 package es.caib.notib.core.helper;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.annotation.Resource;
 
@@ -324,7 +317,30 @@ public class PermisosHelper {
 		return (acl.getEntries() != null && !acl.getEntries().isEmpty());
 		
 	}
-	
+	public boolean haPermission(
+			Long objectIdentifier,
+			Class<?> objectClass,
+			Permission[] permissions) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		List<Sid> sids = new ArrayList<Sid>();
+		sids.add(new PrincipalSid(auth.getName()));
+		for (GrantedAuthority ga: auth.getAuthorities())
+			sids.add(new GrantedAuthoritySid(ga.getAuthority()));
+
+		ObjectIdentity oid = new ObjectIdentityImpl(
+				objectClass,
+				objectIdentifier);
+		Acl acl = aclService.readAclById(oid);
+		List<Permission> ps = Arrays.asList(permissions);
+		try {
+			return acl.isGranted(
+					ps,
+					sids,
+					false);
+		} catch (NotFoundException nfex) {
+			return false;
+		}
+	}
 	
 	public Map<Long, List<PermisDto>> findPermisos(
 			List<Long> objectIdentifiers,
@@ -470,6 +486,8 @@ public class PermisosHelper {
 						permis.setProcessar(true);
 					if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission()))
 						permis.setNotificacio(true);
+					if (ExtendedPermission.COMUNS.equals(ace.getPermission()))
+						permis.setComuns(true);
 				}
 			}
 			resposta.addAll(permisosUsuari.values());
@@ -525,6 +543,8 @@ public class PermisosHelper {
 						permis.setProcessar(true);
 					if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission()))
 						permis.setNotificacio(true);
+					if (ExtendedPermission.COMUNS.equals(ace.getPermission()))
+						permis.setComuns(true);
 				}
 			}
 		}
@@ -651,6 +671,8 @@ public class PermisosHelper {
 			permissions.add(ExtendedPermission.PROCESSAR);
 		if (permis.isNotificacio())
 			permissions.add(ExtendedPermission.NOTIFICACIO);
+		if (permis.isComuns())
+			permissions.add(ExtendedPermission.COMUNS);
 		
 		return permissions.toArray(new Permission[permissions.size()]);
 	}

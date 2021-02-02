@@ -14,6 +14,7 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.security.ExtendedPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -1204,6 +1205,40 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 	}
 
+	@Override
+	public List<CodiValorOrganGestorComuDto> getProcedimentsOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		List<ProcedimentEntity> procediments;
+		if (RolEnumDto.NOT_ADMIN.equals(rol)) {
+
+			if (organCodi == null) {
+				procediments = procedimentRepository.findByEntitat(entitat);
+			}else {
+				List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+						entitat.getDir3Codi(),
+						organCodi);
+				procediments = procedimentRepository.findByOrganGestorCodiInOrComu(organsFills, entitat);
+			}
+		} else {
+			procediments = recuperarProcedimentAmbPermis(entitat, PermisEnum.NOTIFICACIO, organCodi);
+		}
+
+		return CodiValorOrganGestorComuDto(procediments);
+	}
+
+	private List<CodiValorOrganGestorComuDto> CodiValorOrganGestorComuDto(List<ProcedimentEntity> procediments) {
+		List<CodiValorOrganGestorComuDto> response = new ArrayList<>();
+		for (ProcedimentEntity procediment : procediments) {
+			String nom = procediment.getCodi();
+			if (procediment.getNom() != null && !procediment.getNom().isEmpty()) {
+				nom += " - " + procediment.getNom();
+			}
+			response.add(new CodiValorOrganGestorComuDto(procediment.getId().toString(), nom, procediment.getCodi(),
+					procediment.isComu()));
+		}
+		return response;
+	}
+
 	private List<ProcedimentEntity> recuperarProcedimentAmbPermis(
 			EntitatEntity entitat,
 			PermisEnum permis,
@@ -1221,6 +1256,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				auth,
 				entitat,
 				permisos);
+		List<ProcedimentEntity> results;
 		if (organFiltre != null) {
 			List<ProcedimentOrganEntity> procedimentsOrgansAmbPermis = new ArrayList<>();
 			if(procedimentsOrgans != null && !procedimentsOrgans.isEmpty()) {
@@ -1231,10 +1267,25 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						procedimentsOrgansAmbPermis.add(procedimentOrgan);
 				}
 			}
-			procedimentsOrgans = procedimentsOrgansAmbPermis;
+
+			results = addProcedimentsOrgan(procediments, procedimentsOrgansAmbPermis, organFiltre);
+
+			boolean hasComunsPermission = permisosHelper.haPermission(
+					organGestorRepository.findByCodi(organFiltre).getId(),
+					OrganGestorEntity.class,
+					new Permission[] {ExtendedPermission.COMUNS});
+			if (hasComunsPermission && PermisEnum.NOTIFICACIO.equals(permis)) {
+				List<ProcedimentEntity> procedimentsComuns = procedimentRepository.findByEntitatAndComuTrue(entitat);
+				for (ProcedimentEntity procediment: procedimentsComuns) {
+					if (!results.contains(procediment))
+						results.add(procediment);
+				}
+			}
+		} else {
+			results = addProcedimentsOrgan(procediments, procedimentsOrgans, organFiltre);
 		}
 
-		return addProcedimentsOrgan(procediments, procedimentsOrgans, organFiltre);
+		return results;
 	}
 
 	private List<ProcedimentEntity> addProcedimentsOrgan(

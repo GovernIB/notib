@@ -4,47 +4,7 @@
  */
 package es.caib.notib.war.controller;
 
-import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.CodiValorComuDto;
-import es.caib.notib.core.api.dto.CodiValorDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.IdiomaEnumDto;
-import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
-import es.caib.notib.core.api.dto.LocalitatsDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDatatableDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDatatableDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEventDto;
-import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioFiltreDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.PagadorCieFormatFullaDto;
-import es.caib.notib.core.api.dto.PagadorCieFormatSobreDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaisosDto;
-import es.caib.notib.core.api.dto.PermisEnum;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.ProcedimentOrganDto;
-import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
-import es.caib.notib.core.api.dto.ProgresDescarregaDto;
-import es.caib.notib.core.api.dto.ProvinciesDto;
-import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
-import es.caib.notib.core.api.dto.RegistreIdDto;
-import es.caib.notib.core.api.dto.RolEnumDto;
-import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
-import es.caib.notib.core.api.dto.TipusDocumentDto;
-import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
-import es.caib.notib.core.api.dto.UsuariDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.exception.NoPermisosException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -57,6 +17,7 @@ import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
 import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
 import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.war.command.EntregapostalCommand;
 import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.MarcarProcessatCommand;
@@ -263,27 +224,7 @@ public class NotificacioController extends BaseUserController {
     public List<CodiValorComuDto> getProcediments(
             HttpServletRequest request,
             Model model) {
-        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
-
-        if (RolHelper.isUsuariActualAdministrador(request)) {
-            procediments = procedimentService.findAll();
-//            model.addAttribute("entitat", entitatService.findAll());
-        } else if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
-            procediments = procedimentService.findByEntitat(entitatActual.getId());
-        } else if (RolHelper.isUsuariActualUsuari(request)) {
-//			procediments = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), SecurityContextHolder.getContext().getAuthentication().getName(), PermisEnum.NOTIFICACIO);
-            procediments = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), SecurityContextHolder.getContext().getAuthentication().getName(), PermisEnum.CONSULTA);
-            List<ProcedimentOrganDto> procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(
-                    entitatActual.getId(),
-                    SecurityContextHolder.getContext().getAuthentication().getName(),
-                    PermisEnum.CONSULTA);
-            procediments = addProcedimentsOrgan(procediments, procedimentsOrgansDisponibles);
-		} else if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
-            procediments = procedimentService.findByOrganGestorIDescendentsAndComu(
-                    entitatActual.getId(),
-                    getOrganGestorActual(request));
-        }
+        EntitatHelper.getEntitatActual(request);
 
         Long entitatId = EntitatHelper.getEntitatActual(request).getId();
         String organCodi = null;
@@ -1066,60 +1007,17 @@ public class NotificacioController extends BaseUserController {
 
     @RequestMapping(value = "/organ/{organId}/procediments", method = RequestMethod.GET)
     @ResponseBody
-    public List<ProcedimentDto> getProcedimentsOrgan(
+    public List<CodiValorOrganGestorComuDto> getProcedimentsOrgan(
             HttpServletRequest request,
             @PathVariable String organId) {
 
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        List<ProcedimentOrganDto> procedimentsOrgansDisponibles = new ArrayList<ProcedimentOrganDto>(); 
-        List<ProcedimentDto> procedimentsOrgan = new ArrayList<ProcedimentDto>();
-        if(!RolHelper.isUsuariActualAdministradorEntitat(request)) {
-        	UsuariDto usuariActual = aplicacioService.getUsuariActual();
-	        List<ProcedimentDto> procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-	
-	        if (procedimentsDisponibles != null) {
-	            for (ProcedimentDto proc : procedimentsDisponibles) {
-	                // Si no s'ha seleccionat cap òrgan enviaran '-'
-	                if (proc.isComu() || organId.equals("-") || organId.equalsIgnoreCase(proc.getOrganGestor())) {
-	                    procedimentsOrgan.add(proc);
-	                }
-	            }
-	        }
-	
-	        // Procediments-Òrgan (Comuns)
-	        procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-       
-	        if (!procedimentsOrgansDisponibles.isEmpty()) {
-	            if (organId.equals("-")) {
-	            } else {
-	                procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermisByOrgan(organId, entitatActual.getDir3Codi(), procedimentsOrgansDisponibles);
-	            }
-	            for (ProcedimentOrganDto procedimentOrgan : procedimentsOrgansDisponibles) {
-	                if (!procedimentsOrgan.contains(procedimentOrgan.getProcediment())) {
-	                    procedimentsOrgan.add(procedimentOrgan.getProcediment());
-	                }
-	            }
-	            Collections.sort(procedimentsOrgan, new Comparator<ProcedimentDto>() {
-	                @Override
-	                public int compare(ProcedimentDto p1, ProcedimentDto p2) {
-	                    return p1.getNom().compareTo(p2.getNom());
-	                }
-	            });
-	        }
-        } else {
-        	List<ProcedimentDto> procedimentsDisponibles = procedimentService.findByEntitat(entitatActual.getId());
-	        if (procedimentsDisponibles != null) {
-	            for (ProcedimentDto proc : procedimentsDisponibles) {
-	                // Si no s'ha seleccionat cap òrgan enviaran '-'
-	                if (proc.isComu() || organId.equals("-") || organId.equalsIgnoreCase(proc.getOrganGestor())) {
-	                    procedimentsOrgan.add(proc);
-	                }
-	            }
-	        }
-        }
-        return procedimentsOrgan;
+        return procedimentService.getProcedimentsOrganNotificables(
+                entitatActual.getId(),
+                organId.equals("-") ? null : organId,
+                RolEnumDto.valueOf(RolHelper.getRolActual(request))
+        );
     }
-
 
     @RequestMapping(value = "/paisos", method = RequestMethod.GET)
     @ResponseBody
