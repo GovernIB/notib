@@ -29,6 +29,7 @@ import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
+import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 
 /**
@@ -348,13 +349,18 @@ public class ProcedimentHelper {
 			LlibreDto llibreOrgan = pluginHelper.llistarLlibreOrganisme(
 					entitat.getCodi(),
 					organigramaEntitat.get(procedimentGda.getOrganGestor()).getCodi());
-			
+			Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
+			List<OficinaDto> oficinesSIR = cacheHelper.getOficinesSIRUnitat(
+					arbreUnitats, 
+					procedimentGda.getOrganGestor());
 			organGestor = OrganGestorEntity.getBuilder(
 					procedimentGda.getOrganGestor(),
 					organigramaEntitat.get(procedimentGda.getOrganGestor()).getNom(),
 					entitat,
 					llibreOrgan.getCodi(),
-					llibreOrgan.getNomLlarg()).build();
+					llibreOrgan.getNomLlarg(),
+					(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getCodi() : null),
+					(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getNom() : null)).build();
 			organGestorRepository.save(organGestor);
 			
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ.creat"));

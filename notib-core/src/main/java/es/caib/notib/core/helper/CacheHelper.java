@@ -19,7 +19,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.EntitatDto;
@@ -213,6 +212,20 @@ public class CacheHelper {
 		return pluginHelper.llistarLlibreOrganisme(
 				codiDir3Entitat,
 				codiDir3Organ);
+	}
+	
+	@Cacheable(value = "oficinesSIRUnitat", key="#codiDir3Organ")
+	public List<OficinaDto> getOficinesSIRUnitat(
+			Map<String, NodeDir3> arbreUnitats,
+			String codiDir3Organ) {
+		return pluginHelper.oficinesSIRUnitat(
+				codiDir3Organ,
+				arbreUnitats);
+	}
+	
+	@Cacheable(value = "organigramaOriginal", key="#entitatcodi")
+	public Map<String, NodeDir3> findOrganigramaNodeByEntitat(String entitatcodi) {
+		return  pluginHelper.getOrganigramaPerEntitat(entitatcodi);
 	}
 	
 	@Cacheable(value = "llistarNivellsAdministracions")

@@ -16,7 +16,6 @@ import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.gesconadm.GcaProcediment;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
-import es.caib.notib.plugin.registre.*;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.notib.plugin.unitat.NodeDir3;
@@ -58,6 +57,49 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+
+import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.AnexoWsDto;
+import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
+import es.caib.notib.core.api.dto.DatosInteresadoWsDto;
+import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
+import es.caib.notib.core.api.dto.InteresadoWsDto;
+import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.LlibreDto;
+import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioDtoV2;
+import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
+import es.caib.notib.core.api.dto.PersonaDto;
+import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.RegistreAnnexDto;
+import es.caib.notib.core.api.dto.RegistreInteressatDocumentTipusDtoEnum;
+import es.caib.notib.core.api.dto.RegistreInteressatDto;
+import es.caib.notib.core.api.dto.RegistreModeFirmaDtoEnum;
+import es.caib.notib.core.api.dto.RegistreOrigenDtoEnum;
+import es.caib.notib.core.api.dto.RegistreTipusDocumentDtoEnum;
+import es.caib.notib.core.api.dto.RegistreTipusDocumentalDtoEnum;
+import es.caib.notib.core.api.dto.RegistreValidezDocumentDtoEnum;
+import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
+import es.caib.notib.plugin.registre.CodiAssumpte;
+import es.caib.notib.plugin.registre.DadesInteressat;
+import es.caib.notib.plugin.registre.DadesOficina;
+import es.caib.notib.plugin.registre.DadesRepresentat;
+import es.caib.notib.plugin.registre.Interessat;
+import es.caib.notib.plugin.registre.Llibre;
+import es.caib.notib.plugin.registre.LlibreOficina;
+import es.caib.notib.plugin.registre.Oficina;
+import es.caib.notib.plugin.registre.Organisme;
+import es.caib.notib.plugin.registre.RegistrePlugin;
+import es.caib.notib.plugin.registre.RegistrePluginException;
+import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
+import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
+import es.caib.notib.plugin.registre.TipusAssumpte;
+import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
+import es.caib.notib.plugin.unitat.OficinaSIR;
 /**
  * Helper per a interactuar amb els plugins.
  * 
@@ -417,6 +459,38 @@ public class PluginHelper {
 		}
 	
 		return oficinesDto;
+	}
+	
+	public List<OficinaDto> oficinesSIRUnitat(
+			String unitatCodi, 
+			Map<String, NodeDir3> arbreUnitats) throws SistemaExternException {
+		
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenir llista de les oficines SIR d'una unitat organitzativa", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				new AccioParam("Text de la cerca", unitatCodi));
+
+		List<OficinaSIR> oficinesTF = null;
+		List<OficinaDto> oficinesSIR = null;
+		try {
+			oficinesTF = getUnitatsOrganitzativesPlugin().oficinesSIRUnitat(
+					unitatCodi,
+					arbreUnitats);
+			oficinesSIR = conversioTipusHelper.convertirList(
+					oficinesTF, 
+					OficinaDto.class);
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistar organismes  a partir d'un text";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+	
+		return oficinesSIR;
 	}
 	
 	public List<LlibreOficina> llistarLlibresOficines(
@@ -2194,9 +2268,13 @@ public class PluginHelper {
 			NotificacioEntity notificacio,
 			DadesOficina dadesOficina,
 			String dir3Codi) throws RegistrePluginException {
-		if (notificacio.getEntitat().getOficina() != null) {
+		if (notificacio.getEntitat().isOficinaEntitat() && notificacio.getEntitat().getOficina() != null) {
 			dadesOficina.setOficinaCodi(notificacio.getEntitat().getOficina());
 			dadesOficina.setOficinaNom(notificacio.getEntitat().getOficina());
+		} else if (!notificacio.getEntitat().isOficinaEntitat() && notificacio.getOrganGestor().getOficina() != null) {
+			OrganGestorEntity organGestor = notificacio.getOrganGestor();
+			dadesOficina.setOficinaCodi(organGestor.getOficina());
+			dadesOficina.setOficinaNom(organGestor.getOficinaNom());
 		} else {
 			OficinaDto oficinaVirtual = llistarOficinaVirtual(
 					dir3Codi,

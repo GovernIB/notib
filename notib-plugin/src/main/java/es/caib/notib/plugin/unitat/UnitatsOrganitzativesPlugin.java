@@ -192,4 +192,18 @@ public interface UnitatsOrganitzativesPlugin {
 	 */
 	public List<CodiValor> localitats(
 			String codiProvincia) throws SistemaExternException;
+	
+	/**
+	 * @return recupera el llistat de les oficines SIR d'una unitata organitzativa
+	 * 
+	 * @param unitat
+	 * 			Codi de la unitat
+	 * @param arbreUnitats 
+	 * 			Arbre unitat actual
+	 * @throws SistemaExternException
+	 *            Si es produeix un error al consultar les oficines SIR
+	 */
+	public List<OficinaSIR> oficinesSIRUnitat(
+			String unitat, 
+			Map<String, NodeDir3> arbreUnitats) throws SistemaExternException;
 }

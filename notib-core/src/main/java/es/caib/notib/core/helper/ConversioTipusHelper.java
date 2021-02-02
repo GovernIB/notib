@@ -115,6 +115,8 @@ public class ConversioTipusHelper {
 			field("entitat.id", "entitatId").
 			field("entitat.nom", "entitatNom").
 			field("entitat.oficina", "oficinaNom").
+			field("oficina", "oficina.codi").
+			field("oficinaNom", "oficina.nom").
 			byDefault().
 			register();
 		
