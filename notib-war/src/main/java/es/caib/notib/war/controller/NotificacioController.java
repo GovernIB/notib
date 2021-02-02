@@ -4,47 +4,7 @@
  */
 package es.caib.notib.war.controller;
 
-import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.CodiValorComuDto;
-import es.caib.notib.core.api.dto.CodiValorDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.IdiomaEnumDto;
-import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
-import es.caib.notib.core.api.dto.LocalitatsDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDatatableDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDatatableDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEventDto;
-import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioFiltreDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.PagadorCieFormatFullaDto;
-import es.caib.notib.core.api.dto.PagadorCieFormatSobreDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaisosDto;
-import es.caib.notib.core.api.dto.PermisEnum;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.ProcedimentOrganDto;
-import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
-import es.caib.notib.core.api.dto.ProgresDescarregaDto;
-import es.caib.notib.core.api.dto.ProvinciesDto;
-import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
-import es.caib.notib.core.api.dto.RegistreIdDto;
-import es.caib.notib.core.api.dto.RolEnumDto;
-import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
-import es.caib.notib.core.api.dto.TipusDocumentDto;
-import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
-import es.caib.notib.core.api.dto.UsuariDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.exception.NoPermisosException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -57,6 +17,10 @@ import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
 import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
 import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
+import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
+import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
+import es.caib.notib.war.command.DocumentCommand;
 import es.caib.notib.war.command.EntregapostalCommand;
 import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.MarcarProcessatCommand;
@@ -417,45 +381,8 @@ public class NotificacioController extends BaseUserController {
         }
         model.addAttribute(new NotificacioFiltreCommand());
         model.addAttribute(new OrganGestorFiltreCommand());
-        if (notificacioCommand.getTipusDocument() != null) {
-        	String arxiuGestdocId = notificacioCommand.getDocument().getArxiuGestdocId();
-            switch (notificacioCommand.getTipusDocument()) {
-                case ARXIU:
-                    if (notificacioCommand.getArxiu() != null && !notificacioCommand.getArxiu().isEmpty() && arxiuGestdocId.isEmpty() ) {
-                        notificacioCommand.getDocument().setArxiuNom(notificacioCommand.getArxiu().getOriginalFilename());
-                        notificacioCommand.getDocument().setNormalitzat(notificacioCommand.getDocument().isNormalitzat());
-                        String contingutBase64 = Base64.encodeBase64String(notificacioCommand.getArxiu().getBytes());
-                        notificacioCommand.getDocument().setContingutBase64(contingutBase64);
-                        notificacioCommand.getDocument().setMediaType(notificacioCommand.getArxiu().getContentType());
-                        notificacioCommand.getDocument().setMida(notificacioCommand.getArxiu().getSize());
-                        notificacioCommand.getDocument().setMetadadesKeys(notificacioCommand.getDocument().getMetadadesKeys());
-                        notificacioCommand.getDocument().setMetadadesValues(notificacioCommand.getDocument().getMetadadesValues());
-                    }else if(notificacioCommand.getArxiu().isEmpty() && arxiuGestdocId != null ) {
-                    	byte[] result = notificacioService.obtenirArxiuTemporal(arxiuGestdocId);
-                    	String contingutBase64 = Base64.encodeBase64String(result);
-                    	notificacioCommand.getDocument().setContingutBase64(contingutBase64);
-                    }
-                    break;
-                case CSV:
-                    if (notificacioCommand.getDocumentArxiuCsv() != null
-                            && !notificacioCommand.getDocumentArxiuCsv().isEmpty()) {
-                        notificacioCommand.getDocument().setCsv(notificacioCommand.getDocumentArxiuCsv());
-                    }
-                    break;
-                case UUID:
-                    if (notificacioCommand.getDocumentArxiuUuid() != null
-                            && !notificacioCommand.getDocumentArxiuUuid().isEmpty()) {
-                        notificacioCommand.getDocument().setUuid(notificacioCommand.getDocumentArxiuUuid());
-                    }
-                    break;
-                case URL:
-                    if (notificacioCommand.getDocumentArxiuUrl() != null
-                            && !notificacioCommand.getDocumentArxiuUrl().isEmpty()) {
-                        notificacioCommand.getDocument().setUrl(notificacioCommand.getDocumentArxiuUrl());
-                    }
-                    break;
-            }
-        }
+
+        updateDocuments(notificacioCommand);
 
         try {
             if (notificacioCommand.getId() != null) {
@@ -468,21 +395,21 @@ public class NotificacioController extends BaseUserController {
                         entitatActual.getId(),
                         NotificacioCommandV2.asDto(notificacioCommand));
 
-                model.addAttribute("notificacioEstats",
-                        EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
-                                "es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
-                model.addAttribute("tipusUsuari",
-                        EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
-                                "es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
-                model.addAttribute("notificacioEnviamentEstats",
-                        EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
-                                "es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
-                model.addAttribute("notificacioComunicacioTipus",
-                        EnumHelper.getOptionsForEnum(NotificacioComunicacioTipusEnumDto.class,
-                                "es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto."));
-                model.addAttribute("notificacioEnviamentTipus",
-                        EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class,
-                                "es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
+//                model.addAttribute("notificacioEstats",
+//                        EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
+//                                "es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
+//                model.addAttribute("tipusUsuari",
+//                        EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
+//                                "es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
+//                model.addAttribute("notificacioEnviamentEstats",
+//                        EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
+//                                "es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
+//                model.addAttribute("notificacioComunicacioTipus",
+//                        EnumHelper.getOptionsForEnum(NotificacioComunicacioTipusEnumDto.class,
+//                                "es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto."));
+//                model.addAttribute("notificacioEnviamentTipus",
+//                        EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class,
+//                                "es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -500,6 +427,52 @@ public class NotificacioController extends BaseUserController {
         }
 
         return "redirect:../notificacio";
+    }
+
+    private void updateDocuments(NotificacioCommandV2 notificacioCommand) throws IOException {
+
+        for (int i = 0; i < 5; i++) {
+
+            if (notificacioCommand.getTipusDocument()[i] != null) {
+                String arxiuGestdocId = notificacioCommand.getDocuments()[i].getArxiuGestdocId();
+                switch (notificacioCommand.getTipusDocument()[i]) {
+                    case ARXIU:
+                        if (notificacioCommand.getArxiu()[i] != null && !notificacioCommand.getArxiu()[i].isEmpty() && arxiuGestdocId.isEmpty()) {
+                            notificacioCommand.getDocuments()[i].setArxiuNom(notificacioCommand.getArxiu()[i].getOriginalFilename());
+//                                notificacioCommand.getDocument()[i].setNormalitzat(notificacioCommand.getDocument()[i].isNormalitzat());
+                            String contingutBase64 = Base64.encodeBase64String(notificacioCommand.getArxiu()[i].getBytes());
+                            notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
+                            notificacioCommand.getDocuments()[i].setMediaType(notificacioCommand.getArxiu()[i].getContentType());
+                            notificacioCommand.getDocuments()[i].setMida(notificacioCommand.getArxiu()[i].getSize());
+//                                notificacioCommand.getDocument()[i].setMetadadesKeys(notificacioCommand.getDocument()[i].getMetadadesKeys());
+//                                notificacioCommand.getDocument()[i].setMetadadesValues(notificacioCommand.getDocument()[i].getMetadadesValues());
+                        } else if (notificacioCommand.getArxiu()[i].isEmpty() && arxiuGestdocId != null) {
+                            byte[] result = notificacioService.obtenirArxiuTemporal(arxiuGestdocId);
+                            String contingutBase64 = Base64.encodeBase64String(result);
+                            notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
+                        }
+                        break;
+                    case CSV:
+                        if (notificacioCommand.getDocumentArxiuCsv()[i] != null
+                                && !notificacioCommand.getDocumentArxiuCsv()[i].isEmpty()) {
+                            notificacioCommand.getDocuments()[i].setCsv(notificacioCommand.getDocumentArxiuCsv()[i]);
+                        }
+                        break;
+                    case UUID:
+                        if (notificacioCommand.getDocumentArxiuUuid()[i] != null
+                                && !notificacioCommand.getDocumentArxiuUuid()[i].isEmpty()) {
+                            notificacioCommand.getDocuments()[i].setUuid(notificacioCommand.getDocumentArxiuUuid()[i]);
+                        }
+                        break;
+                    case URL:
+                        if (notificacioCommand.getDocumentArxiuUrl()[i] != null
+                                && !notificacioCommand.getDocumentArxiuUrl()[i].isEmpty()) {
+                            notificacioCommand.getDocuments()[i].setUrl(notificacioCommand.getDocumentArxiuUrl()[i]);
+                        }
+                        break;
+                }
+            }
+        }
     }
 
     @RequestMapping(value = "/datatable", method = RequestMethod.GET)
@@ -1241,21 +1214,25 @@ public class NotificacioController extends BaseUserController {
             NotificacioDtoV2 notificacioDto = notificacioService.findAmbId(notificacioId, false);
             notificacio = NotificacioCommandV2.asCommand(notificacioDto);
 
-            if (notificacio.getDocument().getArxiuNom() != null) {
-                model.addAttribute("nomDocument", notificacio.getDocument().getArxiuNom());
-                notificacio.setTipusDocumentDefault(TipusDocumentEnumDto.ARXIU.name());
-            }
-            if (notificacio.getDocument().getUuid() != null) {
-                model.addAttribute("nomDocument", notificacio.getDocument().getUuid());
-                notificacio.setTipusDocumentDefault(TipusDocumentEnumDto.UUID.name());
-            }
-            if (notificacio.getDocument().getCsv() != null) {
-                model.addAttribute("nomDocument", notificacio.getDocument().getCsv());
-                notificacio.setTipusDocumentDefault(TipusDocumentEnumDto.CSV.name());
-            }
-            if (notificacio.getDocument().getUrl() != null) {
-                model.addAttribute("nomDocument", notificacio.getDocument().getUrl());
-                notificacio.setTipusDocumentDefault(TipusDocumentEnumDto.URL.name());
+            for(int i = 0; i < 5; i++) {
+//                if (notificacio.getDocument()[i] != null) {
+                    if (notificacio.getDocuments()[i].getArxiuNom() != null) {
+                        model.addAttribute("nomDocument[" + i + "]", notificacio.getDocuments()[i].getArxiuNom());
+                        notificacio.setTipusDocumentDefault(i, TipusDocumentEnumDto.ARXIU.name());
+                    }
+                    if (notificacio.getDocuments()[i].getUuid() != null) {
+                        model.addAttribute("nomDocument[" + i + "]", notificacio.getDocuments()[i].getUuid());
+                        notificacio.setTipusDocumentDefault(i, TipusDocumentEnumDto.UUID.name());
+                    }
+                    if (notificacio.getDocuments()[i].getCsv() != null) {
+                        model.addAttribute("nomDocument[" + i + "]", notificacio.getDocuments()[i].getCsv());
+                        notificacio.setTipusDocumentDefault(i, TipusDocumentEnumDto.CSV.name());
+                    }
+                    if (notificacio.getDocuments()[i].getUrl() != null) {
+                        model.addAttribute("nomDocument[" + i + "]", notificacio.getDocuments()[i].getUrl());
+                        notificacio.setTipusDocumentDefault(i, TipusDocumentEnumDto.URL.name());
+                    }
+//                }
             }
 
         } else {
@@ -1271,7 +1248,15 @@ public class NotificacioController extends BaseUserController {
 
             TipusDocumentEnumDto tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
             if (tipusDocumentDefault != null) {
-                notificacio.setTipusDocumentDefault(tipusDocumentDefault.name());
+                for(int i = 0; i < 5; i++) {
+                    notificacio.setTipusDocumentDefault(i, tipusDocumentDefault.name());
+                }
+            }
+            for(int i = 0; i < 5; i++) {
+                notificacio.getDocuments()[i] = new DocumentCommand();
+                notificacio.getDocuments()[i].setOrigen(OrigenEnum.ADMINISTRACIO);
+                notificacio.getDocuments()[i].setValidesa(ValidesaEnum.ORIGINAL);
+                notificacio.getDocuments()[i].setTipoDocumental(TipusDocumentalEnum.ALTRES);
             }
         }
         List<TipusDocumentDto> tipusDocuments = entitatService.findTipusDocumentByEntitat(entitatActual.getId());
@@ -1358,6 +1343,18 @@ public class NotificacioController extends BaseUserController {
                 EnumHelper.getOptionsForEnum(
                         IdiomaEnumDto.class,
                         "es.caib.notib.core.api.dto.idiomaEnumDto."));
+        model.addAttribute("origens",
+                EnumHelper.getOptionsForEnum(
+                        OrigenEnum.class,
+                        "es.caib.notib.core.api.ws.notificacio.OrigenEnum."));
+        model.addAttribute("valideses",
+                EnumHelper.getOptionsForEnum(
+                        ValidesaEnum.class,
+                        "es.caib.notib.core.api.ws.notificacio.ValidesaEnum."));
+        model.addAttribute("tipusDocumentals",
+                EnumHelper.getOptionsForEnum(
+                        TipusDocumentalEnum.class,
+                        "es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum."));
 
         try {
             model.addAttribute("concepteSize", notificacio.getConcepteDefaultSize());
@@ -1457,7 +1454,8 @@ public class NotificacioController extends BaseUserController {
                 tipusDocumentEnumDto.add(tipusDocument.getTipusDocEnum().name());
             }
             if (tipusDocumentDefault != null) {
-                notificacioCommand.setTipusDocumentDefault(tipusDocumentDefault.name());
+                for (int i = 0; i < 5; i++)
+                    notificacioCommand.setTipusDocumentDefault(i, tipusDocumentDefault.name());
             }
         }
 
@@ -1530,40 +1528,55 @@ public class NotificacioController extends BaseUserController {
                 EnumHelper.getOptionsForEnum(
                         IdiomaEnumDto.class,
                         "es.caib.notib.core.api.dto.idiomaEnumDto."));
+        model.addAttribute("origens",
+                EnumHelper.getOptionsForEnum(
+                        OrigenEnum.class,
+                        "es.caib.notib.core.api.ws.notificacio.OrigenEnum."));
+        model.addAttribute("valideses",
+                EnumHelper.getOptionsForEnum(
+                        ValidesaEnum.class,
+                        "es.caib.notib.core.api.ws.notificacio.ValidesaEnum."));
+        model.addAttribute("tipusDocumentals",
+                EnumHelper.getOptionsForEnum(
+                        TipusDocumentalEnum.class,
+                        "es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum."));
+
         model.addAttribute("enviosGuardats", notificacioCommand.getEnviaments());
         model.addAttribute("tipusDocument", notificacioCommand.getTipusDocument());
         if(procedimentActual != null) {
         	model.addAttribute("procedimentId", procedimentActual.getId());
         }
-        
+
         model.addAttribute("errors", bindingResult.getAllErrors());
-        
-        if (notificacioCommand.getDocument().getArxiuGestdocId().isEmpty() &&  notificacioCommand.getTipusDocument() != null && notificacioCommand.getArxiu() != null && notificacioCommand.getTipusDocument() == TipusDocumentEnumDto.ARXIU) {
-        	String arxiuGestdocId = null;
-			String contingutBase64 = null;
-        	try {
-        		contingutBase64 = Base64.encodeBase64String(notificacioCommand.getArxiu().getBytes());
-        	} catch (Exception ex) {
-	            logger.error("No s'ha pogut codificar els bytes de l'arxiu: " + ex.getMessage());	
-        	}
-            notificacioCommand.getDocument().setContingutBase64(contingutBase64);
-            notificacioCommand.getDocument().setArxiuNom(notificacioCommand.getArxiu().getOriginalFilename());
-            notificacioCommand.getDocument().setNormalitzat(notificacioCommand.getDocument().isNormalitzat());
-            notificacioCommand.getDocument().setMetadadesKeys(notificacioCommand.getDocument().getMetadadesKeys());
-            notificacioCommand.getDocument().setMetadadesValues(notificacioCommand.getDocument().getMetadadesValues());
-			notificacioCommand.getDocument().setMediaType(notificacioCommand.getArxiu().getContentType());
-            notificacioCommand.getDocument().setMida(notificacioCommand.getArxiu().getSize());
-            
-			arxiuGestdocId = notificacioService.guardarArxiuTemporal(notificacioCommand.getDocument().getContingutBase64());
-			
-			notificacioCommand.getDocument().setArxiuGestdocId(arxiuGestdocId);
-			model.addAttribute("document", notificacioCommand.getDocument());
-            model.addAttribute("nomDocument", notificacioCommand.getArxiu().getOriginalFilename());
- 
-				
-        }else {
-        	model.addAttribute("nomDocument", !notificacioCommand.getDocument().getArxiuNom().isEmpty()?notificacioCommand.getDocument().getArxiuNom():notificacioCommand.getArxiu().getOriginalFilename());
+
+        for (int i = 0; i < 5; i++) {
+            if (notificacioCommand.getDocuments()[i].getArxiuGestdocId().isEmpty() && notificacioCommand.getTipusDocument()[i] != null && notificacioCommand.getArxiu()[i] != null && notificacioCommand.getTipusDocument()[i] == TipusDocumentEnumDto.ARXIU) {
+                String arxiuGestdocId = null;
+                String contingutBase64 = null;
+                try {
+                    contingutBase64 = Base64.encodeBase64String(notificacioCommand.getArxiu()[i].getBytes());
+                } catch (Exception ex) {
+                    logger.error("No s'ha pogut codificar els bytes de l'arxiu: " + ex.getMessage());
+                }
+                notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
+                notificacioCommand.getDocuments()[i].setArxiuNom(notificacioCommand.getArxiu()[i].getOriginalFilename());
+                notificacioCommand.getDocuments()[i].setNormalitzat(notificacioCommand.getDocuments()[i].isNormalitzat());
+//                notificacioCommand.getDocument()[i].setMetadadesKeys(notificacioCommand.getDocument()[i].getMetadadesKeys());
+//                notificacioCommand.getDocument()[i].setMetadadesValues(notificacioCommand.getDocument()[i].getMetadadesValues());
+                notificacioCommand.getDocuments()[i].setMediaType(notificacioCommand.getArxiu()[i].getContentType());
+                notificacioCommand.getDocuments()[i].setMida(notificacioCommand.getArxiu()[i].getSize());
+
+                arxiuGestdocId = notificacioService.guardarArxiuTemporal(notificacioCommand.getDocuments()[i].getContingutBase64());
+
+                notificacioCommand.getDocuments()[i].setArxiuGestdocId(arxiuGestdocId);
+                model.addAttribute("nomDocument[" + i + "]", notificacioCommand.getArxiu()[i].getOriginalFilename());
+
+
+            } else {
+                model.addAttribute("nomDocument[" + i + "]", !notificacioCommand.getDocuments()[i].getArxiuNom().isEmpty() ? notificacioCommand.getDocuments()[i].getArxiuNom() : notificacioCommand.getArxiu()[i].getOriginalFilename());
+            }
         }
+        model.addAttribute("document", notificacioCommand.getDocuments());
 
         try {
             Method concepte = NotificacioCommandV2.class.getMethod("getConcepte");

@@ -1,19 +1,6 @@
 package es.caib.notib.war.validation;
 
 
-
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import javax.mail.internet.InternetAddress;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
-import org.joda.time.LocalDateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.service.AplicacioService;
@@ -22,6 +9,18 @@ import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
 import es.caib.notib.war.command.PersonaCommand;
 import es.caib.notib.war.helper.MessageHelper;
+import org.apache.commons.io.FilenameUtils;
+import org.joda.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.mail.internet.InternetAddress;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Constraint de validació que controla que camp email és obligatori si està habilitada l'entrega a la Direcció Electrònica Hablitada (DEH)
@@ -121,60 +120,86 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 				}
 			}
 			
-			// Validació de document
-			switch (notificacio.getTipusDocument()) {
-			case ARXIU:
-				Long fileMaxSize = 10485760L; //10MB
-				String [] formatsDisponibles = {"application/pdf", "application/zip", "application/x-zip-compressed"};
-				if (aplicacioService.propertyGet("es.caib.notib.notificacio.document.size") != null)
-					fileMaxSize = Long.valueOf(aplicacioService.propertyGet("es.caib.notib.notificacio.document.size"));
-				
-				if ((notificacio.getContingutArxiu() == null || notificacio.getContingutArxiu().length == 0 || notificacio.getDocument().getArxiuGestdocId() == null)
-						&& (notificacio.getDocument().getArxiuGestdocId() == null)) {
-					valid = false;
-					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
-					.addNode("arxiu")
-					.addConstraintViolation();
+			// Validació de documents
+			Long fileMaxSize = 10485760L; //10MB
+			Long fileTotalMaxSize = 15728640L; // 15MB
+			List<String> formatsDisponibles = Arrays.asList(new String[] {"application/pdf", "application/zip", "application/x-zip-compressed"});
+			List<String> extensionsDisponibles = Arrays.asList(new String[] {"jpg", "jpeg", "odt", "odp", "ods", "odg", "docx", "xlsx", "pptx", "pdf", "png", "rtf", "svg", "tiff", "txt", "xml", "xsig", "csig", "html", "csv"});;
+			if (aplicacioService.propertyGet("es.caib.notib.notificacio.document.size") != null)
+				fileMaxSize = Long.valueOf(aplicacioService.propertyGet("es.caib.notib.notificacio.document.size"));
+			Long fileTotalSize = 0L;
+
+			for (int i = 0; i < 5; i++) {
+				if(notificacio.getTipusDocument()[i] != null) {
+					switch (notificacio.getTipusDocument()[i]) {
+						case ARXIU:
+							if (i == 0 && ((notificacio.getContingutArxiu(i) == null || notificacio.getContingutArxiu(i).length == 0 || notificacio.getDocuments()[i].getArxiuGestdocId() == null)
+									&& (notificacio.getDocuments()[i].getArxiuGestdocId() == null))) {
+								valid = false;
+								context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+										.addNode("arxiu[" + i + "]")
+										.addConstraintViolation();
+							}
+							if ((notificacio.getContingutArxiu(i) != null && notificacio.getContingutArxiu(i).length != 0)) {
+								if (comunicacioAmbAdministracio) {
+									String extensio = FilenameUtils.getExtension(notificacio.getArxiu()[i].getOriginalFilename());
+									if (!extensionsDisponibles.contains(extensio)) {
+										valid = false;
+										context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.format"))
+												.addNode("arxiu[" + i + "]")
+												.addConstraintViolation();
+									}
+								} else {
+									if (!formatsDisponibles.contains(notificacio.getArxiu()[i].getContentType())) {
+										valid = false;
+										context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.format"))
+												.addNode("arxiu[" + i + "]")
+												.addConstraintViolation();
+									}
+								}
+							}
+							Long fileSize = notificacio.getArxiu()[i].getSize();
+							fileTotalSize += fileSize;
+							if ((notificacio.getContingutArxiu(i) != null && notificacio.getContingutArxiu(i).length != 0) && fileSize > fileMaxSize) {
+								valid = false;
+								context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.size"))
+										.addNode("arxiu[" + i + "]")
+										.addConstraintViolation();
+							}
+							break;
+						case URL:
+							if (i == 0 && (notificacio.getDocumentArxiuUrl()[i] == null || notificacio.getDocumentArxiuUrl()[i].isEmpty())) {
+								valid = false;
+								context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+										.addNode("documentArxiuUrl[" + i + "]")
+										.addConstraintViolation();
+							}
+							break;
+						case CSV:
+							if (i == 0 && (notificacio.getDocumentArxiuCsv()[i] == null || notificacio.getDocumentArxiuCsv()[i].isEmpty())) {
+								valid = false;
+								context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+										.addNode("documentArxiuCsv[" + i + "]")
+										.addConstraintViolation();
+							}
+							break;
+						case UUID:
+							if (i == 0 && (notificacio.getDocumentArxiuUuid()[i] == null || notificacio.getDocumentArxiuUuid()[i].isEmpty())) {
+								valid = false;
+								context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+										.addNode("documentArxiuUuid[" + i + "]")
+										.addConstraintViolation();
+							}
+							break;
+					}
 				}
-				if ((notificacio.getContingutArxiu() != null && notificacio.getContingutArxiu().length != 0) && !Arrays.asList(formatsDisponibles).contains(notificacio.getArxiu().getContentType())) {
-					valid = false;
-					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.format"))
-					.addNode("arxiu")
-					.addConstraintViolation();
-				}
-				if ((notificacio.getContingutArxiu() != null && notificacio.getContingutArxiu().length != 0) && notificacio.getArxiu().getSize() > fileMaxSize) {
-					valid = false;
-					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.size"))
-					.addNode("arxiu")
-					.addConstraintViolation();
-				}
-				break;
-			case URL:
-				if (notificacio.getDocumentArxiuUrl() == null || notificacio.getDocumentArxiuUrl().isEmpty()) {
-					valid = false;
-					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
-					.addNode("documentArxiuUrl")
-					.addConstraintViolation();
-				}
-				break;
-			case CSV:
-				if (notificacio.getDocumentArxiuCsv() == null || notificacio.getDocumentArxiuCsv().isEmpty()) {
-					valid = false;
-					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
-					.addNode("documentArxiuCsv")
-					.addConstraintViolation();
-				}
-				break;
-			case UUID:
-				if (notificacio.getDocumentArxiuUuid() == null || notificacio.getDocumentArxiuUuid().isEmpty()) {
-					valid = false;
-					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
-					.addNode("documentArxiuUuid")
-					.addConstraintViolation();
-				}
-				break;
 			}
-		
+			if (fileTotalSize > fileTotalMaxSize) {
+				valid = false;
+				context.buildConstraintViolationWithTemplate(
+						MessageHelper.getInstance().getMessage("notificacio.form.valid.document.total.size"));
+			}
+
 			// ENVIAMENTS
 			if (notificacio.getEnviaments() != null) {
 				int envCount = 0;

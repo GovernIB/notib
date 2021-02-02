@@ -3,6 +3,40 @@
  */
 package es.caib.notib.core.service;
 
+import com.codahale.metrics.Timer;
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
+import es.caib.notib.core.api.dto.ProgresDescarregaDto.TipusInfo;
+import es.caib.notib.core.api.exception.JustificantException;
+import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.exception.RegistreNotificaException;
+import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
+import es.caib.notib.core.api.ws.notificacio.Enviament;
+import es.caib.notib.core.api.ws.notificacio.Persona;
+import es.caib.notib.core.entity.*;
+import es.caib.notib.core.helper.*;
+import es.caib.notib.core.repository.*;
+import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
+import es.caib.notib.plugin.unitat.CodiValor;
+import es.caib.notib.plugin.unitat.CodiValorPais;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
@@ -16,82 +50,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.annotation.Resource;
-
-import es.caib.notib.core.api.dto.*;
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.codahale.metrics.Timer;
-
-import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
-import es.caib.notib.core.api.dto.ProgresDescarregaDto.TipusInfo;
-import es.caib.notib.core.api.exception.JustificantException;
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.exception.RegistreNotificaException;
-import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.api.service.AplicacioService;
-import es.caib.notib.core.api.service.NotificacioService;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.Enviament;
-import es.caib.notib.core.api.ws.notificacio.Persona;
-import es.caib.notib.core.entity.DocumentEntity;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.GrupEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.PersonaEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.ProcedimentOrganEntity;
-import es.caib.notib.core.entity.UsuariEntity;
-import es.caib.notib.core.helper.AuditEnviamentHelper;
-import es.caib.notib.core.helper.AuditNotificacioHelper;
-import es.caib.notib.core.helper.CacheHelper;
-import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.CreacioSemaforDto;
-import es.caib.notib.core.helper.EmailHelper;
-import es.caib.notib.core.helper.EntityComprovarHelper;
-import es.caib.notib.core.helper.HibernateHelper;
-import es.caib.notib.core.helper.IntegracioHelper;
-import es.caib.notib.core.helper.JustificantHelper;
-import es.caib.notib.core.helper.MessageHelper;
-import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.NotificaHelper;
-import es.caib.notib.core.helper.NotificacioHelper;
-import es.caib.notib.core.helper.OrganigramaHelper;
-import es.caib.notib.core.helper.PaginacioHelper;
-import es.caib.notib.core.helper.PluginHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
-import es.caib.notib.core.helper.RegistreHelper;
-import es.caib.notib.core.helper.RegistreNotificaHelper;
-import es.caib.notib.core.helper.UsuariHelper;
-import es.caib.notib.core.repository.DocumentRepository;
-import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.GrupRepository;
-import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.repository.NotificacioEventRepository;
-import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.PersonaRepository;
-import es.caib.notib.core.repository.ProcedimentOrganRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
-import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
-import es.caib.notib.plugin.unitat.CodiValor;
-import es.caib.notib.plugin.unitat.CodiValorPais;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentContingut;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -175,7 +133,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			GrupEntity grupNotificacio = null;
 			OrganGestorEntity organGestor = null;
-			String documentGesdocId = null;
 			ProcedimentEntity procediment = null;
 			ProcedimentOrganEntity procedimentOrgan = null;
 			if (notificacio.getProcediment() != null && notificacio.getProcediment().getId() != null) {
@@ -225,56 +182,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (notificacio.getGrup() != null && notificacio.getGrup().getId() != null) {
 				grupNotificacio = grupRepository.findOne(notificacio.getGrup().getId());
 			}
-			if(notificacio.getDocument().getContingutBase64() != null) {
-				documentGesdocId = pluginHelper.gestioDocumentalCreate(
-						PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-						Base64.decodeBase64(notificacio.getDocument().getContingutBase64()));
-			} else if (notificacio.getDocument().getUuid() != null) {
-				DocumentDto document = new DocumentDto();
-				String arxiuUuid = notificacio.getDocument().getUuid();
-				if (pluginHelper.isArxiuPluginDisponible()) {
-					Document documentArxiu = pluginHelper.arxiuDocumentConsultar(arxiuUuid, null);
-					document.setArxiuNom(documentArxiu.getNom());
-					document.setNormalitzat(notificacio.getDocument().isNormalitzat());
-					document.setGenerarCsv(notificacio.getDocument().isGenerarCsv());
-					document.setUuid(arxiuUuid);
-					document.setMediaType(documentArxiu.getContingut().getTipusMime());
-					document.setMida(documentArxiu.getContingut().getTamany());
-					notificacio.setDocument(document);
-				}
-			} else if (notificacio.getDocument().getCsv() != null) {
-				DocumentDto document = new DocumentDto();
-				String arxiuCsv = notificacio.getDocument().getCsv();
-				if (pluginHelper.isArxiuPluginDisponible()) {
-					DocumentContingut documentArxiu = pluginHelper.arxiuGetImprimible(arxiuCsv, false);
-					document.setArxiuNom(documentArxiu.getArxiuNom());
-					document.setNormalitzat(notificacio.getDocument().isNormalitzat());
-					document.setGenerarCsv(notificacio.getDocument().isGenerarCsv());
-					document.setMediaType(documentArxiu.getTipusMime());
-					document.setMida(documentArxiu.getTamany());
-					document.setCsv(arxiuCsv);
-					notificacio.setDocument(document);
-				}
-			}
-			DocumentEntity documentEntity = null;
-			
-			// Guardar document 
-			if(notificacio.getDocument().getCsv() != null || 
-			   notificacio.getDocument().getUuid() != null || 
-			   notificacio.getDocument().getContingutBase64() != null || 
-			   notificacio.getDocument().getArxiuGestdocId() != null) {
-	
-				documentEntity = documentRepository.save(DocumentEntity.getBuilderV2(
-						notificacio.getDocument().getArxiuGestdocId(), 
-						documentGesdocId, 
-						notificacio.getDocument().getArxiuNom(), 
-						notificacio.getDocument().getUrl(),  
-						notificacio.getDocument().isNormalitzat(),  
-						notificacio.getDocument().getUuid(),
-						notificacio.getDocument().getCsv(),
-						notificacio.getDocument().getMediaType(),
-						notificacio.getDocument().getMida()).build());
-			}
+			DocumentEntity documentEntity = getDocumentEntity(notificacio.getDocument());
+			DocumentEntity document2Entity = getDocumentEntity(notificacio.getDocument2());
+			DocumentEntity document3Entity = getDocumentEntity(notificacio.getDocument3());
+			DocumentEntity document4Entity = getDocumentEntity(notificacio.getDocument4());
+			DocumentEntity document5Entity = getDocumentEntity(notificacio.getDocument5());
+
 			// Dades generals de la notificació
 			NotificacioEntity notificacioEntity = auditNotificacioHelper.desaNotificacio(
 					notificacio, 
@@ -283,6 +196,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 					organGestor,
 					procediment,
 					documentEntity,
+					document2Entity,
+					document3Entity,
+					document4Entity,
+					document5Entity,
 					procedimentOrgan);
 	
 			List<Enviament> enviaments = new ArrayList<Enviament>();
@@ -405,7 +322,86 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
+	private DocumentEntity getDocumentEntity(DocumentDto document) {
+		DocumentEntity documentEntity = null;
+
+		if (document != null) {
+			String documentGesdocId = null;
+			if (document.getContingutBase64() != null) {
+				documentGesdocId = pluginHelper.gestioDocumentalCreate(
+						PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
+						Base64.decodeBase64(document.getContingutBase64()));
+			} else if (document.getUuid() != null) {
+				DocumentDto doc = new DocumentDto();
+				String arxiuUuid = document.getUuid();
+				if (pluginHelper.isArxiuPluginDisponible()) {
+					Document documentArxiu = pluginHelper.arxiuDocumentConsultar(arxiuUuid, null, true,true);
+					doc.setArxiuNom(documentArxiu.getNom());
+					doc.setNormalitzat(document.isNormalitzat());
+					doc.setGenerarCsv(document.isGenerarCsv());
+					doc.setUuid(arxiuUuid);
+					doc.setMediaType(documentArxiu.getContingut().getTipusMime());
+					doc.setMida(documentArxiu.getContingut().getTamany());
+					document = doc;
+				}
+			} else if (document.getCsv() != null) {
+				DocumentDto doc = new DocumentDto();
+				String arxiuCsv = document.getCsv();
+				if (pluginHelper.isArxiuPluginDisponible()) {
+					DocumentContingut documentArxiu = pluginHelper.arxiuGetImprimible(arxiuCsv, false);
+					doc.setArxiuNom(documentArxiu.getArxiuNom());
+					doc.setNormalitzat(document.isNormalitzat());
+					doc.setGenerarCsv(document.isGenerarCsv());
+					doc.setMediaType(documentArxiu.getTipusMime());
+					doc.setMida(documentArxiu.getTamany());
+					doc.setCsv(arxiuCsv);
+					document = doc;
+				}
+			}
+			// Guardar document
+			if (document.getCsv() != null ||
+					document.getUuid() != null ||
+					document.getContingutBase64() != null ||
+					document.getArxiuGestdocId() != null) {
+
+				if (document.getId() != null && !document.getId().isEmpty()) {
+					documentEntity = documentRepository.findOne(Long.valueOf(document.getId()));
+					documentEntity.update(
+							documentGesdocId != null ? documentGesdocId : document.getArxiuGestdocId(),
+							document.getArxiuNom(),
+							document.getUrl(),
+							document.isNormalitzat(),
+							document.getUuid(),
+							document.getCsv(),
+							document.getMediaType(),
+							document.getMida(),
+							document.getOrigen(),
+							document.getValidesa(),
+							document.getTipoDocumental(),
+							document.getModoFirma());
+				} else {
+					documentEntity = documentRepository.save(DocumentEntity.getBuilderV2(
+							document.getArxiuGestdocId(),
+							documentGesdocId != null ? documentGesdocId : document.getArxiuGestdocId(),
+							document.getArxiuNom(),
+							document.getUrl(),
+							document.isNormalitzat(),
+							document.getUuid(),
+							document.getCsv(),
+							document.getMediaType(),
+							document.getMida(),
+							document.getOrigen(),
+							document.getValidesa(),
+							document.getTipoDocumental(),
+							document.getModoFirma()
+					).build());
+				}
+			}
+		}
+		return documentEntity;
+	}
+
 	@Transactional
 	@Override
 	public void delete(
@@ -523,69 +519,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 				if (notificacio.getGrup() != null && notificacio.getGrup().getId() != null) {
 					grupNotificacio = grupRepository.findOne(notificacio.getGrup().getId());
 				}
-	//			### Crear document si és nou
-				if(notificacio.getDocument().getContingutBase64() != null) {
-					documentGesdocId = pluginHelper.gestioDocumentalCreate(
-							PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-							Base64.decodeBase64(notificacio.getDocument().getContingutBase64()));
-				} else if (notificacio.getDocument().getUuid() != null) {
-					DocumentDto document = new DocumentDto();
-					String arxiuUuid = notificacio.getDocument().getUuid();
-					if (pluginHelper.isArxiuPluginDisponible()) {
-						Document documentArxiu = pluginHelper.arxiuDocumentConsultar(arxiuUuid, null);
-						document.setArxiuNom(documentArxiu.getNom());
-						document.setNormalitzat(notificacio.getDocument().isNormalitzat());
-						document.setGenerarCsv(notificacio.getDocument().isGenerarCsv());
-						document.setUuid(arxiuUuid);
-						document.setMediaType(documentArxiu.getContingut().getTipusMime());
-						document.setMida(documentArxiu.getContingut().getTamany());
-						notificacio.setDocument(document);
-					}
-				} else if (notificacio.getDocument().getCsv() != null) {
-					DocumentDto document = new DocumentDto();
-					String arxiuCsv = notificacio.getDocument().getCsv();
-					if (pluginHelper.isArxiuPluginDisponible()) {
-						DocumentContingut documentArxiu = pluginHelper.arxiuGetImprimible(arxiuCsv, false);
-						document.setArxiuNom(documentArxiu.getArxiuNom());
-						document.setNormalitzat(notificacio.getDocument().isNormalitzat());
-						document.setGenerarCsv(notificacio.getDocument().isGenerarCsv());
-						document.setMediaType(documentArxiu.getTipusMime());
-						document.setMida(documentArxiu.getTamany());
-						document.setCsv(arxiuCsv);
-						notificacio.setDocument(document);
-					}
-				}
-				DocumentEntity documentEntity = null;
-	//			### Crear o actualitzar un document existent
-				if(notificacio.getDocument().getCsv() != null || 
-				   notificacio.getDocument().getUuid() != null || 
-				   notificacio.getDocument().getContingutBase64() != null || 
-				   notificacio.getDocument().getArxiuGestdocId() != null) {
-		
-					if (notificacio.getDocument().getId() != null) {
-						documentEntity = documentRepository.findOne(Long.valueOf(notificacio.getDocument().getId()));
-						documentEntity.update(
-								documentGesdocId != null ? documentGesdocId : notificacio.getDocument().getArxiuGestdocId(), 
-								notificacio.getDocument().getArxiuNom(), 
-								notificacio.getDocument().getUrl(),  
-								notificacio.getDocument().isNormalitzat(),  
-								notificacio.getDocument().getUuid(),
-								notificacio.getDocument().getCsv(),
-								notificacio.getDocument().getMediaType(),
-								notificacio.getDocument().getMida());
-					} else {
-						documentEntity = documentRepository.save(DocumentEntity.getBuilderV2(
-								notificacio.getDocument().getArxiuGestdocId(), 
-								documentGesdocId != null ? documentGesdocId : notificacio.getDocument().getArxiuGestdocId(), 
-								notificacio.getDocument().getArxiuNom(), 
-								notificacio.getDocument().getUrl(),  
-								notificacio.getDocument().isNormalitzat(),  
-								notificacio.getDocument().getUuid(),
-								notificacio.getDocument().getCsv(),
-								notificacio.getDocument().getMediaType(),
-								notificacio.getDocument().getMida()).build());
-					}
-				}
+
+	//			### Crear documents si son nous
+				DocumentEntity documentEntity = getDocumentEntity(notificacio.getDocument());
+				DocumentEntity document2Entity = getDocumentEntity(notificacio.getDocument2());
+				DocumentEntity document3Entity = getDocumentEntity(notificacio.getDocument3());
+				DocumentEntity document4Entity = getDocumentEntity(notificacio.getDocument4());
+				DocumentEntity document5Entity = getDocumentEntity(notificacio.getDocument5());
+
 	//			### Actualitzar notificació existent
 				auditNotificacioHelper.updateNotificacio(
 						notificacio, 
@@ -595,6 +536,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 						organGestor, 
 						procediment,
 						documentEntity,
+						document2Entity,
+						document3Entity,
+						document4Entity,
+						document5Entity,
 						procedimentOrgan);
 				
 				List<Enviament> enviaments = new ArrayList<Enviament>();
@@ -2171,7 +2116,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 				
 				pluginHelper.gestioDocumentalGet(
 						arxiuGestdocId,
-						PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
+						PluginHelper.GESDOC_AGRUPACIO_TEMPORALS,
+//						PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 						output);
 			}
 		} catch (Exception ex) {
