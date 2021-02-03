@@ -1,5 +1,6 @@
 package es.caib.notib.plugin.registre;
 
+import es.caib.notib.core.api.dto.AnexoWsDto;
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
 import es.caib.notib.core.api.dto.InteresadoWsDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
@@ -395,24 +396,25 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		ar.setUnidadTramitacionDestinoDenominacion(dto.getUnidadTramitacionDestinoDenominacion());
 		ar.setUnidadTramitacionOrigenCodigo(dto.getUnidadTramitacionOrigenCodigo());
 		ar.setUnidadTramitacionOrigenDenominacion(dto.getUnidadTramitacionOrigenDenominacion());
-		if(dto.getAnexos().size() > 0) {
-			AnexoWs anexe = new AnexoWs();
-			anexe.setCsv(dto.getAnexos().get(0).getCsv());
-//			anexe.setFechaCaptura(dto.getAnexos().get(0).getFechaCaptura());
-			anexe.setFicheroAnexado(dto.getAnexos().get(0).getFicheroAnexado());
-			anexe.setFirmaAnexada(dto.getAnexos().get(0).getFirmaAnexada());
-			anexe.setModoFirma(dto.getAnexos().get(0).getModoFirma());
-			anexe.setNombreFicheroAnexado(dto.getAnexos().get(0).getNombreFicheroAnexado());
-			anexe.setNombreFirmaAnexada(dto.getAnexos().get(0).getNombreFirmaAnexada());
-			anexe.setObservaciones(dto.getAnexos().get(0).getObservaciones());
-			anexe.setOrigenCiudadanoAdmin(dto.getAnexos().get(0).getOrigenCiudadanoAdmin());
-			anexe.setTipoDocumental(dto.getAnexos().get(0).getTipoDocumental());
-			anexe.setTipoDocumento(dto.getAnexos().get(0).getTipoDocumento());
-			anexe.setTipoMIMEFicheroAnexado(dto.getAnexos().get(0).getTipoMIMEFicheroAnexado());
-			anexe.setTipoMIMEFirmaAnexada(dto.getAnexos().get(0).getTipoMIMEFirmaAnexada());
-			anexe.setTitulo(dto.getAnexos().get(0).getTitulo());
-			anexe.setValidezDocumento(dto.getAnexos().get(0).getValidezDocumento());
-			ar.getAnexos().add(anexe);
+		if(dto.getAnexos() != null) {
+			for (AnexoWsDto anexo: dto.getAnexos()) {
+				AnexoWs anexe = new AnexoWs();
+				anexe.setCsv(anexo.getCsv());
+				anexe.setFicheroAnexado(anexo.getFicheroAnexado());
+				anexe.setFirmaAnexada(anexo.getFirmaAnexada());
+				anexe.setModoFirma(anexo.getModoFirma());
+				anexe.setNombreFicheroAnexado(anexo.getNombreFicheroAnexado());
+				anexe.setNombreFirmaAnexada(anexo.getNombreFirmaAnexada());
+				anexe.setObservaciones(anexo.getObservaciones());
+				anexe.setOrigenCiudadanoAdmin(anexo.getOrigenCiudadanoAdmin());
+				anexe.setTipoDocumental(anexo.getTipoDocumental());
+				anexe.setTipoDocumento(anexo.getTipoDocumento());
+				anexe.setTipoMIMEFicheroAnexado(anexo.getTipoMIMEFicheroAnexado());
+				anexe.setTipoMIMEFirmaAnexada(anexo.getTipoMIMEFirmaAnexada());
+				anexe.setTitulo(anexo.getTitulo());
+				anexe.setValidezDocumento(anexo.getValidezDocumento());				
+				ar.getAnexos().add(anexe);
+			}
 		}
 		//Interessat + representant
 		if (dto.getInteresados() != null) {
