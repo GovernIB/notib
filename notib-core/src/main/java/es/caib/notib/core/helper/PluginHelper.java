@@ -8,6 +8,7 @@ import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.plugin.conversio.ConversioArxiu;
 import es.caib.notib.plugin.conversio.ConversioPlugin;
@@ -16,10 +17,12 @@ import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.gesconadm.GcaProcediment;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
+import es.caib.notib.plugin.registre.*;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
+import es.caib.notib.plugin.unitat.OficinaSIR;
 import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
@@ -56,50 +59,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
-
-import es.caib.notib.core.api.dto.AccioParam;
-import es.caib.notib.core.api.dto.AnexoWsDto;
-import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
-import es.caib.notib.core.api.dto.DatosInteresadoWsDto;
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.core.api.dto.IntegracioInfo;
-import es.caib.notib.core.api.dto.InteresadoWsDto;
-import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
-import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.OficinaDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.PersonaDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.RegistreAnnexDto;
-import es.caib.notib.core.api.dto.RegistreInteressatDocumentTipusDtoEnum;
-import es.caib.notib.core.api.dto.RegistreInteressatDto;
-import es.caib.notib.core.api.dto.RegistreModeFirmaDtoEnum;
-import es.caib.notib.core.api.dto.RegistreOrigenDtoEnum;
-import es.caib.notib.core.api.dto.RegistreTipusDocumentDtoEnum;
-import es.caib.notib.core.api.dto.RegistreTipusDocumentalDtoEnum;
-import es.caib.notib.core.api.dto.RegistreValidezDocumentDtoEnum;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
-import es.caib.notib.plugin.registre.CodiAssumpte;
-import es.caib.notib.plugin.registre.DadesInteressat;
-import es.caib.notib.plugin.registre.DadesOficina;
-import es.caib.notib.plugin.registre.DadesRepresentat;
-import es.caib.notib.plugin.registre.Interessat;
-import es.caib.notib.plugin.registre.Llibre;
-import es.caib.notib.plugin.registre.LlibreOficina;
-import es.caib.notib.plugin.registre.Oficina;
-import es.caib.notib.plugin.registre.Organisme;
-import es.caib.notib.plugin.registre.RegistrePlugin;
-import es.caib.notib.plugin.registre.RegistrePluginException;
-import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
-import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
-import es.caib.notib.plugin.registre.TipusAssumpte;
-import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
-import es.caib.notib.plugin.unitat.OficinaSIR;
 /**
  * Helper per a interactuar amb els plugins.
  * 
@@ -1488,7 +1447,7 @@ public class PluginHelper {
 			Path path = null;
 
 			// Metadades per defecte (per si no estan emplenades (notificacions antigues)
-			Integer origen = document.getOrigen() != null ? document.getOrigen().getValor() : OrigenEnum.CIUTADA.getValor();
+			Integer origen = document.getOrigen() != null ? document.getOrigen().getValor() : OrigenEnum.ADMINISTRACIO.getValor();
 			String validezDocumento = document.getValidesa() != null ? document.getValidesa().getValor() : ValidesaEnum.ORIGINAL.getValor();
 			String tipoDocumental = document.getTipoDocumental() != null ? document.getTipoDocumental().getValor() : TipusDocumentalEnum.NOTIFICACIO.getValor();
 			Integer modoFirma = document.getModoFirma() != null ? (document.getModoFirma() ? 1 : 0) : 0;
@@ -1541,7 +1500,6 @@ public class PluginHelper {
 				annex.setNombreFicheroAnexado(FilenameUtils.getName(document.getUrl()));
 
 				//Metadades
-				annex.setTipoDocumento(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
 				annex.setTipoDocumental(tipoDocumental);
 				annex.setOrigenCiudadanoAdmin(origen);
 				annex.setValidezDocumento(validezDocumento);
@@ -1559,7 +1517,6 @@ public class PluginHelper {
 				annex.setNombreFicheroAnexado(document.getArxiuNom());
 
 				//Metadades
-				annex.setTipoDocumento(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
 				annex.setTipoDocumental(tipoDocumental);
 				annex.setOrigenCiudadanoAdmin(origen);
 				annex.setValidezDocumento(validezDocumento);
@@ -1574,7 +1531,7 @@ public class PluginHelper {
 				e.printStackTrace();
 			}
 			annex.setTitulo("Annex 1");
-			annex.setModoFirma(0);
+			annex.setTipoDocumento(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
 			return annex;
 		} catch (Exception ex) {
 			throw new SistemaExternException(

@@ -620,7 +620,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private DocumentDto comprovaDocument(DocumentV2 documentV2) { //, boolean versioImprimible) {
 		DocumentDto document = new DocumentDto();
 		// -- Per compatibilitat amb versions anteriors, posam valors per defecte
-		OrigenEnum origen = documentV2.getOrigen() != null ? documentV2.getOrigen() : OrigenEnum.CIUTADA;
+		OrigenEnum origen = documentV2.getOrigen() != null ? documentV2.getOrigen() : OrigenEnum.ADMINISTRACIO;
 		ValidesaEnum validesa = documentV2.getValidesa() != null ? documentV2.getValidesa() : ValidesaEnum.ORIGINAL;
 		TipusDocumentalEnum tipoDocumental = documentV2.getTipoDocumental() != null ? documentV2.getTipoDocumental() : TipusDocumentalEnum.NOTIFICACIO;
 		Boolean modoFirma = documentV2.getModoFirma() != null ? documentV2.getModoFirma() : false;
