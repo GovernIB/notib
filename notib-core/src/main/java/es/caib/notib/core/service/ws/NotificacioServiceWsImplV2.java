@@ -619,6 +619,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 	private DocumentDto comprovaDocument(DocumentV2 documentV2) { //, boolean versioImprimible) {
 		DocumentDto document = new DocumentDto();
+		// -- Per compatibilitat amb versions anteriors, posam valors per defecte
+		OrigenEnum origen = documentV2.getOrigen() != null ? documentV2.getOrigen() : OrigenEnum.CIUTADA;
+		ValidesaEnum validesa = documentV2.getValidesa() != null ? documentV2.getValidesa() : ValidesaEnum.ORIGINAL;
+		TipusDocumentalEnum tipoDocumental = documentV2.getTipoDocumental() != null ? documentV2.getTipoDocumental() : TipusDocumentalEnum.NOTIFICACIO;
+		Boolean modoFirma = documentV2.getModoFirma() != null ? documentV2.getModoFirma() : false;
+		// --
 		if(documentV2.getContingutBase64() != null) {
 			logger.debug(">> [ALTA] document contingut Base64");
 			byte[] contingut = Base64.decodeBase64(documentV2.getContingutBase64());
@@ -628,10 +634,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			document.setArxiuGestdocId(documentGesdocId);
 			document.setMida(Long.valueOf(contingut.length));
 			document.setMediaType(getMimeTypeFromContingut(contingut));
-			document.setOrigen(documentV2.getOrigen());
-			document.setValidesa(documentV2.getValidesa());
-			document.setTipoDocumental(documentV2.getTipoDocumental());
-			document.setModoFirma(documentV2.getModoFirma());
+			document.setOrigen(origen);
+			document.setValidesa(validesa);
+			document.setTipoDocumental(tipoDocumental);
+			document.setModoFirma(modoFirma);
 			logger.debug(">> [ALTA] documentId: " + documentGesdocId);
 		} else if (documentV2.getUuid() != null) {
 			String arxiuUuid = documentV2.getUuid();
@@ -663,10 +669,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			byte[] contingut = pluginHelper.getUrlDocumentContent(arxiuUrl);
 			document.setMida(Long.valueOf(contingut.length));
 			document.setMediaType(getMimeTypeFromContingut(contingut));
-			document.setOrigen(documentV2.getOrigen());
-			document.setValidesa(documentV2.getValidesa());
-			document.setTipoDocumental(documentV2.getTipoDocumental());
-			document.setModoFirma(documentV2.getModoFirma());
+			document.setOrigen(origen);
+			document.setValidesa(validesa);
+			document.setTipoDocumental(tipoDocumental);
+			document.setModoFirma(modoFirma);
 		}
 		return document;
 	}
