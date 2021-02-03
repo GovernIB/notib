@@ -570,6 +570,9 @@ $(document).ready(function() {
 			document.getElementById("searchOrganTit" + index).getElementsByTagName('input')[index].value = dir3Desc+'-'+raoSocialDesc;
 			$(dir3codi).find('.help-block').addClass('hidden')
 			$(dir3codi).find('.form-group').removeClass('has-error')
+		}else if(document.getElementById("enviaments0.titular.dir3Codi.errors") != null && document.getElementById("enviaments0.titular.dir3Codi.errors").innerText != '' ){
+			$(dir3codi).find('.help-block').removeClass('hidden')
+			$(dir3codi).find('.form-group').addClass('has-error')
 		}
 		comprovarTitularComuniacio();
 		var dir3Codi = closest.find("input[name='enviaments[0].titular.dir3Codi']");

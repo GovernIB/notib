@@ -9,7 +9,6 @@ import javax.mail.internet.InternetAddress;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,8 @@ import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.NotificacioCommandV2;
 import es.caib.notib.war.command.PersonaCommand;
 import es.caib.notib.war.helper.MessageHelper;
+import java.util.Date;
+
 
 /**
  * Constraint de validació que controla que camp email és obligatori si està habilitada l'entrega a la Direcció Electrònica Hablitada (DEH)
@@ -112,7 +113,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			
 			// Validació caducitat
 			if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO) {
-				if (notificacio.getCaducitat() != null && !notificacio.getCaducitat().after(LocalDateTime.now().toDate())) {
+				if (notificacio.getCaducitat() != null && !notificacio.getCaducitat().after(new Date())) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
 							MessageHelper.getInstance().getMessage("notificacio.form.valid.caducitat"))

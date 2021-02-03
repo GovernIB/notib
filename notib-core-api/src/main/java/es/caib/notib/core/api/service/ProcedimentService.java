@@ -369,7 +369,7 @@ public interface ProcedimentService {
 			List<String> grups,
 			PermisEnum permis);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	List<CodiValorComuDto> getProcedimentsOrgan(
 			Long entitatId,
 			String organCodi,

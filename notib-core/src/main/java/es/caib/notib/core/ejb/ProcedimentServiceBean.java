@@ -334,7 +334,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
     @Override
-	@RolesAllowed({"tothom"})
+    @RolesAllowed({"NOT_ADMIN", "tothom"})
     public List<CodiValorComuDto> getProcedimentsOrgan(
 			Long entitatId,
 			String organCodi,
