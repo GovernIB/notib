@@ -3,20 +3,18 @@
  */
 package es.caib.notib.core.ejb;
 
-import java.util.List;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import javax.interceptor.Interceptors;
-
 import es.caib.notib.core.api.dto.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
 import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.NotificacioService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
+import java.util.List;
 
 /**
  * Implementació de NotificacioService com a EJB que empra una clase
@@ -75,6 +73,14 @@ public class NotificacioServiceBean implements NotificacioService {
 	public ArxiuDto getDocumentArxiu(
 			Long notificacioId) {
 		return delegate.getDocumentArxiu(notificacioId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_CARPETA"})
+	public ArxiuDto getDocumentArxiu(
+			Long notificacioId,
+			Long documentId) {
+		return delegate.getDocumentArxiu(notificacioId, documentId);
 	}
 	
 	@Override

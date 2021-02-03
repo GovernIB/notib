@@ -5,9 +5,15 @@ package es.caib.notib.core.service.ws;
 
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.ws.notificacio.*;
+import es.caib.notib.core.entity.*;
+import es.caib.notib.core.helper.*;
+import es.caib.notib.core.repository.*;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
+import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -31,80 +37,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import es.caib.notib.core.api.dto.AccioParam;
-import es.caib.notib.core.api.dto.DocumentDto;
-import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.core.api.dto.IntegracioInfo;
-import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
-import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.core.api.dto.OficinaDto;
-import es.caib.notib.core.api.dto.OrganismeDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
-import es.caib.notib.core.api.dto.TipusEnumDto;
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
-import es.caib.notib.core.api.ws.notificacio.Certificacio;
-import es.caib.notib.core.api.ws.notificacio.DadesConsulta;
-import es.caib.notib.core.api.ws.notificacio.DocumentV2;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.Enviament;
-import es.caib.notib.core.api.ws.notificacio.EnviamentEstatEnum;
-import es.caib.notib.core.api.ws.notificacio.EnviamentReferencia;
-import es.caib.notib.core.api.ws.notificacio.EnviamentTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum;
-import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsException;
-import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
-import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
-import es.caib.notib.core.api.ws.notificacio.PermisConsulta;
-import es.caib.notib.core.api.ws.notificacio.Persona;
-import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
-import es.caib.notib.core.api.ws.notificacio.RespostaConsultaDadesRegistre;
-import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
-import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
-import es.caib.notib.core.entity.AplicacioEntity;
-import es.caib.notib.core.entity.DocumentEntity;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.PersonaEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.ProcedimentOrganEntity;
-import es.caib.notib.core.helper.AuditEnviamentHelper;
-import es.caib.notib.core.helper.AuditNotificacioHelper;
-import es.caib.notib.core.helper.CacheHelper;
-import es.caib.notib.core.helper.CaducitatHelper;
-import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.CreacioSemaforDto;
-import es.caib.notib.core.helper.IntegracioHelper;
-import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.NifHelper;
-import es.caib.notib.core.helper.NotificaHelper;
-import es.caib.notib.core.helper.PermisosHelper;
-import es.caib.notib.core.helper.PluginHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
-import es.caib.notib.core.helper.RegistreNotificaHelper;
-import es.caib.notib.core.repository.AplicacioRepository;
-import es.caib.notib.core.repository.DocumentRepository;
-import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.repository.NotificacioEventRepository;
-import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.PersonaRepository;
-import es.caib.notib.core.repository.ProcedimentOrganRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
-import es.caib.notib.plugin.unitat.NodeDir3;
 
 /**
  * Implementació del servei per a l'enviament i consulta de notificacions V2 (Sense paràmetres SEU).
@@ -739,10 +671,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		return document;
 	}
 
-	private OrigenEnum toOrigen() {
-		return null;
-	}
-	
 	private String getMimeTypeFromContingut(byte[] contingut) {
 		String mimeType = null;
 		

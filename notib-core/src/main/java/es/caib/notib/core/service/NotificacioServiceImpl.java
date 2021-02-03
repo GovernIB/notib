@@ -1426,48 +1426,72 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			String nomDocumetnDefault = "document";
 			NotificacioEntity entity = notificacioRepository.findById(notificacioId);
-			if(entity.getDocument() != null && entity.getDocument().getArxiuGestdocId() != null) {
-				ByteArrayOutputStream output = new ByteArrayOutputStream();
-				pluginHelper.gestioDocumentalGet(
-						entity.getDocument().getArxiuGestdocId(),
-						PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-						output);
-				return new ArxiuDto(
-						entity.getDocument().getArxiuNom() != null ? entity.getDocument().getArxiuNom() : nomDocumetnDefault,
-						null,
-						output.toByteArray(),
-						output.size());	
-			}else if(entity.getDocument().getUuid() != null){
-				DocumentContingut dc = pluginHelper.arxiuGetImprimible(entity.getDocument().getUuid(), true);
-				return new ArxiuDto(
-						entity.getDocument().getArxiuNom() != null ? entity.getDocument().getArxiuNom() : nomDocumetnDefault,
-						dc.getTipusMime(),
-						dc.getContingut(),
-						dc.getTamany());
-			}else if(entity.getDocument().getCsv() != null){
-				DocumentContingut dc = pluginHelper.arxiuGetImprimible(entity.getDocument().getCsv(), false);
-				return new ArxiuDto(
-						entity.getDocument().getArxiuNom() != null ? entity.getDocument().getArxiuNom() : nomDocumetnDefault,
-						dc.getTipusMime(),
-						dc.getContingut(),
-						dc.getTamany());	
-			}else if(entity.getDocument().getUrl() != null){
-				try {
-					byte[] contingut = downloadUsingStream(entity.getDocument().getUrl(), "document");
-					return new ArxiuDto(
-							entity.getDocument().getArxiuNom() != null ? entity.getDocument().getArxiuNom() : nomDocumetnDefault,
-							"PDF",
-							contingut,
-							contingut.length);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			return null;
+			DocumentEntity document = entity.getDocument();
+			return documentToArxiuDto(nomDocumetnDefault, document);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public ArxiuDto getDocumentArxiu(
+			Long notificacioId,
+			Long documentId) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			String nomDocumentDefault = "document";
+			DocumentEntity document = documentRepository.findOne(documentId);
+//			DocumentEntity document = documentRepository.findByNotificacioIdAndId(notificacioId, documentId);
+			return documentToArxiuDto(nomDocumentDefault, document);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	private ArxiuDto documentToArxiuDto(String nomDocumetnDefault, DocumentEntity document) {
+		if (document == null)
+			return null;
+		if(document.getArxiuGestdocId() != null) {
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			pluginHelper.gestioDocumentalGet(
+					document.getArxiuGestdocId(),
+					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
+					output);
+			return new ArxiuDto(
+					document.getArxiuNom() != null ? document.getArxiuNom() : nomDocumetnDefault,
+					null,
+					output.toByteArray(),
+					output.size());
+		}else if(document.getUuid() != null){
+			DocumentContingut dc = pluginHelper.arxiuGetImprimible(document.getUuid(), true);
+			return new ArxiuDto(
+					document.getArxiuNom() != null ? document.getArxiuNom() : nomDocumetnDefault,
+					dc.getTipusMime(),
+					dc.getContingut(),
+					dc.getTamany());
+		}else if(document.getCsv() != null){
+			DocumentContingut dc = pluginHelper.arxiuGetImprimible(document.getCsv(), false);
+			return new ArxiuDto(
+					document.getArxiuNom() != null ? document.getArxiuNom() : nomDocumetnDefault,
+					dc.getTipusMime(),
+					dc.getContingut(),
+					dc.getTamany());
+		}else if(document.getUrl() != null){
+			try {
+				byte[] contingut = downloadUsingStream(document.getUrl(), "document");
+				return new ArxiuDto(
+						document.getArxiuNom() != null ? document.getArxiuNom() : nomDocumetnDefault,
+						"PDF",
+						contingut,
+						contingut.length);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
 	@Override
 	@Transactional(readOnly = true)
 	public ArxiuDto enviamentGetCertificacioArxiu(

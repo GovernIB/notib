@@ -850,23 +850,24 @@ public class NotificacioController extends BaseUserController {
         return "enviamentInfo";
     }
 
-    @RequestMapping(value = "/{notificacioId}/documentDescarregar", method = RequestMethod.GET)
+    @RequestMapping(value = "/{notificacioId}/documentDescarregar/{documentId}", method = RequestMethod.GET)
     @ResponseBody
     public void documentDescarregar(
             HttpServletResponse response,
-            @PathVariable Long notificacioId) throws IOException {
-        ArxiuDto arxiu = notificacioService.getDocumentArxiu(notificacioId);
-        String mimeType = "";
-        if (arxiu.getContentType() == "application_pdf" || arxiu.getContentType() == "application/pdf" || arxiu.getContentType() == "PDF" && !arxiu.getNom().contains(".pdf")) {
-            mimeType = ".pdf";
-        }
+            @PathVariable Long notificacioId,
+            @PathVariable Long documentId) throws IOException {
+        ArxiuDto arxiu = notificacioService.getDocumentArxiu(notificacioId, documentId);
+//        String mimeType = "";
+//        if (arxiu.getContentType() == "application_pdf" || arxiu.getContentType() == "application/pdf" || arxiu.getContentType() == "PDF" && !arxiu.getNom().contains(".pdf")) {
+//            mimeType = ".pdf";
+//        }
         response.setHeader("Set-cookie", "fileDownload=true; path=/");
-        writeFileToResponse(arxiu.getNom() + mimeType, arxiu.getContingut(), response);
+        writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
     }
 
     @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/certificacioDescarregar", method = RequestMethod.GET)
     @ResponseBody
-    public void documentDescarregar(
+    public void certificacioDescarregar(
             HttpServletResponse response,
             @PathVariable Long notificacioId,
             @PathVariable Long enviamentId) throws IOException {

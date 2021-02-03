@@ -3,17 +3,14 @@
  */
 package es.caib.notib.core.api.service;
 
-import java.io.ByteArrayOutputStream;
-import java.util.List;
-
-import javax.mail.MessagingException;
-
 import es.caib.notib.core.api.dto.*;
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import javax.mail.MessagingException;
+import java.util.List;
 
 /**
  * Declaració dels mètodes per a la consulta de notificacions i dels
@@ -218,6 +215,20 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_CARPETA')")
 	public ArxiuDto getDocumentArxiu(
 			Long notificacioId);
+
+	/**
+	 * Retorna l'arxiu del document de la notificació.
+	 *
+	 * @param notificacioId
+	 *            Atribut id de la notificació.
+	 * @param documentId
+	 *            Atribut id del document.
+	 * @return el fitxer associat.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_CARPETA')")
+	public ArxiuDto getDocumentArxiu(
+			Long notificacioId,
+			Long documentId);
 	
 	/**
 	 * Retorna l'arxiu de la certificació d'un enviament.
