@@ -245,24 +245,36 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							document2 = comprovaDocument(notificacio.getDocument2());
 							document2Entity = getDocument(notificacio.getDocument2(), document2);
 							midaTotal += document2.getMida();
+							if (document2.getMida() > getMaxSizeFile()) {
+								return setRespostaError("[1065] La longitud del document2 supera el màxim definit (" + getMaxSizeFile() / (1024*1024) + "Mb).");
+							}
 						}
 						numDoc++;
 						if (notificacio.getDocument3() != null) {
 							document3 = comprovaDocument(notificacio.getDocument3());
 							document3Entity = getDocument(notificacio.getDocument3(), document3);
 							midaTotal += document3.getMida();
+							if (document3.getMida() > getMaxSizeFile()) {
+								return setRespostaError("[1065] La longitud del document3 supera el màxim definit (" + getMaxSizeFile() / (1024*1024) + "Mb).");
+							}
 						}
 						numDoc++;
 						if (notificacio.getDocument4() != null) {
 							document4 = comprovaDocument(notificacio.getDocument4());
 							document4Entity = getDocument(notificacio.getDocument4(), document4);
 							midaTotal += document4.getMida();
+							if (document4.getMida() > getMaxSizeFile()) {
+								return setRespostaError("[1065] La longitud del document4 supera el màxim definit (" + getMaxSizeFile() / (1024*1024) + "Mb).");
+							}
 						}
 						numDoc++;
 						if (notificacio.getDocument5() != null) {
 							document5 = comprovaDocument(notificacio.getDocument5());
 							document5Entity = getDocument(notificacio.getDocument5(), document5);
 							midaTotal += document5.getMida();
+							if (document5.getMida() > getMaxSizeFile()) {
+								return setRespostaError("[1065] La longitud del document5 supera el màxim definit (" + getMaxSizeFile() / (1024*1024) + "Mb).");
+							}
 						}
 					} catch (Exception e) {
 						logger.error("Error al obtenir el document " + numDoc, e);
@@ -271,8 +283,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						return setRespostaError(errorDescripcio);
 					}
 					// Mida dels documents
-					if (midaTotal > 1L) {
-						return setRespostaError("[1065] La mida màxima del conjunt de documents supera el total màxim (15 Mb).");
+					if (midaTotal > getMaxTotalSizeFile()) {
+						return setRespostaError("[1065] La mida màxima del conjunt de documents supera el total màxim (" + getMaxTotalSizeFile() / (1024*1024) + "Mb).");
 					}
 
 				} else {
@@ -284,6 +296,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						String errorDescripcio = "[1064] No s'ha pogut obtenir el document a notificar: " + e.getMessage();
 						integracioHelper.addAccioError(info, errorDescripcio);
 						return setRespostaError(errorDescripcio);
+					}
+//					byte[] base64Decoded = Base64.decodeBase64(notificacio.getDocument().getContingutBase64());
+					if (document.getMida() > getMaxSizeFile()) {
+						return setRespostaError("[1065] La longitud del document supera el màxim definit (" + getMaxSizeFile() / (1024*1024) + "Mb).");
 					}
 				}
 
@@ -620,7 +636,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private DocumentDto comprovaDocument(DocumentV2 documentV2) { //, boolean versioImprimible) {
 		DocumentDto document = new DocumentDto();
 		// -- Per compatibilitat amb versions anteriors, posam valors per defecte
-		OrigenEnum origen = documentV2.getOrigen() != null ? documentV2.getOrigen() : OrigenEnum.CIUTADA;
+		OrigenEnum origen = documentV2.getOrigen() != null ? documentV2.getOrigen() : OrigenEnum.ADMINISTRACIO;
 		ValidesaEnum validesa = documentV2.getValidesa() != null ? documentV2.getValidesa() : ValidesaEnum.ORIGINAL;
 		TipusDocumentalEnum tipoDocumental = documentV2.getTipoDocumental() != null ? documentV2.getTipoDocumental() : TipusDocumentalEnum.NOTIFICACIO;
 		Boolean modoFirma = documentV2.getModoFirma() != null ? documentV2.getModoFirma() : false;
@@ -1675,11 +1691,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			resposta.setErrorDescripcio(COMUNICACIOAMBADMINISTRACIO);
 		} else {
 			if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
-				byte[] base64Decoded = Base64.decodeBase64(notificacio.getDocument().getContingutBase64());
-				if (!isFormatValid(document.getContingutBase64()))
+				if (!isFormatValid(document.getContingutBase64())) {
 					return setRespostaError("[1063] El format del document no és vàlid. Les notificacions i comunicacions a ciutadà només admeten els formats PDF i ZIP.");
-				if (base64Decoded.length > getMaxSizeFile()) {
-					return setRespostaError("[1065] La longitud del document supera el màxim definit (" + getMaxSizeFile() / (1024*1024) + "Mb).");
 				}
 			}
 
@@ -1885,6 +1898,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		String property = "es.caib.notib.notificacio.document.size";
 		logger.debug("Consulta del valor de la property (property=" + property + ")");
 		return Long.valueOf(PropertiesHelper.getProperties().getProperty(property, "10485760"));
+	}
+
+	private static Long getMaxTotalSizeFile() {
+		String property = "es.caib.notib.notificacio.document.total.size";
+		logger.debug("Consulta del valor de la property (property=" + property + ")");
+		return Long.valueOf(PropertiesHelper.getProperties().getProperty(property, "15728640"));
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceWsImplV2.class);
