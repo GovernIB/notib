@@ -48,6 +48,10 @@ public class AuditNotificacioHelper {
 			OrganGestorEntity organGestor, 
 			ProcedimentEntity procediment,
 			DocumentEntity documentEntity,
+			DocumentEntity document2Entity,
+			DocumentEntity document3Entity,
+			DocumentEntity document4Entity,
+			DocumentEntity document5Entity,
 			ProcedimentOrganEntity procedimentOrgan) {
 		return notificacioRepository.saveAndFlush(NotificacioEntity.
 				getBuilderV2(
@@ -68,7 +72,13 @@ public class AuditNotificacioHelper {
 						notificacio.getNumExpedient(),
 						TipusUsuariEnumDto.INTERFICIE_WEB,
 						procedimentOrgan,
-						notificacio.getIdioma()).document(documentEntity).build());
+						notificacio.getIdioma())
+				.document(documentEntity)
+				.document2(document2Entity)
+				.document3(document3Entity)
+				.document4(document4Entity)
+				.document5(document5Entity)
+				.build());
 	}
 	
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
@@ -80,6 +90,10 @@ public class AuditNotificacioHelper {
 			OrganGestorEntity organGestor,
 			ProcedimentEntity procediment, 
 			DocumentEntity documentEntity,
+			DocumentEntity document2Entity,
+			DocumentEntity document3Entity,
+			DocumentEntity document4Entity,
+			DocumentEntity document5Entity,
 			ProcedimentOrganEntity procedimentOrgan) {
 		notificacioEntity.update(
 				entitat,
@@ -99,6 +113,10 @@ public class AuditNotificacioHelper {
 				notificacio.getNumExpedient(),
 				TipusUsuariEnumDto.INTERFICIE_WEB,
 				documentEntity,
+				document2Entity,
+				document3Entity,
+				document4Entity,
+				document5Entity,
 				procedimentOrgan,
 				notificacio.getIdioma());
 		return notificacioEntity;

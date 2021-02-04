@@ -5,9 +5,15 @@ package es.caib.notib.core.service.ws;
 
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.ws.notificacio.*;
+import es.caib.notib.core.entity.*;
+import es.caib.notib.core.helper.*;
+import es.caib.notib.core.repository.*;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
+import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -27,83 +33,10 @@ import java.io.InputStream;
 import java.net.URLConnection;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import es.caib.notib.core.api.dto.AccioParam;
-import es.caib.notib.core.api.dto.DocumentDto;
-import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.core.api.dto.IntegracioInfo;
-import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
-import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.core.api.dto.OficinaDto;
-import es.caib.notib.core.api.dto.OrganismeDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
-import es.caib.notib.core.api.dto.TipusEnumDto;
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
-import es.caib.notib.core.api.ws.notificacio.Certificacio;
-import es.caib.notib.core.api.ws.notificacio.DadesConsulta;
-import es.caib.notib.core.api.ws.notificacio.DocumentV2;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.Enviament;
-import es.caib.notib.core.api.ws.notificacio.EnviamentEstatEnum;
-import es.caib.notib.core.api.ws.notificacio.EnviamentReferencia;
-import es.caib.notib.core.api.ws.notificacio.EnviamentTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum;
-import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsException;
-import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
-import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
-import es.caib.notib.core.api.ws.notificacio.PermisConsulta;
-import es.caib.notib.core.api.ws.notificacio.Persona;
-import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
-import es.caib.notib.core.api.ws.notificacio.RespostaConsultaDadesRegistre;
-import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
-import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
-import es.caib.notib.core.entity.AplicacioEntity;
-import es.caib.notib.core.entity.DocumentEntity;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.PersonaEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.ProcedimentOrganEntity;
-import es.caib.notib.core.helper.AuditEnviamentHelper;
-import es.caib.notib.core.helper.AuditNotificacioHelper;
-import es.caib.notib.core.helper.CacheHelper;
-import es.caib.notib.core.helper.CaducitatHelper;
-import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.CreacioSemaforDto;
-import es.caib.notib.core.helper.IntegracioHelper;
-import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.NifHelper;
-import es.caib.notib.core.helper.NotificaHelper;
-import es.caib.notib.core.helper.PermisosHelper;
-import es.caib.notib.core.helper.PluginHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
-import es.caib.notib.core.helper.RegistreNotificaHelper;
-import es.caib.notib.core.repository.AplicacioRepository;
-import es.caib.notib.core.repository.DocumentRepository;
-import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.repository.NotificacioEventRepository;
-import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.PersonaRepository;
-import es.caib.notib.core.repository.ProcedimentOrganRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
-import es.caib.notib.plugin.unitat.NodeDir3;
 
 /**
  * Implementació del servei per a l'enviament i consulta de notificacions V2 (Sense paràmetres SEU).
@@ -163,7 +96,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private AuditNotificacioHelper auditNotificacioHelper;
 	@Autowired
 	private AuditEnviamentHelper auditEnviamentHelper;
-	
+
+	private static final String COMUNICACIOAMBADMINISTRACIO = "comunicacioAmbAdministracio";
 	@Transactional
 	@Override
 	public RespostaAlta alta(
@@ -206,6 +140,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				integracioHelper.addAccioError(info, resposta.getErrorDescripcio());
 				return resposta;
 			}
+			boolean comunicacioAmbAdministracio = false;
+			if (COMUNICACIOAMBADMINISTRACIO.equals(resposta.getErrorDescripcio()))
+				comunicacioAmbAdministracio = true;
 			
 			try {
 				// Obtenir tipus d'enviament
@@ -286,17 +223,70 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				// DOCUMENT
 				// Comprovam si el document és vàlid
 				DocumentDto document = null;
-				try {
-					document = comprovaDocument(notificacio);
-				} catch (Exception e) {
-					logger.error("Error al obtenir el document", e);
-					String errorDescripcio = "[1064] No s'ha pogut obtenir el document a notificar: " + e.getMessage();
-					integracioHelper.addAccioError(info, errorDescripcio);
-					return setRespostaError(errorDescripcio);
+				DocumentEntity documentEntity = null;
+				DocumentDto document2 = null;
+				DocumentEntity document2Entity = null;
+				DocumentDto document3 = null;
+				DocumentEntity document3Entity = null;
+				DocumentDto document4 = null;
+				DocumentEntity document4Entity = null;
+				DocumentDto document5 = null;
+				DocumentEntity document5Entity = null;
+
+				if (comunicacioAmbAdministracio) {
+					int numDoc = 1;
+					Long midaTotal = 0L;
+					try {
+						document = comprovaDocument(notificacio.getDocument()); //, !comunicacioAmbAdministracio);
+						documentEntity = getDocument(notificacio.getDocument(), document);
+						midaTotal = document.getMida();
+						numDoc++;
+						if (notificacio.getDocument2() != null) {
+							document2 = comprovaDocument(notificacio.getDocument2());
+							document2Entity = getDocument(notificacio.getDocument2(), document2);
+							midaTotal += document2.getMida();
+						}
+						numDoc++;
+						if (notificacio.getDocument3() != null) {
+							document3 = comprovaDocument(notificacio.getDocument3());
+							document3Entity = getDocument(notificacio.getDocument3(), document3);
+							midaTotal += document3.getMida();
+						}
+						numDoc++;
+						if (notificacio.getDocument4() != null) {
+							document4 = comprovaDocument(notificacio.getDocument4());
+							document4Entity = getDocument(notificacio.getDocument4(), document4);
+							midaTotal += document4.getMida();
+						}
+						numDoc++;
+						if (notificacio.getDocument5() != null) {
+							document5 = comprovaDocument(notificacio.getDocument5());
+							document5Entity = getDocument(notificacio.getDocument5(), document5);
+							midaTotal += document5.getMida();
+						}
+					} catch (Exception e) {
+						logger.error("Error al obtenir el document " + numDoc, e);
+						String errorDescripcio = "[1064] No s'ha pogut obtenir el document " + numDoc + ": " + e.getMessage();
+						integracioHelper.addAccioError(info, errorDescripcio);
+						return setRespostaError(errorDescripcio);
+					}
+					// Mida dels documents
+					if (midaTotal > 1L) {
+						return setRespostaError("[1065] La mida màxima del conjunt de documents supera el total màxim (15 Mb).");
+					}
+
+				} else {
+					try {
+						document = comprovaDocument(notificacio.getDocument()); //, !comunicacioAmbAdministracio);
+						documentEntity = getDocument(notificacio.getDocument(), document);
+					} catch (Exception e) {
+						logger.error("Error al obtenir el document", e);
+						String errorDescripcio = "[1064] No s'ha pogut obtenir el document a notificar: " + e.getMessage();
+						integracioHelper.addAccioError(info, errorDescripcio);
+						return setRespostaError(errorDescripcio);
+					}
 				}
-				// Obtenim el document
-				DocumentEntity documentEntity = getDocument(notificacio, document);
-	
+
 				NotificacioEntity notificacioEntity = NotificacioEntity.
 						getBuilderV2(
 								entitat,
@@ -317,7 +307,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 								TipusUsuariEnumDto.APLICACIO,
 								procedimentOrgan,
 								notificacio.getIdioma())
-						.document(documentEntity).build();
+						.document(documentEntity)
+						.document2(document2Entity)
+						.document3(document3Entity)
+						.document4(document4Entity)
+						.document5(document5Entity)
+						.build();
 				
 				NotificacioEntity notificacioGuardada = auditNotificacioHelper.desaNotificacio(notificacioEntity);
 				logger.debug(">> [ALTA] notificacio guardada");
@@ -578,24 +573,28 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		return serveiTipus;
 	}
 
-	private DocumentEntity getDocument(NotificacioV2 notificacio, DocumentDto document) {
+	private DocumentEntity getDocument(DocumentV2 documentV2, DocumentDto document) {
 		DocumentEntity documentEntity = null;
-		if(notificacio.getDocument().getCsv() != null || 
-		   notificacio.getDocument().getUuid() != null || 
-		   notificacio.getDocument().getContingutBase64() != null || 
-		   notificacio.getDocument().getUrl() != null ||
-		   notificacio.getDocument().getArxiuId() != null) {
+		if(documentV2.getCsv() != null ||
+		   documentV2.getUuid() != null ||
+		   documentV2.getContingutBase64() != null ||
+		   documentV2.getUrl() != null ||
+		   documentV2.getArxiuId() != null) {
 
 			documentEntity = documentRepository.saveAndFlush(DocumentEntity.getBuilderV2(
-					notificacio.getDocument().getArxiuId(), 
+					documentV2.getArxiuId(),
 					document.getArxiuGestdocId(), 
-					notificacio.getDocument().getArxiuNom(),  
-					notificacio.getDocument().getUrl(),  
-					notificacio.getDocument().isNormalitzat(),  
-					notificacio.getDocument().getUuid(),
-					notificacio.getDocument().getCsv(),
+					documentV2.getArxiuNom(),
+					documentV2.getUrl(),
+					documentV2.isNormalitzat(),
+					documentV2.getUuid(),
+					documentV2.getCsv(),
 					document.getMediaType(),
-					document.getMida()).build());
+					document.getMida(),
+					document.getOrigen(),
+					document.getValidesa(),
+					document.getTipoDocumental(),
+					document.getModoFirma()).build());
 			logger.debug(">> [ALTA] document creat");
 		}
 		return documentEntity;
@@ -618,40 +617,66 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		return enviamentTipus;
 	}
 
-	private DocumentDto comprovaDocument(NotificacioV2 notificacio) {
+	private DocumentDto comprovaDocument(DocumentV2 documentV2) { //, boolean versioImprimible) {
 		DocumentDto document = new DocumentDto();
-		if(notificacio.getDocument().getContingutBase64() != null) {
+		// -- Per compatibilitat amb versions anteriors, posam valors per defecte
+		OrigenEnum origen = documentV2.getOrigen() != null ? documentV2.getOrigen() : OrigenEnum.CIUTADA;
+		ValidesaEnum validesa = documentV2.getValidesa() != null ? documentV2.getValidesa() : ValidesaEnum.ORIGINAL;
+		TipusDocumentalEnum tipoDocumental = documentV2.getTipoDocumental() != null ? documentV2.getTipoDocumental() : TipusDocumentalEnum.NOTIFICACIO;
+		Boolean modoFirma = documentV2.getModoFirma() != null ? documentV2.getModoFirma() : false;
+		// --
+		if(documentV2.getContingutBase64() != null) {
 			logger.debug(">> [ALTA] document contingut Base64");
-			byte[] contingut = Base64.decodeBase64(notificacio.getDocument().getContingutBase64()); 
+			byte[] contingut = Base64.decodeBase64(documentV2.getContingutBase64());
 			String documentGesdocId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 					contingut);
 			document.setArxiuGestdocId(documentGesdocId);
 			document.setMida(Long.valueOf(contingut.length));
 			document.setMediaType(getMimeTypeFromContingut(contingut));
+			document.setOrigen(origen);
+			document.setValidesa(validesa);
+			document.setTipoDocumental(tipoDocumental);
+			document.setModoFirma(modoFirma);
 			logger.debug(">> [ALTA] documentId: " + documentGesdocId);
-		} else if (notificacio.getDocument().getUuid() != null) {
-			String arxiuUuid = notificacio.getDocument().getUuid();
+		} else if (documentV2.getUuid() != null) {
+			String arxiuUuid = documentV2.getUuid();
 			logger.debug(">> [ALTA] documentUuid: " + arxiuUuid);
-			DocumentContingut contingut = pluginHelper.arxiuGetImprimible(arxiuUuid, true);
+			DocumentContingut contingut = null;
+//			if (versioImprimible) {
+				contingut = pluginHelper.arxiuGetImprimible(arxiuUuid, true);
+//			} else {
+//				Document doc = pluginHelper.arxiuDocumentConsultar(arxiuUuid, null, true);
+//				contingut = doc.getContingut();
+//			}
 			document.setMida(contingut.getTamany());
 			document.setMediaType(contingut.getTipusMime());
-		} else if (notificacio.getDocument().getCsv() != null) {
-			String arxiuCsv = notificacio.getDocument().getCsv();
+		} else if (documentV2.getCsv() != null) {
+			String arxiuCsv = documentV2.getCsv();
 			logger.debug(">> [ALTA] documentCsv: " + arxiuCsv);
-			DocumentContingut contingut = pluginHelper.arxiuGetImprimible(arxiuCsv, false);
+			DocumentContingut contingut = null;
+//			if (versioImprimible) {
+				contingut = pluginHelper.arxiuGetImprimible(arxiuCsv, false);
+//			} else {
+//				Document doc = pluginHelper.arxiuDocumentConsultar("csv:" + arxiuCsv, null, true);
+//				contingut = doc.getContingut();
+//			}
 			document.setMida(contingut.getTamany());
 			document.setMediaType(contingut.getTipusMime());
-		} else if (notificacio.getDocument().getUrl() != null) {
-			String arxiuUrl = notificacio.getDocument().getUrl();
+		} else if (documentV2.getUrl() != null) {
+			String arxiuUrl = documentV2.getUrl();
 			logger.debug(">> [ALTA] documentUrl: " + arxiuUrl);
 			byte[] contingut = pluginHelper.getUrlDocumentContent(arxiuUrl);
 			document.setMida(Long.valueOf(contingut.length));
 			document.setMediaType(getMimeTypeFromContingut(contingut));
+			document.setOrigen(origen);
+			document.setValidesa(validesa);
+			document.setTipoDocumental(tipoDocumental);
+			document.setModoFirma(modoFirma);
 		}
 		return document;
 	}
-	
+
 	private String getMimeTypeFromContingut(byte[] contingut) {
 		String mimeType = null;
 		
@@ -1228,10 +1253,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		if (aplicacio == null) {
 			return setRespostaError("[1012] L'usuari d'aplicació no està assignat a l'entitat amb codi Dir3 " + emisorDir3Codi);
 		}
-//		// Procediment
-//		if (notificacio.getProcedimentCodi() == null) {
-//			return setRespostaError("[1020] El camp 'procedimentCodi' no pot ser null.");
-//		}
+		// Procediment
 		if (notificacio.getProcedimentCodi() != null && notificacio.getProcedimentCodi().length() > 9) {
 			return setRespostaError("[1021] El camp 'procedimentCodi' no pot tenir una longitud superior a 9 caràcters.");
 		}
@@ -1274,15 +1296,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				(document.getCsv() == null || document.getCsv().isEmpty()) &&
 				(document.getUrl() == null || document.getUrl().isEmpty()) &&
 				(document.getUuid() == null || document.getUuid().isEmpty())) {
-			return setRespostaError("[1062] És necessari incloure un document a la notificació.");
-		}
-		if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
-			byte[] base64Decoded = Base64.decodeBase64(notificacio.getDocument().getContingutBase64());
-			if (!isFormatValid(document.getContingutBase64()))
-				return setRespostaError("[1063] El format del document no és vàlid. Els formats vàlids són PDF i ZIP.");
-			if (base64Decoded.length > getMaxSizeFile()) {
-				return setRespostaError("[1065] La longitud del document supera el màxim definit (" + getMaxSizeFile() / (1024*1024) + "Mb).");
-			}
+			return setRespostaError("[1062] És necessari incloure un document (contingutBase64, CSV, UUID o URL) a la notificació.");
 		}
 		// Usuari
 		if (notificacio.getUsuariCodi() == null || notificacio.getUsuariCodi().isEmpty()) {
@@ -1363,8 +1377,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				return setRespostaError("[1119] El camp 'telefon' del titular no pot ser major que 16 caràcters.");
 			}
 			// - Raó social
-			if (enviament.getTitular().getRaoSocial() != null && enviament.getTitular().getRaoSocial().length() > 255) {
-				return setRespostaError("[1120] El camp 'raoSocial' del titular no pot ser major que 255 caràcters.");
+			if (enviament.getTitular().getRaoSocial() != null && enviament.getTitular().getRaoSocial().length() > 80) {
+				return setRespostaError("[1120] El camp 'raoSocial' del titular no pot ser major que 80 caràcters.");
 			}
 			// - Codi Dir3
 			if (enviament.getTitular().getDir3Codi() != null && enviament.getTitular().getDir3Codi().length() > 9) {
@@ -1448,8 +1462,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						return setRespostaError("[1178] El camp 'telefon' del destinatari no pot ser major que 16 caràcters.");
 					}
 					// - Raó social
-					if (destinatari.getRaoSocial() != null && destinatari.getRaoSocial().length() > 255) {
-						return setRespostaError("[1179] El camp 'raoSocial' del destinatari no pot ser major que 255 caràcters.");
+					if (destinatari.getRaoSocial() != null && destinatari.getRaoSocial().length() > 80) {
+						return setRespostaError("[1179] El camp 'raoSocial' del destinatari no pot ser major que 80 caràcters.");
 					}
 					// - Codi Dir3
 					if (destinatari.getDir3Codi() != null && destinatari.getDir3Codi().length() > 9) {
@@ -1626,7 +1640,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 		
 		// Procediment
-		// if (!comunicacioAmbAdministracio) {
 		if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.NOTIFICACIO) {
 			if (notificacio.getProcedimentCodi() == null) {
 				return setRespostaError("[1020] El camp 'procedimentCodi' no pot ser null.");
@@ -1634,9 +1647,119 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		} else if (notificacio.getProcedimentCodi() == null && notificacio.getOrganGestor() == null){
 			return setRespostaError("[1022] El camp 'organ gestor' no pot ser null en una comunicació amb l'administració on no s'especifica un procediment.");
 		}
+
+		// Documents
+		if (comunicacioAmbAdministracio) {
+			RespostaAlta respostaDoc = null;
+			if (notificacio.getDocument2() != null && !notificacio.getDocument2().isEmpty()) {
+				respostaDoc = validaDocumentComunicacioAdmin(notificacio.getDocument2(), 2);
+				if (respostaDoc != null)
+					return respostaDoc;
+			}
+			if (notificacio.getDocument3() != null && !notificacio.getDocument3().isEmpty()) {
+				respostaDoc = validaDocumentComunicacioAdmin(notificacio.getDocument3(), 3);
+				if (respostaDoc != null)
+					return respostaDoc;
+			}
+			if (notificacio.getDocument4() != null && !notificacio.getDocument4().isEmpty()) {
+				respostaDoc = validaDocumentComunicacioAdmin(notificacio.getDocument4(), 4);
+				if (respostaDoc != null)
+					return respostaDoc;
+			}
+			if (notificacio.getDocument5() != null && !notificacio.getDocument5().isEmpty()) {
+				respostaDoc = validaDocumentComunicacioAdmin(notificacio.getDocument5(), 5);
+				if (respostaDoc != null)
+					return respostaDoc;
+			}
+			// Apanyo: Posam estat Registrada per a indicar que aquesta és una comunicació amb administració, i per tant va a registre i no a Notifica
+			resposta.setErrorDescripcio(COMUNICACIOAMBADMINISTRACIO);
+		} else {
+			if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
+				byte[] base64Decoded = Base64.decodeBase64(notificacio.getDocument().getContingutBase64());
+				if (!isFormatValid(document.getContingutBase64()))
+					return setRespostaError("[1063] El format del document no és vàlid. Les notificacions i comunicacions a ciutadà només admeten els formats PDF i ZIP.");
+				if (base64Decoded.length > getMaxSizeFile()) {
+					return setRespostaError("[1065] La longitud del document supera el màxim definit (" + getMaxSizeFile() / (1024*1024) + "Mb).");
+				}
+			}
+
+			// Metadades
+			if ((document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) ||
+					(document.getUrl() != null && !document.getUrl().isEmpty())) {
+				if (document.getOrigen() == null) {
+					return setRespostaError("[1066] Error en les metadades del document. No està informat l'ORIGEN del document");
+				}
+				if (document.getValidesa() == null) {
+					return setRespostaError("[1066] Error en les metadades del document. No està informat la VALIDESA del document");
+				}
+				if (document.getTipoDocumental() == null) {
+					return setRespostaError("[1066] Error en les metadades del document. No està informat el TIPUS DOCUMENTAL del document");
+				}
+				if (document.getArxiuNom().toUpperCase().endsWith("PDF") && document.getModoFirma() == null) {
+					return setRespostaError("[1066] Error en les metadades del document. No està informat el MODE de FIRMA del document tipus PDF");
+				}
+			}
+			if (notificacio.getDocument2() != null ||
+					notificacio.getDocument3() != null ||
+					notificacio.getDocument4() != null ||
+					notificacio.getDocument5() != null) {
+				return setRespostaError("[1067] Les notificacions i comunicacions a ciutadà només admeten 1 únic document.");
+			}
+
+		}
+
 		return resposta;
 	}
-	
+
+	private RespostaAlta validaDocumentComunicacioAdmin(DocumentV2 document, int numDocument) {
+
+		if (document.getArxiuNom() == null || document.getArxiuNom().isEmpty()) {
+			return setRespostaError("[1061] El camp 'arxiuNom' del document " + numDocument + " no pot ser null.");
+		}
+		if (document.getArxiuNom() != null && document.getArxiuNom().length() > 200) {
+			return setRespostaError("[1072] El camp 'arxiuNom' del document " + numDocument + " no pot pot tenir una longitud superior a 200 caràcters.");
+		}
+		if (	(document.getContingutBase64() == null || document.getContingutBase64().isEmpty()) &&
+				(document.getCsv() == null || document.getCsv().isEmpty()) &&
+				(document.getUrl() == null || document.getUrl().isEmpty()) &&
+				(document.getUuid() == null || document.getUuid().isEmpty())) {
+			return setRespostaError("[1062] El document " + numDocument + " no té contingut (contingutBase64, CSV, UUID o URL).");
+		}
+
+		// Format
+		if (!isComunicacioAdminFormatValid(document.getArxiuNom())) {
+			return setRespostaError("[1063] El format del document no és vàlid. Les comunicacions a administració només admeten els formats JPG, PEG, ODT, ODP, ODS, ODG, DOCX, XLSX, PPTX, PDF, PNG, RTF, SVG, GIFF, TXT, XML, XSIG, CSIG i HTML.");
+		}
+		// Metadades
+		if ((document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) ||
+				(document.getUrl() != null && !document.getUrl().isEmpty())) {
+			if (document.getOrigen() == null) {
+				return setRespostaError("[1066] Error en les metadades del document. No està informat l'ORIGEN del document " + numDocument);
+			}
+			if (document.getValidesa() == null) {
+				return setRespostaError("[1066] Error en les metadades del document. No està informat la VALIDESA del document " + numDocument);
+			}
+			if (document.getTipoDocumental() == null) {
+				return setRespostaError("[1066] Error en les metadades del document. No està informat el TIPUS DOCUMENTAL del document " + numDocument);
+			}
+			if (document.getArxiuNom().toUpperCase().endsWith("PDF") && document.getModoFirma() == null) {
+				return setRespostaError("[1066] Error en les metadades del document. No està informat el MODE de FIRMA del document tipus PDF " + numDocument);
+			}
+		}
+
+		return null;
+	}
+
+	private boolean isComunicacioAdminFormatValid(String arxiuNom) {
+		String[] formats = {"jpg", "peg", "odt", "odp", "ods", "odg", "docx", "xlsx", "pptx", "pdf", "png", "rtf", "svg", "giff", "txt", "xml", "xsig", "csig", "html"};
+		List<String> formatsValids = new ArrayList<>(Arrays.asList(formats));
+
+		String[] nom_spitted = arxiuNom.split("\\.");
+		String extensio = nom_spitted[nom_spitted.length - 1].toLowerCase();
+		return formatsValids.contains(extensio);
+
+	}
+
 	private RespostaAlta setRespostaError(String descripcioError) {
 		RespostaAlta resposta = new RespostaAlta();
 		resposta.setError(true);
@@ -1745,6 +1868,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			valid = false;
 		
 		return valid;
+	}
+
+	private boolean isPDF(String docBase64) {
+		return docBase64.startsWith("JVBERi0");
 	}
 	
 	private static String isMultipleDestinataris() {
