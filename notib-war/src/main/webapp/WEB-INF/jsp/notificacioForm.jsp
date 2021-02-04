@@ -1692,7 +1692,8 @@ function comptarCaracters(idCamp) {
 			<!-- CONCEPTE -->
 			<div class="row">
 				<div class="col-md-12">
-					<not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="2" required="true" showsize="true" inputMaxLength="${concepteSize}"/>
+					<not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="2" required="true" showsize="true"
+								   inputMaxLength="${concepteSize}" inputMinLength="3"/>
 				</div>
 			</div>
 			
