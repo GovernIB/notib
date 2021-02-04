@@ -148,10 +148,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PaginaDto<NotificacioDatatableDto> findAmbFiltrePaginat(
 			Long entitatId,
-			boolean isUsuari,
-			boolean isUsuariEntitat,
-			boolean isSuperUsuari,
-			boolean isAdministradorOrgan,
+			RolEnumDto rol,
 			List<String> codisProcedimentsDisponibles,
 			List<String> codisProcedimentsProcessables,
 			List<String> codisOrgansGestorsDisponibles,
@@ -162,10 +159,7 @@ public class NotificacioServiceBean implements NotificacioService {
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findAmbFiltrePaginat(
 				entitatId,
-				isUsuari,
-				isUsuariEntitat,
-				isSuperUsuari,
-				isAdministradorOrgan,
+				rol,
 				codisProcedimentsDisponibles,
 				codisProcedimentsProcessables,
 				codisOrgansGestorsDisponibles,

@@ -263,28 +263,6 @@ public class NotificacioController extends BaseUserController {
     public List<CodiValorComuDto> getProcediments(
             HttpServletRequest request,
             Model model) {
-        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
-
-        if (RolHelper.isUsuariActualAdministrador(request)) {
-            procediments = procedimentService.findAll();
-//            model.addAttribute("entitat", entitatService.findAll());
-        } else if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
-            procediments = procedimentService.findByEntitat(entitatActual.getId());
-        } else if (RolHelper.isUsuariActualUsuari(request)) {
-//			procediments = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), SecurityContextHolder.getContext().getAuthentication().getName(), PermisEnum.NOTIFICACIO);
-            procediments = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), SecurityContextHolder.getContext().getAuthentication().getName(), PermisEnum.CONSULTA);
-            List<ProcedimentOrganDto> procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(
-                    entitatActual.getId(),
-                    SecurityContextHolder.getContext().getAuthentication().getName(),
-                    PermisEnum.CONSULTA);
-            procediments = addProcedimentsOrgan(procediments, procedimentsOrgansDisponibles);
-		} else if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
-            procediments = procedimentService.findByOrganGestorIDescendentsAndComu(
-                    entitatActual.getId(),
-                    getOrganGestorActual(request));
-        }
-
         Long entitatId = EntitatHelper.getEntitatActual(request).getId();
         String organCodi = null;
         PermisEnum permis = PermisEnum.CONSULTA;
@@ -549,10 +527,7 @@ public class NotificacioController extends BaseUserController {
             }
             notificacions = notificacioService.findAmbFiltrePaginat(
                     entitatActual != null ? entitatActual.getId() : null,
-                    isUsuari,
-                    isUsuariEntitat,
-                    isAdministrador,
-                    isAdminOrgan,
+                    RolEnumDto.valueOf(RolHelper.getRolActual(request)),
                     codisProcedimentsDisponibles,
                     codisProcedimentsProcessables,
                     codisOrgansGestorsDisponibles,

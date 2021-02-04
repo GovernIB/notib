@@ -294,7 +294,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:isIdentificadorNull = true or " +
 			"		(ntf.id = (select notificacio.id" +
 			"				from NotificacioEnviamentEntity env" +
-			"				where env.notificaIdentificador = :identificador))) " + 
+			"				where lower(env.notificaIdentificador) like concat('%', lower(:identificador), '%')))) " +
 			"and (:nomesAmbErrors = false or ntf.notificaErrorEvent is not null)") 
 	public Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
@@ -362,12 +362,12 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
 			"    ) > 0) " +
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " + 
-			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)" +
+			"and (:isNumExpedientNull = true or lower(ntf.numExpedient) like concat('%', lower(:numExpedient), '%')) " +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
 			"and (:isIdentificadorNull = true or " +
 			"		(ntf.id = (select notificacio.id" + 
 			"				from NotificacioEnviamentEntity env" +
-			"				where env.notificaIdentificador = :identificador)))" +
+			"				where lower(env.notificaIdentificador) like concat('%', lower(:identificador), '%'))))" +
 			"and (:nomesAmbErrors = false or ntf.notificaErrorEvent is not null)")
 	public Page<NotificacioEntity> findAmbFiltre(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
