@@ -20,6 +20,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -111,7 +112,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			
 			// Validació caducitat
 			if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO) {
-				if (notificacio.getCaducitat() != null && !notificacio.getCaducitat().after(LocalDateTime.now().toDate())) {
+				if (notificacio.getCaducitat() != null && !notificacio.getCaducitat().after(new Date())) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
 							MessageHelper.getInstance().getMessage("notificacio.form.valid.caducitat"))
