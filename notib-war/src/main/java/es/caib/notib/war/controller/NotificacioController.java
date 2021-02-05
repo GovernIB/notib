@@ -437,7 +437,7 @@ public class NotificacioController extends BaseUserController {
                 String arxiuGestdocId = notificacioCommand.getDocuments()[i].getArxiuGestdocId();
                 switch (notificacioCommand.getTipusDocument()[i]) {
                     case ARXIU:
-                        if (notificacioCommand.getArxiu()[i] != null && !notificacioCommand.getArxiu()[i].isEmpty() && arxiuGestdocId.isEmpty()) {
+                        if (notificacioCommand.getArxiu()[i] != null && !notificacioCommand.getArxiu()[i].isEmpty()) {
                             notificacioCommand.getDocuments()[i].setArxiuNom(notificacioCommand.getArxiu()[i].getOriginalFilename());
 //                                notificacioCommand.getDocument()[i].setNormalitzat(notificacioCommand.getDocument()[i].isNormalitzat());
                             String contingutBase64 = Base64.encodeBase64String(notificacioCommand.getArxiu()[i].getBytes());
@@ -1218,19 +1218,19 @@ public class NotificacioController extends BaseUserController {
             for(int i = 0; i < 5; i++) {
 //                if (notificacio.getDocument()[i] != null) {
                     if (notificacio.getDocuments()[i].getArxiuNom() != null) {
-                        model.addAttribute("nomDocument[" + i + "]", notificacio.getDocuments()[i].getArxiuNom());
+                        model.addAttribute("nomDocument_" + i, notificacio.getDocuments()[i].getArxiuNom());
                         notificacio.setTipusDocumentDefault(i, TipusDocumentEnumDto.ARXIU.name());
                     }
                     if (notificacio.getDocuments()[i].getUuid() != null) {
-                        model.addAttribute("nomDocument[" + i + "]", notificacio.getDocuments()[i].getUuid());
+                        model.addAttribute("nomDocument_" + i, notificacio.getDocuments()[i].getUuid());
                         notificacio.setTipusDocumentDefault(i, TipusDocumentEnumDto.UUID.name());
                     }
                     if (notificacio.getDocuments()[i].getCsv() != null) {
-                        model.addAttribute("nomDocument[" + i + "]", notificacio.getDocuments()[i].getCsv());
+                        model.addAttribute("nomDocument_" + i, notificacio.getDocuments()[i].getCsv());
                         notificacio.setTipusDocumentDefault(i, TipusDocumentEnumDto.CSV.name());
                     }
                     if (notificacio.getDocuments()[i].getUrl() != null) {
-                        model.addAttribute("nomDocument[" + i + "]", notificacio.getDocuments()[i].getUrl());
+                        model.addAttribute("nomDocument_" + i, notificacio.getDocuments()[i].getUrl());
                         notificacio.setTipusDocumentDefault(i, TipusDocumentEnumDto.URL.name());
                     }
 //                }

@@ -334,7 +334,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		if (document != null) {
 			String documentGesdocId = null;
-			if (document.getContingutBase64() != null) {
+			if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
 				documentGesdocId = pluginHelper.gestioDocumentalCreate(
 						PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 						Base64.decodeBase64(document.getContingutBase64()));
@@ -552,6 +552,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 						document4Entity,
 						document5Entity,
 						procedimentOrgan);
+				
+//				### Esbo
+				if (notificacioEntity.getDocument2() != null && notificacio.getDocument2() == null)
+					documentRepository.delete(document2Entity);
+				if (notificacioEntity.getDocument3() != null && notificacio.getDocument3() == null)
+					documentRepository.delete(document3Entity);
+				if (notificacioEntity.getDocument4() != null && notificacio.getDocument4() == null)
+					documentRepository.delete(document4Entity);
+				if (notificacioEntity.getDocument5() != null && notificacio.getDocument5() == null)
+					documentRepository.delete(document5Entity);
 				
 				List<Enviament> enviaments = new ArrayList<Enviament>();
 				List<Long> enviamentsIds = new ArrayList<Long>();

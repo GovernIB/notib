@@ -97,7 +97,7 @@
 $(document).ready(function() {
 	let fileName = "${fileName}";
 	if (fileName) {
-		$fileinput = $('#${campPath}').closest('.fileinput');
+		$fileinput = $(document.getElementById('${campPath}')).closest('.fileinput');
 		$fileinput.removeClass('fileinput-new');
 		$fileinput.addClass('fileinput-exists');
 		$('.fileinput-filename', $fileinput).append(fileName);

@@ -224,86 +224,105 @@
 			}
 		});
 
-		var tipusDocumentDefault_0 = $('#tipusDocumentDefault_0').val();
+		var tipusDocumentDefault_0 = $('#tipusDocumentDefault0').val();
 		var tipusDocumentSelected_0 = $('#tipusDocumentSelected_0').val();
-		var tipusDocumentDefault_1 = $('#tipusDocumentDefault_1').val();
+		var document_0_arxiuNom = $('input[name="documents\\[0\\].arxiuNom"').val();
+		var tipusDocumentDefault_1 = $('#tipusDocumentDefault1').val();
 		var tipusDocumentSelected_1 = $('#tipusDocumentSelected_1').val();
-		var tipusDocumentDefault_2 = $('#tipusDocumentDefault_2').val();
+		var document_1_arxiuNom = $('input[name="documents\\[1\\].arxiuNom"').val();
+		var tipusDocumentDefault_2 = $('#tipusDocumentDefault2').val();
 		var tipusDocumentSelected_2 = $('#tipusDocumentSelected_2').val();
-		var tipusDocumentDefault_3 = $('#tipusDocumentDefault_3').val();
+		var document_2_arxiuNom = $('input[name="documents\\[2\\].arxiuNom"').val();
+		var tipusDocumentDefault_3 = $('#tipusDocumentDefault3').val();
 		var tipusDocumentSelected_3 = $('#tipusDocumentSelected_3').val();
-		var tipusDocumentDefault_4 = $('#tipusDocumentDefault_4').val();
+		var document_3_arxiuNom = $('input[name="documents\\[3\\].arxiuNom"').val();
+		var tipusDocumentDefault_4 = $('#tipusDocumentDefault4').val();
 		var tipusDocumentSelected_4 = $('#tipusDocumentSelected_4').val();
+		var document_4_arxiuNom = $('input[name="documents\\[4\\].arxiuNom"').val();
+		
 		$('.customSelect').webutilInputSelect2(null);
-
+		
 		if (tipusDocumentSelected_0 != '') {
 			$("#tipusDocument_0").val(tipusDocumentSelected_0).trigger("change");
 			$("#document").removeClass("hidden");
 		} else if (tipusDocumentDefault_0 != '') {
 			$("#tipusDocument_0").val(tipusDocumentDefault_0).trigger("change");
 			if (tipusDocumentDefault_0 == 'CSV') {
-				$('#documentArxiuCsv_0').val("${nomDocument[0]}");
+				$('#documentArxiuCsv\\[0\\]').val("${nomDocument_0}");
 			} else if (tipusDocumentDefault_0 == 'UUID') {
-				$('#documentArxiuUuid_0').val("${nomDocument[0]}");
+				$('#documentArxiuUuid\\[0\\]').val("${nomDocument_0}");
 			} else if (tipusDocumentDefault_0 == 'URL') {
-				$('#documentArxiuUrl_0').val("${nomDocument[0]}");
+				$('#documentArxiuUrl\\[0\\]').val("${nomDocument_0}");
 			}
 		}
 		if (tipusDocumentSelected_1 != '') {
 			$("#tipusDocument_1").val(tipusDocumentSelected_1).trigger("change");
 			$("#document2").removeClass("hidden");
 			numDocuments = 2;
-		} else if (tipusDocumentDefault_1 != '') {
+		} else if (tipusDocumentDefault_1 != '' && document_1_arxiuNom != '') {
 			$("#tipusDocument_1").val(tipusDocumentDefault_1).trigger("change");
 			if (tipusDocumentDefault_1 == 'CSV') {
-				$('#documentArxiuCsv_1').val("${nomDocument[1]}");
+				$('#documentArxiuCsv_1').val("${nomDocument_1}");
 			} else if (tipusDocumentDefault_1 == 'UUID') {
-				$('#documentArxiuUuid_1').val("${nomDocument[1]}");
+				$('#documentArxiuUuid_1').val("${nomDocument_1}");
 			} else if (tipusDocumentDefault_1 == 'URL') {
-				$('#documentArxiuUrl_1').val("${nomDocument[1]}");
+				$('#documentArxiuUrl_1').val("${nomDocument_1}");
 			}
+			
+			$("#tipusDocument_1").val(tipusDocumentDefault_1).trigger("change");
+			$("#document2").removeClass("hidden");
+			numDocuments = 2;
 		}
 		if (tipusDocumentSelected_2 != '') {
 			$("#tipusDocument_2").val(tipusDocumentSelected_2).trigger("change");
 			$("#document3").removeClass("hidden");
 			numDocuments = 3;
-		} else if (tipusDocumentDefault_2 != '') {
+		} else if (tipusDocumentDefault_2 != '' && document_2_arxiuNom != '') {
 			$("#tipusDocument_2").val(tipusDocumentDefault_2).trigger("change");
 			if (tipusDocumentDefault_2 == 'CSV') {
-				$('#documentArxiuCsv_2').val("${nomDocument[2]}");
+				$('#documentArxiuCsv_2').val("${nomDocument_2}");
 			} else if (tipusDocumentDefault_2 == 'UUID') {
-				$('#documentArxiuUuid_2').val("${nomDocument[2]}");
+				$('#documentArxiuUuid_2').val("${nomDocument_2}");
 			} else if (tipusDocumentDefault_2 == 'URL') {
-				$('#documentArxiuUrl_2').val("${nomDocument[2]}");
+				$('#documentArxiuUrl_2').val("${nomDocument_2}");
 			}
+			$("#tipusDocument_2").val(tipusDocumentDefault_2).trigger("change");
+			$("#document3").removeClass("hidden");
+			numDocuments = 3;
 		}
 		if (tipusDocumentSelected_3 != '') {
 			$("#tipusDocument_3").val(tipusDocumentSelected_3).trigger("change");
 			$("#document4").removeClass("hidden");
 			numDocuments = 4;
-		} else if (tipusDocumentDefault_3 != '') {
+		} else if (tipusDocumentDefault_3 != '' && document_3_arxiuNom != '') {
 			$("#tipusDocument_3").val(tipusDocumentDefault_3).trigger("change");
 			if (tipusDocumentDefault_3 == 'CSV') {
-				$('#documentArxiuCsv_3').val("${nomDocument[3]}");
+				$('#documentArxiuCsv_3').val("${nomDocument_3}");
 			} else if (tipusDocumentDefault_3 == 'UUID') {
-				$('#documentArxiuUuid_3').val("${nomDocument[3]}");
+				$('#documentArxiuUuid_3').val("${nomDocument_3}");
 			} else if (tipusDocumentDefault_3 == 'URL') {
-				$('#documentArxiuUrl_3').val("${nomDocument[3]}");
+				$('#documentArxiuUrl_3').val("${nomDocument_3}");
 			}
+			$("#tipusDocument_3").val(tipusDocumentDefault_3).trigger("change");
+			$("#document4").removeClass("hidden");
+			numDocuments = 4;
 		}
 		if (tipusDocumentSelected_4 != '') {
 			$("#tipusDocument_4").val(tipusDocumentSelected_4).trigger("change");
 			$("#document5").removeClass("hidden");
 			numDocuments = 5;
-		} else if (tipusDocumentDefault_4 != '') {
+		} else if (tipusDocumentDefault_4 != '' && document_4_arxiuNom != '') {
 			$("#tipusDocument_4").val(tipusDocumentDefault_4).trigger("change");
 			if (tipusDocumentDefault_4 == 'CSV') {
-				$('#documentArxiuCsv_4').val("${nomDocument[4]}");
+				$('#documentArxiuCsv_4').val("${nomDocument_4}");
 			} else if (tipusDocumentDefault_4 == 'UUID') {
-				$('#documentArxiuUuid_4').val("${nomDocument[4]}");
+				$('#documentArxiuUuid_4').val("${nomDocument_4}");
 			} else if (tipusDocumentDefault_4 == 'URL') {
-				$('#documentArxiuUrl_4').val("${nomDocument[4]}");
+				$('#documentArxiuUrl_4').val("${nomDocument_4}");
 			}
+			$("#tipusDocument_4").val(tipusDocumentDefault_4).trigger("change");
+			$("#document5").removeClass("hidden");
+			numDocuments = 5;
 		}
 
 		$(document).on('change','select.enviamentTipus', function() {
@@ -374,7 +393,7 @@
 				arxiuNom.val("");
 			}
 		});
-
+		
 		$('#addDocument').click(function() {
 			numDocuments++;
 			$('#document' + numDocuments).removeClass('hidden');
@@ -384,6 +403,13 @@
 		});
 		$('#removeDocument').click(function() {
 			$('#document' + numDocuments).addClass('hidden');
+			var documentFields = numDocuments - 1;
+			
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].id"]').val('');
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].arxiuGestdocId"]').val('');
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].arxiuNom"]').val('');
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].mediaType"]').val('');
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].mida"]').val('');
 			numDocuments--;
 			$('#tipusDocument_' + numDocuments).val('').trigger('change');
 
@@ -856,6 +882,11 @@
 				}
 			}, 0);
 		});
+
+
+		if ($('#document2').is(":visible")) {
+			$('#removeDocument').removeClass('hidden');
+		}
 	});
 
 	var t, makeTooltip = function(warning) {
@@ -2046,10 +2077,10 @@
 				<div id="input-origen-arxiu_0" class="col-md-6 hidden">
 					<c:choose>
 						<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
-							<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument[0]}"/>
+							<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="test"/>
 						</c:when>
 						<c:otherwise>
-							<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis"/>
+							<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_0}"/>
 						</c:otherwise>
 					</c:choose>
 				</div>
@@ -2112,10 +2143,10 @@
 					<div id="input-origen-arxiu_1" class="col-md-6 hidden">
 						<c:choose>
 							<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
-								<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument[1]}"/>
+								<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_1}"/>
 							</c:when>
 							<c:otherwise>
-								<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis"/>
+								<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_1}"/>
 							</c:otherwise>
 						</c:choose>
 					</div>
@@ -2176,7 +2207,7 @@
 					<div id="input-origen-arxiu_2" class="col-md-6 hidden">
 						<c:choose>
 							<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
-								<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument[2]}"/>
+								<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_2}"/>
 							</c:when>
 							<c:otherwise>
 								<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis"/>
@@ -2240,7 +2271,7 @@
 					<div id="input-origen-arxiu_3" class="col-md-6 hidden">
 						<c:choose>
 							<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
-								<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument[3]}"/>
+								<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_3}"/>
 							</c:when>
 							<c:otherwise>
 								<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis"/>
@@ -2304,7 +2335,7 @@
 					<div id="input-origen-arxiu_4" class="col-md-6 hidden">
 						<c:choose>
 							<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
-								<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument[4]}"/>
+								<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_4}"/>
 							</c:when>
 							<c:otherwise>
 								<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis"/>

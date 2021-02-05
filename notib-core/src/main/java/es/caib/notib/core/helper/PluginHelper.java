@@ -1441,8 +1441,10 @@ public class PluginHelper {
 		return annex;
 	}
 	
-	private AnexoWsDto documentToAnexoWs(DocumentEntity document) {
+	private AnexoWsDto documentToAnexoWs(DocumentEntity document, int idx) {
 		try {
+			if (HibernateHelper.isProxy(document))
+				document = HibernateHelper.deproxy(document);
 			AnexoWsDto annex = null;
 			Path path = null;
 
@@ -1530,7 +1532,7 @@ public class PluginHelper {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			annex.setTitulo("Annex 1");
+			annex.setTitulo("Annex " + idx);
 			annex.setTipoDocumento(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
 			return annex;
 		} catch (Exception ex) {
@@ -1827,19 +1829,19 @@ public class PluginHelper {
 			registre.getInteresados().add(personaToRepresentanteEInteresadoWs(enviament.getTitular(), destinatari));	
 		}
 		if(notificacio.getDocument() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument()));
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument(), 1));
 		}
 		if(notificacio.getDocument2() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument2()));
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument2(), 2));
 		}
 		if(notificacio.getDocument3() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument3()));
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument3(), 3));
 		}
 		if(notificacio.getDocument4() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument4()));
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument4(), 4));
 		}
 		if(notificacio.getDocument5() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument5()));
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument5(), 5));
 		}
 		return registre;
 	}
@@ -1956,19 +1958,19 @@ public class PluginHelper {
 						enviament.getTitular(), 
 						destinatari));
 		if(notificacio.getDocument() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument()));
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument(), 1));
 		}
 		if(notificacio.getDocument2() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument2()));
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument2(), 2));
 		}
 		if(notificacio.getDocument3() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument3()));
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument3(), 3));
 		}
 		if(notificacio.getDocument4() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument4()));
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument4(), 4));
 		}
 		if(notificacio.getDocument5() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument5()));
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument5(), 5));
 		}
 		return registre;
 	}
