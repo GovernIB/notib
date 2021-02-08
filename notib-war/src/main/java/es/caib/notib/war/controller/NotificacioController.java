@@ -1570,11 +1570,11 @@ public class NotificacioController extends BaseUserController {
                 arxiuGestdocId = notificacioService.guardarArxiuTemporal(notificacioCommand.getDocuments()[i].getContingutBase64());
 
                 notificacioCommand.getDocuments()[i].setArxiuGestdocId(arxiuGestdocId);
-                model.addAttribute("nomDocument[" + i + "]", notificacioCommand.getArxiu()[i].getOriginalFilename());
+                model.addAttribute("nomDocument_" + i, notificacioCommand.getArxiu()[i].getOriginalFilename());
 
 
             } else {
-                model.addAttribute("nomDocument[" + i + "]", !notificacioCommand.getDocuments()[i].getArxiuNom().isEmpty() ? notificacioCommand.getDocuments()[i].getArxiuNom() : notificacioCommand.getArxiu()[i].getOriginalFilename());
+                model.addAttribute("nomDocument_" + i, !notificacioCommand.getDocuments()[i].getArxiuNom().isEmpty() ? notificacioCommand.getDocuments()[i].getArxiuNom() : notificacioCommand.getArxiu()[i].getOriginalFilename());
             }
         }
         model.addAttribute("document", notificacioCommand.getDocuments());

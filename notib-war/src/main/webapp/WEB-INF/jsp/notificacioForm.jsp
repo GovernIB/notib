@@ -2210,7 +2210,7 @@
 								<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_2}"/>
 							</c:when>
 							<c:otherwise>
-								<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis"/>
+								<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_2}"/>
 							</c:otherwise>
 						</c:choose>
 					</div>
@@ -2274,7 +2274,7 @@
 								<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_3}"/>
 							</c:when>
 							<c:otherwise>
-								<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis"/>
+								<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_3}"/>
 							</c:otherwise>
 						</c:choose>
 					</div>
@@ -2302,7 +2302,7 @@
 							<form:hidden path="tipusDocumentSelected[4]" id="tipusDocumentSelected_4" value="${tipusDocument[4]}"/>
 							<div class="controls col-xs-8">
 								<form:hidden path="tipusDocumentDefault[4]"/>
-								<select id="tipusDocument_4" name="tipusDocument[3]" class="customSelect tipusDocument">
+								<select id="tipusDocument_4" name="tipusDocument[4]" class="customSelect tipusDocument">
 									<option value=""></option>
 									<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
 										<option value="${enumValue}" <c:if test="${not empty tipusDocument[4] && tipusDocument[4] == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
@@ -2338,7 +2338,7 @@
 								<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_4}"/>
 							</c:when>
 							<c:otherwise>
-								<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis"/>
+								<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_4}"/>
 							</c:otherwise>
 						</c:choose>
 					</div>
