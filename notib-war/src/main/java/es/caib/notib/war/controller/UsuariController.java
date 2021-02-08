@@ -5,7 +5,9 @@ package es.caib.notib.war.controller;
 
 import java.util.Locale;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import es.caib.notib.war.helper.FlushAuthCacheHelper;
@@ -37,6 +39,18 @@ public class UsuariController extends BaseController {
 	@Autowired
 	private AplicacioService aplicacioService;
 
+	@RequestMapping(value = "/logout", method = RequestMethod.GET)
+	public String logout(HttpServletRequest request, HttpServletResponse response) {
+		// Només per Jboss
+		// Es itera sobre totes les cookies
+		for(Cookie c : request.getCookies()) {
+			// Es sobre escriu el valor de cada cookie a NULL
+			Cookie ck = new Cookie(c.getName(), null);
+			ck.setPath(request.getContextPath());
+			response.addCookie(ck);
+		}
+		return "redirect:/";
+	}
 
 	@RequestMapping(value = "/configuracio", method = RequestMethod.GET)
 	public String getConfiguracio(
