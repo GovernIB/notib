@@ -32,14 +32,18 @@ public class NotificacioV2 {
 	private Date enviamentDataProgramada;
 	private Integer retard;
 	private Date caducitat;
-	private DocumentV2 document;
 	private String usuariCodi;
 	private String procedimentCodi;
 	private String grupCodi;
 	private String numExpedient;
 	private List<Enviament> enviaments;
 	private IdiomaEnumDto idioma;
-	
+	private DocumentV2 document;
+	private DocumentV2 document2;
+	private DocumentV2 document3;
+	private DocumentV2 document4;
+	private DocumentV2 document5;
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

@@ -151,6 +151,7 @@ $(document).ready(function() {
 						selOficines.empty();
 						selOficines.append("<option value=\"\"></option>");
 						if (data) {
+							$('.oficinainfo').addClass('hidden');
 							data.forEach(function(oficina) {
 								var items = [];
 								items.push({
@@ -163,6 +164,8 @@ $(document).ready(function() {
 									selOficines.append("<option value=\"" + oficina.codi + "\">" + oficina.nom + "</option>");
 								}
 							})
+						} else {
+							$('.oficinainfo').removeClass('hidden');
 						}
 						$(".loading-screen").hide();
 					},
@@ -210,6 +213,7 @@ $(document).ready(function() {
 				<form:hidden path="oficina"/>
 				<form:hidden path="oficinaNom"/>
 				<select id="selOficines" data-placeholder="<spring:message code="organgestor.form.camp.oficina"/>"></select>
+				<p class="comentari oficinainfo hidden" style="color: #856404;"><spring:message code="organgestor.form.camp.oficina.info"/></p>
 			</c:if>
 			<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
 				<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">

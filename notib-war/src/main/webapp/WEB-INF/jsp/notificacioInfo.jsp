@@ -219,52 +219,104 @@ $(document).ready(function() {
 			</c:if>
 			<c:if test="${not empty notificacio.document}">
 				<div class="panel panel-default">
-						<div class="panel-heading">
-							<h3 class="panel-title">
-								<strong><spring:message code="notificacio.info.seccio.document" /></strong>
-							</h3>
-						</div>
-						<table class="table table-bordered" style="width: 100%">
-							<tbody>
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							<strong><spring:message code="notificacio.info.seccio.document" /></strong>
+						</h3>
+					</div>
+					<table class="table table-bordered" style="width: 100%">
+						<tbody>
+							<tr>
+								<td width="30%">
+									<strong><spring:message	code="notificacio.info.document.arxiu.nom" /></strong>
+								</td>
+								<td>${notificacio.document.arxiuNom}
+									<a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar/${notificacio.document.id}"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience" title="<spring:message code="notificacio.info.document.descarregar"/>">
+										<spring:message code="notificacio.info.document.descarregar"/>
+										<span class="fa fa-download"></span>
+									</a>
+								</td>
+							</tr>
+							<c:if test="${not empty notificacio.document2}">
 								<tr>
 									<td width="30%">
 										<strong><spring:message	code="notificacio.info.document.arxiu.nom" /></strong>
 									</td>
-									<td>${notificacio.document.arxiuNom}
-										<a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience" title="<spring:message code="notificacio.info.document.descarregar"/>">
+									<td>${notificacio.document2.arxiuNom}
+										<a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar/${notificacio.document2.id}"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience" title="<spring:message code="notificacio.info.document.descarregar"/>">
 											<spring:message code="notificacio.info.document.descarregar"/>
 											<span class="fa fa-download"></span>
 										</a>
 									</td>
 								</tr>
+							</c:if>
+							<c:if test="${not empty notificacio.document3}">
 								<tr>
-									<td><strong><spring:message code="notificacio.info.document.normalitzat" /></strong></td>
-									<td>
-									<c:choose>
-									    <c:when test="${notificacio.document.normalitzat}">
-									       Si
-									    </c:when>
-									    <c:otherwise>
-									        No
-									    </c:otherwise>
-									</c:choose>
+									<td width="30%">
+										<strong><spring:message	code="notificacio.info.document.arxiu.nom" /></strong>
+									</td>
+									<td>${notificacio.document3.arxiuNom}
+										<a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar/${notificacio.document3.id}"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience" title="<spring:message code="notificacio.info.document.descarregar"/>">
+											<spring:message code="notificacio.info.document.descarregar"/>
+											<span class="fa fa-download"></span>
+										</a>
 									</td>
 								</tr>
+							</c:if>
+							<c:if test="${not empty notificacio.document4}">
 								<tr>
-									<td><strong><spring:message code="notificacio.info.document.generar.csv" /></strong></td>
-									<td>
-									<c:choose>
-									    <c:when test="${notificacio.document.generarCsv}">
-									       Si
-									    </c:when>
-									    <c:otherwise>
-									        No
-									    </c:otherwise>
-									</c:choose>
+									<td width="30%">
+										<strong><spring:message	code="notificacio.info.document.arxiu.nom" /></strong>
+									</td>
+									<td>${notificacio.document4.arxiuNom}
+										<a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar/${notificacio.document4.id}"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience" title="<spring:message code="notificacio.info.document.descarregar"/>">
+											<spring:message code="notificacio.info.document.descarregar"/>
+											<span class="fa fa-download"></span>
+										</a>
 									</td>
 								</tr>
-							</tbody>
-						</table>
+							</c:if>
+							<c:if test="${not empty notificacio.document5}">
+								<tr>
+									<td width="30%">
+										<strong><spring:message	code="notificacio.info.document.arxiu.nom" /></strong>
+									</td>
+									<td>${notificacio.document5.arxiuNom}
+										<a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar/${notificacio.document5.id}"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience" title="<spring:message code="notificacio.info.document.descarregar"/>">
+											<spring:message code="notificacio.info.document.descarregar"/>
+											<span class="fa fa-download"></span>
+										</a>
+									</td>
+								</tr>
+							</c:if>
+							<tr>
+								<td><strong><spring:message code="notificacio.info.document.normalitzat" /></strong></td>
+								<td>
+								<c:choose>
+									<c:when test="${notificacio.document.normalitzat}">
+									   Si
+									</c:when>
+									<c:otherwise>
+										No
+									</c:otherwise>
+								</c:choose>
+								</td>
+							</tr>
+							<tr>
+								<td><strong><spring:message code="notificacio.info.document.generar.csv" /></strong></td>
+								<td>
+								<c:choose>
+									<c:when test="${notificacio.document.generarCsv}">
+									   Si
+									</c:when>
+									<c:otherwise>
+										No
+									</c:otherwise>
+								</c:choose>
+								</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 			</c:if>
 			<c:if test="${not empty notificacio.procediment.pagadorpostal}">

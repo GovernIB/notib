@@ -3,38 +3,25 @@
  */
 package es.caib.notib.war.command;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.war.helper.ConversioTipusHelper;
+import es.caib.notib.war.validation.ValidNotificacio;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
-import es.caib.notib.core.api.dto.DocumentDto;
-import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.IdiomaEnumDto;
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
-import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
-import es.caib.notib.core.api.dto.PersonaDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
-import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
-import es.caib.notib.war.helper.ConversioTipusHelper;
-import es.caib.notib.war.validation.ValidNotificacio;
-import lombok.Getter;
-import lombok.Setter;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Command per al manteniment de notificacions manuals (V2).
@@ -60,20 +47,12 @@ public class NotificacioCommandV2 {
 	private int retard;
 	@NotNull
 	private Date caducitat;
-	private DocumentCommand document;
 	private Long procedimentId;
 	private String procedimentNom;
 	private String codiSia;
 	private Long grupId;
 	@Size(max=64)
 	private String usuariCodi;
-	private TipusDocumentEnumDto tipusDocument;
-	private String tipusDocumentSelected;
-	private String tipusDocumentDefault;
-	private String documentArxiuCsv;
-	private String documentArxiuUuid;
-	private String documentArxiuUrl;
-	private MultipartFile arxiu;
 	private String oficina;
 	private String llibre;
 	private String extracte;
@@ -91,11 +70,24 @@ public class NotificacioCommandV2 {
 	protected NotificacioErrorTipusEnumDto notificaErrorTipus;
 	@Valid @NotEmpty
 	private List<EnviamentCommand> enviaments = new ArrayList<EnviamentCommand>();
-	
 
-	public byte[]  getContingutArxiu() {
+	// Document 1
+	private DocumentCommand[] documents = new DocumentCommand[5];
+	private TipusDocumentEnumDto[] tipusDocument = new TipusDocumentEnumDto[5];
+	private String[] tipusDocumentSelected = new String[5];
+	private String[] tipusDocumentDefault = new String[5];
+	private String[] documentArxiuCsv = new String[5];
+	private String[] documentArxiuUuid = new String[5];
+	private String[] documentArxiuUrl = new String[5];
+	private MultipartFile[] arxiu = new MultipartFile[5];
+
+	public void setTipusDocumentDefault(int i, String value) {
+		this.tipusDocumentDefault[i] = value;
+	}
+
+	public byte[] getContingutArxiu(int i) {
 		try {
-			return arxiu.getBytes();
+			return arxiu[i].getBytes();
 		} catch (IOException e) {
 			logger.error("No s'ha pogut recuperar el contingut del fitxer per validar");
 		}
@@ -111,6 +103,9 @@ public class NotificacioCommandV2 {
 		if (dto.getProcediment() != null) {
 			command.setProcedimentId(dto.getProcediment().getId());
 		}
+
+		// Documents
+
 		return command;
 	}
 	public static NotificacioDtoV2 asDto(NotificacioCommandV2 command) {
@@ -129,21 +124,22 @@ public class NotificacioCommandV2 {
 		grupDto.setId(command.getGrupId());
 		dto.setGrup(grupDto);
 
-		DocumentDto document = new DocumentDto();
-		document.setArxiuGestdocId(dto.getDocument().getArxiuGestdocId());
-		document.setArxiuNom(dto.getDocument().getArxiuNom());
-		document.setContingutBase64(dto.getDocument().getContingutBase64());
-		document.setCsv(dto.getDocument().getCsv());
-		document.setHash(dto.getDocument().getHash());
-		document.setId(dto.getDocument().getId());
-		document.setUuid(dto.getDocument().getUuid());
-		document.setUrl(dto.getDocument().getUrl());
-		document.setNormalitzat(dto.getDocument().isNormalitzat());
-		document.setGenerarCsv(dto.getDocument().isGenerarCsv());
-		for (int i = 0; i < command.getDocument().getMetadadesKeys().size(); i++) {
-			document.getMetadades().put(command.getDocument().getMetadadesKeys().get(i), command.getDocument().getMetadadesValues().get(i));
-		}
-		dto.setDocument(document);
+//		// Documents
+//		DocumentDto document = new DocumentDto();
+//		document.setArxiuGestdocId(dto.getDocument().getArxiuGestdocId());
+//		document.setArxiuNom(dto.getDocument().getArxiuNom());
+//		document.setContingutBase64(dto.getDocument().getContingutBase64());
+//		document.setCsv(dto.getDocument().getCsv());
+//		document.setHash(dto.getDocument().getHash());
+//		document.setId(dto.getDocument().getId());
+//		document.setUuid(dto.getDocument().getUuid());
+//		document.setUrl(dto.getDocument().getUrl());
+//		document.setNormalitzat(dto.getDocument().isNormalitzat());
+//		document.setGenerarCsv(dto.getDocument().isGenerarCsv());
+////		for (int i = 0; i < command.getDocument().getMetadadesKeys().size(); i++) {
+////			document.getMetadades().put(command.getDocument().getMetadadesKeys().get(i), command.getDocument().getMetadadesValues().get(i));
+////		}
+//		dto.setDocument(document);
 		
 		// Format de municipi i província
 		if (dto.getEnviaments() != null) {

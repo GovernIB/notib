@@ -1,476 +1,512 @@
-<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions name="NotificacioServiceV2" targetNamespace="http://www.caib.es/notib/ws/notificacio" xmlns:ns1="http://schemas.xmlsoap.org/wsdl/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.caib.es/notib/ws/notificacio" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <wsdl:types>
-<xs:schema elementFormDefault="unqualified" targetNamespace="http://www.caib.es/notib/ws/notificacio" version="1.0" xmlns:tns="http://www.caib.es/notib/ws/notificacio" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-<xs:element name="alta" type="tns:alta" />
-<xs:element name="altaResponse" type="tns:altaResponse" />
-<xs:element name="consultaDadesRegistre" type="tns:consultaDadesRegistre" />
-<xs:element name="consultaDadesRegistreResponse" type="tns:consultaDadesRegistreResponse" />
-<xs:element name="consultaEstatEnviament" type="tns:consultaEstatEnviament" />
-<xs:element name="consultaEstatEnviamentResponse" type="tns:consultaEstatEnviamentResponse" />
-<xs:element name="consultaEstatNotificacio" type="tns:consultaEstatNotificacio" />
-<xs:element name="consultaEstatNotificacioResponse" type="tns:consultaEstatNotificacioResponse" />
-<xs:element name="dadesConsulta" type="tns:dadesConsulta" />
-<xs:element name="donarPermisConsulta" type="tns:donarPermisConsulta" />
-<xs:element name="donarPermisConsultaResponse" type="tns:donarPermisConsultaResponse" />
-<xs:element name="enviamentReferencia" type="tns:enviamentReferencia" />
-<xs:element name="notificacioV2" type="tns:notificacioV2" />
-<xs:element name="permisConsulta" type="tns:permisConsulta" />
-<xs:element name="respostaAlta" type="tns:respostaAlta" />
-<xs:element name="respostaConsultaEstatEnviament" type="tns:respostaConsultaEstatEnviament" />
-<xs:element name="respostaConsultaEstatNotificacio" type="tns:respostaConsultaEstatNotificacio" />
-<xs:complexType name="consultaDadesRegistre">
-<xs:sequence>
-<xs:element minOccurs="0" name="arg0" type="tns:dadesConsulta" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="dadesConsulta">
-<xs:sequence>
-<xs:element name="ambJustificant" type="xs:boolean" />
-<xs:element minOccurs="0" name="identificador" type="xs:string" />
-<xs:element minOccurs="0" name="referencia" type="xs:string" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="consultaDadesRegistreResponse">
-<xs:sequence>
-<xs:element minOccurs="0" name="return" type="tns:respostaConsultaDadesRegistre" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="respostaConsultaDadesRegistre">
-<xs:sequence>
-<xs:element minOccurs="0" name="dataRegistre" type="xs:dateTime" />
-<xs:element name="error" type="xs:boolean" />
-<xs:element minOccurs="0" name="errorData" type="xs:dateTime" />
-<xs:element minOccurs="0" name="errorDescripcio" type="xs:string" />
-<xs:element minOccurs="0" name="justificant" type="xs:base64Binary" />
-<xs:element name="numRegistre" type="xs:int" />
-<xs:element minOccurs="0" name="numRegistreFormatat" type="xs:string" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="consultaEstatNotificacio">
-<xs:sequence>
-<xs:element name="identificador" type="xs:string" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="consultaEstatNotificacioResponse">
-<xs:sequence>
-<xs:element minOccurs="0" name="return" type="tns:respostaConsultaEstatNotificacio" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="respostaConsultaEstatNotificacio">
-<xs:sequence>
-<xs:element name="error" type="xs:boolean" />
-<xs:element minOccurs="0" name="errorData" type="xs:dateTime" />
-<xs:element minOccurs="0" name="errorDescripcio" type="xs:string" />
-<xs:element minOccurs="0" name="estat" type="tns:notificacioEstatEnum" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="alta">
-<xs:sequence>
-<xs:element name="notificacio" type="tns:notificacioV2" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="notificacioV2">
-<xs:sequence>
-<xs:element minOccurs="0" name="caducitat" type="xs:dateTime" />
-<xs:element minOccurs="0" name="concepte" type="xs:string" />
-<xs:element minOccurs="0" name="descripcio" type="xs:string" />
-<xs:element minOccurs="0" name="document" type="tns:documentV2" />
-<xs:element minOccurs="0" name="emisorDir3Codi" type="xs:string" />
-<xs:element minOccurs="0" name="organGestor" type="xs:string" />
-<xs:element minOccurs="0" name="enviamentDataProgramada" type="xs:dateTime" />
-<xs:element minOccurs="0" name="enviamentTipus" type="tns:enviamentTipusEnum" />
-<xs:element maxOccurs="unbounded" minOccurs="0" name="enviaments" nillable="true" type="tns:enviament" />
-<xs:element minOccurs="0" name="grupCodi" type="xs:string" />
-<xs:element minOccurs="0" name="numExpedient" type="xs:string" />
-<xs:element minOccurs="0" name="procedimentCodi" type="xs:string" />
-<xs:element minOccurs="0" name="retard" type="xs:int" />
-<xs:element minOccurs="0" name="usuariCodi" type="xs:string" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="documentV2">
-<xs:sequence>
-<xs:element minOccurs="0" name="arxiuId" type="xs:string" />
-<xs:element minOccurs="0" name="arxiuNom" type="xs:string" />
-<xs:element minOccurs="0" name="contingutBase64" type="xs:string" />
-<xs:element minOccurs="0" name="csv" type="xs:string" />
-<xs:element name="normalitzat" type="xs:boolean" />
-<xs:element minOccurs="0" name="url" type="xs:string" />
-<xs:element minOccurs="0" name="uuid" type="xs:string" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="enviament">
-<xs:sequence>
-<xs:element maxOccurs="unbounded" minOccurs="0" name="destinataris" nillable="true" type="tns:persona" />
-<xs:element minOccurs="0" name="entregaDeh" type="tns:entregaDeh" />
-<xs:element name="entregaDehActiva" type="xs:boolean" />
-<xs:element minOccurs="0" name="entregaPostal" type="tns:entregaPostal" />
-<xs:element name="entregaPostalActiva" type="xs:boolean" />
-<xs:element minOccurs="0" name="referencia" type="xs:string" />
-<xs:element minOccurs="0" name="serveiTipus" type="tns:notificaServeiTipusEnumDto" />
-<xs:element minOccurs="0" name="titular" type="tns:persona" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="persona">
-<xs:sequence>
-<xs:element minOccurs="0" name="dir3Codi" type="xs:string" />
-<xs:element minOccurs="0" name="email" type="xs:string" />
-<xs:element name="incapacitat" type="xs:boolean" />
-<xs:element minOccurs="0" name="interessatTipus" type="tns:interessatTipusEnumDto" />
-<xs:element minOccurs="0" name="llinatge1" type="xs:string" />
-<xs:element minOccurs="0" name="llinatge2" type="xs:string" />
-<xs:element minOccurs="0" name="nif" type="xs:string" />
-<xs:element minOccurs="0" name="nom" type="xs:string" />
-<xs:element minOccurs="0" name="raoSocial" type="xs:string" />
-<xs:element minOccurs="0" name="telefon" type="xs:string" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="entregaDeh">
-<xs:sequence>
-<xs:element minOccurs="0" name="emisorNif" type="xs:string" />
-<xs:element name="obligat" type="xs:boolean" />
-<xs:element minOccurs="0" name="procedimentCodi" type="xs:string" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="entregaPostal">
-<xs:sequence>
-<xs:element minOccurs="0" name="apartatCorreus" type="xs:string" />
-<xs:element minOccurs="0" name="bloc" type="xs:string" />
-<xs:element minOccurs="0" name="cie" type="xs:int" />
-<xs:element minOccurs="0" name="codiPostal" type="xs:string" />
-<xs:element minOccurs="0" name="complement" type="xs:string" />
-<xs:element minOccurs="0" name="escala" type="xs:string" />
-<xs:element minOccurs="0" name="formatFulla" type="xs:string" />
-<xs:element minOccurs="0" name="formatSobre" type="xs:string" />
-<xs:element minOccurs="0" name="linea1" type="xs:string" />
-<xs:element minOccurs="0" name="linea2" type="xs:string" />
-<xs:element minOccurs="0" name="municipiCodi" type="xs:string" />
-<xs:element minOccurs="0" name="numeroCasa" type="xs:string" />
-<xs:element minOccurs="0" name="numeroQualificador" type="xs:string" />
-<xs:element minOccurs="0" name="paisCodi" type="xs:string" />
-<xs:element minOccurs="0" name="planta" type="xs:string" />
-<xs:element minOccurs="0" name="poblacio" type="xs:string" />
-<xs:element minOccurs="0" name="porta" type="xs:string" />
-<xs:element minOccurs="0" name="portal" type="xs:string" />
-<xs:element minOccurs="0" name="provincia" type="xs:string" />
-<xs:element minOccurs="0" name="puntKm" type="xs:string" />
-<xs:element minOccurs="0" name="tipus" type="tns:notificaDomiciliConcretTipusEnumDto" />
-<xs:element minOccurs="0" name="viaNom" type="xs:string" />
-<xs:element minOccurs="0" name="viaTipus" type="tns:entregaPostalViaTipusEnum" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="altaResponse">
-<xs:sequence>
-<xs:element minOccurs="0" name="return" type="tns:respostaAlta" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="respostaAlta">
-<xs:sequence>
-<xs:element name="error" type="xs:boolean" />
-<xs:element minOccurs="0" name="errorDescripcio" type="xs:string" />
-<xs:element minOccurs="0" name="estat" type="tns:notificacioEstatEnum" />
-<xs:element minOccurs="0" name="identificador" type="xs:string" />
-<xs:element maxOccurs="unbounded" minOccurs="0" name="referencies" nillable="true" type="tns:enviamentReferencia" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="enviamentReferencia">
-<xs:sequence>
-<xs:element minOccurs="0" name="referencia" type="xs:string" />
-<xs:element minOccurs="0" name="titularNif" type="xs:string" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="donarPermisConsulta">
-<xs:sequence>
-<xs:element minOccurs="0" name="arg0" type="tns:permisConsulta" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="permisConsulta">
-<xs:sequence>
-<xs:element minOccurs="0" name="codiDir3Entitat" type="xs:string" />
-<xs:element name="permisConsulta" type="xs:boolean" />
-<xs:element minOccurs="0" name="procedimentCodi" type="xs:string" />
-<xs:element minOccurs="0" name="usuariCodi" type="xs:string" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="donarPermisConsultaResponse">
-<xs:sequence>
-<xs:element name="return" type="xs:boolean" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="consultaEstatEnviament">
-<xs:sequence>
-<xs:element name="referencia" type="xs:string" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="consultaEstatEnviamentResponse">
-<xs:sequence>
-<xs:element minOccurs="0" name="return" type="tns:respostaConsultaEstatEnviament" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="respostaConsultaEstatEnviament">
-<xs:sequence>
-<xs:element minOccurs="0" name="certificacio" type="tns:certificacio" />
-<xs:element name="error" type="xs:boolean" />
-<xs:element minOccurs="0" name="errorData" type="xs:dateTime" />
-<xs:element minOccurs="0" name="errorDescripcio" type="xs:string" />
-<xs:element minOccurs="0" name="estat" type="tns:enviamentEstatEnum" />
-<xs:element minOccurs="0" name="estatData" type="xs:dateTime" />
-<xs:element minOccurs="0" name="estatDescripcio" type="xs:string" />
-<xs:element minOccurs="0" name="estatOrigen" type="xs:string" />
-<xs:element minOccurs="0" name="receptorNif" type="xs:string" />
-<xs:element minOccurs="0" name="receptorNom" type="xs:string" />
-</xs:sequence>
-</xs:complexType>
-<xs:complexType name="certificacio">
-<xs:sequence>
-<xs:element minOccurs="0" name="contingutBase64" type="xs:string" />
-<xs:element minOccurs="0" name="csv" type="xs:string" />
-<xs:element minOccurs="0" name="data" type="xs:dateTime" />
-<xs:element minOccurs="0" name="hash" type="xs:string" />
-<xs:element minOccurs="0" name="metadades" type="xs:string" />
-<xs:element minOccurs="0" name="origen" type="xs:string" />
-<xs:element name="tamany" type="xs:int" />
-<xs:element minOccurs="0" name="tipusMime" type="xs:string" />
-</xs:sequence>
-</xs:complexType>
-<xs:simpleType name="notificacioEstatEnum">
-<xs:restriction base="xs:string">
-<xs:enumeration value="PENDENT" />
-<xs:enumeration value="ENVIADA" />
-<xs:enumeration value="REGISTRADA" />
-<xs:enumeration value="FINALITZADA" />
-<xs:enumeration value="PROCESSADA" />
-</xs:restriction>
-</xs:simpleType>
-<xs:simpleType name="enviamentTipusEnum">
-<xs:restriction base="xs:string">
-<xs:enumeration value="NOTIFICACIO" />
-<xs:enumeration value="COMUNICACIO" />
-</xs:restriction>
-</xs:simpleType>
-<xs:simpleType name="interessatTipusEnumDto">
-<xs:restriction base="xs:string">
-<xs:enumeration value="ADMINISTRACIO" />
-<xs:enumeration value="FISICA" />
-<xs:enumeration value="JURIDICA" />
-</xs:restriction>
-</xs:simpleType>
-<xs:simpleType name="notificaDomiciliConcretTipusEnumDto">
-<xs:restriction base="xs:string">
-<xs:enumeration value="NACIONAL" />
-<xs:enumeration value="ESTRANGER" />
-<xs:enumeration value="APARTAT_CORREUS" />
-<xs:enumeration value="SENSE_NORMALITZAR" />
-</xs:restriction>
-</xs:simpleType>
-<xs:simpleType name="entregaPostalViaTipusEnum">
-<xs:restriction base="xs:string">
-<xs:enumeration value="ALAMEDA" />
-<xs:enumeration value="CALLE" />
-<xs:enumeration value="CAMINO" />
-<xs:enumeration value="CARRER" />
-<xs:enumeration value="CARRETERA" />
-<xs:enumeration value="GLORIETA" />
-<xs:enumeration value="KALEA" />
-<xs:enumeration value="PASAJE" />
-<xs:enumeration value="PASEO" />
-<xs:enumeration value="PLAÇA" />
-<xs:enumeration value="PLAZA" />
-<xs:enumeration value="RAMBLA" />
-<xs:enumeration value="RONDA" />
-<xs:enumeration value="RUA" />
-<xs:enumeration value="SECTOR" />
-<xs:enumeration value="TRAVESIA" />
-<xs:enumeration value="URBANIZACION" />
-<xs:enumeration value="AVENIDA" />
-<xs:enumeration value="AVINGUDA" />
-<xs:enumeration value="BARRIO" />
-<xs:enumeration value="CALLEJA" />
-<xs:enumeration value="CAMI" />
-<xs:enumeration value="CAMPO" />
-<xs:enumeration value="CARRERA" />
-<xs:enumeration value="CUESTA" />
-<xs:enumeration value="EDIFICIO" />
-<xs:enumeration value="ENPARANTZA" />
-<xs:enumeration value="ESTRADA" />
-<xs:enumeration value="JARDINES" />
-<xs:enumeration value="JARDINS" />
-<xs:enumeration value="PARQUE" />
-<xs:enumeration value="PASSEIG" />
-<xs:enumeration value="PRAZA" />
-<xs:enumeration value="PLAZUELA" />
-<xs:enumeration value="PLACETA" />
-<xs:enumeration value="POBLADO" />
-<xs:enumeration value="VIA" />
-<xs:enumeration value="TRAVESSERA" />
-<xs:enumeration value="PASSATGE" />
-<xs:enumeration value="BULEVAR" />
-<xs:enumeration value="POLIGONO" />
-<xs:enumeration value="OTROS" />
-</xs:restriction>
-</xs:simpleType>
-<xs:simpleType name="notificaServeiTipusEnumDto">
-<xs:restriction base="xs:string">
-<xs:enumeration value="NORMAL" />
-<xs:enumeration value="URGENT" />
-</xs:restriction>
-</xs:simpleType>
-<xs:simpleType name="enviamentEstatEnum">
-<xs:restriction base="xs:string">
-<xs:enumeration value="NOTIB_PENDENT" />
-<xs:enumeration value="NOTIB_ENVIADA" />
-<xs:enumeration value="ABSENT" />
-<xs:enumeration value="ADRESA_INCORRECTA" />
-<xs:enumeration value="DESCONEGUT" />
-<xs:enumeration value="ENVIADA_CI" />
-<xs:enumeration value="ENVIADA_DEH" />
-<xs:enumeration value="ENVIAMENT_PROGRAMAT" />
-<xs:enumeration value="ENTREGADA_OP" />
-<xs:enumeration value="ERROR_ENTREGA" />
-<xs:enumeration value="EXPIRADA" />
-<xs:enumeration value="EXTRAVIADA" />
-<xs:enumeration value="MORT" />
-<xs:enumeration value="LLEGIDA" />
-<xs:enumeration value="NOTIFICADA" />
-<xs:enumeration value="PENDENT" />
-<xs:enumeration value="PENDENT_ENVIAMENT" />
-<xs:enumeration value="PENDENT_SEU" />
-<xs:enumeration value="PENDENT_CIE" />
-<xs:enumeration value="PENDENT_DEH" />
-<xs:enumeration value="REBUTJADA" />
-<xs:enumeration value="SENSE_INFORMACIO" />
-<xs:enumeration value="FINALITZADA" />
-<xs:enumeration value="ENVIADA" />
-<xs:enumeration value="REGISTRADA" />
-<xs:enumeration value="PROCESSADA" />
-<xs:enumeration value="ANULADA" />
-<xs:enumeration value="ENVIAT_SIR" />
-</xs:restriction>
-</xs:simpleType>
-</xs:schema>
-  </wsdl:types>
-  <wsdl:message name="altaResponse">
-    <wsdl:part element="tns:altaResponse" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="alta">
-    <wsdl:part element="tns:alta" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="consultaEstatEnviament">
-    <wsdl:part element="tns:consultaEstatEnviament" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="donarPermisConsultaResponse">
-    <wsdl:part element="tns:donarPermisConsultaResponse" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="consultaDadesRegistreResponse">
-    <wsdl:part element="tns:consultaDadesRegistreResponse" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="consultaEstatNotificacio">
-    <wsdl:part element="tns:consultaEstatNotificacio" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="consultaEstatEnviamentResponse">
-    <wsdl:part element="tns:consultaEstatEnviamentResponse" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="donarPermisConsulta">
-    <wsdl:part element="tns:donarPermisConsulta" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="consultaEstatNotificacioResponse">
-    <wsdl:part element="tns:consultaEstatNotificacioResponse" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="consultaDadesRegistre">
-    <wsdl:part element="tns:consultaDadesRegistre" name="parameters">
-    </wsdl:part>
-  </wsdl:message>
-  <wsdl:portType name="NotificacioServiceV2">
-    <wsdl:operation name="consultaDadesRegistre">
-      <wsdl:input message="tns:consultaDadesRegistre" name="consultaDadesRegistre">
-    </wsdl:input>
-      <wsdl:output message="tns:consultaDadesRegistreResponse" name="consultaDadesRegistreResponse">
-    </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="consultaEstatNotificacio">
-      <wsdl:input message="tns:consultaEstatNotificacio" name="consultaEstatNotificacio">
-    </wsdl:input>
-      <wsdl:output message="tns:consultaEstatNotificacioResponse" name="consultaEstatNotificacioResponse">
-    </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="alta">
-      <wsdl:input message="tns:alta" name="alta">
-    </wsdl:input>
-      <wsdl:output message="tns:altaResponse" name="altaResponse">
-    </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="donarPermisConsulta">
-      <wsdl:input message="tns:donarPermisConsulta" name="donarPermisConsulta">
-    </wsdl:input>
-      <wsdl:output message="tns:donarPermisConsultaResponse" name="donarPermisConsultaResponse">
-    </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="consultaEstatEnviament">
-      <wsdl:input message="tns:consultaEstatEnviament" name="consultaEstatEnviament">
-    </wsdl:input>
-      <wsdl:output message="tns:consultaEstatEnviamentResponse" name="consultaEstatEnviamentResponse">
-    </wsdl:output>
-    </wsdl:operation>
-  </wsdl:portType>
-  <wsdl:binding name="NotificacioServiceV2SoapBinding" type="tns:NotificacioServiceV2">
-    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
-    <wsdl:operation name="consultaDadesRegistre">
-      <soap:operation soapAction="" style="document" />
-      <wsdl:input name="consultaDadesRegistre">
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output name="consultaDadesRegistreResponse">
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="consultaEstatNotificacio">
-      <soap:operation soapAction="" style="document" />
-      <wsdl:input name="consultaEstatNotificacio">
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output name="consultaEstatNotificacioResponse">
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="alta">
-      <soap:operation soapAction="" style="document" />
-      <wsdl:input name="alta">
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output name="altaResponse">
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="donarPermisConsulta">
-      <soap:operation soapAction="" style="document" />
-      <wsdl:input name="donarPermisConsulta">
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output name="donarPermisConsultaResponse">
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="consultaEstatEnviament">
-      <soap:operation soapAction="" style="document" />
-      <wsdl:input name="consultaEstatEnviament">
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output name="consultaEstatEnviamentResponse">
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-  </wsdl:binding>
-  <wsdl:service name="NotificacioServiceV2">
-    <wsdl:port binding="tns:NotificacioServiceV2SoapBinding" name="NotificacioServiceV2Port">
-      <soap:address location="http://127.0.0.1:8180/notib/ws/notificacioV2WS" />
-    </wsdl:port>
-  </wsdl:service>
-</wsdl:definitions>
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="NotificacioServiceV2" targetNamespace="http://www.caib.es/notib/ws/notificacio" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.caib.es/notib/ws/notificacio" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+ <types>
+  <xs:schema targetNamespace="http://www.caib.es/notib/ws/notificacio" version="1.0" xmlns:tns="http://www.caib.es/notib/ws/notificacio" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:element name="alta" type="tns:alta"/>
+   <xs:element name="altaResponse" type="tns:altaResponse"/>
+   <xs:element name="consultaDadesRegistre" type="tns:consultaDadesRegistre"/>
+   <xs:element name="consultaDadesRegistreResponse" type="tns:consultaDadesRegistreResponse"/>
+   <xs:element name="consultaEstatEnviament" type="tns:consultaEstatEnviament"/>
+   <xs:element name="consultaEstatEnviamentResponse" type="tns:consultaEstatEnviamentResponse"/>
+   <xs:element name="consultaEstatNotificacio" type="tns:consultaEstatNotificacio"/>
+   <xs:element name="consultaEstatNotificacioResponse" type="tns:consultaEstatNotificacioResponse"/>
+   <xs:element name="dadesConsulta" type="tns:dadesConsulta"/>
+   <xs:element name="donarPermisConsulta" type="tns:donarPermisConsulta"/>
+   <xs:element name="donarPermisConsultaResponse" type="tns:donarPermisConsultaResponse"/>
+   <xs:element name="enviamentReferencia" type="tns:enviamentReferencia"/>
+   <xs:element name="notificacioV2" type="tns:notificacioV2"/>
+   <xs:element name="permisConsulta" type="tns:permisConsulta"/>
+   <xs:element name="respostaAlta" type="tns:respostaAlta"/>
+   <xs:element name="respostaConsultaEstatEnviament" type="tns:respostaConsultaEstatEnviament"/>
+   <xs:element name="respostaConsultaEstatNotificacio" type="tns:respostaConsultaEstatNotificacio"/>
+   <xs:complexType name="consultaEstatNotificacio">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="consultaEstatNotificacioResponse">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="return" type="tns:respostaConsultaEstatNotificacio"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="respostaConsultaEstatNotificacio">
+    <xs:sequence>
+     <xs:element name="error" type="xs:boolean"/>
+     <xs:element minOccurs="0" name="errorData" type="xs:dateTime"/>
+     <xs:element minOccurs="0" name="errorDescripcio" type="xs:string"/>
+     <xs:element minOccurs="0" name="estat" type="tns:notificacioEstatEnum"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="consultaEstatEnviament">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="consultaEstatEnviamentResponse">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="return" type="tns:respostaConsultaEstatEnviament"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="respostaConsultaEstatEnviament">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="certificacio" type="tns:certificacio"/>
+     <xs:element name="error" type="xs:boolean"/>
+     <xs:element minOccurs="0" name="errorData" type="xs:dateTime"/>
+     <xs:element minOccurs="0" name="errorDescripcio" type="xs:string"/>
+     <xs:element minOccurs="0" name="estat" type="tns:enviamentEstatEnum"/>
+     <xs:element minOccurs="0" name="estatData" type="xs:dateTime"/>
+     <xs:element minOccurs="0" name="estatDescripcio" type="xs:string"/>
+     <xs:element minOccurs="0" name="estatOrigen" type="xs:string"/>
+     <xs:element minOccurs="0" name="receptorNif" type="xs:string"/>
+     <xs:element minOccurs="0" name="receptorNom" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="certificacio">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="contingutBase64" type="xs:string"/>
+     <xs:element minOccurs="0" name="csv" type="xs:string"/>
+     <xs:element minOccurs="0" name="data" type="xs:dateTime"/>
+     <xs:element minOccurs="0" name="hash" type="xs:string"/>
+     <xs:element minOccurs="0" name="metadades" type="xs:string"/>
+     <xs:element minOccurs="0" name="origen" type="xs:string"/>
+     <xs:element name="tamany" type="xs:int"/>
+     <xs:element minOccurs="0" name="tipusMime" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="alta">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="arg0" type="tns:notificacioV2"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="notificacioV2">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="caducitat" type="xs:dateTime"/>
+     <xs:element minOccurs="0" name="concepte" type="xs:string"/>
+     <xs:element minOccurs="0" name="descripcio" type="xs:string"/>
+     <xs:element minOccurs="0" name="document" type="tns:documentV2"/>
+     <xs:element minOccurs="0" name="document2" type="tns:documentV2"/>
+     <xs:element minOccurs="0" name="document3" type="tns:documentV2"/>
+     <xs:element minOccurs="0" name="document4" type="tns:documentV2"/>
+     <xs:element minOccurs="0" name="document5" type="tns:documentV2"/>
+     <xs:element minOccurs="0" name="emisorDir3Codi" type="xs:string"/>
+     <xs:element minOccurs="0" name="enviamentDataProgramada" type="xs:dateTime"/>
+     <xs:element minOccurs="0" name="enviamentTipus" type="tns:enviamentTipusEnum"/>
+     <xs:element maxOccurs="unbounded" minOccurs="0" name="enviaments" nillable="true" type="tns:enviament"/>
+     <xs:element minOccurs="0" name="grupCodi" type="xs:string"/>
+     <xs:element minOccurs="0" name="idioma" type="tns:idiomaEnumDto"/>
+     <xs:element minOccurs="0" name="numExpedient" type="xs:string"/>
+     <xs:element minOccurs="0" name="organGestor" type="xs:string"/>
+     <xs:element minOccurs="0" name="procedimentCodi" type="xs:string"/>
+     <xs:element minOccurs="0" name="retard" type="xs:int"/>
+     <xs:element minOccurs="0" name="usuariCodi" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="documentV2">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="arxiuId" type="xs:string"/>
+     <xs:element minOccurs="0" name="arxiuNom" type="xs:string"/>
+     <xs:element minOccurs="0" name="contingutBase64" type="xs:string"/>
+     <xs:element minOccurs="0" name="csv" type="xs:string"/>
+     <xs:element minOccurs="0" name="modoFirma" type="xs:boolean"/>
+     <xs:element name="normalitzat" type="xs:boolean"/>
+     <xs:element minOccurs="0" name="origen" type="tns:origenEnum"/>
+     <xs:element minOccurs="0" name="tipoDocumental" type="tns:tipusDocumentalEnum"/>
+     <xs:element minOccurs="0" name="url" type="xs:string"/>
+     <xs:element minOccurs="0" name="uuid" type="xs:string"/>
+     <xs:element minOccurs="0" name="validesa" type="tns:validesaEnum"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="enviament">
+    <xs:sequence>
+     <xs:element maxOccurs="unbounded" minOccurs="0" name="destinataris" nillable="true" type="tns:persona"/>
+     <xs:element minOccurs="0" name="entregaDeh" type="tns:entregaDeh"/>
+     <xs:element name="entregaDehActiva" type="xs:boolean"/>
+     <xs:element minOccurs="0" name="entregaPostal" type="tns:entregaPostal"/>
+     <xs:element name="entregaPostalActiva" type="xs:boolean"/>
+     <xs:element minOccurs="0" name="id" type="xs:long"/>
+     <xs:element minOccurs="0" name="referencia" type="xs:string"/>
+     <xs:element minOccurs="0" name="serveiTipus" type="tns:notificaServeiTipusEnumDto"/>
+     <xs:element minOccurs="0" name="titular" type="tns:persona"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="persona">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="dir3Codi" type="xs:string"/>
+     <xs:element minOccurs="0" name="email" type="xs:string"/>
+     <xs:element minOccurs="0" name="id" type="xs:long"/>
+     <xs:element name="incapacitat" type="xs:boolean"/>
+     <xs:element minOccurs="0" name="interessatTipus" type="tns:interessatTipusEnumDto"/>
+     <xs:element minOccurs="0" name="llinatge1" type="xs:string"/>
+     <xs:element minOccurs="0" name="llinatge2" type="xs:string"/>
+     <xs:element minOccurs="0" name="nif" type="xs:string"/>
+     <xs:element minOccurs="0" name="nom" type="xs:string"/>
+     <xs:element minOccurs="0" name="raoSocial" type="xs:string"/>
+     <xs:element minOccurs="0" name="telefon" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="entregaDeh">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="emisorNif" type="xs:string"/>
+     <xs:element name="obligat" type="xs:boolean"/>
+     <xs:element minOccurs="0" name="procedimentCodi" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="entregaPostal">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="apartatCorreus" type="xs:string"/>
+     <xs:element minOccurs="0" name="bloc" type="xs:string"/>
+     <xs:element minOccurs="0" name="cie" type="xs:int"/>
+     <xs:element minOccurs="0" name="codiPostal" type="xs:string"/>
+     <xs:element minOccurs="0" name="complement" type="xs:string"/>
+     <xs:element minOccurs="0" name="escala" type="xs:string"/>
+     <xs:element minOccurs="0" name="formatFulla" type="xs:string"/>
+     <xs:element minOccurs="0" name="formatSobre" type="xs:string"/>
+     <xs:element minOccurs="0" name="linea1" type="xs:string"/>
+     <xs:element minOccurs="0" name="linea2" type="xs:string"/>
+     <xs:element minOccurs="0" name="municipiCodi" type="xs:string"/>
+     <xs:element minOccurs="0" name="numeroCasa" type="xs:string"/>
+     <xs:element minOccurs="0" name="numeroQualificador" type="xs:string"/>
+     <xs:element minOccurs="0" name="paisCodi" type="xs:string"/>
+     <xs:element minOccurs="0" name="planta" type="xs:string"/>
+     <xs:element minOccurs="0" name="poblacio" type="xs:string"/>
+     <xs:element minOccurs="0" name="porta" type="xs:string"/>
+     <xs:element minOccurs="0" name="portal" type="xs:string"/>
+     <xs:element minOccurs="0" name="provincia" type="xs:string"/>
+     <xs:element minOccurs="0" name="puntKm" type="xs:string"/>
+     <xs:element minOccurs="0" name="tipus" type="tns:notificaDomiciliConcretTipusEnumDto"/>
+     <xs:element minOccurs="0" name="viaNom" type="xs:string"/>
+     <xs:element minOccurs="0" name="viaTipus" type="tns:entregaPostalViaTipusEnum"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="altaResponse">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="return" type="tns:respostaAlta"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="respostaAlta">
+    <xs:sequence>
+     <xs:element name="error" type="xs:boolean"/>
+     <xs:element minOccurs="0" name="errorDescripcio" type="xs:string"/>
+     <xs:element minOccurs="0" name="estat" type="tns:notificacioEstatEnum"/>
+     <xs:element minOccurs="0" name="identificador" type="xs:string"/>
+     <xs:element maxOccurs="unbounded" minOccurs="0" name="referencies" nillable="true" type="tns:enviamentReferencia"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="enviamentReferencia">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="referencia" type="xs:string"/>
+     <xs:element minOccurs="0" name="titularNif" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="donarPermisConsulta">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="arg0" type="tns:permisConsulta"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="permisConsulta">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="codiDir3Entitat" type="xs:string"/>
+     <xs:element name="permisConsulta" type="xs:boolean"/>
+     <xs:element minOccurs="0" name="procedimentCodi" type="xs:string"/>
+     <xs:element minOccurs="0" name="usuariCodi" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="donarPermisConsultaResponse">
+    <xs:sequence>
+     <xs:element name="return" type="xs:boolean"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="consultaDadesRegistre">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="arg0" type="tns:dadesConsulta"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="dadesConsulta">
+    <xs:sequence>
+     <xs:element name="ambJustificant" type="xs:boolean"/>
+     <xs:element minOccurs="0" name="identificador" type="xs:string"/>
+     <xs:element minOccurs="0" name="referencia" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="consultaDadesRegistreResponse">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="return" type="tns:respostaConsultaDadesRegistre"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="respostaConsultaDadesRegistre">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="dataRegistre" type="xs:dateTime"/>
+     <xs:element name="error" type="xs:boolean"/>
+     <xs:element minOccurs="0" name="errorData" type="xs:dateTime"/>
+     <xs:element minOccurs="0" name="errorDescripcio" type="xs:string"/>
+     <xs:element minOccurs="0" name="justificant" type="xs:base64Binary"/>
+     <xs:element name="numRegistre" type="xs:int"/>
+     <xs:element minOccurs="0" name="numRegistreFormatat" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:simpleType name="notificacioEstatEnum">
+    <xs:restriction base="xs:string">
+     <xs:enumeration value="PENDENT"/>
+     <xs:enumeration value="ENVIADA"/>
+     <xs:enumeration value="REGISTRADA"/>
+     <xs:enumeration value="FINALITZADA"/>
+     <xs:enumeration value="PROCESSADA"/>
+    </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="enviamentEstatEnum">
+    <xs:restriction base="xs:string">
+     <xs:enumeration value="NOTIB_PENDENT"/>
+     <xs:enumeration value="NOTIB_ENVIADA"/>
+     <xs:enumeration value="ABSENT"/>
+     <xs:enumeration value="ADRESA_INCORRECTA"/>
+     <xs:enumeration value="DESCONEGUT"/>
+     <xs:enumeration value="ENVIADA_CI"/>
+     <xs:enumeration value="ENVIADA_DEH"/>
+     <xs:enumeration value="ENVIAMENT_PROGRAMAT"/>
+     <xs:enumeration value="ENTREGADA_OP"/>
+     <xs:enumeration value="ERROR_ENTREGA"/>
+     <xs:enumeration value="EXPIRADA"/>
+     <xs:enumeration value="EXTRAVIADA"/>
+     <xs:enumeration value="MORT"/>
+     <xs:enumeration value="LLEGIDA"/>
+     <xs:enumeration value="NOTIFICADA"/>
+     <xs:enumeration value="PENDENT"/>
+     <xs:enumeration value="PENDENT_ENVIAMENT"/>
+     <xs:enumeration value="PENDENT_SEU"/>
+     <xs:enumeration value="PENDENT_CIE"/>
+     <xs:enumeration value="PENDENT_DEH"/>
+     <xs:enumeration value="REBUTJADA"/>
+     <xs:enumeration value="SENSE_INFORMACIO"/>
+     <xs:enumeration value="FINALITZADA"/>
+     <xs:enumeration value="ENVIADA"/>
+     <xs:enumeration value="REGISTRADA"/>
+     <xs:enumeration value="PROCESSADA"/>
+     <xs:enumeration value="ANULADA"/>
+     <xs:enumeration value="ENVIAT_SIR"/>
+    </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="origenEnum">
+    <xs:restriction base="xs:string">
+     <xs:enumeration value="CIUTADA"/>
+     <xs:enumeration value="ADMINISTRACIO"/>
+    </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="tipusDocumentalEnum">
+    <xs:restriction base="xs:string">
+     <xs:enumeration value="RESSOLUCIO"/>
+     <xs:enumeration value="ACORD"/>
+     <xs:enumeration value="CONTRACTE"/>
+     <xs:enumeration value="CONVENI"/>
+     <xs:enumeration value="DECLARACIO"/>
+     <xs:enumeration value="COMUNICACIO"/>
+     <xs:enumeration value="NOTIFICACIO"/>
+     <xs:enumeration value="PUBLICACIO"/>
+     <xs:enumeration value="JUSTIFICANT_RECEPCIO"/>
+     <xs:enumeration value="ACTA"/>
+     <xs:enumeration value="CERTIFICAT"/>
+     <xs:enumeration value="DILIGENCIA"/>
+     <xs:enumeration value="INFORME"/>
+     <xs:enumeration value="SOLICITUD"/>
+     <xs:enumeration value="DENUNCIA"/>
+     <xs:enumeration value="ALEGACIO"/>
+     <xs:enumeration value="RECURS"/>
+     <xs:enumeration value="COMUNICACIO_CIUTADA"/>
+     <xs:enumeration value="FACTURA"/>
+     <xs:enumeration value="ALTRES_INCAUTATS"/>
+     <xs:enumeration value="ALTRES"/>
+    </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="validesaEnum">
+    <xs:restriction base="xs:string">
+     <xs:enumeration value="COPIA"/>
+     <xs:enumeration value="COPIA_AUTENTICA"/>
+     <xs:enumeration value="ORIGINAL"/>
+    </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="enviamentTipusEnum">
+    <xs:restriction base="xs:string">
+     <xs:enumeration value="NOTIFICACIO"/>
+     <xs:enumeration value="COMUNICACIO"/>
+    </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="interessatTipusEnumDto">
+    <xs:restriction base="xs:string">
+     <xs:enumeration value="ADMINISTRACIO"/>
+     <xs:enumeration value="FISICA"/>
+     <xs:enumeration value="JURIDICA"/>
+    </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="notificaDomiciliConcretTipusEnumDto">
+    <xs:restriction base="xs:string">
+     <xs:enumeration value="NACIONAL"/>
+     <xs:enumeration value="ESTRANGER"/>
+     <xs:enumeration value="APARTAT_CORREUS"/>
+     <xs:enumeration value="SENSE_NORMALITZAR"/>
+    </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="entregaPostalViaTipusEnum">
+    <xs:restriction base="xs:string">
+     <xs:enumeration value="ALAMEDA"/>
+     <xs:enumeration value="CALLE"/>
+     <xs:enumeration value="CAMINO"/>
+     <xs:enumeration value="CARRER"/>
+     <xs:enumeration value="CARRETERA"/>
+     <xs:enumeration value="GLORIETA"/>
+     <xs:enumeration value="KALEA"/>
+     <xs:enumeration value="PASAJE"/>
+     <xs:enumeration value="PASEO"/>
+     <xs:enumeration value="PLAÇA"/>
+     <xs:enumeration value="PLAZA"/>
+     <xs:enumeration value="RAMBLA"/>
+     <xs:enumeration value="RONDA"/>
+     <xs:enumeration value="RUA"/>
+     <xs:enumeration value="SECTOR"/>
+     <xs:enumeration value="TRAVESIA"/>
+     <xs:enumeration value="URBANIZACION"/>
+     <xs:enumeration value="AVENIDA"/>
+     <xs:enumeration value="AVINGUDA"/>
+     <xs:enumeration value="BARRIO"/>
+     <xs:enumeration value="CALLEJA"/>
+     <xs:enumeration value="CAMI"/>
+     <xs:enumeration value="CAMPO"/>
+     <xs:enumeration value="CARRERA"/>
+     <xs:enumeration value="CUESTA"/>
+     <xs:enumeration value="EDIFICIO"/>
+     <xs:enumeration value="ENPARANTZA"/>
+     <xs:enumeration value="ESTRADA"/>
+     <xs:enumeration value="JARDINES"/>
+     <xs:enumeration value="JARDINS"/>
+     <xs:enumeration value="PARQUE"/>
+     <xs:enumeration value="PASSEIG"/>
+     <xs:enumeration value="PRAZA"/>
+     <xs:enumeration value="PLAZUELA"/>
+     <xs:enumeration value="PLACETA"/>
+     <xs:enumeration value="POBLADO"/>
+     <xs:enumeration value="VIA"/>
+     <xs:enumeration value="TRAVESSERA"/>
+     <xs:enumeration value="PASSATGE"/>
+     <xs:enumeration value="BULEVAR"/>
+     <xs:enumeration value="POLIGONO"/>
+     <xs:enumeration value="OTROS"/>
+    </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="notificaServeiTipusEnumDto">
+    <xs:restriction base="xs:string">
+     <xs:enumeration value="NORMAL"/>
+     <xs:enumeration value="URGENT"/>
+    </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="idiomaEnumDto">
+    <xs:restriction base="xs:string">
+     <xs:enumeration value="CA"/>
+     <xs:enumeration value="ES"/>
+    </xs:restriction>
+   </xs:simpleType>
+  </xs:schema>
+ </types>
+ <message name="NotificacioServiceV2_alta">
+  <part element="tns:alta" name="alta"/>
+ </message>
+ <message name="NotificacioServiceV2_consultaEstatEnviament">
+  <part element="tns:consultaEstatEnviament" name="consultaEstatEnviament"/>
+ </message>
+ <message name="NotificacioServiceV2_donarPermisConsultaResponse">
+  <part element="tns:donarPermisConsultaResponse" name="donarPermisConsultaResponse"/>
+ </message>
+ <message name="NotificacioServiceV2_consultaEstatEnviamentResponse">
+  <part element="tns:consultaEstatEnviamentResponse" name="consultaEstatEnviamentResponse"/>
+ </message>
+ <message name="NotificacioServiceV2_consultaDadesRegistre">
+  <part element="tns:consultaDadesRegistre" name="consultaDadesRegistre"/>
+ </message>
+ <message name="NotificacioServiceV2_consultaEstatNotificacio">
+  <part element="tns:consultaEstatNotificacio" name="consultaEstatNotificacio"/>
+ </message>
+ <message name="NotificacioServiceV2_consultaEstatNotificacioResponse">
+  <part element="tns:consultaEstatNotificacioResponse" name="consultaEstatNotificacioResponse"/>
+ </message>
+ <message name="NotificacioServiceV2_altaResponse">
+  <part element="tns:altaResponse" name="altaResponse"/>
+ </message>
+ <message name="NotificacioServiceV2_donarPermisConsulta">
+  <part element="tns:donarPermisConsulta" name="donarPermisConsulta"/>
+ </message>
+ <message name="NotificacioServiceV2_consultaDadesRegistreResponse">
+  <part element="tns:consultaDadesRegistreResponse" name="consultaDadesRegistreResponse"/>
+ </message>
+ <portType name="NotificacioServiceV2">
+  <operation name="alta" parameterOrder="alta">
+   <input message="tns:NotificacioServiceV2_alta"/>
+   <output message="tns:NotificacioServiceV2_altaResponse"/>
+  </operation>
+  <operation name="consultaDadesRegistre" parameterOrder="consultaDadesRegistre">
+   <input message="tns:NotificacioServiceV2_consultaDadesRegistre"/>
+   <output message="tns:NotificacioServiceV2_consultaDadesRegistreResponse"/>
+  </operation>
+  <operation name="consultaEstatEnviament" parameterOrder="consultaEstatEnviament">
+   <input message="tns:NotificacioServiceV2_consultaEstatEnviament"/>
+   <output message="tns:NotificacioServiceV2_consultaEstatEnviamentResponse"/>
+  </operation>
+  <operation name="consultaEstatNotificacio" parameterOrder="consultaEstatNotificacio">
+   <input message="tns:NotificacioServiceV2_consultaEstatNotificacio"/>
+   <output message="tns:NotificacioServiceV2_consultaEstatNotificacioResponse"/>
+  </operation>
+  <operation name="donarPermisConsulta" parameterOrder="donarPermisConsulta">
+   <input message="tns:NotificacioServiceV2_donarPermisConsulta"/>
+   <output message="tns:NotificacioServiceV2_donarPermisConsultaResponse"/>
+  </operation>
+ </portType>
+ <binding name="NotificacioServiceV2Binding" type="tns:NotificacioServiceV2">
+  <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+  <operation name="alta">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:body use="literal"/>
+   </input>
+   <output>
+    <soap:body use="literal"/>
+   </output>
+  </operation>
+  <operation name="consultaDadesRegistre">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:body use="literal"/>
+   </input>
+   <output>
+    <soap:body use="literal"/>
+   </output>
+  </operation>
+  <operation name="consultaEstatEnviament">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:body use="literal"/>
+   </input>
+   <output>
+    <soap:body use="literal"/>
+   </output>
+  </operation>
+  <operation name="consultaEstatNotificacio">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:body use="literal"/>
+   </input>
+   <output>
+    <soap:body use="literal"/>
+   </output>
+  </operation>
+  <operation name="donarPermisConsulta">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:body use="literal"/>
+   </input>
+   <output>
+    <soap:body use="literal"/>
+   </output>
+  </operation>
+ </binding>
+ <service name="NotificacioServiceV2">
+  <port binding="tns:NotificacioServiceV2Binding" name="NotificacioServiceV2Port">
+   <soap:address location="http://Programacio18:8280/notib/ws/notificacioV2WS"/>
+  </port>
+ </service>
+</definitions>
