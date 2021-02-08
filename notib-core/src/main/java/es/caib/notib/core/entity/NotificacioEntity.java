@@ -157,25 +157,25 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	protected DocumentEntity document;
 
 	/*document*/
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "document2_id")
 	@ForeignKey(name = "not_document_notificacio_fk")
 	protected DocumentEntity document2;
 
 	/*document*/
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "document3_id")
 	@ForeignKey(name = "not_document_notificacio_fk")
 	protected DocumentEntity document3;
 
 	/*document*/
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "document4_id")
 	@ForeignKey(name = "not_document_notificacio_fk")
 	protected DocumentEntity document4;
 
 	/*document*/
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "document5_id")
 	@ForeignKey(name = "not_document_notificacio_fk")
 	protected DocumentEntity document5;
