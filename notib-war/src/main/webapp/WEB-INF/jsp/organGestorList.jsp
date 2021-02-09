@@ -49,7 +49,19 @@
 				<not:inputText name="nom" inline="true" placeholderKey="organgestor.list.columna.nom"/>
 			</div>
 			<div class="col-md-3">
-				<not:inputText name="oficina" inline="true" placeholderKey="organgestor.list.columna.oficina"/>
+				<not:inputSelect 
+						name="oficina" 
+						textKey="organgestor.list.columna.oficina"
+						required="true" 
+						optionItems="${oficinesEntitat}" 
+						optionValueAttribute="codi" 
+						optionTextAttribute="nom"
+						labelSize="0" 
+						inline="true"
+						emptyOption="true"
+						optionMinimumResultsForSearch="2"
+						emptyOptionTextKey="organgestor.form.camp.oficina.select"/>
+<%-- 				<not:inputSelect name="oficina" textKey="organgestor.list.columna.oficina" required="true" optionMinimumResultsForSearch="0"/> --%>
 			</div>
 			<div class="col-md-2 pull-right">
 				<div class="pull-right">

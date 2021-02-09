@@ -291,7 +291,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			mapeigPropietatsOrdenacio.put("llibreCodiNom", new String[] {"llibre"});
-			mapeigPropietatsOrdenacio.put("oficinaNom", new String[] {"entitat.oficina"});
+			mapeigPropietatsOrdenacio.put("oficina", new String[] {"entitat.oficina"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 			
 			Page<OrganGestorEntity> organs = null;

@@ -2789,9 +2789,10 @@
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.comunitat.autonoma" /></label>
 								<div class="forminput">
-									<select id="o_comunitat" onchange="comunitatAutonomaChange(this.value)" class="form-control">
+									<select id="o_comunitat" type="search" onchange="comunitatAutonomaChange(this.value)" class="form-control">
 										<option value=""></option>
 				    				</select>
+				    				
 								</div>
 							</div>
 						</div>

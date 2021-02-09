@@ -64,6 +64,7 @@ public class OrganGestorController extends BaseUserController{
 		model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
 		model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 		model.addAttribute("setOficina", !entitat.isOficinaEntitat());
+		model.addAttribute("oficinesEntitat", entitatService.findOficinesEntitat(entitat.getCodi()));
 		return "organGestorList";
 	}
 	
