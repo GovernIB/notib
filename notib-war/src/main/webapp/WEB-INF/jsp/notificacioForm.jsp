@@ -203,6 +203,7 @@
 	</c:forEach>
 	var msgInfoDoc = "<spring:message code='notificacio.for.camp.document.avis'/>";
 	var msgInfoDocSir = "<spring:message code='notificacio.for.camp.document.avis.sir'/>";
+	var locale = "${requestLocale}";
 
 	$(document).ready(function() {
 
@@ -900,6 +901,9 @@
 			allowClear: true,
 	        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
 		});
+
+		$("input[name=idioma][value=" + locale.toUpperCase()+ "]").prop('checked', true);
+
 	});
 
 	var t, makeTooltip = function(warning) {
