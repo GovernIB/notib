@@ -1,32 +1,7 @@
 package es.caib.notib.core.service;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Resource;
-
-import es.caib.notib.core.api.dto.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.codahale.metrics.Timer;
-
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.ActualitzacioInfo;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -38,39 +13,28 @@ import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.aspect.Audita;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.GrupEntity;
-import es.caib.notib.core.entity.GrupProcedimentEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.PagadorCieEntity;
-import es.caib.notib.core.entity.PagadorPostalEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.ProcedimentFormEntity;
-import es.caib.notib.core.entity.ProcedimentOrganEntity;
-import es.caib.notib.core.helper.CacheHelper;
-import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.EntityComprovarHelper;
-import es.caib.notib.core.helper.IntegracioHelper;
-import es.caib.notib.core.helper.MessageHelper;
-import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.OrganigramaHelper;
-import es.caib.notib.core.helper.PaginacioHelper;
-import es.caib.notib.core.helper.PermisosHelper;
+import es.caib.notib.core.entity.*;
+import es.caib.notib.core.helper.*;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.notib.core.helper.PluginHelper;
-import es.caib.notib.core.helper.ProcedimentHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
-import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.GrupProcedimentRepository;
-import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.ProcedimentFormRepository;
-import es.caib.notib.core.repository.ProcedimentOrganRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.repository.*;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.TipusAssumpte;
 import es.caib.notib.plugin.unitat.NodeDir3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.*;
 
 /**
  * Implementació del servei de gestió de procediments.
@@ -417,6 +381,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			long startTime;
+			double elapsedTime;
 			ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getDir3Codi());
 			IntegracioInfo info = new IntegracioInfo(
 					IntegracioHelper.INTCODI_PROCEDIMENT, 
@@ -447,8 +413,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						false,
 						false,
 						false);
-				Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(entitatDto.getDir3Codi());
 
+				startTime = System.nanoTime();
+				Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(entitatDto.getDir3Codi());
+				elapsedTime = (System.nanoTime() - startTime) / 10e6;
+				logger.info(" [TIMER-PRO] Obtenir organigrama de l'entitat: " + elapsedTime + " ms");
 //				OficinaDto oficinaVirtual = pluginHelper.llistarOficinaVirtual(
 //						entitatDto.getDir3Codi(), 
 //						entitat.getNomOficinaVirtual(),
@@ -458,7 +427,10 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments"));
 				List<ProcedimentDto> procedimentsGda  = new ArrayList<ProcedimentDto>();
 //				List<ProcedimentDto> totalProcedimentsGda  = new ArrayList<ProcedimentDto>();
+				startTime = System.nanoTime();
 				int totalElements = getTotalProcediments(entitatDto.getDir3Codi());
+				elapsedTime = (System.nanoTime() - startTime) / 10e6;
+				logger.info(" [TIMER-PRO] Obtenir nombre de procediments de l'entitat: " + elapsedTime + " ms");
 				int totalElementsCons = totalElements;
 				Long t1 = System.currentTimeMillis();
 				int numPagina = 1;
@@ -466,6 +438,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				int i = 1;
 				boolean errorConsultantLlista = false;
 				boolean darreraLlista = false;
+				startTime = System.nanoTime();
 				do {
 					try {
 						procedimentsGda = getProcedimentsGdaByEntitat(
@@ -519,9 +492,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 //					totalProcedimentsGda.addAll(procedimentsGda);
 					numPagina++;
 				} while (!darreraLlista || (errorConsultantLlista && reintents < 3));
-
+				elapsedTime = (System.nanoTime() - startTime) / 10e6;
+				logger.info(" [TIMER-PRO] Recorregut procediments i actualització: " + elapsedTime + " ms");
 				
 				if (eliminarOrgans) {
+					startTime = System.nanoTime();
 //					int i = 1;
 //					logger.debug(">>>> Processant organs gestors modificats (" + organsGestorsModificats.size() + ")");
 //					logger.debug(">>>> ==========================================================================");
@@ -538,6 +513,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						//#260 Modificació passar la funcionalitat del for dins un procediment, ja que pel temps de transacció fallava
 						procedimentHelper.eliminarOrganSiNoEstaEnUs(progres,organGestorAntic);
 					}
+					elapsedTime = (System.nanoTime() - startTime) / 10e6;
+					logger.info(" [TIMER-PRO] Eliminar organs: " + elapsedTime + " ms");
 				} else {
 					progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organs.inactiu"));
 				}

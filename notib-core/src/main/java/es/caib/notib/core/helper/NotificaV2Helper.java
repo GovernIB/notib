@@ -3,53 +3,8 @@
  */
 package es.caib.notib.core.helper;
 
-import java.io.ByteArrayOutputStream;
-import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.rmi.RemoteException;
-import java.security.GeneralSecurityException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.ejb.CreateException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MalformedObjectNameException;
-import javax.naming.NamingException;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPEnvelope;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFactory;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
-import javax.xml.ws.soap.SOAPFaultException;
-
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import es.caib.notib.core.api.dto.AccioParam;
-import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.core.api.dto.IntegracioInfo;
-import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.NotificaRespostaDatatDto.NotificaRespostaDatatEventDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
@@ -64,25 +19,47 @@ import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.wsdl.notificaV2.NotificaWsV2PortType;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.AltaRemesaEnvios;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Destinatarios;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Documento;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.EntregaDEH;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.EntregaPostal;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Envio;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Envios;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Opcion;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Opciones;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorCIE;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorPostal;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Persona;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Certificacion;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.CodigoDIR;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Datado;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.InfoEnvioV2;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.*;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.*;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.ejb.CreateException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MalformedObjectNameException;
+import javax.naming.NamingException;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.namespace.QName;
+import javax.xml.soap.*;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPHandler;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
+import javax.xml.ws.soap.SOAPFaultException;
+import java.io.ByteArrayOutputStream;
+import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.rmi.RemoteException;
+import java.security.GeneralSecurityException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Helper per a interactuar amb la versió 2 del servei web de Notific@.
@@ -131,10 +108,18 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					NotificacioEntity.class,
 					"La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA);
 		}
+
 		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
+
 		try {
 			logger.info(" >>> Enviant notificació...");
+
+			long startTime = System.nanoTime();
+			double elapsedTime;
 			ResultadoAltaRemesaEnvios resultadoAlta = enviaNotificacio(notificacio);
+			elapsedTime = (System.nanoTime() - startTime) / 10e6;
+			logger.info(" [TIMER-NOT] Notificació enviar (enviaNotificacio SOAP-QUERY)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
+
 			notificacio.updateNotificaEnviamentData();
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
 				logger.info(" >>> ... OK");
@@ -152,6 +137,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					eventBulider.callbackInicialitza();
 
 				// TODO: Revisar generació d'events amb múltiples enviaments
+				startTime = System.nanoTime();
 				NotificacioEventEntity event = eventBulider.build();
 				
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
@@ -161,6 +147,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						}
 					}
 				}
+				elapsedTime = (System.nanoTime() - startTime) / 10e6;
+				logger.info(" [TIMER-NOT] Notificació enviar (Preparar events)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
 				integracioHelper.addAccioOk(info);
 			} else {
 				logger.info(" >>> ... ERROR");
@@ -222,13 +210,19 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb NotificaV2 (" +
 				"notificacioId=" + notificacio.getId() + ", " +
 				"notificaIdentificador=" + enviament.getNotificaIdentificador() + ")";
-		
+		long startTime;
+		double elapsedTime;
 		try {
 			if (enviament.getNotificaIdentificador() != null) {
 				InfoEnvioV2 infoEnvio = new InfoEnvioV2();
 				infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
+
+				startTime = System.nanoTime();
 				String apiKey = enviament.getNotificacio().getEntitat().getApiKey();
 				ResultadoInfoEnvioV2 resultadoInfoEnvio = getNotificaWs(apiKey).infoEnvioV2(infoEnvio);
+				elapsedTime = (System.nanoTime() - startTime) / 10e6;
+				logger.info(" [TIMER-EST] Refrescar estat enviament (infoEnvioV2)  [Id: " + enviamentId + "]: " + elapsedTime + " ms");
+
 				Datado datatDarrer = null;
 				if (resultadoInfoEnvio.getDatados() != null) {
 					for (Datado datado: resultadoInfoEnvio.getDatados().getDatado()) {
@@ -306,7 +300,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 							logger.info("L'event s'ha guardat correctament...");
 							logger.info("Envio correu en cas d'usuaris no APLICACIÓ");
 							if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
+								startTime = System.nanoTime();
 								emailHelper.prepararEnvioEmailNotificacio(notificacio);
+								elapsedTime = (System.nanoTime() - startTime) / 10e6;
+								logger.info(" [TIMER-EST] Preparar enviament mail notificació (prepararEnvioEmailNotificacio)  [Id: " + enviamentId + "]: " + elapsedTime + " ms");
 							}
 						}
 						logger.info("Enviament actualitzat");
@@ -328,6 +325,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				}
 				if (resultadoInfoEnvio.getCertificacion() != null) {
 					logger.info("Actualitzant informació enviament amb certificació...");
+					startTime = System.nanoTime();
 					Certificacion certificacio = resultadoInfoEnvio.getCertificacion();
 					
 					Date dataCertificacio = toDate(certificacio.getFechaCertificacion());
@@ -382,6 +380,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						notificacioEventRepository.save(eventCert);
 						logger.info("L'event s'ha guardat correctament...");
 					}
+					elapsedTime = (System.nanoTime() - startTime) / 10e6;
+					logger.info(" [TIMER-EST] Actualitzar informació enviament amb certificació  [Id: " + enviamentId + "]: " + elapsedTime + " ms");
 					logger.info("Enviament actualitzat");
 				}
 				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(

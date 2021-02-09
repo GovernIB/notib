@@ -3,15 +3,6 @@
  */
 package es.caib.notib.core.helper;
 
-import java.util.Date;
-import java.util.Set;
-
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
@@ -27,6 +18,14 @@ import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.Set;
 
 /**
  * Helper per a interactuar amb el servei web de Notific@.
@@ -51,6 +50,8 @@ public class RegistreHelper {
 	
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
 	public NotificacioEnviamentEntity enviamentRefrescarEstatRegistre(Long enviamentId) {
+		long startTime;
+		double elapsedTime;
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		logger.info(" [SIR] Inici actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacio().getId());
@@ -58,9 +59,11 @@ public class RegistreHelper {
 		NotificacioEventEntity.Builder eventBuilder  = null;
 		String descripcio;
 		logger.debug("Comunicació SIR --> consular estat...");
-		
+
+		startTime = System.nanoTime();
 		enviament.updateSirNovaConsulta(pluginHelper.getConsultaSirReintentsPeriodeProperty());
-		
+		elapsedTime = (System.nanoTime() - startTime) / 10e6;
+		logger.info(" [TIMER-SIR] Actualizar SIR nova consulta (updateSirNovaConsulta)  [Id: " + enviamentId + "]: " + elapsedTime + " ms");
 		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb Registre (" +
 				"notificacioId=" + notificacio.getId() + ", " +
 				"registreNumeroFormatat=" + enviament.getRegistreNumeroFormatat() + ")";
@@ -69,17 +72,20 @@ public class RegistreHelper {
 			if (enviament.getRegistreNumeroFormatat() != null) {
 				logger.debug("Comunicació SIR --> número registre formatat: " + enviament.getRegistreNumeroFormatat());
 				logger.debug("Comunicació SIR --> consulant estat...");
-				
+
+				startTime = System.nanoTime();
 				RespostaConsultaRegistre resposta = pluginHelper.obtenerAsientoRegistral(
 						notificacio.getEntitat().getDir3Codi(),
 						enviament.getRegistreNumeroFormatat(), 
 						2L,  //registre sortida
 						false);
-				
+				elapsedTime = (System.nanoTime() - startTime) / 10e6;
+				logger.info(" [TIMER-SIR] Obtener asiento registral  [Id: " + enviamentId + "]: " + elapsedTime + " ms");
 //				if (resposta != null) {
 				
 				logger.debug("Comunicació SIR --> creació event...");
 				if (resposta.getErrorCodi() != null && !resposta.getErrorCodi().isEmpty()) {
+					startTime = System.nanoTime();
 					//Crea un nou event
 					eventBuilder = NotificacioEventEntity.getBuilder(
 							NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,
@@ -110,8 +116,12 @@ public class RegistreHelper {
 						notificacio.updateEventAfegir(eventReintents);
 						notificacioEventRepository.save(eventReintents);
 						auditNotificacioHelper.updateNotificacioErrorSir(notificacio, eventReintents);
+
 					}
+					elapsedTime = (System.nanoTime() - startTime) / 10e6;
+					logger.info(" [TIMER-SIR] Creació nou event error [Id: " + enviamentId + "]: " + elapsedTime + " ms");
 				} else {
+					startTime = System.nanoTime();
 					enviamentUpdateDatat(
 							resposta.getEstat(),
 							resposta.getRegistreData(), 
@@ -119,6 +129,8 @@ public class RegistreHelper {
 							resposta.getSirRegistreDestiData(),
 							resposta.getRegistreNumeroFormatat(), 
 							enviament);
+					elapsedTime = (System.nanoTime() - startTime) / 10e6;
+					logger.info(" [TIMER-SIR] Actualitzar estat comunicació SIR [Id: " + enviamentId + "]: " + elapsedTime + " ms");
 					
 					logger.debug("Comunicació SIR --> nou estat: " + resposta.getEstat() != null ? resposta.getEstat().name() : "");
 					if (resposta.getEstat() != null)
@@ -142,7 +154,10 @@ public class RegistreHelper {
 					notificacioEventRepository.save(event);
 					logger.debug("Comunicació SIR --> enviar correu si és aplicació...");
 					if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
+						startTime = System.nanoTime();
 						emailHelper.prepararEnvioEmailNotificacio(notificacio);
+						elapsedTime = (System.nanoTime() - startTime) / 10e6;
+						logger.info(" [TIMER-SIR] Preparar enviament mail notificació [Id: " + enviamentId + "]: " + elapsedTime + " ms");
 					}
 					enviament.refreshSirConsulta();
 				}
