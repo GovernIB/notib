@@ -1553,20 +1553,29 @@ public class NotificacioServiceImpl implements NotificacioService {
 			List<NotificacioEnviamentDtoV2> enviaments = conversioTipusHelper.convertirList(
 					enviamentsEntity, 
 					NotificacioEnviamentDtoV2.class);
-			
+			long startTime = System.nanoTime();
+			double elapsedTime;
 			synchronized(CreacioSemaforDto.getCreacioSemafor()) {
 				logger.info("Comprovant estat actual notificació (id: " + notificacioEntity.getId() + ")...");
 				NotificacioEstatEnumDto estatActual = notificacioRepository.getEstatNotificacio(notificacioEntity.getId());
 				logger.info("Estat notificació [Id:" + notificacioEntity.getId() + ", Estat: "+ estatActual + "]");
 				
 				if (estatActual.equals(NotificacioEstatEnumDto.PENDENT)) {
+					startTime = System.nanoTime();
 					boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(
 							notificacioEntity,
 							enviaments);
+					elapsedTime = (System.nanoTime() - startTime) / 10e6;
+					logger.info(" [TIMER-REG] Realitzar procés registrar [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
 					if (notificar)
+						startTime = System.nanoTime();
 						notificaHelper.notificacioEnviar(notificacioEntity.getId());
+						elapsedTime = (System.nanoTime() - startTime) / 10e6;
+						logger.info(" [TIMER-REG] Notificació enviar [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
 				}
 			}
+			elapsedTime = (System.nanoTime() - startTime) / 10e6;
+			logger.info(" [REG] Temps global registrar notificar amb esperes concurrents [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
 			logger.info(" [REG] Fi registre notificació [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
 			return registresIdDto;
 		} finally {
