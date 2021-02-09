@@ -887,6 +887,19 @@
 		if ($('#document2').is(":visible")) {
 			$('#removeDocument').removeClass('hidden');
 		}
+		
+		$("#o_provincia").select2({
+			theme: 'bootstrap',
+			width: 'auto',
+			allowClear: true,
+	        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
+		});
+		$("#o_localitat").select2({
+			theme: 'bootstrap',
+			width: 'auto',
+			allowClear: true,
+	        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
+		});
 	});
 
 	var t, makeTooltip = function(warning) {
@@ -1429,7 +1442,9 @@
 
 			nivellAdmin.select2({
 				theme: 'bootstrap',
-				width: 'auto'
+				width: 'auto',
+				allowClear: true,
+		        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
 			});
 
 
@@ -1460,7 +1475,9 @@
 			}
 			codiComunitat.select2({
 				theme: 'bootstrap',
-				width: 'auto'
+				width: 'auto',
+				allowClear: true,
+		        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
 			});
 		}).fail(function(jqXHR, textStatus) {
 // 		refreshAlertes();
@@ -1490,7 +1507,9 @@
 				}
 				$("#o_provincia").select2({
 					theme: 'bootstrap',
-					width: 'auto'
+					width: 'auto',
+					allowClear: true,
+			        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
 				});
 			}).fail(function(jqXHR, textStatus) {
 // 			refreshAlertes();
@@ -1501,7 +1520,9 @@
 			$("#o_provincia").html(list_html);
 			$("#o_provincia").select2({
 				theme: 'bootstrap',
-				width: 'auto'
+				width: 'auto',
+				allowClear: true,
+		        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
 			});
 		}
 
@@ -1542,7 +1563,8 @@
 				$("#o_localitat").html(list_html);
 				$("#o_localitat").select2({
 					theme: 'bootstrap',
-					width: 'auto'
+					width: 'auto',
+					allowClear: true
 				});
 			}).fail(function(jqXHR, textStatus) {
 // 			refreshAlertes();
@@ -1553,7 +1575,9 @@
 			$("#o_localitat").html(list_html);
 			$("#o_localitat").select2({
 				theme: 'bootstrap',
-				width: 'auto'
+				width: 'auto',
+				allowClear: true,
+		        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
 			});
 		}
 	}
@@ -2744,7 +2768,7 @@
 					<button type="button" class="close" data-dismiss="modal">&times;</button>
 					<h4 class="modal-title"><spring:message code="notificacio.form.dir3.cercar.organismes"/></h4>
 				</div>
-				<div class="modal-body body">
+				<div class="modal-body body" style="padding-top: 0px;">
 					
 				<div id='dialeg_organs' style='padding: 0px;'>
 					<input type="hidden" id="titular" value="">
@@ -2753,7 +2777,7 @@
 
 					 
 					<div class="row margebaix" style="margin-top:20px;">
-						<div class="col-sm-5">
+						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.codi" /></label>
 								<div class="forminput">
@@ -2761,7 +2785,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-sm-5">
+						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.denominacio" /></label>
 								<div class="forminput">
@@ -2772,7 +2796,7 @@
 					
 					</div>
 					<div class="row margebaix">
-						<div class="col-sm-5">
+						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.nivell.administracio" /></label>
 								<div class="forminput">
@@ -2782,10 +2806,10 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px">
-							<span onclick="limpiarNivellAdmin()" class="fa fa-trash"></span>
-						</div>
-						<div class="col-sm-5">
+<!-- 						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px"> -->
+<!-- 							<span onclick="limpiarNivellAdmin()" class="fa fa-trash"></span> -->
+<!-- 						</div> -->
+						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.comunitat.autonoma" /></label>
 								<div class="forminput">
@@ -2796,12 +2820,12 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px">
-							<span onclick="limpiarComunitat()" class="fa fa-trash"></span>
-						</div>
+<!-- 						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px"> -->
+<!-- 							<span onclick="limpiarComunitat()" class="fa fa-trash"></span> -->
+<!-- 						</div> -->
 					</div>
 					<div class="row margebaix">
-						<div class="col-sm-5">
+						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.provincia" /></label>
 								<div class="forminput">
@@ -2811,10 +2835,10 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px">
-							<span onclick="limpiarProvincia(false)" class="fa fa-trash"></span>
-						</div>
-						<div class="col-sm-5">
+<!-- 						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px"> -->
+<!-- 							<span onclick="limpiarProvincia(false)" class="fa fa-trash"></span> -->
+<!-- 						</div> -->
+						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.localitat" /></label>
 								<div class="forminput">
@@ -2824,18 +2848,18 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px">
-							<span onclick="limpiarLocalitat(false)" class="fa fa-trash"></span>
-						</div>
+<!-- 						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px"> -->
+<!-- 							<span onclick="limpiarLocalitat(false)" class="fa fa-trash"></span> -->
+<!-- 						</div> -->
 					</div>
 				
-					<div id="results" class="row" style="width: calc(100% - 30px); background-color: white; height: 240px; border: 1px solid #CCC; margin: 15px; overflow-y: scroll"" >
+					<div id="results" class="row" style="background-color: white; height: 240px; border: 1px solid #CCC; margin: 0px; overflow-y: scroll"" >
 						<div class="loading-screen" style="text-align: center; width:100%; height: 0%;;">
 								<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
 									<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>
 								</div>
 							</div>
-						<table id="tOficines" class="table table-bordered dataTable dinamicTable">
+						<table id="tOficines" class="table table-bordered dataTable dinamicTable" style="margin-top:0px !important">
 							<thead>
 								<tr class="capsalera" style="font-weight: bold;" >
 									<td width="85%"><spring:message code="notificacio.form.dir3.cercar.titol" /></td>
