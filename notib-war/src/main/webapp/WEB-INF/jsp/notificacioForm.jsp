@@ -433,7 +433,6 @@
 		$('input[name="arxiu[0]"]').change(function(){
 			var arxiuGestdocId = $('input[name="documents[0].arxiuGestdocId"]');
 			var arxiuNom =  $('input[name="documents[0].arxiuNom"]');
-			debugger
 			if($(this).val() == ''){
 				arxiuGestdocId.val("");
 				arxiuNom.val("");
@@ -801,8 +800,6 @@
 					$('#docs-addicionals').addClass('hidden');
 					$('#btn-documents').addClass('hidden');
 				}
-				debugger
-// 				$("#metadades_0").unwrap();
 				
 			}else{
 				$('#rowRetard').removeClass('hidden');
@@ -811,7 +808,6 @@
 				$('#normalitzat').removeClass('hidden');
 				$('#docs-addicionals').addClass('hidden');
 				$('#btn-documents').addClass('hidden');
-// 				$("#documents\\[0\\]\\.validesa>option[value='COPIA']").wrap('<span/>');
 			}
 
 			if (!comunicacioAdministracio) {
