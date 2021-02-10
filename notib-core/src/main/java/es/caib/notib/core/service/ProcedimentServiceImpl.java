@@ -374,7 +374,12 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
+	public boolean isUpdatingProcediments(EntitatDto entitatDto) {
+		ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getDir3Codi());
+		return progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError();
+	}
+
 	@Override
 	//@Transactional(timeout = 300)
 	public void actualitzaProcediments(EntitatDto entitatDto) {

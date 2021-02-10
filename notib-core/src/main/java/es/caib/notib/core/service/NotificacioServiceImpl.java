@@ -901,8 +901,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 				Date dataInici = toIniciDia(filtre.getDataInici());
 				Date dataFi = toFiDia(filtre.getDataFi());
 				OrganGestorEntity organGestor = null;
-				if (filtre.getOrganGestor() != null) {
-					organGestor = organGestorRepository.findByCodi(filtre.getOrganGestor());
+				if (filtre.getOrganGestor() != null && !filtre.getOrganGestor().isEmpty()) {
+					organGestor = organGestorRepository.findOne(Long.parseLong(filtre.getOrganGestor()));
 				}
 				ProcedimentEntity procediment = null;
 				if (filtre.getProcedimentId() != null) {
