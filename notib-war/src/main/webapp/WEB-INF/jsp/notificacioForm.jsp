@@ -179,6 +179,9 @@
     background-color: #ddd;
     cursor: not-allowed;
 }
+.select2-results .select2-results__option[aria-disabled="true"] {
+    display: none;
+}
 #tooltip {
     position: absolute;
     border: 1px solid #ffeeba;
@@ -785,6 +788,9 @@
 					$('#docs-addicionals').addClass('hidden');
 					$('#btn-documents').addClass('hidden');
 				}
+				debugger
+// 				$("#metadades_0").unwrap();
+				
 			}else{
 				$('#rowRetard').removeClass('hidden');
 				$('#rowDataProgramada').removeClass('hidden');
@@ -792,13 +798,14 @@
 				$('#normalitzat').removeClass('hidden');
 				$('#docs-addicionals').addClass('hidden');
 				$('#btn-documents').addClass('hidden');
+// 				$("#documents\\[0\\]\\.validesa>option[value='COPIA']").wrap('<span/>');
 			}
 
 			if (!comunicacioAdministracio) {
 				for (var i = numDocuments - 1; i > 0; i--) {
 					$('#tipusDocument_' + i).val('').trigger('change');
 				}
-			}
+			}			
 			$("#documents\\[0\\]\\.validesa>option[value='COPIA']").prop('disabled', notificacio);
 			$("#documents\\[0\\]\\.validesa").select2({theme: 'bootstrap', width: 'auto'});
 			$("#documents\\[1\\]\\.validesa>option[value='COPIA']").prop('disabled', notificacio);
@@ -901,8 +908,9 @@
 			allowClear: true,
 	        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
 		});
-
+		
 		$("input[name=idioma][value=" + locale.toUpperCase()+ "]").prop('checked', true);
+	
 
 	});
 

@@ -37,7 +37,7 @@ public class DocumentCommand {
 	private OrigenEnum origen;
 	private ValidesaEnum validesa;
 	private TipusDocumentalEnum tipoDocumental;
-	private Boolean modoFirma;
+	private boolean modoFirma;
 	
 	public static DocumentCommand asCommand(DocumentDto dto) {
 		if (dto == null) {
