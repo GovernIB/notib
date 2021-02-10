@@ -908,6 +908,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 				if (filtre.getProcedimentId() != null) {
 					procediment = procedimentRepository.findById(filtre.getProcedimentId());
 				}
+				NotificacioEstatEnumDto estat = filtre.getEstat();
+				Integer notificaEnviamentIntent = null;
+				boolean isEstatNull = estat == null;
+				if (!isEstatNull && estat.equals(NotificacioEstatEnumDto.ENVIANT)) {
+					estat = NotificacioEstatEnumDto.PENDENT;
+					notificaEnviamentIntent = 0;
+
+				}
 				if (isUsuari) {
 					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 							filtre.getEntitatId() == null,
@@ -922,10 +930,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getEnviamentTipus() == null,
 							filtre.getEnviamentTipus(),
 							filtre.getConcepte() == null,
-							filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
-							filtre.getEstat() == null,
-							filtre.getEstat(), 
-							filtre.getEstat() != null ? NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()) : null,
+							filtre.getConcepte() == null ? "" : filtre.getConcepte(),
+							isEstatNull,
+							estat,
+							estat != null ? NotificacioEnviamentEstatEnumDto.valueOf(estat.toString()) : null,
 							dataInici == null,
 							dataInici,
 							dataFi == null,
@@ -947,6 +955,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getIdentificador(),
 							usuariCodi,
 							filtre.isNomesAmbErrors(),
+							notificaEnviamentIntent == null,
+							notificaEnviamentIntent,
 							pageable);
 				} else if (isUsuariEntitat) {
 					notificacions = notificacioRepository.findAmbFiltre(
@@ -956,9 +966,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getEnviamentTipus(),
 							filtre.getConcepte() == null,
 							filtre.getConcepte(),
-							filtre.getEstat() == null,
-							filtre.getEstat(),
-							filtre.getEstat() != null ? NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()) : null,
+							isEstatNull,
+							estat,
+							estat != null ? NotificacioEnviamentEstatEnumDto.valueOf(estat.toString()) : null,
 							dataInici == null,
 							dataInici,
 							dataFi == null,
@@ -978,6 +988,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
 							filtre.getIdentificador(),
 							filtre.isNomesAmbErrors(),
+							notificaEnviamentIntent == null,
+							notificaEnviamentIntent,
 							pageable);
 				} else if (isAdministrador) {
 					notificacions = notificacioRepository.findAmbFiltre(
@@ -987,9 +999,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getEnviamentTipus(),
 							filtre.getConcepte() == null || filtre.getConcepte().isEmpty(),
 							filtre.getConcepte(),
-							filtre.getEstat() == null,
-							filtre.getEstat(),
-							filtre.getEstat() != null ? NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()) : null,
+							isEstatNull,
+							estat,
+							estat != null ? NotificacioEnviamentEstatEnumDto.valueOf(estat.toString()) : null,
 							dataInici == null,
 							dataInici,
 							dataFi == null,
@@ -1009,6 +1021,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
 							filtre.getIdentificador(),
 							filtre.isNomesAmbErrors(),
+							notificaEnviamentIntent == null,
+							notificaEnviamentIntent,
 							pageable);
 				} else if (isAdministradorOrgan) {
 					List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
@@ -1020,10 +1034,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getEnviamentTipus() == null,
 							filtre.getEnviamentTipus(),
 							filtre.getConcepte() == null,
-							filtre.getConcepte() == null ? "" : filtre.getConcepte(), 
-							filtre.getEstat() == null,
-							filtre.getEstat(),
-							filtre.getEstat() != null ? NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()) : null,
+							filtre.getConcepte() == null ? "" : filtre.getConcepte(),
+							isEstatNull,
+							estat,
+							estat != null ? NotificacioEnviamentEstatEnumDto.valueOf(estat.toString()) : null,
 							dataInici == null,
 							dataInici,
 							dataFi == null,
@@ -1044,6 +1058,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
 							filtre.getIdentificador(),
 							organs,
+							notificaEnviamentIntent == null,
+							notificaEnviamentIntent,
 							pageable);
 				}
 			}
@@ -1567,11 +1583,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 							enviaments);
 					elapsedTime = (System.nanoTime() - startTime) / 10e6;
 					logger.info(" [TIMER-REG] Realitzar procés registrar [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
-					if (notificar)
+					if (notificar){
 						startTime = System.nanoTime();
 						notificaHelper.notificacioEnviar(notificacioEntity.getId());
 						elapsedTime = (System.nanoTime() - startTime) / 10e6;
 						logger.info(" [TIMER-REG] Notificació enviar [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
+					}
 				}
 			}
 			elapsedTime = (System.nanoTime() - startTime) / 10e6;

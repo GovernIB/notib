@@ -8,7 +8,6 @@ import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.util.Date;
-import java.util.List;
 
 
 /**
@@ -43,13 +42,18 @@ public class NotificacioDatatableDto {
 	private boolean errorLastEvent;
 //	private boolean hasEnviamentsPendents;
 	private boolean hasEnviamentsPendentsRegistre;
+	protected int notificaEnviamentIntent;
 	
 	private TipusUsuariEnumDto tipusUsuari;
 	
 	public boolean isNotificaError() {
 		return notificaErrorData != null;
 	}
-	
+
+	public boolean isEnviant() {
+		return estat.equals(NotificacioEstatEnumDto.PENDENT) && notificaEnviamentIntent == 0;
+	}
+
 	public String getOrganGestorDesc() {
 		if (organGestorNom != null && !organGestorNom.isEmpty())
 			return organGestor + " - " + organGestorNom;

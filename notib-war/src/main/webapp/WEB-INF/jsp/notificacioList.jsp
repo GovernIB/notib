@@ -472,6 +472,7 @@ $(document).ready(function() {
 				<th data-col-name="hasEnviamentsPendentsRegistre" data-visible="false">#</th>
 				<th data-col-name="notificaError" data-visible="false"></th>
 				<th data-col-name="notificaErrorDescripcio" data-visible="false"></th>
+				<th data-col-name="enviant" data-visible="false"></th>
 				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" class="enviamentTipusCol" width="5px">
 
 					<script id="cellEnviamentTipusTemplate" type="text/x-jsrender">
@@ -503,18 +504,26 @@ $(document).ready(function() {
 				<th data-col-name="estat" data-template="#cellEstatTemplate"  width="120px">
 					<spring:message code="notificacio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
-						{{if estat == 'PENDENT'}}
+						{{if enviant}}
 							<span class="fa fa-clock-o"></span>
+							<spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.ENVIANT"/>
+						{{else estat == 'PENDENT'}}
+							<span class="fa fa-clock-o"></span>
+							{{:~eval('notificacioEstats["' + estat + '"]')}}
 						{{else estat == 'ENVIADA'}}
 							<span class="fa fa-send-o"></span>
+							{{:~eval('notificacioEstats["' + estat + '"]')}}
 						{{else estat == 'FINALITZADA'}}
 							<span class="fa fa-check"></span>
+							{{:~eval('notificacioEstats["' + estat + '"]')}}
 						{{else estat == 'REGISTRADA'}}
 							<span class="fa fa-file-o"></span>
+							{{:~eval('notificacioEstats["' + estat + '"]')}}
 						{{else estat == 'PROCESSADA'}}
 							<span class="fa fa-check-circle"></span>
+							{{:~eval('notificacioEstats["' + estat + '"]')}}
 						{{/if}}
-						{{:~eval('notificacioEstats["' + estat + '"]')}}
+
 						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>notificaErrorDescripcio}}"></span>{{/if}}
 						{{if tipusUsuari == 'APLICACIO' && errorLastEvent}}
 							<span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>
@@ -542,10 +551,12 @@ $(document).ready(function() {
 							{{if permisProcessar }}
 								<li><a href="<c:url value="/notificacio/{{:id}}/processar"/>" data-toggle="modal"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a></li>
 							{{/if}}
-							{^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan()) && hasEnviamentsPendentsRegistre }}
-								<li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
-								<li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-							{{/if}}							
+							{{if !enviant}}
+								{^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan()) && hasEnviamentsPendentsRegistre }}
+									<li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
+									<li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								{{/if}}
+							{{/if}}
 							</ul>
 						</div>
 					</script>
