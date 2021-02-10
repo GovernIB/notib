@@ -343,8 +343,9 @@
 		});
 
 		$('input[name="arxiu[0]"]').change(function(){
-			var arxiuGestdocId = $('input[name="document.arxiuGestdocId[0]"]');
-			var arxiuNom = $('input[name="document.arxiuNom[0]"]');
+			var arxiuGestdocId = $('input[name="documents[0].arxiuGestdocId"]');
+			var arxiuNom =  $('input[name="documents[0].arxiuNom"]');
+			debugger
 			if($(this).val() == ''){
 				arxiuGestdocId.val("");
 				arxiuNom.val("");
@@ -354,8 +355,8 @@
 			}
 		});
 		$('input[name="arxiu[1]"]').change(function(){
-			var arxiuGestdocId = $('input[name="document.arxiuGestdocId[1]"]');
-			var arxiuNom = $('input[name="document.arxiuNom[1]"]');
+			var arxiuGestdocId = $('input[name="documents[1].arxiuGestdocId"]');
+			var arxiuNom =  $('input[name="documents[1].arxiuNom"]');
 			if($(this).val() == ''){
 				arxiuGestdocId.val("");
 				arxiuNom.val("");
@@ -365,8 +366,8 @@
 			}
 		});
 		$('input[name="arxiu[2]"]').change(function(){
-			var arxiuGestdocId = $('input[name="document.arxiuGestdocId[2]"]');
-			var arxiuNom = $('input[name="document.arxiuNom[2]"]');
+			var arxiuGestdocId = $('input[name="documents[2].arxiuGestdocId"]');
+			var arxiuNom =  $('input[name="documents[2].arxiuNom"]');
 			if($(this).val() == ''){
 				arxiuGestdocId.val("");
 				arxiuNom.val("");
@@ -376,8 +377,8 @@
 			}
 		});
 		$('input[name="arxiu[3]"]').change(function(){
-			var arxiuGestdocId = $('input[name="document.arxiuGestdocId[3]"]');
-			var arxiuNom = $('input[name="document.arxiuNom[3]"]');
+			var arxiuGestdocId = $('input[name="documents[3].arxiuGestdocId"]');
+			var arxiuNom =  $('input[name="documents[3].arxiuNom"]');
 			if($(this).val() == ''){
 				arxiuGestdocId.val("");
 				arxiuNom.val("");
@@ -387,8 +388,8 @@
 			}
 		});
 		$('input[name="arxiu[4]"]').change(function(){
-			var arxiuGestdocId = $('input[name="document.arxiuGestdocId[4]"]');
-			var arxiuNom = $('input[name="document.arxiuNom[4]"]');
+			var arxiuGestdocId = $('input[name="documents[4].arxiuGestdocId"]');
+			var arxiuNom =  $('input[name="documents[4].arxiuNom"]');
 			if($(this).val() == ''){
 				arxiuGestdocId.val("");
 				arxiuNom.val("");
