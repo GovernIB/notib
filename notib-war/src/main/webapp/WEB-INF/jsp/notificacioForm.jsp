@@ -228,105 +228,193 @@
 			}
 		});
 
-		var tipusDocumentDefault_0 = $('#tipusDocumentDefault0').val();
-		var tipusDocumentSelected_0 = $('#tipusDocumentSelected_0').val();
 		var document_0_arxiuNom = $('input[name="documents\\[0\\].arxiuNom"').val();
-		var tipusDocumentDefault_1 = $('#tipusDocumentDefault1').val();
-		var tipusDocumentSelected_1 = $('#tipusDocumentSelected_1').val();
 		var document_1_arxiuNom = $('input[name="documents\\[1\\].arxiuNom"').val();
-		var tipusDocumentDefault_2 = $('#tipusDocumentDefault2').val();
-		var tipusDocumentSelected_2 = $('#tipusDocumentSelected_2').val();
 		var document_2_arxiuNom = $('input[name="documents\\[2\\].arxiuNom"').val();
-		var tipusDocumentDefault_3 = $('#tipusDocumentDefault3').val();
-		var tipusDocumentSelected_3 = $('#tipusDocumentSelected_3').val();
 		var document_3_arxiuNom = $('input[name="documents\\[3\\].arxiuNom"').val();
-		var tipusDocumentDefault_4 = $('#tipusDocumentDefault4').val();
-		var tipusDocumentSelected_4 = $('#tipusDocumentSelected_4').val();
 		var document_4_arxiuNom = $('input[name="documents\\[4\\].arxiuNom"').val();
-		
+
+		var tipusDocumentDefault = [
+			$('#tipusDocumentDefault0').val(),
+			$('#tipusDocumentDefault1').val(),
+			$('#tipusDocumentDefault2').val(),
+			$('#tipusDocumentDefault3').val(),
+			$('#tipusDocumentDefault4').val(),
+		];
+
+		var tipusDocumentSelected = [
+			$('#tipusDocumentSelected_0').val(),
+			$('#tipusDocumentSelected_1').val(),
+			$('#tipusDocumentSelected_2').val(),
+			$('#tipusDocumentSelected_3').val(),
+			$('#tipusDocumentSelected_4').val()
+		];
+
 		$('.customSelect').webutilInputSelect2(null);
-		
-		if (tipusDocumentSelected_0 != '') {
-			$("#tipusDocument_0").val(tipusDocumentSelected_0).trigger("change");
+
+		if (tipusDocumentSelected[0] != '') {
+			$("#tipusDocument_0").val(tipusDocumentSelected[0]).trigger("change");
 			$("#document").removeClass("hidden");
-		} else if (tipusDocumentDefault_0 != '') {
-			$("#tipusDocument_0").val(tipusDocumentDefault_0).trigger("change");
-			if (tipusDocumentDefault_0 == 'CSV') {
+		} else if (tipusDocumentDefault[0] != '') {
+			$("#tipusDocument_0").val(tipusDocumentDefault[0]).trigger("change");
+			if (tipusDocumentDefault[0] == 'CSV') {
 				$('#documentArxiuCsv\\[0\\]').val("${nomDocument_0}");
-			} else if (tipusDocumentDefault_0 == 'UUID') {
+			} else if (tipusDocumentDefault[0] == 'UUID') {
 				$('#documentArxiuUuid\\[0\\]').val("${nomDocument_0}");
-			} else if (tipusDocumentDefault_0 == 'URL') {
+			} else if (tipusDocumentDefault[0] == 'URL') {
 				$('#documentArxiuUrl\\[0\\]').val("${nomDocument_0}");
 			}
 		}
-		if (tipusDocumentSelected_1 != '') {
-			$("#tipusDocument_1").val(tipusDocumentSelected_1).trigger("change");
+
+		if (tipusDocumentSelected[1] != '') {
+			$("#tipusDocument_1").val(tipusDocumentSelected[1]).trigger("change");
 			$("#document2").removeClass("hidden");
 			numDocuments = 2;
-		} else if (tipusDocumentDefault_1 != '' && document_1_arxiuNom != '') {
-			$("#tipusDocument_1").val(tipusDocumentDefault_1).trigger("change");
-			if (tipusDocumentDefault_1 == 'CSV') {
+		} else if (tipusDocumentDefault[1] != '' && document_1_arxiuNom != '') {
+			$("#tipusDocument_1").val(tipusDocumentDefault[1]).trigger("change");
+			if (tipusDocumentDefault[1] == 'CSV') {
 				$('#documentArxiuCsv_1').val("${nomDocument_1}");
-			} else if (tipusDocumentDefault_1 == 'UUID') {
+			} else if (tipusDocumentDefault[1] == 'UUID') {
 				$('#documentArxiuUuid_1').val("${nomDocument_1}");
-			} else if (tipusDocumentDefault_1 == 'URL') {
+			} else if (tipusDocumentDefault[1] == 'URL') {
 				$('#documentArxiuUrl_1').val("${nomDocument_1}");
 			}
-			
-			$("#tipusDocument_1").val(tipusDocumentDefault_1).trigger("change");
+
+			$("#tipusDocument_1").val(tipusDocumentDefault[1]).trigger("change");
 			$("#document2").removeClass("hidden");
 			numDocuments = 2;
 		}
-		if (tipusDocumentSelected_2 != '') {
-			$("#tipusDocument_2").val(tipusDocumentSelected_2).trigger("change");
+		if (tipusDocumentSelected[2] != '') {
+			$("#tipusDocument_2").val(tipusDocumentSelected[2]).trigger("change");
 			$("#document3").removeClass("hidden");
 			numDocuments = 3;
-		} else if (tipusDocumentDefault_2 != '' && document_2_arxiuNom != '') {
-			$("#tipusDocument_2").val(tipusDocumentDefault_2).trigger("change");
-			if (tipusDocumentDefault_2 == 'CSV') {
+		} else if (tipusDocumentDefault[2] != '' && document_2_arxiuNom != '') {
+			if (tipusDocumentDefault[2] == 'CSV') {
 				$('#documentArxiuCsv_2').val("${nomDocument_2}");
-			} else if (tipusDocumentDefault_2 == 'UUID') {
+			} else if (tipusDocumentDefault[2] == 'UUID') {
 				$('#documentArxiuUuid_2').val("${nomDocument_2}");
-			} else if (tipusDocumentDefault_2 == 'URL') {
+			} else if (tipusDocumentDefault[2] == 'URL') {
 				$('#documentArxiuUrl_2').val("${nomDocument_2}");
 			}
-			$("#tipusDocument_2").val(tipusDocumentDefault_2).trigger("change");
+			$("#tipusDocument_2").val(tipusDocumentDefault[2]).trigger("change");
 			$("#document3").removeClass("hidden");
 			numDocuments = 3;
 		}
-		if (tipusDocumentSelected_3 != '') {
-			$("#tipusDocument_3").val(tipusDocumentSelected_3).trigger("change");
+		if (tipusDocumentSelected[3] != '') {
+			$("#tipusDocument_3").val(tipusDocumentSelected[3]).trigger("change");
 			$("#document4").removeClass("hidden");
 			numDocuments = 4;
-		} else if (tipusDocumentDefault_3 != '' && document_3_arxiuNom != '') {
-			$("#tipusDocument_3").val(tipusDocumentDefault_3).trigger("change");
-			if (tipusDocumentDefault_3 == 'CSV') {
+		} else if (tipusDocumentDefault[3] != '' && document_3_arxiuNom != '') {
+			if (tipusDocumentDefault[3] == 'CSV') {
 				$('#documentArxiuCsv_3').val("${nomDocument_3}");
-			} else if (tipusDocumentDefault_3 == 'UUID') {
+			} else if (tipusDocumentDefault[3] == 'UUID') {
 				$('#documentArxiuUuid_3').val("${nomDocument_3}");
-			} else if (tipusDocumentDefault_3 == 'URL') {
+			} else if (tipusDocumentDefault[3] == 'URL') {
 				$('#documentArxiuUrl_3').val("${nomDocument_3}");
 			}
-			$("#tipusDocument_3").val(tipusDocumentDefault_3).trigger("change");
+			$("#tipusDocument_3").val(tipusDocumentDefault[3]).trigger("change");
 			$("#document4").removeClass("hidden");
 			numDocuments = 4;
 		}
-		if (tipusDocumentSelected_4 != '') {
-			$("#tipusDocument_4").val(tipusDocumentSelected_4).trigger("change");
+		if (tipusDocumentSelected[4] != '') {
+			$("#tipusDocument_4").val(tipusDocumentSelected[4]).trigger("change");
 			$("#document5").removeClass("hidden");
 			numDocuments = 5;
-		} else if (tipusDocumentDefault_4 != '' && document_4_arxiuNom != '') {
-			$("#tipusDocument_4").val(tipusDocumentDefault_4).trigger("change");
-			if (tipusDocumentDefault_4 == 'CSV') {
+		} else if (tipusDocumentDefault[4] != '' && document_4_arxiuNom != '') {
+			if (tipusDocumentDefault[4] == 'CSV') {
 				$('#documentArxiuCsv_4').val("${nomDocument_4}");
-			} else if (tipusDocumentDefault_4 == 'UUID') {
+			} else if (tipusDocumentDefault[4] == 'UUID') {
 				$('#documentArxiuUuid_4').val("${nomDocument_4}");
-			} else if (tipusDocumentDefault_4 == 'URL') {
+			} else if (tipusDocumentDefault[4] == 'URL') {
 				$('#documentArxiuUrl_4').val("${nomDocument_4}");
 			}
-			$("#tipusDocument_4").val(tipusDocumentDefault_4).trigger("change");
+			$("#tipusDocument_4").val(tipusDocumentDefault[4]).trigger("change");
 			$("#document5").removeClass("hidden");
 			numDocuments = 5;
+		}
+
+		$('#addDocument').click(function() {
+			$("#tipusDocument_" + numDocuments).val(tipusDocumentDefault[numDocuments]).trigger("change");
+			$('#document' + (numDocuments + 1)).removeClass('hidden');
+			numDocuments++;
+			if (numDocuments == 5)
+				$('#addDocument').addClass('hidden');
+			$('#removeDocument').removeClass('hidden');
+		});
+
+		$('#removeDocument').click(function() {
+			$('#document' + numDocuments).addClass('hidden');
+			var documentFields = numDocuments - 1;
+			
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].id"]').val('');
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].arxiuGestdocId"]').val('');
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].arxiuNom"]').val('');
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].mediaType"]').val('');
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].mida"]').val('');
+			numDocuments--;
+			$('#tipusDocument_' + numDocuments).val('').trigger('change');
+
+			if (numDocuments == 1)
+				$('#removeDocument').addClass('hidden');
+			$('#addDocument').removeClass('hidden');
+		});
+
+		$('.tipusDocument').on('change', function() {
+			let id = $(this).attr("id").split("_")[1];
+			if ($(this).val() == 'CSV') {
+				// $('#metadades').removeClass('hidden');
+				$('#input-origen-csv_' + id).removeClass('hidden');
+				$('#input-origen-uuid_' + id).addClass('hidden');
+				$('#documentArxiuUuid\\[' + id + '\\]').val('');
+				$('#input-origen-url_' + id).addClass('hidden');
+				$('#documentArxiuUrl\\[' + id + '\\]').val('');
+				$('#input-origen-arxiu_' + id).addClass('hidden');
+				$('#arxiu\\[' + id + '\\]').val('');
+				$('#metadades_' + id).addClass('hidden');
+			} else if ($(this).val() == 'UUID') {
+				$('#input-origen-csv_' + id).addClass('hidden');
+				$('#documentArxiuCsv\\[' + id + '\\]').val('');
+				$('#input-origen-uuid_' + id).removeClass('hidden');
+				$('#input-origen-url_' + id).addClass('hidden');
+				$('#documentArxiuUrl\\[' + id + '\\]').val('');
+				$('#input-origen-arxiu_' + id).addClass('hidden');
+				$('#arxiu\\[' + id + '\\]').val('');
+				$('#metadades_' + id).addClass('hidden');
+			} else if ($(this).val() == 'URL') {
+				$('#input-origen-csv_' + id).addClass('hidden');
+				$('#documentArxiuCsv\\[' + id + '\\]').val('');
+				$('#input-origen-uuid_' + id).addClass('hidden');
+				$('#documentArxiuUuid\\[' + id + '\\]').val('');
+				$('#input-origen-url_' + id).removeClass('hidden');
+				$('#input-origen-arxiu_' + id).addClass('hidden');
+				$('#arxiu\\[' + id + '\\]').val('');
+				$('#metadades_' + id).removeClass('hidden');
+			} else if ($(this).val() == 'ARXIU'){
+				$('#input-origen-csv_' + id).addClass('hidden');
+				$('#documentArxiuCsv\\[' + id + '\\]').val('');
+				$('#input-origen-uuid_' + id).addClass('hidden');
+				$('#documentArxiuUuid\\[' + id + '\\]').val('');
+				$('#input-origen-url_' + id).addClass('hidden');
+				$('#documentArxiuUrl\\[' + id + '\\]').val('');
+				$('#input-origen-arxiu_' + id).removeClass('hidden');
+				$('#metadades_' + id).removeClass('hidden');
+			} else if ($(this).val() == ''){
+				$('#input-origen-csv_' + id).addClass('hidden');
+				$('#documentArxiuCsv\\[' + id + '\\]').val('');
+				$('#input-origen-uuid_' + id).removeClass('hidden');
+				$('#documentArxiuUuid\\[' + id + '\\]').val('');
+				$('#input-origen-url_' + id).addClass('hidden');
+				$('#documentArxiuUrl\\[' + id + '\\]').val('');
+				$('#input-origen-arxiu_' + id).addClass('hidden');
+				$('#arxiu\\[' + id + '\\]').val('');
+				$('#metadades_' + id).addClass('hidden');
+			}
+			webutilModalAdjustHeight();
+		});
+
+
+		if ($('#document2').is(":visible")) {
+			$('#removeDocument').removeClass('hidden');
 		}
 
 		$(document).on('change','select.enviamentTipus', function() {
@@ -397,30 +485,6 @@
 				arxiuNom.val("");
 			}
 		});
-		
-		$('#addDocument').click(function() {
-			numDocuments++;
-			$('#document' + numDocuments).removeClass('hidden');
-			if (numDocuments == 5)
-				$('#addDocument').addClass('hidden');
-			$('#removeDocument').removeClass('hidden');
-		});
-		$('#removeDocument').click(function() {
-			$('#document' + numDocuments).addClass('hidden');
-			var documentFields = numDocuments - 1;
-			
-			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].id"]').val('');
-			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].arxiuGestdocId"]').val('');
-			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].arxiuNom"]').val('');
-			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].mediaType"]').val('');
-			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].mida"]').val('');
-			numDocuments--;
-			$('#tipusDocument_' + numDocuments).val('').trigger('change');
-
-			if (numDocuments == 1)
-				$('#removeDocument').addClass('hidden');
-			$('#addDocument').removeClass('hidden');
-		});
 
 		var numPlus = 1;
 
@@ -434,58 +498,6 @@
 //       $("#organGestor").prop("disabled", false);
 //       return true;
 //     });
-		$('.tipusDocument').on('change', function() {
-			let id = $(this).attr("id").split("_")[1];
-			if ($(this).val() == 'CSV') {
-				// $('#metadades').removeClass('hidden');
-				$('#input-origen-csv_' + id).removeClass('hidden');
-				$('#input-origen-uuid_' + id).addClass('hidden');
-				$('#documentArxiuUuid\\[' + id + '\\]').val('');
-				$('#input-origen-url_' + id).addClass('hidden');
-				$('#documentArxiuUrl\\[' + id + '\\]').val('');
-				$('#input-origen-arxiu_' + id).addClass('hidden');
-				$('#arxiu\\[' + id + '\\]').val('');
-				$('#metadades_' + id).addClass('hidden');
-			} else if ($(this).val() == 'UUID') {
-				$('#input-origen-csv_' + id).addClass('hidden');
-				$('#documentArxiuCsv\\[' + id + '\\]').val('');
-				$('#input-origen-uuid_' + id).removeClass('hidden');
-				$('#input-origen-url_' + id).addClass('hidden');
-				$('#documentArxiuUrl\\[' + id + '\\]').val('');
-				$('#input-origen-arxiu_' + id).addClass('hidden');
-				$('#arxiu\\[' + id + '\\]').val('');
-				$('#metadades_' + id).addClass('hidden');
-			} else if ($(this).val() == 'URL') {
-				$('#input-origen-csv_' + id).addClass('hidden');
-				$('#documentArxiuCsv\\[' + id + '\\]').val('');
-				$('#input-origen-uuid_' + id).addClass('hidden');
-				$('#documentArxiuUuid\\[' + id + '\\]').val('');
-				$('#input-origen-url_' + id).removeClass('hidden');
-				$('#input-origen-arxiu_' + id).addClass('hidden');
-				$('#arxiu\\[' + id + '\\]').val('');
-				$('#metadades_' + id).removeClass('hidden');
-			} else if ($(this).val() == 'ARXIU'){
-				$('#input-origen-csv_' + id).addClass('hidden');
-				$('#documentArxiuCsv\\[' + id + '\\]').val('');
-				$('#input-origen-uuid_' + id).addClass('hidden');
-				$('#documentArxiuUuid\\[' + id + '\\]').val('');
-				$('#input-origen-url_' + id).addClass('hidden');
-				$('#documentArxiuUrl\\[' + id + '\\]').val('');
-				$('#input-origen-arxiu_' + id).removeClass('hidden');
-				$('#metadades_' + id).removeClass('hidden');
-			} else if ($(this).val() == ''){
-				$('#input-origen-csv_' + id).addClass('hidden');
-				$('#documentArxiuCsv\\[' + id + '\\]').val('');
-				$('#input-origen-uuid_' + id).removeClass('hidden');
-				$('#documentArxiuUuid\\[' + id + '\\]').val('');
-				$('#input-origen-url_' + id).addClass('hidden');
-				$('#documentArxiuUrl\\[' + id + '\\]').val('');
-				$('#input-origen-arxiu_' + id).addClass('hidden');
-				$('#arxiu\\[' + id + '\\]').val('');
-				$('#metadades_' + id).addClass('hidden');
-			}
-			webutilModalAdjustHeight();
-		});
 
 		var agrupable = $("#procedimentId").children(":selected").attr("class");
 		var procedimentId = $("#procedimentId").children(":selected").attr("value");
@@ -891,11 +903,6 @@
 			}, 0);
 		});
 
-
-		if ($('#document2').is(":visible")) {
-			$('#removeDocument').removeClass('hidden');
-		}
-		
 		$("#o_provincia").select2({
 			theme: 'bootstrap',
 			width: 'auto',
