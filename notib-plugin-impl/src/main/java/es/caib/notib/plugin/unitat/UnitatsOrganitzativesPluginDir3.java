@@ -501,6 +501,28 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 					ex);
 		}
 	}
+	
+	@Override
+	public List<OficinaSIR> getOficinesSIREntitat(String entitat) throws SistemaExternException {
+		List<OficinaSIR> oficinesSIR = new ArrayList<OficinaSIR>();
+		List<OficinaTF> oficinesWS = new ArrayList<OficinaTF>();
+		try {
+			oficinesWS = getObtenerOficinasSIRUnidad().obtenerArbolOficinas(entitat, null, null);
+			
+			for (OficinaTF oficinaTF : oficinesWS) {
+				OficinaSIR oficinaSIR = new OficinaSIR();
+				oficinaSIR.setCodi(oficinaTF.getCodigo());
+				oficinaSIR.setNom(oficinaTF.getDenominacion());
+				oficinesSIR.add(oficinaSIR);
+			}
+			return oficinesSIR;
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'han pogut consultar les oficines SIR via REST (" +
+					"entitat=" + entitat + ")",
+					ex);
+		}
+	}
 
 	private void getOficinesUnitatSuperior(
 			String unitat, 

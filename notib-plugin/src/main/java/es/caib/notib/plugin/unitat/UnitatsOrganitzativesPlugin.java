@@ -206,4 +206,14 @@ public interface UnitatsOrganitzativesPlugin {
 	public List<OficinaSIR> oficinesSIRUnitat(
 			String unitat, 
 			Map<String, NodeDir3> arbreUnitats) throws SistemaExternException;
+
+	/**
+	 * @return recupera el llistat de les oficines SIR d'una entitat
+	 * 
+	 * @param unitat
+	 * 			Codi de la unitat
+	 * @throws SistemaExternException
+	 *            Si es produeix un error al consultar les oficines SIR
+	 */
+	public List<OficinaSIR> getOficinesSIREntitat(String entitat) throws SistemaExternException;
 }

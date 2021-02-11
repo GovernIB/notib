@@ -189,8 +189,8 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed("NOT_ADMIN")
-	public List<OficinaDto> getOficinesOrganisme(Long entitatId, String organGestorDir3Codi) {
-		return delegate.getOficinesOrganisme(entitatId, organGestorDir3Codi);
+	public List<OficinaDto> getOficinesSIR(Long entitatId, String organGestorDir3Codi, boolean isFiltre) {
+		return delegate.getOficinesSIR(entitatId, organGestorDir3Codi, isFiltre);
 	}
 
 }
