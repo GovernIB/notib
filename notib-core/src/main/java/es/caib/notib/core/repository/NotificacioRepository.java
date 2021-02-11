@@ -216,12 +216,16 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " + 
 			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)" +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
-			"and (:isNotificaEnviamentIntentNull = true or ntf.notificaEnviamentIntent = :notificaEnviamentIntent) " +
+			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
+			"	(:hasZeronotificaEnviamentIntent = true and ntf.notificaEnviamentIntent = 0) or " +
+			"	(:hasZeronotificaEnviamentIntent = false and ntf.notificaEnviamentIntent > 0) " +
+			") " +
+			"and (:nomesSenseErrors = false or ntf.notificaErrorEvent is null) " +
 			"and (:isIdentificadorNull = true or " +
 			"		(ntf.id = (select notificacio.id"
 			+ "				from NotificacioEnviamentEntity env"
 			+ "				where env.notificaIdentificador = :identificador)))")
-	public Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotib(
+	Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotib(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
 			@Param("isProcNull") boolean isProcNull,
@@ -253,8 +257,9 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("isIdentificadorNull") boolean isIdentificadorNull,
 			@Param("identificador") String identificador,
 			@Param("organs") List<String> organs,
-			@Param("isNotificaEnviamentIntentNull") boolean isNotificaEnviamentIntentNull,
-			@Param("notificaEnviamentIntent") int notificaEnviamentIntent,
+			@Param("nomesSenseErrors") boolean nomesSenseErrors,
+			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
+			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			Pageable paginacio);
 	
 	// Consulta de notificacions per usuaris normals amb filtre
@@ -294,11 +299,15 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " + 
 			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)" +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
-			"and (:isNotificaEnviamentIntentNull = true or ntf.notificaEnviamentIntent = :notificaEnviamentIntent) " +
+			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
+			"	(:hasZeronotificaEnviamentIntent = true and ntf.notificaEnviamentIntent = 0) or " +
+			"	(:hasZeronotificaEnviamentIntent = false and ntf.notificaEnviamentIntent > 0) " +
+			") " +
 			"and (:isIdentificadorNull = true or " +
 			"		(ntf.id = (select notificacio.id" +
 			"				from NotificacioEnviamentEntity env" +
-			"				where env.notificaIdentificador = :identificador))) " + 
+			"				where env.notificaIdentificador = :identificador))) " +
+			"and (:nomesSenseErrors = false or ntf.notificaErrorEvent is null) " +
 			"and (:nomesAmbErrors = false or ntf.notificaErrorEvent is not null)") 
 	Page<NotificacioEntity> findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
@@ -338,8 +347,9 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("identificador") String identificador,
 			@Param("usuariCodi") String usuariCodi,
 			@Param("nomesAmbErrors") boolean nomesAmbErrors,
-			@Param("isNotificaEnviamentIntentNull") boolean isNotificaEnviamentIntentNull,
-			@Param("notificaEnviamentIntent") int notificaEnviamentIntent,
+			@Param("nomesSenseErrors") boolean nomesSenseErrors,
+			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
+			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			Pageable paginacio);
 	
 	// Consulta les notificacions per l'usuari administrador d'entitat i superadmin
@@ -369,12 +379,16 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"    ) > 0) " +
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " + 
 			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)" +
-			"and (:isNotificaEnviamentIntentNull = true or ntf.notificaEnviamentIntent = :notificaEnviamentIntent) " +
+			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
+			"	(:hasZeronotificaEnviamentIntent = true and ntf.notificaEnviamentIntent = 0) or " +
+			"	(:hasZeronotificaEnviamentIntent = false and ntf.notificaEnviamentIntent > 0) " +
+			") " +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
 			"and (:isIdentificadorNull = true or " +
 			"		(ntf.id = (select notificacio.id" + 
 			"				from NotificacioEnviamentEntity env" +
 			"				where env.notificaIdentificador = :identificador)))" +
+			"and (:nomesSenseErrors = false or ntf.notificaErrorEvent is null) " +
 			"and (:nomesAmbErrors = false or ntf.notificaErrorEvent is not null)")
 	Page<NotificacioEntity> findAmbFiltre(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
@@ -405,8 +419,9 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("isIdentificadorNull") boolean isIdentificadorNull,
 			@Param("identificador") String identificador,
 			@Param("nomesAmbErrors") boolean nomesAmbErrors,
-			@Param("isNotificaEnviamentIntentNull") boolean isNotificaEnviamentIntentNull,
-			@Param("notificaEnviamentIntent") int notificaEnviamentIntent,
+			@Param("nomesSenseErrors") boolean nomesSenseErrors,
+			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
+			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			Pageable paginacio);
 	
 	@Query(	"select " +

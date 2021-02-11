@@ -51,7 +51,7 @@ public class NotificacioDatatableDto {
 	}
 
 	public boolean isEnviant() {
-		return estat.equals(NotificacioEstatEnumDto.PENDENT) && notificaEnviamentIntent == 0;
+		return estat != null && estat.equals(NotificacioEstatEnumDto.PENDENT) && notificaEnviamentIntent == 0 && !isNotificaError();
 	}
 
 	public String getOrganGestorDesc() {
@@ -73,7 +73,7 @@ public class NotificacioDatatableDto {
 		String procedimentDesc = "";
 		if (procedimentCodi != null && !procedimentCodi.isEmpty())
 			procedimentDesc = procedimentCodi;
-		if (procedimentNom != null & !procedimentNom.isEmpty())
+		if (procedimentNom != null && !procedimentNom.isEmpty())
 			procedimentDesc += " - " + procedimentNom;
 		return procedimentDesc;
 	}

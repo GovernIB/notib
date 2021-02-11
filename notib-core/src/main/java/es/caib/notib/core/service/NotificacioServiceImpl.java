@@ -909,13 +909,20 @@ public class NotificacioServiceImpl implements NotificacioService {
 					procediment = procedimentRepository.findById(filtre.getProcedimentId());
 				}
 				NotificacioEstatEnumDto estat = filtre.getEstat();
-				Integer notificaEnviamentIntent = null;
+				Boolean hasZeronotificaEnviamentIntent = null;
 				boolean isEstatNull = estat == null;
+				boolean nomesSenseErrors = false;
+				boolean nomesAmbErrors = filtre.isNomesAmbErrors();
 				if (!isEstatNull && estat.equals(NotificacioEstatEnumDto.ENVIANT)) {
 					estat = NotificacioEstatEnumDto.PENDENT;
-					notificaEnviamentIntent = 0;
+					hasZeronotificaEnviamentIntent = true;
+					nomesSenseErrors = true;
 
+				} else if (!isEstatNull && estat.equals(NotificacioEstatEnumDto.PENDENT)) {
+//					hasZeronotificaEnviamentIntent = false;
+					nomesAmbErrors = true;
 				}
+
 				if (isUsuari) {
 					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 							filtre.getEntitatId() == null,
@@ -954,9 +961,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
 							filtre.getIdentificador(),
 							usuariCodi,
-							filtre.isNomesAmbErrors(),
-							notificaEnviamentIntent == null,
-							notificaEnviamentIntent,
+							nomesAmbErrors,
+							nomesSenseErrors,
+							hasZeronotificaEnviamentIntent == null,
+							hasZeronotificaEnviamentIntent,
 							pageable);
 				} else if (isUsuariEntitat) {
 					notificacions = notificacioRepository.findAmbFiltre(
@@ -987,9 +995,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getCreadaPer(),
 							filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
 							filtre.getIdentificador(),
-							filtre.isNomesAmbErrors(),
-							notificaEnviamentIntent == null,
-							notificaEnviamentIntent,
+							nomesAmbErrors,
+							nomesSenseErrors,
+							hasZeronotificaEnviamentIntent == null,
+							hasZeronotificaEnviamentIntent,
 							pageable);
 				} else if (isAdministrador) {
 					notificacions = notificacioRepository.findAmbFiltre(
@@ -1020,9 +1029,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getCreadaPer(),
 							filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
 							filtre.getIdentificador(),
-							filtre.isNomesAmbErrors(),
-							notificaEnviamentIntent == null,
-							notificaEnviamentIntent,
+							nomesAmbErrors,
+							nomesSenseErrors,
+							hasZeronotificaEnviamentIntent == null,
+							hasZeronotificaEnviamentIntent,
 							pageable);
 				} else if (isAdministradorOrgan) {
 					List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
@@ -1058,8 +1068,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getIdentificador() == null || filtre.getIdentificador().isEmpty(),
 							filtre.getIdentificador(),
 							organs,
-							notificaEnviamentIntent == null,
-							notificaEnviamentIntent,
+							nomesSenseErrors,
+							hasZeronotificaEnviamentIntent == null,
+							hasZeronotificaEnviamentIntent,
 							pageable);
 				}
 			}
