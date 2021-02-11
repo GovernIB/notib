@@ -1384,58 +1384,49 @@ public class PluginHelper {
 
 	public RegistreAnnexDto documentToRegistreAnnexDto (DocumentEntity document) {
 		RegistreAnnexDto annex = new RegistreAnnexDto();
+		annex.setTipusDocument(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI);
+		annex.setTipusDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO);
+		annex.setOrigen(RegistreOrigenDtoEnum.ADMINISTRACIO);
+		annex.setData(new Date());
+		annex.setIdiomaCodi("ca");
+
 		if((document.getUuid() != null || document.getCsv() != null) && document.getUrl() == null && document.getContingutBase64() == null) {
-			String id = "";
-			if(document.getUuid() != null) {
-				id = document.getUuid();
+			boolean loadFromArxiu = isReadDocsMetadataFromArxiu() && document.getUuid() != null || document.getCsv() == null;
+			DocumentContingut doc;
+			if(loadFromArxiu) {
 				try {
-					annex.setTipusDocument(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI);
-					annex.setTipusDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO);
-					annex.setOrigen(RegistreOrigenDtoEnum.ADMINISTRACIO);
 					annex.setModeFirma(RegistreModeFirmaDtoEnum.SENSE_FIRMA);
-					annex.setData(new Date());
-					annex.setIdiomaCodi("ca");
-					DocumentContingut doc = arxiuGetImprimible(id, true);
+
+					doc = arxiuGetImprimible(document.getUuid(), true);
 					annex.setArxiuContingut(doc.getContingut());
 					annex.setArxiuNom(doc.getArxiuNom());
 				}catch(ArxiuException ae) {
 					logger.error("Error Obtenint el document per l'uuid");
 				}
-			} else if (document.getCsv() != null){
-				id = document.getCsv();
+
+			} else {
 				try {
-					annex.setTipusDocument(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI);
-					annex.setTipusDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO);
-					annex.setOrigen(RegistreOrigenDtoEnum.ADMINISTRACIO);
 					annex.setModeFirma(RegistreModeFirmaDtoEnum.AUTOFIRMA_SI);
-					annex.setData(new Date());
-					annex.setIdiomaCodi("ca");
-					DocumentContingut doc = arxiuGetImprimible(id, false);
+
+					doc = arxiuGetImprimible(document.getCsv(), false);
 					annex.setArxiuContingut(doc.getContingut());
 					annex.setArxiuNom(doc.getArxiuNom());
 				}catch(ArxiuException ae) {
 					logger.error("Error Obtenint el document per csv");
 				}
 			}
+
 		} else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
 			annex.setNom(document.getUrl());
 			annex.setArxiuNom(document.getArxiuNom());
 			annex.setArxiuContingut(getUrlDocumentContent(document.getUrl()));
-			annex.setTipusDocument(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI);
-			annex.setTipusDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO);
-			annex.setOrigen(RegistreOrigenDtoEnum.ADMINISTRACIO);
 			annex.setModeFirma(RegistreModeFirmaDtoEnum.SENSE_FIRMA);
-			annex.setData(new Date());
-			annex.setIdiomaCodi("ca");
+
 		} else if(document.getContingutBase64() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
 			annex.setArxiuContingut(document.getContingutBase64().getBytes());
 			annex.setArxiuNom(document.getArxiuNom());
-			annex.setTipusDocument(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI);
-			annex.setTipusDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO);
-			annex.setOrigen(RegistreOrigenDtoEnum.ADMINISTRACIO);
 			annex.setModeFirma(RegistreModeFirmaDtoEnum.SENSE_FIRMA);
-			annex.setData(new Date());
-			annex.setIdiomaCodi("ca");
+
 		}
 		/*Llogica de recerca de document*/
 		return annex;
@@ -1459,11 +1450,11 @@ public class PluginHelper {
 				String id = "";
 				DocumentContingut doc = null;
 				Document docDetall = null;
-
-				if(document.getUuid() != null) {
+				boolean loadFromArxiu = isReadDocsMetadataFromArxiu() && document.getUuid() != null || document.getCsv() == null;
+				if(loadFromArxiu) {
 					id = document.getUuid();
-					doc = arxiuGetImprimible(id, true);
-					docDetall = arxiuDocumentConsultar(id, null, true);
+					docDetall = arxiuDocumentConsultar(id, null, true, true);
+					doc = docDetall.getContingut();
 					if (docDetall != null) {
 						// Recuperar csv
 						Map<String, Object> metadadesAddicionals = docDetall.getMetadades().getMetadadesAddicionals();
@@ -1474,10 +1465,11 @@ public class PluginHelper {
 								annex.setCsv((String) metadadesAddicionals.get("eni:csv"));
 						}
 					}
-				} else if (document.getCsv() != null){
+				} else {
 					id = document.getCsv();
-					doc = arxiuGetImprimible(id, false);
-					docDetall = arxiuDocumentConsultar(id, null, false);
+					docDetall = arxiuDocumentConsultar(id, null, true, false);
+					doc = docDetall.getContingut();
+
 					annex.setCsv(document.getCsv());
 				}
 
@@ -2658,7 +2650,10 @@ public class PluginHelper {
 				
 		return tipus;
 	}
-	
+	public boolean isReadDocsMetadataFromArxiu() {
+		return PropertiesHelper.getProperties().getAsBoolean(
+				"es.caib.notib.documents.metadades.from.arxiu", false);
+	}
 	public void setDadesUsuariPlugin(DadesUsuariPlugin dadesUsuariPlugin) {
 		this.dadesUsuariPlugin = dadesUsuariPlugin;
 	}
