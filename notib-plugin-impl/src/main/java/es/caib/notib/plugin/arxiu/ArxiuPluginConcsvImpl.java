@@ -2,23 +2,11 @@ package es.caib.notib.plugin.arxiu;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import es.caib.arxiudigital.apirest.CSGD.entidades.comunes.DocumentNode;
-import es.caib.arxiudigital.apirest.CSGD.entidades.comunes.ResParamSearchDocument;
-import es.caib.arxiudigital.apirest.CSGD.entidades.comunes.VersionNode;
-import es.caib.arxiudigital.apirest.CSGD.entidades.parametrosLlamada.ParamNodeId;
-import es.caib.arxiudigital.apirest.CSGD.entidades.parametrosLlamada.ParamSearch;
-import es.caib.arxiudigital.apirest.CSGD.entidades.resultados.GetDocVersionListResult;
-import es.caib.arxiudigital.apirest.CSGD.entidades.resultados.SearchDocsResult;
-import es.caib.arxiudigital.apirest.CSGD.peticiones.GetDocVersionList;
-import es.caib.arxiudigital.apirest.CSGD.peticiones.SearchDocs;
 import es.caib.notib.plugin.utils.PropertiesHelper;
 import es.caib.plugins.arxiu.api.*;
 import es.caib.plugins.arxiu.caib.ArxiuCaibClient;
-import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
 import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
 import org.apache.commons.io.IOUtils;
 
@@ -26,7 +14,6 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlugin {
@@ -41,106 +28,43 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 
 	private ArxiuCaibClient arxiuClient;
 
-	public ArxiuPluginConcsvImpl(String propertyKeyBase) {
-		super(propertyKeyBase);
-	}
-	
-	public ArxiuPluginConcsvImpl(String propertyKeyBase, Properties properties) {
-		super(propertyKeyBase, properties);
-	}
-
 	@Override
 	public Document documentDetalls(String identificador, String versio, boolean ambContingut) throws ArxiuException {
 		if (identificador.contains("csv:")) {
 			identificador = identificador.replace("csv:", "");
-			return documentDetallsCsv(identificador, versio, ambContingut);
+			return documentDetallsCsv(identificador, ambContingut);
 		} else {
 			identificador = identificador.replace("uuid:", "");
-			return super.documentDetalls(identificador, versio, ambContingut);
+			return documentDetallsUuid(identificador, ambContingut);
 		}
 	}
 
-	private Document documentDetallsCsv(String identificador, String versio, boolean ambContingut) {
-		String metode = "/services/documentSearch";
-
+	private Document documentDetallsCsv(String identificador, boolean ambContingut) {
 		try {
-			List<ContingutArxiu> resultatConsulta = new ArrayList();
-			List continguts = null;
-
-			final String query = getPropertyQueryCsv().replace("*IDF*", identificador);
-			SearchDocsResult resposta = this.getArxiuClient().generarEnviarPeticio(metode, SearchDocs.class,
-					new ArxiuCaibClient.GeneradorParam<ParamSearch>() {
-				public ParamSearch generar() {
-					ParamSearch param = new ParamSearch();
-					param.setQuery(query);
-					param.setPageNumber(0);
-					return param;
-				}
-			}, ParamSearch.class, SearchDocsResult.class);
-			List<DocumentNode> documents = new ArrayList();
-			if (resposta.getSearchDocumentsResult().getResParam() != null &&
-					((ResParamSearchDocument)resposta.getSearchDocumentsResult().getResParam()).getDocuments() != null) {
-				documents = ((ResParamSearchDocument)resposta.getSearchDocumentsResult().getResParam()).getDocuments();
-			}
-
-			if (documents == null || documents.isEmpty())
-				return null;
-
-			String versioResposta = null;
-			if (versio == null) {
-				versioResposta = this.documentDarreraVersio(documents.get(0).getId());
-			} else {
-				versioResposta = versio;
-			}
-
-			Document response = ArxiuConversioHelper.documentNodeToDocument(documents.get(0), versioResposta);
+			Document response = new Document();
 			if (ambContingut)
 				response.setContingut(documentImprimibleCsv(identificador));
 
 			response.setMetadades(documentMetadadesCsv(identificador));
 
 			return response;
-		} catch (ArxiuException var11) {
-			throw var11;
 		} catch (Exception var12) {
-			throw new ArxiuException("S'ha produit un error cridant el mètode " + metode, var12);
+			throw new ArxiuException("S'ha produit un error obtenent els detalls del document: " + identificador, var12);
 		}
 	}
 
-	private String documentDarreraVersio(String identificador) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, UniformInterfaceException, ClientHandlerException, IOException {
-		String darreraVersio = null;
-		List<ContingutArxiu> versions = this.documentVersionsComu(identificador);
-		if (versions != null && !versions.isEmpty()) {
-			darreraVersio = ((ContingutArxiu)versions.get(versions.size() - 1)).getVersio();
+	private Document documentDetallsUuid(String identificador, boolean ambContingut) {
+		try {
+			Document response = new Document();
+			if (ambContingut)
+				response.setContingut(documentImprimibleUuid(identificador));
+
+			response.setMetadades(documentMetadadesUuid(identificador));
+
+			return response;
+		} catch (Exception var12) {
+			throw new ArxiuException("S'ha produit un error obtenent els detalls del document: " + identificador, var12);
 		}
-
-		return darreraVersio;
-	}
-
-	private List<ContingutArxiu> documentVersionsComu(final String identificador) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, UniformInterfaceException, ClientHandlerException, IOException {
-		String metode = "/services/getDocVersionList";
-		GetDocVersionListResult resposta = (GetDocVersionListResult)this.getArxiuClient().generarEnviarPeticio(metode, GetDocVersionList.class, new ArxiuCaibClient.GeneradorParam<ParamNodeId>() {
-			public ParamNodeId generar() {
-				ParamNodeId param = new ParamNodeId();
-				param.setNodeId(identificador);
-				return param;
-			}
-		}, ParamNodeId.class, GetDocVersionListResult.class);
-		List<VersionNode> versions = resposta.getGetDocVersionListResult().getResParam();
-		Collections.sort(versions, new Comparator<VersionNode>() {
-			public int compare(VersionNode vn1, VersionNode vn2) {
-				return vn1.getDate().compareTo(vn2.getDate());
-			}
-		});
-		List<ContingutArxiu> continguts = new ArrayList();
-		Iterator var7 = versions.iterator();
-
-		while(var7.hasNext()) {
-			VersionNode versio = (VersionNode)var7.next();
-			continguts.add(ArxiuConversioHelper.crearContingutArxiu(identificador, (String)null, ContingutTipus.DOCUMENT, String.valueOf(versio.getId())));
-		}
-
-		return continguts;
 	}
 
 	@Override
@@ -215,6 +139,36 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			contingut.setContingut(IOUtils.toByteArray(is));
 			contingut.setTamany(contingut.getContingut().length);
 			return contingut;
+		} catch (Exception ex) {
+			throw new ArxiuException(
+					"S'ha produit un error generant la versió imprimible del document",
+					ex);
+		}
+	}
+
+	private DocumentMetadades documentMetadadesUuid(String identificador) {
+		/*
+		 * Les URLs de consulta son les següents:
+		 *   https://intranet.caib.es/concsv/rest/metadata/uuid/{IDENTIFICADOR}
+		 *   https://intranet.caib.es/concsv/rest/metadata/{CSV}
+		 * A on:
+		 *   - {CSV} és el CSV del document a consultar [OBLIGATORI]
+		 *   - {IDENTIFICADOR} és el UUID del document a consultar [OBLIGATORI]
+		 */
+		try {
+			String url = getPropertyConcsvBaseUrl();
+			if (!url.endsWith("/")) {
+				url += "/";
+			}
+			url += "rest/metadata/uuid/";
+
+			WebResource webResource = getVersioImprimibleClient().
+					resource(url + identificador);
+			String jsonData = webResource.accept(MediaType.APPLICATION_JSON).get(String.class);
+			Map<String,Object> result =
+					new ObjectMapper().readValue(jsonData, HashMap.class);
+			return toDocumentMetadades(result);
+
 		} catch (Exception ex) {
 			throw new ArxiuException(
 					"S'ha produit un error generant la versió imprimible del document",
