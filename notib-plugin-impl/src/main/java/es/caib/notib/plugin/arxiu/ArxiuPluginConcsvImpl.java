@@ -1,40 +1,20 @@
 package es.caib.notib.plugin.arxiu;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import es.caib.arxiudigital.apirest.CSGD.entidades.comunes.DocumentNode;
-import es.caib.arxiudigital.apirest.CSGD.entidades.comunes.ResParamSearchDocument;
-import es.caib.arxiudigital.apirest.CSGD.entidades.comunes.VersionNode;
-import es.caib.arxiudigital.apirest.CSGD.entidades.parametrosLlamada.ParamNodeId;
-import es.caib.arxiudigital.apirest.CSGD.entidades.parametrosLlamada.ParamSearch;
-import es.caib.arxiudigital.apirest.CSGD.entidades.resultados.GetDocVersionListResult;
-import es.caib.arxiudigital.apirest.CSGD.entidades.resultados.SearchDocsResult;
-import es.caib.arxiudigital.apirest.CSGD.peticiones.GetDocVersionList;
-import es.caib.arxiudigital.apirest.CSGD.peticiones.SearchDocs;
 import es.caib.notib.plugin.utils.PropertiesHelper;
-import es.caib.plugins.arxiu.api.ArxiuException;
-import es.caib.plugins.arxiu.api.ContingutArxiu;
-import es.caib.plugins.arxiu.api.ContingutTipus;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentContingut;
-import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import es.caib.plugins.arxiu.api.*;
 import es.caib.plugins.arxiu.caib.ArxiuCaibClient;
-import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
 import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
 import org.apache.commons.io.IOUtils;
 
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlugin {
 
@@ -51,7 +31,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 	public ArxiuPluginConcsvImpl(String propertyKeyBase) {
 		super(propertyKeyBase);
 	}
-	
+
 	public ArxiuPluginConcsvImpl(String propertyKeyBase, Properties properties) {
 		super(propertyKeyBase, properties);
 	}
@@ -60,86 +40,39 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 	public Document documentDetalls(String identificador, String versio, boolean ambContingut) throws ArxiuException {
 		if (identificador.contains("csv:")) {
 			identificador = identificador.replace("csv:", "");
-			return documentDetallsCsv(identificador, versio, ambContingut);
+			return documentDetallsCsv(identificador, ambContingut);
 		} else {
 			identificador = identificador.replace("uuid:", "");
-			return super.documentDetalls(identificador, versio, ambContingut);
+			return documentDetallsUuid(identificador, ambContingut);
 		}
 	}
 
-	private Document documentDetallsCsv(String identificador, String versio, boolean ambContingut) {
-		String metode = "/services/documentSearch";
-
+	private Document documentDetallsCsv(String identificador, boolean ambContingut) {
 		try {
-			List<ContingutArxiu> resultatConsulta = new ArrayList();
-			List continguts = null;
+			Document response = new Document();
+			if (ambContingut)
+				response.setContingut(documentImprimibleCsv(identificador));
 
-			final String query = getPropertyQueryCsv().replace("*IDF*", identificador);
-			SearchDocsResult resposta = (SearchDocsResult)this.getArxiuClient().generarEnviarPeticio(metode, SearchDocs.class, new ArxiuCaibClient.GeneradorParam<ParamSearch>() {
-				public ParamSearch generar() {
-					ParamSearch param = new ParamSearch();
-					param.setQuery(query);
-					param.setPageNumber(0);
-					return param;
-				}
-			}, ParamSearch.class, SearchDocsResult.class);
-			List<DocumentNode> documents = new ArrayList();
-			if (resposta.getSearchDocumentsResult().getResParam() != null && ((ResParamSearchDocument)resposta.getSearchDocumentsResult().getResParam()).getDocuments() != null) {
-				documents = ((ResParamSearchDocument)resposta.getSearchDocumentsResult().getResParam()).getDocuments();
-			}
+			response.setMetadades(documentMetadadesCsv(identificador));
 
-			if (documents == null || documents.isEmpty())
-				return null;
-
-			String versioResposta = null;
-			if (versio == null) {
-				versioResposta = this.documentDarreraVersio(documents.get(0).getId());
-			} else {
-				versioResposta = versio;
-			}
-
-			return ArxiuConversioHelper.documentNodeToDocument(documents.get(0), versioResposta);
-		} catch (ArxiuException var11) {
-			throw var11;
+			return response;
 		} catch (Exception var12) {
-			throw new ArxiuException("S'ha produit un error cridant el mètode " + metode, var12);
+			throw new ArxiuException("S'ha produit un error obtenent els detalls del document: " + identificador, var12);
 		}
 	}
 
-	private String documentDarreraVersio(String identificador) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, UniformInterfaceException, ClientHandlerException, IOException {
-		String darreraVersio = null;
-		List<ContingutArxiu> versions = this.documentVersionsComu(identificador);
-		if (versions != null && !versions.isEmpty()) {
-			darreraVersio = ((ContingutArxiu)versions.get(versions.size() - 1)).getVersio();
+	private Document documentDetallsUuid(String identificador, boolean ambContingut) {
+		try {
+			Document response = new Document();
+			if (ambContingut)
+				response.setContingut(documentImprimibleUuid(identificador));
+
+			response.setMetadades(documentMetadadesUuid(identificador));
+
+			return response;
+		} catch (Exception var12) {
+			throw new ArxiuException("S'ha produit un error obtenent els detalls del document: " + identificador, var12);
 		}
-
-		return darreraVersio;
-	}
-
-	private List<ContingutArxiu> documentVersionsComu(final String identificador) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException, UniformInterfaceException, ClientHandlerException, IOException {
-		String metode = "/services/getDocVersionList";
-		GetDocVersionListResult resposta = (GetDocVersionListResult)this.getArxiuClient().generarEnviarPeticio(metode, GetDocVersionList.class, new ArxiuCaibClient.GeneradorParam<ParamNodeId>() {
-			public ParamNodeId generar() {
-				ParamNodeId param = new ParamNodeId();
-				param.setNodeId(identificador);
-				return param;
-			}
-		}, ParamNodeId.class, GetDocVersionListResult.class);
-		List<VersionNode> versions = resposta.getGetDocVersionListResult().getResParam();
-		Collections.sort(versions, new Comparator<VersionNode>() {
-			public int compare(VersionNode vn1, VersionNode vn2) {
-				return vn1.getDate().compareTo(vn2.getDate());
-			}
-		});
-		List<ContingutArxiu> continguts = new ArrayList();
-		Iterator var7 = versions.iterator();
-
-		while(var7.hasNext()) {
-			VersionNode versio = (VersionNode)var7.next();
-			continguts.add(ArxiuConversioHelper.crearContingutArxiu(identificador, (String)null, ContingutTipus.DOCUMENT, String.valueOf(versio.getId())));
-		}
-
-		return continguts;
 	}
 
 	@Override
@@ -152,7 +85,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			return documentImprimibleCsv(identificador);
 		}
 	}
-	
+
 	private DocumentContingut documentImprimibleCsv(
 			final String identificador) throws ArxiuException {
 		/*
@@ -221,6 +154,66 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 		}
 	}
 
+	private DocumentMetadades documentMetadadesUuid(String identificador) {
+		/*
+		 * Les URLs de consulta son les següents:
+		 *   https://intranet.caib.es/concsv/rest/metadata/uuid/{IDENTIFICADOR}
+		 *   https://intranet.caib.es/concsv/rest/metadata/{CSV}
+		 * A on:
+		 *   - {CSV} és el CSV del document a consultar [OBLIGATORI]
+		 *   - {IDENTIFICADOR} és el UUID del document a consultar [OBLIGATORI]
+		 */
+		try {
+			String url = getPropertyConcsvBaseUrl();
+			if (!url.endsWith("/")) {
+				url += "/";
+			}
+			url += "rest/metadata/uuid/";
+
+			WebResource webResource = getVersioImprimibleClient().
+					resource(url + identificador);
+			String jsonData = webResource.accept(MediaType.APPLICATION_JSON).get(String.class);
+			Map<String,Object> result =
+					new ObjectMapper().readValue(jsonData, HashMap.class);
+			return toDocumentMetadades(result);
+
+		} catch (Exception ex) {
+			throw new ArxiuException(
+					"S'ha produit un error generant la versió imprimible del document",
+					ex);
+		}
+	}
+
+	private DocumentMetadades documentMetadadesCsv(String identificador) {
+		/*
+		 * Les URLs de consulta son les següents:
+		 *   https://intranet.caib.es/concsv/rest/metadata/uuid/{IDENTIFICADOR}
+		 *   https://intranet.caib.es/concsv/rest/metadata/{CSV}
+		 * A on:
+		 *   - {CSV} és el CSV del document a consultar [OBLIGATORI]
+		 *   - {IDENTIFICADOR} és el UUID del document a consultar [OBLIGATORI]
+		 */
+		try {
+			String url = getPropertyConcsvBaseUrl();
+			if (!url.endsWith("/")) {
+				url += "/";
+			}
+			url += "rest/metadata/";
+
+			WebResource webResource = getVersioImprimibleClient().
+					resource(url + identificador);
+			String jsonData = webResource.accept(MediaType.APPLICATION_JSON).get(String.class);
+			Map<String,Object> result =
+					new ObjectMapper().readValue(jsonData, HashMap.class);
+			return toDocumentMetadades(result);
+
+		} catch (Exception ex) {
+			throw new ArxiuException(
+					"S'ha produit un error generant la versió imprimible del document",
+					ex);
+		}
+	}
+
 	private InputStream generarVersioImprimibleCsv(
 			String identificador,
 			String metadada1,
@@ -272,7 +265,65 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 		}
 		return webResource.get(InputStream.class);
 	}
+
+	private static DocumentMetadades toDocumentMetadades(Map<String,Object> metadatas) throws ArxiuException {
+		DocumentMetadades metadades = new DocumentMetadades();
+
+		for (String key : metadatas.keySet()) {
+			Object value = metadatas.get(key);
+			if (value != null) {
+				if ("eni:id".equals(key)) {
+					metadades.setIdentificador(value.toString());
+				} else if ("eni:v_nti".equals(key)) {
+					metadades.setVersioNti(value.toString());
+				} else if ("eni:origen".equals(key)) {
+					metadades.setOrigen(ContingutOrigen.toEnum(String.valueOf(value)));
+				} else if ("eni:fecha_inicio".equals(key)) {
+					metadades.setDataCaptura(parseDateIso8601(value.toString()));
+				} else if ("eni:estado_elaboracion".equals(key)) {
+					metadades.setEstatElaboracio(DocumentEstatElaboracio.toEnum(value.toString()));
+				} else if ("eni:tipo_doc_ENI".equals(key)) {
+					metadades.setTipusDocumental(DocumentTipus.toEnum(value.toString()));
+				} else {
+					Object val;
+					if ("eni:organo".equals(key)) {
+						val = value;
+						if (val instanceof List) {
+							metadades.setOrgans((List<String>) value);
+						} else {
+							metadades.setOrgans(Arrays.asList((String) val));
+						}
+					} else if ("eni:nombre_formato".equals(key)) {
+						metadades.setFormat(DocumentFormat.toEnum(value.toString()));
+					} else if ("eni:extension_formato".equals(key)) {
+						metadades.setExtensio(DocumentExtensio.toEnum(value.toString()));
+					} else {
+						Map<String, Object> metadadesAddicionals = metadades.getMetadadesAddicionals();
+						if (metadadesAddicionals == null) {
+							metadadesAddicionals = new HashMap<String, Object>();
+							metadades.setMetadadesAddicionals(metadadesAddicionals);
+						}
+						metadadesAddicionals.put(key, value);
+					}
+				}
+			}
+		}
+
+		return metadades;
+	}
 	
+	private static Date parseDateIso8601(String date) throws ArxiuException {
+		if (date == null) {
+			return null;
+		} else {
+			try {
+				Calendar c = DatatypeConverter.parseDateTime(date);
+				return c.getTime();
+			} catch (IllegalArgumentException var2) {
+				throw new ArxiuException("No s'ha pogut parsejar el valor de la data (valor=" + date + ")");
+			}
+		}
+	}
 	private Client getVersioImprimibleClient() {
 		if (versioImprimibleClient == null) {
 			versioImprimibleClient = Client.create();
@@ -335,6 +386,9 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			query = "(+TYPE:\"eni:documento\" AND @eni\\:csv:\"*IDF*\" -ASPECT:\"gdib:borrador\" -ASPECT:\"gdib:trasladado\") " +
 					" OR (+TYPE:\"gdib:documentoMigrado\" AND @gdib\\:hash:\"*IDF*\") ";
 		return query;
+	}
+	private String getPropertyConcsvBaseUrl() {
+		return PropertiesHelper.getProperties().getProperty(ARXIU_BASE_PROPERTY + "csv.base.url");
 	}
 
 	private int getPropertyTimeoutConnect() {

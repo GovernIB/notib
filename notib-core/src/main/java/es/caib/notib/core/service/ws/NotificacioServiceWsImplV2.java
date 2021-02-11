@@ -1700,16 +1700,20 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			if ((document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) ||
 					(document.getUrl() != null && !document.getUrl().isEmpty())) {
 				if (document.getOrigen() == null) {
-					return setRespostaError("[1066] Error en les metadades del document. No està informat l'ORIGEN del document");
+					document.setOrigen(OrigenEnum.CIUTADA);
+//					return setRespostaError("[1066] Error en les metadades del document. No està informat l'ORIGEN del document");
 				}
 				if (document.getValidesa() == null) {
-					return setRespostaError("[1066] Error en les metadades del document. No està informat la VALIDESA del document");
+					document.setValidesa(ValidesaEnum.ORIGINAL);
+//					return setRespostaError("[1066] Error en les metadades del document. No està informat la VALIDESA del document");
 				}
 				if (document.getTipoDocumental() == null) {
-					return setRespostaError("[1066] Error en les metadades del document. No està informat el TIPUS DOCUMENTAL del document");
+					document.setTipoDocumental(TipusDocumentalEnum.NOTIFICACIO);
+//					return setRespostaError("[1066] Error en les metadades del document. No està informat el TIPUS DOCUMENTAL del document");
 				}
 				if (document.getArxiuNom().toUpperCase().endsWith("PDF") && document.getModoFirma() == null) {
-					return setRespostaError("[1066] Error en les metadades del document. No està informat el MODE de FIRMA del document tipus PDF");
+					document.setModoFirma(false);
+//					return setRespostaError("[1066] Error en les metadades del document. No està informat el MODE de FIRMA del document tipus PDF");
 				}
 			}
 			if (notificacio.getDocument2() != null ||
