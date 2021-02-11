@@ -28,6 +28,14 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 
 	private ArxiuCaibClient arxiuClient;
 
+	public ArxiuPluginConcsvImpl(String propertyKeyBase) {
+		super(propertyKeyBase);
+	}
+
+	public ArxiuPluginConcsvImpl(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
+
 	@Override
 	public Document documentDetalls(String identificador, String versio, boolean ambContingut) throws ArxiuException {
 		if (identificador.contains("csv:")) {

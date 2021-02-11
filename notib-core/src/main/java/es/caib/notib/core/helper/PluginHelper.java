@@ -1468,7 +1468,8 @@ public class PluginHelper {
 				} else {
 					id = document.getCsv();
 					docDetall = arxiuDocumentConsultar(id, null, true, false);
-					doc = docDetall.getContingut();
+					if (docDetall != null)
+						doc = docDetall.getContingut();
 
 					annex.setCsv(document.getCsv());
 				}
@@ -1484,10 +1485,10 @@ public class PluginHelper {
 					annex.setOrigenCiudadanoAdmin(docDetall.getMetadades().getOrigen().ordinal());
 					annex.setFechaCaptura(toXmlGregorianCalendar(docDetall.getMetadades().getDataCaptura()));
 					annex.setValidezDocumento(estatElaboracioToValidesa(docDetall.getMetadades().getEstatElaboracio()));
-					annex.setModoFirma(getModeFirma(docDetall, document.getArxiuNom()));
+					annex.setModoFirma(getModeFirma(docDetall, doc.getArxiuNom()));
 				}
 				
-				path = new File(document.getArxiuNom()).toPath();
+				path = new File(doc.getArxiuNom()).toPath();
 			}else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
 				annex = new AnexoWsDto();
 				annex.setFicheroAnexado(getUrlDocumentContent(document.getUrl()));
@@ -1552,7 +1553,7 @@ public class PluginHelper {
 	}
 	private Integer getModeFirma(Document document, String nom) {
 		Integer modeFirma = 0;
-		if (nom.toLowerCase().endsWith("pdf") &&
+		if (nom != null && nom.toLowerCase().endsWith("pdf") &&
 				(document.getFirmes() != null && !document.getFirmes().isEmpty()))
 			modeFirma = 1;
 		return modeFirma;
