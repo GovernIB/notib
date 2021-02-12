@@ -456,7 +456,7 @@ $(document).ready(function() {
 		data-toggle="datatable"
 		data-url="<c:url value="/notificacio/datatable"/>"
 		data-search-enabled="false"
-		data-default-order="7"
+		data-default-order="8"
 		data-default-dir="desc"
 		class="table table-striped table-bordered"
 		style="width:100%"

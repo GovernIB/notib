@@ -3,21 +3,17 @@
  */
 package es.caib.notib.core.service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-
+import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDto;
+import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.rest.consulta.*;
+import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.EnviamentService;
+import es.caib.notib.core.entity.*;
+import es.caib.notib.core.helper.*;
+import es.caib.notib.core.repository.*;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,41 +25,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.codahale.metrics.Timer;
-
-import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDto;
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.api.rest.consulta.Document;
-import es.caib.notib.core.api.rest.consulta.Estat;
-import es.caib.notib.core.api.rest.consulta.Persona;
-import es.caib.notib.core.api.rest.consulta.PersonaTipus;
-import es.caib.notib.core.api.rest.consulta.Resposta;
-import es.caib.notib.core.api.rest.consulta.SubEstat;
-import es.caib.notib.core.api.rest.consulta.Transmissio;
-import es.caib.notib.core.api.service.AplicacioService;
-import es.caib.notib.core.api.service.EnviamentService;
-import es.caib.notib.core.entity.ColumnesEntity;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.entity.UsuariEntity;
-import es.caib.notib.core.helper.AuditEnviamentHelper;
-import es.caib.notib.core.helper.CallbackHelper;
-import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.EntityComprovarHelper;
-import es.caib.notib.core.helper.MessageHelper;
-import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.OrganigramaHelper;
-import es.caib.notib.core.helper.PaginacioHelper;
-import es.caib.notib.core.helper.PluginHelper;
-import es.caib.notib.core.repository.ColumnesRepository;
-import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.repository.NotificacioEventRepository;
-import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.UsuariRepository;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Implementació del servei de gestió de enviaments.
@@ -428,14 +396,31 @@ public class EnviamentServiceImpl implements EnviamentService {
 			if (filtre.getDataCaducitatFi() != null && filtre.getDataCaducitatFi() != "") {
 				dataCaducitatFi = toFiDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataCaducitatFi()));
 			}
-			//Filtres camps procediment
-			Integer estat = null;
-			Integer tipusEnviament = null;
-			if(filtre.getEstat()!=null){
-				estat = filtre.getEstat().getNumVal();
-			}else{
-				estat = 0;
+
+			NotificacioEstatEnumDto estat = filtre.getEstat();
+			Boolean hasZeronotificaEnviamentIntent = null;
+			boolean isEstatNull = estat == null;
+			boolean nomesSenseErrors = false;
+			boolean nomesAmbErrors = false;
+			if (!isEstatNull && estat.equals(NotificacioEstatEnumDto.ENVIANT)) {
+				estat = NotificacioEstatEnumDto.PENDENT;
+				hasZeronotificaEnviamentIntent = true;
+				nomesSenseErrors = true;
+
+			} else if (!isEstatNull && estat.equals(NotificacioEstatEnumDto.PENDENT)) {
+//					hasZeronotificaEnviamentIntent = false;
+				nomesAmbErrors = true;
 			}
+
+//			//Filtres camps procediment
+//			Integer estat = null;
+
+//			if(filtre.getEstat()!=null){
+//				estat = filtre.getEstat().getNumVal();
+//			}else{
+//				estat = 0;
+//			}
+			int tipusEnviament;
 			if(filtre.getEnviamentTipus()!=null){
 				tipusEnviament = NotificacioTipusEnviamentEnumDto.getNumVal(filtre.getEnviamentTipus());
 			}else{
@@ -444,7 +429,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			Page<NotificacioEnviamentEntity> enviament = null;
 			
 			campsOrdre(paginacioParams);
-			
+
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
 			if (isUsuari) { // && !procedimentsCodisNotib.isEmpty()) {
 				enviament = notificacioEnviamentRepository.findByNotificacio(
@@ -468,9 +453,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 						(tipusEnviament),
 						(filtre.getCsvUuid() == null || filtre.getCsvUuid().isEmpty()),
 						filtre.getCsvUuid(),
-						(filtre.getEstat() == null),
-						(estat),
-						filtre.getEstat() != null ? NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()) : null,
+						estat == null,
+						estat == null ? 0 : estat.getNumVal(),
+						estat != null ? NotificacioEnviamentEstatEnumDto.valueOf(estat.toString()) : null,
 						entitatEntity,
 						(dataEnviamentInici == null),
 						dataEnviamentInici,
@@ -506,6 +491,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 						esProcedimentsOrgansCodisNotibNull ? null : codisProcedimentOrgansDisponibles,
 						aplicacioService.findRolsUsuariActual(),
 						usuariCodi,
+						nomesAmbErrors,
+						nomesSenseErrors,
+						hasZeronotificaEnviamentIntent == null,
+						hasZeronotificaEnviamentIntent,
 						pageable);
 			} else if (isAdminOrgan) { // && !procedimentsCodisNotib.isEmpty()) {
 				List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatEntity.getDir3Codi(), organGestorCodi);
@@ -530,9 +519,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 						(tipusEnviament),
 						(filtre.getCsvUuid() == null || filtre.getCsvUuid().isEmpty()),
 						filtre.getCsvUuid(),
-						(filtre.getEstat() == null),
-						(estat),
-						filtre.getEstat() != null ? NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()) : null,
+						(estat == null),
+						estat == null ? 0 : estat.getNumVal(),
+						estat != null ? NotificacioEnviamentEstatEnumDto.valueOf(estat.toString()) : null,
 						entitatEntity,
 						(dataEnviamentInici == null),
 						dataEnviamentInici,
@@ -563,6 +552,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 						esProcedimentsCodisNotibNull,
 						esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib,
 						organs,
+						nomesAmbErrors,
+						nomesSenseErrors,
+						hasZeronotificaEnviamentIntent == null,
+						hasZeronotificaEnviamentIntent,
 						pageable);
 			} else if (isUsuariEntitat) {
 				enviament = notificacioEnviamentRepository.findByNotificacio(
@@ -586,9 +579,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 						(tipusEnviament),
 						(filtre.getCsvUuid() == null || filtre.getCsvUuid().isEmpty()),
 						filtre.getCsvUuid(),
-						(filtre.getEstat() == null),
-						(estat),
-						filtre.getEstat() != null ? NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()) : null,
+						estat == null,
+						estat == null ? 0 : estat.getNumVal(),
+						estat != null ? NotificacioEnviamentEstatEnumDto.valueOf(estat.toString()) : null,
 						entitatEntity,
 						(dataEnviamentInici == null),
 						dataEnviamentInici,
@@ -616,6 +609,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 						dataRegistreInici,
 						(dataRegistreFi == null),
 						dataRegistreFi,
+						nomesAmbErrors,
+						nomesSenseErrors,
+						hasZeronotificaEnviamentIntent == null,
+						hasZeronotificaEnviamentIntent,
 						pageable);
 			}
 			if(enviament == null || !enviament.hasContent()) {
@@ -664,6 +661,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					notificacioEnviamentDtoV2.setEstat(enviament.getContent().get(i).getNotificacio().getEstat());
 	//			if (enviament.getContent().get(i).getComunicacioTipus() != null)
 	//				notificacioEnviamentDtoV2.setComunicacioTipus(enviament.getContent().get(i).getComunicacioTipus());
+
 				i++;
 			}
 			return paginaDto;
