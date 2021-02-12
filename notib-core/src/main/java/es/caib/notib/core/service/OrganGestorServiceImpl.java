@@ -291,7 +291,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			mapeigPropietatsOrdenacio.put("llibreCodiNom", new String[] {"llibre"});
-			mapeigPropietatsOrdenacio.put("oficina", new String[] {"entitat.oficina"});
+			//mapeigPropietatsOrdenacio.put("oficina", new String[] {"entitat.oficina"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 			
 			Page<OrganGestorEntity> organs = null;
@@ -872,9 +872,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
     @Override
 	@Transactional(readOnly = true)
-	public List<OficinaDto> getOficinesOrganisme(
+	public List<OficinaDto> getOficinesSIR(
 			Long entitatId,
-			String organGestorDir3Codi) {
+			String dir3codi,
+			boolean isFiltre) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
@@ -884,12 +885,16 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					false);
 			List<OficinaDto> oficines = new ArrayList<OficinaDto>();
 			try {
-				Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
-				oficines = cacheHelper.getOficinesSIRUnitat(
-						arbreUnitats,
-						organGestorDir3Codi);
+				if (!isFiltre) {
+					Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
+					oficines = cacheHelper.getOficinesSIRUnitat(
+							arbreUnitats,
+							dir3codi);
+				} else {
+					oficines = cacheHelper.getOficinesSIREntitat(dir3codi);
+				}
 	 		} catch (Exception e) {
-	 			String errorMessage = "No s'han pogut recuperar les oficines SIR de l'òrgan gestor: " + organGestorDir3Codi;
+	 			String errorMessage = "No s'han pogut recuperar les oficines SIR [dir3codi=" + dir3codi + "]";
 				logger.error(
 						errorMessage, 
 						e.getMessage());

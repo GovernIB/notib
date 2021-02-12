@@ -223,6 +223,12 @@ public class CacheHelper {
 				arbreUnitats);
 	}
 	
+	@Cacheable(value = "oficinesSIREntitat", key="#codiDir3Entitat")
+	public List<OficinaDto> getOficinesSIREntitat(
+			String codiDir3Entitat) {
+		return pluginHelper.oficinesSIREntitat(codiDir3Entitat);
+	}
+	
 	@Cacheable(value = "organigramaOriginal", key="#entitatcodi")
 	public Map<String, NodeDir3> findOrganigramaNodeByEntitat(String entitatcodi) {
 		return  pluginHelper.getOrganigramaPerEntitat(entitatcodi);
