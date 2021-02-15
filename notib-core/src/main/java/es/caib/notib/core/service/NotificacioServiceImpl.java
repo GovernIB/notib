@@ -919,8 +919,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 					nomesSenseErrors = true;
 
 				} else if (!isEstatNull && estat.equals(NotificacioEstatEnumDto.PENDENT)) {
-//					hasZeronotificaEnviamentIntent = false;
-					nomesAmbErrors = true;
+					hasZeronotificaEnviamentIntent = false;
+//					nomesAmbErrors = true;
 				}
 
 				if (isUsuari) {

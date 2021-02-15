@@ -204,11 +204,11 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"   or (:esProcedimentOrgansIdsNotibNull = false and n.notificacio.procedimentOrgan is not null and n.notificacio.procedimentOrgan.id in (:procedimentOrgansIdsNotib))) " +							// És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
 			"and (n.notificacio.grupCodi = null or (n.notificacio.grupCodi in (:grupsProcedimentCodisNotib))) " +
 			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
-			"	(:hasZeronotificaEnviamentIntent = true and n.notificaIntentNum = 0) or " +
-			"	(:hasZeronotificaEnviamentIntent = false and n.notificaIntentNum > 0) " +
+			"	(:hasZeronotificaEnviamentIntent = true and n.notificacio.registreEnviamentIntent = 0) or " +
+			"	(:hasZeronotificaEnviamentIntent = false and n.notificacio.registreEnviamentIntent > 0) " +
 			") " +
-			"and (:nomesSenseErrors = false or n.notificaError = false) " +
-			"and (:nomesAmbErrors = false or n.notificaError = true)")
+			"and (:nomesSenseErrors = false or n.notificacio.notificaErrorEvent is null) " +
+			"and (:nomesAmbErrors = false or n.notificacio.notificaErrorEvent is not null)")
 	Page<NotificacioEnviamentEntity> findByNotificacio(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
 			@Param("codiProcediment") String codiProcediment,
@@ -305,11 +305,11 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and ((:esProcedimentsCodisNotibNull = false and n.notificacio.procedimentCodiNotib is not null and n.notificacio.procedimentCodiNotib in (:procedimentsCodisNotib)) " +
 			"   or (n.notificacio.procedimentCodiNotib is null and n.notificacio.organGestor is not null and n.notificacio.organGestor.codi in (:organs))) " +
 			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
-			"	(:hasZeronotificaEnviamentIntent = true and n.notificaIntentNum = 0) or " +
-			"	(:hasZeronotificaEnviamentIntent = false and n.notificaIntentNum > 0) " +
+			"	(:hasZeronotificaEnviamentIntent = true and n.notificacio.registreEnviamentIntent = 0) or " +
+			"	(:hasZeronotificaEnviamentIntent = false and n.notificacio.registreEnviamentIntent > 0) " +
 			") " +
-			"and (:nomesSenseErrors = false or n.notificaError = false) " +
-			"and (:nomesAmbErrors = false or n.notificaError = true)")
+			"and (:nomesSenseErrors = false or n.notificacio.notificaErrorEvent is null) " +
+			"and (:nomesAmbErrors = false or n.notificacio.notificaErrorEvent is not null)")
 	Page<NotificacioEnviamentEntity> findByNotificacio(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
 			@Param("codiProcediment") String codiProcediment,
@@ -370,7 +370,9 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			Pageable pageable);
 	
-	@Query(	"from" +
+	@Query(	"select" +
+			"	n " +
+			"from" +
 			"    NotificacioEnviamentEntity n " +
 			"where " +
 			"    (:esDataEnviamentIniciNull = true or n.createdDate >= :dataEnviamentInici) " +
@@ -399,11 +401,11 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:esDataRegistreIniciNull = true or n.notificacio.registreData >= :dataRegistreInici) " +
 			"and (:esDataRegistreFiNull = true or n.notificacio.registreData <= :dataRegistreFi)" +
 			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
-			"	(:hasZeronotificaEnviamentIntent = true and n.notificaIntentNum = 0) or " +
-			"	(:hasZeronotificaEnviamentIntent = false and n.notificaIntentNum > 0) " +
+			"	(:hasZeronotificaEnviamentIntent = true and n.notificacio.registreEnviamentIntent = 0) or " +
+			"	(:hasZeronotificaEnviamentIntent = false and n.notificacio.registreEnviamentIntent > 0) " +
 			") " +
-			"and (:nomesSenseErrors = false or n.notificaError = false) " +
-			"and (:nomesAmbErrors = false or n.notificaError = true)")
+			"and (:nomesSenseErrors = false or n.notificacio.notificaErrorEvent is null) " +
+			"and (:nomesAmbErrors = false or n.notificacio.notificaErrorEvent is not null)")
 	Page<NotificacioEnviamentEntity> findByNotificacio(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
 			@Param("codiProcediment") String codiProcediment,

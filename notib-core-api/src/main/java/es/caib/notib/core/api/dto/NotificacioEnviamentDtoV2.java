@@ -87,6 +87,7 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private boolean notificaError;
 	private int notificaIntentNum;
 
+	private boolean isEnviant;
 	public String getDestinatarisNomLlinatges() {
 		destinatarisNomLlinatges = "";
 		for(PersonaDto destinatari: destinataris) {
@@ -95,7 +96,7 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 		return destinatarisNomLlinatges;
 	}
 	public NotificacioEstatEnumDto getEstat() {
-		if (this.estat.equals(NotificacioEstatEnumDto.PENDENT) && !this.notificaError && this.notificaIntentNum == 0){
+		if (isEnviant){
 			return NotificacioEstatEnumDto.ENVIANT;
 		}
 		return this.estat;

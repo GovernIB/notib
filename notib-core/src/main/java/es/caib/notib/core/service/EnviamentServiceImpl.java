@@ -408,8 +408,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				nomesSenseErrors = true;
 
 			} else if (!isEstatNull && estat.equals(NotificacioEstatEnumDto.PENDENT)) {
-//					hasZeronotificaEnviamentIntent = false;
-				nomesAmbErrors = true;
+				hasZeronotificaEnviamentIntent = false;
+//				nomesAmbErrors = true;
 			}
 
 //			//Filtres camps procediment
@@ -426,13 +426,13 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}else{
 				tipusEnviament = 0;
 			}
-			Page<NotificacioEnviamentEntity> enviament = null;
+			Page<NotificacioEnviamentEntity> pageEnviaments = null;
 			
 			campsOrdre(paginacioParams);
 
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
 			if (isUsuari) { // && !procedimentsCodisNotib.isEmpty()) {
-				enviament = notificacioEnviamentRepository.findByNotificacio(
+				pageEnviaments = notificacioEnviamentRepository.findByNotificacio(
 						filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 						filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
 						filtre.getGrup() == null || filtre.getGrup().isEmpty(),
@@ -498,7 +498,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						pageable);
 			} else if (isAdminOrgan) { // && !procedimentsCodisNotib.isEmpty()) {
 				List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatEntity.getDir3Codi(), organGestorCodi);
-				enviament = notificacioEnviamentRepository.findByNotificacio(
+				pageEnviaments = notificacioEnviamentRepository.findByNotificacio(
 						filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 						filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
 						filtre.getGrup() == null || filtre.getGrup().isEmpty(),
@@ -558,7 +558,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						hasZeronotificaEnviamentIntent,
 						pageable);
 			} else if (isUsuariEntitat) {
-				enviament = notificacioEnviamentRepository.findByNotificacio(
+				pageEnviaments = notificacioEnviamentRepository.findByNotificacio(
 						filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 						filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
 						filtre.getGrup() == null || filtre.getGrup().isEmpty(),
@@ -615,8 +615,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 						hasZeronotificaEnviamentIntent,
 						pageable);
 			}
-			if(enviament == null || !enviament.hasContent()) {
-				enviament = new PageImpl<>(new ArrayList<NotificacioEnviamentEntity>());
+			if(pageEnviaments == null || !pageEnviaments.hasContent()) {
+				pageEnviaments = new PageImpl<>(new ArrayList<NotificacioEnviamentEntity>());
 			}
 			
 //			for(NotificacioEnviamentEntity nee: enviament.getContent()) {
@@ -624,41 +624,41 @@ public class EnviamentServiceImpl implements EnviamentService {
 //			}
 			
 			PaginaDto<NotificacioEnviamentDtoV2> paginaDto = paginacioHelper.toPaginaDto(
-					enviament,
+					pageEnviaments,
 					NotificacioEnviamentDtoV2.class);
 			int i = 0;
 			boolean llibreOrgan = !entitat.isLlibreEntitat();
 			
 			for (NotificacioEnviamentDtoV2 notificacioEnviamentDtoV2 : paginaDto.getContingut()) {
-				if (enviament.getContent().get(i).getNotificacio().getProcedimentCodiNotib() != null)
-					notificacioEnviamentDtoV2.setProcedimentCodiNotib(enviament.getContent().get(i).getNotificacio().getProcedimentCodiNotib());
-				if (enviament.getContent().get(i).getNotificacio().getEnviamentDataProgramada() != null)
-					notificacioEnviamentDtoV2.setEnviamentDataProgramada(enviament.getContent().get(i).getNotificacio().getEnviamentDataProgramada());
-				if (enviament.getContent().get(i).getNotificacio().getGrupCodi() != null)
-					notificacioEnviamentDtoV2.setGrupCodi(enviament.getContent().get(i).getNotificacio().getGrupCodi());
-				if (enviament.getContent().get(i).getNotificacio().getEmisorDir3Codi() != null)
-					notificacioEnviamentDtoV2.setEmisorDir3Codi(enviament.getContent().get(i).getNotificacio().getEmisorDir3Codi());
-				if (enviament.getContent().get(i).getNotificacio().getUsuariCodi() != null)
-					notificacioEnviamentDtoV2.setUsuariCodi(enviament.getContent().get(i).getNotificacio().getUsuariCodi());
-				if (enviament.getContent().get(i).getNotificacio().getEnviamentTipus() != null)
-					notificacioEnviamentDtoV2.setEnviamentTipus(enviament.getContent().get(i).getNotificacio().getEnviamentTipus());
-				if (enviament.getContent().get(i).getNotificacio().getConcepte() != null)
-					notificacioEnviamentDtoV2.setConcepte(enviament.getContent().get(i).getNotificacio().getConcepte());
-				if (enviament.getContent().get(i).getNotificacio().getDescripcio() != null)
-					notificacioEnviamentDtoV2.setDescripcio(enviament.getContent().get(i).getNotificacio().getDescripcio());
+				if (pageEnviaments.getContent().get(i).getNotificacio().getProcedimentCodiNotib() != null)
+					notificacioEnviamentDtoV2.setProcedimentCodiNotib(pageEnviaments.getContent().get(i).getNotificacio().getProcedimentCodiNotib());
+				if (pageEnviaments.getContent().get(i).getNotificacio().getEnviamentDataProgramada() != null)
+					notificacioEnviamentDtoV2.setEnviamentDataProgramada(pageEnviaments.getContent().get(i).getNotificacio().getEnviamentDataProgramada());
+				if (pageEnviaments.getContent().get(i).getNotificacio().getGrupCodi() != null)
+					notificacioEnviamentDtoV2.setGrupCodi(pageEnviaments.getContent().get(i).getNotificacio().getGrupCodi());
+				if (pageEnviaments.getContent().get(i).getNotificacio().getEmisorDir3Codi() != null)
+					notificacioEnviamentDtoV2.setEmisorDir3Codi(pageEnviaments.getContent().get(i).getNotificacio().getEmisorDir3Codi());
+				if (pageEnviaments.getContent().get(i).getNotificacio().getUsuariCodi() != null)
+					notificacioEnviamentDtoV2.setUsuariCodi(pageEnviaments.getContent().get(i).getNotificacio().getUsuariCodi());
+				if (pageEnviaments.getContent().get(i).getNotificacio().getEnviamentTipus() != null)
+					notificacioEnviamentDtoV2.setEnviamentTipus(pageEnviaments.getContent().get(i).getNotificacio().getEnviamentTipus());
+				if (pageEnviaments.getContent().get(i).getNotificacio().getConcepte() != null)
+					notificacioEnviamentDtoV2.setConcepte(pageEnviaments.getContent().get(i).getNotificacio().getConcepte());
+				if (pageEnviaments.getContent().get(i).getNotificacio().getDescripcio() != null)
+					notificacioEnviamentDtoV2.setDescripcio(pageEnviaments.getContent().get(i).getNotificacio().getDescripcio());
 				// Llibre
 				if (llibreOrgan) {
-					if (enviament.getContent().get(i).getNotificacio().getProcediment() != null)
-						notificacioEnviamentDtoV2.setLlibre(enviament.getContent().get(i).getNotificacio().getProcediment().getOrganGestor().getLlibre());
+					if (pageEnviaments.getContent().get(i).getNotificacio().getProcediment() != null)
+						notificacioEnviamentDtoV2.setLlibre(pageEnviaments.getContent().get(i).getNotificacio().getProcediment().getOrganGestor().getLlibre());
 				} else {
 					notificacioEnviamentDtoV2.setLlibre(entitatEntity.getLlibre());
 				}
-				if (enviament.getContent().get(i).getNotificacio().getRegistreNumero() != null)
-					notificacioEnviamentDtoV2.setRegistreNumero(enviament.getContent().get(i).getNotificacio().getRegistreNumero());
-				if (enviament.getContent().get(i).getNotificacio().getRegistreData() != null)
-					notificacioEnviamentDtoV2.setRegistreData(enviament.getContent().get(i).getNotificacio().getRegistreData());
-				if (enviament.getContent().get(i).getNotificacio().getEstat() != null)
-					notificacioEnviamentDtoV2.setEstat(enviament.getContent().get(i).getNotificacio().getEstat());
+				if (pageEnviaments.getContent().get(i).getNotificacio().getRegistreNumero() != null)
+					notificacioEnviamentDtoV2.setRegistreNumero(pageEnviaments.getContent().get(i).getNotificacio().getRegistreNumero());
+				if (pageEnviaments.getContent().get(i).getNotificacio().getRegistreData() != null)
+					notificacioEnviamentDtoV2.setRegistreData(pageEnviaments.getContent().get(i).getNotificacio().getRegistreData());
+				if (pageEnviaments.getContent().get(i).getNotificacio().getEstat() != null)
+					notificacioEnviamentDtoV2.setEstat(pageEnviaments.getContent().get(i).getNotificacio().getEstat());
 	//			if (enviament.getContent().get(i).getComunicacioTipus() != null)
 	//				notificacioEnviamentDtoV2.setComunicacioTipus(enviament.getContent().get(i).getComunicacioTipus());
 

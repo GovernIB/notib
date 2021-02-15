@@ -42,7 +42,7 @@ public class NotificacioDatatableDto {
 	private boolean errorLastEvent;
 //	private boolean hasEnviamentsPendents;
 	private boolean hasEnviamentsPendentsRegistre;
-	protected int notificaEnviamentIntent;
+	protected int registreEnviamentIntent;
 	
 	private TipusUsuariEnumDto tipusUsuari;
 	
@@ -51,7 +51,7 @@ public class NotificacioDatatableDto {
 	}
 
 	public boolean isEnviant() {
-		return estat != null && estat.equals(NotificacioEstatEnumDto.PENDENT) && notificaEnviamentIntent == 0 && !isNotificaError();
+		return estat != null && estat.equals(NotificacioEstatEnumDto.PENDENT) && registreEnviamentIntent == 0 && !isNotificaError();
 	}
 
 	public String getOrganGestorDesc() {

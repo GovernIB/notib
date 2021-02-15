@@ -217,8 +217,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)" +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
 			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
-			"	(:hasZeronotificaEnviamentIntent = true and ntf.notificaEnviamentIntent = 0) or " +
-			"	(:hasZeronotificaEnviamentIntent = false and ntf.notificaEnviamentIntent > 0) " +
+			"	(:hasZeronotificaEnviamentIntent = true and ntf.registreEnviamentIntent = 0) or " +
+			"	(:hasZeronotificaEnviamentIntent = false and ntf.registreEnviamentIntent > 0) " +
 			") " +
 			"and (:nomesSenseErrors = false or ntf.notificaErrorEvent is null) " +
 			"and (:isIdentificadorNull = true or " +
@@ -300,8 +300,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)" +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
 			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
-			"	(:hasZeronotificaEnviamentIntent = true and ntf.notificaEnviamentIntent = 0) or " +
-			"	(:hasZeronotificaEnviamentIntent = false and ntf.notificaEnviamentIntent > 0) " +
+			"	(:hasZeronotificaEnviamentIntent = true and ntf.registreEnviamentIntent = 0) or " +
+			"	(:hasZeronotificaEnviamentIntent = false and ntf.registreEnviamentIntent > 0) " +
 			") " +
 			"and (:isIdentificadorNull = true or " +
 			"		(ntf.id = (select notificacio.id" +
@@ -380,8 +380,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " + 
 			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)" +
 			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
-			"	(:hasZeronotificaEnviamentIntent = true and ntf.notificaEnviamentIntent = 0) or " +
-			"	(:hasZeronotificaEnviamentIntent = false and ntf.notificaEnviamentIntent > 0) " +
+			"	(:hasZeronotificaEnviamentIntent = true and ntf.registreEnviamentIntent = 0) or " +
+			"	(:hasZeronotificaEnviamentIntent = false and ntf.registreEnviamentIntent > 0) " +
 			") " +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
 			"and (:isIdentificadorNull = true or " +

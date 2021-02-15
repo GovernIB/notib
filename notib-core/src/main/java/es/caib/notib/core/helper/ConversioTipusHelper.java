@@ -3,37 +3,20 @@
  */
 package es.caib.notib.core.helper;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
 import es.caib.notib.core.api.dto.*;
-import org.joda.time.DateTime;
-import org.springframework.stereotype.Component;
-
-import es.caib.notib.core.entity.AplicacioEntity;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.GrupEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.PagadorCieEntity;
-import es.caib.notib.core.entity.PagadorCieFormatFullaEntity;
-import es.caib.notib.core.entity.PagadorCieFormatSobreEntity;
-import es.caib.notib.core.entity.PagadorPostalEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.UsuariEntity;
+import es.caib.notib.core.entity.*;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
-import ma.glasnost.orika.CustomConverter;
-import ma.glasnost.orika.CustomMapper;
-import ma.glasnost.orika.MapperFacade;
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.MappingContext;
+import ma.glasnost.orika.*;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
+import org.joda.time.DateTime;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Helper per a convertir entre diferents formats de documents.
@@ -179,9 +162,10 @@ public class ConversioTipusHelper {
 			byDefault().
 			register();
 		mapperFactory.classMap(NotificacioEnviamentEntity.class, NotificacioEnviamentDtoV2.class).
-		field("notificacio.id", "notificacioId").
-		byDefault().
-		register();
+				field("notificacio.id", "notificacioId").
+				customize(new NotificacioEnviamentEntitytoDtoV2Mapper()).
+				byDefault().
+				register();
 	
 	}
 
@@ -261,7 +245,23 @@ public class ConversioTipusHelper {
 			}
 		}
 	}
-	
+
+	public class NotificacioEnviamentEntitytoDtoV2Mapper extends CustomMapper<NotificacioEnviamentEntity, NotificacioEnviamentDtoV2> {
+		@Override
+		public void mapAtoB(
+				NotificacioEnviamentEntity notificacioEnviamentEntity,
+				NotificacioEnviamentDtoV2 notificacioEnviamentDto,
+				MappingContext context) {
+			NotificacioEventEntity errorEvent = notificacioEnviamentEntity.getNotificacioErrorEvent();
+			NotificacioEntity notificacio = notificacioEnviamentEntity.getNotificacio();
+			if (errorEvent == null && notificacio.getRegistreEnviamentIntent() == 0 &&
+					notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)) {
+				notificacioEnviamentDto.setEnviant(true);
+			} else {
+				notificacioEnviamentDto.setEnviant(false);
+			}
+		}
+	}
 	
 	private MapperFacade getMapperFacade() {
 		return mapperFactory.getMapperFacade();
