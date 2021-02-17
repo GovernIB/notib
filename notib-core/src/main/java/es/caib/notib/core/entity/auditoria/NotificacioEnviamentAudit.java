@@ -3,33 +3,18 @@
  */
 package es.caib.notib.core.entity.auditoria;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
-import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.audit.NotibAuditoria;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Classe del model de dades que representa la informació de auditoria d'un enviament.
@@ -237,19 +222,33 @@ public class NotificacioEnviamentAudit extends NotibAuditoria<Long> {
 				return null;
 
 			String domicili = "";
+			String domiciliPoblacio ="";
 			switch (notificacioEnviamentEntity.getDomiciliConcretTipus()) {
 			case ESTRANGER:
 				domicili = notificacioEnviamentEntity.getDomiciliPaisCodiIso() + "-";
-				if (notificacioEnviamentEntity.getDomiciliPoblacio() != null)
-					domicili += " (" + notificacioEnviamentEntity.getDomiciliPoblacio().substring(0, 30) + ") - ";
+				domiciliPoblacio = notificacioEnviamentEntity.getDomiciliPoblacio();
+				if (domiciliPoblacio != null) {
+					if (domiciliPoblacio.length() > 30) {
+						domicili += " (" + notificacioEnviamentEntity.getDomiciliPoblacio().substring(0, 30) + ") - ";
+					} else {
+						domicili += " (" + notificacioEnviamentEntity.getDomiciliPoblacio() + ") - ";
+					}
+				}
 				domicili += getAdressa(notificacioEnviamentEntity);
 				break;
 			case NACIONAL:
 				domicili = notificacioEnviamentEntity.getDomiciliProvinciaCodi() + "-";
 				domicili += notificacioEnviamentEntity.getDomiciliMunicipiCodiIne() + "-";
 				domicili += notificacioEnviamentEntity.getDomiciliCodiPostal() + "-";
-				if (notificacioEnviamentEntity.getDomiciliPoblacio() != null)
-					domicili += " (" + notificacioEnviamentEntity.getDomiciliPoblacio().substring(0, 30) + ") - ";
+				domiciliPoblacio = notificacioEnviamentEntity.getDomiciliPoblacio();
+				if (domiciliPoblacio != null) {
+					if (domiciliPoblacio.length() > 30) {
+						domicili += " (" + notificacioEnviamentEntity.getDomiciliPoblacio().substring(0, 30) + ") - ";
+					} else {
+						domicili += " (" + notificacioEnviamentEntity.getDomiciliPoblacio() + ") - ";
+					}
+				}
+
 				domicili += getAdressa(notificacioEnviamentEntity);
 				break;
 			case APARTAT_CORREUS:
@@ -257,8 +256,14 @@ public class NotificacioEnviamentAudit extends NotibAuditoria<Long> {
 				domicili += notificacioEnviamentEntity.getDomiciliMunicipiCodiIne() + "-";
 				domicili += notificacioEnviamentEntity.getDomiciliCodiPostal() + "-";
 				domicili += notificacioEnviamentEntity.getDomiciliApartatCorreus();
-				if (notificacioEnviamentEntity.getDomiciliPoblacio() != null)
-					domicili += " (" + notificacioEnviamentEntity.getDomiciliPoblacio().substring(0, 30) + ")";
+				domiciliPoblacio = notificacioEnviamentEntity.getDomiciliPoblacio();
+				if (domiciliPoblacio != null) {
+					if (domiciliPoblacio.length() > 30) {
+						domicili += " (" + notificacioEnviamentEntity.getDomiciliPoblacio().substring(0, 30) + ") - ";
+					} else {
+						domicili += " (" + notificacioEnviamentEntity.getDomiciliPoblacio() + ") - ";
+					}
+				}
 				break;
 			case SENSE_NORMALITZAR:
 				domicili = notificacioEnviamentEntity.getDomiciliLinea1() + " " + notificacioEnviamentEntity.getDomiciliLinea2();
