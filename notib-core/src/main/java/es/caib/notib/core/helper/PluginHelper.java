@@ -2,9 +2,13 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.exception.SistemaExternException;
+import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
+import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
+import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.plugin.conversio.ConversioArxiu;
 import es.caib.notib.plugin.conversio.ConversioPlugin;
@@ -13,16 +17,19 @@ import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.gesconadm.GcaProcediment;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
+import es.caib.notib.plugin.registre.*;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
+import es.caib.notib.plugin.unitat.OficinaSIR;
 import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
 import es.caib.plugins.arxiu.api.ArxiuException;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
+import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -52,50 +59,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
-
-import es.caib.notib.core.api.dto.AccioParam;
-import es.caib.notib.core.api.dto.AnexoWsDto;
-import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
-import es.caib.notib.core.api.dto.DatosInteresadoWsDto;
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.core.api.dto.IntegracioInfo;
-import es.caib.notib.core.api.dto.InteresadoWsDto;
-import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
-import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.OficinaDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.PersonaDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.RegistreAnnexDto;
-import es.caib.notib.core.api.dto.RegistreInteressatDocumentTipusDtoEnum;
-import es.caib.notib.core.api.dto.RegistreInteressatDto;
-import es.caib.notib.core.api.dto.RegistreModeFirmaDtoEnum;
-import es.caib.notib.core.api.dto.RegistreOrigenDtoEnum;
-import es.caib.notib.core.api.dto.RegistreTipusDocumentDtoEnum;
-import es.caib.notib.core.api.dto.RegistreTipusDocumentalDtoEnum;
-import es.caib.notib.core.api.dto.RegistreValidezDocumentDtoEnum;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
-import es.caib.notib.plugin.registre.CodiAssumpte;
-import es.caib.notib.plugin.registre.DadesInteressat;
-import es.caib.notib.plugin.registre.DadesOficina;
-import es.caib.notib.plugin.registre.DadesRepresentat;
-import es.caib.notib.plugin.registre.Interessat;
-import es.caib.notib.plugin.registre.Llibre;
-import es.caib.notib.plugin.registre.LlibreOficina;
-import es.caib.notib.plugin.registre.Oficina;
-import es.caib.notib.plugin.registre.Organisme;
-import es.caib.notib.plugin.registre.RegistrePlugin;
-import es.caib.notib.plugin.registre.RegistrePluginException;
-import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
-import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
-import es.caib.notib.plugin.registre.TipusAssumpte;
-import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
-import es.caib.notib.plugin.unitat.OficinaSIR;
 /**
  * Helper per a interactuar amb els plugins.
  * 
@@ -478,7 +441,34 @@ public class PluginHelper {
 					OficinaDto.class);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al llistar organismes  a partir d'un text";
+			String errorDescripcio = "Error al llistar les oficines d'una unitat organitzativa";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
+	
+		return oficinesSIR;
+	}
+	
+	public List<OficinaDto> oficinesSIREntitat(String entitatCodi) throws SistemaExternException {
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS, 
+				"Obtenir llista de les oficines SIR d'una entitat", 
+				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				new AccioParam("Text de la cerca", entitatCodi));
+
+		List<OficinaSIR> oficinesTF = null;
+		List<OficinaDto> oficinesSIR = null;
+		try {
+			oficinesTF = getUnitatsOrganitzativesPlugin().getOficinesSIREntitat(entitatCodi);
+			oficinesSIR = conversioTipusHelper.convertirList(
+					oficinesTF, 
+					OficinaDto.class);
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al llistar les oficines SIR d'una entitat";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			throw new SistemaExternException(
 					IntegracioHelper.INTCODI_UNITATS,
@@ -701,24 +691,35 @@ public class PluginHelper {
 	
 	public Document arxiuDocumentConsultar(
 			String arxiuUuid,
-			String versio) {
+			String versio,
+			boolean isUuid) {
 		
+		return arxiuDocumentConsultar(arxiuUuid, versio, false, isUuid);
+	}
+
+	public Document arxiuDocumentConsultar(
+			String identificador,
+			String versio,
+			boolean ambContingut,
+			boolean isUuid) {
+
 		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_ARXIU, 
-				"Consulta d'un document", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("UUID del document", arxiuUuid),
+				IntegracioHelper.INTCODI_ARXIU,
+				"Consulta d'un document",
+				IntegracioAccioTipusEnumDto.ENVIAMENT,
+				new AccioParam("identificador del document", identificador),
 				new AccioParam("Versio", versio));
-		
+
 		try {
+			identificador = isUuid ? "uuid:" + identificador : "csv:" + identificador;
 			Document documentDetalls = getArxiuPlugin().documentDetalls(
-					arxiuUuid,
+					identificador,
 					versio,
-					false);
+					ambContingut);
 			integracioHelper.addAccioOk(info);
 			return documentDetalls;
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al plugin d'arxiu digital: no s'ha pogut obtenir el codument amb UUID " + arxiuUuid;
+			String errorDescripcio = "Error al plugin d'arxiu digital: no s'ha pogut obtenir el codument amb identificador: " + identificador;
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			throw new SistemaExternException(
 					IntegracioHelper.INTCODI_ARXIU,
@@ -1410,122 +1411,121 @@ public class PluginHelper {
 
 	public RegistreAnnexDto documentToRegistreAnnexDto (DocumentEntity document) {
 		RegistreAnnexDto annex = new RegistreAnnexDto();
+		annex.setTipusDocument(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI);
+		annex.setTipusDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO);
+		annex.setOrigen(RegistreOrigenDtoEnum.ADMINISTRACIO);
+		annex.setData(new Date());
+		annex.setIdiomaCodi("ca");
+
 		if((document.getUuid() != null || document.getCsv() != null) && document.getUrl() == null && document.getContingutBase64() == null) {
-			String id = "";
-			if(document.getUuid() != null) {
-				id = document.getUuid();
+			boolean loadFromArxiu = isReadDocsMetadataFromArxiu() && document.getUuid() != null || document.getCsv() == null;
+			DocumentContingut doc;
+			if(loadFromArxiu) {
 				try {
-					annex.setTipusDocument(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI);
-					annex.setTipusDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO);
-					annex.setOrigen(RegistreOrigenDtoEnum.ADMINISTRACIO);
 					annex.setModeFirma(RegistreModeFirmaDtoEnum.SENSE_FIRMA);
-					annex.setData(new Date());
-					annex.setIdiomaCodi("ca");
-					DocumentContingut doc = arxiuGetImprimible(id, true);
+
+					doc = arxiuGetImprimible(document.getUuid(), true);
 					annex.setArxiuContingut(doc.getContingut());
 					annex.setArxiuNom(doc.getArxiuNom());
 				}catch(ArxiuException ae) {
 					logger.error("Error Obtenint el document per l'uuid");
 				}
-			} else if (document.getCsv() != null){
-				id = document.getCsv();
+
+			} else {
 				try {
-					annex.setTipusDocument(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI);
-					annex.setTipusDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO);
-					annex.setOrigen(RegistreOrigenDtoEnum.ADMINISTRACIO);
 					annex.setModeFirma(RegistreModeFirmaDtoEnum.AUTOFIRMA_SI);
-					annex.setData(new Date());
-					annex.setIdiomaCodi("ca");
-					DocumentContingut doc = arxiuGetImprimible(id, false);
+
+					doc = arxiuGetImprimible(document.getCsv(), false);
 					annex.setArxiuContingut(doc.getContingut());
 					annex.setArxiuNom(doc.getArxiuNom());
 				}catch(ArxiuException ae) {
 					logger.error("Error Obtenint el document per csv");
 				}
 			}
+
 		} else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
 			annex.setNom(document.getUrl());
 			annex.setArxiuNom(document.getArxiuNom());
 			annex.setArxiuContingut(getUrlDocumentContent(document.getUrl()));
-			annex.setTipusDocument(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI);
-			annex.setTipusDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO);
-			annex.setOrigen(RegistreOrigenDtoEnum.ADMINISTRACIO);
 			annex.setModeFirma(RegistreModeFirmaDtoEnum.SENSE_FIRMA);
-			annex.setData(new Date());
-			annex.setIdiomaCodi("ca");
+
 		} else if(document.getContingutBase64() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
 			annex.setArxiuContingut(document.getContingutBase64().getBytes());
 			annex.setArxiuNom(document.getArxiuNom());
-			annex.setTipusDocument(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI);
-			annex.setTipusDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO);
-			annex.setOrigen(RegistreOrigenDtoEnum.ADMINISTRACIO);
 			annex.setModeFirma(RegistreModeFirmaDtoEnum.SENSE_FIRMA);
-			annex.setData(new Date());
-			annex.setIdiomaCodi("ca");
+
 		}
 		/*Llogica de recerca de document*/
 		return annex;
 	}
 	
-	private AnexoWsDto documentToAnexoWs(DocumentEntity document) {
+	private AnexoWsDto documentToAnexoWs(DocumentEntity document, int idx) {
 		try {
+			if (HibernateHelper.isProxy(document))
+				document = HibernateHelper.deproxy(document);
 			AnexoWsDto annex = null;
 			Path path = null;
+
+			// Metadades per defecte (per si no estan emplenades (notificacions antigues)
+			Integer origen = document.getOrigen() != null ? document.getOrigen().getValor() : OrigenEnum.ADMINISTRACIO.getValor();
+			String validezDocumento = document.getValidesa() != null ? document.getValidesa().getValor() : ValidesaEnum.ORIGINAL.getValor();
+			String tipoDocumental = document.getTipoDocumental() != null ? document.getTipoDocumental().getValor() : TipusDocumentalEnum.NOTIFICACIO.getValor();
+			Integer modoFirma = document.getModoFirma() != null ? (document.getModoFirma() ? 1 : 0) : 0;
+
 			if((document.getUuid() != null || document.getCsv() != null) && document.getUrl() == null && document.getContingutBase64() == null) {
 				annex = new AnexoWsDto();
 				String id = "";
-				DocumentContingut doc;
+				DocumentContingut doc = null;
 				Document docDetall = null;
-				if(document.getUuid() != null) {
+				boolean loadFromArxiu = isReadDocsMetadataFromArxiu() && document.getUuid() != null || document.getCsv() == null;
+				if(loadFromArxiu) {
 					id = document.getUuid();
-					doc = arxiuGetImprimible(id, true);
-					annex.setFicheroAnexado(doc.getContingut());
-					annex.setNombreFicheroAnexado(doc.getArxiuNom());
-					docDetall = arxiuDocumentConsultar(id, null);
-
+					docDetall = arxiuDocumentConsultar(id, null, true, true);
+					doc = docDetall.getContingut();
 					if (docDetall != null) {
-//						### START #381
-						if (docDetall.getMetadades().getTipusDocumental() != null) {
-							annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumental().toString());
-						} else if (docDetall.getMetadades().getTipusDocumentalAddicional() != null) {
-							annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumentalAddicional());
-						}
-//						### END #381
-						annex.setOrigenCiudadanoAdmin(docDetall.getMetadades().getOrigen().ordinal());
-						annex.setFechaCaptura(toXmlGregorianCalendar(docDetall.getMetadades().getDataCaptura()));
-
 						// Recuperar csv
 						Map<String, Object> metadadesAddicionals = docDetall.getMetadades().getMetadadesAddicionals();
-						if (metadadesAddicionals != null && metadadesAddicionals.containsKey("csv")) {
-							annex.setCsv((String) metadadesAddicionals.get("csv"));
+						if (metadadesAddicionals != null) {
+							if (metadadesAddicionals.containsKey("csv"))
+								annex.setCsv((String) metadadesAddicionals.get("csv"));
+							else if (metadadesAddicionals.containsKey("eni:csv"))
+								annex.setCsv((String) metadadesAddicionals.get("eni:csv"));
 						}
 					}
-				} else if (document.getCsv() != null){
+				} else {
 					id = document.getCsv();
-					doc = arxiuGetImprimible(id, false);
-					annex.setFicheroAnexado(doc.getContingut());
-					annex.setNombreFicheroAnexado(doc.getArxiuNom());
-					annex.setCsv(document.getCsv());
+					docDetall = arxiuDocumentConsultar(id, null, true, false);
+					if (docDetall != null)
+						doc = docDetall.getContingut();
 
-					annex.setTipoDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO.getValor());
-					annex.setOrigenCiudadanoAdmin(0);
-					annex.setFechaCaptura(toXmlGregorianCalendar(new Date()));
+					annex.setCsv(document.getCsv());
+				}
+
+				annex.setFicheroAnexado(doc.getContingut());
+				annex.setNombreFicheroAnexado(doc.getArxiuNom());
+				if (docDetall != null) {
+					if (docDetall.getMetadades().getTipusDocumental() != null) {
+						annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumental().toString());
+					} else if (docDetall.getMetadades().getTipusDocumentalAddicional() != null) {
+						annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumentalAddicional());
+					}
+					annex.setOrigenCiudadanoAdmin(docDetall.getMetadades().getOrigen().ordinal());
+					annex.setFechaCaptura(toXmlGregorianCalendar(docDetall.getMetadades().getDataCaptura()));
+					annex.setValidezDocumento(estatElaboracioToValidesa(docDetall.getMetadades().getEstatElaboracio()));
+					annex.setModoFirma(getModeFirma(docDetall, doc.getArxiuNom()));
 				}
 				
-				annex.setTipoDocumento(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
-				annex.setValidezDocumento(RegistreValidezDocumentDtoEnum.ORIGINAL.getValor());
-				
-				path = new File(document.getArxiuNom()).toPath(); 
+				path = new File(doc.getArxiuNom()).toPath();
 			}else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
 				annex = new AnexoWsDto();
 				annex.setFicheroAnexado(getUrlDocumentContent(document.getUrl()));
 				annex.setNombreFicheroAnexado(FilenameUtils.getName(document.getUrl()));
-				
+
 				//Metadades
-				annex.setTipoDocumento(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
-				annex.setTipoDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO.getValor());
-				annex.setOrigenCiudadanoAdmin(0);	
-				annex.setValidezDocumento(RegistreValidezDocumentDtoEnum.ORIGINAL.getValor());
+				annex.setTipoDocumental(tipoDocumental);
+				annex.setOrigenCiudadanoAdmin(origen);
+				annex.setValidezDocumento(validezDocumento);
+				annex.setModoFirma(modoFirma);
 				annex.setFechaCaptura(toXmlGregorianCalendar(new Date()));
 				path = new File(FilenameUtils.getName(document.getUrl())).toPath();
 			}else if(document.getArxiuGestdocId() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
@@ -1539,12 +1539,12 @@ public class PluginHelper {
 				annex.setNombreFicheroAnexado(document.getArxiuNom());
 
 				//Metadades
-				annex.setTipoDocumento(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
-				annex.setTipoDocumental(RegistreTipusDocumentalDtoEnum.NOTIFICACIO.getValor());
-				annex.setOrigenCiudadanoAdmin(0);	
-				annex.setValidezDocumento(RegistreValidezDocumentDtoEnum.ORIGINAL.getValor());
+				annex.setTipoDocumental(tipoDocumental);
+				annex.setOrigenCiudadanoAdmin(origen);
+				annex.setValidezDocumento(validezDocumento);
+				annex.setModoFirma(modoFirma);
 				annex.setFechaCaptura(toXmlGregorianCalendar(new Date()));
-				
+
 				path = new File(document.getArxiuNom()).toPath();
 			}
 			try {
@@ -1552,8 +1552,8 @@ public class PluginHelper {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			annex.setTitulo("Annex 1");
-			annex.setModoFirma(0);
+			annex.setTitulo("Annex " + idx);
+			annex.setTipoDocumento(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
 			return annex;
 		} catch (Exception ex) {
 			throw new SistemaExternException(
@@ -1562,7 +1562,30 @@ public class PluginHelper {
 					ex.getCause());
 		}
 	}
-	
+
+	private String estatElaboracioToValidesa(DocumentEstatElaboracio estatElaboracio) {
+		if (estatElaboracio == null)
+			return ValidesaEnum.ORIGINAL.getValor();	// Valor per defecte
+		switch (estatElaboracio) {
+			case COPIA_CF:
+			case COPIA_DP:
+			case COPIA_PR:
+				return ValidesaEnum.COPIA_AUTENTICA.getValor();
+			case ALTRES:
+				return ValidesaEnum.COPIA.getValor();
+			case ORIGINAL:
+			default:
+				return ValidesaEnum.ORIGINAL.getValor();
+		}
+	}
+	private Integer getModeFirma(Document document, String nom) {
+		Integer modeFirma = 0;
+		if (nom != null && nom.toLowerCase().endsWith("pdf") &&
+				(document.getFirmes() != null && !document.getFirmes().isEmpty()))
+			modeFirma = 1;
+		return modeFirma;
+	}
+
 	public byte[] getUrlDocumentContent(String urlPath) throws SistemaExternException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		InputStream is = null;
@@ -1826,7 +1849,19 @@ public class PluginHelper {
 			registre.getInteresados().add(personaToRepresentanteEInteresadoWs(enviament.getTitular(), destinatari));	
 		}
 		if(notificacio.getDocument() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument()));
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument(), 1));
+		}
+		if(notificacio.getDocument2() != null) {
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument2(), 2));
+		}
+		if(notificacio.getDocument3() != null) {
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument3(), 3));
+		}
+		if(notificacio.getDocument4() != null) {
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument4(), 4));
+		}
+		if(notificacio.getDocument5() != null) {
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument5(), 5));
 		}
 		return registre;
 	}
@@ -1943,7 +1978,19 @@ public class PluginHelper {
 						enviament.getTitular(), 
 						destinatari));
 		if(notificacio.getDocument() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument()));
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument(), 1));
+		}
+		if(notificacio.getDocument2() != null) {
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument2(), 2));
+		}
+		if(notificacio.getDocument3() != null) {
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument3(), 3));
+		}
+		if(notificacio.getDocument4() != null) {
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument4(), 4));
+		}
+		if(notificacio.getDocument5() != null) {
+			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument5(), 5));
 		}
 		return registre;
 	}
@@ -2195,7 +2242,30 @@ public class PluginHelper {
 		}
 		return interessat;
 	}
-	
+	public void addOficinaAndLlibreRegistre(NotificacioEntity notificacio){
+		DadesOficina dadesOficina = new DadesOficina();
+		String dir3Codi;
+
+		if (notificacio.getEntitat().getDir3CodiReg() != null) {
+			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
+		} else {
+			dir3Codi = notificacio.getEmisorDir3Codi();
+		}
+		try {
+			setOficina(
+					notificacio,
+					dadesOficina,
+					dir3Codi);
+		} catch (RegistrePluginException e) {}
+
+		try {
+			setLlibre(
+					notificacio,
+					dadesOficina,
+					dir3Codi);
+		} catch (RegistrePluginException e) {}
+	}
+
 	private void setOficina(
 			NotificacioEntity notificacio,
 			DadesOficina dadesOficina,
@@ -2221,6 +2291,9 @@ public class PluginHelper {
 		if (dadesOficina.getOficinaCodi() == null) {
 			throw new RegistrePluginException("No hi ha definida cap oficina per realitzar el registre");
 		}
+
+		// Associam la oficina amb l'entitat de la notificació
+		notificacio.setRegistreOficinaNom(dadesOficina.getOficinaNom());
 	}
 	
 	private void setLlibre(
@@ -2267,7 +2340,9 @@ public class PluginHelper {
 		if (dadesOficina.getLlibreCodi() == null) {
 			throw new RegistrePluginException("No hi ha definit cap llibre per realitzar el registre");
 		}
-		
+
+		// Associam el llibre amb l'entitat de la notificació
+		notificacio.setRegistreLlibreNom(dadesOficina.getLlibreNom());
 	}
 	
 	public static DocumentBuilder getDocumentBuilder() throws Exception {
@@ -2631,7 +2706,10 @@ public class PluginHelper {
 				
 		return tipus;
 	}
-	
+	public boolean isReadDocsMetadataFromArxiu() {
+		return PropertiesHelper.getProperties().getAsBoolean(
+				"es.caib.notib.documents.metadades.from.arxiu", false);
+	}
 	public void setDadesUsuariPlugin(DadesUsuariPlugin dadesUsuariPlugin) {
 		this.dadesUsuariPlugin = dadesUsuariPlugin;
 	}

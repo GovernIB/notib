@@ -53,7 +53,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"where (og.entitat = :entitat)" +
 			" and (:isCodiNull = true or lower(og.codi) like lower('%'||:codi||'%'))" +
 			" and (:isNomNull = true or lower(og.nom) like lower('%'||:nom||'%'))" +
-			" and (:isOficinaNull = true or lower(og.entitat.oficina) like lower('%'||:oficina||'%'))")
+			" and (:isOficinaNull = true or lower(og.oficina) like lower('%'||:oficina||'%'))")
 	public Page<OrganGestorEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("isCodiNull") boolean isCodiNull,

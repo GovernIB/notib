@@ -65,10 +65,6 @@
 			jndi-name="notib/UsuariAplicacioServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.UsuariAplicacioService"/>
 	<jee:local-slsb
-			id="notificacioServiceWs"
-			jndi-name="notib/NotificacioServiceWsBean/local"
-			business-interface="es.caib.notib.core.api.ws.notificacio.NotificacioServiceWs"/>
-	<jee:local-slsb
 			id="notificacioServiceWsV2"
 			jndi-name="notib/NotificacioServiceWsBeanV2/local"
 			business-interface="es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2"/>

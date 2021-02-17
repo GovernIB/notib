@@ -64,6 +64,11 @@ public class OrganGestorController extends BaseUserController{
 		model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
 		model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 		model.addAttribute("setOficina", !entitat.isOficinaEntitat());
+		model.addAttribute("oficinesEntitat",
+				organGestorService.getOficinesSIR(
+						entitat.getId(), 
+						entitat.getDir3Codi(), 
+						true));
 		return "organGestorList";
 	}
 	
@@ -296,9 +301,10 @@ public class OrganGestorController extends BaseUserController{
 		Model model,
 		@PathVariable String organGestorDir3Codi) {
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		return organGestorService.getOficinesOrganisme(
+		return organGestorService.getOficinesSIR(
 				entitat.getId(),
-				organGestorDir3Codi);
+				organGestorDir3Codi,
+				false);
 	}
 	
 	private OrganGestorFiltreCommand getFiltreCommand(

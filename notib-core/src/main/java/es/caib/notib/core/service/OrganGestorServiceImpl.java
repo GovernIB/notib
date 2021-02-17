@@ -1,21 +1,25 @@
 package es.caib.notib.core.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Resource;
-import javax.xml.bind.ValidationException;
-
+import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.exception.NoPermisosException;
-import es.caib.notib.core.entity.*;
+import es.caib.notib.core.api.exception.SistemaExternException;
+import es.caib.notib.core.api.service.OrganGestorService;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.GrupEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.entity.PagadorCieEntity;
+import es.caib.notib.core.entity.PagadorPostalEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.ProcedimentOrganEntity;
 import es.caib.notib.core.helper.*;
+import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.notib.core.repository.GrupRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
+import es.caib.notib.core.repository.PagadorCieRepository;
+import es.caib.notib.core.repository.PagadorPostalRepository;
+import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.plugin.unitat.NodeDir3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,17 +31,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.codahale.metrics.Timer;
-
-import es.caib.notib.core.api.exception.SistemaExternException;
-import es.caib.notib.core.api.service.OrganGestorService;
-import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.notib.core.repository.GrupRepository;
-import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.PagadorCieRepository;
-import es.caib.notib.core.repository.PagadorPostalRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
-import es.caib.notib.plugin.unitat.NodeDir3;
+import javax.annotation.Resource;
+import javax.xml.bind.ValidationException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementació del servei de gestió de òrgans gestors.
@@ -98,8 +101,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					entitat,
 					dto.getLlibre(),
 					dto.getLlibreNom(),
-					dto.getOficina().getCodi(),
-					dto.getOficina().getNom()).build();
+					dto.getOficina() != null ? dto.getOficina().getCodi() : null,
+					dto.getOficina() != null ? dto.getOficina().getNom() : null).build();
 			return conversioTipusHelper.convertir(
 					organGestorRepository.save(organGestor),
 					OrganGestorDto.class);
@@ -288,7 +291,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			mapeigPropietatsOrdenacio.put("llibreCodiNom", new String[] {"llibre"});
-			mapeigPropietatsOrdenacio.put("oficinaNom", new String[] {"entitat.oficina"});
+			//mapeigPropietatsOrdenacio.put("oficina", new String[] {"entitat.oficina"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 			
 			Page<OrganGestorEntity> organs = null;
@@ -869,9 +872,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
     @Override
 	@Transactional(readOnly = true)
-	public List<OficinaDto> getOficinesOrganisme(
+	public List<OficinaDto> getOficinesSIR(
 			Long entitatId,
-			String organGestorDir3Codi) {
+			String dir3codi,
+			boolean isFiltre) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
@@ -881,12 +885,16 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					false);
 			List<OficinaDto> oficines = new ArrayList<OficinaDto>();
 			try {
-				Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
-				oficines = cacheHelper.getOficinesSIRUnitat(
-						arbreUnitats,
-						organGestorDir3Codi);
+				if (!isFiltre) {
+					Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
+					oficines = cacheHelper.getOficinesSIRUnitat(
+							arbreUnitats,
+							dir3codi);
+				} else {
+					oficines = cacheHelper.getOficinesSIREntitat(dir3codi);
+				}
 	 		} catch (Exception e) {
-	 			String errorMessage = "No s'han pogut recuperar les oficines SIR de l'òrgan gestor: " + organGestorDir3Codi;
+	 			String errorMessage = "No s'han pogut recuperar les oficines SIR [dir3codi=" + dir3codi + "]";
 				logger.error(
 						errorMessage, 
 						e.getMessage());

@@ -30,7 +30,6 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private Integer retard;
 	protected int notificaEnviamentIntent;
 	private Date caducitat;
-	private DocumentDto document;
 	private String csv_uuid;
 	private ProcedimentDto procediment;
 	private String procedimentCodiNotib;
@@ -52,10 +51,20 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private Date notificaEnviamentData;
 	private Date notificaEnviamentNotificaData;
 	private IdiomaEnumDto idioma;
+
+	private DocumentDto document;
+	private DocumentDto document2;
+	private DocumentDto document3;
+	private DocumentDto document4;
+	private DocumentDto document5;
 	
 	private boolean errorLastEvent;
 	private boolean hasEnviamentsPendents;
-	
+
+
+	private String registreLlibreNom;
+	private String registreOficinaNom;
+
 	public boolean isNotificaError() {
 		return notificaErrorData != null;
 	}

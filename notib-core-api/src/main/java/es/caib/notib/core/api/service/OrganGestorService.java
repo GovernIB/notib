@@ -122,14 +122,21 @@ public interface OrganGestorService {
 			String organGestorDir3Codi);
 	
 	/**
-	 * Recupera les oficines SIR d'un òrgan gestor (anomenat organisme dins Regweb)
+	 * Recupera les oficines SIR d'un òrgan gestor / entitat (anomenat organisme dins Regweb)
 	 * 
-	 * @return La llista dels codis d'assumpte.
+	 * @param entitatId 
+	 * 					Entitat actual
+	 * @param dir3codi
+	 * 					Codi DIR3 de l'òrgan gestor / entitat del qual es volen recuperar les oficines
+	 * @param isFiltre
+	 * 					Indicar si la cerca és per emplenar un filtre
+	 * @return La llista de les oficines
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<OficinaDto> getOficinesOrganisme(
+	public List<OficinaDto> getOficinesSIR(
 			Long entitatId,
-			String organGestorDir3Codi);
+			String dir3codi,
+			boolean isFiltre);
 	
 	/**
 	 * Recupera els òrgans sobre els quals té permís l'usuari actual

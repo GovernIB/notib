@@ -202,7 +202,13 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"	or (:esOrgansGestorsCodisNotib = false and n.notificacio.organGestor.codi is not null and n.notificacio.organGestor.codi in (:organsGestorsCodisNotib)) " +						// Té permís sobre l'òrgan
 			"   or ((n.notificacio.procedimentCodiNotib is null or n.notificacio.procediment.comu = true) and n.notificacio.usuariCodi = :usuariCodi)" +
 			"   or (:esProcedimentOrgansIdsNotibNull = false and n.notificacio.procedimentOrgan is not null and n.notificacio.procedimentOrgan.id in (:procedimentOrgansIdsNotib))) " +							// És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
-			"and (n.notificacio.grupCodi = null or (n.notificacio.grupCodi in (:grupsProcedimentCodisNotib))) ")
+			"and (n.notificacio.grupCodi = null or (n.notificacio.grupCodi in (:grupsProcedimentCodisNotib))) " +
+			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
+			"	(:hasZeronotificaEnviamentIntent = true and n.notificacio.registreEnviamentIntent = 0) or " +
+			"	(:hasZeronotificaEnviamentIntent = false and n.notificacio.registreEnviamentIntent > 0) " +
+			") " +
+			"and (:nomesSenseErrors = false or n.notificacio.notificaErrorEvent is null) " +
+			"and (:nomesAmbErrors = false or n.notificacio.notificaErrorEvent is not null)")
 	Page<NotificacioEnviamentEntity> findByNotificacio(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
 			@Param("codiProcediment") String codiProcediment,
@@ -262,6 +268,10 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("procedimentOrgansIdsNotib") List<Long> procedimentOrgansIdsNotib,
 			@Param("grupsProcedimentCodisNotib") List<String> grupsProcedimentCodisNotib,
 			@Param("usuariCodi") String usuariCodi,
+			@Param("nomesAmbErrors") boolean nomesAmbErrors,
+			@Param("nomesSenseErrors") boolean nomesSenseErrors,
+			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
+			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			Pageable pageable);
 	
 	@Query(	"from" +
@@ -293,7 +303,13 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:esDataRegistreIniciNull = true or n.notificacio.registreData >= :dataRegistreInici) " +
 			"and (:esDataRegistreFiNull = true or n.notificacio.registreData <= :dataRegistreFi) " +
 			"and ((:esProcedimentsCodisNotibNull = false and n.notificacio.procedimentCodiNotib is not null and n.notificacio.procedimentCodiNotib in (:procedimentsCodisNotib)) " +
-			"   or (n.notificacio.procedimentCodiNotib is null and n.notificacio.organGestor is not null and n.notificacio.organGestor.codi in (:organs))) ")
+			"   or (n.notificacio.procedimentCodiNotib is null and n.notificacio.organGestor is not null and n.notificacio.organGestor.codi in (:organs))) " +
+			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
+			"	(:hasZeronotificaEnviamentIntent = true and n.notificacio.registreEnviamentIntent = 0) or " +
+			"	(:hasZeronotificaEnviamentIntent = false and n.notificacio.registreEnviamentIntent > 0) " +
+			") " +
+			"and (:nomesSenseErrors = false or n.notificacio.notificaErrorEvent is null) " +
+			"and (:nomesAmbErrors = false or n.notificacio.notificaErrorEvent is not null)")
 	Page<NotificacioEnviamentEntity> findByNotificacio(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
 			@Param("codiProcediment") String codiProcediment,
@@ -348,9 +364,15 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("esProcedimentsCodisNotibNull") boolean esProcedimentsCodisNotibNull,
 			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
 			@Param("organs") List<String> organs,
+			@Param("nomesAmbErrors") boolean nomesAmbErrors,
+			@Param("nomesSenseErrors") boolean nomesSenseErrors,
+			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
+			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			Pageable pageable);
 	
-	@Query(	"from" +
+	@Query(	"select" +
+			"	n " +
+			"from" +
 			"    NotificacioEnviamentEntity n " +
 			"where " +
 			"    (:esDataEnviamentIniciNull = true or n.createdDate >= :dataEnviamentInici) " +
@@ -377,7 +399,13 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"and (:isUsuariNull = true or n.notificacio.usuariCodi like lower('%'||:usuari||'%')) "+
 			"and (:isNumeroRegistreNull = true or n.notificacio.registreNumero like lower('%'||:numeroRegistre||'%')) "+
 			"and (:esDataRegistreIniciNull = true or n.notificacio.registreData >= :dataRegistreInici) " +
-			"and (:esDataRegistreFiNull = true or n.notificacio.registreData <= :dataRegistreFi)")
+			"and (:esDataRegistreFiNull = true or n.notificacio.registreData <= :dataRegistreFi)" +
+			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
+			"	(:hasZeronotificaEnviamentIntent = true and n.notificacio.registreEnviamentIntent = 0) or " +
+			"	(:hasZeronotificaEnviamentIntent = false and n.notificacio.registreEnviamentIntent > 0) " +
+			") " +
+			"and (:nomesSenseErrors = false or n.notificacio.notificaErrorEvent is null) " +
+			"and (:nomesAmbErrors = false or n.notificacio.notificaErrorEvent is not null)")
 	Page<NotificacioEnviamentEntity> findByNotificacio(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
 			@Param("codiProcediment") String codiProcediment,
@@ -429,6 +457,10 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("dataRegistreInici") Date dataRegistreInici,
 			@Param("esDataRegistreFiNull") boolean esDataRegistreFiNull,
 			@Param("dataRegistreFi") Date dataRegistreFi,
+			@Param("nomesAmbErrors") boolean nomesAmbErrors,
+			@Param("nomesSenseErrors") boolean nomesSenseErrors,
+			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
+			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			Pageable pageable);
 	
 	@Query(	"from" +

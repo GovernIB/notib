@@ -310,7 +310,7 @@ public class ProcedimentHelper {
 			return;
 		}
 		
-		ProcedimentEntity procediment = procedimentRepository.findByCodi(procedimentGda.getCodi());
+		ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(procedimentGda.getCodi(), entitat);
 		if (procediment != null) {
 			// Si no s'ha modificat des de la última actualització, no es fa res
 			if (procediment.getUltimaActualitzacio() != null && procedimentGda.getUltimaActualitzacio() != null && 

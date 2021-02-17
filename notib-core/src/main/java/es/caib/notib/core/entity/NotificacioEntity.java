@@ -11,6 +11,7 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -155,6 +156,31 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@JoinColumn(name = "document_id")
 	@ForeignKey(name = "not_document_notificacio_fk")
 	protected DocumentEntity document;
+
+	/*document*/
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "document2_id")
+	@ForeignKey(name = "not_document_notificacio_fk")
+	protected DocumentEntity document2;
+
+	/*document*/
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "document3_id")
+	@ForeignKey(name = "not_document_notificacio_fk")
+	protected DocumentEntity document3;
+
+	/*document*/
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "document4_id")
+	@ForeignKey(name = "not_document_notificacio_fk")
+	protected DocumentEntity document4;
+
+	/*document*/
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "document5_id")
+	@ForeignKey(name = "not_document_notificacio_fk")
+	protected DocumentEntity document5;
+
 	
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "organ_gestor", referencedColumnName = "codi")
@@ -174,7 +200,14 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	protected Set<NotificacioEventEntity> events = new LinkedHashSet<NotificacioEventEntity>();
-	
+
+	@Setter
+	@Column(name = "registre_oficina_nom")
+	private String registreOficinaNom;
+
+	@Setter
+	@Column(name = "registre_llibre_nom")
+	private String registreLlibreNom;
 
 	@Transient
 	protected boolean permisProcessar;
@@ -307,6 +340,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String numExpedient,
 			TipusUsuariEnumDto tipusUsuari,
 			DocumentEntity document,
+			DocumentEntity document2,
+			DocumentEntity document3,
+			DocumentEntity document4,
+			DocumentEntity document5,
 			ProcedimentOrganEntity procedimentOrgan,
 			IdiomaEnumDto idioma) {
 		this.entitat = entitat;
@@ -326,6 +363,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		this.numExpedient = numExpedient;
 		this.tipusUsuari = tipusUsuari;
 		this.document = document;
+		this.document2 = document2;
+		this.document3 = document3;
+		this.document4 = document4;
+		this.document5 = document5;
 		this.procedimentOrgan = procedimentOrgan;
 		this.idioma = idioma;
 		
@@ -451,6 +492,22 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		}
 		public BuilderV2 document(DocumentEntity document) {
 			built.document = document;
+			return this;
+		}
+		public BuilderV2 document2(DocumentEntity document2) {
+			built.document2 = document2;
+			return this;
+		}
+		public BuilderV2 document3(DocumentEntity document3) {
+			built.document3 = document3;
+			return this;
+		}
+		public BuilderV2 document4(DocumentEntity document4) {
+			built.document4 = document4;
+			return this;
+		}
+		public BuilderV2 document5(DocumentEntity document5) {
+			built.document5 = document5;
 			return this;
 		}
 		public NotificacioEntity build() {

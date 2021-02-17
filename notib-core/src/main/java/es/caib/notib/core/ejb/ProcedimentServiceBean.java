@@ -3,18 +3,16 @@
  */
 package es.caib.notib.core.ejb;
 
-import java.util.List;
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.service.ProcedimentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
-
-import es.caib.notib.core.api.dto.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.service.ProcedimentService;
+import java.util.List;
 
 /**
  * Implementació de ProcedimentService com a EJB que empra una clase
@@ -334,7 +332,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
     @Override
-	@RolesAllowed({"tothom"})
+    @RolesAllowed({"NOT_ADMIN", "tothom"})
     public List<CodiValorComuDto> getProcedimentsOrgan(
 			Long entitatId,
 			String organCodi,
@@ -362,7 +360,10 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	public void actualitzaProcediments(EntitatDto entitat) {
 		delegate.actualitzaProcediments(entitat);
 	}
-
+	@Override
+	public boolean isUpdatingProcediments(EntitatDto entitatDto) {
+		return delegate.isUpdatingProcediments(entitatDto);
+	}
 	@Override
 	public ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi) {
 		return delegate.getProgresActualitzacio(dir3Codi);

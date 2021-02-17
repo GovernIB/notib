@@ -1,11 +1,10 @@
 package es.caib.notib.core.api.service;
 
-import java.util.List;
-
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.notib.core.api.exception.NotFoundException;
+import java.util.List;
 
 /**
  * Declaració dels mètodes per a la consulta dels procediments associats a una entitat
@@ -399,7 +398,7 @@ public interface ProcedimentService {
 			List<String> grups,
 			PermisEnum permis);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	List<CodiValorComuDto> getProcedimentsOrgan(
 			Long entitatId,
 			String organCodi,
@@ -428,5 +427,14 @@ public interface ProcedimentService {
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi);
+
+	/**
+	 * Consulta si existeix un procés en curs actualitzant els procediments de l'entitat indicada.
+	 *
+	 * @param entitatDto Entitat que es vol consultar
+	 * @return boolean indicant si existeix un procés en segon pla actualitzant els procediements de l'entitat indicada.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	boolean isUpdatingProcediments(EntitatDto entitatDto);
 
 }

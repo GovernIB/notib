@@ -179,6 +179,9 @@
     background-color: #ddd;
     cursor: not-allowed;
 }
+.select2-results .select2-results__option[aria-disabled="true"] {
+    display: none;
+}
 #tooltip {
     position: absolute;
     border: 1px solid #ffeeba;
@@ -189,253 +192,436 @@
     display: none;
 }
 </style>
+</head>
+<body>
 <script type="text/javascript">
 
 
 
-var interessatsTipus = new Array();
-var interessatTipusOptions = "";
-<c:forEach items="${interessatTipus}" var="it" varStatus="status">
-   	interessatTipusOptions = interessatTipusOptions + "<option value=${it.value}" + (${status.index == 0} ? " selected='selected'" : "") + "><spring:message code='${it.text}'/></option>";
-</c:forEach>
+	var interessatsTipus = new Array();
+	var interessatTipusOptions = "";
+	var numDocuments = 1;
+	<c:forEach items="${interessatTipus}" var="it" varStatus="status">
+	interessatTipusOptions = interessatTipusOptions + "<option value=${it.value}" + (${status.index == 0} ? " selected='selected'" : "") + "><spring:message code='${it.text}'/></option>";
+	</c:forEach>
+	var msgInfoDoc = "<spring:message code='notificacio.for.camp.document.avis'/>";
+	var msgInfoDocSir = "<spring:message code='notificacio.for.camp.document.avis.sir'/>";
+	var locale = "${requestLocale}";
 
-$(document).ready(function() {
-	
-	
-	$(document).on('change','select.paisos', function() {
-		var provincia = $(this).closest("#entregaPostal").find("select[class*='provincies']");
-		var poblacioSelect = $(this).closest("#entregaPostal").find("div[class*='poblacioSelect']");
-		var poblacioText = $(this).closest("#entregaPostal").find("div[class*='poblacioText']");
-		if ($(this).val() != 'ES') {
-			$(poblacioSelect).addClass('hidden');
-			$(poblacioText).removeClass('hidden');
-			$(provincia).prop('disabled', 'disabled');
-			$(provincia).parent().parent().addClass('hidden');
-		} else {
-			$(poblacioSelect).removeClass('hidden');
-			$(poblacioText).addClass('hidden');
-			$(provincia).removeAttr('disabled');
-			$(provincia).parent().parent().removeClass('hidden');
-		}
-	});
-	
-	var tipusDocumentDefault = $('#tipusDocumentDefault').val();
-	var tipusDocumentSelected = $('#tipusDocumentSelected').val();
-	$('.customSelect').webutilInputSelect2(null);
+	$(document).ready(function() {
 
-	if (tipusDocumentSelected != '') {
-		$(".customSelect").val(tipusDocumentSelected).trigger("change");
-	} else if (tipusDocumentDefault != '') {
-		$(".customSelect").val(tipusDocumentDefault).trigger("change");
-		
-		if (tipusDocumentDefault == 'CSV') {
-			$('#documentArxiuCsv').val("${nomDocument}");
-		} else if (tipusDocumentDefault == 'UUID') {
-			$('#documentArxiuUuid').val("${nomDocument}");
-		} else if (tipusDocumentDefault == 'URL') {
-			$('#documentArxiuUrl').val("${nomDocument}");
-		}
-	}
 
-	$(document).on('change','select.enviamentTipus', function() {
-		var dadesNormalitzat = $(this).closest("#entregaPostal").find("div[class*='normalitzat']");
-		var dadesSenseNormalitzar = $(this).closest("#entregaPostal").find("div[class*='senseNormalitzar']");
-		
-		if ($(this).val() == 'SENSE_NORMALITZAR') {
-			$(dadesNormalitzat).addClass('hidden');
-			$(dadesSenseNormalitzar).removeClass('hidden');
-		} else {
-			$(dadesNormalitzat).removeClass('hidden');
-			$(dadesSenseNormalitzar).addClass('hidden');
+		$(document).on('change','select.paisos', function() {
+			var provincia = $(this).closest("#entregaPostal").find("select[class*='provincies']");
+			var poblacioSelect = $(this).closest("#entregaPostal").find("div[class*='poblacioSelect']");
+			var poblacioText = $(this).closest("#entregaPostal").find("div[class*='poblacioText']");
+			if ($(this).val() != 'ES') {
+				$(poblacioSelect).addClass('hidden');
+				$(poblacioText).removeClass('hidden');
+				$(provincia).prop('disabled', 'disabled');
+				$(provincia).parent().parent().addClass('hidden');
+			} else {
+				$(poblacioSelect).removeClass('hidden');
+				$(poblacioText).addClass('hidden');
+				$(provincia).removeAttr('disabled');
+				$(provincia).parent().parent().removeClass('hidden');
+			}
+		});
+
+		var document_0_arxiuNom = $('input[name="documents\\[0\\].arxiuNom"').val();
+		var document_1_arxiuNom = $('input[name="documents\\[1\\].arxiuNom"').val();
+		var document_2_arxiuNom = $('input[name="documents\\[2\\].arxiuNom"').val();
+		var document_3_arxiuNom = $('input[name="documents\\[3\\].arxiuNom"').val();
+		var document_4_arxiuNom = $('input[name="documents\\[4\\].arxiuNom"').val();
+
+		var tipusDocumentDefault = [
+			$('#tipusDocumentDefault0').val(),
+			$('#tipusDocumentDefault1').val(),
+			$('#tipusDocumentDefault2').val(),
+			$('#tipusDocumentDefault3').val(),
+			$('#tipusDocumentDefault4').val(),
+		];
+
+		var tipusDocumentSelected = [
+			$('#tipusDocumentSelected_0').val(),
+			$('#tipusDocumentSelected_1').val(),
+			$('#tipusDocumentSelected_2').val(),
+			$('#tipusDocumentSelected_3').val(),
+			$('#tipusDocumentSelected_4').val()
+		];
+
+		$('.customSelect').webutilInputSelect2(null);
+
+		if (tipusDocumentSelected[0] != '') {
+			$("#tipusDocument_0").val(tipusDocumentSelected[0]).trigger("change");
+			$("#document").removeClass("hidden");
+		} else if (tipusDocumentDefault[0] != '') {
+			$("#tipusDocument_0").val(tipusDocumentDefault[0]).trigger("change");
+			if (tipusDocumentDefault[0] == 'CSV') {
+				$('#documentArxiuCsv\\[0\\]').val("${nomDocument_0}");
+			} else if (tipusDocumentDefault[0] == 'UUID') {
+				$('#documentArxiuUuid\\[0\\]').val("${nomDocument_0}");
+			} else if (tipusDocumentDefault[0] == 'URL') {
+				$('#documentArxiuUrl\\[0\\]').val("${nomDocument_0}");
+			}
 		}
-	});
-	
-	
-	$('input[name="arxiu"]').change(function(){
-		var arxiuGestdocId = $('input[name="document.arxiuGestdocId"]');
-		var arxiuNom = $('input[name="document.arxiuNom"]');
-		if($(this).val() == ''){
-			arxiuGestdocId.val("");
-			arxiuNom.val("");
-		}else if($(this).val() != '' && $(this).val() != arxiuNom){
-			arxiuGestdocId.val("");
-			arxiuNom.val("");
-		}	  
-	});
-	
-	var numPlus = 1;
-	
-    $(".container-envios").find('.enviamentsForm').each(function() {
-    	if($(this).find('.eliminar_enviament').attr('id') != 'enviamentDelete_0') {
-    		$(this).find('.eliminar_enviament').removeClass('hidden');
-    	}
-    });
+
+		if (tipusDocumentSelected[1] != '') {
+			$("#tipusDocument_1").val(tipusDocumentSelected[1]).trigger("change");
+			$("#document2").removeClass("hidden");
+			numDocuments = 2;
+		} else if (tipusDocumentDefault[1] != '' && document_1_arxiuNom != '') {
+			$("#tipusDocument_1").val(tipusDocumentDefault[1]).trigger("change");
+			if (tipusDocumentDefault[1] == 'CSV') {
+				$('#documentArxiuCsv_1').val("${nomDocument_1}");
+			} else if (tipusDocumentDefault[1] == 'UUID') {
+				$('#documentArxiuUuid_1').val("${nomDocument_1}");
+			} else if (tipusDocumentDefault[1] == 'URL') {
+				$('#documentArxiuUrl_1').val("${nomDocument_1}");
+			}
+
+			$("#tipusDocument_1").val(tipusDocumentDefault[1]).trigger("change");
+			$("#document2").removeClass("hidden");
+			numDocuments = 2;
+		}
+		if (tipusDocumentSelected[2] != '') {
+			$("#tipusDocument_2").val(tipusDocumentSelected[2]).trigger("change");
+			$("#document3").removeClass("hidden");
+			numDocuments = 3;
+		} else if (tipusDocumentDefault[2] != '' && document_2_arxiuNom != '') {
+			if (tipusDocumentDefault[2] == 'CSV') {
+				$('#documentArxiuCsv_2').val("${nomDocument_2}");
+			} else if (tipusDocumentDefault[2] == 'UUID') {
+				$('#documentArxiuUuid_2').val("${nomDocument_2}");
+			} else if (tipusDocumentDefault[2] == 'URL') {
+				$('#documentArxiuUrl_2').val("${nomDocument_2}");
+			}
+			$("#tipusDocument_2").val(tipusDocumentDefault[2]).trigger("change");
+			$("#document3").removeClass("hidden");
+			numDocuments = 3;
+		}
+		if (tipusDocumentSelected[3] != '') {
+			$("#tipusDocument_3").val(tipusDocumentSelected[3]).trigger("change");
+			$("#document4").removeClass("hidden");
+			numDocuments = 4;
+		} else if (tipusDocumentDefault[3] != '' && document_3_arxiuNom != '') {
+			if (tipusDocumentDefault[3] == 'CSV') {
+				$('#documentArxiuCsv_3').val("${nomDocument_3}");
+			} else if (tipusDocumentDefault[3] == 'UUID') {
+				$('#documentArxiuUuid_3').val("${nomDocument_3}");
+			} else if (tipusDocumentDefault[3] == 'URL') {
+				$('#documentArxiuUrl_3').val("${nomDocument_3}");
+			}
+			$("#tipusDocument_3").val(tipusDocumentDefault[3]).trigger("change");
+			$("#document4").removeClass("hidden");
+			numDocuments = 4;
+		}
+		if (tipusDocumentSelected[4] != '') {
+			$("#tipusDocument_4").val(tipusDocumentSelected[4]).trigger("change");
+			$("#document5").removeClass("hidden");
+			numDocuments = 5;
+		} else if (tipusDocumentDefault[4] != '' && document_4_arxiuNom != '') {
+			if (tipusDocumentDefault[4] == 'CSV') {
+				$('#documentArxiuCsv_4').val("${nomDocument_4}");
+			} else if (tipusDocumentDefault[4] == 'UUID') {
+				$('#documentArxiuUuid_4').val("${nomDocument_4}");
+			} else if (tipusDocumentDefault[4] == 'URL') {
+				$('#documentArxiuUrl_4').val("${nomDocument_4}");
+			}
+			$("#tipusDocument_4").val(tipusDocumentDefault[4]).trigger("change");
+			$("#document5").removeClass("hidden");
+			numDocuments = 5;
+		}
+
+		$('#addDocument').click(function() {
+			$("#tipusDocument_" + numDocuments).val(tipusDocumentDefault[numDocuments]).trigger("change");
+			$('#document' + (numDocuments + 1)).removeClass('hidden');
+			numDocuments++;
+			if (numDocuments == 5)
+				$('#addDocument').addClass('hidden');
+			$('#removeDocument').removeClass('hidden');
+		});
+
+		$('#removeDocument').click(function() {
+			$('#document' + numDocuments).addClass('hidden');
+			var documentFields = numDocuments - 1;
+			
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].id"]').val('');
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].arxiuGestdocId"]').val('');
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].arxiuNom"]').val('');
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].mediaType"]').val('');
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].mida"]').val('');
+			numDocuments--;
+			$('#tipusDocument_' + numDocuments).val('').trigger('change');
+
+			if (numDocuments == 1)
+				$('#removeDocument').addClass('hidden');
+			$('#addDocument').removeClass('hidden');
+		});
+
+		$('.tipusDocument').on('change', function() {
+			let id = $(this).attr("id").split("_")[1];
+			if ($(this).val() == 'CSV') {
+				// $('#metadades').removeClass('hidden');
+				$('#input-origen-csv_' + id).removeClass('hidden');
+				$('#input-origen-uuid_' + id).addClass('hidden');
+				$('#documentArxiuUuid\\[' + id + '\\]').val('');
+				$('#input-origen-url_' + id).addClass('hidden');
+				$('#documentArxiuUrl\\[' + id + '\\]').val('');
+				$('#input-origen-arxiu_' + id).addClass('hidden');
+				$('#arxiu\\[' + id + '\\]').val('');
+				$('#metadades_' + id).addClass('hidden');
+			} else if ($(this).val() == 'UUID') {
+				$('#input-origen-csv_' + id).addClass('hidden');
+				$('#documentArxiuCsv\\[' + id + '\\]').val('');
+				$('#input-origen-uuid_' + id).removeClass('hidden');
+				$('#input-origen-url_' + id).addClass('hidden');
+				$('#documentArxiuUrl\\[' + id + '\\]').val('');
+				$('#input-origen-arxiu_' + id).addClass('hidden');
+				$('#arxiu\\[' + id + '\\]').val('');
+				$('#metadades_' + id).addClass('hidden');
+			} else if ($(this).val() == 'URL') {
+				$('#input-origen-csv_' + id).addClass('hidden');
+				$('#documentArxiuCsv\\[' + id + '\\]').val('');
+				$('#input-origen-uuid_' + id).addClass('hidden');
+				$('#documentArxiuUuid\\[' + id + '\\]').val('');
+				$('#input-origen-url_' + id).removeClass('hidden');
+				$('#input-origen-arxiu_' + id).addClass('hidden');
+				$('#arxiu\\[' + id + '\\]').val('');
+				$('#metadades_' + id).removeClass('hidden');
+			} else if ($(this).val() == 'ARXIU'){
+				$('#input-origen-csv_' + id).addClass('hidden');
+				$('#documentArxiuCsv\\[' + id + '\\]').val('');
+				$('#input-origen-uuid_' + id).addClass('hidden');
+				$('#documentArxiuUuid\\[' + id + '\\]').val('');
+				$('#input-origen-url_' + id).addClass('hidden');
+				$('#documentArxiuUrl\\[' + id + '\\]').val('');
+				$('#input-origen-arxiu_' + id).removeClass('hidden');
+				$('#metadades_' + id).removeClass('hidden');
+			} else if ($(this).val() == ''){
+				$('#input-origen-csv_' + id).addClass('hidden');
+				$('#documentArxiuCsv\\[' + id + '\\]').val('');
+				$('#input-origen-uuid_' + id).removeClass('hidden');
+				$('#documentArxiuUuid\\[' + id + '\\]').val('');
+				$('#input-origen-url_' + id).addClass('hidden');
+				$('#documentArxiuUrl\\[' + id + '\\]').val('');
+				$('#input-origen-arxiu_' + id).addClass('hidden');
+				$('#arxiu\\[' + id + '\\]').val('');
+				$('#metadades_' + id).addClass('hidden');
+			}
+			webutilModalAdjustHeight();
+		});
+
+
+		if ($('#document2').is(":visible")) {
+			$('#removeDocument').removeClass('hidden');
+		}
+
+		$(document).on('change','select.enviamentTipus', function() {
+			var dadesNormalitzat = $(this).closest("#entregaPostal").find("div[class*='normalitzat']");
+			var dadesSenseNormalitzar = $(this).closest("#entregaPostal").find("div[class*='senseNormalitzar']");
+
+			if ($(this).val() == 'SENSE_NORMALITZAR') {
+				$(dadesNormalitzat).addClass('hidden');
+				$(dadesSenseNormalitzar).removeClass('hidden');
+			} else {
+				$(dadesNormalitzat).removeClass('hidden');
+				$(dadesSenseNormalitzar).addClass('hidden');
+			}
+		});
+
+		$('input[name="arxiu[0]"]').change(function(){
+			var arxiuGestdocId = $('input[name="documents[0].arxiuGestdocId"]');
+			var arxiuNom =  $('input[name="documents[0].arxiuNom"]');
+			if($(this).val() == ''){
+				arxiuGestdocId.val("");
+				arxiuNom.val("");
+			}else if($(this).val() != '' && $(this).val() != arxiuNom){
+				arxiuGestdocId.val("");
+				arxiuNom.val("");
+			}
+		});
+		$('input[name="arxiu[1]"]').change(function(){
+			var arxiuGestdocId = $('input[name="documents[1].arxiuGestdocId"]');
+			var arxiuNom =  $('input[name="documents[1].arxiuNom"]');
+			if($(this).val() == ''){
+				arxiuGestdocId.val("");
+				arxiuNom.val("");
+			}else if($(this).val() != '' && $(this).val() != arxiuNom){
+				arxiuGestdocId.val("");
+				arxiuNom.val("");
+			}
+		});
+		$('input[name="arxiu[2]"]').change(function(){
+			var arxiuGestdocId = $('input[name="documents[2].arxiuGestdocId"]');
+			var arxiuNom =  $('input[name="documents[2].arxiuNom"]');
+			if($(this).val() == ''){
+				arxiuGestdocId.val("");
+				arxiuNom.val("");
+			}else if($(this).val() != '' && $(this).val() != arxiuNom){
+				arxiuGestdocId.val("");
+				arxiuNom.val("");
+			}
+		});
+		$('input[name="arxiu[3]"]').change(function(){
+			var arxiuGestdocId = $('input[name="documents[3].arxiuGestdocId"]');
+			var arxiuNom =  $('input[name="documents[3].arxiuNom"]');
+			if($(this).val() == ''){
+				arxiuGestdocId.val("");
+				arxiuNom.val("");
+			}else if($(this).val() != '' && $(this).val() != arxiuNom){
+				arxiuGestdocId.val("");
+				arxiuNom.val("");
+			}
+		});
+		$('input[name="arxiu[4]"]').change(function(){
+			var arxiuGestdocId = $('input[name="documents[4].arxiuGestdocId"]');
+			var arxiuNom =  $('input[name="documents[4].arxiuNom"]');
+			if($(this).val() == ''){
+				arxiuGestdocId.val("");
+				arxiuNom.val("");
+			}else if($(this).val() != '' && $(this).val() != arxiuNom){
+				arxiuGestdocId.val("");
+				arxiuNom.val("");
+			}
+		});
+
+		var numPlus = 1;
+
+		$(".container-envios").find('.enviamentsForm').each(function() {
+			if($(this).find('.eliminar_enviament').attr('id') != 'enviamentDelete_0') {
+				$(this).find('.eliminar_enviament').removeClass('hidden');
+			}
+		});
 
 //     $( "#form" ).submit(function( event ) {
 //       $("#organGestor").prop("disabled", false);
 //       return true;
 //     });
-    $('#tipusDocument').on('change', function() {
-        if ($(this).val() == 'CSV') {
-            $('#metadades').removeClass('hidden');
-            $('#input-origen-csv').removeClass('hidden');
-            $('#input-origen-uuid').addClass('hidden');
-            $('#documentArxiuUuid').val('');
-            $('#input-origen-url').addClass('hidden');
-            $('#documentArxiuUrl').val('');
-            $('#input-origen-arxiu').addClass('hidden');
-            $('#arxiu').val('');
-        } else if ($(this).val() == 'UUID') {
-        	$('#input-origen-csv').addClass('hidden');
-        	$('#documentArxiuCsv').val('');
-            $('#input-origen-uuid').removeClass('hidden');
-            $('#input-origen-url').addClass('hidden');
-            $('#documentArxiuUrl').val('');
-            $('#input-origen-arxiu').addClass('hidden');
-            $('#arxiu').val('');
-    	} else if ($(this).val() == 'URL') {
-    		$('#input-origen-csv').addClass('hidden');
-    		$('#documentArxiuCsv').val('');
-            $('#input-origen-uuid').addClass('hidden');
-            $('#documentArxiuUuid').val('');
-            $('#input-origen-url').removeClass('hidden');
-            $('#input-origen-arxiu').addClass('hidden');
-            $('#arxiu').val('');
-    	} else if ($(this).val() == 'ARXIU'){
-    		$('#input-origen-csv').addClass('hidden');
-    		$('#documentArxiuCsv').val('');
-            $('#input-origen-uuid').addClass('hidden');
-            $('#documentArxiuUuid').val('');
-            $('#input-origen-url').addClass('hidden');
-            $('#documentArxiuUrl').val('');
-            $('#input-origen-arxiu').removeClass('hidden');
-        }
-        webutilModalAdjustHeight();
-    });
 
-    var agrupable = $("#procedimentId").children(":selected").attr("class");
-    var procedimentId = $("#procedimentId").children(":selected").attr("value");
+		var agrupable = $("#procedimentId").children(":selected").attr("class");
+		var procedimentId = $("#procedimentId").children(":selected").attr("value");
 
-    $('#organGestor').on('change', function() {
-    	//### seleccionat per defecte si només hi ha un (empty + òrgan)
-    	if ($('#organGestor').children('option').length == 2) {
-    		$('#organGestor option:eq(1)').attr('selected', 'selected');
-    		$('#organGestor').trigger('change.select2');
-    	}else if($('#organGestor').children('option').length == 3){
-    		$('#organGestor > option').each(function() {
-    			if(this.value == $('#entitatDir3Codi').val())
-    				$('#organGestor option:eq(1)').attr('selected', 'selected');
-        			$('#organGestor').trigger('change.select2');
-    		});
-    	}
-    	
-    	var organ = $(this).val();
-    	if (organ == undefined || organ == "") {
-			organ = "-";
-        }
-    	if ($('#organGestor').children('option').length > 1) {
-    		$.ajax({
-    			type: 'GET',
-    			url: "<c:url value="/notificacio/organ/"/>" + organ + "/procediments",
-    			success: function(data) {
-    				var select2Options = {
-    						theme: 'bootstrap',
-    						width: 'auto'};
-    				// Procediments
-    				var procediments = data;
-    				var selProcediments = $("#procedimentId");
-    				selProcediments.empty();
-    				if (procediments && procediments.length > 0) {
-    					selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.select'/></option>");
-    					var procedimentsComuns = [];
-    					var procedimentsOrgan = [];
-    					$.each(data, function(i, val) {
-    						if(val.comu) {
-    							procedimentsComuns.push(val);
-    						} else {
-    							procedimentsOrgan.push(val);
-    						}
-    					});
-    					if (procedimentsComuns.length > 0) {
-    						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
-    							$.each(procedimentsComuns, function(index, val) {
-    								selProcediments.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
-    							});
-    						selProcediments.append("</optgroup>");
-    					}
-    					var isOnlyOneProcedimentOrgan = (procedimentsOrgan.length < 2);
-    					if (procedimentsOrgan.length > 0) {
-    						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
-    							$.each(procedimentsOrgan, function(index, val) {
-    								if (isOnlyOneProcedimentOrgan) {
-    									selProcediments.append("<option value='" + val.codi + "' selected>" + val.valor + "</option>");
-    									$("#organGestor").val(val.organGestor).trigger("change.select2");
-    								} else {
-    									selProcediments.append("<option value='" + val.codi + "'>" + val.valor + "</option>");
-    								}
-    							});
-    						selProcediments.append("</optgroup>");
-    						selProcediments.trigger('change.select2');
-    					}
-    					if (selProcediments.children('option').length == 2) {
-    			    		$('#procedimentId option:eq(1)').attr('selected', 'selected');
-    			    		selProcediments.trigger('change');
-    			    	}
-    				} else {
-    					selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
-    				}
-    				selProcediments.select2(select2Options);
-    				selProcediments.val(selProcediments.attr('data-enum-value'));
-    				selProcediments.trigger('change');
-    			},
-    			error: function() {
-    				console.log("error obtenint els procediments de l'òrgan gestor...");
-    			}
-    		});
-    		
-    	}
-    	
-    });
-    $('#procedimentId').on('change', function() {
-		var procediment = $(this).val();
-		if (procediment == '') {
-			$("#organGestor").prop("disabled", false);
-		} else {
-			$.ajax({
-				type: 'GET',
-				url: "<c:url value="/notificacio/procediment/"/>" + procediment + "/dades",
-				success: function(data) {
-					var select2Options = {
+		$('#organGestor').on('change', function() {
+			//### seleccionat per defecte si només hi ha un (empty + òrgan)
+			if ($('#organGestor').children('option').length == 2) {
+				$('#organGestor option:eq(1)').attr('selected', 'selected');
+				$('#organGestor').trigger('change.select2');
+			}else if($('#organGestor').children('option').length == 3){
+				$('#organGestor > option').each(function() {
+					if(this.value == $('#entitatDir3Codi').val())
+						$('#organGestor option:eq(1)').attr('selected', 'selected');
+					$('#organGestor').trigger('change.select2');
+				});
+			}
+
+			var organ = $(this).val();
+			if (organ == undefined || organ == "") {
+				organ = "-";
+			}
+			if ($('#organGestor').children('option').length > 1) {
+				$.ajax({
+					type: 'GET',
+					url: "<c:url value="/notificacio/organ/"/>" + organ + "/procediments",
+					success: function(data) {
+						var select2Options = {
 							theme: 'bootstrap',
 							width: 'auto'};
-					// Òrgan gestor
-					if (!data.comu) {
-						$("#organGestor").val(data.organCodi).trigger("change.select2");
-					} else if (data.organsDisponibles.length) {
-						if (data.organsDisponibles.length == 1) {
-							$("#organGestor").val(data.organsDisponibles[0]).trigger("change.select2");
+						// Procediments
+						var procediments = data;
+						var selProcediments = $("#procedimentId");
+						selProcediments.empty();
+						if (procediments && procediments.length > 0) {
+							selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.select'/></option>");
+							var procedimentsComuns = [];
+							var procedimentsOrgan = [];
+							$.each(data, function(i, val) {
+								if(val.comu) {
+									procedimentsComuns.push(val);
+								} else {
+									procedimentsOrgan.push(val);
+								}
+							});
+							if (procedimentsComuns.length > 0) {
+								selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
+								$.each(procedimentsComuns, function(index, val) {
+									selProcediments.append("<option value=\"" + val.id + "\">" + val.codi +' - '+ val.nom + "</option>");
+								});
+								selProcediments.append("</optgroup>");
+							}
+							var isOnlyOneProcedimentOrgan = (procedimentsOrgan.length < 2);
+							if (procedimentsOrgan.length > 0) {
+								selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
+								$.each(procedimentsOrgan, function(index, val) {
+									if (isOnlyOneProcedimentOrgan) {
+										selProcediments.append("<option value='" + val.id + "' selected>" + val.codi +' - '+ val.nom + "</option>");
+										$("#organGestor").val(val.organGestor).trigger("change.select2");
+									} else {
+										selProcediments.append("<option value='" + val.id + "'>" + val.codi +' - '+ val.nom + "</option>");
+									}
+								});
+								selProcediments.append("</optgroup>");
+								selProcediments.trigger('change.select2');
+							}
+							if (selProcediments.children('option').length == 2) {
+								$('#procedimentId option:eq(1)').attr('selected', 'selected');
+								selProcediments.trigger('change');
+							}
+						} else {
+							selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
 						}
+						selProcediments.select2(select2Options);
+						selProcediments.val(selProcediments.attr('data-enum-value'));
+						selProcediments.trigger('change');
+					},
+					error: function() {
+						console.log("error obtenint els procediments de l'òrgan gestor...");
 					}
-					// Caducitat
-					$("#caducitat").val(data.caducitat);
-					// Retard
-					$("#retard").val(data.retard);
-					// Grups
-					var grups = data.grups;
-					var selGrups = $("#grupId");
-					selGrups.empty();
-					selGrups.append("<option value=\"\"></option>");
-					if (data.agrupable && grups && grups.length > 0) {
-						$.each(grups, function(i, val) {
-							selGrups.append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
-						});
-						selGrups.select2(select2Options);
-						$("#grups").removeClass("hidden");
-					} else {
-						$("#grups").addClass("hidden");
-					}
-					// TODO: Afegir formats de fulla i sobre
-					// Format fulla
+				});
+
+			}
+
+		});
+		$('#procedimentId').on('change', function() {
+			var procediment = $(this).val();
+			if (procediment == '') {
+				$("#organGestor").prop("disabled", false);
+			} else {
+				$.ajax({
+					type: 'GET',
+					url: "<c:url value="/notificacio/procediment/"/>" + procediment + "/dades",
+					success: function(data) {
+						var select2Options = {
+							theme: 'bootstrap',
+							width: 'auto'};
+						// Òrgan gestor
+						if (!data.comu) {
+							$("#organGestor").val(data.organCodi).trigger("change.select2");
+						} else if (data.organsDisponibles.length) {
+							if (data.organsDisponibles.length == 1) {
+								$("#organGestor").val(data.organsDisponibles[0]).trigger("change.select2");
+							}
+						}
+						// Caducitat
+						$("#caducitat").val(data.caducitat);
+						// Retard
+						$("#retard").val(data.retard);
+						// Grups
+						var grups = data.grups;
+						var selGrups = $("#grupId");
+						selGrups.empty();
+						selGrups.append("<option value=\"\"></option>");
+						if (data.agrupable && grups && grups.length > 0) {
+							$.each(grups, function(i, val) {
+								selGrups.append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
+							});
+							selGrups.select2(select2Options);
+							$("#grups").removeClass("hidden");
+						} else {
+							$("#grups").addClass("hidden");
+						}
+						// TODO: Afegir formats de fulla i sobre
+						// Format fulla
 // 					var selFormatFulla = $("#grupId");
 // 					selFormatFulla.empty();
 // 					selFormatFulla.append("<option value=\"\"></option>");
@@ -446,245 +632,308 @@ $(document).ready(function() {
 // 						});
 // 					}
 // 					selGrups.select2(select2Options);
-<%--
-					// Format sobre
-					<div class="col-md-3 formatFulla">
-						<c:choose>
-							<c:when test="${not empty formatsFulla}">
-								<not:inputSelect name="enviaments[${j}].entregaPostal.formatFulla" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatfulla" optionItems="${formatsFulla}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>
-							</c:when>
-							<c:otherwise>
-								<not:inputText name="enviaments[${j}].entregaPostal.formatFulla" textKey="notificacio.form.camp.entregapostal.formatfulla" labelClass="labelcss" inputClass="inputcss"/>
-							</c:otherwise>
-						</c:choose>
-						</div>
-						<div class="col-md-3 formatSobre">
-						<c:choose>
-							<c:when test="${not empty formatsSobre}">
-								<not:inputSelect name="enviaments[${j}].entregaPostal.formatSobre" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatsobre" optionItems="${formatsSobre}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>
-							</c:when>
-							<c:otherwise>
-								<not:inputText name="enviaments[${j}].entregaPostal.formatSobre" textKey="notificacio.form.camp.entregapostal.formatsobre" labelClass="labelcss" inputClass="inputcss"/>
-							</c:otherwise>
-						</c:choose>	
-					</div>					
---%>
-				},
-				error: function() {
-					console.log("error obtenint la informació del procediment...");
-				}
-			});
-		}	
-    });
-    
-    $('#organGestor').trigger('change');
-    //Add metadata
-    var count = 0;
-    $('#add').on('click', function () {
-        //Input to add
-        var metadataInput =
-            "<div class='form-group'>" +
-                "<label class='control-label col-xs-2'></label>" +
-                "<div class='col-xs-10'>" +
-                    "<div class='input-group'>" +
-                    "<input name='document.metadadesKeys' id='document.metadadesKeys' type='text' class='form-control width50 add grupKey_" + count + "' readonly/>" +
-                    "<input name='document.metadadesValues' id='document.metadadesValues' type='text' class='form-control width50 add grupVal_" + count + "' readonly/>" +
-                    "<span class='input-group-addon' id='remove'><span class='fa fa-remove'></span></span>" +
-                    "</div>" +
-                "</div>" +
-            "</div>";
-    		
-        var keyVal = $(".input-add").children().val();
-        var val = $(".input-add").children().eq(1).val();
-        if (keyVal != '') {
-            $("#list").prepend(metadataInput);
-            $(".grupKey_" + count).attr("value", keyVal);
-            $(".grupVal_" + count).attr("value", val);
-            $("#list").find("#remove").addClass("grupVal_" + count);
-            count++;
-        }
-        webutilModalAdjustHeight();
-    });
-  	//Eliminar grups
-	$(document).on('click', "#remove", function () {
-		var grupId = $(this).parent().children().attr('id'); 
-		var grupsClass = $(this).attr('class'); 
-		var lastClass = grupsClass.split(' ').pop();
-		var parentRemove = $("." + lastClass).parent();
-		var parentInput = parentRemove.parent();
-		var parentDiv = parentInput.parent();
-		
-		parentDiv.slideUp("normal", function() {
-			$(this).remove(); 
-			webutilModalAdjustHeight();
-		});
-			
-	});
-	$(document).on('change', '.interessat', function() {
-		var closest = $(this).closest('.destinatariForm, .personaForm');
-		var llinatge1 = closest.find('.llinatge1');
-		var llinatge2 = closest.find('.llinatge2');
-		var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
-		var nif = closest.find('.nif');
-		var nifLabel = nif.find('label');
-		var dir3codi = closest.find('.dir3Codi');
-		var nifLabelText = "<spring:message code='notificacio.form.camp.titular.nif'/>";
-		var incapacitat = closest.find('.incapacitat');
-		var raoSocial = closest.find('.rao');
-		var index = closest.find(".rowId input").val();
-		var raoSocialDesc = raoSocial.find('input').val();
-		var dir3Desc = closest.find('.codiDir3 input').val();
-		if ($(this).val() == 'ADMINISTRACIO') {
-			$(llinatge1).addClass('hidden');
-			$(llinatge2).addClass('hidden');
-			$(dir3codi).removeClass('hidden');
-			$(incapacitat).addClass('hidden');
-			$(raoSocial).addClass('hidden');
-			if(enviamentTipus == 'COMUNICACIO'){
-				$(nifLabel).text(nifLabelText);
-				$(nif).addClass('hidden');
-			}else{
-				$(nifLabel).text(nifLabelText + " *");
-				$(nif).removeClass('hidden');
-				
+						<%--
+                                            // Format sobre
+                                            <div class="col-md-3 formatFulla">
+                                                <c:choose>
+                                                    <c:when test="${not empty formatsFulla}">
+                                                        <not:inputSelect name="enviaments[${j}].entregaPostal.formatFulla" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatfulla" optionItems="${formatsFulla}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <not:inputText name="enviaments[${j}].entregaPostal.formatFulla" textKey="notificacio.form.camp.entregapostal.formatfulla" labelClass="labelcss" inputClass="inputcss"/>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                                </div>
+                                                <div class="col-md-3 formatSobre">
+                                                <c:choose>
+                                                    <c:when test="${not empty formatsSobre}">
+                                                        <not:inputSelect name="enviaments[${j}].entregaPostal.formatSobre" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatsobre" optionItems="${formatsSobre}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <not:inputText name="enviaments[${j}].entregaPostal.formatSobre" textKey="notificacio.form.camp.entregapostal.formatsobre" labelClass="labelcss" inputClass="inputcss"/>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                        --%>
+					},
+					error: function() {
+						console.log("error obtenint la informació del procediment...");
+					}
+				});
 			}
-		} else if ($(this).val() == 'FISICA') {
-			$(llinatge1).removeClass('hidden');
-			$(llinatge2).removeClass('hidden');
-			$(nif).removeClass('hidden');
-			$(nifLabel).text(nifLabelText + " *");
-			$(dir3codi).addClass('hidden');
-			$(incapacitat).removeClass('hidden');
-			$(raoSocial).removeClass('hidden');	
-		} else {
-			$(llinatge1).addClass('hidden');
-			$(llinatge2).addClass('hidden');
-			$(nif).removeClass('hidden');
-			$(dir3codi).addClass('hidden');
-			$(nifLabel).text(nifLabelText + " *");
-			$(incapacitat).removeClass('hidden');
-			$(raoSocial).removeClass('hidden');
-		}
-		
-		if((raoSocialDesc != null && raoSocialDesc != "") && (dir3Desc != null && dir3Desc != "")){
+		});
+
+		$('#organGestor').trigger('change');
+		//Add metadata
+		var count = 0;
+		// $('#add').on('click', function () {
+		//     //Input to add
+		//     var metadataInput =
+		//         "<div class='form-group'>" +
+		//             "<label class='control-label col-xs-2'></label>" +
+		//             "<div class='col-xs-10'>" +
+		//                 "<div class='input-group'>" +
+		//                 "<input name='document.metadadesKeys' id='document.metadadesKeys' type='text' class='form-control width50 add grupKey_" + count + "' readonly/>" +
+		//                 "<input name='document.metadadesValues' id='document.metadadesValues' type='text' class='form-control width50 add grupVal_" + count + "' readonly/>" +
+		//                 "<span class='input-group-addon' id='remove'><span class='fa fa-remove'></span></span>" +
+		//                 "</div>" +
+		//             "</div>" +
+		//         "</div>";
+		//
+		//     var keyVal = $(".input-add").children().val();
+		//     var val = $(".input-add").children().eq(1).val();
+		//     if (keyVal != '') {
+		//         $("#list").prepend(metadataInput);
+		//         $(".grupKey_" + count).attr("value", keyVal);
+		//         $(".grupVal_" + count).attr("value", val);
+		//         $("#list").find("#remove").addClass("grupVal_" + count);
+		//         count++;
+		//     }
+		//     webutilModalAdjustHeight();
+		// });
+		//Eliminar grups
+		$(document).on('click', "#remove", function () {
+			var grupId = $(this).parent().children().attr('id');
+			var grupsClass = $(this).attr('class');
+			var lastClass = grupsClass.split(' ').pop();
+			var parentRemove = $("." + lastClass).parent();
+			var parentInput = parentRemove.parent();
+			var parentDiv = parentInput.parent();
+
+			parentDiv.slideUp("normal", function() {
+				$(this).remove();
+				webutilModalAdjustHeight();
+			});
+
+		});
+		$(document).on('change', '.interessat', function() {
+			var closest = $(this).closest('.destinatariForm, .personaForm');
+			var llinatge1 = closest.find('.llinatge1');
+			var llinatge2 = closest.find('.llinatge2');
+			var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
+			var nif = closest.find('.nif');
+			var nifLabel = nif.find('label');
+			var dir3codi = closest.find('.dir3Codi');
+			var nifLabelText = "<spring:message code='notificacio.form.camp.titular.nif'/>";
+			var incapacitat = closest.find('.incapacitat');
+			var raoSocial = closest.find('.rao');
+			var index = closest.find(".rowId input").val();
+			var raoSocialDesc = raoSocial.find('input').val();
+			var dir3Desc = closest.find('.codiDir3 input').val();
+			if ($(this).val() == 'ADMINISTRACIO') {
+				$(llinatge1).addClass('hidden');
+				$(llinatge2).addClass('hidden');
+				$(dir3codi).removeClass('hidden');
+				$(incapacitat).addClass('hidden');
+				$(raoSocial).addClass('hidden');
+				if(enviamentTipus == 'COMUNICACIO'){
+					$(nifLabel).text(nifLabelText);
+					$(nif).addClass('hidden');
+				}else{
+					$(nifLabel).text(nifLabelText + " *");
+					$(nif).removeClass('hidden');
+
+				}
+			} else if ($(this).val() == 'FISICA') {
+				$(llinatge1).removeClass('hidden');
+				$(llinatge2).removeClass('hidden');
+				$(nif).removeClass('hidden');
+				$(nifLabel).text(nifLabelText + " *");
+				$(dir3codi).addClass('hidden');
+				$(incapacitat).removeClass('hidden');
+				$(raoSocial).removeClass('hidden');
+			} else {
+				$(llinatge1).addClass('hidden');
+				$(llinatge2).addClass('hidden');
+				$(nif).removeClass('hidden');
+				$(dir3codi).addClass('hidden');
+				$(nifLabel).text(nifLabelText + " *");
+				$(incapacitat).removeClass('hidden');
+				$(raoSocial).removeClass('hidden');
+			}
+
+			if((raoSocialDesc != null && raoSocialDesc != "") && (dir3Desc != null && dir3Desc != "")){
 			document.getElementById("searchOrganTit" + index).getElementsByTagName('input')[index].value = dir3Desc+'-'+raoSocialDesc;
 			$(dir3codi).find('.help-block').addClass('hidden')
 			$(dir3codi).find('.form-group').removeClass('has-error')
+		}else if(document.getElementById("enviaments0.titular.dir3Codi.errors") != null && document.getElementById("enviaments0.titular.dir3Codi.errors").innerText != '' ){
+			$(dir3codi).find('.help-block').removeClass('hidden')
+			$(dir3codi).find('.form-group').addClass('has-error')
 		}
-		comprovarTitularComuniacio();
-		var dir3Codi = closest.find("input[name='enviaments[0].titular.dir3Codi']");
-		var sir = $('#organigrama').val().indexOf(dir3Codi.val());
-		if($('#organigrama').val() != '' && dir3Codi != '' && sir != -1){
-			document.getElementById("searchOrganTit0").getElementsByTagName('input')[0].value = '';
-			$(dir3Codi).val("");
-			closest.find("input[name='enviaments[0].titular.nom']").val("");
+			comprovarTitularComuniacio();
+			var dir3Codi = closest.find("input[name='enviaments[0].titular.dir3Codi']");
+			var sir = $('#organigrama').val().indexOf(dir3Codi.val());
+			if($('#organigrama').val() != '' && dir3Codi != '' && sir != -1){
+				document.getElementById("searchOrganTit0").getElementsByTagName('input')[0].value = '';
+				$(dir3Codi).val("");
+				closest.find("input[name='enviaments[0].titular.nom']").val("");
+			}
+
+
+		});
+
+		$(document).on('change', 'input[type=radio][name=enviamentTipus]', function (event) {
+
+			comprovarTitularComuniacio();
+			$('.interessat').trigger('change');
+
+		});
+
+
+		function comprovarTitularComuniacio() {
+			var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
+			var tipusInteressatTitular = document.getElementById("enviaments[0].titular.interessatTipus").value;
+			var comunicacioAdministracio = false;
+			var notificacio = true;
+			if(enviamentTipus == 'COMUNICACIO') { //&& (tipusInteressatTitular == 'JURIDICA' || tipusInteressatTitular == 'FISICA')){
+				notificacio = false;
+				$('#rowRetard').addClass('hidden');
+				$('#rowDataProgramada').addClass('hidden');
+				$('#rowCaducitat').addClass('hidden');
+				if (tipusInteressatTitular == 'ADMINISTRACIO') {
+					$('#normalitzat').addClass('hidden');
+					$('#docs-addicionals').removeClass('hidden');
+					$('#btn-documents').removeClass('hidden');
+					comunicacioAdministracio = true;
+				} else {
+					$('#normalitzat').removeClass('hidden');
+					$('#docs-addicionals').addClass('hidden');
+					$('#btn-documents').addClass('hidden');
+				}
+				
+			}else{
+				$('#rowRetard').removeClass('hidden');
+				$('#rowDataProgramada').removeClass('hidden');
+				$('#rowCaducitat').removeClass('hidden');
+				$('#normalitzat').removeClass('hidden');
+				$('#docs-addicionals').addClass('hidden');
+				$('#btn-documents').addClass('hidden');
+			}
+
+			if (!comunicacioAdministracio) {
+				for (var i = numDocuments - 1; i > 0; i--) {
+					$('#tipusDocument_' + i).val('').trigger('change');
+				}
+			}			
+			$("#documents\\[0\\]\\.validesa>option[value='COPIA']").prop('disabled', notificacio);
+			$("#documents\\[0\\]\\.validesa").select2({theme: 'bootstrap', width: 'auto'});
+			$("#documents\\[1\\]\\.validesa>option[value='COPIA']").prop('disabled', notificacio);
+			$("#documents\\[1\\]\\.validesa").select2({theme: 'bootstrap', width: 'auto'});
+			$("#documents\\[2\\]\\.validesa>option[value='COPIA']").prop('disabled', notificacio);
+			$("#documents\\[2\\]\\.validesa").select2({theme: 'bootstrap', width: 'auto'});
+			$("#documents\\[3\\]\\.validesa>option[value='COPIA']").prop('disabled', notificacio);
+			$("#documents\\[3\\]\\.validesa").select2({theme: 'bootstrap', width: 'auto'});
+			$("#documents\\[4\\]\\.validesa>option[value='COPIA']").prop('disabled', notificacio);
+			$("#documents\\[4\\]\\.validesa").select2({theme: 'bootstrap', width: 'auto'});
+
+			$("p.comentari").each(function() {
+				if (comunicacioAdministracio) {
+					if (this.innerText.endsWith('ZIP.')) {
+						this.innerText = msgInfoDocSir;
+					}
+				} else if (this.innerText.endsWith('CSV.')) {
+					this.innerText = msgInfoDoc;
+				}
+
+			})
+
 		}
-		
-		
-	});
-	
-	$(document).on('change', 'input[type=radio][name=enviamentTipus]', function (event) {
-		
-	    comprovarTitularComuniacio();
+
+		$(document).on('input', ".titularNif", function () {
+			$(this).closest('.enviamentsForm').find('.nifemisor').val($(this).val());
+		});
+
 		$('.interessat').trigger('change');
-		
-	});
-	
-	
-	function comprovarTitularComuniacio() {
-		var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
-		var tipusInteressatTitular = document.getElementById("enviaments[0].titular.interessatTipus").value;
-		if(enviamentTipus == 'COMUNICACIO' && (tipusInteressatTitular == 'JURIDICA' || tipusInteressatTitular == 'FISICA')){
-			$('#rowRetard').addClass('hidden');
-			$('#rowDataProgramada').addClass('hidden');
-			$('#rowCaducitat').addClass('hidden');
-		}else{
-			$('#rowRetard').removeClass('hidden');
-			$('#rowDataProgramada').removeClass('hidden');
-			$('#rowCaducitat').removeClass('hidden');
-		}
-		
-		
-	}
-	
-	$(document).on('input', ".titularNif", function () {
-		$(this).closest('.enviamentsForm').find('.nifemisor').val($(this).val());
-   	});
-	
-	$('.interessat').trigger('change');
-	$('#tipusDocument').trigger('change');
-	$('.enviamentTipus').trigger('change');
-	
-	//Contado descripció
-	var fieldDescripcio = $('#descripcio');
-	if (fieldDescripcio.val().length != 0) {
-		var size = $(fieldDescripcio).val().length;
-		$('.textAreaCurrentLength').text(size);
-	} else {
-		$('.textAreaCurrentLength').text(0);
-	};;
-	
-	$(fieldDescripcio).bind("change paste keyup", function() {
-		var size = $(this).val().length;
-		$('.textAreaCurrentLength').text(size);
-	});
-	
-	//loading
-	$('#form').on("submit", function(){
-		$('.loading').fadeIn();
-	});
-	
-	
+		$('.tipusDocument').trigger('change');
+		$('.enviamentTipus').trigger('change');
+
+		//Contado descripció
+		var fieldDescripcio = $('#descripcio');
+		if (fieldDescripcio.val().length != 0) {
+			var size = $(fieldDescripcio).val().length;
+			$('.textAreaCurrentLength').text(size);
+		} else {
+			$('.textAreaCurrentLength').text(0);
+		};;
+
+		$(fieldDescripcio).bind("change paste keyup", function() {
+			var size = $(this).val().length;
+			$('.textAreaCurrentLength').text(size);
+		});
+
+		//loading
+		$('#form').on("submit", function(){
+			$('.loading').fadeIn();
+		});
+
+
 
 // 	var organigrama = loadOrganigrama();
 // // 	var organigrama =null;
-	
-	$("#rOrgans").on("dblclick", "tr", function() {
-		if(!$(this).hasClass('unselectable')){
-			seleccionar($(this)); 
-		}
-	});
-		$("#rOrgans").on("click", ".select", function() {
+
+		$("#rOrgans").on("dblclick", "tr", function() {
 			if(!$(this).hasClass('unselectable')){
-				seleccionar($(this).closest("tr")); 
+				seleccionar($(this));
 			}
 		});
-		
-	//### #432
-	$("#descripcio").on("keydown", function (e) {
-		if (e.keyCode != 13) return;
-		var warning = "<spring:message code='notificacio.form.camp.descripcio.write.validacio'/>";
-		makeTooltip(warning);
-		return false;
-	});
-	$("#descripcio").on("change paste", function (e) {
-		var warning = "<spring:message code='notificacio.form.camp.descripcio.paste.validacio'/>";
-		var e = $(this);
-        setTimeout(function(){
-        	while (/\r?\n|\r/.test($.trim(e.val()))) {
-        		makeTooltip(warning);
-        		e.val($.trim(e.val()).replace(/\r?\n|\r\r\n/, ' '));
-        	}
-        }, 0);
-	});
-});
-
-var t, makeTooltip = function(warning) {
-	var pos = $("#descripcio").position();
-	clearTimeout(t);
-	$('#tooltip').remove();
-	$('<p id="tooltip">' + warning + '</p>').insertBefore("#descripcio");
-	$('#tooltip').css({
-					top : pos.top - 30,
-		            left: pos.left
-		        }).fadeIn("fast");
-
-	t = setTimeout(function() {
-		$('#tooltip').fadeOut(300, function() {
-			$(this).remove();
+		$("#rOrgans").on("click", ".select", function() {
+			if(!$(this).hasClass('unselectable')){
+				seleccionar($(this).closest("tr"));
+			}
 		});
-	}, 4000);
-};
+
+		//### #432
+		$("#descripcio").on("keydown", function (e) {
+			if (e.keyCode != 13) return;
+			var warning = "<spring:message code='notificacio.form.camp.descripcio.write.validacio'/>";
+			makeTooltip(warning);
+			return false;
+		});
+		$("#descripcio").on("change paste", function (e) {
+			var warning = "<spring:message code='notificacio.form.camp.descripcio.paste.validacio'/>";
+			var e = $(this);
+			setTimeout(function(){
+				while (/\r?\n|\r/.test($.trim(e.val()))) {
+					makeTooltip(warning);
+					e.val($.trim(e.val()).replace(/\r?\n|\r\r\n/, ' '));
+				}
+			}, 0);
+		});
+
+		$("#o_provincia").select2({
+			theme: 'bootstrap',
+			width: 'auto',
+			allowClear: true,
+	        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
+		});
+		$("#o_localitat").select2({
+			theme: 'bootstrap',
+			width: 'auto',
+			allowClear: true,
+	        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
+		});
+		
+		$("input[name=idioma][value=" + locale.toUpperCase()+ "]").prop('checked', true);
+	
+
+	});
+
+	var t, makeTooltip = function(warning) {
+		var pos = $("#descripcio").position();
+		clearTimeout(t);
+		$('#tooltip').remove();
+		$('<p id="tooltip">' + warning + '</p>').insertBefore("#descripcio");
+		$('#tooltip').css({
+			top : pos.top - 30,
+			left: pos.left
+		}).fadeIn("fast");
+
+		t = setTimeout(function() {
+			$('#tooltip').fadeOut(300, function() {
+				$(this).remove();
+			});
+		}, 4000);
+	};
 
 
 
@@ -701,10 +950,10 @@ var t, makeTooltip = function(warning) {
 					var t = buscarCodiEnOrganigrama(data);
 					$("#organigrama").val(buscarCodiEnOrganigrama(data));
 				}
-				
-				
-				
-			
+
+
+
+
 			},
 			error: function() {
 				console.log("error obtenint l'organigrama...");
@@ -712,12 +961,12 @@ var t, makeTooltip = function(warning) {
 		});
 	}
 
-function addDestinatari(enviament_id) {
-	var isMultiple = ${isMultiplesDestinataris};
-    var num_enviament = parseInt(enviament_id.substring(enviament_id.indexOf( '[' ) + 1, enviament_id.indexOf( ']' )));
-    var num_destinatari = $('div.destenv_' + num_enviament).size();
-    
-	var destinatari =' \
+	function addDestinatari(enviament_id) {
+		var isMultiple = ${isMultiplesDestinataris};
+		var num_enviament = parseInt(enviament_id.substring(enviament_id.indexOf( '[' ) + 1, enviament_id.indexOf( ']' )));
+		var num_destinatari = $('div.destenv_' + num_enviament).size();
+
+		var destinatari =' \
     <div class="col-md-12 destinatariForm destenv_#num_enviament# personaForm_#num_enviament#_#num_destinatari#"> \
 		<div class="col-md-3 interessat"> \
 			<div class="form-group"> \
@@ -838,838 +1087,847 @@ function addDestinatari(enviament_id) {
 		</div> \
 	</div>';
 
-	destinatari = replaceAll(destinatari, "#num_enviament#", num_enviament);
-	destinatari = replaceAll(destinatari, "#num_destinatari#", num_destinatari);
+		destinatari = replaceAll(destinatari, "#num_enviament#", num_enviament);
+		destinatari = replaceAll(destinatari, "#num_destinatari#", num_destinatari);
 
-	$('div.newDestinatari_' + num_enviament).append(destinatari);
-	$('#enviaments\\[' + num_enviament + '\\]\\.destinataris\\[' + num_destinatari + '\\]\\.interessatTipus').select2({theme: 'bootstrap', width: 'auto', minimumResultsForSearch: Infinity});
+		$('div.newDestinatari_' + num_enviament).append(destinatari);
+		$('#enviaments\\[' + num_enviament + '\\]\\.destinataris\\[' + num_destinatari + '\\]\\.interessatTipus').select2({theme: 'bootstrap', width: 'auto', minimumResultsForSearch: Infinity});
 
-	if (!isMultiple) {
-    	$("div[class*=' personaForm_" + num_enviament + "']").closest('div.destinatari').find('.addDestinatari').addClass('hidden');
-    }
-	$('.interessat').trigger('change');
-	
-	addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].nom');
-	addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].llinatge1');
-	addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].llinatge2');
-	addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].telefon');
-	addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].email');
-}
+		if (!isMultiple) {
+			$("div[class*=' personaForm_" + num_enviament + "']").closest('div.destinatari').find('.addDestinatari').addClass('hidden');
+		}
+		$('.interessat').trigger('change');
 
-function replaceAll(string, search, replace) {
-	return string.split(search).join(replace);
-}
-	
-function addEnvio() {
-    var number;
-    var num;
-    var numPlus
-    var enviamentForm = $(".enviamentsForm").last().clone();
+		addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].nom');
+		addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].llinatge1');
+		addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].llinatge2');
+		addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].telefon');
+		addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].email');
+	}
 
-    var classList = enviamentForm.attr('class').split(/\s+/);
-    $.each(classList, function(index, classname) {
-        if (classname.startsWith('enviamentForm_')) {
-            number = classname.substring(14);
-            num = parseInt(number);
-        }
-    });
+	function replaceAll(string, search, replace) {
+		return string.split(search).join(replace);
+	}
 
-  	//Titol enviament
-    if (num != null) {
-    	numPlus = num + 1;
-    	enviamentForm.removeClass('enviamentForm_' + num).addClass('enviamentForm_' + numPlus);
-    	var badge = enviamentForm.find('.envio\\['+numPlus+'\\]');
-    	badge.removeClass('envio[' + numPlus + ']').addClass('envio[' + (numPlus + 1) + ']');
-    	badge[0].innerText = "Enviament " + (numPlus + 1);
-    	var destinataris = enviamentForm.find('.newDestinatari_' + num);
-    	destinataris.removeClass('newDestinatari_' + num).addClass('newDestinatari_' + numPlus);
-    	destinataris.empty();
-	    enviamentForm.find(':input').each(function() {
-	        this.name= this.name.replace(number,numPlus);
-	        this.id= this.id.replace(number,numPlus);
-	        this.value = this.value.replace(number,numPlus);
-			$(this).attr('data-select2-id', numPlus);
-			
-	        if($(this).attr("id") == "envioTooltip") {
-	            this.value= this.value.replace(number,numPlus);
-	            $(this).tooltip();
-	        }
-	
-	        if($(this).hasClass('formEnviament')) {
-	            this.name= this.name.replace("[" + number, "[" + numPlus);
-	            this.id= this.id.replace("[" + number, "[" + numPlus);
-	        }
-	        
-	        if ($(this).attr('type') == 'hidden') {
-	        	var hiddenId = parseInt($(this).val());
-	        	if (typeof hiddenId == 'number') {
-	        		$(this).val(''); //remove hidden id (new)
-	        	}
-	        }
-	    });
-	    enviamentForm.find('#entregaPostal').removeClass('entregaPostal_' + num).addClass('entregaPostal_' + numPlus);
-	    //select
-	    $(enviamentForm).find("span.select2").remove();
-	    $(enviamentForm).find('p').remove();
-	    $(enviamentForm).find('div').removeClass('has-error');
-	    $(enviamentForm).find("select").select2({theme: 'bootstrap', width: 'auto'});
-	    $(enviamentForm).find("select").attr('data-select2-eval', 'true');
-		$(enviamentForm).appendTo(".newEnviament").slideDown("slow").find("input[type='text']").not(".procedimentcodi").val("");
-		
-		//Remove last button addEnviament
-	    if($(enviamentForm).find('.eliminar_enviament').attr('id') != 'entregaPostal[0]') {
-			$(enviamentForm).find('.eliminar_enviament').removeClass('hidden');
-	    }
-		//Show button addDestinatari
-		$(enviamentForm).find('.addDestinatari').removeClass('hidden');
-	    //Inicialitzar chechbox incapacitat
-		$(enviamentForm).find('input:checkbox').removeAttr('checked');
-		//Inicialitzar deh
-		$(enviamentForm).find('.entregaDeh_'+numPlus).hide();
-	    //Inicialitzar entregapostal
-		$(enviamentForm).find('.entregaPostal_'+numPlus).hide();
-		$(enviamentForm).find('.entregaPostal_info_'+number).css('display','none');
-		
-		actualitzarEntrega(numPlus);
-	    webutilModalAdjustHeight();
-	    
-	    addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.nom', '${nomSize}');
-	    addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.llinatge1', '${llinatge1Size}');
-	    addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.llinatge2', '${llinatge2Size}');
-	    addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.email', '${emailSize}');
-	    addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.telefon', '${telefonSize}');
-    }
+	function addEnvio() {
+		var number;
+		var num;
+		var numPlus
+		var enviamentForm = $(".enviamentsForm").last().clone();
 
-}
+		var classList = enviamentForm.attr('class').split(/\s+/);
+		$.each(classList, function(index, classname) {
+			if (classname.startsWith('enviamentForm_')) {
+				number = classname.substring(14);
+				num = parseInt(number);
+			}
+		});
 
-function addContadorAddicionalDestinatari(fieldId) {
-	//Contador
-	var fieldSize = 'inputCurrentLength_' + fieldId;
-	var fieldSizeClass = $(document.getElementsByClassName(fieldSize)[0]);
-	if (fieldSizeClass.val() != undefined && fieldSizeClass.val().length != 0) {
-		var size = $(fieldId).val().length;
-		$(fieldSizeClass).text(size);
-	} else {
-		$(fieldSizeClass).text(0);
-	};
-	
-	$(document.getElementById(fieldId)).bind("change paste keyup", function() {
-		var size = $(this).val().length;
-		$(fieldSizeClass).text(size);
-	});
-}
+		//Titol enviament
+		if (num != null) {
+			numPlus = num + 1;
+			enviamentForm.removeClass('enviamentForm_' + num).addClass('enviamentForm_' + numPlus);
+			var badge = enviamentForm.find('.envio\\['+numPlus+'\\]');
+			badge.removeClass('envio[' + numPlus + ']').addClass('envio[' + (numPlus + 1) + ']');
+			badge[0].innerText = "Enviament " + (numPlus + 1);
+			var destinataris = enviamentForm.find('.newDestinatari_' + num);
+			destinataris.removeClass('newDestinatari_' + num).addClass('newDestinatari_' + numPlus);
+			destinataris.empty();
+			enviamentForm.find(':input').each(function() {
+				this.name= this.name.replace(number,numPlus);
+				this.id= this.id.replace(number,numPlus);
+				this.value = this.value.replace(number,numPlus);
+				$(this).attr('data-select2-id', numPlus);
 
-function addContadorAddicionalEnviament(fieldId, inputMaxLength) {
-	var p = '<p class="info-length text-success"> \
+				if($(this).attr("id") == "envioTooltip") {
+					this.value= this.value.replace(number,numPlus);
+					$(this).tooltip();
+				}
+
+				if($(this).hasClass('formEnviament')) {
+					this.name= this.name.replace("[" + number, "[" + numPlus);
+					this.id= this.id.replace("[" + number, "[" + numPlus);
+				}
+
+				if ($(this).attr('type') == 'hidden') {
+					var hiddenId = parseInt($(this).val());
+					if (typeof hiddenId == 'number') {
+						$(this).val(''); //remove hidden id (new)
+					}
+				}
+			});
+			enviamentForm.find('#entregaPostal').removeClass('entregaPostal_' + num).addClass('entregaPostal_' + numPlus);
+			//select
+			$(enviamentForm).find("span.select2").remove();
+			$(enviamentForm).find('p').remove();
+			$(enviamentForm).find('div').removeClass('has-error');
+			$(enviamentForm).find("select").select2({theme: 'bootstrap', width: 'auto'});
+			$(enviamentForm).find("select").attr('data-select2-eval', 'true');
+			$(enviamentForm).appendTo(".newEnviament").slideDown("slow").find("input[type='text']").not(".procedimentcodi").val("");
+
+			//Remove last button addEnviament
+			if($(enviamentForm).find('.eliminar_enviament').attr('id') != 'entregaPostal[0]') {
+				$(enviamentForm).find('.eliminar_enviament').removeClass('hidden');
+			}
+			//Show button addDestinatari
+			$(enviamentForm).find('.addDestinatari').removeClass('hidden');
+			//Inicialitzar chechbox incapacitat
+			$(enviamentForm).find('input:checkbox').removeAttr('checked');
+			//Inicialitzar deh
+			$(enviamentForm).find('.entregaDeh_'+numPlus).hide();
+			//Inicialitzar entregapostal
+			$(enviamentForm).find('.entregaPostal_'+numPlus).hide();
+			$(enviamentForm).find('.entregaPostal_info_'+number).css('display','none');
+
+			actualitzarEntrega(numPlus);
+			webutilModalAdjustHeight();
+
+			addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.nom', '${nomSize}');
+			addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.llinatge1', '${llinatge1Size}');
+			addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.llinatge2', '${llinatge2Size}');
+			addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.email', '${emailSize}');
+			addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.telefon', '${telefonSize}');
+		}
+
+	}
+
+	function addContadorAddicionalDestinatari(fieldId) {
+		//Contador
+		var fieldSize = 'inputCurrentLength_' + fieldId;
+		var fieldSizeClass = $(document.getElementsByClassName(fieldSize)[0]);
+		if (fieldSizeClass.val() != undefined && fieldSizeClass.val().length != 0) {
+			var size = $(fieldId).val().length;
+			$(fieldSizeClass).text(size);
+		} else {
+			$(fieldSizeClass).text(0);
+		};
+
+		$(document.getElementById(fieldId)).bind("change paste keyup", function() {
+			var size = $(this).val().length;
+			$(fieldSizeClass).text(size);
+		});
+	}
+
+	function addContadorAddicionalEnviament(fieldId, inputMaxLength) {
+		var p = '<p class="info-length text-success"> \
 				<span class="glyphicon glyphicon-info-sign"></span> \
 				<span class="inputCurrentLength_' + fieldId + '">0</span> \
 					<spring:message code="notificacio.form.camp.logitud"/> \
 				<span> ' + inputMaxLength + '</span> \
 			</p>';
-	var inputField = $(document.getElementById(fieldId));
-	$(p).insertAfter(inputField);
-	//Contador
-	var fieldSize = 'inputCurrentLength_' + fieldId;
-	var fieldSizeClass = $(document.getElementsByClassName(fieldSize)[0]);
-	if (fieldSizeClass.val() != undefined && fieldSizeClass.val().length != 0) {
-		var size = $(fieldId).val().length;
-		$(fieldSizeClass).text(size);
-	} else {
-		$(fieldSizeClass).text(0);
-	};
-	
-	$(document.getElementById(fieldId)).bind("change paste keyup", function() {
-		var size = $(this).val().length;
-		$(fieldSizeClass).text(size);
-	});
-}
+		var inputField = $(document.getElementById(fieldId));
+		$(p).insertAfter(inputField);
+		//Contador
+		var fieldSize = 'inputCurrentLength_' + fieldId;
+		var fieldSizeClass = $(document.getElementsByClassName(fieldSize)[0]);
+		if (fieldSizeClass.val() != undefined && fieldSizeClass.val().length != 0) {
+			var size = $(fieldId).val().length;
+			$(fieldSizeClass).text(size);
+		} else {
+			$(fieldSizeClass).text(0);
+		};
 
-function destinatarisDelete(className) {
-    var element = document.getElementById(className);
-    var parent = $(element).closest(".destinatariForm");
-    var classParent = $(parent).attr('class');
-    var destinatari_id_num = parseInt(className.substring(className.lastIndexOf('[') + 1, className.lastIndexOf(']')));
-    var enviament_id_num = parseInt(className.substring(className.indexOf('[') + 1, className.indexOf(']')));
-    var destinatariRoot = $(element).closest(".dest");
-    var numDest = destinatariRoot.find(".destinatariForm").size();
-    
-	$(parent).closest(".destinatari").find('.addDestinatari').removeClass('hidden');
-	$(parent).remove();
+		$(document.getElementById(fieldId)).bind("change paste keyup", function() {
+			var size = $(this).val().length;
+			$(fieldSizeClass).text(size);
+		});
+	}
 
-	// Reanomenar destinataris posteriors
-	if (numDest > (destinatari_id_num + 1)) {
-		for(var i = (destinatari_id_num + 1); i < numDest; i++) {
-			reanumeraDestinatari($(destinatariRoot).find('.destinatariForm:nth-child(' + i + ')'), i);
+	function destinatarisDelete(className) {
+		var element = document.getElementById(className);
+		var parent = $(element).closest(".destinatariForm");
+		var classParent = $(parent).attr('class');
+		var destinatari_id_num = parseInt(className.substring(className.lastIndexOf('[') + 1, className.lastIndexOf(']')));
+		var enviament_id_num = parseInt(className.substring(className.indexOf('[') + 1, className.indexOf(']')));
+		var destinatariRoot = $(element).closest(".dest");
+		var numDest = destinatariRoot.find(".destinatariForm").size();
+
+		$(parent).closest(".destinatari").find('.addDestinatari').removeClass('hidden');
+		$(parent).remove();
+
+		// Reanomenar destinataris posteriors
+		if (numDest > (destinatari_id_num + 1)) {
+			for(var i = (destinatari_id_num + 1); i < numDest; i++) {
+				reanumeraDestinatari($(destinatariRoot).find('.destinatariForm:nth-child(' + i + ')'), i);
+			}
 		}
 	}
-}
 
-function enviamentDelete(id) {
-    var element = document.getElementById(id);
-    var parent = $(element).closest(".enviamentsForm");
-    var classParent = $(parent).attr('class');
-    var enviament_id_num = parseInt(id.substring(16));
-	var enviamentRoot = $(element).closest(".newEnviament");
-	var numEnv = enviamentRoot.find(".enviamentsForm").size();
-	 
-    $(parent).remove();
+	function enviamentDelete(id) {
+		var element = document.getElementById(id);
+		var parent = $(element).closest(".enviamentsForm");
+		var classParent = $(parent).attr('class');
+		var enviament_id_num = parseInt(id.substring(16));
+		var enviamentRoot = $(element).closest(".newEnviament");
+		var numEnv = enviamentRoot.find(".enviamentsForm").size();
 
-    // Reenumerar enviaments posteriors
-    if (numEnv > (enviament_id_num + 1)) {
-		for(var i = (enviament_id_num + 1); i < numEnv; i++) {
-			reanumeraEnviament($(enviamentRoot).find('.enviamentsForm:nth-child(' + i + ')'), i);
+		$(parent).remove();
+
+		// Reenumerar enviaments posteriors
+		if (numEnv > (enviament_id_num + 1)) {
+			for(var i = (enviament_id_num + 1); i < numEnv; i++) {
+				reanumeraEnviament($(enviamentRoot).find('.enviamentsForm:nth-child(' + i + ')'), i);
+			}
 		}
 	}
-}
 
-function reanumeraDestinatari(destinatari, index) {
-	var nouIndex = index - 1;
+	function reanumeraDestinatari(destinatari, index) {
+		var nouIndex = index - 1;
 
-	var classList = destinatari.attr('class').split(/\s+/);
-    $.each(classList, function(index, classname) {
-        if (classname.startsWith('personaForm_')) {
-        	destinatari.removeClass(classname).addClass(classname.substring(0, classname.lastIndexOf('_') + 1) + nouIndex);
-        }
-    });
-    
-	destinatari.find(':input').each(function() {
-        this.name= this.name.replace('destinataris[' + index,'destinataris[' +nouIndex);
-        this.id= this.id.replace('destinataris[' + index,'destinataris[' + nouIndex);
-		
-        if($(this).hasClass('formEnviament')) {
-            this.name= this.name.replace("[" + index, "[" + nouIndex);
-            this.id= this.id.replace("[" + index, "[" + nouIndex);
-        }
-        if($(this).hasClass('delete')) {
-            this.name= this.name.substring(0, this.name.lastIndexOf('[') + 1) + nouIndex + ']';
-            this.id= this.id.substring(0, this.id.lastIndexOf('[') + 1) + nouIndex + ']';
-        }
-    });
-}
+		var classList = destinatari.attr('class').split(/\s+/);
+		$.each(classList, function(index, classname) {
+			if (classname.startsWith('personaForm_')) {
+				destinatari.removeClass(classname).addClass(classname.substring(0, classname.lastIndexOf('_') + 1) + nouIndex);
+			}
+		});
 
-function reanumeraEnviament(enviament, index) {
-   	var nouIndex = index - 1;
-   	enviament.removeClass('enviamentForm_' + index).addClass('enviamentForm_' + nouIndex);
-   	var badge = enviament.find('.envio\\[' + (index + 1) + '\\]');
-   	badge.removeClass('envio[' + (index + 1) + ']').addClass('envio[' + index + ']');
-   	badge[0].innerText = "Enviament " + index;
-   	var destinataris = enviament.find('.newDestinatari_' + index);
-   	destinataris.removeClass('newDestinatari_' + index).addClass('newDestinatari_' + nouIndex);
-   	destinataris.find('.destinatariForm').each(function(index) {
-		$(this).removeClass('destenv_' + index).addClass('destenv_' + nouIndex);
-		var classList = $(this).attr('class').split(/\s+/);
-	    $.each(classList, function(index, classname) {
-	        if (classname.startsWith('personaForm_')) {
-	            $(this).removeClass(classname).addClass('personaForm_' + nouIndex + classname.substring(classname.lastIndexOf('_'), classname.length));
-	        }
-	    });
-   	});
-    enviament.find('#entregaPostal').removeClass('entregaPostal_' + index).addClass('entregaPostal_' + nouIndex);
-   	enviament.find(':input').each(function() {
-        this.name= this.name.replace('enviaments[' + index,'enviaments[' +nouIndex);
-        this.id= this.id.replace('enviaments[' + index,'enviaments[' + nouIndex);
-		if ($(this).attr('data--id') == index) {
-			$(this).attr('data-select2-id', nouIndex);
-		}
-		
-        if($(this).hasClass('formEnviament')) {
-            this.name= this.name.replace("[" + index, "[" + nouIndex);
-            this.id= this.id.replace("[" + index, "[" + nouIndex);
-        }
-        if($(this).hasClass('delete')) {
-            this.name= this.name.replace("destinatarisDelete[" + index, "destinatarisDelete[" + nouIndex);
-            this.id= this.id.replace("destinatarisDelete[" + index, "destinatarisDelete[" + nouIndex);
-        }
-        if($(this).hasClass('eliminar_enviament')) {
-            this.name= this.name.replace("enviamentDelete[" + index, "enviamentDelete[" + nouIndex);
-            this.id= this.id.replace("enviamentDelete_" + index, "enviamentDelete_" + nouIndex);
-        }
-    });
-	
+		destinatari.find(':input').each(function() {
+			this.name= this.name.replace('destinataris[' + index,'destinataris[' +nouIndex);
+			this.id= this.id.replace('destinataris[' + index,'destinataris[' + nouIndex);
+
+			if($(this).hasClass('formEnviament')) {
+				this.name= this.name.replace("[" + index, "[" + nouIndex);
+				this.id= this.id.replace("[" + index, "[" + nouIndex);
+			}
+			if($(this).hasClass('delete')) {
+				this.name= this.name.substring(0, this.name.lastIndexOf('[') + 1) + nouIndex + ']';
+				this.id= this.id.substring(0, this.id.lastIndexOf('[') + 1) + nouIndex + ']';
+			}
+		});
+	}
+
+	function reanumeraEnviament(enviament, index) {
+		var nouIndex = index - 1;
+		enviament.removeClass('enviamentForm_' + index).addClass('enviamentForm_' + nouIndex);
+		var badge = enviament.find('.envio\\[' + (index + 1) + '\\]');
+		badge.removeClass('envio[' + (index + 1) + ']').addClass('envio[' + index + ']');
+		badge[0].innerText = "Enviament " + index;
+		var destinataris = enviament.find('.newDestinatari_' + index);
+		destinataris.removeClass('newDestinatari_' + index).addClass('newDestinatari_' + nouIndex);
+		destinataris.find('.destinatariForm').each(function(index) {
+			$(this).removeClass('destenv_' + index).addClass('destenv_' + nouIndex);
+			var classList = $(this).attr('class').split(/\s+/);
+			$.each(classList, function(index, classname) {
+				if (classname.startsWith('personaForm_')) {
+					$(this).removeClass(classname).addClass('personaForm_' + nouIndex + classname.substring(classname.lastIndexOf('_'), classname.length));
+				}
+			});
+		});
+		enviament.find('#entregaPostal').removeClass('entregaPostal_' + index).addClass('entregaPostal_' + nouIndex);
+		enviament.find(':input').each(function() {
+			this.name= this.name.replace('enviaments[' + index,'enviaments[' +nouIndex);
+			this.id= this.id.replace('enviaments[' + index,'enviaments[' + nouIndex);
+			if ($(this).attr('data--id') == index) {
+				$(this).attr('data-select2-id', nouIndex);
+			}
+
+			if($(this).hasClass('formEnviament')) {
+				this.name= this.name.replace("[" + index, "[" + nouIndex);
+				this.id= this.id.replace("[" + index, "[" + nouIndex);
+			}
+			if($(this).hasClass('delete')) {
+				this.name= this.name.replace("destinatarisDelete[" + index, "destinatarisDelete[" + nouIndex);
+				this.id= this.id.replace("destinatarisDelete[" + index, "destinatarisDelete[" + nouIndex);
+			}
+			if($(this).hasClass('eliminar_enviament')) {
+				this.name= this.name.replace("enviamentDelete[" + index, "enviamentDelete[" + nouIndex);
+				this.id= this.id.replace("enviamentDelete_" + index, "enviamentDelete_" + nouIndex);
+			}
+		});
+
 //     if($(enviament).find('.eliminar_enviament').attr('id') != 'entregaPostal[0]') {
 // 		$(enviament).find('.eliminar_enviament').removeClass('hidden');
 //     }
 // 	actualitzarEntrega(nouIndex);
-}
-
-function mostrarEntregaPostal(className) {
-    var element = document.getElementById(className);
-    var parent = $(element).closest(".enviamentsForm");
-    var classParent = $(parent).attr('class');
-    var concepteLength = $('#concepte').val().length;
-    
-    var enviament_id_num = className.substring(className.lastIndexOf('[') + 1, className.lastIndexOf(']'));
-    
-    if ($(element).is(':checked') && concepteLength > 50) {
-    	var longitidInfo = $('.entregaPostal_info_' + enviament_id_num);
-    	$(longitidInfo).slideDown(1000); 
-    };
-    
-    if($('.entregaPostal_'+enviament_id_num).css('display') != 'none') {
-        $('.entregaPostal_'+enviament_id_num).hide();
-    } else {
-        $('.entregaPostal_'+enviament_id_num).show();
-    }
-}
-
-function mostrarDestinatari(enviament_id) {
-    var number;
-    var num;
-    var enviament_id_num = enviament_id.substring(enviament_id.indexOf( '[' ) + 1, enviament_id.indexOf( ']' ));
-    enviament_id_num = parseInt(enviament_id_num);
-//     var isMultiple = ($("div[class*=' personaForm_" + enviament_id_num + "']").find('#isMultiple').val() == 'true');
-    var isMultiple = ${isMultiplesDestinataris};
-    
-    if ($("div[class*=' personaForm_" + enviament_id_num + "']").hasClass("hidden")) {
-        $("div[class*=' personaForm_" + enviament_id_num + "']").removeClass("hidden").show();
-        
-        if (!isMultiple) {
-        	$("div[class*=' personaForm_" + enviament_id_num + "']").closest('div.destinatari').find('.addDestinatari').addClass('hidden');
-        }
-    }
-}
-
-
-function obrirModalOrganismes(index){
-	var from = index.split('-')[0];
-
-	$("#organismesModal").modal();
-// 	$("#indexTitular").val(index);
-	$("#titular").val(index);
-	var j = $('#titular').val().split('-')[1] != undefined?$('#titular').val().split('-')[1]:from;
-// 	var selOrganismes = $('#selOrganismes');
-	webutilModalAdjustHeight();
-// 	selOrganismes.append("<option value=\"\"></option>");
-	
-	loadNivellsAdministracions($("#o_nivellAdmin").val());
- 	loadComunitatsAutonomes($("#o_comunitat").val());
-	debugger
- 	if(from == 'Tit'){
-		dir3CodiDesc =  document.getElementById("searchOrganTit" + j ).getElementsByTagName('input')[0];
-	}else{
-		dir3CodiDesc =  document.getElementById("searchOrgan" + j );
 	}
- 	
- 	if(dir3CodiDesc.value == '' || dir3CodiDesc.value == null){
- 		netejar(true);
- 	}else{
- 		netejar(false);
- 	}
- 	
-	$(".loading-screen").hide();
-	loadOrganigrama();
 
-	
-};
+	function mostrarEntregaPostal(className) {
+		var element = document.getElementById(className);
+		var parent = $(element).closest(".enviamentsForm");
+		var classParent = $(parent).attr('class');
+		var concepteLength = $('#concepte').val().length;
 
-// function searchCodiChange(text){
-// 	var searchNom = $('#searchNom');
-// 	if(text.trim().length ==0){
-// 		searchNom.removeAttr('disabled');
-// 	}else{
-// 		searchNom.prop("disabled", true);
-// 	}
-	
-// };
+		var enviament_id_num = className.substring(className.lastIndexOf('[') + 1, className.lastIndexOf(']'));
 
-// function searchNomChange(text){
-// 	var searchCodi = $('#searchCodi');
-// 	if(text.trim().length ==0){
-// 		searchCodi.removeAttr('disabled');
-// 	}else{
-// 		searchCodi.prop("disabled", true);
-// 	}
-	
-// };
+		if ($(element).is(':checked') && concepteLength > 50) {
+			var longitidInfo = $('.entregaPostal_info_' + enviament_id_num);
+			$(longitidInfo).slideDown(1000);
+		};
 
-function loadNivellsAdministracions(value) {
-	var nivellAdmin = $("#o_nivellAdmin");
-	$.ajax({
-		type: 'GET',
-		url: '${urlNivellAdministracions}',
-		dataType: 'json',
-		async: false,
-		data: {	}
-	}).done(function(data){
-		var list_html = '<option value=""></option>';
-		if (data.length > 0) {
-			$.each(data, function(i, item) {
-				list_html += '<option value=' + data[i].codi + '>' + data[i].valor + '</option>';
-			});
+		if($('.entregaPostal_'+enviament_id_num).css('display') != 'none') {
+			$('.entregaPostal_'+enviament_id_num).hide();
+		} else {
+			$('.entregaPostal_'+enviament_id_num).show();
 		}
-		nivellAdmin.html(list_html);
-		if(value !=null && value != ''){
-			nivellAdmin.val(value).trigger('change');
+	}
+
+	function mostrarDestinatari(enviament_id) {
+		var number;
+		var num;
+		var enviament_id_num = enviament_id.substring(enviament_id.indexOf( '[' ) + 1, enviament_id.indexOf( ']' ));
+		enviament_id_num = parseInt(enviament_id_num);
+//     var isMultiple = ($("div[class*=' personaForm_" + enviament_id_num + "']").find('#isMultiple').val() == 'true');
+		var isMultiple = ${isMultiplesDestinataris};
+
+		if ($("div[class*=' personaForm_" + enviament_id_num + "']").hasClass("hidden")) {
+			$("div[class*=' personaForm_" + enviament_id_num + "']").removeClass("hidden").show();
+
+			if (!isMultiple) {
+				$("div[class*=' personaForm_" + enviament_id_num + "']").closest('div.destinatari').find('.addDestinatari').addClass('hidden');
+			}
 		}
+	}
+
+
+	function obrirModalOrganismes(index){
+		var from = index.split('-')[0];
+
+		$("#organismesModal").modal();
+// 	$("#indexTitular").val(index);
+		$("#titular").val(index);
+		var j = $('#titular').val().split('-')[1] != undefined?$('#titular').val().split('-')[1]:from;
+// 	var selOrganismes = $('#selOrganismes');
+		webutilModalAdjustHeight();
+// 	selOrganismes.append("<option value=\"\"></option>");
+
+		loadNivellsAdministracions($("#o_nivellAdmin").val());
+		loadComunitatsAutonomes($("#o_comunitat").val());
+
+		if(from == 'Tit'){
+			dir3CodiDesc =  document.getElementById("searchOrganTit" + j ).getElementsByTagName('input')[0];
+		}else{
+			dir3CodiDesc =  document.getElementById("searchOrgan" + j );
+		}
+
+		if(dir3CodiDesc.value == '' || dir3CodiDesc.value == null){
+			netejar(true);
+		}else{
+			netejar(false);
+		}
+
+		$(".loading-screen").hide();
+		loadOrganigrama();
+
+
+	};
+
+	// function searchCodiChange(text){
+	// 	var searchNom = $('#searchNom');
+	// 	if(text.trim().length ==0){
+	// 		searchNom.removeAttr('disabled');
+	// 	}else{
+	// 		searchNom.prop("disabled", true);
+	// 	}
+
+	// };
+
+	// function searchNomChange(text){
+	// 	var searchCodi = $('#searchCodi');
+	// 	if(text.trim().length ==0){
+	// 		searchCodi.removeAttr('disabled');
+	// 	}else{
+	// 		searchCodi.prop("disabled", true);
+	// 	}
+
+	// };
+
+	function loadNivellsAdministracions(value) {
+		var nivellAdmin = $("#o_nivellAdmin");
+		$.ajax({
+			type: 'GET',
+			url: '${urlNivellAdministracions}',
+			dataType: 'json',
+			async: false,
+			data: {	}
+		}).done(function(data){
+			var list_html = '<option value=""></option>';
+			if (data.length > 0) {
+				$.each(data, function(i, item) {
+					list_html += '<option value=' + data[i].codi + '>' + data[i].valor + '</option>';
+				});
+			}
+			nivellAdmin.html(list_html);
+			if(value !=null && value != ''){
+				nivellAdmin.val(value).trigger('change');
+			}
 // 		$("#o_nivellAdmin").select2({
 // 			enable : true,
 // 			allowClear : true,
 // 			dropdownParent: $("#dialeg_organs")
 // 		});
-		
-		nivellAdmin.select2({
-			theme: 'bootstrap',
-			width: 'auto'
-		});
-		
-		
-		
-	}).fail(function(jqXHR, textStatus) {
-// 		refreshAlertes();
-	});
-}
 
-function loadComunitatsAutonomes(value) {
-	var codiComunitat = $("#o_comunitat");
-	$.ajax({
-		type: 'GET',
-		url: '${urlComunitatsAutonomes}',
-		dataType: 'json',
-		async: false,
-		data: {	}
-	}).done(function(data){
-		var list_html = '<option value=""></option>';
-		if (data.length > 0) {
-			$.each(data, function(i, item) {
-				list_html += '<option value=' + data[i].codi + '>' + data[i].valor + '</option>';
+			nivellAdmin.select2({
+				theme: 'bootstrap',
+				width: 'auto',
+				allowClear: true,
+		        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
 			});
-		}
-		codiComunitat.html(list_html);
-		if(value !=null && value != ''){
-			codiComunitat.val(value).trigger('change');
-		}
-		codiComunitat.select2({
-			theme: 'bootstrap',
-			width: 'auto'
-		});
-	}).fail(function(jqXHR, textStatus) {
-// 		refreshAlertes();
-	});
-	
-}
 
-function loadProvincies(codiCA, value) {
-	var provincia = $('#o_provincia');
-	if (codiCA != null && codiCA != '') {
-		$(".loading-screen").show();
+
+
+		}).fail(function(jqXHR, textStatus) {
+// 		refreshAlertes();
+		});
+	}
+
+	function loadComunitatsAutonomes(value) {
+		var codiComunitat = $("#o_comunitat");
 		$.ajax({
 			type: 'GET',
-			url: '${urlProvincies}/' + codiCA ,
+			url: '${urlComunitatsAutonomes}',
 			dataType: 'json',
-			async: false		
+			async: false,
+			data: {	}
 		}).done(function(data){
 			var list_html = '<option value=""></option>';
 			if (data.length > 0) {
 				$.each(data, function(i, item) {
-					list_html += '<option value=' + data[i].id + '>' + data[i].descripcio + '</option>';
+					list_html += '<option value=' + data[i].codi + '>' + data[i].valor + '</option>';
 				});
 			}
-			provincia.html(list_html);
+			codiComunitat.html(list_html);
 			if(value !=null && value != ''){
-				provincia.val(value).trigger('change');
+				codiComunitat.val(value).trigger('change');
 			}
-			$("#o_provincia").select2({
+			codiComunitat.select2({
 				theme: 'bootstrap',
-				width: 'auto'
+				width: 'auto',
+				allowClear: true,
+		        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
 			});
 		}).fail(function(jqXHR, textStatus) {
-// 			refreshAlertes();
+// 		refreshAlertes();
 		});
-		$(".loading-screen").hide();
-	} else {
-		var list_html = '<option value=""></option>';
-		$("#o_provincia").html(list_html);
-		$("#o_provincia").select2({
-			theme: 'bootstrap',
-			width: 'auto'
-		});
-	}
-	
-	
-}
 
-function comunitatAutonomaChange(value){
-	if(value.trim().length !=0){
-		loadProvincies(value,$('#o_provincia').val()!=null?$('#o_provincia').val():'');
-	}else{
-		limpiarProvincia(true);
 	}
-};
 
-function provinciesChange(value){
-	if(value.trim().length !=0){
-		loadLocalitats(value);
-	}else{
-		limpiarLocalitat(true);
-	}
-};
-
-function loadLocalitats(codiProvincia) {
-	if (codiProvincia != null && codiProvincia != '') {
-		$(".loading-screen").show();
-		$.ajax({
-			type: 'GET',
-			url: '${urlLocalitats}/' + codiProvincia,
-			dataType: 'json',
-			async: false
-		}).done(function(data){
-			var list_html = '<option value=""></option>';
-			if (data.length > 0) {
-				$.each(data, function(i, item) {
-					list_html += '<option value=' + data[i].id + '>' + data[i].descripcio + '</option>';
+	function loadProvincies(codiCA, value) {
+		var provincia = $('#o_provincia');
+		if (codiCA != null && codiCA != '') {
+			$(".loading-screen").show();
+			$.ajax({
+				type: 'GET',
+				url: '${urlProvincies}/' + codiCA ,
+				dataType: 'json',
+				async: false
+			}).done(function(data){
+				var list_html = '<option value=""></option>';
+				if (data.length > 0) {
+					$.each(data, function(i, item) {
+						list_html += '<option value=' + data[i].id + '>' + data[i].descripcio + '</option>';
+					});
+				}
+				provincia.html(list_html);
+				if(value !=null && value != ''){
+					provincia.val(value).trigger('change');
+				}
+				$("#o_provincia").select2({
+					theme: 'bootstrap',
+					width: 'auto',
+					allowClear: true,
+			        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
 				});
-			}
+			}).fail(function(jqXHR, textStatus) {
+// 			refreshAlertes();
+			});
+			$(".loading-screen").hide();
+		} else {
+			var list_html = '<option value=""></option>';
+			$("#o_provincia").html(list_html);
+			$("#o_provincia").select2({
+				theme: 'bootstrap',
+				width: 'auto',
+				allowClear: true,
+		        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
+			});
+		}
+
+
+	}
+
+	function comunitatAutonomaChange(value){
+		if(value.trim().length !=0){
+			loadProvincies(value,$('#o_provincia').val()!=null?$('#o_provincia').val():'');
+		}else{
+			limpiarProvincia(true);
+		}
+	};
+
+	function provinciesChange(value){
+		if(value.trim().length !=0){
+			loadLocalitats(value);
+		}else{
+			limpiarLocalitat(true);
+		}
+	};
+
+	function loadLocalitats(codiProvincia) {
+		if (codiProvincia != null && codiProvincia != '') {
+			$(".loading-screen").show();
+			$.ajax({
+				type: 'GET',
+				url: '${urlLocalitats}/' + codiProvincia,
+				dataType: 'json',
+				async: false
+			}).done(function(data){
+				var list_html = '<option value=""></option>';
+				if (data.length > 0) {
+					$.each(data, function(i, item) {
+						list_html += '<option value=' + data[i].id + '>' + data[i].descripcio + '</option>';
+					});
+				}
+				$("#o_localitat").html(list_html);
+				$("#o_localitat").select2({
+					theme: 'bootstrap',
+					width: 'auto',
+					allowClear: true
+				});
+			}).fail(function(jqXHR, textStatus) {
+// 			refreshAlertes();
+			});
+			$(".loading-screen").hide();
+		} else {
+			var list_html = '<option value=""></option>';
 			$("#o_localitat").html(list_html);
 			$("#o_localitat").select2({
 				theme: 'bootstrap',
-				width: 'auto'
+				width: 'auto',
+				allowClear: true,
+		        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
 			});
-		}).fail(function(jqXHR, textStatus) {
-// 			refreshAlertes();
-		});
+		}
+	}
+
+	// function mbloquejar() {
+	// // 	var height = $("#dialeg_organs").css('height');
+	// 	var width = $("#dialeg_organs").css('width');
+	// 	var top = $("#dialeg_organs").css('top');
+	// // 	$(".mloading-screen").css('height', height);
+	// 	$(".mloading-screen").css('width', width);
+	// 	$(".mloading-screen").css('top', top);
+	// 	$(".mloading-screen").show();
+	// }
+
+	// function mdesbloquejar() {
+	// 	$(".mloading-screen").hide();
+	// }
+
+	function netejar(reload) {
+		if(reload){
+			limpiarNivellAdmin();
+			limpiarComunitat();
+			limpiarProvincia(true);
+			limpiarLocalitat(true);
+			$("#o_codi").val("");
+			$("#o_denominacio").val("");
+			$("#rOrgans").html('');
+			$("#resultatsTotal").addClass('hidden');
+		}else{
+			loadOrgansGestors();
+		}
 		$(".loading-screen").hide();
-	} else {
-		var list_html = '<option value=""></option>';
-		$("#o_localitat").html(list_html);
-		$("#o_localitat").select2({
-			theme: 'bootstrap',
-			width: 'auto'
-		});
 	}
-}
 
-// function mbloquejar() {
-// // 	var height = $("#dialeg_organs").css('height');
-// 	var width = $("#dialeg_organs").css('width');
-// 	var top = $("#dialeg_organs").css('top');
-// // 	$(".mloading-screen").css('height', height);
-// 	$(".mloading-screen").css('width', width);
-// 	$(".mloading-screen").css('top', top);
-// 	$(".mloading-screen").show();
-// }
-
-// function mdesbloquejar() {
-// 	$(".mloading-screen").hide();
-// }
-
-function netejar(reload) { 
-	if(reload){
-		limpiarNivellAdmin();
-		limpiarComunitat();
-		limpiarProvincia(true);
-		limpiarLocalitat(true);
-		$("#o_codi").val("");
-		$("#o_denominacio").val("");
-		$("#rOrgans").html('');	
-		$("#resultatsTotal").addClass('hidden');	
-	}else{
-		loadOrgansGestors();
+	function limpiarNivellAdmin() {
+		$('#o_nivellAdmin').val(null).trigger('change');
 	}
-	$(".loading-screen").hide();
-}
-
-function limpiarNivellAdmin() { 
-	$('#o_nivellAdmin').val(null).trigger('change');
-}
-function limpiarComunitat() { 
-	$('#o_comunitat').val(null).trigger('change');
-}
-function limpiarProvincia(borrarLlistat) { 
-	$("#o_provincia").val("").trigger('change');
-	if(borrarLlistat){
-		$("#o_provincia").html("");
-	}	
-}
-function limpiarLocalitat(borrarLlistat) { 
-	$("#o_localitat").val("").trigger('change');
-	if(borrarLlistat){
-		$("#o_localitat").html("");
+	function limpiarComunitat() {
+		$('#o_comunitat').val(null).trigger('change');
 	}
-}
+	function limpiarProvincia(borrarLlistat) {
+		$("#o_provincia").val("").trigger('change');
+		if(borrarLlistat){
+			$("#o_provincia").html("");
+		}
+	}
+	function limpiarLocalitat(borrarLlistat) {
+		$("#o_localitat").val("").trigger('change');
+		if(borrarLlistat){
+			$("#o_localitat").html("");
+		}
+	}
 
 
-function seleccionar(fila){
-	var from = $('#titular').val().split('-')[0];
-	var index = $('#titular').val().split('-')[1] != undefined?$('#titular').val().split('-')[1]:from;
-	var dir3Codi;
-	var raoSocial;
-	var dir3CodiDesc;
+	function seleccionar(fila){
+		var from = $('#titular').val().split('-')[0];
+		var index = $('#titular').val().split('-')[1] != undefined?$('#titular').val().split('-')[1]:from;
+		var dir3Codi;
+		var raoSocial;
+		var dir3CodiDesc;
 // 	var organSelect = document.getElementById('selOrganismes');
-	if(fila.size()>0){
+		if(fila.size()>0){
 // 		var organSeleccionatValue = organSelect.options[organSelect.selectedIndex].value;
 // 		var organSeleccionatText = organSelect.options[organSelect.selectedIndex].text;
-		
-		let codi = fila.data('codi');
-		let denominacio = fila.data('denominacio');
-		let ocodi = codi + '-' + denominacio;
-		
-		if(from == 'Tit'){
-			dir3Codi = document.getElementById("enviaments[" + index + "].titular.dir3Codi");
-			raoSocial = document.getElementById("enviaments[" + index + "].titular.nom");
-			dir3CodiDesc =  document.getElementById("searchOrganTit" + index).getElementsByTagName('input')[0];
-		}else{
-			dir3Codi = document.getElementById("enviaments[" + index + "].destinataris[" + index + "].dir3Codi");
-			raoSocial = document.getElementById("enviaments[" + index + "].destinataris[" + index + "].nom");
-			dir3CodiDesc =  document.getElementById("searchOrgan" + index);
+
+			let codi = fila.data('codi');
+			let denominacio = fila.data('denominacio');
+			let ocodi = codi + '-' + denominacio;
+
+			if(from == 'Tit'){
+				dir3Codi = document.getElementById("enviaments[" + index + "].titular.dir3Codi");
+				raoSocial = document.getElementById("enviaments[" + index + "].titular.nom");
+				dir3CodiDesc =  document.getElementById("searchOrganTit" + index).getElementsByTagName('input')[0];
+			}else{
+				dir3Codi = document.getElementById("enviaments[" + index + "].destinataris[" + index + "].dir3Codi");
+				raoSocial = document.getElementById("enviaments[" + index + "].destinataris[" + index + "].nom");
+				dir3CodiDesc =  document.getElementById("searchOrgan" + index);
+			}
+
+			dir3Codi.value = codi;
+			raoSocial.value = denominacio;
+			dir3CodiDesc.value = ocodi;
+			$('#cerrarModal').click();
 		}
-		
-		dir3Codi.value = codi;
-		raoSocial.value = denominacio;	
-		dir3CodiDesc.value = ocodi;	
-		$('#cerrarModal').click();
+	};
+
+	// function netejarFiltre(){
+	// 	var searchCodi = $('#searchCodi');
+	// 	var searchNom = $('#searchNom');
+	// 	var selOrganismes = $('#selOrganismes');
+
+	// 	searchCodi.removeAttr('disabled');
+	// 	searchCodi.val('');
+	// 	searchNom.removeAttr('disabled');
+	// 	searchNom.val('');
+
+	// 	selOrganismes.empty();
+	// 	selOrganismes.append("<option value=\"\"></option>");
+
+	// };
+
+
+	function buscarCodiEnOrganigrama(fills){
+		var array = new Array();
+		if(fills != null && fills != undefined){
+			$.each(fills, function(key, obj) {
+				array.push(key);
+				if(obj.fills != undefined && obj.fills != null){
+					$.each(obj.fills, function(key, obj) {
+						buscarCodiEnOrganigrama(obj.fills);
+					});
+				}
+			});
+
+		}
+		return array;
 	}
-};
 
-// function netejarFiltre(){
-// 	var searchCodi = $('#searchCodi');
-// 	var searchNom = $('#searchNom');
-// 	var selOrganismes = $('#selOrganismes');
-	
-// 	searchCodi.removeAttr('disabled');
-// 	searchCodi.val('');
-// 	searchNom.removeAttr('disabled');
-// 	searchNom.val('');
-	
-// 	selOrganismes.empty();
-// 	selOrganismes.append("<option value=\"\"></option>");
-
-// };
+	function loadOrgansGestors(){
+		var codi = $("#o_codi").val();
+		var denominacio = $("#o_denominacio").val();
+		var nivellAdmin = $("#o_nivellAdmin").val();
+		var codiComunitat = $('#o_comunitat').val();
+		var codiProvincia = $('#o_provincia').val()!=null?$('#o_provincia').val():'';
+		var codiLocalitat = $("#o_localitat").val()!=null?$('#o_localitat').val():'';
 
 
-function buscarCodiEnOrganigrama(fills){
-	var array = new Array();
-	if(fills != null && fills != undefined){
-		$.each(fills, function(key, obj) { 
-			array.push(key);
-			if(obj.fills != undefined && obj.fills != null){
-				$.each(obj.fills, function(key, obj) { 
-					buscarCodiEnOrganigrama(obj.fills);		
-				});	
-			}	
-		});
-		
-	}
-	return array; 
-}
+		if ((codi == null || codi == "") &&
+				(denominacio == null || denominacio == "") &&
+				(codiComunitat == null || codiComunitat == "")) {
+			alert("<spring:message code='notificacio.form.dir3.cercar.noMinimOrgansFiltre'/>");
+			return false;
+		} else {
+			$(".loading-screen").show();
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value="/notificacio/cercaUnitats"/>" +
+						'?codi='+codi.trim()+
+						'&denominacio='+denominacio+
+						'&nivellAdministracio='+nivellAdmin+
+						'&comunitatAutonoma='+codiComunitat+
+						'&provincia='+codiProvincia+
+						'&municipi='+codiLocalitat,
+				success: function(data) {
+					var list_html = '';
+					$("#resultatsTotal").removeClass('hidden');
+					if (data.length > 0) {
+						$.each(data, function(i, item) {
+							var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
+							var sir = $('#organigrama').val().indexOf(data[i].codi);
+							var clase = null;
+							var claseBoto = 'select btn btn-success';
+							var socSir = (sir!=-1?'<spring:message code="comu.no"/>':'<spring:message code="comu.si"/>');
 
-function loadOrgansGestors(){
-	var codi = $("#o_codi").val();
-	var denominacio = $("#o_denominacio").val();
-	var nivellAdmin = $("#o_nivellAdmin").val();
-	var codiComunitat = $('#o_comunitat').val();
-	var codiProvincia = $('#o_provincia').val()!=null?$('#o_provincia').val():'';
-	var codiLocalitat = $("#o_localitat").val()!=null?$('#o_localitat').val():'';
-
-	
-	if ((codi == null || codi == "") &&
-			(denominacio == null || denominacio == "") &&
-			(codiComunitat == null || codiComunitat == "")) {
-		alert("<spring:message code='notificacio.form.dir3.cercar.noMinimOrgansFiltre'/>");
-		return false;
-	} else {
-		$(".loading-screen").show();
-		$.ajax({
-			type: 'GET',
-			url: "<c:url value="/notificacio/cercaUnitats"/>" + 
-				'?codi='+codi.trim()+
-				'&denominacio='+denominacio+
-				'&nivellAdministracio='+nivellAdmin+
-				'&comunitatAutonoma='+codiComunitat+
-				'&provincia='+codiProvincia+
-				'&municipi='+codiLocalitat,
-			success: function(data) {
-				var list_html = '';
-				$("#resultatsTotal").removeClass('hidden');
-				if (data.length > 0) {
-					$.each(data, function(i, item) {
-						var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
-						var sir = $('#organigrama').val().indexOf(data[i].codi);
-						var clase = null;
-						var claseBoto = 'select btn btn-success';
-						var socSir = (sir!=-1?'<spring:message code="comu.no"/>':'<spring:message code="comu.si"/>');
-						
 // 						if(enviamentTipus == 'NOTIFICACIO' && sir!=-1 ){
 // 							clase = 'unselectable';
 // 							claseBoto = 'unselectable select btn btn-success';
 // 						}else if(enviamentTipus == 'COMUNICACIO' && sir==-1 ){
-						if(enviamentTipus == 'COMUNICACIO' && sir!=-1 ){
-							clase =   (i%2 == 0 ? 'even' : 'odd') +' unselectable';
-							claseBoto = 'hidden select btn btn-success';
-						}else{
-							clase = (i%2 == 0 ? 'even' : 'odd');
-						}
-						
-						list_html += '<tr class="'+clase+'" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].codi + ' - '+ data[i].nom + 
-						'</td><td>'+(socSir)+'</td><td><button type="button" class="'+claseBoto+'"> <spring:message code="comu.boto.seleccionar"/></button</td></tr>';
-						
-						
-// 						list_html += '<tr class="'+clase+'" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom + 
+							if(enviamentTipus == 'COMUNICACIO' && sir!=-1 ){
+								clase =   (i%2 == 0 ? 'even' : 'odd') +' unselectable';
+								claseBoto = 'hidden select btn btn-success';
+							}else{
+								clase = (i%2 == 0 ? 'even' : 'odd');
+							}
+
+							list_html += '<tr class="'+clase+'" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].codi + ' - '+ data[i].nom +
+									'</td><td>'+(socSir)+'</td><td><button type="button" class="'+claseBoto+'"> <spring:message code="comu.boto.seleccionar"/></button</td></tr>';
+
+
+// 						list_html += '<tr class="'+clase+'" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom +
 // 						'</td><td>'+socSir+'</td><td><button type="button" class="'+clase+'" select btn btn-success"> <spring:message code="comu.boto.seleccionar"/></button</td></tr>';
-						
-						
+
+
 // 						if($('#organigrama').val().indexOf(data[i].codi) != -1 ){
-// 							list_html += '<tr class="'+clase+'" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom + 
+// 							list_html += '<tr class="'+clase+'" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom +
 // 							'</td><td>'+sir!=-1?'Si':'No'+'</td><td><button type="button" class="select btn btn-success"> <spring:message code="comu.boto.seleccionar"/></button</td></tr>';
 // 						}else{
-// 							list_html += '<tr class="' + clase) + '" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom + 
+// 							list_html += '<tr class="' + clase) + '" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom +
 // 							'</td><td>No</td><td><button  type="button" class="select btn btn-success"> <spring:message code="comu.boto.seleccionar"/></button></td></tr>';
 // 						}
-						
-					});
-				}else{
-					$("#total").text("0");
-				}
 
-				$("#rOrgans").html(list_html);
-				$("#total").text(data.length);
-// 				$("#rOrgans").append('<tfoot><tr><th id="total" colspan="2"><spring:message code="comu.resultats"/></th><td>'+data.length+'</td></tr></tfoot>');
-				$(".loading-screen").hide();
-			},
-			error: function() {
-				console.log("error obtenint les administracions...");
-				$(".loading-screen").hide();
-			}
-		});
-	}
-	
-	
-};
-
-
-
-function mostrarEntregaDeh(className) {
-    var element = document.getElementById(className);
-    var parent = $(element).closest(".enviamentsForm");
-    var classParent = $(parent).attr('class');
-
-    var enviament_id_num = className.substring(className.lastIndexOf('[') + 1, className.lastIndexOf(']'));
-    if($('.entregaDeh_' + enviament_id_num).css('display') != 'none') {
-        $('.entregaDeh_'+enviament_id_num).hide();
-    } else {
-        $('.entregaDeh_'+enviament_id_num).show();
-    }
-}
-
-function actualitzarEntrega(j) {
-	var selPaisos = document.getElementById("enviaments[" + j + "].entregaPostal.paisCodi");
-	var selProvincies = document.getElementById("enviaments[" + j + "].entregaPostal.provincia");
-	var selLocalitats = document.getElementById("enviaments[" + j + "].entregaPostal.municipiCodi");
-	var selPoblacio =  document.getElementById("enviaments[" + j + "].entregaPostal.poblacio");
-	
-	$.ajax({
-		type: 'GET',
-		url: "<c:url value="/notificacio/paisos/"/>",
-		success: function(data) {
-			$(selPaisos).empty();
-			$(selPaisos).append("<option value=\"\"></option>");
-			if (data && data.length > 0) {
-				$.each(data, function(i, val) {
-					if (val.alfa2Pais == 'ES') {
-						$(selPaisos).append("<option value=\"" + val.alfa2Pais + "\" selected>" + val.descripcioPais + "</option>");
-					} else {
-						$(selPaisos).append("<option value=\"" + val.alfa2Pais + "\">" + val.descripcioPais + "</option>");
-					}
-					
-				});
-				var paisCodi = document.getElementsByClassName('enviaments[' + j + '].entregaPostal.paisCodi');
-				
-				if (paisCodi !== undefined && paisCodi[0] !== undefined) {
-					$(selPaisos).val(paisCodi[0].value).change();
-				}
-			}
-			var select2Options = {
-					theme: 'bootstrap',
-					width: 'auto'};
-			$(selPaisos).select2(select2Options);
-		},
-		error: function() {
-			console.log("error obtenint les provincies...");
-		}
-	});
-	//Provincies
-	$.ajax({
-		type: 'GET',
-		url: "<c:url value="/notificacio/provincies/"/>",
-		success: function(data) {
-			$(selProvincies).empty();
-			$(selProvincies).append("<option value=\"\"></option>");
-			if (data && data.length > 0) {
-				$.each(data, function(i, val) {
-					$(selProvincies).append("<option value=\"" + val.id + "\">" + val.descripcio + "</option>");
-				});
-				
-				var provinciaCodi = document.getElementsByClassName('enviaments[' + j + '].entregaPostal.provincia');
-				
-				if (provinciaCodi !== undefined && provinciaCodi[0] !== undefined) {
-					$(selProvincies).val(provinciaCodi[0].value).change();
-				}
-			}
-			var select2Options = {
-					theme: 'bootstrap',
-					width: 'auto'};
-			$(selProvincies).select2(select2Options);
-		},
-		error: function() {
-			console.log("error obtenint les provincies...");
-		}
-	});
-
-	//Localitats
-	$(selProvincies).on('change', function() {
-		var provincia = $(this);
-		if ($(this).val() == '') {
-			$(selLocalitats).find('option').remove();
-		} else {
-			$.ajax({
-				type: 'GET',
-				url: "<c:url value="/notificacio/localitats/"/>" + $(provincia).val(),
-				success: function(data) {
-					$(selLocalitats).empty();
-					$(selLocalitats).append("<option value=\"\"></option>");
-					if (data && data.length > 0) {
-						$.each(data, function(i, val) {
-							$(selLocalitats).append("<option value=\"" + val.id + "\">" + val.descripcio + "</option>");
 						});
-						
-						var municipiCodi = document.getElementsByClassName('enviaments[' + j + '].entregaPostal.municipiCodi');
-						
-						if (municipiCodi !== undefined && municipiCodi[0] !== undefined) {
-							$(selLocalitats).val(municipiCodi[0].value).change();
-						}
+					}else{
+						$("#total").text("0");
 					}
-					var select2Options = {
-							theme: 'bootstrap',
-							width: 'auto'};
-					$(selLocalitats).select2(select2Options);
+
+					$("#rOrgans").html(list_html);
+					$("#total").text(data.length);
+// 				$("#rOrgans").append('<tfoot><tr><th id="total" colspan="2"><spring:message code="comu.resultats"/></th><td>'+data.length+'</td></tr></tfoot>');
+					$(".loading-screen").hide();
 				},
 				error: function() {
-					console.log("error obtenint les provincies...");
+					console.log("error obtenint les administracions...");
+					$(".loading-screen").hide();
 				}
 			});
 		}
-	});	
-	
-}
 
-function comptarCaracters(idCamp) {
-	var fieldConcepte = $('#' + idCamp);
-	if (fieldConcepte.val().length != 0) {
-		var size = $(fieldConcepte).val().length;
-		$('.inputCurrentLength').text(size);
-	} else {
-		$('.inputCurrentLength').text(0);
+
 	};
-	
-	//$(fieldConcepte).bind("change paste keyup", function() {
-	//	var size = $(this).val().length;
-	//	$('.inputCurrentLength').text(size);
-	//});
-}
-	
+
+
+
+	function mostrarEntregaDeh(className) {
+		var element = document.getElementById(className);
+		var parent = $(element).closest(".enviamentsForm");
+		var classParent = $(parent).attr('class');
+
+		var enviament_id_num = className.substring(className.lastIndexOf('[') + 1, className.lastIndexOf(']'));
+		if($('.entregaDeh_' + enviament_id_num).css('display') != 'none') {
+			$('.entregaDeh_'+enviament_id_num).hide();
+		} else {
+			$('.entregaDeh_'+enviament_id_num).show();
+		}
+	}
+
+	function actualitzarEntrega(j) {
+		var selPaisos = document.getElementById("enviaments[" + j + "].entregaPostal.paisCodi");
+		var selProvincies = document.getElementById("enviaments[" + j + "].entregaPostal.provincia");
+		var selLocalitats = document.getElementById("enviaments[" + j + "].entregaPostal.municipiCodi");
+		var selPoblacio =  document.getElementById("enviaments[" + j + "].entregaPostal.poblacio");
+
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value="/notificacio/paisos/"/>",
+			success: function(data) {
+				$(selPaisos).empty();
+				$(selPaisos).append("<option value=\"\"></option>");
+				if (data && data.length > 0) {
+					$.each(data, function(i, val) {
+						if (val.alfa2Pais == 'ES') {
+							$(selPaisos).append("<option value=\"" + val.alfa2Pais + "\" selected>" + val.descripcioPais + "</option>");
+						} else {
+							$(selPaisos).append("<option value=\"" + val.alfa2Pais + "\">" + val.descripcioPais + "</option>");
+						}
+
+					});
+					var paisCodi = document.getElementsByClassName('enviaments[' + j + '].entregaPostal.paisCodi');
+
+					if (paisCodi !== undefined && paisCodi[0] !== undefined) {
+						$(selPaisos).val(paisCodi[0].value).change();
+					}
+				}
+				var select2Options = {
+					theme: 'bootstrap',
+					width: 'auto'};
+				$(selPaisos).select2(select2Options);
+			},
+			error: function() {
+				console.log("error obtenint les provincies...");
+			}
+		});
+		//Provincies
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value="/notificacio/provincies/"/>",
+			success: function(data) {
+				$(selProvincies).empty();
+				$(selProvincies).append("<option value=\"\"></option>");
+				if (data && data.length > 0) {
+					$.each(data, function(i, val) {
+						$(selProvincies).append("<option value=\"" + val.id + "\">" + val.descripcio + "</option>");
+					});
+
+					var provinciaCodi = document.getElementsByClassName('enviaments[' + j + '].entregaPostal.provincia');
+
+					if (provinciaCodi !== undefined && provinciaCodi[0] !== undefined) {
+						$(selProvincies).val(provinciaCodi[0].value).change();
+					}
+				}
+				var select2Options = {
+					theme: 'bootstrap',
+					width: 'auto'};
+				$(selProvincies).select2(select2Options);
+			},
+			error: function() {
+				console.log("error obtenint les provincies...");
+			}
+		});
+
+		//Localitats
+		$(selProvincies).on('change', function() {
+			var provincia = $(this);
+			if ($(this).val() == '') {
+				$(selLocalitats).find('option').remove();
+			} else {
+				$.ajax({
+					type: 'GET',
+					url: "<c:url value="/notificacio/localitats/"/>" + $(provincia).val(),
+					success: function(data) {
+						$(selLocalitats).empty();
+						$(selLocalitats).append("<option value=\"\"></option>");
+						if (data && data.length > 0) {
+							$.each(data, function(i, val) {
+								$(selLocalitats).append("<option value=\"" + val.id + "\">" + val.descripcio + "</option>");
+							});
+
+							var municipiCodi = document.getElementsByClassName('enviaments[' + j + '].entregaPostal.municipiCodi');
+
+							if (municipiCodi !== undefined && municipiCodi[0] !== undefined) {
+								$(selLocalitats).val(municipiCodi[0].value).change();
+							}
+						}
+						var select2Options = {
+							theme: 'bootstrap',
+							width: 'auto'};
+						$(selLocalitats).select2(select2Options);
+					},
+					error: function() {
+						console.log("error obtenint les provincies...");
+					}
+				});
+			}
+		});
+
+	}
+
+	function comptarCaracters(idCamp) {
+		var fieldConcepte = $('#' + idCamp);
+		if (fieldConcepte.val().length != 0) {
+			var size = $(fieldConcepte).val().length;
+			$('.inputCurrentLength').text(size);
+		} else {
+			$('.inputCurrentLength').text(0);
+		};
+
+		//$(fieldConcepte).bind("change paste keyup", function() {
+		//	var size = $(this).val().length;
+		//	$('.inputCurrentLength').text(size);
+		//});
+	}
+
 </script>
-</head>
-<body>
-	<div class="loading">
+<div class="loading">
 		<div class="loading-gif">
 		<img src="<c:url value="/img/ajax-loader.gif"/>"/>
 		</div>
@@ -1692,7 +1950,8 @@ function comptarCaracters(idCamp) {
 			<!-- CONCEPTE -->
 			<div class="row">
 				<div class="col-md-12">
-					<not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="2" required="true" showsize="true" inputMaxLength="${concepteSize}"/>
+					<not:inputText name="concepte" textKey="notificacio.form.camp.concepte" labelSize="2" required="true" showsize="true"
+								   inputMaxLength="${concepteSize}" inputMinLength="3"/>
 				</div>
 			</div>
 			
@@ -1824,58 +2083,339 @@ function comptarCaracters(idCamp) {
 				<div class="col-md-6">
 					<div class="form-group">
 						<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
-						<form:hidden path="tipusDocumentSelected" value="${tipusDocument}"/>
+						<form:hidden path="tipusDocumentSelected[0]" id="tipusDocumentSelected_0" value="${tipusDocument[0]}"/>
 						<div class="controls col-xs-8">
-							<form:hidden path="tipusDocumentDefault"/>
-							<select id="tipusDocument" name="tipusDocument" class="customSelect">
+							<form:hidden path="tipusDocumentDefault[0]"/>
+							<select id="tipusDocument_0" name="tipusDocument[0]" class="customSelect tipusDocument">
 							<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
-								<option value="${enumValue}" <c:if test="${not empty tipusDocument && tipusDocument == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
+								<option value="${enumValue}" <c:if test="${not empty tipusDocument[0] && tipusDocument[0] == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
 							</c:forEach>
 							</select>
 						</div>
 					</div>
 				</div>
-				<input type="hidden" name="document.id" value="${notificacioCommandV2.document.id}">
-				<input type="hidden" name="document.arxiuGestdocId" value="${notificacioCommandV2.document.arxiuGestdocId}">
-				<input type="hidden" name="document.arxiuNom" value="${notificacioCommandV2.document.arxiuNom}">
-				<input type="hidden" name="document.mediaType" value="${notificacioCommandV2.document.mediaType}">
-				<input type="hidden" name="document.mida" value="${notificacioCommandV2.document.mida}">
+				<input type="hidden" name="documents[0].id" value="${notificacioCommandV2.documents[0].id}">
+				<input type="hidden" name="documents[0].arxiuGestdocId" value="${notificacioCommandV2.documents[0].arxiuGestdocId}">
+				<input type="hidden" name="documents[0].arxiuNom" value="${notificacioCommandV2.documents[0].arxiuNom}">
+				<input type="hidden" name="documents[0].mediaType" value="${notificacioCommandV2.documents[0].mediaType}">
+				<input type="hidden" name="documents[0].mida" value="${notificacioCommandV2.documents[0].mida}">
 				<!-- CSV -->
-				<div id="input-origen-csv" class="col-md-6">
-					<not:inputText name="documentArxiuCsv" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+				<div id="input-origen-csv_0" class="col-md-6">
+					<not:inputText name="documentArxiuCsv[0]" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
 				</div>
 				
 				<!-- UUID -->
-				<div id="input-origen-uuid" class="col-md-6 hidden">
-					<not:inputText name="documentArxiuUuid" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+				<div id="input-origen-uuid_0" class="col-md-6 hidden">
+					<not:inputText name="documentArxiuUuid[0]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
 				</div>
 				
 				<!-- URL -->
-				<div id="input-origen-url" class="col-md-6 hidden">
-					<not:inputText name="documentArxiuUrl" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+				<div id="input-origen-url_0" class="col-md-6 hidden">
+					<not:inputText name="documentArxiuUrl[0]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
 				</div>
 				
 				<!-- FITXER -->
-				<div id="input-origen-arxiu" class="col-md-6 hidden">
+				<div id="input-origen-arxiu_0" class="col-md-6 hidden">
 					<c:choose>
 						<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
-							<not:inputFile name="arxiu" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument}"/>
+							<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="test"/>
 						</c:when>
 						<c:otherwise>
-							<not:inputFile name="arxiu" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis"/>
+							<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_0}"/>
 						</c:otherwise>
 					</c:choose>
 				</div>
 			</div>
-			
+			<div id="metadades_0" class="row doc-metadades hidden">
+				<div class="col-md-4 col-md-offset-2">
+					<not:inputSelect name="documents[0].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+				</div>
+				<div class="col-md-4 col-md-offset-2">
+					<not:inputSelect name="documents[0].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+				</div>
+				<div class="col-md-4 col-md-offset-2">
+					<not:inputSelect name="documents[0].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+				</div>
+				<div class="col-md-4 col-md-offset-2">
+					<not:inputCheckbox name="documents[0].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
+				</div>
+				<hr/>
+			</div>
+
+			<div id="docs-addicionals" class="hidden">
+				<!-- DOCUMENT 2 -->
+				<div id="document2" class="row hidden">
+					<div class="col-md-6">
+						<div class="form-group">
+							<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
+							<form:hidden path="tipusDocumentSelected[1]" id="tipusDocumentSelected_1" value="${tipusDocument[1]}"/>
+							<div class="controls col-xs-8">
+								<form:hidden path="tipusDocumentDefault[1]"/>
+								<select id="tipusDocument_1" name="tipusDocument[1]" class="customSelect tipusDocument">
+									<option value=""></option>
+									<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
+										<option value="${enumValue}" <c:if test="${not empty tipusDocument[1] && tipusDocument[1] == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
+									</c:forEach>
+								</select>
+							</div>
+						</div>
+					</div>
+					<input type="hidden" name="documents[1].id" value="${notificacioCommandV2.documents[1].id}">
+					<input type="hidden" name="documents[1].arxiuGestdocId" value="${notificacioCommandV2.documents[1].arxiuGestdocId}">
+					<input type="hidden" name="documents[1].arxiuNom" value="${notificacioCommandV2.documents[1].arxiuNom}">
+					<input type="hidden" name="documents[1].mediaType" value="${notificacioCommandV2.documents[1].mediaType}">
+					<input type="hidden" name="documents[1].mida" value="${notificacioCommandV2.documents[1].mida}">
+					<!-- CSV -->
+					<div id="input-origen-csv_1" class="col-md-6">
+						<not:inputText name="documentArxiuCsv[1]" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+					</div>
+
+					<!-- UUID -->
+					<div id="input-origen-uuid_1" class="col-md-6 hidden">
+						<not:inputText name="documentArxiuUuid[1]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+					</div>
+
+					<!-- URL -->
+					<div id="input-origen-url_1" class="col-md-6 hidden">
+						<not:inputText name="documentArxiuUrl[1]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+					</div>
+
+					<!-- FITXER -->
+					<div id="input-origen-arxiu_1" class="col-md-6 hidden">
+						<c:choose>
+							<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
+								<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_1}"/>
+							</c:when>
+							<c:otherwise>
+								<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_1}"/>
+							</c:otherwise>
+						</c:choose>
+					</div>
+				</div>
+				<div id="metadades_1" class="row doc-metadades hidden">
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputSelect name="documents[1].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+					</div>
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputSelect name="documents[1].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+					</div>
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputSelect name="documents[1].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+					</div>
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputCheckbox name="documents[1].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
+					</div>
+					<hr/>
+				</div>
+				<!-- DOCUMENT 3 -->
+				<div id="document3" class="row hidden">
+					<div class="col-md-6">
+						<div class="form-group">
+							<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
+							<form:hidden path="tipusDocumentSelected[2]" id="tipusDocumentSelected_2" value="${tipusDocument[2]}"/>
+							<div class="controls col-xs-8">
+								<form:hidden path="tipusDocumentDefault[2]"/>
+								<select id="tipusDocument_2" name="tipusDocument[2]" class="customSelect tipusDocument">
+									<option value=""></option>
+									<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
+										<option value="${enumValue}" <c:if test="${not empty tipusDocument[2] && tipusDocument[2] == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
+									</c:forEach>
+								</select>
+							</div>
+						</div>
+					</div>
+					<input type="hidden" name="documents[2].id" value="${notificacioCommandV2.documents[2].id}">
+					<input type="hidden" name="documents[2].arxiuGestdocId" value="${notificacioCommandV2.documents[2].arxiuGestdocId}">
+					<input type="hidden" name="documents[2].arxiuNom" value="${notificacioCommandV2.documents[2].arxiuNom}">
+					<input type="hidden" name="documents[2].mediaType" value="${notificacioCommandV2.documents[2].mediaType}">
+					<input type="hidden" name="documents[2].mida" value="${notificacioCommandV2.documents[2].mida}">
+					<!-- CSV -->
+					<div id="input-origen-csv_2" class="col-md-6">
+						<not:inputText name="documentArxiuCsv[2]" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+					</div>
+
+					<!-- UUID -->
+					<div id="input-origen-uuid_2" class="col-md-6 hidden">
+						<not:inputText name="documentArxiuUuid[2]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+					</div>
+
+					<!-- URL -->
+					<div id="input-origen-url_2" class="col-md-6 hidden">
+						<not:inputText name="documentArxiuUrl[2]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+					</div>
+
+					<!-- FITXER -->
+					<div id="input-origen-arxiu_2" class="col-md-6 hidden">
+						<c:choose>
+							<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
+								<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_2}"/>
+							</c:when>
+							<c:otherwise>
+								<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_2}"/>
+							</c:otherwise>
+						</c:choose>
+					</div>
+				</div>
+				<div id="metadades_2" class="row doc-metadades hidden">
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputSelect name="documents[2].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+					</div>
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputSelect name="documents[2].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+					</div>
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputSelect name="documents[2].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+					</div>
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputCheckbox name="documents[2].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
+					</div>
+					<hr/>
+				</div>
+				<!-- DOCUMENT 4 -->
+				<div id="document4" class="row hidden">
+					<div class="col-md-6">
+						<div class="form-group">
+							<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
+							<form:hidden path="tipusDocumentSelected[3]" id="tipusDocumentSelected_3" value="${tipusDocument[3]}"/>
+							<div class="controls col-xs-8">
+								<form:hidden path="tipusDocumentDefault[3]"/>
+								<select id="tipusDocument_3" name="tipusDocument[3]" class="customSelect tipusDocument">
+									<option value=""></option>
+									<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
+										<option value="${enumValue}" <c:if test="${not empty tipusDocument[3] && tipusDocument[3] == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
+									</c:forEach>
+								</select>
+							</div>
+						</div>
+					</div>
+					<input type="hidden" name="documents[3].id" value="${notificacioCommandV2.documents[3].id}">
+					<input type="hidden" name="documents[3].arxiuGestdocId" value="${notificacioCommandV2.documents[3].arxiuGestdocId}">
+					<input type="hidden" name="documents[3].arxiuNom" value="${notificacioCommandV2.documents[3].arxiuNom}">
+					<input type="hidden" name="documents[3].mediaType" value="${notificacioCommandV2.documents[3].mediaType}">
+					<input type="hidden" name="documents[3].mida" value="${notificacioCommandV2.documents[3].mida}">
+					<!-- CSV -->
+					<div id="input-origen-csv_3" class="col-md-6">
+						<not:inputText name="documentArxiuCsv[3]" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+					</div>
+
+					<!-- UUID -->
+					<div id="input-origen-uuid_3" class="col-md-6 hidden">
+						<not:inputText name="documentArxiuUuid[3]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+					</div>
+
+					<!-- URL -->
+					<div id="input-origen-url_3" class="col-md-6 hidden">
+						<not:inputText name="documentArxiuUrl[3]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+					</div>
+
+					<!-- FITXER -->
+					<div id="input-origen-arxiu_3" class="col-md-6 hidden">
+						<c:choose>
+							<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
+								<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_3}"/>
+							</c:when>
+							<c:otherwise>
+								<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_3}"/>
+							</c:otherwise>
+						</c:choose>
+					</div>
+				</div>
+				<div id="metadades_3" class="row doc-metadades hidden">
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputSelect name="documents[3].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+					</div>
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputSelect name="documents[3].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+					</div>
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputSelect name="documents[3].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+					</div>
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputCheckbox name="documents[3].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
+					</div>
+					<hr/>
+				</div>
+				<!-- DOCUMENT 5 -->
+				<div id="document5" class="row hidden">
+					<div class="col-md-6">
+						<div class="form-group">
+							<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
+							<form:hidden path="tipusDocumentSelected[4]" id="tipusDocumentSelected_4" value="${tipusDocument[4]}"/>
+							<div class="controls col-xs-8">
+								<form:hidden path="tipusDocumentDefault[4]"/>
+								<select id="tipusDocument_4" name="tipusDocument[4]" class="customSelect tipusDocument">
+									<option value=""></option>
+									<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
+										<option value="${enumValue}" <c:if test="${not empty tipusDocument[4] && tipusDocument[4] == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
+									</c:forEach>
+								</select>
+							</div>
+						</div>
+					</div>
+					<input type="hidden" name="documents[4].id" value="${notificacioCommandV2.documents[4].id}">
+					<input type="hidden" name="documents[4].arxiuGestdocId" value="${notificacioCommandV2.documents[4].arxiuGestdocId}">
+					<input type="hidden" name="documents[4].arxiuNom" value="${notificacioCommandV2.documents[4].arxiuNom}">
+					<input type="hidden" name="documents[4].mediaType" value="${notificacioCommandV2.documents[4].mediaType}">
+					<input type="hidden" name="documents[4].mida" value="${notificacioCommandV2.documents[4].mida}">
+					<!-- CSV -->
+					<div id="input-origen-csv_4" class="col-md-6">
+						<not:inputText name="documentArxiuCsv[4]" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+					</div>
+
+					<!-- UUID -->
+					<div id="input-origen-uuid_4" class="col-md-6 hidden">
+						<not:inputText name="documentArxiuUuid[4]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+					</div>
+
+					<!-- URL -->
+					<div id="input-origen-url_4" class="col-md-6 hidden">
+						<not:inputText name="documentArxiuUrl[4]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+					</div>
+
+					<!-- FITXER -->
+					<div id="input-origen-arxiu_4" class="col-md-6 hidden">
+						<c:choose>
+							<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
+								<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_4}"/>
+							</c:when>
+							<c:otherwise>
+								<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_4}"/>
+							</c:otherwise>
+						</c:choose>
+					</div>
+				</div>
+				<div id="metadades_4" class="row doc-metadades hidden">
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputSelect name="documents[4].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+					</div>
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputSelect name="documents[4].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+					</div>
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputSelect name="documents[4].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+					</div>
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputCheckbox name="documents[4].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
+					</div>
+					<hr/>
+				</div>
+			</div>
+
+			<div id="btn-documents" class="text-left vt10 hidden">
+<%--				<div class="btn-group">--%>
+					<input type="button" class="btn btn-default" id="addDocument" value="<spring:message code="notificacio.form.boto.nou.document"/>" />
+					<input type="button" class="btn btn-danger hidden" id="removeDocument" value="<spring:message code="notificacio.form.boto.remove.document"/>" />
+<%--				</div>--%>
+			</div>
+
 			<!--  DOCUMENT NOTMALITZAT -->
-			<div class="row">
+			<div id="normalitzat" class="row">
 				<div class="col-md-12">
-					<not:inputCheckbox name="document.normalitzat" textKey="notificacio.form.camp.normalitzat" info="true" messageInfo="notificacio.form.camp.normalitzat.info" labelSize="2" />
+					<not:inputCheckbox name="documents[0].normalitzat" textKey="notificacio.form.camp.normalitzat" info="true" messageInfo="notificacio.form.camp.normalitzat.info" labelSize="2" />
 				</div>
 			</div>
 		</div>
-		
+
 		<!-- ENVIAMENT -->
 		<div class="container-fluid">
 			<div class="title">
@@ -2214,7 +2754,7 @@ function comptarCaracters(idCamp) {
 				</c:forEach>
 				</div>
 			</div>
-			<div class="text-left">
+			<div class="text-left vt10">
 				<div class="btn-group">
 					<input type="button" class="btn btn-default" id="addEnviament" onclick="addEnvio()" value="<spring:message code="notificacio.form.boto.nou.enviament"/>" />
 				</div>
@@ -2245,7 +2785,7 @@ function comptarCaracters(idCamp) {
 					<button type="button" class="close" data-dismiss="modal">&times;</button>
 					<h4 class="modal-title"><spring:message code="notificacio.form.dir3.cercar.organismes"/></h4>
 				</div>
-				<div class="modal-body body">
+				<div class="modal-body body" style="padding-top: 0px;">
 					
 				<div id='dialeg_organs' style='padding: 0px;'>
 					<input type="hidden" id="titular" value="">
@@ -2254,7 +2794,7 @@ function comptarCaracters(idCamp) {
 
 					 
 					<div class="row margebaix" style="margin-top:20px;">
-						<div class="col-sm-5">
+						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.codi" /></label>
 								<div class="forminput">
@@ -2262,7 +2802,7 @@ function comptarCaracters(idCamp) {
 								</div>
 							</div>
 						</div>
-						<div class="col-sm-5">
+						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.denominacio" /></label>
 								<div class="forminput">
@@ -2273,7 +2813,7 @@ function comptarCaracters(idCamp) {
 					
 					</div>
 					<div class="row margebaix">
-						<div class="col-sm-5">
+						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.nivell.administracio" /></label>
 								<div class="forminput">
@@ -2283,25 +2823,26 @@ function comptarCaracters(idCamp) {
 								</div>
 							</div>
 						</div>
-						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px">
-							<span onclick="limpiarNivellAdmin()" class="fa fa-trash"></span>
-						</div>
-						<div class="col-sm-5">
+<!-- 						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px"> -->
+<!-- 							<span onclick="limpiarNivellAdmin()" class="fa fa-trash"></span> -->
+<!-- 						</div> -->
+						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.comunitat.autonoma" /></label>
 								<div class="forminput">
-									<select id="o_comunitat" onchange="comunitatAutonomaChange(this.value)" class="form-control">
+									<select id="o_comunitat" type="search" onchange="comunitatAutonomaChange(this.value)" class="form-control">
 										<option value=""></option>
 				    				</select>
+				    				
 								</div>
 							</div>
 						</div>
-						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px">
-							<span onclick="limpiarComunitat()" class="fa fa-trash"></span>
-						</div>
+<!-- 						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px"> -->
+<!-- 							<span onclick="limpiarComunitat()" class="fa fa-trash"></span> -->
+<!-- 						</div> -->
 					</div>
 					<div class="row margebaix">
-						<div class="col-sm-5">
+						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.provincia" /></label>
 								<div class="forminput">
@@ -2311,10 +2852,10 @@ function comptarCaracters(idCamp) {
 								</div>
 							</div>
 						</div>
-						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px">
-							<span onclick="limpiarProvincia(false)" class="fa fa-trash"></span>
-						</div>
-						<div class="col-sm-5">
+<!-- 						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px"> -->
+<!-- 							<span onclick="limpiarProvincia(false)" class="fa fa-trash"></span> -->
+<!-- 						</div> -->
+						<div class="col-sm-6">
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.localitat" /></label>
 								<div class="forminput">
@@ -2324,18 +2865,18 @@ function comptarCaracters(idCamp) {
 								</div>
 							</div>
 						</div>
-						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px">
-							<span onclick="limpiarLocalitat(false)" class="fa fa-trash"></span>
-						</div>
+<!-- 						<div class="col-sm-1" style="width: 1%;  margin-top:33px; margin-left:-25px"> -->
+<!-- 							<span onclick="limpiarLocalitat(false)" class="fa fa-trash"></span> -->
+<!-- 						</div> -->
 					</div>
 				
-					<div id="results" class="row" style="width: calc(100% - 30px); background-color: white; height: 240px; border: 1px solid #CCC; margin: 15px; overflow-y: scroll"" >
+					<div id="results" class="row" style="background-color: white; height: 240px; border: 1px solid #CCC; margin: 0px; overflow-y: scroll"" >
 						<div class="loading-screen" style="text-align: center; width:100%; height: 0%;;">
 								<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
 									<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>
 								</div>
 							</div>
-						<table id="tOficines" class="table table-bordered dataTable dinamicTable">
+						<table id="tOficines" class="table table-bordered dataTable dinamicTable" style="margin-top:0px !important">
 							<thead>
 								<tr class="capsalera" style="font-weight: bold;" >
 									<td width="85%"><spring:message code="notificacio.form.dir3.cercar.titol" /></td>

@@ -8,7 +8,6 @@ import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.util.Date;
-import java.util.List;
 
 
 /**
@@ -43,13 +42,18 @@ public class NotificacioDatatableDto {
 	private boolean errorLastEvent;
 //	private boolean hasEnviamentsPendents;
 	private boolean hasEnviamentsPendentsRegistre;
+	protected int registreEnviamentIntent;
 	
 	private TipusUsuariEnumDto tipusUsuari;
 	
 	public boolean isNotificaError() {
 		return notificaErrorData != null;
 	}
-	
+
+	public boolean isEnviant() {
+		return estat != null && estat.equals(NotificacioEstatEnumDto.PENDENT) && registreEnviamentIntent == 0 && !isNotificaError();
+	}
+
 	public String getOrganGestorDesc() {
 		if (organGestorNom != null && !organGestorNom.isEmpty())
 			return organGestor + " - " + organGestorNom;
@@ -69,7 +73,7 @@ public class NotificacioDatatableDto {
 		String procedimentDesc = "";
 		if (procedimentCodi != null && !procedimentCodi.isEmpty())
 			procedimentDesc = procedimentCodi;
-		if (procedimentNom != null & !procedimentNom.isEmpty())
+		if (procedimentNom != null && !procedimentNom.isEmpty())
 			procedimentDesc += " - " + procedimentNom;
 		return procedimentDesc;
 	}

@@ -219,52 +219,104 @@ $(document).ready(function() {
 			</c:if>
 			<c:if test="${not empty notificacio.document}">
 				<div class="panel panel-default">
-						<div class="panel-heading">
-							<h3 class="panel-title">
-								<strong><spring:message code="notificacio.info.seccio.document" /></strong>
-							</h3>
-						</div>
-						<table class="table table-bordered" style="width: 100%">
-							<tbody>
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							<strong><spring:message code="notificacio.info.seccio.document" /></strong>
+						</h3>
+					</div>
+					<table class="table table-bordered" style="width: 100%">
+						<tbody>
+							<tr>
+								<td width="30%">
+									<strong><spring:message	code="notificacio.info.document.arxiu.nom" /></strong>
+								</td>
+								<td>${notificacio.document.arxiuNom}
+									<a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar/${notificacio.document.id}"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience" title="<spring:message code="notificacio.info.document.descarregar"/>">
+										<spring:message code="notificacio.info.document.descarregar"/>
+										<span class="fa fa-download"></span>
+									</a>
+								</td>
+							</tr>
+							<c:if test="${not empty notificacio.document2}">
 								<tr>
 									<td width="30%">
 										<strong><spring:message	code="notificacio.info.document.arxiu.nom" /></strong>
 									</td>
-									<td>${notificacio.document.arxiuNom}
-										<a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience" title="<spring:message code="notificacio.info.document.descarregar"/>">
+									<td>${notificacio.document2.arxiuNom}
+										<a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar/${notificacio.document2.id}"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience" title="<spring:message code="notificacio.info.document.descarregar"/>">
 											<spring:message code="notificacio.info.document.descarregar"/>
 											<span class="fa fa-download"></span>
 										</a>
 									</td>
 								</tr>
+							</c:if>
+							<c:if test="${not empty notificacio.document3}">
 								<tr>
-									<td><strong><spring:message code="notificacio.info.document.normalitzat" /></strong></td>
-									<td>
-									<c:choose>
-									    <c:when test="${notificacio.document.normalitzat}">
-									       Si
-									    </c:when>
-									    <c:otherwise>
-									        No
-									    </c:otherwise>
-									</c:choose>
+									<td width="30%">
+										<strong><spring:message	code="notificacio.info.document.arxiu.nom" /></strong>
+									</td>
+									<td>${notificacio.document3.arxiuNom}
+										<a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar/${notificacio.document3.id}"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience" title="<spring:message code="notificacio.info.document.descarregar"/>">
+											<spring:message code="notificacio.info.document.descarregar"/>
+											<span class="fa fa-download"></span>
+										</a>
 									</td>
 								</tr>
+							</c:if>
+							<c:if test="${not empty notificacio.document4}">
 								<tr>
-									<td><strong><spring:message code="notificacio.info.document.generar.csv" /></strong></td>
-									<td>
-									<c:choose>
-									    <c:when test="${notificacio.document.generarCsv}">
-									       Si
-									    </c:when>
-									    <c:otherwise>
-									        No
-									    </c:otherwise>
-									</c:choose>
+									<td width="30%">
+										<strong><spring:message	code="notificacio.info.document.arxiu.nom" /></strong>
+									</td>
+									<td>${notificacio.document4.arxiuNom}
+										<a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar/${notificacio.document4.id}"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience" title="<spring:message code="notificacio.info.document.descarregar"/>">
+											<spring:message code="notificacio.info.document.descarregar"/>
+											<span class="fa fa-download"></span>
+										</a>
 									</td>
 								</tr>
-							</tbody>
-						</table>
+							</c:if>
+							<c:if test="${not empty notificacio.document5}">
+								<tr>
+									<td width="30%">
+										<strong><spring:message	code="notificacio.info.document.arxiu.nom" /></strong>
+									</td>
+									<td>${notificacio.document5.arxiuNom}
+										<a id="descarregarDocument" href="<c:url value="/modal/notificacio/${notificacio.id}/documentDescarregar/${notificacio.document5.id}"/>" class="btn btn-default btn-sm pull-right fileDownloadSimpleRichExperience" title="<spring:message code="notificacio.info.document.descarregar"/>">
+											<spring:message code="notificacio.info.document.descarregar"/>
+											<span class="fa fa-download"></span>
+										</a>
+									</td>
+								</tr>
+							</c:if>
+							<tr>
+								<td><strong><spring:message code="notificacio.info.document.normalitzat" /></strong></td>
+								<td>
+								<c:choose>
+									<c:when test="${notificacio.document.normalitzat}">
+									   Si
+									</c:when>
+									<c:otherwise>
+										No
+									</c:otherwise>
+								</c:choose>
+								</td>
+							</tr>
+							<tr>
+								<td><strong><spring:message code="notificacio.info.document.generar.csv" /></strong></td>
+								<td>
+								<c:choose>
+									<c:when test="${notificacio.document.generarCsv}">
+									   Si
+									</c:when>
+									<c:otherwise>
+										No
+									</c:otherwise>
+								</c:choose>
+								</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 			</c:if>
 			<c:if test="${not empty notificacio.procediment.pagadorpostal}">
@@ -331,6 +383,35 @@ $(document).ready(function() {
 						</tbody>
 					</table>
 				</div>
+				</c:if>
+				<c:if test="${(isRolActualAdministradorEntitat || isRolActualAdministradorOrgan) && (not empty notificacio.registreOficinaNom || not empty notificacio.registreLlibreNom)}">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								<strong><spring:message code="notificacio.info.seccio.llocregistre.titol" /></strong>
+							</h3>
+						</div>
+						<table class="table table-bordered" style="width: 100%">
+							<tbody>
+							<c:if test="${not empty notificacio.registreOficinaNom}">
+								<tr>
+									<td width="30%">
+										<strong><spring:message code="notificacio.info.seccio.llocregistre.camp.oficina" /></strong>
+									</td>
+									<td>${notificacio.registreOficinaNom}</td>
+								</tr>
+							</c:if>
+							<c:if test="${not empty notificacio.registreLlibreNom}">
+								<tr>
+									<td width="30%">
+										<strong><spring:message code="notificacio.info.seccio.llocregistre.camp.llibre" /></strong>
+									</td>
+									<td>${notificacio.registreLlibreNom}</td>
+								</tr>
+							</c:if>
+							</tbody>
+						</table>
+					</div>
 				</c:if>
 				<c:if test="${not empty notificacio.enviaments}">
 				
@@ -413,7 +494,7 @@ $(document).ready(function() {
 																</tr>
 															</c:if>
 															<%-- Assentament registral o Registre normal (versió anterior) --%>
-															<c:if test="${(not empty enviament.registreEstat && (enviament.registreEstat == 'DISTRIBUIT' || enviament.registreEstat == 'OFICI_EXTERN'  || enviament.registreEstat == 'OFICI_SIR')) || (empty enviament.registreEstat && not empty enviament.registreNumeroFormatat)}">
+															<c:if test="${(not empty enviament.registreEstat && (enviament.registreEstat == 'DISTRIBUIT' || enviament.registreEstat == 'VALID' || enviament.registreEstat == 'OFICI_EXTERN'  || enviament.registreEstat == 'OFICI_SIR')) || (empty enviament.registreEstat && not empty enviament.registreNumeroFormatat)}">
 																<tr>
 																	<td><strong><spring:message code="enviament.info.seu.registre.justificant"/></strong></td>
 																	<td>
