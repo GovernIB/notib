@@ -17,7 +17,6 @@ import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
 import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
 import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.war.command.EntregapostalCommand;
 import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.MarcarProcessatCommand;
