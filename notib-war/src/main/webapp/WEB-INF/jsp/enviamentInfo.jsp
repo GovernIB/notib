@@ -56,7 +56,14 @@ $(document).ready(function() {
 	<c:if test="${enviament.notificacio.notificaError}">
 		<div class="alert alert-danger well-sm">
 			<span class="fa fa-warning text-danger"></span>
-			<spring:message code="enviament.info.error.titol"/>
+			<c:choose>
+				<c:when test="${enviament.notificacio.notificaErrorTipus == 'ERROR_REGISTRE'}">
+					<spring:message code="enviament.info.error.registre"/>
+				</c:when>
+				<c:otherwise>
+					<spring:message code="enviament.info.error.titol"/>
+				</c:otherwise>
+			</c:choose>
 			<button class="btn btn-default btn-xs pull-right" data-toggle="collapse" data-target="#collapseError" aria-expanded="false" aria-controls="collapseError">
 				<span class="fa fa-bars"></span>
 			</button>

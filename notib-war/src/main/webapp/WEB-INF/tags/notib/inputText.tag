@@ -23,6 +23,7 @@
 <%@ attribute name="inputClass" required="false" rtexprvalue="true"%>
 <%@ attribute name="inputLength" required="false" rtexprvalue="true"%>
 <%@ attribute name="inputMaxLength" required="false" rtexprvalue="true"%>
+<%@ attribute name="inputMinLength" required="false" rtexprvalue="true"%>
 <%@ attribute name="showsize" required="false" rtexprvalue="true"%>
 <c:set var="campValue" value="${value}"/>
 <c:set var="campPath" value="${name}"/>
@@ -32,6 +33,7 @@
 <c:set var="campPlaceholder"><c:choose><c:when test="${not empty placeholderKey}"><spring:message code="${placeholderKey}"/></c:when><c:otherwise>${placeholder}</c:otherwise></c:choose></c:set>
 <c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
 <c:set var="campInputSize"><c:choose><c:when test="${not empty inputSize}">${inputSize}</c:when><c:otherwise>${12 - campLabelSize}</c:otherwise></c:choose></c:set>
+<c:set var="inputMinLength" value="${(empty inputMinLength) ? 0 : inputMinLength}" />
 <c:set var="myReadonly">
 	<c:choose>
 		<c:when test="${empty readonly}">false</c:when>
@@ -82,7 +84,7 @@ $('input').change(function() {
 		<c:choose>
 			<c:when test="${picker}">
 				<div id="${campPath}" class="input-group colorpicker-component">
-					<form:input maxlength="${inputMaxLength}" value="${campValue}" path="${campPath}" cssClass="form-control ${generalClass}" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}"/>
+					<form:input maxlength="${inputMaxLength}" minlength="${inputMinLength}" value="${campValue}" path="${campPath}" cssClass="form-control ${generalClass}" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}"/>
 					<span class="input-group-addon"><i></i></span>
 					<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 					<c:if test="${info == true}">
@@ -99,7 +101,7 @@ $('input').change(function() {
 				</div>
 			</c:when>
 			<c:otherwise>
-				<form:input maxlength="${inputMaxLength}" value="${campValue}" path="${campPath}" cssClass="form-control ${generalClass}" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}"/>
+				<form:input maxlength="${inputMaxLength}" minlength="${inputMinLength}" value="${campValue}" path="${campPath}" cssClass="form-control ${generalClass}" id="${campPath}" disabled="${disabled}" readonly="${myReadonly}"/>
 				<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 				<c:if test="${info == true}">
 					<p class="comentari col-xs-12 col-xs-offset-">${campInfoText}</p>

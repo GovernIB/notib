@@ -15,6 +15,9 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -286,7 +289,8 @@ public class DatatablesHelper {
 	}
 
 
-
+	@NoArgsConstructor
+	@Getter @Setter
 	public static class DatatablesResponse {
 		private int draw;
 		private long recordsTotal;
@@ -294,49 +298,9 @@ public class DatatablesHelper {
 		private List<Map<String, Object>> data;
 		private String error;
 		private AjaxFormResponse filtreFormResponse;
-		public DatatablesResponse() {
-		}
-		public int getDraw() {
-			return draw;
-		}
-		public void setDraw(int draw) {
-			this.draw = draw;
-		}
-		public long getRecordsTotal() {
-			return recordsTotal;
-		}
-		public void setRecordsTotal(long recordsTotal) {
-			this.recordsTotal = recordsTotal;
-		}
-		public long getRecordsFiltered() {
-			return recordsFiltered;
-		}
-		public void setRecordsFiltered(long recordsFiltered) {
-			this.recordsFiltered = recordsFiltered;
-		}
-		public List<Map<String, Object>> getData() {
-			return data;
-		}
-		public void setData(List<Map<String, Object>> data) {
-			this.data = data;
-		}
-		public String getError() {
-			return error;
-		}
-		public void setError(String error) {
-			this.error = error;
-		}
-		public AjaxFormResponse getFiltreFormResponse() {
-			return filtreFormResponse;
-		}
-		public void setFiltreFormResponse(AjaxFormResponse filtreFormResponse) {
-			this.filtreFormResponse = filtreFormResponse;
-		}
-		public boolean isFiltreError() {
-			return filtreFormResponse != null;
-		}
 	}
 
+	@Getter @Setter
 	public static class DatatablesParams {
 		private Integer draw;
 		private Integer start;
@@ -385,87 +349,7 @@ public class DatatablesHelper {
 				}
 			}
 		}
-		public Integer getDraw() {
-			return draw;
-		}
-		public void setDraw(Integer draw) {
-			this.draw = draw;
-		}
-		public Integer getStart() {
-			return start;
-		}
-		public void setStart(Integer start) {
-			this.start = start;
-		}
-		public Integer getLength() {
-			return length;
-		}
-		public void setLength(Integer length) {
-			this.length = length;
-		}
-		public String getSearchValue() {
-			return searchValue;
-		}
-		public void setSearchValue(String searchValue) {
-			this.searchValue = searchValue;
-		}
-		public Boolean getSearchRegex() {
-			return searchRegex;
-		}
-		public void setSearchRegex(Boolean searchRegex) {
-			this.searchRegex = searchRegex;
-		}
-		public List<Integer> getOrderColumn() {
-			return orderColumn;
-		}
-		public void setOrderColumn(List<Integer> orderColumn) {
-			this.orderColumn = orderColumn;
-		}
-		public List<String> getOrderDir() {
-			return orderDir;
-		}
-		public void setOrderDir(List<String> orderDir) {
-			this.orderDir = orderDir;
-		}
-		public List<String> getColumnsData() {
-			return columnsData;
-		}
-		public void setColumnsData(List<String> columnsData) {
-			this.columnsData = columnsData;
-		}
-		public List<String> getColumnsName() {
-			return columnsName;
-		}
-		public void setColumnsName(List<String> columnsName) {
-			this.columnsName = columnsName;
-		}
-		public List<Boolean> getColumnsSearchable() {
-			return columnsSearchable;
-		}
-		public void setColumnsSearchable(List<Boolean> columnsSearchable) {
-			this.columnsSearchable = columnsSearchable;
-		}
-		public List<Boolean> getColumnsOrderable() {
-			return columnsOrderable;
-		}
-		public void setColumnsOrderable(List<Boolean> columnsOrderable) {
-			this.columnsOrderable = columnsOrderable;
-		}
-		public List<String> getColumnsSearchValue() {
-			return columnsSearchValue;
-		}
-		public void setColumnsSearchValue(List<String> columnsSearchValue) {
-			this.columnsSearchValue = columnsSearchValue;
-		}
-		public List<Boolean> getColumnsSearchRegex() {
-			return columnsSearchRegex;
-		}
-		public void setColumnsSearchRegex(List<Boolean> columnsSearchRegex) {
-			this.columnsSearchRegex = columnsSearchRegex;
-		}
 	}
-
-
 
 	private static List<PropertyDescriptor> getBeanPropertyDescriptors(
 			Object bean) {

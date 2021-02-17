@@ -68,7 +68,8 @@ pageContext.setAttribute(
 				<not:inputSelect name="organGestor" optionItems="${organsGestors}" optionValueAttribute="codi" optionTextAttribute="valor" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 			<div class="col-md-5">
-				 <label  for="comuBtn"><spring:message code="procediment.filter.form.camp.comu"/>:</label>  <input type="checkbox" name="comu" id="comuBtn" >
+				<label for="comuBtn"><spring:message code="procediment.filter.form.camp.comu"/>:</label>
+				<form:checkbox path="comu" id="comuBtn" disabled="false"/>
 			</div>
 			<div class="col-md-2 pull-right">
 				<div class="pull-right">
@@ -88,6 +89,8 @@ pageContext.setAttribute(
 		data-default-dir="desc"
 		class="table table-striped table-bordered"
 		data-botons-template="#botonsTemplate"
+		data-save-state="true"
+		data-mantenir-paginacio="true"
 		style="width:100%"
 		data-filter="#filtre">
 		<thead>

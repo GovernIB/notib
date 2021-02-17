@@ -93,12 +93,9 @@ public interface NotificacioService {
 	 * @return La pàgina amb les notificacions.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public PaginaDto<NotificacioDatatableDto> findAmbFiltrePaginat(
+	PaginaDto<NotificacioDatatableDto> findAmbFiltrePaginat(
 			Long entitatId,
-			boolean isUsuari,
-			boolean isUsuariEntitat,
-			boolean isSuperUsuari,
-			boolean isAdministradorOrgan,
+			RolEnumDto rol,
 			List<String> codisProcedimentsDisponibles,
 			List<String> codisProcedimentsProcessables,
 			List<String> codisOrgansGestorsDisponibles,

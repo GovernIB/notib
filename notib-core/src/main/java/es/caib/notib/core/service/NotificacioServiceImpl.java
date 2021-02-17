@@ -118,7 +118,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private NotificacioHelper notificacioHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
-	
+
 	public static Map<String, ProgresDescarregaDto> progresDescarrega = new HashMap<String, ProgresDescarregaDto>();
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActulitzacioExpirades = new HashMap<String, ProgresActualitzacioCertificacioDto>();
 	
@@ -831,11 +831,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<NotificacioDatatableDto> findAmbFiltrePaginat(
-			Long entitatId, 
-			boolean isUsuari,
-			boolean isUsuariEntitat,
-			boolean isAdministrador,
-			boolean isAdministradorOrgan,
+			Long entitatId,
+			RolEnumDto rol,
 			List<String> procedimentsCodisNotib,
 			List<String> codisProcedimentsProcessables,
 			List<String> codisOrgansGestorsDisponibles,
@@ -847,11 +844,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 		
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			boolean isUsuari = RolEnumDto.tothom.equals(rol);
+			boolean isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
+			boolean isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
+			boolean isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
 			EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(
 					entitatId, 
 					false, 
 					isUsuariEntitat,
 					false);
+
 			Page<NotificacioEntity> notificacions = null;
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			mapeigPropietatsOrdenacio.put("procediment.organGestor", new String[] {"pro.organGestor.codi"});
@@ -860,18 +862,18 @@ public class NotificacioServiceImpl implements NotificacioService {
 			mapeigPropietatsOrdenacio.put("procedimentDesc", new String[] {"pro.codi"});
 			mapeigPropietatsOrdenacio.put("createdByComplet", new String[] {"createdBy"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
-			
+
 			boolean esProcedimentsCodisNotibNull = (procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty());
 			boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
 			boolean esProcedimentsOrgansCodisNotibNull = (codisProcedimentOrgansDisponibles == null || codisProcedimentOrgansDisponibles.isEmpty());
-			
+
 			if (filtre == null || filtre.isEmpty()) {
 				//Consulta les notificacions sobre les quals té permis l'usuari actual
 				if (isUsuari) {
 					notificacions = notificacioRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
 							esProcedimentsCodisNotibNull,
-							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib, 
-							aplicacioService.findRolsUsuariActual(), 
+							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib,
+							aplicacioService.findRolsUsuariActual(),
 							esOrgansGestorsCodisNotibNull,
 							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
 							esProcedimentsOrgansCodisNotibNull,
@@ -885,16 +887,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 							entitatActual,
 							pageable);
 				//Consulta totes les notificacions de les entitats actives
-				} else if (isAdministrador) {
+				} else if (isSuperAdmin) {
 					List<EntitatEntity> entitatsActiva = entitatRepository.findByActiva(true);
 					notificacions = notificacioRepository.findByEntitatActiva(
 							entitatsActiva,
 							pageable);
-				} else if (isAdministradorOrgan) {
+				} else if (isAdminOrgan) {
 					List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
 					notificacions = notificacioRepository.findByProcedimentCodiNotibAndEntitat(
 							esProcedimentsCodisNotibNull,
-							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib, 
+							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib,
 							entitatActual,
 							organs,
 							pageable);
@@ -1002,7 +1004,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							hasZeronotificaEnviamentIntent == null,
 							hasZeronotificaEnviamentIntent,
 							pageable);
-				} else if (isAdministrador) {
+				} else if (isSuperAdmin) {
 					notificacions = notificacioRepository.findAmbFiltre(
 							filtre.getEntitatId() == null,
 							filtre.getEntitatId(),
@@ -1036,7 +1038,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							hasZeronotificaEnviamentIntent == null,
 							hasZeronotificaEnviamentIntent,
 							pageable);
-				} else if (isAdministradorOrgan) {
+				} else if (isAdminOrgan) {
 					List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
 					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotib(
 							filtre.getEntitatId() == null,
@@ -1209,7 +1211,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						filtre.getConcepte() == null ? "" : filtre.getConcepte(),
 						filtre.getEstat() == null,
 						filtre.getEstat(),
-						NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
+						filtre.getEstat() == null ? null : NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
 						filtre.getUsuari() == null || filtre.getUsuari().trim().isEmpty(),
 						filtre.getUsuari() == null ? "" : filtre.getUsuari(),
 						paginacioHelper.toSpringDataPageable(paginacioParams));

@@ -90,7 +90,13 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 	} else {
 		message = "Unknown Error: (" + jqxhr.status + ", " + thrownError + ")";
 	}*/
-	alert(message);
+	if (jqxhr.status === 0) {
+		console.log(message);
+
+	} else {
+		alert(message);
+
+	}
 });
 
 (function($) {

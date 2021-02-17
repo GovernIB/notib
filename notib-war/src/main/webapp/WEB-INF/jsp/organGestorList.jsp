@@ -84,6 +84,8 @@
 		class="table table-striped table-bordered"
 		style="width:100%"
 		data-botons-template="#botonsTemplate"
+		data-save-state="true"
+		data-mantenir-paginacio="true"
 		data-filter="#filtre">
 		<thead>
 			<tr>
