@@ -7,6 +7,12 @@
 
 <html>
 <head>
+	<c:if test="${!isModificacio}">
+		<title><spring:message code="organgestor.form.titol.crear"/> ${entitat.nom} <c:out value=" (${entitat.dir3Codi})"></c:out></title>
+	</c:if>
+	<c:if test="${isModificacio}">
+		<title><spring:message code="organgestor.form.titol.modificar"/> ${entitat.nom} <c:out value=" (${entitat.dir3Codi})"></c:out></title>
+	</c:if>
 	<title><spring:message code="organgestor.form.titol.crear"/> ${entitat.nom} <c:out value=" (${entitat.dir3Codi})"></c:out></title>
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
@@ -207,6 +213,13 @@ $(document).ready(function() {
 					<select id="selLlibres" data-placeholder="<spring:message code="organgestor.form.camp.llibre"/>"></select>
 					<p class="comentari"><spring:message code="organgestor.form.camp.llibre.info"/></p>
 				</c:if>
+			</c:if>
+			<c:if test="${isModificacio}">
+				<ul>
+					<li><b><spring:message code="organgestor.form.camp.codiDir3"/>:</b> ${organGestorCommand.codi}</li>
+					<li><b><spring:message code="organgestor.form.camp.organisme"/>:</b> ${organGestorCommand.nom}</li>
+					<li><b><spring:message code="organgestor.form.camp.llibre"/>:</b> ${organGestorCommand.llibreNom}</li>
+				</ul>
 			</c:if>
 			<c:if test="${setOficina}">
 				<br/>
