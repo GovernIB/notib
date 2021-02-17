@@ -60,7 +60,11 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	
 	private boolean errorLastEvent;
 	private boolean hasEnviamentsPendents;
-	
+
+
+	private String registreLlibreNom;
+	private String registreOficinaNom;
+
 	public boolean isNotificaError() {
 		return notificaErrorData != null;
 	}

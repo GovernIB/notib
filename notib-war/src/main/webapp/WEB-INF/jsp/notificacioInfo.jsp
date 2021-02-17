@@ -384,6 +384,35 @@ $(document).ready(function() {
 					</table>
 				</div>
 				</c:if>
+				<c:if test="${(isRolActualAdministradorEntitat || isRolActualAdministradorOrgan) && (not empty notificacio.registreOficinaNom || not empty notificacio.registreLlibreNom)}">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								<strong><spring:message code="notificacio.info.seccio.llocregistre.titol" /></strong>
+							</h3>
+						</div>
+						<table class="table table-bordered" style="width: 100%">
+							<tbody>
+							<c:if test="${not empty notificacio.registreOficinaNom}">
+								<tr>
+									<td width="30%">
+										<strong><spring:message code="notificacio.info.seccio.llocregistre.camp.oficina" /></strong>
+									</td>
+									<td>${notificacio.registreOficinaNom}</td>
+								</tr>
+							</c:if>
+							<c:if test="${not empty notificacio.registreLlibreNom}">
+								<tr>
+									<td width="30%">
+										<strong><spring:message code="notificacio.info.seccio.llocregistre.camp.llibre" /></strong>
+									</td>
+									<td>${notificacio.registreLlibreNom}</td>
+								</tr>
+							</c:if>
+							</tbody>
+						</table>
+					</div>
+				</c:if>
 				<c:if test="${not empty notificacio.enviaments}">
 				
 					<c:forEach items="${notificacio.enviaments}" var="enviament" varStatus="status">

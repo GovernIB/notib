@@ -2242,7 +2242,30 @@ public class PluginHelper {
 		}
 		return interessat;
 	}
-	
+	public void addOficinaAndLlibreRegistre(NotificacioEntity notificacio){
+		DadesOficina dadesOficina = new DadesOficina();
+		String dir3Codi;
+
+		if (notificacio.getEntitat().getDir3CodiReg() != null) {
+			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
+		} else {
+			dir3Codi = notificacio.getEmisorDir3Codi();
+		}
+		try {
+			setOficina(
+					notificacio,
+					dadesOficina,
+					dir3Codi);
+		} catch (RegistrePluginException e) {}
+
+		try {
+			setLlibre(
+					notificacio,
+					dadesOficina,
+					dir3Codi);
+		} catch (RegistrePluginException e) {}
+	}
+
 	private void setOficina(
 			NotificacioEntity notificacio,
 			DadesOficina dadesOficina,
@@ -2268,6 +2291,9 @@ public class PluginHelper {
 		if (dadesOficina.getOficinaCodi() == null) {
 			throw new RegistrePluginException("No hi ha definida cap oficina per realitzar el registre");
 		}
+
+		// Associam la oficina amb l'entitat de la notificació
+		notificacio.setRegistreOficinaNom(dadesOficina.getOficinaNom());
 	}
 	
 	private void setLlibre(
@@ -2314,7 +2340,9 @@ public class PluginHelper {
 		if (dadesOficina.getLlibreCodi() == null) {
 			throw new RegistrePluginException("No hi ha definit cap llibre per realitzar el registre");
 		}
-		
+
+		// Associam el llibre amb l'entitat de la notificació
+		notificacio.setRegistreLlibreNom(dadesOficina.getLlibreNom());
 	}
 	
 	public static DocumentBuilder getDocumentBuilder() throws Exception {

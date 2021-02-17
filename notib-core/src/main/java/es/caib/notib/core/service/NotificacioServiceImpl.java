@@ -796,6 +796,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 					notificacio.setHasEnviamentsPendents(true);
 				}
 				
+				pluginHelper.addOficinaAndLlibreRegistre(notificacio);
+
 				logger.info("Consultant events notificació...");
 				List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
 				

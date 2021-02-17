@@ -11,6 +11,7 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -199,7 +200,14 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	protected Set<NotificacioEventEntity> events = new LinkedHashSet<NotificacioEventEntity>();
-	
+
+	@Setter
+	@Column(name = "registre_oficina_nom")
+	private String registreOficinaNom;
+
+	@Setter
+	@Column(name = "registre_llibre_nom")
+	private String registreLlibreNom;
 
 	@Transient
 	protected boolean permisProcessar;
