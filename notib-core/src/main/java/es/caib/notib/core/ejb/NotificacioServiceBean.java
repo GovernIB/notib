@@ -3,38 +3,18 @@
  */
 package es.caib.notib.core.ejb;
 
-import java.util.List;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import javax.interceptor.Interceptors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
-import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.CodiValorDto;
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.LocalitatsDto;
-import es.caib.notib.core.api.dto.NotificacioDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
-import es.caib.notib.core.api.dto.NotificacioErrorCallbackFiltreDto;
-import es.caib.notib.core.api.dto.NotificacioEventDto;
-import es.caib.notib.core.api.dto.NotificacioFiltreDto;
-import es.caib.notib.core.api.dto.NotificacioRegistreErrorFiltreDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PaisosDto;
-import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
-import es.caib.notib.core.api.dto.ProgresDescarregaDto;
-import es.caib.notib.core.api.dto.ProvinciesDto;
-import es.caib.notib.core.api.dto.RegistreIdDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.NotificacioService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
+import java.util.List;
 
 /**
  * Implementació de NotificacioService com a EJB que empra una clase
@@ -93,6 +73,14 @@ public class NotificacioServiceBean implements NotificacioService {
 	public ArxiuDto getDocumentArxiu(
 			Long notificacioId) {
 		return delegate.getDocumentArxiu(notificacioId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_CARPETA"})
+	public ArxiuDto getDocumentArxiu(
+			Long notificacioId,
+			Long documentId) {
+		return delegate.getDocumentArxiu(notificacioId, documentId);
 	}
 	
 	@Override
@@ -164,7 +152,7 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
+	public PaginaDto<NotificacioDatatableDto> findAmbFiltrePaginat(
 			Long entitatId,
 			boolean isUsuari,
 			boolean isUsuariEntitat,
@@ -387,7 +375,18 @@ public class NotificacioServiceBean implements NotificacioService {
 	public List<ProvinciesDto> llistarProvincies(String codiCA) {
 		return delegate.llistarProvincies(codiCA);
 	}
+	
+	@Override
+	@RolesAllowed({"tothom"})
+	public String guardarArxiuTemporal(String nom){
+		return delegate.guardarArxiuTemporal(nom);
+	}
 
+	@Override
+	@RolesAllowed({"tothom"})
+	public byte[] obtenirArxiuTemporal(String arxiuGestdocId) {
+		return delegate.obtenirArxiuTemporal(arxiuGestdocId);
+	}
 
 
 }

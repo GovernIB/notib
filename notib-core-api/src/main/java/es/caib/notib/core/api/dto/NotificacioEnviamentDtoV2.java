@@ -2,11 +2,11 @@
  * 
  */
 package es.caib.notib.core.api.dto;
-import java.util.Date;
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * Informació d'un destinatari d'una anotació.
@@ -84,13 +84,22 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private NotificaCertificacioTipusEnumDto notificaCertificacioTipus;
 	private NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus;
 	private String notificaCertificacioNumSeguiment;
-	
+	private boolean notificaError;
+	private int notificaIntentNum;
+
+	private boolean isEnviant;
 	public String getDestinatarisNomLlinatges() {
 		destinatarisNomLlinatges = "";
 		for(PersonaDto destinatari: destinataris) {
 			destinatarisNomLlinatges += concatenarNomLlinatges(llinatgesDestinatari(destinatari), destinatari.getNom(), destinatari.getRaoSocial(), null)+"</br>";
 		}
 		return destinatarisNomLlinatges;
+	}
+	public NotificacioEstatEnumDto getEstat() {
+		if (isEnviant){
+			return NotificacioEstatEnumDto.ENVIANT;
+		}
+		return this.estat;
 	}
 
 	public String getTitularNomLlinatge() {

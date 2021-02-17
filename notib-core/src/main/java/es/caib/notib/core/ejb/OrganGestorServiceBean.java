@@ -10,19 +10,10 @@ import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 import javax.xml.bind.ValidationException;
 
+import es.caib.notib.core.api.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.notib.core.api.dto.CodiValorDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.OrganGestorFiltreDto;
-import es.caib.notib.core.api.dto.OrganismeDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.OrganGestorService;
 
@@ -174,6 +165,32 @@ public class OrganGestorServiceBean implements OrganGestorService {
 				entitatId, 
 				usuariCodi,
 				permis);
+	}
+
+    @Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+    public List<CodiValorDto> getOrgansGestorsDisponiblesConsulta(
+    		Long entitatId,
+			String usuari,
+			RolEnumDto rol,
+			String organ) {
+        return delegate.getOrgansGestorsDisponiblesConsulta(
+        		entitatId,
+				usuari,
+				rol,
+				organ);
+    }
+
+	@Override
+	@RolesAllowed("NOT_ADMIN")
+	public OrganGestorDto updateOficina(OrganGestorDto dto) {
+		return delegate.updateOficina(dto);
+	}
+
+	@Override
+	@RolesAllowed("NOT_ADMIN")
+	public List<OficinaDto> getOficinesSIR(Long entitatId, String organGestorDir3Codi, boolean isFiltre) {
+		return delegate.getOficinesSIR(entitatId, organGestorDir3Codi, isFiltre);
 	}
 
 }

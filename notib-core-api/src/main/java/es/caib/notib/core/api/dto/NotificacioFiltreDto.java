@@ -34,7 +34,40 @@ public class NotificacioFiltreDto implements Serializable {
 	private String creadaPer;
 	private String identificador;
 	private boolean nomesAmbErrors;
-	
+
+	public boolean isEmpty() {
+		if (entitatId != null)
+			return false;
+		if (comunicacioTipus != null)
+			return false;
+		if (enviamentTipus != null)
+			return false;
+		if (estat != null)
+			return false;
+		if (concepte != null && !concepte.isEmpty())
+			return false;
+		if (dataInici != null)
+			return false;
+		if (dataFi != null)
+			return false;
+		if (titular != null && !titular.isEmpty())
+			return false;
+		if (organGestor != null && !organGestor.isEmpty())
+			return false;
+		if (procedimentId != null)
+			return false;
+		if (tipusUsuari != null)
+			return false;
+		if (numExpedient != null && !numExpedient.isEmpty())
+			return false;
+		if (creadaPer != null && !creadaPer.isEmpty())
+			return false;
+		if (identificador != null && !identificador.isEmpty())
+			return false;
+		if (nomesAmbErrors)
+			return false;
+		return true;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

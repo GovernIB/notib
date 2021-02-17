@@ -8,9 +8,13 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.entity.*;
+import es.caib.notib.core.repository.ProcedimentOrganRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,25 +22,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.OficinaDto;
-import es.caib.notib.core.api.dto.OrganismeDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.OrganGestorService;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.GrupEntity;
-import es.caib.notib.core.entity.GrupProcedimentEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
+import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 
 /**
@@ -54,11 +47,17 @@ public class ProcedimentHelper {
 	@Autowired
 	private ProcedimentUpdateHelper procedimentUpdateHelper;
 	@Autowired
+	private CacheHelper cacheHelper;
+	@Autowired
+	private OrganigramaHelper organigramaHelper;
+	@Autowired
 	private GrupProcedimentRepository grupProcedimentRepository;
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
+	@Autowired
+	private ProcedimentOrganRepository procedimentOrganRepository;
 	@Resource
 	private OrganGestorService organGestorService;
 	@Resource
@@ -164,6 +163,92 @@ public class ProcedimentHelper {
 		logger.debug(sb.toString());
 		return usuaris;
 	}
+
+	@Cacheable(value = "procedimentEntitiesPermis", key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
+	public List<ProcedimentEntity> getProcedimentsWithPermis(
+			String usuariCodi,
+			Authentication auth,
+			EntitatEntity entitat,
+			Permission[] permisos) {
+
+		// 1. Obtenim els procediments amb permisos per procediment
+		List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+		List<ProcedimentEntity> procediments = procedimentRepository.findProcedimentsByEntitatAndGrup(entitat, grups);
+		List<ProcedimentEntity> procedimentsAmbPermis = new ArrayList<ProcedimentEntity>(procediments);
+		permisosHelper.filterGrantedAny(
+				procedimentsAmbPermis,
+				new PermisosHelper.ObjectIdentifierExtractor<ProcedimentEntity>() {
+					public Long getObjectIdentifier(ProcedimentEntity procediment) {
+						return procediment.getId();
+					}
+				},
+				ProcedimentEntity.class,
+				permisos,
+				auth);
+
+		// 2. Obtenim els òrgans gestors amb permisos
+		List<OrganGestorEntity> organsGestors = organGestorRepository.findByEntitat(entitat);
+		List<OrganGestorEntity> organsGestorsAmbPermis = new ArrayList<OrganGestorEntity>(organsGestors);
+
+		permisosHelper.filterGrantedAny(
+				organsGestorsAmbPermis,
+				new PermisosHelper.ObjectIdentifierExtractor<OrganGestorEntity>() {
+					public Long getObjectIdentifier(OrganGestorEntity organGestor) {
+						return organGestor.getId();
+					}
+				},
+				OrganGestorEntity.class,
+				permisos,
+				auth);
+
+		// 3. Obtenim els òrgans gestors fills dels organs gestors amb permisos
+		List<String> organsGestorsCodisAmbPermis = new ArrayList<String>();
+		if (!organsGestorsAmbPermis.isEmpty()) {
+			Set<String> codisOrgansAmbDescendents = new HashSet<String>();
+			for (OrganGestorEntity organGestorEntity : organsGestorsAmbPermis) {
+				codisOrgansAmbDescendents.addAll(
+						organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+								entitat.getDir3Codi(),
+								organGestorEntity.getCodi()));
+			}
+			organsGestorsCodisAmbPermis = new ArrayList<String>(codisOrgansAmbDescendents);
+		}
+
+		// 4. Obtenim els procediments amb permisos per òrgan gestor
+		List<ProcedimentEntity> procedimentsAmbPermisOrgan = new ArrayList<ProcedimentEntity>();
+		if (!organsGestorsCodisAmbPermis.isEmpty()) {
+			procedimentsAmbPermisOrgan = procedimentRepository.findByOrganGestorCodiInAndGrup(organsGestorsCodisAmbPermis, grups);
+		}
+
+		// 5. Juntam els procediments amb permís per òrgan gestor amb els procediments amb permís per procediment
+		Set<ProcedimentEntity> setProcediments = new HashSet<ProcedimentEntity>(procedimentsAmbPermis);
+		setProcediments.addAll(procedimentsAmbPermisOrgan);
+		procediments = new ArrayList<ProcedimentEntity>(setProcediments);
+		return procediments;
+	}
+
+	@Cacheable(value = "procedimentEntitiessOrganPermis", key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
+	public List<ProcedimentOrganEntity> getProcedimentOrganWithPermis(
+			String usuariCodi,
+			Authentication auth,
+			EntitatEntity entitat,
+			Permission[] permisos) {
+		// 1. Obtenim els procediments amb permisos per procediment
+		List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+		List<ProcedimentOrganEntity> procedimentOrgans = procedimentOrganRepository.findProcedimentsOrganByEntitatAndGrup(entitat, grups);
+		List<ProcedimentOrganEntity> procedimentOrgansAmbPermis = new ArrayList<ProcedimentOrganEntity>(procedimentOrgans);
+		permisosHelper.filterGrantedAny(
+				procedimentOrgansAmbPermis,
+				new PermisosHelper.ObjectIdentifierExtractor<ProcedimentOrganEntity>() {
+					public Long getObjectIdentifier(ProcedimentOrganEntity procedimentOrgan) {
+						return procedimentOrgan.getId();
+					}
+				},
+				ProcedimentOrganEntity.class,
+				permisos,
+				auth);
+		return procedimentOrgansAmbPermis;
+	}
 	
 	public Set<String> findUsuarisAmbPermisReadPerGrupNotificacio(
 			GrupEntity grup,
@@ -225,7 +310,7 @@ public class ProcedimentHelper {
 			return;
 		}
 		
-		ProcedimentEntity procediment = procedimentRepository.findByCodi(procedimentGda.getCodi());
+		ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(procedimentGda.getCodi(), entitat);
 		if (procediment != null) {
 			// Si no s'ha modificat des de la última actualització, no es fa res
 			if (procediment.getUltimaActualitzacio() != null && procedimentGda.getUltimaActualitzacio() != null && 
@@ -264,13 +349,18 @@ public class ProcedimentHelper {
 			LlibreDto llibreOrgan = pluginHelper.llistarLlibreOrganisme(
 					entitat.getCodi(),
 					organigramaEntitat.get(procedimentGda.getOrganGestor()).getCodi());
-			
+			Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
+			List<OficinaDto> oficinesSIR = cacheHelper.getOficinesSIRUnitat(
+					arbreUnitats, 
+					procedimentGda.getOrganGestor());
 			organGestor = OrganGestorEntity.getBuilder(
 					procedimentGda.getOrganGestor(),
 					organigramaEntitat.get(procedimentGda.getOrganGestor()).getNom(),
 					entitat,
 					llibreOrgan.getCodi(),
-					llibreOrgan.getNomLlarg()).build();
+					llibreOrgan.getNomLlarg(),
+					(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getCodi() : null),
+					(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getNom() : null)).build();
 			organGestorRepository.save(organGestor);
 			
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ.creat"));

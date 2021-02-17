@@ -18,6 +18,7 @@
 		var content="<spring:message code="procediemnt.actualitzacio.cancelarActu"/>";
 		var acceptar="<spring:message code="procediemnt.actualitzacio.acceptar"/>";
 		var cancelar="<spring:message code="procediemnt.actualitzacio.cancelar"/>";
+		<c:if test="${not isUpdatingProcediments}">
 		$(document).ready(function() {
 			$('#formUpdateAuto').on("submit", function(){
 				console.log("submitting...");
@@ -51,7 +52,7 @@
 				});
 		    });
 		});
-
+		</c:if>
 		function refreshProgres() {
 			console.log("refreshProgres");
 			itervalProgres =  setInterval(function(){ getProgres(); }, 250);
@@ -271,27 +272,34 @@
 </head>
 
 <body>
-	<div class="confirmacio"> 
-		<h4><spring:message code="procediemnt.actualitzacio.confirmacio"/></h4>
-	</div>
-	
-	<c:set var="formAction"><not:modalUrl value="/procediment/update/auto"/></c:set>
-	<form:form id="formUpdateAuto" action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
-		<div class="loading">
-			<div class="loading-gif">
-				<img src="<c:url value="/img/ajax-loader.gif"/>"/>
+	<c:if test="${not isUpdatingProcediments}">
+		<div class="confirmacio">
+			<h4><spring:message code="procediemnt.actualitzacio.confirmacio"/></h4>
+		</div>
+
+		<c:set var="formAction"><not:modalUrl value="/procediment/update/auto"/></c:set>
+		<form:form id="formUpdateAuto" action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
+			<div class="loading">
+				<div class="loading-gif">
+					<img src="<c:url value="/img/ajax-loader.gif"/>"/>
+				</div>
 			</div>
+			<div class="progress">
+				<div id="bar" class="progress-bar" role="progressbar progress-bar-striped active" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">0%</div>
+			</div>
+			<div id="actualitzacioInfo" class="info">
+				<span id="bcursor" class="blinking-cursor">|</span>
+			</div>
+			<div id="modal-botons" class="well">
+				<button id="autobtn" type="submit" class="btn btn-success"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.actualitzar"/></button>
+				<a id="cancelbtn" href="#" style="display: none !important;" class="btn btn-default" data-modal-cancel="false" onclick="myFunction()" ><spring:message code="comu.boto.tancar"/></a>
+			</div>
+		</form:form>
+	</c:if>
+	<c:if test="${isUpdatingProcediments}">
+		<div class="confirmacio">
+			<h4><spring:message code="procediment.actualitzacio.procesActiu"/></h4>
 		</div>
-		<div class="progress">
-  			<div id="bar" class="progress-bar" role="progressbar progress-bar-striped active" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">0%</div>
-		</div>
-		<div id="actualitzacioInfo" class="info">
-			<span id="bcursor" class="blinking-cursor">|</span>
-		</div>
-		<div id="modal-botons" class="well">
-			<button id="autobtn" type="submit" class="btn btn-success"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.actualitzar"/></button>
-			<a id="cancelbtn" href="#" style="display: none !important;" class="btn btn-default" data-modal-cancel="false" onclick="myFunction()" ><spring:message code="comu.boto.tancar"/></a>
-		</div>
-	</form:form>
+	</c:if>
 </body>
 </html>

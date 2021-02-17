@@ -118,7 +118,8 @@ public class EntitatServiceImpl implements EntitatService {
 					entitat.getNomOficinaVirtual(),
 					entitat.isLlibreEntitat(),
 					entitat.getLlibre(),
-					entitat.getLlibreNom()).
+					entitat.getLlibreNom(),
+					entitat.isOficinaEntitat()).
 					descripcio(entitat.getDescripcio()).
 					build();
 			
@@ -222,7 +223,8 @@ public class EntitatServiceImpl implements EntitatService {
 					entitat.getNomOficinaVirtual(),
 					entitat.isLlibreEntitat(),
 					entitat.getLlibre(),
-					entitat.getLlibreNom());
+					entitat.getLlibreNom(),
+					entitat.isOficinaEntitat());
 			return conversioTipusHelper.convertir(
 					entity,
 					EntitatDto.class);

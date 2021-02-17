@@ -1,12 +1,5 @@
 package es.caib.notib.core.helper;
 
-import java.util.Date;
-
-import javax.annotation.Resource;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
@@ -25,6 +18,11 @@ import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.ProcedimentOrganEntity;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.Date;
 
 
 /**
@@ -50,6 +48,10 @@ public class AuditNotificacioHelper {
 			OrganGestorEntity organGestor, 
 			ProcedimentEntity procediment,
 			DocumentEntity documentEntity,
+			DocumentEntity document2Entity,
+			DocumentEntity document3Entity,
+			DocumentEntity document4Entity,
+			DocumentEntity document5Entity,
 			ProcedimentOrganEntity procedimentOrgan) {
 		return notificacioRepository.saveAndFlush(NotificacioEntity.
 				getBuilderV2(
@@ -69,7 +71,14 @@ public class AuditNotificacioHelper {
 						grupNotificacio != null ? grupNotificacio.getCodi() : null,
 						notificacio.getNumExpedient(),
 						TipusUsuariEnumDto.INTERFICIE_WEB,
-						procedimentOrgan).document(documentEntity).build());
+						procedimentOrgan,
+						notificacio.getIdioma())
+				.document(documentEntity)
+				.document2(document2Entity)
+				.document3(document3Entity)
+				.document4(document4Entity)
+				.document5(document5Entity)
+				.build());
 	}
 	
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
@@ -81,6 +90,10 @@ public class AuditNotificacioHelper {
 			OrganGestorEntity organGestor,
 			ProcedimentEntity procediment, 
 			DocumentEntity documentEntity,
+			DocumentEntity document2Entity,
+			DocumentEntity document3Entity,
+			DocumentEntity document4Entity,
+			DocumentEntity document5Entity,
 			ProcedimentOrganEntity procedimentOrgan) {
 		notificacioEntity.update(
 				entitat,
@@ -100,7 +113,12 @@ public class AuditNotificacioHelper {
 				notificacio.getNumExpedient(),
 				TipusUsuariEnumDto.INTERFICIE_WEB,
 				documentEntity,
-				procedimentOrgan);
+				document2Entity,
+				document3Entity,
+				document4Entity,
+				document5Entity,
+				procedimentOrgan,
+				notificacio.getIdioma());
 		return notificacioEntity;
 	}
 	

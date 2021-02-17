@@ -27,6 +27,9 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import es.caib.dir3caib.ws.api.catalogo.CatPais;
 import es.caib.dir3caib.ws.api.catalogo.Dir3CaibObtenerCatalogosWs;
 import es.caib.dir3caib.ws.api.catalogo.Dir3CaibObtenerCatalogosWsService;
+import es.caib.dir3caib.ws.api.oficina.Dir3CaibObtenerOficinasWs;
+import es.caib.dir3caib.ws.api.oficina.Dir3CaibObtenerOficinasWsService;
+import es.caib.dir3caib.ws.api.oficina.OficinaTF;
 import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWs;
 import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWsService;
 import es.caib.dir3caib.ws.api.unidad.UnidadTF;
@@ -38,7 +41,7 @@ import es.caib.notib.plugin.utils.PropertiesHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlugin {
+public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlugin {
 	
 	private static final String SERVEI_CERCA = "/rest/busqueda/";
 	private static final String SERVEI_CATALEG = "/rest/catalogo/";
@@ -46,7 +49,9 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 	private static final String SERVEI_ORGANIGRAMA = "/rest/organigrama/";
 	private static final String WS_CATALEG = "ws/Dir3CaibObtenerCatalogos";
 	private static final String WS_UNITATS = "ws/Dir3CaibObtenerUnidades";
+	private static final String WS_OFICINA = "ws/Dir3CaibObtenerOficinas";
 	
+	@Override
 	public Map<String, NodeDir3> organigramaPerEntitat(String codiEntitat) throws SistemaExternException {
 		Map<String, NodeDir3> organigrama = new HashMap<String, NodeDir3>();
 		try {
@@ -83,6 +88,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 		}
 	}
 	
+	@Override
 	public Map<String, NodeDir3> organigramaPerEntitatWs(
 			String pareCodi,
 			Timestamp fechaActualizacion,
@@ -133,6 +139,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 		return node;
 	}
 
+	@Override
 	public List<ObjetoDirectorio> unitatsPerEntitat(String codiEntitat, boolean inclourePare) throws SistemaExternException {
 		List<ObjetoDirectorio> unitats = new ArrayList<ObjetoDirectorio>();
 		try {
@@ -168,6 +175,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 		}
 	}
 	
+	@Override
 	public String unitatDenominacio(String codiDir3) throws SistemaExternException {
 		try {
 			URL url = new URL(getServiceUrl() + SERVEI_UNITAT + "denominacion?codigo=" + codiDir3);
@@ -189,6 +197,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 		}
 	}
 	
+	@Override
 	public List<NodeDir3> cercaUnitats(
 			String codi, 
 			String denominacio,
@@ -242,6 +251,7 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 		}
 	}
 	
+	@Override
 	public List<ObjetoDirectorio> unitatsPerDenominacio(String denominacio) throws SistemaExternException {
 		List<ObjetoDirectorio> unitats = new ArrayList<ObjetoDirectorio>();
 		try {
@@ -269,7 +279,6 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 					ex);
 		}
 	}
-
 	
 	@Override
 	public List<NodeDir3> cercaOficines(
@@ -469,6 +478,75 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 		}
 	}
 	
+	@Override
+	public List<OficinaSIR> oficinesSIRUnitat(
+			String unitat,
+			Map<String, NodeDir3> arbreUnitats) throws SistemaExternException {
+		List<OficinaSIR> oficinesSIR = new ArrayList<OficinaSIR>();
+		List<OficinaTF> oficinesWS = new ArrayList<OficinaTF>();
+		try {
+			getOficinesUnitatSuperior(unitat, oficinesWS, arbreUnitats);
+			
+			for (OficinaTF oficinaTF : oficinesWS) {
+				OficinaSIR oficinaSIR = new OficinaSIR();
+				oficinaSIR.setCodi(oficinaTF.getCodigo());
+				oficinaSIR.setNom(oficinaTF.getDenominacion());
+				oficinesSIR.add(oficinaSIR);
+			}
+			return oficinesSIR;
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'han pogut consultar les oficines SIR via REST (" +
+					"unitat=" + unitat + ")",
+					ex);
+		}
+	}
+	
+	@Override
+	public List<OficinaSIR> getOficinesSIREntitat(String entitat) throws SistemaExternException {
+		List<OficinaSIR> oficinesSIR = new ArrayList<OficinaSIR>();
+		List<OficinaTF> oficinesWS = new ArrayList<OficinaTF>();
+		try {
+			oficinesWS = getObtenerOficinasSIRUnidad().obtenerArbolOficinas(entitat, null, null);
+			
+			for (OficinaTF oficinaTF : oficinesWS) {
+				OficinaSIR oficinaSIR = new OficinaSIR();
+				oficinaSIR.setCodi(oficinaTF.getCodigo());
+				oficinaSIR.setNom(oficinaTF.getDenominacion());
+				oficinesSIR.add(oficinaSIR);
+			}
+			return oficinesSIR;
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'han pogut consultar les oficines SIR via REST (" +
+					"entitat=" + entitat + ")",
+					ex);
+		}
+	}
+
+	private void getOficinesUnitatSuperior(
+			String unitat, 
+			List<OficinaTF> oficinesWS, 
+			Map<String, NodeDir3> arbreUnitats) throws MalformedURLException {
+		NodeDir3 arbre = arbreUnitats.get(unitat);
+		List<OficinaTF> oficinesUnitatActual = getObtenerOficinasSIRUnidad().obtenerOficinasSIRUnidad(unitat);
+		
+		if (arbre != null) {
+			String unitatSuperiorCurrentUnitat = arbre.getSuperior();
+			// Cerca de forma recursiva a l'unitat superior si l'unitat actual no disposa d'una oficina
+			if (oficinesUnitatActual.isEmpty() && !unitatSuperiorCurrentUnitat.isEmpty() && !unitatSuperiorCurrentUnitat.equals(arbre.getArrel())) {
+				getOficinesUnitatSuperior(
+						unitatSuperiorCurrentUnitat.substring(0, unitatSuperiorCurrentUnitat.indexOf(' ')), 
+						oficinesUnitatActual,
+						arbreUnitats);
+			// No cercar més si l'oficina actual és l'oficina arrel
+			} else if (oficinesUnitatActual.isEmpty() && !unitatSuperiorCurrentUnitat.isEmpty() && unitatSuperiorCurrentUnitat.equals(arbre.getArrel())) {
+				oficinesWS.addAll(getObtenerOficinasSIRUnidad().obtenerOficinasSIRUnidad(arbre.getCodi()));
+			}
+		}
+		oficinesWS.addAll(oficinesUnitatActual);
+	}
+
 	private Dir3CaibObtenerUnidadesWs getObtenerUnidadesService() throws MalformedURLException {
 	
 		final String endpoint = getServiceUrl() + WS_UNITATS;
@@ -492,6 +570,19 @@ public class 	UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPl
 
 		configAddressUserPassword(getUsernameServiceUrl(), getPasswordServiceUrl(), endpoint, api);
 		
+		return api;
+	}
+	
+	private Dir3CaibObtenerOficinasWs getObtenerOficinasSIRUnidad() throws MalformedURLException {
+		
+		final String endpoint = getServiceUrl() + WS_OFICINA;
+		final URL wsdl = new URL(endpoint + "?wsdl");
+
+		Dir3CaibObtenerOficinasWsService service = new Dir3CaibObtenerOficinasWsService(wsdl);
+		Dir3CaibObtenerOficinasWs api = service.getDir3CaibObtenerOficinasWs();
+
+		configAddressUserPassword(getUsernameServiceUrl(), getPasswordServiceUrl(), endpoint, api);
+
 		return api;
 	}
 	

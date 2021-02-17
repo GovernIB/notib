@@ -3,34 +3,14 @@
  */
 package es.caib.notib.core.api.service;
 
-import java.util.List;
-
-import javax.mail.MessagingException;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-
-import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.CodiValorDto;
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.LocalitatsDto;
-import es.caib.notib.core.api.dto.NotificacioDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
-import es.caib.notib.core.api.dto.NotificacioErrorCallbackFiltreDto;
-import es.caib.notib.core.api.dto.NotificacioEventDto;
-import es.caib.notib.core.api.dto.NotificacioFiltreDto;
-import es.caib.notib.core.api.dto.NotificacioRegistreErrorFiltreDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PaisosDto;
-import es.caib.notib.core.api.dto.ProgresDescarregaDto;
-import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
-import es.caib.notib.core.api.dto.ProvinciesDto;
-import es.caib.notib.core.api.dto.RegistreIdDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import javax.mail.MessagingException;
+import java.util.List;
 
 /**
  * Declaració dels mètodes per a la consulta de notificacions i dels
@@ -113,7 +93,7 @@ public interface NotificacioService {
 	 * @return La pàgina amb les notificacions.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public PaginaDto<NotificacioDto> findAmbFiltrePaginat(
+	public PaginaDto<NotificacioDatatableDto> findAmbFiltrePaginat(
 			Long entitatId,
 			boolean isUsuari,
 			boolean isUsuariEntitat,
@@ -235,6 +215,20 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_CARPETA')")
 	public ArxiuDto getDocumentArxiu(
 			Long notificacioId);
+
+	/**
+	 * Retorna l'arxiu del document de la notificació.
+	 *
+	 * @param notificacioId
+	 *            Atribut id de la notificació.
+	 * @param documentId
+	 *            Atribut id del document.
+	 * @return el fitxer associat.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_CARPETA')")
+	public ArxiuDto getDocumentArxiu(
+			Long notificacioId,
+			Long documentId);
 	
 	/**
 	 * Retorna l'arxiu de la certificació d'un enviament.
@@ -425,8 +419,16 @@ public interface NotificacioService {
 	public ProgresActualitzacioCertificacioDto actualitzacioEnviamentsEstat();
 
 	
-	
+	/**
+	 * Guarda un document a partir del string de bytes
+	 * 
+	 * @return el id
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public String guardarArxiuTemporal(String string);
 
+	@PreAuthorize("hasRole('tothom')")
+	public byte[] obtenirArxiuTemporal(String arxiuGestdocId);
 	
 	
 

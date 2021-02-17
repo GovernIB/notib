@@ -3,31 +3,16 @@
  */
 package es.caib.notib.core.ejb;
 
-import java.util.List;
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.service.ProcedimentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
-import es.caib.notib.core.api.dto.CodiAssumpteDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.PermisEnum;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
-import es.caib.notib.core.api.dto.ProcedimentFormDto;
-import es.caib.notib.core.api.dto.ProcedimentGrupDto;
-import es.caib.notib.core.api.dto.ProcedimentOrganDto;
-import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
-import es.caib.notib.core.api.dto.TipusAssumpteDto;
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.service.ProcedimentService;
+import java.util.List;
 
 /**
  * Implementació de ProcedimentService com a EJB que empra una clase
@@ -110,7 +95,15 @@ public class ProcedimentServiceBean implements ProcedimentService {
 		return delegate.findByOrganGestorIDescendents(entitatId, organGestor);
 	}
 
-	@Override
+    @Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+    public List<ProcedimentDto> findByOrganGestorIDescendentsAndComu(
+    		Long id,
+			OrganGestorDto organGestor) {
+        return delegate.findByOrganGestorIDescendentsAndComu(id, organGestor);
+    }
+
+    @Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public PaginaDto<ProcedimentFormDto> findAmbFiltrePaginat(
 			Long entitatId, 
@@ -337,13 +330,32 @@ public class ProcedimentServiceBean implements ProcedimentService {
 				grups, 
 				permis);
 	}
-	
-	@Override
+
+    @Override
+    @RolesAllowed({"NOT_ADMIN", "tothom"})
+    public List<CodiValorComuDto> getProcedimentsOrgan(
+			Long entitatId,
+			String organCodi,
+			Long organFiltre,
+			RolEnumDto rol,
+			PermisEnum permis) {
+        return delegate.getProcedimentsOrgan(
+        		entitatId,
+				organCodi,
+				organFiltre,
+				rol,
+				permis);
+    }
+
+    @Override
 	@RolesAllowed({"NOT_ADMIN"})
 	public void actualitzaProcediments(EntitatDto entitat) {
 		delegate.actualitzaProcediments(entitat);
 	}
-
+	@Override
+	public boolean isUpdatingProcediments(EntitatDto entitatDto) {
+		return delegate.isUpdatingProcediments(entitatDto);
+	}
 	@Override
 	public ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi) {
 		return delegate.getProgresActualitzacio(dir3Codi);

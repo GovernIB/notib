@@ -4,18 +4,9 @@ import java.util.List;
 
 import javax.xml.bind.ValidationException;
 
+import es.caib.notib.core.api.dto.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.notib.core.api.dto.CodiValorDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.OrganGestorFiltreDto;
-import es.caib.notib.core.api.dto.OrganismeDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.exception.NotFoundException;
 
 /**
@@ -30,6 +21,9 @@ public interface OrganGestorService {
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public OrganGestorDto delete(Long entitatId, Long organId);
+	
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	public OrganGestorDto updateOficina(OrganGestorDto dto);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public void updateNom(
@@ -128,6 +122,23 @@ public interface OrganGestorService {
 			String organGestorDir3Codi);
 	
 	/**
+	 * Recupera les oficines SIR d'un òrgan gestor / entitat (anomenat organisme dins Regweb)
+	 * 
+	 * @param entitatId 
+	 * 					Entitat actual
+	 * @param dir3codi
+	 * 					Codi DIR3 de l'òrgan gestor / entitat del qual es volen recuperar les oficines
+	 * @param isFiltre
+	 * 					Indicar si la cerca és per emplenar un filtre
+	 * @return La llista de les oficines
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	public List<OficinaDto> getOficinesSIR(
+			Long entitatId,
+			String dir3codi,
+			boolean isFiltre);
+	
+	/**
 	 * Recupera els òrgans sobre els quals té permís l'usuari actual
 	 * 
 	 * @param entitatId
@@ -140,4 +151,11 @@ public interface OrganGestorService {
 			Long entitatId, 
 			String usuariCodi,
 			PermisEnum permis);
+
+	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
+    public List<CodiValorDto> getOrgansGestorsDisponiblesConsulta(
+    		Long entitatId,
+			String usuari,
+			RolEnumDto rol,
+			String organ);
 }

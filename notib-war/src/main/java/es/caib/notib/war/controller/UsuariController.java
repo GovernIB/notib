@@ -8,10 +8,12 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import es.caib.notib.war.helper.FlushAuthCacheHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -70,6 +72,19 @@ public class UsuariController extends BaseController {
 	@ResponseBody
 	public String getIdioma() {
 		return new Locale(SessioHelper.getIdioma(aplicacioService), Locale.getDefault().getCountry()).toLanguageTag();
+	}
+
+	@RequestMapping(value = "/{codi}/refrescarRols", method = RequestMethod.GET)
+	public String refrescarRols(
+			HttpServletRequest request,
+			@PathVariable String codi,
+			Model model) {
+		try {
+			FlushAuthCacheHelper.flushAuthenticationCache(codi);
+		} catch (Exception e) {
+			return getAjaxControllerReturnValueError(request, "redirect:/", "usuari.controller.refresh.roles.error");
+		}
+		return getAjaxControllerReturnValueSuccess(request, "redirect:/", "usuari.controller.refresh.roles.ok");
 	}
 	
 }

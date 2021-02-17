@@ -30,6 +30,7 @@ import es.caib.loginModule.client.AuthorizationToken;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Deprecated
 public class WsClientHelper<T> {
 
 	public T generarClientWs(

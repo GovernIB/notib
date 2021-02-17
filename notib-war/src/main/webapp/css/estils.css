@@ -123,6 +123,10 @@ table.dataTable tr.datatable-dades-carregant div {
 	width: 50% !important;	
 }
 
+.vt10 {
+	padding-top: 10px;
+}
+
 .truncate {
 }
 @media (max-width: 1024px) {

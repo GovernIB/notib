@@ -169,36 +169,6 @@ $(function() {
     });
 });
 
-//function returnProcessarUrl(permisProcessar, notificacioId) {
-//	var url;
-//	if(permisProcessar) {
-//		url = '<a href="<c:url value="/notificacio/' + notificacioId + '/processar"/>" class="btn btn-info btn-xs pull-right"  data-toggle="modal" data-modal-id="modal-processar"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a>';
-//	}
-//	if (url !== undefined) {
-//		return  url.replace(/"/g, "'");
-//	} else {
-//		return  url;
-//	}
-//}
-//async function resolve(notificacioId) {
-//	var content;
-//	var getUrl = "<c:url value="/notificacio/"/>" + notificacioId + "/enviament";
-//	
-//	const reposResponse = await fetch(getUrl);
-//	const userRepos = await reposResponse.json();
-//	
-//	if (userRepos != null) {
-//		for (i = 0; i < userRepos.length; i++) {
-//			content = (userRepos[i].notificaEstat) ? notificacioEnviamentEstats[userRepos[i].notificaEstat] + ',' : '';
-//		}
-//	}
-//	if (content !== undefined) {
-//		content = "("+content.replace(/,\s*$/, "")+")";
-//	}
-//	//console.log(content);
-//	return content;
-//}
-
 function formatDate(data) {
 	//Añadir ceros a los numeros de un dígito
 	Number.prototype.padLeft = function(base,chr){
@@ -305,21 +275,20 @@ $(document).ready(function() {
 				}
 				contingutTbody += '<td>' + destinataris + '</td>';
 				contingutTbody += '<td>';
-				//contingutTbody += (data[i].notificacio.estat) ? notificacioEnviamentEstats[data[i].notificacio.estat] : '';
 				contingutTbody += (data[i].notificaEstat) ? notificacioEnviamentEstats[data[i].notificaEstat] : '';
-				if (data[i].notificacio.notificaError) {
+				if (data[i].notificacioError) {
 					var errorTitle = '';
-					if (data[i].notificacio.notificaErrorDescripcio) {
-						errorTitle = data[i].notificacio.notificaErrorDescripcio;
+					if (data[i].notificacioErrorDescripcio) {
+						errorTitle = data[i].notificacioErrorDescripcio;
 					}
-					var escaped = data[i].notificacio.notificaErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+					var escaped = data[i].notificacioErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 					contingutTbody += ' <span class="fa fa-warning text-danger" title="' + escaped + '"></span>';
 				}
 				contingutTbody += '</td>';
 				contingutTbody += '<td width="114px">';
 				if (data[i].notificaCertificacioData != null) {
 					contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/certificacioDescarregar"/>" class="btn btn-default btn-sm fileDownloadSimpleRichExperience" title="<spring:message code="enviament.info.accio.descarregar.certificacio"/>"><span class="fa fa-download"></span></a>';
-				} else if (data[i].notificacio.estat == 'REGISTRADA' && 
+				} else if (data[i].notificacioEstat == 'REGISTRADA' &&
 						(data[i].registreEstat && (data[i].registreEstat == 'DISTRIBUIT' || data[i].registreEstat == 'OFICI_EXTERN'  || data[i].registreEstat == 'OFICI_SIR')) || (data[i].registreData && data[i].registreNumeroFormatat != '')){
 					contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/justificantDescarregar"/>" class="btn btn-default btn-sm fileDownloadSimpleRichExperience" title="<spring:message code="enviament.info.accio.descarregar.justificant"/>"><span class="fa fa-download"></span></a>';
 				}
@@ -355,28 +324,6 @@ $(document).ready(function() {
 	$('#organGestor').on('change', function () {
 		//Procediments
 		omplirProcediments();
-// 		var organGestor = $(this);
-// 		var selProcediments = $("#procedimentId");
-// 		$.ajax({
-// 			type: 'GET',
-// 			url: "<c:url value="/notificacio/procedimentsOrgan/"/>" + $(organGestor).val(),
-// 			success: function(data) {
-// 				$(selProcediments).empty();
-// 				$(selProcediments).append("<option value=\"\"></option>");
-// 				if (data && data.length > 0) {
-// 					$.each(data, function(i, val) {
-// 						$(selProcediments).append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
-// 					});
-// 				}
-// 				var select2Options = {
-// 						theme: 'bootstrap',
-// 						width: 'auto'};
-// 				$(selProcediments).select2(select2Options);
-// 			},
-// 			error: function() {
-// 				console.log("error obtenint els procediments!");
-// 			}
-// 		});
 	});
 	function omplirProcediments() {
 		var organGestor = $("#organGestor");
@@ -406,14 +353,14 @@ $(document).ready(function() {
 					if (procedimentsComuns.length > 0) {
 						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
 							$.each(procedimentsComuns, function(index, val) {
-								selProcediments.append("<option value=\"" + val.id + "\">" + val.codi +' - '+ val.nom + "</option>");
+								selProcediments.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
 							});
 						selProcediments.append("</optgroup>");
 					}
 					if (procedimentsOrgan.length > 0) {
 						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
 							$.each(procedimentsOrgan, function(index, val) {
-								selProcediments.append("<option value=\"" + val.id + "\">" + val.codi +' - '+ val.nom + "</option>");
+								selProcediments.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
 							});
 						selProcediments.append("</optgroup>");
 					}
@@ -465,7 +412,7 @@ $(document).ready(function() {
 				<not:inputText name="titular" inline="true" placeholderKey="notificacio.list.filtre.camp.titular"/>
 			</div>
 			<div class="col-md-4">
-				<not:inputSelect name="organGestor" optionItems="${organsGestorsPermisLectura}" optionValueAttribute="codi" optionTextAttribute="nom" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
+				<not:inputSelect name="organGestor" optionItems="${organsGestorsPermisLectura}" optionValueAttribute="codi" optionTextAttribute="valor" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 			<div class="col-md-6">
 				<not:inputSelect name="procedimentId" optionItems="${procedimentsPermisLectura}" optionValueAttribute="id" optionTextAttribute="descripcio" placeholderKey="notificacio.list.filtre.camp.procediment" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
@@ -509,7 +456,7 @@ $(document).ready(function() {
 		data-toggle="datatable"
 		data-url="<c:url value="/notificacio/datatable"/>"
 		data-search-enabled="false"
-		data-default-order="7"
+		data-default-order="8"
 		data-default-dir="desc"
 		class="table table-striped table-bordered"
 		style="width:100%"
@@ -525,6 +472,7 @@ $(document).ready(function() {
 				<th data-col-name="hasEnviamentsPendentsRegistre" data-visible="false">#</th>
 				<th data-col-name="notificaError" data-visible="false"></th>
 				<th data-col-name="notificaErrorDescripcio" data-visible="false"></th>
+				<th data-col-name="enviant" data-visible="false"></th>
 				<th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" class="enviamentTipusCol" width="5px">
 
 					<script id="cellEnviamentTipusTemplate" type="text/x-jsrender">
@@ -547,7 +495,7 @@ $(document).ready(function() {
 					</script>
 				</th--%>
 				<th data-col-name="organGestorDesc"  width="200px"><spring:message code="notificacio.form.camp.organGestor"/></th>
-				<th data-col-name="procediment.descripcio"  width="200px"><spring:message code="notificacio.list.columna.procediment"/></th>
+				<th data-col-name="procedimentDesc"  width="200px"><spring:message code="notificacio.list.columna.procediment"/></th>
 				<c:if test="${mostrarColumnaNumExpedient}">
 					<th data-col-name="numExpedient" width="170px"><spring:message code="notificacio.list.columna.num.expedient"/></th>
 				</c:if>
@@ -556,18 +504,26 @@ $(document).ready(function() {
 				<th data-col-name="estat" data-template="#cellEstatTemplate"  width="120px">
 					<spring:message code="notificacio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
-						{{if estat == 'PENDENT'}}
+						{{if enviant}}
 							<span class="fa fa-clock-o"></span>
+							<spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.ENVIANT"/>
+						{{else estat == 'PENDENT'}}
+							<span class="fa fa-clock-o"></span>
+							{{:~eval('notificacioEstats["' + estat + '"]')}}
 						{{else estat == 'ENVIADA'}}
 							<span class="fa fa-send-o"></span>
+							{{:~eval('notificacioEstats["' + estat + '"]')}}
 						{{else estat == 'FINALITZADA'}}
 							<span class="fa fa-check"></span>
+							{{:~eval('notificacioEstats["' + estat + '"]')}}
 						{{else estat == 'REGISTRADA'}}
 							<span class="fa fa-file-o"></span>
+							{{:~eval('notificacioEstats["' + estat + '"]')}}
 						{{else estat == 'PROCESSADA'}}
 							<span class="fa fa-check-circle"></span>
+							{{:~eval('notificacioEstats["' + estat + '"]')}}
 						{{/if}}
-						{{:~eval('notificacioEstats["' + estat + '"]')}}
+
 						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>notificaErrorDescripcio}}"></span>{{/if}}
 						{{if tipusUsuari == 'APLICACIO' && errorLastEvent}}
 							<span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>
@@ -595,10 +551,12 @@ $(document).ready(function() {
 							{{if permisProcessar }}
 								<li><a href="<c:url value="/notificacio/{{:id}}/processar"/>" data-toggle="modal"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a></li>
 							{{/if}}
-							{^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan()) && hasEnviamentsPendentsRegistre }}
-								<li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
-								<li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-							{{/if}}							
+							{{if !enviant}}
+								{^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan()) && hasEnviamentsPendentsRegistre }}
+									<li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
+									<li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								{{/if}}
+							{{/if}}
 							</ul>
 						</div>
 					</script>

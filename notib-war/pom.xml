@@ -216,11 +216,11 @@
 			<version>${lombok.version}</version>
 			<scope>provided</scope>
 		</dependency>
-<!-- 		<dependency> -->
-<!--             <groupId>org.slf4j</groupId> -->
-<!--             <artifactId>slf4j-log4j12</artifactId> -->
-<!--             <version>${slf4j.version}</version> -->
-<!--         </dependency> -->
+		<dependency>
+			<groupId>es.caib.jboss</groupId>
+			<artifactId>jboss-jmx</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>
 	<profiles>
 		<profile>
@@ -328,6 +328,7 @@
 					<artifactId>bootstrap</artifactId>
 					<version>3.3.6</version>
 				</dependency>
+
 			</dependencies>
 			<build>
 				<plugins>
@@ -366,6 +367,11 @@
 					<scope>provided</scope>
 					<type>pom</type>
 				</dependency>
+<!--				<dependency>-->
+<!--					<groupId>org.jboss.jbossas</groupId>-->
+<!--					<artifactId>jboss-as-system-jmx</artifactId>-->
+<!--					<version>5.1.0.GA</version>-->
+<!--				</dependency>-->
 			</dependencies>
 			<build>
 				<plugins>
@@ -499,6 +505,11 @@
 			<id>github-governib-maven-repos</id>
 			<name>GitHub GovernIB Maven Repository</name>
 			<url>http://GovernIB.github.io/maven/maven/</url>
+		</repository>
+		<repository>
+			<name>Local Maven repository</name>
+			<id>es.caib.notib.local</id>
+			<url>file://${basedir}/../local-repo</url>
 		</repository>
 	</repositories>
 </project>

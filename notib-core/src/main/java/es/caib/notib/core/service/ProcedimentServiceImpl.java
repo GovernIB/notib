@@ -1,18 +1,25 @@
 package es.caib.notib.core.service;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Resource;
-
+import com.codahale.metrics.Timer;
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.ProgresActualitzacioDto.ActualitzacioInfo;
+import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
+import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.exception.PermissionDeniedException;
+import es.caib.notib.core.api.exception.SistemaExternException;
+import es.caib.notib.core.api.service.AuditService.TipusEntitat;
+import es.caib.notib.core.api.service.AuditService.TipusObjecte;
+import es.caib.notib.core.api.service.AuditService.TipusOperacio;
+import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.aspect.Audita;
+import es.caib.notib.core.entity.*;
+import es.caib.notib.core.helper.*;
+import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.notib.core.repository.*;
+import es.caib.notib.plugin.registre.CodiAssumpte;
+import es.caib.notib.plugin.registre.TipusAssumpte;
+import es.caib.notib.plugin.unitat.NodeDir3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,73 +31,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.codahale.metrics.Timer;
-
-import es.caib.notib.core.api.dto.AccioParam;
-import es.caib.notib.core.api.dto.CodiAssumpteDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.core.api.dto.IntegracioInfo;
-import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.OrganismeDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.PermisEnum;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
-import es.caib.notib.core.api.dto.ProcedimentFormDto;
-import es.caib.notib.core.api.dto.ProcedimentGrupDto;
-import es.caib.notib.core.api.dto.ProcedimentOrganDto;
-import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
-import es.caib.notib.core.api.dto.ProgresActualitzacioDto.ActualitzacioInfo;
-import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
-import es.caib.notib.core.api.dto.TipusAssumpteDto;
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.exception.PermissionDeniedException;
-import es.caib.notib.core.api.exception.SistemaExternException;
-import es.caib.notib.core.api.service.AuditService.TipusEntitat;
-import es.caib.notib.core.api.service.AuditService.TipusObjecte;
-import es.caib.notib.core.api.service.AuditService.TipusOperacio;
-import es.caib.notib.core.api.service.GrupService;
-import es.caib.notib.core.api.service.OrganGestorService;
-import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.core.aspect.Audita;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.GrupEntity;
-import es.caib.notib.core.entity.GrupProcedimentEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.PagadorCieEntity;
-import es.caib.notib.core.entity.PagadorPostalEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.ProcedimentFormEntity;
-import es.caib.notib.core.entity.ProcedimentOrganEntity;
-import es.caib.notib.core.helper.CacheHelper;
-import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.EntityComprovarHelper;
-import es.caib.notib.core.helper.IntegracioHelper;
-import es.caib.notib.core.helper.MessageHelper;
-import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.OrganigramaHelper;
-import es.caib.notib.core.helper.PaginacioHelper;
-import es.caib.notib.core.helper.PermisosHelper;
-import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.notib.core.helper.PluginHelper;
-import es.caib.notib.core.helper.ProcedimentHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
-import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.GrupProcedimentRepository;
-import es.caib.notib.core.repository.GrupRepository;
-import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.ProcedimentFormRepository;
-import es.caib.notib.core.repository.ProcedimentOrganRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
-import es.caib.notib.plugin.registre.CodiAssumpte;
-import es.caib.notib.plugin.registre.TipusAssumpte;
+import javax.annotation.Resource;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.*;
 
 /**
  * Implementació del servei de gestió de procediments.
@@ -119,8 +63,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Resource
 	private GrupService grupService;
 	@Resource
-	private GrupRepository grupRepository;
-	@Resource
 	private EntitatRepository entitatRepository;
 	@Resource
 	private GrupProcedimentRepository grupProcedimentRepository;
@@ -136,8 +78,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private IntegracioHelper integracioHelper;
 	@Resource
 	private MetricsHelper metricsHelper;
-	@Resource
-	private OrganGestorService organGestorService;
 	@Resource
 	private NotificacioRepository notificacioRepository;
 	@Resource
@@ -204,12 +144,18 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		LlibreDto llibre = pluginHelper.llistarLlibreOrganisme(
 				entitat.getCodi(),
 				organGestorCodi);
+		Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
+		List<OficinaDto> oficinesSIR = cacheHelper.getOficinesSIRUnitat(
+				arbreUnitats, 
+				organGestorCodi);
 		organGestor = OrganGestorEntity.getBuilder(
 				organGestorCodi,
 				findDenominacioOrganisme(organGestorCodi),
 				entitat,
 				llibre.getCodi(),
-				llibre.getNomLlarg()).build();
+				llibre.getNomLlarg(),
+				(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getCodi() : null),
+				(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getNom() : null)).build();
 		organGestorRepository.save(organGestor);
 		return organGestor;
 	}
@@ -428,13 +374,20 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
+	public boolean isUpdatingProcediments(EntitatDto entitatDto) {
+		ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getDir3Codi());
+		return progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError();
+	}
+
 	@Override
 	//@Transactional(timeout = 300)
 	public void actualitzaProcediments(EntitatDto entitatDto) {
 		
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			long startTime;
+			double elapsedTime;
 			ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getDir3Codi());
 			IntegracioInfo info = new IntegracioInfo(
 					IntegracioHelper.INTCODI_PROCEDIMENT, 
@@ -465,8 +418,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						false,
 						false,
 						false);
-				Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(entitatDto.getDir3Codi());
 
+				startTime = System.nanoTime();
+				Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(entitatDto.getDir3Codi());
+				elapsedTime = (System.nanoTime() - startTime) / 10e6;
+				logger.info(" [TIMER-PRO] Obtenir organigrama de l'entitat: " + elapsedTime + " ms");
 //				OficinaDto oficinaVirtual = pluginHelper.llistarOficinaVirtual(
 //						entitatDto.getDir3Codi(), 
 //						entitat.getNomOficinaVirtual(),
@@ -476,7 +432,10 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments"));
 				List<ProcedimentDto> procedimentsGda  = new ArrayList<ProcedimentDto>();
 //				List<ProcedimentDto> totalProcedimentsGda  = new ArrayList<ProcedimentDto>();
+				startTime = System.nanoTime();
 				int totalElements = getTotalProcediments(entitatDto.getDir3Codi());
+				elapsedTime = (System.nanoTime() - startTime) / 10e6;
+				logger.info(" [TIMER-PRO] Obtenir nombre de procediments de l'entitat: " + elapsedTime + " ms");
 				int totalElementsCons = totalElements;
 				Long t1 = System.currentTimeMillis();
 				int numPagina = 1;
@@ -484,6 +443,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				int i = 1;
 				boolean errorConsultantLlista = false;
 				boolean darreraLlista = false;
+				startTime = System.nanoTime();
 				do {
 					try {
 						procedimentsGda = getProcedimentsGdaByEntitat(
@@ -537,9 +497,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 //					totalProcedimentsGda.addAll(procedimentsGda);
 					numPagina++;
 				} while (!darreraLlista || (errorConsultantLlista && reintents < 3));
-
+				elapsedTime = (System.nanoTime() - startTime) / 10e6;
+				logger.info(" [TIMER-PRO] Recorregut procediments i actualització: " + elapsedTime + " ms");
 				
 				if (eliminarOrgans) {
+					startTime = System.nanoTime();
 //					int i = 1;
 //					logger.debug(">>>> Processant organs gestors modificats (" + organsGestorsModificats.size() + ")");
 //					logger.debug(">>>> ==========================================================================");
@@ -556,6 +518,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						//#260 Modificació passar la funcionalitat del for dins un procediment, ja que pel temps de transacció fallava
 						procedimentHelper.eliminarOrganSiNoEstaEnUs(progres,organGestorAntic);
 					}
+					elapsedTime = (System.nanoTime() - startTime) / 10e6;
+					logger.info(" [TIMER-PRO] Eliminar organs: " + elapsedTime + " ms");
 				} else {
 					progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organs.inactiu"));
 				}
@@ -750,7 +714,18 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				procedimentRepository.findByOrganGestorCodiIn(organsFills),
 				ProcedimentDto.class);
 	}
-	
+
+	@Override
+	public List<ProcedimentDto> findByOrganGestorIDescendentsAndComu(Long entitatId, OrganGestorDto organGestor) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+				entitat.getDir3Codi(),
+				organGestor.getCodi());
+		return conversioTipusHelper.convertirList(
+				procedimentRepository.findByOrganGestorCodiInOrComu(organsFills, entitat),
+				ProcedimentDto.class);
+	}
+
 	@Override
 	@Transactional
 	public PaginaDto<ProcedimentFormDto> findAmbFiltrePaginat(
@@ -1026,60 +1001,12 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			
 			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
 
-			// 1. Obtenim els procediments amb permisos per procediment
-			List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
-			List<ProcedimentEntity> procediments = procedimentRepository.findProcedimentsByEntitatAndGrup(entitat, grups);
-			List<ProcedimentEntity> procedimentsAmbPermis = new ArrayList<ProcedimentEntity>(procediments);
-			permisosHelper.filterGrantedAny(
-					procedimentsAmbPermis,
-					new ObjectIdentifierExtractor<ProcedimentEntity>() {
-						public Long getObjectIdentifier(ProcedimentEntity procediment) {
-							return procediment.getId();
-						}
-					},
-					ProcedimentEntity.class,
-					permisos,
-					auth);
-			
-			// 2. Obtenim els òrgans gestors amb permisos
-			List<OrganGestorEntity> organsGestors = organGestorRepository.findByEntitat(entitat);
-			List<OrganGestorEntity> organsGestorsAmbPermis = new ArrayList<OrganGestorEntity>(organsGestors);
-			
-			permisosHelper.filterGrantedAny(
-					organsGestorsAmbPermis,
-					new ObjectIdentifierExtractor<OrganGestorEntity>() {
-						public Long getObjectIdentifier(OrganGestorEntity organGestor) {
-							return organGestor.getId();
-						}
-					},
-					OrganGestorEntity.class,
-					permisos,
-					auth);
-			
-			// 3. Obtenim els òrgans gestors fills dels organs gestors amb permisos
-			List<String> organsGestorsCodisAmbPermis = new ArrayList<String>();
-			if (!organsGestorsAmbPermis.isEmpty()) {
-				Set<String> codisOrgansAmbDescendents = new HashSet<String>();
-				for (OrganGestorEntity organGestorEntity : organsGestorsAmbPermis) {
-					codisOrgansAmbDescendents.addAll(
-							organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
-									entitat.getDir3Codi(), 
-									organGestorEntity.getCodi()));
-				}
-				organsGestorsCodisAmbPermis = new ArrayList<String>(codisOrgansAmbDescendents);
-			}
-			
-			// 4. Obtenim els procediments amb permisos per òrgan gestor
-			List<ProcedimentEntity> procedimentsAmbPermisOrgan = new ArrayList<ProcedimentEntity>();
-			if (!organsGestorsCodisAmbPermis.isEmpty()) {
-				procedimentsAmbPermisOrgan = procedimentRepository.findByOrganGestorCodiInAndGrup(organsGestorsCodisAmbPermis, grups);
-			}
-			
-			// 5. Juntam els procediments amb permís per òrgan gestor amb els procediments amb permís per procediment
-			Set<ProcedimentEntity> setProcediments = new HashSet<ProcedimentEntity>(procedimentsAmbPermis);
-			setProcediments.addAll(procedimentsAmbPermisOrgan);
-			procediments = new ArrayList<ProcedimentEntity>(setProcediments);
-			
+			List<ProcedimentEntity> procediments = procedimentHelper.getProcedimentsWithPermis(
+					usuariCodi,
+					auth,
+					entitat,
+					permisos);
+
 			// 6. Ordenam els procediments
 			Collections.sort(procediments, new Comparator<ProcedimentEntity>() {
 				@Override
@@ -1096,7 +1023,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<ProcedimentDto> findProcedimentsByOrganGestor(String organGestorCodi) {
@@ -1184,7 +1111,146 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
+	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "procedimentsOrgan", key="{#entitatId, #organCodi, #organFiltre, #rol.ordinal(), #permis.ordinal()}")
+	public List<CodiValorComuDto> getProcedimentsOrgan(
+			Long entitatId,
+			String organCodi,
+			Long organFiltre,
+			RolEnumDto rol,
+			PermisEnum permis) {
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			List<CodiValorComuDto> procedimentsOrgan = new ArrayList<>();
+			List<ProcedimentEntity> procediments = new ArrayList<>();
+			String organGestor = null;
+
+			if (organFiltre != null) {
+				OrganGestorEntity organGestorEntity = organGestorRepository.findOne(organFiltre);
+				if (organGestorEntity != null)
+					organGestor = organGestorEntity.getCodi();
+			}
+
+			if (RolEnumDto.tothom.equals(rol)) {
+				procediments = recuperarProcedimentAmbPermis(entitat, permis, organGestor);
+			} else {
+
+				if (organGestor != null) {
+					List<ProcedimentEntity> procedimentsDisponibles = procedimentRepository.findByEntitat(entitat);
+					if (procedimentsDisponibles != null) {
+						for (ProcedimentEntity proc : procedimentsDisponibles) {
+							if (proc.isComu() || (proc.getOrganGestor() != null && organGestor.equalsIgnoreCase(proc.getOrganGestor().getCodi()))) {
+								procediments.add(proc);
+							}
+						}
+					}
+				} else {
+					if (RolEnumDto.NOT_SUPER.equals(rol)) {
+						procediments = procedimentRepository.findAll();
+					} else if (RolEnumDto.NOT_ADMIN.equals(rol)) {
+						procediments = procedimentRepository.findByEntitat(entitat);
+					} else if (RolEnumDto.NOT_ADMIN_ORGAN.equals(rol)) {
+						if (organCodi != null) {
+							List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+									entitat.getDir3Codi(),
+									organCodi);
+							procediments = procedimentRepository.findByOrganGestorCodiInOrComu(organsFills, entitat);
+						}
+					}
+				}
+			}
+
+			Collections.sort(procediments, new Comparator<ProcedimentEntity>() {
+				@Override
+				public int compare(ProcedimentEntity p1, ProcedimentEntity p2) {
+					return p1.getNom().compareTo(p2.getNom());
+				}
+			});
+
+			for (ProcedimentEntity procediment : procediments) {
+				String nom = procediment.getCodi();
+				if (procediment.getNom() != null && !procediment.getNom().isEmpty()) {
+					nom += " - " + procediment.getNom();
+				}
+				procedimentsOrgan.add(new CodiValorComuDto(procediment.getId().toString(), nom, procediment.isComu()));
+			}
+
+			return procedimentsOrgan;
+
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	private List<ProcedimentEntity> recuperarProcedimentAmbPermis(
+			EntitatEntity entitat,
+			PermisEnum permis,
+			String organFiltre) {
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
+		List<ProcedimentEntity> procediments = procedimentHelper.getProcedimentsWithPermis(
+				auth.getName(),
+				auth,
+				entitat,
+				permisos);
+		List<ProcedimentOrganEntity> procedimentsOrgans = procedimentHelper.getProcedimentOrganWithPermis(
+				auth.getName(),
+				auth,
+				entitat,
+				permisos);
+		if (organFiltre != null) {
+			List<ProcedimentOrganEntity> procedimentsOrgansAmbPermis = new ArrayList<>();
+			if(procedimentsOrgans != null && !procedimentsOrgans.isEmpty()) {
+
+				List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
+				for (ProcedimentOrganEntity procedimentOrgan: procedimentsOrgans) {
+					if (organsFills.contains(procedimentOrgan.getOrganGestor().getCodi()))
+						procedimentsOrgansAmbPermis.add(procedimentOrgan);
+				}
+			}
+			procedimentsOrgans = procedimentsOrgansAmbPermis;
+		}
+
+		return addProcedimentsOrgan(procediments, procedimentsOrgans, organFiltre);
+	}
+
+	private List<ProcedimentEntity> addProcedimentsOrgan(
+			List<ProcedimentEntity> procediments,
+			List<ProcedimentOrganEntity> procedimentsOrgans,
+			String organFiltre) {
+
+		Set<ProcedimentEntity> setProcediments = new HashSet<>();
+
+		if (organFiltre != null) {
+			if (procediments != null) {
+				for (ProcedimentEntity proc : procediments) {
+					if (proc.isComu() || (proc.getOrganGestor() != null && organFiltre.equalsIgnoreCase(proc.getOrganGestor().getCodi()))) {
+						setProcediments.add(proc);
+					}
+				}
+			}
+			if (procedimentsOrgans != null && !procedimentsOrgans.isEmpty()) {
+				for (ProcedimentOrganEntity procedimentOrgan : procedimentsOrgans) {
+					setProcediments.add(procedimentOrgan.getProcediment());
+				}
+			}
+		} else {
+			if (procediments != null)
+				setProcediments = new HashSet<>(procediments);
+			if (procedimentsOrgans != null && !procedimentsOrgans.isEmpty()) {
+				for (ProcedimentOrganEntity procedimentOrgan : procedimentsOrgans) {
+					setProcediments.add(procedimentOrgan.getProcediment());
+				}
+			}
+		}
+		return new ArrayList<ProcedimentEntity>(setProcediments);
+	}
+
 	@Override
 	@Transactional(readOnly = true)
 	public boolean hasAnyProcedimentsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
@@ -1303,21 +1369,12 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			
 			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
 
-			// 1. Obtenim els procediments amb permisos per procediment
-			List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
-			List<ProcedimentOrganEntity> procedimentOrgans = procedimentOrganRepository.findProcedimentsOrganByEntitatAndGrup(entitat, grups);
-			List<ProcedimentOrganEntity> procedimentOrgansAmbPermis = new ArrayList<ProcedimentOrganEntity>(procedimentOrgans);
-			permisosHelper.filterGrantedAny(
-					procedimentOrgansAmbPermis,
-					new ObjectIdentifierExtractor<ProcedimentOrganEntity>() {
-						public Long getObjectIdentifier(ProcedimentOrganEntity procedimentOrgan) {
-							return procedimentOrgan.getId();
-						}
-					},
-					ProcedimentOrganEntity.class,
-					permisos,
-					auth);
-			
+			List<ProcedimentOrganEntity> procedimentOrgansAmbPermis = procedimentHelper.getProcedimentOrganWithPermis(
+					usuariCodi,
+					auth,
+					entitat,
+					permisos);
+
 			// 2. Convertim els procediments a dto
 			return conversioTipusHelper.convertirList(
 					procedimentOrgansAmbPermis,
@@ -1326,7 +1383,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public List<ProcedimentOrganDto> findProcedimentsOrganWithPermisByOrgan(

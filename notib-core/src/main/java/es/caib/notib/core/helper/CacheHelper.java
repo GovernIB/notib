@@ -19,7 +19,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import es.caib.notib.core.api.dto.EntitatDto;
@@ -48,7 +47,7 @@ import es.caib.notib.plugin.usuari.DadesUsuari;
  */
 @Slf4j
 @Component
-public class CacheHelper { 
+public class CacheHelper {
 
 	@Resource
 	private EntitatRepository entitatRepository;
@@ -70,6 +69,8 @@ public class CacheHelper {
 	private OrganigramaHelper organigramaHelper;
 	@Resource
 	private CacheManager cacheManager;
+
+	public static String appVersion;
 
 	@Cacheable(value = "entitatsUsuari", key="#usuariCodi.concat('-').concat(#rolActual)")
 	public List<EntitatDto> findEntitatsAccessiblesUsuari(
@@ -213,6 +214,26 @@ public class CacheHelper {
 				codiDir3Organ);
 	}
 	
+	@Cacheable(value = "oficinesSIRUnitat", key="#codiDir3Organ")
+	public List<OficinaDto> getOficinesSIRUnitat(
+			Map<String, NodeDir3> arbreUnitats,
+			String codiDir3Organ) {
+		return pluginHelper.oficinesSIRUnitat(
+				codiDir3Organ,
+				arbreUnitats);
+	}
+	
+	@Cacheable(value = "oficinesSIREntitat", key="#codiDir3Entitat")
+	public List<OficinaDto> getOficinesSIREntitat(
+			String codiDir3Entitat) {
+		return pluginHelper.oficinesSIREntitat(codiDir3Entitat);
+	}
+	
+	@Cacheable(value = "organigramaOriginal", key="#entitatcodi")
+	public Map<String, NodeDir3> findOrganigramaNodeByEntitat(String entitatcodi) {
+		return  pluginHelper.getOrganigramaPerEntitat(entitatcodi);
+	}
+	
 	@Cacheable(value = "llistarNivellsAdministracions")
 	public List<CodiValor> llistarNivellsAdministracions() {
 		return pluginHelper.llistarNivellsAdministracions();
@@ -264,15 +285,15 @@ public class CacheHelper {
 	public void evictFindOrganigramaPlugin(String entitatCodi) {
 	}
 			
-	@CacheEvict(value = "procedimentsPermis", allEntries = true)
+	@CacheEvict(value = {"procedimentsPermis", "procedimentEntitiesPermis"}, allEntries = true)
 	public void evictFindProcedimentsWithPermis() {
 	}
 	
-	@CacheEvict(value = "procedimentsOrganPermis", allEntries = true)
+	@CacheEvict(value = {"procedimentsOrganPermis", "procedimentEntitiessOrganPermis", "procedimentsOrgan"}, allEntries = true)
 	public void evictFindProcedimentsOrganWithPermis() {
 	}
 	
-	@CacheEvict(value = "organsPermis", allEntries = true)
+	@CacheEvict(value = {"organsPermis", "organsEntitiesPermis"}, allEntries = true)
 	public void evictFindOrgansGestorWithPermis() {
 	}
 	

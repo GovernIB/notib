@@ -1,15 +1,19 @@
 package es.caib.notib.core.entity;
 
+import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
+import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
+import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
+import es.caib.notib.core.audit.NotibAuditable;
+import lombok.Getter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import es.caib.notib.core.audit.NotibAuditable;
-import lombok.Getter;
 
 /**
  * Classe del model de dades que representa un document.
@@ -39,14 +43,8 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 	@Column(name = "url", length = 256)
 	protected String url;
 	
-//	@Column(name = "metadades")
-//	protected String metadades;
-	
 	@Column(name = "normalitzat")
 	protected Boolean normalitzat;
-	
-//	@Column(name = "generar_csv")
-//	protected Boolean generarCsv;
 	
 	@Column(name = "uuid", length = 256)
 	protected String uuid;
@@ -59,6 +57,22 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 	
 	@Column(name = "mida")
 	private Long mida;
+
+	// Metadades
+	@Column(name = "origen", length = 20)
+	@Enumerated(EnumType.STRING)
+	private OrigenEnum origen;
+
+	@Column(name = "validesa", length = 20)
+	@Enumerated(EnumType.STRING)
+	private ValidesaEnum validesa;
+
+	@Column(name = "tipus_documental", length = 30)
+	@Enumerated(EnumType.STRING)
+	private TipusDocumentalEnum tipoDocumental;
+
+	@Column(name = "firmat")
+	private Boolean modoFirma;
 	
 	public void update (
 			String arxiuGestdocId,
@@ -68,7 +82,11 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			String uuid,
 			String csv,
 			String media,
-			Long mida) {
+			Long mida,
+			OrigenEnum origen,
+			ValidesaEnum validesa,
+			TipusDocumentalEnum tipoDocumental,
+			Boolean modoFirma) {
 		this.arxiuGestdocId = arxiuGestdocId;
 		this.arxiuNom = arxiuNom;
 		this.url = url;
@@ -77,6 +95,10 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 		this.csv = csv;
 		this.mediaType = media;
 		this.mida = mida;
+		this.origen = origen;
+		this.validesa = validesa;
+		this.tipoDocumental = tipoDocumental;
+		this.modoFirma = modoFirma;
 	}
 	
 	public static Builder getBuilder(
@@ -89,7 +111,11 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			Boolean normalitzat,
 			Boolean generarCsv,
 			String media,
-			Long mida
+			Long mida,
+			OrigenEnum origen,
+			ValidesaEnum validesa,
+			TipusDocumentalEnum tipoDocumental,
+			Boolean modoFirma
 			) {
 		return new Builder(
 				arxiuId,
@@ -101,7 +127,11 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 				normalitzat,
 				generarCsv,
 				media,
-				mida
+				mida,
+				origen,
+				validesa,
+				tipoDocumental,
+				modoFirma
 				);
 	}
 	
@@ -117,7 +147,11 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 				Boolean normalitzat,
 				Boolean generarCsv,
 				String media,
-				Long mida
+				Long mida,
+				OrigenEnum origen,
+				ValidesaEnum validesa,
+				TipusDocumentalEnum tipoDocumental,
+				Boolean modoFirma
 				) {
 			built = new DocumentEntity();
 			built.arxiuGestdocId = arxiuGestdocId;
@@ -127,6 +161,10 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			built.url = url;
 			built.mediaType = media;
 			built.mida = mida;
+			built.origen = origen;
+			built.validesa = validesa;
+			built.tipoDocumental = tipoDocumental;
+			built.modoFirma = modoFirma;
 			
 		}
 		public DocumentEntity build() {
@@ -144,7 +182,11 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			String uuid,
 			String csv,
 			String media,
-			Long mida
+			Long mida,
+			OrigenEnum origen,
+			ValidesaEnum validesa,
+			TipusDocumentalEnum tipoDocumental,
+			Boolean modoFirma
 			) {
 		return new BuilderV2(
 				arxiuId,
@@ -155,7 +197,11 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 				uuid,
 				csv,
 				media,
-				mida);
+				mida,
+				origen,
+				validesa,
+				tipoDocumental,
+				modoFirma);
 	}
 	
 	public static class BuilderV2{
@@ -169,7 +215,11 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 				String uuid,
 				String csv,
 				String media,
-				Long mida
+				Long mida,
+				OrigenEnum origen,
+				ValidesaEnum validesa,
+				TipusDocumentalEnum tipoDocumental,
+				Boolean modoFirma
 				) {
 			built = new DocumentEntity();
 			built.arxiuGestdocId = arxiuGestdocId;
@@ -187,6 +237,10 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			built.uuid = uuid;
 			built.mediaType = media;
 			built.mida = mida;
+			built.origen = origen;
+			built.validesa = validesa;
+			built.tipoDocumental = tipoDocumental;
+			built.modoFirma = modoFirma;
 		}
 		public DocumentEntity build() {
 			return built;
