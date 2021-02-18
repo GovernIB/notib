@@ -19,6 +19,7 @@
 		var acceptar="<spring:message code="procediemnt.actualitzacio.acceptar"/>";
 		var cancelar="<spring:message code="procediemnt.actualitzacio.cancelar"/>";
 		<c:if test="${not isUpdatingProcediments}">
+		var isUpdating = false;
 		$(document).ready(function() {
 			$('#formUpdateAuto').on("submit", function(){
 				console.log("submitting...");
@@ -27,9 +28,12 @@
 				$('.confirmacio').fadeOut();
 				$('#autobtn', parent.document).prop('disabled', true);
 				$('#cancelbtn', parent.document).toggle(true);
-				$('.close', parent.document).prop('disabled', true);
 // 				$('.modal-footer', parent.document).hide();
+				$.post($(this).attr('action'));
+				isUpdating = true;
 				refreshProgres();
+
+				return false;
 			});
 			$('.close', parent.document).on('click',function(){
 				$.alert('fuck');
@@ -61,6 +65,7 @@
 
 		function getProgres() {
 			console.log("getProgres");
+			$('.close', parent.document).prop('disabled', true);
 			$.ajax({
 				type: 'GET',
 				url: "<c:url value='/procediment/update/auto/progres'/>",
@@ -71,7 +76,7 @@
 						$('#cancelbtn', parent.document).toggle(true);
 						if (data.progres == 100) {
 							clearInterval(itervalProgres);
-						
+							isUpdating = false;
 // 							$('.modal-footer', parent.document).show();
 							$('.close', parent.document).prop('disabled', false);
 							$('.loading').hide();
@@ -118,6 +123,10 @@
 			}
 		}
 		function myFunction() {
+			if (!isUpdating) {
+				window.top.location.reload();
+				return;
+			}
 			$.confirm({
 				title: title,
 			    content: content,
@@ -291,8 +300,15 @@
 				<span id="bcursor" class="blinking-cursor">|</span>
 			</div>
 			<div id="modal-botons" class="well">
-				<button id="autobtn" type="submit" class="btn btn-success"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.actualitzar"/></button>
-				<a id="cancelbtn" href="#" style="display: none !important;" class="btn btn-default" data-modal-cancel="false" onclick="myFunction()" ><spring:message code="comu.boto.tancar"/></a>
+				<button id="autobtn"
+						type="submit"
+						class="btn btn-success"
+						data-noloading="true">
+					<span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.actualitzar"/>
+				</button>
+				<a id="cancelbtn" href="#"
+				   style="display: none !important;" class="btn btn-default"
+				   data-modal-cancel="false" onclick="myFunction()" ><spring:message code="comu.boto.tancar"/></a>
 			</div>
 		</form:form>
 	</c:if>

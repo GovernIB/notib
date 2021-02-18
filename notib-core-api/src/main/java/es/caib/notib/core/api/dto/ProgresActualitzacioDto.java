@@ -1,12 +1,12 @@
 package es.caib.notib.core.api.dto;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter @Setter
 public class ProgresActualitzacioDto {
@@ -39,7 +39,8 @@ public class ProgresActualitzacioDto {
 	
 	public void incrementProcedimentsActualitzats() {
 		this.numProcedimentsActualitzats++;
-		this.progres = (this.numProcedimentsActualitzats * 100) / this.numProcediments;
+		double auxprogres = (this.numProcedimentsActualitzats.doubleValue()  / this.numProcediments.doubleValue()) * 100;
+		this.progres = (int) auxprogres;
 	}
 	
 	@Getter @Setter @AllArgsConstructor @NoArgsConstructor
