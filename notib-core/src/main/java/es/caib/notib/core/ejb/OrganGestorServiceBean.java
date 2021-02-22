@@ -3,19 +3,17 @@
  */
 package es.caib.notib.core.ejb;
 
-import java.util.List;
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.service.OrganGestorService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 import javax.xml.bind.ValidationException;
-
-import es.caib.notib.core.api.dto.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.service.OrganGestorService;
+import java.util.List;
 
 /**
  * Implementació de ProcedimentService com a EJB que empra una clase
@@ -182,13 +180,13 @@ public class OrganGestorServiceBean implements OrganGestorService {
     }
 
 	@Override
-	@RolesAllowed("NOT_ADMIN")
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public OrganGestorDto updateOficina(OrganGestorDto dto) {
 		return delegate.updateOficina(dto);
 	}
 
 	@Override
-	@RolesAllowed("NOT_ADMIN")
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public List<OficinaDto> getOficinesSIR(Long entitatId, String organGestorDir3Codi, boolean isFiltre) {
 		return delegate.getOficinesSIR(entitatId, organGestorDir3Codi, isFiltre);
 	}
