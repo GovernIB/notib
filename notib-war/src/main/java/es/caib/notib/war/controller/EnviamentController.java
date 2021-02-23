@@ -3,45 +3,31 @@
  */
 package es.caib.notib.war.controller;
 
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.exception.RegistreNotificaException;
+import es.caib.notib.core.api.service.*;
+import es.caib.notib.war.command.ColumnesCommand;
+import es.caib.notib.war.command.NotificacioEnviamentCommand;
+import es.caib.notib.war.command.NotificacioEnviamentFiltreCommand;
+import es.caib.notib.war.command.NotificacioFiltreCommand;
+import es.caib.notib.war.helper.*;
+import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
-import es.caib.notib.core.api.dto.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.exception.RegistreNotificaException;
-import es.caib.notib.core.api.service.AplicacioService;
-import es.caib.notib.core.api.service.EnviamentService;
-import es.caib.notib.core.api.service.NotificacioService;
-import es.caib.notib.core.api.service.OrganGestorService;
-import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.war.command.ColumnesCommand;
-import es.caib.notib.war.command.NotificacioEnviamentCommand;
-import es.caib.notib.war.command.NotificacioEnviamentFiltreCommand;
-import es.caib.notib.war.command.NotificacioFiltreCommand;
-import es.caib.notib.war.helper.DatatablesHelper;
-import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.notib.war.helper.EntitatHelper;
-import es.caib.notib.war.helper.MissatgesHelper;
-import es.caib.notib.war.helper.RequestSessionHelper;
-import es.caib.notib.war.helper.RolHelper;
 /**
  * Controlador per el mantinement d'enviaments.
  *
@@ -366,30 +352,16 @@ public class EnviamentController extends BaseUserController {
 						notificacioService.registrarNotificar(notificacioId);
 					} catch (Exception e) {
 						notificacionsError++;
-						String errorMessage = "";
-						if (e.getMessage() != null && !e.getMessage().isEmpty())
-							errorMessage = e.getMessage();
-						else if (e.getCause() != null && e.getCause().getMessage() != null && !e.getCause().getMessage().isEmpty())
-							errorMessage = e.getCause().getMessage();
-						if (e.getStackTrace() != null && e.getStackTrace().length > 2) {
-							errorMessage += "<br/>";
-							errorMessage += e.getStackTrace()[0] + "<br/>";
-							errorMessage += e.getStackTrace()[1] + "<br/>";
-							errorMessage += e.getStackTrace()[2] + "<br/>...";
-						}
-						MissatgesHelper.error(
-								request,
-								getMessage(
-										request,
-										"enviament.controller.reintent.notificacio.pendents.error",
-										new String[] {
-												notificacioId.toString(),
-												notificacio.getCreatedDateAmbFormat(),
-												notificacio.getConcepte(),
-												errorMessage})
-						);
+						mostraErrorReintentarNotificacio(request, notificacioId, notificacio, e);
 					}
-				}else {
+				}else if (notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)) {
+					try {
+						notificacioService.notificacioEnviar(notificacioId);
+					} catch (Exception e) {
+						notificacionsError++;
+						mostraErrorReintentarNotificacio(request, notificacioId, notificacio, e);
+					}
+				}else{
 					notificacionsNoRegistrades++;
 				}
 			}
@@ -420,6 +392,31 @@ public class EnviamentController extends BaseUserController {
 			resposta = "ok";
 		}
 		return resposta;
+	}
+
+	private void mostraErrorReintentarNotificacio(HttpServletRequest request, Long notificacioId, NotificacioDtoV2 notificacio, Exception e) {
+		String errorMessage = "";
+		if (e.getMessage() != null && !e.getMessage().isEmpty())
+			errorMessage = e.getMessage();
+		else if (e.getCause() != null && e.getCause().getMessage() != null && !e.getCause().getMessage().isEmpty())
+			errorMessage = e.getCause().getMessage();
+		if (e.getStackTrace() != null && e.getStackTrace().length > 2) {
+			errorMessage += "<br/>";
+			errorMessage += e.getStackTrace()[0] + "<br/>";
+			errorMessage += e.getStackTrace()[1] + "<br/>";
+			errorMessage += e.getStackTrace()[2] + "<br/>...";
+		}
+		MissatgesHelper.error(
+				request,
+				getMessage(
+						request,
+						"enviament.controller.reintent.notificacio.pendents.error",
+						new String[] {
+								notificacioId.toString(),
+								notificacio.getCreatedDateAmbFormat(),
+								notificacio.getConcepte(),
+								errorMessage})
+		);
 	}
 
 	@RequestMapping(value = "/reactivar/consulta", method = RequestMethod.GET)
