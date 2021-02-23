@@ -1,13 +1,11 @@
 package es.caib.notib.core.api.service;
 
-import java.util.List;
-
-import javax.xml.bind.ValidationException;
-
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.notib.core.api.exception.NotFoundException;
+import javax.xml.bind.ValidationException;
+import java.util.List;
 
 /**
  * Declaració dels mètodes per a la consulta dels procediments associats a una entitat
@@ -29,9 +27,17 @@ public interface OrganGestorService {
 	public void updateNom(
 			Long entitatId, 
 			String organGestorCodi);
-	
+
+	/**
+	 * Actualitza les dades dels organs gestors de la base de dades
+	 * amb la informació de dir3
+	 *
+	 * @param entitatId Identificador de l'entitat en curs
+	 * @param organActualCodiDir3 Codi Dir3 del pare dels òrgans gestors a actualitzar
+	 *                            null per actualitzar-los a tots
+	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public void updateNoms(
+	void updateNoms(
 			Long entitatId, String organActualCodiDir3);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
