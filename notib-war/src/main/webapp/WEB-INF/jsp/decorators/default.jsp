@@ -306,6 +306,7 @@ body {
 										<li><a href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
 										<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>
 										<li><a href="<c:url value="/metrics/list"/>"><spring:message code="decorator.menu.metriques"/></a></li>
+										<li><a data-toggle="modal" data-maximized="true" id="botoMonitor" href="<c:url value="/modal/monitor"/>"><spring:message code='monitor.titol' /></a></li>
 									</ul>
 								</div>
 							<div class="btn-group">
