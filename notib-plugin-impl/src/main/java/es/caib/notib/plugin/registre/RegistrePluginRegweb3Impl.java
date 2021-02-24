@@ -40,45 +40,56 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			AsientoRegistralBeanDto arb, 
 			Long tipusOperacio) {
 		RespostaConsultaRegistre rc = new RespostaConsultaRegistre();
-		try {			
-			AsientoRegistralWs asiento = toAsientoRegistralBean(arb);
-//			logger.debug("[SalidaAsientoRegistral - INICI]");
-//			logger.debug("   Entitat: " + codiDir3Entitat);
-//			logger.debug("   Tipus operacio: " + tipusOperacio);
-//			ObjectMapper objectMapper = new ObjectMapper();
-//			objectMapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector(){
-//			    @Override
-//			    public boolean hasIgnoreMarker(final AnnotatedMember m) {
-//
-//			    List<String> exclusions = Arrays.asList("anexos");
-//			    return exclusions.contains(m.getName())|| super.hasIgnoreMarker(m);
-//			    }
-//			});
-//			String asientoJson = objectMapper.writeValueAsString(asiento);
-//			logger.debug("   Asiento: " + asientoJson);
-//			logger.debug("[SalidaAsientoRegistral - FI]");
+		
+		
+		if (arb.getResumen().startsWith("Error")) {
+			rc.setErrorCodi("3");
+			rc.setErrorDescripcio("Error de registre MOCK (" + System.currentTimeMillis() + ")");
+			return rc;
+		} else {
+			try {			
+				AsientoRegistralWs asiento = toAsientoRegistralBean(arb);
+//				logger.debug("[SalidaAsientoRegistral - INICI]");
+//				logger.debug("   Entitat: " + codiDir3Entitat);
+//				logger.debug("   Tipus operacio: " + tipusOperacio);
+//				ObjectMapper objectMapper = new ObjectMapper();
+//				objectMapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector(){
+//				    @Override
+//				    public boolean hasIgnoreMarker(final AnnotatedMember m) {
+	//
+//				    List<String> exclusions = Arrays.asList("anexos");
+//				    return exclusions.contains(m.getName())|| super.hasIgnoreMarker(m);
+//				    }
+//				});
+//				String asientoJson = objectMapper.writeValueAsString(asiento);
+//				logger.debug("   Asiento: " + asientoJson);
+//				logger.debug("[SalidaAsientoRegistral - FI]");
 
-			return toRespostaConsultaRegistre(getAsientoRegistralApi().crearAsientoRegistral(
-					null,
-					codiDir3Entitat, 
-					asiento, 
-					tipusOperacio,
-					true,
-					false));
-		} catch (WsI18NException e) {
-			rc.setErrorCodi("0");
-			rc.setErrorDescripcio(e.getMessage());
-			return rc;
-		} catch (WsValidationException e) {
-			rc.setErrorCodi("1");
-			rc.setErrorDescripcio(e.getMessage());
-			return rc;
-		} catch (Exception e) {
-			e.printStackTrace();
-			rc.setErrorCodi("2");
-			rc.setErrorDescripcio(e.getMessage());
-			return rc;
+				return toRespostaConsultaRegistre(getAsientoRegistralApi().crearAsientoRegistral(
+						null,
+						codiDir3Entitat, 
+						asiento, 
+						tipusOperacio,
+						true,
+						false));
+			} catch (WsI18NException e) {
+				rc.setErrorCodi("0");
+				rc.setErrorDescripcio(e.getMessage());
+				return rc;
+			} catch (WsValidationException e) {
+				rc.setErrorCodi("1");
+				rc.setErrorDescripcio(e.getMessage());
+				return rc;
+			} catch (Exception e) {
+				e.printStackTrace();
+				rc.setErrorCodi("2");
+				rc.setErrorDescripcio(e.getMessage());
+				return rc;
+			}
 		}
+		
+		
+		
 	}
 	
 	@Override

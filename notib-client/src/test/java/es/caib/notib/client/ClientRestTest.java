@@ -19,6 +19,7 @@ import org.junit.Test;
 
 import es.caib.notib.ws.notificacio.EnviamentReferencia;
 import es.caib.notib.ws.notificacio.NotificacioEstatEnum;
+import es.caib.notib.ws.notificacio.NotificacioV2;
 import es.caib.notib.ws.notificacio.RespostaAlta;
 
 /**
@@ -29,7 +30,7 @@ import es.caib.notib.ws.notificacio.RespostaAlta;
 public class ClientRestTest extends ClientBaseTest {
 
 	
-	private static final String URL = "http://localhost:8080/notib";
+	private static final String URL = "http://localhost:8180/notib";
 	private static final String USERNAME = "admin";
 	private static final String PASSWORD = "admin";
 	
@@ -77,6 +78,37 @@ public class ClientRestTest extends ClientBaseTest {
 		assertEquals(
 				NotificacioEstatEnum.ENVIADA,
 				respostaAlta.getEstat());
+	}
+	
+	@Test
+	public void testCarga() throws DatatypeConfigurationException, IOException, DecoderException {
+		
+		List<NotificacioV2> notificacions = generarMultiplesNotificacioV2(20000,1,false);
+		
+		for (int i = 0; i < notificacions.size(); i++) {
+			System.out.println(">>> Peitició de la notificació: " +notificacions.get(i).getConcepte());
+			RespostaAlta respostaAlta = client.alta(notificacions.get(i));
+			if (respostaAlta.isError()) {
+				System.out.println(">>> Reposta amb error: " + respostaAlta.getErrorDescripcio());
+				
+			} else {
+				System.out.println(">>> Reposta Ok");
+			}
+			System.out.println(">>> Finalitzan de la notificació: " +notificacions.get(i).getConcepte());
+			assertNotNull(respostaAlta);
+//			assertFalse(respostaAlta.isError());
+//			assertNull(respostaAlta.getErrorDescripcio());
+//			assertNotNull(respostaAlta.getReferencies());
+//			List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+//			assertEquals(1, referencies.size());
+//			assertNotNull(referencies.get(0).getReferencia());
+//			assertEquals(
+//					NotificacioEstatEnum.ENVIADA,
+//					respostaAlta.getEstat());
+			
+		}
+
+		
 	}
 	
 
