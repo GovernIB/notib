@@ -571,8 +571,8 @@
 							selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
 						}
 						selProcediments.select2(select2Options);
-						selProcediments.val(selProcediments.attr('data-enum-value'));
-						selProcediments.trigger('change');
+						// selProcediments.val(selProcediments.attr('data-enum-value'));
+						// selProcediments.trigger('change');
 					},
 					error: function() {
 						console.log("error obtenint els procediments de l'òrgan gestor...");
