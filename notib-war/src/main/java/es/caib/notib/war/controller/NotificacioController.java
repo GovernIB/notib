@@ -1523,13 +1523,13 @@ public class NotificacioController extends BaseUserController {
         model.addAttribute("document", notificacioCommand.getDocuments());
 
         try {
-            Method concepte = NotificacioCommandV2.class.getMethod("getConcepte");
-            int concepteSize = concepte.getAnnotation(Size.class).max();
-
-            Method descripcio = NotificacioCommandV2.class.getMethod("getDescripcio");
-            int descripcioSize = descripcio.getAnnotation(Size.class).max();
-            model.addAttribute("concepteSize", concepteSize);
-            model.addAttribute("descripcioSize", descripcioSize);
+//            Method concepte = NotificacioCommandV2.class.getMethod("getConcepte");
+//            int concepteSize = concepte.getAnnotation(Size.class).max();
+//
+//            Method descripcio = NotificacioCommandV2.class.getMethod("getDescripcio");
+//            int descripcioSize = descripcio.getAnnotation(Size.class).max();
+            model.addAttribute("concepteSize", notificacioCommand.getConcepteDefaultSize() );
+            model.addAttribute("descripcioSize", notificacioCommand.getDescripcioDefaultSize());
         } catch (Exception ex) {
             logger.error("No s'ha pogut recuperar la longitud del concepte: " + ex.getMessage());
         }
