@@ -1,31 +1,5 @@
 package es.caib.notib.core.service;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Resource;
-
-import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.security.ExtendedPermission;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.ActualitzacioInfo;
@@ -43,6 +17,7 @@ import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.*;
+import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.TipusAssumpte;
 import es.caib.notib.plugin.unitat.NodeDir3;
@@ -1230,10 +1205,10 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			procediments = recuperarProcedimentAmbPermis(entitat, PermisEnum.NOTIFICACIO, organCodi);
 		}
 
-		return CodiValorOrganGestorComuDto(procediments);
+		return procedimentsToCodiValorOrganGestorComuDto(procediments);
 	}
 
-	private List<CodiValorOrganGestorComuDto> CodiValorOrganGestorComuDto(List<ProcedimentEntity> procediments) {
+	private List<CodiValorOrganGestorComuDto> procedimentsToCodiValorOrganGestorComuDto(List<ProcedimentEntity> procediments) {
 		List<CodiValorOrganGestorComuDto> response = new ArrayList<>();
 		for (ProcedimentEntity procediment : procediments) {
 			String nom = procediment.getCodi();
