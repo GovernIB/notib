@@ -347,7 +347,15 @@ public class ProcedimentServiceBean implements ProcedimentService {
 				permis);
     }
 
-    @Override
+	@Override
+	public List<CodiValorOrganGestorComuDto> getProcedimentsOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol) {
+		return delegate.getProcedimentsOrganNotificables(
+				entitatId,
+				organCodi,
+				rol);
+	}
+
+	@Override
 	@RolesAllowed({"NOT_ADMIN"})
 	public void actualitzaProcediments(EntitatDto entitat) {
 		delegate.actualitzaProcediments(entitat);

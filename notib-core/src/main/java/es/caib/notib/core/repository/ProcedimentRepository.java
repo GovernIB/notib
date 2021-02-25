@@ -76,7 +76,9 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			@Param("grups") List<String> grups);
 	
 	public List<ProcedimentEntity> findByComuTrue();
-	
+
+	List<ProcedimentEntity> findByEntitatAndComuTrue(EntitatEntity entitat);
+
 	List<ProcedimentEntity> findByEntitatActiva(boolean activa);
 	
 	@Query(
@@ -124,7 +126,8 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 	Page<ProcedimentEntity> findByEntitat(
 			EntitatEntity entitat,
 			Pageable paginacio);
-	
+
+
 	@Query(	"from " +
 			"    ProcedimentEntity pro " +
 			"where (:isCodiNull = true or lower(pro.codi) like lower('%'||:codi||'%'))" +

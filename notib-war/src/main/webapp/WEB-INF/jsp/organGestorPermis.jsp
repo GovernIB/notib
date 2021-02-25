@@ -83,6 +83,12 @@ pageContext.setAttribute(
 						{{if administration}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
+				<th data-col-name="comuns" data-template="#cellPermisComunsTemplate" width="120px">
+					<spring:message code="organgestor.permis.columna.comuns"/>
+					<script id="cellPermisComunsTemplate" type="text/x-jsrender">
+						{{if comuns}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
 				<th data-col-name="administrador" data-template="#cellPermisAdministradorTemplate" data-class="organ-admin" width="120px">
 					<spring:message code="procediment.permis.columna.administrador"/>
 					<script id="cellPermisAdministradorTemplate" type="text/x-jsrender">

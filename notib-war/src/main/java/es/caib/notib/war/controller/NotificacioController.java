@@ -1015,60 +1015,17 @@ public class NotificacioController extends BaseUserController {
 
     @RequestMapping(value = "/organ/{organId}/procediments", method = RequestMethod.GET)
     @ResponseBody
-    public List<ProcedimentDto> getProcedimentsOrgan(
+    public List<CodiValorOrganGestorComuDto> getProcedimentsOrgan(
             HttpServletRequest request,
             @PathVariable String organId) {
 
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        List<ProcedimentOrganDto> procedimentsOrgansDisponibles = new ArrayList<ProcedimentOrganDto>(); 
-        List<ProcedimentDto> procedimentsOrgan = new ArrayList<ProcedimentDto>();
-        if(!RolHelper.isUsuariActualAdministradorEntitat(request)) {
-        	UsuariDto usuariActual = aplicacioService.getUsuariActual();
-	        List<ProcedimentDto> procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-	
-	        if (procedimentsDisponibles != null) {
-	            for (ProcedimentDto proc : procedimentsDisponibles) {
-	                // Si no s'ha seleccionat cap òrgan enviaran '-'
-	                if (proc.isComu() || organId.equals("-") || organId.equalsIgnoreCase(proc.getOrganGestor())) {
-	                    procedimentsOrgan.add(proc);
-	                }
-	            }
-	        }
-	
-	        // Procediments-Òrgan (Comuns)
-	        procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-       
-	        if (!procedimentsOrgansDisponibles.isEmpty()) {
-	            if (organId.equals("-")) {
-	            } else {
-	                procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermisByOrgan(organId, entitatActual.getDir3Codi(), procedimentsOrgansDisponibles);
-	            }
-	            for (ProcedimentOrganDto procedimentOrgan : procedimentsOrgansDisponibles) {
-	                if (!procedimentsOrgan.contains(procedimentOrgan.getProcediment())) {
-	                    procedimentsOrgan.add(procedimentOrgan.getProcediment());
-	                }
-	            }
-	            Collections.sort(procedimentsOrgan, new Comparator<ProcedimentDto>() {
-	                @Override
-	                public int compare(ProcedimentDto p1, ProcedimentDto p2) {
-	                    return p1.getNom().compareTo(p2.getNom());
-	                }
-	            });
-	        }
-        } else {
-        	List<ProcedimentDto> procedimentsDisponibles = procedimentService.findByEntitat(entitatActual.getId());
-	        if (procedimentsDisponibles != null) {
-	            for (ProcedimentDto proc : procedimentsDisponibles) {
-	                // Si no s'ha seleccionat cap òrgan enviaran '-'
-	                if (proc.isComu() || organId.equals("-") || organId.equalsIgnoreCase(proc.getOrganGestor())) {
-	                    procedimentsOrgan.add(proc);
-	                }
-	            }
-	        }
-        }
-        return procedimentsOrgan;
+        return procedimentService.getProcedimentsOrganNotificables(
+                entitatActual.getId(),
+                organId.equals("-") ? null : organId,
+                RolEnumDto.valueOf(RolHelper.getRolActual(request))
+        );
     }
-
 
     @RequestMapping(value = "/paisos", method = RequestMethod.GET)
     @ResponseBody

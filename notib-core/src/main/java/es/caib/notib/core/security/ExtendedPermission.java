@@ -23,6 +23,8 @@ public class ExtendedPermission extends BasePermission {
 
 	public static final Permission PROCESSAR = new ExtendedPermission(1 << 9, 'P'); // 512
 	public static final Permission NOTIFICACIO = new ExtendedPermission(1 << 10, 'N'); // 1024
+
+	public static final Permission COMUNS = new ExtendedPermission(1 << 11, 'O'); // 2048
 	
 	protected ExtendedPermission(int mask) {
 		super(mask);
