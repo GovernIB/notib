@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.*;
@@ -87,7 +84,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	IntegracioHelper integracioHelper;
 	@Autowired
 	private AuditEnviamentHelper auditEnviamentHelper;
-	
+	@Autowired
+	private NotificacioEventHelper notificacioEventHelper;
+
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity notificacioEnviar(
 			Long notificacioId) {
@@ -458,7 +457,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 //		return null;
 //	}
 
+	private void canviEstat(NotificacioEntity notificacio, NotificacioEstatEnumDto nouEstat) {
 
+	}
 	private ResultadoAltaRemesaEnvios enviaNotificacio(
 			NotificacioEntity notificacio) throws Exception {
 		ResultadoAltaRemesaEnvios resultat = null;
@@ -816,28 +817,13 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			String errorDescripcio,
 			NotificacioErrorTipusEnumDto notificacioErrorTipus,
 			boolean notificaError) {
-		NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
-				NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
-				notificacio).
-				error(true).
-				errorDescripcio(errorDescripcio);
-		if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-			eventBulider.callbackInicialitza();
-		NotificacioEventEntity event = eventBulider.build();
-		
-		for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
-			eventBulider.enviament(enviament);
-			auditEnviamentHelper.actualizaErrorNotifica(enviament, notificaError, event);
-//			enviament.updateNotificaError(
-//					notificaError, 
-//					event);
-		}
-		
+
+		NotificacioEventEntity event = notificacioEventHelper.addErrorEvent(notificacio, NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, errorDescripcio, notificaError);
+
 		notificacio.updateNotificaError(
 				notificacioErrorTipus,
 				event);
 		notificacio.updateEventAfegir(event);
-		notificacioEventRepository.save(event);
 	}
 	
 	private NotificaWsV2PortType getNotificaWs(String apiKey) throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {

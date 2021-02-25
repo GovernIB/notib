@@ -36,10 +36,10 @@ public class AuditNotificacioHelper {
 	@Autowired
 	private NotificacioRepository notificacioRepository;
 	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
 	private PluginHelper pluginHelper;
-	
+	@Autowired
+	private NotificacioEventHelper notificacioEventHelper;
+
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.CREATE)
 	public NotificacioEntity desaNotificacio(
 			NotificacioDtoV2 notificacio, 
@@ -134,6 +134,7 @@ public class AuditNotificacioHelper {
 			NotificacioEntity notificacio) {
 		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
 		notificacio.updateMotiu(notificaEstat.name());
+		notificacioEventHelper.clearOldEvents(notificacio);
 		return notificacio;
 	}
 	
