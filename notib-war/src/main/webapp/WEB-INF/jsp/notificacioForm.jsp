@@ -968,7 +968,7 @@
 
 		var destinatari =' \
     <div class="col-md-12 destinatariForm destenv_#num_enviament# personaForm_#num_enviament#_#num_destinatari#"> \
-		<div class="col-md-3 interessat"> \
+		<div class="col-md-3"> \
 			<div class="form-group"> \
 				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].interessatTipus"><spring:message code="notificacio.form.camp.interessatTipus"/></label> \
 				<div class="controls col-xs-12"> \
@@ -1409,7 +1409,7 @@
 		loadOrganigrama();
 
 
-	};
+	}
 
 	// function searchCodiChange(text){
 	// 	var searchNom = $('#searchNom');
@@ -2552,7 +2552,10 @@
 													</div>
 													<!-- PRIMER LLINATGE -->
 													<div class="col-md-3 llinatge1">
-														<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge1" textKey="notificacio.form.camp.titular.llinatge1" labelSize="12" inputSize="12" required="true"  inputMaxLength="${concepteSize}" showsize="true"/>
+														<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge1"
+																	   textKey="notificacio.form.camp.titular.llinatge1"
+																	   labelSize="12" inputSize="12" required="true"
+																	   inputMaxLength="${concepteSize}" showsize="true"/>
 													</div>
 													<!-- SEGON LLINATGE -->
 													<div class="col-md-3 llinatge2">
@@ -2587,8 +2590,11 @@
 								<c:set var="addHidden" value="${isMultiplesDestinataris || empty enviament.destinataris}"/>
 								<!-- AFEGIR NOU DESTINATARI -->
 								<div class="col-md-12">
-									<div class="text-left">	
-										<input type="button" class="btn btn-default addDestinatari<c:if test="addHidden"> hidden</c:if>" name="enviaments[${j}]" id="enviaments[${j}]" onclick="addDestinatari(this.id)" value="<spring:message code="notificacio.form.boto.nou.destinatari"/>" />
+									<div class="text-left">
+										<input type="button" class="btn btn-default addDestinatari<c:if test="addHidden"> hidden</c:if>"
+											   name="enviaments[${j}]" id="enviaments[${j}]"
+											   onclick="addDestinatari(this.id)"
+											   value="<spring:message code="notificacio.form.boto.nou.destinatari"/>" />
 									</div>
 								</div>
 							
