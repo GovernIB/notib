@@ -69,6 +69,24 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					NotificacioEntity.class,
 					"La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA);
 		}
+		if (notificacio.getConcepte().startsWith("Error")) {
+			String errorDescripcio = "Error de registre MOCK (" + System.currentTimeMillis() + ")";
+			logger.error(
+					errorDescripcio,
+					errorDescripcio);
+			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+					NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
+					notificacio).
+					error(true).
+					errorDescripcio(errorDescripcio).
+					build();
+			notificacio.updateEventAfegir(event);
+			notificacioEventRepository.save(event);
+			notificacio.updateNotificaError(
+					NotificacioErrorTipusEnumDto.ERROR_XARXA,
+					event);
+		return notificacio;
+		}
 		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
 		try {
 			logger.info(" >>> Enviant notificació...");
