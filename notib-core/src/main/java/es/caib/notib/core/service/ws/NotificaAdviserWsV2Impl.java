@@ -3,15 +3,20 @@
  */
 package es.caib.notib.core.service.ws;
 
-import java.math.BigInteger;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import javax.jws.WebService;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.ws.Holder;
-
+import com.codahale.metrics.Timer;
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.service.AuditService.TipusEntitat;
+import es.caib.notib.core.api.service.AuditService.TipusOperacio;
+import es.caib.notib.core.aspect.Audita;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.helper.*;
+import es.caib.notib.core.repository.NotificacioEnviamentRepository;
+import es.caib.notib.core.repository.NotificacioEventRepository;
+import es.caib.notib.core.wsdl.adviser.Acuse;
+import es.caib.notib.core.wsdl.adviser.AdviserWsV2PortType;
+import es.caib.notib.core.wsdl.adviser.Opciones;
+import es.caib.notib.core.wsdl.adviser.Receptor;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,31 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.codahale.metrics.Timer;
-
-import es.caib.notib.core.api.dto.AccioParam;
-import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.core.api.dto.IntegracioInfo;
-import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
-import es.caib.notib.core.api.service.AuditService.TipusEntitat;
-import es.caib.notib.core.api.service.AuditService.TipusOperacio;
-import es.caib.notib.core.aspect.Audita;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.helper.IntegracioHelper;
-import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.NotificaHelper;
-import es.caib.notib.core.helper.PluginHelper;
-import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.repository.NotificacioEventRepository;
-import es.caib.notib.core.wsdl.adviser.Acuse;
-import es.caib.notib.core.wsdl.adviser.AdviserWsV2PortType;
-import es.caib.notib.core.wsdl.adviser.Opciones;
-import es.caib.notib.core.wsdl.adviser.Receptor;
+import javax.jws.WebService;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.ws.Holder;
+import java.math.BigInteger;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Implementació del servei adviser de Notifica.
@@ -73,7 +60,8 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private MetricsHelper metricsHelper;
-
+	@Autowired
+	private NotificacioEventHelper notificacioEventHelper;
 
 	@Override
 	@Transactional
@@ -158,147 +146,141 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			Holder<String> descripcionRespuesta,
 			IntegracioInfo info) {
 		NotificacioEnviamentEntity enviament = null;
-		NotificacioEventEntity.Builder eventDatatBuilder = null;
-		NotificacioEventEntity eventDatat = null;
+
+		boolean createEvent =false;
+		boolean eventInitialitzaCallback=false;
+		String eventErrorDescripcio = null;
 		try {
 			enviament = notificacioEnviamentRepository.findByNotificaIdentificador(identificador.value);
 //				if (enviament != null && enviament.getNotificacio() == null) {
 //					NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacio().getId());
 //					enviament.setNotificacio(notificacio);
 //				}
-			if (enviament != null) {
-				
-				if (enviament.isNotificaEstatFinal()) {
-					if (tipoEntrega.equals(BigInteger.valueOf(1L))) { //if datado (1L)
-						logger.error(
-								"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
-								"L'enviament amb l'identificador especificat (" + identificador + ") ja es troba en un estat final.");
-						//Crea un nou event builder
-						eventDatat = NotificacioEventEntity.getBuilder(
-								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-								enviament.getNotificacio()).
-								enviament(enviament).
-								descripcio(estado).build();
-						codigoRespuesta.value = "000";
-						descripcionRespuesta.value = "OK";
-						integracioHelper.addAccioError(info, "L'enviament ja es troba en un estat final");
-					} else if (tipoEntrega.equals(BigInteger.valueOf(3L))) { //if certificació (3L)
-						logger.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
-						certificacionOrganismo(
-								acusePDF,
-								organismoEmisor,
-								modoNotificacion,
-								identificador,
-								codigoRespuesta,
-								descripcionRespuesta,
-								enviament);
-						logger.debug("Certificació guardada correctament.");
-					}
-				} else {
-					String receptorNombre = null;
-					String receptorNif = null;
-					if (receptor != null) {
-						receptorNombre = receptor.getNombreReceptor();
-						receptorNif = receptor.getNifReceptor();
-					}
-					NotificacioEnviamentEstatEnumDto notificaEstat = null;
-					if ("pendiente_envio".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_ENVIAMENT;
-					} else if ("enviado_ci".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIADA_CI;
-					} else if ("notificada".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIFICADA;
-					} else if ("extraviada".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.EXTRAVIADA;
-					} else if ("rehusada".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.REBUTJADA;
-					} else if ("desconocido".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.DESCONEGUT;
-					} else if ("fallecido".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.MORT;
-					} else if ("ausente".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.ABSENT;
-					} else if ("direccion_incorrecta".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA;
-					} else if ("sin_informacion".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO;
-					} else if ("error".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.ERROR_ENTREGA;
-					} else if ("pendiente_sede".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_SEU;
-					} else if ("enviado_deh".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIADA_DEH;
-					} else if ("leida".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.LLEGIDA;
-					} else if ("envio_programado".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIAMENT_PROGRAMAT;
-					} else if ("pendiente_cie".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_CIE;
-					} else if ("pendiente_deh".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_DEH;
-					} else if ("entregado_op".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.ENTREGADA_OP;
-					} else if ("expirada".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.EXPIRADA;
-					} else if ("anulada".equals(estado)) {
-						notificaEstat = NotificacioEnviamentEstatEnumDto.ANULADA;
-					}
-					//Update enviament
-					notificaHelper.enviamentUpdateDatat(
-							notificaEstat,
-							toDate(fechaEstado),
-							estado,
-							getModoNotificacion(modoNotificacion),
-							receptorNif,
-							receptorNombre,
-							null,
-							null,
-							enviament);
-					logger.debug("Registrant event callbackdatat de l'Adviser...");
+			if (enviament == null) {
+				logger.error(
+						"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
+								"identificadorDestinatario=" + identificador + "): " +
+								"No s'ha trobat cap enviament amb l'identificador especificat (" + identificador + ").");
+				codigoRespuesta.value = "002";
+				descripcionRespuesta.value = "Identificador no encontrado";
+				integracioHelper.addAccioError(info, "No s'ha trobat cap enviament amb l'identificador especificat");
+				return enviament;
+			}
+
+			if (enviament.isNotificaEstatFinal()) {
+				if (tipoEntrega.equals(BigInteger.valueOf(1L))) { //if datado (1L)
+					logger.error(
+							"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
+							"L'enviament amb l'identificador especificat (" + identificador + ") ja es troba en un estat final.");
 					//Crea un nou event builder
-					eventDatatBuilder = NotificacioEventEntity.getBuilder(
-							NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-							enviament.getNotificacio()).
-							enviament(enviament).
-							descripcio(estado);
-					
-					if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-						eventDatatBuilder.callbackInicialitza();
-					eventDatat = eventDatatBuilder.build();
-					
+					createEvent = true;
+					eventInitialitzaCallback = false;
+
 					codigoRespuesta.value = "000";
 					descripcionRespuesta.value = "OK";
-					logger.debug("Event callbackdatat registrat correctament: " + eventDatat.getTipus().name());
-					
-					//if datado + certificació
-					if (tipoEntrega.equals(BigInteger.valueOf(2L))) {
-						logger.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
-						certificacionOrganismo(
-								acusePDF,
-								organismoEmisor,
-								modoNotificacion,
-								identificador,
-								codigoRespuesta,
-								descripcionRespuesta,
-								enviament);
-						logger.debug("Certificació guardada correctament.");
-					}
-					integracioHelper.addAccioOk(info);
-					
+					integracioHelper.addAccioError(info, "L'enviament ja es troba en un estat final");
+				} else if (tipoEntrega.equals(BigInteger.valueOf(3L))) { //if certificació (3L)
+					logger.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
+					certificacionOrganismo(
+							acusePDF,
+							organismoEmisor,
+							modoNotificacion,
+							identificador,
+							codigoRespuesta,
+							descripcionRespuesta,
+							enviament);
+					logger.debug("Certificació guardada correctament.");
+				}
+			} else {
+				String receptorNombre = null;
+				String receptorNif = null;
+				if (receptor != null) {
+					receptorNombre = receptor.getNombreReceptor();
+					receptorNif = receptor.getNifReceptor();
+				}
+				NotificacioEnviamentEstatEnumDto notificaEstat = null;
+				if ("pendiente_envio".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_ENVIAMENT;
+				} else if ("enviado_ci".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIADA_CI;
+				} else if ("notificada".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIFICADA;
+				} else if ("extraviada".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.EXTRAVIADA;
+				} else if ("rehusada".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.REBUTJADA;
+				} else if ("desconocido".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.DESCONEGUT;
+				} else if ("fallecido".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.MORT;
+				} else if ("ausente".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.ABSENT;
+				} else if ("direccion_incorrecta".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA;
+				} else if ("sin_informacion".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO;
+				} else if ("error".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.ERROR_ENTREGA;
+				} else if ("pendiente_sede".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_SEU;
+				} else if ("enviado_deh".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIADA_DEH;
+				} else if ("leida".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.LLEGIDA;
+				} else if ("envio_programado".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIAMENT_PROGRAMAT;
+				} else if ("pendiente_cie".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_CIE;
+				} else if ("pendiente_deh".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_DEH;
+				} else if ("entregado_op".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.ENTREGADA_OP;
+				} else if ("expirada".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.EXPIRADA;
+				} else if ("anulada".equals(estado)) {
+					notificaEstat = NotificacioEnviamentEstatEnumDto.ANULADA;
+				}
+				//Update enviament
+				notificaHelper.enviamentUpdateDatat(
+						notificaEstat,
+						toDate(fechaEstado),
+						estado,
+						getModoNotificacion(modoNotificacion),
+						receptorNif,
+						receptorNombre,
+						null,
+						null,
+						enviament);
+				logger.debug("Registrant event callbackdatat de l'Adviser...");
+				//Crea un nou event builder
+				createEvent = true;
+				eventInitialitzaCallback = true;
+
+				codigoRespuesta.value = "000";
+				descripcionRespuesta.value = "OK";
+
+
+				//if datado + certificació
+				if (tipoEntrega.equals(BigInteger.valueOf(2L))) {
+					logger.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
+					certificacionOrganismo(
+							acusePDF,
+							organismoEmisor,
+							modoNotificacion,
+							identificador,
+							codigoRespuesta,
+							descripcionRespuesta,
+							enviament);
+					logger.debug("Certificació guardada correctament.");
+				}
+				integracioHelper.addAccioOk(info);
+
 //					if ("expirada".equals(estado) && acusePDF == null && enviament.getNotificaCertificacioData() == null) {
 //						logger.debug("Consultant la certificació de l'enviament expirat...");
 //						notificaHelper.enviamentRefrescarEstat(enviament.getId());
 //					}
-				}
-			} else {
-				logger.error(
-						"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
-						"identificadorDestinatario=" + identificador + "): " +
-						"No s'ha trobat cap enviament amb l'identificador especificat (" + identificador + ").");
-				codigoRespuesta.value = "002";
-				descripcionRespuesta.value = "Identificador no encontrado";
-				integracioHelper.addAccioError(info, "No s'ha trobat cap enviament amb l'identificador especificat");
 			}
+
 		} catch (DatatypeConfigurationException ex) {
 			codigoRespuesta.value = "004";
 			descripcionRespuesta.value = "Fecha incorrecta";
@@ -313,51 +295,35 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 				logger.debug(
 						"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
 								"identificadorDestinatario=" + identificador + ")");
-				eventDatatBuilder = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-						enviament.getNotificacio()).
-						enviament(enviament).
-						descripcio(estado).
-						error(true).
-						errorDescripcio(ExceptionUtils.getStackTrace(ex));
-				
-				if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-					eventDatatBuilder.callbackInicialitza();
-				
-				eventDatat = eventDatatBuilder.build();
-				logger.debug("Error event: " + eventDatat.getDescripcio());
-				enviament.updateNotificaError(
-						true,
-						eventDatat);
+				createEvent = true;
+				eventInitialitzaCallback = true;
+				eventErrorDescripcio = ExceptionUtils.getStackTrace(ex);
+
 			}
 			codigoRespuesta.value = "666";
 			descripcionRespuesta.value = "Error procesando peticion";
 			integracioHelper.addAccioError(info, "Error processant la petició", ex);
 		}
-		if (enviament != null) {
-			if (eventDatat == null && !tipoEntrega.equals(BigInteger.valueOf(3L))) {
-				logger.debug("L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null");
-				eventDatatBuilder = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-						enviament.getNotificacio()).
-						enviament(enviament).
-						descripcio(estado).
-						error(true).
-						errorDescripcio("Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value);
-				
-				eventDatat = eventDatatBuilder.build();
-				logger.debug("Error event: " + eventDatat.getDescripcio());
-				enviament.updateNotificaError(
-						true,
-						eventDatat);
-			}
-			if (eventDatat != null) {
-				enviament.getNotificacio().updateEventAfegir(eventDatat);
-				notificacioEventRepository.save(eventDatat);
-			}
-			logger.debug("Peticició processada correctament.");
+
+		if (enviament != null && !createEvent && !tipoEntrega.equals(BigInteger.valueOf(3L))) {
+			logger.debug("L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null");
+			createEvent = true;
+			eventInitialitzaCallback = true;
+			eventErrorDescripcio = "Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value;
 		}
-		
+
+		logger.debug("Peticició processada correctament.");
+
+		if (enviament != null && createEvent) { // si no hi ha cap errada enviament mai serà null quan createEvent es true
+			notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament,
+					NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
+					estado,
+					eventErrorDescripcio,
+					eventInitialitzaCallback
+			);
+
+			logger.debug("Event callbackdatat registrat correctament: " + NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT.name());
+		}
 		logger.info("[ADV] Fi sincronització enviament Adviser [Id: " + (identificador != null ? identificador.value : "") + "]");
 		return enviament;
 	}
@@ -370,9 +336,10 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			Holder<String> identificador,
 			Holder<String> codigoRespuesta,
 			Holder<String> descripcionRespuesta,
-			NotificacioEnviamentEntity enviament) {
-
-		NotificacioEventEntity.Builder eventCertBuilder = null;
+			NotificacioEnviamentEntity enviament) throws Exception {
+		if (enviament == null) {
+			throw new Exception("Enviament should not be null");
+		}
 		NotificacioEventEntity eventCert = null;
 		String gestioDocumentalId = null;
 		try {
@@ -413,14 +380,12 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						NotificaCertificacioArxiuTipusEnumDto.PDF,
 						null); // núm. seguiment
 				logger.debug("Registrant event callbackcertificacio de l'Adviser...");
-				eventCertBuilder = NotificacioEventEntity.getBuilder(
+				eventCert = notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament,
 						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-						enviament.getNotificacio()).
-						enviament(enviament);;
-				if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-					eventCertBuilder.callbackInicialitza();
-				
-				eventCert = eventCertBuilder.build();
+						null,
+						null,
+						true
+				);
 				
 				codigoRespuesta.value = "000";
 				descripcionRespuesta.value = "OK";
@@ -438,49 +403,28 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
 					"identificadorDestinatario=" + identificador + ")",
 					ex);
-			if (enviament != null) {
-				logger.debug(
-						"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
-						"identificadorDestinatario=" + identificador + ")");
-				eventCertBuilder = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-						enviament.getNotificacio()).
-						enviament(enviament).
-						error(true).
-						errorDescripcio(ExceptionUtils.getStackTrace(ex));
-				if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-					eventCertBuilder.callbackInicialitza();
-				
-				logger.debug("Error event: " + eventCert.getDescripcio());
-				eventCert = eventCertBuilder.build();
-				enviament.updateNotificaError(
-						true,
-						eventCert);
-			}
+			logger.debug(
+					"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
+					"identificadorDestinatario=" + identificador + ")");
+			eventCert = notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament,
+					NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
+					null,
+					ExceptionUtils.getStackTrace(ex),
+					true
+			);
 			codigoRespuesta.value = "666";
 			descripcionRespuesta.value = "Error procesando peticion";
 		}
 		if (eventCert == null) {
 			logger.debug("L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null (certificació).");
-
-			eventCertBuilder = NotificacioEventEntity.getBuilder(
+			notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament,
 					NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-					enviament.getNotificacio()).
-					enviament(enviament).
-					error(true).
-					errorDescripcio("Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value);
-			if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-				eventCertBuilder.callbackInicialitza();
-			eventCert = eventCertBuilder.build();
-			logger.debug("Error event: " + eventCert.getDescripcio());
-			enviament.updateNotificaError(
-					true,
-					eventCert);
+					null,
+					"Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value,
+					true
+			);
 		}
-		enviament.getNotificacio().updateEventAfegir(eventCert);
-		notificacioEventRepository.save(eventCert);
-		
-		enviament.getNotificacio().updateEventAfegir(eventCert);
+
 		logger.debug("Sortint de la certificació...");
 	}
 

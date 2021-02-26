@@ -134,7 +134,7 @@ public class AuditNotificacioHelper {
 			NotificacioEntity notificacio) {
 		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
 		notificacio.updateMotiu(notificaEstat.name());
-		notificacioEventHelper.clearOldEvents(notificacio);
+		notificacioEventHelper.clearOldUselessEvents(notificacio);
 		return notificacio;
 	}
 	

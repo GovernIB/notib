@@ -137,7 +137,7 @@ public class RegistreHelper {
 			logger.error(
 					errorPrefix,
 					ex);
-			notificacioEventHelper. addRegistreConsultaInfoEvent(notificacio, enviament, ExceptionUtils.getStackTrace(ex));
+			notificacioEventHelper.addRegistreConsultaInfoEvent(notificacio, enviament, ExceptionUtils.getStackTrace(ex));
 			if (enviament.getSirConsultaIntent() >= pluginHelper.getConsultaSirReintentsMaxProperty()) {
 				notificacioEventHelper.addNotificaConsultaSirErrorEvent(notificacio, enviament);
 			}
