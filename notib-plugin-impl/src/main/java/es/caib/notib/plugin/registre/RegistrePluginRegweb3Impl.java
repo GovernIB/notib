@@ -41,12 +41,6 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			Long tipusOperacio) {
 		RespostaConsultaRegistre rc = new RespostaConsultaRegistre();
 		
-		
-		if (arb.getResumen().startsWith("Error")) {
-			rc.setErrorCodi("3");
-			rc.setErrorDescripcio("Error de registre MOCK (" + System.currentTimeMillis() + ")");
-			return rc;
-		} else {
 			try {			
 				AsientoRegistralWs asiento = toAsientoRegistralBean(arb);
 //				logger.debug("[SalidaAsientoRegistral - INICI]");
@@ -85,10 +79,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 				rc.setErrorCodi("2");
 				rc.setErrorDescripcio(e.getMessage());
 				return rc;
-			}
-		}
-		
-		
+			}	
 		
 	}
 	
