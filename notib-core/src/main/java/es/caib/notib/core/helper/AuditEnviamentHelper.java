@@ -1,33 +1,23 @@
 package es.caib.notib.core.helper;
 
-import java.security.GeneralSecurityException;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.aspect.Audita;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.entity.PersonaEntity;
+import es.caib.notib.core.entity.*;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.security.GeneralSecurityException;
+import java.util.List;
 
 
 /**
@@ -147,7 +137,6 @@ public class AuditEnviamentHelper {
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
 	public NotificacioEnviamentEntity updateEnviamentEnviat(
 			NotificacioEntity notificacio,
-			NotificacioEventEntity.Builder eventBulider,
 			NotificacioEventEntity event,
 			ResultadoEnvio resultadoEnvio,
 			NotificacioEnviamentEntity enviament) {
@@ -156,7 +145,7 @@ public class AuditEnviamentHelper {
 		
 		//Registrar event per enviament
 		log.info(" >>> Canvi estat a ENVIADA ");
-		eventBulider.enviament(enviament);
+		event.setEnviament(enviament);
 		notificacio.updateEventAfegir(event);
 		notificacioEventRepository.save(event);
 		
@@ -180,7 +169,6 @@ public class AuditEnviamentHelper {
 			NotificacioEntity notificacioEntity,
 			NotificacioEnviamentEntity enviament,
 			boolean totsAdministracio,
-			NotificacioEventEntity.Builder eventBulider,
 			NotificacioEventEntity event) {
 		enviament.setRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
 		enviament.setRegistreData(arbResposta.getRegistreData());
@@ -191,7 +179,7 @@ public class AuditEnviamentHelper {
 			enviament.setNotificaEstat(NotificacioEnviamentEstatEnumDto.ENVIAT_SIR);
 		}
 		
-		eventBulider.enviament(enviament);
+		event.setEnviament(enviament);
 		notificacioEntity.updateEventAfegir(event);
 		notificacioEventRepository.saveAndFlush(event);
 		return enviament;

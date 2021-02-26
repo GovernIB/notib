@@ -3,15 +3,16 @@
  */
 package es.caib.notib.core.repository;
 
-import java.util.List;
-
+import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.NotificacioEventEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
+import java.util.List;
 
 /**
  * Consultes necessàries per als events de les notificacions.
@@ -29,9 +30,29 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 	
 	List<NotificacioEventEntity> findByEnviamentIdOrderByIdAsc(
 			Long enviamentId);
-	
+
+	@Query( " delete from " +
+			"	NotificacioEventEntity ne " +
+			" where " +
+			"		ne.notificacio = :notificacio " +
+			"	and (ne.error = true " +
+			"  		 or (ne.error = false " +
+			"		 	 and  ne.tipus not in (es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE, " +
+			"								   es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT," +
+			"								   es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO)" +
+			")) "
+	)
+	void deleteOldUselessEvents(NotificacioEntity notificacio);
+
 	void deleteByEnviament(NotificacioEnviamentEntity enviament);
 
+	void deleteByNotificacioAndTipusAndError(NotificacioEntity notificacio,
+									 NotificacioEventTipusEnumDto tipus,
+									 boolean error);
+
+	List<NotificacioEventEntity> findByNotificacioAndTipusAndErrorOrderByDataAsc(NotificacioEntity notificacio,
+																   NotificacioEventTipusEnumDto tipus,
+																   boolean error);
 	/** Recupera la llista de notificacions pendents */
 	@Query("select ne.id " + 
 		   "  from NotificacioEventEntity ne " +

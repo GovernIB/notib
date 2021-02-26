@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.*;
@@ -87,7 +84,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	IntegracioHelper integracioHelper;
 	@Autowired
 	private AuditEnviamentHelper auditEnviamentHelper;
-	
+	@Autowired
+	private NotificacioEventHelper notificacioEventHelper;
+
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity notificacioEnviar(
 			Long notificacioId) {
@@ -130,25 +129,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						null);
 
 				//Crea un nou event
-				NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
-						notificacio);
-				if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-					eventBulider.callbackInicialitza();
-
-				// TODO: Revisar generació d'events amb múltiples enviaments
 				startTime = System.nanoTime();
-				NotificacioEventEntity event = eventBulider.build();
-				
-				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
-					for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
-						if (enviament.getTitular().getNif().equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
-							enviament = auditEnviamentHelper.updateEnviamentEnviat(notificacio, eventBulider, event, resultadoEnvio, enviament);
-						}
-					}
-				}
+				notificacioEventHelper.addNotificaEnviamentEvent(notificacio, resultadoAlta);
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				logger.info(" [TIMER-NOT] Notificació enviar (Preparar events)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
+
 				integracioHelper.addAccioOk(info);
 			} else {
 				logger.info(" >>> ... ERROR");
@@ -201,9 +186,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		Date dataUltimDatat = enviament.getNotificaDataCreacio();
 		Date dataUltimaCertificacio = enviament.getNotificaCertificacioData();
 
-		NotificacioEventEntity.Builder eventDatatBuilder  = null;
-		NotificacioEventEntity.Builder eventCertBuilder  = null;
-		
 		enviament.updateNotificaDataRefrescEstat();
 		enviament.updateNotificaNovaConsulta(pluginHelper.getConsultaReintentsPeriodeProperty());
 		
@@ -274,29 +256,12 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 							logger.info("Fi actualització Datat");
 							
 							logger.info("Creant nou event per Datat...");
+
 							//Crea un nou event
-							eventDatatBuilder = NotificacioEventEntity.getBuilder(
+							notificacioEventHelper.addNotificaCallbackEvent(notificacio, enviament,
 									NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-									enviament.getNotificacio()).
-									enviament(enviament).
-									descripcio(datatDarrer.getResultado());
-							logger.info("Event Datat creat");
-							
-							if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
-								logger.info("Inicialitzar nou event callback per usuari aplicació...");
-								eventDatatBuilder.callbackInicialitza();
-								logger.info("Event callback inicialitzat");
-							}
-							NotificacioEventEntity eventDatat = eventDatatBuilder.build();
-							
-							logger.info("Estat callback: " + eventDatat.getCallbackEstat());
-							logger.info("Afegint event Datat a la notificació...");
-							notificacio.updateEventAfegir(eventDatat);
-							
-							enviament.updateNotificaError(false, null);
-							
-							logger.info("Guardant event...");
-							notificacioEventRepository.save(eventDatat);
+									datatDarrer.getResultado());
+
 							logger.info("L'event s'ha guardat correctament...");
 							logger.info("Envio correu en cas d'usuaris no APLICACIÓ");
 							if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
@@ -356,40 +321,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						
 						logger.info("Creant nou event per certificació...");
 						//Crea un nou event
-						eventCertBuilder = NotificacioEventEntity.getBuilder(
+						notificacioEventHelper.addNotificaCallbackEvent(notificacio, enviament,
 								NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-								enviament.getNotificacio()).
-								enviament(enviament).
-								descripcio(datatDarrer.getResultado());
-						logger.info("Event Datat creat");
-						
-						if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
-							logger.info("Inicialitzar nou event callback per usuari aplicació...");
-							eventCertBuilder.callbackInicialitza();
-							logger.info("Event callback inicialitzat");
-						}
-						
-						NotificacioEventEntity eventCert = eventCertBuilder.build();
-
-						logger.info("Estat callback: " + eventCert.getCallbackEstat());
-						logger.info("Afegint event certificació a la notificació...");
-						
-						notificacio.updateEventAfegir(eventCert);
-						
-						logger.info("Guardant event...");
-						notificacioEventRepository.save(eventCert);
-						logger.info("L'event s'ha guardat correctament...");
+								datatDarrer.getResultado());
 					}
 					elapsedTime = (System.nanoTime() - startTime) / 10e6;
 					logger.info(" [TIMER-EST] Actualitzar informació enviament amb certificació  [Id: " + enviamentId + "]: " + elapsedTime + " ms");
 					logger.info("Enviament actualitzat");
 				}
-				NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
-						notificacio).
-						enviament(enviament).build();
-				notificacio.updateEventAfegir(event);
-				notificacioEventRepository.save(event); // #235 Faltava desar l'event
+				notificacioEventHelper.addNotificaConsultaInfoEvent(notificacio, enviament, null, false);
 				enviament.refreshNotificaConsulta();
 				integracioHelper.addAccioOk(info);
 				logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
@@ -406,36 +346,13 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			logger.error(
 					errorPrefix,
 					ex);
-			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
-					NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
-					notificacio).
-					enviament(enviament).
-					error(true).
-					errorDescripcio(ExceptionUtils.getStackTrace(ex)).
-					build();
-			notificacio.updateEventAfegir(event);
-			notificacioEventRepository.save(event);
-			enviament.updateNotificaError(
-					true,
-					event);
+			notificacioEventHelper.addNotificaConsultaInfoEvent(notificacio, enviament,
+					ExceptionUtils.getStackTrace(ex),
+					true);
+
 			logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 			if (enviament.getNotificaIntentNum() >= pluginHelper.getConsultaReintentsMaxProperty()) {
-				NotificacioEventEntity.Builder eventReintentsBuilder  = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR,
-						notificacio).
-						enviament(enviament).
-						error(true).
-						errorDescripcio("S'han esgotat els reintents de consulta de canvi d'estat a Notific@");
-				if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-					eventReintentsBuilder.callbackInicialitza();
-					
-				NotificacioEventEntity eventReintents = eventReintentsBuilder.build();
-				
-				notificacio.updateEventAfegir(eventReintents);
-				notificacioEventRepository.save(eventReintents);
-				notificacio.updateNotificaError(
-						NotificacioErrorTipusEnumDto.ERROR_REINTENTS_CONSULTA,
-						eventReintents);
+				notificacioEventHelper.addNotificaConsultaErrorEvent(notificacio, enviament);
 			}
 			integracioHelper.addAccioError(info, "Error consultat l'estat de l'enviament", ex);
 //			resposta = false;
@@ -458,7 +375,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 //		return null;
 //	}
 
+	private void canviEstat(NotificacioEntity notificacio, NotificacioEstatEnumDto nouEstat) {
 
+	}
 	private ResultadoAltaRemesaEnvios enviaNotificacio(
 			NotificacioEntity notificacio) throws Exception {
 		ResultadoAltaRemesaEnvios resultat = null;
@@ -816,28 +735,14 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			String errorDescripcio,
 			NotificacioErrorTipusEnumDto notificacioErrorTipus,
 			boolean notificaError) {
-		NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
-				NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
-				notificacio).
-				error(true).
-				errorDescripcio(errorDescripcio);
-		if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-			eventBulider.callbackInicialitza();
-		NotificacioEventEntity event = eventBulider.build();
-		
-		for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
-			eventBulider.enviament(enviament);
-			auditEnviamentHelper.actualizaErrorNotifica(enviament, notificaError, event);
-//			enviament.updateNotificaError(
-//					notificaError, 
-//					event);
-		}
-		
+
+		NotificacioEventEntity event = notificacioEventHelper.addErrorEvent(notificacio,
+				NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, errorDescripcio, notificaError);
+
 		notificacio.updateNotificaError(
 				notificacioErrorTipus,
 				event);
 		notificacio.updateEventAfegir(event);
-		notificacioEventRepository.save(event);
 	}
 	
 	private NotificaWsV2PortType getNotificaWs(String apiKey) throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {

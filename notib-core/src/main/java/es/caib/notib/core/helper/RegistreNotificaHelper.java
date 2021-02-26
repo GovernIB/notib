@@ -3,23 +3,7 @@
  */
 package es.caib.notib.core.helper;
 
-import java.util.List;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import es.caib.notib.core.api.dto.AccioParam;
-import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
-import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
-import es.caib.notib.core.api.dto.IntegracioInfo;
-import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -27,6 +11,15 @@ import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.plugin.registre.RegistrePluginException;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Helper per a interactuar amb la versió 2 del servei web de Notific@.
@@ -37,13 +30,13 @@ import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 public class RegistreNotificaHelper {
 	
 	@Autowired
-	PluginHelper pluginHelper;
+	private PluginHelper pluginHelper;
 	@Autowired
-	ConversioTipusHelper conversioTipusHelper;
+	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
-	NotificaHelper notificaHelper;
+	private NotificaHelper notificaHelper;
 	@Autowired
-	RegistreHelper registreHelper;
+	private RegistreHelper registreHelper;
 	@Autowired
 	private AuditNotificacioHelper auditNotificacioHelper;
 	@Autowired
@@ -52,7 +45,9 @@ public class RegistreNotificaHelper {
 	private NotificacioEventRepository notificacioEventRepository;
 	@Autowired
 	private IntegracioHelper integracioHelper;
-	
+	@Autowired
+	private NotificacioEventHelper notificacioEventHelper;
+
 	public boolean realitzarProcesRegistrar(
 			NotificacioEntity notificacioEntity,
 			List<NotificacioEnviamentDtoV2> enviaments) throws RegistreNotificaException {
@@ -176,8 +171,7 @@ public class RegistreNotificaHelper {
 					arbResposta,
 					null,
 					notificacioEntity,
-					null,
-					notificacioEntity.getEnviaments());
+					null);
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Hi ha hagut un error realitzant el procés de registre (temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
 		} else {
@@ -185,7 +179,6 @@ public class RegistreNotificaHelper {
 			updateEventWithoutError(
 					arbResposta,
 					notificacioEntity,
-					null,
 					notificacioEntity.getEnviaments(),
 					false);
 			long t1 = System.currentTimeMillis();
@@ -221,8 +214,7 @@ public class RegistreNotificaHelper {
 					arbResposta,
 					null,
 					notificacioEntity,
-					enviament,
-					notificacioEntity.getEnviaments());
+					enviament);
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Hi ha hagut un error realitzant el procés de registre (temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
 		} else {
@@ -230,9 +222,21 @@ public class RegistreNotificaHelper {
 			updateEventWithoutError(
 					arbResposta,
 					notificacioEntity,
-					enviament,
-					null,
+					new HashSet<>(Arrays.asList(enviament)),
 					totsAdministracio);
+
+			//Comunicació + administració (SIR)
+			if (totsAdministracio) {
+				logger.debug("Comunicació SIR --> actualitzar estat...");
+				auditNotificacioHelper.updateNotificacioEnviada(notificacioEntity);
+				registreHelper.enviamentUpdateDatat(
+						arbResposta.getEstat(),
+						arbResposta.getRegistreData(),
+						arbResposta.getSirRecepecioData(),
+						arbResposta.getSirRegistreDestiData(),
+						arbResposta.getRegistreNumeroFormatat(),
+						enviament);
+			}
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] El procés de registre ha finalizat correctament (temps=" + (t1 - t0) + "ms)"));
 		}
@@ -248,102 +252,42 @@ public class RegistreNotificaHelper {
 		return enviamentIds;
 	}
 	
-	public NotificacioEntity updateEventWithError(
+	private void updateEventWithError(
 			RespostaConsultaRegistre arbResposta,
 			String errorDescripcio,
 			NotificacioEntity notificacioEntity,
-			NotificacioEnviamentEntity enviament,
-			Set<NotificacioEnviamentEntity> enviaments) {
+			NotificacioEnviamentEntity enviament) {
 		
 		if (arbResposta != null)
 			errorDescripcio = arbResposta.getErrorDescripcio();
-			
-		//Crea un nou event
-		NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
-				NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
-				notificacioEntity).
-				error(true).
-				errorDescripcio(errorDescripcio);
-		
-		if (notificacioEntity.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
-			eventBulider.callbackInicialitza();
-		}
-		NotificacioEventEntity event = eventBulider.build();
-		//Actualitza l'event per cada enviament
-		if (enviament != null) {
-			eventBulider.enviament(enviament);
 
-			auditNotificacioHelper.updateNotificacioErrorRegistre(notificacioEntity, event);
-			notificacioEventRepository.saveAndFlush(event);
-		} else {
-			for (NotificacioEnviamentEntity enviamentEntity : enviaments) {
-				enviamentEntity.updateNotificaError(true, event);
-				eventBulider.enviament(enviamentEntity);
-				
-				auditNotificacioHelper.updateNotificacioErrorRegistre(notificacioEntity, event);
-				notificacioEventRepository.saveAndFlush(event);
-			}
-		} 
-		return notificacioEntity;
+		NotificacioEventEntity event = notificacioEventHelper.addErrorEvent(notificacioEntity, NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE, enviament, errorDescripcio);
+		auditNotificacioHelper.updateNotificacioErrorRegistre(notificacioEntity, event);
 	}
 
-	public NotificacioEntity updateEventWithoutError(
+	private void updateEventWithoutError(
 			RespostaConsultaRegistre arbResposta,
 			NotificacioEntity notificacioEntity,
-			NotificacioEnviamentEntity enviament,
 			Set<NotificacioEnviamentEntity> enviaments,
-//			boolean enviarNotificacio,
 			boolean totsAdministracio) {
+
 		//Crea un nou event
-		NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
-				NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
-				notificacioEntity);
-		
-		if (notificacioEntity.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-			eventBulider.callbackInicialitza();
-		
-		NotificacioEventEntity event = eventBulider.build();
+		NotificacioEventEntity event = notificacioEventHelper.defaultEventInstance(notificacioEntity,
+				NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE);
 		
 		if (arbResposta != null) {
 			auditNotificacioHelper.updateNotificacioRegistre(arbResposta, notificacioEntity);
 			logger.info(" >>> Canvi estat a REGISTRADA ");
-//			if (enviarNotificacio) {
-//				logger.info(" >>> Notificant...");
-//				notificaHelper.notificacioEnviar(notificacioEntity.getId());
-//			}
-			//Comunicació + administració (SIR)
-			if (totsAdministracio) {
-				logger.debug("Comunicació SIR --> actualitzar estat...");
-				auditNotificacioHelper.updateNotificacioEnviada(notificacioEntity);
-				registreHelper.enviamentUpdateDatat(
-						arbResposta.getEstat(), 
-						arbResposta.getRegistreData(), 
-						arbResposta.getSirRecepecioData(),
-						arbResposta.getSirRegistreDestiData(),
-						arbResposta.getRegistreNumeroFormatat(), 
-						enviament);
-			}
-			if (enviament != null) {
+
+			for(NotificacioEnviamentEntity enviamentEntity: enviaments) {
 				auditEnviamentHelper.actualitzaRegistreEnviament(
 						arbResposta,
 						notificacioEntity,
-						enviament,
+						enviamentEntity,
 						totsAdministracio,
-						eventBulider,
 						event);
-			} else {
-				for(NotificacioEnviamentEntity enviamentEntity: enviaments) {
-					auditEnviamentHelper.actualitzaRegistreEnviament(
-							arbResposta,
-							notificacioEntity,
-							enviamentEntity,
-							totsAdministracio,
-							eventBulider,
-							event);
-				}
 			}
 		}
-		return notificacioEntity;
 	}
 
 	private boolean isSirActivat() {

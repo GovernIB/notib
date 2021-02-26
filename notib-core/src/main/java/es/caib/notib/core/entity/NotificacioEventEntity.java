@@ -3,28 +3,17 @@
  */
 package es.caib.notib.core.entity;
 
-import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Classe del model de dades que representa un event
@@ -60,7 +49,8 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	@JoinColumn(name = "notificacio_id")
 	@ForeignKey(name = "not_notifi_noteve_fk")
 	private NotificacioEntity notificacio;
-	
+
+	@Setter
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_env_id")
 	@ForeignKey(name = "not_notenv_noteve_fk")
