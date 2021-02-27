@@ -5,23 +5,15 @@ import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.exception.NoPermisosException;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.service.OrganGestorService;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.GrupEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.PagadorCieEntity;
-import es.caib.notib.core.entity.PagadorPostalEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.ProcedimentOrganEntity;
+import es.caib.notib.core.cacheable.OrganGestorCachable;
+import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.notib.core.repository.GrupRepository;
-import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.PagadorCieRepository;
-import es.caib.notib.core.repository.PagadorPostalRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.repository.*;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,14 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.xml.bind.ValidationException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Implementació del servei de gestió de òrgans gestors.
@@ -78,7 +63,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	private ProcedimentHelper procedimentHelper;
 	@Resource
 	private OrganGestorHelper organGestorHelper;
-	
+	@Autowired
+	private OrganGestorCachable organGestorCachable;
 
 	@Override
 	@Transactional
@@ -672,7 +658,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		try {
 			List<OrganismeDto> organismes = new ArrayList<OrganismeDto>();
 			try {
-				organismes = cacheHelper.findOrganismesByEntitat(entitat.getDir3Codi());
+				organismes = organGestorCachable.findOrganismesByEntitat(entitat.getDir3Codi());
 			} catch (Exception e) {
 				String errorMessage = "No s'han pogut recuperar els organismes de l'entitat: " + entitat.getDir3Codi();
 				logger.error(

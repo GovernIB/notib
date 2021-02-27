@@ -33,7 +33,7 @@ import es.caib.notib.core.helper.ExcepcioLogHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
-import es.caib.notib.core.repository.AclSidRepository;
+import es.caib.notib.core.repository.acl.AclSidRepository;
 import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 

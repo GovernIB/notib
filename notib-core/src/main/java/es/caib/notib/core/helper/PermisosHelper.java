@@ -3,11 +3,19 @@
  */
 package es.caib.notib.core.helper;
 
-import java.io.Serializable;
-import java.util.*;
-
-import javax.annotation.Resource;
-
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.TipusEnumDto;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.entity.acl.AclSidEntity;
+import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
+import es.caib.notib.core.repository.acl.AclObjectIdentityRepository;
+import es.caib.notib.core.repository.acl.AclSidRepository;
+import es.caib.notib.core.security.ExtendedPermission;
+import es.caib.notib.core.security.NotibMutableAclService;
+import es.caib.notib.plugin.usuari.DadesUsuari;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,28 +24,15 @@ import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.jdbc.LookupStrategy;
-import org.springframework.security.acls.model.AccessControlEntry;
-import org.springframework.security.acls.model.Acl;
-import org.springframework.security.acls.model.MutableAcl;
-import org.springframework.security.acls.model.NotFoundException;
-import org.springframework.security.acls.model.ObjectIdentity;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.acls.model.Sid;
+import org.springframework.security.acls.model.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.TipusEnumDto;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.security.ExtendedPermission;
-import es.caib.notib.core.security.NotibMutableAclService;
-import es.caib.notib.plugin.usuari.DadesUsuari;
+import javax.annotation.Resource;
+import java.io.Serializable;
+import java.util.*;
 
 
 /**
@@ -62,7 +57,10 @@ public class PermisosHelper {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private CacheHelper cacheHelper;
-
+	@Resource
+	private AclSidRepository aclSidRepository;
+	@Resource
+	private AclObjectIdentityRepository aclObjectIdentityRepository;
 
 	public void assignarPermisUsuari(
 			String userName,
@@ -276,6 +274,65 @@ public class PermisosHelper {
 		}
 		return result;
 	}
+
+	/**
+	 * Obté els identificadors de tots els objectes de la classe especificada sobre
+	 * els quals l'usuari actual té permisos
+	 *
+	 * @param clazz Classe dels objectes a consultar
+	 * @param permission Permís que es vol esbrinar si conté
+	 * @return Llista dels identificadors dels objectes seleccionats
+	 */
+	public List<Long> getObjectsIdsWithPermission(Class<?> clazz, Permission[] permissions) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		List<AclSidEntity> sids = new ArrayList<AclSidEntity>();
+		AclSidEntity userSid = aclSidRepository.getUserSid(auth.getName());
+		if (userSid != null) {
+			sids.add(userSid);
+		}
+		List<String> rolesNames = new ArrayList<String>();
+		for (GrantedAuthority authority : auth.getAuthorities()) {
+			rolesNames.add(authority.getAuthority());
+		}
+		for (AclSidEntity aclSid: aclSidRepository.findRolesSid(rolesNames)) {
+			if (aclSid != null) {
+				sids.add(aclSid);
+			}
+		}
+		// TODO: no estic segur si hauriem de fer un and binari de totes les mascares en lloc de passar una llista de masks
+		List<Integer> masks = new ArrayList<>();
+		for (Permission p : permissions){
+			masks.add(p.getMask());
+		}
+		return aclObjectIdentityRepository.findObjectsIdWithAnyPermissions(clazz.getName(), sids, masks);
+	}
+
+//	/**
+//	 * Obté els objectes de la classe especificada sobre
+//	 * els quals l'usuari actual té permisos
+//	 *
+//	 * @param clazz Classe dels objectes a consultar
+//	 * @param permission Permís que es vol esbrinar si conté
+//	 * @return Llista dels identificadors dels objectes seleccionats
+//	 */
+//	public <T> List<T> getObjectsWithPermission(AclObjectIdentityInstanceRepository repository, Class<?> clazz, Permission permission) {
+//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//		List<AclSidEntity> sids = new ArrayList<AclSidEntity>();
+//		AclSidEntity userSid = aclSidRepository.getUserSid(auth.getName());
+//		if (userSid != null) {
+//			sids.add(userSid);
+//		}
+//		List<String> rolesNames = new ArrayList<String>();
+//		for (GrantedAuthority authority : auth.getAuthorities()) {
+//			rolesNames.add(authority.getAuthority());
+//		}
+//		for (AclSidEntity aclSid: aclSidRepository.findRolesSid(rolesNames)) {
+//			if (aclSid != null) {
+//				sids.add(aclSid);
+//			}
+//		}
+//		return repository.findObjectsWithPermissions(clazz.getName(), sids, permission.getMask());
+//	}
 
 	public List<PermisDto> findPermisos(
 			Long objectIdentifier,

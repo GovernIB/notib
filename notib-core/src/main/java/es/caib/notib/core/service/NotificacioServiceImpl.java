@@ -16,6 +16,7 @@ import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.Persona;
+import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.*;
@@ -43,14 +44,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -118,7 +112,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private NotificacioHelper notificacioHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
-
+	@Autowired
+	private OrganGestorCachable organGestorCachable;
 	public static Map<String, ProgresDescarregaDto> progresDescarrega = new HashMap<String, ProgresDescarregaDto>();
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActulitzacioExpirades = new HashMap<String, ProgresActualitzacioCertificacioDto>();
 	
@@ -146,7 +141,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 //				organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, notificacio.getOrganGestor());
 				organGestor = organGestorRepository.findByCodi(notificacio.getOrganGestor());
 				if (organGestor == null) {
-					Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(entitat.getDir3Codi());
+					Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
 					if (!organigramaEntitat.containsKey(notificacio.getOrganGestor())) {
 						throw new NotFoundException(
 								notificacio.getOrganGestor(), 
@@ -484,7 +479,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				if (organGestor == null && notificacio.getOrganGestor() != null ) {
 					organGestor = organGestorRepository.findByCodi(notificacio.getOrganGestor());
 					if (organGestor == null) {
-						Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(entitat.getDir3Codi());
+						Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
 						if (!organigramaEntitat.containsKey(notificacio.getOrganGestor())) {
 							throw new NotFoundException(
 									notificacio.getOrganGestor(), 

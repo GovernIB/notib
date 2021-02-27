@@ -56,7 +56,27 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 	public List<ProcedimentEntity> findProcedimentsByEntitatAndGrup(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("grups") List<String> grups);
-	
+
+	@Query("from " +
+			"	ProcedimentEntity pro " +
+			"where " +
+			"		pro.entitat = :entitat " +
+			"	and pro.id in (:ids)" +
+			"  	and (pro.agrupar = false " +
+			"  		or (pro.agrupar = true " +
+			"  			and pro in (select distinct gp.procediment " +
+			"						from GrupProcedimentEntity gp " +
+			"						left outer join gp.grup g " +
+			"						where g.entitat = :entitat " +
+			"		  					  and g.codi in (:grups))" +
+			"			) " +
+			"		) " +
+			"order by pro.nom asc")
+	List<ProcedimentEntity> findProcedimentsByEntitatAndGrupAndIds(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("grups") List<String> grups,
+			@Param("ids") List<Long> ids);
+
 	@Query( "select distinct pro " +
 			"from ProcedimentEntity pro " +
 			"     left outer join pro.organGestor og " +

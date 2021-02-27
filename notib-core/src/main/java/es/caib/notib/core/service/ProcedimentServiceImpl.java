@@ -13,6 +13,7 @@ import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.aspect.Audita;
+import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
@@ -23,6 +24,7 @@ import es.caib.notib.plugin.registre.TipusAssumpte;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -83,7 +85,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private NotificacioRepository notificacioRepository;
 	@Resource
 	private ProcedimentOrganRepository procedimentOrganRepository;
-	
+	@Autowired
+	private OrganGestorCachable organGestorCachable;
+
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
 	
 	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
@@ -421,7 +425,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						false);
 
 				startTime = System.nanoTime();
-				Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(entitatDto.getDir3Codi());
+				Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(entitatDto.getDir3Codi());
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				logger.info(" [TIMER-PRO] Obtenir organigrama de l'entitat: " + elapsedTime + " ms");
 //				OficinaDto oficinaVirtual = pluginHelper.llistarOficinaVirtual(

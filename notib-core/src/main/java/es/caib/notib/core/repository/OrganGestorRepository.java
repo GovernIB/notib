@@ -24,14 +24,22 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	public List<OrganGestorEntity> findByEntitatId(Long entitatId);
 	public Page<OrganGestorEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);
 	public OrganGestorEntity findByCodi(String codi);
-	
+
+	@Query("from " +
+			"    OrganGestorEntity og " +
+			" where " +
+			"     (og.entitat = :entitat)" +
+			" 	and og.id in (:ids)")
+	List<OrganGestorEntity> findByEntitatAndIds(@Param("entitat") EntitatEntity entitat, @Param("ids") List<Long> ids);
+
+
 	@Query(	"select distinct og " +
 			"from " +
 			"    ProcedimentEntity p " +
 			"    left outer join p.organGestor og " +
 			"where p.id in (:procedimentIds)")
 	public List<OrganGestorEntity> findByProcedimentIds(@Param("procedimentIds") List<Long> procedimentIds);
-	
+
 	@Query( "select distinct og " +
 			"from ProcedimentEntity pro " +
 			"	  left outer join pro.organGestor og " +

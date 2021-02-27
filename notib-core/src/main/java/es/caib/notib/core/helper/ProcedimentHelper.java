@@ -1,16 +1,17 @@
 package es.caib.notib.core.helper;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Resource;
-
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
+import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.entity.*;
+import es.caib.notib.core.repository.GrupProcedimentRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentOrganRepository;
+import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.security.ExtendedPermission;
+import es.caib.notib.plugin.unitat.NodeDir3;
+import es.caib.notib.plugin.usuari.DadesUsuari;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +23,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
-import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.api.service.OrganGestorService;
-import es.caib.notib.core.repository.GrupProcedimentRepository;
-import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
-import es.caib.notib.core.security.ExtendedPermission;
-import es.caib.notib.plugin.unitat.NodeDir3;
-import es.caib.notib.plugin.usuari.DadesUsuari;
+import javax.annotation.Resource;
+import java.util.*;
 
 /**
  * Helper per a convertir entities a dto
@@ -58,8 +52,14 @@ public class ProcedimentHelper {
 	private OrganGestorRepository organGestorRepository;
 	@Autowired
 	private ProcedimentOrganRepository procedimentOrganRepository;
+//	@Autowired
+//	private AclObjectIdentityInstanceRepository<ProcedimentEntity> procedimentPermisRepository;
+//	@Autowired
+//	private AclObjectIdentityInstanceRepository<OrganGestorEntity> organPermisRepository;
 	@Resource
 	private OrganGestorService organGestorService;
+	@Resource
+	private OrganGestorHelper organGestorHelper;
 	@Resource
 	MessageHelper messageHelper;
 	
@@ -164,7 +164,8 @@ public class ProcedimentHelper {
 		return usuaris;
 	}
 
-	@Cacheable(value = "procedimentEntitiesPermis", key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
+	@Cacheable(value = "procedimentEntitiesPermis",
+			key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
 	public List<ProcedimentEntity> getProcedimentsWithPermis(
 			String usuariCodi,
 			Authentication auth,
@@ -173,33 +174,18 @@ public class ProcedimentHelper {
 
 		// 1. Obtenim els procediments amb permisos per procediment
 		List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
-		List<ProcedimentEntity> procediments = procedimentRepository.findProcedimentsByEntitatAndGrup(entitat, grups);
-		List<ProcedimentEntity> procedimentsAmbPermis = new ArrayList<ProcedimentEntity>(procediments);
-		permisosHelper.filterGrantedAny(
-				procedimentsAmbPermis,
-				new PermisosHelper.ObjectIdentifierExtractor<ProcedimentEntity>() {
-					public Long getObjectIdentifier(ProcedimentEntity procediment) {
-						return procediment.getId();
-					}
-				},
+		List<Long> procedimentsAmbPermisIds = permisosHelper.getObjectsIdsWithPermission(
 				ProcedimentEntity.class,
-				permisos,
-				auth);
+				permisos
+		);
+		// selecciona els expedients amb permisos per procediment de l'entitat i dels grups
+		List<ProcedimentEntity> procedimentsAmbPermis =  procedimentRepository.findProcedimentsByEntitatAndGrupAndIds(entitat,
+				grups,
+				procedimentsAmbPermisIds);
 
 		// 2. Obtenim els òrgans gestors amb permisos
-		List<OrganGestorEntity> organsGestors = organGestorRepository.findByEntitat(entitat);
-		List<OrganGestorEntity> organsGestorsAmbPermis = new ArrayList<OrganGestorEntity>(organsGestors);
-
-		permisosHelper.filterGrantedAny(
-				organsGestorsAmbPermis,
-				new PermisosHelper.ObjectIdentifierExtractor<OrganGestorEntity>() {
-					public Long getObjectIdentifier(OrganGestorEntity organGestor) {
-						return organGestor.getId();
-					}
-				},
-				OrganGestorEntity.class,
-				permisos,
-				auth);
+		List<OrganGestorEntity> organsGestorsAmbPermis = organGestorHelper.findOrganismesEntitatAmbPermis(entitat,
+				permisos);
 
 		// 3. Obtenim els òrgans gestors fills dels organs gestors amb permisos
 		List<String> organsGestorsCodisAmbPermis = new ArrayList<String>();
@@ -221,10 +207,9 @@ public class ProcedimentHelper {
 		}
 
 		// 5. Juntam els procediments amb permís per òrgan gestor amb els procediments amb permís per procediment
-		Set<ProcedimentEntity> setProcediments = new HashSet<ProcedimentEntity>(procedimentsAmbPermis);
+		List<ProcedimentEntity> setProcediments = new ArrayList<ProcedimentEntity>(procedimentsAmbPermis);
 		setProcediments.addAll(procedimentsAmbPermisOrgan);
-		procediments = new ArrayList<ProcedimentEntity>(setProcediments);
-		return procediments;
+		return setProcediments;
 	}
 
 	@Cacheable(value = "procedimentEntitiessOrganPermis", key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
