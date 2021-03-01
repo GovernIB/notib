@@ -353,16 +353,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				
 				if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
 					logger.debug(">> [ALTA] notificació síncrona");
-					List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacioGuardada);
-					List<NotificacioEnviamentDtoV2> enviaments = conversioTipusHelper.convertirList(
-							enviamentsEntity,
-							NotificacioEnviamentDtoV2.class);
+//					List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacioGuardada);
+//					List<NotificacioEnviamentDtoV2> enviaments = conversioTipusHelper.convertirList(
+//							enviamentsEntity,
+//							NotificacioEnviamentDtoV2.class);
 					
 					logger.info(" [ALTA] Enviament SINCRON notificació [Id: " + notificacioGuardada.getId() + ", Estat: " + notificacioGuardada.getEstat() + "]");
 					synchronized(CreacioSemaforDto.getCreacioSemafor()) {
-						boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(
-								notificacioGuardada,
-								enviaments);
+						boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioGuardada);
 						if (notificar)
 							notificaHelper.notificacioEnviar(notificacioGuardada.getId());
 					}

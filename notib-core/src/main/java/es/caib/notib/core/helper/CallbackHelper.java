@@ -67,7 +67,7 @@ public class CallbackHelper {
 		NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
 		if (event == null)
 			throw new NotFoundException("eventId:" + eventId, NotificacioEventEntity.class);
-		NotificacioEntity notificacio = event.getNotificacio(); //notificacioRepository.findById(event.getNotificacioId());
+		NotificacioEntity notificacio = event.getNotificacio();
 		int intents = event.getCallbackIntents() + 1;
 		Date ara = new Date();
 		try {

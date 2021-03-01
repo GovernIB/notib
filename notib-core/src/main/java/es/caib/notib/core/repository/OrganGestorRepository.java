@@ -113,4 +113,14 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"where e.dir3Codi = :entitatCodiDir3")
 	public List<String> findCodisByEntitatDir3(@Param("entitatCodiDir3") String entitatCodiDir3);
 	public List<OrganGestorEntity> findByCodiIn(List<String> organs);
+
+	@Query(	" select " +
+			"	CASE WHEN count(og) > 0 THEN true ELSE false END " +
+			" from " +
+			"     OrganGestorEntity og join og.entitat e " +
+			" where " +
+			"     og.id in (:organsIds) " +
+			" and e.id = :entitatId ")
+	boolean isAnyOfEntitat(@Param("organsIds") List<Long> organsIds,
+						   @Param("entitatId") Long entitatId);
 }

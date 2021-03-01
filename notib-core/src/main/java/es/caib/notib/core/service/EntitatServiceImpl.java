@@ -10,6 +10,7 @@ import es.caib.notib.core.api.service.AuditService.TipusObjecte;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.aspect.Audita;
+import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.EntitatTipusDocEntity;
@@ -64,7 +65,7 @@ public class EntitatServiceImpl implements EntitatService {
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
-	private UsuariHelper usuariHelper;
+	private PermisosCacheable permisosCacheable;
 	@Resource
 	private MetricsHelper metricsHelper;
 	@Autowired
@@ -426,7 +427,7 @@ public class EntitatServiceImpl implements EntitatService {
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			logger.debug("Consulta les entitats accessibles per l'usuari actual (usuari=" + auth.getName() + ")");
-			return cacheHelper.findEntitatsAccessiblesUsuari(auth.getName(), rolActual);
+			return permisosCacheable.findEntitatsAccessiblesUsuari(auth.getName(), rolActual);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -565,9 +566,8 @@ public class EntitatServiceImpl implements EntitatService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//			System.out.println("Obtenim els permisos de " + auth.getName());
 			if (auth != null) {
-				return entityComprovarHelper.getPermisosEntitatsUsuariActual(auth);
+				return permisosCacheable.getPermisosEntitatsUsuariActual(auth);
 			} else {
 				Map<RolEnumDto, Boolean> hasPermisos = new HashMap<RolEnumDto, Boolean>();
 				hasPermisos.put(RolEnumDto.tothom, false);

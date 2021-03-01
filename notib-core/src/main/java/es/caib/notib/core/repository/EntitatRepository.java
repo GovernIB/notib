@@ -3,15 +3,14 @@
  */
 package es.caib.notib.core.repository;
 
-import java.util.List;
-
+import es.caib.notib.core.entity.EntitatEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.notib.core.entity.EntitatEntity;
+import java.util.List;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -36,5 +35,24 @@ public interface EntitatRepository extends JpaRepository<EntitatEntity, Long> {
 	public Page<EntitatEntity> findByFiltre(
 			@Param("filtre") String filtre,
 			Pageable paginacio);
+
+	@Query(	" select " +
+			"	distinct og.entitat " +
+			" from " +
+			"     OrganGestorEntity og " +
+			" where " +
+			"     og.id in (:organGestorsIds)")
+	List<EntitatEntity> findByOrganGestorsIds( @Param("organGestorsIds") List<Long> organGestorsIds);
+
+
+	@Query(	" select " +
+			"	distinct e " +
+			" from " +
+			"     EntitatEntity e " +
+			" where " +
+			"     e.id in (:ids) " +
+			" and e.activa = :activa ")
+	List<EntitatEntity> findByIdsAndActiva(@Param("ids") List<Long> ids,
+										   @Param("activa") boolean activa);
 
 }

@@ -6,6 +6,8 @@ import es.caib.notib.core.api.exception.NoPermisosException;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
+import es.caib.notib.core.cacheable.PermisosCacheable;
+import es.caib.notib.core.cacheable.ProcedimentsCacheable;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
@@ -65,6 +67,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private OrganGestorCachable organGestorCachable;
+	@Resource
+	private PermisosCacheable permisosCacheable;
+	@Resource
+	private ProcedimentsCacheable procedimentsCacheable;
 
 	@Override
 	@Transactional
@@ -605,7 +611,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					OrganGestorEntity.class,
 					permisDto);
 			cacheHelper.evictFindOrgansGestorsAccessiblesUsuari();
-			cacheHelper.evictFindEntitatsAccessiblesUsuari();
+			permisosCacheable.evictFindEntitatsAccessiblesUsuari();
 			cacheHelper.evictFindProcedimentsWithPermis();
 			cacheHelper.evictFindOrgansGestorWithPermis();
 			cacheHelper.evictAllPermisosEntitatsUsuariActual();
@@ -642,7 +648,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					OrganGestorEntity.class,
 					permisId);
 			cacheHelper.evictFindOrgansGestorsAccessiblesUsuari();
-			cacheHelper.evictFindEntitatsAccessiblesUsuari();
+			permisosCacheable.evictFindEntitatsAccessiblesUsuari();
 			cacheHelper.evictFindProcedimentsWithPermis();
 			cacheHelper.evictFindOrgansGestorWithPermis();
 			cacheHelper.evictAllPermisosEntitatsUsuariActual();
@@ -911,12 +917,11 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
-		List<ProcedimentEntity> procedimentsDisponibles = procedimentHelper.getProcedimentsWithPermis(
+		List<ProcedimentEntity> procedimentsDisponibles = procedimentsCacheable.getProcedimentsWithPermis(
 				usuari,
-				auth,
 				entitat,
 				permisos);
-		List<ProcedimentOrganEntity> procedimentsOrgansDisponibles = procedimentHelper.getProcedimentOrganWithPermis(
+		List<ProcedimentOrganEntity> procedimentsOrgansDisponibles = procedimentsCacheable.getProcedimentOrganWithPermis(
 				usuari,
 				auth,
 				entitat,

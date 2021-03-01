@@ -307,8 +307,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
 				synchronized(CreacioSemaforDto.getCreacioSemafor()) {
 					boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(
-							notificacioEntity,
-							notificacio.getEnviaments());
+							notificacioEntity);
 					if (notificar) 
 						notificaHelper.notificacioEnviar(notificacioEntity.getId());
 				}
@@ -741,8 +740,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
 					synchronized(CreacioSemaforDto.getCreacioSemafor()) {
 						boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(
-								notificacioEntity,
-								notificacio.getEnviaments());
+								notificacioEntity);
 						if (notificar) 
 							notificaHelper.notificacioEnviar(notificacioEntity.getId());
 					}
@@ -1574,11 +1572,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			List<RegistreIdDto> registresIdDto = new ArrayList<RegistreIdDto>();
 			NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioId);
 			logger.info(" [REG] Inici registre notificació [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
-			List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacioEntity);
-			
-			List<NotificacioEnviamentDtoV2> enviaments = conversioTipusHelper.convertirList(
-					enviamentsEntity, 
-					NotificacioEnviamentDtoV2.class);
+
 			long startTime = System.nanoTime();
 			double elapsedTime;
 			synchronized(CreacioSemaforDto.getCreacioSemafor()) {
@@ -1588,9 +1582,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				
 				if (estatActual.equals(NotificacioEstatEnumDto.PENDENT)) {
 					startTime = System.nanoTime();
-					boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(
-							notificacioEntity,
-							enviaments);
+					boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioEntity);
 					elapsedTime = (System.nanoTime() - startTime) / 10e6;
 					logger.info(" [TIMER-REG] Realitzar procés registrar [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
 					if (notificar){

@@ -3,14 +3,9 @@
  */
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.acl.AclSidEntity;
-import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.acl.AclObjectIdentityRepository;
 import es.caib.notib.core.repository.acl.AclSidRepository;
 import es.caib.notib.core.security.ExtendedPermission;
@@ -47,14 +42,6 @@ public class PermisosHelper {
 	private LookupStrategy lookupStrategy;
 	@Resource
 	private NotibMutableAclService aclService;
-	@Resource
-	private EntitatRepository entitatRepository;
-	@Resource
-	private OrganGestorRepository organGestorRepository;
-	@Resource
-	private PermisosHelper permisosHelper;
-	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private CacheHelper cacheHelper;
 	@Resource
@@ -274,17 +261,7 @@ public class PermisosHelper {
 		}
 		return result;
 	}
-
-	/**
-	 * Obté els identificadors de tots els objectes de la classe especificada sobre
-	 * els quals l'usuari actual té permisos
-	 *
-	 * @param clazz Classe dels objectes a consultar
-	 * @param permission Permís que es vol esbrinar si conté
-	 * @return Llista dels identificadors dels objectes seleccionats
-	 */
-	public List<Long> getObjectsIdsWithPermission(Class<?> clazz, Permission[] permissions) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	private List<AclSidEntity> getSids(Authentication auth) {
 		List<AclSidEntity> sids = new ArrayList<AclSidEntity>();
 		AclSidEntity userSid = aclSidRepository.getUserSid(auth.getName());
 		if (userSid != null) {
@@ -299,6 +276,52 @@ public class PermisosHelper {
 				sids.add(aclSid);
 			}
 		}
+		return sids;
+	}
+
+	/**
+	 * Consulta si l'usuari autenticat té permís per algún objecte de la classe indicada
+	 *
+	 * @param clazz Classe dels objectes a consultar
+	 * @param permissions Permisos que es vol esbrinar si conté
+	 * @return Llista dels identificadors dels objectes seleccionats
+	 */
+	public boolean isGrantedAny(Class<?> clazz, Permission[] permissions) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		return isGrantedAny(auth, clazz, permissions);
+	}
+
+	/**
+	 * Consulta si l'objecte auth indicat per paràmetre té permís per algún objecte de la classe indicada
+	 *
+	 * @param auth Authetication object to check
+	 * @param clazz Classe dels objectes a consultar
+	 * @param permissions Permisos que es vol esbrinar si conté
+	 * @return Llista dels identificadors dels objectes seleccionats
+	 */
+	public boolean isGrantedAny(Authentication auth, Class<?> clazz, Permission[] permissions) {
+		List<AclSidEntity> sids = getSids(auth);
+
+		// TODO: no estic segur si hauriem de fer un and binari de totes les mascares en lloc de passar una llista de masks
+		List<Integer> masks = new ArrayList<>();
+		for (Permission p : permissions){
+			masks.add(p.getMask());
+		}
+		return aclObjectIdentityRepository.hasObjectsWithAnyPermissions(clazz.getName(), sids, masks);
+	}
+
+	/**
+	 * Obté els identificadors de tots els objectes de la classe especificada sobre
+	 * els quals l'usuari actual té permisos
+	 *
+	 * @param clazz Classe dels objectes a consultar
+	 * @param permissions Permisos que es vol esbrinar si conté
+	 * @return Llista dels identificadors dels objectes seleccionats
+	 */
+	public List<Long> getObjectsIdsWithPermission(Class<?> clazz, Permission[] permissions) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		List<AclSidEntity> sids = getSids(auth);
+
 		// TODO: no estic segur si hauriem de fer un and binari de totes les mascares en lloc de passar una llista de masks
 		List<Integer> masks = new ArrayList<>();
 		for (Permission p : permissions){
@@ -744,117 +767,6 @@ public class PermisosHelper {
 			return rol;
 	}
 
-	public List<EntitatDto> findEntitatsAccessiblesUsuari(
-			String usuariCodi,
-			String rolActual) {
-		logger.debug("Consulta entitats accessibles (usuariCodi=" + usuariCodi + ")");
-		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		
-		if (rolActual != null && rolActual.equals("NOT_ADMIN_ORGAN")) {
-			
-			List<OrganGestorEntity> organsGestors = organGestorRepository.findAll();
-			Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADOR};
-			
-			permisosHelper.filterGrantedAny(
-					organsGestors,
-					new ObjectIdentifierExtractor<OrganGestorEntity>() {
-						public Long getObjectIdentifier(OrganGestorEntity organGestor) {
-							return organGestor.getId();
-						}
-					},
-					//revisar
-					OrganGestorEntity.class,
-					permisos,
-					auth);
-			Set<EntitatEntity> entitats = new HashSet<EntitatEntity>();
-			if (organsGestors != null) {
-				for (OrganGestorEntity organGestor: organsGestors) {
-					entitats.add(organGestor.getEntitat());
-				}
-			}
-			List<EntitatDto> resposta = conversioTipusHelper.convertirList(
-					new ArrayList<EntitatEntity>(entitats),
-					EntitatDto.class);
-			
-			for(EntitatDto dto : resposta) {
-				dto.setUsuariActualAdministradorOrgan(true);
-				dto.setUsuariActualAdministradorEntitat(true);
-			}
-			
-			return resposta;
-		} else {
-			List<EntitatEntity> entitats = entitatRepository.findByActiva(true);
-			
-			Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT};
-			
-			if (rolActual != null && rolActual.equals("tothom")) {
-				permisos = new Permission[] {ExtendedPermission.USUARI};
-			}
-			
-			permisosHelper.filterGrantedAny(
-					entitats,
-					new ObjectIdentifierExtractor<EntitatEntity>() {
-						public Long getObjectIdentifier(EntitatEntity entitat) {
-							return entitat.getId();
-						}
-					},
-					//revisar
-					EntitatEntity.class,
-					permisos,
-					auth);
-			
-			List<EntitatDto> resposta = conversioTipusHelper.convertirList(
-					entitats,
-					EntitatDto.class);
-			
-			permisos = new Permission[] {ExtendedPermission.ADMINISTRADOR};
-			for(EntitatDto dto : resposta) {
-				dto.setUsuariActualAdministradorEntitat(true);
-				List<OrganGestorEntity> organsGestors = organGestorRepository.findByEntitatId(dto.getId());
-				dto.setUsuariActualAdministradorOrgan(
-						permisosHelper.isGrantedAny(
-								organsGestors,
-								new ObjectIdentifierExtractor<OrganGestorEntity>() {
-									public Long getObjectIdentifier(OrganGestorEntity organGestor) {
-										return organGestor.getId();
-									}
-								},
-								OrganGestorEntity.class,
-								permisos,
-								auth));
-				
-			}
-			
-			return resposta;
-		}
-		
-//		usuarisEntitatHelper.omplirUsuarisPerEntitats(
-//				resposta,
-//				false);
-		
-		//////////////////////////////////////////////////////////////////
-		
-//		List<EntitatDto> entitats = conversioTipusHelper.convertirList(
-//				entitatRepository.findAll(),
-//				EntitatDto.class );
-//		
-//		List<EntitatDto> result = new ArrayList<>();
-//		for(EntitatDto e : entitats) {
-//			List<PermisDto> permisos = permisosHelper.findPermisos(
-//					e.getId(),
-//					EntitatEntity.class);
-//			for(PermisDto p : permisos) {
-//				if(p.getNom().equals(usuariCodi)) {
-//					e.setUsuariActualRepresentant(p.isRepresentant());
-//					result.add(e);
-//				}
-//			}
-//		}
-//		
-//		return result;
-	}
-	
 	public void revocarPermisosEntity(
 			Long objectIdentifier,
 			Class<?> clazz) {

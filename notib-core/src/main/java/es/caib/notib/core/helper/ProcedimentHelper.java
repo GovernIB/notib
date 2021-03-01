@@ -7,7 +7,6 @@ import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.ProcedimentOrganRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.unitat.NodeDir3;
@@ -15,7 +14,6 @@ import es.caib.notib.plugin.usuari.DadesUsuari;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,25 +41,15 @@ public class ProcedimentHelper {
 	@Autowired
 	private CacheHelper cacheHelper;
 	@Autowired
-	private OrganigramaHelper organigramaHelper;
-	@Autowired
 	private GrupProcedimentRepository grupProcedimentRepository;
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
-	@Autowired
-	private ProcedimentOrganRepository procedimentOrganRepository;
-//	@Autowired
-//	private AclObjectIdentityInstanceRepository<ProcedimentEntity> procedimentPermisRepository;
-//	@Autowired
-//	private AclObjectIdentityInstanceRepository<OrganGestorEntity> organPermisRepository;
 	@Resource
 	private OrganGestorService organGestorService;
 	@Resource
-	private OrganGestorHelper organGestorHelper;
-	@Resource
-	MessageHelper messageHelper;
+	private MessageHelper messageHelper;
 	
 	public void omplirPermisos(
 			ProcedimentDto procediment,
@@ -164,77 +152,6 @@ public class ProcedimentHelper {
 		return usuaris;
 	}
 
-	@Cacheable(value = "procedimentEntitiesPermis",
-			key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
-	public List<ProcedimentEntity> getProcedimentsWithPermis(
-			String usuariCodi,
-			Authentication auth,
-			EntitatEntity entitat,
-			Permission[] permisos) {
-
-		// 1. Obtenim els procediments amb permisos per procediment
-		List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
-		List<Long> procedimentsAmbPermisIds = permisosHelper.getObjectsIdsWithPermission(
-				ProcedimentEntity.class,
-				permisos
-		);
-		// selecciona els expedients amb permisos per procediment de l'entitat i dels grups
-		List<ProcedimentEntity> procedimentsAmbPermis =  procedimentRepository.findProcedimentsByEntitatAndGrupAndIds(entitat,
-				grups,
-				procedimentsAmbPermisIds);
-
-		// 2. Obtenim els òrgans gestors amb permisos
-		List<OrganGestorEntity> organsGestorsAmbPermis = organGestorHelper.findOrganismesEntitatAmbPermis(entitat,
-				permisos);
-
-		// 3. Obtenim els òrgans gestors fills dels organs gestors amb permisos
-		List<String> organsGestorsCodisAmbPermis = new ArrayList<String>();
-		if (!organsGestorsAmbPermis.isEmpty()) {
-			Set<String> codisOrgansAmbDescendents = new HashSet<String>();
-			for (OrganGestorEntity organGestorEntity : organsGestorsAmbPermis) {
-				codisOrgansAmbDescendents.addAll(
-						organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
-								entitat.getDir3Codi(),
-								organGestorEntity.getCodi()));
-			}
-			organsGestorsCodisAmbPermis = new ArrayList<String>(codisOrgansAmbDescendents);
-		}
-
-		// 4. Obtenim els procediments amb permisos per òrgan gestor
-		List<ProcedimentEntity> procedimentsAmbPermisOrgan = new ArrayList<ProcedimentEntity>();
-		if (!organsGestorsCodisAmbPermis.isEmpty()) {
-			procedimentsAmbPermisOrgan = procedimentRepository.findByOrganGestorCodiInAndGrup(organsGestorsCodisAmbPermis, grups);
-		}
-
-		// 5. Juntam els procediments amb permís per òrgan gestor amb els procediments amb permís per procediment
-		List<ProcedimentEntity> setProcediments = new ArrayList<ProcedimentEntity>(procedimentsAmbPermis);
-		setProcediments.addAll(procedimentsAmbPermisOrgan);
-		return setProcediments;
-	}
-
-	@Cacheable(value = "procedimentEntitiessOrganPermis", key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
-	public List<ProcedimentOrganEntity> getProcedimentOrganWithPermis(
-			String usuariCodi,
-			Authentication auth,
-			EntitatEntity entitat,
-			Permission[] permisos) {
-		// 1. Obtenim els procediments amb permisos per procediment
-		List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
-		List<ProcedimentOrganEntity> procedimentOrgans = procedimentOrganRepository.findProcedimentsOrganByEntitatAndGrup(entitat, grups);
-		List<ProcedimentOrganEntity> procedimentOrgansAmbPermis = new ArrayList<ProcedimentOrganEntity>(procedimentOrgans);
-		permisosHelper.filterGrantedAny(
-				procedimentOrgansAmbPermis,
-				new PermisosHelper.ObjectIdentifierExtractor<ProcedimentOrganEntity>() {
-					public Long getObjectIdentifier(ProcedimentOrganEntity procedimentOrgan) {
-						return procedimentOrgan.getId();
-					}
-				},
-				ProcedimentOrganEntity.class,
-				permisos,
-				auth);
-		return procedimentOrgansAmbPermis;
-	}
-	
 	public Set<String> findUsuarisAmbPermisReadPerGrupNotificacio(
 			GrupEntity grup,
 			ProcedimentEntity procediment) {
@@ -248,24 +165,24 @@ public class ProcedimentHelper {
 		if (grupProcediment != null) {
 			List<DadesUsuari> usuarisGrup = pluginHelper.dadesUsuariConsultarAmbGrup(
 					grupProcediment.getGrup().getCodi());
-				sb.append(" rol ").append(grupProcediment.getGrup().getCodi()).append(" (");
-				if (usuarisGrup != null) {
-					for (DadesUsuari usuariGrup: usuarisGrup) {
-						for (PermisDto permis : permisos) {
-							if (permis.getPrincipal().equals(usuariGrup.getCodi())) {
-								usuaris.add(usuariGrup.getCodi());
-								sb.append(" ").append(usuariGrup.getCodi());
-							}
+			sb.append(" rol ").append(grupProcediment.getGrup().getCodi()).append(" (");
+			if (usuarisGrup != null) {
+				for (DadesUsuari usuariGrup: usuarisGrup) {
+					for (PermisDto permis : permisos) {
+						if (permis.getPrincipal().equals(usuariGrup.getCodi())) {
+							usuaris.add(usuariGrup.getCodi());
+							sb.append(" ").append(usuariGrup.getCodi());
 						}
 					}
 				}
-				sb.append(")");
-			
+			}
+			sb.append(")");
+
 		}
 		logger.debug(sb.toString());
 		return usuaris;
 	}
-	
+
 	@Transactional(timeout = 300, propagation = Propagation.REQUIRES_NEW)
 	public void actualitzarProcedimentFromGda(
 			ProgresActualitzacioDto progres, 

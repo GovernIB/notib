@@ -60,13 +60,7 @@ public class CacheHelper {
 
 	public static String appVersion;
 
-	@Cacheable(value = "entitatsUsuari", key="#usuariCodi.concat('-').concat(#rolActual)")
-	public List<EntitatDto> findEntitatsAccessiblesUsuari(
-			String usuariCodi,
-			String rolActual) {
-		return permisosHelper.findEntitatsAccessiblesUsuari(usuariCodi, rolActual);
-	}
-	
+
 	@Cacheable(value = "organsGestorsUsuari", key="#auth.name")
 	public List<OrganGestorDto> findOrgansGestorsAccessiblesUsuari(Authentication auth) {
 		List<OrganGestorEntity> organsGestors = organGestorRepository.findAll();
@@ -220,14 +214,6 @@ public class CacheHelper {
 	
 	@CacheEvict(value = "organsGestorsUsuari", allEntries = true)
 	public void evictFindOrgansGestorsAccessiblesUsuari() {
-	}
-	
-	@CacheEvict(value = "entitatsUsuari", allEntries = true)
-	public void evictFindEntitatsAccessiblesUsuari() {
-	}
-	
-	@CacheEvict(value = "getPermisosEntitatsUsuariActual", key="#auth.name")
-	public void evictGetPermisosEntitatsUsuariActual(Authentication auth) {
 	}
 
 	@CacheEvict(value = "getPermisosEntitatsUsuariActual", allEntries = true)
