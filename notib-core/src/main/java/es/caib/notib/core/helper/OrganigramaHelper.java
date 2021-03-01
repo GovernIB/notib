@@ -1,15 +1,15 @@
 package es.caib.notib.core.helper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import es.caib.notib.core.api.dto.OrganismeDto;
+import es.caib.notib.core.cacheable.OrganGestorCachable;
+import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.repository.OrganGestorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.core.api.dto.OrganismeDto;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.repository.OrganGestorRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Helper per a convertir entities a dto
@@ -18,14 +18,14 @@ import es.caib.notib.core.repository.OrganGestorRepository;
  */
 @Component
 public class OrganigramaHelper {
-	
-	@Autowired
-	private CacheHelper cacheHelper;
+
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
+	@Autowired
+	private OrganGestorCachable organGestorCachable;
 	
 	public List<OrganismeDto> getOrganismesFillsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
-		Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(codiDir3Entitat);
+		Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(codiDir3Entitat);
 		
 		String codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
 		
@@ -39,47 +39,20 @@ public class OrganigramaHelper {
 	}
 	
 	public List<String> getCodisOrgansGestorsFillsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
-		Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(codiDir3Entitat);
-		
-		String codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
-		
-		List<String> unitatsEntitat = new ArrayList<String>();
-		
-		unitatsEntitat.addAll(getCodisOrgansGestorsFills(organigramaEntitat, codiDir3));
-		return unitatsEntitat;
+		return organGestorCachable.getCodisOrgansGestorsFillsByOrgan(codiDir3Entitat, codiDir3Organ);
 	}
-	
-	public List<String> getCodisOrgansGestorsFillsExistentsByEntitat(String codiDir3Entitat) {
-		return getCodisOrgansGestorsFillsExistentsByOrgan(codiDir3Entitat, null);
-	}
-	
+
 	public List<String> getCodisOrgansGestorsFillsExistentsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
-		Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(codiDir3Entitat);
-		
-		String codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
-		
-		List<String> unitatsEntitat = new ArrayList<String>();
-		unitatsEntitat.addAll(getCodisOrgansGestorsFills(organigramaEntitat, codiDir3));
-		
+		List<String> unitatsEntitat = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(codiDir3Entitat, codiDir3Organ);
+
 		List<String> unitatsExistents = organGestorRepository.findCodisByEntitatDir3(codiDir3Entitat);
 		unitatsEntitat.retainAll(unitatsExistents);
 		return unitatsEntitat;
 	}
+//	public List<String> getCodisOrgansGestorsFillsExistentsByEntitat(String codiDir3Entitat) {
+//		return getCodisOrgansGestorsFillsExistentsByOrgan(codiDir3Entitat, null);
+//	}
 
-	private List<String> getCodisOrgansGestorsFills(
-			Map<String, OrganismeDto> organigrama,
-			String codiDir3) {
-		List<String> unitats = new ArrayList<String>();
-		unitats.add(codiDir3);
-		OrganismeDto organisme = organigrama.get(codiDir3);
-		if (organisme != null && organisme.getFills() != null && !organisme.getFills().isEmpty()) {
-			for (String fill: organisme.getFills()) {
-				unitats.addAll(getCodisOrgansGestorsFills(organigrama, fill));
-			}
-		}
-		return unitats;
-	}
-	
 	private List<OrganismeDto> getOrgansGestorsFills(
 			Map<String, OrganismeDto> organigrama,
 			String codiDir3) {
@@ -95,7 +68,7 @@ public class OrganigramaHelper {
 	}
 
 	public List<String> getCodisOrgansGestorsParesExistentsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
-		Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(codiDir3Entitat);
+		Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(codiDir3Entitat);
 		
 		String codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
 		
@@ -108,7 +81,7 @@ public class OrganigramaHelper {
 	}
 	
 	public List<OrganGestorEntity> getOrgansGestorsParesExistentsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
-		Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(codiDir3Entitat);
+		Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(codiDir3Entitat);
 		
 		String codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
 		

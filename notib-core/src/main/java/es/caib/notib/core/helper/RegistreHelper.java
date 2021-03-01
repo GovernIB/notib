@@ -53,9 +53,9 @@ public class RegistreHelper {
 		long startTime;
 		double elapsedTime;
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
-		logger.info(" [SIR] Inici actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacio().getId());
-//		enviament.setNotificacio(notificacio);
+		logger.info(" [SIR] Inici actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
+
 		String descripcio;
 		logger.debug("Comunicació SIR --> consular estat...");
 
@@ -68,71 +68,68 @@ public class RegistreHelper {
 				"registreNumeroFormatat=" + enviament.getRegistreNumeroFormatat() + ")";
 		
 		try {
-			if (enviament.getRegistreNumeroFormatat() != null) {
-				logger.debug("Comunicació SIR --> número registre formatat: " + enviament.getRegistreNumeroFormatat());
-				logger.debug("Comunicació SIR --> consulant estat...");
-
-				startTime = System.nanoTime();
-				RespostaConsultaRegistre resposta = pluginHelper.obtenerAsientoRegistral(
-						notificacio.getEntitat().getDir3Codi(),
-						enviament.getRegistreNumeroFormatat(), 
-						2L,  //registre sortida
-						false);
-				elapsedTime = (System.nanoTime() - startTime) / 10e6;
-				logger.info(" [TIMER-SIR] Obtener asiento registral  [Id: " + enviamentId + "]: " + elapsedTime + " ms");
-//				if (resposta != null) {
-				
-				logger.debug("Comunicació SIR --> creació event...");
-				if (resposta.getErrorCodi() != null && !resposta.getErrorCodi().isEmpty()) {
-					startTime = System.nanoTime();
-					//Crea un nou event
-					notificacioEventHelper.addRegistreCallBackEstatEvent(notificacio, enviament, resposta.getErrorDescripcio(), true);
-
-					if (enviament.getSirConsultaIntent() >= pluginHelper.getConsultaSirReintentsMaxProperty()) {
-						notificacioEventHelper.addNotificaConsultaSirErrorEvent(notificacio, enviament);
-					}
-					elapsedTime = (System.nanoTime() - startTime) / 10e6;
-					logger.info(" [TIMER-SIR] Creació nou event error [Id: " + enviamentId + "]: " + elapsedTime + " ms");
-				} else {
-					startTime = System.nanoTime();
-					enviamentUpdateDatat(
-							resposta.getEstat(),
-							resposta.getRegistreData(), 
-							resposta.getSirRecepecioData(),
-							resposta.getSirRegistreDestiData(),
-							resposta.getRegistreNumeroFormatat(), 
-							enviament);
-					elapsedTime = (System.nanoTime() - startTime) / 10e6;
-					logger.info(" [TIMER-SIR] Actualitzar estat comunicació SIR [Id: " + enviamentId + "]: " + elapsedTime + " ms");
-					
-					logger.debug("Comunicació SIR --> nou estat: " + resposta.getEstat() != null ? resposta.getEstat().name() : "");
-					if (resposta.getEstat() != null)
-						descripcio = resposta.getEstat().name();
-					else
-						descripcio = resposta.getRegistreNumeroFormatat();
-					
-					//Crea un nou event
-					notificacioEventHelper.addRegistreCallBackEstatEvent(notificacio, enviament, descripcio, false);
-					logger.debug("Comunicació SIR --> enviar correu si és aplicació...");
-					if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
-						startTime = System.nanoTime();
-						emailHelper.prepararEnvioEmailNotificacio(notificacio);
-						elapsedTime = (System.nanoTime() - startTime) / 10e6;
-						logger.info(" [TIMER-SIR] Preparar enviament mail notificació [Id: " + enviamentId + "]: " + elapsedTime + " ms");
-					}
-					enviament.refreshSirConsulta();
-				}
-//				}
-				logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-//				return true;
-			} else {
+			if (enviament.getRegistreNumeroFormatat() == null) {
 				logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 				throw new ValidationException(
 						enviament,
 						NotificacioEnviamentEntity.class,
 						"L'enviament no té número de registre SIR");
-//				return false;
 			}
+
+			logger.debug("Comunicació SIR --> número registre formatat: " + enviament.getRegistreNumeroFormatat());
+			logger.debug("Comunicació SIR --> consulant estat...");
+
+			startTime = System.nanoTime();
+			RespostaConsultaRegistre resposta = pluginHelper.obtenerAsientoRegistral(
+					notificacio.getEntitat().getDir3Codi(),
+					enviament.getRegistreNumeroFormatat(),
+					2L,  //registre sortida
+					false);
+			elapsedTime = (System.nanoTime() - startTime) / 10e6;
+			logger.info(" [TIMER-SIR] Obtener asiento registral  [Id: " + enviamentId + "]: " + elapsedTime + " ms");
+
+			logger.debug("Comunicació SIR --> creació event...");
+			if (resposta.getErrorCodi() != null && !resposta.getErrorCodi().isEmpty()) {
+				startTime = System.nanoTime();
+				//Crea un nou event
+				notificacioEventHelper.addRegistreCallBackEstatEvent(notificacio, enviament, resposta.getErrorDescripcio(), true);
+
+				if (enviament.getSirConsultaIntent() >= pluginHelper.getConsultaSirReintentsMaxProperty()) {
+					notificacioEventHelper.addNotificaConsultaSirErrorEvent(notificacio, enviament);
+				}
+				elapsedTime = (System.nanoTime() - startTime) / 10e6;
+				logger.info(" [TIMER-SIR] Creació nou event error [Id: " + enviamentId + "]: " + elapsedTime + " ms");
+			} else {
+				startTime = System.nanoTime();
+				enviamentUpdateDatat(
+						resposta.getEstat(),
+						resposta.getRegistreData(),
+						resposta.getSirRecepecioData(),
+						resposta.getSirRegistreDestiData(),
+						resposta.getRegistreNumeroFormatat(),
+						enviament);
+				elapsedTime = (System.nanoTime() - startTime) / 10e6;
+				logger.info(" [TIMER-SIR] Actualitzar estat comunicació SIR [Id: " + enviamentId + "]: " + elapsedTime + " ms");
+
+				logger.debug("Comunicació SIR --> nou estat: " + resposta.getEstat() != null ? resposta.getEstat().name() : "");
+				if (resposta.getEstat() != null)
+					descripcio = resposta.getEstat().name();
+				else
+					descripcio = resposta.getRegistreNumeroFormatat();
+
+				//Crea un nou event
+				notificacioEventHelper.addRegistreCallBackEstatEvent(notificacio, enviament, descripcio, false);
+				logger.debug("Comunicació SIR --> enviar correu si és aplicació...");
+				if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
+					startTime = System.nanoTime();
+					emailHelper.prepararEnvioEmailNotificacio(notificacio);
+					elapsedTime = (System.nanoTime() - startTime) / 10e6;
+					logger.info(" [TIMER-SIR] Preparar enviament mail notificació [Id: " + enviamentId + "]: " + elapsedTime + " ms");
+				}
+				enviament.refreshSirConsulta();
+			}
+			logger.info(" [SIR] Fi actualitzar estat registre enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
+
 		} catch (Exception ex) {
 			logger.error(
 					errorPrefix,

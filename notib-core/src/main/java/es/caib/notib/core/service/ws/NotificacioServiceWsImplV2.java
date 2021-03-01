@@ -9,6 +9,7 @@ import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.ws.notificacio.*;
+import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.*;
@@ -25,18 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.jws.WebService;
 import javax.mail.internet.InternetAddress;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URLConnection;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implementació del servei per a l'enviament i consulta de notificacions V2 (Sense paràmetres SEU).
@@ -96,6 +89,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private AuditNotificacioHelper auditNotificacioHelper;
 	@Autowired
 	private AuditEnviamentHelper auditEnviamentHelper;
+	@Autowired
+	private OrganGestorCachable organGestorCachable;
 
 	private static final String COMUNICACIOAMBADMINISTRACIO = "comunicacioAmbAdministracio";
 	@Transactional
@@ -189,7 +184,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				if (organGestor == null) {
 					organGestor = organGestorRepository.findByCodi(notificacio.getOrganGestor());
 					if (organGestor == null) {
-						Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(entitat.getDir3Codi());
+						Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
 						if (!organigramaEntitat.containsKey(notificacio.getOrganGestor())) {
 							logger.debug(">> [ALTA] Organ gestor desconegut");
 							String errorDescripcio = "[1023] El camp 'organ gestor' no es correspon a cap Òrgan Gestor de l'entitat especificada.";
@@ -358,16 +353,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				
 				if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
 					logger.debug(">> [ALTA] notificació síncrona");
-					List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacioGuardada);
-					List<NotificacioEnviamentDtoV2> enviaments = conversioTipusHelper.convertirList(
-							enviamentsEntity,
-							NotificacioEnviamentDtoV2.class);
+//					List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacioGuardada);
+//					List<NotificacioEnviamentDtoV2> enviaments = conversioTipusHelper.convertirList(
+//							enviamentsEntity,
+//							NotificacioEnviamentDtoV2.class);
 					
 					logger.info(" [ALTA] Enviament SINCRON notificació [Id: " + notificacioGuardada.getId() + ", Estat: " + notificacioGuardada.getEstat() + "]");
 					synchronized(CreacioSemaforDto.getCreacioSemafor()) {
-						boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(
-								notificacioGuardada,
-								enviaments);
+						boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioGuardada);
 						if (notificar)
 							notificaHelper.notificacioEnviar(notificacioGuardada.getId());
 					}

@@ -1,19 +1,18 @@
-/**
- * 
- */
-package es.caib.notib.core.entity;
+package es.caib.notib.core.entity.acl;
+
+import lombok.Getter;
+import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-
-import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
  * Classe del model de dades que representa un SID d'una ACL.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
 @Entity
 @Table(name = "not_acl_sid")
 public class AclSidEntity extends AbstractPersistable<Long> {
@@ -23,14 +22,6 @@ public class AclSidEntity extends AbstractPersistable<Long> {
 	@Column(name = "sid", length = 100, nullable = false)
 	private String sid;
 
-
-
-	public boolean isPrincipal() {
-		return principal;
-	}
-	public String getSid() {
-		return sid;
-	}
 
 	@Override
 	public int hashCode() {

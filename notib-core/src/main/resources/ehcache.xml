@@ -37,4 +37,5 @@
 	<cache name="oficinesSIRUnitat" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
 	<cache name="organigramaOriginal" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />
 	<cache name="oficinesSIREntitat" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
+	<cache name="codisOrgansFills" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
 </ehcache>

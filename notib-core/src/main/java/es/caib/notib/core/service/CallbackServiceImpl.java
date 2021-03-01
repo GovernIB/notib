@@ -1,7 +1,12 @@
 package es.caib.notib.core.service;
 
-import java.util.List;
-
+import com.codahale.metrics.Timer;
+import es.caib.notib.core.api.service.CallbackService;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.helper.CallbackHelper;
+import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.PropertiesHelper;
+import es.caib.notib.core.repository.NotificacioEventRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,14 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.codahale.metrics.Timer;
-
-import es.caib.notib.core.api.service.CallbackService;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.helper.CallbackHelper;
-import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
-import es.caib.notib.core.repository.NotificacioEventRepository;
+import java.util.List;
 
 /**
  * Classe que implementa el servei de callback cap a les aplicacions clients de Notib
@@ -56,7 +54,6 @@ public class CallbackServiceImpl implements CallbackService {
 						logger.debug(">>> Enviant avís a aplicació client de canvi d'estat de la notificació amb identificador: " + pendentsId);
 						NotificacioEntity notificacioProcessada = callbackHelper.notifica(pendentsId);
 						if (notificacioProcessada != null && notificacioProcessada.isErrorLastCallback()) { 
-//						if (!callbackHelper.notifica(pendentsId)) {
 							errors++;
 						}
 					}

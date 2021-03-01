@@ -3,6 +3,33 @@
  */
 package es.caib.notib.core.service;
 
+import com.codahale.metrics.Timer;
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.service.AuditService.TipusEntitat;
+import es.caib.notib.core.api.service.AuditService.TipusObjecte;
+import es.caib.notib.core.api.service.AuditService.TipusOperacio;
+import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.core.aspect.Audita;
+import es.caib.notib.core.cacheable.PermisosCacheable;
+import es.caib.notib.core.cacheable.OrganGestorCachable;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.EntitatTipusDocEntity;
+import es.caib.notib.core.helper.*;
+import es.caib.notib.core.repository.AplicacioRepository;
+import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.EntitatTipusDocRepository;
+import es.caib.notib.core.security.ExtendedPermission;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -12,49 +39,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Resource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.codahale.metrics.Timer;
-
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.OficinaDto;
-import es.caib.notib.core.api.dto.OrganismeDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.RolEnumDto;
-import es.caib.notib.core.api.dto.TipusDocumentDto;
-import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
-import es.caib.notib.core.api.service.AuditService.TipusEntitat;
-import es.caib.notib.core.api.service.AuditService.TipusObjecte;
-import es.caib.notib.core.api.service.AuditService.TipusOperacio;
-import es.caib.notib.core.api.service.EntitatService;
-import es.caib.notib.core.aspect.Audita;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.EntitatTipusDocEntity;
-import es.caib.notib.core.helper.CacheHelper;
-import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.EntityComprovarHelper;
-import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.PaginacioHelper;
-import es.caib.notib.core.helper.PermisosHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
-import es.caib.notib.core.helper.UsuariHelper;
-import es.caib.notib.core.repository.AplicacioRepository;
-import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.EntitatTipusDocRepository;
-import es.caib.notib.core.security.ExtendedPermission;
 
 /**
  * Implementació del servei de gestió d'entitats.
@@ -81,10 +65,11 @@ public class EntitatServiceImpl implements EntitatService {
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
-	private UsuariHelper usuariHelper;
+	private PermisosCacheable permisosCacheable;
 	@Resource
 	private MetricsHelper metricsHelper;
-
+	@Autowired
+	private OrganGestorCachable organGestorCachable;
 
 	@Audita(entityType = TipusEntitat.ENTITAT, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
 	@Transactional
@@ -442,7 +427,7 @@ public class EntitatServiceImpl implements EntitatService {
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			logger.debug("Consulta les entitats accessibles per l'usuari actual (usuari=" + auth.getName() + ")");
-			return cacheHelper.findEntitatsAccessiblesUsuari(auth.getName(), rolActual);
+			return permisosCacheable.findEntitatsAccessiblesUsuari(auth.getName(), rolActual);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -581,9 +566,8 @@ public class EntitatServiceImpl implements EntitatService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//			System.out.println("Obtenim els permisos de " + auth.getName());
 			if (auth != null) {
-				return entityComprovarHelper.getPermisosEntitatsUsuariActual(auth);
+				return permisosCacheable.getPermisosEntitatsUsuariActual(auth);
 			} else {
 				Map<RolEnumDto, Boolean> hasPermisos = new HashMap<RolEnumDto, Boolean>();
 				hasPermisos.put(RolEnumDto.tothom, false);
@@ -674,7 +658,7 @@ public class EntitatServiceImpl implements EntitatService {
 	public Map<String, OrganismeDto> findOrganigramaByEntitat(String entitatCodi) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			return cacheHelper.findOrganigramaByEntitat(entitatCodi);
+			return organGestorCachable.findOrganigramaByEntitat(entitatCodi);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

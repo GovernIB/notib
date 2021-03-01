@@ -3,56 +3,28 @@
  */
 package es.caib.notib.core.helper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.exception.PermissionDeniedException;
+import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.entity.*;
+import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.notib.core.repository.*;
+import es.caib.notib.core.security.ExtendedPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.PermisEnum;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.RolEnumDto;
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.exception.PermissionDeniedException;
-import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.GrupEntity;
-import es.caib.notib.core.entity.GrupProcedimentEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.PagadorCieEntity;
-import es.caib.notib.core.entity.PagadorCieFormatFullaEntity;
-import es.caib.notib.core.entity.PagadorCieFormatSobreEntity;
-import es.caib.notib.core.entity.PagadorPostalEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.ProcedimentOrganEntity;
-import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.GrupProcedimentRepository;
-import es.caib.notib.core.repository.GrupRepository;
-import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.PagadorCieFormatFullaRepository;
-import es.caib.notib.core.repository.PagadorCieFormatSobreRepository;
-import es.caib.notib.core.repository.PagadorCieRepository;
-import es.caib.notib.core.repository.PagadorPostalRepository;
-import es.caib.notib.core.repository.ProcedimentOrganRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
-import es.caib.notib.core.security.ExtendedPermission;
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Helper per a la comprovació de l'existencia d'entitats de base de dades.
@@ -721,79 +693,7 @@ public class EntityComprovarHelper {
 		}
 		return grupsEntity;
 	}
-	
-	@Cacheable(value = "getPermisosEntitatsUsuariActual", key="#auth.name")
-	public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual(Authentication auth) {
-		List<EntitatEntity> entitatsEntity = entitatRepository.findAll();
-		List<OrganGestorEntity> organsGestorsEntity = organGestorRepository.findAll();
-		Map<RolEnumDto, Boolean> hasPermisos = new HashMap<RolEnumDto, Boolean>();
-		
-		Boolean hasPermisUsuariEntitat = permisosHelper.isGrantedAny(
-				entitatsEntity, 
-				new ObjectIdentifierExtractor<EntitatEntity>() {
-					public Long getObjectIdentifier(EntitatEntity entitatEntity) {
-						return entitatEntity.getId();
-					}
-				}, 
-				EntitatEntity.class, 
-				new Permission[] {ExtendedPermission.USUARI}, 
-				auth);
-		Boolean hasPermisAdminEntitat = permisosHelper.isGrantedAny(
-				entitatsEntity, 
-				new ObjectIdentifierExtractor<EntitatEntity>() {
-					public Long getObjectIdentifier(EntitatEntity entitatEntity) {
-						return entitatEntity.getId();
-					}
-				}, 
-				EntitatEntity.class, 
-				new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT}, 
-				auth);		
-		Boolean hasPermisAplicacioEntitat = permisosHelper.isGrantedAny(
-				entitatsEntity, 
-				new ObjectIdentifierExtractor<EntitatEntity>() {
-					public Long getObjectIdentifier(EntitatEntity entitatEntity) {
-						return entitatEntity.getId();
-					}
-				}, 
-				EntitatEntity.class, 
-				new Permission[] {ExtendedPermission.APLICACIO}, 
-				auth);
-		Boolean hasPermisAdminOrgan = permisosHelper.isGrantedAny(
-				organsGestorsEntity, 
-				new ObjectIdentifierExtractor<OrganGestorEntity>() {
-					public Long getObjectIdentifier(OrganGestorEntity organGestorEntity) {
-						return organGestorEntity.getId();
-					}
-				}, 
-				OrganGestorEntity.class, 
-				new Permission[] {ExtendedPermission.ADMINISTRADOR}, 
-				auth);
-		
-		hasPermisos.put(RolEnumDto.tothom, hasPermisUsuariEntitat);
-		hasPermisos.put(RolEnumDto.NOT_ADMIN, hasPermisAdminEntitat);
-		hasPermisos.put(RolEnumDto.NOT_APL, hasPermisAplicacioEntitat);
-		hasPermisos.put(RolEnumDto.NOT_ADMIN_ORGAN, hasPermisAdminOrgan);
 
-		if (getGenerarLogsPermisosOrgan()) {
-			log.info("### PERMISOS - Obtenir Permisos ###########################################");
-			log.info("### -----------------------------------------------------------------------");
-			log.info("### Usuari: " + auth.getName());
-			log.info("### Rols: ");
-			if (auth.getAuthorities() != null)
-				for (GrantedAuthority authority : auth.getAuthorities()) {
-					log.info("### # " + authority.getAuthority());
-				}
-			log.info("### Permís Usuari: " + hasPermisUsuariEntitat);
-			log.info("### Permís Adm entitat: " + hasPermisAdminEntitat);
-			log.info("### Permís Adm òrgan: " + hasPermisAdminOrgan);
-			log.info("### Permís Aplicació: " + hasPermisAplicacioEntitat);
-			log.info("### -----------------------------------------------------------------------");
-		}
-
-		return hasPermisos;
-		
-	}
-	
 	public List<EntitatDto> findPermisEntitat(
 			Permission[] permisos) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();

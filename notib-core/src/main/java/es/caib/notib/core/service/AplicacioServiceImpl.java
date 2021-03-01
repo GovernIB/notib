@@ -3,10 +3,21 @@
  */
 package es.caib.notib.core.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import com.codahale.metrics.Timer;
+import com.codahale.metrics.json.MetricsModule;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import es.caib.notib.core.api.dto.ExcepcioLogDto;
+import es.caib.notib.core.api.dto.IntegracioAccioDto;
+import es.caib.notib.core.api.dto.IntegracioDto;
+import es.caib.notib.core.api.dto.UsuariDto;
+import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.cacheable.PermisosCacheable;
+import es.caib.notib.core.entity.UsuariEntity;
+import es.caib.notib.core.helper.*;
+import es.caib.notib.core.repository.UsuariRepository;
+import es.caib.notib.core.repository.acl.AclSidRepository;
+import es.caib.notib.plugin.usuari.DadesUsuari;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,26 +27,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.codahale.metrics.Timer;
-import com.codahale.metrics.json.MetricsModule;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import es.caib.notib.core.api.dto.ExcepcioLogDto;
-import es.caib.notib.core.api.dto.IntegracioAccioDto;
-import es.caib.notib.core.api.dto.IntegracioDto;
-import es.caib.notib.core.api.dto.UsuariDto;
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.service.AplicacioService;
-import es.caib.notib.core.entity.UsuariEntity;
-import es.caib.notib.core.helper.CacheHelper;
-import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.ExcepcioLogHelper;
-import es.caib.notib.core.helper.IntegracioHelper;
-import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
-import es.caib.notib.core.repository.AclSidRepository;
-import es.caib.notib.core.repository.UsuariRepository;
-import es.caib.notib.plugin.usuari.DadesUsuari;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Implementació dels mètodes per a gestionar la versió de l'aplicació.
@@ -53,6 +47,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Autowired
 	private CacheHelper cacheHelper;
+	@Autowired
+	private PermisosCacheable permisosCacheable;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -110,7 +106,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 							DadesUsuari.class);
 				}
 			}
-			cacheHelper.evictGetPermisosEntitatsUsuariActual(auth);
+			permisosCacheable.evictGetPermisosEntitatsUsuariActual(auth);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

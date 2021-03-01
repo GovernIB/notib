@@ -51,6 +51,7 @@
 	<context:annotation-config />
 	<context:component-scan base-package="es.caib.notib.core.service" />
 	<context:component-scan base-package="es.caib.notib.core.helper" />
+	<context:component-scan base-package="es.caib.notib.core.cacheable" />
 	<context:component-scan base-package="es.caib.notib.core.aspect" />
 	<jpa:repositories base-package="es.caib.notib.core.repository" />
 

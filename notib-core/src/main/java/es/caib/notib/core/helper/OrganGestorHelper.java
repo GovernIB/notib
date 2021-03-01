@@ -1,29 +1,21 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
-import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.api.service.OrganGestorService;
-import es.caib.notib.core.entity.*;
-import es.caib.notib.core.repository.GrupProcedimentRepository;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.ProcedimentOrganRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
-import es.caib.notib.core.security.ExtendedPermission;
-import es.caib.notib.plugin.usuari.DadesUsuari;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Helper per a convertir entities a dto
@@ -52,18 +44,8 @@ public class OrganGestorHelper {
 			Permission[] permisos) {
 
 		// 1. Obtenim els òrgans gestors amb permisos
-		List<OrganGestorEntity> organsDisponibles = organGestorRepository.findByEntitat(entitat);
-
-		permisosHelper.filterGrantedAny(
-				organsDisponibles,
-				new PermisosHelper.ObjectIdentifierExtractor<OrganGestorEntity>() {
-					public Long getObjectIdentifier(OrganGestorEntity organGestor) {
-						return organGestor.getId();
-					}
-				},
-				OrganGestorEntity.class,
-				permisos,
-				auth);
+		List<OrganGestorEntity> organsDisponibles = findOrganismesEntitatAmbPermis(entitat,
+				permisos);
 
 		if (organsDisponibles != null && !organsDisponibles.isEmpty()) {
 			Set<OrganGestorEntity> organsGestorsAmbPermis = new HashSet<>(organsDisponibles);
@@ -84,6 +66,16 @@ public class OrganGestorHelper {
 		}
 
 		return organsDisponibles;
+	}
+
+	public List<OrganGestorEntity> findOrganismesEntitatAmbPermis(EntitatEntity entitat, Permission[] permisos) {
+		List<Long> objectsIds = permisosHelper.getObjectsIdsWithPermission(
+				OrganGestorEntity.class,
+				permisos);
+		if (objectsIds.isEmpty()) {
+			return new ArrayList<OrganGestorEntity>();
+		}
+		return organGestorRepository.findByEntitatAndIds(entitat, objectsIds);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(OrganGestorHelper.class);

@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -49,8 +48,7 @@ public class RegistreNotificaHelper {
 	private NotificacioEventHelper notificacioEventHelper;
 
 	public boolean realitzarProcesRegistrar(
-			NotificacioEntity notificacioEntity,
-			List<NotificacioEnviamentDtoV2> enviaments) throws RegistreNotificaException {
+			NotificacioEntity notificacioEntity) throws RegistreNotificaException {
 		logger.info(" [REG-NOT] Inici procés registrar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
 		boolean enviarANotifica = false;
 		boolean isComunicacio = NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus());

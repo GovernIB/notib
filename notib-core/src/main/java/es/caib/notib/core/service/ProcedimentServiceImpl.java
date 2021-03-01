@@ -13,6 +13,8 @@ import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.aspect.Audita;
+import es.caib.notib.core.cacheable.OrganGestorCachable;
+import es.caib.notib.core.cacheable.ProcedimentsCacheable;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
@@ -23,6 +25,7 @@ import es.caib.notib.plugin.registre.TipusAssumpte;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -83,7 +86,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private NotificacioRepository notificacioRepository;
 	@Resource
 	private ProcedimentOrganRepository procedimentOrganRepository;
-	
+	@Autowired
+	private OrganGestorCachable organGestorCachable;
+	@Autowired
+	private ProcedimentsCacheable procedimentsCacheable;
+
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
 	
 	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
@@ -421,7 +428,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						false);
 
 				startTime = System.nanoTime();
-				Map<String, OrganismeDto> organigramaEntitat = cacheHelper.findOrganigramaByEntitat(entitatDto.getDir3Codi());
+				Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(entitatDto.getDir3Codi());
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				logger.info(" [TIMER-PRO] Obtenir organigrama de l'entitat: " + elapsedTime + " ms");
 //				OficinaDto oficinaVirtual = pluginHelper.llistarOficinaVirtual(
@@ -993,7 +1000,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	public List<ProcedimentDto> findProcedimentsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 					entitatId,
 					true,
@@ -1002,9 +1008,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			
 			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
 
-			List<ProcedimentEntity> procediments = procedimentHelper.getProcedimentsWithPermis(
+			List<ProcedimentEntity> procediments = procedimentsCacheable.getProcedimentsWithPermis(
 					usuariCodi,
-					auth,
 					entitat,
 					permisos);
 
@@ -1228,12 +1233,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
-		List<ProcedimentEntity> procediments = procedimentHelper.getProcedimentsWithPermis(
+		List<ProcedimentEntity> procediments = procedimentsCacheable.getProcedimentsWithPermis(
 				auth.getName(),
-				auth,
 				entitat,
 				permisos);
-		List<ProcedimentOrganEntity> procedimentsOrgans = procedimentHelper.getProcedimentOrganWithPermis(
+		List<ProcedimentOrganEntity> procedimentsOrgans = procedimentsCacheable.getProcedimentOrganWithPermis(
 				auth.getName(),
 				auth,
 				entitat,
@@ -1339,68 +1343,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			PermisEnum permis) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-//			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//			List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
-//			ProcedimentEntity procediment = procedimentRepository.findById(procedimentId);
-//			procediments.add(procediment);
-//			EntitatEntity entitat = procediment.getEntitat();
-//			
-//			// 1. Comprovam si el procediment té assignat el permís d'administration
-//			Permission[] permisos = getPermissionsFromName(permis);
-//			permisosHelper.filterGrantedAny(
-//					procediments,
-//					new ObjectIdentifierExtractor<ProcedimentEntity>() {
-//						public Long getObjectIdentifier(ProcedimentEntity procediment) {
-//							return procediment.getId();
-//						}
-//					},
-//					ProcedimentEntity.class,
-//					permisos,
-//					auth);
-//			if (!procediments.isEmpty())
-//				return true;
-//			
-//			// 2. Comprovam si algun organ pare del procediment té permis d'administration
-//			List<OrganGestorEntity> organsGestors = organigramaHelper.getOrgansGestorsParesExistentsByOrgan(
-//					entitat.getDir3Codi(), 
-//					procediment.getOrganGestor().getCodi());
-//			permisosHelper.filterGrantedAny(
-//					organsGestors,
-//					new ObjectIdentifierExtractor<OrganGestorEntity>() {
-//						public Long getObjectIdentifier(OrganGestorEntity organGestor) {
-//							return organGestor.getId();
-//						}
-//					},
-//					OrganGestorEntity.class,
-//					permisos,
-//					auth);
-//			if (!organsGestors.isEmpty())
-//				return true;
-//			
-//			return false;
 			return entityComprovarHelper.hasPermisProcediment(procedimentId, permis);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
-//	private Permission[] getPermissionsFromName(PermisEnum permis) {
-//		Permission perm = getPermissionFromName(permis);
-//		if (perm == null)
-//			return null;
-//		else
-//			return new Permission[] {perm};
-//	}
-//	
-//	private Permission getPermissionFromName(PermisEnum permis) {
-//		switch (permis) {
-//		case CONSULTA: return ExtendedPermission.READ;
-//		case PROCESSAR: return ExtendedPermission.PROCESSAR;
-//		case NOTIFICACIO: return ExtendedPermission.NOTIFICACIO;
-//		case GESTIO: return ExtendedPermission.ADMINISTRATION;
-//		default: return null;
-//		}
-//	}
 	
 	@Transactional(readOnly = true)
 	@Cacheable(value = "procedimentsOrganPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
@@ -1420,7 +1367,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			
 			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
 
-			List<ProcedimentOrganEntity> procedimentOrgansAmbPermis = procedimentHelper.getProcedimentOrganWithPermis(
+			List<ProcedimentOrganEntity> procedimentOrgansAmbPermis = procedimentsCacheable.getProcedimentOrganWithPermis(
 					usuariCodi,
 					auth,
 					entitat,
