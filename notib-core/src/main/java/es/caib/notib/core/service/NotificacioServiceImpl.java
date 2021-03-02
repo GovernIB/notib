@@ -1577,7 +1577,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			double elapsedTime;
 			synchronized(CreacioSemaforDto.getCreacioSemafor()) {
 				logger.info("Comprovant estat actual notificació (id: " + notificacioEntity.getId() + ")...");
-				NotificacioEstatEnumDto estatActual = notificacioRepository.getEstatNotificacio(notificacioEntity.getId());
+				NotificacioEstatEnumDto estatActual = notificacioEntity.getEstat();
 				logger.info("Estat notificació [Id:" + notificacioEntity.getId() + ", Estat: "+ estatActual + "]");
 				
 				if (estatActual.equals(NotificacioEstatEnumDto.PENDENT)) {

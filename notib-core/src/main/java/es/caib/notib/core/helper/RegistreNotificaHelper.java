@@ -8,7 +8,6 @@ import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.plugin.registre.RegistrePluginException;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import org.slf4j.Logger;
@@ -31,17 +30,11 @@ public class RegistreNotificaHelper {
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private NotificaHelper notificaHelper;
-	@Autowired
 	private RegistreHelper registreHelper;
 	@Autowired
 	private AuditNotificacioHelper auditNotificacioHelper;
 	@Autowired
 	private AuditEnviamentHelper auditEnviamentHelper;
-	@Autowired
-	private NotificacioEventRepository notificacioEventRepository;
 	@Autowired
 	private IntegracioHelper integracioHelper;
 	@Autowired

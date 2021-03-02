@@ -13,7 +13,6 @@ import es.caib.notib.core.aspect.Audita;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -36,15 +35,11 @@ public class RegistreHelper {
 	@Autowired
 	private NotificacioRepository notificacioRepository;
 	@Autowired
-	private NotificacioEventRepository notificacioEventRepository;
-	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired 
 	private EmailHelper emailHelper;
-	@Autowired
-	private AuditNotificacioHelper auditNotificacioHelper;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
 
