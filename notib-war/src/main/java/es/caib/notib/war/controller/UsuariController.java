@@ -3,14 +3,13 @@
  */
 package es.caib.notib.war.controller;
 
-import java.util.Locale;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import es.caib.notib.core.api.dto.IdiomaEnumDto;
+import es.caib.notib.core.api.dto.UsuariDto;
+import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.war.command.UsuariCommand;
+import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.FlushAuthCacheHelper;
+import es.caib.notib.war.helper.SessioHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,12 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.notib.core.api.dto.IdiomaEnumDto;
-import es.caib.notib.core.api.dto.UsuariDto;
-import es.caib.notib.core.api.service.AplicacioService;
-import es.caib.notib.war.command.UsuariCommand;
-import es.caib.notib.war.helper.EnumHelper;
-import es.caib.notib.war.helper.SessioHelper;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.Locale;
 
 /**
  * Controlador per al manteniment de regles.
@@ -88,6 +86,7 @@ public class UsuariController extends BaseController {
 		return new Locale(SessioHelper.getIdioma(aplicacioService), Locale.getDefault().getCountry()).toLanguageTag();
 	}
 
+	// Només funciona amb JBoss
 	@RequestMapping(value = "/{codi}/refrescarRols", method = RequestMethod.GET)
 	public String refrescarRols(
 			HttpServletRequest request,

@@ -62,10 +62,15 @@ public class ProcedimentsCacheable {
                 permisos
         );
         // selecciona els expedients amb permisos per procediment de l'entitat i dels grups
-        List<ProcedimentEntity> procedimentsAmbPermis =  procedimentRepository.findProcedimentsByEntitatAndGrupAndIds(entitat,
-                grups,
-                procedimentsAmbPermisIds);
 
+        List<ProcedimentEntity> procedimentsAmbPermis;
+        if (procedimentsAmbPermisIds.isEmpty()){
+            procedimentsAmbPermis = new ArrayList<>();
+        } else {
+            procedimentsAmbPermis = procedimentRepository.findProcedimentsByEntitatAndGrupAndIds(entitat,
+                    grups,
+                    procedimentsAmbPermisIds);
+        }
         // 2. Obtenim els òrgans gestors amb permisos
         List<OrganGestorEntity> organsGestorsAmbPermis = organGestorHelper.findOrganismesEntitatAmbPermis(entitat,
                 permisos);

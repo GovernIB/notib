@@ -301,7 +301,9 @@ public class PermisosHelper {
 	 */
 	public boolean isGrantedAny(Authentication auth, Class<?> clazz, Permission[] permissions) {
 		List<AclSidEntity> sids = getSids(auth);
-
+		if (sids.isEmpty()) {
+			return false;
+		}
 		// TODO: no estic segur si hauriem de fer un and binari de totes les mascares en lloc de passar una llista de masks
 		List<Integer> masks = new ArrayList<>();
 		for (Permission p : permissions){
@@ -321,7 +323,9 @@ public class PermisosHelper {
 	public List<Long> getObjectsIdsWithPermission(Class<?> clazz, Permission[] permissions) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<AclSidEntity> sids = getSids(auth);
-
+		if (sids.isEmpty()) {
+			return new ArrayList<>();
+		}
 		// TODO: no estic segur si hauriem de fer un and binari de totes les mascares en lloc de passar una llista de masks
 		List<Integer> masks = new ArrayList<>();
 		for (Permission p : permissions){

@@ -8,26 +8,11 @@ import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.exception.NoPermisosException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.api.service.AplicacioService;
-import es.caib.notib.core.api.service.EntitatService;
-import es.caib.notib.core.api.service.EnviamentService;
-import es.caib.notib.core.api.service.GrupService;
-import es.caib.notib.core.api.service.NotificacioService;
-import es.caib.notib.core.api.service.OrganGestorService;
-import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
-import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
-import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.api.service.*;
 import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
 import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
 import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
-import es.caib.notib.war.command.DocumentCommand;
-import es.caib.notib.war.command.EntregapostalCommand;
-import es.caib.notib.war.command.EnviamentCommand;
-import es.caib.notib.war.command.MarcarProcessatCommand;
-import es.caib.notib.war.command.NotificacioCommandV2;
-import es.caib.notib.war.command.NotificacioFiltreCommand;
-import es.caib.notib.war.command.OrganGestorFiltreCommand;
-import es.caib.notib.war.command.PersonaCommand;
+import es.caib.notib.war.command.*;
 import es.caib.notib.war.helper.*;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import lombok.Data;
@@ -42,30 +27,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Controlador per a la consulta i gestió de notificacions.
@@ -177,8 +147,9 @@ public class NotificacioController extends BaseUserController {
                     rol,
                     organ
             );
-        } catch (NoPermisosException e) {
-            MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.lectura"));
+        }catch (Exception e) {
+            if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, NoPermisosException.class))
+                MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.lectura"));
         }
         model.addAttribute("organsGestorsPermisLectura", organsDisponibles);
 
