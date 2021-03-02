@@ -3,16 +3,11 @@
  */
 package es.caib.notib.plugin.gesdoc;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import org.apache.commons.io.IOUtils;
-
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.PropertiesHelper;
+import org.apache.commons.io.IOUtils;
+
+import java.io.*;
 
 /**
  * Implementació del plugin de gestió documental que emmagatzema els arxius
@@ -22,22 +17,17 @@ import es.caib.notib.plugin.utils.PropertiesHelper;
  */
 public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin {
 
+	private static final long MAX_FILES_IN_FOLDER = 5000;
+
 	@Override
 	public String create(
 			String agrupacio,
 			InputStream contingut) throws SistemaExternException {
 		try {
-			String id = new Long(System.currentTimeMillis()).toString();
-			File fContent = new File(getBaseDir(agrupacio) + "/" + id);
-			fContent.getParentFile().mkdirs();
-			while (fContent.exists()) {
-				try {
-					Thread.sleep(1);
-				} catch (Exception ignored) {}
-				id = new Long(System.currentTimeMillis()).toString();
-				fContent = new File(getBaseDir(agrupacio) + "/" + id);
-			}
-			FileOutputStream outContent = new FileOutputStream(fContent);
+			String basedir = getBaseDir(agrupacio);
+			String subfolderId = getValidSubfolder(agrupacio);
+			String id = subfolderId + generateUniqueName(basedir);
+			FileOutputStream outContent = new FileOutputStream(basedir + "/" + id);
 			IOUtils.copy(contingut, outContent);
 			outContent.close();
 			return id;
@@ -113,7 +103,31 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 		}
 	}
 
+	private String getValidSubfolder(String agrupacio){
+		String basedir = getBaseDir(agrupacio);
+		File file = new File(basedir);
+		File[] directories = file.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File current, String name) {
+				File f = new File(current, name);
+				if (!f.isDirectory()) {
+					return false;
+				}
+				String[] files = f.list();
+				if (files != null && files.length > MAX_FILES_IN_FOLDER) {
+					return false;
+				}
+				return true;
+			}
+		});
+		if (directories != null && directories.length > 0){
+			return directories[0].getName() + "/";
+		}
 
+		// si no n'hi ha cap de valida en cream una de nova
+		String subfolder = generateUniqueName(basedir);
+		return subfolder + "/";
+	}
 
 	private String getBaseDir(String agrupacio) {
 		String baseDir = PropertiesHelper.getProperties().getProperty(
@@ -126,6 +140,17 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			}
 		}
 		return baseDir;
+	}
+
+	private String generateUniqueName(String basedir) {
+		String id = Long.toString(System.currentTimeMillis());
+		File fContent = new File( basedir + "/" + id);
+		fContent.getParentFile().mkdirs();
+		while (fContent.exists()) {
+			id = Long.toString(System.currentTimeMillis()-1);
+			fContent = new File(basedir + "/" + id);
+		}
+		return id;
 	}
 
 }
