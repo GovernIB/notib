@@ -8,6 +8,7 @@ import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.repository.NotificacioEventRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
 import org.slf4j.Logger;
@@ -24,6 +25,8 @@ import java.util.List;
  */
 @Component
 public class NotificacioEventHelper {
+    @Autowired
+    private NotificacioRepository notificacioRepository;
     @Autowired
     private AuditNotificacioHelper auditNotificacioHelper;
     @Autowired
@@ -353,7 +356,6 @@ public class NotificacioEventHelper {
             // conservam l'event més antic i eliminam els intermitjos,
             // si tot va correctament em aquest punt la llista només tendra dos elements.
             notificacioEventRepository.delete(events.get(1));
-            notificacioEventRepository.flush();
         }
     }
 
