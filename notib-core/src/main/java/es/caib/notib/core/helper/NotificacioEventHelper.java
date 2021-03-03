@@ -353,6 +353,7 @@ public class NotificacioEventHelper {
             // conservam l'event més antic i eliminam els intermitjos,
             // si tot va correctament em aquest punt la llista només tendra dos elements.
             notificacioEventRepository.delete(events.get(1));
+            notificacioEventRepository.flush();
         }
     }
 

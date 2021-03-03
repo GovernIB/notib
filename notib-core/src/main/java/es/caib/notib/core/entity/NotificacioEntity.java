@@ -197,7 +197,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,
-			cascade = CascadeType.ALL,
+			cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH},
 			orphanRemoval = true)
 	protected Set<NotificacioEventEntity> events = new LinkedHashSet<NotificacioEventEntity>();
 
