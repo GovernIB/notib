@@ -1288,7 +1288,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 	public byte[] getDocumentJustificant(Long enviamentId) {
 		
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
-//		enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
 		
 		if (enviament.getRegistreEstat() != null && enviament.getRegistreEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_EXTERN))
 			return pluginHelper.obtenirOficiExtern(enviament.getNotificacio().getEmisorDir3Codi(), enviament.getRegistreNumeroFormatat()).getJustificant();	

@@ -5,6 +5,7 @@ package es.caib.notib.plugin.gesdoc;
 
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.PropertiesHelper;
+import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -17,6 +18,7 @@ import java.io.*;
  */
 public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin {
 
+	@Getter
 	private static final long MAX_FILES_IN_FOLDER = 5000;
 
 	@Override
@@ -114,7 +116,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 					return false;
 				}
 				String[] files = f.list();
-				if (files != null && files.length > MAX_FILES_IN_FOLDER) {
+				if (files != null && files.length >= MAX_FILES_IN_FOLDER) {
 					return false;
 				}
 				return true;
@@ -126,6 +128,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 
 		// si no n'hi ha cap de valida en cream una de nova
 		String subfolder = generateUniqueName(basedir);
+		(new File(basedir + "/" + subfolder)).mkdir();
 		return subfolder + "/";
 	}
 

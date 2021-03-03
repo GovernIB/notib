@@ -68,7 +68,7 @@ import java.util.Set;
 public class PluginHelper {
 
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
-	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
+	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "";
 	public static final String GESDOC_AGRUPACIO_TEMPORALS = "tmp";
 	
 
@@ -172,7 +172,7 @@ public class PluginHelper {
 		
 		return resposta;
 	}
-	
+
 	public RespostaJustificantRecepcio obtenirJustificant(
 			String codiDir3Entitat, 
 			String numeroRegistreFormatat) {
@@ -1613,131 +1613,6 @@ public class PluginHelper {
 			}
 		}
 	}
-	
-//	private RegistreSortida toRegistreSortida(
-//			NotificacioDtoV2 notificacio,
-//			List<NotificacioEnviamentDtoV2> enviaments) throws RegistrePluginException {
-//		RegistreSortida registreSortida = new RegistreSortida();
-//		DadesOficina dadesOficina = new DadesOficina();
-//		LlibreDto llibreOrganisme = null;
-//		OficinaDto oficinaVirtual = null;
-//		String dir3Codi;
-//		String organisme;
-//		
-//		if (notificacio.getEntitat().getDir3CodiReg() != null) {
-//			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
-//			organisme = notificacio.getEntitat().getDir3CodiReg();
-//		} else {
-//			dir3Codi = notificacio.getEmisorDir3Codi();
-//			if (notificacio.getProcediment() != null)
-//				organisme = notificacio.getProcediment().getOrganGestor();
-//			else 
-//				organisme = notificacio.getOrganGestor();
-//		}
-//		
-//		if (notificacio.getProcediment() != null && notificacio.getProcediment().getOficina() != null) {
-//			dadesOficina.setOficinaCodi(notificacio.getProcediment().getOficina());
-//		} else {
-//			//oficina virtual
-//			oficinaVirtual = llistarOficinaVirtual(
-//					dir3Codi, 
-//					notificacio.getEntitat().getNomOficinaVirtual(),
-//					TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
-//			
-//			if (oficinaVirtual != null) {
-//				dadesOficina.setOficinaCodi(oficinaVirtual.getCodi());
-//			}
-//		}
-//		
-//		if (!notificacio.getEntitat().isLlibreEntitat()) {
-//			if (notificacio.getProcediment() != null && notificacio.getProcediment().getLlibre() != null) {
-//				dadesOficina.setLlibreCodi(notificacio.getProcediment().getLlibre());
-//			} else {
-//				String organGestor = null;
-//				if (notificacio.getProcediment() != null) {
-//					organGestor = notificacio.getProcediment().getOrganGestor();
-//				} else {
-//					organGestor = notificacio.getOrganGestor();
-//				}
-//				if (organGestor != null) {
-//					llibreOrganisme = llistarLlibreOrganisme(
-//							dir3Codi,
-//							organGestor);
-//					if (llibreOrganisme != null) {
-//						String llibreCodi = llibreOrganisme.getCodi();
-//						dadesOficina.setLlibreCodi(llibreCodi);
-//					}
-//				}
-//			}
-//		} else {
-//			String llibre = notificacio.getEntitat().getLlibre();
-//			if (llibre == null) {
-//				llibreOrganisme = llistarLlibreOrganisme(
-//						dir3Codi,
-//						dir3Codi);
-//				if (llibreOrganisme != null)
-//					llibre = llibreOrganisme.getCodi();
-//			}
-//			dadesOficina.setLlibreCodi(llibre);
-//		}
-//		
-//		registreSortida.setCodiEntitat(dir3Codi);
-//		dadesOficina.setOrgan(organisme);
-//		registreSortida.setDadesOficina(dadesOficina);
-//		
-//		
-//		for(NotificacioEnviamentDtoV2 enviament : enviaments) {
-//			PersonaDto destinatari = null;
-//			if(enviament.getDestinataris() != null && enviament.getDestinataris().size() > 0) {
-//				destinatari =  enviament.getDestinataris().get(0);
-//			}
-//			registreSortida.getDadesInteressat().add(personaToDadesInteressatIRepresenat(
-//					notificacio, 
-//					enviament.getTitular(),
-//					destinatari));	
-//		}
-//		
-//		DadesAnotacio dadesAnotacio = new DadesAnotacio();
-//		dadesAnotacio.setIdiomaCodi("ca");
-//		
-//		List<TipusAssumpte> tipusAssumpte = llistarTipusAssumpte(dir3Codi);
-//		
-//		if(notificacio.getProcediment() != null && notificacio.getProcediment().getTipusAssumpte() != null) {
-//			dadesAnotacio.setTipusAssumpte(notificacio.getProcediment().getTipusAssumpte());
-//		} else if (tipusAssumpte != null && ! tipusAssumpte.isEmpty()) {
-//			String tipusAssumpteCodi = tipusAssumpte.get(0).getCodi();
-//			dadesAnotacio.setTipusAssumpte(tipusAssumpteCodi);
-//		}
-//		
-//		if(notificacio.getProcediment() != null && notificacio.getProcediment().getCodiAssumpte() != null) {
-//			dadesAnotacio.setCodiAssumpte(notificacio.getProcediment().getCodiAssumpte());
-//		} else if (tipusAssumpte != null && ! tipusAssumpte.isEmpty()) {
-//			List<CodiAssumpte> codisAssumpte = llistarCodisAssumpte(
-//					dir3Codi, 
-//					tipusAssumpte.get(0).getCodi());
-//			if (codisAssumpte != null && ! codisAssumpte.isEmpty()) {
-//				String codiAssumpte = codisAssumpte.get(0).getCodi();
-//				dadesAnotacio.setCodiAssumpte(codiAssumpte);
-//			}
-//		}
-//		
-//		dadesAnotacio.setExtracte(notificacio.getConcepte());
-//		dadesAnotacio.setUnitatAdministrativa(null);
-//		dadesAnotacio.setDocfisica(1L);
-//		dadesAnotacio.setNumExpedient(notificacio.getNumExpedient());
-//		dadesAnotacio.setObservacions("Notib: " + notificacio.getUsuariCodi());
-//		dadesAnotacio.setCodiUsuari(notificacio.getUsuariCodi());
-//		registreSortida.setDadesAnotacio(dadesAnotacio);
-//		if (notificacio.getDocument() != null) {
-//			List<DocumentRegistre> documents = new ArrayList<DocumentRegistre>();
-//			documents.add(documentToDocumentRegistreDto(notificacio.getDocument()));
-//			
-//			registreSortida.setDocuments(documents);
-//		}
-//		registreSortida.setAplicacio("NOTIB");
-//		
-//		return registreSortida;
-//	}
 
 	public AsientoRegistralBeanDto notificacioEnviamentsToAsientoRegistralBean(
 			NotificacioEntity notificacio, 
@@ -2357,23 +2232,7 @@ public class PluginHelper {
     		throw new Exception(exc.getMessage());
     	}
 	}
-	
-	private static boolean isDocumentEstranger(String nie) {
-		boolean isNie = false;
-		if (nie != null && (nie.startsWith("X") || nie.startsWith("Y") || nie.startsWith("Z")))
-			isNie = true;
-		return isNie;
-    }
-	
-	private XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
-		if (date == null) {
-			return null;
-		}
-		GregorianCalendar gc = new GregorianCalendar();
-		gc.setTime(date);
-		return DatatypeFactory.newInstance().newXMLGregorianCalendar(gc);
-	}
-	
+
 	public boolean isDadesUsuariPluginDisponible() {
 		String pluginClass = getPropertyPluginDadesUsuari();
 		if (pluginClass != null && pluginClass.length() > 0) {
@@ -2666,7 +2525,7 @@ public class PluginHelper {
 	public int getConsultaSirReintentsPeriodeProperty() {
 		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode");
 	}
-	
+
 	public int getRegistreReintentsMaxProperty() {
 		return PropertiesHelper.getProperties().getAsInt(
 				"es.caib.notib.tasca.registre.enviaments.reintents.maxim",
@@ -2706,10 +2565,7 @@ public class PluginHelper {
 				
 		return tipus;
 	}
-	public boolean isReadDocsMetadataFromArxiu() {
-		return PropertiesHelper.getProperties().getAsBoolean(
-				"es.caib.notib.documents.metadades.from.arxiu", false);
-	}
+
 	public void setDadesUsuariPlugin(DadesUsuariPlugin dadesUsuariPlugin) {
 		this.dadesUsuariPlugin = dadesUsuariPlugin;
 	}
@@ -2728,6 +2584,27 @@ public class PluginHelper {
 	
 	public void setUnitatsOrganitzativesPlugin(UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin) {
 		this.unitatsOrganitzativesPlugin = unitatsOrganitzativesPlugin;
+	}
+
+	private boolean isReadDocsMetadataFromArxiu() {
+		return PropertiesHelper.getProperties().getAsBoolean(
+				"es.caib.notib.documents.metadades.from.arxiu", false);
+	}
+
+	private static boolean isDocumentEstranger(String nie) {
+		boolean isNie = false;
+		if (nie != null && (nie.startsWith("X") || nie.startsWith("Y") || nie.startsWith("Z")))
+			isNie = true;
+		return isNie;
+	}
+
+	private XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
+		if (date == null) {
+			return null;
+		}
+		GregorianCalendar gc = new GregorianCalendar();
+		gc.setTime(date);
+		return DatatypeFactory.newInstance().newXMLGregorianCalendar(gc);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(PluginHelper.class);
