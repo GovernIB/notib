@@ -2528,7 +2528,7 @@ public class PluginHelper {
 		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode");
 	}
 	public int getSegonsEntreReintentRegistreProperty() {
-		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.plugin.registre.segons.entre.peticions");
+		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.plugin.registre.segons.entre.peticions", 30);
 	}
 	public int getRegistreReintentsMaxProperty() {
 		return PropertiesHelper.getProperties().getAsInt(
