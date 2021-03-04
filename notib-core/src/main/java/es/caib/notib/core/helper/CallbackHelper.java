@@ -113,7 +113,6 @@ public class CallbackHelper {
 			auditNotificacioHelper.updateLastCallbackError(notificacio, true);
 			integracioHelper.addAccioError(info, "Error enviant l'avís de canvi d'estat", ex);
 		}
-		notificacioRepository.save(notificacio);
 		notificacioEventHelper.addCallbackEvent(notificacio, event);
 		return notificacio;
 	}

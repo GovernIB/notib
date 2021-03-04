@@ -90,11 +90,6 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 		this.callbackData = new Date();
 	}
 
-	public void onDelete() {
-		this.notificacio = null;
-		this.enviament = null;
-	}
-
 	public static Builder getBuilder(
 			NotificacioEventTipusEnumDto tipus,
 			NotificacioEntity notificacio) {

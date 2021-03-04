@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -77,7 +78,11 @@ public class NotificacioEventHelper {
                 NotificacioEventTipusEnumDto.CALLBACK_CLIENT,
                 event.getCallbackEstat().equals(CallbackEstatEnumDto.ERROR)
         );
-
+        for (NotificacioEventEntity e: new ArrayList<>(notificacio.getEvents())) {
+            if (e.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) && e.isError() == event.getCallbackEstat().equals(CallbackEstatEnumDto.ERROR)){
+                notificacio.getEvents().remove(e);
+            }
+        }
         // Crea una nova entrada a la taula d'events per deixar constància de la notificació a l'aplicació client
         NotificacioEventEntity.Builder eventBuilder;
         if (event.getEnviament() != null) {
@@ -357,8 +362,8 @@ public class NotificacioEventHelper {
             if (event.getNotificacio() != null) {
                 notificacio.getEvents().remove(event);
             }
-            event.onDelete();
             notificacioEventRepository.delete(event);
+            notificacioEventRepository.flush();
         }
     }
 
