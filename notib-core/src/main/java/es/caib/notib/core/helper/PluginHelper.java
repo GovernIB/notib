@@ -5,11 +5,7 @@ import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
 import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
 import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
-import es.caib.notib.core.entity.DocumentEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.PersonaEntity;
+import es.caib.notib.core.entity.*;
 import es.caib.notib.plugin.conversio.ConversioArxiu;
 import es.caib.notib.plugin.conversio.ConversioPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
@@ -18,19 +14,10 @@ import es.caib.notib.plugin.gesconadm.GcaProcediment;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.notib.plugin.registre.*;
-import es.caib.notib.plugin.unitat.CodiValor;
-import es.caib.notib.plugin.unitat.CodiValorPais;
-import es.caib.notib.plugin.unitat.NodeDir3;
-import es.caib.notib.plugin.unitat.ObjetoDirectorio;
-import es.caib.notib.plugin.unitat.OficinaSIR;
-import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
+import es.caib.notib.plugin.unitat.*;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
-import es.caib.plugins.arxiu.api.ArxiuException;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentContingut;
-import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
-import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import es.caib.plugins.arxiu.api.*;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,22 +30,15 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Helper per a interactuar amb els plugins.
  * 
@@ -173,10 +153,32 @@ public class PluginHelper {
 		return resposta;
 	}
 
+	private Set<String> blockedObtenirJustificant = null;
+	private void initObtenirJustificant(){
+		blockedObtenirJustificant = new HashSet<>();
+		final ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
+		Runnable clearBlockedRunnable = new Runnable() {
+			public void run() {
+				blockedObtenirJustificant = null;
+				exec.shutdown();
+			}
+		};
+
+		exec.scheduleAtFixedRate(clearBlockedRunnable , 0, getSegonsEntreReintentRegistreProperty(),
+				TimeUnit.SECONDS);
+
+	}
+
 	public RespostaJustificantRecepcio obtenirJustificant(
 			String codiDir3Entitat, 
 			String numeroRegistreFormatat) {
-		
+		if (blockedObtenirJustificant == null){
+			initObtenirJustificant();
+		}
+		if (blockedObtenirJustificant.contains(numeroRegistreFormatat)) {
+			return new RespostaJustificantRecepcio();
+		}
+		blockedObtenirJustificant.add(numeroRegistreFormatat);
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_REGISTRE, 
 				"Obtenir justificant de registre", 
@@ -2525,7 +2527,9 @@ public class PluginHelper {
 	public int getConsultaSirReintentsPeriodeProperty() {
 		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode");
 	}
-
+	public int getSegonsEntreReintentRegistreProperty() {
+		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.plugin.registre.segons.entre.peticions");
+	}
 	public int getRegistreReintentsMaxProperty() {
 		return PropertiesHelper.getProperties().getAsInt(
 				"es.caib.notib.tasca.registre.enviaments.reintents.maxim",
