@@ -896,19 +896,6 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-    
-	private List<ProcedimentEntity> addProcedimentsOrgan(
-			List<ProcedimentEntity> procedimentsDisponibles,
-			List<ProcedimentOrganEntity> procedimentsOrgansDisponibles) {
-		if (procedimentsOrgansDisponibles != null && !procedimentsOrgansDisponibles.isEmpty()) {
-			Set<ProcedimentEntity> setProcediments = new HashSet<>(procedimentsDisponibles);
-			for (ProcedimentOrganEntity procedimentOrgan : procedimentsOrgansDisponibles) {
-				setProcediments.add(procedimentOrgan.getProcediment());
-			}
-			procedimentsDisponibles = new ArrayList<ProcedimentEntity>(setProcediments);
-		}
-		return procedimentsDisponibles;
-	}
 
 	private List<OrganGestorEntity> recuperarOrgansPerProcedimentAmbPermis(
 			String usuari,
@@ -927,7 +914,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				entitat,
 				permisos);
 
-		procedimentsDisponibles = addProcedimentsOrgan(procedimentsDisponibles, procedimentsOrgansDisponibles);
+		procedimentsDisponibles = mergeProcedimentsWithProcedimentsOrgans(procedimentsDisponibles, procedimentsOrgansDisponibles);
 
 		List<OrganGestorEntity> organsGestorsProcediments = new ArrayList<>();
 		List<Long> procedimentsDisponiblesIds = new ArrayList<>();
@@ -961,6 +948,20 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		return organsGestors;
 	}
 
-    private static final Logger logger = LoggerFactory.getLogger(OrganGestorServiceImpl.class);
+	private List<ProcedimentEntity> mergeProcedimentsWithProcedimentsOrgans(
+			List<ProcedimentEntity> procedimentsDisponibles,
+			List<ProcedimentOrganEntity> procedimentsOrgansDisponibles) {
+		if (procedimentsOrgansDisponibles != null && !procedimentsOrgansDisponibles.isEmpty()) {
+			// Empleam un set per no afegir duplicats
+			Set<ProcedimentEntity> setProcediments = new HashSet<>(procedimentsDisponibles);
+			for (ProcedimentOrganEntity procedimentOrgan : procedimentsOrgansDisponibles) {
+				setProcediments.add(procedimentOrgan.getProcediment());
+			}
+			procedimentsDisponibles = new ArrayList<ProcedimentEntity>(setProcediments);
+		}
+		return procedimentsDisponibles;
+	}
+
+	private static final Logger logger = LoggerFactory.getLogger(OrganGestorServiceImpl.class);
 
 }
