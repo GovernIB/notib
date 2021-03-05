@@ -938,7 +938,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		if (!procedimentsDisponiblesIds.isEmpty())
 			organsGestorsProcediments = organGestorRepository.findByProcedimentIds(procedimentsDisponiblesIds);
 		// 2-recuperam els òrgans amb permís
-		List<OrganGestorEntity> organsGestorsAmbPermis = organGestorHelper.getProcedimentsWithPermis(
+		List<OrganGestorEntity> organsGestorsAmbPermis = organGestorHelper.getOrgansGestorsWithPermis(
 				usuari,
 				auth,
 				entitat,

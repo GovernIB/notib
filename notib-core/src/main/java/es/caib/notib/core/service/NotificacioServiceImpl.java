@@ -1641,14 +1641,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			notificacioEntity = auditNotificacioHelper.updateNotificacioProcessada(notificacioEntity, motiu);
 			UsuariEntity usuari = usuariHelper.getUsuariAutenticat();
 			if(usuari != null && notificacioEntity.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
-				
-				if(usuari.isRebreEmailsNotificacioCreats()) {
-					if(usuari.getCodi() == notificacioEntity.getCreatedBy().getCodi()) {
-						resposta = emailHelper.prepararEnvioEmailNotificacio(notificacioEntity);
-					}else {
-						resposta = null;
-					}	
-				}else {
+				if(!usuari.isRebreEmailsNotificacioCreats() || usuari.getCodi() == notificacioEntity.getCreatedBy().getCodi()) {
 					resposta = emailHelper.prepararEnvioEmailNotificacio(notificacioEntity);
 				}
 			}

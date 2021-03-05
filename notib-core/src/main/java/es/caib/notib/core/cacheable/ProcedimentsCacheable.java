@@ -5,7 +5,6 @@ import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.ProcedimentOrganEntity;
 import es.caib.notib.core.helper.*;
-import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.ProcedimentOrganRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -32,13 +31,9 @@ import java.util.Set;
 @Component
 public class ProcedimentsCacheable {
     @Autowired
-    private PluginHelper pluginHelper;
-    @Autowired
     private PermisosHelper permisosHelper;
     @Autowired
     private CacheHelper cacheHelper;
-    @Autowired
-    private GrupProcedimentRepository grupProcedimentRepository;
     @Autowired
     private ProcedimentRepository procedimentRepository;
     @Autowired

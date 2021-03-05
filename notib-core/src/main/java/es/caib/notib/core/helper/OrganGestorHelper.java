@@ -3,7 +3,6 @@ package es.caib.notib.core.helper;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +27,12 @@ public class OrganGestorHelper {
 	@Autowired
 	private PermisosHelper permisosHelper;
 	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
 	private OrganigramaHelper organigramaHelper;
-	@Autowired
-	private ProcedimentRepository procedimentRepository;
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
 
 	@Cacheable(value = "organsEntitiesPermis", key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
-	public List<OrganGestorEntity> getProcedimentsWithPermis(
+	public List<OrganGestorEntity> getOrgansGestorsWithPermis(
 			String usuariCodi,
 			Authentication auth,
 			EntitatEntity entitat,

@@ -1,5 +1,6 @@
 package es.caib.notib.core.helper;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
@@ -22,7 +23,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -969,8 +969,7 @@ public class PluginHelper {
 	
 	// UNITATS ORGANITZATIVES
 	// /////////////////////////////////////////////////////////////////////////////////////
-	
-	@Cacheable(value = "organigramaPlugin", key="#entitatcodi")
+
 	public Map<String, NodeDir3> getOrganigramaPerEntitat(String entitatcodi) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(
@@ -982,16 +981,40 @@ public class PluginHelper {
 		String protocol = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.unitats.dir3.protocol", "REST");
 		
 		Map<String, NodeDir3> organigrama = null;
+		String filenameOrgans = getOrganGestorsFile();
 		try {
 			if ("SOAP".equalsIgnoreCase(protocol)) {
 				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitatWs(entitatcodi, null, null);
 			} else {
 				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(entitatcodi);
 			}
+			if (filenameOrgans != null) {
+				ObjectMapper mapper = new ObjectMapper();
+				mapper.writeValue(new File(filenameOrgans), organigrama);
+			}
+
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al obtenir l'organigrama per entitat";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			if (filenameOrgans != null) {
+				File file = new File(filenameOrgans);
+				if (file.exists()) {
+					try {
+						ObjectMapper mapper = new ObjectMapper();
+						Map<String, Object> map = mapper.readValue(new FileReader(file), Map.class);
+						organigrama = new HashMap<>();
+
+						for (Map.Entry<String, Object> entry : map.entrySet()) {
+							NodeDir3 node = mapper.convertValue(entry.getValue(), NodeDir3.class);
+							organigrama.put(entry.getKey(), node);
+						}
+						return organigrama;
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
 			throw new SistemaExternException(
 					IntegracioHelper.INTCODI_UNITATS,
 					errorDescripcio,
@@ -999,7 +1022,11 @@ public class PluginHelper {
 		}
 		return organigrama;
 	}
-	
+
+	public String getOrganGestorsFile() {
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.unitats.fitxer", null);
+	}
+
 	public List<ObjetoDirectorio> llistarOrganismesPerEntitat(String entitatcodi) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(

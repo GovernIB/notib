@@ -186,20 +186,7 @@ public class CacheHelper {
 	public Collection<String> getAllCaches() {
 		return cacheManager.getCacheNames(); 
 	}
-	
-//	@CacheEvict(value = "findPermisProcedimentsUsuariActualAndEntitat", key="#entitatId")
-//	public void evictFindPermisProcedimentsUsuariActualAndEntitat(Long entitatId) {
-//	}
-//	
-//	@CacheEvict(value = "findByGrupAndPermisProcedimentsUsuariActualAndEntitat", key="#entitatId")
-//	public void evictFindByGrupAndPermisProcedimentsUsuariActualAndEntitat(Long entitatId) {
-//	}
-//	
-//	@CacheEvict(value = "findByPermisProcedimentsUsuariActual", key="#entitatId")
-//	public void evictFindByPermisProcedimentsUsuariActual(Long entitatId) {
-//	}
 
-			
 	@CacheEvict(value = {"procedimentsPermis", "procedimentEntitiesPermis"}, allEntries = true)
 	public void evictFindProcedimentsWithPermis() {
 	}
@@ -223,7 +210,5 @@ public class CacheHelper {
 	public void clearCache(String value) {
 		cacheManager.getCache(value).clear();
 	}
-	
-//	private static final Logger logger = LoggerFactory.getLogger(CacheHelper.class);
 
 }

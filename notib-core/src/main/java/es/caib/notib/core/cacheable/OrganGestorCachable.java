@@ -1,7 +1,7 @@
 package es.caib.notib.core.cacheable;
 
 import es.caib.notib.core.api.dto.OrganismeDto;
-import es.caib.notib.core.helper.PluginHelper;
+import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -23,12 +23,12 @@ import java.util.*;
 @Component
 public class OrganGestorCachable {
     @Resource
-    private PluginHelper pluginHelper;
+    private CacheHelper cacheHelper;
 
     @Cacheable(value = "organigrama", key="#entitatcodi")
     public Map<String, OrganismeDto> findOrganigramaByEntitat(String entitatcodi) {
         Map<String, OrganismeDto> organigrama = new HashMap<String, OrganismeDto>();
-        Map<String, NodeDir3> organigramaDir3 = pluginHelper.getOrganigramaPerEntitat(entitatcodi);
+        Map<String, NodeDir3> organigramaDir3 = cacheHelper.findOrganigramaNodeByEntitat(entitatcodi);
         if (organigramaDir3 != null) {
             for (String organ : organigramaDir3.keySet()) {
                 organigrama.put(organ, nodeDir3ToOrganisme(organigramaDir3.get(organ)));
@@ -50,10 +50,9 @@ public class OrganGestorCachable {
     }
 
     @Cacheable(value = "organismes", key="#entitatcodi")
-    public List<OrganismeDto> findOrganismesByEntitat(
-            String entitatcodi) {
+    public List<OrganismeDto> findOrganismesByEntitat(String entitatcodi) {
         List<OrganismeDto> organismes = new ArrayList<OrganismeDto>();
-        Map<String, NodeDir3> organigramaDir3 = pluginHelper.getOrganigramaPerEntitat(entitatcodi);
+        Map<String, NodeDir3> organigramaDir3 = cacheHelper.findOrganigramaNodeByEntitat(entitatcodi);
         for (String codi: organigramaDir3.keySet()) {
             OrganismeDto organisme = new OrganismeDto();
             NodeDir3 node = organigramaDir3.get(codi);
