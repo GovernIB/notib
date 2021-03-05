@@ -61,15 +61,18 @@ public class RegistreNotificaHelper {
 					totsAdministracio = false;
 				}
 			}
-			
+			long startTime;
+			double elapsedTime;
 //			### COMUNICACIÓ + TOT A ADMINISTRACIÓ
 			if(isComunicacio && totsAdministracio) {
 				logger.info(" [REG-NOT] Realitzant nou assentament registral per SIR");
 				info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Realitzant nou assentament registral per SIR"));
+				startTime = System.nanoTime();
 				for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
 					info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Realitzant nou assentament registral de l'enviament: " + enviament.getId()));
 					try {
 						//Només crea assentament registral sense notificar
+						long startTime2 = System.nanoTime();
 						crearAssentamentRegistralPerEnviament(
 								notificacioEntity, 
 								notificacioEntity.getEntitat().getDir3CodiReg() != null ? notificacioEntity.getEntitat().getDir3CodiReg() : notificacioEntity.getEntitat().getDir3Codi(), 
@@ -77,6 +80,9 @@ public class RegistreNotificaHelper {
 								enviament,
 								info,
 								t0);
+						elapsedTime = (System.nanoTime() - startTime2) / 10e6;
+						logger.info(" [TIMER-REG-NOT] (Sir activat) Creació assentament registrals d'enviament de comunicació [NotId: " +
+								notificacioEntity.getId() + ", encId: " + enviament.getId()+ "]: " + elapsedTime + " ms");
 					} catch (Exception ex) {
 						String errorDescripcio = "Hi ha hagut un error registrant l'enviament + " + enviament.getId();
 						logger.error(errorDescripcio, ex);
@@ -86,11 +92,14 @@ public class RegistreNotificaHelper {
 								ex);
 					}
 				}
+				elapsedTime = (System.nanoTime() - startTime) / 10e6;
+				logger.info(" [TIMER-REG-NOT] (Sir activat) Creació de tots els assentaments registrals de comunicació [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
 			} else {
 //				### COMUNICACIÓ/NOTIFICACIÓ + NOTIFIC@
 				logger.info(" [REG-NOT] Comunicació: Assentament registral + Notifica");
 				try {
 					info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] " + notificacioEntity.getEnviamentTipus() + ": nou assentament registral + Notifica de la notificació: " + notificacioEntity.getId()));
+					startTime = System.nanoTime();
 					enviarANotifica = crearAssentamentRegistralPerNotificacio(
 							notificacioEntity, 
 							notificacioEntity.getEntitat().getDir3CodiReg() != null ? notificacioEntity.getEntitat().getDir3CodiReg() : notificacioEntity.getEntitat().getDir3Codi(), 
@@ -99,6 +108,8 @@ public class RegistreNotificaHelper {
 							true,
 							info,
 							t0);
+					elapsedTime = (System.nanoTime() - startTime) / 10e6;
+					logger.info(" [TIMER-REG-NOT] (Sir activat) Creació assentament registrals per notificació [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
 				} catch (Exception ex) {
 					String errorDescripcio = "Hi ha hagut un error registrant la notificació " + notificacioEntity.getId();
 					logger.error(errorDescripcio, ex);
@@ -113,6 +124,7 @@ public class RegistreNotificaHelper {
 			logger.info(" [REG-NOT] Assentament sortida (registre) + Notifica");
 			try {
 				info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Realitzant nou assentament registral normal de la notificació: " + notificacioEntity.getId()));
+				long startTime = System.nanoTime();
 				enviarANotifica = crearAssentamentRegistralPerNotificacio(
 						notificacioEntity, 
 						notificacioEntity.getEntitat().getDir3CodiReg() != null ? notificacioEntity.getEntitat().getDir3CodiReg() : notificacioEntity.getEntitat().getDir3Codi(), 
@@ -121,6 +133,8 @@ public class RegistreNotificaHelper {
 						false,
 						info,
 						t0);
+				double elapsedTime = (System.nanoTime() - startTime) / 10e6;
+				logger.info(" [TIMER-REG-NOT] Creació assentament registrals normal per notificació [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
 			} catch (Exception ex) {
 				String errorDescripcio = "Hi ha hagut un error registrant la notificació " + notificacioEntity.getId();
 				logger.error(errorDescripcio, ex);
