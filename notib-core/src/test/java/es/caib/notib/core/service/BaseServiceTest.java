@@ -3,20 +3,32 @@
  */
 package es.caib.notib.core.service;
 
-import static org.junit.Assert.fail;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
-
+import es.caib.loginModule.util.Base64.InputStream;
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.service.*;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.UsuariEntity;
+import es.caib.notib.core.helper.PluginHelper;
+import es.caib.notib.core.helper.PropertiesHelper;
+import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.UsuariRepository;
+import es.caib.notib.plugin.SistemaExternException;
+import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
+import es.caib.notib.plugin.registre.*;
+import es.caib.notib.plugin.unitat.CodiValor;
+import es.caib.notib.plugin.unitat.CodiValorPais;
+import es.caib.notib.plugin.unitat.ObjetoDirectorio;
+import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
+import es.caib.notib.plugin.usuari.DadesUsuari;
+import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import es.caib.plugins.arxiu.api.Expedient;
+import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -33,64 +45,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.loginModule.util.Base64.InputStream;
-import es.caib.notib.core.api.dto.AplicacioDto;
-import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.OrganismeDto;
-import es.caib.notib.core.api.dto.PagadorCieDto;
-import es.caib.notib.core.api.dto.PagadorCieFormatFullaDto;
-import es.caib.notib.core.api.dto.PagadorCieFormatSobreDto;
-import es.caib.notib.core.api.dto.PagadorPostalDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.service.EntitatService;
-import es.caib.notib.core.api.service.GrupService;
-import es.caib.notib.core.api.service.NotificacioService;
-import es.caib.notib.core.api.service.OrganGestorService;
-import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
-import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
-import es.caib.notib.core.api.service.PagadorCieService;
-import es.caib.notib.core.api.service.PagadorPostalService;
-import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.core.api.service.UsuariAplicacioService;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.UsuariEntity;
-import es.caib.notib.core.helper.PluginHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
-import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.UsuariRepository;
-import es.caib.notib.plugin.SistemaExternException;
-import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
-import es.caib.notib.plugin.registre.CodiAssumpte;
-import es.caib.notib.plugin.registre.Llibre;
-import es.caib.notib.plugin.registre.LlibreOficina;
-import es.caib.notib.plugin.registre.Oficina;
-import es.caib.notib.plugin.registre.Organisme;
-import es.caib.notib.plugin.registre.RegistrePlugin;
-import es.caib.notib.plugin.registre.RegistrePluginException;
-import es.caib.notib.plugin.registre.RegistreSortida;
-import es.caib.notib.plugin.registre.RespostaAnotacioRegistre;
-import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
-import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
-import es.caib.notib.plugin.registre.TipusAssumpte;
-import es.caib.notib.plugin.unitat.CodiValor;
-import es.caib.notib.plugin.unitat.CodiValorPais;
-import es.caib.notib.plugin.unitat.ObjetoDirectorio;
-import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
-import es.caib.notib.plugin.usuari.DadesUsuari;
-import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentContingut;
-import es.caib.plugins.arxiu.api.Expedient;
-import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
+
+import static org.junit.Assert.fail;
 
 /**
  * Tests per al servei d'entitats.
@@ -636,6 +603,114 @@ public class BaseServiceTest {
 		dto.setTamany(dto.getContingut().length);
 		return dto;
 	}
-	
+
+	// TODO: Millorar per a poder utilitzar amb més casuístiques
+	protected NotificacioDtoV2 generarNotificacio(
+			String notificacioId,
+			ProcedimentDto procediment,
+			EntitatDto entitat,
+			String organEmisor,
+			int numDestinataris,
+			boolean ambEnviamentPostal) throws IOException, DecoderException {
+		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
+		NotificacioDtoV2 notificacio = new NotificacioDtoV2();
+		notificacio.setUsuariCodi("admin");
+		notificacio.setEmisorDir3Codi(organEmisor);
+		notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO);
+		notificacio.setConcepte(
+				"concepte_" + notificacioId);
+		notificacio.setDescripcio(
+				"descripcio_" + notificacioId);
+		notificacio.setEnviamentDataProgramada(new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000));
+		notificacio.setRetard(5);
+		notificacio.setCaducitat(new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000));
+		DocumentDto document = new DocumentDto();
+		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
+		document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
+		document.setHash(
+				Base64.encodeBase64String(
+						Hex.decodeHex(
+								DigestUtils.sha1Hex(arxiuBytes).toCharArray())));
+		document.setNormalitzat(false);
+		document.setGenerarCsv(false);
+		notificacio.setDocument(document);
+		notificacio.setProcediment(procediment);
+		notificacio.setOrganGestor("A00000000");
+		notificacio.setEntitat(entitat);
+		List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<NotificacioEnviamentDtoV2>();
+//		if (ambEnviamentPostal) {
+//			PagadorPostal pagadorPostal = new PagadorPostal();
+//			pagadorPostal.setDir3Codi("A04013511");
+//			pagadorPostal.setFacturacioClientCodi("ccFac_" + notificacioId);
+//			pagadorPostal.setContracteNum("pccNum_" + notificacioId);
+//			pagadorPostal.setContracteDataVigencia(new Date(0));
+//			notificacio.setPagadorPostal(pagadorPostal);
+//			PagadorCie pagadorCie = new PagadorCie();
+//			pagadorCie.setDir3Codi("A04013511");
+//			pagadorCie.setContracteDataVigencia(new Date(0));
+//			notificacio.setPagadorCie(pagadorCie);
+//		}
+		for (int i = 0; i < numDestinataris; i++) {
+			NotificacioEnviamentDtoV2 enviament = new NotificacioEnviamentDtoV2();
+			PersonaDto titular = new PersonaDto();
+			titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+			titular.setNom("titularNom" + i);
+			titular.setLlinatge1("titLlinatge1_" + i);
+			titular.setLlinatge2("titLlinatge2_" + i);
+			titular.setNif("00000000T");
+			titular.setTelefon("666010101");
+			titular.setEmail("titular@gmail.com");
+			enviament.setTitular(titular);
+			List<PersonaDto> destinataris = new ArrayList<PersonaDto>();
+			PersonaDto destinatari = new PersonaDto();
+			destinatari.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+			destinatari.setNom("destinatariNom" + i);
+			destinatari.setLlinatge1("destLlinatge1_" + i);
+			destinatari.setLlinatge2("destLlinatge2_" + i);
+			destinatari.setNif("12345678Z");
+			destinatari.setTelefon("666020202");
+			destinatari.setEmail("destinatari@gmail.com");
+			destinataris.add(destinatari);
+			enviament.setDestinataris(destinataris);
+//			if (ambEnviamentPostal) {
+//				EntregaPostal entregaPostal = new EntregaPostal();
+//				entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.NACIONAL);
+//				entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLE);
+//				entregaPostal.setViaNom("Bas");
+//				entregaPostal.setNumeroCasa("25");
+//				entregaPostal.setNumeroQualificador("bis");
+//				entregaPostal.setPuntKm("pk01");
+//				entregaPostal.setApartatCorreus("0228");
+//				entregaPostal.setPortal("portal" + i);
+//				entregaPostal.setEscala("escala" + i);
+//				entregaPostal.setPlanta("planta" + i);
+//				entregaPostal.setPorta("porta" + i);
+//				entregaPostal.setBloc("bloc" + i);
+//				entregaPostal.setComplement("complement" + i);
+//				entregaPostal.setCodiPostal("07500");
+//				entregaPostal.setPoblacio("poblacio" + i);
+//				entregaPostal.setMunicipiCodi("07033");
+//				entregaPostal.setProvincia("07");
+//				entregaPostal.setPaisCodi("ES");
+//				entregaPostal.setLinea1("linea1_" + i);
+//				entregaPostal.setLinea2("linea2_" + i);
+//				entregaPostal.setCie(new Integer(8));
+//			}
+//			EntregaDehDto entregaDeh = new EntregaDehDto();
+//			entregaDeh.setObligat(true);
+//			entregaDeh.setProcedimentCodi("0000");
+//			enviament.setEntregaDeh(entregaDeh);
+			enviament.setServeiTipus(ServeiTipusEnumDto.URGENT);
+			enviaments.add(enviament);
+		}
+		notificacio.setEnviaments(enviaments);
+		return notificacio;
+	}
+
+	private java.io.InputStream getContingutNotificacioAdjunt() {
+		return getClass().getResourceAsStream(
+				"/es/caib/notib/core/notificacio_adjunt.pdf");
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);
 }
