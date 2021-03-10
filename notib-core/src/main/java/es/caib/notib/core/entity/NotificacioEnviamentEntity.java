@@ -3,44 +3,18 @@
  */
 package es.caib.notib.core.entity;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.ws.notificacio.Enviament;
+import es.caib.notib.core.audit.NotibAuditable;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
-import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
-import es.caib.notib.core.api.ws.notificacio.Enviament;
-import es.caib.notib.core.audit.NotibAuditable;
-import lombok.Getter;
+import javax.persistence.*;
+import java.util.*;
 
 /**
  * Classe del model de dades que representa els enviaments d'una
@@ -51,7 +25,6 @@ import lombok.Getter;
 @Getter
 @Entity
 @Table(name="not_notificacio_env")
-//@SecondaryTable(name="not_notificacio")
 @EntityListeners(AuditingEntityListener.class)
 public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 
@@ -291,8 +264,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	/* Notifica error */
 	@Column(name = "notifica_error", nullable = false)
 	protected boolean notificaError;
-	
-	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade=CascadeType.ALL)
+
+	@Setter
+	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
 	@JoinColumn(name = "notifica_error_event_id")
 	@ForeignKey(name = "not_noteve_noterr_notdest_fk")
 	protected NotificacioEventEntity notificacioErrorEvent;

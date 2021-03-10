@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -275,23 +276,20 @@ public class RegistreNotificaHelper {
 			NotificacioEntity notificacioEntity,
 			Set<NotificacioEnviamentEntity> enviaments,
 			boolean totsAdministracio) {
-
-		//Crea un nou event
-		NotificacioEventEntity event = notificacioEventHelper.defaultEventInstance(notificacioEntity,
-				NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE);
-		
 		if (arbResposta != null) {
 			auditNotificacioHelper.updateNotificacioRegistre(arbResposta, notificacioEntity);
-			logger.info(" >>> Canvi estat a REGISTRADA ");
 
-			for(NotificacioEnviamentEntity enviamentEntity: enviaments) {
-				auditEnviamentHelper.actualitzaRegistreEnviament(
-						arbResposta,
-						notificacioEntity,
-						enviamentEntity,
-						totsAdministracio,
-						event);
-			}
+			String registreNum = arbResposta.getRegistreNumeroFormatat();
+			Date registreData = arbResposta.getRegistreData();
+			NotificacioRegistreEstatEnumDto registreEstat = arbResposta.getEstat();
+
+			//Crea un nou event
+			notificacioEventHelper.addEnviamentRegistreOKEvent(notificacioEntity,
+					registreNum,
+					registreData,
+					registreEstat,
+					enviaments,
+					totsAdministracio);
 		}
 	}
 

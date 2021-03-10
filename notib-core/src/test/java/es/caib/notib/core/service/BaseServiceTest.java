@@ -304,7 +304,7 @@ public class BaseServiceTest {
 						notificacioRepository.delete(notificacioEntity.getId());
 					}
 					procedimentService.delete(
-							entitatId, 
+							entitatId,
 							((ProcedimentDto)element).getId(),
 							true);
 				} else if(element instanceof GrupDto) {
@@ -322,8 +322,10 @@ public class BaseServiceTest {
 				} else if(element instanceof PagadorCieFormatSobreDto) {
 					autenticarUsuari("admin");
 					pagadorCieFormatSobreService.delete(((PagadorCieFormatSobreDto)element).getId());
+				} else if(element instanceof NotificacioDtoV2) {
+					autenticarUsuari("admin");
+					notificacioRepository.delete(((NotificacioDtoV2)element).getId());
 				}
-				
 				logger.debug("...objecte de tipus " + element.getClass().getSimpleName() + " esborrat correctament.");
 			}
 			logger.info("-------------------------------------------------------------------");
@@ -338,7 +340,7 @@ public class BaseServiceTest {
 		testCreantElements(test, null, elements);
 	}
 
-	abstract class TestAmbElementsCreats {
+	protected abstract class TestAmbElementsCreats {
 		public abstract void executar(
 				List<Object> elementsCreats) throws Exception;
 	}
