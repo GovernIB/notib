@@ -1220,7 +1220,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			if (procediment.getNom() != null && !procediment.getNom().isEmpty()) {
 				nom += " - " + procediment.getNom();
 			}
-			response.add(new CodiValorOrganGestorComuDto(procediment.getId().toString(), nom, procediment.getCodi(),
+			response.add(new CodiValorOrganGestorComuDto(procediment.getId().toString(), nom, procediment.getOrganGestor().getCodi(),
 					procediment.isComu()));
 		}
 		return response;
