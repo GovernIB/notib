@@ -116,7 +116,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 
 	@Column(name = "idioma")
 	protected IdiomaEnumDto idioma;
-	
+
+	@Setter
 	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
 	@JoinColumn(name = "not_error_event_id")
 	@ForeignKey(name = "not_noterrevent_notificacio_fk")

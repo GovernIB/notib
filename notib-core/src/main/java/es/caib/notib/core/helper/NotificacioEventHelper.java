@@ -71,6 +71,7 @@ public class NotificacioEventHelper {
                                  NotificacioEventEntity event) {
         deleteByNotificacioAndTipusAndError(
                 notificacio,
+                null,
                 NotificacioEventTipusEnumDto.CALLBACK_CLIENT,
                 event.getCallbackEstat().equals(CallbackEstatEnumDto.ERROR)
         );
@@ -111,6 +112,7 @@ public class NotificacioEventHelper {
         } else {
             deleteByNotificacioAndTipusAndError(
                     notificacio,
+                    enviament,
                     NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,
                     false
             );
@@ -155,6 +157,7 @@ public class NotificacioEventHelper {
     public void addNotificaConsultaSirErrorEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament) {
         deleteByNotificacioAndTipusAndError(
                 notificacio,
+                enviament,
                 NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR,
                 true
         );
@@ -279,6 +282,7 @@ public class NotificacioEventHelper {
         } else {
             deleteByNotificacioAndTipusAndError(
                     notificacio,
+                    enviament,
                     NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
                     false
             );
@@ -369,16 +373,41 @@ public class NotificacioEventHelper {
         }
     }
 
-    private void deleteByNotificacioAndTipusAndError(NotificacioEntity notificacio, NotificacioEventTipusEnumDto tipus, boolean isError){
+    private void deleteByNotificacioAndTipusAndError(NotificacioEntity notificacio,
+                                                     NotificacioEnviamentEntity enviament,
+                                                     NotificacioEventTipusEnumDto tipus, boolean isError){
+        if (isError) {
+            for (NotificacioEventEntity e: new ArrayList<>(notificacio.getEvents())) {
+                if (e.getTipus().equals(tipus) && e.isError() == isError){
+                    preRemoveErrorEvent(e, notificacio, enviament);
+                }
+            }
+        }
+
+        for (NotificacioEventEntity e: new ArrayList<>(notificacio.getEvents())) {
+            if (e.getTipus().equals(tipus) && e.isError() == isError){
+                notificacio.getEvents().remove(e);
+            }
+        }
         notificacioEventRepository.deleteByNotificacioAndTipusAndError(
                 notificacio,
                 tipus,
                 isError
         );
-        for (NotificacioEventEntity e: new ArrayList<>(notificacio.getEvents())) {
-            if (e.getTipus().equals(tipus) && e.isError() == isError){
-                notificacio.getEvents().remove(e);
-            }
+
+    }
+
+    private void preRemoveErrorEvent(NotificacioEventEntity event, NotificacioEntity notificacio, NotificacioEnviamentEntity enviament) {
+        NotificacioEventEntity eventNotificacioNotificaError = notificacio.getNotificaErrorEvent();
+        if (eventNotificacioNotificaError != null && eventNotificacioNotificaError.getId() == event.getId()) {
+            notificacio.setNotificaErrorEvent(null);
+        }
+        event.getEnviament().setNotificacioErrorEvent(null);
+        if (enviament != null) {
+            enviament.setNotificacioErrorEvent(null);
+        }
+        if (event.getNotificacio() != null) {
+            notificacio.getEvents().remove(event);
         }
     }
 
@@ -395,13 +424,7 @@ public class NotificacioEventHelper {
             // conservam l'event més antic i eliminam els intermitjos,
             // si tot va correctament em aquest punt la llista només tendra dos elements.
             NotificacioEventEntity event = events.get(1);
-            event.getEnviament().setNotificacioErrorEvent(null);
-            if (enviament != null) {
-                enviament.setNotificacioErrorEvent(null);
-            }
-            if (event.getNotificacio() != null) {
-                notificacio.getEvents().remove(event);
-            }
+            preRemoveErrorEvent(event, notificacio, enviament);
             notificacioEventRepository.delete(event);
             notificacioEventRepository.flush();
         }

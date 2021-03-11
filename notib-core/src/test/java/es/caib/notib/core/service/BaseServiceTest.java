@@ -324,7 +324,7 @@ public class BaseServiceTest {
 					pagadorCieFormatSobreService.delete(((PagadorCieFormatSobreDto)element).getId());
 				} else if(element instanceof NotificacioDtoV2) {
 					autenticarUsuari("admin");
-					notificacioRepository.delete(((NotificacioDtoV2)element).getId());
+					notificacioService.delete(entitatId, ((NotificacioDtoV2)element).getId());
 				}
 				logger.debug("...objecte de tipus " + element.getClass().getSimpleName() + " esborrat correctament.");
 			}
