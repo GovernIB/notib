@@ -67,19 +67,14 @@ public class NotificacioEventHelper {
         return addErrorEvent(notificacio, eventTipus, null, errorDescripcio, notificaError);
     }
 
-
     public void addCallbackEvent(NotificacioEntity notificacio,
                                  NotificacioEventEntity event) {
-        notificacioEventRepository.deleteByNotificacioAndTipusAndError(
+        deleteByNotificacioAndTipusAndError(
                 notificacio,
                 NotificacioEventTipusEnumDto.CALLBACK_CLIENT,
                 event.getCallbackEstat().equals(CallbackEstatEnumDto.ERROR)
         );
-        for (NotificacioEventEntity e: new ArrayList<>(notificacio.getEvents())) {
-            if (e.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) && e.isError() == event.getCallbackEstat().equals(CallbackEstatEnumDto.ERROR)){
-                notificacio.getEvents().remove(e);
-            }
-        }
+
         // Crea una nova entrada a la taula d'events per deixar constància de la notificació a l'aplicació client
         NotificacioEventEntity.Builder eventBuilder;
         if (event.getEnviament() != null) {
@@ -114,7 +109,7 @@ public class NotificacioEventHelper {
         if (isError) {
             clearUselessErrors(notificacio, enviament, NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT);
         } else {
-            notificacioEventRepository.deleteByNotificacioAndTipusAndError(
+            deleteByNotificacioAndTipusAndError(
                     notificacio,
                     NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,
                     false
@@ -140,6 +135,7 @@ public class NotificacioEventHelper {
         enviament.updateNotificaError(isError, isError ? event : null);
         notificacioEventRepository.save(event);
     }
+
     public void addRegistreConsultaInfoErrorEvent(NotificacioEntity notificacio,
                                               NotificacioEnviamentEntity enviament,
                                               String descripcio) {
@@ -157,7 +153,7 @@ public class NotificacioEventHelper {
     }
 
     public void addNotificaConsultaSirErrorEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament) {
-        notificacioEventRepository.deleteByNotificacioAndTipusAndError(
+        deleteByNotificacioAndTipusAndError(
                 notificacio,
                 NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR,
                 true
@@ -281,7 +277,7 @@ public class NotificacioEventHelper {
         if (isError){
             clearUselessErrors(notificacio, enviament, NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO);
         } else {
-            notificacioEventRepository.deleteByNotificacioAndTipusAndError(
+            deleteByNotificacioAndTipusAndError(
                     notificacio,
                     NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
                     false
@@ -370,6 +366,19 @@ public class NotificacioEventHelper {
                 break;
             default:
                 break;
+        }
+    }
+
+    private void deleteByNotificacioAndTipusAndError(NotificacioEntity notificacio, NotificacioEventTipusEnumDto tipus, boolean isError){
+        notificacioEventRepository.deleteByNotificacioAndTipusAndError(
+                notificacio,
+                tipus,
+                isError
+        );
+        for (NotificacioEventEntity e: new ArrayList<>(notificacio.getEvents())) {
+            if (e.getTipus().equals(tipus) && e.isError() == isError){
+                notificacio.getEvents().remove(e);
+            }
         }
     }
 
