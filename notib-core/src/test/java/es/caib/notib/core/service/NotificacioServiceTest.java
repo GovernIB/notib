@@ -111,6 +111,7 @@ public class NotificacioServiceTest extends BaseServiceTest {
 					configureMockRegistrePlugin();
 					configureMockUnitatsOrganitzativesPlugin();
 					configureMockDadesUsuariPlugin();
+					configureMockGestioDocumentalPlugin();
 					autenticarUsuari("admin");
 					
 					EntitatDto entitatCreate = (EntitatDto)elementsCreats.get(0);
