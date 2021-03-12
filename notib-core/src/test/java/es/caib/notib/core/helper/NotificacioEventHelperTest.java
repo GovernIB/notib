@@ -427,6 +427,9 @@ public class NotificacioEventHelperTest extends BaseServiceTest {
                                 true);
                         assertEquals(0, events.size());
 
+                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+                            enviament.setNotificaEstat(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT);
+                        }
                     }
                 },
                 "Netejar events no útils",

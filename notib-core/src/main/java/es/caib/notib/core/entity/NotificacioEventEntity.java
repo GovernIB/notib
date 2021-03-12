@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.ForeignKey;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -48,12 +50,14 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_id")
 	@ForeignKey(name = "not_notifi_noteve_fk")
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private NotificacioEntity notificacio;
 
 	@Setter
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_env_id")
 	@ForeignKey(name = "not_notenv_noteve_fk")
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private NotificacioEnviamentEntity enviament;
 	
 	@Column(name = "callback_estat", length = 10, nullable = true)

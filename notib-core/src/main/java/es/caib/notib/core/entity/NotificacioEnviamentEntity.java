@@ -8,11 +8,12 @@ import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.audit.NotibAuditable;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ForeignKey;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.persistence.*;
 import java.util.*;
 
@@ -269,6 +270,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
 	@JoinColumn(name = "notifica_error_event_id")
 	@ForeignKey(name = "not_noteve_noterr_notdest_fk")
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	protected NotificacioEventEntity notificacioErrorEvent;
 	
 	@Column(name = "notifica_intent_data")

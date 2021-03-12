@@ -426,15 +426,18 @@ public class NotificacioServiceImpl implements NotificacioService {
 			
 			List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacio(notificacio);
 //			### Esborrar la notificació
-			auditNotificacioHelper.deleteNotificacio(notificacio);
 			if (enviamentsPendents != null && ! enviamentsPendents.isEmpty()) {
 //				## El titular s'ha d'esborrar de forma individual
 				for (NotificacioEnviamentEntity enviament : notificacio.getEnviaments()) {
 					PersonaEntity titular = enviament.getTitular();
 					if (HibernateHelper.isProxy(titular))
 						titular = HibernateHelper.deproxy(titular);
+					notificacioEnviamentRepository.delete(enviament.getId());
 					personaRepository.delete(titular);
 				}
+				notificacio.setEnviaments(null);
+				notificacio.setEvents(null);
+				auditNotificacioHelper.deleteNotificacio(notificacio);
 				logger.debug("La notificació s'ha esborrat correctament (notificacioId=" + notificacioId + ")");
 			} else {
 				throw new ValidationException("Aquesta notificació està enviada i no es pot esborrar");
