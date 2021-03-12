@@ -9,14 +9,13 @@ import es.caib.notib.core.aspect.Audita;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
-import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.security.GeneralSecurityException;
+import java.util.Date;
 import java.util.List;
 
 
@@ -138,10 +137,9 @@ public class AuditEnviamentHelper {
 	public NotificacioEnviamentEntity updateEnviamentEnviat(
 			NotificacioEntity notificacio,
 			NotificacioEventEntity event,
-			ResultadoEnvio resultadoEnvio,
+			String identificadorResultat,
 			NotificacioEnviamentEntity enviament) {
-		enviament.updateNotificaEnviada(
-				resultadoEnvio.getIdentificador());
+		enviament.updateNotificaEnviada(identificadorResultat);
 		
 		//Registrar event per enviament
 		log.info(" >>> Canvi estat a ENVIADA ");
@@ -165,14 +163,16 @@ public class AuditEnviamentHelper {
 	
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
 	public NotificacioEnviamentEntity actualitzaRegistreEnviament(
-			RespostaConsultaRegistre arbResposta,
 			NotificacioEntity notificacioEntity,
 			NotificacioEnviamentEntity enviament,
+			String registreNum,
+			Date registreData,
+			NotificacioRegistreEstatEnumDto registreEstat,
 			boolean totsAdministracio,
 			NotificacioEventEntity event) {
-		enviament.setRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
-		enviament.setRegistreData(arbResposta.getRegistreData());
-		enviament.setRegistreEstat(arbResposta.getEstat());
+		enviament.setRegistreNumeroFormatat(registreNum);
+		enviament.setRegistreData(registreData);
+		enviament.setRegistreEstat(registreEstat);
 		
 		//Comunicació + administració (SIR)
 		if (totsAdministracio) {

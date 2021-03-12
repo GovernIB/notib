@@ -53,9 +53,7 @@ import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Helper per a interactuar amb la versió 2 del servei web de Notific@.
@@ -125,7 +123,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 				//Crea un nou event
 				startTime = System.nanoTime();
-				notificacioEventHelper.addNotificaEnviamentEvent(notificacio, resultadoAlta);
+				Map<NotificacioEnviamentEntity, String> identificadorsResultatsEnviaments = new HashMap<>();
+				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
+					for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+						if (enviament.getTitular().getNif().equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
+							identificadorsResultatsEnviaments.put(enviament, resultadoEnvio.getIdentificador());
+						}
+					}
+				}
+				notificacioEventHelper.addEnviamentNotificaOKEvent(notificacio, identificadorsResultatsEnviaments);
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				logger.info(" [TIMER-NOT] Notificació enviar (Preparar events)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
 

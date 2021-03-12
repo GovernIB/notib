@@ -504,12 +504,13 @@
 
 		$('#organGestor').on('change', function() {
 			//### seleccionat per defecte si només hi ha un (empty + òrgan)
-			if ($('#organGestor').children('option').length == 2) {
-				$('#organGestor option:eq(1)').attr('selected', 'selected');
-				$('#organGestor').trigger('change.select2');
-			}else if($('#organGestor').children('option').length == 3){
+			let num_organs = $('#organGestor').children('option').length - 1;
+			if (num_organs === 1) {
+				let selDir3 = $('#organGestor > option')[1].value;
+				$("#organGestor").val(selDir3).trigger("change.select2");
+			}else if(num_organs === 2){
 				$('#organGestor > option').each(function() {
-					if(this.value == $('#entitatDir3Codi').val())
+					if(this.value === $('#entitatDir3Codi').val())
 						$('#organGestor option:eq(1)').attr('selected', 'selected');
 					$('#organGestor').trigger('change.select2');
 				});
@@ -519,7 +520,7 @@
 			if (organ == undefined || organ == "") {
 				organ = "-";
 			}
-			if ($('#organGestor').children('option').length > 1) {
+			if (num_organs > 0) {
 				$.ajax({
 					type: 'GET',
 					url: "<c:url value="/notificacio/organ/"/>" + organ + "/procediments",

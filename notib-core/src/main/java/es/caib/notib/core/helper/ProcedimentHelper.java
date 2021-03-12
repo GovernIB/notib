@@ -133,19 +133,19 @@ public class ProcedimentHelper {
 		for (GrupProcedimentEntity permisGrup: grupsProcediment) {
 			List<DadesUsuari> usuarisGrup = pluginHelper.dadesUsuariConsultarAmbGrup(
 					permisGrup.getGrup().getCodi());
-				sb.append(" rol ").append(permisGrup.getGrup().getCodi()).append(" (");
-				
-				if (usuarisGrup != null) {
-					for (DadesUsuari usuariGrup: usuarisGrup) {
-						for (PermisDto permis : permisos) {
-							if (permis.getPrincipal().equals(usuariGrup.getCodi())) {
-								usuaris.add(usuariGrup.getCodi());
-								sb.append(" ").append(usuariGrup.getCodi());
-							}
+			sb.append(" rol ").append(permisGrup.getGrup().getCodi()).append(" (");
+
+			if (usuarisGrup != null) {
+				for (DadesUsuari usuariGrup: usuarisGrup) {
+					for (PermisDto permis : permisos) {
+						if (permis.getPrincipal().equals(usuariGrup.getCodi())) {
+							usuaris.add(usuariGrup.getCodi());
+							sb.append(" ").append(usuariGrup.getCodi());
 						}
 					}
 				}
-				sb.append(")");
+			}
+			sb.append(")");
 			
 		}
 		logger.debug(sb.toString());

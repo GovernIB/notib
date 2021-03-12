@@ -3,22 +3,6 @@
  */
 package es.caib.notib.core.helper;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
-import javax.annotation.Resource;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Component;
-
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.GrupProcedimentEntity;
@@ -28,6 +12,16 @@ import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.util.*;
 
 /**
  * Mètodes per a l'enviament de correus.
@@ -237,31 +231,33 @@ public class EmailHelper {
 		Set<String> usuaris = new HashSet<String>();
 		GrupEntity grup;
 		
-		if (notificacio.getProcediment() != null) {
-			if (notificacio.getGrupCodi() != null) {
-				grup = grupRepository.findByCodiAndEntitat(notificacio.getGrupCodi(), notificacio.getEntitat());
-				if (grup != null)
-					usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrupNotificacio(grup, notificacio.getProcediment());
+		if (notificacio.getProcediment() == null) {
+			return destinataris;
+		}
+
+		if (notificacio.getGrupCodi() != null) {
+			grup = grupRepository.findByCodiAndEntitat(notificacio.getGrupCodi(), notificacio.getEntitat());
+			if (grup != null)
+				usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrupNotificacio(grup, notificacio.getProcediment());
+		} else {
+			List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepository.findByProcediment(notificacio.getProcediment());
+
+			if (notificacio.getProcediment().isAgrupar() && !grupsProcediment.isEmpty()) {
+				usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrup(notificacio.getProcediment());
 			} else {
-				List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepository.findByProcediment(notificacio.getProcediment());
-				
-				if (notificacio.getProcediment().isAgrupar() && !grupsProcediment.isEmpty()) {
-					usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrup(notificacio.getProcediment());
-				} else {
-					usuaris = procedimentHelper.findUsuarisAmbPermisReadPerProcediment(notificacio.getProcediment());
-				}
+				usuaris = procedimentHelper.findUsuarisAmbPermisReadPerProcediment(notificacio.getProcediment());
 			}
-			
-			for (String usuari: usuaris) {
-				DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
-				if (dadesUsuari != null && dadesUsuari.getEmail() != null) {
-					UsuariEntity user = usuariRepository.findOne(usuari);
-					if (user == null || user.isRebreEmailsNotificacio()) {
-						UsuariDto u = new UsuariDto();
-						u.setCodi(usuari);
-						u.setEmail(dadesUsuari.getEmail());
-						destinataris.add(u);
-					}
+		}
+
+		for (String usuari: usuaris) {
+			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
+			if (dadesUsuari != null && dadesUsuari.getEmail() != null) {
+				UsuariEntity user = usuariRepository.findOne(usuari);
+				if (user == null || user.isRebreEmailsNotificacio()) {
+					UsuariDto u = new UsuariDto();
+					u.setCodi(usuari);
+					u.setEmail(dadesUsuari.getEmail());
+					destinataris.add(u);
 				}
 			}
 		}

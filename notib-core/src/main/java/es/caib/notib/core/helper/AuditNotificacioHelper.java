@@ -184,7 +184,8 @@ public class AuditNotificacioHelper {
 	}
 	
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
-	public NotificacioEntity updateNotificacioRegistre(RespostaConsultaRegistre arbResposta, NotificacioEntity notificacioEntity) {
+	public NotificacioEntity updateNotificacioRegistre(RespostaConsultaRegistre arbResposta,
+													   NotificacioEntity notificacioEntity) {
 		notificacioEntity.updateRegistreNumero(Integer.parseInt(arbResposta.getRegistreNumero()));
 		notificacioEntity.updateRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
 		notificacioEntity.updateRegistreData(arbResposta.getRegistreData());

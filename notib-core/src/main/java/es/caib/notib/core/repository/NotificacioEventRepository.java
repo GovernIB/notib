@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.notib.core.repository;
 
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
@@ -9,6 +6,7 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -31,6 +29,7 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 	List<NotificacioEventEntity> findByEnviamentIdOrderByIdAsc(
 			Long enviamentId);
 
+	@Modifying
 	@Query( " delete from " +
 			"	NotificacioEventEntity ne " +
 			" where " +
@@ -42,7 +41,7 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			"								   es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO)" +
 			")) "
 	)
-	void deleteOldUselessEvents(NotificacioEntity notificacio);
+	void deleteOldUselessEvents(@Param("notificacio") NotificacioEntity notificacio);
 
 	void deleteByEnviament(NotificacioEnviamentEntity enviament);
 
