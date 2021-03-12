@@ -1017,7 +1017,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			Collections.sort(procediments, new Comparator<ProcedimentEntity>() {
 				@Override
 				public int compare(ProcedimentEntity p1, ProcedimentEntity p2) {
-					return p1.getNom().compareTo(p2.getNom());
+					return (p1.getNom()==null?"":p1.getNom()).compareTo(p2.getNom()==null?"":p2.getNom());
 				}
 			});
 			

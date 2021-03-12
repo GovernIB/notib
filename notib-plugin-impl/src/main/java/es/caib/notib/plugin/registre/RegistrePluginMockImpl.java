@@ -11,6 +11,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.plugin.utils.PropertiesHelper;
@@ -31,6 +37,16 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 			AsientoRegistralBeanDto arb, 
 			Long tipusOperacio) {
 		RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
+		logger.info(arb.toString());
+		System.out.println(">>> DETALL REGISTRE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(arb);
+			System.out.println(json);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		System.out.println(">>> FIIIIIIII  DETALL REGISTRE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		if (arb.getResumen().startsWith("Error")) {
 			resposta.setErrorCodi("3");
 			resposta.setErrorDescripcio("Error de registre MOCK (" + System.currentTimeMillis() + ")");
@@ -361,5 +377,13 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	public static String getJustificantPath() {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.regweb.mock.justificant");
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(RegistrePluginMockImpl.class);
+	
+	@Override
+	public String toString() {
+	    return getClass().getName() + "@" + Integer.toHexString(hashCode());
+	}
+	
 	
 }
