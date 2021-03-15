@@ -396,28 +396,33 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		try {
 			long startTime;
 			double elapsedTime;
-			ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getDir3Codi());
+
 			IntegracioInfo info = new IntegracioInfo(
 					IntegracioHelper.INTCODI_PROCEDIMENT, 
 					"Actualització de procediments", 
 					IntegracioAccioTipusEnumDto.PROCESSAR, 
 					new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
+
+//				logger.debug(">>>> Inici actualitzar procediments");
+//				logger.debug(">>>> ==========================================================================");
+			// Comprova si hi ha una altre instància del procés en execució
+			ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getDir3Codi());
+			if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
+//					logger.debug(">>>> Ja existeix un altre procés que està executant l'actualització");
+//					logger.debug(">>>> ==========================================================================");
+
+				return;	// Ja existeix un altre procés que està executant l'actualització.
+			}
+
+			// inicialitza el seguiment del prgrés d'actualització
+			progres = new ProgresActualitzacioDto();
+			progresActualitzacio.put(entitatDto.getDir3Codi(), progres);
 			
 			try {
 				boolean modificar = isActualitzacioProcedimentsModificarProperty();
 				boolean eliminarOrgans = isActualitzacioProcedimentsEliminarOrgansProperty();
 				Long ti = System.currentTimeMillis();
-//				logger.debug(">>>> Inici actualitzar procediments");
-//				logger.debug(">>>> ==========================================================================");
-				if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
-//					logger.debug(">>>> Ja existeix un altre procés que està executant l'actualització");
-//					logger.debug(">>>> ==========================================================================");
-					
-					return;	// Ja existeix un altre procés que està executant l'actualització.
-				} else {
-					progres = new ProgresActualitzacioDto();
-					progresActualitzacio.put(entitatDto.getDir3Codi(), progres);
-				}
+
 				progres.addInfo(TipusInfo.TITOL, messageHelper.getMessage("procediment.actualitzacio.auto.inici", new Object[] {entitatDto.getNom()}));
 			
 				List<OrganGestorEntity> organsGestorsModificats = new ArrayList<OrganGestorEntity>();
@@ -431,15 +436,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(entitatDto.getDir3Codi());
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				logger.info(" [TIMER-PRO] Obtenir organigrama de l'entitat: " + elapsedTime + " ms");
-//				OficinaDto oficinaVirtual = pluginHelper.llistarOficinaVirtual(
-//						entitatDto.getDir3Codi(), 
-//						entitat.getNomOficinaVirtual(),
-//						TipusRegistreRegweb3Enum.REGISTRE_SORTIDA);
 
-//				logger.debug(">>>> Obtenir de 30 en 30 els procediments de Rolsac de l'entitat...");
 				progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments"));
 				List<ProcedimentDto> procedimentsGda  = new ArrayList<ProcedimentDto>();
-//				List<ProcedimentDto> totalProcedimentsGda  = new ArrayList<ProcedimentDto>();
 				startTime = System.nanoTime();
 				int totalElements = getTotalProcediments(entitatDto.getDir3Codi());
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
@@ -488,9 +487,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						//#260 Modificació passar la funcionalitat del for dins un procediment, ja que pel temps de transacció fallava, 
 						//i també d'aquesta forma els que s'han carregat ja es guardan.
 						procedimentHelper.actualitzarProcedimentFromGda(
-								progres, 
-								t1, 
-								t2, 
+								progres,
 								procedimentGda, 
 								entitatDto, 
 								entitat,
