@@ -126,6 +126,140 @@ public class NotificacioEventHelperTest extends BaseServiceTest {
 
 
     @Test
+    public void clearOldUselessEventsTest() {
+        testCreantElements(
+                new TestAmbElementsCreats() {
+                    @Override
+                    public void executar(List<Object> elementsCreats) throws Exception {
+                        List<NotificacioEventEntity> events;
+                        NotificacioEventTipusEnumDto tipus;
+                        autenticarUsuari("admin");
+
+                        // 1. Crear notificacio
+                        EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+                        ProcedimentDto procedimentCreat = (ProcedimentDto)elementsCreats.get(2);
+                        NotificacioDtoV2 notificacioCreada = (NotificacioDtoV2)elementsCreats.get(3);
+                        assertNotNull(procedimentCreat);
+                        assertNotNull(entitatCreada);
+                        assertNotNull(notificacioCreada);
+
+                        NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioCreada.getId());
+
+                        ////
+                        // 2. Crear events en la notificació
+                        ////
+                        notificacioEventHelper.addEnviamentRegistreOKEvent(notificacioEntity, "666", new Date(),
+                                NotificacioRegistreEstatEnumDto.OFICI_EXTERN, notificacioEntity.getEnviaments(), true);
+
+                        Map<NotificacioEnviamentEntity, String> identificadorsResultatsEnviaments = new HashMap<>();
+                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+                            identificadorsResultatsEnviaments.put(enviament, "identificador");
+                        }
+                        notificacioEventHelper.addEnviamentNotificaOKEvent(notificacioEntity, identificadorsResultatsEnviaments);
+
+                        // event notifica informa finalitzat
+                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+                            notificacioEventHelper.addNotificaCallbackEvent(notificacioEntity, enviament,
+                                    NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
+                                    "datat resultado darrer");
+                        }
+
+                        // Events que s'haurien d'esborrar
+                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+                            notificacioEventHelper.addRegistreConsultaInfoErrorEvent(notificacioEntity,
+                                    enviament, "registre_consulta_info_" + enviament.getId());
+                        }
+
+                        ////
+                        // 3. Comprovar que els events estan desats a la base de dades
+                        ////
+
+                        // events enviament registre ok
+                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE;
+                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+                                notificacioEntity,
+                                tipus,
+                                false);
+                        assertEquals(1, events.size());
+
+                        // events enviament notifica ok
+                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT;
+                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+                                notificacioEntity,
+                                tipus,
+                                false);
+                        assertEquals(1, events.size());
+
+                        // events notifica informa finalitzat
+                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO;
+                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+                                notificacioEntity,
+                                tipus,
+                                false);
+                        assertEquals(notificacioEntity.getEnviaments().size(), events.size());
+
+                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO;
+                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+                                notificacioEntity,
+                                tipus,
+                                true);
+                        assertEquals(notificacioEntity.getEnviaments().size(), events.size());
+
+                        ////
+                        // 4. Executar el mètode
+                        ////
+                        notificacioEventHelper.clearOldUselessEvents(notificacioEntity);
+
+                        ////
+                        // 5. Comprovar que els events que s'havien de borrar s'han borrat,
+                        // i que els que no s'havien de borrar encara hi son
+                        ////
+
+                        // events enviament registre ok
+                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE;
+                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+                                notificacioEntity,
+                                tipus,
+                                false);
+                        assertEquals(1, events.size());
+
+                        // events enviament notifica ok
+                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT;
+                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+                                notificacioEntity,
+                                tipus,
+                                false);
+                        assertEquals(1, events.size());
+
+                        // events notifica informa finalitzat
+                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO;
+                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+                                notificacioEntity,
+                                tipus,
+                                false);
+                        assertEquals(notificacioEntity.getEnviaments().size(), events.size());
+
+                        // events a esborrar
+                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO;
+                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+                                notificacioEntity,
+                                tipus,
+                                true);
+                        assertEquals(0, events.size());
+
+                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+                            enviament.setNotificaEstat(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT);
+                        }
+                    }
+                },
+                "Netejar events no útils",
+                entitat,
+                organGestor,
+                procediment,
+                notificacio);
+    }
+
+    @Test
     public void addRegistreCallBackEstatEventTest() {
         testCreantElements(
                 new TestAmbElementsCreats() {
@@ -305,138 +439,43 @@ public class NotificacioEventHelperTest extends BaseServiceTest {
                 notificacio);
     }
 
-    @Test
-    public void clearOldUselessEventsTest() {
-        testCreantElements(
-                new TestAmbElementsCreats() {
-                    @Override
-                    public void executar(List<Object> elementsCreats) throws Exception {
-                        List<NotificacioEventEntity> events;
-                        NotificacioEventTipusEnumDto tipus;
-                        autenticarUsuari("admin");
-
-                        // 1. Crear notificacio
-                        EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-                        ProcedimentDto procedimentCreat = (ProcedimentDto)elementsCreats.get(2);
-                        NotificacioDtoV2 notificacioCreada = (NotificacioDtoV2)elementsCreats.get(3);
-                        assertNotNull(procedimentCreat);
-                        assertNotNull(entitatCreada);
-                        assertNotNull(notificacioCreada);
-
-                        NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioCreada.getId());
-
-                        ////
-                        // 2. Crear events en la notificació
-                        ////
-                        notificacioEventHelper.addEnviamentRegistreOKEvent(notificacioEntity, "666", new Date(),
-                                NotificacioRegistreEstatEnumDto.OFICI_EXTERN, notificacioEntity.getEnviaments(), true);
-
-                        Map<NotificacioEnviamentEntity, String> identificadorsResultatsEnviaments = new HashMap<>();
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            identificadorsResultatsEnviaments.put(enviament, "identificador");
-                        }
-                        notificacioEventHelper.addEnviamentNotificaOKEvent(notificacioEntity, identificadorsResultatsEnviaments);
-
-                        // event notifica informa finalitzat
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            notificacioEventHelper.addNotificaCallbackEvent(notificacioEntity, enviament,
-                                    NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-                                    "datat resultado darrer");
-                        }
-
-                        // Events que s'haurien d'esborrar
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            notificacioEventHelper.addRegistreConsultaInfoErrorEvent(notificacioEntity,
-                                    enviament, "registre_consulta_info_" + enviament.getId());
-                        }
-
-                        ////
-                        // 3. Comprovar que els events estan desats a la base de dades
-                        ////
-
-                        // events enviament registre ok
-                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                false);
-                        assertEquals(1, events.size());
-
-                        // events enviament notifica ok
-                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                false);
-                        assertEquals(1, events.size());
-
-                        // events notifica informa finalitzat
-                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                false);
-                        assertEquals(notificacioEntity.getEnviaments().size(), events.size());
-
-                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                true);
-                        assertEquals(notificacioEntity.getEnviaments().size(), events.size());
-
-                        ////
-                        // 4. Executar el mètode
-                        ////
-                        notificacioEventHelper.clearOldUselessEvents(notificacioEntity);
-
-                        ////
-                        // 5. Comprovar que els events que s'havien de borrar s'han borrat,
-                        // i que els que no s'havien de borrar encara hi son
-                        ////
-
-                        // events enviament registre ok
-                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                false);
-                        assertEquals(1, events.size());
-
-                        // events enviament notifica ok
-                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                false);
-                        assertEquals(1, events.size());
-
-                        // events notifica informa finalitzat
-                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                false);
-                        assertEquals(notificacioEntity.getEnviaments().size(), events.size());
-
-                        // events a esborrar
-                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                true);
-                        assertEquals(0, events.size());
-
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            enviament.setNotificaEstat(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT);
-                        }
-                    }
-                },
-                "Netejar events no útils",
-                entitat,
-                organGestor,
-                procediment,
-                notificacio);
-    }
-
+//    @Test
+//    public void addErrorEventTest() {
+//
+//    }
+//
+//    @Test
+//    public void addCallbackEventTest() {
+//
+//    }
+//
+//    @Test
+//    public void addNotificaConsultaSirErrorEventTest() {
+//
+//    }
+//
+//    @Test
+//    public void addEnviamentRegistreOKEventTest() {
+//
+//    }
+//
+//    @Test
+//    public void addEnviamentNotificaOKEventTest() {
+//
+//    }
+//
+//    @Test
+//    public void addNotificaCallbackEventTest() {
+//
+//    }
+//
+//    @Test
+//    public void addNotificaConsultaInfoEventTest() {
+//
+//    }
+//
+//    @Test
+//    public void addNotificaConsultaErrorEventTest() {
+//
+//    }
 }

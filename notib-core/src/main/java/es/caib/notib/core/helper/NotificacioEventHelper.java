@@ -41,16 +41,55 @@ public class NotificacioEventHelper {
         notificacioEventRepository.deleteOldUselessEvents(notificacio);
     }
 
-    public NotificacioEventEntity defaultEventInstance(NotificacioEntity notificacio,
-                                     NotificacioEventTipusEnumDto eventTipus){
+    public void addRegistreCallBackEstatEvent(NotificacioEntity notificacio,
+                                              NotificacioEnviamentEntity enviament,
+                                              String descripcio,
+                                              boolean isError) {
+        if (isError) {
+            clearUselessErrors(notificacio, enviament, NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT);
+        } else {
+            deleteByNotificacioAndTipusAndError(
+                    notificacio,
+                    enviament,
+                    NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,
+                    false
+            );
+        }
         NotificacioEventEntity.Builder eventBuilder = NotificacioEventEntity.getBuilder(
-                eventTipus,
-                notificacio);
+                NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,
+                enviament.getNotificacio()).
+                error(isError).
+                enviament(enviament);
+        if (isError) {
+            eventBuilder.errorDescripcio(descripcio);
+        } else {
+            eventBuilder.descripcio(descripcio);
+        }
 
-        if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+
+        if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
             eventBuilder.callbackInicialitza();
-        return eventBuilder.build();
+        NotificacioEventEntity event = eventBuilder.build();
 
+        notificacio.updateEventAfegir(event);
+        enviament.updateNotificaError(isError, isError ? event : null);
+        notificacioEventRepository.save(event);
+    }
+
+    public void addRegistreConsultaInfoErrorEvent(NotificacioEntity notificacio,
+                                                  NotificacioEnviamentEntity enviament,
+                                                  String descripcio) {
+        clearUselessErrors(notificacio, enviament, NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO);
+        NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+                NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO,
+                notificacio).
+                enviament(enviament).
+                error(true).
+                errorDescripcio(descripcio).
+                build();
+        notificacio.updateEventAfegir(event);
+        notificacioEventRepository.save(event);
+        enviament.updateNotificaError(true, event);
     }
 
     public NotificacioEventEntity addErrorEvent(NotificacioEntity notificacio,
@@ -103,57 +142,6 @@ public class NotificacioEventHelper {
         notificacioEventRepository.save(callbackEvent);
     }
 
-    public void addRegistreCallBackEstatEvent(NotificacioEntity notificacio,
-                                              NotificacioEnviamentEntity enviament,
-                                              String descripcio,
-                                              boolean isError) {
-        if (isError) {
-            clearUselessErrors(notificacio, enviament, NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT);
-        } else {
-            deleteByNotificacioAndTipusAndError(
-                    notificacio,
-                    enviament,
-                    NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,
-                    false
-            );
-        }
-        NotificacioEventEntity.Builder eventBuilder = NotificacioEventEntity.getBuilder(
-                NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,
-                enviament.getNotificacio()).
-                error(isError).
-                enviament(enviament);
-        if (isError) {
-            eventBuilder.errorDescripcio(descripcio);
-        } else {
-            eventBuilder.descripcio(descripcio);
-        }
-
-
-        if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-            eventBuilder.callbackInicialitza();
-        NotificacioEventEntity event = eventBuilder.build();
-
-        notificacio.updateEventAfegir(event);
-        enviament.updateNotificaError(isError, isError ? event : null);
-        notificacioEventRepository.save(event);
-    }
-
-    public void addRegistreConsultaInfoErrorEvent(NotificacioEntity notificacio,
-                                              NotificacioEnviamentEntity enviament,
-                                              String descripcio) {
-        clearUselessErrors(notificacio, enviament, NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO);
-        NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
-                NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO,
-                notificacio).
-                enviament(enviament).
-                error(true).
-                errorDescripcio(descripcio).
-                build();
-        notificacio.updateEventAfegir(event);
-        notificacioEventRepository.save(event);
-        enviament.updateNotificaError(true, event);
-    }
-
     public void addNotificaConsultaSirErrorEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament) {
         deleteByNotificacioAndTipusAndError(
                 notificacio,
@@ -186,8 +174,13 @@ public class NotificacioEventHelper {
                                             boolean totsAdministracio) {
 
         //Crea un nou event
-        NotificacioEventEntity event = defaultEventInstance(notificacioEntity,
-                NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE);
+        NotificacioEventEntity.Builder eventBuilder = NotificacioEventEntity.getBuilder(
+                NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
+                notificacioEntity);
+
+        if (notificacioEntity.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+            eventBuilder.callbackInicialitza();
+        NotificacioEventEntity event = eventBuilder.build();
 
         logger.info(" >>> Canvi estat a REGISTRADA ");
         for(NotificacioEnviamentEntity enviamentEntity: enviaments) {
@@ -297,7 +290,7 @@ public class NotificacioEventHelper {
         NotificacioEventEntity event = eventBuilder.build();
 
         notificacio.updateEventAfegir(event);
-        notificacioEventRepository.save(event); // #235 Faltava desar l'event
+        notificacioEventRepository.save(event);
         enviament.updateNotificaError(isError, isError ? event : null);
     }
 
