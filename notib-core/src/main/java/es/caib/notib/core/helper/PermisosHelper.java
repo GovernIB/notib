@@ -414,9 +414,10 @@ public class PermisosHelper {
 		ObjectIdentity oid = new ObjectIdentityImpl(
 				objectClass,
 				objectIdentifier);
-		Acl acl = aclService.readAclById(oid);
-		List<Permission> ps = Arrays.asList(permissions);
 		try {
+			Acl acl = aclService.readAclById(oid);
+			List<Permission> ps = Arrays.asList(permissions);
+
 			return acl.isGranted(
 					ps,
 					sids,
