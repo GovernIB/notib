@@ -344,6 +344,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.registreNumeroFormatat = registreNumeroFormatat;
 	}
 
+
 	public void updateRegistreEstat(
 			NotificacioRegistreEstatEnumDto registreEstat,
 			Date registreEstatData,
@@ -905,7 +906,11 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			return false;
 		return true;
 	}
-	
+
+	@PreRemove
+	private void preRemove() {
+		this.notificacioErrorEvent = null;
+	}
 
 	private static final long serialVersionUID = 6993171107561077019L;
 }

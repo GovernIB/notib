@@ -427,6 +427,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 			List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacio(notificacio);
 //			### Esborrar la notificació
 			if (enviamentsPendents != null && ! enviamentsPendents.isEmpty()) {
+				// esborram tots els seus events
+				notificacioEventRepository.deleteByNotificacio(notificacio);
+
 //				## El titular s'ha d'esborrar de forma individual
 				for (NotificacioEnviamentEntity enviament : notificacio.getEnviaments()) {
 					PersonaEntity titular = enviament.getTitular();
@@ -435,8 +438,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					notificacioEnviamentRepository.delete(enviament.getId());
 					personaRepository.delete(titular);
 				}
-				notificacio.setEnviaments(null);
-				notificacio.setEvents(null);
+
 				auditNotificacioHelper.deleteNotificacio(notificacio);
 				logger.debug("La notificació s'ha esborrat correctament (notificacioId=" + notificacioId + ")");
 			} else {
