@@ -69,11 +69,9 @@ pageContext.setAttribute(
 					<not:inputCheckbox name="processar" labelSize="8" textKey="procediment.permis.form.camp.processar"/>
 					<not:inputCheckbox name="notificacio" labelSize="8" textKey="procediment.permis.form.camp.notificacio"/>
 					<not:inputCheckbox name="administration" labelSize="8" textKey="procediment.permis.form.camp.gestio"/>
+					<not:inputCheckbox name="comuns" labelSize="8" textKey="organgestor.permis.form.camp.comuns"/>
 				</div>
 				<not:inputCheckbox name="administrador" labelSize="8" textKey="procediment.permis.form.camp.administrador" disabled="${isRolActualAdministradorOrgan}"/>
-			</div>
-			<div class="col-xs-6">
-				<not:inputCheckbox name="comuns" textKey="organgestor.permis.form.camp.comuns"/>
 			</div>
 		</div>
 		<div id="modal-botons" class="well">
