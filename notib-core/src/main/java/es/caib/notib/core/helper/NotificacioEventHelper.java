@@ -88,7 +88,7 @@ public class NotificacioEventHelper {
                 errorDescripcio(descripcio).
                 build();
         notificacio.updateEventAfegir(event);
-        notificacioEventRepository.save(event);
+        notificacioEventRepository.saveAndFlush(event);
         enviament.updateNotificaError(true, event);
     }
 
@@ -138,7 +138,7 @@ public class NotificacioEventHelper {
             event.getEnviament().getNotificacio().updateEventAfegir(callbackEvent);
         else
             event.getNotificacio().updateEventAfegir(callbackEvent);
-        notificacioEventRepository.save(callbackEvent);
+        notificacioEventRepository.saveAndFlush(callbackEvent);
     }
 
     public void addNotificaConsultaSirErrorEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament) {
@@ -160,7 +160,7 @@ public class NotificacioEventHelper {
         NotificacioEventEntity event = eventBuilder.build();
 
         notificacio.updateEventAfegir(event);
-        notificacioEventRepository.save(event);
+        notificacioEventRepository.saveAndFlush(event);
         auditNotificacioHelper.updateNotificacioErrorSir(notificacio, event);
     }
 
@@ -281,7 +281,7 @@ public class NotificacioEventHelper {
         enviament.updateNotificaError(errorDescripcio != null, errorDescripcio != null ? event : null);
 
         enviament.getNotificacio().updateEventAfegir(event);
-        notificacioEventRepository.save(event);
+        notificacioEventRepository.saveAndFlush(event);
         return event;
     }
 
@@ -328,7 +328,7 @@ public class NotificacioEventHelper {
         NotificacioEventEntity event = eventBuilder.build();
 
         notificacio.updateEventAfegir(event);
-        notificacioEventRepository.save(event);
+        notificacioEventRepository.saveAndFlush(event);
         notificacio.updateNotificaError(
                 NotificacioErrorTipusEnumDto.ERROR_REINTENTS_CONSULTA,
                 event);
@@ -356,10 +356,12 @@ public class NotificacioEventHelper {
         //Actualitza l'event per cada enviament
         if (enviament != null) {
             eventBuilder.enviament(enviament);
-
+            notificacioEventRepository.saveAndFlush(event);
         } else {
             for (NotificacioEnviamentEntity enviamentEntity : notificacio.getEnviaments()) {
                 eventBuilder.enviament(enviamentEntity);
+                notificacioEventRepository.saveAndFlush(event);
+
                 switch (eventTipus)
                 {
                     case NOTIFICA_REGISTRE:
@@ -374,7 +376,7 @@ public class NotificacioEventHelper {
             }
         }
 
-        notificacioEventRepository.saveAndFlush(event);
+
         return event;
     }
 
