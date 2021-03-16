@@ -170,6 +170,20 @@ public class NotificacioEventHelperTest extends BaseServiceTest {
                                     enviament, "registre_consulta_info_" + enviament.getId());
                         }
 
+                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+                            notificacioEventHelper.addNotificaCallbackEvent(notificacioEntity, enviament,
+                                    NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
+                                    "Notifica callback datat");
+                        }
+
+                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+                            notificacioEventHelper.addNotificaCallbackEvent(notificacioEntity, enviament,
+                                    NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
+                                    "anulada",
+                                    "Descripció de l'error",
+                                    true
+                            );
+                        }
                         ////
                         // 3. Comprovar que els events estan desats a la base de dades
                         ////
@@ -215,6 +229,7 @@ public class NotificacioEventHelperTest extends BaseServiceTest {
                         // i que els que no s'havien de borrar encara hi son
                         ////
 
+
                         // events enviament registre ok
                         tipus = NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE;
                         events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
@@ -246,6 +261,9 @@ public class NotificacioEventHelperTest extends BaseServiceTest {
                                 tipus,
                                 true);
                         assertEquals(0, events.size());
+
+                        events = notificacioEventRepository.findByNotificacio(notificacioEntity);
+                        assertEquals(events.size(), 4);
 
                         for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
                             enviament.setNotificaEstat(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT);

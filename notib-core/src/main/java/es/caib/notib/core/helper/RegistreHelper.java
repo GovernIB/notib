@@ -42,6 +42,8 @@ public class RegistreHelper {
 	private EmailHelper emailHelper;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
+	@Autowired
+	private AuditNotificacioHelper auditNotificacioHelper;
 
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
 	public NotificacioEnviamentEntity enviamentRefrescarEstatRegistre(Long enviamentId) {
@@ -175,8 +177,7 @@ public class RegistreHelper {
 		}
 		logger.debug("Estat final: " + estatsEnviamentsFinals);
 		if (estatsEnviamentsFinals) {
-			enviament.getNotificacio().updateEstat(NotificacioEstatEnumDto.FINALITZADA);
-			enviament.getNotificacio().updateMotiu(registreEstat.name());
+			auditNotificacioHelper.updateEstatNotificacio(registreEstat.name(), enviament.getNotificacio());
 
 			//Marcar com a processada si la notificació s'ha fet des de una aplicació
 			if (enviament.getNotificacio() != null && enviament.getNotificacio().getTipusUsuari() == TipusUsuariEnumDto.APLICACIO) {

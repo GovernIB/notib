@@ -106,8 +106,7 @@ public class NotificacioEventHelper {
         return addErrorEvent(notificacio, eventTipus, null, errorDescripcio, notificaError);
     }
 
-    public void addCallbackEvent(NotificacioEntity notificacio,
-                                 NotificacioEventEntity event) {
+    public void addCallbackEvent(NotificacioEntity notificacio, NotificacioEventEntity event) {
         deleteByNotificacioAndTipusAndError(
                 notificacio,
                 null,
@@ -220,6 +219,14 @@ public class NotificacioEventHelper {
         }
     }
 
+    /**
+     *
+     * @param notificacio Notificació on es vol afegir l'event
+     * @param enviament Enviament relacionat amb l'event
+     * @param eventTipus NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT |
+     *                   NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO
+     * @param descripcio Text descriptiu de l'event
+     */
     public void addNotificaCallbackEvent(NotificacioEntity notificacio,
                                          NotificacioEnviamentEntity enviament,
                                          NotificacioEventTipusEnumDto eventTipus,
@@ -232,6 +239,18 @@ public class NotificacioEventHelper {
         );
     }
 
+    /**
+     *
+     * @param notificacio Notificació on es vol afegir l'event
+     * @param enviament Enviament relacionat amb l'event
+     * @param eventTipus NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT |
+     *                   NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO
+     * @param descripcio Text descriptiu de l'event
+     * @param errorDescripcio Si l'event està asociat a un error definir aquest parametre descrivint-lo
+     * @param initialitzaCallback indicar si s'ha d'inicialitzar el callball a l'event
+     *
+     * @return L'event creat
+     */
     public NotificacioEventEntity addNotificaCallbackEvent(NotificacioEntity notificacio,
                                          NotificacioEnviamentEntity enviament,
                                          NotificacioEventTipusEnumDto eventTipus,
