@@ -309,7 +309,7 @@ public class NotificacioEventHelper {
         NotificacioEventEntity event = eventBuilder.build();
 
         notificacio.updateEventAfegir(event);
-        notificacioEventRepository.save(event);
+        notificacioEventRepository.saveAndFlush(event);
         enviament.updateNotificaError(isError, isError ? event : null);
     }
 
@@ -360,29 +360,22 @@ public class NotificacioEventHelper {
         } else {
             for (NotificacioEnviamentEntity enviamentEntity : notificacio.getEnviaments()) {
                 eventBuilder.enviament(enviamentEntity);
-                updateEnviamentErrorEvent(eventTipus, enviamentEntity, event, notificaError);
+                switch (eventTipus)
+                {
+                    case NOTIFICA_REGISTRE:
+                        enviamentEntity.updateNotificaError(true, event);
+                        break;
+                    case NOTIFICA_ENVIAMENT:
+                        auditEnviamentHelper.actualizaErrorNotifica(enviamentEntity, notificaError, event);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
         notificacioEventRepository.saveAndFlush(event);
         return event;
-    }
-
-    private void updateEnviamentErrorEvent(NotificacioEventTipusEnumDto eventTipus,
-                                      NotificacioEnviamentEntity enviament,
-                                      NotificacioEventEntity event,
-                                      boolean notificaError) {
-        switch (eventTipus)
-        {
-            case NOTIFICA_REGISTRE:
-                enviament.updateNotificaError(true, event);
-                break;
-            case NOTIFICA_ENVIAMENT:
-                auditEnviamentHelper.actualizaErrorNotifica(enviament, notificaError, event);
-                break;
-            default:
-                break;
-        }
     }
 
     private void deleteByNotificacioAndTipusAndError(NotificacioEntity notificacio,

@@ -106,6 +106,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		try {
 			logger.info(" >>> Enviant notificació...");
 
+//			int e = 10/ 0;
+
 			long startTime = System.nanoTime();
 			double elapsedTime;
 			ResultadoAltaRemesaEnvios resultadoAlta = enviaNotificacio(notificacio);

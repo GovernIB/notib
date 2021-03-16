@@ -112,6 +112,9 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 			built.notificacio = notificacio;
 		}
 		public Builder descripcio(String descripcio) {
+			if (descripcio.length() > 256) {
+				descripcio = descripcio.substring(0, 256);
+			}
 			built.descripcio = descripcio;
 			return this;
 		}
