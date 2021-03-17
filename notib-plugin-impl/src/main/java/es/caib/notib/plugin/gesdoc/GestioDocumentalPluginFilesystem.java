@@ -6,6 +6,7 @@ package es.caib.notib.plugin.gesdoc;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.PropertiesHelper;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -16,6 +17,7 @@ import java.io.*;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin {
 
 	@Getter
@@ -29,6 +31,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			String basedir = getBaseDir(agrupacio);
 			String subfolderId = getValidSubfolder(agrupacio);
 			String id = subfolderId + generateUniqueName(basedir);
+			log.debug("Creant fitxer al directori: %s amb id: %s ".format(basedir, id));
 			FileOutputStream outContent = new FileOutputStream(basedir + "/" + id);
 			IOUtils.copy(contingut, outContent);
 			outContent.close();
@@ -46,7 +49,9 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			String agrupacio,
 			InputStream contingut) throws SistemaExternException {
 		try {
-			File fContent = new File(getBaseDir(agrupacio) + "/" + id);
+			String basedir = getBaseDir(agrupacio);
+			File fContent = new File(basedir + "/" + id);
+			log.debug("Actalitzant fitxer, directori: %s amb id: %s ".format(basedir, id));
 			fContent.getParentFile().mkdirs();
 			if (fContent.exists()) {
 				FileOutputStream outContent = new FileOutputStream(fContent, false);
@@ -68,7 +73,9 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			String id,
 			String agrupacio) throws SistemaExternException {
 		try {
-			File fContent = new File(getBaseDir(agrupacio) + "/" + id);
+			String basedir = getBaseDir(agrupacio);
+			File fContent = new File(basedir + "/" + id);
+			log.debug("Eliminant fitxer, directori: %s amb id: %s ".format(basedir, id));
 			fContent.getParentFile().mkdirs();
 			if (fContent.exists()) {
 				fContent.delete();
@@ -89,7 +96,9 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			String agrupacio,
 			OutputStream contingutOut) throws SistemaExternException {
 		try {
-			File fContent = new File(getBaseDir(agrupacio) + "/" + id);
+			String basedir = getBaseDir(agrupacio);
+			File fContent = new File(basedir + "/" + id);
+			log.debug("Consultant fitxer, directori: %s amb id: %s ".format(basedir, id));
 			fContent.getParentFile().mkdirs();
 			if (fContent.exists()) {
 				FileInputStream contingutIn = new FileInputStream(fContent);
