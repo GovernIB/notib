@@ -28,6 +28,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			String agrupacio,
 			InputStream contingut) throws SistemaExternException {
 		try {
+			agrupacio = checkAgrupacio(agrupacio);
 			String basedir = getBaseDir(agrupacio);
 			String subfolderId = getValidSubfolder(agrupacio);
 			String id = subfolderId + generateUniqueName(basedir);
@@ -49,6 +50,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			String agrupacio,
 			InputStream contingut) throws SistemaExternException {
 		try {
+			agrupacio = checkAgrupacio(agrupacio);
 			String basedir = getBaseDir(agrupacio);
 			File fContent = new File(basedir + "/" + id);
 			log.debug("Actalitzant fitxer, directori: %s amb id: %s ".format(basedir, id));
@@ -73,6 +75,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			String id,
 			String agrupacio) throws SistemaExternException {
 		try {
+			agrupacio = checkAgrupacio(agrupacio);
 			String basedir = getBaseDir(agrupacio);
 			File fContent = new File(basedir + "/" + id);
 			log.debug("Eliminant fitxer, directori: %s amb id: %s ".format(basedir, id));
@@ -96,6 +99,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			String agrupacio,
 			OutputStream contingutOut) throws SistemaExternException {
 		try {
+			agrupacio = checkAgrupacio(agrupacio);
 			String basedir = getBaseDir(agrupacio);
 			File fContent = new File(basedir + "/" + id);
 			log.debug("Consultant fitxer, directori: %s amb id: %s ".format(basedir, id));
@@ -163,6 +167,13 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			fContent = new File(basedir + "/" + id);
 		}
 		return id;
+	}
+
+	private String checkAgrupacio(String agrupacio) {
+		if (agrupacio == null || agrupacio.isEmpty()) {
+			return "altres";
+		}
+		return agrupacio;
 	}
 
 }

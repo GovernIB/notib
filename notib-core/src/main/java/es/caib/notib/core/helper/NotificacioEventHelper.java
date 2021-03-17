@@ -376,7 +376,6 @@ public class NotificacioEventHelper {
             }
         }
 
-
         return event;
     }
 
