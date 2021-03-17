@@ -70,6 +70,7 @@ public class GestioDocumentalPluginFilesystemTest extends TestCase {
         for (String agr : agrupacions){
             createdFiles.put(agr, new ArrayList<String>());
         }
+        createdFiles.put("", new ArrayList<String>());
         long nFiles = 100;
         for (int i =0; i < nFiles; i++) {
             String agr = agrupacions[r.nextInt(agrupacions.length)];
@@ -81,6 +82,18 @@ public class GestioDocumentalPluginFilesystemTest extends TestCase {
                 fail();
             }
         }
+
+        nFiles = 5;
+        for (int i =0; i < nFiles; i++) {
+            byte[] contingut = new byte[]{4, 5, 6};
+            try {
+                String idFile = plugin.create("", new ByteArrayInputStream(contingut));
+                createdFiles.get("").add(idFile);
+            } catch (SistemaExternException e) {
+                fail();
+            }
+        }
+
         for (String agr : agrupacions){
             for (String idFile : createdFiles.get(agr)){
                 ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -91,6 +104,17 @@ public class GestioDocumentalPluginFilesystemTest extends TestCase {
                 }
             }
         }
+
+        String agr = "notificacions";
+        for (String idFile : createdFiles.get("")){
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            try {
+                plugin.get(idFile, agr, output);
+            } catch (SistemaExternException e) {
+                fail();
+            }
+        }
+
         // Esborram tots els fitxers creats
         for (String agrupacio : agrupacions){
             File file = new File(getBaseDir(agrupacio));

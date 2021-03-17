@@ -50,12 +50,9 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			String agrupacio,
 			InputStream contingut) throws SistemaExternException {
 		try {
-			agrupacio = checkAgrupacio(agrupacio);
-			String basedir = getBaseDir(agrupacio);
-			File fContent = new File(basedir + "/" + id);
-			log.debug("Actalitzant fitxer, directori: %s amb id: %s ".format(basedir, id));
-			fContent.getParentFile().mkdirs();
-			if (fContent.exists()) {
+			File fContent = getFile(agrupacio, id);
+			log.debug("Actalitzant fitxer, directori: %s amb id: %s ".format(getBaseDir(agrupacio), id));
+			if (fContent != null) {
 				FileOutputStream outContent = new FileOutputStream(fContent, false);
 				IOUtils.copy(contingut, outContent);
 				outContent.close();
@@ -75,12 +72,9 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			String id,
 			String agrupacio) throws SistemaExternException {
 		try {
-			agrupacio = checkAgrupacio(agrupacio);
-			String basedir = getBaseDir(agrupacio);
-			File fContent = new File(basedir + "/" + id);
-			log.debug("Eliminant fitxer, directori: %s amb id: %s ".format(basedir, id));
-			fContent.getParentFile().mkdirs();
-			if (fContent.exists()) {
+			File fContent = getFile(agrupacio, id);
+			log.debug("Eliminant fitxer, directori: %s amb id: %s ".format(getBaseDir(agrupacio), id));
+			if (fContent != null) {
 				fContent.delete();
 			} else {
 				throw new SistemaExternException(
@@ -99,12 +93,14 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			String agrupacio,
 			OutputStream contingutOut) throws SistemaExternException {
 		try {
-			agrupacio = checkAgrupacio(agrupacio);
-			String basedir = getBaseDir(agrupacio);
-			File fContent = new File(basedir + "/" + id);
-			log.debug("Consultant fitxer, directori: %s amb id: %s ".format(basedir, id));
-			fContent.getParentFile().mkdirs();
-			if (fContent.exists()) {
+			File fContent = getFile(agrupacio, id);
+			if (fContent == null && "notificacions".equals(agrupacio)) {
+				fContent = getFile("", id);
+				log.debug("Consultant fitxer, directori: %s amb id: %s ".format(getBaseDir(""), id));
+			} else {
+				log.debug("Consultant fitxer, directori: %s amb id: %s ".format(getBaseDir(agrupacio), id));
+			}
+			if (fContent != null) {
 				FileInputStream contingutIn = new FileInputStream(fContent);
 				IOUtils.copy(contingutIn, contingutOut);
 			} else {
@@ -117,7 +113,18 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 					ex);
 		}
 	}
+	private File getFile(String agrupacio, String id) {
+		agrupacio = checkAgrupacio(agrupacio);
+		String basedir = getBaseDir(agrupacio);
+		File fContent = new File(basedir + "/" + id);
+		fContent.getParentFile().mkdirs();
+		if (!fContent.exists()) {
+			return null;
+		} else {
+			return fContent;
+		}
 
+	}
 	private String getValidSubfolder(String agrupacio){
 		String basedir = getBaseDir(agrupacio);
 		File file = new File(basedir);
