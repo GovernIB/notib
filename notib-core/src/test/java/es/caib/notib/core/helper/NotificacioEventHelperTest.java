@@ -9,7 +9,6 @@ import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.service.BaseServiceTest;
 import org.junit.Before;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -278,7 +277,7 @@ public class NotificacioEventHelperTest extends BaseServiceTest {
                 notificacio);
     }
 
-    @Test
+//    @Test
     public void addRegistreCallBackEstatEventTest() {
         testCreantElements(
                 new TestAmbElementsCreats() {
@@ -387,7 +386,7 @@ public class NotificacioEventHelperTest extends BaseServiceTest {
                 notificacio);
     }
 
-    @Test
+//    @Test
     public void addRegistreConsultaInfoErrorEventTest() {
         testCreantElements(
                 new TestAmbElementsCreats() {
