@@ -225,7 +225,10 @@ $(document).ready(function() {
 				<br/>
 				<form:hidden path="oficina"/>
 				<form:hidden path="oficinaNom"/>
-				<select id="selOficines" data-placeholder="<spring:message code="organgestor.form.camp.oficina"/>"></select>
+<%--				<div class="form-group">--%>
+					<label for="selOficines"><spring:message code="organgestor.form.camp.oficina"/>:</label>
+					<select id="selOficines" data-placeholder="<spring:message code="organgestor.form.camp.oficina"/>"></select>
+<%--				</div>--%>
 				<p class="comentari oficinainfo hidden" style="color: #856404;"><spring:message code="organgestor.form.camp.oficina.info"/></p>
 			</c:if>
 			<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
