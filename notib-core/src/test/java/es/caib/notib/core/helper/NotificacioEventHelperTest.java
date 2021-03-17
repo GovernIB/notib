@@ -10,19 +10,20 @@ import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.service.BaseServiceTest;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
 @Transactional
 public class NotificacioEventHelperTest extends BaseServiceTest {
 
@@ -125,7 +126,7 @@ public class NotificacioEventHelperTest extends BaseServiceTest {
     }
 
 
-    @Test
+//    @Test
     public void clearOldUselessEventsTest() {
         testCreantElements(
                 new TestAmbElementsCreats() {
