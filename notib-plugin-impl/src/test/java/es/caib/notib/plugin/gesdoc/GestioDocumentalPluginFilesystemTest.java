@@ -105,6 +105,7 @@ public class GestioDocumentalPluginFilesystemTest extends TestCase {
             }
         }
 
+        // Comprovam si els documents hospedats al directori arrel es troben com a notificacions (comportament antic que s'ha de conservar)
         String agr = "notificacions";
         for (String idFile : createdFiles.get("")){
             ByteArrayOutputStream output = new ByteArrayOutputStream();
