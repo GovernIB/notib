@@ -401,7 +401,7 @@ public class PermisosHelper {
 		return (acl.getEntries() != null && !acl.getEntries().isEmpty());
 		
 	}
-	public boolean haPermission(
+	public boolean hasPermission(
 			Long objectIdentifier,
 			Class<?> objectClass,
 			Permission[] permissions) {

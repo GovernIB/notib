@@ -20,6 +20,7 @@ import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.*;
+import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
@@ -33,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -113,6 +115,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private IntegracioHelper integracioHelper;
 	@Autowired
+	private PermisosHelper permisosHelper;
+	@Autowired
 	private OrganGestorCachable organGestorCachable;
 	public static Map<String, ProgresDescarregaDto> progresDescarrega = new HashMap<String, ProgresDescarregaDto>();
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActulitzacioExpirades = new HashMap<String, ProgresActualitzacioCertificacioDto>();
@@ -167,7 +171,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			}
 			// Si tenim procediment --> Comprovam permisos
-			if (procediment != null) {
+			boolean hasPermission = false;
+			if (procediment != null && procediment.isComu() && organGestor != null) {
+				hasPermission = permisosHelper.hasPermission(organGestor.getId(), OrganGestorEntity.class,
+						new Permission[]{ExtendedPermission.COMUNS});
+			}
+			if (procediment != null && !hasPermission) {
 				if (procediment.isComu() && organGestor != null) {
 					procedimentOrgan = procedimentOrganRepository.findByProcedimentIdAndOrganGestorId(procediment.getId(), organGestor.getId());
 				}

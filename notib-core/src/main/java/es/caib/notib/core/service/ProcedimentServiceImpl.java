@@ -1256,7 +1256,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 
 			results = addProcedimentsOrgan(procediments, procedimentsOrgansAmbPermis, organFiltre);
 
-			boolean hasComunsPermission = permisosHelper.haPermission(
+			boolean hasComunsPermission = permisosHelper.hasPermission(
 					organGestorRepository.findByCodi(organFiltre).getId(),
 					OrganGestorEntity.class,
 					new Permission[] {ExtendedPermission.COMUNS});
