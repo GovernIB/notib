@@ -8,6 +8,7 @@ import es.caib.notib.core.audit.NotibAuditable;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ForeignKey;
+import org.hibernate.annotations.Index;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -147,6 +148,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "document_id")
 	@ForeignKey(name = "not_document_notificacio_fk")
+	@Index(name = "NOT_NOTIF_DOCUMENT_ID_INDEX")
 	protected DocumentEntity document;
 
 	/*document*/

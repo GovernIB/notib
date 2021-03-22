@@ -4,6 +4,7 @@
 package es.caib.notib.war.controller;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.*;
@@ -135,7 +136,7 @@ public class EnviamentController extends BaseUserController {
 			HttpServletRequest request,
 			Model model) throws ParseException {
 		NotificacioEnviamentFiltreCommand filtreEnviaments = getFiltreCommand(request);
-		PaginaDto<NotificacioEnviamentDtoV2> enviaments = new PaginaDto<NotificacioEnviamentDtoV2>();
+		PaginaDto<NotEnviamentTableItemDto> enviaments = new PaginaDto<>();
 		boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
 		boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
 		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);

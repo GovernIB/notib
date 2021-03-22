@@ -1,19 +1,11 @@
 package es.caib.notib.core.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
 
 /**
  * Classe del model de dades que representa una persona
@@ -48,6 +40,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	private String dir3Codi;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_env_id")
+	@ForeignKey(name = "NOT_PERSONA_NOT_FK")
 	private NotificacioEnviamentEntity enviament;
 	
 	public InteressatTipusEnumDto getInteressatTipus() {

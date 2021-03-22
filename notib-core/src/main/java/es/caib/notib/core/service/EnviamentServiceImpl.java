@@ -6,6 +6,7 @@ package es.caib.notib.core.service;
 import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDto;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.rest.consulta.*;
@@ -73,7 +74,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private MetricsHelper metricsHelper;
 	@Autowired
 	private AuditEnviamentHelper auditEnviamentHelper;
-	
+	@Autowired
+	private PersonaRepository personaRepository;
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<NotificacioEnviamentDatatableDto> enviamentFindAmbNotificacio(
@@ -342,7 +345,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 	@Transactional
 	@Override
-	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByEntityAndFiltre(
+	public PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(
 			EntitatDto entitat,
 			boolean isUsuari,
 			boolean isUsuariEntitat,
@@ -409,27 +412,19 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 			} else if (!isEstatNull && estat.equals(NotificacioEstatEnumDto.PENDENT)) {
 				hasZeronotificaEnviamentIntent = false;
-//				nomesAmbErrors = true;
 			}
 
-//			//Filtres camps procediment
-//			Integer estat = null;
-
-//			if(filtre.getEstat()!=null){
-//				estat = filtre.getEstat().getNumVal();
-//			}else{
-//				estat = 0;
-//			}
+			//Filtres camps procediment
 			int tipusEnviament;
 			if(filtre.getEnviamentTipus()!=null){
 				tipusEnviament = NotificacioTipusEnviamentEnumDto.getNumVal(filtre.getEnviamentTipus());
 			}else{
 				tipusEnviament = 0;
 			}
-			Page<NotificacioEnviamentEntity> pageEnviaments = null;
+			Page<NotEnviamentTableItemDto> pageEnviaments = null;
 			
 			campsOrdre(paginacioParams);
-
+			logger.info("Consulta de taula d'enviaments ...");
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
 			if (isUsuari) { // && !procedimentsCodisNotib.isEmpty()) {
 				pageEnviaments = notificacioEnviamentRepository.findByNotificacio(
@@ -558,112 +553,118 @@ public class EnviamentServiceImpl implements EnviamentService {
 						hasZeronotificaEnviamentIntent,
 						pageable);
 			} else if (isUsuariEntitat) {
+				boolean isNullProcediment = filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty();
+				boolean isNullGrup = filtre.getGrup() == null || filtre.getGrup().isEmpty();
+				boolean isNullConcepte = filtre.getConcepte() == null || filtre.getConcepte().isEmpty();
+				boolean isNullDescripcio = filtre.getDescripcio() == null || filtre.getDescripcio().isEmpty();
+				boolean isNullCsvUuid = filtre.getCsvUuid() == null || filtre.getCsvUuid().isEmpty();
+				boolean isNullCodiNotifica = filtre.getCodiNotifica() == null || filtre.getCodiNotifica().isEmpty();
+				boolean isNullCreatedBy = filtre.getCreatedBy() == null || filtre.getCreatedBy().getCodi().isEmpty();
+				boolean isNullTitularNif = filtre.getNifTitular() == null || filtre.getNifTitular().isEmpty();
+				boolean isNullTitularNom = filtre.getTitularNomLlinatge() == null || filtre.getTitularNomLlinatge().isEmpty();
+				boolean isNullTitularEmail = filtre.getEmailTitular() == null || filtre.getEmailTitular().isEmpty();
+				boolean isNullDir3Codi = filtre.getDir3Codi() == null || filtre.getDir3Codi().isEmpty();
+				boolean isNullNumeroCertCorreus = filtre.getNumeroCertCorreus() == null || filtre.getNumeroCertCorreus().isEmpty();
+				boolean isNullUsuari = filtre.getUsuari() == null || filtre.getUsuari().isEmpty();
+				boolean isNullNumeroRegistre = filtre.getRegistreNumero() == null || filtre.getRegistreNumero().isEmpty();
+				logger.info("--------------");
+				logger.info("--------------");
+				logger.info("--------------");
+				logger.info("Inici Consulta");
+				logger.info("--------------");
+				logger.info("--------------");
+				logger.info("--------------");
+				long ti = System.nanoTime();
 				pageEnviaments = notificacioEnviamentRepository.findByNotificacio(
-						filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
+						isNullProcediment,
 						filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
-						filtre.getGrup() == null || filtre.getGrup().isEmpty(),
+						isNullGrup,
 						filtre.getGrup() == null ? "" : filtre.getGrup(),
-						filtre.getConcepte() == null || filtre.getConcepte().isEmpty(),
+						isNullConcepte,
 						filtre.getConcepte() == null ? "" : filtre.getConcepte(),
-						filtre.getDescripcio() == null || filtre.getDescripcio().isEmpty(),
+						isNullDescripcio,
 						filtre.getDescripcio() == null ? "" : filtre.getDescripcio(),
-						(dataProgramadaDisposicioInici == null),
+						dataProgramadaDisposicioInici == null,
 						dataProgramadaDisposicioInici,
-						(dataProgramadaDisposicioFi == null),
+						dataProgramadaDisposicioFi == null,
 						dataProgramadaDisposicioFi,
-						(dataCaducitatInici == null),
+						dataCaducitatInici == null,
 						dataCaducitatInici,
-						(dataCaducitatFi == null),
+						dataCaducitatFi == null,
 						dataCaducitatFi,
-						(filtre.getEnviamentTipus() == null),
+						filtre.getEnviamentTipus() == null,
 						(tipusEnviament),
-						(filtre.getCsvUuid() == null || filtre.getCsvUuid().isEmpty()),
+						isNullCsvUuid,
 						filtre.getCsvUuid(),
 						estat == null,
 						estat == null ? 0 : estat.getNumVal(),
 						estat != null ? NotificacioEnviamentEstatEnumDto.valueOf(estat.toString()) : null,
 						entitatEntity,
-						(dataEnviamentInici == null),
+						dataEnviamentInici == null,
 						dataEnviamentInici,
-						(dataEnviamentFi == null),
+						dataEnviamentFi == null,
 						dataEnviamentFi,
-						(filtre.getCodiNotifica() == null || filtre.getCodiNotifica().isEmpty()),
+						isNullCodiNotifica,
 						filtre.getCodiNotifica() == null ? "" : filtre.getCodiNotifica(),
-						(filtre.getCreatedBy() == null || filtre.getCreatedBy().getCodi().isEmpty()),
-						conversioTipusHelper.convertir(filtre.getCreatedBy(), UsuariEntity.class),
-						(filtre.getNifTitular() == null || filtre.getNifTitular().isEmpty()),
+						isNullCreatedBy,
+						isNullCreatedBy ? "" : filtre.getCreatedBy().getCodi(),
+						isNullTitularNif,
 						filtre.getNifTitular() == null ? "" : filtre.getNifTitular(),
-						(filtre.getTitularNomLlinatge() == null || filtre.getTitularNomLlinatge().isEmpty()),
+						isNullTitularNom,
 						filtre.getTitularNomLlinatge() == null ? "" : filtre.getTitularNomLlinatge(),
-						(filtre.getEmailTitular() == null || filtre.getEmailTitular().isEmpty()),
+						isNullTitularEmail,
 						filtre.getEmailTitular() == null ? "" : filtre.getEmailTitular(),
-						(filtre.getDir3Codi() == null || filtre.getDir3Codi().isEmpty()),
+						isNullDir3Codi,
 						filtre.getDir3Codi() == null ? "" : filtre.getDir3Codi(),
-						(filtre.getNumeroCertCorreus() == null || filtre.getNumeroCertCorreus().isEmpty()),
+						isNullNumeroCertCorreus,
 						filtre.getNumeroCertCorreus() == null ? "" : filtre.getNumeroCertCorreus(),
-						(filtre.getUsuari() == null || filtre.getUsuari().isEmpty()),
+						isNullUsuari,
 						filtre.getUsuari() == null ? "" : filtre.getUsuari(),
-						(filtre.getRegistreNumero() == null || filtre.getRegistreNumero().isEmpty()),
+						isNullNumeroRegistre,
 						filtre.getRegistreNumero() == null ? "" : filtre.getRegistreNumero(),
-						(dataRegistreInici == null),
+						dataRegistreInici == null,
 						dataRegistreInici,
-						(dataRegistreFi == null),
+						dataRegistreFi == null,
 						dataRegistreFi,
 						nomesAmbErrors,
 						nomesSenseErrors,
 						hasZeronotificaEnviamentIntent == null,
 						hasZeronotificaEnviamentIntent,
 						pageable);
+				logger.info("--------------");
+				logger.info("--------------");
+				logger.info("Fi Consulta");
+				logger.info(String.format("Time spent: %f ms", (System.nanoTime() - ti) / 1e6));
 			}
 			if(pageEnviaments == null || !pageEnviaments.hasContent()) {
-				pageEnviaments = new PageImpl<>(new ArrayList<NotificacioEnviamentEntity>());
+				pageEnviaments = new PageImpl<>(new ArrayList<NotEnviamentTableItemDto>());
 			}
-			
-//			for(NotificacioEnviamentEntity nee: enviament.getContent()) {
-//				nee.setNotificacio(notificacioRepository.findById(nee.getNotificacioId()));
-//			}
-			
-			PaginaDto<NotificacioEnviamentDtoV2> paginaDto = paginacioHelper.toPaginaDto(
-					pageEnviaments,
-					NotificacioEnviamentDtoV2.class);
-			int i = 0;
-			boolean llibreOrgan = !entitat.isLlibreEntitat();
-			
-			for (NotificacioEnviamentDtoV2 notificacioEnviamentDtoV2 : paginaDto.getContingut()) {
-				if (pageEnviaments.getContent().get(i).getNotificacio().getProcedimentCodiNotib() != null)
-					notificacioEnviamentDtoV2.setProcedimentCodiNotib(pageEnviaments.getContent().get(i).getNotificacio().getProcedimentCodiNotib());
-				if (pageEnviaments.getContent().get(i).getNotificacio().getEnviamentDataProgramada() != null)
-					notificacioEnviamentDtoV2.setEnviamentDataProgramada(pageEnviaments.getContent().get(i).getNotificacio().getEnviamentDataProgramada());
-				if (pageEnviaments.getContent().get(i).getNotificacio().getGrupCodi() != null)
-					notificacioEnviamentDtoV2.setGrupCodi(pageEnviaments.getContent().get(i).getNotificacio().getGrupCodi());
-				if (pageEnviaments.getContent().get(i).getNotificacio().getEmisorDir3Codi() != null)
-					notificacioEnviamentDtoV2.setEmisorDir3Codi(pageEnviaments.getContent().get(i).getNotificacio().getEmisorDir3Codi());
-				if (pageEnviaments.getContent().get(i).getNotificacio().getUsuariCodi() != null)
-					notificacioEnviamentDtoV2.setUsuariCodi(pageEnviaments.getContent().get(i).getNotificacio().getUsuariCodi());
-				if (pageEnviaments.getContent().get(i).getNotificacio().getEnviamentTipus() != null)
-					notificacioEnviamentDtoV2.setEnviamentTipus(pageEnviaments.getContent().get(i).getNotificacio().getEnviamentTipus());
-				if (pageEnviaments.getContent().get(i).getNotificacio().getConcepte() != null)
-					notificacioEnviamentDtoV2.setConcepte(pageEnviaments.getContent().get(i).getNotificacio().getConcepte());
-				if (pageEnviaments.getContent().get(i).getNotificacio().getDescripcio() != null)
-					notificacioEnviamentDtoV2.setDescripcio(pageEnviaments.getContent().get(i).getNotificacio().getDescripcio());
-				// Llibre
-				if (llibreOrgan) {
-					if (pageEnviaments.getContent().get(i).getNotificacio().getProcediment() != null)
-						notificacioEnviamentDtoV2.setLlibre(pageEnviaments.getContent().get(i).getNotificacio().getProcediment().getOrganGestor().getLlibre());
-				} else {
-					notificacioEnviamentDtoV2.setLlibre(entitatEntity.getLlibre());
-				}
-				if (pageEnviaments.getContent().get(i).getNotificacio().getRegistreNumero() != null)
-					notificacioEnviamentDtoV2.setRegistreNumero(pageEnviaments.getContent().get(i).getNotificacio().getRegistreNumero());
-				if (pageEnviaments.getContent().get(i).getNotificacio().getRegistreData() != null)
-					notificacioEnviamentDtoV2.setRegistreData(pageEnviaments.getContent().get(i).getNotificacio().getRegistreData());
-				if (pageEnviaments.getContent().get(i).getNotificacio().getEstat() != null)
-					notificacioEnviamentDtoV2.setEstat(pageEnviaments.getContent().get(i).getNotificacio().getEstat());
-	//			if (enviament.getContent().get(i).getComunicacioTipus() != null)
-	//				notificacioEnviamentDtoV2.setComunicacioTipus(enviament.getContent().get(i).getComunicacioTipus());
 
-				i++;
+			PaginaDto<NotEnviamentTableItemDto> paginaDto = paginacioHelper.toPaginaDto(pageEnviaments);
+
+			// TODO: això ho podriem afefir a la consulta amb un CASE isLlibreEntitat THEN llibreEntitat ELSE llibreCamp
+			if (entitat.isLlibreEntitat()) {
+				for (NotEnviamentTableItemDto tableItem : paginaDto.getContingut()) {
+						tableItem.setLlibre(entitatEntity.getLlibre());
+				}
 			}
+
+			for (NotEnviamentTableItemDto tableItem : paginaDto.getContingut()) {
+				List<PersonaEntity> destinataris = personaRepository.findByEnviamentId(tableItem.getId());
+				List<NotEnviamentTableItemDto.DestinatariDto> destinatarisDto = new ArrayList<>();
+				for (PersonaEntity destinatari : destinataris) {
+					destinatarisDto.add(new NotEnviamentTableItemDto.DestinatariDto(
+							destinatari.getNif(),
+							destinatari.getNom(),
+							destinatari.getEmail(),
+							destinatari.getLlinatge1(),
+							destinatari.getLlinatge2(),
+							destinatari.getRaoSocial()
+					));
+				}
+				tableItem.setDestinataris(destinatarisDto);
+			}
+
 			return paginaDto;
 		} finally {
 			metricsHelper.fiMetrica(timer);

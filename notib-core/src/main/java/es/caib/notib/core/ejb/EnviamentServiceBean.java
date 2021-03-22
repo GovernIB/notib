@@ -3,23 +3,22 @@
  */
 package es.caib.notib.core.ejb;
 
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
+import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.rest.consulta.Resposta;
+import es.caib.notib.core.api.service.EnviamentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import javax.interceptor.Interceptors;
-
-import es.caib.notib.core.api.dto.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.rest.consulta.Resposta;
-import es.caib.notib.core.api.service.EnviamentService;
 
 /**
  * Implementació de EnviamentService com a EJB que empra una clase
@@ -45,7 +44,7 @@ public class EnviamentServiceBean implements EnviamentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public PaginaDto<NotificacioEnviamentDtoV2> enviamentFindByEntityAndFiltre(
+	public PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(
 			EntitatDto entitat, 
 			boolean isUsuari,
 			boolean isUsuariEntitat,

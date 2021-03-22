@@ -3,22 +3,22 @@
  */
 package es.caib.notib.core.repository;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.UsuariEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.UsuariEntity;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -169,47 +169,77 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("dataRegistreInici") Date dataRegistreInici,
 			@Param("esDataRegistreFiNull") boolean esDataRegistreFiNull,
 			@Param("dataRegistreFi") Date dataRegistreFi);
-	
-	@Query(	"from" +
-			"    NotificacioEnviamentEntity n " +
+
+	@Query("select" +
+			"	new es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto(" +
+			"		nenv.id," +
+			"		nenv.createdDate, " +
+			"		t.nif, " +
+			"		t.nom, " +
+			"		t.email, " +
+			"		t.llinatge1, " +
+			"		t.llinatge2, " +
+			"		t.raoSocial, " +
+			"		n.enviamentDataProgramada, " +
+			"		n.procedimentCodiNotib, " +
+			"		n.grupCodi, " +
+			"		n.emisorDir3Codi, " +
+			"		n.usuariCodi, " +
+			"		n.concepte, " +
+			"		n.descripcio, " +
+			"		n.registreLlibreNom, " +
+			"		n.estat, " +
+			"		n.id, " +
+			"		concat(d.uuid, d.csv), " + // un dels dos sempre serà null
+			"		n.registreNumero, " +
+			"		n.registreData, " +
+			"		nenv.notificaDataCaducitat, " +
+			"		nenv.notificaIdentificador, " +
+			"		nenv.notificaCertificacioNumSeguiment " +
+			"	) " +
+			"from" +
+			"    NotificacioEnviamentEntity nenv " +
+			"	 JOIN nenv.notificacio n " +
+			"	 JOIN n.document d " +
+			"	 JOIN nenv.titular t " +
 			"where " +
-			"    (:esDataEnviamentIniciNull = true or n.createdDate >= :dataEnviamentInici) " +
-			"and (:isCodiProcedimentNull = true or lower(n.notificacio.procedimentCodiNotib) like lower('%'||:codiProcediment||'%')) " +
-			"and (:isGrupNull = true or lower(n.notificacio.grupCodi) like lower('%'||:grup||'%')) " +
-			"and (:isConcepteNull = true or lower(n.notificacio.concepte) like lower('%'||:concepte||'%')) " +
-			"and (:isDescripcioNull = true or lower(n.notificacio.descripcio) like lower('%'||:descripcio||'%')) " +
-			"and (:isDataProgramadaDisposicioIniciNull = true or n.notificacio.enviamentDataProgramada >= :dataProgramadaDisposicioInici) " +
-			"and (:isDataProgramadaDisposicioFiNull = true or n.notificacio.enviamentDataProgramada <= :dataProgramadaDisposicioFi) " +
-			"and (:isDataCaducitatIniciNull = true or n.notificacio.caducitat >= :dataCaducitatInici) " +
-			"and (:isDataCaducitatFiNull = true or n.notificacio.caducitat <= :dataCaducitatFi) " +
-			"and (:isTipusEnviamentNull = true or lower(n.notificacio.enviamentTipus) like lower('%'||:tipusEnviament||'%')) " +
-			"and (:isCsvNull = true or lower(concat(n.notificacio.document.uuid, n.notificacio.document.csv)) like lower('%'||:csv||'%')) " +
-			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%') or n.notificaEstat like lower('%'||:notificaEstat||'%'))" +
-			"and (:entitat = n.notificacio.entitat) " +
-			"and (:esDataEnviamentFiNull = true or n.createdDate <= :dataEnviamentFi) " +
-			"and (:esCodiNotificaNull = true or lower(n.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
-			"and (:esCreatedbyNull = true or lower(n.createdBy) like lower('%'||:createdBy||'%')) " +
-			"and (:esNifTitularNull = true or lower(n.titular.nif) like lower('%'||:nifTitular||'%')) " +
-			"and (:esNomTitularNull = true or lower(concat('[', n.titular.llinatge1, ' ', n.titular.llinatge2, ', ', n.titular.nom,']')) like lower('%'||:nomTitular||'%')) " +
-			"and (:esEmailTitularNull = true or n.titular.email = :emailTitular) " +
-			"and (:esDir3CodiNull = true or lower(n.notificacio.emisorDir3Codi) like lower('%'||:dir3Codi||'%')) " +
-			"and (:isNumeroCertCorreusNull = true or n.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
-			"and (:isUsuariNull = true or n.notificacio.usuariCodi like lower('%'||:usuari||'%')) "+
-			"and (:isNumeroRegistreNull = true or n.notificacio.registreNumero like lower('%'||:numeroRegistre||'%')) "+
-			"and (:esDataRegistreIniciNull = true or n.notificacio.registreData >= :dataRegistreInici) " +
-			"and (:esDataRegistreFiNull = true or n.notificacio.registreData <= :dataRegistreFi) " +
-			"and ((:esProcedimentsCodisNotibNull = false and n.notificacio.procedimentCodiNotib is not null and n.notificacio.procedimentCodiNotib in (:procedimentsCodisNotib))" +	// Té permís sobre el procediment
-			"	or (:esOrgansGestorsCodisNotib = false and n.notificacio.organGestor.codi is not null and n.notificacio.organGestor.codi in (:organsGestorsCodisNotib)) " +						// Té permís sobre l'òrgan
-			"   or ((n.notificacio.procedimentCodiNotib is null or n.notificacio.procediment.comu = true) and n.notificacio.usuariCodi = :usuariCodi)" +
-			"   or (:esProcedimentOrgansIdsNotibNull = false and n.notificacio.procedimentOrgan is not null and n.notificacio.procedimentOrgan.id in (:procedimentOrgansIdsNotib))) " +							// És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
-			"and (n.notificacio.grupCodi = null or (n.notificacio.grupCodi in (:grupsProcedimentCodisNotib))) " +
+			"    (:entitat = n.entitat) " +
+			"and (:esDataEnviamentFiNull = true or nenv.createdDate <= :dataEnviamentFi) " +
+			"and (:esDataEnviamentIniciNull = true or nenv.createdDate >= :dataEnviamentInici) " +
+			"and (:isCodiProcedimentNull = true or lower(n.procedimentCodiNotib) like lower('%'||:codiProcediment||'%')) " +
+			"and (:isGrupNull = true or lower(n.grupCodi) like lower('%'||:grup||'%')) " +
+			"and (:isConcepteNull = true or lower(n.concepte) like lower('%'||:concepte||'%')) " +
+			"and (:isDescripcioNull = true or lower(n.descripcio) like lower('%'||:descripcio||'%')) " +
+			"and (:isDataProgramadaDisposicioIniciNull = true or n.enviamentDataProgramada >= :dataProgramadaDisposicioInici) " +
+			"and (:isDataProgramadaDisposicioFiNull = true or n.enviamentDataProgramada <= :dataProgramadaDisposicioFi) " +
+			"and (:isDataCaducitatIniciNull = true or n.caducitat >= :dataCaducitatInici) " +
+			"and (:isDataCaducitatFiNull = true or n.caducitat <= :dataCaducitatFi) " +
+			"and (:isTipusEnviamentNull = true or lower(n.enviamentTipus) like lower('%'||:tipusEnviament||'%')) " +
+			"and (:isCsvNull = true or lower(concat(n.document.uuid, d.csv)) like lower('%'||:csv||'%')) " +
+			"and (:isEstatNull = true or lower(n.estat) like lower('%'||:estat||'%') or nenv.notificaEstat like lower('%'||:notificaEstat||'%'))" +
+			"and (:esCodiNotificaNull = true or lower(nenv.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
+			"and (:esCreatedbyNull = true or lower(nenv.createdBy) like lower('%'||:createdBy||'%')) " +
+			"and (:esNifTitularNull = true or lower(t.nif) like lower('%'||:nifTitular||'%')) " +
+			"and (:esNomTitularNull = true or lower(concat('[', t.llinatge1, ' ', t.llinatge2, ', ', t.nom,']')) like lower('%'||:nomTitular||'%')) " +
+			"and (:esEmailTitularNull = true or t.email = :emailTitular) " +
+			"and (:esDir3CodiNull = true or lower(n.emisorDir3Codi) like lower('%'||:dir3Codi||'%')) " +
+			"and (:isNumeroCertCorreusNull = true or nenv.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
+			"and (:isUsuariNull = true or n.usuariCodi like lower('%'||:usuari||'%')) "+
+			"and (:isNumeroRegistreNull = true or n.registreNumero like lower('%'||:numeroRegistre||'%')) "+
+			"and (:esDataRegistreIniciNull = true or n.registreData >= :dataRegistreInici) " +
+			"and (:esDataRegistreFiNull = true or n.registreData <= :dataRegistreFi) " +
+			"and ((:esProcedimentsCodisNotibNull = false and n.procedimentCodiNotib is not null and n.procedimentCodiNotib in (:procedimentsCodisNotib))" +	// Té permís sobre el procediment
+			"	or (:esOrgansGestorsCodisNotib = false and n.organGestor.codi is not null and n.organGestor.codi in (:organsGestorsCodisNotib)) " +						// Té permís sobre l'òrgan
+			"   or ((n.procedimentCodiNotib is null or n.procediment.comu = true) and n.usuariCodi = :usuariCodi)" +
+			"   or (:esProcedimentOrgansIdsNotibNull = false and n.procedimentOrgan is not null and n.procedimentOrgan.id in (:procedimentOrgansIdsNotib))) " +							// És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
+			"and (n.grupCodi = null or (n.grupCodi in (:grupsProcedimentCodisNotib))) " +
 			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
-			"	(:hasZeronotificaEnviamentIntent = true and n.notificacio.registreEnviamentIntent = 0) or " +
-			"	(:hasZeronotificaEnviamentIntent = false and n.notificacio.registreEnviamentIntent > 0) " +
+			"	(:hasZeronotificaEnviamentIntent = true and n.registreEnviamentIntent = 0) or " +
+			"	(:hasZeronotificaEnviamentIntent = false and n.registreEnviamentIntent > 0) " +
 			") " +
-			"and (:nomesSenseErrors = false or n.notificacio.notificaErrorEvent is null) " +
-			"and (:nomesAmbErrors = false or n.notificacio.notificaErrorEvent is not null)")
-	Page<NotificacioEnviamentEntity> findByNotificacio(
+			"and (:nomesSenseErrors = false or n.notificaErrorEvent is null) " +
+			"and (:nomesAmbErrors = false or n.notificaErrorEvent is not null)")
+	Page<NotEnviamentTableItemDto> findByNotificacio(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
 			@Param("codiProcediment") String codiProcediment,
 			@Param("isGrupNull") boolean isGrupNull,
@@ -273,44 +303,74 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
 			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			Pageable pageable);
-	
-	@Query(	"from" +
-			"    NotificacioEnviamentEntity n " +
+
+	@Query("select" +
+			"	new es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto(" +
+			"		nenv.id," +
+			"		nenv.createdDate, " +
+			"		t.nif, " +
+			"		t.nom, " +
+			"		t.email, " +
+			"		t.llinatge1, " +
+			"		t.llinatge2, " +
+			"		t.raoSocial, " +
+			"		n.enviamentDataProgramada, " +
+			"		n.procedimentCodiNotib, " +
+			"		n.grupCodi, " +
+			"		n.emisorDir3Codi, " +
+			"		n.usuariCodi, " +
+			"		n.concepte, " +
+			"		n.descripcio, " +
+			"		n.registreLlibreNom, " +
+			"		n.estat, " +
+			"		n.id, " +
+			"		concat(d.uuid, d.csv), " + // un dels dos sempre serà null
+			"		n.registreNumero, " +
+			"		n.registreData, " +
+			"		nenv.notificaDataCaducitat, " +
+			"		nenv.notificaIdentificador, " +
+			"		nenv.notificaCertificacioNumSeguiment " +
+			"	) " +
+			"from" +
+			"    NotificacioEnviamentEntity nenv " +
+			"	 JOIN nenv.notificacio n " +
+			"	 JOIN n.document d " +
+			"	 JOIN nenv.titular t " +
 			"where " +
-			"    (:esDataEnviamentIniciNull = true or n.createdDate >= :dataEnviamentInici) " +
-			"and (:isCodiProcedimentNull = true or lower(n.notificacio.procedimentCodiNotib) like lower('%'||:codiProcediment||'%')) " +
-			"and (:isGrupNull = true or lower(n.notificacio.grupCodi) like lower('%'||:grup||'%')) " +
-			"and (:isConcepteNull = true or lower(n.notificacio.concepte) like lower('%'||:concepte||'%')) " +
-			"and (:isDescripcioNull = true or lower(n.notificacio.descripcio) like lower('%'||:descripcio||'%')) " +
-			"and (:isDataProgramadaDisposicioIniciNull = true or n.notificacio.enviamentDataProgramada >= :dataProgramadaDisposicioInici) " +
-			"and (:isDataProgramadaDisposicioFiNull = true or n.notificacio.enviamentDataProgramada <= :dataProgramadaDisposicioFi) " +
-			"and (:isDataCaducitatIniciNull = true or n.notificacio.caducitat >= :dataCaducitatInici) " +
-			"and (:isDataCaducitatFiNull = true or n.notificacio.caducitat <= :dataCaducitatFi) " +
-			"and (:isTipusEnviamentNull = true or lower(n.notificacio.enviamentTipus) like lower('%'||:tipusEnviament||'%')) " +
-			"and (:isCsvNull = true or lower(concat(n.notificacio.document.uuid, n.notificacio.document.csv)) like lower('%'||:csv||'%')) " +
-			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%') or n.notificaEstat like lower('%'||:notificaEstat||'%'))" +
-			"and (:entitat = n.notificacio.entitat) " +
-			"and (:esDataEnviamentFiNull = true or n.createdDate <= :dataEnviamentFi) " +
-			"and (:esCodiNotificaNull = true or lower(n.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
-			"and (:esCreatedbyNull = true or lower(n.createdBy) like lower('%'||:createdBy||'%')) " +
-			"and (:esNifTitularNull = true or lower(n.titular.nif) like lower('%'||:nifTitular||'%')) " +
-			"and (:esNomTitularNull = true or lower(concat('[', n.titular.llinatge1, ' ', n.titular.llinatge2, ', ', n.titular.nom,']')) like lower('%'||:nomTitular||'%')) " +
-			"and (:esEmailTitularNull = true or n.titular.email = :emailTitular) " +
-			"and (:esDir3CodiNull = true or lower(n.notificacio.emisorDir3Codi) like lower('%'||:dir3Codi||'%')) " +
-			"and (:isNumeroCertCorreusNull = true or n.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
-			"and (:isUsuariNull = true or n.notificacio.usuariCodi like lower('%'||:usuari||'%')) "+
-			"and (:isNumeroRegistreNull = true or n.notificacio.registreNumero like lower('%'||:numeroRegistre||'%')) "+
-			"and (:esDataRegistreIniciNull = true or n.notificacio.registreData >= :dataRegistreInici) " +
-			"and (:esDataRegistreFiNull = true or n.notificacio.registreData <= :dataRegistreFi) " +
-			"and ((:esProcedimentsCodisNotibNull = false and n.notificacio.procedimentCodiNotib is not null and n.notificacio.procedimentCodiNotib in (:procedimentsCodisNotib)) " +
-			"   or (n.notificacio.procedimentCodiNotib is null and n.notificacio.organGestor is not null and n.notificacio.organGestor.codi in (:organs))) " +
+			"    (:entitat = n.entitat) " +
+			"and (:esDataEnviamentFiNull = true or nenv.createdDate <= :dataEnviamentFi) " +
+			"and (:esDataEnviamentIniciNull = true or nenv.createdDate >= :dataEnviamentInici) " +
+			"and (:isCodiProcedimentNull = true or lower(n.procedimentCodiNotib) like lower('%'||:codiProcediment||'%')) " +
+			"and (:isGrupNull = true or lower(n.grupCodi) like lower('%'||:grup||'%')) " +
+			"and (:isConcepteNull = true or lower(n.concepte) like lower('%'||:concepte||'%')) " +
+			"and (:isDescripcioNull = true or lower(n.descripcio) like lower('%'||:descripcio||'%')) " +
+			"and (:isDataProgramadaDisposicioIniciNull = true or n.enviamentDataProgramada >= :dataProgramadaDisposicioInici) " +
+			"and (:isDataProgramadaDisposicioFiNull = true or n.enviamentDataProgramada <= :dataProgramadaDisposicioFi) " +
+			"and (:isDataCaducitatIniciNull = true or n.caducitat >= :dataCaducitatInici) " +
+			"and (:isDataCaducitatFiNull = true or n.caducitat <= :dataCaducitatFi) " +
+			"and (:isTipusEnviamentNull = true or lower(n.enviamentTipus) like lower('%'||:tipusEnviament||'%')) " +
+			"and (:isCsvNull = true or lower(concat(n.document.uuid, n.document.csv)) like lower('%'||:csv||'%')) " +
+			"and (:isEstatNull = true or lower(n.estat) like lower('%'||:estat||'%') or nenv.notificaEstat like lower('%'||:notificaEstat||'%'))" +
+			"and (:esCodiNotificaNull = true or lower(nenv.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
+			"and (:esCreatedbyNull = true or lower(nenv.createdBy) like lower('%'||:createdBy||'%')) " +
+			"and (:esNifTitularNull = true or lower(t.nif) like lower('%'||:nifTitular||'%')) " +
+			"and (:esNomTitularNull = true or lower(concat('[', t.llinatge1, ' ', t.llinatge2, ', ', t.nom,']')) like lower('%'||:nomTitular||'%')) " +
+			"and (:esEmailTitularNull = true or t.email = :emailTitular) " +
+			"and (:esDir3CodiNull = true or lower(n.emisorDir3Codi) like lower('%'||:dir3Codi||'%')) " +
+			"and (:isNumeroCertCorreusNull = true or nenv.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
+			"and (:isUsuariNull = true or n.usuariCodi like lower('%'||:usuari||'%')) "+
+			"and (:isNumeroRegistreNull = true or n.registreNumero like lower('%'||:numeroRegistre||'%')) "+
+			"and (:esDataRegistreIniciNull = true or n.registreData >= :dataRegistreInici) " +
+			"and (:esDataRegistreFiNull = true or n.registreData <= :dataRegistreFi) " +
+			"and ((:esProcedimentsCodisNotibNull = false and n.procedimentCodiNotib is not null and n.procedimentCodiNotib in (:procedimentsCodisNotib)) " +
+			"   or (n.procedimentCodiNotib is null and n.organGestor is not null and n.organGestor.codi in (:organs))) " +
 			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
-			"	(:hasZeronotificaEnviamentIntent = true and n.notificacio.registreEnviamentIntent = 0) or " +
-			"	(:hasZeronotificaEnviamentIntent = false and n.notificacio.registreEnviamentIntent > 0) " +
+			"	(:hasZeronotificaEnviamentIntent = true and n.registreEnviamentIntent = 0) or " +
+			"	(:hasZeronotificaEnviamentIntent = false and n.registreEnviamentIntent > 0) " +
 			") " +
-			"and (:nomesSenseErrors = false or n.notificacio.notificaErrorEvent is null) " +
-			"and (:nomesAmbErrors = false or n.notificacio.notificaErrorEvent is not null)")
-	Page<NotificacioEnviamentEntity> findByNotificacio(
+			"and (:nomesSenseErrors = false or n.notificaErrorEvent is null) " +
+			"and (:nomesAmbErrors = false or n.notificaErrorEvent is not null)")
+	Page<NotEnviamentTableItemDto> findByNotificacio(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
 			@Param("codiProcediment") String codiProcediment,
 			@Param("isGrupNull") boolean isGrupNull,
@@ -369,44 +429,72 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
 			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			Pageable pageable);
-	
-	@Query(	"select" +
-			"	n " +
+
+	@Query("select" +
+			"	new es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto(" +
+			"		nenv.id," +
+			"		nenv.createdDate, " +
+			"		t.nif, " +
+			"		t.nom, " +
+			"		t.email, " +
+			"		t.llinatge1, " +
+			"		t.llinatge2, " +
+			"		t.raoSocial, " +
+			"		n.enviamentDataProgramada, " +
+			"		n.procedimentCodiNotib, " +
+			"		n.grupCodi, " +
+			"		n.emisorDir3Codi, " +
+			"		n.usuariCodi, " +
+			"		n.concepte, " +
+			"		n.descripcio, " +
+			"		n.registreLlibreNom, " +
+			"		n.estat, " +
+			"		n.id, " +
+			"		concat(d.uuid, d.csv), " + // un dels dos sempre serà null
+			"		n.registreNumero, " +
+			"		n.registreData, " +
+			"		nenv.notificaDataCaducitat, " +
+			"		nenv.notificaIdentificador, " +
+			"		nenv.notificaCertificacioNumSeguiment " +
+			"	) " +
 			"from" +
-			"    NotificacioEnviamentEntity n " +
+			"    NotificacioEnviamentEntity nenv " +
+			"	 JOIN nenv.notificacio n " +
+			"	 JOIN n.document d " +
+			"	 JOIN nenv.titular t " +
 			"where " +
-			"    (:esDataEnviamentIniciNull = true or n.createdDate >= :dataEnviamentInici) " +
-			"and (:isCodiProcedimentNull = true or lower(n.notificacio.procedimentCodiNotib) like lower('%'||:codiProcediment||'%')) " +
-			"and (:isGrupNull = true or lower(n.notificacio.grupCodi) like lower('%'||:grup||'%')) " +
-			"and (:isConcepteNull = true or lower(n.notificacio.concepte) like lower('%'||:concepte||'%')) " +
-			"and (:isDescripcioNull = true or lower(n.notificacio.descripcio) like lower('%'||:descripcio||'%')) " +
-			"and (:isDataProgramadaDisposicioIniciNull = true or n.notificacio.enviamentDataProgramada >= :dataProgramadaDisposicioInici) " +
-			"and (:isDataProgramadaDisposicioFiNull = true or n.notificacio.enviamentDataProgramada <= :dataProgramadaDisposicioFi) " +
-			"and (:isDataCaducitatIniciNull = true or n.notificacio.caducitat >= :dataCaducitatInici) " +
-			"and (:isDataCaducitatFiNull = true or n.notificacio.caducitat <= :dataCaducitatFi) " +
-			"and (:isTipusEnviamentNull = true or lower(n.notificacio.enviamentTipus) like lower('%'||:tipusEnviament||'%')) " +
-			"and (:isCsvNull = true or lower(concat(n.notificacio.document.uuid, n.notificacio.document.csv)) like lower('%'||:csv||'%')) " +
-			"and (:isEstatNull = true or lower(n.notificacio.estat) like lower('%'||:estat||'%') or n.notificaEstat like lower('%'||:notificaEstat||'%'))" +
-			"and (:entitat = n.notificacio.entitat) " +
-			"and (:esDataEnviamentFiNull = true or n.createdDate <= :dataEnviamentFi) " +
-			"and (:esCodiNotificaNull = true or lower(n.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
-			"and (:esCreatedbyNull = true or lower(n.createdBy) like lower('%'||:createdBy||'%')) " +
-			"and (:esNifTitularNull = true or lower(n.titular.nif) like lower('%'||:nifTitular||'%')) " +
-			"and (:esNomTitularNull = true or lower(concat('[', n.titular.llinatge1, ' ', n.titular.llinatge2, ', ', n.titular.nom,']')) like lower('%'||:nomTitular||'%')) " +
-			"and (:esEmailTitularNull = true or n.titular.email = :emailTitular) " +
-			"and (:esDir3CodiNull = true or lower(n.notificacio.emisorDir3Codi) like lower('%'||:dir3Codi||'%')) " +
-			"and (:isNumeroCertCorreusNull = true or n.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
-			"and (:isUsuariNull = true or n.notificacio.usuariCodi like lower('%'||:usuari||'%')) "+
-			"and (:isNumeroRegistreNull = true or n.notificacio.registreNumero like lower('%'||:numeroRegistre||'%')) "+
-			"and (:esDataRegistreIniciNull = true or n.notificacio.registreData >= :dataRegistreInici) " +
-			"and (:esDataRegistreFiNull = true or n.notificacio.registreData <= :dataRegistreFi)" +
+			"    (:entitat = n.entitat) " +
+			"and (:esDataEnviamentIniciNull = true or nenv.createdDate >= :dataEnviamentInici) " +
+			"and (:isCodiProcedimentNull = true or lower(n.procedimentCodiNotib) like lower('%'||:codiProcediment||'%')) " +
+			"and (:isGrupNull = true or lower(n.grupCodi) like lower('%'||:grup||'%')) " +
+			"and (:isConcepteNull = true or lower(n.concepte) like lower('%'||:concepte||'%')) " +
+			"and (:isDescripcioNull = true or lower(n.descripcio) like lower('%'||:descripcio||'%')) " +
+			"and (:isDataProgramadaDisposicioIniciNull = true or n.enviamentDataProgramada >= :dataProgramadaDisposicioInici) " +
+			"and (:isDataProgramadaDisposicioFiNull = true or n.enviamentDataProgramada <= :dataProgramadaDisposicioFi) " +
+			"and (:isDataCaducitatIniciNull = true or n.caducitat >= :dataCaducitatInici) " +
+			"and (:isDataCaducitatFiNull = true or n.caducitat <= :dataCaducitatFi) " +
+			"and (:isTipusEnviamentNull = true or lower(n.enviamentTipus) like lower('%'||:tipusEnviament||'%')) " +
+			"and (:isCsvNull = true or lower(concat(d.uuid, d.csv)) like lower('%'||:csv||'%')) " +
+			"and (:isEstatNull = true or lower(n.estat) like lower('%'||:estat||'%') or nenv.notificaEstat like lower('%'||:notificaEstat||'%'))" +
+			"and (:esDataEnviamentFiNull = true or nenv.createdDate <= :dataEnviamentFi) " +
+			"and (:esCodiNotificaNull = true or lower(nenv.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
+			"and (:esCreatedbyNull = true or lower(nenv.createdBy.codi) like lower('%'||:createdByCodi||'%')) " +
+			"and (:esNifTitularNull = true or lower(t.nif) like lower('%'||:nifTitular||'%')) " +
+			"and (:esNomTitularNull = true or lower(concat('[', t.llinatge1, ' ', t.llinatge2, ', ',t.nom,']')) like lower('%'||:nomTitular||'%')) " +
+			"and (:esEmailTitularNull = true or t.email = :emailTitular) " +
+			"and (:esDir3CodiNull = true or lower(n.emisorDir3Codi) like lower('%'||:dir3Codi||'%')) " +
+			"and (:isNumeroCertCorreusNull = true or nenv.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
+			"and (:isUsuariNull = true or n.usuariCodi like lower('%'||:usuari||'%')) "+
+			"and (:isNumeroRegistreNull = true or n.registreNumero like lower('%'||:numeroRegistre||'%')) "+
+			"and (:esDataRegistreIniciNull = true or n.registreData >= :dataRegistreInici) " +
+			"and (:esDataRegistreFiNull = true or n.registreData <= :dataRegistreFi)" +
 			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
-			"	(:hasZeronotificaEnviamentIntent = true and n.notificacio.registreEnviamentIntent = 0) or " +
-			"	(:hasZeronotificaEnviamentIntent = false and n.notificacio.registreEnviamentIntent > 0) " +
+			"	(:hasZeronotificaEnviamentIntent = true and n.registreEnviamentIntent = 0) or " +
+			"	(:hasZeronotificaEnviamentIntent = false and n.registreEnviamentIntent > 0) " +
 			") " +
-			"and (:nomesSenseErrors = false or n.notificacio.notificaErrorEvent is null) " +
-			"and (:nomesAmbErrors = false or n.notificacio.notificaErrorEvent is not null)")
-	Page<NotificacioEnviamentEntity> findByNotificacio(
+			"and (:nomesSenseErrors = false or n.notificaErrorEvent is null) " +
+			"and (:nomesAmbErrors = false or n.notificaErrorEvent is not null)")
+	Page<NotEnviamentTableItemDto> findByNotificacio(
 			@Param("isCodiProcedimentNull") boolean isCodiProcedimentNull,
 			@Param("codiProcediment") String codiProcediment,
 			@Param("isGrupNull") boolean isGrupNull,
@@ -438,7 +526,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("esCodiNotificaNull") boolean esCodiNotificaNull,
 			@Param("codiNotifica") String codiNotifica,
 			@Param("esCreatedbyNull") boolean esCreatedbyNull,
-			@Param("createdBy") UsuariEntity createdBy,
+			@Param("createdByCodi") String createdBy,
 			@Param("esNifTitularNull") boolean esNifTitularNull,
 			@Param("nifTitular") String nifTitular,
 			@Param("esNomTitularNull") boolean esNomTitularNull,
@@ -462,17 +550,17 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
 			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			Pageable pageable);
-	
+
 	@Query(	"from" +
 			"    NotificacioEnviamentEntity n " +
-			"where " + 
-			"	 (:esNullCodiNotifica = true or n.notificaIdentificador = :notificaIdentificador) " + 
+			"where " +
+			"	 (:esNullCodiNotifica = true or n.notificaIdentificador = :notificaIdentificador) " +
 			"and n.notificacio = :notificacio")
 	List<Long> findIdByEntitatAndFiltre (
 			@Param("esNullCodiNotifica") boolean esNullCodiNotifica,
 			@Param("notificaIdentificador") String codiNotifica,
 			@Param("notificacio") NotificacioEntity notificacio);
-	
+
 	List<NotificacioEnviamentEntity>findByNotificacioAndIdInOrderByIdAsc (
 			NotificacioEntity notificacio,
 			Collection<Long> id);
