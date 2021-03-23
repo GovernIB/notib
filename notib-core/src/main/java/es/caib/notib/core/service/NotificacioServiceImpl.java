@@ -7,12 +7,14 @@ import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
 import es.caib.notib.core.api.dto.ProgresDescarregaDto.TipusInfo;
+import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.Persona;
@@ -118,6 +120,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private PermisosHelper permisosHelper;
 	@Autowired
 	private OrganGestorCachable organGestorCachable;
+	@Autowired
+	private ProcedimentService procedimentService;
+
 	public static Map<String, ProgresDescarregaDto> progresDescarrega = new HashMap<String, ProgresDescarregaDto>();
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActulitzacioExpirades = new HashMap<String, ProgresActualitzacioCertificacioDto>();
 	
@@ -804,27 +809,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 				
 				pluginHelper.addOficinaAndLlibreRegistre(notificacio);
-
-				logger.info("Consultant events notificació...");
-				List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
-				
-				if (events != null && events.size() > 0) {
-					NotificacioEventEntity lastEvent = events.get(events.size() - 1);
-					
-					if(lastEvent.isError() && 
-								(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
-								lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
-								lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
-								lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) || 
-								lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT) || 
-								lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT) || 
-								lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR) || 
-								lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR))) {
-						logger.info("El darrer event de la notificació " + notificacio.getId()  + " conté un error de tipus: " + lastEvent.getTipus().name());
-						notificacio.setErrorLastEvent(true);
-					}
-
-				}
 			}
 			
 			return conversioTipusHelper.convertir(
@@ -837,11 +821,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public PaginaDto<NotificacioDatatableDto> findAmbFiltrePaginat(
+	public PaginaDto<NotificacioTableItemDto> findAmbFiltrePaginat(
 			Long entitatId,
 			RolEnumDto rol,
 			List<String> procedimentsCodisNotib,
-			List<String> codisProcedimentsProcessables,
 			List<String> codisOrgansGestorsDisponibles,
 			List<Long> codisProcedimentOrgansDisponibles,
 			String organGestorCodi,
@@ -1085,7 +1068,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							pageable);
 				}
 			}
-			return complementaNotificacions(notificacions, codisProcedimentsProcessables);
+
+			return complementaNotificacions(entitatActual, usuariCodi, notificacions);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1117,56 +1101,43 @@ public class NotificacioServiceImpl implements NotificacioService {
 		return data;
 	}
 	
-	private PaginaDto<NotificacioDatatableDto> complementaNotificacions(
-			Page<NotificacioEntity> notificacions,
-			List<String> codisProcedimentsProcessables) {
-
-		PaginaDto<NotificacioDatatableDto> resultatPagina = null;
+	private PaginaDto<NotificacioTableItemDto> complementaNotificacions(
+			EntitatEntity entitatEntity,
+			String usuariCodi,
+			Page<NotificacioEntity> notificacions) {
 
 		if (notificacions == null) {
-			resultatPagina = paginacioHelper.getPaginaDtoBuida(NotificacioDatatableDto.class);
-		} else {
-			if(notificacions != null) {
-				
-				for (NotificacioEntity notificacio : notificacions) {
-					if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
-						notificacio.setPermisProcessar(
-								codisProcedimentsProcessables.contains(notificacio.getProcediment().getCodi()));
-						}
-					if (notificacio.getTipusUsuari() != null && notificacio.getTipusUsuari().equals(TipusUsuariEnumDto.APLICACIO) && notificacio.getId() != null) {
-						logger.info("Consultant events notificació...");
-						List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacio.getId());
-
-						if (events != null && events.size() > 0) {
-							NotificacioEventEntity lastEvent = events.get(events.size() - 1);
-
-							if(lastEvent.isError() &&
-										(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
-										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
-										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
-										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) ||
-										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT) ||
-										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT) ||
-										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR) ||
-										lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR))) {
-								logger.info("El darrer event de la notificació " + notificacio.getId()  + " conté un error de tipus: " + lastEvent.getTipus().name());
-								notificacio.setErrorLastEvent(true);
-							}
-						}
-					}
-					
-					List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacio(notificacio);
-					if (enviamentsPendents != null && ! enviamentsPendents.isEmpty()) {
-						notificacio.setHasEnviamentsPendentsRegistre(true);
-					}
-				}
-			}
-			resultatPagina = paginacioHelper.toPaginaDto(
-					notificacions,
-					NotificacioDatatableDto.class);
-		
+			return paginacioHelper.getPaginaDtoBuida(NotificacioTableItemDto.class);
 		}
-		return resultatPagina;
+
+		List<String> codisProcedimentsProcessables = new ArrayList<String>();
+		List<ProcedimentDto> procedimentsProcessables = procedimentService.findProcedimentsWithPermis(entitatEntity.getId(),
+				usuariCodi, PermisEnum.PROCESSAR);
+		if (procedimentsProcessables != null)
+			for (ProcedimentDto procediment : procedimentsProcessables) {
+				codisProcedimentsProcessables.add(procediment.getCodi());
+			}
+		List<ProcedimentOrganDto> procedimentOrgansProcessables = procedimentService.findProcedimentsOrganWithPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
+		if (procedimentOrgansProcessables != null) {
+			for (ProcedimentOrganDto procedimentOrgan : procedimentOrgansProcessables) {
+				codisProcedimentsProcessables.add(procedimentOrgan.getProcediment().getCodi());
+			}
+		}
+
+		for (NotificacioEntity notificacio : notificacions) {
+			if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
+				notificacio.setPermisProcessar(codisProcedimentsProcessables.contains(notificacio.getProcediment().getCodi()));
+			}
+
+			List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacio(notificacio);
+			if (enviamentsPendents != null && !enviamentsPendents.isEmpty()) {
+				notificacio.setHasEnviamentsPendentsRegistre(true);
+			}
+		}
+
+		return paginacioHelper.toPaginaDto(
+				notificacions,
+				NotificacioTableItemDto.class);
 	}
 	
 	@Override

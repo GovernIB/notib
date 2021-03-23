@@ -203,14 +203,16 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "registre_llibre_nom")
 	private String registreLlibreNom;
 
+	@Column(name = "IS_ERROR_LAST_EVENT")
+	protected Boolean errorLastEvent;
+
 	@Transient
 	protected boolean permisProcessar;
-	@Transient
-	protected boolean errorLastEvent;
 	@Transient
 	protected boolean hasEnviamentsPendents;
 	@Transient
 	protected boolean hasEnviamentsPendentsRegistre;
+
 //	@Transient
 //	protected NotificacioEnviamentEstatEnumDto notificaEstat;
 
@@ -682,6 +684,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 //	public void setNotificaEstat(NotificacioEnviamentEstatEnumDto notificaEstat) {
 //		this.notificaEstat = notificaEstat;
 //	}
+
+	public boolean isTipusUsuariAplicacio() {
+		return this.tipusUsuari != null && this.tipusUsuari.equals(TipusUsuariEnumDto.APLICACIO);
+	}
 
 	@PreRemove
 	private void preRemove() {

@@ -4,6 +4,7 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
@@ -59,12 +60,12 @@ public class ConversioTipusHelper {
 			byDefault().
 			register();
 
-		mapperFactory.classMap(NotificacioEntity.class, NotificacioDatatableDto.class).
+		mapperFactory.classMap(NotificacioEntity.class, NotificacioTableItemDto.class).
 				field("notificaErrorEvent.data", "notificaErrorData").
 				field("notificaErrorEvent.errorDescripcio", "notificaErrorDescripcio").
 				field("organGestor.codi", "organGestor").
 				field("organGestor.nom", "organGestorNom").
-				field("entitat.id", "entitatId").
+//				field("entitat.id", "entitatId").
 				field("entitat.nom", "entitatNom").
 				field("procediment.codi", "procedimentCodi").
 				field("procediment.nom", "procedimentNom").
