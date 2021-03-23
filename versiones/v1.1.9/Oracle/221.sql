@@ -9,3 +9,17 @@ CREATE INDEX NOT_PERSONA_NOTENV_ID_INDEX
 
 ALTER TABLE NOT_NOTIFICACIO
     ADD IS_ERROR_LAST_EVENT number(1, 0) default 0;
+
+UPDATE
+    NOT_NOTIFICACIO
+SET IS_ERROR_LAST_EVENT = (
+    (SELECT errorev
+     FROM (
+              SELECT CASE WHEN ev.error = 1 AND ev.TIPUS in (8, 1, 2, 7, 0, 11, 12, 13) THEN 1 ELSE 0 END as errorev
+              FROM NOT_NOTIFICACIO_EVENT ev
+              WHERE ev.NOTIFICACIO_ID = ID
+              ORDER BY ev.DATA DESC
+          )
+     WHERE ROWNUM = 1
+    )
+);
