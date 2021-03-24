@@ -87,8 +87,8 @@ public class NotificacioEventHelper {
                 error(true).
                 errorDescripcio(descripcio).
                 build();
-        notificacio.updateEventAfegir(event);
-        notificacioEventRepository.save(event);
+        updateNotificacio(notificacio, event);
+        notificacioEventRepository.saveAndFlush(event);
         enviament.updateNotificaError(true, event);
     }
 
@@ -106,8 +106,7 @@ public class NotificacioEventHelper {
         return addErrorEvent(notificacio, eventTipus, null, errorDescripcio, notificaError);
     }
 
-    public void addCallbackEvent(NotificacioEntity notificacio,
-                                 NotificacioEventEntity event) {
+    public void addCallbackEvent(NotificacioEntity notificacio, NotificacioEventEntity event) {
         deleteByNotificacioAndTipusAndError(
                 notificacio,
                 null,
@@ -135,11 +134,8 @@ public class NotificacioEventHelper {
                     .errorDescripcio(event.getCallbackError());
         }
         NotificacioEventEntity callbackEvent = eventBuilder.build();
-        if (event.getEnviament() != null)
-            event.getEnviament().getNotificacio().updateEventAfegir(callbackEvent);
-        else
-            event.getNotificacio().updateEventAfegir(callbackEvent);
-        notificacioEventRepository.save(callbackEvent);
+        updateNotificacio(notificacio, callbackEvent);
+        notificacioEventRepository.saveAndFlush(callbackEvent);
     }
 
     public void addNotificaConsultaSirErrorEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament) {
@@ -160,13 +156,13 @@ public class NotificacioEventHelper {
 
         NotificacioEventEntity event = eventBuilder.build();
 
-        notificacio.updateEventAfegir(event);
-        notificacioEventRepository.save(event);
+        updateNotificacio(notificacio, event);
+        notificacioEventRepository.saveAndFlush(event);
         auditNotificacioHelper.updateNotificacioErrorSir(notificacio, event);
     }
 
 
-    public void addEnviamentRegistreOKEvent(NotificacioEntity notificacioEntity,
+    public void addEnviamentRegistreOKEvent(NotificacioEntity notificacio,
                                             String registreNum,
                                             Date registreData,
                                             NotificacioRegistreEstatEnumDto registreEstat,
@@ -176,16 +172,16 @@ public class NotificacioEventHelper {
         //Crea un nou event
         NotificacioEventEntity.Builder eventBuilder = NotificacioEventEntity.getBuilder(
                 NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
-                notificacioEntity);
+                notificacio);
 
-        if (notificacioEntity.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+        if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
             eventBuilder.callbackInicialitza();
         NotificacioEventEntity event = eventBuilder.build();
 
         logger.info(" >>> Canvi estat a REGISTRADA ");
         for(NotificacioEnviamentEntity enviamentEntity: enviaments) {
             auditEnviamentHelper.actualitzaRegistreEnviament(
-                    notificacioEntity,
+                    notificacio,
                     enviamentEntity,
                     registreNum,
                     registreData,
@@ -193,7 +189,7 @@ public class NotificacioEventHelper {
                     totsAdministracio,
                     event);
         }
-
+        updateNotificacio(notificacio, event);
     }
     /**
      * Registre un event a la notificació per a cada enviament realitzat correctament indicant que
@@ -218,8 +214,17 @@ public class NotificacioEventHelper {
                     identificadorsResultatsEnviaments.get(enviament),
                     enviament);
         }
+        updateNotificacio(notificacio, event);
     }
 
+    /**
+     *
+     * @param notificacio Notificació on es vol afegir l'event
+     * @param enviament Enviament relacionat amb l'event
+     * @param eventTipus NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT |
+     *                   NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO
+     * @param descripcio Text descriptiu de l'event
+     */
     public void addNotificaCallbackEvent(NotificacioEntity notificacio,
                                          NotificacioEnviamentEntity enviament,
                                          NotificacioEventTipusEnumDto eventTipus,
@@ -232,6 +237,18 @@ public class NotificacioEventHelper {
         );
     }
 
+    /**
+     *
+     * @param notificacio Notificació on es vol afegir l'event
+     * @param enviament Enviament relacionat amb l'event
+     * @param eventTipus NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT |
+     *                   NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO
+     * @param descripcio Text descriptiu de l'event
+     * @param errorDescripcio Si l'event està asociat a un error definir aquest parametre descrivint-lo
+     * @param initialitzaCallback indicar si s'ha d'inicialitzar el callball a l'event
+     *
+     * @return L'event creat
+     */
     public NotificacioEventEntity addNotificaCallbackEvent(NotificacioEntity notificacio,
                                          NotificacioEnviamentEntity enviament,
                                          NotificacioEventTipusEnumDto eventTipus,
@@ -261,8 +278,8 @@ public class NotificacioEventHelper {
         }
         enviament.updateNotificaError(errorDescripcio != null, errorDescripcio != null ? event : null);
 
-        enviament.getNotificacio().updateEventAfegir(event);
-        notificacioEventRepository.save(event);
+        updateNotificacio(notificacio, event);
+        notificacioEventRepository.saveAndFlush(event);
         return event;
     }
 
@@ -289,8 +306,8 @@ public class NotificacioEventHelper {
         }
         NotificacioEventEntity event = eventBuilder.build();
 
-        notificacio.updateEventAfegir(event);
-        notificacioEventRepository.save(event);
+        updateNotificacio(notificacio, event);
+        notificacioEventRepository.saveAndFlush(event);
         enviament.updateNotificaError(isError, isError ? event : null);
     }
 
@@ -308,11 +325,8 @@ public class NotificacioEventHelper {
 
         NotificacioEventEntity event = eventBuilder.build();
 
-        notificacio.updateEventAfegir(event);
-        notificacioEventRepository.save(event);
-        notificacio.updateNotificaError(
-                NotificacioErrorTipusEnumDto.ERROR_REINTENTS_CONSULTA,
-                event);
+        updateNotificacio(notificacio, event, NotificacioErrorTipusEnumDto.ERROR_REINTENTS_CONSULTA);
+        notificacioEventRepository.saveAndFlush(event);
     }
 
     private NotificacioEventEntity addErrorEvent(NotificacioEntity notificacio,
@@ -337,32 +351,50 @@ public class NotificacioEventHelper {
         //Actualitza l'event per cada enviament
         if (enviament != null) {
             eventBuilder.enviament(enviament);
-
+            notificacioEventRepository.saveAndFlush(event);
         } else {
             for (NotificacioEnviamentEntity enviamentEntity : notificacio.getEnviaments()) {
                 eventBuilder.enviament(enviamentEntity);
-                updateEnviamentErrorEvent(eventTipus, enviamentEntity, event, notificaError);
+                notificacioEventRepository.saveAndFlush(event);
+
+                switch (eventTipus)
+                {
+                    case NOTIFICA_REGISTRE:
+                        enviamentEntity.updateNotificaError(true, event);
+                        break;
+                    case NOTIFICA_ENVIAMENT:
+                        auditEnviamentHelper.actualizaErrorNotifica(enviamentEntity, notificaError, event);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
-
-        notificacioEventRepository.saveAndFlush(event);
+        updateNotificacio(notificacio, event);
         return event;
     }
+    private void updateNotificacio(NotificacioEntity notificacio, NotificacioEventEntity eventCreat) {
+        updateNotificacio(notificacio, eventCreat, null);
+    }
+    private void updateNotificacio(NotificacioEntity notificacio, NotificacioEventEntity eventCreat, NotificacioErrorTipusEnumDto tipusError) {
+        notificacio.updateEventAfegir(eventCreat);
+        List<NotificacioEventTipusEnumDto> errorsTipus = Arrays.asList(
+                NotificacioEventTipusEnumDto.CALLBACK_CLIENT,
+                NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
+                NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
+                NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
+                NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
+                NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,
+                NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR,
+                NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR
+        );
 
-    private void updateEnviamentErrorEvent(NotificacioEventTipusEnumDto eventTipus,
-                                      NotificacioEnviamentEntity enviament,
-                                      NotificacioEventEntity event,
-                                      boolean notificaError) {
-        switch (eventTipus)
-        {
-            case NOTIFICA_REGISTRE:
-                enviament.updateNotificaError(true, event);
-                break;
-            case NOTIFICA_ENVIAMENT:
-                auditEnviamentHelper.actualizaErrorNotifica(enviament, notificaError, event);
-                break;
-            default:
-                break;
+        if (notificacio.isTipusUsuariAplicacio() && eventCreat.isError() && errorsTipus.contains(eventCreat.getTipus())){
+            notificacio.setErrorLastEvent(true);
+        }
+
+        if (tipusError != null) {
+            notificacio.updateNotificaError(tipusError, eventCreat);
         }
     }
 
@@ -405,7 +437,7 @@ public class NotificacioEventHelper {
     }
 
     /**
-     * Si hi ha més d'un error associat a la notificació els elimina conservant el més antic.
+     * Si hi ha més d'un error associat a la notificació els elimina, conservant el més antic.
      *
      * @param notificacio Notificació dels events
      * @param errorType Tipus d'events d'error

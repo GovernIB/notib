@@ -301,7 +301,7 @@ public class BaseServiceTest {
 					Long procedimentId = ((ProcedimentDto)element).getId();
 					List<NotificacioEntity> notificacionsByProcediment = notificacioRepository.findByProcedimentId(procedimentId);
 					for(NotificacioEntity notificacioEntity: notificacionsByProcediment) {
-						notificacioRepository.delete(notificacioEntity.getId());
+						notificacioService.delete(entitatId, notificacioEntity.getId());
 					}
 					procedimentService.delete(
 							entitatId,

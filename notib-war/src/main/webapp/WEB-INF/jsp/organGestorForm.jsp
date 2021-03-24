@@ -215,17 +215,20 @@ $(document).ready(function() {
 				</c:if>
 			</c:if>
 			<c:if test="${isModificacio}">
-				<ul>
-					<li><b><spring:message code="organgestor.form.camp.codiDir3"/>:</b> ${organGestorCommand.codi}</li>
-					<li><b><spring:message code="organgestor.form.camp.organisme"/>:</b> ${organGestorCommand.nom}</li>
-					<li><b><spring:message code="organgestor.form.camp.llibre"/>:</b> ${organGestorCommand.llibreNom}</li>
+				<ul class="list-group">
+					<li class="list-group-item"><b><spring:message code="organgestor.form.camp.codiDir3"/>:</b> ${organGestorCommand.codi}</li>
+					<li class="list-group-item"><b><spring:message code="organgestor.form.camp.organisme"/>:</b> ${organGestorCommand.nom}</li>
+					<li class="list-group-item"><b><spring:message code="organgestor.form.camp.llibre"/>:</b> ${organGestorCommand.llibreNom}</li>
 				</ul>
 			</c:if>
 			<c:if test="${setOficina}">
 				<br/>
 				<form:hidden path="oficina"/>
 				<form:hidden path="oficinaNom"/>
-				<select id="selOficines" data-placeholder="<spring:message code="organgestor.form.camp.oficina"/>"></select>
+<%--				<div class="form-group">--%>
+					<label for="selOficines"><spring:message code="organgestor.form.camp.oficina"/>:</label>
+					<select id="selOficines" data-placeholder="<spring:message code="organgestor.form.camp.oficina"/>"></select>
+<%--				</div>--%>
 				<p class="comentari oficinainfo hidden" style="color: #856404;"><spring:message code="organgestor.form.camp.oficina.info"/></p>
 			</c:if>
 			<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">

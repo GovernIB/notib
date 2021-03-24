@@ -106,6 +106,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		try {
 			logger.info(" >>> Enviant notificació...");
 
+//			int e = 10/ 0;
+
 			long startTime = System.nanoTime();
 			double elapsedTime;
 			ResultadoAltaRemesaEnvios resultadoAlta = enviaNotificacio(notificacio);
@@ -248,57 +250,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						errorDescripcio);
 			}
 
-			Date dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
-			NotificacioEnviamentEstatEnumDto estat = getEstatNotifica(datatDarrer.getResultado());
-			logger.info("Actualitzant informació enviament amb Datat...");
-			if (!dataDatat.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
-				CodigoDIR organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
-				CodigoDIR organismoEmisorRaiz = resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
-				enviament.updateNotificaInformacio(
-						dataDatat,
-						toDate(resultadoInfoEnvio.getFechaPuestaDisposicion()),
-						toDate(resultadoInfoEnvio.getFechaCaducidad()),
-						(organismoEmisor != null) ? organismoEmisor.getCodigo() : null,
-						(organismoEmisor != null) ? organismoEmisor.getDescripcionCodigoDIR() : null,
-						(organismoEmisor != null) ? organismoEmisor.getNifDIR() : null,
-						(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getCodigo() : null,
-						(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getDescripcionCodigoDIR() : null,
-						(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getNifDIR() : null);
-				if (estat.name() != null)
-					logger.info("Nou estat: " + estat.name());
-
-				logger.info("Actualitzant Datat enviament...");
-				enviamentUpdateDatat(
-						estat,
-						toDate(datatDarrer.getFecha()),
-						null,
-						datatDarrer.getOrigen(),
-						datatDarrer.getNifReceptor(),
-						datatDarrer.getNombreReceptor(),
-						null,
-						null,
-						enviament);
-				logger.info("Fi actualització Datat");
-
-				logger.info("Creant nou event per Datat...");
-
-				//Crea un nou event
-				notificacioEventHelper.addNotificaCallbackEvent(notificacio, enviament,
-						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-						datatDarrer.getResultado());
-
-				logger.info("L'event s'ha guardat correctament...");
-				logger.info("Envio correu en cas d'usuaris no APLICACIÓ");
-				if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
-					startTime = System.nanoTime();
-					emailHelper.prepararEnvioEmailNotificacio(notificacio);
-					elapsedTime = (System.nanoTime() - startTime) / 10e6;
-					logger.info(" [TIMER-EST] Preparar enviament mail notificació (prepararEnvioEmailNotificacio)  [Id: " + enviamentId + "]: " + elapsedTime + " ms");
-				}
-			}
-			logger.info("Enviament actualitzat");
-
-
 			if (resultadoInfoEnvio.getCertificacion() != null) {
 				logger.info("Actualitzant informació enviament amb certificació...");
 				startTime = System.nanoTime();
@@ -341,6 +292,56 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				logger.info("Enviament actualitzat");
 			}
 			notificacioEventHelper.addNotificaConsultaInfoEvent(notificacio, enviament, null, false);
+
+			Date dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
+			NotificacioEnviamentEstatEnumDto estat = getEstatNotifica(datatDarrer.getResultado());
+			logger.info("Actualitzant informació enviament amb Datat...");
+			if (!dataDatat.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
+				CodigoDIR organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
+				CodigoDIR organismoEmisorRaiz = resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
+				enviament.updateNotificaInformacio(
+						dataDatat,
+						toDate(resultadoInfoEnvio.getFechaPuestaDisposicion()),
+						toDate(resultadoInfoEnvio.getFechaCaducidad()),
+						(organismoEmisor != null) ? organismoEmisor.getCodigo() : null,
+						(organismoEmisor != null) ? organismoEmisor.getDescripcionCodigoDIR() : null,
+						(organismoEmisor != null) ? organismoEmisor.getNifDIR() : null,
+						(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getCodigo() : null,
+						(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getDescripcionCodigoDIR() : null,
+						(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getNifDIR() : null);
+				if (estat.name() != null)
+					logger.info("Nou estat: " + estat.name());
+
+				//Crea un nou event
+				logger.info("Creant nou event per Datat...");
+				notificacioEventHelper.addNotificaCallbackEvent(notificacio, enviament,
+						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
+						datatDarrer.getResultado());
+				logger.info("L'event s'ha guardat correctament...");
+
+				logger.info("Actualitzant Datat enviament...");
+				enviamentUpdateDatat(
+						estat,
+						toDate(datatDarrer.getFecha()),
+						null,
+						datatDarrer.getOrigen(),
+						datatDarrer.getNifReceptor(),
+						datatDarrer.getNombreReceptor(),
+						null,
+						null,
+						enviament);
+				logger.info("Fi actualització Datat");
+
+				logger.info("Envio correu en cas d'usuaris no APLICACIÓ");
+				if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
+					startTime = System.nanoTime();
+					emailHelper.prepararEnvioEmailNotificacio(notificacio);
+					elapsedTime = (System.nanoTime() - startTime) / 10e6;
+					logger.info(" [TIMER-EST] Preparar enviament mail notificació (prepararEnvioEmailNotificacio)  [Id: " + enviamentId + "]: " + elapsedTime + " ms");
+				}
+			}
+			logger.info("Enviament actualitzat");
+
 			enviament.refreshNotificaConsulta();
 			integracioHelper.addAccioOk(info);
 			logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");

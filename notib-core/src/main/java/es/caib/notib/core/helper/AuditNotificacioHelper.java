@@ -1,14 +1,13 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.aspect.Audita;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.*;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,10 +101,10 @@ public class AuditNotificacioHelper {
 	
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateEstatNotificacio(
-			NotificacioEnviamentEstatEnumDto notificaEstat,
+			String notificaEstatNom,
 			NotificacioEntity notificacio) {
 		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
-		notificacio.updateMotiu(notificaEstat.name());
+		notificacio.updateMotiu(notificaEstatNom);
 		notificacioEventHelper.clearOldUselessEvents(notificacio);
 		return notificacio;
 	}

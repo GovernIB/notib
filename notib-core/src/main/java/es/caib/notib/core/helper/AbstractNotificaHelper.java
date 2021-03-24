@@ -3,13 +3,16 @@
  */
 package es.caib.notib.core.helper;
 
-import java.security.GeneralSecurityException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Set;
-import java.util.TreeSet;
+import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.exception.SistemaExternException;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -18,26 +21,13 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPEnvelope;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFactory;
-import javax.xml.soap.SOAPHeader;
+import javax.xml.soap.*;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
-
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.exception.SistemaExternException;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import java.security.GeneralSecurityException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Mètodes comuns per a accedir a Notific@.
@@ -123,7 +113,7 @@ public abstract class AbstractNotificaHelper {
 		}
 		logger.info("Estat final: " + estatsEnviamentsFinals);
 		if (estatsEnviamentsFinals) {
-			auditNotificacioHelper.updateEstatNotificacio(notificaEstat, enviament.getNotificacio());
+			auditNotificacioHelper.updateEstatNotificacio(notificaEstat.name(), enviament.getNotificacio());
 
 //			//Marcar com a processada si la notificació s'ha fet des de una aplicació
 //			if (enviament.getNotificacio() != null && enviament.getNotificacio().getTipusUsuari() == TipusUsuariEnumDto.APLICACIO) {

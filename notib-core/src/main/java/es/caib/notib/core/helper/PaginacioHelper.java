@@ -3,12 +3,10 @@
  */
 package es.caib.notib.core.helper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
+import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDireccioDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,10 +15,10 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDireccioDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDto;
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Helper per a convertir les dades de paginació entre el DTO
@@ -89,7 +87,10 @@ public class PaginacioHelper {
 		else
 			return null;
 	}
-	
+	public <T> PaginaDto<T> toPaginaDto(Page<T> page) {
+		return toPaginaDto(page, null);
+	}
+
 	public <T> PaginaDto<T> toPaginaDto(
 			Page<?> page,
 			List<?> llista,
@@ -130,23 +131,24 @@ public class PaginacioHelper {
 		dto.setPrimera(page.isFirst());
 		dto.setPosteriors(page.hasNext());
 		dto.setDarrera(page.isLast());
-		if (page.hasContent()) {
-			if (converter == null) {
-				dto.setContingut(
-						conversioTipusHelper.convertirList(
-								page.getContent(),
-								targetType));
-			} else {
-				List<T> contingut = new ArrayList<T>();
-				for (S element: page.getContent()) {
-					contingut.add(
-							converter.convert(element));
-				}
-				dto.setContingut(contingut);
+		if (page.hasContent() && converter != null) {
+			List<T> contingut = new ArrayList<T>();
+			for (S element: page.getContent()) {
+				contingut.add(
+						converter.convert(element));
 			}
+			dto.setContingut(contingut);
+		} else if (page.hasContent() && targetType != null) {
+			dto.setContingut(
+					conversioTipusHelper.convertirList(
+							page.getContent(),
+							targetType));
+		} else if (page.hasContent()){
+			dto.setContingut((List<T>) page.getContent());
 		}
 		return dto;
 	}
+
 	public <T> PaginaDto<T> toPaginaDto(
 			List<?> llista,
 			Class<T> targetType) {

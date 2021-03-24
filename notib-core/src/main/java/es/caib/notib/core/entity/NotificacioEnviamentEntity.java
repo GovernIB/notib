@@ -33,6 +33,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_id")
 	@ForeignKey(name = "NOT_NOTIFICACIO_NOTENV_FK")
+	@Index(name = "NOT_NOTIFICACIO_NOTDEST_FK_I")
 	@NotFound(action = NotFoundAction.IGNORE)
 	protected NotificacioEntity notificacio;
 	
@@ -43,6 +44,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "titular_id")
 	@ForeignKey(name = "not_persona_notificacio_env_fk")
+	@Index(name = "NOT_NOTENV_TITULAR_ID_INDEX")
 	protected PersonaEntity titular;
 	
 	/* Destinataris */
@@ -343,6 +345,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
 		this.registreNumeroFormatat = registreNumeroFormatat;
 	}
+
 
 	public void updateRegistreEstat(
 			NotificacioRegistreEstatEnumDto registreEstat,
@@ -905,7 +908,11 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			return false;
 		return true;
 	}
-	
+
+	@PreRemove
+	private void preRemove() {
+		this.notificacioErrorEvent = null;
+	}
 
 	private static final long serialVersionUID = 6993171107561077019L;
 }

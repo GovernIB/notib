@@ -1,8 +1,9 @@
 package es.caib.notib.core.repository;
 
+import es.caib.notib.core.entity.PersonaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import es.caib.notib.core.entity.PersonaEntity;
+import java.util.List;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -12,4 +13,5 @@ import es.caib.notib.core.entity.PersonaEntity;
  */
 public interface PersonaRepository extends JpaRepository<PersonaEntity, Long> {
 
+    List<PersonaEntity> findByEnviamentId(Long enviamentId);
 }

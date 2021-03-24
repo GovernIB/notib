@@ -57,7 +57,6 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_env_id")
 	@ForeignKey(name = "not_notenv_noteve_fk")
-	@OnDelete(action = OnDeleteAction.CASCADE)
 	private NotificacioEnviamentEntity enviament;
 	
 	@Column(name = "callback_estat", length = 10, nullable = true)
@@ -113,6 +112,9 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 			built.notificacio = notificacio;
 		}
 		public Builder descripcio(String descripcio) {
+			if (descripcio.length() > 256) {
+				descripcio = descripcio.substring(0, 256);
+			}
 			built.descripcio = descripcio;
 			return this;
 		}
@@ -175,7 +177,10 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 			return false;
 		return true;
 	}
-
+	@PreRemove
+	private void preRemove() {
+		this.enviament = null;
+	}
 	private static final long serialVersionUID = -2299453443943600172L;
 
 }

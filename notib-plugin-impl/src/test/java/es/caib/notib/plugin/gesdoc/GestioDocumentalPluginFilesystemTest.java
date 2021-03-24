@@ -6,8 +6,9 @@ import junit.framework.TestCase;
 import org.junit.Before;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.Random;
+import java.util.*;
 
 public class GestioDocumentalPluginFilesystemTest extends TestCase {
 
@@ -63,6 +64,63 @@ public class GestioDocumentalPluginFilesystemTest extends TestCase {
     }
 
     public void testGet() {
+        Random r = new Random();
+        String[] agrupacions = new String[]{"certificacions", "notificacions", "tmp"};
+        Map<String, List<String>> createdFiles = new HashMap<>();
+        for (String agr : agrupacions){
+            createdFiles.put(agr, new ArrayList<String>());
+        }
+        createdFiles.put("", new ArrayList<String>());
+        long nFiles = 100;
+        for (int i =0; i < nFiles; i++) {
+            String agr = agrupacions[r.nextInt(agrupacions.length)];
+            byte[] contingut = new byte[]{4, 5, 6};
+            try {
+                String idFile = plugin.create(agr, new ByteArrayInputStream(contingut));
+                createdFiles.get(agr).add(idFile);
+            } catch (SistemaExternException e) {
+                fail();
+            }
+        }
+
+        nFiles = 5;
+        for (int i =0; i < nFiles; i++) {
+            byte[] contingut = new byte[]{4, 5, 6};
+            try {
+                String idFile = plugin.create("", new ByteArrayInputStream(contingut));
+                createdFiles.get("").add(idFile);
+            } catch (SistemaExternException e) {
+                fail();
+            }
+        }
+
+        for (String agr : agrupacions){
+            for (String idFile : createdFiles.get(agr)){
+                ByteArrayOutputStream output = new ByteArrayOutputStream();
+                try {
+                    plugin.get(idFile, agr, output);
+                } catch (SistemaExternException e) {
+                    fail();
+                }
+            }
+        }
+
+        // Comprovam si els documents hospedats al directori arrel es troben com a notificacions (comportament antic que s'ha de conservar)
+        String agr = "notificacions";
+        for (String idFile : createdFiles.get("")){
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            try {
+                plugin.get(idFile, agr, output);
+            } catch (SistemaExternException e) {
+                fail();
+            }
+        }
+
+        // Esborram tots els fitxers creats
+        for (String agrupacio : agrupacions){
+            File file = new File(getBaseDir(agrupacio));
+            file.delete();
+        }
     }
 
     private String getBaseDir(String agrupacio) {

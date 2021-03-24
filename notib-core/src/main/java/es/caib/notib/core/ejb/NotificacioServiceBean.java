@@ -4,6 +4,7 @@
 package es.caib.notib.core.ejb;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
@@ -152,11 +153,10 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public PaginaDto<NotificacioDatatableDto> findAmbFiltrePaginat(
+	public PaginaDto<NotificacioTableItemDto> findAmbFiltrePaginat(
 			Long entitatId,
 			RolEnumDto rol,
 			List<String> codisProcedimentsDisponibles,
-			List<String> codisProcedimentsProcessables,
 			List<String> codisOrgansGestorsDisponibles,
 			List<Long> codisProcedimentOrgansDisponibles,
 			String organGestorCodi,
@@ -167,7 +167,6 @@ public class NotificacioServiceBean implements NotificacioService {
 				entitatId,
 				rol,
 				codisProcedimentsDisponibles,
-				codisProcedimentsProcessables,
 				codisOrgansGestorsDisponibles,
 				codisProcedimentOrgansDisponibles,
 				organGestorCodi,

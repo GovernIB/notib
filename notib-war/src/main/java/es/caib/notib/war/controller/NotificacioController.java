@@ -5,6 +5,7 @@
 package es.caib.notib.war.controller;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.exception.NoPermisosException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -416,7 +417,7 @@ public class NotificacioController extends BaseUserController {
         getEntitatActualComprovantPermisos(request);
         NotificacioFiltreDto filtre = getFiltreCommand(request).asDto();
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        PaginaDto<NotificacioDatatableDto> notificacions = new PaginaDto<>();
+        PaginaDto<NotificacioTableItemDto> notificacions = new PaginaDto<>();
         UsuariDto usuariActual = aplicacioService.getUsuariActual();
         boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
         boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
@@ -429,18 +430,7 @@ public class NotificacioController extends BaseUserController {
         List<String> codisProcedimentsDisponibles = new ArrayList<String>();
         List<Long> codisProcedimentOrgansDisponibles = new ArrayList<Long>();
         List<String> codisOrgansGestorsDisponibles = new ArrayList<String>();
-        List<String> codisProcedimentsProcessables = new ArrayList<String>();
         try {
-            List<ProcedimentDto> procedimentsProcessables = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.PROCESSAR);
-            if (procedimentsProcessables != null)
-                for (ProcedimentDto procediment : procedimentsProcessables) {
-                    codisProcedimentsProcessables.add(procediment.getCodi());
-                }
-            List<ProcedimentOrganDto> procedimentOrgansProcessables = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.PROCESSAR);
-            if (procedimentOrgansProcessables != null)
-                for (ProcedimentOrganDto procedimentOrgan : procedimentOrgansProcessables) {
-                    codisProcedimentsProcessables.add(procedimentOrgan.getProcediment().getCodi());
-                }
             if (isUsuariEntitat) {
                 if (filtre != null) {
                     filtre.setEntitatId(entitatActual.getId());
@@ -473,7 +463,6 @@ public class NotificacioController extends BaseUserController {
                     entitatActual != null ? entitatActual.getId() : null,
                     RolEnumDto.valueOf(RolHelper.getRolActual(request)),
                     codisProcedimentsDisponibles,
-                    codisProcedimentsProcessables,
                     codisOrgansGestorsDisponibles,
                     codisProcedimentOrgansDisponibles,
                     organGestorCodi,

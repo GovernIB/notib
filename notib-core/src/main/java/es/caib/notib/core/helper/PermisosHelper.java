@@ -401,7 +401,7 @@ public class PermisosHelper {
 		return (acl.getEntries() != null && !acl.getEntries().isEmpty());
 		
 	}
-	public boolean haPermission(
+	public boolean hasPermission(
 			Long objectIdentifier,
 			Class<?> objectClass,
 			Permission[] permissions) {
@@ -414,9 +414,10 @@ public class PermisosHelper {
 		ObjectIdentity oid = new ObjectIdentityImpl(
 				objectClass,
 				objectIdentifier);
-		Acl acl = aclService.readAclById(oid);
-		List<Permission> ps = Arrays.asList(permissions);
 		try {
+			Acl acl = aclService.readAclById(oid);
+			List<Permission> ps = Arrays.asList(permissions);
+
 			return acl.isGranted(
 					ps,
 					sids,

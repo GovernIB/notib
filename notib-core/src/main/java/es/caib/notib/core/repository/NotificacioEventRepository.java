@@ -48,10 +48,13 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 	void deleteByNotificacioAndTipusAndError(NotificacioEntity notificacio,
 									 NotificacioEventTipusEnumDto tipus,
 									 boolean error);
-
+	void deleteByNotificacio(NotificacioEntity notificacio);
 	List<NotificacioEventEntity> findByNotificacioAndTipusAndErrorOrderByDataAsc(NotificacioEntity notificacio,
 																   NotificacioEventTipusEnumDto tipus,
 																   boolean error);
+
+	List<NotificacioEventEntity> findByNotificacio(NotificacioEntity notificacio);
+
 	/** Recupera la llista de notificacions pendents */
 	@Query("select ne.id " + 
 		   "  from NotificacioEventEntity ne " +

@@ -1,25 +1,16 @@
 package es.caib.notib.plugin.registre;
 
+import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
+import es.caib.notib.plugin.utils.PropertiesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
-import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
-import es.caib.notib.plugin.utils.PropertiesHelper;
+import java.util.*;
 
 
 /**
@@ -38,15 +29,15 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 			Long tipusOperacio) {
 		RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
 		logger.info(arb.toString());
-		System.out.println(">>> DETALL REGISTRE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(arb);
-			System.out.println(json);
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-		System.out.println(">>> FIIIIIIII  DETALL REGISTRE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+//		System.out.println(">>> DETALL REGISTRE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+//		ObjectMapper mapper = new ObjectMapper();
+//		try {
+//			String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(arb);
+//			System.out.println(json);
+//		} catch (JsonProcessingException e) {
+//			e.printStackTrace();
+//		}
+//		System.out.println(">>> FIIIIIIII  DETALL REGISTRE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		if (arb.getResumen().startsWith("Error")) {
 			resposta.setErrorCodi("3");
 			resposta.setErrorDescripcio("Error de registre MOCK (" + System.currentTimeMillis() + ")");

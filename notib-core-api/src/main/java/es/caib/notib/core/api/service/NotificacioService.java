@@ -4,6 +4,7 @@
 package es.caib.notib.core.api.service;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
@@ -93,11 +94,10 @@ public interface NotificacioService {
 	 * @return La pàgina amb les notificacions.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	PaginaDto<NotificacioDatatableDto> findAmbFiltrePaginat(
+	PaginaDto<NotificacioTableItemDto> findAmbFiltrePaginat(
 			Long entitatId,
 			RolEnumDto rol,
 			List<String> codisProcedimentsDisponibles,
-			List<String> codisProcedimentsProcessables,
 			List<String> codisOrgansGestorsDisponibles,
 			List<Long> codisProcedimentOrgansDisponibles,
 			String organGestorCodi,
@@ -376,8 +376,8 @@ public interface NotificacioService {
 	/**
 	 * Consulta les administracions disponibles dins DIR3 a partir de la denominació.
 	 * 
-	 * @param text 
-	 * 				Text per la cerca
+	 * @param denominacio
+	 * 				denominacio per a filtrar
 	 * @return Una llista amb les administracions cercades.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")

@@ -48,7 +48,7 @@ import java.util.concurrent.TimeUnit;
 public class PluginHelper {
 
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
-	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "";
+	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
 	public static final String GESDOC_AGRUPACIO_TEMPORALS = "tmp";
 	
 

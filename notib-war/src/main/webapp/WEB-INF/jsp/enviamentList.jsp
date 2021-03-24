@@ -693,7 +693,7 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<th data-col-name="notificacioId" data-visible="false"></th>
-				<th data-col-name="detalls" data-orderable="false" data-template="#cellAccionsTemplate" width="101">
+				<th data-orderable="false" data-template="#cellAccionsTemplate" width="101">
 			 	 	<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a>
 					</script>
