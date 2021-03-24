@@ -4,7 +4,7 @@
 	$.webutilDatatable = function(element, options) {
 		var defaults = {
 			pageLength: 10,
-			lengthMenu: [10, 20, 50, 100],
+			lengthMenu: [10, 20, 50, 100, 250],
 			infoEnabled: true,
 			infoType: 'botons', // 'botons', 'search'
 			searchEnabled: true,
@@ -12,14 +12,12 @@
 			selectionEnabled: false,
 			dragEnabled: false,
 			pagingStyle: 'page', // 'page', 'scroll'
-			pagingStyleX: false,
 			scrollBuffer: 9,
 			scrollOverflow: 'fixed', // 'fixed', 'adaptMax', 'adapt'
 			scrollFixedHeight: 300,
 			scrollMaxHeight: 200,
 			scrollMinHeight: 100,
 			rowInfo: false,
-			individualFilter: false,
 			campsAddicionals: false,
 			ordering: true,
 			defaultDir: 'asc',
@@ -31,10 +29,8 @@
 		plugin.settings = {}
 		plugin.serverParams = [];
 		plugin.init = function() {
-			
 			plugin.settings = $.extend(defaults, $element.data(), options);
 			// Inicialització de les options per a crear la datatable
-			
 			if (plugin.settings.dragEnabled) {
 				$('thead tr,tfoot tr', $taula).each(function() {
 					$(this).prepend($('<th width="1">&nbsp;</th>'));
@@ -45,7 +41,7 @@
 			}
 			if (plugin.settings.selectionEnabled) {
 				$('thead tr,tfoot tr', $taula).each(function() {
-					$(this).prepend($('<th>&nbsp;</th>'));
+					$(this).prepend($('<th width="2%">&nbsp;</th>'));
 				});
 				$('tbody tr', $taula).each(function() {
 					$(this).prepend($('<td></td>'));
@@ -81,9 +77,16 @@
 			else
 				domPrefix = '<"row"<"col-md-' + colMd50p + '"i><"col-md-' + colMd50p + '"<"botons">>>';
 			var language = window.navigator.userLanguage || window.navigator.language;
+			// Només acceptam es i ca com a llengues //
+			if (language.startsWith("es")) {
+				language = "es";
+			} else {
+				language = "ca";
+			}
+			// ------------------------------------- //
 			var dataTableOptions = {
 				language: {
-					url: webutilContextPath() + '/js/datatables/i18n/datatables.' + userLanguage + '.json'
+					url: webutilContextPath() + '/js/datatables/i18n/datatables.' + language + '.json'
 				},
 				info: plugin.settings.infoEnabled,
 				serverSide: true,
@@ -92,7 +95,6 @@
 				ajax: {
 					url: getBaseUrl() + '/datatable',
 					data: function(data) {
-						
 						// Reduir crida - INICI
 						for (var i = 0, len = data.columns.length; i < len; i++) {
 							if (! data.columns[i].search.value) delete data.columns[i].search;
@@ -102,14 +104,19 @@
 						}
 						delete data.search.regex;
 						// Reduir crida - FI
-						
+
+
 						for (var key in plugin.serverParams) {
 							data[key] = plugin.serverParams[key];
 						}
 						if (plugin.settings.filtre) {
 							data = $.extend(
-									data,
-									$(plugin.settings.filtre).serialize());
+								data,
+								JSON.stringify($(plugin.settings.filtre).serializeArray()));
+							var valors = $(plugin.settings.filtre).serializeArray();
+							for (i=0; i<valors.length; i++) {
+								data[valors[i].name] = valors[i].value;
+							}
 						}
 					}
 				},
@@ -139,11 +146,12 @@
 						$('td:last-child', row).html('<a href="#" class="btn btn-default btn-sm"><span class="fa fa-caret-down"></span></a>')
 					}
 					if (plugin.settings.rowhrefTemplate) {
-						if (plugin.settings.rowhrefToggle)
+						if (plugin.settings.rowhrefToggle) {
 							$(row).attr('data-toggle', plugin.settings.rowhrefToggle);
+						}
 						$(row).attr(
-								'data-href',
-								$(plugin.settings.rowhrefTemplate).render(data));
+							'data-href',
+							$(plugin.settings.rowhrefTemplate).render(data));
 						$(row).css('cursor', 'pointer');
 					}
 					if (data['DT_RowSelected']) {
@@ -151,16 +159,10 @@
 					}
 				},
 				preDrawCallback: function(settings_) {
-					
-					var targetBotons = $('.botons', this.parent());
-					
-					//El pare es diferent si el scroll està activat
-					if (plugin.settings.pagingStyleX == true) {
-						targetBotons = $('.botons', this.parent().parent().parent());
-					}
-					
+					var currentLenthMenu = settings_._iDisplayLength;
 					if (plugin.settings.botonsTemplate && plugin.settings.botonsTemplate.length > 0) {
 						$.templates("templateNew", $(plugin.settings.botonsTemplate).html());
+						var targetBotons = $('.botons', this.parent());
 						if (!targetBotons.data('botons-creats')) {
 							targetBotons.html($.render.templateNew());
 							targetBotons.data('botons-creats', 'true');
@@ -171,7 +173,7 @@
 							var label = $('label', $(this));
 							var botons = $('<div class="btn-group"></div>');
 							$('option', label).each(function() {
-								var active = ($(this).val() == plugin.settings.pageLength);
+								var active = (currentLenthMenu != undefined ? ($(this).val() == currentLenthMenu) : ($(this).val() == plugin.settings.pageLength));
 								botons.append('<button value="' + $(this).val() + '" class="btn btn-default' + ((active) ? ' active': '') + '">' + $(this).val() + '</button>')
 							});
 							label.css('display', 'none');
@@ -234,10 +236,8 @@
 					}
 					if (plugin.settings.selectionEnabled) {
 						var $row = headerTrFunction();
-						
 						$row.addClass('selectable');
 						var $cell = $('th:first', $row);
-						
 						$cell.off('click');
 						$cell.on('click', function() {
 							var api = $taula.dataTable().api();
@@ -252,31 +252,8 @@
 							}
 							return false;
 						});
-						
 						$cell.empty().append('<span class="fa fa-square-o"></span>');
-						
 					}
-					if (plugin.settings.individualFilter) {
-						var $rowFilter = headerTrFilterFunction();
-						var $formFilter = getFilterForm();
-						var $buttonFilter;
-						
-						var $cellFilter = $('th:first', $rowFilter);
-						
-						if($($cellFilter).children().get(0) == null){
-							$cellFilter.append($(plugin.settings.cellTemplate).html());
-						}
-						$("#btnFiltrar").on('click', function(index, object) {
-							$rowFilter.each(function(index) {
-								$(this).each(function(index) {
-									$(this).children().each(function(){
-										$formFilter.append($(this).find("div"));
-									});
-								});
-							});
-						});
-					}
-					
 					if (plugin.settings.pagingStyle == 'scroll') {
 						recalcularDimensions();
 					}
@@ -285,7 +262,7 @@
 						var ajaxResponse = api.ajax.json();
 						if (ajaxResponse.filtreError) {
 							$(plugin.settings.filtre).webutilMostrarErrorsCamps(
-									ajaxResponse.filtreFormResponse.errorsCamps);
+								ajaxResponse.filtreFormResponse.errorsCamps);
 						}
 					}
 					if (plugin.settings.editable) {
@@ -305,8 +282,8 @@
 								$('<tr data-row-info="true"><td colspan="' + $parentTr.children().length + '"></td></tr>').insertAfter($parentTr);
 								var rowData = $taula.dataTable().api().row($parentTr).data();
 								$taula.trigger(
-										'rowinfo.dataTable',
-										[$('td', $parentTr.next()), rowData]);
+									'rowinfo.dataTable',
+									[$('td', $parentTr.next()), rowData]);
 							} else {
 								$parentTr.next().remove();
 							}
@@ -385,7 +362,6 @@
 						}
 					}
 				});
-				
 				dataTableOptions['columns'] = columns;
 				if (typeof defaultOrder != 'undefined') {
 					dataTableOptions['order'] = [[defaultOrder, defaultDir]];
@@ -404,31 +380,21 @@
 			if (plugin.settings.dragEnabled) {
 				$taula.on('draw.dt', function () {
 					Sortable.create(
-							$('tbody', $taula)[0], {
-								handle: ".drag-handle",
-								onUpdate: function (event) {
-									var item = event.item;
-									var itemId = item.id.substring("row_".length);
-									$taula.trigger(
-											'dragupdate.dataTable',
-											[itemId, $(item).index()]);
-									$taula.dataTable().fnDraw();
-						    }
+						$('tbody', $taula)[0], {
+							handle: ".drag-handle",
+							onUpdate: function (event) {
+								var item = event.item;
+								var itemId = item.id.substring("row_".length);
+								$taula.trigger(
+									'dragupdate.dataTable',
+									[itemId, $(item).index()]);
+								$taula.dataTable().fnDraw();
+							}
 						});
 				});
 			}
 			// Configuració de la paginació
 			if (plugin.settings.pagingEnabled) {
-				//Scroll horitzontal
-				if (plugin.settings.pagingStyleX == true) {
-					dataTableOptions['scrollX'] = plugin.settings.pagingStyleX;
-					dataTableOptions = $.extend({
-						fixedColumns:   {
-				            leftColumns: 1
-				        }
-					}, dataTableOptions);
-					
-				}
 				if (plugin.settings.pagingStyle == 'page') {
 					dataTableOptions = $.extend({
 						paging: true,
@@ -436,7 +402,6 @@
 						lengthMenu: plugin.settings.lengthMenu,
 						dom: domPrefix + 't<"row"<"col-md-' + colMd25p + '"l><"col-md-' + colMd75p + '"p>>'
 					}, dataTableOptions);
-					
 				} else if (plugin.settings.pagingStyle == 'scroll') {
 					var paramScrollY;
 					if (plugin.settings.scrollOverflow === 'fixed') {
@@ -445,8 +410,8 @@
 						paramScrollY = plugin.settings.scrollMaxHeight;
 					} else if (plugin.settings.scrollOverflow === 'adapt') {
 						paramScrollY = calcularAlcadaLliure(
-								$('div.dataTables_scrollBody', $taula.closest('div.dataTables_wrapper')),
-								plugin.settings.scrollMinHeight);
+							$('div.dataTables_scrollBody', $taula.closest('div.dataTables_wrapper')),
+							plugin.settings.scrollMinHeight);
 					}
 					dataTableOptions = $.extend({
 						paging: true,
@@ -461,8 +426,8 @@
 						waitForFinalEvent(function() {
 							if (plugin.settings.scrollOverflow === 'adapt') {
 								var alcadaLliure = calcularAlcadaLliure(
-										$('div.dataTables_scrollBody', $taula.closest('div.dataTables_wrapper')),
-										plugin.settings.scrollMinHeight);
+									$('div.dataTables_scrollBody', $taula.closest('div.dataTables_wrapper')),
+									plugin.settings.scrollMinHeight);
 								$('div.dataTables_scrollBody', $taula.closest('div.dataTables_wrapper')).height(alcadaLliure);
 								$taula.dataTable().api().scroller.measure(false);
 							}
@@ -525,8 +490,8 @@
 						selectedIds.push(selectedRowsData[d]['DT_Id']);
 					}
 					$taula.trigger(
-							'selectionchange.dataTable',
-							[accio, afectatIds, selectedIds]);
+						'selectionchange.dataTable',
+						[accio, afectatIds, selectedIds]);
 				};
 				$taula.on('select.dt', function (e, dt, type, indexes) {
 					if (indexes) {
@@ -554,8 +519,6 @@
 						triggerSelectionChangeFunction('deselect', indexes);
 					}
 				});
-				
-				
 			}
 			// Configuració del filtre
 			if (plugin.settings.filtre) {
@@ -570,6 +533,8 @@
 					clickedButton = $(this);
 				});
 				filterForm.on('submit', function(event) {
+					if ($(clickedButton).val() === 'netejar')
+						$(this).webutilNetejarInputs();
 					var formData = $(this).serialize() + "&" + $(clickedButton).attr('name') + "=" + $(clickedButton).val();
 					$.ajax({
 						type: $(this).attr('method'),
@@ -579,8 +544,8 @@
 							$taula.DataTable().ajax.reload();
 						}
 					});
-					if ($(clickedButton).val() === 'netejar')
-						$(this).webutilNetejarInputs();
+//					if ($(clickedButton).val() === 'netejar')
+//						$(this).webutilNetejarInputs();
 					return false;
 				});
 			}
@@ -590,7 +555,7 @@
 					keys: {
 						columns: (plugin.settings.selectionEnabled) ? ':not(:first-child)' : '',
 						keys: [38, 40, 9, 13] // ARROW_LEFT = 37, ARROW_UP = 38, ARROW_RIGHT = 39, ARROW_DOWN = 40, ENTER = 13, ESC = 27, TAB = 9,
-				    }
+					}
 				}, dataTableOptions);
 				$('tfoot tr th:last-child a', $taula).click(function(e) {
 					editableAccioCreate($(this).attr('href'), $(this).closest('tr'));
@@ -606,8 +571,8 @@
 						if (triggerOk) {
 							editableSeleccionarRow($parentTr, cell.index().row);
 							$taula.trigger(
-									'editablerowfocus.dataTable',
-									[$parentTr, datatable.row(currentRow).data()]);
+								'editablerowfocus.dataTable',
+								[$parentTr, datatable.row(currentRow).data()]);
 						}
 					}
 					var $currentInput = $('*:input:enabled', cell.node());
@@ -644,8 +609,8 @@
 					var dataTableCell = $taula.dataTable().api().cell(cell.node());
 					var rowEditat = $(currentRow).attr('data-edited');
 					$taula.trigger(
-							'editablerowblur.dataTable',
-							[$(currentRow), editableGetRowData($(currentRow)), rowEditat]);
+						'editablerowblur.dataTable',
+						[$(currentRow), editableGetRowData($(currentRow)), rowEditat]);
 				});
 				$taula.on('keydown', function(e) {
 					if (e.keyCode == 13) {
@@ -679,21 +644,6 @@
 					});
 				}
 			}
-			
-			//Configuració filtre individual columnes
-			if (plugin.settings.individualFilter) {
-				$('thead tr ', $taula).clone(true).off().appendTo('thead');
-				$('thead tr:eq(1) th').each( function (i) {
-					var title = $(this).text();
-					var html = $(this).children().html();
-					
-					$(this).html($(html));
-					$(this).find(".inputDate").attr("placeholder", title)
-				
-			    });
-				
-				dataTableOptions['bSortCellsTop'] = true;
-			}
 			// Creació del datatable
 			$taula.dataTable(dataTableOptions);
 		}
@@ -702,7 +652,7 @@
 			if (serverParams) {
 				plugin.serverParams = serverParams;
 			}
-			$taula.dataTable().fnDraw();
+			$taula.dataTable().fnStandingRedraw();
 		};
 		plugin.refreshUrl = function(url) {
 			$taula.dataTable().api().ajax.url(url).load();
@@ -721,19 +671,8 @@
 		}
 		// Mètodes privats
 		var headerTrFunction = function() {
-			return $('thead:first tr:first', $taula.closest('.dataTables_wrapper'));
+			return $('thead:first tr', $taula.closest('.dataTables_wrapper'));
 		}
-		// (Filtre individual)
-		var headerTrFilterFunction = function() {
-			return $('thead:first tr:nth-child(2)', $taula.closest('.dataTables_wrapper'));
-		}
-		var getFilterForm = function() {
-			return $('#enviamentFiltreForm');
-		}
-		var getButtonFiltrer = function() {
-			return $('#btnFiltrar');
-		}
-		
 		var getBaseUrl = function() {
 			var baseUrl = plugin.settings.url;
 			if (/datatable$/.test(baseUrl) || /datatable\/$/.test(baseUrl)) {
@@ -793,7 +732,7 @@
 						var inici = renderer.indexOf('(');
 						var fin = renderer.indexOf(')');
 						if (inici != -1 && fin != -1) {
-							maxLength = renderer.substring(inici + 1, fin); 
+							maxLength = renderer.substring(inici + 1, fin);
 						}
 						if (data.length > maxLength) {
 							renderHtml = data.substring(0, maxLength - sufix.length) + sufix;
@@ -805,7 +744,7 @@
 						}
 						renderHtml = $.number(data, numDecimals);
 					} else if (renderer.indexOf('enum') >= 0) {
-						var enumClass = '?'; 
+						var enumClass = '?';
 						var inici = renderer.indexOf('(');
 						var fin = renderer.indexOf(')');
 						if (inici != -1 && fin != -1) {
@@ -833,7 +772,7 @@
 						var fin = renderer.indexOf(')');
 						var columnName;
 						if (inici != -1 && fin != -1) {
-							columnName = renderer.substring(inici + 1, fin); 
+							columnName = renderer.substring(inici + 1, fin);
 						}
 						if (typeof columnName != 'undefined') {
 							var rowData = api.row(meta.row).data();
@@ -851,8 +790,8 @@
 			var $currentRow = $('tr[data-editing]', $('tbody', $taula));
 			$currentRow.attr('data-edited', 'true');
 			$taula.trigger(
-					'editablecellchange.dataTable',
-					[$(this), editableGetRowData($currentRow)]);
+				'editablecellchange.dataTable',
+				[$(this), editableGetRowData($currentRow)]);
 		}
 		var editableSeleccionarRow = function($row, rowIndex) {
 			$row.attr('data-editing', 'true');
@@ -865,8 +804,8 @@
 						var dataTableCell = $taula.dataTable().api().cell(this);
 						var $sampleInput = ($sampleContent.is(':input')) ? $sampleContent : $(':input', $sampleContent);
 						var $contingutClonat = $sampleContent.webutilClonarElementAmbInputs(
-								$sampleInput.attr('id') + rowIndex,
-								dataTableCell.data());
+							$sampleInput.attr('id') + rowIndex,
+							dataTableCell.data());
 						var $inputClonat = ($contingutClonat.is(':input')) ? $contingutClonat : $(':input', $contingutClonat);
 						var converter = $thCapcalera.attr('data-converter');
 						if (converter) {
@@ -887,20 +826,20 @@
 						$(this).prop('disabled', false);
 					var inputName = $(this).prop('name');
 					var inputData = ($(this).data('field-path')) ?
-							eval('rowData.' + $(this).data('field-path')) :
-							rowData[inputName];
+						eval('rowData.' + $(this).data('field-path')) :
+						rowData[inputName];
 					if (!$(this).is('[type="checkbox"]')) {
 						if (inputData)
 							$(this).val(inputData);
 						else
-							$(this).val('');								
+							$(this).val('');
 					} else {
 						$(this).prop('checked', inputData);
 					}
 				});
 				$(':input', $rowCampsAddicionals).on(
-						'change',
-						editableCellChange);
+					'change',
+					editableCellChange);
 			}
 		}
 		var editableNetejarEdicioRow = function($row, actualitzarData) {
@@ -915,8 +854,8 @@
 						var dataTableCell = $taula.dataTable().api().cell(this);
 						if (actualitzarData) {
 							modificarDatatableDataAmbValorInput(
-									$row,
-									$(':input', $cellNode));
+								$row,
+								$(':input', $cellNode));
 						}
 						$cellNode.webutilDestroyInputComponents();
 						$cellNode.empty().html(dataTableCell.render('display'));
@@ -928,8 +867,8 @@
 				$(':input', $rowCampsAddicionals).each(function() {
 					if (actualitzarData) {
 						modificarDatatableDataAmbValorInput(
-								$row,
-								$(this));
+							$row,
+							$(this));
 					}
 					$(this).val('');
 					if ($(this).data('datatable-disabled'))
@@ -974,20 +913,20 @@
 				var resultat = {resultat: false};
 				var apiRowData = $taula.dataTable().api().row($row).data();
 				editableAccioUpdate(
-						getBaseUrl() + '/' + apiRowData['DT_Id'],
-						$row,
-						rowData,
-						resultat);
+					getBaseUrl() + '/' + apiRowData['DT_Id'],
+					$row,
+					rowData,
+					resultat);
 				triggerOk = resultat.resultat;
 				if (triggerOk) {
 					var bgOrigen = $row.css('background-color');
 					$row.animate(
-							{backgroundColor: '#dff0d8'},
-							800,
-							"swing").animate(
-							{backgroundColor: bgOrigen},
-							600,
-							"swing");
+						{backgroundColor: '#dff0d8'},
+						800,
+						"swing").animate(
+						{backgroundColor: bgOrigen},
+						600,
+						"swing");
 				}
 			}
 			if (triggerOk && $row.length > 0) {
@@ -999,8 +938,8 @@
 		}
 		var editableAccioCreate = function(createUrl, $row) {
 			$taula.trigger(
-					'beforerowcreate.dataTable',
-					[$row, rowData]);
+				'beforerowcreate.dataTable',
+				[$row, rowData]);
 			var rowData = editableGetRowData($row, false);
 			var csrf = $('form input[name="_csrf"]:first').val();
 			$row.webutilNetejarErrorsCamps();
@@ -1012,11 +951,11 @@
 				success: function(resposta) {
 					if (resposta.estatError) {
 						$row.webutilMostrarErrorsCamps(
-								resposta.errorsCamps);
+							resposta.errorsCamps);
 					} else {
 						$taula.trigger(
-								'afterrowcreate.dataTable',
-								[$row, rowData]);
+							'afterrowcreate.dataTable',
+							[$row, rowData]);
 						$row.webutilNetejarInputs();
 						$taula.dataTable().fnDraw();
 					}
@@ -1025,8 +964,8 @@
 		}
 		var editableAccioUpdate = function(updateUrl, $row, rowData, resultat) {
 			$taula.trigger(
-					'beforerowchange.dataTable',
-					[$row, rowData]);
+				'beforerowchange.dataTable',
+				[$row, rowData]);
 			var csrf = $('form input[name="_csrf"]:first').val();
 			$.ajax({
 				type: 'POST',
@@ -1036,12 +975,12 @@
 				success: function(resposta) {
 					if (resposta.estatError) {
 						$row.webutilMostrarErrorsCamps(
-								resposta.errorsCamps);
+							resposta.errorsCamps);
 					} else {
 						resultat.resultat = true;
 						$taula.trigger(
-								'afterowchange.dataTable',
-								[$row, rowData]);
+							'afterowchange.dataTable',
+							[$row, rowData]);
 						$row.webutilNetejarInputs();
 						$taula.dataTable().fnDraw();
 					}
@@ -1050,7 +989,7 @@
 		}
 		var editableAccioDelete = function(deleteUrl) {
 			$taula.trigger(
-					'beforerowdelete.dataTable');
+				'beforerowdelete.dataTable');
 			$.ajax({
 				type: 'GET',
 				url: deleteUrl,
@@ -1059,7 +998,7 @@
 					if (resposta.estatError) {
 					} else {
 						$taula.trigger(
-								'afterrowdelete.dataTable');
+							'afterrowdelete.dataTable');
 						$taula.dataTable().fnDraw();
 					}
 				}
@@ -1086,35 +1025,58 @@
 			}
 		}
 		// Inicialització del plugin
-        plugin.init();
+		plugin.init();
 	}
 
 	$.fn.webutilDatatable = function(options, param1) {
 		var pluginName = 'webutilDatatable';
-        return this.each(function() {
-            if (undefined == $(this).data(pluginName)) {
-                var plugin = new $.webutilDatatable(this, options);
-                $(this).data(pluginName, plugin);
-            } else if (options && typeof options !== 'object') {
-            	if ('refresh' === options) {
-            		$(this).data(pluginName).refresh(param1);
-            	} else if ('refresh-url' === options) {
-            		$(this).data(pluginName).changeUrl(param1);
-            	} else if ('select-none' === options) {
-            		$(this).data(pluginName).selectNone();
-            	} else if ('select-all' === options) {
-            		$(this).data(pluginName).selectAll();
-            	} else if ('selection' === options) {
-            		$(this).data(pluginName).selection(param1);
-            	}
-            }
-        });
-    }
+		return this.each(function() {
+			if (undefined == $(this).data(pluginName)) {
+				var plugin = new $.webutilDatatable(this, options);
+				$(this).data(pluginName, plugin);
+			} else if (options && typeof options !== 'object') {
+				if ('refresh' === options) {
+					$(this).data(pluginName).refresh(param1);
+				} else if ('refresh-url' === options) {
+					$(this).data(pluginName).changeUrl(param1);
+				} else if ('select-none' === options) {
+					$(this).data(pluginName).selectNone();
+				} else if ('select-all' === options) {
+					$(this).data(pluginName).selectAll();
+				} else if ('selection' === options) {
+					$(this).data(pluginName).selection(param1);
+				}
+			}
+		});
+	}
 
 	$(document).ready(function() {
 		$('table[data-toggle="datatable"]').each(function() {
 			$(this).webutilDatatable();
 		});
 	});
+
+	$.fn.dataTableExt.oApi.fnStandingRedraw = function(oSettings) {
+		// redraw to account for filtering and sorting
+		// concept here is that (for client side) there is a row got inserted at the end (for an add)
+		// or when a record was modified it could be in the middle of the table
+		// that is probably not supposed to be there - due to filtering / sorting
+		// so we need to re process filtering and sorting
+		// BUT - if it is server side - then this should be handled by the server - so skip this step
+		if(oSettings.oFeatures.bServerSide === false){
+			var before = oSettings._iDisplayStart;
+			oSettings.oApi._fnReDraw(oSettings);
+			//iDisplayStart has been reset to zero - so lets change it back
+			oSettings._iDisplayStart = before;
+			oSettings.oApi._fnCalculateEnd(oSettings);
+		}
+		//draw the 'current' page
+		oSettings.oApi._fnDraw(oSettings);
+	};
+
+	$.fn.dataTableExt.oApi.removeFromSessionStorage = function(item) {
+		sessionStorage.removeItem( 'DataTables_' + item);
+	};
+
 
 }(jQuery));

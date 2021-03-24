@@ -376,8 +376,8 @@ public interface NotificacioService {
 	/**
 	 * Consulta les administracions disponibles dins DIR3 a partir de la denominació.
 	 * 
-	 * @param text 
-	 * 				Text per la cerca
+	 * @param denominacio
+	 * 				denominacio per a filtrar
 	 * @return Una llista amb les administracions cercades.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
