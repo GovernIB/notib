@@ -7,6 +7,8 @@ import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
 import es.caib.notib.core.api.dto.ProgresDescarregaDto.TipusInfo;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -22,7 +24,6 @@ import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.*;
-import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
@@ -34,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -129,13 +129,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Transactional(rollbackFor=Exception.class)
 	@Override
-	public NotificacioDtoV2 create(
-			Long entitatId, 
-			NotificacioDtoV2 notificacio) throws RegistreNotificaException {
+	public NotificacioDatabaseDto create(
+			Long entitatId,
+			NotificacioDatabaseDto notificacio) throws RegistreNotificaException {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			boolean isAdministradorEntitat = true;
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 
 			NotificacioHelper.NotificacioData notData = notificacioHelper.buildNotificacioData(entitat, notificacio, false);
@@ -251,12 +250,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 						notificaHelper.notificacioEnviar(notificacioEntity.getId());
 				}
 			}
-	
-//			List<NotificacioEntity> notificacions = notificacioRepository.findByEntitatId(entitatId);
-	
+
 			return conversioTipusHelper.convertir(
 				notificacioEntity,
-				NotificacioDtoV2.class);
+				NotificacioDatabaseDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -311,9 +308,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Transactional
 	@Override
-	public List<NotificacioDto> update(
+	public NotificacioDatabaseDto update(
 			Long entitatId,
-			NotificacioDtoV2 notificacio,
+			NotificacioDatabaseDto notificacio,
 			boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -325,7 +322,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					false);
 			NotificacioEntity notificacioEntity = notificacioRepository.findOne(notificacio.getId());
 			List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacio(notificacioEntity);
-			if (enviamentsPendents == null || !enviamentsPendents.isEmpty()) {
+			if (enviamentsPendents == null || enviamentsPendents.isEmpty()) {
 				throw new ValidationException("Aquesta notificació està enviada i no es pot modificar");
 			}
 
@@ -349,8 +346,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			List<Long> destinatarisIds = new ArrayList<Long>();
 			List<NotificacioEnviamentEntity> nousEnviaments = new ArrayList<NotificacioEnviamentEntity>();
 			for(NotificacioEnviamentDtoV2 enviament: notificacio.getEnviaments()) {
-				if (enviament.getEntregaPostal().getCodiPostal() == null || enviament.getEntregaPostal().getCodiPostal().isEmpty()) {
-					enviament.getEntregaPostal().setCodiPostal(enviament.getEntregaPostal().getCodiPostalNorm());
+				if (enviament.getEntregaPostal() != null) {
+					if (enviament.getEntregaPostal().getCodiPostal() == null || enviament.getEntregaPostal().getCodiPostal().isEmpty()) {
+						enviament.getEntregaPostal().setCodiPostal(enviament.getEntregaPostal().getCodiPostalNorm());
+					}
 				}
 				if (enviament.getTitular() != null) {
 					enviaments.add(conversioTipusHelper.convertir(enviament, Enviament.class));
@@ -533,10 +532,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			}
 
-			List<NotificacioEntity> notificacions = notificacioRepository.findByEntitatId(entitatId);
-			return conversioTipusHelper.convertirList(
-				notificacions,
-				NotificacioDto.class);
+			return conversioTipusHelper.convertir(
+					notificacioRepository.getOne(notificacio.getId()),
+					NotificacioDatabaseDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

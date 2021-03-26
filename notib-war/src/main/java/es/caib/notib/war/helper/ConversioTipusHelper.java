@@ -5,7 +5,7 @@ package es.caib.notib.war.helper;
 
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.war.command.DocumentCommand;

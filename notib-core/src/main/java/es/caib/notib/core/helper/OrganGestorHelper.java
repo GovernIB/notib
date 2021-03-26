@@ -1,9 +1,9 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -85,29 +85,30 @@ public class OrganGestorHelper {
 	}
 
 	public OrganGestorEntity createOrganGestorFromNotificacio(
-			NotificacioDtoV2 notificacio,
+			NotificacioDatabaseDto notificacio,
 			EntitatEntity entitat
 	) {
-		OrganGestorEntity organGestor = organGestorRepository.findByCodi(notificacio.getOrganGestor());
+		String codiOrgan = notificacio.getOrganGestorCodi();
+		OrganGestorEntity organGestor = organGestorRepository.findByCodi(codiOrgan);
 		if (organGestor == null) {
 			Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
-			if (!organigramaEntitat.containsKey(notificacio.getOrganGestor())) {
+			if (!organigramaEntitat.containsKey(codiOrgan)) {
 				throw new NotFoundException(
-						notificacio.getOrganGestor(),
+						codiOrgan,
 						OrganGestorEntity.class,
 						"L'òrgan gestor especificat no es correspon a cap Òrgan Gestor de l'entitat especificada");
 			}
 			LlibreDto llibreOrgan = pluginHelper.llistarLlibreOrganisme(
 					entitat.getCodi(),
-					notificacio.getOrganGestor());
+					codiOrgan);
 			Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
 			List<OficinaDto> oficinesSIR = cacheHelper.getOficinesSIRUnitat(
 					arbreUnitats,
-					notificacio.getOrganGestor());
+					codiOrgan);
 //					### Crear òrgan gestor si no existeix, si existeix no fer res
 			organGestor = OrganGestorEntity.getBuilder(
-					notificacio.getOrganGestor(),
-					organigramaEntitat.get(notificacio.getOrganGestor()).getNom(),
+					codiOrgan,
+					organigramaEntitat.get(codiOrgan).getNom(),
 					entitat,
 					llibreOrgan.getCodi(),
 					llibreOrgan.getNomLlarg(),

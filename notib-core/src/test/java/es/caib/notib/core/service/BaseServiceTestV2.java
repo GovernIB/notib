@@ -5,15 +5,12 @@ package es.caib.notib.core.service;
 
 import es.caib.loginModule.util.Base64.InputStream;
 import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
-import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.service.*;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
-import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.UsuariRepository;
+import es.caib.notib.core.test.AuthenticationTest;
+import es.caib.notib.core.test.data.DatabaseItemTest;
+import es.caib.notib.core.test.data.OrganGestorItemTest;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.notib.plugin.registre.*;
@@ -27,25 +24,15 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -60,11 +47,9 @@ import static org.junit.Assert.fail;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class BaseServiceTest {
+@Slf4j
+public class BaseServiceTestV2 {
 
-	@Autowired
-	private UserDetailsService userDetailsService;
-	
 	@Autowired
 	protected UsuariAplicacioService usuariAplicacioService;
 	@Autowired
@@ -85,22 +70,22 @@ public class BaseServiceTest {
 	protected PagadorCieFormatSobreService pagadorCieFormatSobreService;
 	@Autowired
 	protected NotificacioService notificacioService;
+
+	@Autowired
+	protected AuthenticationTest authenticationTest;
+
 	
 	@Autowired
-	private  UsuariRepository usuariRepository;
-	
-	@Autowired
-	private  NotificacioRepository notificacioRepository;
-	
-	@Autowired
-	private  PluginHelper pluginHelper;
-	
+	protected  PluginHelper pluginHelper;
+
 	private DadesUsuariPlugin dadesUsuariPluginMock;
 	private GestioDocumentalPlugin gestioDocumentalPluginMock;
 	private RegistrePlugin registrePluginMock;
 	private IArxiuPlugin arxiuPluginMock;
 	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPluginMock;
 
+	@Autowired
+	OrganGestorItemTest organGestorCreate;
 
 	@BeforeClass
 	public static void beforeClass() {
@@ -110,223 +95,75 @@ public class BaseServiceTest {
 	@AfterClass
 	public static void afterClass() {
 	}
-	
-	@Transactional
-	protected void autenticarUsuari(String usuariCodi) {
-		logger.debug("Autenticant usuari " + usuariCodi + "...");
-		UserDetails userDetails = userDetailsService.loadUserByUsername(usuariCodi);
-		Authentication authToken = new UsernamePasswordAuthenticationToken(
-				userDetails.getUsername(),
-				userDetails.getPassword(),
-				userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authToken);
-        UsuariEntity usuariEntity = usuariRepository.findOne(usuariCodi);
-		if (usuariEntity == null) {
-			usuariRepository.save(
-					UsuariEntity.getBuilder(
-							usuariCodi,
-							usuariCodi + "@mail.com",
-							"CA")
-					.nom(usuariCodi)
-					.llinatges(usuariCodi)
-					.build());
-		}
-		logger.debug("... usuari " + usuariCodi + " autenticat correctament");
-	}
 
 	protected void testCreantElements(
 			TestAmbElementsCreats test,
 			String descripcioTest,
-			Object... elements) {
+			EntitatDto entitatDto,
+			DatabaseItemTest... elements) {
 		String descripcio = (descripcioTest != null && !descripcioTest.isEmpty()) ? descripcioTest : "";
-		logger.info("-------------------------------------------------------------------");
-		logger.info("-- Executant test \"" + descripcio + "\" amb els elements creats...");
-		logger.info("-------------------------------------------------------------------");
-		List<Object> elementsCreats = new ArrayList<Object>();
+		log.info("-------------------------------------------------------------------");
+		log.info("-- Executant test \"" + descripcio + "\" amb els elements creats...");
+		log.info("-------------------------------------------------------------------");
 		Long entitatId = null;
-		Long organGestorId = null;
-		Long pagadorCieId = null;
 		try {
-			
-			// Entitats que es poden crear:
-			//
-			// - Entitat
-			// - Aplicacio
-			// - Procediment
-			// - Organ gestor -> permisos
-			// - Grup
-			// - Pagador postal
-			// - Pagador cie
-			// - Format fulla
-			// - Format sobre
-			
-			for (Object element: elements) {
-				Long id = null;
-				logger.debug("Creant objecte de tipus " + element.getClass().getSimpleName() + "...");
-				if (element instanceof EntitatDto) {
-					autenticarUsuari("super");
-					EntitatDto entitatCreada = entitatService.create((EntitatDto)element);
-					entitatId = entitatCreada.getId();
-					elementsCreats.add(entitatCreada);
-					if (((EntitatDto)element).getPermisos() != null) {
-						for (PermisDto permis: ((EntitatDto)element).getPermisos()) {
-							entitatService.permisUpdate(
-									entitatCreada.getId(),
-									permis);
-						}
-					}
-					id = entitatCreada.getId();
-				} else if(element instanceof AplicacioDto) {
-					autenticarUsuari("super");
-					AplicacioDto entitatCreada = usuariAplicacioService.create((AplicacioDto)element);
-					elementsCreats.add(entitatCreada);
-					id = entitatCreada.getId();
-				} else if(element instanceof OrganGestorDto) {
-					autenticarUsuari("admin");
-					((OrganGestorDto)element).setEntitatId(entitatId);
-					OrganGestorDto entitatCreada = organGestorService.create((OrganGestorDto)element);
-					organGestorId = entitatCreada.getId();
-					elementsCreats.add(entitatCreada);
-					if (((OrganGestorDto)element).getPermisos() != null) {
-						for (PermisDto permis: ((OrganGestorDto)element).getPermisos()) {
-							organGestorService.permisUpdate(
-									entitatId, 
-									entitatCreada.getId(),
-									false,
-									permis);
-						}
-					}
-					id = entitatCreada.getId();
-				} else if(element instanceof ProcedimentDto) {
-					autenticarUsuari("admin");
-					ProcedimentDto entitatCreada = procedimentService.create(
-							entitatId,
-							(ProcedimentDto)element);
-					elementsCreats.add(entitatCreada);
-					if (((ProcedimentDto)element).getPermisos() != null) {
-						for (PermisDto permis: ((ProcedimentDto)element).getPermisos()) {
-							procedimentService.permisUpdate(
-									entitatId,
-									organGestorId,
-									entitatCreada.getId(),
-									permis);
-						}
-					}
-					id = entitatCreada.getId();
-				} else if(element instanceof GrupDto) {
-					autenticarUsuari("admin");
-					GrupDto entitatCreada = grupService.create(
-							entitatId,
-							(GrupDto)element);
-					elementsCreats.add(entitatCreada);
-					id = entitatCreada.getId();
-				} else if(element instanceof PagadorPostalDto) {
-					autenticarUsuari("admin");
-					PagadorPostalDto entitatCreada = pagadorPostalService.create(
-							entitatId,
-							(PagadorPostalDto)element);
-					elementsCreats.add(entitatCreada);
-					id = entitatCreada.getId();
-				} else if(element instanceof PagadorCieDto) {
-					autenticarUsuari("admin");
-					PagadorCieDto entitatCreada = pagadorCieService.create(
-							entitatId,
-							(PagadorCieDto)element);
-					pagadorCieId = entitatCreada.getId();
-					elementsCreats.add(entitatCreada);
-					id = entitatCreada.getId();
-				} else if(element instanceof PagadorCieFormatFullaDto) {
-					autenticarUsuari("admin");
-					PagadorCieFormatFullaDto entitatCreada = pagadorCieFormatFullaService.create(
-							pagadorCieId,
-							(PagadorCieFormatFullaDto)element);
-					elementsCreats.add(entitatCreada);
-					id = entitatCreada.getId();
-				}else if(element instanceof PagadorCieFormatSobreDto) {
-					autenticarUsuari("admin");
-					PagadorCieFormatSobreDto entitatCreada = pagadorCieFormatSobreService.create(
-							pagadorCieId,
-							(PagadorCieFormatSobreDto)element);
-					elementsCreats.add(entitatCreada);
-					id = entitatCreada.getId();
-				} else if(element instanceof NotificacioDatabaseDto) {
-					autenticarUsuari("admin");
-					NotificacioDatabaseDto entitatCreada = notificacioService.create(
-							entitatId,
-							(NotificacioDatabaseDto)element);
-					elementsCreats.add(entitatCreada);
-					id = entitatCreada.getId();
-				} else {
-					fail("No s'ha trobat cap entitat per associar l'objecte de tipus " + element.getClass().getSimpleName());
+			authenticationTest.autenticarUsuari("super");
+			EntitatDto entitatCreada = entitatService.create(entitatDto);
+			entitatId = entitatCreada.getId();
+			if (entitatDto.getPermisos() != null) {
+				for (PermisDto permis: entitatDto.getPermisos()) {
+					entitatService.permisUpdate(
+							entitatCreada.getId(),
+							permis);
 				}
-				logger.debug("...objecte de tipus " + element.getClass().getSimpleName() + "creat (id=" + id + ").");
 			}
-			logger.debug("Executant accions del test...");
-			test.executar(elementsCreats);
-			logger.debug("...accions del test executades.");
+			organGestorCreate.addObject("organ_default", organGestorCreate.getRandomInstance());
+			organGestorCreate.createAll(entitatId);
+			OrganGestorDto organ = organGestorCreate.getObject("organ_default");
+
+			Map<String, Object> elementsCreats = new HashMap<>();
+			for (DatabaseItemTest<?> element: elements) {
+				log.debug("Creant objecte de tipus " + element.getClass().getSimpleName() + "...");
+				element.relateElements();
+				element.createAll(entitatId);
+				for(String key : element.getObjects().keySet()) {
+					elementsCreats.put(key, element.getObject(key));
+					log.debug("...objecte amb la clau: '" + key + "' creat correctament.");
+				}
+
+			}
+			log.debug("Executant accions del test...");
+			test.executar(new ElementsCreats(entitatCreada, organ, elementsCreats));
+			log.debug("...accions del test executades.");
 		} catch (Exception ex) {
-			logger.error("L'execució del test ha produït una excepció", ex);
+			log.error("L'execució del test ha produït una excepció", ex);
 			fail("L'execució del test ha produït una excepció");
 		} finally {
-			Collections.reverse(elementsCreats);
-			for (Object element: elementsCreats) {
-				logger.debug("Esborrant objecte de tipus " + element.getClass().getSimpleName() + "...");
-				if (element instanceof EntitatDto) {
-					autenticarUsuari("admin");
-					Long entitadId = ((EntitatDto)element).getId();
-					List<OrganGestorDto> organsGestors = organGestorService.findByEntitat(entitadId);
-					for(OrganGestorDto organGestorDto: organsGestors) {
-						organGestorService.delete(entitatId, organGestorDto.getId());
-					}
-					autenticarUsuari("super");
-					entitatService.delete(entitadId);
-					entitatId = null;
-				} else if(element instanceof AplicacioDto) {
-					autenticarUsuari("super");
-					usuariAplicacioService.delete(
-							((AplicacioDto)element).getId(), 
-							entitatId);
-				} else if(element instanceof OrganGestorDto) {
-					autenticarUsuari("admin");
-					organGestorService.delete(
-							entitatId,
-							((OrganGestorDto)element).getId());
-				} else if(element instanceof ProcedimentDto) {
-					
-					autenticarUsuari("admin");
-					Long procedimentId = ((ProcedimentDto)element).getId();
-					List<NotificacioEntity> notificacionsByProcediment = notificacioRepository.findByProcedimentId(procedimentId);
-					for(NotificacioEntity notificacioEntity: notificacionsByProcediment) {
-						notificacioService.delete(entitatId, notificacioEntity.getId());
-					}
-					procedimentService.delete(
-							entitatId,
-							((ProcedimentDto)element).getId(),
-							true);
-				} else if(element instanceof GrupDto) {
-					autenticarUsuari("admin");
-					grupService.delete(((GrupDto)element).getId());
-				} else if(element instanceof PagadorPostalDto) {
-					autenticarUsuari("admin");
-					pagadorPostalService.delete(((PagadorPostalDto)element).getId());
-				} else if(element instanceof PagadorCieDto) {
-					autenticarUsuari("admin");
-					pagadorCieService.delete(((PagadorCieDto)element).getId());
-				} else if(element instanceof PagadorCieFormatFullaDto) {
-					autenticarUsuari("admin");
-					pagadorCieFormatFullaService.delete(((PagadorCieFormatFullaDto)element).getId());
-				} else if(element instanceof PagadorCieFormatSobreDto) {
-					autenticarUsuari("admin");
-					pagadorCieFormatSobreService.delete(((PagadorCieFormatSobreDto)element).getId());
-				} else if(element instanceof NotificacioDtoV2) {
-					autenticarUsuari("admin");
-					notificacioService.delete(entitatId, ((NotificacioDtoV2)element).getId());
+			for(int counter=elements.length-1; counter >= 0;counter--){
+				DatabaseItemTest<?> element = elements[counter];
+				log.debug("Esborrant objecte de tipus " + element.getClass().getSimpleName() + "...");
+				try {
+					element.deleteAll(entitatId);
+					System.out.println("...objecte de tipus " + element.getClass().getSimpleName() + " esborrat correctament.");
+				} catch (Exception e) {
+					System.out.println("...error esborrant objecte de tipus " + element.getClass().getSimpleName() + ".");
+					System.out.println(e);
 				}
-				logger.debug("...objecte de tipus " + element.getClass().getSimpleName() + " esborrat correctament.");
+
 			}
-			logger.info("-------------------------------------------------------------------");
-			logger.info("-- ...test \"" + descripcio + "\" executat.");
-			logger.info("-------------------------------------------------------------------");
+
+			try {
+				organGestorCreate.delete(entitatId, "organ_default");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			authenticationTest.autenticarUsuari("super");
+			entitatService.delete(entitatId);
+
+			log.info("-------------------------------------------------------------------");
+			log.info("-- ...test \"" + descripcio + "\" executat.");
+			log.info("-------------------------------------------------------------------");
 		}
 	}
 
@@ -338,9 +175,19 @@ public class BaseServiceTest {
 
 	protected abstract class TestAmbElementsCreats {
 		public abstract void executar(
-				List<Object> elementsCreats) throws Exception;
+				ElementsCreats elementsCreats) throws Exception;
 	}
-	
+
+	@AllArgsConstructor
+	protected static class ElementsCreats {
+		EntitatDto entitat;
+		OrganGestorDto organ;
+		Map<String, Object> elementsCreats;
+
+		public Object get(String key) {
+			return this.elementsCreats.get(key);
+		}
+	}
 	
 	
 	// PLUGINS
@@ -602,113 +449,9 @@ public class BaseServiceTest {
 		return dto;
 	}
 
-	// TODO: Millorar per a poder utilitzar amb més casuístiques
-	protected NotificacioDtoV2 generarNotificacio(
-			String notificacioId,
-			ProcedimentDto procediment,
-			EntitatDto entitat,
-			String organEmisor,
-			int numDestinataris,
-			boolean ambEnviamentPostal) throws IOException, DecoderException {
-		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
-		NotificacioDtoV2 notificacio = new NotificacioDtoV2();
-		notificacio.setUsuariCodi("admin");
-		notificacio.setEmisorDir3Codi(organEmisor);
-		notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO);
-		notificacio.setConcepte(
-				"concepte_" + notificacioId);
-		notificacio.setDescripcio(
-				"descripcio_" + notificacioId);
-		notificacio.setEnviamentDataProgramada(new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000));
-		notificacio.setRetard(5);
-		notificacio.setCaducitat(new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000));
-		DocumentDto document = new DocumentDto();
-		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
-		document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
-		document.setHash(
-				Base64.encodeBase64String(
-						Hex.decodeHex(
-								DigestUtils.sha1Hex(arxiuBytes).toCharArray())));
-		document.setNormalitzat(false);
-		document.setGenerarCsv(false);
-		notificacio.setDocument(document);
-		notificacio.setProcediment(procediment);
-		notificacio.setOrganGestor("A00000000");
-		notificacio.setEntitat(entitat);
-		List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<NotificacioEnviamentDtoV2>();
-//		if (ambEnviamentPostal) {
-//			PagadorPostal pagadorPostal = new PagadorPostal();
-//			pagadorPostal.setDir3Codi("A04013511");
-//			pagadorPostal.setFacturacioClientCodi("ccFac_" + notificacioId);
-//			pagadorPostal.setContracteNum("pccNum_" + notificacioId);
-//			pagadorPostal.setContracteDataVigencia(new Date(0));
-//			notificacio.setPagadorPostal(pagadorPostal);
-//			PagadorCie pagadorCie = new PagadorCie();
-//			pagadorCie.setDir3Codi("A04013511");
-//			pagadorCie.setContracteDataVigencia(new Date(0));
-//			notificacio.setPagadorCie(pagadorCie);
-//		}
-		for (int i = 0; i < numDestinataris; i++) {
-			NotificacioEnviamentDtoV2 enviament = new NotificacioEnviamentDtoV2();
-			PersonaDto titular = new PersonaDto();
-			titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
-			titular.setNom("titularNom" + i);
-			titular.setLlinatge1("titLlinatge1_" + i);
-			titular.setLlinatge2("titLlinatge2_" + i);
-			titular.setNif("00000000T");
-			titular.setTelefon("666010101");
-			titular.setEmail("titular@gmail.com");
-			enviament.setTitular(titular);
-			List<PersonaDto> destinataris = new ArrayList<PersonaDto>();
-			PersonaDto destinatari = new PersonaDto();
-			destinatari.setInteressatTipus(InteressatTipusEnumDto.FISICA);
-			destinatari.setNom("destinatariNom" + i);
-			destinatari.setLlinatge1("destLlinatge1_" + i);
-			destinatari.setLlinatge2("destLlinatge2_" + i);
-			destinatari.setNif("12345678Z");
-			destinatari.setTelefon("666020202");
-			destinatari.setEmail("destinatari@gmail.com");
-			destinataris.add(destinatari);
-			enviament.setDestinataris(destinataris);
-//			if (ambEnviamentPostal) {
-//				EntregaPostal entregaPostal = new EntregaPostal();
-//				entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.NACIONAL);
-//				entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLE);
-//				entregaPostal.setViaNom("Bas");
-//				entregaPostal.setNumeroCasa("25");
-//				entregaPostal.setNumeroQualificador("bis");
-//				entregaPostal.setPuntKm("pk01");
-//				entregaPostal.setApartatCorreus("0228");
-//				entregaPostal.setPortal("portal" + i);
-//				entregaPostal.setEscala("escala" + i);
-//				entregaPostal.setPlanta("planta" + i);
-//				entregaPostal.setPorta("porta" + i);
-//				entregaPostal.setBloc("bloc" + i);
-//				entregaPostal.setComplement("complement" + i);
-//				entregaPostal.setCodiPostal("07500");
-//				entregaPostal.setPoblacio("poblacio" + i);
-//				entregaPostal.setMunicipiCodi("07033");
-//				entregaPostal.setProvincia("07");
-//				entregaPostal.setPaisCodi("ES");
-//				entregaPostal.setLinea1("linea1_" + i);
-//				entregaPostal.setLinea2("linea2_" + i);
-//				entregaPostal.setCie(new Integer(8));
-//			}
-//			EntregaDehDto entregaDeh = new EntregaDehDto();
-//			entregaDeh.setObligat(true);
-//			entregaDeh.setProcedimentCodi("0000");
-//			enviament.setEntregaDeh(entregaDeh);
-			enviament.setServeiTipus(ServeiTipusEnumDto.URGENT);
-			enviaments.add(enviament);
-		}
-		notificacio.setEnviaments(enviaments);
-		return notificacio;
-	}
-
 	private java.io.InputStream getContingutNotificacioAdjunt() {
 		return getClass().getResourceAsStream(
 				"/es/caib/notib/core/notificacio_adjunt.pdf");
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);
 }

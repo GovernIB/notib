@@ -4,6 +4,8 @@
 package es.caib.notib.war.command;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.ValidNotificacio;
 import lombok.Getter;
@@ -164,6 +166,53 @@ public class NotificacioCommandV2 {
 				if (enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty())
 					enviament.getTitular().setEmail(enviament.getTitular().getEmail().replaceAll("\\s+",""));
 				
+				if (enviament.getDestinataris() != null) {
+					for (PersonaDto destinatari : enviament.getDestinataris()) {
+						if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty())
+							destinatari.setEmail(destinatari.getEmail().replaceAll("\\s+",""));
+					}
+				}
+			}
+		}
+		return dto;
+	}
+
+	public NotificacioDatabaseDto asDatabaseDto() {
+		NotificacioDatabaseDto dto = ConversioTipusHelper.convertir(
+				this,
+				NotificacioDatabaseDto.class);
+
+		ProcedimentDto procedimentDto = new ProcedimentDto();
+		procedimentDto.setId(this.getProcedimentId());
+		dto.setProcediment(procedimentDto);
+
+		GrupDto grupDto = new GrupDto();
+		grupDto.setId(this.getGrupId());
+		dto.setGrup(grupDto);
+
+		// Format de municipi i província
+		if (dto.getEnviaments() != null) {
+			for (NotificacioEnviamentDtoV2 enviament: dto.getEnviaments()) {
+				if (enviament.getEntregaPostal() != null) {
+					String codiProvincia = enviament.getEntregaPostal().getProvincia();
+					if (codiProvincia != null && !codiProvincia.isEmpty()) {
+						try {
+							codiProvincia = String.format("%02d", Integer.parseInt(codiProvincia));
+							enviament.getEntregaPostal().setProvincia(codiProvincia);
+							String codiMunicipi = enviament.getEntregaPostal().getMunicipiCodi();
+							if (codiMunicipi != null && !codiMunicipi.isEmpty()) {
+								codiMunicipi = codiProvincia + String.format("%04d", Integer.parseInt(codiMunicipi));
+								enviament.getEntregaPostal().setMunicipiCodi(codiMunicipi);
+							}
+						} catch (Exception e) {
+							logger.error("Error al donar format a la provincia: '" + enviament.getEntregaPostal().getProvincia() +
+									"' i al municipi '" + enviament.getEntregaPostal().getMunicipiCodi() + "'");
+						}
+					}
+				}
+				if (enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty())
+					enviament.getTitular().setEmail(enviament.getTitular().getEmail().replaceAll("\\s+",""));
+
 				if (enviament.getDestinataris() != null) {
 					for (PersonaDto destinatari : enviament.getDestinataris()) {
 						if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty())

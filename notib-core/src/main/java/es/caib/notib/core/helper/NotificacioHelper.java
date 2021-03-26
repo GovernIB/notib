@@ -1,7 +1,11 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.DocumentDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
+import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.GrupRepository;
@@ -65,7 +69,7 @@ public class NotificacioHelper {
 	}
 
 	public NotificacioData buildNotificacioData(EntitatEntity entitat,
-												NotificacioDtoV2 notificacio,
+												NotificacioDatabaseDto notificacio,
 												boolean checkProcedimentPermissions) {
 		GrupEntity grupNotificacio = null;
 		OrganGestorEntity organGestor = null;
@@ -100,7 +104,7 @@ public class NotificacioHelper {
 		}
 
 		// Recuperar òrgan gestor notificació
-		if (organGestor == null && notificacio.getOrganGestor() != null ) {
+		if (organGestor == null && notificacio.getOrganGestorCodi() != null ) {
 			organGestor = organGestorHelper.createOrganGestorFromNotificacio(notificacio, entitat);
 		}
 
@@ -211,7 +215,7 @@ public class NotificacioHelper {
 	@Getter
 	@Builder
 	public static class NotificacioData {
-		private NotificacioDtoV2 notificacio;
+		private NotificacioDatabaseDto notificacio;
 		private EntitatEntity entitat;
 		private GrupEntity grupNotificacio;
 		private OrganGestorEntity organGestor;

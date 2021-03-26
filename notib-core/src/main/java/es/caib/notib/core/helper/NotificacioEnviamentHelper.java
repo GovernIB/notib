@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import es.caib.notib.core.api.dto.EntregaDehDto;
 import es.caib.notib.core.api.dto.EntregaPostalDto;
 import es.caib.notib.core.api.dto.NotificacioDto;
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.PersonaDto;

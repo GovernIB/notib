@@ -2,6 +2,7 @@ package es.caib.notib.core.helper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
 import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
@@ -610,7 +611,6 @@ public class PluginHelper {
 					errorDescripcio,
 					ex);
 		}
-
 	
 		return organismes;
 	}
@@ -1953,7 +1953,7 @@ public class PluginHelper {
 	}
 	
 	public DadesInteressat personaToDadesInteressatIRepresenat (
-			NotificacioDtoV2 notificacio, 
+			NotificacioDtoV2 notificacio,
 			PersonaDto titular,
 			PersonaDto destinatari) {
 		String dir3Codi;
