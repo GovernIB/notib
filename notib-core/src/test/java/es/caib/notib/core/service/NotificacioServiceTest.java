@@ -292,6 +292,8 @@ public class NotificacioServiceTest extends BaseServiceTestV2 {
 						NotificacioEntity notEditada = notificacioRepository.findOne(notificacioError.getId());
 						assertEquals(0, notEditada.getNotificaEnviamentIntent());
 
+						List pendents = notificacioService.getNotificacionsPendentsEnviar();
+
 
 					}
 				},

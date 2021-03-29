@@ -5,6 +5,7 @@ package es.caib.notib.war.helper;
 
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.PersonaDto;
@@ -122,7 +123,50 @@ public class ConversioTipusHelper {
 					}
 				})
 				.register();
+		mapperFactory.classMap(NotificacioDatabaseDto.class, NotificacioCommandV2.class)
+				.byDefault()
+				.customize(new CustomMapper<NotificacioDatabaseDto, NotificacioCommandV2>() {
+					@Override
+					public void mapAtoB(NotificacioDatabaseDto notificacioDto, NotificacioCommandV2 notificacioCommand, MappingContext context) {
+						int i = 0;
+						// Documents
+						DocumentCommand[] documents = new DocumentCommand[5];
+						documents[0] = DocumentCommand.asCommand(notificacioDto.getDocument());
+						documents[1] = DocumentCommand.asCommand(notificacioDto.getDocument2());
+						documents[2] = DocumentCommand.asCommand(notificacioDto.getDocument3());
+						documents[3] = DocumentCommand.asCommand(notificacioDto.getDocument4());
+						documents[4] = DocumentCommand.asCommand(notificacioDto.getDocument5());
+						notificacioCommand.setDocuments(documents);
+					}
+					@Override
+					public void mapBtoA(NotificacioCommandV2 notificacioCommand, NotificacioDatabaseDto notificacioDto, MappingContext context) {
+						// Documents
+						List<DocumentDto> documents = new ArrayList<>();
+						DocumentDto document = DocumentCommand.asDto(notificacioCommand.getDocuments()[0]);
+						if (document != null)
+							documents.add(document);
+						DocumentDto document2 = DocumentCommand.asDto(notificacioCommand.getDocuments()[1]);
+						if (document2 != null)
+							documents.add(document2);
+						DocumentDto document3 = DocumentCommand.asDto(notificacioCommand.getDocuments()[2]);
+						if (document3 != null)
+							documents.add(document3);
+						DocumentDto document4 = DocumentCommand.asDto(notificacioCommand.getDocuments()[3]);
+						if (document4 != null)
+							documents.add(document4);
+						DocumentDto document5 = DocumentCommand.asDto(notificacioCommand.getDocuments()[4]);
+						if (document5 != null)
+							documents.add(document5);
+						notificacioDto.setDocument(documents.size() > 0 ? documents.get(0) : null);
+						notificacioDto.setDocument2(documents.size() > 1 ? documents.get(1) : null);
+						notificacioDto.setDocument3(documents.size() > 2 ? documents.get(2) : null);
+						notificacioDto.setDocument4(documents.size() > 3 ? documents.get(3) : null);
+						notificacioDto.setDocument5(documents.size() > 4 ? documents.get(4) : null);
+					}
+				})
+				.register();
 	}
+
 	
 	public static <T> T convertir(Object source, Class<T> targetType) {
 		if (source == null)

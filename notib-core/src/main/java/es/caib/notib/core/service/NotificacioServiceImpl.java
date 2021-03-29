@@ -399,7 +399,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.SENSE_NUMERO;
 					}
 				}
-//					### Crear o editar titular enviament existent
 				PersonaEntity titular = null;
 				if (enviament.getTitular().getId() != null) {
 					titular = personaRepository.findOne(enviament.getTitular().getId());
