@@ -35,8 +35,6 @@ public class RegistreNotificaHelper {
 	@Autowired
 	private AuditNotificacioHelper auditNotificacioHelper;
 	@Autowired
-	private AuditEnviamentHelper auditEnviamentHelper;
-	@Autowired
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
@@ -267,8 +265,8 @@ public class RegistreNotificaHelper {
 		if (arbResposta != null)
 			errorDescripcio = arbResposta.getErrorDescripcio();
 
-		NotificacioEventEntity event = notificacioEventHelper.addErrorEvent(notificacioEntity, NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE, enviament, errorDescripcio);
-		auditNotificacioHelper.updateNotificacioErrorRegistre(notificacioEntity, event);
+		NotificacioEventEntity event = notificacioEventHelper.addNotificaRegistreEvent(notificacioEntity,
+				enviament, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_REGISTRE);
 	}
 
 	private void updateEventWithoutError(

@@ -4,8 +4,10 @@ import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioTableViewEntity;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.NotificacioTableViewRepository;
 import es.caib.notib.core.test.data.ConfigTest;
 import es.caib.notib.core.test.data.NotificacioItemTest;
 import es.caib.notib.core.test.data.ProcedimentItemTest;
@@ -41,6 +43,8 @@ public class NotificacioServiceTest extends BaseServiceTestV2 {
 	NotificacioService notificacioService;
 	@Autowired
 	NotificacioRepository notificacioRepository;
+	@Autowired
+	NotificacioTableViewRepository notificacioTableViewRepository;
 
 	EntitatDto entitatCreate;
 
@@ -51,6 +55,9 @@ public class NotificacioServiceTest extends BaseServiceTestV2 {
 	
 	@Before
 	public void setUp() throws SistemaExternException, IOException, DecoderException, RegistrePluginException {
+//		configureMockUnitatsOrganitzativesPlugin();
+//		configureMockGestioDocumentalPlugin();
+
 		List<PermisDto> permisosEntitat = new ArrayList<PermisDto>();
 		entitatCreate = new EntitatDto();
 		entitatCreate.setCodi("LIMIT");
@@ -92,7 +99,7 @@ public class NotificacioServiceTest extends BaseServiceTestV2 {
 		System.setProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir", "/home/bgalmes/dades/notib-fs/");
 
 
-		configureMockUnitatsOrganitzativesPlugin();
+
 	}
 	
 	@Test
@@ -103,7 +110,6 @@ public class NotificacioServiceTest extends BaseServiceTestV2 {
 				public void executar(ElementsCreats elementsCreats) throws Exception {
 					configureMockRegistrePlugin();
 					configureMockDadesUsuariPlugin();
-					configureMockGestioDocumentalPlugin();
 
 					authenticationTest.autenticarUsuari("admin");
 
@@ -114,7 +120,7 @@ public class NotificacioServiceTest extends BaseServiceTestV2 {
 					assertNotNull(entitatCreate);
 					assertNotNull(entitatCreate.getId());
 
-					NotificacioDatabaseDto notificacio = (NotificacioDatabaseDto) notificacioCreate.getRandomInstance();
+					NotificacioDatabaseDto notificacio = notificacioCreate.getRandomInstance();
 					notificacio.setProcediment(procedimentCreate);
 
 					NotificacioDatabaseDto notificacioCreated = notificacioService.create(
@@ -137,7 +143,6 @@ public class NotificacioServiceTest extends BaseServiceTestV2 {
 						assertEquals(notificacio.getNumExpedient(), notificacioCreated.getNumExpedient());
 						assertEquals(notificacio.getIdioma(), notificacioCreated.getIdioma());
 
-						assertEquals(notificacio.getDocument().getArxiuGestdocId(), notificacioCreated.getDocument().getArxiuGestdocId());
 						assertEquals(notificacio.getDocument().getArxiuNom(), notificacioCreated.getDocument().getArxiuNom());
 						assertEquals(notificacio.getDocument().getMediaType(), notificacioCreated.getDocument().getMediaType());
 						assertEquals(notificacio.getDocument().getMida(), notificacioCreated.getDocument().getMida());
@@ -190,10 +195,11 @@ public class NotificacioServiceTest extends BaseServiceTestV2 {
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(ElementsCreats elementsCreats) throws Exception {
+						configureMockGestioDocumentalPlugin();
+
 						EntitatDto entitatCreate = elementsCreats.entitat;
 						ProcedimentDto procedimentCreate = (ProcedimentDto) elementsCreats.get("procediment");
 						NotificacioDatabaseDto notificacioCreate = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
-						NotificacioDatabaseDto notificacioErrorCreate = (NotificacioDatabaseDto) elementsCreats.get("notificacioError");
 
 
 						NotificacioDatabaseDto notificacioEdicio = (NotificacioDatabaseDto) SerializationUtils.clone(notificacioCreate);
@@ -235,12 +241,138 @@ public class NotificacioServiceTest extends BaseServiceTestV2 {
 				procedimentCreate,
 				notificacioCreate);
 	}
+
+
+	@Test
+	public void whenCreateNotificacio_thenCreateTableViewItem() {
+		testCreantElements(
+			new TestAmbElementsCreats() {
+				@Override
+				public void executar(ElementsCreats elementsCreats) throws Exception {
+					configureMockRegistrePlugin();
+					configureMockDadesUsuariPlugin();
+					configureMockGestioDocumentalPlugin();
+
+					authenticationTest.autenticarUsuari("admin");
+					// Given: Notificacio no creada
+					EntitatDto entitatCreate = elementsCreats.entitat;
+					ProcedimentDto procedimentCreate = (ProcedimentDto) elementsCreats.get("procediment");
+					assertNotNull(procedimentCreate);
+					assertNotNull(procedimentCreate.getId());
+					assertNotNull(entitatCreate);
+					assertNotNull(entitatCreate.getId());
+
+					NotificacioDatabaseDto notificacio = notificacioCreate.getRandomInstanceWithoutEnviaments();
+					notificacio.setProcediment(procedimentCreate);
+
+					// When: Registram la notificacio a la Base de dades
+					NotificacioDatabaseDto notificacioCreated = notificacioService.create(
+							entitatCreate.getId(),
+							notificacio);
+
+					// Then: S'ha creat un registre amb el mateix id a la taula de la vista de les notificacions
+					try {
+						assertNotNull(
+							notificacioTableViewRepository.findOne(notificacioCreated.getId())
+						);
+						notificacioTableViewRepository.delete(notificacioCreated.getId());
+					}finally {
+						notificacioRepository.delete(notificacioCreated.getId());
+					}
+				}
+			},
+			"Al crear una nova notificació es registra el seu registre corresponent a la taula de la vista",
+			entitatCreate,
+			procedimentCreate,
+			notificacioCreate);
+	}
+
+	@Test
+	public void whenUpdateNotificacio_thenUpdateTableViewItem() {
+		testCreantElements(
+				new TestAmbElementsCreats() {
+					@Override
+					public void executar(ElementsCreats elementsCreats) throws Exception {
+						configureMockGestioDocumentalPlugin();
+
+						String nouValor = "String valor edicio";
+						authenticationTest.autenticarUsuari("admin");
+						// Given: Notificacio existent
+						EntitatDto entitat = elementsCreats.entitat;
+						NotificacioDatabaseDto notificacio = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
+						assertNotNull(
+								notificacioTableViewRepository.findOne(notificacio.getId())
+						);
+						notificacio.setConcepte(nouValor);
+						notificacio.setNumExpedient(nouValor);
+
+						// When: Actualizam la notificacio a la Base de dades
+						NotificacioDatabaseDto notificacioUpdated = notificacioService.update(
+								entitat.getId(),
+								notificacio,
+								true);
+
+						// Then: S'ha actualitzat registre amb el mateix id a la taula de la vista de les notificacions
+						NotificacioTableViewEntity tableRow = notificacioTableViewRepository.findOne(
+								notificacio.getId());
+						assertNotNull(
+								tableRow
+						);
+						assertEquals(tableRow.getConcepte(), nouValor);
+						assertEquals(tableRow.getNumExpedient(), nouValor);
+					}
+				},
+				"Al crear una nova notificació es registra el seu registre corresponent a la taula de la vista",
+				entitatCreate,
+				procedimentCreate,
+				notificacioCreate);
+	}
+
+	@Test
+	public void whenDeleteNotificacio_thenDeleteTableViewItem() {
+		testCreantElements(
+				new TestAmbElementsCreats() {
+					@Override
+					public void executar(ElementsCreats elementsCreats) throws Exception {
+						configureMockRegistrePlugin();
+						configureMockDadesUsuariPlugin();
+
+						authenticationTest.autenticarUsuari("admin");
+						// Given: Notificacio existent
+						EntitatDto entitat = elementsCreats.entitat;
+						NotificacioDatabaseDto notificacio = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
+						assertNotNull(
+								notificacioTableViewRepository.findOne(notificacio.getId())
+						);
+
+						// When: eliminam la notificacio a la Base de dades
+						notificacioService.delete(
+								entitat.getId(),
+								notificacio.getId());
+
+						// Then: S'ha eliminat el registre amb el mateix id a la taula de la vista de les notificacions
+						assertNull(
+								notificacioTableViewRepository.findOne(notificacio.getId())
+						);
+
+						notificacioCreate.setAsDeleted("notificacio");
+
+					}
+				},
+				"Al crear una nova notificació es registra el seu registre corresponent a la taula de la vista",
+				entitatCreate,
+				procedimentCreate,
+				notificacioCreate);
+	}
+
 	@Test
 	public void whenUptateNotificacio_thenResetRegistreEnviamentIntent() {
 		testCreantElements(
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(ElementsCreats elementsCreats) throws Exception {
+						configureMockGestioDocumentalPlugin();
+
 						NotificacioDatabaseDto notificacioError = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
 
 						// Given: notificacio pendent registrar amb nombre màxim de reintents
@@ -274,6 +406,8 @@ public class NotificacioServiceTest extends BaseServiceTestV2 {
 				new TestAmbElementsCreats() {
 					@Override
 					public void executar(ElementsCreats elementsCreats) throws Exception {
+						configureMockGestioDocumentalPlugin();
+
 						NotificacioDatabaseDto notificacioError = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
 
 						// Given: notificacio pendent registrar amb nombre màxim de reintents

@@ -27,9 +27,8 @@ public class NotificacioTableItemDto {
 	private boolean hasEnviamentsPendentsRegistre;
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
+
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
-	private Date createdDate;
-	private String entitatNom;
 	private String numExpedient;
 	private String concepte;
 	private Date estatDate;
@@ -37,13 +36,15 @@ public class NotificacioTableItemDto {
 
 	private String createdByNom;
 	private String createdByCodi;
+	private Date createdDate;
 
 	private boolean permisProcessar;
 
+	private String entitatNom;
 	private String procedimentCodi;
 	private String procedimentNom;
-	private String organGestor;
-	private String organGestorNom;
+	private String organCodi;
+	private String organNom;
 
 	protected int registreEnviamentIntent;
 
@@ -57,9 +58,9 @@ public class NotificacioTableItemDto {
 	}
 
 	public String getOrganGestorDesc() {
-		if (organGestorNom != null && !organGestorNom.isEmpty())
-			return organGestor + " - " + organGestorNom;
-		return organGestor;
+		if (organNom != null && !organNom.isEmpty())
+			return organCodi + " - " + organNom;
+		return organCodi;
 	}
 
 	public String getProcedimentDesc() {

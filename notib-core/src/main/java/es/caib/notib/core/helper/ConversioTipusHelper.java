@@ -67,15 +67,7 @@ public class ConversioTipusHelper {
 				byDefault().
 				register();
 
-		mapperFactory.classMap(NotificacioEntity.class, NotificacioTableItemDto.class).
-				field("notificaErrorEvent.data", "notificaErrorData").
-				field("notificaErrorEvent.errorDescripcio", "notificaErrorDescripcio").
-				field("organGestor.codi", "organGestor").
-				field("organGestor.nom", "organGestorNom").
-//				field("entitat.id", "entitatId").
-				field("entitat.nom", "entitatNom").
-				field("procediment.codi", "procedimentCodi").
-				field("procediment.nom", "procedimentNom").
+		mapperFactory.classMap(NotificacioTableViewEntity.class, NotificacioTableItemDto.class).
 				field("createdBy.nom", "createdByNom").
 				field("createdBy.codi", "createdByCodi").
 				byDefault().

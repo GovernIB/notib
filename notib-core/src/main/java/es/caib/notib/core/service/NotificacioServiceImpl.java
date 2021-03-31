@@ -20,7 +20,6 @@ import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.Persona;
-import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.*;
@@ -73,6 +72,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
 	@Autowired
+	private NotificacioTableViewRepository notificacioTableViewRepository;
+	@Autowired
 	private EntitatRepository entitatRepository;
 	@Autowired
 	private DocumentRepository documentRepository;
@@ -83,8 +84,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
 	@Autowired
-	private ProcedimentOrganRepository procedimentOrganRepository;
-	@Autowired
 	private EmailHelper emailHelper;
 	@Autowired
 	private UsuariHelper usuariHelper;
@@ -92,8 +91,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private RegistreNotificaHelper registreNotificaHelper;
 	@Autowired
 	private OrganigramaHelper organigramaHelper;
-	@Autowired
-	private GrupRepository grupRepository;
 	@Autowired
 	private RegistreHelper registreHelper;
 	@Autowired
@@ -113,15 +110,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private NotificacioHelper notificacioHelper;
 	@Autowired
-	private OrganGestorHelper organGestorHelper;
-	@Autowired
 	private IntegracioHelper integracioHelper;
 	@Autowired
-	private PermisosHelper permisosHelper;
-	@Autowired
-	private OrganGestorCachable organGestorCachable;
-	@Autowired
 	private ProcedimentService procedimentService;
+	@Autowired
+	private NotificacioTableHelper notificacioTableHelper;
 
 	public static Map<String, ProgresDescarregaDto> progresDescarrega = new HashMap<String, ProgresDescarregaDto>();
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActulitzacioExpirades = new HashMap<String, ProgresActualitzacioCertificacioDto>();
@@ -139,7 +132,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 			NotificacioHelper.NotificacioData notData = notificacioHelper.buildNotificacioData(entitat, notificacio, false);
 			// Dades generals de la notificació
-			NotificacioEntity notificacioEntity = auditNotificacioHelper.desaNotificacio(notData);
+			NotificacioEntity notificacioEntity = notificacioHelper.saveNotificacio(notData);
 	
 			List<Enviament> enviaments = new ArrayList<Enviament>();
 			List<NotificacioEnviamentEntity> enviamentsEntity = new ArrayList<NotificacioEnviamentEntity>();
@@ -240,7 +233,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			}
 			notificacioEntity.getEnviaments().addAll(enviamentsEntity);
-			notificacioEntity = auditNotificacioHelper.desaNotificacio(notificacioEntity);
+
 			// Comprovar on s'ha d'enviar ara
 			if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
 				synchronized(CreacioSemaforDto.getCreacioSemafor()) {
@@ -281,7 +274,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						NotificacioEntity.class,
 						"No s'ha trobat cap notificació amb l'id especificat");
 			
-			List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacio(notificacio);
+			List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacioId);
 //			### Esborrar la notificació
 			if (enviamentsPendents != null && ! enviamentsPendents.isEmpty()) {
 				// esborram tots els seus events
@@ -320,12 +313,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 					true, 
 					true,
 					false);
-			NotificacioEntity notificacioEntity = notificacioRepository.findOne(notificacio.getId());
-			List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacio(notificacioEntity);
+			List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
 			if (enviamentsPendents == null || enviamentsPendents.isEmpty()) {
 				throw new ValidationException("Aquesta notificació està enviada i no es pot modificar");
 			}
 
+			NotificacioEntity notificacioEntity = notificacioRepository.findOne(notificacio.getId());
 			NotificacioHelper.NotificacioData notData = notificacioHelper.buildNotificacioData(entitat, notificacio, !isAdministradorEntitat);
 
 //			### Actualitzar notificació existent
@@ -563,10 +556,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 							entityComprovarHelper.hasPermisProcediment(
 									notificacio.getProcediment().getId(),
 									PermisEnum.PROCESSAR));
-					}
+				}
 				
 				List<NotificacioEnviamentEntity> enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
-				if (enviamentsPendentsNotifica != null && ! enviamentsPendentsNotifica.isEmpty()) {
+				if (enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty()) {
 					notificacio.setHasEnviamentsPendents(true);
 				}
 				
@@ -606,7 +599,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					isUsuariEntitat,
 					false);
 
-			Page<NotificacioEntity> notificacions = null;
+			Page<NotificacioTableViewEntity> notificacions = null;
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			mapeigPropietatsOrdenacio.put("procediment.organGestor", new String[] {"pro.organGestor.codi"});
 			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {(isUsuari ? "organ.codi" : "organGestor.codi")});
@@ -622,7 +615,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (filtre == null || filtre.isEmpty()) {
 				//Consulta les notificacions sobre les quals té permis l'usuari actual
 				if (isUsuari) {
-					notificacions = notificacioRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
+					notificacions = notificacioTableViewRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
 							esProcedimentsCodisNotibNull,
 							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib,
 							aplicacioService.findRolsUsuariActual(),
@@ -635,18 +628,18 @@ public class NotificacioServiceImpl implements NotificacioService {
 							pageable);
 				//Consulta les notificacions de l'entitat acutal
 				} else if (isUsuariEntitat) {
-					notificacions = notificacioRepository.findByEntitatActual(
+					notificacions = notificacioTableViewRepository.findByEntitatActual(
 							entitatActual,
 							pageable);
 				//Consulta totes les notificacions de les entitats actives
 				} else if (isSuperAdmin) {
 					List<EntitatEntity> entitatsActiva = entitatRepository.findByActiva(true);
-					notificacions = notificacioRepository.findByEntitatActiva(
+					notificacions = notificacioTableViewRepository.findByEntitatActiva(
 							entitatsActiva,
 							pageable);
 				} else if (isAdminOrgan) {
 					List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
-					notificacions = notificacioRepository.findByProcedimentCodiNotibAndEntitat(
+					notificacions = notificacioTableViewRepository.findByProcedimentCodiNotibAndEntitat(
 							esProcedimentsCodisNotibNull,
 							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib,
 							entitatActual,
@@ -680,11 +673,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 
 				if (isUsuari) {
-					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
+					notificacions = notificacioTableViewRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
+							entitatActual,
 							filtre.getEntitatId() == null,
 							filtre.getEntitatId(),
 							esProcedimentsCodisNotibNull,
-							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib, 
+							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib,
 							aplicacioService.findRolsUsuariActual(),
 							esOrgansGestorsCodisNotibNull,
 							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
@@ -703,11 +697,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 							dataFi,
 							filtre.getTitular() == null || filtre.getTitular().isEmpty(),
 							filtre.getTitular() == null ? "" : filtre.getTitular(),
-							entitatActual,
 							organGestor == null,
-							organGestor,
+							organGestor == null ? "" : organGestor.getCodi(),
 							procediment == null,
-							procediment,
+							procediment == null ? "" : procediment.getCodi(),
 							filtre.getTipusUsuari() == null,
 							filtre.getTipusUsuari(),
 							filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
@@ -723,9 +716,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 							hasZeronotificaEnviamentIntent,
 							pageable);
 				} else if (isUsuariEntitat) {
-					notificacions = notificacioRepository.findAmbFiltre(
-							entitatId == null, 
-							entitatId, 
+					notificacions = notificacioTableViewRepository.findAmbFiltre(
+							entitatId == null,
+							entitatId,
 							filtre.getEnviamentTipus() == null,
 							filtre.getEnviamentTipus(),
 							filtre.getConcepte() == null,
@@ -740,9 +733,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getTitular() == null || filtre.getTitular().isEmpty(),
 							filtre.getTitular(),
 							organGestor == null,
-							organGestor,
+							organGestor == null ? "" : organGestor.getCodi(),
 							procediment == null,
-							procediment,
+							procediment == null ? "" : procediment.getCodi(),
 							filtre.getTipusUsuari() == null,
 							filtre.getTipusUsuari(),
 							filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
@@ -757,7 +750,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							hasZeronotificaEnviamentIntent,
 							pageable);
 				} else if (isSuperAdmin) {
-					notificacions = notificacioRepository.findAmbFiltre(
+					notificacions = notificacioTableViewRepository.findAmbFiltre(
 							filtre.getEntitatId() == null,
 							filtre.getEntitatId(),
 							filtre.getEnviamentTipus() == null,
@@ -774,9 +767,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtre.getTitular() == null || filtre.getTitular().isEmpty(),
 							filtre.getTitular(),
 							organGestor == null,
-							organGestor,
+							organGestor == null ? "" : organGestor.getCodi(),
 							procediment == null,
-							procediment,
+							procediment == null ? "" : procediment.getCodi(),
 							filtre.getTipusUsuari() == null,
 							filtre.getTipusUsuari(),
 							filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
@@ -792,11 +785,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 							pageable);
 				} else if (isAdminOrgan) {
 					List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
-					notificacions = notificacioRepository.findAmbFiltreAndProcedimentCodiNotib(
+					notificacions = notificacioTableViewRepository.findAmbFiltreAndProcedimentCodiNotib(
+							entitatActual,
 							filtre.getEntitatId() == null,
 							filtre.getEntitatId(),
 							esProcedimentsCodisNotibNull,
-							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib, 
+							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib,
 							filtre.getEnviamentTipus() == null,
 							filtre.getEnviamentTipus(),
 							filtre.getConcepte() == null,
@@ -810,11 +804,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 							dataFi,
 							filtre.getTitular() == null || filtre.getTitular().isEmpty(),
 							filtre.getTitular() == null ? "" : filtre.getTitular(),
-							entitatActual,
 							organGestor == null,
-							organGestor,
+							organGestor == null ? "" : organGestor.getCodi(),
 							procediment == null,
-							procediment,
+							procediment == null ? "" : procediment.getCodi(),
 							filtre.getTipusUsuari() == null,
 							filtre.getTipusUsuari(),
 							filtre.getNumExpedient() == null || filtre.getNumExpedient().isEmpty(),
@@ -866,7 +859,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private PaginaDto<NotificacioTableItemDto> complementaNotificacions(
 			EntitatEntity entitatEntity,
 			String usuariCodi,
-			Page<NotificacioEntity> notificacions) {
+			Page<NotificacioTableViewEntity> notificacions) {
 
 		if (notificacions == null) {
 			return paginacioHelper.getPaginaDtoBuida(NotificacioTableItemDto.class);
@@ -886,12 +879,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 		}
 
-		for (NotificacioEntity notificacio : notificacions) {
-			if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
-				notificacio.setPermisProcessar(codisProcedimentsProcessables.contains(notificacio.getProcediment().getCodi()));
+		for (NotificacioTableViewEntity notificacio : notificacions) {
+			if (notificacio.getProcedimentCodi() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
+				notificacio.setPermisProcessar(codisProcedimentsProcessables.contains(notificacio.getProcedimentCodi()));
 			}
 
-			List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacio(notificacio);
+			List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
 			if (enviamentsPendents != null && !enviamentsPendents.isEmpty()) {
 				notificacio.setHasEnviamentsPendentsRegistre(true);
 			}
@@ -912,7 +905,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			if (filtre == null || filtre.isEmpty()) {
-				page = notificacioRepository.findNotificacioLastEventAmbError(paginacioHelper.toSpringDataPageable(paginacioParams));
+				page = notificacioRepository.findNotificacioLastEventAmbError(
+						paginacioHelper.toSpringDataPageable(paginacioParams));
 			} else {
 				Date dataInici = filtre.getDataInici();
 				if (dataInici != null) {
@@ -1414,7 +1408,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			for(NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
 				auditEnviamentHelper.reiniciaConsultaNotifica(enviament);
 			}
-			auditNotificacioHelper.netejarErrorsNotifica(notificacio);
+			notificacioTableHelper.actualitzarRegistre(notificacio);
 			notificacioRepository.saveAndFlush(notificacio);
 			
 			return true;
@@ -1438,7 +1432,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			for(NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
 				auditEnviamentHelper.reiniciaConsultaSir(enviament);
 			}
-			auditNotificacioHelper.netejarErrorsNotifica(notificacio);
+			notificacioTableHelper.actualitzarRegistre(notificacio);
 			notificacioRepository.saveAndFlush(notificacio);
 			return true;
 		} catch (Exception e) {
@@ -1692,7 +1686,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(
 					null,
 					notificacioId);
-			auditNotificacioHelper.refreshRegistreNotificacio(notificacio);
+			auditNotificacioHelper.updateNotificacioRefreshRegistreNotificacio(notificacio);
 		} catch (Exception e) {
 			logger.debug("Error reactivant consultes d'estat de la notificació (notificacioId=" + notificacioId + ")", e);
 		} finally {
@@ -1775,7 +1769,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
-			List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacio(notificacio);
+			List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
 			
 			if (enviamentsPendents != null && !enviamentsPendents.isEmpty()) 
 				throw new ValidationException("No es pot generar el justificant d'una notificació amb enviaments pendents.");

@@ -1,14 +1,12 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.AccioParam;
-import es.caib.notib.core.api.dto.DocumentDto;
-import es.caib.notib.core.api.dto.IntegracioInfo;
-import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.GrupRepository;
+import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.ProcedimentOrganRepository;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
@@ -47,6 +45,10 @@ public class NotificacioHelper {
 	private MessageHelper messageHelper;
 	@Autowired
 	private NotificaHelper notificaHelper;
+	@Autowired
+	private AuditNotificacioHelper auditNotificacioHelper;
+	@Autowired
+	private NotificacioEventRepository notificacioEventRepository;
 
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public void enviamentRefrescarEstat(
@@ -68,6 +70,34 @@ public class NotificacioHelper {
 		}
 	}
 
+	public NotificacioEntity saveNotificacio(NotificacioHelper.NotificacioData data) {
+		return 	auditNotificacioHelper.desaNotificacio(NotificacioEntity.
+				getBuilderV2(
+						data.getEntitat(),
+						data.getNotificacio().getEmisorDir3Codi(),
+						data.getOrganGestor(),
+						pluginHelper.getNotibTipusComunicacioDefecte(),
+						data.getNotificacio().getEnviamentTipus(),
+						data.getNotificacio().getConcepte(),
+						data.getNotificacio().getDescripcio(),
+						data.getNotificacio().getEnviamentDataProgramada(),
+						data.getNotificacio().getRetard(),
+						data.getNotificacio().getCaducitat(),
+						data.getNotificacio().getUsuariCodi(),
+						data.getProcediment() != null ? data.getProcediment().getCodi() : null,
+						data.getProcediment(),
+						data.getGrupNotificacio() != null ? data.getGrupNotificacio().getCodi() : null,
+						data.getNotificacio().getNumExpedient(),
+						TipusUsuariEnumDto.INTERFICIE_WEB,
+						data.getProcedimentOrgan(),
+						data.getNotificacio().getIdioma())
+				.document(data.getDocumentEntity())
+				.document2(data.getDocument2Entity())
+				.document3(data.getDocument3Entity())
+				.document4(data.getDocument4Entity())
+				.document5(data.getDocument5Entity())
+				.build());
+	}
 	public NotificacioData buildNotificacioData(EntitatEntity entitat,
 												NotificacioDatabaseDto notificacio,
 												boolean checkProcedimentPermissions) {
@@ -212,6 +242,12 @@ public class NotificacioHelper {
 		return documentEntity;
 	}
 
+	public NotificacioEventEntity getNotificaErrorEvent(NotificacioEntity notificacio) {
+		if (notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIADA)) {
+			return null;
+		}
+		return notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
+	}
 	@Getter
 	@Builder
 	public static class NotificacioData {

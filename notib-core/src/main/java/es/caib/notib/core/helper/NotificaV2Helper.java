@@ -7,6 +7,8 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.aspect.Audita;
+import es.caib.notib.core.aspect.UpdateNotificacioEnviamentTable;
+import es.caib.notib.core.aspect.UpdateNotificacioTable;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
@@ -80,9 +82,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
 
+	@UpdateNotificacioTable
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
-	public NotificacioEntity notificacioEnviar(
-			Long notificacioId) {
+	public NotificacioEntity notificacioEnviar(Long notificacioId) {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_NOTIFICA, 
@@ -106,8 +108,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		try {
 			logger.info(" >>> Enviant notificació...");
 
-//			int e = 10/ 0;
-
 			long startTime = System.nanoTime();
 			double elapsedTime;
 			ResultadoAltaRemesaEnvios resultadoAlta = enviaNotificacio(notificacio);
@@ -119,9 +119,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				logger.info(" >>> ... OK");
 				
 				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
-				notificacio.updateNotificaError(
-						null,
-						null);
 
 				//Crea un nou event
 				startTime = System.nanoTime();
@@ -172,9 +169,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return notificacio;
 	}
 
+	@UpdateNotificacioEnviamentTable
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
-	public NotificacioEnviamentEntity enviamentRefrescarEstat(
-			Long enviamentId) throws SistemaExternException {
+	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_NOTIFICA, 
@@ -725,10 +722,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 		NotificacioEventEntity event = notificacioEventHelper.addErrorEvent(notificacio,
 				NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, errorDescripcio, notificaError);
-
-		notificacio.updateNotificaError(
-				notificacioErrorTipus,
-				event);
+//
+//		notificacio.updateNotificaError(
+//				notificacioErrorTipus,
+//				event);
 		notificacio.updateEventAfegir(event);
 	}
 	

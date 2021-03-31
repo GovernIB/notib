@@ -71,11 +71,11 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 //			"   		and notificaEstat != es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIAT_SIR)" +
 //			" order by notificaEstatDataActualitzacio asc nulls first")
 	@Query(	" from NotificacioEnviamentEntity " +
-			" where	notificacio = :notificacio " + 
+			" where	notificacio.id = :notificacioId " +
 			"	and (notificaEstatFinal = false " + 
 			"   		and notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT)" +
 			" order by notificaEstatDataActualitzacio asc nulls first")
-	List<NotificacioEnviamentEntity> findEnviamentsPendentsByNotificacio(@Param("notificacio") NotificacioEntity notificacio);
+	List<NotificacioEnviamentEntity> findEnviamentsPendentsByNotificacioId(@Param("notificacioId") Long notificacioId);
 
 	NotificacioEnviamentEntity findByNotificacioEntitatAndNotificaIdentificador(
 			EntitatEntity entitat,

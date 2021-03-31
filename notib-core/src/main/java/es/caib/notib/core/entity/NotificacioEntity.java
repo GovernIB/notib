@@ -73,8 +73,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "motiu")
 	protected String motiu;
 	
-	@Column(name = "not_error_tipus")
-	protected NotificacioErrorTipusEnumDto notificaErrorTipus;
+//	@Column(name = "not_error_tipus")
+//	protected NotificacioErrorTipusEnumDto notificaErrorTipus;
 	
 	@Column(name = "not_env_data")
 	@Temporal(TemporalType.TIMESTAMP)
@@ -109,11 +109,11 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "idioma")
 	protected IdiomaEnumDto idioma;
 
-	@Setter
-	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
-	@JoinColumn(name = "not_error_event_id")
-	@ForeignKey(name = "not_noterrevent_notificacio_fk")
-	protected NotificacioEventEntity notificaErrorEvent;
+//	@Setter
+//	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
+//	@JoinColumn(name = "not_error_event_id")
+//	@ForeignKey(name = "not_noterrevent_notificacio_fk")
+//	protected NotificacioEventEntity notificaErrorEvent;
 	
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "entitat_id")
@@ -203,15 +203,19 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "registre_llibre_nom")
 	private String registreLlibreNom;
 
-	@Column(name = "IS_ERROR_LAST_EVENT")
-	protected Boolean errorLastEvent;
+//	@Column(name = "IS_ERROR_LAST_EVENT")
+//	protected Boolean errorLastEvent;
 
+	@Setter
 	@Transient
 	protected boolean permisProcessar;
+
+	@Setter
 	@Transient
 	protected boolean hasEnviamentsPendents;
-	@Transient
-	protected boolean hasEnviamentsPendentsRegistre;
+
+//	@Transient
+//	protected boolean hasEnviamentsPendentsRegistre;
 
 //	@Transient
 //	protected NotificacioEnviamentEstatEnumDto notificaEstat;
@@ -220,22 +224,19 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			NotificacioEnviamentEntity enviament) {
 		this.enviaments.add(enviament);
 	}
-	
-	public void setPermisProcessar(boolean permisProcessar) {
-		this.permisProcessar = permisProcessar;
-	}
-	
-	public void setErrorLastEvent(boolean errorLastEvent) {
-		this.errorLastEvent = errorLastEvent;
-	}
-	
-	public void setHasEnviamentsPendents(boolean hasEnviamentsPendents) {
-		this.hasEnviamentsPendents = hasEnviamentsPendents;
-	}
 
-	public void setHasEnviamentsPendentsRegistre(boolean hasEnviamentsPendentsRegistre) {
-		this.hasEnviamentsPendentsRegistre = hasEnviamentsPendentsRegistre;
-	}
+//
+//	public void setErrorLastEvent(boolean errorLastEvent) {
+//		this.errorLastEvent = errorLastEvent;
+//	}
+//
+//	public void setHasEnviamentsPendents(boolean hasEnviamentsPendents) {
+//		this.hasEnviamentsPendents = hasEnviamentsPendents;
+//	}
+//
+//	public void setHasEnviamentsPendentsRegistre(boolean hasEnviamentsPendentsRegistre) {
+//		this.hasEnviamentsPendentsRegistre = hasEnviamentsPendentsRegistre;
+//	}
 
 	
 	public void updateRegistreNumero(Integer registreNumero) {
@@ -254,8 +255,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		this.estat = estat;
 	}
 	
-	public void updateEstatDate(
-			Date estatDate) {
+	public void updateEstatDate(Date estatDate) {
 		this.estatDate = estatDate;
 	}
 	
@@ -303,18 +303,17 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		this.registreData = cal.getTime();
 	}
 	
-	public void updateNotificaError(
-			NotificacioErrorTipusEnumDto errorTipus,
-			NotificacioEventEntity errorEvent) {
-		this.notificaErrorTipus = errorTipus;
-		this.notificaErrorEvent = errorEvent;
-	}
-	public void cleanNotificaError() {
-		this.notificaErrorTipus = null;
-		this.notificaErrorEvent = null;
-	}
-	public void updateEventAfegir(
-			NotificacioEventEntity event) {
+//	public void updateNotificaError(
+//			NotificacioErrorTipusEnumDto errorTipus,
+//			NotificacioEventEntity errorEvent) {
+//		this.notificaErrorTipus = errorTipus;
+//		this.notificaErrorEvent = errorEvent;
+//	}
+//	public void cleanNotificaError() {
+//		this.notificaErrorTipus = null;
+//		this.notificaErrorEvent = null;
+//	}
+	public void updateEventAfegir(NotificacioEventEntity event) {
 		events.add(event);
 	}
 	
@@ -609,10 +608,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		this.motiu = motiu;
 	}
 
-	public void setNotificaErrorTipus(NotificacioErrorTipusEnumDto notificaErrorTipus) {
-		this.notificaErrorTipus = notificaErrorTipus;
-	}
-
 	public void setNotificaEnviamentData(Date notificaEnviamentData) {
 		this.notificaEnviamentData = notificaEnviamentData;
 	}
@@ -639,14 +634,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 
 	public void setNumExpedient(String numExpedient) {
 		this.numExpedient = numExpedient;
-	}
-
-	public void setErrorLastCallback(boolean errorLastCallback) {
-		this.errorLastCallback = errorLastCallback;
-	}
-
-	public void setNotificaErrorEvent(NotificacioEventEntity notificaErrorEvent) {
-		this.notificaErrorEvent = notificaErrorEvent;
 	}
 
 	public void setEntitat(EntitatEntity entitat) {
@@ -681,9 +668,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		this.events = events;
 	}
 
-//	public void setNotificaEstat(NotificacioEnviamentEstatEnumDto notificaEstat) {
-//		this.notificaEstat = notificaEstat;
-//	}
 
 	public boolean isTipusUsuariAplicacio() {
 		return this.tipusUsuari != null && this.tipusUsuari.equals(TipusUsuariEnumDto.APLICACIO);

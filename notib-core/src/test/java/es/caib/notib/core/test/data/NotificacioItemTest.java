@@ -58,14 +58,12 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
         }
     }
 
-    public NotificacioDatabaseDto getRandomInstance() {
-        int numDestinataris = 2;
+    public NotificacioDatabaseDto getRandomInstanceWithoutEnviaments() {
         String notificacioId = new Long(System.currentTimeMillis()).toString();
-        byte[] arxiuBytes = new byte[0];
 
         DocumentDto document = new DocumentDto();
         try {
-            arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
+            byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
             document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
             document.setHash(
                     Base64.encodeBase64String(
@@ -102,6 +100,11 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
                 .document(new DocumentDto())
                 .build();
         notCreated.setDocument(document);
+        return notCreated;
+    }
+    public NotificacioDatabaseDto getRandomInstance() {
+        NotificacioDatabaseDto notCreated = getRandomInstanceWithoutEnviaments();
+        int numDestinataris = 2;
         List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<>();
 //		if (ambEnviamentPostal) {
 //			PagadorPostal pagadorPostal = new PagadorPostal();

@@ -3,7 +3,6 @@
  */
 package es.caib.notib.core.service;
 
-import es.caib.loginModule.util.Base64.InputStream;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.service.*;
 import es.caib.notib.core.helper.PluginHelper;
@@ -34,9 +33,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -213,21 +210,22 @@ public class BaseServiceTestV2 {
 	}
 	
 	//	GestioDocumentalPlugin
-	protected void configureMockGestioDocumentalPlugin() throws SistemaExternException, IOException {
-		gestioDocumentalPluginMock = Mockito.mock(GestioDocumentalPlugin.class);
-		Mockito.when(gestioDocumentalPluginMock.create(Mockito.anyString(), Mockito.any(InputStream.class))).thenReturn(Integer.toString(ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE)));
-		Mockito.doNothing().when(gestioDocumentalPluginMock).update(Mockito.anyString(), Mockito.anyString(), Mockito.any(InputStream.class));
-		Mockito.doNothing().when(gestioDocumentalPluginMock).delete(Mockito.anyString(), Mockito.anyString());
-		Mockito.doAnswer(new Answer<Void>() {
-			public Void answer(InvocationOnMock invocation) throws IOException {
-				Object[] args = invocation.getArguments();
-				FitxerDto fitxer = getFitxerPdfDeTest();
-				byte[] contingut = fitxer.getContingut();
-				IOUtils.copy(new ByteArrayInputStream(contingut), (OutputStream)args[2]);
-				return null;
-			}
-		}).when(gestioDocumentalPluginMock).get(Mockito.anyString(), Mockito.anyString(), Mockito.any(OutputStream.class));
-		pluginHelper.setGestioDocumentalPlugin(gestioDocumentalPluginMock);
+	protected void configureMockGestioDocumentalPlugin() throws SistemaExternException {
+		// TODO: Amb el mock activat quan s'executen tots els tests falla
+//		gestioDocumentalPluginMock = Mockito.mock(GestioDocumentalPlugin.class);
+//		Mockito.when(gestioDocumentalPluginMock.create(Mockito.anyString(), Mockito.any(InputStream.class))).thenReturn(Integer.toString(ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE)));
+//		Mockito.doNothing().when(gestioDocumentalPluginMock).update(Mockito.anyString(), Mockito.anyString(), Mockito.any(InputStream.class));
+//		Mockito.doNothing().when(gestioDocumentalPluginMock).delete(Mockito.anyString(), Mockito.anyString());
+//		Mockito.doAnswer(new Answer<Void>() {
+//			public Void answer(InvocationOnMock invocation) throws IOException {
+//				Object[] args = invocation.getArguments();
+//				FitxerDto fitxer = getFitxerPdfDeTest();
+//				byte[] contingut = fitxer.getContingut();
+//				IOUtils.copy(new ByteArrayInputStream(contingut), (OutputStream)args[2]);
+//				return null;
+//			}
+//		}).when(gestioDocumentalPluginMock).get(Mockito.anyString(), Mockito.anyString(), Mockito.any(OutputStream.class));
+//		pluginHelper.setGestioDocumentalPlugin(gestioDocumentalPluginMock);
 	}
 	
 	//	RegistrePlugin

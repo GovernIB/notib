@@ -59,8 +59,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private PersonaRepository personaRepository;
 	@Autowired
 	private DocumentRepository documentRepository;
-//	@Autowired
-//	private EntitatTipusDocRepository entitatTipusDocRepository;
 	@Autowired
 	private AplicacioRepository aplicacioRepository;
 	@Autowired
@@ -91,6 +89,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private AuditEnviamentHelper auditEnviamentHelper;
 	@Autowired
 	private OrganGestorCachable organGestorCachable;
+	@Autowired
+	private NotificacioHelper notificacioHelper;
 
 	private static final String COMUNICACIOAMBADMINISTRACIO = "comunicacioAmbAdministracio";
 	@Transactional
@@ -416,11 +416,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		default:
 			break;
 		}
-		if (notificacioGuardada.getNotificaErrorEvent() != null) {
-			logger.debug(">> [ALTA] Event d'error de Notifica!: " + notificacioGuardada.getNotificaErrorEvent().getDescripcio() + " - " + notificacioGuardada.getNotificaErrorEvent().getErrorDescripcio());
+		NotificacioEventEntity errorEvent = notificacioHelper.getNotificaErrorEvent(notificacioGuardada);
+		if (errorEvent != null) {
+			logger.debug(">> [ALTA] Event d'error de Notifica!: " + errorEvent.getDescripcio() + " - " + errorEvent.getErrorDescripcio());
 			resposta.setError(true);
 			resposta.setErrorDescripcio(
-					notificacioGuardada.getNotificaErrorEvent().getErrorDescripcio());
+					errorEvent.getErrorDescripcio());
 		}
 		resposta.setReferencies(referencies);
 		logger.debug(">> [ALTA] afegides referències");
@@ -860,9 +861,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						break;
 					}
 				}
-				if (notificacio.getNotificaErrorEvent() != null) {
+
+				NotificacioEventEntity errorEvent = notificacioHelper.getNotificaErrorEvent(notificacio);
+				if (errorEvent != null) {
 					resposta.setError(true);
-					NotificacioEventEntity errorEvent = notificacio.getNotificaErrorEvent();
 					resposta.setErrorData(errorEvent.getData());
 					resposta.setErrorDescripcio(errorEvent.getErrorDescripcio());
 	//				// Si l'error és de reintents de consulta o SIR, hem d'obtenir el missatge d'error de l'event que ha provocat la fallada
