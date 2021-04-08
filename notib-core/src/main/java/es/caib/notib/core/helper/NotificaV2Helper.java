@@ -7,7 +7,7 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.aspect.Audita;
-import es.caib.notib.core.aspect.UpdateNotificacioEnviamentTable;
+import es.caib.notib.core.aspect.UpdateEnviamentTable;
 import es.caib.notib.core.aspect.UpdateNotificacioTable;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -169,7 +169,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return notificacio;
 	}
 
-	@UpdateNotificacioEnviamentTable
+	@UpdateEnviamentTable
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
 		

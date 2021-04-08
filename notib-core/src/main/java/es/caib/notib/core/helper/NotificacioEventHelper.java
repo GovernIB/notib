@@ -156,7 +156,7 @@ public class NotificacioEventHelper {
             event.setEnviament(enviamentEntity);
             notificacioEventRepository.saveAndFlush(event);
 
-            auditEnviamentHelper.actualizaErrorNotifica(enviamentEntity, notificaError, event);
+            auditEnviamentHelper.updateErrorNotifica(enviamentEntity, notificaError, event);
         }
         updateNotificacio(notificacio, event);
         return event;
@@ -235,7 +235,7 @@ public class NotificacioEventHelper {
 
         logger.info(" >>> Canvi estat a REGISTRADA ");
         for(NotificacioEnviamentEntity enviamentEntity: enviaments) {
-            auditEnviamentHelper.actualitzaRegistreEnviament(
+            auditEnviamentHelper.updateRegistreEnviament(
                     notificacio,
                     enviamentEntity,
                     registreNum,
@@ -418,7 +418,7 @@ public class NotificacioEventHelper {
                         enviamentEntity.updateNotificaError(true, event);
                         break;
                     case NOTIFICA_ENVIAMENT:
-                        auditEnviamentHelper.actualizaErrorNotifica(enviamentEntity, notificaError, event);
+                        auditEnviamentHelper.updateErrorNotifica(enviamentEntity, notificaError, event);
                         break;
                     default:
                         break;

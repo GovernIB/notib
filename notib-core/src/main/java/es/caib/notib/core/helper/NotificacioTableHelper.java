@@ -5,7 +5,7 @@ import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.entity.NotificacioTableViewEntity;
+import es.caib.notib.core.entity.NotificacioTableEntity;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioTableViewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class NotificacioTableHelper {
     private NotificacioEventRepository notificacioEventRepository;
 
     public void crearRegistre(NotificacioEntity notificacio){
-        NotificacioTableViewEntity tableViewItem = NotificacioTableViewEntity.builder()
+        NotificacioTableEntity tableViewItem = NotificacioTableEntity.builder()
                 .notificacio(notificacio)
                 .entitat(notificacio.getEntitat())
                 .procedimentCodiNotib(notificacio.getProcedimentCodiNotib())
@@ -52,7 +52,7 @@ public class NotificacioTableHelper {
     }
 
     public void actualitzarRegistre(NotificacioEntity notificacio){
-        NotificacioTableViewEntity tableViewItem = notificacioTableViewRepository.findOne(notificacio.getId());
+        NotificacioTableEntity tableViewItem = notificacioTableViewRepository.findOne(notificacio.getId());
 
         tableViewItem.setEntitat(notificacio.getEntitat());
         tableViewItem.setProcedimentCodiNotib(notificacio.getProcedimentCodiNotib());

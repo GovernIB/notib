@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.notib.core.entity;
 
 import es.caib.notib.core.api.dto.*;
@@ -184,7 +181,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,
-			cascade = CascadeType.ALL,
+			cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH,
+					CascadeType.DETACH},
 			orphanRemoval = true)
 	protected Set<NotificacioEnviamentEntity> enviaments = new LinkedHashSet<NotificacioEnviamentEntity>();
 	

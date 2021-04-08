@@ -32,7 +32,7 @@ public class NotificacioTableAdvice {
 	}
 
 	@AfterReturning(
-			pointcut = "execution(* es.caib.notib.core.helper.AuditNotificacioHelper.update*(..)) && @annotation(UpdateNotificacioTable)",
+			pointcut = "execution(* es.caib.notib.core.helper.AuditNotificacioHelper.update*(..)) || @annotation(UpdateNotificacioTable)",
 			returning = "notificacio")
 	public void updateNotificacioTableView(NotificacioEntity notificacio) {
 		notificacioTableHelper.actualitzarRegistre(notificacio);

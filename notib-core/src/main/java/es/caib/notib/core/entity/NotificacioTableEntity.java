@@ -8,7 +8,6 @@ import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 import lombok.*;
-import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -30,7 +29,7 @@ import java.util.Set;
 @Entity
 @Table(name="NOT_NOTIFICACIO_TABLE")
 @EntityListeners(AuditingEntityListener.class)
-public class NotificacioTableViewEntity extends NotibAuditable<Long> {
+public class NotificacioTableEntity extends NotibAuditable<Long> {
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id")
@@ -43,7 +42,6 @@ public class NotificacioTableViewEntity extends NotibAuditable<Long> {
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "entitat_id")
-	@ForeignKey(name = "not_entitat_notificacio_fk")
 	private EntitatEntity entitat;
 
 	@Column(name = "proc_codi_notib", length = 9)
@@ -51,7 +49,6 @@ public class NotificacioTableViewEntity extends NotibAuditable<Long> {
 	/*Procediment*/
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "procediment_organ_id")
-	@ForeignKey(name = "not_procorgan_not_fk")
 	private ProcedimentOrganEntity procedimentOrgan;
 	@Column(name = "usuari_codi", length = 64, nullable = false)
 	private String usuariCodi;
@@ -109,9 +106,8 @@ public class NotificacioTableViewEntity extends NotibAuditable<Long> {
 	private String organCodi;
 	@Column(name = "ORGAN_NOM")
 	private String organNom;
-
-
-	boolean isErrorLastEvent;
+	@Column(name = "ERROR_LAST_EVENT")
+	private boolean isErrorLastEvent;
 
 	@Setter
 	@Transient

@@ -135,12 +135,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotificacioEntity notificacioEntity = notificacioHelper.saveNotificacio(notData);
 	
 			List<Enviament> enviaments = new ArrayList<Enviament>();
-			List<NotificacioEnviamentEntity> enviamentsEntity = new ArrayList<NotificacioEnviamentEntity>();
 			for(NotificacioEnviamentDtoV2 enviament: notificacio.getEnviaments()) {
 				if (enviament.getEntregaPostal() != null && (enviament.getEntregaPostal().getCodiPostal() == null || enviament.getEntregaPostal().getCodiPostal().isEmpty()))
 					enviament.getEntregaPostal().setCodiPostal(enviament.getEntregaPostal().getCodiPostalNorm());
 				enviaments.add(conversioTipusHelper.convertir(enviament, Enviament.class));
 			}
+			List<NotificacioEnviamentEntity> enviamentsCreats = new ArrayList<NotificacioEnviamentEntity>();
 			for (Enviament enviament: enviaments) {
 				if (enviament.getTitular() != null) {
 					ServeiTipusEnumDto serveiTipus = null;
@@ -220,7 +220,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						viaTipus = enviament.getEntregaPostal().getViaTipus();
 					}
 					// Rellenar dades enviament titular
-					enviamentsEntity.add(auditEnviamentHelper.desaEnviament(
+					enviamentsCreats.add(auditEnviamentHelper.desaEnviament(
 							entitat,
 							notificacioEntity,
 							enviament,
@@ -232,7 +232,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							viaTipus));
 				}
 			}
-			notificacioEntity.getEnviaments().addAll(enviamentsEntity);
+			notificacioEntity.getEnviaments().addAll(enviamentsCreats);
 
 			// Comprovar on s'ha d'enviar ara
 			if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
@@ -285,7 +285,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					PersonaEntity titular = enviament.getTitular();
 					if (HibernateHelper.isProxy(titular))
 						titular = HibernateHelper.deproxy(titular);
-					notificacioEnviamentRepository.delete(enviament.getId());
+					auditEnviamentHelper.deleteEnviament(enviament);
 					personaRepository.delete(titular);
 				}
 
@@ -321,10 +321,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotificacioEntity notificacioEntity = notificacioRepository.findOne(notificacio.getId());
 			NotificacioHelper.NotificacioData notData = notificacioHelper.buildNotificacioData(entitat, notificacio, !isAdministradorEntitat);
 
-//			### Actualitzar notificació existent
+			// Actualitzar notificació existent
 			auditNotificacioHelper.updateNotificacio(notificacioEntity, notData);
 				
-//			### Esbo
+			// Esbo
 			if (notificacioEntity.getDocument2() != null && notificacio.getDocument2() == null)
 				documentRepository.delete(notData.getDocument2Entity());
 			if (notificacioEntity.getDocument3() != null && notificacio.getDocument3() == null)
@@ -350,7 +350,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 				if (enviament.getId() != null) //En cas d'enviaments nous
 					enviamentsIds.add(enviament.getId());
 			}
-//			### Creació o edició enviament existent
+
+			// Creació o edició enviament existent
 			for (Enviament enviament: enviaments) {
 				ServeiTipusEnumDto serveiTipus = null;
 				if (enviament.getServeiTipus() != null) {
@@ -497,8 +498,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 				if (! enviamentsIds.contains(enviament.getId())) {
 					notificacioEntity.getEnviaments().remove(enviament);
-					notificacioEventRepository.deleteByEnviament(enviament);
-					notificacioEnviamentRepository.delete(enviament);
+					auditEnviamentHelper.deleteEnviament(enviament);
 				}
 
 //				### Destinataris esborrats
@@ -599,7 +599,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					isUsuariEntitat,
 					false);
 
-			Page<NotificacioTableViewEntity> notificacions = null;
+			Page<NotificacioTableEntity> notificacions = null;
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			mapeigPropietatsOrdenacio.put("procediment.organGestor", new String[] {"pro.organGestor.codi"});
 			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {(isUsuari ? "organ.codi" : "organGestor.codi")});
@@ -859,7 +859,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private PaginaDto<NotificacioTableItemDto> complementaNotificacions(
 			EntitatEntity entitatEntity,
 			String usuariCodi,
-			Page<NotificacioTableViewEntity> notificacions) {
+			Page<NotificacioTableEntity> notificacions) {
 
 		if (notificacions == null) {
 			return paginacioHelper.getPaginaDtoBuida(NotificacioTableItemDto.class);
@@ -879,7 +879,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 		}
 
-		for (NotificacioTableViewEntity notificacio : notificacions) {
+		for (NotificacioTableEntity notificacio : notificacions) {
 			if (notificacio.getProcedimentCodi() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
 				notificacio.setPermisProcessar(codisProcedimentsProcessables.contains(notificacio.getProcedimentCodi()));
 			}
@@ -1406,7 +1406,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					notificacioId);
 	//			List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacio);
 			for(NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
-				auditEnviamentHelper.reiniciaConsultaNotifica(enviament);
+				auditEnviamentHelper.resetConsultaNotifica(enviament);
 			}
 			notificacioTableHelper.actualitzarRegistre(notificacio);
 			notificacioRepository.saveAndFlush(notificacio);
@@ -1430,7 +1430,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					null,
 					notificacioId);
 			for(NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
-				auditEnviamentHelper.reiniciaConsultaSir(enviament);
+				auditEnviamentHelper.resetConsultaSir(enviament);
 			}
 			notificacioTableHelper.actualitzarRegistre(notificacio);
 			notificacioRepository.saveAndFlush(notificacio);

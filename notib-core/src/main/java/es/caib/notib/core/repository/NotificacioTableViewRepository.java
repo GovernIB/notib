@@ -5,7 +5,7 @@ import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.NotificacioTableViewEntity;
+import es.caib.notib.core.entity.NotificacioTableEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,14 +21,14 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface NotificacioTableViewRepository extends JpaRepository<NotificacioTableViewEntity, Long> {
+public interface NotificacioTableViewRepository extends JpaRepository<NotificacioTableEntity, Long> {
 
 	/**
 	 * Consulta de la taula de remeses sense filtres per al rol usuari
 	 */
 	@Query( "select ntf " +
 			"from " +
-			"    NotificacioTableViewEntity ntf " +
+			"    NotificacioTableEntity ntf " +
 			"where " +
 			"   (" +
 			"		(:esProcedimentsCodisNotibNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " +	// Té permís sobre el procediment
@@ -38,7 +38,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"	) " +
 			"and (ntf.grupCodi = null or (ntf.grupCodi in (:grupsProcedimentCodisNotib))) " +
 			"and (ntf.entitat = :entitat) " )
-	Page<NotificacioTableViewEntity> findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
+	Page<NotificacioTableEntity> findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
 			@Param("esProcedimentsCodisNotibNull") boolean esProcedimentsCodisNotibNull,
 			@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
 			@Param("grupsProcedimentCodisNotib") List<? extends String> grupsProcedimentCodisNotib,
@@ -56,7 +56,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 	 */
 	@Query( "select ntf " +
 			"from " +
-			"    NotificacioTableViewEntity ntf " +
+			"    NotificacioTableEntity ntf " +
 			"where " +
 			"   (" +
 			"	(:esProcedimentsCodisNotibNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib))" +
@@ -64,7 +64,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"   or (ntf.organCodi is not null and ntf.organCodi in (:organs))" +
 			"	) " +
 			"and (ntf.entitat = :entitat) ")
-    Page<NotificacioTableViewEntity> findByProcedimentCodiNotibAndEntitat(
+    Page<NotificacioTableEntity> findByProcedimentCodiNotibAndEntitat(
 			@Param("esProcedimentsCodisNotibNull") boolean esProcedimentsCodisNotibNull,
 			@Param("procedimentsCodisNotib") List<? extends String> procedimentsCodisNotib,
 			@Param("entitat") EntitatEntity entitat,
@@ -77,9 +77,9 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 	 */
 	@Query( "select ntf " +
 			"from " +
-			"    NotificacioTableViewEntity ntf " +
+			"    NotificacioTableEntity ntf " +
 			"where ntf.entitat = (:entitatActual)")
-	Page<NotificacioTableViewEntity> findByEntitatActual(
+	Page<NotificacioTableEntity> findByEntitatActual(
 			@Param("entitatActual") EntitatEntity entitatActiva,
 			Pageable paginacio);
 
@@ -89,9 +89,9 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 	 */
 	@Query(
 			"from " +
-			"    NotificacioTableViewEntity ntf " +
+			"    NotificacioTableEntity ntf " +
 			"where ntf.entitat in (:entitatActiva)")
-	Page<NotificacioTableViewEntity> findByEntitatActiva(
+	Page<NotificacioTableEntity> findByEntitatActiva(
 			@Param("entitatActiva") List<EntitatEntity> entitatActiva,
 			Pageable paginacio);
 
@@ -101,7 +101,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 	 */
 	@Query(	"select ntf " +
 			"from " +
-			"     NotificacioTableViewEntity ntf " +
+			"     NotificacioTableEntity ntf " +
 			"where " +
 			"	 (:entitat = ntf.entitat) " +
 			"and (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
@@ -143,7 +143,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"				where lower(env.notificaIdentificador) like concat('%', lower(:identificador), '%')))) " +
 			"and (:nomesSenseErrors = false or ntf.notificaErrorData is null) " +
 			"and (:nomesAmbErrors = false or ntf.notificaErrorData is not null)")
-	Page<NotificacioTableViewEntity> findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
+	Page<NotificacioTableEntity> findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
@@ -191,7 +191,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 	 */
 	@Query(	"select ntf " +
 			"from " +
-			"     NotificacioTableViewEntity ntf " +
+			"     NotificacioTableEntity ntf " +
 			"where " +
 			"    (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
@@ -225,7 +225,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"				where lower(env.notificaIdentificador) like concat('%', lower(:identificador), '%'))))" +
 			"and (:nomesSenseErrors = false or ntf.notificaErrorData is null) " +
 			"and (:nomesAmbErrors = false or ntf.notificaErrorData is not null)")
-	Page<NotificacioTableViewEntity> findAmbFiltre(
+	Page<NotificacioTableEntity> findAmbFiltre(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
 			@Param("isEnviamentTipusNull") boolean isEnviamentTipusNull,
@@ -265,7 +265,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 	 */
 	@Query(	"select ntf " +
 			"from " +
-			"     NotificacioTableViewEntity ntf " +
+			"     NotificacioTableEntity ntf " +
 			"where " +
 			"     (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
 			"and (:entitat = ntf.entitat) " +
@@ -302,7 +302,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"		(ntf.id in (select env.notificacio.id"
 			+ "				from NotificacioEnviamentEntity env"
 			+ "				where env.notificaIdentificador = :identificador)))")
-	Page<NotificacioTableViewEntity> findAmbFiltreAndProcedimentCodiNotib(
+	Page<NotificacioTableEntity> findAmbFiltreAndProcedimentCodiNotib(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
