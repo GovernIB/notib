@@ -106,9 +106,10 @@ public class PermisosCacheable {
             List<Long> organGestorsIds = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class,
                     permisos);
             // Consulta totes les entitats dels organs gestors amb permisos
-            List<EntitatEntity> entitats = entitatRepository.findByOrganGestorsIds(organGestorsIds);
+            List<Long> entitats = entitatRepository.findByOrganGestorsIds(organGestorsIds);
+
             List<EntitatDto> resposta = conversioTipusHelper.convertirList(
-                    entitats,
+                    entitatRepository.findByIds(entitats),
                     EntitatDto.class);
 
             for(EntitatDto dto : resposta) {

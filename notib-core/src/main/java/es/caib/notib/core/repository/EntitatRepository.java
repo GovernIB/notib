@@ -26,23 +26,29 @@ public interface EntitatRepository extends JpaRepository<EntitatEntity, Long> {
 
 	List<EntitatEntity> findByActiva(boolean activa);
 
+	@Query(	" select " +
+			"	distinct e " +
+			" from " +
+			"     EntitatEntity e " +
+			" where " +
+			"     e.id in (:ids) ")
+	List<EntitatEntity> findByIds(@Param("ids") List<Long> ids);
+
 	@Query(	"from " +
 			"     EntitatEntity eu " +
 			"where " +
 			"    lower(eu.codi) like concat('%', lower(:filtre), '%') " +
 			" or lower(eu.nom) like concat('%', lower(:filtre), '%') " +
 			" or lower(eu.dir3Codi) like concat('%', lower(:filtre), '%') ")
-	public Page<EntitatEntity> findByFiltre(
-			@Param("filtre") String filtre,
-			Pageable paginacio);
+	Page<EntitatEntity> findByFiltre(@Param("filtre") String filtre, Pageable paginacio);
 
 	@Query(	" select " +
-			"	distinct og.entitat " +
+			"	distinct og.entitat.id " +
 			" from " +
 			"     OrganGestorEntity og " +
 			" where " +
 			"     og.id in (:organGestorsIds)")
-	List<EntitatEntity> findByOrganGestorsIds( @Param("organGestorsIds") List<Long> organGestorsIds);
+	List<Long> findByOrganGestorsIds( @Param("organGestorsIds") List<Long> organGestorsIds);
 
 
 	@Query(	" select " +
