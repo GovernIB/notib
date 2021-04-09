@@ -3,21 +3,13 @@
  */
 package es.caib.notib.core.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-import javax.persistence.Version;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 import lombok.Getter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
 
 /**
  * Classe del model de dades que representa una entitat.
@@ -56,9 +48,11 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	private String descripcio;
 	@Column(name = "activa", nullable = false)
 	private boolean activa;
-	@Column(name = "logo_cap", length = 1024)
+	@Lob
+	@Column(name = "logo_cap")
 	private byte[] logoCapBytes;
-	@Column(name = "logo_peu", length = 1024)
+	@Lob
+	@Column(name = "logo_peu")
 	private byte[] logoPeuBytes;
 	@Column(name = "color_fons", length = 1024)
 	private String colorFons;
