@@ -1,19 +1,12 @@
 package es.caib.notib.core.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
+import lombok.Getter;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.NaturalId;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import lombok.Getter;
+import javax.persistence.*;
 
 /**
  * Classe de model de dades que conté la informació dels òrgans gestors.
@@ -33,7 +26,7 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 	@Column(name = "nom", length = 1000)
 	protected String nom;
 	
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "entitat")
 	@ForeignKey(name = "not_organ_entitat_fk")
 	protected EntitatEntity entitat;

@@ -190,6 +190,7 @@ public class NotificacioEventHelper {
                     event);
         }
         updateNotificacio(notificacio, event);
+        notificacioEventRepository.saveAndFlush(event);
     }
     /**
      * Registre un event a la notificació per a cada enviament realitzat correctament indicant que
@@ -215,6 +216,7 @@ public class NotificacioEventHelper {
                     enviament);
         }
         updateNotificacio(notificacio, event);
+        notificacioEventRepository.saveAndFlush(event);
     }
 
     /**
@@ -371,6 +373,7 @@ public class NotificacioEventHelper {
             }
         }
         updateNotificacio(notificacio, event);
+        notificacioEventRepository.saveAndFlush(event);
         return event;
     }
     private void updateNotificacio(NotificacioEntity notificacio, NotificacioEventEntity eventCreat) {
