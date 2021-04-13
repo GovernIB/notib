@@ -253,7 +253,7 @@
 						});
 						$cell.empty().append('<span class="fa fa-square-o"></span>');
 					}
-					if (plugin.settings.individualFilter) {
+					if (plugin.settings.individualFilter && !$("#btnFiltrar").length) {
 						var $rowFilter = headerTrFilterFunction();
 						var $formFilter = getFilterForm();
 						var $buttonFilter;
