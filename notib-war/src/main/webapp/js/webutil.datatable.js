@@ -18,6 +18,7 @@
 			scrollMaxHeight: 200,
 			scrollMinHeight: 100,
 			rowInfo: false,
+			individualFilter: false,
 			campsAddicionals: false,
 			ordering: true,
 			defaultDir: 'asc',
@@ -104,8 +105,6 @@
 						}
 						delete data.search.regex;
 						// Reduir crida - FI
-
-
 						for (var key in plugin.serverParams) {
 							data[key] = plugin.serverParams[key];
 						}
@@ -253,6 +252,27 @@
 							return false;
 						});
 						$cell.empty().append('<span class="fa fa-square-o"></span>');
+					}
+					if (plugin.settings.individualFilter) {
+						var $rowFilter = headerTrFilterFunction();
+						var $formFilter = getFilterForm();
+						var $buttonFilter;
+
+						var $cellFilter = $('th:first', $rowFilter);
+
+						if($($cellFilter).children().get(0) != null){
+							$cellFilter = $('th:last', $rowFilter);
+						}
+						$cellFilter.append($(plugin.settings.cellTemplate).html());
+						$("#btnFiltrar").on('click', function(index, object) {
+							$rowFilter.each(function(index) {
+								$(this).each(function(index) {
+									$(this).children().each(function(){
+										$formFilter.append($(this).find("div"));
+									});
+								});
+							});
+						});
 					}
 					if (plugin.settings.pagingStyle == 'scroll') {
 						recalcularDimensions();
@@ -644,6 +664,22 @@
 					});
 				}
 			}
+
+			//Configuració filtre individual columnes
+			if (plugin.settings.individualFilter) {
+				$('thead tr ', $taula).clone(true).off().appendTo('thead');
+				$('thead tr:eq(1) th').each( function (i) {
+					var title = $(this).text();
+					var html = $(this).children().html();
+
+					$(this).html($(html));
+					$(this).find(".inputDate").attr("placeholder", title)
+
+				});
+
+				dataTableOptions['bSortCellsTop'] = true;
+			}
+
 			// Creació del datatable
 			$taula.dataTable(dataTableOptions);
 		}
@@ -673,6 +709,17 @@
 		var headerTrFunction = function() {
 			return $('thead:first tr', $taula.closest('.dataTables_wrapper'));
 		}
+		// (Filtre individual)
+		var headerTrFilterFunction = function() {
+			return $('thead:first tr:nth-child(2)', $taula.closest('.dataTables_wrapper'));
+		}
+		var getFilterForm = function() {
+			return $('#enviamentFiltreForm');
+		}
+		var getButtonFiltrer = function() {
+			return $('#btnFiltrar');
+		}
+
 		var getBaseUrl = function() {
 			var baseUrl = plugin.settings.url;
 			if (/datatable$/.test(baseUrl) || /datatable\/$/.test(baseUrl)) {
