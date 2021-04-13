@@ -909,6 +909,22 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		return true;
 	}
 
+	public boolean isPendentRefrescarEstatNotifica(){
+		if (!notificaEstatFinal)
+			return !Arrays.asList(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT,
+					NotificacioEnviamentEstatEnumDto.REGISTRADA,
+					NotificacioEnviamentEstatEnumDto.FINALITZADA,
+					NotificacioEnviamentEstatEnumDto.PROCESSADA).contains(notificaEstat);
+		else {
+			return notificaEstat.equals(NotificacioEnviamentEstatEnumDto.EXPIRADA) && notificaCertificacioData == null;
+		}
+	}
+	public boolean isPendentRefrescarEstatRegistre(){
+		return !notificaEstatFinal && notificaEstat.equals(NotificacioEnviamentEstatEnumDto.ENVIAT_SIR)
+					&& !Arrays.asList(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT,
+							NotificacioRegistreEstatEnumDto.REBUTJAT).contains(registreEstat);
+	}
+
 	@PreRemove
 	private void preRemove() {
 		this.notificacioErrorEvent = null;

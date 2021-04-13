@@ -190,8 +190,7 @@ public interface EnviamentService {
 	 * @return document justificant descarregat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_CARPETA')")
-	public byte[] getDocumentJustificant(
-			Long enviamentId);
+	byte[] getDocumentJustificant(Long enviamentId);
 
 	/**
 	 * Reactiva les consultes d'estat a Notific@
@@ -200,7 +199,7 @@ public interface EnviamentService {
 	 *            Llistat de atributs id dels enviaments
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public void reactivaConsultes(Set<Long> enviaments);
+	void reactivaConsultes(Set<Long> enviaments);
 	
 	/**
 	 * Reactiva les consultes d'estat a SIR
@@ -209,15 +208,23 @@ public interface EnviamentService {
 	 *            Llistat de atributs id dels enviaments
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public void reactivaSir(Set<Long> enviaments);
+	void reactivaSir(Set<Long> enviaments);
 	
 	@PreAuthorize("hasRole('NOT_CARPETA') or hasRole('NOT_SUPER')")
-	public Resposta findEnviamentsByNif(
+	Resposta findEnviamentsByNif(
 			String dniTitular,
 			NotificaEnviamentTipusEnumDto tipus,
 			Boolean estatFinal,
 			String basePath, 
 			Integer pagina, 
 			Integer mida);
-	
+
+	/**
+	 * Actualitza l'estat de l'enviament indicat i reinicia el comptador de reintents.
+	 *
+	 * @param enviamentId
+	 *            id de l'enviament.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	void actualitzarEstat(Long enviamentId);
 }
