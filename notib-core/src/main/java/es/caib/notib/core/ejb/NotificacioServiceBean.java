@@ -4,6 +4,8 @@
 package es.caib.notib.core.ejb;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -107,37 +109,19 @@ public class NotificacioServiceBean implements NotificacioService {
 				enviamentId);
 	}
 
-//	@Override
-//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-//	public void notificaEnviamentsRegistrats() {
-//		delegate.notificaEnviamentsRegistrats();
-//	}
-//	
-//	@Override
-//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-//	public void enviamentRefrescarEstatPendents() {
-//		delegate.enviamentRefrescarEstatPendents();
-//	}
-//
-//	@Override
-//	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-//	public void registrarEnviamentsPendents() {
-//		delegate.registrarEnviamentsPendents();
-//	}
-
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public NotificacioDtoV2 create(
-			Long entitatId, 
-			NotificacioDtoV2 notificacio) throws RegistreNotificaException {
+	public NotificacioDatabaseDto create(
+			Long entitatId,
+			NotificacioDatabaseDto notificacio) throws RegistreNotificaException {
 		return delegate.create(entitatId, notificacio);
 	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public List<NotificacioDto> update(
+	public NotificacioDatabaseDto update(
 			Long entitatId,
-			NotificacioDtoV2 notificacio,
+			NotificacioDatabaseDto notificacio,
 			boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
 		return delegate.update(
 				entitatId, 

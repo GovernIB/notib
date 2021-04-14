@@ -422,11 +422,17 @@ public interface ProcedimentService {
 			String organCodi,
 			RolEnumDto rol);
 
+	/**
+	 * Actualitza els procediments de la entitat indicada amb la informació dels procediments actual
+	 * retornada pel plugin Gestor Documental Administratiu (GDA)
+	 *
+	 * @param entitat
+	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public void actualitzaProcediments(EntitatDto entitat);
+	void actualitzaProcediments(EntitatDto entitat);
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi);
+	ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi);
 
 	/**
 	 * Consulta si existeix un procés en curs actualitzant els procediments de l'entitat indicada.

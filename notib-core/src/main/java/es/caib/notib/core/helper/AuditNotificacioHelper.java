@@ -1,6 +1,5 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
@@ -33,84 +32,63 @@ public class AuditNotificacioHelper {
 	private NotificacioEventHelper notificacioEventHelper;
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.CREATE)
-	public NotificacioEntity desaNotificacio(
-			NotificacioDtoV2 notificacio, 
-			EntitatEntity entitat,
-			GrupEntity grupNotificacio, 
-			OrganGestorEntity organGestor, 
-			ProcedimentEntity procediment,
-			DocumentEntity documentEntity,
-			DocumentEntity document2Entity,
-			DocumentEntity document3Entity,
-			DocumentEntity document4Entity,
-			DocumentEntity document5Entity,
-			ProcedimentOrganEntity procedimentOrgan) {
+	public NotificacioEntity desaNotificacio(NotificacioHelper.NotificacioData data) {
 		return notificacioRepository.saveAndFlush(NotificacioEntity.
 				getBuilderV2(
-						entitat,
-						notificacio.getEmisorDir3Codi(),
-						organGestor,
+						data.getEntitat(),
+						data.getNotificacio().getEmisorDir3Codi(),
+						data.getOrganGestor(),
 						pluginHelper.getNotibTipusComunicacioDefecte(),
-						notificacio.getEnviamentTipus(), 
-						notificacio.getConcepte(),
-						notificacio.getDescripcio(),
-						notificacio.getEnviamentDataProgramada(),
-						notificacio.getRetard(),
-						notificacio.getCaducitat(),
-						notificacio.getUsuariCodi(),
-						procediment != null ? procediment.getCodi() : null,
-						procediment,
-						grupNotificacio != null ? grupNotificacio.getCodi() : null,
-						notificacio.getNumExpedient(),
+						data.getNotificacio().getEnviamentTipus(),
+						data.getNotificacio().getConcepte(),
+						data.getNotificacio().getDescripcio(),
+						data.getNotificacio().getEnviamentDataProgramada(),
+						data.getNotificacio().getRetard(),
+						data.getNotificacio().getCaducitat(),
+						data.getNotificacio().getUsuariCodi(),
+						data.getProcediment() != null ? data.getProcediment().getCodi() : null,
+						data.getProcediment(),
+						data.getGrupNotificacio() != null ? data.getGrupNotificacio().getCodi() : null,
+						data.getNotificacio().getNumExpedient(),
 						TipusUsuariEnumDto.INTERFICIE_WEB,
-						procedimentOrgan,
-						notificacio.getIdioma())
-				.document(documentEntity)
-				.document2(document2Entity)
-				.document3(document3Entity)
-				.document4(document4Entity)
-				.document5(document5Entity)
+						data.getProcedimentOrgan(),
+						data.getNotificacio().getIdioma())
+				.document(data.getDocumentEntity())
+				.document2(data.getDocument2Entity())
+				.document3(data.getDocument3Entity())
+				.document4(data.getDocument4Entity())
+				.document5(data.getDocument5Entity())
 				.build());
 	}
 	
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacio(
-			NotificacioDtoV2 notificacio, 
-			EntitatEntity entitat,
-			NotificacioEntity notificacioEntity, 
-			GrupEntity grupNotificacio, 
-			OrganGestorEntity organGestor,
-			ProcedimentEntity procediment, 
-			DocumentEntity documentEntity,
-			DocumentEntity document2Entity,
-			DocumentEntity document3Entity,
-			DocumentEntity document4Entity,
-			DocumentEntity document5Entity,
-			ProcedimentOrganEntity procedimentOrgan) {
+			NotificacioEntity notificacioEntity,
+			NotificacioHelper.NotificacioData data) {
 		notificacioEntity.update(
-				entitat,
-				notificacio.getEmisorDir3Codi(),
-				organGestor,
+				data.getEntitat(),
+				data.getNotificacio().getEmisorDir3Codi(),
+				data.getOrganGestor(),
 				pluginHelper.getNotibTipusComunicacioDefecte(),
-				notificacio.getEnviamentTipus(), 
-				notificacio.getConcepte(),
-				notificacio.getDescripcio(),
-				notificacio.getEnviamentDataProgramada(),
-				notificacio.getRetard(),
-				notificacio.getCaducitat(),
-				notificacio.getUsuariCodi(),
-				procediment != null ? procediment.getCodi() : null,
-				procediment,
-				grupNotificacio != null ? grupNotificacio.getCodi() : null,
-				notificacio.getNumExpedient(),
+				data.getNotificacio().getEnviamentTipus(),
+				data.getNotificacio().getConcepte(),
+				data.getNotificacio().getDescripcio(),
+				data.getNotificacio().getEnviamentDataProgramada(),
+				data.getNotificacio().getRetard(),
+				data.getNotificacio().getCaducitat(),
+				data.getNotificacio().getUsuariCodi(),
+				data.getProcediment() != null ? data.getProcediment().getCodi() : null,
+				data.getProcediment(),
+				data.getGrupNotificacio() != null ? data.getGrupNotificacio().getCodi() : null,
+				data.getNotificacio().getNumExpedient(),
 				TipusUsuariEnumDto.INTERFICIE_WEB,
-				documentEntity,
-				document2Entity,
-				document3Entity,
-				document4Entity,
-				document5Entity,
-				procedimentOrgan,
-				notificacio.getIdioma());
+				data.getDocumentEntity(),
+				data.getDocument2Entity(),
+				data.getDocument3Entity(),
+				data.getDocument4Entity(),
+				data.getDocument5Entity(),
+				data.getProcedimentOrgan(),
+				data.getNotificacio().getIdioma());
 		return notificacioEntity;
 	}
 	

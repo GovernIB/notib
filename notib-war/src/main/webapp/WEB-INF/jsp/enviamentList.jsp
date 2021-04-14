@@ -105,6 +105,13 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 	top: 240px;
 	z-index: 100;
 }
+div.dataTables_wrapper {
+	overflow-x: auto;
+}
+#btnFiltrar {
+	padding: 2px 6px;
+	margin: 8px;
+}
 </style>
 <script>
 
@@ -507,7 +514,7 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="titular.nif" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.niftitular"/>
+				<th data-col-name="titularNif" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.niftitular"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="nifTitular" value="${filtreEnviaments.nifTitular}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.niftitular"/>"/>
@@ -537,7 +544,7 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="titular.email" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.emailtitular"/>
+				<th data-col-name="titularEmail" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.emailtitular"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="emailTitular" value="${filtreEnviaments.emailTitular}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.emailtitular"/>"/>
@@ -552,7 +559,7 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="destinatarisNomLlinatges" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.destinataris"/>
+				<th data-col-name="destinatarisNomLlinatges" data-orderable="false" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.destinataris"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="destinataris" value="${filtreEnviaments.destinataris}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.destinataris"/>"/>

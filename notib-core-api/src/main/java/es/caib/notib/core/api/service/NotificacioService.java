@@ -4,6 +4,8 @@
 package es.caib.notib.core.api.service;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -30,9 +32,9 @@ public interface NotificacioService {
 	 * @throws RegistreNotificaException 
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
-	public NotificacioDtoV2 create(
+	NotificacioDatabaseDto create(
 			Long entitatId,
-			NotificacioDtoV2 notificacio) throws RegistreNotificaException;
+			NotificacioDatabaseDto notificacio) throws RegistreNotificaException;
 	
 	/**
 	 * Esborra la notificació indicada per paràmetre
@@ -60,16 +62,16 @@ public interface NotificacioService {
 	 * @param notificacio
 	 *            Informació de la notificació a modificar
 	 *            
-	 * @return La llista de notificacions actualitzada
+	 * @return La notificacio amb les dades actualitzades
 	 * @throws NotFoundException
 	 *              Si no s'ha trobat l'objecte amb l'id especificat.
 	 * @throws RegistreNotificaException
 	 * 				Si hi ha hagut un error en el procés de registra/notificar
 	 */
 	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
-	public List<NotificacioDto> update(
+	NotificacioDatabaseDto update(
 			Long entitatId,
-			NotificacioDtoV2 notificacio,
+			NotificacioDatabaseDto notificacio,
 			boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException;
 	
 	/**

@@ -1,10 +1,7 @@
-
-/**
- *
- */
 package es.caib.notib.war.controller;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.exception.NoPermisosException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
@@ -324,28 +321,12 @@ public class NotificacioController extends BaseUserController {
             if (notificacioCommand.getId() != null) {
                 notificacioService.update(
                         entitatActual.getId(),
-                        NotificacioCommandV2.asDto(notificacioCommand),
+                        notificacioCommand.asDatabaseDto(),
                         RolHelper.isUsuariActualAdministradorEntitat(request));
             } else {
                 notificacioService.create(
                         entitatActual.getId(),
-                        NotificacioCommandV2.asDto(notificacioCommand));
-
-//                model.addAttribute("notificacioEstats",
-//                        EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
-//                                "es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
-//                model.addAttribute("tipusUsuari",
-//                        EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
-//                                "es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
-//                model.addAttribute("notificacioEnviamentEstats",
-//                        EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
-//                                "es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
-//                model.addAttribute("notificacioComunicacioTipus",
-//                        EnumHelper.getOptionsForEnum(NotificacioComunicacioTipusEnumDto.class,
-//                                "es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto."));
-//                model.addAttribute("notificacioEnviamentTipus",
-//                        EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class,
-//                                "es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
+                        notificacioCommand.asDatabaseDto());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
