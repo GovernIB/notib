@@ -226,28 +226,14 @@ public class NotificacioEnviamentAudit extends NotibAuditoria<Long> {
 			switch (notificacioEnviamentEntity.getDomiciliConcretTipus()) {
 			case ESTRANGER:
 				domicili = notificacioEnviamentEntity.getDomiciliPaisCodiIso() + "-";
-				domiciliPoblacio = notificacioEnviamentEntity.getDomiciliPoblacio();
-				if (domiciliPoblacio != null) {
-					if (domiciliPoblacio.length() > 30) {
-						domicili += " (" + notificacioEnviamentEntity.getDomiciliPoblacio().substring(0, 30) + ") - ";
-					} else {
-						domicili += " (" + notificacioEnviamentEntity.getDomiciliPoblacio() + ") - ";
-					}
-				}
+				domicili += getDomiciliPoblacio(notificacioEnviamentEntity.getDomiciliPoblacio());
 				domicili += getAdressa(notificacioEnviamentEntity);
 				break;
 			case NACIONAL:
 				domicili = notificacioEnviamentEntity.getDomiciliProvinciaCodi() + "-";
 				domicili += notificacioEnviamentEntity.getDomiciliMunicipiCodiIne() + "-";
 				domicili += notificacioEnviamentEntity.getDomiciliCodiPostal() + "-";
-				domiciliPoblacio = notificacioEnviamentEntity.getDomiciliPoblacio();
-				if (domiciliPoblacio != null) {
-					if (domiciliPoblacio.length() > 30) {
-						domicili += " (" + notificacioEnviamentEntity.getDomiciliPoblacio().substring(0, 30) + ") - ";
-					} else {
-						domicili += " (" + notificacioEnviamentEntity.getDomiciliPoblacio() + ") - ";
-					}
-				}
+				domicili += getDomiciliPoblacio(notificacioEnviamentEntity.getDomiciliPoblacio());
 
 				domicili += getAdressa(notificacioEnviamentEntity);
 				break;
@@ -256,14 +242,7 @@ public class NotificacioEnviamentAudit extends NotibAuditoria<Long> {
 				domicili += notificacioEnviamentEntity.getDomiciliMunicipiCodiIne() + "-";
 				domicili += notificacioEnviamentEntity.getDomiciliCodiPostal() + "-";
 				domicili += notificacioEnviamentEntity.getDomiciliApartatCorreus();
-				domiciliPoblacio = notificacioEnviamentEntity.getDomiciliPoblacio();
-				if (domiciliPoblacio != null) {
-					if (domiciliPoblacio.length() > 30) {
-						domicili += " (" + notificacioEnviamentEntity.getDomiciliPoblacio().substring(0, 30) + ") - ";
-					} else {
-						domicili += " (" + notificacioEnviamentEntity.getDomiciliPoblacio() + ") - ";
-					}
-				}
+				domicili += getDomiciliPoblacio(notificacioEnviamentEntity.getDomiciliPoblacio());
 				break;
 			case SENSE_NORMALITZAR:
 				domicili = notificacioEnviamentEntity.getDomiciliLinea1() + " " + notificacioEnviamentEntity.getDomiciliLinea2();
@@ -272,6 +251,17 @@ public class NotificacioEnviamentAudit extends NotibAuditoria<Long> {
 				return null;
 			}
 			return ellipsis(domicili, 500);
+		}
+		private String getDomiciliPoblacio(String domiciliPoblacio) {
+			String domiciliPoblacioCurt = "";
+			if (domiciliPoblacio != null) {
+				if (domiciliPoblacio.length() > 30) {
+					domiciliPoblacioCurt = " (" + domiciliPoblacio.substring(0, 30) + ") - ";
+				} else {
+					domiciliPoblacioCurt += " (" + domiciliPoblacio + ") - ";
+				}
+			}
+			return domiciliPoblacioCurt;
 		}
 		private String getAdressa(NotificacioEnviamentEntity notificacioEnviamentEntity) {
 			String adressa = "";
@@ -307,6 +297,8 @@ public class NotificacioEnviamentAudit extends NotibAuditoria<Long> {
 		    return text;
 		}
 	}
+
+
 
 	private static final long serialVersionUID = 6993171107561077019L;
 }
