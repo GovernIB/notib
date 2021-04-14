@@ -121,14 +121,15 @@ public class AuditEnviamentHelper {
 				toEnviamentViaTipusEnum(viaTipus));
 		return enviamentEntity;
 	}
-	
+
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
-	public void reiniciaConsultaNotifica(NotificacioEnviamentEntity enviament) {
+	public NotificacioEnviamentEntity resetConsultaNotifica(NotificacioEnviamentEntity enviament) {
 		enviament.refreshNotificaConsulta();
+		return enviament;
 	}
 	
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
-	public NotificacioEnviamentEntity reiniciaConsultaSir(NotificacioEnviamentEntity enviament) {
+	public NotificacioEnviamentEntity resetConsultaSir(NotificacioEnviamentEntity enviament) {
 		enviament.refreshSirConsulta();
 		return enviament;
 	}
@@ -151,7 +152,7 @@ public class AuditEnviamentHelper {
 	}
 	
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
-	public NotificacioEnviamentEntity actualizaErrorNotifica(
+	public NotificacioEnviamentEntity updateErrorNotifica(
 			NotificacioEnviamentEntity enviament, 
 			boolean notificaError, 
 			NotificacioEventEntity event) {
@@ -162,7 +163,7 @@ public class AuditEnviamentHelper {
 	}
 	
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
-	public NotificacioEnviamentEntity actualitzaRegistreEnviament(
+	public NotificacioEnviamentEntity updateRegistreEnviament(
 			NotificacioEntity notificacioEntity,
 			NotificacioEnviamentEntity enviament,
 			String registreNum,
@@ -192,5 +193,12 @@ public class AuditEnviamentHelper {
 		}
 		return NotificaDomiciliViaTipusEnumDto.valueOf(viaTipus.name());
 	}
-	
+
+	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.DELETE)
+	public NotificacioEnviamentEntity deleteEnviament(NotificacioEnviamentEntity enviament) {
+		notificacioEventRepository.deleteByEnviament(enviament);
+		notificacioEnviamentRepository.delete(enviament);
+		notificacioEnviamentRepository.flush();
+		return enviament;
+	}
 }

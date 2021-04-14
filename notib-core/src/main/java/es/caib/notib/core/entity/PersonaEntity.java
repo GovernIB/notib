@@ -1,6 +1,7 @@
 package es.caib.notib.core.entity;
 
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.audit.NotibAuditable;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -230,6 +231,21 @@ public class PersonaEntity extends NotibAuditable<Long> {
 			return built;
 		}
 	}
-	
+
+	public PersonaDto asDto(){
+		return PersonaDto.builder()
+				.id(getId())
+				.incapacitat(incapacitat)
+				.interessatTipus(interessatTipus)
+				.nom(nom)
+				.llinatge1(llinatge1)
+				.llinatge2(llinatge2)
+				.raoSocial(raoSocial)
+				.nif(nif)
+				.telefon(telefon)
+				.email(email)
+				.dir3Codi(dir3Codi)
+				.build();
+	}
 	private static final long serialVersionUID = 4569697366006085907L;
 }

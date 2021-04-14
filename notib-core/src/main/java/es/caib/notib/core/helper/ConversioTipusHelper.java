@@ -4,6 +4,7 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
@@ -47,14 +48,14 @@ public class ConversioTipusHelper {
 			byDefault().
 			register();
 		
-		mapperFactory.classMap(NotificacioEntity.class, NotificacioDto.class).
-			field("notificaErrorEvent.data", "notificaErrorData").
-			field("notificaErrorEvent.errorDescripcio", "notificaErrorDescripcio").
-			field("organGestor.codi", "organGestor").
-			field("organGestor.nom", "organGestorNom").
-			exclude("destinataris").
-			byDefault().
-			register();
+//		mapperFactory.classMap(NotificacioEntity.class, NotificacioDto.class).
+//			field("notificaErrorEvent.data", "notificaErrorData").
+//			field("notificaErrorEvent.errorDescripcio", "notificaErrorDescripcio").
+//			field("organGestor.codi", "organGestor").
+//			field("organGestor.nom", "organGestorNom").
+//			exclude("destinataris").
+//			byDefault().
+//			register();
 		
 		mapperFactory.classMap(NotificacioEntity.class, NotificacioDtoV2.class).
 			field("organGestor.codi", "organGestor").
@@ -67,20 +68,22 @@ public class ConversioTipusHelper {
 				byDefault().
 				register();
 
-		mapperFactory.classMap(NotificacioEntity.class, NotificacioTableItemDto.class).
-				field("notificaErrorEvent.data", "notificaErrorData").
-				field("notificaErrorEvent.errorDescripcio", "notificaErrorDescripcio").
-				field("organGestor.codi", "organGestor").
-				field("organGestor.nom", "organGestorNom").
-//				field("entitat.id", "entitatId").
-				field("entitat.nom", "entitatNom").
-				field("procediment.codi", "procedimentCodi").
-				field("procediment.nom", "procedimentNom").
+		mapperFactory.classMap(NotificacioTableEntity.class, NotificacioTableItemDto.class).
 				field("createdBy.nom", "createdByNom").
 				field("createdBy.codi", "createdByCodi").
 				byDefault().
 				register();
-		
+
+		mapperFactory.classMap(EnviamentTableEntity.class, NotEnviamentTableItemDto.class).
+//				field("titularNif", "titular.nif").
+//				field("titularNom", "titular.nom").
+//				field("titularEmail", "titular.email").
+//				field("titularLlinatge1", "titular.llinatge1").
+//				field("titularLlinatge2", "titular.llinatge2").
+//				field("titularRaoSocial", "titular.raoSocial").
+				byDefault().
+				register();
+
 		mapperFactory.classMap(NotificacioEnviamentEntity.class, NotificacioEnviamentDto.class).
 			customize(new NotificacioEnviamentEntitytoMapper()).
 			byDefault().

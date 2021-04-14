@@ -1,31 +1,10 @@
-/**
- * 
- */
+
 package es.caib.notib.core.helper;
 
-import java.io.InputStream;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.ws.soap.SOAPFaultException;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.aspect.UpdateNotificacioTable;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
@@ -35,11 +14,21 @@ import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoEnvios;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Certificacion;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.CodigoDIR;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Datado;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Datados;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.*;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.ws.soap.SOAPFaultException;
+import java.io.InputStream;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * Helper MOCK de prova.
@@ -57,7 +46,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
 	private PluginHelper pluginHelper;
-	
+
+	@UpdateNotificacioTable
 	public NotificacioEntity notificacioEnviar(
 			Long notificacioId) {
 		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
@@ -74,18 +64,16 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			logger.error(
 					errorDescripcio,
 					errorDescripcio);
-			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
-					NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
-					notificacio).
-					error(true).
-					errorDescripcio(errorDescripcio).
+			NotificacioEventEntity event = NotificacioEventEntity.builder()
+					.tipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT)
+					.notificacio(notificacio)
+					.error(true)
+					.errorTipus(NotificacioErrorTipusEnumDto.ERROR_XARXA)
+					.errorDescripcio(errorDescripcio).
 					build();
 			notificacio.updateEventAfegir(event);
 			notificacioEventRepository.save(event);
-			notificacio.updateNotificaError(
-					NotificacioErrorTipusEnumDto.ERROR_XARXA,
-					event);
-		return notificacio;
+			return notificacio;
 		}
 		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
 		try {
@@ -95,7 +83,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
 				logger.info(" >>> ... OK");
 				//Crea un nou event
-				NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
+				NotificacioEventEntity.BuilderOld eventBulider = NotificacioEventEntity.getBuilder(
 						NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
 						notificacio);
 				if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
@@ -114,9 +102,6 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 							logger.info(" >>> Canvi estat a ENVIADA ");
 							eventBulider.enviament(enviament);
 							notificacio.updateEventAfegir(event);
-							notificacio.updateNotificaError(
-									null,
-									null);
 							notificacioEventRepository.save(event);
 						}
 					}
@@ -124,19 +109,17 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			} else {
 				logger.info(" >>> ... ERROR");
 				//Crea un nou event
-				NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
-						notificacio).
-						error(true).
-						errorDescripcio("[" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta());
+				NotificacioEventEntity event = NotificacioEventEntity.builder()
+						.tipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT)
+						.notificacio(notificacio)
+						.error(true)
+						.errorTipus(NotificacioErrorTipusEnumDto.ERROR_REMOT)
+						.errorDescripcio("[" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta())
+						.build();
 				
 				if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-					eventBulider.callbackInicialitza();
-				NotificacioEventEntity event = eventBulider.build();
-				
-				notificacio.updateNotificaError(
-						NotificacioErrorTipusEnumDto.ERROR_REMOT,
-						event);
+					event.callbackInicialitza();
+
 				notificacio.updateEventAfegir(event);
 				notificacioEventRepository.save(event);
 				for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
@@ -153,25 +136,23 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			} else {
 				errorDescripcio = ExceptionUtils.getStackTrace(ex);
 			}
-			NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
-					NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
-					notificacio).
-					error(true).
-					errorDescripcio(errorDescripcio).
-					build();
+			NotificacioEventEntity event = NotificacioEventEntity.builder()
+					.tipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT)
+					.notificacio(notificacio)
+					.error(true)
+					.errorDescripcio(errorDescripcio)
+					.errorTipus(NotificacioErrorTipusEnumDto.ERROR_XARXA)
+					.build();
 			notificacio.updateEventAfegir(event);
 			notificacioEventRepository.save(event);
-			notificacio.updateNotificaError(
-					NotificacioErrorTipusEnumDto.ERROR_XARXA,
-					event);
+
 		}
 		logger.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 //		return NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat());
 		return notificacio;
 	}
 
-	public NotificacioEnviamentEntity enviamentRefrescarEstat(
-			Long enviamentId) throws SistemaExternException {
+	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		logger.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacio().getId());
@@ -179,9 +160,9 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		Date dataUltimDatat = enviament.getNotificaDataCreacio();
 		Date dataUltimaCertificacio = enviament.getNotificaCertificacioData();
 
-		NotificacioEventEntity.Builder eventDatatBuilder  = null;
-		NotificacioEventEntity.Builder eventCertBuilder  = null;
-		
+		NotificacioEventEntity.BuilderOld eventDatatBuilder  = null;
+		NotificacioEventEntity.BuilderOld eventCertBuilder  = null;
+
 		enviament.updateNotificaDataRefrescEstat();
 		
 		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb NotificaV2 (" +

@@ -650,24 +650,24 @@ public class BaseServiceTest {
 //		}
 		for (int i = 0; i < numDestinataris; i++) {
 			NotificacioEnviamentDtoV2 enviament = new NotificacioEnviamentDtoV2();
-			PersonaDto titular = new PersonaDto();
-			titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
-			titular.setNom("titularNom" + i);
-			titular.setLlinatge1("titLlinatge1_" + i);
-			titular.setLlinatge2("titLlinatge2_" + i);
-			titular.setNif("00000000T");
-			titular.setTelefon("666010101");
-			titular.setEmail("titular@gmail.com");
+			PersonaDto titular = PersonaDto.builder()
+					.interessatTipus(InteressatTipusEnumDto.FISICA)
+					.nom("titularNom" + i)
+					.llinatge1("titLlinatge1_" + i)
+					.llinatge2("titLlinatge2_" + i)
+					.nif("00000000T")
+					.telefon("666010101")
+					.email("titular@gmail.com").build();
 			enviament.setTitular(titular);
 			List<PersonaDto> destinataris = new ArrayList<PersonaDto>();
-			PersonaDto destinatari = new PersonaDto();
-			destinatari.setInteressatTipus(InteressatTipusEnumDto.FISICA);
-			destinatari.setNom("destinatariNom" + i);
-			destinatari.setLlinatge1("destLlinatge1_" + i);
-			destinatari.setLlinatge2("destLlinatge2_" + i);
-			destinatari.setNif("12345678Z");
-			destinatari.setTelefon("666020202");
-			destinatari.setEmail("destinatari@gmail.com");
+			PersonaDto destinatari = PersonaDto.builder()
+					.interessatTipus(InteressatTipusEnumDto.FISICA)
+					.nom("destinatariNom" + i)
+					.llinatge1("destLlinatge1_" + i)
+					.llinatge2("destLlinatge2_" + i)
+					.nif("12345678Z")
+					.telefon("666020202")
+					.email("destinatari@gmail.com").build();
 			destinataris.add(destinatari);
 			enviament.setDestinataris(destinataris);
 //			if (ambEnviamentPostal) {

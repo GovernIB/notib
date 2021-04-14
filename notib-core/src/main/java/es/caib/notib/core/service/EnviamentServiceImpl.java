@@ -89,6 +89,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
+	private EnviamentTableRepository enviamentTableRepository;
+	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
 	@Autowired
 	private UsuariRepository usuariRepository;
@@ -453,7 +455,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}else{
 				tipusEnviament = 0;
 			}
-			Page<NotEnviamentTableItemDto> pageEnviaments = null;
+			Page<EnviamentTableEntity> pageEnviaments = null;
 			
 			logger.info("Consulta de taula d'enviaments ...");
 
@@ -478,7 +480,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 
 			if (isUsuari) { // && !procedimentsCodisNotib.isEmpty()) {
-				pageEnviaments = notificacioEnviamentRepository.findByNotificacio(
+				pageEnviaments = enviamentTableRepository.find4UserRole(
 						filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 						filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
 						filtre.getGrup() == null || filtre.getGrup().isEmpty(),
@@ -544,7 +546,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						pageable);
 			} else if (isAdminOrgan) { // && !procedimentsCodisNotib.isEmpty()) {
 				List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatEntity.getDir3Codi(), organGestorCodi);
-				pageEnviaments = notificacioEnviamentRepository.findByNotificacio(
+				pageEnviaments = enviamentTableRepository.find4OrganAdminRole(
 						filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 						filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
 						filtre.getGrup() == null || filtre.getGrup().isEmpty(),
@@ -626,7 +628,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				logger.info("--------------");
 				logger.info("--------------");
 				long ti = System.nanoTime();
-				pageEnviaments = notificacioEnviamentRepository.findByNotificacio(
+				pageEnviaments = enviamentTableRepository.find4EntitatAdminRole(
 						isNullProcediment,
 						filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
 						isNullGrup,
@@ -688,32 +690,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 				logger.info(String.format("Time spent: %f ms", (System.nanoTime() - ti) / 1e6));
 			}
 			if(pageEnviaments == null || !pageEnviaments.hasContent()) {
-				pageEnviaments = new PageImpl<>(new ArrayList<NotEnviamentTableItemDto>());
+				pageEnviaments = new PageImpl<>(new ArrayList<EnviamentTableEntity>());
 			}
 
-			PaginaDto<NotEnviamentTableItemDto> paginaDto = paginacioHelper.toPaginaDto(pageEnviaments);
-
-			// TODO: això ho podriem afefir a la consulta amb un CASE isLlibreEntitat THEN llibreEntitat ELSE llibreCamp
+			PaginaDto<NotEnviamentTableItemDto> paginaDto = paginacioHelper.toPaginaDto(pageEnviaments, NotEnviamentTableItemDto.class);
 			if (entitat.isLlibreEntitat()) {
 				for (NotEnviamentTableItemDto tableItem : paginaDto.getContingut()) {
 						tableItem.setLlibre(entitatEntity.getLlibre());
 				}
-			}
-
-			for (NotEnviamentTableItemDto tableItem : paginaDto.getContingut()) {
-				List<PersonaEntity> destinataris = personaRepository.findByEnviamentId(tableItem.getId());
-				List<NotEnviamentTableItemDto.DestinatariDto> destinatarisDto = new ArrayList<>();
-				for (PersonaEntity destinatari : destinataris) {
-					destinatarisDto.add(new NotEnviamentTableItemDto.DestinatariDto(
-							destinatari.getNif(),
-							destinatari.getNom(),
-							destinatari.getEmail(),
-							destinatari.getLlinatge1(),
-							destinatari.getLlinatge2(),
-							destinatari.getRaoSocial()
-					));
-				}
-				tableItem.setDestinataris(destinatarisDto);
 			}
 
 			return paginaDto;
@@ -1198,7 +1182,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			for (Long enviamentId: enviaments) {
-				auditEnviamentHelper.reiniciaConsultaNotifica(notificacioEnviamentRepository.findById(enviamentId));
+				auditEnviamentHelper.resetConsultaNotifica(notificacioEnviamentRepository.findById(enviamentId));
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1211,7 +1195,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			for (Long enviamentId: enviaments) {
-				auditEnviamentHelper.reiniciaConsultaSir(notificacioEnviamentRepository.findById(enviamentId));
+				auditEnviamentHelper.resetConsultaSir(notificacioEnviamentRepository.findById(enviamentId));
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);

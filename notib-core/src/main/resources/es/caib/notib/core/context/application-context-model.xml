@@ -53,6 +53,8 @@
 	<context:component-scan base-package="es.caib.notib.core.helper" />
 	<context:component-scan base-package="es.caib.notib.core.cacheable" />
 	<context:component-scan base-package="es.caib.notib.core.aspect" />
+	<context:component-scan base-package="es.caib.notib.core.test" />
+
 	<jpa:repositories base-package="es.caib.notib.core.repository" />
 
 	<jpa:auditing auditor-aware-ref="auditorAwareBean" />

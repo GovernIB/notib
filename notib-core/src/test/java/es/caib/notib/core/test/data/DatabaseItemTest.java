@@ -69,6 +69,10 @@ public abstract class DatabaseItemTest<T> {
         }
     }
 
+    public void setAsDeleted(String key) {
+        this.createdObjects.put(key, false);
+    }
+
     public T create(T element) throws Exception {
         return create(element, null);
     }
