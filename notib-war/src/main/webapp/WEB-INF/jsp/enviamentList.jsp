@@ -151,7 +151,7 @@ $(document).ready(function() {
     
     $('.data').datepicker({
 		orientation: "bottom",
-		format: 'dd/mm/yyyy',
+		dateFormat: 'dd/mm/yy',
 		weekStart: 1,
 		todayHighlight: true,
 		language: "${requestLocale}"
@@ -383,7 +383,7 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="createdDate" data-converter="datetime" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dataenviament"/>
+				<th data-col-name="createdDate" data-converter="date" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dataenviament"/>
 					<script id="dataTemplate" type="text/x-jsrender">
 						<div class="from-group">
 							<div class="input-group vdivide">
