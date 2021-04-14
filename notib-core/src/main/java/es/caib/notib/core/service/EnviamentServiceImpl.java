@@ -721,62 +721,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 		return data;
 	}
 	
-//	private void campsOrdre(PaginacioParamsDto paginacioParams) {
-//		PaginacioParamsDto paginacioParamsNou = paginacioParams;
-//
-//		OrdreDto ordreAntic = paginacioParams.getOrdres().get(0);
-//		OrdreDto ordrenNou = null;
-//
-//		switch (ordreAntic.getCamp()) {
-//		case "procedimentCodiNotib":
-//			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.procedimentCodiNotib", ordreAntic.getDireccio());
-//			break;
-//		case "enviamentDataProgramada":
-//			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.enviamentDataProgramada", ordreAntic.getDireccio());
-//			break;
-//		case "grupCodi":
-//			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.grupCodi", ordreAntic.getDireccio());
-//			break;
-//		case "emisorDir3Codi":
-//			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.emisorDir3Codi", ordreAntic.getDireccio());
-//			break;
-//		case "usuariCodi":
-//			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.usuariCodi", ordreAntic.getDireccio());
-//			break;
-//		case "enviamentTipus":
-//			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.enviamentTipus", ordreAntic.getDireccio());
-//			break;
-//		case "concepte":
-//			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.concepte", ordreAntic.getDireccio());
-//			break;
-//		case "descripcio":
-//			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.descripcio", ordreAntic.getDireccio());
-//			break;
-//		case "llibre":
-//			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.llibre", ordreAntic.getDireccio());
-//			break;
-//		case "registreNumero":
-//			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.registreNumero", ordreAntic.getDireccio());
-//			break;
-//		case "estat":
-//			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.estat", ordreAntic.getDireccio());
-//			break;
-//		case "comunicacioTipus":
-//			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.comunicacioTipus", ordreAntic.getDireccio());
-//			break;
-//		case "titularNomLlinatge":
-//			ordrenNou = paginacioParamsNou.new OrdreDto("titular.nom", ordreAntic.getDireccio());
-//			break;
-//		case "destinatarisNomLlinatges":
-//			ordrenNou = paginacioParamsNou.new OrdreDto("destinataris.get(0).llinatge1", ordreAntic.getDireccio());
-//			break;
-//		default:
-//			ordrenNou = paginacioParamsNou.new OrdreDto(ordreAntic.getCamp(), ordreAntic.getDireccio());;
-//			break;
-//		}
-//		paginacioParams.getOrdres().set(0, ordrenNou);
-//	}
-	
 	@Transactional(readOnly = true)
 	@Override
 	public FitxerDto exportacio(
