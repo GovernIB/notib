@@ -184,4 +184,9 @@ public class EnviamentServiceBean implements EnviamentService {
 				pagina, 
 				mida);
 	}
+
+	@Override
+	public void actualitzarEstat(Long enviamentId) {
+		delegate.actualitzarEstat(enviamentId);
+	}
 }

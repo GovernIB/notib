@@ -10,7 +10,7 @@ import java.util.Date;
 
 /**
  * Informació d'un destinatari d'una anotació.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter

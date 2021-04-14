@@ -1518,10 +1518,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Transactional
 	@Override
-	public void enviamentRefrescarEstat(Long notificacioId) {
+	public void enviamentRefrescarEstat(Long enviamentId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			notificaHelper.enviamentRefrescarEstat(notificacioId);
+			notificaHelper.enviamentRefrescarEstat(enviamentId);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1545,16 +1545,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Transactional
 	@Override
-	public void enviamentRefrescarEstatRegistre(Long notificacioId) {
+	public void enviamentRefrescarEstatRegistre(Long enviamentId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			registreHelper.enviamentRefrescarEstatRegistre(
-					notificacioId);
+			registreHelper.enviamentRefrescarEstatRegistre(enviamentId);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<NotificacioDto> findNotificacionsAmbErrorRegistre(

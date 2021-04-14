@@ -8,6 +8,7 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.rest.consulta.*;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EnviamentService;
+import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.*;
@@ -74,6 +75,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private AuditEnviamentHelper auditEnviamentHelper;
 	@Autowired
 	private PersonaRepository personaRepository;
+	@Autowired
+	private NotificacioService notificacioService;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -695,7 +698,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 		return data;
 	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public FitxerDto exportacio(
@@ -1359,7 +1362,23 @@ public class EnviamentServiceImpl implements EnviamentService {
 		persona.setEmail(dto.getEmail());
 		return persona;
 	}
-	
+
+	@Transactional
+	@Override
+	public void actualitzarEstat(Long enviamentId) {
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+		auditEnviamentHelper.reiniciaConsultaNotifica(enviament);
+		auditEnviamentHelper.reiniciaConsultaSir(enviament);
+
+		// si l'enviament esta pendent de refrescar estat a notifica
+		if (enviament.isPendentRefrescarEstatNotifica())
+			notificacioService.enviamentRefrescarEstat(enviamentId);
+
+		// si l'enviament esta pendent de refrescar l'estat enviat SIR
+		if (enviament.isPendentRefrescarEstatRegistre())
+			notificacioService.enviamentRefrescarEstatRegistre(enviamentId);
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(EnviamentServiceImpl.class);
 
 }

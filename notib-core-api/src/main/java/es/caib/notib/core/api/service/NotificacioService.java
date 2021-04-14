@@ -320,7 +320,7 @@ public interface NotificacioService {
 	void notificacioRegistrar(Long notificacioId) throws RegistreNotificaException;
 	void notificacioEnviar(Long notificacioId);
 	void enviamentRefrescarEstat(Long notificacioId);
-	void enviamentRefrescarEstatRegistre(Long notificacioId);
+	void enviamentRefrescarEstatRegistre(Long enviamentId);
 
 	@SuppressWarnings("rawtypes")
 	List getNotificacionsPendentsRegistrar();
