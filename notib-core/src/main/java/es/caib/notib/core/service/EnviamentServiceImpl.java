@@ -1367,8 +1367,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Override
 	public void actualitzarEstat(Long enviamentId) {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
-		auditEnviamentHelper.reiniciaConsultaNotifica(enviament);
-		auditEnviamentHelper.reiniciaConsultaSir(enviament);
+		auditEnviamentHelper.resetConsultaNotifica(enviament);
+		auditEnviamentHelper.resetConsultaSir(enviament);
 
 		// si l'enviament esta pendent de refrescar estat a notifica
 		if (enviament.isPendentRefrescarEstatNotifica())
