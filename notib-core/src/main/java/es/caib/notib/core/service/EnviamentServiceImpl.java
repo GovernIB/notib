@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
@@ -8,38 +5,12 @@ import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.api.rest.consulta.Document;
-import es.caib.notib.core.api.rest.consulta.Estat;
-import es.caib.notib.core.api.rest.consulta.Persona;
-import es.caib.notib.core.api.rest.consulta.PersonaTipus;
-import es.caib.notib.core.api.rest.consulta.Resposta;
-import es.caib.notib.core.api.rest.consulta.SubEstat;
-import es.caib.notib.core.api.rest.consulta.Transmissio;
+import es.caib.notib.core.api.rest.consulta.*;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EnviamentService;
-import es.caib.notib.core.entity.ColumnesEntity;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.entity.PersonaEntity;
-import es.caib.notib.core.entity.UsuariEntity;
-import es.caib.notib.core.helper.AuditEnviamentHelper;
-import es.caib.notib.core.helper.CallbackHelper;
-import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.EntityComprovarHelper;
-import es.caib.notib.core.helper.MessageHelper;
-import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.OrganigramaHelper;
-import es.caib.notib.core.helper.PaginacioHelper;
-import es.caib.notib.core.helper.PluginHelper;
-import es.caib.notib.core.repository.ColumnesRepository;
-import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.repository.NotificacioEventRepository;
-import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.PersonaRepository;
-import es.caib.notib.core.repository.UsuariRepository;
+import es.caib.notib.core.entity.*;
+import es.caib.notib.core.helper.*;
+import es.caib.notib.core.repository.*;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,14 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Implementació del servei de gestió de enviaments.
