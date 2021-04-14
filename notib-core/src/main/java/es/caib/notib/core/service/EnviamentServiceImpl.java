@@ -1382,6 +1382,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		return persona;
 	}
 
+	@Transactional
 	@Override
 	public void actualitzarEstat(Long enviamentId) {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);

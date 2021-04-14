@@ -493,6 +493,48 @@ public class EnviamentController extends BaseUserController {
 		}
 		return resposta;
 	}
+	@RequestMapping(value = "/actualitzarestat", method = RequestMethod.GET)
+	@ResponseBody
+	public String actualitzarEstat(
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		String resposta = "";
+		if (seleccio == null || seleccio.isEmpty()) {
+			MissatgesHelper.error(
+					request,
+					getMessage(
+							request,
+							"enviament.controller.actualitzarestat.buida"));
+			resposta = "error";
+		} else {
+			boolean hasErrors = false;
+			for(Long enviamentId : seleccio) {
+				try {
+					enviamentService.actualitzarEstat(enviamentId);
+				} catch (Exception e) {
+					hasErrors = true;
+					MissatgesHelper.error(
+							request,
+							getMessage(
+									request,
+									"enviament.controller.actualitzarestat.KO") + " [" + enviamentId + "]");
+				}
+			}
+			if (!hasErrors) {
+				MissatgesHelper.info(
+						request,
+						getMessage(
+								request,
+								"enviament.controller.actualitzarestat.OK"));
+				resposta = "ok";
+			}
+		}
+		return resposta;
+	}
 
 	@RequestMapping(value = "/visualitzar", method = RequestMethod.GET)
 	public String visualitzar(

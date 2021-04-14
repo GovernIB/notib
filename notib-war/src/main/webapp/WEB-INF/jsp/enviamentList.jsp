@@ -231,8 +231,19 @@ $(document).ready(function() {
 			}
 			return false;
 		});
+		$('#updateEstat').on('click', function() {
+			if(confirm("<spring:message code="enviament.list.user.actualitzar.estat.misatge.avis"/>")){
+				$.get(
+						"enviament/actualitzarestat",
+						function(data) {
+							location.reload();
+						}
+				);
+			}
+			return false;
+		});
 	});
-	
+
 	$("#enviament th").last().empty();
 	$("#enviament th").last().css("padding", 0);
 
@@ -328,6 +339,7 @@ function getCookie(cname) {
 						<li><a style="cursor: pointer;" id="reintentarNotificacio"><spring:message code="enviament.list.user.reintentar.notificacio"/></a></li>
 						<li><a style="cursor: pointer;" id="reactivarConsulta"><spring:message code="enviament.list.user.reactivar.consulta"/></a></li>
 						<li><a style="cursor: pointer;" id="reactivarSir"><spring:message code="enviament.list.user.reactivar.sir"/></a></li>
+						<li><a style="cursor: pointer;" id="updateEstat"><spring:message code="enviament.list.user.actualitzar.estat"/></a></li>
 					</ul>
 				</div>
 			</div>
