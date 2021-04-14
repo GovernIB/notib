@@ -1,13 +1,13 @@
 package es.caib.notib.core.api.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.io.Serializable;
 
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter @Setter
 public class PersonaDto implements Serializable{
 

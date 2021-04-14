@@ -552,7 +552,7 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="destinatarisNomLlinatges" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.destinataris"/>
+				<th data-col-name="destinataris" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.destinataris"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="destinataris" value="${filtreEnviaments.destinataris}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.destinataris"/>"/>

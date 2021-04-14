@@ -643,18 +643,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}
 
 			PaginaDto<NotEnviamentTableItemDto> paginaDto = paginacioHelper.toPaginaDto(pageEnviaments, NotEnviamentTableItemDto.class);
-
-			for (NotEnviamentTableItemDto tableItem : paginaDto.getContingut()) {
-				if (tableItem.getDestinataris() == null || tableItem.getDestinataris().isEmpty()) {
-					List<PersonaEntity> destinataris = personaRepository.findByEnviamentId(tableItem.getId());
-					StringBuilder destinatarisString = new StringBuilder();
-					for (PersonaEntity destinatari : destinataris) {
-						destinatarisString.append(destinatari.asDto().getNomFormatted());
-					}
-					tableItem.setDestinataris(destinatarisString.toString());
-				}
-				if (entitat.isLlibreEntitat()) {
-					tableItem.setLlibre(entitatEntity.getLlibre());
+			if (entitat.isLlibreEntitat()) {
+				for (NotEnviamentTableItemDto tableItem : paginaDto.getContingut()) {
+						tableItem.setLlibre(entitatEntity.getLlibre());
 				}
 			}
 

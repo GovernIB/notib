@@ -9,7 +9,7 @@ CREATE TABLE NOT_NOTIFICACIO_TABLE
     PROCEDIMENT_ORGAN_ID        NUMBER(19,0),
     GRUP_CODI                   VARCHAR2(64 CHAR),
 
-    USUARI_CODI                 VARCHAR2(64 CHAR) NOT NULL ENABLE,
+    USUARI_CODI                 VARCHAR2(64 CHAR),
     TIPUS_USUARI				NUMBER(10),
 
     ERROR_LAST_CALLBACK         NUMBER(1) DEFAULT 0 NOT NULL,
@@ -67,7 +67,7 @@ INSERT INTO NOT_NOTIFICACIO_TABLE
      CREATEDDATE, CREATEDBY_CODI,  LASTMODIFIEDBY_CODI, LASTMODIFIEDDATE)
     SELECT n.ID,
            n.ENTITAT_ID, entitat.NOM,
-           n.PROC_CODI_NOTIB, n.PROC_CODI_NOTIB, n.GRUP_CODI,
+           n.PROC_CODI_NOTIB, n.PROCEDIMENT_ORGAN_ID, n.GRUP_CODI,
 
            n.USUARI_CODI, n.TIPUS_USUARI,
            n.CALLBACK_ERROR,
@@ -95,11 +95,6 @@ ALTER TABLE NOT_NOTIFICACIO_EVENT
     ADD NOTIFICA_ERROR_TIPUS NUMBER(10, 0);
 
 
-GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_NOTIFICACIO_TABLE TO WWW_NOTIB;
-
-
-DROP TABLE NOT_NOTIFICACIO_TABLE;
-
 CREATE TABLE NOT_NOTIFICACIO_ENV_TABLE
 (
     ID                   		NUMBER(19)			NOT NULL,
@@ -123,7 +118,7 @@ CREATE TABLE NOT_NOTIFICACIO_ENV_TABLE
     PROCEDIMENT_CODI_NOTIB      VARCHAR2(9 BYTE),
     GRUP_CODI                   VARCHAR2(64 CHAR),
     EMISOR_DIR3                 VARCHAR2(9 CHAR),
-    USUARI_CODI                 VARCHAR2(64 CHAR) NOT NULL,
+    USUARI_CODI                 VARCHAR2(64 CHAR),
     NOT_ORGAN_CODI			    VARCHAR2(64 BYTE),
 
     CONCEPTE             		VARCHAR2(240 CHAR),
@@ -197,7 +192,19 @@ INSERT INTO NOT_NOTIFICACIO_ENV_TABLE
     LASTMODIFIEDDATE
 )
 SELECT env.ID, n.id, n.ENTITAT_ID,
-       '', -- TODO
+       (select
+            listagg(
+                        CASE WHEN dest.nif is null THEN '' ELSE concat(dest.nif, ' - ') END ||
+                        CASE WHEN dest.llinatge1 is null AND dest.llinatge2 is null THEN
+                                     '[' || dest.nom || ']'
+                             ELSE
+                                     '[' || dest.llinatge1 || CASE WHEN dest.llinatge2 is null THEN '' ELSE concat(' ', dest.llinatge2) END || ', ' || dest.nom || ']'
+                            END
+                , '<br> ')
+                        within group ( order by dest.nom )
+        from
+            not_persona dest
+        WHERE dest.notificacio_env_id = env.id),
        N.ENV_TIPUS,
 
        titular.NIF, titular.nom, titular.EMAIL, titular.LLINATGE1, titular.LLINATGE2, titular.RAO_SOCIAL,
@@ -222,4 +229,4 @@ FROM
 
 COMMIT;
 
-DROP TABLE NOT_NOTIFICACIO_ENV_TABLE;
+GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_NOTIFICACIO_TABLE TO WWW_NOTIB;

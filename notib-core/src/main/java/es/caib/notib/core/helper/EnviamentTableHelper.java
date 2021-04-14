@@ -122,7 +122,7 @@ public class EnviamentTableHelper {
         List<PersonaEntity> destinataris = enviament.getDestinataris();
         StringBuilder destinatarisNomLlinatges = new StringBuilder();
         for(PersonaEntity destinatari: destinataris) {
-            destinatarisNomLlinatges.append(destinatari.asDto().getNomFormatted()).append("</br>");
+            destinatarisNomLlinatges.append(destinatari.asDto().getNomFormatted()).append("<br>");
         }
         return destinatarisNomLlinatges.toString();
     }
