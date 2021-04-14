@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * Informació d'un destinatari d'una anotació.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter
@@ -80,11 +80,14 @@ public class NotEnviamentTableItemDto implements Serializable {
 	) {
 		this.id = (Long) id;
 		this.createdDate = (Date) createdDate;
-		this.titular = new DestinatariDto((String) titularNif,(String)  titularNom,
+		this.titular = new DestinatariDto(
+				(String) titularNif,
+				(String)  titularNom,
 				(String) titularEmail,
 				(String) titularLlinatge1,
 				(String) titularLlinatge2,
 				(String) titularRaoSocial);
+
 		this.enviamentDataProgramada = (Date) enviamentDataProgramada;
 		this.procedimentCodiNotib = (String) procedimentCodiNotib;
 		this.grupCodi = (String) grupCodi;
@@ -113,18 +116,22 @@ public class NotEnviamentTableItemDto implements Serializable {
 	public String getDestinatarisNomLlinatges() {
 		StringBuilder destinatarisNomLlinatges = new StringBuilder();
 		for(DestinatariDto destinatari: destinataris) {
-			destinatarisNomLlinatges.append(destinatari.concatenarNomLlinatges()).append("</br>");
+			destinatarisNomLlinatges.append(destinatari.concatenarNifNomLlinatges()).append("</br>");
 		}
 		return destinatarisNomLlinatges.toString();
 	}
 
+	public String getTitularNifNomLlinatge() {
+		return titular.concatenarNifNomLlinatges();
+	}
 	public String getTitularNomLlinatge() {
 		return titular.concatenarNomLlinatges();
 	}
-
 	public String getTitularLlinatges() {
 		return titular.concatenarLlinatges();
 	}
+	public String getTitularNif() { return titular.nif; }
+	public String getTitularEmail() { return titular.email; }
 
 	@AllArgsConstructor
 	public static class DestinatariDto {
@@ -150,6 +157,23 @@ public class NotEnviamentTableItemDto implements Serializable {
 		}
 
 		private String concatenarNomLlinatges() {
+			StringBuilder sb = new StringBuilder();
+			String llinatges = concatenarLlinatges();
+			if (llinatges != null && !llinatges.isEmpty()) {
+				sb.append(llinatges);
+			}
+
+			if (nom != null && !nom.isEmpty()) {
+				if (llinatges != null && !llinatges.isEmpty())
+					sb.append(", ");
+				sb.append(nom);
+			} else if (raoSocial != null && !raoSocial.isEmpty()) {
+				sb.append(raoSocial);
+			}
+			return sb.toString();
+		}
+
+		private String concatenarNifNomLlinatges() {
 			StringBuilder sb = new StringBuilder();
 			String llinatges = concatenarLlinatges();
 			if (nif != null) {

@@ -5,7 +5,6 @@ package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -425,10 +424,29 @@ public class EnviamentServiceImpl implements EnviamentService {
 				tipusEnviament = 0;
 			}
 			Page<NotEnviamentTableItemDto> pageEnviaments = null;
-			
-			campsOrdre(paginacioParams);
+
 			logger.info("Consulta de taula d'enviaments ...");
-			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
+			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
+			mapeigPropietatsOrdenacio.put("enviamentDataProgramada", new String[] {"n.enviamentDataProgramada"});
+			mapeigPropietatsOrdenacio.put("notificaIdentificador", new String[] {"nenv.notificaIdentificador"});
+			mapeigPropietatsOrdenacio.put("procedimentCodiNotib", new String[] {"n.procedimentCodiNotib"});
+			mapeigPropietatsOrdenacio.put("grupCodi", new String[] {"n.grupCodi"});
+			mapeigPropietatsOrdenacio.put("emisorDir3Codi", new String[] {"n.emisorDir3Codi"});
+			mapeigPropietatsOrdenacio.put("usuariCodi", new String[] {"n.usuariCodi"});
+			mapeigPropietatsOrdenacio.put("concepte", new String[] {"n.concepte"});
+			mapeigPropietatsOrdenacio.put("descripcio", new String[] {"n.descripcio"});
+			mapeigPropietatsOrdenacio.put("titularNif", new String[] {"t.nif"});
+			mapeigPropietatsOrdenacio.put("titularNomLlinatge", new String[] {"concat(t.llinatge1, t.llinatge2, t.nom)"});
+			mapeigPropietatsOrdenacio.put("titularEmail", new String[] {"t.email"});
+//			mapeigPropietatsOrdenacio.put("destinatarisNomLlinatges", new String[] {"createdBy"});
+			mapeigPropietatsOrdenacio.put("llibre", new String[] {"n.registreLlibreNom"});
+			mapeigPropietatsOrdenacio.put("registreNumero", new String[] {"n.registreNumero"});
+			mapeigPropietatsOrdenacio.put("notificaDataCaducitat", new String[] {"nenv.notificaDataCaducitat"});
+			mapeigPropietatsOrdenacio.put("notificaCertificacioNumSeguiment", new String[] {"nenv.notificaCertificacioNumSeguiment"});
+			mapeigPropietatsOrdenacio.put("csvUuid", new String[] {"concat(d.uuid, d.csv)"});
+			mapeigPropietatsOrdenacio.put("estat", new String[] {"n.estat"});
+			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
+
 			if (isUsuari) { // && !procedimentsCodisNotib.isEmpty()) {
 				pageEnviaments = notificacioEnviamentRepository.findByNotificacio(
 						filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
@@ -699,63 +717,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 		return data;
 	}
-	
-	private void campsOrdre(PaginacioParamsDto paginacioParams) {
-		PaginacioParamsDto paginacioParamsNou = paginacioParams;
-		
-		OrdreDto ordreAntic = paginacioParams.getOrdres().get(0);
-		OrdreDto ordrenNou = null;
-		
-		switch (ordreAntic.getCamp()) {
-		case "procedimentCodiNotib":
-			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.procedimentCodiNotib", ordreAntic.getDireccio());
-			break;
-		case "enviamentDataProgramada":
-			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.enviamentDataProgramada", ordreAntic.getDireccio());
-			break;
-		case "grupCodi":
-			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.grupCodi", ordreAntic.getDireccio());
-			break;
-		case "emisorDir3Codi":
-			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.emisorDir3Codi", ordreAntic.getDireccio());
-			break;
-		case "usuariCodi":
-			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.usuariCodi", ordreAntic.getDireccio());
-			break;
-		case "enviamentTipus":
-			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.enviamentTipus", ordreAntic.getDireccio());
-			break;
-		case "concepte":
-			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.concepte", ordreAntic.getDireccio());
-			break;
-		case "descripcio":
-			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.descripcio", ordreAntic.getDireccio());
-			break;
-		case "llibre":
-			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.llibre", ordreAntic.getDireccio());
-			break;
-		case "registreNumero":
-			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.registreNumero", ordreAntic.getDireccio());
-			break;
-		case "estat":
-			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.estat", ordreAntic.getDireccio());
-			break;
-		case "comunicacioTipus":
-			ordrenNou = paginacioParamsNou.new OrdreDto("notificacio.comunicacioTipus", ordreAntic.getDireccio());
-			break;
-		case "titularNomLlinatge":
-			ordrenNou = paginacioParamsNou.new OrdreDto("titular.nom", ordreAntic.getDireccio());
-			break;
-		case "destinatarisNomLlinatges":
-			ordrenNou = paginacioParamsNou.new OrdreDto("destinataris.get(0).llinatge1", ordreAntic.getDireccio());
-			break;
-		default:
-			ordrenNou = paginacioParamsNou.new OrdreDto(ordreAntic.getCamp(), ordreAntic.getDireccio());;
-			break;
-		}
-		paginacioParams.getOrdres().set(0, ordrenNou);
-	}
-	
+
 	@Transactional(readOnly = true)
 	@Override
 	public FitxerDto exportacio(
