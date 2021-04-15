@@ -167,7 +167,7 @@ $(document).ready(function() {
 		);
 	});
 	
-	$('#enviament').on('draw.dt', function () {
+	$('#enviament').on('init.dt', function () {
 		$('#seleccioAll').on('click', function() {
 			$.get(
 					"enviament/select",
