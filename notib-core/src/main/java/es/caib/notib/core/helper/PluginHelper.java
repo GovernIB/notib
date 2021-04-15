@@ -154,8 +154,8 @@ public class PluginHelper {
 		return resposta;
 	}
 
-	private Set<String> blockedObtenirJustificant = null;
-	private void initObtenirJustificant(){
+	private static Set<String> blockedObtenirJustificant = null;
+	private static void initObtenirJustificant(){
 		blockedObtenirJustificant = new HashSet<>();
 		final ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
 		Runnable clearBlockedRunnable = new Runnable() {
@@ -165,11 +165,24 @@ public class PluginHelper {
 			}
 		};
 
-		exec.scheduleAtFixedRate(clearBlockedRunnable , 0, getSegonsEntreReintentRegistreProperty(),
+		exec.scheduleAtFixedRate(
+				clearBlockedRunnable ,
+				getSegonsEntreReintentRegistreProperty(),
+				getSegonsEntreReintentRegistreProperty(),
 				TimeUnit.SECONDS);
 
 	}
 
+	/**
+	 * Recupera el justificant.
+	 * L'execució del mètode està controlat per la property "es.caib.notib.plugin.registre.segons.entre.peticions"
+	 * que impedeix que es facin peticions consecutives amb intervals de temps inferiors al temps expecificat en segons.
+	 *
+	 * @param codiDir3Entitat	codi DIR3 de l'entitat
+	 * @param numeroRegistreFormatat	número de l'assentament que es vol recuperar
+	 * @return
+	 * 		Retorna un objecte amb la resposta del regweb (data, numero i numero formatejat)
+	 */
 	public RespostaJustificantRecepcio obtenirJustificant(
 			String codiDir3Entitat, 
 			String numeroRegistreFormatat) {
@@ -2555,7 +2568,7 @@ public class PluginHelper {
 	public int getConsultaSirReintentsPeriodeProperty() {
 		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode");
 	}
-	public int getSegonsEntreReintentRegistreProperty() {
+	public static int getSegonsEntreReintentRegistreProperty() {
 		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.plugin.registre.segons.entre.peticions", 30);
 	}
 	public int getRegistreReintentsMaxProperty() {
