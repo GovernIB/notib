@@ -407,7 +407,7 @@ public interface NotificacioService {
 	 * 
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public void enviamentsRefrescarEstat();
+	void enviamentsRefrescarEstat();
 	
 	/**
 	 * Recupera l'estat actual del progrés

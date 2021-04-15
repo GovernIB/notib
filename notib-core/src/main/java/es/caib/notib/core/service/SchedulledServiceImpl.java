@@ -3,23 +3,7 @@
  */
 package es.caib.notib.core.service;
 
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
 import com.codahale.metrics.Timer;
-
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.EntitatService;
@@ -32,6 +16,20 @@ import es.caib.notib.core.helper.CreacioSemaforDto;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -193,6 +191,20 @@ public class SchedulledServiceImpl implements SchedulledService {
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}	
+	}
+
+	// Refrescar notificacions expirades
+	/////////////////////////////////////////////////////////////////////////
+	@Override
+	@Scheduled(cron = "${config:es.caib.notib.refrescar.notificacions.expirades.cron}")
+	public void refrescarNotificacionsExpirades() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.info("[NOT] Refrescant notificacions expirades");
+			notificacioService.enviamentsRefrescarEstat();
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
 	}
 	
 	private void addAdminAuthentication() {
